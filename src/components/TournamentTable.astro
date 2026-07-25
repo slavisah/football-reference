@@ -1,0 +1,353 @@
+---
+import type { Edition, MarkdownTable } from '../lib/types';
+
+interface Props {
+  /** Unique id prefix so multiple tables can coexist on a page. */
+  id: string;
+  caption: string;
+  table: MarkdownTable;
+  editions: Edition[];
+  winners: string[];
+}
+
+const { id, caption, table, editions, winners } = Astro.props;
+
+// Years for the filter, newest first.
+const years = [...editions]
+  .sort((a, b) => b.yearSort - a.yearSort)
+  .map((edition) => edition.year);
+
+// Which column holds the champion, so we can visually mark it.
+const winnerColIndex = table.headers.findIndex((header) =>
+  /winner|champion/i.test(header),
+);
+---
+
+<section class="filters-and-table" aria-labelledby={`${id}-heading`}>
+  <h2 id={`${id}-heading`} class="visually-hidden">{caption}</h2>
+
+  <form
+    class="filters no-print"
+    id={`${id}-filters`}
+    role="search"
+    aria-label={`Filter ${caption}`}
+  >
+    <div class="filters__field">
+      <label for={`${id}-winner`}>Winner</label>
+      <select id={`${id}-winner`} name="winner">
+        <option value="">All winners</option>
+        {winners.map((winner) => <option value={winner}>{winner}</option>)}
+      </select>
+    </div>
+
+    <div class="filters__field">
+      <label for={`${id}-year`}>Year</label>
+      <select id={`${id}-year`} name="year">
+        <option value="">All years</option>
+        {years.map((year) => <option value={year}>{year}</option>)}
+      </select>
+    </div>
+
+    <button type="button" class="filters__reset" id={`${id}-reset`}>
+      Reset
+    </button>
+
+    <p class="filters__status" id={`${id}-status`} role="status" aria-live="polite">
+      Showing all {editions.length} editions.
+    </p>
+  </form>
+
+  <div class="t-wrap">
+    <table class="t-table" id={`${id}-table`}>
+      <caption>{caption}</caption>
+      <thead>
+        <tr>
+          {table.headers.map((header) => <th scope="col">{header}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {
+          editions.map((edition) => (
+            <tr data-winner={edition.winner} data-year={edition.year}>
+              {edition.cells.map((cell, index) => (
+                <td
+                  data-label={cell.label}
+                  class={index === winnerColIndex ? 'is-winner' : undefined}
+                >
+                  {cell.value}
+                </td>
+              ))}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p class="t-empty" id={`${id}-empty`} hidden>
+    No editions match those filters. <button type="button" id={`${id}-empty-reset`} class="linkish">Clear filters</button>
+  </p>
+</section>
+
+<style>
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 0.75rem 1rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .filters__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 9rem;
+    flex: 1 1 9rem;
+  }
+
+  .filters__field label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .filters select {
+    font: inherit;
+    padding: 0.5rem 0.6rem;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: 100%;
+  }
+
+  .filters__reset {
+    font: inherit;
+    padding: 0.55rem 0.9rem;
+    color: var(--text);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+
+  .filters__reset:hover {
+    border-color: var(--accent);
+  }
+
+  .filters__status {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .t-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+  }
+
+  .t-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .t-table caption {
+    text-align: left;
+    padding: 0.75rem 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .t-table th,
+  .t-table td {
+    padding: 0.55rem 0.7rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .t-table thead th {
+    position: sticky;
+    top: 0;
+    background: var(--bg-subtle);
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  .t-table tbody tr:hover {
+    background: color-mix(in srgb, var(--accent) 7%, transparent);
+  }
+
+  .t-table td.is-winner {
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .t-empty {
+    padding: 1rem;
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  .linkish {
+    font: inherit;
+    color: var(--accent);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  /* --- Mobile: stack each row into a labelled card, no horizontal scroll --- */
+  @media (max-width: 40rem) {
+    .t-wrap {
+      overflow-x: visible;
+    }
+
+    .t-table {
+      border: none;
+      background: transparent;
+    }
+
+    .t-table caption {
+      border: none;
+      padding-inline: 0.1rem;
+    }
+
+    .t-table thead {
+      /* Keep headers available to assistive tech but off-screen visually. */
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    .t-table tbody tr {
+      display: block;
+      margin-bottom: 0.85rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    /* The block display above would otherwise override [hidden]'s display:none,
+       so filtered-out rows must be re-hidden explicitly on mobile. */
+    .t-table tbody tr[hidden] {
+      display: none;
+    }
+
+    .t-table td {
+      display: grid;
+      grid-template-columns: 42% 1fr;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      padding: 0.5rem 0.7rem;
+    }
+
+    .t-table tbody tr td:last-child {
+      border-bottom: none;
+    }
+
+    .t-table td::before {
+      content: attr(data-label);
+      font-weight: 600;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .t-table td.is-winner {
+      background: color-mix(in srgb, var(--accent) 9%, transparent);
+    }
+  }
+</style>
+
+<script is:inline define:vars={{ id, total: editions.length }}>
+  const form = document.getElementById(`${id}-filters`);
+  const winnerSel = document.getElementById(`${id}-winner`);
+  const yearSel = document.getElementById(`${id}-year`);
+  const reset = document.getElementById(`${id}-reset`);
+  const status = document.getElementById(`${id}-status`);
+  const empty = document.getElementById(`${id}-empty`);
+  const emptyReset = document.getElementById(`${id}-empty-reset`);
+  const rows = Array.from(
+    document.querySelectorAll(`#${id}-table tbody tr`),
+  );
+
+  function readParams() {
+    const p = new URLSearchParams(window.location.search);
+    return { winner: p.get('winner') || '', year: p.get('year') || '' };
+  }
+
+  function writeParams(winner, year) {
+    const p = new URLSearchParams(window.location.search);
+    winner ? p.set('winner', winner) : p.delete('winner');
+    year ? p.set('year', year) : p.delete('year');
+    const qs = p.toString();
+    const url = window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash;
+    window.history.replaceState({}, '', url);
+  }
+
+  function apply() {
+    const winner = winnerSel.value;
+    const year = yearSel.value;
+    let shown = 0;
+    for (const row of rows) {
+      const matchWinner = !winner || row.dataset.winner === winner;
+      const matchYear = !year || row.dataset.year === year;
+      const visible = matchWinner && matchYear;
+      row.hidden = !visible;
+      if (visible) shown += 1;
+    }
+    empty.hidden = shown !== 0;
+    if (status) {
+      if (!winner && !year) {
+        status.textContent = `Showing all ${total} editions.`;
+      } else {
+        const bits = [];
+        if (winner) bits.push(`winner ${winner}`);
+        if (year) bits.push(`year ${year}`);
+        status.textContent = `Showing ${shown} of ${total} editions (${bits.join(', ')}).`;
+      }
+    }
+    writeParams(winner, year);
+  }
+
+  function clearAll() {
+    winnerSel.value = '';
+    yearSel.value = '';
+    apply();
+  }
+
+  // Restore filters from the URL so shared links reproduce the view.
+  const initial = readParams();
+  if ([...winnerSel.options].some((o) => o.value === initial.winner)) {
+    winnerSel.value = initial.winner;
+  }
+  if ([...yearSel.options].some((o) => o.value === initial.year)) {
+    yearSel.value = initial.year;
+  }
+
+  winnerSel.addEventListener('change', apply);
+  yearSel.addEventListener('change', apply);
+  reset.addEventListener('click', clearAll);
+  emptyReset?.addEventListener('click', clearAll);
+  form.addEventListener('submit', (e) => e.preventDefault());
+
+  apply();
+</script>

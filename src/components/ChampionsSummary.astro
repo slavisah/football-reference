@@ -1,0 +1,101 @@
+---
+import type { ChampionSummary } from '../lib/types';
+
+interface Props {
+  champions: ChampionSummary[];
+  /** Total editions, used to scale the bars. */
+  scaleMax?: number;
+}
+
+const { champions, scaleMax } = Astro.props;
+const max = scaleMax ?? Math.max(1, ...champions.map((c) => c.titles));
+---
+
+<section class="champions" aria-labelledby="champions-heading">
+  <h2 id="champions-heading">Champions by titles</h2>
+  <p class="muted">
+    Generated automatically from the edition table above. Totals group a nation
+    with its sporting predecessor only where the source content does (Germany
+    includes West Germany); every other name is counted as written.
+  </p>
+
+  <ol class="champions__list">
+    {
+      champions.map((champion) => (
+        <li class="champions__item">
+          <div class="champions__row">
+            <span class="champions__name">{champion.displayName}</span>
+            <span class="champions__count">
+              {champion.titles}
+              <span class="visually-hidden">
+                {champion.titles === 1 ? 'title' : 'titles'}
+              </span>
+            </span>
+          </div>
+          <div
+            class="champions__bar"
+            role="img"
+            aria-label={`${champion.titles} of ${max}`}
+          >
+            <span
+              class="champions__bar-fill"
+              style={`width: ${(champion.titles / max) * 100}%`}
+            />
+          </div>
+          <p class="champions__years">
+            <span class="visually-hidden">Winning years: </span>
+            {champion.years.join(', ')}
+          </p>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .champions__list {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .champions__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+  }
+
+  .champions__name {
+    font-weight: 600;
+  }
+
+  .champions__count {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .champions__bar {
+    margin: 0.35rem 0 0.3rem;
+    height: 0.5rem;
+    background: var(--bg-subtle);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .champions__bar-fill {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+  }
+
+  .champions__years {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+</style>

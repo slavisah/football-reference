@@ -1,0 +1,111 @@
+---
+import { withBase } from '../lib/url';
+import ThemeToggle from './ThemeToggle.astro';
+
+const links = [
+  { href: withBase('/'), label: 'Home' },
+  { href: withBase('/competitions/world-cup'), label: 'World Cup' },
+  { href: withBase('/competitions/euro'), label: 'EURO' },
+];
+
+const here = Astro.url.pathname.replace(/\/$/, '');
+function isCurrent(href: string): boolean {
+  return href.replace(/\/$/, '') === here;
+}
+---
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="brand" href={withBase('/')}>
+      <span class="brand__mark" aria-hidden="true">⚽</span>
+      <span class="brand__text">Football Reference</span>
+    </a>
+
+    <nav aria-label="Primary">
+      <ul class="nav-list">
+        {
+          links.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                aria-current={isCurrent(link.href) ? 'page' : undefined}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <ThemeToggle />
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    flex-wrap: wrap;
+    padding-block: 0.6rem;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--text);
+    margin-right: auto;
+  }
+
+  .brand__mark {
+    font-size: 1.25rem;
+  }
+
+  .nav-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-list a {
+    display: inline-block;
+    padding: 0.4rem 0.7rem;
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .nav-list a:hover {
+    color: var(--text);
+    background: var(--bg-subtle);
+  }
+
+  .nav-list a[aria-current='page'] {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+
+  @media (max-width: 26rem) {
+    .brand__text {
+      font-size: 0.95rem;
+    }
+  }
+</style>

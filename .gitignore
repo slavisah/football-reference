@@ -1,0 +1,27 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# test artifacts
+test-results/
+playwright-report/
+.playwright/
+coverage/
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# os / editor
+.DS_Store
+.vscode/
+.idea/
+
+# env
+.env
+.env.*
+!.env.example

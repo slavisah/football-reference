@@ -1,0 +1,58 @@
+---
+import type { CompetitionData } from '../lib/competition';
+import TournamentTable from './TournamentTable.astro';
+import ChampionsSummary from './ChampionsSummary.astro';
+import References from './References.astro';
+
+interface Props {
+  data: CompetitionData;
+  tableId: string;
+  tableCaption: string;
+}
+
+const { data, tableId, tableCaption } = Astro.props;
+---
+
+<article class="competition stack">
+  <header class="competition__header">
+    <p class="eyebrow badge">{data.status === 'verified' ? 'Verified' : 'In review'}</p>
+    <h1>{data.title}</h1>
+    <p class="competition__intro">{data.intro}</p>
+  </header>
+
+  <TournamentTable
+    id={tableId}
+    caption={tableCaption}
+    table={data.table}
+    editions={data.editions}
+    winners={data.winners}
+  />
+
+  <ChampionsSummary champions={data.champions} scaleMax={data.editions.length} />
+
+  <References
+    sources={data.sources}
+    lastReviewed={data.lastReviewed}
+    status={data.status}
+  />
+</article>
+
+<style>
+  .competition__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .competition__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .competition__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+</style>

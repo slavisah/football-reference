@@ -1,0 +1,226 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/url';
+import { getEntry } from 'astro:content';
+import { loadCompetition } from '../lib/competition';
+
+const home = await getEntry('pages', 'index');
+
+// Pull a live champion count from each competition so the home cards stay in
+// sync with the editorial tables instead of hard-coding numbers.
+const [worldCup, euro] = await Promise.all([
+  loadCompetition('fifa-world-cup', {
+    editionsHeading: 'Editions',
+    sourcesHeading: 'FIFA World Cup',
+  }),
+  loadCompetition('uefa-euro', {
+    editionsHeading: 'Editions',
+    sourcesHeading: 'UEFA EURO',
+  }),
+]);
+
+const cards = [
+  {
+    href: withBase('/competitions/world-cup'),
+    title: 'FIFA World Cup',
+    blurb: 'From Uruguay 1930 to 2026 - hosts, finalists and champions.',
+    editions: worldCup.editions.length,
+    topChampion: worldCup.champions[0],
+    accent: '#1f6f4f',
+  },
+  {
+    href: withBase('/competitions/euro'),
+    title: 'UEFA European Championship',
+    blurb: 'From the 1960 Nations’ Cup to EURO 2024 across Europe.',
+    editions: euro.editions.length,
+    topChampion: euro.champions[0],
+    accent: '#2f5fa8',
+  },
+];
+---
+
+<BaseLayout
+  title={home?.data.title ?? 'The Ultimate Football Reference'}
+  description={home?.data.description}
+>
+  <section class="hero stack">
+    <p class="badge">Family-friendly football history</p>
+    <h1>The Ultimate Football Reference</h1>
+    <p class="hero__lede">
+      Tournaments, champions, hosts and finalists - compared in one calm,
+      ad-free place. Built from Markdown, with historical team names preserved
+      and every page linked to its sources.
+    </p>
+    <p class="hero__actions">
+      <a class="btn btn--primary" href={withBase('/competitions/world-cup')}>
+        Explore the World Cup
+      </a>
+      <a class="btn" href={withBase('/competitions/euro')}>Explore the EURO</a>
+    </p>
+  </section>
+
+  <section class="cards" aria-label="Competitions">
+    {
+      cards.map((card) => (
+        <a class="comp-card" href={card.href} style={`--card-accent:${card.accent}`}>
+          <span class="comp-card__bar" aria-hidden="true" />
+          <h2>{card.title}</h2>
+          <p class="comp-card__blurb">{card.blurb}</p>
+          <dl class="comp-card__stats">
+            <div>
+              <dt>Editions</dt>
+              <dd>{card.editions}</dd>
+            </div>
+            {card.topChampion && (
+              <div>
+                <dt>Most titles</dt>
+                <dd>
+                  {card.topChampion.displayName} ({card.topChampion.titles})
+                </dd>
+              </div>
+            )}
+          </dl>
+          <span class="comp-card__go">Open table &rarr;</span>
+        </a>
+      ))
+    }
+  </section>
+
+  <section class="features card">
+    <h2>What each competition page gives you</h2>
+    <ul class="feature-list">
+      <li>A responsive edition-by-edition table that never overflows on a phone.</li>
+      <li>Filter by winner and year, with a shareable link for any view.</li>
+      <li>A champions summary generated straight from the table.</li>
+      <li>Source links and a visible "last reviewed" date.</li>
+      <li>Clean print output on A4 landscape, plus light and dark themes.</li>
+    </ul>
+    <p class="muted">
+      More competitions and awards from the content library are planned as the
+      next milestone.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-block: clamp(1rem, 4vw, 2.5rem) 0.5rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 7vw, 3.4rem);
+    max-width: 16ch;
+  }
+
+  .hero__lede {
+    max-width: 60ch;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 0.6rem 1.1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .btn:hover {
+    border-color: var(--accent);
+  }
+
+  .btn--primary {
+    background: var(--accent);
+    color: var(--accent-contrast);
+    border-color: var(--accent);
+  }
+
+  .cards {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    margin-block: 2rem;
+  }
+
+  .comp-card {
+    position: relative;
+    display: block;
+    padding: 1.3rem;
+    padding-top: 1.6rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    color: inherit;
+    text-decoration: none;
+    overflow: hidden;
+    transition: transform 0.12s ease, border-color 0.12s ease;
+  }
+
+  .comp-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--card-accent, var(--accent));
+  }
+
+  .comp-card__bar {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: var(--card-accent, var(--accent));
+  }
+
+  .comp-card h2 {
+    font-size: 1.3rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .comp-card__blurb {
+    color: var(--text-muted);
+    margin-top: 0;
+  }
+
+  .comp-card__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.5rem;
+    margin: 0.9rem 0;
+  }
+
+  .comp-card__stats dt {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  .comp-card__stats dd {
+    margin: 0;
+    font-weight: 700;
+  }
+
+  .comp-card__go {
+    font-weight: 600;
+    color: var(--card-accent, var(--accent));
+  }
+
+  .feature-list {
+    margin: 0.5rem 0 1rem;
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .feature-list li {
+    max-width: 62ch;
+  }
+</style>

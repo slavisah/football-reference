@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CompetitionView from '../../components/CompetitionView.astro';
+import { loadCompetition } from '../../lib/competition';
+
+const data = await loadCompetition('fifa-world-cup', {
+  editionsHeading: 'Editions',
+  sourcesHeading: 'FIFA World Cup',
+});
+---
+
+<BaseLayout
+  title={data.title}
+  description="Every FIFA World Cup edition, hosts, finalists and champions, with a generated title count. Filter by winner and year."
+>
+  <CompetitionView
+    data={data}
+    tableId="world-cup"
+    tableCaption="FIFA World Cup editions, 1930 onward"
+  />
+</BaseLayout>

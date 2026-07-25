@@ -1,0 +1,84 @@
+---
+import type { SourceLink } from '../lib/sources';
+
+interface Props {
+  sources: SourceLink[];
+  lastReviewed: string;
+  status: string;
+}
+
+const { sources, lastReviewed, status } = Astro.props;
+const reviewed = new Date(`${lastReviewed}T00:00:00Z`);
+const reviewedLabel = Number.isNaN(reviewed.getTime())
+  ? lastReviewed
+  : reviewed.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    });
+---
+
+<section class="references card" aria-labelledby="references-heading">
+  <h2 id="references-heading">References &amp; review</h2>
+
+  <p class="references__meta">
+    <span class="badge">Status: {status}</span>
+    <span class="review">
+      Last reviewed:
+      <time datetime={lastReviewed}>{reviewedLabel}</time>
+    </span>
+  </p>
+
+  {
+    sources.length > 0 ? (
+      <ul class="references__list">
+        {sources.map((source) => (
+          <li>
+            <a href={source.url} rel="nofollow noopener external" target="_blank">
+              {source.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="muted">No source links are listed for this competition yet.</p>
+    )
+  }
+
+  <p class="muted references__note">
+    Primary sources are preferred. Historical formats and team names are recorded
+    as used at the time; see each edition's notes for context.
+  </p>
+</section>
+
+<style>
+  .references__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-top: 0;
+  }
+
+  .review {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .references__list {
+    margin: 0.75rem 0 0;
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .references__list a {
+    word-break: break-word;
+  }
+
+  .references__note {
+    margin-bottom: 0;
+    font-size: 0.85rem;
+  }
+</style>

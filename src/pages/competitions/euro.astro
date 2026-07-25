@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CompetitionView from '../../components/CompetitionView.astro';
+import { loadCompetition } from '../../lib/competition';
+
+const data = await loadCompetition('uefa-euro', {
+  editionsHeading: 'Editions',
+  sourcesHeading: 'UEFA EURO',
+});
+---
+
+<BaseLayout
+  title={data.title}
+  description="Every UEFA European Championship edition, hosts, finalists and champions, with a generated title count. Filter by winner and year."
+>
+  <CompetitionView
+    data={data}
+    tableId="euro"
+    tableCaption="UEFA European Championship editions, 1960 onward"
+  />
+</BaseLayout>
