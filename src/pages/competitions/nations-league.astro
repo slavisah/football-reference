@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CompetitionView from '../../components/CompetitionView.astro';
+import { loadCompetition } from '../../lib/competition';
+
+const data = await loadCompetition('uefa-nations-league', {
+  editionsHeading: 'Finals',
+  sourcesHeading: 'UEFA Nations League',
+});
+---
+
+<BaseLayout
+  title={data.title}
+  description="Every UEFA Nations League Finals edition, hosts, finalists and champions, with a generated title count. Filter by winner and season."
+>
+  <CompetitionView
+    data={data}
+    tableId="nations-league"
+    tableCaption="UEFA Nations League Finals, 2018-19 onward"
+  />
+</BaseLayout>
