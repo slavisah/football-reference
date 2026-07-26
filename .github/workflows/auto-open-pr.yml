@@ -1,0 +1,32 @@
+name: Auto-open PR
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open a PR for this branch if one does not already exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          if gh pr view "$BRANCH" --repo "$REPO" --json number >/dev/null 2>&1; then
+            echo "PR already exists for $BRANCH — it updates automatically on each push."
+            exit 0
+          fi
+          gh pr create \
+            --repo "$REPO" \
+            --base main \
+            --head "$BRANCH" \
+            --title "$BRANCH" \
+            --body "Automated PR for \`$BRANCH\`. Review and merge when ready." \
+            --reviewer slavisah
