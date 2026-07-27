@@ -109,11 +109,12 @@ Reuse the same `loadCompetition` + `CompetitionView` pattern (see
 `docs/ADDING_CONTENT.md` section 7). Note the table headings in these files may
 differ from `## Editions` and will need the matching `editionsHeading`:
 
-- [ ] Copa América (`content/copa-america.md`) - least uniform history; will
-      likely need `allowDuplicateYears` (e.g. the two 1959 editions) and careful
-      format notes.
-- [ ] UEFA Nations League (`content/uefa-nations-league.md`) - uses seasons
-      like `2018-19`; the parser already handles season labels.
+- [x] Copa América (`content/copa-america.md`) - used `editionsHeading:
+      'Champions timeline'` and `allowDuplicateYears: ['1959']` for the two 1959
+      editions. Page at `src/pages/competitions/copa-america.astro`.
+- [x] UEFA Nations League (`content/uefa-nations-league.md`) - uses seasons
+      like `2018-19`; the parser already handles season labels. Page at
+      `src/pages/competitions/nations-league.astro`.
 - [ ] Men's Ballon d'Or (`content/ballon-dor.md`) - award, not competition; may
       want an award-specific view (winner + national team, no host/teams).
 - [ ] Golden Boot / top scorers (`content/golden-boot.md`) - two tables (World
@@ -138,8 +139,9 @@ differ from `## Editions` and will need the matching `editionsHeading`:
 
 ## Known caveats
 
-- Only World Cup and EURO have pages so far; the other content files are
-  validated as front matter but not yet rendered.
+- World Cup, EURO, Nations League, and Copa América have pages so far; Ballon
+  d'Or, Golden Boot, and Records and timelines are still validated as front
+  matter only, not yet rendered.
 - Historical names appear as distinct winner-filter entries by design.
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
   time out; re-running the deploy clears it (it did here).
