@@ -39,6 +39,17 @@ describe('buildEditions', () => {
     };
     expect(buildEditions(seasonTable)[0].yearSort).toBe(2018);
   });
+
+  it('treats a "Player(s)" column as the winner column, for top-scorer tables', () => {
+    const scorersTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [['1958', 'Just Fontaine', 'France', '13']],
+    };
+    expect(buildEditions(scorersTable)[0]).toMatchObject({
+      winner: 'Just Fontaine',
+      host: undefined,
+    });
+  });
 });
 
 describe('buildChampionsSummary', () => {

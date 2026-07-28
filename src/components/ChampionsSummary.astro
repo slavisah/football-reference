@@ -5,19 +5,31 @@ interface Props {
   champions: ChampionSummary[];
   /** Total editions, used to scale the bars. */
   scaleMax?: number;
+  /** Unique id prefix, needed when more than one summary appears on a page. */
+  id?: string;
+  heading?: string;
+  description?: string;
+  /** Singular/plural noun for a count, e.g. ["award", "awards"]. */
+  unit?: [string, string];
 }
 
-const { champions, scaleMax } = Astro.props;
+const {
+  champions,
+  scaleMax,
+  id = 'champions',
+  heading = 'Champions by titles',
+  description = 'Generated automatically from the edition table above. Totals group a nation ' +
+    'with its sporting predecessor only where the source content does (Germany ' +
+    'includes West Germany); every other name is counted as written.',
+  unit = ['title', 'titles'],
+} = Astro.props;
 const max = scaleMax ?? Math.max(1, ...champions.map((c) => c.titles));
+const headingId = `${id}-heading`;
 ---
 
-<section class="champions" aria-labelledby="champions-heading">
-  <h2 id="champions-heading">Champions by titles</h2>
-  <p class="muted">
-    Generated automatically from the edition table above. Totals group a nation
-    with its sporting predecessor only where the source content does (Germany
-    includes West Germany); every other name is counted as written.
-  </p>
+<section class="champions" aria-labelledby={headingId}>
+  <h2 id={headingId}>{heading}</h2>
+  <p class="muted">{description}</p>
 
   <ol class="champions__list">
     {
@@ -28,7 +40,7 @@ const max = scaleMax ?? Math.max(1, ...champions.map((c) => c.titles));
             <span class="champions__count">
               {champion.titles}
               <span class="visually-hidden">
-                {champion.titles === 1 ? 'title' : 'titles'}
+                {champion.titles === 1 ? unit[0] : unit[1]}
               </span>
             </span>
           </div>
