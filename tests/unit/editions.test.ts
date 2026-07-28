@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildChampionsSummary,
   buildEditions,
+  buildTimeline,
   distinctWinners,
 } from '../../src/lib/editions';
 import type { MarkdownTable } from '../../src/lib/types';
@@ -81,5 +82,42 @@ describe('distinctWinners', () => {
       'Spain',
       'West Germany',
     ]);
+  });
+});
+
+describe('buildTimeline', () => {
+  it('reads runner-up and final columns when present, sorted for the caller', () => {
+    const fullTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner', 'Runner-up', 'Final'],
+      rows: [
+        ['1930', 'Uruguay', 'Uruguay', 'Argentina', 'Uruguay 4-2 Argentina'],
+        ['1934', 'Italy', 'Italy', 'Czechoslovakia', 'Italy 2-1 Czechoslovakia'],
+      ],
+    };
+    const timeline = buildTimeline(buildEditions(fullTable));
+    expect(timeline).toEqual([
+      {
+        year: '1930',
+        yearSort: 1930,
+        champion: 'Uruguay',
+        host: 'Uruguay',
+        runnerUp: 'Argentina',
+        final: 'Uruguay 4-2 Argentina',
+      },
+      {
+        year: '1934',
+        yearSort: 1934,
+        champion: 'Italy',
+        host: 'Italy',
+        runnerUp: 'Czechoslovakia',
+        final: 'Italy 2-1 Czechoslovakia',
+      },
+    ]);
+  });
+
+  it('leaves runnerUp and final undefined when the table has no such column', () => {
+    const timeline = buildTimeline(buildEditions(table));
+    expect(timeline[0].runnerUp).toBeUndefined();
+    expect(timeline[0].final).toBeUndefined();
   });
 });

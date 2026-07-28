@@ -1,0 +1,193 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ChampionsTimeline from '../components/ChampionsTimeline.astro';
+import ChampionsSummary from '../components/ChampionsSummary.astro';
+import References from '../components/References.astro';
+import { loadCompetition, loadPageMeta } from '../lib/competition';
+import { buildTimeline } from '../lib/editions';
+import { withBase } from '../lib/url';
+
+const meta = await loadPageMeta('records-and-timelines');
+
+const [worldCup, euro, copaAmerica, nationsLeague] = await Promise.all([
+  loadCompetition('fifa-world-cup', {
+    editionsHeading: 'Editions',
+    sourcesHeading: 'FIFA World Cup',
+  }),
+  loadCompetition('uefa-euro', {
+    editionsHeading: 'Editions',
+    sourcesHeading: 'UEFA EURO',
+  }),
+  loadCompetition('copa-america', {
+    editionsHeading: 'Champions timeline',
+    sourcesHeading: 'Copa América',
+    allowDuplicateYears: ['1959'],
+  }),
+  loadCompetition('uefa-nations-league', {
+    editionsHeading: 'Finals',
+    sourcesHeading: 'UEFA Nations League',
+  }),
+]);
+
+const competitions = [
+  { key: 'world-cup', label: 'FIFA World Cup', href: withBase('/competitions/world-cup'), data: worldCup },
+  { key: 'euro', label: 'UEFA EURO', href: withBase('/competitions/euro'), data: euro },
+  {
+    key: 'copa-america',
+    label: 'Copa América',
+    href: withBase('/competitions/copa-america'),
+    data: copaAmerica,
+  },
+  {
+    key: 'nations-league',
+    label: 'UEFA Nations League',
+    href: withBase('/competitions/nations-league'),
+    data: nationsLeague,
+  },
+];
+
+// Dedup source links across the four competitions, same approach as the
+// combined Golden Boot page.
+const sources = competitions
+  .flatMap((c) => c.data.sources)
+  .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+
+const lastReviewed = competitions
+  .map((c) => c.data.lastReviewed)
+  .sort()
+  .at(-1) as string;
+---
+
+<BaseLayout
+  title={meta.title}
+  description="Champions timelines and most-successful-team rankings generated from the World Cup, EURO, Copa América and Nations League tables, plus how historical nation names are grouped."
+>
+  <article class="records stack">
+    <header class="records__header">
+      <p class="eyebrow badge">Generated from the competition tables</p>
+      <h1>{meta.title}</h1>
+      <p class="records__intro">{meta.intro}</p>
+    </header>
+
+    <section class="stack" aria-labelledby="timeline-heading">
+      <h2 id="timeline-heading">Champions timeline</h2>
+      <p class="muted">
+        Every champion, host and final result, newest first. Generated straight
+        from each competition's edition table - nothing here is hand-typed.
+      </p>
+      {
+        competitions.map((c) => (
+          <ChampionsTimeline
+            id={`timeline-${c.key}`}
+            heading={c.label}
+            entries={buildTimeline(c.data.editions)}
+          />
+        ))
+      }
+    </section>
+
+    <section class="stack" aria-labelledby="teams-heading">
+      <h2 id="teams-heading">Most successful teams</h2>
+      <p class="muted">
+        Title counts ranked separately per competition. See each competition
+        page for the full edition-by-edition table these are generated from.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => (
+            <div>
+              <ChampionsSummary
+                id={`teams-${c.key}`}
+                champions={c.data.champions}
+                scaleMax={c.data.editions.length}
+                heading={c.label}
+                description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
+              />
+              <a class="records__teams-link" href={c.href}>
+                View the full {c.label} table &rarr;
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="card stack" aria-labelledby="identity-heading">
+      <h2 id="identity-heading">How historical nation names are handled</h2>
+      <p>
+        Edition tables and champions timelines above always keep the name a
+        team competed under at the time (e.g. "West Germany", "Soviet Union",
+        "Czechoslovakia", "Yugoslavia") - history is never rewritten. Only the
+        <strong>generated title totals</strong> in "Most successful teams"
+        apply a small, explicit set of aggregation rules:
+      </p>
+      <ul>
+        <li>
+          <strong>West Germany is grouped under Germany</strong> in title
+          totals only, shown as "Germany (incl. West Germany)" - the one
+          sporting-successor case the source content itself groups.
+        </li>
+        <li>
+          <strong>Soviet Union and Russia are not merged.</strong> They are
+          treated as distinct entries with separate title counts.
+        </li>
+        <li>
+          <strong>Czechoslovakia and Czech Republic/Czechia are not merged</strong>
+          without an explicit editorial rule; today there is none, so each
+          counts separately.
+        </li>
+        <li>
+          <strong>Yugoslavia's results stay labeled as Yugoslavia</strong> and
+          are not attributed to any of its successor states.
+        </li>
+      </ul>
+    </section>
+
+    <References sources={sources} lastReviewed={lastReviewed} status={meta.status} />
+  </article>
+</BaseLayout>
+
+<style>
+  .records__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .records__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .records__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .records__teams-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    align-items: start;
+  }
+
+  .records__teams-link {
+    display: inline-block;
+    margin-top: 0.6rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  #identity-heading + p {
+    max-width: 68ch;
+  }
+
+  .records ul {
+    display: grid;
+    gap: 0.5rem;
+    max-width: 68ch;
+    padding-left: 1.2rem;
+  }
+</style>
