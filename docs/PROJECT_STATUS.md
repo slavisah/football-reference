@@ -150,8 +150,23 @@ differ from `## Editions` and will need the matching `editionsHeading`:
       preserved verbatim and passes validation (non-empty winner), though it
       does appear as its own one-off entry in the generated champions summary
       and winner filter - a known minor rough edge, not fixed here.
-- [ ] Golden Boot / top scorers (`content/golden-boot.md`) - two tables (World
-      Cup and EURO top scorers) in one file.
+- [x] Golden Boot / top scorers (`content/golden-boot.md`) - two tables (World
+      Cup and EURO top scorers) in one file. Page at
+      `src/pages/competitions/golden-boot.astro`. Since one content file holds
+      two tables, `loadCompetition('golden-boot', ...)` is called twice with a
+      different `editionsHeading` per table ("FIFA World Cup top scorers" /
+      "UEFA EURO top scorers"), and the page composes two
+      `TournamentTable` + `ChampionsSummary` blocks under one shared header and
+      a single, merged `References` section. The "Player(s)" column is now
+      recognized as the winner/champion column (`/player/` added to the
+      matcher in `src/lib/editions.ts` and the highlight regex in
+      `TournamentTable.astro`), and both `TournamentTable` (`winnerLabel` prop)
+      and `ChampionsSummary` (`heading`/`description`/`unit` props) gained
+      small optional overrides so the copy reads correctly for a top-scorer
+      award instead of a "champion" competition - existing pages are
+      unaffected since every new prop defaults to the old text. Added a
+      Playwright block covering the two-table layout at 360px and independent
+      per-table filtering.
 - [ ] Records and timelines (`content/records-and-timelines.md`) -> `/records`,
       composing generated timelines from the competition tables.
 
@@ -172,9 +187,9 @@ differ from `## Editions` and will need the matching `editionsHeading`:
 
 ## Known caveats
 
-- World Cup, EURO, Nations League, Copa América, and Ballon d'Or have pages so
-  far; Golden Boot and Records and timelines are still validated as front
-  matter only, not yet rendered.
+- World Cup, EURO, Nations League, Copa América, Ballon d'Or, and Golden Boot
+  have pages so far; Records and timelines is still validated as front matter
+  only, not yet rendered.
 - Historical names appear as distinct winner-filter entries by design.
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
   time out; re-running the deploy clears it (it did here).
