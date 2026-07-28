@@ -32,6 +32,13 @@ export type LoadOptions = {
   allowDuplicateYears?: string[];
 };
 
+export type PageMeta = {
+  title: string;
+  intro: string;
+  lastReviewed: string;
+  status: string;
+};
+
 /** Read the first paragraph after the top-level heading as the page intro. */
 function firstParagraph(markdown: string): string {
   const lines = markdown.split(/\r?\n/);
@@ -50,6 +57,20 @@ function firstParagraph(markdown: string): string {
     buffer.push(line.trim());
   }
   return buffer.join(' ');
+}
+
+/** Load a content page's front matter + intro paragraph, no editions table required. */
+export async function loadPageMeta(id: string): Promise<PageMeta> {
+  const entry = await getEntry('pages', id);
+  if (!entry) {
+    throw new Error(`Content entry "${id}" was not found in the pages collection.`);
+  }
+  return {
+    title: entry.data.title,
+    intro: firstParagraph(entry.body ?? ''),
+    lastReviewed: entry.data.lastReviewed,
+    status: entry.data.status,
+  };
 }
 
 export async function loadCompetition(

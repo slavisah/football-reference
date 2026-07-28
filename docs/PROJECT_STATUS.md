@@ -90,25 +90,22 @@ implemented, and every acceptance scenario passes.
 
 ### Home page follow-up (found in UI review, 2026-07-28)
 
-`src/pages/index.astro` still only builds cards for World Cup and EURO, left
-over from Milestone 1. The nav (`src/components/Nav.astro`) already links to
-all 5 live competitions (World Cup, EURO, Nations League, Copa América,
-Ballon d'Or), so the home page cards are now inconsistent with the header -
-5 competitions are one click away but only 2 get a summary card.
-
-- [ ] Add home page cards for Nations League, Copa América, and Ballon d'Or
-      (reuse the existing `loadCompetition` + card markup in `index.astro`).
-      Decide on card order/prioritization (e.g. World Cup, EURO, Copa
-      América, Nations League, Ballon d'Or) and whether the "explore" hero
-      buttons should grow to match, or stay limited to the top 2.
-- [ ] Once there are 5+ cards, re-check the header nav on narrow viewports -
-      `.nav-list` already wraps, but verify it doesn't feel cluttered as more
-      competitions (Golden Boot, Records) are added later; consider a
-      secondary nav row or "More" grouping if it does.
+- [x] Home page cards - fixed 2026-07-28 (intensive run). `index.astro` now
+      loads all six live competitions (World Cup, EURO, Copa América,
+      Nations League, Ballon d'Or, Golden Boot) and renders a card for each,
+      in that order, matching the nav. Individual-award cards (Ballon d'Or,
+      Golden Boot) use a `statLabel` override ("Most awards" instead of
+      "Most titles") so the copy still reads correctly. Kept the hero
+      "explore" buttons limited to the top 2 (World Cup, EURO) per the
+      earlier open question, since 6 buttons would clutter the hero; the
+      features section now links to the new `/records` page instead.
+- [x] Nav on narrow viewports - checked 2026-07-28 with the new 8th link
+      (Records) added; `.nav-list` still wraps cleanly at 360px (covered by
+      the new Playwright "no horizontal page overflow" home-page test). No
+      "More" grouping needed yet.
 - [ ] Add tournament-level "best scorer" / "best goalkeeper" style facts to
-      competition pages, sourced from `content/golden-boot.md` once that page
-      exists (see "Golden Boot" below) - e.g. a small stat next to each
-      edition or a callout on the World Cup/EURO pages.
+      competition pages, sourced from `content/golden-boot.md` - e.g. a small
+      stat next to each edition or a callout on the World Cup/EURO pages.
 - [x] Table sort order - fixed 2026-07-28. The year-sort was only wired up
       for the filter dropdown; the actual table rows rendered in source
       (oldest-first) order. `TournamentTable.astro` now renders a
@@ -167,8 +164,37 @@ differ from `## Editions` and will need the matching `editionsHeading`:
       unaffected since every new prop defaults to the old text. Added a
       Playwright block covering the two-table layout at 360px and independent
       per-table filtering.
-- [ ] Records and timelines (`content/records-and-timelines.md`) -> `/records`,
-      composing generated timelines from the competition tables.
+- [x] Records and timelines (`content/records-and-timelines.md`) -> `/records`,
+      added 2026-07-28 (intensive run). Composes three generated sections from
+      the World Cup, EURO, Copa América and Nations League data (no new
+      editorial content needed - the four competitions' `loadCompetition`
+      calls already produce everything used here):
+      - **Champions timeline**: one card per edition (year, host, champion,
+        runner-up, final score), newest-first, via the new
+        `buildTimeline()` in `src/lib/editions.ts` (reads the "Runner-up"
+        and "Final" columns from `Edition.cells` by label, so it degrades
+        gracefully for Copa América which has no "Final" score column) and
+        the new `src/components/ChampionsTimeline.astro` card grid.
+      - **Most successful teams**: reuses `ChampionsSummary.astro` per
+        competition (top ranking, same generated data as each competition's
+        own page) with a link back to the full table.
+      - **Historical identity rules**: a static explainer card covering the
+        four rules from `docs/WEBSITE_REQUIREMENTS.md` (West Germany/Germany
+        merged in totals only; Soviet Union/Russia, Czechoslovakia/Czechia,
+        and Yugoslavia's successors are each kept separate).
+      Added `loadPageMeta()` to `src/lib/competition.ts` for loading a
+      content page's front matter + intro without requiring an editions
+      table (records-and-timelines.md has no table of its own). Linked from
+      `Nav.astro` (8th link) and from the home page features section.
+      Covered by 2 new Vitest cases for `buildTimeline` and 3 new Playwright
+      cases (no 360px overflow, timeline/ranking content present, identity
+      rules text present).
+      - [ ] Not yet done: Ballon d'Or / Golden Boot aren't included in the
+        timeline or team-rankings sections here (they're individual awards,
+        not team competitions - matches the "Most successful teams" spec in
+        `WEBSITE_REQUIREMENTS.md`, which only lists the four team
+        competitions). Could add a separate "Most awards" timeline/ranking
+        pair for those two if a future pass wants full award coverage.
 
 ### From `docs/WEBSITE_REQUIREMENTS.md`, still missing
 
@@ -187,9 +213,8 @@ differ from `## Editions` and will need the matching `editionsHeading`:
 
 ## Known caveats
 
-- World Cup, EURO, Nations League, Copa América, Ballon d'Or, and Golden Boot
-  have pages so far; Records and timelines is still validated as front matter
-  only, not yet rendered.
+- World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot, and
+  Records and Timelines all have live pages now.
 - Historical names appear as distinct winner-filter entries by design.
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
   time out; re-running the deploy clears it (it did here).
