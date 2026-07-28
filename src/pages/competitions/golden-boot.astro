@@ -1,0 +1,106 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TournamentTable from '../../components/TournamentTable.astro';
+import ChampionsSummary from '../../components/ChampionsSummary.astro';
+import References from '../../components/References.astro';
+import { loadCompetition } from '../../lib/competition';
+
+const [worldCup, euro] = await Promise.all([
+  loadCompetition('golden-boot', {
+    editionsHeading: 'FIFA World Cup top scorers',
+    sourcesHeading: 'FIFA World Cup',
+  }),
+  loadCompetition('golden-boot', {
+    editionsHeading: 'UEFA EURO top scorers',
+    sourcesHeading: 'UEFA EURO',
+  }),
+]);
+
+// Both loads read the same content file, so title/intro/status/review date are
+// identical; the source links differ because each table cites its own section
+// of docs/SOURCES.md.
+const sources = [...worldCup.sources, ...euro.sources].filter(
+  (source, index, all) => all.findIndex((s) => s.url === source.url) === index,
+);
+---
+
+<BaseLayout
+  title={worldCup.title}
+  description="FIFA World Cup and UEFA EURO top-scorer awards, with player, team and goals. Filter each table by player and year."
+>
+  <article class="competition stack">
+    <header class="competition__header">
+      <p class="eyebrow badge">
+        {worldCup.status === 'verified' ? 'Verified' : 'In review'}
+      </p>
+      <h1>{worldCup.title}</h1>
+      <p class="competition__intro">{worldCup.intro}</p>
+    </header>
+
+    <section class="stack">
+      <h2>FIFA World Cup top scorers</h2>
+      <TournamentTable
+        id="golden-boot-world-cup"
+        caption="FIFA World Cup top scorers, 1930 to present"
+        table={worldCup.table}
+        editions={worldCup.editions}
+        winners={worldCup.winners}
+        winnerLabel="Player"
+      />
+      <ChampionsSummary
+        id="golden-boot-world-cup-champions"
+        champions={worldCup.champions}
+        scaleMax={worldCup.editions.length}
+        heading="Most World Cup Golden Boots"
+        description="Generated automatically from the table above. Tied top scorers are counted as the joint entry shown in the table, exactly as the source lists them."
+        unit={['award', 'awards']}
+      />
+    </section>
+
+    <section class="stack">
+      <h2>UEFA EURO top scorers</h2>
+      <TournamentTable
+        id="golden-boot-euro"
+        caption="UEFA EURO top scorers, 1960 to present"
+        table={euro.table}
+        editions={euro.editions}
+        winners={euro.winners}
+        winnerLabel="Player"
+      />
+      <ChampionsSummary
+        id="golden-boot-euro-champions"
+        champions={euro.champions}
+        scaleMax={euro.editions.length}
+        heading="Most EURO top-scorer awards"
+        description="Generated automatically from the table above. Tied top scorers are counted as the joint entry shown in the table, exactly as the source lists them."
+        unit={['award', 'awards']}
+      />
+    </section>
+
+    <References
+      sources={sources}
+      lastReviewed={worldCup.lastReviewed}
+      status={worldCup.status}
+    />
+  </article>
+</BaseLayout>
+
+<style>
+  .competition__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .competition__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .competition__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+</style>

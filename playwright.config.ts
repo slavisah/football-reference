@@ -31,6 +31,9 @@ export default defineConfig({
         ...(process.env.PW_CHROME_CHANNEL
           ? { channel: process.env.PW_CHROME_CHANNEL }
           : {}),
+        ...(process.env.PW_EXECUTABLE_PATH
+          ? { launchOptions: { executablePath: process.env.PW_EXECUTABLE_PATH } }
+          : {}),
       },
     },
   ],

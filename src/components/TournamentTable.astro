@@ -8,9 +8,11 @@ interface Props {
   table: MarkdownTable;
   editions: Edition[];
   winners: string[];
+  /** Label for the winner filter/column, e.g. "Player" on a top-scorers table. */
+  winnerLabel?: string;
 }
 
-const { id, caption, table, editions, winners } = Astro.props;
+const { id, caption, table, editions, winners, winnerLabel = 'Winner' } = Astro.props;
 
 // Years for the filter, newest first.
 const years = [...editions]
@@ -19,7 +21,7 @@ const years = [...editions]
 
 // Which column holds the champion, so we can visually mark it.
 const winnerColIndex = table.headers.findIndex((header) =>
-  /winner|champion/i.test(header),
+  /winner|champion|player/i.test(header),
 );
 ---
 
@@ -33,9 +35,9 @@ const winnerColIndex = table.headers.findIndex((header) =>
     aria-label={`Filter ${caption}`}
   >
     <div class="filters__field">
-      <label for={`${id}-winner`}>Winner</label>
+      <label for={`${id}-winner`}>{winnerLabel}</label>
       <select id={`${id}-winner`} name="winner">
-        <option value="">All winners</option>
+        <option value="">All {winnerLabel.toLowerCase()}s</option>
         {winners.map((winner) => <option value={winner}>{winner}</option>)}
       </select>
     </div>

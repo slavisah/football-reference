@@ -19,7 +19,7 @@ function leadingYear(label: string): number {
 export function buildEditions(table: MarkdownTable): Edition[] {
   const { headers, rows } = table;
   const yearCol = findColumn(headers, [/year/, /season/]);
-  const winnerCol = findColumn(headers, [/winner/, /champion/]);
+  const winnerCol = findColumn(headers, [/winner/, /champion/, /player/]);
   const hostCol = findColumn(headers, [/host/]);
   const teamsCol = findColumn(headers, [/team/]);
 
