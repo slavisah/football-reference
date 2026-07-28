@@ -40,3 +40,15 @@ export type ChampionSummary = {
   /** Distinct historical names counted under this group. */
   names: string[];
 };
+
+/** One edition reduced to the fields a champions-timeline card needs. */
+export type TimelineEntry = {
+  year: string;
+  yearSort: number;
+  champion: string;
+  host?: string;
+  /** Runner-up / losing finalist, if the table has that column. */
+  runnerUp?: string;
+  /** Final score line as written, e.g. "Uruguay 4-2 Argentina", if present. */
+  final?: string;
+};

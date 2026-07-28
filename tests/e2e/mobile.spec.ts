@@ -88,3 +88,52 @@ test.describe('Golden Boot page on a 360px phone', () => {
     await expect(euroVisible).toHaveCount(17);
   });
 });
+
+test.describe('Home page on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('');
+  });
+
+  test('has no horizontal page overflow with six competition cards', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('links to all six competitions plus Records', async ({ page }) => {
+    await expect(page.locator('.comp-card')).toHaveCount(6);
+    await expect(page.locator('a[href$="/records"]').first()).toBeVisible();
+  });
+});
+
+test.describe('Records page on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('records');
+  });
+
+  test('has no horizontal page overflow with timeline cards and rankings', async ({
+    page,
+  }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('shows a champions timeline card and a title-ranking list per competition', async ({
+    page,
+  }) => {
+    await expect(page.locator('.timeline__card').first()).toBeVisible();
+    await expect(page.locator('#teams-world-cup-heading')).toBeVisible();
+    await expect(page.locator('#teams-nations-league-heading')).toBeVisible();
+  });
+
+  test('explains the historical nation-name aggregation rules', async ({ page }) => {
+    await expect(
+      page.getByText('Soviet Union and Russia are not merged.'),
+    ).toBeVisible();
+  });
+});
