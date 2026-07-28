@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CompetitionView from '../../components/CompetitionView.astro';
+import { loadCompetition } from '../../lib/competition';
+
+const data = await loadCompetition('ballon-dor', {
+  editionsHeading: 'Winners',
+  sourcesHeading: "Ballon d'Or",
+});
+---
+
+<BaseLayout
+  title={data.title}
+  description="Every Men's Ballon d'Or winner since 1956, with national team and a generated award count. Filter by winner and year."
+>
+  <CompetitionView
+    data={data}
+    tableId="ballon-dor"
+    tableCaption="Men's Ballon d'Or winners, 1956 to present"
+  />
+</BaseLayout>
