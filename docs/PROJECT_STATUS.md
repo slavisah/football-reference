@@ -115,8 +115,14 @@ differ from `## Editions` and will need the matching `editionsHeading`:
 - [x] UEFA Nations League (`content/uefa-nations-league.md`) - uses seasons
       like `2018-19`; the parser already handles season labels. Page at
       `src/pages/competitions/nations-league.astro`.
-- [ ] Men's Ballon d'Or (`content/ballon-dor.md`) - award, not competition; may
-      want an award-specific view (winner + national team, no host/teams).
+- [x] Men's Ballon d'Or (`content/ballon-dor.md`) - reused the existing
+      `loadCompetition`/`CompetitionView` pattern as-is (`editionsHeading:
+      'Winners'`); the generic table already handles "winner + national team,
+      no host/teams" since it only renders columns that are present. Page at
+      `src/pages/competitions/ballon-dor.astro`. The 2020 "Not awarded" row is
+      preserved verbatim and passes validation (non-empty winner), though it
+      does appear as its own one-off entry in the generated champions summary
+      and winner filter - a known minor rough edge, not fixed here.
 - [ ] Golden Boot / top scorers (`content/golden-boot.md`) - two tables (World
       Cup and EURO top scorers) in one file.
 - [ ] Records and timelines (`content/records-and-timelines.md`) -> `/records`,
@@ -139,8 +145,8 @@ differ from `## Editions` and will need the matching `editionsHeading`:
 
 ## Known caveats
 
-- World Cup, EURO, Nations League, and Copa América have pages so far; Ballon
-  d'Or, Golden Boot, and Records and timelines are still validated as front
+- World Cup, EURO, Nations League, Copa América, and Ballon d'Or have pages so
+  far; Golden Boot and Records and timelines are still validated as front
   matter only, not yet rendered.
 - Historical names appear as distinct winner-filter entries by design.
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
