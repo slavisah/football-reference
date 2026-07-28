@@ -88,6 +88,33 @@ implemented, and every acceptance scenario passes.
 
 ## Left to do
 
+### Home page follow-up (found in UI review, 2026-07-28)
+
+`src/pages/index.astro` still only builds cards for World Cup and EURO, left
+over from Milestone 1. The nav (`src/components/Nav.astro`) already links to
+all 5 live competitions (World Cup, EURO, Nations League, Copa América,
+Ballon d'Or), so the home page cards are now inconsistent with the header -
+5 competitions are one click away but only 2 get a summary card.
+
+- [ ] Add home page cards for Nations League, Copa América, and Ballon d'Or
+      (reuse the existing `loadCompetition` + card markup in `index.astro`).
+      Decide on card order/prioritization (e.g. World Cup, EURO, Copa
+      América, Nations League, Ballon d'Or) and whether the "explore" hero
+      buttons should grow to match, or stay limited to the top 2.
+- [ ] Once there are 5+ cards, re-check the header nav on narrow viewports -
+      `.nav-list` already wraps, but verify it doesn't feel cluttered as more
+      competitions (Golden Boot, Records) are added later; consider a
+      secondary nav row or "More" grouping if it does.
+- [ ] Add tournament-level "best scorer" / "best goalkeeper" style facts to
+      competition pages, sourced from `content/golden-boot.md` once that page
+      exists (see "Golden Boot" below) - e.g. a small stat next to each
+      edition or a callout on the World Cup/EURO pages.
+- [x] Table sort order - fixed 2026-07-28. The year-sort was only wired up
+      for the filter dropdown; the actual table rows rendered in source
+      (oldest-first) order. `TournamentTable.astro` now renders a
+      `displayEditions` copy sorted newest-first, applied to every
+      competition page since they share this component.
+
 ### Next up: implement the emoji decision ("Both")
 
 Decision is made; implementation is pending. Concretely:

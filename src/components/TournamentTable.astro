@@ -17,6 +17,9 @@ const years = [...editions]
   .sort((a, b) => b.yearSort - a.yearSort)
   .map((edition) => edition.year);
 
+// Table rows, newest first (the source Markdown lists editions oldest first).
+const displayEditions = [...editions].sort((a, b) => b.yearSort - a.yearSort);
+
 // Which column holds the champion, so we can visually mark it.
 const winnerColIndex = table.headers.findIndex((header) =>
   /winner|champion/i.test(header),
@@ -67,7 +70,7 @@ const winnerColIndex = table.headers.findIndex((header) =>
       </thead>
       <tbody>
         {
-          editions.map((edition) => (
+          displayEditions.map((edition) => (
             <tr data-winner={edition.winner} data-year={edition.year}>
               {edition.cells.map((cell, index) => (
                 <td
