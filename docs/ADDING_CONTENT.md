@@ -149,6 +149,21 @@ Example: add Copa América.
 That's it - the table, filters, champions summary, and references all come from
 the shared components.
 
+### A file with more than one table (e.g. Golden Boot)
+
+Some award pages hold two tables in one content file (`content/golden-boot.md`
+has a "FIFA World Cup top scorers" table and a "UEFA EURO top scorers" table).
+There's no need for a second content file: call `loadCompetition` once per
+table, giving each call the table's own heading as `editionsHeading` and the
+matching `docs/SOURCES.md` section as `sourcesHeading`, then render one
+`TournamentTable` + `ChampionsSummary` pair per result under a shared page
+header (see `src/pages/competitions/golden-boot.astro`). If the table's
+champion-like column isn't named "Winner" or "Champion" (e.g. "Player(s)" for
+a top-scorer table), pass `winnerLabel="Player"` to `TournamentTable` so the
+filter and empty-state copy read correctly - the underlying column detection
+in `src/lib/editions.ts` already recognizes `/player/` alongside
+`/winner|champion/`.
+
 ## 8. Preview, check, and publish
 
 ```bash

@@ -57,3 +57,34 @@ test.describe('World Cup page on a 360px phone', () => {
     expect(count).toBeGreaterThan(0);
   });
 });
+
+test.describe('Golden Boot page on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('competitions/golden-boot');
+  });
+
+  test('has no horizontal page overflow with two tables stacked', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('shows the 1958 World Cup and 1984 EURO top scorers', async ({ page }) => {
+    const wcRow = page.locator('#golden-boot-world-cup-table tbody tr[data-year="1958"]');
+    await expect(wcRow).toContainText('Just Fontaine');
+
+    const euroRow = page.locator('#golden-boot-euro-table tbody tr[data-year="1984"]');
+    await expect(euroRow).toContainText('Michel Platini');
+  });
+
+  test('the two tables filter independently by player', async ({ page }) => {
+    await page.selectOption('#golden-boot-world-cup-winner', 'Kylian Mbappé');
+    const wcVisible = page.locator('#golden-boot-world-cup-table tbody tr:not([hidden])');
+    await expect(wcVisible).toHaveCount(2);
+
+    const euroVisible = page.locator('#golden-boot-euro-table tbody tr:not([hidden])');
+    await expect(euroVisible).toHaveCount(17);
+  });
+});
