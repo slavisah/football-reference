@@ -8,16 +8,34 @@ const home = await getEntry('pages', 'index');
 
 // Pull a live champion count from each competition so the home cards stay in
 // sync with the editorial tables instead of hard-coding numbers.
-const [worldCup, euro] = await Promise.all([
-  loadCompetition('fifa-world-cup', {
-    editionsHeading: 'Editions',
-    sourcesHeading: 'FIFA World Cup',
-  }),
-  loadCompetition('uefa-euro', {
-    editionsHeading: 'Editions',
-    sourcesHeading: 'UEFA EURO',
-  }),
-]);
+const [worldCup, euro, copaAmerica, nationsLeague, ballonDor, goldenBoot] =
+  await Promise.all([
+    loadCompetition('fifa-world-cup', {
+      editionsHeading: 'Editions',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('uefa-euro', {
+      editionsHeading: 'Editions',
+      sourcesHeading: 'UEFA EURO',
+    }),
+    loadCompetition('copa-america', {
+      editionsHeading: 'Champions timeline',
+      sourcesHeading: 'Copa América',
+      allowDuplicateYears: ['1959'],
+    }),
+    loadCompetition('uefa-nations-league', {
+      editionsHeading: 'Finals',
+      sourcesHeading: 'UEFA Nations League',
+    }),
+    loadCompetition('ballon-dor', {
+      editionsHeading: 'Winners',
+      sourcesHeading: "Ballon d'Or",
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'FIFA World Cup top scorers',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+  ]);
 
 const cards = [
   {
@@ -35,6 +53,40 @@ const cards = [
     editions: euro.editions.length,
     topChampion: euro.champions[0],
     accent: '#2f5fa8',
+  },
+  {
+    href: withBase('/competitions/copa-america'),
+    title: 'Copa América',
+    blurb: 'From 1916 to today - the oldest international football title.',
+    editions: copaAmerica.editions.length,
+    topChampion: copaAmerica.champions[0],
+    accent: '#c98a1f',
+  },
+  {
+    href: withBase('/competitions/nations-league'),
+    title: 'UEFA Nations League',
+    blurb: "Europe's newest national-team competition, since 2018-19.",
+    editions: nationsLeague.editions.length,
+    topChampion: nationsLeague.champions[0],
+    accent: '#6b4fa0',
+  },
+  {
+    href: withBase('/competitions/ballon-dor'),
+    title: "Men's Ballon d'Or",
+    blurb: "Football's top individual award, awarded since 1956.",
+    editions: ballonDor.editions.length,
+    topChampion: ballonDor.champions[0],
+    statLabel: 'Most awards',
+    accent: '#b8912a',
+  },
+  {
+    href: withBase('/competitions/golden-boot'),
+    title: 'Golden Boot',
+    blurb: 'World Cup and EURO top-scorer awards, tournament by tournament.',
+    editions: goldenBoot.editions.length,
+    topChampion: goldenBoot.champions[0],
+    statLabel: 'Most awards',
+    accent: '#a83e3e',
   },
 ];
 ---
@@ -73,7 +125,7 @@ const cards = [
             </div>
             {card.topChampion && (
               <div>
-                <dt>Most titles</dt>
+                <dt>{card.statLabel ?? 'Most titles'}</dt>
                 <dd>
                   {card.topChampion.displayName} ({card.topChampion.titles})
                 </dd>
@@ -96,8 +148,8 @@ const cards = [
       <li>Clean print output on A4 landscape, plus light and dark themes.</li>
     </ul>
     <p class="muted">
-      More competitions and awards from the content library are planned as the
-      next milestone.
+      Want champions timelines and title rankings across every competition on
+      one page? See <a href={withBase('/records')}>Records and Timelines</a>.
     </p>
   </section>
 </BaseLayout>

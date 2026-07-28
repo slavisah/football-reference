@@ -1,0 +1,75 @@
+---
+import type { TimelineEntry } from '../lib/types';
+
+interface Props {
+  entries: TimelineEntry[];
+  id: string;
+  heading: string;
+}
+
+const { entries, id, heading } = Astro.props;
+const headingId = `${id}-heading`;
+const sorted = [...entries].sort((a, b) => b.yearSort - a.yearSort);
+---
+
+<section class="timeline" aria-labelledby={headingId}>
+  <h3 id={headingId}>{heading}</h3>
+  <ul class="timeline__list">
+    {
+      sorted.map((entry) => (
+        <li class="timeline__card">
+          <p class="timeline__year">{entry.year}</p>
+          <p class="timeline__champion">{entry.champion}</p>
+          {entry.host && <p class="timeline__meta">Hosted by {entry.host}</p>}
+          {entry.runnerUp && (
+            <p class="timeline__meta">Runner-up: {entry.runnerUp}</p>
+          )}
+          {entry.final && <p class="timeline__final">{entry.final}</p>}
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .timeline__list {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  }
+
+  .timeline__card {
+    padding: 0.85rem 1rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .timeline__year {
+    margin: 0;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+  }
+
+  .timeline__champion {
+    margin: 0.2rem 0 0;
+    font-weight: 600;
+  }
+
+  .timeline__meta {
+    margin: 0.2rem 0 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .timeline__final {
+    margin: 0.35rem 0 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+</style>

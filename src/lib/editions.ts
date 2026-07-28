@@ -1,4 +1,4 @@
-import type { ChampionSummary, Edition, MarkdownTable } from './types';
+import type { ChampionSummary, Edition, MarkdownTable, TimelineEntry } from './types';
 import { summaryGroupFor } from './countries';
 
 // Turn a parsed Markdown table into normalized editions, and derive the
@@ -85,6 +85,28 @@ export function buildChampionsSummary(editions: Edition[]): ChampionSummary[] {
         leadingYear(a.years[0]) - leadingYear(b.years[0]) ||
         a.displayName.localeCompare(b.displayName),
     );
+}
+
+/** Find a cell's value by matching its column label, e.g. "Runner-up". */
+function cellValue(edition: Edition, matcher: RegExp): string | undefined {
+  const cell = edition.cells.find((c) => matcher.test(c.label.trim()));
+  return cell?.value.trim() || undefined;
+}
+
+/**
+ * Reduce editions to champions-timeline cards: year, host, champion,
+ * runner-up and final score. Runner-up/final are omitted when the source
+ * table has no such column (e.g. Copa América has no "Final" score column).
+ */
+export function buildTimeline(editions: Edition[]): TimelineEntry[] {
+  return editions.map((edition) => ({
+    year: edition.year,
+    yearSort: edition.yearSort,
+    champion: edition.winner,
+    host: edition.host,
+    runnerUp: cellValue(edition, /runner-up|finalist/i),
+    final: cellValue(edition, /^final$/i),
+  }));
 }
 
 /** Distinct winners for populating the filter control, in first-title order. */
