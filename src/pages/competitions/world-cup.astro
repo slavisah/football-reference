@@ -2,11 +2,20 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
+import { buildTopScorerFacts } from '../../lib/editions';
 
-const data = await loadCompetition('fifa-world-cup', {
-  editionsHeading: 'Editions',
-  sourcesHeading: 'FIFA World Cup',
-});
+const [data, goldenBoot] = await Promise.all([
+  loadCompetition('fifa-world-cup', {
+    editionsHeading: 'Editions',
+    sourcesHeading: 'FIFA World Cup',
+  }),
+  loadCompetition('golden-boot', {
+    editionsHeading: 'FIFA World Cup top scorers',
+    sourcesHeading: 'FIFA World Cup',
+  }),
+]);
+
+const topScorers = buildTopScorerFacts(goldenBoot.editions);
 ---
 
 <BaseLayout
@@ -17,5 +26,6 @@ const data = await loadCompetition('fifa-world-cup', {
     data={data}
     tableId="world-cup"
     tableCaption="FIFA World Cup editions, 1930 onward"
+    extraColumn={{ label: 'Top scorer', values: topScorers }}
   />
 </BaseLayout>

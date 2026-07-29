@@ -8,9 +8,11 @@ interface Props {
   data: CompetitionData;
   tableId: string;
   tableCaption: string;
+  /** Optional display-only column joined onto the table by edition year. */
+  extraColumn?: { label: string; values: Map<string, string> };
 }
 
-const { data, tableId, tableCaption } = Astro.props;
+const { data, tableId, tableCaption, extraColumn } = Astro.props;
 ---
 
 <article class="competition stack">
@@ -27,6 +29,7 @@ const { data, tableId, tableCaption } = Astro.props;
     editions={data.editions}
     winners={data.winners}
     hosts={data.hosts}
+    extraColumn={extraColumn}
   />
 
   <ChampionsSummary champions={data.champions} scaleMax={data.editions.length} />
