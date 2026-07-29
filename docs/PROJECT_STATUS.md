@@ -297,14 +297,43 @@ differ from `## Editions` and will need the matching `editionsHeading`:
 
 - [ ] Add the Playwright smoke test as a CI job (needs
       `pnpm test:e2e:install`); currently run locally to keep deploys fast.
-- [ ] Compare two national teams; "on this day" cards
+- [x] Compare two national teams - added 2026-07-29 (intensive run). New
+      `/compare` page, generated from the same World Cup, EURO, Copa América
+      and Nations League edition tables the rest of the site already loads
+      (individual awards excluded: Ballon d'Or/Golden Boot "Team" cells can
+      hold semicolon-separated ties, e.g. the 1962 Golden Boot's six-way tie,
+      which isn't safe to attribute to one country). New `src/lib/compare.ts`:
+      `buildAllCountryRecords()` ranks every country that has won, been
+      runner-up, or reached a tracked semifinal in at least one of the four
+      competitions, by titles then finals reached then name; grouping reuses
+      the existing West Germany/Germany `summaryGroupFor()` rule so totals
+      stay consistent with the champions summaries elsewhere. A head-to-head
+      picker (two `<select>`s + a swap button) lets a reader compare any two
+      teams' titles/runner-up/semifinal/finals-reached, per competition and
+      combined; selection is shareable via `?a=`/`?b=` URL query params
+      (restored on load, same pattern as the existing winner/year/host
+      filters). Progressive enhancement per `AGENTS.md` rule 5: the default
+      pair (the two most-titled teams) and the full all-teams ranking table
+      are rendered as plain server-side HTML tables that work with zero JS;
+      the JS only swaps in a different pair's numbers and updates the URL.
+      Competitions that don't track a third/fourth-place finish (Copa
+      América's table has no such column) render "—" rather than a
+      misleading 0, via the new `tracksSemifinalColumn()`. Linked from
+      `Nav.astro` (between Records and Quiz) and the home page features
+      section. Covered by 9 new Vitest cases (`tests/unit/compare.test.ts`:
+      `distinctCountryGroups`, `buildCountryCompetitionRecord`,
+      `buildCountryRecord`, `buildAllCountryRecords`, `tracksSemifinalColumn`)
+      and 5 new Playwright cases at 360px (no overflow, default pair +
+      ranking table, select-a-team + swap, `?a=`/`?b=` URL restore, the "—"
+      no-data-column case).
 - [ ] Installable PWA / offline reading; per-competition print sheet download
 - [ ] Optional Croatian/English localization
 
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
-  Records and Timelines, and the Family Quiz all have live pages now.
+  Records and Timelines, Compare National Teams, and the Family Quiz all have
+  live pages now.
 - Historical names appear as distinct winner-filter entries by design.
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
   time out; re-running the deploy clears it (it did here).

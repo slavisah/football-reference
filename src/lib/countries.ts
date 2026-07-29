@@ -7,7 +7,7 @@
 // West Germany / Germany continuity is merged, which is the single case the
 // editorial content itself groups. Every other name counts as itself.
 
-type Group = { id: string; displayName: string };
+export type Group = { id: string; displayName: string };
 
 const SUCCESSOR_GROUPS: Record<string, Group> = {
   'west germany': { id: 'germany', displayName: 'Germany (incl. West Germany)' },
