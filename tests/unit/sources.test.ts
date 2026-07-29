@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extractSources } from '../../src/lib/sources';
+import { extractSources, extractSourceSections } from '../../src/lib/sources';
 
 const doc = `# Sources
 
@@ -38,5 +38,24 @@ describe('extractSources', () => {
 
   it('returns an empty array for an unknown section', () => {
     expect(extractSources(doc, 'Copa América')).toEqual([]);
+  });
+});
+
+describe('extractSourceSections', () => {
+  it('returns every heading that has at least one link, in file order', () => {
+    const sections = extractSourceSections(doc);
+    expect(sections.map((s) => s.heading)).toEqual(['FIFA World Cup', 'UEFA EURO']);
+  });
+
+  it('nests each section\'s own links, matching extractSources for that heading', () => {
+    const sections = extractSourceSections(doc);
+    const worldCup = sections.find((s) => s.heading === 'FIFA World Cup');
+    expect(worldCup?.links).toEqual(extractSources(doc, 'FIFA World Cup'));
+  });
+
+  it('skips headings with no links (e.g. a prose-only "Review policy" section)', () => {
+    const withPolicy = `${doc}\n## Review policy\n\n1. Check primary sources first.\n`;
+    const sections = extractSourceSections(withPolicy);
+    expect(sections.some((s) => s.heading === 'Review policy')).toBe(false);
   });
 });

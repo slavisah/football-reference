@@ -256,7 +256,23 @@ differ from `## Editions` and will need the matching `editionsHeading`:
         as a quiz idea in `content/records-and-timelines.md`) needs a
         drag-and-drop or ranking control, not multiple choice - left for a
         future pass.
-- [ ] `/about/sources` - a sources index page (data already in `docs/SOURCES.md`)
+- [x] `/about/sources` - a sources index page, added 2026-07-29 (intensive
+      run). `src/pages/about/sources.astro` groups every source link by
+      competition, read live from `docs/SOURCES.md` via the new
+      `extractSourceSections()` in `src/lib/sources.ts` (loops the file's `##`
+      headings through the existing `extractSources()` per heading, so the
+      index can never drift from what each competition's own References
+      section shows - no new parser, no duplicated data). Each group heading
+      links to the competition page it backs (Golden Boot has no section of
+      its own - a note explains it cites the FIFA World Cup/EURO sources,
+      matching how its page already loads them). A second card gives the
+      reader-facing "How sources are reviewed" policy. Content/front matter
+      lives in `content/about-sources.md` (status: verified, its own
+      `lastReviewed`), loaded with the existing `loadPageMeta()`. Linked from
+      `Nav.astro` (10th link) and `Footer.astro`. Covered by 3 new Vitest
+      cases (`extractSourceSections`) and 4 new Playwright cases (no 360px
+      overflow, grouping + competition links, review policy + last-reviewed
+      date visible, reachable from nav/footer).
 - [x] Additional filters mentioned in `AGENTS.md` (by host) - added 2026-07-29
       (intensive run). `TournamentTable.astro` gained an optional `hosts` prop
       and a third "Host" `<select>` filter alongside Winner/Year, wired
