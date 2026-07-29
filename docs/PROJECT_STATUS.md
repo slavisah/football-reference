@@ -103,9 +103,30 @@ implemented, and every acceptance scenario passes.
       (Records) added; `.nav-list` still wraps cleanly at 360px (covered by
       the new Playwright "no horizontal page overflow" home-page test). No
       "More" grouping needed yet.
-- [ ] Add tournament-level "best scorer" / "best goalkeeper" style facts to
-      competition pages, sourced from `content/golden-boot.md` - e.g. a small
-      stat next to each edition or a callout on the World Cup/EURO pages.
+- [x] Add tournament-level "best scorer" facts to competition pages, sourced
+      from `content/golden-boot.md` - added 2026-07-29 (intensive run). The
+      World Cup and EURO pages (`world-cup.astro`, `euro.astro`) now load the
+      matching Golden Boot table (by year, which lines up exactly with both
+      competitions' editions) alongside their own data and join it in as an
+      extra "Top scorer" table column, e.g. "Just Fontaine (France, 13
+      goals)". Implemented as a generic `extraColumn` prop on
+      `TournamentTable.astro` (label + a `Map<year, text>`, forwarded through
+      `CompetitionView.astro`) rather than a one-off - reusable for a future
+      "best goalkeeper" fact if that content is ever added - and the new
+      `buildTopScorerFacts()` in `src/lib/editions.ts` builds the display
+      string from the Player(s)/Team/Goals columns, falling back to just the
+      player name when team/goals aren't present. A missing year (there are
+      none today for these two competitions) renders an em dash rather than
+      breaking the row. This is purely a joined display column, not new
+      editorial content, so no validation or filter changes were needed; the
+      existing per-row `data-label` mobile-card CSS handles it for free.
+      Covered by 3 new Vitest cases (`buildTopScorerFacts`) and 2 new
+      Playwright cases (World Cup 1930/2018, EURO 2016) at 360px, plus the
+      existing no-overflow checks now also run against a new EURO
+      `describe` block (previously untested on its own).
+      "Best goalkeeper" is **not implemented** - no goalkeeper-award
+      editorial content exists in `content/` yet, would need that added
+      first.
 - [x] Table sort order - fixed 2026-07-28. The year-sort was only wired up
       for the filter dropdown; the actual table rows rendered in source
       (oldest-first) order. `TournamentTable.astro` now renders a

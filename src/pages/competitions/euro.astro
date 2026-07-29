@@ -2,11 +2,20 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
+import { buildTopScorerFacts } from '../../lib/editions';
 
-const data = await loadCompetition('uefa-euro', {
-  editionsHeading: 'Editions',
-  sourcesHeading: 'UEFA EURO',
-});
+const [data, goldenBoot] = await Promise.all([
+  loadCompetition('uefa-euro', {
+    editionsHeading: 'Editions',
+    sourcesHeading: 'UEFA EURO',
+  }),
+  loadCompetition('golden-boot', {
+    editionsHeading: 'UEFA EURO top scorers',
+    sourcesHeading: 'UEFA EURO',
+  }),
+]);
+
+const topScorers = buildTopScorerFacts(goldenBoot.editions);
 ---
 
 <BaseLayout
@@ -17,5 +26,6 @@ const data = await loadCompetition('uefa-euro', {
     data={data}
     tableId="euro"
     tableCaption="UEFA European Championship editions, 1960 onward"
+    extraColumn={{ label: 'Top scorer', values: topScorers }}
   />
 </BaseLayout>
