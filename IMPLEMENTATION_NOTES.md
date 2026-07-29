@@ -98,7 +98,9 @@ deployment → Source** to **GitHub Actions**.
 ## Next logical milestone
 
 All six competition/award pages, `/records`, and `/quiz` are live (see
-`docs/PROJECT_STATUS.md` for what each covers). Remaining from
-`docs/WEBSITE_REQUIREMENTS.md`: an `/about/sources` index page, additional
-filters (by host, by team), sort controls that preserve historical notes, and
-optional Croatian/English localization.
+`docs/PROJECT_STATUS.md` for what each covers). Winner/year/host filtering is
+now in place on every competition table that has host data. Remaining from
+`docs/WEBSITE_REQUIREMENTS.md`: an `/about/sources` index page, a "by team"
+filter (needs new editorial content - only a team *count* column exists
+today), sort controls that preserve historical notes, and optional
+Croatian/English localization.

@@ -4,6 +4,7 @@ import { findTableByHeading } from './markdownTable';
 import {
   buildChampionsSummary,
   buildEditions,
+  distinctHosts,
   distinctWinners,
 } from './editions';
 import { extractSources, type SourceLink } from './sources';
@@ -23,6 +24,8 @@ export type CompetitionData = {
   editions: Edition[];
   champions: ChampionSummary[];
   winners: string[];
+  /** Distinct host values for the host filter; empty when the table has no host column. */
+  hosts: string[];
   sources: SourceLink[];
 };
 
@@ -110,6 +113,7 @@ export async function loadCompetition(
     editions,
     champions: buildChampionsSummary(editions),
     winners: distinctWinners(editions),
+    hosts: distinctHosts(editions),
     sources: extractSources(sourcesRaw, sourcesHeading),
   };
 }
