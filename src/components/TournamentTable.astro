@@ -12,9 +12,24 @@ interface Props {
   hosts?: string[];
   /** Label for the winner filter/column, e.g. "Player" on a top-scorers table. */
   winnerLabel?: string;
+  /**
+   * An extra display-only column joined in by edition year, not part of the
+   * source table (e.g. that edition's Golden Boot top scorer). Omitted rows
+   * show an em dash rather than hiding the column.
+   */
+  extraColumn?: { label: string; values: Map<string, string> };
 }
 
-const { id, caption, table, editions, winners, hosts = [], winnerLabel = 'Winner' } = Astro.props;
+const {
+  id,
+  caption,
+  table,
+  editions,
+  winners,
+  hosts = [],
+  winnerLabel = 'Winner',
+  extraColumn,
+} = Astro.props;
 
 // Years for the filter, newest first.
 const years = [...editions]
@@ -82,6 +97,7 @@ const winnerColIndex = table.headers.findIndex((header) =>
       <thead>
         <tr>
           {table.headers.map((header) => <th scope="col">{header}</th>)}
+          {extraColumn && <th scope="col">{extraColumn.label}</th>}
         </tr>
       </thead>
       <tbody>
@@ -96,6 +112,11 @@ const winnerColIndex = table.headers.findIndex((header) =>
                   {cell.value}
                 </td>
               ))}
+              {extraColumn && (
+                <td data-label={extraColumn.label}>
+                  {extraColumn.values.get(edition.year) ?? '—'}
+                </td>
+              )}
             </tr>
           ))
         }

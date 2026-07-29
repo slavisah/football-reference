@@ -82,6 +82,33 @@ test.describe('World Cup page on a 360px phone', () => {
     const count = await sources.count();
     expect(count).toBeGreaterThan(0);
   });
+
+  test('shows each edition\'s top scorer, joined in from the Golden Boot data', async ({ page }) => {
+    const row2018 = page.locator('tbody tr[data-year="2018"]');
+    await expect(row2018.locator('td[data-label="Top scorer"]')).toContainText('Harry Kane');
+
+    const row1930 = page.locator('tbody tr[data-year="1930"]');
+    await expect(row1930.locator('td[data-label="Top scorer"]')).toContainText('Guillermo Stábile');
+  });
+});
+
+test.describe('EURO page on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('competitions/euro');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('shows each edition\'s top scorer, joined in from the Golden Boot data', async ({ page }) => {
+    const row2016 = page.locator('tbody tr[data-year="2016"]');
+    await expect(row2016.locator('td[data-label="Top scorer"]')).toContainText('Antoine Griezmann');
+  });
 });
 
 test.describe('Golden Boot page on a 360px phone', () => {
