@@ -97,9 +97,8 @@ deployment → Source** to **GitHub Actions**.
 
 ## Next logical milestone
 
-Add the remaining competition and award pages (Copa América, Nations League,
-Ballon d'Or, Golden Boot) reusing the same table/summary components, plus a
-`/records` page that composes the generated timelines and an `/about/sources`
-index. Copa América needs the `allowDuplicateYears`/format-note handling because
-its history is the least uniform. After that: the family quiz generated from the
-structured editions, and optional Croatian/English localization.
+All six competition/award pages, `/records`, and `/quiz` are live (see
+`docs/PROJECT_STATUS.md` for what each covers). Remaining from
+`docs/WEBSITE_REQUIREMENTS.md`: an `/about/sources` index page, additional
+filters (by host, by team), sort controls that preserve historical notes, and
+optional Croatian/English localization.

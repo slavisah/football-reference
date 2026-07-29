@@ -1,0 +1,323 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import QuizCard from '../components/QuizCard.astro';
+import References from '../components/References.astro';
+import { loadCompetition, loadPageMeta } from '../lib/competition';
+import { buildTimeline } from '../lib/editions';
+import {
+  championByYearQuestions,
+  hostByYearQuestions,
+  runnerUpByYearQuestions,
+  topScorerByYearQuestions,
+  selectQuiz,
+  type QuizPool,
+} from '../lib/quiz';
+
+const meta = await loadPageMeta('quiz');
+
+const [worldCup, euro, copaAmerica, nationsLeague, ballonDor, goldenBootWorldCup, goldenBootEuro] =
+  await Promise.all([
+    loadCompetition('fifa-world-cup', {
+      editionsHeading: 'Editions',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('uefa-euro', {
+      editionsHeading: 'Editions',
+      sourcesHeading: 'UEFA EURO',
+    }),
+    loadCompetition('copa-america', {
+      editionsHeading: 'Champions timeline',
+      sourcesHeading: 'Copa América',
+      allowDuplicateYears: ['1959'],
+    }),
+    loadCompetition('uefa-nations-league', {
+      editionsHeading: 'Finals',
+      sourcesHeading: 'UEFA Nations League',
+    }),
+    loadCompetition('ballon-dor', {
+      editionsHeading: 'Winners',
+      sourcesHeading: "Ballon d'Or",
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'FIFA World Cup top scorers',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'UEFA EURO top scorers',
+      sourcesHeading: 'UEFA EURO',
+    }),
+  ]);
+
+// Each pool draws from one competition's real data; `take` caps how many of
+// its generated questions make the final quiz, kept modest so the quiz stays
+// a few minutes long rather than covering every edition ever played.
+const pools: QuizPool[] = [
+  {
+    questions: championByYearQuestions(worldCup.editions, 'FIFA World Cup', 'world-cup'),
+    take: 3,
+    seed: 'pick:world-cup:champion',
+  },
+  {
+    questions: hostByYearQuestions(worldCup.editions, 'FIFA World Cup', 'world-cup'),
+    take: 2,
+    seed: 'pick:world-cup:host',
+  },
+  {
+    questions: runnerUpByYearQuestions(buildTimeline(worldCup.editions), 'FIFA World Cup', 'world-cup'),
+    take: 1,
+    seed: 'pick:world-cup:runner-up',
+  },
+  {
+    questions: championByYearQuestions(euro.editions, 'UEFA EURO', 'euro'),
+    take: 2,
+    seed: 'pick:euro:champion',
+  },
+  {
+    questions: hostByYearQuestions(euro.editions, 'UEFA EURO', 'euro'),
+    take: 2,
+    seed: 'pick:euro:host',
+  },
+  {
+    questions: runnerUpByYearQuestions(buildTimeline(euro.editions), 'UEFA EURO', 'euro'),
+    take: 1,
+    seed: 'pick:euro:runner-up',
+  },
+  {
+    questions: championByYearQuestions(copaAmerica.editions, 'Copa América', 'copa-america'),
+    take: 2,
+    seed: 'pick:copa-america:champion',
+  },
+  {
+    questions: hostByYearQuestions(copaAmerica.editions, 'Copa América', 'copa-america'),
+    take: 1,
+    seed: 'pick:copa-america:host',
+  },
+  {
+    questions: runnerUpByYearQuestions(buildTimeline(copaAmerica.editions), 'Copa América', 'copa-america'),
+    take: 1,
+    seed: 'pick:copa-america:runner-up',
+  },
+  {
+    questions: championByYearQuestions(nationsLeague.editions, 'UEFA Nations League', 'nations-league'),
+    take: 2,
+    seed: 'pick:nations-league:champion',
+  },
+  {
+    questions: hostByYearQuestions(nationsLeague.editions, 'UEFA Nations League', 'nations-league'),
+    take: 2,
+    seed: 'pick:nations-league:host',
+  },
+  {
+    questions: championByYearQuestions(ballonDor.editions, "Ballon d'Or", 'ballon-dor'),
+    take: 3,
+    seed: "pick:ballon-dor:champion",
+  },
+  {
+    questions: topScorerByYearQuestions(goldenBootWorldCup.editions, 'World Cup Golden Boot', 'golden-boot-world-cup'),
+    take: 2,
+    seed: 'pick:golden-boot-world-cup:scorer',
+  },
+  {
+    questions: topScorerByYearQuestions(goldenBootEuro.editions, 'EURO Golden Boot', 'golden-boot-euro'),
+    take: 2,
+    seed: 'pick:golden-boot-euro:scorer',
+  },
+];
+
+const questions = selectQuiz(pools, 'family-quiz:v1');
+
+const sources = [
+  ...worldCup.sources,
+  ...euro.sources,
+  ...copaAmerica.sources,
+  ...nationsLeague.sources,
+  ...ballonDor.sources,
+  ...goldenBootWorldCup.sources,
+  ...goldenBootEuro.sources,
+].filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+
+const lastReviewed = [
+  worldCup.lastReviewed,
+  euro.lastReviewed,
+  copaAmerica.lastReviewed,
+  nationsLeague.lastReviewed,
+  ballonDor.lastReviewed,
+  goldenBootWorldCup.lastReviewed,
+  meta.lastReviewed,
+]
+  .sort()
+  .at(-1) as string;
+---
+
+<BaseLayout
+  title={meta.title}
+  description="A family football quiz generated from the World Cup, EURO, Copa América, Nations League, Ballon d'Or and Golden Boot tables - champions, hosts, finals and top scorers."
+>
+  <article class="quiz stack">
+    <header class="quiz__header">
+      <p class="eyebrow badge">Generated from the competition tables</p>
+      <h1>{meta.title}</h1>
+      <p class="quiz__intro">{meta.intro}</p>
+    </header>
+
+    <div class="quiz__score card no-print" id="quiz-score" hidden>
+      <p>
+        Score:
+        <strong id="quiz-score-value">0</strong> / <span id="quiz-score-total">{questions.length}</span>
+      </p>
+      <button type="button" id="quiz-restart">Restart quiz</button>
+    </div>
+
+    <ol class="quiz__list">
+      {
+        questions.map((question, index) => (
+          <li>
+            <QuizCard question={question} index={index} />
+          </li>
+        ))
+      }
+    </ol>
+
+    <References sources={sources} lastReviewed={lastReviewed} status={meta.status} />
+  </article>
+</BaseLayout>
+
+<style>
+  .quiz__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .quiz__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .quiz__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .quiz__score {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 3.6rem;
+    z-index: 10;
+  }
+
+  .quiz__score p {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  #quiz-restart {
+    font: inherit;
+    padding: 0.5rem 0.9rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg-subtle);
+    cursor: pointer;
+  }
+
+  #quiz-restart:hover {
+    border-color: var(--accent);
+  }
+
+  .quiz__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const cards = Array.from(document.querySelectorAll('.quiz-card'));
+    const scoreBar = document.getElementById('quiz-score');
+    const scoreValue = document.getElementById('quiz-score-value');
+    const restartBtn = document.getElementById('quiz-restart');
+
+    if (scoreBar) scoreBar.hidden = false;
+
+    let score = 0;
+
+    function setScore(value) {
+      score = value;
+      if (scoreValue) scoreValue.textContent = String(score);
+    }
+
+    function setupCard(card) {
+      const answerIndex = Number(card.dataset.answerIndex);
+      const radios = Array.from(card.querySelectorAll('input[type="radio"]'));
+      const checkBtn = card.querySelector('.quiz-card__check');
+      const feedback = card.querySelector('.quiz-card__feedback');
+      const labels = Array.from(card.querySelectorAll('.quiz-card__choice'));
+
+      if (checkBtn) checkBtn.hidden = false;
+
+      function updateCheckState() {
+        if (checkBtn) checkBtn.disabled = !radios.some((r) => r.checked);
+      }
+
+      function check() {
+        const selected = radios.find((r) => r.checked);
+        if (!selected) return;
+        const selectedIndex = Number(selected.value);
+        const correct = selectedIndex === answerIndex;
+
+        radios.forEach((r) => {
+          r.disabled = true;
+        });
+        labels.forEach((label, i) => {
+          label.classList.toggle('is-correct', i === answerIndex);
+          label.classList.toggle('is-incorrect', i === selectedIndex && !correct);
+        });
+        if (feedback) {
+          feedback.textContent = correct
+            ? 'Correct!'
+            : `Not quite - the answer is "${labels[answerIndex]?.textContent?.trim() ?? ''}".`;
+        }
+        if (checkBtn) checkBtn.hidden = true;
+        card.dataset.answered = correct ? 'correct' : 'incorrect';
+        setScore(cards.filter((c) => c.dataset.answered === 'correct').length);
+      }
+
+      radios.forEach((radio) => radio.addEventListener('change', updateCheckState));
+      checkBtn?.addEventListener('click', check);
+    }
+
+    function restart() {
+      cards.forEach((card) => {
+        delete card.dataset.answered;
+        const radios = Array.from(card.querySelectorAll('input[type="radio"]'));
+        const checkBtn = card.querySelector('.quiz-card__check');
+        const feedback = card.querySelector('.quiz-card__feedback');
+        const labels = Array.from(card.querySelectorAll('.quiz-card__choice'));
+
+        radios.forEach((r) => {
+          r.disabled = false;
+          r.checked = false;
+        });
+        labels.forEach((label) => label.classList.remove('is-correct', 'is-incorrect'));
+        if (feedback) feedback.textContent = '';
+        if (checkBtn) {
+          checkBtn.hidden = false;
+          checkBtn.disabled = true;
+        }
+      });
+      setScore(0);
+    }
+
+    cards.forEach(setupCard);
+    restartBtn?.addEventListener('click', restart);
+  })();
+</script>
