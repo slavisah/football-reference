@@ -26,6 +26,7 @@ const { data, tableId, tableCaption } = Astro.props;
     table={data.table}
     editions={data.editions}
     winners={data.winners}
+    hosts={data.hosts}
   />
 
   <ChampionsSummary champions={data.champions} scaleMax={data.editions.length} />

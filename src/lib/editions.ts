@@ -122,3 +122,22 @@ export function distinctWinners(editions: Edition[]): string[] {
   }
   return winners.sort((a, b) => a.localeCompare(b));
 }
+
+/**
+ * Distinct hosts for populating the filter control, alphabetically. Returns
+ * an empty list when the source table has no host column (e.g. Ballon d'Or,
+ * Golden Boot), so callers can hide the filter entirely rather than showing
+ * an empty one.
+ */
+export function distinctHosts(editions: Edition[]): string[] {
+  const seen = new Set<string>();
+  const hosts: string[] = [];
+  for (const edition of editions) {
+    const host = edition.host?.trim();
+    if (host && !seen.has(host)) {
+      seen.add(host);
+      hosts.push(host);
+    }
+  }
+  return hosts.sort((a, b) => a.localeCompare(b));
+}

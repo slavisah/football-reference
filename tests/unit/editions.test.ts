@@ -3,6 +3,7 @@ import {
   buildChampionsSummary,
   buildEditions,
   buildTimeline,
+  distinctHosts,
   distinctWinners,
 } from '../../src/lib/editions';
 import type { MarkdownTable } from '../../src/lib/types';
@@ -82,6 +83,26 @@ describe('distinctWinners', () => {
       'Spain',
       'West Germany',
     ]);
+  });
+});
+
+describe('distinctHosts', () => {
+  it('lists each host once, alphabetically', () => {
+    expect(distinctHosts(buildEditions(table))).toEqual([
+      'Brazil',
+      'Canada, Mexico and United States',
+      'South Africa',
+      'Switzerland',
+      'West Germany',
+    ]);
+  });
+
+  it('returns an empty list when the table has no host column', () => {
+    const scorersTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [['1958', 'Just Fontaine', 'France', '13']],
+    };
+    expect(distinctHosts(buildEditions(scorersTable))).toEqual([]);
   });
 });
 
