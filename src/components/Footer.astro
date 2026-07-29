@@ -1,4 +1,6 @@
 ---
+import { withBase } from '../lib/url';
+
 const year = new Date().getFullYear();
 ---
 
@@ -11,6 +13,7 @@ const year = new Date().getFullYear();
     </p>
     <p class="muted">
       &copy; {year}. No tournament logos, betting content, ads, or trackers.
+      <a href={withBase('/about/sources')}>Sources &amp; review policy</a>.
     </p>
   </div>
 </footer>

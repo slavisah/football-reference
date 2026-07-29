@@ -46,3 +46,27 @@ export function extractSources(markdown: string, heading: string): SourceLink[] 
 
   return links;
 }
+
+export type SourceSection = {
+  heading: string;
+  links: SourceLink[];
+};
+
+/**
+ * Every "## <heading>" section in docs/SOURCES.md that has at least one link,
+ * in file order. Reuses extractSources() per heading (rather than a second
+ * parser) so the /about/sources index can never drift from what each
+ * competition's own References section shows. Headings with no links (e.g.
+ * "Review policy", which is prose, not a source list) are skipped.
+ */
+export function extractSourceSections(markdown: string): SourceSection[] {
+  const headings: string[] = [];
+  for (const line of markdown.split(/\r?\n/)) {
+    const headingMatch = /^##\s+(.*)$/.exec(line.trim());
+    if (headingMatch) headings.push(headingMatch[1].trim());
+  }
+
+  return headings
+    .map((heading) => ({ heading, links: extractSources(markdown, heading) }))
+    .filter((section) => section.links.length > 0);
+}

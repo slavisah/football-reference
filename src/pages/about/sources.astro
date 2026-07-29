@@ -1,0 +1,166 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { loadPageMeta } from '../../lib/competition';
+import { extractSourceSections } from '../../lib/sources';
+import { withBase } from '../../lib/url';
+import sourcesRaw from '../../../docs/SOURCES.md?raw';
+
+const meta = await loadPageMeta('about-sources');
+
+const sections = extractSourceSections(sourcesRaw);
+
+// Maps a docs/SOURCES.md heading to the page whose table it backs, so a
+// reader can jump straight from a source to the data it supports. Golden
+// Boot has no section of its own here - its top-scorer tables cite the
+// FIFA World Cup and UEFA EURO sections below, since that is where its data
+// comes from.
+const competitionPages: Record<string, string> = {
+  'FIFA World Cup': withBase('/competitions/world-cup'),
+  'UEFA EURO': withBase('/competitions/euro'),
+  'UEFA Nations League': withBase('/competitions/nations-league'),
+  'Copa América': withBase('/competitions/copa-america'),
+  "Ballon d'Or": withBase('/competitions/ballon-dor'),
+};
+
+const reviewed = new Date(`${meta.lastReviewed}T00:00:00Z`);
+const reviewedLabel = Number.isNaN(reviewed.getTime())
+  ? meta.lastReviewed
+  : reviewed.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    });
+---
+
+<BaseLayout
+  title={meta.title}
+  description="Every primary source behind the reference's competition and award tables, grouped by competition, plus how sources are reviewed."
+>
+  <article class="sources-page stack">
+    <header class="sources-page__header">
+      <p class="eyebrow badge">Editorial</p>
+      <h1>{meta.title}</h1>
+      <p class="sources-page__intro">{meta.intro}</p>
+      <p class="sources-page__meta">
+        <span class="badge">Status: {meta.status}</span>
+        <span class="review">
+          Last reviewed:
+          <time datetime={meta.lastReviewed}>{reviewedLabel}</time>
+        </span>
+      </p>
+    </header>
+
+    <section class="stack" aria-labelledby="sources-heading">
+      <h2 id="sources-heading">Sources by competition</h2>
+      <p class="muted">
+        These are the same links shown in the "References &amp; review"
+        section at the bottom of each competition page, read live from
+        <code>docs/SOURCES.md</code> so this index can never drift out of
+        sync with them.
+      </p>
+      <div class="sources-page__grid">
+        {
+          sections.map((section) => (
+            <div class="card sources-page__group">
+              <h3>
+                {competitionPages[section.heading] ? (
+                  <a href={competitionPages[section.heading]}>{section.heading}</a>
+                ) : (
+                  section.heading
+                )}
+              </h3>
+              <ul>
+                {section.links.map((source) => (
+                  <li>
+                    <a href={source.url} rel="nofollow noopener external" target="_blank">
+                      {source.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+      <p class="muted">
+        The Golden Boot page's World Cup and EURO top-scorer tables cite the
+        FIFA World Cup and UEFA EURO sources above - its own data comes from
+        those two competitions, so it has no separate source section.
+      </p>
+    </section>
+
+    <section class="card stack" aria-labelledby="policy-heading">
+      <h2 id="policy-heading">How sources are reviewed</h2>
+      <ol>
+        <li>Primary sources are checked first: the governing body for each competition (FIFA, UEFA, CONMEBOL) or the award's own organiser.</li>
+        <li>Reputable secondary sources are used only to fill gaps primary sources leave.</li>
+        <li>Ambiguous historical decisions - renamed nations, disputed scorelines, format changes - are recorded as editorial notes on the relevant page rather than resolved silently.</li>
+        <li>Every content file carries its own <code>lastReviewed</code> date, updated whenever it is revised.</li>
+        <li>Historical team names are never rewritten to match present-day borders or names.</li>
+      </ol>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .sources-page__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .sources-page__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .sources-page__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .sources-page__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .review {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .sources-page__grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    align-items: start;
+  }
+
+  .sources-page__group h3 {
+    margin-top: 0;
+  }
+
+  .sources-page__group ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .sources-page__group a {
+    word-break: break-word;
+  }
+
+  #policy-heading + ol {
+    display: grid;
+    gap: 0.5rem;
+    max-width: 68ch;
+    padding-left: 1.2rem;
+  }
+</style>

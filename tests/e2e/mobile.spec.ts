@@ -251,3 +251,42 @@ test.describe('Quiz page on a 360px phone', () => {
     expect(count).toBe(cardCount);
   });
 });
+
+test.describe('Sources page on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('about/sources');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('groups source links by competition and links each group to its page', async ({
+    page,
+  }) => {
+    const groups = page.locator('.sources-page__group');
+    const count = await groups.count();
+    expect(count).toBeGreaterThanOrEqual(5);
+
+    const worldCupGroup = page.locator('.sources-page__group', { hasText: 'FIFA World Cup' });
+    await expect(worldCupGroup.getByRole('link', { name: 'FIFA World Cup' })).toHaveAttribute(
+      'href',
+      /competitions\/world-cup$/,
+    );
+    await expect(worldCupGroup.locator('a[href^="https://www.fifa.com"]').first()).toBeVisible();
+  });
+
+  test('shows the review policy and a last reviewed date', async ({ page }) => {
+    await expect(page.getByText('Historical team names are never rewritten')).toBeVisible();
+    await expect(page.locator('time[datetime="2026-07-29"]')).toBeVisible();
+  });
+
+  test('is reachable from the nav and the footer', async ({ page }) => {
+    await page.goto('');
+    await expect(page.locator('a[href$="/about/sources"]').first()).toBeVisible();
+  });
+});
