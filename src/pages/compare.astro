@@ -1,0 +1,422 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import References from '../components/References.astro';
+import { loadCompetition, loadPageMeta } from '../lib/competition';
+import { buildAllCountryRecords, tracksSemifinalColumn } from '../lib/compare';
+
+const meta = await loadPageMeta('compare-countries');
+
+const [worldCup, euro, copaAmerica, nationsLeague] = await Promise.all([
+  loadCompetition('fifa-world-cup', {
+    editionsHeading: 'Editions',
+    sourcesHeading: 'FIFA World Cup',
+  }),
+  loadCompetition('uefa-euro', {
+    editionsHeading: 'Editions',
+    sourcesHeading: 'UEFA EURO',
+  }),
+  loadCompetition('copa-america', {
+    editionsHeading: 'Champions timeline',
+    sourcesHeading: 'Copa América',
+    allowDuplicateYears: ['1959'],
+  }),
+  loadCompetition('uefa-nations-league', {
+    editionsHeading: 'Finals',
+    sourcesHeading: 'UEFA Nations League',
+  }),
+]);
+
+const competitions = [
+  { title: 'FIFA World Cup', slug: 'world-cup', editions: worldCup.editions },
+  { title: 'UEFA EURO', slug: 'euro', editions: euro.editions },
+  { title: 'Copa América', slug: 'copa-america', editions: copaAmerica.editions },
+  { title: 'UEFA Nations League', slug: 'nations-league', editions: nationsLeague.editions },
+];
+
+const tracksSemifinal = competitions.map((c) => tracksSemifinalColumn(c.editions));
+
+const allRecords = buildAllCountryRecords(competitions);
+const sortedByName = [...allRecords].sort((a, b) => a.displayName.localeCompare(b.displayName));
+
+// Default head-to-head pair: the two most-titled teams, so the panel shows
+// something meaningful before any JS runs or a URL param is read.
+const [defaultA, defaultB] = allRecords;
+
+function semifinalDisplay(index: number, value: number): string {
+  return tracksSemifinal[index] ? String(value) : '—';
+}
+
+const sources = [worldCup, euro, copaAmerica, nationsLeague]
+  .flatMap((c) => c.sources)
+  .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+
+const lastReviewed = [worldCup, euro, copaAmerica, nationsLeague]
+  .map((c) => c.lastReviewed)
+  .concat(meta.lastReviewed)
+  .sort()
+  .at(-1) as string;
+
+const recordsForClient = allRecords.map((r) => ({
+  id: r.id,
+  displayName: r.displayName,
+  totalTitles: r.totalTitles,
+  totalRunnerUps: r.totalRunnerUps,
+  totalSemifinals: r.totalSemifinals,
+  totalFinals: r.totalFinals,
+  competitions: r.competitions.map((c) => ({
+    slug: c.slug,
+    titles: c.titles,
+    runnerUps: c.runnerUps,
+    semifinals: c.semifinals,
+  })),
+}));
+---
+
+<BaseLayout
+  title={meta.title}
+  description="Compare two national teams' World Cup, EURO, Copa América and Nations League record - titles, runner-up finishes and semifinal finishes, generated from each competition's table."
+>
+  <article class="compare stack">
+    <header class="compare__header">
+      <p class="eyebrow badge">Generated from the competition tables</p>
+      <h1>{meta.title}</h1>
+      <p class="compare__intro">{meta.intro}</p>
+    </header>
+
+    <section class="card stack" aria-labelledby="head-to-head-heading">
+      <h2 id="head-to-head-heading">Head-to-head</h2>
+
+      <div class="compare__picker no-print">
+        <div class="compare__field">
+          <label for="compare-a">Team A</label>
+          <select id="compare-a" name="a">
+            {
+              sortedByName.map((r) => (
+                <option value={r.id} selected={r.id === defaultA.id}>
+                  {r.displayName}
+                </option>
+              ))
+            }
+          </select>
+        </div>
+
+        <button type="button" id="compare-swap" class="compare__swap" aria-label="Swap Team A and Team B">
+          &#8646; Swap
+        </button>
+
+        <div class="compare__field">
+          <label for="compare-b">Team B</label>
+          <select id="compare-b" name="b">
+            {
+              sortedByName.map((r) => (
+                <option value={r.id} selected={r.id === defaultB.id}>
+                  {r.displayName}
+                </option>
+              ))
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="compare__panel">
+        {
+          (['a', 'b'] as const).map((side) => {
+            const record = side === 'a' ? defaultA : defaultB;
+            return (
+              <div class="compare__side">
+                <h3 id={`compare-${side}-name`}>{record.displayName}</h3>
+                <div class="t-wrap">
+                  <table class="compare__table">
+                    <caption class="visually-hidden">
+                      {record.displayName}'s record by competition
+                    </caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Competition</th>
+                        <th scope="col">Titles</th>
+                        <th scope="col">Runner-up</th>
+                        <th scope="col">Semifinal / 4th</th>
+                        <th scope="col">Finals reached</th>
+                      </tr>
+                    </thead>
+                    <tbody id={`compare-${side}-body`}>
+                      {
+                        record.competitions.map((c, index) => (
+                          <tr data-slug={c.slug} data-tracks-semifinal={tracksSemifinal[index]}>
+                            <th scope="row">{c.competition}</th>
+                            <td data-field="titles">{c.titles}</td>
+                            <td data-field="runnerUps">{c.runnerUps}</td>
+                            <td data-field="semifinals">{semifinalDisplay(index, c.semifinals)}</td>
+                            <td data-field="finals">{c.titles + c.runnerUps}</td>
+                          </tr>
+                        ))
+                      }
+                    </tbody>
+                    <tfoot>
+                      <tr id={`compare-${side}-total`}>
+                        <th scope="row">Combined</th>
+                        <td data-field="titles">{record.totalTitles}</td>
+                        <td data-field="runnerUps">{record.totalRunnerUps}</td>
+                        <td data-field="semifinals">{record.totalSemifinals}</td>
+                        <td data-field="finals">{record.totalFinals}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            );
+          })
+        }
+      </div>
+
+      <p class="muted compare__note">
+        "Semifinal / 4th" counts third/fourth-place or "other semifinalist"
+        finishes, where that competition's table tracks one - Copa América's
+        table has no such column, shown as "—". Individual awards (Ballon
+        d'Or, Golden Boot) aren't included: they recognize players, not
+        national teams.
+      </p>
+    </section>
+
+    <section class="stack" aria-labelledby="all-teams-heading">
+      <h2 id="all-teams-heading">All national teams</h2>
+      <p class="muted">
+        Every team that has won, been runner-up, or reached a tracked
+        semifinal in at least one of these four competitions, ranked by
+        titles. Pick any two above to compare them directly.
+      </p>
+      <div class="t-wrap">
+        <table class="compare__table compare__table--all">
+          <caption class="visually-hidden">All national teams' combined record, ranked by titles</caption>
+          <thead>
+            <tr>
+              <th scope="col">Rank</th>
+              <th scope="col">Team</th>
+              <th scope="col">Titles</th>
+              <th scope="col">Runner-up</th>
+              <th scope="col">Semifinal / 4th</th>
+              <th scope="col">Finals reached</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              allRecords.map((r, i) => (
+                <tr>
+                  <td>{i + 1}</td>
+                  <th scope="row">{r.displayName}</th>
+                  <td>{r.totalTitles}</td>
+                  <td>{r.totalRunnerUps}</td>
+                  <td>{r.totalSemifinals}</td>
+                  <td>{r.totalFinals}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <References sources={sources} lastReviewed={lastReviewed} status={meta.status} />
+  </article>
+</BaseLayout>
+
+<style>
+  .compare__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .compare__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .compare__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .compare__picker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 0.75rem 1rem;
+    padding: 1rem;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .compare__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 12rem;
+    flex: 1 1 12rem;
+  }
+
+  .compare__field label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .compare__field select {
+    font: inherit;
+    padding: 0.5rem 0.6rem;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: 100%;
+  }
+
+  .compare__swap {
+    font: inherit;
+    padding: 0.55rem 0.9rem;
+    color: var(--text);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .compare__swap:hover {
+    border-color: var(--accent);
+  }
+
+  .compare__panel {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    align-items: start;
+  }
+
+  .compare__side h3 {
+    margin-bottom: 0.6rem;
+  }
+
+  .t-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+  }
+
+  .compare__table {
+    width: 100%;
+    min-width: 28rem;
+    border-collapse: collapse;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .compare__table--all {
+    min-width: 34rem;
+  }
+
+  .compare__table th,
+  .compare__table td {
+    padding: 0.55rem 0.7rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    white-space: nowrap;
+  }
+
+  .compare__table thead th {
+    background: var(--bg-subtle);
+    font-size: 0.85rem;
+  }
+
+  .compare__table tfoot th,
+  .compare__table tfoot td {
+    font-weight: 700;
+    border-top: 2px solid var(--border);
+    border-bottom: none;
+  }
+
+  .compare__table tbody tr:last-child th,
+  .compare__table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .compare__note {
+    font-size: 0.85rem;
+    max-width: 68ch;
+  }
+</style>
+
+<script is:inline define:vars={{ records: recordsForClient }}>
+  const selectA = document.getElementById('compare-a');
+  const selectB = document.getElementById('compare-b');
+  const swapBtn = document.getElementById('compare-swap');
+  const byId = new Map(records.map((r) => [r.id, r]));
+
+  function setCell(row, field, value) {
+    const cell = row && row.querySelector(`[data-field="${field}"]`);
+    if (cell) cell.textContent = String(value);
+  }
+
+  function fillSide(side, record) {
+    const heading = document.getElementById(`compare-${side}-name`);
+    if (heading) heading.textContent = record.displayName;
+
+    for (const comp of record.competitions) {
+      const row = document.querySelector(`#compare-${side}-body tr[data-slug="${comp.slug}"]`);
+      if (!row) continue;
+      const tracksSemifinal = row.dataset.tracksSemifinal !== 'false';
+      setCell(row, 'titles', comp.titles);
+      setCell(row, 'runnerUps', comp.runnerUps);
+      setCell(row, 'semifinals', tracksSemifinal ? comp.semifinals : '—');
+      setCell(row, 'finals', comp.titles + comp.runnerUps);
+    }
+
+    const totalRow = document.getElementById(`compare-${side}-total`);
+    setCell(totalRow, 'titles', record.totalTitles);
+    setCell(totalRow, 'runnerUps', record.totalRunnerUps);
+    setCell(totalRow, 'semifinals', record.totalSemifinals);
+    setCell(totalRow, 'finals', record.totalFinals);
+  }
+
+  function readParams() {
+    const p = new URLSearchParams(window.location.search);
+    return { a: p.get('a') || '', b: p.get('b') || '' };
+  }
+
+  function writeParams(a, b) {
+    const p = new URLSearchParams(window.location.search);
+    a ? p.set('a', a) : p.delete('a');
+    b ? p.set('b', b) : p.delete('b');
+    const qs = p.toString();
+    const url = window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash;
+    window.history.replaceState({}, '', url);
+  }
+
+  function render() {
+    const a = byId.get(selectA.value);
+    const b = byId.get(selectB.value);
+    if (a) fillSide('a', a);
+    if (b) fillSide('b', b);
+    writeParams(selectA.value, selectB.value);
+  }
+
+  // Restore a shared link's selection, if both ids are known.
+  const initial = readParams();
+  if (initial.a && byId.has(initial.a)) selectA.value = initial.a;
+  if (initial.b && byId.has(initial.b)) selectB.value = initial.b;
+
+  selectA.addEventListener('change', render);
+  selectB.addEventListener('change', render);
+  swapBtn?.addEventListener('click', () => {
+    const a = selectA.value;
+    selectA.value = selectB.value;
+    selectB.value = a;
+    render();
+  });
+
+  render();
+</script>

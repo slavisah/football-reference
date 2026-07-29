@@ -191,6 +191,53 @@ test.describe('Records page on a 360px phone', () => {
   });
 });
 
+test.describe('Compare page on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('compare');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('shows a default head-to-head pair and the all-teams ranking', async ({ page }) => {
+    await expect(page.locator('#compare-a-name')).not.toBeEmpty();
+    await expect(page.locator('#compare-b-name')).not.toBeEmpty();
+    await expect(page.locator('#all-teams-heading')).toBeVisible();
+    const rows = page.locator('table.compare__table--all tbody tr');
+    expect(await rows.count()).toBeGreaterThan(10);
+  });
+
+  test('choosing a different team updates the panel and the URL, and swap works', async ({
+    page,
+  }) => {
+    await page.selectOption('#compare-a', { label: 'Uruguay' });
+    await expect(page.locator('#compare-a-name')).toHaveText('Uruguay');
+    await expect(page).toHaveURL(/a=uruguay/);
+
+    const aBefore = await page.locator('#compare-a-name').textContent();
+    const bBefore = await page.locator('#compare-b-name').textContent();
+    await page.locator('#compare-swap').click();
+    await expect(page.locator('#compare-a-name')).toHaveText(bBefore ?? '');
+    await expect(page.locator('#compare-b-name')).toHaveText(aBefore ?? '');
+  });
+
+  test('a shared URL with ?a= and ?b= restores that pair on load', async ({ page }) => {
+    await page.goto('compare?a=uruguay&b=argentina');
+    await expect(page.locator('#compare-a-name')).toHaveText('Uruguay');
+    await expect(page.locator('#compare-b-name')).toHaveText('Argentina');
+  });
+
+  test('shows an em dash for a competition that has no semifinal column', async ({ page }) => {
+    const copaRow = page.locator('#compare-a-body tr[data-slug="copa-america"]');
+    await expect(copaRow.locator('[data-field="semifinals"]')).toHaveText('—');
+  });
+});
+
 test.describe('Quiz page on a 360px phone', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('quiz');
