@@ -90,6 +90,16 @@ test.describe('World Cup page on a 360px phone', () => {
     const row1930 = page.locator('tbody tr[data-year="1930"]');
     await expect(row1930.locator('td[data-label="Top scorer"]')).toContainText('Guillermo Stábile');
   });
+
+  test('shows the Memorable moments and Editorial notes sections from content/fifa-world-cup.md', async ({ page }) => {
+    const notes = page.locator('.notes__card');
+    await expect(notes).toHaveCount(3);
+    await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
+    await expect(page.getByText('Croatia reached its first final in 2018.')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Editorial notes' })).toBeVisible();
+    // *Maracanazo* renders as emphasis, not literal asterisks.
+    await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
+  });
 });
 
 test.describe('EURO page on a 360px phone', () => {
@@ -108,6 +118,13 @@ test.describe('EURO page on a 360px phone', () => {
   test('shows each edition\'s top scorer, joined in from the Golden Boot data', async ({ page }) => {
     const row2016 = page.locator('tbody tr[data-year="2016"]');
     await expect(row2016.locator('td[data-label="Top scorer"]')).toContainText('Antoine Griezmann');
+  });
+
+  test('shows the Historical format note as a paragraph and Memorable moments as a list', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Historical format note' })).toBeVisible();
+    await expect(page.locator('.notes__card p', { hasText: 'other semifinalist' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
+    await expect(page.getByText("Antonín Panenka's famous chipped penalty")).toBeVisible();
   });
 });
 
@@ -130,6 +147,14 @@ test.describe('Golden Boot page on a 360px phone', () => {
 
     const euroRow = page.locator('#golden-boot-euro-table tbody tr[data-year="1984"]');
     await expect(euroRow).toContainText('Michel Platini');
+  });
+
+  test('shows the World Cup notes and EURO notes sections, one per table', async ({ page }) => {
+    await expect(page.locator('.notes__card')).toHaveCount(2);
+    await expect(page.getByRole('heading', { name: 'World Cup notes' })).toBeVisible();
+    await expect(page.getByText("Just Fontaine's 13 goals in 1958 remain the record")).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'EURO notes' })).toBeVisible();
+    await expect(page.getByText('Michel Platini scored nine goals in five matches in 1984.')).toBeVisible();
   });
 
   test('the two tables filter independently by player', async ({ page }) => {
