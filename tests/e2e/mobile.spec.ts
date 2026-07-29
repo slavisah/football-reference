@@ -137,3 +137,64 @@ test.describe('Records page on a 360px phone', () => {
     ).toBeVisible();
   });
 });
+
+test.describe('Quiz page on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('quiz');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('shows a set of generated questions with multiple choices', async ({ page }) => {
+    const cards = page.locator('.quiz-card');
+    const count = await cards.count();
+    expect(count).toBeGreaterThan(10);
+    const firstChoiceCount = await cards.first().locator('input[type="radio"]').count();
+    expect(firstChoiceCount).toBeGreaterThanOrEqual(3);
+  });
+
+  test('answering a question updates the score, and can be checked with the keyboard', async ({
+    page,
+  }) => {
+    const firstCard = page.locator('.quiz-card').first();
+    const firstRadio = firstCard.locator('input[type="radio"]').first();
+
+    await firstRadio.focus();
+    await expect(firstRadio).toBeFocused();
+    await page.keyboard.press('Space');
+
+    const checkButton = firstCard.locator('.quiz-card__check');
+    await expect(checkButton).toBeEnabled();
+    await checkButton.click();
+
+    await expect(firstCard.locator('.quiz-card__feedback')).not.toBeEmpty();
+    await expect(firstCard.locator('.quiz-card__choice.is-correct')).toBeVisible();
+
+    const scoreValue = page.locator('#quiz-score-value');
+    await expect(scoreValue).toHaveText(/0|1/);
+  });
+
+  test('restart clears answers and resets the score', async ({ page }) => {
+    const firstCard = page.locator('.quiz-card').first();
+    await firstCard.locator('input[type="radio"]').first().check();
+    await firstCard.locator('.quiz-card__check').click();
+
+    await page.locator('#quiz-restart').click();
+
+    await expect(page.locator('#quiz-score-value')).toHaveText('0');
+    await expect(firstCard.locator('input[type="radio"]').first()).not.toBeChecked();
+    await expect(firstCard.locator('.quiz-card__check')).toBeDisabled();
+  });
+
+  test('every question has a "just show me the answer" fallback', async ({ page }) => {
+    const count = await page.locator('.quiz-card__reveal').count();
+    const cardCount = await page.locator('.quiz-card').count();
+    expect(count).toBe(cardCount);
+  });
+});

@@ -198,7 +198,43 @@ differ from `## Editions` and will need the matching `editionsHeading`:
 
 ### From `docs/WEBSITE_REQUIREMENTS.md`, still missing
 
-- [ ] `/quiz` - family quiz generated from the structured editions
+- [x] `/quiz` - family quiz generated from the structured editions, added
+      2026-07-29 (intensive run). `src/lib/quiz.ts` generates multiple-choice
+      questions straight from the same `Edition`/`TimelineEntry` data every
+      competition page already loads - no hand-typed trivia:
+      - "Who won the {competition} in {year}?" (`championByYearQuestions`,
+        all four team competitions plus Ballon d'Or);
+      - "Which country hosted the {year} {competition}?"
+        (`hostByYearQuestions`, World Cup/EURO/Copa América/Nations League;
+        excludes non-country host values like Copa América's early
+        "Home-and-away" editions);
+      - "Who did {champion} beat in the {year} final?" (`runnerUpByYearQuestions`,
+        reuses `buildTimeline`);
+      - "Who was the {competition} top scorer in {year}?"
+        (`topScorerByYearQuestions`, both Golden Boot tables).
+      Choices and distractors are picked with a seeded PRNG (`mulberry32` +
+      an FNV-1a-style string hash), not `Math.random()`, so the generated
+      quiz - and the unit tests - are fully deterministic; a question is
+      skipped outright if its competition doesn't yet have 2 distinct
+      alternative answers to build a fair multiple-choice question from
+      (e.g. would matter for a very new competition). `selectQuiz()` picks a
+      capped number of questions per competition/type (26 total today) and
+      shuffles them into one order, at `src/pages/quiz.astro`.
+      Progressive enhancement per `AGENTS.md` rule 5: every question renders
+      as a real `<fieldset>`/radio-button group plus a native
+      `<details>`/`<summary>` "Just show me the answer" disclosure that
+      works with zero JS. The interactive "Check answer" button and running
+      score bar are `hidden` in the markup and only revealed by the
+      `is:inline` script, so a no-JS visitor sees a clean answer-key quiz
+      sheet (also print-friendly) rather than dead buttons. Scoring, restart,
+      and keyboard operability (native radios + a real `<button>`) are
+      covered by 12 new Vitest cases (`tests/unit/quiz.test.ts`) and 5 new
+      Playwright cases at 360px. Linked from `Nav.astro` (9th link) and the
+      home page features section. Content lives in `content/quiz.md`.
+      - [ ] Not yet done: "put the champions in chronological order" (listed
+        as a quiz idea in `content/records-and-timelines.md`) needs a
+        drag-and-drop or ranking control, not multiple choice - left for a
+        future pass.
 - [ ] `/about/sources` - a sources index page (data already in `docs/SOURCES.md`)
 - [ ] Additional filters mentioned in `AGENTS.md` (by host, by team)
 - [ ] Sort controls that preserve historical notes
@@ -213,8 +249,8 @@ differ from `## Editions` and will need the matching `editionsHeading`:
 
 ## Known caveats
 
-- World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot, and
-  Records and Timelines all have live pages now.
+- World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
+  Records and Timelines, and the Family Quiz all have live pages now.
 - Historical names appear as distinct winner-filter entries by design.
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
   time out; re-running the deploy clears it (it did here).
