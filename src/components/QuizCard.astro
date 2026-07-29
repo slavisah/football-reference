@@ -1,0 +1,159 @@
+---
+import type { QuizQuestion } from '../lib/quiz';
+
+interface Props {
+  question: QuizQuestion;
+  index: number;
+}
+
+const { question, index } = Astro.props;
+const groupName = `quiz-${index}-answer`;
+---
+
+<div
+  class="quiz-card card"
+  id={`quiz-${index}`}
+  data-answer-index={question.answerIndex}
+>
+  <p class="quiz-card__category badge">{question.category}</p>
+
+  <fieldset class="quiz-card__fieldset">
+    <legend class="quiz-card__prompt">
+      {index + 1}. {question.prompt}
+    </legend>
+    <div class="quiz-card__choices">
+      {
+        question.choices.map((choice, choiceIndex) => (
+          <label class="quiz-card__choice">
+            <input type="radio" name={groupName} value={choiceIndex} />
+            <span>{choice}</span>
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+
+  <div class="quiz-card__controls no-print">
+    <button type="button" class="quiz-card__check" hidden disabled>
+      Check answer
+    </button>
+    <p class="quiz-card__feedback" role="status" aria-live="polite"></p>
+  </div>
+
+  <details class="quiz-card__reveal no-print">
+    <summary>Just show me the answer</summary>
+    <p>{question.choices[question.answerIndex]}</p>
+  </details>
+</div>
+
+<style>
+  .quiz-card__category {
+    margin: 0 0 0.6rem;
+  }
+
+  .quiz-card__fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .quiz-card__prompt {
+    padding: 0;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .quiz-card__choices {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .quiz-card__choice {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    cursor: pointer;
+  }
+
+  .quiz-card__choice:has(input:checked) {
+    border-color: var(--accent);
+  }
+
+  .quiz-card__choice:has(input:disabled) {
+    cursor: default;
+  }
+
+  .quiz-card__choice input {
+    flex: none;
+  }
+
+  .quiz-card__choice.is-correct {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
+  }
+
+  .quiz-card__choice.is-correct::after {
+    content: '✓ correct';
+    margin-left: auto;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--accent);
+  }
+
+  .quiz-card__choice.is-incorrect {
+    border-color: #c0392b;
+    background: color-mix(in srgb, #c0392b 16%, transparent);
+  }
+
+  .quiz-card__choice.is-incorrect::after {
+    content: '✗ your answer';
+    margin-left: auto;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: #c0392b;
+  }
+
+  .quiz-card__controls {
+    margin-top: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    min-height: 2.2rem;
+  }
+
+  .quiz-card__check {
+    font: inherit;
+    padding: 0.5rem 0.9rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: var(--accent-contrast);
+    cursor: pointer;
+  }
+
+  .quiz-card__check:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .quiz-card__feedback {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .quiz-card__reveal {
+    margin-top: 0.7rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .quiz-card__reveal summary {
+    cursor: pointer;
+  }
+</style>
