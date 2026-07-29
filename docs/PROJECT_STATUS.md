@@ -236,7 +236,24 @@ differ from `## Editions` and will need the matching `editionsHeading`:
         drag-and-drop or ranking control, not multiple choice - left for a
         future pass.
 - [ ] `/about/sources` - a sources index page (data already in `docs/SOURCES.md`)
-- [ ] Additional filters mentioned in `AGENTS.md` (by host, by team)
+- [x] Additional filters mentioned in `AGENTS.md` (by host) - added 2026-07-29
+      (intensive run). `TournamentTable.astro` gained an optional `hosts` prop
+      and a third "Host" `<select>` filter alongside Winner/Year, wired
+      through the same pattern: `data-host` on each row, a `host` URL query
+      param (shareable link, restored on load), combines with the other two
+      filters (AND), and is omitted entirely when a competition has no host
+      column (Ballon d'Or, Golden Boot) rather than rendering an empty
+      dropdown. New `distinctHosts()` in `src/lib/editions.ts` (mirrors
+      `distinctWinners()`) feeds the new `hosts: string[]` field on
+      `CompetitionData` (`src/lib/competition.ts`), so World Cup, EURO, Copa
+      América and Nations League all get the filter for free via
+      `CompetitionView.astro`; Golden Boot's two tables wire it explicitly
+      since that page doesn't use `CompetitionView`. Covered by 2 new Vitest
+      cases (`distinctHosts`, including the "no host column" case) and 2 new
+      Playwright cases (filter by host alone; winner+host combined) at 360px.
+      "By team" is **not implemented**: the source tables only have a
+      numeric team-count column, not a list of participating teams, so
+      there's no data to filter on - would need new editorial content first.
 - [ ] Sort controls that preserve historical notes
 
 ### Nice-to-have / later

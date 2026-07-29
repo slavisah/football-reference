@@ -49,6 +49,32 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(page).not.toHaveURL(/winner=/);
   });
 
+  test('filtering by host Mexico shows only the 1970 and 1986 editions', async ({ page }) => {
+    await page.selectOption('#world-cup-host', 'Mexico');
+
+    const visibleRows = page.locator('tbody tr:not([hidden])');
+    await expect(visibleRows).toHaveCount(2);
+    await expect(page.locator('tbody tr[data-year="1970"]')).toBeVisible();
+    await expect(page.locator('tbody tr[data-year="1986"]')).toBeVisible();
+    // The 2026 host string is "Canada, Mexico and United States", a distinct value.
+    await expect(page.locator('tbody tr[data-year="2026"]')).toBeHidden();
+
+    await expect(page).toHaveURL(/host=Mexico/);
+
+    await page.locator('#world-cup-reset').click();
+    await expect(page.locator('tbody tr:not([hidden])')).toHaveCount(23);
+    await expect(page).not.toHaveURL(/host=/);
+  });
+
+  test('winner and host filters combine', async ({ page }) => {
+    await page.selectOption('#world-cup-winner', 'Argentina');
+    await page.selectOption('#world-cup-host', 'Mexico');
+
+    const visibleRows = page.locator('tbody tr:not([hidden])');
+    await expect(visibleRows).toHaveCount(1);
+    await expect(page.locator('tbody tr[data-year="1986"]')).toBeVisible();
+  });
+
   test('shows the last reviewed date and source links', async ({ page }) => {
     await expect(page.locator('time[datetime="2026-07-23"]')).toBeVisible();
     const sources = page.locator('.references__list a');

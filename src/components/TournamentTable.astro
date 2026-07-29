@@ -8,11 +8,13 @@ interface Props {
   table: MarkdownTable;
   editions: Edition[];
   winners: string[];
+  /** Distinct host values for the host filter; omit or pass [] to hide the filter. */
+  hosts?: string[];
   /** Label for the winner filter/column, e.g. "Player" on a top-scorers table. */
   winnerLabel?: string;
 }
 
-const { id, caption, table, editions, winners, winnerLabel = 'Winner' } = Astro.props;
+const { id, caption, table, editions, winners, hosts = [], winnerLabel = 'Winner' } = Astro.props;
 
 // Years for the filter, newest first.
 const years = [...editions]
@@ -53,6 +55,18 @@ const winnerColIndex = table.headers.findIndex((header) =>
       </select>
     </div>
 
+    {
+      hosts.length > 0 && (
+        <div class="filters__field">
+          <label for={`${id}-host`}>Host</label>
+          <select id={`${id}-host`} name="host">
+            <option value="">All hosts</option>
+            {hosts.map((host) => <option value={host}>{host}</option>)}
+          </select>
+        </div>
+      )
+    }
+
     <button type="button" class="filters__reset" id={`${id}-reset`}>
       Reset
     </button>
@@ -73,7 +87,7 @@ const winnerColIndex = table.headers.findIndex((header) =>
       <tbody>
         {
           displayEditions.map((edition) => (
-            <tr data-winner={edition.winner} data-year={edition.year}>
+            <tr data-winner={edition.winner} data-year={edition.year} data-host={edition.host ?? ''}>
               {edition.cells.map((cell, index) => (
                 <td
                   data-label={cell.label}
@@ -286,6 +300,7 @@ const winnerColIndex = table.headers.findIndex((header) =>
   const form = document.getElementById(`${id}-filters`);
   const winnerSel = document.getElementById(`${id}-winner`);
   const yearSel = document.getElementById(`${id}-year`);
+  const hostSel = document.getElementById(`${id}-host`);
   const reset = document.getElementById(`${id}-reset`);
   const status = document.getElementById(`${id}-status`);
   const empty = document.getElementById(`${id}-empty`);
@@ -296,13 +311,18 @@ const winnerColIndex = table.headers.findIndex((header) =>
 
   function readParams() {
     const p = new URLSearchParams(window.location.search);
-    return { winner: p.get('winner') || '', year: p.get('year') || '' };
+    return {
+      winner: p.get('winner') || '',
+      year: p.get('year') || '',
+      host: p.get('host') || '',
+    };
   }
 
-  function writeParams(winner, year) {
+  function writeParams(winner, year, host) {
     const p = new URLSearchParams(window.location.search);
     winner ? p.set('winner', winner) : p.delete('winner');
     year ? p.set('year', year) : p.delete('year');
+    host ? p.set('host', host) : p.delete('host');
     const qs = p.toString();
     const url = window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash;
     window.history.replaceState({}, '', url);
@@ -311,31 +331,35 @@ const winnerColIndex = table.headers.findIndex((header) =>
   function apply() {
     const winner = winnerSel.value;
     const year = yearSel.value;
+    const host = hostSel ? hostSel.value : '';
     let shown = 0;
     for (const row of rows) {
       const matchWinner = !winner || row.dataset.winner === winner;
       const matchYear = !year || row.dataset.year === year;
-      const visible = matchWinner && matchYear;
+      const matchHost = !host || row.dataset.host === host;
+      const visible = matchWinner && matchYear && matchHost;
       row.hidden = !visible;
       if (visible) shown += 1;
     }
     empty.hidden = shown !== 0;
     if (status) {
-      if (!winner && !year) {
+      if (!winner && !year && !host) {
         status.textContent = `Showing all ${total} editions.`;
       } else {
         const bits = [];
         if (winner) bits.push(`winner ${winner}`);
         if (year) bits.push(`year ${year}`);
+        if (host) bits.push(`host ${host}`);
         status.textContent = `Showing ${shown} of ${total} editions (${bits.join(', ')}).`;
       }
     }
-    writeParams(winner, year);
+    writeParams(winner, year, host);
   }
 
   function clearAll() {
     winnerSel.value = '';
     yearSel.value = '';
+    if (hostSel) hostSel.value = '';
     apply();
   }
 
@@ -347,9 +371,13 @@ const winnerColIndex = table.headers.findIndex((header) =>
   if ([...yearSel.options].some((o) => o.value === initial.year)) {
     yearSel.value = initial.year;
   }
+  if (hostSel && [...hostSel.options].some((o) => o.value === initial.host)) {
+    hostSel.value = initial.host;
+  }
 
   winnerSel.addEventListener('change', apply);
   yearSel.addEventListener('change', apply);
+  hostSel?.addEventListener('change', apply);
   reset.addEventListener('click', clearAll);
   emptyReset?.addEventListener('click', clearAll);
   form.addEventListener('submit', (e) => e.preventDefault());
