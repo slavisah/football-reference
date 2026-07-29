@@ -1,0 +1,63 @@
+---
+import { renderInlineMarkdown, type NoteSection } from '../lib/notes';
+
+interface Props {
+  sections: NoteSection[];
+}
+
+const { sections } = Astro.props;
+
+// Decorative-only accent per section type; screen readers get the plain heading text.
+function iconFor(heading: string): string {
+  return /moment/i.test(heading) ? '🎉' : '📝';
+}
+---
+
+{
+  sections.length > 0 && (
+    <div class="notes stack">
+      {sections.map((section, index) => (
+        <section
+          class="notes__card card"
+          aria-labelledby={`note-heading-${index}`}
+        >
+          <h2 id={`note-heading-${index}`}>
+            <span aria-hidden="true">{iconFor(section.heading)}</span>{' '}
+            {section.heading}
+          </h2>
+          {section.items.length > 1 ? (
+            <ul class="notes__list">
+              {section.items.map((item) => (
+                <li set:html={renderInlineMarkdown(item)} />
+              ))}
+            </ul>
+          ) : (
+            <p set:html={renderInlineMarkdown(section.items[0])} />
+          )}
+        </section>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .notes__card h2 {
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .notes__card p {
+    margin-bottom: 0;
+    color: var(--text-muted);
+  }
+
+  .notes__list {
+    margin: 0;
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.4rem;
+    color: var(--text-muted);
+  }
+</style>

@@ -45,6 +45,7 @@ const cards = [
     editions: worldCup.editions.length,
     topChampion: worldCup.champions[0],
     accent: '#1f6f4f',
+    icon: '🌍',
   },
   {
     href: withBase('/competitions/euro'),
@@ -53,6 +54,7 @@ const cards = [
     editions: euro.editions.length,
     topChampion: euro.champions[0],
     accent: '#2f5fa8',
+    icon: '🏟️',
   },
   {
     href: withBase('/competitions/copa-america'),
@@ -61,6 +63,7 @@ const cards = [
     editions: copaAmerica.editions.length,
     topChampion: copaAmerica.champions[0],
     accent: '#c98a1f',
+    icon: '🌎',
   },
   {
     href: withBase('/competitions/nations-league'),
@@ -69,6 +72,7 @@ const cards = [
     editions: nationsLeague.editions.length,
     topChampion: nationsLeague.champions[0],
     accent: '#6b4fa0',
+    icon: '🎖️',
   },
   {
     href: withBase('/competitions/ballon-dor'),
@@ -78,6 +82,7 @@ const cards = [
     topChampion: ballonDor.champions[0],
     statLabel: 'Most awards',
     accent: '#b8912a',
+    icon: '🥇',
   },
   {
     href: withBase('/competitions/golden-boot'),
@@ -87,6 +92,7 @@ const cards = [
     topChampion: goldenBoot.champions[0],
     statLabel: 'Most awards',
     accent: '#a83e3e',
+    icon: '👟',
   },
 ];
 ---
@@ -116,7 +122,7 @@ const cards = [
       cards.map((card) => (
         <a class="comp-card" href={card.href} style={`--card-accent:${card.accent}`}>
           <span class="comp-card__bar" aria-hidden="true" />
-          <h2>{card.title}</h2>
+          <h2><span aria-hidden="true">{card.icon}</span> {card.title}</h2>
           <p class="comp-card__blurb">{card.blurb}</p>
           <dl class="comp-card__stats">
             <div>
@@ -141,11 +147,11 @@ const cards = [
   <section class="features card">
     <h2>What each competition page gives you</h2>
     <ul class="feature-list">
-      <li>A responsive edition-by-edition table that never overflows on a phone.</li>
-      <li>Filter by winner and year, with a shareable link for any view.</li>
-      <li>A champions summary generated straight from the table.</li>
-      <li>Source links and a visible "last reviewed" date.</li>
-      <li>Clean print output on A4 landscape, plus light and dark themes.</li>
+      <li><span aria-hidden="true">📱</span> A responsive edition-by-edition table that never overflows on a phone.</li>
+      <li><span aria-hidden="true">🔎</span> Filter by winner and year, with a shareable link for any view.</li>
+      <li><span aria-hidden="true">🏆</span> A champions summary generated straight from the table.</li>
+      <li><span aria-hidden="true">📚</span> Source links and a visible "last reviewed" date.</li>
+      <li><span aria-hidden="true">🖨️</span> Clean print output on A4 landscape, plus light and dark themes.</li>
     </ul>
     <p class="muted">
       Want champions timelines and title rankings across every competition on

@@ -133,20 +133,62 @@ implemented, and every acceptance scenario passes.
       `displayEditions` copy sorted newest-first, applied to every
       competition page since they share this component.
 
-### Next up: implement the emoji decision ("Both")
+### Emoji decision ("Both") - implemented 2026-07-29 (intensive run)
 
-Decision is made; implementation is pending. Concretely:
+- **UI accents** (decorative, `aria-hidden="true"`): 🏆 on the "Champions by
+  titles" heading (`ChampionsSummary.astro`, so it reads correctly wherever the
+  component is reused, e.g. "Most awards"); 📚 on the References heading
+  (`References.astro`); a per-competition icon on each home page card's `<h2>`
+  and a small icon per line in the home page feature list
+  (`src/pages/index.astro`).
+- **Content emojis**: not added to the Markdown prose itself (see the new
+  "Editorial notes sections" entry below - that content now renders on the
+  page verbatim, and `docs/ADDING_CONTENT.md` section 6 already covers new
+  emoji added to `content/*.md` going forward).
 
-- **UI accents** (decorative, `aria-hidden="true"`): e.g. 🏆 on the
-  "Champions by titles" heading in `ChampionsSummary.astro`; 📚 on the
-  References heading in `References.astro`; small icons on the home feature list
-  / competition cards in `src/pages/index.astro`. Keep it subtle.
-- **Content emojis**: add a light touch to the "Memorable moments" sections in
-  `content/fifa-world-cup.md` and `content/uefa-euro.md`, following the
-  conventions above (no flags for historical nations; none in the Editions
-  table).
-- Re-run `pnpm lint && pnpm test && pnpm build` and the Playwright smoke test;
-  confirm no horizontal overflow at 360px still holds.
+### Editorial notes sections (Memorable moments, etc.) - added 2026-07-29 (intensive run)
+
+Every competition content file has "Memorable moments" / "Editorial notes" /
+"Format milestones" / "Key facts" / etc. sections under `## ` headings that
+were being parsed only for the Editions table and then silently dropped - none
+of that writing ever reached a page. New `src/lib/notes.ts`
+(`extractSection`/`extractSections`, mirrors the `extractSources` pattern in
+`src/lib/sources.ts`) pulls a section verbatim by heading text: one item per
+bullet, or the section's lines joined into a paragraph when it has no
+bullets. `loadCompetition()` gained an optional `noteHeadings` option
+(`src/lib/competition.ts`) so each page opts into the specific headings worth
+showing readers; the new `EditorialNotes.astro` component renders them as
+cards (🎉 accent for "Memorable moments", 📝 for the rest) between the
+champions summary and the references section, via `CompetitionView.astro`
+(and directly on the golden-boot page, which composes its layout by hand).
+Meta/internal-note headings that talk to a coding agent rather than a reader
+(Copa América's "Important editorial warning", Nations League's "Website
+idea", World Cup's "Suggested child-friendly features") are intentionally
+**not** requested, so they stay out of the reader-facing page. One stray
+meta-sounding sentence inside Golden Boot's otherwise reader-facing "EURO
+notes" section ("A website should distinguish...") was reworded into plain
+reader-facing prose (`content/golden-boot.md`) - no scores, names, or years
+were touched.
+Pages now show: World Cup (Format milestones, Memorable moments, Editorial
+notes), EURO (Historical format note, Memorable moments), Copa América
+(Memorable moments), Nations League (Key facts), Ballon d'Or (Notes), Golden
+Boot (World Cup notes, EURO notes). A single non-bulleted section (EURO's
+"Historical format note") renders as a paragraph instead of a one-item list.
+Inline `**bold**`/`*italic*`/`` `code` `` in the note text is converted to
+real HTML via a small `renderInlineMarkdown()` (escapes first, so it can't be
+used to inject markup) - not a general Markdown parser, just the three forms
+these notes actually use.
+Covered by 10 new Vitest cases (`tests/unit/notes.test.ts`) and 3 new
+Playwright cases at 360px (World Cup's three sections incl. the *Maracanazo*
+italic check, EURO's paragraph-vs-list rendering, Golden Boot's two merged
+note sections).
+- [ ] Not yet done: Copa América's "Titles after 2024" and Ballon d'Or's
+  "Multiple winners through 2025" are full Markdown tables, not bullet/prose
+  sections, so `extractSection()` doesn't handle them and they're still
+  unused - would need a small table-rendering variant of this feature if a
+  future pass wants them on the page too (the generated `ChampionsSummary`
+  already covers similar ground for both, so this is a nice-to-have, not a
+  gap).
 
 ### Milestone 2: remaining pages (content already exists in `content/`)
 
