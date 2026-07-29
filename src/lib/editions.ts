@@ -109,6 +109,25 @@ export function buildTimeline(editions: Edition[]): TimelineEntry[] {
   }));
 }
 
+/**
+ * Build a year -> display-text map of top-scorer facts (player, team, goals),
+ * for joining Golden Boot editions onto another competition's table by year
+ * (e.g. the World Cup and EURO pages showing that edition's top scorer).
+ * Team/goals are appended only when those columns are present.
+ */
+export function buildTopScorerFacts(editions: Edition[]): Map<string, string> {
+  const facts = new Map<string, string>();
+  for (const edition of editions) {
+    const player = edition.winner.trim();
+    if (!player) continue;
+    const team = cellValue(edition, /^team$/i);
+    const goals = cellValue(edition, /^goals$/i);
+    const detail = [team, goals ? `${goals} goals` : undefined].filter(Boolean).join(', ');
+    facts.set(edition.year, detail ? `${player} (${detail})` : player);
+  }
+  return facts;
+}
+
 /** Distinct winners for populating the filter control, in first-title order. */
 export function distinctWinners(editions: Edition[]): string[] {
   const seen = new Set<string>();

@@ -3,6 +3,7 @@ import {
   buildChampionsSummary,
   buildEditions,
   buildTimeline,
+  buildTopScorerFacts,
   distinctHosts,
   distinctWinners,
 } from '../../src/lib/editions';
@@ -140,5 +141,39 @@ describe('buildTimeline', () => {
     const timeline = buildTimeline(buildEditions(table));
     expect(timeline[0].runnerUp).toBeUndefined();
     expect(timeline[0].final).toBeUndefined();
+  });
+});
+
+describe('buildTopScorerFacts', () => {
+  const scorersTable: MarkdownTable = {
+    headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+    rows: [
+      ['1958', 'Just Fontaine', 'France', '13'],
+      ['1962', 'Garrincha; Vavá', 'Multiple', '4'],
+    ],
+  };
+
+  it('joins player, team and goals into one display string, keyed by year', () => {
+    const facts = buildTopScorerFacts(buildEditions(scorersTable));
+    expect(facts.get('1958')).toBe('Just Fontaine (France, 13 goals)');
+    expect(facts.get('1962')).toBe('Garrincha; Vavá (Multiple, 4 goals)');
+  });
+
+  it('falls back to just the player name when team/goals columns are absent', () => {
+    const minimalTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)'],
+      rows: [['1958', 'Just Fontaine']],
+    };
+    const facts = buildTopScorerFacts(buildEditions(minimalTable));
+    expect(facts.get('1958')).toBe('Just Fontaine');
+  });
+
+  it('has no entry for a year with no winner', () => {
+    const emptyRowTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [['1942', '', '', '']],
+    };
+    const facts = buildTopScorerFacts(buildEditions(emptyRowTable));
+    expect(facts.has('1942')).toBe(false);
   });
 });
