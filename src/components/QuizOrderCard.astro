@@ -1,0 +1,164 @@
+---
+import type { QuizOrderQuestion } from '../lib/quiz';
+
+interface Props {
+  question: QuizOrderQuestion;
+  index: number;
+}
+
+const { question, index } = Astro.props;
+const groupId = `quiz-order-${index}`;
+
+const correctOrderText = question.items
+  .map((item, i) => ({ item, rank: question.correctRanks[i] }))
+  .sort((a, b) => a.rank - b.rank)
+  .map((entry) => entry.item)
+  .join(' → ');
+---
+
+<div
+  class="quiz-card card"
+  id={groupId}
+  data-correct-ranks={question.correctRanks.join(',')}
+>
+  <p class="quiz-card__category badge">{question.category}</p>
+
+  <fieldset class="quiz-card__fieldset">
+    <legend class="quiz-card__prompt">
+      {index + 1}. {question.prompt}
+    </legend>
+    <ol class="quiz-order__items">
+      {
+        question.items.map((item, itemIndex) => (
+          <li class="quiz-order__item">
+            <label for={`${groupId}-rank-${itemIndex}`}>{item}</label>
+            <select
+              id={`${groupId}-rank-${itemIndex}`}
+              class="quiz-order__rank"
+              data-item-index={itemIndex}
+            >
+              <option value="">Rank...</option>
+              {question.items.map((_, rankOption) => (
+                <option value={rankOption + 1}>{rankOption + 1}</option>
+              ))}
+            </select>
+          </li>
+        ))
+      }
+    </ol>
+  </fieldset>
+
+  <div class="quiz-card__controls no-print">
+    <button type="button" class="quiz-card__check quiz-order__check" hidden disabled>
+      Check order
+    </button>
+    <p class="quiz-card__feedback" role="status" aria-live="polite"></p>
+  </div>
+
+  <details class="quiz-card__reveal no-print">
+    <summary>Just show me the answer</summary>
+    <p>{correctOrderText}</p>
+  </details>
+</div>
+
+<style>
+  .quiz-card__category {
+    margin: 0 0 0.6rem;
+  }
+
+  .quiz-card__fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .quiz-card__prompt {
+    padding: 0;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .quiz-order__items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .quiz-order__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+  }
+
+  .quiz-order__item label {
+    flex: 1 1 auto;
+  }
+
+  .quiz-order__rank {
+    font: inherit;
+    flex: none;
+    width: 5rem;
+    padding: 0.35rem 0.4rem;
+    color: var(--text);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .quiz-order__item.is-correct {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
+  }
+
+  .quiz-order__item.is-incorrect {
+    border-color: #c0392b;
+    background: color-mix(in srgb, #c0392b 16%, transparent);
+  }
+
+  .quiz-card__controls {
+    margin-top: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    min-height: 2.2rem;
+  }
+
+  .quiz-card__check {
+    font: inherit;
+    padding: 0.5rem 0.9rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: var(--accent-contrast);
+    cursor: pointer;
+  }
+
+  .quiz-card__check:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .quiz-card__feedback {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .quiz-card__reveal {
+    margin-top: 0.7rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .quiz-card__reveal summary {
+    cursor: pointer;
+  }
+</style>

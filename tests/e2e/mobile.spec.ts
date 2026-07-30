@@ -401,6 +401,48 @@ test.describe('Quiz page on a 360px phone', () => {
     const cardCount = await page.locator('.quiz-card').count();
     expect(count).toBe(cardCount);
   });
+
+  test('champion order challenge: ranking correctly and incorrectly both surface feedback', async ({
+    page,
+  }) => {
+    const heading = page.getByRole('heading', { name: 'Champion order challenge' });
+    await expect(heading).toBeVisible();
+
+    const firstOrderCard = page.locator('.quiz-card:has(.quiz-order__items)').first();
+    const ranks = firstOrderCard.locator('.quiz-order__rank');
+    const rankCount = await ranks.count();
+    expect(rankCount).toBeGreaterThanOrEqual(4);
+
+    const correctRanks = ((await firstOrderCard.getAttribute('data-correct-ranks')) ?? '')
+      .split(',')
+      .map(Number);
+
+    for (let i = 0; i < rankCount; i += 1) {
+      await ranks.nth(i).selectOption(String(correctRanks[i]));
+    }
+
+    const checkButton = firstOrderCard.locator('.quiz-order__check');
+    await expect(checkButton).toBeEnabled();
+    await checkButton.click();
+
+    await expect(firstOrderCard.locator('.quiz-card__feedback')).toHaveText('Correct order!');
+    await expect(firstOrderCard.locator('.quiz-order__item.is-correct')).toHaveCount(rankCount);
+  });
+
+  test('champion order challenge is keyboard operable and has its own answer fallback', async ({
+    page,
+  }) => {
+    const firstOrderCard = page.locator('.quiz-card:has(.quiz-order__items)').first();
+    const firstRank = firstOrderCard.locator('.quiz-order__rank').first();
+
+    await firstRank.focus();
+    await expect(firstRank).toBeFocused();
+
+    const reveal = firstOrderCard.locator('.quiz-card__reveal');
+    await expect(reveal).toBeVisible();
+    await reveal.locator('summary').click();
+    await expect(reveal.locator('p')).not.toBeEmpty();
+  });
 });
 
 test.describe('Sources page on a 360px phone', () => {

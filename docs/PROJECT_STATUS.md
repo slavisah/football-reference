@@ -318,10 +318,35 @@ differ from `## Editions` and will need the matching `editionsHeading`:
       covered by 12 new Vitest cases (`tests/unit/quiz.test.ts`) and 5 new
       Playwright cases at 360px. Linked from `Nav.astro` (9th link) and the
       home page features section. Content lives in `content/quiz.md`.
-      - [ ] Not yet done: "put the champions in chronological order" (listed
-        as a quiz idea in `content/records-and-timelines.md`) needs a
-        drag-and-drop or ranking control, not multiple choice - left for a
-        future pass.
+      - [x] "Put the champions in chronological order" - added 2026-07-30
+        (intensive run), a second run against the `/quiz` page. New
+        `chronologicalOrderQuestions()` in `src/lib/quiz.ts` builds one
+        ranking question per team competition with a host column (FIFA World
+        Cup, UEFA EURO, Copa América, UEFA Nations League - individual
+        awards are excluded because a repeat winner, e.g. a second Ballon
+        d'Or for the same player, would show as two identical, ambiguous
+        tiles): it samples 4 editions with distinct years (Copa América's
+        two 1959 editions are skipped, since a tie can't be strictly
+        ordered), then shuffles their *display* order separately from which
+        editions get picked, with its own seed so a shared link reproduces
+        the same challenge. This is a genuinely different question shape
+        from the existing multiple-choice ones (rank items, not pick one
+        answer), so it got its own type (`QuizOrderQuestion`), its own card
+        component (`QuizOrderCard.astro`, one "Rank..." `<select>` per
+        champion instead of radio buttons), and its own "Champion order
+        challenge" section on `/quiz` below the main question list, entirely
+        separate from the shared score bar to avoid entangling two different
+        scoring models. Same progressive-enhancement pattern as the rest of
+        the quiz (rule 5): every item's correct rank is still readable
+        without JS via the existing "Just show me the answer" `<details>`,
+        and the "Check order" button stays `hidden` until JS confirms it
+        can wire up the check. Covered by 6 new Vitest cases
+        (`tests/unit/quiz.test.ts`: item count, correct chronological
+        recovery, rank permutation, determinism, too-few-editions skip, and
+        the duplicate-year drop) and 2 new Playwright cases at 360px
+        (ranking correctly surfaces "Correct order!" and highlights every
+        item, and the challenge is keyboard-focusable with its own answer
+        fallback).
 - [x] `/about/sources` - a sources index page, added 2026-07-29 (intensive
       run). `src/pages/about/sources.astro` groups every source link by
       competition, read live from `docs/SOURCES.md` via the new

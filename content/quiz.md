@@ -19,6 +19,8 @@ the quiz stays in sync as new editions are added.
   add it to your score.
 - Open "Just show me the answer" on any question to peek without playing.
 - Press "Restart quiz" to clear your answers and play again.
+- The "Champion order challenge" further down works differently: rank each
+  champion with its dropdown, then press "Check order".
 
 ## Question types in this quiz
 
@@ -27,9 +29,5 @@ the quiz stays in sync as new editions are added.
 - Who did the champion beat in the final?
 - Who was the tournament's top scorer (Golden Boot)?
 - Who won the Ballon d'Or in a given year?
-
-## Not yet included
-
-- Putting champions in chronological order - this needs a drag-and-drop or
-  ranking control rather than multiple choice, left for a future pass (see
-  `docs/PROJECT_STATUS.md`).
+- Put four champions from a tournament in chronological order (earliest
+  first).
