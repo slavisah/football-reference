@@ -371,8 +371,21 @@ differ from `## Editions` and will need the matching `editionsHeading`:
 
 ### Nice-to-have / later
 
-- [ ] Add the Playwright smoke test as a CI job (needs
-      `pnpm test:e2e:install`); currently run locally to keep deploys fast.
+- [x] Add the Playwright smoke test as a CI job - added 2026-07-30 (intensive
+      run). Until now the repository had no pull-request CI at all:
+      `.github/workflows/deploy.yml` only triggers on push to `main` and
+      intentionally skips Playwright there to keep deploys fast, so nothing
+      actually validated a PR's diff (build, unit tests, or the 360px mobile
+      smoke test) before it merged - a real gap for a repo whose changes
+      mostly arrive as PRs. New `.github/workflows/ci.yml` runs on every
+      `pull_request` (plus `workflow_dispatch`): type check, unit tests, then
+      `pnpm test:e2e:install` (`playwright install --with-deps chromium`)
+      followed by `pnpm test:e2e`, which builds and serves the production
+      preview itself per `playwright.config.ts`. A `concurrency` group
+      cancels a PR's superseded runs so pushes don't queue up, and a
+      failure uploads `test-results/` (Playwright's traces/screenshots on a
+      failed, retried test) as a build artifact for debugging. `deploy.yml`
+      is unchanged.
 - [x] Compare two national teams - added 2026-07-29 (intensive run). New
       `/compare` page, generated from the same World Cup, EURO, Copa América
       and Nations League edition tables the rest of the site already loads
