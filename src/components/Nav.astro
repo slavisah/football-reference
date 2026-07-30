@@ -1,7 +1,17 @@
 ---
 import { withBase } from '../lib/url';
 import { NAV_LINKS } from '../lib/routes';
+import { t, type Locale } from '../lib/i18n';
 import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  /** Defaults to 'en'; only pages with a translation pass this. */
+  locale?: Locale;
+  /** The equivalent page in the other language, if one exists. Omit to hide the switcher. */
+  alternateHref?: string;
+}
+
+const { locale = 'en', alternateHref } = Astro.props;
 
 const links = NAV_LINKS.map((link) => ({ href: withBase(link.path), label: link.label }));
 
@@ -15,7 +25,7 @@ function isCurrent(href: string): boolean {
   <div class="container site-header__inner">
     <a class="brand" href={withBase('/')}>
       <span class="brand__mark" aria-hidden="true">⚽</span>
-      <span class="brand__text">Football Reference</span>
+      <span class="brand__text">{t(locale, 'brand')}</span>
     </a>
 
     <nav aria-label="Primary">
@@ -34,6 +44,19 @@ function isCurrent(href: string): boolean {
         }
       </ul>
     </nav>
+
+    {
+      alternateHref && (
+        <a
+          class="lang-switch"
+          href={alternateHref}
+          hreflang={locale === 'en' ? 'hr' : 'en'}
+          rel="alternate"
+        >
+          {t(locale, 'switchLanguageTo')}
+        </a>
+      )
+    }
 
     <ThemeToggle />
   </div>
@@ -98,6 +121,21 @@ function isCurrent(href: string): boolean {
   .nav-list a[aria-current='page'] {
     color: var(--accent);
     background: color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+
+  .lang-switch {
+    padding: 0.4rem 0.6rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .lang-switch:hover {
+    color: var(--text);
+    background: var(--bg-subtle);
   }
 
   @media (max-width: 26rem) {
