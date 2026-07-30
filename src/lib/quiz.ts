@@ -190,3 +190,58 @@ export function selectQuiz(pools: QuizPool[], finalSeed: string): QuizQuestion[]
   );
   return seededShuffle(picked, mulberry32(hashSeed(finalSeed)));
 }
+
+export type QuizOrderQuestion = {
+  id: string;
+  category: string;
+  prompt: string;
+  /** Display labels, already shuffled into the order the reader sees them. */
+  items: string[];
+  /** 1-based correct chronological rank for items[i], earliest = 1. */
+  correctRanks: number[];
+};
+
+/**
+ * "Put these {competition} champions in chronological order" - a ranking
+ * question rather than multiple choice, so it needs its own type and its own
+ * card/scoring UI (see QuizOrderCard.astro). Samples `itemCount` editions
+ * with distinct years (skipping ties like Copa América's two 1959 editions,
+ * which can't be strictly ordered), then shuffles their *display* order with
+ * a seed kept separate from which editions get picked, so both stay
+ * deterministic and reproducible from a shared link.
+ */
+export function chronologicalOrderQuestions(
+  editions: Edition[],
+  competition: string,
+  seedPrefix: string,
+  itemLabel: (edition: Edition) => string,
+  itemCount = 4,
+): QuizOrderQuestion[] {
+  const seenYears = new Set<string>();
+  const candidates = editions
+    .filter((edition) => {
+      if (!edition.winner.trim()) return false;
+      if (seenYears.has(edition.year)) return false;
+      seenYears.add(edition.year);
+      return true;
+    })
+    .sort((a, b) => a.yearSort - b.yearSort);
+
+  if (candidates.length < itemCount) return [];
+
+  const picked = seededShuffle(candidates, mulberry32(hashSeed(`${seedPrefix}:order:pick`)))
+    .slice(0, itemCount)
+    .sort((a, b) => a.yearSort - b.yearSort);
+
+  const display = seededShuffle(picked, mulberry32(hashSeed(`${seedPrefix}:order:shuffle`)));
+
+  return [
+    {
+      id: `${seedPrefix}:order`,
+      category: competition,
+      prompt: `Put these ${competition} champions in chronological order (earliest first).`,
+      items: display.map(itemLabel),
+      correctRanks: display.map((edition) => picked.indexOf(edition) + 1),
+    },
+  ];
+}
