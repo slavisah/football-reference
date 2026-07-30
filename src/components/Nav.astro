@@ -1,20 +1,9 @@
 ---
 import { withBase } from '../lib/url';
+import { NAV_LINKS } from '../lib/routes';
 import ThemeToggle from './ThemeToggle.astro';
 
-const links = [
-  { href: withBase('/'), label: 'Home' },
-  { href: withBase('/competitions/world-cup'), label: 'World Cup' },
-  { href: withBase('/competitions/euro'), label: 'EURO' },
-  { href: withBase('/competitions/nations-league'), label: 'Nations League' },
-  { href: withBase('/competitions/copa-america'), label: 'Copa América' },
-  { href: withBase('/competitions/ballon-dor'), label: "Ballon d'Or" },
-  { href: withBase('/competitions/golden-boot'), label: 'Golden Boot' },
-  { href: withBase('/records'), label: 'Records' },
-  { href: withBase('/compare'), label: 'Compare' },
-  { href: withBase('/quiz'), label: 'Quiz' },
-  { href: withBase('/about/sources'), label: 'Sources' },
-];
+const links = NAV_LINKS.map((link) => ({ href: withBase(link.path), label: link.label }));
 
 const here = Astro.url.pathname.replace(/\/$/, '');
 function isCurrent(href: string): boolean {

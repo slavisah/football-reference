@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 73 Vitest unit tests
+pnpm test                      # 76 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 42 Playwright tests at 360px
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 48 Playwright tests at 360px
 ```
 
 Publishing: push to `main`; the Pages workflow builds and deploys.
@@ -439,7 +439,54 @@ differ from `## Editions` and will need the matching `editionsHeading`:
       and 5 new Playwright cases at 360px (no overflow, default pair +
       ranking table, select-a-team + swap, `?a=`/`?b=` URL restore, the "—"
       no-data-column case).
-- [ ] Installable PWA / offline reading; per-competition print sheet download
+- [x] Installable PWA / offline reading - added 2026-07-30 (intensive run). A
+      generated `manifest.webmanifest` (`src/pages/manifest.webmanifest.ts`)
+      and a generated service worker (`src/pages/sw.js.ts`) make the site
+      installable and readable offline, both computed at build time so they
+      pick up the same repository-agnostic `BASE_PATH` every other page
+      already uses (`withBase()` from `src/lib/url.ts`), rather than being
+      hand-written for one deployment. New `src/lib/routes.ts` holds the
+      single list of top-level nav pages (`NAV_LINKS`); `Nav.astro` now reads
+      from it instead of its own inline copy, and the new
+      `buildPrecacheUrls()` in `src/lib/offlineCache.ts` builds the service
+      worker's precache list from that same list plus the manifest/icons/
+      favicon, so a newly added nav page can't silently go missing from
+      offline caching. The service worker's strategy: HTML navigations are
+      network-first (a visitor with a connection always gets the latest
+      content) falling back to the cache, then the cached home page, when
+      offline; everything else (CSS, images, the manifest) is cache-first,
+      filled in as pages are visited. It's registered only for production
+      builds (`import.meta.env.PROD`), since a caching service worker would
+      just get in the way of `astro dev`. New icons at
+      `public/icons/icon-{192,512}.png` and
+      `icon-maskable-{192,512}.png` reuse the exact ball design from
+      `public/favicon.svg`, rasterized from SVG (not committed - a one-off
+      local conversion) since PNG is required for manifest icons/maskable
+      support that SVG can't cover consistently across platforms.
+      **Bug found and fixed in the same pass**: while wiring the new
+      manifest/icon `<link>` tags into `BaseLayout.astro`, the existing
+      favicon link (`href={\`${import.meta.env.BASE_URL}favicon.svg\`}`) turned
+      out to already be broken - the currently installed Astro (5.18.2, up
+      from whatever produced the original `pnpm-lock.yaml`) no longer
+      guarantees a trailing slash on `import.meta.env.BASE_URL`, so that
+      concatenation was actually rendering as
+      `/football-referencefavicon.svg` in the built HTML (confirmed by
+      grepping `dist/index.html`), a silent 404 on the live site. Fixed by
+      switching the favicon link, and the new manifest/apple-touch-icon
+      links and the service worker's registration URLs, to the existing
+      `withBase()` helper (`src/lib/url.ts`), which already normalizes this
+      correctly and is what `Nav.astro` has used all along. Covered by 3 new
+      Vitest cases (`tests/unit/offlineCache.test.ts`) and 5 new Playwright
+      cases (manifest fields/start_url/icons, theme-color + apple-touch-icon
+      meta tags, service worker reaches `navigator.serviceWorker.ready`, a
+      previously visited page keeps rendering its content with
+      `context.setOffline(true)`, and an uncached URL falls back to the
+      cached home page rather than a browser error offline).
+      "Downloadable print sheet per competition" is **not implemented** -
+      the existing print stylesheet already covers on-screen "print this
+      page" for every competition table; a separate downloadable-file
+      version (e.g. build-time PDF generation) is a distinct, larger feature
+      left for a future pass.
 - [ ] Optional Croatian/English localization
 
 ## Known caveats

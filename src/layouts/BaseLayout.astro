@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import { withBase } from '../lib/url';
 
 interface Props {
   title: string;
@@ -23,7 +24,12 @@ const fullTitle =
     <title>{fullTitle}</title>
     {description && <meta name="description" content={description} />}
     <meta name="generator" content={Astro.generator} />
-    <link rel="icon" href={`${import.meta.env.BASE_URL}favicon.svg`} />
+    <link rel="icon" href={withBase('/favicon.svg')} />
+    <link rel="manifest" href={withBase('/manifest.webmanifest')} />
+    <link rel="apple-touch-icon" href={withBase('/icons/icon-192.png')} />
+    <meta name="theme-color" content="#1f6f4f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Football Reference" />
     <meta name="color-scheme" content="light dark" />
 
     {/* Apply the saved theme before paint to avoid a flash. */}
@@ -37,6 +43,27 @@ const fullTitle =
         } catch (e) {}
       })();
     </script>
+
+    {/* Offline reading + installability. Only registered for production
+    builds (import.meta.env.PROD) - in dev the site isn't static, and a
+    caching service worker would just get in the developer's way. */}
+    {
+      import.meta.env.PROD && (
+        <script
+          is:inline
+          define:vars={{
+            swUrl: withBase('/sw.js'),
+            swScope: withBase('/'),
+          }}
+        >
+          if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+              navigator.serviceWorker.register(swUrl, { scope: swScope }).catch(() => {});
+            });
+          }
+        </script>
+      )
+    }
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
