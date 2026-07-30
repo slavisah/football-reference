@@ -28,7 +28,7 @@ const headingId = `${id}-heading`;
 ---
 
 <section class="champions" aria-labelledby={headingId}>
-  <h2 id={headingId}>{heading}</h2>
+  <h2 id={headingId}><span aria-hidden="true">🏆</span> {heading}</h2>
   <p class="muted">{description}</p>
 
   <ol class="champions__list">

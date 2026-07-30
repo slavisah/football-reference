@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 19 Vitest unit tests
+pnpm test                      # 73 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 5 Playwright tests at 360px
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 42 Playwright tests at 360px
 ```
 
 Publishing: push to `main`; the Pages workflow builds and deploys.
@@ -133,20 +133,62 @@ implemented, and every acceptance scenario passes.
       `displayEditions` copy sorted newest-first, applied to every
       competition page since they share this component.
 
-### Next up: implement the emoji decision ("Both")
+### Emoji decision ("Both") - implemented 2026-07-29 (intensive run)
 
-Decision is made; implementation is pending. Concretely:
+- **UI accents** (decorative, `aria-hidden="true"`): 🏆 on the "Champions by
+  titles" heading (`ChampionsSummary.astro`, so it reads correctly wherever the
+  component is reused, e.g. "Most awards"); 📚 on the References heading
+  (`References.astro`); a per-competition icon on each home page card's `<h2>`
+  and a small icon per line in the home page feature list
+  (`src/pages/index.astro`).
+- **Content emojis**: not added to the Markdown prose itself (see the new
+  "Editorial notes sections" entry below - that content now renders on the
+  page verbatim, and `docs/ADDING_CONTENT.md` section 6 already covers new
+  emoji added to `content/*.md` going forward).
 
-- **UI accents** (decorative, `aria-hidden="true"`): e.g. 🏆 on the
-  "Champions by titles" heading in `ChampionsSummary.astro`; 📚 on the
-  References heading in `References.astro`; small icons on the home feature list
-  / competition cards in `src/pages/index.astro`. Keep it subtle.
-- **Content emojis**: add a light touch to the "Memorable moments" sections in
-  `content/fifa-world-cup.md` and `content/uefa-euro.md`, following the
-  conventions above (no flags for historical nations; none in the Editions
-  table).
-- Re-run `pnpm lint && pnpm test && pnpm build` and the Playwright smoke test;
-  confirm no horizontal overflow at 360px still holds.
+### Editorial notes sections (Memorable moments, etc.) - added 2026-07-29 (intensive run)
+
+Every competition content file has "Memorable moments" / "Editorial notes" /
+"Format milestones" / "Key facts" / etc. sections under `## ` headings that
+were being parsed only for the Editions table and then silently dropped - none
+of that writing ever reached a page. New `src/lib/notes.ts`
+(`extractSection`/`extractSections`, mirrors the `extractSources` pattern in
+`src/lib/sources.ts`) pulls a section verbatim by heading text: one item per
+bullet, or the section's lines joined into a paragraph when it has no
+bullets. `loadCompetition()` gained an optional `noteHeadings` option
+(`src/lib/competition.ts`) so each page opts into the specific headings worth
+showing readers; the new `EditorialNotes.astro` component renders them as
+cards (🎉 accent for "Memorable moments", 📝 for the rest) between the
+champions summary and the references section, via `CompetitionView.astro`
+(and directly on the golden-boot page, which composes its layout by hand).
+Meta/internal-note headings that talk to a coding agent rather than a reader
+(Copa América's "Important editorial warning", Nations League's "Website
+idea", World Cup's "Suggested child-friendly features") are intentionally
+**not** requested, so they stay out of the reader-facing page. One stray
+meta-sounding sentence inside Golden Boot's otherwise reader-facing "EURO
+notes" section ("A website should distinguish...") was reworded into plain
+reader-facing prose (`content/golden-boot.md`) - no scores, names, or years
+were touched.
+Pages now show: World Cup (Format milestones, Memorable moments, Editorial
+notes), EURO (Historical format note, Memorable moments), Copa América
+(Memorable moments), Nations League (Key facts), Ballon d'Or (Notes), Golden
+Boot (World Cup notes, EURO notes). A single non-bulleted section (EURO's
+"Historical format note") renders as a paragraph instead of a one-item list.
+Inline `**bold**`/`*italic*`/`` `code` `` in the note text is converted to
+real HTML via a small `renderInlineMarkdown()` (escapes first, so it can't be
+used to inject markup) - not a general Markdown parser, just the three forms
+these notes actually use.
+Covered by 10 new Vitest cases (`tests/unit/notes.test.ts`) and 3 new
+Playwright cases at 360px (World Cup's three sections incl. the *Maracanazo*
+italic check, EURO's paragraph-vs-list rendering, Golden Boot's two merged
+note sections).
+- [ ] Not yet done: Copa América's "Titles after 2024" and Ballon d'Or's
+  "Multiple winners through 2025" are full Markdown tables, not bullet/prose
+  sections, so `extractSection()` doesn't handle them and they're still
+  unused - would need a small table-rendering variant of this feature if a
+  future pass wants them on the page too (the generated `ChampionsSummary`
+  already covers similar ground for both, so this is a nice-to-have, not a
+  gap).
 
 ### Milestone 2: remaining pages (content already exists in `content/`)
 
@@ -291,12 +333,59 @@ differ from `## Editions` and will need the matching `editionsHeading`:
       "By team" is **not implemented**: the source tables only have a
       numeric team-count column, not a list of participating teams, so
       there's no data to filter on - would need new editorial content first.
-- [ ] Sort controls that preserve historical notes
+- [x] Sort controls that preserve historical notes - added 2026-07-30
+      (intensive run). Every tournament table gains a fourth "Sort by"
+      `<select>` alongside Winner/Year/Host, listing only the columns worth
+      sorting by - Year/Season, Winner/Champion/Player, Host (when present),
+      and a numeric quantity column (Teams or Goals, when present) - detected
+      with the exact same matchers `buildEditions` uses for those roles
+      (`findColumn`, now exported from `src/lib/editions.ts`), so the options
+      offered are always consistent with what the page already treats as
+      "the winner column" etc. New `src/lib/tableSort.ts`:
+      `buildSortOptions()` generates the option list/labels/URL-safe slugs
+      server-side (Year gets "newest/oldest first" wording, a quantity
+      column gets "most/fewest first", everything else gets "A–Z"/"Z–A"),
+      and `defaultSortValue()` picks Year newest-first to match the table's
+      existing default row order, so no client-side re-sort runs on first
+      load. Sorting only ever reorders the actual `<tr>` elements already in
+      the DOM (`tbody.appendChild` in source-comparator order) - it never
+      touches cell content - so a historical note in any cell (e.g. Ballon
+      d'Or's 2020 "Not awarded" row) survives verbatim wherever the row
+      lands; a new Playwright case sorts that table by Winner and asserts
+      the row is still there with its text intact. The comparator
+      (`compareCellText`, duplicated inline in the component's script since
+      `define:vars` scripts can't `import`) is numeric-aware
+      (`Intl.Collator({numeric: true})`, so "2" sorts before "10" instead of
+      after it) and always sorts blank/em-dash cells last regardless of
+      direction. Selection is shareable via a `?sort=` URL query param
+      (same restore-on-load pattern as the existing filters, e.g.
+      `?sort=winner-asc`) and Reset clears it back to the default. Covered
+      by 12 new Vitest cases (`tests/unit/tableSort.test.ts`: option
+      generation/labels/omission per role, default selection, the
+      comparator's numeric-aware and missing-last behavior) and 6 new
+      Playwright cases at 360px (Winner A–Z groups ties correctly, Teams
+      fewest-first, Reset restores default order and clears the URL param, a
+      shared `?sort=` link restores the order on load, Golden Boot's Goals
+      most-first surfaces Just Fontaine's 1958 record, and the Ballon d'Or
+      historical-note case above).
 
 ### Nice-to-have / later
 
-- [ ] Add the Playwright smoke test as a CI job (needs
-      `pnpm test:e2e:install`); currently run locally to keep deploys fast.
+- [x] Add the Playwright smoke test as a CI job - added 2026-07-30 (intensive
+      run). Until now the repository had no pull-request CI at all:
+      `.github/workflows/deploy.yml` only triggers on push to `main` and
+      intentionally skips Playwright there to keep deploys fast, so nothing
+      actually validated a PR's diff (build, unit tests, or the 360px mobile
+      smoke test) before it merged - a real gap for a repo whose changes
+      mostly arrive as PRs. New `.github/workflows/ci.yml` runs on every
+      `pull_request` (plus `workflow_dispatch`): type check, unit tests, then
+      `pnpm test:e2e:install` (`playwright install --with-deps chromium`)
+      followed by `pnpm test:e2e`, which builds and serves the production
+      preview itself per `playwright.config.ts`. A `concurrency` group
+      cancels a PR's superseded runs so pushes don't queue up, and a
+      failure uploads `test-results/` (Playwright's traces/screenshots on a
+      failed, retried test) as a build artifact for debugging. `deploy.yml`
+      is unchanged.
 - [x] Compare two national teams - added 2026-07-29 (intensive run). New
       `/compare` page, generated from the same World Cup, EURO, Copa América
       and Nations League edition tables the rest of the site already loads

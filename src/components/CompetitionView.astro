@@ -2,6 +2,7 @@
 import type { CompetitionData } from '../lib/competition';
 import TournamentTable from './TournamentTable.astro';
 import ChampionsSummary from './ChampionsSummary.astro';
+import EditorialNotes from './EditorialNotes.astro';
 import References from './References.astro';
 
 interface Props {
@@ -33,6 +34,8 @@ const { data, tableId, tableCaption, extraColumn } = Astro.props;
   />
 
   <ChampionsSummary champions={data.champions} scaleMax={data.editions.length} />
+
+  <EditorialNotes sections={data.notes} />
 
   <References
     sources={data.sources}

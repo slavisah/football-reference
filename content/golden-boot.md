@@ -69,4 +69,4 @@ The name and tie-breaking rules of top-scorer awards have changed over time. Thi
 ## EURO notes
 
 - Michel Platini scored nine goals in five matches in 1984.
-- UEFA's award rules have changed. A website should distinguish “official award winner” from “joint leading scorers” when appropriate.
+- UEFA's award rules have changed over time; joint leading scorers (marked “Multiple” in the Team column) are shown tied, with no single official winner for that edition.

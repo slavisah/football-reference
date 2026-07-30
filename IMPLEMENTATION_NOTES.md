@@ -87,10 +87,11 @@ PW_CHROME_CHANNEL=chrome pnpm test:e2e
 ## Deployment
 
 `.github/workflows/deploy.yml` builds on every push to `main` and publishes
-`dist/` to GitHub Pages. It runs `pnpm lint` and `pnpm test` before building.
-The Playwright smoke test is run locally (to keep the deploy fast and avoid a
-browser download in CI); it can be added as a job with
-`pnpm test:e2e:install` if desired.
+`dist/` to GitHub Pages. It runs `pnpm lint` and `pnpm test` before building,
+but intentionally skips the Playwright smoke test to keep the deploy fast.
+`.github/workflows/ci.yml` runs on every pull request instead: lint, unit
+tests, `pnpm test:e2e:install`, then the full Playwright mobile smoke test
+against a production preview build.
 
 To enable hosting: in the repository settings, set **Pages → Build and
 deployment → Source** to **GitHub Actions**.

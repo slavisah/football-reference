@@ -6,7 +6,7 @@ import { summaryGroupFor } from './countries';
 // totals table). Column roles are detected from the header text so the same code
 // works for the World Cup and EURO tables even though their columns differ.
 
-function findColumn(headers: string[], matchers: RegExp[]): number {
+export function findColumn(headers: string[], matchers: RegExp[]): number {
   return headers.findIndex((h) => matchers.some((re) => re.test(h.toLowerCase())));
 }
 
