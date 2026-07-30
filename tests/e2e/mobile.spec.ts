@@ -441,3 +441,74 @@ test.describe('Sources page on a 360px phone', () => {
     await expect(page.locator('a[href$="/about/sources"]').first()).toBeVisible();
   });
 });
+
+test.describe('Installability and offline reading', () => {
+  test('links a web app manifest with the expected name, icons, and start_url', async ({
+    page,
+  }) => {
+    await page.goto('');
+    const manifestHref = await page.locator('link[rel="manifest"]').getAttribute('href');
+    expect(manifestHref).toBe('/football-reference/manifest.webmanifest');
+
+    const response = await page.request.get(manifestHref!);
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('manifest+json');
+
+    const manifest = await response.json();
+    expect(manifest.name).toBe('The Ultimate Football Reference');
+    expect(manifest.start_url).toBe('/football-reference/');
+    expect(manifest.scope).toBe('/football-reference/');
+    expect(manifest.display).toBe('standalone');
+    expect(manifest.icons.length).toBeGreaterThanOrEqual(4);
+    expect(manifest.icons.some((icon: { purpose?: string }) => icon.purpose === 'maskable')).toBe(
+      true,
+    );
+  });
+
+  test('sets a theme-color meta tag and an apple touch icon', async ({ page }) => {
+    await page.goto('');
+    await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#1f6f4f');
+    await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute(
+      'href',
+      '/football-reference/icons/icon-192.png',
+    );
+  });
+
+  test('registers an active service worker for the site scope', async ({ page }) => {
+    await page.goto('');
+    const scope = await page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.ready;
+      return registration.scope;
+    });
+    expect(scope).toBe('http://localhost:4321/football-reference/');
+  });
+
+  test('a previously visited page keeps working offline', async ({ page, context }) => {
+    await page.goto('');
+    await page.evaluate(() => navigator.serviceWorker.ready);
+
+    await page.goto('competitions/world-cup');
+    await expect(page.locator('tbody tr[data-year="2018"]')).toContainText('France');
+
+    await context.setOffline(true);
+    await page.reload();
+    await expect(page.locator('tbody tr[data-year="2018"]')).toContainText('France');
+    await context.setOffline(false);
+  });
+
+  test('falls back to the cached home page offline for a URL that was never cached', async ({
+    page,
+    context,
+  }) => {
+    await page.goto('');
+    await page.evaluate(() => navigator.serviceWorker.ready);
+
+    await context.setOffline(true);
+    // Never precached and never visited - the service worker's navigate
+    // handler has nothing for this exact URL, so it should fall back to the
+    // cached home page rather than showing the browser's offline error.
+    await page.goto('competitions/world-cup?utm_source=nowhere');
+    await expect(page.locator('h1')).toHaveText('The Ultimate Football Reference');
+    await context.setOffline(false);
+  });
+});
