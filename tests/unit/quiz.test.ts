@@ -3,12 +3,13 @@ import { buildEditions } from '../../src/lib/editions';
 import { buildTimeline } from '../../src/lib/editions';
 import {
   championByYearQuestions,
+  chronologicalOrderQuestions,
   hostByYearQuestions,
   runnerUpByYearQuestions,
   selectQuiz,
   topScorerByYearQuestions,
 } from '../../src/lib/quiz';
-import type { MarkdownTable } from '../../src/lib/types';
+import type { Edition, MarkdownTable } from '../../src/lib/types';
 
 const table: MarkdownTable = {
   headers: ['Year', 'Host', 'Winner', 'Runner-up', 'Final'],
@@ -123,6 +124,74 @@ describe('topScorerByYearQuestions', () => {
     const q1930 = questions.find((q) => q.id.endsWith('1930'));
     expect(q1930?.prompt).toBe('Who was the World Cup Golden Boot top scorer in 1930?');
     expect(q1930?.choices[q1930.answerIndex]).toBe('Guillermo Stábile');
+  });
+});
+
+describe('chronologicalOrderQuestions', () => {
+  const label = (edition: Edition) => `${edition.winner} (host: ${edition.host ?? '—'})`;
+
+  it('builds one ranking question with the requested number of items', () => {
+    const questions = chronologicalOrderQuestions(editions, 'FIFA World Cup', 'world-cup', label);
+    expect(questions).toHaveLength(1);
+    expect(questions[0].items).toHaveLength(4);
+    expect(questions[0].correctRanks).toHaveLength(4);
+    expect(questions[0].prompt).toBe(
+      'Put these FIFA World Cup champions in chronological order (earliest first).',
+    );
+  });
+
+  it('assigns correctRanks that recover the real chronological order', () => {
+    const questions = chronologicalOrderQuestions(editions, 'FIFA World Cup', 'world-cup', label);
+    const { items, correctRanks } = questions[0];
+    const reordered = [...items.keys()]
+      .sort((a, b) => correctRanks[a] - correctRanks[b])
+      .map((i) => items[i]);
+    // Reordering by correctRanks should yield editions in ascending year order.
+    const years = reordered.map((entry) => /\d{4}/.exec(entry)?.[0]);
+    const sortedYears = [...years].sort();
+    expect(years).toEqual(sortedYears);
+  });
+
+  it('ranks are a permutation of 1..itemCount', () => {
+    const questions = chronologicalOrderQuestions(editions, 'FIFA World Cup', 'world-cup', label);
+    const ranks = [...questions[0].correctRanks].sort((a, b) => a - b);
+    expect(ranks).toEqual([1, 2, 3, 4]);
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const a = chronologicalOrderQuestions(editions, 'FIFA World Cup', 'world-cup', label);
+    const b = chronologicalOrderQuestions(editions, 'FIFA World Cup', 'world-cup', label);
+    expect(a).toEqual(b);
+  });
+
+  it('skips a competition with fewer than itemCount distinct-year editions', () => {
+    const smallTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['2018', 'Russia', 'France'],
+        ['2022', 'Qatar', 'Argentina'],
+      ],
+    };
+    const smallEditions = buildEditions(smallTable);
+    const questions = chronologicalOrderQuestions(smallEditions, 'Test Cup', 'test', label);
+    expect(questions).toHaveLength(0);
+  });
+
+  it('drops duplicate-year editions before sampling (e.g. Copa América 1959)', () => {
+    const dupTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1959', 'Argentina', 'Argentina'],
+        ['1959', 'Ecuador', 'Uruguay'],
+        ['1963', 'Bolivia', 'Bolivia'],
+        ['1967', 'Uruguay', 'Uruguay'],
+        ['1975', 'Multiple', 'Peru'],
+      ],
+    };
+    const dupEditions = buildEditions(dupTable);
+    const questions = chronologicalOrderQuestions(dupEditions, 'Copa América', 'copa', label, 4);
+    expect(questions).toHaveLength(1);
+    expect(questions[0].items).toHaveLength(4);
   });
 });
 

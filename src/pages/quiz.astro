@@ -1,11 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import QuizCard from '../components/QuizCard.astro';
+import QuizOrderCard from '../components/QuizOrderCard.astro';
 import References from '../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import { buildTimeline } from '../lib/editions';
+import type { Edition } from '../lib/types';
 import {
   championByYearQuestions,
+  chronologicalOrderQuestions,
   hostByYearQuestions,
   runnerUpByYearQuestions,
   topScorerByYearQuestions,
@@ -126,6 +129,21 @@ const pools: QuizPool[] = [
 
 const questions = selectQuiz(pools, 'family-quiz:v1');
 
+// "Put the champions in chronological order" - a ranking question rather
+// than multiple choice, so it's generated and rendered separately from the
+// pool above (see chronologicalOrderQuestions / QuizOrderCard.astro). Only
+// the four team competitions with a host column are used: the host makes
+// each sampled champion's display label unique even when the same country
+// wins more than once, which an individual award (e.g. a repeat Ballon d'Or
+// winner) can't guarantee.
+const hostedByLabel = (edition: Edition) => `${edition.winner} (host: ${edition.host ?? '—'})`;
+const orderQuestions = [
+  ...chronologicalOrderQuestions(worldCup.editions, 'FIFA World Cup', 'world-cup', hostedByLabel),
+  ...chronologicalOrderQuestions(euro.editions, 'UEFA EURO', 'euro', hostedByLabel),
+  ...chronologicalOrderQuestions(copaAmerica.editions, 'Copa América', 'copa-america', hostedByLabel),
+  ...chronologicalOrderQuestions(nationsLeague.editions, 'UEFA Nations League', 'nations-league', hostedByLabel),
+];
+
 const sources = [
   ...worldCup.sources,
   ...euro.sources,
@@ -177,6 +195,24 @@ const lastReviewed = [
         ))
       }
     </ol>
+
+    {
+      orderQuestions.length > 0 && (
+        <section class="quiz__order-section" aria-labelledby="quiz-order-heading">
+          <h2 id="quiz-order-heading">Champion order challenge</h2>
+          <p class="quiz__order-intro">
+            Rank each champion below from earliest to latest, then press "Check order".
+          </p>
+          <ol class="quiz__list">
+            {orderQuestions.map((question, index) => (
+              <li>
+                <QuizOrderCard question={question} index={index} />
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
 
     <References sources={sources} lastReviewed={lastReviewed} status={meta.status} />
   </article>
@@ -236,6 +272,22 @@ const lastReviewed = [
     padding: 0;
     display: grid;
     gap: 1rem;
+  }
+
+  .quiz__order-section {
+    margin-top: 1.5rem;
+  }
+
+  .quiz__order-section h2 {
+    font-size: clamp(1.3rem, 4vw, 1.7rem);
+    margin-bottom: 0.35rem;
+  }
+
+  .quiz__order-intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    margin-top: 0;
+    margin-bottom: 1rem;
   }
 </style>
 
@@ -319,5 +371,74 @@ const lastReviewed = [
 
     cards.forEach(setupCard);
     restartBtn?.addEventListener('click', restart);
+
+    // "Champion order challenge" cards check independently of the main
+    // multiple-choice score bar above - each one has its own per-item rank
+    // <select> (works with zero JS as a plain answer-key page via the
+    // "Just show me the answer" <details>), so no radio/answerIndex model
+    // applies here.
+    const orderCards = Array.from(document.querySelectorAll('.quiz-order__items'))
+      .map((list) => list.closest('.quiz-card'))
+      .filter((card) => card !== null);
+
+    function setupOrderCard(card) {
+      const correctRanks = (card.dataset.correctRanks ?? '')
+        .split(',')
+        .map(Number)
+        .filter((n) => !Number.isNaN(n));
+      const selects = Array.from(card.querySelectorAll('.quiz-order__rank'));
+      const items = Array.from(card.querySelectorAll('.quiz-order__item'));
+      const checkBtn = card.querySelector('.quiz-order__check');
+      const feedback = card.querySelector('.quiz-card__feedback');
+
+      if (checkBtn) checkBtn.hidden = false;
+
+      function updateCheckState() {
+        if (checkBtn) checkBtn.disabled = selects.some((s) => s.value === '');
+      }
+
+      function check() {
+        if (selects.some((s) => s.value === '')) return;
+        let allCorrect = true;
+        selects.forEach((select, i) => {
+          const item = items[i];
+          const correct = Number(select.value) === correctRanks[i];
+          if (!correct) allCorrect = false;
+          item?.classList.toggle('is-correct', correct);
+          item?.classList.toggle('is-incorrect', !correct);
+          select.disabled = true;
+        });
+        if (feedback) {
+          feedback.textContent = allCorrect
+            ? 'Correct order!'
+            : 'Not quite - highlighted items are out of place.';
+        }
+        if (checkBtn) checkBtn.hidden = true;
+      }
+
+      selects.forEach((select) => select.addEventListener('change', updateCheckState));
+      checkBtn?.addEventListener('click', check);
+    }
+
+    function restartOrderCard(card) {
+      const selects = Array.from(card.querySelectorAll('.quiz-order__rank'));
+      const items = Array.from(card.querySelectorAll('.quiz-order__item'));
+      const checkBtn = card.querySelector('.quiz-order__check');
+      const feedback = card.querySelector('.quiz-card__feedback');
+
+      selects.forEach((select) => {
+        select.disabled = false;
+        select.value = '';
+      });
+      items.forEach((item) => item.classList.remove('is-correct', 'is-incorrect'));
+      if (feedback) feedback.textContent = '';
+      if (checkBtn) {
+        checkBtn.hidden = false;
+        checkBtn.disabled = true;
+      }
+    }
+
+    orderCards.forEach(setupOrderCard);
+    restartBtn?.addEventListener('click', () => orderCards.forEach(restartOrderCard));
   })();
 </script>
