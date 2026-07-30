@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 19 Vitest unit tests
+pnpm test                      # 73 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 5 Playwright tests at 360px
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 42 Playwright tests at 360px
 ```
 
 Publishing: push to `main`; the Pages workflow builds and deploys.
@@ -333,7 +333,41 @@ differ from `## Editions` and will need the matching `editionsHeading`:
       "By team" is **not implemented**: the source tables only have a
       numeric team-count column, not a list of participating teams, so
       there's no data to filter on - would need new editorial content first.
-- [ ] Sort controls that preserve historical notes
+- [x] Sort controls that preserve historical notes - added 2026-07-30
+      (intensive run). Every tournament table gains a fourth "Sort by"
+      `<select>` alongside Winner/Year/Host, listing only the columns worth
+      sorting by - Year/Season, Winner/Champion/Player, Host (when present),
+      and a numeric quantity column (Teams or Goals, when present) - detected
+      with the exact same matchers `buildEditions` uses for those roles
+      (`findColumn`, now exported from `src/lib/editions.ts`), so the options
+      offered are always consistent with what the page already treats as
+      "the winner column" etc. New `src/lib/tableSort.ts`:
+      `buildSortOptions()` generates the option list/labels/URL-safe slugs
+      server-side (Year gets "newest/oldest first" wording, a quantity
+      column gets "most/fewest first", everything else gets "A–Z"/"Z–A"),
+      and `defaultSortValue()` picks Year newest-first to match the table's
+      existing default row order, so no client-side re-sort runs on first
+      load. Sorting only ever reorders the actual `<tr>` elements already in
+      the DOM (`tbody.appendChild` in source-comparator order) - it never
+      touches cell content - so a historical note in any cell (e.g. Ballon
+      d'Or's 2020 "Not awarded" row) survives verbatim wherever the row
+      lands; a new Playwright case sorts that table by Winner and asserts
+      the row is still there with its text intact. The comparator
+      (`compareCellText`, duplicated inline in the component's script since
+      `define:vars` scripts can't `import`) is numeric-aware
+      (`Intl.Collator({numeric: true})`, so "2" sorts before "10" instead of
+      after it) and always sorts blank/em-dash cells last regardless of
+      direction. Selection is shareable via a `?sort=` URL query param
+      (same restore-on-load pattern as the existing filters, e.g.
+      `?sort=winner-asc`) and Reset clears it back to the default. Covered
+      by 12 new Vitest cases (`tests/unit/tableSort.test.ts`: option
+      generation/labels/omission per role, default selection, the
+      comparator's numeric-aware and missing-last behavior) and 6 new
+      Playwright cases at 360px (Winner A–Z groups ties correctly, Teams
+      fewest-first, Reset restores default order and clears the URL param, a
+      shared `?sort=` link restores the order on load, Golden Boot's Goals
+      most-first surfaces Just Fontaine's 1958 record, and the Ballon d'Or
+      historical-note case above).
 
 ### Nice-to-have / later
 
