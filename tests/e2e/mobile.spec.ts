@@ -100,6 +100,44 @@ test.describe('World Cup page on a 360px phone', () => {
     // *Maracanazo* renders as emphasis, not literal asterisks.
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
   });
+
+  test('sorting by Winner (A–Z) groups all Argentina rows first', async ({ page }) => {
+    await page.selectOption('#world-cup-sort', 'winner-asc');
+
+    const winners = await page
+      .locator('tbody tr')
+      .evaluateAll((rows) => rows.map((row) => row.dataset.winner));
+    expect(winners.slice(0, 3)).toEqual(['Argentina', 'Argentina', 'Argentina']);
+
+    // Sort state is shareable through the URL, like the other filters.
+    await expect(page).toHaveURL(/sort=winner-asc/);
+  });
+
+  test('sorting by Teams (fewest first) puts the smallest tournaments first', async ({ page }) => {
+    await page.selectOption('#world-cup-sort', 'teams-asc');
+
+    const firstRow = page.locator('tbody tr').first();
+    // 1930 and 1958 both had 13 teams, the fewest of any edition.
+    await expect(firstRow).toHaveAttribute('data-year', /1930|1950/);
+  });
+
+  test('Reset restores the default Year (newest first) order and clears ?sort', async ({ page }) => {
+    await page.selectOption('#world-cup-sort', 'winner-asc');
+    await expect(page.locator('tbody tr').first()).not.toHaveAttribute('data-year', '2026');
+
+    await page.locator('#world-cup-reset').click();
+
+    await expect(page.locator('tbody tr').first()).toHaveAttribute('data-year', '2026');
+    await expect(page).not.toHaveURL(/sort=/);
+  });
+
+  test('a shared ?sort= link restores the sorted order on load', async ({ page }) => {
+    await page.goto('competitions/world-cup?sort=winner-asc');
+
+    const firstWinner = await page.locator('tbody tr').first().getAttribute('data-winner');
+    expect(firstWinner).toBe('Argentina');
+    await expect(page.locator('#world-cup-sort')).toHaveValue('winner-asc');
+  });
 });
 
 test.describe('EURO page on a 360px phone', () => {
@@ -164,6 +202,37 @@ test.describe('Golden Boot page on a 360px phone', () => {
 
     const euroVisible = page.locator('#golden-boot-euro-table tbody tr:not([hidden])');
     await expect(euroVisible).toHaveCount(17);
+  });
+
+  test('sorting the World Cup table by Goals (most first) puts Just Fontaine\'s 1958 record first', async ({ page }) => {
+    await page.selectOption('#golden-boot-world-cup-sort', 'goals-desc');
+    const firstRow = page.locator('#golden-boot-world-cup-table tbody tr').first();
+    await expect(firstRow).toHaveAttribute('data-year', '1958');
+    await expect(firstRow).toContainText('Just Fontaine');
+  });
+});
+
+test.describe("Ballon d'Or page on a 360px phone", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('competitions/ballon-dor');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('sorting preserves the 2020 "Not awarded" historical note verbatim', async ({ page }) => {
+    const row2020 = page.locator('tbody tr[data-year="2020"]');
+    await expect(row2020).toContainText('Not awarded');
+
+    // Sorting by Winner (A-Z) reorders rows but must not lose or rewrite the note.
+    await page.selectOption('#ballon-dor-sort', 'winner-asc');
+    await expect(row2020).toContainText('Not awarded');
+    await expect(row2020).toBeVisible();
   });
 });
 
