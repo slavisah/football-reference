@@ -283,6 +283,16 @@ test.describe('Records page on a 360px phone', () => {
       page.getByText('Soviet Union and Russia are not merged.'),
     ).toBeVisible();
   });
+
+  test("shows a separate timeline and ranking for the Ballon d'Or and Golden Boot awards", async ({
+    page,
+  }) => {
+    await expect(page.locator('#timeline-ballon-dor-heading')).toBeVisible();
+    await expect(page.locator('#timeline-golden-boot-world-cup-heading')).toBeVisible();
+    await expect(page.locator('#timeline-golden-boot-euro-heading')).toBeVisible();
+    await expect(page.locator('#awards-ballon-dor-heading')).toBeVisible();
+    await expect(page.getByText('Ousmane Dembélé').first()).toBeVisible();
+  });
 });
 
 test.describe('Compare page on a 360px phone', () => {
