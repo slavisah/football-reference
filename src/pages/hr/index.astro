@@ -1,0 +1,213 @@
+---
+// Croatian translation of the home page (src/pages/index.astro). First slice
+// of the "optional Croatian/English localization" item from
+// docs/WEBSITE_REQUIREMENTS.md - shared chrome (Nav/Footer/BaseLayout) plus
+// this page. See docs/PROJECT_STATUS.md for what is/isn't translated yet.
+//
+// Card numbers (editions count, top champion, title count) come from
+// ../../lib/homeCards.ts, the exact same loader the English home page uses,
+// so the two pages can never disagree on a fact - only the prose differs.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase } from '../../lib/url';
+import { loadHomeCompetitions, buildHomeCards } from '../../lib/homeCards';
+
+const competitions = await loadHomeCompetitions();
+const cards = buildHomeCards('hr', competitions);
+---
+
+<BaseLayout
+  title="The Ultimate Football Reference"
+  description="Nogometna povijest: svjetska prvenstva, europska prvenstva, Copa América, Liga nacija, Zlatna lopta i Zlatna kopačka na jednom mjestu."
+  locale="hr"
+  alternateHref={withBase('/')}
+>
+  <section class="hero stack">
+    <p class="badge">Nogometna povijest prilagođena obitelji</p>
+    <h1>The Ultimate Football Reference</h1>
+    <p class="hero__lede">
+      Natjecanja, prvaci, domaćini i finalisti - uspoređeni na jednom mirnom
+      mjestu bez oglasa. Izrađeno iz Markdowna, uz očuvane povijesne nazive
+      reprezentacija i izvore povezane sa svakom stranicom.
+    </p>
+    <p class="hero__actions">
+      <a class="btn btn--primary" href={withBase('/competitions/world-cup')}>
+        Istraži Svjetsko prvenstvo
+      </a>
+      <a class="btn" href={withBase('/competitions/euro')}>Istraži EURO</a>
+    </p>
+  </section>
+
+  <section class="cards" aria-label="Natjecanja">
+    {
+      cards.map((card) => (
+        <a class="comp-card" href={card.href} style={`--card-accent:${card.accent}`}>
+          <span class="comp-card__bar" aria-hidden="true" />
+          <h2><span aria-hidden="true">{card.icon}</span> {card.title}</h2>
+          <p class="comp-card__blurb">{card.blurb}</p>
+          <dl class="comp-card__stats">
+            <div>
+              <dt>Izdanja</dt>
+              <dd>{card.editions}</dd>
+            </div>
+            {card.topChampion && (
+              <div>
+                <dt>{card.statLabel ?? 'Najviše naslova'}</dt>
+                <dd>
+                  {card.topChampion.displayName} ({card.topChampion.titles})
+                </dd>
+              </div>
+            )}
+          </dl>
+          <span class="comp-card__go">Otvori tablicu &rarr;</span>
+        </a>
+      ))
+    }
+  </section>
+
+  <section class="features card">
+    <h2>Što svaka stranica natjecanja nudi</h2>
+    <ul class="feature-list">
+      <li><span aria-hidden="true">📱</span> Responzivnu tablicu izdanja koja nikad ne prelazi rub zaslona na mobitelu.</li>
+      <li><span aria-hidden="true">🔎</span> Filtriranje po prvaku i godini, s poveznicom koja se može dijeliti.</li>
+      <li><span aria-hidden="true">🏆</span> Pregled prvaka generiran izravno iz tablice.</li>
+      <li><span aria-hidden="true">📚</span> Poveznice na izvore i vidljiv datum posljednje provjere.</li>
+      <li><span aria-hidden="true">🖨️</span> Čist ispis na A4 položenom formatu, uz svijetlu i tamnu temu.</li>
+    </ul>
+    <p class="muted">
+      Želite vremensku crtu prvaka i poredak po broju naslova za sva
+      natjecanja na jednoj stranici? Pogledajte
+      <a href={withBase('/records')}>Rekorde i vremensku crtu</a>.
+    </p>
+    <p class="muted">
+      <a href={withBase('/compare')}>Usporedite dvije reprezentacije</a>
+      izravno - naslovi, drugo mjesto i polufinala u sva četiri natjecanja.
+    </p>
+    <p class="muted">
+      Ili provjerite svoje znanje u <a href={withBase('/quiz')}>obiteljskom kvizu</a>,
+      generiranom iz istih tablica.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-block: clamp(1rem, 4vw, 2.5rem) 0.5rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 7vw, 3.4rem);
+    max-width: 16ch;
+  }
+
+  .hero__lede {
+    max-width: 60ch;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 0.6rem 1.1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .btn:hover {
+    border-color: var(--accent);
+  }
+
+  .btn--primary {
+    background: var(--accent);
+    color: var(--accent-contrast);
+    border-color: var(--accent);
+  }
+
+  .cards {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    margin-block: 2rem;
+  }
+
+  .comp-card {
+    position: relative;
+    display: block;
+    padding: 1.3rem;
+    padding-top: 1.6rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    color: inherit;
+    text-decoration: none;
+    overflow: hidden;
+    transition: transform 0.12s ease, border-color 0.12s ease;
+  }
+
+  .comp-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--card-accent, var(--accent));
+  }
+
+  .comp-card__bar {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: var(--card-accent, var(--accent));
+  }
+
+  .comp-card h2 {
+    font-size: 1.3rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .comp-card__blurb {
+    color: var(--text-muted);
+    margin-top: 0;
+  }
+
+  .comp-card__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.5rem;
+    margin: 0.9rem 0;
+  }
+
+  .comp-card__stats dt {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  .comp-card__stats dd {
+    margin: 0;
+    font-weight: 700;
+  }
+
+  .comp-card__go {
+    font-weight: 600;
+    color: var(--card-accent, var(--accent));
+  }
+
+  .feature-list {
+    margin: 0.5rem 0 1rem;
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .feature-list li {
+    max-width: 62ch;
+  }
+</style>

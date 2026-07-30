@@ -2,104 +2,22 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { withBase } from '../lib/url';
 import { getEntry } from 'astro:content';
-import { loadCompetition } from '../lib/competition';
+import { loadHomeCompetitions, buildHomeCards } from '../lib/homeCards';
 
 const home = await getEntry('pages', 'index');
 
 // Pull a live champion count from each competition so the home cards stay in
-// sync with the editorial tables instead of hard-coding numbers.
-const [worldCup, euro, copaAmerica, nationsLeague, ballonDor, goldenBoot] =
-  await Promise.all([
-    loadCompetition('fifa-world-cup', {
-      editionsHeading: 'Editions',
-      sourcesHeading: 'FIFA World Cup',
-    }),
-    loadCompetition('uefa-euro', {
-      editionsHeading: 'Editions',
-      sourcesHeading: 'UEFA EURO',
-    }),
-    loadCompetition('copa-america', {
-      editionsHeading: 'Champions timeline',
-      sourcesHeading: 'Copa América',
-      allowDuplicateYears: ['1959'],
-    }),
-    loadCompetition('uefa-nations-league', {
-      editionsHeading: 'Finals',
-      sourcesHeading: 'UEFA Nations League',
-    }),
-    loadCompetition('ballon-dor', {
-      editionsHeading: 'Winners',
-      sourcesHeading: "Ballon d'Or",
-    }),
-    loadCompetition('golden-boot', {
-      editionsHeading: 'FIFA World Cup top scorers',
-      sourcesHeading: 'FIFA World Cup',
-    }),
-  ]);
-
-const cards = [
-  {
-    href: withBase('/competitions/world-cup'),
-    title: 'FIFA World Cup',
-    blurb: 'From Uruguay 1930 to 2026 - hosts, finalists and champions.',
-    editions: worldCup.editions.length,
-    topChampion: worldCup.champions[0],
-    accent: '#1f6f4f',
-    icon: '🌍',
-  },
-  {
-    href: withBase('/competitions/euro'),
-    title: 'UEFA European Championship',
-    blurb: 'From the 1960 Nations’ Cup to EURO 2024 across Europe.',
-    editions: euro.editions.length,
-    topChampion: euro.champions[0],
-    accent: '#2f5fa8',
-    icon: '🏟️',
-  },
-  {
-    href: withBase('/competitions/copa-america'),
-    title: 'Copa América',
-    blurb: 'From 1916 to today - the oldest international football title.',
-    editions: copaAmerica.editions.length,
-    topChampion: copaAmerica.champions[0],
-    accent: '#c98a1f',
-    icon: '🌎',
-  },
-  {
-    href: withBase('/competitions/nations-league'),
-    title: 'UEFA Nations League',
-    blurb: "Europe's newest national-team competition, since 2018-19.",
-    editions: nationsLeague.editions.length,
-    topChampion: nationsLeague.champions[0],
-    accent: '#6b4fa0',
-    icon: '🎖️',
-  },
-  {
-    href: withBase('/competitions/ballon-dor'),
-    title: "Men's Ballon d'Or",
-    blurb: "Football's top individual award, awarded since 1956.",
-    editions: ballonDor.editions.length,
-    topChampion: ballonDor.champions[0],
-    statLabel: 'Most awards',
-    accent: '#b8912a',
-    icon: '🥇',
-  },
-  {
-    href: withBase('/competitions/golden-boot'),
-    title: 'Golden Boot',
-    blurb: 'World Cup and EURO top-scorer awards, tournament by tournament.',
-    editions: goldenBoot.editions.length,
-    topChampion: goldenBoot.champions[0],
-    statLabel: 'Most awards',
-    accent: '#a83e3e',
-    icon: '👟',
-  },
-];
+// sync with the editorial tables instead of hard-coding numbers. Shared with
+// the Croatian home page (src/pages/hr/index.astro) so both always agree on
+// the numbers; only the surrounding prose differs per locale.
+const competitions = await loadHomeCompetitions();
+const cards = buildHomeCards('en', competitions);
 ---
 
 <BaseLayout
   title={home?.data.title ?? 'The Ultimate Football Reference'}
   description={home?.data.description}
+  alternateHref={withBase('/hr/')}
 >
   <section class="hero stack">
     <p class="badge">Family-friendly football history</p>

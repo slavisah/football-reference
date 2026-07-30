@@ -512,7 +512,40 @@ differ from `## Editions` and will need the matching `editionsHeading`:
       page" for every competition table; a separate downloadable-file
       version (e.g. build-time PDF generation) is a distinct, larger feature
       left for a future pass.
-- [ ] Optional Croatian/English localization
+- [x] Optional Croatian/English localization - first vertical slice added
+  2026-07-30 (intensive run). New `src/lib/i18n.ts` (a `Locale = 'en' | 'hr'`
+  type, a small `UI_STRINGS` dictionary for shared chrome text, and a `t()`
+  helper) plus optional `locale`/`alternateHref` props on `BaseLayout.astro`,
+  `Nav.astro`, and `Footer.astro` - every prop defaults to `'en'` with the
+  exact original English strings, so all existing pages render byte-identical
+  output and needed no test changes. A new `src/pages/hr/index.astro` is a
+  full Croatian translation of the home page (hero, six competition cards,
+  features section, nav brand, footer), reachable via a new "Hrvatski"/
+  "English" language-switch link that only appears on the two translated
+  pages (`alternateHref` is `undefined` everywhere else, so the switcher is
+  invisible on untranslated pages rather than linking somewhere confusing).
+  The English and Croatian home pages share one data loader,
+  `loadHomeCompetitions()`/`buildHomeCards()` in the new `src/lib/homeCards.ts`
+  (extracted from `index.astro`, which previously inlined this) - both pages
+  call the exact same `loadCompetition()` calls, so the numbers (editions
+  count, top champion, title count) can never drift between languages; only
+  the card titles/blurbs differ, from a `CARD_TEXT` table keyed by locale.
+  `<html lang>` is set correctly per page (verified in the built HTML).
+  Covered by 5 new Vitest cases (`tests/unit/i18n.test.ts`: `t()` per locale,
+  `alternatePath()` both directions and the not-yet-translated case) and 4 new
+  Playwright cases at 360px (no overflow, translated chrome + six cards
+  render, the World Cup edition count matches the English page exactly, the
+  language switcher round-trips both ways with the right `<html lang>`).
+  **Not yet done** (left as follow-up, tracked here rather than a vague
+  "more languages later"): every other page (all six competition/award
+  pages, Records, Compare, Quiz, About/Sources) is still English-only;
+  `ThemeToggle.astro`'s "Theme"/"Light"/"Dark" labels are still hardcoded
+  English (missed because they're set from a client-side script, not a
+  server-rendered prop - would need a `data-*` attribute or similar to pass
+  the locale into the script); and the actual competition *data* (team
+  names, host names) is deliberately **not** translated, matching
+  `AGENTS.md` rule 2 (historical facts/names aren't altered) - only UI chrome
+  and page prose get a Croatian version.
 
 ## Known caveats
 
