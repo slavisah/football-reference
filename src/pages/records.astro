@@ -9,25 +9,38 @@ import { withBase } from '../lib/url';
 
 const meta = await loadPageMeta('records-and-timelines');
 
-const [worldCup, euro, copaAmerica, nationsLeague] = await Promise.all([
-  loadCompetition('fifa-world-cup', {
-    editionsHeading: 'Editions',
-    sourcesHeading: 'FIFA World Cup',
-  }),
-  loadCompetition('uefa-euro', {
-    editionsHeading: 'Editions',
-    sourcesHeading: 'UEFA EURO',
-  }),
-  loadCompetition('copa-america', {
-    editionsHeading: 'Champions timeline',
-    sourcesHeading: 'Copa América',
-    allowDuplicateYears: ['1959'],
-  }),
-  loadCompetition('uefa-nations-league', {
-    editionsHeading: 'Finals',
-    sourcesHeading: 'UEFA Nations League',
-  }),
-]);
+const [worldCup, euro, copaAmerica, nationsLeague, ballonDor, goldenBootWorldCup, goldenBootEuro] =
+  await Promise.all([
+    loadCompetition('fifa-world-cup', {
+      editionsHeading: 'Editions',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('uefa-euro', {
+      editionsHeading: 'Editions',
+      sourcesHeading: 'UEFA EURO',
+    }),
+    loadCompetition('copa-america', {
+      editionsHeading: 'Champions timeline',
+      sourcesHeading: 'Copa América',
+      allowDuplicateYears: ['1959'],
+    }),
+    loadCompetition('uefa-nations-league', {
+      editionsHeading: 'Finals',
+      sourcesHeading: 'UEFA Nations League',
+    }),
+    loadCompetition('ballon-dor', {
+      editionsHeading: 'Winners',
+      sourcesHeading: "Ballon d'Or",
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'FIFA World Cup top scorers',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'UEFA EURO top scorers',
+      sourcesHeading: 'UEFA EURO',
+    }),
+  ]);
 
 const competitions = [
   { key: 'world-cup', label: 'FIFA World Cup', href: withBase('/competitions/world-cup'), data: worldCup },
@@ -46,13 +59,39 @@ const competitions = [
   },
 ];
 
-// Dedup source links across the four competitions, same approach as the
-// combined Golden Boot page.
-const sources = competitions
+// Ballon d'Or and Golden Boot recognize a player, not a national team, so they
+// are listed separately from the four team competitions above rather than
+// folded into "Most successful teams" - matches how WEBSITE_REQUIREMENTS.md
+// scopes that ranking to team competitions only.
+const individualAwards = [
+  {
+    key: 'ballon-dor',
+    label: "Ballon d'Or",
+    href: withBase('/competitions/ballon-dor'),
+    data: ballonDor,
+  },
+  {
+    key: 'golden-boot-world-cup',
+    label: 'Golden Boot (World Cup)',
+    href: withBase('/competitions/golden-boot'),
+    data: goldenBootWorldCup,
+  },
+  {
+    key: 'golden-boot-euro',
+    label: 'Golden Boot (EURO)',
+    href: withBase('/competitions/golden-boot'),
+    data: goldenBootEuro,
+  },
+];
+
+// Dedup source links across every competition and award loaded above, same
+// approach as the combined Golden Boot page.
+const allLoaded = [...competitions, ...individualAwards];
+const sources = allLoaded
   .flatMap((c) => c.data.sources)
   .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
 
-const lastReviewed = competitions
+const lastReviewed = allLoaded
   .map((c) => c.data.lastReviewed)
   .sort()
   .at(-1) as string;
@@ -60,7 +99,7 @@ const lastReviewed = competitions
 
 <BaseLayout
   title={meta.title}
-  description="Champions timelines and most-successful-team rankings generated from the World Cup, EURO, Copa América and Nations League tables, plus how historical nation names are grouped."
+  description="Champions timelines and most-successful-team rankings generated from the World Cup, EURO, Copa América and Nations League tables, plus Ballon d'Or and Golden Boot award timelines and rankings, and how historical nation names are grouped."
 >
   <article class="records stack">
     <header class="records__header">
@@ -105,6 +144,51 @@ const lastReviewed = competitions
               />
               <a class="records__teams-link" href={c.href}>
                 View the full {c.label} table &rarr;
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="award-timeline-heading">
+      <h2 id="award-timeline-heading">Individual award winners timeline</h2>
+      <p class="muted">
+        The Ballon d'Or and the Golden Boot recognize a player, not a national
+        team, so their winners are listed here separately from the team
+        competitions above.
+      </p>
+      {
+        individualAwards.map((a) => (
+          <ChampionsTimeline
+            id={`timeline-${a.key}`}
+            heading={a.label}
+            entries={buildTimeline(a.data.editions)}
+          />
+        ))
+      }
+    </section>
+
+    <section class="stack" aria-labelledby="award-rankings-heading">
+      <h2 id="award-rankings-heading">Most awards</h2>
+      <p class="muted">
+        Award counts ranked separately per award. See each award's own page
+        for the full year-by-year table these are generated from.
+      </p>
+      <div class="records__teams-grid">
+        {
+          individualAwards.map((a) => (
+            <div>
+              <ChampionsSummary
+                id={`awards-${a.key}`}
+                champions={a.data.champions}
+                scaleMax={a.data.editions.length}
+                heading={a.label}
+                description={`Generated from the ${a.data.editions.length} ${a.label} editions.`}
+                unit={['award', 'awards']}
+              />
+              <a class="records__teams-link" href={a.href}>
+                View the full {a.label} table &rarr;
               </a>
             </div>
           ))

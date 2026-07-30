@@ -252,12 +252,36 @@ differ from `## Editions` and will need the matching `editionsHeading`:
       Covered by 2 new Vitest cases for `buildTimeline` and 3 new Playwright
       cases (no 360px overflow, timeline/ranking content present, identity
       rules text present).
-      - [ ] Not yet done: Ballon d'Or / Golden Boot aren't included in the
-        timeline or team-rankings sections here (they're individual awards,
-        not team competitions - matches the "Most successful teams" spec in
-        `WEBSITE_REQUIREMENTS.md`, which only lists the four team
-        competitions). Could add a separate "Most awards" timeline/ranking
-        pair for those two if a future pass wants full award coverage.
+      - [x] Ballon d'Or / Golden Boot "Most awards" timeline and ranking -
+        added 2026-07-30 (intensive run). `records.astro` now also loads
+        `ballon-dor` and both `golden-boot` tables (World Cup top scorers,
+        EURO top scorers - same two-load pattern the Golden Boot page itself
+        uses) and renders two new sections, kept deliberately separate from
+        "Champions timeline" / "Most successful teams" above: "Individual
+        award winners timeline" (one `ChampionsTimeline` per award, reusing
+        the existing `buildTimeline()` - it already degrades gracefully with
+        no host/runner-up/final for an individual award, the same way it
+        already does for Copa América's missing "Final" column) and "Most
+        awards" (one `ChampionsSummary` per award with the existing
+        `unit={['award','awards']}` override, exactly as the Golden Boot page
+        itself already labels its own two rankings). No new library code was
+        needed - both components already generalized cleanly. Considered and
+        rejected a different approach first: rendering Copa América's
+        "Titles after 2024" and Ballon d'Or's "Multiple winners through 2025"
+        hand-written Markdown tables verbatim (the other open item in this
+        section) - verified by hand that both tables' numbers exactly
+        reproduce what `buildChampionsSummary` already computes from the
+        editions table, so building a renderer for them would only have
+        duplicated the `ChampionsSummary` already on each page; leaving that
+        item as-is below. Source links and `lastReviewed` on the Records page
+        now aggregate across all seven loaded tables (four team competitions
+        + three individual-award tables), still deduped by URL. Covered by 1
+        new Playwright case at 360px (both new section headings visible, the
+        2025 Ballon d'Or winner appears in both the timeline and the
+        ranking).
+      - [ ] Not yet done: Copa América's "Titles after 2024" and Ballon d'Or's
+        "Multiple winners through 2025" Markdown tables are still unrendered
+        (see the reasoning above for why) - not considered a gap.
 
 ### From `docs/WEBSITE_REQUIREMENTS.md`, still missing
 
