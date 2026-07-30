@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TournamentTable from '../../components/TournamentTable.astro';
 import ChampionsSummary from '../../components/ChampionsSummary.astro';
+import EditorialNotes from '../../components/EditorialNotes.astro';
 import References from '../../components/References.astro';
 import { loadCompetition } from '../../lib/competition';
 
@@ -9,10 +10,12 @@ const [worldCup, euro] = await Promise.all([
   loadCompetition('golden-boot', {
     editionsHeading: 'FIFA World Cup top scorers',
     sourcesHeading: 'FIFA World Cup',
+    noteHeadings: ['World Cup notes'],
   }),
   loadCompetition('golden-boot', {
     editionsHeading: 'UEFA EURO top scorers',
     sourcesHeading: 'UEFA EURO',
+    noteHeadings: ['EURO notes'],
   }),
 ]);
 
@@ -78,6 +81,8 @@ const sources = [...worldCup.sources, ...euro.sources].filter(
         unit={['award', 'awards']}
       />
     </section>
+
+    <EditorialNotes sections={[...worldCup.notes, ...euro.notes]} />
 
     <References
       sources={sources}

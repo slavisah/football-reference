@@ -8,6 +8,7 @@ import {
   distinctWinners,
 } from './editions';
 import { extractSources, type SourceLink } from './sources';
+import { extractSections, type NoteSection } from './notes';
 import { validateEditions } from './validate';
 import type { ChampionSummary, Edition, MarkdownTable } from './types';
 
@@ -27,12 +28,16 @@ export type CompetitionData = {
   /** Distinct host values for the host filter; empty when the table has no host column. */
   hosts: string[];
   sources: SourceLink[];
+  /** Editorial "notes" sections (e.g. "Memorable moments") requested via noteHeadings, in that order. */
+  notes: NoteSection[];
 };
 
 export type LoadOptions = {
   editionsHeading?: string;
   sourcesHeading: string;
   allowDuplicateYears?: string[];
+  /** Content headings (e.g. "Memorable moments") to pull as reader-facing notes; see src/lib/notes.ts. */
+  noteHeadings?: string[];
 };
 
 export type PageMeta = {
@@ -80,8 +85,12 @@ export async function loadCompetition(
   id: string,
   options: LoadOptions,
 ): Promise<CompetitionData> {
-  const { editionsHeading = 'Editions', sourcesHeading, allowDuplicateYears } =
-    options;
+  const {
+    editionsHeading = 'Editions',
+    sourcesHeading,
+    allowDuplicateYears,
+    noteHeadings = [],
+  } = options;
 
   const entry = await getEntry('pages', id);
   if (!entry) {
@@ -115,5 +124,6 @@ export async function loadCompetition(
     winners: distinctWinners(editions),
     hosts: distinctHosts(editions),
     sources: extractSources(sourcesRaw, sourcesHeading),
+    notes: extractSections(body, noteHeadings),
   };
 }

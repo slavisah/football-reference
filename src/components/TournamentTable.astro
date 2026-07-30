@@ -1,5 +1,6 @@
 ---
 import type { Edition, MarkdownTable } from '../lib/types';
+import { buildSortOptions, defaultSortValue } from '../lib/tableSort';
 
 interface Props {
   /** Unique id prefix so multiple tables can coexist on a page. */
@@ -43,6 +44,13 @@ const displayEditions = [...editions].sort((a, b) => b.yearSort - a.yearSort);
 const winnerColIndex = table.headers.findIndex((header) =>
   /winner|champion|player/i.test(header),
 );
+
+// "Sort by" options: only the columns worth sorting by (Year/Season, Winner,
+// Host, a numeric quantity column), detected the same way `buildEditions`
+// derives those roles. Defaults to Year newest-first, matching the row order
+// already rendered below, so no client-side re-sort is needed on first load.
+const sortOptions = buildSortOptions(table.headers);
+const defaultSort = defaultSortValue(sortOptions);
 ---
 
 <section class="filters-and-table" aria-labelledby={`${id}-heading`}>
@@ -77,6 +85,26 @@ const winnerColIndex = table.headers.findIndex((header) =>
           <select id={`${id}-host`} name="host">
             <option value="">All hosts</option>
             {hosts.map((host) => <option value={host}>{host}</option>)}
+          </select>
+        </div>
+      )
+    }
+
+    {
+      sortOptions.length > 0 && (
+        <div class="filters__field">
+          <label for={`${id}-sort`}>Sort by</label>
+          <select id={`${id}-sort`} name="sort">
+            {sortOptions.map((option) => (
+              <option
+                value={option.value}
+                selected={option.value === defaultSort}
+                data-col={option.colIndex}
+                data-dir={option.dir}
+              >
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
       )
@@ -317,18 +345,37 @@ const winnerColIndex = table.headers.findIndex((header) =>
   }
 </style>
 
-<script is:inline define:vars={{ id, total: editions.length }}>
+<script is:inline define:vars={{ id, total: editions.length, defaultSort }}>
   const form = document.getElementById(`${id}-filters`);
   const winnerSel = document.getElementById(`${id}-winner`);
   const yearSel = document.getElementById(`${id}-year`);
   const hostSel = document.getElementById(`${id}-host`);
+  const sortSel = document.getElementById(`${id}-sort`);
   const reset = document.getElementById(`${id}-reset`);
   const status = document.getElementById(`${id}-status`);
   const empty = document.getElementById(`${id}-empty`);
   const emptyReset = document.getElementById(`${id}-empty-reset`);
+  const tbody = document.querySelector(`#${id}-table tbody`);
   const rows = Array.from(
     document.querySelectorAll(`#${id}-table tbody tr`),
   );
+
+  // Numeric-aware, locale-collated compare so "2" sorts before "10" instead
+  // of after it; blank cells and the "no data" em dash always sort last.
+  // Mirrors src/lib/tableSort.ts's compareCellText (kept in sync manually -
+  // this inline script can't import a module because of `define:vars`).
+  const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+  function compareCellText(a, b, dir) {
+    const av = a.trim();
+    const bv = b.trim();
+    const aMissing = av === '' || av === '—';
+    const bMissing = bv === '' || bv === '—';
+    if (aMissing && bMissing) return 0;
+    if (aMissing) return 1;
+    if (bMissing) return -1;
+    const cmp = collator.compare(av, bv);
+    return dir === 'desc' ? -cmp : cmp;
+  }
 
   function readParams() {
     const p = new URLSearchParams(window.location.search);
@@ -336,14 +383,16 @@ const winnerColIndex = table.headers.findIndex((header) =>
       winner: p.get('winner') || '',
       year: p.get('year') || '',
       host: p.get('host') || '',
+      sort: p.get('sort') || '',
     };
   }
 
-  function writeParams(winner, year, host) {
+  function writeParams(winner, year, host, sort) {
     const p = new URLSearchParams(window.location.search);
     winner ? p.set('winner', winner) : p.delete('winner');
     year ? p.set('year', year) : p.delete('year');
     host ? p.set('host', host) : p.delete('host');
+    sort && sort !== defaultSort ? p.set('sort', sort) : p.delete('sort');
     const qs = p.toString();
     const url = window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash;
     window.history.replaceState({}, '', url);
@@ -353,6 +402,7 @@ const winnerColIndex = table.headers.findIndex((header) =>
     const winner = winnerSel.value;
     const year = yearSel.value;
     const host = hostSel ? hostSel.value : '';
+    const sort = sortSel ? sortSel.value : '';
     let shown = 0;
     for (const row of rows) {
       const matchWinner = !winner || row.dataset.winner === winner;
@@ -374,17 +424,38 @@ const winnerColIndex = table.headers.findIndex((header) =>
         status.textContent = `Showing ${shown} of ${total} editions (${bits.join(', ')}).`;
       }
     }
-    writeParams(winner, year, host);
+    writeParams(winner, year, host, sort);
+  }
+
+  // Reorders the actual <tr> elements in the DOM; never touches a cell's
+  // content, so any historical note in a row (e.g. Ballon d'Or's "Not
+  // awarded" 2020 row) survives a sort verbatim, just in a new position.
+  function applySort() {
+    if (!sortSel || !tbody) return;
+    const option = sortSel.selectedOptions[0];
+    if (!option) return;
+    const col = Number(option.dataset.col);
+    const dir = option.dataset.dir;
+    const sorted = [...rows].sort((a, b) => {
+      const av = a.children[col]?.textContent ?? '';
+      const bv = b.children[col]?.textContent ?? '';
+      return compareCellText(av, bv, dir);
+    });
+    for (const row of sorted) tbody.appendChild(row);
   }
 
   function clearAll() {
     winnerSel.value = '';
     yearSel.value = '';
     if (hostSel) hostSel.value = '';
+    if (sortSel) {
+      sortSel.value = defaultSort;
+      applySort();
+    }
     apply();
   }
 
-  // Restore filters from the URL so shared links reproduce the view.
+  // Restore filters (and sort) from the URL so shared links reproduce the view.
   const initial = readParams();
   if ([...winnerSel.options].some((o) => o.value === initial.winner)) {
     winnerSel.value = initial.winner;
@@ -395,10 +466,18 @@ const winnerColIndex = table.headers.findIndex((header) =>
   if (hostSel && [...hostSel.options].some((o) => o.value === initial.host)) {
     hostSel.value = initial.host;
   }
+  if (sortSel && initial.sort && [...sortSel.options].some((o) => o.value === initial.sort)) {
+    sortSel.value = initial.sort;
+    applySort();
+  }
 
   winnerSel.addEventListener('change', apply);
   yearSel.addEventListener('change', apply);
   hostSel?.addEventListener('change', apply);
+  sortSel?.addEventListener('change', () => {
+    applySort();
+    apply();
+  });
   reset.addEventListener('click', clearAll);
   emptyReset?.addEventListener('click', clearAll);
   form.addEventListener('submit', (e) => e.preventDefault());
