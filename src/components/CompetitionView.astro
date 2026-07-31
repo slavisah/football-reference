@@ -4,6 +4,7 @@ import TournamentTable from './TournamentTable.astro';
 import ChampionsSummary from './ChampionsSummary.astro';
 import EditorialNotes from './EditorialNotes.astro';
 import References from './References.astro';
+import PrintDownloadLink from './PrintDownloadLink.astro';
 
 interface Props {
   data: CompetitionData;
@@ -11,9 +12,11 @@ interface Props {
   tableCaption: string;
   /** Optional display-only column joined onto the table by edition year. */
   extraColumn?: { label: string; values: Map<string, string> };
+  /** Slug of the pre-generated PDF at public/downloads/<pdfSlug>.pdf. Omit to hide the download link. */
+  pdfSlug?: string;
 }
 
-const { data, tableId, tableCaption, extraColumn } = Astro.props;
+const { data, tableId, tableCaption, extraColumn, pdfSlug } = Astro.props;
 ---
 
 <article class="competition stack">
@@ -21,6 +24,7 @@ const { data, tableId, tableCaption, extraColumn } = Astro.props;
     <p class="eyebrow badge">{data.status === 'verified' ? 'Verified' : 'In review'}</p>
     <h1>{data.title}</h1>
     <p class="competition__intro">{data.intro}</p>
+    {pdfSlug && <PrintDownloadLink slug={pdfSlug} />}
   </header>
 
   <TournamentTable

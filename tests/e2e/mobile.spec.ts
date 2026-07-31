@@ -138,6 +138,16 @@ test.describe('World Cup page on a 360px phone', () => {
     expect(firstWinner).toBe('Argentina');
     await expect(page.locator('#world-cup-sort')).toHaveValue('winner-asc');
   });
+
+  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/world-cup.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
 });
 
 test.describe('EURO page on a 360px phone', () => {
@@ -209,6 +219,16 @@ test.describe('Golden Boot page on a 360px phone', () => {
     const firstRow = page.locator('#golden-boot-world-cup-table tbody tr').first();
     await expect(firstRow).toHaveAttribute('data-year', '1958');
     await expect(firstRow).toContainText('Just Fontaine');
+  });
+
+  test('offers a downloadable print PDF covering both tables', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/golden-boot.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
   });
 });
 
