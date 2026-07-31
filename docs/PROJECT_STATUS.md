@@ -657,19 +657,57 @@ differ from `## Editions` and will need the matching `editionsHeading`:
     competition name in the head-to-head table, team-select + swap still
     works, the all-teams ranking's top row matches the English page
     exactly, and the switcher returns to English).
-  - [ ] Still English-only: the six competition/award pages and Quiz - left
-    for a future run. The six competition pages are the biggest remaining
-    piece and meaningfully harder than the pages done so far: their column
-    headers and role-detection regexes (`findColumn` in
+  - [x] `/quiz` - fifth translated page, added 2026-07-31 (intensive run).
+    New `src/pages/hr/quiz.astro` loads the exact same seven
+    `loadCompetition()` calls as the English page, so every question's
+    underlying fact (a champion, host, runner-up or top scorer) can never
+    drift between languages - only the generated prompt wording and this
+    page's own chrome/prose are translated. Every question-builder in
+    `src/lib/quiz.ts` (`championByYearQuestions`, `topScorerByYearQuestions`,
+    `hostByYearQuestions`, `runnerUpByYearQuestions`,
+    `chronologicalOrderQuestions`) gained an optional trailing `locale:
+    Locale = 'en'` parameter that only switches the prompt *template*
+    (competition names are still whatever string the caller passes in, so
+    the Croatian page passes the same Croatian names already established on
+    the Croatian home/records/compare pages, e.g. "FIFA Svjetsko
+    prvenstvo"); the choice-building/shuffling/seeding logic is untouched,
+    so a Croatian question has the exact same correct answer and distractor
+    set as its English counterpart, just asked in Croatian. `QuizCard.astro`
+    and `QuizOrderCard.astro` gained an optional `locale` prop (default
+    `'en'`, byte-identical output for every existing call site) for their
+    static strings ("Check answer", "Just show me the answer", "Rank...",
+    etc.) via new `i18n.ts` keys. The **client-side script** couldn't
+    import `t()` (it's `is:inline`, hoisted out and run in the browser), so
+    its "Correct!" / "Not quite..." / "Correct order!" feedback strings are
+    now read from `data-i18n-*` attributes rendered per-card by
+    `QuizCard`/`QuizOrderCard` - the same pattern `ThemeToggle.astro`
+    already uses for its Light/Dark labels. The ~150-line script itself was
+    extracted from `quiz.astro` into a new shared `QuizScript.astro`
+    component so both the English and Croatian pages include it without
+    duplicating the logic. `TRANSLATED_PATHS` gained `/quiz` -> `/hr/quiz`,
+    and the English `/quiz` page now passes `alternateHref` so its language
+    switcher appears (it was missing one before this run, same gap
+    `/records` and `/compare` had). Covered by 6 new Vitest cases in
+    `tests/unit/quiz.test.ts` (one Croatian-prompt case per question
+    builder, asserting the underlying answer/items/ranks stay identical to
+    the English call) and 14 new UI-string assertions in
+    `tests/unit/i18n.test.ts`, plus 6 new Playwright cases at 360px (English
+    page: language switcher opens the Croatian one; Croatian page: no
+    overflow, translated prompts/controls, a correct multiple-choice answer
+    shows "Točno!" and updates the score, a correct order-challenge ranking
+    shows "Točan redoslijed!", and the switcher returns to English).
+  - [ ] Still English-only: the six competition/award pages. This is the
+    only remaining piece of the localization backlog, and meaningfully
+    harder than every page done so far (including Quiz, which turned out to
+    be tractable via the `locale` template-parameter approach above): the
+    six pages' column headers and role-detection regexes (`findColumn` in
     `src/lib/editions.ts`, `buildSortOptions` in `src/lib/tableSort.ts`) are
     English-only and shared by every page's filters/sort/champions-summary/
     timeline logic, so translating a table's headers would need that
-    detection to also recognize the Croatian header text without breaking
-    it for the untranslated English pages - a real engineering task, not a
-    props-and-prose slice like this run's. Quiz is more tractable than the
-    competition pages (its question text is generated from simple string
-    templates in `src/lib/quiz.ts`, not raw table headers) and is a
-    reasonable next target.
+    detection to also recognize Croatian header text without breaking it
+    for the untranslated English pages - a real engineering task (making
+    `findColumn`'s matchers locale-aware), not a props-and-prose slice like
+    the pages done so far.
 
 ## Known caveats
 
