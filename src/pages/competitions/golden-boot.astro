@@ -4,6 +4,7 @@ import TournamentTable from '../../components/TournamentTable.astro';
 import ChampionsSummary from '../../components/ChampionsSummary.astro';
 import EditorialNotes from '../../components/EditorialNotes.astro';
 import References from '../../components/References.astro';
+import PrintDownloadLink from '../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../lib/competition';
 
 const [worldCup, euro] = await Promise.all([
@@ -38,6 +39,7 @@ const sources = [...worldCup.sources, ...euro.sources].filter(
       </p>
       <h1>{worldCup.title}</h1>
       <p class="competition__intro">{worldCup.intro}</p>
+      <PrintDownloadLink slug="golden-boot" />
     </header>
 
     <section class="stack">
