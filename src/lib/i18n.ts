@@ -35,6 +35,29 @@ const UI_STRINGS = {
   themeLabel: { en: 'Theme', hr: 'Tema' },
   themeLight: { en: 'Light', hr: 'Svijetla' },
   themeDark: { en: 'Dark', hr: 'Tamna' },
+  quizEyebrow: {
+    en: 'Generated from the competition tables',
+    hr: 'Generirano iz tablica natjecanja',
+  },
+  quizScoreLabel: { en: 'Score:', hr: 'Rezultat:' },
+  quizRestart: { en: 'Restart quiz', hr: 'Ponovno pokreni kviz' },
+  quizCheckAnswer: { en: 'Check answer', hr: 'Provjeri odgovor' },
+  quizJustShowAnswer: { en: 'Just show me the answer', hr: 'Samo mi pokaži odgovor' },
+  quizCorrect: { en: 'Correct!', hr: 'Točno!' },
+  quizIncorrectPrefix: { en: 'Not quite - the answer is "', hr: 'Netočno - odgovor je "' },
+  quizIncorrectSuffix: { en: '".', hr: '".' },
+  quizOrderHeading: { en: 'Champion order challenge', hr: 'Izazov: poredaj prvake' },
+  quizOrderIntro: {
+    en: 'Rank each champion below from earliest to latest, then press "Check order".',
+    hr: 'Poredaj svakog prvaka od najranijeg do najnovijeg, zatim pritisni "Provjeri redoslijed".',
+  },
+  quizCheckOrder: { en: 'Check order', hr: 'Provjeri redoslijed' },
+  quizOrderCorrect: { en: 'Correct order!', hr: 'Točan redoslijed!' },
+  quizOrderIncorrect: {
+    en: 'Not quite - highlighted items are out of place.',
+    hr: 'Netočno - označene stavke nisu na pravom mjestu.',
+  },
+  quizRankPlaceholder: { en: 'Rank...', hr: 'Poredak...' },
 } as const;
 
 export type UiStringKey = keyof typeof UI_STRINGS;
@@ -49,6 +72,7 @@ export const TRANSLATED_PATHS: Record<string, string> = {
   '/about/sources': '/hr/about/sources',
   '/records': '/hr/records',
   '/compare': '/hr/compare',
+  '/quiz': '/hr/quiz',
 };
 
 /** The other language's equivalent path for the current one, if translated, else null. */

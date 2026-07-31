@@ -2,9 +2,12 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import QuizCard from '../components/QuizCard.astro';
 import QuizOrderCard from '../components/QuizOrderCard.astro';
+import QuizScript from '../components/QuizScript.astro';
 import References from '../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import { buildTimeline } from '../lib/editions';
+import { t } from '../lib/i18n';
+import { withBase } from '../lib/url';
 import type { Edition } from '../lib/types';
 import {
   championByYearQuestions,
@@ -170,20 +173,21 @@ const lastReviewed = [
 <BaseLayout
   title={meta.title}
   description="A family football quiz generated from the World Cup, EURO, Copa América, Nations League, Ballon d'Or and Golden Boot tables - champions, hosts, finals and top scorers."
+  alternateHref={withBase('/hr/quiz')}
 >
   <article class="quiz stack">
     <header class="quiz__header">
-      <p class="eyebrow badge">Generated from the competition tables</p>
+      <p class="eyebrow badge">{t('en', 'quizEyebrow')}</p>
       <h1>{meta.title}</h1>
       <p class="quiz__intro">{meta.intro}</p>
     </header>
 
     <div class="quiz__score card no-print" id="quiz-score" hidden>
       <p>
-        Score:
+        {t('en', 'quizScoreLabel')}
         <strong id="quiz-score-value">0</strong> / <span id="quiz-score-total">{questions.length}</span>
       </p>
-      <button type="button" id="quiz-restart">Restart quiz</button>
+      <button type="button" id="quiz-restart">{t('en', 'quizRestart')}</button>
     </div>
 
     <ol class="quiz__list">
@@ -199,10 +203,8 @@ const lastReviewed = [
     {
       orderQuestions.length > 0 && (
         <section class="quiz__order-section" aria-labelledby="quiz-order-heading">
-          <h2 id="quiz-order-heading">Champion order challenge</h2>
-          <p class="quiz__order-intro">
-            Rank each champion below from earliest to latest, then press "Check order".
-          </p>
+          <h2 id="quiz-order-heading">{t('en', 'quizOrderHeading')}</h2>
+          <p class="quiz__order-intro">{t('en', 'quizOrderIntro')}</p>
           <ol class="quiz__list">
             {orderQuestions.map((question, index) => (
               <li>
@@ -291,154 +293,4 @@ const lastReviewed = [
   }
 </style>
 
-<script is:inline>
-  (function () {
-    const cards = Array.from(document.querySelectorAll('.quiz-card'));
-    const scoreBar = document.getElementById('quiz-score');
-    const scoreValue = document.getElementById('quiz-score-value');
-    const restartBtn = document.getElementById('quiz-restart');
-
-    if (scoreBar) scoreBar.hidden = false;
-
-    let score = 0;
-
-    function setScore(value) {
-      score = value;
-      if (scoreValue) scoreValue.textContent = String(score);
-    }
-
-    function setupCard(card) {
-      const answerIndex = Number(card.dataset.answerIndex);
-      const radios = Array.from(card.querySelectorAll('input[type="radio"]'));
-      const checkBtn = card.querySelector('.quiz-card__check');
-      const feedback = card.querySelector('.quiz-card__feedback');
-      const labels = Array.from(card.querySelectorAll('.quiz-card__choice'));
-
-      if (checkBtn) checkBtn.hidden = false;
-
-      function updateCheckState() {
-        if (checkBtn) checkBtn.disabled = !radios.some((r) => r.checked);
-      }
-
-      function check() {
-        const selected = radios.find((r) => r.checked);
-        if (!selected) return;
-        const selectedIndex = Number(selected.value);
-        const correct = selectedIndex === answerIndex;
-
-        radios.forEach((r) => {
-          r.disabled = true;
-        });
-        labels.forEach((label, i) => {
-          label.classList.toggle('is-correct', i === answerIndex);
-          label.classList.toggle('is-incorrect', i === selectedIndex && !correct);
-        });
-        if (feedback) {
-          feedback.textContent = correct
-            ? 'Correct!'
-            : `Not quite - the answer is "${labels[answerIndex]?.textContent?.trim() ?? ''}".`;
-        }
-        if (checkBtn) checkBtn.hidden = true;
-        card.dataset.answered = correct ? 'correct' : 'incorrect';
-        setScore(cards.filter((c) => c.dataset.answered === 'correct').length);
-      }
-
-      radios.forEach((radio) => radio.addEventListener('change', updateCheckState));
-      checkBtn?.addEventListener('click', check);
-    }
-
-    function restart() {
-      cards.forEach((card) => {
-        delete card.dataset.answered;
-        const radios = Array.from(card.querySelectorAll('input[type="radio"]'));
-        const checkBtn = card.querySelector('.quiz-card__check');
-        const feedback = card.querySelector('.quiz-card__feedback');
-        const labels = Array.from(card.querySelectorAll('.quiz-card__choice'));
-
-        radios.forEach((r) => {
-          r.disabled = false;
-          r.checked = false;
-        });
-        labels.forEach((label) => label.classList.remove('is-correct', 'is-incorrect'));
-        if (feedback) feedback.textContent = '';
-        if (checkBtn) {
-          checkBtn.hidden = false;
-          checkBtn.disabled = true;
-        }
-      });
-      setScore(0);
-    }
-
-    cards.forEach(setupCard);
-    restartBtn?.addEventListener('click', restart);
-
-    // "Champion order challenge" cards check independently of the main
-    // multiple-choice score bar above - each one has its own per-item rank
-    // <select> (works with zero JS as a plain answer-key page via the
-    // "Just show me the answer" <details>), so no radio/answerIndex model
-    // applies here.
-    const orderCards = Array.from(document.querySelectorAll('.quiz-order__items'))
-      .map((list) => list.closest('.quiz-card'))
-      .filter((card) => card !== null);
-
-    function setupOrderCard(card) {
-      const correctRanks = (card.dataset.correctRanks ?? '')
-        .split(',')
-        .map(Number)
-        .filter((n) => !Number.isNaN(n));
-      const selects = Array.from(card.querySelectorAll('.quiz-order__rank'));
-      const items = Array.from(card.querySelectorAll('.quiz-order__item'));
-      const checkBtn = card.querySelector('.quiz-order__check');
-      const feedback = card.querySelector('.quiz-card__feedback');
-
-      if (checkBtn) checkBtn.hidden = false;
-
-      function updateCheckState() {
-        if (checkBtn) checkBtn.disabled = selects.some((s) => s.value === '');
-      }
-
-      function check() {
-        if (selects.some((s) => s.value === '')) return;
-        let allCorrect = true;
-        selects.forEach((select, i) => {
-          const item = items[i];
-          const correct = Number(select.value) === correctRanks[i];
-          if (!correct) allCorrect = false;
-          item?.classList.toggle('is-correct', correct);
-          item?.classList.toggle('is-incorrect', !correct);
-          select.disabled = true;
-        });
-        if (feedback) {
-          feedback.textContent = allCorrect
-            ? 'Correct order!'
-            : 'Not quite - highlighted items are out of place.';
-        }
-        if (checkBtn) checkBtn.hidden = true;
-      }
-
-      selects.forEach((select) => select.addEventListener('change', updateCheckState));
-      checkBtn?.addEventListener('click', check);
-    }
-
-    function restartOrderCard(card) {
-      const selects = Array.from(card.querySelectorAll('.quiz-order__rank'));
-      const items = Array.from(card.querySelectorAll('.quiz-order__item'));
-      const checkBtn = card.querySelector('.quiz-order__check');
-      const feedback = card.querySelector('.quiz-card__feedback');
-
-      selects.forEach((select) => {
-        select.disabled = false;
-        select.value = '';
-      });
-      items.forEach((item) => item.classList.remove('is-correct', 'is-incorrect'));
-      if (feedback) feedback.textContent = '';
-      if (checkBtn) {
-        checkBtn.hidden = false;
-        checkBtn.disabled = true;
-      }
-    }
-
-    orderCards.forEach(setupOrderCard);
-    restartBtn?.addEventListener('click', () => orderCards.forEach(restartOrderCard));
-  })();
-</script>
+<QuizScript />

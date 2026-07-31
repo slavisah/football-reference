@@ -71,6 +71,15 @@ describe('championByYearQuestions', () => {
     const sparseQuestions = championByYearQuestions(sparseEditions, 'Test Cup', 'test');
     expect(sparseQuestions).toHaveLength(0);
   });
+
+  it('builds a Croatian prompt when locale is "hr", with the same answer as English', () => {
+    const enQuestions = championByYearQuestions(editions, 'FIFA World Cup', 'world-cup', 'en');
+    const hrQuestions = championByYearQuestions(editions, 'FIFA World Cup', 'world-cup', 'hr');
+    expect(hrQuestions[0].prompt).toBe('Tko je osvojio natjecanje FIFA World Cup 1930. godine?');
+    expect(hrQuestions[0].choices[hrQuestions[0].answerIndex]).toBe(
+      enQuestions[0].choices[enQuestions[0].answerIndex],
+    );
+  });
 });
 
 describe('hostByYearQuestions', () => {
@@ -79,6 +88,12 @@ describe('hostByYearQuestions', () => {
     const q1930 = questions.find((q) => q.id.endsWith('1930'));
     expect(q1930?.prompt).toBe('Which country hosted the 1930 FIFA World Cup?');
     expect(q1930?.choices[q1930.answerIndex]).toBe('Uruguay');
+  });
+
+  it('builds a Croatian prompt when locale is "hr"', () => {
+    const questions = hostByYearQuestions(editions, 'FIFA World Cup', 'world-cup', 'hr');
+    const q1930 = questions.find((q) => q.id.endsWith('1930'));
+    expect(q1930?.prompt).toBe('Koja je država bila domaćin natjecanja FIFA World Cup 1930. godine?');
   });
 
   it('excludes non-country host labels like "Home-and-away"', () => {
@@ -106,6 +121,15 @@ describe('runnerUpByYearQuestions', () => {
     expect(q1930?.prompt).toBe('Who did Uruguay beat in the 1930 FIFA World Cup final?');
     expect(q1930?.choices[q1930.answerIndex]).toBe('Argentina');
   });
+
+  it('builds a Croatian prompt when locale is "hr"', () => {
+    const timeline = buildTimeline(editions);
+    const questions = runnerUpByYearQuestions(timeline, 'FIFA World Cup', 'world-cup', 'hr');
+    const q1930 = questions.find((q) => q.id.endsWith('1930'));
+    expect(q1930?.prompt).toBe(
+      'Koga je pobijedio Uruguay u finalu natjecanja FIFA World Cup 1930. godine?',
+    );
+  });
 });
 
 describe('topScorerByYearQuestions', () => {
@@ -124,6 +148,24 @@ describe('topScorerByYearQuestions', () => {
     const q1930 = questions.find((q) => q.id.endsWith('1930'));
     expect(q1930?.prompt).toBe('Who was the World Cup Golden Boot top scorer in 1930?');
     expect(q1930?.choices[q1930.answerIndex]).toBe('Guillermo Stábile');
+  });
+
+  it('builds a Croatian prompt when locale is "hr"', () => {
+    const scorersTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [
+        ['1930', 'Guillermo Stábile', 'Argentina', '8'],
+        ['1934', 'Oldřich Nejedlý', 'Czechoslovakia', '5'],
+        ['1938', 'Leônidas', 'Brazil', '7'],
+        ['1950', 'Ademir', 'Brazil', '8'],
+      ],
+    };
+    const scorerEditions = buildEditions(scorersTable);
+    const questions = topScorerByYearQuestions(scorerEditions, 'World Cup Golden Boot', 'gb-wc', 'hr');
+    const q1930 = questions.find((q) => q.id.endsWith('1930'));
+    expect(q1930?.prompt).toBe(
+      'Tko je bio najbolji strijelac natjecanja World Cup Golden Boot 1930. godine?',
+    );
   });
 });
 
@@ -192,6 +234,16 @@ describe('chronologicalOrderQuestions', () => {
     const questions = chronologicalOrderQuestions(dupEditions, 'Copa América', 'copa', label, 4);
     expect(questions).toHaveLength(1);
     expect(questions[0].items).toHaveLength(4);
+  });
+
+  it('builds a Croatian prompt when locale is "hr", with the same items as English', () => {
+    const enQuestions = chronologicalOrderQuestions(editions, 'FIFA World Cup', 'world-cup', label, 4, 'en');
+    const hrQuestions = chronologicalOrderQuestions(editions, 'FIFA World Cup', 'world-cup', label, 4, 'hr');
+    expect(hrQuestions[0].prompt).toBe(
+      'Poredaj ove prvake natjecanja FIFA World Cup kronološkim redoslijedom (najraniji prvi).',
+    );
+    expect(hrQuestions[0].items).toEqual(enQuestions[0].items);
+    expect(hrQuestions[0].correctRanks).toEqual(enQuestions[0].correctRanks);
   });
 });
 
