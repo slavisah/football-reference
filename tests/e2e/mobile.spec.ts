@@ -546,6 +546,50 @@ test.describe('Sources page on a 360px phone', () => {
     await page.goto('');
     await expect(page.locator('a[href$="/about/sources"]').first()).toBeVisible();
   });
+
+  test('the language switcher opens the Croatian sources page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/about\/sources$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe('Croatian sources page (/hr/about/sources) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/about/sources');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome and headings, with the same last reviewed date as English', async ({
+    page,
+  }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.getByRole('heading', { name: 'Izvori i pravila provjere', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Izvori po natjecanjima' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Kako se provjeravaju izvori' })).toBeVisible();
+    await expect(page.locator('time[datetime="2026-07-29"]')).toBeVisible();
+  });
+
+  test('groups source links by competition using the Croatian home-page names', async ({ page }) => {
+    const worldCupGroup = page.locator('.sources-page__group', { hasText: 'FIFA Svjetsko prvenstvo' });
+    await expect(
+      worldCupGroup.getByRole('link', { name: 'FIFA Svjetsko prvenstvo' }),
+    ).toHaveAttribute('href', /competitions\/world-cup$/);
+    await expect(worldCupGroup.locator('a[href^="https://www.fifa.com"]').first()).toBeVisible();
+  });
+
+  test('the language switcher returns to the English sources page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/about\/sources$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
 });
 
 test.describe('Installability and offline reading', () => {

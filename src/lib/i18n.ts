@@ -28,6 +28,13 @@ const UI_STRINGS = {
   },
   footerSourcesLink: { en: 'Sources & review policy', hr: 'Izvori i pravila provjere' },
   switchLanguageTo: { en: 'Hrvatski', hr: 'English' },
+  themeToggleAriaLabel: {
+    en: 'Switch between light and dark theme',
+    hr: 'Promijeni između svijetle i tamne teme',
+  },
+  themeLabel: { en: 'Theme', hr: 'Tema' },
+  themeLight: { en: 'Light', hr: 'Svijetla' },
+  themeDark: { en: 'Dark', hr: 'Tamna' },
 } as const;
 
 export type UiStringKey = keyof typeof UI_STRINGS;
@@ -39,6 +46,7 @@ export function t(locale: Locale, key: UiStringKey): string {
 /** Paths (as passed to withBase) that currently have a Croatian translation. */
 export const TRANSLATED_PATHS: Record<string, string> = {
   '/': '/hr/',
+  '/about/sources': '/hr/about/sources',
 };
 
 /** The other language's equivalent path for the current one, if translated, else null. */
