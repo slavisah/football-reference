@@ -5,13 +5,38 @@ interface Props {
   sources: SourceLink[];
   lastReviewed: string;
   status: string;
+  /**
+   * Overridable for localized pages; every default below matches the
+   * original English copy, so existing call sites render byte-identical
+   * output. `statusText` defaults to the raw `status` value (unchanged
+   * behavior) - pass a translated word (e.g. "Provjereno") to override it.
+   */
+  heading?: string;
+  statusPrefix?: string;
+  statusText?: string;
+  lastReviewedPrefix?: string;
+  noSourcesText?: string;
+  noteText?: string;
+  dateLocale?: string;
 }
 
-const { sources, lastReviewed, status } = Astro.props;
+const {
+  sources,
+  lastReviewed,
+  status,
+  heading = 'References & review',
+  statusPrefix = 'Status:',
+  statusText = status,
+  lastReviewedPrefix = 'Last reviewed:',
+  noSourcesText = 'No source links are listed for this competition yet.',
+  noteText = "Primary sources are preferred. Historical formats and team names are recorded " +
+    "as used at the time; see each edition's notes for context.",
+  dateLocale = 'en-GB',
+} = Astro.props;
 const reviewed = new Date(`${lastReviewed}T00:00:00Z`);
 const reviewedLabel = Number.isNaN(reviewed.getTime())
   ? lastReviewed
-  : reviewed.toLocaleDateString('en-GB', {
+  : reviewed.toLocaleDateString(dateLocale, {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -20,12 +45,12 @@ const reviewedLabel = Number.isNaN(reviewed.getTime())
 ---
 
 <section class="references card" aria-labelledby="references-heading">
-  <h2 id="references-heading"><span aria-hidden="true">📚</span> References &amp; review</h2>
+  <h2 id="references-heading"><span aria-hidden="true">📚</span> {heading}</h2>
 
   <p class="references__meta">
-    <span class="badge">Status: {status}</span>
+    <span class="badge">{statusPrefix} {statusText}</span>
     <span class="review">
-      Last reviewed:
+      {lastReviewedPrefix}
       <time datetime={lastReviewed}>{reviewedLabel}</time>
     </span>
   </p>
@@ -42,14 +67,11 @@ const reviewedLabel = Number.isNaN(reviewed.getTime())
         ))}
       </ul>
     ) : (
-      <p class="muted">No source links are listed for this competition yet.</p>
+      <p class="muted">{noSourcesText}</p>
     )
   }
 
-  <p class="muted references__note">
-    Primary sources are preferred. Historical formats and team names are recorded
-    as used at the time; see each edition's notes for context.
-  </p>
+  <p class="muted references__note">{noteText}</p>
 </section>
 
 <style>

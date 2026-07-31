@@ -1,0 +1,311 @@
+---
+// Croatian translation of src/pages/records.astro. Third slice of the
+// "optional Croatian/English localization" item from
+// docs/WEBSITE_REQUIREMENTS.md - see docs/PROJECT_STATUS.md for the rollout
+// plan. Loads the exact same live data as the English page (loadCompetition
+// x7, buildTimeline), so every number, timeline entry and ranking can never
+// drift between languages - only this page's own headings/prose, and the
+// competition/award display names, are translated. The competition and
+// award names reuse the exact Croatian strings already used on the Croatian
+// home page (src/lib/homeCards.ts's CARD_TEXT) and sources page, so a
+// competition is never called two different things across the site.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ChampionsTimeline from '../../components/ChampionsTimeline.astro';
+import ChampionsSummary from '../../components/ChampionsSummary.astro';
+import References from '../../components/References.astro';
+import { loadCompetition, loadPageMeta } from '../../lib/competition';
+import { buildTimeline } from '../../lib/editions';
+import { withBase } from '../../lib/url';
+
+const meta = await loadPageMeta('records-and-timelines');
+
+const [worldCup, euro, copaAmerica, nationsLeague, ballonDor, goldenBootWorldCup, goldenBootEuro] =
+  await Promise.all([
+    loadCompetition('fifa-world-cup', {
+      editionsHeading: 'Editions',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('uefa-euro', {
+      editionsHeading: 'Editions',
+      sourcesHeading: 'UEFA EURO',
+    }),
+    loadCompetition('copa-america', {
+      editionsHeading: 'Champions timeline',
+      sourcesHeading: 'Copa América',
+      allowDuplicateYears: ['1959'],
+    }),
+    loadCompetition('uefa-nations-league', {
+      editionsHeading: 'Finals',
+      sourcesHeading: 'UEFA Nations League',
+    }),
+    loadCompetition('ballon-dor', {
+      editionsHeading: 'Winners',
+      sourcesHeading: "Ballon d'Or",
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'FIFA World Cup top scorers',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'UEFA EURO top scorers',
+      sourcesHeading: 'UEFA EURO',
+    }),
+  ]);
+
+const competitions = [
+  { key: 'world-cup', label: 'FIFA Svjetsko prvenstvo', href: withBase('/competitions/world-cup'), data: worldCup },
+  { key: 'euro', label: 'UEFA Europsko prvenstvo', href: withBase('/competitions/euro'), data: euro },
+  {
+    key: 'copa-america',
+    label: 'Copa América',
+    href: withBase('/competitions/copa-america'),
+    data: copaAmerica,
+  },
+  {
+    key: 'nations-league',
+    label: 'UEFA Liga nacija',
+    href: withBase('/competitions/nations-league'),
+    data: nationsLeague,
+  },
+];
+
+// Ballon d'Or and Golden Boot recognize a player, not a national team, so they
+// are listed separately from the four team competitions above, matching the
+// English page.
+const individualAwards = [
+  {
+    key: 'ballon-dor',
+    label: 'Zlatna lopta',
+    href: withBase('/competitions/ballon-dor'),
+    data: ballonDor,
+  },
+  {
+    key: 'golden-boot-world-cup',
+    label: 'Zlatna kopačka (Svjetsko prvenstvo)',
+    href: withBase('/competitions/golden-boot'),
+    data: goldenBootWorldCup,
+  },
+  {
+    key: 'golden-boot-euro',
+    label: 'Zlatna kopačka (EURO)',
+    href: withBase('/competitions/golden-boot'),
+    data: goldenBootEuro,
+  },
+];
+
+const allLoaded = [...competitions, ...individualAwards];
+const sources = allLoaded
+  .flatMap((c) => c.data.sources)
+  .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+
+const lastReviewed = allLoaded
+  .map((c) => c.data.lastReviewed)
+  .sort()
+  .at(-1) as string;
+
+const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
+---
+
+<BaseLayout
+  title="Rekordi i vremenska crta"
+  description="Vremenske crte prvaka i poredak najuspješnijih reprezentacija generirani iz tablica Svjetskog prvenstva, EURA, Copa Américe i Lige nacija, uz vremensku crtu i poredak za Zlatnu loptu i Zlatnu kopačku, te objašnjenje kako se grupiraju povijesni nazivi država."
+  locale="hr"
+  alternateHref={withBase('/records')}
+>
+  <article class="records stack">
+    <header class="records__header">
+      <p class="eyebrow badge">Generirano iz tablica natjecanja</p>
+      <h1>Rekordi i vremenska crta</h1>
+      <p class="records__intro">
+        Svaki prvak, domaćin i konačni rezultat na jednom mjestu, uz poredak
+        najuspješnijih reprezentacija i pojedinačnih nagrada - sve generirano
+        izravno iz podataka koje već koriste stranice pojedinih natjecanja.
+      </p>
+    </header>
+
+    <section class="stack" aria-labelledby="timeline-heading">
+      <h2 id="timeline-heading">Vremenska crta prvaka</h2>
+      <p class="muted">
+        Svaki prvak, domaćin i konačni rezultat, od najnovijeg prema
+        najstarijem. Generirano izravno iz tablice izdanja svakog natjecanja -
+        ništa ovdje nije ručno upisano.
+      </p>
+      {
+        competitions.map((c) => (
+          <ChampionsTimeline
+            id={`timeline-${c.key}`}
+            heading={c.label}
+            entries={buildTimeline(c.data.editions)}
+            hostedByLabel="Domaćin:"
+            runnerUpLabel="Drugo mjesto:"
+          />
+        ))
+      }
+    </section>
+
+    <section class="stack" aria-labelledby="teams-heading">
+      <h2 id="teams-heading">Najuspješnije reprezentacije</h2>
+      <p class="muted">
+        Broj naslova poredan zasebno po natjecanju. Cijelu tablicu izdanje po
+        izdanje pogledajte na stranici svakog natjecanja.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => (
+            <div>
+              <ChampionsSummary
+                id={`teams-${c.key}`}
+                champions={c.data.champions}
+                scaleMax={c.data.editions.length}
+                heading={c.label}
+                description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
+                winningYearsLabel="Godine osvajanja: "
+              />
+              <a class="records__teams-link" href={c.href}>
+                Pogledajte cijelu tablicu - {c.label} &rarr;
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="award-timeline-heading">
+      <h2 id="award-timeline-heading">Vremenska crta pojedinačnih nagrada</h2>
+      <p class="muted">
+        Zlatna lopta i Zlatna kopačka nagrađuju igrača, a ne reprezentaciju,
+        pa su njihovi dobitnici ovdje prikazani zasebno od natjecanja
+        reprezentacija iznad.
+      </p>
+      {
+        individualAwards.map((a) => (
+          <ChampionsTimeline
+            id={`timeline-${a.key}`}
+            heading={a.label}
+            entries={buildTimeline(a.data.editions)}
+            hostedByLabel="Domaćin:"
+            runnerUpLabel="Drugo mjesto:"
+          />
+        ))
+      }
+    </section>
+
+    <section class="stack" aria-labelledby="award-rankings-heading">
+      <h2 id="award-rankings-heading">Najviše nagrada</h2>
+      <p class="muted">
+        Broj nagrada poredan zasebno po nagradi. Cijelu tablicu godina po
+        godinu pogledajte na stranici svake nagrade.
+      </p>
+      <div class="records__teams-grid">
+        {
+          individualAwards.map((a) => (
+            <div>
+              <ChampionsSummary
+                id={`awards-${a.key}`}
+                champions={a.data.champions}
+                scaleMax={a.data.editions.length}
+                heading={a.label}
+                description={`Generirano iz ${a.data.editions.length} izdanja nagrade ${a.label}.`}
+                unit={['nagrada', 'nagrade']}
+                winningYearsLabel="Godine osvajanja: "
+              />
+              <a class="records__teams-link" href={a.href}>
+                Pogledajte cijelu tablicu - {a.label} &rarr;
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="card stack" aria-labelledby="identity-heading">
+      <h2 id="identity-heading">Kako se postupa s povijesnim nazivima država</h2>
+      <p>
+        Tablice izdanja i vremenske crte prvaka iznad uvijek zadržavaju naziv
+        pod kojim je reprezentacija nastupala u to vrijeme (npr. "Zapadna
+        Njemačka", "Sovjetski Savez", "Čehoslovačka", "Jugoslavija") - povijest
+        se nikada ne mijenja naknadno. Samo <strong>generirani zbroj naslova</strong>
+        u odjeljku "Najuspješnije reprezentacije" primjenjuje mali, jasno
+        određen skup pravila grupiranja:
+      </p>
+      <ul>
+        <li>
+          <strong>Zapadna Njemačka se u zbroju naslova ubraja u Njemačku</strong>,
+          prikazano kao "Njemačka (uklj. Zapadnu Njemačku)" - jedini slučaj
+          sportskog nasljednika koji sam izvorni sadržaj tako grupira.
+        </li>
+        <li>
+          <strong>Sovjetski Savez i Rusija se ne spajaju.</strong> Vode se kao
+          zasebni unosi sa zasebnim brojem naslova.
+        </li>
+        <li>
+          <strong>Čehoslovačka i Češka Republika/Češka se ne spajaju</strong>
+          bez izričitog uredničkog pravila; takvo pravilo danas ne postoji, pa
+          se svaka broji zasebno.
+        </li>
+        <li>
+          <strong>Rezultati Jugoslavije ostaju označeni kao Jugoslavija</strong>
+          i ne pripisuju se nijednoj od njezinih država nasljednica.
+        </li>
+      </ul>
+    </section>
+
+    <References
+      sources={sources}
+      lastReviewed={lastReviewed}
+      status={meta.status}
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText={statusText}
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+      noteText="Prednost imaju primarni izvori. Povijesni formati i nazivi reprezentacija bilježe se onako kako su korišteni u to vrijeme; kontekst potražite u napomenama uz svako izdanje."
+    />
+  </article>
+</BaseLayout>
+
+<style>
+  .records__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .records__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .records__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .records__teams-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    align-items: start;
+  }
+
+  .records__teams-link {
+    display: inline-block;
+    margin-top: 0.6rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  #identity-heading + p {
+    max-width: 68ch;
+  }
+
+  .records ul {
+    display: grid;
+    gap: 0.5rem;
+    max-width: 68ch;
+    padding-left: 1.2rem;
+  }
+</style>
