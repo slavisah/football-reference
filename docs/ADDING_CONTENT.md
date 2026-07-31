@@ -178,6 +178,21 @@ To publish: commit and **push to `main`**. GitHub Actions builds and deploys to
 GitHub Pages automatically. The live site is
 <https://slavisah.github.io/football-reference/>.
 
+If you changed an **Editions table** on a competition page that has a
+"Download printable PDF" link (all six competition/award pages), regenerate
+the matching file under `public/downloads/` and commit it too, otherwise the
+downloadable PDF will silently go stale relative to the live table:
+
+```bash
+pnpm build && pnpm build:pdfs
+```
+
+This is a separate, manual step - not part of `pnpm build` or the deploy
+workflow - since it drives a real browser (Playwright's pre-installed
+Chromium) to render and print each page, which would slow down every deploy
+for a file that only changes when editorial content does. See
+`scripts/generate-pdfs.mjs`.
+
 ## 9. Editorial reminders
 
 - Preserve historical team names in edition tables; do not "modernise" them.

@@ -1,41 +1,43 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { withBase } from '../lib/url';
-import { getEntry } from 'astro:content';
-import { loadHomeCompetitions, buildHomeCards } from '../lib/homeCards';
+// Croatian translation of the home page (src/pages/index.astro). First slice
+// of the "optional Croatian/English localization" item from
+// docs/WEBSITE_REQUIREMENTS.md - shared chrome (Nav/Footer/BaseLayout) plus
+// this page. See docs/PROJECT_STATUS.md for what is/isn't translated yet.
+//
+// Card numbers (editions count, top champion, title count) come from
+// ../../lib/homeCards.ts, the exact same loader the English home page uses,
+// so the two pages can never disagree on a fact - only the prose differs.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase } from '../../lib/url';
+import { loadHomeCompetitions, buildHomeCards } from '../../lib/homeCards';
 
-const home = await getEntry('pages', 'index');
-
-// Pull a live champion count from each competition so the home cards stay in
-// sync with the editorial tables instead of hard-coding numbers. Shared with
-// the Croatian home page (src/pages/hr/index.astro) so both always agree on
-// the numbers; only the surrounding prose differs per locale.
 const competitions = await loadHomeCompetitions();
-const cards = buildHomeCards('en', competitions);
+const cards = buildHomeCards('hr', competitions);
 ---
 
 <BaseLayout
-  title={home?.data.title ?? 'The Ultimate Football Reference'}
-  description={home?.data.description}
-  alternateHref={withBase('/hr/')}
+  title="The Ultimate Football Reference"
+  description="Nogometna povijest: svjetska prvenstva, europska prvenstva, Copa América, Liga nacija, Zlatna lopta i Zlatna kopačka na jednom mjestu."
+  locale="hr"
+  alternateHref={withBase('/')}
 >
   <section class="hero stack">
-    <p class="badge">Family-friendly football history</p>
+    <p class="badge">Nogometna povijest prilagođena obitelji</p>
     <h1>The Ultimate Football Reference</h1>
     <p class="hero__lede">
-      Tournaments, champions, hosts and finalists - compared in one calm,
-      ad-free place. Built from Markdown, with historical team names preserved
-      and every page linked to its sources.
+      Natjecanja, prvaci, domaćini i finalisti - uspoređeni na jednom mirnom
+      mjestu bez oglasa. Izrađeno iz Markdowna, uz očuvane povijesne nazive
+      reprezentacija i izvore povezane sa svakom stranicom.
     </p>
     <p class="hero__actions">
       <a class="btn btn--primary" href={withBase('/competitions/world-cup')}>
-        Explore the World Cup
+        Istraži Svjetsko prvenstvo
       </a>
-      <a class="btn" href={withBase('/competitions/euro')}>Explore the EURO</a>
+      <a class="btn" href={withBase('/competitions/euro')}>Istraži EURO</a>
     </p>
   </section>
 
-  <section class="cards" aria-label="Competitions">
+  <section class="cards" aria-label="Natjecanja">
     {
       cards.map((card) => (
         <a class="comp-card" href={card.href} style={`--card-accent:${card.accent}`}>
@@ -44,44 +46,45 @@ const cards = buildHomeCards('en', competitions);
           <p class="comp-card__blurb">{card.blurb}</p>
           <dl class="comp-card__stats">
             <div>
-              <dt>Editions</dt>
+              <dt>Izdanja</dt>
               <dd>{card.editions}</dd>
             </div>
             {card.topChampion && (
               <div>
-                <dt>{card.statLabel ?? 'Most titles'}</dt>
+                <dt>{card.statLabel ?? 'Najviše naslova'}</dt>
                 <dd>
                   {card.topChampion.displayName} ({card.topChampion.titles})
                 </dd>
               </div>
             )}
           </dl>
-          <span class="comp-card__go">Open table &rarr;</span>
+          <span class="comp-card__go">Otvori tablicu &rarr;</span>
         </a>
       ))
     }
   </section>
 
   <section class="features card">
-    <h2>What each competition page gives you</h2>
+    <h2>Što svaka stranica natjecanja nudi</h2>
     <ul class="feature-list">
-      <li><span aria-hidden="true">📱</span> A responsive edition-by-edition table that never overflows on a phone.</li>
-      <li><span aria-hidden="true">🔎</span> Filter by winner and year, with a shareable link for any view.</li>
-      <li><span aria-hidden="true">🏆</span> A champions summary generated straight from the table.</li>
-      <li><span aria-hidden="true">📚</span> Source links and a visible "last reviewed" date.</li>
-      <li><span aria-hidden="true">🖨️</span> Clean print output on A4 landscape, plus light and dark themes.</li>
+      <li><span aria-hidden="true">📱</span> Responzivnu tablicu izdanja koja nikad ne prelazi rub zaslona na mobitelu.</li>
+      <li><span aria-hidden="true">🔎</span> Filtriranje po prvaku i godini, s poveznicom koja se može dijeliti.</li>
+      <li><span aria-hidden="true">🏆</span> Pregled prvaka generiran izravno iz tablice.</li>
+      <li><span aria-hidden="true">📚</span> Poveznice na izvore i vidljiv datum posljednje provjere.</li>
+      <li><span aria-hidden="true">🖨️</span> Čist ispis na A4 položenom formatu, uz svijetlu i tamnu temu.</li>
     </ul>
     <p class="muted">
-      Want champions timelines and title rankings across every competition on
-      one page? See <a href={withBase('/records')}>Records and Timelines</a>.
+      Želite vremensku crtu prvaka i poredak po broju naslova za sva
+      natjecanja na jednoj stranici? Pogledajte
+      <a href={withBase('/records')}>Rekorde i vremensku crtu</a>.
     </p>
     <p class="muted">
-      <a href={withBase('/compare')}>Compare two national teams</a> head-to-head
-      - titles, runner-up and semifinal finishes across all four competitions.
+      <a href={withBase('/compare')}>Usporedite dvije reprezentacije</a>
+      izravno - naslovi, drugo mjesto i polufinala u sva četiri natjecanja.
     </p>
     <p class="muted">
-      Or test what you know with the <a href={withBase('/quiz')}>Family Quiz</a>,
-      generated from these same tables.
+      Ili provjerite svoje znanje u <a href={withBase('/quiz')}>obiteljskom kvizu</a>,
+      generiranom iz istih tablica.
     </p>
   </section>
 </BaseLayout>
