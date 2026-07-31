@@ -638,6 +638,68 @@ test.describe('Quiz page on a 360px phone', () => {
     await reveal.locator('summary').click();
     await expect(reveal.locator('p')).not.toBeEmpty();
   });
+
+  test('the language switcher opens the Croatian quiz page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/quiz(\?|$)/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/quiz');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome, prompts and controls', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.getByRole('heading', { name: 'Obiteljski kviz', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Izazov: poredaj prvake' })).toBeVisible();
+    const firstCard = page.locator('.quiz-card').first();
+    await expect(firstCard.locator('.quiz-card__prompt')).toContainText('godine?');
+    await expect(firstCard.locator('.quiz-card__check')).toHaveText('Provjeri odgovor');
+    await expect(firstCard.locator('.quiz-card__reveal summary')).toHaveText('Samo mi pokaži odgovor');
+  });
+
+  test('answering a question shows Croatian feedback and updates the score', async ({ page }) => {
+    const firstCard = page.locator('.quiz-card').first();
+    const answerIndex = Number(await firstCard.getAttribute('data-answer-index'));
+    await firstCard.locator('input[type="radio"]').nth(answerIndex).check();
+    await firstCard.locator('.quiz-card__check').click();
+
+    await expect(firstCard.locator('.quiz-card__feedback')).toHaveText('Točno!');
+    await expect(page.locator('#quiz-score-value')).toHaveText('1');
+  });
+
+  test('champion order challenge: a correct ranking shows Croatian feedback', async ({ page }) => {
+    const firstOrderCard = page.locator('.quiz-card:has(.quiz-order__items)').first();
+    const ranks = firstOrderCard.locator('.quiz-order__rank');
+    const rankCount = await ranks.count();
+    const correctRanks = ((await firstOrderCard.getAttribute('data-correct-ranks')) ?? '')
+      .split(',')
+      .map(Number);
+
+    for (let i = 0; i < rankCount; i += 1) {
+      await ranks.nth(i).selectOption(String(correctRanks[i]));
+    }
+    await firstOrderCard.locator('.quiz-order__check').click();
+
+    await expect(firstOrderCard.locator('.quiz-card__feedback')).toHaveText('Točan redoslijed!');
+  });
+
+  test('the language switcher returns to the English quiz page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/quiz(\?|$)/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
 });
 
 test.describe('Sources page on a 360px phone', () => {

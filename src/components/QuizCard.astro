@@ -1,12 +1,15 @@
 ---
 import type { QuizQuestion } from '../lib/quiz';
+import { t, type Locale } from '../lib/i18n';
 
 interface Props {
   question: QuizQuestion;
   index: number;
+  /** Defaults to 'en'; only the Croatian quiz page passes 'hr'. */
+  locale?: Locale;
 }
 
-const { question, index } = Astro.props;
+const { question, index, locale = 'en' } = Astro.props;
 const groupName = `quiz-${index}-answer`;
 ---
 
@@ -14,6 +17,9 @@ const groupName = `quiz-${index}-answer`;
   class="quiz-card card"
   id={`quiz-${index}`}
   data-answer-index={question.answerIndex}
+  data-i18n-correct={t(locale, 'quizCorrect')}
+  data-i18n-incorrect-prefix={t(locale, 'quizIncorrectPrefix')}
+  data-i18n-incorrect-suffix={t(locale, 'quizIncorrectSuffix')}
 >
   <p class="quiz-card__category badge">{question.category}</p>
 
@@ -35,13 +41,13 @@ const groupName = `quiz-${index}-answer`;
 
   <div class="quiz-card__controls no-print">
     <button type="button" class="quiz-card__check" hidden disabled>
-      Check answer
+      {t(locale, 'quizCheckAnswer')}
     </button>
     <p class="quiz-card__feedback" role="status" aria-live="polite"></p>
   </div>
 
   <details class="quiz-card__reveal no-print">
-    <summary>Just show me the answer</summary>
+    <summary>{t(locale, 'quizJustShowAnswer')}</summary>
     <p>{question.choices[question.answerIndex]}</p>
   </details>
 </div>

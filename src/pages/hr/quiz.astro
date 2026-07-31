@@ -1,0 +1,355 @@
+---
+// Croatian translation of src/pages/quiz.astro. Fifth vertical slice of the
+// "optional Croatian/English localization" item from
+// docs/WEBSITE_REQUIREMENTS.md - see docs/PROJECT_STATUS.md for the rollout
+// plan. Loads the exact same seven loadCompetition() calls as the English
+// page, so every question's underlying fact (a champion, host, runner-up or
+// top scorer) can never drift between languages - only the prompt wording
+// (via the new `locale` parameter on each question builder in
+// src/lib/quiz.ts), the competition display names, and this page's own
+// chrome/prose are translated. Question *content* (winners, hosts, player
+// names) stays exactly as recorded in the English-only source tables, same
+// precedent as the Croatian compare/records pages.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QuizCard from '../../components/QuizCard.astro';
+import QuizOrderCard from '../../components/QuizOrderCard.astro';
+import QuizScript from '../../components/QuizScript.astro';
+import References from '../../components/References.astro';
+import { loadCompetition, loadPageMeta } from '../../lib/competition';
+import { buildTimeline } from '../../lib/editions';
+import { t } from '../../lib/i18n';
+import { withBase } from '../../lib/url';
+import type { Edition } from '../../lib/types';
+import {
+  championByYearQuestions,
+  chronologicalOrderQuestions,
+  hostByYearQuestions,
+  runnerUpByYearQuestions,
+  topScorerByYearQuestions,
+  selectQuiz,
+  type QuizPool,
+} from '../../lib/quiz';
+
+const meta = await loadPageMeta('quiz');
+
+const [worldCup, euro, copaAmerica, nationsLeague, ballonDor, goldenBootWorldCup, goldenBootEuro] =
+  await Promise.all([
+    loadCompetition('fifa-world-cup', {
+      editionsHeading: 'Editions',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('uefa-euro', {
+      editionsHeading: 'Editions',
+      sourcesHeading: 'UEFA EURO',
+    }),
+    loadCompetition('copa-america', {
+      editionsHeading: 'Champions timeline',
+      sourcesHeading: 'Copa América',
+      allowDuplicateYears: ['1959'],
+    }),
+    loadCompetition('uefa-nations-league', {
+      editionsHeading: 'Finals',
+      sourcesHeading: 'UEFA Nations League',
+    }),
+    loadCompetition('ballon-dor', {
+      editionsHeading: 'Winners',
+      sourcesHeading: "Ballon d'Or",
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'FIFA World Cup top scorers',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'UEFA EURO top scorers',
+      sourcesHeading: 'UEFA EURO',
+    }),
+  ]);
+
+// Competition display names in Croatian, matching the names already
+// established on the Croatian home page (src/lib/homeCards.ts's CARD_TEXT)
+// and the Croatian records/compare pages, so a competition is never called
+// two different things across the site.
+const WORLD_CUP_NAME = 'FIFA Svjetsko prvenstvo';
+const EURO_NAME = 'UEFA Europsko prvenstvo';
+const COPA_AMERICA_NAME = 'Copa América';
+const NATIONS_LEAGUE_NAME = 'UEFA Liga nacija';
+const BALLON_DOR_NAME = 'Zlatna lopta';
+const GOLDEN_BOOT_WORLD_CUP_NAME = 'Zlatna kopačka Svjetskog prvenstva';
+const GOLDEN_BOOT_EURO_NAME = 'Zlatna kopačka Europskog prvenstva';
+
+// Same pool structure/weights as the English page (see quiz.astro for why),
+// just with locale: 'hr' passed to each question builder so the generated
+// prompt wording is Croatian.
+const pools: QuizPool[] = [
+  {
+    questions: championByYearQuestions(worldCup.editions, WORLD_CUP_NAME, 'world-cup', 'hr'),
+    take: 3,
+    seed: 'pick:world-cup:champion',
+  },
+  {
+    questions: hostByYearQuestions(worldCup.editions, WORLD_CUP_NAME, 'world-cup', 'hr'),
+    take: 2,
+    seed: 'pick:world-cup:host',
+  },
+  {
+    questions: runnerUpByYearQuestions(buildTimeline(worldCup.editions), WORLD_CUP_NAME, 'world-cup', 'hr'),
+    take: 1,
+    seed: 'pick:world-cup:runner-up',
+  },
+  {
+    questions: championByYearQuestions(euro.editions, EURO_NAME, 'euro', 'hr'),
+    take: 2,
+    seed: 'pick:euro:champion',
+  },
+  {
+    questions: hostByYearQuestions(euro.editions, EURO_NAME, 'euro', 'hr'),
+    take: 2,
+    seed: 'pick:euro:host',
+  },
+  {
+    questions: runnerUpByYearQuestions(buildTimeline(euro.editions), EURO_NAME, 'euro', 'hr'),
+    take: 1,
+    seed: 'pick:euro:runner-up',
+  },
+  {
+    questions: championByYearQuestions(copaAmerica.editions, COPA_AMERICA_NAME, 'copa-america', 'hr'),
+    take: 2,
+    seed: 'pick:copa-america:champion',
+  },
+  {
+    questions: hostByYearQuestions(copaAmerica.editions, COPA_AMERICA_NAME, 'copa-america', 'hr'),
+    take: 1,
+    seed: 'pick:copa-america:host',
+  },
+  {
+    questions: runnerUpByYearQuestions(
+      buildTimeline(copaAmerica.editions),
+      COPA_AMERICA_NAME,
+      'copa-america',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:runner-up',
+  },
+  {
+    questions: championByYearQuestions(nationsLeague.editions, NATIONS_LEAGUE_NAME, 'nations-league', 'hr'),
+    take: 2,
+    seed: 'pick:nations-league:champion',
+  },
+  {
+    questions: hostByYearQuestions(nationsLeague.editions, NATIONS_LEAGUE_NAME, 'nations-league', 'hr'),
+    take: 2,
+    seed: 'pick:nations-league:host',
+  },
+  {
+    questions: championByYearQuestions(ballonDor.editions, BALLON_DOR_NAME, 'ballon-dor', 'hr'),
+    take: 3,
+    seed: 'pick:ballon-dor:champion',
+  },
+  {
+    questions: topScorerByYearQuestions(
+      goldenBootWorldCup.editions,
+      GOLDEN_BOOT_WORLD_CUP_NAME,
+      'golden-boot-world-cup',
+      'hr',
+    ),
+    take: 2,
+    seed: 'pick:golden-boot-world-cup:scorer',
+  },
+  {
+    questions: topScorerByYearQuestions(
+      goldenBootEuro.editions,
+      GOLDEN_BOOT_EURO_NAME,
+      'golden-boot-euro',
+      'hr',
+    ),
+    take: 2,
+    seed: 'pick:golden-boot-euro:scorer',
+  },
+];
+
+const questions = selectQuiz(pools, 'family-quiz:v1');
+
+// Same "chronological order" ranking questions as the English page, with a
+// Croatian item label and locale: 'hr' for the Croatian prompt wording.
+const hostedByLabel = (edition: Edition) => `${edition.winner} (domaćin: ${edition.host ?? '—'})`;
+const orderQuestions = [
+  ...chronologicalOrderQuestions(worldCup.editions, WORLD_CUP_NAME, 'world-cup', hostedByLabel, 4, 'hr'),
+  ...chronologicalOrderQuestions(euro.editions, EURO_NAME, 'euro', hostedByLabel, 4, 'hr'),
+  ...chronologicalOrderQuestions(copaAmerica.editions, COPA_AMERICA_NAME, 'copa-america', hostedByLabel, 4, 'hr'),
+  ...chronologicalOrderQuestions(
+    nationsLeague.editions,
+    NATIONS_LEAGUE_NAME,
+    'nations-league',
+    hostedByLabel,
+    4,
+    'hr',
+  ),
+];
+
+const sources = [
+  ...worldCup.sources,
+  ...euro.sources,
+  ...copaAmerica.sources,
+  ...nationsLeague.sources,
+  ...ballonDor.sources,
+  ...goldenBootWorldCup.sources,
+  ...goldenBootEuro.sources,
+].filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+
+const lastReviewed = [
+  worldCup.lastReviewed,
+  euro.lastReviewed,
+  copaAmerica.lastReviewed,
+  nationsLeague.lastReviewed,
+  ballonDor.lastReviewed,
+  goldenBootWorldCup.lastReviewed,
+  meta.lastReviewed,
+]
+  .sort()
+  .at(-1) as string;
+---
+
+<BaseLayout
+  title="Obiteljski kviz"
+  description="Obiteljski nogometni kviz generiran izravno iz tablica Svjetskog prvenstva, EURA, Copa América, Lige nacija, Zlatne lopte i Zlatne kopačke - prvaci, domaćini, finala i najbolji strijelci."
+  locale="hr"
+  alternateHref={withBase('/quiz')}
+>
+  <article class="quiz stack">
+    <header class="quiz__header">
+      <p class="eyebrow badge">{t('hr', 'quizEyebrow')}</p>
+      <h1>Obiteljski kviz</h1>
+      <p class="quiz__intro">
+        Provjeri svoje znanje o povijesti nogometa kvizom generiranim izravno
+        iz tablica natjecanja na ovoj stranici - prvaci, domaćini, finala i
+        najbolji strijelci Svjetskog prvenstva, UEFA EURA, natjecanja Copa
+        América, UEFA Lige nacija, Zlatne lopte i Zlatne kopačke. Ništa ovdje
+        nije ručno napisana trivia, pa kviz ostaje usklađen kako se dodaju
+        nova izdanja.
+      </p>
+    </header>
+
+    <div class="quiz__score card no-print" id="quiz-score" hidden>
+      <p>
+        {t('hr', 'quizScoreLabel')}
+        <strong id="quiz-score-value">0</strong> / <span id="quiz-score-total">{questions.length}</span>
+      </p>
+      <button type="button" id="quiz-restart">{t('hr', 'quizRestart')}</button>
+    </div>
+
+    <ol class="quiz__list">
+      {
+        questions.map((question, index) => (
+          <li>
+            <QuizCard question={question} index={index} locale="hr" />
+          </li>
+        ))
+      }
+    </ol>
+
+    {
+      orderQuestions.length > 0 && (
+        <section class="quiz__order-section" aria-labelledby="quiz-order-heading">
+          <h2 id="quiz-order-heading">{t('hr', 'quizOrderHeading')}</h2>
+          <p class="quiz__order-intro">{t('hr', 'quizOrderIntro')}</p>
+          <ol class="quiz__list">
+            {orderQuestions.map((question, index) => (
+              <li>
+                <QuizOrderCard question={question} index={index} locale="hr" />
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
+
+    <References
+      sources={sources}
+      lastReviewed={lastReviewed}
+      status={meta.status}
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText={meta.status === 'verified' ? 'Provjereno' : 'U pregledu'}
+      lastReviewedPrefix="Zadnja provjera:"
+      noSourcesText="Za ovaj kviz još nisu navedene poveznice na izvore."
+      noteText="Prednost imaju primarni izvori. Povijesni formati i nazivi reprezentacija bilježe se onako kako su korišteni u to vrijeme; pogledajte napomene svakog izdanja za kontekst."
+      dateLocale="hr-HR"
+    />
+  </article>
+</BaseLayout>
+
+<style>
+  .quiz__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .quiz__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .quiz__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .quiz__score {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 3.6rem;
+    z-index: 10;
+  }
+
+  .quiz__score p {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  #quiz-restart {
+    font: inherit;
+    padding: 0.5rem 0.9rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg-subtle);
+    cursor: pointer;
+  }
+
+  #quiz-restart:hover {
+    border-color: var(--accent);
+  }
+
+  .quiz__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .quiz__order-section {
+    margin-top: 1.5rem;
+  }
+
+  .quiz__order-section h2 {
+    font-size: clamp(1.3rem, 4vw, 1.7rem);
+    margin-bottom: 0.35rem;
+  }
+
+  .quiz__order-intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+</style>
+
+<QuizScript />

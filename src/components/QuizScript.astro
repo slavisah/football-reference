@@ -1,0 +1,166 @@
+---
+// The quiz's client-side interactivity (scoring, restart, order-challenge
+// checking), extracted out of quiz.astro so the Croatian quiz page can reuse
+// it without duplicating ~150 lines of script. `is:inline` scripts can't
+// import `t()` (they run in the browser after Astro hoists them out), so the
+// locale-specific feedback text ("Correct!", "Correct order!", etc.) is read
+// from `data-i18n-*` attributes that QuizCard.astro/QuizOrderCard.astro
+// already render per-card - the same pattern ThemeToggle.astro uses for its
+// Light/Dark labels.
+---
+
+<script is:inline>
+  (function () {
+    const cards = Array.from(document.querySelectorAll('.quiz-card'));
+    const scoreBar = document.getElementById('quiz-score');
+    const scoreValue = document.getElementById('quiz-score-value');
+    const restartBtn = document.getElementById('quiz-restart');
+
+    if (scoreBar) scoreBar.hidden = false;
+
+    let score = 0;
+
+    function setScore(value) {
+      score = value;
+      if (scoreValue) scoreValue.textContent = String(score);
+    }
+
+    function setupCard(card) {
+      const answerIndex = Number(card.dataset.answerIndex);
+      const radios = Array.from(card.querySelectorAll('input[type="radio"]'));
+      const checkBtn = card.querySelector('.quiz-card__check');
+      const feedback = card.querySelector('.quiz-card__feedback');
+      const labels = Array.from(card.querySelectorAll('.quiz-card__choice'));
+      const correctText = card.dataset.i18nCorrect ?? 'Correct!';
+      const incorrectPrefix = card.dataset.i18nIncorrectPrefix ?? 'Not quite - the answer is "';
+      const incorrectSuffix = card.dataset.i18nIncorrectSuffix ?? '".';
+
+      if (checkBtn) checkBtn.hidden = false;
+
+      function updateCheckState() {
+        if (checkBtn) checkBtn.disabled = !radios.some((r) => r.checked);
+      }
+
+      function check() {
+        const selected = radios.find((r) => r.checked);
+        if (!selected) return;
+        const selectedIndex = Number(selected.value);
+        const correct = selectedIndex === answerIndex;
+
+        radios.forEach((r) => {
+          r.disabled = true;
+        });
+        labels.forEach((label, i) => {
+          label.classList.toggle('is-correct', i === answerIndex);
+          label.classList.toggle('is-incorrect', i === selectedIndex && !correct);
+        });
+        if (feedback) {
+          feedback.textContent = correct
+            ? correctText
+            : `${incorrectPrefix}${labels[answerIndex]?.textContent?.trim() ?? ''}${incorrectSuffix}`;
+        }
+        if (checkBtn) checkBtn.hidden = true;
+        card.dataset.answered = correct ? 'correct' : 'incorrect';
+        setScore(cards.filter((c) => c.dataset.answered === 'correct').length);
+      }
+
+      radios.forEach((radio) => radio.addEventListener('change', updateCheckState));
+      checkBtn?.addEventListener('click', check);
+    }
+
+    function restart() {
+      cards.forEach((card) => {
+        delete card.dataset.answered;
+        const radios = Array.from(card.querySelectorAll('input[type="radio"]'));
+        const checkBtn = card.querySelector('.quiz-card__check');
+        const feedback = card.querySelector('.quiz-card__feedback');
+        const labels = Array.from(card.querySelectorAll('.quiz-card__choice'));
+
+        radios.forEach((r) => {
+          r.disabled = false;
+          r.checked = false;
+        });
+        labels.forEach((label) => label.classList.remove('is-correct', 'is-incorrect'));
+        if (feedback) feedback.textContent = '';
+        if (checkBtn) {
+          checkBtn.hidden = false;
+          checkBtn.disabled = true;
+        }
+      });
+      setScore(0);
+    }
+
+    cards.forEach(setupCard);
+    restartBtn?.addEventListener('click', restart);
+
+    // "Champion order challenge" cards check independently of the main
+    // multiple-choice score bar above - each one has its own per-item rank
+    // <select> (works with zero JS as a plain answer-key page via the
+    // "Just show me the answer" <details>), so no radio/answerIndex model
+    // applies here.
+    const orderCards = Array.from(document.querySelectorAll('.quiz-order__items'))
+      .map((list) => list.closest('.quiz-card'))
+      .filter((card) => card !== null);
+
+    function setupOrderCard(card) {
+      const correctRanks = (card.dataset.correctRanks ?? '')
+        .split(',')
+        .map(Number)
+        .filter((n) => !Number.isNaN(n));
+      const selects = Array.from(card.querySelectorAll('.quiz-order__rank'));
+      const items = Array.from(card.querySelectorAll('.quiz-order__item'));
+      const checkBtn = card.querySelector('.quiz-order__check');
+      const feedback = card.querySelector('.quiz-card__feedback');
+      const orderCorrectText = card.dataset.i18nOrderCorrect ?? 'Correct order!';
+      const orderIncorrectText =
+        card.dataset.i18nOrderIncorrect ?? 'Not quite - highlighted items are out of place.';
+
+      if (checkBtn) checkBtn.hidden = false;
+
+      function updateCheckState() {
+        if (checkBtn) checkBtn.disabled = selects.some((s) => s.value === '');
+      }
+
+      function check() {
+        if (selects.some((s) => s.value === '')) return;
+        let allCorrect = true;
+        selects.forEach((select, i) => {
+          const item = items[i];
+          const correct = Number(select.value) === correctRanks[i];
+          if (!correct) allCorrect = false;
+          item?.classList.toggle('is-correct', correct);
+          item?.classList.toggle('is-incorrect', !correct);
+          select.disabled = true;
+        });
+        if (feedback) {
+          feedback.textContent = allCorrect ? orderCorrectText : orderIncorrectText;
+        }
+        if (checkBtn) checkBtn.hidden = true;
+      }
+
+      selects.forEach((select) => select.addEventListener('change', updateCheckState));
+      checkBtn?.addEventListener('click', check);
+    }
+
+    function restartOrderCard(card) {
+      const selects = Array.from(card.querySelectorAll('.quiz-order__rank'));
+      const items = Array.from(card.querySelectorAll('.quiz-order__item'));
+      const checkBtn = card.querySelector('.quiz-order__check');
+      const feedback = card.querySelector('.quiz-card__feedback');
+
+      selects.forEach((select) => {
+        select.disabled = false;
+        select.value = '';
+      });
+      items.forEach((item) => item.classList.remove('is-correct', 'is-incorrect'));
+      if (feedback) feedback.textContent = '';
+      if (checkBtn) {
+        checkBtn.hidden = false;
+        checkBtn.disabled = true;
+      }
+    }
+
+    orderCards.forEach(setupOrderCard);
+    restartBtn?.addEventListener('click', () => orderCards.forEach(restartOrderCard));
+  })();
+</script>
