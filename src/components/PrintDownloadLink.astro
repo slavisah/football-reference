@@ -1,0 +1,35 @@
+---
+import { withBase } from '../lib/url';
+
+interface Props {
+  /** Matches the generated file at public/downloads/<slug>.pdf, see scripts/generate-pdfs.mjs. */
+  slug: string;
+}
+
+const { slug } = Astro.props;
+---
+
+<p class="print-download no-print">
+  <a href={withBase(`/downloads/${slug}.pdf`)} download>
+    <span aria-hidden="true">⬇️</span> Download printable PDF
+  </a>
+  <span class="print-download__hint muted">A4 landscape, same table and totals as this page.</span>
+</p>
+
+<style>
+  .print-download {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.6rem;
+    margin: 0.75rem 0 0;
+  }
+
+  .print-download a {
+    font-weight: 600;
+  }
+
+  .print-download__hint {
+    font-size: 0.85rem;
+  }
+</style>

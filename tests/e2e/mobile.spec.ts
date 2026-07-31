@@ -138,6 +138,16 @@ test.describe('World Cup page on a 360px phone', () => {
     expect(firstWinner).toBe('Argentina');
     await expect(page.locator('#world-cup-sort')).toHaveValue('winner-asc');
   });
+
+  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/world-cup.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
 });
 
 test.describe('EURO page on a 360px phone', () => {
@@ -210,6 +220,16 @@ test.describe('Golden Boot page on a 360px phone', () => {
     await expect(firstRow).toHaveAttribute('data-year', '1958');
     await expect(firstRow).toContainText('Just Fontaine');
   });
+
+  test('offers a downloadable print PDF covering both tables', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/golden-boot.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
 });
 
 test.describe("Ballon d'Or page on a 360px phone", () => {
@@ -252,6 +272,50 @@ test.describe('Home page on a 360px phone', () => {
   test('links to all six competitions plus Records', async ({ page }) => {
     await expect(page.locator('.comp-card')).toHaveCount(6);
     await expect(page.locator('a[href$="/records"]').first()).toBeVisible();
+  });
+
+  test('the language switcher opens the Croatian home page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe('Croatian home page (/hr/) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/');
+  });
+
+  test('has no horizontal page overflow with six competition cards', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome and the same six competitions as English', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.locator('.comp-card')).toHaveCount(6);
+    await expect(page.locator('.site-footer')).toContainText('Izvori i pravila provjere');
+  });
+
+  test('shows the exact same top champion numbers as the English page', async ({ page, baseURL }) => {
+    const hrCard = page.locator('.comp-card', { hasText: 'FIFA Svjetsko prvenstvo' });
+    await expect(hrCard.locator('.comp-card__stats dd').first()).toHaveText(/^\d+$/);
+    const hrEditions = await hrCard.locator('.comp-card__stats dd').first().textContent();
+
+    await page.goto(baseURL ?? '/');
+    const enCard = page.locator('.comp-card', { hasText: 'FIFA World Cup' });
+    const enEditions = await enCard.locator('.comp-card__stats dd').first().textContent();
+
+    expect(hrEditions).toBe(enEditions);
+  });
+
+  test('the language switcher returns to the English home page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });
 });
 

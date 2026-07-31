@@ -507,12 +507,73 @@ differ from `## Editions` and will need the matching `editionsHeading`:
       previously visited page keeps rendering its content with
       `context.setOffline(true)`, and an uncached URL falls back to the
       cached home page rather than a browser error offline).
-      "Downloadable print sheet per competition" is **not implemented** -
-      the existing print stylesheet already covers on-screen "print this
-      page" for every competition table; a separate downloadable-file
-      version (e.g. build-time PDF generation) is a distinct, larger feature
-      left for a future pass.
-- [ ] Optional Croatian/English localization
+      "Downloadable print sheet per competition" - **added 2026-07-31
+      (intensive run)**, see its own entry below.
+- [x] Downloadable print sheet per competition - added 2026-07-31 (intensive
+      run). The existing print stylesheet already covered on-screen "print
+      this page"; this adds an actual downloadable file so a reader doesn't
+      have to know to open the browser's print dialog. New
+      `scripts/generate-pdfs.mjs` (`pnpm build:pdfs`, run manually after
+      `pnpm build` - deliberately **not** part of `pnpm build`/`deploy.yml`,
+      to keep deploys fast, the same call already made for Playwright/e2e)
+      builds the static site, serves it with `astro preview` (so
+      `BASE_PATH`/content are exactly what a reader sees), and drives the
+      environment's pre-installed Playwright Chromium to open each of the six
+      competition/award pages, emulate `print` media, and save a PDF with
+      `page.pdf({ preferCSSPageSize: true })` - so it reuses the same
+      `@media print` / `@page { size: A4 landscape }` rules already in
+      `src/styles/global.css` rather than duplicating that layout, and the
+      generated PDFs stay in lock-step with whatever the print stylesheet
+      renders. Output is committed as static assets at
+      `public/downloads/{world-cup,euro,nations-league,copa-america,
+      ballon-dor,golden-boot}.pdf` (2-8 pages each, regenerated for this run).
+      New `PrintDownloadLink.astro` (a `no-print` link + short caption) is
+      wired into `CompetitionView.astro` via an optional `pdfSlug` prop (so
+      the five pages that already use it only needed a one-line prop add) and
+      directly into `golden-boot.astro`, which composes its layout by hand
+      and has no single `CompetitionView` call for a single table to attach
+      the prop to. `docs/ADDING_CONTENT.md` section 8 now tells a content
+      editor to rerun `pnpm build:pdfs` after any Editions-table change, so
+      the PDF can't silently go stale relative to the live table. Covered by
+      2 new Playwright cases at 360px (World Cup and Golden Boot: the link is
+      visible with the right `href`, and a real HTTP request for that PDF
+      resolves with a `pdf` content-type) rather than a unit test, since
+      there's no pure function here - the link markup and the generated file
+      are what need checking.
+- [x] Optional Croatian/English localization - first vertical slice added
+  2026-07-30 (intensive run). New `src/lib/i18n.ts` (a `Locale = 'en' | 'hr'`
+  type, a small `UI_STRINGS` dictionary for shared chrome text, and a `t()`
+  helper) plus optional `locale`/`alternateHref` props on `BaseLayout.astro`,
+  `Nav.astro`, and `Footer.astro` - every prop defaults to `'en'` with the
+  exact original English strings, so all existing pages render byte-identical
+  output and needed no test changes. A new `src/pages/hr/index.astro` is a
+  full Croatian translation of the home page (hero, six competition cards,
+  features section, nav brand, footer), reachable via a new "Hrvatski"/
+  "English" language-switch link that only appears on the two translated
+  pages (`alternateHref` is `undefined` everywhere else, so the switcher is
+  invisible on untranslated pages rather than linking somewhere confusing).
+  The English and Croatian home pages share one data loader,
+  `loadHomeCompetitions()`/`buildHomeCards()` in the new `src/lib/homeCards.ts`
+  (extracted from `index.astro`, which previously inlined this) - both pages
+  call the exact same `loadCompetition()` calls, so the numbers (editions
+  count, top champion, title count) can never drift between languages; only
+  the card titles/blurbs differ, from a `CARD_TEXT` table keyed by locale.
+  `<html lang>` is set correctly per page (verified in the built HTML).
+  Covered by 5 new Vitest cases (`tests/unit/i18n.test.ts`: `t()` per locale,
+  `alternatePath()` both directions and the not-yet-translated case) and 4 new
+  Playwright cases at 360px (no overflow, translated chrome + six cards
+  render, the World Cup edition count matches the English page exactly, the
+  language switcher round-trips both ways with the right `<html lang>`).
+  **Not yet done** (left as follow-up, tracked here rather than a vague
+  "more languages later"): every other page (all six competition/award
+  pages, Records, Compare, Quiz, About/Sources) is still English-only;
+  `ThemeToggle.astro`'s "Theme"/"Light"/"Dark" labels are still hardcoded
+  English (missed because they're set from a client-side script, not a
+  server-rendered prop - would need a `data-*` attribute or similar to pass
+  the locale into the script); and the actual competition *data* (team
+  names, host names) is deliberately **not** translated, matching
+  `AGENTS.md` rule 2 (historical facts/names aren't altered) - only UI chrome
+  and page prose get a Croatian version.
 
 ## Known caveats
 

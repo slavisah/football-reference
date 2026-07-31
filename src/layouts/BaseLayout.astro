@@ -3,13 +3,18 @@ import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { withBase } from '../lib/url';
+import { t, type Locale } from '../lib/i18n';
 
 interface Props {
   title: string;
   description?: string;
+  /** Defaults to 'en'; only pages with a translation pass this. */
+  locale?: Locale;
+  /** The equivalent page in the other language, if one exists. */
+  alternateHref?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description, locale = 'en', alternateHref } = Astro.props;
 const fullTitle =
   title === 'The Ultimate Football Reference'
     ? title
@@ -17,7 +22,7 @@ const fullTitle =
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -66,13 +71,13 @@ const fullTitle =
     }
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to main content</a>
-    <Nav />
+    <a class="skip-link" href="#main">{t(locale, 'skipToContent')}</a>
+    <Nav locale={locale} alternateHref={alternateHref} />
     <main id="main" tabindex="-1">
       <div class="container">
         <slot />
       </div>
     </main>
-    <Footer />
+    <Footer locale={locale} />
   </body>
 </html>

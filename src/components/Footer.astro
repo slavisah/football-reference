@@ -1,19 +1,22 @@
 ---
 import { withBase } from '../lib/url';
+import { t, type Locale } from '../lib/i18n';
 
+interface Props {
+  /** Defaults to 'en'; only pages with a translation pass this. */
+  locale?: Locale;
+}
+
+const { locale = 'en' } = Astro.props;
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
   <div class="container">
+    <p class="muted">{t(locale, 'footerTagline')}</p>
     <p class="muted">
-      The Ultimate Football Reference &middot; a family-friendly, source-conscious
-      history project. Content is the editorial source of truth; historical team
-      names are preserved.
-    </p>
-    <p class="muted">
-      &copy; {year}. No tournament logos, betting content, ads, or trackers.
-      <a href={withBase('/about/sources')}>Sources &amp; review policy</a>.
+      &copy; {year}. {t(locale, 'footerCopyright')}
+      <a href={withBase('/about/sources')}>{t(locale, 'footerSourcesLink')}</a>.
     </p>
   </div>
 </footer>
