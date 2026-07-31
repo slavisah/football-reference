@@ -468,6 +468,73 @@ test.describe('Compare page on a 360px phone', () => {
     const copaRow = page.locator('#compare-a-body tr[data-slug="copa-america"]');
     await expect(copaRow.locator('[data-field="semifinals"]')).toHaveText('—');
   });
+
+  test('the language switcher opens the Croatian compare page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    // The page's own script appends ?a=/&b= on load (same as the English
+    // page), so the URL isn't bare - just check the path prefix.
+    await expect(page).toHaveURL(/\/hr\/compare(\?|$)/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe('Croatian compare page (/hr/compare) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/compare');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome and headings, with translated competition names', async ({
+    page,
+  }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.getByRole('heading', { name: 'Usporedi reprezentacije', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Izravna usporedba' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Sve reprezentacije' })).toBeVisible();
+    await expect(page.locator('#compare-a-body').getByText('UEFA Liga nacija')).toBeVisible();
+  });
+
+  test('choosing a different team updates the panel and the URL, and swap works', async ({
+    page,
+  }) => {
+    await page.selectOption('#compare-a', { label: 'Uruguay' });
+    await expect(page.locator('#compare-a-name')).toHaveText('Uruguay');
+    await expect(page).toHaveURL(/a=uruguay/);
+
+    const aBefore = await page.locator('#compare-a-name').textContent();
+    const bBefore = await page.locator('#compare-b-name').textContent();
+    await page.locator('#compare-swap').click();
+    await expect(page.locator('#compare-a-name')).toHaveText(bBefore ?? '');
+    await expect(page.locator('#compare-b-name')).toHaveText(aBefore ?? '');
+  });
+
+  test('shows the same all-teams ranking totals as the English page', async ({ page, baseURL }) => {
+    const hrFirstRow = await page
+      .locator('table.compare__table--all tbody tr')
+      .first()
+      .textContent();
+
+    await page.goto(baseURL ? `${baseURL}compare` : '/compare');
+    const enFirstRow = await page
+      .locator('table.compare__table--all tbody tr')
+      .first()
+      .textContent();
+
+    expect(hrFirstRow?.replace(/\s+/g, ' ').trim()).toBe(enFirstRow?.replace(/\s+/g, ' ').trim());
+  });
+
+  test('the language switcher returns to the English compare page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/compare(\?|$)/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
 });
 
 test.describe('Quiz page on a 360px phone', () => {

@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 76 Vitest unit tests
+pnpm test                      # 91 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 48 Playwright tests at 360px
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 74 Playwright tests at 360px
 ```
 
 Publishing: push to `main`; the Pages workflow builds and deploys.
@@ -629,19 +629,47 @@ differ from `## Editions` and will need the matching `editionsHeading`:
     the Ballon d'Or "Most awards" total matches the English page's number
     exactly, the historical nation-name rules text is translated, and the
     switcher returns to English).
-  - [ ] Still English-only: the six competition/award pages, Compare, Quiz -
-    left for a future run. The six competition pages are the biggest
-    remaining piece and meaningfully harder than the pages done so far:
-    their column headers and role-detection regexes (`findColumn` in
+  - [x] `/compare` - fourth translated page, added 2026-07-31 (intensive
+    run). New `src/pages/hr/compare.astro` loads the exact same four
+    `loadCompetition()` calls as the English page and calls the same
+    `buildAllCountryRecords()`/`tracksSemifinalColumn()`, so every
+    title/runner-up/semifinal count can never drift between languages -
+    only this page's own headings/prose, table column headers, and the
+    four competition display names are translated (reusing the exact
+    Croatian names already established on the Croatian home page and
+    records page: "FIFA Svjetsko prvenstvo", "UEFA Europsko prvenstvo",
+    "Copa América", "UEFA Liga nacija"). Country/team names themselves are
+    left as-is, matching the precedent set by the Croatian records page
+    (they're the underlying data, not UI chrome). No component prop
+    changes were needed - unlike `/records`, this page composes its own
+    markup directly rather than through shared components, so the table
+    headers, the head-to-head picker labels, and the client-side swap
+    button text were just written in Croatian directly in the new file
+    (the client script itself has no UI strings - it only pushes numbers
+    into `data-field` cells already labeled by the server-rendered
+    Croatian headers). `TRANSLATED_PATHS` gained `/compare` ->
+    `/hr/compare`, and the English `/compare` page now passes
+    `alternateHref` so its language switcher appears (it was missing one
+    before this run, same gap `/records` had). Covered by 1 new Vitest
+    case (`alternatePath` both directions) and 5 new Playwright cases
+    (English page: language switcher opens the Croatian one; Croatian
+    page: no 360px overflow, translated headings + a translated
+    competition name in the head-to-head table, team-select + swap still
+    works, the all-teams ranking's top row matches the English page
+    exactly, and the switcher returns to English).
+  - [ ] Still English-only: the six competition/award pages and Quiz - left
+    for a future run. The six competition pages are the biggest remaining
+    piece and meaningfully harder than the pages done so far: their column
+    headers and role-detection regexes (`findColumn` in
     `src/lib/editions.ts`, `buildSortOptions` in `src/lib/tableSort.ts`) are
     English-only and shared by every page's filters/sort/champions-summary/
     timeline logic, so translating a table's headers would need that
     detection to also recognize the Croatian header text without breaking
     it for the untranslated English pages - a real engineering task, not a
-    props-and-prose slice like this run's. Compare and Quiz are more
-    tractable (Quiz's question text is generated from simple string
-    templates in `src/lib/quiz.ts`, not raw table headers) and are
-    reasonable next targets before tackling the competition pages.
+    props-and-prose slice like this run's. Quiz is more tractable than the
+    competition pages (its question text is generated from simple string
+    templates in `src/lib/quiz.ts`, not raw table headers) and is a
+    reasonable next target.
 
 ## Known caveats
 

@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import References from '../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import { buildAllCountryRecords, tracksSemifinalColumn } from '../lib/compare';
+import { withBase } from '../lib/url';
 
 const meta = await loadPageMeta('compare-countries');
 
@@ -75,6 +76,7 @@ const recordsForClient = allRecords.map((r) => ({
 <BaseLayout
   title={meta.title}
   description="Compare two national teams' World Cup, EURO, Copa América and Nations League record - titles, runner-up finishes and semifinal finishes, generated from each competition's table."
+  alternateHref={withBase('/hr/compare')}
 >
   <article class="compare stack">
     <header class="compare__header">
