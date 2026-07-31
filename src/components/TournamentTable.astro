@@ -1,6 +1,7 @@
 ---
 import type { Edition, MarkdownTable } from '../lib/types';
 import { buildSortOptions, defaultSortValue } from '../lib/tableSort';
+import type { Locale } from '../lib/i18n';
 
 interface Props {
   /** Unique id prefix so multiple tables can coexist on a page. */
@@ -19,6 +20,30 @@ interface Props {
    * show an em dash rather than hiding the column.
    */
   extraColumn?: { label: string; values: Map<string, string> };
+  /**
+   * Overridable for localized pages; every default below matches the original
+   * English copy, so existing call sites render byte-identical output.
+   */
+  locale?: Locale;
+  /** Display-only column-header translations, keyed by the raw English header (e.g. "Year" -> "Godina"). */
+  headerLabels?: Record<string, string>;
+  yearLabel?: string;
+  yearAllLabel?: string;
+  hostLabel?: string;
+  hostAllLabel?: string;
+  winnerAllLabel?: string;
+  sortByLabel?: string;
+  resetLabel?: string;
+  filterAriaLabel?: string;
+  /** Uses the literal placeholder "{n}", replaced client-side with the edition count. */
+  showingAllTemplate?: string;
+  /** Uses the literal placeholders "{shown}", "{total}", "{bits}". */
+  showingFilteredTemplate?: string;
+  bitWinnerPrefix?: string;
+  bitYearPrefix?: string;
+  bitHostPrefix?: string;
+  emptyText?: string;
+  clearFiltersLabel?: string;
 }
 
 const {
@@ -30,6 +55,23 @@ const {
   hosts = [],
   winnerLabel = 'Winner',
   extraColumn,
+  locale = 'en',
+  headerLabels = {},
+  yearLabel = 'Year',
+  yearAllLabel = 'All years',
+  hostLabel = 'Host',
+  hostAllLabel = 'All hosts',
+  winnerAllLabel = `All ${winnerLabel.toLowerCase()}s`,
+  sortByLabel = 'Sort by',
+  resetLabel = 'Reset',
+  filterAriaLabel = `Filter ${caption}`,
+  showingAllTemplate = 'Showing all {n} editions.',
+  showingFilteredTemplate = 'Showing {shown} of {total} editions ({bits}).',
+  bitWinnerPrefix = 'winner',
+  bitYearPrefix = 'year',
+  bitHostPrefix = 'host',
+  emptyText = 'No editions match those filters.',
+  clearFiltersLabel = 'Clear filters',
 } = Astro.props;
 
 // Years for the filter, newest first.
@@ -49,7 +91,7 @@ const winnerColIndex = table.headers.findIndex((header) =>
 // Host, a numeric quantity column), detected the same way `buildEditions`
 // derives those roles. Defaults to Year newest-first, matching the row order
 // already rendered below, so no client-side re-sort is needed on first load.
-const sortOptions = buildSortOptions(table.headers);
+const sortOptions = buildSortOptions(table.headers, { locale, headerLabels });
 const defaultSort = defaultSortValue(sortOptions);
 ---
 
@@ -60,20 +102,20 @@ const defaultSort = defaultSortValue(sortOptions);
     class="filters no-print"
     id={`${id}-filters`}
     role="search"
-    aria-label={`Filter ${caption}`}
+    aria-label={filterAriaLabel}
   >
     <div class="filters__field">
       <label for={`${id}-winner`}>{winnerLabel}</label>
       <select id={`${id}-winner`} name="winner">
-        <option value="">All {winnerLabel.toLowerCase()}s</option>
+        <option value="">{winnerAllLabel}</option>
         {winners.map((winner) => <option value={winner}>{winner}</option>)}
       </select>
     </div>
 
     <div class="filters__field">
-      <label for={`${id}-year`}>Year</label>
+      <label for={`${id}-year`}>{yearLabel}</label>
       <select id={`${id}-year`} name="year">
-        <option value="">All years</option>
+        <option value="">{yearAllLabel}</option>
         {years.map((year) => <option value={year}>{year}</option>)}
       </select>
     </div>
@@ -81,9 +123,9 @@ const defaultSort = defaultSortValue(sortOptions);
     {
       hosts.length > 0 && (
         <div class="filters__field">
-          <label for={`${id}-host`}>Host</label>
+          <label for={`${id}-host`}>{hostLabel}</label>
           <select id={`${id}-host`} name="host">
-            <option value="">All hosts</option>
+            <option value="">{hostAllLabel}</option>
             {hosts.map((host) => <option value={host}>{host}</option>)}
           </select>
         </div>
@@ -93,7 +135,7 @@ const defaultSort = defaultSortValue(sortOptions);
     {
       sortOptions.length > 0 && (
         <div class="filters__field">
-          <label for={`${id}-sort`}>Sort by</label>
+          <label for={`${id}-sort`}>{sortByLabel}</label>
           <select id={`${id}-sort`} name="sort">
             {sortOptions.map((option) => (
               <option
@@ -111,11 +153,11 @@ const defaultSort = defaultSortValue(sortOptions);
     }
 
     <button type="button" class="filters__reset" id={`${id}-reset`}>
-      Reset
+      {resetLabel}
     </button>
 
     <p class="filters__status" id={`${id}-status`} role="status" aria-live="polite">
-      Showing all {editions.length} editions.
+      {showingAllTemplate.replace('{n}', String(editions.length))}
     </p>
   </form>
 
@@ -124,7 +166,7 @@ const defaultSort = defaultSortValue(sortOptions);
       <caption>{caption}</caption>
       <thead>
         <tr>
-          {table.headers.map((header) => <th scope="col">{header}</th>)}
+          {table.headers.map((header) => <th scope="col">{headerLabels[header] ?? header}</th>)}
           {extraColumn && <th scope="col">{extraColumn.label}</th>}
         </tr>
       </thead>
@@ -134,7 +176,7 @@ const defaultSort = defaultSortValue(sortOptions);
             <tr data-winner={edition.winner} data-year={edition.year} data-host={edition.host ?? ''}>
               {edition.cells.map((cell, index) => (
                 <td
-                  data-label={cell.label}
+                  data-label={headerLabels[cell.label] ?? cell.label}
                   class={index === winnerColIndex ? 'is-winner' : undefined}
                 >
                   {cell.value}
@@ -153,7 +195,7 @@ const defaultSort = defaultSortValue(sortOptions);
   </div>
 
   <p class="t-empty" id={`${id}-empty`} hidden>
-    No editions match those filters. <button type="button" id={`${id}-empty-reset`} class="linkish">Clear filters</button>
+    {emptyText} <button type="button" id={`${id}-empty-reset`} class="linkish">{clearFiltersLabel}</button>
   </p>
 </section>
 
@@ -345,7 +387,19 @@ const defaultSort = defaultSortValue(sortOptions);
   }
 </style>
 
-<script is:inline define:vars={{ id, total: editions.length, defaultSort }}>
+<script
+  is:inline
+  define:vars={{
+    id,
+    total: editions.length,
+    defaultSort,
+    showingAllTemplate,
+    showingFilteredTemplate,
+    bitWinnerPrefix,
+    bitYearPrefix,
+    bitHostPrefix,
+  }}
+>
   const form = document.getElementById(`${id}-filters`);
   const winnerSel = document.getElementById(`${id}-winner`);
   const yearSel = document.getElementById(`${id}-year`);
@@ -415,13 +469,16 @@ const defaultSort = defaultSortValue(sortOptions);
     empty.hidden = shown !== 0;
     if (status) {
       if (!winner && !year && !host) {
-        status.textContent = `Showing all ${total} editions.`;
+        status.textContent = showingAllTemplate.replace('{n}', String(total));
       } else {
         const bits = [];
-        if (winner) bits.push(`winner ${winner}`);
-        if (year) bits.push(`year ${year}`);
-        if (host) bits.push(`host ${host}`);
-        status.textContent = `Showing ${shown} of ${total} editions (${bits.join(', ')}).`;
+        if (winner) bits.push(`${bitWinnerPrefix} ${winner}`);
+        if (year) bits.push(`${bitYearPrefix} ${year}`);
+        if (host) bits.push(`${bitHostPrefix} ${host}`);
+        status.textContent = showingFilteredTemplate
+          .replace('{shown}', String(shown))
+          .replace('{total}', String(total))
+          .replace('{bits}', bits.join(', '));
       }
     }
     writeParams(winner, year, host, sort);

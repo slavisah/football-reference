@@ -1,0 +1,151 @@
+---
+// Croatian translation of src/pages/competitions/copa-america.astro. First of
+// the six competition/award pages localized - see docs/PROJECT_STATUS.md for
+// why this one was picked first and what's left for the other five. Loads the
+// exact same `loadCompetition('copa-america', ...)` call as the English page,
+// so the table data, generated champions summary and reference links can
+// never drift between languages - only this page's own chrome (filters, sort
+// labels, status text, column headers) and a hand-translated intro/notes
+// paragraph are Croatian. This page composes its own layout by hand (like
+// hr/records.astro and hr/compare.astro) rather than through the shared
+// English-only CompetitionView, so the five untouched English competition
+// pages needed no changes beyond the new optional locale props on
+// TournamentTable/PrintDownloadLink (defaulted to the original English text).
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import TournamentTable from '../../../components/TournamentTable.astro';
+import ChampionsSummary from '../../../components/ChampionsSummary.astro';
+import EditorialNotes from '../../../components/EditorialNotes.astro';
+import References from '../../../components/References.astro';
+import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
+import { loadCompetition } from '../../../lib/competition';
+import { withBase } from '../../../lib/url';
+import type { NoteSection } from '../../../lib/notes';
+
+const data = await loadCompetition('copa-america', {
+  editionsHeading: 'Champions timeline',
+  sourcesHeading: 'Copa América',
+  allowDuplicateYears: ['1959'],
+});
+
+const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+// Hand-translated from content/copa-america.md's "Memorable moments" section.
+// content/ itself stays untouched and English (the single editorial source of
+// truth); this is presentation-layer text local to this page only, the same
+// way hr/records.astro hand-writes its own Croatian prose rather than
+// generating it from an English source at build time.
+const notes: NoteSection[] = [
+  {
+    heading: 'Nezaboravni trenuci',
+    items: [
+      'Argentina, Brazil, Čile i Urugvaj sudjelovali su na prvom izdanju 1916. godine.',
+      'Bolivija je osvojila svoju jedinu titulu kao domaćin 1963. godine.',
+      'Kolumbija je osvojila svoju prvu titulu 2001. godine.',
+      'Čile je osvojio svoje prve dvije titule u uzastopnim izdanjima, 2015. i 2016.',
+      'Argentina je 2024. preuzela vodstvo kao najuspješnija reprezentacija natjecanja.',
+    ],
+  },
+];
+
+const headerLabels: Record<string, string> = {
+  Year: 'Godina',
+  'Host / format': 'Domaćin / format',
+  Champion: 'Prvak',
+  'Runner-up': 'Drugoplasirani',
+};
+---
+
+<BaseLayout
+  title={data.title}
+  description="Svaki prvak Copa Américe od 1916., domaćini i drugoplasirani, uz generirani broj naslova. Filtriraj po prvaku, godini i domaćinu."
+  locale="hr"
+  alternateHref={withBase('/competitions/copa-america')}
+>
+  <article class="competition stack">
+    <header class="competition__header">
+      <p class="eyebrow badge">{statusText}</p>
+      <h1>{data.title}</h1>
+      <p class="competition__intro">
+        Copa América je pokrenuta 1916. godine i najstarije je kontinentalno
+        natjecanje muških nacionalnih reprezentacija koje se i danas igra. Do
+        1975. bila je poznata kao Južnoameričko prvenstvo.
+      </p>
+      <PrintDownloadLink
+        slug="copa-america"
+        label="Preuzmi PDF za ispis"
+        hint="A4 položeno, ista tablica i zbrojevi kao na ovoj stranici."
+      />
+    </header>
+
+    <TournamentTable
+      id="copa-america"
+      caption="Prvaci Copa Américe, od 1916. do danas"
+      table={data.table}
+      editions={data.editions}
+      winners={data.winners}
+      hosts={data.hosts}
+      locale="hr"
+      headerLabels={headerLabels}
+      winnerLabel="Prvak"
+      winnerAllLabel="Svi prvaci"
+      yearLabel="Godina"
+      yearAllLabel="Sve godine"
+      hostLabel="Domaćin"
+      hostAllLabel="Svi domaćini"
+      sortByLabel="Sortiraj po"
+      resetLabel="Poništi"
+      filterAriaLabel="Filtriraj prvake Copa Américe"
+      showingAllTemplate="Prikazano svih {n} izdanja."
+      showingFilteredTemplate="Prikazano {shown} od {total} izdanja ({bits})."
+      bitWinnerPrefix="prvak"
+      bitYearPrefix="godina"
+      bitHostPrefix="domaćin"
+      emptyText="Nijedno izdanje ne odgovara odabranim filterima."
+      clearFiltersLabel="Očisti filtere"
+    />
+
+    <ChampionsSummary
+      champions={data.champions}
+      scaleMax={data.editions.length}
+      heading="Prvaci po broju naslova"
+      description="Automatski generirano iz gornje tablice izdanja. Zbrojevi grupiraju naciju s njezinim sportskim nasljednikom samo tamo gdje to čini izvorni sadržaj (Njemačka uključuje Zapadnu Njemačku); svaki drugi naziv broji se onako kako je zapisan."
+      unit={['naslov', 'naslova']}
+      winningYearsLabel="Godine osvajanja: "
+    />
+
+    <EditorialNotes sections={notes} />
+
+    <References
+      sources={data.sources}
+      lastReviewed={data.lastReviewed}
+      status={data.status}
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText={statusText}
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+      noteText="Prednost imaju primarni izvori. Povijesni formati i nazivi reprezentacija bilježe se onako kako su korišteni u to vrijeme; kontekst potražite u napomenama uz svako izdanje."
+    />
+  </article>
+</BaseLayout>
+
+<style>
+  .competition__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .competition__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .competition__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+</style>

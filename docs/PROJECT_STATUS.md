@@ -696,18 +696,83 @@ differ from `## Editions` and will need the matching `editionsHeading`:
     overflow, translated prompts/controls, a correct multiple-choice answer
     shows "Točno!" and updates the score, a correct order-challenge ranking
     shows "Točan redoslijed!", and the switcher returns to English).
-  - [ ] Still English-only: the six competition/award pages. This is the
-    only remaining piece of the localization backlog, and meaningfully
-    harder than every page done so far (including Quiz, which turned out to
-    be tractable via the `locale` template-parameter approach above): the
-    six pages' column headers and role-detection regexes (`findColumn` in
-    `src/lib/editions.ts`, `buildSortOptions` in `src/lib/tableSort.ts`) are
-    English-only and shared by every page's filters/sort/champions-summary/
-    timeline logic, so translating a table's headers would need that
-    detection to also recognize Croatian header text without breaking it
-    for the untranslated English pages - a real engineering task (making
-    `findColumn`'s matchers locale-aware), not a props-and-prose slice like
-    the pages done so far.
+  - [x] `/competitions/copa-america` - first of the six competition/award
+    pages translated, added 2026-07-31 (intensive run), as a deliberate
+    vertical slice of this backlog item (see the still-English list below
+    for the other five). The earlier note here worried that translating a
+    table's headers would require making `findColumn`'s role-detection
+    matchers themselves locale-aware; that turned out to be unnecessary.
+    `findColumn`/`buildEditions` still only ever run against the raw English
+    headers from `content/copa-america.md` (detection is completely
+    unchanged, for every locale), and a new **display-only** `headerLabels`
+    prop on `TournamentTable.astro` (`Record<rawEnglishHeader,
+    translatedHeader>`) swaps in the translated text purely for the
+    rendered `<th>`/mobile-card `data-label`, after detection has already
+    run. `TournamentTable` also gained ~15 other optional locale props
+    (`yearLabel`, `hostAllLabel`, `sortByLabel`, `showingAllTemplate`, etc.),
+    every one defaulting to the exact original English string/template, so
+    the five untouched English competition pages needed zero changes and
+    render byte-identical HTML (verified by diffing a pre-change build
+    against a post-change build of `/competitions/world-cup` and
+    `/competitions/euro` - the only bytes that differ are the new,
+    English-default `define:vars` the client filter script now carries).
+    `buildSortOptions` (`src/lib/tableSort.ts`) gained the same
+    `{ locale, headerLabels }` config so the "Sort by" dropdown's wording
+    ("(newest first)", "(A-Z)", etc., now in `src/lib/i18n.ts`) and header
+    text translate too; fixed a latent locale-bugfix in passing while there
+    - `defaultSortValue()` used to pick the default option by checking
+    whether its *label* ended in the English string `"(newest first)"`,
+    which would have silently broken (falling back to the first option
+    instead of Year-newest-first) the moment any locale's suffix wording
+    differed. Each `SortOption` now carries an explicit `role: 'year' |
+    'quantity' | 'text'` field instead, so the default-selection logic
+    checks `role === 'year' && dir === 'desc'` directly and is locale-proof;
+    covered by 2 new Vitest cases plus a 3rd asserting the Croatian label
+    and header translation. `PrintDownloadLink.astro` gained optional
+    `label`/`hint` props (defaults unchanged) for the same reason.
+    This page composes its own layout by hand (`src/pages/hr/competitions/
+    copa-america.astro`), like `hr/records.astro` and `hr/compare.astro`
+    already do, rather than through the shared English-only
+    `CompetitionView.astro` - so `CompetitionView` itself (used by the other
+    five English pages) needed no changes and no new prop surface. Loads the
+    exact same `loadCompetition('copa-america', ...)` call as the English
+    page, so the table data, generated champions summary (title counts) and
+    reference links can never drift between languages. The "Memorable
+    moments" bullets are hand-translated Croatian text local to this page
+    only (`content/copa-america.md` itself is untouched - still the single
+    English editorial source of truth); this follows the precedent already
+    set by `hr/records.astro`'s hand-written Croatian identity-rules prose
+    rather than an automated translation of editorial content. Country/team
+    names, years and scores are left as-is throughout (matching the
+    Compare/Records precedent that underlying data isn't translated, only
+    UI chrome and short hand-checked prose). `TRANSLATED_PATHS` gained
+    `/competitions/copa-america` -> `/hr/competitions/copa-america`, and the
+    English page now passes `alternateHref` so its language switcher
+    appears (the same one-line gap `/records`, `/compare` and `/quiz` each
+    had before their own translation). Covered by 3 new Vitest cases
+    (`tableSort`) and 7 new Playwright cases at 360px (English page's
+    switcher opens the Croatian one; Croatian page: no overflow, translated
+    filter labels/column headers, filtering by "prvak" updates the URL and
+    status text, champion totals match the English page exactly, the
+    translated Memorable-moments section renders, the PDF download link
+    shows the translated label and actually resolves, and the switcher
+    returns to English).
+  - [ ] Still English-only: the other five competition/award pages (World
+    Cup, EURO, Nations League, Ballon d'Or, Golden Boot). The reusable
+    infrastructure for this is now all in place from the Copa América slice
+    above (`TournamentTable`'s locale props, `buildSortOptions`'s
+    `{ locale, headerLabels }` config, `PrintDownloadLink`'s `label`/`hint`
+    props) - each remaining page is now a props-and-prose slice like
+    Records/Compare/Quiz were, not new engineering: write
+    `src/pages/hr/competitions/<slug>.astro` composing the same components
+    by hand, supply a `headerLabels` map for that table's own English
+    headers, translate the filter/status strings (copy the Copa América
+    page's Croatian values - they're competition-agnostic chrome text) and
+    hand-translate that page's own "Memorable moments"/notes prose. Golden
+    Boot is the one exception worth flagging in advance: its English page
+    doesn't use `CompetitionView` either (it composes two `TournamentTable`s
+    by hand for the two top-scorer tables), so its Croatian version can
+    follow the same pattern used here rather than `CompetitionView`.
 
 ## Known caveats
 
