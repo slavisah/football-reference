@@ -19,6 +19,18 @@ describe('t', () => {
       expect(t(code, 'themeLabel').length).toBeGreaterThan(0);
       expect(t(code, 'themeLight').length).toBeGreaterThan(0);
       expect(t(code, 'themeDark').length).toBeGreaterThan(0);
+      expect(t(code, 'quizEyebrow').length).toBeGreaterThan(0);
+      expect(t(code, 'quizScoreLabel').length).toBeGreaterThan(0);
+      expect(t(code, 'quizRestart').length).toBeGreaterThan(0);
+      expect(t(code, 'quizCheckAnswer').length).toBeGreaterThan(0);
+      expect(t(code, 'quizJustShowAnswer').length).toBeGreaterThan(0);
+      expect(t(code, 'quizCorrect').length).toBeGreaterThan(0);
+      expect(t(code, 'quizOrderHeading').length).toBeGreaterThan(0);
+      expect(t(code, 'quizOrderIntro').length).toBeGreaterThan(0);
+      expect(t(code, 'quizCheckOrder').length).toBeGreaterThan(0);
+      expect(t(code, 'quizOrderCorrect').length).toBeGreaterThan(0);
+      expect(t(code, 'quizOrderIncorrect').length).toBeGreaterThan(0);
+      expect(t(code, 'quizRankPlaceholder').length).toBeGreaterThan(0);
     }
   });
 
@@ -41,7 +53,6 @@ describe('alternatePath', () => {
 
   it('returns null for a page that has no translation yet', () => {
     expect(alternatePath('/competitions/world-cup', 'en')).toBeNull();
-    expect(alternatePath('/quiz', 'en')).toBeNull();
   });
 
   it('maps the English sources page to its Croatian translation and back', () => {
@@ -57,5 +68,10 @@ describe('alternatePath', () => {
   it('maps the English compare page to its Croatian translation and back', () => {
     expect(alternatePath('/compare', 'en')).toBe('/hr/compare');
     expect(alternatePath('/hr/compare', 'hr')).toBe('/compare');
+  });
+
+  it('maps the English quiz page to its Croatian translation and back', () => {
+    expect(alternatePath('/quiz', 'en')).toBe('/hr/quiz');
+    expect(alternatePath('/hr/quiz', 'hr')).toBe('/quiz');
   });
 });

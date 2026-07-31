@@ -1,12 +1,15 @@
 ---
 import type { QuizOrderQuestion } from '../lib/quiz';
+import { t, type Locale } from '../lib/i18n';
 
 interface Props {
   question: QuizOrderQuestion;
   index: number;
+  /** Defaults to 'en'; only the Croatian quiz page passes 'hr'. */
+  locale?: Locale;
 }
 
-const { question, index } = Astro.props;
+const { question, index, locale = 'en' } = Astro.props;
 const groupId = `quiz-order-${index}`;
 
 const correctOrderText = question.items
@@ -20,6 +23,8 @@ const correctOrderText = question.items
   class="quiz-card card"
   id={groupId}
   data-correct-ranks={question.correctRanks.join(',')}
+  data-i18n-order-correct={t(locale, 'quizOrderCorrect')}
+  data-i18n-order-incorrect={t(locale, 'quizOrderIncorrect')}
 >
   <p class="quiz-card__category badge">{question.category}</p>
 
@@ -37,7 +42,7 @@ const correctOrderText = question.items
               class="quiz-order__rank"
               data-item-index={itemIndex}
             >
-              <option value="">Rank...</option>
+              <option value="">{t(locale, 'quizRankPlaceholder')}</option>
               {question.items.map((_, rankOption) => (
                 <option value={rankOption + 1}>{rankOption + 1}</option>
               ))}
@@ -50,13 +55,13 @@ const correctOrderText = question.items
 
   <div class="quiz-card__controls no-print">
     <button type="button" class="quiz-card__check quiz-order__check" hidden disabled>
-      Check order
+      {t(locale, 'quizCheckOrder')}
     </button>
     <p class="quiz-card__feedback" role="status" aria-live="polite"></p>
   </div>
 
   <details class="quiz-card__reveal no-print">
-    <summary>Just show me the answer</summary>
+    <summary>{t(locale, 'quizJustShowAnswer')}</summary>
     <p>{correctOrderText}</p>
   </details>
 </div>

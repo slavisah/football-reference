@@ -1,3 +1,4 @@
+import type { Locale } from './i18n';
 import type { Edition, TimelineEntry } from './types';
 
 // Generates multiple-choice quiz questions from already-loaded competition
@@ -99,10 +100,13 @@ export function championByYearQuestions(
   editions: Edition[],
   competition: string,
   seedPrefix: string,
+  locale: Locale = 'en',
 ): QuizQuestion[] {
-  return questionsFromWinners(editions, seedPrefix, 'champion', competition, (year) =>
-    `Who won the ${competition} in ${year}?`,
-  );
+  const promptFor =
+    locale === 'hr'
+      ? (year: string) => `Tko je osvojio natjecanje ${competition} ${year}. godine?`
+      : (year: string) => `Who won the ${competition} in ${year}?`;
+  return questionsFromWinners(editions, seedPrefix, 'champion', competition, promptFor);
 }
 
 /** "Who was the {competition} top scorer in {year}?" - for Golden Boot tables. */
@@ -110,10 +114,13 @@ export function topScorerByYearQuestions(
   editions: Edition[],
   competition: string,
   seedPrefix: string,
+  locale: Locale = 'en',
 ): QuizQuestion[] {
-  return questionsFromWinners(editions, seedPrefix, 'scorer', competition, (year) =>
-    `Who was the ${competition} top scorer in ${year}?`,
-  );
+  const promptFor =
+    locale === 'hr'
+      ? (year: string) => `Tko je bio najbolji strijelac natjecanja ${competition} ${year}. godine?`
+      : (year: string) => `Who was the ${competition} top scorer in ${year}?`;
+  return questionsFromWinners(editions, seedPrefix, 'scorer', competition, promptFor);
 }
 
 // Host values that aren't an actual country (e.g. Copa América editions played
@@ -125,6 +132,7 @@ export function hostByYearQuestions(
   editions: Edition[],
   competition: string,
   seedPrefix: string,
+  locale: Locale = 'en',
 ): QuizQuestion[] {
   const pool = editions
     .map((e) => e.host?.trim())
@@ -139,7 +147,10 @@ export function hostByYearQuestions(
     questions.push({
       id,
       category: competition,
-      prompt: `Which country hosted the ${edition.year} ${competition}?`,
+      prompt:
+        locale === 'hr'
+          ? `Koja je država bila domaćin natjecanja ${competition} ${edition.year}. godine?`
+          : `Which country hosted the ${edition.year} ${competition}?`,
       ...choice,
     });
   }
@@ -151,6 +162,7 @@ export function runnerUpByYearQuestions(
   timeline: TimelineEntry[],
   competition: string,
   seedPrefix: string,
+  locale: Locale = 'en',
 ): QuizQuestion[] {
   const pool = timeline
     .map((entry) => entry.runnerUp?.trim())
@@ -165,7 +177,10 @@ export function runnerUpByYearQuestions(
     questions.push({
       id,
       category: competition,
-      prompt: `Who did ${entry.champion} beat in the ${entry.year} ${competition} final?`,
+      prompt:
+        locale === 'hr'
+          ? `Koga je pobijedio ${entry.champion} u finalu natjecanja ${competition} ${entry.year}. godine?`
+          : `Who did ${entry.champion} beat in the ${entry.year} ${competition} final?`,
       ...choice,
     });
   }
@@ -216,6 +231,7 @@ export function chronologicalOrderQuestions(
   seedPrefix: string,
   itemLabel: (edition: Edition) => string,
   itemCount = 4,
+  locale: Locale = 'en',
 ): QuizOrderQuestion[] {
   const seenYears = new Set<string>();
   const candidates = editions
@@ -239,7 +255,10 @@ export function chronologicalOrderQuestions(
     {
       id: `${seedPrefix}:order`,
       category: competition,
-      prompt: `Put these ${competition} champions in chronological order (earliest first).`,
+      prompt:
+        locale === 'hr'
+          ? `Poredaj ove prvake natjecanja ${competition} kronološkim redoslijedom (najraniji prvi).`
+          : `Put these ${competition} champions in chronological order (earliest first).`,
       items: display.map(itemLabel),
       correctRanks: display.map((edition) => picked.indexOf(edition) + 1),
     },
