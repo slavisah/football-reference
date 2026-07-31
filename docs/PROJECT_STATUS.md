@@ -599,8 +599,49 @@ differ from `## Editions` and will need the matching `editionsHeading`:
     no overflow, translated headings + same `lastReviewed` date as English,
     Croatian competition-group names linking to the right English page, and
     the switcher returning to English).
-  - [ ] Still English-only: the six competition/award pages, Records,
-    Compare, Quiz. Left for a future run.
+  - [x] `/records` - third translated page, added 2026-07-31 (intensive
+    run). New `src/pages/hr/records.astro` loads the exact same seven
+    `loadCompetition()` calls as the English page (four team competitions +
+    Ballon d'Or + both Golden Boot tables), so every timeline entry and
+    ranking number can never drift between languages - only this page's own
+    headings/prose and the competition/award display names are translated,
+    reusing the exact Croatian names already established on the Croatian
+    home page (`homeCards.ts`'s `CARD_TEXT`) and the Croatian sources page.
+    Needed three small, backward-compatible prop additions since this is the
+    first Croatian page to reuse `ChampionsTimeline.astro` and
+    `References.astro` (`ChampionsSummary.astro` already supported enough
+    overrides): `ChampionsTimeline` gained optional `hostedByLabel`/
+    `runnerUpLabel` props (default "Hosted by"/"Runner-up:", unchanged for
+    every existing call site), `ChampionsSummary` gained an optional
+    `winningYearsLabel` prop (default "Winning years: "), and `References`
+    gained optional `heading`/`statusPrefix`/`statusText`/
+    `lastReviewedPrefix`/`noSourcesText`/`noteText`/`dateLocale` props -
+    `statusText` defaults to the raw `status` value so every other page's
+    output is byte-identical, while the Croatian page passes a translated
+    "Provjereno"/"U pregledu" word and `dateLocale="hr-HR"` for the reviewed
+    date, matching the pattern the Croatian sources page already established
+    by hand. `TRANSLATED_PATHS` gained `/records` -> `/hr/records`, and the
+    English `/records` page now passes `alternateHref` so its language
+    switcher appears (it was missing one before this run). Covered by 1 new
+    Vitest case (`alternatePath` both directions) and 6 new Playwright cases
+    (English page: language switcher opens the Croatian one; Croatian page:
+    no 360px overflow, all four section headings + a timeline card render,
+    the Ballon d'Or "Most awards" total matches the English page's number
+    exactly, the historical nation-name rules text is translated, and the
+    switcher returns to English).
+  - [ ] Still English-only: the six competition/award pages, Compare, Quiz -
+    left for a future run. The six competition pages are the biggest
+    remaining piece and meaningfully harder than the pages done so far:
+    their column headers and role-detection regexes (`findColumn` in
+    `src/lib/editions.ts`, `buildSortOptions` in `src/lib/tableSort.ts`) are
+    English-only and shared by every page's filters/sort/champions-summary/
+    timeline logic, so translating a table's headers would need that
+    detection to also recognize the Croatian header text without breaking
+    it for the untranslated English pages - a real engineering task, not a
+    props-and-prose slice like this run's. Compare and Quiz are more
+    tractable (Quiz's question text is generated from simple string
+    templates in `src/lib/quiz.ts`, not raw table headers) and are
+    reasonable next targets before tackling the competition pages.
 
 ## Known caveats
 

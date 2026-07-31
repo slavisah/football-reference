@@ -48,4 +48,9 @@ describe('alternatePath', () => {
     expect(alternatePath('/about/sources', 'en')).toBe('/hr/about/sources');
     expect(alternatePath('/hr/about/sources', 'hr')).toBe('/about/sources');
   });
+
+  it('maps the English records page to its Croatian translation and back', () => {
+    expect(alternatePath('/records', 'en')).toBe('/hr/records');
+    expect(alternatePath('/hr/records', 'hr')).toBe('/records');
+  });
 });

@@ -47,6 +47,7 @@ export function t(locale: Locale, key: UiStringKey): string {
 export const TRANSLATED_PATHS: Record<string, string> = {
   '/': '/hr/',
   '/about/sources': '/hr/about/sources',
+  '/records': '/hr/records',
 };
 
 /** The other language's equivalent path for the current one, if translated, else null. */
