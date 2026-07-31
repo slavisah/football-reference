@@ -9,14 +9,23 @@ describe('t', () => {
   });
 
   it('has both locales non-empty for every UI string', () => {
-    const keys: (keyof typeof import('../../src/lib/i18n'))[] = [];
     for (const { code } of LOCALES) {
       expect(t(code, 'brand').length).toBeGreaterThan(0);
       expect(t(code, 'footerTagline').length).toBeGreaterThan(0);
       expect(t(code, 'footerCopyright').length).toBeGreaterThan(0);
       expect(t(code, 'footerSourcesLink').length).toBeGreaterThan(0);
       expect(t(code, 'switchLanguageTo').length).toBeGreaterThan(0);
+      expect(t(code, 'themeToggleAriaLabel').length).toBeGreaterThan(0);
+      expect(t(code, 'themeLabel').length).toBeGreaterThan(0);
+      expect(t(code, 'themeLight').length).toBeGreaterThan(0);
+      expect(t(code, 'themeDark').length).toBeGreaterThan(0);
     }
+  });
+
+  it('gives Light/Dark/Theme distinct strings per locale', () => {
+    expect(t('en', 'themeLight')).not.toBe(t('hr', 'themeLight'));
+    expect(t('en', 'themeDark')).not.toBe(t('hr', 'themeDark'));
+    expect(t('en', 'themeLabel')).not.toBe(t('hr', 'themeLabel'));
   });
 });
 
@@ -33,5 +42,15 @@ describe('alternatePath', () => {
   it('returns null for a page that has no translation yet', () => {
     expect(alternatePath('/competitions/world-cup', 'en')).toBeNull();
     expect(alternatePath('/quiz', 'en')).toBeNull();
+  });
+
+  it('maps the English sources page to its Croatian translation and back', () => {
+    expect(alternatePath('/about/sources', 'en')).toBe('/hr/about/sources');
+    expect(alternatePath('/hr/about/sources', 'hr')).toBe('/about/sources');
+  });
+
+  it('maps the English records page to its Croatian translation and back', () => {
+    expect(alternatePath('/records', 'en')).toBe('/hr/records');
+    expect(alternatePath('/hr/records', 'hr')).toBe('/records');
   });
 });

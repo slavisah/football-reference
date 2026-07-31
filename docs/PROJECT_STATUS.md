@@ -564,16 +564,84 @@ differ from `## Editions` and will need the matching `editionsHeading`:
   Playwright cases at 360px (no overflow, translated chrome + six cards
   render, the World Cup edition count matches the English page exactly, the
   language switcher round-trips both ways with the right `<html lang>`).
-  **Not yet done** (left as follow-up, tracked here rather than a vague
-  "more languages later"): every other page (all six competition/award
-  pages, Records, Compare, Quiz, About/Sources) is still English-only;
-  `ThemeToggle.astro`'s "Theme"/"Light"/"Dark" labels are still hardcoded
-  English (missed because they're set from a client-side script, not a
-  server-rendered prop - would need a `data-*` attribute or similar to pass
-  the locale into the script); and the actual competition *data* (team
-  names, host names) is deliberately **not** translated, matching
-  `AGENTS.md` rule 2 (historical facts/names aren't altered) - only UI chrome
-  and page prose get a Croatian version.
+  - [x] `ThemeToggle.astro`'s "Theme"/"Light"/"Dark" labels - localized
+    2026-07-31 (intensive run). It now takes an optional `locale` prop
+    (`Nav.astro` forwards its own `locale`), and the initial label plus the
+    `aria-label` render through three new `t()` keys (`themeLabel`,
+    `themeLight`, `themeDark`, `themeToggleAriaLabel`). The client script
+    that swaps the label on click can't import `t()` (it runs in the
+    browser, after Astro hoists it out), so the Light/Dark words it needs
+    are passed through `data-light-label`/`data-dark-label` attributes on
+    the button instead - the same pattern `TournamentTable`'s inline script
+    already uses for server values. Covered by 1 new Vitest case plus new
+    assertions in the existing "has both locales non-empty" test
+    (`tests/unit/i18n.test.ts`).
+  - [x] `/about/sources` - second translated page, added 2026-07-31
+    (intensive run). New `src/pages/hr/about/sources.astro` calls the exact
+    same `loadPageMeta('about-sources')` / `extractSourceSections()` as the
+    English page, so the source links, status, and `lastReviewed` date can
+    never drift between languages - only this page's own prose (intro,
+    section headings, the "How sources are reviewed" policy list) and the
+    competition-group heading labels are Croatian. The competition-group
+    labels reuse the exact names already on the Croatian home page
+    (`homeCards.ts`'s `CARD_TEXT`, e.g. "FIFA Svjetsko prvenstvo") so a
+    competition is never called two different things across the site; the
+    links themselves still point at the English competition pages, since
+    those aren't translated yet. `docs/SOURCES.md` itself is **not**
+    translated - it is one shared file backing both languages' References
+    sections, so per-locale link labels would make the English page drift.
+    `TRANSLATED_PATHS` gained `/about/sources` -> `/hr/about/sources`, and
+    `Footer.astro`'s "Sources & review policy" link is now locale-aware
+    (points at the Croatian page from Croatian pages) rather than always
+    pointing at English. Covered by 1 new Vitest case (`alternatePath`
+    both directions) and 5 new Playwright cases at 360px (the English
+    sources page's switcher opens the Croatian one; on the Croatian page:
+    no overflow, translated headings + same `lastReviewed` date as English,
+    Croatian competition-group names linking to the right English page, and
+    the switcher returning to English).
+  - [x] `/records` - third translated page, added 2026-07-31 (intensive
+    run). New `src/pages/hr/records.astro` loads the exact same seven
+    `loadCompetition()` calls as the English page (four team competitions +
+    Ballon d'Or + both Golden Boot tables), so every timeline entry and
+    ranking number can never drift between languages - only this page's own
+    headings/prose and the competition/award display names are translated,
+    reusing the exact Croatian names already established on the Croatian
+    home page (`homeCards.ts`'s `CARD_TEXT`) and the Croatian sources page.
+    Needed three small, backward-compatible prop additions since this is the
+    first Croatian page to reuse `ChampionsTimeline.astro` and
+    `References.astro` (`ChampionsSummary.astro` already supported enough
+    overrides): `ChampionsTimeline` gained optional `hostedByLabel`/
+    `runnerUpLabel` props (default "Hosted by"/"Runner-up:", unchanged for
+    every existing call site), `ChampionsSummary` gained an optional
+    `winningYearsLabel` prop (default "Winning years: "), and `References`
+    gained optional `heading`/`statusPrefix`/`statusText`/
+    `lastReviewedPrefix`/`noSourcesText`/`noteText`/`dateLocale` props -
+    `statusText` defaults to the raw `status` value so every other page's
+    output is byte-identical, while the Croatian page passes a translated
+    "Provjereno"/"U pregledu" word and `dateLocale="hr-HR"` for the reviewed
+    date, matching the pattern the Croatian sources page already established
+    by hand. `TRANSLATED_PATHS` gained `/records` -> `/hr/records`, and the
+    English `/records` page now passes `alternateHref` so its language
+    switcher appears (it was missing one before this run). Covered by 1 new
+    Vitest case (`alternatePath` both directions) and 6 new Playwright cases
+    (English page: language switcher opens the Croatian one; Croatian page:
+    no 360px overflow, all four section headings + a timeline card render,
+    the Ballon d'Or "Most awards" total matches the English page's number
+    exactly, the historical nation-name rules text is translated, and the
+    switcher returns to English).
+  - [ ] Still English-only: the six competition/award pages, Compare, Quiz -
+    left for a future run. The six competition pages are the biggest
+    remaining piece and meaningfully harder than the pages done so far:
+    their column headers and role-detection regexes (`findColumn` in
+    `src/lib/editions.ts`, `buildSortOptions` in `src/lib/tableSort.ts`) are
+    English-only and shared by every page's filters/sort/champions-summary/
+    timeline logic, so translating a table's headers would need that
+    detection to also recognize the Croatian header text without breaking
+    it for the untranslated English pages - a real engineering task, not a
+    props-and-prose slice like this run's. Compare and Quiz are more
+    tractable (Quiz's question text is generated from simple string
+    templates in `src/lib/quiz.ts`, not raw table headers) and are
+    reasonable next targets before tackling the competition pages.
 
 ## Known caveats
 

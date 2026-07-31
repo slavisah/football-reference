@@ -11,6 +11,8 @@ interface Props {
   description?: string;
   /** Singular/plural noun for a count, e.g. ["award", "awards"]. */
   unit?: [string, string];
+  /** Overridable for localized pages; default text matches the original English copy. */
+  winningYearsLabel?: string;
 }
 
 const {
@@ -22,6 +24,7 @@ const {
     'with its sporting predecessor only where the source content does (Germany ' +
     'includes West Germany); every other name is counted as written.',
   unit = ['title', 'titles'],
+  winningYearsLabel = 'Winning years: ',
 } = Astro.props;
 const max = scaleMax ?? Math.max(1, ...champions.map((c) => c.titles));
 const headingId = `${id}-heading`;
@@ -55,7 +58,7 @@ const headingId = `${id}-heading`;
             />
           </div>
           <p class="champions__years">
-            <span class="visually-hidden">Winning years: </span>
+            <span class="visually-hidden">{winningYearsLabel}</span>
             {champion.years.join(', ')}
           </p>
         </li>

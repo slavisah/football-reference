@@ -1,0 +1,188 @@
+---
+// Croatian translation of src/pages/about/sources.astro. Second slice of the
+// "optional Croatian/English localization" item from
+// docs/WEBSITE_REQUIREMENTS.md - see docs/PROJECT_STATUS.md for the rollout
+// plan. Loads the exact same live data as the English page
+// (loadPageMeta/extractSourceSections), so the source links, status, and
+// lastReviewed date can never drift between languages - only this page's own
+// prose, and the competition group headings' display text, are translated.
+// docs/SOURCES.md itself stays English-only: it is one shared file backing
+// both languages' References sections, so its link labels are left as
+// authored rather than translated per-locale.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { loadPageMeta } from '../../../lib/competition';
+import { extractSourceSections } from '../../../lib/sources';
+import { withBase } from '../../../lib/url';
+import sourcesRaw from '../../../../docs/SOURCES.md?raw';
+
+const meta = await loadPageMeta('about-sources');
+
+const sections = extractSourceSections(sourcesRaw);
+
+// Same competition-page links as the English page; the competition pages
+// themselves aren't translated yet, so these deliberately point at the
+// existing English pages. Only the heading label shown here is Croatian -
+// matching the names already used on the Croatian home page
+// (src/lib/homeCards.ts's CARD_TEXT) so a competition is never called two
+// different things across the site.
+const competitionPages: Record<string, { href: string; label: string }> = {
+  'FIFA World Cup': { href: withBase('/competitions/world-cup'), label: 'FIFA Svjetsko prvenstvo' },
+  'UEFA EURO': { href: withBase('/competitions/euro'), label: 'UEFA Europsko prvenstvo' },
+  'UEFA Nations League': { href: withBase('/competitions/nations-league'), label: 'UEFA Liga nacija' },
+  'Copa América': { href: withBase('/competitions/copa-america'), label: 'Copa América' },
+  "Ballon d'Or": { href: withBase('/competitions/ballon-dor'), label: 'Zlatna lopta' },
+};
+
+const statusLabel = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+const reviewed = new Date(`${meta.lastReviewed}T00:00:00Z`);
+const reviewedLabel = Number.isNaN(reviewed.getTime())
+  ? meta.lastReviewed
+  : reviewed.toLocaleDateString('hr-HR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    });
+---
+
+<BaseLayout
+  title="Izvori i pravila provjere"
+  description="Svi primarni izvori iza tablica natjecanja i nagrada, grupirani po natjecanju, uz objašnjenje kako se izvori provjeravaju."
+  locale="hr"
+  alternateHref={withBase('/about/sources')}
+>
+  <article class="sources-page stack">
+    <header class="sources-page__header">
+      <p class="eyebrow badge">Uredništvo</p>
+      <h1>Izvori i pravila provjere</h1>
+      <p class="sources-page__intro">
+        Svaka tablica na ovoj stranici oslanja se na primarne nogometne
+        izvore, a ova stranica ih sve okuplja na jednom mjestu umjesto da
+        budu raspršeni po pojedinim natjecanjima.
+      </p>
+      <p class="sources-page__meta">
+        <span class="badge">Status: {statusLabel}</span>
+        <span class="review">
+          Zadnja provjera:
+          <time datetime={meta.lastReviewed}>{reviewedLabel}</time>
+        </span>
+      </p>
+    </header>
+
+    <section class="stack" aria-labelledby="sources-heading">
+      <h2 id="sources-heading">Izvori po natjecanjima</h2>
+      <p class="muted">
+        Ovo su iste poveznice prikazane u odjeljku "Izvori i provjera" na dnu
+        svake stranice natjecanja, učitane izravno iz
+        <code>docs/SOURCES.md</code>, pa ovaj popis nikada ne može odstupati
+        od njih.
+      </p>
+      <div class="sources-page__grid">
+        {
+          sections.map((section) => (
+            <div class="card sources-page__group">
+              <h3>
+                {competitionPages[section.heading] ? (
+                  <a href={competitionPages[section.heading].href}>
+                    {competitionPages[section.heading].label}
+                  </a>
+                ) : (
+                  section.heading
+                )}
+              </h3>
+              <ul>
+                {section.links.map((source) => (
+                  <li>
+                    <a href={source.url} rel="nofollow noopener external" target="_blank">
+                      {source.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+      <p class="muted">
+        Tablice najboljih strijelaca Svjetskog prvenstva i EURO-a na stranici
+        Zlatne kopačke pozivaju se na gornje izvore za Svjetsko prvenstvo i
+        UEFA EURO - njeni podaci dolaze upravo iz ta dva natjecanja, pa nema
+        zaseban odjeljak s izvorima.
+      </p>
+    </section>
+
+    <section class="card stack" aria-labelledby="policy-heading">
+      <h2 id="policy-heading">Kako se provjeravaju izvori</h2>
+      <ol>
+        <li>Prvo se provjeravaju primarni izvori: krovno tijelo za svako natjecanje (FIFA, UEFA, CONMEBOL) ili organizator same nagrade.</li>
+        <li>Pouzdani sekundarni izvori koriste se samo za popunjavanje praznina koje ostave primarni izvori.</li>
+        <li>Nejasne povijesne odluke - preimenovane države, sporni rezultati, promjene formata - bilježe se kao uredničke napomene na odgovarajućoj stranici, umjesto da se tiho razriješe.</li>
+        <li>Svaka sadržajna datoteka ima vlastiti datum <code>lastReviewed</code>, koji se ažurira pri svakoj reviziji.</li>
+        <li>Povijesni nazivi reprezentacija nikada se ne mijenjaju kako bi odgovarali današnjim granicama ili imenima.</li>
+      </ol>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .sources-page__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .sources-page__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .sources-page__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .sources-page__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .review {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .sources-page__grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    align-items: start;
+  }
+
+  .sources-page__group h3 {
+    margin-top: 0;
+  }
+
+  .sources-page__group ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .sources-page__group a {
+    word-break: break-word;
+  }
+
+  #policy-heading + ol {
+    display: grid;
+    gap: 0.5rem;
+    max-width: 68ch;
+    padding-left: 1.2rem;
+  }
+</style>

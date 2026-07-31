@@ -1,17 +1,33 @@
 ---
 // A light/dark toggle. The actual theme is applied by an inline script in the
 // document head (see BaseLayout) so there is no flash of the wrong theme.
+import { t, type Locale } from '../lib/i18n';
+
+interface Props {
+  /** Defaults to 'en'; only translated pages pass this. */
+  locale?: Locale;
+}
+
+const { locale = 'en' } = Astro.props;
+// The client script below can't import t() (it runs in the browser, after
+// hoisting), so the Light/Dark words it swaps in are passed through data
+// attributes instead - same trick TournamentTable's inline script uses for
+// values it needs from the server render.
+const lightLabel = t(locale, 'themeLight');
+const darkLabel = t(locale, 'themeDark');
 ---
 
 <button
   type="button"
   class="theme-toggle no-print"
   id="theme-toggle"
-  aria-label="Switch between light and dark theme"
+  aria-label={t(locale, 'themeToggleAriaLabel')}
   aria-pressed="false"
+  data-light-label={lightLabel}
+  data-dark-label={darkLabel}
 >
   <span class="theme-toggle__icon" aria-hidden="true"></span>
-  <span class="theme-toggle__label">Theme</span>
+  <span class="theme-toggle__label">{t(locale, 'themeLabel')}</span>
 </button>
 
 <style>
@@ -64,7 +80,10 @@
     const theme = current();
     btn?.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
     const label = btn?.querySelector('.theme-toggle__label');
-    if (label) label.textContent = theme === 'dark' ? 'Dark' : 'Light';
+    if (label) {
+      label.textContent =
+        (theme === 'dark' ? btn?.dataset.darkLabel : btn?.dataset.lightLabel) ?? '';
+    }
   }
 
   btn?.addEventListener('click', () => {

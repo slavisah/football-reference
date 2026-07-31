@@ -357,6 +357,70 @@ test.describe('Records page on a 360px phone', () => {
     await expect(page.locator('#awards-ballon-dor-heading')).toBeVisible();
     await expect(page.getByText('Ousmane Dembélé').first()).toBeVisible();
   });
+
+  test('the language switcher opens the Croatian records page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/records\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/records');
+  });
+
+  test('has no horizontal page overflow with timeline cards and rankings', async ({
+    page,
+  }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome and headings', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.getByRole('heading', { name: 'Rekordi i vremenska crta', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Vremenska crta prvaka' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Najuspješnije reprezentacije' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Vremenska crta pojedinačnih nagrada' }),
+    ).toBeVisible();
+    await expect(page.locator('.timeline__card').first()).toBeVisible();
+  });
+
+  test('shows the same Ballon d\'Or top-award total as the English page', async ({
+    page,
+    baseURL,
+  }) => {
+    const hrCount = await page
+      .locator('section:has(#awards-ballon-dor-heading) .champions__count')
+      .first()
+      .textContent();
+
+    await page.goto(baseURL ? `${baseURL}records` : '/records');
+    const enCount = await page
+      .locator('section:has(#awards-ballon-dor-heading) .champions__count')
+      .first()
+      .textContent();
+
+    // Compare only the number - the trailing unit word ("awards"/"nagrade") differs by design.
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
+  });
+
+  test('explains the historical nation-name aggregation rules', async ({ page }) => {
+    await expect(
+      page.getByText('Sovjetski Savez i Rusija se ne spajaju.'),
+    ).toBeVisible();
+  });
+
+  test('the language switcher returns to the English records page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/records\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
 });
 
 test.describe('Compare page on a 360px phone', () => {
@@ -545,6 +609,50 @@ test.describe('Sources page on a 360px phone', () => {
   test('is reachable from the nav and the footer', async ({ page }) => {
     await page.goto('');
     await expect(page.locator('a[href$="/about/sources"]').first()).toBeVisible();
+  });
+
+  test('the language switcher opens the Croatian sources page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/about\/sources$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe('Croatian sources page (/hr/about/sources) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/about/sources');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome and headings, with the same last reviewed date as English', async ({
+    page,
+  }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.getByRole('heading', { name: 'Izvori i pravila provjere', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Izvori po natjecanjima' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Kako se provjeravaju izvori' })).toBeVisible();
+    await expect(page.locator('time[datetime="2026-07-29"]')).toBeVisible();
+  });
+
+  test('groups source links by competition using the Croatian home-page names', async ({ page }) => {
+    const worldCupGroup = page.locator('.sources-page__group', { hasText: 'FIFA Svjetsko prvenstvo' });
+    await expect(
+      worldCupGroup.getByRole('link', { name: 'FIFA Svjetsko prvenstvo' }),
+    ).toHaveAttribute('href', /competitions\/world-cup$/);
+    await expect(worldCupGroup.locator('a[href^="https://www.fifa.com"]').first()).toBeVisible();
+  });
+
+  test('the language switcher returns to the English sources page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/about\/sources$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });
 });
 

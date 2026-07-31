@@ -16,7 +16,9 @@ const year = new Date().getFullYear();
     <p class="muted">{t(locale, 'footerTagline')}</p>
     <p class="muted">
       &copy; {year}. {t(locale, 'footerCopyright')}
-      <a href={withBase('/about/sources')}>{t(locale, 'footerSourcesLink')}</a>.
+      <a href={withBase(locale === 'hr' ? '/hr/about/sources' : '/about/sources')}>
+        {t(locale, 'footerSourcesLink')}
+      </a>.
     </p>
   </div>
 </footer>
