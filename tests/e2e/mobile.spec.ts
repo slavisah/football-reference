@@ -254,6 +254,77 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
     await expect(row2020).toContainText('Not awarded');
     await expect(row2020).toBeVisible();
   });
+
+  test('the language switcher opens the Croatian Copa América page', async ({ page }) => {
+    await page.goto('competitions/copa-america');
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/competitions\/copa-america\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/competitions/copa-america');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome, filters and column headers', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.getByRole('heading', { name: 'Copa América', level: 1 })).toBeVisible();
+    await expect(page.locator('label[for="copa-america-winner"]')).toHaveText('Prvak');
+    await expect(page.locator('th', { hasText: 'Godina' })).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Prvak' })).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Drugoplasirani' })).toBeVisible();
+  });
+
+  test('filtering by prvak (winner) Uruguay updates the shareable URL and status text', async ({
+    page,
+  }) => {
+    await page.selectOption('#copa-america-winner', 'Uruguay');
+    await expect(page).toHaveURL(/winner=Uruguay/);
+    await expect(page.locator('#copa-america-status')).toContainText('prvak Uruguay');
+  });
+
+  test('shows the same champion totals as the English page', async ({ page, baseURL }) => {
+    const hrTop = await page.locator('.champions__name').first().textContent();
+    const hrCount = await page.locator('.champions__count').first().textContent();
+
+    await page.goto(baseURL ? `${baseURL}competitions/copa-america` : '/competitions/copa-america');
+    const enTop = await page.locator('.champions__name').first().textContent();
+    const enCount = await page.locator('.champions__count').first().textContent();
+
+    expect(hrTop).toBe(enTop);
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
+  });
+
+  test('shows the translated Memorable moments section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
+    await expect(page.getByText('Bolivija je osvojila svoju jedinu titulu')).toBeVisible();
+  });
+
+  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/copa-america.pdf"]');
+    await expect(link).toContainText('Preuzmi PDF za ispis');
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
+
+  test('the language switcher returns to the English Copa América page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/competitions\/copa-america\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
 });
 
 test.describe('Home page on a 360px phone', () => {

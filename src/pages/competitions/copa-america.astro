@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
+import { withBase } from '../../lib/url';
 
 const data = await loadCompetition('copa-america', {
   editionsHeading: 'Champions timeline',
@@ -14,6 +15,7 @@ const data = await loadCompetition('copa-america', {
 <BaseLayout
   title={data.title}
   description="Every Copa América champion since 1916, hosts and runners-up, with a generated title count. Filter by winner, year and host."
+  alternateHref={withBase('/hr/competitions/copa-america')}
 >
   <CompetitionView
     data={data}
