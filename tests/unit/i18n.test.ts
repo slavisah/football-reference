@@ -53,4 +53,9 @@ describe('alternatePath', () => {
     expect(alternatePath('/records', 'en')).toBe('/hr/records');
     expect(alternatePath('/hr/records', 'hr')).toBe('/records');
   });
+
+  it('maps the English compare page to its Croatian translation and back', () => {
+    expect(alternatePath('/compare', 'en')).toBe('/hr/compare');
+    expect(alternatePath('/hr/compare', 'hr')).toBe('/compare');
+  });
 });

@@ -1,9 +1,22 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import References from '../components/References.astro';
-import { loadCompetition, loadPageMeta } from '../lib/competition';
-import { buildAllCountryRecords, tracksSemifinalColumn } from '../lib/compare';
-import { withBase } from '../lib/url';
+// Croatian translation of src/pages/compare.astro. Fourth slice of the
+// "optional Croatian/English localization" item from
+// docs/WEBSITE_REQUIREMENTS.md - see docs/PROJECT_STATUS.md for the rollout
+// plan. Loads the exact same live data as the English page
+// (loadCompetition x4, buildAllCountryRecords, tracksSemifinalColumn), so
+// every title/runner-up/semifinal count can never drift between languages -
+// only this page's own headings/prose and the four competition display
+// names are translated. The competition names reuse the exact Croatian
+// strings already used on the Croatian home page (src/lib/homeCards.ts's
+// CARD_TEXT) and the Croatian records page, so a competition is never
+// called two different things across the site. Country names themselves
+// are left as-is, matching the precedent set by the Croatian records page
+// (champion/country names are the underlying data, not UI chrome).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import References from '../../components/References.astro';
+import { loadCompetition, loadPageMeta } from '../../lib/competition';
+import { buildAllCountryRecords, tracksSemifinalColumn } from '../../lib/compare';
+import { withBase } from '../../lib/url';
 
 const meta = await loadPageMeta('compare-countries');
 
@@ -28,10 +41,10 @@ const [worldCup, euro, copaAmerica, nationsLeague] = await Promise.all([
 ]);
 
 const competitions = [
-  { title: 'FIFA World Cup', slug: 'world-cup', editions: worldCup.editions },
-  { title: 'UEFA EURO', slug: 'euro', editions: euro.editions },
+  { title: 'FIFA Svjetsko prvenstvo', slug: 'world-cup', editions: worldCup.editions },
+  { title: 'UEFA Europsko prvenstvo', slug: 'euro', editions: euro.editions },
   { title: 'Copa América', slug: 'copa-america', editions: copaAmerica.editions },
-  { title: 'UEFA Nations League', slug: 'nations-league', editions: nationsLeague.editions },
+  { title: 'UEFA Liga nacija', slug: 'nations-league', editions: nationsLeague.editions },
 ];
 
 const tracksSemifinal = competitions.map((c) => tracksSemifinalColumn(c.editions));
@@ -57,6 +70,8 @@ const lastReviewed = [worldCup, euro, copaAmerica, nationsLeague]
   .sort()
   .at(-1) as string;
 
+const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
+
 const recordsForClient = allRecords.map((r) => ({
   id: r.id,
   displayName: r.displayName,
@@ -74,23 +89,31 @@ const recordsForClient = allRecords.map((r) => ({
 ---
 
 <BaseLayout
-  title={meta.title}
-  description="Compare two national teams' World Cup, EURO, Copa América and Nations League record - titles, runner-up finishes and semifinal finishes, generated from each competition's table."
-  alternateHref={withBase('/hr/compare')}
+  title="Usporedi reprezentacije"
+  description="Usporedite dvije reprezentacije po njihovom učinku na Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija - naslovi, drugo mjesto i polufinalni plasmani, generirano izravno iz tablice svakog natjecanja."
+  locale="hr"
+  alternateHref={withBase('/compare')}
 >
   <article class="compare stack">
     <header class="compare__header">
-      <p class="eyebrow badge">Generated from the competition tables</p>
-      <h1>{meta.title}</h1>
-      <p class="compare__intro">{meta.intro}</p>
+      <p class="eyebrow badge">Generirano iz tablica natjecanja</p>
+      <h1>Usporedi reprezentacije</h1>
+      <p class="compare__intro">
+        Odaberite dvije reprezentacije za usporedbu njihovog učinka na
+        Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija - naslovi,
+        drugo mjesto i treće/četvrto mjesto ili polufinalni plasmani,
+        generirano izravno iz tablice izdanja svakog natjecanja.
+        Pojedinačne nagrade (Zlatna lopta, Zlatna kopačka) ovdje nisu
+        uključene jer nagrađuju igrače, a ne reprezentacije.
+      </p>
     </header>
 
     <section class="card stack" aria-labelledby="head-to-head-heading">
-      <h2 id="head-to-head-heading">Head-to-head</h2>
+      <h2 id="head-to-head-heading">Izravna usporedba</h2>
 
       <div class="compare__picker no-print">
         <div class="compare__field">
-          <label for="compare-a">Team A</label>
+          <label for="compare-a">Reprezentacija A</label>
           <select id="compare-a" name="a">
             {
               sortedByName.map((r) => (
@@ -102,12 +125,17 @@ const recordsForClient = allRecords.map((r) => ({
           </select>
         </div>
 
-        <button type="button" id="compare-swap" class="compare__swap" aria-label="Swap Team A and Team B">
-          &#8646; Swap
+        <button
+          type="button"
+          id="compare-swap"
+          class="compare__swap"
+          aria-label="Zamijeni reprezentaciju A i B"
+        >
+          &#8646; Zamijeni
         </button>
 
         <div class="compare__field">
-          <label for="compare-b">Team B</label>
+          <label for="compare-b">Reprezentacija B</label>
           <select id="compare-b" name="b">
             {
               sortedByName.map((r) => (
@@ -130,22 +158,22 @@ const recordsForClient = allRecords.map((r) => ({
                 <div class="t-wrap">
                   <table class="compare__table">
                     <caption class="visually-hidden">
-                      {record.displayName}'s record by competition
+                      Učinak reprezentacije {record.displayName} po natjecanjima
                     </caption>
                     <thead>
                       <tr>
-                        <th scope="col">Competition</th>
-                        <th scope="col">Titles</th>
-                        <th scope="col">Runner-up</th>
-                        <th scope="col">Semifinal / 4th</th>
-                        <th scope="col">Finals reached</th>
+                        <th scope="col">Natjecanje</th>
+                        <th scope="col">Naslovi</th>
+                        <th scope="col">Drugo mjesto</th>
+                        <th scope="col">Polufinale / 4. mjesto</th>
+                        <th scope="col">Odigrana finala</th>
                       </tr>
                     </thead>
                     <tbody id={`compare-${side}-body`}>
                       {
                         record.competitions.map((c, index) => (
                           <tr data-slug={c.slug} data-tracks-semifinal={tracksSemifinal[index]}>
-                            <th scope="row">{c.competition}</th>
+                            <th scope="row">{competitions[index].title}</th>
                             <td data-field="titles">{c.titles}</td>
                             <td data-field="runnerUps">{c.runnerUps}</td>
                             <td data-field="semifinals">{semifinalDisplay(index, c.semifinals)}</td>
@@ -156,7 +184,7 @@ const recordsForClient = allRecords.map((r) => ({
                     </tbody>
                     <tfoot>
                       <tr id={`compare-${side}-total`}>
-                        <th scope="row">Combined</th>
+                        <th scope="row">Ukupno</th>
                         <td data-field="titles">{record.totalTitles}</td>
                         <td data-field="runnerUps">{record.totalRunnerUps}</td>
                         <td data-field="semifinals">{record.totalSemifinals}</td>
@@ -172,32 +200,33 @@ const recordsForClient = allRecords.map((r) => ({
       </div>
 
       <p class="muted compare__note">
-        "Semifinal / 4th" counts third/fourth-place or "other semifinalist"
-        finishes, where that competition's table tracks one - Copa América's
-        table has no such column, shown as "—". Individual awards (Ballon
-        d'Or, Golden Boot) aren't included: they recognize players, not
-        national teams.
+        "Polufinale / 4. mjesto" broji treće/četvrto mjesto ili "ostali
+        polufinalist", ako to natjecanje takav podatak prati - tablica Copa
+        Américe nema takav stupac, pa se prikazuje "—". Pojedinačne nagrade
+        (Zlatna lopta, Zlatna kopačka) nisu uključene: one nagrađuju igrače, a
+        ne reprezentacije.
       </p>
     </section>
 
     <section class="stack" aria-labelledby="all-teams-heading">
-      <h2 id="all-teams-heading">All national teams</h2>
+      <h2 id="all-teams-heading">Sve reprezentacije</h2>
       <p class="muted">
-        Every team that has won, been runner-up, or reached a tracked
-        semifinal in at least one of these four competitions, ranked by
-        titles. Pick any two above to compare them directly.
+        Svaka reprezentacija koja je osvojila naslov, bila drugoplasirana ili
+        dosegnula praćeno polufinale u barem jednom od ova četiri natjecanja,
+        poredana po broju naslova. Odaberite bilo koje dvije iznad za izravnu
+        usporedbu.
       </p>
       <div class="t-wrap">
         <table class="compare__table compare__table--all">
-          <caption class="visually-hidden">All national teams' combined record, ranked by titles</caption>
+          <caption class="visually-hidden">Ukupan učinak svih reprezentacija, poredan po broju naslova</caption>
           <thead>
             <tr>
-              <th scope="col">Rank</th>
-              <th scope="col">Team</th>
-              <th scope="col">Titles</th>
-              <th scope="col">Runner-up</th>
-              <th scope="col">Semifinal / 4th</th>
-              <th scope="col">Finals reached</th>
+              <th scope="col">Poredak</th>
+              <th scope="col">Reprezentacija</th>
+              <th scope="col">Naslovi</th>
+              <th scope="col">Drugo mjesto</th>
+              <th scope="col">Polufinale / 4. mjesto</th>
+              <th scope="col">Odigrana finala</th>
             </tr>
           </thead>
           <tbody>
@@ -218,7 +247,18 @@ const recordsForClient = allRecords.map((r) => ({
       </div>
     </section>
 
-    <References sources={sources} lastReviewed={lastReviewed} status={meta.status} />
+    <References
+      sources={sources}
+      lastReviewed={lastReviewed}
+      status={meta.status}
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText={statusText}
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+      noteText="Prednost imaju primarni izvori. Povijesni formati i nazivi reprezentacija bilježe se onako kako su korišteni u to vrijeme; kontekst potražite u napomenama uz svako izdanje."
+    />
   </article>
 </BaseLayout>
 
