@@ -5,9 +5,18 @@ interface Props {
   entries: TimelineEntry[];
   id: string;
   heading: string;
+  /** Overridable for localized pages; default text matches the original English copy. */
+  hostedByLabel?: string;
+  runnerUpLabel?: string;
 }
 
-const { entries, id, heading } = Astro.props;
+const {
+  entries,
+  id,
+  heading,
+  hostedByLabel = 'Hosted by',
+  runnerUpLabel = 'Runner-up:',
+} = Astro.props;
 const headingId = `${id}-heading`;
 const sorted = [...entries].sort((a, b) => b.yearSort - a.yearSort);
 ---
@@ -20,9 +29,9 @@ const sorted = [...entries].sort((a, b) => b.yearSort - a.yearSort);
         <li class="timeline__card">
           <p class="timeline__year">{entry.year}</p>
           <p class="timeline__champion">{entry.champion}</p>
-          {entry.host && <p class="timeline__meta">Hosted by {entry.host}</p>}
+          {entry.host && <p class="timeline__meta">{hostedByLabel} {entry.host}</p>}
           {entry.runnerUp && (
-            <p class="timeline__meta">Runner-up: {entry.runnerUp}</p>
+            <p class="timeline__meta">{runnerUpLabel} {entry.runnerUp}</p>
           )}
           {entry.final && <p class="timeline__final">{entry.final}</p>}
         </li>

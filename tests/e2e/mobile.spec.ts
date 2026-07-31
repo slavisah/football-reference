@@ -357,6 +357,70 @@ test.describe('Records page on a 360px phone', () => {
     await expect(page.locator('#awards-ballon-dor-heading')).toBeVisible();
     await expect(page.getByText('Ousmane Dembélé').first()).toBeVisible();
   });
+
+  test('the language switcher opens the Croatian records page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/records\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/records');
+  });
+
+  test('has no horizontal page overflow with timeline cards and rankings', async ({
+    page,
+  }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome and headings', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.getByRole('heading', { name: 'Rekordi i vremenska crta', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Vremenska crta prvaka' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Najuspješnije reprezentacije' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Vremenska crta pojedinačnih nagrada' }),
+    ).toBeVisible();
+    await expect(page.locator('.timeline__card').first()).toBeVisible();
+  });
+
+  test('shows the same Ballon d\'Or top-award total as the English page', async ({
+    page,
+    baseURL,
+  }) => {
+    const hrCount = await page
+      .locator('section:has(#awards-ballon-dor-heading) .champions__count')
+      .first()
+      .textContent();
+
+    await page.goto(baseURL ? `${baseURL}records` : '/records');
+    const enCount = await page
+      .locator('section:has(#awards-ballon-dor-heading) .champions__count')
+      .first()
+      .textContent();
+
+    // Compare only the number - the trailing unit word ("awards"/"nagrade") differs by design.
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
+  });
+
+  test('explains the historical nation-name aggregation rules', async ({ page }) => {
+    await expect(
+      page.getByText('Sovjetski Savez i Rusija se ne spajaju.'),
+    ).toBeVisible();
+  });
+
+  test('the language switcher returns to the English records page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/records\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
 });
 
 test.describe('Compare page on a 360px phone', () => {
