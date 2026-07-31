@@ -327,6 +327,92 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
   });
 });
 
+test.describe('Nations League page on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('competitions/nations-league');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('the language switcher opens the Croatian Nations League page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/competitions\/nations-league\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe('Croatian Nations League page (/hr/competitions/nations-league) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/competitions/nations-league');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome, filters and column headers', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.getByRole('heading', { name: 'UEFA Liga nacija', level: 1 })).toBeVisible();
+    await expect(page.locator('label[for="nations-league-winner"]')).toHaveText('Prvak');
+    await expect(page.locator('th', { hasText: 'Sezona' })).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Prvak' })).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Drugoplasirani' })).toBeVisible();
+  });
+
+  test('filtering by prvak (winner) Portugal updates the shareable URL and status text', async ({
+    page,
+  }) => {
+    await page.selectOption('#nations-league-winner', 'Portugal');
+    await expect(page).toHaveURL(/winner=Portugal/);
+    await expect(page.locator('#nations-league-status')).toContainText('prvak Portugal');
+  });
+
+  test('shows the same champion totals as the English page', async ({ page, baseURL }) => {
+    const hrTop = await page.locator('.champions__name').first().textContent();
+    const hrCount = await page.locator('.champions__count').first().textContent();
+
+    await page.goto(
+      baseURL ? `${baseURL}competitions/nations-league` : '/competitions/nations-league',
+    );
+    const enTop = await page.locator('.champions__name').first().textContent();
+    const enCount = await page.locator('.champions__count').first().textContent();
+
+    expect(hrTop).toBe(enTop);
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
+  });
+
+  test('shows the translated Key facts section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Ključne činjenice' })).toBeVisible();
+    await expect(page.getByText('Hrvatska je 2023. stigla do svog prvog finala')).toBeVisible();
+  });
+
+  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/nations-league.pdf"]');
+    await expect(link).toContainText('Preuzmi PDF za ispis');
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
+
+  test('the language switcher returns to the English Nations League page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/competitions\/nations-league\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+});
+
 test.describe('Home page on a 360px phone', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('');

@@ -74,4 +74,20 @@ describe('alternatePath', () => {
     expect(alternatePath('/quiz', 'en')).toBe('/hr/quiz');
     expect(alternatePath('/hr/quiz', 'hr')).toBe('/quiz');
   });
+
+  it('maps the English Copa América page to its Croatian translation and back', () => {
+    expect(alternatePath('/competitions/copa-america', 'en')).toBe(
+      '/hr/competitions/copa-america',
+    );
+    expect(alternatePath('/hr/competitions/copa-america', 'hr')).toBe('/competitions/copa-america');
+  });
+
+  it('maps the English Nations League page to its Croatian translation and back', () => {
+    expect(alternatePath('/competitions/nations-league', 'en')).toBe(
+      '/hr/competitions/nations-league',
+    );
+    expect(alternatePath('/hr/competitions/nations-league', 'hr')).toBe(
+      '/competitions/nations-league',
+    );
+  });
 });
