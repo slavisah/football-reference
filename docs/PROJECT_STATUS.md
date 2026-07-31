@@ -757,22 +757,58 @@ differ from `## Editions` and will need the matching `editionsHeading`:
     translated Memorable-moments section renders, the PDF download link
     shows the translated label and actually resolves, and the switcher
     returns to English).
-  - [ ] Still English-only: the other five competition/award pages (World
-    Cup, EURO, Nations League, Ballon d'Or, Golden Boot). The reusable
-    infrastructure for this is now all in place from the Copa América slice
-    above (`TournamentTable`'s locale props, `buildSortOptions`'s
-    `{ locale, headerLabels }` config, `PrintDownloadLink`'s `label`/`hint`
-    props) - each remaining page is now a props-and-prose slice like
-    Records/Compare/Quiz were, not new engineering: write
+  - [x] `/competitions/nations-league` - second of the six competition/award
+    pages translated, added 2026-07-31 (intensive run). Confirms the reusable
+    infrastructure from the Copa América slice needed zero further changes -
+    this page is exactly the props-and-prose slice the note above predicted.
+    New `src/pages/hr/competitions/nations-league.astro` composes its own
+    layout by hand (like the Croatian Copa América page), loading the exact
+    same `loadCompetition('uefa-nations-league', ...)` call as the English
+    page so the table data, generated champions summary and reference links
+    can never drift between languages. Unlike Copa América, this table's
+    "Season" column (not "Year") and its "Finals host"/"Third"/"Fourth"/
+    "Final" columns needed their own `headerLabels` entries and a
+    `yearLabel="Sezona"`/`bitYearPrefix="sezona"` override (Copa América's
+    props already supported this - just different values). The page's own
+    "UEFA Liga nacija" display name and its `<title>` reuse the exact string
+    already established on the Croatian home/records pages
+    (`homeCards.ts`'s `CARD_TEXT`), rather than `data.title` (the raw English
+    front-matter value), matching how `hr/records.astro` and
+    `hr/compare.astro` already handle a translated competition name. The
+    "Key facts" section (`content/uefa-nations-league.md`) is hand-translated
+    Croatian prose local to this page only, same precedent as Copa América's
+    Memorable moments. `TRANSLATED_PATHS` gained `/competitions/nations-league`
+    -> `/hr/competitions/nations-league`, and the English page now passes
+    `alternateHref` so its language switcher appears (the same one-line gap
+    every previously-translated page had before its own translation).
+    Covered by 2 new Vitest cases (`alternatePath` both directions - also
+    backfilled the missing Copa América `alternatePath` case, which
+    `docs/PROJECT_STATUS.md` had claimed as done in the prior run but was
+    never actually added) and 9 new Playwright cases at 360px (English page:
+    no overflow, language switcher opens the Croatian one; Croatian page: no
+    overflow, translated filter labels/column headers including "Sezona",
+    filtering by "prvak" Portugal updates the URL and status text, champion
+    totals match the English page exactly, the translated Key facts section
+    renders, the PDF download link shows the translated label and resolves,
+    and the switcher returns to English).
+  - [ ] Still English-only: the other four competition/award pages (World
+    Cup, EURO, Ballon d'Or, Golden Boot). The reusable infrastructure for
+    this is now proven twice over (Copa América + Nations League) - each
+    remaining page is a props-and-prose slice, not new engineering: write
     `src/pages/hr/competitions/<slug>.astro` composing the same components
     by hand, supply a `headerLabels` map for that table's own English
-    headers, translate the filter/status strings (copy the Copa América
-    page's Croatian values - they're competition-agnostic chrome text) and
-    hand-translate that page's own "Memorable moments"/notes prose. Golden
-    Boot is the one exception worth flagging in advance: its English page
-    doesn't use `CompetitionView` either (it composes two `TournamentTable`s
-    by hand for the two top-scorer tables), so its Croatian version can
-    follow the same pattern used here rather than `CompetitionView`.
+    headers, translate the filter/status strings (copy the Copa América/
+    Nations League pages' Croatian values - they're competition-agnostic
+    chrome text) and hand-translate that page's own "Memorable moments"/
+    notes prose. Golden Boot is the one exception worth flagging in advance:
+    its English page doesn't use `CompetitionView` either (it composes two
+    `TournamentTable`s by hand for the two top-scorer tables), so its
+    Croatian version can follow the same pattern used here rather than
+    `CompetitionView`. World Cup and EURO both also join in a per-year "Top
+    scorer" `extraColumn` from Golden Boot data (see the "tournament-level
+    best scorer facts" entry above) - their Croatian pages will need an
+    `extraColumn.label` override too, which `TournamentTable` already
+    supports as a plain string prop.
 
 ## Known caveats
 
