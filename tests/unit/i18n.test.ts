@@ -52,7 +52,7 @@ describe('alternatePath', () => {
   });
 
   it('returns null for a page that has no translation yet', () => {
-    expect(alternatePath('/competitions/world-cup', 'en')).toBeNull();
+    expect(alternatePath('/competitions/golden-boot', 'en')).toBeNull();
   });
 
   it('maps the English sources page to its Croatian translation and back', () => {
@@ -98,5 +98,19 @@ describe('alternatePath', () => {
     expect(alternatePath('/hr/competitions/ballon-dor', 'hr')).toBe(
       '/competitions/ballon-dor',
     );
+  });
+
+  it('maps the English FIFA World Cup page to its Croatian translation and back', () => {
+    expect(alternatePath('/competitions/world-cup', 'en')).toBe(
+      '/hr/competitions/world-cup',
+    );
+    expect(alternatePath('/hr/competitions/world-cup', 'hr')).toBe(
+      '/competitions/world-cup',
+    );
+  });
+
+  it('maps the English UEFA EURO page to its Croatian translation and back', () => {
+    expect(alternatePath('/competitions/euro', 'en')).toBe('/hr/competitions/euro');
+    expect(alternatePath('/hr/competitions/euro', 'hr')).toBe('/competitions/euro');
   });
 });

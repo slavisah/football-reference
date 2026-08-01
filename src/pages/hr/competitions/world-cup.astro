@@ -1,0 +1,190 @@
+---
+// Croatian translation of src/pages/competitions/world-cup.astro. Fourth of
+// the six competition/award pages localized (Copa América, Nations League and
+// Ballon d'Or came first) - see docs/PROJECT_STATUS.md for the rollout plan
+// and what's left. Loads the exact same `loadCompetition('fifa-world-cup',
+// ...)` and `loadCompetition('golden-boot', ...)` calls as the English page,
+// so the table data, generated champions summary, top-scorer facts and
+// reference links can never drift between languages - only this page's own
+// chrome (filters, sort labels, status text, column headers) and
+// hand-translated notes are Croatian. Composes its own layout by hand (like
+// the three earlier Croatian competition pages) rather than through the
+// shared English-only CompetitionView, which the English page keeps using
+// unchanged.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import TournamentTable from '../../../components/TournamentTable.astro';
+import ChampionsSummary from '../../../components/ChampionsSummary.astro';
+import EditorialNotes from '../../../components/EditorialNotes.astro';
+import References from '../../../components/References.astro';
+import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
+import { loadCompetition } from '../../../lib/competition';
+import { buildTopScorerFacts } from '../../../lib/editions';
+import { withBase } from '../../../lib/url';
+import type { NoteSection } from '../../../lib/notes';
+
+const [data, goldenBoot] = await Promise.all([
+  loadCompetition('fifa-world-cup', {
+    editionsHeading: 'Editions',
+    sourcesHeading: 'FIFA World Cup',
+  }),
+  loadCompetition('golden-boot', {
+    editionsHeading: 'FIFA World Cup top scorers',
+    sourcesHeading: 'FIFA World Cup',
+  }),
+]);
+
+const topScorers = buildTopScorerFacts(goldenBoot.editions, 'hr');
+
+const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+// Croatian display name, matching the name already established on the
+// Croatian home page (homeCards.ts's CARD_TEXT) and the records/compare
+// pages - data.title itself stays the raw English front-matter value.
+const title = 'FIFA Svjetsko prvenstvo';
+
+// Hand-translated from content/fifa-world-cup.md's "Format milestones",
+// "Memorable moments" and "Editorial notes" sections (the same three
+// headings the English page requests via noteHeadings). content/ itself
+// stays untouched and English (the single editorial source of truth); this
+// is presentation-layer text local to this page only, the same way the three
+// earlier Croatian competition pages hand-write their own Croatian prose.
+const notes: NoteSection[] = [
+  {
+    heading: 'Prekretnice formata',
+    items: [
+      '1930.: 13 momčadi sudjelovalo je na prvom izdanju.',
+      '1950.: nije bila zakazana jedna finalna utakmica; prvaka je odredila odlučujuća utakmica završne skupine između Urugvaja i Brazila.',
+      '1982.: broj momčadi povećan je s 16 na 24.',
+      '1998.: broj momčadi povećan je na 32.',
+      '2026.: broj momčadi povećan je na 48, a natjecanje je prvi put ugostilo tri zemlje.',
+    ],
+  },
+  {
+    heading: 'Nezaboravni trenuci',
+    items: [
+      'Urugvaj je pobijedio Brazil u odlučujućoj utakmici 1950. na Maracani, rezultat koji se pamti kao *Maracanazo*.',
+      'Brazilska momčad iz 1970. postala je prva koja je osvojila tri Svjetska prvenstva.',
+      'Diego Maradona predvodio je Argentinu do naslova 1986.',
+      'Hrvatska je 2018. stigla do svog prvog finala.',
+      'Argentina i Francuska odigrale su finale 3:3 2022., a Argentina je slavila nakon jedanaesteraca.',
+      'Španjolska je 2026. osvojila svoj drugi naslov.',
+    ],
+  },
+  {
+    heading: 'Uredničke napomene',
+    items: [
+      'Turnir 1930. nije uključivao utakmicu za treće mjesto. FIFA-in povijesni poredak stavlja Sjedinjene Države na treće, a Jugoslaviju na četvrto mjesto.',
+      'Konačni poredak 1950. proizašao je iz završne skupine od četiri momčadi, a ne iz polufinala i finala.',
+      'Zbroj naslova za "Njemačku" uobičajeno uključuje rezultate Zapadne Njemačke.',
+    ],
+  },
+];
+
+const headerLabels: Record<string, string> = {
+  Year: 'Godina',
+  'Host(s)': 'Domaćin(i)',
+  Teams: 'Momčadi',
+  Winner: 'Prvak',
+  'Runner-up': 'Drugoplasirani',
+  Third: 'Treći',
+  'Fourth / other semifinalist': 'Četvrti / drugi polufinalist',
+  Final: 'Finale',
+};
+---
+
+<BaseLayout
+  title={title}
+  description="Svako izdanje FIFA Svjetskog prvenstva od 1930., domaćini, finalisti i prvaci, uz generirani broj naslova. Filtriraj po prvaku, godini i domaćinu."
+  locale="hr"
+  alternateHref={withBase('/competitions/world-cup')}
+>
+  <article class="competition stack">
+    <header class="competition__header">
+      <p class="eyebrow badge">{statusText}</p>
+      <h1>{title}</h1>
+      <p class="competition__intro">
+        FIFA Svjetsko prvenstvo pokrenuto je u Urugvaju 1930. Nije se igralo
+        1942. i 1946. zbog Drugog svjetskog rata i njegovih posljedica.
+        Natjecanje se s vremenom proširilo s 13 momčadi 1930. na 48 momčadi
+        2026.
+      </p>
+      <PrintDownloadLink
+        slug="world-cup"
+        label="Preuzmi PDF za ispis"
+        hint="A4 položeno, ista tablica i zbrojevi kao na ovoj stranici."
+      />
+    </header>
+
+    <TournamentTable
+      id="world-cup"
+      caption="Izdanja FIFA Svjetskog prvenstva, od 1930. nadalje"
+      table={data.table}
+      editions={data.editions}
+      winners={data.winners}
+      hosts={data.hosts}
+      extraColumn={{ label: 'Najbolji strijelac', values: topScorers }}
+      locale="hr"
+      headerLabels={headerLabels}
+      winnerLabel="Prvak"
+      winnerAllLabel="Svi prvaci"
+      yearLabel="Godina"
+      yearAllLabel="Sve godine"
+      hostLabel="Domaćin"
+      hostAllLabel="Svi domaćini"
+      sortByLabel="Sortiraj po"
+      resetLabel="Poništi"
+      filterAriaLabel="Filtriraj prvake FIFA Svjetskog prvenstva"
+      showingAllTemplate="Prikazano svih {n} izdanja."
+      showingFilteredTemplate="Prikazano {shown} od {total} izdanja ({bits})."
+      bitWinnerPrefix="prvak"
+      bitYearPrefix="godina"
+      bitHostPrefix="domaćin"
+      emptyText="Nijedno izdanje ne odgovara odabranim filterima."
+      clearFiltersLabel="Očisti filtere"
+    />
+
+    <ChampionsSummary
+      champions={data.champions}
+      scaleMax={data.editions.length}
+      heading="Prvaci po broju naslova"
+      description="Automatski generirano iz gornje tablice izdanja. Zbrojevi grupiraju naciju s njezinim sportskim nasljednikom samo tamo gdje to čini izvorni sadržaj (Njemačka uključuje Zapadnu Njemačku); svaki drugi naziv broji se onako kako je zapisan."
+      unit={['naslov', 'naslova']}
+      winningYearsLabel="Godine osvajanja: "
+    />
+
+    <EditorialNotes sections={notes} />
+
+    <References
+      sources={data.sources}
+      lastReviewed={data.lastReviewed}
+      status={data.status}
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText={statusText}
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+      noteText="Prednost imaju primarni izvori. Povijesni formati i nazivi reprezentacija bilježe se onako kako su korišteni u to vrijeme; kontekst potražite u napomenama uz svako izdanje."
+    />
+  </article>
+</BaseLayout>
+
+<style>
+  .competition__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .competition__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .competition__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+</style>
