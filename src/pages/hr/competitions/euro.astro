@@ -1,0 +1,179 @@
+---
+// Croatian translation of src/pages/competitions/euro.astro. Fifth of the six
+// competition/award pages localized (Copa América, Nations League, Ballon
+// d'Or and the FIFA World Cup came first) - see docs/PROJECT_STATUS.md for
+// the rollout plan and what's left (Golden Boot is the last one). Loads the
+// exact same `loadCompetition('uefa-euro', ...)` and `loadCompetition(
+// 'golden-boot', ...)` calls as the English page, so the table data,
+// generated champions summary, top-scorer facts and reference links can
+// never drift between languages - only this page's own chrome (filters, sort
+// labels, status text, column headers) and hand-translated notes are
+// Croatian. Composes its own layout by hand (like the four earlier Croatian
+// competition pages) rather than through the shared English-only
+// CompetitionView, which the English page keeps using unchanged.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import TournamentTable from '../../../components/TournamentTable.astro';
+import ChampionsSummary from '../../../components/ChampionsSummary.astro';
+import EditorialNotes from '../../../components/EditorialNotes.astro';
+import References from '../../../components/References.astro';
+import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
+import { loadCompetition } from '../../../lib/competition';
+import { buildTopScorerFacts } from '../../../lib/editions';
+import { withBase } from '../../../lib/url';
+import type { NoteSection } from '../../../lib/notes';
+
+const [data, goldenBoot] = await Promise.all([
+  loadCompetition('uefa-euro', {
+    editionsHeading: 'Editions',
+    sourcesHeading: 'UEFA EURO',
+  }),
+  loadCompetition('golden-boot', {
+    editionsHeading: 'UEFA EURO top scorers',
+    sourcesHeading: 'UEFA EURO',
+  }),
+]);
+
+const topScorers = buildTopScorerFacts(goldenBoot.editions, 'hr');
+
+const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+// Croatian display name, matching the name already established on the
+// Croatian home page (homeCards.ts's CARD_TEXT) and the records/compare
+// pages - data.title itself stays the raw English front-matter value.
+const title = 'UEFA Europsko prvenstvo';
+
+// Hand-translated from content/uefa-euro.md's "Historical format note" (a
+// single paragraph, no bullets - same as the English page) and "Memorable
+// moments" sections, the same two headings the English page requests via
+// noteHeadings. content/ itself stays untouched and English (the single
+// editorial source of truth); this is presentation-layer text local to this
+// page only, the same way the earlier Croatian competition pages hand-write
+// their own Croatian prose.
+const notes: NoteSection[] = [
+  {
+    heading: 'Povijesna napomena o formatu',
+    items: [
+      'Utakmica za treće mjesto igrala se do 1980. Od 1984. UEFA priznaje oba poražena polufinalista bez rangiranja na treće i četvrto mjesto. Stoga tablica koristi neutralni izraz "drugi polufinalist".',
+    ],
+  },
+  {
+    heading: 'Nezaboravni trenuci',
+    items: [
+      'Slavna "panenka" Antonína Panenke odlučila je izvođenje jedanaesteraca 1976.',
+      'Danska je na turnir 1992. ušla naknadno i na kraju ga osvojila.',
+      'Grčka je 2004. priredila jedno od najvećih iznenađenja u povijesti međunarodnog nogometa.',
+      'Španjolska je 2012. postala prva reprezentacija koja je obranila naslov EURA.',
+      'Odgođeni EURO 2020. odigran je 2021. u više zemalja.',
+      'Španjolska je 2024. osvojila rekordni četvrti naslov.',
+    ],
+  },
+];
+
+const headerLabels: Record<string, string> = {
+  Year: 'Godina',
+  'Host(s)': 'Domaćin(i)',
+  Teams: 'Momčadi',
+  Winner: 'Prvak',
+  'Runner-up': 'Drugoplasirani',
+  'Other semifinalist': 'Drugi polufinalist',
+  'Other semifinalist / fourth': 'Drugi polufinalist / četvrti',
+  Final: 'Finale',
+};
+---
+
+<BaseLayout
+  title={title}
+  description="Svako izdanje UEFA Europskog prvenstva od 1960., domaćini, finalisti i prvaci, uz generirani broj naslova. Filtriraj po prvaku, godini i domaćinu."
+  locale="hr"
+  alternateHref={withBase('/competitions/euro')}
+>
+  <article class="competition stack">
+    <header class="competition__header">
+      <p class="eyebrow badge">{statusText}</p>
+      <h1>{title}</h1>
+      <p class="competition__intro">
+        Europsko prvenstvo pokrenuto je 1960. kao Kup europskih nacija. Rani
+        završni turniri imali su samo četiri momčadi. Suvremeni EURO
+        proširio se na osam momčadi 1980., šesnaest 1996. i dvadeset i četiri
+        2016.
+      </p>
+      <PrintDownloadLink
+        slug="euro"
+        label="Preuzmi PDF za ispis"
+        hint="A4 položeno, ista tablica i zbrojevi kao na ovoj stranici."
+      />
+    </header>
+
+    <TournamentTable
+      id="euro"
+      caption="Izdanja UEFA Europskog prvenstva, od 1960. nadalje"
+      table={data.table}
+      editions={data.editions}
+      winners={data.winners}
+      hosts={data.hosts}
+      extraColumn={{ label: 'Najbolji strijelac', values: topScorers }}
+      locale="hr"
+      headerLabels={headerLabels}
+      winnerLabel="Prvak"
+      winnerAllLabel="Svi prvaci"
+      yearLabel="Godina"
+      yearAllLabel="Sve godine"
+      hostLabel="Domaćin"
+      hostAllLabel="Svi domaćini"
+      sortByLabel="Sortiraj po"
+      resetLabel="Poništi"
+      filterAriaLabel="Filtriraj prvake UEFA Europskog prvenstva"
+      showingAllTemplate="Prikazano svih {n} izdanja."
+      showingFilteredTemplate="Prikazano {shown} od {total} izdanja ({bits})."
+      bitWinnerPrefix="prvak"
+      bitYearPrefix="godina"
+      bitHostPrefix="domaćin"
+      emptyText="Nijedno izdanje ne odgovara odabranim filterima."
+      clearFiltersLabel="Očisti filtere"
+    />
+
+    <ChampionsSummary
+      champions={data.champions}
+      scaleMax={data.editions.length}
+      heading="Prvaci po broju naslova"
+      description="Automatski generirano iz gornje tablice izdanja. Zbrojevi grupiraju naciju s njezinim sportskim nasljednikom samo tamo gdje to čini izvorni sadržaj (Njemačka uključuje Zapadnu Njemačku); svaki drugi naziv broji se onako kako je zapisan."
+      unit={['naslov', 'naslova']}
+      winningYearsLabel="Godine osvajanja: "
+    />
+
+    <EditorialNotes sections={notes} />
+
+    <References
+      sources={data.sources}
+      lastReviewed={data.lastReviewed}
+      status={data.status}
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText={statusText}
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+      noteText="Prednost imaju primarni izvori. Povijesni formati i nazivi reprezentacija bilježe se onako kako su korišteni u to vrijeme; kontekst potražite u napomenama uz svako izdanje."
+    />
+  </article>
+</BaseLayout>
+
+<style>
+  .competition__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .competition__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .competition__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+</style>

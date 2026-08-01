@@ -148,6 +148,12 @@ test.describe('World Cup page on a 360px phone', () => {
     expect(response.ok()).toBe(true);
     expect(response.headers()['content-type']).toContain('pdf');
   });
+
+  test('the language switcher opens the Croatian World Cup page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/competitions\/world-cup\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
 });
 
 test.describe('EURO page on a 360px phone', () => {
@@ -173,6 +179,143 @@ test.describe('EURO page on a 360px phone', () => {
     await expect(page.locator('.notes__card p', { hasText: 'other semifinalist' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
     await expect(page.getByText("Antonín Panenka's famous chipped penalty")).toBeVisible();
+  });
+
+  test('the language switcher opens the Croatian EURO page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/competitions\/euro\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/competitions/world-cup');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome, filters and column headers', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(
+      page.getByRole('heading', { name: 'FIFA Svjetsko prvenstvo', level: 1 }),
+    ).toBeVisible();
+    await expect(page.locator('label[for="world-cup-winner"]')).toHaveText('Prvak');
+    await expect(page.locator('label[for="world-cup-host"]')).toHaveText('Domaćin');
+    await expect(page.locator('th', { hasText: 'Godina' })).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Domaćin(i)' })).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Najbolji strijelac' })).toBeVisible();
+  });
+
+  test('filtering by prvak (winner) Argentina updates the shareable URL and status text', async ({
+    page,
+  }) => {
+    await page.selectOption('#world-cup-winner', 'Argentina');
+    await expect(page).toHaveURL(/winner=Argentina/);
+    await expect(page.locator('#world-cup-status')).toContainText('prvak Argentina');
+  });
+
+  test('shows the same champion totals as the English page', async ({ page, baseURL }) => {
+    const hrTop = await page.locator('.champions__name').first().textContent();
+    const hrCount = await page.locator('.champions__count').first().textContent();
+
+    await page.goto(baseURL ? `${baseURL}competitions/world-cup` : '/competitions/world-cup');
+    const enTop = await page.locator('.champions__name').first().textContent();
+    const enCount = await page.locator('.champions__count').first().textContent();
+
+    expect(hrTop).toBe(enTop);
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
+  });
+
+  test('shows each edition\'s top scorer with the Croatian "golova" wording', async ({ page }) => {
+    const row2018 = page.locator('tbody tr[data-year="2018"]');
+    await expect(row2018.locator('td[data-label="Najbolji strijelac"]')).toContainText(
+      'Harry Kane',
+    );
+    await expect(row2018.locator('td[data-label="Najbolji strijelac"]')).toContainText('golova');
+  });
+
+  test('shows the translated Format milestones, Memorable moments and Editorial notes sections', async ({
+    page,
+  }) => {
+    await expect(page.locator('.notes__card')).toHaveCount(3);
+    await expect(page.getByRole('heading', { name: 'Prekretnice formata' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Uredničke napomene' })).toBeVisible();
+    await expect(page.getByText('Hrvatska je 2018. stigla do svog prvog finala.')).toBeVisible();
+    await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
+  });
+
+  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/world-cup.pdf"]');
+    await expect(link).toContainText('Preuzmi PDF za ispis');
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
+
+  test('the language switcher returns to the English World Cup page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/competitions\/world-cup\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+});
+
+test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/competitions/euro');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome, filters and column headers', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(
+      page.getByRole('heading', { name: 'UEFA Europsko prvenstvo', level: 1 }),
+    ).toBeVisible();
+    await expect(page.locator('label[for="euro-winner"]')).toHaveText('Prvak');
+    await expect(page.locator('th', { hasText: 'Najbolji strijelac' })).toBeVisible();
+  });
+
+  test('shows each edition\'s top scorer with the Croatian "golova" wording', async ({ page }) => {
+    const row2016 = page.locator('tbody tr[data-year="2016"]');
+    await expect(row2016.locator('td[data-label="Najbolji strijelac"]')).toContainText(
+      'Antoine Griezmann',
+    );
+    await expect(row2016.locator('td[data-label="Najbolji strijelac"]')).toContainText('golova');
+  });
+
+  test('shows the Historical format note as a paragraph and Memorable moments as a translated list', async ({
+    page,
+  }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Povijesna napomena o formatu' }),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card p', { hasText: 'drugi polufinalist' }),
+    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
+    await expect(page.getByText('Slavna "panenka" Antonína Panenke')).toBeVisible();
+  });
+
+  test('the language switcher returns to the English EURO page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/competitions\/euro\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });
 });
 
@@ -230,6 +373,91 @@ test.describe('Golden Boot page on a 360px phone', () => {
     expect(response.ok()).toBe(true);
     expect(response.headers()['content-type']).toContain('pdf');
   });
+
+  test('the language switcher opens the Croatian Golden Boot page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/competitions\/golden-boot\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe('Croatian Golden Boot page (/hr/competitions/golden-boot) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/competitions/golden-boot');
+  });
+
+  test('has no horizontal page overflow with two tables stacked', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome, filters and column headers', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.getByRole('heading', { name: 'Zlatna kopačka', level: 1 })).toBeVisible();
+    await expect(page.locator('label[for="golden-boot-world-cup-winner"]')).toHaveText('Igrač');
+    await expect(page.locator('label[for="golden-boot-euro-winner"]')).toHaveText('Igrač');
+    await expect(page.locator('th', { hasText: 'Igrač(i)' }).first()).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Reprezentacija' }).first()).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Golovi' }).first()).toBeVisible();
+  });
+
+  test('shows the 1958 World Cup and 1984 EURO top scorers', async ({ page }) => {
+    const wcRow = page.locator('#golden-boot-world-cup-table tbody tr[data-year="1958"]');
+    await expect(wcRow).toContainText('Just Fontaine');
+
+    const euroRow = page.locator('#golden-boot-euro-table tbody tr[data-year="1984"]');
+    await expect(euroRow).toContainText('Michel Platini');
+  });
+
+  test('shows the translated World Cup notes and EURO notes sections, one per table', async ({
+    page,
+  }) => {
+    await expect(page.locator('.notes__card')).toHaveCount(2);
+    await expect(page.getByRole('heading', { name: 'Napomene o Svjetskom prvenstvu' })).toBeVisible();
+    await expect(page.getByText('13 golova Justa Fontainea 1958. ostaje rekord')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Napomene o EURU' })).toBeVisible();
+    await expect(page.getByText('Michel Platini postigao je devet golova')).toBeVisible();
+  });
+
+  test('the two tables filter independently by player', async ({ page }) => {
+    await page.selectOption('#golden-boot-world-cup-winner', 'Kylian Mbappé');
+    const wcVisible = page.locator('#golden-boot-world-cup-table tbody tr:not([hidden])');
+    await expect(wcVisible).toHaveCount(2);
+
+    const euroVisible = page.locator('#golden-boot-euro-table tbody tr:not([hidden])');
+    await expect(euroVisible).toHaveCount(17);
+  });
+
+  test('shows the same World Cup award totals as the English page', async ({ page, baseURL }) => {
+    const hrTop = await page.locator('.champions__name').first().textContent();
+    const hrCount = await page.locator('.champions__count').first().textContent();
+
+    await page.goto(baseURL ? `${baseURL}competitions/golden-boot` : '/competitions/golden-boot');
+    const enTop = await page.locator('.champions__name').first().textContent();
+    const enCount = await page.locator('.champions__count').first().textContent();
+
+    expect(hrTop).toBe(enTop);
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
+  });
+
+  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/golden-boot.pdf"]');
+    await expect(link).toContainText('Preuzmi PDF za ispis');
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
+
+  test('the language switcher returns to the English Golden Boot page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/competitions\/golden-boot\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
 });
 
 test.describe("Ballon d'Or page on a 360px phone", () => {
@@ -253,6 +481,254 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
     await page.selectOption('#ballon-dor-sort', 'winner-asc');
     await expect(row2020).toContainText('Not awarded');
     await expect(row2020).toBeVisible();
+  });
+
+  test('the 2020 "Not awarded" row is not a champions-summary entry or a filter option', async ({
+    page,
+  }) => {
+    // The raw table row still shows it (checked above); it just should not be
+    // counted as a one-off "champion" in the generated summary, nor offered
+    // as something a reader could filter the table down to.
+    const winnerOptions = await page.locator('#ballon-dor-winner option').allTextContents();
+    expect(winnerOptions).not.toContain('Not awarded');
+    await expect(page.locator('.champions')).not.toContainText('Not awarded');
+  });
+
+  test('the language switcher opens the Croatian Copa América page', async ({ page }) => {
+    await page.goto('competitions/copa-america');
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/competitions\/copa-america\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+
+  test("the language switcher opens the Croatian Ballon d'Or page", async ({ page }) => {
+    await page.goto('competitions/ballon-dor');
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/competitions\/ballon-dor\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360px phone", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/competitions/ballon-dor');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome, filters and column headers', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.getByRole('heading', { name: 'Zlatna lopta', level: 1 })).toBeVisible();
+    await expect(page.locator('label[for="ballon-dor-winner"]')).toHaveText('Pobjednik');
+    await expect(page.locator('th', { hasText: 'Godina' })).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Pobjednik' })).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Reprezentacija' })).toBeVisible();
+  });
+
+  test('filtering by pobjednik (winner) Lionel Messi updates the shareable URL and status text', async ({
+    page,
+  }) => {
+    await page.selectOption('#ballon-dor-winner', 'Lionel Messi');
+    await expect(page).toHaveURL(/winner=Lionel(\+|%20)Messi/);
+    await expect(page.locator('#ballon-dor-status')).toContainText('pobjednik Lionel Messi');
+  });
+
+  test('shows the same champion totals as the English page', async ({ page, baseURL }) => {
+    const hrTop = await page.locator('.champions__name').first().textContent();
+    const hrCount = await page.locator('.champions__count').first().textContent();
+
+    await page.goto(baseURL ? `${baseURL}competitions/ballon-dor` : '/competitions/ballon-dor');
+    const enTop = await page.locator('.champions__name').first().textContent();
+    const enCount = await page.locator('.champions__count').first().textContent();
+
+    expect(hrTop).toBe(enTop);
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
+  });
+
+  test('sorting preserves the 2020 "Not awarded" historical note verbatim', async ({ page }) => {
+    const row2020 = page.locator('tbody tr[data-year="2020"]');
+    await expect(row2020).toContainText('Not awarded');
+
+    await page.selectOption('#ballon-dor-sort', 'winner-asc');
+    await expect(row2020).toContainText('Not awarded');
+    await expect(row2020).toBeVisible();
+  });
+
+  test('shows the translated Notes section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Napomene' })).toBeVisible();
+    await expect(page.getByText('Lev Jašin ostaje jedini vratar')).toBeVisible();
+  });
+
+  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/ballon-dor.pdf"]');
+    await expect(link).toContainText('Preuzmi PDF za ispis');
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
+
+  test("the language switcher returns to the English Ballon d'Or page", async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/competitions\/ballon-dor\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+});
+
+test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/competitions/copa-america');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome, filters and column headers', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.getByRole('heading', { name: 'Copa América', level: 1 })).toBeVisible();
+    await expect(page.locator('label[for="copa-america-winner"]')).toHaveText('Prvak');
+    await expect(page.locator('th', { hasText: 'Godina' })).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Prvak' })).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Drugoplasirani' })).toBeVisible();
+  });
+
+  test('filtering by prvak (winner) Uruguay updates the shareable URL and status text', async ({
+    page,
+  }) => {
+    await page.selectOption('#copa-america-winner', 'Uruguay');
+    await expect(page).toHaveURL(/winner=Uruguay/);
+    await expect(page.locator('#copa-america-status')).toContainText('prvak Uruguay');
+  });
+
+  test('shows the same champion totals as the English page', async ({ page, baseURL }) => {
+    const hrTop = await page.locator('.champions__name').first().textContent();
+    const hrCount = await page.locator('.champions__count').first().textContent();
+
+    await page.goto(baseURL ? `${baseURL}competitions/copa-america` : '/competitions/copa-america');
+    const enTop = await page.locator('.champions__name').first().textContent();
+    const enCount = await page.locator('.champions__count').first().textContent();
+
+    expect(hrTop).toBe(enTop);
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
+  });
+
+  test('shows the translated Memorable moments section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
+    await expect(page.getByText('Bolivija je osvojila svoju jedinu titulu')).toBeVisible();
+  });
+
+  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/copa-america.pdf"]');
+    await expect(link).toContainText('Preuzmi PDF za ispis');
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
+
+  test('the language switcher returns to the English Copa América page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/competitions\/copa-america\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+});
+
+test.describe('Nations League page on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('competitions/nations-league');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('the language switcher opens the Croatian Nations League page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/competitions\/nations-league\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe('Croatian Nations League page (/hr/competitions/nations-league) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/competitions/nations-league');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome, filters and column headers', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.getByRole('heading', { name: 'UEFA Liga nacija', level: 1 })).toBeVisible();
+    await expect(page.locator('label[for="nations-league-winner"]')).toHaveText('Prvak');
+    await expect(page.locator('th', { hasText: 'Sezona' })).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Prvak' })).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Drugoplasirani' })).toBeVisible();
+  });
+
+  test('filtering by prvak (winner) Portugal updates the shareable URL and status text', async ({
+    page,
+  }) => {
+    await page.selectOption('#nations-league-winner', 'Portugal');
+    await expect(page).toHaveURL(/winner=Portugal/);
+    await expect(page.locator('#nations-league-status')).toContainText('prvak Portugal');
+  });
+
+  test('shows the same champion totals as the English page', async ({ page, baseURL }) => {
+    const hrTop = await page.locator('.champions__name').first().textContent();
+    const hrCount = await page.locator('.champions__count').first().textContent();
+
+    await page.goto(
+      baseURL ? `${baseURL}competitions/nations-league` : '/competitions/nations-league',
+    );
+    const enTop = await page.locator('.champions__name').first().textContent();
+    const enCount = await page.locator('.champions__count').first().textContent();
+
+    expect(hrTop).toBe(enTop);
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
+  });
+
+  test('shows the translated Key facts section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Ključne činjenice' })).toBeVisible();
+    await expect(page.getByText('Hrvatska je 2023. stigla do svog prvog finala')).toBeVisible();
+  });
+
+  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/nations-league.pdf"]');
+    await expect(link).toContainText('Preuzmi PDF za ispis');
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
+
+  test('the language switcher returns to the English Nations League page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/competitions\/nations-league\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });
 });
 

@@ -1,3 +1,4 @@
+import { isPlaceholderWinner } from './editions';
 import type { Locale } from './i18n';
 import type { Edition, TimelineEntry } from './types';
 
@@ -82,11 +83,16 @@ function questionsFromWinners(
   category: string,
   promptFor: (year: string) => string,
 ): QuizQuestion[] {
-  const pool = editions.map((e) => e.winner.trim()).filter(Boolean);
+  // A "Not awarded" placeholder row (e.g. the 2020 Ballon d'Or) is not a real
+  // answer: it can't be the correct choice for its own year's question, and it
+  // would be a nonsensical distractor for every other year's question.
+  const pool = editions
+    .map((e) => e.winner.trim())
+    .filter((winner) => winner && !isPlaceholderWinner(winner));
   const questions: QuizQuestion[] = [];
   for (const edition of editions) {
     const correct = edition.winner.trim();
-    if (!correct) continue;
+    if (!correct || isPlaceholderWinner(correct)) continue;
     const id = `${seedPrefix}:${seedKey}:${edition.year}`;
     const choice = buildChoice(id, correct, pool);
     if (!choice) continue;

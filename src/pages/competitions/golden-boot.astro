@@ -6,6 +6,7 @@ import EditorialNotes from '../../components/EditorialNotes.astro';
 import References from '../../components/References.astro';
 import PrintDownloadLink from '../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../lib/competition';
+import { withBase } from '../../lib/url';
 
 const [worldCup, euro] = await Promise.all([
   loadCompetition('golden-boot', {
@@ -31,6 +32,7 @@ const sources = [...worldCup.sources, ...euro.sources].filter(
 <BaseLayout
   title={worldCup.title}
   description="FIFA World Cup and UEFA EURO top-scorer awards, with player, team and goals. Filter each table by player and year."
+  alternateHref={withBase('/hr/competitions/golden-boot')}
 >
   <article class="competition stack">
     <header class="competition__header">

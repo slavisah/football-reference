@@ -4,16 +4,23 @@ import { withBase } from '../lib/url';
 interface Props {
   /** Matches the generated file at public/downloads/<slug>.pdf, see scripts/generate-pdfs.mjs. */
   slug: string;
+  /** Overridable for localized pages; default text matches the original English copy. */
+  label?: string;
+  hint?: string;
 }
 
-const { slug } = Astro.props;
+const {
+  slug,
+  label = 'Download printable PDF',
+  hint = 'A4 landscape, same table and totals as this page.',
+} = Astro.props;
 ---
 
 <p class="print-download no-print">
   <a href={withBase(`/downloads/${slug}.pdf`)} download>
-    <span aria-hidden="true">⬇️</span> Download printable PDF
+    <span aria-hidden="true">⬇️</span> {label}
   </a>
-  <span class="print-download__hint muted">A4 landscape, same table and totals as this page.</span>
+  <span class="print-download__hint muted">{hint}</span>
 </p>
 
 <style>

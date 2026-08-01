@@ -1,0 +1,156 @@
+---
+// Croatian translation of src/pages/competitions/nations-league.astro. Second
+// of the six competition/award pages localized (Copa América was first) - see
+// docs/PROJECT_STATUS.md for the rollout plan and what's left. Loads the
+// exact same `loadCompetition('uefa-nations-league', ...)` call as the
+// English page, so the table data, generated champions summary and reference
+// links can never drift between languages - only this page's own chrome
+// (filters, sort labels, status text, column headers) and a hand-translated
+// intro/notes paragraph are Croatian. Composes its own layout by hand (like
+// hr/competitions/copa-america.astro) rather than through the shared
+// English-only CompetitionView, so the English page needed no changes beyond
+// the locale props already added for the Copa América slice.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import TournamentTable from '../../../components/TournamentTable.astro';
+import ChampionsSummary from '../../../components/ChampionsSummary.astro';
+import EditorialNotes from '../../../components/EditorialNotes.astro';
+import References from '../../../components/References.astro';
+import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
+import { loadCompetition } from '../../../lib/competition';
+import { withBase } from '../../../lib/url';
+import type { NoteSection } from '../../../lib/notes';
+
+const data = await loadCompetition('uefa-nations-league', {
+  editionsHeading: 'Finals',
+  sourcesHeading: 'UEFA Nations League',
+});
+
+const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+// Croatian display name for the competition, matching the name already
+// established on the Croatian home page (homeCards.ts's CARD_TEXT) and
+// records page - data.title itself stays the raw English front-matter value.
+const title = 'UEFA Liga nacija';
+
+// Hand-translated from content/uefa-nations-league.md's "Key facts" section.
+// content/ itself stays untouched and English (the single editorial source of
+// truth); this is presentation-layer text local to this page only, the same
+// way hr/competitions/copa-america.astro hand-writes its own Croatian prose.
+const notes: NoteSection[] = [
+  {
+    heading: 'Ključne činjenice',
+    items: [
+      'Portugal je osvojio inauguralno izdanje.',
+      'Portugal je 2025. postao prvi dvostruki prvak natjecanja.',
+      'Hrvatska je 2023. stigla do svog prvog finala Lige nacija.',
+      'Natjecanje koristi sustav ispadanja i napredovanja između liga.',
+    ],
+  },
+];
+
+const headerLabels: Record<string, string> = {
+  Season: 'Sezona',
+  'Finals host': 'Domaćin Final Foura',
+  Winner: 'Prvak',
+  'Runner-up': 'Drugoplasirani',
+  Third: 'Treći',
+  Fourth: 'Četvrti',
+  Final: 'Finale',
+};
+---
+
+<BaseLayout
+  title={title}
+  description="Svako izdanje Final Foura UEFA Lige nacija, domaćini, finalisti i prvaci, uz generirani broj naslova. Filtriraj po prvaku, sezoni i domaćinu."
+  locale="hr"
+  alternateHref={withBase('/competitions/nations-league')}
+>
+  <article class="competition stack">
+    <header class="competition__header">
+      <p class="eyebrow badge">{statusText}</p>
+      <h1>{title}</h1>
+      <p class="competition__intro">
+        UEFA je pokrenula Ligu nacija kako bi mnoge međunarodne prijateljske
+        utakmice zamijenila natjecateljskim ligaškim susretima. Najbolje
+        rangirane reprezentacije bore se za mjesto na Final Fouru Lige
+        nacija.
+      </p>
+      <PrintDownloadLink
+        slug="nations-league"
+        label="Preuzmi PDF za ispis"
+        hint="A4 položeno, ista tablica i zbrojevi kao na ovoj stranici."
+      />
+    </header>
+
+    <TournamentTable
+      id="nations-league"
+      caption="UEFA Liga nacija, Final Four od sezone 2018-19"
+      table={data.table}
+      editions={data.editions}
+      winners={data.winners}
+      hosts={data.hosts}
+      locale="hr"
+      headerLabels={headerLabels}
+      winnerLabel="Prvak"
+      winnerAllLabel="Svi prvaci"
+      yearLabel="Sezona"
+      yearAllLabel="Sve sezone"
+      hostLabel="Domaćin"
+      hostAllLabel="Svi domaćini"
+      sortByLabel="Sortiraj po"
+      resetLabel="Poništi"
+      filterAriaLabel="Filtriraj prvake UEFA Lige nacija"
+      showingAllTemplate="Prikazano svih {n} izdanja."
+      showingFilteredTemplate="Prikazano {shown} od {total} izdanja ({bits})."
+      bitWinnerPrefix="prvak"
+      bitYearPrefix="sezona"
+      bitHostPrefix="domaćin"
+      emptyText="Nijedno izdanje ne odgovara odabranim filterima."
+      clearFiltersLabel="Očisti filtere"
+    />
+
+    <ChampionsSummary
+      champions={data.champions}
+      scaleMax={data.editions.length}
+      heading="Prvaci po broju naslova"
+      description="Automatski generirano iz gornje tablice izdanja. Zbrojevi grupiraju naciju s njezinim sportskim nasljednikom samo tamo gdje to čini izvorni sadržaj; svaki drugi naziv broji se onako kako je zapisan."
+      unit={['naslov', 'naslova']}
+      winningYearsLabel="Godine osvajanja: "
+    />
+
+    <EditorialNotes sections={notes} />
+
+    <References
+      sources={data.sources}
+      lastReviewed={data.lastReviewed}
+      status={data.status}
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText={statusText}
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+      noteText="Prednost imaju primarni izvori. Povijesni formati i nazivi reprezentacija bilježe se onako kako su korišteni u to vrijeme; kontekst potražite u napomenama uz svako izdanje."
+    />
+  </article>
+</BaseLayout>
+
+<style>
+  .competition__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .competition__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .competition__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+</style>

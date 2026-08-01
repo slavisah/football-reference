@@ -76,6 +76,31 @@ describe('buildSortOptions', () => {
       colIndex: 1,
     });
   });
+
+  it('tags each option with its role, for locale-independent default selection', () => {
+    const options = buildSortOptions(['Year', 'Host', 'Teams', 'Winner']);
+    expect(options.find((o) => o.value === 'year-desc')).toMatchObject({ role: 'year' });
+    expect(options.find((o) => o.value === 'teams-asc')).toMatchObject({ role: 'quantity' });
+    expect(options.find((o) => o.value === 'winner-asc')).toMatchObject({ role: 'text' });
+  });
+
+  it('translates the suffix wording and the header display text for a given locale', () => {
+    const options = buildSortOptions(['Year', 'Host / format', 'Champion'], {
+      locale: 'hr',
+      headerLabels: { Year: 'Godina', 'Host / format': 'Domaćin / format', Champion: 'Prvak' },
+    });
+    expect(options.find((o) => o.value === 'year-desc')).toMatchObject({
+      label: 'Godina (najnoviji prvi)',
+    });
+    expect(options.find((o) => o.value === 'champion-asc')).toMatchObject({
+      label: 'Prvak (A–Ž)',
+    });
+    // The <option> value stays keyed off the raw English header, so a shared
+    // `?sort=` link works the same regardless of which locale generated it.
+    expect(options.find((o) => o.label === 'Domaćin / format (Ž–A)')).toMatchObject({
+      value: 'host-format-desc',
+    });
+  });
 });
 
 describe('defaultSortValue', () => {

@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 91 Vitest unit tests
+pnpm test                      # 105 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 74 Playwright tests at 360px
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 121 Playwright tests at 360px
 ```
 
 Publishing: push to `main`; the Pages workflow builds and deploys.
@@ -207,9 +207,10 @@ differ from `## Editions` and will need the matching `editionsHeading`:
       'Winners'`); the generic table already handles "winner + national team,
       no host/teams" since it only renders columns that are present. Page at
       `src/pages/competitions/ballon-dor.astro`. The 2020 "Not awarded" row is
-      preserved verbatim and passes validation (non-empty winner), though it
-      does appear as its own one-off entry in the generated champions summary
-      and winner filter - a known minor rough edge, not fixed here.
+      preserved verbatim and passes validation (non-empty winner). It no
+      longer appears as a one-off entry in the generated champions summary or
+      winner filter - see the quality-pass entry near the end of this file
+      (2026-08-01, intensive run) for the fix.
 - [x] Golden Boot / top scorers (`content/golden-boot.md`) - two tables (World
       Cup and EURO top scorers) in one file. Page at
       `src/pages/competitions/golden-boot.astro`. Since one content file holds
@@ -696,18 +697,248 @@ differ from `## Editions` and will need the matching `editionsHeading`:
     overflow, translated prompts/controls, a correct multiple-choice answer
     shows "Točno!" and updates the score, a correct order-challenge ranking
     shows "Točan redoslijed!", and the switcher returns to English).
-  - [ ] Still English-only: the six competition/award pages. This is the
-    only remaining piece of the localization backlog, and meaningfully
-    harder than every page done so far (including Quiz, which turned out to
-    be tractable via the `locale` template-parameter approach above): the
-    six pages' column headers and role-detection regexes (`findColumn` in
-    `src/lib/editions.ts`, `buildSortOptions` in `src/lib/tableSort.ts`) are
-    English-only and shared by every page's filters/sort/champions-summary/
-    timeline logic, so translating a table's headers would need that
-    detection to also recognize Croatian header text without breaking it
-    for the untranslated English pages - a real engineering task (making
-    `findColumn`'s matchers locale-aware), not a props-and-prose slice like
-    the pages done so far.
+  - [x] `/competitions/copa-america` - first of the six competition/award
+    pages translated, added 2026-07-31 (intensive run), as a deliberate
+    vertical slice of this backlog item (see the still-English list below
+    for the other five). The earlier note here worried that translating a
+    table's headers would require making `findColumn`'s role-detection
+    matchers themselves locale-aware; that turned out to be unnecessary.
+    `findColumn`/`buildEditions` still only ever run against the raw English
+    headers from `content/copa-america.md` (detection is completely
+    unchanged, for every locale), and a new **display-only** `headerLabels`
+    prop on `TournamentTable.astro` (`Record<rawEnglishHeader,
+    translatedHeader>`) swaps in the translated text purely for the
+    rendered `<th>`/mobile-card `data-label`, after detection has already
+    run. `TournamentTable` also gained ~15 other optional locale props
+    (`yearLabel`, `hostAllLabel`, `sortByLabel`, `showingAllTemplate`, etc.),
+    every one defaulting to the exact original English string/template, so
+    the five untouched English competition pages needed zero changes and
+    render byte-identical HTML (verified by diffing a pre-change build
+    against a post-change build of `/competitions/world-cup` and
+    `/competitions/euro` - the only bytes that differ are the new,
+    English-default `define:vars` the client filter script now carries).
+    `buildSortOptions` (`src/lib/tableSort.ts`) gained the same
+    `{ locale, headerLabels }` config so the "Sort by" dropdown's wording
+    ("(newest first)", "(A-Z)", etc., now in `src/lib/i18n.ts`) and header
+    text translate too; fixed a latent locale-bugfix in passing while there
+    - `defaultSortValue()` used to pick the default option by checking
+    whether its *label* ended in the English string `"(newest first)"`,
+    which would have silently broken (falling back to the first option
+    instead of Year-newest-first) the moment any locale's suffix wording
+    differed. Each `SortOption` now carries an explicit `role: 'year' |
+    'quantity' | 'text'` field instead, so the default-selection logic
+    checks `role === 'year' && dir === 'desc'` directly and is locale-proof;
+    covered by 2 new Vitest cases plus a 3rd asserting the Croatian label
+    and header translation. `PrintDownloadLink.astro` gained optional
+    `label`/`hint` props (defaults unchanged) for the same reason.
+    This page composes its own layout by hand (`src/pages/hr/competitions/
+    copa-america.astro`), like `hr/records.astro` and `hr/compare.astro`
+    already do, rather than through the shared English-only
+    `CompetitionView.astro` - so `CompetitionView` itself (used by the other
+    five English pages) needed no changes and no new prop surface. Loads the
+    exact same `loadCompetition('copa-america', ...)` call as the English
+    page, so the table data, generated champions summary (title counts) and
+    reference links can never drift between languages. The "Memorable
+    moments" bullets are hand-translated Croatian text local to this page
+    only (`content/copa-america.md` itself is untouched - still the single
+    English editorial source of truth); this follows the precedent already
+    set by `hr/records.astro`'s hand-written Croatian identity-rules prose
+    rather than an automated translation of editorial content. Country/team
+    names, years and scores are left as-is throughout (matching the
+    Compare/Records precedent that underlying data isn't translated, only
+    UI chrome and short hand-checked prose). `TRANSLATED_PATHS` gained
+    `/competitions/copa-america` -> `/hr/competitions/copa-america`, and the
+    English page now passes `alternateHref` so its language switcher
+    appears (the same one-line gap `/records`, `/compare` and `/quiz` each
+    had before their own translation). Covered by 3 new Vitest cases
+    (`tableSort`) and 7 new Playwright cases at 360px (English page's
+    switcher opens the Croatian one; Croatian page: no overflow, translated
+    filter labels/column headers, filtering by "prvak" updates the URL and
+    status text, champion totals match the English page exactly, the
+    translated Memorable-moments section renders, the PDF download link
+    shows the translated label and actually resolves, and the switcher
+    returns to English).
+  - [x] `/competitions/nations-league` - second of the six competition/award
+    pages translated, added 2026-07-31 (intensive run). Confirms the reusable
+    infrastructure from the Copa América slice needed zero further changes -
+    this page is exactly the props-and-prose slice the note above predicted.
+    New `src/pages/hr/competitions/nations-league.astro` composes its own
+    layout by hand (like the Croatian Copa América page), loading the exact
+    same `loadCompetition('uefa-nations-league', ...)` call as the English
+    page so the table data, generated champions summary and reference links
+    can never drift between languages. Unlike Copa América, this table's
+    "Season" column (not "Year") and its "Finals host"/"Third"/"Fourth"/
+    "Final" columns needed their own `headerLabels` entries and a
+    `yearLabel="Sezona"`/`bitYearPrefix="sezona"` override (Copa América's
+    props already supported this - just different values). The page's own
+    "UEFA Liga nacija" display name and its `<title>` reuse the exact string
+    already established on the Croatian home/records pages
+    (`homeCards.ts`'s `CARD_TEXT`), rather than `data.title` (the raw English
+    front-matter value), matching how `hr/records.astro` and
+    `hr/compare.astro` already handle a translated competition name. The
+    "Key facts" section (`content/uefa-nations-league.md`) is hand-translated
+    Croatian prose local to this page only, same precedent as Copa América's
+    Memorable moments. `TRANSLATED_PATHS` gained `/competitions/nations-league`
+    -> `/hr/competitions/nations-league`, and the English page now passes
+    `alternateHref` so its language switcher appears (the same one-line gap
+    every previously-translated page had before its own translation).
+    Covered by 2 new Vitest cases (`alternatePath` both directions - also
+    backfilled the missing Copa América `alternatePath` case, which
+    `docs/PROJECT_STATUS.md` had claimed as done in the prior run but was
+    never actually added) and 9 new Playwright cases at 360px (English page:
+    no overflow, language switcher opens the Croatian one; Croatian page: no
+    overflow, translated filter labels/column headers including "Sezona",
+    filtering by "prvak" Portugal updates the URL and status text, champion
+    totals match the English page exactly, the translated Key facts section
+    renders, the PDF download link shows the translated label and resolves,
+    and the switcher returns to English).
+  - [x] `/competitions/ballon-dor` - third of the six competition/award
+    pages translated, added 2026-08-01 (intensive run). Confirms the
+    reusable infrastructure needed zero further changes for an
+    individual-award page with no host column: `hosts` stays the
+    `TournamentTable` default `[]`, which already omits the host
+    filter/label for free (no new prop plumbing). New
+    `src/pages/hr/competitions/ballon-dor.astro` composes its own layout by
+    hand (like the Croatian Copa América and Nations League pages), loading
+    the exact same `loadCompetition('ballon-dor', ...)` call as the English
+    page so the table data, generated champions summary (award/title counts)
+    and reference links can never drift between languages. The page's own
+    "Zlatna lopta" display name and `<title>` reuse the exact string already
+    established on the Croatian home page (`homeCards.ts`'s `CARD_TEXT`),
+    rather than `data.title` (the raw English front-matter value "Men's
+    Ballon d'Or"), matching how the Croatian Nations League page handles its
+    own display name. The "Winner"/"National team" column headers translate
+    via `headerLabels` ("Pobjednik"/"Reprezentacija") the same way the two
+    prior pages did; the `ChampionsSummary` heading/description are left at
+    their translated-default wording (matching the English page, which
+    itself doesn't override them via `CompetitionView` even though this is
+    an individual award, not a team competition - a pre-existing minor
+    copy inconsistency on the English site, out of scope here, so the
+    Croatian page mirrors it exactly rather than silently fixing it). The
+    "Notes" section (`content/ballon-dor.md`) is hand-translated Croatian
+    prose local to this page only, same precedent as the two prior pages'
+    Memorable-moments/Key-facts sections. `TRANSLATED_PATHS` gained
+    `/competitions/ballon-dor` -> `/hr/competitions/ballon-dor`, and the
+    English page now passes `alternateHref` so its language switcher
+    appears (the same one-line gap every previously-translated page had
+    before its own translation). Covered by 1 new Vitest case
+    (`alternatePath` both directions) and 9 new Playwright cases at 360px
+    (English page: no overflow, language switcher opens the Croatian one;
+    Croatian page: no overflow, translated filter labels/column headers,
+    filtering by "pobjednik" Lionel Messi updates the URL and status text,
+    champion totals match the English page exactly, sorting by winner still
+    preserves the 2020 "Not awarded" historical note verbatim, the
+    translated Notes section renders, the PDF download link shows the
+    translated label and resolves, and the switcher returns to English).
+  - [x] `/competitions/world-cup` and `/competitions/euro` - fourth and fifth
+    of the six competition/award pages translated, added 2026-08-01
+    (intensive run). Confirms the reusable infrastructure needed only one
+    small, genuinely new piece for these two: both pages join in a per-year
+    "Top scorer" `extraColumn` from Golden Boot data
+    (`buildTopScorerFacts()`), and that helper's generated detail string
+    hardcoded the English word "goals" (e.g. "Harry Kane (England, 6
+    goals)"). Rather than duplicating the whole function, it gained an
+    optional trailing `locale: Locale = 'en'` parameter - the same pattern
+    already used for every `src/lib/quiz.ts` question builder - that only
+    swaps the unit word via a small `GOALS_WORD` lookup ("goals"/"golova");
+    the player name, team and goal count are still the exact same underlying
+    data either way, so a fact can never drift between languages. Everything
+    else follows the Ballon d'Or slice directly: new
+    `src/pages/hr/competitions/world-cup.astro` and `.../euro.astro` compose
+    their own layout by hand (like the three prior Croatian competition
+    pages) rather than through the shared English-only `CompetitionView`,
+    loading the exact same `loadCompetition('fifa-world-cup' | 'uefa-euro',
+    ...)` plus `loadCompetition('golden-boot', ...)` calls as their English
+    counterparts. Both pages' own display names ("FIFA Svjetsko prvenstvo",
+    "UEFA Europsko prvenstvo") reuse the strings already established on the
+    Croatian home/records/compare pages. World Cup hand-translates its three
+    note sections (Format milestones, Memorable moments, Editorial notes);
+    EURO hand-translates its two (Historical format note - a single
+    paragraph, same as the English page's non-bulleted rendering - and
+    Memorable moments) - same precedent as the three prior Croatian
+    competition pages' hand-translated prose, `content/*.md` itself
+    untouched. `TRANSLATED_PATHS` gained both paths, and both English pages
+    now pass `alternateHref` so their language switchers appear. Covered by
+    2 new Vitest cases (`buildTopScorerFacts` with `locale: 'hr'`) and 24 new
+    Playwright cases at 360px across both languages and both pages (language
+    switchers each direction; translated chrome/filters/column headers
+    including the new "Najbolji strijelac" column; filtering by
+    prvak/domaćin; champion totals matching the English page exactly; the
+    top-scorer column showing the "golova" wording; all translated note
+    sections including the *Maracanazo* italic check and the EURO
+    paragraph-vs-list rendering; the PDF download link's translated label;
+    and World Cup's filter/sort/host tests already covered by the existing
+    English suite carrying over unchanged).
+  - [x] `/competitions/golden-boot` - sixth and last of the six competition/
+    award pages, added 2026-08-01 (intensive run). **The full localization
+    backlog from `AGENTS.md`/`docs/WEBSITE_REQUIREMENTS.md` is now complete -
+    every page on the site has a Croatian translation.** New
+    `src/pages/hr/competitions/golden-boot.astro` follows the same
+    two-table-in-one-page shape as the English page (two separate
+    `loadCompetition('golden-boot', ...)` calls - World Cup top scorers, EURO
+    top scorers - composed by hand under one shared header/References, no
+    `CompetitionView`), reusing the exact ids the English page already uses
+    (`golden-boot-world-cup(-table/-winner/-sort)`,
+    `golden-boot-euro(-table/-winner/-sort)`, and the two `ChampionsSummary`
+    ids) so the two tables keep filtering/sorting independently. Both notes
+    sections ("World Cup notes"/"EURO notes" from `content/golden-boot.md`)
+    are hand-translated; `winnerLabel="Igrač"` reuses the same override
+    pattern the English page uses for `winnerLabel="Player"` on a top-scorer
+    table. `TRANSLATED_PATHS` gained `/competitions/golden-boot` ->
+    `/hr/competitions/golden-boot`, and the English page now passes
+    `alternateHref` so its language switcher appears (the same gap every
+    other competition page had before its own Croatian translation shipped).
+    Covered by 1 new Vitest case (`alternatePath` both directions, replacing
+    the now-obsolete "no translation yet" case, repointed at a nonexistent
+    path) and 9 new Playwright cases at 360px mirroring the existing English
+    Golden Boot coverage (no overflow with two tables stacked; translated
+    chrome/filters/headers; the 1958 World Cup and 1984 EURO top scorers
+    render; both translated notes sections; independent per-table filtering
+    by player; the World Cup award ranking's top total matches the English
+    page exactly; the downloadable PDF link and its translated label; the
+    switcher opens the Croatian page from English and returns from
+    Croatian).
+
+### Quality pass: "Not awarded" placeholder no longer pollutes generated aggregates
+
+Added 2026-08-01 (intensive run). By this point every required and
+nice-to-have item from `docs/WEBSITE_REQUIREMENTS.md` and `AGENTS.md`'s
+milestone list has a live page, including the full Croatian localization
+backlog finished earlier the same day - so this run is the "genuinely useful
+quality pass" fallback rather than a new page. It fixes a bug in code, not a
+content correction: the 2020 Ballon d'Or's "Not awarded" placeholder winner
+(`content/ballon-dor.md`, kept verbatim per editorial policy - no historical
+fact was touched) was leaking into two places that treat the winner column as
+a real answer:
+
+- The generated champions summary (`buildChampionsSummary`) was counting it
+  as a one-off "champion" with 1 title, and the winner filter dropdown
+  (`distinctWinners`) offered "Not awarded" as something a reader could
+  filter the table down to - both flagged as a known rough edge in this file
+  and in `IMPLEMENTATION_NOTES.md`'s "Content caveats" section but not
+  previously fixed.
+- The `/quiz` and `/hr/quiz` question generator (`questionsFromWinners` in
+  `src/lib/quiz.ts`, feeding `championByYearQuestions`) could ask "Who won
+  the Ballon d'Or in 2020?" with "Not awarded" as the correct multiple-choice
+  answer, and could offer "Not awarded" as a nonsensical wrong-answer choice
+  for every *other* year's question.
+
+New `isPlaceholderWinner()` in `src/lib/editions.ts` (a small regex covering
+"not awarded", "not held", "no award(ed)", "cancelled/canceled") is now
+checked everywhere a winner value feeds an aggregate or a set of answer
+choices. `buildTimeline()` (the Records-page timeline and the Croatian
+records page) is deliberately **not** changed - "Not awarded" is itself the
+correct historical fact for that year's timeline card, so it still renders
+there verbatim. The raw Editions table row is untouched either way; only the
+*derived* summary/filter/quiz outputs change. Generalized rather than
+hardcoded to Ballon d'Or/2020, so it would also catch a future "Not held"
+row on another award page without new code. Covered by 6 new Vitest cases
+(`tests/unit/editions.test.ts`: `isPlaceholderWinner`, the summary-exclusion
+case, the filter-exclusion case, and the timeline verbatim case;
+`tests/unit/quiz.test.ts`: the question-skip + no-distractor-leak case) and 1
+new Playwright case at 360px confirming "Not awarded" is absent from both the
+winner `<select>` options and the champions-summary section on the live
+Ballon d'Or page.
 
 ## Known caveats
 
