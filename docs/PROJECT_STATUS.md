@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 91 Vitest unit tests
+pnpm test                      # 105 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 74 Playwright tests at 360px
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 121 Playwright tests at 360px
 ```
 
 Publishing: push to `main`; the Pages workflow builds and deploys.
@@ -829,24 +829,60 @@ differ from `## Editions` and will need the matching `editionsHeading`:
     preserves the 2020 "Not awarded" historical note verbatim, the
     translated Notes section renders, the PDF download link shows the
     translated label and resolves, and the switcher returns to English).
-  - [ ] Still English-only: the other three competition/award pages (World
-    Cup, EURO, Golden Boot). The reusable infrastructure for this is now
-    proven three times over (Copa América + Nations League + Ballon d'Or) -
-    each remaining page is a props-and-prose slice, not new engineering:
-    write `src/pages/hr/competitions/<slug>.astro` composing the same
-    components by hand, supply a `headerLabels` map for that table's own
-    English headers, translate the filter/status strings (copy the existing
-    three Croatian pages' values - they're competition-agnostic chrome text)
-    and hand-translate that page's own "Memorable moments"/notes prose.
-    Golden Boot is the one exception worth flagging in advance: its English
-    page doesn't use `CompetitionView` either (it composes two
-    `TournamentTable`s by hand for the two top-scorer tables), so its
-    Croatian version can follow the same pattern used here rather than
-    `CompetitionView`. World Cup and EURO both also join in a per-year "Top
-    scorer" `extraColumn` from Golden Boot data (see the "tournament-level
-    best scorer facts" entry above) - their Croatian pages will need an
-    `extraColumn.label` override too, which `TournamentTable` already
-    supports as a plain string prop.
+  - [x] `/competitions/world-cup` and `/competitions/euro` - fourth and fifth
+    of the six competition/award pages translated, added 2026-08-01
+    (intensive run). Confirms the reusable infrastructure needed only one
+    small, genuinely new piece for these two: both pages join in a per-year
+    "Top scorer" `extraColumn` from Golden Boot data
+    (`buildTopScorerFacts()`), and that helper's generated detail string
+    hardcoded the English word "goals" (e.g. "Harry Kane (England, 6
+    goals)"). Rather than duplicating the whole function, it gained an
+    optional trailing `locale: Locale = 'en'` parameter - the same pattern
+    already used for every `src/lib/quiz.ts` question builder - that only
+    swaps the unit word via a small `GOALS_WORD` lookup ("goals"/"golova");
+    the player name, team and goal count are still the exact same underlying
+    data either way, so a fact can never drift between languages. Everything
+    else follows the Ballon d'Or slice directly: new
+    `src/pages/hr/competitions/world-cup.astro` and `.../euro.astro` compose
+    their own layout by hand (like the three prior Croatian competition
+    pages) rather than through the shared English-only `CompetitionView`,
+    loading the exact same `loadCompetition('fifa-world-cup' | 'uefa-euro',
+    ...)` plus `loadCompetition('golden-boot', ...)` calls as their English
+    counterparts. Both pages' own display names ("FIFA Svjetsko prvenstvo",
+    "UEFA Europsko prvenstvo") reuse the strings already established on the
+    Croatian home/records/compare pages. World Cup hand-translates its three
+    note sections (Format milestones, Memorable moments, Editorial notes);
+    EURO hand-translates its two (Historical format note - a single
+    paragraph, same as the English page's non-bulleted rendering - and
+    Memorable moments) - same precedent as the three prior Croatian
+    competition pages' hand-translated prose, `content/*.md` itself
+    untouched. `TRANSLATED_PATHS` gained both paths, and both English pages
+    now pass `alternateHref` so their language switchers appear. Covered by
+    2 new Vitest cases (`buildTopScorerFacts` with `locale: 'hr'`) and 24 new
+    Playwright cases at 360px across both languages and both pages (language
+    switchers each direction; translated chrome/filters/column headers
+    including the new "Najbolji strijelac" column; filtering by
+    prvak/domaćin; champion totals matching the English page exactly; the
+    top-scorer column showing the "golova" wording; all translated note
+    sections including the *Maracanazo* italic check and the EURO
+    paragraph-vs-list rendering; the PDF download link's translated label;
+    and World Cup's filter/sort/host tests already covered by the existing
+    English suite carrying over unchanged).
+  - [ ] Still English-only: `/competitions/golden-boot`, the last of the six
+    competition/award pages. The reusable infrastructure is now proven five
+    times over - this is a props-and-prose slice, not new engineering, but
+    with one structural difference worth flagging in advance: the English
+    page doesn't use `CompetitionView` either, but composes **two**
+    `TournamentTable`s by hand (World Cup top scorers, EURO top scorers) from
+    two separate `loadCompetition('golden-boot', ...)` calls against the same
+    content file, under one shared header/References. Its Croatian version
+    should follow that same two-table-in-one-page shape rather than a single
+    `TournamentTable` call, reusing the `winnerLabel="Pobjednik"` override
+    pattern (a top-scorer table's champion column is "Player(s)", not
+    "Winner") and hand-translating the "World Cup notes"/"EURO notes"
+    sections. `buildTopScorerFacts(..., 'hr')` (now locale-aware, see above)
+    is not actually needed here - Golden Boot's own tables don't join in an
+    `extraColumn`, they *are* the top-scorer data.
 
 ## Known caveats
 

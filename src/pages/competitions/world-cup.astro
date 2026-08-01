@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
 import { buildTopScorerFacts } from '../../lib/editions';
+import { withBase } from '../../lib/url';
 
 const [data, goldenBoot] = await Promise.all([
   loadCompetition('fifa-world-cup', {
@@ -22,6 +23,7 @@ const topScorers = buildTopScorerFacts(goldenBoot.editions);
 <BaseLayout
   title={data.title}
   description="Every FIFA World Cup edition, hosts, finalists and champions, with a generated title count. Filter by winner, year and host."
+  alternateHref={withBase('/hr/competitions/world-cup')}
 >
   <CompetitionView
     data={data}

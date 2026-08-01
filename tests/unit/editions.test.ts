@@ -176,4 +176,10 @@ describe('buildTopScorerFacts', () => {
     const facts = buildTopScorerFacts(buildEditions(emptyRowTable));
     expect(facts.has('1942')).toBe(false);
   });
+
+  it('swaps in the Croatian "golova" word for the hr locale, keeping the same names/counts', () => {
+    const facts = buildTopScorerFacts(buildEditions(scorersTable), 'hr');
+    expect(facts.get('1958')).toBe('Just Fontaine (France, 13 golova)');
+    expect(facts.get('1962')).toBe('Garrincha; Vavá (Multiple, 4 golova)');
+  });
 });

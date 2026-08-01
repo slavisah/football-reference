@@ -1,5 +1,6 @@
 import type { ChampionSummary, Edition, MarkdownTable, TimelineEntry } from './types';
 import { summaryGroupFor } from './countries';
+import type { Locale } from './i18n';
 
 // Turn a parsed Markdown table into normalized editions, and derive the
 // champions summary from those editions (rather than trusting a hand-maintained
@@ -115,14 +116,23 @@ export function buildTimeline(editions: Edition[]): TimelineEntry[] {
  * (e.g. the World Cup and EURO pages showing that edition's top scorer).
  * Team/goals are appended only when those columns are present.
  */
-export function buildTopScorerFacts(editions: Edition[]): Map<string, string> {
+const GOALS_WORD: Record<Locale, string> = { en: 'goals', hr: 'golova' };
+
+/**
+ * `locale` only swaps the "goals" word in the generated detail text (e.g. for
+ * a Croatian competition page's "Top scorer" column) - the player/team names
+ * and goal count themselves are the same underlying data either way.
+ */
+export function buildTopScorerFacts(editions: Edition[], locale: Locale = 'en'): Map<string, string> {
   const facts = new Map<string, string>();
   for (const edition of editions) {
     const player = edition.winner.trim();
     if (!player) continue;
     const team = cellValue(edition, /^team$/i);
     const goals = cellValue(edition, /^goals$/i);
-    const detail = [team, goals ? `${goals} goals` : undefined].filter(Boolean).join(', ');
+    const detail = [team, goals ? `${goals} ${GOALS_WORD[locale]}` : undefined]
+      .filter(Boolean)
+      .join(', ');
     facts.set(edition.year, detail ? `${player} (${detail})` : player);
   }
   return facts;
