@@ -38,7 +38,11 @@ const cards = buildHomeCards('en', competitions);
   <section class="cards" aria-label="Competitions">
     {
       cards.map((card) => (
-        <a class="comp-card" href={card.href} style={`--card-accent:${card.accent}`}>
+        <a
+          class="comp-card"
+          href={card.href}
+          style={`--card-accent:${card.accent};--card-accent-text-light:${card.accentTextLight};--card-accent-text-dark:${card.accentTextDark}`}
+        >
           <span class="comp-card__bar" aria-hidden="true" />
           <h2><span aria-hidden="true">{card.icon}</span> {card.title}</h2>
           <p class="comp-card__blurb">{card.blurb}</p>
@@ -194,7 +198,21 @@ const cards = buildHomeCards('en', competitions);
 
   .comp-card__go {
     font-weight: 600;
-    color: var(--card-accent, var(--accent));
+    /* Each card's per-theme text variant, tuned for AA contrast against
+       that theme's --bg-elevated (see homeCards.ts). */
+    color: var(--card-accent-text-light, var(--card-accent, var(--accent)));
+  }
+
+  @media (prefers-color-scheme: dark) {
+    /* :not([data-theme='light']) so an explicit manual "light" override
+       (independent of the OS setting) isn't clobbered by this rule. */
+    :root:not([data-theme='light']) .comp-card__go {
+      color: var(--card-accent-text-dark, var(--card-accent, var(--accent)));
+    }
+  }
+
+  :root[data-theme='dark'] .comp-card__go {
+    color: var(--card-accent-text-dark, var(--card-accent, var(--accent)));
   }
 
   .feature-list {
