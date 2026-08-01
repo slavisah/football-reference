@@ -1331,3 +1331,98 @@ test.describe('Installability and offline reading', () => {
     await context.setOffline(false);
   });
 });
+
+test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
+  // These render from Astro.site (astro.config.mjs's SITE_URL default), the
+  // real deployment origin - not the Playwright dev server's localhost - the
+  // same way the manifest/service worker tests above assert against
+  // '/football-reference/...' rather than a localhost URL.
+  const SITE = 'https://slavisah.github.io/football-reference';
+
+  test('the World Cup page has a canonical link, Open Graph and Twitter Card tags', async ({
+    page,
+  }) => {
+    await page.goto('competitions/world-cup');
+
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      `${SITE}/competitions/world-cup/`,
+    );
+    await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'website');
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+      'content',
+      'FIFA World Cup · The Ultimate Football Reference',
+    );
+    await expect(page.locator('meta[property="og:description"]')).toHaveCount(1);
+    await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute(
+      'content',
+      'en_US',
+    );
+    await expect(page.locator('meta[property="og:locale:alternate"]')).toHaveAttribute(
+      'content',
+      'hr_HR',
+    );
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+      'content',
+      `${SITE}/icons/icon-512.png`,
+    );
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+      'content',
+      'summary',
+    );
+  });
+
+  test('a translated page pair carries matching hreflang alternate links', async ({ page }) => {
+    await page.goto('competitions/world-cup');
+    await expect(page.locator('link[rel="alternate"][hreflang="en"]')).toHaveAttribute(
+      'href',
+      `${SITE}/competitions/world-cup/`,
+    );
+    await expect(page.locator('link[rel="alternate"][hreflang="hr"]')).toHaveAttribute(
+      'href',
+      `${SITE}/hr/competitions/world-cup`,
+    );
+
+    await page.goto('hr/competitions/world-cup');
+    await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute(
+      'content',
+      'hr_HR',
+    );
+    await expect(page.locator('link[rel="alternate"][hreflang="hr"]')).toHaveAttribute(
+      'href',
+      `${SITE}/hr/competitions/world-cup/`,
+    );
+    await expect(page.locator('link[rel="alternate"][hreflang="en"]')).toHaveAttribute(
+      'href',
+      `${SITE}/competitions/world-cup`,
+    );
+  });
+
+  test('robots.txt allows crawling and points at the sitemap', async ({ page }) => {
+    const response = await page.request.get('/football-reference/robots.txt');
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('text/plain');
+    const body = await response.text();
+    expect(body).toContain('User-agent: *');
+    expect(body).toContain('Allow: /');
+    expect(body).toContain(`Sitemap: ${SITE}/sitemap.xml`);
+  });
+
+  test('sitemap.xml lists every page in both languages with hreflang alternates', async ({
+    page,
+  }) => {
+    const response = await page.request.get('/football-reference/sitemap.xml');
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('xml');
+    const body = await response.text();
+
+    // 11 nav pages x 2 languages.
+    expect(body.match(/<url>/g)?.length).toBe(22);
+    expect(body).toContain(`<loc>${SITE}/competitions/world-cup</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/competitions/world-cup</loc>`);
+    expect(body).toContain(
+      `hreflang="hr" href="${SITE}/hr/competitions/world-cup"`,
+    );
+    expect(body).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
+  });
+});

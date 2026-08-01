@@ -19,6 +19,16 @@ const fullTitle =
   title === 'The Ultimate Football Reference'
     ? title
     : `${title} · The Ultimate Football Reference`;
+
+// Absolute URLs for canonical/hreflang/Open Graph tags. Astro.site is set
+// from SITE_URL in astro.config.mjs (repo-agnostic, like every other base-path
+// helper here), so this works under any GitHub Pages project name too.
+const siteOrigin = Astro.site ?? Astro.url;
+const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
+const alternateURL = alternateHref ? new URL(alternateHref, siteOrigin) : undefined;
+const ogImageURL = new URL(withBase('/icons/icon-512.png'), siteOrigin);
+const ogLocale = locale === 'hr' ? 'hr_HR' : 'en_US';
+const ogLocaleAlternate = locale === 'hr' ? 'en_US' : 'hr_HR';
 ---
 
 <!doctype html>
@@ -29,6 +39,19 @@ const fullTitle =
     <title>{fullTitle}</title>
     {description && <meta name="description" content={description} />}
     <meta name="generator" content={Astro.generator} />
+    <link rel="canonical" href={canonicalURL} />
+    {
+      alternateHref && alternateURL && (
+        <>
+          <link rel="alternate" hreflang={locale} href={canonicalURL} />
+          <link
+            rel="alternate"
+            hreflang={locale === 'hr' ? 'en' : 'hr'}
+            href={alternateURL}
+          />
+        </>
+      )
+    }
     <link rel="icon" href={withBase('/favicon.svg')} />
     <link rel="manifest" href={withBase('/manifest.webmanifest')} />
     <link rel="apple-touch-icon" href={withBase('/icons/icon-192.png')} />
@@ -36,6 +59,21 @@ const fullTitle =
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Football Reference" />
     <meta name="color-scheme" content="light dark" />
+
+    {/* Open Graph + Twitter Card, so links shared to chat apps/social media
+    show a real title, description and image instead of a bare URL. */}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="The Ultimate Football Reference" />
+    <meta property="og:title" content={fullTitle} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:locale" content={ogLocale} />
+    {alternateHref && <meta property="og:locale:alternate" content={ogLocaleAlternate} />}
+    <meta property="og:image" content={ogImageURL} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={fullTitle} />
+    {description && <meta name="twitter:description" content={description} />}
+    <meta name="twitter:image" content={ogImageURL} />
 
     {/* Apply the saved theme before paint to avoid a flash. */}
     <script is:inline>
