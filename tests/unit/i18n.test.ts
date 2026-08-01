@@ -52,7 +52,7 @@ describe('alternatePath', () => {
   });
 
   it('returns null for a page that has no translation yet', () => {
-    expect(alternatePath('/competitions/golden-boot', 'en')).toBeNull();
+    expect(alternatePath('/nonexistent-page', 'en')).toBeNull();
   });
 
   it('maps the English sources page to its Croatian translation and back', () => {
@@ -112,5 +112,14 @@ describe('alternatePath', () => {
   it('maps the English UEFA EURO page to its Croatian translation and back', () => {
     expect(alternatePath('/competitions/euro', 'en')).toBe('/hr/competitions/euro');
     expect(alternatePath('/hr/competitions/euro', 'hr')).toBe('/competitions/euro');
+  });
+
+  it('maps the English Golden Boot page to its Croatian translation and back', () => {
+    expect(alternatePath('/competitions/golden-boot', 'en')).toBe(
+      '/hr/competitions/golden-boot',
+    );
+    expect(alternatePath('/hr/competitions/golden-boot', 'hr')).toBe(
+      '/competitions/golden-boot',
+    );
   });
 });

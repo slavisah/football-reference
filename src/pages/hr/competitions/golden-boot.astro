@@ -1,0 +1,211 @@
+---
+// Croatian translation of src/pages/competitions/golden-boot.astro. Sixth and
+// final page of the six competition/award pages localized (Copa América,
+// Nations League, Ballon d'Or, FIFA World Cup and UEFA EURO came first) - see
+// docs/PROJECT_STATUS.md for the rollout history. Loads the exact same two
+// `loadCompetition('golden-boot', ...)` calls (World Cup top scorers, EURO
+// top scorers) as the English page, so the table data, generated award
+// rankings and reference links can never drift between languages - only this
+// page's own chrome (filters, sort labels, status text, column headers) and
+// hand-translated notes are Croatian. Composes its own layout by hand (like
+// every earlier Croatian competition page) rather than through the shared
+// English-only CompetitionView - the English page's two-table-on-one-file
+// layout already does the same, unlike every other competition page.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import TournamentTable from '../../../components/TournamentTable.astro';
+import ChampionsSummary from '../../../components/ChampionsSummary.astro';
+import EditorialNotes from '../../../components/EditorialNotes.astro';
+import References from '../../../components/References.astro';
+import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
+import { loadCompetition } from '../../../lib/competition';
+import { withBase } from '../../../lib/url';
+import type { NoteSection } from '../../../lib/notes';
+
+const [worldCup, euro] = await Promise.all([
+  loadCompetition('golden-boot', {
+    editionsHeading: 'FIFA World Cup top scorers',
+    sourcesHeading: 'FIFA World Cup',
+  }),
+  loadCompetition('golden-boot', {
+    editionsHeading: 'UEFA EURO top scorers',
+    sourcesHeading: 'UEFA EURO',
+  }),
+]);
+
+// Both loads read the same content file, so status/review date are
+// identical; the source links differ because each table cites its own
+// section of docs/SOURCES.md, same as the English page.
+const sources = [...worldCup.sources, ...euro.sources].filter(
+  (source, index, all) => all.findIndex((s) => s.url === source.url) === index,
+);
+
+const statusText = worldCup.status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+// Croatian display name, matching the name already established on the
+// Croatian home page (homeCards.ts's CARD_TEXT) - worldCup.title/euro.title
+// stay the raw English front-matter value ("Golden Boot Winners").
+const title = 'Zlatna kopačka';
+
+// Hand-translated from content/golden-boot.md's "World Cup notes" and "EURO
+// notes" sections. content/ itself stays untouched and English (the single
+// editorial source of truth); this is presentation-layer text local to this
+// page only, the same way every earlier Croatian competition page hand-writes
+// its own Croatian prose.
+const notes: NoteSection[] = [
+  {
+    heading: 'Napomene o Svjetskom prvenstvu',
+    items: [
+      '13 golova Justa Fontainea 1958. ostaje rekord jednog izdanja.',
+      'Suvremena pravila za razdvajanje igrača s istim brojem golova mogu uzeti u obzir asistencije i odigrane minute.',
+      'Ranija izdanja često su priznavala više dijeljenih najboljih strijelaca.',
+    ],
+  },
+  {
+    heading: 'Napomene o EURU',
+    items: [
+      'Michel Platini postigao je devet golova u pet utakmica 1984.',
+      'UEFA-ina pravila za dodjelu nagrade mijenjala su se tijekom vremena; dijeljeni najbolji strijelci (označeni s "Multiple" u stupcu Reprezentacija) prikazani su izjednačeno, bez jedinstvenog službenog pobjednika za to izdanje.',
+    ],
+  },
+];
+
+const headerLabels: Record<string, string> = {
+  Year: 'Godina',
+  'Player(s)': 'Igrač(i)',
+  Team: 'Reprezentacija',
+  Goals: 'Golovi',
+};
+---
+
+<BaseLayout
+  title={title}
+  description="FIFA Svjetsko prvenstvo i UEFA Europsko prvenstvo - nagrade za najboljeg strijelca (Zlatna kopačka), s igračem, reprezentacijom i brojem golova. Filtriraj svaku tablicu po igraču i godini."
+  locale="hr"
+  alternateHref={withBase('/competitions/golden-boot')}
+>
+  <article class="competition stack">
+    <header class="competition__header">
+      <p class="eyebrow badge">{statusText}</p>
+      <h1>{title}</h1>
+      <p class="competition__intro">
+        Naziv i pravila za razdvajanje kod nagrada za najboljeg strijelca
+        mijenjali su se tijekom vremena. Ova stranica koristi naziv "Zlatna
+        kopačka" kao praktičnu suvremenu oznaku, a istovremeno zadržava
+        dijeljene pobjednike ondje gdje ih je povijesno natjecanje
+        priznavalo.
+      </p>
+      <PrintDownloadLink
+        slug="golden-boot"
+        label="Preuzmi PDF za ispis"
+        hint="A4 položeno, ista tablica i zbrojevi kao na ovoj stranici."
+      />
+    </header>
+
+    <section class="stack">
+      <h2>Najbolji strijelci Svjetskog prvenstva</h2>
+      <TournamentTable
+        id="golden-boot-world-cup"
+        caption="Najbolji strijelci FIFA Svjetskog prvenstva, od 1930. do danas"
+        table={worldCup.table}
+        editions={worldCup.editions}
+        winners={worldCup.winners}
+        hosts={worldCup.hosts}
+        locale="hr"
+        headerLabels={headerLabels}
+        winnerLabel="Igrač"
+        winnerAllLabel="Svi igrači"
+        yearLabel="Godina"
+        yearAllLabel="Sve godine"
+        sortByLabel="Sortiraj po"
+        resetLabel="Poništi"
+        filterAriaLabel="Filtriraj najbolje strijelce Svjetskog prvenstva"
+        showingAllTemplate="Prikazano svih {n} izdanja."
+        showingFilteredTemplate="Prikazano {shown} od {total} izdanja ({bits})."
+        bitWinnerPrefix="igrač"
+        bitYearPrefix="godina"
+        emptyText="Nijedno izdanje ne odgovara odabranim filterima."
+        clearFiltersLabel="Očisti filtere"
+      />
+      <ChampionsSummary
+        id="golden-boot-world-cup-champions"
+        champions={worldCup.champions}
+        scaleMax={worldCup.editions.length}
+        heading="Najviše nagrada za najboljeg strijelca Svjetskog prvenstva"
+        description="Automatski generirano iz gornje tablice. Izjednačeni najbolji strijelci broje se kao zajednički unos, točno onako kako ih navodi izvorna tablica."
+        unit={['nagrada', 'nagrade']}
+        winningYearsLabel="Godine osvajanja: "
+      />
+    </section>
+
+    <section class="stack">
+      <h2>Najbolji strijelci EURA</h2>
+      <TournamentTable
+        id="golden-boot-euro"
+        caption="Najbolji strijelci UEFA Europskog prvenstva, od 1960. do danas"
+        table={euro.table}
+        editions={euro.editions}
+        winners={euro.winners}
+        hosts={euro.hosts}
+        locale="hr"
+        headerLabels={headerLabels}
+        winnerLabel="Igrač"
+        winnerAllLabel="Svi igrači"
+        yearLabel="Godina"
+        yearAllLabel="Sve godine"
+        sortByLabel="Sortiraj po"
+        resetLabel="Poništi"
+        filterAriaLabel="Filtriraj najbolje strijelce EURA"
+        showingAllTemplate="Prikazano svih {n} izdanja."
+        showingFilteredTemplate="Prikazano {shown} od {total} izdanja ({bits})."
+        bitWinnerPrefix="igrač"
+        bitYearPrefix="godina"
+        emptyText="Nijedno izdanje ne odgovara odabranim filterima."
+        clearFiltersLabel="Očisti filtere"
+      />
+      <ChampionsSummary
+        id="golden-boot-euro-champions"
+        champions={euro.champions}
+        scaleMax={euro.editions.length}
+        heading="Najviše nagrada za najboljeg strijelca EURA"
+        description="Automatski generirano iz gornje tablice. Izjednačeni najbolji strijelci broje se kao zajednički unos, točno onako kako ih navodi izvorna tablica."
+        unit={['nagrada', 'nagrade']}
+        winningYearsLabel="Godine osvajanja: "
+      />
+    </section>
+
+    <EditorialNotes sections={notes} />
+
+    <References
+      sources={sources}
+      lastReviewed={worldCup.lastReviewed}
+      status={worldCup.status}
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText={statusText}
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+      noteText="Prednost imaju primarni izvori. Povijesni formati i nazivi reprezentacija bilježe se onako kako su korišteni u to vrijeme; kontekst potražite u napomenama uz svako izdanje."
+    />
+  </article>
+</BaseLayout>
+
+<style>
+  .competition__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .competition__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .competition__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+</style>

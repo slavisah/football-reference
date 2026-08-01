@@ -84,6 +84,7 @@ export const TRANSLATED_PATHS: Record<string, string> = {
   '/competitions/ballon-dor': '/hr/competitions/ballon-dor',
   '/competitions/world-cup': '/hr/competitions/world-cup',
   '/competitions/euro': '/hr/competitions/euro',
+  '/competitions/golden-boot': '/hr/competitions/golden-boot',
 };
 
 /** The other language's equivalent path for the current one, if translated, else null. */

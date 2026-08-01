@@ -373,6 +373,91 @@ test.describe('Golden Boot page on a 360px phone', () => {
     expect(response.ok()).toBe(true);
     expect(response.headers()['content-type']).toContain('pdf');
   });
+
+  test('the language switcher opens the Croatian Golden Boot page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/competitions\/golden-boot\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe('Croatian Golden Boot page (/hr/competitions/golden-boot) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/competitions/golden-boot');
+  });
+
+  test('has no horizontal page overflow with two tables stacked', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome, filters and column headers', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.getByRole('heading', { name: 'Zlatna kopačka', level: 1 })).toBeVisible();
+    await expect(page.locator('label[for="golden-boot-world-cup-winner"]')).toHaveText('Igrač');
+    await expect(page.locator('label[for="golden-boot-euro-winner"]')).toHaveText('Igrač');
+    await expect(page.locator('th', { hasText: 'Igrač(i)' }).first()).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Reprezentacija' }).first()).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Golovi' }).first()).toBeVisible();
+  });
+
+  test('shows the 1958 World Cup and 1984 EURO top scorers', async ({ page }) => {
+    const wcRow = page.locator('#golden-boot-world-cup-table tbody tr[data-year="1958"]');
+    await expect(wcRow).toContainText('Just Fontaine');
+
+    const euroRow = page.locator('#golden-boot-euro-table tbody tr[data-year="1984"]');
+    await expect(euroRow).toContainText('Michel Platini');
+  });
+
+  test('shows the translated World Cup notes and EURO notes sections, one per table', async ({
+    page,
+  }) => {
+    await expect(page.locator('.notes__card')).toHaveCount(2);
+    await expect(page.getByRole('heading', { name: 'Napomene o Svjetskom prvenstvu' })).toBeVisible();
+    await expect(page.getByText('13 golova Justa Fontainea 1958. ostaje rekord')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Napomene o EURU' })).toBeVisible();
+    await expect(page.getByText('Michel Platini postigao je devet golova')).toBeVisible();
+  });
+
+  test('the two tables filter independently by player', async ({ page }) => {
+    await page.selectOption('#golden-boot-world-cup-winner', 'Kylian Mbappé');
+    const wcVisible = page.locator('#golden-boot-world-cup-table tbody tr:not([hidden])');
+    await expect(wcVisible).toHaveCount(2);
+
+    const euroVisible = page.locator('#golden-boot-euro-table tbody tr:not([hidden])');
+    await expect(euroVisible).toHaveCount(17);
+  });
+
+  test('shows the same World Cup award totals as the English page', async ({ page, baseURL }) => {
+    const hrTop = await page.locator('.champions__name').first().textContent();
+    const hrCount = await page.locator('.champions__count').first().textContent();
+
+    await page.goto(baseURL ? `${baseURL}competitions/golden-boot` : '/competitions/golden-boot');
+    const enTop = await page.locator('.champions__name').first().textContent();
+    const enCount = await page.locator('.champions__count').first().textContent();
+
+    expect(hrTop).toBe(enTop);
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
+  });
+
+  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/golden-boot.pdf"]');
+    await expect(link).toContainText('Preuzmi PDF za ispis');
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
+
+  test('the language switcher returns to the English Golden Boot page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/competitions\/golden-boot\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
 });
 
 test.describe("Ballon d'Or page on a 360px phone", () => {
