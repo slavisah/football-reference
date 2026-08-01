@@ -58,6 +58,12 @@ const UI_STRINGS = {
     hr: 'Netočno - označene stavke nisu na pravom mjestu.',
   },
   quizRankPlaceholder: { en: 'Rank...', hr: 'Poredak...' },
+  sortOldestFirst: { en: '(oldest first)', hr: '(najstariji prvi)' },
+  sortNewestFirst: { en: '(newest first)', hr: '(najnoviji prvi)' },
+  sortFewestFirst: { en: '(fewest first)', hr: '(najmanje prvo)' },
+  sortMostFirst: { en: '(most first)', hr: '(najviše prvo)' },
+  sortAZ: { en: '(A–Z)', hr: '(A–Ž)' },
+  sortZA: { en: '(Z–A)', hr: '(Ž–A)' },
 } as const;
 
 export type UiStringKey = keyof typeof UI_STRINGS;
@@ -73,6 +79,12 @@ export const TRANSLATED_PATHS: Record<string, string> = {
   '/records': '/hr/records',
   '/compare': '/hr/compare',
   '/quiz': '/hr/quiz',
+  '/competitions/copa-america': '/hr/competitions/copa-america',
+  '/competitions/nations-league': '/hr/competitions/nations-league',
+  '/competitions/ballon-dor': '/hr/competitions/ballon-dor',
+  '/competitions/world-cup': '/hr/competitions/world-cup',
+  '/competitions/euro': '/hr/competitions/euro',
+  '/competitions/golden-boot': '/hr/competitions/golden-boot',
 };
 
 /** The other language's equivalent path for the current one, if translated, else null. */

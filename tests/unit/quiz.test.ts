@@ -72,6 +72,23 @@ describe('championByYearQuestions', () => {
     expect(sparseQuestions).toHaveLength(0);
   });
 
+  it('skips the question for a "Not awarded" placeholder row, and never offers it as a distractor', () => {
+    const withPlaceholder: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['2018', 'Lionel Messi'],
+        ['2019', 'Lionel Messi'],
+        ['2020', 'Not awarded'],
+        ['2021', 'Robert Lewandowski'],
+        ['2022', 'Karim Benzema'],
+      ],
+    };
+    const placeholderEditions = buildEditions(withPlaceholder);
+    const placeholderQuestions = championByYearQuestions(placeholderEditions, "Ballon d'Or", 'ballon-dor');
+    expect(placeholderQuestions.some((q) => q.prompt.includes('2020'))).toBe(false);
+    expect(placeholderQuestions.every((q) => !q.choices.includes('Not awarded'))).toBe(true);
+  });
+
   it('builds a Croatian prompt when locale is "hr", with the same answer as English', () => {
     const enQuestions = championByYearQuestions(editions, 'FIFA World Cup', 'world-cup', 'en');
     const hrQuestions = championByYearQuestions(editions, 'FIFA World Cup', 'world-cup', 'hr');

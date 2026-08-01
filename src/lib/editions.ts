@@ -1,5 +1,6 @@
 import type { ChampionSummary, Edition, MarkdownTable, TimelineEntry } from './types';
 import { summaryGroupFor } from './countries';
+import type { Locale } from './i18n';
 
 // Turn a parsed Markdown table into normalized editions, and derive the
 // champions summary from those editions (rather than trusting a hand-maintained
@@ -50,13 +51,30 @@ export function buildEditions(table: MarkdownTable): Edition[] {
   });
 }
 
+/**
+ * Some editorial tables have a genuine "no winner" row (e.g. the 2020 Ballon
+ * d'Or, not awarded because of the pandemic) - the winner cell is filled in
+ * with a placeholder phrase rather than left blank, so it still passes the
+ * "every row needs a winner" build validation and reads correctly in the raw
+ * edition table. Aggregates derived from the winner column (the generated
+ * champions summary, the winner filter) should not count that placeholder as
+ * a one-off "champion" - it is not a country/player, it is a note that no one
+ * won. `buildTimeline` intentionally still shows it verbatim: "Not awarded"
+ * is itself the accurate historical fact for that year's timeline card.
+ */
+const PLACEHOLDER_WINNERS = /^(not awarded|not held|no award(ed)?|cancell?ed)$/i;
+
+export function isPlaceholderWinner(winner: string): boolean {
+  return PLACEHOLDER_WINNERS.test(winner.trim());
+}
+
 /** Generate champions totals from editions, grouping sporting successors. */
 export function buildChampionsSummary(editions: Edition[]): ChampionSummary[] {
   const groups = new Map<string, ChampionSummary>();
 
   for (const edition of editions) {
     const winner = edition.winner.trim();
-    if (!winner) continue;
+    if (!winner || isPlaceholderWinner(winner)) continue;
     const group = summaryGroupFor(winner);
     const existing = groups.get(group.id);
     if (existing) {
@@ -115,14 +133,23 @@ export function buildTimeline(editions: Edition[]): TimelineEntry[] {
  * (e.g. the World Cup and EURO pages showing that edition's top scorer).
  * Team/goals are appended only when those columns are present.
  */
-export function buildTopScorerFacts(editions: Edition[]): Map<string, string> {
+const GOALS_WORD: Record<Locale, string> = { en: 'goals', hr: 'golova' };
+
+/**
+ * `locale` only swaps the "goals" word in the generated detail text (e.g. for
+ * a Croatian competition page's "Top scorer" column) - the player/team names
+ * and goal count themselves are the same underlying data either way.
+ */
+export function buildTopScorerFacts(editions: Edition[], locale: Locale = 'en'): Map<string, string> {
   const facts = new Map<string, string>();
   for (const edition of editions) {
     const player = edition.winner.trim();
     if (!player) continue;
     const team = cellValue(edition, /^team$/i);
     const goals = cellValue(edition, /^goals$/i);
-    const detail = [team, goals ? `${goals} goals` : undefined].filter(Boolean).join(', ');
+    const detail = [team, goals ? `${goals} ${GOALS_WORD[locale]}` : undefined]
+      .filter(Boolean)
+      .join(', ');
     facts.set(edition.year, detail ? `${player} (${detail})` : player);
   }
   return facts;
@@ -134,7 +161,7 @@ export function distinctWinners(editions: Edition[]): string[] {
   const winners: string[] = [];
   for (const edition of editions) {
     const winner = edition.winner.trim();
-    if (winner && !seen.has(winner)) {
+    if (winner && !isPlaceholderWinner(winner) && !seen.has(winner)) {
       seen.add(winner);
       winners.push(winner);
     }
