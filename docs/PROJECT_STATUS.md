@@ -868,21 +868,35 @@ differ from `## Editions` and will need the matching `editionsHeading`:
     paragraph-vs-list rendering; the PDF download link's translated label;
     and World Cup's filter/sort/host tests already covered by the existing
     English suite carrying over unchanged).
-  - [ ] Still English-only: `/competitions/golden-boot`, the last of the six
-    competition/award pages. The reusable infrastructure is now proven five
-    times over - this is a props-and-prose slice, not new engineering, but
-    with one structural difference worth flagging in advance: the English
-    page doesn't use `CompetitionView` either, but composes **two**
-    `TournamentTable`s by hand (World Cup top scorers, EURO top scorers) from
-    two separate `loadCompetition('golden-boot', ...)` calls against the same
-    content file, under one shared header/References. Its Croatian version
-    should follow that same two-table-in-one-page shape rather than a single
-    `TournamentTable` call, reusing the `winnerLabel="Pobjednik"` override
-    pattern (a top-scorer table's champion column is "Player(s)", not
-    "Winner") and hand-translating the "World Cup notes"/"EURO notes"
-    sections. `buildTopScorerFacts(..., 'hr')` (now locale-aware, see above)
-    is not actually needed here - Golden Boot's own tables don't join in an
-    `extraColumn`, they *are* the top-scorer data.
+  - [x] `/competitions/golden-boot` - sixth and last of the six competition/
+    award pages, added 2026-08-01 (intensive run). **The full localization
+    backlog from `AGENTS.md`/`docs/WEBSITE_REQUIREMENTS.md` is now complete -
+    every page on the site has a Croatian translation.** New
+    `src/pages/hr/competitions/golden-boot.astro` follows the same
+    two-table-in-one-page shape as the English page (two separate
+    `loadCompetition('golden-boot', ...)` calls - World Cup top scorers, EURO
+    top scorers - composed by hand under one shared header/References, no
+    `CompetitionView`), reusing the exact ids the English page already uses
+    (`golden-boot-world-cup(-table/-winner/-sort)`,
+    `golden-boot-euro(-table/-winner/-sort)`, and the two `ChampionsSummary`
+    ids) so the two tables keep filtering/sorting independently. Both notes
+    sections ("World Cup notes"/"EURO notes" from `content/golden-boot.md`)
+    are hand-translated; `winnerLabel="Igrač"` reuses the same override
+    pattern the English page uses for `winnerLabel="Player"` on a top-scorer
+    table. `TRANSLATED_PATHS` gained `/competitions/golden-boot` ->
+    `/hr/competitions/golden-boot`, and the English page now passes
+    `alternateHref` so its language switcher appears (the same gap every
+    other competition page had before its own Croatian translation shipped).
+    Covered by 1 new Vitest case (`alternatePath` both directions, replacing
+    the now-obsolete "no translation yet" case, repointed at a nonexistent
+    path) and 9 new Playwright cases at 360px mirroring the existing English
+    Golden Boot coverage (no overflow with two tables stacked; translated
+    chrome/filters/headers; the 1958 World Cup and 1984 EURO top scorers
+    render; both translated notes sections; independent per-table filtering
+    by player; the World Cup award ranking's top total matches the English
+    page exactly; the downloadable PDF link and its translated label; the
+    switcher opens the Croatian page from English and returns from
+    Croatian).
 
 ## Known caveats
 
