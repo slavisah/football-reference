@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
+import { withBase } from '../../lib/url';
 
 const data = await loadCompetition('ballon-dor', {
   editionsHeading: 'Winners',
@@ -13,6 +14,7 @@ const data = await loadCompetition('ballon-dor', {
 <BaseLayout
   title={data.title}
   description="Every Men's Ballon d'Or winner since 1956, with national team and a generated award count. Filter by winner and year."
+  alternateHref={withBase('/hr/competitions/ballon-dor')}
 >
   <CompetitionView
     data={data}

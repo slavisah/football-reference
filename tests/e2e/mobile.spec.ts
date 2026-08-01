@@ -261,6 +261,86 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
     await expect(page).toHaveURL(/\/hr\/competitions\/copa-america\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
+
+  test("the language switcher opens the Croatian Ballon d'Or page", async ({ page }) => {
+    await page.goto('competitions/ballon-dor');
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/competitions\/ballon-dor\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360px phone", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/competitions/ballon-dor');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome, filters and column headers', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.getByRole('heading', { name: 'Zlatna lopta', level: 1 })).toBeVisible();
+    await expect(page.locator('label[for="ballon-dor-winner"]')).toHaveText('Pobjednik');
+    await expect(page.locator('th', { hasText: 'Godina' })).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Pobjednik' })).toBeVisible();
+    await expect(page.locator('th', { hasText: 'Reprezentacija' })).toBeVisible();
+  });
+
+  test('filtering by pobjednik (winner) Lionel Messi updates the shareable URL and status text', async ({
+    page,
+  }) => {
+    await page.selectOption('#ballon-dor-winner', 'Lionel Messi');
+    await expect(page).toHaveURL(/winner=Lionel(\+|%20)Messi/);
+    await expect(page.locator('#ballon-dor-status')).toContainText('pobjednik Lionel Messi');
+  });
+
+  test('shows the same champion totals as the English page', async ({ page, baseURL }) => {
+    const hrTop = await page.locator('.champions__name').first().textContent();
+    const hrCount = await page.locator('.champions__count').first().textContent();
+
+    await page.goto(baseURL ? `${baseURL}competitions/ballon-dor` : '/competitions/ballon-dor');
+    const enTop = await page.locator('.champions__name').first().textContent();
+    const enCount = await page.locator('.champions__count').first().textContent();
+
+    expect(hrTop).toBe(enTop);
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
+  });
+
+  test('sorting preserves the 2020 "Not awarded" historical note verbatim', async ({ page }) => {
+    const row2020 = page.locator('tbody tr[data-year="2020"]');
+    await expect(row2020).toContainText('Not awarded');
+
+    await page.selectOption('#ballon-dor-sort', 'winner-asc');
+    await expect(row2020).toContainText('Not awarded');
+    await expect(row2020).toBeVisible();
+  });
+
+  test('shows the translated Notes section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Napomene' })).toBeVisible();
+    await expect(page.getByText('Lev Jašin ostaje jedini vratar')).toBeVisible();
+  });
+
+  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/ballon-dor.pdf"]');
+    await expect(link).toContainText('Preuzmi PDF za ispis');
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
+
+  test("the language switcher returns to the English Ballon d'Or page", async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/competitions\/ballon-dor\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
 });
 
 test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 360px phone', () => {

@@ -1,0 +1,157 @@
+---
+// Croatian translation of src/pages/competitions/ballon-dor.astro. Third of
+// the six competition/award pages localized (Copa América and Nations League
+// came first) - see docs/PROJECT_STATUS.md for the rollout plan and what's
+// left. Loads the exact same `loadCompetition('ballon-dor', ...)` call as the
+// English page, so the table data, generated champions summary and reference
+// links can never drift between languages - only this page's own chrome
+// (filters, sort labels, status text, column headers) and a hand-translated
+// intro/notes paragraph are Croatian. Composes its own layout by hand (like
+// hr/competitions/copa-america.astro and hr/competitions/nations-league.astro)
+// rather than through the shared English-only CompetitionView, so the English
+// page needed no changes beyond the locale props already added for the Copa
+// América slice. Unlike the two team competitions done so far, this table has
+// no host column (an individual award, not hosted) - `hosts` stays the
+// TournamentTable default `[]`, which already omits the host filter/label for
+// free, so no new prop plumbing was needed here.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import TournamentTable from '../../../components/TournamentTable.astro';
+import ChampionsSummary from '../../../components/ChampionsSummary.astro';
+import EditorialNotes from '../../../components/EditorialNotes.astro';
+import References from '../../../components/References.astro';
+import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
+import { loadCompetition } from '../../../lib/competition';
+import { withBase } from '../../../lib/url';
+import type { NoteSection } from '../../../lib/notes';
+
+const data = await loadCompetition('ballon-dor', {
+  editionsHeading: 'Winners',
+  sourcesHeading: "Ballon d'Or",
+});
+
+const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+// Croatian display name for the award, matching the name already established
+// on the Croatian home page (homeCards.ts's CARD_TEXT) - data.title itself
+// stays the raw English front-matter value ("Men's Ballon d'Or").
+const title = 'Zlatna lopta';
+
+// Hand-translated from content/ballon-dor.md's "Notes" section. content/
+// itself stays untouched and English (the single editorial source of truth);
+// this is presentation-layer text local to this page only, the same way
+// hr/competitions/copa-america.astro and hr/competitions/nations-league.astro
+// hand-write their own Croatian prose.
+const notes: NoteSection[] = [
+  {
+    heading: 'Napomene',
+    items: [
+      'Lev Jašin ostaje jedini vratar koji je osvojio ovu mušku nagradu.',
+      'George Weah je 1995. postao prvi afrički dobitnik nagrade.',
+      'Luka Modrić je nagradu osvojio 2018. godine.',
+      'Nagrada za 2020. godinu nije dodijeljena.',
+      'Ousmane Dembélé osvojio je nagradu za 2025. godinu.',
+    ],
+  },
+];
+
+const headerLabels: Record<string, string> = {
+  Year: 'Godina',
+  Winner: 'Pobjednik',
+  'National team': 'Reprezentacija',
+};
+---
+
+<BaseLayout
+  title={title}
+  description="Svaki dobitnik muške Zlatne lopte od 1956., s reprezentacijom i generiranim brojem nagrada. Filtriraj po dobitniku i godini."
+  locale="hr"
+  alternateHref={withBase('/competitions/ballon-dor')}
+>
+  <article class="competition stack">
+    <header class="competition__header">
+      <p class="eyebrow badge">{statusText}</p>
+      <h1>{title}</h1>
+      <p class="competition__intro">
+        France Football je 1956. godine pokrenuo Zlatnu loptu. Pravila
+        prihvatljivosti mijenjala su se tijekom vremena: nagrada je isprva
+        bila ograničena na europske igrače, 1995. otvorena je igračima bilo
+        koje nacionalnosti u europskim klubovima, a od 2007. postala je
+        potpuno globalna. Od 2010. do 2015. dodjeljivala se zajedno s
+        FIFA-om.
+      </p>
+      <PrintDownloadLink
+        slug="ballon-dor"
+        label="Preuzmi PDF za ispis"
+        hint="A4 položeno, ista tablica i zbrojevi kao na ovoj stranici."
+      />
+    </header>
+
+    <TournamentTable
+      id="ballon-dor"
+      caption="Dobitnici Zlatne lopte, od 1956. do danas"
+      table={data.table}
+      editions={data.editions}
+      winners={data.winners}
+      hosts={data.hosts}
+      locale="hr"
+      headerLabels={headerLabels}
+      winnerLabel="Pobjednik"
+      winnerAllLabel="Svi pobjednici"
+      yearLabel="Godina"
+      yearAllLabel="Sve godine"
+      sortByLabel="Sortiraj po"
+      resetLabel="Poništi"
+      filterAriaLabel="Filtriraj dobitnike Zlatne lopte"
+      showingAllTemplate="Prikazano svih {n} izdanja."
+      showingFilteredTemplate="Prikazano {shown} od {total} izdanja ({bits})."
+      bitWinnerPrefix="pobjednik"
+      bitYearPrefix="godina"
+      emptyText="Nijedno izdanje ne odgovara odabranim filterima."
+      clearFiltersLabel="Očisti filtere"
+    />
+
+    <ChampionsSummary
+      champions={data.champions}
+      scaleMax={data.editions.length}
+      heading="Prvaci po broju naslova"
+      description="Automatski generirano iz gornje tablice izdanja. Zbrojevi grupiraju naciju s njezinim sportskim nasljednikom samo tamo gdje to čini izvorni sadržaj; svaki drugi naziv broji se onako kako je zapisan."
+      unit={['naslov', 'naslova']}
+      winningYearsLabel="Godine osvajanja: "
+    />
+
+    <EditorialNotes sections={notes} />
+
+    <References
+      sources={data.sources}
+      lastReviewed={data.lastReviewed}
+      status={data.status}
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText={statusText}
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+      noteText="Prednost imaju primarni izvori. Povijesni formati i nazivi reprezentacija bilježe se onako kako su korišteni u to vrijeme; kontekst potražite u napomenama uz svako izdanje."
+    />
+  </article>
+</BaseLayout>
+
+<style>
+  .competition__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .competition__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .competition__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+</style>

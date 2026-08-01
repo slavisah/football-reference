@@ -90,4 +90,13 @@ describe('alternatePath', () => {
       '/competitions/nations-league',
     );
   });
+
+  it("maps the English Ballon d'Or page to its Croatian translation and back", () => {
+    expect(alternatePath('/competitions/ballon-dor', 'en')).toBe(
+      '/hr/competitions/ballon-dor',
+    );
+    expect(alternatePath('/hr/competitions/ballon-dor', 'hr')).toBe(
+      '/competitions/ballon-dor',
+    );
+  });
 });
