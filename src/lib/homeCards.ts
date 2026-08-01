@@ -55,18 +55,81 @@ export type HomeCard = {
   topChampion: CompetitionData['champions'][number] | undefined;
   statLabel?: string;
   accent: string;
+  // Text-only variants of `accent`, one per theme, both tuned to ~5.7:1
+  // contrast (comfortably above the WCAG AA 4.5:1 minimum) against that
+  // theme's --bg-elevated. `accent` itself only passes AA text contrast in
+  // one theme or the other depending on hue - e.g. the World Cup green
+  // reads fine on white but is too dark against the near-black dark-mode
+  // background, while the Copa América gold is the opposite - so the "Open
+  // table" link can't just reuse the bar/border accent directly. `accent`
+  // stays as-is for the decorative bar background and hover border, which
+  // aren't text and have no contrast requirement. See the "color-contrast"
+  // cases in tests/e2e/accessibility.spec.ts (run once with the default
+  // light color scheme, once with `colorScheme: 'dark'`, while developing
+  // this fix - light mode alone missed the dark-mode failures).
+  accentTextLight: string;
+  accentTextDark: string;
   icon: string;
 };
 
 type CardKey = keyof HomeCompetitions;
 
-const CARD_META: { key: CardKey; path: string; accent: string; icon: string }[] = [
-  { key: 'worldCup', path: '/competitions/world-cup', accent: '#1f6f4f', icon: '🌍' },
-  { key: 'euro', path: '/competitions/euro', accent: '#2f5fa8', icon: '🏟️' },
-  { key: 'copaAmerica', path: '/competitions/copa-america', accent: '#c98a1f', icon: '🌎' },
-  { key: 'nationsLeague', path: '/competitions/nations-league', accent: '#6b4fa0', icon: '🎖️' },
-  { key: 'ballonDor', path: '/competitions/ballon-dor', accent: '#b8912a', icon: '🥇' },
-  { key: 'goldenBoot', path: '/competitions/golden-boot', accent: '#a83e3e', icon: '👟' },
+const CARD_META: {
+  key: CardKey;
+  path: string;
+  accent: string;
+  accentTextLight: string;
+  accentTextDark: string;
+  icon: string;
+}[] = [
+  {
+    key: 'worldCup',
+    path: '/competitions/world-cup',
+    accent: '#1f6f4f',
+    accentTextLight: '#207453',
+    accentTextDark: '#31ae7c',
+    icon: '🌍',
+  },
+  {
+    key: 'euro',
+    path: '/competitions/euro',
+    accent: '#2f5fa8',
+    accentTextLight: '#3266b4',
+    accentTextDark: '#749cd8',
+    icon: '🏟️',
+  },
+  {
+    key: 'copaAmerica',
+    path: '/competitions/copa-america',
+    accent: '#c98a1f',
+    accentTextLight: '#895e15',
+    accentTextDark: '#ce8d20',
+    icon: '🌎',
+  },
+  {
+    key: 'nationsLeague',
+    path: '/competitions/nations-league',
+    accent: '#6b4fa0',
+    accentTextLight: '#7457ac',
+    accentTextDark: '#a491c9',
+    icon: '🎖️',
+  },
+  {
+    key: 'ballonDor',
+    path: '/competitions/ballon-dor',
+    accent: '#b8912a',
+    accentTextLight: '#7e631d',
+    accentTextDark: '#bd952b',
+    icon: '🥇',
+  },
+  {
+    key: 'goldenBoot',
+    path: '/competitions/golden-boot',
+    accent: '#a83e3e',
+    accentTextLight: '#b04141',
+    accentTextDark: '#d28686',
+    icon: '👟',
+  },
 ];
 
 type CardText = { title: string; blurb: string; statLabel?: string };
@@ -131,7 +194,7 @@ const CARD_TEXT: Record<Locale, Record<CardKey, CardText>> = {
 };
 
 export function buildHomeCards(locale: Locale, data: HomeCompetitions): HomeCard[] {
-  return CARD_META.map(({ key, path, accent, icon }) => {
+  return CARD_META.map(({ key, path, accent, accentTextLight, accentTextDark, icon }) => {
     const competition = data[key];
     const text = CARD_TEXT[locale][key];
     return {
@@ -142,6 +205,8 @@ export function buildHomeCards(locale: Locale, data: HomeCompetitions): HomeCard
       topChampion: competition.champions[0],
       statLabel: text.statLabel,
       accent,
+      accentTextLight,
+      accentTextDark,
       icon,
     };
   });

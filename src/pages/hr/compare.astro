@@ -155,7 +155,12 @@ const recordsForClient = allRecords.map((r) => ({
             return (
               <div class="compare__side">
                 <h3 id={`compare-${side}-name`}>{record.displayName}</h3>
-                <div class="t-wrap">
+                <div
+                  class="t-wrap"
+                  tabindex="0"
+                  role="region"
+                  aria-label={`Učinak reprezentacije ${record.displayName} po natjecanjima`}
+                >
                   <table class="compare__table">
                     <caption class="visually-hidden">
                       Učinak reprezentacije {record.displayName} po natjecanjima
@@ -216,7 +221,12 @@ const recordsForClient = allRecords.map((r) => ({
         poredana po broju naslova. Odaberite bilo koje dvije iznad za izravnu
         usporedbu.
       </p>
-      <div class="t-wrap">
+      <div
+        class="t-wrap"
+        tabindex="0"
+        role="region"
+        aria-label="Ukupan učinak svih reprezentacija, poredan po broju naslova"
+      >
         <table class="compare__table compare__table--all">
           <caption class="visually-hidden">Ukupan učinak svih reprezentacija, poredan po broju naslova</caption>
           <thead>

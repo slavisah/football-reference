@@ -127,7 +127,12 @@ const recordsForClient = allRecords.map((r) => ({
             return (
               <div class="compare__side">
                 <h3 id={`compare-${side}-name`}>{record.displayName}</h3>
-                <div class="t-wrap">
+                <div
+                  class="t-wrap"
+                  tabindex="0"
+                  role="region"
+                  aria-label={`${record.displayName}'s record by competition`}
+                >
                   <table class="compare__table">
                     <caption class="visually-hidden">
                       {record.displayName}'s record by competition
@@ -187,7 +192,12 @@ const recordsForClient = allRecords.map((r) => ({
         semifinal in at least one of these four competitions, ranked by
         titles. Pick any two above to compare them directly.
       </p>
-      <div class="t-wrap">
+      <div
+        class="t-wrap"
+        tabindex="0"
+        role="region"
+        aria-label="All national teams' combined record, ranked by titles"
+      >
         <table class="compare__table compare__table--all">
           <caption class="visually-hidden">All national teams' combined record, ranked by titles</caption>
           <thead>

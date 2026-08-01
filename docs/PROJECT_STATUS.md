@@ -15,9 +15,11 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 105 Vitest unit tests
+pnpm test                      # 112 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 121 Playwright tests at 360px
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 175 Playwright tests at 360px (mobile
+                                          # smoke + a WCAG 2.1 A/AA sweep, light
+                                          # and dark, across every page)
 ```
 
 Publishing: push to `main`; the Pages workflow builds and deploys.
@@ -939,6 +941,64 @@ case, the filter-exclusion case, and the timeline verbatim case;
 new Playwright case at 360px confirming "Not awarded" is absent from both the
 winner `<select>` options and the champions-summary section on the live
 Ballon d'Or page.
+
+### Quality pass: automated WCAG 2.1 A/AA sweep, plus two real contrast/keyboard bugs it found
+
+Added 2026-08-01 (intensive run). With every backlog item and the full
+localization pass complete, the site had hand-written accessibility checks
+(keyboard focus, filter operability, no-360px-overflow) but nothing that
+automatically audits WCAG rules like color contrast, landmark structure, or
+scrollable-region keyboard access across the whole site. New
+`tests/e2e/accessibility.spec.ts` uses `@axe-core/playwright` to run an axe
+scan (`wcag2a`/`wcag2aa`/`wcag21a`/`wcag21aa` tags, `region` rule disabled -
+the skip-link's target anchor legitimately sits just outside `<main>`)
+against all 22 live pages (the 11 `NAV_LINKS` plus their 11
+`TRANSLATED_PATHS` Croatian equivalents), under **both** light and dark
+`colorScheme` (`test.describe` per scheme via `test.use`) - 44 cases total.
+Testing only the default (light) scheme during development missed real
+dark-mode-only failures, which is why both are covered permanently now, not
+just light.
+
+The sweep found and fixed two genuine bugs, both pre-existing (not
+introduced by this run):
+
+- **Home page card links failed color contrast in one theme or the other.**
+  Each competition card's accent color (`homeCards.ts`) is reused directly
+  as the "Open table" link's text color; the World Cup/EURO/Nations
+  League/Golden Boot accents are dark enough to read fine on the light
+  theme's white card background but fail AA (2.5-2.6:1, need 4.5:1) against
+  the dark theme's near-black background, while the Copa América/Ballon d'Or
+  gold accents are the reverse - fine in dark mode, fail (2.9:1) on white.
+  `homeCards.ts` now carries two additional per-card fields,
+  `accentTextLight`/`accentTextDark` (~5.7:1 against `--bg-elevated` in each
+  theme, computed by holding each accent's hue/saturation fixed and solving
+  for a lightness that hits the target contrast - not just an eyeballed
+  darken/lighten), rendered as `--card-accent-text-light`/
+  `-dark` custom properties (`index.astro`, `hr/index.astro`) alongside the
+  existing `--card-accent` (unchanged, still used for the purely decorative
+  top bar and hover border, which have no text-contrast requirement). The
+  CSS picks between them with the same `@media (prefers-color-scheme: dark)`
+  + `:root[data-theme]` precedence the rest of the site already uses for
+  theme switching (`ThemeToggle.astro`'s icon rule was the existing
+  precedent for the `:root:not([data-theme='light'])` guard, needed so an OS
+  dark preference doesn't override an explicit manual "light" choice).
+- **The `/compare` page's two side-by-side tables and its all-teams ranking
+  table had no keyboard way to scroll their horizontally-overflowing
+  `.t-wrap` wrapper** (`axe`'s `scrollable-region-focusable`) - a mouse/touch
+  user could scroll them at 360px, a keyboard-only user could not. Fixed by
+  adding `tabindex="0" role="region" aria-label="..."` (reusing each table's
+  existing caption text) to the three wrappers in `compare.astro` and their
+  Croatian equivalents in `hr/compare.astro`. `TournamentTable.astro`'s own
+  `.t-wrap` (used by every competition table) got the same treatment
+  defensively, even though it wasn't flagged today - its tables collapse to
+  non-scrolling stacked cards at the tested 360px width, but a future wider
+  table or a desktop-only overflow case would hit the identical bug, and the
+  fix has no visual effect either way (`[tabindex]:focus-visible` was
+  already a global rule, so no new CSS was needed).
+
+No other page or theme combination had a violation. Covered entirely by the
+new Playwright suite above (44 cases) - there's no pure function to unit
+test here, only rendered contrast and DOM structure.
 
 ## Known caveats
 
