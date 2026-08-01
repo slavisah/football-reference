@@ -17,7 +17,7 @@ pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
 pnpm test                      # 112 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 175 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 179 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
                                           # and dark, across every page)
 ```
@@ -999,6 +999,60 @@ introduced by this run):
 No other page or theme combination had a violation. Covered entirely by the
 new Playwright suite above (44 cases) - there's no pure function to unit
 test here, only rendered contrast and DOM structure.
+
+### Quality pass: SEO essentials - canonical/Open Graph tags, sitemap.xml, robots.txt
+
+Added 2026-08-01 (intensive run). With the full backlog, localization, and the
+WCAG sweep already done, the site had no discoverability layer at all: no
+canonical URLs, no Open Graph/Twitter Card tags (a shared link showed a bare
+URL with no preview), no `sitemap.xml`, and no `robots.txt`. All four are
+implemented the same way the site's other generated files already are
+(`manifest.webmanifest.ts`, `sw.js.ts`): computed at build time from
+`Astro.site`/`BASE_PATH` so nothing is hand-typed for one deployment, and
+driven from the single existing route lists (`NAV_LINKS` in `src/lib/
+routes.ts`, `TRANSLATED_PATHS` in `src/lib/i18n.ts`) so a page can't be added
+to the nav and silently missed here, the same guarantee those two lists
+already gave the offline precache list.
+
+- **`BaseLayout.astro`** now renders a `<link rel="canonical">`, a matching
+  hreflang alternate-link pair on every translated page (reusing the
+  `alternateHref` prop every page already passes for the language switcher -
+  no new prop needed), and Open Graph + Twitter Card meta tags (`og:type`,
+  `og:site_name`, `og:title`, `og:description`, `og:url`, `og:locale` +
+  `og:locale:alternate`, `og:image`, `twitter:card`/`title`/`description`/
+  `image`). `og:description`/`twitter:description` reuse each page's existing
+  `description` prop, so nothing needed adding per-page. `og:image` points at
+  the existing `icon-512.png` PWA icon (already in `public/icons/`, not a
+  scraped photograph, so it doesn't touch the "never copy copyrighted photos"
+  rule in `AGENTS.md`) rather than requiring new per-page social images.
+- **`src/pages/sitemap.xml.ts`** (new) generates one `<url>` per locale of
+  every `NAV_LINKS` page (22 total today), each with an `xhtml:link
+  rel="alternate"` pair back to its translation and a `<lastmod>` read from
+  that page's own `lastReviewed` front matter via `getEntry('pages', id)` -
+  the same field the page itself already displays, so the sitemap can't claim
+  a different freshness date than the page does.
+- **`src/pages/robots.txt.ts`** (new) allows all crawling and points at the
+  generated sitemap's real absolute URL.
+- Both new routes follow the exact `export const prerender = true` /
+  `APIRoute` shape `manifest.webmanifest.ts` and `sw.js.ts` already use, so no
+  new pattern was introduced.
+
+Covered by 4 new Playwright cases (`tests/e2e/mobile.spec.ts`): canonical +
+Open Graph + Twitter Card tags on the World Cup page; a translated pair's
+hreflang links pointing at each other correctly in both directions;
+`robots.txt`'s `Allow`/`Sitemap` lines; and `sitemap.xml`'s URL count,
+locale pairing and `<lastmod>` format. No unit test was added - there's no
+pure function here beyond what `getEntry`/`withBase` already cover elsewhere.
+Verified locally with a full `pnpm build` (22 pages + the two new generated
+routes) and the full Playwright suite (179 cases, up from 175) passing
+together, confirming the `BaseLayout.astro` change didn't regress any
+existing page.
+
+**Left for a future pass:** JSON-LD structured data (e.g. `SportsOrganization`/
+`Article` schema) was considered and deliberately deferred - it would need a
+per-competition-type schema shape to be genuinely useful to search engines
+rather than boilerplate, which is a bigger design decision than fits a single
+quality-pass item.
 
 ## Known caveats
 
