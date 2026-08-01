@@ -6,6 +6,7 @@ import {
   buildTopScorerFacts,
   distinctHosts,
   distinctWinners,
+  isPlaceholderWinner,
 } from '../../src/lib/editions';
 import type { MarkdownTable } from '../../src/lib/types';
 
@@ -75,6 +76,35 @@ describe('buildChampionsSummary', () => {
       'Spain',
     ]);
   });
+
+  it('excludes a "Not awarded" placeholder row, like the 2020 Ballon d\'Or, from the totals', () => {
+    const withPlaceholder: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['2019', 'Lionel Messi'],
+        ['2020', 'Not awarded'],
+        ['2021', 'Lionel Messi'],
+      ],
+    };
+    const summary = buildChampionsSummary(buildEditions(withPlaceholder));
+    expect(summary).toHaveLength(1);
+    expect(summary[0]).toMatchObject({ displayName: 'Lionel Messi', titles: 2 });
+  });
+});
+
+describe('isPlaceholderWinner', () => {
+  it('recognizes common "no winner" phrases case-insensitively', () => {
+    expect(isPlaceholderWinner('Not awarded')).toBe(true);
+    expect(isPlaceholderWinner('not held')).toBe(true);
+    expect(isPlaceholderWinner('Cancelled')).toBe(true);
+    expect(isPlaceholderWinner('Canceled')).toBe(true);
+    expect(isPlaceholderWinner('No award')).toBe(true);
+  });
+
+  it('does not flag a real winner name', () => {
+    expect(isPlaceholderWinner('Spain')).toBe(false);
+    expect(isPlaceholderWinner('Lionel Messi')).toBe(false);
+  });
 });
 
 describe('distinctWinners', () => {
@@ -84,6 +114,17 @@ describe('distinctWinners', () => {
       'Spain',
       'West Germany',
     ]);
+  });
+
+  it('omits a "Not awarded" placeholder row from the filter options', () => {
+    const withPlaceholder: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['2019', 'Lionel Messi'],
+        ['2020', 'Not awarded'],
+      ],
+    };
+    expect(distinctWinners(buildEditions(withPlaceholder))).toEqual(['Lionel Messi']);
   });
 });
 
@@ -141,6 +182,15 @@ describe('buildTimeline', () => {
     const timeline = buildTimeline(buildEditions(table));
     expect(timeline[0].runnerUp).toBeUndefined();
     expect(timeline[0].final).toBeUndefined();
+  });
+
+  it('still shows a "Not awarded" placeholder row verbatim - it is the accurate fact for that year', () => {
+    const withPlaceholder: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [['2020', 'Not awarded']],
+    };
+    const timeline = buildTimeline(buildEditions(withPlaceholder));
+    expect(timeline[0].champion).toBe('Not awarded');
   });
 });
 

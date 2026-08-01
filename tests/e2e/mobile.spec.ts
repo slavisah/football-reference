@@ -483,6 +483,17 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
     await expect(row2020).toBeVisible();
   });
 
+  test('the 2020 "Not awarded" row is not a champions-summary entry or a filter option', async ({
+    page,
+  }) => {
+    // The raw table row still shows it (checked above); it just should not be
+    // counted as a one-off "champion" in the generated summary, nor offered
+    // as something a reader could filter the table down to.
+    const winnerOptions = await page.locator('#ballon-dor-winner option').allTextContents();
+    expect(winnerOptions).not.toContain('Not awarded');
+    await expect(page.locator('.champions')).not.toContainText('Not awarded');
+  });
+
   test('the language switcher opens the Croatian Copa América page', async ({ page }) => {
     await page.goto('competitions/copa-america');
     await page.locator('a.lang-switch').click();

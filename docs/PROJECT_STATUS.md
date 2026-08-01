@@ -207,9 +207,10 @@ differ from `## Editions` and will need the matching `editionsHeading`:
       'Winners'`); the generic table already handles "winner + national team,
       no host/teams" since it only renders columns that are present. Page at
       `src/pages/competitions/ballon-dor.astro`. The 2020 "Not awarded" row is
-      preserved verbatim and passes validation (non-empty winner), though it
-      does appear as its own one-off entry in the generated champions summary
-      and winner filter - a known minor rough edge, not fixed here.
+      preserved verbatim and passes validation (non-empty winner). It no
+      longer appears as a one-off entry in the generated champions summary or
+      winner filter - see the quality-pass entry near the end of this file
+      (2026-08-01, intensive run) for the fix.
 - [x] Golden Boot / top scorers (`content/golden-boot.md`) - two tables (World
       Cup and EURO top scorers) in one file. Page at
       `src/pages/competitions/golden-boot.astro`. Since one content file holds
@@ -897,6 +898,47 @@ differ from `## Editions` and will need the matching `editionsHeading`:
     page exactly; the downloadable PDF link and its translated label; the
     switcher opens the Croatian page from English and returns from
     Croatian).
+
+### Quality pass: "Not awarded" placeholder no longer pollutes generated aggregates
+
+Added 2026-08-01 (intensive run). By this point every required and
+nice-to-have item from `docs/WEBSITE_REQUIREMENTS.md` and `AGENTS.md`'s
+milestone list has a live page, including the full Croatian localization
+backlog finished earlier the same day - so this run is the "genuinely useful
+quality pass" fallback rather than a new page. It fixes a bug in code, not a
+content correction: the 2020 Ballon d'Or's "Not awarded" placeholder winner
+(`content/ballon-dor.md`, kept verbatim per editorial policy - no historical
+fact was touched) was leaking into two places that treat the winner column as
+a real answer:
+
+- The generated champions summary (`buildChampionsSummary`) was counting it
+  as a one-off "champion" with 1 title, and the winner filter dropdown
+  (`distinctWinners`) offered "Not awarded" as something a reader could
+  filter the table down to - both flagged as a known rough edge in this file
+  and in `IMPLEMENTATION_NOTES.md`'s "Content caveats" section but not
+  previously fixed.
+- The `/quiz` and `/hr/quiz` question generator (`questionsFromWinners` in
+  `src/lib/quiz.ts`, feeding `championByYearQuestions`) could ask "Who won
+  the Ballon d'Or in 2020?" with "Not awarded" as the correct multiple-choice
+  answer, and could offer "Not awarded" as a nonsensical wrong-answer choice
+  for every *other* year's question.
+
+New `isPlaceholderWinner()` in `src/lib/editions.ts` (a small regex covering
+"not awarded", "not held", "no award(ed)", "cancelled/canceled") is now
+checked everywhere a winner value feeds an aggregate or a set of answer
+choices. `buildTimeline()` (the Records-page timeline and the Croatian
+records page) is deliberately **not** changed - "Not awarded" is itself the
+correct historical fact for that year's timeline card, so it still renders
+there verbatim. The raw Editions table row is untouched either way; only the
+*derived* summary/filter/quiz outputs change. Generalized rather than
+hardcoded to Ballon d'Or/2020, so it would also catch a future "Not held"
+row on another award page without new code. Covered by 6 new Vitest cases
+(`tests/unit/editions.test.ts`: `isPlaceholderWinner`, the summary-exclusion
+case, the filter-exclusion case, and the timeline verbatim case;
+`tests/unit/quiz.test.ts`: the question-skip + no-distractor-leak case) and 1
+new Playwright case at 360px confirming "Not awarded" is absent from both the
+winner `<select>` options and the champions-summary section on the live
+Ballon d'Or page.
 
 ## Known caveats
 
