@@ -791,17 +791,55 @@ differ from `## Editions` and will need the matching `editionsHeading`:
     totals match the English page exactly, the translated Key facts section
     renders, the PDF download link shows the translated label and resolves,
     and the switcher returns to English).
-  - [ ] Still English-only: the other four competition/award pages (World
-    Cup, EURO, Ballon d'Or, Golden Boot). The reusable infrastructure for
-    this is now proven twice over (Copa América + Nations League) - each
-    remaining page is a props-and-prose slice, not new engineering: write
-    `src/pages/hr/competitions/<slug>.astro` composing the same components
-    by hand, supply a `headerLabels` map for that table's own English
-    headers, translate the filter/status strings (copy the Copa América/
-    Nations League pages' Croatian values - they're competition-agnostic
-    chrome text) and hand-translate that page's own "Memorable moments"/
-    notes prose. Golden Boot is the one exception worth flagging in advance:
-    its English page doesn't use `CompetitionView` either (it composes two
+  - [x] `/competitions/ballon-dor` - third of the six competition/award
+    pages translated, added 2026-08-01 (intensive run). Confirms the
+    reusable infrastructure needed zero further changes for an
+    individual-award page with no host column: `hosts` stays the
+    `TournamentTable` default `[]`, which already omits the host
+    filter/label for free (no new prop plumbing). New
+    `src/pages/hr/competitions/ballon-dor.astro` composes its own layout by
+    hand (like the Croatian Copa América and Nations League pages), loading
+    the exact same `loadCompetition('ballon-dor', ...)` call as the English
+    page so the table data, generated champions summary (award/title counts)
+    and reference links can never drift between languages. The page's own
+    "Zlatna lopta" display name and `<title>` reuse the exact string already
+    established on the Croatian home page (`homeCards.ts`'s `CARD_TEXT`),
+    rather than `data.title` (the raw English front-matter value "Men's
+    Ballon d'Or"), matching how the Croatian Nations League page handles its
+    own display name. The "Winner"/"National team" column headers translate
+    via `headerLabels` ("Pobjednik"/"Reprezentacija") the same way the two
+    prior pages did; the `ChampionsSummary` heading/description are left at
+    their translated-default wording (matching the English page, which
+    itself doesn't override them via `CompetitionView` even though this is
+    an individual award, not a team competition - a pre-existing minor
+    copy inconsistency on the English site, out of scope here, so the
+    Croatian page mirrors it exactly rather than silently fixing it). The
+    "Notes" section (`content/ballon-dor.md`) is hand-translated Croatian
+    prose local to this page only, same precedent as the two prior pages'
+    Memorable-moments/Key-facts sections. `TRANSLATED_PATHS` gained
+    `/competitions/ballon-dor` -> `/hr/competitions/ballon-dor`, and the
+    English page now passes `alternateHref` so its language switcher
+    appears (the same one-line gap every previously-translated page had
+    before its own translation). Covered by 1 new Vitest case
+    (`alternatePath` both directions) and 9 new Playwright cases at 360px
+    (English page: no overflow, language switcher opens the Croatian one;
+    Croatian page: no overflow, translated filter labels/column headers,
+    filtering by "pobjednik" Lionel Messi updates the URL and status text,
+    champion totals match the English page exactly, sorting by winner still
+    preserves the 2020 "Not awarded" historical note verbatim, the
+    translated Notes section renders, the PDF download link shows the
+    translated label and resolves, and the switcher returns to English).
+  - [ ] Still English-only: the other three competition/award pages (World
+    Cup, EURO, Golden Boot). The reusable infrastructure for this is now
+    proven three times over (Copa América + Nations League + Ballon d'Or) -
+    each remaining page is a props-and-prose slice, not new engineering:
+    write `src/pages/hr/competitions/<slug>.astro` composing the same
+    components by hand, supply a `headerLabels` map for that table's own
+    English headers, translate the filter/status strings (copy the existing
+    three Croatian pages' values - they're competition-agnostic chrome text)
+    and hand-translate that page's own "Memorable moments"/notes prose.
+    Golden Boot is the one exception worth flagging in advance: its English
+    page doesn't use `CompetitionView` either (it composes two
     `TournamentTable`s by hand for the two top-scorer tables), so its
     Croatian version can follow the same pattern used here rather than
     `CompetitionView`. World Cup and EURO both also join in a per-year "Top
