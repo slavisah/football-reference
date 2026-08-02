@@ -87,6 +87,11 @@ const winnerColIndex = table.headers.findIndex((header) =>
   /winner|champion|player/i.test(header),
 );
 
+// A "Format" column (e.g. Copa América's league-table/final-playoff/
+// knockout-final/home-and-away/special-edition audit) renders as a small
+// badge, matching the existing status badge style, rather than plain text.
+const formatColIndex = table.headers.findIndex((header) => /^format$/i.test(header.trim()));
+
 // "Sort by" options: only the columns worth sorting by (Year/Season, Winner,
 // Host, a numeric quantity column), detected the same way `buildEditions`
 // derives those roles. Defaults to Year newest-first, matching the row order
@@ -179,7 +184,7 @@ const defaultSort = defaultSortValue(sortOptions);
                   data-label={headerLabels[cell.label] ?? cell.label}
                   class={index === winnerColIndex ? 'is-winner' : undefined}
                 >
-                  {cell.value}
+                  {index === formatColIndex ? <span class="badge">{cell.value}</span> : cell.value}
                 </td>
               ))}
               {extraColumn && (

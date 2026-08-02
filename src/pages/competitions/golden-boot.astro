@@ -6,7 +6,8 @@ import EditorialNotes from '../../components/EditorialNotes.astro';
 import References from '../../components/References.astro';
 import PrintDownloadLink from '../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../lib/competition';
-import { withBase } from '../../lib/url';
+import { absolutePageUrl, withBase } from '../../lib/url';
+import { buildChampionsItemList } from '../../lib/jsonLd';
 
 const [worldCup, euro] = await Promise.all([
   loadCompetition('golden-boot', {
@@ -27,12 +28,29 @@ const [worldCup, euro] = await Promise.all([
 const sources = [...worldCup.sources, ...euro.sources].filter(
   (source, index, all) => all.findIndex((s) => s.url === source.url) === index,
 );
+
+// Two separate ItemLists, matching how ChampionsSummary itself is duplicated
+// below - one Golden Boot ranking per competition, not a merged one.
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [
+  buildChampionsItemList(worldCup.champions, {
+    pageUrl,
+    name: 'Most World Cup Golden Boots',
+    unit: ['award', 'awards'],
+  }),
+  buildChampionsItemList(euro.champions, {
+    pageUrl,
+    name: 'Most EURO top-scorer awards',
+    unit: ['award', 'awards'],
+  }),
+];
 ---
 
 <BaseLayout
   title={worldCup.title}
   description="FIFA World Cup and UEFA EURO top-scorer awards, with player, team and goals. Filter each table by player and year."
   alternateHref={withBase('/hr/competitions/golden-boot')}
+  jsonLd={jsonLd}
 >
   <article class="competition stack">
     <header class="competition__header">

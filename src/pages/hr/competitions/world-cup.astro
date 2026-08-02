@@ -19,7 +19,12 @@ import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
 import { buildTopScorerFacts } from '../../../lib/editions';
-import { withBase } from '../../../lib/url';
+import { absolutePageUrl, withBase } from '../../../lib/url';
+import {
+  buildChampionsItemList,
+  buildLatestEditionSportsEvent,
+  type JsonLdObject,
+} from '../../../lib/jsonLd';
 import type { NoteSection } from '../../../lib/notes';
 
 const [data, goldenBoot] = await Promise.all([
@@ -41,6 +46,12 @@ const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 // Croatian home page (homeCards.ts's CARD_TEXT) and the records/compare
 // pages - data.title itself stays the raw English front-matter value.
 const title = 'FIFA Svjetsko prvenstvo';
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [
+  buildChampionsItemList(data.champions, { pageUrl, name: `${title} - prvaci po broju naslova` }),
+  buildLatestEditionSportsEvent(data.editions, title),
+].filter((item): item is JsonLdObject => item !== undefined);
 
 // Hand-translated from content/fifa-world-cup.md's "Format milestones",
 // "Memorable moments" and "Editorial notes" sections (the same three
@@ -97,6 +108,7 @@ const headerLabels: Record<string, string> = {
   description="Svako izdanje FIFA Svjetskog prvenstva od 1930., domaćini, finalisti i prvaci, uz generirani broj naslova. Filtriraj po prvaku, godini i domaćinu."
   locale="hr"
   alternateHref={withBase('/competitions/world-cup')}
+  jsonLd={jsonLd}
 >
   <article class="competition stack">
     <header class="competition__header">
