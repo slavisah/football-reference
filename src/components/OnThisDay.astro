@@ -1,0 +1,170 @@
+---
+// "On this day in football history": a home-page widget built from every
+// edition that has a "Final date" column (currently World Cup + EURO - see
+// src/lib/onThisDay.ts and docs/PROJECT_STATUS.md for the rollout plan to the
+// other four competitions). Server-rendered using the build's own current
+// date so a no-JS visitor still sees real content; a client script then
+// re-checks the visitor's actual today and swaps the card in if the site
+// hasn't been rebuilt since - same progressive-enhancement pattern as
+// ThemeToggle/ TournamentTable's inline scripts.
+import { entriesOnDate, fallbackEntry, type OnThisDayEntry } from '../lib/onThisDay';
+
+interface Props {
+  entries: OnThisDayEntry[];
+  heading?: string;
+}
+
+const { entries, heading = 'On this day in football history' } = Astro.props;
+
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+const buildDate = new Date();
+const matches = entriesOnDate(entries, buildDate);
+const featured = matches.length > 0 ? matches : (() => {
+  const fallback = fallbackEntry(entries, buildDate);
+  return fallback ? [fallback] : [];
+})();
+const isFallback = matches.length === 0;
+const dateLabel = `${buildDate.getDate()} ${MONTH_NAMES[buildDate.getMonth()]}`;
+---
+
+<section class="on-this-day card" aria-labelledby="on-this-day-heading">
+  <h2 id="on-this-day-heading">{heading}</h2>
+  <p class="on-this-day__date" id="on-this-day-date">{dateLabel}</p>
+  <p class="on-this-day__hint" id="on-this-day-hint" hidden={!isFallback}>
+    No final was played on this exact date - here's one from the archive instead.
+  </p>
+  <ul class="on-this-day__list" id="on-this-day-list">
+    {
+      featured.map((entry) => (
+        <li>
+          <p class="on-this-day__comp">{entry.competition} {entry.year}</p>
+          <p class="on-this-day__result">
+            {entry.final ?? `${entry.champion} won the final.`}
+          </p>
+        </li>
+      ))
+    }
+    {
+      featured.length === 0 && (
+        <li><p class="on-this-day__empty">No final dates on record yet.</p></li>
+      )
+    }
+  </ul>
+</section>
+
+<style>
+  .on-this-day__date {
+    margin: 0.2rem 0 0.8rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--accent);
+  }
+
+  .on-this-day__hint {
+    margin: -0.5rem 0 0.8rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .on-this-day__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .on-this-day__list li {
+    padding: 0.75rem 0.9rem;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .on-this-day__comp {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .on-this-day__result {
+    margin: 0.2rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .on-this-day__empty {
+    margin: 0;
+    color: var(--text-muted);
+  }
+</style>
+
+<script
+  is:inline
+  define:vars={{ entries, monthNames: MONTH_NAMES }}
+>
+  // Mirrors src/lib/onThisDay.ts's entriesOnDate/fallbackEntry (kept in sync
+  // manually - this inline script can't import a module, same constraint
+  // TournamentTable's filter script documents for its own duplicated logic).
+  function entriesOnDate(all, date) {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return all
+      .filter((e) => e.month === month && e.day === day)
+      .sort((a, b) => Number(b.year) - Number(a.year));
+  }
+
+  function fallbackEntry(all, date) {
+    if (all.length === 0) return undefined;
+    const startOfYear = Date.UTC(date.getFullYear(), 0, 0);
+    const today = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+    const dayOfYear = Math.floor((today - startOfYear) / 86400000);
+    const sorted = [...all].sort(
+      (a, b) => a.month - b.month || a.day - b.day || Number(a.year) - Number(b.year),
+    );
+    return sorted[dayOfYear % sorted.length];
+  }
+
+  const now = new Date();
+  const matches = entriesOnDate(entries, now);
+  const featured = matches.length > 0 ? matches : (() => {
+    const fb = fallbackEntry(entries, now);
+    return fb ? [fb] : [];
+  })();
+  const isFallback = matches.length === 0;
+
+  const dateEl = document.getElementById('on-this-day-date');
+  const hintEl = document.getElementById('on-this-day-hint');
+  const listEl = document.getElementById('on-this-day-list');
+
+  if (dateEl) dateEl.textContent = `${now.getDate()} ${monthNames[now.getMonth()]}`;
+  if (hintEl) hintEl.hidden = !isFallback;
+
+  if (listEl) {
+    listEl.textContent = '';
+    if (featured.length === 0) {
+      const li = document.createElement('li');
+      const p = document.createElement('p');
+      p.className = 'on-this-day__empty';
+      p.textContent = 'No final dates on record yet.';
+      li.appendChild(p);
+      listEl.appendChild(li);
+    } else {
+      for (const entry of featured) {
+        const li = document.createElement('li');
+        const comp = document.createElement('p');
+        comp.className = 'on-this-day__comp';
+        comp.textContent = `${entry.competition} ${entry.year}`;
+        const result = document.createElement('p');
+        result.className = 'on-this-day__result';
+        result.textContent = entry.final ?? `${entry.champion} won the final.`;
+        li.appendChild(comp);
+        li.appendChild(result);
+        listEl.appendChild(li);
+      }
+    }
+  }
+</script>

@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-07-23
+lastReviewed: 2026-08-02
 status: review
 ---
 
@@ -15,25 +15,25 @@ The European Championship began in 1960 as the European Nations' Cup. Early fina
 
 ## Editions
 
-| Year | Host(s) | Teams | Winner | Runner-up | Other semifinalist | Other semifinalist / fourth | Final |
-|---:|---|---:|---|---|---|---|---|
-| 1960 | France | 4 | Soviet Union | Yugoslavia | Czechoslovakia | France | Soviet Union 2–1 Yugoslavia (a.e.t.) |
-| 1964 | Spain | 4 | Spain | Soviet Union | Hungary | Denmark | Spain 2–1 Soviet Union |
-| 1968 | Italy | 4 | Italy | Yugoslavia | England | Soviet Union | Italy 2–0 Yugoslavia (replay) |
-| 1972 | Belgium | 4 | West Germany | Soviet Union | Belgium | Hungary | West Germany 3–0 Soviet Union |
-| 1976 | Yugoslavia | 4 | Czechoslovakia | West Germany | Netherlands | Yugoslavia | 2–2; Czechoslovakia 5–3 pens |
-| 1980 | Italy | 8 | West Germany | Belgium | Czechoslovakia | Italy | West Germany 2–1 Belgium |
-| 1984 | France | 8 | France | Spain | Portugal | Denmark | France 2–0 Spain |
-| 1988 | West Germany | 8 | Netherlands | Soviet Union | West Germany | Italy | Netherlands 2–0 Soviet Union |
-| 1992 | Sweden | 8 | Denmark | Germany | Netherlands | Sweden | Denmark 2–0 Germany |
-| 1996 | England | 16 | Germany | Czech Republic | England | France | Germany 2–1 Czech Republic (golden goal) |
-| 2000 | Belgium and Netherlands | 16 | France | Italy | Portugal | Netherlands | France 2–1 Italy (golden goal) |
-| 2004 | Portugal | 16 | Greece | Portugal | Czech Republic | Netherlands | Greece 1–0 Portugal |
-| 2008 | Austria and Switzerland | 16 | Spain | Germany | Russia | Türkiye | Spain 1–0 Germany |
-| 2012 | Poland and Ukraine | 16 | Spain | Italy | Germany | Portugal | Spain 4–0 Italy |
-| 2016 | France | 24 | Portugal | France | Germany | Wales | Portugal 1–0 France (a.e.t.) |
-| 2020 | Eleven European cities | 24 | Italy | England | Spain | Denmark | 1–1; Italy 3–2 pens |
-| 2024 | Germany | 24 | Spain | England | France | Netherlands | Spain 2–1 England |
+| Year | Host(s) | Teams | Winner | Runner-up | Other semifinalist | Other semifinalist / fourth | Final | Final date |
+|---:|---|---:|---|---|---|---|---|---|
+| 1960 | France | 4 | Soviet Union | Yugoslavia | Czechoslovakia | France | Soviet Union 2–1 Yugoslavia (a.e.t.) | 10 July 1960 |
+| 1964 | Spain | 4 | Spain | Soviet Union | Hungary | Denmark | Spain 2–1 Soviet Union | 21 June 1964 |
+| 1968 | Italy | 4 | Italy | Yugoslavia | England | Soviet Union | Italy 2–0 Yugoslavia (replay) | 10 June 1968 |
+| 1972 | Belgium | 4 | West Germany | Soviet Union | Belgium | Hungary | West Germany 3–0 Soviet Union | 18 June 1972 |
+| 1976 | Yugoslavia | 4 | Czechoslovakia | West Germany | Netherlands | Yugoslavia | 2–2; Czechoslovakia 5–3 pens | 20 June 1976 |
+| 1980 | Italy | 8 | West Germany | Belgium | Czechoslovakia | Italy | West Germany 2–1 Belgium | 22 June 1980 |
+| 1984 | France | 8 | France | Spain | Portugal | Denmark | France 2–0 Spain | 27 June 1984 |
+| 1988 | West Germany | 8 | Netherlands | Soviet Union | West Germany | Italy | Netherlands 2–0 Soviet Union | 25 June 1988 |
+| 1992 | Sweden | 8 | Denmark | Germany | Netherlands | Sweden | Denmark 2–0 Germany | 26 June 1992 |
+| 1996 | England | 16 | Germany | Czech Republic | England | France | Germany 2–1 Czech Republic (golden goal) | 30 June 1996 |
+| 2000 | Belgium and Netherlands | 16 | France | Italy | Portugal | Netherlands | France 2–1 Italy (golden goal) | 2 July 2000 |
+| 2004 | Portugal | 16 | Greece | Portugal | Czech Republic | Netherlands | Greece 1–0 Portugal | 4 July 2004 |
+| 2008 | Austria and Switzerland | 16 | Spain | Germany | Russia | Türkiye | Spain 1–0 Germany | 29 June 2008 |
+| 2012 | Poland and Ukraine | 16 | Spain | Italy | Germany | Portugal | Spain 4–0 Italy | 1 July 2012 |
+| 2016 | France | 24 | Portugal | France | Germany | Wales | Portugal 1–0 France (a.e.t.) | 10 July 2016 |
+| 2020 | Eleven European cities | 24 | Italy | England | Spain | Denmark | 1–1; Italy 3–2 pens | 11 July 2021 |
+| 2024 | Germany | 24 | Spain | England | France | Netherlands | Spain 2–1 England | 14 July 2024 |
 
 ## Champions by titles
 

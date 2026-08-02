@@ -1,8 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import OnThisDay from '../components/OnThisDay.astro';
 import { withBase } from '../lib/url';
 import { getEntry } from 'astro:content';
 import { loadHomeCompetitions, buildHomeCards } from '../lib/homeCards';
+import { buildOnThisDayEntries } from '../lib/onThisDay';
 
 const home = await getEntry('pages', 'index');
 
@@ -12,6 +14,15 @@ const home = await getEntry('pages', 'index');
 // the numbers; only the surrounding prose differs per locale.
 const competitions = await loadHomeCompetitions();
 const cards = buildHomeCards('en', competitions);
+
+// "On this day" widget: built from the World Cup and EURO editions already
+// loaded above (both have a "Final date" column) - no extra data load. The
+// other four competitions don't have that column yet; see
+// docs/PROJECT_STATUS.md for the plan to extend this.
+const onThisDayEntries = [
+  ...buildOnThisDayEntries(competitions.worldCup.editions, 'FIFA World Cup'),
+  ...buildOnThisDayEntries(competitions.euro.editions, 'UEFA European Championship'),
+];
 ---
 
 <BaseLayout
@@ -65,6 +76,8 @@ const cards = buildHomeCards('en', competitions);
       ))
     }
   </section>
+
+  <OnThisDay entries={onThisDayEntries} />
 
   <section class="features card">
     <h2>What each competition page gives you</h2>
