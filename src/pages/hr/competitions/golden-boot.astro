@@ -18,7 +18,8 @@ import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
-import { withBase } from '../../../lib/url';
+import { absolutePageUrl, withBase } from '../../../lib/url';
+import { buildChampionsItemList } from '../../../lib/jsonLd';
 import type { NoteSection } from '../../../lib/notes';
 
 const [worldCup, euro] = await Promise.all([
@@ -45,6 +46,20 @@ const statusText = worldCup.status === 'verified' ? 'Provjereno' : 'U pregledu';
 // Croatian home page (homeCards.ts's CARD_TEXT) - worldCup.title/euro.title
 // stay the raw English front-matter value ("Golden Boot Winners").
 const title = 'Zlatna kopačka';
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [
+  buildChampionsItemList(worldCup.champions, {
+    pageUrl,
+    name: 'Najviše osvojenih zlatnih kopački - Svjetsko prvenstvo',
+    unit: ['nagrada', 'nagrade'],
+  }),
+  buildChampionsItemList(euro.champions, {
+    pageUrl,
+    name: 'Najviše osvojenih zlatnih kopački - EURO',
+    unit: ['nagrada', 'nagrade'],
+  }),
+];
 
 // Hand-translated from content/golden-boot.md's "World Cup notes" and "EURO
 // notes" sections. content/ itself stays untouched and English (the single
@@ -82,6 +97,7 @@ const headerLabels: Record<string, string> = {
   description="FIFA Svjetsko prvenstvo i UEFA Europsko prvenstvo - nagrade za najboljeg strijelca (Zlatna kopačka), s igračem, reprezentacijom i brojem golova. Filtriraj svaku tablicu po igraču i godini."
   locale="hr"
   alternateHref={withBase('/competitions/golden-boot')}
+  jsonLd={jsonLd}
 >
   <article class="competition stack">
     <header class="competition__header">

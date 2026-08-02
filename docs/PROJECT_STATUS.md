@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 112 Vitest unit tests
+pnpm test                      # 119 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 179 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 184 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
                                           # and dark, across every page)
 ```
@@ -1053,6 +1053,63 @@ existing page.
 per-competition-type schema shape to be genuinely useful to search engines
 rather than boilerplate, which is a bigger design decision than fits a single
 quality-pass item.
+
+### Quality pass: JSON-LD structured data (BreadcrumbList, champions ItemList, latest-edition SportsEvent)
+
+Added 2026-08-02 (intensive run). Picks up the "left for a future pass" item
+right above: the earlier SEO pass added canonical/OG/sitemap but no
+structured data at all, so a search engine only ever saw plain HTML. The
+"per-competition-type schema shape" problem that deferred this turned out to
+have a generic answer rather than needing bespoke schema per competition:
+
+- **`src/lib/jsonLd.ts`** (new) has three pure builders, all schema.org:
+  `buildBreadcrumbList()` (a "Home > page" trail), `buildChampionsItemList()`
+  (a ranked `ItemList` of `Thing`s - name + a "N title(s) (years)" description
+  - built directly from the exact `ChampionSummary[]` every page already
+    computes for its on-page Champions summary, no recomputation, no new
+    facts), and `buildLatestEditionSportsEvent()` (the most recently completed
+  edition as a `SportsEvent`: name, host as `location`, winner as
+  `competitor`, `startDate` as the bare year already in the Editions table -
+  no calendar date is invented, since none exists in the editorial source).
+  `ItemList` is genuinely generic across both team competitions and
+  individual awards (Ballon d'Or, Golden Boot), which is what made the
+  earlier "per-type schema" concern moot; `SportsEvent` is only attached to
+  the four team competitions (World Cup, EURO, Copa América, Nations League)
+  - an individual award isn't a sporting *event*, so Ballon d'Or/Golden Boot
+  get an `ItemList` only, no `SportsEvent`.
+- **`BaseLayout.astro`** renders the `BreadcrumbList` automatically for every
+  page except the home page (computed from the same `canonicalURL`/`title`
+  every page already passes in - zero new props needed on any of the 22
+  pages for this part) and takes an optional `jsonLd?: JsonLdObject[]` prop
+  for page-specific objects, each rendered as its own
+  `<script type="application/ld+json">` (simpler and equally valid to merging
+  into one `@graph`). New `homeBreadcrumb` UI string in `src/lib/i18n.ts`
+  ("Home"/"Početna").
+- Each of the twelve competition/award pages (six English, six Croatian) now
+  computes its own `jsonLd` array via the new `absolutePageUrl()` helper in
+  `src/lib/url.ts` (mirrors the `site ?? url` fallback `sitemap.xml.ts`
+  already uses) and passes it to `BaseLayout`. Golden Boot passes two
+  `ItemList`s (one per table), matching how its `ChampionsSummary` is already
+  duplicated on that page.
+- Verified the generated markup directly, not just that the build succeeds:
+  parsed every `<script type="application/ld+json">` block across all 22
+  built pages (42 total) as JSON - all valid - and spot-checked the World Cup
+  page's three blocks (`BreadcrumbList`, `ItemList` topped by Brazil's 5
+  titles, `SportsEvent` for "2026 FIFA World Cup" with Canada/Mexico/United
+  States as `location` and Spain as `competitor`), the home page (correctly
+  has none), and Ballon d'Or (`ItemList` only, no `SportsEvent`).
+- Covered by 7 new Vitest cases (`tests/unit/jsonLd.test.ts`: breadcrumb
+  shape, ItemList with default vs. overridden unit wording, SportsEvent
+  picking the latest year regardless of source order, omitting
+  location/competitor when absent, excluding a placeholder "Not awarded"
+  winner from `competitor`, and returning `undefined` when no edition has a
+  parseable year) and 5 new Playwright cases in the existing
+  `tests/e2e/mobile.spec.ts` SEO describe block (home page has none; the
+  World Cup page's three-block shape and content; an individual-award page
+  has no `SportsEvent`; Golden Boot's two `ItemList`s; a translated page's
+  Croatian breadcrumb/`ItemList` names). Verified with `pnpm lint`, the full
+  Vitest suite (119 cases, up from 112) and the full Playwright suite (184
+  cases, up from 179), all passing.
 
 ## Known caveats
 

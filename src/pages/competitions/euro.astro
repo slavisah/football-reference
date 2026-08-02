@@ -3,7 +3,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
 import { buildTopScorerFacts } from '../../lib/editions';
-import { withBase } from '../../lib/url';
+import { absolutePageUrl, withBase } from '../../lib/url';
+import {
+  buildChampionsItemList,
+  buildLatestEditionSportsEvent,
+  type JsonLdObject,
+} from '../../lib/jsonLd';
 
 const [data, goldenBoot] = await Promise.all([
   loadCompetition('uefa-euro', {
@@ -18,12 +23,19 @@ const [data, goldenBoot] = await Promise.all([
 ]);
 
 const topScorers = buildTopScorerFacts(goldenBoot.editions);
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [
+  buildChampionsItemList(data.champions, { pageUrl, name: `${data.title} - Champions by titles` }),
+  buildLatestEditionSportsEvent(data.editions, data.title),
+].filter((item): item is JsonLdObject => item !== undefined);
 ---
 
 <BaseLayout
   title={data.title}
   description="Every UEFA European Championship edition, hosts, finalists and champions, with a generated title count. Filter by winner, year and host."
   alternateHref={withBase('/hr/competitions/euro')}
+  jsonLd={jsonLd}
 >
   <CompetitionView
     data={data}

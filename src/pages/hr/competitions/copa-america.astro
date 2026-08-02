@@ -18,7 +18,12 @@ import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
-import { withBase } from '../../../lib/url';
+import { absolutePageUrl, withBase } from '../../../lib/url';
+import {
+  buildChampionsItemList,
+  buildLatestEditionSportsEvent,
+  type JsonLdObject,
+} from '../../../lib/jsonLd';
 import type { NoteSection } from '../../../lib/notes';
 
 const data = await loadCompetition('copa-america', {
@@ -28,6 +33,15 @@ const data = await loadCompetition('copa-america', {
 });
 
 const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [
+  buildChampionsItemList(data.champions, {
+    pageUrl,
+    name: `${data.title} - prvaci po broju naslova`,
+  }),
+  buildLatestEditionSportsEvent(data.editions, data.title),
+].filter((item): item is JsonLdObject => item !== undefined);
 
 // Hand-translated from content/copa-america.md's "Memorable moments" section.
 // content/ itself stays untouched and English (the single editorial source of
@@ -60,6 +74,7 @@ const headerLabels: Record<string, string> = {
   description="Svaki prvak Copa Américe od 1916., domaćini i drugoplasirani, uz generirani broj naslova. Filtriraj po prvaku, godini i domaćinu."
   locale="hr"
   alternateHref={withBase('/competitions/copa-america')}
+  jsonLd={jsonLd}
 >
   <article class="competition stack">
     <header class="competition__header">

@@ -17,7 +17,12 @@ import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
-import { withBase } from '../../../lib/url';
+import { absolutePageUrl, withBase } from '../../../lib/url';
+import {
+  buildChampionsItemList,
+  buildLatestEditionSportsEvent,
+  type JsonLdObject,
+} from '../../../lib/jsonLd';
 import type { NoteSection } from '../../../lib/notes';
 
 const data = await loadCompetition('uefa-nations-league', {
@@ -31,6 +36,12 @@ const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 // established on the Croatian home page (homeCards.ts's CARD_TEXT) and
 // records page - data.title itself stays the raw English front-matter value.
 const title = 'UEFA Liga nacija';
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [
+  buildChampionsItemList(data.champions, { pageUrl, name: `${title} - prvaci po broju naslova` }),
+  buildLatestEditionSportsEvent(data.editions, title),
+].filter((item): item is JsonLdObject => item !== undefined);
 
 // Hand-translated from content/uefa-nations-league.md's "Key facts" section.
 // content/ itself stays untouched and English (the single editorial source of
@@ -64,6 +75,7 @@ const headerLabels: Record<string, string> = {
   description="Svako izdanje Final Foura UEFA Lige nacija, domaćini, finalisti i prvaci, uz generirani broj naslova. Filtriraj po prvaku, sezoni i domaćinu."
   locale="hr"
   alternateHref={withBase('/competitions/nations-league')}
+  jsonLd={jsonLd}
 >
   <article class="competition stack">
     <header class="competition__header">

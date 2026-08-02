@@ -1425,4 +1425,76 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     );
     expect(body).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
   });
+
+  async function jsonLdBlocks(page: import('@playwright/test').Page) {
+    const raw = await page.locator('script[type="application/ld+json"]').allTextContents();
+    return raw.map((text) => JSON.parse(text));
+  }
+
+  test('the home page has no JSON-LD (breadcrumb is skipped on the home page itself)', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    expect(await page.locator('script[type="application/ld+json"]').count()).toBe(0);
+  });
+
+  test('a competition page carries a BreadcrumbList, a champions ItemList and a SportsEvent for the latest edition', async ({
+    page,
+  }) => {
+    await page.goto('competitions/world-cup');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks).toHaveLength(3);
+
+    const breadcrumb = blocks.find((b) => b['@type'] === 'BreadcrumbList');
+    expect(breadcrumb.itemListElement).toEqual([
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'FIFA World Cup',
+        item: `${SITE}/competitions/world-cup/`,
+      },
+    ]);
+
+    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
+    expect(itemList.name).toBe('FIFA World Cup - Champions by titles');
+    expect(itemList.url).toBe(`${SITE}/competitions/world-cup/`);
+    expect(itemList.itemListElement[0].item.name).toBe('Brazil');
+
+    const sportsEvent = blocks.find((b) => b['@type'] === 'SportsEvent');
+    expect(sportsEvent.name).toBe('2026 FIFA World Cup');
+    expect(sportsEvent.location).toEqual({ '@type': 'Place', name: 'Canada, Mexico and United States' });
+    expect(sportsEvent.competitor).toEqual({ '@type': 'SportsTeam', name: 'Spain' });
+  });
+
+  test('an individual award page carries an ItemList but no SportsEvent', async ({ page }) => {
+    await page.goto('competitions/ballon-dor');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList']);
+    expect(blocks.find((b) => b['@type'] === 'ItemList').name).toContain('Most awards');
+  });
+
+  test('the Golden Boot page carries one ItemList per table', async ({ page }) => {
+    await page.goto('competitions/golden-boot');
+    const blocks = await jsonLdBlocks(page);
+    const lists = blocks.filter((b) => b['@type'] === 'ItemList');
+    expect(lists).toHaveLength(2);
+    expect(lists.map((l) => l.name)).toEqual([
+      'Most World Cup Golden Boots',
+      'Most EURO top-scorer awards',
+    ]);
+  });
+
+  test('a translated competition page carries its own Croatian BreadcrumbList/ItemList names', async ({
+    page,
+  }) => {
+    await page.goto('hr/competitions/world-cup');
+    const blocks = await jsonLdBlocks(page);
+    const breadcrumb = blocks.find((b) => b['@type'] === 'BreadcrumbList');
+    expect(breadcrumb.itemListElement[0].name).toBe('Početna');
+    expect(breadcrumb.itemListElement[1].name).toBe('FIFA Svjetsko prvenstvo');
+    expect(blocks.find((b) => b['@type'] === 'ItemList').name).toBe(
+      'FIFA Svjetsko prvenstvo - prvaci po broju naslova',
+    );
+  });
 });

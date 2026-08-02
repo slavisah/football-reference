@@ -4,6 +4,7 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { withBase } from '../lib/url';
 import { t, type Locale } from '../lib/i18n';
+import { buildBreadcrumbList, type JsonLdObject } from '../lib/jsonLd';
 
 interface Props {
   title: string;
@@ -12,9 +13,11 @@ interface Props {
   locale?: Locale;
   /** The equivalent page in the other language, if one exists. */
   alternateHref?: string;
+  /** Extra schema.org JSON-LD objects for this page (e.g. an ItemList of champions, a SportsEvent for the latest edition). A "Home > page" BreadcrumbList is added automatically for every non-home page. */
+  jsonLd?: JsonLdObject[];
 }
 
-const { title, description, locale = 'en', alternateHref } = Astro.props;
+const { title, description, locale = 'en', alternateHref, jsonLd = [] } = Astro.props;
 const fullTitle =
   title === 'The Ultimate Football Reference'
     ? title
@@ -29,6 +32,20 @@ const alternateURL = alternateHref ? new URL(alternateHref, siteOrigin) : undefi
 const ogImageURL = new URL(withBase('/icons/icon-512.png'), siteOrigin);
 const ogLocale = locale === 'hr' ? 'hr_HR' : 'en_US';
 const ogLocaleAlternate = locale === 'hr' ? 'en_US' : 'hr_HR';
+
+// A "Home > this page" trail for every page except the home page itself,
+// built from the same canonicalURL every page already computes above - no
+// per-page wiring needed for this part. `jsonLd` carries page-specific
+// structured data (e.g. a champions ItemList) supplied by the page.
+const homeURL = new URL(withBase(locale === 'hr' ? '/hr/' : '/'), siteOrigin);
+const isHome = canonicalURL.pathname.replace(/\/$/, '') === homeURL.pathname.replace(/\/$/, '');
+const breadcrumb = isHome
+  ? undefined
+  : buildBreadcrumbList([
+      { name: t(locale, 'homeBreadcrumb'), url: homeURL.toString() },
+      { name: title, url: canonicalURL.toString() },
+    ]);
+const structuredData = [breadcrumb, ...jsonLd].filter((item): item is JsonLdObject => Boolean(item));
 ---
 
 <!doctype html>
@@ -74,6 +91,17 @@ const ogLocaleAlternate = locale === 'hr' ? 'en_US' : 'hr_HR';
     <meta name="twitter:title" content={fullTitle} />
     {description && <meta name="twitter:description" content={description} />}
     <meta name="twitter:image" content={ogImageURL} />
+
+    {/* schema.org structured data: an automatic Home > page BreadcrumbList
+    plus whatever page-specific objects (e.g. a champions ItemList) the page
+    passed in via `jsonLd`. Each is its own self-contained script tag (its own
+    "@context"), which is valid JSON-LD and simpler than merging into one
+    "@graph". */}
+    {
+      structuredData.map((item) => (
+        <script is:inline type="application/ld+json" set:html={JSON.stringify(item)} />
+      ))
+    }
 
     {/* Apply the saved theme before paint to avoid a flash. */}
     <script is:inline>
