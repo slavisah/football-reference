@@ -1294,6 +1294,80 @@ harder to find and cross-check era-by-era; a future pass should budget for
 researching (and citing) each edition individually rather than assuming a
 single source covers all thirty at once.
 
+### Content-accuracy pass: Copa América third/fourth for the full pre-1975 era - audit closed
+
+Added 2026-08-02 (intensive run). Closes the item directly above and the
+Copa América third/fourth audit as a whole: the remaining 29 editions from
+1916-1967 (every edition in the pre-1975 League table/Final playoff era
+except the 1919/1922/1937/1949/1953 playoff years' already-known result,
+which still needed their own third/fourth read from the pre-playoff group
+table) now have researched third- and fourth-place teams in
+`content/copa-america.md`'s Champions timeline table, replacing "—".
+
+- Research was fanned out across three parallel research agents (1916-1927,
+  1929-1947, 1949-1967), each cross-checking RSSSF's per-edition table pages
+  against Wikipedia's per-edition articles and an internal points-arithmetic
+  consistency check (reported points must be consistent with the number of
+  matches played and, where teams tied on points, the stated goal
+  difference/average must actually separate them in the claimed order).
+  Their reported "high"/"medium" confidence split was not taken at face
+  value: this session's own direct `WebFetch` of both rsssf.org and
+  en.wikipedia.org pages returned HTTP 403 (the outbound network policy
+  blocks direct fetches to those hosts), matching what the research agents
+  had already found, so every one of the 29 results - including the four
+  the agents rated only "medium" confidence (1917, 1920, 1926, 1945), which
+  lacked a full recoverable points table - was independently re-verified
+  with fresh `WebSearch` queries before being written into the content file,
+  not just carried over from the agents' output.
+- **1922** is a documented edge case rather than a simple table read: Brazil,
+  Paraguay, and Uruguay finished level on both points and goal difference,
+  triggering a three-way title playoff; Uruguay withdrew from it in protest
+  at refereeing decisions, finishing third by that elimination rather than a
+  table tiebreak, with Argentina (not level with the top three) fourth. This
+  is spelled out in the rewritten "Important editorial warning" section
+  rather than left as an unexplained table cell.
+- **1925** is the one edition that keeps a "—": only three teams entered
+  (Argentina, Brazil, Paraguay) playing a double round-robin, so third
+  (Paraguay) exists but a fourth-place team structurally never did. This is
+  the historical fact, not a sourcing gap - explained in the content file's
+  warning section so a future editor doesn't mistake it for unfinished work.
+- The 1975/1979/1983 Home-and-away "—" cells are unchanged and explained as
+  permanent (no standings table or third-place fixture of any kind exists
+  for a two-legged final).
+- `docs/SOURCES.md` gained one citation entry per edition (RSSSF table page
+  + Wikipedia article where both were checked), plus a note on the 403
+  network restriction and the re-verification method, so a future reader can
+  see exactly how confident to be in each row.
+- `tests/e2e/mobile.spec.ts`'s Copa América Format/Third/Fourth test
+  (previously asserting 1916 showed "—") now asserts real values for 1916
+  and 1922 (including the withdrawal case), the 1925 partial-"—" case, and
+  moves the "no data exists" assertion to 1975 (Home-and-away), which is now
+  the only kind of row that still shows "—" as a permanent fact rather than
+  an open item. `tests/unit/compare.test.ts` needed no changes - it tests
+  `src/lib/compare.ts`'s pure functions against synthetic fixtures, not the
+  real content file, and the existing "—"-skipping logic (`isMissingCell()`,
+  added in the earlier knockout-era third/fourth pass) already handles the
+  new 1925 partial-data row correctly with no code change. The `/compare`
+  page's all-teams ranking numbers do shift for any country that reached
+  third/fourth in 1916-1967 (e.g. Brazil, Uruguay, Chile, Argentina,
+  Paraguay, Peru all gain finishes) - Colombia's existing e2e test assertion
+  (count of 7) is unaffected since Colombia never appears in this era's
+  results, and no other test hardcoded a specific country's Copa América
+  semifinal count for this range.
+- Front matter: `lastReviewed: 2026-08-02` (unchanged), `status: review`
+  (unchanged - this pass used secondary sources per `docs/SOURCES.md`'s
+  review policy, not the primary CONMEBOL history PDF already cited there,
+  same reasoning the Format-audit pass gave for not marking `verified`).
+  Regenerated `public/downloads/copa-america.pdf` via `pnpm build:pdfs`
+  since the Editions table's cell values changed.
+- Verified with `pnpm lint`, the full Vitest suite, and the full Playwright
+  suite, all passing (see exact counts in the commit this entry ships with).
+
+This closes the entire Copa América Third/Fourth backlog item: every edition
+from 1916 to 2024 now shows either a real, sourced placing or an explained
+"—" that is itself the historical fact, and the content file's "Important
+editorial warning" section documents both.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

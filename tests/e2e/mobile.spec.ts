@@ -614,7 +614,7 @@ test.describe('Copa América page on a 360px phone', () => {
     await expect(row2016).toBeVisible();
   });
 
-  test('shows the audited Third/Fourth place for the knockout-final era, and "—" for earlier editions', async ({
+  test('shows the audited Third/Fourth place across every league-table and knockout-final edition, and "—" only where no such placing exists', async ({
     page,
   }) => {
     const row2024 = page.locator('tbody tr[data-year="2024"]');
@@ -625,10 +625,30 @@ test.describe('Copa América page on a 360px phone', () => {
     await expect(row1987.locator('td[data-label="Third"]')).toHaveText('Colombia');
     await expect(row1987.locator('td[data-label="Fourth"]')).toHaveText('Argentina');
 
-    // Pre-1975 league-table era: no discrete third-place match, so no guess.
+    // Pre-1975 league-table/final-playoff era: read off the final standings
+    // table, audited 2026-08-02.
     const row1916 = page.locator('tbody tr[data-year="1916"]');
-    await expect(row1916.locator('td[data-label="Third"]')).toHaveText('—');
-    await expect(row1916.locator('td[data-label="Fourth"]')).toHaveText('—');
+    await expect(row1916.locator('td[data-label="Third"]')).toHaveText('Brazil');
+    await expect(row1916.locator('td[data-label="Fourth"]')).toHaveText('Chile');
+
+    // 1922: Uruguay finished 3rd not by the table alone but by withdrawing
+    // from the three-way title playoff - still a sourced, real placing.
+    const row1922 = page.locator('tbody tr[data-year="1922"]');
+    await expect(row1922.locator('td[data-label="Third"]')).toHaveText('Uruguay');
+    await expect(row1922.locator('td[data-label="Fourth"]')).toHaveText('Argentina');
+
+    // 1925 only had three entrants (Argentina, Brazil, Paraguay), so a
+    // fourth place structurally never existed - "—" here isn't a research
+    // gap, it's the historical fact.
+    const row1925 = page.locator('tbody tr[data-year="1925"]');
+    await expect(row1925.locator('td[data-label="Third"]')).toHaveText('Paraguay');
+    await expect(row1925.locator('td[data-label="Fourth"]')).toHaveText('—');
+
+    // Home-and-away era (1975/1979/1983): no standings table exists at all,
+    // so this "—" remains permanent, not a future-audit gap.
+    const row1975 = page.locator('tbody tr[data-year="1975"]');
+    await expect(row1975.locator('td[data-label="Third"]')).toHaveText('—');
+    await expect(row1975.locator('td[data-label="Fourth"]')).toHaveText('—');
   });
 
   test('the language switcher opens the Croatian Copa América page', async ({ page }) => {
