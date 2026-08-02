@@ -614,6 +614,23 @@ test.describe('Copa América page on a 360px phone', () => {
     await expect(row2016).toBeVisible();
   });
 
+  test('shows the audited Third/Fourth place for the knockout-final era, and "—" for earlier editions', async ({
+    page,
+  }) => {
+    const row2024 = page.locator('tbody tr[data-year="2024"]');
+    await expect(row2024.locator('td[data-label="Third"]')).toHaveText('Uruguay');
+    await expect(row2024.locator('td[data-label="Fourth"]')).toHaveText('Canada');
+
+    const row1987 = page.locator('tbody tr[data-year="1987"]');
+    await expect(row1987.locator('td[data-label="Third"]')).toHaveText('Colombia');
+    await expect(row1987.locator('td[data-label="Fourth"]')).toHaveText('Argentina');
+
+    // Pre-1975 league-table era: no discrete third-place match, so no guess.
+    const row1916 = page.locator('tbody tr[data-year="1916"]');
+    await expect(row1916.locator('td[data-label="Third"]')).toHaveText('—');
+    await expect(row1916.locator('td[data-label="Fourth"]')).toHaveText('—');
+  });
+
   test('the language switcher opens the Croatian Copa América page', async ({ page }) => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/competitions\/copa-america\/?$/);
@@ -988,9 +1005,15 @@ test.describe('Compare page on a 360px phone', () => {
     await expect(page.locator('#compare-b-name')).toHaveText('Argentina');
   });
 
-  test('shows an em dash for a competition that has no semifinal column', async ({ page }) => {
+  test('shows real Copa América third/fourth counts for the knockout-final era, not an em dash', async ({
+    page,
+  }) => {
+    // Copa América only tracked a discrete third-place match from 1987 (and
+    // 1993) onward, so this is no longer the "no such column" case - Colombia
+    // reached third or fourth six times across those editions.
+    await page.goto('compare?a=colombia&b=argentina');
     const copaRow = page.locator('#compare-a-body tr[data-slug="copa-america"]');
-    await expect(copaRow.locator('[data-field="semifinals"]')).toHaveText('—');
+    await expect(copaRow.locator('[data-field="semifinals"]')).toHaveText('6');
   });
 
   test('the language switcher opens the Croatian compare page', async ({ page }) => {

@@ -46,6 +46,27 @@ Primary sources should be preferred.
     points, no playoff)
   - https://en.wikipedia.org/wiki/1967_South_American_Championship (won
     outright on points, no playoff)
+- Third/fourth-place audit (2026-08-02): the winner and loser of every
+  discrete third-place match in the knockout-final era (1987, then 1993
+  onward, including the 2016 centenary edition). Official recaps where
+  available, match reports otherwise:
+  - https://www.rsssf.org/tables/87sa.html (1987)
+  - https://www.rsssf.org/tables/93sa-full.html (1993)
+  - https://www.thescore.com/mls/news/1049826 (1995)
+  - https://www.rsssf.org/tables/97sa.html (1997)
+  - https://www.rsssf.org/tables/99safull.html (1999)
+  - https://www.espn.com/soccer/match/_/gameId/10744/uruguay-honduras (2001)
+  - https://www.espn.com/soccer/match/_/gameId/151953/colombia-uruguay (2004)
+  - https://www.espn.com/soccer/match/_/gameId/221082/mexico-uruguay (2007)
+  - https://www.espn.com/soccer/match/_/gameId/317559/venezuela-peru (2011)
+  - https://www.espn.com/soccer/match/_/gameId/424358/paraguay-peru (2015)
+  - https://www.espn.com/soccer/report/_/gameId/444697 (2016 centenary)
+  - https://copaamerica.com/en/news/argentina-defeated-chile-2-1-to-win-third-place
+    (2019)
+  - https://copaamerica.com/en/news/colombia-score-in-the-final-minute-to-finish-in-3rd-place
+    (2021)
+  - https://copaamerica.com/en/news/highlights-uruguay-canada-third-place-penalties-copa-america-2024
+    (2024)
 
 ## Ballon d'Or
 

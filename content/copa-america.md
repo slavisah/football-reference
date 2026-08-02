@@ -17,56 +17,56 @@ Its history is less uniform than the World Cup or EURO. Some editions used a fin
 
 ## Champions timeline
 
-| Year | Host / format | Champion | Runner-up | Format |
-|---:|---|---|---|---|
-| 1916 | Argentina | Uruguay | Argentina | League table |
-| 1917 | Uruguay | Uruguay | Argentina | League table |
-| 1919 | Brazil | Brazil | Uruguay | Final playoff |
-| 1920 | Chile | Uruguay | Argentina | League table |
-| 1921 | Argentina | Argentina | Brazil | League table |
-| 1922 | Brazil | Brazil | Paraguay | Final playoff |
-| 1923 | Uruguay | Uruguay | Argentina | League table |
-| 1924 | Uruguay | Uruguay | Argentina | League table |
-| 1925 | Argentina | Argentina | Brazil | League table |
-| 1926 | Chile | Uruguay | Argentina | League table |
-| 1927 | Peru | Argentina | Uruguay | League table |
-| 1929 | Argentina | Argentina | Paraguay | League table |
-| 1935 | Peru | Uruguay | Argentina | League table |
-| 1937 | Argentina | Argentina | Brazil | Final playoff |
-| 1939 | Peru | Peru | Uruguay | League table |
-| 1941 | Chile | Argentina | Uruguay | League table |
-| 1942 | Uruguay | Uruguay | Argentina | League table |
-| 1945 | Chile | Argentina | Brazil | League table |
-| 1946 | Argentina | Argentina | Brazil | League table |
-| 1947 | Ecuador | Argentina | Paraguay | League table |
-| 1949 | Brazil | Brazil | Paraguay | Final playoff |
-| 1953 | Peru | Paraguay | Brazil | Final playoff |
-| 1955 | Chile | Argentina | Chile | League table |
-| 1956 | Uruguay | Uruguay | Chile | League table |
-| 1957 | Peru | Argentina | Brazil | League table |
-| 1959 | Argentina | Argentina | Brazil | League table |
-| 1959 | Ecuador | Uruguay | Argentina | League table |
-| 1963 | Bolivia | Bolivia | Paraguay | League table |
-| 1967 | Uruguay | Uruguay | Argentina | League table |
-| 1975 | Home-and-away | Peru | Colombia | Home-and-away |
-| 1979 | Home-and-away | Paraguay | Chile | Home-and-away |
-| 1983 | Home-and-away | Uruguay | Brazil | Home-and-away |
-| 1987 | Argentina | Uruguay | Chile | Knockout final |
-| 1989 | Brazil | Brazil | Uruguay | League table |
-| 1991 | Chile | Argentina | Brazil | League table |
-| 1993 | Ecuador | Argentina | Mexico | Knockout final |
-| 1995 | Uruguay | Uruguay | Brazil | Knockout final |
-| 1997 | Bolivia | Brazil | Bolivia | Knockout final |
-| 1999 | Paraguay | Brazil | Uruguay | Knockout final |
-| 2001 | Colombia | Colombia | Mexico | Knockout final |
-| 2004 | Peru | Brazil | Argentina | Knockout final |
-| 2007 | Venezuela | Brazil | Argentina | Knockout final |
-| 2011 | Argentina | Uruguay | Paraguay | Knockout final |
-| 2015 | Chile | Chile | Argentina | Knockout final |
-| 2016 | United States | Chile | Argentina | Special centenary edition |
-| 2019 | Brazil | Brazil | Peru | Knockout final |
-| 2021 | Brazil | Argentina | Brazil | Knockout final |
-| 2024 | United States | Argentina | Colombia | Knockout final |
+| Year | Host / format | Champion | Runner-up | Third | Fourth | Format |
+|---:|---|---|---|---|---|---|
+| 1916 | Argentina | Uruguay | Argentina | — | — | League table |
+| 1917 | Uruguay | Uruguay | Argentina | — | — | League table |
+| 1919 | Brazil | Brazil | Uruguay | — | — | Final playoff |
+| 1920 | Chile | Uruguay | Argentina | — | — | League table |
+| 1921 | Argentina | Argentina | Brazil | — | — | League table |
+| 1922 | Brazil | Brazil | Paraguay | — | — | Final playoff |
+| 1923 | Uruguay | Uruguay | Argentina | — | — | League table |
+| 1924 | Uruguay | Uruguay | Argentina | — | — | League table |
+| 1925 | Argentina | Argentina | Brazil | — | — | League table |
+| 1926 | Chile | Uruguay | Argentina | — | — | League table |
+| 1927 | Peru | Argentina | Uruguay | — | — | League table |
+| 1929 | Argentina | Argentina | Paraguay | — | — | League table |
+| 1935 | Peru | Uruguay | Argentina | — | — | League table |
+| 1937 | Argentina | Argentina | Brazil | — | — | Final playoff |
+| 1939 | Peru | Peru | Uruguay | — | — | League table |
+| 1941 | Chile | Argentina | Uruguay | — | — | League table |
+| 1942 | Uruguay | Uruguay | Argentina | — | — | League table |
+| 1945 | Chile | Argentina | Brazil | — | — | League table |
+| 1946 | Argentina | Argentina | Brazil | — | — | League table |
+| 1947 | Ecuador | Argentina | Paraguay | — | — | League table |
+| 1949 | Brazil | Brazil | Paraguay | — | — | Final playoff |
+| 1953 | Peru | Paraguay | Brazil | — | — | Final playoff |
+| 1955 | Chile | Argentina | Chile | — | — | League table |
+| 1956 | Uruguay | Uruguay | Chile | — | — | League table |
+| 1957 | Peru | Argentina | Brazil | — | — | League table |
+| 1959 | Argentina | Argentina | Brazil | — | — | League table |
+| 1959 | Ecuador | Uruguay | Argentina | — | — | League table |
+| 1963 | Bolivia | Bolivia | Paraguay | — | — | League table |
+| 1967 | Uruguay | Uruguay | Argentina | — | — | League table |
+| 1975 | Home-and-away | Peru | Colombia | — | — | Home-and-away |
+| 1979 | Home-and-away | Paraguay | Chile | — | — | Home-and-away |
+| 1983 | Home-and-away | Uruguay | Brazil | — | — | Home-and-away |
+| 1987 | Argentina | Uruguay | Chile | Colombia | Argentina | Knockout final |
+| 1989 | Brazil | Brazil | Uruguay | — | — | League table |
+| 1991 | Chile | Argentina | Brazil | — | — | League table |
+| 1993 | Ecuador | Argentina | Mexico | Colombia | Ecuador | Knockout final |
+| 1995 | Uruguay | Uruguay | Brazil | Colombia | United States | Knockout final |
+| 1997 | Bolivia | Brazil | Bolivia | Mexico | Peru | Knockout final |
+| 1999 | Paraguay | Brazil | Uruguay | Mexico | Chile | Knockout final |
+| 2001 | Colombia | Colombia | Mexico | Honduras | Uruguay | Knockout final |
+| 2004 | Peru | Brazil | Argentina | Uruguay | Colombia | Knockout final |
+| 2007 | Venezuela | Brazil | Argentina | Mexico | Uruguay | Knockout final |
+| 2011 | Argentina | Uruguay | Paraguay | Peru | Venezuela | Knockout final |
+| 2015 | Chile | Chile | Argentina | Peru | Paraguay | Knockout final |
+| 2016 | United States | Chile | Argentina | Colombia | United States | Special centenary edition |
+| 2019 | Brazil | Brazil | Peru | Argentina | Chile | Knockout final |
+| 2021 | Brazil | Argentina | Brazil | Colombia | Peru | Knockout final |
+| 2024 | United States | Argentina | Colombia | Uruguay | Canada | Knockout final |
 
 ## Titles after 2024
 
@@ -91,7 +91,7 @@ This page intentionally begins with champions and runners-up rather than claimin
 - **Knockout final**: group stage followed by a single-elimination bracket ending in a one-off final (1987, and every edition from 1993 onward except 2016);
 - **Special centenary edition**: the 2016 Copa América Centenario, an extra edition outside the normal cycle marking the tournament's 100th anniversary.
 
-Third and fourth places are still **not** added to every edition - that would need a separate per-tournament audit (many early editions had no such placing at all, since the format was a single round-robin table), so it remains open for a future pass.
+Third and fourth places - audited 2026-08-02 (intensive run) against match reports and official recaps (see `docs/SOURCES.md`) - are now recorded for every edition that decided them with a single, discrete third-place match: 1987, then every edition from 1993 onward including the 2016 centenary edition. They are **not** yet added for the pre-1975 league-table/final-playoff era or the 1989 and 1991 editions, because those years had no standalone third-place fixture - the placing would have to be read off a full final standings table instead of one match result, a separate audit left open for a future pass. Those rows show "—" rather than a guess.
 
 ## Memorable moments
 
