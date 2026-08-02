@@ -1181,6 +1181,70 @@ warning section in the content file).
   suite (188 cases, up from 184), all passing, including the existing WCAG
   sweep (44 cases, unchanged - the badge reuses an already-audited style).
 
+### Content-accuracy pass: Copa América third/fourth place for the knockout-final era
+
+Added 2026-08-02 (intensive run). Picks up the other open item the Format
+audit above left unresolved: `content/copa-america.md`'s "Champions timeline"
+table gained two new columns, "Third" and "Fourth", filled in for every
+edition that decided that placing with a single, discrete third-place match -
+1987, then every edition from 1993 onward including the 2016 centenary
+edition (14 editions total). Researched against official CONMEBOL/Copa
+América recaps where available and match reports otherwise (see
+`docs/SOURCES.md`'s new "Third/fourth-place audit" entry), including the two
+upset results worth double-checking carefully rather than assuming the
+higher-ranked side finished third: Honduras beat Uruguay on penalties for
+third in 2001, and Uruguay needed penalties over Canada for third in 2024.
+The pre-1975 league-table/final-playoff era and the 1989/1991 editions are
+**deliberately left as "—"**, not a guess - those years had no standalone
+third-place fixture, so the placing would have to be read off a full final
+standings table rather than one match result, which the rewritten "Important
+editorial warning" note in the content file now describes as the remaining
+open item for a future pass.
+
+This unexpectedly touched `/compare` (the "compare two national teams"
+page), which was built (2026-07-29, see the "Nice-to-have / later" entry
+above) on the explicit assumption that Copa América had no third/fourth
+column at all - its `tracksSemifinalColumn()` check is per-table, not
+per-row, so the moment *any* Copa América row has a "Third"/"Fourth" header
+the whole competition switches from showing "—" to showing a real generated
+count for every team, including the 34 rows that still don't have the data.
+Two follow-on fixes were needed, not just the new content:
+
+- **`src/lib/compare.ts` would have turned the new "—" placeholder cells
+  into a phantom country.** `distinctCountryGroups` and the internal
+  `matchesGroup` helper previously treated any non-empty cell as a team
+  name; a new shared `isMissingCell()` check (matching the "—"/empty
+  convention `TournamentTable.astro`'s own sort comparator already uses)
+  makes both skip it, the same category of bug the "Not awarded" quality
+  pass (2026-08-01) fixed for the champions summary and quiz. Without this,
+  "—" would have shown up as a selectable team in the picker and in the
+  all-teams ranking table.
+- **The English and Croatian `/compare` pages' explanatory note** ("Copa
+  América's table has no such column, shown as '—'") was now false - it does
+  have the column, just partial coverage - so both were reworded to explain
+  the 1987/1993-onward cutoff instead of claiming the column doesn't exist.
+
+Covered by 3 new Vitest cases (`tests/unit/compare.test.ts`: Copa América's
+`tracksSemifinalColumn` flips to `true`, a partially-filled column's real
+names are collected while "—" never becomes a phantom group, and a country's
+semifinal count is correct while a literal `'—'` group id never accrues a
+finish) and 4 new Playwright cases at 360px (the audited Third/Fourth values
+for 2024 and 1987, "—" still shown for 1916; the Croatian page's translated
+"Treći"/"Četvrti" column headers; and `/compare` now showing Colombia's real
+Copa América count of 6 third/fourth finishes instead of the old hardcoded
+em-dash expectation, which the existing test for that exact scenario was
+rewritten in place rather than duplicated). Regenerated
+`public/downloads/copa-america.pdf` via `pnpm build:pdfs` since the Editions
+table's columns changed again. Verified with `pnpm lint`, the full Vitest
+suite (121 cases, up from 119) and the full Playwright suite (189 cases, up
+from 188), all passing, including the unchanged WCAG sweep (44 cases) and
+the unchanged SEO/JSON-LD suites.
+
+**Left for a future pass:** the pre-1987 third/fourth audit (round-robin
+standings for 1916-1983, plus the 1989/1991 final round-robin groups) is
+real remaining work, not a "nice to have" - it's the one piece of the
+Format-audit warning note still open.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
