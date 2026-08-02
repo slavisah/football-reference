@@ -17,7 +17,7 @@ pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
 pnpm test                      # 119 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 184 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 188 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
                                           # and dark, across every page)
 ```
@@ -200,7 +200,10 @@ differ from `## Editions` and will need the matching `editionsHeading`:
 
 - [x] Copa América (`content/copa-america.md`) - used `editionsHeading:
       'Champions timeline'` and `allowDuplicateYears: ['1959']` for the two 1959
-      editions. Page at `src/pages/competitions/copa-america.astro`.
+      editions. Page at `src/pages/competitions/copa-america.astro`. The page's
+      own "needs-detailed-audit" content status is resolved by the dedicated
+      quality pass below (2026-08-02) - see that entry for the per-edition
+      "Format" audit.
 - [x] UEFA Nations League (`content/uefa-nations-league.md`) - uses seasons
       like `2018-19`; the parser already handles season labels. Page at
       `src/pages/competitions/nations-league.astro`.
@@ -1110,6 +1113,73 @@ have a generic answer rather than needing bespoke schema per competition:
   Croatian breadcrumb/`ItemList` names). Verified with `pnpm lint`, the full
   Vitest suite (119 cases, up from 112) and the full Playwright suite (184
   cases, up from 179), all passing.
+
+### Content-accuracy pass: Copa América per-edition "Format" audit
+
+Added 2026-08-02 (intensive run). `content/copa-america.md` was the one
+content file still marked `status: needs-detailed-audit` (every other page is
+`review` or `verified`), and its own "Important editorial warning" section
+spelled out exactly what a future coding agent should do about it: audit each
+edition's format and display a "format" badge (league table / final playoff /
+knockout final / home-and-away / special centenary edition) before ever
+considering adding third/fourth places to every row. This run does that first
+half of the ask - a badge, not the placings, which still needs its own
+separate per-tournament audit and stays explicitly open (see the rewritten
+warning section in the content file).
+
+- Researched all 48 Champions-timeline rows (1916-2024, including both 1959
+  editions) via web search against Wikipedia's per-edition articles and RSSSF,
+  rather than trusting memory for 20+ early-20th-century tournaments - see the
+  new citations in `docs/SOURCES.md`. Confirmed five, and only five, editions
+  where the round-robin table finished level on points and needed a separate
+  decider match (1919, 1922, 1937, 1949, 1953 - each has its own Wikipedia
+  "play-off" article); every other pre-1975 edition, plus the 1989/1991 group-
+  stage-then-final-round-robin-group editions, was decided by table standings
+  alone ("League table"). 1975/1979/1983 keep the "Home-and-away" label already
+  present in the Host/format column; 1987 and every edition from 1993 onward
+  except 2016 get "Knockout final" (group stage into a single-elimination
+  bracket); 2016 (Copa América Centenario, played outside the normal cycle for
+  the 100th anniversary) gets "Special centenary edition".
+- New "Format" column appended to the Champions timeline table - no new parser
+  or library code needed, since `buildEditions` already preserves every column
+  in `Edition.cells` and `TournamentTable.astro` already renders whatever
+  columns the source table has. The one small addition: `TournamentTable.astro`
+  now detects a column literally named "Format" (mirroring how it already
+  detects the winner column by header text) and wraps that cell's value in the
+  same `.badge` pill already used for the page's "Verified"/"In review" status
+  eyebrow, rather than plain text, matching what the warning asked for. No
+  other page has a "Format" column, so `formatColIndex` is simply `-1`
+  everywhere else and nothing about them changes.
+- `src/pages/hr/competitions/copa-america.astro` gained a `Format: 'Format'`
+  header-label entry (the word is identical in Croatian); the badge *values*
+  ("League table", "Home-and-away", etc.) stay in English on the Croatian page,
+  the same precedent the existing "Home-and-away" host-column value already
+  set - column headers/chrome are translated, editorial data values are not.
+- Front matter: `lastReviewed: 2026-08-02`, `status: review` (downgraded from
+  `needs-detailed-audit`, not straight to `verified`, since this used secondary
+  sources per `docs/SOURCES.md`'s review policy rather than the primary
+  CONMEBOL history PDF already cited there).
+- Regenerated all six `public/downloads/*.pdf` via `pnpm build:pdfs` per
+  `docs/ADDING_CONTENT.md` section 8, since the Copa América table's columns
+  changed.
+- **Also found and fixed in passing**: the Copa América competition page
+  itself had no dedicated Playwright describe block at all - every other of
+  the six competition/award pages has both an English and a Croatian "page on
+  a 360px phone" block, but Copa América only had the Croatian one; its one
+  English-page assertion (the language-switcher test) had been left stranded
+  inside the unrelated Ballon d'Or describe block, presumably a copy-paste
+  slip from an earlier translation run. Added the missing `'Copa América page
+  on a 360px phone'` block and moved that stray test into it.
+  Covered by 4 new Playwright cases in the new English block (no 360px
+  overflow, the Format badge on five representative editions spanning every
+  category, sorting by champion doesn't detach the badge from its row, the
+  language switcher) and 1 new case in the existing Croatian block (the badge
+  value matches the English page exactly, i.e. it isn't translated) - 5 new
+  cases total, no new pure function to unit-test since the change is a content
+  column plus a small display-only component branch. Verified with `pnpm
+  lint`, the full Vitest suite (119 cases, unchanged) and the full Playwright
+  suite (188 cases, up from 184), all passing, including the existing WCAG
+  sweep (44 cases, unchanged - the badge reuses an already-audited style).
 
 ## Known caveats
 
