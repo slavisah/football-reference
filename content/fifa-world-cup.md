@@ -5,7 +5,7 @@ competitionType: international
 confederation: FIFA
 firstEdition: 1930
 lastCompletedEdition: 2026
-lastReviewed: 2026-07-23
+lastReviewed: 2026-08-02
 status: review
 ---
 
@@ -15,31 +15,31 @@ The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 b
 
 ## Editions
 
-| Year | Host(s) | Teams | Winner | Runner-up | Third | Fourth / other semifinalist | Final |
-|---:|---|---:|---|---|---|---|---|
-| 1930 | Uruguay | 13 | Uruguay | Argentina | United States | Yugoslavia | Uruguay 4–2 Argentina |
-| 1934 | Italy | 16 | Italy | Czechoslovakia | Germany | Austria | Italy 2–1 Czechoslovakia (a.e.t.) |
-| 1938 | France | 15 | Italy | Hungary | Brazil | Sweden | Italy 4–2 Hungary |
-| 1950 | Brazil | 13 | Uruguay | Brazil | Sweden | Spain | Uruguay 2–1 Brazil (final-group decider) |
-| 1954 | Switzerland | 16 | West Germany | Hungary | Austria | Uruguay | West Germany 3–2 Hungary |
-| 1958 | Sweden | 16 | Brazil | Sweden | France | West Germany | Brazil 5–2 Sweden |
-| 1962 | Chile | 16 | Brazil | Czechoslovakia | Chile | Yugoslavia | Brazil 3–1 Czechoslovakia |
-| 1966 | England | 16 | England | West Germany | Portugal | Soviet Union | England 4–2 West Germany (a.e.t.) |
-| 1970 | Mexico | 16 | Brazil | Italy | West Germany | Uruguay | Brazil 4–1 Italy |
-| 1974 | West Germany | 16 | West Germany | Netherlands | Poland | Brazil | West Germany 2–1 Netherlands |
-| 1978 | Argentina | 16 | Argentina | Netherlands | Brazil | Italy | Argentina 3–1 Netherlands (a.e.t.) |
-| 1982 | Spain | 24 | Italy | West Germany | Poland | France | Italy 3–1 West Germany |
-| 1986 | Mexico | 24 | Argentina | West Germany | France | Belgium | Argentina 3–2 West Germany |
-| 1990 | Italy | 24 | West Germany | Argentina | Italy | England | West Germany 1–0 Argentina |
-| 1994 | United States | 24 | Brazil | Italy | Sweden | Bulgaria | Brazil 0–0 Italy; 3–2 pens |
-| 1998 | France | 32 | France | Brazil | Croatia | Netherlands | France 3–0 Brazil |
-| 2002 | South Korea and Japan | 32 | Brazil | Germany | Türkiye | South Korea | Brazil 2–0 Germany |
-| 2006 | Germany | 32 | Italy | France | Germany | Portugal | Italy 1–1 France; 5–3 pens |
-| 2010 | South Africa | 32 | Spain | Netherlands | Germany | Uruguay | Spain 1–0 Netherlands (a.e.t.) |
-| 2014 | Brazil | 32 | Germany | Argentina | Netherlands | Brazil | Germany 1–0 Argentina (a.e.t.) |
-| 2018 | Russia | 32 | France | Croatia | Belgium | England | France 4–2 Croatia |
-| 2022 | Qatar | 32 | Argentina | France | Croatia | Morocco | Argentina 3–3 France; 4–2 pens |
-| 2026 | Canada, Mexico and United States | 48 | Spain | Argentina | England | France | Spain 1–0 Argentina |
+| Year | Host(s) | Teams | Winner | Runner-up | Third | Fourth / other semifinalist | Final | Final date |
+|---:|---|---:|---|---|---|---|---|---|
+| 1930 | Uruguay | 13 | Uruguay | Argentina | United States | Yugoslavia | Uruguay 4–2 Argentina | 30 July 1930 |
+| 1934 | Italy | 16 | Italy | Czechoslovakia | Germany | Austria | Italy 2–1 Czechoslovakia (a.e.t.) | 10 June 1934 |
+| 1938 | France | 15 | Italy | Hungary | Brazil | Sweden | Italy 4–2 Hungary | 19 June 1938 |
+| 1950 | Brazil | 13 | Uruguay | Brazil | Sweden | Spain | Uruguay 2–1 Brazil (final-group decider) | 16 July 1950 |
+| 1954 | Switzerland | 16 | West Germany | Hungary | Austria | Uruguay | West Germany 3–2 Hungary | 4 July 1954 |
+| 1958 | Sweden | 16 | Brazil | Sweden | France | West Germany | Brazil 5–2 Sweden | 29 June 1958 |
+| 1962 | Chile | 16 | Brazil | Czechoslovakia | Chile | Yugoslavia | Brazil 3–1 Czechoslovakia | 17 June 1962 |
+| 1966 | England | 16 | England | West Germany | Portugal | Soviet Union | England 4–2 West Germany (a.e.t.) | 30 July 1966 |
+| 1970 | Mexico | 16 | Brazil | Italy | West Germany | Uruguay | Brazil 4–1 Italy | 21 June 1970 |
+| 1974 | West Germany | 16 | West Germany | Netherlands | Poland | Brazil | West Germany 2–1 Netherlands | 7 July 1974 |
+| 1978 | Argentina | 16 | Argentina | Netherlands | Brazil | Italy | Argentina 3–1 Netherlands (a.e.t.) | 25 June 1978 |
+| 1982 | Spain | 24 | Italy | West Germany | Poland | France | Italy 3–1 West Germany | 11 July 1982 |
+| 1986 | Mexico | 24 | Argentina | West Germany | France | Belgium | Argentina 3–2 West Germany | 29 June 1986 |
+| 1990 | Italy | 24 | West Germany | Argentina | Italy | England | West Germany 1–0 Argentina | 8 July 1990 |
+| 1994 | United States | 24 | Brazil | Italy | Sweden | Bulgaria | Brazil 0–0 Italy; 3–2 pens | 17 July 1994 |
+| 1998 | France | 32 | France | Brazil | Croatia | Netherlands | France 3–0 Brazil | 12 July 1998 |
+| 2002 | South Korea and Japan | 32 | Brazil | Germany | Türkiye | South Korea | Brazil 2–0 Germany | 30 June 2002 |
+| 2006 | Germany | 32 | Italy | France | Germany | Portugal | Italy 1–1 France; 5–3 pens | 9 July 2006 |
+| 2010 | South Africa | 32 | Spain | Netherlands | Germany | Uruguay | Spain 1–0 Netherlands (a.e.t.) | 11 July 2010 |
+| 2014 | Brazil | 32 | Germany | Argentina | Netherlands | Brazil | Germany 1–0 Argentina (a.e.t.) | 13 July 2014 |
+| 2018 | Russia | 32 | France | Croatia | Belgium | England | France 4–2 Croatia | 15 July 2018 |
+| 2022 | Qatar | 32 | Argentina | France | Croatia | Morocco | Argentina 3–3 France; 4–2 pens | 18 December 2022 |
+| 2026 | Canada, Mexico and United States | 48 | Spain | Argentina | England | France | Spain 1–0 Argentina | 19 July 2026 |
 
 ## Champions by titles after 2026
 
