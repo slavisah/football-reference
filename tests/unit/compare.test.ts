@@ -28,13 +28,31 @@ const euroTable: MarkdownTable = {
   ],
 };
 
-// No third/fourth column at all, like Copa América's champions timeline.
-const copaTable: MarkdownTable = {
+// No third/fourth column at all - a hypothetical award-style table.
+const noSemifinalColumnTable: MarkdownTable = {
   headers: ['Year', 'Host', 'Champion', 'Runner-up'],
   rows: [
     ['2021', 'Brazil', 'Argentina', 'Brazil'],
     ['2024', 'United States', 'Argentina', 'Colombia'],
   ],
+};
+
+// Copa América's real shape: a "Third"/"Fourth" column that exists on every
+// row, but is only filled in for the knockout-final era - earlier editions
+// use the shared "—" missing-cell placeholder rather than a guessed name.
+const copaTable: MarkdownTable = {
+  headers: ['Year', 'Host', 'Champion', 'Runner-up', 'Third', 'Fourth'],
+  rows: [
+    ['1916', 'Argentina', 'Uruguay', 'Argentina', '—', '—'],
+    ['2021', 'Brazil', 'Argentina', 'Brazil', 'Colombia', 'Peru'],
+    ['2024', 'United States', 'Argentina', 'Colombia', 'Uruguay', 'Canada'],
+  ],
+};
+
+const noSemifinalColumn: CompetitionEditions = {
+  title: 'No semifinal column award',
+  slug: 'no-semifinal-column',
+  editions: buildEditions(noSemifinalColumnTable),
 };
 
 const worldCup: CompetitionEditions = {
@@ -59,10 +77,13 @@ describe('tracksSemifinalColumn', () => {
   it('is true when the table has a third/fourth/semifinalist column', () => {
     expect(tracksSemifinalColumn(worldCup.editions)).toBe(true);
     expect(tracksSemifinalColumn(euro.editions)).toBe(true);
+    // Copa América's real table: the column exists on every row even though
+    // only some rows have real data in it (the rest are "—").
+    expect(tracksSemifinalColumn(copaAmerica.editions)).toBe(true);
   });
 
   it('is false when the table has no such column', () => {
-    expect(tracksSemifinalColumn(copaAmerica.editions)).toBe(false);
+    expect(tracksSemifinalColumn(noSemifinalColumn.editions)).toBe(false);
   });
 });
 
@@ -77,6 +98,19 @@ describe('distinctCountryGroups', () => {
 
     const germany = groups.find((g) => g.id === 'germany');
     expect(germany?.displayName).toBe('Germany (incl. West Germany)');
+  });
+
+  it('collects real names from a partially filled semifinal column and never turns the "—" placeholder into a phantom team', () => {
+    const groups = distinctCountryGroups(competitions);
+    const ids = groups.map((g) => g.id);
+    // From Copa América's 2021/2024 Third/Fourth cells.
+    expect(ids).toContain('colombia');
+    expect(ids).toContain('peru');
+    expect(ids).toContain('uruguay');
+    expect(ids).toContain('canada');
+    // From 1916's empty Third/Fourth cells - must never appear as a group.
+    expect(ids).not.toContain('—');
+    expect(groups.find((g) => g.displayName === '—')).toBeUndefined();
   });
 });
 
@@ -102,9 +136,24 @@ describe('buildCountryCompetitionRecord', () => {
   });
 
   it('returns 0 semifinals (not a false positive) when the competition has no such column', () => {
-    const record = buildCountryCompetitionRecord('brazil', copaAmerica);
+    const record = buildCountryCompetitionRecord('brazil', noSemifinalColumn);
     expect(record.runnerUps).toBe(1); // 2021 runner-up
     expect(record.semifinals).toBe(0);
+  });
+
+  it('counts a real third/fourth finish and ignores the "—" missing-cell placeholder', () => {
+    // Colombia: third in 2021, runner-up in 2024, and 1916's "—" Third/Fourth
+    // cells must not falsely match any group.
+    const colombia = buildCountryCompetitionRecord('colombia', copaAmerica);
+    expect(colombia.titles).toBe(0);
+    expect(colombia.runnerUps).toBe(1);
+    expect(colombia.semifinals).toBe(1);
+
+    // No real team is ever named "—", so it must never accrue a "finish".
+    const dash = buildCountryCompetitionRecord('—', copaAmerica);
+    expect(dash.titles).toBe(0);
+    expect(dash.runnerUps).toBe(0);
+    expect(dash.semifinals).toBe(0);
   });
 });
 

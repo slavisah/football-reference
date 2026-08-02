@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 112 Vitest unit tests
+pnpm test                      # 119 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 179 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 188 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
                                           # and dark, across every page)
 ```
@@ -200,7 +200,10 @@ differ from `## Editions` and will need the matching `editionsHeading`:
 
 - [x] Copa América (`content/copa-america.md`) - used `editionsHeading:
       'Champions timeline'` and `allowDuplicateYears: ['1959']` for the two 1959
-      editions. Page at `src/pages/competitions/copa-america.astro`.
+      editions. Page at `src/pages/competitions/copa-america.astro`. The page's
+      own "needs-detailed-audit" content status is resolved by the dedicated
+      quality pass below (2026-08-02) - see that entry for the per-edition
+      "Format" audit.
 - [x] UEFA Nations League (`content/uefa-nations-league.md`) - uses seasons
       like `2018-19`; the parser already handles season labels. Page at
       `src/pages/competitions/nations-league.astro`.
@@ -1053,6 +1056,317 @@ existing page.
 per-competition-type schema shape to be genuinely useful to search engines
 rather than boilerplate, which is a bigger design decision than fits a single
 quality-pass item.
+
+### Quality pass: JSON-LD structured data (BreadcrumbList, champions ItemList, latest-edition SportsEvent)
+
+Added 2026-08-02 (intensive run). Picks up the "left for a future pass" item
+right above: the earlier SEO pass added canonical/OG/sitemap but no
+structured data at all, so a search engine only ever saw plain HTML. The
+"per-competition-type schema shape" problem that deferred this turned out to
+have a generic answer rather than needing bespoke schema per competition:
+
+- **`src/lib/jsonLd.ts`** (new) has three pure builders, all schema.org:
+  `buildBreadcrumbList()` (a "Home > page" trail), `buildChampionsItemList()`
+  (a ranked `ItemList` of `Thing`s - name + a "N title(s) (years)" description
+  - built directly from the exact `ChampionSummary[]` every page already
+    computes for its on-page Champions summary, no recomputation, no new
+    facts), and `buildLatestEditionSportsEvent()` (the most recently completed
+  edition as a `SportsEvent`: name, host as `location`, winner as
+  `competitor`, `startDate` as the bare year already in the Editions table -
+  no calendar date is invented, since none exists in the editorial source).
+  `ItemList` is genuinely generic across both team competitions and
+  individual awards (Ballon d'Or, Golden Boot), which is what made the
+  earlier "per-type schema" concern moot; `SportsEvent` is only attached to
+  the four team competitions (World Cup, EURO, Copa América, Nations League)
+  - an individual award isn't a sporting *event*, so Ballon d'Or/Golden Boot
+  get an `ItemList` only, no `SportsEvent`.
+- **`BaseLayout.astro`** renders the `BreadcrumbList` automatically for every
+  page except the home page (computed from the same `canonicalURL`/`title`
+  every page already passes in - zero new props needed on any of the 22
+  pages for this part) and takes an optional `jsonLd?: JsonLdObject[]` prop
+  for page-specific objects, each rendered as its own
+  `<script type="application/ld+json">` (simpler and equally valid to merging
+  into one `@graph`). New `homeBreadcrumb` UI string in `src/lib/i18n.ts`
+  ("Home"/"Početna").
+- Each of the twelve competition/award pages (six English, six Croatian) now
+  computes its own `jsonLd` array via the new `absolutePageUrl()` helper in
+  `src/lib/url.ts` (mirrors the `site ?? url` fallback `sitemap.xml.ts`
+  already uses) and passes it to `BaseLayout`. Golden Boot passes two
+  `ItemList`s (one per table), matching how its `ChampionsSummary` is already
+  duplicated on that page.
+- Verified the generated markup directly, not just that the build succeeds:
+  parsed every `<script type="application/ld+json">` block across all 22
+  built pages (42 total) as JSON - all valid - and spot-checked the World Cup
+  page's three blocks (`BreadcrumbList`, `ItemList` topped by Brazil's 5
+  titles, `SportsEvent` for "2026 FIFA World Cup" with Canada/Mexico/United
+  States as `location` and Spain as `competitor`), the home page (correctly
+  has none), and Ballon d'Or (`ItemList` only, no `SportsEvent`).
+- Covered by 7 new Vitest cases (`tests/unit/jsonLd.test.ts`: breadcrumb
+  shape, ItemList with default vs. overridden unit wording, SportsEvent
+  picking the latest year regardless of source order, omitting
+  location/competitor when absent, excluding a placeholder "Not awarded"
+  winner from `competitor`, and returning `undefined` when no edition has a
+  parseable year) and 5 new Playwright cases in the existing
+  `tests/e2e/mobile.spec.ts` SEO describe block (home page has none; the
+  World Cup page's three-block shape and content; an individual-award page
+  has no `SportsEvent`; Golden Boot's two `ItemList`s; a translated page's
+  Croatian breadcrumb/`ItemList` names). Verified with `pnpm lint`, the full
+  Vitest suite (119 cases, up from 112) and the full Playwright suite (184
+  cases, up from 179), all passing.
+
+### Content-accuracy pass: Copa América per-edition "Format" audit
+
+Added 2026-08-02 (intensive run). `content/copa-america.md` was the one
+content file still marked `status: needs-detailed-audit` (every other page is
+`review` or `verified`), and its own "Important editorial warning" section
+spelled out exactly what a future coding agent should do about it: audit each
+edition's format and display a "format" badge (league table / final playoff /
+knockout final / home-and-away / special centenary edition) before ever
+considering adding third/fourth places to every row. This run does that first
+half of the ask - a badge, not the placings, which still needs its own
+separate per-tournament audit and stays explicitly open (see the rewritten
+warning section in the content file).
+
+- Researched all 48 Champions-timeline rows (1916-2024, including both 1959
+  editions) via web search against Wikipedia's per-edition articles and RSSSF,
+  rather than trusting memory for 20+ early-20th-century tournaments - see the
+  new citations in `docs/SOURCES.md`. Confirmed five, and only five, editions
+  where the round-robin table finished level on points and needed a separate
+  decider match (1919, 1922, 1937, 1949, 1953 - each has its own Wikipedia
+  "play-off" article); every other pre-1975 edition, plus the 1989/1991 group-
+  stage-then-final-round-robin-group editions, was decided by table standings
+  alone ("League table"). 1975/1979/1983 keep the "Home-and-away" label already
+  present in the Host/format column; 1987 and every edition from 1993 onward
+  except 2016 get "Knockout final" (group stage into a single-elimination
+  bracket); 2016 (Copa América Centenario, played outside the normal cycle for
+  the 100th anniversary) gets "Special centenary edition".
+- New "Format" column appended to the Champions timeline table - no new parser
+  or library code needed, since `buildEditions` already preserves every column
+  in `Edition.cells` and `TournamentTable.astro` already renders whatever
+  columns the source table has. The one small addition: `TournamentTable.astro`
+  now detects a column literally named "Format" (mirroring how it already
+  detects the winner column by header text) and wraps that cell's value in the
+  same `.badge` pill already used for the page's "Verified"/"In review" status
+  eyebrow, rather than plain text, matching what the warning asked for. No
+  other page has a "Format" column, so `formatColIndex` is simply `-1`
+  everywhere else and nothing about them changes.
+- `src/pages/hr/competitions/copa-america.astro` gained a `Format: 'Format'`
+  header-label entry (the word is identical in Croatian); the badge *values*
+  ("League table", "Home-and-away", etc.) stay in English on the Croatian page,
+  the same precedent the existing "Home-and-away" host-column value already
+  set - column headers/chrome are translated, editorial data values are not.
+- Front matter: `lastReviewed: 2026-08-02`, `status: review` (downgraded from
+  `needs-detailed-audit`, not straight to `verified`, since this used secondary
+  sources per `docs/SOURCES.md`'s review policy rather than the primary
+  CONMEBOL history PDF already cited there).
+- Regenerated all six `public/downloads/*.pdf` via `pnpm build:pdfs` per
+  `docs/ADDING_CONTENT.md` section 8, since the Copa América table's columns
+  changed.
+- **Also found and fixed in passing**: the Copa América competition page
+  itself had no dedicated Playwright describe block at all - every other of
+  the six competition/award pages has both an English and a Croatian "page on
+  a 360px phone" block, but Copa América only had the Croatian one; its one
+  English-page assertion (the language-switcher test) had been left stranded
+  inside the unrelated Ballon d'Or describe block, presumably a copy-paste
+  slip from an earlier translation run. Added the missing `'Copa América page
+  on a 360px phone'` block and moved that stray test into it.
+  Covered by 4 new Playwright cases in the new English block (no 360px
+  overflow, the Format badge on five representative editions spanning every
+  category, sorting by champion doesn't detach the badge from its row, the
+  language switcher) and 1 new case in the existing Croatian block (the badge
+  value matches the English page exactly, i.e. it isn't translated) - 5 new
+  cases total, no new pure function to unit-test since the change is a content
+  column plus a small display-only component branch. Verified with `pnpm
+  lint`, the full Vitest suite (119 cases, unchanged) and the full Playwright
+  suite (188 cases, up from 184), all passing, including the existing WCAG
+  sweep (44 cases, unchanged - the badge reuses an already-audited style).
+
+### Content-accuracy pass: Copa América third/fourth place for the knockout-final era
+
+Added 2026-08-02 (intensive run). Picks up the other open item the Format
+audit above left unresolved: `content/copa-america.md`'s "Champions timeline"
+table gained two new columns, "Third" and "Fourth", filled in for every
+edition that decided that placing with a single, discrete third-place match -
+1987, then every edition from 1993 onward including the 2016 centenary
+edition (14 editions total). Researched against official CONMEBOL/Copa
+América recaps where available and match reports otherwise (see
+`docs/SOURCES.md`'s new "Third/fourth-place audit" entry), including the two
+upset results worth double-checking carefully rather than assuming the
+higher-ranked side finished third: Honduras beat Uruguay on penalties for
+third in 2001, and Uruguay needed penalties over Canada for third in 2024.
+The pre-1975 league-table/final-playoff era and the 1989/1991 editions are
+**deliberately left as "—"**, not a guess - those years had no standalone
+third-place fixture, so the placing would have to be read off a full final
+standings table rather than one match result, which the rewritten "Important
+editorial warning" note in the content file now describes as the remaining
+open item for a future pass.
+
+This unexpectedly touched `/compare` (the "compare two national teams"
+page), which was built (2026-07-29, see the "Nice-to-have / later" entry
+above) on the explicit assumption that Copa América had no third/fourth
+column at all - its `tracksSemifinalColumn()` check is per-table, not
+per-row, so the moment *any* Copa América row has a "Third"/"Fourth" header
+the whole competition switches from showing "—" to showing a real generated
+count for every team, including the 34 rows that still don't have the data.
+Two follow-on fixes were needed, not just the new content:
+
+- **`src/lib/compare.ts` would have turned the new "—" placeholder cells
+  into a phantom country.** `distinctCountryGroups` and the internal
+  `matchesGroup` helper previously treated any non-empty cell as a team
+  name; a new shared `isMissingCell()` check (matching the "—"/empty
+  convention `TournamentTable.astro`'s own sort comparator already uses)
+  makes both skip it, the same category of bug the "Not awarded" quality
+  pass (2026-08-01) fixed for the champions summary and quiz. Without this,
+  "—" would have shown up as a selectable team in the picker and in the
+  all-teams ranking table.
+- **The English and Croatian `/compare` pages' explanatory note** ("Copa
+  América's table has no such column, shown as '—'") was now false - it does
+  have the column, just partial coverage - so both were reworded to explain
+  the 1987/1993-onward cutoff instead of claiming the column doesn't exist.
+
+Covered by 3 new Vitest cases (`tests/unit/compare.test.ts`: Copa América's
+`tracksSemifinalColumn` flips to `true`, a partially-filled column's real
+names are collected while "—" never becomes a phantom group, and a country's
+semifinal count is correct while a literal `'—'` group id never accrues a
+finish) and 4 new Playwright cases at 360px (the audited Third/Fourth values
+for 2024 and 1987, "—" still shown for 1916; the Croatian page's translated
+"Treći"/"Četvrti" column headers; and `/compare` now showing Colombia's real
+Copa América count of 6 third/fourth finishes instead of the old hardcoded
+em-dash expectation, which the existing test for that exact scenario was
+rewritten in place rather than duplicated). Regenerated
+`public/downloads/copa-america.pdf` via `pnpm build:pdfs` since the Editions
+table's columns changed again. Verified with `pnpm lint`, the full Vitest
+suite (121 cases, up from 119) and the full Playwright suite (189 cases, up
+from 188), all passing, including the unchanged WCAG sweep (44 cases) and
+the unchanged SEO/JSON-LD suites.
+
+**Left for a future pass:** the pre-1987 third/fourth audit (round-robin
+standings for 1916-1983, plus the 1989/1991 final round-robin groups) is
+real remaining work, not a "nice to have" - it's the one piece of the
+Format-audit warning note still open.
+
+### Quality pass: Copa América third/fourth for the 1989 and 1991 closing groups
+
+Added 2026-08-02 (intensive run). Picks up half of the "left for a future
+pass" note directly above: the 1989 and 1991 editions are `League table`
+format but, unlike the pre-1975 single round-robin era, each was decided by
+a small **closing group** of just four teams (the top two from each of two
+opening groups), so third and fourth read directly off that group's final
+standings without needing a full ten-plus-team table audit - a genuinely
+different, much more tractable case than the remaining pre-1975 rows.
+
+- `content/copa-america.md`: 1989 gets Third: Argentina, Fourth: Paraguay
+  (Brazil won the closing group 3-0-0, Uruguay second at 2-0-1; Argentina and
+  Paraguay both finished 0-1-2 at 1 point, Argentina ahead on goal
+  difference, 0-4 vs 0-6). 1991 gets Third: Chile, Fourth:
+  Colombia (Argentina won at 2W-1D, Brazil second at 2W-1L, Chile third at
+  2D-1L, Colombia fourth at 1D-2L). Both cross-checked against independent
+  match-by-match results, not just a single standings snapshot.
+- `docs/SOURCES.md` gained the two citations; the content file's "Important
+  editorial warning" section now explains the 1989/1991 closing-group
+  reasoning and narrows the still-open item to the pre-1975 league-table/
+  final-playoff era only (1916-1967 - the 1975-1983 home-and-away era has no
+  standings table to read at all, so it was never part of this open item).
+- `tests/e2e/mobile.spec.ts`'s `/compare` Copa América count test updated
+  from 6 to 7 (Colombia's new 1991 fourth-place finish adds one more
+  semifinal-or-better count) - the underlying number changing is the correct,
+  expected effect of adding real historical data, not a bug.
+- Regenerated all six downloadable PDFs (`pnpm build:pdfs`; the script
+  rebuilds the whole static site from the preview server for each one, so
+  every PDF's bytes shift slightly even though only Copa América's content
+  changed - consistent with every prior PDF-regeneration run in this file).
+- Environment note for future runs: this session's Playwright browser
+  wasn't at the `chrome` channel path `PW_CHROME_CHANNEL` expects
+  (`/opt/google/chrome/chrome` - not installed here); `playwright.config.ts`
+  already has a `PW_EXECUTABLE_PATH` escape hatch for exactly this, so
+  `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` was used
+  instead and is the more portable command going forward. Verified: `pnpm
+  lint`, the full Vitest suite (121 cases, unchanged), and the full
+  Playwright suite (189 cases, unchanged count - one assertion's expected
+  value updated, no cases added or removed), all passing.
+
+**Left for a future pass:** the pre-1975 League table/Final playoff era
+(1916-1967, 30 editions) is the one remaining open item in the Copa América
+editorial warning. Unlike 1989/1991, most of these had no small closing
+group - third/fourth would have to be read off a single round-robin table of
+up to ten teams, for which reliable secondary sources are considerably
+harder to find and cross-check era-by-era; a future pass should budget for
+researching (and citing) each edition individually rather than assuming a
+single source covers all thirty at once.
+
+### Content-accuracy pass: Copa América third/fourth for the full pre-1975 era - audit closed
+
+Added 2026-08-02 (intensive run). Closes the item directly above and the
+Copa América third/fourth audit as a whole: the remaining 29 editions from
+1916-1967 (every edition in the pre-1975 League table/Final playoff era
+except the 1919/1922/1937/1949/1953 playoff years' already-known result,
+which still needed their own third/fourth read from the pre-playoff group
+table) now have researched third- and fourth-place teams in
+`content/copa-america.md`'s Champions timeline table, replacing "—".
+
+- Research was fanned out across three parallel research agents (1916-1927,
+  1929-1947, 1949-1967), each cross-checking RSSSF's per-edition table pages
+  against Wikipedia's per-edition articles and an internal points-arithmetic
+  consistency check (reported points must be consistent with the number of
+  matches played and, where teams tied on points, the stated goal
+  difference/average must actually separate them in the claimed order).
+  Their reported "high"/"medium" confidence split was not taken at face
+  value: this session's own direct `WebFetch` of both rsssf.org and
+  en.wikipedia.org pages returned HTTP 403 (the outbound network policy
+  blocks direct fetches to those hosts), matching what the research agents
+  had already found, so every one of the 29 results - including the four
+  the agents rated only "medium" confidence (1917, 1920, 1926, 1945), which
+  lacked a full recoverable points table - was independently re-verified
+  with fresh `WebSearch` queries before being written into the content file,
+  not just carried over from the agents' output.
+- **1922** is a documented edge case rather than a simple table read: Brazil,
+  Paraguay, and Uruguay finished level on both points and goal difference,
+  triggering a three-way title playoff; Uruguay withdrew from it in protest
+  at refereeing decisions, finishing third by that elimination rather than a
+  table tiebreak, with Argentina (not level with the top three) fourth. This
+  is spelled out in the rewritten "Important editorial warning" section
+  rather than left as an unexplained table cell.
+- **1925** is the one edition that keeps a "—": only three teams entered
+  (Argentina, Brazil, Paraguay) playing a double round-robin, so third
+  (Paraguay) exists but a fourth-place team structurally never did. This is
+  the historical fact, not a sourcing gap - explained in the content file's
+  warning section so a future editor doesn't mistake it for unfinished work.
+- The 1975/1979/1983 Home-and-away "—" cells are unchanged and explained as
+  permanent (no standings table or third-place fixture of any kind exists
+  for a two-legged final).
+- `docs/SOURCES.md` gained one citation entry per edition (RSSSF table page
+  + Wikipedia article where both were checked), plus a note on the 403
+  network restriction and the re-verification method, so a future reader can
+  see exactly how confident to be in each row.
+- `tests/e2e/mobile.spec.ts`'s Copa América Format/Third/Fourth test
+  (previously asserting 1916 showed "—") now asserts real values for 1916
+  and 1922 (including the withdrawal case), the 1925 partial-"—" case, and
+  moves the "no data exists" assertion to 1975 (Home-and-away), which is now
+  the only kind of row that still shows "—" as a permanent fact rather than
+  an open item. `tests/unit/compare.test.ts` needed no changes - it tests
+  `src/lib/compare.ts`'s pure functions against synthetic fixtures, not the
+  real content file, and the existing "—"-skipping logic (`isMissingCell()`,
+  added in the earlier knockout-era third/fourth pass) already handles the
+  new 1925 partial-data row correctly with no code change. The `/compare`
+  page's all-teams ranking numbers do shift for any country that reached
+  third/fourth in 1916-1967 (e.g. Brazil, Uruguay, Chile, Argentina,
+  Paraguay, Peru all gain finishes) - Colombia's existing e2e test assertion
+  (count of 7) is unaffected since Colombia never appears in this era's
+  results, and no other test hardcoded a specific country's Copa América
+  semifinal count for this range.
+- Front matter: `lastReviewed: 2026-08-02` (unchanged), `status: review`
+  (unchanged - this pass used secondary sources per `docs/SOURCES.md`'s
+  review policy, not the primary CONMEBOL history PDF already cited there,
+  same reasoning the Format-audit pass gave for not marking `verified`).
+  Regenerated `public/downloads/copa-america.pdf` via `pnpm build:pdfs`
+  since the Editions table's cell values changed.
+- Verified with `pnpm lint`, the full Vitest suite, and the full Playwright
+  suite, all passing (see exact counts in the commit this entry ships with).
+
+This closes the entire Copa América Third/Fourth backlog item: every edition
+from 1916 to 2024 now shows either a real, sourced placing or an explained
+"—" that is itself the historical fact, and the content file's "Important
+editorial warning" section documents both.
 
 ## Known caveats
 

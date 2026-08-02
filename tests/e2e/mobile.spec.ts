@@ -494,13 +494,6 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
     await expect(page.locator('.champions')).not.toContainText('Not awarded');
   });
 
-  test('the language switcher opens the Croatian Copa América page', async ({ page }) => {
-    await page.goto('competitions/copa-america');
-    await page.locator('a.lang-switch').click();
-    await expect(page).toHaveURL(/\/hr\/competitions\/copa-america\/?$/);
-    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
-  });
-
   test("the language switcher opens the Croatian Ballon d'Or page", async ({ page }) => {
     await page.goto('competitions/ballon-dor');
     await page.locator('a.lang-switch').click();
@@ -582,6 +575,89 @@ test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360p
   });
 });
 
+test.describe('Copa América page on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('competitions/copa-america');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('shows an audited "Format" badge per edition', async ({ page }) => {
+    await expect(page.getByRole('columnheader', { name: 'Format', exact: true })).toBeVisible();
+
+    const row1919 = page.locator('tbody tr[data-year="1919"]');
+    await expect(row1919.locator('.badge')).toHaveText('Final playoff');
+
+    const row1975 = page.locator('tbody tr[data-year="1975"]');
+    await expect(row1975.locator('.badge')).toHaveText('Home-and-away');
+
+    const row1989 = page.locator('tbody tr[data-year="1989"]');
+    await expect(row1989.locator('.badge')).toHaveText('League table');
+
+    const row2016 = page.locator('tbody tr[data-year="2016"]');
+    await expect(row2016.locator('.badge')).toHaveText('Special centenary edition');
+
+    const row2024 = page.locator('tbody tr[data-year="2024"]');
+    await expect(row2024.locator('.badge')).toHaveText('Knockout final');
+  });
+
+  test('sorting by winner preserves the Format badge in the same row', async ({ page }) => {
+    const row2016 = page.locator('tbody tr[data-year="2016"]');
+    await page.selectOption('#copa-america-sort', 'champion-asc');
+    await expect(row2016.locator('.badge')).toHaveText('Special centenary edition');
+    await expect(row2016).toBeVisible();
+  });
+
+  test('shows the audited Third/Fourth place across every league-table and knockout-final edition, and "—" only where no such placing exists', async ({
+    page,
+  }) => {
+    const row2024 = page.locator('tbody tr[data-year="2024"]');
+    await expect(row2024.locator('td[data-label="Third"]')).toHaveText('Uruguay');
+    await expect(row2024.locator('td[data-label="Fourth"]')).toHaveText('Canada');
+
+    const row1987 = page.locator('tbody tr[data-year="1987"]');
+    await expect(row1987.locator('td[data-label="Third"]')).toHaveText('Colombia');
+    await expect(row1987.locator('td[data-label="Fourth"]')).toHaveText('Argentina');
+
+    // Pre-1975 league-table/final-playoff era: read off the final standings
+    // table, audited 2026-08-02.
+    const row1916 = page.locator('tbody tr[data-year="1916"]');
+    await expect(row1916.locator('td[data-label="Third"]')).toHaveText('Brazil');
+    await expect(row1916.locator('td[data-label="Fourth"]')).toHaveText('Chile');
+
+    // 1922: Uruguay finished 3rd not by the table alone but by withdrawing
+    // from the three-way title playoff - still a sourced, real placing.
+    const row1922 = page.locator('tbody tr[data-year="1922"]');
+    await expect(row1922.locator('td[data-label="Third"]')).toHaveText('Uruguay');
+    await expect(row1922.locator('td[data-label="Fourth"]')).toHaveText('Argentina');
+
+    // 1925 only had three entrants (Argentina, Brazil, Paraguay), so a
+    // fourth place structurally never existed - "—" here isn't a research
+    // gap, it's the historical fact.
+    const row1925 = page.locator('tbody tr[data-year="1925"]');
+    await expect(row1925.locator('td[data-label="Third"]')).toHaveText('Paraguay');
+    await expect(row1925.locator('td[data-label="Fourth"]')).toHaveText('—');
+
+    // Home-and-away era (1975/1979/1983): no standings table exists at all,
+    // so this "—" remains permanent, not a future-audit gap.
+    const row1975 = page.locator('tbody tr[data-year="1975"]');
+    await expect(row1975.locator('td[data-label="Third"]')).toHaveText('—');
+    await expect(row1975.locator('td[data-label="Fourth"]')).toHaveText('—');
+  });
+
+  test('the language switcher opens the Croatian Copa América page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/competitions\/copa-america\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
 test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 360px phone', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('hr/competitions/copa-america');
@@ -602,6 +678,15 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await expect(page.locator('th', { hasText: 'Godina' })).toBeVisible();
     await expect(page.locator('th', { hasText: 'Prvak' })).toBeVisible();
     await expect(page.locator('th', { hasText: 'Drugoplasirani' })).toBeVisible();
+    await expect(page.getByRole('columnheader', { name: 'Format', exact: true })).toBeVisible();
+  });
+
+  test('shows the same "Format" badge value as the English page (data, not translated)', async ({
+    page,
+  }) => {
+    await expect(page.locator('tbody tr[data-year="2016"] .badge')).toHaveText(
+      'Special centenary edition',
+    );
   });
 
   test('filtering by prvak (winner) Uruguay updates the shareable URL and status text', async ({
@@ -940,9 +1025,17 @@ test.describe('Compare page on a 360px phone', () => {
     await expect(page.locator('#compare-b-name')).toHaveText('Argentina');
   });
 
-  test('shows an em dash for a competition that has no semifinal column', async ({ page }) => {
+  test('shows real Copa América third/fourth counts for the knockout-final era, not an em dash', async ({
+    page,
+  }) => {
+    // Copa América now records third/fourth for the knockout-final era (1987
+    // and 1993 onward) plus the 1989/1991 closing-group editions, so this is
+    // no longer the "no such column" case - Colombia reached third or fourth
+    // seven times across those editions (six knockout-era finishes plus
+    // fourth in the 1991 closing group).
+    await page.goto('compare?a=colombia&b=argentina');
     const copaRow = page.locator('#compare-a-body tr[data-slug="copa-america"]');
-    await expect(copaRow.locator('[data-field="semifinals"]')).toHaveText('—');
+    await expect(copaRow.locator('[data-field="semifinals"]')).toHaveText('7');
   });
 
   test('the language switcher opens the Croatian compare page', async ({ page }) => {
@@ -1424,5 +1517,77 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
       `hreflang="hr" href="${SITE}/hr/competitions/world-cup"`,
     );
     expect(body).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
+  });
+
+  async function jsonLdBlocks(page: import('@playwright/test').Page) {
+    const raw = await page.locator('script[type="application/ld+json"]').allTextContents();
+    return raw.map((text) => JSON.parse(text));
+  }
+
+  test('the home page has no JSON-LD (breadcrumb is skipped on the home page itself)', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    expect(await page.locator('script[type="application/ld+json"]').count()).toBe(0);
+  });
+
+  test('a competition page carries a BreadcrumbList, a champions ItemList and a SportsEvent for the latest edition', async ({
+    page,
+  }) => {
+    await page.goto('competitions/world-cup');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks).toHaveLength(3);
+
+    const breadcrumb = blocks.find((b) => b['@type'] === 'BreadcrumbList');
+    expect(breadcrumb.itemListElement).toEqual([
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'FIFA World Cup',
+        item: `${SITE}/competitions/world-cup/`,
+      },
+    ]);
+
+    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
+    expect(itemList.name).toBe('FIFA World Cup - Champions by titles');
+    expect(itemList.url).toBe(`${SITE}/competitions/world-cup/`);
+    expect(itemList.itemListElement[0].item.name).toBe('Brazil');
+
+    const sportsEvent = blocks.find((b) => b['@type'] === 'SportsEvent');
+    expect(sportsEvent.name).toBe('2026 FIFA World Cup');
+    expect(sportsEvent.location).toEqual({ '@type': 'Place', name: 'Canada, Mexico and United States' });
+    expect(sportsEvent.competitor).toEqual({ '@type': 'SportsTeam', name: 'Spain' });
+  });
+
+  test('an individual award page carries an ItemList but no SportsEvent', async ({ page }) => {
+    await page.goto('competitions/ballon-dor');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList']);
+    expect(blocks.find((b) => b['@type'] === 'ItemList').name).toContain('Most awards');
+  });
+
+  test('the Golden Boot page carries one ItemList per table', async ({ page }) => {
+    await page.goto('competitions/golden-boot');
+    const blocks = await jsonLdBlocks(page);
+    const lists = blocks.filter((b) => b['@type'] === 'ItemList');
+    expect(lists).toHaveLength(2);
+    expect(lists.map((l) => l.name)).toEqual([
+      'Most World Cup Golden Boots',
+      'Most EURO top-scorer awards',
+    ]);
+  });
+
+  test('a translated competition page carries its own Croatian BreadcrumbList/ItemList names', async ({
+    page,
+  }) => {
+    await page.goto('hr/competitions/world-cup');
+    const blocks = await jsonLdBlocks(page);
+    const breadcrumb = blocks.find((b) => b['@type'] === 'BreadcrumbList');
+    expect(breadcrumb.itemListElement[0].name).toBe('Početna');
+    expect(breadcrumb.itemListElement[1].name).toBe('FIFA Svjetsko prvenstvo');
+    expect(blocks.find((b) => b['@type'] === 'ItemList').name).toBe(
+      'FIFA Svjetsko prvenstvo - prvaci po broju naslova',
+    );
   });
 });
