@@ -1245,6 +1245,55 @@ standings for 1916-1983, plus the 1989/1991 final round-robin groups) is
 real remaining work, not a "nice to have" - it's the one piece of the
 Format-audit warning note still open.
 
+### Quality pass: Copa América third/fourth for the 1989 and 1991 closing groups
+
+Added 2026-08-02 (intensive run). Picks up half of the "left for a future
+pass" note directly above: the 1989 and 1991 editions are `League table`
+format but, unlike the pre-1975 single round-robin era, each was decided by
+a small **closing group** of just four teams (the top two from each of two
+opening groups), so third and fourth read directly off that group's final
+standings without needing a full ten-plus-team table audit - a genuinely
+different, much more tractable case than the remaining pre-1975 rows.
+
+- `content/copa-america.md`: 1989 gets Third: Argentina, Fourth: Paraguay
+  (Brazil won the closing group 3-0-0, Uruguay second at 2-0-1; Argentina and
+  Paraguay both finished 0-1-2 at 1 point, Argentina ahead on goal
+  difference, 0-4 vs 0-6). 1991 gets Third: Chile, Fourth:
+  Colombia (Argentina won at 2W-1D, Brazil second at 2W-1L, Chile third at
+  2D-1L, Colombia fourth at 1D-2L). Both cross-checked against independent
+  match-by-match results, not just a single standings snapshot.
+- `docs/SOURCES.md` gained the two citations; the content file's "Important
+  editorial warning" section now explains the 1989/1991 closing-group
+  reasoning and narrows the still-open item to the pre-1975 league-table/
+  final-playoff era only (1916-1967 - the 1975-1983 home-and-away era has no
+  standings table to read at all, so it was never part of this open item).
+- `tests/e2e/mobile.spec.ts`'s `/compare` Copa América count test updated
+  from 6 to 7 (Colombia's new 1991 fourth-place finish adds one more
+  semifinal-or-better count) - the underlying number changing is the correct,
+  expected effect of adding real historical data, not a bug.
+- Regenerated all six downloadable PDFs (`pnpm build:pdfs`; the script
+  rebuilds the whole static site from the preview server for each one, so
+  every PDF's bytes shift slightly even though only Copa América's content
+  changed - consistent with every prior PDF-regeneration run in this file).
+- Environment note for future runs: this session's Playwright browser
+  wasn't at the `chrome` channel path `PW_CHROME_CHANNEL` expects
+  (`/opt/google/chrome/chrome` - not installed here); `playwright.config.ts`
+  already has a `PW_EXECUTABLE_PATH` escape hatch for exactly this, so
+  `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` was used
+  instead and is the more portable command going forward. Verified: `pnpm
+  lint`, the full Vitest suite (121 cases, unchanged), and the full
+  Playwright suite (189 cases, unchanged count - one assertion's expected
+  value updated, no cases added or removed), all passing.
+
+**Left for a future pass:** the pre-1975 League table/Final playoff era
+(1916-1967, 30 editions) is the one remaining open item in the Copa América
+editorial warning. Unlike 1989/1991, most of these had no small closing
+group - third/fourth would have to be read off a single round-robin table of
+up to ten teams, for which reliable secondary sources are considerably
+harder to find and cross-check era-by-era; a future pass should budget for
+researching (and citing) each edition individually rather than assuming a
+single source covers all thirty at once.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

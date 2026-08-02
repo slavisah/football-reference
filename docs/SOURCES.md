@@ -67,6 +67,15 @@ Primary sources should be preferred.
     (2021)
   - https://copaamerica.com/en/news/highlights-uruguay-canada-third-place-penalties-copa-america-2024
     (2024)
+- Third/fourth-place audit (2026-08-02), 1989 and 1991: both editions used a
+  closing final round-robin group of four teams rather than a single
+  third-place fixture, so third/fourth are read directly off that group's
+  final standings:
+  - https://en.wikipedia.org/wiki/1989_Copa_Am%C3%A9rica (final group: Brazil
+    6pts, Uruguay 4pts, Argentina 1pt/GD 0-4, Paraguay 1pt/GD 0-6 - Argentina
+    ahead of Paraguay on goal difference)
+  - https://en.wikipedia.org/wiki/1991_Copa_Am%C3%A9rica (final group:
+    Argentina 2W-1D, Brazil 2W-1L, Chile 2D-1L, Colombia 1D-2L)
 
 ## Ballon d'Or
 
