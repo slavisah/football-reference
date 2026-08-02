@@ -1368,6 +1368,101 @@ from 1916 to 2024 now shows either a real, sourced placing or an explained
 "—" that is itself the historical fact, and the content file's "Important
 editorial warning" section documents both.
 
+### Nice-to-have: "On this day in football history" widget - first vertical slice (World Cup + EURO)
+
+Added 2026-08-02 (intensive run). With the entire required-pages backlog, the
+full Croatian localization pass, and every Copa América content-accuracy item
+now closed, this run picked the one clearly unbuilt item left from
+`docs/WEBSITE_REQUIREMENTS.md`'s nice-to-have list: "on this day" cards. It
+had never been started - no code, no data - unlike the "by team" filter
+(also still missing from Required capabilities), which needs a full
+participating-teams roster per edition across every competition and is a
+much larger research task than this feature, which only needed one new fact
+per edition: the calendar date of the final.
+
+- **`content/fifa-world-cup.md` and `content/uefa-euro.md`** each gained a
+  new "Final date" column (e.g. "30 July 1930") on their Editions tables -
+  the two most prominent competitions, as a deliberate vertical slice rather
+  than researching all six competitions/awards in one run (Copa América,
+  Nations League, Ballon d'Or and Golden Boot don't have this column yet;
+  see "Left for a future pass" below). Dates were researched via WebSearch
+  (two parallel research agents, one per competition) rather than trusted
+  from memory, cross-checking Wikipedia's per-edition final articles against
+  ESPN/UEFA.com/Transfermarkt match records; see the new "Final match dates
+  audit" entries under `docs/SOURCES.md`'s FIFA World Cup and UEFA EURO
+  sections for the full citation list and the two documented edge cases
+  (1950's de facto final was a final-group decider, not a knockout match;
+  EURO 2020's final was actually played in 2021 - the column records the
+  real 2021 date while the edition keeps its "2020" label). Adding a column
+  needed no library or component changes beyond the new feature itself -
+  `docs/ADDING_CONTENT.md` already documents "you can add columns freely,"
+  and `buildEditions`/`TournamentTable` already render whatever columns a
+  source table has.
+- **`src/lib/onThisDay.ts`** (new): `parseFinalDate()` parses a "D Month
+  YYYY" cell; `buildOnThisDayEntries()` reduces editions with a "Final date"
+  column into a flat, calendar-day-searchable list (mirrors the
+  cellValue-by-label lookup `buildTimeline`/`buildTopScorerFacts` already use
+  in `editions.ts`, kept local since no other module needs it); editions
+  without the column, or with an unparseable value, are skipped rather than
+  guessed at. `entriesOnDate()` filters by month/day regardless of year;
+  `fallbackEntry()` picks a deterministic "featured" entry (keyed by
+  day-of-year, not `Math.random()`) for the many calendar days with no exact
+  final match, so the widget always has something to show. Covered by 13 new
+  Vitest cases (`tests/unit/onThisDay.test.ts`): date parsing (valid,
+  case-insensitive month, unparseable, unknown month, out-of-range day),
+  entry building (skips unparseable/missing dates), date matching (same
+  month/day across different years and competitions, no-match case), and the
+  fallback (deterministic per date, empty-list case, always picks a real
+  entry).
+- **`src/components/OnThisDay.astro`** (new) + a new section on the home
+  page (`src/pages/index.astro`, English only this run - see "Left for a
+  future pass"), built from the World Cup and EURO editions the home page
+  already loads via `loadHomeCompetitions()` (no extra data fetch).
+  Progressive enhancement per `AGENTS.md` rule 5: the initial HTML is
+  server-rendered using the build's own current date (so a no-JS visitor
+  still sees real content, same precedent as the rest of the static site),
+  then a `<script>` re-checks the visitor's actual browser date and swaps
+  the card in if the site hasn't been rebuilt since that day - the same
+  data-driven-script pattern `ThemeToggle`/`TournamentTable` already use,
+  since an inline script can't `import` a module. On an exact calendar-day
+  match (e.g. 30 July matches both the 1930 and 1966 World Cup finals) it
+  lists every match played that day, newest first; otherwise it shows the
+  deterministic fallback pick with a small "no final was played on this
+  exact date" note rather than an empty card. Covered by 2 new Playwright
+  cases at 360px in the existing "Home page" describe block, using
+  `page.clock.setFixedTime()` to pin the browser's date: 30 July shows both
+  the 1930 and 1966 finals with the hint hidden; 1 January (no World Cup or
+  EURO final has ever fallen on it) shows the fallback note and exactly one
+  card. Verified with `pnpm lint`, the full Vitest suite (134 cases, up from
+  121) and the full Playwright suite (191 cases, up from 189 - including the
+  unchanged 44-case WCAG sweep, which found no new violations), all passing.
+  Regenerated `public/downloads/world-cup.pdf` and `.../euro.pdf` via `pnpm
+  build:pdfs` since both Editions tables gained a column.
+- **`src/pages/hr/competitions/world-cup.astro` and `.../euro.astro`** each
+  gained a `'Final date': 'Datum finala'` entry in their `headerLabels` map,
+  so the new column's header translates on the Croatian competition pages
+  even though the widget itself isn't on the Croatian home page yet - the
+  raw data column exists on both languages' tables either way, since
+  `content/*.md` is the single shared editorial source.
+
+**Left for a future pass:**
+- The other four competitions (Copa América, Nations League, Ballon d'Or,
+  Golden Boot) don't have a "Final date" column yet, so the widget only ever
+  surfaces World Cup/EURO matches. Extending it is additive - research each
+  competition's final dates the same way, add the column, and append
+  `buildOnThisDayEntries(...)` calls in `index.astro`; no changes to
+  `src/lib/onThisDay.ts` or `OnThisDay.astro` should be needed.
+- **`src/pages/hr/index.astro`** does not yet render the widget - this run
+  shipped English first, matching the precedent every other feature on this
+  site followed (English vertical slice, then a dedicated translation pass).
+  Would need Croatian heading/hint copy plus a `locale` prop on
+  `OnThisDay.astro` (currently English-only strings), following the same
+  `t()`/data-attribute pattern used for `ThemeToggle`'s client script.
+- The "by team" filter (`docs/WEBSITE_REQUIREMENTS.md`'s other still-missing
+  required capability) remains **not implemented** - it needs a full
+  participating-teams roster per edition, not just one new fact, so it's a
+  substantially larger research task than this widget was.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

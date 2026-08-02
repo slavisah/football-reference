@@ -76,7 +76,7 @@ test.describe('World Cup page on a 360px phone', () => {
   });
 
   test('shows the last reviewed date and source links', async ({ page }) => {
-    await expect(page.locator('time[datetime="2026-07-23"]')).toBeVisible();
+    await expect(page.locator('time[datetime="2026-08-02"]')).toBeVisible();
     const sources = page.locator('.references__list a');
     await expect(sources.first()).toBeVisible();
     const count = await sources.count();
@@ -839,6 +839,26 @@ test.describe('Home page on a 360px phone', () => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+
+  test('"On this day" shows the matching finals on an exact final date', async ({ page }) => {
+    // 30 July matches both the 1930 and 1966 World Cup finals.
+    await page.clock.setFixedTime(new Date('2026-07-30T12:00:00'));
+    await page.goto('');
+    const list = page.locator('#on-this-day-list');
+    await expect(list).toContainText('FIFA World Cup 1930');
+    await expect(list).toContainText('FIFA World Cup 1966');
+    await expect(page.locator('#on-this-day-date')).toHaveText('30 July');
+    await expect(page.locator('#on-this-day-hint')).toBeHidden();
+  });
+
+  test('"On this day" falls back to an archive card on a non-final date', async ({ page }) => {
+    // No World Cup or EURO final has ever been played on 1 January.
+    await page.clock.setFixedTime(new Date('2026-01-01T12:00:00'));
+    await page.goto('');
+    await expect(page.locator('#on-this-day-hint')).toBeVisible();
+    await expect(page.locator('#on-this-day-list li')).toHaveCount(1);
+    await expect(page.locator('#on-this-day-list')).toContainText(/FIFA World Cup|UEFA European Championship/);
   });
 });
 

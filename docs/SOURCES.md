@@ -11,6 +11,20 @@ Primary sources should be preferred.
   - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/award-winners
 - FIFA historical top scorers:
   - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/fontaine-mbappe-ronaldo-and-more-every-world-cup-top-scorer
+- Final match dates audit (2026-08-02): the calendar date of each edition's
+  decisive final match, used for the "On this day in football history" widget
+  on the home page. Verified via WebSearch against each edition's dedicated
+  Wikipedia "{year} FIFA World Cup final" article, cross-checked against
+  ESPN's match archive; no discrepancies found across any of the 23 dates
+  (1930-2026). 1950 has no single-match final in the knockout sense - the
+  tournament was decided by a final round-robin group, and the Uruguay v
+  Brazil match (16 July 1950) is the universally recognized de facto final,
+  including by FIFA.com itself. 2026's date (19 July) is the scheduled final
+  per the tournament calendar:
+  - https://en.wikipedia.org/wiki/1930_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1966_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_final
 
 ## UEFA EURO
 
@@ -20,6 +34,29 @@ Primary sources should be preferred.
   - https://www.uefa.com/uefaeuro/history/winners/
 - UEFA finals:
   - https://www.uefa.com/uefaeuro/history/winners/finals/
+- Final match dates audit (2026-08-02): the calendar date of each edition's
+  final, for the same "On this day" widget. Verified via WebSearch, one
+  Wikipedia final-match article per edition, cross-checked against UEFA.com/
+  Transfermarkt match records where surfaced; no discrepancies found. 1968's
+  final was drawn 1-1 on 8 June and decided by a replay on 10 June - the
+  replay date is the one used. 2020's final was played in 2021 (postponed a
+  year by the pandemic); the "Final date" column records the real 2021 date
+  while the edition keeps its "2020" label, matching how the rest of the site
+  already treats that edition:
+  - https://en.wikipedia.org/wiki/1960_European_Nations%27_Cup_final
+  - https://en.wikipedia.org/wiki/1964_European_Nations%27_Cup_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1968_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1980_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1984_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1988_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1992_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2000_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2004_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2008_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2012_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2016_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2020_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2024_final
 
 ## UEFA Nations League
 
