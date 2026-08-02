@@ -494,13 +494,6 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
     await expect(page.locator('.champions')).not.toContainText('Not awarded');
   });
 
-  test('the language switcher opens the Croatian Copa América page', async ({ page }) => {
-    await page.goto('competitions/copa-america');
-    await page.locator('a.lang-switch').click();
-    await expect(page).toHaveURL(/\/hr\/competitions\/copa-america\/?$/);
-    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
-  });
-
   test("the language switcher opens the Croatian Ballon d'Or page", async ({ page }) => {
     await page.goto('competitions/ballon-dor');
     await page.locator('a.lang-switch').click();
@@ -582,6 +575,52 @@ test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360p
   });
 });
 
+test.describe('Copa América page on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('competitions/copa-america');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('shows an audited "Format" badge per edition', async ({ page }) => {
+    await expect(page.getByRole('columnheader', { name: 'Format', exact: true })).toBeVisible();
+
+    const row1919 = page.locator('tbody tr[data-year="1919"]');
+    await expect(row1919.locator('.badge')).toHaveText('Final playoff');
+
+    const row1975 = page.locator('tbody tr[data-year="1975"]');
+    await expect(row1975.locator('.badge')).toHaveText('Home-and-away');
+
+    const row1989 = page.locator('tbody tr[data-year="1989"]');
+    await expect(row1989.locator('.badge')).toHaveText('League table');
+
+    const row2016 = page.locator('tbody tr[data-year="2016"]');
+    await expect(row2016.locator('.badge')).toHaveText('Special centenary edition');
+
+    const row2024 = page.locator('tbody tr[data-year="2024"]');
+    await expect(row2024.locator('.badge')).toHaveText('Knockout final');
+  });
+
+  test('sorting by winner preserves the Format badge in the same row', async ({ page }) => {
+    const row2016 = page.locator('tbody tr[data-year="2016"]');
+    await page.selectOption('#copa-america-sort', 'champion-asc');
+    await expect(row2016.locator('.badge')).toHaveText('Special centenary edition');
+    await expect(row2016).toBeVisible();
+  });
+
+  test('the language switcher opens the Croatian Copa América page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/competitions\/copa-america\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
 test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 360px phone', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('hr/competitions/copa-america');
@@ -602,6 +641,15 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await expect(page.locator('th', { hasText: 'Godina' })).toBeVisible();
     await expect(page.locator('th', { hasText: 'Prvak' })).toBeVisible();
     await expect(page.locator('th', { hasText: 'Drugoplasirani' })).toBeVisible();
+    await expect(page.getByRole('columnheader', { name: 'Format', exact: true })).toBeVisible();
+  });
+
+  test('shows the same "Format" badge value as the English page (data, not translated)', async ({
+    page,
+  }) => {
+    await expect(page.locator('tbody tr[data-year="2016"] .badge')).toHaveText(
+      'Special centenary edition',
+    );
   });
 
   test('filtering by prvak (winner) Uruguay updates the shareable URL and status text', async ({

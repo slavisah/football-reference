@@ -32,6 +32,20 @@ Primary sources should be preferred.
 
 - CONMEBOL 2024 tournament history:
   - https://cdn.conmebol.com/wp-content/uploads/2024/12/LIBRO-GET-CONMEBOL-INGLES-04-12-24.pdf
+- Format audit (2026-08-02): which editions were decided by a round-robin
+  league table outright, which needed an extra playoff decider, and the
+  home-and-away/knockout-final/centenary-edition eras. Wikipedia's per-edition
+  articles for the five confirmed playoff years, cross-checked against RSSSF's
+  historical tables:
+  - https://en.wikipedia.org/wiki/1919_South_American_Championship_play-off
+  - https://en.wikipedia.org/wiki/1922_South_American_Championship_play-off
+  - https://en.wikipedia.org/wiki/1937_South_American_Championship_play-off
+  - https://en.wikipedia.org/wiki/1949_South_American_Championship_play-off
+  - https://en.wikipedia.org/wiki/1953_South_American_Championship_play-off
+  - https://www.rsssf.org/tables/59-2sa.html (1959 Ecuador: won outright on
+    points, no playoff)
+  - https://en.wikipedia.org/wiki/1967_South_American_Championship (won
+    outright on points, no playoff)
 
 ## Ballon d'Or
 
