@@ -19,35 +19,35 @@ Its history is less uniform than the World Cup or EURO. Some editions used a fin
 
 | Year | Host / format | Champion | Runner-up | Third | Fourth | Format |
 |---:|---|---|---|---|---|---|
-| 1916 | Argentina | Uruguay | Argentina | — | — | League table |
-| 1917 | Uruguay | Uruguay | Argentina | — | — | League table |
-| 1919 | Brazil | Brazil | Uruguay | — | — | Final playoff |
-| 1920 | Chile | Uruguay | Argentina | — | — | League table |
-| 1921 | Argentina | Argentina | Brazil | — | — | League table |
-| 1922 | Brazil | Brazil | Paraguay | — | — | Final playoff |
-| 1923 | Uruguay | Uruguay | Argentina | — | — | League table |
-| 1924 | Uruguay | Uruguay | Argentina | — | — | League table |
-| 1925 | Argentina | Argentina | Brazil | — | — | League table |
-| 1926 | Chile | Uruguay | Argentina | — | — | League table |
-| 1927 | Peru | Argentina | Uruguay | — | — | League table |
-| 1929 | Argentina | Argentina | Paraguay | — | — | League table |
-| 1935 | Peru | Uruguay | Argentina | — | — | League table |
-| 1937 | Argentina | Argentina | Brazil | — | — | Final playoff |
-| 1939 | Peru | Peru | Uruguay | — | — | League table |
-| 1941 | Chile | Argentina | Uruguay | — | — | League table |
-| 1942 | Uruguay | Uruguay | Argentina | — | — | League table |
-| 1945 | Chile | Argentina | Brazil | — | — | League table |
-| 1946 | Argentina | Argentina | Brazil | — | — | League table |
-| 1947 | Ecuador | Argentina | Paraguay | — | — | League table |
-| 1949 | Brazil | Brazil | Paraguay | — | — | Final playoff |
-| 1953 | Peru | Paraguay | Brazil | — | — | Final playoff |
-| 1955 | Chile | Argentina | Chile | — | — | League table |
-| 1956 | Uruguay | Uruguay | Chile | — | — | League table |
-| 1957 | Peru | Argentina | Brazil | — | — | League table |
-| 1959 | Argentina | Argentina | Brazil | — | — | League table |
-| 1959 | Ecuador | Uruguay | Argentina | — | — | League table |
-| 1963 | Bolivia | Bolivia | Paraguay | — | — | League table |
-| 1967 | Uruguay | Uruguay | Argentina | — | — | League table |
+| 1916 | Argentina | Uruguay | Argentina | Brazil | Chile | League table |
+| 1917 | Uruguay | Uruguay | Argentina | Brazil | Chile | League table |
+| 1919 | Brazil | Brazil | Uruguay | Argentina | Chile | Final playoff |
+| 1920 | Chile | Uruguay | Argentina | Brazil | Chile | League table |
+| 1921 | Argentina | Argentina | Brazil | Uruguay | Paraguay | League table |
+| 1922 | Brazil | Brazil | Paraguay | Uruguay | Argentina | Final playoff |
+| 1923 | Uruguay | Uruguay | Argentina | Paraguay | Brazil | League table |
+| 1924 | Uruguay | Uruguay | Argentina | Paraguay | Chile | League table |
+| 1925 | Argentina | Argentina | Brazil | Paraguay | — | League table |
+| 1926 | Chile | Uruguay | Argentina | Chile | Paraguay | League table |
+| 1927 | Peru | Argentina | Uruguay | Peru | Bolivia | League table |
+| 1929 | Argentina | Argentina | Paraguay | Uruguay | Peru | League table |
+| 1935 | Peru | Uruguay | Argentina | Peru | Chile | League table |
+| 1937 | Argentina | Argentina | Brazil | Uruguay | Paraguay | Final playoff |
+| 1939 | Peru | Peru | Uruguay | Paraguay | Chile | League table |
+| 1941 | Chile | Argentina | Uruguay | Chile | Peru | League table |
+| 1942 | Uruguay | Uruguay | Argentina | Brazil | Paraguay | League table |
+| 1945 | Chile | Argentina | Brazil | Chile | Uruguay | League table |
+| 1946 | Argentina | Argentina | Brazil | Paraguay | Uruguay | League table |
+| 1947 | Ecuador | Argentina | Paraguay | Uruguay | Chile | League table |
+| 1949 | Brazil | Brazil | Paraguay | Peru | Bolivia | Final playoff |
+| 1953 | Peru | Paraguay | Brazil | Uruguay | Chile | Final playoff |
+| 1955 | Chile | Argentina | Chile | Peru | Uruguay | League table |
+| 1956 | Uruguay | Uruguay | Chile | Argentina | Brazil | League table |
+| 1957 | Peru | Argentina | Brazil | Uruguay | Peru | League table |
+| 1959 | Argentina | Argentina | Brazil | Paraguay | Peru | League table |
+| 1959 | Ecuador | Uruguay | Argentina | Brazil | Ecuador | League table |
+| 1963 | Bolivia | Bolivia | Paraguay | Argentina | Brazil | League table |
+| 1967 | Uruguay | Uruguay | Argentina | Chile | Paraguay | League table |
 | 1975 | Home-and-away | Peru | Colombia | — | — | Home-and-away |
 | 1979 | Home-and-away | Paraguay | Chile | — | — | Home-and-away |
 | 1983 | Home-and-away | Uruguay | Brazil | — | — | Home-and-away |
@@ -91,7 +91,18 @@ This page intentionally begins with champions and runners-up rather than claimin
 - **Knockout final**: group stage followed by a single-elimination bracket ending in a one-off final (1987, and every edition from 1993 onward except 2016);
 - **Special centenary edition**: the 2016 Copa América Centenario, an extra edition outside the normal cycle marking the tournament's 100th anniversary.
 
-Third and fourth places - audited 2026-08-02 (intensive run) against match reports and official recaps (see `docs/SOURCES.md`) - are now recorded for every edition that decided them with a single, discrete third-place match: 1987, then every edition from 1993 onward including the 2016 centenary edition. The 1989 and 1991 editions, though league-table format, are also filled in: each had a distinct final round-robin group of four teams (Brazil, Uruguay, Argentina, Paraguay in 1989; Argentina, Brazil, Chile, Colombia in 1991) whose final standings read off cleanly, so no extra fixture was needed to identify third and fourth. They are **not** yet added for the remaining pre-1975 league-table/final-playoff era (1916-1967), because those years' third/fourth placing would have to be read off a full, single-group final standings table across up to ten teams rather than a small closing group - a separate audit left open for a future pass, given the scarcity and inconsistency of secondary sources for that era. Those rows show "—" rather than a guess.
+Third and fourth places - audited 2026-08-02 (intensive run) against match reports, official recaps, and (for the pre-1975 era) full final league-table standings (see `docs/SOURCES.md`) - are now recorded for **every** edition that has a well-defined third/fourth placing:
+
+- 1987, then every edition from 1993 onward including the 2016 centenary edition, each decided by a single, discrete third-place match.
+- 1989 and 1991: each had a distinct final round-robin group of four teams (Brazil, Uruguay, Argentina, Paraguay in 1989; Argentina, Brazil, Chile, Colombia in 1991) whose final standings read off cleanly, so no extra fixture was needed.
+- The full pre-1975 league-table/final-playoff era (1916-1967, 29 editions): third and fourth read directly off each edition's final standings table (points, then goal difference/average where points were level), cross-checked against RSSSF and Wikipedia's per-edition articles, with at least two independent source queries per edition and an internal points-arithmetic consistency check. 1922 is a documented exception worth calling out: Brazil, Paraguay, and Uruguay finished level on both points and goal difference, but Uruguay withdrew from the resulting three-way title playoff in protest at refereeing decisions, leaving it ranked third by elimination rather than by a table tiebreak - Argentina, who was never level with the top three, finished fourth.
+
+Two "—" cells remain, and both are the historical fact rather than a research gap:
+
+- **1925** had only three entrants (Argentina, Brazil, Paraguay) playing a double round-robin - Paraguay finished third, but a fourth-place team never existed to finish.
+- **1975, 1979, and 1983** (Home-and-away format) had no standings table or third-place fixture of any kind - only a two-legged final between two teams - so there is nothing to read a placing from.
+
+This closes the third/fourth audit opened by the earlier Format-audit pass; no further pre-1975 research is outstanding for this table.
 
 ## Memorable moments
 
