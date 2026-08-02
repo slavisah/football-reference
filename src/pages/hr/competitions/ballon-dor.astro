@@ -21,7 +21,8 @@ import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
-import { withBase } from '../../../lib/url';
+import { absolutePageUrl, withBase } from '../../../lib/url';
+import { buildChampionsItemList } from '../../../lib/jsonLd';
 import type { NoteSection } from '../../../lib/notes';
 
 const data = await loadCompetition('ballon-dor', {
@@ -35,6 +36,11 @@ const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 // on the Croatian home page (homeCards.ts's CARD_TEXT) - data.title itself
 // stays the raw English front-matter value ("Men's Ballon d'Or").
 const title = 'Zlatna lopta';
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [
+  buildChampionsItemList(data.champions, { pageUrl, name: `${title} - najviše nagrada` }),
+];
 
 // Hand-translated from content/ballon-dor.md's "Notes" section. content/
 // itself stays untouched and English (the single editorial source of truth);
@@ -66,6 +72,7 @@ const headerLabels: Record<string, string> = {
   description="Svaki dobitnik muške Zlatne lopte od 1956., s reprezentacijom i generiranim brojem nagrada. Filtriraj po dobitniku i godini."
   locale="hr"
   alternateHref={withBase('/competitions/ballon-dor')}
+  jsonLd={jsonLd}
 >
   <article class="competition stack">
     <header class="competition__header">

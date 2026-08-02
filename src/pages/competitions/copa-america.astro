@@ -2,7 +2,12 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
-import { withBase } from '../../lib/url';
+import { absolutePageUrl, withBase } from '../../lib/url';
+import {
+  buildChampionsItemList,
+  buildLatestEditionSportsEvent,
+  type JsonLdObject,
+} from '../../lib/jsonLd';
 
 const data = await loadCompetition('copa-america', {
   editionsHeading: 'Champions timeline',
@@ -10,12 +15,19 @@ const data = await loadCompetition('copa-america', {
   allowDuplicateYears: ['1959'],
   noteHeadings: ['Memorable moments'],
 });
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [
+  buildChampionsItemList(data.champions, { pageUrl, name: `${data.title} - Champions by titles` }),
+  buildLatestEditionSportsEvent(data.editions, data.title),
+].filter((item): item is JsonLdObject => item !== undefined);
 ---
 
 <BaseLayout
   title={data.title}
   description="Every Copa América champion since 1916, hosts and runners-up, with a generated title count. Filter by winner, year and host."
   alternateHref={withBase('/hr/competitions/copa-america')}
+  jsonLd={jsonLd}
 >
   <CompetitionView
     data={data}

@@ -7,3 +7,14 @@ export function withBase(path: string): string {
   const clean = path.startsWith('/') ? path : `/${path}`;
   return `${base}${clean}` || '/';
 }
+
+/**
+ * Absolute URL of the current page (e.g. for a JSON-LD `url` field, which
+ * needs a full URL rather than a path). Mirrors the `site ?? url` fallback
+ * `BaseLayout.astro` and `sitemap.xml.ts` already use for the same reason:
+ * `Astro.site` is unset in local dev, so falling back to `Astro.url` keeps
+ * this working there too.
+ */
+export function absolutePageUrl(url: URL, site?: URL): string {
+  return new URL(url.pathname, site ?? url).toString();
+}
