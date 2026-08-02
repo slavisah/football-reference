@@ -52,8 +52,8 @@ Its history is less uniform than the World Cup or EURO. Some editions used a fin
 | 1979 | Home-and-away | Paraguay | Chile | — | — | Home-and-away |
 | 1983 | Home-and-away | Uruguay | Brazil | — | — | Home-and-away |
 | 1987 | Argentina | Uruguay | Chile | Colombia | Argentina | Knockout final |
-| 1989 | Brazil | Brazil | Uruguay | — | — | League table |
-| 1991 | Chile | Argentina | Brazil | — | — | League table |
+| 1989 | Brazil | Brazil | Uruguay | Argentina | Paraguay | League table |
+| 1991 | Chile | Argentina | Brazil | Chile | Colombia | League table |
 | 1993 | Ecuador | Argentina | Mexico | Colombia | Ecuador | Knockout final |
 | 1995 | Uruguay | Uruguay | Brazil | Colombia | United States | Knockout final |
 | 1997 | Bolivia | Brazil | Bolivia | Mexico | Peru | Knockout final |
@@ -91,7 +91,7 @@ This page intentionally begins with champions and runners-up rather than claimin
 - **Knockout final**: group stage followed by a single-elimination bracket ending in a one-off final (1987, and every edition from 1993 onward except 2016);
 - **Special centenary edition**: the 2016 Copa América Centenario, an extra edition outside the normal cycle marking the tournament's 100th anniversary.
 
-Third and fourth places - audited 2026-08-02 (intensive run) against match reports and official recaps (see `docs/SOURCES.md`) - are now recorded for every edition that decided them with a single, discrete third-place match: 1987, then every edition from 1993 onward including the 2016 centenary edition. They are **not** yet added for the pre-1975 league-table/final-playoff era or the 1989 and 1991 editions, because those years had no standalone third-place fixture - the placing would have to be read off a full final standings table instead of one match result, a separate audit left open for a future pass. Those rows show "—" rather than a guess.
+Third and fourth places - audited 2026-08-02 (intensive run) against match reports and official recaps (see `docs/SOURCES.md`) - are now recorded for every edition that decided them with a single, discrete third-place match: 1987, then every edition from 1993 onward including the 2016 centenary edition. The 1989 and 1991 editions, though league-table format, are also filled in: each had a distinct final round-robin group of four teams (Brazil, Uruguay, Argentina, Paraguay in 1989; Argentina, Brazil, Chile, Colombia in 1991) whose final standings read off cleanly, so no extra fixture was needed to identify third and fourth. They are **not** yet added for the remaining pre-1975 league-table/final-playoff era (1916-1967), because those years' third/fourth placing would have to be read off a full, single-group final standings table across up to ten teams rather than a small closing group - a separate audit left open for a future pass, given the scarcity and inconsistency of secondary sources for that era. Those rows show "—" rather than a guess.
 
 ## Memorable moments
 

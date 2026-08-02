@@ -1008,12 +1008,14 @@ test.describe('Compare page on a 360px phone', () => {
   test('shows real Copa América third/fourth counts for the knockout-final era, not an em dash', async ({
     page,
   }) => {
-    // Copa América only tracked a discrete third-place match from 1987 (and
-    // 1993) onward, so this is no longer the "no such column" case - Colombia
-    // reached third or fourth six times across those editions.
+    // Copa América now records third/fourth for the knockout-final era (1987
+    // and 1993 onward) plus the 1989/1991 closing-group editions, so this is
+    // no longer the "no such column" case - Colombia reached third or fourth
+    // seven times across those editions (six knockout-era finishes plus
+    // fourth in the 1991 closing group).
     await page.goto('compare?a=colombia&b=argentina');
     const copaRow = page.locator('#compare-a-body tr[data-slug="copa-america"]');
-    await expect(copaRow.locator('[data-field="semifinals"]')).toHaveText('6');
+    await expect(copaRow.locator('[data-field="semifinals"]')).toHaveText('7');
   });
 
   test('the language switcher opens the Croatian compare page', async ({ page }) => {
