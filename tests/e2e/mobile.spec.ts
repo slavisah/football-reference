@@ -917,6 +917,51 @@ test.describe('Croatian home page (/hr/) on a 360px phone', () => {
     await expect(page).toHaveURL(/\/football-reference\/$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });
+
+  test('"On this day" shows translated chrome and the matching finals on an exact final date', async ({
+    page,
+  }) => {
+    // 30 July matches both the 1930 and 1966 World Cup finals.
+    await page.clock.setFixedTime(new Date('2026-07-30T12:00:00'));
+    await page.goto('hr/');
+    await expect(page.locator('#on-this-day-heading')).toHaveText(
+      'Na današnji dan u povijesti nogometa',
+    );
+    const list = page.locator('#on-this-day-list');
+    await expect(list).toContainText('FIFA Svjetsko prvenstvo 1930');
+    await expect(list).toContainText('FIFA Svjetsko prvenstvo 1966');
+    await expect(page.locator('#on-this-day-date')).toHaveText('30. srpnja');
+    await expect(page.locator('#on-this-day-hint')).toBeHidden();
+  });
+
+  test('"On this day" falls back to a translated archive-card hint on a non-final date', async ({
+    page,
+  }) => {
+    // No World Cup, EURO, Copa América, Nations League decisive match or
+    // Ballon d'Or ceremony has ever fallen on 1 January.
+    await page.clock.setFixedTime(new Date('2026-01-01T12:00:00'));
+    await page.goto('hr/');
+    const hint = page.locator('#on-this-day-hint');
+    await expect(hint).toBeVisible();
+    await expect(hint).toHaveText(
+      'Na ovaj točan datum nije odigrano finale - evo jednog iz arhive.',
+    );
+    await expect(page.locator('#on-this-day-list li')).toHaveCount(1);
+  });
+
+  test('"On this day" shows a Ballon d\'Or entry with Croatian award wording, not "finalu"', async ({
+    page,
+  }) => {
+    // 12 December matches only the 2016 Ballon d'Or ceremony (Cristiano
+    // Ronaldo) - an exact-date match, not the day-of-year fallback.
+    await page.clock.setFixedTime(new Date('2026-12-12T12:00:00'));
+    await page.goto('hr/');
+    const list = page.locator('#on-this-day-list');
+    await expect(list).toContainText('Zlatna lopta 2016');
+    await expect(list).toContainText('Cristiano Ronaldo je osvojio nagradu.');
+    await expect(list).not.toContainText('finalu');
+    await expect(page.locator('#on-this-day-hint')).toBeHidden();
+  });
 });
 
 test.describe('Records page on a 360px phone', () => {

@@ -8,11 +8,29 @@
 // ../../lib/homeCards.ts, the exact same loader the English home page uses,
 // so the two pages can never disagree on a fact - only the prose differs.
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import OnThisDay from '../../components/OnThisDay.astro';
 import { withBase } from '../../lib/url';
 import { loadHomeCompetitions, buildHomeCards } from '../../lib/homeCards';
+import { buildOnThisDayEntries } from '../../lib/onThisDay';
 
 const competitions = await loadHomeCompetitions();
 const cards = buildHomeCards('hr', competitions);
+
+// "On this day" widget, Croatian slice - see docs/PROJECT_STATUS.md. Reuses
+// the exact same editions the English home page loads (via the shared
+// loadHomeCompetitions() above), so a card can never disagree on a fact
+// between languages - only the display names passed here, the widget's own
+// chrome strings (OnThisDay's `locale` prop) and the result-sentence wording
+// differ. Golden Boot is skipped for the same reason the English page skips
+// it: its top-scorer facts are tied to the same World Cup/EURO finals
+// already listed here.
+const onThisDayEntries = [
+  ...buildOnThisDayEntries(competitions.worldCup.editions, 'FIFA Svjetsko prvenstvo'),
+  ...buildOnThisDayEntries(competitions.euro.editions, 'UEFA Europsko prvenstvo'),
+  ...buildOnThisDayEntries(competitions.copaAmerica.editions, 'Copa América'),
+  ...buildOnThisDayEntries(competitions.nationsLeague.editions, 'UEFA Liga nacija'),
+  ...buildOnThisDayEntries(competitions.ballonDor.editions, 'Zlatna lopta'),
+];
 ---
 
 <BaseLayout
@@ -67,6 +85,8 @@ const cards = buildHomeCards('hr', competitions);
       ))
     }
   </section>
+
+  <OnThisDay entries={onThisDayEntries} locale="hr" />
 
   <section class="features card">
     <h2>Što svaka stranica natjecanja nudi</h2>
