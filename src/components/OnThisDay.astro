@@ -1,8 +1,9 @@
 ---
 // "On this day in football history": a home-page widget built from every
-// edition that has a "Final date" column (currently World Cup + EURO - see
-// src/lib/onThisDay.ts and docs/PROJECT_STATUS.md for the rollout plan to the
-// other four competitions). Server-rendered using the build's own current
+// edition that has a "Final date" (tournaments) or "Ceremony date" (Ballon
+// d'Or) column - see src/lib/onThisDay.ts and docs/PROJECT_STATUS.md for the
+// rollout plan to the one remaining competition (Golden Boot, deliberately
+// skipped - see index.astro). Server-rendered using the build's own current
 // date so a no-JS visitor still sees real content; a client script then
 // re-checks the visitor's actual today and swaps the card in if the site
 // hasn't been rebuilt since - same progressive-enhancement pattern as
@@ -43,7 +44,7 @@ const dateLabel = `${buildDate.getDate()} ${MONTH_NAMES[buildDate.getMonth()]}`;
         <li>
           <p class="on-this-day__comp">{entry.competition} {entry.year}</p>
           <p class="on-this-day__result">
-            {entry.final ?? `${entry.champion} won the final.`}
+            {entry.final ?? `${entry.champion} won ${entry.isAward ? 'the award' : 'the final'}.`}
           </p>
         </li>
       ))
@@ -160,7 +161,8 @@ const dateLabel = `${buildDate.getDate()} ${MONTH_NAMES[buildDate.getMonth()]}`;
         comp.textContent = `${entry.competition} ${entry.year}`;
         const result = document.createElement('p');
         result.className = 'on-this-day__result';
-        result.textContent = entry.final ?? `${entry.champion} won the final.`;
+        result.textContent =
+          entry.final ?? `${entry.champion} won ${entry.isAward ? 'the award' : 'the final'}.`;
         li.appendChild(comp);
         li.appendChild(result);
         listEl.appendChild(li);
