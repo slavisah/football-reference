@@ -187,3 +187,62 @@ export function distinctHosts(editions: Edition[]): string[] {
   }
   return hosts.sort((a, b) => a.localeCompare(b));
 }
+
+/**
+ * Column labels that hold a team/national-team name rather than a count, a
+ * date or a score line - covers every team-competition editions table
+ * (Winner/Champion, Runner-up, Third, Fourth or "Other semifinalist" in its
+ * various header spellings) plus the individual awards' "National team"/
+ * "Team" columns. `/finalist/i` alone matches both "Other semifinalist" and
+ * "Other semifinalist / fourth" since "semifinalist" contains "finalist".
+ */
+const WINNER_LABEL_PATTERN = /^(winner|champion)$/i;
+const DEDICATED_TEAM_LABEL_PATTERN = /^(national team|team)$/i;
+const OTHER_TEAM_LABEL_PATTERNS: RegExp[] = [/runner-up/i, /finalist/i, /^third$/i, /^fourth/i];
+
+function isTeamCellLabel(label: string): boolean {
+  const trimmed = label.trim();
+  return (
+    WINNER_LABEL_PATTERN.test(trimmed) ||
+    DEDICATED_TEAM_LABEL_PATTERN.test(trimmed) ||
+    OTHER_TEAM_LABEL_PATTERNS.some((re) => re.test(trimmed))
+  );
+}
+
+/**
+ * Every team name appearing in a team-holding column of this edition - not
+ * just the champion. Powers the "Team" filter (required alongside year, host
+ * and winner by docs/WEBSITE_REQUIREMENTS.md) so, e.g., searching "Portugal"
+ * on the World Cup page surfaces 1966 (fourth place) even though Portugal
+ * has never won it.
+ *
+ * "Winner"/"Champion" is a team name on every team-competition table (World
+ * Cup, EURO, Copa América, Nations League) but a *player* name on the
+ * individual-award tables (Ballon d'Or, Golden Boot) - those tables carry a
+ * separate "National team"/"Team" column instead, so its presence on the same
+ * row is the signal to skip "Winner"/"Champion" here rather than double-count
+ * the player as if they were a team.
+ */
+export function editionTeams(edition: Edition): string[] {
+  const hasDedicatedTeamColumn = edition.cells.some((cell) =>
+    DEDICATED_TEAM_LABEL_PATTERN.test(cell.label.trim()),
+  );
+  const teams = new Set<string>();
+  for (const cell of edition.cells) {
+    const label = cell.label.trim();
+    if (hasDedicatedTeamColumn && WINNER_LABEL_PATTERN.test(label)) continue;
+    if (!isTeamCellLabel(label)) continue;
+    const value = cell.value.trim();
+    if (value && value !== '—' && !isPlaceholderWinner(value)) teams.add(value);
+  }
+  return [...teams];
+}
+
+/** Distinct teams across all editions, alphabetically, for the team filter's options. */
+export function distinctTeams(editions: Edition[]): string[] {
+  const seen = new Set<string>();
+  for (const edition of editions) {
+    for (const team of editionTeams(edition)) seen.add(team);
+  }
+  return [...seen].sort((a, b) => a.localeCompare(b));
+}

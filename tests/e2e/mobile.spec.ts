@@ -75,6 +75,23 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(page.locator('tbody tr[data-year="1986"]')).toBeVisible();
   });
 
+  test('filtering by team Portugal surfaces editions it never won', async ({ page }) => {
+    // Portugal has never won or been runner-up in the World Cup - this is the
+    // key difference from the winner filter: third place in 1966, fourth in 2006.
+    await page.selectOption('#world-cup-team', 'Portugal');
+
+    const visibleRows = page.locator('tbody tr:not([hidden])');
+    await expect(visibleRows).toHaveCount(2);
+    await expect(page.locator('tbody tr[data-year="1966"]')).toBeVisible();
+    await expect(page.locator('tbody tr[data-year="2006"]')).toBeVisible();
+
+    await expect(page).toHaveURL(/team=Portugal/);
+
+    await page.locator('#world-cup-reset').click();
+    await expect(page.locator('tbody tr:not([hidden])')).toHaveCount(23);
+    await expect(page).not.toHaveURL(/team=/);
+  });
+
   test('shows the last reviewed date and source links', async ({ page }) => {
     await expect(page.locator('time[datetime="2026-08-02"]')).toBeVisible();
     const sources = page.locator('.references__list a');
@@ -208,6 +225,7 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     ).toBeVisible();
     await expect(page.locator('label[for="world-cup-winner"]')).toHaveText('Prvak');
     await expect(page.locator('label[for="world-cup-host"]')).toHaveText('Domaćin');
+    await expect(page.locator('label[for="world-cup-team"]')).toHaveText('Reprezentacija');
     await expect(page.locator('th', { hasText: 'Godina' })).toBeVisible();
     await expect(page.locator('th', { hasText: 'Domaćin(i)' })).toBeVisible();
     await expect(page.locator('th', { hasText: 'Najbolji strijelac' })).toBeVisible();

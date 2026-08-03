@@ -73,7 +73,7 @@ const headerLabels: Record<string, string> = {
 
 <BaseLayout
   title={title}
-  description="Svako izdanje Final Foura UEFA Lige nacija, domaćini, finalisti i prvaci, uz generirani broj naslova. Filtriraj po prvaku, sezoni i domaćinu."
+  description="Svako izdanje Final Foura UEFA Lige nacija, domaćini, finalisti i prvaci, uz generirani broj naslova. Filtriraj po prvaku, sezoni, domaćinu i reprezentaciji."
   locale="hr"
   alternateHref={withBase('/competitions/nations-league')}
   jsonLd={jsonLd}
@@ -102,6 +102,7 @@ const headerLabels: Record<string, string> = {
       editions={data.editions}
       winners={data.winners}
       hosts={data.hosts}
+      teams={data.teams}
       locale="hr"
       headerLabels={headerLabels}
       winnerLabel="Prvak"
@@ -110,6 +111,8 @@ const headerLabels: Record<string, string> = {
       yearAllLabel="Sve sezone"
       hostLabel="Domaćin"
       hostAllLabel="Svi domaćini"
+      teamLabel="Reprezentacija"
+      teamAllLabel="Sve reprezentacije"
       sortByLabel="Sortiraj po"
       resetLabel="Poništi"
       filterAriaLabel="Filtriraj prvake UEFA Lige nacija"
@@ -118,6 +121,7 @@ const headerLabels: Record<string, string> = {
       bitWinnerPrefix="prvak"
       bitYearPrefix="sezona"
       bitHostPrefix="domaćin"
+      bitTeamPrefix="reprezentacija"
       emptyText="Nijedno izdanje ne odgovara odabranim filterima."
       clearFiltersLabel="Očisti filtere"
     />
