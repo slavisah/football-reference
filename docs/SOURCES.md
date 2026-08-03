@@ -163,6 +163,50 @@ Primary sources should be preferred.
     independent queries; a small number (1917, 1920, 1926, 1945) had a
     clearly stated final ranking but no full numeric points table
     recoverable this way.
+- Final match dates audit (2026-08-03): the calendar date of the decisive
+  match for the 19 editions with a single one-off decider, for the "On this
+  day in football history" widget on the home page (same feature already
+  covering the FIFA World Cup and UEFA EURO). The League-table era (no
+  single title match) and the three Home-and-away finals (two dated legs,
+  no single date to pick) are left as "—" in the content file rather than
+  guessed at; see the "Final date" note in `content/copa-america.md`'s
+  "Important editorial warning" section for why. Verified via WebSearch,
+  each edition's dedicated Wikipedia final/play-off article cross-checked
+  against a second source (RSSSF, ESPN's match archive, Transfermarkt,
+  11v11, or copaamerica.com's official recap) where available:
+  - https://en.wikipedia.org/wiki/1919_South_American_Championship_play-off
+    (29 May 1919)
+  - https://en.wikipedia.org/wiki/1922_South_American_Championship_play-off
+    (6 November 1922 - confirmed only by this single Wikipedia article; a
+    second independent source giving the day-level date was not found, only
+    RSSSF's tournament-range snippet, which is consistent but not
+    conclusive on its own)
+  - https://en.wikipedia.org/wiki/1937_South_American_Championship_play-off
+    (1 February 1937)
+  - https://en.wikipedia.org/wiki/1949_South_American_Championship_play-off
+    (11 May 1949)
+  - https://en.wikipedia.org/wiki/1953_South_American_Championship_play-off
+    (1 April 1953; RSSSF: "PLAYOFF FOR THE COPA AMERICA Lima, April 1,
+    1953. Paraguay 3-2 Brazil")
+  - https://en.wikipedia.org/wiki/1987_Copa_Am%C3%A9rica_final (12 July 1987)
+  - https://en.wikipedia.org/wiki/1993_Copa_Am%C3%A9rica_final (4 July 1993)
+  - https://en.wikipedia.org/wiki/1995_Copa_Am%C3%A9rica_final (23 July 1995)
+  - https://en.wikipedia.org/wiki/1997_Copa_Am%C3%A9rica_final (29 June 1997)
+  - https://en.wikipedia.org/wiki/1999_Copa_Am%C3%A9rica_final (18 July
+    1999; footballdatabase.eu gives an outlier 17 July, against three
+    independent sources agreeing on 18 July)
+  - https://en.wikipedia.org/wiki/2001_Copa_Am%C3%A9rica_final (29 July 2001)
+  - https://en.wikipedia.org/wiki/2004_Copa_Am%C3%A9rica_final (25 July 2004)
+  - https://en.wikipedia.org/wiki/2007_Copa_Am%C3%A9rica_final (15 July 2007)
+  - https://en.wikipedia.org/wiki/2011_Copa_Am%C3%A9rica_final (24 July 2011)
+  - https://en.wikipedia.org/wiki/2015_Copa_Am%C3%A9rica_final (4 July 2015)
+  - https://en.wikipedia.org/wiki/Copa_Am%C3%A9rica_Centenario_final (26 June
+    2016)
+  - https://en.wikipedia.org/wiki/2019_Copa_Am%C3%A9rica_final (7 July 2019)
+  - https://en.wikipedia.org/wiki/2021_Copa_Am%C3%A9rica_final (10 July 2021;
+    some regional ESPN pages show 11 July due to timezone display - the US
+    ESPN page and copaamerica.com's own recap agree on 10 July)
+  - https://en.wikipedia.org/wiki/2024_Copa_Am%C3%A9rica_final (14 July 2024)
 
 ## Ballon d'Or
 

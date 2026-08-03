@@ -15,13 +15,14 @@ const home = await getEntry('pages', 'index');
 const competitions = await loadHomeCompetitions();
 const cards = buildHomeCards('en', competitions);
 
-// "On this day" widget: built from the World Cup and EURO editions already
-// loaded above (both have a "Final date" column) - no extra data load. The
-// other four competitions don't have that column yet; see
-// docs/PROJECT_STATUS.md for the plan to extend this.
+// "On this day" widget: built from editions that have a "Final date" column
+// - no extra data load, since all three competitions are already loaded
+// above. Nations League, Ballon d'Or, and Golden Boot don't have that
+// column yet; see docs/PROJECT_STATUS.md for the plan to extend this.
 const onThisDayEntries = [
   ...buildOnThisDayEntries(competitions.worldCup.editions, 'FIFA World Cup'),
   ...buildOnThisDayEntries(competitions.euro.editions, 'UEFA European Championship'),
+  ...buildOnThisDayEntries(competitions.copaAmerica.editions, 'Copa América'),
 ];
 ---
 
