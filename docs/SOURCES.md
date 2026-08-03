@@ -64,6 +64,18 @@ Primary sources should be preferred.
   - https://www.uefa.com/uefanationsleague/
 - 2025 champion:
   - https://www.uefa.com/uefanationsleague/news/0297-1d5ccb0b6747-d10a8fc4eb86-1000--portugal-meet-the-nations-league-winners/
+- Final match dates audit (2026-08-03): the calendar date of each edition's
+  final, for the "On this day in football history" widget on the home page.
+  Verified via WebSearch, one Wikipedia final-match article per edition,
+  cross-checked against a second source (ESPN or UEFA.com) where available;
+  no discrepancies found across all four dates (2019-2025):
+  - https://en.wikipedia.org/wiki/2019_UEFA_Nations_League_final
+  - https://www.espn.com/soccer/match/_/gameId/540881/netherlands-portugal
+  - https://en.wikipedia.org/wiki/2021_UEFA_Nations_League_final
+  - https://www.espn.com/soccer/match/_/gameId/589985/france-spain
+  - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_final
+  - https://www.espn.com/soccer/match/_/gameId/654361/spain-croatia
+  - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
 
 ## Copa América
 
