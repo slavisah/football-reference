@@ -1693,3 +1693,35 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     );
   });
 });
+
+test.describe('Required-page redirects (/awards/... -> /competitions/...)', () => {
+  // docs/WEBSITE_REQUIREMENTS.md's "Required pages" list specifies
+  // /awards/ballon-dor and /awards/golden-boot, but both pages actually live
+  // at /competitions/ballon-dor and /competitions/golden-boot, grouped with
+  // the site's other competition pages. astro.config.mjs's `redirects`
+  // generates a static meta-refresh page at the documented path instead of
+  // moving the canonical page, so the required URL still resolves.
+  test('/awards/ballon-dor redirects to the real Ballon d\'Or page', async ({ page }) => {
+    await page.goto('awards/ballon-dor');
+    await page.waitForURL(/\/competitions\/ballon-dor\/?$/);
+    await expect(page.locator('h1')).toHaveText("Men's Ballon d'Or");
+  });
+
+  test('/awards/golden-boot redirects to the real Golden Boot page', async ({ page }) => {
+    await page.goto('awards/golden-boot');
+    await page.waitForURL(/\/competitions\/golden-boot\/?$/);
+    await expect(page.locator('h1')).toHaveText('Golden Boot Winners');
+  });
+
+  test('the redirect pages are noindex and target the base-path-prefixed destination', async ({
+    page,
+  }) => {
+    const response = await page.request.get('/football-reference/awards/ballon-dor/');
+    expect(response.ok()).toBe(true);
+    const body = await response.text();
+    expect(body).toContain(
+      '<meta http-equiv="refresh" content="0;url=/football-reference/competitions/ballon-dor">',
+    );
+    expect(body).toContain('<meta name="robots" content="noindex">');
+  });
+});

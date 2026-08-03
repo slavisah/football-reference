@@ -1833,6 +1833,60 @@ award pages, in both languages.
 - The same handful of Ballon d'Or ceremony dates noted in an earlier slice
   still rest on single-source research.
 
+### "Required pages" fix: `/awards/ballon-dor` and `/awards/golden-boot` redirects
+
+Added 2026-08-03 (intensive run). With the previous run's "by team" filter,
+every item in `docs/WEBSITE_REQUIREMENTS.md`'s "Required capabilities" list
+was implemented - but re-checking that same file's "Required pages" list
+turned up a gap none of the prior ~20 intensive runs had flagged: it
+specifies `/awards/ballon-dor` and `/awards/golden-boot`, while both pages
+were actually built at `/competitions/ballon-dor` and
+`/competitions/golden-boot` (grouped with the other four competition pages,
+matching the site nav, the Croatian translations, the generated PDFs, the
+sitemap, and every existing test - all of which already point at
+`/competitions/...`).
+
+Moving the canonical pages now would have meant touching every internal
+link, both languages' `TRANSLATED_PATHS`, `NAV_LINKS`, the sitemap's
+`CONTENT_ID_BY_PATH`, the generated PDF filenames, and every test that
+already asserts a `/competitions/...` URL - a wide, purely mechanical,
+higher-risk rename for zero reader-facing benefit. Instead, `astro.config.mjs`
+gained a `redirects` entry so the documented required path actually resolves:
+
+- `/awards/ballon-dor` -> `/competitions/ballon-dor`
+- `/awards/golden-boot` -> `/competitions/golden-boot`
+
+**Bug found and fixed in the same pass**: Astro's `redirects` config prepends
+the site's `base` path (`/football-reference`) to the *source* path
+automatically, but not to the *destination* - the first build produced a
+redirect page whose meta-refresh target and canonical link both pointed at
+`/competitions/ballon-dor` with no base prefix, which would 404 once deployed
+under the GitHub Pages base path. Fixed by prepending `base` to both
+destination strings by hand in the config (confirmed by inspecting the built
+`dist/awards/ballon-dor/index.html` before and after: the meta refresh now
+reads `content="0;url=/football-reference/competitions/ballon-dor"`). For a
+static build, Astro's `redirects` produces a small HTML page with
+`<meta http-equiv="refresh">`, `<meta name="robots" content="noindex">`, and a
+canonical link pointing at the destination - so the redirect page itself is
+excluded from the sitemap (which already only lists `NAV_LINKS`, unchanged)
+and never gets indexed as a duplicate of the real page.
+
+Covered by 3 new Playwright cases (`tests/e2e/mobile.spec.ts`, new
+"Required-page redirects" describe block): both redirects land on the real
+page's `<h1>`, and the raw response for `/awards/ballon-dor/` carries the
+base-path-prefixed meta refresh and the `noindex` tag. Verified with `pnpm
+lint` (0 errors/0 warnings, same pre-existing hint as every prior run), the
+full Vitest suite (152 cases, unchanged - no library code changed), and the
+full Playwright suite (199 cases, up from 196), all passing. No PDF
+regeneration needed - no Editions table changed.
+
+**Left for a future pass:** the Croatian competition pages
+(`/hr/competitions/ballon-dor`, `/hr/competitions/golden-boot`) have no
+`/hr/awards/...` equivalent - `docs/WEBSITE_REQUIREMENTS.md`'s "Required
+pages" list predates localization and only lists the English paths, so this
+wasn't treated as a gap; would be a one-line addition to the same
+`redirects` map if ever wanted.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
