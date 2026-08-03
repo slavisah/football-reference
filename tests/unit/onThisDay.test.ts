@@ -25,6 +25,15 @@ const europeanTable: MarkdownTable = {
   rows: [['2024', 'Spain', 'Spain 2–1 England', '14 July 2024']],
 };
 
+const ballonDorTable: MarkdownTable = {
+  heading: 'Winners',
+  headers: ['Year', 'Winner', 'National team', 'Ceremony date'],
+  rows: [
+    ['2018', 'Luka Modrić', 'Croatia', '3 December 2018'],
+    ['2020', 'Not awarded', '—', '—'],
+  ],
+};
+
 describe('parseFinalDate', () => {
   it('parses "D Month YYYY"', () => {
     expect(parseFinalDate('30 July 1966')).toEqual({ month: 7, day: 30 });
@@ -72,6 +81,26 @@ describe('buildOnThisDayEntries', () => {
     };
     const entries = buildOnThisDayEntries(buildEditions(noDateTable), 'Test');
     expect(entries).toEqual([]);
+  });
+
+  it('also builds entries from a "Ceremony date" column (individual awards)', () => {
+    const editions = buildEditions(ballonDorTable);
+    const entries = buildOnThisDayEntries(editions, "Men's Ballon d'Or");
+    // The 2020 "Not awarded" row has "—" for Ceremony date and is skipped.
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({
+      competition: "Men's Ballon d'Or",
+      year: '2018',
+      month: 12,
+      day: 3,
+      champion: 'Luka Modrić',
+      isAward: true,
+    });
+  });
+
+  it('does not mark a "Final date" entry as an award', () => {
+    const entries = buildOnThisDayEntries(buildEditions(worldCupTable), 'FIFA World Cup');
+    expect(entries.every((e) => !e.isAward)).toBe(true);
   });
 });
 
