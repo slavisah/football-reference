@@ -226,6 +226,38 @@ Primary sources should be preferred.
   - https://ballondor.com/all-rankings
 - Official homepage:
   - https://ballondor.com/
+- Ceremony dates audit (2026-08-03, intensive run): the calendar date each
+  year's winner was announced/awarded, for the "On this day in football
+  history" widget on the home page (same feature already covering the four
+  team competitions). Researched via three parallel WebSearch passes
+  (1956-1991, 1992-2009, 2010-2025) cross-checking each year's dedicated
+  Wikipedia "{year} Ballon d'Or"/"{year} FIFA Ballon d'Or" article against a
+  second independent source per year where one could be found (France
+  Football magazine issue numbers/cover-date listings, contemporaneous news
+  archives - France24, CNN, TIME, NPR, UEFA.com - and, for the pre-1992
+  years, a check that every date falls on a Tuesday, France Football's known
+  weekly publication day in that era). Direct WebFetch access to Wikipedia
+  and similar hosts was blocked by this environment's egress policy for
+  every year, so all findings come from WebSearch-summarized results rather
+  than a directly-fetched primary source - noted here for a future pass with
+  different network access to re-verify against. Two years have a genuine
+  source conflict, resolved in favor of the date consistent with the
+  Tuesday-publication check: **1965** (28 December, vs. 27 December implied
+  by one club retrospective) and **1973** (25 December, vs. 31 December from
+  one other source). Six further years rest on a single corroborating source
+  rather than two independent ones despite a real search effort for a
+  second: 1976, 1978, 1984, 1986 (each Wikipedia-only) and 2005 (the year
+  the ceremony first moved from December to late November, confirmed by
+  Wikipedia and secondary retrospectives but no same-day news archive
+  found). The 2010-2015 "FIFA Ballon d'Or" era ceremonies were each held in
+  January of the year after the award-year label (e.g. the "2010" award was
+  presented 10 January 2011 in Zurich) - the content file's Year column
+  keeps the award-year label throughout, matching every other column, while
+  the Ceremony date cell records the real calendar date, the same treatment
+  already given to UEFA EURO 2020's postponed final. See
+  `content/ballon-dor.md`'s "Important editorial note" section for the full
+  explanation. 2020 has no ceremony date (the award was not held that year)
+  - a permanent "—", not a research gap.
 
 ## Review policy
 
