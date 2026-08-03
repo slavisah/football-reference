@@ -15,15 +15,18 @@ const home = await getEntry('pages', 'index');
 const competitions = await loadHomeCompetitions();
 const cards = buildHomeCards('en', competitions);
 
-// "On this day" widget: built from editions that have a "Final date" column
-// - no extra data load, since all four competitions are already loaded
-// above. Ballon d'Or and Golden Boot don't have that column yet; see
-// docs/PROJECT_STATUS.md for the plan to extend this.
+// "On this day" widget: built from editions that have a "Final date" (or,
+// for the Ballon d'Or, "Ceremony date") column - no extra data load, since
+// all five competitions/awards are already loaded above. Golden Boot doesn't
+// have its own date column - its top-scorer facts are tied to the same World
+// Cup/EURO finals already listed here, so adding it would just duplicate
+// those entries; see docs/PROJECT_STATUS.md for the full rollout plan.
 const onThisDayEntries = [
   ...buildOnThisDayEntries(competitions.worldCup.editions, 'FIFA World Cup'),
   ...buildOnThisDayEntries(competitions.euro.editions, 'UEFA European Championship'),
   ...buildOnThisDayEntries(competitions.copaAmerica.editions, 'Copa América'),
   ...buildOnThisDayEntries(competitions.nationsLeague.editions, 'UEFA Nations League'),
+  ...buildOnThisDayEntries(competitions.ballonDor.editions, "Men's Ballon d'Or"),
 ];
 ---
 

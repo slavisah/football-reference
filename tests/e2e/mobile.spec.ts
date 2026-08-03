@@ -853,15 +853,31 @@ test.describe('Home page on a 360px phone', () => {
   });
 
   test('"On this day" falls back to an archive card on a non-final date', async ({ page }) => {
-    // No World Cup, EURO, Copa América, or Nations League decisive match has
-    // ever been played on 1 January.
+    // No World Cup, EURO, Copa América, Nations League decisive match or
+    // Ballon d'Or ceremony has ever fallen on 1 January.
     await page.clock.setFixedTime(new Date('2026-01-01T12:00:00'));
     await page.goto('');
     await expect(page.locator('#on-this-day-hint')).toBeVisible();
     await expect(page.locator('#on-this-day-list li')).toHaveCount(1);
     await expect(page.locator('#on-this-day-list')).toContainText(
-      /FIFA World Cup|UEFA European Championship|Copa América|UEFA Nations League/,
+      /FIFA World Cup|UEFA European Championship|Copa América|UEFA Nations League|Ballon d'Or/,
     );
+  });
+
+  test('"On this day" shows a Ballon d\'Or entry with award wording, not "final"', async ({
+    page,
+  }) => {
+    // 12 December matches only the 2016 Ballon d'Or ceremony (Cristiano
+    // Ronaldo) - no World Cup/EURO/Copa América/Nations League decisive match
+    // has ever fallen on that date, so this is an exact-date match, not the
+    // day-of-year fallback.
+    await page.clock.setFixedTime(new Date('2026-12-12T12:00:00'));
+    await page.goto('');
+    const list = page.locator('#on-this-day-list');
+    await expect(list).toContainText("Men's Ballon d'Or 2016");
+    await expect(list).toContainText('Cristiano Ronaldo won the award.');
+    await expect(list).not.toContainText('won the final');
+    await expect(page.locator('#on-this-day-hint')).toBeHidden();
   });
 });
 

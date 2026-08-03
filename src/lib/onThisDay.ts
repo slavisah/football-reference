@@ -1,7 +1,8 @@
 import type { Edition } from './types';
 
 // "On this day in football history": reduces editions that have a "Final
-// date" column into a flat, calendar-day-searchable list. Mirrors the
+// date" (tournaments) or "Ceremony date" (individual awards, e.g. Ballon
+// d'Or) column into a flat, calendar-day-searchable list. Mirrors the
 // cellValue-by-label lookup pattern already used by buildTimeline/
 // buildTopScorerFacts in editions.ts, kept local here since this is the only
 // module that needs it.
@@ -16,6 +17,12 @@ export type OnThisDayEntry = {
   champion: string;
   runnerUp?: string;
   final?: string;
+  /**
+   * True for an individual award with no match to date (e.g. Ballon d'Or,
+   * from its "Ceremony date" column) - the display layer needs this to avoid
+   * saying a "final" was played when the date is really an award ceremony.
+   */
+  isAward?: boolean;
 };
 
 const MONTHS: Record<string, number> = {
@@ -49,15 +56,18 @@ function cellValue(edition: Edition, matcher: RegExp): string | undefined {
 }
 
 /**
- * Builds "on this day" entries from editions with a "Final date" column.
- * Editions without that column, or with an unparseable value, are skipped
- * rather than guessed at - the feature only ever shows dates that were
- * explicitly researched and added to the content file.
+ * Builds "on this day" entries from editions with a "Final date" (or, for an
+ * individual award with no match, "Ceremony date") column. Editions without
+ * either column, or with an unparseable value, are skipped rather than
+ * guessed at - the feature only ever shows dates that were explicitly
+ * researched and added to the content file.
  */
 export function buildOnThisDayEntries(editions: Edition[], competition: string): OnThisDayEntry[] {
   const entries: OnThisDayEntry[] = [];
   for (const edition of editions) {
-    const raw = cellValue(edition, /^final date$/i);
+    const finalDateRaw = cellValue(edition, /^final date$/i);
+    const ceremonyDateRaw = finalDateRaw ? undefined : cellValue(edition, /^ceremony date$/i);
+    const raw = finalDateRaw ?? ceremonyDateRaw;
     if (!raw) continue;
     const parsed = parseFinalDate(raw);
     if (!parsed) continue;
@@ -69,6 +79,7 @@ export function buildOnThisDayEntries(editions: Edition[], competition: string):
       champion: edition.winner,
       runnerUp: cellValue(edition, /runner-up|finalist/i),
       final: cellValue(edition, /^final$/i),
+      isAward: Boolean(ceremonyDateRaw),
     });
   }
   return entries;
