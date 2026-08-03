@@ -853,14 +853,14 @@ test.describe('Home page on a 360px phone', () => {
   });
 
   test('"On this day" falls back to an archive card on a non-final date', async ({ page }) => {
-    // No World Cup, EURO, or Copa América decisive match has ever been
-    // played on 1 January.
+    // No World Cup, EURO, Copa América, or Nations League decisive match has
+    // ever been played on 1 January.
     await page.clock.setFixedTime(new Date('2026-01-01T12:00:00'));
     await page.goto('');
     await expect(page.locator('#on-this-day-hint')).toBeVisible();
     await expect(page.locator('#on-this-day-list li')).toHaveCount(1);
     await expect(page.locator('#on-this-day-list')).toContainText(
-      /FIFA World Cup|UEFA European Championship|Copa América/,
+      /FIFA World Cup|UEFA European Championship|Copa América|UEFA Nations League/,
     );
   });
 });
