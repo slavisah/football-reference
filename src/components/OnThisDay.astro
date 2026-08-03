@@ -8,19 +8,25 @@
 // re-checks the visitor's actual today and swaps the card in if the site
 // hasn't been rebuilt since - same progressive-enhancement pattern as
 // ThemeToggle/ TournamentTable's inline scripts.
-import { entriesOnDate, fallbackEntry, type OnThisDayEntry } from '../lib/onThisDay';
+import {
+  entriesOnDate,
+  fallbackEntry,
+  formatOnThisDayDate,
+  monthNamesFor,
+  onThisDayResultText,
+  type OnThisDayEntry,
+} from '../lib/onThisDay';
+import { t, type Locale } from '../lib/i18n';
 
 interface Props {
   entries: OnThisDayEntry[];
   heading?: string;
+  locale?: Locale;
 }
 
-const { entries, heading = 'On this day in football history' } = Astro.props;
-
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
+const { entries, heading, locale = 'en' } = Astro.props;
+const resolvedHeading = heading ?? t(locale, 'onThisDayHeading');
+const monthNames = monthNamesFor(locale);
 
 const buildDate = new Date();
 const matches = entriesOnDate(entries, buildDate);
@@ -29,29 +35,27 @@ const featured = matches.length > 0 ? matches : (() => {
   return fallback ? [fallback] : [];
 })();
 const isFallback = matches.length === 0;
-const dateLabel = `${buildDate.getDate()} ${MONTH_NAMES[buildDate.getMonth()]}`;
+const dateLabel = formatOnThisDayDate(buildDate.getMonth() + 1, buildDate.getDate(), locale);
 ---
 
 <section class="on-this-day card" aria-labelledby="on-this-day-heading">
-  <h2 id="on-this-day-heading">{heading}</h2>
+  <h2 id="on-this-day-heading">{resolvedHeading}</h2>
   <p class="on-this-day__date" id="on-this-day-date">{dateLabel}</p>
   <p class="on-this-day__hint" id="on-this-day-hint" hidden={!isFallback}>
-    No final was played on this exact date - here's one from the archive instead.
+    {t(locale, 'onThisDayHint')}
   </p>
   <ul class="on-this-day__list" id="on-this-day-list">
     {
       featured.map((entry) => (
         <li>
           <p class="on-this-day__comp">{entry.competition} {entry.year}</p>
-          <p class="on-this-day__result">
-            {entry.final ?? `${entry.champion} won ${entry.isAward ? 'the award' : 'the final'}.`}
-          </p>
+          <p class="on-this-day__result">{onThisDayResultText(entry, locale)}</p>
         </li>
       ))
     }
     {
       featured.length === 0 && (
-        <li><p class="on-this-day__empty">No final dates on record yet.</p></li>
+        <li><p class="on-this-day__empty">{t(locale, 'onThisDayEmpty')}</p></li>
       )
     }
   </ul>
@@ -105,11 +109,12 @@ const dateLabel = `${buildDate.getDate()} ${MONTH_NAMES[buildDate.getMonth()]}`;
 
 <script
   is:inline
-  define:vars={{ entries, monthNames: MONTH_NAMES }}
+  define:vars={{ entries, monthNames, locale, emptyText: t(locale, 'onThisDayEmpty') }}
 >
-  // Mirrors src/lib/onThisDay.ts's entriesOnDate/fallbackEntry (kept in sync
-  // manually - this inline script can't import a module, same constraint
-  // TournamentTable's filter script documents for its own duplicated logic).
+  // Mirrors src/lib/onThisDay.ts's entriesOnDate/fallbackEntry/
+  // formatOnThisDayDate/onThisDayResultText (kept in sync manually - this
+  // inline script can't import a module, same constraint TournamentTable's
+  // filter script documents for its own duplicated logic).
   function entriesOnDate(all, date) {
     const month = date.getMonth() + 1;
     const day = date.getDate();
@@ -129,6 +134,19 @@ const dateLabel = `${buildDate.getDate()} ${MONTH_NAMES[buildDate.getMonth()]}`;
     return sorted[dayOfYear % sorted.length];
   }
 
+  function formatDate(month, day) {
+    const monthName = monthNames[month - 1];
+    return locale === 'hr' ? `${day}. ${monthName}` : `${day} ${monthName}`;
+  }
+
+  function resultText(entry) {
+    if (entry.final) return entry.final;
+    if (locale === 'hr') {
+      return `${entry.champion} je ${entry.isAward ? 'osvojio nagradu' : 'pobijedio u finalu'}.`;
+    }
+    return `${entry.champion} won ${entry.isAward ? 'the award' : 'the final'}.`;
+  }
+
   const now = new Date();
   const matches = entriesOnDate(entries, now);
   const featured = matches.length > 0 ? matches : (() => {
@@ -141,7 +159,7 @@ const dateLabel = `${buildDate.getDate()} ${MONTH_NAMES[buildDate.getMonth()]}`;
   const hintEl = document.getElementById('on-this-day-hint');
   const listEl = document.getElementById('on-this-day-list');
 
-  if (dateEl) dateEl.textContent = `${now.getDate()} ${monthNames[now.getMonth()]}`;
+  if (dateEl) dateEl.textContent = formatDate(now.getMonth() + 1, now.getDate());
   if (hintEl) hintEl.hidden = !isFallback;
 
   if (listEl) {
@@ -150,7 +168,7 @@ const dateLabel = `${buildDate.getDate()} ${MONTH_NAMES[buildDate.getMonth()]}`;
       const li = document.createElement('li');
       const p = document.createElement('p');
       p.className = 'on-this-day__empty';
-      p.textContent = 'No final dates on record yet.';
+      p.textContent = emptyText;
       li.appendChild(p);
       listEl.appendChild(li);
     } else {
@@ -161,8 +179,7 @@ const dateLabel = `${buildDate.getDate()} ${MONTH_NAMES[buildDate.getMonth()]}`;
         comp.textContent = `${entry.competition} ${entry.year}`;
         const result = document.createElement('p');
         result.className = 'on-this-day__result';
-        result.textContent =
-          entry.final ?? `${entry.champion} won ${entry.isAward ? 'the award' : 'the final'}.`;
+        result.textContent = resultText(entry);
         li.appendChild(comp);
         li.appendChild(result);
         listEl.appendChild(li);

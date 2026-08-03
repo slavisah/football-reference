@@ -1,4 +1,5 @@
 import type { Edition } from './types';
+import type { Locale } from './i18n';
 
 // "On this day in football history": reduces editions that have a "Final
 // date" (tournaments) or "Ceremony date" (individual awards, e.g. Ballon
@@ -92,6 +93,39 @@ export function entriesOnDate(entries: OnThisDayEntry[], date: Date): OnThisDayE
   return entries
     .filter((entry) => entry.month === month && entry.day === day)
     .sort((a, b) => Number(b.year) - Number(a.year));
+}
+
+const MONTH_NAMES: Record<Locale, string[]> = {
+  en: [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ],
+  // Genitive case, as Croatian dates are conventionally written ("30.
+  // srpnja", not "30. srpanj").
+  hr: [
+    'siječnja', 'veljače', 'ožujka', 'travnja', 'svibnja', 'lipnja',
+    'srpnja', 'kolovoza', 'rujna', 'listopada', 'studenoga', 'prosinca',
+  ],
+};
+
+/** The 12 month names for a locale, indexed 0 (January) to 11 (December) - also handed to the client script via `define:vars`, since it can't import this module. */
+export function monthNamesFor(locale: Locale = 'en'): string[] {
+  return MONTH_NAMES[locale];
+}
+
+/** Formats a month/day pair the way each locale conventionally writes a bare calendar date (no year). */
+export function formatOnThisDayDate(month: number, day: number, locale: Locale = 'en'): string {
+  const monthName = MONTH_NAMES[locale][month - 1];
+  return locale === 'hr' ? `${day}. ${monthName}` : `${day} ${monthName}`;
+}
+
+/** The card's result line: the recorded final score when there is one, else a locale-appropriate "{champion} won ..." sentence. */
+export function onThisDayResultText(entry: OnThisDayEntry, locale: Locale = 'en'): string {
+  if (entry.final) return entry.final;
+  if (locale === 'hr') {
+    return `${entry.champion} je ${entry.isAward ? 'osvojio nagradu' : 'pobijedio u finalu'}.`;
+  }
+  return `${entry.champion} won ${entry.isAward ? 'the award' : 'the final'}.`;
 }
 
 /**
