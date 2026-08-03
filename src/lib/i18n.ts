@@ -65,6 +65,15 @@ const UI_STRINGS = {
   sortMostFirst: { en: '(most first)', hr: '(najviše prvo)' },
   sortAZ: { en: '(A–Z)', hr: '(A–Ž)' },
   sortZA: { en: '(Z–A)', hr: '(Ž–A)' },
+  onThisDayHeading: {
+    en: 'On this day in football history',
+    hr: 'Na današnji dan u povijesti nogometa',
+  },
+  onThisDayHint: {
+    en: "No final was played on this exact date - here's one from the archive instead.",
+    hr: 'Na ovaj točan datum nije odigrano finale - evo jednog iz arhive.',
+  },
+  onThisDayEmpty: { en: 'No final dates on record yet.', hr: 'Još nema zabilježenih datuma finala.' },
 } as const;
 
 export type UiStringKey = keyof typeof UI_STRINGS;

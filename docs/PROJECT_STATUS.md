@@ -1681,6 +1681,78 @@ date" as-is.
   than two independently agreeing sources - worth a follow-up pass with
   direct (non-WebSearch-only) source access if higher certainty is needed.
 
+### "On this day" widget - Croatian translation
+
+Added 2026-08-03 (intensive run). Closes the "Croatian home page doesn't
+render the widget" item every one of the four prior slices left open - the
+last remaining gap in the widget's rollout, since all five competitions/
+awards that feed it are already localized elsewhere on the site.
+
+- **`src/lib/onThisDay.ts`** gained three small, pure, locale-aware helpers
+  rather than hardcoding English strings in the component: `monthNamesFor()`
+  (12 month names per locale - Croatian in the grammatically-correct genitive
+  case used in dates, e.g. "srpnja" not "Srpanj"), `formatOnThisDayDate()`
+  (locale-appropriate bare-date formatting - "30 July" vs "30. srpnja", with
+  the period Croatian convention requires), and `onThisDayResultText()` (the
+  card's result line: the recorded score verbatim when there is one - scores
+  are data, not translated, matching every other page's precedent - else a
+  locale-appropriate "{champion} won the final/award" sentence). All three
+  default to `'en'` so the existing English call sites needed no changes.
+- **`OnThisDay.astro`** gained an optional `locale` prop (default `'en'`,
+  byte-identical English output verified against a pre-change build) used for
+  the heading (new `onThisDayHeading` i18n key, overridable via the existing
+  `heading` prop same as before), the hint text (new `onThisDayHint` key) and
+  the empty-state text (new `onThisDayEmpty` key). The **client-side re-check
+  script** can't import `t()` or the new lib helpers (same `is:inline`
+  constraint every other duplicated-logic script in this codebase documents),
+  so it now receives `monthNames`/`locale`/`emptyText` via `define:vars` and
+  carries its own `formatDate()`/`resultText()` mirroring the two new pure
+  functions, alongside the pre-existing duplicated `entriesOnDate()`/
+  `fallbackEntry()`.
+- **`src/pages/hr/index.astro`** now loads `buildOnThisDayEntries()` for the
+  same five competitions/awards as the English home page (World Cup, EURO,
+  Copa América, Nations League, Ballon d'Or; Golden Boot excluded for the
+  same reason noted on the English page), passing each competition's already-
+  established Croatian display name from `homeCards.ts`'s `CARD_TEXT` (e.g.
+  "FIFA Svjetsko prvenstvo", "Zlatna lopta") so a card's competition label
+  matches the rest of the Croatian site. Renders `<OnThisDay
+  entries={onThisDayEntries} locale="hr" />` in the same position between the
+  competition cards and the features section as the English page. No new
+  data was researched - reuses the exact "Final date"/"Ceremony date" columns
+  already on the shared `content/*.md` files, so a card's underlying fact
+  (year, champion, date) can never drift between languages, only the
+  competition name, sentence wording and date format around it.
+- Covered by 7 new Vitest cases (`tests/unit/onThisDay.test.ts`:
+  `monthNamesFor` for both locales, `formatOnThisDayDate`'s English vs.
+  Croatian-with-period formatting, `onThisDayResultText`'s score-verbatim/
+  English-sentence/Croatian-sentence cases) and 3 new Playwright cases at
+  360px in the Croatian home page describe block, mirroring the three
+  existing English "On this day" cases exactly: an exact-date match (30 July,
+  both 1930 and 1966 World Cup finals, translated heading and "30. srpnja"
+  date), the archive-fallback hint (translated hint text, on 1 January), and
+  the Ballon d'Or award-wording case (12 December 2016 Cristiano Ronaldo,
+  asserting "je osvojio nagradu" appears and "finalu" does not). Verified
+  with `pnpm lint` (0 errors/0 warnings - one pre-existing-pattern `astro
+  check` hint on the client script's `define:vars`-only `monthNames`
+  reference, the same false positive `entries` already had), the full Vitest
+  suite (143 cases, up from 136) and the full Playwright suite (195 cases,
+  up from 192 - including the unchanged 44-case WCAG sweep, which found no
+  new contrast/keyboard violations on either home page), all passing. Also
+  confirmed byte-for-byte that the built `dist/index.html` (English) widget
+  markup is unchanged from before this run, and spot-checked the built
+  `dist/hr/index.html` widget markup directly (translated heading/hint,
+  genitive-case date, and the correct "je osvojio nagradu" sentence).
+
+**Left for a future pass:**
+- Golden Boot remains intentionally excluded from the widget on both
+  languages (unchanged reasoning from the first slice).
+- The "by team" filter remains the largest still-missing required
+  capability from `docs/WEBSITE_REQUIREMENTS.md` - now the single largest
+  item left in the entire backlog, since the widget's rollout (all four team
+  competitions + Ballon d'Or + both languages) is complete.
+- The same handful of Ballon d'Or ceremony dates noted in the previous slice
+  still rest on single-source research.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

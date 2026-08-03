@@ -3,6 +3,9 @@ import {
   buildOnThisDayEntries,
   entriesOnDate,
   fallbackEntry,
+  formatOnThisDayDate,
+  monthNamesFor,
+  onThisDayResultText,
   parseFinalDate,
 } from '../../src/lib/onThisDay';
 import { buildEditions } from '../../src/lib/editions';
@@ -152,5 +155,55 @@ describe('fallbackEntry', () => {
     // Not asserting they always differ (small list, pigeonhole), just that
     // the function varies with day-of-year rather than being constant.
     expect([a, b].some((x) => x !== undefined)).toBe(true);
+  });
+});
+
+describe('monthNamesFor', () => {
+  it('returns 12 English month names by default', () => {
+    const months = monthNamesFor();
+    expect(months).toHaveLength(12);
+    expect(months[0]).toBe('January');
+    expect(months[11]).toBe('December');
+  });
+
+  it('returns 12 Croatian (genitive-case) month names for "hr"', () => {
+    const months = monthNamesFor('hr');
+    expect(months).toHaveLength(12);
+    expect(months[0]).toBe('siječnja');
+    expect(months[6]).toBe('srpnja');
+    expect(months[11]).toBe('prosinca');
+  });
+});
+
+describe('formatOnThisDayDate', () => {
+  it('formats "{day} {Month}" for English', () => {
+    expect(formatOnThisDayDate(7, 30)).toBe('30 July');
+    expect(formatOnThisDayDate(1, 1, 'en')).toBe('1 January');
+  });
+
+  it('formats "{day}. {mjesec}" (genitive, with a period) for Croatian', () => {
+    expect(formatOnThisDayDate(7, 30, 'hr')).toBe('30. srpnja');
+    expect(formatOnThisDayDate(12, 3, 'hr')).toBe('3. prosinca');
+  });
+});
+
+describe('onThisDayResultText', () => {
+  const withScore = { competition: 'X', year: '1966', month: 7, day: 30, champion: 'England', final: 'England 4–2 West Germany (a.e.t.)' };
+  const finalNoScore = { competition: 'X', year: '1930', month: 7, day: 30, champion: 'Uruguay' };
+  const award = { competition: 'X', year: '2016', month: 12, day: 12, champion: 'Cristiano Ronaldo', isAward: true };
+
+  it('returns the recorded score verbatim, in either locale, when present', () => {
+    expect(onThisDayResultText(withScore)).toBe('England 4–2 West Germany (a.e.t.)');
+    expect(onThisDayResultText(withScore, 'hr')).toBe('England 4–2 West Germany (a.e.t.)');
+  });
+
+  it('builds an English "won the final"/"won the award" sentence when there is no score', () => {
+    expect(onThisDayResultText(finalNoScore)).toBe('Uruguay won the final.');
+    expect(onThisDayResultText(award)).toBe('Cristiano Ronaldo won the award.');
+  });
+
+  it('builds a Croatian sentence when there is no score', () => {
+    expect(onThisDayResultText(finalNoScore, 'hr')).toBe('Uruguay je pobijedio u finalu.');
+    expect(onThisDayResultText(award, 'hr')).toBe('Cristiano Ronaldo je osvojio nagradu.');
   });
 });
