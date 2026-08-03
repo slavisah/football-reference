@@ -1753,6 +1753,86 @@ awards that feed it are already localized elsewhere on the site.
 - The same handful of Ballon d'Or ceremony dates noted in the previous slice
   still rest on single-source research.
 
+### "By team" filter - added 2026-08-03 (intensive run)
+
+Closes the item the previous three runs' "Left for a future pass" notes each
+called out as "the single largest item left in the entire backlog" -
+`docs/WEBSITE_REQUIREMENTS.md` requires filtering by "year, host, winner, and
+team", and only the team filter was still missing across all six competition/
+award pages, in both languages.
+
+- **`src/lib/editions.ts`** gained `editionTeams()` and `distinctTeams()`.
+  Rather than reusing the existing `winner` field (which would only surface
+  the champion), `editionTeams()` reads every team-holding column of a row -
+  Winner/Champion, Runner-up, Third, Fourth (and EURO's "Other semifinalist"
+  variants, matched via a shared `/finalist/i` pattern since "semifinalist"
+  contains "finalist") - so a team that only ever reached a final or
+  semifinal, and never won, still surfaces when a reader filters by its name
+  (e.g. Portugal has never won or been runner-up in the World Cup, but
+  filtering by "Portugal" now correctly returns 1966, third place, and 2006,
+  fourth place). One subtlety: on the individual-award tables (Ballon d'Or,
+  Golden Boot) the "Winner" column holds a *player*, not a team, and a
+  separate "National team"/"Team" column holds the actual country - so
+  `editionTeams()` detects whether a row carries a dedicated team column and,
+  if so, skips "Winner"/"Champion" for that row rather than treating a
+  player's name as a team. Missing-data em dashes and "Not awarded"-style
+  placeholders are excluded the same way the existing winner/host filters
+  already do.
+- **`src/components/TournamentTable.astro`** gained a `teams` prop (mirroring
+  the existing `hosts` prop: pass `[]` or omit to hide the filter) plus a new
+  `<select>` field, a `data-teams` attribute per row (pipe-joined, since team
+  names contain spaces and can't safely share a space-joined attribute the
+  way single-token values could), and full client-side wiring: the team
+  filter combines with winner/year/host exactly like the existing filters,
+  is restored from and written back to a `?team=` URL parameter (so a
+  filtered view stays shareable), and is included in the reset button and the
+  "Showing N of M" status text. `teamLabel`/`teamAllLabel`/`bitTeamPrefix`
+  props follow the same override pattern every other filter label already
+  uses, so localized pages can translate it.
+- **`src/lib/competition.ts`**: `CompetitionData` gained a `teams: string[]`
+  field (`distinctTeams(editions)`), threaded through automatically to every
+  page that uses `loadCompetition()` + `CompetitionView.astro` (World Cup,
+  EURO, Copa América, Nations League, Ballon d'Or). The English Golden Boot
+  page and all six Croatian competition pages compose their own layout by
+  hand (see earlier entries in this file for why), so each of those 8
+  `TournamentTable` call sites needed its own `teams={...}` prop added
+  directly - done for all of them in this pass, so the filter is live on
+  every competition/award page in both languages, not a partial rollout.
+  Croatian pages label it "Reprezentacija" / "Sve reprezentacije" (matching
+  the existing Ballon d'Or/Golden Boot Croatian header translation for
+  "National team"/"Team"), deliberately distinct from "Momčadi" (the
+  existing translation of the World Cup/EURO team-*count* column) to avoid
+  the two reading as the same concept.
+  Every page's meta `description` (English and Croatian) was also updated to
+  mention the team filter, matching what the page now actually offers.
+- **Tests**: 9 new Vitest cases in `tests/unit/editions.test.ts`
+  (`editionTeams`: every team-holding column, em-dash skipping, the shared
+  EURO "finalist" pattern, the National-team-vs-Winner-as-player distinction,
+  placeholder exclusion; `distinctTeams`: alphabetical dedup, a
+  semifinal-only team surfacing where `distinctWinners` would miss it, and
+  the empty-list case for a table with no team-holding column - 152 total,
+  up from 143) and 1 new Playwright case at 360px on the World Cup page (the
+  Portugal 1966/2006 scenario above, including the shareable `?team=` URL and
+  reset behavior), plus one new assertion added to the existing Croatian
+  World Cup "renders translated chrome, filters and column headers" case
+  that `label[for="world-cup-team"]` reads "Reprezentacija" (196 total, up
+  from 195). Verified with `pnpm lint` (0 errors/0 warnings, same
+  pre-existing `monthNames` hint as every prior run), the full Vitest suite,
+  and the full Playwright suite, all passing.
+
+**Left for a future pass:**
+- No known gaps in the team filter itself - it's live on all six
+  competition/award pages, both languages, and combines correctly with every
+  existing filter.
+- With the team filter shipped, every "Required capability" listed in
+  `docs/WEBSITE_REQUIREMENTS.md` is now implemented. The largest remaining
+  work is on the "Nice-to-have" list (installable PWA and "on this day" are
+  already done; a per-competition downloadable print sheet exists via the
+  PDF links) - a future pass could revisit content-accuracy/quality passes
+  instead, per this routine's fallback instruction.
+- The same handful of Ballon d'Or ceremony dates noted in an earlier slice
+  still rest on single-source research.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

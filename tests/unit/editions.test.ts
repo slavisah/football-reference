@@ -5,7 +5,9 @@ import {
   buildTimeline,
   buildTopScorerFacts,
   distinctHosts,
+  distinctTeams,
   distinctWinners,
+  editionTeams,
   isPlaceholderWinner,
 } from '../../src/lib/editions';
 import type { MarkdownTable } from '../../src/lib/types';
@@ -145,6 +147,112 @@ describe('distinctHosts', () => {
       rows: [['1958', 'Just Fontaine', 'France', '13']],
     };
     expect(distinctHosts(buildEditions(scorersTable))).toEqual([]);
+  });
+});
+
+describe('editionTeams', () => {
+  const fullTable: MarkdownTable = {
+    headers: ['Year', 'Host(s)', 'Teams', 'Winner', 'Runner-up', 'Third', 'Fourth / other semifinalist'],
+    rows: [
+      ['1930', 'Uruguay', '13', 'Uruguay', 'Argentina', 'United States', 'Yugoslavia'],
+      ['1934', 'Italy', '16', 'Italy', 'Czechoslovakia', 'Germany', '—'],
+    ],
+  };
+
+  it('collects every team-holding column, not just the winner', () => {
+    const editions = buildEditions(fullTable);
+    expect(editionTeams(editions[0])).toEqual([
+      'Uruguay',
+      'Argentina',
+      'United States',
+      'Yugoslavia',
+    ]);
+  });
+
+  it('skips a missing-data em dash cell', () => {
+    const editions = buildEditions(fullTable);
+    expect(editionTeams(editions[1])).toEqual(['Italy', 'Czechoslovakia', 'Germany']);
+  });
+
+  it('ignores non-team columns like Year, Host(s) and Teams', () => {
+    const editions = buildEditions(fullTable);
+    expect(editionTeams(editions[0])).not.toContain('13');
+    expect(editionTeams(editions[0])).not.toContain('1930');
+  });
+
+  it('matches "Other semifinalist" headers via the shared "finalist" pattern', () => {
+    const euroTable: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up', 'Other semifinalist', 'Other semifinalist / fourth'],
+      rows: [['1960', 'Soviet Union', 'Yugoslavia', 'Czechoslovakia', 'France']],
+    };
+    expect(editionTeams(buildEditions(euroTable)[0])).toEqual([
+      'Soviet Union',
+      'Yugoslavia',
+      'Czechoslovakia',
+      'France',
+    ]);
+  });
+
+  it('reads a "National team" column (Ballon d\'Or) and a "Team" column (Golden Boot)', () => {
+    const ballonDorTable: MarkdownTable = {
+      headers: ['Year', 'Winner', 'National team'],
+      rows: [['1956', 'Stanley Matthews', 'England']],
+    };
+    expect(editionTeams(buildEditions(ballonDorTable)[0])).toEqual(['England']);
+
+    const goldenBootTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [['1930', 'Guillermo Stábile', 'Argentina', '8']],
+    };
+    expect(editionTeams(buildEditions(goldenBootTable)[0])).toEqual(['Argentina']);
+  });
+
+  it('excludes a "Not awarded" placeholder from the team list', () => {
+    const withPlaceholder: MarkdownTable = {
+      headers: ['Year', 'Winner', 'National team'],
+      rows: [['2020', 'Not awarded', 'Not awarded']],
+    };
+    expect(editionTeams(buildEditions(withPlaceholder)[0])).toEqual([]);
+  });
+});
+
+describe('distinctTeams', () => {
+  it('lists each team once across every team-holding column, alphabetically', () => {
+    const fullTable: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up', 'Third', 'Fourth'],
+      rows: [
+        ['1930', 'Uruguay', 'Argentina', 'United States', 'Yugoslavia'],
+        ['1934', 'Italy', 'Czechoslovakia', 'Germany', 'Austria'],
+      ],
+    };
+    expect(distinctTeams(buildEditions(fullTable))).toEqual([
+      'Argentina',
+      'Austria',
+      'Czechoslovakia',
+      'Germany',
+      'Italy',
+      'United States',
+      'Uruguay',
+      'Yugoslavia',
+    ]);
+  });
+
+  it('surfaces a team that only ever reached a semifinal, not just champions', () => {
+    const fullTable: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up', 'Third', 'Fourth'],
+      rows: [['1966', 'England', 'West Germany', 'Portugal', 'Soviet Union']],
+    };
+    const teams = distinctTeams(buildEditions(fullTable));
+    expect(teams).toContain('Portugal');
+    expect(distinctWinners(buildEditions(fullTable))).not.toContain('Portugal');
+  });
+
+  it('returns an empty list when the table has no team-holding column', () => {
+    const noTeamsTable: MarkdownTable = {
+      headers: ['Year', 'Host'],
+      rows: [['1930', 'Uruguay']],
+    };
+    expect(distinctTeams(buildEditions(noTeamsTable))).toEqual([]);
   });
 });
 

@@ -5,6 +5,7 @@ import {
   buildChampionsSummary,
   buildEditions,
   distinctHosts,
+  distinctTeams,
   distinctWinners,
 } from './editions';
 import { extractSources, type SourceLink } from './sources';
@@ -27,6 +28,8 @@ export type CompetitionData = {
   winners: string[];
   /** Distinct host values for the host filter; empty when the table has no host column. */
   hosts: string[];
+  /** Distinct team values (winner/runner-up/third/fourth/national team/etc.) for the team filter. */
+  teams: string[];
   sources: SourceLink[];
   /** Editorial "notes" sections (e.g. "Memorable moments") requested via noteHeadings, in that order. */
   notes: NoteSection[];
@@ -123,6 +126,7 @@ export async function loadCompetition(
     champions: buildChampionsSummary(editions),
     winners: distinctWinners(editions),
     hosts: distinctHosts(editions),
+    teams: distinctTeams(editions),
     sources: extractSources(sourcesRaw, sourcesHeading),
     notes: extractSections(body, noteHeadings),
   };

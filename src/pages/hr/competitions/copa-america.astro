@@ -75,7 +75,7 @@ const headerLabels: Record<string, string> = {
 
 <BaseLayout
   title={data.title}
-  description="Svaki prvak Copa Américe od 1916., domaćini i drugoplasirani, uz generirani broj naslova. Filtriraj po prvaku, godini i domaćinu."
+  description="Svaki prvak Copa Américe od 1916., domaćini i drugoplasirani, uz generirani broj naslova. Filtriraj po prvaku, godini, domaćinu i reprezentaciji."
   locale="hr"
   alternateHref={withBase('/competitions/copa-america')}
   jsonLd={jsonLd}
@@ -103,6 +103,7 @@ const headerLabels: Record<string, string> = {
       editions={data.editions}
       winners={data.winners}
       hosts={data.hosts}
+      teams={data.teams}
       locale="hr"
       headerLabels={headerLabels}
       winnerLabel="Prvak"
@@ -111,6 +112,8 @@ const headerLabels: Record<string, string> = {
       yearAllLabel="Sve godine"
       hostLabel="Domaćin"
       hostAllLabel="Svi domaćini"
+      teamLabel="Reprezentacija"
+      teamAllLabel="Sve reprezentacije"
       sortByLabel="Sortiraj po"
       resetLabel="Poništi"
       filterAriaLabel="Filtriraj prvake Copa Américe"
@@ -119,6 +122,7 @@ const headerLabels: Record<string, string> = {
       bitWinnerPrefix="prvak"
       bitYearPrefix="godina"
       bitHostPrefix="domaćin"
+      bitTeamPrefix="reprezentacija"
       emptyText="Nijedno izdanje ne odgovara odabranim filterima."
       clearFiltersLabel="Očisti filtere"
     />
