@@ -315,6 +315,23 @@ Primary sources should be preferred.
   `content/ballon-dor.md`'s "Important editorial note" section for the full
   explanation. 2020 has no ceremony date (the award was not held that year)
   - a permanent "—", not a research gap.
+- Winners and national-team audit (2026-08-04, intensive run): every one of
+  the 69 awarded editions' Winner and National team cells (1956-2025,
+  excluding the cancelled 2020 award), verified via four parallel WebSearch
+  passes split by era (1956-1973, 1974-1991, 1992-2009, 2010-2025), each
+  cross-checking multiple independent sources per year (ESPN, Sky Sports,
+  BBC, Goal.com, UEFA.com, France Football retrospectives, and Wikipedia
+  search snippets - no direct WebFetch, same network-policy constraint as
+  the ceremony-dates audit above). Specifically re-checked the two
+  nationality-naturalization cases most likely to hide an error - 1960 Luis
+  Suárez (Spanish-born, correctly attributed to Spain) and 1961 Omar Sívori
+  (Argentine-born, naturalized Italian and playing for Italy by 1961,
+  correctly attributed to Italy, not Argentina) - and the 2020 "Not
+  awarded" placeholder (confirmed cancelled by France Football due to
+  COVID-19 disrupting the football calendar, not a data-entry gap). Also
+  spot-checked the "Multiple winners through 2025" summary table's two
+  largest totals (Messi 8, Cristiano Ronaldo 5) against the same sources.
+  **No discrepancies found** across any of the 69 rows or either total.
 
 ## Review policy
 
