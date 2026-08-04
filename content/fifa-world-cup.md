@@ -39,7 +39,7 @@ The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 b
 | 2014 | Brazil | 32 | Germany | Argentina | Netherlands | Brazil | Germany 1–0 Argentina (a.e.t.) | 13 July 2014 |
 | 2018 | Russia | 32 | France | Croatia | Belgium | England | France 4–2 Croatia | 15 July 2018 |
 | 2022 | Qatar | 32 | Argentina | France | Croatia | Morocco | Argentina 3–3 France; 4–2 pens | 18 December 2022 |
-| 2026 | Canada, Mexico and United States | 48 | Spain | Argentina | England | France | Spain 1–0 Argentina | 19 July 2026 |
+| 2026 | Canada, Mexico and United States | 48 | Spain | Argentina | England | France | Spain 1–0 Argentina (a.e.t.) | 19 July 2026 |
 
 ## Champions by titles after 2026
 

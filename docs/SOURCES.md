@@ -54,6 +54,42 @@ Primary sources should be preferred.
     via beIN Sports and Liquisearch summaries (no separate match played)
   - 1950: final round-robin group table (Uruguay 5pts, Brazil 4pts, Sweden
     2pts, Spain 1pt), corroborated via two independent table summaries
+- 2026 final result audit (2026-08-04, intensive run): the two prior FIFA
+  World Cup audits above (final match dates, 2026-08-02; third/fourth-place,
+  2026-08-04) both explicitly excluded the 2026 edition from their scope as
+  "the scheduled/forward-looking final," reasoning that held when this
+  routine's audit series began but had gone stale by the time either pass
+  actually ran - the 2026 final was played 19 July 2026, over two weeks
+  before the third/fourth-place audit's own 2026-08-04 run date, and the
+  bronze match a day earlier. This run re-checked the full 2026 row in
+  `content/fifa-world-cup.md` (host, teams, winner, runner-up, third,
+  fourth, final score, final date) as a genuinely completed, independently
+  verifiable tournament rather than skipping it again. Verified via
+  WebSearch cross-checking FIFA.com's own final and bronze-match reports
+  against ESPN's match archive, CBS News, Al Jazeera's live coverage, Fox
+  News, and Yahoo Sports:
+  - Winner/runner-up/final date (Spain, Argentina, 19 July 2026) and
+    third/fourth (England beat France 6-4 in the bronze match, the highest-
+    scoring third-place match in World Cup history) were already correct as
+    authored.
+  - **One discrepancy found and fixed:** the Final column read "Spain 1-0
+    Argentina" with no extra-time marker; Ferran Torres actually settled it
+    in the 106th minute of extra time (Argentina played the second half of
+    extra time down a man after Enzo Fernández's second yellow card), the
+    same shape as an extra-time final decided without penalties elsewhere in
+    this table (e.g. 1966, 1978, 2010). Corrected to "Spain 1-0 Argentina
+    (a.e.t.)" to match this table's own established notation.
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/spain-argentina-final-report-highlights
+  - https://www.espn.com/soccer/match/_/gameId/760517/argentina-spain
+  - https://www.cbsnews.com/news/2026-fifa-world-cup-final-spain-argentina-sunday/
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/france-england-report-highlights-bronze-final
+  - https://www.espn.com/soccer/match/_/gameId/760516/england-france
+  - https://www.foxnews.com/sports/england-wins-thriller-ages-france-claim-third-2026-fifa-world-cup
+
+  **Process note for future runs:** don't assume the current year's
+  in-progress-looking edition is unplayed just because an earlier pass
+  labeled it that way - check the actual current date against the edition's
+  known calendar before excluding it from an audit's scope.
 - Golden Boot (top-scorer) audit (2026-08-04, intensive run): the "FIFA
   World Cup top scorers" table in `content/golden-boot.md` - player name(s),
   team, and goal count for all 23 editions (1930-2026) - verified via three
@@ -368,6 +404,40 @@ Primary sources should be preferred.
   spot-checked the "Multiple winners through 2025" summary table's two
   largest totals (Messi 8, Cristiano Ronaldo 5) against the same sources.
   **No discrepancies found** across any of the 69 rows or either total.
+- Second-source follow-up for single-sourced ceremony dates (2026-08-04,
+  intensive run): the 2026-08-03 ceremony-dates audit above left five years
+  (1976, 1978, 1984, 1986, 2005) resting on a single corroborating source
+  despite a real search effort for a second. This run specifically targeted
+  a second independent source for each via WebSearch:
+  - 1976 (28 December, Beckenbauer): corroborated by RSSSF
+    (`rsssf.org/miscellaneous/europa-poy76.html`), independent of Wikipedia.
+    Falls on a Tuesday, consistent with France Football's known weekly
+    publication day that era.
+  - 1978 (27 December, Keegan): corroborated by the official Ballon d'Or
+    social accounts and contemporaneous retrospectives (Yorkshire Post).
+    Falls on a **Wednesday**, not the usual Tuesday - a genuine exception to
+    the Tuesday-publication heuristic this audit series has otherwise relied
+    on, but every independent source agrees on the date regardless, so it is
+    correct as authored. Flagged so a future conflict resolution does not
+    treat the Tuesday pattern as decisive on its own.
+  - 1984 (25 December, Platini): corroborated by RSSSF
+    (`rsssf.org/miscellaneous/europa-poy84.html`). Falls on a Tuesday
+    (Christmas Day that year).
+  - 1986 (30 December, Belanov): corroborated by RSSSF
+    (`rsssf.org/miscellaneous/europa-poy86.html`) and France Football's own
+    Facebook announcement. **Resolved a genuine conflict** found during this
+    same search: Dynamo Kyiv's own site (dynamo.kiev.ua) states Belanov won
+    on 29 December 1986. 30 December 1986 was a Tuesday; 29 December 1986
+    was a Monday - the Tuesday-publication pattern, plus RSSSF and France
+    Football's own account, favor 30 December as already authored.
+  - 2005 (28 November, Ronaldinho): corroborated by Sky Sports
+    (`skysports.com/football/news/2355861/ronaldinho-scoops-ballon-dor`) and
+    multiple further independent outlets, all agreeing on 28 November in
+    Paris.
+  **No date changes needed** - every one of the five years is confirmed as
+  already authored, now each with a genuine second independent source. Same
+  network-policy constraint as the other Ballon d'Or audits (WebSearch only,
+  no direct WebFetch to Wikipedia/RSSSF).
 
 ## Review policy
 
