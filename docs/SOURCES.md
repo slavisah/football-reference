@@ -76,6 +76,19 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_final
   - https://www.espn.com/soccer/match/_/gameId/654361/spain-croatia
   - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
+- Third-place match audit (2026-08-04): the winner, score, and date of each
+  edition's third-place play-off, i.e. the content table's "Third"/"Fourth"
+  columns. Verified via WebSearch, cross-checked against UEFA.com's own match
+  report plus ESPN's box score for each edition; no discrepancies found
+  across all four editions (2019-2025):
+  - https://www.uefa.com/uefanationsleague/news/0253-0d821b962b73-720b41ee3a40-1000--england-beat-switzerland-on-penalties-in-nations-league-m/
+  - https://www.espn.com/soccer/match/_/gameId/540882/england-switzerland
+  - https://www.uefa.com/uefanationsleague/news/026e-137218f01734-bf182cc6c45c-1000--italy-2-1-belgium-azzurri-secure-third-place-at-nations-lea/
+  - https://www.espn.com/soccer/match/_/gameId/589984
+  - https://www.uefa.com/uefanationsleague/news/0282-18494807115a-60db6abfda87-1000--netherlands-2-3-italy-azzurri-claim-third-place-with-thr/
+  - https://www.espn.com/soccer/match/_/gameId/654362/italy-netherlands
+  - https://www.uefa.com/uefanationsleague/news/029a-1df3af7eedc9-c3b6e51cf3f1-1000--germany-vs-france-highlights-and-report-kylian-mbappe-sco/
+  - https://www.espn.com/soccer/match/_/gameId/723737/france-germany
 
 ## Copa América
 
