@@ -2195,6 +2195,76 @@ Ademir's goal count) is fixed.
   that have only had one audit pass so far - rather than assuming there is
   nothing left to verify.
 
+### Content-accuracy pass: 2026 FIFA World Cup final result, plus five Ballon d'Or ceremony-date second sources
+
+Added 2026-08-04 (intensive run). Before starting a new quality angle, this
+run checked whether `docs/SOURCES.md`'s stated liveness-check idea was
+actually executable in this environment: WebFetch returned HTTP 403 for
+every host tried (fifa.com, espn.com, en.wikipedia.org, rsssf.org - not just
+Wikipedia/RSSSF, which earlier audits already knew were blocked). A source
+"liveness check" built on WebFetch would therefore mark every single link
+"dead" regardless of its real status, so that idea is not viable here and
+was skipped in favor of two bounded, WebSearch-based tasks that are.
+
+**1. 2026 FIFA World Cup final result (real discrepancy, fixed).** The
+2026-08-02 final-dates audit and the 2026-08-04 third/fourth-place audit
+both explicitly excluded the 2026 edition as "the scheduled/forward-looking
+final" - true when this routine's audit series began, but stale by the time
+either pass actually ran: the final was played 19 July 2026, weeks before
+either audit's own run date. This run re-checked the full 2026 row in
+`content/fifa-world-cup.md` as a genuinely completed tournament. Host,
+teams, winner, runner-up, final date, and the third/fourth-place result
+(England beat France 6-4, the highest-scoring bronze match in World Cup
+history) were already correct. **One discrepancy found and fixed:** the
+Final column read "Spain 1-0 Argentina" with no extra-time marker, but
+Ferran Torres settled it in the 106th minute of extra time - corrected to
+"Spain 1-0 Argentina (a.e.t.)" to match this table's own notation for every
+other extra-time final decided without penalties. See `docs/SOURCES.md`'s
+new "2026 final result audit" entry for sources and a process note: don't
+exclude the current year's edition from an audit's scope just because an
+earlier pass labeled it forward-looking - check the actual date first.
+
+**2. Ballon d'Or ceremony dates: second sources for the last five
+single-sourced years.** The 2026-08-03 ceremony-dates audit left five years
+(1976, 1978, 1984, 1986, 2005) on a single corroborating source. This run
+found a genuine second independent source for all five (RSSSF, France
+Football's own social accounts, Sky Sports, and other outlets) - no date
+changes needed, every year confirmed as already authored. Along the way it
+resolved one further conflict (Dynamo Kyiv's own site claims 29 December for
+Belanov's 1986 award; the weekly-Tuesday-publication pattern plus RSSSF and
+France Football's own account confirm 30 December, as already authored) and
+found one genuine exception to that same Tuesday-publication heuristic
+(1978's well-corroborated date, 27 December, was a Wednesday) - flagged in
+`content/ballon-dor.md`'s editorial note so a future conflict resolution
+doesn't treat the Tuesday pattern as decisive on its own. See
+`docs/SOURCES.md`'s new entry under Ballon d'Or for the full per-year source
+list.
+
+Verified with `pnpm lint` (0 errors/0 warnings, same pre-existing hint as
+every prior run), the full Vitest suite (152/152, unchanged), and the full
+Playwright suite (199/199, unchanged) - the pre-installed Chromium needed
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` this run since the default
+bundled browser Playwright's own `pnpm install` pulled didn't match what's
+preinstalled in this container; noted here in case a future run hits the
+same "Executable doesn't exist" error.
+
+**Left for a future pass:**
+- A source-link liveness check remains infeasible in this specific
+  environment (WebFetch 403s on every host, not just Wikipedia/RSSSF) -
+  drop this idea unless a future run confirms different network access,
+  rather than re-attempting it as-is.
+- Accessibility is already automated (`tests/e2e/accessibility.spec.ts` runs
+  an axe WCAG 2.1 A/AA sweep across every nav page, both languages, both
+  color schemes) and performance has little surface on this
+  image-light static content site - a future pass should look for a
+  concrete gap in either (e.g. pages/states outside `NAV_LINKS` that axe
+  doesn't reach, like individual quiz question states) rather than a broad,
+  likely-low-yield sweep.
+- A second independent cross-check of the tables that have only had one
+  audit pass so far (World Cup/EURO/Copa América/Nations League
+  winner-runner-up-final data beyond 2026, which the final-date audits only
+  partially covered) remains open.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
