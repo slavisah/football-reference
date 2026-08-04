@@ -1987,6 +1987,67 @@ pass.
 - The same handful of Ballon d'Or ceremony dates noted in an earlier slice
   still rest on single-source research.
 
+### Content-accuracy pass: FIFA World Cup third/fourth-place results audit - no discrepancies
+
+Added 2026-08-04 (intensive run). Closes the previous run's own "Left for a
+future pass" note directly above: World Cup was the last of the four team
+competitions without its own dedicated third/fourth-place audit (Copa
+América, Nations League, and EURO all already had one). This is the largest
+of the four - 22 editions spanning nearly a century of format changes,
+including the two edge cases (1930, 1950) where no separate third-place
+match was ever played.
+
+- Verified the "Third"/"Fourth / other semifinalist" columns for all 21
+  completed editions (1930-2022) in `content/fifa-world-cup.md` via three
+  parallel WebSearch research passes split by era (1930-1962, 1966-1994,
+  1998-2022), each edition cross-checked against at least two independent
+  sources - ESPN's match archive/box scores and FIFA.com's official match
+  pages as the primary pair, supplemented by other outlets search surfaced
+  (Wikinews, France24, CBS News, Sky Sports, Athlet.org) where useful. 2026
+  is the site's own forward-looking scheduled entry, not a completed
+  tournament to fact-check against outside sources, so it was excluded from
+  audit scope (same reasoning every other page's "Final date" audits have
+  applied to any not-yet-played fixture).
+- **No discrepancies found in any of the 21 editions.** Both format edge
+  cases already documented in the page's "Editorial notes" section were
+  independently reconfirmed rather than merely trusted: 1930 played no
+  third-place match at all, with the United States (3rd) and Yugoslavia
+  (4th) coming from FIFA's own 1986 technical-committee retrospective
+  ranking; 1950 had no separate match either, with Sweden (3rd) and Spain
+  (4th) read directly off the four-team final round-robin group's points
+  table (Uruguay 5, Brazil 4, Sweden 2, Spain 1). The other 19 editions'
+  documented third-place winners and losers all matched their real
+  third-place play-off results exactly.
+- `docs/SOURCES.md` gained a "Third/fourth-place audit" entry under FIFA
+  World Cup with the full source list per era.
+  `content/fifa-world-cup.md`'s `lastReviewed` moved to 2026-08-04; `status`
+  stays `review` (unchanged) - secondary sources (ESPN, FIFA.com, and other
+  outlets), not a single primary competition record, matching the same
+  reasoning every earlier secondary-sourced audit in this file has given.
+- No content, code, or test changes were needed beyond the front-matter date
+  and the sources entry, since nothing in the existing table was wrong -
+  this is a clean audit-closed entry, the same shape as the Copa América,
+  Nations League, and EURO "audit closed" passes. Verified with `pnpm lint`
+  (0 errors/0 warnings, same pre-existing hint as every prior run) and the
+  full Vitest/Playwright suites, both unchanged from the prior run (no code
+  or test changes were needed), all still passing.
+
+This closes the third/fourth-place audit series across all four team
+competitions - Copa América, Nations League, EURO, and now the World Cup -
+every one of the site's team-competition tables has now had its
+runner-up/third/fourth data independently cross-checked against outside
+sources at least once.
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in an earlier slice
+  still rest on single-source research.
+- With every team competition's third/fourth-place data now audited and
+  every required/nice-to-have backlog item from `docs/WEBSITE_REQUIREMENTS.md`
+  and `AGENTS.md` implemented, a future run should look for a fresh
+  content-accuracy angle (e.g. auditing the individual-award tables' winner/
+  runner-up-equivalent data, or a full source-link liveness check across
+  `docs/SOURCES.md`) rather than assuming there's nothing left to verify.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
