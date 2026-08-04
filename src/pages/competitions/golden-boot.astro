@@ -48,7 +48,7 @@ const jsonLd = [
 
 <BaseLayout
   title={worldCup.title}
-  description="FIFA World Cup and UEFA EURO top-scorer awards, with player, team and goals. Filter each table by player and year."
+  description="FIFA World Cup and UEFA EURO top-scorer awards, with player, team and goals. Filter each table by player, year and team."
   alternateHref={withBase('/hr/competitions/golden-boot')}
   jsonLd={jsonLd}
 >
@@ -71,6 +71,7 @@ const jsonLd = [
         editions={worldCup.editions}
         winners={worldCup.winners}
         hosts={worldCup.hosts}
+        teams={worldCup.teams}
         winnerLabel="Player"
       />
       <ChampionsSummary
@@ -92,6 +93,7 @@ const jsonLd = [
         editions={euro.editions}
         winners={euro.winners}
         hosts={euro.hosts}
+        teams={euro.teams}
         winnerLabel="Player"
       />
       <ChampionsSummary

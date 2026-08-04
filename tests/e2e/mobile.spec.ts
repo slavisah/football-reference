@@ -75,6 +75,23 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(page.locator('tbody tr[data-year="1986"]')).toBeVisible();
   });
 
+  test('filtering by team Portugal surfaces editions it never won', async ({ page }) => {
+    // Portugal has never won or been runner-up in the World Cup - this is the
+    // key difference from the winner filter: third place in 1966, fourth in 2006.
+    await page.selectOption('#world-cup-team', 'Portugal');
+
+    const visibleRows = page.locator('tbody tr:not([hidden])');
+    await expect(visibleRows).toHaveCount(2);
+    await expect(page.locator('tbody tr[data-year="1966"]')).toBeVisible();
+    await expect(page.locator('tbody tr[data-year="2006"]')).toBeVisible();
+
+    await expect(page).toHaveURL(/team=Portugal/);
+
+    await page.locator('#world-cup-reset').click();
+    await expect(page.locator('tbody tr:not([hidden])')).toHaveCount(23);
+    await expect(page).not.toHaveURL(/team=/);
+  });
+
   test('shows the last reviewed date and source links', async ({ page }) => {
     await expect(page.locator('time[datetime="2026-08-02"]')).toBeVisible();
     const sources = page.locator('.references__list a');
@@ -208,6 +225,7 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     ).toBeVisible();
     await expect(page.locator('label[for="world-cup-winner"]')).toHaveText('Prvak');
     await expect(page.locator('label[for="world-cup-host"]')).toHaveText('Domaćin');
+    await expect(page.locator('label[for="world-cup-team"]')).toHaveText('Reprezentacija');
     await expect(page.locator('th', { hasText: 'Godina' })).toBeVisible();
     await expect(page.locator('th', { hasText: 'Domaćin(i)' })).toBeVisible();
     await expect(page.locator('th', { hasText: 'Najbolji strijelac' })).toBeVisible();
@@ -1673,5 +1691,37 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(blocks.find((b) => b['@type'] === 'ItemList').name).toBe(
       'FIFA Svjetsko prvenstvo - prvaci po broju naslova',
     );
+  });
+});
+
+test.describe('Required-page redirects (/awards/... -> /competitions/...)', () => {
+  // docs/WEBSITE_REQUIREMENTS.md's "Required pages" list specifies
+  // /awards/ballon-dor and /awards/golden-boot, but both pages actually live
+  // at /competitions/ballon-dor and /competitions/golden-boot, grouped with
+  // the site's other competition pages. astro.config.mjs's `redirects`
+  // generates a static meta-refresh page at the documented path instead of
+  // moving the canonical page, so the required URL still resolves.
+  test('/awards/ballon-dor redirects to the real Ballon d\'Or page', async ({ page }) => {
+    await page.goto('awards/ballon-dor');
+    await page.waitForURL(/\/competitions\/ballon-dor\/?$/);
+    await expect(page.locator('h1')).toHaveText("Men's Ballon d'Or");
+  });
+
+  test('/awards/golden-boot redirects to the real Golden Boot page', async ({ page }) => {
+    await page.goto('awards/golden-boot');
+    await page.waitForURL(/\/competitions\/golden-boot\/?$/);
+    await expect(page.locator('h1')).toHaveText('Golden Boot Winners');
+  });
+
+  test('the redirect pages are noindex and target the base-path-prefixed destination', async ({
+    page,
+  }) => {
+    const response = await page.request.get('/football-reference/awards/ballon-dor/');
+    expect(response.ok()).toBe(true);
+    const body = await response.text();
+    expect(body).toContain(
+      '<meta http-equiv="refresh" content="0;url=/football-reference/competitions/ballon-dor">',
+    );
+    expect(body).toContain('<meta name="robots" content="noindex">');
   });
 });
