@@ -1937,6 +1937,56 @@ results audit of its own, only the narrower final-*date* audit from
 - The same handful of Ballon d'Or ceremony dates noted in an earlier slice
   still rest on single-source research.
 
+### Content-accuracy pass: UEFA EURO third-place play-off audit - no discrepancies
+
+Added 2026-08-04 (intensive run). Directly closes half of the previous run's
+own "Left for a future pass" note above - EURO's own third/fourth-place audit
+was still open (only Copa América and Nations League had one). EURO's data
+model differs from the other two: only six editions (1960-1980) played an
+actual third-place match, under the old 4-team "final four" format; from 1984
+onward UEFA does not rank the two defeated semifinalists, so there is nothing
+to audit for the other eleven editions - `content/uefa-euro.md`'s own
+"Historical format note" already documents this split, unchanged by this
+pass.
+
+- Verified all six 1960-1980 editions' third-place play-offs via WebSearch,
+  cross-checking UEFA.com's own match/history pages against a second
+  independent source (eu-football.info, 11v11, or a contemporaneous match
+  report) per edition, the same two-independent-sources method the Nations
+  League third-place audit used. The check specifically targets whether the
+  content table's "Other semifinalist" (3rd) / "Other semifinalist / fourth"
+  (4th) column *order* is correct for these rows, since neither column is
+  explicitly labeled "Third"/"Fourth" - the ranking is encoded purely by
+  which column a team appears in.
+- **No discrepancies found.** All six third-place results match exactly as
+  the column order already implies: Czechoslovakia beat France 2-0 (1960),
+  Hungary beat Denmark 3-1 after extra time (1964), England beat the Soviet
+  Union 2-0 (1968), Belgium beat Hungary 2-1 (1972), Netherlands beat
+  Yugoslavia 3-2 after extra time (1976), and Czechoslovakia beat host Italy
+  1-1 (a.e.t.), 9-8 on penalties (1980).
+- `docs/SOURCES.md` gained a "Third-place play-off audit" citation entry
+  under the UEFA EURO section (6 UEFA.com/eu-football.info links, one per
+  edition). `content/uefa-euro.md`'s `lastReviewed` moved to 2026-08-04;
+  `status` stays `review` (unchanged) - secondary sources, not a primary
+  UEFA competition record, matching the same reasoning every earlier
+  secondary-sourced audit in this file has given.
+- No content, code, or test changes were needed since nothing was wrong -
+  the table's existing data was already correct, so this is a clean
+  audit-closed entry, the same shape as the Nations League and Copa América
+  "audit closed" passes. Verified with `pnpm lint` (0 errors/0 warnings, same
+  pre-existing hint as every prior run) and the full Vitest/Playwright
+  suites (152/199 cases, both unchanged from the prior run - no code or test
+  changes were needed), all still passing.
+
+**Left for a future pass:**
+- World Cup remains the only competition without a dedicated third/fourth-
+  place results audit of its own (Copa América, Nations League, and now
+  EURO all have one) - its 22 editions and mixed formats (some early
+  editions had no third-place match at all) make it the largest remaining
+  audit in this series, next in line.
+- The same handful of Ballon d'Or ceremony dates noted in an earlier slice
+  still rest on single-source research.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
