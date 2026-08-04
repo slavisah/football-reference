@@ -25,6 +25,35 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/1966_FIFA_World_Cup_final
   - https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final
   - https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_final
+- Third/fourth-place audit (2026-08-04): the winner and loser of every
+  edition's third-place play-off (or, where no such match was played, the
+  historical ranking source for those two places), i.e. the content table's
+  "Third"/"Fourth / other semifinalist" columns, for all 21 completed
+  editions (1930-2022; 2026 is the site's own forward-looking scheduled
+  entry and out of scope for a factual audit). Verified via WebSearch across
+  three parallel passes (1930-1962, 1966-1994, 1998-2022), each edition
+  cross-checked against at least two independent sources (ESPN's match
+  archive/box scores, FIFA.com's official match pages, and other outlets
+  surfaced by search - Wikinews, France24, CBS News, Sky Sports, etc.).
+  **No discrepancies found in any edition's third/fourth-place teams.**
+  1930 (no third-place match was played; FIFA's 1986 technical-committee
+  retrospective ranking placed the United States third and Yugoslavia
+  fourth) and 1950 (no separate match; Sweden and Spain's 3rd/4th positions
+  come from the four-team final round-robin group table) were already
+  documented as format edge cases in `content/fifa-world-cup.md`'s
+  "Editorial notes" and are unchanged by this audit - both edge cases were
+  independently reconfirmed rather than merely trusted:
+  - https://www.espn.com/soccer/ (match archive, all editions with a played
+    third-place match: 1934, 1938, 1954, 1958, 1962, 1966, 1970, 1974, 1978,
+    1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022)
+  - https://plus.fifa.com/ (official match pages, cross-check for 1970,
+    1974, 1978, 1982, 1986, 1990)
+  - https://www.athlet.org/ (third place game summaries, cross-check for
+    1934, 1938, 1954, 1958, 1962)
+  - 1930: FIFA 1986 technical-committee retrospective ranking, corroborated
+    via beIN Sports and Liquisearch summaries (no separate match played)
+  - 1950: final round-robin group table (Uruguay 5pts, Brazil 4pts, Sweden
+    2pts, Spain 1pt), corroborated via two independent table summaries
 
 ## UEFA EURO
 
