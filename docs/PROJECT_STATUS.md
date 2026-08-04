@@ -2117,6 +2117,84 @@ sources.
 - A full source-link liveness check across `docs/SOURCES.md` remains
   unstarted, per the previous run's note.
 
+### Content-accuracy pass: Golden Boot top-scorer audit - one discrepancy found and fixed
+
+Added 2026-08-04 (intensive run). Follows directly from the previous run's own
+"Left for a future pass" note: Golden Boot was the one remaining competition/
+award table on the site with no dedicated content-accuracy audit, and had the
+oldest `lastReviewed` date (2026-07-23). This is the routine's
+next-highest-priority item per its stated order (Copa América, Nations
+League, and Ballon d'Or are all fully audited; Golden Boot is last).
+
+- Verified all 39 rows of `content/golden-boot.md`'s two tables - the FIFA
+  World Cup top scorers (23 editions, 1930-2026) and UEFA EURO top scorers
+  (16 editions, 1960-2024) - via five parallel WebSearch research passes
+  split by era/competition (World Cup 1930-1966, 1970-2002, 2006-2026; EURO
+  1960-1992, 1996-2024), each row cross-checked against multiple independent
+  sources (ESPN, BBC, Sky Sports, Goal.com, FIFA.com, UEFA.com, CBS Sports,
+  Sports Illustrated, Transfermarkt, Wikipedia search snippets - WebSearch
+  only, since direct WebFetch to Wikipedia/RSSSF-type hosts remains blocked
+  by this environment's network policy, the same constraint every prior
+  secondary-sourced audit in this file has documented).
+- Every multi-way tie got special attention for completeness (no missing or
+  extra names) and diacritic accuracy: the 1962 World Cup's six-way tie; the
+  1960 (five-way), 1964 (three-way), and 1992 (four-way) EURO ties; and the
+  2012 and 2024 EURO six-way ties. All confirmed correct as authored.
+- The 2026 World Cup row (Kylian Mbappé, France, 10 goals) got deliberate
+  extra scrutiny as the newest, highest-risk entry on the page - the 2026
+  tournament's scheduled final (19 July) predates this run's date, so a real
+  result should be independently verifiable rather than assumed from
+  training data. Confirmed by FIFA.com's own official award-winners page for
+  the 2026 tournament plus six further independent outlets (ESPN, Sky
+  Sports, NBC Sports, Fox Sports, Yahoo Sports, Real Madrid's own site);
+  Mbappé became the first player to win the World Cup Golden Boot twice
+  (also 2022), and his 10 goals ties Gerd Müller's 1970 tally as the highest
+  single-tournament total since then.
+- **One discrepancy found and fixed:** the 1950 row credited Ademir (Brazil)
+  with 8 goals; the consensus figure across independent sources (Wikipedia,
+  Goal.com, Sports Illustrated, OneFootball, worldcupranking.com) is **9
+  goals**. Corrected in `content/golden-boot.md`. This is the same shape as
+  two other pre-1940s totals already on this page that historical sources
+  have revised over time (Oldřich Nejedlý's 1934 total, corrected from 4 to
+  5; Leônidas's 1938 total, corrected from 8 to 7) - both already correct as
+  authored, confirmed by this same research pass.
+- No other discrepancies found across either table's 39 rows.
+- `docs/SOURCES.md` gained a "Golden Boot (top-scorer) audit" entry under
+  both the FIFA World Cup and UEFA EURO headings (not a new "Golden Boot"
+  heading - the Golden Boot page's own References section reads from those
+  two existing headings via `sourcesHeading: 'FIFA World Cup' | 'UEFA EURO'`
+  in `golden-boot.astro`, and `/about/sources` explicitly documents that
+  Golden Boot has no source section of its own; a standalone heading would
+  have silently orphaned the new links from the page that actually cites
+  them, and contradicted that page's own explanatory text).
+  `content/golden-boot.md`'s `lastReviewed` moved to 2026-08-04; `status`
+  stays `review` (unchanged) - secondary sources, not a primary
+  FIFA/UEFA statistics archive, matching the same reasoning every earlier
+  secondary-sourced audit in this file has given.
+- Verified with `pnpm lint` (0 errors/0 warnings, same pre-existing hint as
+  every prior run) and the full Vitest/Playwright suites, both unchanged
+  from the prior run (a one-number content fix needed no code or test
+  changes), all still passing.
+
+This closes the individual-award content-accuracy audit series - every
+competition/award table on the site (World Cup, EURO, Copa América, Nations
+League third/fourth-place data; Ballon d'Or and now Golden Boot winner/
+scorer data) has now had at least one independent cross-check against
+outside sources, and the one real error found in the whole series (1950
+Ademir's goal count) is fixed.
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in an earlier slice
+  still rest on single-source research.
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  unstarted, per two previous runs' notes now.
+- With every competition/award table's core data now independently audited
+  at least once, a future pass should look for a different quality angle
+  entirely - e.g. accessibility/performance sweeps, the source-link
+  liveness check above, or a second independent cross-check of the tables
+  that have only had one audit pass so far - rather than assuming there is
+  nothing left to verify.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
