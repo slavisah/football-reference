@@ -1753,6 +1753,240 @@ awards that feed it are already localized elsewhere on the site.
 - The same handful of Ballon d'Or ceremony dates noted in the previous slice
   still rest on single-source research.
 
+### "By team" filter - added 2026-08-03 (intensive run)
+
+Closes the item the previous three runs' "Left for a future pass" notes each
+called out as "the single largest item left in the entire backlog" -
+`docs/WEBSITE_REQUIREMENTS.md` requires filtering by "year, host, winner, and
+team", and only the team filter was still missing across all six competition/
+award pages, in both languages.
+
+- **`src/lib/editions.ts`** gained `editionTeams()` and `distinctTeams()`.
+  Rather than reusing the existing `winner` field (which would only surface
+  the champion), `editionTeams()` reads every team-holding column of a row -
+  Winner/Champion, Runner-up, Third, Fourth (and EURO's "Other semifinalist"
+  variants, matched via a shared `/finalist/i` pattern since "semifinalist"
+  contains "finalist") - so a team that only ever reached a final or
+  semifinal, and never won, still surfaces when a reader filters by its name
+  (e.g. Portugal has never won or been runner-up in the World Cup, but
+  filtering by "Portugal" now correctly returns 1966, third place, and 2006,
+  fourth place). One subtlety: on the individual-award tables (Ballon d'Or,
+  Golden Boot) the "Winner" column holds a *player*, not a team, and a
+  separate "National team"/"Team" column holds the actual country - so
+  `editionTeams()` detects whether a row carries a dedicated team column and,
+  if so, skips "Winner"/"Champion" for that row rather than treating a
+  player's name as a team. Missing-data em dashes and "Not awarded"-style
+  placeholders are excluded the same way the existing winner/host filters
+  already do.
+- **`src/components/TournamentTable.astro`** gained a `teams` prop (mirroring
+  the existing `hosts` prop: pass `[]` or omit to hide the filter) plus a new
+  `<select>` field, a `data-teams` attribute per row (pipe-joined, since team
+  names contain spaces and can't safely share a space-joined attribute the
+  way single-token values could), and full client-side wiring: the team
+  filter combines with winner/year/host exactly like the existing filters,
+  is restored from and written back to a `?team=` URL parameter (so a
+  filtered view stays shareable), and is included in the reset button and the
+  "Showing N of M" status text. `teamLabel`/`teamAllLabel`/`bitTeamPrefix`
+  props follow the same override pattern every other filter label already
+  uses, so localized pages can translate it.
+- **`src/lib/competition.ts`**: `CompetitionData` gained a `teams: string[]`
+  field (`distinctTeams(editions)`), threaded through automatically to every
+  page that uses `loadCompetition()` + `CompetitionView.astro` (World Cup,
+  EURO, Copa América, Nations League, Ballon d'Or). The English Golden Boot
+  page and all six Croatian competition pages compose their own layout by
+  hand (see earlier entries in this file for why), so each of those 8
+  `TournamentTable` call sites needed its own `teams={...}` prop added
+  directly - done for all of them in this pass, so the filter is live on
+  every competition/award page in both languages, not a partial rollout.
+  Croatian pages label it "Reprezentacija" / "Sve reprezentacije" (matching
+  the existing Ballon d'Or/Golden Boot Croatian header translation for
+  "National team"/"Team"), deliberately distinct from "Momčadi" (the
+  existing translation of the World Cup/EURO team-*count* column) to avoid
+  the two reading as the same concept.
+  Every page's meta `description` (English and Croatian) was also updated to
+  mention the team filter, matching what the page now actually offers.
+- **Tests**: 9 new Vitest cases in `tests/unit/editions.test.ts`
+  (`editionTeams`: every team-holding column, em-dash skipping, the shared
+  EURO "finalist" pattern, the National-team-vs-Winner-as-player distinction,
+  placeholder exclusion; `distinctTeams`: alphabetical dedup, a
+  semifinal-only team surfacing where `distinctWinners` would miss it, and
+  the empty-list case for a table with no team-holding column - 152 total,
+  up from 143) and 1 new Playwright case at 360px on the World Cup page (the
+  Portugal 1966/2006 scenario above, including the shareable `?team=` URL and
+  reset behavior), plus one new assertion added to the existing Croatian
+  World Cup "renders translated chrome, filters and column headers" case
+  that `label[for="world-cup-team"]` reads "Reprezentacija" (196 total, up
+  from 195). Verified with `pnpm lint` (0 errors/0 warnings, same
+  pre-existing `monthNames` hint as every prior run), the full Vitest suite,
+  and the full Playwright suite, all passing.
+
+**Left for a future pass:**
+- No known gaps in the team filter itself - it's live on all six
+  competition/award pages, both languages, and combines correctly with every
+  existing filter.
+- With the team filter shipped, every "Required capability" listed in
+  `docs/WEBSITE_REQUIREMENTS.md` is now implemented. The largest remaining
+  work is on the "Nice-to-have" list (installable PWA and "on this day" are
+  already done; a per-competition downloadable print sheet exists via the
+  PDF links) - a future pass could revisit content-accuracy/quality passes
+  instead, per this routine's fallback instruction.
+- The same handful of Ballon d'Or ceremony dates noted in an earlier slice
+  still rest on single-source research.
+
+### "Required pages" fix: `/awards/ballon-dor` and `/awards/golden-boot` redirects
+
+Added 2026-08-03 (intensive run). With the previous run's "by team" filter,
+every item in `docs/WEBSITE_REQUIREMENTS.md`'s "Required capabilities" list
+was implemented - but re-checking that same file's "Required pages" list
+turned up a gap none of the prior ~20 intensive runs had flagged: it
+specifies `/awards/ballon-dor` and `/awards/golden-boot`, while both pages
+were actually built at `/competitions/ballon-dor` and
+`/competitions/golden-boot` (grouped with the other four competition pages,
+matching the site nav, the Croatian translations, the generated PDFs, the
+sitemap, and every existing test - all of which already point at
+`/competitions/...`).
+
+Moving the canonical pages now would have meant touching every internal
+link, both languages' `TRANSLATED_PATHS`, `NAV_LINKS`, the sitemap's
+`CONTENT_ID_BY_PATH`, the generated PDF filenames, and every test that
+already asserts a `/competitions/...` URL - a wide, purely mechanical,
+higher-risk rename for zero reader-facing benefit. Instead, `astro.config.mjs`
+gained a `redirects` entry so the documented required path actually resolves:
+
+- `/awards/ballon-dor` -> `/competitions/ballon-dor`
+- `/awards/golden-boot` -> `/competitions/golden-boot`
+
+**Bug found and fixed in the same pass**: Astro's `redirects` config prepends
+the site's `base` path (`/football-reference`) to the *source* path
+automatically, but not to the *destination* - the first build produced a
+redirect page whose meta-refresh target and canonical link both pointed at
+`/competitions/ballon-dor` with no base prefix, which would 404 once deployed
+under the GitHub Pages base path. Fixed by prepending `base` to both
+destination strings by hand in the config (confirmed by inspecting the built
+`dist/awards/ballon-dor/index.html` before and after: the meta refresh now
+reads `content="0;url=/football-reference/competitions/ballon-dor"`). For a
+static build, Astro's `redirects` produces a small HTML page with
+`<meta http-equiv="refresh">`, `<meta name="robots" content="noindex">`, and a
+canonical link pointing at the destination - so the redirect page itself is
+excluded from the sitemap (which already only lists `NAV_LINKS`, unchanged)
+and never gets indexed as a duplicate of the real page.
+
+Covered by 3 new Playwright cases (`tests/e2e/mobile.spec.ts`, new
+"Required-page redirects" describe block): both redirects land on the real
+page's `<h1>`, and the raw response for `/awards/ballon-dor/` carries the
+base-path-prefixed meta refresh and the `noindex` tag. Verified with `pnpm
+lint` (0 errors/0 warnings, same pre-existing hint as every prior run), the
+full Vitest suite (152 cases, unchanged - no library code changed), and the
+full Playwright suite (199 cases, up from 196), all passing. No PDF
+regeneration needed - no Editions table changed.
+
+**Left for a future pass:** the Croatian competition pages
+(`/hr/competitions/ballon-dor`, `/hr/competitions/golden-boot`) have no
+`/hr/awards/...` equivalent - `docs/WEBSITE_REQUIREMENTS.md`'s "Required
+pages" list predates localization and only lists the English paths, so this
+wasn't treated as a gap; would be a one-line addition to the same
+`redirects` map if ever wanted.
+
+### Content-accuracy pass: UEFA Nations League full results audit - no discrepancies
+
+Added 2026-08-04 (intensive run). With the team filter and required-pages
+redirect both closed, and every "Required capability" in
+`docs/WEBSITE_REQUIREMENTS.md` now implemented, this run followed the
+previous two runs' own "Left for a future pass" notes toward a
+content-accuracy pass instead of new features - Nations League is next in
+this routine's stated competition-priority order (Copa América's own
+third/fourth/Format audits are already closed) and had never had a dedicated
+results audit of its own, only the narrower final-*date* audit from
+2026-08-03.
+
+- Verified every one of `content/uefa-nations-league.md`'s four completed
+  editions (2018-19 through 2024-25) - Winner, Runner-up, Third, Fourth, and
+  the Final score - via WebSearch, cross-checking UEFA.com's own match report
+  against ESPN's box score per edition, the same two-independent-sources
+  method the 2026-08-03 date audit used. The final-date audit already
+  implicitly covered each Final's winner/score (same match, same source
+  pair); this pass adds the third-place play-off specifically, which had
+  never been independently checked.
+- **No discrepancies found.** Every row matches exactly as authored: England
+  beat Switzerland on penalties for third in 2019 (0-0 after 120, 6-5 pens);
+  Italy beat Belgium 2-1 for third in 2021; Italy beat co-host Netherlands
+  3-2 for third in 2023; France beat host Germany 2-0 for third in 2025. The
+  "Key facts" bullets (Portugal's inaugural and first-repeat titles, Croatia's
+  first final) were re-checked against the same sources and are also
+  accurate.
+- `docs/SOURCES.md` gained a "Third-place match audit" citation entry (UEFA.com
+  + ESPN per edition, 8 links) alongside the existing final-dates entry.
+  `content/uefa-nations-league.md`'s `lastReviewed` moved to 2026-08-04;
+  `status` stays `review` (unchanged) - this pass used secondary sources
+  (UEFA.com, ESPN), not primary competition records, matching the same
+  reasoning every earlier secondary-sourced Copa América audit gave for not
+  marking a page `verified`.
+- No content, code, or test changes were needed since nothing was wrong - this
+  is a clean audit-closed entry, the same shape as the Copa América
+  "audit closed" passes. Verified with `pnpm lint` (0 errors/0 warnings, same
+  pre-existing hint as every prior run) and the full Vitest/Playwright suites
+  (152/199 cases, both unchanged from the prior run - no code or test changes
+  were needed), all still passing.
+
+**Left for a future pass:**
+- EURO and World Cup have no dedicated third/fourth-place results audit of
+  their own yet (only Copa América and now Nations League do) - EURO's and
+  World Cup's editions are older and more thoroughly cross-referenced across
+  independent secondary sources already, so this is lower priority than it
+  was for Copa América's harder-to-source pre-1975 era, but still open.
+- The same handful of Ballon d'Or ceremony dates noted in an earlier slice
+  still rest on single-source research.
+
+### Content-accuracy pass: UEFA EURO third-place play-off audit - no discrepancies
+
+Added 2026-08-04 (intensive run). Directly closes half of the previous run's
+own "Left for a future pass" note above - EURO's own third/fourth-place audit
+was still open (only Copa América and Nations League had one). EURO's data
+model differs from the other two: only six editions (1960-1980) played an
+actual third-place match, under the old 4-team "final four" format; from 1984
+onward UEFA does not rank the two defeated semifinalists, so there is nothing
+to audit for the other eleven editions - `content/uefa-euro.md`'s own
+"Historical format note" already documents this split, unchanged by this
+pass.
+
+- Verified all six 1960-1980 editions' third-place play-offs via WebSearch,
+  cross-checking UEFA.com's own match/history pages against a second
+  independent source (eu-football.info, 11v11, or a contemporaneous match
+  report) per edition, the same two-independent-sources method the Nations
+  League third-place audit used. The check specifically targets whether the
+  content table's "Other semifinalist" (3rd) / "Other semifinalist / fourth"
+  (4th) column *order* is correct for these rows, since neither column is
+  explicitly labeled "Third"/"Fourth" - the ranking is encoded purely by
+  which column a team appears in.
+- **No discrepancies found.** All six third-place results match exactly as
+  the column order already implies: Czechoslovakia beat France 2-0 (1960),
+  Hungary beat Denmark 3-1 after extra time (1964), England beat the Soviet
+  Union 2-0 (1968), Belgium beat Hungary 2-1 (1972), Netherlands beat
+  Yugoslavia 3-2 after extra time (1976), and Czechoslovakia beat host Italy
+  1-1 (a.e.t.), 9-8 on penalties (1980).
+- `docs/SOURCES.md` gained a "Third-place play-off audit" citation entry
+  under the UEFA EURO section (6 UEFA.com/eu-football.info links, one per
+  edition). `content/uefa-euro.md`'s `lastReviewed` moved to 2026-08-04;
+  `status` stays `review` (unchanged) - secondary sources, not a primary
+  UEFA competition record, matching the same reasoning every earlier
+  secondary-sourced audit in this file has given.
+- No content, code, or test changes were needed since nothing was wrong -
+  the table's existing data was already correct, so this is a clean
+  audit-closed entry, the same shape as the Nations League and Copa América
+  "audit closed" passes. Verified with `pnpm lint` (0 errors/0 warnings, same
+  pre-existing hint as every prior run) and the full Vitest/Playwright
+  suites (152/199 cases, both unchanged from the prior run - no code or test
+  changes were needed), all still passing.
+
+**Left for a future pass:**
+- World Cup remains the only competition without a dedicated third/fourth-
+  place results audit of its own (Copa América, Nations League, and now
+  EURO all have one) - its 22 editions and mixed formats (some early
+  editions had no third-place match at all) make it the largest remaining
+  audit in this series, next in line.
+- The same handful of Ballon d'Or ceremony dates noted in an earlier slice
+  still rest on single-source research.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

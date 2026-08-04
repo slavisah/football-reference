@@ -1,6 +1,7 @@
 ---
 import type { Edition, MarkdownTable } from '../lib/types';
 import { buildSortOptions, defaultSortValue } from '../lib/tableSort';
+import { editionTeams } from '../lib/editions';
 import type { Locale } from '../lib/i18n';
 
 interface Props {
@@ -12,6 +13,13 @@ interface Props {
   winners: string[];
   /** Distinct host values for the host filter; omit or pass [] to hide the filter. */
   hosts?: string[];
+  /**
+   * Distinct team values (drawn from winner/runner-up/third/fourth/national
+   * team/etc. columns, see src/lib/editions.ts's `distinctTeams`) for the
+   * team filter; omit or pass [] to hide it. Unlike the winner filter, this
+   * surfaces an edition where the team took part without winning it.
+   */
+  teams?: string[];
   /** Label for the winner filter/column, e.g. "Player" on a top-scorers table. */
   winnerLabel?: string;
   /**
@@ -31,6 +39,8 @@ interface Props {
   yearAllLabel?: string;
   hostLabel?: string;
   hostAllLabel?: string;
+  teamLabel?: string;
+  teamAllLabel?: string;
   winnerAllLabel?: string;
   sortByLabel?: string;
   resetLabel?: string;
@@ -42,6 +52,7 @@ interface Props {
   bitWinnerPrefix?: string;
   bitYearPrefix?: string;
   bitHostPrefix?: string;
+  bitTeamPrefix?: string;
   emptyText?: string;
   clearFiltersLabel?: string;
 }
@@ -53,6 +64,7 @@ const {
   editions,
   winners,
   hosts = [],
+  teams = [],
   winnerLabel = 'Winner',
   extraColumn,
   locale = 'en',
@@ -61,6 +73,8 @@ const {
   yearAllLabel = 'All years',
   hostLabel = 'Host',
   hostAllLabel = 'All hosts',
+  teamLabel = 'Team',
+  teamAllLabel = 'All teams',
   winnerAllLabel = `All ${winnerLabel.toLowerCase()}s`,
   sortByLabel = 'Sort by',
   resetLabel = 'Reset',
@@ -70,6 +84,7 @@ const {
   bitWinnerPrefix = 'winner',
   bitYearPrefix = 'year',
   bitHostPrefix = 'host',
+  bitTeamPrefix = 'team',
   emptyText = 'No editions match those filters.',
   clearFiltersLabel = 'Clear filters',
 } = Astro.props;
@@ -138,6 +153,18 @@ const defaultSort = defaultSortValue(sortOptions);
     }
 
     {
+      teams.length > 0 && (
+        <div class="filters__field">
+          <label for={`${id}-team`}>{teamLabel}</label>
+          <select id={`${id}-team`} name="team">
+            <option value="">{teamAllLabel}</option>
+            {teams.map((team) => <option value={team}>{team}</option>)}
+          </select>
+        </div>
+      )
+    }
+
+    {
       sortOptions.length > 0 && (
         <div class="filters__field">
           <label for={`${id}-sort`}>{sortByLabel}</label>
@@ -178,7 +205,12 @@ const defaultSort = defaultSortValue(sortOptions);
       <tbody>
         {
           displayEditions.map((edition) => (
-            <tr data-winner={edition.winner} data-year={edition.year} data-host={edition.host ?? ''}>
+            <tr
+              data-winner={edition.winner}
+              data-year={edition.year}
+              data-host={edition.host ?? ''}
+              data-teams={editionTeams(edition).join('|')}
+            >
               {edition.cells.map((cell, index) => (
                 <td
                   data-label={headerLabels[cell.label] ?? cell.label}
@@ -403,12 +435,14 @@ const defaultSort = defaultSortValue(sortOptions);
     bitWinnerPrefix,
     bitYearPrefix,
     bitHostPrefix,
+    bitTeamPrefix,
   }}
 >
   const form = document.getElementById(`${id}-filters`);
   const winnerSel = document.getElementById(`${id}-winner`);
   const yearSel = document.getElementById(`${id}-year`);
   const hostSel = document.getElementById(`${id}-host`);
+  const teamSel = document.getElementById(`${id}-team`);
   const sortSel = document.getElementById(`${id}-sort`);
   const reset = document.getElementById(`${id}-reset`);
   const status = document.getElementById(`${id}-status`);
@@ -442,15 +476,17 @@ const defaultSort = defaultSortValue(sortOptions);
       winner: p.get('winner') || '',
       year: p.get('year') || '',
       host: p.get('host') || '',
+      team: p.get('team') || '',
       sort: p.get('sort') || '',
     };
   }
 
-  function writeParams(winner, year, host, sort) {
+  function writeParams(winner, year, host, team, sort) {
     const p = new URLSearchParams(window.location.search);
     winner ? p.set('winner', winner) : p.delete('winner');
     year ? p.set('year', year) : p.delete('year');
     host ? p.set('host', host) : p.delete('host');
+    team ? p.set('team', team) : p.delete('team');
     sort && sort !== defaultSort ? p.set('sort', sort) : p.delete('sort');
     const qs = p.toString();
     const url = window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash;
@@ -461,32 +497,35 @@ const defaultSort = defaultSortValue(sortOptions);
     const winner = winnerSel.value;
     const year = yearSel.value;
     const host = hostSel ? hostSel.value : '';
+    const team = teamSel ? teamSel.value : '';
     const sort = sortSel ? sortSel.value : '';
     let shown = 0;
     for (const row of rows) {
       const matchWinner = !winner || row.dataset.winner === winner;
       const matchYear = !year || row.dataset.year === year;
       const matchHost = !host || row.dataset.host === host;
-      const visible = matchWinner && matchYear && matchHost;
+      const matchTeam = !team || (row.dataset.teams || '').split('|').includes(team);
+      const visible = matchWinner && matchYear && matchHost && matchTeam;
       row.hidden = !visible;
       if (visible) shown += 1;
     }
     empty.hidden = shown !== 0;
     if (status) {
-      if (!winner && !year && !host) {
+      if (!winner && !year && !host && !team) {
         status.textContent = showingAllTemplate.replace('{n}', String(total));
       } else {
         const bits = [];
         if (winner) bits.push(`${bitWinnerPrefix} ${winner}`);
         if (year) bits.push(`${bitYearPrefix} ${year}`);
         if (host) bits.push(`${bitHostPrefix} ${host}`);
+        if (team) bits.push(`${bitTeamPrefix} ${team}`);
         status.textContent = showingFilteredTemplate
           .replace('{shown}', String(shown))
           .replace('{total}', String(total))
           .replace('{bits}', bits.join(', '));
       }
     }
-    writeParams(winner, year, host, sort);
+    writeParams(winner, year, host, team, sort);
   }
 
   // Reorders the actual <tr> elements in the DOM; never touches a cell's
@@ -510,6 +549,7 @@ const defaultSort = defaultSortValue(sortOptions);
     winnerSel.value = '';
     yearSel.value = '';
     if (hostSel) hostSel.value = '';
+    if (teamSel) teamSel.value = '';
     if (sortSel) {
       sortSel.value = defaultSort;
       applySort();
@@ -528,6 +568,9 @@ const defaultSort = defaultSortValue(sortOptions);
   if (hostSel && [...hostSel.options].some((o) => o.value === initial.host)) {
     hostSel.value = initial.host;
   }
+  if (teamSel && [...teamSel.options].some((o) => o.value === initial.team)) {
+    teamSel.value = initial.team;
+  }
   if (sortSel && initial.sort && [...sortSel.options].some((o) => o.value === initial.sort)) {
     sortSel.value = initial.sort;
     applySort();
@@ -536,6 +579,7 @@ const defaultSort = defaultSortValue(sortOptions);
   winnerSel.addEventListener('change', apply);
   yearSel.addEventListener('change', apply);
   hostSel?.addEventListener('change', apply);
+  teamSel?.addEventListener('change', apply);
   sortSel?.addEventListener('change', () => {
     applySort();
     apply();

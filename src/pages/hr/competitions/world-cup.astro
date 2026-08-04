@@ -106,7 +106,7 @@ const headerLabels: Record<string, string> = {
 
 <BaseLayout
   title={title}
-  description="Svako izdanje FIFA Svjetskog prvenstva od 1930., domaćini, finalisti i prvaci, uz generirani broj naslova. Filtriraj po prvaku, godini i domaćinu."
+  description="Svako izdanje FIFA Svjetskog prvenstva od 1930., domaćini, finalisti i prvaci, uz generirani broj naslova. Filtriraj po prvaku, godini, domaćinu i reprezentaciji."
   locale="hr"
   alternateHref={withBase('/competitions/world-cup')}
   jsonLd={jsonLd}
@@ -135,6 +135,7 @@ const headerLabels: Record<string, string> = {
       editions={data.editions}
       winners={data.winners}
       hosts={data.hosts}
+      teams={data.teams}
       extraColumn={{ label: 'Najbolji strijelac', values: topScorers }}
       locale="hr"
       headerLabels={headerLabels}
@@ -144,6 +145,8 @@ const headerLabels: Record<string, string> = {
       yearAllLabel="Sve godine"
       hostLabel="Domaćin"
       hostAllLabel="Svi domaćini"
+      teamLabel="Reprezentacija"
+      teamAllLabel="Sve reprezentacije"
       sortByLabel="Sortiraj po"
       resetLabel="Poništi"
       filterAriaLabel="Filtriraj prvake FIFA Svjetskog prvenstva"
@@ -152,6 +155,7 @@ const headerLabels: Record<string, string> = {
       bitWinnerPrefix="prvak"
       bitYearPrefix="godina"
       bitHostPrefix="domaćin"
+      bitTeamPrefix="reprezentacija"
       emptyText="Nijedno izdanje ne odgovara odabranim filterima."
       clearFiltersLabel="Očisti filtere"
     />
