@@ -57,6 +57,21 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/UEFA_Euro_2016_final
   - https://en.wikipedia.org/wiki/UEFA_Euro_2020_final
   - https://en.wikipedia.org/wiki/UEFA_Euro_2024_final
+- Third-place play-off audit (2026-08-04): the winner, score, and date of the
+  third-place match for each of the six editions (1960-1980) that played one
+  under the old 4-team "final four" format, i.e. whether the content table's
+  "Other semifinalist" (3rd) / "Other semifinalist / fourth" (4th) column
+  order is correct. Verified via WebSearch, cross-checking UEFA.com's own
+  match/history pages against a second source (eu-football.info, 11v11, or a
+  contemporaneous match report) per edition; no discrepancies found across
+  all six editions. 1980's play-off (Czechoslovakia beat host Italy) was
+  drawn 1-1 after extra time and decided on penalties, 9-8:
+  - https://www.uefa.com/uefaeuro/history/news/0253-0d7b30be097b-418a5f1636df-1000--third-place-consolation-for-czechoslovakia/
+  - https://www.uefa.com/uefaeuro/match/3995--hungary-vs-denmark/
+  - https://www.uefa.com/uefaeuro/history/news/0254-0d7b2e1adede-c896e22df928-1000--england-beat-soviet-union-to-win-euro-1968-third-place-pla/
+  - https://www.uefa.com/uefaeuro/match/3837--hungary-vs-belgium/
+  - https://www.uefa.com/uefaeuro/match/3692--netherlands-vs-yugoslavia/
+  - https://www.uefa.com/uefaeuro/match/3584--czechoslovakia-vs-italy/
 
 ## UEFA Nations League
 
