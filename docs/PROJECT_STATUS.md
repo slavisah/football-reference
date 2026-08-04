@@ -1887,6 +1887,56 @@ pages" list predates localization and only lists the English paths, so this
 wasn't treated as a gap; would be a one-line addition to the same
 `redirects` map if ever wanted.
 
+### Content-accuracy pass: UEFA Nations League full results audit - no discrepancies
+
+Added 2026-08-04 (intensive run). With the team filter and required-pages
+redirect both closed, and every "Required capability" in
+`docs/WEBSITE_REQUIREMENTS.md` now implemented, this run followed the
+previous two runs' own "Left for a future pass" notes toward a
+content-accuracy pass instead of new features - Nations League is next in
+this routine's stated competition-priority order (Copa América's own
+third/fourth/Format audits are already closed) and had never had a dedicated
+results audit of its own, only the narrower final-*date* audit from
+2026-08-03.
+
+- Verified every one of `content/uefa-nations-league.md`'s four completed
+  editions (2018-19 through 2024-25) - Winner, Runner-up, Third, Fourth, and
+  the Final score - via WebSearch, cross-checking UEFA.com's own match report
+  against ESPN's box score per edition, the same two-independent-sources
+  method the 2026-08-03 date audit used. The final-date audit already
+  implicitly covered each Final's winner/score (same match, same source
+  pair); this pass adds the third-place play-off specifically, which had
+  never been independently checked.
+- **No discrepancies found.** Every row matches exactly as authored: England
+  beat Switzerland on penalties for third in 2019 (0-0 after 120, 6-5 pens);
+  Italy beat Belgium 2-1 for third in 2021; Italy beat co-host Netherlands
+  3-2 for third in 2023; France beat host Germany 2-0 for third in 2025. The
+  "Key facts" bullets (Portugal's inaugural and first-repeat titles, Croatia's
+  first final) were re-checked against the same sources and are also
+  accurate.
+- `docs/SOURCES.md` gained a "Third-place match audit" citation entry (UEFA.com
+  + ESPN per edition, 8 links) alongside the existing final-dates entry.
+  `content/uefa-nations-league.md`'s `lastReviewed` moved to 2026-08-04;
+  `status` stays `review` (unchanged) - this pass used secondary sources
+  (UEFA.com, ESPN), not primary competition records, matching the same
+  reasoning every earlier secondary-sourced Copa América audit gave for not
+  marking a page `verified`.
+- No content, code, or test changes were needed since nothing was wrong - this
+  is a clean audit-closed entry, the same shape as the Copa América
+  "audit closed" passes. Verified with `pnpm lint` (0 errors/0 warnings, same
+  pre-existing hint as every prior run) and the full Vitest/Playwright suites
+  (152/199 cases, both unchanged from the prior run - no code or test changes
+  were needed), all still passing.
+
+**Left for a future pass:**
+- EURO and World Cup have no dedicated third/fourth-place results audit of
+  their own yet (only Copa América and now Nations League do) - EURO's and
+  World Cup's editions are older and more thoroughly cross-referenced across
+  independent secondary sources already, so this is lower priority than it
+  was for Copa América's harder-to-source pre-1975 era, but still open.
+- The same handful of Ballon d'Or ceremony dates noted in an earlier slice
+  still rest on single-source research.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
