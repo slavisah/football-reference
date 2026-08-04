@@ -54,6 +54,28 @@ Primary sources should be preferred.
     via beIN Sports and Liquisearch summaries (no separate match played)
   - 1950: final round-robin group table (Uruguay 5pts, Brazil 4pts, Sweden
     2pts, Spain 1pt), corroborated via two independent table summaries
+- Golden Boot (top-scorer) audit (2026-08-04, intensive run): the "FIFA
+  World Cup top scorers" table in `content/golden-boot.md` - player name(s),
+  team, and goal count for all 23 editions (1930-2026) - verified via three
+  parallel WebSearch passes (1930-1966, 1970-2002, 2006-2026), each edition
+  cross-checked against multiple independent outlets (ESPN, BBC, Sky Sports,
+  Goal.com, FIFA.com, CBS Sports, Sports Illustrated). The 1962 six-way tie
+  had every individual name and diacritic checked for completeness - all
+  confirmed accurate. The 2026 row (Kylian Mbappé, France, 10 goals) got
+  extra scrutiny as the newest, highest-risk entry on the page - confirmed
+  by FIFA.com's own official award-winners page for the 2026 tournament
+  (linked above) plus six further independent outlets, so it is not stale
+  or fabricated data; Mbappé became the first player to win the World Cup
+  Golden Boot twice (also 2022). **One discrepancy found and fixed:** the
+  1950 row credited Ademir (Brazil) with 8 goals; the consensus figure
+  across independent sources (Wikipedia, Goal.com, Sports Illustrated,
+  OneFootball, worldcupranking.com) is **9 goals** - corrected in
+  `content/golden-boot.md`. A minority of secondary listicles still show 7
+  or 8, likely because Ademir's tally, like Oldřich Nejedlý's 1934 total and
+  Leônidas's 1938 total (both already correct on this page per the same
+  research), has been subject to historical recount/correction; 9 is the
+  figure consistently used by modern independent sources. No other
+  discrepancies found across the table's 23 rows.
 
 ## UEFA EURO
 
@@ -101,6 +123,20 @@ Primary sources should be preferred.
   - https://www.uefa.com/uefaeuro/match/3837--hungary-vs-belgium/
   - https://www.uefa.com/uefaeuro/match/3692--netherlands-vs-yugoslavia/
   - https://www.uefa.com/uefaeuro/match/3584--czechoslovakia-vs-italy/
+- Golden Boot (top-scorer) audit (2026-08-04, intensive run): the "UEFA EURO
+  top scorers" table in `content/golden-boot.md` - player name(s), team, and
+  goal count for all 16 editions (1960-2024) - verified via two parallel
+  WebSearch passes (1960-1992, 1996-2024), each edition cross-checked
+  against multiple independent outlets (UEFA.com, ESPN, BBC, Sky Sports,
+  Goal.com, Transfermarkt). Every multi-way tie (1960's five-way tie, 1964's
+  three-way tie, 1992's four-way tie, 2012's and 2024's six-way ties) had
+  every individual name and diacritic checked for completeness and correct
+  spelling - all confirmed accurate. **No discrepancies found** across the
+  table's 16 rows. 2012's row is shown as a six-way tie at 3 goals each
+  rather than crediting Fernando Torres alone, even though sources note he
+  won UEFA's own tie-breaker (fewest minutes, plus an assist) - this matches
+  the page's own stated methodology of showing joint leading scorers as
+  tied with no single official winner, not a discrepancy in the data.
 
 ## UEFA Nations League
 
