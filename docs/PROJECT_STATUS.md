@@ -2048,6 +2048,75 @@ sources at least once.
   runner-up-equivalent data, or a full source-link liveness check across
   `docs/SOURCES.md`) rather than assuming there's nothing left to verify.
 
+### Content-accuracy pass: Men's Ballon d'Or winners audit - no discrepancies
+
+Added 2026-08-04 (intensive run). Follows directly from the previous run's own
+"Left for a future pass" suggestion: with every team competition's third/
+fourth-place data now audited, this run turns to the individual-award tables -
+the Ballon d'Or "Winner"/"National team" columns themselves had never been
+independently audited (only the separate Ceremony date column got a dedicated
+pass on 2026-08-03). This is the routine's next-highest-priority competition
+per its stated order (Copa América and Nations League are both fully audited;
+Ballon d'Or comes before Golden Boot).
+
+- Verified all 69 awarded editions (1956-2025, excluding the cancelled 2020
+  award) in `content/ballon-dor.md` via four parallel WebSearch research
+  agents split by era (1956-1973, 1974-1991, 1992-2009, 2010-2025 - the same
+  era split the ceremony-dates audit used), each cross-checking every
+  winner's name and national team against multiple independent sources
+  (ESPN, Sky Sports, BBC, Goal.com, UEFA.com, France Football retrospectives,
+  Wikipedia search snippets - WebSearch only, since direct WebFetch to
+  Wikipedia/RSSSF-type hosts remains blocked by this environment's network
+  policy, the same constraint every prior secondary-sourced audit in this
+  file has documented).
+- Specifically targeted the two nationality-naturalization cases in the
+  1956-1973 era most likely to hide a subtle error - a player's country of
+  birth silently swapped in for the country they actually represented:
+  **1960 Luis Suárez** (Spanish-born, correctly attributed to Spain) and
+  **1961 Omar Sívori** (Argentine-born, naturalized Italian and playing for
+  the Italy national team by 1961, correctly attributed to Italy rather than
+  Argentina). Both confirmed correct as already authored.
+- Also re-confirmed **2020**'s "Not awarded"/"—" row is the genuine historical
+  fact (France Football cancelled the award due to COVID-19 disrupting the
+  football calendar, not a data-entry gap), and spot-checked the "Multiple
+  winners through 2025" summary table's two largest totals (Messi 8,
+  Cristiano Ronaldo 5) against the same sources.
+- **No discrepancies found in any of the 69 rows or either summary total.**
+  Every winner name (including diacritics: Alfredo Di Stéfano, Flórián
+  Albert, Eusébio, Pavel Nedvěd, Kaká) and every national-team attribution
+  matches independent sources exactly.
+- `docs/SOURCES.md` gained a "Winners and national-team audit" entry under
+  Ballon d'Or documenting the method and the two nationality edge cases.
+  `content/ballon-dor.md`'s `lastReviewed` moved to 2026-08-04; `status`
+  stays `review` (unchanged) - secondary sources, not a primary France
+  Football archive, matching the same reasoning every earlier
+  secondary-sourced audit in this file has given.
+- No content, code, or test changes were needed since nothing was wrong -
+  this is a clean audit-closed entry, the same shape as the Copa América,
+  Nations League, EURO, and World Cup "audit closed" passes. Verified with
+  `pnpm lint` (0 errors/0 warnings, same pre-existing hint as every prior
+  run) and the full Vitest/Playwright suites (152/199 cases, both unchanged
+  from the prior run - no code or test changes were needed), all still
+  passing.
+
+This closes the first individual-award content-accuracy audit - every team
+competition's third/fourth-place data and now the Ballon d'Or's winner/team
+data have each had at least one independent cross-check against outside
+sources.
+
+**Left for a future pass:**
+- **Golden Boot** (`content/golden-boot.md`) is the one remaining
+  competition/award table with no dedicated content-accuracy audit of its
+  own - its 39 rows (23 World Cup + 16 EURO top-scorer editions, several with
+  multi-way ties) have never been independently cross-checked, and it also
+  has the oldest `lastReviewed` date on the site (2026-07-23). Natural next
+  step per this routine's priority order.
+- The same handful of Ballon d'Or ceremony dates noted in an earlier slice
+  still rest on single-source research (unchanged - this pass audited
+  winner/team data, not ceremony dates).
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  unstarted, per the previous run's note.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
