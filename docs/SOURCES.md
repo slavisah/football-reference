@@ -90,6 +90,40 @@ Primary sources should be preferred.
   in-progress-looking edition is unplayed just because an earlier pass
   labeled it that way - check the actual current date against the edition's
   known calendar before excluding it from an audit's scope.
+- Champion/Runner-up/Final-score audit (2026-08-05, intensive run): the core
+  **Winner**, **Runner-up**, and **Final** (score line) columns for all 21
+  completed editions (1930-2022; 2026 was already independently audited
+  above) - the last of the site's four team competitions to get this
+  specific column-pair check (Copa América, Nations League, and EURO were
+  each already closed). Verified via three parallel WebSearch passes split
+  by era (1930-1962, 1966-1994, 1998-2022), the same era-split approach the
+  third/fourth-place audit used, each edition cross-checked against at least
+  two independent sources (FIFA.com, ESPN's match archive, Wikipedia's
+  dedicated final articles, BBC, CNN, CBS News, Britannica, and other
+  outlets surfaced by search). **No discrepancies found in any of the 21
+  editions.** Every extra-time and penalty-shootout final was specifically
+  re-confirmed rather than assumed: 1934, 1966, 1978 (a.e.t., no penalties);
+  1994, 2006, 2022 (penalty shoot-outs); 2010, 2014 (a.e.t., golden-goal-era
+  and 2010/2014 sudden-death rules no longer applied). 1950's unusual format
+  (no single knockout final - the title was decided by the final
+  round-robin group's last match, Uruguay 2-1 Brazil) was reconfirmed as
+  correctly represented, matching the existing "Editorial notes" text. One
+  apparent conflict surfaced mid-audit - a single ESPN search-snippet title
+  suggesting the 1938 final was "2-1" - was resolved against five other
+  independent sources (Wikipedia, CBC Sports, eu-football.info, athlet.org,
+  worldcuppro) that unanimously confirmed the authored 4-2 scoreline, so it
+  was treated as a snippet/caching artifact, not a genuine discrepancy.
+  - https://www.fifa.com/en/tournaments/mens/worldcup/articles/world-cup-champions-1930-1978-uruguay-italy-germany-brazil-england-argentina
+  - https://www.fifa.com/en/tournaments/mens/worldcup/articles/world-cup-champions-1982-2026-italy-argentina-germany-brazil-france-spain
+  - https://www.espn.com/soccer/ (match archive/reports, all 21 editions)
+  - https://en.wikipedia.org/wiki/1934_FIFA_World_Cup_final (and the
+    equivalent dedicated Wikipedia final article per edition, 1930-2022)
+  - https://www.bbc.com/sport/football (1978, 1982, 1986)
+  - https://www.cnn.com/sport/football (2010, 2014)
+
+  This closes the Champion/Runner-up/Final-score audit series across all
+  four team competitions (Copa América, Nations League, EURO, World Cup) -
+  every one now has at least one independent cross-check on record.
 - Golden Boot (top-scorer) audit (2026-08-04, intensive run): the "FIFA
   World Cup top scorers" table in `content/golden-boot.md` - player name(s),
   team, and goal count for all 23 editions (1930-2026) - verified via three
