@@ -25,6 +25,8 @@ const correctOrderText = question.items
   data-correct-ranks={question.correctRanks.join(',')}
   data-i18n-order-correct={t(locale, 'quizOrderCorrect')}
   data-i18n-order-incorrect={t(locale, 'quizOrderIncorrect')}
+  data-i18n-result-correct={t(locale, 'quizOrderResultCorrectLabel')}
+  data-i18n-result-incorrect={t(locale, 'quizOrderResultIncorrectLabel')}
 >
   <p class="quiz-card__category badge">{question.category}</p>
 
@@ -47,6 +49,7 @@ const correctOrderText = question.items
                 <option value={rankOption + 1}>{rankOption + 1}</option>
               ))}
             </select>
+            <span class="quiz-card__result-badge"></span>
           </li>
         ))
       }
@@ -95,7 +98,7 @@ const correctOrderText = question.items
   .quiz-order__item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    flex-wrap: wrap;
     gap: 0.75rem;
     padding: 0.55rem 0.75rem;
     border: 1px solid var(--border);
@@ -124,8 +127,26 @@ const correctOrderText = question.items
   }
 
   .quiz-order__item.is-incorrect {
-    border-color: #c0392b;
-    background: color-mix(in srgb, #c0392b 16%, transparent);
+    border-color: var(--danger);
+    background: color-mix(in srgb, var(--danger) 16%, transparent);
+  }
+
+  /* Real DOM text (populated by QuizScript.astro), not color alone (WCAG
+     1.4.1) - see the matching comment in QuizCard.astro. Unlike the
+     multiple-choice cards, these items previously had no text equivalent at
+     all, only a border/background color change. */
+  .quiz-order__item .quiz-card__result-badge {
+    margin-left: 0.5rem;
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+
+  .quiz-order__item.is-correct .quiz-card__result-badge {
+    color: var(--accent);
+  }
+
+  .quiz-order__item.is-incorrect .quiz-card__result-badge {
+    color: var(--danger);
   }
 
   .quiz-card__controls {

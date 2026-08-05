@@ -47,6 +47,10 @@ const UI_STRINGS = {
   quizCorrect: { en: 'Correct!', hr: 'Točno!' },
   quizIncorrectPrefix: { en: 'Not quite - the answer is "', hr: 'Netočno - odgovor je "' },
   quizIncorrectSuffix: { en: '".', hr: '".' },
+  quizAnswerCorrectLabel: { en: '✓ correct', hr: '✓ točno' },
+  quizAnswerIncorrectLabel: { en: '✗ your answer', hr: '✗ tvoj odgovor' },
+  quizOrderResultCorrectLabel: { en: '✓ correct spot', hr: '✓ točno mjesto' },
+  quizOrderResultIncorrectLabel: { en: '✗ wrong spot', hr: '✗ krivo mjesto' },
   quizOrderHeading: { en: 'Champion order challenge', hr: 'Izazov: poredaj prvake' },
   quizOrderIntro: {
     en: 'Rank each champion below from earliest to latest, then press "Check order".',

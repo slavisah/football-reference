@@ -2522,6 +2522,84 @@ wrong.
   stacked under the site header) has not been done and would need a reason
   to suspect one exists before spending time on it.
 
+### Accessibility: quiz answer-state color contrast, use-of-color, and a hidden localization gap
+
+Added 2026-08-05 (intensive run). The previous entry's new
+`tests/e2e/accessibility-quiz-states.spec.ts` sweep already ran axe against
+the quiz's answered state and passed 8/8 - but a manual WCAG contrast
+calculation on the "wrong answer" styling (`is-incorrect`, hardcoded
+`#c0392b`) found two real failures axe's automated color-contrast rule never
+flagged: axe's rule operates on real DOM text nodes and this indicator's
+"✓ correct" / "✗ your answer" wording lived entirely in CSS `::after`
+generated content, which axe-core (like most screen readers) does not
+reliably read - so the check never ran against it at all, on any page state,
+in either commit. Confirmed by hand: `#c0392b` as text against its own
+16%-mixed background tint measures ~4.27:1 in light mode (just under the
+4.5:1 AA minimum for normal-weight text) and ~2.65:1 in dark mode (a major
+failure, not a marginal one - the mixed-in dark background pulls luminance
+down further than the light theme's white-based one does).
+
+**Fixed in three parts, all in `QuizCard.astro`, `QuizOrderCard.astro`,
+`QuizScript.astro`, `src/lib/i18n.ts`, and `global.css`:**
+
+1. **Real DOM text instead of CSS-generated content.** Both
+   `is-correct`/`is-incorrect` indicators now render as an actual
+   `<span class="quiz-card__result-badge">`, populated by
+   `QuizScript.astro` when a question is checked (and cleared on restart) -
+   not just for contrast-checkability, but because generated content isn't
+   part of the accessible name/description of an element in every
+   AT/browser combination, so relying on it to convey "correct"/"incorrect"
+   was itself a fragile pattern independent of the color issue.
+2. **A theme-tuned `--danger` token.** `global.css` gained `--danger:
+   #b3261e` (light) / `#ff7b72` (dark) alongside the existing `--accent`
+   pair, replacing every hardcoded `#c0392b`. Both new values were chosen by
+   computing the same "danger color as text over its own 16%-mixed
+   background" contrast the bug used and confirming ≥4.5:1 in both themes
+   (light ≈5.0:1, dark ≈4.95:1) - documented inline in `global.css` so a
+   future edit doesn't casually swap in a prettier-looking red that fails
+   again.
+3. **Use-of-color fix on the order-challenge cards (WCAG 1.4.1), found
+   along the way.** `QuizOrderCard.astro`'s `is-correct`/`is-incorrect`
+   items had no text equivalent at all before this run - only a
+   border/background color change - unlike the multiple-choice cards, which
+   at least had (contrast-failing) `::after` text. They now get the same
+   real-DOM result badge as the choice cards.
+4. **Incidental localization fix.** The multiple-choice `::after` text was
+   hardcoded English ("✓ correct" / "✗ your answer") in component-scoped
+   CSS, so it rendered in English even on `/hr/quiz` despite every other
+   piece of quiz chrome being translated. Moving to real DOM text populated
+   from new `quizAnswerCorrectLabel` / `quizAnswerIncorrectLabel` /
+   `quizOrderResultCorrectLabel` / `quizOrderResultIncorrectLabel` keys in
+   `src/lib/i18n.ts` (English and Croatian) fixed this as a side effect of
+   the accessibility fix, not a separate change.
+
+No new test file was needed - `accessibility-quiz-states.spec.ts`'s existing
+8 tests already assert an `is-correct` and an `is-incorrect` element are
+visible in the answered state and run the full axe sweep (which includes
+`color-contrast`) against it; they now exercise real text nodes instead of
+generated content, so this is the first time that assertion has actually
+been meaningful. Verified with `pnpm lint` (0 errors/0 warnings, same
+pre-existing hint), the full Vitest suite (152/152, unchanged), and the
+full Playwright suite (207/207, unchanged pass count - this was a fix to
+what the suite was checking, not new coverage).
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in earlier slices
+  still rest on single-source research.
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  infeasible in this environment (WebFetch 403s on every host tried), per
+  prior runs' notes.
+- A second independent cross-check of the Champion/Runner-up/Final-score
+  tables (closed on their first pass for all four team competitions) remains
+  open as a "belt and suspenders" idea.
+- This run's discovery process (hand-computing contrast for a color axe
+  couldn't check) suggests it may be worth a future pass specifically
+  auditing the site for other meaningful `::before`/`::after` generated
+  content that neither axe nor a screen reader would reliably surface - a
+  quick grep of `content:` declarations across `src/**/*.astro` found only
+  this one non-decorative case, but that grep was not exhaustive of every
+  component's scoped `<style>` block.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
