@@ -5,7 +5,7 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-08-03
+lastReviewed: 2026-08-05
 status: review
 ---
 
@@ -103,6 +103,8 @@ Two "—" cells remain, and both are the historical fact rather than a research 
 - **1975, 1979, and 1983** (Home-and-away format) had no standings table or third-place fixture of any kind - only a two-legged final between two teams - so there is nothing to read a placing from.
 
 This closes the third/fourth audit opened by the earlier Format-audit pass; no further pre-1975 research is outstanding for this table.
+
+The **Champion** and **Runner-up** columns - audited 2026-08-05 (intensive run) against RSSSF, each edition's dedicated Wikipedia article, and (for the modern knockout-final era) CONMEBOL's own recap articles (see `docs/SOURCES.md`) - were cross-checked for all 49 editions, 1916 through 2024. No discrepancies were found: every champion and runner-up in the table above already matched at least two independent sources, including every level-on-points tie resolved by a playoff decider (1919, 1922, 1937, 1949, 1953) and every penalty-shootout final (1995, 2015, 2016).
 
 The **Final date** column (added 2026-08-03, intensive run) records the calendar date of each edition's single decisive match, for the "On this day in football history" widget on the home page - the same widget already covers the FIFA World Cup and UEFA EURO. It is filled in only for the 19 editions with one clearly identifiable decisive match: the five **Final playoff** deciders (1919, 1922, 1937, 1949, 1953), the 13 **Knockout final** editions (1987, and 1993 onward except 2016), and the 2016 centenary final. The remaining editions keep "—": the **League table** era had no single title match (the champion was whoever led the final standings after the last round of group games, sometimes played across several cities on the same date), and the three **Home-and-away** finals (1975, 1979, 1983) were decided over two legs on two different dates, so neither has one date to record without an arbitrary choice. See `docs/SOURCES.md` for the per-edition citations.
 

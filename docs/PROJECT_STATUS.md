@@ -2117,6 +2117,236 @@ sources.
 - A full source-link liveness check across `docs/SOURCES.md` remains
   unstarted, per the previous run's note.
 
+### Content-accuracy pass: Golden Boot top-scorer audit - one discrepancy found and fixed
+
+Added 2026-08-04 (intensive run). Follows directly from the previous run's own
+"Left for a future pass" note: Golden Boot was the one remaining competition/
+award table on the site with no dedicated content-accuracy audit, and had the
+oldest `lastReviewed` date (2026-07-23). This is the routine's
+next-highest-priority item per its stated order (Copa América, Nations
+League, and Ballon d'Or are all fully audited; Golden Boot is last).
+
+- Verified all 39 rows of `content/golden-boot.md`'s two tables - the FIFA
+  World Cup top scorers (23 editions, 1930-2026) and UEFA EURO top scorers
+  (16 editions, 1960-2024) - via five parallel WebSearch research passes
+  split by era/competition (World Cup 1930-1966, 1970-2002, 2006-2026; EURO
+  1960-1992, 1996-2024), each row cross-checked against multiple independent
+  sources (ESPN, BBC, Sky Sports, Goal.com, FIFA.com, UEFA.com, CBS Sports,
+  Sports Illustrated, Transfermarkt, Wikipedia search snippets - WebSearch
+  only, since direct WebFetch to Wikipedia/RSSSF-type hosts remains blocked
+  by this environment's network policy, the same constraint every prior
+  secondary-sourced audit in this file has documented).
+- Every multi-way tie got special attention for completeness (no missing or
+  extra names) and diacritic accuracy: the 1962 World Cup's six-way tie; the
+  1960 (five-way), 1964 (three-way), and 1992 (four-way) EURO ties; and the
+  2012 and 2024 EURO six-way ties. All confirmed correct as authored.
+- The 2026 World Cup row (Kylian Mbappé, France, 10 goals) got deliberate
+  extra scrutiny as the newest, highest-risk entry on the page - the 2026
+  tournament's scheduled final (19 July) predates this run's date, so a real
+  result should be independently verifiable rather than assumed from
+  training data. Confirmed by FIFA.com's own official award-winners page for
+  the 2026 tournament plus six further independent outlets (ESPN, Sky
+  Sports, NBC Sports, Fox Sports, Yahoo Sports, Real Madrid's own site);
+  Mbappé became the first player to win the World Cup Golden Boot twice
+  (also 2022), and his 10 goals ties Gerd Müller's 1970 tally as the highest
+  single-tournament total since then.
+- **One discrepancy found and fixed:** the 1950 row credited Ademir (Brazil)
+  with 8 goals; the consensus figure across independent sources (Wikipedia,
+  Goal.com, Sports Illustrated, OneFootball, worldcupranking.com) is **9
+  goals**. Corrected in `content/golden-boot.md`. This is the same shape as
+  two other pre-1940s totals already on this page that historical sources
+  have revised over time (Oldřich Nejedlý's 1934 total, corrected from 4 to
+  5; Leônidas's 1938 total, corrected from 8 to 7) - both already correct as
+  authored, confirmed by this same research pass.
+- No other discrepancies found across either table's 39 rows.
+- `docs/SOURCES.md` gained a "Golden Boot (top-scorer) audit" entry under
+  both the FIFA World Cup and UEFA EURO headings (not a new "Golden Boot"
+  heading - the Golden Boot page's own References section reads from those
+  two existing headings via `sourcesHeading: 'FIFA World Cup' | 'UEFA EURO'`
+  in `golden-boot.astro`, and `/about/sources` explicitly documents that
+  Golden Boot has no source section of its own; a standalone heading would
+  have silently orphaned the new links from the page that actually cites
+  them, and contradicted that page's own explanatory text).
+  `content/golden-boot.md`'s `lastReviewed` moved to 2026-08-04; `status`
+  stays `review` (unchanged) - secondary sources, not a primary
+  FIFA/UEFA statistics archive, matching the same reasoning every earlier
+  secondary-sourced audit in this file has given.
+- Verified with `pnpm lint` (0 errors/0 warnings, same pre-existing hint as
+  every prior run) and the full Vitest/Playwright suites, both unchanged
+  from the prior run (a one-number content fix needed no code or test
+  changes), all still passing.
+
+This closes the individual-award content-accuracy audit series - every
+competition/award table on the site (World Cup, EURO, Copa América, Nations
+League third/fourth-place data; Ballon d'Or and now Golden Boot winner/
+scorer data) has now had at least one independent cross-check against
+outside sources, and the one real error found in the whole series (1950
+Ademir's goal count) is fixed.
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in an earlier slice
+  still rest on single-source research.
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  unstarted, per two previous runs' notes now.
+- With every competition/award table's core data now independently audited
+  at least once, a future pass should look for a different quality angle
+  entirely - e.g. accessibility/performance sweeps, the source-link
+  liveness check above, or a second independent cross-check of the tables
+  that have only had one audit pass so far - rather than assuming there is
+  nothing left to verify.
+
+### Content-accuracy pass: 2026 FIFA World Cup final result, plus five Ballon d'Or ceremony-date second sources
+
+Added 2026-08-04 (intensive run). Before starting a new quality angle, this
+run checked whether `docs/SOURCES.md`'s stated liveness-check idea was
+actually executable in this environment: WebFetch returned HTTP 403 for
+every host tried (fifa.com, espn.com, en.wikipedia.org, rsssf.org - not just
+Wikipedia/RSSSF, which earlier audits already knew were blocked). A source
+"liveness check" built on WebFetch would therefore mark every single link
+"dead" regardless of its real status, so that idea is not viable here and
+was skipped in favor of two bounded, WebSearch-based tasks that are.
+
+**1. 2026 FIFA World Cup final result (real discrepancy, fixed).** The
+2026-08-02 final-dates audit and the 2026-08-04 third/fourth-place audit
+both explicitly excluded the 2026 edition as "the scheduled/forward-looking
+final" - true when this routine's audit series began, but stale by the time
+either pass actually ran: the final was played 19 July 2026, weeks before
+either audit's own run date. This run re-checked the full 2026 row in
+`content/fifa-world-cup.md` as a genuinely completed tournament. Host,
+teams, winner, runner-up, final date, and the third/fourth-place result
+(England beat France 6-4, the highest-scoring bronze match in World Cup
+history) were already correct. **One discrepancy found and fixed:** the
+Final column read "Spain 1-0 Argentina" with no extra-time marker, but
+Ferran Torres settled it in the 106th minute of extra time - corrected to
+"Spain 1-0 Argentina (a.e.t.)" to match this table's own notation for every
+other extra-time final decided without penalties. See `docs/SOURCES.md`'s
+new "2026 final result audit" entry for sources and a process note: don't
+exclude the current year's edition from an audit's scope just because an
+earlier pass labeled it forward-looking - check the actual date first.
+
+**2. Ballon d'Or ceremony dates: second sources for the last five
+single-sourced years.** The 2026-08-03 ceremony-dates audit left five years
+(1976, 1978, 1984, 1986, 2005) on a single corroborating source. This run
+found a genuine second independent source for all five (RSSSF, France
+Football's own social accounts, Sky Sports, and other outlets) - no date
+changes needed, every year confirmed as already authored. Along the way it
+resolved one further conflict (Dynamo Kyiv's own site claims 29 December for
+Belanov's 1986 award; the weekly-Tuesday-publication pattern plus RSSSF and
+France Football's own account confirm 30 December, as already authored) and
+found one genuine exception to that same Tuesday-publication heuristic
+(1978's well-corroborated date, 27 December, was a Wednesday) - flagged in
+`content/ballon-dor.md`'s editorial note so a future conflict resolution
+doesn't treat the Tuesday pattern as decisive on its own. See
+`docs/SOURCES.md`'s new entry under Ballon d'Or for the full per-year source
+list.
+
+Verified with `pnpm lint` (0 errors/0 warnings, same pre-existing hint as
+every prior run), the full Vitest suite (152/152, unchanged), and the full
+Playwright suite (199/199, unchanged) - the pre-installed Chromium needed
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` this run since the default
+bundled browser Playwright's own `pnpm install` pulled didn't match what's
+preinstalled in this container; noted here in case a future run hits the
+same "Executable doesn't exist" error.
+
+**Left for a future pass:**
+- A source-link liveness check remains infeasible in this specific
+  environment (WebFetch 403s on every host, not just Wikipedia/RSSSF) -
+  drop this idea unless a future run confirms different network access,
+  rather than re-attempting it as-is.
+- Accessibility is already automated (`tests/e2e/accessibility.spec.ts` runs
+  an axe WCAG 2.1 A/AA sweep across every nav page, both languages, both
+  color schemes) and performance has little surface on this
+  image-light static content site - a future pass should look for a
+  concrete gap in either (e.g. pages/states outside `NAV_LINKS` that axe
+  doesn't reach, like individual quiz question states) rather than a broad,
+  likely-low-yield sweep.
+- A second independent cross-check of the tables that have only had one
+  audit pass so far (World Cup/EURO/Copa América/Nations League
+  winner-runner-up-final data beyond 2026, which the final-date audits only
+  partially covered) remains open. **Copa América's Champion/Runner-up
+  columns are now closed** (see the entry below, 2026-08-05) - World
+  Cup/EURO/Nations League Champion/Runner-up/Final-score data is still open.
+
+### Content-accuracy pass: Copa América Champion/Runner-up audit - no discrepancies
+
+Added 2026-08-05 (intensive run). Closes the "second independent cross-check"
+item left open by the 2026-08-04 run above, scoped to Copa América - the
+competition prioritized first by this routine's backlog ordering. Unlike the
+Format, third/fourth-place, and Final-date columns (each already audited in
+earlier runs), the core **Champion** and **Runner-up** columns in
+`content/copa-america.md` had never had a dedicated second-source pass of
+their own; they had only been implicitly checked against the "Titles after
+2024" per-team totals table (which is itself derived from the same editorial
+source, not an independent check).
+
+This run cross-checked all 49 editions (1916-2024) via WebSearch against each
+edition's dedicated Wikipedia article, plus RSSSF, CONMEBOL's own recap
+articles, or another independent outlet (ESPN, Bleacher Report, Fox Sports)
+where available - the same WebSearch-snippet approach the 2026-08-04 run
+established, since direct WebFetch to these hosts still returns HTTP 403 in
+this environment. **Result: zero discrepancies.** Every Champion and
+Runner-up value already in the table matched, including the five
+level-on-points playoff deciders (1919, 1922, 1937, 1949, 1953), the two
+1959 editions, the three home-and-away finals (1975, 1979, 1983), the two
+closing-group editions (1989, 1991), and every penalty-shootout final (1995,
+2015, 2016). See `docs/SOURCES.md`'s new "Champion/Runner-up audit" entry
+under Copa América for the full per-edition citation list. Added a summary
+note to `content/copa-america.md`'s "Important editorial warning" section
+recording the audit (mirrors how the Format/third-fourth/Final-date audits
+are each documented there) and bumped `lastReviewed` to 2026-08-05.
+
+No code changes - this is a content-only verification pass, so `pnpm lint`,
+the full Vitest suite, and the full Playwright suite are all unaffected
+(unchanged from the 2026-08-04 run's 0 errors / 152/152 / 199/199).
+
+**Left for a future pass:** the same Champion/Runner-up/Final-score audit for
+UEFA EURO, FIFA World Cup, and UEFA Nations League - none of the three has
+had this specific column pair independently cross-checked yet (their prior
+audits covered third/fourth place, final dates, and the 2026 World Cup final
+specifically, not the full historical Champion/Runner-up/Final-score
+columns). UEFA Nations League is the smallest (4 completed editions) and the
+natural next candidate. Correction to this note: Nations League's Winner/
+Runner-up/Final score *had* already been checked once, in the 2026-08-04
+"full results audit" entry above (against UEFA.com + ESPN) - this note should
+have said "only one audit pass," not "none." The entry below closes that gap
+with a second, independently-sourced pass.
+
+### Content-accuracy pass: UEFA Nations League Champion/Runner-up/Final-score - second independent cross-check, no discrepancies
+
+Added 2026-08-05 (intensive run). Nations League ranks above EURO and World
+Cup in this routine's stated competition-priority order, and its own
+Champion/Runner-up/Final-score data had already had exactly one audit pass
+(2026-08-04, UEFA.com + ESPN) - the smallest gap of the three competitions
+named in the note above, and the natural next candidate per that note.
+
+This run re-verified all four completed editions (2018-19 through 2024-25) -
+Winner, Runner-up, and Final score - via WebSearch, using a source pair
+deliberately distinct from the 2026-08-04 pass: each edition's dedicated
+Wikipedia final article plus one independent news outlet not used before
+(CBS Sports for 2019, Al Jazeera for 2021, Sky Sports for 2023, Euronews for
+2025 - ESPN was intentionally avoided as a repeat source for 2023 and 2025).
+**No discrepancies found.** Every Winner, Runner-up, and Final score already
+in `content/uefa-nations-league.md` matches both new sources exactly,
+including both penalty-shootout finals (2023: Spain 5-4 pens after 0-0;
+2025: Portugal 5-3 pens after 2-2).
+
+`docs/SOURCES.md` gained a "Champion/Runner-up/Final-score second-source
+audit" entry under UEFA Nations League. `lastReviewed` moved to 2026-08-05;
+`status` stays `review` (secondary sources, same reasoning as every prior
+secondary-sourced audit in this file). No content, code, or test changes
+were needed since nothing was wrong. Verified with `pnpm lint` (0 errors/0
+warnings, same pre-existing hint as every prior run) and the full Vitest/
+Playwright suites, both unchanged from the prior run.
+
+This closes UEFA Nations League's Champion/Runner-up/Final-score item with
+two independent audit passes now on record (2026-08-04 and 2026-08-05).
+
+**Left for a future pass:** the same Champion/Runner-up/Final-score audit -
+first pass, not yet done once - for UEFA EURO (17 editions) and FIFA World
+Cup (22 editions), the two remaining competitions from the note above. Both
+are larger research tasks than Nations League's four editions; EURO is the
+smaller of the two and the natural next candidate.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
