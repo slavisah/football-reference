@@ -144,3 +144,30 @@ function isCurrent(href: string): boolean {
     }
   }
 </style>
+
+<script is:inline>
+  // The header wraps onto multiple lines well before the viewport gets
+  // narrow - eleven nav links plus the theme toggle (and, on translated
+  // pages, the language switch) don't fit on one line even at the
+  // container's own max-width, so its real height varies by page/locale
+  // and is nowhere near the single-line height a hardcoded CSS value would
+  // assume. Any other sticky element meant to sit just below this sticky,
+  // higher-z-index header (e.g. the quiz page's score bar) needs that real
+  // height, not a guess, or the header ends up covering it once both are
+  // stuck. Exposed as a custom property so plain CSS can read it.
+  (function () {
+    var header = document.querySelector('.site-header');
+    if (!header) return;
+
+    function setHeaderHeight() {
+      document.documentElement.style.setProperty('--site-header-height', header.offsetHeight + 'px');
+    }
+
+    setHeaderHeight();
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(setHeaderHeight).observe(header);
+    } else {
+      window.addEventListener('resize', setHeaderHeight);
+    }
+  })();
+</script>

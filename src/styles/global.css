@@ -79,6 +79,14 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  /* Reserves space so smooth-scroll navigation (anchor links, the skip link,
+     and the browser's own scroll-into-view for keyboard focus) stops below
+     the sticky site header instead of underneath it. Nav.astro measures the
+     header's real height into --site-header-height - it wraps onto several
+     lines on most viewports (eleven nav links don't fit one line even at
+     the page's own max-width), so a fixed guess here would undershoot on
+     exactly the pages where this rule matters most. */
+  scroll-padding-top: var(--site-header-height, 3.6rem);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -305,7 +305,11 @@ const lastReviewed = [
     gap: 0.75rem 1.5rem;
     flex-wrap: wrap;
     position: sticky;
-    top: 3.6rem;
+    /* Nav.astro measures its own real (often multi-line) height into this
+       custom property; 3.6rem is only the no-JS fallback and undershoots
+       the real header almost everywhere, since eleven nav links don't fit
+       one line even at the container's max-width. */
+    top: var(--site-header-height, 3.6rem);
     z-index: 10;
   }
 
@@ -349,6 +353,17 @@ const lastReviewed = [
     color: var(--text-muted);
     margin-top: 0;
     margin-bottom: 1rem;
+  }
+</style>
+
+<style is:global>
+  /* This page has a second sticky bar (the score bar) below the sticky site
+     header, so scroll-into-view targets here need to clear both heights, not
+     just the header's - global.css's own scroll-padding-top only knows
+     about the header. QuizScript.astro sets --quiz-score-height once the
+     score bar is visible. */
+  html:has(#quiz-score) {
+    scroll-padding-top: calc(var(--site-header-height, 3.6rem) + var(--quiz-score-height, 4.5rem));
   }
 </style>
 

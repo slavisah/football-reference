@@ -2443,6 +2443,85 @@ result columns against outside sources.
   or another concrete content/quality gap - rather than assuming there is
   nothing left to verify.
 
+### Accessibility: quiz interactive-state coverage, plus a real sticky-header bug it found
+
+Added 2026-08-05 (intensive run). Closes the specific gap the previous entry's
+"Left for a future pass" note named: the main axe sweep
+(`tests/e2e/accessibility.spec.ts`) only ever visits each `NAV_LINKS` page in
+its untouched initial DOM state, so it never audited the quiz page's
+interactive states - answered choices (`is-correct`/`is-incorrect` classes,
+the `aria-live` feedback text, disabled radios), the order-challenge's own
+answered state, the expanded "just show me the answer" `<details>`, or the
+post-restart state.
+
+**New test file:** `tests/e2e/accessibility-quiz-states.spec.ts` drives the
+quiz to two additional DOM states - "answered" (every choice card and order
+card answered with a deliberate mix of correct/incorrect picks, every reveal
+expanded) and "restarted-after-answering" - and runs the same axe WCAG
+2.1 A/AA sweep as the main file against each, for both languages and both
+color schemes (8 new tests). Each state assertion includes a sanity check
+(e.g. an `is-incorrect` choice is actually visible) so a future markup
+change that silently breaks the quiz script can't pass vacuously by auditing
+a page that never actually reached the state its test name claims.
+
+**Real bug found and fixed while building this.** Driving the "answered"
+state (which requires scrolling through all ~20+ quiz cards) surfaced a
+genuine, previously-undetected defect, not a test artifact: `.quiz__score`'s
+sticky score/restart bar used a hardcoded `top: 3.6rem`, sized for a
+single-line nav header. But `Nav.astro`'s eleven links plus the theme toggle
+(and, on translated pages, the language switch) don't fit on one line even
+at the page's own `--maxw` container width - the header actually wraps to
+2-6 lines depending on viewport and locale, with a real height anywhere from
+~188px (desktop) to ~300-700px (phone widths). Since the sticky header has a
+higher z-index than the sticky score bar, once both are "stuck" during a
+scroll, the header visually and functionally covers the *entire* score bar -
+including the restart button - on effectively every viewport width tested
+(360px, 1280px, 1920px), confirmed with `elementFromPoint` and a screenshot
+before the fix (see this run's browser session). A mouse user could not
+click "Restart quiz" at all once scrolled past the first question.
+
+**Fix:** `Nav.astro` now measures its own real height with a `ResizeObserver`
+(falling back to a `resize` listener) and exposes it as `--site-header-height`
+on the document root; `quiz.astro`/`hr/quiz.astro`'s `.quiz__score` reads
+`top: var(--site-header-height, 3.6rem)` instead of the hardcoded value
+(3.6rem kept only as the no-JS fallback). The same wrap also meant
+`scroll-into-view` targets (keyboard focus, anchor links, Playwright's own
+actionability auto-scroll) could land underneath the sticky header
+site-wide, not just on the quiz page - fixed generally by adding
+`scroll-padding-top: var(--site-header-height, 3.6rem)` to `html` in
+`global.css`. The quiz page has a *second* sticky bar stacked below the
+header, so it additionally needs `--quiz-score-height` (set by
+`QuizScript.astro` once the bar is shown) added into its own
+`scroll-padding-top` via a small `<style is:global>` block scoped to
+`html:has(#quiz-score)`.
+
+Verified with `pnpm lint` (0 errors/0 warnings, same pre-existing hint as
+every prior run), the full Vitest suite (152/152, unchanged), and the full
+Playwright suite, now 207/207 (199 previous + 8 new) - confirmed passing
+only after killing two stale `astro preview` processes left over from this
+run's own manual browser reproduction, which Playwright's
+`reuseExistingServer` option had silently reused instead of rebuilding
+against; a future run hitting inexplicably-stale Playwright results should
+check `ps aux` for a leftover preview server before assuming the code is
+wrong.
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in earlier slices
+  still rest on single-source research.
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  infeasible in this environment (WebFetch 403s on every host tried), per
+  prior runs' notes.
+- A second independent cross-check of the Champion/Runner-up/Final-score
+  tables (closed on their first pass for all four team competitions) remains
+  open as a "belt and suspenders" idea, per the previous entry's note.
+- This run's fix was scoped to the one sticky-stacking bug the new quiz
+  tests actually surfaced; a broader sweep for other sticky/z-index
+  interactions elsewhere on the site (there don't appear to be any today -
+  `TournamentTable.astro`'s sticky table header is the only other `position:
+  sticky` user, and it's `top: 0` inside its own scroll container, not
+  stacked under the site header) has not been done and would need a reason
+  to suspect one exists before spending time on it.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
