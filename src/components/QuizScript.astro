@@ -41,6 +41,8 @@
       const correctText = card.dataset.i18nCorrect ?? 'Correct!';
       const incorrectPrefix = card.dataset.i18nIncorrectPrefix ?? 'Not quite - the answer is "';
       const incorrectSuffix = card.dataset.i18nIncorrectSuffix ?? '".';
+      const resultCorrectLabel = card.dataset.i18nResultCorrect ?? '✓ correct';
+      const resultIncorrectLabel = card.dataset.i18nResultIncorrect ?? '✗ your answer';
 
       if (checkBtn) checkBtn.hidden = false;
 
@@ -58,8 +60,18 @@
           r.disabled = true;
         });
         labels.forEach((label, i) => {
-          label.classList.toggle('is-correct', i === answerIndex);
-          label.classList.toggle('is-incorrect', i === selectedIndex && !correct);
+          const isCorrectChoice = i === answerIndex;
+          const isWrongPick = i === selectedIndex && !correct;
+          label.classList.toggle('is-correct', isCorrectChoice);
+          label.classList.toggle('is-incorrect', isWrongPick);
+          const badge = label.querySelector('.quiz-card__result-badge');
+          if (badge) {
+            badge.textContent = isCorrectChoice
+              ? resultCorrectLabel
+              : isWrongPick
+                ? resultIncorrectLabel
+                : '';
+          }
         });
         if (feedback) {
           feedback.textContent = correct
@@ -87,7 +99,11 @@
           r.disabled = false;
           r.checked = false;
         });
-        labels.forEach((label) => label.classList.remove('is-correct', 'is-incorrect'));
+        labels.forEach((label) => {
+          label.classList.remove('is-correct', 'is-incorrect');
+          const badge = label.querySelector('.quiz-card__result-badge');
+          if (badge) badge.textContent = '';
+        });
         if (feedback) feedback.textContent = '';
         if (checkBtn) {
           checkBtn.hidden = false;
@@ -121,6 +137,8 @@
       const orderCorrectText = card.dataset.i18nOrderCorrect ?? 'Correct order!';
       const orderIncorrectText =
         card.dataset.i18nOrderIncorrect ?? 'Not quite - highlighted items are out of place.';
+      const resultCorrectLabel = card.dataset.i18nResultCorrect ?? '✓ correct spot';
+      const resultIncorrectLabel = card.dataset.i18nResultIncorrect ?? '✗ wrong spot';
 
       if (checkBtn) checkBtn.hidden = false;
 
@@ -137,6 +155,8 @@
           if (!correct) allCorrect = false;
           item?.classList.toggle('is-correct', correct);
           item?.classList.toggle('is-incorrect', !correct);
+          const badge = item?.querySelector('.quiz-card__result-badge');
+          if (badge) badge.textContent = correct ? resultCorrectLabel : resultIncorrectLabel;
           select.disabled = true;
         });
         if (feedback) {
@@ -159,7 +179,11 @@
         select.disabled = false;
         select.value = '';
       });
-      items.forEach((item) => item.classList.remove('is-correct', 'is-incorrect'));
+      items.forEach((item) => {
+        item.classList.remove('is-correct', 'is-incorrect');
+        const badge = item.querySelector('.quiz-card__result-badge');
+        if (badge) badge.textContent = '';
+      });
       if (feedback) feedback.textContent = '';
       if (checkBtn) {
         checkBtn.hidden = false;
