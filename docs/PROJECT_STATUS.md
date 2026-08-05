@@ -2304,8 +2304,48 @@ UEFA EURO, FIFA World Cup, and UEFA Nations League - none of the three has
 had this specific column pair independently cross-checked yet (their prior
 audits covered third/fourth place, final dates, and the 2026 World Cup final
 specifically, not the full historical Champion/Runner-up/Final-score
-columns). UEFA Nations League is the smallest (7 completed editions) and the
-natural next candidate.
+columns). UEFA Nations League is the smallest (4 completed editions) and the
+natural next candidate. Correction to this note: Nations League's Winner/
+Runner-up/Final score *had* already been checked once, in the 2026-08-04
+"full results audit" entry above (against UEFA.com + ESPN) - this note should
+have said "only one audit pass," not "none." The entry below closes that gap
+with a second, independently-sourced pass.
+
+### Content-accuracy pass: UEFA Nations League Champion/Runner-up/Final-score - second independent cross-check, no discrepancies
+
+Added 2026-08-05 (intensive run). Nations League ranks above EURO and World
+Cup in this routine's stated competition-priority order, and its own
+Champion/Runner-up/Final-score data had already had exactly one audit pass
+(2026-08-04, UEFA.com + ESPN) - the smallest gap of the three competitions
+named in the note above, and the natural next candidate per that note.
+
+This run re-verified all four completed editions (2018-19 through 2024-25) -
+Winner, Runner-up, and Final score - via WebSearch, using a source pair
+deliberately distinct from the 2026-08-04 pass: each edition's dedicated
+Wikipedia final article plus one independent news outlet not used before
+(CBS Sports for 2019, Al Jazeera for 2021, Sky Sports for 2023, Euronews for
+2025 - ESPN was intentionally avoided as a repeat source for 2023 and 2025).
+**No discrepancies found.** Every Winner, Runner-up, and Final score already
+in `content/uefa-nations-league.md` matches both new sources exactly,
+including both penalty-shootout finals (2023: Spain 5-4 pens after 0-0;
+2025: Portugal 5-3 pens after 2-2).
+
+`docs/SOURCES.md` gained a "Champion/Runner-up/Final-score second-source
+audit" entry under UEFA Nations League. `lastReviewed` moved to 2026-08-05;
+`status` stays `review` (secondary sources, same reasoning as every prior
+secondary-sourced audit in this file). No content, code, or test changes
+were needed since nothing was wrong. Verified with `pnpm lint` (0 errors/0
+warnings, same pre-existing hint as every prior run) and the full Vitest/
+Playwright suites, both unchanged from the prior run.
+
+This closes UEFA Nations League's Champion/Runner-up/Final-score item with
+two independent audit passes now on record (2026-08-04 and 2026-08-05).
+
+**Left for a future pass:** the same Champion/Runner-up/Final-score audit -
+first pass, not yet done once - for UEFA EURO (17 editions) and FIFA World
+Cup (22 editions), the two remaining competitions from the note above. Both
+are larger research tasks than Nations League's four editions; EURO is the
+smaller of the two and the natural next candidate.
 
 ## Known caveats
 
