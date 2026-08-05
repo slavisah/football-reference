@@ -2263,7 +2263,49 @@ same "Executable doesn't exist" error.
 - A second independent cross-check of the tables that have only had one
   audit pass so far (World Cup/EURO/Copa América/Nations League
   winner-runner-up-final data beyond 2026, which the final-date audits only
-  partially covered) remains open.
+  partially covered) remains open. **Copa América's Champion/Runner-up
+  columns are now closed** (see the entry below, 2026-08-05) - World
+  Cup/EURO/Nations League Champion/Runner-up/Final-score data is still open.
+
+### Content-accuracy pass: Copa América Champion/Runner-up audit - no discrepancies
+
+Added 2026-08-05 (intensive run). Closes the "second independent cross-check"
+item left open by the 2026-08-04 run above, scoped to Copa América - the
+competition prioritized first by this routine's backlog ordering. Unlike the
+Format, third/fourth-place, and Final-date columns (each already audited in
+earlier runs), the core **Champion** and **Runner-up** columns in
+`content/copa-america.md` had never had a dedicated second-source pass of
+their own; they had only been implicitly checked against the "Titles after
+2024" per-team totals table (which is itself derived from the same editorial
+source, not an independent check).
+
+This run cross-checked all 49 editions (1916-2024) via WebSearch against each
+edition's dedicated Wikipedia article, plus RSSSF, CONMEBOL's own recap
+articles, or another independent outlet (ESPN, Bleacher Report, Fox Sports)
+where available - the same WebSearch-snippet approach the 2026-08-04 run
+established, since direct WebFetch to these hosts still returns HTTP 403 in
+this environment. **Result: zero discrepancies.** Every Champion and
+Runner-up value already in the table matched, including the five
+level-on-points playoff deciders (1919, 1922, 1937, 1949, 1953), the two
+1959 editions, the three home-and-away finals (1975, 1979, 1983), the two
+closing-group editions (1989, 1991), and every penalty-shootout final (1995,
+2015, 2016). See `docs/SOURCES.md`'s new "Champion/Runner-up audit" entry
+under Copa América for the full per-edition citation list. Added a summary
+note to `content/copa-america.md`'s "Important editorial warning" section
+recording the audit (mirrors how the Format/third-fourth/Final-date audits
+are each documented there) and bumped `lastReviewed` to 2026-08-05.
+
+No code changes - this is a content-only verification pass, so `pnpm lint`,
+the full Vitest suite, and the full Playwright suite are all unaffected
+(unchanged from the 2026-08-04 run's 0 errors / 152/152 / 199/199).
+
+**Left for a future pass:** the same Champion/Runner-up/Final-score audit for
+UEFA EURO, FIFA World Cup, and UEFA Nations League - none of the three has
+had this specific column pair independently cross-checked yet (their prior
+audits covered third/fourth place, final dates, and the 2026 World Cup final
+specifically, not the full historical Champion/Runner-up/Final-score
+columns). UEFA Nations League is the smallest (7 completed editions) and the
+natural next candidate.
 
 ## Known caveats
 
