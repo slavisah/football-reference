@@ -16,7 +16,14 @@
     const scoreValue = document.getElementById('quiz-score-value');
     const restartBtn = document.getElementById('quiz-restart');
 
-    if (scoreBar) scoreBar.hidden = false;
+    if (scoreBar) {
+      scoreBar.hidden = false;
+      // The score bar is itself sticky, stacked directly below the sticky
+      // site header (see quiz.astro's --site-header-height usage) - so
+      // scroll-into-view targets on this page need to clear both, not just
+      // the header. Exposed the same way Nav.astro exposes its own height.
+      document.documentElement.style.setProperty('--quiz-score-height', scoreBar.offsetHeight + 'px');
+    }
 
     let score = 0;
 
