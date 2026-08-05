@@ -2,7 +2,7 @@
 title: Golden Boot Winners
 slug: golden-boot
 awardType: scoring
-lastReviewed: 2026-07-23
+lastReviewed: 2026-08-04
 status: review
 ---
 
@@ -17,7 +17,7 @@ The name and tie-breaking rules of top-scorer awards have changed over time. Thi
 | 1930 | Guillermo Stábile | Argentina | 8 |
 | 1934 | Oldřich Nejedlý | Czechoslovakia | 5 |
 | 1938 | Leônidas | Brazil | 7 |
-| 1950 | Ademir | Brazil | 8 |
+| 1950 | Ademir | Brazil | 9 |
 | 1954 | Sándor Kocsis | Hungary | 11 |
 | 1958 | Just Fontaine | France | 13 |
 | 1962 | Garrincha; Vavá; Leonel Sánchez; Flórián Albert; Valentin Ivanov; Dražan Jerković | Multiple | 4 |
