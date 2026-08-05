@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-08-04
+lastReviewed: 2026-08-05
 status: review
 ---
 
