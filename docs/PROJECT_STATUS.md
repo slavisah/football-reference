@@ -2380,6 +2380,69 @@ whose Champion/Runner-up/Final-score data has not yet had a dedicated audit
 pass of its own - the natural next candidate, and the last item in this
 particular audit series.
 
+### Content-accuracy pass: FIFA World Cup Champion/Runner-up/Final-score audit - no discrepancies
+
+Added 2026-08-05 (intensive run). Closes the last item in the
+Champion/Runner-up/Final-score audit series named by the entry above: World
+Cup was the only one of the site's four team competitions (Copa América,
+Nations League, EURO already closed) whose core Winner/Runner-up/Final
+columns had never had a dedicated cross-check of their own, distinct from
+the existing final-date (2026-08-02), third/fourth-place (2026-08-04), and
+2026-specific (2026-08-04) audits already on record for this competition.
+
+- Verified all 21 completed editions (1930-2022; 2026 was already
+  independently audited in the entry above) in `content/fifa-world-cup.md`
+  via three parallel WebSearch research passes split by era (1930-1962,
+  1966-1994, 1998-2022) - the same era-split approach the third/fourth-place
+  audit used - each edition cross-checked against at least two independent
+  sources (FIFA.com, ESPN's match archive, Wikipedia's dedicated final
+  articles, BBC, CNN, CBS News, Britannica, and other outlets search
+  surfaced).
+- **No discrepancies found in any of the 21 editions.** Every extra-time and
+  penalty-shootout final was specifically re-confirmed: 1934, 1966, and 1978
+  (a.e.t., no penalties); 1994, 2006, and 2022 (penalty shoot-outs); 2010 and
+  2014 (a.e.t.). 1950's unusual format (no single knockout final - the title
+  was decided by the final round-robin group's last match, Uruguay 2-1
+  Brazil, the *Maracanazo*) was reconfirmed as correctly represented,
+  matching the page's existing "Editorial notes" text. One apparent conflict
+  surfaced mid-audit - a single ESPN search-snippet title suggesting the
+  1938 final was "2-1" - was resolved against five other independent sources
+  that unanimously confirmed the authored 4-2 scoreline, so it was treated
+  as a snippet/caching artifact rather than a genuine discrepancy.
+- `docs/SOURCES.md` gained a "Champion/Runner-up/Final-score audit" entry
+  under FIFA World Cup with the full per-era source list.
+  `content/fifa-world-cup.md`'s `lastReviewed` moved to 2026-08-05; `status`
+  stays `review` (unchanged) - secondary sources, not a single primary FIFA
+  competition record, matching the same reasoning every earlier
+  secondary-sourced audit in this file has given.
+- No content, code, or test changes were needed since nothing was wrong -
+  this is a clean audit-closed entry, the same shape as the Copa América,
+  Nations League, and EURO closures in this same series. Verified with
+  `pnpm lint` (0 errors/0 warnings, same pre-existing hint as every prior
+  run) and the full Vitest/Playwright suites, both unchanged from the prior
+  run (no code or test changes were needed), all still passing.
+
+This closes the Champion/Runner-up/Final-score audit series across all four
+team competitions (Copa América, Nations League, EURO, and now World Cup) -
+every one has now had at least one independent cross-check of its core
+result columns against outside sources.
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in earlier slices
+  still rest on single-source research.
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  infeasible in this environment (WebFetch 403s on every host tried), per
+  prior runs' notes.
+- With every competition/award table's core result columns and every
+  third/fourth-place column now independently audited at least once, and
+  every required/nice-to-have feature from `docs/WEBSITE_REQUIREMENTS.md`
+  and `AGENTS.md` already implemented, a future run should look for a
+  second independent cross-check of the tables that have only had one audit
+  pass so far, a fresh accessibility/performance angle (e.g. individual quiz
+  question states, which sit outside the axe sweep's `NAV_LINKS` coverage),
+  or another concrete content/quality gap - rather than assuming there is
+  nothing left to verify.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
