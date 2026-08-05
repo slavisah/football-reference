@@ -173,6 +173,27 @@ Primary sources should be preferred.
   won UEFA's own tie-breaker (fewest minutes, plus an assist) - this matches
   the page's own stated methodology of showing joint leading scorers as
   tied with no single official winner, not a discrepancy in the data.
+- Champion/Runner-up/Final-score audit (2026-08-05, intensive run): the core
+  **Winner**, **Runner-up**, and **Final** (score line) columns in
+  `content/uefa-euro.md`'s Editions table - the first dedicated cross-check
+  of these three columns specifically, as distinct from the final-date and
+  third-place-play-off audits above. All 17 editions (1960-2024) verified
+  via three parallel WebSearch passes (1960-1980, 1984-2004, 2008-2024),
+  each edition cross-checked against at least two independent outlets
+  (UEFA.com match/history pages, Wikipedia final articles, RSSSF, ESPN, Sky
+  Sports, BBC, CNN, and others). **No discrepancies found** across all 17
+  rows, including every non-regulation final: 1960's and 2016's a.e.t.
+  results, 1968's replay (drawn 1-1, replay won 2-0), 1976's and 2020's
+  penalty shoot-outs, and 1996's and 2000's golden-goal deciders:
+  - https://www.uefa.com/uefaeuro/match/4025 (1960)
+  - https://www.uefa.com/uefaeuro/match/73911 (1968 replay)
+  - https://www.uefa.com/uefaeuro/match/3585 (1980)
+  - https://www.uefa.com/uefaeuro/match/3463--france-vs-spain/ (1984)
+  - https://www.uefa.com/uefaeuro/match/6098--denmark-vs-germany/ (1992)
+  - https://www.uefa.com/uefaeuro/match/301696 (2008)
+  - https://www.uefa.com/uefaeuro/match/2003351 (2012)
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2016_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2024_final
 
 ## UEFA Nations League
 

@@ -2347,6 +2347,39 @@ Cup (22 editions), the two remaining competitions from the note above. Both
 are larger research tasks than Nations League's four editions; EURO is the
 smaller of the two and the natural next candidate.
 
+### Content-accuracy pass: UEFA EURO Champion/Runner-up/Final-score audit - no discrepancies
+
+Added 2026-08-05 (intensive run). Closes the item the previous run's "Left
+for a future pass" note called the natural next candidate: UEFA EURO's core
+**Winner**, **Runner-up**, and **Final** (score line) columns had never had
+a dedicated cross-check of their own, distinct from the existing final-date
+(2026-08-02) and third-place-play-off (2026-08-04) audits already on record
+for this competition.
+
+This run cross-checked all 17 editions (1960-2024) via three parallel
+WebSearch passes split by era (1960-1980, 1984-2004, 2008-2024), the same
+era-split approach earlier Golden Boot and Ballon d'Or audits used, each
+edition checked against at least two independent outlets (UEFA.com match
+and history pages, Wikipedia final articles, RSSSF, ESPN, Sky Sports, BBC,
+CNN, and others) rather than relying on training-data recall. **Result: zero
+discrepancies.** Every Winner, Runner-up, and Final value already in
+`content/uefa-euro.md` matched, including every non-regulation final on the
+page: the 1960 and 2016 a.e.t. results, the 1968 final's 1-1 draw and
+2-0 replay, the 1976 and 2020 penalty shoot-outs (with 1976's Panenka
+chip specifically re-confirmed), and the 1996 and 2000 golden-goal
+deciders. See `docs/SOURCES.md`'s new entry under UEFA EURO for the full
+per-edition source list.
+
+`content/uefa-euro.md`'s `lastReviewed` moved to 2026-08-05; `status` stays
+`review` (secondary sources, same reasoning as every prior secondary-sourced
+audit in this file). No content, code, or test changes were needed since
+nothing was wrong.
+
+This leaves FIFA World Cup (22 editions) as the only competition on the site
+whose Champion/Runner-up/Final-score data has not yet had a dedicated audit
+pass of its own - the natural next candidate, and the last item in this
+particular audit series.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
