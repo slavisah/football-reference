@@ -205,6 +205,20 @@ Primary sources should be preferred.
   - https://www.espn.com/soccer/match/_/gameId/654362/italy-netherlands
   - https://www.uefa.com/uefanationsleague/news/029a-1df3af7eedc9-c3b6e51cf3f1-1000--germany-vs-france-highlights-and-report-kylian-mbappe-sco/
   - https://www.espn.com/soccer/match/_/gameId/723737/france-germany
+- Champion/Runner-up/Final-score second-source audit (2026-08-05): a second,
+  independent cross-check of the Finals table's Winner, Runner-up, and Final
+  score for all four completed editions, using sources distinct from the
+  2026-08-04 UEFA.com/ESPN pair above (each edition's dedicated Wikipedia
+  final article, plus CBS Sports, Al Jazeera, or Euronews); no discrepancies
+  found:
+  - https://en.wikipedia.org/wiki/2019_UEFA_Nations_League_final
+  - https://www.cbssports.com/soccer/news/2019-uefa-nations-league-schedule-dates-tv-live-stream-start-times-netherlands-vs-portugal-in-final/
+  - https://en.wikipedia.org/wiki/2021_UEFA_Nations_League_final
+  - https://www.aljazeera.com/sports/2021/10/11/france-beat-spain-to-lift-nations-league-title
+  - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_final
+  - https://www.skysports.com/football/news/12904237/croatia-0-0-spain-4-5-on-penalties-dani-carvajal-converts-winning-penalty-as-la-roja-clinch-nations-league-glory
+  - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
+  - https://www.euronews.com/2025/06/09/portugal-beats-spain-to-win-the-nations-league
 
 ## Copa América
 
