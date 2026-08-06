@@ -2893,6 +2893,84 @@ directly: no remaining `aria-label="… of …"` fragment anywhere under `dist/h
   already went through the dedicated quiz-localization pass) rather than
   assuming this specific bug class is now fully closed.
 
+### Bug fix: two downloadable PDFs were stale relative to their own source tables
+
+Added 2026-08-06 (intensive run, later slice). Every backlog item and every
+UI/localization bug found by this routine's earlier close-reads was already
+closed going into this run, so this is another "genuinely useful quality
+pass" fallback - found by checking, for the first time, whether the
+generated `public/downloads/*.pdf` files (added 2026-07-31, regenerated
+manually via `pnpm build:pdfs` whenever a content-accuracy pass changes an
+Editions table, per `docs/ADDING_CONTENT.md` section 8) actually still
+matched their source content, rather than assuming every prior run remembered
+to rerun the regeneration step.
+
+**The bug:** they hadn't. `git log` on `public/downloads/` showed the PDFs
+were last regenerated at 2026-08-04 16:59 UTC (the Golden Boot audit run),
+but `content/fifa-world-cup.md` and `content/ballon-dor.md` were both edited
+*after* that, at 2026-08-04 21:04 UTC, by the very next run - fixing the 2026
+World Cup final's missing "(a.e.t.)" marker on its score. That fix reached
+the live HTML page immediately (it's read at build time), but
+`public/downloads/world-cup.pdf` is a committed static snapshot, so it kept
+showing the pre-fix score ("Spain 1–0 Argentina", no extra-time marker) for
+two days across two merged PRs (#33, #34) - the exact "silently goes stale"
+failure mode `docs/ADDING_CONTENT.md` section 8 exists to prevent, missed
+because no run had actually checked PDF-vs-content freshness before.
+The other 2026-08-05 content commits (Copa América/EURO/Nations
+League/World Cup Champion-Runner-up-Final-score audits) turned out to be
+`lastReviewed`-date-only edits with no discrepancies found, so their PDFs
+were still byte-accurate on data - only the two 08-04 files were genuinely
+wrong.
+
+**Fix:** regenerated all six PDFs via `PW_EXECUTABLE_PATH=<preinstalled
+Chromium> pnpm build:pdfs` (the documented command assumes a plain
+`chromium` binary path; this environment's pre-installed Chromium lives one
+level deeper, so the override was needed - noted here in case a future run
+hits the same path mismatch). Confirmed the fix landed by diffing the built
+HTML the PDF step screenshots (`dist/competitions/world-cup/index.html` now
+contains "Spain 1–0 Argentina (a.e.t.)") and checking each PDF's file size
+changed. Five of the six PDFs also picked up the 2026-08-05
+Champion/Runner-up/Final-score audits' `lastReviewed` footer date and the
+2026-08-04 Ballon d'Or ceremony-date sourcing-note expansion in the process
+(ballon-dor.pdf's byte size is unchanged since that content isn't on the
+printed page itself - only the References section's `lastReviewed` line,
+already bumped to 08-04 before the last regen). No test changes needed - the
+existing PDF-link Playwright cases only assert the link/content-type, not
+PDF byte content, so this was a manual verification, same as every prior PDF
+regeneration in this file's history.
+
+**Second fix, closes an explicitly-flagged gap:** the 2026-08-03 run that
+added the `/awards/ballon-dor` and `/awards/golden-boot` redirects (for
+`docs/WEBSITE_REQUIREMENTS.md`'s "Required pages" list) had explicitly left
+"Croatian equivalents" for a future pass, since the requirements doc predates
+localization. Added `/hr/awards/ballon-dor` -> `/hr/competitions/ballon-dor`
+and `/hr/awards/golden-boot` -> `/hr/competitions/golden-boot` to
+`astro.config.mjs`'s `redirects` map, same base-path-prefixing the English
+redirects already need (confirmed via the built
+`dist/hr/awards/ballon-dor/index.html` meta refresh target). 3 new Playwright
+cases in the existing "Required-page redirects" describe block (mirroring the
+3 English ones): both Croatian redirects land on the real page's `<h1>`, and
+noindex/base-path assertions for the Croatian redirect page.
+
+**Tests:** full Vitest suite unchanged (158/158 - no library code touched)
+and the full Playwright suite, now 223/223 (up from 220, the 3 new redirect
+cases). `pnpm lint` clean (0 errors/0 warnings, same pre-existing hint as
+every prior run).
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in earlier slices
+  were already re-confirmed with a genuine second source as of the
+  2026-08-04 slice - no known open ceremony-date sourcing gap today.
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  infeasible in this environment (WebFetch 403s on every host tried), per
+  prior runs' notes.
+- This run adds "PDF freshness vs. source content" to the list of things a
+  future run should spot-check after any content-accuracy pass, alongside
+  the existing `docs/ADDING_CONTENT.md` section 8 instruction - a
+  lightweight `git log` comparison between `public/downloads/*.pdf` and the
+  six `content/*.md` files (the check this run did by hand) would be a
+  reasonable thing to script if this class of staleness recurs.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
