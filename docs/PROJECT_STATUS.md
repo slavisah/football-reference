@@ -2971,6 +2971,78 @@ every prior run).
   six `content/*.md` files (the check this run did by hand) would be a
   reasonable thing to script if this class of staleness recurs.
 
+### Automated PDF-freshness check - added 2026-08-06 (intensive run)
+
+Every backlog item and every previously-flagged bug was already closed going
+into this run - the entire `docs/WEBSITE_REQUIREMENTS.md` "Required
+capabilities" list, all six competition/award pages in both languages, and
+every quality-pass audit logged above. Per this routine's fallback
+instruction, this is another quality pass: it scripts the exact gap the
+previous run ("Bug fix: two downloadable PDFs were stale relative to their
+own source tables", above) explicitly flagged as worth automating, rather
+than leaving PDF freshness as a manual `git log` check nobody is guaranteed
+to remember to run before every merge.
+
+That prior entry's own suggestion - diffing `git log` timestamps between
+`public/downloads/*.pdf` and `content/*.md` - turns out to have a real flaw:
+`.github/workflows/ci.yml`'s `actions/checkout@v4` step uses the default
+shallow clone (fetch depth 1), so `git log` on a path in CI only ever sees
+whichever single commit happens to be in that shallow slice - it would give
+a false "fresh" or false "stale" answer depending on what that commit
+happened to touch, not a real answer. Content hashing sidesteps this
+entirely and works identically locally and in CI.
+
+- **`scripts/check-pdf-freshness.mjs`** (new): hashes (SHA-256) each of the
+  content files a PDF depends on and compares against
+  `public/downloads/.pdf-manifest.json`, a manifest recorded the last time
+  `pnpm build:pdfs` ran. Reports exactly which PDF(s) are stale and which
+  source file changed, and exits non-zero. World Cup and EURO's PDFs depend
+  on *two* content files each (their own table plus `content/golden-boot.md`,
+  joined in as the "Top scorer" column per the earlier "tournament-level
+  best scorer facts" entry above) - missing that second dependency would have
+  silently under-detected staleness, so it's covered explicitly.
+- **`scripts/generate-pdfs.mjs`**: now writes `.pdf-manifest.json` after
+  generating the six PDFs, hashing the same content file(s) it just rendered
+  onto each page (kept in sync by hand with `check-pdf-freshness.mjs`'s
+  source list, since both need the identical Golden Boot join dependency for
+  World Cup/EURO).
+- **`.github/workflows/ci.yml`**: new "PDF freshness check" step (`pnpm
+  check:pdfs`) runs right after unit tests, before the Playwright browser
+  install - it needs no browser and completes in well under a second, so it
+  catches a forgotten PDF regeneration on every pull request instead of
+  only when someone happens to check by hand (as the previous run did, the
+  first time in this project's history anyone had).
+- **`docs/ADDING_CONTENT.md`** section 8: now tells an editor that CI backs
+  up the manual regeneration reminder with this check.
+- Regenerated all six PDFs and the new manifest via `PW_EXECUTABLE_PATH=
+  <preinstalled Chromium> pnpm build && pnpm build:pdfs` (same environment
+  path override the previous run noted) so the manifest reflects the
+  already-current content confirmed fresh by that run; `pnpm check:pdfs`
+  passes cleanly against it. Manually verified the check actually catches
+  staleness by appending a line to `content/copa-america.md`, confirming
+  `pnpm check:pdfs` reported exactly that one PDF as stale with the right
+  file name, then reverting the edit and re-confirming a clean pass.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (158/158) and `pnpm lint` is clean (0 errors/0 warnings, same
+pre-existing `monthNames` hint every prior run has logged). These two new
+Node scripts have no Playwright coverage of their own (there's no page to
+smoke-test) - correctness was verified by hand as described above, the same
+way the original PDF generation script's correctness has always been spot
+checked rather than unit tested.
+
+**Left for a future pass:**
+- The manifest is a plain JSON file, not enforced by any schema/type - if
+  `PDF_SOURCES` in `check-pdf-freshness.mjs` and `PAGES[].sources` in
+  `generate-pdfs.mjs` ever drift apart by hand-editing only one of them, the
+  check could pass or fail incorrectly. They're small and rarely touched
+  (new competition pages are the only thing that changes them), so a shared
+  constants module felt like premature abstraction for two four-line lists,
+  but a future run adding a seventh competition/award page should double
+  check both stay in sync.
+- Source-link liveness and Ballon d'Or ceremony-date sourcing remain as
+  noted in the entry above - no change this run.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

@@ -1,0 +1,22 @@
+{
+  "world-cup": {
+    "fifa-world-cup.md": "9802f314f2eb2ef9fb7e43f3b5d2c1ebdc3206ac1cc7105a50d6281f0a780d51",
+    "golden-boot.md": "0173cf059516b90251480b1f6d9010851b107475d5356c72386a6a33b08c1e13"
+  },
+  "euro": {
+    "uefa-euro.md": "31f6c6115cf12998193bf528912902ebf9ea9f5c10efcc4316cab2b0baa377ef",
+    "golden-boot.md": "0173cf059516b90251480b1f6d9010851b107475d5356c72386a6a33b08c1e13"
+  },
+  "nations-league": {
+    "uefa-nations-league.md": "b82bf844b1e08dcdbb098d8fb09499363e046329f5153d89bde0c36d54abdf73"
+  },
+  "copa-america": {
+    "copa-america.md": "506617144a5191a859ccceccb40227b20118c4d13606895221d93a4985094d6e"
+  },
+  "ballon-dor": {
+    "ballon-dor.md": "92d83c8af7314a5688855cddd99805f87a247f016073d06e514ff111c6de1a32"
+  },
+  "golden-boot": {
+    "golden-boot.md": "0173cf059516b90251480b1f6d9010851b107475d5356c72386a6a33b08c1e13"
+  }
+}
