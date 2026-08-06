@@ -1810,4 +1810,35 @@ test.describe('Required-page redirects (/awards/... -> /competitions/...)', () =
     );
     expect(body).toContain('<meta name="robots" content="noindex">');
   });
+
+  // Croatian equivalents, added 2026-08-06 (intensive run): the English
+  // /awards/... redirects existed but /hr/awards/... did not, so a Croatian
+  // reader following the same convention had no fallback.
+  test('/hr/awards/ballon-dor redirects to the real Croatian Ballon d\'Or page', async ({
+    page,
+  }) => {
+    await page.goto('hr/awards/ballon-dor');
+    await page.waitForURL(/\/hr\/competitions\/ballon-dor\/?$/);
+    await expect(page.locator('h1')).toHaveText('Zlatna lopta');
+  });
+
+  test('/hr/awards/golden-boot redirects to the real Croatian Golden Boot page', async ({
+    page,
+  }) => {
+    await page.goto('hr/awards/golden-boot');
+    await page.waitForURL(/\/hr\/competitions\/golden-boot\/?$/);
+    await expect(page.locator('h1')).toHaveText('Zlatna kopačka');
+  });
+
+  test('the Croatian redirect page targets the base-path-prefixed Croatian destination', async ({
+    page,
+  }) => {
+    const response = await page.request.get('/football-reference/hr/awards/ballon-dor/');
+    expect(response.ok()).toBe(true);
+    const body = await response.text();
+    expect(body).toContain(
+      '<meta http-equiv="refresh" content="0;url=/football-reference/hr/competitions/ballon-dor">',
+    );
+    expect(body).toContain('<meta name="robots" content="noindex">');
+  });
 });

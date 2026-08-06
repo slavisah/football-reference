@@ -28,5 +28,11 @@ export default defineConfig({
   redirects: {
     '/awards/ballon-dor': `${base}/competitions/ballon-dor`,
     '/awards/golden-boot': `${base}/competitions/golden-boot`,
+    // Croatian equivalents: docs/WEBSITE_REQUIREMENTS.md's "Required pages"
+    // list predates localization and only lists the English paths, but a
+    // Croatian reader following the same /awards/... convention (e.g. from
+    // an old link) deserves the same redirect their English counterpart gets.
+    '/hr/awards/ballon-dor': `${base}/hr/competitions/ballon-dor`,
+    '/hr/awards/golden-boot': `${base}/hr/competitions/golden-boot`,
   },
 });
