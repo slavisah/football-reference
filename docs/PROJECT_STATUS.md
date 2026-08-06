@@ -2664,6 +2664,66 @@ Playwright suite (207/207).
   believed closed pending any newly written component introducing a new
   `content:` rule in future.
 
+### Accessibility: `/compare`'s head-to-head panel updated silently for screen-reader users
+
+Added 2026-08-06 (intensive run, later slice). Continues the same "sweep
+interactive client-JS states the main axe pass never reaches" series as the
+two quiz-state entries and the mobile table-label entry above - this time
+against `/compare`, the one other page on the site whose client script
+rewrites page content in place after load (`src/pages/compare.astro` and
+`src/pages/hr/compare.astro`).
+
+- Picking a different team in the "Team A"/"Team B" `<select>`s, or clicking
+  "Swap", rewrites the head-to-head panel's `<h3>` name and every stat cell
+  via `textContent` - but nothing in either page announced that change to a
+  screen-reader user. A sighted user sees the new numbers appear instantly;
+  a keyboard/screen-reader user's focus stays on the `<select>` they just
+  changed, so without an `aria-live` region there was no way to know the
+  panel below had actually updated - the exact same silent-DOM-update shape
+  that motivated the quiz interactive-state fixes two entries above, just on
+  a page that series hadn't reached yet.
+- **Fix:** both pages gain a `role="status" aria-live="polite"` paragraph
+  (`#compare-status`, visually hidden - the panel's own heading already
+  shows the same information visually, so a duplicate visible line would
+  just be redundant noise for sighted users) that announces
+  "Comparing {A} vs {B}." (English) / "Usporedba: {A} protiv {B}." (Croatian)
+  whenever `render()` runs - on team reselection, on Swap, and on the
+  initial URL-param restore. Mirrors the exact pattern
+  `TournamentTable.astro`'s existing `#…-status` filter region already uses
+  in production: a server-rendered initial value plus an unconditional
+  `textContent` update inside the same function that already redraws the
+  rest of the state, driven by a `data-template` attribute (`{a}`/`{b}`
+  placeholders) so the client script - which is `is:inline` and can't
+  `import t()` - still gets the correctly localized wording per page,
+  the same data-attribute trick `ThemeToggle.astro` and `TournamentTable`
+  already use for their own client-only strings.
+- New `tests/e2e/accessibility-compare-states.spec.ts` (8 new Playwright
+  cases: English/Croatian x light/dark, re-selecting Team A and clicking
+  Swap) runs the same WCAG 2.1 A/AA axe sweep the quiz-states file runs
+  against each resulting DOM state, plus a functional assertion that
+  `#compare-status`'s text actually changes and the visible heading matches
+  the newly selected team - so a future regression that silently breaks the
+  live-region update (or the swap/reselect logic itself) fails a real
+  assertion, not just an unchanged axe pass.
+- Verified with `pnpm lint` (0 errors/0 warnings, same pre-existing hint),
+  the full Vitest suite (152/152, unchanged - no library code changed), and
+  the full Playwright suite (215/215, up from 207).
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in earlier slices
+  still rest on single-source research.
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  infeasible in this environment (WebFetch 403s on every host tried), per
+  prior runs' notes.
+- A second independent cross-check of the Champion/Runner-up/Final-score
+  tables (closed on their first pass for all four team competitions) remains
+  open as a "belt and suspenders" idea.
+- The interactive-state accessibility angle (quiz, mobile table labels, and
+  now `/compare`) has now covered every page on the site with a client
+  script that rewrites content after load - a future pass should look for a
+  different quality angle (e.g. the second cross-check above) rather than
+  assuming there's a third page in this specific series.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
