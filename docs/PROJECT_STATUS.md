@@ -2443,6 +2443,456 @@ result columns against outside sources.
   or another concrete content/quality gap - rather than assuming there is
   nothing left to verify.
 
+### Accessibility: quiz interactive-state coverage, plus a real sticky-header bug it found
+
+Added 2026-08-05 (intensive run). Closes the specific gap the previous entry's
+"Left for a future pass" note named: the main axe sweep
+(`tests/e2e/accessibility.spec.ts`) only ever visits each `NAV_LINKS` page in
+its untouched initial DOM state, so it never audited the quiz page's
+interactive states - answered choices (`is-correct`/`is-incorrect` classes,
+the `aria-live` feedback text, disabled radios), the order-challenge's own
+answered state, the expanded "just show me the answer" `<details>`, or the
+post-restart state.
+
+**New test file:** `tests/e2e/accessibility-quiz-states.spec.ts` drives the
+quiz to two additional DOM states - "answered" (every choice card and order
+card answered with a deliberate mix of correct/incorrect picks, every reveal
+expanded) and "restarted-after-answering" - and runs the same axe WCAG
+2.1 A/AA sweep as the main file against each, for both languages and both
+color schemes (8 new tests). Each state assertion includes a sanity check
+(e.g. an `is-incorrect` choice is actually visible) so a future markup
+change that silently breaks the quiz script can't pass vacuously by auditing
+a page that never actually reached the state its test name claims.
+
+**Real bug found and fixed while building this.** Driving the "answered"
+state (which requires scrolling through all ~20+ quiz cards) surfaced a
+genuine, previously-undetected defect, not a test artifact: `.quiz__score`'s
+sticky score/restart bar used a hardcoded `top: 3.6rem`, sized for a
+single-line nav header. But `Nav.astro`'s eleven links plus the theme toggle
+(and, on translated pages, the language switch) don't fit on one line even
+at the page's own `--maxw` container width - the header actually wraps to
+2-6 lines depending on viewport and locale, with a real height anywhere from
+~188px (desktop) to ~300-700px (phone widths). Since the sticky header has a
+higher z-index than the sticky score bar, once both are "stuck" during a
+scroll, the header visually and functionally covers the *entire* score bar -
+including the restart button - on effectively every viewport width tested
+(360px, 1280px, 1920px), confirmed with `elementFromPoint` and a screenshot
+before the fix (see this run's browser session). A mouse user could not
+click "Restart quiz" at all once scrolled past the first question.
+
+**Fix:** `Nav.astro` now measures its own real height with a `ResizeObserver`
+(falling back to a `resize` listener) and exposes it as `--site-header-height`
+on the document root; `quiz.astro`/`hr/quiz.astro`'s `.quiz__score` reads
+`top: var(--site-header-height, 3.6rem)` instead of the hardcoded value
+(3.6rem kept only as the no-JS fallback). The same wrap also meant
+`scroll-into-view` targets (keyboard focus, anchor links, Playwright's own
+actionability auto-scroll) could land underneath the sticky header
+site-wide, not just on the quiz page - fixed generally by adding
+`scroll-padding-top: var(--site-header-height, 3.6rem)` to `html` in
+`global.css`. The quiz page has a *second* sticky bar stacked below the
+header, so it additionally needs `--quiz-score-height` (set by
+`QuizScript.astro` once the bar is shown) added into its own
+`scroll-padding-top` via a small `<style is:global>` block scoped to
+`html:has(#quiz-score)`.
+
+Verified with `pnpm lint` (0 errors/0 warnings, same pre-existing hint as
+every prior run), the full Vitest suite (152/152, unchanged), and the full
+Playwright suite, now 207/207 (199 previous + 8 new) - confirmed passing
+only after killing two stale `astro preview` processes left over from this
+run's own manual browser reproduction, which Playwright's
+`reuseExistingServer` option had silently reused instead of rebuilding
+against; a future run hitting inexplicably-stale Playwright results should
+check `ps aux` for a leftover preview server before assuming the code is
+wrong.
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in earlier slices
+  still rest on single-source research.
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  infeasible in this environment (WebFetch 403s on every host tried), per
+  prior runs' notes.
+- A second independent cross-check of the Champion/Runner-up/Final-score
+  tables (closed on their first pass for all four team competitions) remains
+  open as a "belt and suspenders" idea, per the previous entry's note.
+- This run's fix was scoped to the one sticky-stacking bug the new quiz
+  tests actually surfaced; a broader sweep for other sticky/z-index
+  interactions elsewhere on the site (there don't appear to be any today -
+  `TournamentTable.astro`'s sticky table header is the only other `position:
+  sticky` user, and it's `top: 0` inside its own scroll container, not
+  stacked under the site header) has not been done and would need a reason
+  to suspect one exists before spending time on it.
+
+### Accessibility: quiz answer-state color contrast, use-of-color, and a hidden localization gap
+
+Added 2026-08-05 (intensive run). The previous entry's new
+`tests/e2e/accessibility-quiz-states.spec.ts` sweep already ran axe against
+the quiz's answered state and passed 8/8 - but a manual WCAG contrast
+calculation on the "wrong answer" styling (`is-incorrect`, hardcoded
+`#c0392b`) found two real failures axe's automated color-contrast rule never
+flagged: axe's rule operates on real DOM text nodes and this indicator's
+"✓ correct" / "✗ your answer" wording lived entirely in CSS `::after`
+generated content, which axe-core (like most screen readers) does not
+reliably read - so the check never ran against it at all, on any page state,
+in either commit. Confirmed by hand: `#c0392b` as text against its own
+16%-mixed background tint measures ~4.27:1 in light mode (just under the
+4.5:1 AA minimum for normal-weight text) and ~2.65:1 in dark mode (a major
+failure, not a marginal one - the mixed-in dark background pulls luminance
+down further than the light theme's white-based one does).
+
+**Fixed in three parts, all in `QuizCard.astro`, `QuizOrderCard.astro`,
+`QuizScript.astro`, `src/lib/i18n.ts`, and `global.css`:**
+
+1. **Real DOM text instead of CSS-generated content.** Both
+   `is-correct`/`is-incorrect` indicators now render as an actual
+   `<span class="quiz-card__result-badge">`, populated by
+   `QuizScript.astro` when a question is checked (and cleared on restart) -
+   not just for contrast-checkability, but because generated content isn't
+   part of the accessible name/description of an element in every
+   AT/browser combination, so relying on it to convey "correct"/"incorrect"
+   was itself a fragile pattern independent of the color issue.
+2. **A theme-tuned `--danger` token.** `global.css` gained `--danger:
+   #b3261e` (light) / `#ff7b72` (dark) alongside the existing `--accent`
+   pair, replacing every hardcoded `#c0392b`. Both new values were chosen by
+   computing the same "danger color as text over its own 16%-mixed
+   background" contrast the bug used and confirming ≥4.5:1 in both themes
+   (light ≈5.0:1, dark ≈4.95:1) - documented inline in `global.css` so a
+   future edit doesn't casually swap in a prettier-looking red that fails
+   again.
+3. **Use-of-color fix on the order-challenge cards (WCAG 1.4.1), found
+   along the way.** `QuizOrderCard.astro`'s `is-correct`/`is-incorrect`
+   items had no text equivalent at all before this run - only a
+   border/background color change - unlike the multiple-choice cards, which
+   at least had (contrast-failing) `::after` text. They now get the same
+   real-DOM result badge as the choice cards.
+4. **Incidental localization fix.** The multiple-choice `::after` text was
+   hardcoded English ("✓ correct" / "✗ your answer") in component-scoped
+   CSS, so it rendered in English even on `/hr/quiz` despite every other
+   piece of quiz chrome being translated. Moving to real DOM text populated
+   from new `quizAnswerCorrectLabel` / `quizAnswerIncorrectLabel` /
+   `quizOrderResultCorrectLabel` / `quizOrderResultIncorrectLabel` keys in
+   `src/lib/i18n.ts` (English and Croatian) fixed this as a side effect of
+   the accessibility fix, not a separate change.
+
+No new test file was needed - `accessibility-quiz-states.spec.ts`'s existing
+8 tests already assert an `is-correct` and an `is-incorrect` element are
+visible in the answered state and run the full axe sweep (which includes
+`color-contrast`) against it; they now exercise real text nodes instead of
+generated content, so this is the first time that assertion has actually
+been meaningful. Verified with `pnpm lint` (0 errors/0 warnings, same
+pre-existing hint), the full Vitest suite (152/152, unchanged), and the
+full Playwright suite (207/207, unchanged pass count - this was a fix to
+what the suite was checking, not new coverage).
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in earlier slices
+  still rest on single-source research.
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  infeasible in this environment (WebFetch 403s on every host tried), per
+  prior runs' notes.
+- A second independent cross-check of the Champion/Runner-up/Final-score
+  tables (closed on their first pass for all four team competitions) remains
+  open as a "belt and suspenders" idea.
+- This run's discovery process (hand-computing contrast for a color axe
+  couldn't check) suggests it may be worth a future pass specifically
+  auditing the site for other meaningful `::before`/`::after` generated
+  content that neither axe nor a screen reader would reliably surface - a
+  quick grep of `content:` declarations across `src/**/*.astro` found only
+  this one non-decorative case, but that grep was not exhaustive of every
+  component's scoped `<style>` block.
+
+### Accessibility: mobile-card column labels weren't reliably exposed to assistive tech
+
+Added 2026-08-06 (intensive run). Follows up on the previous entry's own
+"Left for a future pass" note by doing the fuller `content:` grep it flagged
+as not-yet-exhaustive. It found exactly one more non-decorative case, and a
+much higher-blast-radius one: `TournamentTable.astro`'s responsive mobile
+card layout (`@media (max-width: 40rem)`, i.e. every phone-width visitor)
+labels each value with its column name (Year, Winner, Host, Teams, etc.)
+purely via `.t-table td::before { content: attr(data-label); }`. This is the
+exact same category of bug as the quiz "wrong answer" indicator fixed two
+entries above - CSS generated content isn't reliably exposed to assistive
+tech - except `TournamentTable` is the single most shared component in the
+codebase (every one of the six competition/award pages, in both English and
+Croatian, all render their entire results table through it on mobile). A
+screen reader user on a phone hitting any tournament table would have heard
+only the raw values row by row ("1930", "Uruguay", "Argentina", "4-2") with
+no reliable way to tell which value was the year, the winner, or the score -
+the mobile-card layout's whole reason for existing (labeling values once the
+table no longer visually reads left-to-right by column) silently didn't
+reach assistive tech at all. Confirmed the failure mode by hand: Chromium's
+accessibility tree (inspected via CDP) omits `::before`/`::after` generated
+text from any accessible-name/description computation for a plain `<td>`,
+matching the same root cause already written up for the quiz bug.
+
+**Fix:** each `<td>` in `TournamentTable.astro` now also carries a real
+`aria-label` (e.g. `aria-label="Winner: Uruguay"`), built server-side from
+the exact same `data-label`/value pair the CSS `::before` already displays
+visually - so the visible mobile-card styling is completely unchanged (the
+`::before` rule stays, now commented as visual-only) while assistive tech
+gets a reliable, always-present accessible name regardless of viewport,
+browser, or whether that browser happens to expose generated content. This
+covers both the per-column table cells and the joined-in Golden Boot
+"Top scorer" `extraColumn` cell on the World Cup/EURO pages. Deliberately
+not scoped to the mobile media query - the label is harmless, mildly
+reinforcing context at desktop widths too, and CSS can't conditionally add
+or remove an ARIA attribute by viewport anyway.
+
+No new test file was needed: the existing full Playwright suite (207 tests,
+unchanged pass count) already exercises `TournamentTable` on every page
+including the WCAG 2.1 A/AA axe sweep, and none of the existing
+`td[data-label="..."]` assertions (`tests/e2e/mobile.spec.ts`) check
+`aria-label`, so they were unaffected by adding it - `toHaveText`/
+`toContainText` read visible text content, not the accessible name. Verified
+with `pnpm lint` (0 errors/0 warnings, same pre-existing hint), the full
+Vitest suite (152/152, unchanged - no library code changed), and the full
+Playwright suite (207/207).
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in earlier slices
+  still rest on single-source research.
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  infeasible in this environment (WebFetch 403s on every host tried), per
+  prior runs' notes.
+- A second independent cross-check of the Champion/Runner-up/Final-score
+  tables (closed on their first pass for all four team competitions) remains
+  open as a "belt and suspenders" idea.
+- The `content:` grep run for this entry is now exhaustive across
+  `src/**/*.astro` (all `<style>` blocks, scoped and global) and found no
+  further non-decorative generated-content cases - the two found across
+  both entries in this series (quiz's correct/incorrect indicator, and this
+  table column label) both had real fixes shipped, so this specific angle is
+  believed closed pending any newly written component introducing a new
+  `content:` rule in future.
+
+### Accessibility: `/compare`'s head-to-head panel updated silently for screen-reader users
+
+Added 2026-08-06 (intensive run, later slice). Continues the same "sweep
+interactive client-JS states the main axe pass never reaches" series as the
+two quiz-state entries and the mobile table-label entry above - this time
+against `/compare`, the one other page on the site whose client script
+rewrites page content in place after load (`src/pages/compare.astro` and
+`src/pages/hr/compare.astro`).
+
+- Picking a different team in the "Team A"/"Team B" `<select>`s, or clicking
+  "Swap", rewrites the head-to-head panel's `<h3>` name and every stat cell
+  via `textContent` - but nothing in either page announced that change to a
+  screen-reader user. A sighted user sees the new numbers appear instantly;
+  a keyboard/screen-reader user's focus stays on the `<select>` they just
+  changed, so without an `aria-live` region there was no way to know the
+  panel below had actually updated - the exact same silent-DOM-update shape
+  that motivated the quiz interactive-state fixes two entries above, just on
+  a page that series hadn't reached yet.
+- **Fix:** both pages gain a `role="status" aria-live="polite"` paragraph
+  (`#compare-status`, visually hidden - the panel's own heading already
+  shows the same information visually, so a duplicate visible line would
+  just be redundant noise for sighted users) that announces
+  "Comparing {A} vs {B}." (English) / "Usporedba: {A} protiv {B}." (Croatian)
+  whenever `render()` runs - on team reselection, on Swap, and on the
+  initial URL-param restore. Mirrors the exact pattern
+  `TournamentTable.astro`'s existing `#…-status` filter region already uses
+  in production: a server-rendered initial value plus an unconditional
+  `textContent` update inside the same function that already redraws the
+  rest of the state, driven by a `data-template` attribute (`{a}`/`{b}`
+  placeholders) so the client script - which is `is:inline` and can't
+  `import t()` - still gets the correctly localized wording per page,
+  the same data-attribute trick `ThemeToggle.astro` and `TournamentTable`
+  already use for their own client-only strings.
+- New `tests/e2e/accessibility-compare-states.spec.ts` (8 new Playwright
+  cases: English/Croatian x light/dark, re-selecting Team A and clicking
+  Swap) runs the same WCAG 2.1 A/AA axe sweep the quiz-states file runs
+  against each resulting DOM state, plus a functional assertion that
+  `#compare-status`'s text actually changes and the visible heading matches
+  the newly selected team - so a future regression that silently breaks the
+  live-region update (or the swap/reselect logic itself) fails a real
+  assertion, not just an unchanged axe pass.
+- Verified with `pnpm lint` (0 errors/0 warnings, same pre-existing hint),
+  the full Vitest suite (152/152, unchanged - no library code changed), and
+  the full Playwright suite (215/215, up from 207).
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in earlier slices
+  still rest on single-source research.
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  infeasible in this environment (WebFetch 403s on every host tried), per
+  prior runs' notes.
+- A second independent cross-check of the Champion/Runner-up/Final-score
+  tables (closed on their first pass for all four team competitions) remains
+  open as a "belt and suspenders" idea.
+- The interactive-state accessibility angle (quiz, mobile table labels, and
+  now `/compare`) has now covered every page on the site with a client
+  script that rewrites content after load - a future pass should look for a
+  different quality angle (e.g. the second cross-check above) rather than
+  assuming there's a third page in this specific series.
+
+### Bug fix: the primary nav (and the offline cache) silently dropped Croatian readers back into English
+
+Added 2026-08-06 (intensive run). Every backlog item and nice-to-have from
+`docs/WEBSITE_REQUIREMENTS.md`/`AGENTS.md` was already complete going into
+this run (per the previous entry's own note), so this is the "genuinely
+useful quality pass" fallback - a real, previously-undetected bug, found by
+re-reading `src/components/Nav.astro` and `src/lib/offlineCache.ts` end to
+end rather than assuming the localization rollout (11 nav pages, both
+languages, per earlier entries) was airtight just because every individual
+page had been translated.
+
+**The bug:** `Nav.astro` built every primary nav link - and the logo/brand
+link - from `NAV_LINKS` (`src/lib/routes.ts`) using each link's plain
+English `path`, with no branch on the `locale` prop it already receives.
+`src/lib/i18n.ts`'s `TRANSLATED_PATHS` (the same map the sitemap and every
+page's language-switcher link already use) was never consulted here. The
+practical effect: a reader on any of the ten Croatian pages
+(`/hr/competitions/world-cup`, `/hr/quiz`, `/hr/records`, ...) saw the page
+itself correctly in Croatian, but clicking *any* nav item other than the
+explicit "English"/"Hrvatski" language switch - including the site logo -
+silently took them back to the English version of that section. A Croatian
+reader could never actually browse the site in Croatian past the first page
+they landed on. This is the same class of bug as the earlier sticky-header
+and generated-content accessibility fixes in this file: a real, user-facing
+defect that every per-page Playwright test missed because each test only
+ever visits one Croatian page directly by URL and never clicks through the
+nav to a second one.
+The offline service worker (`src/pages/sw.js.ts`, built from
+`buildPrecacheUrls()` in `src/lib/offlineCache.ts`) had the matching gap:
+`buildPrecacheUrls()` only ever read `NAV_LINKS`' English paths, so none of
+the ten Croatian pages were precached on install - a Croatian reader got no
+"already works offline" guarantee at all unless they had individually
+visited each hr page online first - and the navigate handler's offline
+fallback was hardcoded to `precacheUrls[0]` (the English home page), so an
+offline Croatian reader hitting an uncached URL was bounced to an English
+page even when a perfectly good cached Croatian home page existed.
+
+**Fix, three parts:**
+1. **`src/lib/routes.ts`**: `NavLink` gained a `labelHr` field, one short
+   Croatian nav label per entry, reusing exactly the display names already
+   established elsewhere (`src/lib/homeCards.ts`'s `CARD_TEXT` for the six
+   competitions/awards, e.g. "Zlatna lopta", "Liga nacija"; each hr page's
+   own heading for the rest, shortened the same way the English label is
+   already a short form of the full page title, e.g. "Rekordi", "Kviz",
+   "Izvori", "Usporedba", "Početna" for Home) - not new wording invented for
+   this fix.
+2. **`src/components/Nav.astro`**: the nav-link list and the brand/logo href
+   now branch on `locale`, mapping each `NAV_LINKS` path through
+   `TRANSLATED_PATHS` (and label through `labelHr`) when `locale === 'hr'` -
+   the exact same source of truth the sitemap and the language switcher
+   already trusted, so this can't drift out of sync with either. English
+   pages render byte-identical nav markup to before this fix (verified via
+   the build output).
+3. **`src/lib/offlineCache.ts`**/**`src/pages/sw.js.ts`**: `buildPrecacheUrls()`
+   now emits both language's URL for every `NAV_LINKS` path (28 precached
+   URLs total, up from 17), and the generated service worker's offline
+   navigate-fallback picks between a Croatian and an English cached home URL
+   based on whether the failed request's own path falls under `/hr/`,
+   instead of always falling back to English. `withBasePath()` was extracted
+   as its own exported helper (previously an unexported closure inside
+   `buildPrecacheUrls`) so `sw.js.ts` can derive the Croatian home URL
+   without re-deriving the same base-path logic twice. `CACHE_VERSION`
+   bumped to `v2` so returning visitors' browsers evict the old
+   English-only precache instead of keeping it forever.
+
+**Tests:** 2 new Vitest cases in `tests/unit/routes.test.ts` (every
+`labelHr` is non-empty and unique), 3 new cases in
+`tests/unit/offlineCache.test.ts` (every Croatian nav page is precached,
+every `NAV_LINKS` path has a `TRANSLATED_PATHS` entry, and the new
+`withBasePath` export - the doubled-precache-count assertion updates an
+existing case rather than adding a new one), and 4 new Playwright cases in
+`tests/e2e/mobile.spec.ts`: a "Primary nav stays in the current language"
+block asserting every nav href (English and Croatian) matches its own
+language and that clicking a translated nav item actually lands on and
+stays on the Croatian equivalent page; and two additions to the existing
+"Installability and offline reading" block - an hr page that was never
+individually visited still renders offline (proves the precache fix) and an
+uncached hr URL falls back to the cached Croatian home page rather than the
+English one (proves the fallback fix). Verified with `pnpm lint` (0
+errors/0 warnings, same pre-existing hint as every prior run), the full
+Vitest suite (157/157, up from 152), and the full Playwright suite
+(219/219, up from 215).
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in earlier slices
+  were already re-confirmed with a genuine second source as of the
+  2026-08-04 slice - this repeated note across several earlier entries in
+  this file was stale by the time it was last copied forward; there is no
+  known open ceremony-date sourcing gap today.
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  infeasible in this environment (WebFetch 403s on every host tried), per
+  prior runs' notes.
+- A second independent cross-check of the Champion/Runner-up/Final-score
+  tables (closed on their first pass for all four team competitions) remains
+  open as a "belt and suspenders" idea.
+- This fix closes the specific "nav points to the wrong language" bug found
+  by re-reading the shared chrome components; a future pass could do the
+  same close read of another still-unaudited shared component (e.g.
+  `ThemeToggle.astro`, `PrintDownloadLink.astro`) rather than assuming this
+  was the only one, though a quick check while fixing this one found no
+  equivalent path/label mismatch in either.
+
+### Accessibility/localization: champions-bar's screen-reader label was English on every Croatian page
+
+Added 2026-08-06 (intensive run). Continues the "close read of another
+still-unaudited shared component" idea the previous entry's own "Left for a
+future pass" note suggested, this time against `ChampionsSummary.astro` - the
+component behind every "Champions by titles" / "Most awards" ranking on the
+site (every one of the six competition/award pages, `/records`, in both
+languages).
+
+**The bug:** each ranking bar's `role="img"` `aria-label` was built as a
+template literal with a hardcoded English word - `` `${champion.titles} of
+${max}` `` - with no branch on locale and no overridable prop, unlike every
+other piece of copy in this component (`heading`, `description`, `unit`,
+`winningYearsLabel` are all already overridable, and every Croatian page that
+renders this component already overrides them with Croatian text). The
+practical effect: a screen-reader user on any of the nine `ChampionsSummary`
+instances across the seven Croatian pages
+(`/hr/records` x2, and all six `/hr/competitions/*`) heard an English
+fragment - e.g. "5 of 23" - stitched into an otherwise fully Croatian
+ranking list, the same "one hardcoded English string slipped through a
+component whose other strings were all translated" shape as the primary-nav
+bug fixed earlier today, just in a different component.
+
+**Fix:** `ChampionsSummary.astro` gained an optional `ofLabel` prop (default
+`'of'`, so every English page - `CompetitionView`-driven pages and the
+English `/records` page - renders byte-identical output). A new
+`championsBarOfLabel` key was added to `src/lib/i18n.ts`'s `UI_STRINGS`
+(`'of'`/`'od'`) for consistency with the dictionary, though the nine Croatian
+call sites pass the literal `ofLabel="od"` directly, matching the existing
+convention every one of them already uses for `winningYearsLabel` and the
+`description`/`heading` text (hand-written Croatian strings inline in the
+page, not routed through `t()`, since these pages compose their own layout
+by hand rather than importing the shared dictionary for per-instance props).
+
+**Tests:** 1 new Vitest case (`tests/unit/i18n.test.ts`, asserting
+`championsBarOfLabel` is `'of'`/`'od'` and differs per locale) and 1 new
+Playwright case in the existing Croatian records-page describe block
+(`tests/e2e/mobile.spec.ts`: asserts a champions-bar `aria-label` matches
+`/^\d+ od \d+$/` and never contains the English `" of "`) - covers the
+shared component, so the fix is verified once rather than once per page it
+appears on, matching how the earlier `TournamentTable` mobile-label fix was
+tested. Verified with `pnpm lint` (0 errors/0 warnings, same pre-existing
+hint as every prior run), the full Vitest suite (158/158, up from 157), and
+the full Playwright suite (220/220, up from 219). Also spot-checked the
+built `dist/hr/records/index.html` and every `dist/hr/competitions/*`
+directly: no remaining `aria-label="… of …"` fragment anywhere under `dist/hr/`.
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in earlier slices
+  were already re-confirmed with a genuine second source as of the
+  2026-08-04 slice - no known open ceremony-date sourcing gap today.
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  infeasible in this environment (WebFetch 403s on every host tried), per
+  prior runs' notes.
+- A second independent cross-check of the Champion/Runner-up/Final-score
+  tables (closed on their first pass for all four team competitions) remains
+  open as a "belt and suspenders" idea.
+- The "close read of an unaudited shared component" angle has now found and
+  fixed two real bugs in two different components today (`Nav.astro`/
+  `offlineCache.ts`'s locale-blind nav links, and now `ChampionsSummary`'s
+  hardcoded English bar label) - a future pass could do the same close read
+  of the remaining shared components not yet covered by name in this file
+  (`CompetitionView.astro`, `PrintDownloadLink.astro` was already checked
+  and found clean, `QuizCard.astro`/`QuizOrderCard.astro`/`QuizScript.astro`
+  already went through the dedicated quiz-localization pass) rather than
+  assuming this specific bug class is now fully closed.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

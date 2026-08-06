@@ -214,13 +214,17 @@ const defaultSort = defaultSortValue(sortOptions);
               {edition.cells.map((cell, index) => (
                 <td
                   data-label={headerLabels[cell.label] ?? cell.label}
+                  aria-label={`${headerLabels[cell.label] ?? cell.label}: ${cell.value}`}
                   class={index === winnerColIndex ? 'is-winner' : undefined}
                 >
                   {index === formatColIndex ? <span class="badge">{cell.value}</span> : cell.value}
                 </td>
               ))}
               {extraColumn && (
-                <td data-label={extraColumn.label}>
+                <td
+                  data-label={extraColumn.label}
+                  aria-label={`${extraColumn.label}: ${extraColumn.values.get(edition.year) ?? '—'}`}
+                >
                   {extraColumn.values.get(edition.year) ?? '—'}
                 </td>
               )}
@@ -411,6 +415,9 @@ const defaultSort = defaultSortValue(sortOptions);
       border-bottom: none;
     }
 
+    /* Visual-only: CSS generated content isn't reliably exposed to assistive
+       tech, so the `aria-label` on each <td> above is the real accessible
+       label - this ::before is just how sighted mobile-card users see it. */
     .t-table td::before {
       content: attr(data-label);
       font-weight: 600;

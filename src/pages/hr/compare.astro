@@ -148,6 +148,16 @@ const recordsForClient = allRecords.map((r) => ({
         </div>
       </div>
 
+      <p
+        id="compare-status"
+        class="visually-hidden"
+        role="status"
+        aria-live="polite"
+        data-template="Usporedba: {a} protiv {b}."
+      >
+        {`Usporedba: ${defaultA.displayName} protiv ${defaultB.displayName}.`}
+      </p>
+
       <div class="compare__panel">
         {
           (['a', 'b'] as const).map((side) => {
@@ -409,6 +419,8 @@ const recordsForClient = allRecords.map((r) => ({
   const selectA = document.getElementById('compare-a');
   const selectB = document.getElementById('compare-b');
   const swapBtn = document.getElementById('compare-swap');
+  const status = document.getElementById('compare-status');
+  const statusTemplate = status?.dataset.template ?? '{a} vs {b}';
   const byId = new Map(records.map((r) => [r.id, r]));
 
   function setCell(row, field, value) {
@@ -456,6 +468,11 @@ const recordsForClient = allRecords.map((r) => ({
     const b = byId.get(selectB.value);
     if (a) fillSide('a', a);
     if (b) fillSide('b', b);
+    if (status && a && b) {
+      status.textContent = statusTemplate
+        .replace('{a}', a.displayName)
+        .replace('{b}', b.displayName);
+    }
     writeParams(selectA.value, selectB.value);
   }
 
