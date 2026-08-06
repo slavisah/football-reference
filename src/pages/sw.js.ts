@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
-import { buildPrecacheUrls } from '../lib/offlineCache';
+import { buildPrecacheUrls, withBasePath } from '../lib/offlineCache';
+import { TRANSLATED_PATHS } from '../lib/i18n';
 
 export const prerender = true;
 
@@ -7,7 +8,7 @@ export const prerender = true;
 // activate handler evicts the old cache instead of leaving stale pages
 // behind forever. Plain string, not a build timestamp, so rebuilds without
 // a real change don't force every visitor to re-download everything.
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 
 // A tiny offline-reading service worker, generated at build time so it can
 // bake in the real BASE_PATH (see astro.config.mjs) and the current nav
@@ -15,20 +16,34 @@ const CACHE_VERSION = 'v1';
 //
 // Strategy: HTML navigations are network-first (so a visitor with a
 // connection always sees the latest content) falling back to the cache,
-// then the cached home page, when offline. Everything else (CSS, images,
-// the manifest) is cache-first, filled in as pages are visited, so a
-// reader who has opened a page once can reopen it offline later.
+// then the cached home page for that same language, when offline.
+// Everything else (CSS, images, the manifest) is cache-first, filled in as
+// pages are visited, so a reader who has opened a page once can reopen it
+// offline later.
 export const GET: APIRoute = () => {
   const precacheUrls = buildPrecacheUrls(import.meta.env.BASE_URL);
   // The home page is always the first precached URL (see buildPrecacheUrls) -
   // reuse it rather than re-deriving it, so this can never drift out of sync
   // with what actually got cached under this exact base path.
-  const homeUrl = precacheUrls[0];
+  const homeUrlEn = precacheUrls[0];
+  const homeUrlHr = withBasePath(import.meta.env.BASE_URL, TRANSLATED_PATHS['/']);
+  // The Croatian home URL's own path, minus its trailing slash, e.g.
+  // "/football-reference/hr" - a prefix match against this tells a
+  // navigation request's URL apart from an English one, so the offline
+  // fallback below lands a Croatian reader back on the Croatian home page
+  // instead of silently switching them to English.
+  const hrPrefix = homeUrlHr.replace(/\/$/, '');
 
   const script = `// Generated at build time from src/pages/sw.js.ts - do not edit by hand.
 const CACHE_NAME = 'football-reference-${CACHE_VERSION}';
 const PRECACHE_URLS = ${JSON.stringify(precacheUrls)};
-const HOME_URL = ${JSON.stringify(homeUrl)};
+const HOME_URL_EN = ${JSON.stringify(homeUrlEn)};
+const HOME_URL_HR = ${JSON.stringify(homeUrlHr)};
+const HR_PREFIX = ${JSON.stringify(hrPrefix)};
+
+function homeUrlFor(pathname) {
+  return pathname === HR_PREFIX || pathname.startsWith(HR_PREFIX + '/') ? HOME_URL_HR : HOME_URL_EN;
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -63,7 +78,9 @@ self.addEventListener('fetch', (event) => {
           caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
           return response;
         })
-        .catch(() => caches.match(request).then((cached) => cached || caches.match(HOME_URL)))
+        .catch(() =>
+          caches.match(request).then((cached) => cached || caches.match(homeUrlFor(url.pathname)))
+        )
     );
     return;
   }

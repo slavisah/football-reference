@@ -2724,6 +2724,108 @@ rewrites page content in place after load (`src/pages/compare.astro` and
   different quality angle (e.g. the second cross-check above) rather than
   assuming there's a third page in this specific series.
 
+### Bug fix: the primary nav (and the offline cache) silently dropped Croatian readers back into English
+
+Added 2026-08-06 (intensive run). Every backlog item and nice-to-have from
+`docs/WEBSITE_REQUIREMENTS.md`/`AGENTS.md` was already complete going into
+this run (per the previous entry's own note), so this is the "genuinely
+useful quality pass" fallback - a real, previously-undetected bug, found by
+re-reading `src/components/Nav.astro` and `src/lib/offlineCache.ts` end to
+end rather than assuming the localization rollout (11 nav pages, both
+languages, per earlier entries) was airtight just because every individual
+page had been translated.
+
+**The bug:** `Nav.astro` built every primary nav link - and the logo/brand
+link - from `NAV_LINKS` (`src/lib/routes.ts`) using each link's plain
+English `path`, with no branch on the `locale` prop it already receives.
+`src/lib/i18n.ts`'s `TRANSLATED_PATHS` (the same map the sitemap and every
+page's language-switcher link already use) was never consulted here. The
+practical effect: a reader on any of the ten Croatian pages
+(`/hr/competitions/world-cup`, `/hr/quiz`, `/hr/records`, ...) saw the page
+itself correctly in Croatian, but clicking *any* nav item other than the
+explicit "English"/"Hrvatski" language switch - including the site logo -
+silently took them back to the English version of that section. A Croatian
+reader could never actually browse the site in Croatian past the first page
+they landed on. This is the same class of bug as the earlier sticky-header
+and generated-content accessibility fixes in this file: a real, user-facing
+defect that every per-page Playwright test missed because each test only
+ever visits one Croatian page directly by URL and never clicks through the
+nav to a second one.
+The offline service worker (`src/pages/sw.js.ts`, built from
+`buildPrecacheUrls()` in `src/lib/offlineCache.ts`) had the matching gap:
+`buildPrecacheUrls()` only ever read `NAV_LINKS`' English paths, so none of
+the ten Croatian pages were precached on install - a Croatian reader got no
+"already works offline" guarantee at all unless they had individually
+visited each hr page online first - and the navigate handler's offline
+fallback was hardcoded to `precacheUrls[0]` (the English home page), so an
+offline Croatian reader hitting an uncached URL was bounced to an English
+page even when a perfectly good cached Croatian home page existed.
+
+**Fix, three parts:**
+1. **`src/lib/routes.ts`**: `NavLink` gained a `labelHr` field, one short
+   Croatian nav label per entry, reusing exactly the display names already
+   established elsewhere (`src/lib/homeCards.ts`'s `CARD_TEXT` for the six
+   competitions/awards, e.g. "Zlatna lopta", "Liga nacija"; each hr page's
+   own heading for the rest, shortened the same way the English label is
+   already a short form of the full page title, e.g. "Rekordi", "Kviz",
+   "Izvori", "Usporedba", "Početna" for Home) - not new wording invented for
+   this fix.
+2. **`src/components/Nav.astro`**: the nav-link list and the brand/logo href
+   now branch on `locale`, mapping each `NAV_LINKS` path through
+   `TRANSLATED_PATHS` (and label through `labelHr`) when `locale === 'hr'` -
+   the exact same source of truth the sitemap and the language switcher
+   already trusted, so this can't drift out of sync with either. English
+   pages render byte-identical nav markup to before this fix (verified via
+   the build output).
+3. **`src/lib/offlineCache.ts`**/**`src/pages/sw.js.ts`**: `buildPrecacheUrls()`
+   now emits both language's URL for every `NAV_LINKS` path (28 precached
+   URLs total, up from 17), and the generated service worker's offline
+   navigate-fallback picks between a Croatian and an English cached home URL
+   based on whether the failed request's own path falls under `/hr/`,
+   instead of always falling back to English. `withBasePath()` was extracted
+   as its own exported helper (previously an unexported closure inside
+   `buildPrecacheUrls`) so `sw.js.ts` can derive the Croatian home URL
+   without re-deriving the same base-path logic twice. `CACHE_VERSION`
+   bumped to `v2` so returning visitors' browsers evict the old
+   English-only precache instead of keeping it forever.
+
+**Tests:** 2 new Vitest cases in `tests/unit/routes.test.ts` (every
+`labelHr` is non-empty and unique), 3 new cases in
+`tests/unit/offlineCache.test.ts` (every Croatian nav page is precached,
+every `NAV_LINKS` path has a `TRANSLATED_PATHS` entry, and the new
+`withBasePath` export - the doubled-precache-count assertion updates an
+existing case rather than adding a new one), and 4 new Playwright cases in
+`tests/e2e/mobile.spec.ts`: a "Primary nav stays in the current language"
+block asserting every nav href (English and Croatian) matches its own
+language and that clicking a translated nav item actually lands on and
+stays on the Croatian equivalent page; and two additions to the existing
+"Installability and offline reading" block - an hr page that was never
+individually visited still renders offline (proves the precache fix) and an
+uncached hr URL falls back to the cached Croatian home page rather than the
+English one (proves the fallback fix). Verified with `pnpm lint` (0
+errors/0 warnings, same pre-existing hint as every prior run), the full
+Vitest suite (157/157, up from 152), and the full Playwright suite
+(219/219, up from 215).
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in earlier slices
+  were already re-confirmed with a genuine second source as of the
+  2026-08-04 slice - this repeated note across several earlier entries in
+  this file was stale by the time it was last copied forward; there is no
+  known open ceremony-date sourcing gap today.
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  infeasible in this environment (WebFetch 403s on every host tried), per
+  prior runs' notes.
+- A second independent cross-check of the Champion/Runner-up/Final-score
+  tables (closed on their first pass for all four team competitions) remains
+  open as a "belt and suspenders" idea.
+- This fix closes the specific "nav points to the wrong language" bug found
+  by re-reading the shared chrome components; a future pass could do the
+  same close read of another still-unaudited shared component (e.g.
+  `ThemeToggle.astro`, `PrintDownloadLink.astro`) rather than assuming this
+  was the only one, though a quick check while fixing this one found no
+  equivalent path/label mismatch in either.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
