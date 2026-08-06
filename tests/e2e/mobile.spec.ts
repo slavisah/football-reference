@@ -1084,6 +1084,12 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
     await expect(page).toHaveURL(/\/football-reference\/records\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });
+
+  test('champions-bar count is announced in Croatian, not English', async ({ page }) => {
+    const barLabel = await page.locator('.champions__bar').first().getAttribute('aria-label');
+    expect(barLabel).toMatch(/^\d+ od \d+$/);
+    expect(barLabel).not.toContain(' of ');
+  });
 });
 
 test.describe('Compare page on a 360px phone', () => {
