@@ -20,6 +20,8 @@ const groupName = `quiz-${index}-answer`;
   data-i18n-correct={t(locale, 'quizCorrect')}
   data-i18n-incorrect-prefix={t(locale, 'quizIncorrectPrefix')}
   data-i18n-incorrect-suffix={t(locale, 'quizIncorrectSuffix')}
+  data-i18n-result-correct={t(locale, 'quizAnswerCorrectLabel')}
+  data-i18n-result-incorrect={t(locale, 'quizAnswerIncorrectLabel')}
 >
   <p class="quiz-card__category badge">{question.category}</p>
 
@@ -33,6 +35,7 @@ const groupName = `quiz-${index}-answer`;
           <label class="quiz-card__choice">
             <input type="radio" name={groupName} value={choiceIndex} />
             <span>{choice}</span>
+            <span class="quiz-card__result-badge"></span>
           </label>
         ))
       }
@@ -103,25 +106,29 @@ const groupName = `quiz-${index}-answer`;
     background: color-mix(in srgb, var(--accent) 16%, transparent);
   }
 
-  .quiz-card__choice.is-correct::after {
-    content: '✓ correct';
+  .quiz-card__choice.is-incorrect {
+    border-color: var(--danger);
+    background: color-mix(in srgb, var(--danger) 16%, transparent);
+  }
+
+  /* Real DOM text, not ::after generated content - generated content isn't
+     reliably exposed to screen readers, and this label is the only thing
+     that isn't color alone conveying which choice was right/wrong (WCAG
+     1.4.1). Populated by QuizScript.astro from the localized
+     data-i18n-result-* attributes above; empty and untouched until the
+     question is checked. */
+  .quiz-card__result-badge {
     margin-left: auto;
     font-weight: 700;
     font-size: 0.8rem;
+  }
+
+  .quiz-card__choice.is-correct .quiz-card__result-badge {
     color: var(--accent);
   }
 
-  .quiz-card__choice.is-incorrect {
-    border-color: #c0392b;
-    background: color-mix(in srgb, #c0392b 16%, transparent);
-  }
-
-  .quiz-card__choice.is-incorrect::after {
-    content: '✗ your answer';
-    margin-left: auto;
-    font-weight: 700;
-    font-size: 0.8rem;
-    color: #c0392b;
+  .quiz-card__choice.is-incorrect .quiz-card__result-badge {
+    color: var(--danger);
   }
 
   .quiz-card__controls {

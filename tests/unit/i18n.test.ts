@@ -39,6 +39,12 @@ describe('t', () => {
     expect(t('en', 'themeDark')).not.toBe(t('hr', 'themeDark'));
     expect(t('en', 'themeLabel')).not.toBe(t('hr', 'themeLabel'));
   });
+
+  it('gives the champions-bar "of" word a distinct, non-empty string per locale', () => {
+    expect(t('en', 'championsBarOfLabel')).toBe('of');
+    expect(t('hr', 'championsBarOfLabel')).toBe('od');
+    expect(t('en', 'championsBarOfLabel')).not.toBe(t('hr', 'championsBarOfLabel'));
+  });
 });
 
 describe('alternatePath', () => {

@@ -1,7 +1,7 @@
 ---
 import { withBase } from '../lib/url';
 import { NAV_LINKS } from '../lib/routes';
-import { t, type Locale } from '../lib/i18n';
+import { t, TRANSLATED_PATHS, type Locale } from '../lib/i18n';
 import ThemeToggle from './ThemeToggle.astro';
 
 interface Props {
@@ -13,7 +13,16 @@ interface Props {
 
 const { locale = 'en', alternateHref } = Astro.props;
 
-const links = NAV_LINKS.map((link) => ({ href: withBase(link.path), label: link.label }));
+// Every NAV_LINKS path has a Croatian translation (TRANSLATED_PATHS), so on
+// a Croatian page the nav itself - not just the language switcher - should
+// stay in Croatian: same page, translated path and label, so a reader
+// browsing /hr/... never gets silently bounced back to the English site by
+// clicking a nav item other than the explicit language switch.
+const links = NAV_LINKS.map((link) => ({
+  href: withBase(locale === 'hr' ? (TRANSLATED_PATHS[link.path] ?? link.path) : link.path),
+  label: locale === 'hr' ? link.labelHr : link.label,
+}));
+const homeHref = withBase(locale === 'hr' ? TRANSLATED_PATHS['/'] : '/');
 
 const here = Astro.url.pathname.replace(/\/$/, '');
 function isCurrent(href: string): boolean {
@@ -23,7 +32,7 @@ function isCurrent(href: string): boolean {
 
 <header class="site-header">
   <div class="container site-header__inner">
-    <a class="brand" href={withBase('/')}>
+    <a class="brand" href={homeHref}>
       <span class="brand__mark" aria-hidden="true">⚽</span>
       <span class="brand__text">{t(locale, 'brand')}</span>
     </a>
@@ -144,3 +153,30 @@ function isCurrent(href: string): boolean {
     }
   }
 </style>
+
+<script is:inline>
+  // The header wraps onto multiple lines well before the viewport gets
+  // narrow - eleven nav links plus the theme toggle (and, on translated
+  // pages, the language switch) don't fit on one line even at the
+  // container's own max-width, so its real height varies by page/locale
+  // and is nowhere near the single-line height a hardcoded CSS value would
+  // assume. Any other sticky element meant to sit just below this sticky,
+  // higher-z-index header (e.g. the quiz page's score bar) needs that real
+  // height, not a guess, or the header ends up covering it once both are
+  // stuck. Exposed as a custom property so plain CSS can read it.
+  (function () {
+    var header = document.querySelector('.site-header');
+    if (!header) return;
+
+    function setHeaderHeight() {
+      document.documentElement.style.setProperty('--site-header-height', header.offsetHeight + 'px');
+    }
+
+    setHeaderHeight();
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(setHeaderHeight).observe(header);
+    } else {
+      window.addEventListener('resize', setHeaderHeight);
+    }
+  })();
+</script>
