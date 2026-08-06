@@ -1525,6 +1525,86 @@ test.describe('Installability and offline reading', () => {
     await expect(page.locator('h1')).toHaveText('The Ultimate Football Reference');
     await context.setOffline(false);
   });
+
+  test('a Croatian page that was never individually visited still works offline (precached on install)', async ({
+    page,
+    context,
+  }) => {
+    await page.goto('');
+    await page.evaluate(() => navigator.serviceWorker.ready);
+
+    await context.setOffline(true);
+    // Never visited before in this test, but every NAV_LINKS page is now
+    // precached in both languages (buildPrecacheUrls) - before that fix, an
+    // hr page not yet visited online had nothing in the cache at all.
+    await page.goto('hr/competitions/world-cup');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(
+      page.getByRole('heading', { name: 'FIFA Svjetsko prvenstvo', level: 1 }),
+    ).toBeVisible();
+    await context.setOffline(false);
+  });
+
+  test('falls back to the cached Croatian home page, not the English one, for an hr URL that was never cached', async ({
+    page,
+    context,
+  }) => {
+    await page.goto('');
+    await page.evaluate(() => navigator.serviceWorker.ready);
+
+    await context.setOffline(true);
+    // Never precached and never visited under this exact URL - the
+    // navigate handler's fallback should stay in Croatian because the
+    // request path is under /hr/, not silently switch the reader to the
+    // English home page.
+    await page.goto('hr/competitions/world-cup?utm_source=nowhere');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.locator('a.lang-switch')).toHaveText('English');
+    await context.setOffline(false);
+  });
+});
+
+test.describe('Primary nav stays in the current language', () => {
+  test('every nav link and the logo point to Croatian pages while browsing /hr/...', async ({
+    page,
+  }) => {
+    await page.goto('hr/competitions/world-cup');
+
+    await expect(page.locator('a.brand')).toHaveAttribute('href', '/football-reference/hr/');
+
+    const navHrefs = await page.locator('nav[aria-label="Primary"] a').evaluateAll((links) =>
+      links.map((link) => link.getAttribute('href')),
+    );
+    expect(navHrefs.length).toBeGreaterThan(0);
+    for (const href of navHrefs) {
+      expect(href, `nav link ${href} should stay under /hr/`).toMatch(
+        /^\/football-reference\/hr(\/|$)/,
+      );
+    }
+
+    // Clicking a translated nav item (not the explicit language switch)
+    // should land on that page's own Croatian equivalent and stay in
+    // Croatian, not silently bounce the reader back to English.
+    await page.getByRole('link', { name: 'Rekordi' }).click();
+    await expect(page).toHaveURL(/\/football-reference\/hr\/records\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+
+  test('every nav link and the logo point to English pages while browsing the English site', async ({
+    page,
+  }) => {
+    await page.goto('competitions/world-cup');
+
+    await expect(page.locator('a.brand')).toHaveAttribute('href', '/football-reference/');
+
+    const navHrefs = await page.locator('nav[aria-label="Primary"] a').evaluateAll((links) =>
+      links.map((link) => link.getAttribute('href')),
+    );
+    expect(navHrefs.length).toBeGreaterThan(0);
+    for (const href of navHrefs) {
+      expect(href, `nav link ${href} should not point into /hr/`).not.toMatch(/\/hr(\/|$)/);
+    }
+  });
 });
 
 test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
