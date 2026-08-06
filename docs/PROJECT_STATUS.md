@@ -2600,6 +2600,70 @@ what the suite was checking, not new coverage).
   this one non-decorative case, but that grep was not exhaustive of every
   component's scoped `<style>` block.
 
+### Accessibility: mobile-card column labels weren't reliably exposed to assistive tech
+
+Added 2026-08-06 (intensive run). Follows up on the previous entry's own
+"Left for a future pass" note by doing the fuller `content:` grep it flagged
+as not-yet-exhaustive. It found exactly one more non-decorative case, and a
+much higher-blast-radius one: `TournamentTable.astro`'s responsive mobile
+card layout (`@media (max-width: 40rem)`, i.e. every phone-width visitor)
+labels each value with its column name (Year, Winner, Host, Teams, etc.)
+purely via `.t-table td::before { content: attr(data-label); }`. This is the
+exact same category of bug as the quiz "wrong answer" indicator fixed two
+entries above - CSS generated content isn't reliably exposed to assistive
+tech - except `TournamentTable` is the single most shared component in the
+codebase (every one of the six competition/award pages, in both English and
+Croatian, all render their entire results table through it on mobile). A
+screen reader user on a phone hitting any tournament table would have heard
+only the raw values row by row ("1930", "Uruguay", "Argentina", "4-2") with
+no reliable way to tell which value was the year, the winner, or the score -
+the mobile-card layout's whole reason for existing (labeling values once the
+table no longer visually reads left-to-right by column) silently didn't
+reach assistive tech at all. Confirmed the failure mode by hand: Chromium's
+accessibility tree (inspected via CDP) omits `::before`/`::after` generated
+text from any accessible-name/description computation for a plain `<td>`,
+matching the same root cause already written up for the quiz bug.
+
+**Fix:** each `<td>` in `TournamentTable.astro` now also carries a real
+`aria-label` (e.g. `aria-label="Winner: Uruguay"`), built server-side from
+the exact same `data-label`/value pair the CSS `::before` already displays
+visually - so the visible mobile-card styling is completely unchanged (the
+`::before` rule stays, now commented as visual-only) while assistive tech
+gets a reliable, always-present accessible name regardless of viewport,
+browser, or whether that browser happens to expose generated content. This
+covers both the per-column table cells and the joined-in Golden Boot
+"Top scorer" `extraColumn` cell on the World Cup/EURO pages. Deliberately
+not scoped to the mobile media query - the label is harmless, mildly
+reinforcing context at desktop widths too, and CSS can't conditionally add
+or remove an ARIA attribute by viewport anyway.
+
+No new test file was needed: the existing full Playwright suite (207 tests,
+unchanged pass count) already exercises `TournamentTable` on every page
+including the WCAG 2.1 A/AA axe sweep, and none of the existing
+`td[data-label="..."]` assertions (`tests/e2e/mobile.spec.ts`) check
+`aria-label`, so they were unaffected by adding it - `toHaveText`/
+`toContainText` read visible text content, not the accessible name. Verified
+with `pnpm lint` (0 errors/0 warnings, same pre-existing hint), the full
+Vitest suite (152/152, unchanged - no library code changed), and the full
+Playwright suite (207/207).
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in earlier slices
+  still rest on single-source research.
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  infeasible in this environment (WebFetch 403s on every host tried), per
+  prior runs' notes.
+- A second independent cross-check of the Champion/Runner-up/Final-score
+  tables (closed on their first pass for all four team competitions) remains
+  open as a "belt and suspenders" idea.
+- The `content:` grep run for this entry is now exhaustive across
+  `src/**/*.astro` (all `<style>` blocks, scoped and global) and found no
+  further non-decorative generated-content cases - the two found across
+  both entries in this series (quiz's correct/incorrect indicator, and this
+  table column label) both had real fixes shipped, so this specific angle is
+  believed closed pending any newly written component introducing a new
+  `content:` rule in future.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
