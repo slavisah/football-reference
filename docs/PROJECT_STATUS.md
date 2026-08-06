@@ -2826,6 +2826,73 @@ Vitest suite (157/157, up from 152), and the full Playwright suite
   was the only one, though a quick check while fixing this one found no
   equivalent path/label mismatch in either.
 
+### Accessibility/localization: champions-bar's screen-reader label was English on every Croatian page
+
+Added 2026-08-06 (intensive run). Continues the "close read of another
+still-unaudited shared component" idea the previous entry's own "Left for a
+future pass" note suggested, this time against `ChampionsSummary.astro` - the
+component behind every "Champions by titles" / "Most awards" ranking on the
+site (every one of the six competition/award pages, `/records`, in both
+languages).
+
+**The bug:** each ranking bar's `role="img"` `aria-label` was built as a
+template literal with a hardcoded English word - `` `${champion.titles} of
+${max}` `` - with no branch on locale and no overridable prop, unlike every
+other piece of copy in this component (`heading`, `description`, `unit`,
+`winningYearsLabel` are all already overridable, and every Croatian page that
+renders this component already overrides them with Croatian text). The
+practical effect: a screen-reader user on any of the nine `ChampionsSummary`
+instances across the seven Croatian pages
+(`/hr/records` x2, and all six `/hr/competitions/*`) heard an English
+fragment - e.g. "5 of 23" - stitched into an otherwise fully Croatian
+ranking list, the same "one hardcoded English string slipped through a
+component whose other strings were all translated" shape as the primary-nav
+bug fixed earlier today, just in a different component.
+
+**Fix:** `ChampionsSummary.astro` gained an optional `ofLabel` prop (default
+`'of'`, so every English page - `CompetitionView`-driven pages and the
+English `/records` page - renders byte-identical output). A new
+`championsBarOfLabel` key was added to `src/lib/i18n.ts`'s `UI_STRINGS`
+(`'of'`/`'od'`) for consistency with the dictionary, though the nine Croatian
+call sites pass the literal `ofLabel="od"` directly, matching the existing
+convention every one of them already uses for `winningYearsLabel` and the
+`description`/`heading` text (hand-written Croatian strings inline in the
+page, not routed through `t()`, since these pages compose their own layout
+by hand rather than importing the shared dictionary for per-instance props).
+
+**Tests:** 1 new Vitest case (`tests/unit/i18n.test.ts`, asserting
+`championsBarOfLabel` is `'of'`/`'od'` and differs per locale) and 1 new
+Playwright case in the existing Croatian records-page describe block
+(`tests/e2e/mobile.spec.ts`: asserts a champions-bar `aria-label` matches
+`/^\d+ od \d+$/` and never contains the English `" of "`) - covers the
+shared component, so the fix is verified once rather than once per page it
+appears on, matching how the earlier `TournamentTable` mobile-label fix was
+tested. Verified with `pnpm lint` (0 errors/0 warnings, same pre-existing
+hint as every prior run), the full Vitest suite (158/158, up from 157), and
+the full Playwright suite (220/220, up from 219). Also spot-checked the
+built `dist/hr/records/index.html` and every `dist/hr/competitions/*`
+directly: no remaining `aria-label="… of …"` fragment anywhere under `dist/hr/`.
+
+**Left for a future pass:**
+- The same handful of Ballon d'Or ceremony dates noted in earlier slices
+  were already re-confirmed with a genuine second source as of the
+  2026-08-04 slice - no known open ceremony-date sourcing gap today.
+- A full source-link liveness check across `docs/SOURCES.md` remains
+  infeasible in this environment (WebFetch 403s on every host tried), per
+  prior runs' notes.
+- A second independent cross-check of the Champion/Runner-up/Final-score
+  tables (closed on their first pass for all four team competitions) remains
+  open as a "belt and suspenders" idea.
+- The "close read of an unaudited shared component" angle has now found and
+  fixed two real bugs in two different components today (`Nav.astro`/
+  `offlineCache.ts`'s locale-blind nav links, and now `ChampionsSummary`'s
+  hardcoded English bar label) - a future pass could do the same close read
+  of the remaining shared components not yet covered by name in this file
+  (`CompetitionView.astro`, `PrintDownloadLink.astro` was already checked
+  and found clean, `QuizCard.astro`/`QuizOrderCard.astro`/`QuizScript.astro`
+  already went through the dedicated quiz-localization pass) rather than
+  assuming this specific bug class is now fully closed.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

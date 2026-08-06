@@ -78,6 +78,7 @@ const UI_STRINGS = {
     hr: 'Na ovaj točan datum nije odigrano finale - evo jednog iz arhive.',
   },
   onThisDayEmpty: { en: 'No final dates on record yet.', hr: 'Još nema zabilježenih datuma finala.' },
+  championsBarOfLabel: { en: 'of', hr: 'od' },
 } as const;
 
 export type UiStringKey = keyof typeof UI_STRINGS;

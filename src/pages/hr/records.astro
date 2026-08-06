@@ -160,6 +160,7 @@ const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
                 heading={c.label}
                 description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                 winningYearsLabel="Godine osvajanja: "
+                ofLabel="od"
               />
               <a class="records__teams-link" href={c.href}>
                 Pogledajte cijelu tablicu - {c.label} &rarr;
@@ -208,6 +209,7 @@ const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
                 description={`Generirano iz ${a.data.editions.length} izdanja nagrade ${a.label}.`}
                 unit={['nagrada', 'nagrade']}
                 winningYearsLabel="Godine osvajanja: "
+                ofLabel="od"
               />
               <a class="records__teams-link" href={a.href}>
                 Pogledajte cijelu tablicu - {a.label} &rarr;
