@@ -3158,6 +3158,74 @@ this page.
 - The manifest schema-enforcement, source-link liveness, and Ballon d'Or
   ceremony-date items noted in earlier entries are unchanged this run.
 
+### Content-accuracy pass: FIFA World Cup Champion/Runner-up/Final-score - second independent cross-check, no discrepancies
+
+Added 2026-08-07 (intensive run, later slice). Every backlog item and every
+required/nice-to-have capability from `docs/WEBSITE_REQUIREMENTS.md` was
+already closed going into this run, so per this routine's fallback
+instruction this continues the "second independent cross-check" series. The
+two entries immediately above (UEFA EURO and Copa América, both 2026-08-07)
+each closed their own second pass; FIFA World Cup was the one team
+competition still on a single audit pass (its first pass, 2026-08-05, is
+recorded above and explicitly named itself "the last of the site's four team
+competitions to get this specific column-pair check" - closing that first
+pass is exactly what makes this second pass the correct next move now, per
+the same reasoning the EURO and Copa América second passes used).
+
+Re-verified all 21 completed editions (1930-2022; 2026 is the site's own
+forward-looking scheduled entry, out of scope for a factual audit) via three
+parallel WebSearch passes split by era (1930-1962, 1966-1994, 1998-2022),
+deliberately drawing from a source mix distinct from the 2026-08-05 first
+pass (which leaned on FIFA.com, ESPN's match archive, Wikipedia's dedicated
+final articles, BBC, and CNN): this pass mainly used RSSSF, Britannica,
+worldfootball.net, Transfermarkt, 11v11.com, Sky Sports, BBC Sport, CBS
+Sports, Bleacher Report, athlet.org, footballhistory.org, planetworldcup.com,
+national-football-teams.com, EBSCO Research Starters, UPI's wire archives,
+TheFA.com, englandstats.com, and beIN Sports. **No discrepancies found**
+across any of the 21 editions, including every extra-time and
+penalty-shootout final (1934, 1966, 1978 a.e.t.; 1994, 2006, 2022 penalty
+shoot-outs; 2010, 2014 golden-goal-era a.e.t.) and 1950's unusual
+final-round-robin-group format (Uruguay 2-1 Brazil, the "Maracanazo").
+
+See `docs/SOURCES.md`'s new "Champion/Runner-up/Final-score second-source
+audit" entry under FIFA World Cup for the full per-edition citation list.
+`content/fifa-world-cup.md`'s `lastReviewed` moved to 2026-08-07; `status`
+stays `review` (secondary sources, same reasoning as every prior
+secondary-sourced audit in this file). No table data changed - the only file
+changes are the `lastReviewed` bump, the new source citations, and this
+entry. Since this page's `lastReviewed` date is pinned by an exact-match
+Playwright assertion (`tests/e2e/mobile.spec.ts`, the one page in the suite
+that checks a literal date rather than just presence), that test's expected
+value was updated alongside the content change.
+
+This closes the "second independent cross-check" series across all four team
+competitions (Copa América, Nations League, EURO, World Cup) - every one now
+has at least two independent audit passes on record for its core
+Champion/Runner-up/Final-score data.
+
+Bumping `lastReviewed` changed `content/fifa-world-cup.md`'s SHA-256, which
+`pnpm check:pdfs` (added 2026-08-06) correctly flagged as making
+`public/downloads/world-cup.pdf` stale. Regenerated all six PDFs and the
+manifest via `PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`;
+`pnpm check:pdfs` now passes cleanly.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged and `pnpm lint` is clean (0 errors/0 warnings, same pre-existing
+`monthNames` hint every prior run has logged). The full Playwright suite
+passes with the one intentional update noted above (the World Cup page's
+pinned `lastReviewed` date, 2026-08-05 -> 2026-08-07).
+
+**Left for a future pass:**
+- With all four team competitions now on at least two Champion/Runner-up/
+  Final-score audit passes, a natural next candidate in this series is
+  extending it to the individual awards (Ballon d'Or's Winner column, and
+  Golden Boot's two top-scorer tables) if a future run wants a comparably
+  deep second-source check there too - today those tables' most recent audit
+  is each competition's single first pass (see the entries earlier in this
+  file).
+- The manifest schema-enforcement, source-link liveness, and Ballon d'Or
+  ceremony-date items noted in earlier entries are unchanged this run.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
