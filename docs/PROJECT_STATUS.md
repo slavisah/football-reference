@@ -3100,6 +3100,64 @@ untouched by this run).
 - The manifest schema-enforcement, source-link liveness, and Ballon d'Or
   ceremony-date items noted in the entry above are unchanged this run.
 
+### Content-accuracy pass: Copa América Champion/Runner-up - second independent cross-check, no discrepancies
+
+Added 2026-08-07 (intensive run, later slice). Every backlog item and every
+required/nice-to-have capability from `docs/WEBSITE_REQUIREMENTS.md` was
+already closed going into this run, so per this routine's fallback
+instruction this continues the "second independent cross-check" series -
+and per this routine's own stated priority order (Copa América > Nations
+League > Ballon d'Or > Golden Boot), Copa América comes first among the two
+team competitions still on a single audit pass (the previous entry's "Left
+for a future pass" note named only FIFA World Cup, overlooking that Copa
+América itself hadn't had a second pass yet either - corrected here).
+
+Re-verified all 48 editions (1916-2024) via three parallel research passes
+(1916-1949, 1953-1991, 1993-2024), deliberately drawing from a source mix
+distinct from the 2026-08-05 first pass (which leaned on Wikipedia, RSSSF,
+and CONMEBOL's own recaps): this pass used national-federation histories
+(AFA, AUF), sports-history/statistics sites (worldfootball.net,
+footballdatabase.eu, athlet.org, topendsports.com, 11v11.com, todor66.com,
+bolavip.com), and independent press (El Gráfico, La Nación, El Economista,
+UPI, Washington Post, ESPN, CNN, BBC, Al Jazeera, Fox News, Bleacher Report,
+Sky Sports, and others). **No discrepancies found** across any of the 48
+editions, including all five level-on-points playoff deciders (1919, 1922,
+1937, 1949, 1953) and all three penalty-shootout finals (1995, 2015, 2016).
+In the course of this pass, one of the sub-agents also noticed the site's
+own prose mis-stated the edition count as "49" in two places (the table has
+48 rows: two separate 1959 editions, one each in Argentina and Ecuador,
+already correctly listed as distinct rows) - corrected the count in
+`content/copa-america.md`'s audit paragraph while touching that file anyway;
+left the historical 2026-08-05 changelog entry above as-written since this
+file is an append-only record of what each run did and believed at the time.
+
+See `docs/SOURCES.md`'s expanded Copa América section for the full
+per-edition citation list. `content/copa-america.md`'s `lastReviewed` moved
+to 2026-08-07; `status` stays `review` (secondary sources, same reasoning as
+every prior secondary-sourced audit in this file). No table data changed -
+the only file changes are the `lastReviewed` bump, the corrected edition
+count, the new source citations, and this entry.
+
+Bumping `lastReviewed` changed `content/copa-america.md`'s SHA-256, which
+`pnpm check:pdfs` (added 2026-08-06) correctly flagged as making
+`public/downloads/copa-america.pdf` stale. Regenerated all six PDFs and the
+manifest via `PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`;
+`pnpm check:pdfs` now passes cleanly.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (158/158) and `pnpm lint` is clean (0 errors/0 warnings, same
+pre-existing `monthNames` hint every prior run has logged). The full
+Playwright suite (223/223) also passes unchanged - a `lastReviewed` date
+bump and a prose word-count edit have no assertion anywhere in the suite for
+this page.
+
+**Left for a future pass:**
+- FIFA World Cup (22 editions) is now the last of the four team competitions
+  still on a single Champion/Runner-up/Final-score audit pass - the natural
+  next candidate in this series.
+- The manifest schema-enforcement, source-link liveness, and Ballon d'Or
+  ceremony-date items noted in earlier entries are unchanged this run.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
