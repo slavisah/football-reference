@@ -9,11 +9,37 @@
 // so the two pages can never disagree on a fact - only the prose differs.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import OnThisDay from '../../components/OnThisDay.astro';
+import EditorialNotes from '../../components/EditorialNotes.astro';
 import { withBase } from '../../lib/url';
 import { loadHomeCompetitions, buildHomeCards } from '../../lib/homeCards';
 import { buildOnThisDayEntries } from '../../lib/onThisDay';
+import type { NoteSection } from '../../lib/notes';
 
 const competitions = await loadHomeCompetitions();
+
+// Hand-translated from content/index.md's "How to use the reference" and
+// "Important historical naming note" sections - the same convention the
+// Croatian competition/quiz pages already use for their own notes. content/
+// itself stays untouched and English (the single editorial source of truth).
+const homeNotes: NoteSection[] = [
+  {
+    heading: 'Kako koristiti ovaj pregled',
+    items: [
+      'sažet uvod;',
+      'potpunu ili gotovo potpunu tablicu izdanja natjecanja;',
+      'povijesne napomene koje objašnjavaju promjene formata;',
+      'pregled prvaka;',
+      'nezaboravne činjenice;',
+      'poveznice na primarne izvore.',
+    ],
+  },
+  {
+    heading: 'Važna napomena o povijesnim nazivima',
+    items: [
+      'Reprezentacije i države mijenjale su se tijekom vremena. Ovaj projekt u pravilu bilježi naziv korišten u vrijeme natjecanja, dok zbirna statistika ponekad grupira sportske nasljednike ondje gdje je to uobičajeno. Primjeri uključuju Zapadnu Njemačku/Njemačku, Sovjetski Savez/Rusiju i Čehoslovačku/Češku. Stranica te odluke objašnjava umjesto da se pretvara da su politički i sportski kontinuitet uvijek jednostavni.',
+    ],
+  },
+];
 const cards = buildHomeCards('hr', competitions);
 
 // "On this day" widget, Croatian slice - see docs/PROJECT_STATUS.md. Reuses
@@ -111,6 +137,8 @@ const onThisDayEntries = [
       generiranom iz istih tablica.
     </p>
   </section>
+
+  <EditorialNotes sections={homeNotes} />
 </BaseLayout>
 
 <style>
