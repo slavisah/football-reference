@@ -124,6 +124,46 @@ Primary sources should be preferred.
   This closes the Champion/Runner-up/Final-score audit series across all
   four team competitions (Copa América, Nations League, EURO, World Cup) -
   every one now has at least one independent cross-check on record.
+- Champion/Runner-up/Final-score second-source audit (2026-08-07, intensive
+  run): a second, independent cross-check of the same three columns audited
+  above - the last of the four team competitions to get this second pass
+  (Nations League, EURO, and Copa América were each already closed) - using
+  a source mix deliberately distinct from the 2026-08-05 pass (that pass
+  leaned on FIFA.com, ESPN's match archive, Wikipedia's dedicated final
+  articles, BBC, and CNN). This pass split the 21 completed editions
+  (1930-2022; 2026 is the site's own forward-looking scheduled entry, out of
+  scope) across three parallel WebSearch passes by era (1930-1962,
+  1966-1994, 1998-2022), drawing mainly from RSSSF, Britannica,
+  worldfootball.net, Transfermarkt, 11v11.com, Sky Sports, BBC Sport,
+  CBS Sports, Bleacher Report, athlet.org, footballhistory.org,
+  planetworldcup.com, national-football-teams.com, EBSCO Research Starters,
+  UPI's wire archives, TheFA.com, englandstats.com, beIN Sports, and other
+  independent outlets, each edition cross-checked against at least two
+  non-overlapping sources. **No discrepancies found in any of the 21
+  editions.** Every extra-time and penalty-shootout final was specifically
+  re-confirmed a second time: 1934, 1966, 1978 (a.e.t., no penalties); 1994,
+  2006, 2022 (penalty shoot-outs); 2010, 2014 (a.e.t., golden-goal-era and
+  2010/2014 sudden-death rules no longer applied). 1950's unusual format (no
+  single knockout final - the title decided by the final round-robin
+  group's last match, Uruguay 2-1 Brazil) was reconfirmed as correctly
+  represented a second time, matching the existing "Editorial notes" text.
+  - https://www.rsssf.org/tables/30f.html (and RSSSF's equivalent per-edition
+    tournament table, 1930-1994, confirmed via search indexing where direct
+    fetch was blocked by this environment's network egress policy)
+  - https://www.britannica.com/event/World-Cup-2010
+  - https://www.worldfootball.net/report/wm-1970-in-mexiko-endspiel-brasilien-italien/
+  - https://www.transfermarkt.us/germany_argentina/index/spielbericht/2466308 (2014)
+  - https://www.11v11.com/matches/brazil-v-italy-17-july-1994-245173/
+  - https://www.skysports.com/football/news/12098/11437927 (2018)
+  - https://www.thefa.com/news/2014/jul/29/england-west-germany-world-cup-final-1966-4-2
+  - https://www.cbssports.com/soccer/news/ (2022 final report)
+  - https://www.espn.com/soccer/ (match archive, all 21 editions, as a
+    secondary cross-check alongside the sources above)
+
+  This closes the Champion/Runner-up/Final-score second-source audit series
+  across all four team competitions (Copa América, Nations League, EURO,
+  World Cup) - every one now has at least two independent cross-checks on
+  record.
 - Golden Boot (top-scorer) audit (2026-08-04, intensive run): the "FIFA
   World Cup top scorers" table in `content/golden-boot.md` - player name(s),
   team, and goal count for all 23 editions (1930-2026) - verified via three
