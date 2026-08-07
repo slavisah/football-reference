@@ -3043,6 +3043,63 @@ checked rather than unit tested.
 - Source-link liveness and Ballon d'Or ceremony-date sourcing remain as
   noted in the entry above - no change this run.
 
+### Content-accuracy pass: UEFA EURO Champion/Runner-up/Final-score - second independent cross-check, no discrepancies
+
+Added 2026-08-07 (intensive run). Every backlog item, every required and
+nice-to-have capability from `docs/WEBSITE_REQUIREMENTS.md`, and every
+previously-flagged bug were already closed going into this run - so, per
+this routine's fallback instruction, this continues the "second independent
+cross-check" series the 2026-08-05 UEFA Nations League entry started: of the
+four team competitions, only Nations League had a genuine second-source pass
+on its core Winner/Runner-up/Final-score data; Copa América, EURO, and FIFA
+World Cup each had exactly one. EURO (17 editions) is the smaller of the two
+remaining candidates (World Cup has 22), so it's the natural next one.
+
+Re-verified all 17 editions (1960-2024) via three parallel WebSearch passes
+(1960-1980, 1984-2004, 2008-2024), deliberately drawing from a source mix
+distinct from the 2026-08-05 pass (which leaned on UEFA.com, Wikipedia,
+RSSSF, ESPN, Sky Sports, BBC, and CNN): this pass mainly used CNN's original
+match report, Bleacher Report, Al Jazeera, CBS Sports, Olympics.com, NBC
+News, Gulf News, RFE/RL, Taipei Times, and independent retrospectives
+(thesefootballtimes.co, the Irish Times, FIFA.com's own recap of the 1992
+final). **No discrepancies found.** Every Winner, Runner-up, and Final value
+already in `content/uefa-euro.md` matches both audit passes now, including
+every non-regulation final: the 1960 and 2016 a.e.t. results, the 1968
+replay (drawn 1-1, replay won 2-0), the 1976 and 2020 penalty shoot-outs,
+and the 1996 and 2000 golden-goal deciders.
+
+See `docs/SOURCES.md`'s new "Champion/Runner-up/Final-score second-source
+audit" entry under UEFA EURO for the full per-edition citation list.
+`content/uefa-euro.md`'s `lastReviewed` moved to 2026-08-07; `status` stays
+`review` (secondary sources, same reasoning as every prior secondary-sourced
+audit in this file). No content or code changes were needed since nothing
+was wrong - the only file changes are the `lastReviewed` bump, the new
+source citations, and this entry.
+
+Bumping `lastReviewed` did change `content/uefa-euro.md`'s SHA-256, which
+`pnpm check:pdfs` (added 2026-08-06) correctly flagged as making
+`public/downloads/euro.pdf` stale - a live demonstration of that check doing
+its job on real content churn, not just the synthetic edit-and-revert test
+from its own introduction. Regenerated all six PDFs and the manifest via
+`PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`; `pnpm
+check:pdfs` now passes cleanly.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (158/158) and `pnpm lint` is clean (0 errors/0 warnings, same
+pre-existing `monthNames` hint every prior run has logged). The full
+Playwright suite (223/223) also passes unchanged - a `lastReviewed` date
+bump has no assertion anywhere in the suite for this page (only the World
+Cup page's mobile spec pins an exact `lastReviewed` date via
+`time[datetime="..."]`, and that page's own date - and its PDF - are
+untouched by this run).
+
+**Left for a future pass:**
+- The same second independent cross-check for FIFA World Cup (22 editions,
+  the last of the four team competitions still on a single audit pass) is
+  the natural next candidate in this series.
+- The manifest schema-enforcement, source-link liveness, and Ballon d'Or
+  ceremony-date items noted in the entry above are unchanged this run.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
