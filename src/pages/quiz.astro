@@ -4,6 +4,7 @@ import QuizCard from '../components/QuizCard.astro';
 import QuizOrderCard from '../components/QuizOrderCard.astro';
 import QuizScript from '../components/QuizScript.astro';
 import References from '../components/References.astro';
+import EditorialNotes from '../components/EditorialNotes.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import { buildTimeline } from '../lib/editions';
 import { t } from '../lib/i18n';
@@ -19,7 +20,7 @@ import {
   type QuizPool,
 } from '../lib/quiz';
 
-const meta = await loadPageMeta('quiz');
+const meta = await loadPageMeta('quiz', ['How it works', 'Question types in this quiz']);
 
 const [worldCup, euro, copaAmerica, nationsLeague, ballonDor, goldenBootWorldCup, goldenBootEuro] =
   await Promise.all([
@@ -181,6 +182,8 @@ const lastReviewed = [
       <h1>{meta.title}</h1>
       <p class="quiz__intro">{meta.intro}</p>
     </header>
+
+    <EditorialNotes sections={meta.notes} />
 
     <div class="quiz__score card no-print" id="quiz-score" hidden>
       <p>

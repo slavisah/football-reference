@@ -48,6 +48,8 @@ export type PageMeta = {
   intro: string;
   lastReviewed: string;
   status: string;
+  /** Editorial notes sections requested via the optional noteHeadings argument; empty when none were requested. */
+  notes: NoteSection[];
 };
 
 /** Read the first paragraph after the top-level heading as the page intro. */
@@ -70,17 +72,24 @@ function firstParagraph(markdown: string): string {
   return buffer.join(' ');
 }
 
-/** Load a content page's front matter + intro paragraph, no editions table required. */
-export async function loadPageMeta(id: string): Promise<PageMeta> {
+/**
+ * Load a content page's front matter + intro paragraph, no editions table
+ * required. `noteHeadings` optionally pulls further sections (e.g. "How it
+ * works") the same way loadCompetition()'s noteHeadings does, for pages that
+ * have reader-facing prose beyond the intro paragraph.
+ */
+export async function loadPageMeta(id: string, noteHeadings: string[] = []): Promise<PageMeta> {
   const entry = await getEntry('pages', id);
   if (!entry) {
     throw new Error(`Content entry "${id}" was not found in the pages collection.`);
   }
+  const body = entry.body ?? '';
   return {
     title: entry.data.title,
-    intro: firstParagraph(entry.body ?? ''),
+    intro: firstParagraph(body),
     lastReviewed: entry.data.lastReviewed,
     status: entry.data.status,
+    notes: extractSections(body, noteHeadings),
   };
 }
 

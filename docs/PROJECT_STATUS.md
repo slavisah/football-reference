@@ -3372,6 +3372,86 @@ cleanly.
 - The manifest schema-enforcement and source-link liveness items noted in
   earlier entries are unchanged this run.
 
+### Content-completeness pass: `/quiz` and the home page were silently dropping their own reader-facing prose - fixed 2026-08-07 (intensive run)
+
+Every backlog item and required/nice-to-have capability was already closed
+going into this run, and the "second independent cross-check" content-
+accuracy series (see the five entries above) had just closed out across
+every competition/award table, naming secondary columns as the natural next
+content-accuracy candidate - but a re-read of `content/quiz.md` and
+`content/index.md` (prompted by the routine's own "left for a future pass"
+notes) turned up a real content-completeness gap instead, not a duplicate of
+the two items already on record and rejected below (Copa América's "Titles
+after 2024" / Ballon d'Or's "Multiple winners through 2025" tables, which
+duplicate `ChampionsSummary`'s own numbers).
+
+**The gap:** `content/quiz.md` has always had `## How it works` (explaining
+the "Check answer" button, the "Just show me the answer" no-JS fallback,
+"Restart quiz", and the separately-scored "Champion order challenge") and
+`## Question types in this quiz` - genuinely useful onboarding copy for a
+family/kid-facing quiz. `content/index.md` has always had `## How to use the
+reference` and `## Important historical naming note` (the West
+Germany/Germany, Soviet Union/Russia, Czechoslovakia/Czechia editorial
+convention explainer) - real transparency copy for first-time readers.
+Neither page ever rendered any of the four sections, in either language:
+`src/pages/quiz.astro`/`hr/quiz.astro` only rendered `meta.intro` (the first
+paragraph) via `loadPageMeta('quiz')`, and `src/pages/index.astro`/
+`hr/index.astro` are fully hand-authored and never touched the Markdown body
+at all beyond front matter (`title`/`description`). Both had been silently
+dead content since the pages were first built.
+
+**The fix:** reused the exact existing `extractSections()`/
+`renderInlineMarkdown()`/`EditorialNotes.astro` machinery every competition
+page already relies on for its own "Memorable moments" etc. sections - no
+new parsing or rendering code needed.
+- `loadPageMeta()` (`src/lib/competition.ts`) gained an optional
+  `noteHeadings` second argument, mirroring `loadCompetition()`'s existing
+  option, and now always returns a `notes: NoteSection[]` field (empty when
+  no headings are requested, so every existing caller - `records.astro`,
+  `compare.astro`, `about/sources.astro`, `sitemap.xml.ts`, and their `hr/`
+  equivalents - is unaffected).
+- `quiz.astro` requests `['How it works', 'Question types in this quiz']`
+  and renders `<EditorialNotes sections={meta.notes} />` right after the
+  page intro, before the score bar and question list, so a reader sees the
+  mechanics before playing.
+- `hr/quiz.astro` hand-translates the same two sections into a local
+  `NoteSection[]` constant (`Kako funkcionira` / `Vrste pitanja u ovom
+  kvizu`), the same "hand-translated notes, not routed through content/ or
+  `t()`" convention the six Croatian competition pages already use for their
+  own notes.
+- `index.astro` (which uses `getEntry()` directly rather than
+  `loadPageMeta()`, since it also needs the page's optional `description`
+  front-matter field that `PageMeta` doesn't expose) now calls the same
+  `extractSections()` directly and renders both sections after the features
+  section, at the foot of the page.
+- `hr/index.astro` hand-translates the same two sections
+  (`Kako koristiti ovaj pregled` / `Važna napomena o povijesnim nazivima`),
+  same convention.
+
+`content/quiz.md` and `content/index.md` themselves are untouched - both
+sections already existed verbatim; this was purely a rendering gap.
+
+**Tests:** `extractSections()`/`renderInlineMarkdown()` already have 10
+Vitest cases (`tests/unit/notes.test.ts`) covering this exact code path, so
+no new unit tests were needed. Added 4 new Playwright cases at 360px
+(`tests/e2e/mobile.spec.ts`): English quiz page and home page each assert
+both new `.notes__card` sections are present with real body text, and the
+Croatian equivalents assert the translated headings/body text. `pnpm lint`
+- 0 errors, 0 warnings, the one pre-existing unrelated hint; `pnpm test` -
+158/158 (unchanged, no library logic changed); `pnpm build` succeeds and the
+four new sections were spot-checked in the built HTML
+(`dist/quiz/index.html`, `dist/index.html`, `dist/hr/quiz/index.html`,
+`dist/hr/index.html`); the full Playwright suite passes with
+`PW_EXECUTABLE_PATH` pointed at the environment's preinstalled Chromium
+(bundled `chromium_headless_shell` isn't present in this sandbox).
+
+**Left for a future pass:** the two already-rejected table-rendering items
+(Copa América "Titles after 2024", Ballon d'Or "Multiple winners through
+2025") are unchanged - still considered not a gap, see above. A first-ever
+audit of secondary columns (host nation, attendance, qualifying detail) not
+yet covered by any content-accuracy pass remains the natural next candidate
+if a future run wants to continue that series instead.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
