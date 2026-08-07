@@ -501,6 +501,61 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/2019_Copa_Am%C3%A9rica_final (Brazil/Peru)
   - https://en.wikipedia.org/wiki/2021_Copa_Am%C3%A9rica_final (Argentina/Brazil)
   - https://en.wikipedia.org/wiki/2024_Copa_Am%C3%A9rica_final (Argentina/Colombia)
+- Champion/Runner-up second-source audit (2026-08-07, intensive run): a
+  second, independent cross-check of the same 48 editions audited above,
+  using a source mix deliberately distinct from the 2026-08-05 pass (that
+  pass leaned on Wikipedia/RSSSF/CONMEBOL; this one draws mainly from
+  national-federation histories, sports-history/statistics sites, and
+  independent press coverage). Re-verified via three parallel WebSearch
+  passes (1916-1949, 1953-1991, 1993-2024). **No discrepancies found** -
+  every Champion and Runner-up value matches both passes, including all five
+  playoff deciders (1919, 1922, 1937, 1949, 1953) and all three penalty
+  shoot-out finals (1995, 2015, 2016):
+  - https://www.footballdatabase.eu (per-match pages: 1916, 1921, 1922, 1925,
+    1949, 1983, 1999)
+  - https://uruguayfootballhistory.com/copa-america.html (1916, 1924)
+  - https://www.auf.org.uy/copa-america-1917/ (1917)
+  - https://www.11v11.com/matches/brazil-v-uruguay-29-may-1919-223092/ (1919)
+  - https://portales.eluniversal.com.co/copa-america/2015/historia/decada-de-1920-166 (1920)
+  - https://eleconomista.com.ar/deportes/historia-copa-america-1917-1929-n73487 (1922, 1923, 1942, 1947)
+  - https://www.worldfootball.net/competition/co22/conmebol-copa-america/ (per-year pages: 1926, 1939, 1941, 1956)
+  - https://athlet.org/football/copa-america/ (per-year pages: 1927, 1929, 1937, 1957, 1959, 1963, 1967)
+  - https://bolavip.com/en/copa-america/copa-america-champions-full-history-and-complete-winners-list (1925)
+  - https://www.topendsports.com/events/soccer/copa-america/ (hosts/winners pages: 1935, 1955, 1959, 1975, 1979, 1983, 1991)
+  - https://sites.duke.edu/wcwp/tournament-guides/copa-america-centenario-en-espanol/ (1935)
+  - https://www.11v11.com/matches/argentina-v-brazil-01-february-1937-224689/ (1937)
+  - https://www.afa.com.ar (official Argentine FA history: 1945, 1946)
+  - https://www.elgrafico.com.ar (1946, 1955, 1993)
+  - https://www.hoy.com.py/deportes/paraguay-campeon-sudamericano-por-primera-vez-en-1953 ;
+    https://www.ultimahora.com/copa-america-1953-la-primera-gran-conquista-n2878336 (1953)
+  - https://www.lanacion.com.ar/deportes/futbol/la-tarde-caliente-en-la-que-la-argentina-le-gano-a-chile-una-copa-america-en-santiago-hace-60-anos-nid1806373/ (1955)
+  - https://espndeportes.espn.com/futbol/copa-america/nota/_/id/243961/copa-america-historia-campeon-subcampeon-ganadores-titulos (1957)
+  - http://www.todor66.com/football/South_America/Championship_1959a.html (1959 Ecuador)
+  - https://www.ambito.com/deportes/copa-america-todos-los-campeones-y-quien-domina-el-historial-titulos-n6015166 (1963)
+  - https://lasimagenesretro.wordpress.com/tag/paraguay-campeon-copa-america-1979/ (1979)
+  - https://football.fandom.com/wiki/1987_Copa_Am%C3%A9rica_Final (1987)
+  - https://www.terra.com.br/esportes/futebol/copa-america-de-1989-da-ovada-em-salvador-a-revanche-do-maracanazo,08d8f37d2744386ba0b2e459d10e6391vze02lq6.html ;
+    https://www.gazetaesportiva.com/campeonatos/copa-america/copa-america-de-1989-enfim-a-redencao-brasileira/ (1989)
+  - http://soccernostalgia.blogspot.com/2017/07/copa-america-part-4-1991.html (1991)
+  - https://www.upi.com/Archives/1993/07/04/Argentina-beats-Mexico-2-1-to-win-Copa-America/5899741758400/ (1993)
+  - https://www.washingtonpost.com/archive/sports/1995/07/24/uruguay-wins-copa-title/bd7c1c2c-1480-49af-afc1-f66c6e768818/ (1995)
+  - https://www.wsc.co.uk/the-archive/bad-altitude/ (1997)
+  - https://www.transfermarkt.us/brazil_uruguay/index/spielbericht/3041948 (1999)
+  - https://colombiaone.com/2024/10/17/colombia-copa-america-win/ (2001)
+  - https://www.planetfootball.com/nostalgia/adriano-i-want-to-kill-you-when-the-emperor-ruled-the-2004-copa-america (2004)
+  - https://www.soccerphile.com/soccerphile/south-america/copa-america-07.html (2007)
+  - https://www.aljazeera.com/sports/2011/7/24/uruguay-beat-paraguay-for-copa-america-title (2011)
+  - https://www.foxnews.com/world/chile-beats-argentina-4-1-on-penalties-to-win-copa-america-at-home-lift-1st-major-trophy.amp (2015)
+  - https://bleacherreport.com/articles/2648628-argentina-vs-chile-score-reaction-from-2016-copa-america-final (2016)
+  - https://www.aljazeera.com/sports/2019/7/8/copa-america-brazil-beat-peru-3-1-to-lift-the-title (2019)
+  - https://www.cnn.com/2021/07/11/football/copa-america-intl-spt (2021)
+  - https://www.cnn.com/2024/07/14/sport/copa-america-final-argentina-colombia-tickets-spt-intl-hnk/index.html ;
+    https://www.skysports.com/football/news/11095/13178041/copa-america-2024-argentina-1-0-colombia-aet-lautaro-martinez-earns-victory-after-crowd-trouble-mars-final (2024)
+  - Note: this session's outbound network policy blocks direct fetches to
+    most of these domains (EGRESS_BLOCKED/403), so verification relied on
+    WebSearch's indexed snippets of each page rather than a direct page
+    load, same limitation as every prior secondary-sourced audit in this
+    file.
 
 ## Ballon d'Or
 
