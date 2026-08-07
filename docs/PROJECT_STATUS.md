@@ -3226,6 +3226,70 @@ pinned `lastReviewed` date, 2026-08-05 -> 2026-08-07).
 - The manifest schema-enforcement, source-link liveness, and Ballon d'Or
   ceremony-date items noted in earlier entries are unchanged this run.
 
+### Content-accuracy pass: Ballon d'Or Winner/National-team - second independent cross-check, no discrepancies
+
+Added 2026-08-07 (intensive run, later slice). Every backlog item and every
+required/nice-to-have capability from `docs/WEBSITE_REQUIREMENTS.md` was
+already closed going into this run, and the previous entry (FIFA World Cup)
+had just closed the "second independent cross-check" series for all four
+team competitions, naming individual awards as the natural next candidate:
+Ballon d'Or's Winner column, and Golden Boot's two top-scorer tables. This
+run does the Ballon d'Or half of that (Golden Boot remains on a single audit
+pass - the natural next candidate for a future run).
+
+Re-verified all 69 awarded editions (1956-2025, excluding the cancelled 2020
+award) via three parallel WebSearch passes split by era (1956-1978,
+1979-2001, 2002-2025), deliberately drawing from a source mix distinct from
+the 2026-08-04 first pass (which used ESPN, Sky Sports, BBC, Goal.com,
+UEFA.com, France Football retrospectives, and Wikipedia): this pass mainly
+used RSSSF, Transfermarkt, Bleacher Report, CBS Sports, OneFootball, NBC
+Sports, Olympics.com, official club/federation sites (Real Madrid, SL
+Benfica, FC Dynamo Kyiv, Scottish FA), IFFHS, Britannica, kicker.de, and
+Spanish-language outlets. **No discrepancies found** across any of the 69
+rows, including the two nationality-naturalization cases specifically
+re-checked (1960 Luis Suárez to Spain, 1961 Omar Sívori to Italy) and the
+2020 cancellation. Also reconfirmed the "Multiple winners through 2025"
+summary table's two largest totals (Messi 8, Cristiano Ronaldo 5).
+
+One genuine labeling nuance surfaced, not an error: 1990's National team
+("West Germany" for Lothar Matthäus) is defensible either way depending on
+whether a source keys off the team he won the award *for* (West Germany's
+July 1990 World Cup win) or the country as it existed on the December 1990
+announcement date (ten weeks post-reunification). Kept as "West Germany" for
+consistency with every other pre-1990 row - documented as a footnote in
+`content/ballon-dor.md`'s "Important editorial note" section and in
+`docs/SOURCES.md` rather than silently changed either way. 1996 (Matthias
+Sammer) has no such ambiguity and is unambiguously "Germany" in every
+source, unchanged.
+
+See `docs/SOURCES.md`'s expanded Ballon d'Or section for the full per-era
+source breakdown. `content/ballon-dor.md`'s `lastReviewed` moved to
+2026-08-07; `status` stays `review` (secondary sources, same reasoning as
+every prior secondary-sourced audit in this file). No table data changed -
+the only file changes are the `lastReviewed` bump, the new "West
+Germany"/"Germany" footnote, the new source citations, and this entry.
+
+Bumping `lastReviewed` changed `content/ballon-dor.md`'s SHA-256, which
+`pnpm check:pdfs` (added 2026-08-06) correctly flagged as making
+`public/downloads/ballon-dor.pdf` stale. Regenerated all six PDFs and the
+manifest via `PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`;
+`pnpm check:pdfs` now passes cleanly.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged and `pnpm lint` is clean (0 errors/0 warnings, same pre-existing
+`monthNames` hint every prior run has logged). The full Playwright suite
+passes unchanged - a `lastReviewed` date bump and a footnote addition have
+no assertion anywhere in the suite for this page.
+
+**Left for a future pass:**
+- Golden Boot's two top-scorer tables (World Cup and EURO) are now the last
+  competition/award data still on a single audit pass - the natural next
+  candidate in this series.
+- The manifest schema-enforcement and source-link liveness items noted in
+  earlier entries are unchanged this run. The Ballon d'Or ceremony-date item
+  is now fully closed (see the second-source follow-up entry above,
+  2026-08-04) - dropping it from this recurring note going forward.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

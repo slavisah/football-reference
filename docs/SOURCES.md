@@ -686,6 +686,36 @@ Primary sources should be preferred.
   already authored, now each with a genuine second independent source. Same
   network-policy constraint as the other Ballon d'Or audits (WebSearch only,
   no direct WebFetch to Wikipedia/RSSSF).
+- Winners and national-team second independent cross-check (2026-08-07,
+  intensive run): every one of the 69 awarded editions' Winner and National
+  team cells (1956-2025, excluding the cancelled 2020 award) re-verified via
+  three parallel WebSearch passes split by era (1956-1978, 1979-2001,
+  2002-2025), deliberately drawing from a source mix distinct from the
+  2026-08-04 first pass (which used ESPN, Sky Sports, BBC, Goal.com,
+  UEFA.com, France Football retrospectives, and Wikipedia). This pass mainly
+  used RSSSF (rsssf.org/miscellaneous/europa-poy*.html, the master
+  "European Footballer of the Year" list and per-year pages), Transfermarkt,
+  Bleacher Report, CBS Sports, OneFootball, NBC Sports, Olympics.com,
+  official club/federation sites (Real Madrid, SL Benfica, FC Dynamo Kyiv,
+  Scottish FA), IFFHS, Britannica, kicker.de, and Spanish-language outlets
+  (AS/Marca-style aggregation, La Nación, ESPN Deportes). Same network-policy
+  constraint as every other audit in this file - WebSearch snippets only, no
+  direct WebFetch (apnews.com, reuters.com, theguardian.com and marca.com's
+  own domains returned no directly fetchable pages via search this session).
+  **No discrepancies found** across any of the 69 rows, including a specific
+  re-check of the two nationality-naturalization cases (1960 Luis Suárez to
+  Spain, 1961 Omar Sívori to Italy) and the 2020 cancellation. Also
+  reconfirmed the "Multiple winners through 2025" summary table's two
+  largest totals (Messi 8, Cristiano Ronaldo 5) via Olympics.com and NBC
+  Sports, independent of the first pass's sources. One genuine labeling
+  nuance was surfaced rather than an error: 1990's "West Germany" (Lothar
+  Matthäus) is defensible either way depending on whether a source keys off
+  the team he won the award for (West Germany's July 1990 World Cup win) or
+  the country as it existed on the December 1990 announcement date (ten
+  weeks post-reunification) - see `content/ballon-dor.md`'s "Important
+  editorial note" section for the full explanation; the page's existing
+  choice is kept as-is, since it's consistent with how every other pre-1990
+  row is labeled.
 
 ## Review policy
 
