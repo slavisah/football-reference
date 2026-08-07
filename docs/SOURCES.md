@@ -228,6 +228,36 @@ Primary sources should be preferred.
   - https://www.uefa.com/uefaeuro/match/2003351 (2012)
   - https://en.wikipedia.org/wiki/UEFA_Euro_2016_final
   - https://en.wikipedia.org/wiki/UEFA_Euro_2024_final
+- Champion/Runner-up/Final-score second-source audit (2026-08-07, intensive
+  run): a second, independent cross-check of the same three columns audited
+  above, using a source mix deliberately distinct from the 2026-08-05 pass
+  (that pass leaned on UEFA.com/Wikipedia/RSSSF/ESPN/Sky Sports/BBC/CNN; this
+  one draws mainly from CNN's original match report, Reuters-affiliated wire
+  reprints, Bleacher Report, Al Jazeera, CBS Sports, Olympics.com, NBC News,
+  Gulf News, RFE/RL, Taipei Times, and independent retrospectives). All 17
+  editions (1960-2024) re-verified via three parallel WebSearch passes
+  (1960-1980, 1984-2004, 2008-2024). **No discrepancies found** - every
+  Winner, Runner-up, and Final value matches both this pass and the prior
+  one, including the two a.e.t. finals (1960, 2016), the 1968 replay, the two
+  penalty shoot-outs (1976, 2020) and the two golden-goal deciders (1996,
+  2000):
+  - https://en.wikipedia.org/wiki/1960_European_Nations%27_Cup_final_tournament
+  - https://www.uefa.com/uefaeuro/match/3996--spain-vs-ussr/ (1964)
+  - https://www.uefa.com/uefaeuro/history/news/0253-0d7b30305868-f37cf2b58b1d-1000--riva-steers-italy-to-euro-1968-final-replay-win-against-/ (1968 replay)
+  - https://www.uefa.com/uefaeuro/history/video/0253-0d7ade1ffe39-4df953d6e594-1000--euro-1972-final-highlights-west-germany-3-0-ussr/ (1972)
+  - https://www.uefa.com/uefaeuro/history/news/0253-0d7b2fd33353-cdc961ca4218-1000--panenka-makes-his-name-as-czechoslovakia-beat-west-german/ (1976)
+  - https://thesefootballtimes.co/2020/06/22/west-germany-2-1-belgium-at-euro-80-the-glory-that-set-up-a-new-era-for-die-mannschaft/ (1980)
+  - https://thesefootballtimes.co/2020/06/27/france-2-0-spain-at-euro-84-how-frances-magical-michael-platini-secured-glory/ (1984)
+  - https://www.uefa.com/uefaeuro/history/news/0253-0d7b2f78ca99-40f24ef873fd-1000--van-basten-volley-crowns-netherlands-euro-1988-final-win-agains/ (1988)
+  - https://www.fifa.com/en/articles/denmarks-92-triumph-30-years-on-from-a-euro-sensation (1992)
+  - https://www.irishtimes.com/sport/soccer/international/euro-moments-czech-mate-as-oliver-bierhoff-nets-1996-golden-goal-1.2633403 (1996)
+  - https://www.sofascore.com/news/euro-2000-final-frances-golden-goal-triumph (2000)
+  - https://www.irishtimes.com/sport/soccer/international/euro-moments-greece-stun-europe-and-break-portuguese-hearts-1.2650683 (2004)
+  - https://www.cnn.com/2008/SPORT/football/06/29/euro.final/index.html (2008)
+  - https://www.rferl.org/a/spain-italy-euro-2012-final/24631923.html (2012)
+  - https://www.espn.com/soccer/story/_/id/37451959/portugal-shock-france-win-euro-2016-eder-scores-winning-goal (2016)
+  - https://www.cnn.com/2021/07/11/football/england-italy-euro-2020-final-wembley-spt-intl/ (2020)
+  - https://www.cnn.com/2024/07/14/sport/spain-england-euro-2024-final-spt-intl (2024)
 
 ## UEFA Nations League
 
