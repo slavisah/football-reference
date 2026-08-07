@@ -186,6 +186,42 @@ Primary sources should be preferred.
   research), has been subject to historical recount/correction; 9 is the
   figure consistently used by modern independent sources. No other
   discrepancies found across the table's 23 rows.
+- Golden Boot (top-scorer) second independent cross-check (2026-08-07,
+  intensive run): re-verified all 23 rows of the "FIFA World Cup top
+  scorers" table (player name(s), team, goal count, 1930-2026) via three
+  parallel WebSearch passes split by era (1930-1962, 1966-2002, 2006-2026),
+  deliberately drawing from a source mix distinct from the 2026-08-04 first
+  pass (which leaned on ESPN, BBC, Sky Sports, Goal.com, FIFA.com, CBS
+  Sports, Sports Illustrated): this pass used RSSSF, English and German
+  Wikipedia, Britannica, worldfootball.net, 11v11.com, Transfermarkt,
+  fussballdaten.de, IFFHS, national football museums/federations, and
+  independent retrospectives. **No discrepancies found** across any of the
+  23 rows, including every multi-way tie (1962's six-way tie and 1994's
+  Stoichkov/Salenko tie) with every name and diacritic re-checked. Two
+  non-discrepancy notes surfaced worth recording: (1) 1934's Oldřich
+  Nejedlý total has a known historical footnote - an older FIFA tally once
+  split his goals differently across teammates, but the now-standard 5-goal
+  sole-leader figure already on the page matches every modern independent
+  source; (2) 2010's Thomas Müller tied on 5 goals with Diego Forlán, David
+  Villa, and Wesley Sneijder and won the award on UEFA/FIFA's own tiebreak
+  (fewer minutes, more assists) - the page's existing "World Cup notes"
+  bullet ("Modern tie-breakers may separate players with the same number of
+  goals...") already covers this generically, so no table change was made,
+  matching how this page already treats EURO 2012's Torres tiebreak the
+  same way. The 2026 row (Mbappé, France, 10 goals) got the same extra
+  scrutiny as the first pass, cross-checking a dozen independently-phrased
+  searches spanning ESPN, Sky Sports, FIFA.com, Fox Sports, NBC Sports,
+  Yahoo Sports, ABC News, Olympics.com, and others, all mutually consistent
+  on the final (Spain 1-0 Argentina a.e.t.) and third-place match (England
+  6-4 France, Mbappé's two goals there completing his 10) - reconfirmed, not
+  fabricated. Direct WebFetch to primary-source domains (rsssf.org,
+  wikipedia.org, worldfootball.net, and others) was blocked by this
+  environment's egress policy for this run, so verification relied on
+  WebSearch's synthesized snippets rather than directly rendered pages; a
+  future run without that restriction could upgrade confidence further,
+  though convergence across five-plus independently-sourced snippets per
+  year is already strong. This closes the Golden Boot second-source audit
+  for the FIFA World Cup table.
 
 ## UEFA EURO
 
@@ -247,6 +283,29 @@ Primary sources should be preferred.
   won UEFA's own tie-breaker (fewest minutes, plus an assist) - this matches
   the page's own stated methodology of showing joint leading scorers as
   tied with no single official winner, not a discrepancy in the data.
+- Golden Boot (top-scorer) second independent cross-check (2026-08-07,
+  intensive run): re-verified all 16 rows of the "UEFA EURO top scorers"
+  table (player name(s), team, goal count, 1960-2024) via two parallel
+  WebSearch passes split by era (1960-1992, 1996-2024), deliberately
+  drawing from a source mix distinct from the 2026-08-04 first pass (which
+  leaned on UEFA.com, ESPN, BBC, Sky Sports, Goal.com, Transfermarkt): this
+  pass used RSSSF, English and German Wikipedia, worldfootball.net,
+  11v11.com, eu-football.info, Wikidata, and independent retrospectives.
+  **No discrepancies found** across any of the 16 rows, including every
+  multi-way tie (1960's five-way tie, 1964's three-way tie, 1992's
+  four-way tie, 2012's and 2024's six-way ties) with every individual name
+  and diacritic re-checked for completeness and correct spelling. As with
+  the first pass, 2012's six-way tie (rather than crediting Fernando
+  Torres alone, despite his UEFA tiebreak award) and 2020's Ronaldo/Schick
+  tie both match the page's stated methodology of showing joint leading
+  scorers tied with no single official winner - not discrepancies. Direct
+  WebFetch to primary-source domains was blocked by this environment's
+  egress policy for this run (as it was for the World Cup half of this
+  pass, see above), so verification relied on WebSearch's synthesized
+  snippets rather than directly rendered pages. This closes the Golden
+  Boot second-source audit for the UEFA EURO table - both of Golden Boot's
+  tables, and now every competition/award table on the site, have at
+  least two independent audit passes on record.
 - Champion/Runner-up/Final-score audit (2026-08-05, intensive run): the core
   **Winner**, **Runner-up**, and **Final** (score line) columns in
   `content/uefa-euro.md`'s Editions table - the first dedicated cross-check

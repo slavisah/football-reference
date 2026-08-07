@@ -3290,6 +3290,88 @@ no assertion anywhere in the suite for this page.
   is now fully closed (see the second-source follow-up entry above,
   2026-08-04) - dropping it from this recurring note going forward.
 
+### Content-accuracy pass: Golden Boot (World Cup + EURO top scorers) - second independent cross-check, no discrepancies
+
+Added 2026-08-07 (intensive run, later slice). Every backlog item and every
+required/nice-to-have capability from `docs/WEBSITE_REQUIREMENTS.md` was
+already closed going into this run, and the previous entry (Ballon d'Or)
+named Golden Boot's two top-scorer tables as the last competition/award data
+still on a single audit pass - closing that gap is exactly this run's slice
+of the "second independent cross-check" series, which now covers every
+competition/award table on the site.
+
+Re-verified both tables in `content/golden-boot.md` via five parallel
+research passes: three for the FIFA World Cup table split by era
+(1930-1962, 1966-2002, 2006-2026, 23 editions) and two for the UEFA EURO
+table split by era (1960-1992, 1996-2024, 16 editions) - matching the same
+per-table pass count the 2026-08-04 first audit used. Each pass
+deliberately drew from a source mix distinct from its first-pass
+counterpart: RSSSF, English and German Wikipedia, Britannica,
+worldfootball.net, 11v11.com, Transfermarkt, fussballdaten.de, IFFHS,
+eu-football.info, Wikidata, national football museums/federations, and
+independent retrospectives, rather than the first pass's ESPN/BBC/Sky
+Sports/Goal.com/FIFA.com/CBS Sports/Sports Illustrated/UEFA.com/Transfermarkt
+mix. **No discrepancies found** across any of the 39 rows (23 World Cup +
+16 EURO), including every multi-way tie - 1962's six-way tie, 1994's
+Stoichkov/Salenko tie, 1960's five-way tie, 1964's three-way tie, 1992's
+four-way tie, and 2012's and 2024's six-way ties - with every individual
+name and diacritic re-checked for completeness and correct spelling.
+
+Two non-discrepancy notes surfaced, recorded in `docs/SOURCES.md` rather
+than changing any table data: 1934's Oldřich Nejedlý total has a known
+historical footnote (an older FIFA tally once split his goals differently
+among teammates) that doesn't affect the now-standard 5-goal figure already
+on the page; and 2010's Thomas Müller tied on 5 goals with three other
+players and won on FIFA's own tiebreak, which the page's existing generic
+"World Cup notes" bullet about tiebreakers already covers, consistent with
+how EURO 2012's Torres tiebreak is already handled the same way. The 2026
+World Cup row (Mbappé, France, 10 goals) got the same extra scrutiny the
+first pass gave it, re-checked via a dozen independently-phrased searches
+across a dozen outlets, all mutually consistent on the final and
+third-place match details - reconfirmed as genuine data, not fabricated.
+
+One tooling limitation applied to every pass this run: direct WebFetch to
+primary-source domains (rsssf.org, wikipedia.org, worldfootball.net, and
+others) was blocked by this environment's egress policy, so verification
+relied on WebSearch's synthesized result snippets rather than directly
+rendered pages. This is noted in `docs/SOURCES.md` as a caveat on the
+audit's strength, not a data concern - convergence across five-plus
+independently-sourced snippets per row is still strong evidence, and a
+future run without that restriction could upgrade confidence further.
+
+See `docs/SOURCES.md`'s two new "second independent cross-check" entries
+under FIFA World Cup and UEFA EURO for full per-era source lists.
+`content/golden-boot.md`'s `lastReviewed` moved to 2026-08-07; `status`
+stays `review` (secondary sources, same reasoning as every prior
+secondary-sourced audit in this file). No table data changed - the only
+file changes are the `lastReviewed` bump, the new source citations, and
+this entry.
+
+This closes the "second independent cross-check" series across every
+competition and award table on the site (Copa América, Nations League,
+EURO, World Cup, Ballon d'Or, and now Golden Boot) - every one now has at
+least two independent audit passes on record for its core data.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite
+is unchanged and `pnpm lint` is clean. The full Playwright suite is
+unchanged - a `lastReviewed` date bump has no assertion anywhere in the
+suite for this page. Bumping `lastReviewed` changed
+`content/golden-boot.md`'s SHA-256, which `pnpm check:pdfs` correctly
+flagged as making the Golden Boot section of the affected PDFs stale;
+regenerated all six PDFs and the manifest via `PW_EXECUTABLE_PATH=
+<preinstalled Chromium> pnpm build:pdfs`, and `pnpm check:pdfs` now passes
+cleanly.
+
+**Left for a future pass:**
+- With every competition/award table now on at least two independent audit
+  passes, this specific "second independent cross-check" series is
+  complete. A third-pass series, or a first-ever audit of secondary
+  columns not yet covered by any pass (e.g. host nation, attendance,
+  qualifying-round detail), would be the natural next content-accuracy
+  candidate if a future run wants to continue in this vein.
+- The manifest schema-enforcement and source-link liveness items noted in
+  earlier entries are unchanged this run.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
