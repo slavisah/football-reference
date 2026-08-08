@@ -3602,6 +3602,55 @@ independently re-verified since). Source-link liveness remains infeasible in
 this environment (WebFetch 403s on every host tried), per prior runs' notes
 - unchanged.
 
+### Content-accuracy audit: Copa América "Final date" column, first-ever pass - added 2026-08-08 (intensive run)
+
+Closes the exact gap the previous entry's "Left for a future pass" note
+named: the "Final date" column in `content/copa-america.md` (added
+2026-08-03, alongside the Format column) had never had a dedicated
+content-accuracy audit of its own, even though the Champion/Runner-up and
+Format columns it sits next to had each been audited at least once.
+
+Verified all 19 dated rows - every edition decided by a single-match
+final-playoff, knockout-final, or the 2016 centenary final (the other 30
+rows, League table and Home-and-away editions, correctly carry no single
+final date and were left alone). Split into two WebSearch research passes:
+the five pre-1960 final-playoff dates (1919, 1922, 1937, 1949, 1953) and the
+14 knockout-final-era dates (1987 through 2024), each date cross-checked
+against its Wikipedia final/play-off article plus at least one independent
+source (RSSSF, ESPN, Transfermarkt, or copaamerica.com's own recap).
+
+**No discrepancies found across any of the 19 dated rows.** Every date,
+including the less-documented pre-1960 playoffs (e.g. 1953's 1 April final
+in Lima, 1922's 6 November final in Rio), matched the page exactly.
+
+See `docs/SOURCES.md`'s Copa América section for the full per-edition source
+list, with the same egress-blocked-domains caveat every prior audit in this
+file has noted (WebSearch snippets, not direct page loads).
+
+No table data changed - `content/copa-america.md`'s `lastReviewed` was
+already 2026-08-08 from the prior run in this same intensive session, so no
+further bump was needed; only `docs/SOURCES.md` gained the new source
+citations and this entry. No PDF regeneration was needed since the content
+file's bytes didn't change.
+
+**Tests:** no library code under `src/` and no content file changed, so the
+full Vitest suite is unchanged (158/158) and `pnpm lint` is clean (0
+errors/0 warnings, the one pre-existing unrelated `monthNames` hint every
+prior run has logged). The full Playwright suite is unchanged for the same
+reason.
+
+**Left for a future pass:** with this run, every dated/audited column across
+all six competition/award tables (Champion/Runner-up/Final-score, Format,
+Host(s)/Teams, Third/Fourth-place, and now Copa América's Final date) has at
+least one independent content-accuracy audit on record. Remaining
+candidates: a second independent cross-check of columns/tables that have
+only had one audit pass so far (most of them, at this point), a first audit
+of Ballon d'Or's or Golden Boot's less-common columns if any remain
+unchecked, or a fresh accessibility/performance pass (the last dedicated one
+was 2026-08-05's quiz interactive-state sweep). Source-link liveness remains
+infeasible in this environment (WebFetch 403s on every host tried), per
+prior runs' notes - unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
