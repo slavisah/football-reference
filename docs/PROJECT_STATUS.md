@@ -3525,6 +3525,83 @@ has no assertion anywhere in the suite for either page.
 - Source-link liveness remains infeasible in this environment (WebFetch
   403s on every host tried), per prior runs' notes - unchanged.
 
+### Content-accuracy audit: first-ever Copa América Host and Nations League Finals-host verification - added 2026-08-08 (intensive run)
+
+Every backlog item and required/nice-to-have capability was already closed
+going into this run, and the previous entry's "Left for a future pass" note
+named Nations League's "Finals host" and Copa América's "Host / format"
+column's host-country value as the only remaining competition-table columns
+with no dedicated content-accuracy audit on record (World Cup and EURO's
+Host(s)/Teams columns had just been closed by the prior run). This run closes
+both. (Note: neither Nations League nor Copa América actually has a "Teams"
+participating-team-count column - both tables only have a host column, unlike
+World Cup/EURO - so this run audits exactly what exists, not a team count that
+was never on the page.)
+
+Verified via three parallel WebSearch research passes: two for Copa América's
+"Host / format" column split by era (1916-1957, 25 editions; 1959-2024, 23
+editions including both 1959 tournaments) and one for Nations League's
+"Finals host" column (all 4 completed editions). Sources: each edition's
+dedicated Wikipedia article, RSSSF's historical tables, UEFA.com and
+CONMEBOL's own host-announcement pages, cross-checked against a second
+independent source per edition (aggregate host-list sites, national-
+federation histories, press coverage, Fotmob, or venue announcements).
+**No discrepancies found across any of the 52 rows audited** (48 Copa América
+editions + 4 Nations League editions).
+
+Special attention went to two known edge cases, both reconfirmed correct as
+already on the page: the two 1959 Copa América editions are not mixed up
+(the regular Campeonato Sudamericano was hosted by Argentina; a separate
+one-off "Extraordinario" edition, requested by Ecuador to inaugurate a new
+stadium in Guayaquil, was hosted by Ecuador and is recorded as a second,
+distinct 1959 row); and 1975, 1979, and 1983 genuinely had no single host
+country (two-legged home-and-away finals played across the finalists' own
+countries, not hosted by a third nation), matching the "Home-and-away" label
+already in the "Host / format" column for those three rows - this is
+distinct from (and confirms, rather than duplicates) the separate Format
+column classification audited on 2026-08-02, which covered the
+League-table/Final-playoff/Home-and-away/Knockout-final/Centenary
+*classification* rather than which country actually hosted.
+
+One tooling limitation applied to every pass, same as every prior audit in
+this file: direct WebFetch to primary-source domains was blocked by this
+environment's egress policy, so verification relied on WebSearch's
+synthesized result snippets rather than directly rendered pages - noted as a
+caveat on the audit's strength, not a data concern, given convergence across
+2+ independently-sourced snippets per row.
+
+See `docs/SOURCES.md`'s new entries under UEFA Nations League and Copa
+América for the full per-era source lists. `content/uefa-nations-league.md`
+and `content/copa-america.md` both had their `lastReviewed` bumped to
+2026-08-08; `status` stays `review` (secondary sources, same reasoning as
+every prior secondary-sourced audit in this file). No table data changed -
+the only file changes are the two `lastReviewed` bumps, the new source
+citations, and this entry.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (158/158) and `pnpm lint` is clean (0 errors/0 warnings, the one
+pre-existing unrelated `monthNames` hint every prior run has logged). The
+full Playwright suite is unchanged - a `lastReviewed` date bump has no
+assertion anywhere in the suite for either page. Bumping `lastReviewed`
+changed both files' SHA-256, which `pnpm check:pdfs` correctly flagged as
+making `public/downloads/nations-league.pdf` and
+`public/downloads/copa-america.pdf` stale; regenerated all six PDFs and the
+manifest via `PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`,
+and `pnpm check:pdfs` now passes cleanly again.
+
+**Left for a future pass:** with this run, every competition/award table's
+host and team-count columns that actually exist on the site (World Cup,
+EURO, Nations League, Copa América) now have at least one dedicated
+content-accuracy audit pass, on top of the completed "second independent
+cross-check" series for Champion/Runner-up/Final-score columns across all
+six tables. Remaining candidates for a future content-accuracy pass: a
+third-pass series on any table (going beyond the current one-or-two-pass
+coverage), or a first audit of columns not yet covered by any pass at all
+(e.g. Copa América's per-edition "Final date", added 2026-08-03 but not
+independently re-verified since). Source-link liveness remains infeasible in
+this environment (WebFetch 403s on every host tried), per prior runs' notes
+- unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
