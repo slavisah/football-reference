@@ -781,6 +781,34 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     indexed snippets rather than direct page loads.
+- Final-date audit (2026-08-08): the 19 dated rows in the "Final date"
+  column (every edition decided by a single-match final-playoff/knockout-
+  final/centenary format; the 30 "League table"/"Home-and-away" rows
+  correctly carry no single final date). Each date cross-checked against its
+  Wikipedia match/final article and at least one independent source
+  (RSSSF, ESPN, Transfermarkt, or the competition's own copaamerica.com
+  recap):
+  - https://en.wikipedia.org/wiki/1919_South_American_Championship_final (29 May 1919)
+  - https://en.wikipedia.org/wiki/1922_South_American_Championship_final (6 November 1922)
+  - https://en.wikipedia.org/wiki/1937_South_American_Championship_play-off (1 February 1937)
+  - https://www.rsssf.org/tables/49sa.html (11 May 1949)
+  - https://www.rsssf.org/tables/53sa.html (1 April 1953)
+  - https://en.wikipedia.org/wiki/1987_Copa_Am%C3%A9rica_final (12 July 1987)
+  - https://en.wikipedia.org/wiki/1993_Copa_Am%C3%A9rica_final (4 July 1993)
+  - https://en.wikipedia.org/wiki/1995_Copa_Am%C3%A9rica_final (23 July 1995)
+  - https://en.wikipedia.org/wiki/1997_Copa_Am%C3%A9rica_final (29 June 1997)
+  - https://en.wikipedia.org/wiki/1999_Copa_Am%C3%A9rica_final (18 July 1999)
+  - https://en.wikipedia.org/wiki/2001_Copa_Am%C3%A9rica_final (29 July 2001)
+  - https://en.wikipedia.org/wiki/2004_Copa_Am%C3%A9rica_final (25 July 2004)
+  - https://en.wikipedia.org/wiki/2007_Copa_Am%C3%A9rica_final (15 July 2007)
+  - https://en.wikipedia.org/wiki/2011_Copa_Am%C3%A9rica_final (24 July 2011)
+  - https://en.wikipedia.org/wiki/2015_Copa_Am%C3%A9rica_final (4 July 2015)
+  - https://en.wikipedia.org/wiki/Copa_Am%C3%A9rica_Centenario_final (26 June 2016)
+  - https://en.wikipedia.org/wiki/2019_Copa_Am%C3%A9rica_final (7 July 2019)
+  - https://en.wikipedia.org/wiki/2021_Copa_Am%C3%A9rica_final (10 July 2021)
+  - https://en.wikipedia.org/wiki/2024_Copa_Am%C3%A9rica_final (14 July 2024)
+  - Note: the same egress-blocked-domains caveat applies; verification
+    relied on WebSearch's indexed snippets rather than direct page loads.
 
 ## Ballon d'Or
 
