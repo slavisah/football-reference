@@ -3722,6 +3722,64 @@ changed, this is a test-only addition).
 - Source-link liveness remains infeasible in this environment (WebFetch
   403s on every host tried), per prior runs' notes - unchanged.
 
+### Accessibility: theme-toggle button's live click interaction, first-ever test coverage - added 2026-08-08 (intensive run)
+
+Closes the exact gap the previous entry's "Left for a future pass" note
+named. `ThemeToggle.astro` (rendered in `Nav.astro` on every page, English
+and Croatian) is the one genuinely interactive, client-scripted control that
+sits outside any `TournamentTable`/quiz/compare state, and it had **zero**
+test coverage of any kind before this run - not a Vitest unit test (there is
+no pure function here, it's a DOM click handler), not a Playwright
+functional test, not an axe pass. The main `accessibility.spec.ts` sweep
+only ever loads pages once per Playwright-emulated `colorScheme`; it never
+actually clicks the button and drives the real `data-theme`
+attribute/`aria-pressed`/label-swap/`localStorage` logic in
+`ThemeToggle.astro`'s inline script.
+
+New `tests/e2e/accessibility-theme-toggle.spec.ts` covers, on the English
+home page: the initial state (confirming `sync()` runs once on load and
+already reflects the emulated OS color scheme - Playwright's un-set default
+is `light` - rather than the static server-rendered "Theme" label text,
+which the test comments explain to avoid a future false assumption);
+clicking toggles `aria-pressed`, the visible label text ("Light"/"Dark"),
+`<html data-theme>`, and `localStorage.getItem('theme')`, checked in both
+directions, with a live axe pass after each click (not just the emulated-
+`colorScheme` page loads the main sweep already covers); keyboard operability
+(`Tab`-focus then both `Enter` and `Space`, since a native `<button>` must
+accept either); and that a saved choice survives a real `page.reload()`
+(exercising `BaseLayout.astro`'s before-paint inline script reading
+`localStorage`, not just the in-memory DOM state of the current page). A
+second `describe` block re-runs the click-and-relabel check on the Croatian
+home page, confirming the toggle's localized `data-light-label`/
+`data-dark-label` (wired through `ThemeToggle`'s `locale` prop) actually
+reach the live-updated text ("Svijetla"/"Tamna"), not just the initial
+server render already covered by the main sweep.
+
+**No WCAG violations found** - this is a coverage-gap closure, not a
+bug-fix pass; the toggle already meets WCAG 2.1 A/AA in both states, it had
+simply never been driven through axe as a live interaction. No `src/` or
+`content/` changes were needed.
+
+**Tests:** 3 new Playwright cases (245 total, up from 242), all passing
+against the environment's preinstalled Chromium
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`).
+`pnpm lint` is clean (0 errors/0 warnings, the one pre-existing unrelated
+`monthNames` hint) and the full Vitest suite is unchanged (158/158 - no
+library code changed, this is a test-only addition). `pnpm build` succeeds
+(22 pages).
+
+**Left for a future pass:**
+- A second independent content-accuracy cross-check of columns/tables with
+  only one audit pass so far, or a first audit of Ballon d'Or's/Golden
+  Boot's remaining less-common columns if any, remain the main open
+  candidates - the accessibility side has now had two consecutive
+  concrete-gap closures (table filter/sort/empty states, then the
+  theme-toggle interaction) and no further specific gap is known offhand;
+  a future pass should look for one rather than run a broad, likely-low-
+  yield sweep, per the lesson already on record in this file.
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
