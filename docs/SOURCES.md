@@ -452,6 +452,28 @@ Primary sources should be preferred.
   - https://www.skysports.com/football/news/12904237/croatia-0-0-spain-4-5-on-penalties-dani-carvajal-converts-winning-penalty-as-la-roja-clinch-nations-league-glory
   - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
   - https://www.euronews.com/2025/06/09/portugal-beats-spain-to-win-the-nations-league
+- Finals-host audit (2026-08-08): the content table's "Finals host" column -
+  which country hosted the four-team Finals mini-tournament for each edition
+  - had never had a dedicated audit pass before (every prior pass here
+  covered final-match dates, third-place results, or Winner/Runner-up/Final
+  score, not the host column itself). Verified via WebSearch against UEFA.com
+  and Wikipedia's per-edition Finals articles, cross-checked with a second
+  source per edition (Fotmob, Allianz Arena's own venue announcement, or
+  Olympics.com); no discrepancies found across all four editions (Portugal
+  2019, Italy 2021, Netherlands 2023, Germany 2025):
+  - https://en.wikipedia.org/wiki/2019_UEFA_Nations_League_Finals
+  - https://www.uefa.com/uefanationsleague/news/0253-0d8200f22e52-053d234ec760-1000--portugal-confirmed-as-nations-league-finals-hosts
+  - https://en.wikipedia.org/wiki/2021_UEFA_Nations_League_Finals
+  - https://www.uefa.com/uefanationsleague/news/0264-110090fdb7d2-9b65a2e89c6a-1000--nations-league-hosts-confirmed/
+  - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_Finals
+  - https://www.uefa.com/news-media/news/027b-16b46bcb7a2b-ce54df2cb399-1000--netherlands-to-host-2023-uefa-nations-league-finals/
+  - https://www.fotmob.com/news/85kd364vfk5416h3yqlfmsgg8-netherlands-confirmed-to-host-2023-nations-league-finals
+  - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_Finals
+  - https://www.uefa.com/news-media/news/029a-1deb0169b106-2e1771fe5029-1000--welcome-to-the-2025-uefa-nations-league-finals/
+  - https://allianz-arena.com/en/news/2025/03/allianz-arena-venue-for-uefa-nations-league-final-four
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    indexed snippets rather than direct page loads.
 
 ## Copa América
 
@@ -704,6 +726,61 @@ Primary sources should be preferred.
     WebSearch's indexed snippets of each page rather than a direct page
     load, same limitation as every prior secondary-sourced audit in this
     file.
+- Host-country audit (2026-08-08): the content table's "Host / format"
+  column's host-country value (distinct from the separate 2026-08-02 Format
+  audit above, which covered only the League table/Final playoff/Home-and-
+  away/Knockout-final/Centenary classification, not which country hosted)
+  had never had a dedicated audit pass before. Verified via WebSearch against
+  each edition's dedicated Wikipedia article, RSSSF's historical tables, and
+  (for the modern era) CONMEBOL's own host-announcement pages, cross-checked
+  against a second independent source per edition (aggregate host-list
+  sites, national-federation histories, or press coverage); no discrepancies
+  found across all 48 editions, 1916-2024. Special attention was paid to the
+  two 1959 editions (confirmed not mixed up: the regular Campeonato
+  Sudamericano was hosted by Argentina, a separate one-off "Extraordinario"
+  edition was hosted by Ecuador to inaugurate a new stadium in Guayaquil) and
+  to confirming 1975, 1979, and 1983 genuinely had no single host country
+  (two-legged home-and-away finals between the finalists' own countries, not
+  a third-country host) - both already correctly reflected on the page.
+  - 1916-1957 (25 editions):
+    - https://en.wikipedia.org/wiki/1916_South_American_Championship through
+      https://en.wikipedia.org/wiki/1957_South_American_Championship (one
+      per-edition Wikipedia article per year)
+    - https://www.rsssf.org/tables/16sa.html
+    - https://www.mapsofworld.com/sports/football/copa-america/host-countries.html
+    - https://copaamerica.com/en/news/all-of-the-conmebol-copa-america-champions
+    - https://www.britannica.com/sports/Copa-America
+  - 1959-1997 (7 editions incl. both 1959 tournaments):
+    - https://en.wikipedia.org/wiki/1959_South_American_Championship_(Argentina)
+    - https://en.wikipedia.org/wiki/1959_South_American_Championship_(Ecuador)
+    - https://www.eluniverso.com/deportes/futbol/la-copa-america-se-jugo-dos-veces-en-1959-y-fue-clave-para-pele-y-alberto-spencer-nota/
+    - https://www.rsssf.org/tables/63sa.html
+    - https://en.wikipedia.org/wiki/1967_South_American_Championship
+    - https://en.wikipedia.org/wiki/1987_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/1989_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/1991_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/1993_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/1995_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/1997_Copa_Am%C3%A9rica
+  - 1975-1983 (home-and-away, no host):
+    - https://en.wikipedia.org/wiki/1975_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/1979_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/1983_Copa_Am%C3%A9rica_final
+    - https://www.footballhistory.org/tournament/copa-america.html
+  - 1999-2024 (10 editions):
+    - https://en.wikipedia.org/wiki/1999_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/2001_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/2004_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/2007_Copa_Am%C3%A9rica
+    - https://copaamerica.com/en/news/uruguay-become-champions-during-argentina-2011
+    - https://en.wikipedia.org/wiki/2015_Copa_Am%C3%A9rica
+    - https://www.starsandstripesfc.com/copa-america-2016-centenario/2015/10/23/9605580/copa-america-centenario-2016-host-usa
+    - https://www.espn.com/soccer/story/_/id/37474035/brazil-host-2019-copa-america
+    - https://www.aljazeera.com/sports/2021/5/31/brazil-to-host-copa-america-after-argentina-drops-due-to-covid
+    - https://copaamerica.com/en/copa-america-2024/host/estados-unidos
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    indexed snippets rather than direct page loads.
 
 ## Ballon d'Or
 
