@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 119 Vitest unit tests
+pnpm test                      # 158 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 188 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 242 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
                                           # and dark, across every page)
 ```
@@ -3650,6 +3650,135 @@ unchecked, or a fresh accessibility/performance pass (the last dedicated one
 was 2026-08-05's quiz interactive-state sweep). Source-link liveness remains
 infeasible in this environment (WebFetch 403s on every host tried), per
 prior runs' notes - unchanged.
+
+### Accessibility: every TournamentTable's filter/sort/empty-result states, first-ever audit - added 2026-08-08 (intensive run)
+
+Every backlog item was already closed going into this run, and the previous
+entry's "Left for a future pass" note named a fresh accessibility pass as one
+of three remaining candidates - specifically warning that it should target
+"a concrete gap... rather than a broad, likely-low-yield sweep" (a lesson
+from the 2026-08-04 entry, which found performance has little surface on
+this image-light static site). This run found and closed exactly that kind
+of concrete gap: `tests/e2e/accessibility.spec.ts`'s automated WCAG sweep
+loads every `NAV_LINKS` page exactly once, in its untouched initial DOM
+state, and `accessibility-quiz-states.spec.ts`/`accessibility-compare-
+states.spec.ts` already closed the equivalent gap for those two pages' own
+interactive states - but every one of the six competition/award pages' own
+`TournamentTable` filter/sort/empty-result states had never been driven
+through axe, or even through a plain functional test. In particular, the
+`#{id}-empty` "No editions match those filters" block
+(`src/components/TournamentTable.astro`) - which appears whenever a winner
+and year filter combination matches zero rows, with its own "Clear filters"
+button - has existed since the original filter feature shipped but had
+literally **zero** test coverage of any kind (functional or accessibility)
+before this run; every prior test, across the whole suite's history, only
+ever exercised filter combinations that returned at least one row.
+
+New `tests/e2e/accessibility-table-states.spec.ts` covers all seven table
+ids on the site (`world-cup`, `euro`, `copa-america`, `nations-league`,
+`ballon-dor`, `golden-boot-world-cup`, `golden-boot-euro`) with two states
+each: the no-results state (reaching it via a `findNoResultsCombo()` helper
+that reads each table's own live row `dataset` in the browser to find a
+genuinely non-matching winner/year pair, rather than a guessed pair that
+could silently stop being a real gap after a future content edit - and then
+confirms the "Clear filters" button is keyboard-focusable, activates on
+`Enter`, and actually restores the default view), and a combined
+filtered-and-re-sorted state (a real winner filter plus a changed "Sort by"
+option at once, since sorting only reorders `<tr>` elements in place while
+filtering hides some of them - a combination the existing `mobile.spec.ts`
+coverage always exercised separately, never together). A further canary test
+re-runs the no-results state against the Croatian World Cup page in the dark
+color scheme, since the underlying filter/sort/empty script is identical
+across locales and themes (same element ids, same logic) but the rendered
+labels and CSS custom properties differ - one representative table stands in
+for re-running all seven a second and third time, the same "vertical slice"
+reasoning this project's localization work used throughout.
+
+**No WCAG violations found in any of the 15 new cases** - this is a
+coverage-gap closure, not a bug-fix pass; the empty state's copy, the "Clear
+filters" button, and the reordered/filtered table all already meet WCAG 2.1
+A/AA, they simply had never been checked. No `src/` or `content/` changes
+were needed.
+
+**Tests:** 15 new Playwright cases (242 total, up from 227), all passing
+against the environment's preinstalled Chromium
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`,
+noted here since the plain `chromium` symlink Playwright reports in its own
+error message does not resolve on its own in this container - a future run
+hitting the same "Executable doesn't exist" error should point at the
+versioned `chromium-1194/chrome-linux/chrome` path directly). `pnpm lint` is
+clean (0 errors/0 warnings, the one pre-existing unrelated `monthNames`
+hint) and the full Vitest suite is unchanged (158/158 - no library code
+changed, this is a test-only addition).
+
+**Left for a future pass:**
+- The same three candidates the previous entry named remain otherwise open:
+  a second independent content-accuracy cross-check of columns/tables with
+  only one audit pass so far, a first audit of Ballon d'Or's/Golden Boot's
+  remaining less-common columns if any, or further concrete accessibility
+  gaps (e.g. the theme-toggle button's actual click interaction, as opposed
+  to the main sweep's `colorScheme`-forced page loads, has not been driven
+  through axe as a live state change).
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
+
+### Accessibility: theme-toggle button's live click interaction, first-ever test coverage - added 2026-08-08 (intensive run)
+
+Closes the exact gap the previous entry's "Left for a future pass" note
+named. `ThemeToggle.astro` (rendered in `Nav.astro` on every page, English
+and Croatian) is the one genuinely interactive, client-scripted control that
+sits outside any `TournamentTable`/quiz/compare state, and it had **zero**
+test coverage of any kind before this run - not a Vitest unit test (there is
+no pure function here, it's a DOM click handler), not a Playwright
+functional test, not an axe pass. The main `accessibility.spec.ts` sweep
+only ever loads pages once per Playwright-emulated `colorScheme`; it never
+actually clicks the button and drives the real `data-theme`
+attribute/`aria-pressed`/label-swap/`localStorage` logic in
+`ThemeToggle.astro`'s inline script.
+
+New `tests/e2e/accessibility-theme-toggle.spec.ts` covers, on the English
+home page: the initial state (confirming `sync()` runs once on load and
+already reflects the emulated OS color scheme - Playwright's un-set default
+is `light` - rather than the static server-rendered "Theme" label text,
+which the test comments explain to avoid a future false assumption);
+clicking toggles `aria-pressed`, the visible label text ("Light"/"Dark"),
+`<html data-theme>`, and `localStorage.getItem('theme')`, checked in both
+directions, with a live axe pass after each click (not just the emulated-
+`colorScheme` page loads the main sweep already covers); keyboard operability
+(`Tab`-focus then both `Enter` and `Space`, since a native `<button>` must
+accept either); and that a saved choice survives a real `page.reload()`
+(exercising `BaseLayout.astro`'s before-paint inline script reading
+`localStorage`, not just the in-memory DOM state of the current page). A
+second `describe` block re-runs the click-and-relabel check on the Croatian
+home page, confirming the toggle's localized `data-light-label`/
+`data-dark-label` (wired through `ThemeToggle`'s `locale` prop) actually
+reach the live-updated text ("Svijetla"/"Tamna"), not just the initial
+server render already covered by the main sweep.
+
+**No WCAG violations found** - this is a coverage-gap closure, not a
+bug-fix pass; the toggle already meets WCAG 2.1 A/AA in both states, it had
+simply never been driven through axe as a live interaction. No `src/` or
+`content/` changes were needed.
+
+**Tests:** 3 new Playwright cases (245 total, up from 242), all passing
+against the environment's preinstalled Chromium
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`).
+`pnpm lint` is clean (0 errors/0 warnings, the one pre-existing unrelated
+`monthNames` hint) and the full Vitest suite is unchanged (158/158 - no
+library code changed, this is a test-only addition). `pnpm build` succeeds
+(22 pages).
+
+**Left for a future pass:**
+- A second independent content-accuracy cross-check of columns/tables with
+  only one audit pass so far, or a first audit of Ballon d'Or's/Golden
+  Boot's remaining less-common columns if any, remain the main open
+  candidates - the accessibility side has now had two consecutive
+  concrete-gap closures (table filter/sort/empty states, then the
+  theme-toggle interaction) and no further specific gap is known offhand;
+  a future pass should look for one rather than run a broad, likely-low-
+  yield sweep, per the lesson already on record in this file.
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
 
 ## Known caveats
 
