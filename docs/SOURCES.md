@@ -124,6 +124,46 @@ Primary sources should be preferred.
   This closes the Champion/Runner-up/Final-score audit series across all
   four team competitions (Copa América, Nations League, EURO, World Cup) -
   every one now has at least one independent cross-check on record.
+- Champion/Runner-up/Final-score second-source audit (2026-08-07, intensive
+  run): a second, independent cross-check of the same three columns audited
+  above - the last of the four team competitions to get this second pass
+  (Nations League, EURO, and Copa América were each already closed) - using
+  a source mix deliberately distinct from the 2026-08-05 pass (that pass
+  leaned on FIFA.com, ESPN's match archive, Wikipedia's dedicated final
+  articles, BBC, and CNN). This pass split the 21 completed editions
+  (1930-2022; 2026 is the site's own forward-looking scheduled entry, out of
+  scope) across three parallel WebSearch passes by era (1930-1962,
+  1966-1994, 1998-2022), drawing mainly from RSSSF, Britannica,
+  worldfootball.net, Transfermarkt, 11v11.com, Sky Sports, BBC Sport,
+  CBS Sports, Bleacher Report, athlet.org, footballhistory.org,
+  planetworldcup.com, national-football-teams.com, EBSCO Research Starters,
+  UPI's wire archives, TheFA.com, englandstats.com, beIN Sports, and other
+  independent outlets, each edition cross-checked against at least two
+  non-overlapping sources. **No discrepancies found in any of the 21
+  editions.** Every extra-time and penalty-shootout final was specifically
+  re-confirmed a second time: 1934, 1966, 1978 (a.e.t., no penalties); 1994,
+  2006, 2022 (penalty shoot-outs); 2010, 2014 (a.e.t., golden-goal-era and
+  2010/2014 sudden-death rules no longer applied). 1950's unusual format (no
+  single knockout final - the title decided by the final round-robin
+  group's last match, Uruguay 2-1 Brazil) was reconfirmed as correctly
+  represented a second time, matching the existing "Editorial notes" text.
+  - https://www.rsssf.org/tables/30f.html (and RSSSF's equivalent per-edition
+    tournament table, 1930-1994, confirmed via search indexing where direct
+    fetch was blocked by this environment's network egress policy)
+  - https://www.britannica.com/event/World-Cup-2010
+  - https://www.worldfootball.net/report/wm-1970-in-mexiko-endspiel-brasilien-italien/
+  - https://www.transfermarkt.us/germany_argentina/index/spielbericht/2466308 (2014)
+  - https://www.11v11.com/matches/brazil-v-italy-17-july-1994-245173/
+  - https://www.skysports.com/football/news/12098/11437927 (2018)
+  - https://www.thefa.com/news/2014/jul/29/england-west-germany-world-cup-final-1966-4-2
+  - https://www.cbssports.com/soccer/news/ (2022 final report)
+  - https://www.espn.com/soccer/ (match archive, all 21 editions, as a
+    secondary cross-check alongside the sources above)
+
+  This closes the Champion/Runner-up/Final-score second-source audit series
+  across all four team competitions (Copa América, Nations League, EURO,
+  World Cup) - every one now has at least two independent cross-checks on
+  record.
 - Golden Boot (top-scorer) audit (2026-08-04, intensive run): the "FIFA
   World Cup top scorers" table in `content/golden-boot.md` - player name(s),
   team, and goal count for all 23 editions (1930-2026) - verified via three
@@ -146,6 +186,69 @@ Primary sources should be preferred.
   research), has been subject to historical recount/correction; 9 is the
   figure consistently used by modern independent sources. No other
   discrepancies found across the table's 23 rows.
+- Golden Boot (top-scorer) second independent cross-check (2026-08-07,
+  intensive run): re-verified all 23 rows of the "FIFA World Cup top
+  scorers" table (player name(s), team, goal count, 1930-2026) via three
+  parallel WebSearch passes split by era (1930-1962, 1966-2002, 2006-2026),
+  deliberately drawing from a source mix distinct from the 2026-08-04 first
+  pass (which leaned on ESPN, BBC, Sky Sports, Goal.com, FIFA.com, CBS
+  Sports, Sports Illustrated): this pass used RSSSF, English and German
+  Wikipedia, Britannica, worldfootball.net, 11v11.com, Transfermarkt,
+  fussballdaten.de, IFFHS, national football museums/federations, and
+  independent retrospectives. **No discrepancies found** across any of the
+  23 rows, including every multi-way tie (1962's six-way tie and 1994's
+  Stoichkov/Salenko tie) with every name and diacritic re-checked. Two
+  non-discrepancy notes surfaced worth recording: (1) 1934's Oldřich
+  Nejedlý total has a known historical footnote - an older FIFA tally once
+  split his goals differently across teammates, but the now-standard 5-goal
+  sole-leader figure already on the page matches every modern independent
+  source; (2) 2010's Thomas Müller tied on 5 goals with Diego Forlán, David
+  Villa, and Wesley Sneijder and won the award on UEFA/FIFA's own tiebreak
+  (fewer minutes, more assists) - the page's existing "World Cup notes"
+  bullet ("Modern tie-breakers may separate players with the same number of
+  goals...") already covers this generically, so no table change was made,
+  matching how this page already treats EURO 2012's Torres tiebreak the
+  same way. The 2026 row (Mbappé, France, 10 goals) got the same extra
+  scrutiny as the first pass, cross-checking a dozen independently-phrased
+  searches spanning ESPN, Sky Sports, FIFA.com, Fox Sports, NBC Sports,
+  Yahoo Sports, ABC News, Olympics.com, and others, all mutually consistent
+  on the final (Spain 1-0 Argentina a.e.t.) and third-place match (England
+  6-4 France, Mbappé's two goals there completing his 10) - reconfirmed, not
+  fabricated. Direct WebFetch to primary-source domains (rsssf.org,
+  wikipedia.org, worldfootball.net, and others) was blocked by this
+  environment's egress policy for this run, so verification relied on
+  WebSearch's synthesized snippets rather than directly rendered pages; a
+  future run without that restriction could upgrade confidence further,
+  though convergence across five-plus independently-sourced snippets per
+  year is already strong. This closes the Golden Boot second-source audit
+  for the FIFA World Cup table.
+- Host(s)/Teams audit (2026-08-08, intensive run): the first-ever
+  verification pass of the "Host(s)" and "Teams" columns (previously only
+  Champion/Runner-up/Third/Fourth had been audited, across several prior
+  entries). Verified via two parallel WebSearch passes split by era
+  (1930-1970, 1974-2026), each edition cross-checked against 2-3
+  independent sources. **No discrepancies found across any of the 23
+  editions.** Confirms the two historical nuances already documented on the
+  page: 1938 (16 teams qualified, but Austria was annexed by Germany before
+  the tournament and its slot left vacant, so 15 teams actually competed)
+  and 1950 (16 qualified, but Scotland, Turkey, and India withdrew, so 13
+  actually competed) - the table records teams that actually competed, not
+  qualifiers, and both figures check out against multiple sources. Also
+  independently corroborates that the 2026 edition's announced 48-team,
+  three-host (Canada/Mexico/United States) format was the format actually
+  played, not merely a pre-tournament plan - multiple July 2026 news
+  sources (ABC News, CBS News, NBC News, NPR, France24) confirm the
+  tournament concluded as scheduled:
+  - https://en.wikipedia.org/wiki/FIFA_World_Cup (per-edition host/team
+    tables, all 23 editions)
+  - https://www.rsssf.org/ (historical squad/qualification records, era 1)
+  - https://www.footballhistory.org/ (per-edition format retrospectives)
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026
+    (2026 host/format confirmation)
+  - Direct WebFetch to primary-source domains was blocked by this
+    environment's egress policy for this run, so verification relied on
+    WebSearch's synthesized snippets, per the same caveat prior audits in
+    this file have already noted.
 
 ## UEFA EURO
 
@@ -207,6 +310,29 @@ Primary sources should be preferred.
   won UEFA's own tie-breaker (fewest minutes, plus an assist) - this matches
   the page's own stated methodology of showing joint leading scorers as
   tied with no single official winner, not a discrepancy in the data.
+- Golden Boot (top-scorer) second independent cross-check (2026-08-07,
+  intensive run): re-verified all 16 rows of the "UEFA EURO top scorers"
+  table (player name(s), team, goal count, 1960-2024) via two parallel
+  WebSearch passes split by era (1960-1992, 1996-2024), deliberately
+  drawing from a source mix distinct from the 2026-08-04 first pass (which
+  leaned on UEFA.com, ESPN, BBC, Sky Sports, Goal.com, Transfermarkt): this
+  pass used RSSSF, English and German Wikipedia, worldfootball.net,
+  11v11.com, eu-football.info, Wikidata, and independent retrospectives.
+  **No discrepancies found** across any of the 16 rows, including every
+  multi-way tie (1960's five-way tie, 1964's three-way tie, 1992's
+  four-way tie, 2012's and 2024's six-way ties) with every individual name
+  and diacritic re-checked for completeness and correct spelling. As with
+  the first pass, 2012's six-way tie (rather than crediting Fernando
+  Torres alone, despite his UEFA tiebreak award) and 2020's Ronaldo/Schick
+  tie both match the page's stated methodology of showing joint leading
+  scorers tied with no single official winner - not discrepancies. Direct
+  WebFetch to primary-source domains was blocked by this environment's
+  egress policy for this run (as it was for the World Cup half of this
+  pass, see above), so verification relied on WebSearch's synthesized
+  snippets rather than directly rendered pages. This closes the Golden
+  Boot second-source audit for the UEFA EURO table - both of Golden Boot's
+  tables, and now every competition/award table on the site, have at
+  least two independent audit passes on record.
 - Champion/Runner-up/Final-score audit (2026-08-05, intensive run): the core
   **Winner**, **Runner-up**, and **Final** (score line) columns in
   `content/uefa-euro.md`'s Editions table - the first dedicated cross-check
@@ -228,6 +354,58 @@ Primary sources should be preferred.
   - https://www.uefa.com/uefaeuro/match/2003351 (2012)
   - https://en.wikipedia.org/wiki/UEFA_Euro_2016_final
   - https://en.wikipedia.org/wiki/UEFA_Euro_2024_final
+- Champion/Runner-up/Final-score second-source audit (2026-08-07, intensive
+  run): a second, independent cross-check of the same three columns audited
+  above, using a source mix deliberately distinct from the 2026-08-05 pass
+  (that pass leaned on UEFA.com/Wikipedia/RSSSF/ESPN/Sky Sports/BBC/CNN; this
+  one draws mainly from CNN's original match report, Reuters-affiliated wire
+  reprints, Bleacher Report, Al Jazeera, CBS Sports, Olympics.com, NBC News,
+  Gulf News, RFE/RL, Taipei Times, and independent retrospectives). All 17
+  editions (1960-2024) re-verified via three parallel WebSearch passes
+  (1960-1980, 1984-2004, 2008-2024). **No discrepancies found** - every
+  Winner, Runner-up, and Final value matches both this pass and the prior
+  one, including the two a.e.t. finals (1960, 2016), the 1968 replay, the two
+  penalty shoot-outs (1976, 2020) and the two golden-goal deciders (1996,
+  2000):
+  - https://en.wikipedia.org/wiki/1960_European_Nations%27_Cup_final_tournament
+  - https://www.uefa.com/uefaeuro/match/3996--spain-vs-ussr/ (1964)
+  - https://www.uefa.com/uefaeuro/history/news/0253-0d7b30305868-f37cf2b58b1d-1000--riva-steers-italy-to-euro-1968-final-replay-win-against-/ (1968 replay)
+  - https://www.uefa.com/uefaeuro/history/video/0253-0d7ade1ffe39-4df953d6e594-1000--euro-1972-final-highlights-west-germany-3-0-ussr/ (1972)
+  - https://www.uefa.com/uefaeuro/history/news/0253-0d7b2fd33353-cdc961ca4218-1000--panenka-makes-his-name-as-czechoslovakia-beat-west-german/ (1976)
+  - https://thesefootballtimes.co/2020/06/22/west-germany-2-1-belgium-at-euro-80-the-glory-that-set-up-a-new-era-for-die-mannschaft/ (1980)
+  - https://thesefootballtimes.co/2020/06/27/france-2-0-spain-at-euro-84-how-frances-magical-michael-platini-secured-glory/ (1984)
+  - https://www.uefa.com/uefaeuro/history/news/0253-0d7b2f78ca99-40f24ef873fd-1000--van-basten-volley-crowns-netherlands-euro-1988-final-win-agains/ (1988)
+  - https://www.fifa.com/en/articles/denmarks-92-triumph-30-years-on-from-a-euro-sensation (1992)
+  - https://www.irishtimes.com/sport/soccer/international/euro-moments-czech-mate-as-oliver-bierhoff-nets-1996-golden-goal-1.2633403 (1996)
+  - https://www.sofascore.com/news/euro-2000-final-frances-golden-goal-triumph (2000)
+  - https://www.irishtimes.com/sport/soccer/international/euro-moments-greece-stun-europe-and-break-portuguese-hearts-1.2650683 (2004)
+  - https://www.cnn.com/2008/SPORT/football/06/29/euro.final/index.html (2008)
+  - https://www.rferl.org/a/spain-italy-euro-2012-final/24631923.html (2012)
+  - https://www.espn.com/soccer/story/_/id/37451959/portugal-shock-france-win-euro-2016-eder-scores-winning-goal (2016)
+  - https://www.cnn.com/2021/07/11/football/england-italy-euro-2020-final-wembley-spt-intl/ (2020)
+  - https://www.cnn.com/2024/07/14/sport/spain-england-euro-2024-final-spt-intl (2024)
+- Host(s)/Teams audit (2026-08-08, intensive run): the first-ever
+  verification pass of the "Host(s)" and "Teams" columns (previously only
+  Champion/Runner-up/semifinalists had been audited, across the entries
+  above). Verified via two parallel WebSearch passes split by era
+  (1960-1992, 1996-2024), each edition cross-checked against 2-3
+  independent sources. **No discrepancies found across any of the 17
+  editions**, including every format-boundary edition on record: 1980 (the
+  first 8-team expansion), 1992 (Denmark's late substitution for Yugoslavia
+  changed the participant list but not the host or team count), 1996 (the
+  first 16-team expansion), 2016 (the first 24-team expansion), and 2020
+  (hosted across eleven European cities for UEFA's 60th anniversary,
+  confirmed as an accurate standard description rather than an error, still
+  a 24-team edition):
+  - https://en.wikipedia.org/wiki/UEFA_European_Championship (per-edition
+    host/team tables, all 17 editions)
+  - https://www.uefa.com/uefaeuro/history/ (era-by-era format history)
+  - https://www.topendsports.com/ (host/team-count cross-check, most
+    editions)
+  - Direct WebFetch to primary-source domains was blocked by this
+    environment's egress policy for this run, so verification relied on
+    WebSearch's synthesized snippets, per the same caveat the FIFA World
+    Cup Host(s)/Teams audit entry above (2026-08-08) already notes.
 
 ## UEFA Nations League
 
@@ -274,6 +452,28 @@ Primary sources should be preferred.
   - https://www.skysports.com/football/news/12904237/croatia-0-0-spain-4-5-on-penalties-dani-carvajal-converts-winning-penalty-as-la-roja-clinch-nations-league-glory
   - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
   - https://www.euronews.com/2025/06/09/portugal-beats-spain-to-win-the-nations-league
+- Finals-host audit (2026-08-08): the content table's "Finals host" column -
+  which country hosted the four-team Finals mini-tournament for each edition
+  - had never had a dedicated audit pass before (every prior pass here
+  covered final-match dates, third-place results, or Winner/Runner-up/Final
+  score, not the host column itself). Verified via WebSearch against UEFA.com
+  and Wikipedia's per-edition Finals articles, cross-checked with a second
+  source per edition (Fotmob, Allianz Arena's own venue announcement, or
+  Olympics.com); no discrepancies found across all four editions (Portugal
+  2019, Italy 2021, Netherlands 2023, Germany 2025):
+  - https://en.wikipedia.org/wiki/2019_UEFA_Nations_League_Finals
+  - https://www.uefa.com/uefanationsleague/news/0253-0d8200f22e52-053d234ec760-1000--portugal-confirmed-as-nations-league-finals-hosts
+  - https://en.wikipedia.org/wiki/2021_UEFA_Nations_League_Finals
+  - https://www.uefa.com/uefanationsleague/news/0264-110090fdb7d2-9b65a2e89c6a-1000--nations-league-hosts-confirmed/
+  - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_Finals
+  - https://www.uefa.com/news-media/news/027b-16b46bcb7a2b-ce54df2cb399-1000--netherlands-to-host-2023-uefa-nations-league-finals/
+  - https://www.fotmob.com/news/85kd364vfk5416h3yqlfmsgg8-netherlands-confirmed-to-host-2023-nations-league-finals
+  - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_Finals
+  - https://www.uefa.com/news-media/news/029a-1deb0169b106-2e1771fe5029-1000--welcome-to-the-2025-uefa-nations-league-finals/
+  - https://allianz-arena.com/en/news/2025/03/allianz-arena-venue-for-uefa-nations-league-final-four
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    indexed snippets rather than direct page loads.
 
 ## Copa América
 
@@ -471,6 +671,144 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/2019_Copa_Am%C3%A9rica_final (Brazil/Peru)
   - https://en.wikipedia.org/wiki/2021_Copa_Am%C3%A9rica_final (Argentina/Brazil)
   - https://en.wikipedia.org/wiki/2024_Copa_Am%C3%A9rica_final (Argentina/Colombia)
+- Champion/Runner-up second-source audit (2026-08-07, intensive run): a
+  second, independent cross-check of the same 48 editions audited above,
+  using a source mix deliberately distinct from the 2026-08-05 pass (that
+  pass leaned on Wikipedia/RSSSF/CONMEBOL; this one draws mainly from
+  national-federation histories, sports-history/statistics sites, and
+  independent press coverage). Re-verified via three parallel WebSearch
+  passes (1916-1949, 1953-1991, 1993-2024). **No discrepancies found** -
+  every Champion and Runner-up value matches both passes, including all five
+  playoff deciders (1919, 1922, 1937, 1949, 1953) and all three penalty
+  shoot-out finals (1995, 2015, 2016):
+  - https://www.footballdatabase.eu (per-match pages: 1916, 1921, 1922, 1925,
+    1949, 1983, 1999)
+  - https://uruguayfootballhistory.com/copa-america.html (1916, 1924)
+  - https://www.auf.org.uy/copa-america-1917/ (1917)
+  - https://www.11v11.com/matches/brazil-v-uruguay-29-may-1919-223092/ (1919)
+  - https://portales.eluniversal.com.co/copa-america/2015/historia/decada-de-1920-166 (1920)
+  - https://eleconomista.com.ar/deportes/historia-copa-america-1917-1929-n73487 (1922, 1923, 1942, 1947)
+  - https://www.worldfootball.net/competition/co22/conmebol-copa-america/ (per-year pages: 1926, 1939, 1941, 1956)
+  - https://athlet.org/football/copa-america/ (per-year pages: 1927, 1929, 1937, 1957, 1959, 1963, 1967)
+  - https://bolavip.com/en/copa-america/copa-america-champions-full-history-and-complete-winners-list (1925)
+  - https://www.topendsports.com/events/soccer/copa-america/ (hosts/winners pages: 1935, 1955, 1959, 1975, 1979, 1983, 1991)
+  - https://sites.duke.edu/wcwp/tournament-guides/copa-america-centenario-en-espanol/ (1935)
+  - https://www.11v11.com/matches/argentina-v-brazil-01-february-1937-224689/ (1937)
+  - https://www.afa.com.ar (official Argentine FA history: 1945, 1946)
+  - https://www.elgrafico.com.ar (1946, 1955, 1993)
+  - https://www.hoy.com.py/deportes/paraguay-campeon-sudamericano-por-primera-vez-en-1953 ;
+    https://www.ultimahora.com/copa-america-1953-la-primera-gran-conquista-n2878336 (1953)
+  - https://www.lanacion.com.ar/deportes/futbol/la-tarde-caliente-en-la-que-la-argentina-le-gano-a-chile-una-copa-america-en-santiago-hace-60-anos-nid1806373/ (1955)
+  - https://espndeportes.espn.com/futbol/copa-america/nota/_/id/243961/copa-america-historia-campeon-subcampeon-ganadores-titulos (1957)
+  - http://www.todor66.com/football/South_America/Championship_1959a.html (1959 Ecuador)
+  - https://www.ambito.com/deportes/copa-america-todos-los-campeones-y-quien-domina-el-historial-titulos-n6015166 (1963)
+  - https://lasimagenesretro.wordpress.com/tag/paraguay-campeon-copa-america-1979/ (1979)
+  - https://football.fandom.com/wiki/1987_Copa_Am%C3%A9rica_Final (1987)
+  - https://www.terra.com.br/esportes/futebol/copa-america-de-1989-da-ovada-em-salvador-a-revanche-do-maracanazo,08d8f37d2744386ba0b2e459d10e6391vze02lq6.html ;
+    https://www.gazetaesportiva.com/campeonatos/copa-america/copa-america-de-1989-enfim-a-redencao-brasileira/ (1989)
+  - http://soccernostalgia.blogspot.com/2017/07/copa-america-part-4-1991.html (1991)
+  - https://www.upi.com/Archives/1993/07/04/Argentina-beats-Mexico-2-1-to-win-Copa-America/5899741758400/ (1993)
+  - https://www.washingtonpost.com/archive/sports/1995/07/24/uruguay-wins-copa-title/bd7c1c2c-1480-49af-afc1-f66c6e768818/ (1995)
+  - https://www.wsc.co.uk/the-archive/bad-altitude/ (1997)
+  - https://www.transfermarkt.us/brazil_uruguay/index/spielbericht/3041948 (1999)
+  - https://colombiaone.com/2024/10/17/colombia-copa-america-win/ (2001)
+  - https://www.planetfootball.com/nostalgia/adriano-i-want-to-kill-you-when-the-emperor-ruled-the-2004-copa-america (2004)
+  - https://www.soccerphile.com/soccerphile/south-america/copa-america-07.html (2007)
+  - https://www.aljazeera.com/sports/2011/7/24/uruguay-beat-paraguay-for-copa-america-title (2011)
+  - https://www.foxnews.com/world/chile-beats-argentina-4-1-on-penalties-to-win-copa-america-at-home-lift-1st-major-trophy.amp (2015)
+  - https://bleacherreport.com/articles/2648628-argentina-vs-chile-score-reaction-from-2016-copa-america-final (2016)
+  - https://www.aljazeera.com/sports/2019/7/8/copa-america-brazil-beat-peru-3-1-to-lift-the-title (2019)
+  - https://www.cnn.com/2021/07/11/football/copa-america-intl-spt (2021)
+  - https://www.cnn.com/2024/07/14/sport/copa-america-final-argentina-colombia-tickets-spt-intl-hnk/index.html ;
+    https://www.skysports.com/football/news/11095/13178041/copa-america-2024-argentina-1-0-colombia-aet-lautaro-martinez-earns-victory-after-crowd-trouble-mars-final (2024)
+  - Note: this session's outbound network policy blocks direct fetches to
+    most of these domains (EGRESS_BLOCKED/403), so verification relied on
+    WebSearch's indexed snippets of each page rather than a direct page
+    load, same limitation as every prior secondary-sourced audit in this
+    file.
+- Host-country audit (2026-08-08): the content table's "Host / format"
+  column's host-country value (distinct from the separate 2026-08-02 Format
+  audit above, which covered only the League table/Final playoff/Home-and-
+  away/Knockout-final/Centenary classification, not which country hosted)
+  had never had a dedicated audit pass before. Verified via WebSearch against
+  each edition's dedicated Wikipedia article, RSSSF's historical tables, and
+  (for the modern era) CONMEBOL's own host-announcement pages, cross-checked
+  against a second independent source per edition (aggregate host-list
+  sites, national-federation histories, or press coverage); no discrepancies
+  found across all 48 editions, 1916-2024. Special attention was paid to the
+  two 1959 editions (confirmed not mixed up: the regular Campeonato
+  Sudamericano was hosted by Argentina, a separate one-off "Extraordinario"
+  edition was hosted by Ecuador to inaugurate a new stadium in Guayaquil) and
+  to confirming 1975, 1979, and 1983 genuinely had no single host country
+  (two-legged home-and-away finals between the finalists' own countries, not
+  a third-country host) - both already correctly reflected on the page.
+  - 1916-1957 (25 editions):
+    - https://en.wikipedia.org/wiki/1916_South_American_Championship through
+      https://en.wikipedia.org/wiki/1957_South_American_Championship (one
+      per-edition Wikipedia article per year)
+    - https://www.rsssf.org/tables/16sa.html
+    - https://www.mapsofworld.com/sports/football/copa-america/host-countries.html
+    - https://copaamerica.com/en/news/all-of-the-conmebol-copa-america-champions
+    - https://www.britannica.com/sports/Copa-America
+  - 1959-1997 (7 editions incl. both 1959 tournaments):
+    - https://en.wikipedia.org/wiki/1959_South_American_Championship_(Argentina)
+    - https://en.wikipedia.org/wiki/1959_South_American_Championship_(Ecuador)
+    - https://www.eluniverso.com/deportes/futbol/la-copa-america-se-jugo-dos-veces-en-1959-y-fue-clave-para-pele-y-alberto-spencer-nota/
+    - https://www.rsssf.org/tables/63sa.html
+    - https://en.wikipedia.org/wiki/1967_South_American_Championship
+    - https://en.wikipedia.org/wiki/1987_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/1989_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/1991_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/1993_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/1995_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/1997_Copa_Am%C3%A9rica
+  - 1975-1983 (home-and-away, no host):
+    - https://en.wikipedia.org/wiki/1975_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/1979_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/1983_Copa_Am%C3%A9rica_final
+    - https://www.footballhistory.org/tournament/copa-america.html
+  - 1999-2024 (10 editions):
+    - https://en.wikipedia.org/wiki/1999_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/2001_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/2004_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/2007_Copa_Am%C3%A9rica
+    - https://copaamerica.com/en/news/uruguay-become-champions-during-argentina-2011
+    - https://en.wikipedia.org/wiki/2015_Copa_Am%C3%A9rica
+    - https://www.starsandstripesfc.com/copa-america-2016-centenario/2015/10/23/9605580/copa-america-centenario-2016-host-usa
+    - https://www.espn.com/soccer/story/_/id/37474035/brazil-host-2019-copa-america
+    - https://www.aljazeera.com/sports/2021/5/31/brazil-to-host-copa-america-after-argentina-drops-due-to-covid
+    - https://copaamerica.com/en/copa-america-2024/host/estados-unidos
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    indexed snippets rather than direct page loads.
+- Final-date audit (2026-08-08): the 19 dated rows in the "Final date"
+  column (every edition decided by a single-match final-playoff/knockout-
+  final/centenary format; the 30 "League table"/"Home-and-away" rows
+  correctly carry no single final date). Each date cross-checked against its
+  Wikipedia match/final article and at least one independent source
+  (RSSSF, ESPN, Transfermarkt, or the competition's own copaamerica.com
+  recap):
+  - https://en.wikipedia.org/wiki/1919_South_American_Championship_final (29 May 1919)
+  - https://en.wikipedia.org/wiki/1922_South_American_Championship_final (6 November 1922)
+  - https://en.wikipedia.org/wiki/1937_South_American_Championship_play-off (1 February 1937)
+  - https://www.rsssf.org/tables/49sa.html (11 May 1949)
+  - https://www.rsssf.org/tables/53sa.html (1 April 1953)
+  - https://en.wikipedia.org/wiki/1987_Copa_Am%C3%A9rica_final (12 July 1987)
+  - https://en.wikipedia.org/wiki/1993_Copa_Am%C3%A9rica_final (4 July 1993)
+  - https://en.wikipedia.org/wiki/1995_Copa_Am%C3%A9rica_final (23 July 1995)
+  - https://en.wikipedia.org/wiki/1997_Copa_Am%C3%A9rica_final (29 June 1997)
+  - https://en.wikipedia.org/wiki/1999_Copa_Am%C3%A9rica_final (18 July 1999)
+  - https://en.wikipedia.org/wiki/2001_Copa_Am%C3%A9rica_final (29 July 2001)
+  - https://en.wikipedia.org/wiki/2004_Copa_Am%C3%A9rica_final (25 July 2004)
+  - https://en.wikipedia.org/wiki/2007_Copa_Am%C3%A9rica_final (15 July 2007)
+  - https://en.wikipedia.org/wiki/2011_Copa_Am%C3%A9rica_final (24 July 2011)
+  - https://en.wikipedia.org/wiki/2015_Copa_Am%C3%A9rica_final (4 July 2015)
+  - https://en.wikipedia.org/wiki/Copa_Am%C3%A9rica_Centenario_final (26 June 2016)
+  - https://en.wikipedia.org/wiki/2019_Copa_Am%C3%A9rica_final (7 July 2019)
+  - https://en.wikipedia.org/wiki/2021_Copa_Am%C3%A9rica_final (10 July 2021)
+  - https://en.wikipedia.org/wiki/2024_Copa_Am%C3%A9rica_final (14 July 2024)
+  - Note: the same egress-blocked-domains caveat applies; verification
+    relied on WebSearch's indexed snippets rather than direct page loads.
 
 ## Ballon d'Or
 
@@ -561,6 +899,36 @@ Primary sources should be preferred.
   already authored, now each with a genuine second independent source. Same
   network-policy constraint as the other Ballon d'Or audits (WebSearch only,
   no direct WebFetch to Wikipedia/RSSSF).
+- Winners and national-team second independent cross-check (2026-08-07,
+  intensive run): every one of the 69 awarded editions' Winner and National
+  team cells (1956-2025, excluding the cancelled 2020 award) re-verified via
+  three parallel WebSearch passes split by era (1956-1978, 1979-2001,
+  2002-2025), deliberately drawing from a source mix distinct from the
+  2026-08-04 first pass (which used ESPN, Sky Sports, BBC, Goal.com,
+  UEFA.com, France Football retrospectives, and Wikipedia). This pass mainly
+  used RSSSF (rsssf.org/miscellaneous/europa-poy*.html, the master
+  "European Footballer of the Year" list and per-year pages), Transfermarkt,
+  Bleacher Report, CBS Sports, OneFootball, NBC Sports, Olympics.com,
+  official club/federation sites (Real Madrid, SL Benfica, FC Dynamo Kyiv,
+  Scottish FA), IFFHS, Britannica, kicker.de, and Spanish-language outlets
+  (AS/Marca-style aggregation, La Nación, ESPN Deportes). Same network-policy
+  constraint as every other audit in this file - WebSearch snippets only, no
+  direct WebFetch (apnews.com, reuters.com, theguardian.com and marca.com's
+  own domains returned no directly fetchable pages via search this session).
+  **No discrepancies found** across any of the 69 rows, including a specific
+  re-check of the two nationality-naturalization cases (1960 Luis Suárez to
+  Spain, 1961 Omar Sívori to Italy) and the 2020 cancellation. Also
+  reconfirmed the "Multiple winners through 2025" summary table's two
+  largest totals (Messi 8, Cristiano Ronaldo 5) via Olympics.com and NBC
+  Sports, independent of the first pass's sources. One genuine labeling
+  nuance was surfaced rather than an error: 1990's "West Germany" (Lothar
+  Matthäus) is defensible either way depending on whether a source keys off
+  the team he won the award for (West Germany's July 1990 World Cup win) or
+  the country as it existed on the December 1990 announcement date (ten
+  weeks post-reunification) - see `content/ballon-dor.md`'s "Important
+  editorial note" section for the full explanation; the page's existing
+  choice is kept as-is, since it's consistent with how every other pre-1990
+  row is labeled.
 
 ## Review policy
 

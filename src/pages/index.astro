@@ -1,12 +1,26 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import OnThisDay from '../components/OnThisDay.astro';
+import EditorialNotes from '../components/EditorialNotes.astro';
 import { withBase } from '../lib/url';
 import { getEntry } from 'astro:content';
 import { loadHomeCompetitions, buildHomeCards } from '../lib/homeCards';
 import { buildOnThisDayEntries } from '../lib/onThisDay';
+import { extractSections } from '../lib/notes';
 
 const home = await getEntry('pages', 'index');
+
+// "How to use the reference" and "Important historical naming note" already
+// exist in content/index.md but, unlike every competition page, this page is
+// fully hand-authored and never touched the Markdown body beyond the front
+// matter - so both sections were dead content. Extracted the same way
+// loadCompetition()'s noteHeadings works (getEntry() here instead of
+// loadPageMeta() since this page also needs the optional `description` front
+// matter field that PageMeta doesn't expose).
+const homeNotes = extractSections(home?.body ?? '', [
+  'How to use the reference',
+  'Important historical naming note',
+]);
 
 // Pull a live champion count from each competition so the home cards stay in
 // sync with the editorial tables instead of hard-coding numbers. Shared with
@@ -106,6 +120,8 @@ const onThisDayEntries = [
       generated from these same tables.
     </p>
   </section>
+
+  <EditorialNotes sections={homeNotes} />
 </BaseLayout>
 
 <style>

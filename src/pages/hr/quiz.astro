@@ -15,11 +15,13 @@ import QuizCard from '../../components/QuizCard.astro';
 import QuizOrderCard from '../../components/QuizOrderCard.astro';
 import QuizScript from '../../components/QuizScript.astro';
 import References from '../../components/References.astro';
+import EditorialNotes from '../../components/EditorialNotes.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import { buildTimeline } from '../../lib/editions';
 import { t } from '../../lib/i18n';
 import { withBase } from '../../lib/url';
 import type { Edition } from '../../lib/types';
+import type { NoteSection } from '../../lib/notes';
 import {
   championByYearQuestions,
   chronologicalOrderQuestions,
@@ -31,6 +33,35 @@ import {
 } from '../../lib/quiz';
 
 const meta = await loadPageMeta('quiz');
+
+// Hand-translated from content/quiz.md's "How it works" and "Question types
+// in this quiz" sections (the same two headings the English page requests
+// via loadPageMeta's noteHeadings). content/ itself stays untouched and
+// English (the single editorial source of truth); this is presentation-layer
+// text local to this page only, the same convention the six Croatian
+// competition pages already use for their own hand-translated notes.
+const notes: NoteSection[] = [
+  {
+    heading: 'Kako funkcionira',
+    items: [
+      'Odaberi odgovor, a zatim pritisni "Provjeri odgovor" da vidiš jesi li točno pogodio/la i dodaš bod svom rezultatu.',
+      'Otvori "Samo mi pokaži odgovor" na bilo kojem pitanju da pogledaš rješenje bez igranja.',
+      'Pritisni "Ponovno pokreni kviz" da obrišeš odgovore i igraš ponovno.',
+      '"Izazov: poredaj prvake" niže na stranici funkcionira drugačije: poredaj svakog prvaka pomoću padajućeg izbornika, a zatim pritisni "Provjeri redoslijed".',
+    ],
+  },
+  {
+    heading: 'Vrste pitanja u ovom kvizu',
+    items: [
+      'Tko je osvojio dano natjecanje u danoj godini?',
+      'Koja je zemlja bila domaćin danog natjecanja?',
+      'Koga je prvak pobijedio u finalu?',
+      'Tko je bio najbolji strijelac natjecanja (Zlatna kopačka)?',
+      'Tko je osvojio Zlatnu loptu u danoj godini?',
+      'Poredaj četiri prvaka natjecanja kronološkim redoslijedom (od najranijeg).',
+    ],
+  },
+];
 
 const [worldCup, euro, copaAmerica, nationsLeague, ballonDor, goldenBootWorldCup, goldenBootEuro] =
   await Promise.all([
@@ -229,6 +260,8 @@ const lastReviewed = [
         nova izdanja.
       </p>
     </header>
+
+    <EditorialNotes sections={notes} />
 
     <div class="quiz__score card no-print" id="quiz-score" hidden>
       <p>

@@ -42,6 +42,9 @@ jobs:
       - name: Unit tests
         run: pnpm test
 
+      - name: PDF freshness check
+        run: pnpm check:pdfs
+
       - name: Install Playwright browser
         run: pnpm test:e2e:install
 
