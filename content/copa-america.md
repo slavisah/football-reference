@@ -91,6 +91,24 @@ This page intentionally begins with champions and runners-up rather than claimin
 - **Knockout final**: group stage followed by a single-elimination bracket ending in a one-off final (1987, and every edition from 1993 onward except 2016);
 - **Special centenary edition**: the 2016 Copa América Centenario, an extra edition outside the normal cycle marking the tournament's 100th anniversary.
 
+A **second, independent cross-check** of this Format column (2026-08-08,
+intensive run) re-verified all 48 editions in four era-based WebSearch
+passes (1916-1929, 1935-1967 including both 1959 tournaments, 1975-1987, and
+1989-2024), deliberately drawing on a source mix distinct from the
+2026-08-02 first pass - national-federation-adjacent and sports-history
+sites (worldfootball.net, todor66.com, athlet.org, topendsports.com,
+soccernostalgia.blogspot.com, Grokipedia, Liquipedia) alongside Wikipedia's
+per-edition articles and RSSSF, rather than Wikipedia/RSSSF alone. **No
+discrepancies found**: every classification already on the page held up,
+including the five level-on-points playoff deciders (1919, 1922, 1937, 1949,
+1953), the 1989/1991 closing-group League table editions, the 1975-1983
+Home-and-away three-legged-decider era, 1987's first knockout-final
+transition edition, and 2016's Special centenary edition (structurally a
+group-stage-into-knockout tournament like the 1993-onward era, but kept
+distinct because of its expanded 16-team CONMEBOL+CONCACAF field and
+off-cycle scheduling, the same reasoning the first pass gave). See
+`docs/SOURCES.md` for the full per-era citation list.
+
 Third and fourth places - audited 2026-08-02 (intensive run) against match reports, official recaps, and (for the pre-1975 era) full final league-table standings (see `docs/SOURCES.md`) - are now recorded for **every** edition that has a well-defined third/fourth placing:
 
 - 1987, then every edition from 1993 onward including the 2016 centenary edition, each decided by a single, discrete third-place match.

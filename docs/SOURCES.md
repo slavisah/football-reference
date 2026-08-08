@@ -809,6 +809,79 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/2024_Copa_Am%C3%A9rica_final (14 July 2024)
   - Note: the same egress-blocked-domains caveat applies; verification
     relied on WebSearch's indexed snippets rather than direct page loads.
+- Format-column second-source audit (2026-08-08, intensive run): a second,
+  independent cross-check of the same 48-edition Format classification
+  audited on 2026-08-02 above, re-verified in four era-based WebSearch
+  passes and deliberately drawing on a source mix distinct from the first
+  pass (which leaned on Wikipedia's per-edition/play-off articles and
+  RSSSF). **No discrepancies found** - every classification already on the
+  page held up, including all five playoff deciders, the 1989/1991
+  closing-group League table editions, the 1975-1983 Home-and-away era,
+  1987's knockout-final transition, and 2016's Special centenary edition:
+  - 1916-1929 (12 editions):
+    - https://en.wikipedia.org/wiki/1916_South_American_Championship
+    - https://en.wikipedia.org/wiki/1917_South_American_Championship
+    - https://en.wikipedia.org/wiki/1919_South_American_Championship_play-off
+    - https://en.wikipedia.org/wiki/1920_South_American_Championship
+    - https://en.wikipedia.org/wiki/1921_South_American_Championship
+    - https://en.wikipedia.org/wiki/1922_South_American_Championship_play-off
+    - https://en.wikipedia.org/wiki/1923_South_American_Championship
+    - https://en.wikipedia.org/wiki/1924_South_American_Championship
+    - https://en.wikipedia.org/wiki/1925_South_American_Championship
+    - https://en.wikipedia.org/wiki/1926_South_American_Championship
+    - https://en.wikipedia.org/wiki/1927_South_American_Championship
+    - https://en.wikipedia.org/wiki/1929_South_American_Championship
+    - http://www.todor66.com/football/South_America/Championship_1929.html
+    - https://rsssfbrasil.com/historics.htm
+  - 1935-1967 including both 1959 tournaments (17 editions):
+    - https://en.wikipedia.org/wiki/1935_South_American_Championship
+    - https://en.wikipedia.org/wiki/1937_South_American_Championship_play-off
+    - https://en.wikipedia.org/wiki/1939_South_American_Championship
+    - https://en.wikipedia.org/wiki/1941_South_American_Championship
+    - https://en.wikipedia.org/wiki/1942_South_American_Championship
+    - https://en.wikipedia.org/wiki/1945_South_American_Championship
+    - https://en.wikipedia.org/wiki/1946_South_American_Championship
+    - https://en.wikipedia.org/wiki/1947_South_American_Championship
+    - https://en.wikipedia.org/wiki/1949_South_American_Championship_play-off
+    - https://en.wikipedia.org/wiki/1953_South_American_Championship_play-off
+    - https://en.wikipedia.org/wiki/1955_South_American_Championship
+    - https://en.wikipedia.org/wiki/1956_South_American_Championship
+    - https://en.wikipedia.org/wiki/1957_South_American_Championship
+    - https://en.wikipedia.org/wiki/1959_South_American_Championship_(Argentina)
+    - http://www.todor66.com/football/South_America/Championship_1959a.html
+      (1959 Ecuador)
+    - https://liquipedia.net/lab/Football/CONMEBOL/South_American_Championship/1963
+    - https://en.wikipedia.org/wiki/1967_South_American_Championship
+  - 1975-1987, home-and-away to knockout-final transition (4 editions):
+    - https://soccerwizdom.com/2025/05/31/1975-copa-america-the-year-south-america-broke-the-mold/
+    - https://en.wikipedia.org/wiki/1975_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/1979_Copa_Am%C3%A9rica_final
+    - https://www.rsssf.org/tables/79sa.html
+    - https://en.wikipedia.org/wiki/1983_Copa_Am%C3%A9rica_final
+    - https://www.rsssf.org/tables/83sa.html
+    - https://liquipedia.net/lab/Football/CONMEBOL/Copa_Am%C3%A9rica/1987
+    - https://www.rsssf.org/tables/87sa.html
+  - 1989-2024, knockout-final era plus the two closing-group League table
+    editions and the 2016 centenary edition (15 editions):
+    - http://soccernostalgia.blogspot.com/2017/02/copa-america-part-3-1989.html
+    - http://soccernostalgia.blogspot.com/2017/07/copa-america-part-4-1991.html
+    - https://liquipedia.net/lab/Football/CONMEBOL/Copa_Am%C3%A9rica/1993
+    - https://en.wikipedia.org/wiki/1995_Copa_Am%C3%A9rica_final
+    - https://liquipedia.net/lab/Football/CONMEBOL/Copa_Am%C3%A9rica/1997
+    - https://en.wikipedia.org/wiki/1999_Copa_Am%C3%A9rica_knockout_stage
+    - https://en.wikipedia.org/wiki/2001_Copa_Am%C3%A9rica_knockout_stage
+    - https://en.wikipedia.org/wiki/2004_Copa_Am%C3%A9rica_knockout_stage
+    - https://liquipedia.net/lab/Football/CONMEBOL/Copa_Am%C3%A9rica/2007
+    - https://en.wikipedia.org/wiki/2011_Copa_Am%C3%A9rica_knockout_stage
+    - https://en.wikipedia.org/wiki/2015_Copa_Am%C3%A9rica_knockout_stage
+    - https://www.si.com/soccer/2016/06/01/copa-america-centenario-tournament-format-corruption-explainer
+      (2016 centenary: expanded 16-team CONMEBOL+CONCACAF field)
+    - https://en.wikipedia.org/wiki/2019_Copa_Am%C3%A9rica_knockout_stage
+    - https://en.wikipedia.org/wiki/2021_Copa_Am%C3%A9rica_knockout_stage
+    - https://en.wikipedia.org/wiki/2024_Copa_Am%C3%A9rica_knockout_stage
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    indexed snippets rather than direct page loads.
 
 ## Ballon d'Or
 

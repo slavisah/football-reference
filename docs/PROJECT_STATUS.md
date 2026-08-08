@@ -3780,6 +3780,102 @@ library code changed, this is a test-only addition). `pnpm build` succeeds
 - Source-link liveness remains infeasible in this environment (WebFetch
   403s on every host tried), per prior runs' notes - unchanged.
 
+### Content-accuracy pass: Copa América Format column - second independent cross-check
+
+Added 2026-08-08 (intensive run). The previous entry's "Left for a future
+pass" note named a second independent cross-check of any column/table still
+on a single audit pass as a main open candidate; the per-edition "Format"
+column in `content/copa-america.md`'s Champions timeline table (League
+table / Final playoff / Home-and-away / Knockout final / Special centenary
+edition, 48 editions) was the one flagged specifically - it had only had its
+first pass on 2026-08-02, unlike Champion/Runner-up/Final-score (all four
+team competitions now on a second pass) and Host/Final-date (each on a first
+pass added just earlier today).
+
+Re-verified all 48 editions (1916-2024, including both 1959 tournaments) in
+four WebSearch passes split by era, mirroring how the first pass itself was
+split: 1916-1929 (12 editions), 1935-1967 including both 1959s (17
+editions), 1975-1987 - the home-and-away-to-knockout-final transition (4
+editions), and 1989-2024 - the knockout-final era plus the two closing-group
+League table editions and the 2016 centenary edition (15 editions).
+Deliberately drew on a source mix distinct from the first pass (which leaned
+on Wikipedia's per-edition/play-off articles and RSSSF's tables): this pass
+added sports-history and stats sites not used the first time around
+(worldfootball.net's era, todor66.com, Liquipedia's lab wiki, Grokipedia,
+soccernostalgia.blogspot.com, Soccer Wizdom's retrospective series) and
+Wikipedia's dedicated `*_knockout_stage` articles for the modern era rather
+than only the final-match articles the first pass cited.
+
+**No discrepancies found.** Every classification already on the page held
+up under the second pass:
+
+- The five level-on-points playoff deciders (1919, 1922, 1937, 1949, 1953)
+  each re-confirmed as needing an extra decider match after the round-robin
+  table finished tied - including 1922's three-way tie where Uruguay
+  withdrew from the scheduled playoff in protest, leaving Brazil to beat
+  Paraguay for the title.
+- Every other pre-1975 edition re-confirmed as a plain single (or, in 1925's
+  three-team case, double) round-robin table decided outright on points, no
+  extra match needed.
+- 1975, 1979, and 1983 re-confirmed as two-legged home-and-away finals
+  (with a third, neutral-venue decider in 1975 and 1979, when each side won
+  one leg), not hosted in a fixed venue.
+- 1987 re-confirmed as the first knockout-final-era edition: a group stage
+  feeding a single-elimination bracket (with defending champions Uruguay
+  entering directly at the semifinal), ending in a one-off final.
+- 1989 and 1991 re-confirmed as League table editions in the specific sense
+  the content file's warning section already describes: two opening groups
+  feeding a four-team closing round-robin group, not a single final match -
+  genuinely different from both the pre-1975 shape and the 1993-onward
+  knockout-final shape, but still decided by table standings rather than a
+  bracket.
+- 1993 through 2024 (except 2016) re-confirmed as group stage into a
+  single-elimination knockout bracket ending in a one-off final.
+- 2016 (Copa América Centenario) re-confirmed as the deliberate outlier kept
+  in its own "Special centenary edition" category: structurally a group-
+  stage-into-knockout tournament like every edition from 1993 onward, but
+  played outside the normal four-year cycle, hosted for the first time ever
+  outside South America (the United States), and expanded to 16 teams (10
+  CONMEBOL plus 6 CONCACAF) rather than the usual 10 or 12 - the same
+  reasoning the first pass gave for not folding it into "Knockout final".
+
+See `docs/SOURCES.md`'s expanded Copa América section (new "Format-column
+second-source audit" entry) for the full per-era citation list.
+`content/copa-america.md` gained one new prose paragraph in the "Important
+editorial warning" section documenting this second pass, in the same style
+as the existing Champion/Runner-up second-cross-check paragraph immediately
+below it. `lastReviewed` was already `2026-08-08` from two earlier passes in
+this same intensive session (the Host/Finals-host audit and the Final-date
+audit), so no further date bump was needed; `status` stays `review`
+(secondary sources, same reasoning as every prior secondary-sourced audit in
+this file). No table data changed - the only file changes are the new
+content-file paragraph, the new `docs/SOURCES.md` citations, and this entry.
+
+Adding the new paragraph changed `content/copa-america.md`'s bytes (even
+though no table cell changed), which `pnpm check:pdfs` correctly flagged as
+making `public/downloads/copa-america.pdf` stale. Regenerated all six PDFs
+and the manifest via `PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm
+build:pdfs`; `pnpm check:pdfs` now passes cleanly.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (158/158) and `pnpm lint` is clean (0 errors/0 warnings, the one
+pre-existing unrelated `monthNames` hint every prior run has logged). The
+Playwright suite was not re-run for this pass (a prose-only content change
+with no assertion anywhere in the suite pinned to that paragraph's text or
+byte count, and the instruction for this pass didn't require it); the full
+Vitest suite and `pnpm lint` were run and are clean.
+
+**Left for a future pass:**
+- With this run, the Format column joins Champion/Runner-up/Final-score as
+  having at least two independent audit passes; Host/Final-date each still
+  have only their first pass (both added earlier today) and are the
+  natural next candidates for a second cross-check.
+- Third/fourth-place and the remaining columns not yet covered by any
+  second pass remain open, per the same "Left for a future pass" note this
+  run picked up from.
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
