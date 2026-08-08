@@ -193,6 +193,14 @@ Chromium) to render and print each page, which would slow down every deploy
 for a file that only changes when editorial content does. See
 `scripts/generate-pdfs.mjs`.
 
+If you forget, CI now catches it: `pnpm check:pdfs`
+(`scripts/check-pdf-freshness.mjs`) compares a hash of each PDF's source
+content against a manifest recorded the last time `pnpm build:pdfs` ran, and
+fails the build if any content file has changed since - no browser required,
+so it runs on every pull request alongside the type check and unit tests
+(`.github/workflows/ci.yml`), not just when someone remembers to check by
+hand.
+
 ## 9. Editorial reminders
 
 - Preserve historical team names in edition tables; do not "modernise" them.

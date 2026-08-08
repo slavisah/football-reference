@@ -93,7 +93,7 @@ test.describe('World Cup page on a 360px phone', () => {
   });
 
   test('shows the last reviewed date and source links', async ({ page }) => {
-    await expect(page.locator('time[datetime="2026-08-05"]')).toBeVisible();
+    await expect(page.locator('time[datetime="2026-08-08"]')).toBeVisible();
     const sources = page.locator('.references__list a');
     await expect(sources.first()).toBeVisible();
     const count = await sources.count();
@@ -897,6 +897,19 @@ test.describe('Home page on a 360px phone', () => {
     await expect(list).not.toContainText('won the final');
     await expect(page.locator('#on-this-day-hint')).toBeHidden();
   });
+
+  test('shows the "How to use the reference" and "Important historical naming note" sections from content/index.md', async ({
+    page,
+  }) => {
+    const notes = page.locator('.notes__card');
+    await expect(notes).toHaveCount(2);
+    await expect(page.getByRole('heading', { name: 'How to use the reference' })).toBeVisible();
+    await expect(page.getByText('a champions summary;')).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Important historical naming note' }),
+    ).toBeVisible();
+    await expect(page.getByText(/West Germany\/Germany, Soviet Union\/Russia/)).toBeVisible();
+  });
 });
 
 test.describe('Croatian home page (/hr/) on a 360px phone', () => {
@@ -979,6 +992,19 @@ test.describe('Croatian home page (/hr/) on a 360px phone', () => {
     await expect(list).toContainText('Cristiano Ronaldo je osvojio nagradu.');
     await expect(list).not.toContainText('finalu');
     await expect(page.locator('#on-this-day-hint')).toBeHidden();
+  });
+
+  test('shows the translated "Kako koristiti ovaj pregled" and "Važna napomena o povijesnim nazivima" sections', async ({
+    page,
+  }) => {
+    const notes = page.locator('.notes__card');
+    await expect(notes).toHaveCount(2);
+    await expect(page.getByRole('heading', { name: 'Kako koristiti ovaj pregled' })).toBeVisible();
+    await expect(page.getByText('pregled prvaka;')).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Važna napomena o povijesnim nazivima' }),
+    ).toBeVisible();
+    await expect(page.getByText(/Zapadnu Njemačku\/Njemačku, Sovjetski Savez\/Rusiju/)).toBeVisible();
   });
 });
 
@@ -1321,6 +1347,17 @@ test.describe('Quiz page on a 360px phone', () => {
     await expect(page).toHaveURL(/\/hr\/quiz(\?|$)/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
+
+  test('shows the "How it works" and "Question types in this quiz" sections from content/quiz.md', async ({
+    page,
+  }) => {
+    const notes = page.locator('.notes__card');
+    await expect(notes).toHaveCount(2);
+    await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
+    await expect(page.getByText('Press "Restart quiz" to clear your answers and play again.')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Question types in this quiz' })).toBeVisible();
+    await expect(page.getByText("Who won the Ballon d'Or in a given year?")).toBeVisible();
+  });
 });
 
 test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
@@ -1376,6 +1413,19 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/quiz(\?|$)/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('shows the translated "Kako funkcionira" and "Vrste pitanja u ovom kvizu" sections', async ({
+    page,
+  }) => {
+    const notes = page.locator('.notes__card');
+    await expect(notes).toHaveCount(2);
+    await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
+    await expect(
+      page.getByText('Pritisni "Ponovno pokreni kviz" da obrišeš odgovore i igraš ponovno.'),
+    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Vrste pitanja u ovom kvizu' })).toBeVisible();
+    await expect(page.getByText('Tko je osvojio Zlatnu loptu u danoj godini?')).toBeVisible();
   });
 });
 

@@ -14,28 +14,43 @@
 // with the pre-installed Playwright Chromium, emulates print media (so the
 // existing @media print / @page rules in src/styles/global.css apply - same
 // A4-landscape layout a reader gets from Ctrl+P), and saves a PDF per page.
+//
+// It also writes public/downloads/.pdf-manifest.json - a content-hash
+// fingerprint of each PDF's source file(s), so scripts/check-pdf-freshness.mjs
+// (`pnpm check:pdfs`) can later tell whether a PDF still matches the
+// content it was rendered from, without needing a browser or git history.
 
 import { chromium } from '@playwright/test';
+import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PDF_PAGES as PAGES } from './pdf-pages.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const PORT = 4399;
 const BASE = process.env.BASE_PATH ?? '/football-reference';
 const ORIGIN = `http://localhost:${PORT}`;
 const OUT_DIR = path.join(ROOT, 'public', 'downloads');
+const MANIFEST_PATH = path.join(OUT_DIR, '.pdf-manifest.json');
 
-// One PDF per required competition page (src/pages/competitions/*.astro).
-const PAGES = [
-  { slug: 'world-cup', path: '/competitions/world-cup' },
-  { slug: 'euro', path: '/competitions/euro' },
-  { slug: 'nations-league', path: '/competitions/nations-league' },
-  { slug: 'copa-america', path: '/competitions/copa-america' },
-  { slug: 'ballon-dor', path: '/competitions/ballon-dor' },
-  { slug: 'golden-boot', path: '/competitions/golden-boot' },
-];
+// One PDF per required competition page (src/pages/competitions/*.astro),
+// plus which content/*.md file(s) each page's table data is sourced from -
+// the shared PDF_PAGES list (scripts/pdf-pages.mjs) so this can never drift
+// from scripts/check-pdf-freshness.mjs's PDF_SOURCES.
+
+async function buildManifest() {
+  const manifest = {};
+  for (const { slug, sources } of PAGES) {
+    manifest[slug] = {};
+    for (const file of sources) {
+      const contents = await readFile(path.join(ROOT, 'content', file), 'utf8');
+      manifest[slug][file] = createHash('sha256').update(contents).digest('hex');
+    }
+  }
+  return manifest;
+}
 
 async function waitForServer(url, timeoutMs = 60_000) {
   const start = Date.now();
@@ -106,6 +121,10 @@ async function main() {
   } finally {
     stopServer();
   }
+
+  const manifest = await buildManifest();
+  await writeFile(MANIFEST_PATH, `${JSON.stringify(manifest, null, 2)}\n`);
+  console.log(`Wrote ${path.relative(ROOT, MANIFEST_PATH)}`);
 }
 
 main()

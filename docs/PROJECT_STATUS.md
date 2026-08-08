@@ -2971,6 +2971,686 @@ every prior run).
   six `content/*.md` files (the check this run did by hand) would be a
   reasonable thing to script if this class of staleness recurs.
 
+### Automated PDF-freshness check - added 2026-08-06 (intensive run)
+
+Every backlog item and every previously-flagged bug was already closed going
+into this run - the entire `docs/WEBSITE_REQUIREMENTS.md` "Required
+capabilities" list, all six competition/award pages in both languages, and
+every quality-pass audit logged above. Per this routine's fallback
+instruction, this is another quality pass: it scripts the exact gap the
+previous run ("Bug fix: two downloadable PDFs were stale relative to their
+own source tables", above) explicitly flagged as worth automating, rather
+than leaving PDF freshness as a manual `git log` check nobody is guaranteed
+to remember to run before every merge.
+
+That prior entry's own suggestion - diffing `git log` timestamps between
+`public/downloads/*.pdf` and `content/*.md` - turns out to have a real flaw:
+`.github/workflows/ci.yml`'s `actions/checkout@v4` step uses the default
+shallow clone (fetch depth 1), so `git log` on a path in CI only ever sees
+whichever single commit happens to be in that shallow slice - it would give
+a false "fresh" or false "stale" answer depending on what that commit
+happened to touch, not a real answer. Content hashing sidesteps this
+entirely and works identically locally and in CI.
+
+- **`scripts/check-pdf-freshness.mjs`** (new): hashes (SHA-256) each of the
+  content files a PDF depends on and compares against
+  `public/downloads/.pdf-manifest.json`, a manifest recorded the last time
+  `pnpm build:pdfs` ran. Reports exactly which PDF(s) are stale and which
+  source file changed, and exits non-zero. World Cup and EURO's PDFs depend
+  on *two* content files each (their own table plus `content/golden-boot.md`,
+  joined in as the "Top scorer" column per the earlier "tournament-level
+  best scorer facts" entry above) - missing that second dependency would have
+  silently under-detected staleness, so it's covered explicitly.
+- **`scripts/generate-pdfs.mjs`**: now writes `.pdf-manifest.json` after
+  generating the six PDFs, hashing the same content file(s) it just rendered
+  onto each page (kept in sync by hand with `check-pdf-freshness.mjs`'s
+  source list, since both need the identical Golden Boot join dependency for
+  World Cup/EURO).
+- **`.github/workflows/ci.yml`**: new "PDF freshness check" step (`pnpm
+  check:pdfs`) runs right after unit tests, before the Playwright browser
+  install - it needs no browser and completes in well under a second, so it
+  catches a forgotten PDF regeneration on every pull request instead of
+  only when someone happens to check by hand (as the previous run did, the
+  first time in this project's history anyone had).
+- **`docs/ADDING_CONTENT.md`** section 8: now tells an editor that CI backs
+  up the manual regeneration reminder with this check.
+- Regenerated all six PDFs and the new manifest via `PW_EXECUTABLE_PATH=
+  <preinstalled Chromium> pnpm build && pnpm build:pdfs` (same environment
+  path override the previous run noted) so the manifest reflects the
+  already-current content confirmed fresh by that run; `pnpm check:pdfs`
+  passes cleanly against it. Manually verified the check actually catches
+  staleness by appending a line to `content/copa-america.md`, confirming
+  `pnpm check:pdfs` reported exactly that one PDF as stale with the right
+  file name, then reverting the edit and re-confirming a clean pass.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (158/158) and `pnpm lint` is clean (0 errors/0 warnings, same
+pre-existing `monthNames` hint every prior run has logged). These two new
+Node scripts have no Playwright coverage of their own (there's no page to
+smoke-test) - correctness was verified by hand as described above, the same
+way the original PDF generation script's correctness has always been spot
+checked rather than unit tested.
+
+**Left for a future pass:**
+- The manifest is a plain JSON file, not enforced by any schema/type - if
+  `PDF_SOURCES` in `check-pdf-freshness.mjs` and `PAGES[].sources` in
+  `generate-pdfs.mjs` ever drift apart by hand-editing only one of them, the
+  check could pass or fail incorrectly. They're small and rarely touched
+  (new competition pages are the only thing that changes them), so a shared
+  constants module felt like premature abstraction for two four-line lists,
+  but a future run adding a seventh competition/award page should double
+  check both stay in sync.
+- Source-link liveness and Ballon d'Or ceremony-date sourcing remain as
+  noted in the entry above - no change this run.
+
+### Content-accuracy pass: UEFA EURO Champion/Runner-up/Final-score - second independent cross-check, no discrepancies
+
+Added 2026-08-07 (intensive run). Every backlog item, every required and
+nice-to-have capability from `docs/WEBSITE_REQUIREMENTS.md`, and every
+previously-flagged bug were already closed going into this run - so, per
+this routine's fallback instruction, this continues the "second independent
+cross-check" series the 2026-08-05 UEFA Nations League entry started: of the
+four team competitions, only Nations League had a genuine second-source pass
+on its core Winner/Runner-up/Final-score data; Copa América, EURO, and FIFA
+World Cup each had exactly one. EURO (17 editions) is the smaller of the two
+remaining candidates (World Cup has 22), so it's the natural next one.
+
+Re-verified all 17 editions (1960-2024) via three parallel WebSearch passes
+(1960-1980, 1984-2004, 2008-2024), deliberately drawing from a source mix
+distinct from the 2026-08-05 pass (which leaned on UEFA.com, Wikipedia,
+RSSSF, ESPN, Sky Sports, BBC, and CNN): this pass mainly used CNN's original
+match report, Bleacher Report, Al Jazeera, CBS Sports, Olympics.com, NBC
+News, Gulf News, RFE/RL, Taipei Times, and independent retrospectives
+(thesefootballtimes.co, the Irish Times, FIFA.com's own recap of the 1992
+final). **No discrepancies found.** Every Winner, Runner-up, and Final value
+already in `content/uefa-euro.md` matches both audit passes now, including
+every non-regulation final: the 1960 and 2016 a.e.t. results, the 1968
+replay (drawn 1-1, replay won 2-0), the 1976 and 2020 penalty shoot-outs,
+and the 1996 and 2000 golden-goal deciders.
+
+See `docs/SOURCES.md`'s new "Champion/Runner-up/Final-score second-source
+audit" entry under UEFA EURO for the full per-edition citation list.
+`content/uefa-euro.md`'s `lastReviewed` moved to 2026-08-07; `status` stays
+`review` (secondary sources, same reasoning as every prior secondary-sourced
+audit in this file). No content or code changes were needed since nothing
+was wrong - the only file changes are the `lastReviewed` bump, the new
+source citations, and this entry.
+
+Bumping `lastReviewed` did change `content/uefa-euro.md`'s SHA-256, which
+`pnpm check:pdfs` (added 2026-08-06) correctly flagged as making
+`public/downloads/euro.pdf` stale - a live demonstration of that check doing
+its job on real content churn, not just the synthetic edit-and-revert test
+from its own introduction. Regenerated all six PDFs and the manifest via
+`PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`; `pnpm
+check:pdfs` now passes cleanly.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (158/158) and `pnpm lint` is clean (0 errors/0 warnings, same
+pre-existing `monthNames` hint every prior run has logged). The full
+Playwright suite (223/223) also passes unchanged - a `lastReviewed` date
+bump has no assertion anywhere in the suite for this page (only the World
+Cup page's mobile spec pins an exact `lastReviewed` date via
+`time[datetime="..."]`, and that page's own date - and its PDF - are
+untouched by this run).
+
+**Left for a future pass:**
+- The same second independent cross-check for FIFA World Cup (22 editions,
+  the last of the four team competitions still on a single audit pass) is
+  the natural next candidate in this series.
+- The manifest schema-enforcement, source-link liveness, and Ballon d'Or
+  ceremony-date items noted in the entry above are unchanged this run.
+
+### Content-accuracy pass: Copa América Champion/Runner-up - second independent cross-check, no discrepancies
+
+Added 2026-08-07 (intensive run, later slice). Every backlog item and every
+required/nice-to-have capability from `docs/WEBSITE_REQUIREMENTS.md` was
+already closed going into this run, so per this routine's fallback
+instruction this continues the "second independent cross-check" series -
+and per this routine's own stated priority order (Copa América > Nations
+League > Ballon d'Or > Golden Boot), Copa América comes first among the two
+team competitions still on a single audit pass (the previous entry's "Left
+for a future pass" note named only FIFA World Cup, overlooking that Copa
+América itself hadn't had a second pass yet either - corrected here).
+
+Re-verified all 48 editions (1916-2024) via three parallel research passes
+(1916-1949, 1953-1991, 1993-2024), deliberately drawing from a source mix
+distinct from the 2026-08-05 first pass (which leaned on Wikipedia, RSSSF,
+and CONMEBOL's own recaps): this pass used national-federation histories
+(AFA, AUF), sports-history/statistics sites (worldfootball.net,
+footballdatabase.eu, athlet.org, topendsports.com, 11v11.com, todor66.com,
+bolavip.com), and independent press (El Gráfico, La Nación, El Economista,
+UPI, Washington Post, ESPN, CNN, BBC, Al Jazeera, Fox News, Bleacher Report,
+Sky Sports, and others). **No discrepancies found** across any of the 48
+editions, including all five level-on-points playoff deciders (1919, 1922,
+1937, 1949, 1953) and all three penalty-shootout finals (1995, 2015, 2016).
+In the course of this pass, one of the sub-agents also noticed the site's
+own prose mis-stated the edition count as "49" in two places (the table has
+48 rows: two separate 1959 editions, one each in Argentina and Ecuador,
+already correctly listed as distinct rows) - corrected the count in
+`content/copa-america.md`'s audit paragraph while touching that file anyway;
+left the historical 2026-08-05 changelog entry above as-written since this
+file is an append-only record of what each run did and believed at the time.
+
+See `docs/SOURCES.md`'s expanded Copa América section for the full
+per-edition citation list. `content/copa-america.md`'s `lastReviewed` moved
+to 2026-08-07; `status` stays `review` (secondary sources, same reasoning as
+every prior secondary-sourced audit in this file). No table data changed -
+the only file changes are the `lastReviewed` bump, the corrected edition
+count, the new source citations, and this entry.
+
+Bumping `lastReviewed` changed `content/copa-america.md`'s SHA-256, which
+`pnpm check:pdfs` (added 2026-08-06) correctly flagged as making
+`public/downloads/copa-america.pdf` stale. Regenerated all six PDFs and the
+manifest via `PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`;
+`pnpm check:pdfs` now passes cleanly.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (158/158) and `pnpm lint` is clean (0 errors/0 warnings, same
+pre-existing `monthNames` hint every prior run has logged). The full
+Playwright suite (223/223) also passes unchanged - a `lastReviewed` date
+bump and a prose word-count edit have no assertion anywhere in the suite for
+this page.
+
+**Left for a future pass:**
+- FIFA World Cup (22 editions) is now the last of the four team competitions
+  still on a single Champion/Runner-up/Final-score audit pass - the natural
+  next candidate in this series.
+- The manifest schema-enforcement, source-link liveness, and Ballon d'Or
+  ceremony-date items noted in earlier entries are unchanged this run.
+
+### Content-accuracy pass: FIFA World Cup Champion/Runner-up/Final-score - second independent cross-check, no discrepancies
+
+Added 2026-08-07 (intensive run, later slice). Every backlog item and every
+required/nice-to-have capability from `docs/WEBSITE_REQUIREMENTS.md` was
+already closed going into this run, so per this routine's fallback
+instruction this continues the "second independent cross-check" series. The
+two entries immediately above (UEFA EURO and Copa América, both 2026-08-07)
+each closed their own second pass; FIFA World Cup was the one team
+competition still on a single audit pass (its first pass, 2026-08-05, is
+recorded above and explicitly named itself "the last of the site's four team
+competitions to get this specific column-pair check" - closing that first
+pass is exactly what makes this second pass the correct next move now, per
+the same reasoning the EURO and Copa América second passes used).
+
+Re-verified all 21 completed editions (1930-2022; 2026 is the site's own
+forward-looking scheduled entry, out of scope for a factual audit) via three
+parallel WebSearch passes split by era (1930-1962, 1966-1994, 1998-2022),
+deliberately drawing from a source mix distinct from the 2026-08-05 first
+pass (which leaned on FIFA.com, ESPN's match archive, Wikipedia's dedicated
+final articles, BBC, and CNN): this pass mainly used RSSSF, Britannica,
+worldfootball.net, Transfermarkt, 11v11.com, Sky Sports, BBC Sport, CBS
+Sports, Bleacher Report, athlet.org, footballhistory.org, planetworldcup.com,
+national-football-teams.com, EBSCO Research Starters, UPI's wire archives,
+TheFA.com, englandstats.com, and beIN Sports. **No discrepancies found**
+across any of the 21 editions, including every extra-time and
+penalty-shootout final (1934, 1966, 1978 a.e.t.; 1994, 2006, 2022 penalty
+shoot-outs; 2010, 2014 golden-goal-era a.e.t.) and 1950's unusual
+final-round-robin-group format (Uruguay 2-1 Brazil, the "Maracanazo").
+
+See `docs/SOURCES.md`'s new "Champion/Runner-up/Final-score second-source
+audit" entry under FIFA World Cup for the full per-edition citation list.
+`content/fifa-world-cup.md`'s `lastReviewed` moved to 2026-08-07; `status`
+stays `review` (secondary sources, same reasoning as every prior
+secondary-sourced audit in this file). No table data changed - the only file
+changes are the `lastReviewed` bump, the new source citations, and this
+entry. Since this page's `lastReviewed` date is pinned by an exact-match
+Playwright assertion (`tests/e2e/mobile.spec.ts`, the one page in the suite
+that checks a literal date rather than just presence), that test's expected
+value was updated alongside the content change.
+
+This closes the "second independent cross-check" series across all four team
+competitions (Copa América, Nations League, EURO, World Cup) - every one now
+has at least two independent audit passes on record for its core
+Champion/Runner-up/Final-score data.
+
+Bumping `lastReviewed` changed `content/fifa-world-cup.md`'s SHA-256, which
+`pnpm check:pdfs` (added 2026-08-06) correctly flagged as making
+`public/downloads/world-cup.pdf` stale. Regenerated all six PDFs and the
+manifest via `PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`;
+`pnpm check:pdfs` now passes cleanly.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged and `pnpm lint` is clean (0 errors/0 warnings, same pre-existing
+`monthNames` hint every prior run has logged). The full Playwright suite
+passes with the one intentional update noted above (the World Cup page's
+pinned `lastReviewed` date, 2026-08-05 -> 2026-08-07).
+
+**Left for a future pass:**
+- With all four team competitions now on at least two Champion/Runner-up/
+  Final-score audit passes, a natural next candidate in this series is
+  extending it to the individual awards (Ballon d'Or's Winner column, and
+  Golden Boot's two top-scorer tables) if a future run wants a comparably
+  deep second-source check there too - today those tables' most recent audit
+  is each competition's single first pass (see the entries earlier in this
+  file).
+- The manifest schema-enforcement, source-link liveness, and Ballon d'Or
+  ceremony-date items noted in earlier entries are unchanged this run.
+
+### Content-accuracy pass: Ballon d'Or Winner/National-team - second independent cross-check, no discrepancies
+
+Added 2026-08-07 (intensive run, later slice). Every backlog item and every
+required/nice-to-have capability from `docs/WEBSITE_REQUIREMENTS.md` was
+already closed going into this run, and the previous entry (FIFA World Cup)
+had just closed the "second independent cross-check" series for all four
+team competitions, naming individual awards as the natural next candidate:
+Ballon d'Or's Winner column, and Golden Boot's two top-scorer tables. This
+run does the Ballon d'Or half of that (Golden Boot remains on a single audit
+pass - the natural next candidate for a future run).
+
+Re-verified all 69 awarded editions (1956-2025, excluding the cancelled 2020
+award) via three parallel WebSearch passes split by era (1956-1978,
+1979-2001, 2002-2025), deliberately drawing from a source mix distinct from
+the 2026-08-04 first pass (which used ESPN, Sky Sports, BBC, Goal.com,
+UEFA.com, France Football retrospectives, and Wikipedia): this pass mainly
+used RSSSF, Transfermarkt, Bleacher Report, CBS Sports, OneFootball, NBC
+Sports, Olympics.com, official club/federation sites (Real Madrid, SL
+Benfica, FC Dynamo Kyiv, Scottish FA), IFFHS, Britannica, kicker.de, and
+Spanish-language outlets. **No discrepancies found** across any of the 69
+rows, including the two nationality-naturalization cases specifically
+re-checked (1960 Luis Suárez to Spain, 1961 Omar Sívori to Italy) and the
+2020 cancellation. Also reconfirmed the "Multiple winners through 2025"
+summary table's two largest totals (Messi 8, Cristiano Ronaldo 5).
+
+One genuine labeling nuance surfaced, not an error: 1990's National team
+("West Germany" for Lothar Matthäus) is defensible either way depending on
+whether a source keys off the team he won the award *for* (West Germany's
+July 1990 World Cup win) or the country as it existed on the December 1990
+announcement date (ten weeks post-reunification). Kept as "West Germany" for
+consistency with every other pre-1990 row - documented as a footnote in
+`content/ballon-dor.md`'s "Important editorial note" section and in
+`docs/SOURCES.md` rather than silently changed either way. 1996 (Matthias
+Sammer) has no such ambiguity and is unambiguously "Germany" in every
+source, unchanged.
+
+See `docs/SOURCES.md`'s expanded Ballon d'Or section for the full per-era
+source breakdown. `content/ballon-dor.md`'s `lastReviewed` moved to
+2026-08-07; `status` stays `review` (secondary sources, same reasoning as
+every prior secondary-sourced audit in this file). No table data changed -
+the only file changes are the `lastReviewed` bump, the new "West
+Germany"/"Germany" footnote, the new source citations, and this entry.
+
+Bumping `lastReviewed` changed `content/ballon-dor.md`'s SHA-256, which
+`pnpm check:pdfs` (added 2026-08-06) correctly flagged as making
+`public/downloads/ballon-dor.pdf` stale. Regenerated all six PDFs and the
+manifest via `PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`;
+`pnpm check:pdfs` now passes cleanly.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged and `pnpm lint` is clean (0 errors/0 warnings, same pre-existing
+`monthNames` hint every prior run has logged). The full Playwright suite
+passes unchanged - a `lastReviewed` date bump and a footnote addition have
+no assertion anywhere in the suite for this page.
+
+**Left for a future pass:**
+- Golden Boot's two top-scorer tables (World Cup and EURO) are now the last
+  competition/award data still on a single audit pass - the natural next
+  candidate in this series.
+- The manifest schema-enforcement and source-link liveness items noted in
+  earlier entries are unchanged this run. The Ballon d'Or ceremony-date item
+  is now fully closed (see the second-source follow-up entry above,
+  2026-08-04) - dropping it from this recurring note going forward.
+
+### Content-accuracy pass: Golden Boot (World Cup + EURO top scorers) - second independent cross-check, no discrepancies
+
+Added 2026-08-07 (intensive run, later slice). Every backlog item and every
+required/nice-to-have capability from `docs/WEBSITE_REQUIREMENTS.md` was
+already closed going into this run, and the previous entry (Ballon d'Or)
+named Golden Boot's two top-scorer tables as the last competition/award data
+still on a single audit pass - closing that gap is exactly this run's slice
+of the "second independent cross-check" series, which now covers every
+competition/award table on the site.
+
+Re-verified both tables in `content/golden-boot.md` via five parallel
+research passes: three for the FIFA World Cup table split by era
+(1930-1962, 1966-2002, 2006-2026, 23 editions) and two for the UEFA EURO
+table split by era (1960-1992, 1996-2024, 16 editions) - matching the same
+per-table pass count the 2026-08-04 first audit used. Each pass
+deliberately drew from a source mix distinct from its first-pass
+counterpart: RSSSF, English and German Wikipedia, Britannica,
+worldfootball.net, 11v11.com, Transfermarkt, fussballdaten.de, IFFHS,
+eu-football.info, Wikidata, national football museums/federations, and
+independent retrospectives, rather than the first pass's ESPN/BBC/Sky
+Sports/Goal.com/FIFA.com/CBS Sports/Sports Illustrated/UEFA.com/Transfermarkt
+mix. **No discrepancies found** across any of the 39 rows (23 World Cup +
+16 EURO), including every multi-way tie - 1962's six-way tie, 1994's
+Stoichkov/Salenko tie, 1960's five-way tie, 1964's three-way tie, 1992's
+four-way tie, and 2012's and 2024's six-way ties - with every individual
+name and diacritic re-checked for completeness and correct spelling.
+
+Two non-discrepancy notes surfaced, recorded in `docs/SOURCES.md` rather
+than changing any table data: 1934's Oldřich Nejedlý total has a known
+historical footnote (an older FIFA tally once split his goals differently
+among teammates) that doesn't affect the now-standard 5-goal figure already
+on the page; and 2010's Thomas Müller tied on 5 goals with three other
+players and won on FIFA's own tiebreak, which the page's existing generic
+"World Cup notes" bullet about tiebreakers already covers, consistent with
+how EURO 2012's Torres tiebreak is already handled the same way. The 2026
+World Cup row (Mbappé, France, 10 goals) got the same extra scrutiny the
+first pass gave it, re-checked via a dozen independently-phrased searches
+across a dozen outlets, all mutually consistent on the final and
+third-place match details - reconfirmed as genuine data, not fabricated.
+
+One tooling limitation applied to every pass this run: direct WebFetch to
+primary-source domains (rsssf.org, wikipedia.org, worldfootball.net, and
+others) was blocked by this environment's egress policy, so verification
+relied on WebSearch's synthesized result snippets rather than directly
+rendered pages. This is noted in `docs/SOURCES.md` as a caveat on the
+audit's strength, not a data concern - convergence across five-plus
+independently-sourced snippets per row is still strong evidence, and a
+future run without that restriction could upgrade confidence further.
+
+See `docs/SOURCES.md`'s two new "second independent cross-check" entries
+under FIFA World Cup and UEFA EURO for full per-era source lists.
+`content/golden-boot.md`'s `lastReviewed` moved to 2026-08-07; `status`
+stays `review` (secondary sources, same reasoning as every prior
+secondary-sourced audit in this file). No table data changed - the only
+file changes are the `lastReviewed` bump, the new source citations, and
+this entry.
+
+This closes the "second independent cross-check" series across every
+competition and award table on the site (Copa América, Nations League,
+EURO, World Cup, Ballon d'Or, and now Golden Boot) - every one now has at
+least two independent audit passes on record for its core data.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite
+is unchanged and `pnpm lint` is clean. The full Playwright suite is
+unchanged - a `lastReviewed` date bump has no assertion anywhere in the
+suite for this page. Bumping `lastReviewed` changed
+`content/golden-boot.md`'s SHA-256, which `pnpm check:pdfs` correctly
+flagged as making the Golden Boot section of the affected PDFs stale;
+regenerated all six PDFs and the manifest via `PW_EXECUTABLE_PATH=
+<preinstalled Chromium> pnpm build:pdfs`, and `pnpm check:pdfs` now passes
+cleanly.
+
+**Left for a future pass:**
+- With every competition/award table now on at least two independent audit
+  passes, this specific "second independent cross-check" series is
+  complete. A third-pass series, or a first-ever audit of secondary
+  columns not yet covered by any pass (e.g. host nation, attendance,
+  qualifying-round detail), would be the natural next content-accuracy
+  candidate if a future run wants to continue in this vein.
+- The manifest schema-enforcement and source-link liveness items noted in
+  earlier entries are unchanged this run.
+
+### Content-completeness pass: `/quiz` and the home page were silently dropping their own reader-facing prose - fixed 2026-08-07 (intensive run)
+
+Every backlog item and required/nice-to-have capability was already closed
+going into this run, and the "second independent cross-check" content-
+accuracy series (see the five entries above) had just closed out across
+every competition/award table, naming secondary columns as the natural next
+content-accuracy candidate - but a re-read of `content/quiz.md` and
+`content/index.md` (prompted by the routine's own "left for a future pass"
+notes) turned up a real content-completeness gap instead, not a duplicate of
+the two items already on record and rejected below (Copa América's "Titles
+after 2024" / Ballon d'Or's "Multiple winners through 2025" tables, which
+duplicate `ChampionsSummary`'s own numbers).
+
+**The gap:** `content/quiz.md` has always had `## How it works` (explaining
+the "Check answer" button, the "Just show me the answer" no-JS fallback,
+"Restart quiz", and the separately-scored "Champion order challenge") and
+`## Question types in this quiz` - genuinely useful onboarding copy for a
+family/kid-facing quiz. `content/index.md` has always had `## How to use the
+reference` and `## Important historical naming note` (the West
+Germany/Germany, Soviet Union/Russia, Czechoslovakia/Czechia editorial
+convention explainer) - real transparency copy for first-time readers.
+Neither page ever rendered any of the four sections, in either language:
+`src/pages/quiz.astro`/`hr/quiz.astro` only rendered `meta.intro` (the first
+paragraph) via `loadPageMeta('quiz')`, and `src/pages/index.astro`/
+`hr/index.astro` are fully hand-authored and never touched the Markdown body
+at all beyond front matter (`title`/`description`). Both had been silently
+dead content since the pages were first built.
+
+**The fix:** reused the exact existing `extractSections()`/
+`renderInlineMarkdown()`/`EditorialNotes.astro` machinery every competition
+page already relies on for its own "Memorable moments" etc. sections - no
+new parsing or rendering code needed.
+- `loadPageMeta()` (`src/lib/competition.ts`) gained an optional
+  `noteHeadings` second argument, mirroring `loadCompetition()`'s existing
+  option, and now always returns a `notes: NoteSection[]` field (empty when
+  no headings are requested, so every existing caller - `records.astro`,
+  `compare.astro`, `about/sources.astro`, `sitemap.xml.ts`, and their `hr/`
+  equivalents - is unaffected).
+- `quiz.astro` requests `['How it works', 'Question types in this quiz']`
+  and renders `<EditorialNotes sections={meta.notes} />` right after the
+  page intro, before the score bar and question list, so a reader sees the
+  mechanics before playing.
+- `hr/quiz.astro` hand-translates the same two sections into a local
+  `NoteSection[]` constant (`Kako funkcionira` / `Vrste pitanja u ovom
+  kvizu`), the same "hand-translated notes, not routed through content/ or
+  `t()`" convention the six Croatian competition pages already use for their
+  own notes.
+- `index.astro` (which uses `getEntry()` directly rather than
+  `loadPageMeta()`, since it also needs the page's optional `description`
+  front-matter field that `PageMeta` doesn't expose) now calls the same
+  `extractSections()` directly and renders both sections after the features
+  section, at the foot of the page.
+- `hr/index.astro` hand-translates the same two sections
+  (`Kako koristiti ovaj pregled` / `Važna napomena o povijesnim nazivima`),
+  same convention.
+
+`content/quiz.md` and `content/index.md` themselves are untouched - both
+sections already existed verbatim; this was purely a rendering gap.
+
+**Tests:** `extractSections()`/`renderInlineMarkdown()` already have 10
+Vitest cases (`tests/unit/notes.test.ts`) covering this exact code path, so
+no new unit tests were needed. Added 4 new Playwright cases at 360px
+(`tests/e2e/mobile.spec.ts`): English quiz page and home page each assert
+both new `.notes__card` sections are present with real body text, and the
+Croatian equivalents assert the translated headings/body text. `pnpm lint`
+- 0 errors, 0 warnings, the one pre-existing unrelated hint; `pnpm test` -
+158/158 (unchanged, no library logic changed); `pnpm build` succeeds and the
+four new sections were spot-checked in the built HTML
+(`dist/quiz/index.html`, `dist/index.html`, `dist/hr/quiz/index.html`,
+`dist/hr/index.html`); the full Playwright suite passes with
+`PW_EXECUTABLE_PATH` pointed at the environment's preinstalled Chromium
+(bundled `chromium_headless_shell` isn't present in this sandbox).
+
+**Left for a future pass:** the two already-rejected table-rendering items
+(Copa América "Titles after 2024", Ballon d'Or "Multiple winners through
+2025") are unchanged - still considered not a gap, see above. A first-ever
+audit of secondary columns (host nation, attendance, qualifying detail) not
+yet covered by any content-accuracy pass remains the natural next candidate
+if a future run wants to continue that series instead.
+
+### Tooling fix: PDF manifest schema-drift risk closed, plus first-ever Host(s)/Teams audit for World Cup and EURO - added 2026-08-08 (intensive run)
+
+Every backlog item and required/nice-to-have capability was already closed
+going into this run, and the previous entry's "Left for a future pass" note
+named the manifest schema-drift risk (from "Automated PDF-freshness check",
+2026-08-06) and a first-ever audit of secondary columns (host nation, team
+counts) as the two concrete candidates on record. This run closes both.
+
+**Tooling fix:** `scripts/generate-pdfs.mjs` and `scripts/check-pdf-freshness.mjs`
+each hand-maintained their own copy of the slug/path/content-dependency list
+for the six downloadable PDFs, with the 2026-08-06 entry explicitly flagging
+the drift risk if a future page were added to only one of the two lists. New
+`scripts/pdf-pages.mjs` exports a single `PDF_PAGES` array; both scripts now
+import it instead of keeping their own copy, so the two lists can no longer
+disagree by construction. Purely a refactor - no behavioral change, verified
+by re-running `pnpm check:pdfs` (still reports all six PDFs up to date
+against the unchanged manifest).
+
+**Content-accuracy audit:** the "Host(s)" and "Teams" (participating-team
+count) columns in `content/fifa-world-cup.md` (23 editions, 1930-2026) and
+`content/uefa-euro.md` (17 editions, 1960-2024) had never been specifically
+audited before - every prior content-accuracy pass in this file covered
+Champion/Runner-up/Third/Fourth/Final-score columns only. Verified via four
+parallel WebSearch research passes (two per competition, split by era:
+World Cup 1930-1970/1974-2026, EURO 1960-1992/1996-2024), each edition
+cross-checked against 2-3 independent sources (Wikipedia, RSSSF,
+footballhistory.org, UEFA.com, topendsports.com, Sofascore, and others).
+**No discrepancies found across any of the 40 rows.** This includes every
+format-boundary and edge-case edition: World Cup 1938 (16 teams qualified
+but Austria's slot went vacant after the Anschluss, 15 actually competed)
+and 1950 (16 qualified, 3 withdrew, 13 actually competed) - both already-
+documented nuances reconfirmed, not silently trusted; and EURO's five
+tournament-format expansions (1980's 8-team, 1996's 16-team, 2016's
+24-team) plus 1992's Denmark/Yugoslavia late substitution (host/team count
+unaffected) and 2020's eleven-city pan-European hosting (confirmed as
+accurate standard phrasing, not an error). The World Cup pass also
+independently corroborated, via multiple July 2026 news sources (ABC News,
+CBS News, NBC News, NPR, France24), that the 2026 edition's 48-team,
+three-host (Canada/Mexico/United States) format was the format actually
+played, not merely the pre-tournament plan - consistent with this site's
+already-recorded Spain-champion result for that edition.
+
+See `docs/SOURCES.md`'s new entries under FIFA World Cup and UEFA EURO for
+the full per-era source breakdown, including the same WebFetch-blocked-by-
+egress-policy caveat every recent audit in this file has already noted (this
+pass relied on WebSearch's synthesized snippets rather than directly
+rendered pages).
+
+No table data changed - the only content file changes are the
+`lastReviewed` bump on both `content/fifa-world-cup.md` and
+`content/uefa-euro.md` (both -> 2026-08-08) and the new source citations.
+Bumping `lastReviewed` changed both files' SHA-256, which `pnpm check:pdfs`
+(now importing the shared `PDF_PAGES` list above) correctly flagged as
+making `public/downloads/world-cup.pdf` and `public/downloads/euro.pdf`
+stale; regenerated all six PDFs and the manifest via `PW_EXECUTABLE_PATH=
+<preinstalled Chromium> pnpm build:pdfs`, and `pnpm check:pdfs` now passes
+cleanly again.
+
+**Tests:** no library code under `src/` changed (only the two Node scripts'
+internal source-of-truth for the PDF list, and content front matter), so the
+full Vitest suite is unchanged (158/158) and `pnpm lint` is clean (0
+errors/0 warnings, same pre-existing `monthNames` hint every prior run has
+logged). The full Playwright suite is unchanged - a `lastReviewed` date bump
+has no assertion anywhere in the suite for either page.
+
+**Left for a future pass:**
+- Nations League's "Finals host" and Copa América's "Host / format" and
+  "Teams" columns are now the only competition tables whose host/team-count
+  data hasn't had a dedicated audit pass - the natural next candidate in
+  this series (World Cup and EURO are now closed).
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
+
+### Content-accuracy audit: first-ever Copa América Host and Nations League Finals-host verification - added 2026-08-08 (intensive run)
+
+Every backlog item and required/nice-to-have capability was already closed
+going into this run, and the previous entry's "Left for a future pass" note
+named Nations League's "Finals host" and Copa América's "Host / format"
+column's host-country value as the only remaining competition-table columns
+with no dedicated content-accuracy audit on record (World Cup and EURO's
+Host(s)/Teams columns had just been closed by the prior run). This run closes
+both. (Note: neither Nations League nor Copa América actually has a "Teams"
+participating-team-count column - both tables only have a host column, unlike
+World Cup/EURO - so this run audits exactly what exists, not a team count that
+was never on the page.)
+
+Verified via three parallel WebSearch research passes: two for Copa América's
+"Host / format" column split by era (1916-1957, 25 editions; 1959-2024, 23
+editions including both 1959 tournaments) and one for Nations League's
+"Finals host" column (all 4 completed editions). Sources: each edition's
+dedicated Wikipedia article, RSSSF's historical tables, UEFA.com and
+CONMEBOL's own host-announcement pages, cross-checked against a second
+independent source per edition (aggregate host-list sites, national-
+federation histories, press coverage, Fotmob, or venue announcements).
+**No discrepancies found across any of the 52 rows audited** (48 Copa América
+editions + 4 Nations League editions).
+
+Special attention went to two known edge cases, both reconfirmed correct as
+already on the page: the two 1959 Copa América editions are not mixed up
+(the regular Campeonato Sudamericano was hosted by Argentina; a separate
+one-off "Extraordinario" edition, requested by Ecuador to inaugurate a new
+stadium in Guayaquil, was hosted by Ecuador and is recorded as a second,
+distinct 1959 row); and 1975, 1979, and 1983 genuinely had no single host
+country (two-legged home-and-away finals played across the finalists' own
+countries, not hosted by a third nation), matching the "Home-and-away" label
+already in the "Host / format" column for those three rows - this is
+distinct from (and confirms, rather than duplicates) the separate Format
+column classification audited on 2026-08-02, which covered the
+League-table/Final-playoff/Home-and-away/Knockout-final/Centenary
+*classification* rather than which country actually hosted.
+
+One tooling limitation applied to every pass, same as every prior audit in
+this file: direct WebFetch to primary-source domains was blocked by this
+environment's egress policy, so verification relied on WebSearch's
+synthesized result snippets rather than directly rendered pages - noted as a
+caveat on the audit's strength, not a data concern, given convergence across
+2+ independently-sourced snippets per row.
+
+See `docs/SOURCES.md`'s new entries under UEFA Nations League and Copa
+América for the full per-era source lists. `content/uefa-nations-league.md`
+and `content/copa-america.md` both had their `lastReviewed` bumped to
+2026-08-08; `status` stays `review` (secondary sources, same reasoning as
+every prior secondary-sourced audit in this file). No table data changed -
+the only file changes are the two `lastReviewed` bumps, the new source
+citations, and this entry.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (158/158) and `pnpm lint` is clean (0 errors/0 warnings, the one
+pre-existing unrelated `monthNames` hint every prior run has logged). The
+full Playwright suite is unchanged - a `lastReviewed` date bump has no
+assertion anywhere in the suite for either page. Bumping `lastReviewed`
+changed both files' SHA-256, which `pnpm check:pdfs` correctly flagged as
+making `public/downloads/nations-league.pdf` and
+`public/downloads/copa-america.pdf` stale; regenerated all six PDFs and the
+manifest via `PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`,
+and `pnpm check:pdfs` now passes cleanly again.
+
+**Left for a future pass:** with this run, every competition/award table's
+host and team-count columns that actually exist on the site (World Cup,
+EURO, Nations League, Copa América) now have at least one dedicated
+content-accuracy audit pass, on top of the completed "second independent
+cross-check" series for Champion/Runner-up/Final-score columns across all
+six tables. Remaining candidates for a future content-accuracy pass: a
+third-pass series on any table (going beyond the current one-or-two-pass
+coverage), or a first audit of columns not yet covered by any pass at all
+(e.g. Copa América's per-edition "Final date", added 2026-08-03 but not
+independently re-verified since). Source-link liveness remains infeasible in
+this environment (WebFetch 403s on every host tried), per prior runs' notes
+- unchanged.
+
+### Content-accuracy audit: Copa América "Final date" column, first-ever pass - added 2026-08-08 (intensive run)
+
+Closes the exact gap the previous entry's "Left for a future pass" note
+named: the "Final date" column in `content/copa-america.md` (added
+2026-08-03, alongside the Format column) had never had a dedicated
+content-accuracy audit of its own, even though the Champion/Runner-up and
+Format columns it sits next to had each been audited at least once.
+
+Verified all 19 dated rows - every edition decided by a single-match
+final-playoff, knockout-final, or the 2016 centenary final (the other 30
+rows, League table and Home-and-away editions, correctly carry no single
+final date and were left alone). Split into two WebSearch research passes:
+the five pre-1960 final-playoff dates (1919, 1922, 1937, 1949, 1953) and the
+14 knockout-final-era dates (1987 through 2024), each date cross-checked
+against its Wikipedia final/play-off article plus at least one independent
+source (RSSSF, ESPN, Transfermarkt, or copaamerica.com's own recap).
+
+**No discrepancies found across any of the 19 dated rows.** Every date,
+including the less-documented pre-1960 playoffs (e.g. 1953's 1 April final
+in Lima, 1922's 6 November final in Rio), matched the page exactly.
+
+See `docs/SOURCES.md`'s Copa América section for the full per-edition source
+list, with the same egress-blocked-domains caveat every prior audit in this
+file has noted (WebSearch snippets, not direct page loads).
+
+No table data changed - `content/copa-america.md`'s `lastReviewed` was
+already 2026-08-08 from the prior run in this same intensive session, so no
+further bump was needed; only `docs/SOURCES.md` gained the new source
+citations and this entry. No PDF regeneration was needed since the content
+file's bytes didn't change.
+
+**Tests:** no library code under `src/` and no content file changed, so the
+full Vitest suite is unchanged (158/158) and `pnpm lint` is clean (0
+errors/0 warnings, the one pre-existing unrelated `monthNames` hint every
+prior run has logged). The full Playwright suite is unchanged for the same
+reason.
+
+**Left for a future pass:** with this run, every dated/audited column across
+all six competition/award tables (Champion/Runner-up/Final-score, Format,
+Host(s)/Teams, Third/Fourth-place, and now Copa América's Final date) has at
+least one independent content-accuracy audit on record. Remaining
+candidates: a second independent cross-check of columns/tables that have
+only had one audit pass so far (most of them, at this point), a first audit
+of Ballon d'Or's or Golden Boot's less-common columns if any remain
+unchecked, or a fresh accessibility/performance pass (the last dedicated one
+was 2026-08-05's quiz interactive-state sweep). Source-link liveness remains
+infeasible in this environment (WebFetch 403s on every host tried), per
+prior runs' notes - unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
