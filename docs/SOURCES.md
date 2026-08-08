@@ -222,6 +222,33 @@ Primary sources should be preferred.
   though convergence across five-plus independently-sourced snippets per
   year is already strong. This closes the Golden Boot second-source audit
   for the FIFA World Cup table.
+- Host(s)/Teams audit (2026-08-08, intensive run): the first-ever
+  verification pass of the "Host(s)" and "Teams" columns (previously only
+  Champion/Runner-up/Third/Fourth had been audited, across several prior
+  entries). Verified via two parallel WebSearch passes split by era
+  (1930-1970, 1974-2026), each edition cross-checked against 2-3
+  independent sources. **No discrepancies found across any of the 23
+  editions.** Confirms the two historical nuances already documented on the
+  page: 1938 (16 teams qualified, but Austria was annexed by Germany before
+  the tournament and its slot left vacant, so 15 teams actually competed)
+  and 1950 (16 qualified, but Scotland, Turkey, and India withdrew, so 13
+  actually competed) - the table records teams that actually competed, not
+  qualifiers, and both figures check out against multiple sources. Also
+  independently corroborates that the 2026 edition's announced 48-team,
+  three-host (Canada/Mexico/United States) format was the format actually
+  played, not merely a pre-tournament plan - multiple July 2026 news
+  sources (ABC News, CBS News, NBC News, NPR, France24) confirm the
+  tournament concluded as scheduled:
+  - https://en.wikipedia.org/wiki/FIFA_World_Cup (per-edition host/team
+    tables, all 23 editions)
+  - https://www.rsssf.org/ (historical squad/qualification records, era 1)
+  - https://www.footballhistory.org/ (per-edition format retrospectives)
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026
+    (2026 host/format confirmation)
+  - Direct WebFetch to primary-source domains was blocked by this
+    environment's egress policy for this run, so verification relied on
+    WebSearch's synthesized snippets, per the same caveat prior audits in
+    this file have already noted.
 
 ## UEFA EURO
 
@@ -357,6 +384,28 @@ Primary sources should be preferred.
   - https://www.espn.com/soccer/story/_/id/37451959/portugal-shock-france-win-euro-2016-eder-scores-winning-goal (2016)
   - https://www.cnn.com/2021/07/11/football/england-italy-euro-2020-final-wembley-spt-intl/ (2020)
   - https://www.cnn.com/2024/07/14/sport/spain-england-euro-2024-final-spt-intl (2024)
+- Host(s)/Teams audit (2026-08-08, intensive run): the first-ever
+  verification pass of the "Host(s)" and "Teams" columns (previously only
+  Champion/Runner-up/semifinalists had been audited, across the entries
+  above). Verified via two parallel WebSearch passes split by era
+  (1960-1992, 1996-2024), each edition cross-checked against 2-3
+  independent sources. **No discrepancies found across any of the 17
+  editions**, including every format-boundary edition on record: 1980 (the
+  first 8-team expansion), 1992 (Denmark's late substitution for Yugoslavia
+  changed the participant list but not the host or team count), 1996 (the
+  first 16-team expansion), 2016 (the first 24-team expansion), and 2020
+  (hosted across eleven European cities for UEFA's 60th anniversary,
+  confirmed as an accurate standard description rather than an error, still
+  a 24-team edition):
+  - https://en.wikipedia.org/wiki/UEFA_European_Championship (per-edition
+    host/team tables, all 17 editions)
+  - https://www.uefa.com/uefaeuro/history/ (era-by-era format history)
+  - https://www.topendsports.com/ (host/team-count cross-check, most
+    editions)
+  - Direct WebFetch to primary-source domains was blocked by this
+    environment's egress policy for this run, so verification relied on
+    WebSearch's synthesized snippets, per the same caveat the FIFA World
+    Cup Host(s)/Teams audit entry above (2026-08-08) already notes.
 
 ## UEFA Nations League
 

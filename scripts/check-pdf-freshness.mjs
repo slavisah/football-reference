@@ -24,23 +24,14 @@ import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PDF_PAGES } from './pdf-pages.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const MANIFEST_PATH = path.join(ROOT, 'public', 'downloads', '.pdf-manifest.json');
 
-// Mirrors scripts/generate-pdfs.mjs's PAGES list, plus each page's editorial
-// content dependencies. World Cup and EURO also render a per-year "Top
-// scorer" column joined in from Golden Boot (docs/PROJECT_STATUS.md, "Add
-// tournament-level 'best scorer' facts"), so a Golden Boot edit can make
-// those two PDFs stale too, not just golden-boot.pdf itself.
-const PDF_SOURCES = {
-  'world-cup': ['fifa-world-cup.md', 'golden-boot.md'],
-  euro: ['uefa-euro.md', 'golden-boot.md'],
-  'nations-league': ['uefa-nations-league.md'],
-  'copa-america': ['copa-america.md'],
-  'ballon-dor': ['ballon-dor.md'],
-  'golden-boot': ['golden-boot.md'],
-};
+// Derived from the single shared PDF_PAGES list (scripts/pdf-pages.mjs), so
+// this can never drift from what scripts/generate-pdfs.mjs actually rendered.
+const PDF_SOURCES = Object.fromEntries(PDF_PAGES.map(({ slug, sources }) => [slug, sources]));
 
 async function hashFile(relativePath) {
   const contents = await readFile(path.join(ROOT, 'content', relativePath), 'utf8');

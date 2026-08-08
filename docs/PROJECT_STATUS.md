@@ -3452,6 +3452,79 @@ audit of secondary columns (host nation, attendance, qualifying detail) not
 yet covered by any content-accuracy pass remains the natural next candidate
 if a future run wants to continue that series instead.
 
+### Tooling fix: PDF manifest schema-drift risk closed, plus first-ever Host(s)/Teams audit for World Cup and EURO - added 2026-08-08 (intensive run)
+
+Every backlog item and required/nice-to-have capability was already closed
+going into this run, and the previous entry's "Left for a future pass" note
+named the manifest schema-drift risk (from "Automated PDF-freshness check",
+2026-08-06) and a first-ever audit of secondary columns (host nation, team
+counts) as the two concrete candidates on record. This run closes both.
+
+**Tooling fix:** `scripts/generate-pdfs.mjs` and `scripts/check-pdf-freshness.mjs`
+each hand-maintained their own copy of the slug/path/content-dependency list
+for the six downloadable PDFs, with the 2026-08-06 entry explicitly flagging
+the drift risk if a future page were added to only one of the two lists. New
+`scripts/pdf-pages.mjs` exports a single `PDF_PAGES` array; both scripts now
+import it instead of keeping their own copy, so the two lists can no longer
+disagree by construction. Purely a refactor - no behavioral change, verified
+by re-running `pnpm check:pdfs` (still reports all six PDFs up to date
+against the unchanged manifest).
+
+**Content-accuracy audit:** the "Host(s)" and "Teams" (participating-team
+count) columns in `content/fifa-world-cup.md` (23 editions, 1930-2026) and
+`content/uefa-euro.md` (17 editions, 1960-2024) had never been specifically
+audited before - every prior content-accuracy pass in this file covered
+Champion/Runner-up/Third/Fourth/Final-score columns only. Verified via four
+parallel WebSearch research passes (two per competition, split by era:
+World Cup 1930-1970/1974-2026, EURO 1960-1992/1996-2024), each edition
+cross-checked against 2-3 independent sources (Wikipedia, RSSSF,
+footballhistory.org, UEFA.com, topendsports.com, Sofascore, and others).
+**No discrepancies found across any of the 40 rows.** This includes every
+format-boundary and edge-case edition: World Cup 1938 (16 teams qualified
+but Austria's slot went vacant after the Anschluss, 15 actually competed)
+and 1950 (16 qualified, 3 withdrew, 13 actually competed) - both already-
+documented nuances reconfirmed, not silently trusted; and EURO's five
+tournament-format expansions (1980's 8-team, 1996's 16-team, 2016's
+24-team) plus 1992's Denmark/Yugoslavia late substitution (host/team count
+unaffected) and 2020's eleven-city pan-European hosting (confirmed as
+accurate standard phrasing, not an error). The World Cup pass also
+independently corroborated, via multiple July 2026 news sources (ABC News,
+CBS News, NBC News, NPR, France24), that the 2026 edition's 48-team,
+three-host (Canada/Mexico/United States) format was the format actually
+played, not merely the pre-tournament plan - consistent with this site's
+already-recorded Spain-champion result for that edition.
+
+See `docs/SOURCES.md`'s new entries under FIFA World Cup and UEFA EURO for
+the full per-era source breakdown, including the same WebFetch-blocked-by-
+egress-policy caveat every recent audit in this file has already noted (this
+pass relied on WebSearch's synthesized snippets rather than directly
+rendered pages).
+
+No table data changed - the only content file changes are the
+`lastReviewed` bump on both `content/fifa-world-cup.md` and
+`content/uefa-euro.md` (both -> 2026-08-08) and the new source citations.
+Bumping `lastReviewed` changed both files' SHA-256, which `pnpm check:pdfs`
+(now importing the shared `PDF_PAGES` list above) correctly flagged as
+making `public/downloads/world-cup.pdf` and `public/downloads/euro.pdf`
+stale; regenerated all six PDFs and the manifest via `PW_EXECUTABLE_PATH=
+<preinstalled Chromium> pnpm build:pdfs`, and `pnpm check:pdfs` now passes
+cleanly again.
+
+**Tests:** no library code under `src/` changed (only the two Node scripts'
+internal source-of-truth for the PDF list, and content front matter), so the
+full Vitest suite is unchanged (158/158) and `pnpm lint` is clean (0
+errors/0 warnings, same pre-existing `monthNames` hint every prior run has
+logged). The full Playwright suite is unchanged - a `lastReviewed` date bump
+has no assertion anywhere in the suite for either page.
+
+**Left for a future pass:**
+- Nations League's "Finals host" and Copa América's "Host / format" and
+  "Teams" columns are now the only competition tables whose host/team-count
+  data hasn't had a dedicated audit pass - the natural next candidate in
+  this series (World Cup and EURO are now closed).
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
