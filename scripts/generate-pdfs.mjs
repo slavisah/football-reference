@@ -26,6 +26,7 @@ import { spawn } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PDF_PAGES as PAGES } from './pdf-pages.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const PORT = 4399;
@@ -36,17 +37,8 @@ const MANIFEST_PATH = path.join(OUT_DIR, '.pdf-manifest.json');
 
 // One PDF per required competition page (src/pages/competitions/*.astro),
 // plus which content/*.md file(s) each page's table data is sourced from -
-// used only to record freshness in the manifest below (kept in sync by hand
-// with scripts/check-pdf-freshness.mjs's PDF_SOURCES, since both need the
-// same World Cup/EURO -> Golden Boot "Top scorer" join dependency).
-const PAGES = [
-  { slug: 'world-cup', path: '/competitions/world-cup', sources: ['fifa-world-cup.md', 'golden-boot.md'] },
-  { slug: 'euro', path: '/competitions/euro', sources: ['uefa-euro.md', 'golden-boot.md'] },
-  { slug: 'nations-league', path: '/competitions/nations-league', sources: ['uefa-nations-league.md'] },
-  { slug: 'copa-america', path: '/competitions/copa-america', sources: ['copa-america.md'] },
-  { slug: 'ballon-dor', path: '/competitions/ballon-dor', sources: ['ballon-dor.md'] },
-  { slug: 'golden-boot', path: '/competitions/golden-boot', sources: ['golden-boot.md'] },
-];
+// the shared PDF_PAGES list (scripts/pdf-pages.mjs) so this can never drift
+// from scripts/check-pdf-freshness.mjs's PDF_SOURCES.
 
 async function buildManifest() {
   const manifest = {};
