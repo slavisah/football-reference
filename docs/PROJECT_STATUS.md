@@ -4232,6 +4232,82 @@ and performance coverage is already extensive - print-media, quiz
 interactive states, table filter/sort/empty states, and page-weight budgets
 are all covered per the entries above).
 
+Note: the "Ballon d'Or ceremony dates" candidate named above is itself a
+stale repeat - the 2026-08-04 slice (see its own entry earlier in this file)
+already re-confirmed every single-sourced ceremony date with a genuine
+second source, and a later entry ("champions-bar's screen-reader label",
+2026-08-06) already flagged this exact note as stale once. Recorded here
+again so a future run doesn't have to re-derive that from two different
+places in the file.
+
+### Quality pass: custom 404 page - added 2026-08-09 (intensive run)
+
+Every "Required"/"Nice-to-have" capability from `docs/WEBSITE_REQUIREMENTS.md`
+and `AGENTS.md` was already shipped, both languages were already fully
+translated, and the last several entries' own "Left for a future pass" notes
+agreed a third content-accuracy pass would be low-yield without a specific
+reason to suspect an error - so this run took the "fresh angle entirely
+outside the audit series" option instead of another audit pass. A close read
+of `src/pages/` and `astro.config.mjs` turned up a real, previously-unnoticed
+gap: the site had no `404.astro` at all. GitHub Pages project sites serve
+`dist/404.html` automatically for any URL under the base path that doesn't
+match a real file, so every broken/mistyped link (in either language) was
+silently falling through to GitHub's own generic, unstyled, English-only 404
+page instead of the site's own chrome - a real reader-facing dead end that
+none of the many accessibility/SEO/print passes in this file had ever
+covered, since none of them look for a *missing* page.
+
+**The fix:** `src/pages/404.astro`, built on the existing `BaseLayout`
+(so it gets the same nav, footer, theme toggle, skip link and offline
+service-worker registration as every real page) rather than a bespoke shell.
+Since a static host can't route a 404 by locale - one file has to answer for
+both `/competitions/nonexistent` and `/hr/competitions/nonexistent` alike -
+the page shows its message in both languages on one screen (`lang="hr"` on
+the Croatian paragraph/section, matching the per-fragment `lang` attribute
+convention already used elsewhere for mixed-language text) rather than
+guessing or defaulting to English-only. Two "Popular pages"/"Popularne
+stranice" link grids are generated directly from the existing
+`NAV_LINKS`/`TRANSLATED_PATHS` (`src/lib/routes.ts`/`src/lib/i18n.ts`) - the
+same two lists `Nav.astro` and the sitemap already read from - so the 404
+page's link list can never drift out of sync with the site's real nav as
+pages are added or renamed.
+`BaseLayout.astro` gained a small additive `noindex` prop (defaults to
+`false`, so every existing page's output is byte-identical) that renders
+`<meta name="robots" content="noindex">` when set, so the 404 page itself is
+never accidentally indexed as a duplicate/thin-content page - the same
+`noindex` treatment the `/awards/...` redirect pages already get, just now
+generalized into the shared layout instead of being unique to Astro's
+built-in `redirects` output.
+
+**Tests:** 6 new Playwright cases in `tests/e2e/mobile.spec.ts` (a new "404
+page" describe block: no 360px overflow, the raw HTTP response is a genuine
+404 status with the noindex tag, both languages' headings/text render, all
+22 link-grid hrefs - 11 nav pages x 2 languages - actually resolve, and the
+"home page" link lands back on a real page) plus the 404 path added to the
+existing WCAG 2.1 A/AA sweep (`tests/e2e/accessibility.spec.ts`) in both
+light and dark color schemes, so it gets the same automated accessibility
+coverage every real page already has. Verified with `pnpm lint` (0 errors/0
+warnings/0 hints, same pre-existing hint as every prior run), the full
+Vitest suite (167/167 unchanged - no library logic touched), and the full
+Playwright suite (**314/314 passing**, up from 307). `pnpm build` confirms
+`dist/404.html` is produced at the site root (not nested under a
+`/404/index.html` directory, which GitHub Pages would not find) and contains
+both languages' content plus the noindex tag. `pnpm check:pdfs` and
+`pnpm check:perf` both still pass cleanly (no content file or Editions table
+touched; the new page's weight isn't among the heaviest 5 pages reported).
+
+**Left for a future pass:**
+- The 404 page's own popular-pages link list is generated from `NAV_LINKS`,
+  so it needs no maintenance as pages are added - no known gap here.
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates from the entry above
+  are unchanged.
+- A future pass could look at whether any other GitHub-Pages-specific static
+  hosting convention is similarly missing (e.g. a `CNAME` file is
+  intentionally not needed here since the site is served from the default
+  `github.io` subdomain, not a custom domain) - nothing else surfaced in this
+  run's read of `astro.config.mjs` and `.github/workflows/deploy.yml`.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

@@ -23,11 +23,16 @@ const CROATIAN_PATHS = Object.values(TRANSLATED_PATHS);
 const ALL_PATHS = [...new Set([...ENGLISH_PATHS, ...CROATIAN_PATHS])];
 const COLOR_SCHEMES = ['light', 'dark'] as const;
 
+// The 404 page (src/pages/404.astro) isn't in NAV_LINKS - it's not a real nav
+// destination, only what a broken/unmatched URL renders - so it's swept
+// separately rather than folded into ALL_PATHS above.
+const SWEPT_PATHS = [...ALL_PATHS, 'this-page-definitely-does-not-exist'];
+
 for (const colorScheme of COLOR_SCHEMES) {
   test.describe(`${colorScheme} color scheme`, () => {
     test.use({ colorScheme });
 
-    for (const path of ALL_PATHS) {
+    for (const path of SWEPT_PATHS) {
       test(`${path || '/'} has no automatic WCAG 2.1 A/AA violations`, async ({ page }) => {
         const target = path === '/' ? '' : path.replace(/^\//, '');
         await page.goto(target);

@@ -1512,6 +1512,61 @@ test.describe('Croatian sources page (/hr/about/sources) on a 360px phone', () =
   });
 });
 
+test.describe('404 page on a 360px phone', () => {
+  // GitHub Pages serves dist/404.html for any unmatched path under the
+  // project's base path, in either language - there is no server-side
+  // routing to pick a locale, so the page itself shows both languages.
+  test.beforeEach(async ({ page }) => {
+    await page.goto('this-page-definitely-does-not-exist');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('responds with a real 404 status and is excluded from indexing', async ({ page }) => {
+    const response = await page.request.get(
+      '/football-reference/this-page-definitely-does-not-exist',
+    );
+    expect(response.status()).toBe(404);
+    const body = await response.text();
+    expect(body).toContain('<meta name="robots" content="noindex">');
+  });
+
+  test('shows the not-found message and link lists in both English and Croatian', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Page not found', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Popular pages' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Popularne stranice' })).toBeVisible();
+    await expect(page.getByText('Stranica koju tražite ne postoji')).toBeVisible();
+  });
+
+  test('every popular-page link resolves to a real page, in both languages', async ({
+    page,
+    request,
+  }) => {
+    const hrefs = await page.locator('.not-found__links a').evaluateAll((links) =>
+      links.map((link) => (link as HTMLAnchorElement).getAttribute('href')),
+    );
+    expect(hrefs.length).toBe(22); // 11 nav pages x 2 languages
+    for (const href of hrefs) {
+      const response = await request.get(href!);
+      expect(response.ok(), `expected ${href} to resolve`).toBe(true);
+    }
+  });
+
+  test('the home-page link leads back to a real page', async ({ page }) => {
+    await page.getByRole('link', { name: 'home page' }).click();
+    await expect(page).toHaveURL(/\/football-reference\/?$/);
+    await expect(page.locator('h1')).toBeVisible();
+  });
+});
+
 test.describe('Installability and offline reading', () => {
   test('links a web app manifest with the expected name, icons, and start_url', async ({
     page,
