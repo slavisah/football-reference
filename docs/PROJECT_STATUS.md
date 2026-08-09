@@ -4131,6 +4131,46 @@ print-media cases plus the full 287-case suite pass together.
 - Source-link liveness remains infeasible in this environment (WebFetch
   403s on every host tried), per prior runs' notes - unchanged.
 
+### Accessibility: print-media coverage extended to the remaining five Croatian competition pages - added 2026-08-09 (intensive run)
+
+The previous entry's "Left for a future pass" note named this exact gap:
+print-media coverage was complete for every page in both languages except
+five of the six individual competition pages' Croatian variants (only World
+Cup's HR page had a dedicated print test, kept as a "representative shape"
+choice at the time). This run closed it. `tests/e2e/print-styles.spec.ts`'s
+`PRINT_PAGES` table-driven block now also covers `hr/competitions/euro`,
+`hr/competitions/copa-america`, `hr/competitions/nations-league`,
+`hr/competitions/ballon-dor` and `hr/competitions/golden-boot` (its
+two-table layout), each getting the same four checks every other row gets:
+WCAG-under-print, interactive chrome hidden, black-on-white colors, and
+mobile-card-to-real-`<table>` reversion. No component or stylesheet changes
+were needed - the existing `@media print` rules in `src/styles/global.css`
+already apply uniformly regardless of `lang`, so this was pure coverage
+extension, not a bug hunt; all 20 new cases passed on the first run.
+
+Print-media coverage is now complete for every page in both languages: all
+six competition pages (EN+HR), Records, Compare, Sources and Quiz (EN+HR
+covered indirectly via the shared `@media print` sheet's page-agnostic
+rules; the competition pages were specifically the ones still missing
+per-instance Playwright assertions).
+
+**Tests:** 20 new Playwright cases (307 total, up from 287). `pnpm test` -
+167/167 unchanged (no library logic touched). `pnpm lint` - 0 errors/0
+warnings/0 hints, unchanged. `pnpm build` succeeds (22 pages);
+`pnpm check:pdfs` and `pnpm check:perf` both still pass cleanly (test-only
+change, no content or markup touched). Full Playwright suite -
+**307/307 passing**.
+
+**Left for a future pass:**
+- Print-media coverage is now genuinely complete across the page inventory;
+  the standing content-accuracy and source-link-liveness candidates below
+  are the only recurring open items left in this file.
+- Content-accuracy's standing candidate (a second independent cross-check of
+  columns/tables that have only had one audit pass) remains unchanged and
+  still likely low-yield, per prior entries' notes.
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
