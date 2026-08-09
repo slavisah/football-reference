@@ -25,6 +25,21 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/1966_FIFA_World_Cup_final
   - https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final
   - https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_final
+- Final match dates second independent cross-check (2026-08-09, intensive
+  run): re-verified all 23 "Final date" entries (1930-2026) via three
+  parallel WebSearch passes split by era (1930-1962, 1966-1994, 1998-2026),
+  deliberately drawing a source mix beyond the first pass's Wikipedia/ESPN
+  pairing - FIFA.com, Britannica, 11v11.com, and Al Jazeera also confirmed
+  individual dates. **No discrepancies found across any of the 23 dates.**
+  The 1950 "Maracanazo" decider (16 July 1950) and the 2022 off-cycle
+  November-December Qatar slot (18 December 2022) were both independently
+  reconfirmed. 2026 was a completed tournament by this audit's run date
+  (played 19 July 2026, Spain 1-0 Argentina a.e.t.), re-checked as a real
+  result rather than a scheduled placeholder - matching this same date
+  already on the page:
+  - https://en.wikipedia.org/wiki/1934_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1994_FIFA_World_Cup_final
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/final
 - Third/fourth-place audit (2026-08-04): the winner and loser of every
   edition's third-place play-off (or, where no such match was played, the
   historical ranking source for those two places), i.e. the content table's
@@ -281,6 +296,18 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/UEFA_Euro_2016_final
   - https://en.wikipedia.org/wiki/UEFA_Euro_2020_final
   - https://en.wikipedia.org/wiki/UEFA_Euro_2024_final
+- Final match dates second independent cross-check (2026-08-09, intensive
+  run): re-verified all 17 "Final date" entries (1960-2024) via two parallel
+  WebSearch passes split by era (1960-1992, 1996-2024), each date checked
+  against Wikipedia's dedicated final-match article plus a second source
+  (UEFA.com, Transfermarkt, 11v11, or a football-history retrospective).
+  **No discrepancies found across any of the 17 dates.** The 1968 replay
+  date (10 June, not the original 8 June drawn match) and the 2020-labelled/
+  2021-played final (11 July 2021) were both independently reconfirmed as
+  correctly represented:
+  - https://en.wikipedia.org/wiki/1972_European_Nations%27_Cup_final
+  - https://en.wikipedia.org/wiki/1976_European_Nations%27_Cup_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1996_final
 - Third-place play-off audit (2026-08-04): the winner, score, and date of the
   third-place match for each of the six editions (1960-1980) that played one
   under the old 4-team "final four" format, i.e. whether the content table's
@@ -425,6 +452,17 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_final
   - https://www.espn.com/soccer/match/_/gameId/654361/spain-croatia
   - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
+- Final match dates second independent cross-check (2026-08-09, intensive
+  run): re-verified all four "Final date" entries via WebSearch, each
+  checked against Wikipedia's dedicated final-match article plus a second
+  source (ESPN or UEFA.com's own match report/highlights page). **No
+  discrepancies found across any of the four dates.** A Euronews article
+  covering the 2025 final carried a 9 June publication date, one day after
+  the 8 June match itself - confirmed as a next-day reporting artifact, not
+  a genuine date discrepancy, once checked against Wikipedia, ESPN and
+  UEFA.com's own match page, which all agree on 8 June:
+  - https://www.uefa.com/uefanationsleague/news/0282-1849d8b2412c-f43f87000e15-1000--spain-win-nations-league-croatia-edged-out-on-penalties/
+  - https://www.uefa.com/uefanationsleague/video/highlights/029a-1df45a93f27a-f9ad891597e4-1000--2025-uefa-nations-league-final-highlights-portugal-2-2-spai/
 - Third-place match audit (2026-08-04): the winner, score, and date of each
   edition's third-place play-off, i.e. the content table's "Third"/"Fourth"
   columns. Verified via WebSearch, cross-checked against UEFA.com's own match
