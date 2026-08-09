@@ -1,0 +1,85 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/url';
+import { NAV_LINKS } from '../lib/routes';
+import { TRANSLATED_PATHS } from '../lib/i18n';
+
+// GitHub Pages project sites serve dist/404.html for any URL under the
+// project's base path that doesn't match a real file, so this one page has
+// to work for a reader arriving from either language - there is no way for
+// a static host to pick a locale-specific 404 page. It shows the message in
+// both languages rather than defaulting to English only.
+---
+
+<BaseLayout
+  title="Page not found"
+  description="The page you were looking for doesn't exist. Find your way back to the football reference."
+  noindex
+>
+  <article class="not-found stack">
+    <header class="not-found__header">
+      <p class="eyebrow badge" aria-hidden="true">🔴 Offside</p>
+      <h1>Page not found</h1>
+      <p class="not-found__lead">
+        The page you were looking for doesn't exist, may have moved, or the link might be
+        broken. Head back to the <a href={withBase('/')}>home page</a> or pick a section below.
+      </p>
+      <p class="not-found__lead" lang="hr">
+        Stranica koju tražite ne postoji, možda je premještena, ili je poveznica pokvarena.
+        Vratite se na <a href={withBase('/hr/')}>početnu stranicu</a> ili odaberite odjeljak
+        ispod.
+      </p>
+    </header>
+
+    <section class="card stack" aria-labelledby="not-found-links-en">
+      <h2 id="not-found-links-en">Popular pages</h2>
+      <ul class="not-found__links">
+        {
+          NAV_LINKS.map((link) => (
+            <li>
+              <a href={withBase(link.path)}>{link.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="card stack" lang="hr" aria-labelledby="not-found-links-hr">
+      <h2 id="not-found-links-hr">Popularne stranice</h2>
+      <ul class="not-found__links">
+        {
+          NAV_LINKS.map((link) => (
+            <li>
+              <a href={withBase(TRANSLATED_PATHS[link.path] ?? link.path)}>{link.labelHr}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .not-found__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .not-found__lead {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .not-found__links {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .not-found__links a {
+    display: block;
+  }
+</style>
