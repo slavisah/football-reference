@@ -15,7 +15,7 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 158 Vitest unit tests
+pnpm test                      # 167 Vitest unit tests
 pnpm build                     # static build + all content validation
 PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 242 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
@@ -3873,6 +3873,89 @@ Vitest suite and `pnpm lint` were run and are clean.
 - Third/fourth-place and the remaining columns not yet covered by any
   second pass remain open, per the same "Left for a future pass" note this
   run picked up from.
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
+
+### Performance: first-ever page-weight budget check - added 2026-08-09 (intensive run)
+
+Every "Required capability" and "Nice-to-have capability" in
+`docs/WEBSITE_REQUIREMENTS.md` was already shipped going into this run, and
+the recent content-accuracy series had reached genuine diminishing returns
+(the last several passes each re-confirmed data a prior pass had already
+verified, finding no discrepancies). Of the fallback quality-pass categories
+this routine's instructions name (content accuracy, missing data,
+accessibility, performance), **performance** was the one dimension no prior
+run had ever measured or guarded - every other category had multiple passes
+on record.
+
+Measured the actual site first rather than assuming there was a problem:
+`pnpm build` produces 26 static HTML pages, none reference an image (the
+site has none - `AGENTS.md` rule 4 forbids scraped photographs) or a web
+font (`--font-sans`/`--font-mono` are both system-font stacks, confirmed in
+`src/styles/global.css`), and there are only two small shared CSS bundles
+(~6.4 KB and ~10.7 KB) - so the site is already lightweight by construction,
+not something this pass needed to fix. But nothing had ever put a number on
+that or would catch a future regression (a stray large asset, an
+accidentally duplicated inline script block, an unminified debug dump)
+before it shipped - the same gap `check:pdfs` (2026-08-06) closed for PDF
+staleness, just for page weight instead.
+
+New `scripts/check-page-weight.mjs` (`pnpm check:perf`, modeled directly on
+`scripts/check-pdf-freshness.mjs`'s shape): walks every `dist/**/*.html`
+file after a build, sums each page's own HTML bytes with every same-origin
+CSS asset it references (resolved under `dist/_astro/` regardless of the
+site's `BASE_PATH`, so it works both locally and under GitHub Pages'
+`/football-reference/` prefix), and fails with a full over-budget listing if
+any page exceeds `PAGE_WEIGHT_BUDGET_BYTES` (300 KB). That budget was set
+from a real measurement, not a guess: the heaviest page today is English
+`/records` at ~227.7 KB (genuinely the densest page on the site - it
+aggregates seven tables' worth of generated timeline/ranking content, not
+bloat), so 300 KB leaves real headroom for that content to keep growing
+while still catching an accidental regression well before production. Wired
+into `.github/workflows/ci.yml` as a new "Page-weight budget check" step
+(with its own "Build" step ahead of it, since - unlike `check:pdfs`, which
+only hashes `content/*.md` - this check needs a real `dist/`); left out of
+`deploy.yml` on purpose, matching that workflow's existing "keep deploys
+fast" policy for `check:pdfs` and Playwright.
+
+Covered by 9 new Vitest cases (`tests/unit/checkPageWeight.test.ts`:
+`findCssRefs` dedup and the no-stylesheet case, `resolveDistAsset`'s
+base-path-agnostic resolution and its "not an `/_astro/` asset" null case,
+`pageWeight` summation, and `overBudget`'s filtering/sort/exactly-at-budget
+boundary). Also manually verified the failure path end-to-end against the
+real build (temporarily set the budget to a value below every page's size,
+confirmed all 26 pages were reported with a non-zero exit code, then
+restored the real 300 KB budget) - the pure functions are unit-tested, but
+the script's file I/O and process-exit behavior are not, matching how
+`check-pdf-freshness.mjs` itself has no dedicated test file either.
+
+**Result: every page is already within budget today** (heaviest: 229.0 KB
+`hr/records`, 227.7 KB `records`, then quiz and Copa América at 174 KB and
+156 KB) - this pass adds a guard rail against future regressions, it did not
+find or fix an existing one.
+
+**Tests:** 167/167 Vitest (up from 158), `pnpm lint` clean (0 errors/0
+warnings, the one pre-existing unrelated `monthNames` hint every prior run
+has logged - confirmed again this run to be a known Astro `define:vars`
+type-checker limitation, not a real bug: the client script's `monthNames` is
+injected at runtime by `define:vars={{ ..., monthNames, ... }}`, which the
+static type checker has no visibility into). Playwright suite unchanged (no
+page markup or client behavior changed, only new build/CI tooling).
+
+**Left for a future pass:**
+- The content-accuracy series' open items are unchanged from the note
+  above (Host/Final-date second cross-checks, remaining third/fourth-place
+  columns) and remain valid future work, just no longer the single
+  highest-value option every run - now that performance has a first pass on
+  record too, whichever category has gone longest without one is the
+  natural next pick.
+- This check measures HTML + CSS weight only (the two things that vary
+  per-page); it deliberately does not count the service worker
+  (`sw.js`, fetched lazily on registration, not part of initial page load)
+  or the downloadable PDFs (opt-in downloads, not part of the page itself).
+  A future pass could add a similar budget for total JS execution
+  (currently all `is:inline`, so there is no separate JS file size to
+  measure) if that ever changes.
 - Source-link liveness remains infeasible in this environment (WebFetch
   403s on every host tried), per prior runs' notes - unchanged.
 

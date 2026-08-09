@@ -15,7 +15,8 @@
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install --with-deps chromium",
     "build:pdfs": "node scripts/generate-pdfs.mjs",
-    "check:pdfs": "node scripts/check-pdf-freshness.mjs"
+    "check:pdfs": "node scripts/check-pdf-freshness.mjs",
+    "check:perf": "node scripts/check-page-weight.mjs"
   },
   "dependencies": {
     "astro": "^5.13.0"

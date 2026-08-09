@@ -45,6 +45,12 @@ jobs:
       - name: PDF freshness check
         run: pnpm check:pdfs
 
+      - name: Build
+        run: pnpm build
+
+      - name: Page-weight budget check
+        run: pnpm check:perf
+
       - name: Install Playwright browser
         run: pnpm test:e2e:install
 
