@@ -4171,6 +4171,67 @@ change, no content or markup touched). Full Playwright suite -
 - Source-link liveness remains infeasible in this environment (WebFetch
   403s on every host tried), per prior runs' notes - unchanged.
 
+### Content-accuracy audit: FIFA World Cup, UEFA EURO and UEFA Nations League "Final date" columns - second independent cross-check, no discrepancies - added 2026-08-09 (intensive run)
+
+Closes the standing candidate this file's last several entries kept naming:
+"Final date" was one of the few columns still on only a single audit pass
+for three of the four team competitions - World Cup and EURO's dates were
+verified once when the column was first added (2026-08-02), Nations
+League's once at 2026-08-03, and only Copa América had since received a
+dedicated, independent *second* pass (2026-08-08). This run closes the same
+gap symmetrically for the other three.
+
+- Verified all 44 dated rows across the three tables (World Cup 23,
+  1930-2026; EURO 17, 1960-2024; Nations League 4, 2019-2025) via six
+  parallel WebSearch research passes (three eras for World Cup, two for
+  EURO, one for Nations League), each date cross-checked against at least
+  two independent sources distinct from the first pass's own mix -
+  FIFA.com, Britannica, 11v11.com, and Al Jazeera supplemented Wikipedia/
+  ESPN this time round.
+- **No discrepancies found across any of the 44 dates.** Every previously
+  flagged edge case was independently reconfirmed rather than merely
+  trusted: the 1950 World Cup's "Maracanazo" final-group decider (16 July
+  1950), the 2022 World Cup's off-cycle Qatar slot (18 December 2022), the
+  2026 World Cup as a genuinely completed tournament by this audit's run
+  date (19 July 2026, not a forward-looking placeholder), EURO 1968's
+  replay date rather than the original drawn match (10 June, not 8 June),
+  and EURO 2020's real 2021 final date under its "2020" edition label (11
+  July 2021).
+- `docs/SOURCES.md` gained three new "Final match dates second independent
+  cross-check" entries (FIFA World Cup, UEFA EURO, UEFA Nations League)
+  with the full per-era source lists. `content/fifa-world-cup.md`,
+  `content/uefa-euro.md` and `content/uefa-nations-league.md`'s
+  `lastReviewed` all moved to 2026-08-09; `status` stays `review`
+  (unchanged) - secondary sources, matching every prior secondary-sourced
+  audit's reasoning in this file.
+- No table data changed - this is a clean audit-closed entry, the same
+  shape as the Copa América Final-date pass it mirrors. `pnpm test` -
+  167/167 unchanged (no library logic touched); `pnpm lint` - 0 errors/0
+  warnings/0 hints, unchanged. Regenerated the three affected PDFs
+  (`world-cup.pdf`, `euro.pdf`, `nations-league.pdf`) via `pnpm build:pdfs`
+  since their source `lastReviewed` bytes changed; `pnpm check:pdfs` now
+  passes cleanly. The full Playwright suite is unchanged for the same
+  reason a `lastReviewed`-only content change has never needed new
+  Playwright cases in any prior audit entry.
+
+This closes the "Final date" second-cross-check gap across all four team
+competitions - Copa América (2026-08-08), and now World Cup, EURO and
+Nations League (this run) - every dated column on the site now has at
+least two independent audit passes on record.
+
+**Left for a future pass:** with this closure, essentially every
+competition/award table and every one of their columns has at least two
+independent content-accuracy passes on record. A future run should treat
+a *third* pass as genuinely low-yield unless a specific reason to suspect
+an error surfaces, and instead look toward: Ballon d'Or's still-single-
+sourced ceremony dates (the same handful noted in several earlier entries),
+a source-link liveness check (infeasible in this environment - WebFetch
+403s on every host tried, unchanged across many prior attempts), or a
+fresh angle entirely outside the audit series (this file's accessibility
+and performance coverage is already extensive - print-media, quiz
+interactive states, table filter/sort/empty states, and page-weight budgets
+are all covered per the entries above).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
