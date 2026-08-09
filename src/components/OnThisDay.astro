@@ -135,8 +135,8 @@ const dateLabel = formatOnThisDayDate(buildDate.getMonth() + 1, buildDate.getDat
   }
 
   function formatDate(month, day) {
-    const monthName = monthNames[month - 1];
-    return locale === 'hr' ? `${day}. ${monthName}` : `${day} ${monthName}`;
+    const name = monthNames[month - 1];
+    return locale === 'hr' ? `${day}. ${name}` : `${day} ${name}`;
   }
 
   function resultText(entry) {

@@ -3959,6 +3959,99 @@ page markup or client behavior changed, only new build/CI tooling).
 - Source-link liveness remains infeasible in this environment (WebFetch
   403s on every host tried), per prior runs' notes - unchanged.
 
+### Accessibility: print stylesheet, first-ever test coverage - plus the `monthNames` hint was a real (tiny) fixable bug, not a checker limitation - added 2026-08-09 (intensive run)
+
+The previous entry's "Left for a future pass" note pointed at whichever
+quality category had gone longest without a pass; content-accuracy audits
+had already reached diminishing returns (a dozen-plus consecutive "no
+discrepancies" passes) and this session's own prior two entries had just
+closed concrete gaps in accessibility (table filter/sort/empty states,
+theme-toggle) and performance (page-weight budget) - all three within the
+same day. Before picking one of those to repeat, this run measured what was
+actually still uncovered rather than assuming: every existing Playwright
+spec (`mobile.spec.ts`, all four `accessibility*.spec.ts` files) only ever
+renders the default **screen** media. `src/styles/global.css`'s `@media
+print` block - required by `AGENTS.md` rule 7 and live since Milestone 1 (A4
+landscape, on-screen-filtered rows forced back to visible, the mobile card
+layout reverted to a real `<table>`, interactive chrome hidden, colors
+flipped to pure black-on-white) - had **zero** test coverage of any kind,
+confirmed by grepping the whole suite for `emulateMedia`/`media: 'print'`
+before starting. This print path is also exactly what the six downloadable
+per-competition PDFs (`scripts/generate-pdfs.mjs`) render from, so a print-
+stylesheet regression would silently ship into those PDFs too, with nothing
+to catch it.
+
+New `tests/e2e/print-styles.spec.ts` (13 cases) covers English and Croatian
+World Cup (a single full-featured `TournamentTable`) and the two-table
+Golden Boot page, each driven through `page.emulateMedia({ media: 'print'
+})`:
+- a full axe WCAG 2.1 A/AA pass under print media (the print palette had
+  never actually been checked for contrast/other violations - screen-media
+  axe runs say nothing about it);
+- the interactive chrome (`.site-header`, `.site-footer`, `.theme-toggle`,
+  `.skip-link`) is actually hidden;
+- `body` really flips to pure `rgb(255, 255, 255)` background /
+  `rgb(0, 0, 0)` text;
+- the mobile card `<td>` layout (`display: grid` at the suite's 360px
+  screen viewport) reverts to a real `display: table-cell` under print.
+
+A separate case confirms the specific behavior the print sheet exists to
+guarantee: filtering World Cup down to one winner on screen (hiding most
+rows via the native `hidden` attribute), then switching to print media and
+checking that same `tr[hidden]` row is visible again with a live axe pass -
+i.e., a reader who filtered the on-screen table and then hits print/PDF
+still gets every edition, not just the filtered subset.
+
+**No WCAG violations found under print media** - like the theme-toggle
+pass, this is a coverage-gap closure, not a discovered bug in the print
+styles themselves.
+
+**Also fixed while in this area, correcting a prior run's conclusion:** the
+2026-08-09 page-weight entry above states the long-standing `astro check`
+`monthNames` hint (`src/components/OnThisDay.astro:138`) is "a known Astro
+`define:vars` type-checker limitation, not a real bug." That conclusion was
+wrong, and this run corrected it rather than repeating it a third time: the
+same `define:vars={{ entries, monthNames, locale, emptyText }}` call injects
+four names into the inline script, and only `monthNames` was ever flagged -
+`entries`, `locale`, and `emptyText` all resolve cleanly throughout the same
+script, which a genuine "no visibility into `define:vars`" limitation could
+not explain. The actual cause: one line below, `formatDate()` declares a
+same-scoped local `const monthName` (singular) that reads from `monthNames`
+- close enough to the injected plural name that Astro's language-service
+diagnostic misattributed the reference and suggested the wrong one ("Did you
+mean 'monthName'?"). Renamed the local to `name` - a pure rename, zero
+behavior change (`formatDate()`'s return value is identical for every
+input, confirmed by the unchanged 167/167 Vitest run and the unchanged
+print/on-this-day Playwright cases). `pnpm lint` now reports **0 errors, 0
+warnings, 0 hints** - the first clean run in this file's recorded history,
+after months of every prior run logging the same hint as "pre-existing" and
+moving on without checking it.
+
+**Tests:** 13 new Playwright print-media cases (271 total, up from 258).
+`pnpm lint` - 0/0/0 (previously 0/0/1). `pnpm test` - 167/167 unchanged (no
+library logic touched, pure rename). `pnpm build` succeeds (22 pages);
+`pnpm check:pdfs` and `pnpm check:perf` both still pass cleanly (no content
+or page-weight changes). Full Playwright suite - **258/258 passing** before
+this run's additions, all green together with the 13 new cases after,
+against the environment's preinstalled Chromium (`PW_EXECUTABLE_PATH=/opt/pw-
+browsers/chromium-1194/chrome-linux/chrome`, same constraint every prior run
+has noted).
+
+**Left for a future pass:**
+- Print coverage here deliberately checked three representative pages
+  (World Cup EN/HR, Golden Boot's two-table shape) rather than all six
+  competition/award pages plus Records/Compare/Quiz/Sources - a future pass
+  could extend the same pattern to the remaining pages if full instance-by-
+  instance coverage is wanted, the same "representative shape vs exhaustive"
+  tradeoff the table-states pass already documented for its own two-table
+  choice.
+- Content-accuracy: a second independent cross-check of columns/tables that
+  have only had one audit pass so far remains the standing candidate,
+  unchanged from prior entries - still likely low-yield given the run of
+  "no discrepancies" results, but the only category not touched today.
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
