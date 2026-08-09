@@ -39,10 +39,15 @@ const PRINT_PAGES = [
   { label: 'English World Cup', path: 'competitions/world-cup' },
   { label: 'Croatian World Cup', path: 'hr/competitions/world-cup' },
   { label: 'English Golden Boot (two tables)', path: 'competitions/golden-boot' },
+  { label: 'Croatian Golden Boot (two tables)', path: 'hr/competitions/golden-boot' },
   { label: 'English EURO', path: 'competitions/euro' },
+  { label: 'Croatian EURO', path: 'hr/competitions/euro' },
   { label: 'English Copa América', path: 'competitions/copa-america' },
+  { label: 'Croatian Copa América', path: 'hr/competitions/copa-america' },
   { label: 'English Nations League', path: 'competitions/nations-league' },
+  { label: 'Croatian Nations League', path: 'hr/competitions/nations-league' },
   { label: "English Ballon d'Or", path: 'competitions/ballon-dor' },
+  { label: "Croatian Ballon d'Or", path: 'hr/competitions/ballon-dor' },
 ];
 
 for (const { label, path } of PRINT_PAGES) {
