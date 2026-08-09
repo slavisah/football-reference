@@ -296,6 +296,19 @@ main {
     break-inside: avoid;
   }
 
+  /* The quiz's "Just show me the answer" <details> disclosure must read as
+     an answer key on paper - a printed page can't reflect its interactive
+     open/closed state, so force the answer text visible regardless of it.
+     Modern Chromium/Firefox render a closed <details>'s non-summary content
+     inside an internal ::details-content box with `content-visibility:
+     hidden`, not a plain `display: none` on the children - overriding that
+     display property alone (tried first) left the answer computed-hidden.
+     Targeting the pseudo-element directly is the actual override point. */
+  .quiz-card__reveal::details-content {
+    content-visibility: visible !important;
+    display: block !important;
+  }
+
   .references a::after {
     content: ' (' attr(href) ')';
     font-size: 9pt;

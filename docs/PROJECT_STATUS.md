@@ -4052,6 +4052,85 @@ has noted).
 - Source-link liveness remains infeasible in this environment (WebFetch
   403s on every host tried), per prior runs' notes - unchanged.
 
+### Accessibility: print-media coverage extended to every remaining page, plus a real "answer key vanishes on paper" quiz bug found and fixed - added 2026-08-09 (intensive run)
+
+The previous entry's print-stylesheet pass deliberately checked three
+representative pages (World Cup EN/HR, Golden Boot's two-table shape) and
+left extending the same pattern to the rest of the site as explicit future
+work. This run did that extension - and, in the process of driving the
+`/quiz` page through print media for the first time, found the pass's
+highest-value catch of the day: a real, user-facing bug, not just a
+coverage gap.
+
+**Coverage extension:** `tests/e2e/print-styles.spec.ts`'s `PRINT_PAGES`
+table-driven block (WCAG-under-print, interactive chrome hidden, black-on-
+white colors, mobile-card-to-real-`<table>` reversion) now also covers EURO,
+Copa América, Nations League and Ballon d'Or (the four single-table
+competition pages the previous pass hadn't reached yet). A new
+`OTHER_PRINT_PAGES` block adds the same WCAG/chrome/colors trio for Records,
+Compare and `/about/sources` - three pages with no `TournamentTable` at all,
+so the mobile-card-reversion check doesn't apply to them. `/compare` also
+gets a page-specific check that its team-picker `<select>`s are hidden on
+paper (`.compare__picker.no-print`, same mechanism the filters already use).
+
+**The bug:** while writing the Quiz page's print tests, `.quiz-card__reveal`
+- the "Just show me the answer" `<details>` disclosure in both
+`QuizCard.astro` and `QuizOrderCard.astro` - turned out to carry the
+`no-print` class alongside the JS-only "Check answer" button/feedback
+controls. `docs/PROJECT_STATUS.md`'s own quiz entry documents the intended
+design explicitly: "a no-JS visitor sees a clean answer-key quiz sheet
+(also print-friendly) rather than dead buttons." `no-print` on the reveal
+did the opposite - it hid the one thing a printed/no-JS quiz sheet actually
+needs, the answer itself, while correctly hiding the JS-only controls that
+share the class. A parent who printed the quiz for a kid, or opened it with
+JS disabled and hit print, got questions with no way to check any answer.
+
+Fix: dropped `no-print` from `.quiz-card__reveal` in both components, then
+added a `@media print` rule in `src/styles/global.css` forcing the answer
+text visible regardless of the `<details>`'s open/closed state (a printed
+page can't reflect that interactive state anyway). The first attempt
+(`.quiz-card__reveal > :not(summary) { display: block !important; }`,
+overriding the child directly) looked right in the CSS but the new
+Playwright assertions caught it as still failing - modern Chromium/Firefox
+hide a closed `<details>`'s non-summary content via an internal
+`::details-content` box using `content-visibility: hidden`, not a plain
+`display: none` on the children, so overriding the child's own `display`
+did nothing. Verified support first (`CSS.supports('selector(::details-
+content)')` is `true` in this environment's Chromium 141) and targeting the
+pseudo-element itself (`content-visibility: visible !important` +
+`display: block !important`) is what actually works - confirmed with a
+minimal standalone repro before touching the real stylesheet, then with the
+real Playwright assertions.
+
+New Quiz print-media tests (`tests/e2e/print-styles.spec.ts`): a WCAG pass;
+one confirming the score bar and every card's JS-only controls stay hidden
+while the answer-key `<details>` and its non-empty answer text are visible;
+and a second for the chronological-order challenge cards, which share the
+same `QuizCard`-adjacent pattern in `QuizOrderCard.astro` and had the
+identical bug.
+
+**Tests:** 29 new Playwright cases (287 total, up from 258).
+`pnpm test` - 167/167 unchanged (no library logic touched). `pnpm lint` -
+0 errors/0 warnings/0 hints, unchanged. `pnpm build` succeeds (22 pages);
+`pnpm check:pdfs` and `pnpm check:perf` both still pass cleanly (no content
+or page-weight changes - the CSS/markup edits here are bytes, not a new
+column). Full Playwright suite - **287/287 passing**, run twice: once to
+catch the `::details-content` bug (2 real failures, both in the new Quiz
+tests, everything else green), and once after the fix to confirm all 42
+print-media cases plus the full 287-case suite pass together.
+
+**Left for a future pass:**
+- Print coverage is now complete for every page except the individual
+  competition pages' Croatian variants (only World Cup's HR page has a
+  dedicated print test, matching the previous pass's "representative shape"
+  choice) - a future pass could add the remaining five HR competition pages
+  if full instance-by-instance coverage across both languages is wanted.
+- Content-accuracy's standing candidate (a second independent cross-check of
+  columns/tables that have only had one audit pass) remains unchanged and
+  still likely low-yield, per prior entries' notes.
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
