@@ -148,6 +148,17 @@ describe('distinctHosts', () => {
     };
     expect(distinctHosts(buildEditions(scorersTable))).toEqual([]);
   });
+
+  it('excludes the "Home-and-away" non-country placeholder from the host filter', () => {
+    const copaTable: MarkdownTable = {
+      headers: ['Year', 'Host / format', 'Winner', 'Runner-up'],
+      rows: [
+        ['1975', 'Home-and-away', 'Peru', 'Colombia'],
+        ['1929', 'Argentina', 'Argentina', 'Uruguay'],
+      ],
+    };
+    expect(distinctHosts(buildEditions(copaTable))).toEqual(['Argentina']);
+  });
 });
 
 describe('editionTeams', () => {
@@ -213,6 +224,22 @@ describe('editionTeams', () => {
       rows: [['2020', 'Not awarded', 'Not awarded']],
     };
     expect(editionTeams(buildEditions(withPlaceholder)[0])).toEqual([]);
+  });
+
+  it('splits a Golden Boot "; "-separated joint-team tie into individual teams', () => {
+    const jointTie: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [['1994', 'Hristo Stoichkov; Oleg Salenko', 'Bulgaria; Russia', '6']],
+    };
+    expect(editionTeams(buildEditions(jointTie)[0])).toEqual(['Bulgaria', 'Russia']);
+  });
+
+  it('excludes the "Multiple" too-many-scorers-to-name placeholder from the team list', () => {
+    const sixWayTie: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [['1962', 'Garrincha; Vavá; Leonel Sánchez', 'Multiple', '4']],
+    };
+    expect(editionTeams(buildEditions(sixWayTie)[0])).toEqual([]);
   });
 });
 

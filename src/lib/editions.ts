@@ -169,18 +169,28 @@ export function distinctWinners(editions: Edition[]): string[] {
   return winners.sort((a, b) => a.localeCompare(b));
 }
 
+// Host values that aren't an actual country - e.g. Copa América's 1975,
+// 1979 and 1983 editions, played home-and-away with no single host, record
+// "Home-and-away" in the host cell instead. Shared with quiz.ts's
+// "Which country hosted...?" question builder (which needs the exact same
+// exclusion so it never asks a reader to name the host of an edition with no
+// host) so the two can't silently disagree on what counts as a real host.
+export const NOT_A_HOST = /home-and-away|no host|not held/i;
+
 /**
  * Distinct hosts for populating the filter control, alphabetically. Returns
  * an empty list when the source table has no host column (e.g. Ballon d'Or,
  * Golden Boot), so callers can hide the filter entirely rather than showing
- * an empty one.
+ * an empty one. Excludes non-country host placeholders like Copa América's
+ * "Home-and-away" (see NOT_A_HOST) - those rows are still reachable via the
+ * Year filter, just not offered as a nonsensical "country" to filter by.
  */
 export function distinctHosts(editions: Edition[]): string[] {
   const seen = new Set<string>();
   const hosts: string[] = [];
   for (const edition of editions) {
     const host = edition.host?.trim();
-    if (host && !seen.has(host)) {
+    if (host && !NOT_A_HOST.test(host) && !seen.has(host)) {
       seen.add(host);
       hosts.push(host);
     }
@@ -209,6 +219,12 @@ function isTeamCellLabel(label: string): boolean {
   );
 }
 
+// Golden Boot's "Team" column uses "Multiple" as a placeholder when a tie has
+// too many scorers to name one team (e.g. 1962's six-way tie) - not a real
+// team name, so it must not become a filterable option (see the "; "-split
+// case below for the two-or-three-way ties that *do* name real teams).
+const TEAM_TIE_PLACEHOLDER = /^multiple$/i;
+
 /**
  * Every team name appearing in a team-holding column of this edition - not
  * just the champion. Powers the "Team" filter (required alongside year, host
@@ -222,6 +238,11 @@ function isTeamCellLabel(label: string): boolean {
  * separate "National team"/"Team" column instead, so its presence on the same
  * row is the signal to skip "Winner"/"Champion" here rather than double-count
  * the player as if they were a team.
+ *
+ * Golden Boot's "Team" column also holds "; "-separated ties for a joint top
+ * scorer from different countries (e.g. 1994's "Bulgaria; Russia") - each
+ * name is split out as its own team so, e.g., filtering by "Russia" surfaces
+ * that edition instead of only the unsplit compound string being filterable.
  */
 export function editionTeams(edition: Edition): string[] {
   const hasDedicatedTeamColumn = edition.cells.some((cell) =>
@@ -232,8 +253,12 @@ export function editionTeams(edition: Edition): string[] {
     const label = cell.label.trim();
     if (hasDedicatedTeamColumn && WINNER_LABEL_PATTERN.test(label)) continue;
     if (!isTeamCellLabel(label)) continue;
-    const value = cell.value.trim();
-    if (value && value !== '—' && !isPlaceholderWinner(value)) teams.add(value);
+    for (const rawValue of cell.value.split(';')) {
+      const value = rawValue.trim();
+      if (value && value !== '—' && !isPlaceholderWinner(value) && !TEAM_TIE_PLACEHOLDER.test(value)) {
+        teams.add(value);
+      }
+    }
   }
   return [...teams];
 }

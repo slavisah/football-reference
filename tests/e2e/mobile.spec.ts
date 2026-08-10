@@ -904,6 +904,7 @@ test.describe('Home page on a 360px phone', () => {
     const notes = page.locator('.notes__card');
     await expect(notes).toHaveCount(2);
     await expect(page.getByRole('heading', { name: 'How to use the reference' })).toBeVisible();
+    await expect(page.getByText('Each competition page contains:')).toBeVisible();
     await expect(page.getByText('a champions summary;')).toBeVisible();
     await expect(
       page.getByRole('heading', { name: 'Important historical naming note' }),
@@ -1000,6 +1001,7 @@ test.describe('Croatian home page (/hr/) on a 360px phone', () => {
     const notes = page.locator('.notes__card');
     await expect(notes).toHaveCount(2);
     await expect(page.getByRole('heading', { name: 'Kako koristiti ovaj pregled' })).toBeVisible();
+    await expect(page.getByText('Svaka stranica natjecanja sadrži:')).toBeVisible();
     await expect(page.getByText('pregled prvaka;')).toBeVisible();
     await expect(
       page.getByRole('heading', { name: 'Važna napomena o povijesnim nazivima' }),
