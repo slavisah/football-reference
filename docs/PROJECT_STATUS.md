@@ -4308,6 +4308,108 @@ touched; the new page's weight isn't among the heaviest 5 pages reported).
   `github.io` subdomain, not a custom domain) - nothing else surfaced in this
   run's read of `astro.config.mjs` and `.github/workflows/deploy.yml`.
 
+### Bug fix: source-link extraction was silently dropping and corrupting real citations - fixed 2026-08-10 (intensive run)
+
+Every "Required"/"Nice-to-have" capability was already shipped, the recent
+audit series had reached the same diminishing-returns conclusion the last
+several entries already recorded, and a live-link check remains infeasible
+in this environment (confirmed again this run - WebFetch still returns
+`EGRESS_BLOCKED` on both `en.wikipedia.org` and `copaamerica.com`, matching
+every prior attempt). Rather than a fourth content-accuracy WebSearch pass
+of the same tables, this run re-read `docs/CONTENT_MODEL.md`'s own
+build-time validation checklist against what `src/lib/validate.ts` actually
+checks - and found it: "source URLs are valid" has been on that checklist
+since the file was first written, and nothing in the codebase has ever
+enforced it. `extractSources()` (`src/lib/sources.ts`) extracted whatever
+its regex matched and never validated the result.
+
+**Two real bugs, found by testing the parser against the real
+`docs/SOURCES.md` rather than just its fixtures:**
+
+1. **Dropped citations.** `extractSources()` matched only the *first* URL on
+   each line (`/(https?:\/\/\S+)/.exec(line)`). 25 lines in `docs/SOURCES.md`
+   - mostly the Copa América pre-1975 era, cited as
+   `- <rsssf table url> ; <wikipedia article url>` - carry two citations per
+   line. Every one of those second URLs was silently missing from the
+   competition page's "References & review" section and from
+   `/about/sources`, in both languages, since the day each was added.
+2. **Corrupted URLs.** The trailing-punctuation cleanup
+   (`.replace(/[).,]+$/, '')`) stripped every trailing `)` unconditionally,
+   assuming it was always markdown-link noise. Five citations across three
+   sections are genuine Wikipedia disambiguation URLs that legitimately end
+   in `)` - `.../1959_South_American_Championship_(Argentina)` and
+   `_(Ecuador)` - and had their real closing paren stripped, turning a live
+   link into a dead, truncated one. This was already rendered into
+   `dist/competitions/copa-america/index.html` and `dist/about/sources/`
+   before this fix (confirmed by inspecting the built HTML).
+
+**The fix**, both in `src/lib/sources.ts`:
+- `extractSources()` now matches every URL on a line (`line.match(/.../g)`)
+  instead of only the first.
+- The trailing-punctuation stripper (`stripTrailingPunctuation()`) still
+  strips a trailing `.`/`,` unconditionally (never legitimately part of a
+  URL in this corpus), but now only strips a trailing `)` while it is
+  *unbalanced* - more `)` than `(` in the URL so far - so a markdown-link's
+  outer paren is still stripped while a URL's own balanced parenthetical
+  (like the 1959 disambiguation pages) survives intact.
+- New `validateSourceSections()` closes the actual gap named above: given
+  every section `extractSourceSections()` finds, it throws a build-failing
+  `ContentValidationError` (reusing the same class `validateEditions()`
+  already uses) if any URL fails to parse, uses a non-http(s) protocol, or
+  has unbalanced parentheses - the same signal that would have caught bug 2
+  outright. A true liveness check is still infeasible here, so this
+  validates only what's decidable without a network call. Wired into
+  `src/pages/about/sources.astro` right after `extractSourceSections()`,
+  which already reads every heading in the whole file, so this one call
+  site gives full-file build-time coverage regardless of which competition
+  pages exist.
+
+**Related blind spot closed in the same pass:** `scripts/check-pdf-freshness.mjs`
+tracked each PDF's `content/*.md` table file(s) as its only staleness
+dependency, never `docs/SOURCES.md` - even though every PDF's own
+References section is rendered from it (`loadCompetition()` reads
+`docs/SOURCES.md` for every competition, not just its own `content/*.md`
+table). A source-link fix exactly like this one would have silently left
+every downloadable PDF showing the old broken/missing links with
+`pnpm check:pdfs` still reporting green. `scripts/pdf-pages.mjs`'s
+`PDF_PAGES` entries now list root-relative paths and every entry includes
+`docs/SOURCES.md`; `check-pdf-freshness.mjs`/`generate-pdfs.mjs` updated to
+resolve paths from the repo root instead of assuming a `content/` prefix.
+Regenerated all six PDFs and the manifest (`pnpm build:pdfs`); `pnpm
+check:pdfs` now correctly flags all six as stale before the regeneration
+and clean after.
+
+**Tests:** 8 new Vitest cases in `tests/unit/sources.test.ts`
+(`extractSources`: multi-URL-per-line extraction, a balanced-parenthesis
+URL surviving intact, a markdown-wrapped URL still losing its outer paren,
+trailing sentence punctuation after a parenthesised URL;
+`validateSourceSections`: accepts well-formed links, rejects an unparseable
+URL, a non-http(s) protocol, and unbalanced parentheses - 175 total, up from
+167). No existing test's fixtures had more than one URL per line, so all
+prior cases pass unchanged. `pnpm lint` - 0 errors/0 warnings/0 hints.
+`pnpm build` succeeds (23 pages) and the fix was confirmed directly in the
+output: `dist/competitions/copa-america/index.html` and
+`dist/about/sources/index.html` both now show the corrected
+`..._(Argentina)`/`..._(Ecuador)` URLs with their closing parens intact,
+and the previously-missing second citation on each affected line (e.g. the
+`1937_South_American_Championship` Wikipedia article, previously dropped
+entirely) is now present. Full Playwright suite - **314/314 passing**,
+including the WCAG-under-print and reference-list assertions on
+`/about/sources` and `/hr/about/sources`. `pnpm check:pdfs` and `pnpm
+check:perf` both pass cleanly after regeneration.
+
+**Left for a future pass:**
+- Source-link *liveness* (an actual HTTP check, not just syntax) remains
+  infeasible in this environment - reconfirmed this run, unchanged from
+  every prior attempt.
+- The standing content-accuracy (third-pass, low-yield) candidate is
+  unchanged.
+- `validateSourceSections()` only checks syntax (parses, http/https,
+  balanced parens) since that's all that's decidable offline - it would not
+  catch, for example, a URL that's syntactically fine but points to the
+  wrong article entirely. That class of error is exactly what the ongoing
+  content-accuracy WebSearch audits are for, not this build-time check.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
