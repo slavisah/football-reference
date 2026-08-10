@@ -24,6 +24,20 @@ Intro paragraph.
 - Tap a year to reveal a short story.
 `;
 
+const mixedDoc = `# The Ultimate Football Reference
+
+## How to use the reference
+
+Each competition page contains:
+
+- a concise introduction;
+- a champions summary.
+
+## Important historical naming note
+
+National teams and countries have changed over time.
+`;
+
 const paragraphDoc = `# UEFA European Championship
 
 ## Historical format note
@@ -62,6 +76,20 @@ describe('extractSection', () => {
 
   it('returns null for a heading that does not exist', () => {
     expect(extractSection(doc, 'Nonexistent heading')).toBeNull();
+  });
+
+  it('keeps a lead-in paragraph before a bullet list as `intro`, not dropped', () => {
+    const section = extractSection(mixedDoc, 'How to use the reference');
+    expect(section).toEqual({
+      heading: 'How to use the reference',
+      intro: 'Each competition page contains:',
+      items: ['a concise introduction;', 'a champions summary.'],
+    });
+  });
+
+  it('leaves `intro` undefined for a section with bullets and no lead-in paragraph', () => {
+    const section = extractSection(doc, 'Memorable moments');
+    expect(section?.intro).toBeUndefined();
   });
 
   it('joins a non-bulleted section into a single paragraph item', () => {

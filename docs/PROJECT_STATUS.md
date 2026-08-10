@@ -4472,6 +4472,99 @@ what happens on a malformed row, and no page's content or markup changed.
   so it doesn't share this specific flaw, but a fresh pair of eyes on it
   wouldn't hurt).
 
+### Three real bugs found by re-reading `src/lib/*.ts` against its own doc comments and the real content files - fixed 2026-08-10 (intensive run)
+
+Every "Required"/"Nice-to-have" capability was already shipped and the
+content-accuracy audit series had reached the diminishing-returns conclusion
+recorded in the last several entries, so this run continued the pattern from
+the prior two ("dead validation check", "source-link extraction bugs"):
+critically re-read library code against its own claims and against the real
+`content/*.md` data, rather than re-verifying a score via WebSearch. Found
+three real, previously-unnoticed bugs:
+
+1. **`extractSection()` (`src/lib/notes.ts`) silently dropped a lead-in
+   sentence whenever a note section mixed prose and a bullet list.** The
+   function built two buffers (`paragraph`, `bullets`) but returned only one
+   - bullets unconditionally won when both were non-empty. `content/index.md`'s
+   "How to use the reference" section is exactly this shape: an intro line
+   ("Each competition page contains:") followed by six bullets. Verified live
+   on the home page: readers saw six disconnected fragments ("a concise
+   introduction;", "a champions summary;"...) with no lead-in sentence, in
+   both languages (the Croatian `hr/index.astro` hand-translation has the
+   same gap, since it mirrors the same content shape). `tests/unit/notes.test.ts`'s
+   10 existing cases tested "bullets only" and "paragraph only" separately,
+   never the mixed case that actually occurs in the real content.
+   **Fix:** `NoteSection` gained an optional `intro?: string` field; when a
+   section has both a leading paragraph and bullets, both are now returned
+   instead of the paragraph being discarded. `EditorialNotes.astro` renders
+   `section.intro` (when present) as a `<p class="notes__intro">` above the
+   list, with its own small bottom margin so it doesn't run into the list.
+   `hr/index.astro`'s hand-translated section gained the matching Croatian
+   sentence ("Svaka stranica natjecanja sadrži:"). 2 new Vitest cases
+   (mixed-shape section keeps its intro; a bullets-only section leaves
+   `intro` undefined); the English and Croatian home-page Playwright cases
+   now also assert the intro sentence is visible.
+
+2. **`editionTeams()` (`src/lib/editions.ts`) never split Golden Boot's
+   "; "-separated joint-team ties, breaking the Team filter for those rows.**
+   `content/golden-boot.md`'s "Team" column legitimately holds values like
+   `"Bulgaria; Russia"` (1994, Stoichkov/Salenko's joint top-scorer award)
+   and the six-way-tie placeholder `"Multiple"` (1962, 1960, 1992, 2012,
+   2024). `editionTeams()` added the whole cell value as one string, so the
+   Team filter - one of the filters `docs/WEBSITE_REQUIREMENTS.md` explicitly
+   requires - had no standalone "Russia" option; a reader could never find
+   Oleg Salenko's 1994 award by filtering on "Russia" (only the compound
+   "Bulgaria; Russia" surfaced it, alphabetized under B), and "Multiple"
+   leaked into the dropdown as a nonsensical filter value.
+   `src/lib/compare.ts`'s own doc comment already named this exact data shape
+   as the reason Golden Boot/Ballon d'Or are excluded from the country-compare
+   feature - that reasoning was never carried over to fix the shared
+   `editionTeams()` the Golden Boot page's own filter actually uses.
+   **Fix:** `editionTeams()` now splits each team-holding cell's value on
+   `;` and adds each trimmed name individually, and a new `TEAM_TIE_PLACEHOLDER`
+   check drops the "Multiple" too-many-to-name placeholder from the team
+   list. 2 new Vitest cases (a "; "-joint tie splits into two distinct teams;
+   "Multiple" is excluded). Verified in the actual `pnpm build` output:
+   `<option value="Russia">` and `<option value="Bulgaria">` now both exist
+   on the Golden Boot page, `<option value="Bulgaria; Russia">` and
+   `<option value="Multiple">` do not, and the row's `data-teams` attribute
+   is correctly `"Bulgaria|Russia"`.
+
+3. **`distinctHosts()` (`src/lib/editions.ts`) offered Copa América's
+   "Home-and-away" host placeholder as a filterable "country".**
+   `src/lib/quiz.ts` already defines `NOT_A_HOST` (`/home-and-away|no host|not held/i`)
+   specifically because Copa América's 1975/1979/1983 rows record
+   "Home-and-away" in the host cell (no single host - a two-legged final) -
+   but that exclusion was only ever wired into the quiz's own question
+   builder, not into the shared `distinctHosts()` that every competition
+   page's actual Host filter dropdown uses. Lower severity than #1/#2 (it
+   didn't produce wrong results - selecting it correctly showed those three
+   rows - just a non-country value cluttering a country filter). **Fix:**
+   moved `NOT_A_HOST` to `src/lib/editions.ts` as a shared, exported constant
+   (closing the exact "two lists that can silently disagree" risk this
+   project's PDF-manifest fix on 2026-08-08 was written to avoid elsewhere);
+   `quiz.ts` now imports it instead of keeping its own copy; `distinctHosts()`
+   excludes it. 1 new Vitest case. Verified in the build output: the Copa
+   América page's `data-host="Home-and-away"` row attribute (used by the Year
+   filter's row matching) is untouched, but the host `<select>` no longer
+   offers a "Home-and-away" option.
+
+**Tests:** 5 new Vitest cases total (182/182, up from 177). `pnpm lint` - 0
+errors/0 warnings/0 hints. `pnpm build` - 23 pages, unchanged page count.
+No `content/*.md` file changed, so `pnpm check:pdfs` and `pnpm check:perf`
+both pass unchanged with no PDF regeneration needed. Full 314-case Playwright
+suite passing (unchanged count - these are filter/rendering fixes, not new
+UI surface).
+
+**Left for a future pass:**
+- This run closes every concrete "worth a skeptical second look" candidate
+  named by the prior two runs. A further pass in this vein would mean
+  picking a fresh `src/lib/*.ts` module (e.g. `homeCards.ts`, `i18n.ts`,
+  `offlineCache.ts`) and testing it against real edge-case content rather
+  than trusting existing test fixtures, the same method used here.
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates are unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
