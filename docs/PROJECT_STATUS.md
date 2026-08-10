@@ -4630,6 +4630,62 @@ without any test changes needed.
   itself still lacking a dedicated unit test file (only exercised indirectly
   via the home-page Playwright specs).
 
+### Closed the `homeCards.ts` test-coverage gap named by the prior entry - added 2026-08-10 (intensive run)
+
+Followed up on the standing "fresh module" suggestion: `homeCards.ts` was the
+one library module with no dedicated unit test file, only ever exercised
+indirectly through the home-page Playwright specs.
+
+Before writing tests, re-checked `buildChampionsSummary()` (`src/lib/editions.ts`)
+against the real Golden Boot content as a candidate bug, since it groups each
+edition's raw `edition.winner` cell value into the champions leaderboard
+without splitting `"; "`-joined joint ties the way `distinctWinners()`/
+`editionTeams()` do for their filters - e.g. the EURO table's 1962/2012/2024
+multi-player ties. This looked like the same bug class fixed three times
+already today, and would have made Cristiano Ronaldo's EURO 2012 tie +
+2020 solo award count as two champions instead of one two-time champion.
+**Turned out not to be a bug**: both `golden-boot.astro` pages (English and
+Croatian) pass the Champions Summary component an explicit, deliberate
+description - "Tied top scorers are counted as the joint entry shown in the
+table, exactly as the source lists them." - so grouping by the whole
+compound tie string is the documented, intended behavior for this specific
+leaderboard, unlike the Team/Winner *filters* (which do need per-name
+splitting so a reader can filter to one name). Reverted the speculative
+change before it was committed; no `src/lib/editions.ts` change went in this
+run. Worth recording so a future pass doesn't re-investigate the same lead.
+
+Wrote `tests/unit/homeCards.test.ts` (6 new Vitest cases) for `buildHomeCards()`:
+card order/count matches `HomeCompetitions`, each card's `editions`/`topChampion`
+come from its own competition data (not a shared default), `topChampion` is
+`undefined` when a competition has no champions yet, `statLabel` ("Most
+awards") is set only for the two individual-award cards (Ballon d'Or, Golden
+Boot) and unset for the four team competitions, English/Croatian locales
+swap title/blurb text without changing the underlying numbers, and every
+card gets a distinct accent color plus a `withBase()`-built href. Testing
+`buildHomeCards()` directly (rather than only through Playwright) required a
+`vi.mock('astro:content', ...)` stub, since `homeCards.ts` also imports
+`loadCompetition` from `./competition` at module scope for
+`loadHomeCompetitions()`, and that module imports `astro:content` - even
+though `buildHomeCards()` itself never touches it. That's the reason no one
+had written this test file before.
+
+**Tests:** 190/190 (up from 184 - the 6 new `homeCards.test.ts` cases).
+`pnpm lint` - 0 errors/0 warnings/0 hints. `pnpm build` - 23 pages, unchanged.
+No `src/lib/*.ts` or `content/*.md` file changed, so `pnpm check:pdfs` and
+`pnpm check:perf` both pass unchanged and the full Playwright suite is
+unaffected.
+
+**Left for a future pass:**
+- `i18n.ts` and `offlineCache.ts` were already confirmed correct and tested
+  in the prior run; `homeCards.ts` is now the last of that trio covered too.
+  A further "fresh module" pass would mean picking a different `src/lib/*.ts`
+  file not yet covered by this method (e.g. `jsonLd.ts`'s `buildChampionsItemList`
+  already has a test file, but `competition.ts`'s `loadCompetition`/`loadPageMeta`
+  and `countries.ts`'s `summaryGroupFor` have never been read against real
+  content the way `editions.ts` was in the last several runs).
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates are unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
