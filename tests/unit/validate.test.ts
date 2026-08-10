@@ -58,6 +58,26 @@ describe('validateEditions', () => {
     ).toThrow(/duplicate table header/);
   });
 
+  it('rejects a row with too few cells for the header count', () => {
+    // A row missing one pipe-delimited value, e.g. `| 2022 | Qatar | Argentina |`
+    // for a Year/Host/Winner/Runner-up table. buildEditions() pads this to 4
+    // cells (Runner-up becomes ''), so the check must compare the raw row
+    // width, not the derived, always-padded edition.cells.
+    const headers = ['Year', 'Host', 'Winner', 'Runner-up'];
+    const table: MarkdownTable = { headers, rows: [['2022', 'Qatar', 'Argentina']] };
+    expect(() =>
+      validateEditions({ competition: 'Test', table, editions: buildEditions(table) }),
+    ).toThrow(/row 1 has 3 cells but the table has 4 columns/);
+  });
+
+  it('rejects a row with too many cells for the header count', () => {
+    const headers = ['Year', 'Winner'];
+    const table: MarkdownTable = { headers, rows: [['1930', 'Uruguay', 'extra']] };
+    expect(() =>
+      validateEditions({ competition: 'Test', table, editions: buildEditions(table) }),
+    ).toThrow(/row 1 has 3 cells but the table has 2 columns/);
+  });
+
   it('reports every problem it finds in one error', () => {
     const table = tableOf([['not-a-year', '0', '']]);
     try {

@@ -4410,6 +4410,68 @@ check:perf` both pass cleanly after regeneration.
   wrong article entirely. That class of error is exactly what the ongoing
   content-accuracy WebSearch audits are for, not this build-time check.
 
+### Bug fix: the row-width content-validation check was structurally dead code - fixed 2026-08-10 (intensive run)
+
+Same shape as the prior run's source-link fix: rather than another
+low-yield third content-accuracy pass, this run re-verified an existing
+build-time validation check against what it actually does, instead of
+trusting that it works because `docs/CONTENT_MODEL.md` lists it. It doesn't.
+
+`docs/CONTENT_MODEL.md`'s validation checklist requires "no duplicate table
+headers" *and*, implicitly (it's the same class of structural check),
+that every row actually has one cell per header - `validateEditions()`
+(`src/lib/validate.ts`) has a check with exactly that comment. It has
+never been able to fire. `buildEditions()` (`src/lib/editions.ts`) builds
+each row's `cells` as `headers.map((label, index) => ({ label, value:
+row[index] ?? '' }))` - by construction this **always** produces exactly
+`headers.length` cells, silently padding a short row with empty strings
+(or truncating a long one). The validator was comparing
+`edition.cells.length` against `table.headers.length`, i.e. a value against
+itself after it had already been forced to match - a check that can never
+be false. Confirmed with a throwaway repro (not committed): a table with
+`Year | Host | Winner | Runner-up` headers and a row missing one
+pipe-delimited value (`Belgium` as the raw third-place value with no
+"Runner-up" cell) built silent, wrong data - `Belgium` mislabeled as
+`Runner-up`, the real runner-up dropped, "Third" blank - with no build
+failure. All six of today's content tables happen to be well-formed, which
+is exactly why this has never been noticed in the wild; the risk is a
+future edit (human or agent) that drops or adds a pipe mid-row in any of
+the six `content/*.md` tables.
+
+**The fix** (`src/lib/validate.ts`): compare the raw parsed row width -
+`table.rows[i].length`, from the `MarkdownTable` already passed into
+`validateEditions()` - against `table.headers.length`, instead of the
+derived, always-padded `edition.cells.length`. Uses data that hasn't
+already been normalized to agree with itself.
+
+Also considered and set aside as not a fresh finding, per the agent
+research pass behind this entry: `content/fifa-world-cup.md`'s "Champions
+by titles after 2026" and `content/uefa-euro.md`'s "Champions by titles"
+sections are unparsed, unrendered duplicate tables - but this is the exact
+pattern already examined and explicitly rejected for Copa América's
+"Titles after 2024" and Ballon d'Or's "Multiple winners through 2025"
+tables (2026-07-30 entry above: verified by hand to match the generated
+`ChampionsSummary`, so a renderer would only duplicate it) - not a new gap.
+
+**Tests:** 2 new Vitest cases in `tests/unit/validate.test.ts` reproducing
+the exact bug class (a row with one too few cells, a row with one too many)
+against the fixed check - 177 total, up from 175. `pnpm lint` - 0 errors/0
+warnings/0 hints. `pnpm build` - 23 pages, unchanged. No content file
+changed (all six tables are already well-formed), so `pnpm check:pdfs` and
+`pnpm check:perf` both pass unchanged with no regeneration needed. Full
+Playwright suite unaffected for the same reason - this check only changes
+what happens on a malformed row, and no page's content or markup changed.
+
+**Left for a future pass:**
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates are unchanged.
+- This class of bug - a derived value validated against itself instead of
+  against its raw input - is worth a skeptical second look anywhere else
+  validation logic exists (e.g. `validateSourceSections()`, added last run,
+  does validate against raw extracted URLs rather than a re-derived value,
+  so it doesn't share this specific flaw, but a fresh pair of eyes on it
+  wouldn't hurt).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
