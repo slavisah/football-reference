@@ -128,6 +128,44 @@ describe('distinctWinners', () => {
     };
     expect(distinctWinners(buildEditions(withPlaceholder))).toEqual(['Lionel Messi']);
   });
+
+  it('splits a "; "-joined joint-tie Player(s) cell into individual winners (Golden Boot)', () => {
+    const jointTieTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)'],
+      rows: [
+        [
+          '1962',
+          'Garrincha; Vavá; Leonel Sánchez; Flórián Albert; Valentin Ivanov; Dražan Jerković',
+        ],
+        ['1994', 'Hristo Stoichkov; Oleg Salenko'],
+      ],
+    };
+    expect(distinctWinners(buildEditions(jointTieTable))).toEqual([
+      'Dražan Jerković',
+      'Flórián Albert',
+      'Garrincha',
+      'Hristo Stoichkov',
+      'Leonel Sánchez',
+      'Oleg Salenko',
+      'Valentin Ivanov',
+      'Vavá',
+    ]);
+  });
+
+  it('lists a player once even if they appear both solo and in a joint tie in different editions', () => {
+    const mixedTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)'],
+      rows: [
+        ['2012', 'Mario Balotelli; Mario Gómez; Cristiano Ronaldo'],
+        ['2020', 'Cristiano Ronaldo'],
+      ],
+    };
+    expect(distinctWinners(buildEditions(mixedTable))).toEqual([
+      'Cristiano Ronaldo',
+      'Mario Balotelli',
+      'Mario Gómez',
+    ]);
+  });
 });
 
 describe('distinctHosts', () => {

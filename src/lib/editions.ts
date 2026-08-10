@@ -155,18 +155,28 @@ export function buildTopScorerFacts(editions: Edition[], locale: Locale = 'en'):
   return facts;
 }
 
-/** Distinct winners for populating the filter control, in first-title order. */
+/**
+ * Distinct winners for populating the filter control, alphabetically.
+ *
+ * Golden Boot's "Player(s)" column also holds "; "-separated ties for a
+ * joint top scorer (e.g. 1962's six-way "Garrincha; Vavá; Leonel Sánchez;
+ * Flórián Albert; Valentin Ivanov; Dražan Jerković") - each name is split
+ * out as its own winner, the same way `editionTeams()` splits Golden Boot's
+ * "; "-joined Team column, so a reader can filter by e.g. "Vavá" or "Oleg
+ * Salenko" individually instead of only the whole compound string being
+ * filterable (and a player tied once and outright another year, e.g.
+ * Cristiano Ronaldo in EURO 2012/2020, isn't split into two unmatched
+ * strings that each only surface one of their editions).
+ */
 export function distinctWinners(editions: Edition[]): string[] {
   const seen = new Set<string>();
-  const winners: string[] = [];
   for (const edition of editions) {
-    const winner = edition.winner.trim();
-    if (winner && !isPlaceholderWinner(winner) && !seen.has(winner)) {
-      seen.add(winner);
-      winners.push(winner);
+    for (const rawValue of edition.winner.split(';')) {
+      const winner = rawValue.trim();
+      if (winner && !isPlaceholderWinner(winner)) seen.add(winner);
     }
   }
-  return winners.sort((a, b) => a.localeCompare(b));
+  return [...seen].sort((a, b) => a.localeCompare(b));
 }
 
 // Host values that aren't an actual country - e.g. Copa América's 1975,
