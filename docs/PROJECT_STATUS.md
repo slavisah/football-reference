@@ -4565,6 +4565,71 @@ UI surface).
 - The standing content-accuracy (third-pass, low-yield) and source-link
   liveness (infeasible in this environment) candidates are unchanged.
 
+### Fixed the Golden Boot Winner/Player filter for joint-tie editions - same bug class as the Team filter, one column over (2026-08-10, intensive run)
+
+Followed up on this run's suggested next step (a fresh look at `homeCards.ts`,
+`i18n.ts`, `offlineCache.ts`) by first spawning a research agent to weigh that
+against other candidates; it found a stronger, concrete lead instead: the
+exact bug class fixed for `editionTeams()`/the Team filter earlier today
+(2026-08-10 entry above) was still present in `distinctWinners()` and the
+Winner/Player filter, one column over.
+
+`content/golden-boot.md`'s "Player(s)" column legitimately holds `"; "`-joined
+joint-tie values for 7 of its 40 rows across both tables (World Cup 1962,
+1994; EURO 1960, 1964, 1992, 2012, 2024) - e.g. 1962's six-way tie
+`"Garrincha; Vavá; Leonel Sánchez; Flórián Albert; Valentin Ivanov; Dražan
+Jerković"`. `distinctWinners()` (`src/lib/editions.ts`) added each cell as one
+opaque string, so the Winner/Player `<select>` on the Golden Boot page (both
+languages) offered the whole compound string as a single option instead of
+each name - confirmed in the built `dist/competitions/golden-boot/index.html`
+before the fix. A reader could never filter to just "Vavá" or "Oleg Salenko";
+worse, filtering to "Cristiano Ronaldo" alone silently dropped his 2012 tied
+EURO award and surfaced only his solo 2020 one, since the compound 2012 string
+never equality-matched the plain "Cristiano Ronaldo" option value.
+`tests/unit/editions.test.ts`'s `distinctWinners` block never tested a
+`;`-joined value, mirroring the exact coverage gap that let the Team-filter
+version of this bug through.
+
+**Fix:** `distinctWinners()` now splits each winner cell on `;`, trims, and
+excludes placeholder winners ("Not awarded" etc.) per split value - mirroring
+`editionTeams()`'s pattern, rewritten as a `Set` build + one alphabetical
+sort (previously a separate `seen` Set plus an array, doing the same
+dedupe/sort in a more roundabout way). `TournamentTable.astro`'s row markup
+now writes `data-winner` as a `|`-joined list of the split, trimmed names
+(matching `data-teams`'s existing pipe-separated convention) instead of the
+raw unsplit cell value, and the client-side filter match changed from
+`row.dataset.winner === winner` to `(row.dataset.winner || '').split('|').includes(winner)`
+- again mirroring the Team filter's own matching logic exactly. Non-Golden-Boot
+tables are unaffected: none of their Winner/Champion cells contain `;`, so
+splitting is a no-op and `data-winner` renders byte-identical to before.
+
+**Tests:** 2 new Vitest cases (`distinctWinners` splits a six-way and a
+two-way joint tie into individual names; a player who won both solo and
+tied in different editions, e.g. Cristiano Ronaldo's 2012 tie/2020 solo
+EURO awards, is listed once) - 184/184, up from 182. `pnpm lint` - 0
+errors/0 warnings/0 hints. `pnpm build` - 23 pages, unchanged page count.
+Verified in the rebuilt `dist/competitions/golden-boot/index.html`: `<option
+value="Vavá">` now exists standalone, the old compound-string option is
+gone, and the 2012 EURO row's `data-winner` now contains `Cristiano Ronaldo`
+as one of six pipe-separated names (previously only exact-matched the full
+compound string). Full Playwright suite (`accessibility-table-states.spec.ts`'s
+golden-boot cases specifically, plus a full run) passing - the "no-results"
+combo finder in that spec reads live `<option>`/`data-winner` values off the
+page rather than hardcoding them, so it adapted to the new per-name options
+without any test changes needed.
+
+**Left for a future pass:**
+- No further `;`-joined-value gaps are known to remain: `editionTeams()` (Team
+  filter) and `distinctWinners()` (Winner filter) are now the only two
+  functions that read Golden Boot's tie-holding columns for filter options,
+  and both split correctly.
+- The `homeCards.ts`/`i18n.ts`/`offlineCache.ts` "fresh module" suggestion from
+  the prior entry is still open if a future run wants it - this run's research
+  pass read all three against real content and found them correct and already
+  well-tested (`i18n.test.ts`, `offlineCache.test.ts`), aside from `homeCards.ts`
+  itself still lacking a dedicated unit test file (only exercised indirectly
+  via the home-page Playwright specs).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
