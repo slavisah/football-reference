@@ -4686,6 +4686,73 @@ unaffected.
 - The standing content-accuracy (third-pass, low-yield) and source-link
   liveness (infeasible in this environment) candidates are unchanged.
 
+### Closed the `competition.ts`/`countries.ts`/`url.ts` test-coverage gap named by the prior entry - added 2026-08-10 (intensive run)
+
+The prior run's "Left for a future pass" note named `competition.ts`'s
+`loadCompetition()`/`loadPageMeta()`/`firstParagraph()` and `countries.ts`'s
+`summaryGroupFor()` as the two `src/lib/*.ts` modules never read against real
+content the way `editions.ts` was in several earlier runs (which found three
+real bugs). This run closed that gap, plus a third module found the same way
+while auditing: `url.ts`'s `withBase()`/`absolutePageUrl()`, used on every
+page for hrefs/canonical URLs/JSON-LD but likewise never covered by a
+dedicated test.
+
+Traced `firstParagraph()` (the private helper behind both `loadCompetition()`
+and `loadPageMeta()`'s `intro` field) against every shape actually present in
+`content/*.md`: a single-line paragraph, a hard-wrapped multi-line paragraph
+(joined with spaces - matches `content/quiz.md`'s wrapped intro), leading
+blank lines before the first heading, and two consecutive heading lines with
+no paragraph between them (matches `content/golden-boot.md`'s "# Golden Boot
+Winners" immediately followed by "# FIFA World Cup top scorers" as its next
+table heading, no intro paragraph of its own between them) - all read
+correctly. No bug was found in `firstParagraph()` itself; the function
+matches its doc comment.
+
+`url.ts`'s `withBase()` has a `|| '/'` fallback (line 8) that turned out to be
+dead code once traced: `clean` is built as `path.startsWith('/') ? path :
+'/' + path`, so it always starts with `/` and the concatenated result can
+never be an empty string - confirmed by a test asserting the empty-string and
+root-path inputs still both resolve to `'/'` via the `clean` branch, not the
+fallback. Left as-is rather than removed: it is harmless, documents the
+author's intent defensively, and removing it is a separate cleanup with no
+behavioral difference, not a bug fix.
+
+New `tests/unit/competition.test.ts` (12 cases, using the same
+`vi.mock('astro:content', ...)` stub pattern `tests/unit/homeCards.test.ts`
+established) covers `loadPageMeta()`'s front-matter/intro/notes wiring, the
+"entry not found" error message for both `loadCompetition()` and
+`loadPageMeta()`, a non-default `editionsHeading`, the "table not found"
+error message, `allowDuplicateYears` actually suppressing the duplicate-year
+validation error it's meant to (and the same table still throwing without
+it), and one live integration check against the real `docs/SOURCES.md` file
+(a real heading resolves sources, a nonexistent one returns `[]` rather than
+throwing) so the `sourcesRaw` wiring itself is exercised, not just mocked.
+New `tests/unit/countries.test.ts` (4 cases) pins the West Germany/Germany
+merge (case-insensitive, trimmed), that the other three historical-successor
+pairs named in `AGENTS.md` (Soviet Union/Russia, Czechoslovakia/Czechia,
+Yugoslavia/successors) are deliberately *not* grouped, and that any other
+name passes through as its own group with original display casing preserved.
+New `tests/unit/url.test.ts` (5 cases) covers `withBase()`'s leading-slash
+normalization and the dead-fallback finding above, plus `absolutePageUrl()`
+against both a configured `site` and the local-dev fallback (mirrors the
+`site ?? url` pattern already used by `BaseLayout.astro`/`sitemap.xml.ts`).
+
+**Tests:** 211/211 (up from 190 - 21 new cases across the three new files).
+`pnpm lint` - 0 errors/0 warnings/0 hints. `pnpm build` - 23 pages, unchanged.
+`pnpm check:perf` - all 27 pages within the 300 KB budget (heaviest:
+`hr/records` at 232.0 KB, unchanged). No `content/*.md` file changed, so
+`pnpm check:pdfs` and the full Playwright suite are unaffected.
+
+**Left for a future pass:**
+- Every `src/lib/*.ts` module now has a dedicated test file. A further "fresh
+  module" pass would need to look at component-level coverage instead (e.g.
+  confirming `EditorialNotes.astro`'s `intro` rendering, added alongside the
+  `notes.ts` fix a few runs back, has explicit Playwright assertions beyond
+  "is visible" - flagged as lower-confidence and unverified during this run's
+  scoping, worth a quick look before treating it as a real gap).
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates are unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
