@@ -5026,6 +5026,82 @@ budget, heaviest unchanged at `hr/records` ~234.8 KB) and `pnpm check:pdfs`
 - The standing content-accuracy (third-pass, low-yield) and source-link
   liveness (infeasible in this environment) candidates are unchanged.
 
+### Content-accuracy pass: UEFA EURO "Other semifinalist" columns - full audit closed - added 2026-08-11 (intensive run)
+
+Every backlog item and required/nice-to-have capability was already closed
+going into this run, so per this routine's fallback instruction this
+continued the standing content-accuracy series, closing the exact gap the
+previous entry's "Left for a future pass" note named: EURO's "Other
+semifinalist" / "Other semifinalist / fourth" columns were still on only
+their first audit pass (2026-08-04), and that first pass itself only ever
+covered 6 of the table's 17 editions - the six 1960-1980 editions that
+played an actual third-place match under the old 4-team format. The other
+eleven editions (1984-2024), where UEFA does not rank the two defeated
+semifinalists, had never had their team names independently re-verified at
+all - the 2026-08-04 entry only established that there was no ranking to
+audit, not that the two names themselves were correct.
+
+Two parallel WebSearch research passes closed both gaps in the same run:
+
+- **1960-1980 (6 editions), second independent cross-check:** re-verified
+  the third-place play-off winner/loser and score for all six editions,
+  deliberately drawing from a source mix distinct from the first pass
+  (which leaned on UEFA.com and eu-football.info/11v11): this pass used
+  Wikipedia tournament articles, RSSSF, worldfootball.net, 11v11.com,
+  national-football-teams.com, and football-history retrospectives (World
+  Soccer magazine, Soccer Nostalgia).
+- **1984-2024 (11 editions), first-ever verification:** confirmed the two
+  teams recorded as eliminated in each edition's semifinals match the
+  actual semifinal results, checked as an unordered pair since the column
+  intentionally carries no ranking for this era (per the page's own
+  "Historical format note") - verified against Wikipedia knockout-stage/
+  final articles, UEFA.com, worldfootball.net, and press coverage.
+
+**No discrepancies found across any of the 17 editions.** Every 1960-1980
+third-place result - including the two extra-time deciders (1964, 1976)
+and 1980's penalty shoot-out (Czechoslovakia beat host Italy 9-8) - matched
+both this pass and the first. Every 1984-2024 semifinalist pair, including
+every penalty-shootout and golden-goal-decided semifinal along the way,
+matched the page exactly.
+
+See `docs/SOURCES.md`'s expanded UEFA EURO section for the full 19-source
+citation list. `content/uefa-euro.md`'s `lastReviewed` moved to 2026-08-11;
+`status` stays `review` (secondary sources, same reasoning as every prior
+secondary-sourced audit in this file). No table data changed - the only
+file changes are the `lastReviewed` bump and the new source citations.
+Confirmed no Playwright test pins an exact `lastReviewed` value for the
+EURO page (unlike the World Cup page), so no test needed updating for the
+date bump.
+
+Bumping `lastReviewed` changed `content/uefa-euro.md`'s SHA-256, which
+`pnpm check:pdfs` correctly flagged as making `public/downloads/euro.pdf`
+(and, since `docs/SOURCES.md` is a shared dependency of every competition
+PDF, all six PDFs) stale. Regenerated all six PDFs and the manifest via
+`PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`; `pnpm
+check:pdfs` now passes cleanly again.
+
+This closes the "second independent cross-check" series for every core
+column on the UEFA EURO page (Champion/Runner-up/Final-score, Host(s)/
+Teams, Final date, and now the semifinalist columns) - EURO joins Copa
+América and FIFA World Cup as fully covered by at least two independent
+passes (or, for the 1984-2024 semifinalist names, a first genuinely
+dedicated pass) on every column its table tracks.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite
+is unchanged (211/211) and `pnpm lint` is clean (0 errors/0 warnings/0
+hints). `pnpm build` - 23 pages, unchanged. Full Playwright suite
+unchanged (326/326 - a `lastReviewed` bump has no pinned assertion for
+this page). `pnpm check:perf` (all pages within the 300 KB budget) and
+`pnpm check:pdfs` (all six PDFs regenerated and up to date) both pass.
+
+**Left for a future pass:**
+- Nations League's "Third"/"Fourth" columns and Copa América's third/
+  fourth-place data are each still on only their first audit pass
+  (2026-08-02/2026-08-03 respectively) - the same gap this run closed for
+  EURO is the natural next candidate, one competition at a time.
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates are unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
