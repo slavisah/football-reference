@@ -48,6 +48,56 @@ for (const colorScheme of COLOR_SCHEMES) {
   });
 }
 
+// The sweep above scans each page in whatever "today" happens to be when the
+// suite runs, which means the "On this day" widget (src/components/
+// OnThisDay.astro) almost never gets its exact-final-date DOM state included
+// in an automated scan: a specific competition final or Ballon d'Or ceremony
+// falls on only a couple dozen of the year's 365 days, so most real runs only
+// ever cover the fallback-archive-card state by luck. mobile.spec.ts already
+// has hand-written content assertions for the exact-match, fallback and
+// award-wording states, but none of them run through axe. This pins the
+// browser clock (same `page.clock.setFixedTime` pattern mobile.spec.ts uses)
+// to the two known exact-match dates - 30 July (a two-entry state: both the
+// 1930 and 1966 World Cup finals) and 12 December (the Ballon d'Or
+// award-wording branch, "won the award" instead of "won the final") - and
+// scans just the widget region, for both languages and both color schemes,
+// on top of the whole-page sweep above (which already covers the fallback
+// state on any date without a match, including this suite's own run date).
+const ON_THIS_DAY_DATES = [
+  { label: 'two-entry exact match (World Cup 1930 + 1966 finals)', date: '2026-07-30T12:00:00' },
+  { label: "Ballon d'Or award-wording exact match", date: '2026-12-12T12:00:00' },
+];
+
+const ON_THIS_DAY_HOME_PAGES = [
+  { label: 'English', path: '' },
+  { label: 'Croatian', path: 'hr/' },
+];
+
+for (const colorScheme of COLOR_SCHEMES) {
+  test.describe(`"On this day" widget - ${colorScheme} color scheme`, () => {
+    test.use({ colorScheme });
+
+    for (const { label: dateLabel, date } of ON_THIS_DAY_DATES) {
+      for (const { label: pageLabel, path } of ON_THIS_DAY_HOME_PAGES) {
+        test(`${pageLabel} home page, ${dateLabel}, has no WCAG 2.1 A/AA violations`, async ({
+          page,
+        }) => {
+          await page.clock.setFixedTime(new Date(date));
+          await page.goto(path);
+
+          const results = await new AxeBuilder({ page })
+            .include('.on-this-day')
+            .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+            .disableRules(['region'])
+            .analyze();
+
+          expect(results.violations, formatViolations(results.violations)).toEqual([]);
+        });
+      }
+    }
+  });
+}
+
 // Turns axe's violation objects into a readable failure message instead of
 // Playwright's default full-object dump (each violation can carry dozens of
 // matching DOM nodes). Typed off AxeBuilder's own return type rather than an

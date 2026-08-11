@@ -4753,6 +4753,71 @@ against both a configured `site` and the local-dev fallback (mirrors the
 - The standing content-accuracy (third-pass, low-yield) and source-link
   liveness (infeasible in this environment) candidates are unchanged.
 
+### Accessibility: first-ever automated WCAG scan of the "On this day" widget's exact-match states - added 2026-08-11 (intensive run)
+
+This run first ran down the prior entry's own flagged candidate -
+`EditorialNotes.astro`'s `intro` rendering - and confirmed it is **not** a
+real gap: both `tests/e2e/mobile.spec.ts` "How to use the reference" cases
+(English `page.getByText('Each competition page contains:')` at line ~907,
+Croatian `page.getByText('Svaka stranica natjecanja sadrži:')` at line ~1004)
+already assert the intro paragraph's actual text, not just heading
+visibility. No code or test change was needed there; recorded here so a
+future run doesn't re-open it a second time.
+
+Every required/nice-to-have capability was already shipped, content-accuracy
+had reached its own diminishing-returns point (every table double-audited),
+performance and PDF freshness both check out clean (`pnpm check:perf`,
+`pnpm check:pdfs`), and this environment's egress policy still blocks direct
+fetches to source domains (confirmed again this run: `curl` to
+en.wikipedia.org and rsssf.org both fail with a 403 CONNECT-tunnel error), so
+source-link liveness remains off the table. Went looking for a genuinely new
+angle instead and found one: `tests/e2e/accessibility.spec.ts`'s sitewide
+automated axe sweep scans every page using **whatever the real calendar date
+is when the suite runs** - which means the "On this day" widget
+(`src/components/OnThisDay.astro`) has two structurally different DOM states
+(an exact-final-date match: hint hidden, one-or-more result `<li>`s; the
+fallback archive pick: hint visible, exactly one `<li>`) and the sweep has
+essentially only ever exercised the fallback state, since a specific
+competition final or Ballon d'Or ceremony lands on only a couple dozen of the
+year's 365 days. `tests/e2e/mobile.spec.ts` already has hand-written content
+assertions for both states (added when the widget shipped), but none of them
+ran through axe.
+
+**Fix:** new tests appended to `tests/e2e/accessibility.spec.ts`, reusing its
+existing `AxeBuilder`/`formatViolations` setup. `page.clock.setFixedTime()`
+(the same pattern `mobile.spec.ts` already uses for this widget) pins the
+browser to two known exact-match dates - 30 July (the two-entry state: both
+the 1930 and 1966 World Cup finals render as separate `<li>`s) and 12
+December (the Ballon d'Or award-wording branch, "won the award" instead of
+"won the final") - then scans just `.on-this-day` (`.include()`, keeping the
+scan focused on the widget rather than re-running the whole-page sweep) on
+both the English and Croatian home pages, under both light and dark color
+schemes (8 new cases total). **No violations found** in any of the 8
+combinations - this is a coverage-gap closure, not a bug fix, matching the
+same "closes a concrete, previously-unexercised DOM state" shape as the
+`TournamentTable`/theme-toggle/print-media audits earlier in this file,
+several of which did turn up real bugs but this one didn't.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (211/211) and `pnpm lint` is clean (0 errors/0 warnings/0 hints).
+Full Playwright suite: 322/322 (up from 314 - the 8 new cases), including the
+unchanged whole-page WCAG sweep and the existing hand-written "On this day"
+content assertions. `pnpm build` unchanged (23 pages); `pnpm check:perf`
+(all pages within the 300 KB budget, heaviest unchanged at `hr/records`
+232.0 KB) and `pnpm check:pdfs` (all six PDFs up to date) both pass - no
+`content/*.md` file changed this run.
+
+**Left for a future pass:**
+- With the "On this day" widget's exact-match states now covered, no other
+  component is known to have a similarly date/state-gated DOM that the
+  sitewide sweep might be silently skipping - worth a quick scan for that
+  pattern specifically (any component whose rendered structure depends on
+  the build/request date or another external condition, not just a URL
+  filter param) before assuming there is nothing left to check there.
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment, reconfirmed again this run)
+  candidates are unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
