@@ -5,7 +5,7 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-08-08
+lastReviewed: 2026-08-11
 status: review
 ---
 
@@ -121,6 +121,8 @@ Two "—" cells remain, and both are the historical fact rather than a research 
 - **1975, 1979, and 1983** (Home-and-away format) had no standings table or third-place fixture of any kind - only a two-legged final between two teams - so there is nothing to read a placing from.
 
 This closes the third/fourth audit opened by the earlier Format-audit pass; no further pre-1975 research is outstanding for this table.
+
+A **second, independent cross-check** of Third and Fourth (2026-08-11, intensive run) re-verified all 45 editions that carry a placing (1916 through 2024, both 1959 tournaments, excluding only the three Home-and-away finals and 1925's missing fourth place) in four era-based passes, deliberately drawing on a source mix distinct from the 2026-08-02 first pass - sports-statistics and results archives (worldfootball.net, athlet.org, footballdatabase.eu, topendsports.com, besoccer.com, soccer365.net, Transfermarkt, 11v11.com, betexplorer.com), Spanish-language federation and results-history sites (resultados-futbol.com, AFA, AUF, Memoria Chilena), and period press/wire coverage (CBC, BBC, CTV/TSN, China Daily/Xinhua, Yahoo Sports) rather than RSSSF/Wikipedia. **No discrepancies found**: every third and fourth place already on the page - including the 1922 Uruguay-withdrawal ruling, the 1989/1991 closing-group tiebreaks (re-derived match-by-match from each group's six games), and both flagged upsets (Honduras over Uruguay on penalties in 2001, Uruguay over Canada on penalties in 2024) - held up independently. See `docs/SOURCES.md` for the full per-era citation list.
 
 The **Champion** and **Runner-up** columns - audited 2026-08-05 (intensive run) against RSSSF, each edition's dedicated Wikipedia article, and (for the modern knockout-final era) CONMEBOL's own recap articles (see `docs/SOURCES.md`) - were cross-checked for all 48 editions, 1916 through 2024. No discrepancies were found: every champion and runner-up in the table above already matched at least two independent sources, including every level-on-points tie resolved by a playoff decider (1919, 1922, 1937, 1949, 1953) and every penalty-shootout final (1995, 2015, 2016).
 

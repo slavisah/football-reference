@@ -2,27 +2,27 @@
   "world-cup": {
     "content/fifa-world-cup.md": "4cc5426a21d6672328f1956dc35839192d41def381278a566ec5e6ae1a367b0e",
     "content/golden-boot.md": "09e67a552d2138042cf83e8442fe62d9d71ea19409694bc980abdca5afde8e8f",
-    "docs/SOURCES.md": "122890d3960fc64bbad69f15c66bc2a6b4cc8fba771ad229f5afec2ee1ae37ef"
+    "docs/SOURCES.md": "370d444cbb851680c053b974bf965b70c55eb6c50951def56827062c1821e08a"
   },
   "euro": {
     "content/uefa-euro.md": "856235cb28f92e70d3f1f43136cd8b80c3a50c59258991981185c711a5b92496",
     "content/golden-boot.md": "09e67a552d2138042cf83e8442fe62d9d71ea19409694bc980abdca5afde8e8f",
-    "docs/SOURCES.md": "122890d3960fc64bbad69f15c66bc2a6b4cc8fba771ad229f5afec2ee1ae37ef"
+    "docs/SOURCES.md": "370d444cbb851680c053b974bf965b70c55eb6c50951def56827062c1821e08a"
   },
   "nations-league": {
     "content/uefa-nations-league.md": "e884d8cdc457f80322597ff9067377d2699759acac6527d5f3e0036905e99d74",
-    "docs/SOURCES.md": "122890d3960fc64bbad69f15c66bc2a6b4cc8fba771ad229f5afec2ee1ae37ef"
+    "docs/SOURCES.md": "370d444cbb851680c053b974bf965b70c55eb6c50951def56827062c1821e08a"
   },
   "copa-america": {
-    "content/copa-america.md": "4296b7236166bc5ffb68a2886788796241e4ca8e8d48673ad7340af4e68251c1",
-    "docs/SOURCES.md": "122890d3960fc64bbad69f15c66bc2a6b4cc8fba771ad229f5afec2ee1ae37ef"
+    "content/copa-america.md": "dda117d5f33bfba2ebe2c8c430cd1c321d26bc2f8696791e503622ae2251da62",
+    "docs/SOURCES.md": "370d444cbb851680c053b974bf965b70c55eb6c50951def56827062c1821e08a"
   },
   "ballon-dor": {
     "content/ballon-dor.md": "3c02a745d6a09936f105d95a911802ab7550fcb69bdcf2482b589239423c6433",
-    "docs/SOURCES.md": "122890d3960fc64bbad69f15c66bc2a6b4cc8fba771ad229f5afec2ee1ae37ef"
+    "docs/SOURCES.md": "370d444cbb851680c053b974bf965b70c55eb6c50951def56827062c1821e08a"
   },
   "golden-boot": {
     "content/golden-boot.md": "09e67a552d2138042cf83e8442fe62d9d71ea19409694bc980abdca5afde8e8f",
-    "docs/SOURCES.md": "122890d3960fc64bbad69f15c66bc2a6b4cc8fba771ad229f5afec2ee1ae37ef"
+    "docs/SOURCES.md": "370d444cbb851680c053b974bf965b70c55eb6c50951def56827062c1821e08a"
   }
 }

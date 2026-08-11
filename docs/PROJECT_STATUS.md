@@ -5102,6 +5102,95 @@ this page). `pnpm check:perf` (all pages within the 300 KB budget) and
 - The standing content-accuracy (third-pass, low-yield) and source-link
   liveness (infeasible in this environment) candidates are unchanged.
 
+### Content-accuracy pass: Copa América Third/Fourth-place - first-ever second independent cross-check, no discrepancies - added 2026-08-11 (intensive run)
+
+Every backlog item and required/nice-to-have capability was already closed
+going into this run, so per this routine's fallback instruction this
+continued the standing content-accuracy series, picking up the exact gap
+the previous entry's "Left for a future pass" note named alongside Nations
+League: Copa América's "Third"/"Fourth" columns in `content/copa-america.md`
+had only ever had their first audit pass (2026-08-02, itself split across
+three entries - the knockout-final era, the 1989/1991 closing groups, and
+the full pre-1975 league-table era) - every other column on the page
+(Champion/Runner-up/Final-score, Format, Host) already had a second
+independent cross-check on record, but Third/Fourth did not.
+
+Re-verified all 45 editions that carry a placing (1916 through 2024,
+including both 1959 tournaments; the three Home-and-away finals and 1925's
+missing fourth place are correctly excluded, since there is nothing to
+verify there) via four parallel WebSearch passes split by era: 1916-1929
+(12 editions), 1935-1967 including both 1959s (17 editions), 1987/1989/1991
+(3 editions - the knockout-final transition plus the two closing-group
+years), and 1993-2024 (13 editions). Deliberately drew on a source mix
+distinct from the 2026-08-02 first pass (which leaned on RSSSF and
+Wikipedia): worldfootball.net, athlet.org, footballdatabase.eu,
+topendsports.com, besoccer.com, soccer365.net, Transfermarkt, 11v11.com,
+betexplorer.com, resultados-futbol.com, AFA/AUF official histories, Memoria
+Chilena, and press/wire coverage (CBC, BBC, CTV/TSN, China Daily/Xinhua,
+Yahoo Sports).
+
+**No discrepancies found across any of the 45 editions.** Every placing
+already on the page held up under independent re-verification, including
+the trickiest cases:
+
+- **1922's Uruguay-withdrawal ruling** - Brazil, Paraguay, and Uruguay
+  finished level on points and goal difference, but Uruguay withdrew from
+  the resulting three-way title playoff in protest at refereeing decisions,
+  finishing third by elimination rather than by table tiebreak - reconfirmed
+  against an independent source mix (not just the first pass's sources).
+- **1989 and 1991's closing-group tiebreaks** - re-derived match-by-match
+  from all six games in each four-team closing group (not just trusted as a
+  summary standings claim) and cross-checked against the won/drawn/lost
+  and goal-difference figures already in the page's editorial notes; both
+  reconciled exactly.
+- **Both flagged upsets** - Honduras' 5-4 penalty-shootout win over Uruguay
+  for third in 2001, and Uruguay's 4-3 penalty-shootout win over Canada for
+  third in 2024 - independently reconfirmed with exact scorelines from wire
+  coverage (Transfermarkt's match sheet, CTV News).
+
+See `docs/SOURCES.md`'s expanded Copa América section (new "Third/
+fourth-place second independent cross-check" entry) for the full per-era
+citation list. `content/copa-america.md` gained one new prose paragraph in
+the "Important editorial warning" section documenting this second pass, in
+the same style as the existing Format-column and Champion/Runner-up
+second-cross-check paragraphs already there; `lastReviewed` moved to
+2026-08-11. `status` stays `review` (secondary sources, same reasoning as
+every prior secondary-sourced audit in this file). No table data changed -
+the only file changes are the new content-file paragraph, the
+`lastReviewed` bump, and the new `docs/SOURCES.md` citations. Confirmed no
+Playwright test pins an exact `lastReviewed` value for the Copa América
+page, so no test needed updating for the date bump.
+
+Bumping `lastReviewed` changed `content/copa-america.md`'s SHA-256, which
+`pnpm check:pdfs` correctly flagged as making `public/downloads/copa-america.pdf`
+(and, since `docs/SOURCES.md` is a shared dependency of every competition
+PDF, all six PDFs) stale. Regenerated all six PDFs and the manifest via
+`PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`; `pnpm
+check:pdfs` now passes cleanly again.
+
+This closes the "second independent cross-check" series for every core
+column on the Copa América page (Champion/Runner-up/Final-score, Format,
+and now Third/Fourth) - Copa América joins FIFA World Cup and UEFA EURO as
+fully covered by at least two independent passes on every column its table
+tracks.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (211/211) and `pnpm lint` is clean (0 errors/0 warnings/0 hints).
+`pnpm build` - 23 pages, unchanged. `pnpm check:perf` (all pages within the
+300 KB budget) and `pnpm check:pdfs` (all six PDFs regenerated and up to
+date) both pass. The Playwright suite was kicked off for this pass (a
+prose-only content change with no assertion anywhere in the suite pinned to
+the new paragraph's text, byte count, or the `lastReviewed` date); see the
+next entry or this run's commit history for its result if it finished
+before this file was written.
+
+**Left for a future pass:**
+- Nations League's "Third"/"Fourth" columns remain on only their first audit
+  pass (2026-08-03) - now the last team-competition column on the site
+  without a second independent cross-check, and the natural next candidate.
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates are unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

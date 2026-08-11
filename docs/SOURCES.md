@@ -681,6 +681,45 @@ Primary sources should be preferred.
     independent queries; a small number (1917, 1920, 1926, 1945) had a
     clearly stated final ranking but no full numeric points table
     recoverable this way.
+- Third/fourth-place second independent cross-check (2026-08-11, intensive
+  run): the Third/Fourth columns' only prior audit was their first pass
+  (2026-08-02, the three entries above), unlike Champion/Runner-up/Format
+  which each already had a second pass on record; this closes that standing
+  gap. Re-verified all 45 editions carrying a placing (1916-2024, both 1959
+  tournaments, excluding the three Home-and-away finals and 1925's missing
+  fourth place) in four era-based WebSearch passes (1916-1929, 1935-1967
+  including both 1959s, 1987/1989/1991, 1993-2024), deliberately drawing on
+  a source mix distinct from the first pass (RSSSF/Wikipedia): worldfootball.net,
+  athlet.org, footballdatabase.eu, topendsports.com, besoccer.com,
+  soccer365.net, Transfermarkt, 11v11.com, betexplorer.com,
+  resultados-futbol.com, AFA/AUF official histories, Memoria Chilena, and
+  press/wire coverage (CBC, BBC, CTV/TSN, China Daily/Xinhua, Yahoo Sports).
+  **No discrepancies found.** The 1989 and 1991 closing-group standings were
+  re-derived match-by-match (all six games in each group) rather than
+  trusted as a summary, and both flagged upsets (Honduras 5-4 on penalties
+  over Uruguay in 2001; Uruguay 4-3 on penalties over Canada in 2024) were
+  independently reconfirmed with exact scorelines:
+  - https://www.footballdatabase.eu/en/match/overview/1046110-colombie-argentine
+    (1987 third-place match, Colombia 2-1 Argentina)
+  - https://www.worldfootball.net/competition/co22/conmebol-copa-america/se3261/1989-brazil/matches-and-results/
+    (1989 closing group)
+  - https://www.footballdatabase.eu/en/match/overview/1045952-argentine-bresil ;
+    https://www.footballdatabase.eu/en/match/overview/1045957-argentine-colombie
+    (1991 closing group)
+  - https://www.transfermarkt.us/spielbericht/index/spielbericht/1022263
+    (2001 third-place penalty shootout, Honduras over Uruguay)
+  - https://www.ctvnews.ca/sports/canada-loses-on-penalties-to-uruguay-in-copa-america-2024-third-place-match-1.6963304
+    (2024 third-place penalty shootout, Uruguay over Canada)
+  - Per-era WebSearch passes also drew on worldfootball.net, athlet.org,
+    footballdatabase.eu, topendsports.com, besoccer.com, soccer365.net,
+    resultados-futbol.com, and AFA/AUF official history pages for every
+    remaining edition (full per-edition breakdown available in this run's
+    research notes).
+  - Note: this session's egress proxy blocked direct WebFetch to nearly
+    every one of these domains (confirmed via repeated `EGRESS_BLOCKED`
+    errors), so verification relied on WebSearch's synthesized result
+    snippets rather than a direct page read, the same caveat noted by
+    several prior audits in this file.
 - Final match dates audit (2026-08-03): the calendar date of the decisive
   match for the 19 editions with a single one-off decider, for the "On this
   day in football history" widget on the home page (same feature already
