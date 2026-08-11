@@ -103,6 +103,72 @@ test.describe('theme toggle, English home page', () => {
   });
 });
 
+// The home page has no `is-winner` table cells or `is-correct`/`is-incorrect`
+// quiz feedback - those contrast-sensitive dynamic states only exist on a
+// competition page and /quiz. The prior entry's "Left for a future pass"
+// note named exactly this gap: the live-click toggle path (real
+// `data-theme` attribute + real ThemeToggle click, as opposed to
+// `accessibility.spec.ts`'s `colorScheme` emulation) had only ever been
+// exercised against the home page, so these two states had only ever been
+// checked against the *emulated* dark palette, never the toggle-driven one.
+test.describe('theme toggle, World Cup competition page', () => {
+  test('live-click dark mode has no WCAG violations with is-winner cells visible', async ({
+    page,
+  }) => {
+    await page.goto('competitions/world-cup');
+
+    // Confirm the state this test exists to cover is actually present before
+    // toggling, so a future markup change that drops the winner column can't
+    // make this test pass vacuously.
+    await expect(page.locator('#world-cup-table td.is-winner').first()).toBeVisible();
+
+    await page.locator('#theme-toggle').click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+
+    await runAxe(page);
+
+    await page.locator('#theme-toggle').click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+
+    await runAxe(page);
+  });
+});
+
+test.describe('theme toggle, quiz page', () => {
+  test('live-click dark mode has no WCAG violations with answered is-correct/is-incorrect states', async ({
+    page,
+  }) => {
+    await page.goto('quiz');
+
+    await page.locator('#theme-toggle').click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+
+    // Answer the first two choice cards - one right, one deliberately wrong -
+    // so both feedback classes render under the toggle-driven dark palette,
+    // the same "one correct, one incorrect" pattern
+    // accessibility-quiz-states.spec.ts uses for the colorScheme-emulated
+    // sweep.
+    const cards = page.locator('.quiz-card').filter({ has: page.locator('input[type="radio"]') });
+    const cardCount = await cards.count();
+    expect(cardCount).toBeGreaterThanOrEqual(2);
+
+    for (let i = 0; i < 2; i += 1) {
+      const card = cards.nth(i);
+      const answerIndex = Number(await card.getAttribute('data-answer-index'));
+      const radios = card.locator('input[type="radio"]');
+      const radioCount = await radios.count();
+      const pick = i === 0 ? answerIndex : (answerIndex + 1) % radioCount;
+      await radios.nth(pick).check();
+      await card.locator('.quiz-card__check').click();
+    }
+
+    await expect(page.locator('.quiz-card__choice.is-correct').first()).toBeVisible();
+    await expect(page.locator('.quiz-card__choice.is-incorrect').first()).toBeVisible();
+
+    await runAxe(page);
+  });
+});
+
 // Canary coverage in the Croatian translation, confirming the toggle's
 // localized labels (data-light-label/data-dark-label, wired through
 // ThemeToggle's `locale` prop) actually reach the live-updated label text -
