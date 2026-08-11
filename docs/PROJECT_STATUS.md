@@ -4818,6 +4818,71 @@ content assertions. `pnpm build` unchanged (23 pages); `pnpm check:perf`
   liveness (infeasible in this environment, reconfirmed again this run)
   candidates are unchanged.
 
+### Quality pass: theme-token single-source-of-truth refactor, plus a regression test for the drift class that already bit `--danger` - added 2026-08-11 (intensive run)
+
+Followed up on the prior entry's own flagged lead ("no other component is
+known to have a similarly date/state-gated DOM... worth a quick scan for
+that pattern"). A scan of every `Date`/`new Date()` call site in
+`src/components/*.astro` and `src/pages/**/*.astro` confirmed that lead is
+closed - `References.astro`, `about/sources.astro` (both locales) and
+`Footer.astro` only format text into an unchanged element, none branch DOM
+*structure* the way `OnThisDay.astro` does. That scan surfaced a different,
+real gap instead: `src/styles/global.css` resolved its color tokens
+(`--bg`, `--text`, `--danger`, etc.) via **four separately hand-maintained
+blocks** - the `:root` light default, the `@media (prefers-color-scheme:
+dark)` block, `:root[data-theme='light']`, and `:root[data-theme='dark']` -
+each repeating the same ~11 literal hex values. The file's own comment on
+`--danger` already documents that this exact duplication caused a real bug
+once: a contrast fix (the WCAG-failing ~2.65:1 red) landed in the
+media-query block but not the matching `[data-theme='dark']` block, so a
+reader who let the OS pick dark mode got the fixed color while a reader who
+explicitly clicked the toggle to dark did not. Test coverage for the two
+*mechanisms* was asymmetric in the same way: the sitewide axe sweep
+(`accessibility.spec.ts`) only ever emulates `prefers-color-scheme`, while
+`accessibility-theme-toggle.spec.ts` only drives the live `data-theme` click
+path on the English/Croatian home pages - nothing asserted the two
+mechanisms actually produce the *same* colors anywhere.
+
+**Fix:** `src/styles/global.css`'s `:root` block now defines each theme's
+values exactly once, as `--light-*`/`--dark-*` constants (e.g. `--light-bg`,
+`--dark-bg`). The three resolution blocks (media-query default,
+`[data-theme='light']`, `[data-theme='dark']`) now only ever assign
+`var(--light-*)`/`var(--dark-*)` to the real tokens components read - never
+a literal color - so a future contrast fix can miss a block by omission
+(still possible, CSS has no cross-block `@media`+attribute-selector "OR")
+but can no longer silently apply to one block's *copy* of a value and leave
+another's stale, which is what actually happened before. New
+`tests/e2e/theme-token-parity.spec.ts` (2 cases) reads
+`getComputedStyle(document.documentElement)` for all 12 tokens under two
+independent browser contexts per case - OS `colorScheme: 'dark'` with no
+toggle interaction vs. OS `colorScheme: 'light'` with the toggle clicked to
+force `data-theme='dark'` (and the mirror pair for light) - and asserts the
+two token sets are identical. This test would have caught the original
+`--danger` drift; it's a regression guard for the drift *class*, not a
+one-off fix.
+
+**Tests:** Vitest unchanged (211/211 - no `src/lib/*.ts` logic changed).
+`pnpm lint` - 0 errors/0 warnings/0 hints. `pnpm build` - 23 pages,
+unchanged. Full Playwright suite: 324/324 (up from 322 - the 2 new parity
+cases), including the existing whole-page WCAG sweep and the theme-toggle
+click-path suite, confirming the refactor is computed-value-identical to
+the pre-refactor CSS (same colors, same specificity resolution order) for
+every page exercised. `pnpm check:perf` (all pages within the 300 KB
+budget, heaviest unchanged at `hr/records` ~233 KB) and `pnpm check:pdfs`
+(all six PDFs up to date) both pass - no `content/*.md` file changed this
+run.
+
+**Left for a future pass:**
+- Extend `accessibility-theme-toggle.spec.ts`'s live-click axe coverage
+  beyond the home page to a representative competition page and `/quiz`,
+  so contrast-sensitive dynamic states (table `is-winner` highlighting,
+  quiz `is-correct`/`is-incorrect`) get scanned via the actual toggle click
+  path, not only via `colorScheme` emulation on the main sweep. Scoped and
+  ready to pick up; not done this run to keep this pass focused on the
+  token-duplication fix itself.
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates are unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

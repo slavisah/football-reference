@@ -12,73 +12,111 @@
   --radius: 0.6rem;
   --space: 1rem;
 
-  /* Light theme (default) */
-  --bg: #f7f8fa;
-  --bg-elevated: #ffffff;
-  --bg-subtle: #eef1f5;
-  --text: #16202c;
-  --text-muted: #56636f;
-  --border: #d7dde5;
-  --accent: #1f6f4f;
-  --accent-contrast: #ffffff;
-  --highlight: #fff4cc;
-  --focus: #1f6feb;
+  /* Palette constants: each theme's colors are defined exactly once here.
+     The three resolution blocks below (media-query default, [data-theme='light']
+     override, [data-theme='dark'] override) only ever assign var(--light-*)/
+     var(--dark-*) to the real tokens components read (--bg, --text, etc.) -
+     never a literal color - so a future contrast fix can only miss a block
+     by omission, not silently apply to one block's copy of a value and not
+     another's. That already happened once with --danger (see its comment
+     below): a fix landed in the media-query block but not the matching
+     [data-theme='dark'] block, so a reader who toggled to dark manually kept
+     the broken-contrast red that a reader who left it on the OS default did
+     not. tests/e2e/theme-token-parity.spec.ts now guards against a repeat. */
+  --light-bg: #f7f8fa;
+  --light-bg-elevated: #ffffff;
+  --light-bg-subtle: #eef1f5;
+  --light-text: #16202c;
+  --light-text-muted: #56636f;
+  --light-border: #d7dde5;
+  --light-accent: #1f6f4f;
+  --light-accent-contrast: #ffffff;
+  --light-highlight: #fff4cc;
+  --light-focus: #1f6feb;
   /* Text/border-only "wrong answer" red. Chosen (not the more common #c0392b)
      specifically so it still hits WCAG AA 4.5:1 as *text* when laid over its
      own 16%-mixed background tint (see quiz-card__result-badge in
      QuizCard.astro/QuizOrderCard.astro) - #c0392b measured ~4.27:1 there,
      just under AA. */
-  --danger: #b3261e;
-  --shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 4px 12px rgba(16, 24, 40, 0.06);
+  --light-danger: #b3261e;
+  --light-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 4px 12px rgba(16, 24, 40, 0.06);
+
+  --dark-bg: #0f1520;
+  --dark-bg-elevated: #172233;
+  --dark-bg-subtle: #1e2b3d;
+  --dark-text: #e8eef6;
+  --dark-text-muted: #a3b0c0;
+  --dark-border: #2b3a4f;
+  --dark-accent: #46c08a;
+  --dark-accent-contrast: #05130d;
+  --dark-highlight: #3a3417;
+  --dark-focus: #6ba6ff;
+  /* #c0392b measured ~2.65:1 as text on this theme's mixed background -
+     a major AA failure, not just marginal. */
+  --dark-danger: #ff7b72;
+  --dark-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 16px rgba(0, 0, 0, 0.4);
+
+  /* Resolved tokens components actually read. Default (no JS, no OS
+     preference reported) is light. */
+  --bg: var(--light-bg);
+  --bg-elevated: var(--light-bg-elevated);
+  --bg-subtle: var(--light-bg-subtle);
+  --text: var(--light-text);
+  --text-muted: var(--light-text-muted);
+  --border: var(--light-border);
+  --accent: var(--light-accent);
+  --accent-contrast: var(--light-accent-contrast);
+  --highlight: var(--light-highlight);
+  --focus: var(--light-focus);
+  --danger: var(--light-danger);
+  --shadow: var(--light-shadow);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f1520;
-    --bg-elevated: #172233;
-    --bg-subtle: #1e2b3d;
-    --text: #e8eef6;
-    --text-muted: #a3b0c0;
-    --border: #2b3a4f;
-    --accent: #46c08a;
-    --accent-contrast: #05130d;
-    --highlight: #3a3417;
-    --focus: #6ba6ff;
-    /* #c0392b measured ~2.65:1 as text on this theme's mixed background -
-       a major AA failure, not just marginal. */
-    --danger: #ff7b72;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 16px rgba(0, 0, 0, 0.4);
+  :root:not([data-theme='light']) {
+    --bg: var(--dark-bg);
+    --bg-elevated: var(--dark-bg-elevated);
+    --bg-subtle: var(--dark-bg-subtle);
+    --text: var(--dark-text);
+    --text-muted: var(--dark-text-muted);
+    --border: var(--dark-border);
+    --accent: var(--dark-accent);
+    --accent-contrast: var(--dark-accent-contrast);
+    --highlight: var(--dark-highlight);
+    --focus: var(--dark-focus);
+    --danger: var(--dark-danger);
+    --shadow: var(--dark-shadow);
   }
 }
 
 :root[data-theme='light'] {
-  --bg: #f7f8fa;
-  --bg-elevated: #ffffff;
-  --bg-subtle: #eef1f5;
-  --text: #16202c;
-  --text-muted: #56636f;
-  --border: #d7dde5;
-  --accent: #1f6f4f;
-  --accent-contrast: #ffffff;
-  --highlight: #fff4cc;
-  --focus: #1f6feb;
-  --danger: #b3261e;
-  --shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 4px 12px rgba(16, 24, 40, 0.06);
+  --bg: var(--light-bg);
+  --bg-elevated: var(--light-bg-elevated);
+  --bg-subtle: var(--light-bg-subtle);
+  --text: var(--light-text);
+  --text-muted: var(--light-text-muted);
+  --border: var(--light-border);
+  --accent: var(--light-accent);
+  --accent-contrast: var(--light-accent-contrast);
+  --highlight: var(--light-highlight);
+  --focus: var(--light-focus);
+  --danger: var(--light-danger);
+  --shadow: var(--light-shadow);
 }
 
 :root[data-theme='dark'] {
-  --bg: #0f1520;
-  --bg-elevated: #172233;
-  --bg-subtle: #1e2b3d;
-  --text: #e8eef6;
-  --text-muted: #a3b0c0;
-  --border: #2b3a4f;
-  --accent: #46c08a;
-  --accent-contrast: #05130d;
-  --highlight: #3a3417;
-  --focus: #6ba6ff;
-  --danger: #ff7b72;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 16px rgba(0, 0, 0, 0.4);
+  --bg: var(--dark-bg);
+  --bg-elevated: var(--dark-bg-elevated);
+  --bg-subtle: var(--dark-bg-subtle);
+  --text: var(--dark-text);
+  --text-muted: var(--dark-text-muted);
+  --border: var(--dark-border);
+  --accent: var(--dark-accent);
+  --accent-contrast: var(--dark-accent-contrast);
+  --highlight: var(--dark-highlight);
+  --focus: var(--dark-focus);
+  --danger: var(--dark-danger);
+  --shadow: var(--dark-shadow);
 }
 
 *,
