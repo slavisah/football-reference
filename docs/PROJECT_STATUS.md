@@ -4883,6 +4883,70 @@ run.
 - The standing content-accuracy (third-pass, low-yield) and source-link
   liveness (infeasible in this environment) candidates are unchanged.
 
+### Accessibility: theme-toggle live-click coverage extended to a competition page and `/quiz`, plus a real dark-mode contrast bug it found and fixed - added 2026-08-11 (intensive run)
+
+Closed the exact gap the prior entry's "Left for a future pass" note named:
+`accessibility-theme-toggle.spec.ts` had only ever driven the real
+click-then-`data-theme` path against the home page, which has neither a
+`TournamentTable` (`is-winner` highlighted cells) nor a quiz card
+(`is-correct`/`is-incorrect` feedback) - so those two contrast-sensitive
+dynamic states had only ever been scanned via `accessibility.spec.ts`'s
+`colorScheme` emulation, never via an actual toggle click. Two new test
+cases: `/competitions/world-cup` (chosen as the one table with the full
+winner/year/host/team/sort filter set, same "representative table"
+reasoning `accessibility-table-states.spec.ts` already uses) clicks the
+toggle to dark, confirms an `is-winner` cell is visible, and runs axe both
+ways; `/quiz` clicks the toggle to dark, answers two choice cards (one right,
+one deliberately wrong, same pattern `accessibility-quiz-states.spec.ts`
+already uses) to produce both feedback classes, and runs axe.
+
+**The World Cup case passed; the quiz case did not** - a real
+`color-contrast` violation, not a flake: `#quiz-restart` ("Restart quiz")
+rendered black text (`#000000`) on the dark theme's `#1e2b3d` background
+(1.46:1, WCAG AA requires 4.5:1). Root cause: `#quiz-restart` was the one
+interactive button in the codebase missing an explicit `color` declaration -
+every other button (`.quiz-card__check`, `.filters__reset`, `.compare__swap`,
+`ThemeToggle`'s own button) sets `color: var(--text)` or
+`var(--accent-contrast)` explicitly, but `#quiz-restart` only set
+`background: var(--bg-subtle)`, leaving text color to the browser's native
+`ButtonText` default. That default happens to track Playwright's *emulated*
+`colorScheme` (so the existing `colorScheme: 'dark'` test in
+`accessibility-quiz-states.spec.ts` never saw a problem - the OS-level dark
+preference gave the button light-on-dark UA colors for free) but does
+**not** track this site's own click-driven `data-theme` attribute, which
+only repaints CSS custom properties, not native form-control defaults - so a
+reader who explicitly clicks the toggle (rather than relying on OS
+preference) got the broken black-on-dark button. This is the same root
+cause class the immediately preceding entry's regression test targeted -
+OS-emulation coverage and real-click coverage silently diverging - just
+surfacing as a genuine WCAG violation instead of a token-value mismatch, and
+in exactly the place that entry's own scan didn't look (an unstyled UA
+default, not a CSS custom property).
+
+**Fix:** added `color: var(--text);` to `#quiz-restart` in both
+`src/pages/quiz.astro` and `src/pages/hr/quiz.astro` (the Croatian page has
+its own copy of the same rule) - matching every other button's existing
+pattern, not a new one. No other button in the codebase was missing `color`
+(checked every `cursor: pointer` rule site-wide).
+
+**Tests:** the two new live-click cases (2, both now passing) plus the
+existing 3 theme-toggle cases: 5/5. Full Playwright suite: 326/326 (up from
+324). Vitest unchanged (211/211 - no `src/lib/*.ts` logic changed).
+`pnpm lint` - 0 errors/0 warnings/0 hints. `pnpm build` - 23 pages,
+unchanged. `pnpm check:perf` and `pnpm check:pdfs` both pass - no
+`content/*.md` file changed this run (a component-CSS fix, not editorial
+content).
+
+**Left for a future pass:**
+- The other named lead from the prior entry - the standing content-accuracy
+  (third-pass, low-yield) and source-link liveness (infeasible in this
+  environment) candidates - is unchanged.
+- No other live-click/OS-emulation divergence is known, but this is now the
+  second time that exact class of bug has surfaced in two consecutive runs
+  (a CSS-token duplication, then a missing-`color` native-control default) -
+  worth keeping in mind as a recurring risk category if a future pass adds
+  more toggle-adjacent or native-form-control-heavy UI.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
