@@ -466,6 +466,43 @@ Primary sources should be preferred.
     environment's egress policy for this run, so verification relied on
     WebSearch's synthesized snippets, per the same caveat the FIFA World
     Cup Host(s)/Teams audit entry above (2026-08-08) already notes.
+- "Other semifinalist" columns - full audit closed (2026-08-11, intensive
+  run): closes the last "first pass only" gap named in this file's own
+  standing content-accuracy notes. Two parallel WebSearch passes: a second
+  independent cross-check of the six 1960-1980 third-place play-offs (using
+  a source mix distinct from the 2026-08-04 first pass - this time leaning on
+  Wikipedia tournament articles, RSSSF, worldfootball.net, 11v11.com,
+  national-football-teams.com, and press retrospectives rather than
+  UEFA.com alone), plus a first-ever verification of the eleven 1984-2024
+  editions' two unranked semifinalist team names (order carries no ranking
+  meaning for these editions, per the page's own "Historical format note",
+  so only set membership - which two teams - was checked). **No
+  discrepancies found across any of the 17 editions:**
+  - https://en.wikipedia.org/wiki/1960_European_Nations%27_Cup
+  - https://www.rsssf.org/tables/60e-full.html
+  - https://en.wikipedia.org/wiki/1964_European_Nations%27_Cup
+  - https://www.11v11.com/matches/england-v-ussr-08-june-1968-230262/
+  - https://www.rsssf.org/tables/68e.html
+  - https://www.national-football-teams.com/app.php/matches/report/16375/Belgium_Hungary.html
+  - http://soccernostalgia.blogspot.com/2018/05/the-euros-part-five-1976-edition-part-d.html
+  - https://soccernostalgia.blogspot.com/2020/09/compendium-to-1980-euros-finals-part-12.html
+  - https://www.worldsoccer.com/world-soccer-latest/european-championships-retrospective-italy-1980-335094
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1984_knockout_stage
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1988
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1992
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1996_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2000_knockout_stage
+  - https://www.worldfootball.net/competition/co36/euro/se3316/2004-portugal/ro13167/semi-finals/results-and-standings/
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2008_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2012_final
+  - https://www.uefa.com/uefaeuro/history/news/0253-0d81def27342-902d74133a03-1000--meet-the-uefa-euro-2016-semi-finalists
+  - https://www.uefa.com/uefaeuro/history/news/026b-12ab79b983eb-06a7e83779f9-1000--uefa-euro-2020-semi-finals-italy-vs-spain-england-vs-denmark/
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2024
+  - Direct WebFetch to primary-source domains (including wikipedia.org and
+    rsssf.org) was blocked by this environment's egress policy for this
+    run, so verification relied on WebSearch's synthesized snippets rather
+    than directly rendered pages, per every prior audit's caveat in this
+    file.
 
 ## UEFA Nations League
 
