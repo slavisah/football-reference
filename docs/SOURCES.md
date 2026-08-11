@@ -264,6 +264,39 @@ Primary sources should be preferred.
     environment's egress policy for this run, so verification relied on
     WebSearch's synthesized snippets, per the same caveat prior audits in
     this file have already noted.
+- Third/fourth-place second independent cross-check (2026-08-11, intensive
+  run): the "Third"/"Fourth / other semifinalist" columns' only prior audit
+  was their first pass (2026-08-04, above); this closes the standing "not
+  yet covered by any second pass" gap that entry's own follow-ups kept
+  naming. Re-verified all 23 editions (1930-2026) via three parallel
+  WebSearch passes split by era (1934-1962, 1966-1994, 1998-2022), plus two
+  dedicated searches for the 1930/1950 format edge cases and one for the
+  2026 bronze match, deliberately drawing from a source mix distinct from
+  the first pass (ESPN, plus.fifa.com, athlet.org, beIN Sports,
+  Liquisearch): this pass used NBC Bay Area, Yahoo Sports,
+  soccergraph.com, chaseyoursport.com, getmoresports.com, RSSSF,
+  sport-histoire.fr, Grokipedia, and Al Jazeera. **No discrepancies found
+  across any of the 23 editions.** Both format edge cases were
+  independently reconfirmed rather than merely trusted: 1930 (no
+  third-place match played; the United States' retrospective third place
+  ahead of Yugoslavia, per FIFA's own later ranking, is itself the subject
+  of long-running historian dispute precisely because no match settled it -
+  the page's existing edge-case note already covers this) and 1950
+  (Sweden 2pts/Spain 1pt in the four-team final round-robin group, with
+  Uruguay and Brazil above them - re-derived from the full points table,
+  not just the two rows in question). The 2026 bronze match (England 6-4
+  France) was also reconfirmed by this independent source mix, matching
+  the row already on the page:
+  - https://www.nbcbayarea.com/world-cup/every-third-place-game-result-in-fifa-world-cup-history/3102549/
+  - https://sports.yahoo.com/every-third-place-game-result-110022284.html
+  - https://www.soccergraph.com/2026/07/fifa-world-cup-third-place-playoff-winners-bronze-mdalists-history.html
+  - https://www.rsssf.org/tables/30full.html
+  - https://www.sport-histoire.fr/en/Sport/Football/World_Cup/1950_World_Cup.php
+  - https://www.aljazeera.com/sports/liveblog/2026/7/18/france-vs-england-live-fifa-world-cup-2026-third-place-playoff
+  - Direct WebFetch to primary-source domains was blocked by this
+    environment's egress policy for this run, so verification relied on
+    WebSearch's synthesized snippets, per the same caveat prior audits in
+    this file have already noted.
 
 ## UEFA EURO
 

@@ -4947,6 +4947,85 @@ content).
   worth keeping in mind as a recurring risk category if a future pass adds
   more toggle-adjacent or native-form-control-heavy UI.
 
+### Content-accuracy pass: FIFA World Cup Third/Fourth-place - first-ever second independent cross-check, no discrepancies - added 2026-08-11 (intensive run)
+
+Every backlog item and required/nice-to-have capability was already closed
+going into this run, so per this routine's fallback instruction this
+continued the standing content-accuracy series. Picked the one lead the
+file's own "Left for a future pass" notes had named repeatedly but never
+closed: the "Third"/"Fourth / other semifinalist" columns in
+`content/fifa-world-cup.md` had only ever had their first audit pass
+(2026-08-04) - every other core column pair on the World Cup page
+(Champion/Runner-up/Final-score, Host(s)/Teams, Final date) already had a
+second independent cross-check on record, but Third/Fourth did not, a gap
+first flagged on 2026-08-08 and repeated unresolved in several entries
+since.
+
+Re-verified all 23 editions (1930-2026) via three parallel WebSearch passes
+split by era (1934-1962, 1966-1994, 1998-2022), plus two dedicated searches
+for the 1930 (no third-place match played) and 1950 (final round-robin
+group table) format edge cases and one for the 2026 bronze match,
+deliberately drawing from a source mix distinct from the first pass (ESPN,
+plus.fifa.com, athlet.org, beIN Sports, Liquisearch): this pass used NBC
+Bay Area, Yahoo Sports, soccergraph.com, chaseyoursport.com,
+getmoresports.com, RSSSF, sport-histoire.fr, Grokipedia, and Al Jazeera.
+
+**No discrepancies found across any of the 23 editions.** Every row already
+on the page - including every third-place match decided by a routine
+scoreline and the two structural edge cases - matched independently. 1930's
+United States/Yugoslavia ranking (no match was ever played; FIFA's later
+technical-committee ranking is the only source, and remains a genuine
+historian's dispute rather than a settled fact - already the framing used
+in the page's own "Editorial notes") and 1950's Sweden/Spain positions
+(re-derived from the full four-team final-group points table: Uruguay 5,
+Brazil 4, Sweden 2, Spain 1) were both independently reconfirmed rather
+than merely trusted. The 2026 bronze match (England 6-4 France) was also
+reconfirmed by this distinct source mix, matching the row already on the
+page and the earlier 2026-08-04 result-specific audit.
+
+See `docs/SOURCES.md`'s new "Third/fourth-place second independent
+cross-check" entry under FIFA World Cup for the full citation list.
+`content/fifa-world-cup.md`'s `lastReviewed` moved to 2026-08-11; `status`
+stays `review` (secondary sources, same reasoning as every prior
+secondary-sourced audit in this file). No table data changed - the only
+file changes are the `lastReviewed` bump and the new source citations.
+Since this page's `lastReviewed` date is pinned by an exact-match
+Playwright assertion (`tests/e2e/mobile.spec.ts`), that test's expected
+value was updated alongside the content change (2026-08-09 -> 2026-08-11).
+
+Bumping `lastReviewed` changed `content/fifa-world-cup.md`'s SHA-256, which
+`pnpm check:pdfs` correctly flagged as making `public/downloads/world-cup.pdf`
+(and, since `docs/SOURCES.md` is a shared dependency of every competition
+PDF, all six PDFs) stale. Regenerated all six PDFs and the manifest via
+`PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`; `pnpm
+check:pdfs` now passes cleanly.
+
+This closes the "second independent cross-check" series for every core
+column on the FIFA World Cup page (Champion/Runner-up/Final-score,
+Host(s)/Teams, Final date, and now Third/Fourth) - the World Cup joins Copa
+América (whose Format column got the same closing treatment on 2026-08-08)
+as fully covered by at least two independent passes on every column its
+table tracks.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (211/211) and `pnpm lint` is clean (0 errors/0 warnings/0 hints).
+`pnpm build` - 23 pages, unchanged. Full Playwright suite: 326/326, with the
+one intentional update noted above (the World Cup page's pinned
+`lastReviewed` date). `pnpm check:perf` (all pages within the 300 KB
+budget, heaviest unchanged at `hr/records` ~234.8 KB) and `pnpm check:pdfs`
+(all six PDFs regenerated and up to date) both pass.
+
+**Left for a future pass:**
+- EURO's "Other semifinalist" / "Other semifinalist / fourth" columns and
+  Nations League's "Third"/"Fourth" columns are each still on only their
+  first audit pass (2026-08-04), and Copa América's third/fourth-place data
+  is still on its own first pass too (2026-08-02, a different column from
+  the Format column that got its second pass on 2026-08-08) - the same gap
+  this run closed for World Cup is the natural next candidate, one
+  competition at a time.
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates are unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
