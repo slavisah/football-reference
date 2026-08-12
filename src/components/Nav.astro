@@ -37,7 +37,7 @@ function isCurrent(href: string): boolean {
       <span class="brand__text">{t(locale, 'brand')}</span>
     </a>
 
-    <nav aria-label="Primary">
+    <nav aria-label={t(locale, 'primaryNav')}>
       <ul class="nav-list">
         {
           links.map((link) => (

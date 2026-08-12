@@ -5408,6 +5408,64 @@ one - auditing whether some other cross-cutting feature (not just links or
 PDFs) actually works end-to-end rather than merely rendering correctly in
 isolation.
 
+### Accessibility/localization: the primary nav landmark's `aria-label` was hardcoded English on every Croatian page - fixed 2026-08-12 (intensive run)
+
+Following the last two entries' steer toward "another cross-cutting feature
+that actually works end-to-end, not just links or PDFs," this run found the
+same untranslated-attribute bug class that has already bitten this project
+twice before (the champions-bar screen-reader label, 2026-08-07; the nav
+hrefs/offline-cache fallback, 2026-08-07) - just a third, previously
+unaudited instance of it.
+
+**The bug:** `src/components/Nav.astro`'s `<nav aria-label="Primary">` was a
+literal string with no branch on the `locale` prop, even though the same
+component already threads `locale` through every other piece of text (brand
+name, nav labels, language-switch button) and `ThemeToggle.astro` right next
+to it already has a locale-aware `themeToggleAriaLabel` key for exactly this
+situation. Verified in the built output: every one of the 11 `/hr/...` pages
+shipped `aria-label="Primary"` in English - a Croatian screen-reader user
+landing on this nav landmark heard "Primary" spoken in English, sandwiched
+between an otherwise fully Croatian page.
+
+**Compounding it, the test suite had baked the bug in as correct behavior:**
+`tests/e2e/mobile.spec.ts`'s "Primary nav stays in the current language"
+block selected the nav on the *Croatian* page via
+`nav[aria-label="Primary"] a` - using the untranslated English string as the
+CSS selector on the very page where it was wrong - so nothing ever asserted
+what the landmark's accessible name should actually be in Croatian. Same
+test shape as the Croatian-PDF bug two entries back.
+
+**The fix:** added a `primaryNav` key to `UI_STRINGS` in `src/lib/i18n.ts`
+(`en: 'Primary'`, `hr: 'Glavna navigacija'`) and changed
+`Nav.astro` to `<nav aria-label={t(locale, 'primaryNav')}>`. Updated the
+Croatian half of the "Primary nav stays in the current language" Playwright
+test to select `nav[aria-label="Glavna navigacija"]` and assert exactly one
+match, so a future regression back to the hardcoded string would fail the
+test instead of silently passing. Added a new Vitest case in
+`tests/unit/i18n.test.ts` asserting `primaryNav` is non-empty and distinct
+per locale, matching the existing pattern for `championsBarOfLabel` and the
+theme strings.
+
+**Tests:** `pnpm test` - 226/226 (up from 225: the one new `primaryNav`
+case). `pnpm lint` - 0 errors/0 warnings/0 hints. `pnpm build` - 23 pages
+(unchanged page count; only the nav's `aria-label` attribute value changed
+on the 11 Croatian pages). `pnpm check:links` - 0 broken links (27 pages).
+`pnpm check:perf` - all pages within the 300 KB budget (heaviest 242.3 KB,
+unchanged). `pnpm check:pdfs` - all 12 PDFs unchanged and up to date (no
+content file touched, so no PDF regeneration needed). Full Playwright suite:
+**327/327**, including the two updated/verified "Primary nav stays in the
+current language" cases.
+
+**Left for a future pass:** with this specific hardcoded-English-attribute
+bug class now checked in `Nav.astro`, `ChampionsSummary.astro`, and the
+offline-cache fallback, a systematic sweep for any *other* remaining
+hardcoded-English `aria-label`/`alt`/`title` attribute across the component
+tree (rather than finding them one at a time, as the last three runs have)
+would be the natural next step in this vein - none turned up during this
+run's investigation, but it wasn't an exhaustive attribute-by-attribute
+grep. PDF/UA accessibility tagging and source-link liveness checks remain
+the other open candidates noted in the last two entries, unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
