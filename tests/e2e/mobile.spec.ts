@@ -93,7 +93,7 @@ test.describe('World Cup page on a 360px phone', () => {
   });
 
   test('shows the last reviewed date and source links', async ({ page }) => {
-    await expect(page.locator('time[datetime="2026-08-08"]')).toBeVisible();
+    await expect(page.locator('time[datetime="2026-08-11"]')).toBeVisible();
     const sources = page.locator('.references__list a');
     await expect(sources.first()).toBeVisible();
     const count = await sources.count();
@@ -270,8 +270,11 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
   });
 
-  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
-    const link = page.locator('a[download][href$="downloads/world-cup.pdf"]');
+  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/world-cup-hr.pdf"]');
     await expect(link).toContainText('Preuzmi PDF za ispis');
 
     const href = await link.getAttribute('href');
@@ -328,6 +331,19 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
     await expect(page.getByText('Slavna "panenka" Antonína Panenke')).toBeVisible();
+  });
+
+  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/euro-hr.pdf"]');
+    await expect(link).toContainText('Preuzmi PDF za ispis');
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
   });
 
   test('the language switcher returns to the English EURO page', async ({ page }) => {
@@ -461,8 +477,11 @@ test.describe('Croatian Golden Boot page (/hr/competitions/golden-boot) on a 360
     expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
   });
 
-  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
-    const link = page.locator('a[download][href$="downloads/golden-boot.pdf"]');
+  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/golden-boot-hr.pdf"]');
     await expect(link).toContainText('Preuzmi PDF za ispis');
 
     const href = await link.getAttribute('href');
@@ -576,8 +595,11 @@ test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360p
     await expect(page.getByText('Lev Jašin ostaje jedini vratar')).toBeVisible();
   });
 
-  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
-    const link = page.locator('a[download][href$="downloads/ballon-dor.pdf"]');
+  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/ballon-dor-hr.pdf"]');
     await expect(link).toContainText('Preuzmi PDF za ispis');
 
     const href = await link.getAttribute('href');
@@ -732,8 +754,11 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await expect(page.getByText('Bolivija je osvojila svoju jedinu titulu')).toBeVisible();
   });
 
-  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
-    const link = page.locator('a[download][href$="downloads/copa-america.pdf"]');
+  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/copa-america-hr.pdf"]');
     await expect(link).toContainText('Preuzmi PDF za ispis');
 
     const href = await link.getAttribute('href');
@@ -818,8 +843,11 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
     await expect(page.getByText('Hrvatska je 2023. stigla do svog prvog finala')).toBeVisible();
   });
 
-  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
-    const link = page.locator('a[download][href$="downloads/nations-league.pdf"]');
+  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/nations-league-hr.pdf"]');
     await expect(link).toContainText('Preuzmi PDF za ispis');
 
     const href = await link.getAttribute('href');
@@ -904,6 +932,7 @@ test.describe('Home page on a 360px phone', () => {
     const notes = page.locator('.notes__card');
     await expect(notes).toHaveCount(2);
     await expect(page.getByRole('heading', { name: 'How to use the reference' })).toBeVisible();
+    await expect(page.getByText('Each competition page contains:')).toBeVisible();
     await expect(page.getByText('a champions summary;')).toBeVisible();
     await expect(
       page.getByRole('heading', { name: 'Important historical naming note' }),
@@ -1000,6 +1029,7 @@ test.describe('Croatian home page (/hr/) on a 360px phone', () => {
     const notes = page.locator('.notes__card');
     await expect(notes).toHaveCount(2);
     await expect(page.getByRole('heading', { name: 'Kako koristiti ovaj pregled' })).toBeVisible();
+    await expect(page.getByText('Svaka stranica natjecanja sadrži:')).toBeVisible();
     await expect(page.getByText('pregled prvaka;')).toBeVisible();
     await expect(
       page.getByRole('heading', { name: 'Važna napomena o povijesnim nazivima' }),
@@ -1512,6 +1542,61 @@ test.describe('Croatian sources page (/hr/about/sources) on a 360px phone', () =
   });
 });
 
+test.describe('404 page on a 360px phone', () => {
+  // GitHub Pages serves dist/404.html for any unmatched path under the
+  // project's base path, in either language - there is no server-side
+  // routing to pick a locale, so the page itself shows both languages.
+  test.beforeEach(async ({ page }) => {
+    await page.goto('this-page-definitely-does-not-exist');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('responds with a real 404 status and is excluded from indexing', async ({ page }) => {
+    const response = await page.request.get(
+      '/football-reference/this-page-definitely-does-not-exist',
+    );
+    expect(response.status()).toBe(404);
+    const body = await response.text();
+    expect(body).toContain('<meta name="robots" content="noindex">');
+  });
+
+  test('shows the not-found message and link lists in both English and Croatian', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Page not found', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Popular pages' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Popularne stranice' })).toBeVisible();
+    await expect(page.getByText('Stranica koju tražite ne postoji')).toBeVisible();
+  });
+
+  test('every popular-page link resolves to a real page, in both languages', async ({
+    page,
+    request,
+  }) => {
+    const hrefs = await page.locator('.not-found__links a').evaluateAll((links) =>
+      links.map((link) => (link as HTMLAnchorElement).getAttribute('href')),
+    );
+    expect(hrefs.length).toBe(22); // 11 nav pages x 2 languages
+    for (const href of hrefs) {
+      const response = await request.get(href!);
+      expect(response.ok(), `expected ${href} to resolve`).toBe(true);
+    }
+  });
+
+  test('the home-page link leads back to a real page', async ({ page }) => {
+    await page.getByRole('link', { name: 'home page' }).click();
+    await expect(page).toHaveURL(/\/football-reference\/?$/);
+    await expect(page.locator('h1')).toBeVisible();
+  });
+});
+
 test.describe('Installability and offline reading', () => {
   test('links a web app manifest with the expected name, icons, and start_url', async ({
     page,
@@ -1628,7 +1713,12 @@ test.describe('Primary nav stays in the current language', () => {
 
     await expect(page.locator('a.brand')).toHaveAttribute('href', '/football-reference/hr/');
 
-    const navHrefs = await page.locator('nav[aria-label="Primary"] a').evaluateAll((links) =>
+    // The nav landmark's own accessible name should be Croatian too, not an
+    // English string left over from an untranslated attribute (same bug
+    // class as the champions-bar screen-reader label fixed 2026-08-07).
+    const nav = page.locator('nav[aria-label="Glavna navigacija"]');
+    await expect(nav).toHaveCount(1);
+    const navHrefs = await nav.locator('a').evaluateAll((links) =>
       links.map((link) => link.getAttribute('href')),
     );
     expect(navHrefs.length).toBeGreaterThan(0);

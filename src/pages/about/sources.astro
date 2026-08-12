@@ -1,13 +1,14 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { loadPageMeta } from '../../lib/competition';
-import { extractSourceSections } from '../../lib/sources';
+import { extractSourceSections, validateSourceSections } from '../../lib/sources';
 import { withBase } from '../../lib/url';
 import sourcesRaw from '../../../docs/SOURCES.md?raw';
 
 const meta = await loadPageMeta('about-sources');
 
 const sections = extractSourceSections(sourcesRaw);
+validateSourceSections(sections);
 
 // Maps a docs/SOURCES.md heading to the page whose table it backs, so a
 // reader can jump straight from a source to the data it supports. Golden

@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 119 Vitest unit tests
+pnpm test                      # 167 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 188 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 242 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
                                           # and dark, across every page)
 ```
@@ -3650,6 +3650,1821 @@ unchecked, or a fresh accessibility/performance pass (the last dedicated one
 was 2026-08-05's quiz interactive-state sweep). Source-link liveness remains
 infeasible in this environment (WebFetch 403s on every host tried), per
 prior runs' notes - unchanged.
+
+### Accessibility: every TournamentTable's filter/sort/empty-result states, first-ever audit - added 2026-08-08 (intensive run)
+
+Every backlog item was already closed going into this run, and the previous
+entry's "Left for a future pass" note named a fresh accessibility pass as one
+of three remaining candidates - specifically warning that it should target
+"a concrete gap... rather than a broad, likely-low-yield sweep" (a lesson
+from the 2026-08-04 entry, which found performance has little surface on
+this image-light static site). This run found and closed exactly that kind
+of concrete gap: `tests/e2e/accessibility.spec.ts`'s automated WCAG sweep
+loads every `NAV_LINKS` page exactly once, in its untouched initial DOM
+state, and `accessibility-quiz-states.spec.ts`/`accessibility-compare-
+states.spec.ts` already closed the equivalent gap for those two pages' own
+interactive states - but every one of the six competition/award pages' own
+`TournamentTable` filter/sort/empty-result states had never been driven
+through axe, or even through a plain functional test. In particular, the
+`#{id}-empty` "No editions match those filters" block
+(`src/components/TournamentTable.astro`) - which appears whenever a winner
+and year filter combination matches zero rows, with its own "Clear filters"
+button - has existed since the original filter feature shipped but had
+literally **zero** test coverage of any kind (functional or accessibility)
+before this run; every prior test, across the whole suite's history, only
+ever exercised filter combinations that returned at least one row.
+
+New `tests/e2e/accessibility-table-states.spec.ts` covers all seven table
+ids on the site (`world-cup`, `euro`, `copa-america`, `nations-league`,
+`ballon-dor`, `golden-boot-world-cup`, `golden-boot-euro`) with two states
+each: the no-results state (reaching it via a `findNoResultsCombo()` helper
+that reads each table's own live row `dataset` in the browser to find a
+genuinely non-matching winner/year pair, rather than a guessed pair that
+could silently stop being a real gap after a future content edit - and then
+confirms the "Clear filters" button is keyboard-focusable, activates on
+`Enter`, and actually restores the default view), and a combined
+filtered-and-re-sorted state (a real winner filter plus a changed "Sort by"
+option at once, since sorting only reorders `<tr>` elements in place while
+filtering hides some of them - a combination the existing `mobile.spec.ts`
+coverage always exercised separately, never together). A further canary test
+re-runs the no-results state against the Croatian World Cup page in the dark
+color scheme, since the underlying filter/sort/empty script is identical
+across locales and themes (same element ids, same logic) but the rendered
+labels and CSS custom properties differ - one representative table stands in
+for re-running all seven a second and third time, the same "vertical slice"
+reasoning this project's localization work used throughout.
+
+**No WCAG violations found in any of the 15 new cases** - this is a
+coverage-gap closure, not a bug-fix pass; the empty state's copy, the "Clear
+filters" button, and the reordered/filtered table all already meet WCAG 2.1
+A/AA, they simply had never been checked. No `src/` or `content/` changes
+were needed.
+
+**Tests:** 15 new Playwright cases (242 total, up from 227), all passing
+against the environment's preinstalled Chromium
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`,
+noted here since the plain `chromium` symlink Playwright reports in its own
+error message does not resolve on its own in this container - a future run
+hitting the same "Executable doesn't exist" error should point at the
+versioned `chromium-1194/chrome-linux/chrome` path directly). `pnpm lint` is
+clean (0 errors/0 warnings, the one pre-existing unrelated `monthNames`
+hint) and the full Vitest suite is unchanged (158/158 - no library code
+changed, this is a test-only addition).
+
+**Left for a future pass:**
+- The same three candidates the previous entry named remain otherwise open:
+  a second independent content-accuracy cross-check of columns/tables with
+  only one audit pass so far, a first audit of Ballon d'Or's/Golden Boot's
+  remaining less-common columns if any, or further concrete accessibility
+  gaps (e.g. the theme-toggle button's actual click interaction, as opposed
+  to the main sweep's `colorScheme`-forced page loads, has not been driven
+  through axe as a live state change).
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
+
+### Accessibility: theme-toggle button's live click interaction, first-ever test coverage - added 2026-08-08 (intensive run)
+
+Closes the exact gap the previous entry's "Left for a future pass" note
+named. `ThemeToggle.astro` (rendered in `Nav.astro` on every page, English
+and Croatian) is the one genuinely interactive, client-scripted control that
+sits outside any `TournamentTable`/quiz/compare state, and it had **zero**
+test coverage of any kind before this run - not a Vitest unit test (there is
+no pure function here, it's a DOM click handler), not a Playwright
+functional test, not an axe pass. The main `accessibility.spec.ts` sweep
+only ever loads pages once per Playwright-emulated `colorScheme`; it never
+actually clicks the button and drives the real `data-theme`
+attribute/`aria-pressed`/label-swap/`localStorage` logic in
+`ThemeToggle.astro`'s inline script.
+
+New `tests/e2e/accessibility-theme-toggle.spec.ts` covers, on the English
+home page: the initial state (confirming `sync()` runs once on load and
+already reflects the emulated OS color scheme - Playwright's un-set default
+is `light` - rather than the static server-rendered "Theme" label text,
+which the test comments explain to avoid a future false assumption);
+clicking toggles `aria-pressed`, the visible label text ("Light"/"Dark"),
+`<html data-theme>`, and `localStorage.getItem('theme')`, checked in both
+directions, with a live axe pass after each click (not just the emulated-
+`colorScheme` page loads the main sweep already covers); keyboard operability
+(`Tab`-focus then both `Enter` and `Space`, since a native `<button>` must
+accept either); and that a saved choice survives a real `page.reload()`
+(exercising `BaseLayout.astro`'s before-paint inline script reading
+`localStorage`, not just the in-memory DOM state of the current page). A
+second `describe` block re-runs the click-and-relabel check on the Croatian
+home page, confirming the toggle's localized `data-light-label`/
+`data-dark-label` (wired through `ThemeToggle`'s `locale` prop) actually
+reach the live-updated text ("Svijetla"/"Tamna"), not just the initial
+server render already covered by the main sweep.
+
+**No WCAG violations found** - this is a coverage-gap closure, not a
+bug-fix pass; the toggle already meets WCAG 2.1 A/AA in both states, it had
+simply never been driven through axe as a live interaction. No `src/` or
+`content/` changes were needed.
+
+**Tests:** 3 new Playwright cases (245 total, up from 242), all passing
+against the environment's preinstalled Chromium
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`).
+`pnpm lint` is clean (0 errors/0 warnings, the one pre-existing unrelated
+`monthNames` hint) and the full Vitest suite is unchanged (158/158 - no
+library code changed, this is a test-only addition). `pnpm build` succeeds
+(22 pages).
+
+**Left for a future pass:**
+- A second independent content-accuracy cross-check of columns/tables with
+  only one audit pass so far, or a first audit of Ballon d'Or's/Golden
+  Boot's remaining less-common columns if any, remain the main open
+  candidates - the accessibility side has now had two consecutive
+  concrete-gap closures (table filter/sort/empty states, then the
+  theme-toggle interaction) and no further specific gap is known offhand;
+  a future pass should look for one rather than run a broad, likely-low-
+  yield sweep, per the lesson already on record in this file.
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
+
+### Content-accuracy pass: Copa América Format column - second independent cross-check
+
+Added 2026-08-08 (intensive run). The previous entry's "Left for a future
+pass" note named a second independent cross-check of any column/table still
+on a single audit pass as a main open candidate; the per-edition "Format"
+column in `content/copa-america.md`'s Champions timeline table (League
+table / Final playoff / Home-and-away / Knockout final / Special centenary
+edition, 48 editions) was the one flagged specifically - it had only had its
+first pass on 2026-08-02, unlike Champion/Runner-up/Final-score (all four
+team competitions now on a second pass) and Host/Final-date (each on a first
+pass added just earlier today).
+
+Re-verified all 48 editions (1916-2024, including both 1959 tournaments) in
+four WebSearch passes split by era, mirroring how the first pass itself was
+split: 1916-1929 (12 editions), 1935-1967 including both 1959s (17
+editions), 1975-1987 - the home-and-away-to-knockout-final transition (4
+editions), and 1989-2024 - the knockout-final era plus the two closing-group
+League table editions and the 2016 centenary edition (15 editions).
+Deliberately drew on a source mix distinct from the first pass (which leaned
+on Wikipedia's per-edition/play-off articles and RSSSF's tables): this pass
+added sports-history and stats sites not used the first time around
+(worldfootball.net's era, todor66.com, Liquipedia's lab wiki, Grokipedia,
+soccernostalgia.blogspot.com, Soccer Wizdom's retrospective series) and
+Wikipedia's dedicated `*_knockout_stage` articles for the modern era rather
+than only the final-match articles the first pass cited.
+
+**No discrepancies found.** Every classification already on the page held
+up under the second pass:
+
+- The five level-on-points playoff deciders (1919, 1922, 1937, 1949, 1953)
+  each re-confirmed as needing an extra decider match after the round-robin
+  table finished tied - including 1922's three-way tie where Uruguay
+  withdrew from the scheduled playoff in protest, leaving Brazil to beat
+  Paraguay for the title.
+- Every other pre-1975 edition re-confirmed as a plain single (or, in 1925's
+  three-team case, double) round-robin table decided outright on points, no
+  extra match needed.
+- 1975, 1979, and 1983 re-confirmed as two-legged home-and-away finals
+  (with a third, neutral-venue decider in 1975 and 1979, when each side won
+  one leg), not hosted in a fixed venue.
+- 1987 re-confirmed as the first knockout-final-era edition: a group stage
+  feeding a single-elimination bracket (with defending champions Uruguay
+  entering directly at the semifinal), ending in a one-off final.
+- 1989 and 1991 re-confirmed as League table editions in the specific sense
+  the content file's warning section already describes: two opening groups
+  feeding a four-team closing round-robin group, not a single final match -
+  genuinely different from both the pre-1975 shape and the 1993-onward
+  knockout-final shape, but still decided by table standings rather than a
+  bracket.
+- 1993 through 2024 (except 2016) re-confirmed as group stage into a
+  single-elimination knockout bracket ending in a one-off final.
+- 2016 (Copa América Centenario) re-confirmed as the deliberate outlier kept
+  in its own "Special centenary edition" category: structurally a group-
+  stage-into-knockout tournament like every edition from 1993 onward, but
+  played outside the normal four-year cycle, hosted for the first time ever
+  outside South America (the United States), and expanded to 16 teams (10
+  CONMEBOL plus 6 CONCACAF) rather than the usual 10 or 12 - the same
+  reasoning the first pass gave for not folding it into "Knockout final".
+
+See `docs/SOURCES.md`'s expanded Copa América section (new "Format-column
+second-source audit" entry) for the full per-era citation list.
+`content/copa-america.md` gained one new prose paragraph in the "Important
+editorial warning" section documenting this second pass, in the same style
+as the existing Champion/Runner-up second-cross-check paragraph immediately
+below it. `lastReviewed` was already `2026-08-08` from two earlier passes in
+this same intensive session (the Host/Finals-host audit and the Final-date
+audit), so no further date bump was needed; `status` stays `review`
+(secondary sources, same reasoning as every prior secondary-sourced audit in
+this file). No table data changed - the only file changes are the new
+content-file paragraph, the new `docs/SOURCES.md` citations, and this entry.
+
+Adding the new paragraph changed `content/copa-america.md`'s bytes (even
+though no table cell changed), which `pnpm check:pdfs` correctly flagged as
+making `public/downloads/copa-america.pdf` stale. Regenerated all six PDFs
+and the manifest via `PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm
+build:pdfs`; `pnpm check:pdfs` now passes cleanly.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (158/158) and `pnpm lint` is clean (0 errors/0 warnings, the one
+pre-existing unrelated `monthNames` hint every prior run has logged). The
+Playwright suite was not re-run for this pass (a prose-only content change
+with no assertion anywhere in the suite pinned to that paragraph's text or
+byte count, and the instruction for this pass didn't require it); the full
+Vitest suite and `pnpm lint` were run and are clean.
+
+**Left for a future pass:**
+- With this run, the Format column joins Champion/Runner-up/Final-score as
+  having at least two independent audit passes; Host/Final-date each still
+  have only their first pass (both added earlier today) and are the
+  natural next candidates for a second cross-check.
+- Third/fourth-place and the remaining columns not yet covered by any
+  second pass remain open, per the same "Left for a future pass" note this
+  run picked up from.
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
+
+### Performance: first-ever page-weight budget check - added 2026-08-09 (intensive run)
+
+Every "Required capability" and "Nice-to-have capability" in
+`docs/WEBSITE_REQUIREMENTS.md` was already shipped going into this run, and
+the recent content-accuracy series had reached genuine diminishing returns
+(the last several passes each re-confirmed data a prior pass had already
+verified, finding no discrepancies). Of the fallback quality-pass categories
+this routine's instructions name (content accuracy, missing data,
+accessibility, performance), **performance** was the one dimension no prior
+run had ever measured or guarded - every other category had multiple passes
+on record.
+
+Measured the actual site first rather than assuming there was a problem:
+`pnpm build` produces 26 static HTML pages, none reference an image (the
+site has none - `AGENTS.md` rule 4 forbids scraped photographs) or a web
+font (`--font-sans`/`--font-mono` are both system-font stacks, confirmed in
+`src/styles/global.css`), and there are only two small shared CSS bundles
+(~6.4 KB and ~10.7 KB) - so the site is already lightweight by construction,
+not something this pass needed to fix. But nothing had ever put a number on
+that or would catch a future regression (a stray large asset, an
+accidentally duplicated inline script block, an unminified debug dump)
+before it shipped - the same gap `check:pdfs` (2026-08-06) closed for PDF
+staleness, just for page weight instead.
+
+New `scripts/check-page-weight.mjs` (`pnpm check:perf`, modeled directly on
+`scripts/check-pdf-freshness.mjs`'s shape): walks every `dist/**/*.html`
+file after a build, sums each page's own HTML bytes with every same-origin
+CSS asset it references (resolved under `dist/_astro/` regardless of the
+site's `BASE_PATH`, so it works both locally and under GitHub Pages'
+`/football-reference/` prefix), and fails with a full over-budget listing if
+any page exceeds `PAGE_WEIGHT_BUDGET_BYTES` (300 KB). That budget was set
+from a real measurement, not a guess: the heaviest page today is English
+`/records` at ~227.7 KB (genuinely the densest page on the site - it
+aggregates seven tables' worth of generated timeline/ranking content, not
+bloat), so 300 KB leaves real headroom for that content to keep growing
+while still catching an accidental regression well before production. Wired
+into `.github/workflows/ci.yml` as a new "Page-weight budget check" step
+(with its own "Build" step ahead of it, since - unlike `check:pdfs`, which
+only hashes `content/*.md` - this check needs a real `dist/`); left out of
+`deploy.yml` on purpose, matching that workflow's existing "keep deploys
+fast" policy for `check:pdfs` and Playwright.
+
+Covered by 9 new Vitest cases (`tests/unit/checkPageWeight.test.ts`:
+`findCssRefs` dedup and the no-stylesheet case, `resolveDistAsset`'s
+base-path-agnostic resolution and its "not an `/_astro/` asset" null case,
+`pageWeight` summation, and `overBudget`'s filtering/sort/exactly-at-budget
+boundary). Also manually verified the failure path end-to-end against the
+real build (temporarily set the budget to a value below every page's size,
+confirmed all 26 pages were reported with a non-zero exit code, then
+restored the real 300 KB budget) - the pure functions are unit-tested, but
+the script's file I/O and process-exit behavior are not, matching how
+`check-pdf-freshness.mjs` itself has no dedicated test file either.
+
+**Result: every page is already within budget today** (heaviest: 229.0 KB
+`hr/records`, 227.7 KB `records`, then quiz and Copa América at 174 KB and
+156 KB) - this pass adds a guard rail against future regressions, it did not
+find or fix an existing one.
+
+**Tests:** 167/167 Vitest (up from 158), `pnpm lint` clean (0 errors/0
+warnings, the one pre-existing unrelated `monthNames` hint every prior run
+has logged - confirmed again this run to be a known Astro `define:vars`
+type-checker limitation, not a real bug: the client script's `monthNames` is
+injected at runtime by `define:vars={{ ..., monthNames, ... }}`, which the
+static type checker has no visibility into). Playwright suite unchanged (no
+page markup or client behavior changed, only new build/CI tooling).
+
+**Left for a future pass:**
+- The content-accuracy series' open items are unchanged from the note
+  above (Host/Final-date second cross-checks, remaining third/fourth-place
+  columns) and remain valid future work, just no longer the single
+  highest-value option every run - now that performance has a first pass on
+  record too, whichever category has gone longest without one is the
+  natural next pick.
+- This check measures HTML + CSS weight only (the two things that vary
+  per-page); it deliberately does not count the service worker
+  (`sw.js`, fetched lazily on registration, not part of initial page load)
+  or the downloadable PDFs (opt-in downloads, not part of the page itself).
+  A future pass could add a similar budget for total JS execution
+  (currently all `is:inline`, so there is no separate JS file size to
+  measure) if that ever changes.
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
+
+### Accessibility: print stylesheet, first-ever test coverage - plus the `monthNames` hint was a real (tiny) fixable bug, not a checker limitation - added 2026-08-09 (intensive run)
+
+The previous entry's "Left for a future pass" note pointed at whichever
+quality category had gone longest without a pass; content-accuracy audits
+had already reached diminishing returns (a dozen-plus consecutive "no
+discrepancies" passes) and this session's own prior two entries had just
+closed concrete gaps in accessibility (table filter/sort/empty states,
+theme-toggle) and performance (page-weight budget) - all three within the
+same day. Before picking one of those to repeat, this run measured what was
+actually still uncovered rather than assuming: every existing Playwright
+spec (`mobile.spec.ts`, all four `accessibility*.spec.ts` files) only ever
+renders the default **screen** media. `src/styles/global.css`'s `@media
+print` block - required by `AGENTS.md` rule 7 and live since Milestone 1 (A4
+landscape, on-screen-filtered rows forced back to visible, the mobile card
+layout reverted to a real `<table>`, interactive chrome hidden, colors
+flipped to pure black-on-white) - had **zero** test coverage of any kind,
+confirmed by grepping the whole suite for `emulateMedia`/`media: 'print'`
+before starting. This print path is also exactly what the six downloadable
+per-competition PDFs (`scripts/generate-pdfs.mjs`) render from, so a print-
+stylesheet regression would silently ship into those PDFs too, with nothing
+to catch it.
+
+New `tests/e2e/print-styles.spec.ts` (13 cases) covers English and Croatian
+World Cup (a single full-featured `TournamentTable`) and the two-table
+Golden Boot page, each driven through `page.emulateMedia({ media: 'print'
+})`:
+- a full axe WCAG 2.1 A/AA pass under print media (the print palette had
+  never actually been checked for contrast/other violations - screen-media
+  axe runs say nothing about it);
+- the interactive chrome (`.site-header`, `.site-footer`, `.theme-toggle`,
+  `.skip-link`) is actually hidden;
+- `body` really flips to pure `rgb(255, 255, 255)` background /
+  `rgb(0, 0, 0)` text;
+- the mobile card `<td>` layout (`display: grid` at the suite's 360px
+  screen viewport) reverts to a real `display: table-cell` under print.
+
+A separate case confirms the specific behavior the print sheet exists to
+guarantee: filtering World Cup down to one winner on screen (hiding most
+rows via the native `hidden` attribute), then switching to print media and
+checking that same `tr[hidden]` row is visible again with a live axe pass -
+i.e., a reader who filtered the on-screen table and then hits print/PDF
+still gets every edition, not just the filtered subset.
+
+**No WCAG violations found under print media** - like the theme-toggle
+pass, this is a coverage-gap closure, not a discovered bug in the print
+styles themselves.
+
+**Also fixed while in this area, correcting a prior run's conclusion:** the
+2026-08-09 page-weight entry above states the long-standing `astro check`
+`monthNames` hint (`src/components/OnThisDay.astro:138`) is "a known Astro
+`define:vars` type-checker limitation, not a real bug." That conclusion was
+wrong, and this run corrected it rather than repeating it a third time: the
+same `define:vars={{ entries, monthNames, locale, emptyText }}` call injects
+four names into the inline script, and only `monthNames` was ever flagged -
+`entries`, `locale`, and `emptyText` all resolve cleanly throughout the same
+script, which a genuine "no visibility into `define:vars`" limitation could
+not explain. The actual cause: one line below, `formatDate()` declares a
+same-scoped local `const monthName` (singular) that reads from `monthNames`
+- close enough to the injected plural name that Astro's language-service
+diagnostic misattributed the reference and suggested the wrong one ("Did you
+mean 'monthName'?"). Renamed the local to `name` - a pure rename, zero
+behavior change (`formatDate()`'s return value is identical for every
+input, confirmed by the unchanged 167/167 Vitest run and the unchanged
+print/on-this-day Playwright cases). `pnpm lint` now reports **0 errors, 0
+warnings, 0 hints** - the first clean run in this file's recorded history,
+after months of every prior run logging the same hint as "pre-existing" and
+moving on without checking it.
+
+**Tests:** 13 new Playwright print-media cases (271 total, up from 258).
+`pnpm lint` - 0/0/0 (previously 0/0/1). `pnpm test` - 167/167 unchanged (no
+library logic touched, pure rename). `pnpm build` succeeds (22 pages);
+`pnpm check:pdfs` and `pnpm check:perf` both still pass cleanly (no content
+or page-weight changes). Full Playwright suite - **258/258 passing** before
+this run's additions, all green together with the 13 new cases after,
+against the environment's preinstalled Chromium (`PW_EXECUTABLE_PATH=/opt/pw-
+browsers/chromium-1194/chrome-linux/chrome`, same constraint every prior run
+has noted).
+
+**Left for a future pass:**
+- Print coverage here deliberately checked three representative pages
+  (World Cup EN/HR, Golden Boot's two-table shape) rather than all six
+  competition/award pages plus Records/Compare/Quiz/Sources - a future pass
+  could extend the same pattern to the remaining pages if full instance-by-
+  instance coverage is wanted, the same "representative shape vs exhaustive"
+  tradeoff the table-states pass already documented for its own two-table
+  choice.
+- Content-accuracy: a second independent cross-check of columns/tables that
+  have only had one audit pass so far remains the standing candidate,
+  unchanged from prior entries - still likely low-yield given the run of
+  "no discrepancies" results, but the only category not touched today.
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
+
+### Accessibility: print-media coverage extended to every remaining page, plus a real "answer key vanishes on paper" quiz bug found and fixed - added 2026-08-09 (intensive run)
+
+The previous entry's print-stylesheet pass deliberately checked three
+representative pages (World Cup EN/HR, Golden Boot's two-table shape) and
+left extending the same pattern to the rest of the site as explicit future
+work. This run did that extension - and, in the process of driving the
+`/quiz` page through print media for the first time, found the pass's
+highest-value catch of the day: a real, user-facing bug, not just a
+coverage gap.
+
+**Coverage extension:** `tests/e2e/print-styles.spec.ts`'s `PRINT_PAGES`
+table-driven block (WCAG-under-print, interactive chrome hidden, black-on-
+white colors, mobile-card-to-real-`<table>` reversion) now also covers EURO,
+Copa América, Nations League and Ballon d'Or (the four single-table
+competition pages the previous pass hadn't reached yet). A new
+`OTHER_PRINT_PAGES` block adds the same WCAG/chrome/colors trio for Records,
+Compare and `/about/sources` - three pages with no `TournamentTable` at all,
+so the mobile-card-reversion check doesn't apply to them. `/compare` also
+gets a page-specific check that its team-picker `<select>`s are hidden on
+paper (`.compare__picker.no-print`, same mechanism the filters already use).
+
+**The bug:** while writing the Quiz page's print tests, `.quiz-card__reveal`
+- the "Just show me the answer" `<details>` disclosure in both
+`QuizCard.astro` and `QuizOrderCard.astro` - turned out to carry the
+`no-print` class alongside the JS-only "Check answer" button/feedback
+controls. `docs/PROJECT_STATUS.md`'s own quiz entry documents the intended
+design explicitly: "a no-JS visitor sees a clean answer-key quiz sheet
+(also print-friendly) rather than dead buttons." `no-print` on the reveal
+did the opposite - it hid the one thing a printed/no-JS quiz sheet actually
+needs, the answer itself, while correctly hiding the JS-only controls that
+share the class. A parent who printed the quiz for a kid, or opened it with
+JS disabled and hit print, got questions with no way to check any answer.
+
+Fix: dropped `no-print` from `.quiz-card__reveal` in both components, then
+added a `@media print` rule in `src/styles/global.css` forcing the answer
+text visible regardless of the `<details>`'s open/closed state (a printed
+page can't reflect that interactive state anyway). The first attempt
+(`.quiz-card__reveal > :not(summary) { display: block !important; }`,
+overriding the child directly) looked right in the CSS but the new
+Playwright assertions caught it as still failing - modern Chromium/Firefox
+hide a closed `<details>`'s non-summary content via an internal
+`::details-content` box using `content-visibility: hidden`, not a plain
+`display: none` on the children, so overriding the child's own `display`
+did nothing. Verified support first (`CSS.supports('selector(::details-
+content)')` is `true` in this environment's Chromium 141) and targeting the
+pseudo-element itself (`content-visibility: visible !important` +
+`display: block !important`) is what actually works - confirmed with a
+minimal standalone repro before touching the real stylesheet, then with the
+real Playwright assertions.
+
+New Quiz print-media tests (`tests/e2e/print-styles.spec.ts`): a WCAG pass;
+one confirming the score bar and every card's JS-only controls stay hidden
+while the answer-key `<details>` and its non-empty answer text are visible;
+and a second for the chronological-order challenge cards, which share the
+same `QuizCard`-adjacent pattern in `QuizOrderCard.astro` and had the
+identical bug.
+
+**Tests:** 29 new Playwright cases (287 total, up from 258).
+`pnpm test` - 167/167 unchanged (no library logic touched). `pnpm lint` -
+0 errors/0 warnings/0 hints, unchanged. `pnpm build` succeeds (22 pages);
+`pnpm check:pdfs` and `pnpm check:perf` both still pass cleanly (no content
+or page-weight changes - the CSS/markup edits here are bytes, not a new
+column). Full Playwright suite - **287/287 passing**, run twice: once to
+catch the `::details-content` bug (2 real failures, both in the new Quiz
+tests, everything else green), and once after the fix to confirm all 42
+print-media cases plus the full 287-case suite pass together.
+
+**Left for a future pass:**
+- Print coverage is now complete for every page except the individual
+  competition pages' Croatian variants (only World Cup's HR page has a
+  dedicated print test, matching the previous pass's "representative shape"
+  choice) - a future pass could add the remaining five HR competition pages
+  if full instance-by-instance coverage across both languages is wanted.
+- Content-accuracy's standing candidate (a second independent cross-check of
+  columns/tables that have only had one audit pass) remains unchanged and
+  still likely low-yield, per prior entries' notes.
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
+
+### Accessibility: print-media coverage extended to the remaining five Croatian competition pages - added 2026-08-09 (intensive run)
+
+The previous entry's "Left for a future pass" note named this exact gap:
+print-media coverage was complete for every page in both languages except
+five of the six individual competition pages' Croatian variants (only World
+Cup's HR page had a dedicated print test, kept as a "representative shape"
+choice at the time). This run closed it. `tests/e2e/print-styles.spec.ts`'s
+`PRINT_PAGES` table-driven block now also covers `hr/competitions/euro`,
+`hr/competitions/copa-america`, `hr/competitions/nations-league`,
+`hr/competitions/ballon-dor` and `hr/competitions/golden-boot` (its
+two-table layout), each getting the same four checks every other row gets:
+WCAG-under-print, interactive chrome hidden, black-on-white colors, and
+mobile-card-to-real-`<table>` reversion. No component or stylesheet changes
+were needed - the existing `@media print` rules in `src/styles/global.css`
+already apply uniformly regardless of `lang`, so this was pure coverage
+extension, not a bug hunt; all 20 new cases passed on the first run.
+
+Print-media coverage is now complete for every page in both languages: all
+six competition pages (EN+HR), Records, Compare, Sources and Quiz (EN+HR
+covered indirectly via the shared `@media print` sheet's page-agnostic
+rules; the competition pages were specifically the ones still missing
+per-instance Playwright assertions).
+
+**Tests:** 20 new Playwright cases (307 total, up from 287). `pnpm test` -
+167/167 unchanged (no library logic touched). `pnpm lint` - 0 errors/0
+warnings/0 hints, unchanged. `pnpm build` succeeds (22 pages);
+`pnpm check:pdfs` and `pnpm check:perf` both still pass cleanly (test-only
+change, no content or markup touched). Full Playwright suite -
+**307/307 passing**.
+
+**Left for a future pass:**
+- Print-media coverage is now genuinely complete across the page inventory;
+  the standing content-accuracy and source-link-liveness candidates below
+  are the only recurring open items left in this file.
+- Content-accuracy's standing candidate (a second independent cross-check of
+  columns/tables that have only had one audit pass) remains unchanged and
+  still likely low-yield, per prior entries' notes.
+- Source-link liveness remains infeasible in this environment (WebFetch
+  403s on every host tried), per prior runs' notes - unchanged.
+
+### Content-accuracy audit: FIFA World Cup, UEFA EURO and UEFA Nations League "Final date" columns - second independent cross-check, no discrepancies - added 2026-08-09 (intensive run)
+
+Closes the standing candidate this file's last several entries kept naming:
+"Final date" was one of the few columns still on only a single audit pass
+for three of the four team competitions - World Cup and EURO's dates were
+verified once when the column was first added (2026-08-02), Nations
+League's once at 2026-08-03, and only Copa América had since received a
+dedicated, independent *second* pass (2026-08-08). This run closes the same
+gap symmetrically for the other three.
+
+- Verified all 44 dated rows across the three tables (World Cup 23,
+  1930-2026; EURO 17, 1960-2024; Nations League 4, 2019-2025) via six
+  parallel WebSearch research passes (three eras for World Cup, two for
+  EURO, one for Nations League), each date cross-checked against at least
+  two independent sources distinct from the first pass's own mix -
+  FIFA.com, Britannica, 11v11.com, and Al Jazeera supplemented Wikipedia/
+  ESPN this time round.
+- **No discrepancies found across any of the 44 dates.** Every previously
+  flagged edge case was independently reconfirmed rather than merely
+  trusted: the 1950 World Cup's "Maracanazo" final-group decider (16 July
+  1950), the 2022 World Cup's off-cycle Qatar slot (18 December 2022), the
+  2026 World Cup as a genuinely completed tournament by this audit's run
+  date (19 July 2026, not a forward-looking placeholder), EURO 1968's
+  replay date rather than the original drawn match (10 June, not 8 June),
+  and EURO 2020's real 2021 final date under its "2020" edition label (11
+  July 2021).
+- `docs/SOURCES.md` gained three new "Final match dates second independent
+  cross-check" entries (FIFA World Cup, UEFA EURO, UEFA Nations League)
+  with the full per-era source lists. `content/fifa-world-cup.md`,
+  `content/uefa-euro.md` and `content/uefa-nations-league.md`'s
+  `lastReviewed` all moved to 2026-08-09; `status` stays `review`
+  (unchanged) - secondary sources, matching every prior secondary-sourced
+  audit's reasoning in this file.
+- No table data changed - this is a clean audit-closed entry, the same
+  shape as the Copa América Final-date pass it mirrors. `pnpm test` -
+  167/167 unchanged (no library logic touched); `pnpm lint` - 0 errors/0
+  warnings/0 hints, unchanged. Regenerated the three affected PDFs
+  (`world-cup.pdf`, `euro.pdf`, `nations-league.pdf`) via `pnpm build:pdfs`
+  since their source `lastReviewed` bytes changed; `pnpm check:pdfs` now
+  passes cleanly. The full Playwright suite is unchanged for the same
+  reason a `lastReviewed`-only content change has never needed new
+  Playwright cases in any prior audit entry.
+
+This closes the "Final date" second-cross-check gap across all four team
+competitions - Copa América (2026-08-08), and now World Cup, EURO and
+Nations League (this run) - every dated column on the site now has at
+least two independent audit passes on record.
+
+**Left for a future pass:** with this closure, essentially every
+competition/award table and every one of their columns has at least two
+independent content-accuracy passes on record. A future run should treat
+a *third* pass as genuinely low-yield unless a specific reason to suspect
+an error surfaces, and instead look toward: Ballon d'Or's still-single-
+sourced ceremony dates (the same handful noted in several earlier entries),
+a source-link liveness check (infeasible in this environment - WebFetch
+403s on every host tried, unchanged across many prior attempts), or a
+fresh angle entirely outside the audit series (this file's accessibility
+and performance coverage is already extensive - print-media, quiz
+interactive states, table filter/sort/empty states, and page-weight budgets
+are all covered per the entries above).
+
+Note: the "Ballon d'Or ceremony dates" candidate named above is itself a
+stale repeat - the 2026-08-04 slice (see its own entry earlier in this file)
+already re-confirmed every single-sourced ceremony date with a genuine
+second source, and a later entry ("champions-bar's screen-reader label",
+2026-08-06) already flagged this exact note as stale once. Recorded here
+again so a future run doesn't have to re-derive that from two different
+places in the file.
+
+### Quality pass: custom 404 page - added 2026-08-09 (intensive run)
+
+Every "Required"/"Nice-to-have" capability from `docs/WEBSITE_REQUIREMENTS.md`
+and `AGENTS.md` was already shipped, both languages were already fully
+translated, and the last several entries' own "Left for a future pass" notes
+agreed a third content-accuracy pass would be low-yield without a specific
+reason to suspect an error - so this run took the "fresh angle entirely
+outside the audit series" option instead of another audit pass. A close read
+of `src/pages/` and `astro.config.mjs` turned up a real, previously-unnoticed
+gap: the site had no `404.astro` at all. GitHub Pages project sites serve
+`dist/404.html` automatically for any URL under the base path that doesn't
+match a real file, so every broken/mistyped link (in either language) was
+silently falling through to GitHub's own generic, unstyled, English-only 404
+page instead of the site's own chrome - a real reader-facing dead end that
+none of the many accessibility/SEO/print passes in this file had ever
+covered, since none of them look for a *missing* page.
+
+**The fix:** `src/pages/404.astro`, built on the existing `BaseLayout`
+(so it gets the same nav, footer, theme toggle, skip link and offline
+service-worker registration as every real page) rather than a bespoke shell.
+Since a static host can't route a 404 by locale - one file has to answer for
+both `/competitions/nonexistent` and `/hr/competitions/nonexistent` alike -
+the page shows its message in both languages on one screen (`lang="hr"` on
+the Croatian paragraph/section, matching the per-fragment `lang` attribute
+convention already used elsewhere for mixed-language text) rather than
+guessing or defaulting to English-only. Two "Popular pages"/"Popularne
+stranice" link grids are generated directly from the existing
+`NAV_LINKS`/`TRANSLATED_PATHS` (`src/lib/routes.ts`/`src/lib/i18n.ts`) - the
+same two lists `Nav.astro` and the sitemap already read from - so the 404
+page's link list can never drift out of sync with the site's real nav as
+pages are added or renamed.
+`BaseLayout.astro` gained a small additive `noindex` prop (defaults to
+`false`, so every existing page's output is byte-identical) that renders
+`<meta name="robots" content="noindex">` when set, so the 404 page itself is
+never accidentally indexed as a duplicate/thin-content page - the same
+`noindex` treatment the `/awards/...` redirect pages already get, just now
+generalized into the shared layout instead of being unique to Astro's
+built-in `redirects` output.
+
+**Tests:** 6 new Playwright cases in `tests/e2e/mobile.spec.ts` (a new "404
+page" describe block: no 360px overflow, the raw HTTP response is a genuine
+404 status with the noindex tag, both languages' headings/text render, all
+22 link-grid hrefs - 11 nav pages x 2 languages - actually resolve, and the
+"home page" link lands back on a real page) plus the 404 path added to the
+existing WCAG 2.1 A/AA sweep (`tests/e2e/accessibility.spec.ts`) in both
+light and dark color schemes, so it gets the same automated accessibility
+coverage every real page already has. Verified with `pnpm lint` (0 errors/0
+warnings/0 hints, same pre-existing hint as every prior run), the full
+Vitest suite (167/167 unchanged - no library logic touched), and the full
+Playwright suite (**314/314 passing**, up from 307). `pnpm build` confirms
+`dist/404.html` is produced at the site root (not nested under a
+`/404/index.html` directory, which GitHub Pages would not find) and contains
+both languages' content plus the noindex tag. `pnpm check:pdfs` and
+`pnpm check:perf` both still pass cleanly (no content file or Editions table
+touched; the new page's weight isn't among the heaviest 5 pages reported).
+
+**Left for a future pass:**
+- The 404 page's own popular-pages link list is generated from `NAV_LINKS`,
+  so it needs no maintenance as pages are added - no known gap here.
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates from the entry above
+  are unchanged.
+- A future pass could look at whether any other GitHub-Pages-specific static
+  hosting convention is similarly missing (e.g. a `CNAME` file is
+  intentionally not needed here since the site is served from the default
+  `github.io` subdomain, not a custom domain) - nothing else surfaced in this
+  run's read of `astro.config.mjs` and `.github/workflows/deploy.yml`.
+
+### Bug fix: source-link extraction was silently dropping and corrupting real citations - fixed 2026-08-10 (intensive run)
+
+Every "Required"/"Nice-to-have" capability was already shipped, the recent
+audit series had reached the same diminishing-returns conclusion the last
+several entries already recorded, and a live-link check remains infeasible
+in this environment (confirmed again this run - WebFetch still returns
+`EGRESS_BLOCKED` on both `en.wikipedia.org` and `copaamerica.com`, matching
+every prior attempt). Rather than a fourth content-accuracy WebSearch pass
+of the same tables, this run re-read `docs/CONTENT_MODEL.md`'s own
+build-time validation checklist against what `src/lib/validate.ts` actually
+checks - and found it: "source URLs are valid" has been on that checklist
+since the file was first written, and nothing in the codebase has ever
+enforced it. `extractSources()` (`src/lib/sources.ts`) extracted whatever
+its regex matched and never validated the result.
+
+**Two real bugs, found by testing the parser against the real
+`docs/SOURCES.md` rather than just its fixtures:**
+
+1. **Dropped citations.** `extractSources()` matched only the *first* URL on
+   each line (`/(https?:\/\/\S+)/.exec(line)`). 25 lines in `docs/SOURCES.md`
+   - mostly the Copa América pre-1975 era, cited as
+   `- <rsssf table url> ; <wikipedia article url>` - carry two citations per
+   line. Every one of those second URLs was silently missing from the
+   competition page's "References & review" section and from
+   `/about/sources`, in both languages, since the day each was added.
+2. **Corrupted URLs.** The trailing-punctuation cleanup
+   (`.replace(/[).,]+$/, '')`) stripped every trailing `)` unconditionally,
+   assuming it was always markdown-link noise. Five citations across three
+   sections are genuine Wikipedia disambiguation URLs that legitimately end
+   in `)` - `.../1959_South_American_Championship_(Argentina)` and
+   `_(Ecuador)` - and had their real closing paren stripped, turning a live
+   link into a dead, truncated one. This was already rendered into
+   `dist/competitions/copa-america/index.html` and `dist/about/sources/`
+   before this fix (confirmed by inspecting the built HTML).
+
+**The fix**, both in `src/lib/sources.ts`:
+- `extractSources()` now matches every URL on a line (`line.match(/.../g)`)
+  instead of only the first.
+- The trailing-punctuation stripper (`stripTrailingPunctuation()`) still
+  strips a trailing `.`/`,` unconditionally (never legitimately part of a
+  URL in this corpus), but now only strips a trailing `)` while it is
+  *unbalanced* - more `)` than `(` in the URL so far - so a markdown-link's
+  outer paren is still stripped while a URL's own balanced parenthetical
+  (like the 1959 disambiguation pages) survives intact.
+- New `validateSourceSections()` closes the actual gap named above: given
+  every section `extractSourceSections()` finds, it throws a build-failing
+  `ContentValidationError` (reusing the same class `validateEditions()`
+  already uses) if any URL fails to parse, uses a non-http(s) protocol, or
+  has unbalanced parentheses - the same signal that would have caught bug 2
+  outright. A true liveness check is still infeasible here, so this
+  validates only what's decidable without a network call. Wired into
+  `src/pages/about/sources.astro` right after `extractSourceSections()`,
+  which already reads every heading in the whole file, so this one call
+  site gives full-file build-time coverage regardless of which competition
+  pages exist.
+
+**Related blind spot closed in the same pass:** `scripts/check-pdf-freshness.mjs`
+tracked each PDF's `content/*.md` table file(s) as its only staleness
+dependency, never `docs/SOURCES.md` - even though every PDF's own
+References section is rendered from it (`loadCompetition()` reads
+`docs/SOURCES.md` for every competition, not just its own `content/*.md`
+table). A source-link fix exactly like this one would have silently left
+every downloadable PDF showing the old broken/missing links with
+`pnpm check:pdfs` still reporting green. `scripts/pdf-pages.mjs`'s
+`PDF_PAGES` entries now list root-relative paths and every entry includes
+`docs/SOURCES.md`; `check-pdf-freshness.mjs`/`generate-pdfs.mjs` updated to
+resolve paths from the repo root instead of assuming a `content/` prefix.
+Regenerated all six PDFs and the manifest (`pnpm build:pdfs`); `pnpm
+check:pdfs` now correctly flags all six as stale before the regeneration
+and clean after.
+
+**Tests:** 8 new Vitest cases in `tests/unit/sources.test.ts`
+(`extractSources`: multi-URL-per-line extraction, a balanced-parenthesis
+URL surviving intact, a markdown-wrapped URL still losing its outer paren,
+trailing sentence punctuation after a parenthesised URL;
+`validateSourceSections`: accepts well-formed links, rejects an unparseable
+URL, a non-http(s) protocol, and unbalanced parentheses - 175 total, up from
+167). No existing test's fixtures had more than one URL per line, so all
+prior cases pass unchanged. `pnpm lint` - 0 errors/0 warnings/0 hints.
+`pnpm build` succeeds (23 pages) and the fix was confirmed directly in the
+output: `dist/competitions/copa-america/index.html` and
+`dist/about/sources/index.html` both now show the corrected
+`..._(Argentina)`/`..._(Ecuador)` URLs with their closing parens intact,
+and the previously-missing second citation on each affected line (e.g. the
+`1937_South_American_Championship` Wikipedia article, previously dropped
+entirely) is now present. Full Playwright suite - **314/314 passing**,
+including the WCAG-under-print and reference-list assertions on
+`/about/sources` and `/hr/about/sources`. `pnpm check:pdfs` and `pnpm
+check:perf` both pass cleanly after regeneration.
+
+**Left for a future pass:**
+- Source-link *liveness* (an actual HTTP check, not just syntax) remains
+  infeasible in this environment - reconfirmed this run, unchanged from
+  every prior attempt.
+- The standing content-accuracy (third-pass, low-yield) candidate is
+  unchanged.
+- `validateSourceSections()` only checks syntax (parses, http/https,
+  balanced parens) since that's all that's decidable offline - it would not
+  catch, for example, a URL that's syntactically fine but points to the
+  wrong article entirely. That class of error is exactly what the ongoing
+  content-accuracy WebSearch audits are for, not this build-time check.
+
+### Bug fix: the row-width content-validation check was structurally dead code - fixed 2026-08-10 (intensive run)
+
+Same shape as the prior run's source-link fix: rather than another
+low-yield third content-accuracy pass, this run re-verified an existing
+build-time validation check against what it actually does, instead of
+trusting that it works because `docs/CONTENT_MODEL.md` lists it. It doesn't.
+
+`docs/CONTENT_MODEL.md`'s validation checklist requires "no duplicate table
+headers" *and*, implicitly (it's the same class of structural check),
+that every row actually has one cell per header - `validateEditions()`
+(`src/lib/validate.ts`) has a check with exactly that comment. It has
+never been able to fire. `buildEditions()` (`src/lib/editions.ts`) builds
+each row's `cells` as `headers.map((label, index) => ({ label, value:
+row[index] ?? '' }))` - by construction this **always** produces exactly
+`headers.length` cells, silently padding a short row with empty strings
+(or truncating a long one). The validator was comparing
+`edition.cells.length` against `table.headers.length`, i.e. a value against
+itself after it had already been forced to match - a check that can never
+be false. Confirmed with a throwaway repro (not committed): a table with
+`Year | Host | Winner | Runner-up` headers and a row missing one
+pipe-delimited value (`Belgium` as the raw third-place value with no
+"Runner-up" cell) built silent, wrong data - `Belgium` mislabeled as
+`Runner-up`, the real runner-up dropped, "Third" blank - with no build
+failure. All six of today's content tables happen to be well-formed, which
+is exactly why this has never been noticed in the wild; the risk is a
+future edit (human or agent) that drops or adds a pipe mid-row in any of
+the six `content/*.md` tables.
+
+**The fix** (`src/lib/validate.ts`): compare the raw parsed row width -
+`table.rows[i].length`, from the `MarkdownTable` already passed into
+`validateEditions()` - against `table.headers.length`, instead of the
+derived, always-padded `edition.cells.length`. Uses data that hasn't
+already been normalized to agree with itself.
+
+Also considered and set aside as not a fresh finding, per the agent
+research pass behind this entry: `content/fifa-world-cup.md`'s "Champions
+by titles after 2026" and `content/uefa-euro.md`'s "Champions by titles"
+sections are unparsed, unrendered duplicate tables - but this is the exact
+pattern already examined and explicitly rejected for Copa América's
+"Titles after 2024" and Ballon d'Or's "Multiple winners through 2025"
+tables (2026-07-30 entry above: verified by hand to match the generated
+`ChampionsSummary`, so a renderer would only duplicate it) - not a new gap.
+
+**Tests:** 2 new Vitest cases in `tests/unit/validate.test.ts` reproducing
+the exact bug class (a row with one too few cells, a row with one too many)
+against the fixed check - 177 total, up from 175. `pnpm lint` - 0 errors/0
+warnings/0 hints. `pnpm build` - 23 pages, unchanged. No content file
+changed (all six tables are already well-formed), so `pnpm check:pdfs` and
+`pnpm check:perf` both pass unchanged with no regeneration needed. Full
+Playwright suite unaffected for the same reason - this check only changes
+what happens on a malformed row, and no page's content or markup changed.
+
+**Left for a future pass:**
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates are unchanged.
+- This class of bug - a derived value validated against itself instead of
+  against its raw input - is worth a skeptical second look anywhere else
+  validation logic exists (e.g. `validateSourceSections()`, added last run,
+  does validate against raw extracted URLs rather than a re-derived value,
+  so it doesn't share this specific flaw, but a fresh pair of eyes on it
+  wouldn't hurt).
+
+### Three real bugs found by re-reading `src/lib/*.ts` against its own doc comments and the real content files - fixed 2026-08-10 (intensive run)
+
+Every "Required"/"Nice-to-have" capability was already shipped and the
+content-accuracy audit series had reached the diminishing-returns conclusion
+recorded in the last several entries, so this run continued the pattern from
+the prior two ("dead validation check", "source-link extraction bugs"):
+critically re-read library code against its own claims and against the real
+`content/*.md` data, rather than re-verifying a score via WebSearch. Found
+three real, previously-unnoticed bugs:
+
+1. **`extractSection()` (`src/lib/notes.ts`) silently dropped a lead-in
+   sentence whenever a note section mixed prose and a bullet list.** The
+   function built two buffers (`paragraph`, `bullets`) but returned only one
+   - bullets unconditionally won when both were non-empty. `content/index.md`'s
+   "How to use the reference" section is exactly this shape: an intro line
+   ("Each competition page contains:") followed by six bullets. Verified live
+   on the home page: readers saw six disconnected fragments ("a concise
+   introduction;", "a champions summary;"...) with no lead-in sentence, in
+   both languages (the Croatian `hr/index.astro` hand-translation has the
+   same gap, since it mirrors the same content shape). `tests/unit/notes.test.ts`'s
+   10 existing cases tested "bullets only" and "paragraph only" separately,
+   never the mixed case that actually occurs in the real content.
+   **Fix:** `NoteSection` gained an optional `intro?: string` field; when a
+   section has both a leading paragraph and bullets, both are now returned
+   instead of the paragraph being discarded. `EditorialNotes.astro` renders
+   `section.intro` (when present) as a `<p class="notes__intro">` above the
+   list, with its own small bottom margin so it doesn't run into the list.
+   `hr/index.astro`'s hand-translated section gained the matching Croatian
+   sentence ("Svaka stranica natjecanja sadrži:"). 2 new Vitest cases
+   (mixed-shape section keeps its intro; a bullets-only section leaves
+   `intro` undefined); the English and Croatian home-page Playwright cases
+   now also assert the intro sentence is visible.
+
+2. **`editionTeams()` (`src/lib/editions.ts`) never split Golden Boot's
+   "; "-separated joint-team ties, breaking the Team filter for those rows.**
+   `content/golden-boot.md`'s "Team" column legitimately holds values like
+   `"Bulgaria; Russia"` (1994, Stoichkov/Salenko's joint top-scorer award)
+   and the six-way-tie placeholder `"Multiple"` (1962, 1960, 1992, 2012,
+   2024). `editionTeams()` added the whole cell value as one string, so the
+   Team filter - one of the filters `docs/WEBSITE_REQUIREMENTS.md` explicitly
+   requires - had no standalone "Russia" option; a reader could never find
+   Oleg Salenko's 1994 award by filtering on "Russia" (only the compound
+   "Bulgaria; Russia" surfaced it, alphabetized under B), and "Multiple"
+   leaked into the dropdown as a nonsensical filter value.
+   `src/lib/compare.ts`'s own doc comment already named this exact data shape
+   as the reason Golden Boot/Ballon d'Or are excluded from the country-compare
+   feature - that reasoning was never carried over to fix the shared
+   `editionTeams()` the Golden Boot page's own filter actually uses.
+   **Fix:** `editionTeams()` now splits each team-holding cell's value on
+   `;` and adds each trimmed name individually, and a new `TEAM_TIE_PLACEHOLDER`
+   check drops the "Multiple" too-many-to-name placeholder from the team
+   list. 2 new Vitest cases (a "; "-joint tie splits into two distinct teams;
+   "Multiple" is excluded). Verified in the actual `pnpm build` output:
+   `<option value="Russia">` and `<option value="Bulgaria">` now both exist
+   on the Golden Boot page, `<option value="Bulgaria; Russia">` and
+   `<option value="Multiple">` do not, and the row's `data-teams` attribute
+   is correctly `"Bulgaria|Russia"`.
+
+3. **`distinctHosts()` (`src/lib/editions.ts`) offered Copa América's
+   "Home-and-away" host placeholder as a filterable "country".**
+   `src/lib/quiz.ts` already defines `NOT_A_HOST` (`/home-and-away|no host|not held/i`)
+   specifically because Copa América's 1975/1979/1983 rows record
+   "Home-and-away" in the host cell (no single host - a two-legged final) -
+   but that exclusion was only ever wired into the quiz's own question
+   builder, not into the shared `distinctHosts()` that every competition
+   page's actual Host filter dropdown uses. Lower severity than #1/#2 (it
+   didn't produce wrong results - selecting it correctly showed those three
+   rows - just a non-country value cluttering a country filter). **Fix:**
+   moved `NOT_A_HOST` to `src/lib/editions.ts` as a shared, exported constant
+   (closing the exact "two lists that can silently disagree" risk this
+   project's PDF-manifest fix on 2026-08-08 was written to avoid elsewhere);
+   `quiz.ts` now imports it instead of keeping its own copy; `distinctHosts()`
+   excludes it. 1 new Vitest case. Verified in the build output: the Copa
+   América page's `data-host="Home-and-away"` row attribute (used by the Year
+   filter's row matching) is untouched, but the host `<select>` no longer
+   offers a "Home-and-away" option.
+
+**Tests:** 5 new Vitest cases total (182/182, up from 177). `pnpm lint` - 0
+errors/0 warnings/0 hints. `pnpm build` - 23 pages, unchanged page count.
+No `content/*.md` file changed, so `pnpm check:pdfs` and `pnpm check:perf`
+both pass unchanged with no PDF regeneration needed. Full 314-case Playwright
+suite passing (unchanged count - these are filter/rendering fixes, not new
+UI surface).
+
+**Left for a future pass:**
+- This run closes every concrete "worth a skeptical second look" candidate
+  named by the prior two runs. A further pass in this vein would mean
+  picking a fresh `src/lib/*.ts` module (e.g. `homeCards.ts`, `i18n.ts`,
+  `offlineCache.ts`) and testing it against real edge-case content rather
+  than trusting existing test fixtures, the same method used here.
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates are unchanged.
+
+### Fixed the Golden Boot Winner/Player filter for joint-tie editions - same bug class as the Team filter, one column over (2026-08-10, intensive run)
+
+Followed up on this run's suggested next step (a fresh look at `homeCards.ts`,
+`i18n.ts`, `offlineCache.ts`) by first spawning a research agent to weigh that
+against other candidates; it found a stronger, concrete lead instead: the
+exact bug class fixed for `editionTeams()`/the Team filter earlier today
+(2026-08-10 entry above) was still present in `distinctWinners()` and the
+Winner/Player filter, one column over.
+
+`content/golden-boot.md`'s "Player(s)" column legitimately holds `"; "`-joined
+joint-tie values for 7 of its 40 rows across both tables (World Cup 1962,
+1994; EURO 1960, 1964, 1992, 2012, 2024) - e.g. 1962's six-way tie
+`"Garrincha; Vavá; Leonel Sánchez; Flórián Albert; Valentin Ivanov; Dražan
+Jerković"`. `distinctWinners()` (`src/lib/editions.ts`) added each cell as one
+opaque string, so the Winner/Player `<select>` on the Golden Boot page (both
+languages) offered the whole compound string as a single option instead of
+each name - confirmed in the built `dist/competitions/golden-boot/index.html`
+before the fix. A reader could never filter to just "Vavá" or "Oleg Salenko";
+worse, filtering to "Cristiano Ronaldo" alone silently dropped his 2012 tied
+EURO award and surfaced only his solo 2020 one, since the compound 2012 string
+never equality-matched the plain "Cristiano Ronaldo" option value.
+`tests/unit/editions.test.ts`'s `distinctWinners` block never tested a
+`;`-joined value, mirroring the exact coverage gap that let the Team-filter
+version of this bug through.
+
+**Fix:** `distinctWinners()` now splits each winner cell on `;`, trims, and
+excludes placeholder winners ("Not awarded" etc.) per split value - mirroring
+`editionTeams()`'s pattern, rewritten as a `Set` build + one alphabetical
+sort (previously a separate `seen` Set plus an array, doing the same
+dedupe/sort in a more roundabout way). `TournamentTable.astro`'s row markup
+now writes `data-winner` as a `|`-joined list of the split, trimmed names
+(matching `data-teams`'s existing pipe-separated convention) instead of the
+raw unsplit cell value, and the client-side filter match changed from
+`row.dataset.winner === winner` to `(row.dataset.winner || '').split('|').includes(winner)`
+- again mirroring the Team filter's own matching logic exactly. Non-Golden-Boot
+tables are unaffected: none of their Winner/Champion cells contain `;`, so
+splitting is a no-op and `data-winner` renders byte-identical to before.
+
+**Tests:** 2 new Vitest cases (`distinctWinners` splits a six-way and a
+two-way joint tie into individual names; a player who won both solo and
+tied in different editions, e.g. Cristiano Ronaldo's 2012 tie/2020 solo
+EURO awards, is listed once) - 184/184, up from 182. `pnpm lint` - 0
+errors/0 warnings/0 hints. `pnpm build` - 23 pages, unchanged page count.
+Verified in the rebuilt `dist/competitions/golden-boot/index.html`: `<option
+value="Vavá">` now exists standalone, the old compound-string option is
+gone, and the 2012 EURO row's `data-winner` now contains `Cristiano Ronaldo`
+as one of six pipe-separated names (previously only exact-matched the full
+compound string). Full Playwright suite (`accessibility-table-states.spec.ts`'s
+golden-boot cases specifically, plus a full run) passing - the "no-results"
+combo finder in that spec reads live `<option>`/`data-winner` values off the
+page rather than hardcoding them, so it adapted to the new per-name options
+without any test changes needed.
+
+**Left for a future pass:**
+- No further `;`-joined-value gaps are known to remain: `editionTeams()` (Team
+  filter) and `distinctWinners()` (Winner filter) are now the only two
+  functions that read Golden Boot's tie-holding columns for filter options,
+  and both split correctly.
+- The `homeCards.ts`/`i18n.ts`/`offlineCache.ts` "fresh module" suggestion from
+  the prior entry is still open if a future run wants it - this run's research
+  pass read all three against real content and found them correct and already
+  well-tested (`i18n.test.ts`, `offlineCache.test.ts`), aside from `homeCards.ts`
+  itself still lacking a dedicated unit test file (only exercised indirectly
+  via the home-page Playwright specs).
+
+### Closed the `homeCards.ts` test-coverage gap named by the prior entry - added 2026-08-10 (intensive run)
+
+Followed up on the standing "fresh module" suggestion: `homeCards.ts` was the
+one library module with no dedicated unit test file, only ever exercised
+indirectly through the home-page Playwright specs.
+
+Before writing tests, re-checked `buildChampionsSummary()` (`src/lib/editions.ts`)
+against the real Golden Boot content as a candidate bug, since it groups each
+edition's raw `edition.winner` cell value into the champions leaderboard
+without splitting `"; "`-joined joint ties the way `distinctWinners()`/
+`editionTeams()` do for their filters - e.g. the EURO table's 1962/2012/2024
+multi-player ties. This looked like the same bug class fixed three times
+already today, and would have made Cristiano Ronaldo's EURO 2012 tie +
+2020 solo award count as two champions instead of one two-time champion.
+**Turned out not to be a bug**: both `golden-boot.astro` pages (English and
+Croatian) pass the Champions Summary component an explicit, deliberate
+description - "Tied top scorers are counted as the joint entry shown in the
+table, exactly as the source lists them." - so grouping by the whole
+compound tie string is the documented, intended behavior for this specific
+leaderboard, unlike the Team/Winner *filters* (which do need per-name
+splitting so a reader can filter to one name). Reverted the speculative
+change before it was committed; no `src/lib/editions.ts` change went in this
+run. Worth recording so a future pass doesn't re-investigate the same lead.
+
+Wrote `tests/unit/homeCards.test.ts` (6 new Vitest cases) for `buildHomeCards()`:
+card order/count matches `HomeCompetitions`, each card's `editions`/`topChampion`
+come from its own competition data (not a shared default), `topChampion` is
+`undefined` when a competition has no champions yet, `statLabel` ("Most
+awards") is set only for the two individual-award cards (Ballon d'Or, Golden
+Boot) and unset for the four team competitions, English/Croatian locales
+swap title/blurb text without changing the underlying numbers, and every
+card gets a distinct accent color plus a `withBase()`-built href. Testing
+`buildHomeCards()` directly (rather than only through Playwright) required a
+`vi.mock('astro:content', ...)` stub, since `homeCards.ts` also imports
+`loadCompetition` from `./competition` at module scope for
+`loadHomeCompetitions()`, and that module imports `astro:content` - even
+though `buildHomeCards()` itself never touches it. That's the reason no one
+had written this test file before.
+
+**Tests:** 190/190 (up from 184 - the 6 new `homeCards.test.ts` cases).
+`pnpm lint` - 0 errors/0 warnings/0 hints. `pnpm build` - 23 pages, unchanged.
+No `src/lib/*.ts` or `content/*.md` file changed, so `pnpm check:pdfs` and
+`pnpm check:perf` both pass unchanged and the full Playwright suite is
+unaffected.
+
+**Left for a future pass:**
+- `i18n.ts` and `offlineCache.ts` were already confirmed correct and tested
+  in the prior run; `homeCards.ts` is now the last of that trio covered too.
+  A further "fresh module" pass would mean picking a different `src/lib/*.ts`
+  file not yet covered by this method (e.g. `jsonLd.ts`'s `buildChampionsItemList`
+  already has a test file, but `competition.ts`'s `loadCompetition`/`loadPageMeta`
+  and `countries.ts`'s `summaryGroupFor` have never been read against real
+  content the way `editions.ts` was in the last several runs).
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates are unchanged.
+
+### Closed the `competition.ts`/`countries.ts`/`url.ts` test-coverage gap named by the prior entry - added 2026-08-10 (intensive run)
+
+The prior run's "Left for a future pass" note named `competition.ts`'s
+`loadCompetition()`/`loadPageMeta()`/`firstParagraph()` and `countries.ts`'s
+`summaryGroupFor()` as the two `src/lib/*.ts` modules never read against real
+content the way `editions.ts` was in several earlier runs (which found three
+real bugs). This run closed that gap, plus a third module found the same way
+while auditing: `url.ts`'s `withBase()`/`absolutePageUrl()`, used on every
+page for hrefs/canonical URLs/JSON-LD but likewise never covered by a
+dedicated test.
+
+Traced `firstParagraph()` (the private helper behind both `loadCompetition()`
+and `loadPageMeta()`'s `intro` field) against every shape actually present in
+`content/*.md`: a single-line paragraph, a hard-wrapped multi-line paragraph
+(joined with spaces - matches `content/quiz.md`'s wrapped intro), leading
+blank lines before the first heading, and two consecutive heading lines with
+no paragraph between them (matches `content/golden-boot.md`'s "# Golden Boot
+Winners" immediately followed by "# FIFA World Cup top scorers" as its next
+table heading, no intro paragraph of its own between them) - all read
+correctly. No bug was found in `firstParagraph()` itself; the function
+matches its doc comment.
+
+`url.ts`'s `withBase()` has a `|| '/'` fallback (line 8) that turned out to be
+dead code once traced: `clean` is built as `path.startsWith('/') ? path :
+'/' + path`, so it always starts with `/` and the concatenated result can
+never be an empty string - confirmed by a test asserting the empty-string and
+root-path inputs still both resolve to `'/'` via the `clean` branch, not the
+fallback. Left as-is rather than removed: it is harmless, documents the
+author's intent defensively, and removing it is a separate cleanup with no
+behavioral difference, not a bug fix.
+
+New `tests/unit/competition.test.ts` (12 cases, using the same
+`vi.mock('astro:content', ...)` stub pattern `tests/unit/homeCards.test.ts`
+established) covers `loadPageMeta()`'s front-matter/intro/notes wiring, the
+"entry not found" error message for both `loadCompetition()` and
+`loadPageMeta()`, a non-default `editionsHeading`, the "table not found"
+error message, `allowDuplicateYears` actually suppressing the duplicate-year
+validation error it's meant to (and the same table still throwing without
+it), and one live integration check against the real `docs/SOURCES.md` file
+(a real heading resolves sources, a nonexistent one returns `[]` rather than
+throwing) so the `sourcesRaw` wiring itself is exercised, not just mocked.
+New `tests/unit/countries.test.ts` (4 cases) pins the West Germany/Germany
+merge (case-insensitive, trimmed), that the other three historical-successor
+pairs named in `AGENTS.md` (Soviet Union/Russia, Czechoslovakia/Czechia,
+Yugoslavia/successors) are deliberately *not* grouped, and that any other
+name passes through as its own group with original display casing preserved.
+New `tests/unit/url.test.ts` (5 cases) covers `withBase()`'s leading-slash
+normalization and the dead-fallback finding above, plus `absolutePageUrl()`
+against both a configured `site` and the local-dev fallback (mirrors the
+`site ?? url` pattern already used by `BaseLayout.astro`/`sitemap.xml.ts`).
+
+**Tests:** 211/211 (up from 190 - 21 new cases across the three new files).
+`pnpm lint` - 0 errors/0 warnings/0 hints. `pnpm build` - 23 pages, unchanged.
+`pnpm check:perf` - all 27 pages within the 300 KB budget (heaviest:
+`hr/records` at 232.0 KB, unchanged). No `content/*.md` file changed, so
+`pnpm check:pdfs` and the full Playwright suite are unaffected.
+
+**Left for a future pass:**
+- Every `src/lib/*.ts` module now has a dedicated test file. A further "fresh
+  module" pass would need to look at component-level coverage instead (e.g.
+  confirming `EditorialNotes.astro`'s `intro` rendering, added alongside the
+  `notes.ts` fix a few runs back, has explicit Playwright assertions beyond
+  "is visible" - flagged as lower-confidence and unverified during this run's
+  scoping, worth a quick look before treating it as a real gap).
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates are unchanged.
+
+### Accessibility: first-ever automated WCAG scan of the "On this day" widget's exact-match states - added 2026-08-11 (intensive run)
+
+This run first ran down the prior entry's own flagged candidate -
+`EditorialNotes.astro`'s `intro` rendering - and confirmed it is **not** a
+real gap: both `tests/e2e/mobile.spec.ts` "How to use the reference" cases
+(English `page.getByText('Each competition page contains:')` at line ~907,
+Croatian `page.getByText('Svaka stranica natjecanja sadrži:')` at line ~1004)
+already assert the intro paragraph's actual text, not just heading
+visibility. No code or test change was needed there; recorded here so a
+future run doesn't re-open it a second time.
+
+Every required/nice-to-have capability was already shipped, content-accuracy
+had reached its own diminishing-returns point (every table double-audited),
+performance and PDF freshness both check out clean (`pnpm check:perf`,
+`pnpm check:pdfs`), and this environment's egress policy still blocks direct
+fetches to source domains (confirmed again this run: `curl` to
+en.wikipedia.org and rsssf.org both fail with a 403 CONNECT-tunnel error), so
+source-link liveness remains off the table. Went looking for a genuinely new
+angle instead and found one: `tests/e2e/accessibility.spec.ts`'s sitewide
+automated axe sweep scans every page using **whatever the real calendar date
+is when the suite runs** - which means the "On this day" widget
+(`src/components/OnThisDay.astro`) has two structurally different DOM states
+(an exact-final-date match: hint hidden, one-or-more result `<li>`s; the
+fallback archive pick: hint visible, exactly one `<li>`) and the sweep has
+essentially only ever exercised the fallback state, since a specific
+competition final or Ballon d'Or ceremony lands on only a couple dozen of the
+year's 365 days. `tests/e2e/mobile.spec.ts` already has hand-written content
+assertions for both states (added when the widget shipped), but none of them
+ran through axe.
+
+**Fix:** new tests appended to `tests/e2e/accessibility.spec.ts`, reusing its
+existing `AxeBuilder`/`formatViolations` setup. `page.clock.setFixedTime()`
+(the same pattern `mobile.spec.ts` already uses for this widget) pins the
+browser to two known exact-match dates - 30 July (the two-entry state: both
+the 1930 and 1966 World Cup finals render as separate `<li>`s) and 12
+December (the Ballon d'Or award-wording branch, "won the award" instead of
+"won the final") - then scans just `.on-this-day` (`.include()`, keeping the
+scan focused on the widget rather than re-running the whole-page sweep) on
+both the English and Croatian home pages, under both light and dark color
+schemes (8 new cases total). **No violations found** in any of the 8
+combinations - this is a coverage-gap closure, not a bug fix, matching the
+same "closes a concrete, previously-unexercised DOM state" shape as the
+`TournamentTable`/theme-toggle/print-media audits earlier in this file,
+several of which did turn up real bugs but this one didn't.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (211/211) and `pnpm lint` is clean (0 errors/0 warnings/0 hints).
+Full Playwright suite: 322/322 (up from 314 - the 8 new cases), including the
+unchanged whole-page WCAG sweep and the existing hand-written "On this day"
+content assertions. `pnpm build` unchanged (23 pages); `pnpm check:perf`
+(all pages within the 300 KB budget, heaviest unchanged at `hr/records`
+232.0 KB) and `pnpm check:pdfs` (all six PDFs up to date) both pass - no
+`content/*.md` file changed this run.
+
+**Left for a future pass:**
+- With the "On this day" widget's exact-match states now covered, no other
+  component is known to have a similarly date/state-gated DOM that the
+  sitewide sweep might be silently skipping - worth a quick scan for that
+  pattern specifically (any component whose rendered structure depends on
+  the build/request date or another external condition, not just a URL
+  filter param) before assuming there is nothing left to check there.
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment, reconfirmed again this run)
+  candidates are unchanged.
+
+### Quality pass: theme-token single-source-of-truth refactor, plus a regression test for the drift class that already bit `--danger` - added 2026-08-11 (intensive run)
+
+Followed up on the prior entry's own flagged lead ("no other component is
+known to have a similarly date/state-gated DOM... worth a quick scan for
+that pattern"). A scan of every `Date`/`new Date()` call site in
+`src/components/*.astro` and `src/pages/**/*.astro` confirmed that lead is
+closed - `References.astro`, `about/sources.astro` (both locales) and
+`Footer.astro` only format text into an unchanged element, none branch DOM
+*structure* the way `OnThisDay.astro` does. That scan surfaced a different,
+real gap instead: `src/styles/global.css` resolved its color tokens
+(`--bg`, `--text`, `--danger`, etc.) via **four separately hand-maintained
+blocks** - the `:root` light default, the `@media (prefers-color-scheme:
+dark)` block, `:root[data-theme='light']`, and `:root[data-theme='dark']` -
+each repeating the same ~11 literal hex values. The file's own comment on
+`--danger` already documents that this exact duplication caused a real bug
+once: a contrast fix (the WCAG-failing ~2.65:1 red) landed in the
+media-query block but not the matching `[data-theme='dark']` block, so a
+reader who let the OS pick dark mode got the fixed color while a reader who
+explicitly clicked the toggle to dark did not. Test coverage for the two
+*mechanisms* was asymmetric in the same way: the sitewide axe sweep
+(`accessibility.spec.ts`) only ever emulates `prefers-color-scheme`, while
+`accessibility-theme-toggle.spec.ts` only drives the live `data-theme` click
+path on the English/Croatian home pages - nothing asserted the two
+mechanisms actually produce the *same* colors anywhere.
+
+**Fix:** `src/styles/global.css`'s `:root` block now defines each theme's
+values exactly once, as `--light-*`/`--dark-*` constants (e.g. `--light-bg`,
+`--dark-bg`). The three resolution blocks (media-query default,
+`[data-theme='light']`, `[data-theme='dark']`) now only ever assign
+`var(--light-*)`/`var(--dark-*)` to the real tokens components read - never
+a literal color - so a future contrast fix can miss a block by omission
+(still possible, CSS has no cross-block `@media`+attribute-selector "OR")
+but can no longer silently apply to one block's *copy* of a value and leave
+another's stale, which is what actually happened before. New
+`tests/e2e/theme-token-parity.spec.ts` (2 cases) reads
+`getComputedStyle(document.documentElement)` for all 12 tokens under two
+independent browser contexts per case - OS `colorScheme: 'dark'` with no
+toggle interaction vs. OS `colorScheme: 'light'` with the toggle clicked to
+force `data-theme='dark'` (and the mirror pair for light) - and asserts the
+two token sets are identical. This test would have caught the original
+`--danger` drift; it's a regression guard for the drift *class*, not a
+one-off fix.
+
+**Tests:** Vitest unchanged (211/211 - no `src/lib/*.ts` logic changed).
+`pnpm lint` - 0 errors/0 warnings/0 hints. `pnpm build` - 23 pages,
+unchanged. Full Playwright suite: 324/324 (up from 322 - the 2 new parity
+cases), including the existing whole-page WCAG sweep and the theme-toggle
+click-path suite, confirming the refactor is computed-value-identical to
+the pre-refactor CSS (same colors, same specificity resolution order) for
+every page exercised. `pnpm check:perf` (all pages within the 300 KB
+budget, heaviest unchanged at `hr/records` ~233 KB) and `pnpm check:pdfs`
+(all six PDFs up to date) both pass - no `content/*.md` file changed this
+run.
+
+**Left for a future pass:**
+- Extend `accessibility-theme-toggle.spec.ts`'s live-click axe coverage
+  beyond the home page to a representative competition page and `/quiz`,
+  so contrast-sensitive dynamic states (table `is-winner` highlighting,
+  quiz `is-correct`/`is-incorrect`) get scanned via the actual toggle click
+  path, not only via `colorScheme` emulation on the main sweep. Scoped and
+  ready to pick up; not done this run to keep this pass focused on the
+  token-duplication fix itself.
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates are unchanged.
+
+### Accessibility: theme-toggle live-click coverage extended to a competition page and `/quiz`, plus a real dark-mode contrast bug it found and fixed - added 2026-08-11 (intensive run)
+
+Closed the exact gap the prior entry's "Left for a future pass" note named:
+`accessibility-theme-toggle.spec.ts` had only ever driven the real
+click-then-`data-theme` path against the home page, which has neither a
+`TournamentTable` (`is-winner` highlighted cells) nor a quiz card
+(`is-correct`/`is-incorrect` feedback) - so those two contrast-sensitive
+dynamic states had only ever been scanned via `accessibility.spec.ts`'s
+`colorScheme` emulation, never via an actual toggle click. Two new test
+cases: `/competitions/world-cup` (chosen as the one table with the full
+winner/year/host/team/sort filter set, same "representative table"
+reasoning `accessibility-table-states.spec.ts` already uses) clicks the
+toggle to dark, confirms an `is-winner` cell is visible, and runs axe both
+ways; `/quiz` clicks the toggle to dark, answers two choice cards (one right,
+one deliberately wrong, same pattern `accessibility-quiz-states.spec.ts`
+already uses) to produce both feedback classes, and runs axe.
+
+**The World Cup case passed; the quiz case did not** - a real
+`color-contrast` violation, not a flake: `#quiz-restart` ("Restart quiz")
+rendered black text (`#000000`) on the dark theme's `#1e2b3d` background
+(1.46:1, WCAG AA requires 4.5:1). Root cause: `#quiz-restart` was the one
+interactive button in the codebase missing an explicit `color` declaration -
+every other button (`.quiz-card__check`, `.filters__reset`, `.compare__swap`,
+`ThemeToggle`'s own button) sets `color: var(--text)` or
+`var(--accent-contrast)` explicitly, but `#quiz-restart` only set
+`background: var(--bg-subtle)`, leaving text color to the browser's native
+`ButtonText` default. That default happens to track Playwright's *emulated*
+`colorScheme` (so the existing `colorScheme: 'dark'` test in
+`accessibility-quiz-states.spec.ts` never saw a problem - the OS-level dark
+preference gave the button light-on-dark UA colors for free) but does
+**not** track this site's own click-driven `data-theme` attribute, which
+only repaints CSS custom properties, not native form-control defaults - so a
+reader who explicitly clicks the toggle (rather than relying on OS
+preference) got the broken black-on-dark button. This is the same root
+cause class the immediately preceding entry's regression test targeted -
+OS-emulation coverage and real-click coverage silently diverging - just
+surfacing as a genuine WCAG violation instead of a token-value mismatch, and
+in exactly the place that entry's own scan didn't look (an unstyled UA
+default, not a CSS custom property).
+
+**Fix:** added `color: var(--text);` to `#quiz-restart` in both
+`src/pages/quiz.astro` and `src/pages/hr/quiz.astro` (the Croatian page has
+its own copy of the same rule) - matching every other button's existing
+pattern, not a new one. No other button in the codebase was missing `color`
+(checked every `cursor: pointer` rule site-wide).
+
+**Tests:** the two new live-click cases (2, both now passing) plus the
+existing 3 theme-toggle cases: 5/5. Full Playwright suite: 326/326 (up from
+324). Vitest unchanged (211/211 - no `src/lib/*.ts` logic changed).
+`pnpm lint` - 0 errors/0 warnings/0 hints. `pnpm build` - 23 pages,
+unchanged. `pnpm check:perf` and `pnpm check:pdfs` both pass - no
+`content/*.md` file changed this run (a component-CSS fix, not editorial
+content).
+
+**Left for a future pass:**
+- The other named lead from the prior entry - the standing content-accuracy
+  (third-pass, low-yield) and source-link liveness (infeasible in this
+  environment) candidates - is unchanged.
+- No other live-click/OS-emulation divergence is known, but this is now the
+  second time that exact class of bug has surfaced in two consecutive runs
+  (a CSS-token duplication, then a missing-`color` native-control default) -
+  worth keeping in mind as a recurring risk category if a future pass adds
+  more toggle-adjacent or native-form-control-heavy UI.
+
+### Content-accuracy pass: FIFA World Cup Third/Fourth-place - first-ever second independent cross-check, no discrepancies - added 2026-08-11 (intensive run)
+
+Every backlog item and required/nice-to-have capability was already closed
+going into this run, so per this routine's fallback instruction this
+continued the standing content-accuracy series. Picked the one lead the
+file's own "Left for a future pass" notes had named repeatedly but never
+closed: the "Third"/"Fourth / other semifinalist" columns in
+`content/fifa-world-cup.md` had only ever had their first audit pass
+(2026-08-04) - every other core column pair on the World Cup page
+(Champion/Runner-up/Final-score, Host(s)/Teams, Final date) already had a
+second independent cross-check on record, but Third/Fourth did not, a gap
+first flagged on 2026-08-08 and repeated unresolved in several entries
+since.
+
+Re-verified all 23 editions (1930-2026) via three parallel WebSearch passes
+split by era (1934-1962, 1966-1994, 1998-2022), plus two dedicated searches
+for the 1930 (no third-place match played) and 1950 (final round-robin
+group table) format edge cases and one for the 2026 bronze match,
+deliberately drawing from a source mix distinct from the first pass (ESPN,
+plus.fifa.com, athlet.org, beIN Sports, Liquisearch): this pass used NBC
+Bay Area, Yahoo Sports, soccergraph.com, chaseyoursport.com,
+getmoresports.com, RSSSF, sport-histoire.fr, Grokipedia, and Al Jazeera.
+
+**No discrepancies found across any of the 23 editions.** Every row already
+on the page - including every third-place match decided by a routine
+scoreline and the two structural edge cases - matched independently. 1930's
+United States/Yugoslavia ranking (no match was ever played; FIFA's later
+technical-committee ranking is the only source, and remains a genuine
+historian's dispute rather than a settled fact - already the framing used
+in the page's own "Editorial notes") and 1950's Sweden/Spain positions
+(re-derived from the full four-team final-group points table: Uruguay 5,
+Brazil 4, Sweden 2, Spain 1) were both independently reconfirmed rather
+than merely trusted. The 2026 bronze match (England 6-4 France) was also
+reconfirmed by this distinct source mix, matching the row already on the
+page and the earlier 2026-08-04 result-specific audit.
+
+See `docs/SOURCES.md`'s new "Third/fourth-place second independent
+cross-check" entry under FIFA World Cup for the full citation list.
+`content/fifa-world-cup.md`'s `lastReviewed` moved to 2026-08-11; `status`
+stays `review` (secondary sources, same reasoning as every prior
+secondary-sourced audit in this file). No table data changed - the only
+file changes are the `lastReviewed` bump and the new source citations.
+Since this page's `lastReviewed` date is pinned by an exact-match
+Playwright assertion (`tests/e2e/mobile.spec.ts`), that test's expected
+value was updated alongside the content change (2026-08-09 -> 2026-08-11).
+
+Bumping `lastReviewed` changed `content/fifa-world-cup.md`'s SHA-256, which
+`pnpm check:pdfs` correctly flagged as making `public/downloads/world-cup.pdf`
+(and, since `docs/SOURCES.md` is a shared dependency of every competition
+PDF, all six PDFs) stale. Regenerated all six PDFs and the manifest via
+`PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`; `pnpm
+check:pdfs` now passes cleanly.
+
+This closes the "second independent cross-check" series for every core
+column on the FIFA World Cup page (Champion/Runner-up/Final-score,
+Host(s)/Teams, Final date, and now Third/Fourth) - the World Cup joins Copa
+América (whose Format column got the same closing treatment on 2026-08-08)
+as fully covered by at least two independent passes on every column its
+table tracks.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (211/211) and `pnpm lint` is clean (0 errors/0 warnings/0 hints).
+`pnpm build` - 23 pages, unchanged. Full Playwright suite: 326/326, with the
+one intentional update noted above (the World Cup page's pinned
+`lastReviewed` date). `pnpm check:perf` (all pages within the 300 KB
+budget, heaviest unchanged at `hr/records` ~234.8 KB) and `pnpm check:pdfs`
+(all six PDFs regenerated and up to date) both pass.
+
+**Left for a future pass:**
+- EURO's "Other semifinalist" / "Other semifinalist / fourth" columns and
+  Nations League's "Third"/"Fourth" columns are each still on only their
+  first audit pass (2026-08-04), and Copa América's third/fourth-place data
+  is still on its own first pass too (2026-08-02, a different column from
+  the Format column that got its second pass on 2026-08-08) - the same gap
+  this run closed for World Cup is the natural next candidate, one
+  competition at a time.
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates are unchanged.
+
+### Content-accuracy pass: UEFA EURO "Other semifinalist" columns - full audit closed - added 2026-08-11 (intensive run)
+
+Every backlog item and required/nice-to-have capability was already closed
+going into this run, so per this routine's fallback instruction this
+continued the standing content-accuracy series, closing the exact gap the
+previous entry's "Left for a future pass" note named: EURO's "Other
+semifinalist" / "Other semifinalist / fourth" columns were still on only
+their first audit pass (2026-08-04), and that first pass itself only ever
+covered 6 of the table's 17 editions - the six 1960-1980 editions that
+played an actual third-place match under the old 4-team format. The other
+eleven editions (1984-2024), where UEFA does not rank the two defeated
+semifinalists, had never had their team names independently re-verified at
+all - the 2026-08-04 entry only established that there was no ranking to
+audit, not that the two names themselves were correct.
+
+Two parallel WebSearch research passes closed both gaps in the same run:
+
+- **1960-1980 (6 editions), second independent cross-check:** re-verified
+  the third-place play-off winner/loser and score for all six editions,
+  deliberately drawing from a source mix distinct from the first pass
+  (which leaned on UEFA.com and eu-football.info/11v11): this pass used
+  Wikipedia tournament articles, RSSSF, worldfootball.net, 11v11.com,
+  national-football-teams.com, and football-history retrospectives (World
+  Soccer magazine, Soccer Nostalgia).
+- **1984-2024 (11 editions), first-ever verification:** confirmed the two
+  teams recorded as eliminated in each edition's semifinals match the
+  actual semifinal results, checked as an unordered pair since the column
+  intentionally carries no ranking for this era (per the page's own
+  "Historical format note") - verified against Wikipedia knockout-stage/
+  final articles, UEFA.com, worldfootball.net, and press coverage.
+
+**No discrepancies found across any of the 17 editions.** Every 1960-1980
+third-place result - including the two extra-time deciders (1964, 1976)
+and 1980's penalty shoot-out (Czechoslovakia beat host Italy 9-8) - matched
+both this pass and the first. Every 1984-2024 semifinalist pair, including
+every penalty-shootout and golden-goal-decided semifinal along the way,
+matched the page exactly.
+
+See `docs/SOURCES.md`'s expanded UEFA EURO section for the full 19-source
+citation list. `content/uefa-euro.md`'s `lastReviewed` moved to 2026-08-11;
+`status` stays `review` (secondary sources, same reasoning as every prior
+secondary-sourced audit in this file). No table data changed - the only
+file changes are the `lastReviewed` bump and the new source citations.
+Confirmed no Playwright test pins an exact `lastReviewed` value for the
+EURO page (unlike the World Cup page), so no test needed updating for the
+date bump.
+
+Bumping `lastReviewed` changed `content/uefa-euro.md`'s SHA-256, which
+`pnpm check:pdfs` correctly flagged as making `public/downloads/euro.pdf`
+(and, since `docs/SOURCES.md` is a shared dependency of every competition
+PDF, all six PDFs) stale. Regenerated all six PDFs and the manifest via
+`PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`; `pnpm
+check:pdfs` now passes cleanly again.
+
+This closes the "second independent cross-check" series for every core
+column on the UEFA EURO page (Champion/Runner-up/Final-score, Host(s)/
+Teams, Final date, and now the semifinalist columns) - EURO joins Copa
+América and FIFA World Cup as fully covered by at least two independent
+passes (or, for the 1984-2024 semifinalist names, a first genuinely
+dedicated pass) on every column its table tracks.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite
+is unchanged (211/211) and `pnpm lint` is clean (0 errors/0 warnings/0
+hints). `pnpm build` - 23 pages, unchanged. Full Playwright suite
+unchanged (326/326 - a `lastReviewed` bump has no pinned assertion for
+this page). `pnpm check:perf` (all pages within the 300 KB budget) and
+`pnpm check:pdfs` (all six PDFs regenerated and up to date) both pass.
+
+**Left for a future pass:**
+- Nations League's "Third"/"Fourth" columns and Copa América's third/
+  fourth-place data are each still on only their first audit pass
+  (2026-08-02/2026-08-03 respectively) - the same gap this run closed for
+  EURO is the natural next candidate, one competition at a time.
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates are unchanged.
+
+### Content-accuracy pass: Copa América Third/Fourth-place - first-ever second independent cross-check, no discrepancies - added 2026-08-11 (intensive run)
+
+Every backlog item and required/nice-to-have capability was already closed
+going into this run, so per this routine's fallback instruction this
+continued the standing content-accuracy series, picking up the exact gap
+the previous entry's "Left for a future pass" note named alongside Nations
+League: Copa América's "Third"/"Fourth" columns in `content/copa-america.md`
+had only ever had their first audit pass (2026-08-02, itself split across
+three entries - the knockout-final era, the 1989/1991 closing groups, and
+the full pre-1975 league-table era) - every other column on the page
+(Champion/Runner-up/Final-score, Format, Host) already had a second
+independent cross-check on record, but Third/Fourth did not.
+
+Re-verified all 45 editions that carry a placing (1916 through 2024,
+including both 1959 tournaments; the three Home-and-away finals and 1925's
+missing fourth place are correctly excluded, since there is nothing to
+verify there) via four parallel WebSearch passes split by era: 1916-1929
+(12 editions), 1935-1967 including both 1959s (17 editions), 1987/1989/1991
+(3 editions - the knockout-final transition plus the two closing-group
+years), and 1993-2024 (13 editions). Deliberately drew on a source mix
+distinct from the 2026-08-02 first pass (which leaned on RSSSF and
+Wikipedia): worldfootball.net, athlet.org, footballdatabase.eu,
+topendsports.com, besoccer.com, soccer365.net, Transfermarkt, 11v11.com,
+betexplorer.com, resultados-futbol.com, AFA/AUF official histories, Memoria
+Chilena, and press/wire coverage (CBC, BBC, CTV/TSN, China Daily/Xinhua,
+Yahoo Sports).
+
+**No discrepancies found across any of the 45 editions.** Every placing
+already on the page held up under independent re-verification, including
+the trickiest cases:
+
+- **1922's Uruguay-withdrawal ruling** - Brazil, Paraguay, and Uruguay
+  finished level on points and goal difference, but Uruguay withdrew from
+  the resulting three-way title playoff in protest at refereeing decisions,
+  finishing third by elimination rather than by table tiebreak - reconfirmed
+  against an independent source mix (not just the first pass's sources).
+- **1989 and 1991's closing-group tiebreaks** - re-derived match-by-match
+  from all six games in each four-team closing group (not just trusted as a
+  summary standings claim) and cross-checked against the won/drawn/lost
+  and goal-difference figures already in the page's editorial notes; both
+  reconciled exactly.
+- **Both flagged upsets** - Honduras' 5-4 penalty-shootout win over Uruguay
+  for third in 2001, and Uruguay's 4-3 penalty-shootout win over Canada for
+  third in 2024 - independently reconfirmed with exact scorelines from wire
+  coverage (Transfermarkt's match sheet, CTV News).
+
+See `docs/SOURCES.md`'s expanded Copa América section (new "Third/
+fourth-place second independent cross-check" entry) for the full per-era
+citation list. `content/copa-america.md` gained one new prose paragraph in
+the "Important editorial warning" section documenting this second pass, in
+the same style as the existing Format-column and Champion/Runner-up
+second-cross-check paragraphs already there; `lastReviewed` moved to
+2026-08-11. `status` stays `review` (secondary sources, same reasoning as
+every prior secondary-sourced audit in this file). No table data changed -
+the only file changes are the new content-file paragraph, the
+`lastReviewed` bump, and the new `docs/SOURCES.md` citations. Confirmed no
+Playwright test pins an exact `lastReviewed` value for the Copa América
+page, so no test needed updating for the date bump.
+
+Bumping `lastReviewed` changed `content/copa-america.md`'s SHA-256, which
+`pnpm check:pdfs` correctly flagged as making `public/downloads/copa-america.pdf`
+(and, since `docs/SOURCES.md` is a shared dependency of every competition
+PDF, all six PDFs) stale. Regenerated all six PDFs and the manifest via
+`PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`; `pnpm
+check:pdfs` now passes cleanly again.
+
+This closes the "second independent cross-check" series for every core
+column on the Copa América page (Champion/Runner-up/Final-score, Format,
+and now Third/Fourth) - Copa América joins FIFA World Cup and UEFA EURO as
+fully covered by at least two independent passes on every column its table
+tracks.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (211/211) and `pnpm lint` is clean (0 errors/0 warnings/0 hints).
+`pnpm build` - 23 pages, unchanged. `pnpm check:perf` (all pages within the
+300 KB budget) and `pnpm check:pdfs` (all six PDFs regenerated and up to
+date) both pass. The Playwright suite was kicked off for this pass (a
+prose-only content change with no assertion anywhere in the suite pinned to
+the new paragraph's text, byte count, or the `lastReviewed` date); see the
+next entry or this run's commit history for its result if it finished
+before this file was written.
+
+**Left for a future pass:**
+- Nations League's "Third"/"Fourth" columns remain on only their first audit
+  pass (2026-08-03) - now the last team-competition column on the site
+  without a second independent cross-check, and the natural next candidate.
+- The standing content-accuracy (third-pass, low-yield) and source-link
+  liveness (infeasible in this environment) candidates are unchanged.
+
+### Content-accuracy pass: UEFA Nations League Third/Fourth-place - second independent cross-check, no discrepancies - added 2026-08-12 (intensive run)
+
+Every backlog item and required/nice-to-have capability was already closed
+going into this run (per every entry above since 2026-08-09), so per this
+routine's fallback instruction this continued the standing content-accuracy
+series, closing the exact gap the previous entry's "Left for a future pass"
+note named: Nations League's "Third"/"Fourth" columns in
+`content/uefa-nations-league.md` were the last team-competition Third/
+Fourth-place data on the site still on only a first audit pass
+(2026-08-04, UEFA.com + ESPN) - Copa América, EURO, and World Cup had all
+already had their own second independent cross-check.
+
+Re-verified all four completed editions (2018-19 through 2024-25) via
+WebSearch, using a source mix deliberately distinct from the 2026-08-04
+pass: each edition's dedicated Wikipedia Finals article, plus Sky Sports
+(2019), theScore (2021), Sports Mole (2023), and BBNTimes (2025) - UEFA.com
+and ESPN were intentionally avoided as repeat sources.
+
+**No discrepancies found across any of the four editions.** Every Third/
+Fourth pairing already on the page matches exactly: England beat
+Switzerland 6-5 on penalties after a 0-0 draw (2019), Italy beat Belgium
+2-1 (2021), Italy beat the Netherlands 3-2 (2023), and France beat host
+Germany 2-0 (2025).
+
+`docs/SOURCES.md` gained a "Third-place match second independent
+cross-check" entry under UEFA Nations League (8 new links). `lastReviewed`
+moved to 2026-08-12; `status` stays `review` (secondary sources, same
+reasoning as every prior secondary-sourced audit in this file). No table
+data changed - the only file changes are the `lastReviewed` bump and the
+new `docs/SOURCES.md` citations.
+
+This closes the "second independent cross-check" series for every core
+column on every team competition's page (Champion/Runner-up/Final-score,
+Format where applicable, Host, and Third/Fourth) across FIFA World Cup,
+UEFA EURO, UEFA Nations League, and Copa América.
+
+Bumping `lastReviewed` changed `content/uefa-nations-league.md`'s SHA-256,
+which `pnpm check:pdfs` correctly flagged as making
+`public/downloads/nations-league.pdf` (and, since `docs/SOURCES.md` is a
+shared dependency of every competition PDF, all six PDFs) stale.
+Regenerated all six PDFs and the manifest via
+`PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`; `pnpm
+check:pdfs` now passes cleanly again.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (211/211) and `pnpm lint` is clean (0 errors/0 warnings/0 hints).
+`pnpm build` - 23 pages, unchanged. `pnpm check:perf` (all pages within the
+300 KB budget) and `pnpm check:pdfs` (all six PDFs regenerated and up to
+date) both pass.
+
+**Left for a future pass:**
+- Every team-competition Third/Fourth-place (and Champion/Runner-up/
+  Final-score, Format, Host) column across all four team competitions now
+  has at least two independent audit passes on record. Remaining
+  content-accuracy candidates are all third-pass (low-yield, since a first
+  and second pass already agree) or infeasible in this environment
+  (source-link liveness checks, which need live outbound HTTP the sandbox
+  doesn't allow).
+- Note: Ballon d'Or's ceremony dates are **not** an open item - the
+  2026-08-04 entry already gave them a second source, and two later entries
+  (2026-08-06, 2026-08-09) already flagged this exact "left for a future
+  pass" note as a stale repeat. Recorded here a third time so it stops
+  resurfacing.
+- With the content-accuracy series now essentially exhausted, a future run
+  should look toward a fresh angle outside it, per the reasoning the
+  2026-08-09 entry above already laid out (accessibility/performance
+  coverage is extensive already; a genuinely new angle is the better use of
+  a run than a low-yield third accuracy pass).
+
+### Bug fix: all six Croatian PDF downloads silently served English content - added 2026-08-12 (intensive run)
+
+Following the previous entry's steer toward a genuinely new angle (the
+content-accuracy series is exhausted), this run looked at the downloadable
+PDFs from the angle no prior audit had covered: whether the *localized*
+pages' own download links actually deliver localized PDFs. They didn't.
+
+**The bug:** every one of the six Croatian competition/award pages
+(`src/pages/hr/competitions/*.astro`) renders a `PrintDownloadLink` with the
+Croatian button label "Preuzmi PDF za ispis" ("Download printable PDF"), but
+each one passed the same `slug` as its English counterpart (e.g.
+`slug="world-cup"`), so the link's `href` pointed at
+`/downloads/world-cup.pdf` - the English-only PDF, rendered from the English
+page. A Croatian reader who clicked the button and printed or opened the
+file got English column headers, filter labels, and prose, with no
+indication anything had switched languages. `scripts/pdf-pages.mjs` /
+`scripts/generate-pdfs.mjs` only ever built the original six PDFs (one per
+English page), never a Croatian counterpart. This is the same "Croatian
+readers silently get English content" bug class already fixed twice before
+in this project (the nav/offline-cache fallback, 2026-08-07; the
+champions-bar screen-reader label, 2026-08-07) - just a third, previously
+unaudited instance of it. `tests/e2e/mobile.spec.ts` had actually codified
+the bug as correct behavior: every "offers a downloadable print PDF with the
+translated label" test on a Croatian page asserted a Croatian label paired
+with an *English* PDF filename, and the Croatian EURO page had no PDF-link
+test at all.
+
+**The fix:** `scripts/pdf-pages.mjs`'s shared `PDF_PAGES` list (the single
+source of truth `scripts/generate-pdfs.mjs` and `scripts/check-pdf-freshness.mjs`
+both already build from - see the 2026-08-08 entry on why it exists) gained
+six new entries, one per Croatian page, each pointing at the real `/hr/...`
+page path with a `-hr` slug suffix (`world-cup-hr`, `euro-hr`,
+`nations-league-hr`, `copa-america-hr`, `ballon-dor-hr`, `golden-boot-hr`) -
+same underlying `content/*.md` source files as their English counterparts
+(content stays English-only per `AGENTS.md`; only each `/hr/` page's own
+chrome is translated, same as the live HTML already works), but a distinct
+rendered page so the PDF actually carries the Croatian labels/headers that
+page shows. Each of the six Croatian `.astro` pages' `PrintDownloadLink` now
+passes the matching `-hr` slug. Regenerated all 12 PDFs (`pnpm build &&
+pnpm build:pdfs`, `PW_EXECUTABLE_PATH=<preinstalled Chromium>`) - the
+original six are byte-for-byte the English pages as before, plus six new
+genuinely Croatian PDFs. `pnpm check:pdfs` passes cleanly against the new
+12-entry manifest.
+
+Fixed the five existing Playwright PDF-link assertions to expect the `-hr`
+filename instead of the English one, and added the missing sixth test (the
+Croatian EURO page's PDF download had never been covered at all). Also
+updated `docs/ADDING_CONTENT.md`'s PDF-regeneration note to mention there
+are 12 PDFs (six pages × two languages), not six.
+
+**Tests:** no library code under `src/lib` changed, so the full Vitest suite
+is unchanged (211/211) and `pnpm lint` is clean (0 errors/0 warnings/0
+hints). `pnpm build` - 23 pages, unchanged. `pnpm check:pdfs` passes against
+the new 12-PDF manifest. Full Playwright suite: **327/327** (up from 326 -
+the six changed PDF-link assertions plus the one newly-added Croatian EURO
+PDF test), run against the rebuilt site with `PW_EXECUTABLE_PATH` pointed at
+the preinstalled Chromium.
+
+**Left for a future pass:** every downloadable PDF on the site now matches
+the language of the page that links to it. The PDF files themselves remain
+untagged (no `/StructTreeRoot`/`/MarkInfo` - not a full PDF/UA-accessible
+document), which Playwright's print-to-PDF path doesn't straightforwardly
+support fixing; flagged as a real but separately-scoped candidate, not
+addressed here. Source-link liveness remains infeasible in this environment
+(WebFetch 403s on every host tried), per prior runs' notes - unchanged.
+
+### Tooling: first-ever internal link integrity check, closes a real blind spot in the existing perf checker - added 2026-08-12 (intensive run)
+
+Following the two previous entries' steer toward a fresh angle outside the
+now-exhausted content-accuracy series, this run looked at a class of bug
+nothing on the site had ever checked for: a stale or mistyped internal
+`href`/`src` - a nav link, footer link, home-page card, cross-link between
+pages, PDF download link, canonical/hreflang tag, or same-page fragment
+target (e.g. the skip-link's `href="#main"`) - that would silently 404 or
+land nowhere for a real reader. This is the same "does the feature actually
+work end-to-end" angle the immediately preceding entry (the Croatian PDF
+bug) used, just aimed at links instead of downloads.
+
+**New `scripts/check-internal-links.mjs`** (`pnpm check:links`, modeled
+directly on `scripts/check-page-weight.mjs`'s shape: pure, exported,
+independently-tested functions plus a thin `main()`): walks every
+`dist/**/*.html`, extracts every `href`/`src` attribute value
+(`extractLinks`), classifies each as a same-page `fragment`, `internal`
+(base-path-relative or an absolute same-site URL - both forms this site
+actually emits, e.g. in canonical/hreflang/JSON-LD tags), or out-of-scope
+`external`/`skip` (`classifyLink`), and for every internal link resolves it
+against Astro's `format: 'directory'` output (`candidateDistPaths`: an
+extensionless path is a directory with its own `index.html`; an asset path
+like `.pdf`/`.css`/`.xml`/`.webmanifest` is a file) to confirm a real file
+exists. Fragment links are checked against the same page's own `id`
+attributes, so a skip-link or in-page anchor pointing at a renamed/removed
+`id` is caught too - the identical "silently broken for one specific reader"
+bug class as a 404 link, just for keyboard/screen-reader users. External
+(third-party) links are intentionally out of scope, for the same reason
+every content-accuracy audit in this file already notes: this environment's
+egress policy blocks outbound WebFetch/HTTP to third-party hosts, so there's
+no way to verify those resolve from this sandbox.
+
+**A real, if minor, blind spot this closes in existing tooling:**
+`scripts/check-page-weight.mjs`'s `measurePage()` resolves each page's CSS
+refs via `resolveDistAsset()` but silently treats a missing asset as 0 bytes
+(a caught `ENOENT` just short-circuits to `return 0`) rather than failing -
+so a broken CSS link would under-report a page's weight instead of ever
+being flagged as broken. This new script is the first thing on the site
+that actually verifies every internal link/reference resolves to a real
+file, closing that specific gap as a side effect of checking links
+generally.
+
+**Result: zero broken links found** - unsurprising given how much of this
+file's accessibility/SEO/i18n work has already exercised the site's link
+graph by hand, but the value is the same as `check:pdfs` or `check:perf`:
+a permanent regression guard, now wired into CI (`.github/workflows/ci.yml`,
+run right after the existing page-weight budget check), that will catch a
+future stale link (e.g. a renamed route, a typo'd `slug` prop) before it
+ships, the same way `check:pdfs` already catches a stale PDF and
+`check:perf` catches a runaway page.
+
+Verified the checker actually detects breakage (not just green by
+construction) by hand-corrupting a built page's link and its skip-link
+target, confirming both were reported with the exact broken href and reason,
+then restoring the untouched build - not committed, just a sanity check
+during development.
+
+New `tests/unit/checkInternalLinks.test.ts`: 14 Vitest cases covering
+`extractLinks` (dedup, source order, no-links case), `classifyLink` (all
+five link forms this site emits: fragment, mailto/tel, external, base-path-
+relative internal, absolute same-site internal, plus query-string/fragment
+stripping and the bare-root case) and `candidateDistPaths` (root, trailing
+slash, extensionless directory path, and a direct asset path).
+
+**Tests:** `pnpm test` - 225/225 (up from 211: the 14 new cases). `pnpm
+lint` - 0 errors/0 warnings/0 hints. `pnpm build` - 27 pages (unchanged).
+`pnpm check:links` (new) - 0 broken links/fragment targets across all 27
+built pages. `pnpm check:perf` and `pnpm check:pdfs` both pass unchanged (no
+content or library file touched). Full Playwright suite: 327/327 unchanged
+(no page markup changed, only new tooling).
+
+**Left for a future pass:** with the content-accuracy series exhausted (per
+the last two entries) and this run closing the link-integrity gap, remaining
+candidates are: a source-link *liveness* check (still infeasible in this
+environment - WebFetch 403s on every host tried, unchanged across many prior
+attempts), PDF/UA accessibility tagging for the downloadable PDFs (flagged
+as a real but separately-scoped candidate by the immediately preceding
+entry), or another fresh angle in the same spirit as this run and the prior
+one - auditing whether some other cross-cutting feature (not just links or
+PDFs) actually works end-to-end rather than merely rendering correctly in
+isolation.
+
+### Accessibility/localization: the primary nav landmark's `aria-label` was hardcoded English on every Croatian page - fixed 2026-08-12 (intensive run)
+
+Following the last two entries' steer toward "another cross-cutting feature
+that actually works end-to-end, not just links or PDFs," this run found the
+same untranslated-attribute bug class that has already bitten this project
+twice before (the champions-bar screen-reader label, 2026-08-07; the nav
+hrefs/offline-cache fallback, 2026-08-07) - just a third, previously
+unaudited instance of it.
+
+**The bug:** `src/components/Nav.astro`'s `<nav aria-label="Primary">` was a
+literal string with no branch on the `locale` prop, even though the same
+component already threads `locale` through every other piece of text (brand
+name, nav labels, language-switch button) and `ThemeToggle.astro` right next
+to it already has a locale-aware `themeToggleAriaLabel` key for exactly this
+situation. Verified in the built output: every one of the 11 `/hr/...` pages
+shipped `aria-label="Primary"` in English - a Croatian screen-reader user
+landing on this nav landmark heard "Primary" spoken in English, sandwiched
+between an otherwise fully Croatian page.
+
+**Compounding it, the test suite had baked the bug in as correct behavior:**
+`tests/e2e/mobile.spec.ts`'s "Primary nav stays in the current language"
+block selected the nav on the *Croatian* page via
+`nav[aria-label="Primary"] a` - using the untranslated English string as the
+CSS selector on the very page where it was wrong - so nothing ever asserted
+what the landmark's accessible name should actually be in Croatian. Same
+test shape as the Croatian-PDF bug two entries back.
+
+**The fix:** added a `primaryNav` key to `UI_STRINGS` in `src/lib/i18n.ts`
+(`en: 'Primary'`, `hr: 'Glavna navigacija'`) and changed
+`Nav.astro` to `<nav aria-label={t(locale, 'primaryNav')}>`. Updated the
+Croatian half of the "Primary nav stays in the current language" Playwright
+test to select `nav[aria-label="Glavna navigacija"]` and assert exactly one
+match, so a future regression back to the hardcoded string would fail the
+test instead of silently passing. Added a new Vitest case in
+`tests/unit/i18n.test.ts` asserting `primaryNav` is non-empty and distinct
+per locale, matching the existing pattern for `championsBarOfLabel` and the
+theme strings.
+
+**Tests:** `pnpm test` - 226/226 (up from 225: the one new `primaryNav`
+case). `pnpm lint` - 0 errors/0 warnings/0 hints. `pnpm build` - 23 pages
+(unchanged page count; only the nav's `aria-label` attribute value changed
+on the 11 Croatian pages). `pnpm check:links` - 0 broken links (27 pages).
+`pnpm check:perf` - all pages within the 300 KB budget (heaviest 242.3 KB,
+unchanged). `pnpm check:pdfs` - all 12 PDFs unchanged and up to date (no
+content file touched, so no PDF regeneration needed). Full Playwright suite:
+**327/327**, including the two updated/verified "Primary nav stays in the
+current language" cases.
+
+**Left for a future pass:** with this specific hardcoded-English-attribute
+bug class now checked in `Nav.astro`, `ChampionsSummary.astro`, and the
+offline-cache fallback, a systematic sweep for any *other* remaining
+hardcoded-English `aria-label`/`alt`/`title` attribute across the component
+tree (rather than finding them one at a time, as the last three runs have)
+would be the natural next step in this vein - none turned up during this
+run's investigation, but it wasn't an exhaustive attribute-by-attribute
+grep. PDF/UA accessibility tagging and source-link liveness checks remain
+the other open candidates noted in the last two entries, unchanged.
 
 ## Known caveats
 

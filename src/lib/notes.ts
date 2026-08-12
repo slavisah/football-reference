@@ -6,16 +6,20 @@
 
 export type NoteSection = {
   heading: string;
+  /** A lead-in paragraph that appears before the bullet list, if any (e.g. content/index.md's "How to use the reference"). */
+  intro?: string;
   items: string[];
 };
 
 /**
  * Returns the content under a Markdown heading (matched by exact,
  * case-insensitive heading text) as a NoteSection: one item per bullet line,
- * or the section's lines joined into a single paragraph item when it has no
- * bullets. Stops at the next heading of the same or shallower level. Returns
- * null when the heading isn't found or its section has no content, so
- * callers can build an optional-sections list without an extra existence
+ * plus an optional `intro` paragraph when the section leads with prose before
+ * the list (dropped entirely until 2026-08-10 - see notes.test.ts); or, when
+ * the section has no bullets at all, the lines joined into a single
+ * paragraph item. Stops at the next heading of the same or shallower level.
+ * Returns null when the heading isn't found or its section has no content,
+ * so callers can build an optional-sections list without an extra existence
  * check.
  */
 export function extractSection(markdown: string, heading: string): NoteSection | null {
@@ -49,7 +53,10 @@ export function extractSection(markdown: string, heading: string): NoteSection |
     }
   }
 
-  if (bullets.length > 0) return { heading, items: bullets };
+  if (bullets.length > 0) {
+    const intro = paragraph.length > 0 ? paragraph.join(' ') : undefined;
+    return { heading, intro, items: bullets };
+  }
   if (paragraph.length > 0) return { heading, items: [paragraph.join(' ')] };
   return null;
 }

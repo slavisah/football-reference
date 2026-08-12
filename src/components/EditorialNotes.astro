@@ -25,6 +25,7 @@ function iconFor(heading: string): string {
             <span aria-hidden="true">{iconFor(section.heading)}</span>{' '}
             {section.heading}
           </h2>
+          {section.intro && <p class="notes__intro" set:html={renderInlineMarkdown(section.intro)} />}
           {section.items.length > 1 ? (
             <ul class="notes__list">
               {section.items.map((item) => (
@@ -51,6 +52,10 @@ function iconFor(heading: string): string {
   .notes__card p {
     margin-bottom: 0;
     color: var(--text-muted);
+  }
+
+  .notes__card p.notes__intro {
+    margin-bottom: 0.6rem;
   }
 
   .notes__list {

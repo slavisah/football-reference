@@ -36,16 +36,18 @@ const OUT_DIR = path.join(ROOT, 'public', 'downloads');
 const MANIFEST_PATH = path.join(OUT_DIR, '.pdf-manifest.json');
 
 // One PDF per required competition page (src/pages/competitions/*.astro),
-// plus which content/*.md file(s) each page's table data is sourced from -
-// the shared PDF_PAGES list (scripts/pdf-pages.mjs) so this can never drift
-// from scripts/check-pdf-freshness.mjs's PDF_SOURCES.
+// plus which file(s) each page's rendered content is sourced from (its
+// content/*.md edition table, plus docs/SOURCES.md for the References
+// section every page shares) - the shared PDF_PAGES list
+// (scripts/pdf-pages.mjs) so this can never drift from
+// scripts/check-pdf-freshness.mjs's PDF_SOURCES.
 
 async function buildManifest() {
   const manifest = {};
   for (const { slug, sources } of PAGES) {
     manifest[slug] = {};
     for (const file of sources) {
-      const contents = await readFile(path.join(ROOT, 'content', file), 'utf8');
+      const contents = await readFile(path.join(ROOT, file), 'utf8');
       manifest[slug][file] = createHash('sha256').update(contents).digest('hex');
     }
   }

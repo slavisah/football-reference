@@ -45,6 +45,12 @@ describe('t', () => {
     expect(t('hr', 'championsBarOfLabel')).toBe('od');
     expect(t('en', 'championsBarOfLabel')).not.toBe(t('hr', 'championsBarOfLabel'));
   });
+
+  it('gives the primary nav landmark a distinct, non-empty aria-label per locale', () => {
+    expect(t('en', 'primaryNav')).toBe('Primary');
+    expect(t('hr', 'primaryNav')).toBe('Glavna navigacija');
+    expect(t('en', 'primaryNav')).not.toBe(t('hr', 'primaryNav'));
+  });
 });
 
 describe('alternatePath', () => {

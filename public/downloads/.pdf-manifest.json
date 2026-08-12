@@ -1,22 +1,54 @@
 {
   "world-cup": {
-    "fifa-world-cup.md": "a16182b5efa676261e091d0d8b9cc698ded83068db7f4ae4e9a50920514de30d",
-    "golden-boot.md": "09e67a552d2138042cf83e8442fe62d9d71ea19409694bc980abdca5afde8e8f"
+    "content/fifa-world-cup.md": "4cc5426a21d6672328f1956dc35839192d41def381278a566ec5e6ae1a367b0e",
+    "content/golden-boot.md": "09e67a552d2138042cf83e8442fe62d9d71ea19409694bc980abdca5afde8e8f",
+    "docs/SOURCES.md": "e4ca9ef78945300696ba9954c13adebc3e19f9665ff217d240ad1e2eb88bdf9c"
   },
   "euro": {
-    "uefa-euro.md": "aaaf34de70929c6372a8beaa37fe989131e6eea15968cb5da7160b88bf91de22",
-    "golden-boot.md": "09e67a552d2138042cf83e8442fe62d9d71ea19409694bc980abdca5afde8e8f"
+    "content/uefa-euro.md": "856235cb28f92e70d3f1f43136cd8b80c3a50c59258991981185c711a5b92496",
+    "content/golden-boot.md": "09e67a552d2138042cf83e8442fe62d9d71ea19409694bc980abdca5afde8e8f",
+    "docs/SOURCES.md": "e4ca9ef78945300696ba9954c13adebc3e19f9665ff217d240ad1e2eb88bdf9c"
   },
   "nations-league": {
-    "uefa-nations-league.md": "45752096f03d54e6a5a9366c6ac94a912954d211bec8be48e613428dc3801ae6"
+    "content/uefa-nations-league.md": "ed6acc7fe3febd9d2aecce0043e163832300c0fc5a76c39c226b43627ab91ed5",
+    "docs/SOURCES.md": "e4ca9ef78945300696ba9954c13adebc3e19f9665ff217d240ad1e2eb88bdf9c"
   },
   "copa-america": {
-    "copa-america.md": "8159b9cc417458be2abbe693ed7462ba16683142b15364a2117290310a3a7d63"
+    "content/copa-america.md": "dda117d5f33bfba2ebe2c8c430cd1c321d26bc2f8696791e503622ae2251da62",
+    "docs/SOURCES.md": "e4ca9ef78945300696ba9954c13adebc3e19f9665ff217d240ad1e2eb88bdf9c"
   },
   "ballon-dor": {
-    "ballon-dor.md": "3c02a745d6a09936f105d95a911802ab7550fcb69bdcf2482b589239423c6433"
+    "content/ballon-dor.md": "3c02a745d6a09936f105d95a911802ab7550fcb69bdcf2482b589239423c6433",
+    "docs/SOURCES.md": "e4ca9ef78945300696ba9954c13adebc3e19f9665ff217d240ad1e2eb88bdf9c"
   },
   "golden-boot": {
-    "golden-boot.md": "09e67a552d2138042cf83e8442fe62d9d71ea19409694bc980abdca5afde8e8f"
+    "content/golden-boot.md": "09e67a552d2138042cf83e8442fe62d9d71ea19409694bc980abdca5afde8e8f",
+    "docs/SOURCES.md": "e4ca9ef78945300696ba9954c13adebc3e19f9665ff217d240ad1e2eb88bdf9c"
+  },
+  "world-cup-hr": {
+    "content/fifa-world-cup.md": "4cc5426a21d6672328f1956dc35839192d41def381278a566ec5e6ae1a367b0e",
+    "content/golden-boot.md": "09e67a552d2138042cf83e8442fe62d9d71ea19409694bc980abdca5afde8e8f",
+    "docs/SOURCES.md": "e4ca9ef78945300696ba9954c13adebc3e19f9665ff217d240ad1e2eb88bdf9c"
+  },
+  "euro-hr": {
+    "content/uefa-euro.md": "856235cb28f92e70d3f1f43136cd8b80c3a50c59258991981185c711a5b92496",
+    "content/golden-boot.md": "09e67a552d2138042cf83e8442fe62d9d71ea19409694bc980abdca5afde8e8f",
+    "docs/SOURCES.md": "e4ca9ef78945300696ba9954c13adebc3e19f9665ff217d240ad1e2eb88bdf9c"
+  },
+  "nations-league-hr": {
+    "content/uefa-nations-league.md": "ed6acc7fe3febd9d2aecce0043e163832300c0fc5a76c39c226b43627ab91ed5",
+    "docs/SOURCES.md": "e4ca9ef78945300696ba9954c13adebc3e19f9665ff217d240ad1e2eb88bdf9c"
+  },
+  "copa-america-hr": {
+    "content/copa-america.md": "dda117d5f33bfba2ebe2c8c430cd1c321d26bc2f8696791e503622ae2251da62",
+    "docs/SOURCES.md": "e4ca9ef78945300696ba9954c13adebc3e19f9665ff217d240ad1e2eb88bdf9c"
+  },
+  "ballon-dor-hr": {
+    "content/ballon-dor.md": "3c02a745d6a09936f105d95a911802ab7550fcb69bdcf2482b589239423c6433",
+    "docs/SOURCES.md": "e4ca9ef78945300696ba9954c13adebc3e19f9665ff217d240ad1e2eb88bdf9c"
+  },
+  "golden-boot-hr": {
+    "content/golden-boot.md": "09e67a552d2138042cf83e8442fe62d9d71ea19409694bc980abdca5afde8e8f",
+    "docs/SOURCES.md": "e4ca9ef78945300696ba9954c13adebc3e19f9665ff217d240ad1e2eb88bdf9c"
   }
 }

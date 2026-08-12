@@ -25,6 +25,21 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/1966_FIFA_World_Cup_final
   - https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final
   - https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_final
+- Final match dates second independent cross-check (2026-08-09, intensive
+  run): re-verified all 23 "Final date" entries (1930-2026) via three
+  parallel WebSearch passes split by era (1930-1962, 1966-1994, 1998-2026),
+  deliberately drawing a source mix beyond the first pass's Wikipedia/ESPN
+  pairing - FIFA.com, Britannica, 11v11.com, and Al Jazeera also confirmed
+  individual dates. **No discrepancies found across any of the 23 dates.**
+  The 1950 "Maracanazo" decider (16 July 1950) and the 2022 off-cycle
+  November-December Qatar slot (18 December 2022) were both independently
+  reconfirmed. 2026 was a completed tournament by this audit's run date
+  (played 19 July 2026, Spain 1-0 Argentina a.e.t.), re-checked as a real
+  result rather than a scheduled placeholder - matching this same date
+  already on the page:
+  - https://en.wikipedia.org/wiki/1934_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1994_FIFA_World_Cup_final
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/final
 - Third/fourth-place audit (2026-08-04): the winner and loser of every
   edition's third-place play-off (or, where no such match was played, the
   historical ranking source for those two places), i.e. the content table's
@@ -249,6 +264,39 @@ Primary sources should be preferred.
     environment's egress policy for this run, so verification relied on
     WebSearch's synthesized snippets, per the same caveat prior audits in
     this file have already noted.
+- Third/fourth-place second independent cross-check (2026-08-11, intensive
+  run): the "Third"/"Fourth / other semifinalist" columns' only prior audit
+  was their first pass (2026-08-04, above); this closes the standing "not
+  yet covered by any second pass" gap that entry's own follow-ups kept
+  naming. Re-verified all 23 editions (1930-2026) via three parallel
+  WebSearch passes split by era (1934-1962, 1966-1994, 1998-2022), plus two
+  dedicated searches for the 1930/1950 format edge cases and one for the
+  2026 bronze match, deliberately drawing from a source mix distinct from
+  the first pass (ESPN, plus.fifa.com, athlet.org, beIN Sports,
+  Liquisearch): this pass used NBC Bay Area, Yahoo Sports,
+  soccergraph.com, chaseyoursport.com, getmoresports.com, RSSSF,
+  sport-histoire.fr, Grokipedia, and Al Jazeera. **No discrepancies found
+  across any of the 23 editions.** Both format edge cases were
+  independently reconfirmed rather than merely trusted: 1930 (no
+  third-place match played; the United States' retrospective third place
+  ahead of Yugoslavia, per FIFA's own later ranking, is itself the subject
+  of long-running historian dispute precisely because no match settled it -
+  the page's existing edge-case note already covers this) and 1950
+  (Sweden 2pts/Spain 1pt in the four-team final round-robin group, with
+  Uruguay and Brazil above them - re-derived from the full points table,
+  not just the two rows in question). The 2026 bronze match (England 6-4
+  France) was also reconfirmed by this independent source mix, matching
+  the row already on the page:
+  - https://www.nbcbayarea.com/world-cup/every-third-place-game-result-in-fifa-world-cup-history/3102549/
+  - https://sports.yahoo.com/every-third-place-game-result-110022284.html
+  - https://www.soccergraph.com/2026/07/fifa-world-cup-third-place-playoff-winners-bronze-mdalists-history.html
+  - https://www.rsssf.org/tables/30full.html
+  - https://www.sport-histoire.fr/en/Sport/Football/World_Cup/1950_World_Cup.php
+  - https://www.aljazeera.com/sports/liveblog/2026/7/18/france-vs-england-live-fifa-world-cup-2026-third-place-playoff
+  - Direct WebFetch to primary-source domains was blocked by this
+    environment's egress policy for this run, so verification relied on
+    WebSearch's synthesized snippets, per the same caveat prior audits in
+    this file have already noted.
 
 ## UEFA EURO
 
@@ -281,6 +329,18 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/UEFA_Euro_2016_final
   - https://en.wikipedia.org/wiki/UEFA_Euro_2020_final
   - https://en.wikipedia.org/wiki/UEFA_Euro_2024_final
+- Final match dates second independent cross-check (2026-08-09, intensive
+  run): re-verified all 17 "Final date" entries (1960-2024) via two parallel
+  WebSearch passes split by era (1960-1992, 1996-2024), each date checked
+  against Wikipedia's dedicated final-match article plus a second source
+  (UEFA.com, Transfermarkt, 11v11, or a football-history retrospective).
+  **No discrepancies found across any of the 17 dates.** The 1968 replay
+  date (10 June, not the original 8 June drawn match) and the 2020-labelled/
+  2021-played final (11 July 2021) were both independently reconfirmed as
+  correctly represented:
+  - https://en.wikipedia.org/wiki/1972_European_Nations%27_Cup_final
+  - https://en.wikipedia.org/wiki/1976_European_Nations%27_Cup_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1996_final
 - Third-place play-off audit (2026-08-04): the winner, score, and date of the
   third-place match for each of the six editions (1960-1980) that played one
   under the old 4-team "final four" format, i.e. whether the content table's
@@ -406,6 +466,43 @@ Primary sources should be preferred.
     environment's egress policy for this run, so verification relied on
     WebSearch's synthesized snippets, per the same caveat the FIFA World
     Cup Host(s)/Teams audit entry above (2026-08-08) already notes.
+- "Other semifinalist" columns - full audit closed (2026-08-11, intensive
+  run): closes the last "first pass only" gap named in this file's own
+  standing content-accuracy notes. Two parallel WebSearch passes: a second
+  independent cross-check of the six 1960-1980 third-place play-offs (using
+  a source mix distinct from the 2026-08-04 first pass - this time leaning on
+  Wikipedia tournament articles, RSSSF, worldfootball.net, 11v11.com,
+  national-football-teams.com, and press retrospectives rather than
+  UEFA.com alone), plus a first-ever verification of the eleven 1984-2024
+  editions' two unranked semifinalist team names (order carries no ranking
+  meaning for these editions, per the page's own "Historical format note",
+  so only set membership - which two teams - was checked). **No
+  discrepancies found across any of the 17 editions:**
+  - https://en.wikipedia.org/wiki/1960_European_Nations%27_Cup
+  - https://www.rsssf.org/tables/60e-full.html
+  - https://en.wikipedia.org/wiki/1964_European_Nations%27_Cup
+  - https://www.11v11.com/matches/england-v-ussr-08-june-1968-230262/
+  - https://www.rsssf.org/tables/68e.html
+  - https://www.national-football-teams.com/app.php/matches/report/16375/Belgium_Hungary.html
+  - http://soccernostalgia.blogspot.com/2018/05/the-euros-part-five-1976-edition-part-d.html
+  - https://soccernostalgia.blogspot.com/2020/09/compendium-to-1980-euros-finals-part-12.html
+  - https://www.worldsoccer.com/world-soccer-latest/european-championships-retrospective-italy-1980-335094
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1984_knockout_stage
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1988
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1992
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1996_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2000_knockout_stage
+  - https://www.worldfootball.net/competition/co36/euro/se3316/2004-portugal/ro13167/semi-finals/results-and-standings/
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2008_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2012_final
+  - https://www.uefa.com/uefaeuro/history/news/0253-0d81def27342-902d74133a03-1000--meet-the-uefa-euro-2016-semi-finalists
+  - https://www.uefa.com/uefaeuro/history/news/026b-12ab79b983eb-06a7e83779f9-1000--uefa-euro-2020-semi-finals-italy-vs-spain-england-vs-denmark/
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2024
+  - Direct WebFetch to primary-source domains (including wikipedia.org and
+    rsssf.org) was blocked by this environment's egress policy for this
+    run, so verification relied on WebSearch's synthesized snippets rather
+    than directly rendered pages, per every prior audit's caveat in this
+    file.
 
 ## UEFA Nations League
 
@@ -425,6 +522,17 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_final
   - https://www.espn.com/soccer/match/_/gameId/654361/spain-croatia
   - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
+- Final match dates second independent cross-check (2026-08-09, intensive
+  run): re-verified all four "Final date" entries via WebSearch, each
+  checked against Wikipedia's dedicated final-match article plus a second
+  source (ESPN or UEFA.com's own match report/highlights page). **No
+  discrepancies found across any of the four dates.** A Euronews article
+  covering the 2025 final carried a 9 June publication date, one day after
+  the 8 June match itself - confirmed as a next-day reporting artifact, not
+  a genuine date discrepancy, once checked against Wikipedia, ESPN and
+  UEFA.com's own match page, which all agree on 8 June:
+  - https://www.uefa.com/uefanationsleague/news/0282-1849d8b2412c-f43f87000e15-1000--spain-win-nations-league-croatia-edged-out-on-penalties/
+  - https://www.uefa.com/uefanationsleague/video/highlights/029a-1df45a93f27a-f9ad891597e4-1000--2025-uefa-nations-league-final-highlights-portugal-2-2-spai/
 - Third-place match audit (2026-08-04): the winner, score, and date of each
   edition's third-place play-off, i.e. the content table's "Third"/"Fourth"
   columns. Verified via WebSearch, cross-checked against UEFA.com's own match
@@ -438,6 +546,26 @@ Primary sources should be preferred.
   - https://www.espn.com/soccer/match/_/gameId/654362/italy-netherlands
   - https://www.uefa.com/uefanationsleague/news/029a-1df3af7eedc9-c3b6e51cf3f1-1000--germany-vs-france-highlights-and-report-kylian-mbappe-sco/
   - https://www.espn.com/soccer/match/_/gameId/723737/france-germany
+- Third-place match second independent cross-check (2026-08-12, intensive
+  run): re-verified the winner and score of each edition's third-place
+  play-off - the last team-competition Third/Fourth column on the site still
+  on only a first audit pass - using a source mix distinct from the
+  2026-08-04 UEFA.com/ESPN pair (Wikipedia's dedicated Finals article per
+  edition, plus Sky Sports, Bleacher Report/Euronews, Sports Mole, and
+  BBNTimes/Outlook India). **No discrepancies found across any of the four
+  editions.** Every Third/Fourth pairing already in
+  `content/uefa-nations-league.md` matches exactly: England beat Switzerland
+  6-5 on penalties after a 0-0 draw (2019), Italy beat Belgium 2-1 (2021),
+  Italy beat the Netherlands 3-2 (2023), and France beat host Germany 2-0
+  (2025):
+  - https://en.wikipedia.org/wiki/2019_UEFA_Nations_League_Finals
+  - https://www.skysports.com/football/news/13958/11738309/switzerland-0-0-england-5-6-on-pens-jordan-pickford-settles-nations-league-third-place-play-off
+  - https://en.wikipedia.org/wiki/2021_UEFA_Nations_League_Finals
+  - https://www.thescore.com/seri/news/2201665
+  - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_Finals
+  - https://www.sportsmole.co.uk/football/netherlands/uefa-nations-league/result/italy-edge-out-netherlands-to-win-uefa-nations-league-third-place-playoff_516568.html
+  - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_Finals
+  - https://www.bbntimes.com/society/france-triumphs-over-germany-to-claim-third-place-in-2025-uefa-nations-league
 - Champion/Runner-up/Final-score second-source audit (2026-08-05): a second,
   independent cross-check of the Finals table's Winner, Runner-up, and Final
   score for all four completed editions, using sources distinct from the
@@ -573,6 +701,45 @@ Primary sources should be preferred.
     independent queries; a small number (1917, 1920, 1926, 1945) had a
     clearly stated final ranking but no full numeric points table
     recoverable this way.
+- Third/fourth-place second independent cross-check (2026-08-11, intensive
+  run): the Third/Fourth columns' only prior audit was their first pass
+  (2026-08-02, the three entries above), unlike Champion/Runner-up/Format
+  which each already had a second pass on record; this closes that standing
+  gap. Re-verified all 45 editions carrying a placing (1916-2024, both 1959
+  tournaments, excluding the three Home-and-away finals and 1925's missing
+  fourth place) in four era-based WebSearch passes (1916-1929, 1935-1967
+  including both 1959s, 1987/1989/1991, 1993-2024), deliberately drawing on
+  a source mix distinct from the first pass (RSSSF/Wikipedia): worldfootball.net,
+  athlet.org, footballdatabase.eu, topendsports.com, besoccer.com,
+  soccer365.net, Transfermarkt, 11v11.com, betexplorer.com,
+  resultados-futbol.com, AFA/AUF official histories, Memoria Chilena, and
+  press/wire coverage (CBC, BBC, CTV/TSN, China Daily/Xinhua, Yahoo Sports).
+  **No discrepancies found.** The 1989 and 1991 closing-group standings were
+  re-derived match-by-match (all six games in each group) rather than
+  trusted as a summary, and both flagged upsets (Honduras 5-4 on penalties
+  over Uruguay in 2001; Uruguay 4-3 on penalties over Canada in 2024) were
+  independently reconfirmed with exact scorelines:
+  - https://www.footballdatabase.eu/en/match/overview/1046110-colombie-argentine
+    (1987 third-place match, Colombia 2-1 Argentina)
+  - https://www.worldfootball.net/competition/co22/conmebol-copa-america/se3261/1989-brazil/matches-and-results/
+    (1989 closing group)
+  - https://www.footballdatabase.eu/en/match/overview/1045952-argentine-bresil ;
+    https://www.footballdatabase.eu/en/match/overview/1045957-argentine-colombie
+    (1991 closing group)
+  - https://www.transfermarkt.us/spielbericht/index/spielbericht/1022263
+    (2001 third-place penalty shootout, Honduras over Uruguay)
+  - https://www.ctvnews.ca/sports/canada-loses-on-penalties-to-uruguay-in-copa-america-2024-third-place-match-1.6963304
+    (2024 third-place penalty shootout, Uruguay over Canada)
+  - Per-era WebSearch passes also drew on worldfootball.net, athlet.org,
+    footballdatabase.eu, topendsports.com, besoccer.com, soccer365.net,
+    resultados-futbol.com, and AFA/AUF official history pages for every
+    remaining edition (full per-edition breakdown available in this run's
+    research notes).
+  - Note: this session's egress proxy blocked direct WebFetch to nearly
+    every one of these domains (confirmed via repeated `EGRESS_BLOCKED`
+    errors), so verification relied on WebSearch's synthesized result
+    snippets rather than a direct page read, the same caveat noted by
+    several prior audits in this file.
 - Final match dates audit (2026-08-03): the calendar date of the decisive
   match for the 19 editions with a single one-off decider, for the "On this
   day in football history" widget on the home page (same feature already
@@ -809,6 +976,79 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/2024_Copa_Am%C3%A9rica_final (14 July 2024)
   - Note: the same egress-blocked-domains caveat applies; verification
     relied on WebSearch's indexed snippets rather than direct page loads.
+- Format-column second-source audit (2026-08-08, intensive run): a second,
+  independent cross-check of the same 48-edition Format classification
+  audited on 2026-08-02 above, re-verified in four era-based WebSearch
+  passes and deliberately drawing on a source mix distinct from the first
+  pass (which leaned on Wikipedia's per-edition/play-off articles and
+  RSSSF). **No discrepancies found** - every classification already on the
+  page held up, including all five playoff deciders, the 1989/1991
+  closing-group League table editions, the 1975-1983 Home-and-away era,
+  1987's knockout-final transition, and 2016's Special centenary edition:
+  - 1916-1929 (12 editions):
+    - https://en.wikipedia.org/wiki/1916_South_American_Championship
+    - https://en.wikipedia.org/wiki/1917_South_American_Championship
+    - https://en.wikipedia.org/wiki/1919_South_American_Championship_play-off
+    - https://en.wikipedia.org/wiki/1920_South_American_Championship
+    - https://en.wikipedia.org/wiki/1921_South_American_Championship
+    - https://en.wikipedia.org/wiki/1922_South_American_Championship_play-off
+    - https://en.wikipedia.org/wiki/1923_South_American_Championship
+    - https://en.wikipedia.org/wiki/1924_South_American_Championship
+    - https://en.wikipedia.org/wiki/1925_South_American_Championship
+    - https://en.wikipedia.org/wiki/1926_South_American_Championship
+    - https://en.wikipedia.org/wiki/1927_South_American_Championship
+    - https://en.wikipedia.org/wiki/1929_South_American_Championship
+    - http://www.todor66.com/football/South_America/Championship_1929.html
+    - https://rsssfbrasil.com/historics.htm
+  - 1935-1967 including both 1959 tournaments (17 editions):
+    - https://en.wikipedia.org/wiki/1935_South_American_Championship
+    - https://en.wikipedia.org/wiki/1937_South_American_Championship_play-off
+    - https://en.wikipedia.org/wiki/1939_South_American_Championship
+    - https://en.wikipedia.org/wiki/1941_South_American_Championship
+    - https://en.wikipedia.org/wiki/1942_South_American_Championship
+    - https://en.wikipedia.org/wiki/1945_South_American_Championship
+    - https://en.wikipedia.org/wiki/1946_South_American_Championship
+    - https://en.wikipedia.org/wiki/1947_South_American_Championship
+    - https://en.wikipedia.org/wiki/1949_South_American_Championship_play-off
+    - https://en.wikipedia.org/wiki/1953_South_American_Championship_play-off
+    - https://en.wikipedia.org/wiki/1955_South_American_Championship
+    - https://en.wikipedia.org/wiki/1956_South_American_Championship
+    - https://en.wikipedia.org/wiki/1957_South_American_Championship
+    - https://en.wikipedia.org/wiki/1959_South_American_Championship_(Argentina)
+    - http://www.todor66.com/football/South_America/Championship_1959a.html
+      (1959 Ecuador)
+    - https://liquipedia.net/lab/Football/CONMEBOL/South_American_Championship/1963
+    - https://en.wikipedia.org/wiki/1967_South_American_Championship
+  - 1975-1987, home-and-away to knockout-final transition (4 editions):
+    - https://soccerwizdom.com/2025/05/31/1975-copa-america-the-year-south-america-broke-the-mold/
+    - https://en.wikipedia.org/wiki/1975_Copa_Am%C3%A9rica
+    - https://en.wikipedia.org/wiki/1979_Copa_Am%C3%A9rica_final
+    - https://www.rsssf.org/tables/79sa.html
+    - https://en.wikipedia.org/wiki/1983_Copa_Am%C3%A9rica_final
+    - https://www.rsssf.org/tables/83sa.html
+    - https://liquipedia.net/lab/Football/CONMEBOL/Copa_Am%C3%A9rica/1987
+    - https://www.rsssf.org/tables/87sa.html
+  - 1989-2024, knockout-final era plus the two closing-group League table
+    editions and the 2016 centenary edition (15 editions):
+    - http://soccernostalgia.blogspot.com/2017/02/copa-america-part-3-1989.html
+    - http://soccernostalgia.blogspot.com/2017/07/copa-america-part-4-1991.html
+    - https://liquipedia.net/lab/Football/CONMEBOL/Copa_Am%C3%A9rica/1993
+    - https://en.wikipedia.org/wiki/1995_Copa_Am%C3%A9rica_final
+    - https://liquipedia.net/lab/Football/CONMEBOL/Copa_Am%C3%A9rica/1997
+    - https://en.wikipedia.org/wiki/1999_Copa_Am%C3%A9rica_knockout_stage
+    - https://en.wikipedia.org/wiki/2001_Copa_Am%C3%A9rica_knockout_stage
+    - https://en.wikipedia.org/wiki/2004_Copa_Am%C3%A9rica_knockout_stage
+    - https://liquipedia.net/lab/Football/CONMEBOL/Copa_Am%C3%A9rica/2007
+    - https://en.wikipedia.org/wiki/2011_Copa_Am%C3%A9rica_knockout_stage
+    - https://en.wikipedia.org/wiki/2015_Copa_Am%C3%A9rica_knockout_stage
+    - https://www.si.com/soccer/2016/06/01/copa-america-centenario-tournament-format-corruption-explainer
+      (2016 centenary: expanded 16-team CONMEBOL+CONCACAF field)
+    - https://en.wikipedia.org/wiki/2019_Copa_Am%C3%A9rica_knockout_stage
+    - https://en.wikipedia.org/wiki/2021_Copa_Am%C3%A9rica_knockout_stage
+    - https://en.wikipedia.org/wiki/2024_Copa_Am%C3%A9rica_knockout_stage
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    indexed snippets rather than direct page loads.
 
 ## Ballon d'Or
 

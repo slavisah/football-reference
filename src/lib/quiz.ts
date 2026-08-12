@@ -1,4 +1,4 @@
-import { isPlaceholderWinner } from './editions';
+import { isPlaceholderWinner, NOT_A_HOST } from './editions';
 import type { Locale } from './i18n';
 import type { Edition, TimelineEntry } from './types';
 
@@ -128,10 +128,6 @@ export function topScorerByYearQuestions(
       : (year: string) => `Who was the ${competition} top scorer in ${year}?`;
   return questionsFromWinners(editions, seedPrefix, 'scorer', competition, promptFor);
 }
-
-// Host values that aren't an actual country (e.g. Copa América editions played
-// home-and-away with no single host) and so make poor quiz answers.
-const NOT_A_HOST = /home-and-away|no host|not held/i;
 
 /** "Which country hosted the {year} {competition}?" */
 export function hostByYearQuestions(
