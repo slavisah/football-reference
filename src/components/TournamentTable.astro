@@ -206,7 +206,11 @@ const defaultSort = defaultSortValue(sortOptions);
         {
           displayEditions.map((edition) => (
             <tr
-              data-winner={edition.winner}
+              data-winner={edition.winner
+                .split(';')
+                .map((name) => name.trim())
+                .filter(Boolean)
+                .join('|')}
               data-year={edition.year}
               data-host={edition.host ?? ''}
               data-teams={editionTeams(edition).join('|')}
@@ -508,7 +512,7 @@ const defaultSort = defaultSortValue(sortOptions);
     const sort = sortSel ? sortSel.value : '';
     let shown = 0;
     for (const row of rows) {
-      const matchWinner = !winner || row.dataset.winner === winner;
+      const matchWinner = !winner || (row.dataset.winner || '').split('|').includes(winner);
       const matchYear = !year || row.dataset.year === year;
       const matchHost = !host || row.dataset.host === host;
       const matchTeam = !team || (row.dataset.teams || '').split('|').includes(team);

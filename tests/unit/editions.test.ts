@@ -128,6 +128,44 @@ describe('distinctWinners', () => {
     };
     expect(distinctWinners(buildEditions(withPlaceholder))).toEqual(['Lionel Messi']);
   });
+
+  it('splits a "; "-joined joint-tie Player(s) cell into individual winners (Golden Boot)', () => {
+    const jointTieTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)'],
+      rows: [
+        [
+          '1962',
+          'Garrincha; Vavá; Leonel Sánchez; Flórián Albert; Valentin Ivanov; Dražan Jerković',
+        ],
+        ['1994', 'Hristo Stoichkov; Oleg Salenko'],
+      ],
+    };
+    expect(distinctWinners(buildEditions(jointTieTable))).toEqual([
+      'Dražan Jerković',
+      'Flórián Albert',
+      'Garrincha',
+      'Hristo Stoichkov',
+      'Leonel Sánchez',
+      'Oleg Salenko',
+      'Valentin Ivanov',
+      'Vavá',
+    ]);
+  });
+
+  it('lists a player once even if they appear both solo and in a joint tie in different editions', () => {
+    const mixedTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)'],
+      rows: [
+        ['2012', 'Mario Balotelli; Mario Gómez; Cristiano Ronaldo'],
+        ['2020', 'Cristiano Ronaldo'],
+      ],
+    };
+    expect(distinctWinners(buildEditions(mixedTable))).toEqual([
+      'Cristiano Ronaldo',
+      'Mario Balotelli',
+      'Mario Gómez',
+    ]);
+  });
 });
 
 describe('distinctHosts', () => {
@@ -147,6 +185,17 @@ describe('distinctHosts', () => {
       rows: [['1958', 'Just Fontaine', 'France', '13']],
     };
     expect(distinctHosts(buildEditions(scorersTable))).toEqual([]);
+  });
+
+  it('excludes the "Home-and-away" non-country placeholder from the host filter', () => {
+    const copaTable: MarkdownTable = {
+      headers: ['Year', 'Host / format', 'Winner', 'Runner-up'],
+      rows: [
+        ['1975', 'Home-and-away', 'Peru', 'Colombia'],
+        ['1929', 'Argentina', 'Argentina', 'Uruguay'],
+      ],
+    };
+    expect(distinctHosts(buildEditions(copaTable))).toEqual(['Argentina']);
   });
 });
 
@@ -213,6 +262,22 @@ describe('editionTeams', () => {
       rows: [['2020', 'Not awarded', 'Not awarded']],
     };
     expect(editionTeams(buildEditions(withPlaceholder)[0])).toEqual([]);
+  });
+
+  it('splits a Golden Boot "; "-separated joint-team tie into individual teams', () => {
+    const jointTie: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [['1994', 'Hristo Stoichkov; Oleg Salenko', 'Bulgaria; Russia', '6']],
+    };
+    expect(editionTeams(buildEditions(jointTie)[0])).toEqual(['Bulgaria', 'Russia']);
+  });
+
+  it('excludes the "Multiple" too-many-scorers-to-name placeholder from the team list', () => {
+    const sixWayTie: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [['1962', 'Garrincha; Vavá; Leonel Sánchez', 'Multiple', '4']],
+    };
+    expect(editionTeams(buildEditions(sixWayTie)[0])).toEqual([]);
   });
 });
 

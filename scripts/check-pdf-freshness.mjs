@@ -34,7 +34,7 @@ const MANIFEST_PATH = path.join(ROOT, 'public', 'downloads', '.pdf-manifest.json
 const PDF_SOURCES = Object.fromEntries(PDF_PAGES.map(({ slug, sources }) => [slug, sources]));
 
 async function hashFile(relativePath) {
-  const contents = await readFile(path.join(ROOT, 'content', relativePath), 'utf8');
+  const contents = await readFile(path.join(ROOT, relativePath), 'utf8');
   return createHash('sha256').update(contents).digest('hex');
 }
 
@@ -86,7 +86,7 @@ async function main() {
 
   console.error('Stale PDF(s) detected - content has changed since the last `pnpm build:pdfs`:\n');
   for (const { slug, outOfDate } of stale) {
-    console.error(`  public/downloads/${slug}.pdf  <-  content/${outOfDate.join(', content/')}`);
+    console.error(`  public/downloads/${slug}.pdf  <-  ${outOfDate.join(', ')}`);
   }
   console.error(
     '\nRegenerate with `pnpm build && pnpm build:pdfs`, then commit the updated PDF(s) and manifest.',

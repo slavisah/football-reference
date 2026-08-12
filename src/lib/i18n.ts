@@ -17,6 +17,7 @@ export const LOCALES: { code: Locale; label: string; htmlLang: string }[] = [
 /** Shared chrome strings (nav brand, skip link, footer, theme toggle, language switcher). */
 const UI_STRINGS = {
   skipToContent: { en: 'Skip to main content', hr: 'Preskoči na sadržaj' },
+  primaryNav: { en: 'Primary', hr: 'Glavna navigacija' },
   brand: { en: 'Football Reference', hr: 'Football Reference' },
   homeBreadcrumb: { en: 'Home', hr: 'Početna' },
   footerTagline: {

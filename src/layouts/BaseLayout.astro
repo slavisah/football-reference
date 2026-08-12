@@ -15,9 +15,18 @@ interface Props {
   alternateHref?: string;
   /** Extra schema.org JSON-LD objects for this page (e.g. an ItemList of champions, a SportsEvent for the latest edition). A "Home > page" BreadcrumbList is added automatically for every non-home page. */
   jsonLd?: JsonLdObject[];
+  /** Excludes the page from search indexing (e.g. the 404 page). Defaults to false for every existing page. */
+  noindex?: boolean;
 }
 
-const { title, description, locale = 'en', alternateHref, jsonLd = [] } = Astro.props;
+const {
+  title,
+  description,
+  locale = 'en',
+  alternateHref,
+  jsonLd = [],
+  noindex = false,
+} = Astro.props;
 const fullTitle =
   title === 'The Ultimate Football Reference'
     ? title
@@ -57,6 +66,7 @@ const structuredData = [breadcrumb, ...jsonLd].filter((item): item is JsonLdObje
     {description && <meta name="description" content={description} />}
     <meta name="generator" content={Astro.generator} />
     <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex" />}
     {
       alternateHref && alternateURL && (
         <>
