@@ -114,7 +114,21 @@ async function main() {
         const url = `${ORIGIN}${BASE}${pagePath}`;
         await page.goto(url, { waitUntil: 'networkidle' });
         const outFile = path.join(OUT_DIR, `${slug}.pdf`);
-        await page.pdf({ path: outFile, preferCSSPageSize: true, printBackground: true });
+        // `tagged` emits a PDF/UA-style structure tree (headings, table
+        // roles, reading order) so a screen reader can navigate the
+        // downloaded file the same way it navigates the live page, instead
+        // of falling back to raw text-position guessing; `outline` embeds
+        // the same structure as PDF bookmarks for sighted keyboard/reader
+        // navigation. Both are native to Playwright's Chromium print-to-PDF
+        // (no new dependency) - previously omitted, so every downloadable
+        // PDF was untagged.
+        await page.pdf({
+          path: outFile,
+          preferCSSPageSize: true,
+          printBackground: true,
+          tagged: true,
+          outline: true,
+        });
         console.log(`Wrote ${path.relative(ROOT, outFile)}`);
       }
     } finally {

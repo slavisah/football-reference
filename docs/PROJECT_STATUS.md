@@ -5466,6 +5466,77 @@ run's investigation, but it wasn't an exhaustive attribute-by-attribute
 grep. PDF/UA accessibility tagging and source-link liveness checks remain
 the other open candidates noted in the last two entries, unchanged.
 
+### Accessibility: downloadable PDFs are now tagged (PDF/UA-style), first-ever pass - added 2026-08-12 (intensive run)
+
+Followed up on the last entry's exact suggestion: first did the "systematic
+sweep for any other remaining hardcoded-English `aria-label`/`alt`/`title`
+attribute" it named as the natural next step - a full `grep` of every
+`aria-label=`/`alt=`/`title=` in `src/components`, `src/pages`, and
+`src/layouts` (there are no `<img>` elements anywhere in the codebase, so
+`alt` was a no-op check), cross-checked against every Croatian page's actual
+prop values. **Result: no bugs found**, including one plausible-looking false
+lead - `src/pages/hr/index.astro`'s `title="The Ultimate Football Reference"`
+and `<h1>` look hardcoded-English at first glance, but `src/lib/i18n.ts`'s
+`brand` and `footerTagline` strings already establish, on the record, that
+this exact phrase is a deliberately untranslated brand/product name (`brand:
+{ en: 'Football Reference', hr: 'Football Reference' }` - identical for both
+locales) - every other Croatian page defines its own distinct translated
+`title` local instead of reusing the English one, which is what made this
+worth checking by hand rather than assuming. Also re-verified all six
+Croatian competition pages' `TournamentTable`/`ChampionsSummary`/
+`References`/`PrintDownloadLink` calls pass every one of their many
+overridable Croatian-text props (filter labels, empty-state text, JSON-LD
+`name` fields) - none were missing. This closes out the hardcoded-English
+sweep with actual exhaustive coverage, not just "none turned up" - see the
+prior entry for why that distinction mattered.
+
+With that angle confirmed clean, moved to the other named candidate: **PDF/UA
+accessibility tagging for the downloadable PDFs**, flagged as a real but
+separately-scoped candidate three entries running. Assumed infeasible at
+first (same "no outbound network for a new dependency" limitation that blocks
+the source-link liveness check), but Playwright 1.62 (this repo's pinned
+`@playwright/test` version) turned out to already support it natively:
+`page.pdf()` gained `tagged` (emits a PDF structure tree - headings, tables,
+reading order) and `outline` (embeds that same structure as PDF bookmarks) as
+built-in options, no new dependency needed. `scripts/generate-pdfs.mjs`'s one
+`page.pdf({...})` call now passes both. Every one of the 12 downloadable PDFs
+(6 competitions × 2 locales) was previously untagged - a screen reader
+opening one had no structure to navigate, just a flat stream of text
+positions.
+
+Regenerated all 12 PDFs via `PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm
+build:pdfs` and verified tagging actually took effect by grepping the raw PDF
+bytes for `StructTreeRoot` (the structure-tree root, absent before this
+change), `/Outlines` (the new bookmark tree), and `/MarkInfo` (the tagged-PDF
+marker) - all three are now present in every regenerated PDF. File sizes
+roughly doubled (e.g. `world-cup.pdf` 165.6 KB → 271.9 KB, `copa-america.pdf`
+394.2 KB → 656.5 KB) since a structure tag accompanies every heading/table
+cell/paragraph; all 12 stay well under any reasonable download-size
+expectation and this doesn't touch `pnpm check:perf`'s page-weight budget,
+which only measures built HTML pages, not `public/downloads/`.
+
+**Tests:** no library code under `src/` or test files changed (the fix is
+entirely in the PDF-generation script), so `pnpm test` is unchanged at
+226/226 and `pnpm lint` stays 0 errors/0 warnings/0 hints. `pnpm build` - 23
+pages, unchanged. `pnpm check:links` - 0 broken links (27 pages, unchanged).
+`pnpm check:perf` - all pages within the 300 KB budget, unchanged (heaviest
+242.3 KB). `pnpm check:pdfs` - all 12 regenerated PDFs pass freshness
+validation against their current source content. Full Playwright suite run
+against the rebuilt site to confirm the regenerated PDFs didn't disturb
+anything the existing "Download printable PDF" link tests check (href
+target, visible label/hint text per locale).
+
+**Left for a future pass:** with both explicitly-named candidates from the
+last three entries now closed (hardcoded-English sweep: exhaustively clean;
+PDF tagging: implemented), and the content-accuracy series already exhausted
+before that, remaining candidates are: a source-link *liveness* check (still
+infeasible - no outbound WebFetch/HTTP in this environment), or another fresh
+angle in the same "does this cross-cutting feature actually work end-to-end"
+spirit that surfaced the last three real bugs (Croatian PDFs, broken links,
+the nav aria-label) - worth a careful look at the offline/service-worker
+caching path next, since it hasn't had this kind of end-to-end audit yet and
+follows the same pattern.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
