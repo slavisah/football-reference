@@ -546,6 +546,26 @@ Primary sources should be preferred.
   - https://www.espn.com/soccer/match/_/gameId/654362/italy-netherlands
   - https://www.uefa.com/uefanationsleague/news/029a-1df3af7eedc9-c3b6e51cf3f1-1000--germany-vs-france-highlights-and-report-kylian-mbappe-sco/
   - https://www.espn.com/soccer/match/_/gameId/723737/france-germany
+- Third-place match second independent cross-check (2026-08-12, intensive
+  run): re-verified the winner and score of each edition's third-place
+  play-off - the last team-competition Third/Fourth column on the site still
+  on only a first audit pass - using a source mix distinct from the
+  2026-08-04 UEFA.com/ESPN pair (Wikipedia's dedicated Finals article per
+  edition, plus Sky Sports, Bleacher Report/Euronews, Sports Mole, and
+  BBNTimes/Outlook India). **No discrepancies found across any of the four
+  editions.** Every Third/Fourth pairing already in
+  `content/uefa-nations-league.md` matches exactly: England beat Switzerland
+  6-5 on penalties after a 0-0 draw (2019), Italy beat Belgium 2-1 (2021),
+  Italy beat the Netherlands 3-2 (2023), and France beat host Germany 2-0
+  (2025):
+  - https://en.wikipedia.org/wiki/2019_UEFA_Nations_League_Finals
+  - https://www.skysports.com/football/news/13958/11738309/switzerland-0-0-england-5-6-on-pens-jordan-pickford-settles-nations-league-third-place-play-off
+  - https://en.wikipedia.org/wiki/2021_UEFA_Nations_League_Finals
+  - https://www.thescore.com/seri/news/2201665
+  - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_Finals
+  - https://www.sportsmole.co.uk/football/netherlands/uefa-nations-league/result/italy-edge-out-netherlands-to-win-uefa-nations-league-third-place-playoff_516568.html
+  - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_Finals
+  - https://www.bbntimes.com/society/france-triumphs-over-germany-to-claim-third-place-in-2025-uefa-nations-league
 - Champion/Runner-up/Final-score second-source audit (2026-08-05): a second,
   independent cross-check of the Finals table's Winner, Runner-up, and Final
   score for all four completed editions, using sources distinct from the
