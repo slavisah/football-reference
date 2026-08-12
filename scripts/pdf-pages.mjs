@@ -51,4 +51,41 @@ export const PDF_PAGES = [
     path: '/competitions/golden-boot',
     sources: ['content/golden-boot.md', SOURCES_MD],
   },
+  // Croatian counterparts of the six pages above. Same underlying editorial
+  // source files (content/ stays English-only, per AGENTS.md - only each
+  // /hr/ page's own chrome is translated), but a distinct `/hr/...` page
+  // path so the rendered PDF actually carries the Croatian labels/headers
+  // that page shows, not just an English PDF wearing a Croatian button
+  // label (docs/PROJECT_STATUS.md, "Bug fix: Croatian PDF downloads served
+  // English content").
+  {
+    slug: 'world-cup-hr',
+    path: '/hr/competitions/world-cup',
+    sources: ['content/fifa-world-cup.md', 'content/golden-boot.md', SOURCES_MD],
+  },
+  {
+    slug: 'euro-hr',
+    path: '/hr/competitions/euro',
+    sources: ['content/uefa-euro.md', 'content/golden-boot.md', SOURCES_MD],
+  },
+  {
+    slug: 'nations-league-hr',
+    path: '/hr/competitions/nations-league',
+    sources: ['content/uefa-nations-league.md', SOURCES_MD],
+  },
+  {
+    slug: 'copa-america-hr',
+    path: '/hr/competitions/copa-america',
+    sources: ['content/copa-america.md', SOURCES_MD],
+  },
+  {
+    slug: 'ballon-dor-hr',
+    path: '/hr/competitions/ballon-dor',
+    sources: ['content/ballon-dor.md', SOURCES_MD],
+  },
+  {
+    slug: 'golden-boot-hr',
+    path: '/hr/competitions/golden-boot',
+    sources: ['content/golden-boot.md', SOURCES_MD],
+  },
 ];

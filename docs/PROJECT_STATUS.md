@@ -5260,6 +5260,72 @@ date) both pass.
   coverage is extensive already; a genuinely new angle is the better use of
   a run than a low-yield third accuracy pass).
 
+### Bug fix: all six Croatian PDF downloads silently served English content - added 2026-08-12 (intensive run)
+
+Following the previous entry's steer toward a genuinely new angle (the
+content-accuracy series is exhausted), this run looked at the downloadable
+PDFs from the angle no prior audit had covered: whether the *localized*
+pages' own download links actually deliver localized PDFs. They didn't.
+
+**The bug:** every one of the six Croatian competition/award pages
+(`src/pages/hr/competitions/*.astro`) renders a `PrintDownloadLink` with the
+Croatian button label "Preuzmi PDF za ispis" ("Download printable PDF"), but
+each one passed the same `slug` as its English counterpart (e.g.
+`slug="world-cup"`), so the link's `href` pointed at
+`/downloads/world-cup.pdf` - the English-only PDF, rendered from the English
+page. A Croatian reader who clicked the button and printed or opened the
+file got English column headers, filter labels, and prose, with no
+indication anything had switched languages. `scripts/pdf-pages.mjs` /
+`scripts/generate-pdfs.mjs` only ever built the original six PDFs (one per
+English page), never a Croatian counterpart. This is the same "Croatian
+readers silently get English content" bug class already fixed twice before
+in this project (the nav/offline-cache fallback, 2026-08-07; the
+champions-bar screen-reader label, 2026-08-07) - just a third, previously
+unaudited instance of it. `tests/e2e/mobile.spec.ts` had actually codified
+the bug as correct behavior: every "offers a downloadable print PDF with the
+translated label" test on a Croatian page asserted a Croatian label paired
+with an *English* PDF filename, and the Croatian EURO page had no PDF-link
+test at all.
+
+**The fix:** `scripts/pdf-pages.mjs`'s shared `PDF_PAGES` list (the single
+source of truth `scripts/generate-pdfs.mjs` and `scripts/check-pdf-freshness.mjs`
+both already build from - see the 2026-08-08 entry on why it exists) gained
+six new entries, one per Croatian page, each pointing at the real `/hr/...`
+page path with a `-hr` slug suffix (`world-cup-hr`, `euro-hr`,
+`nations-league-hr`, `copa-america-hr`, `ballon-dor-hr`, `golden-boot-hr`) -
+same underlying `content/*.md` source files as their English counterparts
+(content stays English-only per `AGENTS.md`; only each `/hr/` page's own
+chrome is translated, same as the live HTML already works), but a distinct
+rendered page so the PDF actually carries the Croatian labels/headers that
+page shows. Each of the six Croatian `.astro` pages' `PrintDownloadLink` now
+passes the matching `-hr` slug. Regenerated all 12 PDFs (`pnpm build &&
+pnpm build:pdfs`, `PW_EXECUTABLE_PATH=<preinstalled Chromium>`) - the
+original six are byte-for-byte the English pages as before, plus six new
+genuinely Croatian PDFs. `pnpm check:pdfs` passes cleanly against the new
+12-entry manifest.
+
+Fixed the five existing Playwright PDF-link assertions to expect the `-hr`
+filename instead of the English one, and added the missing sixth test (the
+Croatian EURO page's PDF download had never been covered at all). Also
+updated `docs/ADDING_CONTENT.md`'s PDF-regeneration note to mention there
+are 12 PDFs (six pages × two languages), not six.
+
+**Tests:** no library code under `src/lib` changed, so the full Vitest suite
+is unchanged (211/211) and `pnpm lint` is clean (0 errors/0 warnings/0
+hints). `pnpm build` - 23 pages, unchanged. `pnpm check:pdfs` passes against
+the new 12-PDF manifest. Full Playwright suite: **327/327** (up from 326 -
+the six changed PDF-link assertions plus the one newly-added Croatian EURO
+PDF test), run against the rebuilt site with `PW_EXECUTABLE_PATH` pointed at
+the preinstalled Chromium.
+
+**Left for a future pass:** every downloadable PDF on the site now matches
+the language of the page that links to it. The PDF files themselves remain
+untagged (no `/StructTreeRoot`/`/MarkInfo` - not a full PDF/UA-accessible
+document), which Playwright's print-to-PDF path doesn't straightforwardly
+support fixing; flagged as a real but separately-scoped candidate, not
+addressed here. Source-link liveness remains infeasible in this environment
+(WebFetch 403s on every host tried), per prior runs' notes - unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

@@ -270,8 +270,11 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
   });
 
-  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
-    const link = page.locator('a[download][href$="downloads/world-cup.pdf"]');
+  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/world-cup-hr.pdf"]');
     await expect(link).toContainText('Preuzmi PDF za ispis');
 
     const href = await link.getAttribute('href');
@@ -328,6 +331,19 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
     await expect(page.getByText('Slavna "panenka" Antonína Panenke')).toBeVisible();
+  });
+
+  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/euro-hr.pdf"]');
+    await expect(link).toContainText('Preuzmi PDF za ispis');
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
   });
 
   test('the language switcher returns to the English EURO page', async ({ page }) => {
@@ -461,8 +477,11 @@ test.describe('Croatian Golden Boot page (/hr/competitions/golden-boot) on a 360
     expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
   });
 
-  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
-    const link = page.locator('a[download][href$="downloads/golden-boot.pdf"]');
+  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/golden-boot-hr.pdf"]');
     await expect(link).toContainText('Preuzmi PDF za ispis');
 
     const href = await link.getAttribute('href');
@@ -576,8 +595,11 @@ test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360p
     await expect(page.getByText('Lev Jašin ostaje jedini vratar')).toBeVisible();
   });
 
-  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
-    const link = page.locator('a[download][href$="downloads/ballon-dor.pdf"]');
+  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/ballon-dor-hr.pdf"]');
     await expect(link).toContainText('Preuzmi PDF za ispis');
 
     const href = await link.getAttribute('href');
@@ -732,8 +754,11 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await expect(page.getByText('Bolivija je osvojila svoju jedinu titulu')).toBeVisible();
   });
 
-  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
-    const link = page.locator('a[download][href$="downloads/copa-america.pdf"]');
+  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/copa-america-hr.pdf"]');
     await expect(link).toContainText('Preuzmi PDF za ispis');
 
     const href = await link.getAttribute('href');
@@ -818,8 +843,11 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
     await expect(page.getByText('Hrvatska je 2023. stigla do svog prvog finala')).toBeVisible();
   });
 
-  test('offers a downloadable print PDF with the translated label', async ({ page, request }) => {
-    const link = page.locator('a[download][href$="downloads/nations-league.pdf"]');
+  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/nations-league-hr.pdf"]');
     await expect(link).toContainText('Preuzmi PDF za ispis');
 
     const href = await link.getAttribute('href');
