@@ -5326,6 +5326,88 @@ support fixing; flagged as a real but separately-scoped candidate, not
 addressed here. Source-link liveness remains infeasible in this environment
 (WebFetch 403s on every host tried), per prior runs' notes - unchanged.
 
+### Tooling: first-ever internal link integrity check, closes a real blind spot in the existing perf checker - added 2026-08-12 (intensive run)
+
+Following the two previous entries' steer toward a fresh angle outside the
+now-exhausted content-accuracy series, this run looked at a class of bug
+nothing on the site had ever checked for: a stale or mistyped internal
+`href`/`src` - a nav link, footer link, home-page card, cross-link between
+pages, PDF download link, canonical/hreflang tag, or same-page fragment
+target (e.g. the skip-link's `href="#main"`) - that would silently 404 or
+land nowhere for a real reader. This is the same "does the feature actually
+work end-to-end" angle the immediately preceding entry (the Croatian PDF
+bug) used, just aimed at links instead of downloads.
+
+**New `scripts/check-internal-links.mjs`** (`pnpm check:links`, modeled
+directly on `scripts/check-page-weight.mjs`'s shape: pure, exported,
+independently-tested functions plus a thin `main()`): walks every
+`dist/**/*.html`, extracts every `href`/`src` attribute value
+(`extractLinks`), classifies each as a same-page `fragment`, `internal`
+(base-path-relative or an absolute same-site URL - both forms this site
+actually emits, e.g. in canonical/hreflang/JSON-LD tags), or out-of-scope
+`external`/`skip` (`classifyLink`), and for every internal link resolves it
+against Astro's `format: 'directory'` output (`candidateDistPaths`: an
+extensionless path is a directory with its own `index.html`; an asset path
+like `.pdf`/`.css`/`.xml`/`.webmanifest` is a file) to confirm a real file
+exists. Fragment links are checked against the same page's own `id`
+attributes, so a skip-link or in-page anchor pointing at a renamed/removed
+`id` is caught too - the identical "silently broken for one specific reader"
+bug class as a 404 link, just for keyboard/screen-reader users. External
+(third-party) links are intentionally out of scope, for the same reason
+every content-accuracy audit in this file already notes: this environment's
+egress policy blocks outbound WebFetch/HTTP to third-party hosts, so there's
+no way to verify those resolve from this sandbox.
+
+**A real, if minor, blind spot this closes in existing tooling:**
+`scripts/check-page-weight.mjs`'s `measurePage()` resolves each page's CSS
+refs via `resolveDistAsset()` but silently treats a missing asset as 0 bytes
+(a caught `ENOENT` just short-circuits to `return 0`) rather than failing -
+so a broken CSS link would under-report a page's weight instead of ever
+being flagged as broken. This new script is the first thing on the site
+that actually verifies every internal link/reference resolves to a real
+file, closing that specific gap as a side effect of checking links
+generally.
+
+**Result: zero broken links found** - unsurprising given how much of this
+file's accessibility/SEO/i18n work has already exercised the site's link
+graph by hand, but the value is the same as `check:pdfs` or `check:perf`:
+a permanent regression guard, now wired into CI (`.github/workflows/ci.yml`,
+run right after the existing page-weight budget check), that will catch a
+future stale link (e.g. a renamed route, a typo'd `slug` prop) before it
+ships, the same way `check:pdfs` already catches a stale PDF and
+`check:perf` catches a runaway page.
+
+Verified the checker actually detects breakage (not just green by
+construction) by hand-corrupting a built page's link and its skip-link
+target, confirming both were reported with the exact broken href and reason,
+then restoring the untouched build - not committed, just a sanity check
+during development.
+
+New `tests/unit/checkInternalLinks.test.ts`: 14 Vitest cases covering
+`extractLinks` (dedup, source order, no-links case), `classifyLink` (all
+five link forms this site emits: fragment, mailto/tel, external, base-path-
+relative internal, absolute same-site internal, plus query-string/fragment
+stripping and the bare-root case) and `candidateDistPaths` (root, trailing
+slash, extensionless directory path, and a direct asset path).
+
+**Tests:** `pnpm test` - 225/225 (up from 211: the 14 new cases). `pnpm
+lint` - 0 errors/0 warnings/0 hints. `pnpm build` - 27 pages (unchanged).
+`pnpm check:links` (new) - 0 broken links/fragment targets across all 27
+built pages. `pnpm check:perf` and `pnpm check:pdfs` both pass unchanged (no
+content or library file touched). Full Playwright suite: 327/327 unchanged
+(no page markup changed, only new tooling).
+
+**Left for a future pass:** with the content-accuracy series exhausted (per
+the last two entries) and this run closing the link-integrity gap, remaining
+candidates are: a source-link *liveness* check (still infeasible in this
+environment - WebFetch 403s on every host tried, unchanged across many prior
+attempts), PDF/UA accessibility tagging for the downloadable PDFs (flagged
+as a real but separately-scoped candidate by the immediately preceding
+entry), or another fresh angle in the same spirit as this run and the prior
+one - auditing whether some other cross-cutting feature (not just links or
+PDFs) actually works end-to-end rather than merely rendering correctly in
+isolation.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
