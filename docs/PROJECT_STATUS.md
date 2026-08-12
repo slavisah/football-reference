@@ -5537,6 +5537,100 @@ the nav aria-label) - worth a careful look at the offline/service-worker
 caching path next, since it hasn't had this kind of end-to-end audit yet and
 follows the same pattern.
 
+### Content-accuracy pass: Copa América "Final date" - first-ever second independent cross-check, no discrepancies - added 2026-08-12 (intensive run)
+
+Every backlog item and required/nice-to-have capability was already closed
+going into this run, so per this routine's fallback instruction this
+continued the standing content-accuracy series, picking up the exact gap
+the 2026-08-08 "Final date" first-pass entry named in its own "Left for a
+future pass" note: at that point every other audited column on the Copa
+América page (Champion/Runner-up/Final-score, Format, Host, Third/Fourth)
+already had a second independent cross-check on record, but "Final date"
+did not.
+
+Re-verified all 19 dated editions (the five pre-1960 **Final playoff**
+deciders, the 13 **Knockout final** editions, and the 2016 centenary final -
+the League-table era and the three Home-and-away finals correctly have no
+single date to check) in four parallel WebSearch passes split by era:
+1919-1953, 1987-1999, 2001-2011, and 2015-2024. Deliberately drew on a
+source mix distinct from the 2026-08-08 first pass (which leaned on
+Wikipedia's per-edition articles, RSSSF, ESPN, Transfermarkt, 11v11, and
+copaamerica.com): worldfootball.net, footballdatabase.eu, besoccer.com,
+soccer365.net, athlet.org, topendsports.com, resultados-futbol.com,
+official federation/CONMEBOL history pages, and contemporary press/wire
+coverage (UPI, Washington Post, AP via spokesman.com, CNN).
+
+**No discrepancies found across any of the 19 dates.** The two cases the
+first pass had flagged for extra scrutiny were both re-confirmed rather
+than resolved differently:
+
+- **1999's final** - footballdatabase.eu's lone claim of 17 July remains an
+  outlier; Transfermarkt and 11v11, checked independently of the first
+  pass's sources, both agree with the page's 18 July.
+- **2021's final** - re-checked the timezone-display concern specifically;
+  US-dated wire syndication (spokesman.com's AP recap) and a FoxSports
+  boxscore both independently confirm 10 July, the same date the first
+  pass's US-sourced ESPN/copaamerica.com pages gave, over the 11 July shown
+  on some regional ESPN pages.
+
+One additional soft note, not a contradiction: 11v11.com's own match page
+for the 1922 play-off carries a mislabeled 22 October date that doesn't
+match any other source for that match (including worldfootball.net,
+checked specifically for this pass, and the page's own 6 November date) -
+recorded as a source-reliability flag in `docs/SOURCES.md`, not evidence
+against the page.
+
+See `docs/SOURCES.md`'s expanded Copa América section (new "Final match
+dates second independent cross-check" entry) for the full per-era citation
+list. `content/copa-america.md` gained one new prose paragraph in the
+"Important editorial warning" section documenting this second pass, in the
+same style as the existing Format/Third-Fourth/Champion-Runner-up
+second-cross-check paragraphs already there; `lastReviewed` moved to
+2026-08-12. `status` stays `review` (secondary sources, same reasoning as
+every prior secondary-sourced audit in this file). No table data changed -
+the only file changes are the new content-file paragraph, the
+`lastReviewed` bump, and the new `docs/SOURCES.md` citations.
+
+Bumping `lastReviewed` changed `content/copa-america.md`'s SHA-256, which
+`pnpm check:pdfs` correctly flagged as making `public/downloads/copa-america.pdf`
+(and, since `docs/SOURCES.md` is a shared dependency of every competition
+PDF, all twelve PDFs across both locales) stale. Regenerated all twelve PDFs
+and the manifest via `PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm
+build:pdfs`; `pnpm check:pdfs` now passes cleanly again.
+
+This closes the "second independent cross-check" series for every column on
+the Copa América page that carries one (Champion/Runner-up/Final-score,
+Format, Third/Fourth, and now Final date) - Copa América now has at least
+two independent audit passes on record for every column its table tracks,
+joining FIFA World Cup and UEFA EURO.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (226/226) and `pnpm lint` is clean (0 errors/0 warnings/0 hints).
+`pnpm build` - 23 pages, unchanged. `pnpm check:links` - 0 broken links (27
+pages, unchanged). `pnpm check:perf` - all pages within the 300 KB budget,
+unchanged (heaviest 247.1 KB). `pnpm check:pdfs` - all twelve PDFs
+regenerated and up to date. Full Playwright suite run against the rebuilt
+site to confirm the content-only change and PDF regeneration didn't disturb
+anything the existing "Download printable PDF" link tests or Copa América
+page tests check.
+
+**Left for a future pass:**
+- Nations League's "Final date"-equivalent columns and every other core
+  column across World Cup, EURO, and Nations League already have at least
+  one second cross-check on record from prior entries in this file - the
+  standing content-accuracy series has now covered every dated/audited
+  column on all four team-competition pages at least twice. Remaining
+  candidates: a third-pass spot-check (likely low-yield, per the 2026-08-04
+  performance-surface lesson), Ballon d'Or/Golden Boot columns that haven't
+  had a dedicated second pass yet if any remain, or a fresh
+  accessibility/quality angle in the same "does this cross-cutting feature
+  actually work end-to-end" spirit as the last few real bugs found (the
+  offline/service-worker caching path, named as the next candidate by the
+  previous entry, hasn't had this kind of audit yet).
+- Source-link liveness remains infeasible in this environment (WebFetch and
+  direct fetches to nearly every source domain return 403/EGRESS_BLOCKED),
+  per every prior run's notes - unchanged.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
