@@ -1713,7 +1713,12 @@ test.describe('Primary nav stays in the current language', () => {
 
     await expect(page.locator('a.brand')).toHaveAttribute('href', '/football-reference/hr/');
 
-    const navHrefs = await page.locator('nav[aria-label="Primary"] a').evaluateAll((links) =>
+    // The nav landmark's own accessible name should be Croatian too, not an
+    // English string left over from an untranslated attribute (same bug
+    // class as the champions-bar screen-reader label fixed 2026-08-07).
+    const nav = page.locator('nav[aria-label="Glavna navigacija"]');
+    await expect(nav).toHaveCount(1);
+    const navHrefs = await nav.locator('a').evaluateAll((links) =>
       links.map((link) => link.getAttribute('href')),
     );
     expect(navHrefs.length).toBeGreaterThan(0);
