@@ -784,6 +784,66 @@ Primary sources should be preferred.
     some regional ESPN pages show 11 July due to timezone display - the US
     ESPN page and copaamerica.com's own recap agree on 10 July)
   - https://en.wikipedia.org/wiki/2024_Copa_Am%C3%A9rica_final (14 July 2024)
+- Final match dates second independent cross-check (2026-08-12, intensive
+  run): the "Final date" column's only prior audit was its first pass
+  (2026-08-08, the entry above), unlike Champion/Runner-up/Format/
+  Third-Fourth which each already had a second pass on record; this closes
+  that gap. Re-verified all 19 dated editions in four era-based WebSearch
+  passes (the five pre-1960 Final playoff deciders; 1987-1999; 2001-2011;
+  2015-2024), deliberately drawing on a source mix distinct from the first
+  pass (which leaned on Wikipedia/RSSSF/ESPN/Transfermarkt/11v11/
+  copaamerica.com): worldfootball.net, footballdatabase.eu, besoccer.com,
+  soccer365.net, athlet.org, topendsports.com, resultados-futbol.com,
+  official federation/CONMEBOL histories, and contemporary press/wire
+  coverage. **No discrepancies found.** Both cases the first pass flagged for
+  extra scrutiny were re-confirmed rather than resolved differently: 1999's
+  final (footballdatabase.eu's lone 17 July claim remains an outlier against
+  Transfermarkt and 11v11 independently agreeing on 18 July) and 2021's final
+  (US-dated wire/official sources again confirm 10 July over the 11 July
+  shown on some regional ESPN pages).
+  - https://www.11v11.com/matches/brazil-v-uruguay-29-may-1919-223092/ ;
+    https://www.footballdatabase.eu/en/match/overview/1052896-bresil-uruguay
+    (1919, 29 May)
+  - https://www.worldfootball.net/competition/co22/conmebol-copa-america/se3395/1922-brazil/matches-and-results/
+    (1922, 6 November - 11v11's own page for this fixture is mislabeled 22
+    October, inconsistent with every other source; treated as unreliable for
+    this date, not as evidence against it)
+  - https://www.11v11.com/matches/argentina-v-brazil-01-february-1937-224689/ ;
+    https://www.footballdatabase.eu/en/match/overview/1052820-argentine-bresil
+    (1937, 1 February)
+  - https://www.worldfootball.net/competition/co22/conmebol-copa-america/se3380/1949-brazil/matches-and-results/ ;
+    https://soccer365.net/competitions/618/1949/ (1949, 11 May)
+  - https://www.worldfootball.net/competition/co22/conmebol-copa-america/se3378/1953-peru/all-matches/ ;
+    https://www.topendsports.com/events/soccer/copa-america/hosts/1953.htm
+    (1953, 1 April)
+  - Transfermarkt match sheets (dated Jul 12 1987, Jul 4 1993, Jul 23 1995,
+    Jun 29 1997, Jul 18 1999) cross-checked against contemporary wire/press
+    archives (UPI 4 Jul 1993 recap; Washington Post 24 Jul 1995 and 30 Jun
+    1997 recaps) - all five 1987-1999 dates confirmed, no discrepancies
+  - https://www.espn.com/soccer/match/_/gameId/10576/mexico-colombia ;
+    https://www.transfermarkt.us/colombia_mexico/aufstellung/spielbericht/1022264
+    (2001, 29 July)
+  - https://www.espn.com/soccer/match/_/gameId/151955/brazil-argentina ;
+    https://copaamerica.com/en/news/final-of-the-2004-conmebol-copa-america-brazil-argentina-and-a-comeback-for-history
+    (2004, 25 July)
+  - https://www.espn.com/soccer/match/_/gameId/221083/argentina-brazil ;
+    https://copaamerica.com/en/news/brazil-3-0-argentina-the-heart-stopping-final-of-the-2007-conmebol-copa-america
+    (2007, 15 July)
+  - https://www.espn.com/soccer/match/_/gameId/317560/paraguay-uruguay ;
+    https://copaamerica.com/en/news/diego-forlan-in-the-2011-conmebol-copa-america-grand-final
+    (2011, 24 July)
+  - https://www.espn.com/soccer/match/_/gameId/424357 (2015, 4 July)
+  - https://athlet.org/football/copa-america/2016 (2016 centenary, 26 June)
+  - FoxSports boxscore (Jul 07 2019) and copaamerica.com's own recap (2019,
+    7 July)
+  - spokesman.com (AP wire, dated jul/10/2021) and FoxSports boxscore (Jul
+    10 2021) (2021, 10 July - reconfirms the US-dated source consensus)
+  - https://www.cnn.com (2024/07/14 dateline) and FoxSports boxscore (2024,
+    14 July)
+  - Note: this session's egress proxy blocked direct WebFetch to nearly
+    every one of these domains, so verification relied on WebSearch's
+    synthesized result snippets rather than a direct page read, the same
+    caveat noted by several prior audits in this file.
 - Champion/Runner-up audit (2026-08-05): every edition's Champion and
   Runner-up, 1916 through 2024 (49 editions), cross-checked against each
   edition's dedicated Wikipedia article and at least one of RSSSF, CONMEBOL's
