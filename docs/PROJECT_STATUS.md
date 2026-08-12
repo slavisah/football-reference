@@ -5191,6 +5191,75 @@ before this file was written.
 - The standing content-accuracy (third-pass, low-yield) and source-link
   liveness (infeasible in this environment) candidates are unchanged.
 
+### Content-accuracy pass: UEFA Nations League Third/Fourth-place - second independent cross-check, no discrepancies - added 2026-08-12 (intensive run)
+
+Every backlog item and required/nice-to-have capability was already closed
+going into this run (per every entry above since 2026-08-09), so per this
+routine's fallback instruction this continued the standing content-accuracy
+series, closing the exact gap the previous entry's "Left for a future pass"
+note named: Nations League's "Third"/"Fourth" columns in
+`content/uefa-nations-league.md` were the last team-competition Third/
+Fourth-place data on the site still on only a first audit pass
+(2026-08-04, UEFA.com + ESPN) - Copa América, EURO, and World Cup had all
+already had their own second independent cross-check.
+
+Re-verified all four completed editions (2018-19 through 2024-25) via
+WebSearch, using a source mix deliberately distinct from the 2026-08-04
+pass: each edition's dedicated Wikipedia Finals article, plus Sky Sports
+(2019), theScore (2021), Sports Mole (2023), and BBNTimes (2025) - UEFA.com
+and ESPN were intentionally avoided as repeat sources.
+
+**No discrepancies found across any of the four editions.** Every Third/
+Fourth pairing already on the page matches exactly: England beat
+Switzerland 6-5 on penalties after a 0-0 draw (2019), Italy beat Belgium
+2-1 (2021), Italy beat the Netherlands 3-2 (2023), and France beat host
+Germany 2-0 (2025).
+
+`docs/SOURCES.md` gained a "Third-place match second independent
+cross-check" entry under UEFA Nations League (8 new links). `lastReviewed`
+moved to 2026-08-12; `status` stays `review` (secondary sources, same
+reasoning as every prior secondary-sourced audit in this file). No table
+data changed - the only file changes are the `lastReviewed` bump and the
+new `docs/SOURCES.md` citations.
+
+This closes the "second independent cross-check" series for every core
+column on every team competition's page (Champion/Runner-up/Final-score,
+Format where applicable, Host, and Third/Fourth) across FIFA World Cup,
+UEFA EURO, UEFA Nations League, and Copa América.
+
+Bumping `lastReviewed` changed `content/uefa-nations-league.md`'s SHA-256,
+which `pnpm check:pdfs` correctly flagged as making
+`public/downloads/nations-league.pdf` (and, since `docs/SOURCES.md` is a
+shared dependency of every competition PDF, all six PDFs) stale.
+Regenerated all six PDFs and the manifest via
+`PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm build:pdfs`; `pnpm
+check:pdfs` now passes cleanly again.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (211/211) and `pnpm lint` is clean (0 errors/0 warnings/0 hints).
+`pnpm build` - 23 pages, unchanged. `pnpm check:perf` (all pages within the
+300 KB budget) and `pnpm check:pdfs` (all six PDFs regenerated and up to
+date) both pass.
+
+**Left for a future pass:**
+- Every team-competition Third/Fourth-place (and Champion/Runner-up/
+  Final-score, Format, Host) column across all four team competitions now
+  has at least two independent audit passes on record. Remaining
+  content-accuracy candidates are all third-pass (low-yield, since a first
+  and second pass already agree) or infeasible in this environment
+  (source-link liveness checks, which need live outbound HTTP the sandbox
+  doesn't allow).
+- Note: Ballon d'Or's ceremony dates are **not** an open item - the
+  2026-08-04 entry already gave them a second source, and two later entries
+  (2026-08-06, 2026-08-09) already flagged this exact "left for a future
+  pass" note as a stale repeat. Recorded here a third time so it stops
+  resurfacing.
+- With the content-accuracy series now essentially exhausted, a future run
+  should look toward a fresh angle outside it, per the reasoning the
+  2026-08-09 entry above already laid out (accessibility/performance
+  coverage is extensive already; a genuinely new angle is the better use of
+  a run than a low-yield third accuracy pass).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
