@@ -51,6 +51,9 @@ jobs:
       - name: Page-weight budget check
         run: pnpm check:perf
 
+      - name: Internal link integrity check
+        run: pnpm check:links
+
       - name: Install Playwright browser
         run: pnpm test:e2e:install
 
