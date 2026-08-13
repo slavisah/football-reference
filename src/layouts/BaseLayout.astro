@@ -36,8 +36,28 @@ const fullTitle =
 // from SITE_URL in astro.config.mjs (repo-agnostic, like every other base-path
 // helper here), so this works under any GitHub Pages project name too.
 const siteOrigin = Astro.site ?? Astro.url;
-const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
-const alternateURL = alternateHref ? new URL(alternateHref, siteOrigin) : undefined;
+// Every real page here is a directory-format route (astro.config.mjs's
+// `build.format: 'directory'`) and Astro.url.pathname reflects that with a
+// trailing slash for every route except the site root under a base path
+// (e.g. "/football-reference", not "/football-reference/") - a quirk found
+// by scripts/check-sitemap.mjs, which caught the English home page's
+// canonical/OG/breadcrumb URLs disagreeing with its own sitemap.xml <loc>
+// (and with the Croatian home page's own, correctly slashed, canonical URL)
+// solely because of this. Normalizing here fixes it for every current and
+// future page in one place instead of special-casing the home page.
+function withTrailingSlash(pathname: string): string {
+  return pathname.endsWith('/') ? pathname : `${pathname}/`;
+}
+const canonicalURL = new URL(withTrailingSlash(Astro.url.pathname), siteOrigin);
+// Every page passes alternateHref without a trailing slash (e.g.
+// withBase('/hr/compare')) - normalized the same way as canonicalURL above,
+// for the same reason: the other language's page is itself served/
+// canonicalized with a trailing slash, so this hreflang tag needs one too
+// to agree with that page's own <link rel="canonical"> and with this site's
+// sitemap.xml (src/pages/sitemap.xml.ts), both already normalized.
+const alternateURL = alternateHref
+  ? new URL(withTrailingSlash(alternateHref), siteOrigin)
+  : undefined;
 const ogImageURL = new URL(withBase('/icons/icon-512.png'), siteOrigin);
 const ogLocale = locale === 'hr' ? 'hr_HR' : 'en_US';
 const ogLocaleAlternate = locale === 'hr' ? 'en_US' : 'hr_HR';

@@ -1819,7 +1819,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     );
     await expect(page.locator('link[rel="alternate"][hreflang="hr"]')).toHaveAttribute(
       'href',
-      `${SITE}/hr/competitions/world-cup`,
+      `${SITE}/hr/competitions/world-cup/`,
     );
 
     await page.goto('hr/competitions/world-cup');
@@ -1833,7 +1833,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     );
     await expect(page.locator('link[rel="alternate"][hreflang="en"]')).toHaveAttribute(
       'href',
-      `${SITE}/competitions/world-cup`,
+      `${SITE}/competitions/world-cup/`,
     );
   });
 
@@ -1857,10 +1857,10 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
 
     // 11 nav pages x 2 languages.
     expect(body.match(/<url>/g)?.length).toBe(22);
-    expect(body).toContain(`<loc>${SITE}/competitions/world-cup</loc>`);
-    expect(body).toContain(`<loc>${SITE}/hr/competitions/world-cup</loc>`);
+    expect(body).toContain(`<loc>${SITE}/competitions/world-cup/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/competitions/world-cup/</loc>`);
     expect(body).toContain(
-      `hreflang="hr" href="${SITE}/hr/competitions/world-cup"`,
+      `hreflang="hr" href="${SITE}/hr/competitions/world-cup/"`,
     );
     expect(body).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
   });
