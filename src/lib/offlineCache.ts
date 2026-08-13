@@ -5,6 +5,7 @@ import { TRANSLATED_PATHS } from './i18n';
 // page. Kept separate from NAV_LINKS since these aren't links a reader clicks.
 const STATIC_ASSETS = [
   '/manifest.webmanifest',
+  '/hr/manifest.webmanifest',
   '/favicon.svg',
   '/icons/icon-192.png',
   '/icons/icon-512.png',

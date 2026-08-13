@@ -1620,6 +1620,24 @@ test.describe('Installability and offline reading', () => {
     );
   });
 
+  test('links a Croatian web app manifest that launches to the Croatian home page, not the English one', async ({
+    page,
+  }) => {
+    await page.goto('hr/');
+    const manifestHref = await page.locator('link[rel="manifest"]').getAttribute('href');
+    expect(manifestHref).toBe('/football-reference/hr/manifest.webmanifest');
+
+    const response = await page.request.get(manifestHref!);
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('manifest+json');
+
+    const manifest = await response.json();
+    expect(manifest.lang).toBe('hr');
+    expect(manifest.start_url).toBe('/football-reference/hr/');
+    expect(manifest.name).toBe('The Ultimate Football Reference');
+    expect(manifest.description).not.toContain('family-friendly');
+  });
+
   test('sets a theme-color meta tag and an apple touch icon', async ({ page }) => {
     await page.goto('');
     await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#1f6f4f');
