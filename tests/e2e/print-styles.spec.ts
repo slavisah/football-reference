@@ -128,14 +128,27 @@ test.describe('a screen-filtered row still prints', () => {
   });
 });
 
-// Records, Compare, Sources and Quiz don't use TournamentTable's mobile-card
-// layout, so they don't need the "reverts to a real <table>" check above, but
-// they still need the shared WCAG-under-print and chrome-hiding guarantees -
-// none of the four had ever been driven through print media before.
+// Records, Compare, Sources, the home page and 404 don't use TournamentTable's
+// mobile-card layout, so they don't need the "reverts to a real <table>" check
+// above, but they still need the shared WCAG-under-print and chrome-hiding
+// guarantees. Until now only the three English pages here had ever been
+// driven through print media at all - their Croatian counterparts, and the
+// home page in either language, had zero print coverage (the six competition
+// pages and Quiz are the only other pages with any print testing, both
+// checked separately below/above). This closes that gap, the same
+// "does this page actually work end-to-end, not just assumed-clean because
+// the CSS is shared" angle that has found real bugs elsewhere in this file
+// and in this test suite generally (see e.g. the Croatian-PDF and nav
+// aria-label bugs recorded in docs/PROJECT_STATUS.md).
 const OTHER_PRINT_PAGES = [
+  { label: 'English Home', path: '' },
+  { label: 'Croatian Home', path: 'hr/' },
   { label: 'English Records', path: 'records' },
+  { label: 'Croatian Records', path: 'hr/records' },
   { label: 'English Compare', path: 'compare' },
+  { label: 'Croatian Compare', path: 'hr/compare' },
   { label: 'English Sources', path: 'about/sources' },
+  { label: 'Croatian Sources', path: 'hr/about/sources' },
 ];
 
 for (const { label, path } of OTHER_PRINT_PAGES) {
@@ -170,12 +183,53 @@ for (const { label, path } of OTHER_PRINT_PAGES) {
   });
 }
 
-test.describe('Compare (/compare) in print media', () => {
-  test('hides the team-picker controls, which are meaningless on paper', async ({ page }) => {
-    await page.goto('compare');
+const COMPARE_PAGES = [
+  { label: 'English', path: 'compare' },
+  { label: 'Croatian', path: 'hr/compare' },
+];
+
+for (const { label, path } of COMPARE_PAGES) {
+  test.describe(`${label} Compare (/${path}) in print media`, () => {
+    test('hides the team-picker controls, which are meaningless on paper', async ({ page }) => {
+      await page.goto(path);
+      await page.emulateMedia({ media: 'print' });
+
+      await expect(page.locator('.compare__picker').first()).toBeHidden();
+    });
+  });
+}
+
+// GitHub Pages serves dist/404.html for any unmatched path under the base
+// path, in either language (see mobile.spec.ts's "404 page on a 360px
+// phone" block) - it shows both languages on the same page rather than
+// picking one, so there's only ever one version of it to check here.
+test.describe('404 page in print media', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('this-page-definitely-does-not-exist');
+  });
+
+  test('has no WCAG violations when rendered for print', async ({ page }) => {
+    await page.emulateMedia({ media: 'print' });
+    await runAxe(page);
+  });
+
+  test('hides interactive chrome that makes no sense on paper', async ({ page }) => {
     await page.emulateMedia({ media: 'print' });
 
-    await expect(page.locator('.compare__picker').first()).toBeHidden();
+    for (const selector of ['.site-header', '.site-footer', '.theme-toggle', '.skip-link']) {
+      await expect(page.locator(selector).first()).toBeHidden();
+    }
+  });
+
+  test('flips to pure black-on-white body colors', async ({ page }) => {
+    await page.emulateMedia({ media: 'print' });
+
+    const { background, color } = await page.evaluate(() => {
+      const style = getComputedStyle(document.body);
+      return { background: style.backgroundColor, color: style.color };
+    });
+    expect(background).toBe('rgb(255, 255, 255)');
+    expect(color).toBe('rgb(0, 0, 0)');
   });
 });
 
@@ -188,48 +242,58 @@ test.describe('Compare (/compare) in print media', () => {
 // `no-print` from `.quiz-card__reveal`) plus a new global.css print rule that
 // forces the <details> content visible regardless of its open/closed state,
 // since a printed page can't reflect that interactive state either way.
-test.describe('Quiz (/quiz) in print media', () => {
-  test('has no WCAG violations when rendered for print', async ({ page }) => {
-    await page.goto('quiz');
-    await page.emulateMedia({ media: 'print' });
-    await runAxe(page);
+// Parameterized over both locales - the Croatian quiz (/hr/quiz) shares the
+// exact same QuizCard/QuizOrderCard/global.css print rules, but had never
+// actually been driven through print media itself until now.
+const QUIZ_PAGES = [
+  { label: 'English', path: 'quiz' },
+  { label: 'Croatian', path: 'hr/quiz' },
+];
+
+for (const { label, path } of QUIZ_PAGES) {
+  test.describe(`${label} Quiz (/${path}) in print media`, () => {
+    test('has no WCAG violations when rendered for print', async ({ page }) => {
+      await page.goto(path);
+      await page.emulateMedia({ media: 'print' });
+      await runAxe(page);
+    });
+
+    test('hides interactive chrome and JS-only controls, but keeps the answer key visible', async ({
+      page,
+    }) => {
+      await page.goto(path);
+      await page.emulateMedia({ media: 'print' });
+
+      for (const selector of ['.site-header', '.site-footer', '.theme-toggle', '.skip-link']) {
+        await expect(page.locator(selector).first()).toBeHidden();
+      }
+
+      // JS-only chrome: the score bar and each card's "Check answer" button +
+      // live feedback region stay hidden - there's no interpreter on paper to
+      // drive them.
+      await expect(page.locator('#quiz-score')).toBeHidden();
+      await expect(page.locator('.quiz-card__controls').first()).toBeHidden();
+
+      // The answer-key disclosure itself, and its answer text, must render.
+      const reveal = page.locator('.quiz-card__reveal').first();
+      await expect(reveal).toBeVisible();
+      await expect(reveal.locator('p')).toBeVisible();
+      await expect(reveal.locator('p')).not.toBeEmpty();
+    });
+
+    test('the chronological-order challenge card also keeps its answer key visible', async ({
+      page,
+    }) => {
+      await page.goto(path);
+      await page.emulateMedia({ media: 'print' });
+
+      const orderSection = page.locator('.quiz__order-section');
+      const reveal = orderSection.locator('.quiz-card__reveal').first();
+      await expect(reveal).toBeVisible();
+      await expect(reveal.locator('p')).toBeVisible();
+      // The correct order text renders as "Team A → Team B → ..." - just
+      // confirm it's non-empty real content, not asserting the exact chain.
+      await expect(reveal.locator('p')).not.toBeEmpty();
+    });
   });
-
-  test('hides interactive chrome and JS-only controls, but keeps the answer key visible', async ({
-    page,
-  }) => {
-    await page.goto('quiz');
-    await page.emulateMedia({ media: 'print' });
-
-    for (const selector of ['.site-header', '.site-footer', '.theme-toggle', '.skip-link']) {
-      await expect(page.locator(selector).first()).toBeHidden();
-    }
-
-    // JS-only chrome: the score bar and each card's "Check answer" button +
-    // live feedback region stay hidden - there's no interpreter on paper to
-    // drive them.
-    await expect(page.locator('#quiz-score')).toBeHidden();
-    await expect(page.locator('.quiz-card__controls').first()).toBeHidden();
-
-    // The answer-key disclosure itself, and its answer text, must render.
-    const reveal = page.locator('.quiz-card__reveal').first();
-    await expect(reveal).toBeVisible();
-    await expect(reveal.locator('p')).toBeVisible();
-    await expect(reveal.locator('p')).not.toBeEmpty();
-  });
-
-  test('the chronological-order challenge card also keeps its answer key visible', async ({
-    page,
-  }) => {
-    await page.goto('quiz');
-    await page.emulateMedia({ media: 'print' });
-
-    const orderSection = page.locator('.quiz__order-section');
-    const reveal = orderSection.locator('.quiz-card__reveal').first();
-    await expect(reveal).toBeVisible();
-    await expect(reveal.locator('p')).toBeVisible();
-    // The correct order text renders as "Team A → Team B → ..." - just
-    // confirm it's non-empty real content, not asserting the exact chain.
-    await expect(reveal.locator('p')).not.toBeEmpty();
-  });
-});
+}
