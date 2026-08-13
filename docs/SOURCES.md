@@ -1229,6 +1229,63 @@ Primary sources should be preferred.
   editorial note" section for the full explanation; the page's existing
   choice is kept as-is, since it's consistent with how every other pre-1990
   row is labeled.
+- Ceremony date second independent cross-check (2026-08-13, intensive run):
+  the "Ceremony date" column's only prior audit was its first pass
+  (2026-08-03) plus a narrow five-year follow-up (2026-08-04) - unlike
+  Winner/National team, which already had a full second pass across all 69
+  editions, this column had never had every row independently re-verified.
+  Re-verified all 69 dated editions (1956-2025, excluding the 2020
+  cancellation) in four era-based passes (1956-1973, 1974-1991, 1992-2009,
+  2010-2025), deliberately drawing on a source mix distinct from the first
+  pass (Wikipedia + France Football issue cover-dates + a Tuesday-publication
+  heuristic): RSSSF's per-year pages (`rsssf.org/miscellaneous/europa-poy*.html`),
+  Britannica, official club sites (SL Benfica, FC Dynamo Kyiv, AC Milan,
+  Paris Saint-Germain), UEFA.com, contemporaneous wire/press coverage (VOA
+  News, Jeune Afrique, Sky Sports, CNN, Al Jazeera, France24), and physical
+  France Football issue-cover-date listings surfaced via collector/auction
+  sites (PicClick, eBay, Amazon.fr) - a materially different evidence type
+  from the first pass's reliance on Wikipedia prose. **No discrepancies
+  found across any of the 69 dates.** Both years the first pass had flagged
+  as resting on a single corroborating source before its 2026-08-04
+  follow-up (1965, 1973) were independently re-confirmed with further
+  non-Wikipedia evidence (France Football issue-number listings, a club
+  retrospective). The long-contested 1986 date (30 December, vs. a 29
+  December figure some Dynamo Kyiv/Ukrainian-press retrospectives repeat)
+  was resolved with a genuine explanation this pass found rather than a
+  re-assertion: those retrospectives describe Igor Belanov being privately
+  notified of the result on 29 December, while France Football's own issue
+  (#2125) carrying the published result is dated 30 December - the page
+  tracks the publication date, so the two figures describe different
+  moments in the same story, not a factual conflict. Also newly discovered:
+  the Tuesday-publication heuristic that helped resolve earlier-era
+  conflicts (1965, 1973, 1978, 1986) stops holding from **2002 onward** -
+  12 December 2002 (Thursday), 22 December 2003 (Monday), and 13 December
+  2004 (Monday) are all confirmed correct despite breaking the pattern,
+  each independently corroborated (a contemporaneous BigSoccer forum
+  thread for 2002, a VOA News wire dateline for 2003, UEFA.com's own report
+  naming the weekday for 2004) - flagged so a future pass doesn't mistake
+  this real shift in France Football's release-day pattern for an error.
+  - https://www.rsssf.org/miscellaneous/europa-poy65.html (and the
+    equivalent per-year RSSSF page, 1956-1991)
+  - https://www.britannica.com/topic/Ballon-dOr (list of winners; also used
+    for individual-year cross-checks 1983-1985)
+  - https://www.jeuneafrique.com/381505/politique/jour-26-decembre-1995-george-weah-elu-ballon-dor/
+    (1995)
+  - https://www.voanews.com/ (2003 wire dateline, "Nedved Wins European
+    Football's Golden Ball - 2003-12-22")
+  - https://www.uefa.com/uefachampionsleague/news/ (per-year "wins Ballon
+    d'Or" report pages, 1992-2024, several naming the exact weekday)
+  - Official club sites: slbenfica.pt (1965 retrospective), fcdynamo.com/
+    dynamo.kiev.ua (1975, 1986), acmilan.com (2007), psg.fr (2025)
+  - Physical France Football issue-cover-date listings via collector/
+    auction sites (PicClick, eBay Italy, Amazon.fr), used as a primary-
+    source-adjacent check independent of any web article, for 1965, 1973,
+    1977, 1982, 1989, 1990
+  - Direct WebFetch to nearly every one of these domains (rsssf.org,
+    wikipedia.org, dynamo.kiev.ua, and others) was blocked by this
+    environment's egress policy for this run, so verification relied on
+    WebSearch's synthesized snippets rather than directly rendered pages,
+    per the same caveat noted throughout this file.
 
 ## Review policy
 
