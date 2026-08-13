@@ -39,7 +39,18 @@ function xmlEscape(value: string): string {
 // being a hand-maintained list that can silently go stale.
 export const GET: APIRoute = async ({ site, url }) => {
   const origin = site ?? url;
-  const absolute = (path: string) => new URL(withBase(path), origin).toString();
+  // NAV_LINKS/TRANSLATED_PATHS paths (e.g. "/competitions/world-cup") don't
+  // carry a trailing slash, but every live page here is a directory-format
+  // route (astro.config.mjs's `build.format: 'directory'`) and is actually
+  // served/canonicalized with one - BaseLayout.astro's own canonicalURL
+  // normalizes to match. Without the same normalization here, every <loc>/
+  // <xhtml:link> this route emitted disagreed with the real page's own
+  // canonical URL - caught by scripts/check-sitemap.mjs, which cross-checks
+  // this file's output against every built page's actual <head>.
+  const absolute = (path: string) => {
+    const withSlash = path.endsWith('/') ? path : `${path}/`;
+    return new URL(withBase(withSlash), origin).toString();
+  };
 
   const urlEntries: string[] = [];
 

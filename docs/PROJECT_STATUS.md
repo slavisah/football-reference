@@ -5703,6 +5703,109 @@ downloads, and PWA install/offline - a fresh angle worth considering next:
 the `/sitemap.xml` and `robots.txt` outputs have never had a dedicated
 audit for whether they correctly list both locales' URLs.
 
+### Bug fix + tooling: every non-home page's canonical/hreflang URL disagreed with `sitemap.xml`, closed with a new permanent `pnpm check:sitemap` guard - added 2026-08-13 (intensive run)
+
+Every backlog item was already closed going into this run, so per this
+routine's fallback instruction this picked up the exact candidate the
+previous entry named: a first-ever audit of whether `/sitemap.xml` and
+`robots.txt` actually agree with the pages they describe, the same
+"does this cross-cutting feature actually work end-to-end" angle that found
+the nav `aria-label`, Croatian-PDF, and PWA-manifest bugs.
+
+**Why a manual read of `sitemap.xml.ts`/`robots.txt.ts` wasn't enough:**
+both looked correct on inspection (robots.txt turned out fine), so this
+first built a new checker rather than trusting a read-through - the same
+reasoning `scripts/check-internal-links.mjs`'s own history already
+demonstrates on this project (a link that *looks* right in source can still
+be wrong once actually rendered). That checker immediately found a real,
+site-wide bug.
+
+**The bug:** `BaseLayout.astro`'s `canonicalURL` was built from
+`Astro.url.pathname` directly. Astro's directory-format build
+(`astro.config.mjs`'s `build.format: 'directory'`) serves every route with a
+trailing slash *except* the bare site root under a base path - so the
+English home page's canonical/OG/breadcrumb URLs were
+`.../football-reference` (no slash) while literally every other page,
+including the Croatian home page, got `.../football-reference/hr/` (with
+one). Separately, and more widely, every page's `alternateHref` prop is
+written *without* a trailing slash (e.g. `withBase('/hr/compare')`), so
+every page's hreflang link to its *other*-language counterpart also lacked
+one - 11 pages x 2 languages = 22 wrong hreflang tags. And
+`src/pages/sitemap.xml.ts`'s own `absolute()` helper had the identical gap:
+it built every `<loc>`/`<xhtml:link>` straight from `NAV_LINKS`/
+`TRANSLATED_PATHS` paths (also written without trailing slashes), so the
+sitemap's URLs disagreed with the real canonical URLs those pages actually
+serve for every page except the (also-broken) English home page. Net
+effect: a crawler reading `sitemap.xml` got a *different* URL for every
+single page than the one that page's own `<link rel="canonical">` and
+`<link rel="alternate" hreflang>` tags declared - exactly the kind of
+crawler-confusing signal Google's own hreflang documentation calls out as
+liable to make an alternate get ignored.
+
+**The fix, in the same "normalize once, centrally" style the
+localization/manifest fixes already used:** `BaseLayout.astro` gained one
+`withTrailingSlash()` helper applied to both `canonicalURL` (so the home
+page matches every other page) and the newly-normalized `alternateURL` (so
+every hreflang link to the other language gets a trailing slash without
+having to touch all 22 `alternateHref={withBase(...)}` call sites
+individually). `sitemap.xml.ts`'s `absolute()` gained the identical
+normalization, so its output is now built the same way the pages themselves
+are.
+
+**New `scripts/check-sitemap.mjs`** (`pnpm check:sitemap`, same
+pure-functions-plus-thin-`main()` shape as `check-internal-links.mjs` and
+`check-page-weight.mjs`) closes the gap that let this ship unnoticed:
+`check-internal-links.mjs` only walks `dist/**/*.html`, so `sitemap.xml`
+itself - not an `.html` file, and its `<loc>`/`<xhtml:link>` values aren't
+plain `href="..."` attributes either - was invisible to it. The new script
+parses `dist/sitemap.xml` (`parseSitemapUrls`) and every built page's
+`<head>` (`parsePageHead`: canonical, noindex, hreflang alternates), then
+checks in both directions: every sitemap `<loc>`/alternate resolves to a
+real file (reusing `check-internal-links.mjs`'s already-tested
+`classifyLink`/`candidateDistPaths`) *and* matches that page's own canonical
+URL and hreflang tags exactly (`sameAlternates`); every indexable built page
+has a matching sitemap entry; and hreflang alternates are reciprocal (if
+page A lists B, B's own entry lists A back). Verified it actually catches
+regressions, not just green-by-construction, by re-running it against the
+build before the fix above (the run that produced this entry) - it reported
+63 mismatches across exactly the pages the bug affected, and 0 after the
+fix.
+
+Two existing Playwright assertions in `tests/e2e/mobile.spec.ts` (SEO
+describe block) had the same "test bakes in the bug" shape as the Croatian-
+PDF and nav-`aria-label` bugs before it: the hreflang-alternate test and the
+`sitemap.xml` content test both explicitly asserted the *un-slashed* URL as
+correct. Updated both to expect the trailing slash.
+
+Covered by 11 new Vitest cases (`tests/unit/checkSitemap.test.ts`:
+`parseSitemapUrls` incl. XML-entity unescaping and the no-alternates case,
+`parsePageHead` incl. the noindex case, `sameAlternates` incl. order-
+independence and a same-hreflang-different-href mismatch).
+
+**Tests:** `pnpm test` - 242/242 (231 -> 242: the 11 new cases). `pnpm lint`
+- 0 errors/0 warnings/0 hints. `pnpm build` - 23 pages, unchanged. `pnpm
+check:links` - 0 broken links (27 pages, unchanged). `pnpm check:sitemap`
+(new) - 0 mismatches: every sitemap entry resolves, canonicals/hreflang
+agree with each page's own `<head>`, and no indexable page is missing.
+`pnpm check:perf` - all pages within budget, unchanged (heaviest 247.1 KB).
+`pnpm check:pdfs` - all 12 PDFs still up to date (no content file changed,
+only layout/route code, so nothing needed regenerating). Full Playwright
+suite: **328/328** (up from 327: the two SEO assertions now correctly
+expect a trailing slash, still one test each - no new cases added there).
+Wired `pnpm check:sitemap` into `.github/workflows/ci.yml` right after the
+existing link-integrity check, so a future regression here fails CI instead
+of shipping silently, the same permanent-guard pattern `check:links` and
+`check:pdfs` already established.
+
+**Left for a future pass:** with the nav-localization, PDF-download, PWA-
+install, and now sitemap/hreflang cross-cutting audits all closed, remaining
+candidates are: source-link liveness (still infeasible - this environment's
+egress policy returns 403 for every third-party host tried, confirmed again
+this run), a third-pass content-accuracy spot-check (low-yield per the
+2026-08-04 lesson), or a systematic look at whether `docs/SOURCES.md`
+citations for the individual-award pages (Ballon d'Or, Golden Boot) have had
+as much audit attention as the four team competitions.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

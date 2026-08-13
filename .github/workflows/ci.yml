@@ -54,6 +54,9 @@ jobs:
       - name: Internal link integrity check
         run: pnpm check:links
 
+      - name: Sitemap integrity check
+        run: pnpm check:sitemap
+
       - name: Install Playwright browser
         run: pnpm test:e2e:install
 
