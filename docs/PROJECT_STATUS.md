@@ -5883,6 +5883,76 @@ infeasible in this environment), a third-pass content-accuracy spot-check
 "Titles after 2024"/"Multiple winners through 2025" table-rendering items
 (still not considered gaps, see above).
 
+### Test coverage: print-media testing extended to every remaining page (home, and the Croatian half of Records/Compare/Sources/Quiz), plus a first-ever 404 print check - added 2026-08-13 (intensive run)
+
+Every backlog item and every previously-named "left for a future pass"
+candidate was already closed going into this run, so this continued the
+established "does this cross-cutting feature actually work end-to-end"
+series (`tests/e2e/print-styles.spec.ts`, added 2026-07-30/31/08-09) by
+auditing that file's own coverage gaps rather than assuming a shared
+`@media print` stylesheet means every page is equally covered.
+
+**The gap:** `print-styles.spec.ts`'s `OTHER_PRINT_PAGES` list (added
+2026-08-09) only ever drove the **English** Records, Compare and Sources
+pages through print media; the home page (English or Croatian) had never
+been print-tested at all, and the Croatian halves of Records, Compare,
+Sources and Quiz - despite being tested extensively under screen media
+elsewhere in the suite - had zero print coverage. This is exactly the same
+"tested in English, never checked in Croatian" shape that produced three
+real bugs earlier in this file (the six stale Croatian PDFs, the nav
+`aria-label`, the English-only PWA manifest); the difference this time is
+the underlying CSS is genuinely shared and locale-agnostic (class-name
+selectors, not per-page rules), so before writing tests, manually drove all
+seven previously-untested pages (English/Croatian home, Croatian
+Records/Compare/Sources/Quiz, plus 404) through Playwright with
+`page.emulateMedia({ media: 'print' })` and an axe-core scan by hand.
+**Result: no bug found** - every page already flips to black-on-white,
+hides the header/footer/theme-toggle/skip-link, and passes WCAG 2.1 AA
+under print, including the Croatian quiz's JS-only score bar/controls
+staying hidden while both its multiple-choice and chronological-order
+answer keys stay visible.
+
+**What this run actually adds:** the missing **permanent regression
+coverage** itself, matching this project's established view (see the
+2026-08-09 "hardcoded-English sweep" and 2026-08-12 "internal link
+integrity" entries) that closing a test-coverage gap has real, lasting
+value even when the manual check behind it comes back clean - a future
+regression in any of these seven pages will now be caught. Extended
+`OTHER_PRINT_PAGES` with English/Croatian Home and Croatian
+Records/Compare/Sources (8 entries, up from 3); parameterized the
+previously English-only `Compare` picker-hiding test and the entire `Quiz`
+describe block over both locales (`COMPARE_PAGES`/`QUIZ_PAGES`, mirroring
+the file's existing `PRINT_PAGES` pattern); and added a new "404 page in
+print media" block (WCAG, chrome-hiding, black-on-white), reusing the
+existing `this-page-definitely-does-not-exist` navigation convention from
+`mobile.spec.ts` since GitHub Pages serves the same bilingual 404.html
+regardless of the requesting locale.
+
+**Tests:** no library, component or content file changed - this run is
+test-file-only. `pnpm test` - 242/242 unchanged. `pnpm lint` - 0 errors/0
+warnings/0 hints. `pnpm build` - 23 pages, unchanged. `pnpm check:links` - 0
+broken links (27 pages, unchanged). `pnpm check:perf` - all pages within
+the 300 KB budget, unchanged (heaviest 248.3 KB). `pnpm check:sitemap` - 0
+mismatches, unchanged. `pnpm check:pdfs` - all 12 PDFs unchanged and up to
+date (no content file touched). Full Playwright suite: **350/350** (up from
+328 - the 22 new print-media cases: 15 new page × 3-test combinations across
+the expanded `OTHER_PRINT_PAGES`, the new Croatian Compare picker test, the
+new Croatian Quiz block's 3 tests, and the new 404 block's 3 tests, net of
+the file's existing structure), all passing on the first run with zero
+failures, confirming this really is new coverage of already-correct
+behavior rather than a bug this run had to fix.
+
+**Left for a future pass:** with print-media coverage now complete across
+every page in both languages, the standing candidates remain unchanged from
+the last several entries: source-link liveness (infeasible in this
+environment), a third-pass content-accuracy spot-check (low-yield), or the
+two intentionally-deferred table-rendering items (not gaps). A fresh angle
+worth considering next, in the same "actually works end-to-end" spirit:
+whether the `manifest.webmanifest`/`sw.js` precache list and the
+`check:links`/`check:sitemap` tooling agree on the *complete* page set (e.g.
+a future new page added to one list but not another) - no dedicated
+cross-check between those manifests exists yet.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
