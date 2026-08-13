@@ -6044,6 +6044,93 @@ internal-link crawl as a side effect of the import (harmless - it only
 duplicates already-passing output - but worth a guard clause if it's ever
 touched again).
 
+### Content-accuracy pass: Host(s)/Teams (World Cup, EURO) and Host-country (Nations League, Copa América) - second independent cross-check, no discrepancies - added 2026-08-13 (intensive run)
+
+With every backlog item, cross-cutting audit, and required/nice-to-have
+capability already closed going into this run, the standing candidate this
+picked up was the one gap the coverage record itself still showed: the
+"Host(s)"/"Teams" columns (World Cup, EURO) and the host-country component
+of "Finals host"/"Host / format" (Nations League, Copa América) each had
+exactly one audit pass on record (2026-08-08), never a second independent
+cross-check the way every other column on these four pages already has (see
+the many "second independent cross-check" entries above). `docs/SOURCES.md`
+itself notes for these first passes that `status` stays `review` rather than
+`verified` specifically because verification relies on WebSearch-synthesized
+snippets, not primary documents directly fetched (this environment's egress
+policy blocks WebFetch to essentially every source domain) - that reasoning
+is unchanged by this run, and `status` is intentionally left at `review` on
+all four files; this pass closes the *audit-count* gap, not the sourcing-tier
+one.
+
+Verified via two independent research passes, run in parallel and each using
+a source mix deliberately distinct from its own file's 2026-08-08 first pass:
+
+- **FIFA World Cup Host(s)/Teams** (23 editions, 1930-2026) and **UEFA EURO
+  Host(s)/Teams** (17 editions, 1960-2024): re-checked via worldfootball.net,
+  Britannica, Liquipedia, Transfermarkt, 11v11.com, worldsoccer.com,
+  Grokipedia, NamuWiki, soccergraph.com, and contemporary 2026 World Cup
+  press coverage (Yahoo Sports, MLSSoccer, Sky Sports). **No discrepancies
+  found across any of the 40 rows.** Every previously-documented edge case
+  was independently reconfirmed rather than just trusted: World Cup 1938
+  (16 qualified, Austria's slot vacated after the Anschluss, 15 actually
+  competed) and 1950 (16 qualified, Scotland/Turkey/India withdrew, 13
+  actually competed); EURO's 1980/1996/2016 team-count expansions, 1992's
+  Denmark-for-Yugoslavia late substitution (host/count unaffected), and
+  2020's eleven-city pan-European hosting. The 2026 World Cup's 48-team,
+  three-host (Canada/Mexico/United States) format was reconfirmed as the
+  format actually played, via Britannica's dedicated 2026 article plus
+  multiple contemporary outlets.
+- **UEFA Nations League Finals host** (4 completed editions) and **Copa
+  América host-country** (48 editions, 1916-2024, both 1959 tournaments
+  included): re-checked via worldfootball.net, footballdatabase.eu,
+  besoccer.com, athlet.org, topendsports.com, resultados-futbol.com,
+  Transfermarkt, Grokipedia, Liquipedia, sportsbrief.com, mapsofworld.com,
+  Spanish-language press (El Universo, Goal.com, AUF, opinion.com.bo), and
+  Nations League-specific sources (FIGC, Inside World Football, Football
+  Fandom Wiki, Bleacher Report). **No discrepancies found across any of the
+  52 rows.** Both flagged edge cases held: the two 1959 Copa América
+  editions are correctly kept distinct (regular Campeonato Sudamericano in
+  Buenos Aires, Argentina; the separate one-off "Extraordinario" edition in
+  Guayaquil, Ecuador) and 1975/1979/1983 genuinely had no single host
+  country (two-legged home-and-away finals). One search snippet briefly
+  surfaced "Argentina" for 2021 - the original, later-abandoned co-host
+  plan with Colombia - but a targeted follow-up (ESPN, besoccer.com,
+  Fotmob) confirmed the actual host was Brazil, matching the page; not a
+  discrepancy. Grokipedia's aggregate Copa América host-count summary
+  (Argentina 9, Uruguay/Chile 7 each, Brazil/Peru 6 each, Ecuador 3,
+  Bolivia/US/Paraguay/Colombia/Venezuela 1-2 each) independently reconciles
+  exactly against a manual count of the page's 48 rows - a useful
+  whole-column sanity check beyond the row-by-row pass.
+
+See `docs/SOURCES.md`'s four updated sections (FIFA World Cup, UEFA EURO,
+UEFA Nations League, Copa América) for the full per-pass citation lists.
+`content/fifa-world-cup.md`, `content/uefa-euro.md`,
+`content/uefa-nations-league.md`, and `content/copa-america.md` all had
+their `lastReviewed` bumped to 2026-08-13; `status` stays `review` on all
+four, per the sourcing-tier reasoning above. No table data changed - the
+only content file changes are the four `lastReviewed` bumps.
+
+**Tests:** no library, component, or test file changed - this run is
+content/documentation-only. `pnpm test`, `pnpm lint`, `pnpm build`,
+`pnpm check:links`, `pnpm check:sitemap`, `pnpm check:precache`,
+`pnpm check:perf`, and `pnpm check:pdfs` all re-run against the updated
+content to confirm nothing regressed and the PDFs were regenerated to match
+the new `lastReviewed` dates (see the command output recorded when this run
+closed out).
+
+**Left for a future pass:** with Host(s)/Teams/Finals-host/Host-country now
+on a second independent pass across all four files, every team-competition
+data column on the site has had at least one dedicated content-accuracy
+audit and the large majority have had two. Remaining candidates, unchanged
+in kind from recent entries: source-link liveness (still infeasible in this
+environment - WebFetch is blocked to every domain tried), a third-pass
+content-accuracy spot-check (likely low-yield, per the 2026-08-04 lesson),
+the two intentionally-deferred "Titles after 2024"/"Multiple winners through
+2025" table-rendering items (not gaps - the generated `ChampionsSummary`
+already covers the same ground), and the `check-internal-links.mjs`
+missing-entry-point-guard note from the previous entry (a real but minor
+tooling nit, not a reader-facing gap).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
