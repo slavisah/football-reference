@@ -5631,6 +5631,78 @@ page tests check.
   direct fetches to nearly every source domain return 403/EGRESS_BLOCKED),
   per every prior run's notes - unchanged.
 
+### Bug fix: the installable PWA silently launched Croatian readers into the English app - added 2026-08-13 (intensive run)
+
+Every backlog item was already closed going into this run (Copa América,
+Nations League, Ballon d'Or and Golden Boot all have complete pages with two
+independent content-accuracy passes each), so per this routine's fallback
+instruction this picked up the specific candidate the last three entries had
+each named but never actually done: a first-ever end-to-end audit of the
+offline/service-worker/PWA-install path, in the same spirit as the audits
+that found the nav `aria-label` bug and the six stale Croatian PDFs.
+
+**The bug:** `src/pages/manifest.webmanifest.ts` was a single, English-only
+web app manifest shared by every page on the site, including the `/hr/...`
+pages (`BaseLayout.astro` linked the same `<link rel="manifest">` regardless
+of `locale`). A Croatian reader who installed the site as an app from an
+`/hr/` page got: `lang: 'en'` (so the OS reported the installed app as
+English), `start_url: '/'` (so the installed app always launched to the
+*English* home page, not the Croatian one they installed from), and an
+English-only `description`. This is the same "reader silently dropped back
+into English" bug class `docs/PROJECT_STATUS.md` has already recorded twice
+(the primary nav's `aria-label`, all six Croatian PDF downloads) - just in
+the PWA install/launch path this time, which none of the existing manifest
+Playwright coverage (added with the PWA feature itself, 2026-07-30) had ever
+exercised from an `/hr/` page.
+
+**The fix:** extracted manifest field construction into a new
+`src/lib/manifest.ts` (`buildManifest(locale)`), the same "single source of
+truth read from both routes" pattern `offlineCache.ts` already uses for the
+service worker's precache list. `name`/`short_name`/`icons`/`scope`/theme
+colors stay identical across locales (the brand name is intentionally
+untranslated everywhere else on the site, e.g. `i18n.ts`'s
+`UI_STRINGS.brand`); only `description`, `start_url`, `id`, and `lang` differ
+per locale. `scope` is deliberately kept site-wide (not scoped to `/hr/`) so
+a reader who follows the language-switch link from inside the installed app
+stays in standalone display mode instead of breaking out to the browser -
+it's one app with two launch languages, not two separate installable apps.
+New `src/pages/hr/manifest.webmanifest.ts` serves the Croatian manifest at
+its own URL; `BaseLayout.astro`'s manifest `<link>` now picks the right one
+per `locale`. `offlineCache.ts`'s `STATIC_ASSETS` (feeding the service
+worker's precache list) now includes `/hr/manifest.webmanifest` alongside
+the existing English one, and the service worker's `CACHE_VERSION` bumped
+`v2` -> `v3` so existing installs pick up the new precache entry on their
+next activate rather than being stuck on the old single-manifest cache
+forever.
+
+Covered by 4 new Vitest cases (`tests/unit/manifest.test.ts`: per-locale
+`start_url`/`id`/`lang`/`description`, and that name/icons/scope/theme stay
+identical across locales) plus 2 updated/new cases in
+`tests/unit/offlineCache.test.ts` for the new precache entry, and 1 new
+Playwright case at 360px (`/hr/` links its own manifest, served with the
+right content type, `lang: 'hr'`, and a `start_url` under `/hr/` rather than
+the English one).
+
+**Tests:** no other library code or content changed. `pnpm test` - 231/231
+(226 -> 231: the 5 new cases above). `pnpm lint` - 0 errors/0 warnings/0
+hints. `pnpm build` - 23 pages
+(the new `/hr/manifest.webmanifest` route, unchanged page count since it's
+an API route, not a content page). `pnpm check:links` - 0 broken links (27
+pages, unchanged). `pnpm check:perf` - all pages within the 300 KB budget,
+unchanged (heaviest 247.1 KB). `pnpm check:pdfs` - all 12 PDFs still up to
+date (no content file changed, so nothing needed regenerating). Full
+Playwright suite run against the rebuilt site.
+
+**Left for a future pass:** the two still-open nice-to-have items near the
+top of this file (Copa América's "Titles after 2024" and Ballon d'Or's
+"Multiple winners through 2025" hand-written Markdown tables staying
+unrendered) remain intentionally deferred, not gaps. With this pass closing
+the PWA/offline install path, the standing "does this cross-cutting feature
+actually work end-to-end" series has now covered nav localization, PDF
+downloads, and PWA install/offline - a fresh angle worth considering next:
+the `/sitemap.xml` and `robots.txt` outputs have never had a dedicated
+audit for whether they correctly list both locales' URLs.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

@@ -80,7 +80,10 @@ const structuredData = [breadcrumb, ...jsonLd].filter((item): item is JsonLdObje
       )
     }
     <link rel="icon" href={withBase('/favicon.svg')} />
-    <link rel="manifest" href={withBase('/manifest.webmanifest')} />
+    <link
+      rel="manifest"
+      href={withBase(locale === 'hr' ? '/hr/manifest.webmanifest' : '/manifest.webmanifest')}
+    />
     <link rel="apple-touch-icon" href={withBase('/icons/icon-192.png')} />
     <meta name="theme-color" content="#1f6f4f" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
