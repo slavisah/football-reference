@@ -18,7 +18,8 @@
     "check:pdfs": "node scripts/check-pdf-freshness.mjs",
     "check:perf": "node scripts/check-page-weight.mjs",
     "check:links": "node scripts/check-internal-links.mjs",
-    "check:sitemap": "node scripts/check-sitemap.mjs"
+    "check:sitemap": "node scripts/check-sitemap.mjs",
+    "check:precache": "node scripts/check-precache.mjs"
   },
   "dependencies": {
     "astro": "^5.13.0"
