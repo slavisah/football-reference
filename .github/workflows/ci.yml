@@ -57,6 +57,9 @@ jobs:
       - name: Sitemap integrity check
         run: pnpm check:sitemap
 
+      - name: Offline install (manifest/service worker) integrity check
+        run: pnpm check:precache
+
       - name: Install Playwright browser
         run: pnpm test:e2e:install
 

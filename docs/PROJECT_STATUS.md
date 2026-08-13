@@ -5953,6 +5953,97 @@ whether the `manifest.webmanifest`/`sw.js` precache list and the
 a future new page added to one list but not another) - no dedicated
 cross-check between those manifests exists yet.
 
+### New permanent guard: offline install (manifest/service worker) integrity check, `pnpm check:precache` - added 2026-08-13 (intensive run)
+
+Every backlog item was already closed going into this run, so this picked up
+the exact candidate the previous entry's "left for a future pass" note
+named: whether the built `manifest.webmanifest`/`sw.js` precache list agrees
+with the *actual* page set, the same "does this cross-cutting feature really
+work end-to-end" angle that found the nav `aria-label`, Croatian-PDF,
+PWA-manifest, and sitemap/hreflang bugs before it.
+
+**Why this was worth checking directly rather than trusting the existing
+tests:** `tests/unit/offlineCache.test.ts` and `tests/unit/manifest.test.ts`
+only call `buildPrecacheUrls()`/`buildManifest()` as pure functions and
+assert their output is internally consistent with `NAV_LINKS`/
+`TRANSLATED_PATHS` - the same source data the functions themselves read. That
+proves the function is self-consistent; it never proves the *actual served*
+`dist/sw.js`/`dist/manifest.webmanifest` point at files that exist in the
+real build. A single wrong path baked into the real `sw.js` would fail the
+service worker's `cache.addAll()` atomically at install time (the Cache API
+spec aborts the whole call if any one resource 404s), silently breaking
+offline reading for every nav page on every visitor's first install - and
+nothing in the existing suite builds the site and inspects that generated
+file the way `check-sitemap.mjs` already does for `sitemap.xml`.
+
+**The check, built and run against the real build (`scripts/check-precache.mjs`,
+`pnpm check:precache`, same pure-functions-plus-thin-`main()` shape as
+`check-internal-links.mjs`/`check-sitemap.mjs`, reusing the latter's
+`classifyLink`/`candidateDistPaths`):**
+
+- every URL in the real `dist/sw.js`'s `PRECACHE_URLS` array (parsed with a
+  new `parsePrecacheUrls`, not re-derived from the source function) resolves
+  to a real file in `dist/`;
+- both built `manifest.webmanifest` files' `start_url` and every `icons[].src`
+  resolve to a real file in `dist/`;
+- every link inside the real primary `<nav>` landmark on the built home page,
+  in both languages (a new `parseNavLinks`, parsed from `dist/index.html`/
+  `dist/hr/index.html` rather than re-read from `src/lib/routes.ts` - the
+  same "ground-truth against the build output, not the source" choice
+  `check-sitemap.mjs` already made for the sitemap), has a matching
+  `PRECACHE_URLS` entry, so a future nav page wired into the nav but not the
+  precache list (or the reverse) would be caught here.
+
+**Result: no bug found.** `NAV_LINKS` was already the single shared source
+for both `Nav.astro` and `buildPrecacheUrls()` by construction (see
+`src/lib/routes.ts`'s own header comment), and the site's internal links -
+including the language-switcher link, which uses the un-normalized
+`alternateHref` rather than the trailing-slash-normalized canonical/hreflang
+URLs the 2026-08-13 sitemap fix touched - already match the precache list's
+own un-normalized paths exactly, so the trailing-slash bug class that hit
+`sitemap.xml` never reached the offline path. Matching this project's
+established view (see the 2026-08-09 hardcoded-English sweep and 2026-08-13
+print-media entries above): the missing **permanent regression coverage**
+still has real, lasting value on its own - a future drift here (e.g. a new
+nav page, or a `STATIC_ASSETS`/icon path typo) will now be caught by CI
+instead of only being discoverable by a reader whose install silently stops
+updating.
+
+Covered by 5 new Vitest cases (`tests/unit/checkPrecache.test.ts`:
+`parsePrecacheUrls` incl. the missing-declaration error case, `parseNavLinks`
+incl. correctly excluding the brand link and lang-switcher link that sit
+outside the `<nav>` landmark, and the missing-`<nav>` error case).
+
+**Tests:** no library, component or content file changed - this run is
+tooling/test-file-only. `pnpm test` - 247/247 (242 -> 247: the 5 new cases).
+`pnpm lint` - 0 errors/0 warnings/0 hints. `pnpm build` - 23 pages,
+unchanged. `pnpm check:links` - 0 broken links (27 pages, unchanged). `pnpm
+check:sitemap` - 0 mismatches, unchanged. `pnpm check:precache` (new) - 0
+problems: every precached URL and manifest asset resolves, and every nav
+link in both languages is precached. `pnpm check:perf` - all pages within
+the 300 KB budget, unchanged (heaviest 248.3 KB). `pnpm check:pdfs` - all 12
+PDFs unchanged and up to date (no content file touched). Wired `pnpm
+check:precache` into `.github/workflows/ci.yml` right after the existing
+sitemap check, so a future regression here fails CI instead of shipping
+silently, the same permanent-guard pattern `check:links`/`check:sitemap`
+already established. Full Playwright suite run against the rebuilt site.
+
+**Left for a future pass:** with the nav-localization, PDF-download,
+PWA-install, sitemap/hreflang, and now offline-precache cross-cutting audits
+all closed, remaining candidates are unchanged from the last several
+entries: source-link liveness (still infeasible in this environment), a
+third-pass content-accuracy spot-check (low-yield per the 2026-08-04
+lesson), or the two intentionally-deferred "Titles after 2024"/"Multiple
+winners through 2025" table-rendering items (not gaps). One process note
+worth recording for the next run: `check-sitemap.mjs` and now
+`check-precache.mjs` both import `classifyLink`/`candidateDistPaths` from
+`check-internal-links.mjs` for reuse, but that file's own `main()` runs
+unconditionally at module load with no `import.meta.url` entry-point guard -
+so `pnpm check:sitemap`/`pnpm check:precache` each silently re-run the full
+internal-link crawl as a side effect of the import (harmless - it only
+duplicates already-passing output - but worth a guard clause if it's ever
+touched again).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
