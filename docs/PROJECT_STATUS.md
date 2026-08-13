@@ -5806,6 +5806,83 @@ this run), a third-pass content-accuracy spot-check (low-yield per the
 citations for the individual-award pages (Ballon d'Or, Golden Boot) have had
 as much audit attention as the four team competitions.
 
+### Content-accuracy pass: Ballon d'Or Ceremony date - first-ever second independent cross-check of all 69 editions, no discrepancies - added 2026-08-13 (intensive run)
+
+The previous entry's own "left for a future pass" note named the exact
+candidate this run picked up: whether `docs/SOURCES.md` citations for the
+individual-award pages (Ballon d'Or, Golden Boot) have had as much audit
+attention as the four team competitions. Checking that directly turned up a
+real, well-scoped gap rather than a non-finding: Golden Boot's two tables
+and Ballon d'Or's Winner/National team column had each already received a
+full second independent cross-check across every row, matching the pattern
+every team-competition column eventually got - but Ballon d'Or's **Ceremony
+date** column had not. Its only prior work was a first full pass
+(2026-08-03) plus a narrow five-year follow-up (2026-08-04) that only
+re-checked the years the first pass had flagged as single-sourced, never a
+full second pass across all 69 rows the way e.g. Copa América's Final date
+column got (2026-08-12, the entry three above this one).
+
+**The audit:** re-verified all 69 dated editions (1956-2025, excluding the
+2020 cancellation) in four parallel era-based passes (1956-1973, 1974-1991,
+1992-2009, 2010-2025), deliberately drawing on a source mix distinct from
+the first pass's Wikipedia/France-Football-issue-cover-date/Tuesday-
+publication-heuristic combination: RSSSF's per-year "European Footballer of
+the Year" pages, Britannica, official club sites (SL Benfica, FC Dynamo
+Kyiv, AC Milan, Paris Saint-Germain), UEFA.com, contemporaneous wire/press
+coverage (VOA News, Jeune Afrique, Sky Sports, CNN, Al Jazeera, France24),
+and physical France Football issue-cover-date listings surfaced via
+collector/auction sites (PicClick, eBay, Amazon.fr) - genuinely independent
+evidence, not another pass through the same Wikipedia mirrors. **No
+discrepancies found across any of the 69 dates.**
+
+Two things worth recording beyond the clean result:
+
+- The 1986 date (30 December, on the page) has long carried an unresolved
+  tension with a "29 December" figure some Dynamo Kyiv/Ukrainian-press
+  retrospectives repeat. This pass found the actual explanation rather than
+  just re-asserting one side: those retrospectives describe Igor Belanov
+  being privately notified of the result on 29 December, while France
+  Football's own issue (#2125) carrying the *published* result is dated 30
+  December. The page tracks the publication date, so both figures are
+  correct - they just describe different moments in the same story.
+- The "falls on a Tuesday" heuristic used throughout earlier audits to
+  break source ties (successfully, for 1965, 1973, 1986) turns out to stop
+  holding from **2002 onward** - 12 December 2002 is a Thursday, and 22
+  December 2003 / 13 December 2004 are both Mondays. All three are
+  independently corroborated regardless (a contemporaneous BigSoccer forum
+  thread for 2002, a VOA News wire dateline for 2003, UEFA.com's own report
+  naming the weekday for 2004), so this is a real shift in France
+  Football's release-day pattern, not an error - flagged in both
+  `content/ballon-dor.md` and `docs/SOURCES.md` so a future pass doesn't
+  mistake it for one.
+
+Both findings, plus the full per-era source list, are recorded in
+`content/ballon-dor.md`'s "Important editorial note" section and
+`docs/SOURCES.md`'s Ballon d'Or entry. `lastReviewed` bumped to 2026-08-13.
+
+**Tests:** no library code under `src/` changed, so the full Vitest suite is
+unchanged (242/242) and `pnpm lint` is clean (0 errors/0 warnings/0 hints).
+`pnpm build` - 23 pages, unchanged. `pnpm check:links` - 0 broken links (27
+pages, unchanged). `pnpm check:sitemap` - 0 mismatches, unchanged. `pnpm
+check:perf` - all pages within the 300 KB budget, unchanged (heaviest 248.3
+KB). `pnpm check:pdfs` flagged all 12 PDFs stale (the editorial-note prose
+change touches every PDF via the shared `docs/SOURCES.md` include, plus
+`content/ballon-dor.md` itself for the Ballon d'Or PDFs); regenerated with
+`pnpm build:pdfs` and re-ran `pnpm check:pdfs` clean. Full Playwright suite:
+**328/328**, unchanged - no page structure or component changed, only
+content prose and citations.
+
+**Left for a future pass:** with Golden Boot and Ballon d'Or's Winner/
+National team column already confirmed to match the team competitions'
+audit depth, and Ceremony date now closed too, the individual-award pages
+have the same "every column has at least two independent passes" coverage
+as all four team competitions - this specific gap is fully closed. Standing
+candidates for a future run remain unchanged: source-link liveness (still
+infeasible in this environment), a third-pass content-accuracy spot-check
+(low-yield per the 2026-08-04 lesson), or the two intentionally-deferred
+"Titles after 2024"/"Multiple winners through 2025" table-rendering items
+(still not considered gaps, see above).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
