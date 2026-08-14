@@ -5,8 +5,8 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-08-13
-status: review
+lastReviewed: 2026-08-14
+status: verified
 ---
 
 # Copa América

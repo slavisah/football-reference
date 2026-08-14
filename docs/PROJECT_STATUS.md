@@ -6523,6 +6523,62 @@ otherwise unchanged: source-link liveness (infeasible in this environment),
 a third-pass content-accuracy spot-check (low-yield), and `/records`' page
 weight (still worth watching, unrelated to this change).
 
+### Quality pass: promoted all six competition/award pages from "In review" to "Verified" - added 2026-08-14 (intensive run)
+
+All six data-carrying content files (`content/fifa-world-cup.md`,
+`content/uefa-euro.md`, `content/copa-america.md`,
+`content/uefa-nations-league.md`, `content/ballon-dor.md`,
+`content/golden-boot.md`) had sat at front-matter `status: review` since
+their creation, which renders as an "In review" badge (`CompetitionView.astro`
+and its six `hr/competitions/*.astro` Croatian counterparts, "U pregledu")
+at the top of every one of these pages - even though the accuracy-audit
+history in this file already shows every substantive column of every one
+of the six pages independently cross-checked **twice**, always with "no
+discrepancies": Champion/Runner-up/Final-score, Third/Fourth-place,
+Host(s)/Teams and Final date for World Cup, EURO, Nations League and Copa
+América; Format for Copa América; Winner/National-team and Ceremony date
+for Ballon d'Or; Player(s)/Team/Goals for Golden Boot (see the dated
+entries earlier in this file for each). The "In review" badge had simply
+never been revisited after that audit trail closed out, so the page was
+under-claiming its own accuracy to readers - the exact kind of drift this
+project's repeated accuracy passes exist to catch, just pointed at the
+status field instead of a data cell this time.
+
+Re-confirmed each page's audit coverage against its own table's column
+headers before changing anything (every column on every one of the six
+pages has a matching closed, no-discrepancy, second-independent-source
+audit entry above), then flipped `status: review` to `status: verified`
+and bumped `lastReviewed` to 2026-08-14 in all six content files. No code
+changes were needed - `content.config.ts`'s zod schema already allows
+`verified`, and both `CompetitionView.astro` and every Croatian
+`hr/competitions/*.astro` page already branch on `status === 'verified'`
+("Verified" / "Provjereno") with "In review" ("U pregledu") as the only
+other rendered state, so the badge text updates automatically once the
+front matter does.
+
+Regenerated the six English + six Croatian downloadable PDFs
+(`pnpm build && PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+build:pdfs`) since they embed the same front matter and had gone stale the
+moment `lastReviewed` changed - `pnpm check:pdfs` is clean again. Fixed one
+now-stale hardcoded `lastReviewed` date assertion in
+`tests/e2e/mobile.spec.ts` (the World Cup "last reviewed" Playwright case)
+to match the new 2026-08-14 date.
+
+**Tests:** full suite re-run after the change - `pnpm test` (252/252,
+unchanged), `pnpm lint` (0/0/0), `pnpm build` (23 pages), full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (**406/406**,
+including the one fixed date assertion), and `check:pdfs` /
+`check:links` / `check:sitemap` / `check:precache` / `check:perf` all pass.
+
+**Left for a future pass:** the three generated/tool pages that were
+already `status: verified` (`records-and-timelines.md`,
+`compare-countries.md`, `about-sources.md`/`index.md`/`quiz.md`) needed no
+change. If new editions are added to any of the six competitions in the
+future, their new rows should go through the same audit process before the
+page's status is trusted at "Verified" again - this is a snapshot of the
+data as independently double-checked through 2026-08-14, not a permanent
+guarantee.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

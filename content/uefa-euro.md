@@ -5,8 +5,8 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-08-13
-status: review
+lastReviewed: 2026-08-14
+status: verified
 ---
 
 # UEFA European Championship
