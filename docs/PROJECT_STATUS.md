@@ -6509,8 +6509,9 @@ tone already used on the Croatian EURO/Copa América pages, including
 "Memorable moments" headings and a sample line render; Croatian: the
 "Nezaboravni trenuci" heading and its translated Italy-hosted-but-finished-
 third line render. Ran the full Nations League/print-media Playwright slice
-(19 cases) plus the complete suite - **402/404 passing** (`pnpm test` 252/252
-unchanged, no library code touched). `pnpm lint` (0/0/0) and `pnpm build`
+(19 cases) plus the complete suite - **406/406 passing**, including the 2
+new cases (`pnpm test` 252/252 unchanged, no library code touched).
+`pnpm lint` (0/0/0) and `pnpm build`
 (23 pages) both clean; `check:links`/`check:sitemap`/`check:precache`/
 `check:perf` all still pass, with `/competitions/nations-league` and
 `/hr/competitions/nations-league` well under the page-weight budget (nowhere
