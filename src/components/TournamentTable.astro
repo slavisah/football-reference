@@ -347,6 +347,12 @@ const defaultSort = defaultSortValue(sortOptions);
   .t-table td.is-winner {
     font-weight: 700;
     color: var(--accent);
+    /* Non-color signal (see global.css's forced-colors section): this
+       survives Windows/OS high-contrast mode, which strips the color/tint
+       above but not text-decoration. */
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.15em;
   }
 
   .t-empty {

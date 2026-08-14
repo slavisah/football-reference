@@ -144,6 +144,44 @@ html {
   }
 }
 
+/* --- Forced-colors mode (Windows/OS high-contrast themes) ---
+   First-ever pass for this mode: nothing in the codebase referenced
+   `forced-colors` before this. In forced-colors mode the browser replaces
+   author `background`/`color`/`border-color` with a small fixed system
+   palette, so any element whose only visual signal is a *background tint or
+   text color with no border* effectively loses that signal (its box becomes
+   indistinguishable from plain background). Most of the site is already
+   safe because interactive chrome (`.badge`, `.card`, `.filters select`,
+   `.filters__reset`, the theme-toggle button) already carries a real
+   `border`, which forced-colors renders in a system color rather than
+   dropping - a border-color survives, an unbordered background tint does
+   not. The two places that relied on background/color alone are fixed
+   locally: `.skip-link` now always carries a (normally transparent) border
+   so it still reads as a bordered pill rather than a colorless box when
+   focused under forced-colors, and TournamentTable.astro's `.is-winner`
+   cell gets a non-color `text-decoration: underline` alongside its existing
+   `font-weight`/`color` so the champion cell keeps a second, color-independent
+   signal beyond bold text. Decorative-only shapes that lose their fill under
+   forced-colors (the theme-toggle's sun/moon gradient dot) are left alone on
+   purpose - they are `aria-hidden`, and the toggle's real state is already
+   carried by its visible text label and `aria-pressed`, not by that icon's
+   color. Covered by tests/e2e/accessibility-forced-colors.spec.ts. */
+@media (forced-colors: active) {
+  .t-table tbody tr:hover {
+    outline: 1px solid CanvasText;
+    outline-offset: -1px;
+  }
+
+  /* The base rule's border is `transparent` on purpose (invisible in every
+     normal theme, since the pill's accent background already reads fine on
+     its own there) - forced-colors mode leaves a literal `transparent`
+     border-color untouched rather than forcing it, so the pill needs this
+     explicit override to actually gain a visible edge once focused. */
+  .skip-link {
+    border-color: CanvasText;
+  }
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);
@@ -193,6 +231,7 @@ h3 {
   background: var(--accent);
   color: var(--accent-contrast);
   padding: 0.5rem 0.9rem;
+  border: 1px solid transparent;
   border-radius: var(--radius);
   transition: top 0.15s ease;
 }
