@@ -838,6 +838,14 @@ test.describe('Nations League page on a 360px phone', () => {
     await expect(page).toHaveURL(/\/hr\/competitions\/nations-league\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
+
+  test('shows the Key facts and Memorable moments sections from content/uefa-nations-league.md', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Key facts' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
+    await expect(page.getByText('Italy hosted the 2021 Finals')).toBeVisible();
+  });
 });
 
 test.describe('Croatian Nations League page (/hr/competitions/nations-league) on a 360px phone', () => {
@@ -887,6 +895,11 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
   test('shows the translated Key facts section', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Ključne činjenice' })).toBeVisible();
     await expect(page.getByText('Hrvatska je 2023. stigla do svog prvog finala')).toBeVisible();
+  });
+
+  test('shows the translated Memorable moments section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
+    await expect(page.getByText('Italija je 2021. bila domaćin Final Foura')).toBeVisible();
   });
 
   test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({

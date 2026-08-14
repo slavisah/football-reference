@@ -29,6 +29,14 @@ UEFA introduced the Nations League to replace many international friendlies with
 - Croatia reached its first Nations League final in 2023.
 - The competition uses promotion and relegation between leagues.
 
+## Memorable moments
+
+- Portugal won the first-ever Nations League Finals in 2019, beating Netherlands 1–0 as hosts.
+- Italy hosted the 2021 Finals without reaching the final itself, finishing third as France beat Spain 2–1 for the title.
+- Spain won the 2023 final on penalties after a goalless draw with Croatia.
+- Portugal beat Spain on penalties in the 2025 final to become the competition's first two-time champion.
+- The host nation has finished in the Finals' top four in every edition so far, including Germany finishing fourth in 2025.
+
 ## Website idea
 
 Show a compact podium card for each edition and a separate explanation of the league system. Avoid overwhelming younger readers with every group-stage result on the main page.

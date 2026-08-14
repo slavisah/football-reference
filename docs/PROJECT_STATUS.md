@@ -6473,6 +6473,55 @@ against its own edition data, that both would exactly duplicate the existing
 generated `ChampionsSummary` totals, so building them would add page
 clutter with zero new information, not close a real gap).
 
+### Content: UEFA Nations League gains a "Memorable moments" section - added 2026-08-14 (intensive run)
+
+With the standing candidates from the prior two entries confirmed unchanged
+(source-link liveness still infeasible, a third-pass content-accuracy
+spot-check still low-yield), this run looked for a genuinely fresh gap
+instead and found one: `content/uefa-nations-league.md` was the **only**
+one of the six competition/award pages with no narrative "Memorable
+moments"-style section - it had only a data table and a four-bullet "Key
+facts" list, while World Cup, EURO, Copa América, Ballon d'Or and Golden
+Boot all pair their table with a storytelling notes section rendered via
+`EditorialNotes.astro`. This wasn't an intentional exclusion (only genuine
+meta/internal headings like Nations League's own "Website idea" are
+deliberately excluded from rendering) - "Memorable moments" simply hadn't
+been written yet.
+
+Added a five-bullet "Memorable moments" section to
+`content/uefa-nations-league.md`, strictly derived from facts already in
+the page's own (previously double-audited) Finals table rather than any new
+research, consistent with this run's read of the accuracy-first culture in
+this file: Portugal's first title as 2019 hosts, Italy hosting the 2021
+Finals while itself finishing third, Spain's penalty-shootout 2023 title
+over Croatia, Portugal's penalty-shootout second title over Spain in 2025,
+and the previously-unremarked pattern (verified by checking all four rows)
+that the host nation has finished in the Finals' top four in every edition
+so far, including Germany finishing fourth in 2025. `src/pages/competitions/
+nations-league.astro`'s `noteHeadings` gained `'Memorable moments'` (the
+same additive one-line pattern every other `noteHeadings` extension in this
+file has used) and `src/pages/hr/competitions/nations-league.astro` gained
+a matching hand-translated "Nezaboravni trenuci" section (same heading and
+tone already used on the Croatian EURO/Copa América pages, including
+"jedanaesterci" for the penalty-shootout wording).
+
+**Tests:** 2 new Playwright cases at 360px - English: both "Key facts" and
+"Memorable moments" headings and a sample line render; Croatian: the
+"Nezaboravni trenuci" heading and its translated Italy-hosted-but-finished-
+third line render. Ran the full Nations League/print-media Playwright slice
+(19 cases) plus the complete suite - **402/404 passing** (`pnpm test` 252/252
+unchanged, no library code touched). `pnpm lint` (0/0/0) and `pnpm build`
+(23 pages) both clean; `check:links`/`check:sitemap`/`check:precache`/
+`check:perf` all still pass, with `/competitions/nations-league` and
+`/hr/competitions/nations-league` well under the page-weight budget (nowhere
+near `/records`' current ~293-295 KB).
+
+**Left for a future pass:** with this gap closed, no competition/award page
+is missing its narrative notes section anymore. Standing candidates are
+otherwise unchanged: source-link liveness (infeasible in this environment),
+a third-pass content-accuracy spot-check (low-yield), and `/records`' page
+weight (still worth watching, unrelated to this change).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
