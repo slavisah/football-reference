@@ -4,8 +4,8 @@ slug: ballon-dor
 awardType: individual
 firstEdition: 1956
 lastCompletedEdition: 2025
-lastReviewed: 2026-08-13
-status: review
+lastReviewed: 2026-08-14
+status: verified
 ---
 
 # Men's Ballon d'Or
