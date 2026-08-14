@@ -43,7 +43,8 @@ const jsonLd = [
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 
-// Hand-translated from content/uefa-nations-league.md's "Key facts" section.
+// Hand-translated from content/uefa-nations-league.md's "Key facts" and
+// "Memorable moments" sections.
 // content/ itself stays untouched and English (the single editorial source of
 // truth); this is presentation-layer text local to this page only, the same
 // way hr/competitions/copa-america.astro hand-writes its own Croatian prose.
@@ -55,6 +56,16 @@ const notes: NoteSection[] = [
       'Portugal je 2025. postao prvi dvostruki prvak natjecanja.',
       'Hrvatska je 2023. stigla do svog prvog finala Lige nacija.',
       'Natjecanje koristi sustav ispadanja i napredovanja između liga.',
+    ],
+  },
+  {
+    heading: 'Nezaboravni trenuci',
+    items: [
+      'Portugal je osvojio prvi Final Four Lige nacija 2019. godine, pobijedivši Nizozemsku 1:0 kao domaćin.',
+      'Italija je 2021. bila domaćin Final Foura, a da nije igrala u finalu - završila je treća, dok je Francuska svladala Španjolsku 2:1 za naslov.',
+      'Španjolska je naslov 2023. osvojila izvođenjem jedanaesteraca nakon 0:0 protiv Hrvatske.',
+      'Portugal je 2025. u finalu pobijedio Španjolsku izvođenjem jedanaesteraca i postao prvi dvostruki prvak natjecanja.',
+      'Domaćin je u svakom dosadašnjem izdanju završio među četiri najbolje rangirane reprezentacije, uključujući Njemačku, koja je 2025. bila četvrta.',
     ],
   },
 ];
