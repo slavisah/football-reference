@@ -6131,6 +6131,84 @@ already covers the same ground), and the `check-internal-links.mjs`
 missing-entry-point-guard note from the previous entry (a real but minor
 tooling nit, not a reader-facing gap).
 
+### Accessibility: forced-colors (Windows/OS high-contrast theme) support, first-ever pass - added 2026-08-14 (intensive run)
+
+With content-accuracy audits exhausted (every column has at least one pass,
+most have two) and every requirement/nice-to-have from
+`docs/WEBSITE_REQUIREMENTS.md` already built, this run scoped a genuinely
+untested accessibility mode rather than repeat a diminishing-returns
+content re-check. Grepping the whole codebase for `forced-colors` returned
+zero hits before this run - the site's ~15 prior accessibility passes cover
+`prefers-reduced-motion`, `prefers-color-scheme` (both emulated and
+live-toggled), and print media, but never the OS-level Windows/high-contrast
+mode, which a real low-vision reader can have active independently of
+either of those.
+
+In forced-colors mode the browser replaces most author
+`background`/`color`/`border-color` with a small fixed system palette, so
+any element whose only visual signal was a background tint or accent text
+color (no border, no non-color text style) silently loses that signal. Most
+of the site was already safe: interactive chrome (`.badge`, `.card`,
+`.filters select`, `.filters__reset`, the theme-toggle button, both quiz
+components' `is-correct`/`is-incorrect` states) already carries a real
+`border` plus, for the quiz states, a real text badge - borders and text
+survive forced-colors, an unbordered tint does not. Two real gaps were found
+and fixed:
+
+- **`TournamentTable.astro`'s `.is-winner` cell** relied on `font-weight` +
+  `color` alone (no border, no text-decoration) to mark the champion row/
+  cell. Gained a non-color `text-decoration: underline` alongside the
+  existing styling (`text-decoration-thickness`/`text-underline-offset` for
+  legibility) - a second, color-independent signal that survives once the
+  accent color and mobile-card background tint are both overridden by the
+  OS palette. Covers every page that uses the shared table component (all
+  six competitions, both languages).
+- **`BaseLayout.astro`'s skip link** (`.skip-link`) relied on its accent
+  `background` alone for shape, no border at all. Gained a
+  `border: 1px solid transparent` (invisible in every normal theme, since
+  the accent-filled pill already reads fine there) plus a
+  `@media (forced-colors: active)` override in `global.css` forcing
+  `border-color: CanvasText` - needed because forced-colors mode is
+  documented to leave a literal `transparent` border-color untouched rather
+  than forcing it, so the override has to name a real color explicitly.
+  `global.css` also gained a small `@media (forced-colors: active)` block
+  restoring the table row `:hover` highlight via `outline` (its
+  `color-mix` background tint disappears otherwise) - a minor polish item,
+  not a lost-information one, since the row's own text is unaffected either
+  way.
+
+`ThemeToggle.astro`'s decorative sun/moon gradient icon was deliberately
+left alone: it's `aria-hidden="true"`, and the toggle's real state is
+already carried by its visible text label and `aria-pressed`, not by that
+icon's fill color - "fix" it and you'd just be fighting the OS mode's intent
+on a purely cosmetic element for no accessibility gain.
+
+**Tests:** new `tests/e2e/accessibility-forced-colors.spec.ts` (3 cases),
+using Playwright's `page.emulateMedia({ forcedColors: 'active' })` (Chromium
+only, matching this project's single `mobile-chromium` project): the World
+Cup page's `.is-winner` underline survives forced-colors activation, has no
+new 360px overflow, and passes an axe WCAG 2.1 A/AA sweep under forced-colors;
+the home page's skip link resolves to a real, non-transparent
+`border-top-color` once focused under forced-colors; the quiz page's
+`is-correct`/`is-incorrect` states (already border- and text-badge-backed)
+stay axe-clean under forced-colors, confirming that gap really was
+pre-existing-safe rather than untested-and-lucky. `pnpm lint`, `pnpm test`
+(247 Vitest cases), `pnpm build`, the full `pnpm test:e2e` suite (353 cases,
+3 of them new), `pnpm check:links`, `pnpm check:sitemap`,
+`pnpm check:precache`, and `pnpm check:perf` all pass against the changes.
+
+**Left for a future pass:** this pass covered the two signal-loss bugs
+`forced-colors` emulation actually surfaced; it did not attempt an
+exhaustive component-by-component forced-colors sweep (e.g. the quiz's
+order-ranking `<select>`s, the compare page's team pickers) since Chromium's
+native form controls already render correctly in forced-colors by default
+and a targeted check found no other custom-styled, color-only signal beyond
+the two fixed here. If a future pass wants stronger confidence, the highest-
+value next step is running the *existing* axe sweep (`accessibility.spec.ts`)
+under `forcedColors: 'active'` across every page rather than just the three
+covered here - not attempted this run to keep the diff scoped to the actual
+gaps found.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
