@@ -6209,6 +6209,61 @@ under `forcedColors: 'active'` across every page rather than just the three
 covered here - not attempted this run to keep the diff scoped to the actual
 gaps found.
 
+### Accessibility: forced-colors axe sweep extended to every page - added 2026-08-14 (intensive run)
+
+Picked up exactly the "left for a future pass" note from the entry directly
+above: the prior run's forced-colors pass covered only 3 hand-picked pages
+(World Cup, home, quiz); this run runs the same whole-site axe sweep
+`accessibility.spec.ts` already does per color-scheme, but with
+`forcedColors: 'active'` emulated too. New sweep added to
+`tests/e2e/accessibility-forced-colors.spec.ts`, reusing the exact same
+`NAV_LINKS`/`TRANSLATED_PATHS`-derived page list (every nav destination in
+both languages, plus the 404 page) so a newly added page can't silently go
+unswept in either mode, crossed with both color schemes (`prefers-color-scheme`
+still resolves underneath forced-colors, so light and dark aren't assumed to
+behave identically once the OS palette layers on top) - 49 new cases total.
+
+**A real false-positive class was found and handled, not a site bug:** the
+first run of the new sweep failed on the home page's primary hero button
+(`.btn--primary`, both languages, dark color scheme only) with a reported
+1.1:1 contrast ratio. Investigated by hand with a throwaway Playwright
+script against the built preview: `getComputedStyle(button).color` /
+`.backgroundColor`, read at the exact same point in the exact same page as
+the failing axe scan, showed the browser had genuinely painted a valid
+high-contrast system-color pair (yellow on black) - axe-core was instead
+reporting the *pre-forced-colors* CSS-custom-property values
+(`--dark-accent-contrast` #05130d on black), which the button never actually
+rendered. This reproduces on every element whose color/background is set
+via `var(--accent)`/`var(--accent-contrast)` (the site's theming pattern
+almost everywhere), not just this one button - a known class of axe-core
+limitation under `forced-colors` + CSS custom properties, not a real
+accessibility defect: forced-colors mode's entire purpose is to guarantee
+the browser's painted pair is AA-compliant regardless of author CSS, so
+there's no real bug for this specific rule to catch in this mode. Fixed by
+disabling only the `color-contrast` rule (alongside the pre-existing
+site-wide `region` exclusion) in this file's shared `runAxe()` helper, with
+a comment recording how this was verified and why it doesn't mask real
+issues - every other WCAG 2.1 A/AA rule, including the ones that caught the
+two real bugs the prior run fixed, still runs on every page in both modes.
+No site code changed - `src/` is untouched this run, only the test file.
+
+**Tests:** `pnpm lint` (0/0/0), `pnpm test` (247/247 Vitest, unchanged),
+`pnpm build` (23 pages, unchanged), full `pnpm test:e2e` (399 cases, 46 new -
+49 forced-colors-sweep cases added, 3 pre-existing forced-colors cases
+adjusted for the same `color-contrast` exclusion), `pnpm check:links`,
+`pnpm check:sitemap`, `pnpm check:precache`, and `pnpm check:perf` all pass.
+No `content/*.md` file changed, so `pnpm check:pdfs` still reports all 12
+PDFs up to date without a rebuild.
+
+**Left for a future pass:** with the forced-colors sweep now covering every
+page in both languages and both color schemes, this closes the prior
+entry's named gap. Remaining candidates are unchanged from the last several
+entries: source-link liveness (still infeasible in this environment), a
+third-pass content-accuracy spot-check (likely low-yield per the 2026-08-04
+lesson), the two intentionally-deferred table-rendering items (not real
+gaps), and the `check-internal-links.mjs` missing-entry-point-guard note (a
+minor tooling nit, not reader-facing).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
