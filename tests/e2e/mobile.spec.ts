@@ -391,6 +391,37 @@ test.describe('Golden Boot page on a 360px phone', () => {
     await expect(euroVisible).toHaveCount(17);
   });
 
+  test('the two tables write independently namespaced URL params, not one shared key', async ({ page }) => {
+    await page.selectOption('#golden-boot-world-cup-year', '1958');
+    await expect(page).toHaveURL(/world-cup-year=1958/);
+
+    // Filtering the EURO table must not clobber the World Cup table's own
+    // param under a bare, unprefixed "year" key shared by both instances.
+    await page.selectOption('#golden-boot-euro-year', '1984');
+    await expect(page).toHaveURL(/world-cup-year=1958/);
+    await expect(page).toHaveURL(/euro-year=1984/);
+    await expect(page).not.toHaveURL(/[?&]year=/);
+
+    // Both tables must still reflect their own filter, independently.
+    await expect(page.locator('#golden-boot-world-cup-year')).toHaveValue('1958');
+    await expect(page.locator('#golden-boot-euro-year')).toHaveValue('1984');
+  });
+
+  test('a shared link with both namespaced params restores each table independently', async ({ page, baseURL }) => {
+    await page.goto(
+      baseURL
+        ? `${baseURL}competitions/golden-boot?world-cup-year=1958&euro-year=1984`
+        : '/competitions/golden-boot?world-cup-year=1958&euro-year=1984',
+    );
+
+    await expect(page.locator('#golden-boot-world-cup-year')).toHaveValue('1958');
+    await expect(page.locator('#golden-boot-euro-year')).toHaveValue('1984');
+    const wcVisible = page.locator('#golden-boot-world-cup-table tbody tr:not([hidden])');
+    await expect(wcVisible).toHaveCount(1);
+    const euroVisible = page.locator('#golden-boot-euro-table tbody tr:not([hidden])');
+    await expect(euroVisible).toHaveCount(1);
+  });
+
   test('sorting the World Cup table by Goals (most first) puts Just Fontaine\'s 1958 record first', async ({ page }) => {
     await page.selectOption('#golden-boot-world-cup-sort', 'goals-desc');
     const firstRow = page.locator('#golden-boot-world-cup-table tbody tr').first();
@@ -463,6 +494,21 @@ test.describe('Croatian Golden Boot page (/hr/competitions/golden-boot) on a 360
 
     const euroVisible = page.locator('#golden-boot-euro-table tbody tr:not([hidden])');
     await expect(euroVisible).toHaveCount(17);
+  });
+
+  test('a shared link with both namespaced params restores each table independently', async ({ page, baseURL }) => {
+    await page.goto(
+      baseURL
+        ? `${baseURL}hr/competitions/golden-boot?world-cup-year=1958&euro-year=1984`
+        : '/hr/competitions/golden-boot?world-cup-year=1958&euro-year=1984',
+    );
+
+    await expect(page.locator('#golden-boot-world-cup-year')).toHaveValue('1958');
+    await expect(page.locator('#golden-boot-euro-year')).toHaveValue('1984');
+    const wcVisible = page.locator('#golden-boot-world-cup-table tbody tr:not([hidden])');
+    await expect(wcVisible).toHaveCount(1);
+    const euroVisible = page.locator('#golden-boot-euro-table tbody tr:not([hidden])');
+    await expect(euroVisible).toHaveCount(1);
   });
 
   test('shows the same World Cup award totals as the English page', async ({ page, baseURL }) => {
