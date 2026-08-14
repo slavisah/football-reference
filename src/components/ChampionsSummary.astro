@@ -9,6 +9,8 @@ interface Props {
   id?: string;
   heading?: string;
   description?: string;
+  /** Decorative heading icon (aria-hidden); defaults to the trophy used for titles/awards. */
+  icon?: string;
   /** Singular/plural noun for a count, e.g. ["award", "awards"]. */
   unit?: [string, string];
   /** Overridable for localized pages; default text matches the original English copy. */
@@ -25,6 +27,7 @@ const {
   description = 'Generated automatically from the edition table above. Totals group a nation ' +
     'with its sporting predecessor only where the source content does (Germany ' +
     'includes West Germany); every other name is counted as written.',
+  icon = '🏆',
   unit = ['title', 'titles'],
   winningYearsLabel = 'Winning years: ',
   ofLabel = 'of',
@@ -34,7 +37,7 @@ const headingId = `${id}-heading`;
 ---
 
 <section class="champions" aria-labelledby={headingId}>
-  <h2 id={headingId}><span aria-hidden="true">🏆</span> {heading}</h2>
+  <h2 id={headingId}><span aria-hidden="true">{icon}</span> {heading}</h2>
   <p class="muted">{description}</p>
 
   <ol class="champions__list">

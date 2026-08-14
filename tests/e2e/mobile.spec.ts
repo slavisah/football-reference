@@ -1113,6 +1113,18 @@ test.describe('Records page on a 360px phone', () => {
     ).toBeVisible();
   });
 
+  test('shows a "Most frequent hosts" ranking per competition, keeping West Germany and Germany distinct', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Most frequent hosts' })).toBeVisible();
+    await expect(page.locator('#hosts-world-cup-heading')).toBeVisible();
+    await expect(page.locator('#hosts-nations-league-heading')).toBeVisible();
+
+    const worldCupHosts = page.locator('section.champions:has(#hosts-world-cup-heading) .champions__name');
+    await expect(worldCupHosts.filter({ hasText: 'West Germany' })).toBeVisible();
+    await expect(worldCupHosts.filter({ hasText: /^Germany$/ })).toBeVisible();
+  });
+
   test("shows a separate timeline and ranking for the Ballon d'Or and Golden Boot awards", async ({
     page,
   }) => {
@@ -1179,6 +1191,25 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
     await expect(
       page.getByText('Sovjetski Savez i Rusija se ne spajaju.'),
     ).toBeVisible();
+  });
+
+  test('shows the same "Most frequent hosts" World Cup ranking as the English page', async ({
+    page,
+    baseURL,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Najčešći domaćini' })).toBeVisible();
+    const hrTop = await page
+      .locator('section.champions:has(#hosts-world-cup-heading) .champions__name')
+      .first()
+      .textContent();
+
+    await page.goto(baseURL ? `${baseURL}records` : '/records');
+    const enTop = await page
+      .locator('section.champions:has(#hosts-world-cup-heading) .champions__name')
+      .first()
+      .textContent();
+
+    expect(hrTop).toBe(enTop);
   });
 
   test('the language switcher returns to the English records page', async ({ page }) => {

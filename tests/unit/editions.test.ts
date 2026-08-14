@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildChampionsSummary,
   buildEditions,
+  buildHostsSummary,
   buildTimeline,
   buildTopScorerFacts,
   distinctHosts,
@@ -196,6 +197,62 @@ describe('distinctHosts', () => {
       ],
     };
     expect(distinctHosts(buildEditions(copaTable))).toEqual(['Argentina']);
+  });
+});
+
+describe('buildHostsSummary', () => {
+  it('does NOT group West Germany under Germany, unlike buildChampionsSummary', () => {
+    const summary = buildHostsSummary(buildEditions(table));
+    const westGermany = summary.find((s) => s.displayName === 'West Germany');
+    const germany = summary.find((s) => s.displayName === 'Germany');
+    expect(westGermany).toMatchObject({ titles: 1, years: ['1974'] });
+    expect(germany).toBeUndefined();
+  });
+
+  it('counts a co-host edition\'s combined label as a single host entry, matching distinctHosts', () => {
+    const summary = buildHostsSummary(buildEditions(table));
+    expect(summary.find((s) => s.displayName === 'Canada, Mexico and United States')).toMatchObject({
+      titles: 1,
+      years: ['2026'],
+    });
+  });
+
+  it('sorts by times-hosted desc, then earliest hosting year', () => {
+    const repeatHostTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1930', 'Uruguay', 'Uruguay'],
+        ['1950', 'Brazil', 'Uruguay'],
+        ['1970', 'Mexico', 'Brazil'],
+        ['1986', 'Mexico', 'Argentina'],
+      ],
+    };
+    const summary = buildHostsSummary(buildEditions(repeatHostTable));
+    // Mexico hosted twice, so it ranks first; Uruguay (1930) and Brazil (1950)
+    // both hosted once and tie-break on earliest hosting year.
+    expect(summary.map((s) => s.displayName)).toEqual(['Mexico', 'Uruguay', 'Brazil']);
+    expect(summary[0]).toMatchObject({ titles: 2, years: ['1970', '1986'] });
+  });
+
+  it('excludes the "Home-and-away" non-country placeholder, like distinctHosts', () => {
+    const copaTable: MarkdownTable = {
+      headers: ['Year', 'Host / format', 'Winner', 'Runner-up'],
+      rows: [
+        ['1975', 'Home-and-away', 'Peru', 'Colombia'],
+        ['1929', 'Argentina', 'Argentina', 'Uruguay'],
+      ],
+    };
+    expect(buildHostsSummary(buildEditions(copaTable))).toEqual([
+      expect.objectContaining({ displayName: 'Argentina', titles: 1 }),
+    ]);
+  });
+
+  it('returns an empty list when the table has no host column', () => {
+    const scorersTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [['1958', 'Just Fontaine', 'France', '13']],
+    };
+    expect(buildHostsSummary(buildEditions(scorersTable))).toEqual([]);
   });
 });
 

@@ -2,7 +2,7 @@
 title: The Ultimate Football Reference
 description: A family-friendly guide to the history of major international football competitions and awards.
 lastReviewed: 2026-07-23
-status: draft
+status: verified
 ---
 
 # The Ultimate Football Reference

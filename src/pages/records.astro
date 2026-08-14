@@ -4,7 +4,7 @@ import ChampionsTimeline from '../components/ChampionsTimeline.astro';
 import ChampionsSummary from '../components/ChampionsSummary.astro';
 import References from '../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
-import { buildTimeline } from '../lib/editions';
+import { buildHostsSummary, buildTimeline } from '../lib/editions';
 import { withBase } from '../lib/url';
 
 const meta = await loadPageMeta('records-and-timelines');
@@ -142,6 +142,41 @@ const lastReviewed = allLoaded
                 scaleMax={c.data.editions.length}
                 heading={c.label}
                 description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
+              />
+              <a class="records__teams-link" href={c.href}>
+                View the full {c.label} table &rarr;
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="hosts-heading">
+      <h2 id="hosts-heading">Most frequent hosts</h2>
+      <p class="muted">
+        How many times each country has hosted, ranked separately per
+        competition. Unlike the title totals above, this does not group West
+        Germany under Germany - hosting is a fact about a specific edition,
+        not a sporting-successor question, so West Germany (1974 FIFA World
+        Cup, EURO 1988) and Germany (2006 FIFA World Cup, EURO 2024) are kept
+        distinct. A co-hosted edition (e.g. "Belgium and Netherlands") counts
+        as one combined host, the same way the host filter on each
+        competition page already treats it.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => (
+            <div>
+              <ChampionsSummary
+                id={`hosts-${c.key}`}
+                champions={buildHostsSummary(c.data.editions)}
+                scaleMax={c.data.editions.length}
+                heading={c.label}
+                description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
+                icon="🏟️"
+                unit={['time hosted', 'times hosted']}
+                winningYearsLabel="Hosting years: "
               />
               <a class="records__teams-link" href={c.href}>
                 View the full {c.label} table &rarr;
