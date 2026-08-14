@@ -6264,6 +6264,39 @@ lesson), the two intentionally-deferred table-rendering items (not real
 gaps), and the `check-internal-links.mjs` missing-entry-point-guard note (a
 minor tooling nit, not reader-facing).
 
+### Tooling: `check-internal-links.mjs` entry-point guard - added 2026-08-14 (intensive run)
+
+Closed the exact minor nit the previous entry named: `check-internal-links.mjs`'s
+`main()` ran unconditionally at module load, so `check-sitemap.mjs` and
+`check-precache.mjs` (both import `classifyLink`/`candidateDistPaths` from it
+for reuse) silently re-ran the full internal-link crawl a second and third
+time as a side effect of the import - harmless (it only duplicated
+already-passing output) but wasteful and confusing in CI logs. Added a
+standard `if (import.meta.url === \`file://${process.argv[1]}\`)` guard around
+the `main().catch(...)` call at the bottom of the file, so `main()` only runs
+when the script is the actual entry point (`pnpm check:links` or
+`node scripts/check-internal-links.mjs` directly), not when another script
+imports its exported helpers. Verified `pnpm check:links`, `pnpm
+check:sitemap`, and `pnpm check:precache` each still pass cleanly and
+`check:sitemap`/`check:precache`'s console output no longer includes a
+duplicate "Checked N pages" line from the imported module.
+
+With this backlog's every "required capability," "nice-to-have," content-
+accuracy audit, and now this last named tooling nit closed, this run also
+dispatched a fresh independent correctness review of the site's client-side
+`<script>` logic (`TournamentTable.astro`, `compare.astro`, `QuizScript.astro`,
+`OnThisDay.astro`, `ThemeToggle.astro`, the service worker) - the one class of
+code that has never had the "re-read against the real tested logic it
+duplicates" treatment every `src/lib/*.ts` module already received (see the
+"Three real bugs found by re-reading `src/lib/*.ts`" entry above for why this
+technique has a real track record on this codebase). Results, if any, are
+recorded in a follow-up entry.
+
+**Tests:** no library code under `src/` changed. `pnpm lint` (0/0/0), `pnpm
+test` (247/247, unchanged), `pnpm build` (23 pages, unchanged), `pnpm
+check:links`/`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs` all
+pass.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
