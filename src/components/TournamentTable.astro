@@ -55,6 +55,17 @@ interface Props {
   bitTeamPrefix?: string;
   emptyText?: string;
   clearFiltersLabel?: string;
+  /**
+   * Namespaces the shareable `?winner=`/`?year=`/etc. URL query-param keys as
+   * `{paramPrefix}-winner` etc. Required whenever a page renders more than one
+   * `TournamentTable` (e.g. golden-boot.astro's World Cup + EURO tables) -
+   * without it, two instances on the same page silently share one `?year=`
+   * key and each one's filter/sort selection overwrites the other's in the
+   * URL, so a shared link only ever restores the last-changed table. Leave
+   * unset for the (default, far more common) single-table-per-page case so
+   * every existing page's URLs/tests stay byte-identical.
+   */
+  paramPrefix?: string;
 }
 
 const {
@@ -67,6 +78,7 @@ const {
   teams = [],
   winnerLabel = 'Winner',
   extraColumn,
+  paramPrefix = '',
   locale = 'en',
   headerLabels = {},
   yearLabel = 'Year',
@@ -445,6 +457,7 @@ const defaultSort = defaultSortValue(sortOptions);
   is:inline
   define:vars={{
     id,
+    paramPrefix,
     total: editions.length,
     defaultSort,
     showingAllTemplate,
@@ -487,24 +500,34 @@ const defaultSort = defaultSortValue(sortOptions);
     return dir === 'desc' ? -cmp : cmp;
   }
 
+  // Namespaces each param key so multiple TournamentTable instances on one
+  // page (e.g. golden-boot.astro's World Cup + EURO tables, paramPrefix
+  // "world-cup"/"euro") don't silently share and overwrite the same bare
+  // ?winner=/?year=/etc. key in the URL - see the `paramPrefix` prop doc.
+  function paramKey(name) {
+    return paramPrefix ? `${paramPrefix}-${name}` : name;
+  }
+
   function readParams() {
     const p = new URLSearchParams(window.location.search);
     return {
-      winner: p.get('winner') || '',
-      year: p.get('year') || '',
-      host: p.get('host') || '',
-      team: p.get('team') || '',
-      sort: p.get('sort') || '',
+      winner: p.get(paramKey('winner')) || '',
+      year: p.get(paramKey('year')) || '',
+      host: p.get(paramKey('host')) || '',
+      team: p.get(paramKey('team')) || '',
+      sort: p.get(paramKey('sort')) || '',
     };
   }
 
   function writeParams(winner, year, host, team, sort) {
     const p = new URLSearchParams(window.location.search);
-    winner ? p.set('winner', winner) : p.delete('winner');
-    year ? p.set('year', year) : p.delete('year');
-    host ? p.set('host', host) : p.delete('host');
-    team ? p.set('team', team) : p.delete('team');
-    sort && sort !== defaultSort ? p.set('sort', sort) : p.delete('sort');
+    winner ? p.set(paramKey('winner'), winner) : p.delete(paramKey('winner'));
+    year ? p.set(paramKey('year'), year) : p.delete(paramKey('year'));
+    host ? p.set(paramKey('host'), host) : p.delete(paramKey('host'));
+    team ? p.set(paramKey('team'), team) : p.delete(paramKey('team'));
+    sort && sort !== defaultSort
+      ? p.set(paramKey('sort'), sort)
+      : p.delete(paramKey('sort'));
     const qs = p.toString();
     const url = window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash;
     window.history.replaceState({}, '', url);

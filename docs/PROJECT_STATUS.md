@@ -6297,6 +6297,82 @@ test` (247/247, unchanged), `pnpm build` (23 pages, unchanged), `pnpm
 check:links`/`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs` all
 pass.
 
+### Bug fix: Golden Boot's two tables silently shared one `?year=`/`?winner=`/etc. URL key, so filtering one clobbered the other's shareable link - added 2026-08-14 (intensive run)
+
+The fresh client-script correctness review dispatched by the entry above found
+a real bug, its first hit after checking `compare.astro`, `QuizScript.astro`
+(vs. `quiz.ts`), `OnThisDay.astro`'s client re-check script (vs. `onThisDay.ts`),
+`ThemeToggle.astro`, and the service worker/`offlineCache.ts` pair and finding
+each one's client-side logic a faithful match for its tested counterpart or
+free of hand-duplication risk.
+
+**The bug:** `TournamentTable.astro`'s `readParams()`/`writeParams()` read and
+write the shareable `?winner=`/`?year=`/`?host=`/`?team=`/`?sort=` URL keys as
+bare, unprefixed strings. Every page on the site renders exactly one
+`TournamentTable`, so this was never a problem - except `golden-boot.astro`
+(English and Croatian), the only page that renders **two** independent
+instances (`golden-boot-world-cup` and `golden-boot-euro`) side by side. Their
+DOM element ids were already correctly namespaced by `id`, but their inline
+`<script>`s both read/wrote the exact same bare query-param keys, so filtering
+the EURO table's Year select would silently overwrite the World Cup table's
+own `?year=` value in the URL (last-write-wins) even though the World Cup
+table's on-screen filter stayed applied. Reloading a "shared" link in that
+state restored only the table whose filter happened to write last; the other
+table's filter was invisibly lost - `?year=1958` (meant for the World Cup
+table) never round-trips if the EURO table was touched afterward. It gets
+worse with real data: Team values genuinely overlap between the two award
+tables (e.g. "France" is a valid team in both), so a link like `?team=France`
+on initial load filtered **both** tables at once even when only one was
+intended - directly contradicting the page's own documented claim (elsewhere
+in this file) that the two tables "keep filtering/sorting independently." This
+was never caught before because the only existing test for this
+("the two tables filter independently by player") only asserts the two
+tables' visible row counts after a single filter change - it never checks the
+URL, a reload, or a second filter change on the other table.
+
+**Fix:** `TournamentTable.astro` gains an optional `paramPrefix` prop
+(default `''`, so every existing single-table page's URLs/tests stay
+byte-identical - verified `pnpm build` renders unchanged HTML for the five
+other competition/award pages). When set, the client script's new
+`paramKey(name)` helper namespaces every URL key as `` `${paramPrefix}-${name}` ``
+before every `p.get(...)`/`p.set(...)`/`p.delete(...)` call in
+`readParams()`/`writeParams()` - the only two functions in the script that
+touch raw param strings, so this was a small, self-contained change.
+`golden-boot.astro` and `hr/competitions/golden-boot.astro` now pass
+`paramPrefix="world-cup"` / `paramPrefix="euro"` on their respective
+`TournamentTable` instances, so a link now reads
+`?world-cup-year=1958&euro-year=1984` and both tables restore independently,
+with no cross-table collision possible.
+
+**Tests:** 2 new Playwright cases per language (4 total, at 360px): filtering
+the World Cup table by Year writes `?world-cup-year=1958`, then filtering the
+EURO table by Year proves the World Cup table's own param survives untouched
+(`?world-cup-year=1958&euro-year=1984`, and asserts no bare `?year=` key ever
+appears) with both `<select>`s still showing their own value; and a
+shared-link test that loads the page directly with both namespaced params set
+and confirms each table restores its own filter and row count independently.
+`pnpm lint` (0/0/0), `pnpm test` (247/247, unchanged - no library code
+changed), `pnpm build` (23 pages, unchanged for every page except the two
+Golden Boot pages' filter-script `define:vars`), `pnpm check:links`/
+`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs` all pass. No other
+page passes `paramPrefix`, so every other page's behavior and existing
+URL-based tests are structurally unaffected by this change - `id` alone still
+fully determines every DOM element id exactly as before, only the new,
+opt-in `paramKey()` indirection was added to the two URL-param functions. The
+full Playwright suite's first run against this change hit unrelated
+environment flakiness (several `print-styles`/`theme-token-parity` cases,
+none touching `TournamentTable` or Golden Boot, failed together in a pattern
+consistent with resource contention, not a real regression); re-running to
+confirm before treating any of them as real.
+
+**Left for a future pass:** with this bug fixed, no other page on the site
+renders more than one `TournamentTable`, so no other instance of this
+specific collision exists today - but the new `paramPrefix` prop is now the
+documented, required pattern if a future page ever does. Standing candidates
+are otherwise unchanged: source-link liveness (still infeasible in this
+environment), a third-pass content-accuracy spot-check (low-yield), and the
+two intentionally-deferred table-rendering items (not real gaps).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
