@@ -6358,12 +6358,21 @@ Golden Boot pages' filter-script `define:vars`), `pnpm check:links`/
 page passes `paramPrefix`, so every other page's behavior and existing
 URL-based tests are structurally unaffected by this change - `id` alone still
 fully determines every DOM element id exactly as before, only the new,
-opt-in `paramKey()` indirection was added to the two URL-param functions. The
-full Playwright suite's first run against this change hit unrelated
-environment flakiness (several `print-styles`/`theme-token-parity` cases,
-none touching `TournamentTable` or Golden Boot, failed together in a pattern
-consistent with resource contention, not a real regression); re-running to
-confirm before treating any of them as real.
+opt-in `paramKey()` indirection was added to the two URL-param functions.
+Full Playwright suite: **402/402 passing**, including the 4 new cases (2 per
+language). The first two attempts at this full run reported failures, but
+both turned out to be this session's own environment mistake, not a site
+regression: the first passed a wrong, nonexistent `PW_EXECUTABLE_PATH`
+(`.../chromium/chrome-linux/chrome` - `chromium` is itself a symlink straight
+to the Chrome binary, not a directory to descend into), and the second
+(no override at all) hit a version mismatch between the installed
+`@playwright/test` (1.62.0, expecting browser revision 1234) and the
+environment's pre-installed browser (revision 1194) - both failed *every*
+test at the browser-launch step, which a truncated `tail` of the output
+initially misread as "only these specific print-styles/theme-token-parity
+cases failed." Re-run correctly with `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+(the symlink itself, matching this environment's own documented guidance for
+a pinned-Playwright-version project) and got a clean, fully green run.
 
 **Left for a future pass:** with this bug fixed, no other page on the site
 renders more than one `TournamentTable`, so no other instance of this
