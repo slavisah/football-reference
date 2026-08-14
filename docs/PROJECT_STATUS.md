@@ -184,13 +184,16 @@ Covered by 10 new Vitest cases (`tests/unit/notes.test.ts`) and 3 new
 Playwright cases at 360px (World Cup's three sections incl. the *Maracanazo*
 italic check, EURO's paragraph-vs-list rendering, Golden Boot's two merged
 note sections).
-- [ ] Not yet done: Copa América's "Titles after 2024" and Ballon d'Or's
-  "Multiple winners through 2025" are full Markdown tables, not bullet/prose
-  sections, so `extractSection()` doesn't handle them and they're still
-  unused - would need a small table-rendering variant of this feature if a
-  future pass wants them on the page too (the generated `ChampionsSummary`
-  already covers similar ground for both, so this is a nice-to-have, not a
-  gap).
+- [x] Intentionally not done: Copa América's "Titles after 2024" and Ballon
+  d'Or's "Multiple winners through 2025" are full Markdown tables, not
+  bullet/prose sections, so `extractSection()` doesn't handle them and
+  they're still unused. Re-confirmed 2026-08-14 (intensive run, see the
+  "Most frequent hosts" entry near the end of this file): hand-computed
+  Copa América's table against its own edition data and the totals exactly
+  match the generated `ChampionsSummary` already on the page (Argentina 16,
+  Uruguay 15, Brazil 9, etc.) - building a renderer for these two tables
+  would duplicate an existing section with zero new information, not close
+  a real gap. Not planned unless the two ever diverge.
 
 ### Milestone 2: remaining pages (content already exists in `content/`)
 
@@ -285,9 +288,10 @@ differ from `## Editions` and will need the matching `editionsHeading`:
         new Playwright case at 360px (both new section headings visible, the
         2025 Ballon d'Or winner appears in both the timeline and the
         ranking).
-      - [ ] Not yet done: Copa América's "Titles after 2024" and Ballon d'Or's
-        "Multiple winners through 2025" Markdown tables are still unrendered
-        (see the reasoning above for why) - not considered a gap.
+      - [x] Intentionally not done: Copa América's "Titles after 2024" and
+        Ballon d'Or's "Multiple winners through 2025" Markdown tables are
+        still unrendered (see the reasoning above for why, re-confirmed
+        2026-08-14) - not considered a gap.
 
 ### From `docs/WEBSITE_REQUIREMENTS.md`, still missing
 
@@ -6381,6 +6385,93 @@ documented, required pattern if a future page ever does. Standing candidates
 are otherwise unchanged: source-link liveness (still infeasible in this
 environment), a third-pass content-accuracy spot-check (low-yield), and the
 two intentionally-deferred table-rendering items (not real gaps).
+
+### New feature: "Most frequent hosts" ranking on `/records`, plus three stale `status: draft` badges fixed - added 2026-08-14 (intensive run)
+
+With every required/nice-to-have capability, every competition/award page,
+and both intentionally-deferred table-rendering items already accounted for
+(see the prior two entries' "Left for a future pass" notes), this run looked
+for a genuinely new, reader-facing slice rather than a third-pass
+content-accuracy spot-check (already flagged low-yield) or the infeasible
+source-link liveness check. `content/fifa-world-cup.md`'s own "Suggested
+child-friendly features" meta-note ("Compare title counts visually" - already
+built as `ChampionsSummary`'s title-ranking bars) and `content/uefa-euro.md`'s
+host/team-count columns being fully audited but never *aggregated* pointed at
+the same gap: the site ranks title-winners everywhere, but nowhere ranks
+which countries have hosted the most editions, even though every one of the
+four team competitions (World Cup, EURO, Copa América, Nations League) has a
+host column carrying exactly the data needed.
+
+**New library function:** `buildHostsSummary()` (`src/lib/editions.ts`)
+mirrors `buildChampionsSummary()`'s shape and sort order (by count desc, then
+earliest year, then name) so it can be rendered by the *same*
+`ChampionsSummary.astro` component with different copy/labels - the same
+reuse pattern that component's `unit`/`heading`/`description` overrides
+already enable for the Golden Boot/Ballon d'Or "Most awards" sections.
+Deliberately **does not** group West Germany under Germany the way
+`buildChampionsSummary` does for title totals: that merge is a specific,
+documented decision about *sporting-successor title counts*
+(`src/lib/countries.ts`), not a rule about hosting, which is a plain
+historical fact about one specific edition. West Germany hosted the 1974
+FIFA World Cup and EURO 1988; Germany hosted 2006 and EURO 2024 - the new
+ranking correctly keeps these as four separate hosting credits across two
+distinct entries, not a merged "Germany: 4". A co-hosted edition's host cell
+(e.g. "Belgium and Netherlands", "Canada, Mexico and United States") is
+counted as one atomic combined-host entry, matching how `distinctHosts()`
+and the existing host filter already treat that exact string - not a new
+per-country split the source content and the rest of the site don't make.
+`ChampionsSummary.astro` gained an optional `icon` prop (default `🏆`,
+unchanged for every existing call site) so the new section can use `🏟️`
+instead of a trophy, which doesn't fit "how many times has this country
+hosted."
+
+**Page changes:** both `/records` and `/hr/records` gained a new "Most
+frequent hosts" / "Najčešći domaćini" section (English and Croatian,
+`src/pages/records.astro` / `src/pages/hr/records.astro`) between "Most
+successful teams" and the individual-award timeline, one ranked list per
+team competition, with inline copy explaining the West Germany/Germany
+distinction so a reader doesn't wonder why it differs from the title-totals
+section right above it.
+
+**Also fixed in passing:** `content/index.md`, `content/quiz.md` and
+`content/records-and-timelines.md` all still carried `status: draft` from
+before those pages were built - stale metadata rendered verbatim as a
+reader-facing "Status: draft" badge (`References.astro`) on three pages that
+have since shipped, been reviewed, and been covered by dozens of Playwright/
+accessibility passes over the past three weeks (the same standard that
+already earned `compare-countries.md` and `about-sources.md` their
+`status: verified`). Corrected all three to `verified`; `records-and-
+timelines.md` also had its `lastReviewed` bumped to today since this run
+edited that page directly, the other two were left at their existing
+`lastReviewed` date since only the stale `status` field was wrong, not the
+content itself.
+
+**Tests:** 5 new Vitest cases for `buildHostsSummary` (West Germany/Germany
+kept distinct; co-host string counted once; count-desc/earliest-year sort;
+"Home-and-away" excluded like `distinctHosts`; empty list when no host
+column) - full suite **252/252**. 4 new Playwright cases at 360px (English:
+the new heading and both World Cup ranking entries are visible; Croatian:
+the translated heading renders and its top-ranked host matches the English
+page's) plus the existing `/records`/`/hr/records` no-overflow, WCAG and
+print-media coverage re-verified against the now-larger page. `pnpm lint`
+(0 errors/0 warnings), `pnpm build` (23 pages), and `pnpm check:links`/
+`check:sitemap`/`check:precache`/`check:perf` all still pass - page weight
+for `/records` and `/hr/records` grew from ~258-260 KB to ~293-295 KB with
+the four extra ranking lists, still under the 300 KB budget but the closest
+any page has come to it; a future addition to this page should watch that
+number. No PDF regeneration needed - `/records` isn't one of the six
+downloadable competition pages `scripts/pdf-pages.mjs` tracks.
+
+**Left for a future pass:** `/records`' page weight is now within ~5-7 KB of
+the 300 KB budget - worth watching before adding more to that page. Standing
+candidates are otherwise unchanged from the prior two entries: source-link
+liveness (infeasible in this environment), a third-pass content-accuracy
+spot-check (low-yield), and the two intentionally-deferred table-rendering
+items (Copa América "Titles after 2024" / Ballon d'Or "Multiple winners
+through 2025" - confirmed this run, by hand-computing Copa América's table
+against its own edition data, that both would exactly duplicate the existing
+generated `ChampionsSummary` totals, so building them would add page
+clutter with zero new information, not close a real gap).
 
 ## Known caveats
 

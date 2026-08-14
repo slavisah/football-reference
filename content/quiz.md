@@ -2,7 +2,7 @@
 title: Family Quiz
 slug: quiz
 lastReviewed: 2026-07-29
-status: draft
+status: verified
 ---
 
 # Family Quiz

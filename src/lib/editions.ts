@@ -209,6 +209,57 @@ export function distinctHosts(editions: Edition[]): string[] {
 }
 
 /**
+ * Generate hosting totals from editions, in the same `ChampionSummary` shape
+ * `buildChampionsSummary` returns (`titles` here means "times hosted",
+ * `years` the editions hosted) so it can be rendered by the same
+ * `ChampionsSummary.astro` component with different labels/copy, the same
+ * way that component already relabels for the Golden Boot's "awards".
+ *
+ * Unlike `buildChampionsSummary`, this does **not** group West Germany under
+ * Germany. That merge is a specific, documented editorial decision about
+ * *title* totals only (see `src/lib/countries.ts` and the "How historical
+ * nation names are handled" card on `/records`) - hosting is a plain
+ * historical fact about a specific edition, not a sporting-successor
+ * question, so West Germany (1974 World Cup, EURO 1988) and Germany (2006
+ * World Cup, EURO 2024) are kept as the distinct hosts the source content
+ * already records them as.
+ *
+ * A co-hosted edition's host cell (e.g. "Belgium and Netherlands", "Canada,
+ * Mexico and United States") is counted as one atomic host value, matching
+ * `distinctHosts()`/the host filter, which already treat that whole string
+ * as a single option rather than splitting it into per-country entries -
+ * this function does not invent a split the source content and the rest of
+ * the site don't make.
+ */
+export function buildHostsSummary(editions: Edition[]): ChampionSummary[] {
+  const groups = new Map<string, ChampionSummary>();
+
+  for (const edition of editions) {
+    const host = edition.host?.trim();
+    if (!host || NOT_A_HOST.test(host)) continue;
+    const existing = groups.get(host);
+    if (existing) {
+      existing.titles += 1;
+      existing.years.push(edition.year);
+    } else {
+      groups.set(host, { id: host, displayName: host, titles: 1, years: [edition.year], names: [host] });
+    }
+  }
+
+  return [...groups.values()]
+    .map((summary) => ({
+      ...summary,
+      years: [...summary.years].sort((a, b) => leadingYear(a) - leadingYear(b)),
+    }))
+    .sort(
+      (a, b) =>
+        b.titles - a.titles ||
+        leadingYear(a.years[0]) - leadingYear(b.years[0]) ||
+        a.displayName.localeCompare(b.displayName),
+    );
+}
+
+/**
  * Column labels that hold a team/national-team name rather than a count, a
  * date or a score line - covers every team-competition editions table
  * (Winner/Champion, Runner-up, Third, Fourth or "Other semifinalist" in its

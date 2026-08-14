@@ -14,7 +14,7 @@ import ChampionsTimeline from '../../components/ChampionsTimeline.astro';
 import ChampionsSummary from '../../components/ChampionsSummary.astro';
 import References from '../../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
-import { buildTimeline } from '../../lib/editions';
+import { buildHostsSummary, buildTimeline } from '../../lib/editions';
 import { withBase } from '../../lib/url';
 
 const meta = await loadPageMeta('records-and-timelines');
@@ -160,6 +160,42 @@ const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
                 heading={c.label}
                 description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                 winningYearsLabel="Godine osvajanja: "
+                ofLabel="od"
+              />
+              <a class="records__teams-link" href={c.href}>
+                Pogledajte cijelu tablicu - {c.label} &rarr;
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="hosts-heading">
+      <h2 id="hosts-heading">Najčešći domaćini</h2>
+      <p class="muted">
+        Koliko je puta svaka država bila domaćin, poredano zasebno po
+        natjecanju. Za razliku od zbroja naslova iznad, ovdje se Zapadna
+        Njemačka ne ubraja u Njemačku - domaćinstvo je činjenica o
+        pojedinom izdanju, a ne pitanje sportskog nasljednika, pa se Zapadna
+        Njemačka (SP 1974., EURO 1988.) i Njemačka (SP 2006., EURO 2024.)
+        vode zasebno. Izdanje sa zajedničkim domaćinstvom (npr. "Belgija i
+        Nizozemska") broji se kao jedan zajednički domaćin, isto kao što to
+        već čini filtar domaćina na stranici svakog natjecanja.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => (
+            <div>
+              <ChampionsSummary
+                id={`hosts-${c.key}`}
+                champions={buildHostsSummary(c.data.editions)}
+                scaleMax={c.data.editions.length}
+                heading={c.label}
+                description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
+                icon="🏟️"
+                unit={['put domaćin', 'puta domaćin']}
+                winningYearsLabel="Godine domaćinstva: "
                 ofLabel="od"
               />
               <a class="records__teams-link" href={c.href}>
