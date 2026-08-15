@@ -168,3 +168,32 @@ export function buildQuizJsonLd(
     })),
   };
 }
+
+/**
+ * The site itself as a schema.org WebSite - the one page-independent fact
+ * every other builder in this file deliberately doesn't cover, and the only
+ * page that had zero JSON-LD at all (see the "home page has no JSON-LD" test
+ * this replaces in tests/e2e/mobile.spec.ts; BaseLayout.astro's automatic
+ * BreadcrumbList is skipped there too, since "Home" has no parent to link
+ * to). `inLanguage` is a BCP 47 tag ('en' or 'hr'), matching the same two
+ * values already used for `<html lang>` in BaseLayout.astro. No
+ * `potentialAction`/`SearchAction` is included - the site has no search
+ * feature, and inventing one here would misrepresent a capability that
+ * doesn't exist.
+ */
+export function buildWebSiteJsonLd(options: {
+  url: string;
+  name: string;
+  description: string;
+  inLanguage: string;
+}): JsonLdObject {
+  const { url, name, description, inLanguage } = options;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name,
+    url,
+    description,
+    inLanguage,
+  };
+}

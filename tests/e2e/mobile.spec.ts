@@ -1988,11 +1988,33 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     return raw.map((text) => JSON.parse(text));
   }
 
-  test('the home page has no JSON-LD (breadcrumb is skipped on the home page itself)', async ({
+  test('the home page carries a WebSite block instead of a breadcrumb (it has no parent page)', async ({
     page,
   }) => {
     await page.goto('/');
-    expect(await page.locator('script[type="application/ld+json"]').count()).toBe(0);
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks).toHaveLength(1);
+    expect(blocks[0]).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'The Ultimate Football Reference',
+      url: `${SITE}/`,
+      description:
+        'A family-friendly guide to the history of major international football competitions and awards.',
+      inLanguage: 'en',
+    });
+  });
+
+  test('the Croatian home page carries its own translated WebSite block', async ({ page }) => {
+    await page.goto('hr/');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks).toHaveLength(1);
+    expect(blocks[0]).toMatchObject({
+      '@type': 'WebSite',
+      url: `${SITE}/hr/`,
+      inLanguage: 'hr',
+    });
+    expect((blocks[0] as { description: string }).description).toContain('Nogometna povijest');
   });
 
   test('a competition page carries a BreadcrumbList, a champions ItemList and a SportsEvent for the latest edition', async ({

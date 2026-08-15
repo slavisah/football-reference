@@ -4,7 +4,7 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { withBase } from '../lib/url';
 import { t, type Locale } from '../lib/i18n';
-import { buildBreadcrumbList, type JsonLdObject } from '../lib/jsonLd';
+import { buildBreadcrumbList, buildWebSiteJsonLd, type JsonLdObject } from '../lib/jsonLd';
 
 interface Props {
   title: string;
@@ -13,7 +13,7 @@ interface Props {
   locale?: Locale;
   /** The equivalent page in the other language, if one exists. */
   alternateHref?: string;
-  /** Extra schema.org JSON-LD objects for this page (e.g. an ItemList of champions, a SportsEvent for the latest edition). A "Home > page" BreadcrumbList is added automatically for every non-home page. */
+  /** Extra schema.org JSON-LD objects for this page (e.g. an ItemList of champions, a SportsEvent for the latest edition). A "Home > page" BreadcrumbList is added automatically for every non-home page; the home page instead gets an automatic WebSite block. */
   jsonLd?: JsonLdObject[];
   /** Excludes the page from search indexing (e.g. the 404 page). Defaults to false for every existing page. */
   noindex?: boolean;
@@ -74,7 +74,23 @@ const breadcrumb = isHome
       { name: t(locale, 'homeBreadcrumb'), url: homeURL.toString() },
       { name: title, url: canonicalURL.toString() },
     ]);
-const structuredData = [breadcrumb, ...jsonLd].filter((item): item is JsonLdObject => Boolean(item));
+// The home page gets a WebSite block instead of a breadcrumb (it has no
+// parent to link to) - the one page-independent fact no other jsonLd.ts
+// builder covers, built here rather than per-page so it always uses the
+// same trailing-slash-normalized canonicalURL this file already computes
+// above (see withTrailingSlash's comment for why that matters specifically
+// for the home page under a base path).
+const website = isHome
+  ? buildWebSiteJsonLd({
+      url: canonicalURL.toString(),
+      name: fullTitle,
+      description: description ?? fullTitle,
+      inLanguage: locale,
+    })
+  : undefined;
+const structuredData = [breadcrumb, website, ...jsonLd].filter((item): item is JsonLdObject =>
+  Boolean(item),
+);
 ---
 
 <!doctype html>
@@ -143,11 +159,11 @@ const structuredData = [breadcrumb, ...jsonLd].filter((item): item is JsonLdObje
     {description && <meta name="twitter:description" content={description} />}
     <meta name="twitter:image" content={ogImageURL} />
 
-    {/* schema.org structured data: an automatic Home > page BreadcrumbList
-    plus whatever page-specific objects (e.g. a champions ItemList) the page
-    passed in via `jsonLd`. Each is its own self-contained script tag (its own
-    "@context"), which is valid JSON-LD and simpler than merging into one
-    "@graph". */}
+    {/* schema.org structured data: an automatic Home > page BreadcrumbList (or,
+    on the home page itself, an automatic WebSite block instead) plus whatever
+    page-specific objects (e.g. a champions ItemList) the page passed in via
+    `jsonLd`. Each is its own self-contained script tag (its own "@context"),
+    which is valid JSON-LD and simpler than merging into one "@graph". */}
     {
       structuredData.map((item) => (
         <script is:inline type="application/ld+json" set:html={JSON.stringify(item)} />

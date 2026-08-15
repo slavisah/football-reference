@@ -5,6 +5,7 @@ import {
   buildCountryRecordsItemList,
   buildLatestEditionSportsEvent,
   buildQuizJsonLd,
+  buildWebSiteJsonLd,
 } from '../../src/lib/jsonLd';
 import type { ChampionSummary, Edition } from '../../src/lib/types';
 import type { CountryRecord } from '../../src/lib/compare';
@@ -241,5 +242,36 @@ describe('buildQuizJsonLd', () => {
   it('returns an empty hasPart for an empty question list', () => {
     const quiz = buildQuizJsonLd([], { pageUrl: 'https://example.test/quiz/', name: 'Family Quiz' });
     expect(quiz.hasPart).toEqual([]);
+  });
+});
+
+describe('buildWebSiteJsonLd', () => {
+  it('builds a WebSite block with the schema.org context/type and every field passed through verbatim', () => {
+    const website = buildWebSiteJsonLd({
+      url: 'https://example.test/',
+      name: 'The Ultimate Football Reference',
+      description: 'A family-friendly guide to football history.',
+      inLanguage: 'en',
+    });
+
+    expect(website).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'The Ultimate Football Reference',
+      url: 'https://example.test/',
+      description: 'A family-friendly guide to football history.',
+      inLanguage: 'en',
+    });
+  });
+
+  it('supports a non-English inLanguage tag for the Croatian home page', () => {
+    const website = buildWebSiteJsonLd({
+      url: 'https://example.test/hr/',
+      name: 'The Ultimate Football Reference',
+      description: 'Nogometna povijest na jednom mjestu.',
+      inLanguage: 'hr',
+    });
+
+    expect(website.inLanguage).toBe('hr');
   });
 });
