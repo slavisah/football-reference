@@ -1138,6 +1138,22 @@ test.describe('Records page on a 360px phone', () => {
     await expect(worldCupHosts.filter({ hasText: /^Germany$/ })).toBeVisible();
   });
 
+  test('shows a "Back-to-back champions" streak ranking, including a competition with none yet', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Back-to-back champions' })).toBeVisible();
+
+    const ballonDorStreaks = page.locator('section.champions:has(#streaks-ballon-dor-heading)');
+    await expect(ballonDorStreaks.locator('.champions__name').filter({ hasText: 'Lionel Messi' })).toBeVisible();
+    await expect(ballonDorStreaks.locator('.champions__count').first()).toHaveText(/4/);
+    await expect(ballonDorStreaks.getByText('2009, 2010, 2011, 2012')).toBeVisible();
+
+    // UEFA Nations League has had four different champions in its four
+    // editions so far, so it falls back to the "no streak yet" message
+    // instead of an empty ranking list.
+    await expect(page.getByText('No one has won two editions in a row yet.').first()).toBeVisible();
+  });
+
   test("shows a separate timeline and ranking for the Ballon d'Or and Golden Boot awards", async ({
     page,
   }) => {
@@ -1223,6 +1239,18 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
       .textContent();
 
     expect(hrTop).toBe(enTop);
+  });
+
+  test('shows the translated "Uzastopni prvaci" streak ranking, including the no-streak-yet fallback', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Uzastopni prvaci' })).toBeVisible();
+
+    const ballonDorStreaks = page.locator('section.champions:has(#streaks-ballon-dor-heading)');
+    await expect(ballonDorStreaks.locator('.champions__name').filter({ hasText: 'Lionel Messi' })).toBeVisible();
+    await expect(ballonDorStreaks.getByText('2009, 2010, 2011, 2012')).toBeVisible();
+
+    await expect(page.getByText('Nitko još nije osvojio dva izdanja zaredom.').first()).toBeVisible();
   });
 
   test('the language switcher returns to the English records page', async ({ page }) => {

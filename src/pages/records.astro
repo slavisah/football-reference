@@ -4,7 +4,7 @@ import ChampionsTimeline from '../components/ChampionsTimeline.astro';
 import ChampionsSummary from '../components/ChampionsSummary.astro';
 import References from '../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
-import { buildHostsSummary, buildTimeline } from '../lib/editions';
+import { buildHostsSummary, buildLongestStreaks, buildTimeline } from '../lib/editions';
 import { withBase } from '../lib/url';
 
 const meta = await loadPageMeta('records-and-timelines');
@@ -99,7 +99,7 @@ const lastReviewed = allLoaded
 
 <BaseLayout
   title={meta.title}
-  description="Champions timelines and most-successful-team rankings generated from the World Cup, EURO, Copa América and Nations League tables, plus Ballon d'Or and Golden Boot award timelines and rankings, and how historical nation names are grouped."
+  description="Champions timelines, most-successful-team rankings, most-frequent hosts and back-to-back champions generated from the World Cup, EURO, Copa América and Nations League tables, plus Ballon d'Or and Golden Boot award timelines and rankings, and how historical nation names are grouped."
   alternateHref={withBase('/hr/records')}
 >
   <article class="records stack">
@@ -183,6 +183,49 @@ const lastReviewed = allLoaded
               </a>
             </div>
           ))
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="streaks-heading">
+      <h2 id="streaks-heading">Back-to-back champions</h2>
+      <p class="muted">
+        Every run of two or more <em>consecutive editions</em> won by the same
+        team, player, or tied group of players - generated from the same
+        tables as everything else on this page, not hand-picked trivia. A
+        placeholder year with no result (the 2020 Ballon d'Or) breaks a
+        streak spanning it, and West Germany/Germany are kept distinct here
+        too, the same way "Most frequent hosts" above does.
+      </p>
+      <div class="records__teams-grid">
+        {
+          allLoaded.map((c) => {
+            const streaks = buildLongestStreaks(c.data.editions);
+            return (
+              <div>
+                {streaks.length > 0 ? (
+                  <ChampionsSummary
+                    id={`streaks-${c.key}`}
+                    champions={streaks}
+                    scaleMax={Math.max(...streaks.map((s) => s.titles))}
+                    heading={c.label}
+                    description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
+                    icon="🔥"
+                    unit={['edition in a row', 'editions in a row']}
+                    winningYearsLabel="Streak years: "
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">No one has won two editions in a row yet.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  View the full {c.label} table &rarr;
+                </a>
+              </div>
+            );
+          })
         }
       </div>
     </section>
