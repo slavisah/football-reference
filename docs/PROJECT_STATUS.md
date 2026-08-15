@@ -6579,6 +6579,96 @@ page's status is trusted at "Verified" again - this is a snapshot of the
 data as independently double-checked through 2026-08-14, not a permanent
 guarantee.
 
+### New feature: "Back-to-back champions" streak ranking on `/records` - added 2026-08-15 (intensive run)
+
+With every required capability, every nice-to-have, and every "Left for a
+future pass" candidate from the prior run's own accounting either closed or
+re-confirmed low-yield/infeasible (source-link liveness still blocked by
+this environment's outbound network policy - confirmed again this run by a
+direct `curl` test against `en.wikipedia.org`/`fifa.com`, both returning a
+403 from the proxy; a third content-accuracy spot-check pass was already
+called low-yield), this run looked for a genuinely new, *safe* angle rather
+than repeat an already-exhausted audit category. A country-flag-emoji idea
+was seriously considered and rejected: several historical entities in this
+dataset (Soviet Union, Czechoslovakia, Yugoslavia, West Germany) have no
+current Unicode flag emoji, and rendering it across the ~100+ distinct team
+names on every table/timeline/ranking component would have touched most of
+the site's markup and risked breaking many of `mobile.spec.ts`'s 56
+exact-text (`toHaveText`) assertions for no bounded, low-risk gain - not a
+good fit for an unattended run with no human review before merge.
+
+Instead: **`buildLongestStreaks()`** (new, `src/lib/editions.ts`) computes
+every run of two or more *consecutive editions* (adjacent table rows, not
+adjacent calendar years - matters for the World Cup's 1942/1946 wartime gap
+and Copa América's irregular early calendar) won by the exact same winner
+value, purely from data every page already loads and that has already been
+independently double-audited (see the many "second independent
+cross-check" entries above) - zero new editorial research, zero new
+historical-fact risk. It deliberately uses the raw winner string, not
+`summaryGroupFor()`: a "back-to-back" streak is a fact about the same team/
+player literally repeating, not a sporting-succession question, so West
+Germany and Germany cannot silently chain into one streak (they don't
+overlap in the data regardless, but the function documents and tests the
+distinction). A placeholder winner (the 2020 Ballon d'Or's "Not awarded")
+breaks any streak spanning it, so Messi's 2019 and 2021 Ballon d'Or wins
+correctly do **not** count as "back-to-back". Returns the `ChampionSummary`
+shape every other `/records` ranking already uses (`titles` standing in for
+streak length), so it renders through the exact same `ChampionsSummary.astro`
+component with an overridden `unit`/`icon`/`winningYearsLabel`, the same
+pattern "Most frequent hosts" (2026-08-14) and "Most awards" already
+established - no new component.
+
+Verified the real numbers by hand-parsing all six content files with a
+throwaway Node script before writing a single test, rather than trusting a
+guess: Italy (1934, 1938) and Brazil (1958, 1962) for the World Cup; Spain
+(2008, 2012) for EURO; eleven streaks for Copa América including a rare
+three-in-a-row for Argentina (1945-1947); Cristiano Ronaldo (twice: 2013-14
+and 2016-17) and a genuinely fun **Lionel Messi four-in-a-row (2009-2012)**
+for the Ballon d'Or; Kylian Mbappé (2022, 2026) for the World Cup Golden
+Boot. UEFA Nations League (only 4 editions, 4 different champions so far)
+and the EURO Golden Boot have no streak at all - `records.astro`/
+`hr/records.astro` render a plain "No one has won two editions in a row
+yet." fallback for those instead of an empty bar-chart ranking, rather than
+silently showing nothing.
+
+**Page-weight budget:** the new section pushed both `/records` pages over
+the existing 300 KB `check:perf` budget (English 311.9 KB, Croatian
+314.0 KB, up from ~292-295 KB). Per the check script's own guidance ("if
+this growth is genuinely new editorial content, raise the budget
+deliberately"), raised `PAGE_WEIGHT_BUDGET_BYTES` to 360 KB in
+`scripts/check-page-weight.mjs` with an updated comment documenting why -
+matches how this budget was already raised once before (from an original
+~234 KB measurement). Both page descriptions (English and Croatian) were
+also updated to mention the new section, since they'd already drifted
+slightly out of date (missing "Most frequent hosts" too) before this run.
+
+**Tests:** 7 new Vitest cases (`tests/unit/editions.test.ts`:
+`buildLongestStreaks` - a real two-edition streak, a four-edition streak,
+the placeholder-breaks-a-streak case, West Germany/Germany staying distinct,
+an empty result when nothing repeats, multi-streak sort order, and
+sorting by `yearSort` rather than trusting source row order - 259 total, up
+from 252) and 2 new Playwright cases at 360px (`tests/e2e/mobile.spec.ts`:
+English page shows Messi's 4-streak and the Nations League fallback text;
+Croatian page shows the same streak translated, plus its own fallback text
+- 408 total, up from 406). Verified with `pnpm lint` (0/0/0), the full
+Vitest suite, the full Playwright suite (**408/408 passing**, including a
+full WCAG sweep and print-media pass over both `/records` pages with the
+new section - no new violations), `pnpm build` (23 pages), and
+`check:links`/`check:sitemap`/`check:precache`/`check:pdfs`/`check:perf`
+all clean.
+
+**Left for a future pass:** no known gaps in this feature - it covers all
+seven tables already loaded by `/records`, both languages, with a
+documented, tested fallback for the zero-streak case. Standing candidates
+are otherwise unchanged from the prior run: source-link liveness remains
+infeasible in this environment (re-confirmed), and a further
+content-accuracy spot-check remains low-yield with the entire six-table
+audit trail already at two independent passes per column. The flag-emoji
+idea, if ever revisited, should stay scoped to a single low-risk surface
+(e.g. one competition's Winner cells only) with an explicit map covering
+every `distinctTeams()` value and a documented "no flag" fallback for
+historical entities, rather than a site-wide rollout in one run.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

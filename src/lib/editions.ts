@@ -260,6 +260,66 @@ export function buildHostsSummary(editions: Edition[]): ChampionSummary[] {
 }
 
 /**
+ * Every run of two or more *consecutive editions* (adjacent rows in the
+ * source table, not adjacent calendar years - matters for the World Cup,
+ * which skipped 1942/1946, and for Copa América's irregular early
+ * calendar) won by the exact same winner value, reusing the
+ * `ChampionSummary` shape so it can render through the same
+ * `ChampionsSummary.astro` component every other ranking on `/records`
+ * already uses (with `titles` standing in for streak length here).
+ *
+ * Deliberately uses the raw winner string, not `summaryGroupFor()` - a
+ * "back-to-back" streak is a fact about the exact same team/player
+ * repeating, not about sporting succession, so West Germany and Germany
+ * (already kept distinct everywhere except title *totals*, see
+ * `buildChampionsSummary`) cannot silently chain into one streak here
+ * either. A placeholder winner (e.g. the 2020 Ballon d'Or's "Not awarded")
+ * breaks any streak spanning it - Messi's 2019 and 2021 Ballon d'Or wins
+ * are not "back-to-back" with a cancelled year between them, even though
+ * they're adjacent table rows.
+ *
+ * A competition/award with no repeat winner in a row (true of UEFA Nations
+ * League and the EURO Golden Boot as of 2026) simply returns an empty
+ * array - callers should handle that case in their own copy rather than
+ * treating an empty list as a bug.
+ */
+export function buildLongestStreaks(editions: Edition[]): ChampionSummary[] {
+  const sorted = [...editions].sort((a, b) => a.yearSort - b.yearSort);
+  const runs: { winner: string; years: string[] }[] = [];
+  let current: { winner: string; years: string[] } | null = null;
+
+  for (const edition of sorted) {
+    const winner = edition.winner.trim();
+    if (!winner || isPlaceholderWinner(winner)) {
+      current = null;
+      continue;
+    }
+    if (current && current.winner === winner) {
+      current.years.push(edition.year);
+    } else {
+      current = { winner, years: [edition.year] };
+      runs.push(current);
+    }
+  }
+
+  return runs
+    .filter((run) => run.years.length > 1)
+    .map((run) => ({
+      id: `${run.winner}-${run.years[0]}`,
+      displayName: run.winner,
+      titles: run.years.length,
+      years: run.years,
+      names: [run.winner],
+    }))
+    .sort(
+      (a, b) =>
+        b.titles - a.titles ||
+        leadingYear(a.years[0]) - leadingYear(b.years[0]) ||
+        a.displayName.localeCompare(b.displayName),
+    );
+}
+
+/**
  * Column labels that hold a team/national-team name rather than a count, a
  * date or a score line - covers every team-competition editions table
  * (Winner/Champion, Runner-up, Third, Fourth or "Other semifinalist" in its

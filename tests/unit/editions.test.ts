@@ -3,6 +3,7 @@ import {
   buildChampionsSummary,
   buildEditions,
   buildHostsSummary,
+  buildLongestStreaks,
   buildTimeline,
   buildTopScorerFacts,
   distinctHosts,
@@ -253,6 +254,116 @@ describe('buildHostsSummary', () => {
       rows: [['1958', 'Just Fontaine', 'France', '13']],
     };
     expect(buildHostsSummary(buildEditions(scorersTable))).toEqual([]);
+  });
+});
+
+describe('buildLongestStreaks', () => {
+  it('finds a real back-to-back streak (Italy 1934 and 1938)', () => {
+    const wc: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1930', 'Uruguay'],
+        ['1934', 'Italy'],
+        ['1938', 'Italy'],
+        ['1950', 'Uruguay'],
+      ],
+    };
+    expect(buildLongestStreaks(buildEditions(wc))).toEqual([
+      { id: 'Italy-1934', displayName: 'Italy', titles: 2, years: ['1934', '1938'], names: ['Italy'] },
+    ]);
+  });
+
+  it('extends a streak across more than two consecutive editions', () => {
+    const ballonDor: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['2009', 'Lionel Messi'],
+        ['2010', 'Lionel Messi'],
+        ['2011', 'Lionel Messi'],
+        ['2012', 'Lionel Messi'],
+        ['2013', 'Cristiano Ronaldo'],
+      ],
+    };
+    expect(buildLongestStreaks(buildEditions(ballonDor))).toEqual([
+      {
+        id: 'Lionel Messi-2009',
+        displayName: 'Lionel Messi',
+        titles: 4,
+        years: ['2009', '2010', '2011', '2012'],
+        names: ['Lionel Messi'],
+      },
+    ]);
+  });
+
+  it('does not chain a streak across a placeholder "Not awarded" year', () => {
+    const ballonDor: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['2019', 'Lionel Messi'],
+        ['2020', 'Not awarded'],
+        ['2021', 'Lionel Messi'],
+      ],
+    };
+    expect(buildLongestStreaks(buildEditions(ballonDor))).toEqual([]);
+  });
+
+  it('does not merge West Germany into Germany, unlike buildChampionsSummary', () => {
+    const wc: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1990', 'West Germany'],
+        ['1994', 'Brazil'],
+        ['2014', 'Germany'],
+        ['2018', 'France'],
+      ],
+    };
+    expect(buildLongestStreaks(buildEditions(wc))).toEqual([]);
+  });
+
+  it('returns an empty list when no winner repeats in consecutive editions', () => {
+    const nationsLeague: MarkdownTable = {
+      headers: ['Season', 'Winner'],
+      rows: [
+        ['2018-19', 'Portugal'],
+        ['2020-21', 'France'],
+        ['2022-23', 'Spain'],
+        ['2024-25', 'Portugal'],
+      ],
+    };
+    expect(buildLongestStreaks(buildEditions(nationsLeague))).toEqual([]);
+  });
+
+  it('sorts multiple streaks by length desc, then earliest start year, then name', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1916', 'Uruguay'],
+        ['1917', 'Uruguay'],
+        ['1927', 'Argentina'],
+        ['1929', 'Argentina'],
+        ['1945', 'Brazil'],
+        ['1946', 'Brazil'],
+        ['1947', 'Brazil'],
+      ],
+    };
+    expect(buildLongestStreaks(buildEditions(table)).map((s) => s.displayName)).toEqual([
+      'Brazil',
+      'Uruguay',
+      'Argentina',
+    ]);
+  });
+
+  it('sorts editions by yearSort first, independent of source row order', () => {
+    const outOfOrder: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1938', 'Italy'],
+        ['1934', 'Italy'],
+      ],
+    };
+    expect(buildLongestStreaks(buildEditions(outOfOrder))).toEqual([
+      { id: 'Italy-1934', displayName: 'Italy', titles: 2, years: ['1934', '1938'], names: ['Italy'] },
+    ]);
   });
 });
 
