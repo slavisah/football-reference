@@ -6924,6 +6924,78 @@ spot-check (low-yield), the scoped-down flag-emoji idea, and the CSP's
 `'unsafe-inline'` allowance (only worth revisiting if the site ever gains a
 form or comment surface).
 
+### Bug fix: Golden Boot joint-winner ties silently fragmented and undercounted the "Most awards" ranking, JSON-LD and quiz - fixed 2026-08-15 (intensive run)
+
+With every explicit backlog item, required/nice-to-have capability, and every
+previously-named "left for a future pass" candidate already exhausted
+(source-link liveness infeasible, a third content-accuracy spot-check
+low-yield, flag emoji rejected, CSP's `'unsafe-inline'` not worth revisiting
+without a form), this run looked specifically for **code-correctness bugs**
+rather than another editorial audit - a category the exhausted list above
+explicitly does not cover, since it's about aggregation logic, not source
+facts. A fresh read of `src/lib/editions.ts` against its own sibling function
+`distinctWinners()` turned up a real one.
+
+Golden Boot's "Player(s)" column stores joint-winner ties as a `"; "`-joined
+string (e.g. EURO 2012's six-way tie: "Mario Balotelli; Mario Gómez; Mario
+Mandžukić; Cristiano Ronaldo; Alan Dzagoev; Fernando Torres"). `distinctWinners()`
+has always split that string before grouping, with a doc comment explaining
+exactly why: "a player tied once and outright another year, e.g. Cristiano
+Ronaldo in EURO 2012/2020, isn't split into two unmatched strings that each
+only surface one of their editions." `buildChampionsSummary()` - the function
+behind every "Most awards"/"Champions by titles" ranking on `/competitions/
+golden-boot`, `/records`, and their JSON-LD `ItemList`s - never got that same
+treatment. It grouped by the raw, unsplit winner string, so Cristiano Ronaldo's
+2020 EURO Golden Boot (won outright) and his share of the 2012 six-way tie
+were counted as two disconnected entities: "Cristiano Ronaldo" -> 1 award, and
+a nonsensical six-name compound -> 1 award, instead of the correct "Cristiano
+Ronaldo -> 2 awards (2012, 2020)". The same bug affected 1962's and 1994's
+World Cup Golden Boot ties.
+
+**Fix** (`buildChampionsSummary()`, `src/lib/editions.ts`): split each
+winner cell on `;` before grouping, mirroring `distinctWinners()`'s existing
+treatment exactly. Every tied player now earns individual credit for that
+edition, the same way the winner filter already lets a reader pick any one
+of them. Deliberately left `buildLongestStreaks()` untouched - its own doc
+comment already explains why it intentionally uses the raw (unsplit) winner
+string for streaks, a different and still-correct design decision unrelated
+to this bug. Also fixed the same root cause's quiz symptom:
+`questionsFromWinners()` in `src/lib/quiz.ts` (which backs `topScorerByYearQuestions`)
+was generating "Who was the top scorer in {year}?" questions whose only
+correct choice, for a tie year, was the same ugly compound string sitting
+next to clean single-name distractors elsewhere in the same pool - now tie
+years are skipped entirely (no fair single "correct" multiple-choice answer
+exists for a shared award) and excluded from the distractor pool for other
+years, rather than asked and silently misrepresented as a solo win.
+
+Both fixes are pure aggregation-logic corrections - zero new editorial
+research, zero new historical facts, zero risk to any already-audited source
+data (the raw per-row table cells, which still show every tie verbatim, are
+untouched).
+
+**Tests:** 2 new Vitest cases - `buildChampionsSummary` splits a `"; "`
+joint-winner tie and correctly totals Cristiano Ronaldo's 2012+2020 EURO
+Golden Boot at 2 awards while keeping every other 2012 name at 1 (`tests/unit/editions.test.ts`,
+267 total, up from 265); `topScorerByYearQuestions` skips a tie year and
+excludes it from the distractor pool (`tests/unit/quiz.test.ts`). Full suite:
+`pnpm test` (267/267), `pnpm lint` (0/0/0), `pnpm build` (23 pages). Verified
+against the real built output, not just the unit tests: `/competitions/golden-boot`'s
+"Most awards" widget and its JSON-LD `ItemList` both now show `"Cristiano
+Ronaldo","description":"2 awards (2012, 2020)"` (Croatian: "2 nagrade (2012,
+2020)"), and no quiz answer choice on `/quiz` contains a `;`. The champions
+*timeline* card for 2012 (a different, intentionally-verbatim widget) still
+correctly shows the full six-name tie string, confirming the fix didn't touch
+data display, only the aggregate grouping.
+
+**Left for a future pass:** the same underlying question - what other
+generated aggregates over raw editorial text might silently diverge from
+`distinctWinners()`'s established tie-splitting convention - is worth a
+dedicated pass rather than assuming this was the only instance; a search for
+`edition.winner` usages elsewhere in `src/lib/` would be the starting point.
+Standing candidates are otherwise unchanged: source-link liveness (infeasible
+in this environment), a further content-accuracy spot-check (low-yield), the
+scoped-down flag-emoji idea, and the CSP's `'unsafe-inline'` allowance.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

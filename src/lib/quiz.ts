@@ -86,13 +86,21 @@ function questionsFromWinners(
   // A "Not awarded" placeholder row (e.g. the 2020 Ballon d'Or) is not a real
   // answer: it can't be the correct choice for its own year's question, and it
   // would be a nonsensical distractor for every other year's question.
+  //
+  // Golden Boot's "Player(s)" column also holds "; "-separated joint-winner
+  // ties (e.g. 2012's six-way EURO tie) - a compound string like that can't
+  // be a fair multiple-choice "correct" answer (it would misrepresent a
+  // shared award as one single winner) or a sane distractor next to clean
+  // single-name choices, so tie years are excluded from both the pool and
+  // the set of years a question gets generated for, rather than asked about
+  // and answered wrong by design.
   const pool = editions
     .map((e) => e.winner.trim())
-    .filter((winner) => winner && !isPlaceholderWinner(winner));
+    .filter((winner) => winner && !isPlaceholderWinner(winner) && !winner.includes(';'));
   const questions: QuizQuestion[] = [];
   for (const edition of editions) {
     const correct = edition.winner.trim();
-    if (!correct || isPlaceholderWinner(correct)) continue;
+    if (!correct || isPlaceholderWinner(correct) || correct.includes(';')) continue;
     const id = `${seedPrefix}:${seedKey}:${edition.year}`;
     const choice = buildChoice(id, correct, pool);
     if (!choice) continue;

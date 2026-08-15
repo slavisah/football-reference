@@ -68,27 +68,43 @@ export function isPlaceholderWinner(winner: string): boolean {
   return PLACEHOLDER_WINNERS.test(winner.trim());
 }
 
-/** Generate champions totals from editions, grouping sporting successors. */
+/**
+ * Generate champions totals from editions, grouping sporting successors.
+ *
+ * Splits each winner cell on `;` first, the same way `distinctWinners()`
+ * does, for the same reason: Golden Boot's "Player(s)" column holds
+ * "; "-separated joint-winner ties (e.g. 2012's six-way EURO tie). Without
+ * the split, a tie year was grouped as one bogus multi-name "champion"
+ * entirely disconnected from that same player's solo years elsewhere in the
+ * table - e.g. Cristiano Ronaldo's outright 2020 EURO Golden Boot didn't
+ * combine with his share of the 2012 tie, so the "Most awards" ranking
+ * undercounted him (1 instead of 2) and showed a nonsensical six-name row
+ * for 2012. Each tied player now earns credit for that edition individually,
+ * matching how `distinctWinners()` already lets a reader filter by any one
+ * of them.
+ */
 export function buildChampionsSummary(editions: Edition[]): ChampionSummary[] {
   const groups = new Map<string, ChampionSummary>();
 
   for (const edition of editions) {
-    const winner = edition.winner.trim();
-    if (!winner || isPlaceholderWinner(winner)) continue;
-    const group = summaryGroupFor(winner);
-    const existing = groups.get(group.id);
-    if (existing) {
-      existing.titles += 1;
-      existing.years.push(edition.year);
-      if (!existing.names.includes(winner)) existing.names.push(winner);
-    } else {
-      groups.set(group.id, {
-        id: group.id,
-        displayName: group.displayName,
-        titles: 1,
-        years: [edition.year],
-        names: [winner],
-      });
+    for (const rawWinner of edition.winner.split(';')) {
+      const winner = rawWinner.trim();
+      if (!winner || isPlaceholderWinner(winner)) continue;
+      const group = summaryGroupFor(winner);
+      const existing = groups.get(group.id);
+      if (existing) {
+        existing.titles += 1;
+        existing.years.push(edition.year);
+        if (!existing.names.includes(winner)) existing.names.push(winner);
+      } else {
+        groups.set(group.id, {
+          id: group.id,
+          displayName: group.displayName,
+          titles: 1,
+          years: [edition.year],
+          names: [winner],
+        });
+      }
     }
   }
 
