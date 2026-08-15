@@ -6669,6 +6669,69 @@ idea, if ever revisited, should stay scoped to a single low-risk surface
 every `distinctTeams()` value and a documented "no flag" fallback for
 historical entities, rather than a site-wide rollout in one run.
 
+### SEO: `/records` and `/hr/records` gain champions `ItemList` structured data, closing a gap the 2026-08-02 JSON-LD pass never revisited - added 2026-08-15 (intensive run)
+
+The 2026-08-02 JSON-LD pass (`buildBreadcrumbList`/`buildChampionsItemList`/
+`buildLatestEditionSportsEvent` in `src/lib/jsonLd.ts`) explicitly scoped
+itself to "the twelve competition/award pages" and was never revisited for
+`/records`, `/compare`, `/quiz` or `/about/sources`. Of those, `/records` is
+the gap that matters: it's the site's single richest aggregation page (built
+entirely from the same `ChampionSummary[]` data every competition page's
+`ItemList` already serializes) and has only grown since that pass - "Most
+frequent hosts" (2026-08-14) and "Back-to-back champions" (2026-08-15,
+earlier today) both shipped after it, so the page was under-describing
+itself to search engines by a wider margin with every recent run. `/compare`,
+`/quiz` and `/about/sources` don't have an equivalent gap: none of them
+render a `ChampionSummary[]` ranking `buildChampionsItemList` was built to
+serialize, so there was nothing there to wire up.
+
+`records.astro`/`hr/records.astro` now build one `ItemList` per ranking
+section actually rendered on the page - "Most successful teams" and "Most
+frequent hosts" for all four team competitions, "Back-to-back champions" for
+whichever of the seven tables has a real streak (skipping the same zero-
+streak fallback the page itself renders a text explanation for instead of a
+ranking - Nations League and the EURO Golden Boot today), and "Most awards"
+for both individual awards - 16 `ItemList` blocks plus the existing
+auto-injected `BreadcrumbList`, verified against the actual build output
+before writing any test assertion rather than assumed. Every block reuses
+`buildChampionsItemList()` verbatim (no new library code) over data the page
+already computes for its `ChampionsSummary` components (`c.data.champions`,
+`buildHostsSummary()`, `buildLongestStreaks()`) - zero new editorial
+research, zero new historical-fact risk, purely an additive `<script
+type="application/ld+json">` block invisible to every existing visible-text
+assertion. The Croatian page names its 16 blocks with their own
+Croatian strings (e.g. "UEFA Svjetsko prvenstvo - najuspješnije
+reprezentacije"), matching how every translated competition page already
+names its structured data.
+
+**Tests:** 2 new Playwright cases in the existing SEO `describe` block
+(`tests/e2e/mobile.spec.ts`, reusing its `jsonLdBlocks()` helper) - English:
+17 total blocks (1 `BreadcrumbList` + 16 `ItemList`), spot-checks several
+section names, and confirms no `ItemList` exists for either zero-streak
+fallback; Croatian: 16 `ItemList` blocks with their Croatian names, same
+zero-streak exclusion. Full suite: `pnpm test` (259/259, unchanged - no
+library code touched), `pnpm lint` (0/0/0), `pnpm build` (23 pages), full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (**410/410
+passing**, up from 408), and `check:links`/`check:sitemap`/`check:precache`/
+`check:pdfs`/`check:perf` all pass - `/records` grew from ~311.9/314.0 KB to
+~337.8/340.2 KB with the new JSON-LD, still under the 360 KB budget but with
+less headroom now (~20-22 KB); a future addition to this page should watch
+that number closely. No PDF regeneration needed (`/records` isn't one of the
+six downloadable competition pages `scripts/pdf-pages.mjs` tracks).
+
+**Left for a future pass:** with this gap closed, every page whose content
+shape (`ChampionSummary[]` rankings, a latest-edition date) matches an
+existing `jsonLd.ts` builder now has structured data - `/compare` and
+`/quiz` render different shapes (head-to-head comparison, quiz questions)
+that would need their own new builder functions, not a reuse of the
+existing ones, so they're a distinct future item rather than an extension of
+this one. `/records`' page weight is now the closest of any page to the
+360 KB budget (~20-22 KB headroom, down from ~46-48 KB) - the single most
+important thing to watch before adding more to that page. Standing
+candidates are otherwise unchanged: source-link liveness (infeasible in this
+environment), a third-pass content-accuracy spot-check (low-yield), and the
+scoped-down flag-emoji idea from the prior entry.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

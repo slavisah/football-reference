@@ -2054,6 +2054,39 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
       'FIFA Svjetsko prvenstvo - prvaci po broju naslova',
     );
   });
+
+  test('/records carries a BreadcrumbList plus one ItemList per ranking section, skipping zero-streak fallbacks', async ({
+    page,
+  }) => {
+    await page.goto('records');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks).toHaveLength(17);
+    expect(blocks.filter((b) => b['@type'] === 'BreadcrumbList')).toHaveLength(1);
+
+    const lists = blocks.filter((b) => b['@type'] === 'ItemList');
+    expect(lists).toHaveLength(16);
+    expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Most successful teams');
+    expect(lists.map((l) => l.name)).toContain('Copa América - Most frequent hosts');
+    expect(lists.map((l) => l.name)).toContain('Golden Boot (World Cup) - Back-to-back champions');
+    expect(lists.map((l) => l.name)).toContain('Golden Boot (EURO) - Most awards');
+    // Nations League (4 different champions so far) and the EURO Golden Boot
+    // have no back-to-back streak, so records.astro renders a text fallback
+    // instead of a ranking for them - no ItemList should exist for either.
+    expect(lists.map((l) => l.name)).not.toContain('UEFA Nations League - Back-to-back champions');
+    expect(lists.map((l) => l.name)).not.toContain('Golden Boot (EURO) - Back-to-back champions');
+  });
+
+  test('/hr/records carries its own Croatian ItemList names for every ranking section', async ({
+    page,
+  }) => {
+    await page.goto('hr/records');
+    const blocks = await jsonLdBlocks(page);
+    const lists = blocks.filter((b) => b['@type'] === 'ItemList');
+    expect(lists).toHaveLength(16);
+    expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - najuspješnije reprezentacije');
+    expect(lists.map((l) => l.name)).toContain('Zlatna lopta - uzastopni prvaci');
+    expect(lists.map((l) => l.name)).not.toContain('UEFA Liga nacija - uzastopni prvaci');
+  });
 });
 
 test.describe('Required-page redirects (/awards/... -> /competitions/...)', () => {

@@ -5,7 +5,8 @@ import ChampionsSummary from '../components/ChampionsSummary.astro';
 import References from '../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import { buildHostsSummary, buildLongestStreaks, buildTimeline } from '../lib/editions';
-import { withBase } from '../lib/url';
+import { absolutePageUrl, withBase } from '../lib/url';
+import { buildChampionsItemList, type JsonLdObject } from '../lib/jsonLd';
 
 const meta = await loadPageMeta('records-and-timelines');
 
@@ -95,12 +96,52 @@ const lastReviewed = allLoaded
   .map((c) => c.data.lastReviewed)
   .sort()
   .at(-1) as string;
+
+// One ItemList per ranking section rendered below (Most successful teams,
+// Most frequent hosts, Back-to-back champions - skipping the zero-streak
+// fallback, Most awards), reusing the same generated ChampionSummary[] data
+// each ChampionsSummary component already renders - see docs/PROJECT_STATUS.md
+// for why this page was missing structured data that all twelve
+// competition/award pages already have.
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd: JsonLdObject[] = [
+  ...competitions.map((c) =>
+    buildChampionsItemList(c.data.champions, { pageUrl, name: `${c.label} - Most successful teams` }),
+  ),
+  ...competitions.map((c) =>
+    buildChampionsItemList(buildHostsSummary(c.data.editions), {
+      pageUrl,
+      name: `${c.label} - Most frequent hosts`,
+      unit: ['time hosted', 'times hosted'],
+    }),
+  ),
+  ...allLoaded.flatMap((c) => {
+    const streaks = buildLongestStreaks(c.data.editions);
+    return streaks.length > 0
+      ? [
+          buildChampionsItemList(streaks, {
+            pageUrl,
+            name: `${c.label} - Back-to-back champions`,
+            unit: ['edition in a row', 'editions in a row'],
+          }),
+        ]
+      : [];
+  }),
+  ...individualAwards.map((a) =>
+    buildChampionsItemList(a.data.champions, {
+      pageUrl,
+      name: `${a.label} - Most awards`,
+      unit: ['award', 'awards'],
+    }),
+  ),
+];
 ---
 
 <BaseLayout
   title={meta.title}
   description="Champions timelines, most-successful-team rankings, most-frequent hosts and back-to-back champions generated from the World Cup, EURO, Copa América and Nations League tables, plus Ballon d'Or and Golden Boot award timelines and rankings, and how historical nation names are grouped."
   alternateHref={withBase('/hr/records')}
+  jsonLd={jsonLd}
 >
   <article class="records stack">
     <header class="records__header">
