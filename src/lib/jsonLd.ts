@@ -6,6 +6,8 @@
 // BaseLayout.astro, so pages can freely mix however many of these apply.
 import { isPlaceholderWinner } from './editions';
 import type { ChampionSummary, Edition } from './types';
+import type { CountryRecord } from './compare';
+import type { QuizQuestion } from './quiz';
 
 export type JsonLdObject = Record<string, unknown>;
 
@@ -89,4 +91,80 @@ export function buildLatestEditionSportsEvent(
     event.competitor = { '@type': 'SportsTeam', name: latest.winner.trim() };
   }
   return event;
+}
+
+/**
+ * The /compare page's "All national teams" ranking (already sorted by
+ * `buildAllCountryRecords()`) as an ItemList - the shape schema.org tooling
+ * expects for any ranked list, same as `buildChampionsItemList()` above, but
+ * over `CountryRecord`'s combined-titles/runner-ups/finals shape instead of a
+ * single competition's `ChampionSummary[]`, since /compare aggregates across
+ * four competitions per team rather than reporting one competition's titles.
+ * Every count reused here is the exact number already rendered in the page's
+ * own "All national teams" table - no recomputation, no new facts.
+ */
+function defaultCountryRecordDescription(record: CountryRecord): string {
+  const { totalTitles, totalRunnerUps, totalFinals } = record;
+  return `${totalTitles} title${totalTitles === 1 ? '' : 's'}, ${totalRunnerUps} runner-up finish${totalRunnerUps === 1 ? '' : 'es'}, ${totalFinals} final${totalFinals === 1 ? '' : 's'} reached across the World Cup, EURO, Copa América and Nations League`;
+}
+
+export function buildCountryRecordsItemList(
+  records: CountryRecord[],
+  options: {
+    pageUrl: string;
+    name: string;
+    /** Overrides the per-team description, e.g. for a translated page. Defaults to an English sentence. */
+    describe?: (record: CountryRecord) => string;
+  },
+): JsonLdObject {
+  const { pageUrl, name, describe = defaultCountryRecordDescription } = options;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name,
+    url: pageUrl,
+    itemListElement: records.map((record, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Thing',
+        name: record.displayName,
+        description: describe(record),
+      },
+    })),
+  };
+}
+
+/**
+ * The /quiz page's generated multiple-choice questions as a schema.org Quiz
+ * (a LearningResource subtype) - `hasPart` is a list of `Question`s, each
+ * with its correct choice as an `acceptedAnswer`. Every prompt/answer pair
+ * reused here is exactly what QuizCard.astro already renders for that
+ * question - no new trivia, no recomputation. Deliberately scoped to the
+ * multiple-choice `questions` pool only: the separate "put them in
+ * chronological order" ranking questions (QuizOrderCard.astro) are a
+ * different question shape schema.org has no equivalent property for, so
+ * folding them in here would misrepresent the format rather than describe it
+ * accurately.
+ */
+export function buildQuizJsonLd(
+  questions: QuizQuestion[],
+  options: { pageUrl: string; name: string },
+): JsonLdObject {
+  const { pageUrl, name } = options;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Quiz',
+    name,
+    url: pageUrl,
+    about: 'Football history',
+    hasPart: questions.map((question) => ({
+      '@type': 'Question',
+      name: question.prompt,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: question.choices[question.answerIndex],
+      },
+    })),
+  };
 }

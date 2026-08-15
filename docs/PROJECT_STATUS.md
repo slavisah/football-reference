@@ -6800,6 +6800,83 @@ content-accuracy spot-check (low-yield), the scoped-down flag-emoji idea, and
 `/compare`/`/quiz` JSON-LD (would need new builder functions - a distinct
 future item, not an extension of the CSP or JSON-LD work above).
 
+### SEO: `/compare` and `/quiz` gain structured data, closing the two gaps the 2026-08-15 `/records` JSON-LD entry named as a distinct future item - added 2026-08-15 (intensive run)
+
+Earlier today's `/records` JSON-LD entry explicitly scoped itself to pages
+whose content shape (`ChampionSummary[]` rankings) matched an existing
+`jsonLd.ts` builder, and named `/compare` and `/quiz` as "a distinct future
+item, not an extension of this one" because both render different shapes -
+a head-to-head comparison and multiple-choice quiz questions - that would
+need their own new builder functions. This run wrote those two builders and
+wired them up, so every live page whose content can be described in
+schema.org vocabulary now has structured data.
+
+**`buildCountryRecordsItemList()`** (new, `src/lib/jsonLd.ts`) covers
+`/compare`'s "All national teams" ranking - the one list-shaped section on
+that page (the head-to-head panel above it is an interactive two-team
+picker, not a list, so it has no ItemList equivalent). It mirrors
+`buildChampionsItemList()`'s ranked-`ItemList`-of-`Thing` shape but over
+`CountryRecord`'s combined titles/runner-ups/finals-reached fields instead
+of a single competition's `ChampionSummary[]`, since `/compare` aggregates
+each team's record across four competitions rather than reporting one
+competition's title count. Takes an optional `describe()` callback (default:
+an English sentence) so the Croatian page can render its per-team
+descriptions in Croatian too, the same translation pattern
+`buildChampionsItemList()`'s `unit` parameter already established for
+`hr/records.astro`.
+
+**`buildQuizJsonLd()`** (new, `src/lib/jsonLd.ts`) covers `/quiz`'s
+generated multiple-choice question pool as a schema.org `Quiz` (a
+`LearningResource` subtype) with one `Question`/`acceptedAnswer` pair per
+question - reusing the exact prompt and correct-choice text
+`QuizCard.astro` already renders, zero new trivia. Deliberately scoped to
+the multiple-choice pool only: the separate "put these champions in
+chronological order" ranking questions (`QuizOrderCard.astro`) are a
+different question shape with no schema.org-vocabulary equivalent, so
+folding them in would misrepresent the format rather than describe it
+accurately - the function's own doc comment records this scoping decision
+for whoever revisits it next.
+
+Both pages pass their `ItemList`/`Quiz` through the same `jsonLd` prop on
+`BaseLayout` every other structured-data page already uses, so each also
+keeps its automatic `BreadcrumbList`. `compare.astro`/`hr/compare.astro` and
+`quiz.astro`/`hr/quiz.astro` were the only four page files touched beyond
+`jsonLd.ts` itself - no library code outside the two new builder functions
+changed, and no new editorial content or recomputed facts were introduced
+anywhere.
+
+**Tests:** 6 new Vitest cases (`tests/unit/jsonLd.test.ts`:
+`buildCountryRecordsItemList` - the ranked-list shape, singular/plural
+wording, and the `describe()` override; `buildQuizJsonLd` - the
+`Question`/`Answer` shape and an empty-list edge case - 263 total, up from
+259) and 4 new Playwright cases in the existing SEO `describe` block
+(`tests/e2e/mobile.spec.ts`, reusing its `jsonLdBlocks()` helper): English
+and Croatian `/compare` (asserts the `ItemList` length matches the "All
+national teams" table's actual row count, and that the Croatian page's
+descriptions read in Croatian), and English and Croatian `/quiz` (asserts
+`hasPart` length matches the number of rendered multiple-choice
+`.quiz-card` elements - scoped to the top-level `<ol class="quiz__list">`
+only, since `QuizOrderCard.astro` reuses the same `.quiz-card` class one
+DOM level deeper for the separate order-question section, which the first
+version of this test missed and had to fix before it passed). Full suite:
+`pnpm test` (263/263), `pnpm lint` (0/0/0), `pnpm build` (23 pages), full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (**416/416
+passing**, up from 412), and `check:links`/`check:sitemap`/`check:precache`/
+`check:pdfs`/`check:perf` all pass (`/quiz`/`hr/quiz` grew from their prior
+weight to 207.1/209.5 KB with the new `Quiz` block - still well under the
+360 KB budget; `/compare`/`hr/compare` grew negligibly since their new
+`ItemList` reuses data already on the page).
+
+**Left for a future pass:** with this gap closed, every page whose content
+shape matches an existing or new `jsonLd.ts` builder now has structured
+data. Standing candidates are unchanged from the prior entry: source-link
+liveness (infeasible in this environment - re-confirmed this run, `curl`/
+`WebFetch` to external sources still hard-blocked by the egress proxy), a
+further content-accuracy spot-check (low-yield, two independent passes
+already cover every column), the scoped-down flag-emoji idea, and the CSP's
+`'unsafe-inline'` script/style allowance (only worth revisiting if the site
+ever gains a form or comment surface).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

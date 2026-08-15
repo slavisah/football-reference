@@ -2087,6 +2087,65 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(lists.map((l) => l.name)).toContain('Zlatna lopta - uzastopni prvaci');
     expect(lists.map((l) => l.name)).not.toContain('UEFA Liga nacija - uzastopni prvaci');
   });
+
+  test('/compare carries a BreadcrumbList and one ItemList ranking every national team by combined record', async ({
+    page,
+  }) => {
+    await page.goto('compare');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList']);
+
+    const rowCount = await page.locator('.compare__table--all tbody tr').count();
+    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
+    expect(itemList.name).toBe(
+      'All national teams - combined World Cup, EURO, Copa América and Nations League record',
+    );
+    expect(itemList.itemListElement).toHaveLength(rowCount);
+    expect(itemList.itemListElement[0].item.description).toContain('across the World Cup, EURO, Copa América and Nations League');
+  });
+
+  test('/hr/compare carries its own Croatian ItemList name and description', async ({ page }) => {
+    await page.goto('hr/compare');
+    const blocks = await jsonLdBlocks(page);
+    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
+    expect(itemList.name).toBe(
+      'Sve reprezentacije - ukupan učinak na Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija',
+    );
+    expect(itemList.itemListElement[0].item.description).toContain('naslova');
+  });
+
+  test('/quiz carries a BreadcrumbList and a Quiz with one Question per rendered multiple-choice card', async ({
+    page,
+  }) => {
+    await page.goto('quiz');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'Quiz']);
+
+    // .quiz-card is shared by QuizCard.astro (multiple-choice) and
+    // QuizOrderCard.astro (chronological-order) - scope to the top-level
+    // <ol class="quiz__list"> only, since the order-question one is nested
+    // one level deeper inside .quiz__order-section.
+    const cardCount = await page.locator('.quiz > ol.quiz__list > li .quiz-card').count();
+    const quiz = blocks.find((b) => b['@type'] === 'Quiz');
+    expect(quiz.name).toBe('The Ultimate Football Reference - Family Quiz');
+    expect(quiz.hasPart).toHaveLength(cardCount);
+    for (const question of quiz.hasPart) {
+      expect(question['@type']).toBe('Question');
+      expect(question.acceptedAnswer['@type']).toBe('Answer');
+      expect(question.acceptedAnswer.text.length).toBeGreaterThan(0);
+    }
+  });
+
+  test('/hr/quiz carries its own Croatian Quiz name over the Croatian-language question pool', async ({
+    page,
+  }) => {
+    await page.goto('hr/quiz');
+    const blocks = await jsonLdBlocks(page);
+    const quiz = blocks.find((b) => b['@type'] === 'Quiz');
+    expect(quiz.name).toBe('Kompletna nogometna referenca - obiteljski kviz');
+    const cardCount = await page.locator('.quiz > ol.quiz__list > li .quiz-card').count();
+    expect(quiz.hasPart).toHaveLength(cardCount);
+  });
 });
 
 test.describe('Content-Security-Policy', () => {
