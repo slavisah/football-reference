@@ -19,7 +19,8 @@ import EditorialNotes from '../../components/EditorialNotes.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import { buildTimeline } from '../../lib/editions';
 import { t } from '../../lib/i18n';
-import { withBase } from '../../lib/url';
+import { absolutePageUrl, withBase } from '../../lib/url';
+import { buildQuizJsonLd, type JsonLdObject } from '../../lib/jsonLd';
 import type { Edition } from '../../lib/types';
 import type { NoteSection } from '../../lib/notes';
 import {
@@ -239,6 +240,17 @@ const lastReviewed = [
 ]
   .sort()
   .at(-1) as string;
+
+// Croatian counterpart of src/pages/quiz.astro's jsonLd block. The
+// `questions` pool already carries Croatian prompt/choice text (every
+// builder above was called with `'hr'`), so no separate translation is
+// needed here beyond the schema's own `name`.
+const jsonLd: JsonLdObject[] = [
+  buildQuizJsonLd(questions, {
+    pageUrl: absolutePageUrl(Astro.url, Astro.site),
+    name: 'Kompletna nogometna referenca - obiteljski kviz',
+  }),
+];
 ---
 
 <BaseLayout
@@ -246,6 +258,7 @@ const lastReviewed = [
   description="Obiteljski nogometni kviz generiran izravno iz tablica Svjetskog prvenstva, EURA, Copa América, Lige nacija, Zlatne lopte i Zlatne kopačke - prvaci, domaćini, finala i najbolji strijelci."
   locale="hr"
   alternateHref={withBase('/quiz')}
+  jsonLd={jsonLd}
 >
   <article class="quiz stack">
     <header class="quiz__header">

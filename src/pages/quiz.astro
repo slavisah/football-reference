@@ -8,7 +8,8 @@ import EditorialNotes from '../components/EditorialNotes.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import { buildTimeline } from '../lib/editions';
 import { t } from '../lib/i18n';
-import { withBase } from '../lib/url';
+import { absolutePageUrl, withBase } from '../lib/url';
+import { buildQuizJsonLd, type JsonLdObject } from '../lib/jsonLd';
 import type { Edition } from '../lib/types';
 import {
   championByYearQuestions,
@@ -169,12 +170,24 @@ const lastReviewed = [
 ]
   .sort()
   .at(-1) as string;
+
+// A schema.org Quiz for the multiple-choice pool above (see buildQuizJsonLd's
+// own comment for why the separate chronological-order questions are
+// intentionally excluded). See docs/PROJECT_STATUS.md for why /quiz was the
+// other named gap after /records gained the same kind of structured data.
+const jsonLd: JsonLdObject[] = [
+  buildQuizJsonLd(questions, {
+    pageUrl: absolutePageUrl(Astro.url, Astro.site),
+    name: 'The Ultimate Football Reference - Family Quiz',
+  }),
+];
 ---
 
 <BaseLayout
   title={meta.title}
   description="A family football quiz generated from the World Cup, EURO, Copa América, Nations League, Ballon d'Or and Golden Boot tables - champions, hosts, finals and top scorers."
   alternateHref={withBase('/hr/quiz')}
+  jsonLd={jsonLd}
 >
   <article class="quiz stack">
     <header class="quiz__header">

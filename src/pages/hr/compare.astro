@@ -16,7 +16,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import References from '../../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import { buildAllCountryRecords, tracksSemifinalColumn } from '../../lib/compare';
-import { withBase } from '../../lib/url';
+import { absolutePageUrl, withBase } from '../../lib/url';
+import { buildCountryRecordsItemList, type JsonLdObject } from '../../lib/jsonLd';
 
 const meta = await loadPageMeta('compare-countries');
 
@@ -86,6 +87,19 @@ const recordsForClient = allRecords.map((r) => ({
     semifinals: c.semifinals,
   })),
 }));
+
+// Croatian counterpart of src/pages/compare.astro's jsonLd block - same data,
+// a Croatian item-list name, and a `describe()` override so each team's
+// description reads in Croatian too, the same "unit" translation pattern
+// hr/records.astro already uses for buildChampionsItemList.
+const jsonLd: JsonLdObject[] = [
+  buildCountryRecordsItemList(allRecords, {
+    pageUrl: absolutePageUrl(Astro.url, Astro.site),
+    name: 'Sve reprezentacije - ukupan učinak na Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija',
+    describe: (record) =>
+      `${record.totalTitles} naslova, ${record.totalRunnerUps} drugih mjesta, ${record.totalFinals} odigranih finala na Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija`,
+  }),
+];
 ---
 
 <BaseLayout
@@ -93,6 +107,7 @@ const recordsForClient = allRecords.map((r) => ({
   description="Usporedite dvije reprezentacije po njihovom učinku na Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija - naslovi, drugo mjesto i polufinalni plasmani, generirano izravno iz tablice svakog natjecanja."
   locale="hr"
   alternateHref={withBase('/compare')}
+  jsonLd={jsonLd}
 >
   <article class="compare stack">
     <header class="compare__header">

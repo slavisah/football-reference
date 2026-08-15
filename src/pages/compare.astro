@@ -3,7 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import References from '../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import { buildAllCountryRecords, tracksSemifinalColumn } from '../lib/compare';
-import { withBase } from '../lib/url';
+import { absolutePageUrl, withBase } from '../lib/url';
+import { buildCountryRecordsItemList, type JsonLdObject } from '../lib/jsonLd';
 
 const meta = await loadPageMeta('compare-countries');
 
@@ -71,12 +72,25 @@ const recordsForClient = allRecords.map((r) => ({
     semifinals: c.semifinals,
   })),
 }));
+
+// One ItemList for the "All national teams" ranking below - the only
+// ChampionSummary-shaped ranking this page has (the head-to-head panel is an
+// interactive two-team picker, not a list, so it has no ItemList equivalent).
+// See docs/PROJECT_STATUS.md for why /compare was the named next gap after
+// /records gained the same structured data.
+const jsonLd: JsonLdObject[] = [
+  buildCountryRecordsItemList(allRecords, {
+    pageUrl: absolutePageUrl(Astro.url, Astro.site),
+    name: 'All national teams - combined World Cup, EURO, Copa América and Nations League record',
+  }),
+];
 ---
 
 <BaseLayout
   title={meta.title}
   description="Compare two national teams' World Cup, EURO, Copa América and Nations League record - titles, runner-up finishes and semifinal finishes, generated from each competition's table."
   alternateHref={withBase('/hr/compare')}
+  jsonLd={jsonLd}
 >
   <article class="compare stack">
     <header class="compare__header">
