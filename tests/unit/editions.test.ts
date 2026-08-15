@@ -94,6 +94,32 @@ describe('buildChampionsSummary', () => {
     expect(summary).toHaveLength(1);
     expect(summary[0]).toMatchObject({ displayName: 'Lionel Messi', titles: 2 });
   });
+
+  it('splits "; "-separated joint-winner ties so each player is credited individually, like Golden Boot\'s Cristiano Ronaldo (tied in 2012, outright in 2020)', () => {
+    const goldenBootLike: MarkdownTable = {
+      headers: ['Year', "Player(s)"],
+      rows: [
+        ['2012', 'Mario Balotelli; Mario Gómez; Mario Mandžukić; Cristiano Ronaldo; Alan Dzagoev; Fernando Torres'],
+        ['2016', 'Antoine Griezmann'],
+        ['2020', 'Cristiano Ronaldo'],
+      ],
+    };
+    const summary = buildChampionsSummary(buildEditions(goldenBootLike));
+
+    const ronaldo = summary.find((s) => s.displayName === 'Cristiano Ronaldo');
+    expect(ronaldo?.titles).toBe(2);
+    expect(ronaldo?.years).toEqual(['2012', '2020']);
+
+    // Every other tied 2012 name is its own one-title entry, not folded into
+    // a single six-name compound "champion".
+    for (const name of ['Mario Balotelli', 'Mario Gómez', 'Mario Mandžukić', 'Alan Dzagoev', 'Fernando Torres']) {
+      const entry = summary.find((s) => s.displayName === name);
+      expect(entry?.titles).toBe(1);
+      expect(entry?.years).toEqual(['2012']);
+    }
+
+    expect(summary.some((s) => s.displayName.includes(';'))).toBe(false);
+  });
 });
 
 describe('isPlaceholderWinner', () => {

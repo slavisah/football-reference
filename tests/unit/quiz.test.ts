@@ -184,6 +184,25 @@ describe('topScorerByYearQuestions', () => {
       'Tko je bio najbolji strijelac natjecanja World Cup Golden Boot 1930. godine?',
     );
   });
+
+  it('skips a "; "-separated joint-winner tie year rather than asking a question whose only correct answer is a compound multi-name string', () => {
+    const scorersTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [
+        ['2010', 'Diego Forlán; Thomas Müller; David Villa; Wesley Sneijder', 'Multiple', '5'],
+        ['2014', 'James Rodríguez', 'Colombia', '6'],
+        ['2018', 'Harry Kane', 'England', '6'],
+      ],
+    };
+    const scorerEditions = buildEditions(scorersTable);
+    const questions = topScorerByYearQuestions(scorerEditions, 'World Cup Golden Boot', 'gb-wc');
+
+    expect(questions.some((q) => q.id.endsWith('2010'))).toBe(false);
+    // The tie is also excluded as a distractor for the clean single-winner years.
+    for (const q of questions) {
+      expect(q.choices.some((choice) => choice.includes(';'))).toBe(false);
+    }
+  });
 });
 
 describe('chronologicalOrderQuestions', () => {
