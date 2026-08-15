@@ -1991,7 +1991,12 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
   test('the home page carries a WebSite block instead of a breadcrumb (it has no parent page)', async ({
     page,
   }) => {
-    await page.goto('/');
+    // '' (not '/'), matching every other home-page test in this file: a
+    // leading slash resolves against the baseURL's *origin*, landing on the
+    // server root rather than the /football-reference/ base path, which the
+    // previous version of this test got away with only because "0 JSON-LD
+    // blocks" was also vacuously true on that 404 page.
+    await page.goto('');
     const blocks = await jsonLdBlocks(page);
     expect(blocks).toHaveLength(1);
     expect(blocks[0]).toEqual({
