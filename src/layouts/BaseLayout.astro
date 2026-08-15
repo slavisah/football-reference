@@ -81,6 +81,24 @@ const structuredData = [breadcrumb, ...jsonLd].filter((item): item is JsonLdObje
 <html lang={locale}>
   <head>
     <meta charset="utf-8" />
+    {/* Every resource this site ever loads is same-origin (no CDN fonts/
+    scripts/analytics/trackers, per AGENTS.md rule 8) - a strict CSP costs
+    nothing functionally and closes off data exfiltration or a remote payload
+    if a future dependency or a compromised deploy ever tried to add one.
+    'unsafe-inline' stays for script/style because the site's inline
+    <script is:inline> blocks (theme pre-paint, service-worker registration,
+    per-page interactivity) and per-row inline styles (card accent colors,
+    /records' generated bar widths) are static/build-generated, not
+    user-input-echoing, so the residual XSS risk they'd add is the same
+    residual risk a hash/nonce scheme would still have to cover for this
+    site's threat model (there is no form, comment box, or any other place a
+    reader's input is ever echoed back). frame-ancestors is omitted - the
+    <meta> form of CSP never applies it (only a real response header does),
+    so listing it here would be a no-op that reads as protection it isn't. */}
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     {description && <meta name="description" content={description} />}

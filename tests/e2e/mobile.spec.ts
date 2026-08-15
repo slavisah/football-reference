@@ -2089,6 +2089,61 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
   });
 });
 
+test.describe('Content-Security-Policy', () => {
+  const EXPECTED_CSP =
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';";
+
+  test('the meta tag is present with the expected directives on English and Croatian pages', async ({
+    page,
+  }) => {
+    for (const path of ['competitions/world-cup', 'hr/competitions/world-cup', 'quiz', 'records']) {
+      await page.goto(path);
+      await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveAttribute(
+        'content',
+        EXPECTED_CSP,
+      );
+    }
+  });
+
+  test('the policy does not block real interactivity: filters, sorting, theme toggle and the service worker', async ({
+    page,
+  }) => {
+    const cspViolations: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error' && /Content Security Policy|Refused to/i.test(msg.text())) {
+        cspViolations.push(msg.text());
+      }
+    });
+    page.on('pageerror', (err) => {
+      if (/Content Security Policy|Refused to/i.test(err.message)) {
+        cspViolations.push(err.message);
+      }
+    });
+
+    await page.goto('competitions/world-cup');
+    await page.selectOption('#world-cup-winner', 'Spain');
+    await page.selectOption('#world-cup-host', { index: 1 });
+    await page.selectOption('#world-cup-team', { index: 1 });
+    await page.locator('#world-cup-reset').click();
+    await page.locator('#theme-toggle').click();
+
+    await page.goto('quiz');
+    await page.locator('input[type="radio"]').first().check();
+
+    // The service worker only registers in production builds (this test
+    // runs against the built+previewed site), and only on window "load".
+    await page.waitForFunction(() => document.readyState === 'complete');
+    const swState = await page.evaluate(async () => {
+      if (!('serviceWorker' in navigator)) return 'unsupported';
+      const reg = await navigator.serviceWorker.getRegistration();
+      return reg ? 'registered' : 'not-registered';
+    });
+    expect(swState).not.toBe('not-registered');
+
+    expect(cspViolations).toEqual([]);
+  });
+});
+
 test.describe('Required-page redirects (/awards/... -> /competitions/...)', () => {
   // docs/WEBSITE_REQUIREMENTS.md's "Required pages" list specifies
   // /awards/ballon-dor and /awards/golden-boot, but both pages actually live
