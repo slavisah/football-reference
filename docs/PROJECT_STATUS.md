@@ -6877,6 +6877,53 @@ already cover every column), the scoped-down flag-emoji idea, and the CSP's
 `'unsafe-inline'` script/style allowance (only worth revisiting if the site
 ever gains a form or comment surface).
 
+### SEO: home page gains a `WebSite` JSON-LD block, closing the one page that had zero structured data - added 2026-08-15 (intensive run)
+
+The 2026-08-15 `/compare`/`/quiz` JSON-LD entry above closed the last gap
+among pages whose content shape matched an *existing* `jsonLd.ts` builder,
+but one page was never in scope for any of these passes at all: the home
+page. `BaseLayout.astro` already auto-adds a "Home > page" `BreadcrumbList`
+to every other page and explicitly skips it on the home page itself (it has
+no parent to link to) - which meant the home page rendered no JSON-LD
+whatsoever, a gap a Playwright test even asserted by name ("the home page
+has no JSON-LD"). The home page is also the one URL most likely to be a
+search engine's entry point into the whole site, so it's the highest-value
+page to describe, not a marginal one.
+
+**`buildWebSiteJsonLd()`** (new, `src/lib/jsonLd.ts`) returns a minimal
+schema.org `WebSite` block (`name`/`url`/`description`/`inLanguage`) - no
+`potentialAction`/`SearchAction`, since the site has no search feature and
+inventing one would misrepresent a capability that doesn't exist. Rather
+than have `index.astro`/`hr/index.astro` each wire this up (the pattern
+every other JSON-LD page uses), it's built directly inside
+`BaseLayout.astro` alongside the existing breadcrumb `isHome` branch, reusing
+the exact same already-computed, trailing-slash-normalized `canonicalURL`
+and the page's own `title`/`description`/`locale` props - no new props, no
+risk of the home page's URL disagreeing with its own canonical/OG tags the
+way `withTrailingSlash()`'s own comment already warns a naive `Astro.url`
+read would (the exact bug `check-sitemap.mjs` caught once before, for this
+same page). English and Croatian each get their own `description`/
+`inLanguage` for free, since both home pages already pass those props.
+
+**Tests:** 2 new Vitest cases (`tests/unit/jsonLd.test.ts`:
+`buildWebSiteJsonLd`'s field pass-through and a non-English `inLanguage`
+tag - 265 total, up from 263) and the existing home-page SEO test was
+rewritten rather than deleted (`tests/e2e/mobile.spec.ts`: it now asserts
+the exact `WebSite` block instead of zero JSON-LD), plus one new Playwright
+case for the Croatian home page's translated block. Full suite: `pnpm test`
+(265/265), `pnpm lint` (0/0/0), `pnpm build` (23 pages), full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e`, and
+`check:links`/`check:sitemap`/`check:precache`/`check:pdfs`/`check:perf` all
+pass (home page weight unchanged beyond the new block's ~230 bytes,
+negligible against the 360 KB budget).
+
+**Left for a future pass:** with this gap closed, every live page now has
+some structured data. Standing candidates are otherwise unchanged: source-link
+liveness (infeasible in this environment), a further content-accuracy
+spot-check (low-yield), the scoped-down flag-emoji idea, and the CSP's
+`'unsafe-inline'` allowance (only worth revisiting if the site ever gains a
+form or comment surface).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
