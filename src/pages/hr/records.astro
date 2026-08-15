@@ -15,7 +15,8 @@ import ChampionsSummary from '../../components/ChampionsSummary.astro';
 import References from '../../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import { buildHostsSummary, buildLongestStreaks, buildTimeline } from '../../lib/editions';
-import { withBase } from '../../lib/url';
+import { absolutePageUrl, withBase } from '../../lib/url';
+import { buildChampionsItemList, type JsonLdObject } from '../../lib/jsonLd';
 
 const meta = await loadPageMeta('records-and-timelines');
 
@@ -104,6 +105,43 @@ const lastReviewed = allLoaded
   .at(-1) as string;
 
 const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+// Croatian counterpart of src/pages/records.astro's jsonLd block - same
+// generated data, own Croatian ItemList names, matching how every other
+// translated competition page names its structured data (see
+// hr/competitions/copa-america.astro).
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd: JsonLdObject[] = [
+  ...competitions.map((c) =>
+    buildChampionsItemList(c.data.champions, { pageUrl, name: `${c.label} - najuspješnije reprezentacije` }),
+  ),
+  ...competitions.map((c) =>
+    buildChampionsItemList(buildHostsSummary(c.data.editions), {
+      pageUrl,
+      name: `${c.label} - najčešći domaćini`,
+      unit: ['put domaćin', 'puta domaćin'],
+    }),
+  ),
+  ...allLoaded.flatMap((c) => {
+    const streaks = buildLongestStreaks(c.data.editions);
+    return streaks.length > 0
+      ? [
+          buildChampionsItemList(streaks, {
+            pageUrl,
+            name: `${c.label} - uzastopni prvaci`,
+            unit: ['uzastopno izdanje', 'uzastopna izdanja'],
+          }),
+        ]
+      : [];
+  }),
+  ...individualAwards.map((a) =>
+    buildChampionsItemList(a.data.champions, {
+      pageUrl,
+      name: `${a.label} - najviše nagrada`,
+      unit: ['nagrada', 'nagrade'],
+    }),
+  ),
+];
 ---
 
 <BaseLayout
@@ -111,6 +149,7 @@ const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
   description="Vremenske crte prvaka, poredak najuspješnijih reprezentacija, najčešći domaćini i uzastopni prvaci generirani iz tablica Svjetskog prvenstva, EURA, Copa Américe i Lige nacija, uz vremensku crtu i poredak za Zlatnu loptu i Zlatnu kopačku, te objašnjenje kako se grupiraju povijesni nazivi država."
   locale="hr"
   alternateHref={withBase('/records')}
+  jsonLd={jsonLd}
 >
   <article class="records stack">
     <header class="records__header">
