@@ -6732,6 +6732,74 @@ candidates are otherwise unchanged: source-link liveness (infeasible in this
 environment), a third-pass content-accuracy spot-check (low-yield), and the
 scoped-down flag-emoji idea from the prior entry.
 
+### Security: first-ever Content-Security-Policy, added via `<meta>` - added 2026-08-15 (intensive run)
+
+With the explicit "Left to do" backlog fully checked off and the standing
+"future pass" candidates all previously ruled out as infeasible or low-yield
+(re-confirmed this run: `curl`/WebFetch to `en.wikipedia.org` and `fifa.com`
+both still hard-blocked by this environment's egress proxy, so no new
+content-accuracy work was possible either), this run looked for a genuinely
+new, safe angle outside the categories already exhausted (WCAG/forced-colors/
+print accessibility, SEO JSON-LD/sitemap/canonical, PWA/offline, i18n,
+performance budget, link/PDF integrity). The site had no `Content-Security-
+Policy` at all - a real, previously-uncovered gap, and a natural fit given
+AGENTS.md rule 8 (no ads, tracking pixels, or manipulative engagement
+features): a CSP is the browser-enforced version of that same "nothing calls
+home" promise.
+
+Audited every page's actual resource use before writing the policy, rather
+than assuming: no `@font-face`/external fonts (`--font-sans` is a system-font
+stack), no `<iframe>`, no client-side `fetch()` outside `sw.js` (a separate
+execution context, unaffected by the registering page's CSP), no `data:` URIs
+today, and the ~90 external domains that do appear in built HTML are all
+plain `<a href>` source citations - CSP never restricts navigation, only
+resource *loads* (script/style/img/connect/font/etc.), so those citation
+links are untouched. `BaseLayout.astro` now emits one `<meta http-equiv=
+"Content-Security-Policy">` (first tag after `<meta charset>`, per spec, so
+it covers every resource the page goes on to declare) with `default-src
+'self'` and explicit `script-src`/`style-src`/`img-src`/`font-src`/
+`connect-src`/`manifest-src`/`object-src 'none'`/`base-uri 'self'`/
+`form-action 'self'`. `script-src`/`style-src` keep `'unsafe-inline'`: the
+site's inline `<script is:inline>` blocks (theme pre-paint, service-worker
+registration, every table's filter/sort script) and inline `style="..."`
+attributes (per-card accent colors, `/records`' generated ranking-bar
+widths) are all static/build-generated, never echo reader input, and there
+is no form or comment box anywhere on the site for an attacker to inject
+through - so a hash/nonce scheme would close the same near-zero residual
+risk this site already has, at real complexity and breakage cost (a mismatched
+hash silently breaks every filter/sort/quiz interaction). `frame-ancestors`
+is deliberately omitted: the `<meta>` form of CSP never applies it (only a
+real HTTP response header does, and GitHub Pages doesn't allow custom
+headers), so including it would read as protection it silently isn't - the
+kind of trap this file has flagged before with `robots.txt`/sitemap
+consistency.
+
+**Tests:** 2 new Playwright cases in a new `Content-Security-Policy` describe
+block (`tests/e2e/mobile.spec.ts`) - the exact directive string is present on
+four representative English/Croatian pages, and (the real verification) a
+live-browser pass that exercises winner/host/team filters, the reset button,
+the theme toggle, a quiz answer selection, and confirms the service worker
+still registers, while listening for `console`/`pageerror` CSP-violation
+messages and asserting zero were raised. Full suite: `pnpm test` (259/259,
+unchanged), `pnpm lint` (0/0/0), `pnpm build` (23 pages), full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (**412/412
+passing**, up from 410 - every existing test, including all WCAG/axe scans,
+theme-toggle interaction, and offline/service-worker cases, still passes
+under the new policy), and `check:links`/`check:sitemap`/`check:precache`/
+`check:pdfs`/`check:perf` all pass (page weights unchanged from the prior
+entry - the new meta tag is a fixed ~370 bytes per page, negligible against
+the 360 KB budget).
+
+**Left for a future pass:** the policy currently trusts `'unsafe-inline'` for
+script/style, which is a real (if currently unexploitable) gap versus a full
+hash-based CSP - if the site ever gains a form, a comment surface, or any
+place reader input is echoed back, this should be revisited with per-page
+build-time hashes instead. Standing candidates are otherwise unchanged:
+source-link liveness (infeasible in this environment), a third-pass
+content-accuracy spot-check (low-yield), the scoped-down flag-emoji idea, and
+`/compare`/`/quiz` JSON-LD (would need new builder functions - a distinct
+future item, not an extension of the CSP or JSON-LD work above).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
