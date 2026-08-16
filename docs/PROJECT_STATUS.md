@@ -7278,6 +7278,87 @@ liveness (infeasible in this environment), a further content-accuracy
 spot-check (low-yield), the scoped-down flag-emoji idea, and the CSP's
 `'unsafe-inline'` allowance.
 
+### New feature: "Which team/player has won the most titles/awards?" quiz question - added 2026-08-16 (later intensive run)
+
+The immediately preceding entry ("Titles won on home soil") explicitly
+flagged that `/records` is now the densest page on the site after five
+budget raises across five ranking additions, and that a future ranking-
+shaped feature should go on `/quiz` or `/compare` instead, both of which
+still have real headroom. This run acted on that steer directly rather than
+adding a sixth `/records` section.
+
+`/quiz`'s five existing question types (`championByYearQuestions`,
+`hostByYearQuestions`, `runnerUpByYearQuestions`, `topScorerByYearQuestions`,
+`chronologicalOrderQuestions`) all ask about one specific edition. Nothing
+asked about a competition's data *in aggregate* - the kind of question a
+family would actually ask out loud ("who's won the most World Cups?"),
+answerable today only by counting rows on a competition page by hand.
+
+**`mostTitlesQuestion()`** (new, `src/lib/quiz.ts`) closes that gap using
+data every competition page already computes: `loadCompetition()`'s
+`champions` field (built by `buildChampionsSummary()`, already
+tie-splitting-safe per the 2026-08-15 Golden Boot fix and already sorted by
+titles descending) is reused as-is, with zero new editorial research and
+zero new content loaded - the same "generated from data everything else
+already audited" precedent every `/records` ranking above already
+established. A single question per competition asks which team/player leads
+the summary; it's deliberately generated, not asked, when the top two spots
+are tied (no unambiguous correct answer, e.g. this file's own scratch check
+confirmed World Cup's Italy/Germany tie sits at 2nd/3rd, not 1st, so it
+doesn't block the question) or when fewer than 3 distinct entries exist (not
+enough fair distractors) - the same conservative "skip rather than
+misrepresent" precedent `questionsFromWinners()` already set for placeholder
+and tied-winner years. Wording branches on a new `subject: 'team' | 'player'`
+parameter: "Which team has won the most {competition} titles?" for the four
+team competitions, "Who has won the most {competition} awards?" for Ballon
+d'Or and both Golden Boot tables - matching the exact "Most successful
+teams" vs. "Most awards" heading split `/records` already uses for the same
+distinction.
+
+Verified every one of the 7 real results with a throwaway Vitest-driven
+script over the actual content files first (same `findTableByHeading`/
+`buildEditions` approach every prior "verify first" entry in this changelog
+used), confirming each has a clear, non-tied leader today: Brazil (World
+Cup, 5), Spain (EURO, 4), Argentina (Copa América, 16), Portugal (Nations
+League, 2), Lionel Messi (Ballon d'Or, 8), Kylian Mbappé (World Cup Golden
+Boot, 2), Cristiano Ronaldo (EURO Golden Boot, 2, correctly combining his
+split 2012 tie-share with his outright 2020 win). Wired one new pool entry
+(`take: 1`) per competition into both `src/pages/quiz.astro` and
+`src/pages/hr/quiz.astro`, immediately after that competition's existing
+`championByYearQuestions`/`topScorerByYearQuestions` pool, using each
+page's already-loaded `*.champions` data - no new `loadCompetition()` calls
+needed. `content/quiz.md`'s "Question types in this quiz" list and
+`hr/quiz.astro`'s hand-translated Croatian equivalent both gained a bullet
+for the new type, matching the precedent the "champion order challenge"
+entry (2026-07-30) set for documenting a new question type there.
+
+**Tests:** 7 new Vitest cases (`tests/unit/quiz.test.ts`: the real "most
+titles" question with the correct answer and category, no repeated
+choices within the 3-4 choice range, determinism across repeated calls,
+the "awards" wording branch for an individual-award `subject`, the Croatian
+prompt with the same answer as English, no question at all when the top two
+are tied, and no question when fewer than 3 distinct entries exist - 297
+total, up from 290) and the full suite otherwise unchanged. `pnpm lint` -
+0 errors/0 warnings/0 hints. `pnpm build` - 23 pages (unchanged page count).
+`pnpm check:links`/`check:sitemap`/`check:precache`/`check:pdfs` all pass
+(no downloadable-PDF page touched, so no PDF regeneration needed). `pnpm
+check:perf` - `/quiz` grew from its prior weight to 222.4 KB (Croatian:
+225.2 KB), still comfortably under the 440 KB budget with no change needed
+there, confirming the previous entry's own read that `/quiz` had real
+headroom. Full Playwright suite: **423/423**, unchanged (no existing test
+pinned to the prior 26-question total, and the new questions render
+correctly in both the visible quiz cards and each page's `Quiz` JSON-LD,
+spot-checked directly against the built HTML for all 7 competitions in both
+languages).
+
+**Left for a future pass:** this closes the "aggregate, not per-edition"
+question-type gap identified above; `/quiz` still has meaningful page-weight
+headroom (222-225 KB against 440 KB) for a further question type if one is
+found. Standing candidates are otherwise unchanged: source-link liveness
+(infeasible in this environment), a further content-accuracy spot-check
+(low-yield), the scoped-down flag-emoji idea, and the CSP's
+`'unsafe-inline'` allowance.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

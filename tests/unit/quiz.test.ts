@@ -1,15 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { buildEditions } from '../../src/lib/editions';
+import { buildChampionsSummary, buildEditions } from '../../src/lib/editions';
 import { buildTimeline } from '../../src/lib/editions';
 import {
   championByYearQuestions,
   chronologicalOrderQuestions,
   hostByYearQuestions,
+  mostTitlesQuestion,
   runnerUpByYearQuestions,
   selectQuiz,
   topScorerByYearQuestions,
 } from '../../src/lib/quiz';
-import type { Edition, MarkdownTable } from '../../src/lib/types';
+import type { ChampionSummary, Edition, MarkdownTable } from '../../src/lib/types';
 
 const table: MarkdownTable = {
   headers: ['Year', 'Host', 'Winner', 'Runner-up', 'Final'],
@@ -280,6 +281,82 @@ describe('chronologicalOrderQuestions', () => {
     );
     expect(hrQuestions[0].items).toEqual(enQuestions[0].items);
     expect(hrQuestions[0].correctRanks).toEqual(enQuestions[0].correctRanks);
+  });
+});
+
+describe('mostTitlesQuestion', () => {
+  const clearWinnerTable: MarkdownTable = {
+    headers: ['Year', 'Winner'],
+    rows: [
+      ['1930', 'Brazil'],
+      ['1934', 'Brazil'],
+      ['1938', 'Brazil'],
+      ['1950', 'Italy'],
+      ['1954', 'Italy'],
+      ['1958', 'Germany'],
+    ],
+  };
+  const clearSummary = buildChampionsSummary(buildEditions(clearWinnerTable));
+
+  it('asks a "most titles" question with the top-titled entry as the answer', () => {
+    const questions = mostTitlesQuestion(clearSummary, 'FIFA World Cup', 'world-cup');
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe('Which team has won the most FIFA World Cup titles?');
+    expect(questions[0].category).toBe('FIFA World Cup');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('Brazil');
+  });
+
+  it('never repeats a choice and stays within the 3-4 choice range', () => {
+    const questions = mostTitlesQuestion(clearSummary, 'FIFA World Cup', 'world-cup');
+    const [q] = questions;
+    expect(new Set(q.choices).size).toBe(q.choices.length);
+    expect(q.choices.length).toBeGreaterThanOrEqual(3);
+    expect(q.choices.length).toBeLessThanOrEqual(4);
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const a = mostTitlesQuestion(clearSummary, 'FIFA World Cup', 'world-cup');
+    const b = mostTitlesQuestion(clearSummary, 'FIFA World Cup', 'world-cup');
+    expect(a).toEqual(b);
+  });
+
+  it('uses "awards" wording for an individual-award subject, e.g. Ballon d\'Or/Golden Boot', () => {
+    const questions = mostTitlesQuestion(clearSummary, "Ballon d'Or", 'ballon-dor', 'player');
+    expect(questions[0].prompt).toBe("Who has won the most Ballon d'Or awards?");
+  });
+
+  it('builds a Croatian prompt when locale is "hr", with the same answer as English', () => {
+    const enQuestions = mostTitlesQuestion(clearSummary, 'FIFA World Cup', 'world-cup', 'team', 'en');
+    const hrQuestions = mostTitlesQuestion(clearSummary, 'FIFA World Cup', 'world-cup', 'team', 'hr');
+    expect(hrQuestions[0].prompt).toBe(
+      'Koja reprezentacija ima najviše naslova na natjecanju FIFA World Cup?',
+    );
+    expect(hrQuestions[0].choices[hrQuestions[0].answerIndex]).toBe(
+      enQuestions[0].choices[enQuestions[0].answerIndex],
+    );
+  });
+
+  it('returns no question when there is a tie for first place', () => {
+    const tiedTable: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1930', 'Uruguay'],
+        ['1934', 'Italy'],
+        ['1938', 'Italy'],
+        ['1950', 'Uruguay'],
+        ['1954', 'West Germany'],
+      ],
+    };
+    const tiedSummary = buildChampionsSummary(buildEditions(tiedTable));
+    expect(mostTitlesQuestion(tiedSummary, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when fewer than 3 distinct entries exist', () => {
+    const sparse: ChampionSummary[] = [
+      { id: 'a', displayName: 'A', titles: 3, years: ['2000'], names: ['A'] },
+      { id: 'b', displayName: 'B', titles: 1, years: ['2004'], names: ['B'] },
+    ];
+    expect(mostTitlesQuestion(sparse, 'Test Cup', 'test')).toHaveLength(0);
   });
 });
 

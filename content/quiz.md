@@ -29,5 +29,7 @@ the quiz stays in sync as new editions are added.
 - Who did the champion beat in the final?
 - Who was the tournament's top scorer (Golden Boot)?
 - Who won the Ballon d'Or in a given year?
+- Which team or player has won the most titles/awards in a competition
+  overall?
 - Put four champions from a tournament in chronological order (earliest
   first).
