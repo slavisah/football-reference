@@ -144,6 +144,45 @@ export function buildTimeline(editions: Edition[]): TimelineEntry[] {
 }
 
 /**
+ * Extracts the goal margin (absolute difference) from a "Final" score line
+ * like "Brazil 5–2 Sweden" or a penalty-decided "1–1; Italy 3–2 pens" - the
+ * *first* score pair in the string is always the regulation/extra-time
+ * result, since a penalty shootout only ever follows a draw, so those finals
+ * correctly come out with a margin of 0 rather than the penalty score being
+ * mistaken for a goal difference. Returns undefined when there's no cell or
+ * no "digit-dash-digit" pair to parse (defensive - every current "Final"
+ * value on the site has one).
+ */
+function finalMargin(final: string | undefined): number | undefined {
+  if (!final) return undefined;
+  const match = /(\d+)\s*[–-]\s*(\d+)/.exec(final);
+  if (!match) return undefined;
+  return Math.abs(Number(match[1]) - Number(match[2]));
+}
+
+/**
+ * Every final ranked by goal margin, biggest win first - for competitions
+ * whose table has a "Final" score column (Copa América does not, same
+ * omission `buildTimeline` already documents). Reuses `ChampionSummary`'s
+ * shape the way `buildLongestTitleGaps` does for a non-title-count stat:
+ * `displayName` holds the final's score line (it already names both teams),
+ * `titles` holds the goal margin, and `years` holds the single year that
+ * final was played.
+ */
+export function buildBiggestFinalMargins(editions: Edition[]): ChampionSummary[] {
+  const margins: ChampionSummary[] = [];
+  for (const edition of editions) {
+    const final = cellValue(edition, /^final$/i);
+    const margin = finalMargin(final);
+    if (final === undefined || margin === undefined) continue;
+    margins.push({ id: edition.year, displayName: final, titles: margin, years: [edition.year], names: [] });
+  }
+  return margins.sort(
+    (a, b) => b.titles - a.titles || leadingYear(a.years[0]) - leadingYear(b.years[0]),
+  );
+}
+
+/**
  * Build a year -> display-text map of top-scorer facts (player, team, goals),
  * for joining Golden Boot editions onto another competition's table by year
  * (e.g. the World Cup and EURO pages showing that edition's top scorer).

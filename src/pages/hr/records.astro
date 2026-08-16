@@ -15,6 +15,7 @@ import ChampionsSummary from '../../components/ChampionsSummary.astro';
 import References from '../../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import {
+  buildBiggestFinalMargins,
   buildHomeSoilTitles,
   buildHostsSummary,
   buildLongestStreaks,
@@ -177,6 +178,18 @@ const jsonLd: JsonLdObject[] = [
         ]
       : [];
   }),
+  ...competitions.flatMap((c) => {
+    const margins = buildBiggestFinalMargins(c.data.editions);
+    return margins.length > 0
+      ? [
+          buildChampionsItemList(margins, {
+            pageUrl,
+            name: `${c.label} - najveće pobjede u finalu`,
+            unit: ['gol', 'gola'],
+          }),
+        ]
+      : [];
+  }),
   ...individualAwards.map((a) =>
     buildChampionsItemList(a.data.champions, {
       pageUrl,
@@ -189,7 +202,7 @@ const jsonLd: JsonLdObject[] = [
 
 <BaseLayout
   title="Rekordi i vremenska crta"
-  description="Vremenske crte prvaka, poredak najuspješnijih reprezentacija, najčešći domaćini, naslovi osvojeni na domaćem terenu, uzastopni prvaci, vječiti drugoplasirani i najduže čekanje na novi naslov generirani iz tablica Svjetskog prvenstva, EURA, Copa Américe i Lige nacija, uz vremensku crtu i poredak za Zlatnu loptu i Zlatnu kopačku, te objašnjenje kako se grupiraju povijesni nazivi država."
+  description="Vremenske crte prvaka, poredak najuspješnijih reprezentacija, najčešći domaćini, naslovi osvojeni na domaćem terenu, uzastopni prvaci, vječiti drugoplasirani, najduže čekanje na novi naslov i najveće pobjede u finalu generirani iz tablica Svjetskog prvenstva, EURA, Copa Américe i Lige nacija, uz vremensku crtu i poredak za Zlatnu loptu i Zlatnu kopačku, te objašnjenje kako se grupiraju povijesni nazivi država."
   locale="hr"
   alternateHref={withBase('/records')}
   jsonLd={jsonLd}
@@ -460,6 +473,54 @@ const jsonLd: JsonLdObject[] = [
                   <>
                     <h2>{c.label}</h2>
                     <p class="muted">Nitko to još nije osvojio dvaput.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  Pogledajte cijelu tablicu - {c.label} &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="final-margins-heading">
+      <h2 id="final-margins-heading">Najveće pobjede u finalu</h2>
+      <p class="muted">
+        Svako finale rangirano po razlici u pogocima, generirano izravno iz
+        retka "Finale" svake tablice - jedanaesterci se igraju samo nakon
+        neriješenog rezultata, pa finale odlučeno jedanaestercima ispravno
+        završava na dnu popisa s razlikom 0, umjesto da se rezultat
+        jedanaesteraca pogrešno računa kao razlika u pogocima. Tablica Copa
+        Américe nema stupac s rezultatom finala, pa nije rangirana ovdje
+        (detalje po utakmicama, gdje postoje, potražite na njezinoj
+        stranici).
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => {
+            const margins = buildBiggestFinalMargins(c.data.editions);
+            return (
+              <div>
+                {margins.length > 0 ? (
+                  <ChampionsSummary
+                    id={`final-margins-${c.key}`}
+                    champions={margins}
+                    scaleMax={Math.max(...margins.map((m) => m.titles))}
+                    heading={c.label}
+                    description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
+                    icon="⚽"
+                    unit={['gol', 'gola']}
+                    winningYearsLabel="Godina: "
+                    ofLabel="od"
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">
+                      Tablica ovog natjecanja nema stupac s rezultatom finala pa se ne može rangirati po razlici u pogocima.
+                    </p>
                   </>
                 )}
                 <a class="records__teams-link" href={c.href}>

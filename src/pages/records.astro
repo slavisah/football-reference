@@ -5,6 +5,7 @@ import ChampionsSummary from '../components/ChampionsSummary.astro';
 import References from '../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import {
+  buildBiggestFinalMargins,
   buildHomeSoilTitles,
   buildHostsSummary,
   buildLongestStreaks,
@@ -170,6 +171,18 @@ const jsonLd: JsonLdObject[] = [
         ]
       : [];
   }),
+  ...competitions.flatMap((c) => {
+    const margins = buildBiggestFinalMargins(c.data.editions);
+    return margins.length > 0
+      ? [
+          buildChampionsItemList(margins, {
+            pageUrl,
+            name: `${c.label} - Biggest final wins`,
+            unit: ['goal', 'goals'],
+          }),
+        ]
+      : [];
+  }),
   ...individualAwards.map((a) =>
     buildChampionsItemList(a.data.champions, {
       pageUrl,
@@ -182,7 +195,7 @@ const jsonLd: JsonLdObject[] = [
 
 <BaseLayout
   title={meta.title}
-  description="Champions timelines, most-successful-team rankings, most-frequent hosts, titles won on home soil, back-to-back champions, nearly-champions and longest title droughts generated from the World Cup, EURO, Copa América and Nations League tables, plus Ballon d'Or and Golden Boot award timelines and rankings, and how historical nation names are grouped."
+  description="Champions timelines, most-successful-team rankings, most-frequent hosts, titles won on home soil, back-to-back champions, nearly-champions, longest title droughts and biggest final wins generated from the World Cup, EURO, Copa América and Nations League tables, plus Ballon d'Or and Golden Boot award timelines and rankings, and how historical nation names are grouped."
   alternateHref={withBase('/hr/records')}
   jsonLd={jsonLd}
 >
@@ -436,6 +449,50 @@ const jsonLd: JsonLdObject[] = [
                   <>
                     <h2>{c.label}</h2>
                     <p class="muted">No one has won this twice yet.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  View the full {c.label} table &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="final-margins-heading">
+      <h2 id="final-margins-heading">Biggest final wins</h2>
+      <p class="muted">
+        Every final ranked by goal margin, generated straight from each
+        table's own "Final" score line - a penalty shootout only ever follows
+        a draw, so a final decided on penalties correctly ranks at the bottom
+        with a margin of 0 rather than the penalty score being counted as a
+        goal difference. Copa América's source table has no "Final" score
+        column, so it is not ranked here (see its own page for match-by-match
+        detail where available).
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => {
+            const margins = buildBiggestFinalMargins(c.data.editions);
+            return (
+              <div>
+                {margins.length > 0 ? (
+                  <ChampionsSummary
+                    id={`final-margins-${c.key}`}
+                    champions={margins}
+                    scaleMax={Math.max(...margins.map((m) => m.titles))}
+                    heading={c.label}
+                    description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
+                    icon="⚽"
+                    unit={['goal', 'goals']}
+                    winningYearsLabel="Year: "
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">This competition's table has no "Final" score column to rank by margin.</p>
                   </>
                 )}
                 <a class="records__teams-link" href={c.href}>

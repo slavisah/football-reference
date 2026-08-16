@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  buildBiggestFinalMargins,
   buildChampionsSummary,
   buildEditions,
   buildHomeSoilTitles,
@@ -885,6 +886,51 @@ describe('buildTimeline', () => {
     };
     const timeline = buildTimeline(buildEditions(withPlaceholder));
     expect(timeline[0].champion).toBe('Not awarded');
+  });
+});
+
+describe('buildBiggestFinalMargins', () => {
+  const finalsTable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'Final'],
+    rows: [
+      ['1930', 'Uruguay', 'Uruguay 4-2 Argentina'],
+      ['1958', 'Brazil', 'Brazil 5-2 Sweden'],
+      ['1974', 'West Germany', 'West Germany 2-1 Netherlands'],
+      ['1990', 'West Germany', 'West Germany 1-0 Argentina'],
+      ['1994', 'Brazil', 'Brazil 0-0 Italy; 3-2 pens'],
+    ],
+  };
+
+  it('ranks finals by goal margin, biggest win first', () => {
+    const margins = buildBiggestFinalMargins(buildEditions(finalsTable));
+    expect(margins.map((m) => m.titles)).toEqual([3, 2, 1, 1, 0]);
+  });
+
+  it('reads the margin from the score before any penalty notation, not the pens score', () => {
+    const margins = buildBiggestFinalMargins(buildEditions(finalsTable));
+    const shootout = margins.find((m) => m.displayName === 'Brazil 0-0 Italy; 3-2 pens');
+    expect(shootout?.titles).toBe(0);
+  });
+
+  it('breaks a margin tie by year, earliest first', () => {
+    const margins = buildBiggestFinalMargins(buildEditions(finalsTable));
+    const tied = margins.filter((m) => m.titles === 1).map((m) => m.years[0]);
+    expect(tied).toEqual(['1974', '1990']);
+  });
+
+  it('keeps the full score line as displayName and the edition year as years', () => {
+    const margins = buildBiggestFinalMargins(buildEditions(finalsTable));
+    expect(margins[0]).toEqual({
+      id: '1958',
+      displayName: 'Brazil 5-2 Sweden',
+      titles: 3,
+      years: ['1958'],
+      names: [],
+    });
+  });
+
+  it('returns an empty list when the table has no "Final" column', () => {
+    expect(buildBiggestFinalMargins(buildEditions(table))).toEqual([]);
   });
 });
 
