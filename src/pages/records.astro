@@ -7,6 +7,7 @@ import { loadCompetition, loadPageMeta } from '../lib/competition';
 import {
   buildHostsSummary,
   buildLongestStreaks,
+  buildLongestTitleGaps,
   buildRunnerUpsWithoutTitle,
   buildTimeline,
 } from '../lib/editions';
@@ -144,6 +145,18 @@ const jsonLd: JsonLdObject[] = [
         ]
       : [];
   }),
+  ...allLoaded.flatMap((c) => {
+    const gaps = buildLongestTitleGaps(c.data.editions);
+    return gaps.length > 0
+      ? [
+          buildChampionsItemList(gaps, {
+            pageUrl,
+            name: `${c.label} - Longest wait between titles`,
+            unit: ['year', 'years'],
+          }),
+        ]
+      : [];
+  }),
   ...individualAwards.map((a) =>
     buildChampionsItemList(a.data.champions, {
       pageUrl,
@@ -156,7 +169,7 @@ const jsonLd: JsonLdObject[] = [
 
 <BaseLayout
   title={meta.title}
-  description="Champions timelines, most-successful-team rankings, most-frequent hosts, back-to-back champions and nearly-champions generated from the World Cup, EURO, Copa América and Nations League tables, plus Ballon d'Or and Golden Boot award timelines and rankings, and how historical nation names are grouped."
+  description="Champions timelines, most-successful-team rankings, most-frequent hosts, back-to-back champions, nearly-champions and longest title droughts generated from the World Cup, EURO, Copa América and Nations League tables, plus Ballon d'Or and Golden Boot award timelines and rankings, and how historical nation names are grouped."
   alternateHref={withBase('/hr/records')}
   jsonLd={jsonLd}
 >
@@ -319,6 +332,51 @@ const jsonLd: JsonLdObject[] = [
                   <>
                     <h2>{c.label}</h2>
                     <p class="muted">Every finalist so far has gone on to win a title.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  View the full {c.label} table &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="title-gaps-heading">
+      <h2 id="title-gaps-heading">Longest wait between titles</h2>
+      <p class="muted">
+        For every team, player or tied group with at least two titles, the
+        biggest calendar-year gap between two of their wins - generated from
+        the same title years as "Most successful teams" above, not
+        hand-picked trivia. The opposite question from "Back-to-back
+        champions": that section finds the shortest possible gap (the very
+        next edition); this one finds the longest gap in a title holder's own
+        record. Grouped the same way "Most successful teams" groups West
+        Germany under Germany.
+      </p>
+      <div class="records__teams-grid">
+        {
+          allLoaded.map((c) => {
+            const gaps = buildLongestTitleGaps(c.data.editions);
+            return (
+              <div>
+                {gaps.length > 0 ? (
+                  <ChampionsSummary
+                    id={`title-gaps-${c.key}`}
+                    champions={gaps}
+                    scaleMax={Math.max(...gaps.map((g) => g.titles))}
+                    heading={c.label}
+                    description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
+                    icon="⏳"
+                    unit={['year', 'years']}
+                    winningYearsLabel="Years apart: "
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">No one has won this twice yet.</p>
                   </>
                 )}
                 <a class="records__teams-link" href={c.href}>

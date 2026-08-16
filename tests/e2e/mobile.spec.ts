@@ -1169,6 +1169,23 @@ test.describe('Records page on a 360px phone', () => {
     await expect(worldCupNearly.locator('.champions__name').filter({ hasText: /^Argentina$/ })).toHaveCount(0);
   });
 
+  test('shows a "Longest wait between titles" ranking, including a team whose two titles are back-to-back', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Longest wait between titles' })).toBeVisible();
+
+    const worldCupGaps = page.locator('section.champions:has(#title-gaps-world-cup-heading)');
+    await expect(worldCupGaps.locator('.champions__name').filter({ hasText: 'Italy' })).toBeVisible();
+    await expect(worldCupGaps.locator('.champions__count').first()).toHaveText(/44/);
+    await expect(worldCupGaps.getByText('1938, 1982')).toBeVisible();
+
+    // UEFA Nations League has only had one repeat champion so far (Portugal,
+    // 2018-19 and 2024-25) - it still gets an entry here, not the "hasn't
+    // happened yet" fallback the streaks section shows.
+    const nationsLeagueGaps = page.locator('section.champions:has(#title-gaps-nations-league-heading)');
+    await expect(nationsLeagueGaps.locator('.champions__name').filter({ hasText: 'Portugal' })).toBeVisible();
+  });
+
   test("shows a separate timeline and ranking for the Ballon d'Or and Golden Boot awards", async ({
     page,
   }) => {
@@ -1290,6 +1307,35 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
       .textContent();
     const enCount = await page
       .locator('section.champions:has(#nearly-champions-world-cup-heading) .champions__count')
+      .first()
+      .textContent();
+
+    expect(hrTop).toBe(enTop);
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
+  });
+
+  test('shows the translated "Najduže čekanje na novi naslov" ranking, matching the English World Cup numbers', async ({
+    page,
+    baseURL,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Najduže čekanje na novi naslov' })).toBeVisible();
+
+    const hrTop = await page
+      .locator('section.champions:has(#title-gaps-world-cup-heading) .champions__name')
+      .first()
+      .textContent();
+    const hrCount = await page
+      .locator('section.champions:has(#title-gaps-world-cup-heading) .champions__count')
+      .first()
+      .textContent();
+
+    await page.goto(baseURL ? `${baseURL}records` : '/records');
+    const enTop = await page
+      .locator('section.champions:has(#title-gaps-world-cup-heading) .champions__name')
+      .first()
+      .textContent();
+    const enCount = await page
+      .locator('section.champions:has(#title-gaps-world-cup-heading) .champions__count')
       .first()
       .textContent();
 
@@ -2131,11 +2177,11 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
   }) => {
     await page.goto('records');
     const blocks = await jsonLdBlocks(page);
-    expect(blocks).toHaveLength(21);
+    expect(blocks).toHaveLength(28);
     expect(blocks.filter((b) => b['@type'] === 'BreadcrumbList')).toHaveLength(1);
 
     const lists = blocks.filter((b) => b['@type'] === 'ItemList');
-    expect(lists).toHaveLength(20);
+    expect(lists).toHaveLength(27);
     expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Most successful teams');
     expect(lists.map((l) => l.name)).toContain('Copa América - Most frequent hosts');
     expect(lists.map((l) => l.name)).toContain('Golden Boot (World Cup) - Back-to-back champions');
@@ -2151,6 +2197,14 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     // d'Or and Golden Boot recognize a player, not a team, and have no
     // Runner-up column to begin with.
     expect(lists.map((l) => l.name)).not.toContain("Ballon d'Or - Nearly champions");
+    // "Longest wait between titles" covers all seven loaded tables (unlike
+    // "Nearly champions", it applies to individual awards too) and every one
+    // of them today has at least one repeat title holder, so there's no
+    // zero-gap fallback case to skip.
+    expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Longest wait between titles');
+    expect(lists.map((l) => l.name)).toContain('UEFA Nations League - Longest wait between titles');
+    expect(lists.map((l) => l.name)).toContain("Ballon d'Or - Longest wait between titles");
+    expect(lists.map((l) => l.name)).toContain('Golden Boot (World Cup) - Longest wait between titles');
   });
 
   test('/hr/records carries its own Croatian ItemList names for every ranking section', async ({
@@ -2159,11 +2213,12 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     await page.goto('hr/records');
     const blocks = await jsonLdBlocks(page);
     const lists = blocks.filter((b) => b['@type'] === 'ItemList');
-    expect(lists).toHaveLength(20);
+    expect(lists).toHaveLength(27);
     expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - najuspješnije reprezentacije');
     expect(lists.map((l) => l.name)).toContain('Zlatna lopta - uzastopni prvaci');
     expect(lists.map((l) => l.name)).not.toContain('UEFA Liga nacija - uzastopni prvaci');
     expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - vječiti drugoplasirani');
+    expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - najduže čekanje na novi naslov');
   });
 
   test('/compare carries a BreadcrumbList and one ItemList ranking every national team by combined record', async ({

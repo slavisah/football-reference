@@ -7082,6 +7082,91 @@ source-link liveness (infeasible in this environment), a further
 content-accuracy spot-check (low-yield), the scoped-down flag-emoji idea,
 and the CSP's `'unsafe-inline'` allowance.
 
+### New feature: "Longest wait between titles" ranking on `/records` - added 2026-08-16 (intensive run)
+
+With every explicit backlog item and every previously-named "left for a
+future pass" candidate still exhausted (source-link liveness infeasible, a
+further content-accuracy spot-check low-yield, the flag-emoji idea
+rejected, the CSP's `'unsafe-inline'` not worth revisiting), this run added
+one more bounded ranking in the same spirit as "Back-to-back champions"
+(2026-08-15) and "Nearly champions" (earlier today) - a new angle computed
+purely from already-loaded, already-double-audited title-year data, not new
+editorial research.
+
+**`buildLongestTitleGaps()`** (new, `src/lib/editions.ts`) finds, for every
+team/player/tied-award-group with two or more titles, the widest
+calendar-year gap between any two of their title wins - the generated
+"longest wait for another title" trivia (Italy's real 44 years between its
+1938 and 1982 FIFA World Cup wins, EURO's Italy 52 years between 1968 and
+2020, Copa América's Brazil 40 years between 1949 and 1989). Deliberately
+the mirror image of `buildLongestStreaks()`: that function finds the
+*shortest* possible gap (the very next edition, the same winner twice in a
+row); this one finds the *longest* gap in a title holder's own record. The
+two are not mutually exclusive - a team whose only two titles happen to be
+back-to-back still gets an entry here too, with a small gap. Reuses
+`buildChampionsSummary()`'s own grouping (West Germany counts as Germany,
+Golden Boot ties are split before grouping, exactly like every other
+title-totals ranking) so this can never disagree with "Most successful
+teams" about who has won what, and reuses the `ChampionSummary` shape
+(`titles` repurposed as "years between", `years` narrowed to just the two
+bounding editions) so it renders through the existing
+`ChampionsSummary.astro` component - no new component, matching the
+"Back-to-back champions"/"Nearly champions" precedent. Applied to all seven
+loaded tables (the four team competitions plus Ballon d'Or and both Golden
+Boot tables), unlike "Nearly champions" which is scoped to the four team
+competitions only (individual awards have no Runner-up column) - a repeat
+title gap is a well-defined question for an individual award too, so
+`records.astro`/`hr/records.astro` loop over `allLoaded`, the same list the
+streaks section already uses, with the same "hasn't happened yet" text
+fallback pattern for the (today theoretical) case of a competition with no
+repeat winner at all.
+
+Verified the real numbers with a throwaway script over the actual content
+files before writing a single permanent test (bypassing `astro:content` by
+calling `findTableByHeading`/`buildEditions` directly against
+`content/*.md`, since the loader itself needs the Astro runtime): every one
+of the seven tables produced a non-empty ranking today, including
+interesting real results - the Ballon d'Or's "Ronaldo" (the Brazilian,
+1997-2002) and "Cristiano Ronaldo" (2008-2013) correctly stayed two
+separate 5-year entries rather than merging, and the EURO Golden Boot's
+Cristiano Ronaldo correctly showed an 8-year gap (2012-2020) using the
+already-tie-split winner data the 2026-08-15 Golden Boot bug fix put in
+place.
+
+**Tests:** 8 new Vitest cases (`tests/unit/editions.test.ts`:
+the real Italy 1938/1982 World Cup gap picking the widest of three gaps
+rather than the full first-to-last span, excludes a team with only one
+title, still includes a team whose only two titles are back-to-back, groups
+West Germany under Germany, does not chain a gap across a placeholder "Not
+awarded" year, splits Golden Boot joint-winner ties before computing the
+gap, the sort order, and an empty-result competition - 290 total, up from
+282) and 2 new Playwright cases (`tests/e2e/mobile.spec.ts`: the English
+page shows Italy's real 44-year World Cup gap and confirms Nations League
+still gets an entry rather than a fallback; the Croatian page's numbers
+match the English page's), plus updated the existing `/records`/`/hr/records`
+structured-data tests' expected `ItemList` counts (all 7 tables' new
+ItemLists are non-empty today, so the total climbs from 20 to 27 rankings,
+28 blocks including the page's own `BreadcrumbList`). Full suite: `pnpm
+test` (290/290), `pnpm lint` (0/0/0), `pnpm build` (23 pages), full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e`, and
+`check:links`/`check:sitemap`/`check:precache`/`check:pdfs` all pass.
+`/records`'s heaviest page (Croatian) grew from ~372 KB to ~402 KB with this
+section's addition, crossing the existing 400 KB budget by about 1.7 KB -
+raised `PAGE_WEIGHT_BUDGET_BYTES` to 420 KB in
+`scripts/check-page-weight.mjs`, the same deliberate way this budget has
+been raised three times before (~234 KB, then 300 KB, then 360 KB, then
+400 KB), confirmed via `pnpm check:perf` afterward. No PDF regeneration
+needed - `/records` is not one of the six downloadable competition/award
+pages `scripts/pdf-pages.mjs` tracks.
+
+**Left for a future pass:** no known gaps in this feature - it covers all
+seven loaded tables, both languages, with the same fallback pattern the
+streaks section established for a competition that could theoretically have
+no repeat winner. Standing candidates are otherwise unchanged: source-link
+liveness (infeasible in this environment), a further content-accuracy
+spot-check (low-yield), the scoped-down flag-emoji idea, and the CSP's
+`'unsafe-inline'` allowance.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

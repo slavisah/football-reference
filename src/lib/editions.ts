@@ -407,6 +407,70 @@ export function buildRunnerUpsWithoutTitle(editions: Edition[]): ChampionSummary
 }
 
 /**
+ * For every team/player with two or more titles, the longest calendar-year
+ * gap between any two of their *chronologically consecutive* title wins -
+ * the generated "longest wait for another title" trivia (Italy's 44 years
+ * between its 1938 and 1982 FIFA World Cup wins). Reuses
+ * `buildChampionsSummary()`'s own grouping (West Germany counts as Germany,
+ * same as every other title-totals ranking) so this never disagrees with
+ * "Most successful teams" about who has won what.
+ *
+ * Deliberately the opposite question from `buildLongestStreaks()`: that
+ * function finds the *shortest* possible gap (adjacent editions, the same
+ * winner twice in a row); this one finds the *longest* gap in a title
+ * holder's own record, measured in calendar years between the two bounding
+ * editions' years (not table-row adjacency, since the years being compared
+ * are rarely adjacent rows once every other winner in between is accounted
+ * for). A team whose only two titles happen to be back-to-back still gets
+ * an entry here too (a small gap, e.g. 4 years) - the two rankings answer
+ * different questions and are not mutually exclusive.
+ *
+ * Reuses the `ChampionSummary` shape with `titles` repurposed to mean "years
+ * between" and `years` narrowed to just the two editions bounding the
+ * longest gap (not every title year), so it renders through the same
+ * `ChampionsSummary.astro` component as every other `/records` ranking,
+ * with `winningYearsLabel` overridden to describe the two bounding years. A
+ * team with only one title, or the vanishingly unlikely case where every
+ * gap works out to zero, is excluded rather than shown with a meaningless
+ * zero-year gap.
+ */
+export function buildLongestTitleGaps(editions: Edition[]): ChampionSummary[] {
+  const gaps: ChampionSummary[] = [];
+
+  for (const champion of buildChampionsSummary(editions)) {
+    if (champion.titles < 2) continue;
+
+    let widestGap = 0;
+    let gapStart = champion.years[0];
+    let gapEnd = champion.years[1];
+    for (let i = 1; i < champion.years.length; i++) {
+      const gap = leadingYear(champion.years[i]) - leadingYear(champion.years[i - 1]);
+      if (gap > widestGap) {
+        widestGap = gap;
+        gapStart = champion.years[i - 1];
+        gapEnd = champion.years[i];
+      }
+    }
+    if (widestGap <= 0) continue;
+
+    gaps.push({
+      id: champion.id,
+      displayName: champion.displayName,
+      titles: widestGap,
+      years: [gapStart, gapEnd],
+      names: champion.names,
+    });
+  }
+
+  return gaps.sort(
+    (a, b) =>
+      b.titles - a.titles ||
+      leadingYear(a.years[0]) - leadingYear(b.years[0]) ||
+      a.displayName.localeCompare(b.displayName),
+  );
+}
+
+/**
  * Column labels that hold a team/national-team name rather than a count, a
  * date or a score line - covers every team-competition editions table
  * (Winner/Champion, Runner-up, Third, Fourth or "Other semifinalist" in its

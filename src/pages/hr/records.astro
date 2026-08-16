@@ -17,6 +17,7 @@ import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import {
   buildHostsSummary,
   buildLongestStreaks,
+  buildLongestTitleGaps,
   buildRunnerUpsWithoutTitle,
   buildTimeline,
 } from '../../lib/editions';
@@ -151,6 +152,18 @@ const jsonLd: JsonLdObject[] = [
         ]
       : [];
   }),
+  ...allLoaded.flatMap((c) => {
+    const gaps = buildLongestTitleGaps(c.data.editions);
+    return gaps.length > 0
+      ? [
+          buildChampionsItemList(gaps, {
+            pageUrl,
+            name: `${c.label} - najduže čekanje na novi naslov`,
+            unit: ['godina', 'godine'],
+          }),
+        ]
+      : [];
+  }),
   ...individualAwards.map((a) =>
     buildChampionsItemList(a.data.champions, {
       pageUrl,
@@ -163,7 +176,7 @@ const jsonLd: JsonLdObject[] = [
 
 <BaseLayout
   title="Rekordi i vremenska crta"
-  description="Vremenske crte prvaka, poredak najuspješnijih reprezentacija, najčešći domaćini, uzastopni prvaci i vječiti drugoplasirani generirani iz tablica Svjetskog prvenstva, EURA, Copa Américe i Lige nacija, uz vremensku crtu i poredak za Zlatnu loptu i Zlatnu kopačku, te objašnjenje kako se grupiraju povijesni nazivi država."
+  description="Vremenske crte prvaka, poredak najuspješnijih reprezentacija, najčešći domaćini, uzastopni prvaci, vječiti drugoplasirani i najduže čekanje na novi naslov generirani iz tablica Svjetskog prvenstva, EURA, Copa Américe i Lige nacija, uz vremensku crtu i poredak za Zlatnu loptu i Zlatnu kopačku, te objašnjenje kako se grupiraju povijesni nazivi država."
   locale="hr"
   alternateHref={withBase('/records')}
   jsonLd={jsonLd}
@@ -340,6 +353,52 @@ const jsonLd: JsonLdObject[] = [
                   <>
                     <h2>{c.label}</h2>
                     <p class="muted">Svaki dosadašnji finalist na kraju je osvojio naslov.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  Pogledajte cijelu tablicu - {c.label} &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="title-gaps-heading">
+      <h2 id="title-gaps-heading">Najduže čekanje na novi naslov</h2>
+      <p class="muted">
+        Za svaku reprezentaciju, igrača ili skupinu igrača s podijeljenom
+        nagradom koja ima barem dva naslova, najveći razmak u godinama između
+        dvije pobjede - generirano iz istih godina osvajanja kao i
+        "Najuspješnije reprezentacije" iznad, ne ručno odabrano. Suprotno
+        pitanje od "Uzastopnih prvaka": taj odjeljak traži najkraći mogući
+        razmak (sljedeće izdanje), a ovaj najduži razmak u karijeri
+        pojedinog naslova. Grupirano na isti način na koji "Najuspješnije
+        reprezentacije" ubraja Zapadnu Njemačku u Njemačku.
+      </p>
+      <div class="records__teams-grid">
+        {
+          allLoaded.map((c) => {
+            const gaps = buildLongestTitleGaps(c.data.editions);
+            return (
+              <div>
+                {gaps.length > 0 ? (
+                  <ChampionsSummary
+                    id={`title-gaps-${c.key}`}
+                    champions={gaps}
+                    scaleMax={Math.max(...gaps.map((g) => g.titles))}
+                    heading={c.label}
+                    description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
+                    icon="⏳"
+                    unit={['godina', 'godine']}
+                    winningYearsLabel="Razmak: "
+                    ofLabel="od"
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">Nitko to još nije osvojio dvaput.</p>
                   </>
                 )}
                 <a class="records__teams-link" href={c.href}>
