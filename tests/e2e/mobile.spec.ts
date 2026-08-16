@@ -1154,6 +1154,21 @@ test.describe('Records page on a 360px phone', () => {
     await expect(page.getByText('No one has won two editions in a row yet.').first()).toBeVisible();
   });
 
+  test('shows a "Nearly champions" ranking of runner-up teams that have never won', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Nearly champions' })).toBeVisible();
+
+    const worldCupNearly = page.locator('section.champions:has(#nearly-champions-world-cup-heading)');
+    await expect(worldCupNearly.locator('.champions__name').filter({ hasText: 'Netherlands' })).toBeVisible();
+    await expect(worldCupNearly.locator('.champions__count').first()).toHaveText(/3/);
+    await expect(worldCupNearly.getByText('1974, 1978, 2010')).toBeVisible();
+
+    // Argentina has lost a World Cup final (1930, 1990) but has also won it
+    // three times, so it must not appear in this "never won" ranking at all.
+    await expect(worldCupNearly.locator('.champions__name').filter({ hasText: /^Argentina$/ })).toHaveCount(0);
+  });
+
   test("shows a separate timeline and ranking for the Ballon d'Or and Golden Boot awards", async ({
     page,
   }) => {
@@ -1251,6 +1266,35 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
     await expect(ballonDorStreaks.getByText('2009, 2010, 2011, 2012')).toBeVisible();
 
     await expect(page.getByText('Nitko još nije osvojio dva izdanja zaredom.').first()).toBeVisible();
+  });
+
+  test('shows the translated "Vječiti drugoplasirani" ranking, matching the English World Cup numbers', async ({
+    page,
+    baseURL,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Vječiti drugoplasirani' })).toBeVisible();
+
+    const hrTop = await page
+      .locator('section.champions:has(#nearly-champions-world-cup-heading) .champions__name')
+      .first()
+      .textContent();
+    const hrCount = await page
+      .locator('section.champions:has(#nearly-champions-world-cup-heading) .champions__count')
+      .first()
+      .textContent();
+
+    await page.goto(baseURL ? `${baseURL}records` : '/records');
+    const enTop = await page
+      .locator('section.champions:has(#nearly-champions-world-cup-heading) .champions__name')
+      .first()
+      .textContent();
+    const enCount = await page
+      .locator('section.champions:has(#nearly-champions-world-cup-heading) .champions__count')
+      .first()
+      .textContent();
+
+    expect(hrTop).toBe(enTop);
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
   });
 
   test('the language switcher returns to the English records page', async ({ page }) => {
@@ -2087,20 +2131,26 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
   }) => {
     await page.goto('records');
     const blocks = await jsonLdBlocks(page);
-    expect(blocks).toHaveLength(17);
+    expect(blocks).toHaveLength(21);
     expect(blocks.filter((b) => b['@type'] === 'BreadcrumbList')).toHaveLength(1);
 
     const lists = blocks.filter((b) => b['@type'] === 'ItemList');
-    expect(lists).toHaveLength(16);
+    expect(lists).toHaveLength(20);
     expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Most successful teams');
     expect(lists.map((l) => l.name)).toContain('Copa América - Most frequent hosts');
     expect(lists.map((l) => l.name)).toContain('Golden Boot (World Cup) - Back-to-back champions');
     expect(lists.map((l) => l.name)).toContain('Golden Boot (EURO) - Most awards');
+    expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Nearly champions');
+    expect(lists.map((l) => l.name)).toContain('UEFA Nations League - Nearly champions');
     // Nations League (4 different champions so far) and the EURO Golden Boot
     // have no back-to-back streak, so records.astro renders a text fallback
     // instead of a ranking for them - no ItemList should exist for either.
     expect(lists.map((l) => l.name)).not.toContain('UEFA Nations League - Back-to-back champions');
     expect(lists.map((l) => l.name)).not.toContain('Golden Boot (EURO) - Back-to-back champions');
+    // "Nearly champions" only covers the four team competitions - Ballon
+    // d'Or and Golden Boot recognize a player, not a team, and have no
+    // Runner-up column to begin with.
+    expect(lists.map((l) => l.name)).not.toContain("Ballon d'Or - Nearly champions");
   });
 
   test('/hr/records carries its own Croatian ItemList names for every ranking section', async ({
@@ -2109,10 +2159,11 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     await page.goto('hr/records');
     const blocks = await jsonLdBlocks(page);
     const lists = blocks.filter((b) => b['@type'] === 'ItemList');
-    expect(lists).toHaveLength(16);
+    expect(lists).toHaveLength(20);
     expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - najuspješnije reprezentacije');
     expect(lists.map((l) => l.name)).toContain('Zlatna lopta - uzastopni prvaci');
     expect(lists.map((l) => l.name)).not.toContain('UEFA Liga nacija - uzastopni prvaci');
+    expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - vječiti drugoplasirani');
   });
 
   test('/compare carries a BreadcrumbList and one ItemList ranking every national team by combined record', async ({

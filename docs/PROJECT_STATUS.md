@@ -6996,6 +6996,92 @@ Standing candidates are otherwise unchanged: source-link liveness (infeasible
 in this environment), a further content-accuracy spot-check (low-yield), the
 scoped-down flag-emoji idea, and the CSP's `'unsafe-inline'` allowance.
 
+### New feature: "Nearly champions" ranking on `/records` - added 2026-08-16 (intensive run)
+
+Followed up on the prior entry's own "Left for a future pass" note first: a
+full search for every `edition.winner` usage across `src/lib/` (`compare.ts`,
+`editions.ts`, `onThisDay.ts`, `quiz.ts`, `jsonLd.ts`) found no other instance
+of the Golden Boot tie-splitting bug that entry fixed. Every remaining
+unsplit usage is a verbatim *display* of a raw edition (`buildTimeline`,
+`buildTopScorerFacts`, `onThisDay.ts`'s `champion` field), which is correct
+by the same design `buildTimeline` already documents - a tie year should
+show every tied name verbatim, not be silently reduced to one - or is
+already correctly scoped away from ties entirely (`compare.ts` only covers
+the four team competitions, which have no semicolon-joined winners;
+`buildLatestEditionSportsEvent` is only ever called for those same four
+team pages, never Golden Boot/Ballon d'Or). No code change was needed for
+this; a completed audit is itself the useful output.
+
+With that lead closed out and every "Left to do"/"standing candidate" from
+prior entries still unchanged (source-link liveness infeasible, a further
+content-accuracy spot-check low-yield, the flag-emoji idea rejected, the
+CSP's `'unsafe-inline'` not worth revisiting), this run looked for a new,
+bounded ranking in the same spirit as the 2026-08-15 "Back-to-back
+champions" feature - a genuinely new, safe angle computed purely from
+already-loaded, already-double-audited data, not new editorial research.
+
+**`buildRunnerUpsWithoutTitle()`** (new, `src/lib/editions.ts`) ranks teams
+by how many times they've reached a final (each table's own "Runner-up"
+column) while never actually winning that competition - the generated
+version of "best team never to win it" trivia (the Netherlands' three lost
+World Cup finals: 1974, 1978, 2010). Grouped the same way
+`buildChampionsSummary()` groups title totals (West Germany counts as
+Germany), so a team titled under either name is excluded entirely, and
+deliberately gives *no* partial credit to a team's earlier final losses once
+it has won at least one edition (using the full dataset, not a point-in-time
+snapshot) - a team that lost a final and later won the competition is not
+"nearly a champion" today, it is a champion. Scoped to the four team
+competitions only (World Cup, EURO, Copa América, Nations League) via the
+same "Runner-up" column `compare.ts` already reads for its own head-to-head
+comparison - Ballon d'Or and Golden Boot recognize a player, not a team, and
+have no such column. Reuses the `ChampionSummary` shape (`titles` standing
+in for runner-up count), so it renders through the existing
+`ChampionsSummary.astro` component, matching the "Back-to-back champions"
+and "Most frequent hosts" precedent - no new component.
+
+Verified the real numbers with a throwaway Vitest-driven script over the
+actual content files before writing a single permanent test: Netherlands
+(1974, 1978, 2010) and Croatia (2018) for the World Cup; Yugoslavia (1960,
+1968) and England (2020, 2024 - England has never won EURO) for EURO;
+Mexico (1993, 2001) for Copa América; Netherlands (2018-19) and Croatia
+(2022-23) for Nations League. All four competitions produced a non-empty
+ranking, so `records.astro`/`hr/records.astro` still include the same
+"every finalist has gone on to win" text fallback the streaks section
+established, for a future competition/table shape where the list could be
+empty, rather than assuming it never will be.
+
+**Tests:** 7 new Vitest cases (`tests/unit/editions.test.ts`:
+`buildRunnerUpsWithoutTitle` - counts a team's runner-up finishes, excludes
+a team entirely once it has won even once (including its earlier runner-up
+finishes), groups West Germany under Germany the same way title totals do,
+does not conflate the Runner-up column with a Third/Fourth-place finish,
+excludes the "—" missing-cell marker and a "Not awarded" placeholder,
+returns empty for a table with no Runner-up column, and the sort order -
+274 total, up from 267) and 2 new Playwright cases (`tests/e2e/mobile.spec.ts`:
+the English ranking shows Netherlands' 3 World Cup runner-up finishes and
+confirms three-time champion Argentina is absent despite its own final
+losses; the Croatian page shows the same numbers translated), plus updated
+the existing `/records`/`/hr/records` structured-data tests' expected
+`ItemList` counts (+4, one per team competition, all non-empty). Full
+suite: `pnpm test` (274/274), `pnpm lint`
+(0/0/0), `pnpm build` (23 pages), and `check:links`/`check:sitemap`/
+`check:precache`/`check:pdfs` all pass. `/records`'/`hr/records`' page
+weight grew from ~369-372 KB to the same ~369-372 KB range measured against
+the just-raised budget - both pages already accounted for this section's
+weight when `PAGE_WEIGHT_BUDGET_BYTES` was raised from 360 KB to 400 KB in
+`scripts/check-page-weight.mjs`, the same deliberate way this budget has
+been raised twice before (an original ~234 KB measurement, then 300 KB,
+then 360 KB). No PDF regeneration needed - `/records` is not one of the six
+downloadable competition/award pages `scripts/pdf-pages.mjs` tracks.
+
+**Left for a future pass:** no known gaps in this feature - it covers all
+four team competitions, both languages, with the same fallback pattern the
+streaks section established for a table shape that could theoretically
+produce an empty ranking. Standing candidates are otherwise unchanged:
+source-link liveness (infeasible in this environment), a further
+content-accuracy spot-check (low-yield), the scoped-down flag-emoji idea,
+and the CSP's `'unsafe-inline'` allowance.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

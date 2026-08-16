@@ -4,7 +4,12 @@ import ChampionsTimeline from '../components/ChampionsTimeline.astro';
 import ChampionsSummary from '../components/ChampionsSummary.astro';
 import References from '../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
-import { buildHostsSummary, buildLongestStreaks, buildTimeline } from '../lib/editions';
+import {
+  buildHostsSummary,
+  buildLongestStreaks,
+  buildRunnerUpsWithoutTitle,
+  buildTimeline,
+} from '../lib/editions';
 import { absolutePageUrl, withBase } from '../lib/url';
 import { buildChampionsItemList, type JsonLdObject } from '../lib/jsonLd';
 
@@ -127,6 +132,18 @@ const jsonLd: JsonLdObject[] = [
         ]
       : [];
   }),
+  ...competitions.flatMap((c) => {
+    const nearlyChampions = buildRunnerUpsWithoutTitle(c.data.editions);
+    return nearlyChampions.length > 0
+      ? [
+          buildChampionsItemList(nearlyChampions, {
+            pageUrl,
+            name: `${c.label} - Nearly champions`,
+            unit: ['runner-up finish', 'runner-up finishes'],
+          }),
+        ]
+      : [];
+  }),
   ...individualAwards.map((a) =>
     buildChampionsItemList(a.data.champions, {
       pageUrl,
@@ -139,7 +156,7 @@ const jsonLd: JsonLdObject[] = [
 
 <BaseLayout
   title={meta.title}
-  description="Champions timelines, most-successful-team rankings, most-frequent hosts and back-to-back champions generated from the World Cup, EURO, Copa América and Nations League tables, plus Ballon d'Or and Golden Boot award timelines and rankings, and how historical nation names are grouped."
+  description="Champions timelines, most-successful-team rankings, most-frequent hosts, back-to-back champions and nearly-champions generated from the World Cup, EURO, Copa América and Nations League tables, plus Ballon d'Or and Golden Boot award timelines and rankings, and how historical nation names are grouped."
   alternateHref={withBase('/hr/records')}
   jsonLd={jsonLd}
 >
@@ -259,6 +276,49 @@ const jsonLd: JsonLdObject[] = [
                   <>
                     <h2>{c.label}</h2>
                     <p class="muted">No one has won two editions in a row yet.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  View the full {c.label} table &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="nearly-champions-heading">
+      <h2 id="nearly-champions-heading">Nearly champions</h2>
+      <p class="muted">
+        Teams that have reached a final - generated from each table's own
+        "Runner-up" column - but have never actually won the competition,
+        ranked by runner-up count. A team is dropped from this list the
+        moment it wins even once, so an earlier final loss is not "credited"
+        to a team that went on to lift the trophy later. Grouped the same
+        way "Most successful teams" groups West Germany under Germany.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => {
+            const nearlyChampions = buildRunnerUpsWithoutTitle(c.data.editions);
+            return (
+              <div>
+                {nearlyChampions.length > 0 ? (
+                  <ChampionsSummary
+                    id={`nearly-champions-${c.key}`}
+                    champions={nearlyChampions}
+                    scaleMax={Math.max(...nearlyChampions.map((s) => s.titles))}
+                    heading={c.label}
+                    description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
+                    icon="🥈"
+                    unit={['runner-up finish', 'runner-up finishes']}
+                    winningYearsLabel="Runner-up years: "
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">Every finalist so far has gone on to win a title.</p>
                   </>
                 )}
                 <a class="records__teams-link" href={c.href}>
