@@ -7435,6 +7435,88 @@ competitions - not a gap, just a note for why those two are absent here
 unlike some other `/compare` sections that explicitly call this out in
 their own copy.
 
+### New feature: "Biggest final wins" ranking on `/records` - added 2026-08-16 (later intensive run)
+
+`/records` ranked teams by title count, host frequency, home-soil titles,
+streaks, near-misses and title gaps, but never surfaced the single most
+naturally "wow"-able fact families ask about a final: how one-sided was it?
+1958's 5-2 and 2012's 4-0 are genuinely notable results with zero new
+editorial content needed to surface them - every team competition's table
+already carries a "Final" score line (e.g. "Brazil 5–2 Sweden") in the exact
+same cell `buildTimeline()` already reads for the champions timeline above.
+
+New **`buildBiggestFinalMargins()`** in `src/lib/editions.ts` reuses
+`ChampionSummary`'s shape the same way `buildLongestTitleGaps()` already
+does for a non-title-count stat: `displayName` holds the final's full score
+line (it already names both teams, so nothing else is needed to identify
+the match), `titles` holds the goal margin, and `years` holds the single
+year that final was played. A small `finalMargin()` helper parses the
+*first* "digit-dash-digit" pair out of the score line with one regex - the
+first pair is always the regulation/extra-time result, because a penalty
+shootout only ever follows a draw (`"Brazil 0–0 Italy; 3–2 pens"`,
+`"2–2; Czechoslovakia 5–3 pens"`), so a final decided on penalties correctly
+comes out with a margin of 0 rather than the shootout score being mistaken
+for a goal difference. Verified this against all 44 real "Final" cells
+across the World Cup (23), EURO (17) and Nations League (4) tables by hand
+before writing the parser (same "verify first" precedent every prior entry
+in this changelog uses) - every one fits the "first pair is the real score"
+rule, including the three golden-goal finals and the one replay final
+(1968 EURO), whose cell only records the replay score. Copa América has no
+"Final" score column at all (the same gap `buildTimeline()`'s own doc
+comment already names), so it is intentionally excluded from this ranking
+rather than guessed at.
+
+Wired into `/records` and `/hr/records` as a new "Biggest final wins"
+section (⚽ icon, unlike any icon already used on this page) between
+"Longest wait between titles" and "Individual award winners timeline",
+scoped to the four team competitions and following the exact
+`ChampionsSummary` + "no ranking yet" text-fallback pattern every other
+per-competition ranking on this page already uses - here the fallback fires
+for Copa América specifically, explaining the missing column rather than
+rendering an empty list. Confirmed by hand against the real content: the
+biggest World Cup final win is Brazil 5–2 Sweden (1958, margin 3, tied with
+Brazil 4–1 Italy 1970 and France 3–0 Brazil 1998 but 1958 sorts first), the
+biggest EURO final win is Spain 4–0 Italy (2012, margin 4), and every
+penalty-decided final (1976/2020 EURO, 1994/2006/2022 World Cup, both
+penalty-decided Nations League finals) correctly ranks at the bottom of its
+competition with a margin of 0. Added to both pages' `ItemList` JSON-LD the
+same way every other ranking section already is, skipped for Copa América
+exactly like the zero-streak/zero-gap fallbacks already skip their own
+`ItemList`.
+
+**Tests:** 5 new Vitest cases in `tests/unit/editions.test.ts` (ranks by
+margin biggest-first, reads the margin from before any penalty notation,
+breaks a margin tie by year, keeps the full score line as `displayName`,
+returns an empty list with no "Final" column) - 311 total, up from 306. 1
+new Playwright case in `tests/e2e/mobile.spec.ts` (heading visible, the
+real 1958/2012 top entries, the penalty-decided final's margin, and the
+Copa América fallback text) plus updated `ItemList` count/name assertions
+in the existing `/records` and `/hr/records` SEO tests (34 lists, up from
+31; the 3 new "Biggest final wins" lists minus the Copa América one that's
+correctly absent). `pnpm lint` - 0 errors/0 warnings/0 hints. `pnpm build`
+- 23 pages (unchanged page count). `pnpm check:links`/`check:sitemap`/
+`check:precache` all pass. `pnpm check:perf` - the new section pushed
+`hr/records` to 457.2 KB and `records` to 453.1 KB, over the previous
+440 KB budget; raised `PAGE_WEIGHT_BUDGET_BYTES` to 480 KB in
+`scripts/check-page-weight.mjs` the same deliberate way this script's own
+guidance recommends (real new generated content, not a regression - the
+sixth such raise, from an initial ~234 KB measurement through 300/360/400/
+420/440 KB). Full Playwright suite re-run against the new budget and the
+updated `/records` markup: all passing, including the accessibility and
+forced-colors sweeps that already cover this page in both languages and
+color schemes.
+
+**Left for a future pass:** the same standing candidates as the prior entry
+(source-link liveness infeasible, further content-accuracy spot-check
+low-yield, flag-emoji idea rejected, CSP's `'unsafe-inline'` not worth
+revisiting, Ballon d'Or/Golden Boot have no "Finals meetings"-equivalent
+concept). "Biggest final wins" only covers the three team competitions
+whose table has a "Final" score column (Copa América doesn't); Ballon d'Or
+and Golden Boot were never in scope either since they recognize a player,
+not a two-team final. `hr/records`/`records` are now the two heaviest pages
+on the site by a wide margin (next heaviest, `hr/quiz`, is 225.2 KB) -
+worth watching before adding yet another ranking section to this page.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

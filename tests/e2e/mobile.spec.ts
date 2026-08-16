@@ -1205,6 +1205,33 @@ test.describe('Records page on a 360px phone', () => {
     await expect(nationsLeagueGaps.locator('.champions__name').filter({ hasText: 'Portugal' })).toBeVisible();
   });
 
+  test('shows a "Biggest final wins" ranking by goal margin, with Copa América excluded for lacking a Final score column', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Biggest final wins' })).toBeVisible();
+
+    const worldCupMargins = page.locator('section.champions:has(#final-margins-world-cup-heading)');
+    await expect(worldCupMargins.locator('.champions__name').first()).toHaveText('Brazil 5–2 Sweden');
+    await expect(worldCupMargins.locator('.champions__count').first()).toHaveText(/3/);
+    await expect(worldCupMargins.getByText('1958')).toBeVisible();
+
+    const euroMargins = page.locator('section.champions:has(#final-margins-euro-heading)');
+    await expect(euroMargins.locator('.champions__name').first()).toHaveText('Spain 4–0 Italy');
+    await expect(euroMargins.locator('.champions__count').first()).toHaveText(/4/);
+
+    // A final decided on penalties (drawn after normal/extra time) ranks with
+    // a margin of 0, not the penalty shootout score.
+    await expect(worldCupMargins.getByText(/Brazil 0–0 Italy; 3–2 pens/)).toBeVisible();
+    const shootoutRow = worldCupMargins.locator('.champions__item').filter({ hasText: '0–0 Italy' });
+    await expect(shootoutRow.locator('.champions__count')).toHaveText(/0/);
+
+    // Copa América's source table has no "Final" score column, so it falls
+    // back to an explanatory message instead of an empty ranking.
+    await expect(
+      page.getByText('This competition\'s table has no "Final" score column to rank by margin.'),
+    ).toBeVisible();
+  });
+
   test("shows a separate timeline and ranking for the Ballon d'Or and Golden Boot awards", async ({
     page,
   }) => {
@@ -2225,11 +2252,11 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
   }) => {
     await page.goto('records');
     const blocks = await jsonLdBlocks(page);
-    expect(blocks).toHaveLength(32);
+    expect(blocks).toHaveLength(35);
     expect(blocks.filter((b) => b['@type'] === 'BreadcrumbList')).toHaveLength(1);
 
     const lists = blocks.filter((b) => b['@type'] === 'ItemList');
-    expect(lists).toHaveLength(31);
+    expect(lists).toHaveLength(34);
     expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Most successful teams');
     expect(lists.map((l) => l.name)).toContain('Copa América - Most frequent hosts');
     expect(lists.map((l) => l.name)).toContain('Golden Boot (World Cup) - Back-to-back champions');
@@ -2260,6 +2287,13 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(lists.map((l) => l.name)).toContain('UEFA Nations League - Longest wait between titles');
     expect(lists.map((l) => l.name)).toContain("Ballon d'Or - Longest wait between titles");
     expect(lists.map((l) => l.name)).toContain('Golden Boot (World Cup) - Longest wait between titles');
+    // "Biggest final wins" only covers the three team competitions whose
+    // table has a "Final" score column - Copa América has none (see
+    // buildTimeline's own doc comment), so it must not appear here.
+    expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Biggest final wins');
+    expect(lists.map((l) => l.name)).toContain('UEFA EURO - Biggest final wins');
+    expect(lists.map((l) => l.name)).toContain('UEFA Nations League - Biggest final wins');
+    expect(lists.map((l) => l.name)).not.toContain('Copa América - Biggest final wins');
   });
 
   test('/hr/records carries its own Croatian ItemList names for every ranking section', async ({
@@ -2268,7 +2302,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     await page.goto('hr/records');
     const blocks = await jsonLdBlocks(page);
     const lists = blocks.filter((b) => b['@type'] === 'ItemList');
-    expect(lists).toHaveLength(31);
+    expect(lists).toHaveLength(34);
     expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - najuspješnije reprezentacije');
     expect(lists.map((l) => l.name)).toContain('Zlatna lopta - uzastopni prvaci');
     expect(lists.map((l) => l.name)).not.toContain('UEFA Liga nacija - uzastopni prvaci');
@@ -2276,6 +2310,8 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - najduže čekanje na novi naslov');
     expect(lists.map((l) => l.name)).toContain('Copa América - naslovi osvojeni na domaćem terenu');
     expect(lists.map((l) => l.name)).not.toContain("Zlatna lopta - naslovi osvojeni na domaćem terenu");
+    expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - najveće pobjede u finalu');
+    expect(lists.map((l) => l.name)).not.toContain('Copa América - najveće pobjede u finalu');
   });
 
   test('/compare carries a BreadcrumbList and one ItemList ranking every national team by combined record', async ({
