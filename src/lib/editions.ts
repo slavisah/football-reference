@@ -276,6 +276,68 @@ export function buildHostsSummary(editions: Edition[]): ChampionSummary[] {
 }
 
 /**
+ * Titles won on home soil - editions where the winner cell exactly matches
+ * that same row's host cell - ranked by count, grouped the same way
+ * `buildChampionsSummary()` groups title totals (West Germany counts as
+ * Germany). The generated "home advantage" trivia (Uruguay's seven Copa
+ * América titles won on home soil, 1930's inaugural World Cup won by host
+ * Uruguay), computed purely from two columns every team-competition table
+ * already loads, combined in a way no existing `/records` ranking does.
+ *
+ * A co-hosted edition's host cell is a single combined string (e.g. "Belgium
+ * and Netherlands", "Canada, Mexico and United States") - this deliberately
+ * requires an *exact* match against the winner cell, so a co-host that goes
+ * on to win (a single-country name) never matches the multi-country host
+ * string, the same "does not invent a split the source content doesn't make"
+ * choice `buildHostsSummary()` already documents for the same host cells.
+ * Spain's 2026 FIFA World Cup win, with the tournament co-hosted by Canada,
+ * Mexico and United States, is real data that already exercises exactly this
+ * case: Spain does not count as a "home soil" win.
+ *
+ * Individual awards (Ballon d'Or, Golden Boot) have no host column, so every
+ * edition is naturally skipped rather than needing a separate competition
+ * check - callers only need to render this for the four team competitions,
+ * matching the "Nearly champions" precedent (`buildRunnerUpsWithoutTitle`).
+ */
+export function buildHomeSoilTitles(editions: Edition[]): ChampionSummary[] {
+  const groups = new Map<string, ChampionSummary>();
+
+  for (const edition of editions) {
+    const host = edition.host?.trim();
+    const winner = edition.winner.trim();
+    if (!host || !winner || isPlaceholderWinner(winner) || host !== winner) continue;
+
+    const group = summaryGroupFor(winner);
+    const existing = groups.get(group.id);
+    if (existing) {
+      existing.titles += 1;
+      existing.years.push(edition.year);
+      if (!existing.names.includes(winner)) existing.names.push(winner);
+    } else {
+      groups.set(group.id, {
+        id: group.id,
+        displayName: group.displayName,
+        titles: 1,
+        years: [edition.year],
+        names: [winner],
+      });
+    }
+  }
+
+  return [...groups.values()]
+    .map((summary) => ({
+      ...summary,
+      years: [...summary.years].sort((a, b) => leadingYear(a) - leadingYear(b)),
+    }))
+    .sort(
+      (a, b) =>
+        b.titles - a.titles ||
+        leadingYear(a.years[0]) - leadingYear(b.years[0]) ||
+        a.displayName.localeCompare(b.displayName),
+    );
+}
+
+/**
  * Every run of two or more *consecutive editions* (adjacent rows in the
  * source table, not adjacent calendar years - matters for the World Cup,
  * which skipped 1942/1946, and for Copa América's irregular early
