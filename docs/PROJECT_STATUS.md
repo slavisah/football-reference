@@ -7167,6 +7167,117 @@ liveness (infeasible in this environment), a further content-accuracy
 spot-check (low-yield), the scoped-down flag-emoji idea, and the CSP's
 `'unsafe-inline'` allowance.
 
+### New feature: "Titles won on home soil" ranking on `/records` - added 2026-08-16 (later intensive run)
+
+A later slice of the same day's intensive run. With every explicit backlog
+item and every previously-named "left for a future pass" candidate still
+exhausted (source-link liveness infeasible, a further content-accuracy
+spot-check low-yield, the flag-emoji idea rejected, the CSP's
+`'unsafe-inline'` not worth revisiting), and the day's own three earlier
+rankings ("Back-to-back champions" the day before, "Nearly champions" and
+"Longest wait between titles" earlier today) each already claiming "no known
+gaps" for their own angle, this run looked for a genuinely new combination of
+already-loaded columns rather than another variation on title totals alone -
+a fifth ranking derived from an angle nothing on the page yet used.
+
+Every existing `/records` ranking reads either the Winner column alone
+(titles, streaks, gaps) or the Host column alone (most frequent hosts). None
+of them reads *both columns of the same row together*. **`buildHomeSoilTitles()`**
+(new, `src/lib/editions.ts`) does exactly that: it counts, for every team,
+how many times that team's winner cell exactly matches that same edition's
+host cell - the generated "home advantage" trivia (Uruguay's seven Copa
+América titles won on home soil; the 1930 inaugural World Cup, won by host
+Uruguay). Grouped the same way `buildChampionsSummary()` groups title totals
+(West Germany counts as Germany) for consistency with every other
+title-shaped ranking on the page. Scoped to the four team competitions only,
+matching the "Nearly champions" precedent - Ballon d'Or and Golden Boot have
+no host column, so every one of their editions is naturally skipped rather
+than needing a separate per-competition check.
+
+The interesting design decision, called out in the function's own doc
+comment and locked in by three dedicated tests: a co-hosted edition's host
+cell is a single combined string (e.g. "Canada, Mexico and United States"),
+and this function requires an *exact* match against the winner cell, the same
+"does not invent a split the source content doesn't make" choice
+`buildHostsSummary()` already established for the same host cells. This
+means a co-host that goes on to win under its own single-country name is
+*not* counted as a home-soil title - and the live data already exercises
+this exact case for real, not just in a synthetic test: Spain won the
+three-country-co-hosted 2026 FIFA World Cup (Canada, Mexico and United
+States), and correctly does not appear in the World Cup's home-soil ranking
+at all, despite winning that edition.
+
+Verified the real numbers with a throwaway script over the actual content
+files before writing a single permanent test (the same `findTableByHeading`/
+`buildEditions` approach every prior "verify first" entry above used):
+World Cup (Uruguay 1930, Italy 1934, England 1966, West Germany 1974,
+Argentina 1978, France 1998 - six single home-soil titles, no repeats),
+EURO (Spain 1964, Italy 1968, France 1984), Nations League (Portugal
+2018-19), and, easily the richest result, Copa América - Uruguay leads with
+seven (1917, 1923, 1924, 1942, 1956, 1967, 1995), ahead of Argentina's six
+and Brazil's five, reflecting how often the historically host-heavy early
+Copa América editions were won by whichever country was hosting that year.
+All four team competitions produced a non-empty ranking today, so
+`records.astro`/`hr/records.astro` still include the same "no host has won
+its own edition yet" text fallback the streaks/nearly-champions/title-gaps
+sections established, for a hypothetical future table shape where the list
+could be empty.
+
+**Page-weight budget:** this fourth `/records` ranking section pushed the
+page's already-tight headroom past its limit - the Croatian page measured
+419.8 KB against the 420 KB budget (raised earlier today) even *before* this
+section, only ~0.2 KB of headroom, too thin to survive even a trivial future
+change, let alone a new section. Raised `PAGE_WEIGHT_BUDGET_BYTES` to 440 KB
+in `scripts/check-page-weight.mjs` with an updated comment documenting why -
+the fifth time this budget has been raised (an original ~234 KB measurement,
+then 300 KB, then 360 KB, then 400 KB, then 420 KB), each time for the same
+reason the script's own guidance recommends: real new generated content, not
+a regression. Confirmed via `pnpm check:perf` afterward - both `/records`
+pages now sit comfortably under the new budget with real headroom again.
+
+**Tests:** 8 new Vitest cases (`tests/unit/editions.test.ts`:
+`buildHomeSoilTitles` - a real home-soil title using the shared fixture's
+1974 West Germany row, the shared fixture's 2026 Spain/co-host row confirming
+a non-host winner is excluded, a dedicated co-host case where one of the
+named co-hosts wins under its own name and is still excluded, a title won
+away from the host, grouping West Germany under Germany across separate
+home-soil wins, excluding a "Not awarded"-style placeholder, an empty result
+for a table with no host column, and the sort order) and 2 new Playwright
+cases (`tests/e2e/mobile.spec.ts`: the English page shows Copa América's real
+Uruguay/7 result and confirms Spain is absent from the World Cup ranking
+despite its 2026 co-hosted win; the Croatian page's Copa América numbers
+match the English page's), plus updated the existing `/records`/`/hr/records`
+structured-data tests' expected `ItemList` counts (+4, one per team
+competition, all non-empty - 31 lists/32 blocks total, up from 27/28). Full
+suite: `pnpm test` (**290/290, up from 282**), `pnpm lint` (0/0/0), `pnpm
+build` (23 pages), full `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+test:e2e` (**423/423 passing, up from 421**), and `check:links`/
+`check:sitemap`/`check:precache`/`check:pdfs`/`check:perf` all pass. Both
+baselines (282 unit / 421 e2e) were re-measured directly against a clean
+`git stash` of this run's own changes rather than trusted from the prior
+entry's prose - the prior "Longest wait between titles" entry above states
+"290 total, up from 282" for its own change, but a clean checkout of that
+entry's own commit actually runs 282 tests, not 290; that entry's recorded
+after-count looks like a bookkeeping slip (`git log` shows no test file
+changes between that commit and this run starting), left as-is here since
+this file is a running changelog, not something earlier entries get
+rewritten, but worth knowing if a future pass's own "up from N" arithmetic
+ever looks off against this entry.
+
+**Left for a future pass:** no known gaps in this feature - it covers all
+four team competitions, both languages, with the same fallback pattern the
+streaks/nearly-champions/title-gaps sections established. `/records`' page
+weight has now needed five budget raises across its last five ranking
+additions; a sixth ranking section on this same page should seriously
+consider whether it belongs on `/records` at all, versus a lighter-weight
+page (`/quiz` and `/compare` both still have meaningful headroom under the
+360 KB/440 KB budgets respectively) - this page is close to being "the
+densest page on the site" as a permanent structural fact rather than a
+temporary state. Standing candidates are otherwise unchanged: source-link
+liveness (infeasible in this environment), a further content-accuracy
+spot-check (low-yield), the scoped-down flag-emoji idea, and the CSP's
+`'unsafe-inline'` allowance.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

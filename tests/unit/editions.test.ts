@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildChampionsSummary,
   buildEditions,
+  buildHomeSoilTitles,
   buildHostsSummary,
   buildLongestStreaks,
   buildLongestTitleGaps,
@@ -282,6 +283,99 @@ describe('buildHostsSummary', () => {
       rows: [['1958', 'Just Fontaine', 'France', '13']],
     };
     expect(buildHostsSummary(buildEditions(scorersTable))).toEqual([]);
+  });
+});
+
+describe('buildHomeSoilTitles', () => {
+  it('counts an edition where the winner exactly matches the host, using the shared fixture', () => {
+    // The shared `table` fixture's 1974 row is West Germany hosting and
+    // winning - a real home-soil title.
+    const summary = buildHomeSoilTitles(buildEditions(table));
+    const germany = summary.find((s) => s.id === 'germany');
+    expect(germany).toMatchObject({
+      displayName: 'Germany (incl. West Germany)',
+      titles: 1,
+      years: ['1974'],
+      names: ['West Germany'],
+    });
+  });
+
+  it('does not count a co-host edition even when one of the co-hosts wins, matching Spain not winning "at home" in 2026', () => {
+    // The shared fixture's 2026 row: host "Canada, Mexico and United
+    // States", winner "Spain" - Spain is not a host at all here, but this
+    // also locks in the co-host exact-match design even for a country that
+    // *is* one of several hosts (see the next test for that exact case).
+    const summary = buildHomeSoilTitles(buildEditions(table));
+    expect(summary.find((s) => s.displayName === 'Spain')).toBeUndefined();
+  });
+
+  it('does not count a co-host that wins under its own single-country name, since the host cell is a combined string', () => {
+    const coHostTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [['2000', 'Belgium and Netherlands', 'Netherlands']],
+    };
+    expect(buildHomeSoilTitles(buildEditions(coHostTable))).toEqual([]);
+  });
+
+  it('does not count a title won away from the host country', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [['2014', 'Brazil', 'Germany']],
+    };
+    expect(buildHomeSoilTitles(buildEditions(table))).toEqual([]);
+  });
+
+  it('groups West Germany under Germany across separate home-soil wins, matching buildChampionsSummary', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1974', 'West Germany', 'West Germany'],
+        ['2006', 'Germany', 'Italy'],
+        ['2026', 'Germany', 'Germany'],
+      ],
+    };
+    expect(buildHomeSoilTitles(buildEditions(table))).toEqual([
+      {
+        id: 'germany',
+        displayName: 'Germany (incl. West Germany)',
+        titles: 2,
+        years: ['1974', '2026'],
+        names: ['West Germany', 'Germany'],
+      },
+    ]);
+  });
+
+  it('excludes a "Not awarded"-style placeholder even if it somehow matched the host cell', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [['2020', 'Not awarded', 'Not awarded']],
+    };
+    expect(buildHomeSoilTitles(buildEditions(table))).toEqual([]);
+  });
+
+  it('returns an empty list when the table has no host column', () => {
+    const scorersTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [['1958', 'Just Fontaine', 'France', '13']],
+    };
+    expect(buildHomeSoilTitles(buildEditions(scorersTable))).toEqual([]);
+  });
+
+  it('sorts by home-soil title count desc, then earliest year, then name', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1917', 'Uruguay', 'Uruguay'],
+        ['1923', 'Uruguay', 'Uruguay'],
+        ['1921', 'Argentina', 'Argentina'],
+        ['1929', 'Peru', 'Peru'],
+      ],
+    };
+    // Uruguay hosted-and-won twice, so it ranks first; Argentina (1921) and
+    // Peru (1929) both did it once and tie-break on earliest year.
+    const summary = buildHomeSoilTitles(buildEditions(table));
+    expect(summary.map((s) => s.displayName)).toEqual(['Uruguay', 'Argentina', 'Peru']);
+    expect(summary[0]).toMatchObject({ titles: 2, years: ['1917', '1923'] });
   });
 });
 

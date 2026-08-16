@@ -15,6 +15,7 @@ import ChampionsSummary from '../../components/ChampionsSummary.astro';
 import References from '../../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import {
+  buildHomeSoilTitles,
   buildHostsSummary,
   buildLongestStreaks,
   buildLongestTitleGaps,
@@ -128,6 +129,18 @@ const jsonLd: JsonLdObject[] = [
       unit: ['put domaćin', 'puta domaćin'],
     }),
   ),
+  ...competitions.flatMap((c) => {
+    const homeSoil = buildHomeSoilTitles(c.data.editions);
+    return homeSoil.length > 0
+      ? [
+          buildChampionsItemList(homeSoil, {
+            pageUrl,
+            name: `${c.label} - naslovi osvojeni na domaćem terenu`,
+            unit: ['naslov na domaćem terenu', 'naslova na domaćem terenu'],
+          }),
+        ]
+      : [];
+  }),
   ...allLoaded.flatMap((c) => {
     const streaks = buildLongestStreaks(c.data.editions);
     return streaks.length > 0
@@ -176,7 +189,7 @@ const jsonLd: JsonLdObject[] = [
 
 <BaseLayout
   title="Rekordi i vremenska crta"
-  description="Vremenske crte prvaka, poredak najuspješnijih reprezentacija, najčešći domaćini, uzastopni prvaci, vječiti drugoplasirani i najduže čekanje na novi naslov generirani iz tablica Svjetskog prvenstva, EURA, Copa Américe i Lige nacija, uz vremensku crtu i poredak za Zlatnu loptu i Zlatnu kopačku, te objašnjenje kako se grupiraju povijesni nazivi država."
+  description="Vremenske crte prvaka, poredak najuspješnijih reprezentacija, najčešći domaćini, naslovi osvojeni na domaćem terenu, uzastopni prvaci, vječiti drugoplasirani i najduže čekanje na novi naslov generirani iz tablica Svjetskog prvenstva, EURA, Copa Américe i Lige nacija, uz vremensku crtu i poredak za Zlatnu loptu i Zlatnu kopačku, te objašnjenje kako se grupiraju povijesni nazivi država."
   locale="hr"
   alternateHref={withBase('/records')}
   jsonLd={jsonLd}
@@ -272,6 +285,54 @@ const jsonLd: JsonLdObject[] = [
               </a>
             </div>
           ))
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="home-soil-heading">
+      <h2 id="home-soil-heading">Naslovi osvojeni na domaćem terenu</h2>
+      <p class="muted">
+        Izdanja u kojima je prvak ujedno i domaćin tog izdanja, poredana po
+        broju - generirano uspoređivanjem stupaca "Pobjednik" i "Domaćin"
+        svake tablice, ne ručno odabrano. Zajednički naziv domaćina kod
+        izdanja sa zajedničkim domaćinstvom (npr. "Kanada, Meksiko i
+        Sjedinjene Američke Države") broji se kao pogodak samo uz točno
+        podudaranje, pa jedan od nekoliko zajedničkih domaćina koji na kraju
+        osvoji naslov ovdje nije uračunat - naslov Španjolske na SP-u 2026.,
+        čiji su domaćini bile tri druge države, upravo je takav stvaran
+        primjer. Grupirano na isti način na koji "Najuspješnije
+        reprezentacije" ubraja Zapadnu Njemačku u Njemačku.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => {
+            const homeSoil = buildHomeSoilTitles(c.data.editions);
+            return (
+              <div>
+                {homeSoil.length > 0 ? (
+                  <ChampionsSummary
+                    id={`home-soil-${c.key}`}
+                    champions={homeSoil}
+                    scaleMax={Math.max(...homeSoil.map((s) => s.titles))}
+                    heading={c.label}
+                    description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
+                    icon="🏠"
+                    unit={['naslov na domaćem terenu', 'naslova na domaćem terenu']}
+                    winningYearsLabel="Godine domaćeg naslova: "
+                    ofLabel="od"
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">Nijedan domaćin još nije osvojio vlastito izdanje.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  Pogledajte cijelu tablicu - {c.label} &rarr;
+                </a>
+              </div>
+            );
+          })
         }
       </div>
     </section>

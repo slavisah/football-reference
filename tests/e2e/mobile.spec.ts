@@ -1138,6 +1138,25 @@ test.describe('Records page on a 360px phone', () => {
     await expect(worldCupHosts.filter({ hasText: /^Germany$/ })).toBeVisible();
   });
 
+  test('shows a "Titles won on home soil" ranking, excluding a co-host that went on to win', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Titles won on home soil' })).toBeVisible();
+
+    // Copa América has by far the most home-soil titles - Uruguay tops it
+    // with seven (1917, 1923, 1924, 1942, 1956, 1967, 1995).
+    const copaHomeSoil = page.locator('section.champions:has(#home-soil-copa-america-heading)');
+    await expect(copaHomeSoil.locator('.champions__name').first()).toHaveText('Uruguay');
+    await expect(copaHomeSoil.locator('.champions__count').first()).toHaveText(/7/);
+
+    // Spain won the co-hosted 2026 FIFA World Cup (hosted by Canada, Mexico
+    // and United States) - it is not one of the hosts, so it must not appear
+    // in the World Cup's home-soil ranking at all.
+    const worldCupHomeSoil = page.locator('section.champions:has(#home-soil-world-cup-heading)');
+    await expect(worldCupHomeSoil.locator('.champions__name').filter({ hasText: /^Spain$/ })).toHaveCount(0);
+    await expect(worldCupHomeSoil.locator('.champions__name').filter({ hasText: /^Uruguay$/ })).toBeVisible();
+  });
+
   test('shows a "Back-to-back champions" streak ranking, including a competition with none yet', async ({
     page,
   }) => {
@@ -1271,6 +1290,35 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
       .textContent();
 
     expect(hrTop).toBe(enTop);
+  });
+
+  test('shows the translated "Naslovi osvojeni na domaćem terenu" ranking, matching the English Copa América numbers', async ({
+    page,
+    baseURL,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Naslovi osvojeni na domaćem terenu' })).toBeVisible();
+
+    const hrTop = await page
+      .locator('section.champions:has(#home-soil-copa-america-heading) .champions__name')
+      .first()
+      .textContent();
+    const hrCount = await page
+      .locator('section.champions:has(#home-soil-copa-america-heading) .champions__count')
+      .first()
+      .textContent();
+
+    await page.goto(baseURL ? `${baseURL}records` : '/records');
+    const enTop = await page
+      .locator('section.champions:has(#home-soil-copa-america-heading) .champions__name')
+      .first()
+      .textContent();
+    const enCount = await page
+      .locator('section.champions:has(#home-soil-copa-america-heading) .champions__count')
+      .first()
+      .textContent();
+
+    expect(hrTop).toBe(enTop);
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
   });
 
   test('shows the translated "Uzastopni prvaci" streak ranking, including the no-streak-yet fallback', async ({
@@ -2177,17 +2225,24 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
   }) => {
     await page.goto('records');
     const blocks = await jsonLdBlocks(page);
-    expect(blocks).toHaveLength(28);
+    expect(blocks).toHaveLength(32);
     expect(blocks.filter((b) => b['@type'] === 'BreadcrumbList')).toHaveLength(1);
 
     const lists = blocks.filter((b) => b['@type'] === 'ItemList');
-    expect(lists).toHaveLength(27);
+    expect(lists).toHaveLength(31);
     expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Most successful teams');
     expect(lists.map((l) => l.name)).toContain('Copa América - Most frequent hosts');
     expect(lists.map((l) => l.name)).toContain('Golden Boot (World Cup) - Back-to-back champions');
     expect(lists.map((l) => l.name)).toContain('Golden Boot (EURO) - Most awards');
     expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Nearly champions');
     expect(lists.map((l) => l.name)).toContain('UEFA Nations League - Nearly champions');
+    // "Titles won on home soil" only covers the four team competitions - same
+    // scope as "Nearly champions" - and every one of them has at least one
+    // real home-soil title today, so there's no empty-ranking fallback case
+    // to skip.
+    expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Titles won on home soil');
+    expect(lists.map((l) => l.name)).toContain('Copa América - Titles won on home soil');
+    expect(lists.map((l) => l.name)).not.toContain("Ballon d'Or - Titles won on home soil");
     // Nations League (4 different champions so far) and the EURO Golden Boot
     // have no back-to-back streak, so records.astro renders a text fallback
     // instead of a ranking for them - no ItemList should exist for either.
@@ -2213,12 +2268,14 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     await page.goto('hr/records');
     const blocks = await jsonLdBlocks(page);
     const lists = blocks.filter((b) => b['@type'] === 'ItemList');
-    expect(lists).toHaveLength(27);
+    expect(lists).toHaveLength(31);
     expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - najuspješnije reprezentacije');
     expect(lists.map((l) => l.name)).toContain('Zlatna lopta - uzastopni prvaci');
     expect(lists.map((l) => l.name)).not.toContain('UEFA Liga nacija - uzastopni prvaci');
     expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - vječiti drugoplasirani');
     expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - najduže čekanje na novi naslov');
+    expect(lists.map((l) => l.name)).toContain('Copa América - naslovi osvojeni na domaćem terenu');
+    expect(lists.map((l) => l.name)).not.toContain("Zlatna lopta - naslovi osvojeni na domaćem terenu");
   });
 
   test('/compare carries a BreadcrumbList and one ItemList ranking every national team by combined record', async ({
