@@ -7359,6 +7359,82 @@ found. Standing candidates are otherwise unchanged: source-link liveness
 (low-yield), the scoped-down flag-emoji idea, and the CSP's
 `'unsafe-inline'` allowance.
 
+### New feature: "Finals meetings" panel on `/compare` - added 2026-08-16 (later intensive run)
+
+`/compare`'s head-to-head panel already showed two teams' combined
+titles/runner-ups/semifinals side by side, but never answered the single
+most natural head-to-head question a family would actually ask: "when
+these two have met in a final, who actually won?" World Cup and Copa
+América rivalries in particular (Argentina/Uruguay have met in 15 finals
+across these four competitions) had no way to see that history on the
+site at all - a reader could infer *that* two teams had both reached
+finals from the existing panel, but not *whether they played each other*.
+
+**`buildFinalsMeetings()`** and **`finalsMeetingsBetween()`** (new,
+`src/lib/compare.ts`) close this using zero new editorial content: every
+edition of the four team competitions already carries a Winner and
+Runner-up cell (the same `RUNNER_UP_COLUMN` pattern `buildCountryCompetitionRecord`
+already matches), so a "final" is just any edition where both cells hold
+real team names. `buildFinalsMeetings()` walks every edition once and
+records one `FinalsMeeting` per real final (skipping the shared `—`
+missing-cell placeholder), grouping winner/runner-up by `summaryGroupFor()`
+the same way every other ranking on this site merges West Germany into
+Germany for matching purposes - while keeping the exact historical name
+(`winnerName`/`runnerUpName`) for display, per AGENTS.md's "do not silently
+alter historical facts" rule. World Cup and EURO editions also carry a
+"Final" score column; `buildFinalsMeetings()` pulls that in as an optional
+`score` field (Copa América and Nations League have no such column, so it's
+`undefined` there rather than guessed). `finalsMeetingsBetween(idA, idB,
+meetings)` then filters that list for the current pair in either order,
+sorted oldest-first by `yearSort`.
+
+Wired into both `/compare` and `/hr/compare` as a new "Finals meetings"
+card between the existing head-to-head panel and the "All national teams"
+table: server-rendered for the default pair (Argentina vs Uruguay, the two
+most-titled teams) so it works with zero JS, then re-rendered client-side
+on every Team A/B change or Swap click, matching the existing
+`fillSide()`/`renderFinalsMeetings()` progressive-enhancement pattern this
+page already uses for its table cells. A pair that has never met in a final
+shows a plain-language empty state instead of a blank card. The Croatian
+page uses a "Winner: X, losing finalist: Y" phrasing rather than a
+conjugated "beat" verb, sidestepping Croatian's gendered past-participle
+agreement (some team names are grammatically masculine, others feminine)
+without risking a wrong conjugation for any of the ~90 real pairs this
+could render.
+
+**Tests:** 9 new Vitest cases in `tests/unit/compare.test.ts` (one meeting
+per real final in source order, West Germany/Germany merged by id while the
+historical name is preserved for display, score omitted when the table has
+no "Final" column, the `—` placeholder never becomes a phantom meeting, a
+pair matched regardless of who won, id-normalized matching across the
+West Germany/Germany split, an empty result for a pair that never met,
+meetings correctly attributed when combining multiple competitions, and
+correct oldest-first sorting for a pair with more than one meeting) - 306
+total, up from 297. Verified the real default pair first with a throwaway
+script over the actual content files (same "verify first" precedent every
+prior entry in this changelog uses): Argentina and Uruguay have met in 15
+finals (14 Copa América editions plus the inaugural 1930 World Cup final),
+confirming the default view is genuinely rich rather than a near-empty
+placeholder. `pnpm lint` - 0 errors/0 warnings/0 hints. `pnpm build` - 23
+pages (unchanged page count). `pnpm check:links`/`check:sitemap`/
+`check:precache`/`check:pdfs` all pass. `pnpm check:perf` - `/compare` grew
+to 191.9 KB and `/hr/compare` to 193.1 KB, both comfortably under the
+440 KB budget. Full Playwright suite, including the existing
+`accessibility-compare-states.spec.ts` sweep (which already exercises this
+page's client-side re-render path in both languages, both color schemes):
+re-ran and confirmed no new WCAG violations from the new panel's dynamic
+`innerHTML` update path.
+
+**Left for a future pass:** the same standing candidates as the prior
+entry (source-link liveness infeasible, further content-accuracy spot-check
+low-yield, flag-emoji idea rejected, CSP's `'unsafe-inline'` not worth
+revisiting) plus one new one: Ballon d'Or and Golden Boot have no
+"Finals meetings"-equivalent concept (individual awards, not a bracket with
+a final), so this panel intentionally covers only the four team
+competitions - not a gap, just a note for why those two are absent here
+unlike some other `/compare` sections that explicitly call this out in
+their own copy.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
