@@ -4,6 +4,7 @@ import {
   buildEditions,
   buildHostsSummary,
   buildLongestStreaks,
+  buildRunnerUpsWithoutTitle,
   buildTimeline,
   buildTopScorerFacts,
   distinctHosts,
@@ -390,6 +391,95 @@ describe('buildLongestStreaks', () => {
     expect(buildLongestStreaks(buildEditions(outOfOrder))).toEqual([
       { id: 'Italy-1934', displayName: 'Italy', titles: 2, years: ['1934', '1938'], names: ['Italy'] },
     ]);
+  });
+});
+
+describe('buildRunnerUpsWithoutTitle', () => {
+  const runnerUpTable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'Runner-up'],
+    rows: [
+      ['1974', 'West Germany', 'Netherlands'],
+      ['1978', 'Argentina', 'Netherlands'],
+      ['1990', 'West Germany', 'Argentina'],
+      ['2010', 'Spain', 'Netherlands'],
+      ['2014', 'Germany', 'Argentina'],
+    ],
+  };
+
+  it('counts a team\'s runner-up finishes when it has never won', () => {
+    const summary = buildRunnerUpsWithoutTitle(buildEditions(runnerUpTable));
+    expect(summary).toEqual([
+      {
+        id: 'netherlands',
+        displayName: 'Netherlands',
+        titles: 3,
+        years: ['1974', '1978', '2010'],
+        names: ['Netherlands'],
+      },
+    ]);
+  });
+
+  it('excludes a team entirely once it has won at least one edition, even counting its earlier runner-up finishes', () => {
+    const summary = buildRunnerUpsWithoutTitle(buildEditions(runnerUpTable));
+    // Argentina lost the 1990 final but won in 1978 (and 2014, as its own
+    // grouping) - it must not appear here at all, not even with a lower count.
+    expect(summary.find((s) => s.displayName === 'Argentina')).toBeUndefined();
+  });
+
+  it('groups West Germany under Germany, matching buildChampionsSummary - a team titled under either name is excluded', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up'],
+      rows: [
+        ['1966', 'England', 'West Germany'],
+        ['2002', 'Brazil', 'Germany'],
+      ],
+    };
+    // West Germany's only appearance is as runner-up, but Germany (its
+    // grouped successor) never won here either - so the group should still
+    // show up, combining both runner-up finishes under "Germany (incl. West
+    // Germany)"'s title-grouping id, not as two separate one-off entries.
+    expect(buildRunnerUpsWithoutTitle(buildEditions(table))).toEqual([
+      {
+        id: 'germany',
+        displayName: 'Germany (incl. West Germany)',
+        titles: 2,
+        years: ['1966', '2002'],
+        names: ['West Germany', 'Germany'],
+      },
+    ]);
+  });
+
+  it('does not conflate the Runner-up column with a Third/Fourth-place finish', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up', 'Third', 'Fourth'],
+      rows: [['1990', 'West Germany', 'Argentina', 'Italy', 'England']],
+    };
+    const summary = buildRunnerUpsWithoutTitle(buildEditions(table));
+    expect(summary.map((s) => s.displayName)).toEqual(['Argentina']);
+  });
+
+  it('excludes the "—" missing-cell marker and a "Not awarded"-style placeholder', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up'],
+      rows: [
+        ['1975', 'Peru', '—'],
+        ['2020', 'Not awarded', 'Not awarded'],
+      ],
+    };
+    expect(buildRunnerUpsWithoutTitle(buildEditions(table))).toEqual([]);
+  });
+
+  it('returns an empty list when the table has no Runner-up column', () => {
+    const scorersTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [['1958', 'Just Fontaine', 'France', '13']],
+    };
+    expect(buildRunnerUpsWithoutTitle(buildEditions(scorersTable))).toEqual([]);
+  });
+
+  it('sorts by runner-up count desc, then earliest runner-up year, then name', () => {
+    const summary = buildRunnerUpsWithoutTitle(buildEditions(runnerUpTable));
+    expect(summary.map((s) => s.displayName)).toEqual(['Netherlands']);
   });
 });
 

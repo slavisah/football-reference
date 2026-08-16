@@ -335,6 +335,77 @@ export function buildLongestStreaks(editions: Edition[]): ChampionSummary[] {
     );
 }
 
+// Same exact-match convention as compare.ts's own RUNNER_UP_COLUMN - kept as
+// a separate local constant rather than a shared import, since editions.ts
+// has no existing dependency on compare.ts and this is the only place here
+// that needs the runner-up column specifically (buildTimeline's own
+// cellValue lookup uses a looser /runner-up|finalist/i pattern because it
+// only needs *a* result, relying on column order to land on Runner-up first
+// - too fragile for a ranking that must never conflate Runner-up with a
+// Third/Fourth-place finish).
+const RUNNER_UP_COLUMN = /^runner-up$/i;
+
+/**
+ * Countries that have reached a final - a "Runner-up" cell in one of the
+ * four team-competition tables - at least once, but have never won that
+ * competition outright, ranked by runner-up count. The generated Golden
+ * Boot/Ballon d'Or equivalent of "best team never to win it" trivia (e.g.
+ * the Netherlands' three lost World Cup finals), except computed, not
+ * hand-picked, from data every competition page already loads and has
+ * already been independently double-checked.
+ *
+ * Grouped the same way `buildChampionsSummary()` groups title totals (e.g.
+ * West Germany counts as Germany), so a team already excluded here for
+ * having *ever* won under either name is not double-counted as "title-less"
+ * under the other. Excludes Czechoslovakia/Czech Republic from merging with
+ * each other for the same reason `buildChampionsSummary()` does: no
+ * explicit editorial rule groups them, so each is judged on its own record.
+ *
+ * A team that lost a final before eventually winning the competition (e.g.
+ * a country that lost in 1990 and won in 1994) is excluded entirely, not
+ * given partial credit for its earlier runner-up finishes - this ranking
+ * answers "has this team ever won", using the full dataset, not "how did
+ * this team's record look at some earlier point in time".
+ */
+export function buildRunnerUpsWithoutTitle(editions: Edition[]): ChampionSummary[] {
+  const titledGroupIds = new Set(buildChampionsSummary(editions).map((champion) => champion.id));
+  const groups = new Map<string, ChampionSummary>();
+
+  for (const edition of editions) {
+    const runnerUp = cellValue(edition, RUNNER_UP_COLUMN);
+    if (!runnerUp || runnerUp === '—' || isPlaceholderWinner(runnerUp)) continue;
+    const group = summaryGroupFor(runnerUp);
+    if (titledGroupIds.has(group.id)) continue;
+
+    const existing = groups.get(group.id);
+    if (existing) {
+      existing.titles += 1;
+      existing.years.push(edition.year);
+      if (!existing.names.includes(runnerUp)) existing.names.push(runnerUp);
+    } else {
+      groups.set(group.id, {
+        id: group.id,
+        displayName: group.displayName,
+        titles: 1,
+        years: [edition.year],
+        names: [runnerUp],
+      });
+    }
+  }
+
+  return [...groups.values()]
+    .map((summary) => ({
+      ...summary,
+      years: [...summary.years].sort((a, b) => leadingYear(a) - leadingYear(b)),
+    }))
+    .sort(
+      (a, b) =>
+        b.titles - a.titles ||
+        leadingYear(a.years[0]) - leadingYear(b.years[0]) ||
+        a.displayName.localeCompare(b.displayName),
+    );
+}
+
 /**
  * Column labels that hold a team/national-team name rather than a count, a
  * date or a score line - covers every team-competition editions table

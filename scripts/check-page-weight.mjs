@@ -19,16 +19,18 @@ const DIST_DIR = path.join(ROOT, 'dist');
 
 // The heaviest page today (Croatian "/records", which - like its English
 // counterpart - aggregates seven tables' worth of generated timeline/ranking
-// content plus a "Back-to-back champions" streaks section added 2026-08-15,
-// genuinely the densest page on the site, not bloat) weighs ~314 KB of
-// HTML + CSS. Raised from the original 300 KB budget (itself raised once
-// already, from an initial ~234 KB measurement) the same deliberate way this
-// script's own guidance recommends: real new generated content, not a
-// regression. This budget leaves headroom for that content to keep growing
-// while still catching an accidental multi-page regression (a stray large
-// asset, a duplicated script block, an unminified debug dump) well before it
-// reaches production.
-export const PAGE_WEIGHT_BUDGET_BYTES = 360 * 1024;
+// content, including the "Back-to-back champions" streaks section added
+// 2026-08-15 and the "Nearly champions" runner-up-without-a-title section
+// added 2026-08-16, genuinely the densest page on the site, not bloat)
+// weighs ~372 KB of HTML + CSS. Raised from the 360 KB budget (itself
+// raised twice already, from an initial ~234 KB measurement, then to 300 KB,
+// then to 360 KB) the same deliberate way this script's own guidance
+// recommends: real new generated content, not a regression. This budget
+// leaves headroom for that content to keep growing while still catching an
+// accidental multi-page regression (a stray large asset, a duplicated
+// script block, an unminified debug dump) well before it reaches
+// production.
+export const PAGE_WEIGHT_BUDGET_BYTES = 400 * 1024;
 
 /** Every same-origin CSS asset path (e.g. "/football-reference/_astro/foo.css") referenced by an HTML page. */
 export function findCssRefs(html) {

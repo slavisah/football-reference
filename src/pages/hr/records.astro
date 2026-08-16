@@ -14,7 +14,12 @@ import ChampionsTimeline from '../../components/ChampionsTimeline.astro';
 import ChampionsSummary from '../../components/ChampionsSummary.astro';
 import References from '../../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
-import { buildHostsSummary, buildLongestStreaks, buildTimeline } from '../../lib/editions';
+import {
+  buildHostsSummary,
+  buildLongestStreaks,
+  buildRunnerUpsWithoutTitle,
+  buildTimeline,
+} from '../../lib/editions';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import { buildChampionsItemList, type JsonLdObject } from '../../lib/jsonLd';
 
@@ -134,6 +139,18 @@ const jsonLd: JsonLdObject[] = [
         ]
       : [];
   }),
+  ...competitions.flatMap((c) => {
+    const nearlyChampions = buildRunnerUpsWithoutTitle(c.data.editions);
+    return nearlyChampions.length > 0
+      ? [
+          buildChampionsItemList(nearlyChampions, {
+            pageUrl,
+            name: `${c.label} - vječiti drugoplasirani`,
+            unit: ['finale bez naslova', 'finala bez naslova'],
+          }),
+        ]
+      : [];
+  }),
   ...individualAwards.map((a) =>
     buildChampionsItemList(a.data.champions, {
       pageUrl,
@@ -146,7 +163,7 @@ const jsonLd: JsonLdObject[] = [
 
 <BaseLayout
   title="Rekordi i vremenska crta"
-  description="Vremenske crte prvaka, poredak najuspješnijih reprezentacija, najčešći domaćini i uzastopni prvaci generirani iz tablica Svjetskog prvenstva, EURA, Copa Américe i Lige nacija, uz vremensku crtu i poredak za Zlatnu loptu i Zlatnu kopačku, te objašnjenje kako se grupiraju povijesni nazivi država."
+  description="Vremenske crte prvaka, poredak najuspješnijih reprezentacija, najčešći domaćini, uzastopni prvaci i vječiti drugoplasirani generirani iz tablica Svjetskog prvenstva, EURA, Copa Américe i Lige nacija, uz vremensku crtu i poredak za Zlatnu loptu i Zlatnu kopačku, te objašnjenje kako se grupiraju povijesni nazivi država."
   locale="hr"
   alternateHref={withBase('/records')}
   jsonLd={jsonLd}
@@ -278,6 +295,51 @@ const jsonLd: JsonLdObject[] = [
                   <>
                     <h2>{c.label}</h2>
                     <p class="muted">Nitko još nije osvojio dva izdanja zaredom.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  Pogledajte cijelu tablicu - {c.label} &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="nearly-champions-heading">
+      <h2 id="nearly-champions-heading">Vječiti drugoplasirani</h2>
+      <p class="muted">
+        Reprezentacije koje su igrale finale - generirano iz stupca
+        "Drugo mjesto" svake tablice - ali nikada nisu osvojile natjecanje,
+        poredane po broju izgubljenih finala. Reprezentacija se briše s ovog
+        popisa čim jednom osvoji naslov, pa se ranije izgubljeno finale ne
+        "pripisuje" reprezentaciji koja je kasnije ipak osvojila trofej.
+        Grupirano na isti način na koji "Najuspješnije reprezentacije" iznad
+        ubraja Zapadnu Njemačku u Njemačku.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => {
+            const nearlyChampions = buildRunnerUpsWithoutTitle(c.data.editions);
+            return (
+              <div>
+                {nearlyChampions.length > 0 ? (
+                  <ChampionsSummary
+                    id={`nearly-champions-${c.key}`}
+                    champions={nearlyChampions}
+                    scaleMax={Math.max(...nearlyChampions.map((s) => s.titles))}
+                    heading={c.label}
+                    description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
+                    icon="🥈"
+                    unit={['finale bez naslova', 'finala bez naslova']}
+                    winningYearsLabel="Godine finala: "
+                    ofLabel="od"
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">Svaki dosadašnji finalist na kraju je osvojio naslov.</p>
                   </>
                 )}
                 <a class="records__teams-link" href={c.href}>
