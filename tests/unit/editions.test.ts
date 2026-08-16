@@ -4,6 +4,7 @@ import {
   buildEditions,
   buildHostsSummary,
   buildLongestStreaks,
+  buildLongestTitleGaps,
   buildRunnerUpsWithoutTitle,
   buildTimeline,
   buildTopScorerFacts,
@@ -480,6 +481,148 @@ describe('buildRunnerUpsWithoutTitle', () => {
   it('sorts by runner-up count desc, then earliest runner-up year, then name', () => {
     const summary = buildRunnerUpsWithoutTitle(buildEditions(runnerUpTable));
     expect(summary.map((s) => s.displayName)).toEqual(['Netherlands']);
+  });
+});
+
+describe('buildLongestTitleGaps', () => {
+  it('finds the real 44-year gap between Italy\'s 1938 and 1982 World Cup wins', () => {
+    const wc: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1934', 'Italy'],
+        ['1938', 'Italy'],
+        ['1982', 'Italy'],
+        ['2006', 'Italy'],
+      ],
+    };
+    // Gaps: 1934->1938 = 4, 1938->1982 = 44, 1982->2006 = 24 - the widest is
+    // 1938->1982, not the full 1934->2006 span.
+    expect(buildLongestTitleGaps(buildEditions(wc))).toEqual([
+      { id: 'italy', displayName: 'Italy', titles: 44, years: ['1938', '1982'], names: ['Italy'] },
+    ]);
+  });
+
+  it('excludes a team with only one title', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1930', 'Uruguay'],
+        ['1934', 'Italy'],
+      ],
+    };
+    expect(buildLongestTitleGaps(buildEditions(table))).toEqual([]);
+  });
+
+  it('still includes a team whose only two titles are back-to-back', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1934', 'Italy'],
+        ['1938', 'Italy'],
+      ],
+    };
+    expect(buildLongestTitleGaps(buildEditions(table))).toEqual([
+      { id: 'italy', displayName: 'Italy', titles: 4, years: ['1934', '1938'], names: ['Italy'] },
+    ]);
+  });
+
+  it('groups West Germany under Germany, matching buildChampionsSummary', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1954', 'West Germany'],
+        ['1974', 'West Germany'],
+        ['1990', 'West Germany'],
+        ['2014', 'Germany'],
+      ],
+    };
+    // Combined title years: 1954, 1974, 1990, 2014 - gaps 20, 16, 24, widest
+    // is 1990->2014.
+    expect(buildLongestTitleGaps(buildEditions(table))).toEqual([
+      {
+        id: 'germany',
+        displayName: 'Germany (incl. West Germany)',
+        titles: 24,
+        years: ['1990', '2014'],
+        names: ['West Germany', 'Germany'],
+      },
+    ]);
+  });
+
+  it('does not chain a gap across a placeholder "Not awarded" year, since that year is never a title', () => {
+    const ballonDor: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['2018', 'Lionel Messi'],
+        ['2019', 'Lionel Messi'],
+        ['2020', 'Not awarded'],
+        ['2021', 'Lionel Messi'],
+      ],
+    };
+    // Placeholder years never enter buildChampionsSummary's years list, so
+    // the widest gap is 2019->2021, not 2018->2021.
+    expect(buildLongestTitleGaps(buildEditions(ballonDor))).toEqual([
+      {
+        id: 'lionel messi',
+        displayName: 'Lionel Messi',
+        titles: 2,
+        years: ['2019', '2021'],
+        names: ['Lionel Messi'],
+      },
+    ]);
+  });
+
+  it('splits Golden Boot joint-winner ties before computing the gap, matching buildChampionsSummary', () => {
+    const goldenBoot: MarkdownTable = {
+      headers: ['Year', 'Player(s)'],
+      rows: [
+        ['2012', 'Mario Balotelli; Cristiano Ronaldo; Mario Gómez'],
+        ['2020', 'Cristiano Ronaldo'],
+      ],
+    };
+    expect(buildLongestTitleGaps(buildEditions(goldenBoot))).toEqual([
+      {
+        id: 'cristiano ronaldo',
+        displayName: 'Cristiano Ronaldo',
+        titles: 8,
+        years: ['2012', '2020'],
+        names: ['Cristiano Ronaldo'],
+      },
+    ]);
+  });
+
+  it('sorts by widest gap desc, then the gap\'s earliest year, then name', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1900', 'Argentina'],
+        ['1925', 'Argentina'],
+        ['1950', 'Brazil'],
+        ['1980', 'Brazil'],
+        ['1960', 'Uruguay'],
+        ['1990', 'Uruguay'],
+      ],
+    };
+    // Gaps: Argentina 25, Brazil 30, Uruguay 30 - Brazil and Uruguay tie on
+    // gap size, so Brazil (whose gap starts in 1950) sorts before Uruguay
+    // (whose gap starts in 1960); Argentina's smaller 25-year gap sorts last.
+    expect(buildLongestTitleGaps(buildEditions(table)).map((s) => s.displayName)).toEqual([
+      'Brazil',
+      'Uruguay',
+      'Argentina',
+    ]);
+  });
+
+  it('returns an empty list when no one has won a competition twice', () => {
+    const nationsLeague: MarkdownTable = {
+      headers: ['Season', 'Winner'],
+      rows: [
+        ['2018-19', 'Portugal'],
+        ['2020-21', 'France'],
+        ['2022-23', 'Spain'],
+      ],
+    };
+    expect(buildLongestTitleGaps(buildEditions(nationsLeague))).toEqual([]);
   });
 });
 
