@@ -1,6 +1,6 @@
 import { isPlaceholderWinner, NOT_A_HOST } from './editions';
 import type { Locale } from './i18n';
-import type { Edition, TimelineEntry } from './types';
+import type { ChampionSummary, Edition, TimelineEntry } from './types';
 
 // Generates multiple-choice quiz questions from already-loaded competition
 // data (editions + timelines), the same structures every competition page
@@ -195,6 +195,50 @@ export function runnerUpByYearQuestions(
     });
   }
   return questions;
+}
+
+/**
+ * "Which team/player has won the most {competition} titles/awards?" - a
+ * single generated question per competition, built from the same
+ * `ChampionSummary[]` totals `buildChampionsSummary()` already produces for
+ * every competition page's "Most successful teams"/"Most awards" widget
+ * (see `src/lib/editions.ts`) - no new editorial research, just a new way of
+ * asking about data every competition page already displays and every
+ * content-accuracy pass has already audited.
+ *
+ * `summary` must already be sorted by titles descending (every caller of
+ * `buildChampionsSummary()` gets this for free - see its own sort). Returns
+ * no question at all when there's a tie for first place (no single
+ * unambiguous correct answer) or fewer than 3 distinct entries (not enough
+ * distractors for a fair multiple-choice question).
+ */
+export function mostTitlesQuestion(
+  summary: ChampionSummary[],
+  competition: string,
+  seedPrefix: string,
+  subject: 'team' | 'player' = 'team',
+  locale: Locale = 'en',
+): QuizQuestion[] {
+  const [top, runnerUp] = summary;
+  if (!top || !runnerUp || summary.length < 3) return [];
+  if (top.titles === runnerUp.titles) return [];
+
+  const correct = top.displayName;
+  const pool = summary.map((s) => s.displayName);
+  const id = `${seedPrefix}:most-titles`;
+  const choice = buildChoice(id, correct, pool);
+  if (!choice) return [];
+
+  const prompt =
+    locale === 'hr'
+      ? subject === 'player'
+        ? `Tko ima najviše nagrada na natjecanju ${competition}?`
+        : `Koja reprezentacija ima najviše naslova na natjecanju ${competition}?`
+      : subject === 'player'
+        ? `Who has won the most ${competition} awards?`
+        : `Which team has won the most ${competition} titles?`;
+
+  return [{ id, category: competition, prompt, ...choice }];
 }
 
 export type QuizPool = {

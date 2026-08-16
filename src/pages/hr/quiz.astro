@@ -27,6 +27,7 @@ import {
   championByYearQuestions,
   chronologicalOrderQuestions,
   hostByYearQuestions,
+  mostTitlesQuestion,
   runnerUpByYearQuestions,
   topScorerByYearQuestions,
   selectQuiz,
@@ -59,6 +60,7 @@ const notes: NoteSection[] = [
       'Koga je prvak pobijedio u finalu?',
       'Tko je bio najbolji strijelac natjecanja (Zlatna kopačka)?',
       'Tko je osvojio Zlatnu loptu u danoj godini?',
+      'Koja reprezentacija ili igrač ima najviše naslova/nagrada na natjecanju?',
       'Poredaj četiri prvaka natjecanja kronološkim redoslijedom (od najranijeg).',
     ],
   },
@@ -129,6 +131,11 @@ const pools: QuizPool[] = [
     seed: 'pick:world-cup:runner-up',
   },
   {
+    questions: mostTitlesQuestion(worldCup.champions, WORLD_CUP_NAME, 'world-cup', 'team', 'hr'),
+    take: 1,
+    seed: 'pick:world-cup:most-titles',
+  },
+  {
     questions: championByYearQuestions(euro.editions, EURO_NAME, 'euro', 'hr'),
     take: 2,
     seed: 'pick:euro:champion',
@@ -142,6 +149,11 @@ const pools: QuizPool[] = [
     questions: runnerUpByYearQuestions(buildTimeline(euro.editions), EURO_NAME, 'euro', 'hr'),
     take: 1,
     seed: 'pick:euro:runner-up',
+  },
+  {
+    questions: mostTitlesQuestion(euro.champions, EURO_NAME, 'euro', 'team', 'hr'),
+    take: 1,
+    seed: 'pick:euro:most-titles',
   },
   {
     questions: championByYearQuestions(copaAmerica.editions, COPA_AMERICA_NAME, 'copa-america', 'hr'),
@@ -164,6 +176,11 @@ const pools: QuizPool[] = [
     seed: 'pick:copa-america:runner-up',
   },
   {
+    questions: mostTitlesQuestion(copaAmerica.champions, COPA_AMERICA_NAME, 'copa-america', 'team', 'hr'),
+    take: 1,
+    seed: 'pick:copa-america:most-titles',
+  },
+  {
     questions: championByYearQuestions(nationsLeague.editions, NATIONS_LEAGUE_NAME, 'nations-league', 'hr'),
     take: 2,
     seed: 'pick:nations-league:champion',
@@ -174,9 +191,19 @@ const pools: QuizPool[] = [
     seed: 'pick:nations-league:host',
   },
   {
+    questions: mostTitlesQuestion(nationsLeague.champions, NATIONS_LEAGUE_NAME, 'nations-league', 'team', 'hr'),
+    take: 1,
+    seed: 'pick:nations-league:most-titles',
+  },
+  {
     questions: championByYearQuestions(ballonDor.editions, BALLON_DOR_NAME, 'ballon-dor', 'hr'),
     take: 3,
     seed: 'pick:ballon-dor:champion',
+  },
+  {
+    questions: mostTitlesQuestion(ballonDor.champions, BALLON_DOR_NAME, 'ballon-dor', 'player', 'hr'),
+    take: 1,
+    seed: 'pick:ballon-dor:most-titles',
   },
   {
     questions: topScorerByYearQuestions(
@@ -189,6 +216,17 @@ const pools: QuizPool[] = [
     seed: 'pick:golden-boot-world-cup:scorer',
   },
   {
+    questions: mostTitlesQuestion(
+      goldenBootWorldCup.champions,
+      GOLDEN_BOOT_WORLD_CUP_NAME,
+      'golden-boot-world-cup',
+      'player',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:golden-boot-world-cup:most-titles',
+  },
+  {
     questions: topScorerByYearQuestions(
       goldenBootEuro.editions,
       GOLDEN_BOOT_EURO_NAME,
@@ -197,6 +235,17 @@ const pools: QuizPool[] = [
     ),
     take: 2,
     seed: 'pick:golden-boot-euro:scorer',
+  },
+  {
+    questions: mostTitlesQuestion(
+      goldenBootEuro.champions,
+      GOLDEN_BOOT_EURO_NAME,
+      'golden-boot-euro',
+      'player',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:golden-boot-euro:most-titles',
   },
 ];
 
