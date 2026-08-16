@@ -2,7 +2,12 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import References from '../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
-import { buildAllCountryRecords, tracksSemifinalColumn } from '../lib/compare';
+import {
+  buildAllCountryRecords,
+  buildFinalsMeetings,
+  finalsMeetingsBetween,
+  tracksSemifinalColumn,
+} from '../lib/compare';
 import { absolutePageUrl, withBase } from '../lib/url';
 import { buildCountryRecordsItemList, type JsonLdObject } from '../lib/jsonLd';
 
@@ -44,6 +49,11 @@ const sortedByName = [...allRecords].sort((a, b) => a.displayName.localeCompare(
 // something meaningful before any JS runs or a URL param is read.
 const [defaultA, defaultB] = allRecords;
 
+// Every final actually played across these four competitions - the data set
+// the "Finals meetings" panel below filters by the current picker pair.
+const finalsMeetings = buildFinalsMeetings(competitions);
+const defaultMeetings = finalsMeetingsBetween(defaultA.id, defaultB.id, finalsMeetings);
+
 function semifinalDisplay(index: number, value: number): string {
   return tracksSemifinal[index] ? String(value) : '—';
 }
@@ -71,6 +81,17 @@ const recordsForClient = allRecords.map((r) => ({
     runnerUps: c.runnerUps,
     semifinals: c.semifinals,
   })),
+}));
+
+const finalsMeetingsForClient = finalsMeetings.map((m) => ({
+  competition: m.competition,
+  year: m.year,
+  yearSort: m.yearSort,
+  winnerId: m.winnerId,
+  winnerName: m.winnerName,
+  runnerUpId: m.runnerUpId,
+  runnerUpName: m.runnerUpName,
+  score: m.score ?? null,
 }));
 
 // One ItemList for the "All national teams" ranking below - the only
@@ -209,6 +230,38 @@ const jsonLd: JsonLdObject[] = [
         isn't counted here. Individual awards (Ballon d'Or, Golden Boot)
         aren't included: they recognize players, not national teams.
       </p>
+    </section>
+
+    <section class="card stack" aria-labelledby="finals-meetings-heading">
+      <h2 id="finals-meetings-heading">Finals meetings</h2>
+      <p class="muted" id="finals-meetings-intro">
+        Every time <span id="finals-meetings-a-name">{defaultA.displayName}</span> and{' '}
+        <span id="finals-meetings-b-name">{defaultB.displayName}</span> have met in a World Cup, EURO,
+        Copa América or Nations League final, oldest first.
+      </p>
+      <div
+        id="finals-meetings-body"
+        data-empty-text="These two haven't met in a final across these four competitions."
+      >
+        {
+          defaultMeetings.length === 0 ? (
+            <p class="muted" id="finals-meetings-empty">
+              These two haven't met in a final across these four competitions.
+            </p>
+          ) : (
+            <ol class="finals-meetings__list" id="finals-meetings-list">
+              {defaultMeetings.map((m) => (
+                <li>
+                  <span class="finals-meetings__year">{m.year}</span>
+                  <span class="finals-meetings__competition">{m.competition}</span>
+                  <strong>{m.winnerName}</strong> beat {m.runnerUpName}
+                  {m.score ? <span class="finals-meetings__score">{m.score}</span> : null}
+                </li>
+              ))}
+            </ol>
+          )
+        }
+      </div>
     </section>
 
     <section class="stack" aria-labelledby="all-teams-heading">
@@ -386,15 +439,60 @@ const jsonLd: JsonLdObject[] = [
     font-size: 0.85rem;
     max-width: 68ch;
   }
+
+  .finals-meetings__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .finals-meetings__list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .finals-meetings__year {
+    font-weight: 700;
+    min-width: 3.2rem;
+  }
+
+  .finals-meetings__competition {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .finals-meetings__score {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .finals-meetings__score::before {
+    content: '(';
+  }
+
+  .finals-meetings__score::after {
+    content: ')';
+  }
 </style>
 
-<script is:inline define:vars={{ records: recordsForClient }}>
+<script is:inline define:vars={{ records: recordsForClient, finalsMeetings: finalsMeetingsForClient }}>
   const selectA = document.getElementById('compare-a');
   const selectB = document.getElementById('compare-b');
   const swapBtn = document.getElementById('compare-swap');
   const status = document.getElementById('compare-status');
   const statusTemplate = status?.dataset.template ?? '{a} vs {b}';
   const byId = new Map(records.map((r) => [r.id, r]));
+  const finalsMeetingsBody = document.getElementById('finals-meetings-body');
+  const finalsMeetingsEmptyText = finalsMeetingsBody?.dataset.emptyText ?? '';
 
   function setCell(row, field, value) {
     const cell = row && row.querySelector(`[data-field="${field}"]`);
@@ -422,6 +520,44 @@ const jsonLd: JsonLdObject[] = [
     setCell(totalRow, 'finals', record.totalFinals);
   }
 
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function renderFinalsMeetings(a, b) {
+    if (!finalsMeetingsBody) return;
+
+    const aName = document.getElementById('finals-meetings-a-name');
+    const bName = document.getElementById('finals-meetings-b-name');
+    if (aName) aName.textContent = a.displayName;
+    if (bName) bName.textContent = b.displayName;
+
+    const meetings = finalsMeetings
+      .filter(
+        (m) =>
+          (m.winnerId === a.id && m.runnerUpId === b.id) || (m.winnerId === b.id && m.runnerUpId === a.id),
+      )
+      .sort((x, y) => x.yearSort - y.yearSort);
+
+    if (meetings.length === 0) {
+      finalsMeetingsBody.innerHTML = `<p class="muted" id="finals-meetings-empty">${escapeHtml(finalsMeetingsEmptyText)}</p>`;
+      return;
+    }
+
+    const items = meetings
+      .map((m) => {
+        const score = m.score
+          ? `<span class="finals-meetings__score">${escapeHtml(m.score)}</span>`
+          : '';
+        return `<li><span class="finals-meetings__year">${escapeHtml(m.year)}</span><span class="finals-meetings__competition">${escapeHtml(m.competition)}</span><strong>${escapeHtml(m.winnerName)}</strong> beat ${escapeHtml(m.runnerUpName)}${score}</li>`;
+      })
+      .join('');
+    finalsMeetingsBody.innerHTML = `<ol class="finals-meetings__list" id="finals-meetings-list">${items}</ol>`;
+  }
+
   function readParams() {
     const p = new URLSearchParams(window.location.search);
     return { a: p.get('a') || '', b: p.get('b') || '' };
@@ -441,6 +577,7 @@ const jsonLd: JsonLdObject[] = [
     const b = byId.get(selectB.value);
     if (a) fillSide('a', a);
     if (b) fillSide('b', b);
+    if (a && b) renderFinalsMeetings(a, b);
     if (status && a && b) {
       status.textContent = statusTemplate
         .replace('{a}', a.displayName)

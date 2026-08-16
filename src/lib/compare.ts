@@ -167,3 +167,73 @@ export function buildAllCountryRecords(competitions: CompetitionEditions[]): Cou
         a.displayName.localeCompare(b.displayName),
     );
 }
+
+const FINAL_SCORE_COLUMN = /^final$/i;
+
+export type FinalsMeeting = {
+  competition: string;
+  slug: string;
+  year: string;
+  yearSort: number;
+  winnerId: string;
+  /** Historical name as written for that edition (e.g. "West Germany"), never normalized. */
+  winnerName: string;
+  runnerUpId: string;
+  runnerUpName: string;
+  /** Score line as written (e.g. "Uruguay 4-2 Argentina"), when the table has a "Final" column. */
+  score?: string;
+};
+
+/**
+ * Every edition of the given competitions where the winner and runner-up
+ * cells are both real teams - i.e. every final actually played, one row per
+ * meeting. Grouped by `summaryGroupFor()` the same way the rest of this
+ * module groups titles (West Germany counts as Germany for matching a
+ * head-to-head pair), while `winnerName`/`runnerUpName` keep the exact
+ * historical name for display, matching AGENTS.md's "do not silently alter
+ * historical facts" rule. Powers /compare's "Finals meetings" panel: given
+ * two team ids, filter this list for rows where the pair is {winnerId,
+ * runnerUpId} in either order.
+ */
+export function buildFinalsMeetings(competitions: CompetitionEditions[]): FinalsMeeting[] {
+  const meetings: FinalsMeeting[] = [];
+  for (const { title, slug, editions } of competitions) {
+    for (const edition of editions) {
+      const winnerName = edition.winner.trim();
+      if (isMissingCell(winnerName)) continue;
+
+      const runnerUpCell = edition.cells.find((c) => RUNNER_UP_COLUMN.test(c.label.trim()));
+      const runnerUpName = runnerUpCell?.value.trim();
+      if (!runnerUpCell || isMissingCell(runnerUpName)) continue;
+
+      const scoreCell = edition.cells.find((c) => FINAL_SCORE_COLUMN.test(c.label.trim()));
+      const score = scoreCell && !isMissingCell(scoreCell.value) ? scoreCell.value.trim() : undefined;
+
+      meetings.push({
+        competition: title,
+        slug,
+        year: edition.year,
+        yearSort: edition.yearSort,
+        winnerId: summaryGroupFor(winnerName).id,
+        winnerName,
+        runnerUpId: summaryGroupFor(runnerUpName as string).id,
+        runnerUpName: runnerUpName as string,
+        score,
+      });
+    }
+  }
+  return meetings;
+}
+
+/** Every final two teams played against each other, oldest first. */
+export function finalsMeetingsBetween(
+  idA: string,
+  idB: string,
+  meetings: FinalsMeeting[],
+): FinalsMeeting[] {
+  return meetings
+    .filter(
+      (m) => (m.winnerId === idA && m.runnerUpId === idB) || (m.winnerId === idB && m.runnerUpId === idA),
+    )
+    .sort((a, b) => a.yearSort - b.yearSort);
+}
