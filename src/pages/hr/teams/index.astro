@@ -1,0 +1,147 @@
+---
+// Croatian translation of src/pages/teams/index.astro. Same rollout pattern
+// as hr/compare.astro/hr/records.astro: loads the exact same live data as
+// the English page (loadTeamCompetitions, buildAllCountryRecords), so the
+// A-to-Z list and each team's title count can never drift between
+// languages - only this page's own headings/prose and the four competition
+// display names are translated. Country names themselves are left as-is,
+// matching the precedent set by the Croatian records/compare pages (team
+// names are the underlying data, not UI chrome).
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import References from '../../../components/References.astro';
+import { loadPageMeta } from '../../../lib/competition';
+import { buildAllCountryRecords } from '../../../lib/compare';
+import { loadTeamCompetitions } from '../../../lib/teamCompetitions';
+import { teamProfileSlug } from '../../../lib/teamProfile';
+import { withBase } from '../../../lib/url';
+
+const meta = await loadPageMeta('teams');
+
+const { worldCup, euro, copaAmerica, nationsLeague, competitions } = await loadTeamCompetitions();
+
+const allRecords = buildAllCountryRecords(competitions);
+const sortedByName = [...allRecords].sort((a, b) => a.displayName.localeCompare(b.displayName));
+
+const sources = [worldCup, euro, copaAmerica, nationsLeague]
+  .flatMap((c) => c.sources)
+  .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+
+const lastReviewed = [worldCup, euro, copaAmerica, nationsLeague]
+  .map((c) => c.lastReviewed)
+  .concat(meta.lastReviewed)
+  .sort()
+  .at(-1) as string;
+
+const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
+---
+
+<BaseLayout
+  title="Reprezentacije"
+  description="Svaka reprezentacija koja je dosegnula finale ili polufinale Svjetskog prvenstva, EURA, Copa Américe ili Lige nacija, od A do Ž - odaberite jednu za njezin cjeloviti pregled po godinama."
+  locale="hr"
+  alternateHref={withBase('/teams')}
+>
+  <article class="teams stack">
+    <header class="teams__header">
+      <p class="eyebrow badge">Generirano iz tablica natjecanja</p>
+      <h1>Reprezentacije</h1>
+      <p class="teams__intro">
+        Svaka reprezentacija koja je osvojila naslov, bila drugoplasirana ili dosegnula praćeno
+        polufinale ili treće/četvrto mjesto na Svjetskom prvenstvu, EURU, Copa Américi ili Ligi
+        nacija - generirano iz istih tablica izdanja kao i svaka stranica natjecanja, s cjelovitim
+        pregledom svake reprezentacije po godinama, umjesto samo zbirnih brojeva prikazanih na
+        poretku "Usporedba reprezentacija". Pojedinačne nagrade (Zlatna lopta, Zlatna kopačka)
+        ovdje nisu uključene jer se dodjeljuju igračima, a ne reprezentacijama.
+      </p>
+    </header>
+
+    <section class="stack" aria-labelledby="teams-list-heading">
+      <h2 id="teams-list-heading" class="visually-hidden">Reprezentacije od A do Ž</h2>
+      <ul class="teams__grid">
+        {
+          sortedByName.map((r) => (
+            <li>
+              <a class="teams__link" href={withBase(`/hr/teams/${teamProfileSlug(r.id)}`)}>
+                <span class="teams__name">{r.displayName}</span>
+                <span class="teams__stat">
+                  {r.totalTitles} {r.totalTitles === 1 ? 'naslov' : 'naslova'}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <References
+      sources={sources}
+      lastReviewed={lastReviewed}
+      status={meta.status}
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText={statusText}
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+      noteText="Prednost imaju primarni izvori. Povijesni formati i nazivi reprezentacija bilježe se onako kako su korišteni u to vrijeme; kontekst potražite u napomenama uz svako izdanje."
+    />
+  </article>
+</BaseLayout>
+
+<style>
+  .teams__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .teams__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .teams__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .teams__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  }
+
+  .teams__link {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.7rem 0.9rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .teams__link:hover,
+  .teams__link:focus-visible {
+    border-color: var(--accent);
+  }
+
+  .teams__name {
+    font-weight: 600;
+  }
+
+  .teams__stat {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+</style>

@@ -21,6 +21,7 @@ import {
   finalsMeetingsBetween,
   tracksSemifinalColumn,
 } from '../../lib/compare';
+import { teamProfileSlug } from '../../lib/teamProfile';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import { buildCountryRecordsItemList, type JsonLdObject } from '../../lib/jsonLd';
 
@@ -300,7 +301,8 @@ const jsonLd: JsonLdObject[] = [
         Svaka reprezentacija koja je osvojila naslov, bila drugoplasirana ili
         dosegnula praćeno polufinale u barem jednom od ova četiri natjecanja,
         poredana po broju naslova. Odaberite bilo koje dvije iznad za izravnu
-        usporedbu.
+        usporedbu, ili odaberite ime u nastavku za njezin cjeloviti pregled po
+        godinama na <a href={withBase('/hr/teams')}>stranici Reprezentacije</a>.
       </p>
       <div
         class="t-wrap"
@@ -325,7 +327,9 @@ const jsonLd: JsonLdObject[] = [
               allRecords.map((r, i) => (
                 <tr>
                   <td>{i + 1}</td>
-                  <th scope="row">{r.displayName}</th>
+                  <th scope="row">
+                    <a href={withBase(`/hr/teams/${teamProfileSlug(r.id)}`)}>{r.displayName}</a>
+                  </th>
                   <td>{r.totalTitles}</td>
                   <td>{r.totalRunnerUps}</td>
                   <td>{r.totalSemifinals}</td>

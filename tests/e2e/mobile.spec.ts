@@ -1924,7 +1924,7 @@ test.describe('404 page on a 360px phone', () => {
     const hrefs = await page.locator('.not-found__links a').evaluateAll((links) =>
       links.map((link) => (link as HTMLAnchorElement).getAttribute('href')),
     );
-    expect(hrefs.length).toBe(22); // 11 nav pages x 2 languages
+    expect(hrefs.length).toBe(24); // 12 nav pages x 2 languages
     for (const href of hrefs) {
       const response = await request.get(href!);
       expect(response.ok(), `expected ${href} to resolve`).toBe(true);
@@ -2196,17 +2196,21 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(response.headers()['content-type']).toContain('xml');
     const body = await response.text();
 
-    // 11 nav pages x 2 languages, plus the English-only /teams directory (1
-    // index page + 40 team profile pages, src/pages/teams/ - no Croatian
-    // translation yet, so no hreflang alternate for any of those 41).
-    expect(body.match(/<url>/g)?.length).toBe(63);
+    // 12 nav pages x 2 languages (the index loop, now including /teams),
+    // plus 40 team profile pages x 2 languages (src/pages/teams/[slug].astro
+    // and its Croatian sibling), each pair carrying reciprocal hreflang
+    // alternates.
+    expect(body.match(/<url>/g)?.length).toBe(104);
     expect(body).toContain(`<loc>${SITE}/competitions/world-cup/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/competitions/world-cup/</loc>`);
     expect(body).toContain(
       `hreflang="hr" href="${SITE}/hr/competitions/world-cup/"`,
     );
     expect(body).toContain(`<loc>${SITE}/teams/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/teams/</loc>`);
     expect(body).toContain(`<loc>${SITE}/teams/brazil/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/teams/brazil/</loc>`);
+    expect(body).toContain(`hreflang="hr" href="${SITE}/hr/teams/brazil/"`);
     expect(body).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
   });
 

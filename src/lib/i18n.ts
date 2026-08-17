@@ -105,6 +105,7 @@ export const TRANSLATED_PATHS: Record<string, string> = {
   '/about/sources': '/hr/about/sources',
   '/records': '/hr/records',
   '/compare': '/hr/compare',
+  '/teams': '/hr/teams',
   '/quiz': '/hr/quiz',
   '/competitions/copa-america': '/hr/competitions/copa-america',
   '/competitions/nations-league': '/hr/competitions/nations-league',

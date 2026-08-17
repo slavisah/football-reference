@@ -1,14 +1,36 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import References from '../../components/References.astro';
-import { buildAllCountryRecords, type CompetitionEditions, type CountryRecord } from '../../lib/compare';
-import { loadTeamCompetitions } from '../../lib/teamCompetitions';
-import { buildTeamProfile, teamProfileSlug } from '../../lib/teamProfile';
-import type { SourceLink } from '../../lib/sources';
-import { withBase } from '../../lib/url';
+// Croatian translation of src/pages/teams/[slug].astro - this codebase's
+// first Croatian dynamic route. getStaticPaths() mirrors the English page's
+// slug-collision guard exactly (same teamProfileSlug(), same fail-loudly
+// precedent) so a build error there catches a collision here too, and the
+// two pages can never end up with a different set of team profiles. Only
+// the four competition display names (passed into buildTeamProfile() via
+// this file's own Croatian `competitions` array, the same construction
+// hr/compare.astro/hr/teams/index.astro already use) and this page's own
+// prose/labels are translated - every title/runner-up/semifinal/appearance
+// is computed by the exact same buildTeamProfile() the English page calls,
+// so the two pages can never disagree on the underlying record.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import References from '../../../components/References.astro';
+import {
+  buildAllCountryRecords,
+  type CompetitionEditions,
+  type CountryRecord,
+} from '../../../lib/compare';
+import { loadTeamCompetitions } from '../../../lib/teamCompetitions';
+import { buildTeamProfile, teamProfileSlug } from '../../../lib/teamProfile';
+import type { SourceLink } from '../../../lib/sources';
+import { withBase } from '../../../lib/url';
 
 export async function getStaticPaths() {
-  const { worldCup, euro, copaAmerica, nationsLeague, competitions } = await loadTeamCompetitions();
+  const { worldCup, euro, copaAmerica, nationsLeague } = await loadTeamCompetitions();
+
+  const competitions: CompetitionEditions[] = [
+    { title: 'FIFA Svjetsko prvenstvo', slug: 'world-cup', editions: worldCup.editions },
+    { title: 'UEFA Europsko prvenstvo', slug: 'euro', editions: euro.editions },
+    { title: 'Copa América', slug: 'copa-america', editions: copaAmerica.editions },
+    { title: 'UEFA Liga nacija', slug: 'nations-league', editions: nationsLeague.editions },
+  ];
   const records = buildAllCountryRecords(competitions);
 
   const sources = [worldCup, euro, copaAmerica, nationsLeague]
@@ -22,11 +44,8 @@ export async function getStaticPaths() {
   const seenSlugs = new Set<string>();
   return records.map((record) => {
     const slug = teamProfileSlug(record.id);
-    // A slug collision would silently merge two different teams onto one
-    // page - fail the build loudly instead, matching validateEditions()'s
-    // "never ship a silent data problem" precedent elsewhere in this codebase.
     if (seenSlugs.has(slug)) {
-      throw new Error(`Two national teams produced the same /teams/ slug: "${slug}"`);
+      throw new Error(`Two national teams produced the same /hr/teams/ slug: "${slug}"`);
     }
     seenSlugs.add(slug);
     return {
@@ -49,38 +68,39 @@ const slug = teamProfileSlug(record.id);
 ---
 
 <BaseLayout
-  title={`${profile.displayName} - Full history`}
-  description={`Every FIFA World Cup, UEFA EURO, Copa América and UEFA Nations League final or semifinal for ${profile.displayName}, generated from each competition's edition table.`}
-  alternateHref={withBase(`/hr/teams/${slug}`)}
+  title={`${profile.displayName} - cjelovita povijest`}
+  description={`Svako finale ili polufinale Svjetskog prvenstva, EURA, Copa Américe i Lige nacija za reprezentaciju ${profile.displayName}, generirano iz tablice svakog natjecanja.`}
+  locale="hr"
+  alternateHref={withBase(`/teams/${slug}`)}
 >
   <article class="team-profile stack">
     <header class="team-profile__header">
-      <p class="eyebrow badge">Generated from the competition tables</p>
+      <p class="eyebrow badge">Generirano iz tablica natjecanja</p>
       <h1>{profile.displayName}</h1>
       <p class="team-profile__intro">
-        {profile.displayName}'s full record across the FIFA World Cup, UEFA EURO, Copa América and
-        UEFA Nations League - every title, runner-up finish, and third/fourth-place or semifinal
-        finish, generated straight from each competition's edition table.
+        Cjeloviti učinak reprezentacije {profile.displayName} na Svjetskom prvenstvu, EURU, Copa
+        Américi i Ligi nacija - svaki naslov, drugo mjesto i treće/četvrto mjesto ili polufinale,
+        generirano izravno iz tablice svakog natjecanja.
       </p>
     </header>
 
     <section class="team-profile__totals card" aria-labelledby="totals-heading">
-      <h2 id="totals-heading" class="visually-hidden">Combined totals</h2>
+      <h2 id="totals-heading" class="visually-hidden">Ukupni zbroj</h2>
       <dl class="team-profile__totals-grid">
         <div>
-          <dt>Titles</dt>
+          <dt>Naslovi</dt>
           <dd>{profile.totalTitles}</dd>
         </div>
         <div>
-          <dt>Runner-up</dt>
+          <dt>Drugo mjesto</dt>
           <dd>{profile.totalRunnerUps}</dd>
         </div>
         <div>
-          <dt>Semifinal / 4th</dt>
+          <dt>Polufinale / 4. mjesto</dt>
           <dd>{profile.totalSemifinals}</dd>
         </div>
         <div>
-          <dt>Finals reached</dt>
+          <dt>Odigrana finala</dt>
           <dd>{profile.totalFinals}</dd>
         </div>
       </dl>
@@ -89,14 +109,14 @@ const slug = teamProfileSlug(record.id);
     {
       profile.competitions.length === 0 ? (
         <p class="muted">
-          {profile.displayName} has not reached a tracked final or semifinal in any of these four
-          competitions.
+          {profile.displayName} nije dosegla praćeno finale ili polufinale ni na jednom od ova
+          četiri natjecanja.
         </p>
       ) : (
         profile.competitions.map((c) => (
           <section class="card stack" aria-labelledby={`${c.slug}-heading`}>
             <h2 id={`${c.slug}-heading`}>
-              <a href={withBase(`/competitions/${c.slug}`)}>{c.title}</a>
+              <a href={withBase(`/hr/competitions/${c.slug}`)}>{c.title}</a>
             </h2>
             <ol class="team-profile__list">
               {c.appearances.map((a) => (
@@ -113,12 +133,23 @@ const slug = teamProfileSlug(record.id);
     }
 
     <p class="team-profile__compare-link">
-      <a href={withBase(`/compare?a=${encodeURIComponent(profile.id)}`)}>
-        Compare {profile.displayName} against another team &rarr;
+      <a href={withBase(`/hr/compare?a=${encodeURIComponent(profile.id)}`)}>
+        Usporedi reprezentaciju {profile.displayName} s drugom &rarr;
       </a>
     </p>
 
-    <References sources={sources} lastReviewed={lastReviewed} status="verified" />
+    <References
+      sources={sources}
+      lastReviewed={lastReviewed}
+      status="verified"
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText="Provjereno"
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+      noteText="Prednost imaju primarni izvori. Povijesni formati i nazivi reprezentacija bilježe se onako kako su korišteni u to vrijeme; kontekst potražite u napomenama uz svako izdanje."
+    />
   </article>
 </BaseLayout>
 
