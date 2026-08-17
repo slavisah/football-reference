@@ -1,44 +1,20 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import References from '../components/References.astro';
-import { loadCompetition, loadPageMeta } from '../lib/competition';
+import { loadPageMeta } from '../lib/competition';
 import {
   buildAllCountryRecords,
   buildFinalsMeetings,
   finalsMeetingsBetween,
   tracksSemifinalColumn,
 } from '../lib/compare';
+import { loadTeamCompetitions } from '../lib/teamCompetitions';
 import { absolutePageUrl, withBase } from '../lib/url';
 import { buildCountryRecordsItemList, type JsonLdObject } from '../lib/jsonLd';
 
 const meta = await loadPageMeta('compare-countries');
 
-const [worldCup, euro, copaAmerica, nationsLeague] = await Promise.all([
-  loadCompetition('fifa-world-cup', {
-    editionsHeading: 'Editions',
-    sourcesHeading: 'FIFA World Cup',
-  }),
-  loadCompetition('uefa-euro', {
-    editionsHeading: 'Editions',
-    sourcesHeading: 'UEFA EURO',
-  }),
-  loadCompetition('copa-america', {
-    editionsHeading: 'Champions timeline',
-    sourcesHeading: 'Copa América',
-    allowDuplicateYears: ['1959'],
-  }),
-  loadCompetition('uefa-nations-league', {
-    editionsHeading: 'Finals',
-    sourcesHeading: 'UEFA Nations League',
-  }),
-]);
-
-const competitions = [
-  { title: 'FIFA World Cup', slug: 'world-cup', editions: worldCup.editions },
-  { title: 'UEFA EURO', slug: 'euro', editions: euro.editions },
-  { title: 'Copa América', slug: 'copa-america', editions: copaAmerica.editions },
-  { title: 'UEFA Nations League', slug: 'nations-league', editions: nationsLeague.editions },
-];
+const { worldCup, euro, copaAmerica, nationsLeague, competitions } = await loadTeamCompetitions();
 
 const tracksSemifinal = competitions.map((c) => tracksSemifinalColumn(c.editions));
 

@@ -80,6 +80,17 @@ const UI_STRINGS = {
   },
   onThisDayEmpty: { en: 'No final dates on record yet.', hr: 'Još nema zabilježenih datuma finala.' },
   championsBarOfLabel: { en: 'of', hr: 'od' },
+  teamSearchLabel: { en: 'Find a team', hr: 'Pronađi reprezentaciju' },
+  teamSearchPlaceholder: { en: 'Find a team…', hr: 'Pronađi reprezentaciju…' },
+  teamSearchNoResults: {
+    en: 'No teams match “{query}”.',
+    hr: 'Nijedna reprezentacija ne odgovara upitu „{query}”.',
+  },
+  teamSearchLoading: { en: 'Loading teams…', hr: 'Učitavanje reprezentacija…' },
+  teamSearchError: {
+    en: 'Team list unavailable right now.',
+    hr: 'Popis reprezentacija trenutno nije dostupan.',
+  },
 } as const;
 
 export type UiStringKey = keyof typeof UI_STRINGS;
