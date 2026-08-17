@@ -4,6 +4,7 @@ import {
   buildCountryCompetitionRecord,
   buildCountryRecord,
   buildFinalsMeetings,
+  buildTeamIndex,
   distinctCountryGroups,
   finalsMeetingsBetween,
   tracksSemifinalColumn,
@@ -187,6 +188,38 @@ describe('buildAllCountryRecords', () => {
     expect(austria).toBeDefined();
     expect(austria?.totalTitles).toBe(0);
     expect(austria?.totalSemifinals).toBe(1);
+  });
+});
+
+describe('buildTeamIndex', () => {
+  it('returns every country as an id/displayName pair, sorted alphabetically', () => {
+    const all = buildAllCountryRecords(competitions);
+    const index = buildTeamIndex(all);
+    expect(index).toHaveLength(all.length);
+    const names = index.map((entry) => entry.displayName);
+    expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+  });
+
+  it('is not affected by buildAllCountryRecords()\'s own titles-first ranking', () => {
+    const all = buildAllCountryRecords(competitions);
+    // The most-titled country (Germany) is not first alphabetically among
+    // this fixture's countries (Argentina/Austria/Brazil/... sort earlier),
+    // so a search index that just reused the ranked order would put it
+    // first - confirming buildTeamIndex() re-sorts rather than passing the
+    // ranking through unchanged.
+    const index = buildTeamIndex(all);
+    expect(index[0].displayName).not.toBe('Germany (incl. West Germany)');
+  });
+
+  it('carries only id and displayName, dropping every title/competition field', () => {
+    const index = buildTeamIndex(buildAllCountryRecords(competitions));
+    for (const entry of index) {
+      expect(Object.keys(entry).sort()).toEqual(['displayName', 'id']);
+    }
+  });
+
+  it('returns an empty list for no competitions', () => {
+    expect(buildTeamIndex(buildAllCountryRecords([]))).toEqual([]);
   });
 });
 

@@ -7623,6 +7623,125 @@ the 27 built pages in both languages, and needs its own accessible
 combobox/keyboard pattern - worth a dedicated run rather than being folded
 in alongside an unrelated PDF-infrastructure change.
 
+### New feature: "Find a team" global quick-jump search widget - added 2026-08-17 (later intensive run)
+
+The immediately preceding entry named this as the deferred alternative to
+the `/records` PDF work: there was genuinely no search feature anywhere on
+the site, and `/compare` already supports a shareable `?a=<id>` param
+(`src/pages/compare.astro`) a search widget could target - reachable only
+from `/compare`'s own two `<select>` pickers before this run, not from
+anywhere else on the site. This run built it as its own dedicated pass, per
+that entry's own recommendation.
+
+**New `src/lib/teamCompetitions.ts`**: factors the "load the four team
+competitions (World Cup, EURO, Copa América, Nations League) and shape them
+for `src/lib/compare.ts`'s pure functions" logic that used to live only in
+`compare.astro`'s frontmatter into a shared `loadTeamCompetitions()`, since
+the new search index endpoint (below) needs the exact same country list and
+duplicating the four `loadCompetition()` calls with their own load options
+risked the two drifting apart - the same reasoning `scripts/pdf-pages.mjs`'s
+shared `PDF_PAGES` list already documents for PDF generation.
+`compare.astro` itself is now a caller of this function rather than owning
+the loading logic, with no behavior change (confirmed by the full existing
+Playwright `/compare` suite, unchanged, still passing).
+
+**New `buildTeamIndex()`** in `src/lib/compare.ts`: the id/displayName pairs
+for every country `buildAllCountryRecords()` already ranks, just
+alphabetically (by name) rather than by title count, since a searcher is
+typing a name, not scanning a leaderboard.
+
+**New `src/pages/team-index.json.ts`**: a build-time-generated JSON
+endpoint serving `buildTeamIndex()`'s output (40 countries, ~1.7 KB). Content
+is English-only everywhere on this site (`AGENTS.md`), so one endpoint
+serves both `/...` and `/hr/...` pages - only the widget's own copy is
+translated, the same as every team name already shown untranslated on
+`/compare`. Deliberately **not** embedded inline in every page's HTML: the
+data is fetched lazily on first focus/keystroke instead, so the search
+widget's fixed markup cost on every page's own weight budget
+(`scripts/check-page-weight.mjs`) is a few hundred bytes, not the full
+team-list payload - a real concern given `/records` and `/hr/records` sit
+close to that budget already. The service worker's existing generic
+cache-first handler for non-navigation requests (`src/pages/sw.js.ts`)
+opportunistically caches this endpoint the same way it already does for
+CSS/manifest assets, with no `sw.js.ts` changes needed. Not added to the
+sitemap or offline precache list - it's a data endpoint, not a page, the
+same as `manifest.webmanifest`/`sw.js` already aren't.
+
+**`Nav.astro`** (the shared sticky header on all 27 pages, both languages)
+gained the widget itself: an editable ARIA 1.2 combobox
+(https://www.w3.org/WAI/ARIA/apg/patterns/combobox/) - a labelled text
+input (`role="combobox"`, `aria-autocomplete="list"`,
+`aria-controls`/`aria-activedescendant` wired to a `role="listbox"`
+dropdown) between the primary nav and the language switcher. Typing filters
+the fetched team list (diacritic-insensitive via `.normalize('NFD')`, so
+"turkiye" still finds "Türkiye"), capped to 8 matches; the first match
+auto-activates so Enter works immediately without an arrow-key press first.
+ArrowUp/ArrowDown cycle the active option and wrap at both ends; Escape
+closes the dropdown (or clears the input if already closed); a click
+outside the widget closes it; a no-match query replaces the dropdown with a
+translated, `aria-live="polite"`-announced "No teams match …" message
+instead of leaving a stale list visible. Selecting a team (Enter or click)
+sends the reader to `/compare?a=<id>` (or `/hr/compare?a=<id>` from a
+Croatian page) - `/compare`'s own existing script then reads that param the
+same way it already does when a reader pastes a shared link. Config (the
+JSON endpoint URL, the target compare path, and every translated string) is
+passed through the input's `data-*` attributes, the same pattern
+`ThemeToggle.astro`'s script already uses for its Light/Dark labels, rather
+than embedding page data in the script itself. The listbox's active-option
+highlight, like `TournamentTable.astro`'s `.is-winner` cell and the skip
+link before it, relied on background/color alone at first; added a
+`forced-colors: active` outline rule alongside it before this shipped,
+following the same precedent those two fixes already established rather
+than waiting for a dedicated forced-colors audit to catch a third instance.
+
+**A TypeScript note for future client scripts in this codebase:**
+`initTeamSearch()`'s helpers are nested inside a function that takes the
+input/listbox/status elements as typed parameters, rather than closing over
+module-level `const`s narrowed by an outer `if` -
+`astro check` reported every closure use of the outer narrowed consts as
+"possibly null" (`ts(18047)`), since TypeScript's control-flow narrowing
+does not reliably persist into nested function declarations. Parameters
+carry their non-null type unconditionally, so this sidesteps the issue
+entirely instead of scattering `!`/`?.` through the widget's logic.
+
+**Tests:** 4 new Vitest cases in `tests/unit/compare.test.ts` for
+`buildTeamIndex()` (alphabetical order independent of the titles-based
+ranking `buildAllCountryRecords()` returns, id/displayName-only shape, empty
+input) - 315 total, up from 311. 2 new cases in `tests/unit/i18n.test.ts`
+for the five new `teamSearch*` strings (non-empty and distinct per locale,
+`{query}` placeholder present in both locales' no-results template) - 317
+total. `pnpm lint` - 0 errors/0 warnings/0 hints. `pnpm build` - 23 pages
+(unchanged; the JSON endpoint is a `λ` route like `sitemap.xml`/`sw.js`, not
+an HTML page). `pnpm check:links`/`check:sitemap`/`check:precache`/
+`check:pdfs` all pass unchanged. `pnpm check:perf` - every page grew by the
+widget's fixed per-page markup (~5.8 KB of HTML, mostly the CSS added to
+the shared bundle plus the input's translated `data-*` attributes); the
+heaviest page, `hr/records`, is now 463.7 KB, still comfortably under the
+480 KB budget (16.3 KB of headroom left). New `tests/e2e/team-search.spec.ts`:
+16 Playwright cases covering typing/filtering, diacritic-insensitive
+matching, the no-results state, Escape/click-outside dismissal, keyboard
+selection (with wrap-around) and mouse-click selection both landing on
+`/compare?a=<id>` with the right team pre-filled, the Croatian variant
+(translated copy, `/hr/compare?a=<id>` target), the widget's presence on a
+non-`/compare` page (confirming it's genuinely global via the shared Nav),
+the combobox's ARIA wiring while open, and two axe WCAG scans (light/dark)
+of the open-listbox state with an active option. Full Playwright suite
+re-run afterward to confirm no regression from touching the header shared
+by every existing page-level test: **442/442** (up from 426 - the 16 new
+cases above).
+
+**Left for a future pass:** the widget only searches the same four team
+competitions `/compare` itself covers - Ballon d'Or and Golden Boot
+(individual awards, not national teams) are intentionally out of scope, the
+same boundary the "Finals meetings" panel entry already drew. It also only
+ever targets Team A, never Team B - a reasonable default (a searcher is
+starting a comparison, not completing one) but worth reconsidering if
+readers ask for a "compare against" flow. The same standing candidates
+noted in prior entries remain otherwise (source-link liveness infeasible,
+further content-accuracy spot-check low-yield, flag-emoji idea rejected,
+CSP's `'unsafe-inline'` not worth revisiting, the PDF-freshness checker's
+blind spot to `src/lib` rendering-logic changes).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

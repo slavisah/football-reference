@@ -51,6 +51,25 @@ describe('t', () => {
     expect(t('hr', 'primaryNav')).toBe('Glavna navigacija');
     expect(t('en', 'primaryNav')).not.toBe(t('hr', 'primaryNav'));
   });
+
+  it('gives the "find a team" search widget distinct, non-empty strings per locale', () => {
+    for (const key of [
+      'teamSearchLabel',
+      'teamSearchPlaceholder',
+      'teamSearchNoResults',
+      'teamSearchLoading',
+      'teamSearchError',
+    ] as const) {
+      expect(t('en', key).length).toBeGreaterThan(0);
+      expect(t('hr', key).length).toBeGreaterThan(0);
+      expect(t('en', key)).not.toBe(t('hr', key));
+    }
+  });
+
+  it('keeps the {query} placeholder in the no-results template for both locales', () => {
+    expect(t('en', 'teamSearchNoResults')).toContain('{query}');
+    expect(t('hr', 'teamSearchNoResults')).toContain('{query}');
+  });
 });
 
 describe('alternatePath', () => {

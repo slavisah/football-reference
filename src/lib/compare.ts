@@ -168,6 +168,21 @@ export function buildAllCountryRecords(competitions: CompetitionEditions[]): Cou
     );
 }
 
+export type TeamIndexEntry = { id: string; displayName: string };
+
+/**
+ * The id/displayName pairs the global "find a team" nav search widget
+ * (Nav.astro, fed by src/pages/team-index.json.ts) offers as autocomplete
+ * options - every country buildAllCountryRecords() already ranks, just
+ * alphabetically rather than by title count, since a searcher is typing a
+ * name rather than scanning a leaderboard.
+ */
+export function buildTeamIndex(records: CountryRecord[]): TeamIndexEntry[] {
+  return records
+    .map((r) => ({ id: r.id, displayName: r.displayName }))
+    .sort((a, b) => a.displayName.localeCompare(b.displayName));
+}
+
 const FINAL_SCORE_COLUMN = /^final$/i;
 
 export type FinalsMeeting = {
