@@ -23,6 +23,7 @@ const CONTENT_ID_BY_PATH: Record<string, string> = {
   '/competitions/golden-boot': 'golden-boot',
   '/records': 'records-and-timelines',
   '/compare': 'compare-countries',
+  '/teams': 'teams',
   '/quiz': 'quiz',
   '/about/sources': 'about-sources',
 };
@@ -83,28 +84,30 @@ export const GET: APIRoute = async ({ site, url }) => {
     }
   }
 
-  // The /teams directory (an index page plus one profile page per national
-  // team, src/pages/teams/index.astro and src/pages/teams/[slug].astro) is
-  // deliberately not in NAV_LINKS yet - it has no Croatian translation to
-  // link from the shared Nav.astro header - so it needs its own entries here
-  // rather than falling out of the loop above. English-only: no hreflang
-  // alternate, matching how any NAV_LINKS page without an hrPath already
-  // renders above.
-  const teamsEntry = await getEntry('pages', 'teams');
-  if (teamsEntry) {
-    const lastmodTag = `<lastmod>${teamsEntry.data.lastReviewed}</lastmod>`;
-    urlEntries.push(`<url><loc>${xmlEscape(absolute('/teams'))}</loc>${lastmodTag}</url>`);
-  }
-
+  // The /teams directory's index page (src/pages/teams/index.astro and its
+  // Croatian sibling) is now a normal NAV_LINKS/TRANSLATED_PATHS entry and
+  // is covered by the loop above. Its 40 per-team profile pages
+  // (src/pages/teams/[slug].astro) aren't page-content-collection entries
+  // with a single id the CONTENT_ID_BY_PATH map could name, so they still
+  // need their own loop here - now emitting both languages per team with
+  // reciprocal hreflang alternates, the same shape the main loop already
+  // gives every other bilingual page.
   const { worldCup, euro, copaAmerica, nationsLeague, competitions } = await loadTeamCompetitions();
   const teamsLastmod = [worldCup, euro, copaAmerica, nationsLeague]
     .map((c) => c.lastReviewed)
     .sort()
     .at(-1);
+  const lastmodTag = teamsLastmod ? `<lastmod>${teamsLastmod}</lastmod>` : '';
   for (const record of buildAllCountryRecords(competitions)) {
-    const loc = absolute(`/teams/${teamProfileSlug(record.id)}`);
-    const lastmodTag = teamsLastmod ? `<lastmod>${teamsLastmod}</lastmod>` : '';
-    urlEntries.push(`<url><loc>${xmlEscape(loc)}</loc>${lastmodTag}</url>`);
+    const slug = teamProfileSlug(record.id);
+    const enPath = `/teams/${slug}`;
+    const hrPath = `/hr/teams/${slug}`;
+    const altLinks = [
+      `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
+      `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
+    ].join('');
+    urlEntries.push(`<url><loc>${xmlEscape(absolute(enPath))}</loc>${lastmodTag}${altLinks}</url>`);
+    urlEntries.push(`<url><loc>${xmlEscape(absolute(hrPath))}</loc>${lastmodTag}${altLinks}</url>`);
   }
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urlEntries.join('\n')}\n</urlset>\n`;

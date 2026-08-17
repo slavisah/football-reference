@@ -25,6 +25,7 @@ export const NAV_LINKS: NavLink[] = [
   { path: '/competitions/golden-boot', label: 'Golden Boot', labelHr: 'Zlatna kopačka' },
   { path: '/records', label: 'Records', labelHr: 'Rekordi' },
   { path: '/compare', label: 'Compare', labelHr: 'Usporedba' },
+  { path: '/teams', label: 'Teams', labelHr: 'Reprezentacije' },
   { path: '/quiz', label: 'Quiz', labelHr: 'Kviz' },
   { path: '/about/sources', label: 'Sources', labelHr: 'Izvori' },
 ];

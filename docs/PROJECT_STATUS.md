@@ -7974,14 +7974,98 @@ content-accuracy spot-check low-yield, flag-emoji idea rejected, CSP's
 `'unsafe-inline'` not worth revisiting, the Golden Boot reverse-lookup quiz
 type not pursued).
 
+### Croatian localization of `/teams` - added 2026-08-17 (intensive run)
+
+Closed the exact gap the previous entry's "Left for a future pass" flagged:
+`/teams` (the A-to-Z national-team directory plus 40 year-by-year profile
+pages) was English-only, the one live feature not yet reachable from the
+Croatian half of the site. With the required-pages backlog, every
+nice-to-have, and the six-page localization rollout all otherwise complete,
+this was the clear highest-value remaining item rather than another content-
+accuracy pass.
+
+**New `src/pages/hr/teams/index.astro`** and **`src/pages/hr/teams/[slug].astro`**
+follow the exact rollout pattern `hr/compare.astro`/`hr/records.astro`
+already established: load the same live data as the English page
+(`loadTeamCompetitions`, `buildAllCountryRecords`, `buildTeamProfile`), so
+every title/runner-up/semifinal count and appearance list can never drift
+between languages - only this page's own headings/prose and the four
+competition display names (hardcoded Croatian strings, reused from
+`homeCards.ts`'s `CARD_TEXT`/`hr/compare.astro`'s own `competitions` array)
+are translated. Country names themselves are left as-is, the same
+data-not-chrome precedent the Croatian records/compare pages already set.
+`/hr/teams/[slug]` is this codebase's first-ever Croatian dynamic route -
+its `getStaticPaths()` mirrors the English page's slug-collision guard
+exactly (same `teamProfileSlug()`, same fail-loudly precedent), so the two
+pages can never end up with a different set of 40 team profiles.
+
+**Wiring**: `/teams` is now a normal `NAV_LINKS` entry (`labelHr:
+'Reprezentacije'`) with a `TRANSLATED_PATHS['/teams'] = '/hr/teams'`
+mapping, so it appears in the shared bilingual nav, the offline precache
+list (`buildPrecacheUrls()`, `scripts/check-precache.mjs`), and folds into
+`sitemap.xml.ts`'s main bilingual loop for free - no page-specific code
+needed in any of those three for the index page itself. The English `/teams`
+index and `[slug]` pages gained an `alternateHref` prop (they had none
+before, since there was nothing to link to) so the language switcher now
+appears on them too. The per-team-profile loop in `sitemap.xml.ts` (still
+hand-written, since 40 profile pages aren't a single content-collection
+entry `CONTENT_ID_BY_PATH` could name) now emits both `/teams/<slug>` and
+`/hr/teams/<slug>` per team with reciprocal `hreflang` alternates, instead
+of the previous English-only, no-alternate entries. `compare.astro`'s
+Croatian "Sve reprezentacije" table (previously plain text, since there was
+no Croatian profile page to link to) now links each team name to its
+`/hr/teams/<slug>` page, matching the English table's existing behavior,
+and its intro paragraph gained the same "pick a name for its full record"
+sentence the English page already had.
+
+**Tests:** `tests/unit/i18n.test.ts` gained the `/teams` <-> `/hr/teams`
+`alternatePath()` round-trip case (21 total, up from 20).
+`tests/unit/offlineCache.test.ts` gained an explicit
+`/football-reference/hr/teams` precache assertion; its existing generic
+"every `NAV_LINKS` path has an `hr` translation" and URL-count checks
+already cover the new entry with no test change needed (337 unit tests
+total, up from 336). `pnpm lint` (`astro check`) - 0 errors/warnings/hints
+across 115 files. `pnpm build` - 105 pages (up from 64: 41 new - the
+`/hr/teams` index plus 40 Croatian team profile pages). `pnpm check:links` -
+0 broken links across 109 built pages. `pnpm check:sitemap` - 104 sitemap
+entries (up from 63: 12 nav pages x 2 languages in the main loop, plus 40
+team profiles x 2 languages each with reciprocal `hreflang` alternates, in
+place of the old 22 nav entries + 41 English-only team entries) all resolve
+and agree with their pages' own canonical/hreflang tags. `pnpm check:perf` -
+heaviest page still `hr/records` at 463.8 KB, unchanged (no shared
+component touched); every new `/hr/teams/*` page is far under budget.
+`pnpm check:precache` - 31 precached URLs (up from 29), every nav link
+precached in both languages. `pnpm check:pdfs` passes unchanged (no
+PDF-generating page touched). `tests/e2e/team-profile.spec.ts` gained 12 new
+Croatian cases (index listing/links, profile totals matching the English
+page, translated competition-heading and compare-link cross-links, the
+diacritic-slug case via `/hr/teams/turkiye`, 360px overflow, two WCAG scans,
+both language-switcher directions, and `/hr/compare`'s new team-name links)
+alongside the 8 pre-existing English cases - 20 total, all passing.
+`tests/e2e/mobile.spec.ts`'s sitemap `<url>`-count assertion updated
+(63 -> 104) with matching Croatian-teams `<loc>`/`hreflang` assertions
+added. A full Playwright run surfaced one more now-stale hardcoded count in
+the same file - the 404 page's "popular links" list is `NAV_LINKS`-driven
+too, so its own test's expected link count needed the same bump (22 -> 24
+= 12 nav pages x 2 languages); fixed and re-verified. Full Playwright
+suite: **472/472 passing**, no regression from the shared
+`compare.astro`/`sitemap.xml.ts`/`routes.ts`/`i18n.ts` edits.
+
+**Left for a future pass:** `/teams` and `/hr/teams` were deliberately kept
+out of `print-styles.spec.ts`'s page lists, matching the precedent that the
+English `/teams` pages were never added there either (no print-specific
+styling concern has come up for this feature in either language). The same
+standing candidates noted in prior entries remain otherwise (source-link
+liveness infeasible, further content-accuracy spot-check low-yield,
+flag-emoji idea rejected, CSP's `'unsafe-inline'` not worth revisiting, the
+Golden Boot reverse-lookup quiz type not pursued).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
-  Records and Timelines, Compare National Teams, and the Family Quiz all have
-  live pages now.
-- The `/teams` directory (an A-to-Z index plus one profile page per national
-  team) is live in English only; Croatian translation and primary-nav
-  integration are a follow-up (see the entry above).
+  Records and Timelines, Compare National Teams, the Family Quiz, and the
+  `/teams` national-team directory all have live pages in both English and
+  Croatian now.
 - Historical names appear as distinct winner-filter entries by design.
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
   time out; re-running the deploy clears it (it did here).

@@ -101,6 +101,11 @@ describe('alternatePath', () => {
     expect(alternatePath('/hr/compare', 'hr')).toBe('/compare');
   });
 
+  it('maps the English teams page to its Croatian translation and back', () => {
+    expect(alternatePath('/teams', 'en')).toBe('/hr/teams');
+    expect(alternatePath('/hr/teams', 'hr')).toBe('/teams');
+  });
+
   it('maps the English quiz page to its Croatian translation and back', () => {
     expect(alternatePath('/quiz', 'en')).toBe('/hr/quiz');
     expect(alternatePath('/hr/quiz', 'hr')).toBe('/quiz');

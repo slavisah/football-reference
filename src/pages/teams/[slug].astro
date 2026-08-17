@@ -45,11 +45,13 @@ type Props = {
 
 const { record, competitions, sources, lastReviewed } = Astro.props as Props;
 const profile = buildTeamProfile(record, competitions);
+const slug = teamProfileSlug(record.id);
 ---
 
 <BaseLayout
   title={`${profile.displayName} - Full history`}
   description={`Every FIFA World Cup, UEFA EURO, Copa América and UEFA Nations League final or semifinal for ${profile.displayName}, generated from each competition's edition table.`}
+  alternateHref={withBase(`/hr/teams/${slug}`)}
 >
   <article class="team-profile stack">
     <header class="team-profile__header">
