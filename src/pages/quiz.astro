@@ -18,6 +18,7 @@ import {
   mostTitlesQuestion,
   runnerUpByYearQuestions,
   topScorerByYearQuestions,
+  yearByWinnerQuestions,
   selectQuiz,
   type QuizPool,
 } from '../lib/quiz';
@@ -147,6 +148,11 @@ const pools: QuizPool[] = [
     seed: 'pick:ballon-dor:most-titles',
   },
   {
+    questions: yearByWinnerQuestions(ballonDor.editions, "Ballon d'Or", 'ballon-dor'),
+    take: 2,
+    seed: 'pick:ballon-dor:year-by-winner',
+  },
+  {
     questions: topScorerByYearQuestions(goldenBootWorldCup.editions, 'World Cup Golden Boot', 'golden-boot-world-cup'),
     take: 2,
     seed: 'pick:golden-boot-world-cup:scorer',
@@ -226,7 +232,7 @@ const jsonLd: JsonLdObject[] = [
 
 <BaseLayout
   title={meta.title}
-  description="A family football quiz generated from the World Cup, EURO, Copa América, Nations League, Ballon d'Or and Golden Boot tables - champions, hosts, finals and top scorers."
+  description="A family football quiz generated from the World Cup, EURO, Copa América, Nations League, Ballon d'Or and Golden Boot tables - champions, hosts, finals, top scorers and Ballon d'Or years."
   alternateHref={withBase('/hr/quiz')}
   jsonLd={jsonLd}
 >

@@ -9,6 +9,7 @@ import {
   runnerUpByYearQuestions,
   selectQuiz,
   topScorerByYearQuestions,
+  yearByWinnerQuestions,
 } from '../../src/lib/quiz';
 import type { ChampionSummary, Edition, MarkdownTable } from '../../src/lib/types';
 
@@ -203,6 +204,76 @@ describe('topScorerByYearQuestions', () => {
     for (const q of questions) {
       expect(q.choices.some((choice) => choice.includes(';'))).toBe(false);
     }
+  });
+});
+
+describe('yearByWinnerQuestions', () => {
+  const ballonDorTable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'National team'],
+    rows: [
+      ['2016', 'Cristiano Ronaldo', 'Portugal'],
+      ['2017', 'Cristiano Ronaldo', 'Portugal'],
+      ['2018', 'Luka Modrić', 'Croatia'],
+      ['2019', 'Lionel Messi', 'Argentina'],
+      ['2020', 'Not awarded', '—'],
+      ['2021', 'Lionel Messi', 'Argentina'],
+      ['2022', 'Karim Benzema', 'France'],
+    ],
+  };
+  const ballonDorEditions = buildEditions(ballonDorTable);
+
+  it('asks a "which year" question only for a winner who won exactly once', () => {
+    const questions = yearByWinnerQuestions(ballonDorEditions, "Ballon d'Or", 'ballon-dor');
+    const winners = questions.map((q) => q.prompt);
+    expect(winners.some((p) => p.includes('Luka Modrić'))).toBe(true);
+    expect(winners.some((p) => p.includes('Karim Benzema'))).toBe(true);
+    // Cristiano Ronaldo (2016, 2017) and Lionel Messi (2019, 2021) each won
+    // more than once, so neither has a single unambiguous correct year.
+    expect(winners.some((p) => p.includes('Cristiano Ronaldo'))).toBe(false);
+    expect(winners.some((p) => p.includes('Lionel Messi'))).toBe(false);
+  });
+
+  it('places the correct year at answerIndex', () => {
+    const questions = yearByWinnerQuestions(ballonDorEditions, "Ballon d'Or", 'ballon-dor');
+    const modric = questions.find((q) => q.prompt.includes('Luka Modrić'));
+    expect(modric?.choices[modric.answerIndex]).toBe('2018');
+  });
+
+  it('builds a Croatian prompt when locale is "hr"', () => {
+    const questions = yearByWinnerQuestions(ballonDorEditions, "Ballon d'Or", 'ballon-dor', 'hr');
+    const modric = questions.find((q) => q.prompt.includes('Luka Modrić'));
+    expect(modric?.prompt).toBe("Koje je godine Luka Modrić osvojio nagradu Ballon d'Or?");
+  });
+
+  it('never asks about a "Not awarded" placeholder row, and never offers its year as a distractor', () => {
+    const questions = yearByWinnerQuestions(ballonDorEditions, "Ballon d'Or", 'ballon-dor');
+    expect(questions.some((q) => q.prompt.includes('Not awarded'))).toBe(false);
+  });
+
+  it('never repeats a choice within one question', () => {
+    const questions = yearByWinnerQuestions(ballonDorEditions, "Ballon d'Or", 'ballon-dor');
+    for (const q of questions) {
+      expect(new Set(q.choices).size).toBe(q.choices.length);
+    }
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const first = yearByWinnerQuestions(ballonDorEditions, "Ballon d'Or", 'ballon-dor');
+    const second = yearByWinnerQuestions(ballonDorEditions, "Ballon d'Or", 'ballon-dor');
+    expect(second).toEqual(first);
+  });
+
+  it('skips a question when fewer than 2 distinct distractor years exist', () => {
+    const sparseTable: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['2021', 'Lionel Messi'],
+        ['2022', 'Karim Benzema'],
+      ],
+    };
+    const sparseEditions = buildEditions(sparseTable);
+    const questions = yearByWinnerQuestions(sparseEditions, "Ballon d'Or", 'ballon-dor');
+    expect(questions).toHaveLength(0);
   });
 });
 

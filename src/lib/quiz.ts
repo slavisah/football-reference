@@ -198,6 +198,49 @@ export function runnerUpByYearQuestions(
 }
 
 /**
+ * "In which year did {winner} win the {competition}?" - the reverse of
+ * championByYearQuestions, matching the "Match a player to his Ballon d'Or
+ * year" quiz idea from content/records-and-timelines.md. Only generated for
+ * a winner who appears exactly once across the whole table: a repeat winner
+ * (e.g. an eight-time Ballon d'Or winner) has no single correct year, and
+ * every other year they won would otherwise be a wrongly-marked distractor.
+ */
+export function yearByWinnerQuestions(
+  editions: Edition[],
+  competition: string,
+  seedPrefix: string,
+  locale: Locale = 'en',
+): QuizQuestion[] {
+  const winnerCounts = new Map<string, number>();
+  for (const edition of editions) {
+    const winner = edition.winner.trim();
+    if (!winner || isPlaceholderWinner(winner) || winner.includes(';')) continue;
+    winnerCounts.set(winner, (winnerCounts.get(winner) ?? 0) + 1);
+  }
+
+  const pool = [...new Set(editions.map((e) => e.year))];
+  const questions: QuizQuestion[] = [];
+  for (const edition of editions) {
+    const winner = edition.winner.trim();
+    if (!winner || isPlaceholderWinner(winner) || winner.includes(';')) continue;
+    if (winnerCounts.get(winner) !== 1) continue;
+    const id = `${seedPrefix}:year-by-winner:${edition.year}`;
+    const choice = buildChoice(id, edition.year, pool);
+    if (!choice) continue;
+    questions.push({
+      id,
+      category: competition,
+      prompt:
+        locale === 'hr'
+          ? `Koje je godine ${winner} osvojio nagradu ${competition}?`
+          : `In which year did ${winner} win the ${competition}?`,
+      ...choice,
+    });
+  }
+  return questions;
+}
+
+/**
  * "Which team/player has won the most {competition} titles/awards?" - a
  * single generated question per competition, built from the same
  * `ChampionSummary[]` totals `buildChampionsSummary()` already produces for
