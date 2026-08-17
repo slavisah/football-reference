@@ -1,0 +1,205 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import References from '../../components/References.astro';
+import { buildAllCountryRecords, type CompetitionEditions, type CountryRecord } from '../../lib/compare';
+import { loadTeamCompetitions } from '../../lib/teamCompetitions';
+import { buildTeamProfile, teamProfileSlug } from '../../lib/teamProfile';
+import type { SourceLink } from '../../lib/sources';
+import { withBase } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const { worldCup, euro, copaAmerica, nationsLeague, competitions } = await loadTeamCompetitions();
+  const records = buildAllCountryRecords(competitions);
+
+  const sources = [worldCup, euro, copaAmerica, nationsLeague]
+    .flatMap((c) => c.sources)
+    .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+  const lastReviewed = [worldCup, euro, copaAmerica, nationsLeague]
+    .map((c) => c.lastReviewed)
+    .sort()
+    .at(-1) as string;
+
+  const seenSlugs = new Set<string>();
+  return records.map((record) => {
+    const slug = teamProfileSlug(record.id);
+    // A slug collision would silently merge two different teams onto one
+    // page - fail the build loudly instead, matching validateEditions()'s
+    // "never ship a silent data problem" precedent elsewhere in this codebase.
+    if (seenSlugs.has(slug)) {
+      throw new Error(`Two national teams produced the same /teams/ slug: "${slug}"`);
+    }
+    seenSlugs.add(slug);
+    return {
+      params: { slug },
+      props: { record, competitions, sources, lastReviewed },
+    };
+  });
+}
+
+type Props = {
+  record: CountryRecord;
+  competitions: CompetitionEditions[];
+  sources: SourceLink[];
+  lastReviewed: string;
+};
+
+const { record, competitions, sources, lastReviewed } = Astro.props as Props;
+const profile = buildTeamProfile(record, competitions);
+---
+
+<BaseLayout
+  title={`${profile.displayName} - Full history`}
+  description={`Every FIFA World Cup, UEFA EURO, Copa América and UEFA Nations League final or semifinal for ${profile.displayName}, generated from each competition's edition table.`}
+>
+  <article class="team-profile stack">
+    <header class="team-profile__header">
+      <p class="eyebrow badge">Generated from the competition tables</p>
+      <h1>{profile.displayName}</h1>
+      <p class="team-profile__intro">
+        {profile.displayName}'s full record across the FIFA World Cup, UEFA EURO, Copa América and
+        UEFA Nations League - every title, runner-up finish, and third/fourth-place or semifinal
+        finish, generated straight from each competition's edition table.
+      </p>
+    </header>
+
+    <section class="team-profile__totals card" aria-labelledby="totals-heading">
+      <h2 id="totals-heading" class="visually-hidden">Combined totals</h2>
+      <dl class="team-profile__totals-grid">
+        <div>
+          <dt>Titles</dt>
+          <dd>{profile.totalTitles}</dd>
+        </div>
+        <div>
+          <dt>Runner-up</dt>
+          <dd>{profile.totalRunnerUps}</dd>
+        </div>
+        <div>
+          <dt>Semifinal / 4th</dt>
+          <dd>{profile.totalSemifinals}</dd>
+        </div>
+        <div>
+          <dt>Finals reached</dt>
+          <dd>{profile.totalFinals}</dd>
+        </div>
+      </dl>
+    </section>
+
+    {
+      profile.competitions.length === 0 ? (
+        <p class="muted">
+          {profile.displayName} has not reached a tracked final or semifinal in any of these four
+          competitions.
+        </p>
+      ) : (
+        profile.competitions.map((c) => (
+          <section class="card stack" aria-labelledby={`${c.slug}-heading`}>
+            <h2 id={`${c.slug}-heading`}>
+              <a href={withBase(`/competitions/${c.slug}`)}>{c.title}</a>
+            </h2>
+            <ol class="team-profile__list">
+              {c.appearances.map((a) => (
+                <li class={a.role === 'Champion' ? 'is-title' : undefined}>
+                  <span class="team-profile__year">{a.year}</span>
+                  {a.role === 'Champion' && <span aria-hidden="true">🏆</span>}
+                  <span class="team-profile__role">{a.role}</span>
+                </li>
+              ))}
+            </ol>
+          </section>
+        ))
+      )
+    }
+
+    <p class="team-profile__compare-link">
+      <a href={withBase(`/compare?a=${encodeURIComponent(profile.id)}`)}>
+        Compare {profile.displayName} against another team &rarr;
+      </a>
+    </p>
+
+    <References sources={sources} lastReviewed={lastReviewed} status="verified" />
+  </article>
+</BaseLayout>
+
+<style>
+  .team-profile__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .team-profile__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .team-profile__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .team-profile__totals-grid {
+    margin: 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+    text-align: center;
+  }
+
+  .team-profile__totals-grid dt {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .team-profile__totals-grid dd {
+    margin: 0.2rem 0 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+  }
+
+  .team-profile__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .team-profile__list li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.5rem 0.8rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .team-profile__list li.is-title {
+    border-color: var(--accent);
+  }
+
+  .team-profile__year {
+    font-weight: 700;
+    min-width: 4.5rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .team-profile__role {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .team-profile__list li.is-title .team-profile__role {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .team-profile__compare-link {
+    font-weight: 600;
+  }
+</style>

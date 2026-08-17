@@ -7858,11 +7858,130 @@ standing candidates noted in prior entries remain otherwise (source-link
 liveness infeasible, further content-accuracy spot-check low-yield,
 flag-emoji idea rejected, CSP's `'unsafe-inline'` not worth revisiting).
 
+### New feature: "/teams" directory - one full year-by-year profile page per national team - added 2026-08-17 (intensive run)
+
+With the required-pages backlog, every nice-to-have, and the six-page
+localization rollout all complete (per the previous entry), and the last
+several runs' standing candidates all either infeasible (source-link
+liveness) or explicitly low-yield (further content-accuracy spot-checks,
+another reverse-lookup quiz type), this run looked for a genuinely new angle
+rather than repeating one of those. `/compare`'s own "All national teams"
+ranking (added with the page itself) already shows every team's *aggregate*
+titles/runner-up/semifinal counts across the four team competitions, but
+nowhere on the site could a reader see the actual *year-by-year* list behind
+those numbers for one team - e.g. exactly which years Brazil won the World
+Cup, not just "5 titles." This closes that gap.
+
+**New `src/lib/teamProfile.ts`**: `buildTeamProfile(record, competitions)`
+turns a `compare.ts` `CountryRecord` into a full per-competition,
+chronological list of every edition a team reached a tracked final or
+semifinal in - `{ year, role }` pairs, where `role` is `'Champion'` for a
+title or the source table's own exact column wording otherwise
+(`'Runner-up'`, `'Third'`, `'Fourth'`, `'Other semifinalist'`, ...), matching
+the historical-fidelity rule every edition table already follows rather than
+inventing generic labels. Reuses `compare.ts`'s own winner/runner-up/
+semifinal-column matching (`RUNNER_UP_COLUMN`, `SEMIFINAL_COLUMN`,
+`matchesGroup`, `isMissingCell` - now exported for this reuse) rather than
+redefining the same classification a second time, so a team's profile page
+can never disagree with its own `/compare` totals. Also exports
+`teamProfileSlug()`: a URL-safe ASCII slug for the `/teams/<slug>` path,
+distinct from `compare.ts`'s `id` (already used in `?a=<id>` query params,
+where the browser percent-encodes spaces/diacritics automatically) - real
+team ids include both spaces ("south korea") and diacritics ("türkiye"), so
+a path segment needed its own plain-ASCII form rather than relying on raw
+percent-encoding in every internal `<a href>`.
+
+**New `src/pages/teams/index.astro`** (backed by a new, minimal
+`content/teams.md`, the same front-matter-plus-intro-paragraph shape as
+`compare-countries.md`): an A-to-Z directory of every team `/compare`'s own
+ranking already lists, each linking to its profile page.
+
+**New `src/pages/teams/[slug].astro`** - this codebase's first-ever dynamic
+Astro route (every other page until now was a fixed file). `getStaticPaths()`
+generates one static page per `buildAllCountryRecords()` entry (40 teams
+currently), throwing a hard build error on any `teamProfileSlug()` collision
+rather than letting two different teams silently merge onto one page -
+matching `validateEditions()`'s established "fail loudly, never silently"
+precedent elsewhere in this codebase. Each page shows the team's combined
+totals (titles/runner-up/semifinal/finals, identical to what `/compare`
+computes) plus one section per competition it has actually appeared in, each
+a chronological list of `{year, role}` - deliberately **not** including each
+edition's host, to avoid any risk of overstating a fact (e.g. implying a team
+hosted an edition it merely competed in); a reader who wants that context
+already gets it one click away via the section heading's link back to that
+competition's own page. Also links to `/compare?a=<id>` to start a
+head-to-head comparison with this team pre-selected.
+
+**Wiring**: `/compare`'s "All national teams" table now links each team name
+to its profile page, and its intro paragraph gained a sentence pointing at
+`/teams`. **`src/pages/sitemap.xml.ts`** gained a second, independent block
+(the `/teams` index plus all 40 profile pages) alongside its existing
+NAV_LINKS-driven loop, rather than folding them into `NAV_LINKS` itself -
+`NAV_LINKS` drives the shared `Nav.astro` header and requires a Croatian
+`labelHr`/translated page for every entry, and `/teams` has no Croatian
+translation yet (deliberately, see below), so adding it there would have
+forced that scope into this run. English-only sitemap entries (no hreflang
+alternate) for all 41 URLs; `pnpm check:sitemap`'s existing "every indexable
+page has a matching `<loc>`" reverse-check confirms none of the 41 new pages
+is silently unindexed.
+
+Chose **not** to add `/teams` to the primary nav or the offline precache list
+this run - both are keyed off the same `NAV_LINKS` list, and doing so without
+a Croatian counterpart would leave a lone English-only nav item on every
+`/hr/...` page, a pattern this site has never shipped (every existing
+`NAV_LINKS` page has had both languages from the day it was added). The
+feature ships as a complete, working, fully indexed English slice - reachable
+from `/compare` and directly via search-engine crawling - with nav
+integration and localization as the natural next-slice follow-up, the same
+staged-rollout precedent the "On this day" widget and the Croatian
+translation pass both already established in this file.
+
+**Tests:** 12 new Vitest cases (`tests/unit/teamProfile.test.ts`): role
+labeling (`'Champion'` vs. the exact runner-up/third/fourth/semifinalist
+column wording), chronological sort order independent of the source table's
+own row order, only-competitions-actually-reached filtering, the "—"
+missing-cell placeholder never producing a phantom appearance, totals
+matching the source `CountryRecord` exactly, and `teamProfileSlug()`'s
+diacritic-stripping/space-hyphenation/punctuation-collapsing/trimming
+behavior - 336 total, up from 324. `pnpm lint` (`astro check`) - 0
+errors/warnings/hints across 112 files. `pnpm build` - 64 pages (up from 23:
+41 new - the `/teams` index plus 40 team profile pages). `pnpm check:links` -
+0 broken links across the 68 built `.html` files (64 pages plus the 4
+`/awards/*` redirect shims, which `astro build`'s own summary counts and
+logs separately from its "64 page(s) built" total).
+`pnpm check:sitemap` - 63 sitemap entries all resolve and agree with their
+pages' own canonical/hreflang tags, and no indexable page is missing.
+`pnpm check:perf` - heaviest page still `hr/records` at 463.7 KB, unchanged
+(no shared component touched); every new `/teams/*` page is far under
+budget. `pnpm check:precache`/`check:pdfs` both pass unchanged (no
+`NAV_LINKS`/PDF-generating page touched). New
+`tests/e2e/team-profile.spec.ts`: 9 Playwright cases (the index page's
+listing and links, a profile page's totals/appearance list/cross-links, the
+diacritic-slug case via `/teams/turkiye`, `/compare`'s new team-name links,
+360px overflow, and two WCAG scans). Also fixed one now-stale pre-existing
+assertion this change was expected to break:
+`tests/e2e/mobile.spec.ts`'s sitemap test's hardcoded `<url>` count (22 → 63).
+Full Playwright suite re-run twice to confirm no regression from the shared
+`/compare` page edit and to rule out flakiness: **453/453** both times (the 9
+new team-profile cases plus the pre-existing suite, all green).
+
+**Left for a future pass:** Croatian localization of `/teams` (both the
+index and all 40 profile pages) plus adding it to `NAV_LINKS`/the primary
+nav/the offline precache list once translated - deliberately deferred this
+run, per the reasoning above. The same standing candidates noted in prior
+entries remain otherwise (source-link liveness infeasible, further
+content-accuracy spot-check low-yield, flag-emoji idea rejected, CSP's
+`'unsafe-inline'` not worth revisiting, the Golden Boot reverse-lookup quiz
+type not pursued).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
   Records and Timelines, Compare National Teams, and the Family Quiz all have
   live pages now.
+- The `/teams` directory (an A-to-Z index plus one profile page per national
+  team) is live in English only; Croatian translation and primary-nav
+  integration are a follow-up (see the entry above).
 - Historical names appear as distinct winner-filter entries by design.
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
   time out; re-running the deploy clears it (it did here).
