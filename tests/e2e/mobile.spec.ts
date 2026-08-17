@@ -1242,6 +1242,19 @@ test.describe('Records page on a 360px phone', () => {
     await expect(page.getByText('Ousmane Dembélé').first()).toBeVisible();
   });
 
+  test('offers a downloadable print PDF covering every ranking and timeline', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/records.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
+
   test('the language switcher opens the Croatian records page', async ({ page }) => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/records\/?$/);
@@ -1428,6 +1441,19 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
     const barLabel = await page.locator('.champions__bar').first().getAttribute('aria-label');
     expect(barLabel).toMatch(/^\d+ od \d+$/);
     expect(barLabel).not.toContain(' of ');
+  });
+
+  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/records-hr.pdf"]');
+    await expect(link).toContainText('Preuzmi PDF za ispis');
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
   });
 });
 

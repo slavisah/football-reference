@@ -51,6 +51,25 @@ export const PDF_PAGES = [
     path: '/competitions/golden-boot',
     sources: ['content/golden-boot.md', SOURCES_MD],
   },
+  // /records draws on all six competition/award tables (see
+  // src/pages/records.astro's seven loadCompetition() calls - Golden Boot is
+  // loaded twice, once per competition's top-scorer table) plus SOURCES_MD
+  // for its own References section, so any one of them can make this PDF
+  // stale, not just a single content file the way each competition's own
+  // PDF works.
+  {
+    slug: 'records',
+    path: '/records',
+    sources: [
+      'content/fifa-world-cup.md',
+      'content/uefa-euro.md',
+      'content/copa-america.md',
+      'content/uefa-nations-league.md',
+      'content/ballon-dor.md',
+      'content/golden-boot.md',
+      SOURCES_MD,
+    ],
+  },
   // Croatian counterparts of the six pages above. Same underlying editorial
   // source files (content/ stays English-only, per AGENTS.md - only each
   // /hr/ page's own chrome is translated), but a distinct `/hr/...` page
@@ -87,5 +106,18 @@ export const PDF_PAGES = [
     slug: 'golden-boot-hr',
     path: '/hr/competitions/golden-boot',
     sources: ['content/golden-boot.md', SOURCES_MD],
+  },
+  {
+    slug: 'records-hr',
+    path: '/hr/records',
+    sources: [
+      'content/fifa-world-cup.md',
+      'content/uefa-euro.md',
+      'content/copa-america.md',
+      'content/uefa-nations-league.md',
+      'content/ballon-dor.md',
+      'content/golden-boot.md',
+      SOURCES_MD,
+    ],
   },
 ];

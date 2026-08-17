@@ -35,10 +35,10 @@ const ORIGIN = `http://localhost:${PORT}`;
 const OUT_DIR = path.join(ROOT, 'public', 'downloads');
 const MANIFEST_PATH = path.join(OUT_DIR, '.pdf-manifest.json');
 
-// One PDF per required competition page (src/pages/competitions/*.astro),
-// plus which file(s) each page's rendered content is sourced from (its
-// content/*.md edition table, plus docs/SOURCES.md for the References
-// section every page shares) - the shared PDF_PAGES list
+// One PDF per required competition page (src/pages/competitions/*.astro)
+// plus /records, and which file(s) each page's rendered content is sourced
+// from (its content/*.md edition table, plus docs/SOURCES.md for the
+// References section every page shares) - the shared PDF_PAGES list
 // (scripts/pdf-pages.mjs) so this can never drift from
 // scripts/check-pdf-freshness.mjs's PDF_SOURCES.
 

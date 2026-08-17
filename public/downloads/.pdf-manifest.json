@@ -25,6 +25,15 @@
     "content/golden-boot.md": "cf32208c2f5b6791904933ae230452676100956b07eb40eb2c19ff95b8a306fe",
     "docs/SOURCES.md": "ff4cae1b1b0af0b0c7feaef1ccd8b88bc718092748ac2c07c0d24aab5ef4ba6a"
   },
+  "records": {
+    "content/fifa-world-cup.md": "e2da6a5ee74332cefd9b50ece5e40c70655e5697f989055a17882531225ac5ca",
+    "content/uefa-euro.md": "28c7ad48c0acd4166af4314432f27ba5e94f5dedcde073d242482a31de916c6f",
+    "content/copa-america.md": "9241c8348205dc1e7ec5c9e37711489fef4e0d88901d8cbd19c8ae4240e88f2c",
+    "content/uefa-nations-league.md": "092bab1ef7e5e867b57e3c8e06549e03d920a4887447943b6805f501ad22ba61",
+    "content/ballon-dor.md": "51adc2f56674989c6b516958a915a37327e56ad535d5aea3c1122b1504c15f3f",
+    "content/golden-boot.md": "cf32208c2f5b6791904933ae230452676100956b07eb40eb2c19ff95b8a306fe",
+    "docs/SOURCES.md": "ff4cae1b1b0af0b0c7feaef1ccd8b88bc718092748ac2c07c0d24aab5ef4ba6a"
+  },
   "world-cup-hr": {
     "content/fifa-world-cup.md": "e2da6a5ee74332cefd9b50ece5e40c70655e5697f989055a17882531225ac5ca",
     "content/golden-boot.md": "cf32208c2f5b6791904933ae230452676100956b07eb40eb2c19ff95b8a306fe",
@@ -48,6 +57,15 @@
     "docs/SOURCES.md": "ff4cae1b1b0af0b0c7feaef1ccd8b88bc718092748ac2c07c0d24aab5ef4ba6a"
   },
   "golden-boot-hr": {
+    "content/golden-boot.md": "cf32208c2f5b6791904933ae230452676100956b07eb40eb2c19ff95b8a306fe",
+    "docs/SOURCES.md": "ff4cae1b1b0af0b0c7feaef1ccd8b88bc718092748ac2c07c0d24aab5ef4ba6a"
+  },
+  "records-hr": {
+    "content/fifa-world-cup.md": "e2da6a5ee74332cefd9b50ece5e40c70655e5697f989055a17882531225ac5ca",
+    "content/uefa-euro.md": "28c7ad48c0acd4166af4314432f27ba5e94f5dedcde073d242482a31de916c6f",
+    "content/copa-america.md": "9241c8348205dc1e7ec5c9e37711489fef4e0d88901d8cbd19c8ae4240e88f2c",
+    "content/uefa-nations-league.md": "092bab1ef7e5e867b57e3c8e06549e03d920a4887447943b6805f501ad22ba61",
+    "content/ballon-dor.md": "51adc2f56674989c6b516958a915a37327e56ad535d5aea3c1122b1504c15f3f",
     "content/golden-boot.md": "cf32208c2f5b6791904933ae230452676100956b07eb40eb2c19ff95b8a306fe",
     "docs/SOURCES.md": "ff4cae1b1b0af0b0c7feaef1ccd8b88bc718092748ac2c07c0d24aab5ef4ba6a"
   }
