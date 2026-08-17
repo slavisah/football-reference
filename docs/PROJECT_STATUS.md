@@ -7795,6 +7795,69 @@ remain otherwise (source-link liveness infeasible, further content-accuracy
 spot-check low-yield, flag-emoji idea rejected, CSP's `'unsafe-inline'` not
 worth revisiting).
 
+### New quiz question type: "In which year did {player} win the Ballon d'Or?" - added 2026-08-17 (intensive run)
+
+Closes a real, never-implemented gap: `content/records-and-timelines.md`'s
+own "Family quiz ideas" list has named "Match a player to his Ballon d'Or
+year" since the quiz was first built (2026-07-29), but every existing
+question type asks year-to-winner (`championByYearQuestions`), never the
+reverse. With the full backlog (required pages, nice-to-haves, and the
+six-page localization rollout) otherwise complete and every `pnpm check:*`
+script, `astro check`, and the unit suite green, this was the highest-value
+remaining item rather than another audit pass - the "further content-accuracy
+spot-check" and other standing candidates in prior entries are already
+noted as low-yield.
+
+New `yearByWinnerQuestions()` in `src/lib/quiz.ts` mirrors the existing
+`championByYearQuestions`/`buildChoice` pattern but swaps the prompt/answer
+roles: given a player, the reader picks their winning year from a
+multiple-choice list of years. Only generated for a winner who appears
+**exactly once** in the table - a repeat winner (e.g. an eight-time Ballon
+d'Or winner) has no single unambiguous correct year, and every other year
+they won would otherwise be a wrongly-marked-wrong distractor for their own
+question. This reuses the exact same placeholder/joint-tie exclusions
+(`isPlaceholderWinner`, the `;`-tie check) `questionsFromWinners` already
+applies, so the 2020 "Not awarded" row is never asked about and never offered
+as a distractor.
+
+Wired into both `src/pages/quiz.astro` and `src/pages/hr/quiz.astro` as a
+new pool (`take: 2`, Ballon d'Or only - the only competition the content
+brief names for this question shape, and the one individual award where a
+"clean" single-year winner is the common case rather than the exception).
+The Croatian pool passes `locale: 'hr'` for the localized prompt template,
+same convention as every other question builder. No new component was
+needed - the returned `QuizQuestion` shape (a `choices: string[]`, here of
+years) is identical to every other multiple-choice question type, so
+`QuizCard.astro`, the JSON-LD `Quiz` schema builder, and `QuizScript.astro`'s
+scoring logic all handle it for free.
+
+`content/quiz.md`'s "Question types in this quiz" list (and its
+hand-translated Croatian counterpart in `hr/quiz.astro`) gained a new bullet
+naming the question type, and its `lastReviewed` date was bumped to today.
+
+Covered by 6 new Vitest cases (`tests/unit/quiz.test.ts`: only single-time
+winners get a question, correct year at `answerIndex`, Croatian prompt
+wording, the "Not awarded" row is excluded from both prompts and
+distractors, no repeated choices, determinism, and the too-few-distractors
+skip) and 2 new Playwright cases at 360px (English and Croatian quiz pages:
+the new question card renders, is answerable, and shows the correct-answer
+feedback), plus the two existing "Question types" content-list assertions
+extended to also check for the new bullet. Full `pnpm test` (324 tests), a
+scoped Playwright pass covering every quiz/Ballon d'Or spec (43 tests) and a
+full `pnpm test:e2e` run, `astro check`, `pnpm build`, and
+`pnpm check:links`/`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs`
+all pass clean.
+
+**Left for a future pass:** the same reverse-lookup shape (player/team →
+year) could extend to Golden Boot's two top-scorer tables, but most Golden
+Boot years already have a unique scorer so the "exactly one win" filter
+would generate very few questions there relative to World Cup/EURO's own
+much larger single-winner pool from `championByYearQuestions`; not pursued
+here since the content brief specifically named Ballon d'Or. The same
+standing candidates noted in prior entries remain otherwise (source-link
+liveness infeasible, further content-accuracy spot-check low-yield,
+flag-emoji idea rejected, CSP's `'unsafe-inline'` not worth revisiting).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
