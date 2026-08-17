@@ -3,6 +3,9 @@ import { getEntry } from 'astro:content';
 import { NAV_LINKS } from '../lib/routes';
 import { TRANSLATED_PATHS } from '../lib/i18n';
 import { withBase } from '../lib/url';
+import { buildAllCountryRecords } from '../lib/compare';
+import { loadTeamCompetitions } from '../lib/teamCompetitions';
+import { teamProfileSlug } from '../lib/teamProfile';
 
 export const prerender = true;
 
@@ -78,6 +81,30 @@ export const GET: APIRoute = async ({ site, url }) => {
       const lastmodTag = lastmod ? `<lastmod>${lastmod}</lastmod>` : '';
       urlEntries.push(`<url><loc>${xmlEscape(loc)}</loc>${lastmodTag}${altLinks}</url>`);
     }
+  }
+
+  // The /teams directory (an index page plus one profile page per national
+  // team, src/pages/teams/index.astro and src/pages/teams/[slug].astro) is
+  // deliberately not in NAV_LINKS yet - it has no Croatian translation to
+  // link from the shared Nav.astro header - so it needs its own entries here
+  // rather than falling out of the loop above. English-only: no hreflang
+  // alternate, matching how any NAV_LINKS page without an hrPath already
+  // renders above.
+  const teamsEntry = await getEntry('pages', 'teams');
+  if (teamsEntry) {
+    const lastmodTag = `<lastmod>${teamsEntry.data.lastReviewed}</lastmod>`;
+    urlEntries.push(`<url><loc>${xmlEscape(absolute('/teams'))}</loc>${lastmodTag}</url>`);
+  }
+
+  const { worldCup, euro, copaAmerica, nationsLeague, competitions } = await loadTeamCompetitions();
+  const teamsLastmod = [worldCup, euro, copaAmerica, nationsLeague]
+    .map((c) => c.lastReviewed)
+    .sort()
+    .at(-1);
+  for (const record of buildAllCountryRecords(competitions)) {
+    const loc = absolute(`/teams/${teamProfileSlug(record.id)}`);
+    const lastmodTag = teamsLastmod ? `<lastmod>${teamsLastmod}</lastmod>` : '';
+    urlEntries.push(`<url><loc>${xmlEscape(loc)}</loc>${lastmodTag}</url>`);
   }
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urlEntries.join('\n')}\n</urlset>\n`;

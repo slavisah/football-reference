@@ -2196,13 +2196,17 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(response.headers()['content-type']).toContain('xml');
     const body = await response.text();
 
-    // 11 nav pages x 2 languages.
-    expect(body.match(/<url>/g)?.length).toBe(22);
+    // 11 nav pages x 2 languages, plus the English-only /teams directory (1
+    // index page + 40 team profile pages, src/pages/teams/ - no Croatian
+    // translation yet, so no hreflang alternate for any of those 41).
+    expect(body.match(/<url>/g)?.length).toBe(63);
     expect(body).toContain(`<loc>${SITE}/competitions/world-cup/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/competitions/world-cup/</loc>`);
     expect(body).toContain(
       `hreflang="hr" href="${SITE}/hr/competitions/world-cup/"`,
     );
+    expect(body).toContain(`<loc>${SITE}/teams/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/teams/brazil/</loc>`);
     expect(body).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
   });
 

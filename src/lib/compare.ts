@@ -9,25 +9,28 @@ import { summaryGroupFor, type Group } from './countries';
 // "Team"/"National team" cells can hold semicolon-separated ties (e.g. the
 // 1962 Golden Boot's six-way tie), which isn't safe to count as one country.
 
-const RUNNER_UP_COLUMN = /^runner-up$/i;
+// Exported so src/lib/teamProfile.ts can classify the same "Runner-up"/
+// "Third"/"Fourth"/"Other semifinalist" columns without redefining these
+// patterns a second time and risking the two drifting apart.
+export const RUNNER_UP_COLUMN = /^runner-up$/i;
 // World Cup: "Third", "Fourth / other semifinalist". EURO: "Other
 // semifinalist", "Other semifinalist / fourth". Nations League: "Third",
 // "Fourth". Copa América has the same "Third"/"Fourth" columns, but only for
 // the knockout-final era (1987, 1993 onward) - earlier editions had no
 // standalone third-place match, so those cells are the "—" placeholder
 // handled by isMissingCell() below rather than a real team name.
-const SEMIFINAL_COLUMN = /third|fourth|semifinalist/i;
+export const SEMIFINAL_COLUMN = /third|fourth|semifinalist/i;
 
 // The shared "no data for this row" marker used across every generic table
 // column (see TournamentTable.astro's own missing-cell check). A cell this
 // blank must never be treated as a country name, or it would show up as a
 // phantom "—" team on /compare.
-function isMissingCell(value: string | undefined): boolean {
+export function isMissingCell(value: string | undefined): boolean {
   const trimmed = (value ?? '').trim();
   return trimmed === '' || trimmed === '—';
 }
 
-function matchesGroup(value: string | undefined, groupId: string): boolean {
+export function matchesGroup(value: string | undefined, groupId: string): boolean {
   if (isMissingCell(value)) return false;
   return summaryGroupFor((value as string).trim()).id === groupId;
 }
