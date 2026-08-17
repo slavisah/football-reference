@@ -13,6 +13,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ChampionsTimeline from '../../components/ChampionsTimeline.astro';
 import ChampionsSummary from '../../components/ChampionsSummary.astro';
 import References from '../../components/References.astro';
+import PrintDownloadLink from '../../components/PrintDownloadLink.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import {
   buildBiggestFinalMargins,
@@ -216,6 +217,11 @@ const jsonLd: JsonLdObject[] = [
         najuspješnijih reprezentacija i pojedinačnih nagrada - sve generirano
         izravno iz podataka koje već koriste stranice pojedinih natjecanja.
       </p>
+      <PrintDownloadLink
+        slug="records-hr"
+        label="Preuzmi PDF za ispis"
+        hint="A4 položeno, svi poredci i vremenske crte s ove stranice."
+      />
     </header>
 
     <section class="stack" aria-labelledby="timeline-heading">

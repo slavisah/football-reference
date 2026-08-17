@@ -7517,6 +7517,112 @@ not a two-team final. `hr/records`/`records` are now the two heaviest pages
 on the site by a wide margin (next heaviest, `hr/quiz`, is 225.2 KB) -
 worth watching before adding yet another ranking section to this page.
 
+### New feature: downloadable print PDF for `/records` and `/hr/records` - added 2026-08-17 (intensive run)
+
+Every one of the six competition/award pages has had a "Download printable
+PDF" link since early on, but `/records` - one of the ten pages
+`docs/WEBSITE_REQUIREMENTS.md` explicitly lists under "Required pages" - has
+never had one, and the prior entry's own "left for a future pass" note
+steered away from piling yet another ranking section onto this page without
+first addressing its weight, not toward leaving it as the one page-weight
+outlier with no PDF at all. Unlike another ranking section, a PDF link adds
+only a couple hundred bytes of HTML to the live page (negligible against the
+480 KB budget) while reusing infrastructure that has been stable since the
+2026-08-06 PDF-freshness work, so this was a low-risk way to close a real
+completeness gap rather than another page-weight risk.
+
+**`scripts/pdf-pages.mjs`** gained two new `PDF_PAGES` entries, `records`
+(`/records`) and `records-hr` (`/hr/records`) - both single source of truth
+for `scripts/generate-pdfs.mjs` and `scripts/check-pdf-freshness.mjs`, per
+the module's own stated purpose. Unlike every existing entry, whose
+`sources` list is one `content/*.md` file (plus `docs/SOURCES.md`),
+`/records` draws on all six competition/award tables at once - it loads
+World Cup, EURO, Copa América, Nations League, Ballon d'Or and Golden Boot
+via seven `loadCompetition()` calls (Golden Boot twice, once per top-scorer
+table) - so its `sources` list names all six `content/*.md` files plus
+`SOURCES_MD`, meaning an edit to *any* competition's table can now make
+`records.pdf`/`records-hr.pdf` stale, not just its own page's PDF. Noted
+this explicitly in a new code comment (the existing per-competition entries
+don't need one - each is self-evidently tied to its own single content
+file) and in `docs/ADDING_CONTENT.md`'s PDF-regeneration reminder, which
+previously only warned about a single page going stale per edit.
+
+**`src/pages/records.astro`** and **`src/pages/hr/records.astro`** each
+gained a `<PrintDownloadLink>` in their header, right after the intro
+paragraph - the same position World Cup/EURO/Nations League/Copa América use
+(Ballon d'Or and Golden Boot place theirs slightly differently, but
+`/records`' header shape matches the four team-competition pages exactly).
+Reused the existing component and its established `label`/`hint` override
+pattern for the Croatian page (`"Preuzmi PDF za ispis"`, matching every
+other Croatian PDF link verbatim) rather than introducing anything new.
+
+Regenerated all 14 PDFs (`pnpm build && pnpm build:pdfs`,
+`PW_EXECUTABLE_PATH=<preinstalled Chromium>`) - the twelve competition/award
+PDFs are unchanged content wearing a fresh render (the same "regenerate
+everything, not just the new slugs" precedent the Croatian-PDF-bug entry
+already established, since `generate-pdfs.mjs` has no incremental mode), and
+`records.pdf`/`records-hr.pdf` are new: 8 pages each (A4 landscape, tagged
+for accessibility, matching every other PDF on the site), ~1.5 MB - the
+biggest PDF on the site by a wide margin (next biggest, `copa-america.pdf`,
+is ~720 KB), unsurprising given `/records` is also the biggest page by HTML
+weight and covers all six competitions/awards in one document rather than
+one. `pnpm check:pdfs` passes cleanly against the new 14-entry manifest.
+
+Added one Playwright case per language to `tests/e2e/mobile.spec.ts`'s
+existing "Records page"/"Croatian records page" describe blocks, matching
+the exact assertion shape every other PDF-link test already uses (link
+visible/translated, then a real HTTP request confirms the href resolves
+with a `pdf` content type) - the same pattern used for all twelve existing
+PDF links, just aimed at the two new ones.
+
+**Tests:** no library code under `src/lib` changed, so the full Vitest suite
+is unchanged (311/311) and `pnpm lint` is clean (0 errors/0 warnings/0
+hints). `pnpm build` - 23 pages, unchanged. `pnpm check:pdfs` passes against
+the new 14-PDF manifest. `pnpm check:links`/`check:sitemap`/`check:precache`
+all pass (dist rebuilt after `build:pdfs` so the new PDFs are present under
+`dist/downloads/` for `check:links` to find). `pnpm check:perf` - `/records`
+and `/hr/records` page weight is unchanged (453.7 KB / 457.8 KB - a PDF link
+adds well under 1 KB of HTML), still within the 480 KB budget. Full
+Playwright suite: **426/426** (up from 424 - the two new PDF-link cases),
+run against the rebuilt site with `PW_EXECUTABLE_PATH` pointed at the
+preinstalled Chromium.
+
+**Bonus find while regenerating:** `golden-boot.pdf`/`golden-boot-hr.pdf`
+came out of this run's mandatory "regenerate everything" step ~33 KB bigger
+than before (every other existing PDF regenerated byte-identical). Traced
+it to a real, previously undetected staleness bug, not a build fluke:
+`7bddb53` ("Fix Golden Boot joint-winner ties fragmenting/undercounting
+champions summary", 2026-08-15) changed `src/lib/editions.ts`'s grouping
+logic, which changes what the Golden Boot page's "Most awards" ranking
+renders - but that commit never regenerated the PDFs, and
+`scripts/check-pdf-freshness.mjs` had no way to catch it either, since its
+`PDF_SOURCES` manifest only hashes `content/*.md` + `docs/SOURCES.md`, never
+`src/lib/*.ts` rendering code. So the committed `golden-boot.pdf`/
+`golden-boot-hr.pdf` silently under-counted tied Golden Boot winners (the
+exact bug `7bddb53` fixed on the live page) for two days before this run's
+unrelated regeneration happened to catch it up. Fixed as a side effect here,
+not a separate commit. **Left for a future pass:** the freshness checker's
+blind spot to `src/lib` rendering-logic changes (as opposed to content-file
+edits) is real and not specific to this one bug - worth deciding whether to
+track a hash of the relevant `src/lib/*.ts` files too, or accept it as a
+known gap the way source-link liveness already is.
+
+**Left for a future pass:** the same standing candidates noted in the prior
+entry remain (source-link liveness infeasible, further content-accuracy
+spot-check low-yield, flag-emoji idea rejected, CSP's `'unsafe-inline'` not
+worth revisiting). Every page in `docs/WEBSITE_REQUIREMENTS.md`'s "Required
+pages" list that has an "Editions"-style table now has a matching PDF
+export; `/quiz`, `/compare`, `/about/sources` and `/` were never candidates
+for one (no tabular data to export the same way). A "find a team" global
+quick-jump/search widget was considered as an alternative candidate for this
+run (there is genuinely no search feature anywhere on the site, and
+`/compare` already supports a shareable `?a=<id>` param that such a widget
+could target) but deferred as higher blast-radius than this PDF gap - it
+would touch `Nav.astro`, the shared sticky header rendered on every one of
+the 27 built pages in both languages, and needs its own accessible
+combobox/keyboard pattern - worth a dedicated run rather than being folded
+in alongside an unrelated PDF-infrastructure change.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
