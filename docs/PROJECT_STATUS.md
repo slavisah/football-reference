@@ -7742,6 +7742,59 @@ further content-accuracy spot-check low-yield, flag-emoji idea rejected,
 CSP's `'unsafe-inline'` not worth revisiting, the PDF-freshness checker's
 blind spot to `src/lib` rendering-logic changes).
 
+### Bug prevention: PDF-freshness checker now tracks rendering code, not just content - closed 2026-08-17 (later intensive run)
+
+Closed the exact gap the previous two entries both flagged as a standing
+candidate. `pnpm check:pdfs` (`scripts/check-pdf-freshness.mjs`) previously
+hashed only each PDF's `content/*.md` source table(s) plus `docs/SOURCES.md`
+against `public/downloads/.pdf-manifest.json` - a change to the
+`src/lib/*.ts`/`src/components/*.astro` code that actually renders a table
+into a PDF was invisible to it. That blind spot was not hypothetical: the
+`7bddb53` Golden Boot joint-winner-tie bug (fixed in `src/lib/editions.ts`,
+no `content/*.md` edit involved) left `golden-boot.pdf`/`golden-boot-hr.pdf`
+silently wrong against the already-fixed live page for two days, exactly as
+the immediately preceding entry's "Left for a future pass" note described.
+
+**`scripts/pdf-pages.mjs`**: each `PDF_PAGES` entry's `sources` list now
+also names the rendering code that page's PDF depends on, not just its
+editorial content. Three new shared arrays avoid repeating this by hand
+across 14 near-identical entries: `COMPETITION_LIB` (the six
+`src/lib/*.ts` files `loadCompetition()`/`loadPageMeta()` pull in -
+`competition.ts`, `editions.ts`, `markdownTable.ts`, `notes.ts`,
+`sources.ts`, `validate.ts` - shared by every page), `TABLE_COMPONENTS`
+(`TournamentTable`/`ChampionsSummary`/`EditorialNotes`/`References`, used by
+every competition/award page) and `TIMELINE_COMPONENTS`
+(`ChampionsTimeline`/`ChampionsSummary`/`References`, used by `/records` and
+`/hr/records` instead, which never render a per-edition table). Each entry
+also now lists its own page file (`src/pages/competitions/world-cup.astro`,
+`src/pages/hr/records.astro`, etc.), and the six English pages that compose
+`src/components/CompetitionView.astro` list that too - Golden Boot's English
+page and every `/hr/` page assemble the four leaf components by hand instead
+(each for its own pre-existing reason, noted at each page's top) and were
+checked individually against their actual imports rather than assumed
+uniform. Both `scripts/generate-pdfs.mjs` and `scripts/check-pdf-freshness.mjs`
+already imported this one shared list (the drift risk the original
+`pdf-pages.mjs` header comment already called out), so neither script itself
+needed a code change - only the shared data did.
+
+Regenerated all 14 PDFs and `.pdf-manifest.json` (`pnpm build && pnpm
+build:pdfs`) so `pnpm check:pdfs` starts clean against the wider dependency
+list; every regenerated PDF is byte-identical in size to its predecessor
+(confirmed via `git diff --stat`), since no content or rendering code
+actually changed this run - only what the checker watches did.
+
+**Left for a future pass:** the dependency lists were built by reading each
+page's actual imports, not derived automatically, so a future page that adds
+a new rendering dependency (a new shared component, a new `src/lib` helper)
+needs a matching `pdf-pages.mjs` update by hand, the same manual-sync risk
+the file's header comment already flags for the page-list itself - a
+lint rule that cross-checks `sources` against each page's real import graph
+would close this more durably but is more machinery than this gap
+currently justifies. The same standing candidates noted in prior entries
+remain otherwise (source-link liveness infeasible, further content-accuracy
+spot-check low-yield, flag-emoji idea rejected, CSP's `'unsafe-inline'` not
+worth revisiting).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
