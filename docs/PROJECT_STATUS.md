@@ -8326,6 +8326,59 @@ content-wise regardless.
 unchanged. No further "missing feature" gaps are known across the site as of
 this run.
 
+### Bug fix: quiz "Champion order challenge" cards accepted invalid, non-bijective rankings - fixed 2026-08-18 (intensive run)
+
+With the backlog still fully checked off, this run did a fresh audit rather
+than trusting the standing "nothing left" note verbatim, and found a real
+interaction bug in the quiz's ranking questions that no prior pass had
+caught: each item's rank `<select>` independently offers every value
+`1..N`, and `QuizScript.astro`'s `setupOrderCard()` only ever gated the
+"Check order" button on *no select being empty* - nothing stopped a reader
+from assigning the same number to two different items (e.g. `1, 1, 3, 4`)
+while another number went unused. `check()` then compared each select to
+its `correctRanks[i]` independently, so two items sharing the identical
+dropdown value could be marked one "correct spot" and one "wrong spot"
+purely by chance, with no message ever telling the reader their answer
+wasn't a valid ordering to begin with - confusing feedback for what the
+site's own `AGENTS.md` calls a family-friendly quiz.
+
+Fixed by adding a `hasDuplicateRank()` check to both `updateCheckState()`
+(disables "Check order" and shows an inline warning the moment two selects
+share a value, even before every select is filled) and `check()` itself
+(defensive guard against the same case, matching the existing empty-select
+guard). New `quizOrderDuplicateRank` string in `src/lib/i18n.ts` (EN/HR),
+wired through `QuizOrderCard.astro` as a new `data-i18n-order-duplicate`
+attribute alongside the card's existing `data-i18n-order-*` strings, same
+pattern every other quiz feedback string already uses since `is:inline`
+scripts can't call `t()` directly.
+
+**Tests:** 2 new Playwright cases in `tests/e2e/mobile.spec.ts` (English:
+fill every rank validly, then collide the last two on the same number -
+asserts the button disables, the exact warning text appears, and both
+clear once the collision is resolved; Croatian: same collision, asserts the
+translated warning). Full suite re-run: **495 passed** (up from 493,
+matching the 2 new cases), including the pre-existing order-challenge and
+quiz-states accessibility specs, confirming no regression from the shared
+`QuizScript.astro`/`QuizOrderCard.astro`/`i18n.ts` edits. `pnpm lint`
+(`astro check`) - 0 errors/warnings/hints across 115 files. `pnpm test` -
+344 Vitest cases, unchanged (no library/data code touched, only quiz
+components/script and i18n strings). `pnpm build` - 105 pages, unchanged.
+`check:links`/`check:sitemap`/`check:perf`/`check:precache` all clean
+against the rebuilt `dist/`; quiz pages are not part of the PDF pipeline
+(`scripts/pdf-pages.mjs` has no quiz entry), so `check:pdfs` is unaffected.
+
+**Left for a future pass:** the standing "nothing left" list is otherwise
+unchanged; this was a genuine bug found by re-auditing rather than a new
+backlog item. The audit that surfaced this also flagged two lower-priority
+candidates not pursued here: `yearByWinnerQuestions` (the "in which year
+did X win" reverse-lookup pool) is wired only for Ballon d'Or in
+`src/pages/quiz.astro`, never for the four team competitions, even though
+`src/lib/quiz.ts`'s implementation is already fully generic; and
+`public/downloads/` has grown to ~56 MB of near-duplicate per-team PDFs,
+which is documented/intentional bloat (embedded fonts/CSS per file) rather
+than an overlooked bug, only worth revisiting if PDF weight becomes an
+actual complaint.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
