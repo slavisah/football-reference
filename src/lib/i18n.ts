@@ -64,6 +64,10 @@ const UI_STRINGS = {
     hr: 'Netočno - označene stavke nisu na pravom mjestu.',
   },
   quizRankPlaceholder: { en: 'Rank...', hr: 'Poredak...' },
+  quizOrderDuplicateRank: {
+    en: 'Each rank can only be used once - two items currently share a number.',
+    hr: 'Svaki broj poretka smije se koristiti samo jednom - dvije stavke trenutačno dijele isti broj.',
+  },
   sortOldestFirst: { en: '(oldest first)', hr: '(najstariji prvi)' },
   sortNewestFirst: { en: '(newest first)', hr: '(najnoviji prvi)' },
   sortFewestFirst: { en: '(fewest first)', hr: '(najmanje prvo)' },

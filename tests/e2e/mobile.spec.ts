@@ -1697,6 +1697,35 @@ test.describe('Quiz page on a 360px phone', () => {
     await expect(firstOrderCard.locator('.quiz-order__item.is-correct')).toHaveCount(rankCount);
   });
 
+  test('champion order challenge: assigning the same rank twice disables "Check order" with a warning', async ({
+    page,
+  }) => {
+    const firstOrderCard = page.locator('.quiz-card:has(.quiz-order__items)').first();
+    const ranks = firstOrderCard.locator('.quiz-order__rank');
+    const rankCount = await ranks.count();
+    expect(rankCount).toBeGreaterThanOrEqual(2);
+    const checkButton = firstOrderCard.locator('.quiz-order__check');
+    const feedback = firstOrderCard.locator('.quiz-card__feedback');
+
+    // Fill every select validly first, then collide the last two on the
+    // same rank - reproduces a reader re-picking an already-used number.
+    for (let i = 0; i < rankCount; i += 1) {
+      await ranks.nth(i).selectOption(String(i + 1));
+    }
+    await expect(checkButton).toBeEnabled();
+    await ranks.nth(rankCount - 1).selectOption('1');
+
+    await expect(checkButton).toBeDisabled();
+    await expect(feedback).toHaveText(
+      'Each rank can only be used once - two items currently share a number.',
+    );
+
+    // Resolving the collision re-enables the button and clears the warning.
+    await ranks.nth(rankCount - 1).selectOption(String(rankCount));
+    await expect(checkButton).toBeEnabled();
+    await expect(feedback).toHaveText('');
+  });
+
   test('champion order challenge is keyboard operable and has its own answer fallback', async ({
     page,
   }) => {
@@ -1793,6 +1822,24 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
     await firstOrderCard.locator('.quiz-order__check').click();
 
     await expect(firstOrderCard.locator('.quiz-card__feedback')).toHaveText('Točan redoslijed!');
+  });
+
+  test('champion order challenge: duplicate ranks show the Croatian warning', async ({ page }) => {
+    const firstOrderCard = page.locator('.quiz-card:has(.quiz-order__items)').first();
+    const ranks = firstOrderCard.locator('.quiz-order__rank');
+    const rankCount = await ranks.count();
+    expect(rankCount).toBeGreaterThanOrEqual(2);
+    const checkButton = firstOrderCard.locator('.quiz-order__check');
+
+    for (let i = 0; i < rankCount; i += 1) {
+      await ranks.nth(i).selectOption(String(i + 1));
+    }
+    await ranks.nth(rankCount - 1).selectOption('1');
+
+    await expect(checkButton).toBeDisabled();
+    await expect(firstOrderCard.locator('.quiz-card__feedback')).toHaveText(
+      'Svaki broj poretka smije se koristiti samo jednom - dvije stavke trenutačno dijele isti broj.',
+    );
   });
 
   test('the language switcher returns to the English quiz page', async ({ page }) => {
