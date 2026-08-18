@@ -2431,6 +2431,34 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(itemList.itemListElement[0].item.description).toContain('naslova');
   });
 
+  test('/teams carries a BreadcrumbList and an ItemList of every national team, distinct from /compare\'s', async ({
+    page,
+  }) => {
+    await page.goto('teams');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList']);
+
+    const teamCount = await page.locator('.teams__grid .teams__link').count();
+    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
+    expect(itemList.name).toBe(
+      'National teams directory - combined World Cup, EURO, Copa América and Nations League record',
+    );
+    expect(itemList.itemListElement).toHaveLength(teamCount);
+    expect(itemList.itemListElement.some((item: { item: { name: string } }) => item.item.name === 'Brazil')).toBe(
+      true,
+    );
+  });
+
+  test('/hr/teams carries its own Croatian ItemList name and description', async ({ page }) => {
+    await page.goto('hr/teams');
+    const blocks = await jsonLdBlocks(page);
+    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
+    expect(itemList.name).toBe(
+      'Popis reprezentacija - ukupan učinak na Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija',
+    );
+    expect(itemList.itemListElement[0].item.description).toContain('naslova');
+  });
+
   test('/quiz carries a BreadcrumbList and a Quiz with one Question per rendered multiple-choice card', async ({
     page,
   }) => {

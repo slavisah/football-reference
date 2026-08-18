@@ -112,7 +112,7 @@ const slug = teamProfileSlug(record.id);
       )
     }
 
-    <p class="team-profile__compare-link">
+    <p class="team-profile__compare-link no-print">
       <a href={withBase(`/compare?a=${encodeURIComponent(profile.id)}`)}>
         Compare {profile.displayName} against another team &rarr;
       </a>

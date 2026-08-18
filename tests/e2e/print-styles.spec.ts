@@ -140,6 +140,11 @@ test.describe('a screen-filtered row still prints', () => {
 // the CSS is shared" angle that has found real bugs elsewhere in this file
 // and in this test suite generally (see e.g. the Croatian-PDF and nav
 // aria-label bugs recorded in docs/PROJECT_STATUS.md).
+//
+// The /teams directory (index + one representative profile page per
+// language) joined this list once it shipped (docs/PROJECT_STATUS.md,
+// 2026-08-17) but was never actually added here - like Records/Compare it
+// has no TournamentTable, so the same "no table revert" exemption applies.
 const OTHER_PRINT_PAGES = [
   { label: 'English Home', path: '' },
   { label: 'Croatian Home', path: 'hr/' },
@@ -149,6 +154,10 @@ const OTHER_PRINT_PAGES = [
   { label: 'Croatian Compare', path: 'hr/compare' },
   { label: 'English Sources', path: 'about/sources' },
   { label: 'Croatian Sources', path: 'hr/about/sources' },
+  { label: 'English Teams index', path: 'teams' },
+  { label: 'Croatian Teams index', path: 'hr/teams' },
+  { label: 'English Team profile (Brazil)', path: 'teams/brazil' },
+  { label: 'Croatian Team profile (Brazil)', path: 'hr/teams/brazil' },
 ];
 
 for (const { label, path } of OTHER_PRINT_PAGES) {
@@ -179,6 +188,24 @@ for (const { label, path } of OTHER_PRINT_PAGES) {
       });
       expect(background).toBe('rgb(255, 255, 255)');
       expect(color).toBe('rgb(0, 0, 0)');
+    });
+  });
+}
+
+const TEAM_PROFILE_PAGES = [
+  { label: 'English', path: 'teams/brazil' },
+  { label: 'Croatian', path: 'hr/teams/brazil' },
+];
+
+for (const { label, path } of TEAM_PROFILE_PAGES) {
+  test.describe(`${label} Team profile (/${path}) in print media`, () => {
+    test('hides the "Compare against another team" link, which is meaningless on paper', async ({
+      page,
+    }) => {
+      await page.goto(path);
+      await page.emulateMedia({ media: 'print' });
+
+      await expect(page.locator('.team-profile__compare-link').first()).toBeHidden();
     });
   });
 }

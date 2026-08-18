@@ -13,7 +13,8 @@ import { loadPageMeta } from '../../../lib/competition';
 import { buildAllCountryRecords } from '../../../lib/compare';
 import { loadTeamCompetitions } from '../../../lib/teamCompetitions';
 import { teamProfileSlug } from '../../../lib/teamProfile';
-import { withBase } from '../../../lib/url';
+import { absolutePageUrl, withBase } from '../../../lib/url';
+import { buildCountryRecordsItemList, type JsonLdObject } from '../../../lib/jsonLd';
 
 const meta = await loadPageMeta('teams');
 
@@ -33,6 +34,18 @@ const lastReviewed = [worldCup, euro, copaAmerica, nationsLeague]
   .at(-1) as string;
 
 const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+// Croatian counterpart of src/pages/teams/index.astro's jsonLd block - same
+// "unit"/describe() translation pattern hr/compare.astro already uses for
+// buildCountryRecordsItemList.
+const jsonLd: JsonLdObject[] = [
+  buildCountryRecordsItemList(allRecords, {
+    pageUrl: absolutePageUrl(Astro.url, Astro.site),
+    name: 'Popis reprezentacija - ukupan učinak na Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija',
+    describe: (record) =>
+      `${record.totalTitles} naslova, ${record.totalRunnerUps} drugih mjesta, ${record.totalFinals} odigranih finala na Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija`,
+  }),
+];
 ---
 
 <BaseLayout
@@ -40,6 +53,7 @@ const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
   description="Svaka reprezentacija koja je dosegnula finale ili polufinale Svjetskog prvenstva, EURA, Copa Américe ili Lige nacija, od A do Ž - odaberite jednu za njezin cjeloviti pregled po godinama."
   locale="hr"
   alternateHref={withBase('/teams')}
+  jsonLd={jsonLd}
 >
   <article class="teams stack">
     <header class="teams__header">
