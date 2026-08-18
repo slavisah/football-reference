@@ -256,3 +256,49 @@ export const PDF_PAGES = [
     ],
   },
 ];
+
+// /teams/<slug> and /hr/teams/<slug> (one PDF per national team, per
+// language - 40 teams as of 2026-08-18) aren't listed individually above the
+// way the six competition pages and /records are, because - unlike those -
+// there's no fixed, hand-typeable list of pages: the team roster itself is
+// data, derived at build time from the same four team-competition content
+// files (src/lib/teamCompetitions.ts), not hand-maintained here. Hard-coding
+// 80 slugs in this file would silently drift the moment a new team's first
+// tracked final/semifinal appearance lands in one of those files.
+//
+// Every team's page (src/pages/teams/[slug].astro,
+// src/pages/hr/teams/[slug].astro) is built from exactly this same fixed set
+// of files regardless of which team it is - there's no per-team content file
+// - so this one shared list stands in for the "sources" array every entry in
+// PDF_PAGES above carries individually:
+//   - scripts/generate-pdfs.mjs asks the running preview server for the live
+//     team list (GET /team-index.json, the same endpoint the site's own
+//     "Find a team" search widget uses) and renders one PDF pair per team it
+//     finds, recording this same TEAM_PDF_SOURCES list against each
+//     `team-<slug>`/`team-<slug>-hr` manifest key.
+//   - scripts/check-pdf-freshness.mjs has no running server (it runs before
+//     `pnpm build` in CI), so it can't re-derive the live team list itself;
+//     instead it trusts whichever `team-*` keys the last `pnpm build:pdfs`
+//     already recorded in the manifest and re-hashes this list against each
+//     of them. Any edit to one of these files - the only way a team can ever
+//     be added, renamed, or removed - changes that file's hash, which
+//     immediately flags every existing `team-*` manifest entry as stale
+//     (they all share this one list) and forces a regeneration; that
+//     regeneration is what actually discovers a brand-new team via the live
+//     endpoint. So a new team is never silently missing a PDF forever - it's
+//     one `pnpm build:pdfs` behind, the same lag every other PDF has between
+//     a content edit and the next manual regeneration.
+export const TEAM_PDF_SOURCES = [
+  'content/fifa-world-cup.md',
+  'content/uefa-euro.md',
+  'content/copa-america.md',
+  'content/uefa-nations-league.md',
+  SOURCES_MD,
+  ...COMPETITION_LIB,
+  'src/lib/compare.ts',
+  'src/lib/teamCompetitions.ts',
+  'src/lib/teamProfile.ts',
+  'src/components/References.astro',
+  'src/pages/teams/[slug].astro',
+  'src/pages/hr/teams/[slug].astro',
+];

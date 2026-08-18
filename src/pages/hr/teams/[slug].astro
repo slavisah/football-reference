@@ -11,6 +11,7 @@
 // is computed by the exact same buildTeamProfile() the English page calls,
 // so the two pages can never disagree on the underlying record.
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import References from '../../../components/References.astro';
 import {
   buildAllCountryRecords,
@@ -82,6 +83,11 @@ const slug = teamProfileSlug(record.id);
         Américi i Ligi nacija - svaki naslov, drugo mjesto i treće/četvrto mjesto ili polufinale,
         generirano izravno iz tablice svakog natjecanja.
       </p>
+      <PrintDownloadLink
+        slug={`team-${slug}-hr`}
+        label="Preuzmi PDF za ispis"
+        hint="A4 položeno, cjelovita evidencija ove reprezentacije u svim praćenim natjecanjima."
+      />
     </header>
 
     <section class="team-profile__totals card" aria-labelledby="totals-heading">

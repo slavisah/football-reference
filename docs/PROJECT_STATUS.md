@@ -8229,6 +8229,103 @@ pursued here since it would mean 80 new PDFs (40 teams x 2 languages) via
 "close silently-missed sweep gaps" scope; worth a dedicated future run if a
 downloadable per-team sheet turns out to matter to readers.
 
+### New feature: downloadable print PDF for every `/teams/<slug>` profile page - added 2026-08-18 (later intensive run)
+
+Closed the gap the prior entry named: all 40 national teams now get the same
+"Download printable PDF" affordance every competition/award page and
+`/records` already has (80 files - one English and one Croatian PDF per
+team), bringing `/teams` to full parity with the rest of the site.
+
+**Why this needed a different approach than every other PDF.** Every entry
+in `scripts/pdf-pages.mjs`'s `PDF_PAGES` list is a hand-typed `{slug, path,
+sources}` triple, which works because there are exactly 14 such pages and
+the list changes rarely. The team roster isn't a fixed list - it's *data*,
+derived at build time from the same four team-competition content files
+(`src/lib/teamCompetitions.ts`) - so hand-typing 80 slugs here would silently
+drift the first time a team's first tracked final/semifinal appearance
+landed in one of those files. Instead, new `TEAM_PDF_SOURCES` in
+`scripts/pdf-pages.mjs` exports just the one fixed file list every team PDF
+actually depends on (the four content files, `docs/SOURCES.md`,
+`COMPETITION_LIB`, `compare.ts`, `teamCompetitions.ts`, `teamProfile.ts`,
+`References.astro`, and both `[slug].astro` templates) - not a per-team
+entry - and the two scripts that need the *current team roster* get it two
+different ways depending on what's available to them:
+
+- `scripts/generate-pdfs.mjs` already spins up an `astro preview` server to
+  render the other 14 PDFs, so it now also fetches that server's own
+  `/team-index.json` (the same endpoint `Nav.astro`'s "Find a team" widget
+  already uses) to get the live `{id, displayName}` roster, computes each
+  team's `/teams/<slug>` URL with a `teamProfileSlug()` ported verbatim from
+  `src/lib/teamProfile.ts` (duplicated rather than imported - that module's
+  sibling `compare.ts` imports `astro:content`, which only resolves inside
+  an Astro/Vite build, and this script runs under plain Node - the exact
+  same constraint `tableSort.ts`'s inline-duplicated comparator already
+  documents for a different script), and renders both language pages for
+  every team it finds, same `page.pdf({ tagged: true, outline: true, ... })`
+  call every other PDF already uses. Also refactored `buildManifest()` to
+  take an explicit entry list instead of always looping the static `PAGES`,
+  so it can be handed `[...PAGES, ...teamEntries]`.
+- `scripts/check-pdf-freshness.mjs` has no running server (`pnpm check:pdfs`
+  runs *before* `pnpm build` in CI - see `.github/workflows/ci.yml`), so it
+  can't ask the live endpoint. Instead it trusts whichever `team-*` keys the
+  last `pnpm build:pdfs` already wrote into the manifest, and re-hashes
+  `TEAM_PDF_SOURCES` against each of them - the new `teamSourcesFromManifest()`
+  helper. This has one honestly-documented narrow gap (see that function's
+  own comment): a team that has *never* had a PDF generated at all has no
+  manifest key yet, so nothing here flags it "missing." It can't silently go
+  unnoticed forever, though - the only way a new team can appear is by
+  editing one of the four content files `TEAM_PDF_SOURCES` already tracks,
+  which immediately flags every *existing* `team-*` entry stale and forces a
+  regeneration, and that regeneration is what discovers the new team via the
+  live endpoint. Same one-`build:pdfs`-cycle lag every other PDF already has
+  between a content edit and its next manual regeneration - not a new class
+  of staleness.
+
+Wired into both `src/pages/teams/[slug].astro` and
+`src/pages/hr/teams/[slug].astro` via the existing `PrintDownloadLink`
+component (no changes needed there - it already just takes a `slug`), placed
+in the page header right after the intro paragraph, same position
+`hr/records.astro` and the six competition pages already use. Filenames
+follow the established `<slug>`/`<slug>-hr` convention:
+`team-brazil.pdf`/`team-brazil-hr.pdf`, etc.
+
+Ran the full manual pipeline end to end: `pnpm build && pnpm build:pdfs`
+rendered all 94 PDFs (14 existing + 80 new), `pnpm check:pdfs` confirms all
+94 are fresh, `pnpm check:links`/`check:sitemap`/`check:precache` all clean
+against the rebuilt `dist/` (the new download links needed a second `pnpm
+build` after `build:pdfs` to pick up the freshly-written files - `astro
+build` copies `public/` at build time, so the first build's `dist/` predated
+them). `pnpm check:perf` - `/teams/<slug>` pages are far under budget (the
+new link adds a fixed, small amount of markup); heaviest page unchanged
+(`hr/records`, 489.0 KB). `pnpm lint` - 0 errors/warnings/hints across 115
+files. `pnpm test` - 344 Vitest cases, unchanged (no library code changed,
+only scripts/pages/tests). `pnpm build` - 105 pages, unchanged.
+
+**Tests:** 2 new Playwright cases in `tests/e2e/team-profile.spec.ts`
+(English and Croatian `/teams/brazil` - download link visible, resolves with
+a `pdf` content-type, matching the exact pattern every other PDF's own
+Playwright case already uses). Full suite: 493 passed (up from 491,
+matching the 2 new cases) - one `team-search.spec.ts` Croatian-navigation
+test flaked once under full-suite load and passed cleanly both in isolation
+and on a full clean re-run, confirming it's unrelated to this change (that
+spec file's own `Nav.astro` "Find a team" widget code path was untouched
+here).
+
+Repo footprint: `public/downloads/` grows from 7.3 MB to ~56 MB (80 files,
+~600-660 KB each - similar per-file overhead to the existing PDFs, not
+content-driven since a team profile's own content is short; team-total
+titles/runner-ups/appearances are a handful of list items, same shared
+fonts/CSS the print stylesheet already embeds in every PDF). The 14
+pre-existing PDFs also show as changed in the diff despite no source content
+change - `page.pdf()` embeds a per-render timestamp, so a full
+`build:pdfs` re-run always touches every file's bytes even when nothing
+about what it draws has changed; `check:pdfs` confirms all 94 are current
+content-wise regardless.
+
+**Left for a future pass:** the standing "nothing left" list is otherwise
+unchanged. No further "missing feature" gaps are known across the site as of
+this run.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
