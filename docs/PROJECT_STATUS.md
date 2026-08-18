@@ -8437,6 +8437,48 @@ pages aren't part of the PDF pipeline, so `check:pdfs` is unaffected.
 unchanged. The `public/downloads/` PDF-bloat note from the previous run
 still stands (documented/intentional, not an overlooked bug).
 
+### Accessibility: main WCAG sweep's own /teams/<slug> gap - closed 2026-08-18 (later intensive run)
+
+The earlier same-day "close /teams's three site-wide-sweep gaps" entry
+(JSON-LD, forced-colors, print media) fixed every gap it named, but missed a
+fourth one of the identical shape in the one sweep most likely to catch a
+real bug: `tests/e2e/accessibility.spec.ts`'s main WCAG 2.1 A/AA pass (light
++ dark `colorScheme`) builds its page list from `NAV_LINKS`/
+`TRANSLATED_PATHS` - the fixed top-level routes, which already covers the
+`/teams` index - so it has no way to reach the 40 dynamic `/teams/<slug>`
+profile pages (`src/pages/teams/[slug].astro`, added 2026-08-17). Both
+`accessibility-forced-colors.spec.ts` and `print-styles.spec.ts` already
+carry their own targeted `/teams/<slug>` spot-check for exactly this reason;
+this is the one sweep of the three that doesn't disable the `color-contrast`
+rule, so it's the one a real contrast regression on those pages would
+actually have caught, and it was the one left uncovered.
+
+Added a new describe block to `accessibility.spec.ts`, spot-checking the
+same representative team (Brazil) the other two specs already chose, for
+both languages and both color schemes (4 new tests): `teams/brazil` and
+`hr/teams/brazil`, each swept with the identical axe config
+(`wcag2a`/`wcag2aa`/`wcag21a`/`wcag21aa`, `region` disabled, `color-contrast`
+left enabled) the main sweep already uses for every other page, rather than
+one test per team.
+
+**No WCAG violations found** - this is a coverage-gap closure, not a bug-fix
+pass; the profile page already meets WCAG 2.1 A/AA in both languages and
+both color schemes, it had simply never been swept by this particular file.
+No `src/` or `content/` changes were needed.
+
+**Tests:** 4 new Playwright cases. Full suite re-run: **501 passed** (up
+from 497, matching the 4 new cases). `pnpm lint` (`astro check`) - 0
+errors/warnings/hints across 115 files. `pnpm test` - 346 Vitest cases,
+unchanged (test-only change, no library or page code touched). `pnpm build`
+- 105 pages, unchanged. `check:links`/`check:sitemap`/`check:perf`/
+`check:precache` all clean against the rebuilt `dist/`.
+
+**Left for a future pass:** the standing "nothing left" list is otherwise
+unchanged; this closes the last known gap in `/teams/<slug>`'s test
+coverage across all three accessibility specs. The `public/downloads/`
+PDF-bloat note still stands (documented/intentional, not an overlooked
+bug).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
