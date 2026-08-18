@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PrintDownloadLink from '../../components/PrintDownloadLink.astro';
 import References from '../../components/References.astro';
 import { buildAllCountryRecords, type CompetitionEditions, type CountryRecord } from '../../lib/compare';
 import { loadTeamCompetitions } from '../../lib/teamCompetitions';
@@ -62,6 +63,10 @@ const slug = teamProfileSlug(record.id);
         UEFA Nations League - every title, runner-up finish, and third/fourth-place or semifinal
         finish, generated straight from each competition's edition table.
       </p>
+      <PrintDownloadLink
+        slug={`team-${slug}`}
+        hint="A4 landscape, this team's full record across every tracked competition."
+      />
     </header>
 
     <section class="team-profile__totals card" aria-labelledby="totals-heading">

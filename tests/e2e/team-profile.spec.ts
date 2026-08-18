@@ -86,6 +86,17 @@ test.describe('Team profile page', () => {
       .analyze();
     expect(results.violations).toEqual([]);
   });
+
+  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
+    await page.goto('teams/brazil');
+    const link = page.locator('a[download][href$="downloads/team-brazil.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
 });
 
 test.describe('Linked from /compare', () => {
@@ -189,6 +200,17 @@ test.describe('Croatian team profile page (/hr/teams/<slug>)', () => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/teams\/brazil\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
+    await page.goto('hr/teams/brazil');
+    const link = page.locator('a[download][href$="downloads/team-brazil-hr.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
   });
 });
 
