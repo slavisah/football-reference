@@ -21,6 +21,7 @@ import {
   buildHostsSummary,
   buildLongestStreaks,
   buildLongestTitleGaps,
+  buildNearlyFinalists,
   buildRunnerUpsWithoutTitle,
   buildTimeline,
 } from '../../lib/editions';
@@ -167,6 +168,18 @@ const jsonLd: JsonLdObject[] = [
         ]
       : [];
   }),
+  ...competitions.flatMap((c) => {
+    const nearlyFinalists = buildNearlyFinalists(c.data.editions);
+    return nearlyFinalists.length > 0
+      ? [
+          buildChampionsItemList(nearlyFinalists, {
+            pageUrl,
+            name: `${c.label} - vječiti polufinalisti`,
+            unit: ['polufinale bez finala', 'polufinala bez finala'],
+          }),
+        ]
+      : [];
+  }),
   ...allLoaded.flatMap((c) => {
     const gaps = buildLongestTitleGaps(c.data.editions);
     return gaps.length > 0
@@ -203,7 +216,7 @@ const jsonLd: JsonLdObject[] = [
 
 <BaseLayout
   title="Rekordi i vremenska crta"
-  description="Vremenske crte prvaka, poredak najuspješnijih reprezentacija, najčešći domaćini, naslovi osvojeni na domaćem terenu, uzastopni prvaci, vječiti drugoplasirani, najduže čekanje na novi naslov i najveće pobjede u finalu generirani iz tablica Svjetskog prvenstva, EURA, Copa Américe i Lige nacija, uz vremensku crtu i poredak za Zlatnu loptu i Zlatnu kopačku, te objašnjenje kako se grupiraju povijesni nazivi država."
+  description="Vremenske crte prvaka, poredak najuspješnijih reprezentacija, najčešći domaćini, naslovi osvojeni na domaćem terenu, uzastopni prvaci, vječiti drugoplasirani, vječiti polufinalisti, najduže čekanje na novi naslov i najveće pobjede u finalu generirani iz tablica Svjetskog prvenstva, EURA, Copa Américe i Lige nacija, uz vremensku crtu i poredak za Zlatnu loptu i Zlatnu kopačku, te objašnjenje kako se grupiraju povijesni nazivi država."
   locale="hr"
   alternateHref={withBase('/records')}
   jsonLd={jsonLd}
@@ -433,6 +446,52 @@ const jsonLd: JsonLdObject[] = [
                   <>
                     <h2>{c.label}</h2>
                     <p class="muted">Svaki dosadašnji finalist na kraju je osvojio naslov.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  Pogledajte cijelu tablicu - {c.label} &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="nearly-finalists-heading">
+      <h2 id="nearly-finalists-heading">Vječiti polufinalisti</h2>
+      <p class="muted">
+        Reprezentacije koje su barem jednom igrale polufinale - završile na
+        trećem, četvrtom ili drugom polufinalnom mjestu - ali nikada nisu
+        stigle do finala, poredane po broju polufinalnih nastupa.
+        Reprezentacija se briše s ovog popisa čim jednom stigne do finala,
+        bez obzira osvoji li ga na kraju ili ne. Izdanja Copa América prije
+        uvođenja doigravanja za treće mjesto nemaju taj stupac, pa ne
+        pridonose ovom popisu. Grupirano na isti način na koji "Najuspješnije
+        reprezentacije" iznad ubraja Zapadnu Njemačku u Njemačku.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => {
+            const nearlyFinalists = buildNearlyFinalists(c.data.editions);
+            return (
+              <div>
+                {nearlyFinalists.length > 0 ? (
+                  <ChampionsSummary
+                    id={`nearly-finalists-${c.key}`}
+                    champions={nearlyFinalists}
+                    scaleMax={Math.max(...nearlyFinalists.map((s) => s.titles))}
+                    heading={c.label}
+                    description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
+                    icon="🥉"
+                    unit={['polufinale bez finala', 'polufinala bez finala']}
+                    winningYearsLabel="Godine polufinala: "
+                    ofLabel="od"
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">Svaki dosadašnji polufinalist na kraju je stigao do finala.</p>
                   </>
                 )}
                 <a class="records__teams-link" href={c.href}>

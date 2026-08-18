@@ -1188,6 +1188,22 @@ test.describe('Records page on a 360px phone', () => {
     await expect(worldCupNearly.locator('.champions__name').filter({ hasText: /^Argentina$/ })).toHaveCount(0);
   });
 
+  test('shows a "Nearly finalists" ranking of semifinal teams that have never reached a final', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Nearly finalists' })).toBeVisible();
+
+    const worldCupNearly = page.locator('section.champions:has(#nearly-finalists-world-cup-heading)');
+    await expect(worldCupNearly.locator('.champions__name').filter({ hasText: 'Yugoslavia' })).toBeVisible();
+    await expect(worldCupNearly.locator('.champions__count').first()).toHaveText(/2/);
+    await expect(worldCupNearly.getByText('1930, 1962')).toBeVisible();
+
+    // The Netherlands has lost three World Cup finals (a "Nearly champions"
+    // entry above) but never a mere third/fourth-place finish without also
+    // reaching the final, so it must not appear in this one-tier-down ranking.
+    await expect(worldCupNearly.locator('.champions__name').filter({ hasText: /^Netherlands$/ })).toHaveCount(0);
+  });
+
   test('shows a "Longest wait between titles" ranking, including a team whose two titles are back-to-back', async ({
     page,
   }) => {
@@ -2318,17 +2334,25 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
   }) => {
     await page.goto('records');
     const blocks = await jsonLdBlocks(page);
-    expect(blocks).toHaveLength(35);
+    expect(blocks).toHaveLength(39);
     expect(blocks.filter((b) => b['@type'] === 'BreadcrumbList')).toHaveLength(1);
 
     const lists = blocks.filter((b) => b['@type'] === 'ItemList');
-    expect(lists).toHaveLength(34);
+    expect(lists).toHaveLength(38);
     expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Most successful teams');
     expect(lists.map((l) => l.name)).toContain('Copa América - Most frequent hosts');
     expect(lists.map((l) => l.name)).toContain('Golden Boot (World Cup) - Back-to-back champions');
     expect(lists.map((l) => l.name)).toContain('Golden Boot (EURO) - Most awards');
     expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Nearly champions');
     expect(lists.map((l) => l.name)).toContain('UEFA Nations League - Nearly champions');
+    // "Nearly finalists" (semifinal but never a final) is populated for all
+    // four team competitions today - every one of them has at least one team
+    // stuck at that tier, so there's no empty-ranking fallback to skip here.
+    expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Nearly finalists');
+    expect(lists.map((l) => l.name)).toContain('Copa América - Nearly finalists');
+    // Same scope restriction as "Nearly champions" - individual awards have
+    // no Third/Fourth/semifinalist column to begin with.
+    expect(lists.map((l) => l.name)).not.toContain("Ballon d'Or - Nearly finalists");
     // "Titles won on home soil" only covers the four team competitions - same
     // scope as "Nearly champions" - and every one of them has at least one
     // real home-soil title today, so there's no empty-ranking fallback case
@@ -2368,11 +2392,12 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     await page.goto('hr/records');
     const blocks = await jsonLdBlocks(page);
     const lists = blocks.filter((b) => b['@type'] === 'ItemList');
-    expect(lists).toHaveLength(34);
+    expect(lists).toHaveLength(38);
     expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - najuspješnije reprezentacije');
     expect(lists.map((l) => l.name)).toContain('Zlatna lopta - uzastopni prvaci');
     expect(lists.map((l) => l.name)).not.toContain('UEFA Liga nacija - uzastopni prvaci');
     expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - vječiti drugoplasirani');
+    expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - vječiti polufinalisti');
     expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - najduže čekanje na novi naslov');
     expect(lists.map((l) => l.name)).toContain('Copa América - naslovi osvojeni na domaćem terenu');
     expect(lists.map((l) => l.name)).not.toContain("Zlatna lopta - naslovi osvojeni na domaćem terenu");

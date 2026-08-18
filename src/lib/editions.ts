@@ -507,6 +507,81 @@ export function buildRunnerUpsWithoutTitle(editions: Edition[]): ChampionSummary
     );
 }
 
+// Same convention as compare.ts's own SEMIFINAL_COLUMN (kept as a separate
+// local constant for the same reason RUNNER_UP_COLUMN above is): World Cup's
+// "Third"/"Fourth / other semifinalist", EURO's "Other semifinalist"/"Other
+// semifinalist / fourth", Nations League's "Third"/"Fourth", and Copa
+// América's "Third"/"Fourth" (knockout-final era only - earlier editions have
+// no such column, or a "—" placeholder in it, both handled below).
+const SEMIFINAL_COLUMN = /third|fourth|semifinalist/i;
+
+/**
+ * The "Nearly champions" ranking's one-tier-down sibling: teams that have
+ * reached a semifinal - a "Third", "Fourth", or "Other semifinalist" finish -
+ * at least once, but have never actually reached a final (no title, no
+ * runner-up finish either), ranked by semifinal-finish count. A team is
+ * dropped from this list the moment it reaches *any* final, whether it goes
+ * on to win it or not - matching `buildRunnerUpsWithoutTitle`'s own "no
+ * partial credit once the higher bar is cleared" rule, one level up.
+ *
+ * Grouped the same way `buildChampionsSummary()` groups title totals (e.g.
+ * West Germany counts as Germany). A row can name two different teams in its
+ * Third and Fourth columns at once (World Cup, Nations League); both are
+ * counted as separate semifinal appearances for their own team, never
+ * conflated with each other.
+ */
+export function buildNearlyFinalists(editions: Edition[]): ChampionSummary[] {
+  const finalistGroupIds = new Set<string>();
+  for (const edition of editions) {
+    const winner = edition.winner.trim();
+    if (winner && !isPlaceholderWinner(winner)) {
+      finalistGroupIds.add(summaryGroupFor(winner).id);
+    }
+    const runnerUp = cellValue(edition, RUNNER_UP_COLUMN);
+    if (runnerUp && runnerUp !== '—' && !isPlaceholderWinner(runnerUp)) {
+      finalistGroupIds.add(summaryGroupFor(runnerUp).id);
+    }
+  }
+
+  const groups = new Map<string, ChampionSummary>();
+  for (const edition of editions) {
+    const semifinalCells = edition.cells.filter((c) => SEMIFINAL_COLUMN.test(c.label.trim()));
+    for (const cell of semifinalCells) {
+      const value = cell.value.trim();
+      if (!value || value === '—' || isPlaceholderWinner(value)) continue;
+      const group = summaryGroupFor(value);
+      if (finalistGroupIds.has(group.id)) continue;
+
+      const existing = groups.get(group.id);
+      if (existing) {
+        existing.titles += 1;
+        existing.years.push(edition.year);
+        if (!existing.names.includes(value)) existing.names.push(value);
+      } else {
+        groups.set(group.id, {
+          id: group.id,
+          displayName: group.displayName,
+          titles: 1,
+          years: [edition.year],
+          names: [value],
+        });
+      }
+    }
+  }
+
+  return [...groups.values()]
+    .map((summary) => ({
+      ...summary,
+      years: [...summary.years].sort((a, b) => leadingYear(a) - leadingYear(b)),
+    }))
+    .sort(
+      (a, b) =>
+        b.titles - a.titles ||
+        leadingYear(a.years[0]) - leadingYear(b.years[0]) ||
+        a.displayName.localeCompare(b.displayName),
+    );
+}
+
 /**
  * For every team/player with two or more titles, the longest calendar-year
  * gap between any two of their *chronologically consecutive* title wins -
