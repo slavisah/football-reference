@@ -1631,6 +1631,23 @@ test.describe('Quiz page on a 360px phone', () => {
     await expect(yearCard.locator('.quiz-card__feedback')).toHaveText('Correct!');
   });
 
+  test('includes a "which year did {team} win {tournament}" question for a one-time champion', async ({
+    page,
+  }) => {
+    const yearCard = page
+      .locator('.quiz-card')
+      .filter({
+        hasText: /In which year did .+ win the (FIFA World Cup|UEFA EURO|Copa América|UEFA Nations League)\?/,
+      })
+      .first();
+    await expect(yearCard).toBeVisible();
+
+    const answerIndex = Number(await yearCard.getAttribute('data-answer-index'));
+    await yearCard.locator('input[type="radio"]').nth(answerIndex).check();
+    await yearCard.locator('.quiz-card__check').click();
+    await expect(yearCard.locator('.quiz-card__feedback')).toHaveText('Correct!');
+  });
+
   test('answering a question updates the score, and can be checked with the keyboard', async ({
     page,
   }) => {
@@ -1756,7 +1773,9 @@ test.describe('Quiz page on a 360px phone', () => {
     await expect(page.getByText('Press "Restart quiz" to clear your answers and play again.')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Question types in this quiz' })).toBeVisible();
     await expect(page.getByText("Who won the Ballon d'Or in a given year?")).toBeVisible();
-    await expect(page.getByText('In which year did a given Ballon d\'Or winner win it?')).toBeVisible();
+    await expect(
+      page.getByText('In which year did a given team win a tournament, or a given Ballon d\'Or'),
+    ).toBeVisible();
   });
 });
 
@@ -1799,6 +1818,21 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
     const yearCard = page
       .locator('.quiz-card')
       .filter({ hasText: /Koje je godine .+ osvojio nagradu Zlatna lopta\?/ })
+      .first();
+    await expect(yearCard).toBeVisible();
+
+    const answerIndex = Number(await yearCard.getAttribute('data-answer-index'));
+    await yearCard.locator('input[type="radio"]').nth(answerIndex).check();
+    await yearCard.locator('.quiz-card__check').click();
+    await expect(yearCard.locator('.quiz-card__feedback')).toHaveText('Točno!');
+  });
+
+  test('includes a "koje je godine ... osvojio natjecanje" question for a one-time team champion', async ({
+    page,
+  }) => {
+    const yearCard = page
+      .locator('.quiz-card')
+      .filter({ hasText: /Koje je godine .+ osvojio natjecanje .+\?/ })
       .first();
     await expect(yearCard).toBeVisible();
 
@@ -1859,7 +1893,9 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Vrste pitanja u ovom kvizu' })).toBeVisible();
     await expect(page.getByText('Tko je osvojio Zlatnu loptu u danoj godini?')).toBeVisible();
-    await expect(page.getByText('Koje je godine osvojio Zlatnu loptu dani igrač?')).toBeVisible();
+    await expect(
+      page.getByText('Koje je godine dana reprezentacija osvojila natjecanje'),
+    ).toBeVisible();
   });
 });
 

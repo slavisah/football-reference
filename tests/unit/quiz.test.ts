@@ -275,6 +275,21 @@ describe('yearByWinnerQuestions', () => {
     const questions = yearByWinnerQuestions(sparseEditions, "Ballon d'Or", 'ballon-dor');
     expect(questions).toHaveLength(0);
   });
+
+  it('asks about a one-time team champion when subject is "team"', () => {
+    // From the shared World Cup `editions` fixture above: Uruguay (1930,
+    // 1950) and Italy (1934, 1938) each won twice, so only West Germany
+    // (1954) is a one-time champion.
+    const questions = yearByWinnerQuestions(editions, 'FIFA World Cup', 'world-cup', 'en', 'team');
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe('In which year did West Germany win the FIFA World Cup?');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('1954');
+  });
+
+  it('builds a "won the competition" (not "won the award") Croatian prompt for subject "team"', () => {
+    const questions = yearByWinnerQuestions(editions, 'FIFA World Cup', 'world-cup', 'hr', 'team');
+    expect(questions[0].prompt).toBe('Koje je godine West Germany osvojio natjecanje FIFA World Cup?');
+  });
 });
 
 describe('chronologicalOrderQuestions', () => {

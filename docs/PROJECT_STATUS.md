@@ -8379,6 +8379,64 @@ which is documented/intentional bloat (embedded fonts/CSS per file) rather
 than an overlooked bug, only worth revisiting if PDF weight becomes an
 actual complaint.
 
+### Extend "in which year did X win it?" quiz questions from Ballon d'Or-only to the four team competitions - 2026-08-18 (intensive run)
+
+With the backlog still fully checked off, this run picked up the lower-
+priority gap the previous run's audit flagged but didn't pursue:
+`yearByWinnerQuestions()` in `src/lib/quiz.ts` was already a fully generic
+"in which year did {winner} win the {competition}?" builder - it only needs
+an `Edition[]` and works for any table with a `winner` column - but
+`src/pages/quiz.astro`/`hr/quiz.astro` only ever called it for Ballon d'Or,
+so the reverse-lookup question type never appeared for the FIFA World Cup,
+UEFA EURO, Copa América or UEFA Nations League despite each of those tables
+having genuine one-time champions to ask about (e.g. England 1966 and Spain
+2010 for the World Cup; the function already excludes any winner - team or
+player - who won more than once, since a repeat winner has no single
+correct year).
+
+The one real wrinkle: the existing Croatian prompt hard-coded "osvojio
+nagradu {competition}" (won the **award**), which reads naturally for the
+Ballon d'Or but not for a team winning a competition ("osvojio nagradu FIFA
+Svjetsko prvenstvo" would misname a tournament as an award). Added a new
+`subject: 'team' | 'player'` parameter (defaulting to `'player'`, so the
+existing Ballon d'Or call sites are untouched) that only branches the
+Croatian wording - `'team'` renders "osvojio natjecanje {competition}" (won
+the **competition**) instead. The English prompt already reads naturally
+either way ("win the {competition}"), so it takes no subject branch, same
+pattern `mostTitlesQuestion()` already established for its own
+team-vs-player Croatian wording.
+
+Wired one new low-weight pool entry (`take: 1`) per team competition into
+both `quiz.astro` and `hr/quiz.astro`, right after that competition's
+"most titles" question, passing `subject: 'team'`. Verified all four
+competitions actually produce at least one qualifying question against the
+current tables before wiring them in: World Cup (England, Spain), EURO
+(several one-time champions), Copa América (e.g. Paraguay, Bolivia,
+Colombia), Nations League (France 2021, Spain 2023 - Portugal won twice so
+is correctly excluded). Also updated `content/quiz.md`'s "Question types in
+this quiz" list and the hand-translated Croatian equivalent in
+`hr/quiz.astro` to describe the now-generalized question type instead of
+naming only the Ballon d'Or.
+
+**Tests:** 2 new Vitest cases in `tests/unit/quiz.test.ts` (a one-time team
+champion produces the expected English prompt/answer; the Croatian prompt
+says "osvojio natjecanje" rather than "osvojio nagradu" for `subject:
+'team'`). 2 new Playwright cases in `tests/e2e/mobile.spec.ts` (English and
+Croatian: a generated team year-by-winner card renders, is answerable, and
+shows correct feedback) plus 2 existing cases updated for the changed
+static copy (the "Question types" list text on both language pages).
+Full suite re-run: **497 passed** (up from 495, matching the 4 net new/
+changed Playwright cases - 2 added here plus the 2 pre-existing copy
+assertions updated in place) and **346 Vitest cases** (up from 344).
+`pnpm lint` (`astro check`) - 0 errors/warnings/hints across 115 files.
+`pnpm build` - 105 pages, unchanged. `check:links`/`check:sitemap`/
+`check:perf`/`check:precache` all clean against the rebuilt `dist/`; quiz
+pages aren't part of the PDF pipeline, so `check:pdfs` is unaffected.
+
+**Left for a future pass:** the standing "nothing left" list is otherwise
+unchanged. The `public/downloads/` PDF-bloat note from the previous run
+still stands (documented/intentional, not an overlooked bug).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

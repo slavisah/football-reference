@@ -83,6 +83,11 @@ const pools: QuizPool[] = [
     seed: 'pick:world-cup:most-titles',
   },
   {
+    questions: yearByWinnerQuestions(worldCup.editions, 'FIFA World Cup', 'world-cup', 'en', 'team'),
+    take: 1,
+    seed: 'pick:world-cup:year-by-winner',
+  },
+  {
     questions: championByYearQuestions(euro.editions, 'UEFA EURO', 'euro'),
     take: 2,
     seed: 'pick:euro:champion',
@@ -101,6 +106,11 @@ const pools: QuizPool[] = [
     questions: mostTitlesQuestion(euro.champions, 'UEFA EURO', 'euro'),
     take: 1,
     seed: 'pick:euro:most-titles',
+  },
+  {
+    questions: yearByWinnerQuestions(euro.editions, 'UEFA EURO', 'euro', 'en', 'team'),
+    take: 1,
+    seed: 'pick:euro:year-by-winner',
   },
   {
     questions: championByYearQuestions(copaAmerica.editions, 'Copa América', 'copa-america'),
@@ -123,6 +133,11 @@ const pools: QuizPool[] = [
     seed: 'pick:copa-america:most-titles',
   },
   {
+    questions: yearByWinnerQuestions(copaAmerica.editions, 'Copa América', 'copa-america', 'en', 'team'),
+    take: 1,
+    seed: 'pick:copa-america:year-by-winner',
+  },
+  {
     questions: championByYearQuestions(nationsLeague.editions, 'UEFA Nations League', 'nations-league'),
     take: 2,
     seed: 'pick:nations-league:champion',
@@ -136,6 +151,11 @@ const pools: QuizPool[] = [
     questions: mostTitlesQuestion(nationsLeague.champions, 'UEFA Nations League', 'nations-league'),
     take: 1,
     seed: 'pick:nations-league:most-titles',
+  },
+  {
+    questions: yearByWinnerQuestions(nationsLeague.editions, 'UEFA Nations League', 'nations-league', 'en', 'team'),
+    take: 1,
+    seed: 'pick:nations-league:year-by-winner',
   },
   {
     questions: championByYearQuestions(ballonDor.editions, "Ballon d'Or", 'ballon-dor'),

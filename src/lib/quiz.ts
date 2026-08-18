@@ -202,14 +202,22 @@ export function runnerUpByYearQuestions(
  * championByYearQuestions, matching the "Match a player to his Ballon d'Or
  * year" quiz idea from content/records-and-timelines.md. Only generated for
  * a winner who appears exactly once across the whole table: a repeat winner
- * (e.g. an eight-time Ballon d'Or winner) has no single correct year, and
- * every other year they won would otherwise be a wrongly-marked distractor.
+ * (e.g. an eight-time Ballon d'Or winner, or a two-time World Cup champion)
+ * has no single correct year, and every other year they won would otherwise
+ * be a wrongly-marked distractor.
+ *
+ * `subject` only changes the Croatian phrasing: a player "wins an award"
+ * (osvojio nagradu) while a team "wins a competition" (osvojio natjecanje) -
+ * the English prompt reads naturally as "win the {competition}" either way,
+ * so it takes no locale branch. Defaults to 'player' to match the original
+ * Ballon d'Or-only caller.
  */
 export function yearByWinnerQuestions(
   editions: Edition[],
   competition: string,
   seedPrefix: string,
   locale: Locale = 'en',
+  subject: 'team' | 'player' = 'player',
 ): QuizQuestion[] {
   const winnerCounts = new Map<string, number>();
   for (const edition of editions) {
@@ -232,7 +240,9 @@ export function yearByWinnerQuestions(
       category: competition,
       prompt:
         locale === 'hr'
-          ? `Koje je godine ${winner} osvojio nagradu ${competition}?`
+          ? subject === 'team'
+            ? `Koje je godine ${winner} osvojio natjecanje ${competition}?`
+            : `Koje je godine ${winner} osvojio nagradu ${competition}?`
           : `In which year did ${winner} win the ${competition}?`,
       ...choice,
     });

@@ -61,7 +61,7 @@ const notes: NoteSection[] = [
       'Koga je prvak pobijedio u finalu?',
       'Tko je bio najbolji strijelac natjecanja (Zlatna kopačka)?',
       'Tko je osvojio Zlatnu loptu u danoj godini?',
-      'Koje je godine osvojio Zlatnu loptu dani igrač?',
+      'Koje je godine dana reprezentacija osvojila natjecanje, ili dani igrač osvojio Zlatnu loptu? (pita se samo o jednokratnim prvacima/dobitnicima)',
       'Koja reprezentacija ili igrač ima najviše naslova/nagrada na natjecanju?',
       'Poredaj četiri prvaka natjecanja kronološkim redoslijedom (od najranijeg).',
     ],
@@ -138,6 +138,11 @@ const pools: QuizPool[] = [
     seed: 'pick:world-cup:most-titles',
   },
   {
+    questions: yearByWinnerQuestions(worldCup.editions, WORLD_CUP_NAME, 'world-cup', 'hr', 'team'),
+    take: 1,
+    seed: 'pick:world-cup:year-by-winner',
+  },
+  {
     questions: championByYearQuestions(euro.editions, EURO_NAME, 'euro', 'hr'),
     take: 2,
     seed: 'pick:euro:champion',
@@ -156,6 +161,11 @@ const pools: QuizPool[] = [
     questions: mostTitlesQuestion(euro.champions, EURO_NAME, 'euro', 'team', 'hr'),
     take: 1,
     seed: 'pick:euro:most-titles',
+  },
+  {
+    questions: yearByWinnerQuestions(euro.editions, EURO_NAME, 'euro', 'hr', 'team'),
+    take: 1,
+    seed: 'pick:euro:year-by-winner',
   },
   {
     questions: championByYearQuestions(copaAmerica.editions, COPA_AMERICA_NAME, 'copa-america', 'hr'),
@@ -183,6 +193,11 @@ const pools: QuizPool[] = [
     seed: 'pick:copa-america:most-titles',
   },
   {
+    questions: yearByWinnerQuestions(copaAmerica.editions, COPA_AMERICA_NAME, 'copa-america', 'hr', 'team'),
+    take: 1,
+    seed: 'pick:copa-america:year-by-winner',
+  },
+  {
     questions: championByYearQuestions(nationsLeague.editions, NATIONS_LEAGUE_NAME, 'nations-league', 'hr'),
     take: 2,
     seed: 'pick:nations-league:champion',
@@ -196,6 +211,11 @@ const pools: QuizPool[] = [
     questions: mostTitlesQuestion(nationsLeague.champions, NATIONS_LEAGUE_NAME, 'nations-league', 'team', 'hr'),
     take: 1,
     seed: 'pick:nations-league:most-titles',
+  },
+  {
+    questions: yearByWinnerQuestions(nationsLeague.editions, NATIONS_LEAGUE_NAME, 'nations-league', 'hr', 'team'),
+    take: 1,
+    seed: 'pick:nations-league:year-by-winner',
   },
   {
     questions: championByYearQuestions(ballonDor.editions, BALLON_DOR_NAME, 'ballon-dor', 'hr'),
