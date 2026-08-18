@@ -22,17 +22,19 @@ const DIST_DIR = path.join(ROOT, 'dist');
 // content, including the "Back-to-back champions" streaks section added
 // 2026-08-15, the "Nearly champions" and "Longest wait between titles"
 // sections added 2026-08-16, the "Titles won on home soil" section added
-// later the same day, and the "Biggest final wins" ranking added still later
-// (2026-08-16, a later intensive run) - genuinely the densest page on the
-// site, not bloat) weighs ~457.2 KB of HTML + CSS - over the previous 440 KB
-// budget. Raised to 480 KB (itself raised five times already, from an
-// initial ~234 KB measurement, then 300 KB, then 360 KB, then 400 KB, then
-// 420 KB, then 440 KB) the same deliberate way this script's own guidance
-// recommends: real new generated content, not a regression. This budget
-// leaves headroom for that content to keep growing while still catching an
-// accidental multi-page regression (a stray large asset, a duplicated script
-// block, an unminified debug dump) well before it reaches production.
-export const PAGE_WEIGHT_BUDGET_BYTES = 480 * 1024;
+// later the same day, the "Biggest final wins" ranking added still later
+// (2026-08-16, a later intensive run), and the "Nearly finalists" ranking
+// added 2026-08-18 (intensive run) - genuinely the densest page on the site,
+// not bloat) weighs ~489.0 KB of HTML + CSS - over the previous 480 KB
+// budget. Raised to 510 KB (itself raised six times already, from an initial
+// ~234 KB measurement, then 300 KB, then 360 KB, then 400 KB, then 420 KB,
+// then 440 KB, then 480 KB) the same deliberate way this script's own
+// guidance recommends: real new generated content, not a regression. This
+// budget leaves headroom for that content to keep growing while still
+// catching an accidental multi-page regression (a stray large asset, a
+// duplicated script block, an unminified debug dump) well before it reaches
+// production.
+export const PAGE_WEIGHT_BUDGET_BYTES = 510 * 1024;
 
 /** Every same-origin CSS asset path (e.g. "/football-reference/_astro/foo.css") referenced by an HTML page. */
 export function findCssRefs(html) {

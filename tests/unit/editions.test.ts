@@ -7,6 +7,7 @@ import {
   buildHostsSummary,
   buildLongestStreaks,
   buildLongestTitleGaps,
+  buildNearlyFinalists,
   buildRunnerUpsWithoutTitle,
   buildTimeline,
   buildTopScorerFacts,
@@ -576,6 +577,134 @@ describe('buildRunnerUpsWithoutTitle', () => {
   it('sorts by runner-up count desc, then earliest runner-up year, then name', () => {
     const summary = buildRunnerUpsWithoutTitle(buildEditions(runnerUpTable));
     expect(summary.map((s) => s.displayName)).toEqual(['Netherlands']);
+  });
+});
+
+describe('buildNearlyFinalists', () => {
+  const semifinalTable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'Runner-up', 'Third', 'Fourth'],
+    rows: [
+      ['1930', 'Uruguay', 'Argentina', 'United States', 'Yugoslavia'],
+      ['1962', 'Brazil', 'Czechoslovakia', 'Chile', 'Yugoslavia'],
+      ['1966', 'England', 'West Germany', 'Portugal', 'Soviet Union'],
+    ],
+  };
+
+  it("counts a team's semifinal (Third/Fourth) finishes when it has never reached a final", () => {
+    const summary = buildNearlyFinalists(buildEditions(semifinalTable));
+    expect(summary).toEqual([
+      {
+        id: 'yugoslavia',
+        displayName: 'Yugoslavia',
+        titles: 2,
+        years: ['1930', '1962'],
+        names: ['Yugoslavia'],
+      },
+      {
+        id: 'united states',
+        displayName: 'United States',
+        titles: 1,
+        years: ['1930'],
+        names: ['United States'],
+      },
+      {
+        id: 'chile',
+        displayName: 'Chile',
+        titles: 1,
+        years: ['1962'],
+        names: ['Chile'],
+      },
+      {
+        id: 'portugal',
+        displayName: 'Portugal',
+        titles: 1,
+        years: ['1966'],
+        names: ['Portugal'],
+      },
+      {
+        id: 'soviet union',
+        displayName: 'Soviet Union',
+        titles: 1,
+        years: ['1966'],
+        names: ['Soviet Union'],
+      },
+    ]);
+  });
+
+  it('groups West Germany under Germany, matching buildChampionsSummary - a team that reached a final under either name is excluded', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up', 'Third', 'Fourth'],
+      rows: [
+        ['1970', 'Brazil', 'Italy', 'West Germany', 'Uruguay'],
+        ['2006', 'Italy', 'France', 'Germany', 'Portugal'],
+      ],
+    };
+    // West Germany's only appearance is a Third-place finish, and Germany's
+    // (its grouped successor) only appearance is also a Third-place finish -
+    // neither name has ever reached a final, so the merged group should show
+    // up once, combining both semifinal finishes under "Germany (incl. West
+    // Germany)"'s grouping id, not as two separate one-off entries.
+    const summary = buildNearlyFinalists(buildEditions(table));
+    expect(summary.find((s) => s.id === 'germany')).toEqual({
+      id: 'germany',
+      displayName: 'Germany (incl. West Germany)',
+      titles: 2,
+      years: ['1970', '2006'],
+      names: ['West Germany', 'Germany'],
+    });
+  });
+
+  it('counts a team that later reaches a final in one edition but not another as excluded entirely', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up', 'Third', 'Fourth'],
+      rows: [
+        ['1990', 'West Germany', 'Argentina', 'Italy', 'England'],
+        ['1994', 'Brazil', 'Italy', 'Sweden', 'Bulgaria'],
+      ],
+    };
+    // Italy reached a semifinal in 1990 (Third) but a final in 1994
+    // (Runner-up) - the "no partial credit once the higher bar is cleared"
+    // rule excludes it entirely, the same way buildRunnerUpsWithoutTitle
+    // excludes a team once it has won even once.
+    const summary = buildNearlyFinalists(buildEditions(table));
+    expect(summary.find((s) => s.displayName === 'Italy')).toBeUndefined();
+    expect(summary.map((s) => s.displayName)).toEqual(['England', 'Bulgaria', 'Sweden']);
+  });
+
+  it('counts two different teams named in the same row\'s Third and Fourth columns separately', () => {
+    const summary = buildNearlyFinalists(buildEditions(semifinalTable));
+    expect(summary.find((s) => s.displayName === 'United States')?.titles).toBe(1);
+    expect(summary.find((s) => s.displayName === 'Yugoslavia')?.titles).toBe(2);
+  });
+
+  it('excludes the "—" missing-cell marker and a "Not awarded"-style placeholder', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up', 'Third', 'Fourth'],
+      rows: [
+        ['1987', 'Uruguay', 'Chile', '—', '—'],
+        ['2020', 'Not awarded', 'Not awarded', 'Not awarded', 'Not awarded'],
+      ],
+    };
+    expect(buildNearlyFinalists(buildEditions(table))).toEqual([]);
+  });
+
+  it('returns an empty list when the table has no Third/Fourth/semifinalist column', () => {
+    const scorersTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [['1958', 'Just Fontaine', 'France', '13']],
+    };
+    expect(buildNearlyFinalists(buildEditions(scorersTable))).toEqual([]);
+  });
+
+  it('sorts by semifinal count desc, then earliest year, then name', () => {
+    const summary = buildNearlyFinalists(buildEditions(semifinalTable));
+    expect(summary.map((s) => s.displayName)).toEqual([
+      'Yugoslavia',
+      'United States',
+      'Chile',
+      'Portugal',
+      'Soviet Union',
+    ]);
   });
 });
 

@@ -11,6 +11,7 @@ import {
   buildHostsSummary,
   buildLongestStreaks,
   buildLongestTitleGaps,
+  buildNearlyFinalists,
   buildRunnerUpsWithoutTitle,
   buildTimeline,
 } from '../lib/editions';
@@ -160,6 +161,18 @@ const jsonLd: JsonLdObject[] = [
         ]
       : [];
   }),
+  ...competitions.flatMap((c) => {
+    const nearlyFinalists = buildNearlyFinalists(c.data.editions);
+    return nearlyFinalists.length > 0
+      ? [
+          buildChampionsItemList(nearlyFinalists, {
+            pageUrl,
+            name: `${c.label} - Nearly finalists`,
+            unit: ['semifinal finish', 'semifinal finishes'],
+          }),
+        ]
+      : [];
+  }),
   ...allLoaded.flatMap((c) => {
     const gaps = buildLongestTitleGaps(c.data.editions);
     return gaps.length > 0
@@ -196,7 +209,7 @@ const jsonLd: JsonLdObject[] = [
 
 <BaseLayout
   title={meta.title}
-  description="Champions timelines, most-successful-team rankings, most-frequent hosts, titles won on home soil, back-to-back champions, nearly-champions, longest title droughts and biggest final wins generated from the World Cup, EURO, Copa América and Nations League tables, plus Ballon d'Or and Golden Boot award timelines and rankings, and how historical nation names are grouped."
+  description="Champions timelines, most-successful-team rankings, most-frequent hosts, titles won on home soil, back-to-back champions, nearly-champions, nearly-finalists, longest title droughts and biggest final wins generated from the World Cup, EURO, Copa América and Nations League tables, plus Ballon d'Or and Golden Boot award timelines and rankings, and how historical nation names are grouped."
   alternateHref={withBase('/hr/records')}
   jsonLd={jsonLd}
 >
@@ -409,6 +422,51 @@ const jsonLd: JsonLdObject[] = [
                   <>
                     <h2>{c.label}</h2>
                     <p class="muted">Every finalist so far has gone on to win a title.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  View the full {c.label} table &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="nearly-finalists-heading">
+      <h2 id="nearly-finalists-heading">Nearly finalists</h2>
+      <p class="muted">
+        Teams that have reached a semifinal - a "Third", "Fourth", or "Other
+        semifinalist" finish, generated from each table's own columns for
+        those - but have never actually reached a final, ranked by semifinal
+        count. A team is dropped from this list the moment it reaches any
+        final, whether it goes on to win or not. Copa América's editions
+        before its knockout-final era have no separate third-place match, so
+        they contribute no entries here. Grouped the same way "Most
+        successful teams" groups West Germany under Germany.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => {
+            const nearlyFinalists = buildNearlyFinalists(c.data.editions);
+            return (
+              <div>
+                {nearlyFinalists.length > 0 ? (
+                  <ChampionsSummary
+                    id={`nearly-finalists-${c.key}`}
+                    champions={nearlyFinalists}
+                    scaleMax={Math.max(...nearlyFinalists.map((s) => s.titles))}
+                    heading={c.label}
+                    description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
+                    icon="🥉"
+                    unit={['semifinal finish', 'semifinal finishes']}
+                    winningYearsLabel="Semifinal years: "
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">Every semifinalist so far has gone on to reach a final.</p>
                   </>
                 )}
                 <a class="records__teams-link" href={c.href}>

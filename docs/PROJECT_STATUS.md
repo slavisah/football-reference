@@ -8060,6 +8060,105 @@ liveness infeasible, further content-accuracy spot-check low-yield,
 flag-emoji idea rejected, CSP's `'unsafe-inline'` not worth revisiting, the
 Golden Boot reverse-lookup quiz type not pursued).
 
+### New feature: "Nearly finalists" ranking on `/records` - added 2026-08-18 (intensive run)
+
+With the required-pages backlog, every nice-to-have, and the six-page
+localization rollout all complete, and the standing "Left for a future pass"
+candidates from recent runs still exhausted (source-link liveness
+infeasible, a further content-accuracy spot-check low-yield, the flag-emoji
+idea rejected, the CSP's `'unsafe-inline'` allowance not worth revisiting,
+the Golden Boot reverse-lookup quiz type not pursued), this run added the
+"Nearly champions" ranking's one-tier-down sibling: teams that have reached
+a semifinal - a "Third", "Fourth", or "Other semifinalist" finish - at least
+once, but have never actually reached a final, ranked by semifinal-finish
+count. `/records` already had "best team to lose a final and never win it"
+("Nearly champions"); this closes the equally real "best team to lose a
+semifinal and never even reach a final" gap one tier below it, using data
+every competition table already loads.
+
+**New `buildNearlyFinalists()` in `src/lib/editions.ts`** mirrors
+`buildRunnerUpsWithoutTitle()`'s exact shape and "no partial credit once the
+higher bar is cleared" rule, one level up: a team is excluded entirely the
+moment it reaches *any* final (a title or a runner-up finish), even if an
+earlier or later edition saw it only reach a semifinal. Unlike the
+runner-up ranking (one column, `RUNNER_UP_COLUMN`), a row can name two
+different teams in a "Third" and "Fourth" column at once (World Cup,
+Nations League) - the new `SEMIFINAL_COLUMN` pattern (`/third|fourth|
+semifinalist/i`, the same convention `compare.ts`'s own constant of that
+name already uses) is matched against every cell in the row via `.filter()`
+rather than the single-cell `cellValue()` lookup the runner-up version
+uses, so both teams are counted as separate semifinal appearances for their
+own group, never conflated with each other. Grouped the same way
+`buildChampionsSummary()` groups title totals (West Germany counts as
+Germany). Copa América's editions before its knockout-final era (pre-1987)
+have no separate third-place match - handled for free by the same
+missing-cell/no-such-column guards `buildRunnerUpsWithoutTitle()` already
+relies on, contributing zero entries for those years rather than a false
+positive.
+
+Wired into both `src/pages/records.astro` and `src/pages/hr/records.astro`
+as a new section (`🥉`, right after "Nearly champions"), scoped to the four
+team competitions only - same boundary as "Nearly champions" itself, since
+Ballon d'Or/Golden Boot have no Third/Fourth/semifinalist column to begin
+with. New JSON-LD `ItemList` entries follow the same per-competition,
+skip-if-empty pattern every other ranking section already uses (though in
+practice all four team competitions have at least one qualifying team
+today, so there's no empty-ranking fallback case live to exercise). The
+Croatian page's heading/prose ("Vječiti polufinalisti") follows the exact
+"translate the concept, not the literal English column names" convention
+`hr/records.astro`'s "Vječiti drugoplasirani" section already established -
+the underlying `content/*.md` tables' column headers ("Third", "Fourth")
+stay English-only on both language pages, only the surrounding chrome is
+translated.
+
+Real top result for the World Cup: **Yugoslavia**, 2 semifinal finishes
+(1930, 1962) with no final ever reached - the Netherlands (three lost World
+Cup finals, already `/records`' headline "Nearly champions" example) does
+not appear here, since a runner-up finish is a final reached, not a
+semifinal-ceiling case, regardless of how many separate third/fourth-place
+finishes a team also has on its record.
+
+**Tests:** 7 new Vitest cases (`tests/unit/editions.test.ts`:
+`buildNearlyFinalists`) - counting Third/Fourth finishes for teams that
+never reached a final, excluding a team once it reaches *any* final (a
+title or a runner-up finish, not just a title), a team that reaches a
+semifinal in one edition and a final in another still excluded entirely,
+two different teams named in one row's Third/Fourth columns counted
+separately, the West Germany/Germany grouping merge, the "—"/placeholder
+exclusion, the no-such-column empty-list case, and sort order - 344 total,
+up from 337. `pnpm lint` (`astro check`) - 0 errors/warnings/hints across
+115 files. `pnpm build` - 105 pages (unchanged, no new page). New
+Playwright case in `tests/e2e/mobile.spec.ts` for the section itself
+(heading visible, Yugoslavia's real World Cup numbers, Netherlands
+correctly absent), plus the existing `/records` and `/hr/records` JSON-LD
+`ItemList`-count tests updated (35 → 39 blocks, 34 → 38 `ItemList`s, both
+pages) with new containment/exclusion assertions for the new ranking's
+name. Full Playwright suite re-run to confirm no regression from the shared
+`records.astro`/`hr/records.astro` edits.
+
+Regenerated `records.pdf`/`records-hr.pdf` (and, since `src/lib/editions.ts`
+is a shared rendering dependency named in every `pdf-pages.mjs` entry's
+`sources` list, all 14 PDFs' manifest hashes) via `pnpm build && pnpm
+build:pdfs`, so `pnpm check:pdfs` starts clean; every PDF except the two
+`records` ones is byte-identical to its predecessor, confirming no other
+content or rendering code actually changed this run.
+
+`hr/records` grew past the previous 480 KB `check:perf` budget (~489.0 KB,
+up from ~463.8 KB) purely from the new ranking's generated markup - raised
+to 510 KB in `scripts/check-page-weight.mjs`, the same deliberate,
+documented way this budget has been raised six times before, per that
+file's own header comment.
+
+**Left for a future pass:** the standing candidates noted in prior entries
+remain unchanged (source-link liveness infeasible, a further
+content-accuracy spot-check low-yield, the flag-emoji idea rejected, the
+CSP's `'unsafe-inline'` allowance not worth revisiting, the Golden Boot
+reverse-lookup quiz type not pursued). A further tier-down ranking
+("teams that appeared in a competition but never even reached a
+semifinal") was considered and rejected: with no round-of-16/quarterfinal
+column in any source table, there is no data to rank that claim by beyond
+"did they ever appear at all," which is not a meaningful stat.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
