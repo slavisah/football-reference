@@ -8159,6 +8159,76 @@ semifinal") was considered and rejected: with no round-of-16/quarterfinal
 column in any source table, there is no data to rank that claim by beyond
 "did they ever appear at all," which is not a meaningful stat.
 
+### Quality pass: `/teams` closed three site-wide-sweep gaps it had silently fallen outside of - added 2026-08-18 (later intensive run)
+
+With every backlog item in this file checked off (`grep '^- \[ \]'` over the
+whole document returns nothing), this run did the "quality pass instead"
+fallback: audited the newest page type on the site, `/teams` (added
+2026-08-17, Croatian localization the same day), against every "extended to
+every page"/"whole-site sweep" pass recorded above and found it had missed
+three of them - not because anyone regressed a fix, but because the sweeps
+all predate `/teams` and were never revisited once it shipped.
+
+1. **Zero structured data.** Every other generated ranking on the site
+   (`/records`, `/compare`, the six competition/award pages) has had a
+   schema.org `ItemList` since the 2026-08-15 SEO passes; `/teams` and
+   `/hr/teams` had none at all - not even the automatic `BreadcrumbList`
+   every non-home `BaseLayout` page gets for free, because neither page
+   passed a `jsonLd` prop for `buildBreadcrumbList()`'s sibling `website`
+   check to skip. Fixed by reusing `buildCountryRecordsItemList()`
+   (`src/lib/jsonLd.ts`) exactly as `/compare`'s own `ItemList` already
+   does - same `CountryRecord[]` (`buildAllCountryRecords()`), no new
+   builder - with a name distinct from `/compare`'s ("National teams
+   directory..." vs. "All national teams...") so a search engine sees two
+   intentionally different lists over the same data, not a duplicate. The
+   Croatian page follows `hr/compare.astro`'s exact `describe()` translation
+   pattern. 2 new Playwright cases (`tests/e2e/mobile.spec.ts`) assert the
+   `BreadcrumbList`+`ItemList` pair, the English name/count-matches-rendered-
+   list check, and the Croatian name/description.
+2. **No forced-colors coverage on the 40 profile pages.** The forced-colors
+   full-site sweep (2026-08-14) only enumerates `NAV_LINKS`/
+   `TRANSLATED_PATHS` - the fixed top-level pages, which already covers the
+   `/teams` index itself - so it has no way to reach the dynamic
+   `/teams/<slug>` routes. Added a targeted `describe` block
+   (`tests/e2e/accessibility-forced-colors.spec.ts`), the same
+   spot-check-not-every-team pattern the file's existing three targeted
+   blocks already use for TournamentTable/quiz, covering the English page's
+   WCAG-clean + `.is-title` role text and the Croatian page's WCAG-clean
+   state.
+3. **No print-media coverage at all.** `/teams`, `/hr/teams`, and every
+   `/teams/<slug>` profile page had never been driven through print media -
+   the 2026-08-13 pass that extended print coverage to Records/Compare/
+   Sources/Home predates `/teams` by four days and was never revisited
+   either. Added both index pages plus one representative profile page per
+   language to `OTHER_PRINT_PAGES` (same table-free exemption Records/
+   Compare/Sources already use) in `tests/e2e/print-styles.spec.ts`. This
+   also surfaced one small real bug while writing the test: the profile
+   page's "Compare {team} against another team &rarr;" link is a
+   navigational affordance with the exact same "meaningless on paper" shape
+   as `/compare`'s own team-picker (already `no-print`) or the site nav
+   (already hidden) - it was rendering as dead underlined text on every
+   printed/PDF-exported profile page. Fixed by adding `no-print` to
+   `.team-profile__compare-link` in both `teams/[slug].astro` and
+   `hr/teams/[slug].astro`, with a dedicated new test pinning it hidden.
+
+`pnpm lint` (`astro check`) - 0 errors/warnings/hints across 115 files.
+`pnpm test` - 344 Vitest cases, unchanged (no library code changed, only
+`.astro` pages and Playwright specs). `pnpm build` - 105 pages, unchanged (no
+new page, no page removed). `pnpm check:sitemap`/`check:links`/`check:perf`/
+`check:precache`/`check:pdfs` all clean - `/teams` and `/teams/<slug>` carry
+no downloadable PDF (out of scope for this pass; every other page type does),
+so `check:pdfs` is unaffected by the new JSON-LD. Full Playwright suite (491
+tests, up from 483) re-run end to end - all green, no regressions from the
+`no-print` class addition or the new jsonLd prop on two already-live pages.
+
+**Left for a future pass:** the standing "nothing left" list from the prior
+entry is otherwise unchanged. `/teams/<slug>` still has no downloadable PDF
+of its own (unlike every competition/award page and `/records`) - not
+pursued here since it would mean 80 new PDFs (40 teams x 2 languages) via
+`scripts/pdf-pages.mjs`, a materially bigger vertical slice than this pass's
+"close silently-missed sweep gaps" scope; worth a dedicated future run if a
+downloadable per-team sheet turns out to matter to readers.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

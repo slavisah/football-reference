@@ -150,6 +150,42 @@ test.describe('forced-colors mode, quiz answer states', () => {
   });
 });
 
+// The full-site sweep below (SWEPT_PATHS) only enumerates NAV_LINKS/
+// TRANSLATED_PATHS - the fixed top-level pages, including /teams itself -
+// so it already covers the teams *index*. It has no way to reach the 40
+// individual dynamic /teams/<slug> profile pages (src/pages/teams/[slug].astro,
+// added 2026-08-17), which render the same .team-profile__list/.is-title
+// cards on every page but were never driven through forced-colors at all.
+// Spot-checked the same way the three targeted describes above spot-check
+// TournamentTable/quiz, rather than generating one test per team.
+test.describe('forced-colors mode, team profile page', () => {
+  test('the champion "is-title" list item keeps a non-color signal and the page stays WCAG-clean', async ({
+    page,
+  }) => {
+    await page.goto('teams/brazil');
+
+    const titleItem = page.locator('.team-profile__list li.is-title').first();
+    await expect(titleItem).toBeVisible();
+
+    await page.emulateMedia({ forcedColors: 'active' });
+
+    // Unlike TournamentTable's is-winner cell (fixed via an underline
+    // because it had no other signal), a title item already carries a
+    // trophy emoji plus the "Champion" text - both survive forced-colors on
+    // their own, so this only needs to confirm the page is still clean, not
+    // pin a CSS fix of its own.
+    await expect(titleItem.locator('.team-profile__role')).toHaveText('Champion');
+
+    await runAxe(page);
+  });
+
+  test('the Croatian team profile page is also WCAG-clean under forced-colors', async ({ page }) => {
+    await page.goto('hr/teams/brazil');
+    await page.emulateMedia({ forcedColors: 'active' });
+    await runAxe(page);
+  });
+});
+
 // The three targeted tests above pin the exact bugs this mode surfaced and
 // their fixes; they don't answer whether forced-colors is clean everywhere
 // else. This sweep runs the same whole-site axe pass accessibility.spec.ts
