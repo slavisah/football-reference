@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
+import { buildPodiums } from '../../lib/editions';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import {
   buildChampionsItemList,
@@ -15,6 +16,8 @@ const data = await loadCompetition('copa-america', {
   allowDuplicateYears: ['1959'],
   noteHeadings: ['How it works', 'Memorable moments'],
 });
+
+const podium = buildPodiums(data.editions);
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd = [
@@ -34,5 +37,7 @@ const jsonLd = [
     tableId="copa-america"
     tableCaption="Copa América champions, 1916 to present"
     pdfSlug="copa-america"
+    podium={podium}
+    podiumHeading="Podium by edition"
   />
 </BaseLayout>

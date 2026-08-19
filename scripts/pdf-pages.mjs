@@ -65,6 +65,15 @@ const TIMELINE_COMPONENTS = [
   'src/components/References.astro',
 ];
 
+// Rendered into the actual PDF (generate-pdfs.mjs prints the live page under
+// print media, podium cards included, not a separate PDF-only layout) but
+// only opted into by the three team competitions with a genuine top-four
+// finish in their table (World Cup, Nations League, Copa América - not
+// EURO, see buildPodiums()'s own doc comment in src/lib/editions.ts), so
+// it's listed per-entry below rather than folded into the universal
+// TABLE_COMPONENTS.
+const PODIUM_COMPONENT = 'src/components/PodiumCards.astro';
+
 export const PDF_PAGES = [
   {
     slug: 'world-cup',
@@ -76,6 +85,7 @@ export const PDF_PAGES = [
       ...COMPETITION_LIB,
       'src/components/CompetitionView.astro',
       ...TABLE_COMPONENTS,
+      PODIUM_COMPONENT,
       'src/pages/competitions/world-cup.astro',
     ],
   },
@@ -101,6 +111,7 @@ export const PDF_PAGES = [
       ...COMPETITION_LIB,
       'src/components/CompetitionView.astro',
       ...TABLE_COMPONENTS,
+      PODIUM_COMPONENT,
       'src/pages/competitions/nations-league.astro',
     ],
   },
@@ -113,6 +124,7 @@ export const PDF_PAGES = [
       ...COMPETITION_LIB,
       'src/components/CompetitionView.astro',
       ...TABLE_COMPONENTS,
+      PODIUM_COMPONENT,
       'src/pages/competitions/copa-america.astro',
     ],
   },
@@ -180,6 +192,7 @@ export const PDF_PAGES = [
       SOURCES_MD,
       ...COMPETITION_LIB,
       ...TABLE_COMPONENTS,
+      PODIUM_COMPONENT,
       'src/pages/hr/competitions/world-cup.astro',
     ],
   },
@@ -203,6 +216,7 @@ export const PDF_PAGES = [
       SOURCES_MD,
       ...COMPETITION_LIB,
       ...TABLE_COMPONENTS,
+      PODIUM_COMPONENT,
       'src/pages/hr/competitions/nations-league.astro',
     ],
   },
@@ -214,6 +228,7 @@ export const PDF_PAGES = [
       SOURCES_MD,
       ...COMPETITION_LIB,
       ...TABLE_COMPONENTS,
+      PODIUM_COMPONENT,
       'src/pages/hr/competitions/copa-america.astro',
     ],
   },

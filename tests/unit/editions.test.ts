@@ -1066,6 +1066,37 @@ describe('buildPodiums', () => {
     const podium = buildPodiums(buildEditions(withPlaceholder));
     expect(podium[0].champion).toBe('Not awarded');
   });
+
+  it('reads fourth place from the World Cup\'s "Fourth / other semifinalist" header', () => {
+    const worldCupTable: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up', 'Third', 'Fourth / other semifinalist'],
+      rows: [['1930', 'Uruguay', 'Argentina', 'United States', 'Yugoslavia']],
+    };
+    const podium = buildPodiums(buildEditions(worldCupTable));
+    expect(podium[0].third).toBe('United States');
+    expect(podium[0].fourth).toBe('Yugoslavia');
+  });
+
+  it('does not match EURO\'s "Other semifinalist" columns as third/fourth', () => {
+    const euroTable: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up', 'Other semifinalist', 'Other semifinalist / fourth'],
+      rows: [['2020', 'Italy', 'England', 'Spain', 'Denmark']],
+    };
+    const podium = buildPodiums(buildEditions(euroTable));
+    expect(podium[0].third).toBeUndefined();
+    expect(podium[0].fourth).toBeUndefined();
+  });
+
+  it('treats a "—" placeholder third/fourth cell as absent, not a literal team name', () => {
+    const copaHomeAndAway: MarkdownTable = {
+      headers: ['Year', 'Champion', 'Runner-up', 'Third', 'Fourth'],
+      rows: [['1983', 'Uruguay', 'Brazil', '—', '—']],
+    };
+    const podium = buildPodiums(buildEditions(copaHomeAndAway));
+    expect(podium[0].runnerUp).toBe('Brazil');
+    expect(podium[0].third).toBeUndefined();
+    expect(podium[0].fourth).toBeUndefined();
+  });
 });
 
 describe('buildBiggestFinalMargins', () => {
