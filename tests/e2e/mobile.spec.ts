@@ -890,6 +890,22 @@ test.describe('Nations League page on a 360px phone', () => {
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
     await expect(page.getByText('Italy hosted the 2021 Finals')).toBeVisible();
   });
+
+  test('shows a compact podium card for every edition, top four finishers only', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Podium by edition' })).toBeVisible();
+    const cards = page.locator('.podium__card');
+    await expect(cards).toHaveCount(4);
+    // Most recent edition first (2024-25: Portugal beat Spain, France third, Germany fourth).
+    const latest = cards.first();
+    await expect(latest.getByText('2024–25')).toBeVisible();
+    await expect(latest.getByText('Hosted by Germany')).toBeVisible();
+    await expect(latest).toContainText('Portugal');
+    await expect(latest).toContainText('Spain');
+    await expect(latest).toContainText('France');
+    await expect(latest).toContainText('Germany');
+  });
 });
 
 test.describe('Croatian Nations League page (/hr/competitions/nations-league) on a 360px phone', () => {
@@ -949,6 +965,17 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
   test('shows the translated Memorable moments section', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
     await expect(page.getByText('Italija je 2021. bila domaćin Final Foura')).toBeVisible();
+  });
+
+  test('shows the translated podium cards, one per edition', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Pobjednici po izdanju' })).toBeVisible();
+    const cards = page.locator('.podium__card');
+    await expect(cards).toHaveCount(4);
+    const latest = cards.first();
+    await expect(latest.getByText('2024–25')).toBeVisible();
+    await expect(latest.getByText('Domaćin: Germany')).toBeVisible();
+    await expect(latest).toContainText('Portugal');
+    await expect(latest).toContainText('Spain');
   });
 
   test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({

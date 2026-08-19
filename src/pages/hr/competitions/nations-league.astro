@@ -12,11 +12,13 @@
 // the locale props already added for the Copa América slice.
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import TournamentTable from '../../../components/TournamentTable.astro';
+import PodiumCards from '../../../components/PodiumCards.astro';
 import ChampionsSummary from '../../../components/ChampionsSummary.astro';
 import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
+import { buildPodiums } from '../../../lib/editions';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
   buildChampionsItemList,
@@ -29,6 +31,8 @@ const data = await loadCompetition('uefa-nations-league', {
   editionsHeading: 'Finals',
   sourcesHeading: 'UEFA Nations League',
 });
+
+const podium = buildPodiums(data.editions);
 
 const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 
@@ -144,6 +148,17 @@ const headerLabels: Record<string, string> = {
       bitTeamPrefix="reprezentacija"
       emptyText="Nijedno izdanje ne odgovara odabranim filterima."
       clearFiltersLabel="Očisti filtere"
+    />
+
+    <PodiumCards
+      entries={podium}
+      id="nations-league-podium"
+      heading="Pobjednici po izdanju"
+      hostedByLabel="Domaćin:"
+      championLabel="Prvak"
+      runnerUpLabel="Drugoplasirani"
+      thirdLabel="Treći"
+      fourthLabel="Četvrti"
     />
 
     <ChampionsSummary

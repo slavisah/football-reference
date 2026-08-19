@@ -8558,6 +8558,88 @@ flag-emoji idea rejected, CSP's `'unsafe-inline'` not worth revisiting, the
 Golden Boot reverse-lookup quiz type not pursued, `public/downloads/`
 PDF-bloat documented/intentional).
 
+### New feature: "Podium by edition" compact cards on the UEFA Nations League page - added 2026-08-19 (later intensive run)
+
+With the "How it works" rollout closing the last content-parity gap earlier
+the same day, this run went back to a concrete, still-open feature request
+inside the editorial content itself: `content/uefa-nations-league.md`'s
+"Website idea" section asks for "a compact podium card for each edition" as
+well as the league-system explanation - the explanation half was satisfied
+by the "How it works" section, but the podium-card half was never built.
+Nations League ranks highest in this routine's competition priority order
+among anything with an open, named ask, and unlike a from-scratch feature
+this one is scoped by the source content itself: one card per edition
+showing only the top four finishers (champion, runner-up, third, fourth),
+explicitly *not* group-stage results, matching the note's "avoid
+overwhelming younger readers with every group-stage result" instruction.
+
+**New `buildPodiums()`** (`src/lib/editions.ts`) reduces editions to a
+`PodiumEntry` (`src/lib/types.ts`): year, host, champion, and runner-up/
+third/fourth read generically from the row's cells by column-label match
+(`/^third$/i`, `/^fourth$/i`, reusing the same `cellValue()` helper and
+"undefined when the column doesn't exist" convention `buildTimeline()`
+already established for runner-up/final) - so the function works for any
+competition whose table has "Third"/"Fourth" columns, not just Nations
+League, without new per-competition logic.
+
+**New `PodiumCards.astro`** component, styled after the existing
+`ChampionsTimeline.astro` card-grid (same `auto-fill`/`minmax` grid, same
+`--bg-elevated`/`--border`/`--radius` tokens) but medal-ranked: 🥇🥈🥉 plus a
+plain "4." for fourth, each decorative glyph `aria-hidden` with a
+`.visually-hidden` ordinal label ("Champion:", "Runner-up:", etc.) ahead of
+the name, the same accessible-decoration pattern `ChampionsSummary.astro`
+already uses for its trophy icon and count. All four label props are
+overridable, matching every other card component's localization mechanism.
+
+**Wiring:** rather than hardcode this into the shared `CompetitionView.astro`
+(used by all six English competition/award pages) or duplicate it, added an
+optional `podium`/`podiumHeading` prop to `CompetitionView.astro` - unset by
+default (every other competition page is unaffected), passed only from
+`src/pages/competitions/nations-league.astro` via
+`buildPodiums(data.editions)`. The hand-rolled
+`src/pages/hr/competitions/nations-league.astro` (which doesn't use
+`CompetitionView`, like every other Croatian competition page) renders
+`PodiumCards` directly with Croatian labels ("Pobjednici po izdanju",
+"Prvak", "Drugoplasirani", "Treći", "Četvrti", "Domaćin:") - country/team
+names themselves stay untranslated, matching every other translated page's
+"UI chrome only, not the underlying data" rule.
+
+**Tests:** 3 new Vitest cases in `tests/unit/editions.test.ts` (`buildPodiums`
+reads all four columns; falls back to `undefined` on tables without them;
+still shows a "Not awarded" placeholder champion verbatim). 2 new Playwright
+cases in `tests/e2e/mobile.spec.ts` (English and Croatian, one per page: the
+heading is visible, exactly 4 cards render, the latest edition's card shows
+the correct year/host/all four finishers). Full suite re-run: **508 passed**
+(up from 506, matching the 2 new cases; the existing English/Croatian
+print-styles and WCAG accessibility specs for `/competitions/nations-league`
+and `/hr/competitions/nations-league` also re-ran and confirmed no
+violations with the new cards present, in both light/dark and
+forced-colors modes) and **354 Vitest cases** (up from 351, matching the 3
+new cases). `pnpm lint`
+(`astro check`) - 0 errors/warnings/hints across 116 files (up from 115: the
+new `PodiumCards.astro`). `pnpm build` - 105 pages, unchanged.
+`check:links`/`check:sitemap`/`check:perf`/`check:precache` all clean
+against the rebuilt `dist/`. `pnpm build:pdfs` regenerated all 94 PDFs (the
+new function lives in `src/lib/editions.ts`, which every PDF's rendering
+path depends on, so the freshness checker correctly flagged all of them
+stale even though the podium cards themselves aren't rendered into the PDF
+layout - the PDF template is a separate, print-specific component tree that
+was not changed); `pnpm check:pdfs` confirms all 94 are fresh again.
+
+**Left for a future pass:** the podium cards render only on the English and
+Croatian Nations League pages. Extending the same `podium`/`podiumHeading`
+prop to the other three team competitions with "Third"/"Fourth" columns
+(World Cup, EURO, Copa América - Copa América's only for editions with a
+standalone third-place match, the same caveat `SEMIFINAL_COLUMN` in
+`src/lib/compare.ts` already documents) is a natural follow-up but was kept
+out of this run's scope, since the source content's "Website idea" note only
+asked for it on the Nations League page specifically. The standing
+candidates from prior runs are otherwise unchanged (source-link liveness
+infeasible, further content-accuracy spot-checks low-yield, the flag-emoji
+idea rejected, CSP's `'unsafe-inline'` not worth revisiting, the Golden Boot
+reverse-lookup quiz type not pursued, `public/downloads/` PDF-bloat
+documented/intentional).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

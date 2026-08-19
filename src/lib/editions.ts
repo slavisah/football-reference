@@ -1,4 +1,4 @@
-import type { ChampionSummary, Edition, MarkdownTable, TimelineEntry } from './types';
+import type { ChampionSummary, Edition, MarkdownTable, PodiumEntry, TimelineEntry } from './types';
 import { summaryGroupFor } from './countries';
 import type { Locale } from './i18n';
 
@@ -140,6 +140,28 @@ export function buildTimeline(editions: Edition[]): TimelineEntry[] {
     host: edition.host,
     runnerUp: cellValue(edition, /runner-up|finalist/i),
     final: cellValue(edition, /^final$/i),
+  }));
+}
+
+/**
+ * Reduce editions to compact podium cards: year, host, and the top four
+ * finishers (champion, runner-up, third, fourth). Third/fourth are omitted
+ * when the source table has no such column, the same "undefined when
+ * absent, not a placeholder" convention `buildTimeline` already uses for
+ * runner-up/final - a reader-facing "Podium by edition" widget for
+ * competitions whose table already tracks all four places (e.g. the UEFA
+ * Nations League Finals), deliberately excluding group-stage results so it
+ * stays compact, per `content/uefa-nations-league.md`'s "Website idea" note.
+ */
+export function buildPodiums(editions: Edition[]): PodiumEntry[] {
+  return editions.map((edition) => ({
+    year: edition.year,
+    yearSort: edition.yearSort,
+    champion: edition.winner,
+    host: edition.host,
+    runnerUp: cellValue(edition, /runner-up|finalist/i),
+    third: cellValue(edition, /^third$/i),
+    fourth: cellValue(edition, /^fourth$/i),
   }));
 }
 
