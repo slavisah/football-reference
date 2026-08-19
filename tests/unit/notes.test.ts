@@ -120,6 +120,67 @@ describe('extractSections', () => {
     const sections = extractSections(doc, ['Memorable moments']);
     expect(sections.some((s) => s.heading === 'Suggested child-friendly features')).toBe(false);
   });
+
+  it('places "How it works" first when a page puts it first in noteHeadings, matching the competition pages\' convention of a rules explainer ahead of historical notes', () => {
+    const howItWorksDoc = `# UEFA European Championship
+
+Intro paragraph.
+
+## How it works
+
+- The finals open with a group stage; the best-placed teams in each group move on.
+- A single loss ends a team's tournament from the quarterfinals onward.
+
+## Historical format note
+
+A third-place match was played through 1980.
+
+## Memorable moments
+
+- Antonín Panenka's famous chipped penalty decided the 1976 shoot-out.
+`;
+    const sections = extractSections(howItWorksDoc, [
+      'How it works',
+      'Historical format note',
+      'Memorable moments',
+    ]);
+    expect(sections.map((s) => s.heading)).toEqual([
+      'How it works',
+      'Historical format note',
+      'Memorable moments',
+    ]);
+    expect(sections[0].items).toHaveLength(2);
+  });
+
+  it('lets one shared "How it works" section be requested by only one of two loads against the same file, as golden-boot.astro does for its two tables', () => {
+    const sharedDoc = `# Golden Boot Winners
+
+Intro paragraph.
+
+## How it works
+
+- The Golden Boot goes to a tournament's top goalscorer.
+
+# FIFA World Cup top scorers
+
+## World Cup notes
+
+- Just Fontaine's 13 goals in 1958 remain the record.
+
+# UEFA EURO top scorers
+
+## EURO notes
+
+- Michel Platini scored nine goals in five matches in 1984.
+`;
+    const worldCupSections = extractSections(sharedDoc, ['How it works', 'World Cup notes']);
+    const euroSections = extractSections(sharedDoc, ['EURO notes']);
+    expect(worldCupSections.map((s) => s.heading)).toEqual(['How it works', 'World Cup notes']);
+    expect(euroSections.map((s) => s.heading)).toEqual(['EURO notes']);
+    // Merged the way golden-boot.astro merges them - "How it works" appears once.
+    const merged = [...worldCupSections, ...euroSections];
+    expect(merged.filter((s) => s.heading === 'How it works')).toHaveLength(1);
+  });
 });
 
 describe('renderInlineMarkdown', () => {

@@ -53,14 +53,23 @@ const jsonLd = [
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 
-// Hand-translated from content/uefa-euro.md's "Historical format note" (a
-// single paragraph, no bullets - same as the English page) and "Memorable
-// moments" sections, the same two headings the English page requests via
-// noteHeadings. content/ itself stays untouched and English (the single
+// Hand-translated from content/uefa-euro.md's "How it works", "Historical
+// format note" (a single paragraph, no bullets - same as the English page)
+// and "Memorable moments" sections, the same three headings the English page
+// requests via noteHeadings. content/ itself stays untouched and English (the single
 // editorial source of truth); this is presentation-layer text local to this
 // page only, the same way the earlier Croatian competition pages hand-write
 // their own Croatian prose.
 const notes: NoteSection[] = [
+  {
+    heading: 'Kako funkcionira',
+    items: [
+      'UEFA reprezentacije prolaze kvalifikacije kroz otprilike dvije godine skupnih utakmica prije završnice.',
+      'Završnica počinje skupnom fazom; najbolje plasirane momčadi iz svake skupine prolaze dalje.',
+      'Od četvrtfinala nadalje igra se izravni nokaut sustav: jedan poraz završava turnir za momčad.',
+      'Finale odlučuje prvaka; utakmica za treće mjesto nije se igrala od 1980. (pogledajte "Povijesnu napomenu o formatu" niže).',
+    ],
+  },
   {
     heading: 'Povijesna napomena o formatu',
     items: [

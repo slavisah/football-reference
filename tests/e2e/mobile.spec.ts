@@ -110,7 +110,9 @@ test.describe('World Cup page on a 360px phone', () => {
 
   test('shows the Memorable moments and Editorial notes sections from content/fifa-world-cup.md', async ({ page }) => {
     const notes = page.locator('.notes__card');
-    await expect(notes).toHaveCount(3);
+    await expect(notes).toHaveCount(4);
+    await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
+    await expect(page.getByText('The two semifinal winners meet in the final')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
     await expect(page.getByText('Croatia reached its first final in 2018.')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Editorial notes' })).toBeVisible();
@@ -192,6 +194,8 @@ test.describe('EURO page on a 360px phone', () => {
   });
 
   test('shows the Historical format note as a paragraph and Memorable moments as a list', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
+    await expect(page.getByText('no third-place match has been played since 1980')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Historical format note' })).toBeVisible();
     await expect(page.locator('.notes__card p', { hasText: 'other semifinalist' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
@@ -262,7 +266,9 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
   test('shows the translated Format milestones, Memorable moments and Editorial notes sections', async ({
     page,
   }) => {
-    await expect(page.locator('.notes__card')).toHaveCount(3);
+    await expect(page.locator('.notes__card')).toHaveCount(4);
+    await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
+    await expect(page.getByText('Pobjednici polufinala igraju finale')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Prekretnice formata' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Uredničke napomene' })).toBeVisible();
@@ -323,6 +329,8 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
   test('shows the Historical format note as a paragraph and Memorable moments as a translated list', async ({
     page,
   }) => {
+    await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
+    await expect(page.getByText('utakmica za treće mjesto nije se igrala od 1980')).toBeVisible();
     await expect(
       page.getByRole('heading', { name: 'Povijesna napomena o formatu' }),
     ).toBeVisible();
@@ -375,7 +383,9 @@ test.describe('Golden Boot page on a 360px phone', () => {
   });
 
   test('shows the World Cup notes and EURO notes sections, one per table', async ({ page }) => {
-    await expect(page.locator('.notes__card')).toHaveCount(2);
+    await expect(page.locator('.notes__card')).toHaveCount(3);
+    await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
+    await expect(page.getByText('it is a personal scoring award, not the team championship')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'World Cup notes' })).toBeVisible();
     await expect(page.getByText("Just Fontaine's 13 goals in 1958 remain the record")).toBeVisible();
     await expect(page.getByRole('heading', { name: 'EURO notes' })).toBeVisible();
@@ -480,7 +490,11 @@ test.describe('Croatian Golden Boot page (/hr/competitions/golden-boot) on a 360
   test('shows the translated World Cup notes and EURO notes sections, one per table', async ({
     page,
   }) => {
-    await expect(page.locator('.notes__card')).toHaveCount(2);
+    await expect(page.locator('.notes__card')).toHaveCount(3);
+    await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
+    await expect(
+      page.getByText('riječ je o osobnoj nagradi za golove, a ne o momčadskom naslovu prvaka'),
+    ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Napomene o Svjetskom prvenstvu' })).toBeVisible();
     await expect(page.getByText('13 golova Justa Fontainea 1958. ostaje rekord')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Napomene o EURU' })).toBeVisible();
@@ -577,6 +591,13 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
     await expect(page.locator('.champions')).not.toContainText('Not awarded');
   });
 
+  test('shows the How it works section from content/ballon-dor.md', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
+    await expect(
+      page.getByText('it is not a team competition or a national-team trophy'),
+    ).toBeVisible();
+  });
+
   test("the language switcher opens the Croatian Ballon d'Or page", async ({ page }) => {
     await page.goto('competitions/ballon-dor');
     await page.locator('a.lang-switch').click();
@@ -641,6 +662,13 @@ test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360p
     await expect(page.getByText('Lev Jašin ostaje jedini vratar')).toBeVisible();
   });
 
+  test('shows the translated How it works section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
+    await expect(
+      page.getByText('nije riječ o momčadskom natjecanju ni nagradi za reprezentaciju'),
+    ).toBeVisible();
+  });
+
   test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
     page,
     request,
@@ -672,6 +700,13 @@ test.describe('Copa América page on a 360px phone', () => {
       return el.scrollWidth - el.clientWidth;
     });
     expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('shows the How it works section from content/copa-america.md', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
+    await expect(
+      page.getByText('has not always run on a fixed four-year cycle'),
+    ).toBeVisible();
   });
 
   test('shows an audited "Format" badge per edition', async ({ page }) => {
@@ -800,6 +835,13 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await expect(page.getByText('Bolivija je osvojila svoju jedinu titulu')).toBeVisible();
   });
 
+  test('shows the translated How it works section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
+    await expect(
+      page.getByText('nije uvijek imala fiksni četverogodišnji ciklus'),
+    ).toBeVisible();
+  });
+
   test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
     page,
     request,
@@ -842,6 +884,8 @@ test.describe('Nations League page on a 360px phone', () => {
   test('shows the Key facts and Memorable moments sections from content/uefa-nations-league.md', async ({
     page,
   }) => {
+    await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
+    await expect(page.getByText('Held every two years.')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Key facts' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
     await expect(page.getByText('Italy hosted the 2021 Finals')).toBeVisible();
@@ -895,6 +939,11 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
   test('shows the translated Key facts section', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Ključne činjenice' })).toBeVisible();
     await expect(page.getByText('Hrvatska je 2023. stigla do svog prvog finala')).toBeVisible();
+  });
+
+  test('shows the translated How it works section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
+    await expect(page.getByText('Igra se svake dvije godine.')).toBeVisible();
   });
 
   test('shows the translated Memorable moments section', async ({ page }) => {

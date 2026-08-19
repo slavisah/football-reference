@@ -43,12 +43,21 @@ const jsonLd = [
   buildLatestEditionSportsEvent(data.editions, data.title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 
-// Hand-translated from content/copa-america.md's "Memorable moments" section.
+// Hand-translated from content/copa-america.md's "How it works" and
+// "Memorable moments" sections.
 // content/ itself stays untouched and English (the single editorial source of
 // truth); this is presentation-layer text local to this page only, the same
 // way hr/records.astro hand-writes its own Croatian prose rather than
 // generating it from an English source at build time.
 const notes: NoteSection[] = [
+  {
+    heading: 'Kako funkcionira',
+    items: [
+      'Deset južnoameričkih reprezentacija članica CONMEBOL-a natječe se jedna protiv druge, a od 1993. povremeno im se pridružuju i pozvane gostujuće momčadi izvan regije.',
+      'Format natjecanja mijenjao se više nego kod ijednog drugog natjecanja na ovoj stranici: neka rana izdanja prvaka su određivala konačnim poretkom lige, druga dvomečem kod kuće i u gostima, a većina izdanja od 1990-ih skupnom fazom nakon koje slijedi nokaut sustav.',
+      'Copa América, za razliku od Svjetskog prvenstva ili EURA, nije uvijek imala fiksni četverogodišnji ciklus.',
+    ],
+  },
   {
     heading: 'Nezaboravni trenuci',
     items: [
