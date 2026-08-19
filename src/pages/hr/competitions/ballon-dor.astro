@@ -42,12 +42,22 @@ const jsonLd = [
   buildChampionsItemList(data.champions, { pageUrl, name: `${title} - najviše nagrada` }),
 ];
 
-// Hand-translated from content/ballon-dor.md's "Notes" section. content/
+// Hand-translated from content/ballon-dor.md's "How it works" and "Notes"
+// sections. content/
 // itself stays untouched and English (the single editorial source of truth);
 // this is presentation-layer text local to this page only, the same way
 // hr/competitions/copa-america.astro and hr/competitions/nations-league.astro
 // hand-write their own Croatian prose.
 const notes: NoteSection[] = [
+  {
+    heading: 'Kako funkcionira',
+    items: [
+      'Zlatna lopta nagrađuje najboljeg pojedinačnog muškog igrača godine - nije riječ o momčadskom natjecanju ni nagradi za reprezentaciju.',
+      'Skupina novinara, po jedan iz svake zemlje s pravom glasa, rangira svoje najbolje igrače; glasovi se zbrajaju u konačni poredak.',
+      'Uvjeti prihvatljivosti proširivali su se tijekom vremena: isprva samo Europljani, zatim od 1995. igrači bilo koje nacionalnosti u europskim klubovima, a od 2007. nagrada je potpuno globalna (pogledajte uvod iznad).',
+      'Pobjednik se objavljuje na svečanosti krajem godine koju organizira magazin France Football.',
+    ],
+  },
   {
     heading: 'Napomene',
     items: [

@@ -13,6 +13,13 @@ status: verified
 
 The European Championship began in 1960 as the European Nations' Cup. Early final tournaments had only four teams. The modern EURO expanded to eight teams in 1980, sixteen in 1996, and twenty-four in 2016.
 
+## How it works
+
+- UEFA national teams qualify over roughly two years of group matches before the finals.
+- The finals open with a group stage; the best-placed teams in each group move on.
+- From the quarterfinals onward it is a straight knockout: a single loss ends a team's tournament.
+- The final decides the champion; no third-place match has been played since 1980 (see "Historical format note" below).
+
 ## Editions
 
 | Year | Host(s) | Teams | Winner | Runner-up | Other semifinalist | Other semifinalist / fourth | Final | Final date |

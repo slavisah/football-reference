@@ -53,13 +53,23 @@ const jsonLd = [
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 
-// Hand-translated from content/fifa-world-cup.md's "Format milestones",
-// "Memorable moments" and "Editorial notes" sections (the same three
-// headings the English page requests via noteHeadings). content/ itself
+// Hand-translated from content/fifa-world-cup.md's "How it works", "Format
+// milestones", "Memorable moments" and "Editorial notes" sections (the same
+// four headings the English page requests via noteHeadings). content/ itself
 // stays untouched and English (the single editorial source of truth); this
 // is presentation-layer text local to this page only, the same way the three
 // earlier Croatian competition pages hand-write their own Croatian prose.
 const notes: NoteSection[] = [
+  {
+    heading: 'Kako funkcionira',
+    items: [
+      'Reprezentacije najprije godinama igraju kvalifikacijske utakmice unutar svoje konfederacije kako bi osvojile jedno od ograničenog broja mjesta na završnici.',
+      'Završnica počinje skupnom fazom, u kojoj svaka momčad igra protiv ostalih u svojoj skupini; najbolje plasirane momčadi napreduju.',
+      'Od osmine finala nadalje igra se izravni nokaut sustav: jedan poraz i momčad ispada.',
+      'Pobjednici polufinala igraju finale koje odlučuje prvaka.',
+      'Turnir se od 1930. nekoliko puta proširio - pogledajte "Prekretnice formata" niže za točne godine.',
+    ],
+  },
   {
     heading: 'Prekretnice formata',
     items: [

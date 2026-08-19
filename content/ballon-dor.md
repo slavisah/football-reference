@@ -12,6 +12,13 @@ status: verified
 
 France Football created the Ballon d'Or in 1956. Eligibility rules changed over time: the award was initially limited to European players, opened to players of any nationality at European clubs in 1995, and became fully global in 2007. From 2010 through 2015 it was presented jointly with FIFA.
 
+## How it works
+
+- The Ballon d'Or honors the best individual men's player of the year - it is not a team competition or a national-team trophy.
+- A panel of football journalists, one from each eligible country, ranks their top players; the votes are combined into one final ranking.
+- Eligibility has widened over time: Europe-only at first, then any nationality at a European club from 1995, then fully global since 2007 (see the introduction above).
+- The winner is announced at an end-of-year ceremony organized by France Football magazine.
+
 ## Winners
 
 | Year | Winner | National team | Ceremony date |

@@ -13,6 +13,13 @@ status: verified
 
 UEFA introduced the Nations League to replace many international friendlies with competitive league matches. The highest-ranked teams compete for a place in the Nations League Finals.
 
+## How it works
+
+- Every UEFA national team is placed into one of four leagues (A to D) by strength, then split into small groups within its league.
+- Teams play each other in their group; results promote the best teams to a higher league and relegate the weakest to a lower one, alongside separate World Cup/EURO qualifying.
+- The four League A group winners advance to the Nations League Finals: two semifinals, a third-place match, and a final, all hosted by one of the four finalists.
+- Held every two years.
+
 ## Finals
 
 | Season | Finals host | Winner | Runner-up | Third | Fourth | Final | Final date |

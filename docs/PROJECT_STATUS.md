@@ -8479,6 +8479,85 @@ coverage across all three accessibility specs. The `public/downloads/`
 PDF-bloat note still stands (documented/intentional, not an overlooked
 bug).
 
+### New feature: "How it works" plain-language rules explainer on all six competition/award pages - added 2026-08-19 (intensive run)
+
+With every standing "Left for a future pass" candidate from recent runs
+either infeasible (source-link liveness) or explicitly low-yield/rejected
+(further content-accuracy spot-checks, the flag-emoji idea, CSP's
+`'unsafe-inline'` tightening, the Golden Boot reverse-lookup quiz type,
+PDF bloat), this run went looking for a genuinely new gap rather than
+re-treading those. It found one the site's own content had already asked
+for: `content/uefa-nations-league.md`'s "Website idea" section (never fully
+acted on) explicitly requested "a separate explanation of the league
+system," and `content/fifa-world-cup.md`'s "Suggested child-friendly
+features" list gestures at the same need. More broadly, despite the depth
+of historical-trivia notes on every competition page (`Format milestones`,
+`Historical format note`, `Key facts`, `Memorable moments`, `Editorial
+notes`), none of the six competition/award pages ever explained *how the
+tournament or award actually works* in plain language - qualification,
+group stage, knockout, promotion/relegation, voting - which is a real gap
+against `AGENTS.md`'s "family-friendly football-history website" mission
+and its "Recommended first milestone" list.
+
+Added a new `## How it works` section (3-5 short, plain-language bullets) to
+all six `content/*.md` files - FIFA World Cup, UEFA EURO, Copa América, UEFA
+Nations League, Ballon d'Or, and Golden Boot - covering qualification, the
+group-to-knockout shape, Nations League's league/promotion system, Copa
+América's format history (already summarized for editors in "Important
+editorial warning" but never simplified for readers), and the Ballon
+d'Or/Golden Boot's very different "individual award, not a team trophy"
+shape. Every bullet that cross-references another section was checked
+against that page's actual `noteHeadings` (or hr `notes` array) so it only
+points at content the page truly renders below it - e.g. Copa América's
+"How it works" deliberately does *not* point at "Important editorial
+warning," since that heading is editorial audit trail never exposed via
+`noteHeadings` on either language's page.
+
+Wired into the six English pages via the existing `noteHeadings` parameter
+to `loadCompetition()` (`src/pages/competitions/*.astro`), placed first in
+each array so the rules explainer renders ahead of the historical notes -
+the same "generic, ordered, requested-heading" mechanism every other note
+section already uses, no library changes needed beyond that. Golden Boot's
+two-table page requests it only once (on the World Cup-scorers load, not
+the EURO one) so the merged `[...worldCup.notes, ...euro.notes]` shows it a
+single time, not duplicated per table - covered by a new unit test.
+Hand-translated into all six `src/pages/hr/competitions/*.astro` pages'
+existing `notes: NoteSection[]` arrays as "Kako funkcionira," matching the
+translation `quiz.astro`/`hr/quiz.astro` already established for their own
+unrelated "How it works" section. `EditorialNotes.astro`'s `iconFor()`
+gained a new case (`ℹ️`) for "How it works"/"Kako funkcionira" headings,
+alongside the existing 🎉 moments case and 📝 default.
+
+**Tests:** 2 new Vitest cases in `tests/unit/notes.test.ts` (ordering when
+"How it works" is requested first; the Golden Boot one-load/one-render
+sharing pattern). 5 new Playwright cases in `tests/e2e/mobile.spec.ts`
+(Copa América English/Croatian, Nations League Croatian, Ballon d'Or
+English/Croatian - each page not already asserting a `.notes__card` count),
+plus every existing note-count assertion and cross-heading check updated in
+place for the six pages that gained a section (World Cup and Golden Boot
+English/Croatian counts bumped from 3/2 to 4/3; EURO, Nations League and
+Ballon d'Or English pages, which had no count assertion, gained a targeted
+heading + text check instead). Full suite re-run: **506 passed** (up from
+501, matching the 5 new cases) and **348 Vitest cases** (up from 346,
+matching the 2 new cases). `pnpm lint` (`astro check`) - 0
+errors/warnings/hints across 115 files. `pnpm build` - 105 pages, unchanged.
+`check:links`/`check:sitemap`/`check:perf`/`check:precache` all clean
+against the rebuilt `dist/`. `pnpm build:pdfs` regenerated all 94 PDFs (the
+new section is inside `TABLE_COMPONENTS`/`content/*.md`, both already
+tracked as PDF sources in `scripts/pdf-pages.mjs`, so every competition PDF
+*and* all 80 team PDFs - which join in the four team-competition content
+files - correctly went stale and were regenerated); `pnpm check:pdfs`
+confirms all 94 are fresh again.
+
+**Left for a future pass:** the Nations League "Website idea" section this
+run partially closed still asks for "a compact podium card for each
+edition" - a bigger UI feature, out of scope here, and not pursued. The
+standing candidates from prior runs are otherwise unchanged (source-link
+liveness infeasible, further content-accuracy spot-checks low-yield, the
+flag-emoji idea rejected, CSP's `'unsafe-inline'` not worth revisiting, the
+Golden Boot reverse-lookup quiz type not pursued, `public/downloads/`
+PDF-bloat documented/intentional).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

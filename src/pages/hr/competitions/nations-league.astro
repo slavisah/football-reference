@@ -43,12 +43,21 @@ const jsonLd = [
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 
-// Hand-translated from content/uefa-nations-league.md's "Key facts" and
-// "Memorable moments" sections.
+// Hand-translated from content/uefa-nations-league.md's "How it works", "Key
+// facts" and "Memorable moments" sections.
 // content/ itself stays untouched and English (the single editorial source of
 // truth); this is presentation-layer text local to this page only, the same
 // way hr/competitions/copa-america.astro hand-writes its own Croatian prose.
 const notes: NoteSection[] = [
+  {
+    heading: 'Kako funkcionira',
+    items: [
+      'Svaka UEFA reprezentacija razvrstana je u jednu od četiri lige (A do D) prema jačini, a zatim podijeljena u male skupine unutar svoje lige.',
+      'Momčadi igraju jedna protiv druge u svojoj skupini; rezultati vode do napredovanja najboljih u višu ligu i ispadanja najslabijih u nižu, usporedno s odvojenim kvalifikacijama za Svjetsko prvenstvo/EURO.',
+      'Četiri pobjednika skupina Lige A napreduju na Final Four Lige nacija: dva polufinala, utakmica za treće mjesto i finale, sve na terenu jednog od četiri finalista.',
+      'Igra se svake dvije godine.',
+    ],
+  },
   {
     heading: 'Ključne činjenice',
     items: [
