@@ -8835,6 +8835,97 @@ host/runner-up question types) and "Display a map of host countries" (would
 need either a real SVG world map or new editorial geo-data, a bigger scope
 than this run) - were not pursued this run.
 
+### New feature: "Display a map of host countries" - a World Cup host locator map - added 2026-08-19 (intensive run)
+
+The last unaddressed item from `content/fifa-world-cup.md`'s "Suggested
+child-friendly features" list - every prior intensive run that reached this
+note deferred it as "would need either a real SVG world map or new
+editorial geo-data, a bigger scope than this run" (most recently the
+2026-08-19 "Tap a year" entry above). This run closed it without either: no
+coastline/border data is drawn (none of this repository's editorial content
+has ever included any, and hand-authoring it from memory risked shipping
+something quietly wrong with no human review before merge, the same
+"unattended run" caution that shelved the flag-emoji idea back on
+2026-08-15) - instead each host's well-known capital-city coordinate is
+plotted on a plain latitude/longitude grid.
+
+**Data:** new `src/lib/hostCoordinates.ts` - `WORLD_CUP_HOST_COORDINATES`,
+one `{lat, lon, region}` entry per each of the World Cup table's 19 distinct
+`Host(s)` values (matching the exact atomic strings `buildHostsSummary()`
+already groups co-hosted editions under, e.g. "South Korea and Japan",
+"Canada, Mexico and United States" stay single entries, not split). West
+Germany (1974) and Germany (2006) deliberately get distinct points (Bonn vs.
+a central-Germany point) so the two eras don't collapse onto one marker on
+the map the way their title totals already do elsewhere by editorial choice.
+
+**Library:** new `buildHostMapPoints(editions, coordinates, regionOrder?)` in
+`src/lib/editions.ts`, joining `buildHostsSummary()`'s grouped hosting totals
+onto that coordinate table. Throws on any host with no coordinate entry
+rather than silently omitting it - the same "don't let a real gap render as
+if everything is covered" reasoning `scripts/pdf-pages.mjs`'s header comment
+documents for PDF freshness, so a real future edition (e.g. 2030) fails the
+build loudly instead of quietly missing its marker. Sorted by region then
+earliest hosting year, so the map's list reads as a geographic story rather
+than a titles-ranked one (`buildHostsSummary()` already covers that ranking
+on `/records`).
+
+**Component:** new `HostMap.astro` - a plain equirectangular (Plate Carrée)
+projection, `viewBox` cropped tightly to the actual marker spread (not the
+whole globe) with a light latitude/longitude graticule and equator line for
+orientation, dots sized by times-hosted. The SVG is `aria-hidden` on
+purpose: every fact it carries - host, hosting years, times hosted, region -
+is duplicated in an always-visible list underneath, grouped by region, the
+same "chart plus real text" pairing `ChampionsSummary.astro` already uses
+for title counts. That split sidesteps forced-colors/print/screen-reader
+SVG-graphics accessibility entirely (confirmed by the full
+`accessibility.spec.ts`/`accessibility-forced-colors.spec.ts`/
+`print-styles.spec.ts` sweeps, which cover `/competitions/world-cup` and
+`/hr/competitions/world-cup`, all still zero violations) rather than trying
+to make the decorative graphic itself fully accessible. Colors use the
+existing `--accent`/`--border`/`--bg-subtle` tokens, so dark mode, forced-
+colors and print media all repaint it automatically with no dedicated rules.
+
+**Wiring:** World Cup only, matching the content brief's own scope and the
+precedent PodiumCards set (shipped on one page before a later run extended
+it - this run left that extension undone; see below). `CompetitionView.astro`
+gained an optional `hostMap` prop, rendered after `ChampionsSummary`;
+`src/pages/competitions/world-cup.astro` passes it, the other five English
+competition/award pages don't. The Croatian page (hand-composed, not using
+`CompetitionView`) imports `HostMap.astro` directly with hand-translated
+heading/description/unit/region-label props; country names themselves stay
+untranslated, the same choice every other table/card on that page already
+makes.
+
+**Tests:** 5 new Vitest cases (`buildHostMapPoints`: region/year sort order
+using the shared `table` fixture, the no-`regionOrder` default, the
+throw-on-missing-coordinate guard, every coordinate's region appearing in
+`HOST_REGION_ORDER`, and the "exactly 19 distinct hosts" count staying in
+sync with `content/fifa-world-cup.md`). 2 new Playwright cases (English: the
+map is decorative, 19 dots, all 5 region headings, Brazil's "2 times"/"1950,
+2014"; Croatian: translated region headings, "2 puta", untranslated country
+names). `scripts/pdf-pages.mjs` gained `HOST_MAP_COMPONENT`/`HOST_MAP_DATA`
+entries on the `world-cup`/`world-cup-hr` PDF sources, the same per-page
+pattern `PODIUM_COMPONENT` already follows.
+
+Full suite: **519 Playwright passed** (up from 517), **365 Vitest passed**
+(up from 360). `pnpm lint`/`pnpm build`/`check:links`/`check:sitemap`/
+`check:perf`/`check:precache` all clean. All 94 downloadable PDFs
+regenerated and fresh (`check:pdfs` confirms) - editing `src/lib/editions.ts`
+(shared by `COMPETITION_LIB`) makes every PDF's manifest entry stale, the
+same all-PDFs-regenerate side effect the Golden Boot bug-fix entry
+(2026-08-17) already documented for that file.
+
+**Left for a future pass:** the World Cup page's "Suggested child-friendly
+features" list is now fully closed. Extending the host map to Nations
+League, Copa América and EURO (their content files have no matching
+request for one, unlike the podium cards' precedent) wasn't pursued - the
+standing candidates from prior runs are otherwise unchanged (source-link
+liveness infeasible, further content-accuracy spot-checks low-yield, the
+flag-emoji idea rejected, CSP's `'unsafe-inline'` not worth revisiting, the
+Golden Boot reverse-lookup quiz type not pursued, `public/downloads/`
+PDF-bloat documented/intentional, EURO podium cards structurally not
+possible).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

@@ -66,3 +66,14 @@ export type PodiumEntry = {
   /** Fourth-place finisher, if the table has a "Fourth" column. */
   fourth?: string;
 };
+
+/** One distinct host, positioned for HostMap.astro's schematic locator map. */
+export type HostMapPoint = {
+  host: string;
+  titles: number;
+  /** Hosting years in chronological order. */
+  years: string[];
+  lat: number;
+  lon: number;
+  region: string;
+};

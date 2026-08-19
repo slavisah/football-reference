@@ -4,6 +4,7 @@ import {
   buildChampionsSummary,
   buildEditions,
   buildHomeSoilTitles,
+  buildHostMapPoints,
   buildHostsSummary,
   buildLongestStreaks,
   buildLongestTitleGaps,
@@ -19,6 +20,7 @@ import {
   editionTeams,
   isPlaceholderWinner,
 } from '../../src/lib/editions';
+import { HOST_REGION_ORDER, WORLD_CUP_HOST_COORDINATES } from '../../src/lib/hostCoordinates';
 import type { MarkdownTable } from '../../src/lib/types';
 
 const table: MarkdownTable = {
@@ -287,6 +289,54 @@ describe('buildHostsSummary', () => {
       rows: [['1958', 'Just Fontaine', 'France', '13']],
     };
     expect(buildHostsSummary(buildEditions(scorersTable))).toEqual([]);
+  });
+});
+
+describe('buildHostMapPoints', () => {
+  it('joins buildHostsSummary totals onto their coordinate, sorted by region order then earliest hosting year', () => {
+    const points = buildHostMapPoints(buildEditions(table), WORLD_CUP_HOST_COORDINATES, HOST_REGION_ORDER);
+    // The shared `table` fixture hosts, in South America / Europe (by year) /
+    // North America / Africa order - `HOST_REGION_ORDER` has no Asia entry
+    // here since the fixture never hosts one.
+    expect(points.map((p) => p.host)).toEqual([
+      'Brazil',
+      'Switzerland',
+      'West Germany',
+      'Canada, Mexico and United States',
+      'South Africa',
+    ]);
+    expect(points.find((p) => p.host === 'Brazil')).toMatchObject({
+      titles: 1,
+      years: ['2014'],
+      lat: -15.8,
+      lon: -47.9,
+      region: 'South America',
+    });
+  });
+
+  it('defaults to buildHostsSummary\'s own order when no regionOrder is given', () => {
+    const points = buildHostMapPoints(buildEditions(table), WORLD_CUP_HOST_COORDINATES);
+    expect(points).toHaveLength(5);
+  });
+
+  it('throws for a host with no matching coordinate, instead of silently omitting it from the map', () => {
+    const unmappedTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [['2034', 'Atlantis', 'Atlantis']],
+    };
+    expect(() => buildHostMapPoints(buildEditions(unmappedTable), WORLD_CUP_HOST_COORDINATES)).toThrow(
+      /no coordinate for host "Atlantis"/,
+    );
+  });
+
+  it('gives every coordinate table entry a region listed in HOST_REGION_ORDER', () => {
+    for (const coordinate of Object.values(WORLD_CUP_HOST_COORDINATES)) {
+      expect(HOST_REGION_ORDER).toContain(coordinate.region);
+    }
+  });
+
+  it('has exactly one coordinate per distinct World Cup host, matching content/fifa-world-cup.md\'s 19 unique Host(s) values', () => {
+    expect(Object.keys(WORLD_CUP_HOST_COORDINATES)).toHaveLength(19);
   });
 });
 

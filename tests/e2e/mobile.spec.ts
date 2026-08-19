@@ -206,6 +206,29 @@ test.describe('World Cup page on a 360px phone', () => {
     const noStoryCell = page.locator('tbody tr[data-year="2014"] td[data-label="Story"]');
     await expect(noStoryCell).toHaveText('—');
   });
+
+  test('shows a host locator map grouped by region, with every host and its hosting years', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Where the tournament has been hosted' })).toBeVisible();
+    // Decorative - the real, accessible content is the region list below it.
+    await expect(page.locator('.host-map__svg')).toHaveAttribute('aria-hidden', 'true');
+    await expect(page.locator('.host-map__dot')).toHaveCount(19);
+
+    const regions = page.locator('.host-map__region');
+    await expect(regions).toHaveCount(5);
+    await expect(page.getByRole('heading', { name: 'South America', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Europe', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'North America', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Asia', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Africa', level: 4 })).toBeVisible();
+
+    // Brazil hosted twice, in South America.
+    const brazil = page.locator('.host-map__item', { hasText: 'Brazil' });
+    await expect(brazil.locator('.host-map__count')).toHaveText('2 times');
+    await expect(brazil.locator('.host-map__years')).toContainText('1950, 2014');
+
+    // The 2026 co-host cell is kept as one combined entry, matching the table's own host filter.
+    await expect(page.locator('.host-map__item', { hasText: 'Canada, Mexico and United States' })).toBeVisible();
+  });
 });
 
 test.describe('EURO page on a 360px phone', () => {
@@ -349,6 +372,23 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     await expect(latest.getByText('Domaćin: Canada, Mexico and United States')).toBeVisible();
     await expect(latest).toContainText('Spain');
     await expect(latest).toContainText('Argentina');
+  });
+
+  test('shows the translated host map with Croatian region headings and the same 19 hosts as the English page', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Gdje je Svjetsko prvenstvo igralo domaćinu' })).toBeVisible();
+    await expect(page.locator('.host-map__dot')).toHaveCount(19);
+    await expect(page.getByRole('heading', { name: 'Južna Amerika', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Europa', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Sjeverna Amerika', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Azija', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Afrika', level: 4 })).toBeVisible();
+
+    // Country names themselves stay untranslated, matching every other table/card on this page.
+    const brazil = page.locator('.host-map__item', { hasText: 'Brazil' });
+    await expect(brazil.locator('.host-map__count')).toHaveText('2 puta');
+    await expect(page.locator('.host-map__item', { hasText: 'Urugvaj' })).toHaveCount(0);
   });
 });
 

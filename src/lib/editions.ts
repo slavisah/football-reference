@@ -1,6 +1,7 @@
-import type { ChampionSummary, Edition, MarkdownTable, PodiumEntry, TimelineEntry } from './types';
+import type { ChampionSummary, Edition, HostMapPoint, MarkdownTable, PodiumEntry, TimelineEntry } from './types';
 import { summaryGroupFor } from './countries';
 import type { Locale } from './i18n';
+import type { HostCoordinate } from './hostCoordinates';
 
 // Turn a parsed Markdown table into normalized editions, and derive the
 // champions summary from those editions (rather than trusting a hand-maintained
@@ -412,6 +413,54 @@ export function buildHostsSummary(editions: Edition[]): ChampionSummary[] {
         leadingYear(a.years[0]) - leadingYear(b.years[0]) ||
         a.displayName.localeCompare(b.displayName),
     );
+}
+
+/**
+ * Join `buildHostsSummary()`'s grouped hosting totals onto a fixed
+ * coordinate table, for HostMap.astro's schematic locator map. Deliberately
+ * throws on any host with no entry in `coordinates` rather than silently
+ * dropping it - the same "don't let a real gap render as if everything is
+ * covered" reasoning `scripts/pdf-pages.mjs`'s own header comment documents
+ * for PDF freshness, applied here so a newly-added future host (e.g. a real
+ * 2030 edition) fails the build loudly instead of quietly missing its
+ * marker. Sorted by region (`regionOrder`, falling back to appearance order
+ * for an unlisted region) then by first-hosted year, so the map's paired
+ * text list reads as a simple geographic story rather than a titles-ranked
+ * list (`buildHostsSummary()` already covers that ranking on /records).
+ */
+export function buildHostMapPoints(
+  editions: Edition[],
+  coordinates: Record<string, HostCoordinate>,
+  regionOrder: string[] = [],
+): HostMapPoint[] {
+  const points = buildHostsSummary(editions).map((summary) => {
+    const coordinate = coordinates[summary.displayName];
+    if (!coordinate) {
+      throw new Error(
+        `buildHostMapPoints: no coordinate for host "${summary.displayName}" - add one to WORLD_CUP_HOST_COORDINATES.`,
+      );
+    }
+    return {
+      host: summary.displayName,
+      titles: summary.titles,
+      years: summary.years,
+      lat: coordinate.lat,
+      lon: coordinate.lon,
+      region: coordinate.region,
+    };
+  });
+
+  const regionRank = (region: string) => {
+    const index = regionOrder.indexOf(region);
+    return index === -1 ? regionOrder.length : index;
+  };
+
+  return points.sort(
+    (a, b) =>
+      regionRank(a.region) - regionRank(b.region) ||
+      leadingYear(a.years[0]) - leadingYear(b.years[0]) ||
+      a.host.localeCompare(b.host),
+  );
 }
 
 /**
