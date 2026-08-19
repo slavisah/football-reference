@@ -386,6 +386,14 @@ main {
     display: block !important;
   }
 
+  /* Same reasoning as the quiz reveal above: a table's "tap a year to reveal
+     a short story" <details> must read as plain text on paper, since print
+     can't reflect its open/closed state. */
+  .story-reveal::details-content {
+    content-visibility: visible !important;
+    display: block !important;
+  }
+
   .references a::after {
     content: ' (' attr(href) ')';
     font-size: 9pt;

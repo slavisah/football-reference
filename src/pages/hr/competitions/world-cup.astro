@@ -19,7 +19,7 @@ import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
-import { buildTopScorerFacts, buildPodiums } from '../../../lib/editions';
+import { buildTopScorerFacts, buildPodiums, buildYearStories } from '../../../lib/editions';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
   buildChampionsItemList,
@@ -103,6 +103,15 @@ const notes: NoteSection[] = [
   },
 ];
 
+// "Dodirni godinu za priču": joins the Croatian Memorable-moments bullets
+// above onto the matching edition row by year, same as the English page's
+// CompetitionView does with the English bullets - see buildYearStories() in
+// src/lib/editions.ts.
+const stories = buildYearStories(
+  data.editions,
+  notes.find((section) => section.heading === 'Nezaboravni trenuci')?.items ?? [],
+);
+
 const headerLabels: Record<string, string> = {
   Year: 'Godina',
   'Host(s)': 'Domaćin(i)',
@@ -170,6 +179,8 @@ const headerLabels: Record<string, string> = {
       bitTeamPrefix="reprezentacija"
       emptyText="Nijedno izdanje ne odgovara odabranim filterima."
       clearFiltersLabel="Očisti filtere"
+      storyColumn={stories.size > 0 ? { label: 'Priča', values: stories } : undefined}
+      storySummaryLabel="📖 Dodirni za priču"
     />
 
     <PodiumCards

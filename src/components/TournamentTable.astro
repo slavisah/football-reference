@@ -2,6 +2,7 @@
 import type { Edition, MarkdownTable } from '../lib/types';
 import { buildSortOptions, defaultSortValue } from '../lib/tableSort';
 import { editionTeams } from '../lib/editions';
+import { renderInlineMarkdown } from '../lib/notes';
 import type { Locale } from '../lib/i18n';
 
 interface Props {
@@ -28,6 +29,15 @@ interface Props {
    * show an em dash rather than hiding the column.
    */
   extraColumn?: { label: string; values: Map<string, string> };
+  /**
+   * An optional "tap a year to reveal a short story" column, joined in by
+   * edition year like `extraColumn` - but rendered as a native
+   * `<details>`/`<summary>` disclosure rather than plain text, since a story
+   * is a full sentence rather than a short fact. Editions with no story show
+   * an em dash. See `buildYearStories()` in src/lib/editions.ts.
+   */
+  storyColumn?: { label: string; values: Map<string, string> };
+  storySummaryLabel?: string;
   /**
    * Overridable for localized pages; every default below matches the original
    * English copy, so existing call sites render byte-identical output.
@@ -78,6 +88,8 @@ const {
   teams = [],
   winnerLabel = 'Winner',
   extraColumn,
+  storyColumn,
+  storySummaryLabel = '📖 Tap to read the story',
   paramPrefix = '',
   locale = 'en',
   headerLabels = {},
@@ -212,6 +224,7 @@ const defaultSort = defaultSortValue(sortOptions);
         <tr>
           {table.headers.map((header) => <th scope="col">{headerLabels[header] ?? header}</th>)}
           {extraColumn && <th scope="col">{extraColumn.label}</th>}
+          {storyColumn && <th scope="col">{storyColumn.label}</th>}
         </tr>
       </thead>
       <tbody>
@@ -242,6 +255,18 @@ const defaultSort = defaultSortValue(sortOptions);
                   aria-label={`${extraColumn.label}: ${extraColumn.values.get(edition.year) ?? '—'}`}
                 >
                   {extraColumn.values.get(edition.year) ?? '—'}
+                </td>
+              )}
+              {storyColumn && (
+                <td data-label={storyColumn.label}>
+                  {storyColumn.values.has(edition.year) ? (
+                    <details class="story-reveal">
+                      <summary>{storySummaryLabel}</summary>
+                      <p set:html={renderInlineMarkdown(storyColumn.values.get(edition.year)!)} />
+                    </details>
+                  ) : (
+                    <span aria-label={`${storyColumn.label}: —`}>—</span>
+                  )}
                 </td>
               )}
             </tr>
@@ -381,6 +406,18 @@ const defaultSort = defaultSortValue(sortOptions);
     padding: 0;
     cursor: pointer;
     text-decoration: underline;
+  }
+
+  .story-reveal summary {
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--accent);
+  }
+
+  .story-reveal p {
+    margin: 0.4rem 0 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
   }
 
   /* --- Mobile: stack each row into a labelled card, no horizontal scroll --- */

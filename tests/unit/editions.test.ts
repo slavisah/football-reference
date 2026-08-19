@@ -12,6 +12,7 @@ import {
   buildRunnerUpsWithoutTitle,
   buildTimeline,
   buildTopScorerFacts,
+  buildYearStories,
   distinctHosts,
   distinctTeams,
   distinctWinners,
@@ -1181,5 +1182,74 @@ describe('buildTopScorerFacts', () => {
     const facts = buildTopScorerFacts(buildEditions(scorersTable), 'hr');
     expect(facts.get('1958')).toBe('Just Fontaine (France, 13 golova)');
     expect(facts.get('1962')).toBe('Garrincha; Vavá (Multiple, 4 golova)');
+  });
+});
+
+describe('buildYearStories', () => {
+  it('maps a bullet to the edition whose plain Year column matches its first mentioned year', () => {
+    const stories = buildYearStories(buildEditions(table), [
+      "Uruguay defeated Brazil in the decisive 1950 match at the Maracanã, remembered as the *Maracanazo*.",
+      'Spain won its second title in 2026.',
+    ]);
+    expect(stories.get('2026')).toBe('Spain won its second title in 2026.');
+    // 1950 matches no edition in the fixture table (only 1954/1974/2010/2014/2026), so it's dropped.
+    expect(stories.size).toBe(1);
+  });
+
+  it("matches a season label like Nations League's \"2018–19\" (en dash, the real table separator) by its Finals (second) year, not its start year", () => {
+    const seasonTable: MarkdownTable = {
+      headers: ['Season', 'Winner'],
+      rows: [
+        ['2018–19', 'Portugal'],
+        ['2024–25', 'Portugal'],
+      ],
+    };
+    const stories = buildYearStories(buildEditions(seasonTable), [
+      'Portugal won the first-ever Nations League Finals in 2019, beating Netherlands 1-0 as hosts.',
+      'Portugal beat Spain on penalties in the 2025 final to become a two-time champion.',
+    ]);
+    expect(stories.get('2018–19')).toContain('first-ever Nations League Finals');
+    expect(stories.get('2024–25')).toContain('two-time champion');
+  });
+
+  it('also accepts a plain-hyphen season label (e.g. front-matter/prose style "2018-19")', () => {
+    const seasonTable: MarkdownTable = {
+      headers: ['Season', 'Winner'],
+      rows: [['2018-19', 'Portugal']],
+    };
+    const stories = buildYearStories(buildEditions(seasonTable), [
+      'Portugal won the first-ever Nations League Finals in 2019.',
+    ]);
+    expect(stories.get('2018-19')).toContain('first-ever Nations League Finals');
+  });
+
+  it('resolves a bullet naming two years (e.g. a delayed edition) by its first-mentioned year, matching the Year-column label', () => {
+    const euroTable: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [['2020', 'Italy']],
+    };
+    const stories = buildYearStories(buildEditions(euroTable), [
+      'The delayed EURO 2020 was played in 2021 across multiple countries.',
+    ]);
+    expect(stories.get('2020')).toBe('The delayed EURO 2020 was played in 2021 across multiple countries.');
+  });
+
+  it('keeps the first bullet for an edition when a later, more general bullet also names its year', () => {
+    const seasonTable: MarkdownTable = {
+      headers: ['Season', 'Winner'],
+      rows: [['2024–25', 'Portugal']],
+    };
+    const stories = buildYearStories(buildEditions(seasonTable), [
+      'Portugal beat Spain on penalties in the 2025 final to become the first two-time champion.',
+      "The host nation has finished in the Finals' top four every edition, including Germany finishing fourth in 2025.",
+    ]);
+    expect(stories.get('2024–25')).toBe(
+      'Portugal beat Spain on penalties in the 2025 final to become the first two-time champion.',
+    );
+  });
+
+  it('skips a bullet with no 4-digit year and returns an empty map for no bullets', () => {
+    expect(buildYearStories(buildEditions(table), ['A bullet with no year mentioned at all.']).size).toBe(0);
+    expect(buildYearStories(buildEditions(table), []).size).toBe(0);
   });
 });

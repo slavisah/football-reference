@@ -18,7 +18,7 @@ import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
-import { buildTopScorerFacts } from '../../../lib/editions';
+import { buildTopScorerFacts, buildYearStories } from '../../../lib/editions';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
   buildChampionsItemList,
@@ -89,6 +89,17 @@ const notes: NoteSection[] = [
   },
 ];
 
+// "Dodirni godinu za priču": joins the Croatian Memorable-moments bullets
+// above onto the matching edition row by year, same as the English page's
+// CompetitionView does with the English bullets - see buildYearStories() in
+// src/lib/editions.ts. The "Odgođeni EURO 2020..." bullet's first mentioned
+// year (2020) is the edition's actual Year-column label, matching how the
+// English page's own "delayed EURO 2020...2021" bullet resolves.
+const stories = buildYearStories(
+  data.editions,
+  notes.find((section) => section.heading === 'Nezaboravni trenuci')?.items ?? [],
+);
+
 const headerLabels: Record<string, string> = {
   Year: 'Godina',
   'Host(s)': 'Domaćin(i)',
@@ -156,6 +167,8 @@ const headerLabels: Record<string, string> = {
       bitTeamPrefix="reprezentacija"
       emptyText="Nijedno izdanje ne odgovara odabranim filterima."
       clearFiltersLabel="Očisti filtere"
+      storyColumn={stories.size > 0 ? { label: 'Priča', values: stories } : undefined}
+      storySummaryLabel="📖 Dodirni za priču"
     />
 
     <ChampionsSummary

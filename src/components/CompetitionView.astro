@@ -1,6 +1,7 @@
 ---
 import type { CompetitionData } from '../lib/competition';
 import type { PodiumEntry } from '../lib/types';
+import { buildYearStories } from '../lib/editions';
 import TournamentTable from './TournamentTable.astro';
 import PodiumCards from './PodiumCards.astro';
 import ChampionsSummary from './ChampionsSummary.astro';
@@ -23,6 +24,16 @@ interface Props {
 
 const { data, tableId, tableCaption, extraColumn, pdfSlug, podium, podiumHeading = 'Podium by edition' } =
   Astro.props;
+
+// "Tap a year to reveal a short story": joins the page's own "Memorable
+// moments" bullets (already loaded via noteHeadings, no extra content read)
+// onto the matching edition row by year. Empty when a page doesn't request
+// that section (e.g. it has no year-tied stories, or isn't a team
+// competition) - TournamentTable omits the column entirely in that case.
+const memorableMoments = data.notes.find((section) => section.heading === 'Memorable moments');
+const stories = memorableMoments
+  ? buildYearStories(data.editions, memorableMoments.items)
+  : new Map<string, string>();
 ---
 
 <article class="competition stack">
@@ -42,6 +53,7 @@ const { data, tableId, tableCaption, extraColumn, pdfSlug, podium, podiumHeading
     hosts={data.hosts}
     teams={data.teams}
     extraColumn={extraColumn}
+    storyColumn={stories.size > 0 ? { label: 'Story', values: stories } : undefined}
   />
 
   {podium && podium.length > 0 && (
