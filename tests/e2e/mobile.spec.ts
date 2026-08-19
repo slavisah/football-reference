@@ -173,6 +173,22 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(page).toHaveURL(/\/hr\/competitions\/world-cup\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
+
+  test('shows a compact podium card for every edition, top four finishers only', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Podium by edition' })).toBeVisible();
+    const cards = page.locator('.podium__card');
+    await expect(cards).toHaveCount(23);
+    // Most recent edition first (2026: Spain beat Argentina, England third, France fourth).
+    const latest = cards.first();
+    await expect(latest.getByText('2026')).toBeVisible();
+    await expect(latest.getByText('Hosted by Canada, Mexico and United States')).toBeVisible();
+    await expect(latest).toContainText('Spain');
+    await expect(latest).toContainText('Argentina');
+    await expect(latest).toContainText('England');
+    await expect(latest).toContainText('France');
+  });
 });
 
 test.describe('EURO page on a 360px phone', () => {
@@ -293,6 +309,17 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/competitions\/world-cup\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('shows the translated podium cards, one per edition', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Pobjednici po izdanju' })).toBeVisible();
+    const cards = page.locator('.podium__card');
+    await expect(cards).toHaveCount(23);
+    const latest = cards.first();
+    await expect(latest.getByText('2026')).toBeVisible();
+    await expect(latest.getByText('Domaćin: Canada, Mexico and United States')).toBeVisible();
+    await expect(latest).toContainText('Spain');
+    await expect(latest).toContainText('Argentina');
   });
 });
 
@@ -777,6 +804,31 @@ test.describe('Copa América page on a 360px phone', () => {
     await expect(page).toHaveURL(/\/hr\/competitions\/copa-america\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
+
+  test('shows a compact podium card for every edition, top four finishers only, omitting "—" placeholders', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Podium by edition' })).toBeVisible();
+    const cards = page.locator('.podium__card');
+    await expect(cards).toHaveCount(48);
+
+    // Most recent edition first (2024: Argentina beat Colombia, Uruguay third, Canada fourth).
+    const latest = cards.first();
+    await expect(latest.getByText('2024')).toBeVisible();
+    await expect(latest.getByText('Hosted by United States')).toBeVisible();
+    await expect(latest).toContainText('Argentina');
+    await expect(latest).toContainText('Colombia');
+    await expect(latest).toContainText('Uruguay');
+    await expect(latest).toContainText('Canada');
+
+    // The 1975 home-and-away edition has no standalone third-place match -
+    // its card must show champion/runner-up only, not a literal "—" name.
+    const cardsText = await cards.allTextContents();
+    const card1975 = cardsText.find((text) => text.includes('1975'));
+    expect(card1975).toContain('Peru');
+    expect(card1975).toContain('Colombia');
+    expect(card1975).not.toContain('—');
+  });
 });
 
 test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 360px phone', () => {
@@ -859,6 +911,17 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/competitions\/copa-america\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('shows the translated podium cards, one per edition', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Pobjednici po izdanju' })).toBeVisible();
+    const cards = page.locator('.podium__card');
+    await expect(cards).toHaveCount(48);
+    const latest = cards.first();
+    await expect(latest.getByText('2024')).toBeVisible();
+    await expect(latest.getByText('Domaćin: United States')).toBeVisible();
+    await expect(latest).toContainText('Argentina');
+    await expect(latest).toContainText('Colombia');
   });
 });
 

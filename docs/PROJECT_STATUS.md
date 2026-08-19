@@ -8640,6 +8640,104 @@ idea rejected, CSP's `'unsafe-inline'` not worth revisiting, the Golden Boot
 reverse-lookup quiz type not pursued, `public/downloads/` PDF-bloat
 documented/intentional).
 
+### Extended "Podium by edition" cards to the World Cup and Copa América pages - added 2026-08-19 (intensive run)
+
+The previous run's own "Left for a future pass" note flagged this as a
+natural follow-up: `buildPodiums()`/`PodiumCards.astro` (built for the UEFA
+Nations League page) work for any competition table with real top-four
+data, and two of the other three team competitions genuinely have one -
+Copa América ranks highest in this routine's priority order among anything
+with an open, scoped ask, so it and World Cup (which also has a full
+Third/Fourth-place history) were picked up together this run.
+
+**EURO was deliberately excluded, not just deferred.** Its own content
+already documents why: EURO's page states outright that "no third-place
+match has been played since 1980," so its table only has "Other
+semifinalist" / "Other semifinalist / fourth" columns - the two semifinal
+losers are never actually ranked 3rd vs 4th against each other. Showing
+them in ranked podium slots would invent a distinction the historical
+record doesn't support (AGENTS.md rule 2, "do not silently alter
+historical facts"). `buildPodiums()`'s fourth-place matcher was widened
+from an exact `/^fourth$/i` to `/^fourth\b/i` so it also reads the World
+Cup's actual header, `"Fourth / other semifinalist"` (a header that looks
+similar to EURO's but is always a real team there, since the World Cup has
+played a third-place match every edition) - deliberately written so it
+still doesn't match EURO's "Other semifinalist / fourth" header, which
+starts with "Other," not "Fourth."
+
+**Bug caught before shipping:** Copa América's three home-and-away editions
+(1975, 1979, 1983 - no standalone third-place match at all) hold the
+sitewide "—" placeholder in their Third/Fourth cells. `buildPodiums()`
+previously had no caller that could reach a "—" cell (Nations League's
+table never has one), so this was latent, not yet a shipped bug - it would
+have rendered a literal em dash as a "team name" on those three cards.
+Added a small `definiteCell()` helper (same "—" convention `isMissingCell()`
+in `compare.ts` already uses) so those two cells now correctly omit their
+rows instead, matching how every other missing podium column already
+renders.
+
+**Wiring:** `buildPodiums(data.editions)` plus the existing `podium`/
+`podiumHeading` props on `CompetitionView.astro`, following the exact
+Nations League precedent, for both `src/pages/competitions/{world-cup,
+copa-america}.astro`. The two hand-rolled Croatian pages
+(`src/pages/hr/competitions/{world-cup,copa-america}.astro`, which don't
+use `CompetitionView` like every other `/hr/` competition page) render
+`PodiumCards` directly with the same Croatian labels the Nations League
+Croatian page already established ("Pobjednici po izdanju", "Prvak",
+"Drugoplasirani", "Treći", "Četvrti", "Domaćin:").
+
+**Tests:** 3 new Vitest cases in `tests/unit/editions.test.ts` (reads the
+World Cup's "Fourth / other semifinalist" header; does *not* match EURO's
+"Other semifinalist" columns; treats a "—" cell as absent, not a literal
+team name). 4 new Playwright cases in `tests/e2e/mobile.spec.ts` (World Cup
+English/Croatian - 23 cards, latest edition 2026: Spain over Argentina,
+England third, France fourth; Copa América English/Croatian - 48 cards,
+latest edition 2024: Argentina over Colombia, Uruguay third, Canada fourth,
+plus a targeted check that the 1975 home-and-away card shows only
+champion/runner-up and never a literal "—"). Full suite re-run: **512
+Playwright passed** (up from 508, matching the 4 new cases; run against the
+pre-installed Chromium via `PW_EXECUTABLE_PATH`, since the freshly
+`pnpm install`-ed `@playwright/test` resolved a newer browser build than
+the one pre-provisioned in this environment) and **354 Vitest cases**
+(unchanged - the 3 new `buildPodiums` cases replace no others, and no
+existing case needed updating). `pnpm lint` (`astro check`) - 0
+errors/warnings/hints across 116 files. `pnpm build` - 105 pages,
+unchanged. `check:links`/`check:sitemap`/`check:perf`/`check:precache` all
+clean against the rebuilt `dist/`.
+
+**Correction to the previous run's PDF note, found while regenerating:**
+that entry claimed "the podium cards themselves aren't rendered into the
+PDF layout - the PDF template is a separate, print-specific component
+tree." That was wrong - `scripts/generate-pdfs.mjs` prints the actual live
+page under emulated print media (there is no separate PDF-only template),
+so podium cards render into the PDF exactly like any other on-page content;
+confirmed here by `world-cup.pdf` growing from 302 KB to 384 KB and
+`copa-america.pdf` from 723 KB to 861 KB once their podium sections
+existed (`nations-league.pdf`'s unchanged byte size last run was
+coincidental, not evidence of a separate template). That correction
+surfaced a real, previously-untracked gap: `scripts/pdf-pages.mjs`'s
+per-page `sources` lists never included `PodiumCards.astro`, so a future
+edit to that component alone (e.g. a styling fix) would have silently left
+all six podium-bearing PDFs (`world-cup(-hr)`, `nations-league(-hr)`,
+`copa-america(-hr)`) stale without `pnpm check:pdfs` ever catching it -
+exactly the "content-only hashing blind spot" the file's own header
+comment already warns about for rendering-code changes in general. Added a
+shared `PODIUM_COMPONENT` constant, referenced individually by those six
+entries only (not folded into the universal `TABLE_COMPONENTS`, since EURO/
+Ballon d'Or/Golden Boot/Records don't render it). `pnpm build:pdfs`
+regenerated all 94 PDFs; `pnpm check:pdfs` confirms all 94 fresh again.
+
+**Left for a future pass:** EURO structurally cannot get real podium cards
+without either a design change (e.g. an unranked "semifinalists" pair
+instead of medal-ranked slots) or new editorial content ranking third
+against fourth, which doesn't exist and isn't something this routine
+should invent - not pursued. The standing candidates from prior runs are
+otherwise unchanged (source-link liveness infeasible, further
+content-accuracy spot-checks low-yield, the flag-emoji idea rejected,
+CSP's `'unsafe-inline'` not worth revisiting, the Golden Boot
+reverse-lookup quiz type not pursued, `public/downloads/` PDF-bloat
+documented/intentional).
+
 ## CI infrastructure note (2026-08-19)
 
 The `test` job on commit `a899137` (the "Podium by edition" commit above) got

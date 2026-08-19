@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
-import { buildTopScorerFacts } from '../../lib/editions';
+import { buildTopScorerFacts, buildPodiums } from '../../lib/editions';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import {
   buildChampionsItemList,
@@ -23,6 +23,7 @@ const [data, goldenBoot] = await Promise.all([
 ]);
 
 const topScorers = buildTopScorerFacts(goldenBoot.editions);
+const podium = buildPodiums(data.editions);
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd = [
@@ -43,5 +44,7 @@ const jsonLd = [
     tableCaption="FIFA World Cup editions, 1930 onward"
     extraColumn={{ label: 'Top scorer', values: topScorers }}
     pdfSlug="world-cup"
+    podium={podium}
+    podiumHeading="Podium by edition"
   />
 </BaseLayout>

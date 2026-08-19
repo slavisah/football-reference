@@ -150,9 +150,30 @@ export function buildTimeline(editions: Edition[]): TimelineEntry[] {
  * absent, not a placeholder" convention `buildTimeline` already uses for
  * runner-up/final - a reader-facing "Podium by edition" widget for
  * competitions whose table already tracks all four places (e.g. the UEFA
- * Nations League Finals), deliberately excluding group-stage results so it
- * stays compact, per `content/uefa-nations-league.md`'s "Website idea" note.
+ * Nations League Finals, FIFA World Cup, Copa América), deliberately
+ * excluding group-stage results so it stays compact, per
+ * `content/uefa-nations-league.md`'s "Website idea" note.
+ *
+ * The fourth-place matcher is `/^fourth\b/i` rather than an exact
+ * `/^fourth$/i`, so it also reads the World Cup's "Fourth / other
+ * semifinalist" header (World Cup has played a genuine third-place match
+ * every edition, so that cell is always a real team, not an "other
+ * semifinalist" placeholder). It deliberately does *not* match EURO's
+ * "Other semifinalist" / "Other semifinalist / fourth" pair - EURO has no
+ * standalone third-place match, so its two semifinal losers are not
+ * actually ranked 3rd vs 4th against each other, and showing them as if
+ * they were would misrepresent the historical record (AGENTS.md rule 2).
+ * Callers should not wire podium cards into the EURO page for that reason.
+ *
+ * Third/fourth cells that hold the site-wide "no data" placeholder ("—",
+ * see `isMissingCell()` in `compare.ts`) are treated as absent rather than
+ * rendered as a literal team name - e.g. Copa América's 1975/1979/1983
+ * home-and-away editions, which had no standalone third-place match.
  */
+function definiteCell(value: string | undefined): string | undefined {
+  return value === '—' ? undefined : value;
+}
+
 export function buildPodiums(editions: Edition[]): PodiumEntry[] {
   return editions.map((edition) => ({
     year: edition.year,
@@ -160,8 +181,8 @@ export function buildPodiums(editions: Edition[]): PodiumEntry[] {
     champion: edition.winner,
     host: edition.host,
     runnerUp: cellValue(edition, /runner-up|finalist/i),
-    third: cellValue(edition, /^third$/i),
-    fourth: cellValue(edition, /^fourth$/i),
+    third: definiteCell(cellValue(edition, /^third$/i)),
+    fourth: definiteCell(cellValue(edition, /^fourth\b/i)),
   }));
 }
 

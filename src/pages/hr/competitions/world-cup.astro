@@ -13,12 +13,13 @@
 // unchanged.
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import TournamentTable from '../../../components/TournamentTable.astro';
+import PodiumCards from '../../../components/PodiumCards.astro';
 import ChampionsSummary from '../../../components/ChampionsSummary.astro';
 import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
-import { buildTopScorerFacts } from '../../../lib/editions';
+import { buildTopScorerFacts, buildPodiums } from '../../../lib/editions';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
   buildChampionsItemList,
@@ -39,6 +40,7 @@ const [data, goldenBoot] = await Promise.all([
 ]);
 
 const topScorers = buildTopScorerFacts(goldenBoot.editions, 'hr');
+const podium = buildPodiums(data.editions);
 
 const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 
@@ -168,6 +170,17 @@ const headerLabels: Record<string, string> = {
       bitTeamPrefix="reprezentacija"
       emptyText="Nijedno izdanje ne odgovara odabranim filterima."
       clearFiltersLabel="Očisti filtere"
+    />
+
+    <PodiumCards
+      entries={podium}
+      id="world-cup-podium"
+      heading="Pobjednici po izdanju"
+      hostedByLabel="Domaćin:"
+      championLabel="Prvak"
+      runnerUpLabel="Drugoplasirani"
+      thirdLabel="Treći"
+      fourthLabel="Četvrti"
     />
 
     <ChampionsSummary
