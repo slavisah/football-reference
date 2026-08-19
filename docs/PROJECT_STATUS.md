@@ -8640,6 +8640,21 @@ idea rejected, CSP's `'unsafe-inline'` not worth revisiting, the Golden Boot
 reverse-lookup quiz type not pursued, `public/downloads/` PDF-bloat
 documented/intentional).
 
+## CI infrastructure note (2026-08-19)
+
+The `test` job on commit `a899137` (the "Podium by edition" commit above) got
+stuck on the "Install Playwright browser" step for 3+ hours with no progress
+- every prior run on this PR completed the full suite in ~7-8 minutes, and
+every step before that one (type check, unit tests, build, the five
+`check:*` scripts) had already passed normally. This looks like a hung
+GitHub Actions runner, not a real test failure: nothing errored, the job
+just stopped making progress. The PR-watching routine has no permission to
+cancel or re-run an Actions workflow via the API (`403 Resource not
+accessible by integration`), so this trivial addendum commit exists solely
+to trigger a fresh CI run on a new SHA and unstick it - no code or content
+changed. If this recurs, it's an infra issue to raise with GitHub Actions
+support/status, not something to keep re-triggering around.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
