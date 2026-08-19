@@ -8926,6 +8926,86 @@ Golden Boot reverse-lookup quiz type not pursued, `public/downloads/`
 PDF-bloat documented/intentional, EURO podium cards structurally not
 possible).
 
+### Quality pass: full-repo health audit, plus a stale-docs fix - added 2026-08-19 (intensive run)
+
+With every item in this file's own "Left to do"/"Nice-to-have" sections
+checked off and the standing "Left for a future pass" list unchanged since
+the previous run (source-link liveness infeasible, further content-accuracy
+spot-checks low-yield, the flag-emoji idea rejected, CSP's `'unsafe-inline'`
+not worth revisiting, the Golden Boot reverse-lookup quiz type not pursued,
+`public/downloads/` PDF-bloat documented/intentional, EURO podium cards
+structurally not possible, extending the host map beyond World Cup not
+requested by the content), this run first re-verified there was genuinely
+nothing left rather than trusting that list at face value: re-read every
+`content/*.md` file for an unactioned "Suggested"/"idea"/editorial-warning
+section (none - the two remaining World Cup/Nations League feature ideas
+were already closed by the previous two runs), re-checked
+`docs/WEBSITE_REQUIREMENTS.md` line by line against the live site (every
+required page and capability is live; the "by team" filter is the sole
+exception, unchanged from when `IMPLEMENTATION_NOTES.md` first named it -
+see below), and grepped `src/`/`scripts`/`tests/` for `TODO`/`FIXME`/`XXX`
+(none).
+
+Ran the full local check suite clean: `pnpm test` (365 Vitest cases),
+`pnpm lint` (`astro check`, 0 errors/warnings/hints across 118 files),
+`pnpm build` (105 pages), and `check:links`/`check:sitemap`/`check:perf`/
+`check:precache`/`check:pdfs` (94 PDFs) all pass with no changes needed.
+
+Also ran the **full Playwright suite** (519 tests) end-to-end in this
+session's sandboxed environment, which the repository's own CI does not run
+against - **519/519 passed** with `--workers=1`, confirming no regression
+anywhere. Worth recording for whichever future run reaches for this next:
+the same suite run at the default worker count (2) failed 89-519 tests with
+`net::ERR_CONNECTION_REFUSED`, not real WCAG/behavioral failures - the
+`astro preview` server this sandbox's constrained resources can't keep up
+with two concurrent Chromium workers, not a site bug. A future run
+confirming full e2e health in one of these unattended sessions should pass
+`--workers=1` (slower - about 11 minutes here - but reliable) rather than
+treating a fast, mass "connection refused" failure as a real regression.
+Separately, the pre-installed Chromium at `/opt/pw-browsers/chromium` didn't
+match the `@playwright/test` version resolved by `pnpm install` (browser
+build 1194 vs. the pinned test package's expected 1234); `playwright.config.ts`
+already has a `PW_EXECUTABLE_PATH` escape hatch for exactly this, so no
+config change was needed, just setting the env var.
+
+**Real gap found:** `IMPLEMENTATION_NOTES.md`'s "Next logical milestone"
+section had gone stale - last written for the Milestone-2-in-progress state
+(no `/compare`, `/teams`, PWA, quiz order challenge, "On this day" widget,
+downloadable PDFs, or host map existed yet) and still listed `/about/sources`,
+sort controls, and Croatian localization as "remaining" work that has in
+fact been complete for weeks. Left uncorrected, a future agent skimming that
+file instead of this one could waste a run rebuilding something that
+already exists. Rewrote it to point at this file as the current source of
+truth and to correctly name the "by team" filter as the one still-open
+requirement (and why it can't just be coded up - see below).
+
+**Not pursued:** implementing the "by team" filter itself. It is a genuine,
+named gap against `docs/WEBSITE_REQUIREMENTS.md`'s required capabilities
+("filter by year, host, winner, and team"), but closing it properly needs
+new editorial content - a full list of participating national teams per
+edition (up to 48 for a single World Cup, across ~140 editions total in
+`content/`) - not a code change; only a team *count* column exists today.
+Fabricating that data from memory in an unattended run, with no reliable
+per-edition source verified the way every other column on these pages has
+been (see the many "second independent cross-check" entries above), risks
+shipping confidently-wrong history with no human review before merge - the
+same "unattended run" caution that has shelved the flag-emoji idea and the
+host-country map (twice) in earlier runs. `/compare` and `/teams` already
+cover the closely related "which editions did team X reach a final or
+semifinal in" question from the data that does exist; a real "which teams
+even took part" filter is left for whenever someone sources that data
+deliberately, not as a quick pass here.
+
+Full suite unchanged by this run's edits (documentation-only): **519
+Playwright passed**, **365 Vitest passed**, `pnpm lint`/`pnpm build`/
+`check:links`/`check:sitemap`/`check:perf`/`check:precache`/`check:pdfs` all
+clean.
+
+**Left for a future pass:** the standing list above is otherwise unchanged;
+this run found no new code-level gap, only the one stale-docs fix. The "by
+team" filter remains the one honestly-open requirement, blocked on
+editorial data rather than engineering effort.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
