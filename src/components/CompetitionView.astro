@@ -1,6 +1,8 @@
 ---
 import type { CompetitionData } from '../lib/competition';
+import type { PodiumEntry } from '../lib/types';
 import TournamentTable from './TournamentTable.astro';
+import PodiumCards from './PodiumCards.astro';
 import ChampionsSummary from './ChampionsSummary.astro';
 import EditorialNotes from './EditorialNotes.astro';
 import References from './References.astro';
@@ -14,9 +16,13 @@ interface Props {
   extraColumn?: { label: string; values: Map<string, string> };
   /** Slug of the pre-generated PDF at public/downloads/<pdfSlug>.pdf. Omit to hide the download link. */
   pdfSlug?: string;
+  /** Optional compact "podium by edition" cards, shown between the table and the champions summary. */
+  podium?: PodiumEntry[];
+  podiumHeading?: string;
 }
 
-const { data, tableId, tableCaption, extraColumn, pdfSlug } = Astro.props;
+const { data, tableId, tableCaption, extraColumn, pdfSlug, podium, podiumHeading = 'Podium by edition' } =
+  Astro.props;
 ---
 
 <article class="competition stack">
@@ -37,6 +43,10 @@ const { data, tableId, tableCaption, extraColumn, pdfSlug } = Astro.props;
     teams={data.teams}
     extraColumn={extraColumn}
   />
+
+  {podium && podium.length > 0 && (
+    <PodiumCards entries={podium} id={`${tableId}-podium`} heading={podiumHeading} />
+  )}
 
   <ChampionsSummary champions={data.champions} scaleMax={data.editions.length} />
 

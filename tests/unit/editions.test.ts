@@ -8,6 +8,7 @@ import {
   buildLongestStreaks,
   buildLongestTitleGaps,
   buildNearlyFinalists,
+  buildPodiums,
   buildRunnerUpsWithoutTitle,
   buildTimeline,
   buildTopScorerFacts,
@@ -1015,6 +1016,55 @@ describe('buildTimeline', () => {
     };
     const timeline = buildTimeline(buildEditions(withPlaceholder));
     expect(timeline[0].champion).toBe('Not awarded');
+  });
+});
+
+describe('buildPodiums', () => {
+  it('reads champion, host, runner-up, third and fourth when all four columns are present', () => {
+    const finalsTable: MarkdownTable = {
+      headers: ['Season', 'Finals host', 'Winner', 'Runner-up', 'Third', 'Fourth'],
+      rows: [
+        ['2018-19', 'Portugal', 'Portugal', 'Netherlands', 'England', 'Switzerland'],
+        ['2022-23', 'Netherlands', 'Spain', 'Croatia', 'Italy', 'Netherlands'],
+      ],
+    };
+    const podium = buildPodiums(buildEditions(finalsTable));
+    expect(podium).toEqual([
+      {
+        year: '2018-19',
+        yearSort: 2018,
+        champion: 'Portugal',
+        host: 'Portugal',
+        runnerUp: 'Netherlands',
+        third: 'England',
+        fourth: 'Switzerland',
+      },
+      {
+        year: '2022-23',
+        yearSort: 2022,
+        champion: 'Spain',
+        host: 'Netherlands',
+        runnerUp: 'Croatia',
+        third: 'Italy',
+        fourth: 'Netherlands',
+      },
+    ]);
+  });
+
+  it('leaves runnerUp/third/fourth undefined when the table has no such column', () => {
+    const podium = buildPodiums(buildEditions(table));
+    expect(podium[0].runnerUp).toBeUndefined();
+    expect(podium[0].third).toBeUndefined();
+    expect(podium[0].fourth).toBeUndefined();
+  });
+
+  it('still shows a "Not awarded" placeholder champion verbatim, matching buildTimeline', () => {
+    const withPlaceholder: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [['2020', 'Not awarded']],
+    };
+    const podium = buildPodiums(buildEditions(withPlaceholder));
+    expect(podium[0].champion).toBe('Not awarded');
   });
 });
 
