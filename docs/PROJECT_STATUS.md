@@ -8753,6 +8753,88 @@ to trigger a fresh CI run on a new SHA and unstick it - no code or content
 changed. If this recurs, it's an infra issue to raise with GitHub Actions
 support/status, not something to keep re-triggering around.
 
+### New feature: "Tap a year to reveal a short story" on the four team-competition tables - added 2026-08-19 (intensive run)
+
+`content/fifa-world-cup.md`'s own "Suggested child-friendly features" note
+(never previously acted on) asked for exactly this: "Tap a year to reveal a
+short story." Each competition's "Memorable moments" bullets already name a
+specific year (e.g. "Uruguay defeated Brazil...in the decisive 1950 match"),
+so this joins them onto the matching edition row as a native
+`<details>`/`<summary>` disclosure - no JS required, works with screen
+readers and print out of the box.
+
+**Library:** new `buildYearStories(editions, storyBullets)` in
+`src/lib/editions.ts` - matches each bullet's first 4-digit year to the one
+edition whose *effective* year equals it. For a plain Year column that's just
+`yearSort`; for a season label (Nations League's "2018–19", real separator is
+an en dash in the source table, though the regex also accepts a plain hyphen
+for front-matter/prose style) it's the *Finals* (second) year - 2019, not
+2018 - since that's the year the bullets themselves reference. A bullet
+naming two years (EURO's "The delayed EURO 2020 was played in 2021...")
+resolves via its first-mentioned year, 2020, matching that edition's actual
+Year-column label. The first bullet wins when a later, more general bullet
+also happens to name an already-covered year (e.g. Nations League's "so
+far...including Germany finishing fourth in 2025" bullet, after the
+specific "Portugal beat Spain...2025" one).
+
+**Real bug caught before shipping:** the season-label matching above was
+originally written with a plain-hyphen-only regex; the Nations League table
+actually separates its "Season" values with an en dash ("2018–19"), so every
+row silently fell back to matching by season *start* year instead - a
+row-count-preserving, easy-to-miss bug (the column still rendered, just
+joined to the wrong or no edition for every row) caught only by actually
+inspecting the built HTML's `data-year` attributes against which rows got a
+story, not by the type checker or a naively-written test. Fixed by accepting
+both separators; added a dedicated regression test.
+
+**Wiring:** `TournamentTable.astro` gained an optional `storyColumn` prop
+(label + `Map<edition.year, story>`, same "em dash for a missing row" shape
+as the existing `extraColumn`, but rendered as a disclosure instead of plain
+text) plus a `storySummaryLabel` prop for the tap prompt text.
+`CompetitionView.astro` computes the map automatically from whichever
+"Memorable moments" section a page already requested via `noteHeadings` -
+zero changes needed to the four English competition pages themselves. The
+four hand-rolled Croatian competition pages (which don't use
+`CompetitionView`) call `buildYearStories()` directly against their own
+hand-translated "Nezaboravni trenuci" bullets and pass `storyColumn`/
+`storySummaryLabel="📖 Dodirni za priču"` explicitly, the same pattern every
+other locale prop on this component already follows. Ballon d'Or and Golden
+Boot get no story column (no "Memorable moments" section on either -
+individual awards, not team competitions, same scoping precedent the podium
+cards already established). A new `.story-reveal::details-content` print
+rule in `global.css` mirrors the existing quiz-reveal fix so the story reads
+as plain text on paper regardless of its on-screen open/closed state.
+
+**Tests:** 6 new Vitest cases (`buildYearStories`: plain-year match, the en
+dash season-year regression, the plain-hyphen season variant, the
+two-years-in-one-bullet case, first-bullet-wins, and the no-year/no-bullets
+empty cases). 5 new Playwright cases (World Cup: tap-to-reveal + the em-dash
+no-story case; EURO: the delayed-2020 case; Nations League: the season-year
+join; Croatian Copa América: translated label/prompt/story; print media: the
+story renders without being tapped open). 7 pre-existing Playwright cases
+needed a locator fix, not a behavior change - `getByText('<a
+Memorable-moments sentence>')` on those pages now matches two elements (the
+original notes-section text and the new in-table story), since strict mode
+requires an unambiguous match; rescoped each to `.notes__card` explicitly,
+which they were already implicitly scoped to.
+
+Full suite: **517 Playwright passed** (up from 512), **360 Vitest passed**
+(up from 354). `pnpm lint`/`pnpm build`/`check:links`/`check:sitemap`/
+`check:perf`/`check:precache` all clean. All 94 downloadable PDFs
+regenerated and fresh (`check:pdfs` confirms).
+
+**Left for a future pass:** the standing candidates from prior runs are
+unchanged (source-link liveness infeasible, further content-accuracy
+spot-checks low-yield, the flag-emoji idea rejected, CSP's `'unsafe-inline'`
+not worth revisiting, the Golden Boot reverse-lookup quiz type not pursued,
+`public/downloads/` PDF-bloat documented/intentional, EURO podium cards
+structurally not possible). The remaining two "Suggested child-friendly
+features" from `content/fifa-world-cup.md` - "Guess the champion from the
+host and finalists" (already substantially covered by the existing quiz's
+host/runner-up question types) and "Display a map of host countries" (would
+need either a real SVG world map or new editorial geo-data, a bigger scope
+than this run) - were not pursued this run.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

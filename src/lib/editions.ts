@@ -254,6 +254,63 @@ export function buildTopScorerFacts(editions: Edition[], locale: Locale = 'en'):
 }
 
 /**
+ * An edition's "effective" year for matching against a story bullet: the
+ * plain year itself for a normal Year column, but the *second* (Finals) year
+ * of a season label like the Nations League's "2018-19" - that's the year a
+ * Memorable-moments bullet about that edition actually names (e.g. "Portugal
+ * won the first-ever Nations League Finals in 2019"), not the season's start
+ * year `yearSort` already resolves to for sorting purposes.
+ */
+function editionStoryYear(edition: Edition): number {
+  // A season label's separator is an en dash in the source tables (e.g.
+  // "2018–19", see content/uefa-nations-league.md) but a plain hyphen in
+  // front matter/prose ("2018-19", e.g. homeCards.ts's blurb) - accept both.
+  const season = /^(\d{4})[-–](\d{2})$/.exec(edition.year.trim());
+  if (!season) return edition.yearSort;
+  const century = Math.floor(Number(season[1]) / 100) * 100;
+  let end = century + Number(season[2]);
+  if (end <= Number(season[1])) end += 100;
+  return end;
+}
+
+/**
+ * Build an edition.year -> short "story" text map from a competition's
+ * Memorable-moments bullets, for a "tap a year to reveal a short story"
+ * disclosure joined onto that edition's table row (child-friendly feature
+ * suggested by content/fifa-world-cup.md's own "Suggested child-friendly
+ * features" note: "Tap a year to reveal a short story").
+ *
+ * Each bullet is matched to the one edition whose `editionStoryYear()` equals
+ * the first 4-digit year mentioned in the bullet text - the same "first
+ * number wins" reading a human would give it, which also does the right
+ * thing for a bullet naming two years (e.g. EURO's "The delayed EURO 2020
+ * was played in 2021...": 2020 is both the first year mentioned and the
+ * edition's own Year-column label). A bullet whose year matches no edition,
+ * or an edition that already has a story from an earlier bullet (e.g. a
+ * later, more general "so far" bullet that happens to also name a year
+ * already covered by an earlier, more specific bullet), is skipped.
+ */
+export function buildYearStories(editions: Edition[], storyBullets: string[]): Map<string, string> {
+  const editionYearByStoryYear = new Map<number, string>();
+  for (const edition of editions) {
+    const storyYear = editionStoryYear(edition);
+    if (!editionYearByStoryYear.has(storyYear)) {
+      editionYearByStoryYear.set(storyYear, edition.year);
+    }
+  }
+
+  const stories = new Map<string, string>();
+  for (const bullet of storyBullets) {
+    const match = /\d{4}/.exec(bullet);
+    if (!match) continue;
+    const editionYear = editionYearByStoryYear.get(Number(match[0]));
+    if (!editionYear || stories.has(editionYear)) continue;
+    stories.set(editionYear, bullet);
+  }
+  return stories;
+}
+
+/**
  * Distinct winners for populating the filter control, alphabetically.
  *
  * Golden Boot's "Player(s)" column also holds "; "-separated ties for a

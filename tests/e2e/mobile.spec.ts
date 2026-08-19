@@ -114,7 +114,9 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('The two semifinal winners meet in the final')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
-    await expect(page.getByText('Croatia reached its first final in 2018.')).toBeVisible();
+    // Scoped to the notes cards, not the table - the same sentence is now
+    // also joined onto its edition row as a "tap a year for a story" reveal.
+    await expect(notes.getByText('Croatia reached its first final in 2018.')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Editorial notes' })).toBeVisible();
     // *Maracanazo* renders as emphasis, not literal asterisks.
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
@@ -189,6 +191,21 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(latest).toContainText('England');
     await expect(latest).toContainText('France');
   });
+
+  test('lets a reader tap a year to reveal its short story, closed by default', async ({ page }) => {
+    const storyCell = page.locator('tbody tr[data-year="2026"] td[data-label="Story"]');
+    const details = storyCell.locator('details.story-reveal');
+    await expect(details).toHaveJSProperty('open', false);
+    await expect(storyCell.getByText('Spain won its second title in 2026.')).toBeHidden();
+
+    await storyCell.locator('summary').click();
+    await expect(details).toHaveJSProperty('open', true);
+    await expect(storyCell.getByText('Spain won its second title in 2026.')).toBeVisible();
+
+    // An edition with no Memorable-moments bullet (e.g. 2014) shows an em dash, not an empty/broken cell.
+    const noStoryCell = page.locator('tbody tr[data-year="2014"] td[data-label="Story"]');
+    await expect(noStoryCell).toHaveText('—');
+  });
 });
 
 test.describe('EURO page on a 360px phone', () => {
@@ -215,13 +232,21 @@ test.describe('EURO page on a 360px phone', () => {
     await expect(page.getByRole('heading', { name: 'Historical format note' })).toBeVisible();
     await expect(page.locator('.notes__card p', { hasText: 'other semifinalist' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
-    await expect(page.getByText("Antonín Panenka's famous chipped penalty")).toBeVisible();
+    // Scoped to the notes cards, not the table - the same sentence is now
+    // also joined onto its edition row as a "tap a year for a story" reveal.
+    await expect(page.locator('.notes__card').getByText("Antonín Panenka's famous chipped penalty")).toBeVisible();
   });
 
   test('the language switcher opens the Croatian EURO page', async ({ page }) => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/competitions\/euro\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+
+  test('the delayed EURO 2020 edition gets its story, matched by its first-mentioned year', async ({ page }) => {
+    const storyCell = page.locator('tbody tr[data-year="2020"] td[data-label="Story"]');
+    await storyCell.locator('summary').click();
+    await expect(storyCell.getByText('The delayed EURO 2020 was played in 2021 across multiple countries.')).toBeVisible();
   });
 });
 
@@ -288,7 +313,11 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     await expect(page.getByRole('heading', { name: 'Prekretnice formata' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Uredničke napomene' })).toBeVisible();
-    await expect(page.getByText('Hrvatska je 2018. stigla do svog prvog finala.')).toBeVisible();
+    // Scoped to the notes cards, not the table - the same sentence is now
+    // also joined onto its edition row as a "tap a year for a story" reveal.
+    await expect(
+      page.locator('.notes__card').getByText('Hrvatska je 2018. stigla do svog prvog finala.'),
+    ).toBeVisible();
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
   });
 
@@ -365,7 +394,9 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
       page.locator('.notes__card p', { hasText: 'drugi polufinalist' }),
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
-    await expect(page.getByText('Slavna "panenka" Antonína Panenke')).toBeVisible();
+    // Scoped to the notes cards, not the table - the same sentence is now
+    // also joined onto its edition row as a "tap a year for a story" reveal.
+    await expect(page.locator('.notes__card').getByText('Slavna "panenka" Antonína Panenke')).toBeVisible();
   });
 
   test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
@@ -862,6 +893,15 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     );
   });
 
+  test('has a translated "Priča" story column with a Croatian tap-to-reveal story', async ({ page }) => {
+    await expect(page.getByRole('columnheader', { name: 'Priča', exact: true })).toBeVisible();
+    const storyCell = page.locator('tbody tr[data-year="2024"] td[data-label="Priča"]');
+    await storyCell.getByText('📖 Dodirni za priču').click();
+    await expect(
+      storyCell.getByText('Argentina je 2024. preuzela vodstvo kao najuspješnija reprezentacija natjecanja.'),
+    ).toBeVisible();
+  });
+
   test('filtering by prvak (winner) Uruguay updates the shareable URL and status text', async ({
     page,
   }) => {
@@ -884,7 +924,9 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
 
   test('shows the translated Memorable moments section', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
-    await expect(page.getByText('Bolivija je osvojila svoju jedinu titulu')).toBeVisible();
+    // Scoped to the notes cards, not the table - the same sentence is now
+    // also joined onto its edition row as a "tap a year for a story" reveal.
+    await expect(page.locator('.notes__card').getByText('Bolivija je osvojila svoju jedinu titulu')).toBeVisible();
   });
 
   test('shows the translated How it works section', async ({ page }) => {
@@ -951,7 +993,17 @@ test.describe('Nations League page on a 360px phone', () => {
     await expect(page.getByText('Held every two years.')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Key facts' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
-    await expect(page.getByText('Italy hosted the 2021 Finals')).toBeVisible();
+    // Scoped to the notes cards, not the table - the same sentence is now
+    // also joined onto its edition row as a "tap a year for a story" reveal.
+    await expect(page.locator('.notes__card').getByText('Italy hosted the 2021 Finals')).toBeVisible();
+  });
+
+  test('joins a season row (e.g. "2018-19") to its story by the Finals year, not the season start year', async ({
+    page,
+  }) => {
+    const storyCell = page.locator('tbody tr[data-year="2018–19"] td[data-label="Story"]');
+    await storyCell.locator('summary').click();
+    await expect(storyCell.getByText('Portugal won the first-ever Nations League Finals in 2019')).toBeVisible();
   });
 
   test('shows a compact podium card for every edition, top four finishers only', async ({
@@ -1027,7 +1079,11 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
 
   test('shows the translated Memorable moments section', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
-    await expect(page.getByText('Italija je 2021. bila domaćin Final Foura')).toBeVisible();
+    // Scoped to the notes cards, not the table - the same sentence is now
+    // also joined onto its edition row as a "tap a year for a story" reveal.
+    await expect(
+      page.locator('.notes__card').getByText('Italija je 2021. bila domaćin Final Foura'),
+    ).toBeVisible();
   });
 
   test('shows the translated podium cards, one per edition', async ({ page }) => {

@@ -324,3 +324,21 @@ for (const { label, path } of QUIZ_PAGES) {
     });
   });
 }
+
+// A competition table's "tap a year to reveal a short story" <details>
+// (src/components/TournamentTable.astro, joined via buildYearStories() in
+// src/lib/editions.ts) shares the same print-visibility need as the quiz's
+// answer-key reveal above, and the same fix: a `.story-reveal::details-content`
+// rule in global.css forces its content visible on paper regardless of the
+// on-screen open/closed state.
+test.describe('World Cup story reveal in print media', () => {
+  test('the story disclosure renders its text on paper without being tapped open', async ({ page }) => {
+    await page.goto('competitions/world-cup');
+    await page.emulateMedia({ media: 'print' });
+
+    const reveal = page.locator('tbody tr[data-year="2026"] .story-reveal');
+    await expect(reveal).toBeVisible();
+    await expect(reveal.locator('p')).toBeVisible();
+    await expect(reveal.locator('p')).toContainText('Spain won its second title in 2026.');
+  });
+});
