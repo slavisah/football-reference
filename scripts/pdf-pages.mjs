@@ -74,6 +74,14 @@ const TIMELINE_COMPONENTS = [
 // TABLE_COMPONENTS.
 const PODIUM_COMPONENT = 'src/components/PodiumCards.astro';
 
+// Rendered into the actual PDF like PODIUM_COMPONENT above, but currently
+// only opted into by the World Cup page (its own "Suggested child-friendly
+// features" note is the only content file that asks for a host map) - see
+// HostMap.astro's own doc comment. Listed per-entry rather than folded into
+// TABLE_COMPONENTS for the same reason PODIUM_COMPONENT is.
+const HOST_MAP_COMPONENT = 'src/components/HostMap.astro';
+const HOST_MAP_DATA = 'src/lib/hostCoordinates.ts';
+
 export const PDF_PAGES = [
   {
     slug: 'world-cup',
@@ -86,6 +94,8 @@ export const PDF_PAGES = [
       'src/components/CompetitionView.astro',
       ...TABLE_COMPONENTS,
       PODIUM_COMPONENT,
+      HOST_MAP_COMPONENT,
+      HOST_MAP_DATA,
       'src/pages/competitions/world-cup.astro',
     ],
   },
@@ -193,6 +203,8 @@ export const PDF_PAGES = [
       ...COMPETITION_LIB,
       ...TABLE_COMPONENTS,
       PODIUM_COMPONENT,
+      HOST_MAP_COMPONENT,
+      HOST_MAP_DATA,
       'src/pages/hr/competitions/world-cup.astro',
     ],
   },

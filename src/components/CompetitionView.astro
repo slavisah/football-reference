@@ -1,10 +1,11 @@
 ---
 import type { CompetitionData } from '../lib/competition';
-import type { PodiumEntry } from '../lib/types';
+import type { HostMapPoint, PodiumEntry } from '../lib/types';
 import { buildYearStories } from '../lib/editions';
 import TournamentTable from './TournamentTable.astro';
 import PodiumCards from './PodiumCards.astro';
 import ChampionsSummary from './ChampionsSummary.astro';
+import HostMap from './HostMap.astro';
 import EditorialNotes from './EditorialNotes.astro';
 import References from './References.astro';
 import PrintDownloadLink from './PrintDownloadLink.astro';
@@ -20,10 +21,20 @@ interface Props {
   /** Optional compact "podium by edition" cards, shown between the table and the champions summary. */
   podium?: PodiumEntry[];
   podiumHeading?: string;
+  /** Optional "where it's been hosted" locator map, shown after the champions summary. World Cup only for now. */
+  hostMap?: HostMapPoint[];
 }
 
-const { data, tableId, tableCaption, extraColumn, pdfSlug, podium, podiumHeading = 'Podium by edition' } =
-  Astro.props;
+const {
+  data,
+  tableId,
+  tableCaption,
+  extraColumn,
+  pdfSlug,
+  podium,
+  podiumHeading = 'Podium by edition',
+  hostMap,
+} = Astro.props;
 
 // "Tap a year to reveal a short story": joins the page's own "Memorable
 // moments" bullets (already loaded via noteHeadings, no extra content read)
@@ -61,6 +72,8 @@ const stories = memorableMoments
   )}
 
   <ChampionsSummary champions={data.champions} scaleMax={data.editions.length} />
+
+  {hostMap && hostMap.length > 0 && <HostMap points={hostMap} id={`${tableId}-host-map`} />}
 
   <EditorialNotes sections={data.notes} />
 

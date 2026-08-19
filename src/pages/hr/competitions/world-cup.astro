@@ -15,11 +15,13 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import TournamentTable from '../../../components/TournamentTable.astro';
 import PodiumCards from '../../../components/PodiumCards.astro';
 import ChampionsSummary from '../../../components/ChampionsSummary.astro';
+import HostMap from '../../../components/HostMap.astro';
 import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
-import { buildTopScorerFacts, buildPodiums, buildYearStories } from '../../../lib/editions';
+import { buildTopScorerFacts, buildPodiums, buildYearStories, buildHostMapPoints } from '../../../lib/editions';
+import { WORLD_CUP_HOST_COORDINATES, HOST_REGION_ORDER } from '../../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
   buildChampionsItemList,
@@ -41,6 +43,14 @@ const [data, goldenBoot] = await Promise.all([
 
 const topScorers = buildTopScorerFacts(goldenBoot.editions, 'hr');
 const podium = buildPodiums(data.editions);
+const hostMap = buildHostMapPoints(data.editions, WORLD_CUP_HOST_COORDINATES, HOST_REGION_ORDER);
+const hostRegionLabels: Record<string, string> = {
+  'South America': 'Južna Amerika',
+  Europe: 'Europa',
+  'North America': 'Sjeverna Amerika',
+  Asia: 'Azija',
+  Africa: 'Afrika',
+};
 
 const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 
@@ -202,6 +212,16 @@ const headerLabels: Record<string, string> = {
       unit={['naslov', 'naslova']}
       winningYearsLabel="Godine osvajanja: "
       ofLabel="od"
+    />
+
+    <HostMap
+      points={hostMap}
+      id="world-cup-host-map"
+      heading="Gdje je Svjetsko prvenstvo igralo domaćinu"
+      description="Približan položaj svakog domaćina na jednostavnoj mreži zemljopisne dužine i širine, grupiran po regijama u popisu ispod - ne tvrdimo točne granice, samo otprilike gdje se u svijetu igralo pojedino izdanje. Veće točke znače da je zemlja bila domaćin više puta."
+      unit={['put', 'puta']}
+      hostingYearsLabel="Godine domaćinstva: "
+      regionLabels={hostRegionLabels}
     />
 
     <EditorialNotes sections={notes} />

@@ -1,0 +1,197 @@
+---
+// "Display a map of host countries without using protected tournament
+// logos" - the last unaddressed idea from content/fifa-world-cup.md's
+// "Suggested child-friendly features" (tap-a-year stories, comparing title
+// counts visually, and the host/runner-up quiz question type already cover
+// the other three). No real coastline data is drawn - just each host's
+// approximate coordinate (src/lib/hostCoordinates.ts) plotted on a plain
+// latitude/longitude grid, sized by times hosted. The SVG is decorative
+// (aria-hidden) on purpose: every fact it shows - host, hosting years, times
+// hosted, region - is duplicated in the always-visible list underneath, the
+// same "chart plus real text" pairing ChampionsSummary.astro already uses,
+// so screen-reader and print readers never depend on hovering a dot.
+import type { HostMapPoint } from '../lib/types';
+
+interface Props {
+  points: HostMapPoint[];
+  id: string;
+  heading?: string;
+  description?: string;
+  /** Singular/plural noun for a count, e.g. ["time", "times"]. */
+  unit?: [string, string];
+  hostingYearsLabel?: string;
+  /** Optional translated region name lookup, e.g. { Europe: 'Europa' } for the Croatian page. */
+  regionLabels?: Record<string, string>;
+}
+
+const {
+  points,
+  id,
+  heading = 'Where the tournament has been hosted',
+  description = "Every host country's approximate location on a simple latitude/longitude grid, " +
+    'grouped by region in the list below - not a claim of exact borders, just roughly where in ' +
+    'the world each edition took place. Bigger dots hosted more than once.',
+  unit = ['time', 'times'],
+  hostingYearsLabel = 'Hosting years: ',
+  regionLabels,
+} = Astro.props;
+
+const headingId = `${id}-heading`;
+
+// Plain equirectangular (Plate Carrée) projection: longitude and latitude
+// map linearly onto a 720x360 grid (2:1, the projection's natural aspect).
+function project(lat: number, lon: number) {
+  return { x: (lon + 180) * 2, y: (90 - lat) * 2 };
+}
+
+const projected = points.map((point) => ({ ...point, ...project(point.lat, point.lon) }));
+
+const PAD = 28;
+const minX = Math.min(...projected.map((p) => p.x)) - PAD;
+const maxX = Math.max(...projected.map((p) => p.x)) + PAD;
+const minY = Math.min(...projected.map((p) => p.y)) - PAD;
+const maxY = Math.max(...projected.map((p) => p.y)) + PAD;
+const viewBox = `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
+
+const lonLines = [];
+for (let lon = -180; lon <= 180; lon += 30) {
+  const x = project(0, lon).x;
+  if (x >= minX && x <= maxX) lonLines.push(x);
+}
+const latLines = [];
+for (let lat = -80; lat <= 80; lat += 20) {
+  const y = project(lat, 0).y;
+  if (y >= minY && y <= maxY) latLines.push(y);
+}
+const equatorY = project(0, 0).y;
+
+const maxTitles = Math.max(1, ...points.map((p) => p.titles));
+const MIN_RADIUS = 5;
+const MAX_RADIUS = 11;
+function radius(titles: number) {
+  return MIN_RADIUS + (MAX_RADIUS - MIN_RADIUS) * Math.sqrt(titles / maxTitles);
+}
+
+// `points` already arrives sorted by region (see buildHostMapPoints's
+// `regionOrder` parameter), so grouping by first appearance here preserves
+// that order without re-sorting.
+const regionGroups = new Map<string, HostMapPoint[]>();
+for (const point of points) {
+  const list = regionGroups.get(point.region);
+  if (list) {
+    list.push(point);
+  } else {
+    regionGroups.set(point.region, [point]);
+  }
+}
+---
+
+<section class="host-map" aria-labelledby={headingId}>
+  <h3 id={headingId}>{heading}</h3>
+  <p class="muted">{description}</p>
+
+  <svg class="host-map__svg" viewBox={viewBox} aria-hidden="true" focusable="false">
+    <rect x={minX} y={minY} width={maxX - minX} height={maxY - minY} class="host-map__bg" />
+    {lonLines.map((x) => <line x1={x} y1={minY} x2={x} y2={maxY} class="host-map__grid" />)}
+    {latLines.map((y) => <line x1={minX} y1={y} x2={maxX} y2={y} class="host-map__grid" />)}
+    <line x1={minX} y1={equatorY} x2={maxX} y2={equatorY} class="host-map__equator" />
+    {projected.map((point) => <circle cx={point.x} cy={point.y} r={radius(point.titles)} class="host-map__dot" />)}
+  </svg>
+
+  <div class="host-map__regions">
+    {
+      [...regionGroups.entries()].map(([region, hosts]) => (
+        <div class="host-map__region">
+          <h4>{regionLabels?.[region] ?? region}</h4>
+          <ul class="host-map__list">
+            {hosts.map((host) => (
+              <li class="host-map__item">
+                <span class="host-map__name">{host.host}</span>
+                <span class="host-map__count">
+                  {host.titles} {host.titles === 1 ? unit[0] : unit[1]}
+                </span>
+                <p class="host-map__years">
+                  <span class="visually-hidden">{hostingYearsLabel}</span>
+                  {host.years.join(', ')}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .host-map__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 20rem;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .host-map__bg {
+    fill: var(--bg-subtle);
+  }
+
+  .host-map__grid {
+    stroke: var(--border);
+    stroke-width: 0.6;
+    opacity: 0.6;
+  }
+
+  .host-map__equator {
+    stroke: var(--border);
+    stroke-width: 1.2;
+    opacity: 0.85;
+  }
+
+  .host-map__dot {
+    fill: var(--accent);
+    opacity: 0.85;
+  }
+
+  .host-map__regions {
+    margin-top: 1rem;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  }
+
+  .host-map__region h4 {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .host-map__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .host-map__item {
+    break-inside: avoid;
+  }
+
+  .host-map__name {
+    font-weight: 600;
+  }
+
+  .host-map__count {
+    margin-left: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .host-map__years {
+    margin: 0.1rem 0 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+</style>

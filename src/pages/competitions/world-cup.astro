@@ -2,7 +2,8 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
-import { buildTopScorerFacts, buildPodiums } from '../../lib/editions';
+import { buildTopScorerFacts, buildPodiums, buildHostMapPoints } from '../../lib/editions';
+import { WORLD_CUP_HOST_COORDINATES, HOST_REGION_ORDER } from '../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import {
   buildChampionsItemList,
@@ -24,6 +25,7 @@ const [data, goldenBoot] = await Promise.all([
 
 const topScorers = buildTopScorerFacts(goldenBoot.editions);
 const podium = buildPodiums(data.editions);
+const hostMap = buildHostMapPoints(data.editions, WORLD_CUP_HOST_COORDINATES, HOST_REGION_ORDER);
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd = [
@@ -46,5 +48,6 @@ const jsonLd = [
     pdfSlug="world-cup"
     podium={podium}
     podiumHeading="Podium by edition"
+    hostMap={hostMap}
   />
 </BaseLayout>
