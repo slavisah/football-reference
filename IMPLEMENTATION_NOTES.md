@@ -98,10 +98,18 @@ deployment → Source** to **GitHub Actions**.
 
 ## Next logical milestone
 
-All six competition/award pages, `/records`, and `/quiz` are live (see
-`docs/PROJECT_STATUS.md` for what each covers). Winner/year/host filtering is
-now in place on every competition table that has host data. Remaining from
-`docs/WEBSITE_REQUIREMENTS.md`: an `/about/sources` index page, a "by team"
-filter (needs new editorial content - only a team *count* column exists
-today), sort controls that preserve historical notes, and optional
-Croatian/English localization.
+Every page and capability named in `docs/WEBSITE_REQUIREMENTS.md` is live,
+including `/about/sources`, sort controls that preserve historical notes,
+and full Croatian/English localization - see `docs/PROJECT_STATUS.md` for
+the complete, continuously-updated list (it now also covers `/compare`,
+`/teams`, a PWA/offline mode, downloadable print PDFs, and an "On this day"
+widget, none of which existed when this section was last accurate). The one
+requirement still open is the "by team" filter: only a team *count* column
+exists in `content/`, not a list of participating teams per edition, so
+there is no data to filter on yet - this needs new editorial content first,
+not a code change, and adding ~140 editions' worth of participant lists
+without reliable per-edition sourcing is exactly the kind of unattended,
+unreviewed data entry `docs/PROJECT_STATUS.md`'s "Known caveats" section
+already cautions against. `docs/PROJECT_STATUS.md`'s own "Left for a future
+pass" notes are the accurate, current source of truth for what (if
+anything) remains; this file only covers the original Milestone-1 slice.
