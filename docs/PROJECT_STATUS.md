@@ -9440,13 +9440,95 @@ type not pursued, `public/downloads/` PDF-bloat documented/intentional, EURO
 podium cards structurally impossible, full per-edition team participant
 lists blocked on sourcing).
 
+### `/players` Croatian localization + `NAV_LINKS` promotion + structured data - added 2026-08-20 (intensive run)
+
+The immediate "Left for a future pass" from the `/players` launch entry
+above, completed as one vertical slice: `/players` is now a fully bilingual,
+primary-nav-linked page family with structured data, exactly the same
+two-step rollout `/teams` followed.
+
+**Croatian pages:** `src/pages/hr/players/index.astro` (the A-Z directory)
+and `src/pages/hr/players/[slug].astro` (98 per-player profiles), each
+mirroring its English sibling's shape the same way the Croatian `/teams`
+pages mirror theirs. They load the *exact same* live award data
+(`buildAllPlayerProfiles()` over the three `loadCompetition()` tables), so
+the A-Z list, each player's award count, and every appearance can never
+drift between languages - only this page's own headings/prose, the JSON-LD
+description text, and the three award display names ("Zlatna lopta", "Zlatna
+kopačka Svjetskog prvenstva", "Zlatna kopačka EURA") are translated. Player
+names and source-derived facts (team, ceremony date) are left as-is, the
+same "only UI chrome is translated, not the underlying data" precedent the
+Croatian `/teams` pages set. The one genuinely translatable *unit* word in
+an appearance's detail line - "goals" - is handled by a new optional
+`goalsLabel` parameter threaded through `buildPlayerProfile()` /
+`buildAllPlayerProfiles()` (default `'goals'`, so every existing caller is
+byte-unchanged; the Croatian page passes `'golova'`), rather than
+hard-coding English into the shared builder.
+
+**Nav promotion:** `/players` is now a normal `NAV_LINKS` entry
+(`src/lib/routes.ts`, label "Players" / "Igrači") with its Croatian
+translation registered in `TRANSLATED_PATHS` (`src/lib/i18n.ts`) - which is
+what `tests/unit/offlineCache.test.ts` requires of every nav link, and why
+the Croatian pages had to ship *first*. Both languages of the directory are
+now precached for offline reading (33 URLs, up from 31) and appear in the
+primary nav and the 404 page's "Popular pages" list (now 13 nav links x 2
+languages).
+
+**Structured data:** three new `jsonLd.ts` builders close the ItemList gap
+the launch entry flagged - `buildPlayerProfileItemList()` (one Thing per
+award a player won, the individual-award counterpart of
+`buildTeamProfileItemList()`), `buildPlayersDirectoryItemList()` (the
+directory's A-Z list, counterpart of `/teams`' `buildCountryRecordsItemList`
+block), each with a `describe()` override for the Croatian page, following
+the exact translation mechanism the other builders already use. Both English
+and Croatian directory and profile pages now emit their ItemList.
+
+**Sitemap:** `src/pages/sitemap.xml.ts` now emits `/players` + `/hr/players`
+via the main bilingual `NAV_LINKS` loop (with a `CONTENT_ID_BY_PATH` entry
+for `<lastmod>`), and its per-player loop now emits *both* languages per
+player with reciprocal hreflang alternates - the same shape the `/teams`
+per-team loop already uses. 302 sitemap entries, up from 203 (99 new
+`/hr/players` URLs).
+
+**Tests:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across 125
+files. `pnpm test` - **395/395** (up from 388: +1 `goalsLabel` case in
+`playerProfile.test.ts`, +6 across the two new `jsonLd.test.ts` describe
+blocks). `pnpm build` - 303 pages (up from 204: 98 new `/hr/players`
+profiles + 1 `/hr/players` directory). `pnpm check:links` (307 pages),
+`check:sitemap` (302 entries), `check:precache` (33 URLs), `check:pdfs` (94
+PDFs, unchanged - no per-player PDF this run) all pass. Playwright: the
+`player-profile.spec.ts` suite grew from 10 to 23 cases (13 new Croatian
+cases mirroring `team-profile.spec.ts`'s own bilingual coverage - directory
+list, language switcher round-trip both ways, translated totals matching the
+English page, Croatian award names + `/hr/competitions/` links, the tied-row
+team + "golova" unit, a diacritic slug, 360px overflow and WCAG on both
+pages), all green; `mobile.spec.ts`'s sitemap `<url>` count (203 -> 302) and
+404 popular-links count (24 -> 26) updated to match.
+
+**Deliberately not done this run, and why:** a downloadable print PDF per
+player profile is still deferred - it's the one remaining `/teams/<slug>`
+parity item, and adding 196 new PDFs (98 players x EN/HR) is a large binary
+churn better kept as its own reviewable slice, the same way `/teams`' PDFs
+landed separately from its Croatian pages. See "Left for a future pass"
+below.
+
+**Left for a future pass:** a downloadable print PDF per player profile
+(the `PrintDownloadLink` / `scripts/pdf-pages.mjs` wiring `/teams/<slug>`
+already has, for both languages). The standing candidates from prior runs
+are otherwise unchanged (source-link liveness infeasible, further
+content-accuracy spot-checks low-yield, the flag-emoji idea rejected, CSP's
+`'unsafe-inline'` not worth revisiting, the Golden Boot reverse-lookup quiz
+type not pursued, `public/downloads/` PDF-bloat documented/intentional, EURO
+podium cards structurally impossible, full per-edition team participant
+lists blocked on sourcing).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
-  Records and Timelines, Compare National Teams, the Family Quiz, and the
-  `/teams` national-team directory all have live pages in both English and
-  Croatian now. The new `/players` directory (2026-08-20) is English-only so
-  far - not yet in `NAV_LINKS`, see that entry's "Left for a future pass".
+  Records and Timelines, Compare National Teams, the Family Quiz, the
+  `/teams` national-team directory, and the `/players` award-winner directory
+  all have live pages in both English and Croatian now, all reachable from
+  the primary nav.
 - Historical names appear as distinct winner-filter entries by design.
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
   time out; re-running the deploy clears it (it did here).

@@ -1,16 +1,29 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import References from '../../components/References.astro';
-import { loadCompetition } from '../../lib/competition';
+// Croatian translation of src/pages/players/[slug].astro. getStaticPaths()
+// mirrors the English page's slug-collision guard exactly (same
+// playerProfileSlug(), same fail-loudly precedent) so a build error there
+// catches a collision here too, and the two pages can never end up with a
+// different set of player profiles. Only the three award display names
+// (passed into buildAllPlayerProfiles() via this file's own Croatian `sources`
+// array titles) and this page's own prose/labels are translated - every
+// appearance/year/total is computed by the exact same builder the English
+// page calls, so the two pages can never disagree on the underlying record.
+// The "goalsLabel" option translates the one unit word in an appearance's
+// detail line ("8 goals" -> "8 golova"); the team name and ceremony date in
+// that same line are source-derived data, left as-is like every other
+// historical label on the Croatian site.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import References from '../../../components/References.astro';
+import { loadCompetition } from '../../../lib/competition';
 import {
   buildAllPlayerProfiles,
   playerProfileSlug,
   type PlayerAwardSource,
   type PlayerProfile,
-} from '../../lib/playerProfile';
-import type { SourceLink } from '../../lib/sources';
-import { absolutePageUrl, withBase } from '../../lib/url';
-import { buildPlayerProfileItemList, type JsonLdObject } from '../../lib/jsonLd';
+} from '../../../lib/playerProfile';
+import { buildPlayerProfileItemList, type JsonLdObject } from '../../../lib/jsonLd';
+import type { SourceLink } from '../../../lib/sources';
+import { absolutePageUrl, withBase } from '../../../lib/url';
 
 export async function getStaticPaths() {
   const [ballonDor, worldCupGoldenBoot, euroGoldenBoot] = await Promise.all([
@@ -26,12 +39,12 @@ export async function getStaticPaths() {
   ]);
 
   const sources: PlayerAwardSource[] = [
-    { title: "Ballon d'Or", slug: 'ballon-dor', editions: ballonDor.editions },
-    { title: 'FIFA World Cup Golden Boot', slug: 'golden-boot', editions: worldCupGoldenBoot.editions },
-    { title: 'UEFA EURO Golden Boot', slug: 'golden-boot', editions: euroGoldenBoot.editions },
+    { title: 'Zlatna lopta', slug: 'ballon-dor', editions: ballonDor.editions },
+    { title: 'Zlatna kopačka Svjetskog prvenstva', slug: 'golden-boot', editions: worldCupGoldenBoot.editions },
+    { title: 'Zlatna kopačka EURA', slug: 'golden-boot', editions: euroGoldenBoot.editions },
   ];
 
-  const profiles = buildAllPlayerProfiles(sources);
+  const profiles = buildAllPlayerProfiles(sources, { goalsLabel: 'golova' });
 
   const combinedSources = [ballonDor.sources, worldCupGoldenBoot.sources, euroGoldenBoot.sources]
     .flat()
@@ -43,11 +56,8 @@ export async function getStaticPaths() {
   const seenSlugs = new Set<string>();
   return profiles.map((profile) => {
     const slug = playerProfileSlug(profile.id);
-    // A slug collision would silently merge two different players onto one
-    // page - fail the build loudly instead, the same "never ship a silent
-    // data problem" precedent teams/[slug].astro's own getStaticPaths follows.
     if (seenSlugs.has(slug)) {
-      throw new Error(`Two players produced the same /players/ slug: "${slug}"`);
+      throw new Error(`Two players produced the same /hr/players/ slug: "${slug}"`);
     }
     seenSlugs.add(slug);
     return {
@@ -66,43 +76,40 @@ type Props = {
 const { profile, sources, lastReviewed } = Astro.props as Props;
 const slug = playerProfileSlug(profile.id);
 
-// One ItemList per player profile - the same structured-data parity every
-// other generated-ranking page family on the site already has (see
-// buildPlayerProfileItemList in jsonLd.ts). Only emitted when the player has
-// at least one award (every built profile does, but this guards the empty
-// case the same way /teams/<slug> does).
 const jsonLd: JsonLdObject[] =
   profile.awards.length > 0
     ? [
         buildPlayerProfileItemList(profile, {
           pageUrl: absolutePageUrl(Astro.url, Astro.site),
-          name: `${profile.displayName} - full award history`,
+          name: `${profile.displayName} - cjelovita povijest nagrada`,
         }),
       ]
     : [];
 ---
 
 <BaseLayout
-  title={`${profile.displayName} - Full award history`}
-  description={`Every Men's Ballon d'Or and FIFA World Cup/UEFA EURO Golden Boot award for ${profile.displayName}, generated from each award's winners table.`}
-  alternateHref={withBase(`/hr/players/${slug}`)}
+  title={`${profile.displayName} - cjelovita povijest nagrada`}
+  description={`Svaka muška Zlatna lopta i Zlatna kopačka Svjetskog prvenstva/EURA za igrača ${profile.displayName}, generirano iz tablice pobjednika svake nagrade.`}
+  locale="hr"
+  alternateHref={withBase(`/players/${slug}`)}
   jsonLd={jsonLd}
 >
   <article class="player-profile stack">
     <header class="player-profile__header">
-      <p class="eyebrow badge">Generated from the award tables</p>
+      <p class="eyebrow badge">Generirano iz tablica nagrada</p>
       <h1>{profile.displayName}</h1>
       <p class="player-profile__intro">
-        {profile.displayName}'s full record across the Men's Ballon d'Or and the FIFA World Cup and
-        UEFA EURO Golden Boot - every award, generated straight from each award's winners table.
+        Cjeloviti učinak igrača {profile.displayName} u muškoj Zlatnoj lopti te Zlatnoj kopački
+        Svjetskog prvenstva i EURA - svaka nagrada, generirano izravno iz tablice pobjednika svake
+        nagrade.
       </p>
     </header>
 
     <section class="player-profile__totals card" aria-labelledby="totals-heading">
-      <h2 id="totals-heading" class="visually-hidden">Combined totals</h2>
+      <h2 id="totals-heading" class="visually-hidden">Ukupni zbroj</h2>
       <dl class="player-profile__totals-grid">
         <div>
-          <dt>Total awards</dt>
+          <dt>Ukupno nagrada</dt>
           <dd>{profile.totalAwards}</dd>
         </div>
       </dl>
@@ -112,7 +119,7 @@ const jsonLd: JsonLdObject[] =
       profile.awards.map((award, index) => (
         <section class="card stack" aria-labelledby={`award-${index}-heading`}>
           <h2 id={`award-${index}-heading`}>
-            <a href={withBase(`/competitions/${award.slug}`)}>{award.title}</a>
+            <a href={withBase(`/hr/competitions/${award.slug}`)}>{award.title}</a>
           </h2>
           <ol class="player-profile__list">
             {award.appearances.map((a) => (
@@ -127,7 +134,18 @@ const jsonLd: JsonLdObject[] =
       ))
     }
 
-    <References sources={sources} lastReviewed={lastReviewed} status="verified" />
+    <References
+      sources={sources}
+      lastReviewed={lastReviewed}
+      status="verified"
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText="Provjereno"
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+      noteText="Prednost imaju primarni izvori. Povijesni formati i nazivi bilježe se onako kako su korišteni u to vrijeme; kontekst potražite u napomenama uz svako izdanje."
+    />
   </article>
 </BaseLayout>
 

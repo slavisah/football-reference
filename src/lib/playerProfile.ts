@@ -61,7 +61,22 @@ function teamFor(edition: Edition, playerIndex: number, winnerCount: number): st
   return undefined;
 }
 
-function appearancesFor(playerName: string, editions: Edition[]): PlayerAppearance[] {
+/**
+ * Options carried through the profile builders. `goalsLabel` is the unit word
+ * appended to a Golden Boot row's goal count ("8 goals"); it defaults to
+ * English "goals" so every existing caller is unchanged, and the Croatian
+ * pages pass their own ("golova") - the team name and ceremony-date strings
+ * are source-derived data and are deliberately left untranslated, matching the
+ * same "only UI chrome is translated, not the underlying facts" precedent the
+ * Croatian /teams pages set.
+ */
+export type PlayerProfileOptions = { goalsLabel?: string };
+
+function appearancesFor(
+  playerName: string,
+  editions: Edition[],
+  goalsLabel: string,
+): PlayerAppearance[] {
   const appearances: PlayerAppearance[] = [];
 
   for (const edition of editions) {
@@ -72,7 +87,7 @@ function appearancesFor(playerName: string, editions: Edition[]): PlayerAppearan
     const team = teamFor(edition, index, winners.length);
     const goals = cellValue(edition, /^goals$/i);
     const ceremonyDate = cellValue(edition, /^ceremony date$/i);
-    const detail = [team, goals ? `${goals} goals` : undefined, ceremonyDate]
+    const detail = [team, goals ? `${goals} ${goalsLabel}` : undefined, ceremonyDate]
       .filter(Boolean)
       .join(' · ');
 
@@ -85,12 +100,17 @@ function appearancesFor(playerName: string, editions: Edition[]): PlayerAppearan
 export type PlayerAwardSource = { title: string; slug: string; editions: Edition[] };
 
 /** Build one player's full profile from every individual-award table they might appear in. */
-export function buildPlayerProfile(playerName: string, sources: PlayerAwardSource[]): PlayerProfile {
+export function buildPlayerProfile(
+  playerName: string,
+  sources: PlayerAwardSource[],
+  options: PlayerProfileOptions = {},
+): PlayerProfile {
+  const { goalsLabel = 'goals' } = options;
   const awards = sources
     .map((source) => ({
       title: source.title,
       slug: source.slug,
-      appearances: appearancesFor(playerName, source.editions),
+      appearances: appearancesFor(playerName, source.editions, goalsLabel),
     }))
     .filter((award) => award.appearances.length > 0);
 
@@ -112,10 +132,13 @@ export function distinctPlayers(sources: PlayerAwardSource[]): string[] {
 }
 
 /** Build every player's profile from the given award sources, alphabetically by display name. */
-export function buildAllPlayerProfiles(sources: PlayerAwardSource[]): PlayerProfile[] {
+export function buildAllPlayerProfiles(
+  sources: PlayerAwardSource[],
+  options: PlayerProfileOptions = {},
+): PlayerProfile[] {
   return distinctPlayers(sources)
     .filter((name) => !isPlaceholderWinner(name))
-    .map((name) => buildPlayerProfile(name, sources))
+    .map((name) => buildPlayerProfile(name, sources, options))
     .sort((a, b) => a.displayName.localeCompare(b.displayName));
 }
 

@@ -9,6 +9,7 @@ import type { ChampionSummary, Edition } from './types';
 import type { CountryRecord, Rivalry } from './compare';
 import type { QuizQuestion } from './quiz';
 import type { TeamProfile, TeamProfileCompetition } from './teamProfile';
+import type { PlayerProfile, PlayerProfileAward } from './playerProfile';
 
 export type JsonLdObject = Record<string, unknown>;
 
@@ -224,6 +225,93 @@ export function buildTeamProfileItemList(
         '@type': 'Thing',
         name: competition.title,
         description: describe(competition),
+      },
+    })),
+  };
+}
+
+/**
+ * A /players/<slug> player profile page's per-award appearance list
+ * (buildPlayerProfile() in playerProfile.ts) as an ItemList - the individual-
+ * award counterpart of buildTeamProfileItemList() above, closing the same
+ * "a new generated-ranking page family shipped without its own ItemList" gap
+ * that the team profile pages had until 2026-08-20. One Thing per award the
+ * player has actually won (in the order the page lists them), named after
+ * that award with a description enumerating each appearance's year and detail
+ * (team/goals/ceremony date) - the exact facts the page's own <ol> already
+ * renders per award, no new computation and no combined-total figure invented
+ * beyond what's on the page. A `describe()` override mirrors the other
+ * builders' translation mechanism for the Croatian page.
+ */
+function defaultPlayerProfileDescription(award: PlayerProfileAward): string {
+  return award.appearances
+    .map((a) => (a.detail ? `${a.year} (${a.detail})` : a.year))
+    .join(', ');
+}
+
+export function buildPlayerProfileItemList(
+  profile: PlayerProfile,
+  options: {
+    pageUrl: string;
+    name: string;
+    /** Overrides the per-award description, e.g. for a translated page. Defaults to an English "Year (detail), ..." list. */
+    describe?: (award: PlayerProfileAward) => string;
+  },
+): JsonLdObject {
+  const { pageUrl, name, describe = defaultPlayerProfileDescription } = options;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name,
+    url: pageUrl,
+    itemListElement: profile.awards.map((award, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Thing',
+        name: award.title,
+        description: describe(award),
+      },
+    })),
+  };
+}
+
+/**
+ * The /players directory (an A-Z index of every Ballon d'Or/Golden Boot
+ * winner, buildAllPlayerProfiles()) as an ItemList - the individual-award
+ * counterpart of the /teams directory's buildCountryRecordsItemList() block,
+ * so the directory index page carries structured data just like every profile
+ * page it links to. One Thing per player, named after them with a description
+ * of their combined award count - the exact figure the directory already
+ * shows next to each name. A `describe()` override mirrors the other builders'
+ * translation mechanism for the Croatian directory.
+ */
+function defaultPlayersDirectoryDescription(profile: PlayerProfile): string {
+  return `${profile.totalAwards} award${profile.totalAwards === 1 ? '' : 's'} across the Men's Ballon d'Or and FIFA World Cup/UEFA EURO Golden Boot`;
+}
+
+export function buildPlayersDirectoryItemList(
+  profiles: PlayerProfile[],
+  options: {
+    pageUrl: string;
+    name: string;
+    /** Overrides the per-player description, e.g. for the Croatian directory. Defaults to an English sentence. */
+    describe?: (profile: PlayerProfile) => string;
+  },
+): JsonLdObject {
+  const { pageUrl, name, describe = defaultPlayersDirectoryDescription } = options;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name,
+    url: pageUrl,
+    itemListElement: profiles.map((profile, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Thing',
+        name: profile.displayName,
+        description: describe(profile),
       },
     })),
   };

@@ -25,6 +25,7 @@ describe('buildPrecacheUrls', () => {
     expect(urls).toContain('/football-reference/hr/records');
     expect(urls).toContain('/football-reference/hr/compare');
     expect(urls).toContain('/football-reference/hr/teams');
+    expect(urls).toContain('/football-reference/hr/players');
     expect(urls).toContain('/football-reference/hr/about/sources');
   });
 
