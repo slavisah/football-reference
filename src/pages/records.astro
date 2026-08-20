@@ -18,7 +18,7 @@ import {
 import { buildFinalsMeetings, buildRivalries, type CompetitionEditions } from '../lib/compare';
 import { teamProfileSlug } from '../lib/teamProfile';
 import { absolutePageUrl, withBase } from '../lib/url';
-import { buildChampionsItemList, type JsonLdObject } from '../lib/jsonLd';
+import { buildChampionsItemList, buildRivalriesItemList, type JsonLdObject } from '../lib/jsonLd';
 
 const meta = await loadPageMeta('records-and-timelines');
 
@@ -217,6 +217,9 @@ const jsonLd: JsonLdObject[] = [
       unit: ['award', 'awards'],
     }),
   ),
+  ...(rivalries.length > 0
+    ? [buildRivalriesItemList(rivalries, { pageUrl, name: 'Fiercest rivalries' })]
+    : []),
 ];
 ---
 

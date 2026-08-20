@@ -9094,6 +9094,117 @@ qualifies (can't happen today, but keeps the page honest for e.g. a future
 competition with no repeat finalists yet). The "by team" filter is not an
 open item; it was already complete. No other gap surfaced this run.
 
+### Bug fix: the previous run's "Fiercest rivalries" ranking shipped without structured data or PDF-freshness tracking - fixed 2026-08-20 (intensive run)
+
+With every standing "Left for a future pass" candidate still exhausted
+(source-link liveness infeasible, further content-accuracy spot-checks
+low-yield, the flag-emoji idea rejected, CSP's `'unsafe-inline'` not worth
+revisiting, the Golden Boot reverse-lookup quiz type not pursued,
+`public/downloads/` PDF-bloat documented/intentional, EURO podium cards
+structurally impossible, full per-edition team participant lists blocked on
+sourcing), this run re-audited the site's own most recently shipped feature
+- earlier today's "Fiercest rivalries" ranking - against the conventions
+every other `/records` ranking already follows, rather than assuming a
+same-day feature had already caught up to them. It found two real,
+previously-unflagged gaps.
+
+**1. No `ItemList` structured data.** Every one of `/records`' other eight
+ranking sections (Most successful teams, Most frequent hosts, Titles won on
+home soil, Back-to-back champions, Nearly champions, Nearly finalists,
+Longest wait between titles, Biggest final wins) has had a schema.org
+`ItemList` since the 2026-08-15/16 SEO passes - "Fiercest rivalries" was
+built the same way (a generated ranking over already-audited data) but its
+own entry never mentioned JSON-LD, and a direct check of the built HTML
+confirmed the omission: the section rendered its accessible on-page table
+with no matching `<script type="application/ld+json">` block anywhere on
+the page.
+
+New **`buildRivalriesItemList()`** in `src/lib/jsonLd.ts` closes this,
+following the exact shape `buildCountryRecordsItemList()` already
+established for a non-`ChampionSummary` ranking: one `Thing` per rivalry,
+named `"{Team A} vs {Team B}"` (matching the table's own "Rivalry" column),
+with a `describe()`-overridable description covering meetings, head-to-head
+wins, competitions, and the most recent meeting - the same facts the table
+already renders, no new computation. Wired into both `records.astro`'s and
+`hr/records.astro`'s existing `jsonLd` arrays with the same
+`rivalries.length > 0` fallback-skip guard every other ranking's `ItemList`
+already uses (today always populated - Argentina and Uruguay alone have met
+13 times). The Croatian page's `describe()` override uses the same
+"neutral phrasing, no gendered verb" trick the "Finals meetings" panel
+entry (2026-08-16) already established for the ~90 possible team pairs this
+could render, rather than risking a wrong Croatian conjugation for any of
+them.
+
+**2. `/records` and `/hr/records`'s PDFs had no dependency on
+`src/lib/compare.ts` or `src/lib/teamProfile.ts`.** The "Fiercest rivalries"
+section calls `buildFinalsMeetings()`/`buildRivalries()` (from
+`compare.ts`) and `teamProfileSlug()` (from `teamProfile.ts`, for each
+team's link) directly in `records.astro`/`hr/records.astro` - but neither
+file was ever added to those two pages' `sources` list in
+`scripts/pdf-pages.mjs`. That is exactly the "content-only hashing blind
+spot" the file's own header comment has warned about since the 2026-08-17
+"PDF-freshness checker now tracks rendering code" entry closed the same gap
+everywhere else - it was simply never re-applied to this one section,
+because it shipped after that fix and nothing re-checked it against the
+now-established convention. Confirmed the gap was real, not theoretical,
+by running `pnpm check:pdfs` before touching `pdf-pages.mjs`: it reported
+both PDFs clean despite the new rivalries section already being live on
+the page and printed into both PDFs (`generate-pdfs.mjs` prints the actual
+live page - no separate PDF template, per the 2026-08-19 correction in this
+same file) - a future bug fix to `buildRivalries()`'s grouping logic would
+have silently left `records.pdf`/`records-hr.pdf` wrong, unnoticed, the
+same way the original Golden Boot PDF bug went undetected for two days.
+
+Fixed by adding `src/lib/compare.ts` and `src/lib/teamProfile.ts` to both
+the `records` and `records-hr` entries' `sources` arrays in
+`scripts/pdf-pages.mjs`, with an updated comment explaining why (both files
+were already tracked for the 80 `/teams/<slug>` PDFs via `TEAM_PDF_SOURCES`,
+just never added to `/records`' own separate entry).
+
+**Tests:** 4 new Vitest cases (`tests/unit/jsonLd.test.ts`:
+`buildRivalriesItemList` - the ranked `Thing`-per-pair shape and default
+English description, the singular "1 meeting" wording for a hypothetical
+one-meeting rivalry, the `describe()` override, and an empty-list case -
+376 total, up from 372). 2 existing Playwright cases in
+`tests/e2e/mobile.spec.ts` updated in place (`/records`'s and
+`/hr/records`'s JSON-LD block-count assertions: 39→40 blocks / 38→39
+`ItemList`s each) plus new assertions in both that the rivalries `ItemList`
+exists, names the real top pair, and its description matches the expected
+"N meeting(s) (" / "N susreta (" wording - no hardcoded meeting count,
+since that number is real, audited data that could shift if the underlying
+tables are ever corrected.
+
+`pnpm lint` (`astro check`) - 0 errors/warnings/hints across 118 files.
+`pnpm test` - **376/376** (up from 372). `pnpm build` - 105 pages,
+unchanged. Confirmed `pnpm check:pdfs` failed as expected before
+regenerating (`records.pdf`/`records-hr.pdf` correctly flagged stale
+against the two newly-tracked files), then regenerated all 94 PDFs via
+`pnpm build:pdfs` (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) and
+re-ran `pnpm build` so `dist/` picked up the fresh files; `pnpm check:pdfs`
+now passes clean. `check:links` (109 pages, 0 broken links),
+`check:sitemap` (104 entries), and `check:precache` (31 URLs) all pass
+unchanged. `check:perf` - `/hr/records` (499.3 KB) and `/records`
+(494.2 KB) grew by the new JSON-LD block's few hundred bytes, still
+comfortably under the 510 KB budget. Full Playwright suite re-run at
+`--workers=1`: **521/521 passing** (unchanged count - both updated cases
+are existing tests edited in place, not new ones; 11.3 minutes, confirming
+no regression anywhere else in the site from the shared `records.astro`/
+`hr/records.astro`/`jsonLd.ts` edits).
+
+**Left for a future pass:** with both gaps closed, "Fiercest rivalries" now
+matches every other `/records` ranking's conventions exactly. The standing
+candidates from prior runs are otherwise unchanged (source-link liveness
+infeasible, further content-accuracy spot-checks low-yield, the flag-emoji
+idea rejected, CSP's `'unsafe-inline'` not worth revisiting, the Golden
+Boot reverse-lookup quiz type not pursued, `public/downloads/` PDF-bloat
+documented/intentional, EURO podium cards structurally impossible, full
+per-edition team participant lists blocked on sourcing). Worth noting for
+whoever ships the *next* new `/records` ranking: this run's own lesson is
+that a same-day feature addition needs its own explicit checklist pass
+against "does it have an ItemList?" and "did I add its new `src/lib`
+dependencies to `pdf-pages.mjs`?" rather than trusting that shipping fast
+means shipping complete.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

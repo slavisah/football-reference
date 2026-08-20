@@ -28,7 +28,7 @@ import {
 import { buildFinalsMeetings, buildRivalries, type CompetitionEditions } from '../../lib/compare';
 import { teamProfileSlug } from '../../lib/teamProfile';
 import { absolutePageUrl, withBase } from '../../lib/url';
-import { buildChampionsItemList, type JsonLdObject } from '../../lib/jsonLd';
+import { buildChampionsItemList, buildRivalriesItemList, type JsonLdObject } from '../../lib/jsonLd';
 
 const meta = await loadPageMeta('records-and-timelines');
 
@@ -223,6 +223,16 @@ const jsonLd: JsonLdObject[] = [
       unit: ['nagrada', 'nagrade'],
     }),
   ),
+  ...(rivalries.length > 0
+    ? [
+        buildRivalriesItemList(rivalries, {
+          pageUrl,
+          name: 'Najveći rivaliteti',
+          describe: (r) =>
+            `${r.meetings} susreta (${r.teamADisplayName} ${r.teamAWins}, ${r.teamBDisplayName} ${r.teamBWins}) u natjecanjima: ${r.competitions.join(', ')} - posljednji susret: ${r.mostRecent.year}. (${r.mostRecent.competition})`,
+        }),
+      ]
+    : []),
 ];
 ---
 
