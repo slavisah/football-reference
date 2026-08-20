@@ -116,6 +116,9 @@ const jsonLd = [
       status={worldCup.status}
     />
   </article>
+  <p class="golden-boot__players-link no-print">
+    <a href={withBase('/players')}>Browse every player's full award history &rarr;</a>
+  </p>
 </BaseLayout>
 
 <style>
@@ -135,5 +138,9 @@ const jsonLd = [
     max-width: 62ch;
     color: var(--text-muted);
     font-size: 1.05rem;
+  }
+
+  .golden-boot__players-link {
+    font-weight: 600;
   }
 </style>

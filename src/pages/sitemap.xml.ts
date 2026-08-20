@@ -6,6 +6,8 @@ import { withBase } from '../lib/url';
 import { buildAllCountryRecords } from '../lib/compare';
 import { loadTeamCompetitions } from '../lib/teamCompetitions';
 import { teamProfileSlug } from '../lib/teamProfile';
+import { loadCompetition } from '../lib/competition';
+import { buildAllPlayerProfiles, playerProfileSlug, type PlayerAwardSource } from '../lib/playerProfile';
 
 export const prerender = true;
 
@@ -108,6 +110,48 @@ export const GET: APIRoute = async ({ site, url }) => {
     ].join('');
     urlEntries.push(`<url><loc>${xmlEscape(absolute(enPath))}</loc>${lastmodTag}${altLinks}</url>`);
     urlEntries.push(`<url><loc>${xmlEscape(absolute(hrPath))}</loc>${lastmodTag}${altLinks}</url>`);
+  }
+
+  // /players is not yet a NAV_LINKS entry (see docs/PROJECT_STATUS.md's
+  // "Left for a future pass" note - it has no Croatian translation yet, and
+  // every NAV_LINKS path is required to have one, see offlineCache.test.ts),
+  // so its directory index and per-player profile pages both get their own
+  // loop here instead of the main NAV_LINKS loop above, the same way /teams'
+  // per-team profile pages already need their own loop below for a different
+  // reason (no single content-collection id). English-only for now, so no
+  // hreflang alternate is emitted - the same no-altLinks shape the main loop
+  // above already uses for any NAV_LINKS path with no TRANSLATED_PATHS entry.
+  const [ballonDor, worldCupGoldenBoot, euroGoldenBoot] = await Promise.all([
+    loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'FIFA World Cup top scorers',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'UEFA EURO top scorers',
+      sourcesHeading: 'UEFA EURO',
+    }),
+  ]);
+  const playerSources: PlayerAwardSource[] = [
+    { title: "Ballon d'Or", slug: 'ballon-dor', editions: ballonDor.editions },
+    { title: 'FIFA World Cup Golden Boot', slug: 'golden-boot', editions: worldCupGoldenBoot.editions },
+    { title: 'UEFA EURO Golden Boot', slug: 'golden-boot', editions: euroGoldenBoot.editions },
+  ];
+  const playersEntry = await getEntry('pages', 'players');
+  const playersLastmod = [
+    ballonDor.lastReviewed,
+    worldCupGoldenBoot.lastReviewed,
+    euroGoldenBoot.lastReviewed,
+    playersEntry?.data.lastReviewed,
+  ]
+    .filter((value): value is string => Boolean(value))
+    .sort()
+    .at(-1);
+  const playersLastmodTag = playersLastmod ? `<lastmod>${playersLastmod}</lastmod>` : '';
+  urlEntries.push(`<url><loc>${xmlEscape(absolute('/players'))}</loc>${playersLastmodTag}</url>`);
+  for (const profile of buildAllPlayerProfiles(playerSources)) {
+    const enPath = `/players/${playerProfileSlug(profile.id)}`;
+    urlEntries.push(`<url><loc>${xmlEscape(absolute(enPath))}</loc>${playersLastmodTag}</url>`);
   }
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urlEntries.join('\n')}\n</urlset>\n`;
