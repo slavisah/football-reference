@@ -1,0 +1,184 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import References from '../../components/References.astro';
+import { loadCompetition } from '../../lib/competition';
+import {
+  buildAllPlayerProfiles,
+  playerProfileSlug,
+  type PlayerAwardSource,
+  type PlayerProfile,
+} from '../../lib/playerProfile';
+import type { SourceLink } from '../../lib/sources';
+import { withBase } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const [ballonDor, worldCupGoldenBoot, euroGoldenBoot] = await Promise.all([
+    loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'FIFA World Cup top scorers',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'UEFA EURO top scorers',
+      sourcesHeading: 'UEFA EURO',
+    }),
+  ]);
+
+  const sources: PlayerAwardSource[] = [
+    { title: "Ballon d'Or", slug: 'ballon-dor', editions: ballonDor.editions },
+    { title: 'FIFA World Cup Golden Boot', slug: 'golden-boot', editions: worldCupGoldenBoot.editions },
+    { title: 'UEFA EURO Golden Boot', slug: 'golden-boot', editions: euroGoldenBoot.editions },
+  ];
+
+  const profiles = buildAllPlayerProfiles(sources);
+
+  const combinedSources = [ballonDor.sources, worldCupGoldenBoot.sources, euroGoldenBoot.sources]
+    .flat()
+    .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+  const lastReviewed = [ballonDor.lastReviewed, worldCupGoldenBoot.lastReviewed, euroGoldenBoot.lastReviewed]
+    .sort()
+    .at(-1) as string;
+
+  const seenSlugs = new Set<string>();
+  return profiles.map((profile) => {
+    const slug = playerProfileSlug(profile.id);
+    // A slug collision would silently merge two different players onto one
+    // page - fail the build loudly instead, the same "never ship a silent
+    // data problem" precedent teams/[slug].astro's own getStaticPaths follows.
+    if (seenSlugs.has(slug)) {
+      throw new Error(`Two players produced the same /players/ slug: "${slug}"`);
+    }
+    seenSlugs.add(slug);
+    return {
+      params: { slug },
+      props: { profile, sources: combinedSources, lastReviewed },
+    };
+  });
+}
+
+type Props = {
+  profile: PlayerProfile;
+  sources: SourceLink[];
+  lastReviewed: string;
+};
+
+const { profile, sources, lastReviewed } = Astro.props as Props;
+---
+
+<BaseLayout
+  title={`${profile.displayName} - Full award history`}
+  description={`Every Men's Ballon d'Or and FIFA World Cup/UEFA EURO Golden Boot award for ${profile.displayName}, generated from each award's winners table.`}
+>
+  <article class="player-profile stack">
+    <header class="player-profile__header">
+      <p class="eyebrow badge">Generated from the award tables</p>
+      <h1>{profile.displayName}</h1>
+      <p class="player-profile__intro">
+        {profile.displayName}'s full record across the Men's Ballon d'Or and the FIFA World Cup and
+        UEFA EURO Golden Boot - every award, generated straight from each award's winners table.
+      </p>
+    </header>
+
+    <section class="player-profile__totals card" aria-labelledby="totals-heading">
+      <h2 id="totals-heading" class="visually-hidden">Combined totals</h2>
+      <dl class="player-profile__totals-grid">
+        <div>
+          <dt>Total awards</dt>
+          <dd>{profile.totalAwards}</dd>
+        </div>
+      </dl>
+    </section>
+
+    {
+      profile.awards.map((award, index) => (
+        <section class="card stack" aria-labelledby={`award-${index}-heading`}>
+          <h2 id={`award-${index}-heading`}>
+            <a href={withBase(`/competitions/${award.slug}`)}>{award.title}</a>
+          </h2>
+          <ol class="player-profile__list">
+            {award.appearances.map((a) => (
+              <li class="is-title">
+                <span class="player-profile__year">{a.year}</span>
+                <span aria-hidden="true">🏆</span>
+                {a.detail && <span class="player-profile__detail">{a.detail}</span>}
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))
+    }
+
+    <References sources={sources} lastReviewed={lastReviewed} status="verified" />
+  </article>
+</BaseLayout>
+
+<style>
+  .player-profile__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .player-profile__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .player-profile__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .player-profile__totals-grid {
+    margin: 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+    text-align: center;
+  }
+
+  .player-profile__totals-grid dt {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .player-profile__totals-grid dd {
+    margin: 0.2rem 0 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+  }
+
+  .player-profile__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .player-profile__list li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.5rem 0.8rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+  }
+
+  .player-profile__year {
+    font-weight: 700;
+    min-width: 4.5rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .player-profile__detail {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+</style>

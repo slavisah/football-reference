@@ -9322,12 +9322,131 @@ counting output pages (`pnpm build`'s own page count, or `check:sitemap`'s
 entry count) against which page *files* actually pass a `jsonLd` prop is a
 more reliable cross-check than eyeballing the file list.
 
+### New feature: "/players" - one full award-history profile page per Ballon d'Or/Golden Boot winner - added 2026-08-20 (intensive run)
+
+With every standing "Left for a future pass" candidate still exhausted or
+explicitly deprioritized (source-link liveness infeasible, further
+content-accuracy spot-checks low-yield, the flag-emoji idea rejected, CSP's
+`'unsafe-inline'` not worth revisiting, the Golden Boot reverse-lookup quiz
+type not pursued, `public/downloads/` PDF-bloat documented/intentional, EURO
+podium cards structurally impossible, full per-edition team participant
+lists blocked on sourcing), this run looked for a genuinely new page family
+rather than another incremental fix. `content/teams.md`'s own intro already
+names the gap: "Individual awards (Ballon d'Or, Golden Boot) are not
+included here since they recognize players, not national teams" - `/teams`
+aggregates a *team's* record across four team competitions into one
+year-by-year view, but no equivalent existed for a *player's* record across
+the two individual-award tables (`content/ballon-dor.md`,
+`content/golden-boot.md`'s FIFA World Cup and UEFA EURO top-scorer tables).
+That aggregation is genuinely new information, not a re-render of an
+existing table: several players who won more than one of these three awards
+(Gerd Müller - 1970 Ballon d'Or, 1970 World Cup Golden Boot, 1972 EURO
+Golden Boot; Ronaldo - 1997/2002 Ballon d'Or, 2002 World Cup Golden Boot)
+have never had their combined award history shown on one page before.
+
+**Built:** `src/lib/playerProfile.ts`, following `src/lib/teamProfile.ts`'s
+exact shape (`buildPlayerProfile()`, `playerProfileSlug()`) but for players:
+`buildPlayerProfile(name, sources)` scans each award's editions for a
+winner-cell match (splitting on `; ` the same way `distinctWinners()`
+already does, so a tied year credits every tied player individually), and
+`buildAllPlayerProfiles()`/`distinctPlayers()` build the full A-Z roster. The
+one genuinely new piece of logic: a tied Golden Boot row's Team cell is
+itself `; `-joined (e.g. 1994's "Hristo Stoichkov; Oleg Salenko" /
+"Bulgaria; Russia") and must be aligned by the *same index* as the matching
+player name, not shown as the whole joined string - `teamFor()` handles that,
+falling back to "no team shown" (rather than guessing) for the rarer case
+where a tie's Team cell is the "Multiple" placeholder used when there are too
+many scorers to name one team each (e.g. 1962's six-way tie), while still
+showing that edition's shared goal count.
+
+New pages: `src/pages/players/index.astro` (an A-Z directory, mirroring
+`src/pages/teams/index.astro`) and `src/pages/players/[slug].astro` (one
+profile per player, mirroring `src/pages/teams/[slug].astro` - combined
+"Total awards" count, one section per award actually won, each appearance
+showing year, team/goals/ceremony-date detail, and a link back to that
+award's competition page). `content/players.md` is the new page-meta entry
+(front matter + intro paragraph, same shape as `content/teams.md`). Both the
+Ballon d'Or and Golden Boot competition pages
+(`src/pages/competitions/ballon-dor.astro`,
+`src/pages/competitions/golden-boot.astro`) gained a "Browse every player's
+full award history" link to `/players`, so the new directory is reachable
+from the two pages whose data it's built from.
+
+**Deliberately not done this run, and why:** `/players` is **not** wired
+into `NAV_LINKS` (`src/lib/routes.ts`) yet. `tests/unit/offlineCache.test.ts`
+enforces, as a hard invariant, that every `NAV_LINKS` entry has a Croatian
+translation in `TRANSLATED_PATHS` (`src/lib/i18n.ts`) - `/teams` itself only
+ever entered `NAV_LINKS` already carrying both languages. Building 98
+Croatian player-profile pages (one per distinct Ballon d'Or/Golden Boot
+winner) in the same run as the English feature was too large a slice for one
+pass, so `/players` instead ships as a fully working, standalone English
+page family this run - reachable via direct URL, the sitemap, and the two
+cross-links above, exactly the same "complete but not yet linked from primary
+nav" state `/teams` itself was never in, since `/teams` got its Croatian
+pages one commit later but *before* it was ever added to `NAV_LINKS`. The
+sitemap (`src/pages/sitemap.xml.ts`) still lists every `/players` URL (the
+directory plus all 98 profile pages) via its own loop, English-only (no
+hreflang alternate), the same shape the main `NAV_LINKS` loop already uses
+for a path with no `TRANSLATED_PATHS` entry.
+
+**Tests:** 8 new Vitest cases (`tests/unit/playerProfile.test.ts`:
+combining a player's awards across all three sources, omitting an award
+never won, the tied-row Team/player index alignment, the "Multiple"
+placeholder falling back to no team while keeping the shared goal count, an
+unknown player producing an empty profile, the full roster excluding the
+Ballon d'Or's "Not awarded" placeholder row and sorting alphabetically, and
+`playerProfileSlug()`'s diacritic folding - 388 total, up from 380). A new
+`tests/e2e/player-profile.spec.ts` (mirroring `team-profile.spec.ts`,
+English-only): the directory lists and links to profiles, a multi-award
+profile (Gerd Müller) shows all three sections and the correct combined
+total, a single-award player (Kylian Mbappé) shows only that one section, a
+diacritic name resolves at a plain-ASCII URL, the tied-row team-alignment
+fix (Oleg Salenko showing "Russia", not the joined cell) holds end-to-end,
+360px overflow and WCAG checks on both pages, and both competition pages'
+new "Browse every player's full award history" link.
+
+`pnpm lint` (`astro check`) - 0 errors/warnings/hints across 122 files.
+`pnpm test` - **388/388** (up from 380). `pnpm build` - 204 pages (up from
+105: 98 new player profile pages, 1 new `/players` directory page). `pnpm
+check:links` (208 pages, 0 broken links), `check:sitemap` (203 entries, up
+from 104), and `check:precache` (31 URLs, unchanged - `/players` isn't a
+`NAV_LINKS` entry yet, so it isn't precached either, consistent with the
+"not yet in primary nav" scope above) all pass. `check:pdfs` correctly
+flagged `ballon-dor.pdf`/`golden-boot.pdf` stale after the two competition
+pages' new cross-link; regenerated with `pnpm build:pdfs`, then
+`check:pdfs` passed clean on all 94 PDFs. Full Playwright suite: **536/536
+passed** (up from 524). A first full run caught `mobile.spec.ts`'s own
+hardcoded sitemap `<url>` count (104, now 203 - fixed alongside this entry);
+a second full run turned up one unrelated failure, `team-search.spec.ts`'s
+Croatian "navigates to the Croatian compare page" case timing out - confirmed
+a pre-existing flake, not a regression (this run touched neither
+`team-search.spec.ts` nor `Nav.astro`'s search widget logic, only a
+non-functional comment nearby): a third full run passed all 536 cleanly,
+including that exact case.
+
+**Left for a future pass:** Croatian localization for `/players` (98 profile
+pages + the directory), then adding `/players` to `NAV_LINKS` once that
+parity exists (see "Deliberately not done" above) - the same two-step
+rollout `/teams` itself followed. After that: a schema.org `ItemList` for
+each player profile (the same gap `/teams/<slug>` itself had until the
+previous run - `buildPlayerProfileItemList()` would follow
+`buildTeamProfileItemList()`'s exact precedent), and a downloadable print
+PDF per player profile (the same `PrintDownloadLink`/`pdf-pages.mjs` wiring
+`/teams/<slug>` already has). The standing candidates from prior runs are
+otherwise unchanged (source-link liveness infeasible, further
+content-accuracy spot-checks low-yield, the flag-emoji idea rejected, CSP's
+`'unsafe-inline'` not worth revisiting, the Golden Boot reverse-lookup quiz
+type not pursued, `public/downloads/` PDF-bloat documented/intentional, EURO
+podium cards structurally impossible, full per-edition team participant
+lists blocked on sourcing).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
   Records and Timelines, Compare National Teams, the Family Quiz, and the
   `/teams` national-team directory all have live pages in both English and
-  Croatian now.
+  Croatian now. The new `/players` directory (2026-08-20) is English-only so
+  far - not yet in `NAV_LINKS`, see that entry's "Left for a future pass".
 - Historical names appear as distinct winner-filter entries by design.
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
   time out; re-running the deploy clears it (it did here).

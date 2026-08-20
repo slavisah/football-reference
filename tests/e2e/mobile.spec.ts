@@ -2583,8 +2583,11 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     // 12 nav pages x 2 languages (the index loop, now including /teams),
     // plus 40 team profile pages x 2 languages (src/pages/teams/[slug].astro
     // and its Croatian sibling), each pair carrying reciprocal hreflang
-    // alternates.
-    expect(body.match(/<url>/g)?.length).toBe(104);
+    // alternates, plus the English-only /players directory and its 98
+    // per-player profile pages (src/pages/players/[slug].astro - not yet a
+    // NAV_LINKS entry, see docs/PROJECT_STATUS.md's 2026-08-20 "/players"
+    // entry, so no hreflang alternate on any of these 99).
+    expect(body.match(/<url>/g)?.length).toBe(203);
     expect(body).toContain(`<loc>${SITE}/competitions/world-cup/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/competitions/world-cup/</loc>`);
     expect(body).toContain(
@@ -2595,6 +2598,9 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(body).toContain(`<loc>${SITE}/teams/brazil/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/teams/brazil/</loc>`);
     expect(body).toContain(`hreflang="hr" href="${SITE}/hr/teams/brazil/"`);
+    expect(body).toContain(`<loc>${SITE}/players/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/players/gerd-muller/</loc>`);
+    expect(body).not.toContain(`<loc>${SITE}/hr/players/</loc>`);
     expect(body).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
   });
 
