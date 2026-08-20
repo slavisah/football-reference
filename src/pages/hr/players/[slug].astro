@@ -13,6 +13,7 @@
 // that same line are source-derived data, left as-is like every other
 // historical label on the Croatian site.
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import References from '../../../components/References.astro';
 import { loadCompetition } from '../../../lib/competition';
 import {
@@ -103,6 +104,11 @@ const jsonLd: JsonLdObject[] =
         Svjetskog prvenstva i EURA - svaka nagrada, generirano izravno iz tablice pobjednika svake
         nagrade.
       </p>
+      <PrintDownloadLink
+        slug={`player-${slug}-hr`}
+        label="Preuzmi PDF za ispis"
+        hint="A4 položeno, cjelovita povijest nagrada ovog igrača u svim praćenim nagradama."
+      />
     </header>
 
     <section class="player-profile__totals card" aria-labelledby="totals-heading">

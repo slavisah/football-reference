@@ -9522,6 +9522,72 @@ type not pursued, `public/downloads/` PDF-bloat documented/intentional, EURO
 podium cards structurally impossible, full per-edition team participant
 lists blocked on sourcing).
 
+### Downloadable print PDF for every `/players/<slug>` profile - added 2026-08-20 (intensive run)
+
+Closes the "Left for a future pass" item the `/players` launch entry above
+flagged: `/players/<slug>` and `/hr/players/<slug>` now offer a downloadable
+print PDF exactly like `/teams/<slug>` already did, giving the two profile
+page families full parity.
+
+**Enumerating players for the PDF script:** `scripts/generate-pdfs.mjs` runs
+under plain Node against a running `astro preview` server, so - the same
+constraint that made `/team-index.json` necessary for `/teams/<slug>` - it
+can't import `src/lib/playerProfile.ts`'s `buildAllPlayerProfiles()` directly
+(no Vite, no `astro:content`) and the player roster isn't a hand-typeable
+list. Added `src/pages/player-index.json.ts`, a new build-time endpoint
+mirroring `team-index.json.ts`'s shape (`{id, displayName}[]`, alphabetical),
+built from the same `loadCompetition()` + `buildAllPlayerProfiles()` calls
+`/players/index.astro` already makes. Unlike `/team-index.json` it isn't
+fetched by any client-side widget - there's no "find a player" search - it
+exists solely for this script to read once, server-side.
+
+**PDF generation:** `scripts/pdf-pages.mjs` gained `PLAYER_PDF_SOURCES`, the
+individual-award counterpart of `TEAM_PDF_SOURCES` (content/ballon-dor.md,
+content/golden-boot.md, docs/SOURCES.md, the shared competition-parsing
+libs, `src/lib/playerProfile.ts`, `References.astro`, and both
+`/players/[slug].astro` page files). `scripts/generate-pdfs.mjs` fetches
+`/player-index.json` after the team loop, computes each player's slug with a
+duplicated `playerProfileSlug()` (same duplication precedent
+`teamProfileSlug()` already set, for the same plain-Node reason), and
+renders `/players/<slug>` → `player-<slug>.pdf` and `/hr/players/<slug>` →
+`player-<slug>-hr.pdf` for all 98 players (196 new PDFs), recording each
+against `PLAYER_PDF_SOURCES` in the shared manifest.
+`scripts/check-pdf-freshness.mjs` gained a matching `playerSourcesFromManifest()`
+(mirroring `teamSourcesFromManifest()`, filtering the manifest's `player-`
+keys) so `pnpm check:pdfs` covers the new PDFs the same way it already
+covers team PDFs.
+
+**Pages:** both `/players/[slug].astro` and `/hr/players/[slug].astro` now
+import `PrintDownloadLink` and render it in the header, right after the
+intro paragraph - the exact same placement `/teams/<slug>` uses. Croatian
+page uses the translated `label`/`hint` props the same way `/hr/teams/<slug>`
+does.
+
+**Tests:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across 126
+files (one new `player-index.json.ts` route). `pnpm test` - **395/395**
+(unchanged - no unit-testable logic added, `playerProfileSlug()`'s
+duplicate in `generate-pdfs.mjs` is a verbatim copy of the already-tested
+original). `pnpm build` - 303 pages (unchanged - PDF endpoints/files aren't
+Astro pages). `pnpm build:pdfs` - regenerated all 8 competition/records +
+80 team + 196 new player PDFs (284 total, up from 88) and
+`.pdf-manifest.json`. `pnpm check:pdfs`, `pnpm check:links` (now resolving
+196 more `.pdf` asset references), `pnpm check:sitemap`, `pnpm
+check:precache` all pass. Playwright: `player-profile.spec.ts` gained one
+PDF-download test per language (EN: `players/gerd-muller` →
+`player-gerd-muller.pdf`; HR: `hr/players/gerd-muller` →
+`player-gerd-muller-hr.pdf`), mirroring `team-profile.spec.ts`'s own PDF
+test exactly.
+
+**Left for a future pass:** the standing candidates from prior runs are
+unchanged (source-link liveness infeasible, further content-accuracy
+spot-checks low-yield, the flag-emoji idea rejected, CSP's `'unsafe-inline'`
+not worth revisiting, the Golden Boot reverse-lookup quiz type not pursued,
+`public/downloads/` PDF-bloat documented/intentional, EURO podium cards
+structurally impossible, full per-edition team participant lists blocked on
+sourcing). With this run, `/players/<slug>` and `/teams/<slug>` are now at
+full feature parity (Croatian localization, structured data, print PDFs) -
+no further parity gaps between the two profile-page families remain.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PrintDownloadLink from '../../components/PrintDownloadLink.astro';
 import References from '../../components/References.astro';
 import { loadCompetition } from '../../lib/competition';
 import {
@@ -96,6 +97,10 @@ const jsonLd: JsonLdObject[] =
         {profile.displayName}'s full record across the Men's Ballon d'Or and the FIFA World Cup and
         UEFA EURO Golden Boot - every award, generated straight from each award's winners table.
       </p>
+      <PrintDownloadLink
+        slug={`player-${slug}`}
+        hint="A4 landscape, this player's full award history across every tracked award."
+      />
     </header>
 
     <section class="player-profile__totals card" aria-labelledby="totals-heading">

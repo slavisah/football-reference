@@ -24,7 +24,7 @@ import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PDF_PAGES, TEAM_PDF_SOURCES } from './pdf-pages.mjs';
+import { PDF_PAGES, TEAM_PDF_SOURCES, PLAYER_PDF_SOURCES } from './pdf-pages.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const MANIFEST_PATH = path.join(ROOT, 'public', 'downloads', '.pdf-manifest.json');
@@ -54,6 +54,17 @@ function teamSourcesFromManifest(manifest) {
     Object.keys(manifest)
       .filter((slug) => slug.startsWith('team-'))
       .map((slug) => [slug, TEAM_PDF_SOURCES]),
+  );
+}
+
+// Same trust-the-manifest-keys strategy as teamSourcesFromManifest() above,
+// for the `player-<slug>`/`player-<slug>-hr` PDFs - see
+// scripts/pdf-pages.mjs's PLAYER_PDF_SOURCES doc comment.
+function playerSourcesFromManifest(manifest) {
+  return Object.fromEntries(
+    Object.keys(manifest)
+      .filter((slug) => slug.startsWith('player-'))
+      .map((slug) => [slug, PLAYER_PDF_SOURCES]),
   );
 }
 
@@ -90,7 +101,11 @@ async function main() {
     return;
   }
 
-  const sources = { ...PDF_SOURCES, ...teamSourcesFromManifest(manifest) };
+  const sources = {
+    ...PDF_SOURCES,
+    ...teamSourcesFromManifest(manifest),
+    ...playerSourcesFromManifest(manifest),
+  };
   const current = await currentHashes(sources);
   const stale = [];
 
