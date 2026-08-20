@@ -9,7 +9,8 @@ import {
   type PlayerProfile,
 } from '../../lib/playerProfile';
 import type { SourceLink } from '../../lib/sources';
-import { withBase } from '../../lib/url';
+import { absolutePageUrl, withBase } from '../../lib/url';
+import { buildPlayerProfileItemList, type JsonLdObject } from '../../lib/jsonLd';
 
 export async function getStaticPaths() {
   const [ballonDor, worldCupGoldenBoot, euroGoldenBoot] = await Promise.all([
@@ -63,11 +64,29 @@ type Props = {
 };
 
 const { profile, sources, lastReviewed } = Astro.props as Props;
+const slug = playerProfileSlug(profile.id);
+
+// One ItemList per player profile - the same structured-data parity every
+// other generated-ranking page family on the site already has (see
+// buildPlayerProfileItemList in jsonLd.ts). Only emitted when the player has
+// at least one award (every built profile does, but this guards the empty
+// case the same way /teams/<slug> does).
+const jsonLd: JsonLdObject[] =
+  profile.awards.length > 0
+    ? [
+        buildPlayerProfileItemList(profile, {
+          pageUrl: absolutePageUrl(Astro.url, Astro.site),
+          name: `${profile.displayName} - full award history`,
+        }),
+      ]
+    : [];
 ---
 
 <BaseLayout
   title={`${profile.displayName} - Full award history`}
   description={`Every Men's Ballon d'Or and FIFA World Cup/UEFA EURO Golden Boot award for ${profile.displayName}, generated from each award's winners table.`}
+  alternateHref={withBase(`/hr/players/${slug}`)}
+  jsonLd={jsonLd}
 >
   <article class="player-profile stack">
     <header class="player-profile__header">

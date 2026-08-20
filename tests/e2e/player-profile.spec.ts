@@ -6,9 +6,9 @@ import AxeBuilder from '@axe-core/playwright';
 // (src/pages/players/[slug].astro) - every Men's Ballon d'Or and FIFA World
 // Cup/UEFA EURO Golden Boot award a player has ever won, generated from the
 // same award tables the "Ballon d'Or" and "Golden Boot" pages already load.
-// English-only for now (see docs/PROJECT_STATUS.md's "Left for a future
-// pass" note) - no /hr/players pages exist yet, so this file has no Croatian
-// counterpart, unlike team-profile.spec.ts.
+// Now fully bilingual (src/pages/hr/players/index.astro,
+// src/pages/hr/players/[slug].astro) - the Croatian describe blocks at the
+// bottom of this file mirror team-profile.spec.ts's own Croatian coverage.
 
 test.describe('Players index', () => {
   test('lists players A to Z, each linking to its own profile page', async ({ page }) => {
@@ -115,5 +115,105 @@ test.describe('Linked from the Ballon d’Or and Golden Boot pages', () => {
     await page.goto('competitions/golden-boot');
     const link = page.locator('a', { hasText: "Browse every player's full award history" });
     await expect(link).toHaveAttribute('href', /\/players\/?$/);
+  });
+});
+
+test.describe('Croatian /players index (/hr/players)', () => {
+  test('lists players A to Z, each linking to its own Croatian profile page', async ({ page }) => {
+    await page.goto('hr/players');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.locator('h1')).toHaveText('Igrači');
+    const mullerLink = page.locator('.players__link', { hasText: 'Gerd Müller' });
+    await expect(mullerLink).toBeVisible();
+    await expect(mullerLink).toHaveAttribute('href', /\/hr\/players\/gerd-muller\/?$/);
+  });
+
+  test('has no horizontal page overflow at 360px', async ({ page }) => {
+    await page.goto('hr/players');
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('has no WCAG violations', async ({ page }) => {
+    await page.goto('hr/players');
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .disableRules(['region'])
+      .analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test('the language switcher opens the English players index', async ({ page }) => {
+    await page.goto('hr/players');
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/players\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+});
+
+test.describe('Croatian player profile page (/hr/players/<slug>)', () => {
+  test('shows the same combined total as the English page, with translated labels', async ({ page }) => {
+    await page.goto('hr/players/gerd-muller');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.locator('h1')).toHaveText('Gerd Müller');
+    await expect(page.locator('.player-profile__totals-grid dt').first()).toHaveText('Ukupno nagrada');
+
+    const hrTotal = await page.locator('.player-profile__totals-grid dd').first().textContent();
+
+    await page.goto('players/gerd-muller');
+    const enTotal = await page.locator('.player-profile__totals-grid dd').first().textContent();
+    expect(hrTotal).toBe(enTotal);
+  });
+
+  test('shows one section per award with Croatian award names, linking to the Croatian competition page', async ({
+    page,
+  }) => {
+    await page.goto('hr/players/gerd-muller');
+    await expect(page.locator('h2 a', { hasText: 'Zlatna lopta' })).toHaveAttribute(
+      'href',
+      /\/hr\/competitions\/ballon-dor\/?$/,
+    );
+    await expect(page.locator('h2', { hasText: 'Zlatna kopačka Svjetskog prvenstva' })).toBeVisible();
+    await expect(page.locator('h2', { hasText: 'Zlatna kopačka EURA' })).toBeVisible();
+  });
+
+  test('a tied Golden Boot year shows the team with the Croatian goals unit', async ({ page }) => {
+    await page.goto('hr/players/oleg-salenko');
+    const detail = page.locator('.player-profile__detail').first();
+    await expect(detail).toContainText('Russia');
+    await expect(detail).toContainText('golova');
+  });
+
+  test('a player with diacritics in their name resolves at a plain-ASCII URL', async ({ page }) => {
+    await page.goto('hr/players/drazan-jerkovic');
+    await expect(page.locator('h1')).toHaveText('Dražan Jerković');
+  });
+
+  test('has no horizontal page overflow at 360px', async ({ page }) => {
+    await page.goto('hr/players/gerd-muller');
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('has no WCAG violations', async ({ page }) => {
+    await page.goto('hr/players/gerd-muller');
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .disableRules(['region'])
+      .analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test('the language switcher returns to the English profile page', async ({ page }) => {
+    await page.goto('hr/players/gerd-muller');
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/football-reference\/players\/gerd-muller\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });
 });

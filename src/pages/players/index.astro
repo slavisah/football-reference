@@ -3,7 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import References from '../../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import { buildAllPlayerProfiles, playerProfileSlug, type PlayerAwardSource } from '../../lib/playerProfile';
-import { withBase } from '../../lib/url';
+import { absolutePageUrl, withBase } from '../../lib/url';
+import { buildPlayersDirectoryItemList, type JsonLdObject } from '../../lib/jsonLd';
 
 const meta = await loadPageMeta('players');
 
@@ -35,11 +36,20 @@ const lastReviewed = [ballonDor.lastReviewed, worldCupGoldenBoot.lastReviewed, e
   .concat(meta.lastReviewed)
   .sort()
   .at(-1) as string;
+
+const jsonLd: JsonLdObject[] = [
+  buildPlayersDirectoryItemList(profiles, {
+    pageUrl: absolutePageUrl(Astro.url, Astro.site),
+    name: "Players directory - every Men's Ballon d'Or and FIFA World Cup/UEFA EURO Golden Boot winner",
+  }),
+];
 ---
 
 <BaseLayout
   title={meta.title}
   description="Every Men's Ballon d'Or winner and FIFA World Cup or UEFA EURO Golden Boot winner, A to Z - pick one for their full year-by-year award record."
+  alternateHref={withBase('/hr/players')}
+  jsonLd={jsonLd}
 >
   <article class="players stack">
     <header class="players__header">

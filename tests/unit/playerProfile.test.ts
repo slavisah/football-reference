@@ -76,6 +76,15 @@ describe('buildPlayerProfile', () => {
     expect(profile.awards).toEqual([]);
     expect(profile.totalAwards).toBe(0);
   });
+
+  it('uses a custom goalsLabel for the goal-count unit, leaving team/date facts untouched (Croatian page)', () => {
+    const profile = buildPlayerProfile('Gerd Müller', sources, { goalsLabel: 'golova' });
+    // The Golden Boot row's unit word is translated...
+    expect(profile.awards[1].appearances[0].detail).toBe('West Germany · 10 golova');
+    // ...but the Ballon d'Or row (team + ceremony date, no goal count) is
+    // unaffected: those are source-derived facts, not a translatable unit.
+    expect(profile.awards[0].appearances[0].detail).toBe('West Germany · 29 December 1970');
+  });
 });
 
 describe('distinctPlayers / buildAllPlayerProfiles', () => {

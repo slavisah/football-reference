@@ -7,12 +7,15 @@ import {
   buildQuizJsonLd,
   buildRivalriesItemList,
   buildTeamProfileItemList,
+  buildPlayerProfileItemList,
+  buildPlayersDirectoryItemList,
   buildWebSiteJsonLd,
 } from '../../src/lib/jsonLd';
 import type { ChampionSummary, Edition } from '../../src/lib/types';
 import type { CountryRecord, FinalsMeeting, Rivalry } from '../../src/lib/compare';
 import type { QuizQuestion } from '../../src/lib/quiz';
 import type { TeamProfile } from '../../src/lib/teamProfile';
+import type { PlayerProfile } from '../../src/lib/playerProfile';
 
 describe('buildBreadcrumbList', () => {
   it('builds a positioned ListItem per entry with the schema.org context/type', () => {
@@ -373,6 +376,125 @@ describe('buildTeamProfileItemList', () => {
       name: 'Nowhere - competition appearances',
     });
     expect(itemList.itemListElement).toEqual([]);
+  });
+});
+
+describe('buildPlayerProfileItemList', () => {
+  const profile: PlayerProfile = {
+    id: 'Gerd Müller',
+    displayName: 'Gerd Müller',
+    awards: [
+      {
+        title: "Ballon d'Or",
+        slug: 'ballon-dor',
+        appearances: [{ year: '1970', yearSort: 1970, detail: 'West Germany · 29 December 1970' }],
+      },
+      {
+        title: 'FIFA World Cup Golden Boot',
+        slug: 'golden-boot',
+        appearances: [{ year: '1970', yearSort: 1970, detail: 'West Germany · 10 goals' }],
+      },
+    ],
+    totalAwards: 2,
+  };
+
+  it('produces one ranked ListItem per award the player has won, named after that award', () => {
+    const itemList = buildPlayerProfileItemList(profile, {
+      pageUrl: 'https://example.test/players/gerd-muller/',
+      name: 'Gerd Müller - full award history',
+    });
+
+    expect(itemList['@type']).toBe('ItemList');
+    expect(itemList.name).toBe('Gerd Müller - full award history');
+    expect(itemList.url).toBe('https://example.test/players/gerd-muller/');
+    expect(itemList.itemListElement).toEqual([
+      {
+        '@type': 'ListItem',
+        position: 1,
+        item: {
+          '@type': 'Thing',
+          name: "Ballon d'Or",
+          description: '1970 (West Germany · 29 December 1970)',
+        },
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        item: {
+          '@type': 'Thing',
+          name: 'FIFA World Cup Golden Boot',
+          description: '1970 (West Germany · 10 goals)',
+        },
+      },
+    ]);
+  });
+
+  it('omits the parenthetical when an appearance has no detail string', () => {
+    const noDetail: PlayerProfile = {
+      ...profile,
+      awards: [
+        {
+          title: "Ballon d'Or",
+          slug: 'ballon-dor',
+          appearances: [{ year: '1970', yearSort: 1970, detail: '' }],
+        },
+      ],
+    };
+    const itemList = buildPlayerProfileItemList(noDetail, {
+      pageUrl: 'https://example.test/players/x/',
+      name: 'X',
+    });
+    const [first] = itemList.itemListElement as { item: { description: string } }[];
+    expect(first.item.description).toBe('1970');
+  });
+
+  it('supports a describe() override for a translated page', () => {
+    const itemList = buildPlayerProfileItemList(profile, {
+      pageUrl: 'https://example.test/hr/players/gerd-muller/',
+      name: 'Gerd Müller - cjelovita povijest nagrada',
+      describe: (a) => `${a.appearances.length} osvajanja`,
+    });
+    const [first] = itemList.itemListElement as { item: { description: string } }[];
+    expect(first.item.description).toBe('1 osvajanja');
+  });
+
+  it('returns an empty itemListElement for a player with no awards', () => {
+    const empty: PlayerProfile = { ...profile, awards: [], totalAwards: 0 };
+    const itemList = buildPlayerProfileItemList(empty, {
+      pageUrl: 'https://example.test/players/nobody/',
+      name: 'Nobody',
+    });
+    expect(itemList.itemListElement).toEqual([]);
+  });
+});
+
+describe('buildPlayersDirectoryItemList', () => {
+  const profiles: PlayerProfile[] = [
+    { id: 'A', displayName: 'A', awards: [], totalAwards: 3 },
+    { id: 'B', displayName: 'B', awards: [], totalAwards: 1 },
+  ];
+
+  it('produces one ranked ListItem per player, describing their combined award count', () => {
+    const itemList = buildPlayersDirectoryItemList(profiles, {
+      pageUrl: 'https://example.test/players/',
+      name: 'Players directory',
+    });
+    expect(itemList['@type']).toBe('ItemList');
+    const items = itemList.itemListElement as { position: number; item: { name: string; description: string } }[];
+    expect(items[0].item.name).toBe('A');
+    expect(items[0].item.description).toContain('3 awards');
+    expect(items[1].item.description).toContain('1 award');
+    expect(items[1].item.description).not.toContain('1 awards');
+  });
+
+  it('supports a describe() override for the Croatian directory', () => {
+    const itemList = buildPlayersDirectoryItemList(profiles, {
+      pageUrl: 'https://example.test/hr/players/',
+      name: 'Popis igrača',
+      describe: (p) => `${p.totalAwards} nagrada`,
+    });
+    const [first] = itemList.itemListElement as { item: { description: string } }[];
+    expect(first.item.description).toBe('3 nagrada');
   });
 });
 
