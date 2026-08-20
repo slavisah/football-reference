@@ -9205,6 +9205,123 @@ against "does it have an ItemList?" and "did I add its new `src/lib`
 dependencies to `pdf-pages.mjs`?" rather than trusting that shipping fast
 means shipping complete.
 
+### Bug fix: the 80 `/teams/<slug>` profile pages had zero page-specific structured data - fixed 2026-08-20 (intensive run)
+
+With every standing "Left for a future pass" candidate still exhausted
+(source-link liveness infeasible, further content-accuracy spot-checks
+low-yield, the flag-emoji idea rejected, CSP's `'unsafe-inline'` not worth
+revisiting, the Golden Boot reverse-lookup quiz type not pursued,
+`public/downloads/` PDF-bloat documented/intentional, EURO podium cards
+structurally impossible, full per-edition team participant lists blocked on
+sourcing), this run took the previous entry's own closing lesson literally -
+"a same-day feature addition needs its own explicit ItemList checklist pass"
+- and applied it retroactively across the whole site rather than just the
+one section that had just been caught. `grep -rln "jsonLd\|JsonLd" src/pages/`
+showed every page family with generated rankings already wired up **except**
+`src/pages/teams/[slug].astro` and `src/pages/hr/teams/[slug].astro` - the 80
+individual national-team profile pages (40 teams x English/Croatian, added
+2026-08-18) that `buildTeamProfile()` (`src/lib/teamProfile.ts`) already
+turns into a genuine generated ranking-shaped list (every FIFA World Cup,
+UEFA EURO, Copa América and UEFA Nations League final/semifinal a team has
+reached, grouped by competition). Confirmed the gap was real, not just an
+absent grep hit: neither page ever passed a `jsonLd` prop to `BaseLayout`,
+so each of the 80 pages carried only the automatic `BreadcrumbList`
+`BaseLayout.astro` adds to every non-home page - no other site-wide sweep
+(the JSON-LD SEO passes of 2026-08-15/16, or the 2026-08-20 "Fiercest
+rivalries" fix earlier today) had ever reached these pages, because they
+were the one page family generated from a per-team dynamic route rather
+than a hand-written page file `grep`-visible alongside the others in a
+single pass.
+
+**Fix:** new `buildTeamProfileItemList(profile, options)` in
+`src/lib/jsonLd.ts`, following the exact shape `buildRivalriesItemList()`
+already established for a non-`ChampionSummary` ranking - one `Thing` per
+competition the team has actually reached a tracked final or semifinal in
+(in the same order the page's own `<section>` cards list them), named after
+that competition, with a description enumerating every appearance as
+`"{role} ({year})"` joined by commas - the exact two facts (year, role) the
+page's own `<ol>` already renders per competition, in the same chronological
+order, no combined-totals figure invented beyond what the page shows. A
+`describe()` override mirrors every other builder's translation mechanism,
+though the Croatian page ends up not needing one: the role/year labels are
+the same untranslated historical column labels (`"Champion"`, `"Runner-up"`,
+`"Other semifinalist"`, ...) the Croatian page's own `<ol>` already renders
+verbatim (see that page's own top-of-file note on what is and isn't
+translated), so the default English-shaped join needs no re-wording there.
+
+Wired into both `src/pages/teams/[slug].astro` and
+`src/pages/hr/teams/[slug].astro`: a `jsonLd` array built from
+`buildTeamProfileItemList()`, guarded by `profile.competitions.length > 0`
+the same way `/records`' rivalries `ItemList` guards on a non-empty ranking
+(every real team profile page has at least one competition today, since
+`getStaticPaths()` only generates a page for a team `buildAllCountryRecords()`
+already found a final/semifinal for - but a team profile generated from a
+future edge case with zero appearances degrades to just the automatic
+`BreadcrumbList`, matching the page's own "has not reached a tracked final
+or semifinal" fallback text for that same case), passed through to
+`BaseLayout`'s existing `jsonLd` prop exactly like every other page.
+
+**Tests:** 4 new Vitest cases (`tests/unit/jsonLd.test.ts`:
+`buildTeamProfileItemList` - the ranked one-Thing-per-competition shape with
+the default "Role (Year), ..." description, preserving an exact source
+column label like "Runner-up" rather than inventing generic wording, the
+`describe()` override, and an empty-`competitions` case - 380 total, up from
+376). 3 new Playwright cases in `tests/e2e/mobile.spec.ts`: `/teams/brazil`
+carries a `BreadcrumbList` plus an `ItemList` with one `Thing` per competition
+matching the page's own rendered `<section>` count, and the World Cup
+`Thing`'s description contains real appearances ("Champion (1958)", "Champion
+(2002)"); `/hr/teams/brazil` carries its own Croatian `ItemList` name
+("Brazil - nastupi u natjecanjima") with per-competition descriptions
+identical to the English page's (confirming the "no translation needed"
+reasoning above actually holds, not just in theory); `/teams/germany` omits
+a Copa América `Thing` entirely (Germany/West Germany has never entered it),
+confirming the `ItemList` only lists competitions the team actually appears
+in, the same rule `tests/unit/teamProfile.test.ts` already covers at the
+data layer.
+
+`pnpm lint` (`astro check`) - 0 errors/warnings/hints across 118 files.
+`pnpm test` - **380/380** (up from 376). `pnpm build` - 105 pages, unchanged.
+`pnpm check:pdfs` correctly flagged all 80 `team-*`/`team-*-hr` PDFs stale
+immediately after editing `src/pages/teams/[slug].astro` and
+`src/pages/hr/teams/[slug].astro` (both already tracked in
+`TEAM_PDF_SOURCES`, `scripts/pdf-pages.mjs` - no `pdf-pages.mjs` edit was
+needed here, unlike the rivalries fix, since these two page files were
+already the per-team dependency list's own page-specific entries); ran
+`pnpm build:pdfs` (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) and
+`pnpm build` again, then `pnpm check:pdfs` passed clean on all 94 PDFs (the
+14 non-team PDFs were re-touched by the same `build:pdfs` run but unaffected
+content-wise - print output never includes `<script type="application/
+ld+json">` tags, so no PDF's visible content actually changed). `check:links`
+(109 pages, 0 broken links), `check:sitemap` (104 entries), `check:perf`
+(`/hr/records` 499.3 KB / `/records` 494.2 KB, unchanged - `<script
+type="application/ld+json">` on 80 already-lightweight team pages added a
+few hundred bytes each, nowhere near the two heaviest pages), and
+`check:precache` (31 URLs) all pass unchanged. Full Playwright suite
+re-run at `--workers=1`: **523/524 passed** (up from 521; the 3 new team-
+profile JSON-LD cases plus the existing suite), 15.6 minutes. The single
+failure - `accessibility-quiz-states.spec.ts`'s Croatian "restarted-after-
+answering state has no WCAG violations" case, a `#quiz-restart` click
+timing out at 30s - is unrelated to anything this run touched (quiz restart
+UI, not `/teams/<slug>` or `jsonLd.ts`) and confirmed a pre-existing flake,
+not a regression: re-running just that spec file immediately afterward
+passed all 4 of its cases (English/Croatian x light/dark) cleanly in 54s.
+
+**Left for a future pass:** with this fix, every page family on the site
+that renders a generated ranking now has a matching `ItemList` - no other
+gap of this shape is currently known. The standing candidates from prior
+runs are otherwise unchanged (source-link liveness infeasible, further
+content-accuracy spot-checks low-yield, the flag-emoji idea rejected, CSP's
+`'unsafe-inline'` not worth revisiting, the Golden Boot reverse-lookup quiz
+type not pursued, `public/downloads/` PDF-bloat documented/intentional,
+EURO podium cards structurally impossible, full per-edition team
+participant lists blocked on sourcing). Worth flagging for whoever adds the
+*next* new page family generated from a dynamic route (`[slug].astro` or
+similar): a plain `grep -rln "jsonLd" src/pages/` misses any page file
+`grep` can see but that in fact renders many pages via `getStaticPaths()` -
+counting output pages (`pnpm build`'s own page count, or `check:sitemap`'s
+entry count) against which page *files* actually pass a `jsonLd` prop is a
+more reliable cross-check than eyeballing the file list.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

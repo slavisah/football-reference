@@ -20,8 +20,9 @@ import {
 } from '../../../lib/compare';
 import { loadTeamCompetitions } from '../../../lib/teamCompetitions';
 import { buildTeamProfile, teamProfileSlug } from '../../../lib/teamProfile';
+import { buildTeamProfileItemList, type JsonLdObject } from '../../../lib/jsonLd';
 import type { SourceLink } from '../../../lib/sources';
-import { withBase } from '../../../lib/url';
+import { absolutePageUrl, withBase } from '../../../lib/url';
 
 export async function getStaticPaths() {
   const { worldCup, euro, copaAmerica, nationsLeague } = await loadTeamCompetitions();
@@ -66,6 +67,24 @@ type Props = {
 const { record, competitions, sources, lastReviewed } = Astro.props as Props;
 const profile = buildTeamProfile(record, competitions);
 const slug = teamProfileSlug(record.id);
+
+// The role/year labels the ItemList's description reuses ("Champion (2016)",
+// "Runner-up (2020)", ...) are the same source column labels the page's own
+// <ol> above already renders untranslated (see this file's own top-of-file
+// note - only the surrounding prose/labels are Croatian, not the historical
+// column labels or team/competition names) - so the default English-shaped
+// "Role (Year), ..." join from buildTeamProfileItemList() needs no describe()
+// override here; there is no Croatian word in it to translate.
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd: JsonLdObject[] =
+  profile.competitions.length > 0
+    ? [
+        buildTeamProfileItemList(profile, {
+          pageUrl,
+          name: `${profile.displayName} - nastupi u natjecanjima`,
+        }),
+      ]
+    : [];
 ---
 
 <BaseLayout
@@ -73,6 +92,7 @@ const slug = teamProfileSlug(record.id);
   description={`Svako finale ili polufinale Svjetskog prvenstva, EURA, Copa Américe i Lige nacija za reprezentaciju ${profile.displayName}, generirano iz tablice svakog natjecanja.`}
   locale="hr"
   alternateHref={withBase(`/teams/${slug}`)}
+  jsonLd={jsonLd}
 >
   <article class="team-profile stack">
     <header class="team-profile__header">
