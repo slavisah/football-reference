@@ -9006,6 +9006,94 @@ this run found no new code-level gap, only the one stale-docs fix. The "by
 team" filter remains the one honestly-open requirement, blocked on
 editorial data rather than engineering effort.
 
+### Correction: the "by team" filter was already live; new feature: "Fiercest rivalries" ranking on /records - added 2026-08-20 (intensive run)
+
+**Docs correction, not a code change:** the previous entry above (and the
+"Next logical milestone" section it rewrote in `IMPLEMENTATION_NOTES.md`)
+both state the "by team" filter is still missing. That is wrong. It was
+built and shipped on 2026-08-03 (see the "'By team' filter" entry earlier in
+this file) - `src/lib/editions.ts`'s `editionTeams()`/`distinctTeams()`, a
+`teams` prop and `<select>` on `TournamentTable.astro`, live on all six
+competition/award pages in both languages, with its own Vitest and
+Playwright coverage. Confirmed still live today: `grep` finds
+`data-teams`/`teamLabel` wired up in the current `TournamentTable.astro`,
+and a fresh `pnpm build` + manual check of `dist/competitions/world-cup/
+index.html` shows the "Team" filter `<select>` rendered with real options.
+Every `docs/WEBSITE_REQUIREMENTS.md` required capability has in fact been
+complete since 2026-08-03, not "all but one" - re-verified this run,
+`grep -rn "TODO\|FIXME\|XXX" src/ scripts/ tests/` still finds nothing new.
+Rewrote `IMPLEMENTATION_NOTES.md`'s "Next logical milestone" section to stop
+naming a false gap, so a future run skimming that file first doesn't waste a
+run either avoiding or re-attempting something that already shipped. Left
+this file's own 2026-08-19 entry text as written above rather than editing
+it in place - matching how every other correction in this file (e.g. the
+"Tooling: `check-internal-links.mjs` entry-point guard" and the many
+"second independent cross-check" audits) has always corrected forward with a
+new entry, not by rewriting a past one.
+
+**New feature**, now that there genuinely was nothing left in
+`docs/WEBSITE_REQUIREMENTS.md`'s required/nice-to-have lists: a "Fiercest
+rivalries" ranking on `/records` (and `/hr/records`) - every pair of teams
+that has met 2 or more times in a FIFA World Cup, UEFA EURO, Copa América,
+or UEFA Nations League final, ranked by total meetings. Built entirely from
+data `/compare`'s existing "Finals meetings" panel already computes
+(`buildFinalsMeetings()` in `src/lib/compare.ts`, which reads the Champion/
+Runner-up columns every competition page already loads) - no new editorial
+content, so none of the caution around the "by team" filter's *missing*
+data applies here.
+
+- **`src/lib/compare.ts`** gains `buildRivalries(meetings: FinalsMeeting[])`:
+  groups every `FinalsMeeting` by an unordered team-id pair, keeps only pairs
+  with 2+ meetings (a "rivalry", not a one-off final), and returns each
+  pair's total meetings, per-team win counts, the distinct competitions
+  they've met in (first-meeting order), and the most recent meeting -
+  ranked by meeting count, then combined wins, then name. West Germany and
+  Germany merge into one pair via the same `winnerId`/`runnerUpId` grouping
+  `buildFinalsMeetings()` already applies; the display name goes through
+  `summaryGroupFor()` so a merged pair reads "Germany (incl. West Germany)"
+  exactly like every other generated ranking on this page, even though each
+  individual meeting keeps its own historical winner/runner-up name.
+- **`src/pages/records.astro`/`hr/records.astro`** gain a "Fiercest
+  rivalries" ("Najveći rivaliteti") section between "Biggest final wins" and
+  "Individual award winners timeline": an accessible, horizontally-scrollable
+  table (`role="region"`, `tabindex="0"`, visually-hidden caption - the same
+  pattern `/compare`'s "All national teams" table already uses) ranking every
+  qualifying pair, with each team name linking to its `/teams/<slug>` profile
+  page. Built from the same `competitions` array (World Cup/EURO/Copa
+  América/Nations League) both pages already load for their other rankings,
+  reshaped inline into the `CompetitionEditions[]` shape `buildFinalsMeetings`
+  expects - no new data loading, no refactor of the existing four
+  `loadCompetition()` calls.
+- **Tests**: 7 new Vitest cases in `tests/unit/compare.test.ts`
+  (`buildRivalries`: the 2+-meetings threshold, alphabetical teamA/teamB
+  ordering, per-team win counts including a one-sided rivalry, the West
+  Germany/Germany merge, distinct-competitions + most-recent tracking across
+  two competitions, ranking by meeting count, and the empty-list case - 372
+  total, up from 365) and 2 new Playwright cases at 360px (English: the top
+  row is Argentina vs Uruguay with a real meeting count and a working
+  `/teams/argentina` link, plus the Germany merge is visible in the table;
+  Croatian: the translated heading and table exist, and its top row's team
+  names and meeting count match the English page's exactly).
+- Confirmed with `pnpm lint` (0 errors/warnings/hints), the full Vitest
+  suite (372/372), and a full `pnpm build` (105 pages, unchanged page count).
+  Editing `src/lib/compare.ts` triggered `check:pdfs`' rendering-code
+  tracking (added 2026-08-17) across every page that depends on it -
+  `/records`, `/hr/records`, and all 80 `/teams/<slug>` PDFs (English +
+  Croatian) - regenerated with `pnpm build:pdfs`
+  (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`, per the escape hatch the
+  2026-08-19 entry documented) and reverified clean. `check:links`,
+  `check:sitemap`, `check:perf` (records/hr-records stay the two heaviest
+  pages at ~492/497 KB, still under the 510 KB budget), and `check:precache`
+  all pass unchanged. Playwright: the **full suite passed 521/521** at
+  `--workers=1` (up from 519, the 2 new rivalries cases), confirming no
+  regression anywhere else in the site.
+
+**Left for a future pass:** no known gap in this ranking - it's live on
+both languages, degrades to an explanatory message if no pair ever
+qualifies (can't happen today, but keeps the page honest for e.g. a future
+competition with no repeat finalists yet). The "by team" filter is not an
+open item; it was already complete. No other gap surfaced this run.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

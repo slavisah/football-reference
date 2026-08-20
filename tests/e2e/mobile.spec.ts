@@ -1483,6 +1483,34 @@ test.describe('Records page on a 360px phone', () => {
     ).toBeVisible();
   });
 
+  test('shows a "Fiercest rivalries" ranking of pairs that have met 2+ times in a final, topped by Argentina vs Uruguay', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Fiercest rivalries' })).toBeVisible();
+
+    const rivalriesTable = page.locator('.records__rivalries-table');
+    const firstRow = rivalriesTable.locator('tbody tr').first();
+    await expect(firstRow).toContainText('Argentina');
+    await expect(firstRow).toContainText('Uruguay');
+    // Argentina and Uruguay have met more than any other pair across the four
+    // team competitions (mostly Copa América finals).
+    await expect(firstRow.locator('td').nth(1)).toHaveText(/^\d+$/);
+    const meetingsCount = Number(await firstRow.locator('td').nth(1).innerText());
+    expect(meetingsCount).toBeGreaterThan(5);
+
+    // Each team name links to its own /teams/<slug> profile.
+    await expect(firstRow.getByRole('link', { name: 'Argentina' })).toHaveAttribute(
+      'href',
+      /\/teams\/argentina\/?$/,
+    );
+
+    // West Germany and Germany merge into one rivalry pair (a France-vs-
+    // Germany or similar entry would double-count otherwise) - assert the
+    // merged display name appears at least once rather than a bare
+    // "West Germany" rivalry row existing separately from "Germany".
+    await expect(rivalriesTable.getByText('Germany (incl. West Germany)').first()).toBeVisible();
+  });
+
   test("shows a separate timeline and ranking for the Ballon d'Or and Golden Boot awards", async ({
     page,
   }) => {
@@ -1680,6 +1708,28 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
 
     expect(hrTop).toBe(enTop);
     expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
+  });
+
+  test('shows the translated "Najveći rivaliteti" ranking, matching the English page\'s top pair and meeting count', async ({
+    page,
+    baseURL,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Najveći rivaliteti' })).toBeVisible();
+
+    const hrFirstRow = page.locator('.records__rivalries-table tbody tr').first();
+    const hrText = await hrFirstRow.textContent();
+    const hrMeetings = await hrFirstRow.locator('td').nth(1).textContent();
+
+    await page.goto(baseURL ? `${baseURL}records` : '/records');
+    const enFirstRow = page.locator('.records__rivalries-table tbody tr').first();
+    const enText = await enFirstRow.textContent();
+    const enMeetings = await enFirstRow.locator('td').nth(1).textContent();
+
+    expect(hrText).toContain('Argentina');
+    expect(hrText).toContain('Uruguay');
+    expect(enText).toContain('Argentina');
+    expect(enText).toContain('Uruguay');
+    expect(hrMeetings).toBe(enMeetings);
   });
 
   test('the language switcher returns to the English records page', async ({ page }) => {

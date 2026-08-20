@@ -25,6 +25,8 @@ import {
   buildRunnerUpsWithoutTitle,
   buildTimeline,
 } from '../../lib/editions';
+import { buildFinalsMeetings, buildRivalries, type CompetitionEditions } from '../../lib/compare';
+import { teamProfileSlug } from '../../lib/teamProfile';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import { buildChampionsItemList, type JsonLdObject } from '../../lib/jsonLd';
 
@@ -115,6 +117,16 @@ const lastReviewed = allLoaded
   .at(-1) as string;
 
 const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+// Croatian counterpart of the English page's "Fiercest rivalries" ranking -
+// same generated data (buildFinalsMeetings/buildRivalries), only the
+// section's own prose and table headers are translated.
+const finalsMeetingCompetitions: CompetitionEditions[] = competitions.map((c) => ({
+  title: c.label,
+  slug: c.key,
+  editions: c.data.editions,
+}));
+const rivalries = buildRivalries(buildFinalsMeetings(finalsMeetingCompetitions));
 
 // Croatian counterpart of src/pages/records.astro's jsonLd block - same
 // generated data, own Croatian ItemList names, matching how every other
@@ -598,6 +610,64 @@ const jsonLd: JsonLdObject[] = [
       </div>
     </section>
 
+    <section class="stack" aria-labelledby="rivalries-heading">
+      <h2 id="rivalries-heading">Najveći rivaliteti</h2>
+      <p class="muted">
+        Svaki par reprezentacija koje su se 2 ili više puta susrele u finalu
+        FIFA Svjetskog prvenstva, UEFA Europskog prvenstva, Copa Américe ili
+        UEFA Lige nacija, rangiran po ukupnom broju susreta - generirano iz
+        stupaca Prvak/Drugo mjesto koji već postoje na stranici svakog
+        natjecanja, bez novog uredničkog sadržaja.
+      </p>
+      {
+        rivalries.length > 0 ? (
+          <div
+            class="t-wrap"
+            tabindex="0"
+            role="region"
+            aria-label="Najveći rivaliteti, rangirani po broju susreta u finalu"
+          >
+            <table class="records__rivalries-table">
+              <caption class="visually-hidden">Najveći rivaliteti, rangirani po broju susreta u finalu</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Poredak</th>
+                  <th scope="col">Rivalitet</th>
+                  <th scope="col">Susreti</th>
+                  <th scope="col">Međusobni omjer</th>
+                  <th scope="col">Natjecanja</th>
+                  <th scope="col">Posljednji susret</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rivalries.map((r, i) => (
+                  <tr>
+                    <td>{i + 1}</td>
+                    <th scope="row">
+                      <a href={withBase(`/teams/${teamProfileSlug(r.teamAId)}`)}>{r.teamADisplayName}</a>
+                      {' - '}
+                      <a href={withBase(`/teams/${teamProfileSlug(r.teamBId)}`)}>{r.teamBDisplayName}</a>
+                    </th>
+                    <td>{r.meetings}</td>
+                    <td>
+                      {r.teamAWins}-{r.teamBWins}
+                      {r.teamAWins === r.teamBWins ? '' : ` (vodi ${r.teamAWins > r.teamBWins ? r.teamADisplayName : r.teamBDisplayName})`}
+                    </td>
+                    <td>{r.competitions.join(', ')}</td>
+                    <td>
+                      {r.mostRecent.year} ({r.mostRecent.competition})
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p class="muted">Nijedan par reprezentacija još se nije susreo u više od jednog finala.</p>
+        )
+      }
+    </section>
+
     <section class="stack" aria-labelledby="award-timeline-heading">
       <h2 id="award-timeline-heading">Vremenska crta pojedinačnih nagrada</h2>
       <p class="muted">
@@ -736,5 +806,38 @@ const jsonLd: JsonLdObject[] = [
     gap: 0.5rem;
     max-width: 68ch;
     padding-left: 1.2rem;
+  }
+
+  .t-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+  }
+
+  .records__rivalries-table {
+    width: 100%;
+    min-width: 34rem;
+    border-collapse: collapse;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .records__rivalries-table th,
+  .records__rivalries-table td {
+    padding: 0.55rem 0.7rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    white-space: nowrap;
+  }
+
+  .records__rivalries-table thead th {
+    background: var(--bg-subtle);
+    font-size: 0.85rem;
+  }
+
+  .records__rivalries-table tbody tr:last-child th,
+  .records__rivalries-table tbody tr:last-child td {
+    border-bottom: none;
   }
 </style>
