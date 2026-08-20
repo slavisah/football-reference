@@ -118,7 +118,9 @@
     "src/components/ChampionsTimeline.astro": "2806b12e451650ebcfc7b47640cb9cc766bf7ebf18b013dc520fc0bf1bdddea5",
     "src/components/ChampionsSummary.astro": "2809a09ed5528dc1236fecaebc41bd3ff6f78881732cf9f8ebb367588337b3de",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/records.astro": "5d274d9996444cdae6bf63e030c03c8cccb3a6a80fa1060bd0740406ba1302a7"
+    "src/lib/compare.ts": "9192fca6c619321799bf16067aefd908050d3c02a82465e4775a9b4767579364",
+    "src/lib/teamProfile.ts": "a1cdc7be2b4de321da431b5b64ace9785483bcb219d022fd8d0cd4489e6c6b6f",
+    "src/pages/records.astro": "023c4f41952e5b338ef461c14afb3384a36fbfafb5685ca9789b9d83fcf857cf"
   },
   "world-cup-hr": {
     "content/fifa-world-cup.md": "a25c75128ad4c22694f5718c03d52b59dd4a9d8b901f7a19103af8fb730548b6",
@@ -234,7 +236,9 @@
     "src/components/ChampionsTimeline.astro": "2806b12e451650ebcfc7b47640cb9cc766bf7ebf18b013dc520fc0bf1bdddea5",
     "src/components/ChampionsSummary.astro": "2809a09ed5528dc1236fecaebc41bd3ff6f78881732cf9f8ebb367588337b3de",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/hr/records.astro": "afa4ab4ed53c5f6521503b053e38cd8bf3db17124d97e124fc87870ae13894f9"
+    "src/lib/compare.ts": "9192fca6c619321799bf16067aefd908050d3c02a82465e4775a9b4767579364",
+    "src/lib/teamProfile.ts": "a1cdc7be2b4de321da431b5b64ace9785483bcb219d022fd8d0cd4489e6c6b6f",
+    "src/pages/hr/records.astro": "adff79f7bd6abb8111f9572afb057a617c4655e208ea0e0350385353694be8ed"
   },
   "team-argentina": {
     "content/fifa-world-cup.md": "a25c75128ad4c22694f5718c03d52b59dd4a9d8b901f7a19103af8fb730548b6",

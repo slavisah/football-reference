@@ -2702,11 +2702,11 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
   }) => {
     await page.goto('records');
     const blocks = await jsonLdBlocks(page);
-    expect(blocks).toHaveLength(39);
+    expect(blocks).toHaveLength(40);
     expect(blocks.filter((b) => b['@type'] === 'BreadcrumbList')).toHaveLength(1);
 
     const lists = blocks.filter((b) => b['@type'] === 'ItemList');
-    expect(lists).toHaveLength(38);
+    expect(lists).toHaveLength(39);
     expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Most successful teams');
     expect(lists.map((l) => l.name)).toContain('Copa América - Most frequent hosts');
     expect(lists.map((l) => l.name)).toContain('Golden Boot (World Cup) - Back-to-back champions');
@@ -2752,6 +2752,15 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(lists.map((l) => l.name)).toContain('UEFA EURO - Biggest final wins');
     expect(lists.map((l) => l.name)).toContain('UEFA Nations League - Biggest final wins');
     expect(lists.map((l) => l.name)).not.toContain('Copa América - Biggest final wins');
+
+    // "Fiercest rivalries" (added 2026-08-20) is populated today - Argentina
+    // and Uruguay alone have met 15+ times - so there's no empty-ranking
+    // fallback case live to exercise.
+    const rivalries = lists.find((l) => l.name === 'Fiercest rivalries');
+    expect(rivalries).toBeDefined();
+    expect(rivalries.itemListElement[0].item.name).toContain('Argentina');
+    expect(rivalries.itemListElement[0].item.name).toContain('Uruguay');
+    expect(rivalries.itemListElement[0].item.description).toMatch(/^\d+ meetings? \(/);
   });
 
   test('/hr/records carries its own Croatian ItemList names for every ranking section', async ({
@@ -2760,7 +2769,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     await page.goto('hr/records');
     const blocks = await jsonLdBlocks(page);
     const lists = blocks.filter((b) => b['@type'] === 'ItemList');
-    expect(lists).toHaveLength(38);
+    expect(lists).toHaveLength(39);
     expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - najuspješnije reprezentacije');
     expect(lists.map((l) => l.name)).toContain('Zlatna lopta - uzastopni prvaci');
     expect(lists.map((l) => l.name)).not.toContain('UEFA Liga nacija - uzastopni prvaci');
@@ -2771,6 +2780,10 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(lists.map((l) => l.name)).not.toContain("Zlatna lopta - naslovi osvojeni na domaćem terenu");
     expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - najveće pobjede u finalu');
     expect(lists.map((l) => l.name)).not.toContain('Copa América - najveće pobjede u finalu');
+
+    const rivalries = lists.find((l) => l.name === 'Najveći rivaliteti');
+    expect(rivalries).toBeDefined();
+    expect(rivalries.itemListElement[0].item.description).toMatch(/^\d+ susreta \(/);
   });
 
   test('/compare carries a BreadcrumbList and one ItemList ranking every national team by combined record', async ({

@@ -166,7 +166,13 @@ export const PDF_PAGES = [
   // loaded twice, once per competition's top-scorer table) plus SOURCES_MD
   // for its own References section, so any one of them can make this PDF
   // stale, not just a single content file the way each competition's own
-  // PDF works.
+  // PDF works. Also depends on src/lib/compare.ts (buildFinalsMeetings/
+  // buildRivalries, behind the "Fiercest rivalries" section added
+  // 2026-08-20) and src/lib/teamProfile.ts (teamProfileSlug, for that
+  // section's per-team links) - found missing from this list entirely on a
+  // fresh audit shortly after that section shipped, exactly the
+  // content-only-hashing blind spot this file's own header comment already
+  // warns about for rendering code in general.
   {
     slug: 'records',
     path: '/records',
@@ -180,6 +186,8 @@ export const PDF_PAGES = [
       SOURCES_MD,
       ...COMPETITION_LIB,
       ...TIMELINE_COMPONENTS,
+      'src/lib/compare.ts',
+      'src/lib/teamProfile.ts',
       'src/pages/records.astro',
     ],
   },
@@ -279,6 +287,8 @@ export const PDF_PAGES = [
       SOURCES_MD,
       ...COMPETITION_LIB,
       ...TIMELINE_COMPONENTS,
+      'src/lib/compare.ts',
+      'src/lib/teamProfile.ts',
       'src/pages/hr/records.astro',
     ],
   },

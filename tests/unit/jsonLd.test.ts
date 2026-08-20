@@ -5,10 +5,11 @@ import {
   buildCountryRecordsItemList,
   buildLatestEditionSportsEvent,
   buildQuizJsonLd,
+  buildRivalriesItemList,
   buildWebSiteJsonLd,
 } from '../../src/lib/jsonLd';
 import type { ChampionSummary, Edition } from '../../src/lib/types';
-import type { CountryRecord } from '../../src/lib/compare';
+import type { CountryRecord, FinalsMeeting, Rivalry } from '../../src/lib/compare';
 import type { QuizQuestion } from '../../src/lib/quiz';
 
 describe('buildBreadcrumbList', () => {
@@ -196,6 +197,84 @@ describe('buildCountryRecordsItemList', () => {
 
     const [first] = itemList.itemListElement as { item: { description: string } }[];
     expect(first.item.description).toBe('5 naslova');
+  });
+});
+
+describe('buildRivalriesItemList', () => {
+  const mostRecentMeeting: FinalsMeeting = {
+    competition: 'Copa América',
+    slug: 'copa-america',
+    year: '2024',
+    yearSort: 2024,
+    winnerId: 'argentina',
+    winnerName: 'Argentina',
+    runnerUpId: 'colombia',
+    runnerUpName: 'Colombia',
+  };
+  const rivalries: Rivalry[] = [
+    {
+      teamAId: 'argentina',
+      teamADisplayName: 'Argentina',
+      teamBId: 'uruguay',
+      teamBDisplayName: 'Uruguay',
+      meetings: 15,
+      teamAWins: 6,
+      teamBWins: 9,
+      competitions: ['Copa América', 'FIFA World Cup'],
+      mostRecent: mostRecentMeeting,
+    },
+  ];
+
+  it('produces one ranked ListItem per rivalry, named "Team A vs Team B"', () => {
+    const itemList = buildRivalriesItemList(rivalries, {
+      pageUrl: 'https://example.test/records/',
+      name: 'Fiercest rivalries',
+    });
+
+    expect(itemList['@type']).toBe('ItemList');
+    expect(itemList.name).toBe('Fiercest rivalries');
+    expect(itemList.url).toBe('https://example.test/records/');
+    expect(itemList.itemListElement).toEqual([
+      {
+        '@type': 'ListItem',
+        position: 1,
+        item: {
+          '@type': 'Thing',
+          name: 'Argentina vs Uruguay',
+          description:
+            '15 meetings (Argentina 6, Uruguay 9) across Copa América, FIFA World Cup, most recently 2024 (Copa América)',
+        },
+      },
+    ]);
+  });
+
+  it('uses the singular "meeting" wording for a hypothetical exactly-one-meeting rivalry', () => {
+    const oneMeeting: Rivalry[] = [{ ...rivalries[0], meetings: 1 }];
+    const itemList = buildRivalriesItemList(oneMeeting, {
+      pageUrl: 'https://example.test/records/',
+      name: 'Fiercest rivalries',
+    });
+    const [first] = itemList.itemListElement as { item: { description: string } }[];
+    expect(first.item.description).toContain('1 meeting (');
+    expect(first.item.description).not.toContain('1 meetings');
+  });
+
+  it('supports a describe() override for a translated page', () => {
+    const itemList = buildRivalriesItemList(rivalries, {
+      pageUrl: 'https://example.test/hr/records/',
+      name: 'Najveći rivaliteti',
+      describe: (r) => `${r.meetings} susreta`,
+    });
+    const [first] = itemList.itemListElement as { item: { description: string } }[];
+    expect(first.item.description).toBe('15 susreta');
+  });
+
+  it('returns an empty itemListElement for no qualifying rivalries', () => {
+    const itemList = buildRivalriesItemList([], {
+      pageUrl: 'https://example.test/records/',
+      name: 'Fiercest rivalries',
+    });
+    expect(itemList.itemListElement).toEqual([]);
   });
 });
 

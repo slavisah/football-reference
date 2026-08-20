@@ -6,7 +6,7 @@
 // BaseLayout.astro, so pages can freely mix however many of these apply.
 import { isPlaceholderWinner } from './editions';
 import type { ChampionSummary, Edition } from './types';
-import type { CountryRecord } from './compare';
+import type { CountryRecord, Rivalry } from './compare';
 import type { QuizQuestion } from './quiz';
 
 export type JsonLdObject = Record<string, unknown>;
@@ -130,6 +130,51 @@ export function buildCountryRecordsItemList(
         '@type': 'Thing',
         name: record.displayName,
         description: describe(record),
+      },
+    })),
+  };
+}
+
+/**
+ * /records' "Fiercest rivalries" ranking (buildRivalries() in compare.ts) as
+ * an ItemList - the one ranking section on that page that shipped
+ * (2026-08-20) without the ItemList every other /records ranking has had
+ * since the 2026-08-15 SEO pass, closed here rather than left drifting
+ * further. Each pair becomes one Thing named "Team A vs Team B", matching
+ * the on-page table's own "Rivalry" column, with a description covering
+ * meetings/head-to-head/competitions/most-recent - the exact facts that
+ * column set already renders, no new computation. A `describe()` override
+ * mirrors `buildCountryRecordsItemList()`'s own translation mechanism, for
+ * the Croatian page's Croatian description text.
+ */
+function defaultRivalryDescription(rivalry: Rivalry): string {
+  const { teamADisplayName, teamBDisplayName, meetings, teamAWins, teamBWins, competitions, mostRecent } =
+    rivalry;
+  return `${meetings} meeting${meetings === 1 ? '' : 's'} (${teamADisplayName} ${teamAWins}, ${teamBDisplayName} ${teamBWins}) across ${competitions.join(', ')}, most recently ${mostRecent.year} (${mostRecent.competition})`;
+}
+
+export function buildRivalriesItemList(
+  rivalries: Rivalry[],
+  options: {
+    pageUrl: string;
+    name: string;
+    /** Overrides the per-pair description, e.g. for the Croatian page. Defaults to an English sentence. */
+    describe?: (rivalry: Rivalry) => string;
+  },
+): JsonLdObject {
+  const { pageUrl, name, describe = defaultRivalryDescription } = options;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name,
+    url: pageUrl,
+    itemListElement: rivalries.map((rivalry, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Thing',
+        name: `${rivalry.teamADisplayName} vs ${rivalry.teamBDisplayName}`,
+        description: describe(rivalry),
       },
     })),
   };
