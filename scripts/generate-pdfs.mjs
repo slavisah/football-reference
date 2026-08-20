@@ -26,7 +26,7 @@ import { spawn } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PDF_PAGES as PAGES, TEAM_PDF_SOURCES } from './pdf-pages.mjs';
+import { PDF_PAGES as PAGES, TEAM_PDF_SOURCES, PLAYER_PDF_SOURCES } from './pdf-pages.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const PORT = 4399;
@@ -76,6 +76,18 @@ function teamProfileSlug(id) {
     .toLowerCase();
 }
 
+// Mirrors src/lib/playerProfile.ts's playerProfileSlug() exactly, for the
+// same plain-Node reason teamProfileSlug() above is duplicated rather than
+// imported.
+function playerProfileSlug(name) {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/gi, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase();
+}
+
 async function waitForServer(url, timeoutMs = 60_000) {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
@@ -118,6 +130,7 @@ async function main() {
   process.on('exit', stopServer);
 
   let teamEntries = [];
+  let playerEntries = [];
 
   try {
     await waitForServer(`${ORIGIN}${BASE}/`);
@@ -196,6 +209,44 @@ async function main() {
       }
 
       teamEntries = teamManifestEntries;
+
+      // One PDF pair (English + Croatian) per award-winning player - the
+      // individual-award counterpart of the team loop above, see
+      // scripts/pdf-pages.mjs's PLAYER_PDF_SOURCES doc comment.
+      console.log('Fetching live player list from /player-index.json...');
+      const playerIndexRes = await fetch(`${ORIGIN}${BASE}/player-index.json`);
+      if (!playerIndexRes.ok) {
+        throw new Error(`GET /player-index.json returned ${playerIndexRes.status}`);
+      }
+      const playerIndex = await playerIndexRes.json();
+      console.log(`Found ${playerIndex.length} players.`);
+
+      const playerManifestEntries = [];
+      const seenPlayerSlugs = new Set();
+      for (const { id, displayName } of playerIndex) {
+        const slug = playerProfileSlug(id);
+        // Same collision guard src/pages/players/[slug].astro's own
+        // getStaticPaths() applies at build time - fail loudly rather than
+        // silently overwrite one player's PDF with another's.
+        if (seenPlayerSlugs.has(slug)) {
+          throw new Error(`Two players produced the same player PDF slug: "${slug}" (${displayName})`);
+        }
+        seenPlayerSlugs.add(slug);
+
+        for (const [pagePath, fileSlug] of [
+          [`/players/${slug}`, `player-${slug}`],
+          [`/hr/players/${slug}`, `player-${slug}-hr`],
+        ]) {
+          const url = `${ORIGIN}${BASE}${pagePath}`;
+          await page.goto(url, { waitUntil: 'networkidle' });
+          const outFile = path.join(OUT_DIR, `${fileSlug}.pdf`);
+          await page.pdf(pdfOptions(outFile));
+          playerManifestEntries.push({ slug: fileSlug, sources: PLAYER_PDF_SOURCES });
+        }
+        console.log(`Wrote player-${slug}.pdf / player-${slug}-hr.pdf (${displayName})`);
+      }
+
+      playerEntries = playerManifestEntries;
     } finally {
       await browser.close();
     }
@@ -203,7 +254,7 @@ async function main() {
     stopServer();
   }
 
-  const manifest = await buildManifest([...PAGES, ...teamEntries]);
+  const manifest = await buildManifest([...PAGES, ...teamEntries, ...playerEntries]);
   await writeFile(MANIFEST_PATH, `${JSON.stringify(manifest, null, 2)}\n`);
   console.log(`Wrote ${path.relative(ROOT, MANIFEST_PATH)}`);
 }

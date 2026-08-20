@@ -339,3 +339,30 @@ export const TEAM_PDF_SOURCES = [
   'src/pages/teams/[slug].astro',
   'src/pages/hr/teams/[slug].astro',
 ];
+
+// /players/<slug> and /hr/players/<slug> (one PDF per award-winning player,
+// per language - 98 players as of 2026-08-20) - the individual-award
+// counterpart of TEAM_PDF_SOURCES above, for exactly the same reason: the
+// player roster is derived at build time from the three award tables
+// (src/lib/playerProfile.ts's buildAllPlayerProfiles()), not a fixed,
+// hand-typeable list, so it can't be listed per-entry in PDF_PAGES the way
+// the six competition pages and /records are.
+//
+// scripts/generate-pdfs.mjs asks the running preview server for the live
+// player list (GET /player-index.json, this family's own endpoint - there's
+// no "find a player" widget to share one with, unlike /team-index.json) and
+// renders one PDF pair per player it finds, recording this same
+// PLAYER_PDF_SOURCES list against each `player-<slug>`/`player-<slug>-hr`
+// manifest key. scripts/check-pdf-freshness.mjs applies the identical
+// trust-the-manifest-keys strategy TEAM_PDF_SOURCES's own doc comment
+// explains, substituting the `player-` prefix for `team-`.
+export const PLAYER_PDF_SOURCES = [
+  'content/ballon-dor.md',
+  'content/golden-boot.md',
+  SOURCES_MD,
+  ...COMPETITION_LIB,
+  'src/lib/playerProfile.ts',
+  'src/components/References.astro',
+  'src/pages/players/[slug].astro',
+  'src/pages/hr/players/[slug].astro',
+];
