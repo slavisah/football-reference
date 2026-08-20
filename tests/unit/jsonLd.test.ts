@@ -6,11 +6,13 @@ import {
   buildLatestEditionSportsEvent,
   buildQuizJsonLd,
   buildRivalriesItemList,
+  buildTeamProfileItemList,
   buildWebSiteJsonLd,
 } from '../../src/lib/jsonLd';
 import type { ChampionSummary, Edition } from '../../src/lib/types';
 import type { CountryRecord, FinalsMeeting, Rivalry } from '../../src/lib/compare';
 import type { QuizQuestion } from '../../src/lib/quiz';
+import type { TeamProfile } from '../../src/lib/teamProfile';
 
 describe('buildBreadcrumbList', () => {
   it('builds a positioned ListItem per entry with the schema.org context/type', () => {
@@ -273,6 +275,102 @@ describe('buildRivalriesItemList', () => {
     const itemList = buildRivalriesItemList([], {
       pageUrl: 'https://example.test/records/',
       name: 'Fiercest rivalries',
+    });
+    expect(itemList.itemListElement).toEqual([]);
+  });
+});
+
+describe('buildTeamProfileItemList', () => {
+  const profile: TeamProfile = {
+    id: 'germany',
+    displayName: 'Germany',
+    competitions: [
+      {
+        title: 'FIFA World Cup',
+        slug: 'world-cup',
+        appearances: [
+          { year: '1954', yearSort: 1954, role: 'Champion' },
+          { year: '1974', yearSort: 1974, role: 'Champion' },
+          { year: '2014', yearSort: 2014, role: 'Champion' },
+        ],
+      },
+      {
+        title: 'UEFA EURO',
+        slug: 'euro',
+        appearances: [{ year: '2016', yearSort: 2016, role: 'Other semifinalist' }],
+      },
+    ],
+    totalTitles: 3,
+    totalRunnerUps: 0,
+    totalSemifinals: 1,
+    totalFinals: 3,
+  };
+
+  it('produces one ranked ListItem per competition the team appears in, named after that competition', () => {
+    const itemList = buildTeamProfileItemList(profile, {
+      pageUrl: 'https://example.test/teams/germany/',
+      name: 'Germany - competition appearances',
+    });
+
+    expect(itemList['@type']).toBe('ItemList');
+    expect(itemList.name).toBe('Germany - competition appearances');
+    expect(itemList.url).toBe('https://example.test/teams/germany/');
+    expect(itemList.itemListElement).toEqual([
+      {
+        '@type': 'ListItem',
+        position: 1,
+        item: {
+          '@type': 'Thing',
+          name: 'FIFA World Cup',
+          description: 'Champion (1954), Champion (1974), Champion (2014)',
+        },
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        item: {
+          '@type': 'Thing',
+          name: 'UEFA EURO',
+          description: 'Other semifinalist (2016)',
+        },
+      },
+    ]);
+  });
+
+  it('preserves the exact source column label for a runner-up finish rather than inventing generic wording', () => {
+    const runnerUp: TeamProfile = {
+      ...profile,
+      competitions: [
+        {
+          title: 'Copa América',
+          slug: 'copa-america',
+          appearances: [{ year: '2024', yearSort: 2024, role: 'Runner-up' }],
+        },
+      ],
+    };
+    const itemList = buildTeamProfileItemList(runnerUp, {
+      pageUrl: 'https://example.test/teams/colombia/',
+      name: 'Colombia - competition appearances',
+    });
+    const [first] = itemList.itemListElement as { item: { description: string } }[];
+    expect(first.item.description).toBe('Runner-up (2024)');
+  });
+
+  it('supports a describe() override for a translated page', () => {
+    const itemList = buildTeamProfileItemList(profile, {
+      pageUrl: 'https://example.test/hr/teams/germany/',
+      name: 'Njemačka - nastupi u natjecanjima',
+      describe: (c) => `${c.appearances.length} nastupa`,
+    });
+    const [first] = itemList.itemListElement as { item: { description: string } }[];
+    expect(first.item.description).toBe('3 nastupa');
+  });
+
+  it('returns an empty itemListElement for a team with no tracked competition appearances', () => {
+    const empty: TeamProfile = { ...profile, competitions: [] };
+    const itemList = buildTeamProfileItemList(empty, {
+      pageUrl: 'https://example.test/teams/nowhere/',
+      name: 'Nowhere - competition appearances',
     });
     expect(itemList.itemListElement).toEqual([]);
   });

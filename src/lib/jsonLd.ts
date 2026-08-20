@@ -8,6 +8,7 @@ import { isPlaceholderWinner } from './editions';
 import type { ChampionSummary, Edition } from './types';
 import type { CountryRecord, Rivalry } from './compare';
 import type { QuizQuestion } from './quiz';
+import type { TeamProfile, TeamProfileCompetition } from './teamProfile';
 
 export type JsonLdObject = Record<string, unknown>;
 
@@ -175,6 +176,54 @@ export function buildRivalriesItemList(
         '@type': 'Thing',
         name: `${rivalry.teamADisplayName} vs ${rivalry.teamBDisplayName}`,
         description: describe(rivalry),
+      },
+    })),
+  };
+}
+
+/**
+ * A /teams/<slug> team profile page's per-competition final/semifinal
+ * appearance list (buildTeamProfile() in teamProfile.ts) as an ItemList -
+ * found missing entirely (2026-08-20) on a fresh audit: every one of the
+ * site's other 80+ generated-ranking sections has had a matching ItemList
+ * since the 2026-08-15/16 SEO passes, but the 80 team profile pages (40
+ * teams x English/Croatian, added 2026-08-18) were built afterwards and
+ * never wired one up - the exact "a same-day/later feature needs its own
+ * explicit ItemList checklist pass" lesson the 2026-08-20 "Fiercest
+ * rivalries" bug-fix entry already recorded, just not yet re-applied here.
+ * One Thing per competition the team has actually reached a tracked final
+ * or semifinal in (in the same order the page itself lists them), each
+ * named after that competition with a description enumerating every
+ * appearance's role and year - the exact two facts (year, role) the page's
+ * own <ol> already renders per competition, no new computation and no
+ * combined-totals figure invented beyond what's on the page.
+ */
+function defaultTeamProfileDescription(competition: TeamProfileCompetition): string {
+  return competition.appearances.map((a) => `${a.role} (${a.year})`).join(', ');
+}
+
+export function buildTeamProfileItemList(
+  profile: TeamProfile,
+  options: {
+    pageUrl: string;
+    name: string;
+    /** Overrides the per-competition description, e.g. for a translated page. Defaults to an English "Role (Year), ..." list. */
+    describe?: (competition: TeamProfileCompetition) => string;
+  },
+): JsonLdObject {
+  const { pageUrl, name, describe = defaultTeamProfileDescription } = options;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name,
+    url: pageUrl,
+    itemListElement: profile.competitions.map((competition, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Thing',
+        name: competition.title,
+        description: describe(competition),
       },
     })),
   };

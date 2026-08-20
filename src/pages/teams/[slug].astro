@@ -5,8 +5,9 @@ import References from '../../components/References.astro';
 import { buildAllCountryRecords, type CompetitionEditions, type CountryRecord } from '../../lib/compare';
 import { loadTeamCompetitions } from '../../lib/teamCompetitions';
 import { buildTeamProfile, teamProfileSlug } from '../../lib/teamProfile';
+import { buildTeamProfileItemList, type JsonLdObject } from '../../lib/jsonLd';
 import type { SourceLink } from '../../lib/sources';
-import { withBase } from '../../lib/url';
+import { absolutePageUrl, withBase } from '../../lib/url';
 
 export async function getStaticPaths() {
   const { worldCup, euro, copaAmerica, nationsLeague, competitions } = await loadTeamCompetitions();
@@ -47,12 +48,24 @@ type Props = {
 const { record, competitions, sources, lastReviewed } = Astro.props as Props;
 const profile = buildTeamProfile(record, competitions);
 const slug = teamProfileSlug(record.id);
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd: JsonLdObject[] =
+  profile.competitions.length > 0
+    ? [
+        buildTeamProfileItemList(profile, {
+          pageUrl,
+          name: `${profile.displayName} - competition appearances`,
+        }),
+      ]
+    : [];
 ---
 
 <BaseLayout
   title={`${profile.displayName} - Full history`}
   description={`Every FIFA World Cup, UEFA EURO, Copa América and UEFA Nations League final or semifinal for ${profile.displayName}, generated from each competition's edition table.`}
   alternateHref={withBase(`/hr/teams/${slug}`)}
+  jsonLd={jsonLd}
 >
   <article class="team-profile stack">
     <header class="team-profile__header">

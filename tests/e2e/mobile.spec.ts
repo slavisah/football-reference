@@ -2840,6 +2840,69 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(itemList.itemListElement[0].item.description).toContain('naslova');
   });
 
+  test('/teams/brazil carries a BreadcrumbList and an ItemList of its competition appearances, one Thing per competition', async ({
+    page,
+  }) => {
+    await page.goto('teams/brazil');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList']);
+
+    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
+    expect(itemList.name).toBe('Brazil - competition appearances');
+    // Brazil has appeared in a tracked FIFA World Cup and Copa América final
+    // or semifinal, but never a EURO or Nations League one (national-team
+    // eligibility) - exactly two Things, matching the two <section> cards
+    // the page itself renders.
+    const sectionCount = await page.locator('.team-profile section.card.stack').count();
+    expect(itemList.itemListElement).toHaveLength(sectionCount);
+    const names = itemList.itemListElement.map((item: { item: { name: string } }) => item.item.name);
+    expect(names).toContain('FIFA World Cup');
+    expect(names).toContain('Copa América');
+    // The description reuses the exact role/year pairs the page's own <ol>
+    // renders (e.g. "Champion (1958)"), not an invented summary count.
+    const worldCupItem = itemList.itemListElement.find(
+      (item: { item: { name: string } }) => item.item.name === 'FIFA World Cup',
+    );
+    expect(worldCupItem.item.description).toContain('Champion (1958)');
+    expect(worldCupItem.item.description).toContain('Champion (2002)');
+  });
+
+  test('/hr/teams/brazil carries its own Croatian ItemList name, same appearance descriptions as the English page', async ({
+    page,
+  }) => {
+    await page.goto('teams/brazil');
+    const englishItemList = (await jsonLdBlocks(page)).find((b) => b['@type'] === 'ItemList');
+
+    await page.goto('hr/teams/brazil');
+    const itemList = (await jsonLdBlocks(page)).find((b) => b['@type'] === 'ItemList');
+    expect(itemList.name).toBe('Brazil - nastupi u natjecanjima');
+
+    // Role/year labels are the same untranslated source column labels the
+    // page's own <ol> already renders on both languages (see the Croatian
+    // page's own top-of-file note) - so beyond the ItemList's own `name`,
+    // every per-competition description should match the English page's
+    // exactly, not a re-translated wording.
+    expect(itemList.itemListElement.map((i: { item: { description: string } }) => i.item.description)).toEqual(
+      englishItemList.itemListElement.map((i: { item: { description: string } }) => i.item.description),
+    );
+  });
+
+  test('/teams/germany omits an ItemList entry for a competition it has never reached a tracked final or semifinal in', async ({
+    page,
+  }) => {
+    // Germany/West Germany has no tracked Copa América appearance (a
+    // European team never enters it) - confirms the ItemList only lists
+    // competitions the team actually appears in, matching the page's own
+    // "only includes competitions the team actually appears in" behavior
+    // (tests/unit/teamProfile.test.ts covers the same rule at the data layer).
+    await page.goto('teams/germany');
+    const blocks = await jsonLdBlocks(page);
+    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
+    const names = itemList.itemListElement.map((item: { item: { name: string } }) => item.item.name);
+    expect(names).toContain('FIFA World Cup');
+    expect(names).not.toContain('Copa América');
+  });
+
   test('/quiz carries a BreadcrumbList and a Quiz with one Question per rendered multiple-choice card', async ({
     page,
   }) => {
