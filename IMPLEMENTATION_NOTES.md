@@ -100,16 +100,20 @@ deployment → Source** to **GitHub Actions**.
 
 Every page and capability named in `docs/WEBSITE_REQUIREMENTS.md` is live,
 including `/about/sources`, sort controls that preserve historical notes,
-and full Croatian/English localization - see `docs/PROJECT_STATUS.md` for
-the complete, continuously-updated list (it now also covers `/compare`,
-`/teams`, a PWA/offline mode, downloadable print PDFs, and an "On this day"
-widget, none of which existed when this section was last accurate). The one
-requirement still open is the "by team" filter: only a team *count* column
-exists in `content/`, not a list of participating teams per edition, so
-there is no data to filter on yet - this needs new editorial content first,
-not a code change, and adding ~140 editions' worth of participant lists
-without reliable per-edition sourcing is exactly the kind of unattended,
-unreviewed data entry `docs/PROJECT_STATUS.md`'s "Known caveats" section
-already cautions against. `docs/PROJECT_STATUS.md`'s own "Left for a future
-pass" notes are the accurate, current source of truth for what (if
-anything) remains; this file only covers the original Milestone-1 slice.
+full Croatian/English localization, and the "by team" filter (shipped
+2026-08-03: `TournamentTable.astro`'s `teams` prop/`<select>`, filtering by
+any team that appears in a Winner/Runner-up/Third/Fourth/semifinalist
+column) - see `docs/PROJECT_STATUS.md` for the complete, continuously-updated
+list (it now also covers `/compare`, `/teams`, a PWA/offline mode,
+downloadable print PDFs, and an "On this day" widget, none of which existed
+when this section was last accurate).
+**Correction (2026-08-20 intensive run):** this section previously named the
+"by team" filter as the one still-missing requirement. That was stale - the
+filter has been live since 2026-08-03; the note only ever meant a *stricter*
+reading (full per-edition participant lists, not just teams that reached the
+latter stages) would need new editorial content, but stated it as if the
+filter didn't exist at all. See `docs/PROJECT_STATUS.md`'s 2026-08-20
+"Correction" entry for the full explanation. `docs/PROJECT_STATUS.md`'s own
+"Left for a future pass" notes are the accurate, current source of truth for
+what (if anything) remains; this file only covers the original Milestone-1
+slice.

@@ -15,6 +15,8 @@ import {
   buildRunnerUpsWithoutTitle,
   buildTimeline,
 } from '../lib/editions';
+import { buildFinalsMeetings, buildRivalries, type CompetitionEditions } from '../lib/compare';
+import { teamProfileSlug } from '../lib/teamProfile';
 import { absolutePageUrl, withBase } from '../lib/url';
 import { buildChampionsItemList, type JsonLdObject } from '../lib/jsonLd';
 
@@ -106,6 +108,17 @@ const lastReviewed = allLoaded
   .map((c) => c.data.lastReviewed)
   .sort()
   .at(-1) as string;
+
+// Pairs of teams that have met 2+ times in a final, across the four team
+// competitions - reuses the same per-meeting data /compare's "Finals
+// meetings" panel already builds for one chosen pair, no new editorial
+// content needed.
+const finalsMeetingCompetitions: CompetitionEditions[] = competitions.map((c) => ({
+  title: c.label,
+  slug: c.key,
+  editions: c.data.editions,
+}));
+const rivalries = buildRivalries(buildFinalsMeetings(finalsMeetingCompetitions));
 
 // One ItemList per ranking section rendered below (Most successful teams,
 // Most frequent hosts, Back-to-back champions - skipping the zero-streak
@@ -568,6 +581,58 @@ const jsonLd: JsonLdObject[] = [
       </div>
     </section>
 
+    <section class="stack" aria-labelledby="rivalries-heading">
+      <h2 id="rivalries-heading">Fiercest rivalries</h2>
+      <p class="muted">
+        Every pair of teams that has met 2 or more times in a FIFA World Cup,
+        UEFA EURO, Copa América, or UEFA Nations League final, ranked by total
+        meetings - generated from the Champion/Runner-up columns already on
+        each competition's own page, not new editorial content.
+      </p>
+      {
+        rivalries.length > 0 ? (
+          <div class="t-wrap" tabindex="0" role="region" aria-label="Fiercest rivalries, ranked by finals meetings">
+            <table class="records__rivalries-table">
+              <caption class="visually-hidden">Fiercest rivalries, ranked by finals meetings</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Rank</th>
+                  <th scope="col">Rivalry</th>
+                  <th scope="col">Meetings</th>
+                  <th scope="col">Head-to-head</th>
+                  <th scope="col">Competitions</th>
+                  <th scope="col">Most recent</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rivalries.map((r, i) => (
+                  <tr>
+                    <td>{i + 1}</td>
+                    <th scope="row">
+                      <a href={withBase(`/teams/${teamProfileSlug(r.teamAId)}`)}>{r.teamADisplayName}</a>
+                      {' vs '}
+                      <a href={withBase(`/teams/${teamProfileSlug(r.teamBId)}`)}>{r.teamBDisplayName}</a>
+                    </th>
+                    <td>{r.meetings}</td>
+                    <td>
+                      {r.teamAWins}-{r.teamBWins}
+                      {r.teamAWins === r.teamBWins ? '' : ` (${r.teamAWins > r.teamBWins ? r.teamADisplayName : r.teamBDisplayName} ahead)`}
+                    </td>
+                    <td>{r.competitions.join(', ')}</td>
+                    <td>
+                      {r.mostRecent.year} ({r.mostRecent.competition})
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p class="muted">No pair of teams has met in more than one final yet.</p>
+        )
+      }
+    </section>
+
     <section class="stack" aria-labelledby="award-timeline-heading">
       <h2 id="award-timeline-heading">Individual award winners timeline</h2>
       <p class="muted">
@@ -690,5 +755,38 @@ const jsonLd: JsonLdObject[] = [
     gap: 0.5rem;
     max-width: 68ch;
     padding-left: 1.2rem;
+  }
+
+  .t-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+  }
+
+  .records__rivalries-table {
+    width: 100%;
+    min-width: 34rem;
+    border-collapse: collapse;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .records__rivalries-table th,
+  .records__rivalries-table td {
+    padding: 0.55rem 0.7rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    white-space: nowrap;
+  }
+
+  .records__rivalries-table thead th {
+    background: var(--bg-subtle);
+    font-size: 0.85rem;
+  }
+
+  .records__rivalries-table tbody tr:last-child th,
+  .records__rivalries-table tbody tr:last-child td {
+    border-bottom: none;
   }
 </style>

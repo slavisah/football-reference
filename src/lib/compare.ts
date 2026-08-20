@@ -255,3 +255,74 @@ export function finalsMeetingsBetween(
     )
     .sort((a, b) => a.yearSort - b.yearSort);
 }
+
+export type Rivalry = {
+  teamAId: string;
+  teamADisplayName: string;
+  teamBId: string;
+  teamBDisplayName: string;
+  meetings: number;
+  teamAWins: number;
+  teamBWins: number;
+  /** Distinct competitions this pair has met in a final, in first-meeting order. */
+  competitions: string[];
+  mostRecent: FinalsMeeting;
+};
+
+/**
+ * Every pair of teams that has met in 2 or more finals across the given
+ * competitions, ranked by total meetings (ties broken by combined wins, then
+ * name) - a "most frequent rivalry" ranking built entirely from
+ * buildFinalsMeetings()'s existing per-meeting data, no new editorial
+ * content. West Germany/Germany meetings are merged under one pair via the
+ * same winnerId/runnerUpId grouping buildFinalsMeetings() already applies;
+ * the display name uses summaryGroupFor() so a merged pair reads "Germany
+ * (incl. West Germany)" exactly like every other generated ranking on this
+ * page, even though the individual FinalsMeeting rows keep each meeting's
+ * own historical name.
+ */
+export function buildRivalries(meetings: FinalsMeeting[]): Rivalry[] {
+  const byPair = new Map<string, FinalsMeeting[]>();
+  for (const meeting of meetings) {
+    const key = [meeting.winnerId, meeting.runnerUpId].sort().join('::');
+    const group = byPair.get(key);
+    if (group) {
+      group.push(meeting);
+    } else {
+      byPair.set(key, [meeting]);
+    }
+  }
+
+  const rivalries: Rivalry[] = [];
+  for (const group of byPair.values()) {
+    if (group.length < 2) continue;
+    const sorted = [...group].sort((a, b) => a.yearSort - b.yearSort);
+    const nameFor = (id: string) => {
+      const meeting = sorted.find((m) => m.winnerId === id || m.runnerUpId === id) as FinalsMeeting;
+      const raw = meeting.winnerId === id ? meeting.winnerName : meeting.runnerUpName;
+      return summaryGroupFor(raw).displayName;
+    };
+    const [idA, idB] = [sorted[0].winnerId, sorted[0].runnerUpId].sort((a, b) =>
+      nameFor(a).localeCompare(nameFor(b)),
+    );
+    const competitions = [...new Set(sorted.map((m) => m.competition))];
+    rivalries.push({
+      teamAId: idA,
+      teamADisplayName: nameFor(idA),
+      teamBId: idB,
+      teamBDisplayName: nameFor(idB),
+      meetings: sorted.length,
+      teamAWins: sorted.filter((m) => m.winnerId === idA).length,
+      teamBWins: sorted.filter((m) => m.winnerId === idB).length,
+      competitions,
+      mostRecent: sorted[sorted.length - 1],
+    });
+  }
+
+  return rivalries.sort(
+    (a, b) =>
+      b.meetings - a.meetings ||
+      b.teamAWins + b.teamBWins - (a.teamAWins + a.teamBWins) ||
+      a.teamADisplayName.localeCompare(b.teamADisplayName),
+  );
+}
