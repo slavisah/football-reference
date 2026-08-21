@@ -88,6 +88,7 @@ const jsonLd: JsonLdObject[] =
   description={`Every Men's Ballon d'Or and FIFA World Cup/UEFA EURO Golden Boot award for ${profile.displayName}, generated from each award's winners table.`}
   alternateHref={withBase(`/hr/players/${slug}`)}
   jsonLd={jsonLd}
+  breadcrumbTrail={[{ name: 'Players', url: withBase('/players') }]}
 >
   <article class="player-profile stack">
     <header class="player-profile__header">

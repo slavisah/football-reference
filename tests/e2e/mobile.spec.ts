@@ -2861,6 +2861,18 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     const blocks = await jsonLdBlocks(page);
     expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList']);
 
+    // A profile page is nested under its directory, so the breadcrumb is
+    // three levels deep (Home > Teams > Brazil) rather than the flat "Home >
+    // page" every other non-home page gets - see BaseLayout.astro's
+    // `breadcrumbTrail` prop.
+    const breadcrumb = blocks.find((b) => b['@type'] === 'BreadcrumbList');
+    expect(breadcrumb.itemListElement.map((i: { name: string }) => i.name)).toEqual([
+      'Home',
+      'Teams',
+      'Brazil - Full history',
+    ]);
+    expect(breadcrumb.itemListElement[1].item).toMatch(/\/teams\/$/);
+
     const itemList = blocks.find((b) => b['@type'] === 'ItemList');
     expect(itemList.name).toBe('Brazil - competition appearances');
     // Brazil has appeared in a tracked FIFA World Cup and Copa América final
@@ -2899,6 +2911,30 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(itemList.itemListElement.map((i: { item: { description: string } }) => i.item.description)).toEqual(
       englishItemList.itemListElement.map((i: { item: { description: string } }) => i.item.description),
     );
+  });
+
+  test('/players/lionel-messi carries a three-level BreadcrumbList (Home > Players > page), same nesting as /teams/<slug>', async ({
+    page,
+  }) => {
+    await page.goto('players/lionel-messi');
+    const breadcrumb = (await jsonLdBlocks(page)).find((b) => b['@type'] === 'BreadcrumbList');
+    expect(breadcrumb.itemListElement.map((i: { name: string }) => i.name)).toEqual([
+      'Home',
+      'Players',
+      'Lionel Messi - Full award history',
+    ]);
+    expect(breadcrumb.itemListElement[1].item).toMatch(/\/players\/$/);
+  });
+
+  test('/hr/players/lionel-messi carries its own Croatian three-level BreadcrumbList', async ({ page }) => {
+    await page.goto('hr/players/lionel-messi');
+    const breadcrumb = (await jsonLdBlocks(page)).find((b) => b['@type'] === 'BreadcrumbList');
+    expect(breadcrumb.itemListElement.map((i: { name: string }) => i.name)).toEqual([
+      'Početna',
+      'Igrači',
+      'Lionel Messi - cjelovita povijest nagrada',
+    ]);
+    expect(breadcrumb.itemListElement[1].item).toMatch(/\/hr\/players\/$/);
   });
 
   test('/teams/germany omits an ItemList entry for a competition it has never reached a tracked final or semifinal in', async ({
