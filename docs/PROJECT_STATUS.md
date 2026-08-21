@@ -9728,28 +9728,114 @@ promotion for that coverage). `tests/e2e/mobile.spec.ts`'s hardcoded
 sitemap `<url>` count updated 302 → 303 for the new single-locale entry;
 full `mobile.spec.ts` re-run **232/232** passing.
 
+**Left for a future pass (superseded by the next entry):** `/compare-players`
+Croatian localization + `NAV_LINKS`/`TRANSLATED_PATHS` promotion, named above
+as the natural next slice, was picked up the same day - see the following
+entry.
+
+### Localize `/compare-players` into Croatian, promote it to the primary nav - added 2026-08-21 (later intensive run)
+
+Completed the two-step `/compare-players` rollout named as the natural next
+slice by the immediately preceding entry - the same English-first-then-
+localize pattern `/players` and `/teams` each followed before it.
+
+- **Croatian page:** `src/pages/hr/compare-players.astro`, loading the exact
+  same live award data as the English page (the same three
+  `loadCompetition()` calls, `buildAllPlayerProfiles()`,
+  `buildAllComparePlayerRecords()`), so the head-to-head panel, "Shared
+  years" and "All players" ranking can never drift between languages - only
+  this page's own headings/prose and the three award display names are
+  translated (`Zlatna lopta` / `Zlatna kopačka Svjetskog prvenstva` /
+  `Zlatna kopačka EURA`, the exact same three strings
+  `hr/players/[slug].astro` already uses, matched by title through
+  `comparePlayers.ts`'s `awardDefs`/`buildAllComparePlayerRecords()` so a
+  typo here would silently zero out a player's award row rather than fail
+  loudly - verified by hand against the English page's own totals in a new
+  Playwright case). `buildAllPlayerProfiles()` gets the same
+  `{ goalsLabel: 'golova' }` option `hr/players/[slug].astro` already passes,
+  even though this page never renders an appearance's goals detail itself -
+  kept for consistency with every other Croatian caller of that function,
+  not because this page needs it.
+- **Nav:** `/compare-players` added to `NAV_LINKS` (label "Compare
+  Players"/"Usporedi igrače") and `TRANSLATED_PATHS`, so both languages are
+  now precached, appear in the primary nav and the 404 popular-pages list,
+  and - the main payoff of this promotion - are automatically picked up by
+  every `NAV_LINKS`-driven sweep (`accessibility.spec.ts`,
+  `accessibility-forced-colors.spec.ts`) with no per-page test wiring
+  needed, verified clean on both.
+- **Cross-link:** added the Croatian equivalent of the English page's
+  "Compare two players head-to-head" link
+  (`src/pages/players/index.astro`) to `hr/players/index.astro` ("Usporedi
+  dva igrača izravno"), including its `.players__compare-link` style rule
+  that the Croatian file's `<style>` block hadn't needed until now (Astro
+  scopes styles per file, so copying the markup without the rule would have
+  left it unstyled).
+- **Structured data:** the Croatian page's `ItemList` reuses
+  `jsonLd.ts`'s existing `buildPlayersDirectoryItemList()` with a Croatian
+  `name`/`describe()` override, the exact same pattern
+  `hr/players/index.astro` already established for its own directory
+  listing - no new JSON-LD builder needed.
+- **Sitemap:** `sitemap.xml.ts`'s special-cased single-locale `<url>` block
+  for `/compare-players` (added by the launch commit) is removed entirely -
+  the page now flows through the main `NAV_LINKS`/`TRANSLATED_PATHS` loop
+  like every other bilingual top-level page, picking up its `<lastmod>` from
+  `content/compare-players.md`'s own `lastReviewed` instead of the
+  three-source-table aggregation the special case needed.
+- **Print-media test coverage:** added `compare-players` +
+  `hr/compare-players` to `print-styles.spec.ts`'s `OTHER_PRINT_PAGES` list
+  (same "no `TournamentTable`" exemption as `/compare`/`/teams`/`/players`)
+  and a new `COMPARE_PLAYERS_PAGES` block mirroring the existing
+  `COMPARE_PAGES` block, since this page reuses the identical
+  `.compare__picker`/`.no-print` markup `/compare` already has its own
+  dedicated "picker is meaningless on paper" check for.
+
+**Tests:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across 131
+files (1 new: `hr/compare-players.astro`). `pnpm test` - **400/400**
+unchanged (no library logic touched, only pages/tests/routing tables).
+`pnpm build` - **305 pages** (up from 304). `pnpm check:links` - 0 broken
+links across 309 built pages. `pnpm check:sitemap` - 304 sitemap entries
+(up from 303: `/compare-players` moved from one single-locale entry to two
+bilingual entries, net +1) match the 309 built pages exactly, canonicals/
+hreflang agree. `pnpm check:precache` - 35 precached URLs, every nav link
+covered. `pnpm check:perf` - all pages within the page-weight budget.
+`pnpm check:pdfs` - all 290 PDFs unchanged and up to date (no PDF for this
+page, matching `/compare`'s own precedent). `tests/e2e/mobile.spec.ts`'s
+hardcoded sitemap `<url>` count updated 303 → 304 and the 404 popular-links
+count 26 → 28 (14 nav pages × 2 languages, up from 13); full re-run of the
+sitemap/SEO/404 block - **26/26** passing. `tests/unit/offlineCache.test.ts`
+gained one new `hr/compare-players` containment check. New Croatian describe
+block in `tests/e2e/compare-players.spec.ts` (8 cases: overflow, WCAG,
+same combined total as the English page, translated award names, the
+Croatian "Shared years" panel, the all-players table linking to Croatian
+profile pages, reachable from the Croatian `/players` index, and the
+language switcher) - all 16 cases in the file (8 English + 8 Croatian)
+passing. Full `accessibility.spec.ts` sweep - **74/74** passing, including
+both languages of `/compare-players` for the first time. Full
+`accessibility-forced-colors.spec.ts` sweep - **65/65** passing, same. Full
+`print-styles.spec.ts` - **119/119** passing, including the new
+`OTHER_PRINT_PAGES`/`COMPARE_PLAYERS_PAGES` entries.
+
 **Left for a future pass:** the standing candidates from prior runs are
 unchanged (source-link liveness infeasible, further content-accuracy
 spot-checks low-yield, the flag-emoji idea rejected, CSP's `'unsafe-inline'`
 not worth revisiting, the Golden Boot reverse-lookup quiz type not pursued,
 `public/downloads/` PDF-bloat documented/intentional, EURO podium cards
 structurally impossible, full per-edition team participant lists blocked on
-sourcing). New from this run: `/compare-players` Croatian localization +
-`NAV_LINKS`/`TRANSLATED_PATHS` promotion (unlocks nav visibility, offline
-precache, and its own WCAG/forced-colors/print-media sweep coverage, the
-same three-step follow-up `/players` itself needed after its English-only
-launch) is the natural next slice.
+sourcing). With this run, `/compare-players` reaches full feature parity
+(bilingual, nav-linked, structured data, precached, full accessibility/
+print-media sweep coverage) with `/players` and `/teams` - the only
+deferred item across all three families is `/compare-players` having no
+downloadable print PDF, which matches `/compare`'s own precedent rather
+than being a gap.
 
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
   Records and Timelines, Compare National Teams, the Family Quiz, the
-  `/teams` national-team directory, and the `/players` award-winner directory
+  `/teams` national-team directory, the `/players` award-winner directory,
+  and `/compare-players` (head-to-head Ballon d'Or/Golden Boot comparison)
   all have live pages in both English and Croatian now, all reachable from
   the primary nav.
-- `/compare-players` (head-to-head Ballon d'Or/Golden Boot comparison) is
-  live in English only, not yet in the primary nav - see this file's own
-  2026-08-21 entry for the reachable-but-not-promoted rollout it's following.
 - Historical names appear as distinct winner-filter entries by design.
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
   time out; re-running the deploy clears it (it did here).

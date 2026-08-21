@@ -80,6 +80,9 @@ const jsonLd: JsonLdObject[] = [
         pobjednika pojedinog natjecanja. Reprezentacije ovdje nisu uključene; za taj popis pogledajte
         "Reprezentacije".
       </p>
+      <p class="players__compare-link no-print">
+        <a href={withBase('/hr/compare-players')}>Usporedi dva igrača izravno &rarr;</a>
+      </p>
     </header>
 
     <section class="stack" aria-labelledby="players-list-heading">
@@ -132,6 +135,10 @@ const jsonLd: JsonLdObject[] = [
     max-width: 62ch;
     color: var(--text-muted);
     font-size: 1.05rem;
+  }
+
+  .players__compare-link {
+    font-weight: 600;
   }
 
   .players__grid {

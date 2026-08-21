@@ -1,17 +1,32 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import References from '../components/References.astro';
-import { loadCompetition, loadPageMeta } from '../lib/competition';
-import { buildAllPlayerProfiles } from '../lib/playerProfile';
-import type { PlayerAwardSource } from '../lib/playerProfile';
+// Croatian translation of src/pages/compare-players.astro. Same two-step
+// rollout /players and /teams both followed (English-only launch, then a
+// second run for the Croatian page + NAV_LINKS/TRANSLATED_PATHS promotion) -
+// see docs/PROJECT_STATUS.md's 2026-08-21 "/compare-players" entries for the
+// English launch and the "left for a future pass" note naming this as the
+// natural next slice. Loads the exact same live data as the English page
+// (loadCompetition x3 with the same editionsHeading/sourcesHeading pairs,
+// buildAllPlayerProfiles, buildAllComparePlayerRecords), so every award
+// count/year can never drift between languages - only this page's own
+// headings/prose and the three award display names (passed into
+// buildAllPlayerProfiles()/the awardDefs list via this file's own Croatian
+// `sources` array titles, the same pattern hr/players/[slug].astro already
+// uses) are translated. Player names stay as-is, matching every other
+// Croatian page's precedent (winner/champion names are the underlying data,
+// not UI chrome).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import References from '../../components/References.astro';
+import { loadCompetition, loadPageMeta } from '../../lib/competition';
+import { buildAllPlayerProfiles } from '../../lib/playerProfile';
+import type { PlayerAwardSource } from '../../lib/playerProfile';
 import {
   buildAllComparePlayerRecords,
   buildSharedAwardYears,
   type ComparePlayerAwardDef,
-} from '../lib/comparePlayers';
-import { playerProfileSlug } from '../lib/playerProfile';
-import { absolutePageUrl, withBase } from '../lib/url';
-import { buildPlayersDirectoryItemList, type JsonLdObject } from '../lib/jsonLd';
+} from '../../lib/comparePlayers';
+import { playerProfileSlug } from '../../lib/playerProfile';
+import { absolutePageUrl, withBase } from '../../lib/url';
+import { buildPlayersDirectoryItemList, type JsonLdObject } from '../../lib/jsonLd';
 
 const meta = await loadPageMeta('compare-players');
 
@@ -28,14 +43,14 @@ const [ballonDor, worldCupGoldenBoot, euroGoldenBoot] = await Promise.all([
 ]);
 
 const sources: PlayerAwardSource[] = [
-  { title: "Ballon d'Or", slug: 'ballon-dor', editions: ballonDor.editions },
-  { title: 'FIFA World Cup Golden Boot', slug: 'golden-boot', editions: worldCupGoldenBoot.editions },
-  { title: 'UEFA EURO Golden Boot', slug: 'golden-boot', editions: euroGoldenBoot.editions },
+  { title: 'Zlatna lopta', slug: 'ballon-dor', editions: ballonDor.editions },
+  { title: 'Zlatna kopačka Svjetskog prvenstva', slug: 'golden-boot', editions: worldCupGoldenBoot.editions },
+  { title: 'Zlatna kopačka EURA', slug: 'golden-boot', editions: euroGoldenBoot.editions },
 ];
 
 const awardDefs: ComparePlayerAwardDef[] = sources.map((s) => ({ title: s.title, slug: s.slug }));
 
-const profiles = buildAllPlayerProfiles(sources);
+const profiles = buildAllPlayerProfiles(sources, { goalsLabel: 'golova' });
 const sortedByName = [...profiles].sort((a, b) => a.displayName.localeCompare(b.displayName));
 
 const allRecords = buildAllComparePlayerRecords(profiles, awardDefs);
@@ -54,6 +69,8 @@ const lastReviewed = [ballonDor.lastReviewed, worldCupGoldenBoot.lastReviewed, e
   .sort()
   .at(-1) as string;
 
+const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
+
 const recordsForClient = allRecords.map((r) => ({
   id: r.id,
   displayName: r.displayName,
@@ -61,38 +78,46 @@ const recordsForClient = allRecords.map((r) => ({
   awards: r.awards.map((a) => ({ title: a.title, slug: a.slug, count: a.count, years: a.years })),
 }));
 
-// One ItemList for the "All players" ranking below, ranked by total awards -
-// the same buildPlayersDirectoryItemList() /players uses for its alphabetical
-// directory, just fed a differently-ordered profile list (there's no
-// award-count-shaped fact this ranking adds beyond what /players already
-// states per player, so no new describe() override is needed).
+// Croatian counterpart of src/pages/compare-players.astro's jsonLd block -
+// same data (ranked by total awards, not alphabetical, like the English
+// page), a Croatian item-list name, and the same describe() translation
+// pattern hr/players/index.astro already uses for its own directory ItemList.
 const jsonLd: JsonLdObject[] = [
   buildPlayersDirectoryItemList(profiles, {
     pageUrl: absolutePageUrl(Astro.url, Astro.site),
-    name: "Players ranked by total Ballon d'Or/Golden Boot awards",
+    name: 'Igrači poredani po ukupnom broju osvojenih Zlatnih lopti/kopački',
+    describe: (profile) =>
+      `${profile.totalAwards} ${profile.totalAwards === 1 ? 'nagrada' : 'nagrade'} u muškoj Zlatnoj lopti i Zlatnoj kopački Svjetskog prvenstva/EURA`,
   }),
 ];
 ---
 
 <BaseLayout
-  title={meta.title}
-  description="Compare two Men's Ballon d'Or or FIFA World Cup/UEFA EURO Golden Boot winners' award record head-to-head, generated from the same tables as the Players directory."
-  alternateHref={withBase('/hr/compare-players')}
+  title="Usporedi igrače"
+  description="Usporedite dvojicu dobitnika muške Zlatne lopte ili Zlatne kopačke Svjetskog prvenstva/EURA izravno, generirano iz istih tablica nagrada kao i stranica Igrači."
+  locale="hr"
+  alternateHref={withBase('/compare-players')}
   jsonLd={jsonLd}
 >
   <article class="compare stack">
     <header class="compare__header">
-      <p class="eyebrow badge">Generated from the award tables</p>
-      <h1>{meta.title}</h1>
-      <p class="compare__intro">{meta.intro}</p>
+      <p class="eyebrow badge">Generirano iz tablica nagrada</p>
+      <h1>Usporedi igrače</h1>
+      <p class="compare__intro">
+        Odaberite dva igrača za usporedbu njihovog učinka u muškoj Zlatnoj
+        lopti te Zlatnoj kopački Svjetskog prvenstva i EURA - koliko je puta
+        svaki od njih osvojio svaku nagradu, generirano izravno iz istih
+        tablica nagrada kao i stranica "Igrači". Reprezentacije ovdje nisu
+        uključene; za tu usporedbu pogledajte "Usporedba".
+      </p>
     </header>
 
     <section class="card stack" aria-labelledby="head-to-head-heading">
-      <h2 id="head-to-head-heading">Head-to-head</h2>
+      <h2 id="head-to-head-heading">Izravna usporedba</h2>
 
       <div class="compare__picker no-print">
         <div class="compare__field">
-          <label for="compare-a">Player A</label>
+          <label for="compare-a">Igrač A</label>
           <select id="compare-a" name="a">
             {
               sortedByName.map((p) => (
@@ -104,12 +129,12 @@ const jsonLd: JsonLdObject[] = [
           </select>
         </div>
 
-        <button type="button" id="compare-swap" class="compare__swap" aria-label="Swap Player A and Player B">
-          &#8646; Swap
+        <button type="button" id="compare-swap" class="compare__swap" aria-label="Zamijeni igrača A i B">
+          &#8646; Zamijeni
         </button>
 
         <div class="compare__field">
-          <label for="compare-b">Player B</label>
+          <label for="compare-b">Igrač B</label>
           <select id="compare-b" name="b">
             {
               sortedByName.map((p) => (
@@ -127,9 +152,9 @@ const jsonLd: JsonLdObject[] = [
         class="visually-hidden"
         role="status"
         aria-live="polite"
-        data-template="Comparing {a} vs {b}."
+        data-template="Usporedba: {a} protiv {b}."
       >
-        {`Comparing ${defaultA.displayName} vs ${defaultB.displayName}.`}
+        {`Usporedba: ${defaultA.displayName} protiv ${defaultB.displayName}.`}
       </p>
 
       <div class="compare__panel">
@@ -143,15 +168,15 @@ const jsonLd: JsonLdObject[] = [
                   class="t-wrap"
                   tabindex="0"
                   role="region"
-                  aria-label={`${record.displayName}'s award record`}
+                  aria-label={`Nagrade igrača ${record.displayName}`}
                 >
                   <table class="compare__table">
-                    <caption class="visually-hidden">{record.displayName}'s award record</caption>
+                    <caption class="visually-hidden">Nagrade igrača {record.displayName}</caption>
                     <thead>
                       <tr>
-                        <th scope="col">Award</th>
-                        <th scope="col">Times won</th>
-                        <th scope="col">Years</th>
+                        <th scope="col">Nagrada</th>
+                        <th scope="col">Broj osvajanja</th>
+                        <th scope="col">Godine</th>
                       </tr>
                     </thead>
                     <tbody id={`compare-${side}-body`}>
@@ -167,7 +192,7 @@ const jsonLd: JsonLdObject[] = [
                     </tbody>
                     <tfoot>
                       <tr id={`compare-${side}-total`}>
-                        <th scope="row">Combined</th>
+                        <th scope="row">Ukupno</th>
                         <td data-field="count">{record.totalAwards}</td>
                         <td data-field="years" aria-hidden="true"></td>
                       </tr>
@@ -181,29 +206,29 @@ const jsonLd: JsonLdObject[] = [
       </div>
 
       <p class="muted compare__note">
-        "Years" lists every year that player won the award in that row, oldest
-        first. National-team competitions (World Cup, EURO, Copa América,
-        Nations League titles) aren't included here: they recognize teams, not
-        individual players - see <a href={withBase('/compare')}>Compare</a> for that
-        comparison.
+        "Godine" navodi svaku godinu u kojoj je taj igrač osvojio nagradu u
+        tom retku, od najstarije prema najnovijoj. Natjecanja reprezentacija
+        (naslovi Svjetskog prvenstva, EURA, Copa Américe, Lige nacija) ovdje
+        nisu uključena: ona nagrađuju reprezentacije, a ne pojedince - za tu
+        usporedbu pogledajte <a href={withBase('/hr/compare')}>Usporedba</a>.
       </p>
     </section>
 
     <section class="card stack" aria-labelledby="shared-years-heading">
-      <h2 id="shared-years-heading">Shared years</h2>
+      <h2 id="shared-years-heading">Zajedničke godine</h2>
       <p class="muted" id="shared-years-intro">
-        Every year <span id="shared-years-a-name">{defaultA.displayName}</span> and{' '}
-        <span id="shared-years-b-name">{defaultB.displayName}</span> both won an award, whether or not it
-        was the same one.
+        Svaka godina u kojoj su i <span id="shared-years-a-name">{defaultA.displayName}</span> i{' '}
+        <span id="shared-years-b-name">{defaultB.displayName}</span> osvojili nagradu, bez obzira je
+        li riječ o istoj nagradi.
       </p>
       <div
         id="shared-years-body"
-        data-empty-text="These two haven't both won an award in the same year."
+        data-empty-text="Ova dva igrača nisu nikada iste godine osvojila nagradu."
       >
         {
           defaultSharedYears.length === 0 ? (
             <p class="muted" id="shared-years-empty">
-              These two haven't both won an award in the same year.
+              Ova dva igrača nisu nikada iste godine osvojila nagradu.
             </p>
           ) : (
             <ol class="shared-years__list" id="shared-years-list">
@@ -225,27 +250,29 @@ const jsonLd: JsonLdObject[] = [
     </section>
 
     <section class="stack" aria-labelledby="all-players-heading">
-      <h2 id="all-players-heading">All players</h2>
+      <h2 id="all-players-heading">Svi igrači</h2>
       <p class="muted">
-        Every Ballon d'Or or Golden Boot winner, ranked by total awards. Pick
-        any two above to compare them directly, or select a name below for
-        their full year-by-year record on{' '}
-        <a href={withBase('/players')}>the Players page</a>.
+        Svaki dobitnik Zlatne lopte ili Zlatne kopačke, poredan po ukupnom
+        broju nagrada. Odaberite bilo koja dva iznad za izravnu usporedbu,
+        ili odaberite ime u nastavku za cjeloviti pregled po godinama na{' '}
+        <a href={withBase('/hr/players')}>stranici Igrači</a>.
       </p>
       <div
         class="t-wrap"
         tabindex="0"
         role="region"
-        aria-label="All players' combined award record, ranked by total awards"
+        aria-label="Ukupan pregled nagrada svih igrača, poredanih po ukupnom broju nagrada"
       >
         <table class="compare__table compare__table--all">
-          <caption class="visually-hidden">All players' combined award record, ranked by total awards</caption>
+          <caption class="visually-hidden">
+            Ukupan pregled nagrada svih igrača, poredanih po ukupnom broju nagrada
+          </caption>
           <thead>
             <tr>
-              <th scope="col">Rank</th>
-              <th scope="col">Player</th>
+              <th scope="col">Poredak</th>
+              <th scope="col">Igrač</th>
               {awardDefs.map((a) => <th scope="col">{a.title}</th>)}
-              <th scope="col">Total</th>
+              <th scope="col">Ukupno</th>
             </tr>
           </thead>
           <tbody>
@@ -254,7 +281,7 @@ const jsonLd: JsonLdObject[] = [
                 <tr>
                   <td>{i + 1}</td>
                   <th scope="row">
-                    <a href={withBase(`/players/${playerProfileSlug(r.id)}`)}>{r.displayName}</a>
+                    <a href={withBase(`/hr/players/${playerProfileSlug(r.id)}`)}>{r.displayName}</a>
                   </th>
                   {r.awards.map((a) => (
                     <td>{a.count}</td>
@@ -268,7 +295,18 @@ const jsonLd: JsonLdObject[] = [
       </div>
     </section>
 
-    <References sources={combinedSources} lastReviewed={lastReviewed} status={meta.status} />
+    <References
+      sources={combinedSources}
+      lastReviewed={lastReviewed}
+      status={meta.status}
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText={statusText}
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+      noteText="Prednost imaju primarni izvori. Povijesni formati i nazivi bilježe se onako kako su korišteni u to vrijeme; kontekst potražite u napomenama uz svako izdanje."
+    />
   </article>
 </BaseLayout>
 
