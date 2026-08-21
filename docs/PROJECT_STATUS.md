@@ -9654,6 +9654,92 @@ full test-coverage parity too, on top of the feature parity the prior run
 already closed - no known coverage gap remains between the two profile-page
 families.
 
+### New feature: `/compare-players` - head-to-head Ballon d'Or/Golden Boot comparison - added 2026-08-21 (later intensive run)
+
+`/compare` explicitly excludes individual awards ("Ballon d'Or, Golden Boot
+... recognize players, not national teams"), and the `/players` directory
+(2026-08-20) only ever showed one player's record at a time. This closes
+that gap: pick two players and compare how many times each has won the
+Men's Ballon d'Or, FIFA World Cup Golden Boot, and UEFA EURO Golden Boot,
+generated from the exact same three award tables `/players` already loads -
+no new editorial content.
+
+**New `src/lib/comparePlayers.ts`:** `buildComparePlayerRecord()` turns a
+`PlayerProfile` (from `playerProfile.ts`) into a fixed-shape record with one
+row per award - including a `count: 0` row for an award the player never
+won - so both sides of the head-to-head panel always render the same rows,
+the individual-award equivalent of how `compare.ts`'s `CountryRecord`
+always has one row per team competition. `buildAllComparePlayerRecords()`
+ranks every player by total awards, doubling as both the head-to-head
+picker's data set and the page's "All players" reference table.
+`buildSharedAwardYears()` is the one genuinely new fact this page surfaces
+that isn't derivable from either player's own `/players/<slug>` profile:
+every year both selected players won *something*, even a different award
+each - e.g. 1998, when Zinedine Zidane won the Ballon d'Or the same year
+Davor Šuker won the World Cup Golden Boot. It's the individual-award
+analogue of `/compare`'s "Finals meetings" panel, which has no equivalent
+for players since there's no match between two individual award winners.
+
+**Page (`src/pages/compare-players.astro`):** mirrors `/compare`'s
+picker/swap/URL-param pattern almost exactly (same `<select>` + swap
+button + `role="status"` live region + `history.replaceState` shareable
+URL), swapping the "Finals meetings" section for "Shared years" and the
+per-competition titles/runner-ups/semifinals columns for a single
+award/count/years table. One caveat the "Head-to-head" note calls out
+explicitly: `PlayerProfile.id` (from `playerProfile.ts`) is the player's
+raw display name, not a slug like `CountryRecord.id` - so the picker's
+`<option value>` and the shareable `?a=/&b=` URL carry a URL-encoded name
+(`?a=Zinedine+Zidane`) rather than a clean slug. Linking to a profile page
+still goes through `playerProfileSlug()`, so `/players/<slug>` links are
+unaffected.
+
+**Reused, not duplicated, structured data:** the "All players" ranking's
+`ItemList` reuses `jsonLd.ts`'s existing `buildPlayersDirectoryItemList()`
+(the same builder `/players` itself uses), just fed a totals-ranked profile
+list instead of an alphabetical one - no new JSON-LD builder needed, since
+the per-player description it already generates ("N awards across the...")
+is exactly the fact this ranking shows too.
+
+**English-only this run**, the same two-step rollout `/players` and
+`/teams` both followed: not yet a `NAV_LINKS`/`TRANSLATED_PATHS` entry (no
+Croatian translation yet), so it isn't in the primary nav or the offline
+precache list, and `sitemap.xml.ts` gives it its own single-locale `<url>`
+entry rather than joining the main bilingual loop - matching exactly how
+`/players`' own launch commit handled this. Reachable today via a new
+"Compare two players head-to-head" link on the `/players` index page.
+Localization + `NAV_LINKS` promotion left for a future pass.
+
+**Tests:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across 129
+files (2 new: `comparePlayers.ts`, `compare-players.astro`). `pnpm test` -
+**400/400** (5 new `comparePlayers.test.ts` cases covering the 0-count row,
+multi-award totals, ranking order, and `buildSharedAwardYears()` both
+finding and correctly not finding a match). `pnpm build` - **304 pages**
+(up from 303). `pnpm check:sitemap`, `pnpm check:links`, `pnpm
+check:precache`, `pnpm check:perf`, `pnpm check:pdfs` all pass unchanged
+(no PDF for this page, matching `/compare`'s own precedent - `/compare` has
+no print PDF either). New `tests/e2e/compare-players.spec.ts` (8 cases:
+overflow, WCAG, the `/players` cross-link, the real default pair by total
+awards, picker + URL + shared-years update together, swap, a shared-link
+round trip, and the all-players table's profile links) - all passing,
+including a WCAG axe sweep with zero violations even though this page isn't
+yet covered by the site-wide `accessibility.spec.ts` sweep (that sweep is
+`NAV_LINKS`-driven, same reason `/players` itself waited until nav
+promotion for that coverage). `tests/e2e/mobile.spec.ts`'s hardcoded
+sitemap `<url>` count updated 302 → 303 for the new single-locale entry;
+full `mobile.spec.ts` re-run **232/232** passing.
+
+**Left for a future pass:** the standing candidates from prior runs are
+unchanged (source-link liveness infeasible, further content-accuracy
+spot-checks low-yield, the flag-emoji idea rejected, CSP's `'unsafe-inline'`
+not worth revisiting, the Golden Boot reverse-lookup quiz type not pursued,
+`public/downloads/` PDF-bloat documented/intentional, EURO podium cards
+structurally impossible, full per-edition team participant lists blocked on
+sourcing). New from this run: `/compare-players` Croatian localization +
+`NAV_LINKS`/`TRANSLATED_PATHS` promotion (unlocks nav visibility, offline
+precache, and its own WCAG/forced-colors/print-media sweep coverage, the
+same three-step follow-up `/players` itself needed after its English-only
+launch) is the natural next slice.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
@@ -9661,6 +9747,9 @@ families.
   `/teams` national-team directory, and the `/players` award-winner directory
   all have live pages in both English and Croatian now, all reachable from
   the primary nav.
+- `/compare-players` (head-to-head Ballon d'Or/Golden Boot comparison) is
+  live in English only, not yet in the primary nav - see this file's own
+  2026-08-21 entry for the reachable-but-not-promoted rollout it's following.
 - Historical names appear as distinct winner-filter entries by design.
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
   time out; re-running the deploy clears it (it did here).
