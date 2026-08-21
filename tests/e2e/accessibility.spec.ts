@@ -140,6 +140,47 @@ for (const colorScheme of COLOR_SCHEMES) {
   });
 }
 
+// The gap above (team profile pages never being reachable from SWEPT_PATHS)
+// applies identically to the 98 individual dynamic /players/<slug> profile
+// pages (src/pages/players/[slug].astro, added 2026-08-20): NAV_LINKS only
+// contains the /players *index*, and [slug].astro is generated per-player at
+// build time, so this sweep - built the same way, from the same list - never
+// reached a single player profile either. Unlike /teams/<slug>, this was
+// missed from day one rather than caught and fixed in a later pass. Spot-
+// checked one representative player (Gerd Muller, the same slug the PDF
+// download Playwright coverage already uses) rather than one test per player.
+for (const colorScheme of COLOR_SCHEMES) {
+  test.describe(`player profile page, ${colorScheme} color scheme`, () => {
+    test.use({ colorScheme });
+
+    test('English /players/gerd-muller has no automatic WCAG 2.1 A/AA violations', async ({
+      page,
+    }) => {
+      await page.goto('players/gerd-muller');
+
+      const results = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .disableRules(['region'])
+        .analyze();
+
+      expect(results.violations, formatViolations(results.violations)).toEqual([]);
+    });
+
+    test('Croatian /hr/players/gerd-muller has no automatic WCAG 2.1 A/AA violations', async ({
+      page,
+    }) => {
+      await page.goto('hr/players/gerd-muller');
+
+      const results = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .disableRules(['region'])
+        .analyze();
+
+      expect(results.violations, formatViolations(results.violations)).toEqual([]);
+    });
+  });
+}
+
 // Turns axe's violation objects into a readable failure message instead of
 // Playwright's default full-object dump (each violation can carry dozens of
 // matching DOM nodes). Typed off AxeBuilder's own return type rather than an
