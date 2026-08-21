@@ -149,6 +149,10 @@ test.describe('a screen-filtered row still prints', () => {
 // The /players directory (index + one representative profile page per
 // language, added 2026-08-20) had the identical gap and was never added at
 // all - same "no TournamentTable" exemption as /teams.
+//
+// /compare-players (Croatian localization added 2026-08-21) is added here
+// too - it also has no TournamentTable, same exemption as /compare, /teams
+// and /players.
 const OTHER_PRINT_PAGES = [
   { label: 'English Home', path: '' },
   { label: 'Croatian Home', path: 'hr/' },
@@ -166,6 +170,8 @@ const OTHER_PRINT_PAGES = [
   { label: 'Croatian Players index', path: 'hr/players' },
   { label: 'English Player profile (Gerd Muller)', path: 'players/gerd-muller' },
   { label: 'Croatian Player profile (Gerd Muller)', path: 'hr/players/gerd-muller' },
+  { label: 'English Compare Players', path: 'compare-players' },
+  { label: 'Croatian Compare Players', path: 'hr/compare-players' },
 ];
 
 for (const { label, path } of OTHER_PRINT_PAGES) {
@@ -226,6 +232,26 @@ const COMPARE_PAGES = [
 for (const { label, path } of COMPARE_PAGES) {
   test.describe(`${label} Compare (/${path}) in print media`, () => {
     test('hides the team-picker controls, which are meaningless on paper', async ({ page }) => {
+      await page.goto(path);
+      await page.emulateMedia({ media: 'print' });
+
+      await expect(page.locator('.compare__picker').first()).toBeHidden();
+    });
+  });
+}
+
+// /compare-players reuses the exact same .compare__picker/.no-print markup
+// as /compare (same component shape, different data), so it needs the same
+// dedicated "picker is meaningless on paper" check as its own case, not just
+// the generic WCAG/hide-chrome checks OTHER_PRINT_PAGES already runs on it.
+const COMPARE_PLAYERS_PAGES = [
+  { label: 'English', path: 'compare-players' },
+  { label: 'Croatian', path: 'hr/compare-players' },
+];
+
+for (const { label, path } of COMPARE_PLAYERS_PAGES) {
+  test.describe(`${label} Compare Players (/${path}) in print media`, () => {
+    test('hides the player-picker controls, which are meaningless on paper', async ({ page }) => {
       await page.goto(path);
       await page.emulateMedia({ media: 'print' });
 

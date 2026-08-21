@@ -27,6 +27,7 @@ export const NAV_LINKS: NavLink[] = [
   { path: '/compare', label: 'Compare', labelHr: 'Usporedba' },
   { path: '/teams', label: 'Teams', labelHr: 'Reprezentacije' },
   { path: '/players', label: 'Players', labelHr: 'Igrači' },
+  { path: '/compare-players', label: 'Compare Players', labelHr: 'Usporedi igrače' },
   { path: '/quiz', label: 'Quiz', labelHr: 'Kviz' },
   { path: '/about/sources', label: 'Sources', labelHr: 'Izvori' },
 ];

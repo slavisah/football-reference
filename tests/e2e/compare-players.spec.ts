@@ -6,9 +6,10 @@ import AxeBuilder from '@axe-core/playwright';
 // tables the "Players" directory already loads
 // (src/lib/comparePlayers.ts, src/pages/compare-players.astro). The
 // individual-award equivalent of /compare (national teams), which
-// explicitly excludes these two awards. English-only this run, like
-// /players and /teams before their own localization pass - not yet a
-// NAV_LINKS entry, reachable via the link on the /players index.
+// explicitly excludes these two awards. Now fully bilingual
+// (src/pages/hr/compare-players.astro) and a NAV_LINKS entry - the Croatian
+// describe block at the bottom of this file mirrors player-profile.spec.ts's
+// own Croatian coverage.
 
 test.describe('Compare Players page', () => {
   test('has no horizontal page overflow at 360px', async ({ page }) => {
@@ -97,5 +98,84 @@ test.describe('Compare Players page', () => {
     await page.goto('compare-players');
     const messiLink = page.locator('.compare__table--all a', { hasText: 'Lionel Messi' });
     await expect(messiLink).toHaveAttribute('href', /\/players\/lionel-messi\/?$/);
+  });
+});
+
+test.describe('Croatian Compare Players page (/hr/compare-players)', () => {
+  test('has no horizontal page overflow at 360px', async ({ page }) => {
+    await page.goto('hr/compare-players');
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('has no WCAG violations', async ({ page }) => {
+    await page.goto('hr/compare-players');
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .disableRules(['region'])
+      .analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test('shows the same default pair and combined total as the English page, with translated labels', async ({
+    page,
+  }) => {
+    await page.goto('hr/compare-players');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.locator('h1')).toHaveText('Usporedi igrače');
+    await expect(page.locator('#compare-a-name')).toHaveText('Lionel Messi');
+
+    const hrTotal = await page
+      .locator('#compare-a-total [data-field="count"]')
+      .textContent();
+
+    await page.goto('compare-players');
+    const enTotal = await page
+      .locator('#compare-a-total [data-field="count"]')
+      .textContent();
+    expect(hrTotal).toBe(enTotal);
+  });
+
+  test('shows Croatian award names in the head-to-head table', async ({ page }) => {
+    await page.goto('hr/compare-players');
+    await expect(page.locator('#compare-a-body th', { hasText: 'Zlatna lopta' })).toBeVisible();
+    await expect(
+      page.locator('#compare-a-body th', { hasText: 'Zlatna kopačka Svjetskog prvenstva' }),
+    ).toBeVisible();
+    await expect(page.locator('#compare-a-body th', { hasText: 'Zlatna kopačka EURA' })).toBeVisible();
+  });
+
+  test('choosing a different pair updates the shared-years panel in Croatian', async ({ page }) => {
+    await page.goto('hr/compare-players');
+    await page.selectOption('#compare-a', { label: 'Zinedine Zidane' });
+    await page.selectOption('#compare-b', { label: 'Davor Šuker' });
+
+    const sharedItem = page.locator('.shared-years__list li', { hasText: '1998' });
+    await expect(sharedItem).toContainText('Zlatna lopta');
+    await expect(sharedItem).toContainText('Zlatna kopačka Svjetskog prvenstva');
+  });
+
+  test('the all-players table links each player to their own Croatian profile page', async ({ page }) => {
+    await page.goto('hr/compare-players');
+    const messiLink = page.locator('.compare__table--all a', { hasText: 'Lionel Messi' });
+    await expect(messiLink).toHaveAttribute('href', /\/hr\/players\/lionel-messi\/?$/);
+  });
+
+  test('is reachable from the Croatian Players index', async ({ page }) => {
+    await page.goto('hr/players');
+    const link = page.locator('a', { hasText: 'Usporedi dva igrača izravno' });
+    await expect(link).toHaveAttribute('href', /\/hr\/compare-players\/?$/);
+  });
+
+  test('the language switcher returns to the English page', async ({ page }) => {
+    await page.goto('hr/compare-players');
+    await page.locator('a.lang-switch').click();
+    // The page's own script appends ?a=...&b=... on load (same as /compare),
+    // so the URL isn't bare - just check the path prefix.
+    await expect(page).toHaveURL(/\/football-reference\/compare-players(\?|$)/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });
 });
