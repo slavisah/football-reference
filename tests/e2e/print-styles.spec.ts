@@ -145,6 +145,10 @@ test.describe('a screen-filtered row still prints', () => {
 // language) joined this list once it shipped (docs/PROJECT_STATUS.md,
 // 2026-08-17) but was never actually added here - like Records/Compare it
 // has no TournamentTable, so the same "no table revert" exemption applies.
+//
+// The /players directory (index + one representative profile page per
+// language, added 2026-08-20) had the identical gap and was never added at
+// all - same "no TournamentTable" exemption as /teams.
 const OTHER_PRINT_PAGES = [
   { label: 'English Home', path: '' },
   { label: 'Croatian Home', path: 'hr/' },
@@ -158,6 +162,10 @@ const OTHER_PRINT_PAGES = [
   { label: 'Croatian Teams index', path: 'hr/teams' },
   { label: 'English Team profile (Brazil)', path: 'teams/brazil' },
   { label: 'Croatian Team profile (Brazil)', path: 'hr/teams/brazil' },
+  { label: 'English Players index', path: 'players' },
+  { label: 'Croatian Players index', path: 'hr/players' },
+  { label: 'English Player profile (Gerd Muller)', path: 'players/gerd-muller' },
+  { label: 'Croatian Player profile (Gerd Muller)', path: 'hr/players/gerd-muller' },
 ];
 
 for (const { label, path } of OTHER_PRINT_PAGES) {

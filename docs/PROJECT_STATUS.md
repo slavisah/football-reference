@@ -9588,6 +9588,72 @@ sourcing). With this run, `/players/<slug>` and `/teams/<slug>` are now at
 full feature parity (Croatian localization, structured data, print PDFs) -
 no further parity gaps between the two profile-page families remain.
 
+### Accessibility: closed `/players/<slug>`'s three-way test-coverage gap (main WCAG sweep, forced-colors, print media) - added 2026-08-21 (intensive run)
+
+Every roadmap backlog item (Copa América, Nations League, Ballon d'Or, Golden
+Boot pages) has been complete for weeks - see the many "Left for a future
+pass" entries above, all pointing at the same short standing list of
+infeasible/rejected/low-yield candidates. This run is a quality/accessibility
+pass instead, closing a real, previously-undetected gap.
+
+`/teams/<slug>` (40 dynamic per-team profile pages) got its own dedicated
+spot-check in all three of `tests/e2e/accessibility.spec.ts` (the main WCAG
+2.1 A/AA sweep), `accessibility-forced-colors.spec.ts`, and
+`print-styles.spec.ts` on 2026-08-18, precisely because the automated sweeps
+in those files only ever enumerate `NAV_LINKS`/`TRANSLATED_PATHS` - the fixed
+top-level pages - and have no way to reach a page generated per-slug by
+`getStaticPaths()` at build time. `/players/<slug>` (98 dynamic per-player
+profile pages, added 2026-08-20, two days *after* that `/teams/<slug>` fix)
+has the identical structural gap: its index is in `NAV_LINKS` and so is swept,
+but every individual profile page was never driven through WCAG, forced-colors,
+or print-media testing at all, in either language, since the day it shipped.
+The `/players` launch, its Croatian localization, and its PDF-download entries
+above all recorded full parity work with `/teams/<slug>` on every other
+dimension (structured data, localization, print PDFs) but missed this one,
+since none of those runs were looking at test-file coverage rather than the
+page itself.
+
+Closed by mirroring each spec's existing `/teams/brazil` precedent exactly,
+spot-checking one representative player (Gerd Müller - the same slug the PDF
+Playwright coverage already uses) rather than one test per player, in both
+languages:
+
+- **`accessibility.spec.ts`**: new `player profile page` describe block (light
+  + dark color scheme x English/Croatian, 4 tests), matching the team-profile
+  block's structure and axe config exactly.
+- **`accessibility-forced-colors.spec.ts`**: new `forced-colors mode, player
+  profile page` describe block (2 tests). Unlike the team-profile fix this
+  block follows, there was no CSS bug to pin here - every `/players/<slug>`
+  award-list entry is a win (there's no "runner-up" role to lose its color-only
+  signal, unlike `/teams/<slug>`'s `.team-profile__role` "Champion" text), so
+  this only confirms the page's accent-colored year and accent-bordered award
+  cards stay WCAG-clean once forced-colors overrides those custom-property
+  colors.
+- **`print-styles.spec.ts`**: added `players` + `hr/players` (the index) and
+  `players/gerd-muller` + `hr/players/gerd-muller` (a representative profile)
+  to `OTHER_PRINT_PAGES`, the same list `/teams` and `/teams/brazil` are in -
+  no player-profile-specific interactive chrome (there's no "Compare against
+  another team"-style link to hide) needed a dedicated block the way
+  `/teams/<slug>` needed one for its compare link.
+
+**Tests:** `pnpm lint` (0/0/0, unchanged - no source files touched, only
+tests), `pnpm test` **395/395** (unchanged - no unit-testable logic added),
+`pnpm build` **303 pages** (unchanged). Full Playwright suite: **575/575**
+(up from 557; +18 new cases: 4 WCAG-sweep + 2 forced-colors + 12 print-media,
+all passing on first run). `check:links`, `check:sitemap`, `check:precache`,
+`check:perf` all pass unchanged (no build-output-affecting changes).
+
+**Left for a future pass:** the standing candidates from prior runs are
+unchanged (source-link liveness infeasible, further content-accuracy
+spot-checks low-yield, the flag-emoji idea rejected, CSP's `'unsafe-inline'`
+not worth revisiting, the Golden Boot reverse-lookup quiz type not pursued,
+`public/downloads/` PDF-bloat documented/intentional, EURO podium cards
+structurally impossible, full per-edition team participant lists blocked on
+sourcing). With this run, `/players/<slug>` and `/teams/<slug>` are now at
+full test-coverage parity too, on top of the feature parity the prior run
+already closed - no known coverage gap remains between the two profile-page
+families.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

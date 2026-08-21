@@ -186,6 +186,30 @@ test.describe('forced-colors mode, team profile page', () => {
   });
 });
 
+// The same gap the block above closed for /teams/<slug> applies identically
+// to the 98 individual dynamic /players/<slug> profile pages
+// (src/pages/players/[slug].astro, added 2026-08-20): they were never driven
+// through forced-colors at all. Unlike the team profile's role text
+// ("Champion"/"Runner-up"), every /players/<slug> list entry is a win - there
+// is no role distinction to lose - so there is no equivalent CSS fix to pin
+// here; this only confirms the page (its accent-colored year and
+// accent-bordered award cards) stays WCAG-clean once forced-colors overrides
+// those custom-property colors. Spot-checked the same representative player
+// (Gerd Muller) the main WCAG sweep in accessibility.spec.ts uses.
+test.describe('forced-colors mode, player profile page', () => {
+  test('the English player profile page is WCAG-clean under forced-colors', async ({ page }) => {
+    await page.goto('players/gerd-muller');
+    await page.emulateMedia({ forcedColors: 'active' });
+    await runAxe(page);
+  });
+
+  test('the Croatian player profile page is also WCAG-clean under forced-colors', async ({ page }) => {
+    await page.goto('hr/players/gerd-muller');
+    await page.emulateMedia({ forcedColors: 'active' });
+    await runAxe(page);
+  });
+});
+
 // The three targeted tests above pin the exact bugs this mode surfaced and
 // their fixes; they don't answer whether forced-colors is clean everywhere
 // else. This sweep runs the same whole-site axe pass accessibility.spec.ts
