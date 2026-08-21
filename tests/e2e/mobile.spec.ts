@@ -2588,7 +2588,12 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     // /players is now a fully bilingual NAV_LINKS entry (see
     // docs/PROJECT_STATUS.md's 2026-08-20 "/players Croatian localization"
     // entry), so both its directory and every profile page have an hr sibling.
-    expect(body.match(/<url>/g)?.length).toBe(302);
+    // Plus one more single-locale entry for /compare-players, which - like
+    // /players and /teams before their own localization pass - ships
+    // English-only this run and isn't a NAV_LINKS entry yet, so it has no
+    // Croatian sibling to pair with.
+    expect(body.match(/<url>/g)?.length).toBe(303);
+    expect(body).toContain(`<loc>${SITE}/compare-players/</loc>`);
     expect(body).toContain(`<loc>${SITE}/competitions/world-cup/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/competitions/world-cup/</loc>`);
     expect(body).toContain(

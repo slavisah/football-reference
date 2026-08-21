@@ -160,6 +160,25 @@ export const GET: APIRoute = async ({ site, url }) => {
     urlEntries.push(`<url><loc>${xmlEscape(absolute(hrPath))}</loc>${playersLastmodTag}${altLinks}</url>`);
   }
 
+  // /compare-players is not yet a NAV_LINKS entry (same "English-only this
+  // run" two-step rollout /players and /teams both followed - see
+  // docs/PROJECT_STATUS.md): no Croatian translation yet, so it gets its own
+  // single-locale entry here instead of the main NAV_LINKS loop above.
+  const comparePlayersEntry = await getEntry('pages', 'compare-players');
+  const comparePlayersLastmod = [
+    ballonDor.lastReviewed,
+    worldCupGoldenBoot.lastReviewed,
+    euroGoldenBoot.lastReviewed,
+    comparePlayersEntry?.data.lastReviewed,
+  ]
+    .filter((value): value is string => Boolean(value))
+    .sort()
+    .at(-1);
+  const comparePlayersLastmodTag = comparePlayersLastmod ? `<lastmod>${comparePlayersLastmod}</lastmod>` : '';
+  urlEntries.push(
+    `<url><loc>${xmlEscape(absolute('/compare-players'))}</loc>${comparePlayersLastmodTag}</url>`,
+  );
+
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urlEntries.join('\n')}\n</urlset>\n`;
 
   return new Response(xml, {
