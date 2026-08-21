@@ -9895,6 +9895,93 @@ structurally impossible, full per-edition team participant lists blocked on
 sourcing, `/compare-players` print PDF matching `/compare`'s own precedent).
 No new gap identified this run beyond the ones already on this list.
 
+### New feature: "Find a player" global quick-jump search widget - added 2026-08-21 (later intensive run)
+
+Closed a gap the 2026-08-20 `/players` launch left standing: `src/pages/
+player-index.json.ts` (a build-time `{id, displayName}[]` endpoint mirroring
+`team-index.json.ts`) already existed to let `scripts/generate-pdfs.mjs`
+enumerate `/players/<slug>` PDF targets, but that file's own doc comment
+explicitly flagged it as "not used by any client-side widget (there's no
+'find a player' search)" - the 2026-08-17 "find a team" widget had a
+same-shaped sibling data source sitting unused one page family over. Same
+mismatch this file's `/compare-players` note above already named for the
+print-PDF question, just for search instead.
+
+**`Nav.astro`** gains a second combobox, `#player-search-input` /
+`#player-search-listbox` / `#player-search-status`, right next to the
+existing "find a team" one, wired to `/player-index.json` and sending
+Enter/click to `/compare-players?a=<id>` (or `/hr/compare-players?a=<id>`) -
+the same shareable `a` param `src/pages/compare-players.astro`'s own two
+`<select>` pickers already read/write, exactly the precedent the team
+widget set for `/compare`. Reuses the `.team-search`/`.team-search__*` CSS
+as-is (structural, not team-specific - a comment now says so at the shared
+rule) rather than duplicating ~50 lines of near-identical styles under a
+new class name.
+
+The client script was a straight duplicate of the team widget's combobox
+logic (fetch-on-focus, diacritic-insensitive filter, arrow-key/Enter/Escape
+handling, click-outside-to-close) with only the endpoint/target/labels and
+the rendered option-id prefix differing, so rather than paste a second
+~180-line copy, `initTeamSearch()` became `initSearchWidget(input, listbox,
+status, idPrefix)` - one implementation, instantiated twice via a small
+`initWidgetById()` helper. `idPrefix` keeps the two widgets' rendered
+`role="option"` ids from colliding (`team-search-option-brazil` vs.
+`player-search-option-...`) since both listboxes can be open... well, not
+simultaneously (only one input can have focus), but their DOM ids still
+share one document. Internal names inside the shared function
+(`TeamIndexEntry`, `teams`, `goToTeam`) were deliberately left as-is rather
+than renamed to something generic - both index endpoints already return the
+identical `{id, displayName}[]` shape, so the existing names still describe
+the data correctly and a rename would have been pure churn with no
+behavior change.
+
+One real difference from the team widget worth recording: player ids are
+the player's raw display name (`src/lib/playerProfile.ts`'s
+`buildPlayerProfile`: `id: playerName`, e.g. "Lionel Messi"), not a
+lowercase slug like team ids ("brazil") - so a selected player's `a=`
+param can contain a space, which `URLSearchParams` renders as `+` in the
+resulting URL (`/compare-players?a=Lionel+Messi`). `compare-players.astro`
+already read/wrote that same raw-name id in its own two `<select>` values
+(unrelated to this change), so no target-page code needed to change - only
+this widget's own new e2e assertions needed the `+`-aware regex.
+
+Five new `UI_STRINGS` entries (`playerSearchLabel`, `playerSearchPlaceholder`,
+`playerSearchNoResults`, `playerSearchLoading`, `playerSearchError`,
+`src/lib/i18n.ts`), Croatian translations included, mirroring the
+`teamSearch*` keys exactly (same key naming, same `{query}` placeholder
+convention).
+
+**`player-index.json.ts`**'s doc comment was updated to drop the
+now-inaccurate "not used by any client-side widget" line and note both
+consumers (the PDF script, server-side, and this widget, client-side) -
+its behavior itself is completely unchanged, this endpoint already returned
+exactly the shape the widget needed.
+
+**Tests:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints. `pnpm
+test` - **402/402** (2 new cases in `tests/unit/i18n.test.ts` for the five
+new keys and the `{query}` placeholder, mirroring the existing team-search
+cases exactly). `pnpm build` - 305 pages (unchanged - no new pages, only
+shared chrome). `pnpm check:links`, `check:sitemap`, `check:precache`,
+`check:perf` all pass unchanged. `pnpm check:pdfs` - all 290 PDFs still
+correctly reported up to date without regeneration: `Nav.astro` isn't a
+listed source for any `PDF_PAGES`/`TEAM_PDF_SOURCES`/`PLAYER_PDF_SOURCES`
+entry, and both search widgets already carry `no-print` (same as the team
+widget), so they never render into a generated PDF regardless. New
+`tests/e2e/player-search.spec.ts` (16 cases, English/Croatian/accessibility,
+directly mirroring `team-search.spec.ts`'s structure, plus one extra case
+confirming the two widgets' option ids never collide) - full scoped run of
+both search spec files together, **31/31 passing**. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` run in
+progress at the time of writing this entry; any failure it turns up will be
+fixed before this run's changes are pushed.
+
+**Left for a future pass:** standing candidates unchanged from the list
+above this entry. No new gap identified beyond closing this one - the
+"find a player"/`/player-index.json` mismatch was the last of the
+"data source exists but nothing client-side reads it yet" class of gap on
+this site; a repo-wide check for any remaining unused build-time endpoint
+found none.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

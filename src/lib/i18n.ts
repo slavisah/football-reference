@@ -95,6 +95,17 @@ const UI_STRINGS = {
     en: 'Team list unavailable right now.',
     hr: 'Popis reprezentacija trenutno nije dostupan.',
   },
+  playerSearchLabel: { en: 'Find a player', hr: 'Pronađi igrača' },
+  playerSearchPlaceholder: { en: 'Find a player…', hr: 'Pronađi igrača…' },
+  playerSearchNoResults: {
+    en: 'No players match “{query}”.',
+    hr: 'Nijedan igrač ne odgovara upitu „{query}”.',
+  },
+  playerSearchLoading: { en: 'Loading players…', hr: 'Učitavanje igrača…' },
+  playerSearchError: {
+    en: 'Player list unavailable right now.',
+    hr: 'Popis igrača trenutno nije dostupan.',
+  },
 } as const;
 
 export type UiStringKey = keyof typeof UI_STRINGS;
