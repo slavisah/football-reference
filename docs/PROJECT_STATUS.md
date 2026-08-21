@@ -9982,6 +9982,112 @@ above this entry. No new gap identified beyond closing this one - the
 this site; a repo-wide check for any remaining unused build-time endpoint
 found none.
 
+### Tooling: first-ever Vitest coverage report for `src/lib`, closes two real gaps it found - added 2026-08-21 (later intensive run)
+
+With every roadmap backlog item complete and the standing "Left for a future
+pass" candidates all still infeasible/rejected/low-yield (source-link
+liveness, further content-accuracy spot-checks, the flag-emoji idea, CSP's
+`'unsafe-inline'`, the Golden Boot reverse-lookup quiz type, PDF-bloat, EURO
+podium cards, full participant lists), this run first did a fresh, deliberate
+sweep of every Croatian page/component shipped since the last exhaustive
+hardcoded-English audit (99c4ea6, 2026-08-12) - `/teams`, `/players`,
+`/compare-players`, and both of `Nav.astro`'s search widgets - checking every
+prop, aria-label, placeholder and inline-script string by hand. It turned up
+nothing: every one of these already follows the site's established
+translation conventions (UI chrome translated, historical/data values left
+verbatim) correctly. Rather than stop there, this run added a different kind
+of check the site never had: a Vitest coverage report for `src/lib`, the pure
+business-logic layer every page reads from.
+
+New `@vitest/coverage-v8` (pinned to `2.1.9` to match the installed `vitest`
+2.1.9 - the latest coverage-v8 release requires vitest 4, too large a jump for
+this run) and a `coverage` block in `vitest.config.ts`, scoped to
+`src/lib/**/*.ts` only. Deliberately excluded, not just uncovered:
+`src/pages/**`/`src/components/**`/`src/layouts/**` (`.astro` files, exercised
+by the Playwright mobile suite instead - Vitest never runs them at all) and
+`scripts/*.mjs` (each check script is split between a handful of exported
+pure helpers, already covered by their own `tests/unit/check*.test.ts`, and a
+`main()`-invocation/reporting shell meant to be exercised by actually running
+`pnpm check:*`, the same "guard main() behind an entry-point check" precedent
+this file already recorded, 2026-08-12). Reporting on either would only
+produce a permanently low, misleading number for code this suite was never
+meant to fully cover. New `pnpm test:coverage` script - manual, like `pnpm
+build:pdfs`, not wired into `ci.yml` or gated by a threshold; this is a
+diagnostic for future intensive runs to point at, not a merge gate.
+
+Running it against the existing suite (402 tests before this run) surfaced
+two real, if narrow, gaps - defensive branches with zero test exercising
+them:
+
+- **`src/lib/sources.ts`'s `extractSources()`** falls back to using the raw
+  matched text as its own label when `new URL(url).hostname` throws - but
+  every existing test URL parses cleanly, so that `catch` had never actually
+  run. A malformed port (`https://example.com:abc/page` - matches the
+  citation regex's "starts with https://" check, but fails `new URL()`'s own
+  parsing) exercises it for the first time, confirming the fallback label is
+  the raw URL text, not a crash.
+- **`src/lib/markdownTable.ts`'s `parseMarkdownTables()`** skips a line
+  containing "|" whose next line isn't a valid separator row (either not
+  table syntax at all, or a real table with a header/separator column-count
+  mismatch) rather than misreading it as a table - untested by name, though
+  implicitly exercised by every passing content file today, none of which
+  happens to contain this shape. Two new cases: a stray "|" inside ordinary
+  prose, and a genuinely broken table (a 3-column separator under a 2-column
+  header) followed immediately by a real, well-formed table under its own
+  heading - confirming the parser recovers and still finds the good table
+  rather than getting stuck or corrupting it.
+
+Both are realistic shapes for a hand-edited `content/*.md`/`docs/SOURCES.md`
+file to accidentally produce, so this closes real risk, not just a coverage
+number: previously an editor's typo in either place had no test proving the
+parser degrades gracefully instead of silently corrupting a table or crashing
+the build.
+
+**Also found and fixed in the same pass:** `tsconfig.json`'s `exclude` list
+only ever named `dist`/`node_modules`, not the new `coverage/` output
+directory (already `.gitignore`d, so this was never a committed-file problem,
+but a real local one) - running `astro check` after `pnpm test:coverage`
+picked up `coverage/`'s generated HTML/JS report (Istanbul's bundled
+`prettify.js`, `sorter.js`, etc.) and produced dozens of spurious diagnostics
+against third-party report assets, not this repo's own code. Added
+`"coverage"` to `tsconfig.json`'s `exclude` array, matching the existing
+`dist`/`node_modules` entries; confirmed `pnpm lint` is clean again
+immediately after a fresh `pnpm test:coverage` run.
+
+**Coverage baseline** (informational, `src/lib/**/*.ts` only): **96.68%
+statements / 94.6% branches / 98.41% functions / 96.68% lines** (up from
+96.5%/94.29%/98.41%/96.5% before this run's two new cases). The remaining
+gaps are either genuinely low-value branch edges already accepted elsewhere
+on this site (e.g. `offlineCache.ts`'s 66.66% branch coverage, `i18n.ts`'s
+85.71%) or a thin async loader with no dedicated unit test of its own -
+`teamCompetitions.ts` (0%, four `loadCompetition()` calls plus a fixed
+reshape, exercised only through the real pages/build) - which mirrors
+`homeCards.ts`'s own `loadHomeCompetitions()` (also 0%, same shape), an
+already-accepted pattern on this site rather than a newly discovered gap: a
+thin async wrapper around real content loading is left to the pages/
+Playwright suite that actually exercises it, while the pure `buildXxx()`
+logic each loader feeds gets the dedicated unit tests.
+
+Tests: `pnpm lint` (`astro check`) - 0 errors/warnings/hints across 132
+files. `pnpm test` - **405/405** (3 new: 1 in `tests/unit/sources.test.ts`, 2
+in `tests/unit/markdownTable.test.ts`). `pnpm build` - 305 pages (unchanged -
+no page/component touched). `pnpm check:links`, `check:sitemap`,
+`check:precache`, `check:perf`, `check:pdfs` all pass unchanged (this run
+touched only test/tooling config, no content or rendering code).
+
+**Left for a future pass:** the standing candidates from prior runs are
+unchanged (source-link liveness infeasible, further content-accuracy
+spot-checks low-yield, the flag-emoji idea rejected, CSP's `'unsafe-inline'`
+not worth revisiting, the Golden Boot reverse-lookup quiz type not pursued,
+`public/downloads/` PDF-bloat documented/intentional, EURO podium cards
+structurally impossible, full per-edition team participant lists blocked on
+sourcing, `/compare-players` print PDF matching `/compare`'s own precedent).
+The hardcoded-English audit this run also performed (five newest features:
+`/teams`, `/players`, `/compare-players`, both `Nav.astro` search widgets)
+found no new gap - every Croatian page/component shipped since the last such
+audit (99c4ea6) already follows the site's established translation
+conventions correctly. No new gap identified beyond the two this run closed.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
