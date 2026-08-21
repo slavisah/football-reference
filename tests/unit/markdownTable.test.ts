@@ -53,3 +53,33 @@ describe('findTableByHeading', () => {
     expect(findTableByHeading(doc, 'Records')).toBeUndefined();
   });
 });
+
+describe('parseMarkdownTables with a malformed table', () => {
+  it('skips a line with a "|" whose next line is not a valid GFM separator row, without crashing or misreading it as a table', () => {
+    // A stray "|" in ordinary prose (not a table at all) - the separator
+    // check must reject "Prices are here." rather than treat it as one.
+    const notATable = `# Title\n\n## Notes\n\nOn the card | it just says "prices are here." | Prices are here.\n`;
+    expect(parseMarkdownTables(notATable)).toEqual([]);
+  });
+
+  it('skips a broken table (separator column count does not match the header) and still finds a later well-formed one', () => {
+    const brokenThenGood = `# Title
+
+## Broken
+
+| Year | Winner |
+|---|---|---|
+| 2020 | Nobody |
+
+## Editions
+
+| Year | Winner |
+|---|---|
+| 2024 | Somebody |
+`;
+    const tables = parseMarkdownTables(brokenThenGood);
+    expect(tables).toHaveLength(1);
+    expect(tables[0].heading).toBe('Editions');
+    expect(tables[0].rows).toEqual([['2024', 'Somebody']]);
+  });
+});
