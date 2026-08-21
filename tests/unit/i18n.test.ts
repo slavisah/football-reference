@@ -70,6 +70,25 @@ describe('t', () => {
     expect(t('en', 'teamSearchNoResults')).toContain('{query}');
     expect(t('hr', 'teamSearchNoResults')).toContain('{query}');
   });
+
+  it('gives the "find a player" search widget distinct, non-empty strings per locale', () => {
+    for (const key of [
+      'playerSearchLabel',
+      'playerSearchPlaceholder',
+      'playerSearchNoResults',
+      'playerSearchLoading',
+      'playerSearchError',
+    ] as const) {
+      expect(t('en', key).length).toBeGreaterThan(0);
+      expect(t('hr', key).length).toBeGreaterThan(0);
+      expect(t('en', key)).not.toBe(t('hr', key));
+    }
+  });
+
+  it('keeps the {query} placeholder in the player no-results template for both locales', () => {
+    expect(t('en', 'playerSearchNoResults')).toContain('{query}');
+    expect(t('hr', 'playerSearchNoResults')).toContain('{query}');
+  });
 });
 
 describe('alternatePath', () => {
