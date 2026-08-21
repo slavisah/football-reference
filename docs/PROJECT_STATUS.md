@@ -9828,6 +9828,73 @@ deferred item across all three families is `/compare-players` having no
 downloadable print PDF, which matches `/compare`'s own precedent rather
 than being a gap.
 
+### SEO: three-level BreadcrumbList for `/teams/<slug>` and `/players/<slug>` profile pages - added 2026-08-21 (intensive run)
+
+With every roadmap backlog item long complete and this run's own standing
+"Left for a future pass" candidates still infeasible/rejected/low-yield (same
+list as above), this run looked for a genuinely new angle instead of
+repeating one of those - the same approach the `/teams` and `/compare-players`
+entries above each took. Found one: `BaseLayout.astro` has generated an
+automatic `BreadcrumbList` for every non-home page since the very first SEO
+pass, but it was always flat - `[Home, <page title>]` - even for the 138
+`/teams/<slug>` and `/players/<slug>` profile pages that are genuinely nested
+one level under their own directory (`/teams`, `/players`). A search engine
+reading that flat trail had no way to know Croatia's profile page lives under
+"Teams," not directly under the home page.
+
+**`BaseLayout.astro`** gained an optional `breadcrumbTrail` prop - an array of
+extra `{ name, url }` entries spliced between the automatic "Home" crumb and
+the page's own title crumb, resolved through the same `withTrailingSlash`
+normalization every other URL in this file already uses (so a trail entry's
+`item` URL always agrees with the linked page's own canonical URL). Empty by
+default, so every other page's breadcrumb is byte-identical to before.
+
+**Four pages** now pass a single-entry `breadcrumbTrail`, reusing the exact
+nav label/Croatian label pair `src/lib/routes.ts`'s own `NAV_LINKS` already
+established for these two sections (`"Teams"`/`"Reprezentacije"`,
+`"Players"`/`"Igrači"`), linking to the section's own index page:
+`src/pages/teams/[slug].astro`, `src/pages/hr/teams/[slug].astro`,
+`src/pages/players/[slug].astro`, `src/pages/hr/players/[slug].astro`. E.g.
+`/teams/croatia` now emits `Home > Teams > Croatia - Full history` instead of
+`Home > Croatia - Full history`; `/hr/players/lionel-messi` emits `Početna >
+Igrači > Lionel Messi - cjelovita povijest nagrada`.
+
+**Not touched:** every other page family (`/compare`, `/compare-players`,
+`/records`, the six competition pages, `/quiz`, `/about/sources`) is a
+top-level nav destination with no index page of its own to nest under, so
+their flat `Home > page` breadcrumb is already correct and unchanged - this
+is purely closing the gap for the two page families that actually have a
+parent directory.
+
+**Tests:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across 131
+files (no new files, only `BaseLayout.astro` and the four profile pages
+touched). `pnpm test` - **400/400** unchanged (no library logic touched,
+`BaseLayout.astro` isn't unit-tested - its structured data is covered by
+`tests/e2e/mobile.spec.ts`'s own JSON-LD assertions, extended below).
+`pnpm build` - 305 pages (unchanged). `pnpm check:links`,
+`check:sitemap`, `check:precache`, `check:perf` all pass unchanged (no
+markup, routing, or page-weight change - JSON-LD is invisible metadata).
+`check:pdfs` correctly flagged all 290 PDFs as stale (`BaseLayout.astro` is a
+rendering-code dependency of every page, the exact "blind spot" the checker
+was built to catch) - regenerated with `pnpm build:pdfs`, confirmed clean
+after. Extended `tests/e2e/mobile.spec.ts`'s existing `/teams/brazil`
+BreadcrumbList assertion to check the full three-name trail and the middle
+crumb's URL, and added two new cases (`/players/lionel-messi` and
+`/hr/players/lionel-messi`) confirming the same three-level shape and its
+Croatian labels; full scoped run - **609/609** Playwright tests passing,
+including every existing print-media/accessibility/team/player spec (this
+change touches shared layout, so the full suite was run rather than a
+scoped slice).
+
+**Left for a future pass:** the standing candidates from prior runs are
+unchanged (source-link liveness infeasible, further content-accuracy
+spot-checks low-yield, the flag-emoji idea rejected, CSP's `'unsafe-inline'`
+not worth revisiting, the Golden Boot reverse-lookup quiz type not pursued,
+`public/downloads/` PDF-bloat documented/intentional, EURO podium cards
+structurally impossible, full per-edition team participant lists blocked on
+sourcing, `/compare-players` print PDF matching `/compare`'s own precedent).
+No new gap identified this run beyond the ones already on this list.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

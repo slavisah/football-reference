@@ -15,6 +15,8 @@ interface Props {
   alternateHref?: string;
   /** Extra schema.org JSON-LD objects for this page (e.g. an ItemList of champions, a SportsEvent for the latest edition). A "Home > page" BreadcrumbList is added automatically for every non-home page; the home page instead gets an automatic WebSite block. */
   jsonLd?: JsonLdObject[];
+  /** Extra breadcrumb entries inserted between Home and this page, for a page nested under an index (e.g. [{ name: 'Teams', url: withBase('/teams') }] for a /teams/<slug> profile, producing "Home > Teams > Croatia" instead of the default flat "Home > Croatia"). `url` is resolved the same trailing-slash-normalized way as every other page URL here. Defaults to none. */
+  breadcrumbTrail?: { name: string; url: string }[];
   /** Excludes the page from search indexing (e.g. the 404 page). Defaults to false for every existing page. */
   noindex?: boolean;
 }
@@ -25,6 +27,7 @@ const {
   locale = 'en',
   alternateHref,
   jsonLd = [],
+  breadcrumbTrail = [],
   noindex = false,
 } = Astro.props;
 const fullTitle =
@@ -72,6 +75,10 @@ const breadcrumb = isHome
   ? undefined
   : buildBreadcrumbList([
       { name: t(locale, 'homeBreadcrumb'), url: homeURL.toString() },
+      ...breadcrumbTrail.map((item) => ({
+        name: item.name,
+        url: new URL(withTrailingSlash(item.url), siteOrigin).toString(),
+      })),
       { name: title, url: canonicalURL.toString() },
     ]);
 // The home page gets a WebSite block instead of a breadcrumb (it has no

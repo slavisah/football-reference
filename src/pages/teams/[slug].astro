@@ -66,6 +66,7 @@ const jsonLd: JsonLdObject[] =
   description={`Every FIFA World Cup, UEFA EURO, Copa América and UEFA Nations League final or semifinal for ${profile.displayName}, generated from each competition's edition table.`}
   alternateHref={withBase(`/hr/teams/${slug}`)}
   jsonLd={jsonLd}
+  breadcrumbTrail={[{ name: 'Teams', url: withBase('/teams') }]}
 >
   <article class="team-profile stack">
     <header class="team-profile__header">
