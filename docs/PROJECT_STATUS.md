@@ -9971,9 +9971,9 @@ widget), so they never render into a generated PDF regardless. New
 directly mirroring `team-search.spec.ts`'s structure, plus one extra case
 confirming the two widgets' option ids never collide) - full scoped run of
 both search spec files together, **31/31 passing**. Full
-`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` run in
-progress at the time of writing this entry; any failure it turns up will be
-fixed before this run's changes are pushed.
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` - **624/624
+passing** (up from 609), confirming no regression on the shared header
+across every page/language/color-scheme combination.
 
 **Left for a future pass:** standing candidates unchanged from the list
 above this entry. No new gap identified beyond closing this one - the
