@@ -2,6 +2,8 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
+import { buildPodiums, buildHostMapPoints } from '../../lib/editions';
+import { NATIONS_LEAGUE_HOST_COORDINATES } from '../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import {
   buildChampionsItemList,
@@ -12,8 +14,11 @@ import {
 const data = await loadCompetition('uefa-nations-league', {
   editionsHeading: 'Finals',
   sourcesHeading: 'UEFA Nations League',
-  noteHeadings: ['Key facts'],
+  noteHeadings: ['How it works', 'Key facts', 'Memorable moments'],
 });
+
+const podium = buildPodiums(data.editions);
+const hostMap = buildHostMapPoints(data.editions, NATIONS_LEAGUE_HOST_COORDINATES);
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd = [
@@ -33,5 +38,8 @@ const jsonLd = [
     tableId="nations-league"
     tableCaption="UEFA Nations League Finals, 2018-19 onward"
     pdfSlug="nations-league"
+    podium={podium}
+    podiumHeading="Podium by edition"
+    hostMap={hostMap}
   />
 </BaseLayout>

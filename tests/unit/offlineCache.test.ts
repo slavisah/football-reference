@@ -24,6 +24,9 @@ describe('buildPrecacheUrls', () => {
     expect(urls).toContain('/football-reference/hr/quiz');
     expect(urls).toContain('/football-reference/hr/records');
     expect(urls).toContain('/football-reference/hr/compare');
+    expect(urls).toContain('/football-reference/hr/teams');
+    expect(urls).toContain('/football-reference/hr/players');
+    expect(urls).toContain('/football-reference/hr/compare-players');
     expect(urls).toContain('/football-reference/hr/about/sources');
   });
 
@@ -35,8 +38,14 @@ describe('buildPrecacheUrls', () => {
 
   it('includes exactly two entries (English + Croatian) per nav link plus the static assets, deduped', () => {
     const urls = buildPrecacheUrls('/football-reference/');
-    expect(urls.length).toBe(NAV_LINKS.length * 2 + 6);
+    expect(urls.length).toBe(NAV_LINKS.length * 2 + 7);
     expect(new Set(urls).size).toBe(urls.length);
+  });
+
+  it('precaches both the English and Croatian web app manifest', () => {
+    const urls = buildPrecacheUrls('/football-reference/');
+    expect(urls).toContain('/football-reference/manifest.webmanifest');
+    expect(urls).toContain('/football-reference/hr/manifest.webmanifest');
   });
 
   it('works with a bare "/" base path (local dev)', () => {

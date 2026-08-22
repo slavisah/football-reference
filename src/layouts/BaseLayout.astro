@@ -2,9 +2,10 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
 import { withBase } from '../lib/url';
 import { t, type Locale } from '../lib/i18n';
-import { buildBreadcrumbList, type JsonLdObject } from '../lib/jsonLd';
+import { buildBreadcrumbList, buildWebSiteJsonLd, type JsonLdObject } from '../lib/jsonLd';
 
 interface Props {
   title: string;
@@ -13,8 +14,10 @@ interface Props {
   locale?: Locale;
   /** The equivalent page in the other language, if one exists. */
   alternateHref?: string;
-  /** Extra schema.org JSON-LD objects for this page (e.g. an ItemList of champions, a SportsEvent for the latest edition). A "Home > page" BreadcrumbList is added automatically for every non-home page. */
+  /** Extra schema.org JSON-LD objects for this page (e.g. an ItemList of champions, a SportsEvent for the latest edition). A "Home > page" BreadcrumbList is added automatically for every non-home page; the home page instead gets an automatic WebSite block. */
   jsonLd?: JsonLdObject[];
+  /** Extra breadcrumb entries inserted between Home and this page, for a page nested under an index (e.g. [{ name: 'Teams', url: withBase('/teams') }] for a /teams/<slug> profile, producing "Home > Teams > Croatia" instead of the default flat "Home > Croatia"). `url` is resolved the same trailing-slash-normalized way as every other page URL here. Defaults to none. */
+  breadcrumbTrail?: { name: string; url: string }[];
   /** Excludes the page from search indexing (e.g. the 404 page). Defaults to false for every existing page. */
   noindex?: boolean;
 }
@@ -25,6 +28,7 @@ const {
   locale = 'en',
   alternateHref,
   jsonLd = [],
+  breadcrumbTrail = [],
   noindex = false,
 } = Astro.props;
 const fullTitle =
@@ -36,8 +40,28 @@ const fullTitle =
 // from SITE_URL in astro.config.mjs (repo-agnostic, like every other base-path
 // helper here), so this works under any GitHub Pages project name too.
 const siteOrigin = Astro.site ?? Astro.url;
-const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
-const alternateURL = alternateHref ? new URL(alternateHref, siteOrigin) : undefined;
+// Every real page here is a directory-format route (astro.config.mjs's
+// `build.format: 'directory'`) and Astro.url.pathname reflects that with a
+// trailing slash for every route except the site root under a base path
+// (e.g. "/football-reference", not "/football-reference/") - a quirk found
+// by scripts/check-sitemap.mjs, which caught the English home page's
+// canonical/OG/breadcrumb URLs disagreeing with its own sitemap.xml <loc>
+// (and with the Croatian home page's own, correctly slashed, canonical URL)
+// solely because of this. Normalizing here fixes it for every current and
+// future page in one place instead of special-casing the home page.
+function withTrailingSlash(pathname: string): string {
+  return pathname.endsWith('/') ? pathname : `${pathname}/`;
+}
+const canonicalURL = new URL(withTrailingSlash(Astro.url.pathname), siteOrigin);
+// Every page passes alternateHref without a trailing slash (e.g.
+// withBase('/hr/compare')) - normalized the same way as canonicalURL above,
+// for the same reason: the other language's page is itself served/
+// canonicalized with a trailing slash, so this hreflang tag needs one too
+// to agree with that page's own <link rel="canonical"> and with this site's
+// sitemap.xml (src/pages/sitemap.xml.ts), both already normalized.
+const alternateURL = alternateHref
+  ? new URL(withTrailingSlash(alternateHref), siteOrigin)
+  : undefined;
 const ogImageURL = new URL(withBase('/icons/icon-512.png'), siteOrigin);
 const ogLocale = locale === 'hr' ? 'hr_HR' : 'en_US';
 const ogLocaleAlternate = locale === 'hr' ? 'en_US' : 'hr_HR';
@@ -52,15 +76,53 @@ const breadcrumb = isHome
   ? undefined
   : buildBreadcrumbList([
       { name: t(locale, 'homeBreadcrumb'), url: homeURL.toString() },
+      ...breadcrumbTrail.map((item) => ({
+        name: item.name,
+        url: new URL(withTrailingSlash(item.url), siteOrigin).toString(),
+      })),
       { name: title, url: canonicalURL.toString() },
     ]);
-const structuredData = [breadcrumb, ...jsonLd].filter((item): item is JsonLdObject => Boolean(item));
+// The home page gets a WebSite block instead of a breadcrumb (it has no
+// parent to link to) - the one page-independent fact no other jsonLd.ts
+// builder covers, built here rather than per-page so it always uses the
+// same trailing-slash-normalized canonicalURL this file already computes
+// above (see withTrailingSlash's comment for why that matters specifically
+// for the home page under a base path).
+const website = isHome
+  ? buildWebSiteJsonLd({
+      url: canonicalURL.toString(),
+      name: fullTitle,
+      description: description ?? fullTitle,
+      inLanguage: locale,
+    })
+  : undefined;
+const structuredData = [breadcrumb, website, ...jsonLd].filter((item): item is JsonLdObject =>
+  Boolean(item),
+);
 ---
 
 <!doctype html>
 <html lang={locale}>
   <head>
     <meta charset="utf-8" />
+    {/* Every resource this site ever loads is same-origin (no CDN fonts/
+    scripts/analytics/trackers, per AGENTS.md rule 8) - a strict CSP costs
+    nothing functionally and closes off data exfiltration or a remote payload
+    if a future dependency or a compromised deploy ever tried to add one.
+    'unsafe-inline' stays for script/style because the site's inline
+    <script is:inline> blocks (theme pre-paint, service-worker registration,
+    per-page interactivity) and per-row inline styles (card accent colors,
+    /records' generated bar widths) are static/build-generated, not
+    user-input-echoing, so the residual XSS risk they'd add is the same
+    residual risk a hash/nonce scheme would still have to cover for this
+    site's threat model (there is no form, comment box, or any other place a
+    reader's input is ever echoed back). frame-ancestors is omitted - the
+    <meta> form of CSP never applies it (only a real response header does),
+    so listing it here would be a no-op that reads as protection it isn't. */}
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     {description && <meta name="description" content={description} />}
@@ -80,7 +142,10 @@ const structuredData = [breadcrumb, ...jsonLd].filter((item): item is JsonLdObje
       )
     }
     <link rel="icon" href={withBase('/favicon.svg')} />
-    <link rel="manifest" href={withBase('/manifest.webmanifest')} />
+    <link
+      rel="manifest"
+      href={withBase(locale === 'hr' ? '/hr/manifest.webmanifest' : '/manifest.webmanifest')}
+    />
     <link rel="apple-touch-icon" href={withBase('/icons/icon-192.png')} />
     <meta name="theme-color" content="#1f6f4f" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -102,11 +167,11 @@ const structuredData = [breadcrumb, ...jsonLd].filter((item): item is JsonLdObje
     {description && <meta name="twitter:description" content={description} />}
     <meta name="twitter:image" content={ogImageURL} />
 
-    {/* schema.org structured data: an automatic Home > page BreadcrumbList
-    plus whatever page-specific objects (e.g. a champions ItemList) the page
-    passed in via `jsonLd`. Each is its own self-contained script tag (its own
-    "@context"), which is valid JSON-LD and simpler than merging into one
-    "@graph". */}
+    {/* schema.org structured data: an automatic Home > page BreadcrumbList (or,
+    on the home page itself, an automatic WebSite block instead) plus whatever
+    page-specific objects (e.g. a champions ItemList) the page passed in via
+    `jsonLd`. Each is its own self-contained script tag (its own "@context"),
+    which is valid JSON-LD and simpler than merging into one "@graph". */}
     {
       structuredData.map((item) => (
         <script is:inline type="application/ld+json" set:html={JSON.stringify(item)} />
@@ -151,6 +216,7 @@ const structuredData = [breadcrumb, ...jsonLd].filter((item): item is JsonLdObje
     <Nav locale={locale} alternateHref={alternateHref} />
     <main id="main" tabindex="-1">
       <div class="container">
+        {!isHome && <Breadcrumb locale={locale} trail={breadcrumbTrail} title={title} />}
         <slot />
       </div>
     </main>

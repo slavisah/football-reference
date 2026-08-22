@@ -1,6 +1,7 @@
-import type { ChampionSummary, Edition, MarkdownTable, TimelineEntry } from './types';
+import type { ChampionSummary, Edition, HostMapPoint, MarkdownTable, PodiumEntry, TimelineEntry } from './types';
 import { summaryGroupFor } from './countries';
 import type { Locale } from './i18n';
+import type { HostCoordinate } from './hostCoordinates';
 
 // Turn a parsed Markdown table into normalized editions, and derive the
 // champions summary from those editions (rather than trusting a hand-maintained
@@ -68,27 +69,43 @@ export function isPlaceholderWinner(winner: string): boolean {
   return PLACEHOLDER_WINNERS.test(winner.trim());
 }
 
-/** Generate champions totals from editions, grouping sporting successors. */
+/**
+ * Generate champions totals from editions, grouping sporting successors.
+ *
+ * Splits each winner cell on `;` first, the same way `distinctWinners()`
+ * does, for the same reason: Golden Boot's "Player(s)" column holds
+ * "; "-separated joint-winner ties (e.g. 2012's six-way EURO tie). Without
+ * the split, a tie year was grouped as one bogus multi-name "champion"
+ * entirely disconnected from that same player's solo years elsewhere in the
+ * table - e.g. Cristiano Ronaldo's outright 2020 EURO Golden Boot didn't
+ * combine with his share of the 2012 tie, so the "Most awards" ranking
+ * undercounted him (1 instead of 2) and showed a nonsensical six-name row
+ * for 2012. Each tied player now earns credit for that edition individually,
+ * matching how `distinctWinners()` already lets a reader filter by any one
+ * of them.
+ */
 export function buildChampionsSummary(editions: Edition[]): ChampionSummary[] {
   const groups = new Map<string, ChampionSummary>();
 
   for (const edition of editions) {
-    const winner = edition.winner.trim();
-    if (!winner || isPlaceholderWinner(winner)) continue;
-    const group = summaryGroupFor(winner);
-    const existing = groups.get(group.id);
-    if (existing) {
-      existing.titles += 1;
-      existing.years.push(edition.year);
-      if (!existing.names.includes(winner)) existing.names.push(winner);
-    } else {
-      groups.set(group.id, {
-        id: group.id,
-        displayName: group.displayName,
-        titles: 1,
-        years: [edition.year],
-        names: [winner],
-      });
+    for (const rawWinner of edition.winner.split(';')) {
+      const winner = rawWinner.trim();
+      if (!winner || isPlaceholderWinner(winner)) continue;
+      const group = summaryGroupFor(winner);
+      const existing = groups.get(group.id);
+      if (existing) {
+        existing.titles += 1;
+        existing.years.push(edition.year);
+        if (!existing.names.includes(winner)) existing.names.push(winner);
+      } else {
+        groups.set(group.id, {
+          id: group.id,
+          displayName: group.displayName,
+          titles: 1,
+          years: [edition.year],
+          names: [winner],
+        });
+      }
     }
   }
 
@@ -128,6 +145,88 @@ export function buildTimeline(editions: Edition[]): TimelineEntry[] {
 }
 
 /**
+ * Reduce editions to compact podium cards: year, host, and the top four
+ * finishers (champion, runner-up, third, fourth). Third/fourth are omitted
+ * when the source table has no such column, the same "undefined when
+ * absent, not a placeholder" convention `buildTimeline` already uses for
+ * runner-up/final - a reader-facing "Podium by edition" widget for
+ * competitions whose table already tracks all four places (e.g. the UEFA
+ * Nations League Finals, FIFA World Cup, Copa América), deliberately
+ * excluding group-stage results so it stays compact, per
+ * `content/uefa-nations-league.md`'s "Website idea" note.
+ *
+ * The fourth-place matcher is `/^fourth\b/i` rather than an exact
+ * `/^fourth$/i`, so it also reads the World Cup's "Fourth / other
+ * semifinalist" header (World Cup has played a genuine third-place match
+ * every edition, so that cell is always a real team, not an "other
+ * semifinalist" placeholder). It deliberately does *not* match EURO's
+ * "Other semifinalist" / "Other semifinalist / fourth" pair - EURO has no
+ * standalone third-place match, so its two semifinal losers are not
+ * actually ranked 3rd vs 4th against each other, and showing them as if
+ * they were would misrepresent the historical record (AGENTS.md rule 2).
+ * Callers should not wire podium cards into the EURO page for that reason.
+ *
+ * Third/fourth cells that hold the site-wide "no data" placeholder ("—",
+ * see `isMissingCell()` in `compare.ts`) are treated as absent rather than
+ * rendered as a literal team name - e.g. Copa América's 1975/1979/1983
+ * home-and-away editions, which had no standalone third-place match.
+ */
+function definiteCell(value: string | undefined): string | undefined {
+  return value === '—' ? undefined : value;
+}
+
+export function buildPodiums(editions: Edition[]): PodiumEntry[] {
+  return editions.map((edition) => ({
+    year: edition.year,
+    yearSort: edition.yearSort,
+    champion: edition.winner,
+    host: edition.host,
+    runnerUp: cellValue(edition, /runner-up|finalist/i),
+    third: definiteCell(cellValue(edition, /^third$/i)),
+    fourth: definiteCell(cellValue(edition, /^fourth\b/i)),
+  }));
+}
+
+/**
+ * Extracts the goal margin (absolute difference) from a "Final" score line
+ * like "Brazil 5–2 Sweden" or a penalty-decided "1–1; Italy 3–2 pens" - the
+ * *first* score pair in the string is always the regulation/extra-time
+ * result, since a penalty shootout only ever follows a draw, so those finals
+ * correctly come out with a margin of 0 rather than the penalty score being
+ * mistaken for a goal difference. Returns undefined when there's no cell or
+ * no "digit-dash-digit" pair to parse (defensive - every current "Final"
+ * value on the site has one).
+ */
+function finalMargin(final: string | undefined): number | undefined {
+  if (!final) return undefined;
+  const match = /(\d+)\s*[–-]\s*(\d+)/.exec(final);
+  if (!match) return undefined;
+  return Math.abs(Number(match[1]) - Number(match[2]));
+}
+
+/**
+ * Every final ranked by goal margin, biggest win first - for competitions
+ * whose table has a "Final" score column (Copa América does not, same
+ * omission `buildTimeline` already documents). Reuses `ChampionSummary`'s
+ * shape the way `buildLongestTitleGaps` does for a non-title-count stat:
+ * `displayName` holds the final's score line (it already names both teams),
+ * `titles` holds the goal margin, and `years` holds the single year that
+ * final was played.
+ */
+export function buildBiggestFinalMargins(editions: Edition[]): ChampionSummary[] {
+  const margins: ChampionSummary[] = [];
+  for (const edition of editions) {
+    const final = cellValue(edition, /^final$/i);
+    const margin = finalMargin(final);
+    if (final === undefined || margin === undefined) continue;
+    margins.push({ id: edition.year, displayName: final, titles: margin, years: [edition.year], names: [] });
+  }
+  return margins.sort(
+    (a, b) => b.titles - a.titles || leadingYear(a.years[0]) - leadingYear(b.years[0]),
+  );
+}
+
+/**
  * Build a year -> display-text map of top-scorer facts (player, team, goals),
  * for joining Golden Boot editions onto another competition's table by year
  * (e.g. the World Cup and EURO pages showing that edition's top scorer).
@@ -153,6 +252,63 @@ export function buildTopScorerFacts(editions: Edition[], locale: Locale = 'en'):
     facts.set(edition.year, detail ? `${player} (${detail})` : player);
   }
   return facts;
+}
+
+/**
+ * An edition's "effective" year for matching against a story bullet: the
+ * plain year itself for a normal Year column, but the *second* (Finals) year
+ * of a season label like the Nations League's "2018-19" - that's the year a
+ * Memorable-moments bullet about that edition actually names (e.g. "Portugal
+ * won the first-ever Nations League Finals in 2019"), not the season's start
+ * year `yearSort` already resolves to for sorting purposes.
+ */
+function editionStoryYear(edition: Edition): number {
+  // A season label's separator is an en dash in the source tables (e.g.
+  // "2018–19", see content/uefa-nations-league.md) but a plain hyphen in
+  // front matter/prose ("2018-19", e.g. homeCards.ts's blurb) - accept both.
+  const season = /^(\d{4})[-–](\d{2})$/.exec(edition.year.trim());
+  if (!season) return edition.yearSort;
+  const century = Math.floor(Number(season[1]) / 100) * 100;
+  let end = century + Number(season[2]);
+  if (end <= Number(season[1])) end += 100;
+  return end;
+}
+
+/**
+ * Build an edition.year -> short "story" text map from a competition's
+ * Memorable-moments bullets, for a "tap a year to reveal a short story"
+ * disclosure joined onto that edition's table row (child-friendly feature
+ * suggested by content/fifa-world-cup.md's own "Suggested child-friendly
+ * features" note: "Tap a year to reveal a short story").
+ *
+ * Each bullet is matched to the one edition whose `editionStoryYear()` equals
+ * the first 4-digit year mentioned in the bullet text - the same "first
+ * number wins" reading a human would give it, which also does the right
+ * thing for a bullet naming two years (e.g. EURO's "The delayed EURO 2020
+ * was played in 2021...": 2020 is both the first year mentioned and the
+ * edition's own Year-column label). A bullet whose year matches no edition,
+ * or an edition that already has a story from an earlier bullet (e.g. a
+ * later, more general "so far" bullet that happens to also name a year
+ * already covered by an earlier, more specific bullet), is skipped.
+ */
+export function buildYearStories(editions: Edition[], storyBullets: string[]): Map<string, string> {
+  const editionYearByStoryYear = new Map<number, string>();
+  for (const edition of editions) {
+    const storyYear = editionStoryYear(edition);
+    if (!editionYearByStoryYear.has(storyYear)) {
+      editionYearByStoryYear.set(storyYear, edition.year);
+    }
+  }
+
+  const stories = new Map<string, string>();
+  for (const bullet of storyBullets) {
+    const match = /\d{4}/.exec(bullet);
+    if (!match) continue;
+    const editionYear = editionYearByStoryYear.get(Number(match[0]));
+    if (!editionYear || stories.has(editionYear)) continue;
+    stories.set(editionYear, bullet);
+  }
+  return stories;
 }
 
 /**
@@ -206,6 +362,437 @@ export function distinctHosts(editions: Edition[]): string[] {
     }
   }
   return hosts.sort((a, b) => a.localeCompare(b));
+}
+
+/**
+ * Generate hosting totals from editions, in the same `ChampionSummary` shape
+ * `buildChampionsSummary` returns (`titles` here means "times hosted",
+ * `years` the editions hosted) so it can be rendered by the same
+ * `ChampionsSummary.astro` component with different labels/copy, the same
+ * way that component already relabels for the Golden Boot's "awards".
+ *
+ * Unlike `buildChampionsSummary`, this does **not** group West Germany under
+ * Germany. That merge is a specific, documented editorial decision about
+ * *title* totals only (see `src/lib/countries.ts` and the "How historical
+ * nation names are handled" card on `/records`) - hosting is a plain
+ * historical fact about a specific edition, not a sporting-successor
+ * question, so West Germany (1974 World Cup, EURO 1988) and Germany (2006
+ * World Cup, EURO 2024) are kept as the distinct hosts the source content
+ * already records them as.
+ *
+ * A co-hosted edition's host cell (e.g. "Belgium and Netherlands", "Canada,
+ * Mexico and United States") is counted as one atomic host value, matching
+ * `distinctHosts()`/the host filter, which already treat that whole string
+ * as a single option rather than splitting it into per-country entries -
+ * this function does not invent a split the source content and the rest of
+ * the site don't make.
+ */
+export function buildHostsSummary(editions: Edition[]): ChampionSummary[] {
+  const groups = new Map<string, ChampionSummary>();
+
+  for (const edition of editions) {
+    const host = edition.host?.trim();
+    if (!host || NOT_A_HOST.test(host)) continue;
+    const existing = groups.get(host);
+    if (existing) {
+      existing.titles += 1;
+      existing.years.push(edition.year);
+    } else {
+      groups.set(host, { id: host, displayName: host, titles: 1, years: [edition.year], names: [host] });
+    }
+  }
+
+  return [...groups.values()]
+    .map((summary) => ({
+      ...summary,
+      years: [...summary.years].sort((a, b) => leadingYear(a) - leadingYear(b)),
+    }))
+    .sort(
+      (a, b) =>
+        b.titles - a.titles ||
+        leadingYear(a.years[0]) - leadingYear(b.years[0]) ||
+        a.displayName.localeCompare(b.displayName),
+    );
+}
+
+/**
+ * Join `buildHostsSummary()`'s grouped hosting totals onto a fixed
+ * coordinate table, for HostMap.astro's schematic locator map. Deliberately
+ * throws on any host with no entry in `coordinates` rather than silently
+ * dropping it - the same "don't let a real gap render as if everything is
+ * covered" reasoning `scripts/pdf-pages.mjs`'s own header comment documents
+ * for PDF freshness, applied here so a newly-added future host (e.g. a real
+ * 2030 edition) fails the build loudly instead of quietly missing its
+ * marker. Sorted by region (`regionOrder`, falling back to appearance order
+ * for an unlisted region) then by first-hosted year, so the map's paired
+ * text list reads as a simple geographic story rather than a titles-ranked
+ * list (`buildHostsSummary()` already covers that ranking on /records).
+ */
+export function buildHostMapPoints(
+  editions: Edition[],
+  coordinates: Record<string, HostCoordinate>,
+  regionOrder: string[] = [],
+): HostMapPoint[] {
+  const points = buildHostsSummary(editions).map((summary) => {
+    const coordinate = coordinates[summary.displayName];
+    if (!coordinate) {
+      throw new Error(
+        `buildHostMapPoints: no coordinate for host "${summary.displayName}" - add one to WORLD_CUP_HOST_COORDINATES.`,
+      );
+    }
+    return {
+      host: summary.displayName,
+      titles: summary.titles,
+      years: summary.years,
+      lat: coordinate.lat,
+      lon: coordinate.lon,
+      region: coordinate.region,
+    };
+  });
+
+  const regionRank = (region: string) => {
+    const index = regionOrder.indexOf(region);
+    return index === -1 ? regionOrder.length : index;
+  };
+
+  return points.sort(
+    (a, b) =>
+      regionRank(a.region) - regionRank(b.region) ||
+      leadingYear(a.years[0]) - leadingYear(b.years[0]) ||
+      a.host.localeCompare(b.host),
+  );
+}
+
+/**
+ * Titles won on home soil - editions where the winner cell exactly matches
+ * that same row's host cell - ranked by count, grouped the same way
+ * `buildChampionsSummary()` groups title totals (West Germany counts as
+ * Germany). The generated "home advantage" trivia (Uruguay's seven Copa
+ * América titles won on home soil, 1930's inaugural World Cup won by host
+ * Uruguay), computed purely from two columns every team-competition table
+ * already loads, combined in a way no existing `/records` ranking does.
+ *
+ * A co-hosted edition's host cell is a single combined string (e.g. "Belgium
+ * and Netherlands", "Canada, Mexico and United States") - this deliberately
+ * requires an *exact* match against the winner cell, so a co-host that goes
+ * on to win (a single-country name) never matches the multi-country host
+ * string, the same "does not invent a split the source content doesn't make"
+ * choice `buildHostsSummary()` already documents for the same host cells.
+ * Spain's 2026 FIFA World Cup win, with the tournament co-hosted by Canada,
+ * Mexico and United States, is real data that already exercises exactly this
+ * case: Spain does not count as a "home soil" win.
+ *
+ * Individual awards (Ballon d'Or, Golden Boot) have no host column, so every
+ * edition is naturally skipped rather than needing a separate competition
+ * check - callers only need to render this for the four team competitions,
+ * matching the "Nearly champions" precedent (`buildRunnerUpsWithoutTitle`).
+ */
+export function buildHomeSoilTitles(editions: Edition[]): ChampionSummary[] {
+  const groups = new Map<string, ChampionSummary>();
+
+  for (const edition of editions) {
+    const host = edition.host?.trim();
+    const winner = edition.winner.trim();
+    if (!host || !winner || isPlaceholderWinner(winner) || host !== winner) continue;
+
+    const group = summaryGroupFor(winner);
+    const existing = groups.get(group.id);
+    if (existing) {
+      existing.titles += 1;
+      existing.years.push(edition.year);
+      if (!existing.names.includes(winner)) existing.names.push(winner);
+    } else {
+      groups.set(group.id, {
+        id: group.id,
+        displayName: group.displayName,
+        titles: 1,
+        years: [edition.year],
+        names: [winner],
+      });
+    }
+  }
+
+  return [...groups.values()]
+    .map((summary) => ({
+      ...summary,
+      years: [...summary.years].sort((a, b) => leadingYear(a) - leadingYear(b)),
+    }))
+    .sort(
+      (a, b) =>
+        b.titles - a.titles ||
+        leadingYear(a.years[0]) - leadingYear(b.years[0]) ||
+        a.displayName.localeCompare(b.displayName),
+    );
+}
+
+/**
+ * Every run of two or more *consecutive editions* (adjacent rows in the
+ * source table, not adjacent calendar years - matters for the World Cup,
+ * which skipped 1942/1946, and for Copa América's irregular early
+ * calendar) won by the exact same winner value, reusing the
+ * `ChampionSummary` shape so it can render through the same
+ * `ChampionsSummary.astro` component every other ranking on `/records`
+ * already uses (with `titles` standing in for streak length here).
+ *
+ * Deliberately uses the raw winner string, not `summaryGroupFor()` - a
+ * "back-to-back" streak is a fact about the exact same team/player
+ * repeating, not about sporting succession, so West Germany and Germany
+ * (already kept distinct everywhere except title *totals*, see
+ * `buildChampionsSummary`) cannot silently chain into one streak here
+ * either. A placeholder winner (e.g. the 2020 Ballon d'Or's "Not awarded")
+ * breaks any streak spanning it - Messi's 2019 and 2021 Ballon d'Or wins
+ * are not "back-to-back" with a cancelled year between them, even though
+ * they're adjacent table rows.
+ *
+ * A competition/award with no repeat winner in a row (true of UEFA Nations
+ * League and the EURO Golden Boot as of 2026) simply returns an empty
+ * array - callers should handle that case in their own copy rather than
+ * treating an empty list as a bug.
+ */
+export function buildLongestStreaks(editions: Edition[]): ChampionSummary[] {
+  const sorted = [...editions].sort((a, b) => a.yearSort - b.yearSort);
+  const runs: { winner: string; years: string[] }[] = [];
+  let current: { winner: string; years: string[] } | null = null;
+
+  for (const edition of sorted) {
+    const winner = edition.winner.trim();
+    if (!winner || isPlaceholderWinner(winner)) {
+      current = null;
+      continue;
+    }
+    if (current && current.winner === winner) {
+      current.years.push(edition.year);
+    } else {
+      current = { winner, years: [edition.year] };
+      runs.push(current);
+    }
+  }
+
+  return runs
+    .filter((run) => run.years.length > 1)
+    .map((run) => ({
+      id: `${run.winner}-${run.years[0]}`,
+      displayName: run.winner,
+      titles: run.years.length,
+      years: run.years,
+      names: [run.winner],
+    }))
+    .sort(
+      (a, b) =>
+        b.titles - a.titles ||
+        leadingYear(a.years[0]) - leadingYear(b.years[0]) ||
+        a.displayName.localeCompare(b.displayName),
+    );
+}
+
+// Same exact-match convention as compare.ts's own RUNNER_UP_COLUMN - kept as
+// a separate local constant rather than a shared import, since editions.ts
+// has no existing dependency on compare.ts and this is the only place here
+// that needs the runner-up column specifically (buildTimeline's own
+// cellValue lookup uses a looser /runner-up|finalist/i pattern because it
+// only needs *a* result, relying on column order to land on Runner-up first
+// - too fragile for a ranking that must never conflate Runner-up with a
+// Third/Fourth-place finish).
+const RUNNER_UP_COLUMN = /^runner-up$/i;
+
+/**
+ * Countries that have reached a final - a "Runner-up" cell in one of the
+ * four team-competition tables - at least once, but have never won that
+ * competition outright, ranked by runner-up count. The generated Golden
+ * Boot/Ballon d'Or equivalent of "best team never to win it" trivia (e.g.
+ * the Netherlands' three lost World Cup finals), except computed, not
+ * hand-picked, from data every competition page already loads and has
+ * already been independently double-checked.
+ *
+ * Grouped the same way `buildChampionsSummary()` groups title totals (e.g.
+ * West Germany counts as Germany), so a team already excluded here for
+ * having *ever* won under either name is not double-counted as "title-less"
+ * under the other. Excludes Czechoslovakia/Czech Republic from merging with
+ * each other for the same reason `buildChampionsSummary()` does: no
+ * explicit editorial rule groups them, so each is judged on its own record.
+ *
+ * A team that lost a final before eventually winning the competition (e.g.
+ * a country that lost in 1990 and won in 1994) is excluded entirely, not
+ * given partial credit for its earlier runner-up finishes - this ranking
+ * answers "has this team ever won", using the full dataset, not "how did
+ * this team's record look at some earlier point in time".
+ */
+export function buildRunnerUpsWithoutTitle(editions: Edition[]): ChampionSummary[] {
+  const titledGroupIds = new Set(buildChampionsSummary(editions).map((champion) => champion.id));
+  const groups = new Map<string, ChampionSummary>();
+
+  for (const edition of editions) {
+    const runnerUp = cellValue(edition, RUNNER_UP_COLUMN);
+    if (!runnerUp || runnerUp === '—' || isPlaceholderWinner(runnerUp)) continue;
+    const group = summaryGroupFor(runnerUp);
+    if (titledGroupIds.has(group.id)) continue;
+
+    const existing = groups.get(group.id);
+    if (existing) {
+      existing.titles += 1;
+      existing.years.push(edition.year);
+      if (!existing.names.includes(runnerUp)) existing.names.push(runnerUp);
+    } else {
+      groups.set(group.id, {
+        id: group.id,
+        displayName: group.displayName,
+        titles: 1,
+        years: [edition.year],
+        names: [runnerUp],
+      });
+    }
+  }
+
+  return [...groups.values()]
+    .map((summary) => ({
+      ...summary,
+      years: [...summary.years].sort((a, b) => leadingYear(a) - leadingYear(b)),
+    }))
+    .sort(
+      (a, b) =>
+        b.titles - a.titles ||
+        leadingYear(a.years[0]) - leadingYear(b.years[0]) ||
+        a.displayName.localeCompare(b.displayName),
+    );
+}
+
+// Same convention as compare.ts's own SEMIFINAL_COLUMN (kept as a separate
+// local constant for the same reason RUNNER_UP_COLUMN above is): World Cup's
+// "Third"/"Fourth / other semifinalist", EURO's "Other semifinalist"/"Other
+// semifinalist / fourth", Nations League's "Third"/"Fourth", and Copa
+// América's "Third"/"Fourth" (knockout-final era only - earlier editions have
+// no such column, or a "—" placeholder in it, both handled below).
+const SEMIFINAL_COLUMN = /third|fourth|semifinalist/i;
+
+/**
+ * The "Nearly champions" ranking's one-tier-down sibling: teams that have
+ * reached a semifinal - a "Third", "Fourth", or "Other semifinalist" finish -
+ * at least once, but have never actually reached a final (no title, no
+ * runner-up finish either), ranked by semifinal-finish count. A team is
+ * dropped from this list the moment it reaches *any* final, whether it goes
+ * on to win it or not - matching `buildRunnerUpsWithoutTitle`'s own "no
+ * partial credit once the higher bar is cleared" rule, one level up.
+ *
+ * Grouped the same way `buildChampionsSummary()` groups title totals (e.g.
+ * West Germany counts as Germany). A row can name two different teams in its
+ * Third and Fourth columns at once (World Cup, Nations League); both are
+ * counted as separate semifinal appearances for their own team, never
+ * conflated with each other.
+ */
+export function buildNearlyFinalists(editions: Edition[]): ChampionSummary[] {
+  const finalistGroupIds = new Set<string>();
+  for (const edition of editions) {
+    const winner = edition.winner.trim();
+    if (winner && !isPlaceholderWinner(winner)) {
+      finalistGroupIds.add(summaryGroupFor(winner).id);
+    }
+    const runnerUp = cellValue(edition, RUNNER_UP_COLUMN);
+    if (runnerUp && runnerUp !== '—' && !isPlaceholderWinner(runnerUp)) {
+      finalistGroupIds.add(summaryGroupFor(runnerUp).id);
+    }
+  }
+
+  const groups = new Map<string, ChampionSummary>();
+  for (const edition of editions) {
+    const semifinalCells = edition.cells.filter((c) => SEMIFINAL_COLUMN.test(c.label.trim()));
+    for (const cell of semifinalCells) {
+      const value = cell.value.trim();
+      if (!value || value === '—' || isPlaceholderWinner(value)) continue;
+      const group = summaryGroupFor(value);
+      if (finalistGroupIds.has(group.id)) continue;
+
+      const existing = groups.get(group.id);
+      if (existing) {
+        existing.titles += 1;
+        existing.years.push(edition.year);
+        if (!existing.names.includes(value)) existing.names.push(value);
+      } else {
+        groups.set(group.id, {
+          id: group.id,
+          displayName: group.displayName,
+          titles: 1,
+          years: [edition.year],
+          names: [value],
+        });
+      }
+    }
+  }
+
+  return [...groups.values()]
+    .map((summary) => ({
+      ...summary,
+      years: [...summary.years].sort((a, b) => leadingYear(a) - leadingYear(b)),
+    }))
+    .sort(
+      (a, b) =>
+        b.titles - a.titles ||
+        leadingYear(a.years[0]) - leadingYear(b.years[0]) ||
+        a.displayName.localeCompare(b.displayName),
+    );
+}
+
+/**
+ * For every team/player with two or more titles, the longest calendar-year
+ * gap between any two of their *chronologically consecutive* title wins -
+ * the generated "longest wait for another title" trivia (Italy's 44 years
+ * between its 1938 and 1982 FIFA World Cup wins). Reuses
+ * `buildChampionsSummary()`'s own grouping (West Germany counts as Germany,
+ * same as every other title-totals ranking) so this never disagrees with
+ * "Most successful teams" about who has won what.
+ *
+ * Deliberately the opposite question from `buildLongestStreaks()`: that
+ * function finds the *shortest* possible gap (adjacent editions, the same
+ * winner twice in a row); this one finds the *longest* gap in a title
+ * holder's own record, measured in calendar years between the two bounding
+ * editions' years (not table-row adjacency, since the years being compared
+ * are rarely adjacent rows once every other winner in between is accounted
+ * for). A team whose only two titles happen to be back-to-back still gets
+ * an entry here too (a small gap, e.g. 4 years) - the two rankings answer
+ * different questions and are not mutually exclusive.
+ *
+ * Reuses the `ChampionSummary` shape with `titles` repurposed to mean "years
+ * between" and `years` narrowed to just the two editions bounding the
+ * longest gap (not every title year), so it renders through the same
+ * `ChampionsSummary.astro` component as every other `/records` ranking,
+ * with `winningYearsLabel` overridden to describe the two bounding years. A
+ * team with only one title, or the vanishingly unlikely case where every
+ * gap works out to zero, is excluded rather than shown with a meaningless
+ * zero-year gap.
+ */
+export function buildLongestTitleGaps(editions: Edition[]): ChampionSummary[] {
+  const gaps: ChampionSummary[] = [];
+
+  for (const champion of buildChampionsSummary(editions)) {
+    if (champion.titles < 2) continue;
+
+    let widestGap = 0;
+    let gapStart = champion.years[0];
+    let gapEnd = champion.years[1];
+    for (let i = 1; i < champion.years.length; i++) {
+      const gap = leadingYear(champion.years[i]) - leadingYear(champion.years[i - 1]);
+      if (gap > widestGap) {
+        widestGap = gap;
+        gapStart = champion.years[i - 1];
+        gapEnd = champion.years[i];
+      }
+    }
+    if (widestGap <= 0) continue;
+
+    gaps.push({
+      id: champion.id,
+      displayName: champion.displayName,
+      titles: widestGap,
+      years: [gapStart, gapEnd],
+      names: champion.names,
+    });
+  }
+
+  return gaps.sort(
+    (a, b) =>
+      b.titles - a.titles ||
+      leadingYear(a.years[0]) - leadingYear(b.years[0]) ||
+      a.displayName.localeCompare(b.displayName),
+  );
 }
 
 /**

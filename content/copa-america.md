@@ -5,8 +5,8 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-08-11
-status: review
+lastReviewed: 2026-08-14
+status: verified
 ---
 
 # Copa América
@@ -14,6 +14,12 @@ status: review
 Copa América began in 1916 and is the oldest still-running continental men's national-team competition. It was known as the South American Championship until 1975.
 
 Its history is less uniform than the World Cup or EURO. Some editions used a final league table, some were played over several months, some had no fixed host, and invited teams from outside South America have participated since 1993.
+
+## How it works
+
+- CONMEBOL's ten South American national teams compete, sometimes joined by invited guest teams from outside the region since 1993.
+- The tournament's format has varied more than any other on this site: some early editions crowned a champion by final league-table standings, others by a home-and-away final, and most editions since the 1990s by a group stage into a knockout bracket.
+- Copa América has not always run on a fixed four-year cycle, unlike the World Cup or EURO.
 
 ## Champions timeline
 
@@ -129,6 +135,8 @@ The **Champion** and **Runner-up** columns - audited 2026-08-05 (intensive run) 
 A **second, independent cross-check** (2026-08-07, intensive run) re-verified the same 48 editions using a source mix deliberately distinct from the first pass - national-federation histories (AFA, AUF), sports-history sites (worldfootball.net, footballdatabase.eu, athlet.org, topendsports.com, 11v11.com, todor66.com), and press coverage (El Gráfico, La Nación, El Economista, ESPN, CNN, BBC, Al Jazeera, and others) rather than RSSSF/Wikipedia/CONMEBOL - matching the same-methodology second passes already done for UEFA Nations League and UEFA EURO. **No discrepancies found**: every champion and runner-up already in the table matched this second pass too, including all five playoff deciders and all three penalty-shootout finals. See `docs/SOURCES.md` for the full per-edition citation list.
 
 The **Final date** column (added 2026-08-03, intensive run) records the calendar date of each edition's single decisive match, for the "On this day in football history" widget on the home page - the same widget already covers the FIFA World Cup and UEFA EURO. It is filled in only for the 19 editions with one clearly identifiable decisive match: the five **Final playoff** deciders (1919, 1922, 1937, 1949, 1953), the 13 **Knockout final** editions (1987, and 1993 onward except 2016), and the 2016 centenary final. The remaining editions keep "—": the **League table** era had no single title match (the champion was whoever led the final standings after the last round of group games, sometimes played across several cities on the same date), and the three **Home-and-away** finals (1975, 1979, 1983) were decided over two legs on two different dates, so neither has one date to record without an arbitrary choice. See `docs/SOURCES.md` for the per-edition citations.
+
+A **second, independent cross-check** of the Final date column (2026-08-12, intensive run) re-verified all 19 dated editions in four era-based WebSearch passes (the five pre-1960 Final playoff deciders; the 1987-1999 knockout-final era; 2001-2011; 2015-2024), deliberately drawing on a source mix distinct from the 2026-08-08 first pass - worldfootball.net, footballdatabase.eu, besoccer.com, soccer365.net, athlet.org, topendsports.com, 11v11.com, Transfermarkt, resultados-futbol.com, official federation/CONMEBOL histories, and contemporary press/wire coverage (UPI, Washington Post, AP via spokesman.com, CNN) rather than Wikipedia/RSSSF/ESPN alone. **No discrepancies found** across any of the 19 dates, including the two cases the first pass flagged for extra scrutiny: 1999's final (footballdatabase.eu's lone 17 July claim was reconfirmed as an outlier against Transfermarkt and 11v11's independently agreeing 18 July) and 2021's final (US-dated wire and official sources again confirmed 10 July over the 11 July shown on some regional ESPN pages). One additional soft note: 11v11.com's own listing for the 1922 play-off carries a mislabeled 22 October date inconsistent with every other source for that match, including 11v11's own site elsewhere - a source-reliability flag, not a contradiction of the page's 6 November 1922 date, which every other source (including worldfootball.net, checked specifically for this pass) confirms. See `docs/SOURCES.md` for the full per-era citation list.
 
 ## Memorable moments
 

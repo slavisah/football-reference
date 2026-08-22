@@ -1,6 +1,6 @@
 import { isPlaceholderWinner, NOT_A_HOST } from './editions';
 import type { Locale } from './i18n';
-import type { Edition, TimelineEntry } from './types';
+import type { ChampionSummary, Edition, TimelineEntry } from './types';
 
 // Generates multiple-choice quiz questions from already-loaded competition
 // data (editions + timelines), the same structures every competition page
@@ -86,13 +86,21 @@ function questionsFromWinners(
   // A "Not awarded" placeholder row (e.g. the 2020 Ballon d'Or) is not a real
   // answer: it can't be the correct choice for its own year's question, and it
   // would be a nonsensical distractor for every other year's question.
+  //
+  // Golden Boot's "Player(s)" column also holds "; "-separated joint-winner
+  // ties (e.g. 2012's six-way EURO tie) - a compound string like that can't
+  // be a fair multiple-choice "correct" answer (it would misrepresent a
+  // shared award as one single winner) or a sane distractor next to clean
+  // single-name choices, so tie years are excluded from both the pool and
+  // the set of years a question gets generated for, rather than asked about
+  // and answered wrong by design.
   const pool = editions
     .map((e) => e.winner.trim())
-    .filter((winner) => winner && !isPlaceholderWinner(winner));
+    .filter((winner) => winner && !isPlaceholderWinner(winner) && !winner.includes(';'));
   const questions: QuizQuestion[] = [];
   for (const edition of editions) {
     const correct = edition.winner.trim();
-    if (!correct || isPlaceholderWinner(correct)) continue;
+    if (!correct || isPlaceholderWinner(correct) || correct.includes(';')) continue;
     const id = `${seedPrefix}:${seedKey}:${edition.year}`;
     const choice = buildChoice(id, correct, pool);
     if (!choice) continue;
@@ -187,6 +195,103 @@ export function runnerUpByYearQuestions(
     });
   }
   return questions;
+}
+
+/**
+ * "In which year did {winner} win the {competition}?" - the reverse of
+ * championByYearQuestions, matching the "Match a player to his Ballon d'Or
+ * year" quiz idea from content/records-and-timelines.md. Only generated for
+ * a winner who appears exactly once across the whole table: a repeat winner
+ * (e.g. an eight-time Ballon d'Or winner, or a two-time World Cup champion)
+ * has no single correct year, and every other year they won would otherwise
+ * be a wrongly-marked distractor.
+ *
+ * `subject` only changes the Croatian phrasing: a player "wins an award"
+ * (osvojio nagradu) while a team "wins a competition" (osvojio natjecanje) -
+ * the English prompt reads naturally as "win the {competition}" either way,
+ * so it takes no locale branch. Defaults to 'player' to match the original
+ * Ballon d'Or-only caller.
+ */
+export function yearByWinnerQuestions(
+  editions: Edition[],
+  competition: string,
+  seedPrefix: string,
+  locale: Locale = 'en',
+  subject: 'team' | 'player' = 'player',
+): QuizQuestion[] {
+  const winnerCounts = new Map<string, number>();
+  for (const edition of editions) {
+    const winner = edition.winner.trim();
+    if (!winner || isPlaceholderWinner(winner) || winner.includes(';')) continue;
+    winnerCounts.set(winner, (winnerCounts.get(winner) ?? 0) + 1);
+  }
+
+  const pool = [...new Set(editions.map((e) => e.year))];
+  const questions: QuizQuestion[] = [];
+  for (const edition of editions) {
+    const winner = edition.winner.trim();
+    if (!winner || isPlaceholderWinner(winner) || winner.includes(';')) continue;
+    if (winnerCounts.get(winner) !== 1) continue;
+    const id = `${seedPrefix}:year-by-winner:${edition.year}`;
+    const choice = buildChoice(id, edition.year, pool);
+    if (!choice) continue;
+    questions.push({
+      id,
+      category: competition,
+      prompt:
+        locale === 'hr'
+          ? subject === 'team'
+            ? `Koje je godine ${winner} osvojio natjecanje ${competition}?`
+            : `Koje je godine ${winner} osvojio nagradu ${competition}?`
+          : `In which year did ${winner} win the ${competition}?`,
+      ...choice,
+    });
+  }
+  return questions;
+}
+
+/**
+ * "Which team/player has won the most {competition} titles/awards?" - a
+ * single generated question per competition, built from the same
+ * `ChampionSummary[]` totals `buildChampionsSummary()` already produces for
+ * every competition page's "Most successful teams"/"Most awards" widget
+ * (see `src/lib/editions.ts`) - no new editorial research, just a new way of
+ * asking about data every competition page already displays and every
+ * content-accuracy pass has already audited.
+ *
+ * `summary` must already be sorted by titles descending (every caller of
+ * `buildChampionsSummary()` gets this for free - see its own sort). Returns
+ * no question at all when there's a tie for first place (no single
+ * unambiguous correct answer) or fewer than 3 distinct entries (not enough
+ * distractors for a fair multiple-choice question).
+ */
+export function mostTitlesQuestion(
+  summary: ChampionSummary[],
+  competition: string,
+  seedPrefix: string,
+  subject: 'team' | 'player' = 'team',
+  locale: Locale = 'en',
+): QuizQuestion[] {
+  const [top, runnerUp] = summary;
+  if (!top || !runnerUp || summary.length < 3) return [];
+  if (top.titles === runnerUp.titles) return [];
+
+  const correct = top.displayName;
+  const pool = summary.map((s) => s.displayName);
+  const id = `${seedPrefix}:most-titles`;
+  const choice = buildChoice(id, correct, pool);
+  if (!choice) return [];
+
+  const prompt =
+    locale === 'hr'
+      ? subject === 'player'
+        ? `Tko ima najviše nagrada na natjecanju ${competition}?`
+        : `Koja reprezentacija ima najviše naslova na natjecanju ${competition}?`
+      : subject === 'player'
+        ? `Who has won the most ${competition} awards?`
+        : `Which team has won the most ${competition} titles?`;
+
+  return [{ id, category: competition, prompt, ...choice }];
 }
 
 export type QuizPool = {

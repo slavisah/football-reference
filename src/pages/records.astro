@@ -3,9 +3,22 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ChampionsTimeline from '../components/ChampionsTimeline.astro';
 import ChampionsSummary from '../components/ChampionsSummary.astro';
 import References from '../components/References.astro';
+import PrintDownloadLink from '../components/PrintDownloadLink.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
-import { buildTimeline } from '../lib/editions';
-import { withBase } from '../lib/url';
+import {
+  buildBiggestFinalMargins,
+  buildHomeSoilTitles,
+  buildHostsSummary,
+  buildLongestStreaks,
+  buildLongestTitleGaps,
+  buildNearlyFinalists,
+  buildRunnerUpsWithoutTitle,
+  buildTimeline,
+} from '../lib/editions';
+import { buildFinalsMeetings, buildRivalries, type CompetitionEditions } from '../lib/compare';
+import { teamProfileSlug } from '../lib/teamProfile';
+import { absolutePageUrl, withBase } from '../lib/url';
+import { buildChampionsItemList, buildRivalriesItemList, type JsonLdObject } from '../lib/jsonLd';
 
 const meta = await loadPageMeta('records-and-timelines');
 
@@ -95,18 +108,136 @@ const lastReviewed = allLoaded
   .map((c) => c.data.lastReviewed)
   .sort()
   .at(-1) as string;
+
+// Pairs of teams that have met 2+ times in a final, across the four team
+// competitions - reuses the same per-meeting data /compare's "Finals
+// meetings" panel already builds for one chosen pair, no new editorial
+// content needed.
+const finalsMeetingCompetitions: CompetitionEditions[] = competitions.map((c) => ({
+  title: c.label,
+  slug: c.key,
+  editions: c.data.editions,
+}));
+const rivalries = buildRivalries(buildFinalsMeetings(finalsMeetingCompetitions));
+
+// One ItemList per ranking section rendered below (Most successful teams,
+// Most frequent hosts, Back-to-back champions - skipping the zero-streak
+// fallback, Most awards), reusing the same generated ChampionSummary[] data
+// each ChampionsSummary component already renders - see docs/PROJECT_STATUS.md
+// for why this page was missing structured data that all twelve
+// competition/award pages already have.
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd: JsonLdObject[] = [
+  ...competitions.map((c) =>
+    buildChampionsItemList(c.data.champions, { pageUrl, name: `${c.label} - Most successful teams` }),
+  ),
+  ...competitions.map((c) =>
+    buildChampionsItemList(buildHostsSummary(c.data.editions), {
+      pageUrl,
+      name: `${c.label} - Most frequent hosts`,
+      unit: ['time hosted', 'times hosted'],
+    }),
+  ),
+  ...competitions.flatMap((c) => {
+    const homeSoil = buildHomeSoilTitles(c.data.editions);
+    return homeSoil.length > 0
+      ? [
+          buildChampionsItemList(homeSoil, {
+            pageUrl,
+            name: `${c.label} - Titles won on home soil`,
+            unit: ['home-soil title', 'home-soil titles'],
+          }),
+        ]
+      : [];
+  }),
+  ...allLoaded.flatMap((c) => {
+    const streaks = buildLongestStreaks(c.data.editions);
+    return streaks.length > 0
+      ? [
+          buildChampionsItemList(streaks, {
+            pageUrl,
+            name: `${c.label} - Back-to-back champions`,
+            unit: ['edition in a row', 'editions in a row'],
+          }),
+        ]
+      : [];
+  }),
+  ...competitions.flatMap((c) => {
+    const nearlyChampions = buildRunnerUpsWithoutTitle(c.data.editions);
+    return nearlyChampions.length > 0
+      ? [
+          buildChampionsItemList(nearlyChampions, {
+            pageUrl,
+            name: `${c.label} - Nearly champions`,
+            unit: ['runner-up finish', 'runner-up finishes'],
+          }),
+        ]
+      : [];
+  }),
+  ...competitions.flatMap((c) => {
+    const nearlyFinalists = buildNearlyFinalists(c.data.editions);
+    return nearlyFinalists.length > 0
+      ? [
+          buildChampionsItemList(nearlyFinalists, {
+            pageUrl,
+            name: `${c.label} - Nearly finalists`,
+            unit: ['semifinal finish', 'semifinal finishes'],
+          }),
+        ]
+      : [];
+  }),
+  ...allLoaded.flatMap((c) => {
+    const gaps = buildLongestTitleGaps(c.data.editions);
+    return gaps.length > 0
+      ? [
+          buildChampionsItemList(gaps, {
+            pageUrl,
+            name: `${c.label} - Longest wait between titles`,
+            unit: ['year', 'years'],
+          }),
+        ]
+      : [];
+  }),
+  ...competitions.flatMap((c) => {
+    const margins = buildBiggestFinalMargins(c.data.editions);
+    return margins.length > 0
+      ? [
+          buildChampionsItemList(margins, {
+            pageUrl,
+            name: `${c.label} - Biggest final wins`,
+            unit: ['goal', 'goals'],
+          }),
+        ]
+      : [];
+  }),
+  ...individualAwards.map((a) =>
+    buildChampionsItemList(a.data.champions, {
+      pageUrl,
+      name: `${a.label} - Most awards`,
+      unit: ['award', 'awards'],
+    }),
+  ),
+  ...(rivalries.length > 0
+    ? [buildRivalriesItemList(rivalries, { pageUrl, name: 'Fiercest rivalries' })]
+    : []),
+];
 ---
 
 <BaseLayout
   title={meta.title}
-  description="Champions timelines and most-successful-team rankings generated from the World Cup, EURO, Copa América and Nations League tables, plus Ballon d'Or and Golden Boot award timelines and rankings, and how historical nation names are grouped."
+  description="Champions timelines, most-successful-team rankings, most-frequent hosts, titles won on home soil, back-to-back champions, nearly-champions, nearly-finalists, longest title droughts and biggest final wins generated from the World Cup, EURO, Copa América and Nations League tables, plus Ballon d'Or and Golden Boot award timelines and rankings, and how historical nation names are grouped."
   alternateHref={withBase('/hr/records')}
+  jsonLd={jsonLd}
 >
   <article class="records stack">
     <header class="records__header">
       <p class="eyebrow badge">Generated from the competition tables</p>
       <h1>{meta.title}</h1>
       <p class="records__intro">{meta.intro}</p>
+      <PrintDownloadLink
+        slug="records"
+        hint="A4 landscape, every ranking and timeline on this page."
+      />
     </header>
 
     <section class="stack" aria-labelledby="timeline-heading">
@@ -150,6 +281,359 @@ const lastReviewed = allLoaded
           ))
         }
       </div>
+    </section>
+
+    <section class="stack" aria-labelledby="hosts-heading">
+      <h2 id="hosts-heading">Most frequent hosts</h2>
+      <p class="muted">
+        How many times each country has hosted, ranked separately per
+        competition. Unlike the title totals above, this does not group West
+        Germany under Germany - hosting is a fact about a specific edition,
+        not a sporting-successor question, so West Germany (1974 FIFA World
+        Cup, EURO 1988) and Germany (2006 FIFA World Cup, EURO 2024) are kept
+        distinct. A co-hosted edition (e.g. "Belgium and Netherlands") counts
+        as one combined host, the same way the host filter on each
+        competition page already treats it.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => (
+            <div>
+              <ChampionsSummary
+                id={`hosts-${c.key}`}
+                champions={buildHostsSummary(c.data.editions)}
+                scaleMax={c.data.editions.length}
+                heading={c.label}
+                description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
+                icon="🏟️"
+                unit={['time hosted', 'times hosted']}
+                winningYearsLabel="Hosting years: "
+              />
+              <a class="records__teams-link" href={c.href}>
+                View the full {c.label} table &rarr;
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="home-soil-heading">
+      <h2 id="home-soil-heading">Titles won on home soil</h2>
+      <p class="muted">
+        Editions where the champion is also that edition's host, ranked by
+        count - generated by matching each table's own Winner and Host
+        columns row by row, not hand-picked trivia. A co-hosted edition's
+        combined host label (e.g. "Canada, Mexico and United States") only
+        counts as a home-soil win for an exact match, so a single co-host
+        that goes on to win is not counted here - Spain's 2026 FIFA World Cup
+        title, with the tournament co-hosted by three other countries, is a
+        real example. Grouped the same way "Most successful teams" groups
+        West Germany under Germany.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => {
+            const homeSoil = buildHomeSoilTitles(c.data.editions);
+            return (
+              <div>
+                {homeSoil.length > 0 ? (
+                  <ChampionsSummary
+                    id={`home-soil-${c.key}`}
+                    champions={homeSoil}
+                    scaleMax={Math.max(...homeSoil.map((s) => s.titles))}
+                    heading={c.label}
+                    description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
+                    icon="🏠"
+                    unit={['home-soil title', 'home-soil titles']}
+                    winningYearsLabel="Home-soil years: "
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">No host has won its own edition yet.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  View the full {c.label} table &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="streaks-heading">
+      <h2 id="streaks-heading">Back-to-back champions</h2>
+      <p class="muted">
+        Every run of two or more <em>consecutive editions</em> won by the same
+        team, player, or tied group of players - generated from the same
+        tables as everything else on this page, not hand-picked trivia. A
+        placeholder year with no result (the 2020 Ballon d'Or) breaks a
+        streak spanning it, and West Germany/Germany are kept distinct here
+        too, the same way "Most frequent hosts" above does.
+      </p>
+      <div class="records__teams-grid">
+        {
+          allLoaded.map((c) => {
+            const streaks = buildLongestStreaks(c.data.editions);
+            return (
+              <div>
+                {streaks.length > 0 ? (
+                  <ChampionsSummary
+                    id={`streaks-${c.key}`}
+                    champions={streaks}
+                    scaleMax={Math.max(...streaks.map((s) => s.titles))}
+                    heading={c.label}
+                    description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
+                    icon="🔥"
+                    unit={['edition in a row', 'editions in a row']}
+                    winningYearsLabel="Streak years: "
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">No one has won two editions in a row yet.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  View the full {c.label} table &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="nearly-champions-heading">
+      <h2 id="nearly-champions-heading">Nearly champions</h2>
+      <p class="muted">
+        Teams that have reached a final - generated from each table's own
+        "Runner-up" column - but have never actually won the competition,
+        ranked by runner-up count. A team is dropped from this list the
+        moment it wins even once, so an earlier final loss is not "credited"
+        to a team that went on to lift the trophy later. Grouped the same
+        way "Most successful teams" groups West Germany under Germany.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => {
+            const nearlyChampions = buildRunnerUpsWithoutTitle(c.data.editions);
+            return (
+              <div>
+                {nearlyChampions.length > 0 ? (
+                  <ChampionsSummary
+                    id={`nearly-champions-${c.key}`}
+                    champions={nearlyChampions}
+                    scaleMax={Math.max(...nearlyChampions.map((s) => s.titles))}
+                    heading={c.label}
+                    description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
+                    icon="🥈"
+                    unit={['runner-up finish', 'runner-up finishes']}
+                    winningYearsLabel="Runner-up years: "
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">Every finalist so far has gone on to win a title.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  View the full {c.label} table &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="nearly-finalists-heading">
+      <h2 id="nearly-finalists-heading">Nearly finalists</h2>
+      <p class="muted">
+        Teams that have reached a semifinal - a "Third", "Fourth", or "Other
+        semifinalist" finish, generated from each table's own columns for
+        those - but have never actually reached a final, ranked by semifinal
+        count. A team is dropped from this list the moment it reaches any
+        final, whether it goes on to win or not. Copa América's editions
+        before its knockout-final era have no separate third-place match, so
+        they contribute no entries here. Grouped the same way "Most
+        successful teams" groups West Germany under Germany.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => {
+            const nearlyFinalists = buildNearlyFinalists(c.data.editions);
+            return (
+              <div>
+                {nearlyFinalists.length > 0 ? (
+                  <ChampionsSummary
+                    id={`nearly-finalists-${c.key}`}
+                    champions={nearlyFinalists}
+                    scaleMax={Math.max(...nearlyFinalists.map((s) => s.titles))}
+                    heading={c.label}
+                    description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
+                    icon="🥉"
+                    unit={['semifinal finish', 'semifinal finishes']}
+                    winningYearsLabel="Semifinal years: "
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">Every semifinalist so far has gone on to reach a final.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  View the full {c.label} table &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="title-gaps-heading">
+      <h2 id="title-gaps-heading">Longest wait between titles</h2>
+      <p class="muted">
+        For every team, player or tied group with at least two titles, the
+        biggest calendar-year gap between two of their wins - generated from
+        the same title years as "Most successful teams" above, not
+        hand-picked trivia. The opposite question from "Back-to-back
+        champions": that section finds the shortest possible gap (the very
+        next edition); this one finds the longest gap in a title holder's own
+        record. Grouped the same way "Most successful teams" groups West
+        Germany under Germany.
+      </p>
+      <div class="records__teams-grid">
+        {
+          allLoaded.map((c) => {
+            const gaps = buildLongestTitleGaps(c.data.editions);
+            return (
+              <div>
+                {gaps.length > 0 ? (
+                  <ChampionsSummary
+                    id={`title-gaps-${c.key}`}
+                    champions={gaps}
+                    scaleMax={Math.max(...gaps.map((g) => g.titles))}
+                    heading={c.label}
+                    description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
+                    icon="⏳"
+                    unit={['year', 'years']}
+                    winningYearsLabel="Years apart: "
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">No one has won this twice yet.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  View the full {c.label} table &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="final-margins-heading">
+      <h2 id="final-margins-heading">Biggest final wins</h2>
+      <p class="muted">
+        Every final ranked by goal margin, generated straight from each
+        table's own "Final" score line - a penalty shootout only ever follows
+        a draw, so a final decided on penalties correctly ranks at the bottom
+        with a margin of 0 rather than the penalty score being counted as a
+        goal difference. Copa América's source table has no "Final" score
+        column, so it is not ranked here (see its own page for match-by-match
+        detail where available).
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => {
+            const margins = buildBiggestFinalMargins(c.data.editions);
+            return (
+              <div>
+                {margins.length > 0 ? (
+                  <ChampionsSummary
+                    id={`final-margins-${c.key}`}
+                    champions={margins}
+                    scaleMax={Math.max(...margins.map((m) => m.titles))}
+                    heading={c.label}
+                    description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
+                    icon="⚽"
+                    unit={['goal', 'goals']}
+                    winningYearsLabel="Year: "
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">This competition's table has no "Final" score column to rank by margin.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  View the full {c.label} table &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="rivalries-heading">
+      <h2 id="rivalries-heading">Fiercest rivalries</h2>
+      <p class="muted">
+        Every pair of teams that has met 2 or more times in a FIFA World Cup,
+        UEFA EURO, Copa América, or UEFA Nations League final, ranked by total
+        meetings - generated from the Champion/Runner-up columns already on
+        each competition's own page, not new editorial content.
+      </p>
+      {
+        rivalries.length > 0 ? (
+          <div class="t-wrap" tabindex="0" role="region" aria-label="Fiercest rivalries, ranked by finals meetings">
+            <table class="records__rivalries-table">
+              <caption class="visually-hidden">Fiercest rivalries, ranked by finals meetings</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Rank</th>
+                  <th scope="col">Rivalry</th>
+                  <th scope="col">Meetings</th>
+                  <th scope="col">Head-to-head</th>
+                  <th scope="col">Competitions</th>
+                  <th scope="col">Most recent</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rivalries.map((r, i) => (
+                  <tr>
+                    <td>{i + 1}</td>
+                    <th scope="row">
+                      <a href={withBase(`/teams/${teamProfileSlug(r.teamAId)}`)}>{r.teamADisplayName}</a>
+                      {' vs '}
+                      <a href={withBase(`/teams/${teamProfileSlug(r.teamBId)}`)}>{r.teamBDisplayName}</a>
+                    </th>
+                    <td>{r.meetings}</td>
+                    <td>
+                      {r.teamAWins}-{r.teamBWins}
+                      {r.teamAWins === r.teamBWins ? '' : ` (${r.teamAWins > r.teamBWins ? r.teamADisplayName : r.teamBDisplayName} ahead)`}
+                    </td>
+                    <td>{r.competitions.join(', ')}</td>
+                    <td>
+                      {r.mostRecent.year} ({r.mostRecent.competition})
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p class="muted">No pair of teams has met in more than one final yet.</p>
+        )
+      }
     </section>
 
     <section class="stack" aria-labelledby="award-timeline-heading">
@@ -274,5 +758,38 @@ const lastReviewed = allLoaded
     gap: 0.5rem;
     max-width: 68ch;
     padding-left: 1.2rem;
+  }
+
+  .t-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+  }
+
+  .records__rivalries-table {
+    width: 100%;
+    min-width: 34rem;
+    border-collapse: collapse;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .records__rivalries-table th,
+  .records__rivalries-table td {
+    padding: 0.55rem 0.7rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    white-space: nowrap;
+  }
+
+  .records__rivalries-table thead th {
+    background: var(--bg-subtle);
+    font-size: 0.85rem;
+  }
+
+  .records__rivalries-table tbody tr:last-child th,
+  .records__rivalries-table tbody tr:last-child td {
+    border-bottom: none;
   }
 </style>

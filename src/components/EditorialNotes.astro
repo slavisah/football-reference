@@ -9,7 +9,9 @@ const { sections } = Astro.props;
 
 // Decorative-only accent per section type; screen readers get the plain heading text.
 function iconFor(heading: string): string {
-  return /moment/i.test(heading) ? '🎉' : '📝';
+  if (/moment/i.test(heading)) return '🎉';
+  if (/how it works|kako funkcionira/i.test(heading)) return 'ℹ️';
+  return '📝';
 }
 ---
 

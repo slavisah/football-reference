@@ -1,15 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { buildEditions } from '../../src/lib/editions';
+import { buildChampionsSummary, buildEditions } from '../../src/lib/editions';
 import { buildTimeline } from '../../src/lib/editions';
 import {
   championByYearQuestions,
   chronologicalOrderQuestions,
   hostByYearQuestions,
+  mostTitlesQuestion,
   runnerUpByYearQuestions,
   selectQuiz,
   topScorerByYearQuestions,
+  yearByWinnerQuestions,
 } from '../../src/lib/quiz';
-import type { Edition, MarkdownTable } from '../../src/lib/types';
+import type { ChampionSummary, Edition, MarkdownTable } from '../../src/lib/types';
 
 const table: MarkdownTable = {
   headers: ['Year', 'Host', 'Winner', 'Runner-up', 'Final'],
@@ -184,6 +186,110 @@ describe('topScorerByYearQuestions', () => {
       'Tko je bio najbolji strijelac natjecanja World Cup Golden Boot 1930. godine?',
     );
   });
+
+  it('skips a "; "-separated joint-winner tie year rather than asking a question whose only correct answer is a compound multi-name string', () => {
+    const scorersTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [
+        ['2010', 'Diego Forlán; Thomas Müller; David Villa; Wesley Sneijder', 'Multiple', '5'],
+        ['2014', 'James Rodríguez', 'Colombia', '6'],
+        ['2018', 'Harry Kane', 'England', '6'],
+      ],
+    };
+    const scorerEditions = buildEditions(scorersTable);
+    const questions = topScorerByYearQuestions(scorerEditions, 'World Cup Golden Boot', 'gb-wc');
+
+    expect(questions.some((q) => q.id.endsWith('2010'))).toBe(false);
+    // The tie is also excluded as a distractor for the clean single-winner years.
+    for (const q of questions) {
+      expect(q.choices.some((choice) => choice.includes(';'))).toBe(false);
+    }
+  });
+});
+
+describe('yearByWinnerQuestions', () => {
+  const ballonDorTable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'National team'],
+    rows: [
+      ['2016', 'Cristiano Ronaldo', 'Portugal'],
+      ['2017', 'Cristiano Ronaldo', 'Portugal'],
+      ['2018', 'Luka Modrić', 'Croatia'],
+      ['2019', 'Lionel Messi', 'Argentina'],
+      ['2020', 'Not awarded', '—'],
+      ['2021', 'Lionel Messi', 'Argentina'],
+      ['2022', 'Karim Benzema', 'France'],
+    ],
+  };
+  const ballonDorEditions = buildEditions(ballonDorTable);
+
+  it('asks a "which year" question only for a winner who won exactly once', () => {
+    const questions = yearByWinnerQuestions(ballonDorEditions, "Ballon d'Or", 'ballon-dor');
+    const winners = questions.map((q) => q.prompt);
+    expect(winners.some((p) => p.includes('Luka Modrić'))).toBe(true);
+    expect(winners.some((p) => p.includes('Karim Benzema'))).toBe(true);
+    // Cristiano Ronaldo (2016, 2017) and Lionel Messi (2019, 2021) each won
+    // more than once, so neither has a single unambiguous correct year.
+    expect(winners.some((p) => p.includes('Cristiano Ronaldo'))).toBe(false);
+    expect(winners.some((p) => p.includes('Lionel Messi'))).toBe(false);
+  });
+
+  it('places the correct year at answerIndex', () => {
+    const questions = yearByWinnerQuestions(ballonDorEditions, "Ballon d'Or", 'ballon-dor');
+    const modric = questions.find((q) => q.prompt.includes('Luka Modrić'));
+    expect(modric?.choices[modric.answerIndex]).toBe('2018');
+  });
+
+  it('builds a Croatian prompt when locale is "hr"', () => {
+    const questions = yearByWinnerQuestions(ballonDorEditions, "Ballon d'Or", 'ballon-dor', 'hr');
+    const modric = questions.find((q) => q.prompt.includes('Luka Modrić'));
+    expect(modric?.prompt).toBe("Koje je godine Luka Modrić osvojio nagradu Ballon d'Or?");
+  });
+
+  it('never asks about a "Not awarded" placeholder row, and never offers its year as a distractor', () => {
+    const questions = yearByWinnerQuestions(ballonDorEditions, "Ballon d'Or", 'ballon-dor');
+    expect(questions.some((q) => q.prompt.includes('Not awarded'))).toBe(false);
+  });
+
+  it('never repeats a choice within one question', () => {
+    const questions = yearByWinnerQuestions(ballonDorEditions, "Ballon d'Or", 'ballon-dor');
+    for (const q of questions) {
+      expect(new Set(q.choices).size).toBe(q.choices.length);
+    }
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const first = yearByWinnerQuestions(ballonDorEditions, "Ballon d'Or", 'ballon-dor');
+    const second = yearByWinnerQuestions(ballonDorEditions, "Ballon d'Or", 'ballon-dor');
+    expect(second).toEqual(first);
+  });
+
+  it('skips a question when fewer than 2 distinct distractor years exist', () => {
+    const sparseTable: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['2021', 'Lionel Messi'],
+        ['2022', 'Karim Benzema'],
+      ],
+    };
+    const sparseEditions = buildEditions(sparseTable);
+    const questions = yearByWinnerQuestions(sparseEditions, "Ballon d'Or", 'ballon-dor');
+    expect(questions).toHaveLength(0);
+  });
+
+  it('asks about a one-time team champion when subject is "team"', () => {
+    // From the shared World Cup `editions` fixture above: Uruguay (1930,
+    // 1950) and Italy (1934, 1938) each won twice, so only West Germany
+    // (1954) is a one-time champion.
+    const questions = yearByWinnerQuestions(editions, 'FIFA World Cup', 'world-cup', 'en', 'team');
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe('In which year did West Germany win the FIFA World Cup?');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('1954');
+  });
+
+  it('builds a "won the competition" (not "won the award") Croatian prompt for subject "team"', () => {
+    const questions = yearByWinnerQuestions(editions, 'FIFA World Cup', 'world-cup', 'hr', 'team');
+    expect(questions[0].prompt).toBe('Koje je godine West Germany osvojio natjecanje FIFA World Cup?');
+  });
 });
 
 describe('chronologicalOrderQuestions', () => {
@@ -261,6 +367,82 @@ describe('chronologicalOrderQuestions', () => {
     );
     expect(hrQuestions[0].items).toEqual(enQuestions[0].items);
     expect(hrQuestions[0].correctRanks).toEqual(enQuestions[0].correctRanks);
+  });
+});
+
+describe('mostTitlesQuestion', () => {
+  const clearWinnerTable: MarkdownTable = {
+    headers: ['Year', 'Winner'],
+    rows: [
+      ['1930', 'Brazil'],
+      ['1934', 'Brazil'],
+      ['1938', 'Brazil'],
+      ['1950', 'Italy'],
+      ['1954', 'Italy'],
+      ['1958', 'Germany'],
+    ],
+  };
+  const clearSummary = buildChampionsSummary(buildEditions(clearWinnerTable));
+
+  it('asks a "most titles" question with the top-titled entry as the answer', () => {
+    const questions = mostTitlesQuestion(clearSummary, 'FIFA World Cup', 'world-cup');
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe('Which team has won the most FIFA World Cup titles?');
+    expect(questions[0].category).toBe('FIFA World Cup');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('Brazil');
+  });
+
+  it('never repeats a choice and stays within the 3-4 choice range', () => {
+    const questions = mostTitlesQuestion(clearSummary, 'FIFA World Cup', 'world-cup');
+    const [q] = questions;
+    expect(new Set(q.choices).size).toBe(q.choices.length);
+    expect(q.choices.length).toBeGreaterThanOrEqual(3);
+    expect(q.choices.length).toBeLessThanOrEqual(4);
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const a = mostTitlesQuestion(clearSummary, 'FIFA World Cup', 'world-cup');
+    const b = mostTitlesQuestion(clearSummary, 'FIFA World Cup', 'world-cup');
+    expect(a).toEqual(b);
+  });
+
+  it('uses "awards" wording for an individual-award subject, e.g. Ballon d\'Or/Golden Boot', () => {
+    const questions = mostTitlesQuestion(clearSummary, "Ballon d'Or", 'ballon-dor', 'player');
+    expect(questions[0].prompt).toBe("Who has won the most Ballon d'Or awards?");
+  });
+
+  it('builds a Croatian prompt when locale is "hr", with the same answer as English', () => {
+    const enQuestions = mostTitlesQuestion(clearSummary, 'FIFA World Cup', 'world-cup', 'team', 'en');
+    const hrQuestions = mostTitlesQuestion(clearSummary, 'FIFA World Cup', 'world-cup', 'team', 'hr');
+    expect(hrQuestions[0].prompt).toBe(
+      'Koja reprezentacija ima najviše naslova na natjecanju FIFA World Cup?',
+    );
+    expect(hrQuestions[0].choices[hrQuestions[0].answerIndex]).toBe(
+      enQuestions[0].choices[enQuestions[0].answerIndex],
+    );
+  });
+
+  it('returns no question when there is a tie for first place', () => {
+    const tiedTable: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1930', 'Uruguay'],
+        ['1934', 'Italy'],
+        ['1938', 'Italy'],
+        ['1950', 'Uruguay'],
+        ['1954', 'West Germany'],
+      ],
+    };
+    const tiedSummary = buildChampionsSummary(buildEditions(tiedTable));
+    expect(mostTitlesQuestion(tiedSummary, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when fewer than 3 distinct entries exist', () => {
+    const sparse: ChampionSummary[] = [
+      { id: 'a', displayName: 'A', titles: 3, years: ['2000'], names: ['A'] },
+      { id: 'b', displayName: 'B', titles: 1, years: ['2004'], names: ['B'] },
+    ];
+    expect(mostTitlesQuestion(sparse, 'Test Cup', 'test')).toHaveLength(0);
   });
 });
 

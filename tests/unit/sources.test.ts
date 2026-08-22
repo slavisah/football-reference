@@ -75,6 +75,19 @@ describe('extractSources', () => {
       'https://en.wikipedia.org/wiki/1959_South_American_Championship_(Argentina)',
     );
   });
+
+  it('falls back to the raw URL as its own label when the matched text is not a parseable URL (e.g. a garbage port)', () => {
+    // A malformed port fails `new URL()` outright, even though the regex
+    // that finds it in the first place only checks for a "https://" prefix -
+    // extractSources() must not throw here; validateSourceSections() is the
+    // build-time check that rejects a URL this broken (see below).
+    const brokenPort = `## Copa América\n\n- https://example.com:abc/page\n`;
+    const links = extractSources(brokenPort, 'Copa América');
+    expect(links[0]).toEqual({
+      label: 'https://example.com:abc/page',
+      url: 'https://example.com:abc/page',
+    });
+  });
 });
 
 describe('validateSourceSections', () => {

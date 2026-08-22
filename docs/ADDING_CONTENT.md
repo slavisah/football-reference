@@ -179,11 +179,13 @@ GitHub Pages automatically. The live site is
 <https://slavisah.github.io/football-reference/>.
 
 If you changed an **Editions table** on a competition page that has a
-"Download printable PDF" link (all six competition/award pages, each with an
-English and a Croatian PDF - see `scripts/pdf-pages.mjs` for the full list of
-12), regenerate the matching file(s) under `public/downloads/` and commit
-them too, otherwise the downloadable PDF will silently go stale relative to
-the live table:
+"Download printable PDF" link (all six competition/award pages plus
+`/records`, each with an English and a Croatian PDF - see
+`scripts/pdf-pages.mjs` for the full list of 14; note that any competition's
+table also feeds `/records`' rankings, so editing one may need to regenerate
+`records.pdf`/`records-hr.pdf` too), regenerate the matching file(s) under
+`public/downloads/` and commit them too, otherwise the downloadable PDF will
+silently go stale relative to the live table:
 
 ```bash
 pnpm build && pnpm build:pdfs

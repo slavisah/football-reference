@@ -52,3 +52,28 @@ export type TimelineEntry = {
   /** Final score line as written, e.g. "Uruguay 4-2 Argentina", if present. */
   final?: string;
 };
+
+/** One edition reduced to the fields a compact podium card needs (top four finishers). */
+export type PodiumEntry = {
+  year: string;
+  yearSort: number;
+  champion: string;
+  host?: string;
+  /** Runner-up / losing finalist, if the table has that column. */
+  runnerUp?: string;
+  /** Third-place finisher, if the table has a "Third" column. */
+  third?: string;
+  /** Fourth-place finisher, if the table has a "Fourth" column. */
+  fourth?: string;
+};
+
+/** One distinct host, positioned for HostMap.astro's schematic locator map. */
+export type HostMapPoint = {
+  host: string;
+  titles: number;
+  /** Hosting years in chronological order. */
+  years: string[];
+  lat: number;
+  lon: number;
+  region: string;
+};

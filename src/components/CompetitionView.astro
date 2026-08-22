@@ -1,7 +1,11 @@
 ---
 import type { CompetitionData } from '../lib/competition';
+import type { HostMapPoint, PodiumEntry } from '../lib/types';
+import { buildYearStories } from '../lib/editions';
 import TournamentTable from './TournamentTable.astro';
+import PodiumCards from './PodiumCards.astro';
 import ChampionsSummary from './ChampionsSummary.astro';
+import HostMap from './HostMap.astro';
 import EditorialNotes from './EditorialNotes.astro';
 import References from './References.astro';
 import PrintDownloadLink from './PrintDownloadLink.astro';
@@ -14,9 +18,33 @@ interface Props {
   extraColumn?: { label: string; values: Map<string, string> };
   /** Slug of the pre-generated PDF at public/downloads/<pdfSlug>.pdf. Omit to hide the download link. */
   pdfSlug?: string;
+  /** Optional compact "podium by edition" cards, shown between the table and the champions summary. */
+  podium?: PodiumEntry[];
+  podiumHeading?: string;
+  /** Optional "where it's been hosted" locator map, shown after the champions summary. */
+  hostMap?: HostMapPoint[];
 }
 
-const { data, tableId, tableCaption, extraColumn, pdfSlug } = Astro.props;
+const {
+  data,
+  tableId,
+  tableCaption,
+  extraColumn,
+  pdfSlug,
+  podium,
+  podiumHeading = 'Podium by edition',
+  hostMap,
+} = Astro.props;
+
+// "Tap a year to reveal a short story": joins the page's own "Memorable
+// moments" bullets (already loaded via noteHeadings, no extra content read)
+// onto the matching edition row by year. Empty when a page doesn't request
+// that section (e.g. it has no year-tied stories, or isn't a team
+// competition) - TournamentTable omits the column entirely in that case.
+const memorableMoments = data.notes.find((section) => section.heading === 'Memorable moments');
+const stories = memorableMoments
+  ? buildYearStories(data.editions, memorableMoments.items)
+  : new Map<string, string>();
 ---
 
 <article class="competition stack">
@@ -36,9 +64,16 @@ const { data, tableId, tableCaption, extraColumn, pdfSlug } = Astro.props;
     hosts={data.hosts}
     teams={data.teams}
     extraColumn={extraColumn}
+    storyColumn={stories.size > 0 ? { label: 'Story', values: stories } : undefined}
   />
 
+  {podium && podium.length > 0 && (
+    <PodiumCards entries={podium} id={`${tableId}-podium`} heading={podiumHeading} />
+  )}
+
   <ChampionsSummary champions={data.champions} scaleMax={data.editions.length} />
+
+  {hostMap && hostMap.length > 0 && <HostMap points={hostMap} id={`${tableId}-host-map`} />}
 
   <EditorialNotes sections={data.notes} />
 

@@ -98,10 +98,22 @@ deployment → Source** to **GitHub Actions**.
 
 ## Next logical milestone
 
-All six competition/award pages, `/records`, and `/quiz` are live (see
-`docs/PROJECT_STATUS.md` for what each covers). Winner/year/host filtering is
-now in place on every competition table that has host data. Remaining from
-`docs/WEBSITE_REQUIREMENTS.md`: an `/about/sources` index page, a "by team"
-filter (needs new editorial content - only a team *count* column exists
-today), sort controls that preserve historical notes, and optional
-Croatian/English localization.
+Every page and capability named in `docs/WEBSITE_REQUIREMENTS.md` is live,
+including `/about/sources`, sort controls that preserve historical notes,
+full Croatian/English localization, and the "by team" filter (shipped
+2026-08-03: `TournamentTable.astro`'s `teams` prop/`<select>`, filtering by
+any team that appears in a Winner/Runner-up/Third/Fourth/semifinalist
+column) - see `docs/PROJECT_STATUS.md` for the complete, continuously-updated
+list (it now also covers `/compare`, `/teams`, a PWA/offline mode,
+downloadable print PDFs, and an "On this day" widget, none of which existed
+when this section was last accurate).
+**Correction (2026-08-20 intensive run):** this section previously named the
+"by team" filter as the one still-missing requirement. That was stale - the
+filter has been live since 2026-08-03; the note only ever meant a *stricter*
+reading (full per-edition participant lists, not just teams that reached the
+latter stages) would need new editorial content, but stated it as if the
+filter didn't exist at all. See `docs/PROJECT_STATUS.md`'s 2026-08-20
+"Correction" entry for the full explanation. `docs/PROJECT_STATUS.md`'s own
+"Left for a future pass" notes are the accurate, current source of truth for
+what (if anything) remains; this file only covers the original Milestone-1
+slice.

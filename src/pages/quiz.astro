@@ -8,14 +8,17 @@ import EditorialNotes from '../components/EditorialNotes.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import { buildTimeline } from '../lib/editions';
 import { t } from '../lib/i18n';
-import { withBase } from '../lib/url';
+import { absolutePageUrl, withBase } from '../lib/url';
+import { buildQuizJsonLd, type JsonLdObject } from '../lib/jsonLd';
 import type { Edition } from '../lib/types';
 import {
   championByYearQuestions,
   chronologicalOrderQuestions,
   hostByYearQuestions,
+  mostTitlesQuestion,
   runnerUpByYearQuestions,
   topScorerByYearQuestions,
+  yearByWinnerQuestions,
   selectQuiz,
   type QuizPool,
 } from '../lib/quiz';
@@ -75,6 +78,16 @@ const pools: QuizPool[] = [
     seed: 'pick:world-cup:runner-up',
   },
   {
+    questions: mostTitlesQuestion(worldCup.champions, 'FIFA World Cup', 'world-cup'),
+    take: 1,
+    seed: 'pick:world-cup:most-titles',
+  },
+  {
+    questions: yearByWinnerQuestions(worldCup.editions, 'FIFA World Cup', 'world-cup', 'en', 'team'),
+    take: 1,
+    seed: 'pick:world-cup:year-by-winner',
+  },
+  {
     questions: championByYearQuestions(euro.editions, 'UEFA EURO', 'euro'),
     take: 2,
     seed: 'pick:euro:champion',
@@ -88,6 +101,16 @@ const pools: QuizPool[] = [
     questions: runnerUpByYearQuestions(buildTimeline(euro.editions), 'UEFA EURO', 'euro'),
     take: 1,
     seed: 'pick:euro:runner-up',
+  },
+  {
+    questions: mostTitlesQuestion(euro.champions, 'UEFA EURO', 'euro'),
+    take: 1,
+    seed: 'pick:euro:most-titles',
+  },
+  {
+    questions: yearByWinnerQuestions(euro.editions, 'UEFA EURO', 'euro', 'en', 'team'),
+    take: 1,
+    seed: 'pick:euro:year-by-winner',
   },
   {
     questions: championByYearQuestions(copaAmerica.editions, 'Copa América', 'copa-america'),
@@ -105,6 +128,16 @@ const pools: QuizPool[] = [
     seed: 'pick:copa-america:runner-up',
   },
   {
+    questions: mostTitlesQuestion(copaAmerica.champions, 'Copa América', 'copa-america'),
+    take: 1,
+    seed: 'pick:copa-america:most-titles',
+  },
+  {
+    questions: yearByWinnerQuestions(copaAmerica.editions, 'Copa América', 'copa-america', 'en', 'team'),
+    take: 1,
+    seed: 'pick:copa-america:year-by-winner',
+  },
+  {
     questions: championByYearQuestions(nationsLeague.editions, 'UEFA Nations League', 'nations-league'),
     take: 2,
     seed: 'pick:nations-league:champion',
@@ -115,9 +148,29 @@ const pools: QuizPool[] = [
     seed: 'pick:nations-league:host',
   },
   {
+    questions: mostTitlesQuestion(nationsLeague.champions, 'UEFA Nations League', 'nations-league'),
+    take: 1,
+    seed: 'pick:nations-league:most-titles',
+  },
+  {
+    questions: yearByWinnerQuestions(nationsLeague.editions, 'UEFA Nations League', 'nations-league', 'en', 'team'),
+    take: 1,
+    seed: 'pick:nations-league:year-by-winner',
+  },
+  {
     questions: championByYearQuestions(ballonDor.editions, "Ballon d'Or", 'ballon-dor'),
     take: 3,
     seed: "pick:ballon-dor:champion",
+  },
+  {
+    questions: mostTitlesQuestion(ballonDor.champions, "Ballon d'Or", 'ballon-dor', 'player'),
+    take: 1,
+    seed: 'pick:ballon-dor:most-titles',
+  },
+  {
+    questions: yearByWinnerQuestions(ballonDor.editions, "Ballon d'Or", 'ballon-dor'),
+    take: 2,
+    seed: 'pick:ballon-dor:year-by-winner',
   },
   {
     questions: topScorerByYearQuestions(goldenBootWorldCup.editions, 'World Cup Golden Boot', 'golden-boot-world-cup'),
@@ -125,9 +178,24 @@ const pools: QuizPool[] = [
     seed: 'pick:golden-boot-world-cup:scorer',
   },
   {
+    questions: mostTitlesQuestion(
+      goldenBootWorldCup.champions,
+      'World Cup Golden Boot',
+      'golden-boot-world-cup',
+      'player',
+    ),
+    take: 1,
+    seed: 'pick:golden-boot-world-cup:most-titles',
+  },
+  {
     questions: topScorerByYearQuestions(goldenBootEuro.editions, 'EURO Golden Boot', 'golden-boot-euro'),
     take: 2,
     seed: 'pick:golden-boot-euro:scorer',
+  },
+  {
+    questions: mostTitlesQuestion(goldenBootEuro.champions, 'EURO Golden Boot', 'golden-boot-euro', 'player'),
+    take: 1,
+    seed: 'pick:golden-boot-euro:most-titles',
   },
 ];
 
@@ -169,12 +237,24 @@ const lastReviewed = [
 ]
   .sort()
   .at(-1) as string;
+
+// A schema.org Quiz for the multiple-choice pool above (see buildQuizJsonLd's
+// own comment for why the separate chronological-order questions are
+// intentionally excluded). See docs/PROJECT_STATUS.md for why /quiz was the
+// other named gap after /records gained the same kind of structured data.
+const jsonLd: JsonLdObject[] = [
+  buildQuizJsonLd(questions, {
+    pageUrl: absolutePageUrl(Astro.url, Astro.site),
+    name: 'The Ultimate Football Reference - Family Quiz',
+  }),
+];
 ---
 
 <BaseLayout
   title={meta.title}
-  description="A family football quiz generated from the World Cup, EURO, Copa América, Nations League, Ballon d'Or and Golden Boot tables - champions, hosts, finals and top scorers."
+  description="A family football quiz generated from the World Cup, EURO, Copa América, Nations League, Ballon d'Or and Golden Boot tables - champions, hosts, finals, top scorers and Ballon d'Or years."
   alternateHref={withBase('/hr/quiz')}
+  jsonLd={jsonLd}
 >
   <article class="quiz stack">
     <header class="quiz__header">

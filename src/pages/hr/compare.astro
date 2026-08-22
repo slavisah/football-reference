@@ -15,8 +15,15 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import References from '../../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
-import { buildAllCountryRecords, tracksSemifinalColumn } from '../../lib/compare';
-import { withBase } from '../../lib/url';
+import {
+  buildAllCountryRecords,
+  buildFinalsMeetings,
+  finalsMeetingsBetween,
+  tracksSemifinalColumn,
+} from '../../lib/compare';
+import { teamProfileSlug } from '../../lib/teamProfile';
+import { absolutePageUrl, withBase } from '../../lib/url';
+import { buildCountryRecordsItemList, type JsonLdObject } from '../../lib/jsonLd';
 
 const meta = await loadPageMeta('compare-countries');
 
@@ -56,6 +63,11 @@ const sortedByName = [...allRecords].sort((a, b) => a.displayName.localeCompare(
 // something meaningful before any JS runs or a URL param is read.
 const [defaultA, defaultB] = allRecords;
 
+// Every final actually played across these four competitions - the data set
+// the "Finals meetings" panel below filters by the current picker pair.
+const finalsMeetings = buildFinalsMeetings(competitions);
+const defaultMeetings = finalsMeetingsBetween(defaultA.id, defaultB.id, finalsMeetings);
+
 function semifinalDisplay(index: number, value: number): string {
   return tracksSemifinal[index] ? String(value) : '—';
 }
@@ -86,6 +98,30 @@ const recordsForClient = allRecords.map((r) => ({
     semifinals: c.semifinals,
   })),
 }));
+
+const finalsMeetingsForClient = finalsMeetings.map((m) => ({
+  competition: m.competition,
+  year: m.year,
+  yearSort: m.yearSort,
+  winnerId: m.winnerId,
+  winnerName: m.winnerName,
+  runnerUpId: m.runnerUpId,
+  runnerUpName: m.runnerUpName,
+  score: m.score ?? null,
+}));
+
+// Croatian counterpart of src/pages/compare.astro's jsonLd block - same data,
+// a Croatian item-list name, and a `describe()` override so each team's
+// description reads in Croatian too, the same "unit" translation pattern
+// hr/records.astro already uses for buildChampionsItemList.
+const jsonLd: JsonLdObject[] = [
+  buildCountryRecordsItemList(allRecords, {
+    pageUrl: absolutePageUrl(Astro.url, Astro.site),
+    name: 'Sve reprezentacije - ukupan učinak na Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija',
+    describe: (record) =>
+      `${record.totalTitles} naslova, ${record.totalRunnerUps} drugih mjesta, ${record.totalFinals} odigranih finala na Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija`,
+  }),
+];
 ---
 
 <BaseLayout
@@ -93,6 +129,7 @@ const recordsForClient = allRecords.map((r) => ({
   description="Usporedite dvije reprezentacije po njihovom učinku na Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija - naslovi, drugo mjesto i polufinalni plasmani, generirano izravno iz tablice svakog natjecanja."
   locale="hr"
   alternateHref={withBase('/compare')}
+  jsonLd={jsonLd}
 >
   <article class="compare stack">
     <header class="compare__header">
@@ -226,13 +263,46 @@ const recordsForClient = allRecords.map((r) => ({
       </p>
     </section>
 
+    <section class="card stack" aria-labelledby="finals-meetings-heading">
+      <h2 id="finals-meetings-heading">Susreti u finalima</h2>
+      <p class="muted" id="finals-meetings-intro">
+        Svaki put kada su se <span id="finals-meetings-a-name">{defaultA.displayName}</span> i{' '}
+        <span id="finals-meetings-b-name">{defaultB.displayName}</span> susreli u finalu Svjetskog prvenstva,
+        EURA, Copa Américe ili Lige nacija, od najstarijeg prema najnovijem susretu.
+      </p>
+      <div
+        id="finals-meetings-body"
+        data-empty-text="Ove dvije reprezentacije nikada se nisu susrele u finalu ni jednog od ova četiri natjecanja."
+      >
+        {
+          defaultMeetings.length === 0 ? (
+            <p class="muted" id="finals-meetings-empty">
+              Ove dvije reprezentacije nikada se nisu susrele u finalu ni jednog od ova četiri natjecanja.
+            </p>
+          ) : (
+            <ol class="finals-meetings__list" id="finals-meetings-list">
+              {defaultMeetings.map((m) => (
+                <li>
+                  <span class="finals-meetings__year">{m.year}</span>
+                  <span class="finals-meetings__competition">{m.competition}</span>
+                  Pobjednik: <strong>{m.winnerName}</strong>, poraženi finalist: {m.runnerUpName}
+                  {m.score ? <span class="finals-meetings__score">{m.score}</span> : null}
+                </li>
+              ))}
+            </ol>
+          )
+        }
+      </div>
+    </section>
+
     <section class="stack" aria-labelledby="all-teams-heading">
       <h2 id="all-teams-heading">Sve reprezentacije</h2>
       <p class="muted">
         Svaka reprezentacija koja je osvojila naslov, bila drugoplasirana ili
         dosegnula praćeno polufinale u barem jednom od ova četiri natjecanja,
         poredana po broju naslova. Odaberite bilo koje dvije iznad za izravnu
-        usporedbu.
+        usporedbu, ili odaberite ime u nastavku za njezin cjeloviti pregled po
+        godinama na <a href={withBase('/hr/teams')}>stranici Reprezentacije</a>.
       </p>
       <div
         class="t-wrap"
@@ -257,7 +327,9 @@ const recordsForClient = allRecords.map((r) => ({
               allRecords.map((r, i) => (
                 <tr>
                   <td>{i + 1}</td>
-                  <th scope="row">{r.displayName}</th>
+                  <th scope="row">
+                    <a href={withBase(`/hr/teams/${teamProfileSlug(r.id)}`)}>{r.displayName}</a>
+                  </th>
                   <td>{r.totalTitles}</td>
                   <td>{r.totalRunnerUps}</td>
                   <td>{r.totalSemifinals}</td>
@@ -413,15 +485,60 @@ const recordsForClient = allRecords.map((r) => ({
     font-size: 0.85rem;
     max-width: 68ch;
   }
+
+  .finals-meetings__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .finals-meetings__list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .finals-meetings__year {
+    font-weight: 700;
+    min-width: 3.2rem;
+  }
+
+  .finals-meetings__competition {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .finals-meetings__score {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .finals-meetings__score::before {
+    content: '(';
+  }
+
+  .finals-meetings__score::after {
+    content: ')';
+  }
 </style>
 
-<script is:inline define:vars={{ records: recordsForClient }}>
+<script is:inline define:vars={{ records: recordsForClient, finalsMeetings: finalsMeetingsForClient }}>
   const selectA = document.getElementById('compare-a');
   const selectB = document.getElementById('compare-b');
   const swapBtn = document.getElementById('compare-swap');
   const status = document.getElementById('compare-status');
   const statusTemplate = status?.dataset.template ?? '{a} vs {b}';
   const byId = new Map(records.map((r) => [r.id, r]));
+  const finalsMeetingsBody = document.getElementById('finals-meetings-body');
+  const finalsMeetingsEmptyText = finalsMeetingsBody?.dataset.emptyText ?? '';
 
   function setCell(row, field, value) {
     const cell = row && row.querySelector(`[data-field="${field}"]`);
@@ -449,6 +566,44 @@ const recordsForClient = allRecords.map((r) => ({
     setCell(totalRow, 'finals', record.totalFinals);
   }
 
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function renderFinalsMeetings(a, b) {
+    if (!finalsMeetingsBody) return;
+
+    const aName = document.getElementById('finals-meetings-a-name');
+    const bName = document.getElementById('finals-meetings-b-name');
+    if (aName) aName.textContent = a.displayName;
+    if (bName) bName.textContent = b.displayName;
+
+    const meetings = finalsMeetings
+      .filter(
+        (m) =>
+          (m.winnerId === a.id && m.runnerUpId === b.id) || (m.winnerId === b.id && m.runnerUpId === a.id),
+      )
+      .sort((x, y) => x.yearSort - y.yearSort);
+
+    if (meetings.length === 0) {
+      finalsMeetingsBody.innerHTML = `<p class="muted" id="finals-meetings-empty">${escapeHtml(finalsMeetingsEmptyText)}</p>`;
+      return;
+    }
+
+    const items = meetings
+      .map((m) => {
+        const score = m.score
+          ? `<span class="finals-meetings__score">${escapeHtml(m.score)}</span>`
+          : '';
+        return `<li><span class="finals-meetings__year">${escapeHtml(m.year)}</span><span class="finals-meetings__competition">${escapeHtml(m.competition)}</span>Pobjednik: <strong>${escapeHtml(m.winnerName)}</strong>, poraženi finalist: ${escapeHtml(m.runnerUpName)}${score}</li>`;
+      })
+      .join('');
+    finalsMeetingsBody.innerHTML = `<ol class="finals-meetings__list" id="finals-meetings-list">${items}</ol>`;
+  }
+
   function readParams() {
     const p = new URLSearchParams(window.location.search);
     return { a: p.get('a') || '', b: p.get('b') || '' };
@@ -468,6 +623,7 @@ const recordsForClient = allRecords.map((r) => ({
     const b = byId.get(selectB.value);
     if (a) fillSide('a', a);
     if (b) fillSide('b', b);
+    if (a && b) renderFinalsMeetings(a, b);
     if (status && a && b) {
       status.textContent = statusTemplate
         .replace('{a}', a.displayName)

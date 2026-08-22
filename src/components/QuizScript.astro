@@ -137,17 +137,33 @@
       const orderCorrectText = card.dataset.i18nOrderCorrect ?? 'Correct order!';
       const orderIncorrectText =
         card.dataset.i18nOrderIncorrect ?? 'Not quite - highlighted items are out of place.';
+      const orderDuplicateText =
+        card.dataset.i18nOrderDuplicate ?? 'Each rank can only be used once.';
       const resultCorrectLabel = card.dataset.i18nResultCorrect ?? '✓ correct spot';
       const resultIncorrectLabel = card.dataset.i18nResultIncorrect ?? '✗ wrong spot';
 
       if (checkBtn) checkBtn.hidden = false;
 
+      // A plain "every select has a value" check lets a reader assign the
+      // same rank to two different items (e.g. 1, 1, 3, 4) while another
+      // rank goes unused - check() would then mark each of those two items
+      // independently, producing arbitrary-looking feedback with no
+      // explanation. Ranks must form a bijection onto 1..N before the
+      // "Check order" button is enabled.
+      function hasDuplicateRank() {
+        const filled = selects.map((s) => s.value).filter((v) => v !== '');
+        return new Set(filled).size !== filled.length;
+      }
+
       function updateCheckState() {
-        if (checkBtn) checkBtn.disabled = selects.some((s) => s.value === '');
+        const duplicate = hasDuplicateRank();
+        const allFilled = selects.every((s) => s.value !== '');
+        if (checkBtn) checkBtn.disabled = !allFilled || duplicate;
+        if (feedback) feedback.textContent = duplicate ? orderDuplicateText : '';
       }
 
       function check() {
-        if (selects.some((s) => s.value === '')) return;
+        if (selects.some((s) => s.value === '') || hasDuplicateRank()) return;
         let allCorrect = true;
         selects.forEach((select, i) => {
           const item = items[i];

@@ -61,12 +61,21 @@ const jsonLd = [
   }),
 ];
 
-// Hand-translated from content/golden-boot.md's "World Cup notes" and "EURO
-// notes" sections. content/ itself stays untouched and English (the single
+// Hand-translated from content/golden-boot.md's "How it works", "World Cup
+// notes" and "EURO notes" sections. content/ itself stays untouched and English (the single
 // editorial source of truth); this is presentation-layer text local to this
 // page only, the same way every earlier Croatian competition page hand-writes
 // its own Croatian prose.
 const notes: NoteSection[] = [
+  {
+    heading: 'Kako funkcionira',
+    items: [
+      'Zlatna kopačka pripada najboljem strijelcu (ili strijelcima) turnira - riječ je o osobnoj nagradi za golove, a ne o momčadskom naslovu prvaka.',
+      'Nagradu osvaja onaj tko postigne najviše golova u svim utakmicama tog turnira, računajući golove od skupne faze do finala.',
+      'Dva ili više igrača mogu završiti izjednačeni po broju golova; ranija izdanja često su priznavala sve igrače izjednačene na vrhu, dok suvremena pravila za razdvajanje mogu uzeti u obzir asistencije ili odigrane minute (pogledajte napomene ispod svake tablice).',
+      'Ova stranica prati dvije odvojene utrke za Zlatnu kopačku, jednu za FIFA Svjetsko prvenstvo i jednu za UEFA EURO, svaku sa svojom tablicom pobjednika.',
+    ],
+  },
   {
     heading: 'Napomene o Svjetskom prvenstvu',
     items: [
@@ -121,6 +130,7 @@ const headerLabels: Record<string, string> = {
       <h2>Najbolji strijelci Svjetskog prvenstva</h2>
       <TournamentTable
         id="golden-boot-world-cup"
+        paramPrefix="world-cup"
         caption="Najbolji strijelci FIFA Svjetskog prvenstva, od 1930. do danas"
         table={worldCup.table}
         editions={worldCup.editions}
@@ -162,6 +172,7 @@ const headerLabels: Record<string, string> = {
       <h2>Najbolji strijelci EURA</h2>
       <TournamentTable
         id="golden-boot-euro"
+        paramPrefix="euro"
         caption="Najbolji strijelci UEFA Europskog prvenstva, od 1960. do danas"
         table={euro.table}
         editions={euro.editions}

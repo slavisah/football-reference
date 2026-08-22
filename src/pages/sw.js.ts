@@ -8,7 +8,7 @@ export const prerender = true;
 // activate handler evicts the old cache instead of leaving stale pages
 // behind forever. Plain string, not a build timestamp, so rebuilds without
 // a real change don't force every visitor to re-download everything.
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 
 // A tiny offline-reading service worker, generated at build time so it can
 // bake in the real BASE_PATH (see astro.config.mjs) and the current nav

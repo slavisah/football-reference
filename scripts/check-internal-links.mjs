@@ -162,7 +162,13 @@ async function main() {
   process.exitCode = 1;
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+// Guarded so importing classifyLink/candidateDistPaths from
+// check-sitemap.mjs/check-precache.mjs doesn't also re-run the full crawl as
+// a side effect of the import - only run main() when this file is the actual
+// entry point (`pnpm check:links` / `node scripts/check-internal-links.mjs`).
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}

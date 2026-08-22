@@ -13,7 +13,7 @@ const [worldCup, euro] = await Promise.all([
   loadCompetition('golden-boot', {
     editionsHeading: 'FIFA World Cup top scorers',
     sourcesHeading: 'FIFA World Cup',
-    noteHeadings: ['World Cup notes'],
+    noteHeadings: ['How it works', 'World Cup notes'],
   }),
   loadCompetition('golden-boot', {
     editionsHeading: 'UEFA EURO top scorers',
@@ -66,6 +66,7 @@ const jsonLd = [
       <h2>FIFA World Cup top scorers</h2>
       <TournamentTable
         id="golden-boot-world-cup"
+        paramPrefix="world-cup"
         caption="FIFA World Cup top scorers, 1930 to present"
         table={worldCup.table}
         editions={worldCup.editions}
@@ -88,6 +89,7 @@ const jsonLd = [
       <h2>UEFA EURO top scorers</h2>
       <TournamentTable
         id="golden-boot-euro"
+        paramPrefix="euro"
         caption="UEFA EURO top scorers, 1960 to present"
         table={euro.table}
         editions={euro.editions}
@@ -114,6 +116,9 @@ const jsonLd = [
       status={worldCup.status}
     />
   </article>
+  <p class="golden-boot__players-link no-print">
+    <a href={withBase('/players')}>Browse every player's full award history &rarr;</a>
+  </p>
 </BaseLayout>
 
 <style>
@@ -133,5 +138,9 @@ const jsonLd = [
     max-width: 62ch;
     color: var(--text-muted);
     font-size: 1.05rem;
+  }
+
+  .golden-boot__players-link {
+    font-weight: 600;
   }
 </style>

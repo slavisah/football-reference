@@ -5,13 +5,20 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 2018-19
 lastCompletedEdition: 2024-25
-lastReviewed: 2026-08-12
-status: review
+lastReviewed: 2026-08-14
+status: verified
 ---
 
 # UEFA Nations League
 
 UEFA introduced the Nations League to replace many international friendlies with competitive league matches. The highest-ranked teams compete for a place in the Nations League Finals.
+
+## How it works
+
+- Every UEFA national team is placed into one of four leagues (A to D) by strength, then split into small groups within its league.
+- Teams play each other in their group; results promote the best teams to a higher league and relegate the weakest to a lower one, alongside separate World Cup/EURO qualifying.
+- The four League A group winners advance to the Nations League Finals: two semifinals, a third-place match, and a final, all hosted by one of the four finalists.
+- Held every two years.
 
 ## Finals
 
@@ -28,6 +35,14 @@ UEFA introduced the Nations League to replace many international friendlies with
 - Portugal became the first two-time champion in 2025.
 - Croatia reached its first Nations League final in 2023.
 - The competition uses promotion and relegation between leagues.
+
+## Memorable moments
+
+- Portugal won the first-ever Nations League Finals in 2019, beating Netherlands 1–0 as hosts.
+- Italy hosted the 2021 Finals without reaching the final itself, finishing third as France beat Spain 2–1 for the title.
+- Spain won the 2023 final on penalties after a goalless draw with Croatia.
+- Portugal beat Spain on penalties in the 2025 final to become the competition's first two-time champion.
+- The host nation has finished in the Finals' top four in every edition so far, including Germany finishing fourth in 2025.
 
 ## Website idea
 

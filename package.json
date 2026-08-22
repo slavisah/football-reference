@@ -12,12 +12,15 @@
     "lint": "astro check",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install --with-deps chromium",
     "build:pdfs": "node scripts/generate-pdfs.mjs",
     "check:pdfs": "node scripts/check-pdf-freshness.mjs",
     "check:perf": "node scripts/check-page-weight.mjs",
-    "check:links": "node scripts/check-internal-links.mjs"
+    "check:links": "node scripts/check-internal-links.mjs",
+    "check:sitemap": "node scripts/check-sitemap.mjs",
+    "check:precache": "node scripts/check-precache.mjs"
   },
   "dependencies": {
     "astro": "^5.13.0"
@@ -27,6 +30,7 @@
     "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "^1.55.0",
     "@types/node": "^26.1.1",
+    "@vitest/coverage-v8": "2.1.9",
     "typescript": "^5.9.0",
     "vitest": "^2.1.0"
   },

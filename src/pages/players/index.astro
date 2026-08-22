@@ -1,0 +1,146 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import References from '../../components/References.astro';
+import { loadCompetition, loadPageMeta } from '../../lib/competition';
+import { buildAllPlayerProfiles, playerProfileSlug, type PlayerAwardSource } from '../../lib/playerProfile';
+import { absolutePageUrl, withBase } from '../../lib/url';
+import { buildPlayersDirectoryItemList, type JsonLdObject } from '../../lib/jsonLd';
+
+const meta = await loadPageMeta('players');
+
+const [ballonDor, worldCupGoldenBoot, euroGoldenBoot] = await Promise.all([
+  loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),
+  loadCompetition('golden-boot', {
+    editionsHeading: 'FIFA World Cup top scorers',
+    sourcesHeading: 'FIFA World Cup',
+  }),
+  loadCompetition('golden-boot', {
+    editionsHeading: 'UEFA EURO top scorers',
+    sourcesHeading: 'UEFA EURO',
+  }),
+]);
+
+const sources: PlayerAwardSource[] = [
+  { title: "Ballon d'Or", slug: 'ballon-dor', editions: ballonDor.editions },
+  { title: 'FIFA World Cup Golden Boot', slug: 'golden-boot', editions: worldCupGoldenBoot.editions },
+  { title: 'UEFA EURO Golden Boot', slug: 'golden-boot', editions: euroGoldenBoot.editions },
+];
+
+const profiles = buildAllPlayerProfiles(sources);
+
+const combinedSources = [ballonDor.sources, worldCupGoldenBoot.sources, euroGoldenBoot.sources]
+  .flat()
+  .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+
+const lastReviewed = [ballonDor.lastReviewed, worldCupGoldenBoot.lastReviewed, euroGoldenBoot.lastReviewed]
+  .concat(meta.lastReviewed)
+  .sort()
+  .at(-1) as string;
+
+const jsonLd: JsonLdObject[] = [
+  buildPlayersDirectoryItemList(profiles, {
+    pageUrl: absolutePageUrl(Astro.url, Astro.site),
+    name: "Players directory - every Men's Ballon d'Or and FIFA World Cup/UEFA EURO Golden Boot winner",
+  }),
+];
+---
+
+<BaseLayout
+  title={meta.title}
+  description="Every Men's Ballon d'Or winner and FIFA World Cup or UEFA EURO Golden Boot winner, A to Z - pick one for their full year-by-year award record."
+  alternateHref={withBase('/hr/players')}
+  jsonLd={jsonLd}
+>
+  <article class="players stack">
+    <header class="players__header">
+      <p class="eyebrow badge">Generated from the award tables</p>
+      <h1>{meta.title}</h1>
+      <p class="players__intro">{meta.intro}</p>
+      <p class="players__compare-link no-print">
+        <a href={withBase('/compare-players')}>Compare two players head-to-head &rarr;</a>
+      </p>
+    </header>
+
+    <section class="stack" aria-labelledby="players-list-heading">
+      <h2 id="players-list-heading" class="visually-hidden">Players A to Z</h2>
+      <ul class="players__grid">
+        {
+          profiles.map((p) => (
+            <li>
+              <a class="players__link" href={withBase(`/players/${playerProfileSlug(p.id)}`)}>
+                <span class="players__name">{p.displayName}</span>
+                <span class="players__stat">
+                  {p.totalAwards} {p.totalAwards === 1 ? 'award' : 'awards'}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <References sources={combinedSources} lastReviewed={lastReviewed} status={meta.status} />
+  </article>
+</BaseLayout>
+
+<style>
+  .players__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .players__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .players__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .players__compare-link {
+    font-weight: 600;
+  }
+
+  .players__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  }
+
+  .players__link {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.7rem 0.9rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .players__link:hover,
+  .players__link:focus-visible {
+    border-color: var(--accent);
+  }
+
+  .players__name {
+    font-weight: 600;
+  }
+
+  .players__stat {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+</style>

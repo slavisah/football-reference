@@ -2,6 +2,8 @@
 import type { Edition, MarkdownTable } from '../lib/types';
 import { buildSortOptions, defaultSortValue } from '../lib/tableSort';
 import { editionTeams } from '../lib/editions';
+import { renderInlineMarkdown } from '../lib/notes';
+import { abbreviateFinalScore, hasAbbreviation } from '../lib/glossary';
 import type { Locale } from '../lib/i18n';
 
 interface Props {
@@ -29,6 +31,15 @@ interface Props {
    */
   extraColumn?: { label: string; values: Map<string, string> };
   /**
+   * An optional "tap a year to reveal a short story" column, joined in by
+   * edition year like `extraColumn` - but rendered as a native
+   * `<details>`/`<summary>` disclosure rather than plain text, since a story
+   * is a full sentence rather than a short fact. Editions with no story show
+   * an em dash. See `buildYearStories()` in src/lib/editions.ts.
+   */
+  storyColumn?: { label: string; values: Map<string, string> };
+  storySummaryLabel?: string;
+  /**
    * Overridable for localized pages; every default below matches the original
    * English copy, so existing call sites render byte-identical output.
    */
@@ -55,6 +66,17 @@ interface Props {
   bitTeamPrefix?: string;
   emptyText?: string;
   clearFiltersLabel?: string;
+  /**
+   * Namespaces the shareable `?winner=`/`?year=`/etc. URL query-param keys as
+   * `{paramPrefix}-winner` etc. Required whenever a page renders more than one
+   * `TournamentTable` (e.g. golden-boot.astro's World Cup + EURO tables) -
+   * without it, two instances on the same page silently share one `?year=`
+   * key and each one's filter/sort selection overwrites the other's in the
+   * URL, so a shared link only ever restores the last-changed table. Leave
+   * unset for the (default, far more common) single-table-per-page case so
+   * every existing page's URLs/tests stay byte-identical.
+   */
+  paramPrefix?: string;
 }
 
 const {
@@ -67,6 +89,9 @@ const {
   teams = [],
   winnerLabel = 'Winner',
   extraColumn,
+  storyColumn,
+  storySummaryLabel = '📖 Tap to read the story',
+  paramPrefix = '',
   locale = 'en',
   headerLabels = {},
   yearLabel = 'Year',
@@ -106,6 +131,12 @@ const winnerColIndex = table.headers.findIndex((header) =>
 // knockout-final/home-and-away/special-edition audit) renders as a small
 // badge, matching the existing status badge style, rather than plain text.
 const formatColIndex = table.headers.findIndex((header) => /^format$/i.test(header.trim()));
+
+// The "Final" column (World Cup/EURO/Nations League only) can contain the
+// "a.e.t." or "pens" shorthand docs/EDITORIAL_GUIDE.md requires be explained
+// before use - wrapped in a native <abbr title> via abbreviateFinalScore()
+// below, rather than plain text, on those columns/rows only.
+const finalColIndex = table.headers.findIndex((header) => /^final$/i.test(header.trim()));
 
 // "Sort by" options: only the columns worth sorting by (Year/Season, Winner,
 // Host, a numeric quantity column), detected the same way `buildEditions`
@@ -200,6 +231,7 @@ const defaultSort = defaultSortValue(sortOptions);
         <tr>
           {table.headers.map((header) => <th scope="col">{headerLabels[header] ?? header}</th>)}
           {extraColumn && <th scope="col">{extraColumn.label}</th>}
+          {storyColumn && <th scope="col">{storyColumn.label}</th>}
         </tr>
       </thead>
       <tbody>
@@ -221,7 +253,13 @@ const defaultSort = defaultSortValue(sortOptions);
                   aria-label={`${headerLabels[cell.label] ?? cell.label}: ${cell.value}`}
                   class={index === winnerColIndex ? 'is-winner' : undefined}
                 >
-                  {index === formatColIndex ? <span class="badge">{cell.value}</span> : cell.value}
+                  {index === formatColIndex ? (
+                    <span class="badge">{cell.value}</span>
+                  ) : index === finalColIndex && hasAbbreviation(cell.value) ? (
+                    <span set:html={abbreviateFinalScore(cell.value, locale)} />
+                  ) : (
+                    cell.value
+                  )}
                 </td>
               ))}
               {extraColumn && (
@@ -230,6 +268,18 @@ const defaultSort = defaultSortValue(sortOptions);
                   aria-label={`${extraColumn.label}: ${extraColumn.values.get(edition.year) ?? '—'}`}
                 >
                   {extraColumn.values.get(edition.year) ?? '—'}
+                </td>
+              )}
+              {storyColumn && (
+                <td data-label={storyColumn.label}>
+                  {storyColumn.values.has(edition.year) ? (
+                    <details class="story-reveal">
+                      <summary>{storySummaryLabel}</summary>
+                      <p set:html={renderInlineMarkdown(storyColumn.values.get(edition.year)!)} />
+                    </details>
+                  ) : (
+                    <span aria-label={`${storyColumn.label}: —`}>—</span>
+                  )}
                 </td>
               )}
             </tr>
@@ -347,6 +397,12 @@ const defaultSort = defaultSortValue(sortOptions);
   .t-table td.is-winner {
     font-weight: 700;
     color: var(--accent);
+    /* Non-color signal (see global.css's forced-colors section): this
+       survives Windows/OS high-contrast mode, which strips the color/tint
+       above but not text-decoration. */
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.15em;
   }
 
   .t-empty {
@@ -363,6 +419,18 @@ const defaultSort = defaultSortValue(sortOptions);
     padding: 0;
     cursor: pointer;
     text-decoration: underline;
+  }
+
+  .story-reveal summary {
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--accent);
+  }
+
+  .story-reveal p {
+    margin: 0.4rem 0 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
   }
 
   /* --- Mobile: stack each row into a labelled card, no horizontal scroll --- */
@@ -439,6 +507,7 @@ const defaultSort = defaultSortValue(sortOptions);
   is:inline
   define:vars={{
     id,
+    paramPrefix,
     total: editions.length,
     defaultSort,
     showingAllTemplate,
@@ -481,24 +550,34 @@ const defaultSort = defaultSortValue(sortOptions);
     return dir === 'desc' ? -cmp : cmp;
   }
 
+  // Namespaces each param key so multiple TournamentTable instances on one
+  // page (e.g. golden-boot.astro's World Cup + EURO tables, paramPrefix
+  // "world-cup"/"euro") don't silently share and overwrite the same bare
+  // ?winner=/?year=/etc. key in the URL - see the `paramPrefix` prop doc.
+  function paramKey(name) {
+    return paramPrefix ? `${paramPrefix}-${name}` : name;
+  }
+
   function readParams() {
     const p = new URLSearchParams(window.location.search);
     return {
-      winner: p.get('winner') || '',
-      year: p.get('year') || '',
-      host: p.get('host') || '',
-      team: p.get('team') || '',
-      sort: p.get('sort') || '',
+      winner: p.get(paramKey('winner')) || '',
+      year: p.get(paramKey('year')) || '',
+      host: p.get(paramKey('host')) || '',
+      team: p.get(paramKey('team')) || '',
+      sort: p.get(paramKey('sort')) || '',
     };
   }
 
   function writeParams(winner, year, host, team, sort) {
     const p = new URLSearchParams(window.location.search);
-    winner ? p.set('winner', winner) : p.delete('winner');
-    year ? p.set('year', year) : p.delete('year');
-    host ? p.set('host', host) : p.delete('host');
-    team ? p.set('team', team) : p.delete('team');
-    sort && sort !== defaultSort ? p.set('sort', sort) : p.delete('sort');
+    winner ? p.set(paramKey('winner'), winner) : p.delete(paramKey('winner'));
+    year ? p.set(paramKey('year'), year) : p.delete(paramKey('year'));
+    host ? p.set(paramKey('host'), host) : p.delete(paramKey('host'));
+    team ? p.set(paramKey('team'), team) : p.delete(paramKey('team'));
+    sort && sort !== defaultSort
+      ? p.set(paramKey('sort'), sort)
+      : p.delete(paramKey('sort'));
     const qs = p.toString();
     const url = window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash;
     window.history.replaceState({}, '', url);

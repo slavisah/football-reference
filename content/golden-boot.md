@@ -2,13 +2,20 @@
 title: Golden Boot Winners
 slug: golden-boot
 awardType: scoring
-lastReviewed: 2026-08-07
-status: review
+lastReviewed: 2026-08-14
+status: verified
 ---
 
 # Golden Boot Winners
 
 The name and tie-breaking rules of top-scorer awards have changed over time. This page uses “Golden Boot” as a convenient modern label while preserving tied winners where the historical competition recognized them.
+
+## How it works
+
+- The Golden Boot goes to a tournament's top goalscorer (or scorers) - it is a personal scoring award, not the team championship.
+- Whoever scores the most goals across every match in that tournament wins it, counting goals from the group stage through the final.
+- Two or more players can finish level on goals; earlier tournaments often recognized every player tied at the top, while modern tie-breakers may use assists or minutes played to separate them (see the notes under each table below).
+- This page tracks two separate Golden Boot races, one for the FIFA World Cup and one for UEFA EURO, each with its own table of winners.
 
 # FIFA World Cup top scorers
 

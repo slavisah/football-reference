@@ -3,7 +3,11 @@ import {
   buildAllCountryRecords,
   buildCountryCompetitionRecord,
   buildCountryRecord,
+  buildFinalsMeetings,
+  buildRivalries,
+  buildTeamIndex,
   distinctCountryGroups,
+  finalsMeetingsBetween,
   tracksSemifinalColumn,
   type CompetitionEditions,
 } from '../../src/lib/compare';
@@ -11,12 +15,12 @@ import { buildEditions } from '../../src/lib/editions';
 import type { MarkdownTable } from '../../src/lib/types';
 
 const worldCupTable: MarkdownTable = {
-  headers: ['Year', 'Host', 'Winner', 'Runner-up', 'Third', 'Fourth'],
+  headers: ['Year', 'Host', 'Winner', 'Runner-up', 'Third', 'Fourth', 'Final'],
   rows: [
-    ['1954', 'Switzerland', 'West Germany', 'Hungary', 'Austria', 'Uruguay'],
-    ['1974', 'West Germany', 'West Germany', 'Netherlands', 'Poland', 'Brazil'],
-    ['2014', 'Brazil', 'Germany', 'Argentina', 'Netherlands', 'Brazil'],
-    ['2018', 'Russia', 'France', 'Croatia', 'Belgium', 'England'],
+    ['1954', 'Switzerland', 'West Germany', 'Hungary', 'Austria', 'Uruguay', 'West Germany 3-2 Hungary'],
+    ['1974', 'West Germany', 'West Germany', 'Netherlands', 'Poland', 'Brazil', 'West Germany 2-1 Netherlands'],
+    ['2014', 'Brazil', 'Germany', 'Argentina', 'Netherlands', 'Brazil', 'Germany 1-0 Argentina'],
+    ['2018', 'Russia', 'France', 'Croatia', 'Belgium', 'England', 'France 4-2 Croatia'],
   ],
 };
 
@@ -185,5 +189,251 @@ describe('buildAllCountryRecords', () => {
     expect(austria).toBeDefined();
     expect(austria?.totalTitles).toBe(0);
     expect(austria?.totalSemifinals).toBe(1);
+  });
+});
+
+describe('buildTeamIndex', () => {
+  it('returns every country as an id/displayName pair, sorted alphabetically', () => {
+    const all = buildAllCountryRecords(competitions);
+    const index = buildTeamIndex(all);
+    expect(index).toHaveLength(all.length);
+    const names = index.map((entry) => entry.displayName);
+    expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+  });
+
+  it('is not affected by buildAllCountryRecords()\'s own titles-first ranking', () => {
+    const all = buildAllCountryRecords(competitions);
+    // The most-titled country (Germany) is not first alphabetically among
+    // this fixture's countries (Argentina/Austria/Brazil/... sort earlier),
+    // so a search index that just reused the ranked order would put it
+    // first - confirming buildTeamIndex() re-sorts rather than passing the
+    // ranking through unchanged.
+    const index = buildTeamIndex(all);
+    expect(index[0].displayName).not.toBe('Germany (incl. West Germany)');
+  });
+
+  it('carries only id and displayName, dropping every title/competition field', () => {
+    const index = buildTeamIndex(buildAllCountryRecords(competitions));
+    for (const entry of index) {
+      expect(Object.keys(entry).sort()).toEqual(['displayName', 'id']);
+    }
+  });
+
+  it('returns an empty list for no competitions', () => {
+    expect(buildTeamIndex(buildAllCountryRecords([]))).toEqual([]);
+  });
+});
+
+describe('buildFinalsMeetings', () => {
+  it('records one meeting per edition with a real winner and runner-up, in source order', () => {
+    const meetings = buildFinalsMeetings([worldCup]);
+    expect(meetings).toHaveLength(4);
+    expect(meetings[0]).toMatchObject({
+      competition: 'FIFA World Cup',
+      slug: 'world-cup',
+      year: '1954',
+      winnerId: 'germany',
+      winnerName: 'West Germany',
+      runnerUpId: 'hungary',
+      runnerUpName: 'Hungary',
+      score: 'West Germany 3-2 Hungary',
+    });
+  });
+
+  it('groups West Germany and Germany under the same id while keeping the historical name for display', () => {
+    const meetings = buildFinalsMeetings([worldCup]);
+    const germanyMeetings = meetings.filter((m) => m.winnerId === 'germany');
+    expect(germanyMeetings.map((m) => m.winnerName)).toEqual(['West Germany', 'West Germany', 'Germany']);
+  });
+
+  it('leaves score undefined when the table has no "Final" score column', () => {
+    const meetings = buildFinalsMeetings([euro]);
+    expect(meetings.length).toBeGreaterThan(0);
+    expect(meetings.every((m) => m.score === undefined)).toBe(true);
+  });
+
+  it('skips a "—" placeholder runner-up cell instead of inventing a phantom meeting', () => {
+    // Copa América 1916: Uruguay champion, Argentina runner-up (a real meeting).
+    // 1916's own Third/Fourth cells are "—" but that column isn't consulted here.
+    const meetings = buildFinalsMeetings([copaAmerica]);
+    expect(meetings).toHaveLength(3);
+    expect(meetings.every((m) => m.runnerUpName !== '—' && m.winnerName !== '—')).toBe(true);
+  });
+});
+
+describe('finalsMeetingsBetween', () => {
+  it('finds every meeting between two teams regardless of which one won, sorted oldest first', () => {
+    const meetings = buildFinalsMeetings([worldCup]);
+    const result = finalsMeetingsBetween('germany', 'netherlands', meetings);
+    expect(result.map((m) => m.year)).toEqual(['1974']);
+  });
+
+  it('merges West Germany and Germany as the same team when matching a pair across editions', () => {
+    // West Germany beat Hungary in 1954; a query for "germany" vs "hungary"
+    // must find it even though the id is normalized, not the raw name.
+    const meetings = buildFinalsMeetings([worldCup]);
+    const result = finalsMeetingsBetween('germany', 'hungary', meetings);
+    expect(result).toHaveLength(1);
+    expect(result[0].winnerName).toBe('West Germany');
+  });
+
+  it('returns an empty list for a pair that has never met in a final', () => {
+    const meetings = buildFinalsMeetings([worldCup]);
+    expect(finalsMeetingsBetween('brazil', 'hungary', meetings)).toEqual([]);
+  });
+
+  it('combines meetings from multiple competitions, attributing each to its own competition', () => {
+    const meetings = buildFinalsMeetings([worldCup, copaAmerica]);
+    const germanyArgentina = finalsMeetingsBetween('germany', 'argentina', meetings);
+    expect(germanyArgentina).toHaveLength(1);
+    expect(germanyArgentina[0]).toMatchObject({ competition: 'FIFA World Cup', year: '2014' });
+
+    const argentinaColombia = finalsMeetingsBetween('argentina', 'colombia', meetings);
+    expect(argentinaColombia).toHaveLength(1);
+    expect(argentinaColombia[0]).toMatchObject({ competition: 'Copa América', year: '2024' });
+  });
+
+  it('sorts a pair with more than one meeting oldest first, regardless of source row order', () => {
+    const outOfOrderTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner', 'Runner-up'],
+      rows: [
+        ['2010', 'South Africa', 'Spain', 'Netherlands'],
+        ['1974', 'West Germany', 'Netherlands', 'West Germany'],
+        ['1988', 'West Germany', 'Netherlands', 'Spain'],
+      ],
+    };
+    const outOfOrder: CompetitionEditions = {
+      title: 'Test Cup',
+      slug: 'test-cup',
+      editions: buildEditions(outOfOrderTable),
+    };
+    const meetings = buildFinalsMeetings([outOfOrder]);
+    const result = finalsMeetingsBetween('netherlands', 'spain', meetings);
+    // Two Netherlands/Spain finals (1988, 2010), rows given out of order; the
+    // 1974 row (Netherlands vs West Germany) is a different pair and must be excluded.
+    expect(result.map((m) => m.year)).toEqual(['1988', '2010']);
+  });
+});
+
+describe('buildRivalries', () => {
+  const outOfOrderTable: MarkdownTable = {
+    headers: ['Year', 'Host', 'Winner', 'Runner-up'],
+    rows: [
+      ['2010', 'South Africa', 'Spain', 'Netherlands'],
+      ['1974', 'West Germany', 'Netherlands', 'West Germany'],
+      ['1988', 'West Germany', 'Netherlands', 'Spain'],
+    ],
+  };
+  const outOfOrder: CompetitionEditions = {
+    title: 'Test Cup',
+    slug: 'test-cup',
+    editions: buildEditions(outOfOrderTable),
+  };
+
+  it('only includes pairs that have met 2 or more times', () => {
+    const meetings = buildFinalsMeetings([outOfOrder]);
+    const rivalries = buildRivalries(meetings);
+    // Netherlands/Spain met twice (1988, 2010); Netherlands/West Germany only
+    // once (1974), so that pair must not appear at all.
+    expect(rivalries).toHaveLength(1);
+    expect(rivalries[0]).toMatchObject({
+      teamADisplayName: 'Netherlands',
+      teamBDisplayName: 'Spain',
+      meetings: 2,
+      teamAWins: 1,
+      teamBWins: 1,
+    });
+  });
+
+  it('orders teamA/teamB alphabetically by display name regardless of who won which meeting', () => {
+    const meetings = buildFinalsMeetings([outOfOrder]);
+    const [rivalry] = buildRivalries(meetings);
+    expect(rivalry.teamAId).toBe('netherlands');
+    expect(rivalry.teamBId).toBe('spain');
+  });
+
+  it('counts wins per team correctly when one side has won every meeting', () => {
+    const oneSidedTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner', 'Runner-up'],
+      rows: [
+        ['2000', 'A', 'Brazil', 'Chile'],
+        ['2010', 'B', 'Brazil', 'Chile'],
+        ['2020', 'C', 'Brazil', 'Chile'],
+      ],
+    };
+    const oneSided: CompetitionEditions = {
+      title: 'Test Cup',
+      slug: 'test-cup',
+      editions: buildEditions(oneSidedTable),
+    };
+    const [rivalry] = buildRivalries(buildFinalsMeetings([oneSided]));
+    expect(rivalry.meetings).toBe(3);
+    expect(rivalry.teamAWins + rivalry.teamBWins).toBe(3);
+    expect([rivalry.teamAWins, rivalry.teamBWins]).toContain(3);
+    expect([rivalry.teamAWins, rivalry.teamBWins]).toContain(0);
+  });
+
+  it('merges West Germany/Germany into one rivalry pair while keeping each meeting\'s own historical name', () => {
+    const germanyTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner', 'Runner-up'],
+      rows: [
+        ['1974', 'West Germany', 'West Germany', 'Argentina'],
+        ['2014', 'Brazil', 'Germany', 'Argentina'],
+      ],
+    };
+    const germanyCup: CompetitionEditions = {
+      title: 'Test Cup',
+      slug: 'test-cup',
+      editions: buildEditions(germanyTable),
+    };
+    const rivalries = buildRivalries(buildFinalsMeetings([germanyCup]));
+    expect(rivalries).toHaveLength(1);
+    expect(rivalries[0]).toMatchObject({
+      teamADisplayName: 'Argentina',
+      teamBDisplayName: 'Germany (incl. West Germany)',
+      meetings: 2,
+      teamAWins: 0,
+      teamBWins: 2,
+    });
+  });
+
+  it('lists distinct competitions a pair has met in, and the most recent meeting', () => {
+    const secondCompetitionTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner', 'Runner-up'],
+      rows: [['2022', 'X', 'Netherlands', 'Spain']],
+    };
+    const secondCompetition: CompetitionEditions = {
+      title: 'Other Cup',
+      slug: 'other-cup',
+      editions: buildEditions(secondCompetitionTable),
+    };
+    const meetings = buildFinalsMeetings([outOfOrder, secondCompetition]);
+    const [rivalry] = buildRivalries(meetings);
+    expect(rivalry.meetings).toBe(3);
+    expect(rivalry.competitions).toEqual(['Test Cup', 'Other Cup']);
+    expect(rivalry.mostRecent).toMatchObject({ year: '2022', competition: 'Other Cup' });
+  });
+
+  it('ranks rivalries by meeting count, most first', () => {
+    const threeTimesTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner', 'Runner-up'],
+      rows: [
+        ['1990', 'A', 'Italy', 'France'],
+        ['2000', 'B', 'France', 'Italy'],
+        ['2010', 'C', 'Italy', 'France'],
+      ],
+    };
+    const threeTimes: CompetitionEditions = {
+      title: 'Test Cup',
+      slug: 'test-cup',
+      editions: buildEditions(threeTimesTable),
+    };
+    const meetings = buildFinalsMeetings([outOfOrder, threeTimes]);
+    const rivalries = buildRivalries(meetings);
+    expect(rivalries.map((r) => r.meetings)).toEqual([3, 2]);
+  });
+
+  it('returns an empty list when no pair has met more than once', () => {
+    expect(buildRivalries(buildFinalsMeetings([worldCup]))).toEqual([]);
   });
 });

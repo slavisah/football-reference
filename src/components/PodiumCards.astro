@@ -1,0 +1,141 @@
+---
+// Compact per-edition podium: champion, runner-up, third and fourth place,
+// one card per edition. Deliberately excludes group-stage results, matching
+// content/uefa-nations-league.md's "Website idea" note ("avoid overwhelming
+// younger readers with every group-stage result"). Third/fourth rows are
+// simply omitted for an edition whose table has no such column (see
+// buildPodiums in src/lib/editions.ts).
+import type { PodiumEntry } from '../lib/types';
+
+interface Props {
+  entries: PodiumEntry[];
+  id: string;
+  heading: string;
+  /** Overridable for localized pages; default text matches the original English copy. */
+  hostedByLabel?: string;
+  championLabel?: string;
+  runnerUpLabel?: string;
+  thirdLabel?: string;
+  fourthLabel?: string;
+}
+
+const {
+  entries,
+  id,
+  heading,
+  hostedByLabel = 'Hosted by',
+  championLabel = 'Champion',
+  runnerUpLabel = 'Runner-up',
+  thirdLabel = 'Third',
+  fourthLabel = 'Fourth',
+} = Astro.props;
+const headingId = `${id}-heading`;
+const sorted = [...entries].sort((a, b) => b.yearSort - a.yearSort);
+---
+
+<section class="podium" aria-labelledby={headingId}>
+  <h3 id={headingId}>{heading}</h3>
+  <ul class="podium__list">
+    {
+      sorted.map((entry) => (
+        <li class="podium__card">
+          <p class="podium__year">{entry.year}</p>
+          {entry.host && <p class="podium__host">{hostedByLabel} {entry.host}</p>}
+          <ol class="podium__ranks">
+            <li class="podium__rank podium__rank--gold">
+              <span class="podium__medal" aria-hidden="true">🥇</span>
+              <span class="visually-hidden">{championLabel}:</span>
+              <span class="podium__name">{entry.champion}</span>
+            </li>
+            {entry.runnerUp && (
+              <li class="podium__rank podium__rank--silver">
+                <span class="podium__medal" aria-hidden="true">🥈</span>
+                <span class="visually-hidden">{runnerUpLabel}:</span>
+                <span class="podium__name">{entry.runnerUp}</span>
+              </li>
+            )}
+            {entry.third && (
+              <li class="podium__rank podium__rank--bronze">
+                <span class="podium__medal" aria-hidden="true">🥉</span>
+                <span class="visually-hidden">{thirdLabel}:</span>
+                <span class="podium__name">{entry.third}</span>
+              </li>
+            )}
+            {entry.fourth && (
+              <li class="podium__rank podium__rank--fourth">
+                <span class="podium__place" aria-hidden="true">4.</span>
+                <span class="visually-hidden">{fourthLabel}:</span>
+                <span class="podium__name">{entry.fourth}</span>
+              </li>
+            )}
+          </ol>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .podium__list {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  }
+
+  .podium__card {
+    padding: 0.85rem 1rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .podium__year {
+    margin: 0;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+  }
+
+  .podium__host {
+    margin: 0.2rem 0 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .podium__ranks {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .podium__rank {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+
+  .podium__medal {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .podium__place {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    min-width: 1.2rem;
+  }
+
+  .podium__rank--gold .podium__name {
+    font-weight: 600;
+  }
+
+  .podium__name {
+    font-size: 0.9rem;
+  }
+</style>

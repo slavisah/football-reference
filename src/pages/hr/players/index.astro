@@ -1,0 +1,181 @@
+---
+// Croatian translation of src/pages/players/index.astro. Same rollout pattern
+// as hr/teams/index.astro: loads the exact same live data as the English page
+// (the three loadCompetition() award tables, buildAllPlayerProfiles), so the
+// A-to-Z list and each player's award count can never drift between languages
+// - only this page's own headings/prose, the JSON-LD description and the
+// award/count labels are translated. Player names themselves are left as-is,
+// matching the precedent set by the Croatian teams/records/compare pages
+// (winner names are the underlying data, not UI chrome).
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import References from '../../../components/References.astro';
+import { loadCompetition, loadPageMeta } from '../../../lib/competition';
+import { buildAllPlayerProfiles, playerProfileSlug, type PlayerAwardSource } from '../../../lib/playerProfile';
+import { absolutePageUrl, withBase } from '../../../lib/url';
+import { buildPlayersDirectoryItemList, type JsonLdObject } from '../../../lib/jsonLd';
+
+const meta = await loadPageMeta('players');
+
+const [ballonDor, worldCupGoldenBoot, euroGoldenBoot] = await Promise.all([
+  loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),
+  loadCompetition('golden-boot', {
+    editionsHeading: 'FIFA World Cup top scorers',
+    sourcesHeading: 'FIFA World Cup',
+  }),
+  loadCompetition('golden-boot', {
+    editionsHeading: 'UEFA EURO top scorers',
+    sourcesHeading: 'UEFA EURO',
+  }),
+]);
+
+const sources: PlayerAwardSource[] = [
+  { title: "Ballon d'Or", slug: 'ballon-dor', editions: ballonDor.editions },
+  { title: 'FIFA World Cup Golden Boot', slug: 'golden-boot', editions: worldCupGoldenBoot.editions },
+  { title: 'UEFA EURO Golden Boot', slug: 'golden-boot', editions: euroGoldenBoot.editions },
+];
+
+const profiles = buildAllPlayerProfiles(sources);
+
+const combinedSources = [ballonDor.sources, worldCupGoldenBoot.sources, euroGoldenBoot.sources]
+  .flat()
+  .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+
+const lastReviewed = [ballonDor.lastReviewed, worldCupGoldenBoot.lastReviewed, euroGoldenBoot.lastReviewed]
+  .concat(meta.lastReviewed)
+  .sort()
+  .at(-1) as string;
+
+const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+// Croatian counterpart of src/pages/players/index.astro's jsonLd block - same
+// describe() translation pattern hr/teams/index.astro already uses for its own
+// directory ItemList. "nagrada"/"nagrade" follows the site's established
+// two-form convention for that noun (see hr/records.astro's own
+// `unit: ['nagrada', 'nagrade']`).
+const jsonLd: JsonLdObject[] = [
+  buildPlayersDirectoryItemList(profiles, {
+    pageUrl: absolutePageUrl(Astro.url, Astro.site),
+    name: 'Popis igrača - svaki dobitnik muške Zlatne lopte i Zlatne kopačke Svjetskog prvenstva/EURA',
+    describe: (profile) =>
+      `${profile.totalAwards} ${profile.totalAwards === 1 ? 'nagrada' : 'nagrade'} u muškoj Zlatnoj lopti i Zlatnoj kopački Svjetskog prvenstva/EURA`,
+  }),
+];
+---
+
+<BaseLayout
+  title="Igrači"
+  description="Svaki dobitnik muške Zlatne lopte ili Zlatne kopačke Svjetskog prvenstva ili EURA, od A do Ž - odaberite jednog za njegov cjeloviti pregled nagrada po godinama."
+  locale="hr"
+  alternateHref={withBase('/players')}
+  jsonLd={jsonLd}
+>
+  <article class="players stack">
+    <header class="players__header">
+      <p class="eyebrow badge">Generirano iz tablica nagrada</p>
+      <h1>Igrači</h1>
+      <p class="players__intro">
+        Svaki igrač koji je osvojio mušku Zlatnu loptu ili Zlatnu kopačku Svjetskog prvenstva ili
+        EURA - generirano iz istih tablica nagrada kao i stranice "Zlatna lopta" i "Zlatna kopačka",
+        s cjelovitim pregledom svih nagrada svakog igrača na jednom mjestu, umjesto samo tablica
+        pobjednika pojedinog natjecanja. Reprezentacije ovdje nisu uključene; za taj popis pogledajte
+        "Reprezentacije".
+      </p>
+      <p class="players__compare-link no-print">
+        <a href={withBase('/hr/compare-players')}>Usporedi dva igrača izravno &rarr;</a>
+      </p>
+    </header>
+
+    <section class="stack" aria-labelledby="players-list-heading">
+      <h2 id="players-list-heading" class="visually-hidden">Igrači od A do Ž</h2>
+      <ul class="players__grid">
+        {
+          profiles.map((p) => (
+            <li>
+              <a class="players__link" href={withBase(`/hr/players/${playerProfileSlug(p.id)}`)}>
+                <span class="players__name">{p.displayName}</span>
+                <span class="players__stat">
+                  {p.totalAwards} {p.totalAwards === 1 ? 'nagrada' : 'nagrade'}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <References
+      sources={combinedSources}
+      lastReviewed={lastReviewed}
+      status={meta.status}
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText={statusText}
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+      noteText="Prednost imaju primarni izvori. Povijesni formati i nazivi bilježe se onako kako su korišteni u to vrijeme; kontekst potražite u napomenama uz svako izdanje."
+    />
+  </article>
+</BaseLayout>
+
+<style>
+  .players__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .players__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .players__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .players__compare-link {
+    font-weight: 600;
+  }
+
+  .players__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  }
+
+  .players__link {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.7rem 0.9rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .players__link:hover,
+  .players__link:focus-visible {
+    border-color: var(--accent);
+  }
+
+  .players__name {
+    font-weight: 600;
+  }
+
+  .players__stat {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+</style>

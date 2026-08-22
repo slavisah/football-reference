@@ -20,6 +20,7 @@ const UI_STRINGS = {
   primaryNav: { en: 'Primary', hr: 'Glavna navigacija' },
   brand: { en: 'Football Reference', hr: 'Football Reference' },
   homeBreadcrumb: { en: 'Home', hr: 'Početna' },
+  breadcrumbNavLabel: { en: 'Breadcrumb', hr: 'Navigacijski put' },
   footerTagline: {
     en: 'The Ultimate Football Reference · a family-friendly, source-conscious history project. Content is the editorial source of truth; historical team names are preserved.',
     hr: 'The Ultimate Football Reference · obiteljski prijateljski projekt povijesti nogometa s naglaskom na izvore. Sadržaj je uređivački izvor istine; povijesni nazivi reprezentacija su sačuvani.',
@@ -64,6 +65,10 @@ const UI_STRINGS = {
     hr: 'Netočno - označene stavke nisu na pravom mjestu.',
   },
   quizRankPlaceholder: { en: 'Rank...', hr: 'Poredak...' },
+  quizOrderDuplicateRank: {
+    en: 'Each rank can only be used once - two items currently share a number.',
+    hr: 'Svaki broj poretka smije se koristiti samo jednom - dvije stavke trenutačno dijele isti broj.',
+  },
   sortOldestFirst: { en: '(oldest first)', hr: '(najstariji prvi)' },
   sortNewestFirst: { en: '(newest first)', hr: '(najnoviji prvi)' },
   sortFewestFirst: { en: '(fewest first)', hr: '(najmanje prvo)' },
@@ -80,6 +85,28 @@ const UI_STRINGS = {
   },
   onThisDayEmpty: { en: 'No final dates on record yet.', hr: 'Još nema zabilježenih datuma finala.' },
   championsBarOfLabel: { en: 'of', hr: 'od' },
+  teamSearchLabel: { en: 'Find a team', hr: 'Pronađi reprezentaciju' },
+  teamSearchPlaceholder: { en: 'Find a team…', hr: 'Pronađi reprezentaciju…' },
+  teamSearchNoResults: {
+    en: 'No teams match “{query}”.',
+    hr: 'Nijedna reprezentacija ne odgovara upitu „{query}”.',
+  },
+  teamSearchLoading: { en: 'Loading teams…', hr: 'Učitavanje reprezentacija…' },
+  teamSearchError: {
+    en: 'Team list unavailable right now.',
+    hr: 'Popis reprezentacija trenutno nije dostupan.',
+  },
+  playerSearchLabel: { en: 'Find a player', hr: 'Pronađi igrača' },
+  playerSearchPlaceholder: { en: 'Find a player…', hr: 'Pronađi igrača…' },
+  playerSearchNoResults: {
+    en: 'No players match “{query}”.',
+    hr: 'Nijedan igrač ne odgovara upitu „{query}”.',
+  },
+  playerSearchLoading: { en: 'Loading players…', hr: 'Učitavanje igrača…' },
+  playerSearchError: {
+    en: 'Player list unavailable right now.',
+    hr: 'Popis igrača trenutno nije dostupan.',
+  },
 } as const;
 
 export type UiStringKey = keyof typeof UI_STRINGS;
@@ -94,7 +121,11 @@ export const TRANSLATED_PATHS: Record<string, string> = {
   '/about/sources': '/hr/about/sources',
   '/records': '/hr/records',
   '/compare': '/hr/compare',
+  '/teams': '/hr/teams',
+  '/players': '/hr/players',
+  '/compare-players': '/hr/compare-players',
   '/quiz': '/hr/quiz',
+  '/glossary': '/hr/glossary',
   '/competitions/copa-america': '/hr/competitions/copa-america',
   '/competitions/nations-league': '/hr/competitions/nations-league',
   '/competitions/ballon-dor': '/hr/competitions/ballon-dor',

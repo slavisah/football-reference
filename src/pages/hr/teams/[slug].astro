@@ -1,0 +1,265 @@
+---
+// Croatian translation of src/pages/teams/[slug].astro - this codebase's
+// first Croatian dynamic route. getStaticPaths() mirrors the English page's
+// slug-collision guard exactly (same teamProfileSlug(), same fail-loudly
+// precedent) so a build error there catches a collision here too, and the
+// two pages can never end up with a different set of team profiles. Only
+// the four competition display names (passed into buildTeamProfile() via
+// this file's own Croatian `competitions` array, the same construction
+// hr/compare.astro/hr/teams/index.astro already use) and this page's own
+// prose/labels are translated - every title/runner-up/semifinal/appearance
+// is computed by the exact same buildTeamProfile() the English page calls,
+// so the two pages can never disagree on the underlying record.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
+import References from '../../../components/References.astro';
+import {
+  buildAllCountryRecords,
+  type CompetitionEditions,
+  type CountryRecord,
+} from '../../../lib/compare';
+import { loadTeamCompetitions } from '../../../lib/teamCompetitions';
+import { buildTeamProfile, teamProfileSlug } from '../../../lib/teamProfile';
+import { buildTeamProfileItemList, type JsonLdObject } from '../../../lib/jsonLd';
+import type { SourceLink } from '../../../lib/sources';
+import { absolutePageUrl, withBase } from '../../../lib/url';
+
+export async function getStaticPaths() {
+  const { worldCup, euro, copaAmerica, nationsLeague } = await loadTeamCompetitions();
+
+  const competitions: CompetitionEditions[] = [
+    { title: 'FIFA Svjetsko prvenstvo', slug: 'world-cup', editions: worldCup.editions },
+    { title: 'UEFA Europsko prvenstvo', slug: 'euro', editions: euro.editions },
+    { title: 'Copa América', slug: 'copa-america', editions: copaAmerica.editions },
+    { title: 'UEFA Liga nacija', slug: 'nations-league', editions: nationsLeague.editions },
+  ];
+  const records = buildAllCountryRecords(competitions);
+
+  const sources = [worldCup, euro, copaAmerica, nationsLeague]
+    .flatMap((c) => c.sources)
+    .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+  const lastReviewed = [worldCup, euro, copaAmerica, nationsLeague]
+    .map((c) => c.lastReviewed)
+    .sort()
+    .at(-1) as string;
+
+  const seenSlugs = new Set<string>();
+  return records.map((record) => {
+    const slug = teamProfileSlug(record.id);
+    if (seenSlugs.has(slug)) {
+      throw new Error(`Two national teams produced the same /hr/teams/ slug: "${slug}"`);
+    }
+    seenSlugs.add(slug);
+    return {
+      params: { slug },
+      props: { record, competitions, sources, lastReviewed },
+    };
+  });
+}
+
+type Props = {
+  record: CountryRecord;
+  competitions: CompetitionEditions[];
+  sources: SourceLink[];
+  lastReviewed: string;
+};
+
+const { record, competitions, sources, lastReviewed } = Astro.props as Props;
+const profile = buildTeamProfile(record, competitions);
+const slug = teamProfileSlug(record.id);
+
+// The role/year labels the ItemList's description reuses ("Champion (2016)",
+// "Runner-up (2020)", ...) are the same source column labels the page's own
+// <ol> above already renders untranslated (see this file's own top-of-file
+// note - only the surrounding prose/labels are Croatian, not the historical
+// column labels or team/competition names) - so the default English-shaped
+// "Role (Year), ..." join from buildTeamProfileItemList() needs no describe()
+// override here; there is no Croatian word in it to translate.
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd: JsonLdObject[] =
+  profile.competitions.length > 0
+    ? [
+        buildTeamProfileItemList(profile, {
+          pageUrl,
+          name: `${profile.displayName} - nastupi u natjecanjima`,
+        }),
+      ]
+    : [];
+---
+
+<BaseLayout
+  title={`${profile.displayName} - cjelovita povijest`}
+  description={`Svako finale ili polufinale Svjetskog prvenstva, EURA, Copa Américe i Lige nacija za reprezentaciju ${profile.displayName}, generirano iz tablice svakog natjecanja.`}
+  locale="hr"
+  alternateHref={withBase(`/teams/${slug}`)}
+  jsonLd={jsonLd}
+  breadcrumbTrail={[{ name: 'Reprezentacije', url: withBase('/hr/teams') }]}
+>
+  <article class="team-profile stack">
+    <header class="team-profile__header">
+      <p class="eyebrow badge">Generirano iz tablica natjecanja</p>
+      <h1>{profile.displayName}</h1>
+      <p class="team-profile__intro">
+        Cjeloviti učinak reprezentacije {profile.displayName} na Svjetskom prvenstvu, EURU, Copa
+        Américi i Ligi nacija - svaki naslov, drugo mjesto i treće/četvrto mjesto ili polufinale,
+        generirano izravno iz tablice svakog natjecanja.
+      </p>
+      <PrintDownloadLink
+        slug={`team-${slug}-hr`}
+        label="Preuzmi PDF za ispis"
+        hint="A4 položeno, cjelovita evidencija ove reprezentacije u svim praćenim natjecanjima."
+      />
+    </header>
+
+    <section class="team-profile__totals card" aria-labelledby="totals-heading">
+      <h2 id="totals-heading" class="visually-hidden">Ukupni zbroj</h2>
+      <dl class="team-profile__totals-grid">
+        <div>
+          <dt>Naslovi</dt>
+          <dd>{profile.totalTitles}</dd>
+        </div>
+        <div>
+          <dt>Drugo mjesto</dt>
+          <dd>{profile.totalRunnerUps}</dd>
+        </div>
+        <div>
+          <dt>Polufinale / 4. mjesto</dt>
+          <dd>{profile.totalSemifinals}</dd>
+        </div>
+        <div>
+          <dt>Odigrana finala</dt>
+          <dd>{profile.totalFinals}</dd>
+        </div>
+      </dl>
+    </section>
+
+    {
+      profile.competitions.length === 0 ? (
+        <p class="muted">
+          {profile.displayName} nije dosegla praćeno finale ili polufinale ni na jednom od ova
+          četiri natjecanja.
+        </p>
+      ) : (
+        profile.competitions.map((c) => (
+          <section class="card stack" aria-labelledby={`${c.slug}-heading`}>
+            <h2 id={`${c.slug}-heading`}>
+              <a href={withBase(`/hr/competitions/${c.slug}`)}>{c.title}</a>
+            </h2>
+            <ol class="team-profile__list">
+              {c.appearances.map((a) => (
+                <li class={a.role === 'Champion' ? 'is-title' : undefined}>
+                  <span class="team-profile__year">{a.year}</span>
+                  {a.role === 'Champion' && <span aria-hidden="true">🏆</span>}
+                  <span class="team-profile__role">{a.role}</span>
+                </li>
+              ))}
+            </ol>
+          </section>
+        ))
+      )
+    }
+
+    <p class="team-profile__compare-link no-print">
+      <a href={withBase(`/hr/compare?a=${encodeURIComponent(profile.id)}`)}>
+        Usporedi reprezentaciju {profile.displayName} s drugom &rarr;
+      </a>
+    </p>
+
+    <References
+      sources={sources}
+      lastReviewed={lastReviewed}
+      status="verified"
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText="Provjereno"
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+      noteText="Prednost imaju primarni izvori. Povijesni formati i nazivi reprezentacija bilježe se onako kako su korišteni u to vrijeme; kontekst potražite u napomenama uz svako izdanje."
+    />
+  </article>
+</BaseLayout>
+
+<style>
+  .team-profile__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .team-profile__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .team-profile__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .team-profile__totals-grid {
+    margin: 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+    text-align: center;
+  }
+
+  .team-profile__totals-grid dt {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .team-profile__totals-grid dd {
+    margin: 0.2rem 0 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+  }
+
+  .team-profile__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .team-profile__list li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.5rem 0.8rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .team-profile__list li.is-title {
+    border-color: var(--accent);
+  }
+
+  .team-profile__year {
+    font-weight: 700;
+    min-width: 4.5rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .team-profile__role {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .team-profile__list li.is-title .team-profile__role {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .team-profile__compare-link {
+    font-weight: 600;
+  }
+</style>

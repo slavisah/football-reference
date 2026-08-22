@@ -2,9 +2,21 @@ import { describe, expect, it } from 'vitest';
 import {
   buildBreadcrumbList,
   buildChampionsItemList,
+  buildCountryRecordsItemList,
+  buildDefinedTermSet,
   buildLatestEditionSportsEvent,
+  buildQuizJsonLd,
+  buildRivalriesItemList,
+  buildTeamProfileItemList,
+  buildPlayerProfileItemList,
+  buildPlayersDirectoryItemList,
+  buildWebSiteJsonLd,
 } from '../../src/lib/jsonLd';
 import type { ChampionSummary, Edition } from '../../src/lib/types';
+import type { CountryRecord, FinalsMeeting, Rivalry } from '../../src/lib/compare';
+import type { QuizQuestion } from '../../src/lib/quiz';
+import type { TeamProfile } from '../../src/lib/teamProfile';
+import type { PlayerProfile } from '../../src/lib/playerProfile';
 
 describe('buildBreadcrumbList', () => {
   it('builds a positioned ListItem per entry with the schema.org context/type', () => {
@@ -125,5 +137,479 @@ describe('buildLatestEditionSportsEvent', () => {
   it('returns undefined when no edition has a parseable year', () => {
     const noYear: Edition[] = [{ year: 'TBD', yearSort: Number.NaN, winner: 'Unknown', cells: [] }];
     expect(buildLatestEditionSportsEvent(noYear, 'Test Cup')).toBeUndefined();
+  });
+});
+
+describe('buildCountryRecordsItemList', () => {
+  const records: CountryRecord[] = [
+    {
+      id: 'brazil',
+      displayName: 'Brazil',
+      competitions: [],
+      totalTitles: 5,
+      totalRunnerUps: 2,
+      totalSemifinals: 1,
+      totalFinals: 7,
+    },
+    {
+      id: 'spain',
+      displayName: 'Spain',
+      competitions: [],
+      totalTitles: 1,
+      totalRunnerUps: 0,
+      totalSemifinals: 0,
+      totalFinals: 1,
+    },
+  ];
+
+  it('produces one ranked ListItem per team, singular/plural handled by the default description', () => {
+    const itemList = buildCountryRecordsItemList(records, {
+      pageUrl: 'https://example.test/compare/',
+      name: 'All national teams',
+    });
+
+    expect(itemList['@type']).toBe('ItemList');
+    expect(itemList.url).toBe('https://example.test/compare/');
+    expect(itemList.itemListElement).toEqual([
+      {
+        '@type': 'ListItem',
+        position: 1,
+        item: {
+          '@type': 'Thing',
+          name: 'Brazil',
+          description:
+            '5 titles, 2 runner-up finishes, 7 finals reached across the World Cup, EURO, Copa América and Nations League',
+        },
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        item: {
+          '@type': 'Thing',
+          name: 'Spain',
+          description:
+            '1 title, 0 runner-up finishes, 1 final reached across the World Cup, EURO, Copa América and Nations League',
+        },
+      },
+    ]);
+  });
+
+  it('supports a describe() override for a translated page', () => {
+    const itemList = buildCountryRecordsItemList(records, {
+      pageUrl: 'https://example.test/hr/compare/',
+      name: 'Sve reprezentacije',
+      describe: (record) => `${record.totalTitles} naslova`,
+    });
+
+    const [first] = itemList.itemListElement as { item: { description: string } }[];
+    expect(first.item.description).toBe('5 naslova');
+  });
+});
+
+describe('buildRivalriesItemList', () => {
+  const mostRecentMeeting: FinalsMeeting = {
+    competition: 'Copa América',
+    slug: 'copa-america',
+    year: '2024',
+    yearSort: 2024,
+    winnerId: 'argentina',
+    winnerName: 'Argentina',
+    runnerUpId: 'colombia',
+    runnerUpName: 'Colombia',
+  };
+  const rivalries: Rivalry[] = [
+    {
+      teamAId: 'argentina',
+      teamADisplayName: 'Argentina',
+      teamBId: 'uruguay',
+      teamBDisplayName: 'Uruguay',
+      meetings: 15,
+      teamAWins: 6,
+      teamBWins: 9,
+      competitions: ['Copa América', 'FIFA World Cup'],
+      mostRecent: mostRecentMeeting,
+    },
+  ];
+
+  it('produces one ranked ListItem per rivalry, named "Team A vs Team B"', () => {
+    const itemList = buildRivalriesItemList(rivalries, {
+      pageUrl: 'https://example.test/records/',
+      name: 'Fiercest rivalries',
+    });
+
+    expect(itemList['@type']).toBe('ItemList');
+    expect(itemList.name).toBe('Fiercest rivalries');
+    expect(itemList.url).toBe('https://example.test/records/');
+    expect(itemList.itemListElement).toEqual([
+      {
+        '@type': 'ListItem',
+        position: 1,
+        item: {
+          '@type': 'Thing',
+          name: 'Argentina vs Uruguay',
+          description:
+            '15 meetings (Argentina 6, Uruguay 9) across Copa América, FIFA World Cup, most recently 2024 (Copa América)',
+        },
+      },
+    ]);
+  });
+
+  it('uses the singular "meeting" wording for a hypothetical exactly-one-meeting rivalry', () => {
+    const oneMeeting: Rivalry[] = [{ ...rivalries[0], meetings: 1 }];
+    const itemList = buildRivalriesItemList(oneMeeting, {
+      pageUrl: 'https://example.test/records/',
+      name: 'Fiercest rivalries',
+    });
+    const [first] = itemList.itemListElement as { item: { description: string } }[];
+    expect(first.item.description).toContain('1 meeting (');
+    expect(first.item.description).not.toContain('1 meetings');
+  });
+
+  it('supports a describe() override for a translated page', () => {
+    const itemList = buildRivalriesItemList(rivalries, {
+      pageUrl: 'https://example.test/hr/records/',
+      name: 'Najveći rivaliteti',
+      describe: (r) => `${r.meetings} susreta`,
+    });
+    const [first] = itemList.itemListElement as { item: { description: string } }[];
+    expect(first.item.description).toBe('15 susreta');
+  });
+
+  it('returns an empty itemListElement for no qualifying rivalries', () => {
+    const itemList = buildRivalriesItemList([], {
+      pageUrl: 'https://example.test/records/',
+      name: 'Fiercest rivalries',
+    });
+    expect(itemList.itemListElement).toEqual([]);
+  });
+});
+
+describe('buildTeamProfileItemList', () => {
+  const profile: TeamProfile = {
+    id: 'germany',
+    displayName: 'Germany',
+    competitions: [
+      {
+        title: 'FIFA World Cup',
+        slug: 'world-cup',
+        appearances: [
+          { year: '1954', yearSort: 1954, role: 'Champion' },
+          { year: '1974', yearSort: 1974, role: 'Champion' },
+          { year: '2014', yearSort: 2014, role: 'Champion' },
+        ],
+      },
+      {
+        title: 'UEFA EURO',
+        slug: 'euro',
+        appearances: [{ year: '2016', yearSort: 2016, role: 'Other semifinalist' }],
+      },
+    ],
+    totalTitles: 3,
+    totalRunnerUps: 0,
+    totalSemifinals: 1,
+    totalFinals: 3,
+  };
+
+  it('produces one ranked ListItem per competition the team appears in, named after that competition', () => {
+    const itemList = buildTeamProfileItemList(profile, {
+      pageUrl: 'https://example.test/teams/germany/',
+      name: 'Germany - competition appearances',
+    });
+
+    expect(itemList['@type']).toBe('ItemList');
+    expect(itemList.name).toBe('Germany - competition appearances');
+    expect(itemList.url).toBe('https://example.test/teams/germany/');
+    expect(itemList.itemListElement).toEqual([
+      {
+        '@type': 'ListItem',
+        position: 1,
+        item: {
+          '@type': 'Thing',
+          name: 'FIFA World Cup',
+          description: 'Champion (1954), Champion (1974), Champion (2014)',
+        },
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        item: {
+          '@type': 'Thing',
+          name: 'UEFA EURO',
+          description: 'Other semifinalist (2016)',
+        },
+      },
+    ]);
+  });
+
+  it('preserves the exact source column label for a runner-up finish rather than inventing generic wording', () => {
+    const runnerUp: TeamProfile = {
+      ...profile,
+      competitions: [
+        {
+          title: 'Copa América',
+          slug: 'copa-america',
+          appearances: [{ year: '2024', yearSort: 2024, role: 'Runner-up' }],
+        },
+      ],
+    };
+    const itemList = buildTeamProfileItemList(runnerUp, {
+      pageUrl: 'https://example.test/teams/colombia/',
+      name: 'Colombia - competition appearances',
+    });
+    const [first] = itemList.itemListElement as { item: { description: string } }[];
+    expect(first.item.description).toBe('Runner-up (2024)');
+  });
+
+  it('supports a describe() override for a translated page', () => {
+    const itemList = buildTeamProfileItemList(profile, {
+      pageUrl: 'https://example.test/hr/teams/germany/',
+      name: 'Njemačka - nastupi u natjecanjima',
+      describe: (c) => `${c.appearances.length} nastupa`,
+    });
+    const [first] = itemList.itemListElement as { item: { description: string } }[];
+    expect(first.item.description).toBe('3 nastupa');
+  });
+
+  it('returns an empty itemListElement for a team with no tracked competition appearances', () => {
+    const empty: TeamProfile = { ...profile, competitions: [] };
+    const itemList = buildTeamProfileItemList(empty, {
+      pageUrl: 'https://example.test/teams/nowhere/',
+      name: 'Nowhere - competition appearances',
+    });
+    expect(itemList.itemListElement).toEqual([]);
+  });
+});
+
+describe('buildPlayerProfileItemList', () => {
+  const profile: PlayerProfile = {
+    id: 'Gerd Müller',
+    displayName: 'Gerd Müller',
+    awards: [
+      {
+        title: "Ballon d'Or",
+        slug: 'ballon-dor',
+        appearances: [{ year: '1970', yearSort: 1970, detail: 'West Germany · 29 December 1970' }],
+      },
+      {
+        title: 'FIFA World Cup Golden Boot',
+        slug: 'golden-boot',
+        appearances: [{ year: '1970', yearSort: 1970, detail: 'West Germany · 10 goals' }],
+      },
+    ],
+    totalAwards: 2,
+  };
+
+  it('produces one ranked ListItem per award the player has won, named after that award', () => {
+    const itemList = buildPlayerProfileItemList(profile, {
+      pageUrl: 'https://example.test/players/gerd-muller/',
+      name: 'Gerd Müller - full award history',
+    });
+
+    expect(itemList['@type']).toBe('ItemList');
+    expect(itemList.name).toBe('Gerd Müller - full award history');
+    expect(itemList.url).toBe('https://example.test/players/gerd-muller/');
+    expect(itemList.itemListElement).toEqual([
+      {
+        '@type': 'ListItem',
+        position: 1,
+        item: {
+          '@type': 'Thing',
+          name: "Ballon d'Or",
+          description: '1970 (West Germany · 29 December 1970)',
+        },
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        item: {
+          '@type': 'Thing',
+          name: 'FIFA World Cup Golden Boot',
+          description: '1970 (West Germany · 10 goals)',
+        },
+      },
+    ]);
+  });
+
+  it('omits the parenthetical when an appearance has no detail string', () => {
+    const noDetail: PlayerProfile = {
+      ...profile,
+      awards: [
+        {
+          title: "Ballon d'Or",
+          slug: 'ballon-dor',
+          appearances: [{ year: '1970', yearSort: 1970, detail: '' }],
+        },
+      ],
+    };
+    const itemList = buildPlayerProfileItemList(noDetail, {
+      pageUrl: 'https://example.test/players/x/',
+      name: 'X',
+    });
+    const [first] = itemList.itemListElement as { item: { description: string } }[];
+    expect(first.item.description).toBe('1970');
+  });
+
+  it('supports a describe() override for a translated page', () => {
+    const itemList = buildPlayerProfileItemList(profile, {
+      pageUrl: 'https://example.test/hr/players/gerd-muller/',
+      name: 'Gerd Müller - cjelovita povijest nagrada',
+      describe: (a) => `${a.appearances.length} osvajanja`,
+    });
+    const [first] = itemList.itemListElement as { item: { description: string } }[];
+    expect(first.item.description).toBe('1 osvajanja');
+  });
+
+  it('returns an empty itemListElement for a player with no awards', () => {
+    const empty: PlayerProfile = { ...profile, awards: [], totalAwards: 0 };
+    const itemList = buildPlayerProfileItemList(empty, {
+      pageUrl: 'https://example.test/players/nobody/',
+      name: 'Nobody',
+    });
+    expect(itemList.itemListElement).toEqual([]);
+  });
+});
+
+describe('buildPlayersDirectoryItemList', () => {
+  const profiles: PlayerProfile[] = [
+    { id: 'A', displayName: 'A', awards: [], totalAwards: 3 },
+    { id: 'B', displayName: 'B', awards: [], totalAwards: 1 },
+  ];
+
+  it('produces one ranked ListItem per player, describing their combined award count', () => {
+    const itemList = buildPlayersDirectoryItemList(profiles, {
+      pageUrl: 'https://example.test/players/',
+      name: 'Players directory',
+    });
+    expect(itemList['@type']).toBe('ItemList');
+    const items = itemList.itemListElement as { position: number; item: { name: string; description: string } }[];
+    expect(items[0].item.name).toBe('A');
+    expect(items[0].item.description).toContain('3 awards');
+    expect(items[1].item.description).toContain('1 award');
+    expect(items[1].item.description).not.toContain('1 awards');
+  });
+
+  it('supports a describe() override for the Croatian directory', () => {
+    const itemList = buildPlayersDirectoryItemList(profiles, {
+      pageUrl: 'https://example.test/hr/players/',
+      name: 'Popis igrača',
+      describe: (p) => `${p.totalAwards} nagrada`,
+    });
+    const [first] = itemList.itemListElement as { item: { description: string } }[];
+    expect(first.item.description).toBe('3 nagrada');
+  });
+});
+
+describe('buildQuizJsonLd', () => {
+  const questions: QuizQuestion[] = [
+    {
+      id: 'q1',
+      category: 'Champion',
+      prompt: 'Who won the 2018 FIFA World Cup?',
+      choices: ['France', 'Croatia', 'Belgium', 'England'],
+      answerIndex: 0,
+    },
+    {
+      id: 'q2',
+      category: 'Host',
+      prompt: 'Which country hosted the 2016 UEFA EURO?',
+      choices: ['Germany', 'France'],
+      answerIndex: 1,
+    },
+  ];
+
+  it('builds a Quiz with one Question/acceptedAnswer per multiple-choice question', () => {
+    const quiz = buildQuizJsonLd(questions, {
+      pageUrl: 'https://example.test/quiz/',
+      name: 'Family Quiz',
+    });
+
+    expect(quiz['@type']).toBe('Quiz');
+    expect(quiz.url).toBe('https://example.test/quiz/');
+    expect(quiz.hasPart).toEqual([
+      {
+        '@type': 'Question',
+        name: 'Who won the 2018 FIFA World Cup?',
+        acceptedAnswer: { '@type': 'Answer', text: 'France' },
+      },
+      {
+        '@type': 'Question',
+        name: 'Which country hosted the 2016 UEFA EURO?',
+        acceptedAnswer: { '@type': 'Answer', text: 'France' },
+      },
+    ]);
+  });
+
+  it('returns an empty hasPart for an empty question list', () => {
+    const quiz = buildQuizJsonLd([], { pageUrl: 'https://example.test/quiz/', name: 'Family Quiz' });
+    expect(quiz.hasPart).toEqual([]);
+  });
+});
+
+describe('buildDefinedTermSet', () => {
+  it('builds a DefinedTermSet with one DefinedTerm per glossary entry, each pointing back at the set', () => {
+    const termSet = buildDefinedTermSet(
+      [
+        { term: 'a.e.t.', definition: 'Short for after extra time.' },
+        { term: 'pens', definition: 'Short for a penalty shoot-out.' },
+      ],
+      { pageUrl: 'https://example.test/glossary/', name: 'Glossary' },
+    );
+
+    expect(termSet).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'DefinedTermSet',
+      name: 'Glossary',
+      url: 'https://example.test/glossary/',
+      hasDefinedTerm: [
+        {
+          '@type': 'DefinedTerm',
+          name: 'a.e.t.',
+          description: 'Short for after extra time.',
+          inDefinedTermSet: 'https://example.test/glossary/',
+        },
+        {
+          '@type': 'DefinedTerm',
+          name: 'pens',
+          description: 'Short for a penalty shoot-out.',
+          inDefinedTermSet: 'https://example.test/glossary/',
+        },
+      ],
+    });
+  });
+
+  it('returns an empty hasDefinedTerm for an empty entry list', () => {
+    const termSet = buildDefinedTermSet([], { pageUrl: 'https://example.test/glossary/', name: 'Glossary' });
+    expect(termSet.hasDefinedTerm).toEqual([]);
+  });
+});
+
+describe('buildWebSiteJsonLd', () => {
+  it('builds a WebSite block with the schema.org context/type and every field passed through verbatim', () => {
+    const website = buildWebSiteJsonLd({
+      url: 'https://example.test/',
+      name: 'The Ultimate Football Reference',
+      description: 'A family-friendly guide to football history.',
+      inLanguage: 'en',
+    });
+
+    expect(website).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'The Ultimate Football Reference',
+      url: 'https://example.test/',
+      description: 'A family-friendly guide to football history.',
+      inLanguage: 'en',
+    });
+  });
+
+  it('supports a non-English inLanguage tag for the Croatian home page', () => {
+    const website = buildWebSiteJsonLd({
+      url: 'https://example.test/hr/',
+      name: 'The Ultimate Football Reference',
+      description: 'Nogometna povijest na jednom mjestu.',
+      inLanguage: 'hr',
+    });
+
+    expect(website.inLanguage).toBe('hr');
   });
 });
