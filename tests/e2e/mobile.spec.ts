@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import { openMenu } from './menu';
+import { NAV_LINKS } from '../../src/lib/routes';
 
 // The one critical mobile smoke test. Runs against the built site at a 360px
 // viewport (configured in playwright.config.ts) and covers the acceptance
@@ -183,6 +185,7 @@ test.describe('World Cup page on a 360px phone', () => {
   });
 
   test('the language switcher opens the Croatian World Cup page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/competitions\/world-cup\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
@@ -273,6 +276,7 @@ test.describe('EURO page on a 360px phone', () => {
   });
 
   test('the language switcher opens the Croatian EURO page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/competitions\/euro\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
@@ -388,6 +392,7 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
   });
 
   test('the language switcher returns to the English World Cup page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/competitions\/world-cup\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -483,6 +488,7 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
   });
 
   test('the language switcher returns to the English EURO page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/competitions\/euro\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -591,6 +597,7 @@ test.describe('Golden Boot page on a 360px phone', () => {
   });
 
   test('the language switcher opens the Croatian Golden Boot page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/competitions\/golden-boot\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
@@ -692,6 +699,7 @@ test.describe('Croatian Golden Boot page (/hr/competitions/golden-boot) on a 360
   });
 
   test('the language switcher returns to the English Golden Boot page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/competitions\/golden-boot\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -741,6 +749,7 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
 
   test("the language switcher opens the Croatian Ballon d'Or page", async ({ page }) => {
     await page.goto('competitions/ballon-dor');
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/competitions\/ballon-dor\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
@@ -824,6 +833,7 @@ test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360p
   });
 
   test("the language switcher returns to the English Ballon d'Or page", async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/competitions\/ballon-dor\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -914,6 +924,7 @@ test.describe('Copa América page on a 360px phone', () => {
   });
 
   test('the language switcher opens the Croatian Copa América page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/competitions\/copa-america\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
@@ -1053,6 +1064,7 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
   });
 
   test('the language switcher returns to the English Copa América page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/competitions\/copa-america\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -1092,6 +1104,7 @@ test.describe('Nations League page on a 360px phone', () => {
   });
 
   test('the language switcher opens the Croatian Nations League page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/competitions\/nations-league\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
@@ -1230,6 +1243,7 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
   });
 
   test('the language switcher returns to the English Nations League page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/competitions\/nations-league\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -1260,10 +1274,12 @@ test.describe('Home page on a 360px phone', () => {
 
   test('links to all six competitions plus Records', async ({ page }) => {
     await expect(page.locator('.comp-card')).toHaveCount(6);
+    await openMenu(page);
     await expect(page.locator('a[href$="/records"]').first()).toBeVisible();
   });
 
   test('the language switcher opens the Croatian home page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
@@ -1355,6 +1371,7 @@ test.describe('Croatian home page (/hr/) on a 360px phone', () => {
   });
 
   test('the language switcher returns to the English home page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -1623,6 +1640,7 @@ test.describe('Records page on a 360px phone', () => {
   });
 
   test('the language switcher opens the Croatian records page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/records\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
@@ -1821,6 +1839,7 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
   });
 
   test('the language switcher returns to the English records page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/records\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -1901,6 +1920,7 @@ test.describe('Compare page on a 360px phone', () => {
   });
 
   test('the language switcher opens the Croatian compare page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     // The page's own script appends ?a=/&b= on load (same as the English
     // page), so the URL isn't bare - just check the path prefix.
@@ -1962,6 +1982,7 @@ test.describe('Croatian compare page (/hr/compare) on a 360px phone', () => {
   });
 
   test('the language switcher returns to the English compare page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/compare(\?|$)/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -2132,6 +2153,7 @@ test.describe('Quiz page on a 360px phone', () => {
   });
 
   test('the language switcher opens the Croatian quiz page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/quiz(\?|$)/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
@@ -2250,6 +2272,7 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
   });
 
   test('the language switcher returns to the English quiz page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/quiz(\?|$)/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -2307,10 +2330,12 @@ test.describe('Sources page on a 360px phone', () => {
 
   test('is reachable from the nav and the footer', async ({ page }) => {
     await page.goto('');
+    await openMenu(page);
     await expect(page.locator('a[href$="/about/sources"]').first()).toBeVisible();
   });
 
   test('the language switcher opens the Croatian sources page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/about\/sources$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
@@ -2349,6 +2374,7 @@ test.describe('Croatian sources page (/hr/about/sources) on a 360px phone', () =
   });
 
   test('the language switcher returns to the English sources page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/about\/sources$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -2380,10 +2406,12 @@ test.describe('Glossary page on a 360px phone', () => {
 
   test('is reachable from the nav', async ({ page }) => {
     await page.goto('');
+    await openMenu(page);
     await expect(page.locator('nav a[href$="/glossary"]').first()).toBeVisible();
   });
 
   test('the language switcher opens the Croatian glossary page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/glossary$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
@@ -2411,6 +2439,7 @@ test.describe('Croatian glossary page (/hr/glossary) on a 360px phone', () => {
   });
 
   test('the language switcher returns to the English glossary page', async ({ page }) => {
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/glossary$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -2593,6 +2622,7 @@ test.describe('Installability and offline reading', () => {
     // English home page.
     await page.goto('hr/competitions/world-cup?utm_source=nowhere');
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await openMenu(page);
     await expect(page.locator('a.lang-switch')).toHaveText('English');
     await context.setOffline(false);
   });
@@ -2624,6 +2654,7 @@ test.describe('Primary nav stays in the current language', () => {
     // Clicking a translated nav item (not the explicit language switch)
     // should land on that page's own Croatian equivalent and stay in
     // Croatian, not silently bounce the reader back to English.
+    await openMenu(page);
     await page.getByRole('link', { name: 'Rekordi' }).click();
     await expect(page).toHaveURL(/\/football-reference\/hr\/records\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
@@ -3216,6 +3247,7 @@ test.describe('Content-Security-Policy', () => {
     await page.selectOption('#world-cup-host', { index: 1 });
     await page.selectOption('#world-cup-team', { index: 1 });
     await page.locator('#world-cup-reset').click();
+    await openMenu(page);
     await page.locator('#theme-toggle').click();
 
     await page.goto('quiz');
@@ -3295,5 +3327,114 @@ test.describe('Required-page redirects (/awards/... -> /competitions/...)', () =
       '<meta http-equiv="refresh" content="0;url=/football-reference/hr/competitions/ballon-dor">',
     );
     expect(body).toContain('<meta name="robots" content="noindex">');
+  });
+});
+
+// The header's mobile drawer (Nav.astro). At this 360px viewport the eleven
+// nav links plus both search widgets, the language switch and the theme
+// toggle used to wrap into a five-row header that ate most of the first
+// screen; they now live behind one menu button. These cover the disclosure
+// behaviour itself - the rest of the suite only opens the drawer to reach a
+// control inside it (tests/e2e/menu.ts).
+test.describe('header menu on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('');
+  });
+
+  test('the header collapses to a brand and one menu button', async ({ page }) => {
+    const toggle = page.locator('#menu-toggle');
+    await expect(toggle).toBeVisible();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator('#site-menu')).toBeHidden();
+    await expect(page.locator('.nav-list a', { hasText: 'World Cup' }).first()).toBeHidden();
+
+    // The whole collapsed header fits in a fraction of the first screen -
+    // the point of the drawer. It used to run to roughly half of it.
+    const height = await page.locator('.site-header').evaluate((el) => el.getBoundingClientRect().height);
+    expect(height).toBeLessThan(80);
+  });
+
+  test('the button opens the drawer with every nav destination in it', async ({ page }) => {
+    await page.locator('#menu-toggle').click();
+
+    await expect(page.locator('#menu-toggle')).toHaveAttribute('aria-expanded', 'true');
+    const menu = page.locator('#site-menu');
+    await expect(menu).toBeVisible();
+    await expect(menu.locator('.nav-list a')).toHaveCount(NAV_LINKS.length);
+    await expect(menu.locator('#team-search-input')).toBeVisible();
+    await expect(menu.locator('#player-search-input')).toBeVisible();
+    await expect(menu.locator('a.lang-switch')).toBeVisible();
+    await expect(menu.locator('#theme-toggle')).toBeVisible();
+  });
+
+  test('every drawer control is at least a 44px tap target', async ({ page }) => {
+    await page.locator('#menu-toggle').click();
+
+    const heights = await page
+      .locator('#site-menu .nav-list a, #site-menu .team-search__field, #site-menu a.lang-switch, #site-menu #theme-toggle')
+      .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height));
+    expect(heights.length).toBeGreaterThan(0);
+    for (const height of heights) {
+      expect(height).toBeGreaterThanOrEqual(44);
+    }
+  });
+
+  test('a nav link inside the drawer navigates', async ({ page }) => {
+    await page.locator('#menu-toggle').click();
+    await page.locator('#site-menu .nav-list a', { hasText: 'Glossary' }).click();
+    await expect(page).toHaveURL(/\/glossary\/?$/);
+  });
+
+  test('Escape closes the drawer and returns focus to the button', async ({ page }) => {
+    const toggle = page.locator('#menu-toggle');
+    await toggle.click();
+    await expect(page.locator('#site-menu')).toBeVisible();
+
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#site-menu')).toBeHidden();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(toggle).toBeFocused();
+  });
+
+  test('a click outside closes the drawer', async ({ page }) => {
+    await page.locator('#menu-toggle').click();
+    await expect(page.locator('#site-menu')).toBeVisible();
+
+    // Just below the open drawer, which covers most of this 740px screen.
+    const box = (await page.locator('#site-menu').boundingBox())!;
+    expect(box.y + box.height + 12).toBeLessThan(740);
+    await page.mouse.click(180, box.y + box.height + 12);
+    await expect(page.locator('#site-menu')).toBeHidden();
+  });
+
+  test('the open drawer adds no horizontal overflow', async ({ page }) => {
+    await page.locator('#menu-toggle').click();
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('--site-header-height stays the collapsed bar height while the drawer is open', async ({
+    page,
+  }) => {
+    const read = () =>
+      page.evaluate(() =>
+        parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--site-header-height')),
+      );
+    const closed = await read();
+    await page.locator('#menu-toggle').click();
+    await expect(page.locator('#site-menu')).toBeVisible();
+    expect(await read()).toBeCloseTo(closed, 0);
+  });
+
+  test('the Croatian header labels the menu in Croatian', async ({ page }) => {
+    await page.goto('hr/');
+    const toggle = page.locator('#menu-toggle');
+    await expect(toggle).toHaveText('Izbornik');
+    await expect(toggle).toHaveAttribute('aria-label', 'Otvori izbornik');
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-label', 'Zatvori izbornik');
   });
 });

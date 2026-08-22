@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { openMenu } from './menu';
 
 // The main accessibility.spec.ts sweep loads every page once per color scheme
 // via Playwright's `colorScheme` emulation - it never actually clicks the
@@ -38,6 +39,7 @@ test.describe('theme toggle, English home page', () => {
   }) => {
     await page.goto('');
 
+    await openMenu(page);
     const toggle = page.locator('#theme-toggle');
     const label = page.locator('#theme-toggle .theme-toggle__label');
 
@@ -77,6 +79,7 @@ test.describe('theme toggle, English home page', () => {
   test('is keyboard-operable and the saved choice survives a reload', async ({ page }) => {
     await page.goto('');
 
+    await openMenu(page);
     const toggle = page.locator('#theme-toggle');
     await toggle.focus();
     await expect(toggle).toBeFocused();
@@ -122,6 +125,7 @@ test.describe('theme toggle, World Cup competition page', () => {
     // make this test pass vacuously.
     await expect(page.locator('#world-cup-table td.is-winner').first()).toBeVisible();
 
+    await openMenu(page);
     await page.locator('#theme-toggle').click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 
@@ -140,6 +144,7 @@ test.describe('theme toggle, quiz page', () => {
   }) => {
     await page.goto('quiz');
 
+    await openMenu(page);
     await page.locator('#theme-toggle').click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 
@@ -178,6 +183,7 @@ test.describe('theme toggle, Croatian home page', () => {
   test('click toggles the Croatian label text', async ({ page }) => {
     await page.goto('hr/');
 
+    await openMenu(page);
     const toggle = page.locator('#theme-toggle');
     const label = page.locator('#theme-toggle .theme-toggle__label');
 

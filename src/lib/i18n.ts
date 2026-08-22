@@ -18,6 +18,9 @@ export const LOCALES: { code: Locale; label: string; htmlLang: string }[] = [
 const UI_STRINGS = {
   skipToContent: { en: 'Skip to main content', hr: 'Preskoči na sadržaj' },
   primaryNav: { en: 'Primary', hr: 'Glavna navigacija' },
+  menuLabel: { en: 'Menu', hr: 'Izbornik' },
+  menuOpenLabel: { en: 'Open the menu', hr: 'Otvori izbornik' },
+  menuCloseLabel: { en: 'Close the menu', hr: 'Zatvori izbornik' },
   brand: { en: 'Football Reference', hr: 'Football Reference' },
   homeBreadcrumb: { en: 'Home', hr: 'Početna' },
   breadcrumbNavLabel: { en: 'Breadcrumb', hr: 'Navigacijski put' },

@@ -10509,6 +10509,81 @@ lower-yield shape than the two whole-function integration gaps this run
 closed; `competitions.ts` and `types.ts` showing 0% are type-only/config
 modules with no runtime logic to cover, not real gaps.
 
+### Mobile-first header: the primary nav collapses into a menu drawer; CI/deploy actions moved off the deprecated Node 20 runtime - added 2026-08-22 (later intensive run)
+
+**Problem 1 (the header).** At the 360px viewport this whole project targets,
+the header rendered the brand plus fifteen nav links, two search widgets, the
+language switch and the theme toggle as one wrapping flex row - five rows
+deep, roughly half the first screen gone before any content. Every page paid
+that cost on every load.
+
+**Fix.** `src/components/Nav.astro` now wraps everything except the brand in a
+`#site-menu` drawer behind one `#menu-toggle` button:
+
+- **Mobile first, literally**: the collapsed drawer is the *base* stylesheet
+  state and `@media (min-width: 60rem)` is what restores the inline header, so
+  the desktop layout is unchanged from before this entry while the phone
+  layout is the default the CSS is written for.
+- **No-JS safe**: the button ships `hidden` and the drawer ships expanded. The
+  inline script adds `.site-header--js` (the only hook the collapsing CSS keys
+  off) and reveals the button, so a reader without JavaScript keeps the old
+  always-visible header instead of an inert button and no navigation at all.
+- **Disclosure semantics**: `aria-expanded` + `aria-controls`, a translated
+  `aria-label` that swaps between "Open/Close the menu" ("Otvori/Zatvori
+  izbornik" - three new `src/lib/i18n.ts` keys), Escape closes and returns
+  focus to the button, an outside click closes, and crossing the 60rem
+  breakpoint closes so a return to a narrow viewport never starts open. The
+  hamburger becomes a cross via geometry, not colour, so forced-colors keeps
+  the cue.
+- **Thumb-sized targets**: inside the drawer the nav becomes a two-column grid
+  of >=44px rows and the search fields, language switch and theme toggle each
+  get a >=44px target (the theme toggle via `:global()`, since that button
+  belongs to `ThemeToggle.astro`'s scope).
+- **`--site-header-height` keeps its meaning**: the open drawer is positioned
+  against the header rather than sitting in its flow, so the custom property
+  other sticky elements read (the quiz score bar) still measures the bar, not
+  the bar plus an open drawer. Pinned by its own test.
+
+**Problem 2 (the workflows).** Every run of `deploy.yml` finished with two
+GitHub annotations: "Node.js 20 is deprecated... but are being forced to run on
+Node.js 24" for `actions/checkout@v4`, `actions/configure-pages@v5`,
+`actions/setup-node@v4`, `actions/upload-artifact@v4`,
+`actions/upload-pages-artifact@v3`, `actions/deploy-pages@v4` and
+`pnpm/action-setup@v4`.
+
+**Fix.** Bumped every action in `deploy.yml` and `ci.yml` to the major that
+actually declares `using: node24` (checkout v7, setup-node v7, configure-pages
+v6, upload-pages-artifact v5, deploy-pages v5, upload-artifact v7,
+pnpm/action-setup v6). `upload-pages-artifact` matters twice over: v4 still
+pins `upload-artifact@v4.6.2` internally and would have kept the warning
+alive, v5 pins v7. No workflow inputs changed - Node stays pinned at 22 for
+the build itself via `setup-node`'s `node-version`.
+
+**Tests:** every e2e test that drives a header control now opens the drawer
+first through one shared `tests/e2e/menu.ts` helper (idempotent, so it is a
+no-op on a wide viewport or an already-open drawer). New coverage: nine cases
+in `mobile.spec.ts` for the disclosure itself (collapsed header under 80px
+tall, drawer contents equal to `NAV_LINKS`, 44px targets, navigation from a
+drawer link, Escape, outside click, no horizontal overflow while open,
+`--site-header-height` stability, Croatian labels) and two axe scans of the
+*open* drawer per colour scheme in `accessibility.spec.ts` - real, reachable
+DOM the existing sweep never saw, because every page loads with the menu shut.
+Two pre-existing races in the Croatian search-widget tests surfaced and were
+fixed properly (they waited on the *English* loading label, then drove the
+keyboard before any option had rendered). `pnpm lint` - 0 errors/warnings/
+hints. `pnpm test` - **431/431** (the 5 extra are the prior entry's new
+`loadHomeCompetitions()`/`loadGlossaryEntries()` cases, merged in before this
+branch was rebased onto them; this change adds no unit-testable logic). `pnpm build` - 307 pages, and
+`check:perf`/`check:links`/`check:sitemap`/`check:precache`/`check:pdfs` all
+clean. Full `pnpm test:e2e` - **676/676 passing** (up from 663).
+
+**Left for a future pass:** the drawer does not trap focus while open - Escape,
+the outside click and the natural tab order out of it are the current
+behaviour, which is acceptable for a disclosure but not what a true modal
+dialog would do. The desktop header above 60rem still wraps its fifteen nav
+links onto two rows; a grouped/overflow nav there is a separate design
+question this change deliberately left alone.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

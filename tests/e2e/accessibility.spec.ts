@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { NAV_LINKS } from '../../src/lib/routes';
 import { TRANSLATED_PATHS } from '../../src/lib/i18n';
+import { openMenu } from './menu';
 
 // Automated WCAG 2.1 A/AA sweep across every live page (English and Croatian),
 // on top of the hand-written keyboard/filter checks in mobile.spec.ts. Runs at
@@ -36,6 +37,32 @@ for (const colorScheme of COLOR_SCHEMES) {
       test(`${path || '/'} has no automatic WCAG 2.1 A/AA violations`, async ({ page }) => {
         const target = path === '/' ? '' : path.replace(/^\//, '');
         await page.goto(target);
+
+        const results = await new AxeBuilder({ page })
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+          .disableRules(['region'])
+          .analyze();
+
+        expect(results.violations, formatViolations(results.violations)).toEqual([]);
+      });
+    }
+  });
+}
+
+// The sweep above only ever sees the header's mobile drawer closed, which is
+// the state every page loads in at this viewport - the nav links, both search
+// widgets, the language switch and the theme toggle are all display:none until
+// the reader opens the menu (Nav.astro). Their open state is real, reachable
+// DOM that no other axe run covers, so it gets its own scan per color scheme.
+for (const colorScheme of COLOR_SCHEMES) {
+  test.describe(`${colorScheme} color scheme, header menu open`, () => {
+    test.use({ colorScheme });
+
+    for (const path of ['', 'hr/']) {
+      test(`${path || '/'} has no violations with the mobile menu open`, async ({ page }) => {
+        await page.goto(path);
+        await openMenu(page);
+        await expect(page.locator('#site-menu')).toHaveClass(/is-open/);
 
         const results = await new AxeBuilder({ page })
           .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])

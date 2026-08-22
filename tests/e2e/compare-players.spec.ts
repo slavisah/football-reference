@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { openMenu } from './menu';
 
 // /compare-players: pick two Ballon d'Or/Golden Boot winners and compare
 // their award record head-to-head, generated from the same three award
@@ -172,6 +173,7 @@ test.describe('Croatian Compare Players page (/hr/compare-players)', () => {
 
   test('the language switcher returns to the English page', async ({ page }) => {
     await page.goto('hr/compare-players');
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     // The page's own script appends ?a=...&b=... on load (same as /compare),
     // so the URL isn't bare - just check the path prefix.
