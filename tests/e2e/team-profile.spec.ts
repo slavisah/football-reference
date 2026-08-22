@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { openMenu } from './menu';
 
 // The /teams directory: an A-to-Z index (src/pages/teams/index.astro) plus
 // one full year-by-year profile page per national team
@@ -140,6 +141,7 @@ test.describe('Croatian /teams index (/hr/teams)', () => {
 
   test('the language switcher opens the English teams index', async ({ page }) => {
     await page.goto('hr/teams');
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/teams\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -197,6 +199,7 @@ test.describe('Croatian team profile page (/hr/teams/<slug>)', () => {
 
   test('the language switcher returns to the English profile page', async ({ page }) => {
     await page.goto('hr/teams/brazil');
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/teams\/brazil\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');

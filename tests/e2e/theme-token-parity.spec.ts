@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { openMenu } from './menu';
 
 // src/styles/global.css resolves its color tokens (--bg, --text, etc.) two
 // different ways: the `prefers-color-scheme: dark` media query (the OS
@@ -48,6 +49,7 @@ test.describe('theme token parity between OS preference and the explicit toggle'
     const toggledContext = await browser.newContext({ colorScheme: 'light' });
     const toggledPage = await toggledContext.newPage();
     await toggledPage.goto('');
+    await openMenu(toggledPage);
     await toggledPage.locator('#theme-toggle').click();
     await expect(toggledPage.locator('html')).toHaveAttribute('data-theme', 'dark');
     const toggledDarkTokens = await readTokens(toggledPage);
@@ -68,6 +70,7 @@ test.describe('theme token parity between OS preference and the explicit toggle'
     const toggledContext = await browser.newContext({ colorScheme: 'dark' });
     const toggledPage = await toggledContext.newPage();
     await toggledPage.goto('');
+    await openMenu(toggledPage);
     await toggledPage.locator('#theme-toggle').click();
     await expect(toggledPage.locator('html')).toHaveAttribute('data-theme', 'light');
     const toggledLightTokens = await readTokens(toggledPage);
