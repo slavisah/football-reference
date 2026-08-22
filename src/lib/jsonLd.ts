@@ -352,6 +352,31 @@ export function buildQuizJsonLd(
 }
 
 /**
+ * The /glossary page's terms as a schema.org DefinedTermSet - one
+ * DefinedTerm per entry, reusing the exact GlossaryEntry[] the page itself
+ * renders (src/lib/glossary.ts's parseGlossaryEntries()), so the structured
+ * data can never list a term the visible page doesn't also explain.
+ */
+export function buildDefinedTermSet(
+  entries: { term: string; definition: string }[],
+  options: { pageUrl: string; name: string },
+): JsonLdObject {
+  const { pageUrl, name } = options;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'DefinedTermSet',
+    name,
+    url: pageUrl,
+    hasDefinedTerm: entries.map((entry) => ({
+      '@type': 'DefinedTerm',
+      name: entry.term,
+      description: entry.definition,
+      inDefinedTermSet: pageUrl,
+    })),
+  };
+}
+
+/**
  * The site itself as a schema.org WebSite - the one page-independent fact
  * every other builder in this file deliberately doesn't cover, and the only
  * page that had zero JSON-LD at all (see the "home page has no JSON-LD" test

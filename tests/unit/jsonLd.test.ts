@@ -3,6 +3,7 @@ import {
   buildBreadcrumbList,
   buildChampionsItemList,
   buildCountryRecordsItemList,
+  buildDefinedTermSet,
   buildLatestEditionSportsEvent,
   buildQuizJsonLd,
   buildRivalriesItemList,
@@ -541,6 +542,44 @@ describe('buildQuizJsonLd', () => {
   it('returns an empty hasPart for an empty question list', () => {
     const quiz = buildQuizJsonLd([], { pageUrl: 'https://example.test/quiz/', name: 'Family Quiz' });
     expect(quiz.hasPart).toEqual([]);
+  });
+});
+
+describe('buildDefinedTermSet', () => {
+  it('builds a DefinedTermSet with one DefinedTerm per glossary entry, each pointing back at the set', () => {
+    const termSet = buildDefinedTermSet(
+      [
+        { term: 'a.e.t.', definition: 'Short for after extra time.' },
+        { term: 'pens', definition: 'Short for a penalty shoot-out.' },
+      ],
+      { pageUrl: 'https://example.test/glossary/', name: 'Glossary' },
+    );
+
+    expect(termSet).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'DefinedTermSet',
+      name: 'Glossary',
+      url: 'https://example.test/glossary/',
+      hasDefinedTerm: [
+        {
+          '@type': 'DefinedTerm',
+          name: 'a.e.t.',
+          description: 'Short for after extra time.',
+          inDefinedTermSet: 'https://example.test/glossary/',
+        },
+        {
+          '@type': 'DefinedTerm',
+          name: 'pens',
+          description: 'Short for a penalty shoot-out.',
+          inDefinedTermSet: 'https://example.test/glossary/',
+        },
+      ],
+    });
+  });
+
+  it('returns an empty hasDefinedTerm for an empty entry list', () => {
+    const termSet = buildDefinedTermSet([], { pageUrl: 'https://example.test/glossary/', name: 'Glossary' });
+    expect(termSet.hasDefinedTerm).toEqual([]);
   });
 });
 

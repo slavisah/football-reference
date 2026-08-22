@@ -24,6 +24,18 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(row).toContainText('France');
   });
 
+  test('the Final column explains a.e.t. via a native abbr tooltip, linked to the Glossary', async ({
+    page,
+  }) => {
+    const row1934 = page.locator('tbody tr[data-year="1934"]');
+    const abbr = row1934.locator('td abbr');
+    await expect(abbr).toHaveText('a.e.t.');
+    await expect(abbr).toHaveAttribute('title', 'after extra time');
+
+    await page.goto('glossary');
+    await expect(page.locator('.glossary-page__entry dt', { hasText: 'a.e.t.' })).toBeVisible();
+  });
+
   test('filtering by Spain shows only Spain title years', async ({ page }) => {
     await page.selectOption('#world-cup-winner', 'Spain');
 
@@ -2267,6 +2279,68 @@ test.describe('Croatian sources page (/hr/about/sources) on a 360px phone', () =
   });
 });
 
+test.describe('Glossary page on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('glossary');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('lists a.e.t. and pens with their plain-English explanations', async ({ page }) => {
+    const aetEntry = page.locator('.glossary-page__entry', { hasText: 'a.e.t.' });
+    await expect(aetEntry.locator('dt')).toHaveText('a.e.t.');
+    await expect(aetEntry.locator('dd')).toContainText('after extra time');
+
+    const pensEntry = page.locator('.glossary-page__entry', { hasText: 'pens' });
+    await expect(pensEntry.locator('dt')).toHaveText('pens');
+    await expect(pensEntry.locator('dd')).toContainText('penalty shoot-out');
+  });
+
+  test('is reachable from the nav', async ({ page }) => {
+    await page.goto('');
+    await expect(page.locator('nav a[href$="/glossary"]').first()).toBeVisible();
+  });
+
+  test('the language switcher opens the Croatian glossary page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/glossary$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe('Croatian glossary page (/hr/glossary) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/glossary');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome with the same glossary terms as English', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.getByRole('heading', { name: 'Pojmovnik', level: 1 })).toBeVisible();
+    const aetEntry = page.locator('.glossary-page__entry', { hasText: 'a.e.t.' });
+    await expect(aetEntry.locator('dt')).toHaveText('a.e.t.');
+  });
+
+  test('the language switcher returns to the English glossary page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/glossary$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+});
+
 test.describe('404 page on a 360px phone', () => {
   // GitHub Pages serves dist/404.html for any unmatched path under the
   // project's base path, in either language - there is no server-side
@@ -2308,7 +2382,7 @@ test.describe('404 page on a 360px phone', () => {
     const hrefs = await page.locator('.not-found__links a').evaluateAll((links) =>
       links.map((link) => (link as HTMLAnchorElement).getAttribute('href')),
     );
-    expect(hrefs.length).toBe(28); // 14 nav pages x 2 languages
+    expect(hrefs.length).toBe(30); // 15 nav pages x 2 languages
     for (const href of hrefs) {
       const response = await request.get(href!);
       expect(response.ok(), `expected ${href} to resolve`).toBe(true);
@@ -2580,17 +2654,18 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(response.headers()['content-type']).toContain('xml');
     const body = await response.text();
 
-    // 14 nav pages x 2 languages (the index loop, now including /teams,
-    // /players and /compare-players), plus 40 team profile pages x 2
-    // languages (src/pages/teams/[slug].astro and its Croatian sibling) and
-    // 98 player profile pages x 2 languages (src/pages/players/[slug].astro
+    // 15 nav pages x 2 languages (the index loop, now including /teams,
+    // /players, /compare-players and /glossary), plus 40 team profile pages
+    // x 2 languages (src/pages/teams/[slug].astro and its Croatian sibling)
+    // and 98 player profile pages x 2 languages (src/pages/players/[slug].astro
     // and its Croatian sibling), each pair carrying reciprocal hreflang
-    // alternates - /compare-players is now a fully bilingual NAV_LINKS entry
-    // too (see docs/PROJECT_STATUS.md's 2026-08-21 "/compare-players
-    // Croatian localization" entry), so it flows through the main loop like
-    // /players and /teams before it, rather than the single-locale entry it
-    // used to get.
-    expect(body.match(/<url>/g)?.length).toBe(304);
+    // alternates - /glossary is a fully bilingual NAV_LINKS entry from launch
+    // (see docs/PROJECT_STATUS.md's Glossary entry), so it flows through the
+    // main loop like every other top-level page.
+    expect(body.match(/<url>/g)?.length).toBe(306);
+    expect(body).toContain(`<loc>${SITE}/glossary/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/glossary/</loc>`);
+    expect(body).toContain(`hreflang="hr" href="${SITE}/hr/glossary/"`);
     expect(body).toContain(`<loc>${SITE}/compare-players/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/compare-players/</loc>`);
     expect(body).toContain(`hreflang="hr" href="${SITE}/hr/compare-players/"`);

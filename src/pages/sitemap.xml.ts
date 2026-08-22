@@ -29,6 +29,7 @@ const CONTENT_ID_BY_PATH: Record<string, string> = {
   '/players': 'players',
   '/compare-players': 'compare-players',
   '/quiz': 'quiz',
+  '/glossary': 'glossary',
   '/about/sources': 'about-sources',
 };
 
