@@ -10385,6 +10385,52 @@ participant lists blocked on sourcing, `/compare-players` print PDF matching
 `/compare`'s own precedent, EURO podium cards structurally impossible, no
 host locator map for Ballon d'Or/Golden Boot - no host data to build from).
 
+### Accessibility: `/compare-players` interactive states were never added to the WCAG state-change sweep - closed 2026-08-22 (later intensive run)
+
+`tests/e2e/accessibility-compare-states.spec.ts` exists specifically to catch
+a "silent DOM update" gap - `/compare`'s Team A/B pickers and Swap button
+rewrite the head-to-head panel's heading and table cells in place via
+`textContent`, invisible to the `NAV_LINKS`-driven `accessibility.spec.ts`
+sweep (which only ever loads each page once, in its initial state) unless the
+`aria-live` status region actually announces the change. `/compare-players`
+(added 2026-08-21, `src/pages/compare-players.astro`) reuses the exact same
+DOM shape - `#compare-a`/`#compare-b` selects, `#compare-swap`,
+`#compare-status[aria-live="polite"]`, `#compare-a-name`/`#compare-b-name`
+headings - but shipped fifteen days after this spec file was written and was
+never added to its `COMPARE_PAGES` list, leaving its own re-selected-player
+and swapped states completely untested for this exact bug class. Confirmed
+by inspection that neither `accessibility.spec.ts` nor
+`accessibility-forced-colors.spec.ts` (both `NAV_LINKS`-driven, initial-state
+only) closes this gap either.
+
+Fixed by adding `compare-players` and `hr/compare-players` to
+`COMPARE_PAGES` in `accessibility-compare-states.spec.ts` - no new test
+logic needed, since `/compare-players` uses an identical ID scheme to
+`/compare` down to the element name, so the existing two `test()` bodies
+(re-select Player A, click Swap) generalize verbatim across all four pages.
+Ran the extended suite before committing: **16/16 passing** (up from 8),
+confirming `/compare-players` already announces both state changes
+correctly and introduces no WCAG 2.1 A/AA violation in either state, either
+color scheme, or either language - a clean audit result, not a bug fix, but
+one that closes a real, previously-untested gap rather than re-confirming
+something already covered.
+
+**Tests:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across 137
+files (test-only change, no page/component edits). `pnpm test` -
+**426/426** (unchanged - no unit-testable logic changed). `pnpm build` - 307
+pages (unchanged). Full `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+test:e2e` - **663/663 passing** (up from 655, the 8 new cases from this
+change), confirming no regression anywhere in the complete suite.
+
+**Left for a future pass:** the standing candidates above are unchanged.
+`docs/EDITORIAL_GUIDE.md`'s "Content safety and family suitability" rules
+(betting/gambling links, graphic violence, abusive chants, unverified
+scandals, invasive private-life details) have only ever been spot-checked
+incidentally (see the 2026-08-22 glossary entry above) - a dedicated,
+line-by-line sweep of every `content/*.md` prose section against that
+specific list is a reasonable next angle, distinct from the
+already-low-yield factual-column re-verification.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
