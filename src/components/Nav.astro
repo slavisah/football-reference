@@ -52,7 +52,23 @@ function isCurrent(href: string): boolean {
       <span class="brand__text">{t(locale, 'brand')}</span>
     </a>
 
-    <nav aria-label={t(locale, 'primaryNav')}>
+    <button
+      id="menu-toggle"
+      class="menu-toggle no-print"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-menu"
+      aria-label={t(locale, 'menuOpenLabel')}
+      data-label-open={t(locale, 'menuOpenLabel')}
+      data-label-close={t(locale, 'menuCloseLabel')}
+      hidden
+    >
+      <span class="menu-toggle__bars" aria-hidden="true"></span>
+      <span class="menu-toggle__text">{t(locale, 'menuLabel')}</span>
+    </button>
+
+    <div id="site-menu" class="site-menu">
+    <nav aria-label={t(locale, 'primaryNav')} class="site-menu__nav">
       <ul class="nav-list">
         {
           links.map((link) => (
@@ -157,6 +173,7 @@ function isCurrent(href: string): boolean {
     }
 
     <ThemeToggle locale={locale} />
+    </div>
   </div>
 </header>
 
@@ -170,12 +187,122 @@ function isCurrent(href: string): boolean {
     border-bottom: 1px solid var(--border);
   }
 
+  /* Mobile first: the header row is brand + menu button only, and
+     everything else (nav links, both search widgets, the language switch
+     and the theme toggle) lives in the #site-menu drawer below it. The
+     drawer is only collapsed once the inline script at the bottom of this
+     file marks the header as script-driven (.site-header--js), so a
+     no-JS reader still gets the old always-visible header rather than an
+     inert button and no navigation at all. */
   .site-header__inner {
     display: flex;
     align-items: center;
-    gap: 0.75rem 1rem;
+    gap: 0.5rem 1rem;
     flex-wrap: wrap;
-    padding-block: 0.6rem;
+    padding-block: 0.5rem;
+  }
+
+  .site-menu {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .site-header--js .site-menu {
+    display: none;
+  }
+
+  .site-header--js .site-menu.is-open {
+    /* Anchored to the header rather than in its flow, so the sticky header
+       itself stays one row tall - the --site-header-height custom property
+       other sticky elements read (see the script below) keeps meaning
+       "the bar at the top", not "the bar plus an open drawer". */
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    z-index: 21;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    max-height: calc(100dvh - var(--site-header-height, 3.5rem));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0.85rem clamp(0.85rem, 4vw, 2rem) 1.25rem;
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg-subtle);
+    color: var(--text);
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
+  .menu-toggle[hidden] {
+    display: none;
+  }
+
+  .menu-toggle:hover {
+    border-color: var(--accent);
+  }
+
+  .menu-toggle__bars,
+  .menu-toggle__bars::before,
+  .menu-toggle__bars::after {
+    display: block;
+    width: 1.05rem;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+  }
+
+  .menu-toggle__bars {
+    position: relative;
+  }
+
+  .menu-toggle__bars::before,
+  .menu-toggle__bars::after {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+  }
+
+  .menu-toggle__bars::before {
+    top: -6px;
+  }
+
+  .menu-toggle__bars::after {
+    top: 6px;
+  }
+
+  /* The open state turns the three bars into a cross - a non-colour cue
+     that survives forced-colors, alongside aria-expanded for assistive
+     technology. */
+  .menu-toggle[aria-expanded='true'] .menu-toggle__bars {
+    background: transparent;
+  }
+
+  .menu-toggle[aria-expanded='true'] .menu-toggle__bars::before {
+    top: 0;
+    transform: rotate(45deg);
+  }
+
+  .menu-toggle[aria-expanded='true'] .menu-toggle__bars::after {
+    top: 0;
+    transform: rotate(-45deg);
   }
 
   .brand {
@@ -199,6 +326,28 @@ function isCurrent(href: string): boolean {
     list-style: none;
     margin: 0;
     padding: 0;
+  }
+
+  /* Inside the open drawer the same list becomes two columns of full-width,
+     thumb-sized rows instead of a wrapping inline row. */
+  .site-menu.is-open .nav-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem;
+  }
+
+  .site-menu.is-open .nav-list a {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 0.75rem;
+    background: var(--bg-subtle);
+    font-size: 1rem;
+  }
+
+  .site-menu.is-open .nav-list a[aria-current='page'] {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
   }
 
   .nav-list a {
@@ -328,20 +477,140 @@ function isCurrent(href: string): boolean {
     background: var(--bg-subtle);
   }
 
+  .site-menu.is-open .team-search__input {
+    width: 100%;
+  }
+
+  .site-menu.is-open .team-search__field,
+  .site-menu.is-open .lang-switch {
+    min-height: 2.75rem;
+  }
+
+  .site-menu.is-open .lang-switch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* :global because the button belongs to ThemeToggle.astro's own scope -
+     only its placement inside this drawer is Nav's business. */
+  .site-menu.is-open :global(#theme-toggle) {
+    justify-content: center;
+    min-height: 2.75rem;
+  }
+
   @media (max-width: 26rem) {
     .brand__text {
       font-size: 0.95rem;
     }
   }
+
+  /* From here up the whole header fits on one row comfortably, so the
+     drawer collapses back into the inline header it has always been and
+     the menu button disappears. */
+  @media (min-width: 60rem) {
+    .site-header--js .site-menu,
+    .site-header--js .site-menu.is-open {
+      position: static;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem 0.75rem;
+      max-height: none;
+      overflow: visible;
+      padding: 0;
+      background: none;
+      border: 0;
+      box-shadow: none;
+    }
+
+    .site-header--js .site-menu.is-open .nav-list {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .site-header--js .site-menu.is-open .nav-list a {
+      display: inline-block;
+      min-height: 0;
+      padding: 0.4rem 0.7rem;
+      background: none;
+      font-size: 0.95rem;
+    }
+
+    .site-header--js .site-menu.is-open .nav-list a[aria-current='page'] {
+      background: color-mix(in srgb, var(--accent) 14%, transparent);
+    }
+
+    .site-header--js .site-menu.is-open .team-search__input {
+      width: 9rem;
+    }
+
+    .menu-toggle {
+      display: none;
+    }
+  }
 </style>
 
 <script is:inline>
-  // The header wraps onto multiple lines well before the viewport gets
-  // narrow - eleven nav links plus the theme toggle (and, on translated
-  // pages, the language switch) don't fit on one line even at the
-  // container's own max-width, so its real height varies by page/locale
-  // and is nowhere near the single-line height a hardcoded CSS value would
-  // assume. Any other sticky element meant to sit just below this sticky,
+  // Mobile menu. The button ships hidden and the drawer ships expanded, so
+  // a reader without JavaScript keeps the full, always-visible header; this
+  // script is what swaps in the collapsed-by-default behaviour (it adds
+  // .site-header--js, which is the only thing the collapsing CSS above keys
+  // off) and reveals the button. Inline rather than bundled so the header
+  // never renders in the wrong state for a frame.
+  (function () {
+    var header = document.querySelector('.site-header');
+    var toggle = document.getElementById('menu-toggle');
+    var menu = document.getElementById('site-menu');
+    if (!header || !toggle || !menu) return;
+
+    header.classList.add('site-header--js');
+    toggle.hidden = false;
+
+    function setOpen(open) {
+      menu.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      var label = open ? toggle.dataset.labelClose : toggle.dataset.labelOpen;
+      if (label) toggle.setAttribute('aria-label', label);
+    }
+
+    toggle.addEventListener('click', function () {
+      setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+    });
+
+    // Escape closes and returns focus to the button, the usual disclosure
+    // behaviour; clicking outside closes without stealing focus.
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    document.addEventListener('click', function (event) {
+      if (toggle.getAttribute('aria-expanded') !== 'true') return;
+      var target = event.target;
+      if (!(target instanceof Node)) return;
+      if (!menu.contains(target) && !toggle.contains(target)) setOpen(false);
+    });
+
+    // Above the breakpoint the drawer is laid out inline again, so leaving
+    // it "open" would mean coming back to a narrow viewport with the drawer
+    // already down.
+    window.matchMedia('(min-width: 60rem)').addEventListener('change', function (event) {
+      if (event.matches) setOpen(false);
+    });
+  })();
+</script>
+
+<script is:inline>
+  // The header's real height varies by viewport, page and locale: below the
+  // 60rem breakpoint it is one bar plus a menu button, above it the nav
+  // links wrap onto a second row (fifteen of them plus both search widgets,
+  // the theme toggle and, on translated pages, the language switch don't fit
+  // on one line even at the container's own max-width). Either way it is
+  // nowhere near the single-line height a hardcoded CSS value would assume. Any other sticky element meant to sit just below this sticky,
   // higher-z-index header (e.g. the quiz page's score bar) needs that real
   // height, not a guess, or the header ends up covering it once both are
   // stuck. Exposed as a custom property so plain CSS can read it.

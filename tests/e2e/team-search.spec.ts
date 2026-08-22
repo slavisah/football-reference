@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { openMenu } from './menu';
 
 // The global "find a team" quick-jump widget (Nav.astro, both languages,
 // every one of the 27 built pages) - an editable ARIA 1.2 combobox that
@@ -19,6 +20,7 @@ import AxeBuilder from '@axe-core/playwright';
 // widget controls or should assert away.
 
 async function openAndType(page: import('@playwright/test').Page, query: string) {
+  await openMenu(page);
   const input = page.locator('#team-search-input');
   await input.click();
   await input.fill(query);
@@ -28,6 +30,7 @@ async function openAndType(page: import('@playwright/test').Page, query: string)
 test.describe('Find a team (English)', () => {
   test('is present, closed, on the home page', async ({ page }) => {
     await page.goto('');
+    await openMenu(page);
     const input = page.locator('#team-search-input');
     await expect(input).toBeVisible();
     await expect(input).toHaveAttribute('placeholder', 'Find a team…');
@@ -37,6 +40,7 @@ test.describe('Find a team (English)', () => {
 
   test('is present on a non-home page too (shared Nav.astro)', async ({ page }) => {
     await page.goto('quiz');
+    await openMenu(page);
     await expect(page.locator('#team-search-input')).toBeVisible();
   });
 
@@ -68,6 +72,7 @@ test.describe('Find a team (English)', () => {
     await page.goto('');
     await openAndType(page, 'brazil');
     await expect(page.locator('#team-search-listbox')).toBeVisible();
+    await openMenu(page);
     await page.locator('#team-search-input').fill('');
     await expect(page.locator('#team-search-listbox')).toBeHidden();
   });
@@ -136,11 +141,15 @@ test.describe('Find a team (Croatian)', () => {
     page,
   }) => {
     await page.goto('hr/');
+    await openMenu(page);
     const input = page.locator('#team-search-input');
     await expect(input).toHaveAttribute('placeholder', 'Pronađi reprezentaciju…');
     await expect(page.locator('label[for="team-search-input"]')).toHaveText('Pronađi reprezentaciju');
 
     await openAndType(page, 'brazil');
+    // The Croatian page's own loading label differs from the one openAndType
+    // waits on, so wait for a rendered option before driving the keyboard.
+    await expect(page.locator('#team-search-listbox [role="option"]').first()).toBeVisible();
     await page.keyboard.press('ArrowDown');
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(/\/hr\/compare\?a=brazil(&|$)/);
@@ -177,6 +186,7 @@ test.describe('Find a team accessibility', () => {
 
   test('combobox exposes the expected ARIA wiring while open', async ({ page }) => {
     await page.goto('');
+    await openMenu(page);
     const input = page.locator('#team-search-input');
     await expect(input).toHaveAttribute('role', 'combobox');
     await expect(input).toHaveAttribute('aria-autocomplete', 'list');
