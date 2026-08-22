@@ -66,10 +66,14 @@ test.describe('Compare Players page', () => {
     await expect(page).toHaveURL(/a=Zinedine(\+|%20)Zidane/);
     await expect(page).toHaveURL(/b=Davor/);
 
-    // Zidane's Ballon d'Or row shows exactly one win, in 1998.
-    const zidaneBallonDorRow = page.locator('#compare-a-body tr').first();
-    await expect(zidaneBallonDorRow.locator('[data-field="count"]')).toHaveText('1');
-    await expect(zidaneBallonDorRow.locator('[data-field="years"]')).toHaveText('1998');
+    // Zidane's Ballon d'Or rows show exactly one win, in 1998, and the
+    // versus panel puts Šuker's zero for the same award on the same row.
+    const ballonDor = page.locator('#compare-panel tbody[data-index="0"]');
+    await expect(ballonDor.locator('tr[data-metric="count"] .vs__value[data-side="a"]')).toHaveText('1');
+    await expect(ballonDor.locator('tr[data-metric="count"] .vs__value[data-side="b"]')).toHaveText('0');
+    await expect(ballonDor.locator('tr[data-metric="years"] .vs__years[data-side="a"]')).toHaveText('1998');
+    // A won row is marked as the lead on that side, not by colour alone.
+    await expect(ballonDor.locator('tr[data-metric="count"]')).toHaveAttribute('data-leader', 'a');
 
     // They both won an award in 1998 (Zidane's Ballon d'Or, Šuker's World
     // Cup Golden Boot) - a genuinely new cross-reference not shown on either
@@ -129,24 +133,20 @@ test.describe('Croatian Compare Players page (/hr/compare-players)', () => {
     await expect(page.locator('h1')).toHaveText('Usporedi igrače');
     await expect(page.locator('#compare-a-name')).toHaveText('Lionel Messi');
 
-    const hrTotal = await page
-      .locator('#compare-a-total [data-field="count"]')
-      .textContent();
+    const combinedA = '#compare-panel tbody[data-index="combined"] .vs__value[data-side="a"]';
+    const hrTotal = await page.locator(combinedA).textContent();
 
     await page.goto('compare-players');
-    const enTotal = await page
-      .locator('#compare-a-total [data-field="count"]')
-      .textContent();
+    const enTotal = await page.locator(combinedA).textContent();
     expect(hrTotal).toBe(enTotal);
   });
 
   test('shows Croatian award names in the head-to-head table', async ({ page }) => {
     await page.goto('hr/compare-players');
-    await expect(page.locator('#compare-a-body th', { hasText: 'Zlatna lopta' })).toBeVisible();
-    await expect(
-      page.locator('#compare-a-body th', { hasText: 'Zlatna kopačka Svjetskog prvenstva' }),
-    ).toBeVisible();
-    await expect(page.locator('#compare-a-body th', { hasText: 'Zlatna kopačka EURA' })).toBeVisible();
+    const groups = page.locator('#compare-panel .vs__group th');
+    await expect(groups.filter({ hasText: 'Zlatna lopta' })).toBeVisible();
+    await expect(groups.filter({ hasText: 'Zlatna kopačka Svjetskog prvenstva' })).toBeVisible();
+    await expect(groups.filter({ hasText: 'Zlatna kopačka EURA' })).toBeVisible();
   });
 
   test('choosing a different pair updates the shared-years panel in Croatian', async ({ page }) => {
@@ -179,5 +179,54 @@ test.describe('Croatian Compare Players page (/hr/compare-players)', () => {
     // so the URL isn't bare - just check the path prefix.
     await expect(page).toHaveURL(/\/football-reference\/compare-players(\?|$)/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+});
+
+// Same "versus" panel as /compare (see mobile.spec.ts): one row per award
+// with both players' values on it, instead of a table each.
+test.describe('Compare Players versus panel on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('compare-players');
+  });
+
+  test("puts both players' counts for one award on one visible row", async ({ page }) => {
+    const row = page.locator('#compare-panel tbody[data-index="0"] tr[data-metric="count"]');
+    const a = row.locator('.vs__value[data-side="a"]');
+    const b = row.locator('.vs__value[data-side="b"]');
+    const boxA = (await a.boundingBox())!;
+    const boxB = (await b.boundingBox())!;
+    expect(Math.abs(boxA.y - boxB.y)).toBeLessThan(2);
+    expect(boxB.x + boxB.width).toBeLessThanOrEqual(360);
+
+    const overflow = await page
+      .locator('#compare-panel')
+      .evaluate((el) => el.scrollWidth - el.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('an award neither player has won collapses to one line', async ({ page }) => {
+    // Neither Zidane nor Šuker was ever a EURO top scorer.
+    await page.selectOption('#compare-a', { label: 'Zinedine Zidane' });
+    await page.selectOption('#compare-b', { label: 'Davor Šuker' });
+    const euroGoldenBoot = page.locator('#compare-panel tbody[data-index="2"]');
+    await expect(euroGoldenBoot).toHaveAttribute('data-empty', 'true');
+    await expect(euroGoldenBoot.locator('.vs__none')).toBeVisible();
+
+    // Ronaldo has won it, so the same group expands again.
+    await page.selectOption('#compare-b', { label: 'Cristiano Ronaldo' });
+    await expect(euroGoldenBoot).toHaveAttribute('data-empty', 'false');
+    await expect(
+      euroGoldenBoot.locator('tr[data-metric="count"] .vs__value[data-side="b"]'),
+    ).toHaveText('2');
+  });
+
+  test('the leader mark follows a swap', async ({ page }) => {
+    await page.selectOption('#compare-a', { label: 'Lionel Messi' });
+    await page.selectOption('#compare-b', { label: 'Davor Šuker' });
+    const ballonDor = page.locator('#compare-panel tbody[data-index="0"] tr[data-metric="count"]');
+    await expect(ballonDor).toHaveAttribute('data-leader', 'a');
+
+    await page.locator('#compare-swap').click();
+    await expect(ballonDor).toHaveAttribute('data-leader', 'b');
   });
 });
