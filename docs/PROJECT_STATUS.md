@@ -10431,6 +10431,84 @@ line-by-line sweep of every `content/*.md` prose section against that
 specific list is a reasonable next angle, distinct from the
 already-low-yield factual-column re-verification.
 
+### Content-safety audit, plus a real test-coverage gap closed: `loadHomeCompetitions()`/`loadGlossaryEntries()` were never unit-tested - added 2026-08-22 (later intensive run)
+
+With every "Suggested child-friendly feature", competition/award page, and
+directory (`/teams`, `/players`, `/compare`, `/compare-players`) already
+shipped, and the standing "Left for a future pass" list exhausted or
+rejected the same way every recent run's entry has recorded, this run took
+the prior entry's own suggested next angle: a dedicated, line-by-line read
+of every `content/*.md` prose section (all 15 files, all front matter and
+body text, not just the tables) against `docs/EDITORIAL_GUIDE.md`'s
+"Content safety and family suitability" list - betting/gambling links,
+graphic descriptions of crowd disasters or violence, abusive chants,
+unverified scandals, invasive details about players' private lives.
+**No violations found.** The site's "Memorable moments" sections describe
+sporting results in neutral, factual language even for historically loaded
+subjects (the 1950 Maracanazo, Maradona's 1986 tournament); no page mentions
+betting/odds, describes a disaster or violent incident graphically, quotes a
+chant, or repeats an unverified or private-life claim about any player. This
+is a clean-audit result, not a bug fix, but the first time this specific
+rule list has had a dedicated full-content pass rather than incidental
+spot-checks during unrelated content-accuracy work.
+
+Since a clean content audit alone leaves nothing to ship, this run also
+closed a real, unrelated gap it found while establishing a fresh
+`pnpm test:coverage` baseline to confirm the site's actual current health
+before picking a quality-pass angle (the last dedicated Vitest-coverage pass
+was 2026-08-21's "first-ever coverage report" entry, itself now a run old):
+`src/lib/homeCards.ts`'s `loadHomeCompetitions()` - the function that wires
+all six real `content/*.md` files into the home page, one `loadCompetition()`
+call per competition with its own hard-coded id, `editionsHeading` and (for
+Copa América) `allowDuplicateYears` - sat at 50% function coverage (18-48
+uncovered) and had never once been called in a test. Every existing
+`homeCards.test.ts` case only exercised the pure `buildHomeCards()`, feeding
+it an already-built `HomeCompetitions` fixture, so a typo in one of those six
+ids or heading strings (e.g. `'uefa-euro'` → `'euro-uefa'`, or Copa América's
+`'Champions timeline'` heading regressing to the default `'Editions'`) would
+have passed every unit test and only surfaced as a build failure - or worse,
+have silently mismatched a competition to the wrong content if two ids
+happened to both resolve. `src/lib/glossary.ts`'s equivalent
+`loadGlossaryEntries()` (50-56 uncovered) had the identical gap for the same
+reason: `glossary.test.ts` only ever called the pure `parseGlossaryEntries()`
+it wraps.
+
+Fixed by adding a `loadHomeCompetitions` describe block to
+`homeCards.test.ts` (mirroring `tests/unit/competition.test.ts`'s existing
+`getEntry` mock pattern for `loadCompetition`/`loadPageMeta`): one test that
+mocks all six ids with a distinct winner name each and asserts each of
+`data.worldCup`/`euro`/`copaAmerica`/`nationsLeague`/`ballonDor`/`goldenBoot`
+resolved from its own id under its own `editionsHeading` (catching a
+mismatched id/key or wrong heading), and one test that gives Copa América
+specifically a same-year 1959 duplicate (mirroring the real
+`content/copa-america.md` 1959 South American Championship/Ecuador split)
+and asserts it does not throw - the one place `allowDuplicateYears` wiring
+genuinely matters. `glossary.test.ts` gained three `loadGlossaryEntries`
+cases: the happy path via `getEntry`, the missing-entry throw, and a
+missing-body-defaults-to-empty-array case, matching the equivalent
+`loadPageMeta`/`loadCompetition` cases already covering that shape.
+
+**Tests:** `pnpm test` - **431/431** (up from 426: 2 new `loadHomeCompetitions`
+cases in `homeCards.test.ts`, 3 new `loadGlossaryEntries` cases in
+`glossary.test.ts`; no existing case changed). `pnpm test:coverage` -
+**`homeCards.ts` and `glossary.ts` both now 100%
+statements/branches/functions/lines** (up from 80.5%/50% functions and
+87.5%/83.33% functions respectively); the whole-repo `src/lib` average rose
+from 96.54% to 98.2% statements. `pnpm lint` (`astro check`) - 0
+errors/warnings/hints across 137 files. `pnpm build` - 307 pages (unchanged
+- test-only change, no page/component/content edits). `check:links`/
+`check:sitemap`/`check:perf`/`check:precache`/`check:pdfs` all clean.
+
+**Left for a future pass:** the standing candidates above are unchanged. The
+remaining small coverage gaps (`compare.ts` 325-326, `competition.ts` 62/112,
+`editions.ts` a handful of lines, `notes.ts` 61-62, `playerProfile.ts`
+60-62, `validate.ts` 30-31, and a few single-line branch gaps in `i18n.ts`/
+`jsonLd.ts`/`offlineCache.ts`/`sources.ts`/`tableSort.ts`/`url.ts`) are each
+one or two uncovered lines in an already-well-tested pure function, a much
+lower-yield shape than the two whole-function integration gaps this run
+closed; `competitions.ts` and `types.ts` showing 0% are type-only/config
+modules with no runtime logic to cover, not real gaps.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

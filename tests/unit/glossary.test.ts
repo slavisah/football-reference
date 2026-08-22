@@ -6,9 +6,11 @@ import { describe, expect, it, vi } from 'vitest';
 // tests/unit/competition.test.ts for the identical pattern this mirrors.
 vi.mock('astro:content', () => ({ getEntry: vi.fn() }));
 
-const { abbreviateFinalScore, hasAbbreviation, parseGlossaryEntries } = await import(
-  '../../src/lib/glossary'
-);
+const { getEntry } = await import('astro:content');
+const { abbreviateFinalScore, hasAbbreviation, loadGlossaryEntries, parseGlossaryEntries } =
+  await import('../../src/lib/glossary');
+
+const mockGetEntry = vi.mocked(getEntry);
 
 const doc = `# Glossary
 
@@ -91,5 +93,33 @@ describe('abbreviateFinalScore', () => {
 
   it('leaves a plain score with neither token unchanged apart from escaping', () => {
     expect(abbreviateFinalScore('Uruguay 4–2 Argentina')).toBe('Uruguay 4–2 Argentina');
+  });
+});
+
+// loadGlossaryEntries() itself was never exercised - every test above only
+// covers parseGlossaryEntries(), which it wraps. Mirrors the equivalent
+// loadPageMeta()/loadCompetition() "missing entry" and "body defaults to
+// empty" tests in tests/unit/competition.test.ts.
+describe('loadGlossaryEntries', () => {
+  it('loads content/glossary.md via getEntry and parses its body', async () => {
+    mockGetEntry.mockResolvedValueOnce({
+      data: { title: 'Glossary', lastReviewed: '2026-01-01', status: 'verified' },
+      body: doc,
+    });
+    const entries = await loadGlossaryEntries();
+    expect(entries).toHaveLength(3);
+    expect(entries[0].term).toBe('a.e.t.');
+  });
+
+  it('throws when the glossary content entry does not exist', async () => {
+    mockGetEntry.mockResolvedValueOnce(undefined);
+    await expect(loadGlossaryEntries()).rejects.toThrow(
+      'Content entry "glossary" was not found in the pages collection.',
+    );
+  });
+
+  it('treats a missing body as empty rather than throwing', async () => {
+    mockGetEntry.mockResolvedValueOnce({ data: { title: 'Glossary' }, body: undefined });
+    await expect(loadGlossaryEntries()).resolves.toEqual([]);
   });
 });
