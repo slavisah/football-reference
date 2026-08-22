@@ -74,9 +74,10 @@ const TIMELINE_COMPONENTS = [
 // TABLE_COMPONENTS.
 const PODIUM_COMPONENT = 'src/components/PodiumCards.astro';
 
-// Rendered into the actual PDF like PODIUM_COMPONENT above, but currently
-// only opted into by the World Cup page (its own "Suggested child-friendly
-// features" note is the only content file that asks for a host map) - see
+// Rendered into the actual PDF like PODIUM_COMPONENT above. Opted into by
+// every team competition with a host column and at least one real,
+// mappable host (World Cup, EURO, UEFA Nations League, Copa América - not
+// the two individual awards, which have no host column at all) - see
 // HostMap.astro's own doc comment. Listed per-entry rather than folded into
 // TABLE_COMPONENTS for the same reason PODIUM_COMPONENT is.
 const HOST_MAP_COMPONENT = 'src/components/HostMap.astro';
@@ -109,6 +110,8 @@ export const PDF_PAGES = [
       ...COMPETITION_LIB,
       'src/components/CompetitionView.astro',
       ...TABLE_COMPONENTS,
+      HOST_MAP_COMPONENT,
+      HOST_MAP_DATA,
       'src/pages/competitions/euro.astro',
     ],
   },
@@ -122,6 +125,8 @@ export const PDF_PAGES = [
       'src/components/CompetitionView.astro',
       ...TABLE_COMPONENTS,
       PODIUM_COMPONENT,
+      HOST_MAP_COMPONENT,
+      HOST_MAP_DATA,
       'src/pages/competitions/nations-league.astro',
     ],
   },
@@ -135,6 +140,8 @@ export const PDF_PAGES = [
       'src/components/CompetitionView.astro',
       ...TABLE_COMPONENTS,
       PODIUM_COMPONENT,
+      HOST_MAP_COMPONENT,
+      HOST_MAP_DATA,
       'src/pages/competitions/copa-america.astro',
     ],
   },
@@ -225,6 +232,8 @@ export const PDF_PAGES = [
       SOURCES_MD,
       ...COMPETITION_LIB,
       ...TABLE_COMPONENTS,
+      HOST_MAP_COMPONENT,
+      HOST_MAP_DATA,
       'src/pages/hr/competitions/euro.astro',
     ],
   },
@@ -237,6 +246,8 @@ export const PDF_PAGES = [
       ...COMPETITION_LIB,
       ...TABLE_COMPONENTS,
       PODIUM_COMPONENT,
+      HOST_MAP_COMPONENT,
+      HOST_MAP_DATA,
       'src/pages/hr/competitions/nations-league.astro',
     ],
   },
@@ -249,6 +260,8 @@ export const PDF_PAGES = [
       ...COMPETITION_LIB,
       ...TABLE_COMPONENTS,
       PODIUM_COMPONENT,
+      HOST_MAP_COMPONENT,
+      HOST_MAP_DATA,
       'src/pages/hr/competitions/copa-america.astro',
     ],
   },

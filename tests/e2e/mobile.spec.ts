@@ -283,6 +283,24 @@ test.describe('EURO page on a 360px phone', () => {
     await storyCell.locator('summary').click();
     await expect(storyCell.getByText('The delayed EURO 2020 was played in 2021 across multiple countries.')).toBeVisible();
   });
+
+  test('shows a host locator map with one Europe region, including the multi-city 2020 edition', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Where the tournament has been hosted' })).toBeVisible();
+    await expect(page.locator('.host-map__svg')).toHaveAttribute('aria-hidden', 'true');
+    await expect(page.locator('.host-map__dot')).toHaveCount(14);
+
+    const regions = page.locator('.host-map__region');
+    await expect(regions).toHaveCount(1);
+    await expect(page.getByRole('heading', { name: 'Europe', level: 4 })).toBeVisible();
+
+    // France hosted three times.
+    const france = page.locator('.host-map__item', { hasText: 'France' });
+    await expect(france.locator('.host-map__count')).toHaveText('3 times');
+    await expect(france.locator('.host-map__years')).toContainText('1960, 1984, 2016');
+
+    // 2020 has no single host country - still gets its own marker/entry.
+    await expect(page.locator('.host-map__item', { hasText: 'Eleven European cities' })).toBeVisible();
+  });
 });
 
 test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px phone', () => {
@@ -468,6 +486,19 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/competitions\/euro\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('shows the translated host map with a Croatian region heading and the same 14 hosts as the English page', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Gdje je Europsko prvenstvo igralo domaćinu' })).toBeVisible();
+    await expect(page.locator('.host-map__dot')).toHaveCount(14);
+    await expect(page.getByRole('heading', { name: 'Europa', level: 4 })).toBeVisible();
+
+    // Country names themselves stay untranslated, matching every other table/card on this page.
+    const france = page.locator('.host-map__item', { hasText: 'France' });
+    await expect(france.locator('.host-map__count')).toHaveText('3 puta');
+    await expect(page.locator('.host-map__item', { hasText: 'Eleven European cities' })).toBeVisible();
   });
 });
 
@@ -912,6 +943,26 @@ test.describe('Copa América page on a 360px phone', () => {
     expect(card1975).toContain('Colombia');
     expect(card1975).not.toContain('—');
   });
+
+  test('shows a host locator map grouped by South America then North America, skipping the Home-and-away editions', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Where the tournament has been hosted' })).toBeVisible();
+    await expect(page.locator('.host-map__dot')).toHaveCount(11);
+
+    const regions = page.locator('.host-map__region');
+    await expect(regions).toHaveCount(2);
+    await expect(page.getByRole('heading', { name: 'South America', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'North America', level: 4 })).toBeVisible();
+
+    // Uruguay hosted more than once.
+    const uruguay = page.locator('.host-map__item', { hasText: 'Uruguay' });
+    await expect(uruguay.locator('.host-map__count')).not.toHaveText('1 time');
+
+    // The three Home-and-away editions (1975, 1979, 1983) have no single host - no marker for them.
+    await expect(page.locator('.host-map__item', { hasText: 'Home-and-away' })).toHaveCount(0);
+    await expect(page.locator('.host-map__item', { hasText: 'United States' })).toBeVisible();
+  });
 });
 
 test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 360px phone', () => {
@@ -1017,6 +1068,14 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await expect(latest).toContainText('Argentina');
     await expect(latest).toContainText('Colombia');
   });
+
+  test('shows the translated host map with South America/North America region headings', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Gdje je Copa América igrala domaćinu' })).toBeVisible();
+    await expect(page.locator('.host-map__dot')).toHaveCount(11);
+    await expect(page.getByRole('heading', { name: 'Južna Amerika', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Sjeverna Amerika', level: 4 })).toBeVisible();
+    await expect(page.locator('.host-map__item', { hasText: 'United States' })).toBeVisible();
+  });
 });
 
 test.describe('Nations League page on a 360px phone', () => {
@@ -1072,6 +1131,14 @@ test.describe('Nations League page on a 360px phone', () => {
     await expect(latest).toContainText('Spain');
     await expect(latest).toContainText('France');
     await expect(latest).toContainText('Germany');
+  });
+
+  test('shows a host locator map with one Europe region and every Finals host', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Where the tournament has been hosted' })).toBeVisible();
+    await expect(page.locator('.host-map__dot')).toHaveCount(4);
+    await expect(page.getByRole('heading', { name: 'Europe', level: 4 })).toBeVisible();
+    await expect(page.locator('.host-map__item', { hasText: 'Portugal' })).toBeVisible();
+    await expect(page.locator('.host-map__item', { hasText: 'Germany' })).toBeVisible();
   });
 });
 
@@ -1166,6 +1233,15 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/competitions\/nations-league\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('shows the translated host map with a Croatian region heading', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Gdje je Final Four Lige nacija igrao domaćinu' }),
+    ).toBeVisible();
+    await expect(page.locator('.host-map__dot')).toHaveCount(4);
+    await expect(page.getByRole('heading', { name: 'Europa', level: 4 })).toBeVisible();
+    await expect(page.locator('.host-map__item', { hasText: 'Portugal' })).toBeVisible();
   });
 });
 

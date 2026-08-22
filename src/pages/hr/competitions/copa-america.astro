@@ -15,11 +15,13 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import TournamentTable from '../../../components/TournamentTable.astro';
 import PodiumCards from '../../../components/PodiumCards.astro';
 import ChampionsSummary from '../../../components/ChampionsSummary.astro';
+import HostMap from '../../../components/HostMap.astro';
 import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
-import { buildPodiums, buildYearStories } from '../../../lib/editions';
+import { buildPodiums, buildYearStories, buildHostMapPoints } from '../../../lib/editions';
+import { COPA_AMERICA_HOST_COORDINATES, COPA_AMERICA_REGION_ORDER } from '../../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
   buildChampionsItemList,
@@ -35,6 +37,11 @@ const data = await loadCompetition('copa-america', {
 });
 
 const podium = buildPodiums(data.editions);
+const hostMap = buildHostMapPoints(data.editions, COPA_AMERICA_HOST_COORDINATES, COPA_AMERICA_REGION_ORDER);
+const hostRegionLabels: Record<string, string> = {
+  'South America': 'Južna Amerika',
+  'North America': 'Sjeverna Amerika',
+};
 
 const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 
@@ -170,6 +177,16 @@ const headerLabels: Record<string, string> = {
       unit={['naslov', 'naslova']}
       winningYearsLabel="Godine osvajanja: "
       ofLabel="od"
+    />
+
+    <HostMap
+      points={hostMap}
+      id="copa-america-host-map"
+      heading="Gdje je Copa América igrala domaćinu"
+      description="Približan položaj svakog domaćina na jednostavnoj mreži zemljopisne dužine i širine, grupiran po regijama u popisu ispod - ne tvrdimo točne granice, samo otprilike gdje se u svijetu igralo pojedino izdanje. Veće točke znače da je zemlja bila domaćin više puta."
+      unit={['put', 'puta']}
+      hostingYearsLabel="Godine domaćinstva: "
+      regionLabels={hostRegionLabels}
     />
 
     <EditorialNotes sections={notes} />

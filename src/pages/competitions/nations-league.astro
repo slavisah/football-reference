@@ -2,7 +2,8 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
-import { buildPodiums } from '../../lib/editions';
+import { buildPodiums, buildHostMapPoints } from '../../lib/editions';
+import { NATIONS_LEAGUE_HOST_COORDINATES } from '../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import {
   buildChampionsItemList,
@@ -17,6 +18,7 @@ const data = await loadCompetition('uefa-nations-league', {
 });
 
 const podium = buildPodiums(data.editions);
+const hostMap = buildHostMapPoints(data.editions, NATIONS_LEAGUE_HOST_COORDINATES);
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd = [
@@ -38,5 +40,6 @@ const jsonLd = [
     pdfSlug="nations-league"
     podium={podium}
     podiumHeading="Podium by edition"
+    hostMap={hostMap}
   />
 </BaseLayout>
