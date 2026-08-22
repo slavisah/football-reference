@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
 import { withBase } from '../lib/url';
 import { t, type Locale } from '../lib/i18n';
 import { buildBreadcrumbList, buildWebSiteJsonLd, type JsonLdObject } from '../lib/jsonLd';
@@ -215,6 +216,7 @@ const structuredData = [breadcrumb, website, ...jsonLd].filter((item): item is J
     <Nav locale={locale} alternateHref={alternateHref} />
     <main id="main" tabindex="-1">
       <div class="container">
+        {!isHome && <Breadcrumb locale={locale} trail={breadcrumbTrail} title={title} />}
         <slot />
       </div>
     </main>

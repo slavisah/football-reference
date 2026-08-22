@@ -3088,6 +3088,48 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(breadcrumb.itemListElement[1].item).toMatch(/\/hr\/players\/$/);
   });
 
+  test('/teams/brazil renders a visible breadcrumb nav matching its BreadcrumbList, distinct from the primary nav', async ({
+    page,
+  }) => {
+    await page.goto('teams/brazil');
+    const nav = page.getByRole('navigation', { name: 'Breadcrumb' });
+    await expect(nav).toBeVisible();
+    const items = nav.locator('li');
+    await expect(items).toHaveCount(3);
+    await expect(items.nth(2)).toHaveAttribute('aria-current', 'page');
+    await expect(items.nth(2)).toHaveText('Brazil - Full history');
+
+    const teamsLink = nav.getByRole('link', { name: 'Teams' });
+    await expect(teamsLink).toHaveAttribute('href', /\/teams\/?$/);
+    await teamsLink.click();
+    await expect(page).toHaveURL(/\/teams\/?$/);
+  });
+
+  test('/hr/teams/brazil renders the same breadcrumb nav with Croatian labels', async ({ page }) => {
+    await page.goto('hr/teams/brazil');
+    const nav = page.getByRole('navigation', { name: 'Navigacijski put' });
+    await expect(nav).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Početna' })).toHaveAttribute('href', /\/hr\/$/);
+    await expect(nav.getByRole('link', { name: 'Reprezentacije' })).toHaveAttribute(
+      'href',
+      /\/hr\/teams\/?$/,
+    );
+    await expect(nav.locator('li').nth(2)).toHaveText('Brazil - cjelovita povijest');
+  });
+
+  test('a flat page like /records gets a two-item "Home > page" breadcrumb, and the home page gets none', async ({
+    page,
+  }) => {
+    await page.goto('records');
+    const nav = page.getByRole('navigation', { name: 'Breadcrumb' });
+    await expect(nav.locator('li')).toHaveCount(2);
+    await expect(nav.locator('li').nth(1)).toHaveText('Records and Timelines');
+    await expect(nav.getByRole('link', { name: 'Home' })).toHaveAttribute('href', /\/football-reference\/$/);
+
+    await page.goto('/');
+    await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toHaveCount(0);
+  });
+
   test('/teams/germany omits an ItemList entry for a competition it has never reached a tracked final or semifinal in', async ({
     page,
   }) => {

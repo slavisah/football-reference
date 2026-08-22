@@ -52,6 +52,12 @@ describe('t', () => {
     expect(t('en', 'primaryNav')).not.toBe(t('hr', 'primaryNav'));
   });
 
+  it('gives the breadcrumb nav landmark a distinct, non-empty aria-label per locale', () => {
+    expect(t('en', 'breadcrumbNavLabel')).toBe('Breadcrumb');
+    expect(t('hr', 'breadcrumbNavLabel')).toBe('Navigacijski put');
+    expect(t('en', 'breadcrumbNavLabel')).not.toBe(t('hr', 'breadcrumbNavLabel'));
+  });
+
   it('gives the "find a team" search widget distinct, non-empty strings per locale', () => {
     for (const key of [
       'teamSearchLabel',

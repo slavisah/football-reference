@@ -10305,6 +10305,86 @@ doesn't have - not pursued, matching the same "no data to build from" reason
 the two individual awards are already excluded from `buildHomeSoilTitles()`
 and the "Most frequent hosts"/podium rankings elsewhere on this site.
 
+### Accessibility/UX: visible breadcrumb navigation on every non-home page - added 2026-08-22 (later intensive run)
+
+With every backlog item, cross-cutting audit, and standing "Left for a future
+pass" candidate still infeasible/rejected/low-yield, and every plausible new
+content-accuracy or data-audit angle already covered by prior runs (checked
+this run: World Cup/EURO/Nations League/Copa América Champion/Runner-up/
+Third-Fourth/Final-date/Host/Teams, Ballon d'Or Winner/Ceremony-date, Golden
+Boot, and the "Format" and "Teams" columns each competition actually has -
+no gap found there either), this run looked at the schema.org structured
+data instead of the content and found a real, previously-overlooked gap:
+`BaseLayout.astro` already computes a "Home > page" (or, for a nested
+profile page, "Home > Teams > Brazil") breadcrumb trail for the invisible
+`BreadcrumbList` JSON-LD block every non-home page carries - but that trail
+was never actually rendered anywhere a reader could see or click it. A
+visitor deep on `/teams/brazil` or `/players/lionel-messi` had no on-page
+way back to the parent directory besides the primary nav or the browser's
+back button, even though the exact data needed for a breadcrumb trail
+already existed on every single page.
+
+**New `src/components/Breadcrumb.astro`**: takes the same `locale`/`trail`/
+page `title` values `BaseLayout.astro` already threads through to
+`buildBreadcrumbList()`, and renders them a second time as a real `<nav
+aria-label="Breadcrumb">` with an ordered list - `Home` (and, for a nested
+profile page, its parent index) as links, the current page as plain text
+with `aria-current="page"` rather than a dead self-link. `no-print` (matching
+every other nav-only chrome element on this site - `ThemeToggle.astro`, both
+`Nav.astro` search widgets, `.filters`) since a printed page doesn't need a
+link trail back to a directory it can't click through to. `BaseLayout.astro`
+now renders it inside `.container`, right before `<slot />>`, for every page
+except the home page itself (which has no parent to link to, same condition
+`isHome` already gates the JSON-LD block on). New `breadcrumbNavLabel` UI
+string (`src/lib/i18n.ts`, "Breadcrumb"/"Navigacijski put") gives the new
+landmark a distinct `aria-label` from the primary nav's own ("Primary"/
+"Glavna navigacija"), required for two `<nav>` landmarks to coexist without
+an accessibility-tree ambiguity.
+
+No new data or page-specific wiring needed anywhere: every page already
+passes (or, for a flat page, omits) the exact `trail`/`title` values this
+component needed, so all 307 pages picked this up automatically in both
+languages - a flat page like `/records` now shows "Home / Records and
+Timelines", a nested profile page like `/teams/brazil` shows "Home / Teams /
+Brazil - Full history" with a working middle link back to `/teams`.
+
+**Tests:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across 137
+files. `pnpm test` - **426/426** (1 new in `tests/unit/i18n.test.ts` for the
+new `breadcrumbNavLabel` key). `pnpm build` - 307 pages, unchanged. `pnpm
+check:links`/`check:sitemap`/`check:precache` all pass unchanged (no new
+page, no new route). `pnpm check:perf` - all pages still within the 510 KB
+budget (heaviest, `hr/records`, grew from 501.2 KB to 502.4 KB - the extra
+~1.2 KB of shared breadcrumb markup/CSS on the site's already-heaviest page,
+well inside the existing headroom). `pnpm check:pdfs` - all 290 PDFs still
+correctly reported up to date: neither `BaseLayout.astro` nor `Nav.astro`
+is a listed source in `scripts/pdf-pages.mjs` for any PDF (the same
+precedent recorded when Nav.astro's two search widgets were added), and the
+new nav carries `no-print` regardless, so it would never render into a PDF
+even if it were tracked. 3 new Playwright cases in `tests/e2e/mobile.spec.ts`
+(English `/teams/brazil`: the visible nav renders with the right 3 items,
+`aria-current="page"` on the last one, and its middle link actually
+navigates to `/teams`; Croatian `/hr/teams/brazil`: same shape with
+Croatian labels/hrefs; a flat page (`/records`) gets a 2-item trail while
+the home page gets no breadcrumb nav at all). Full `accessibility.spec.ts` +
+`accessibility-forced-colors.spec.ts` re-run scoped to just those two files -
+**147/147 passing** - confirms the new second `<nav>` landmark introduces no
+WCAG 2.1 A/AA violation on any page/color-scheme/language combination axe
+already sweeps. Full `print-styles.spec.ts` - **125/125 passing** - confirms
+`no-print` actually hides the new nav in print media on every page type the
+suite covers, including the WCAG-in-print checks. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` kicked off to
+confirm no regression across the complete suite; see the next entry or this
+run's commit history for its result if it surfaced anything to fix.
+
+**Left for a future pass:** the standing candidates from prior runs are
+unchanged (source-link liveness infeasible, further content-accuracy
+spot-checks low-yield, flag-emoji idea rejected, CSP's `'unsafe-inline'` not
+worth revisiting, the Golden Boot reverse-lookup quiz type not pursued,
+`public/downloads/` PDF-bloat documented/intentional, full per-edition team
+participant lists blocked on sourcing, `/compare-players` print PDF matching
+`/compare`'s own precedent, EURO podium cards structurally impossible, no
+host locator map for Ballon d'Or/Golden Boot - no host data to build from).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

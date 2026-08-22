@@ -1,0 +1,81 @@
+---
+// Visible counterpart to the "Home > page" trail BaseLayout.astro already
+// builds for schema.org's BreadcrumbList on every non-home page - that JSON-LD
+// only ever helped search-result rendering, not an actual reader navigating
+// this site, so a page nested under an index (e.g. /teams/<slug>) had no
+// on-page way back to that index besides the primary nav or the browser's
+// back button. Reuses the exact same `trail`/`title` values the page already
+// passes to BaseLayout - no new data, just a second, visible rendering of it.
+import { withBase } from '../lib/url';
+import { t, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale?: Locale;
+  /** Extra entries between Home and the current page, e.g. [{ name: 'Teams', url: withBase('/teams') }]. Defaults to none, producing "Home > title". */
+  trail?: { name: string; url: string }[];
+  /** The current page's own title, rendered last as plain text (not a link). */
+  title: string;
+}
+
+const { locale = 'en', trail = [], title } = Astro.props;
+const homeHref = withBase(locale === 'hr' ? '/hr/' : '/');
+---
+
+<nav class="breadcrumb no-print" aria-label={t(locale, 'breadcrumbNavLabel')}>
+  <ol>
+    <li><a href={homeHref}>{t(locale, 'homeBreadcrumb')}</a></li>
+    {
+      trail.map((item) => (
+        <li>
+          <a href={item.url}>{item.name}</a>
+        </li>
+      ))
+    }
+    <li aria-current="page">{title}</li>
+  </ol>
+</nav>
+
+<style>
+  .breadcrumb {
+    margin-block: 0 0.75rem;
+  }
+
+  .breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .breadcrumb li {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .breadcrumb li + li::before {
+    content: '/';
+    color: var(--border);
+  }
+
+  .breadcrumb a {
+    color: var(--text-muted);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+  }
+
+  .breadcrumb a:hover,
+  .breadcrumb a:focus-visible {
+    text-decoration-color: currentColor;
+  }
+
+  .breadcrumb li[aria-current='page'] {
+    color: var(--text);
+    font-weight: 600;
+  }
+</style>
