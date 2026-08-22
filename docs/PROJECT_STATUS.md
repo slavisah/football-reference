@@ -10646,6 +10646,80 @@ of its own (noted inline in `mobile.spec.ts`). The panel shows raw counts
 only; a proportional bar per row was considered and deliberately deferred -
 the counts are small integers where a bar adds decoration, not information.
 
+### `/compare` and `/compare-players` gain a downloadable print PDF, closing the gap the 2026-08-17 entry named as a standing candidate - added 2026-08-22 (later intensive run)
+
+Every other reader-facing page with real content - the six competition/award
+pages, `/records`, every `/teams/<slug>` and `/players/<slug>` profile - has
+had a "Download printable PDF" link since 2026-07-31/2026-08-18/2026-08-20.
+The two head-to-head comparison pages never got one, despite being named
+explicitly as the natural next slice in three separate "Left for a future
+pass" notes (most recently the 2026-08-17 entry). Both pages already render a
+fully meaningful default view with zero JavaScript - `/compare`'s two
+most-titled teams, `/compare-players`'s two most-decorated players, per each
+page's own "before any JS runs" comment - which is exactly the
+progressive-enhancement precedent every other PDF here already relies on: the
+generator (`scripts/generate-pdfs.mjs`) just prints the live page under print
+media, no PDF-only layout of its own.
+
+Added four entries to the shared `scripts/pdf-pages.mjs` list (`compare`,
+`compare-players`, and their `/hr/` counterparts, following the exact
+Croatian-gets-its-own-page-path precedent every other bilingual PDF here
+uses) with their own accurate `sources` list - `src/lib/teamCompetitions.ts`/
+`src/lib/compare.ts`/`src/lib/teamProfile.ts` for `/compare`,
+`src/lib/playerProfile.ts`/`src/lib/comparePlayers.ts` for
+`/compare-players` - rather than reusing `TABLE_COMPONENTS`/
+`TIMELINE_COMPONENTS`, since neither page renders `TournamentTable`,
+`ChampionsSummary`, or `EditorialNotes` (they compose their own "versus"
+markup by hand); only `References.astro` actually applies, factored into a
+new shared `REFERENCES_COMPONENT` constant. `generate-pdfs.mjs` and
+`check-pdf-freshness.mjs` both already iterate this shared list generically
+(page path in, slug-named PDF out; source list in, staleness check out), so
+no change to either script was needed - the existing pattern absorbed four
+new pages for free. Wired the existing, reusable `PrintDownloadLink.astro`
+into all four pages' headers (English/Croatian labels, an A4-landscape hint
+naming what's on the printed page), the same call shape `/records` already
+uses for a multi-section aggregate page.
+
+Regenerated all 294 PDFs via `PW_EXECUTABLE_PATH=<preinstalled Chromium>
+pnpm build && pnpm build:pdfs` (the tool has no per-page filter, so a
+refreshed manifest always re-renders everything, the same full-regeneration
+precedent every prior PDF-tooling entry here has followed since the
+2026-08-06 "Automated PDF-freshness check" entry) and confirmed `pnpm
+check:pdfs` reports all 294 up to date (up from 290) against the new
+manifest.
+
+**Tests:** four new Playwright cases mirroring `/records`' own existing "PDF
+link resolves and serves a real PDF" test - one per new page/locale
+(`tests/e2e/mobile.spec.ts` for `/compare`/`/hr/compare`,
+`tests/e2e/compare-players.spec.ts` for `/compare-players`/
+`/hr/compare-players`), each asserting the link is visible, the Croatian
+pages show the translated label, and an actual `request.get()` against the
+href returns a 200 with a PDF content-type - not just that a link element
+exists. `pnpm lint` (`astro check`) - 0 errors/warnings/hints across 138
+files. `pnpm test` - **431/431** (unchanged - no `src/lib` logic changed,
+only the shared, already-tested `PrintDownloadLink.astro` reused). `pnpm
+build` - 307 pages (unchanged). `check:links`/`check:sitemap`/`check:perf`/
+`check:precache` all clean against the rebuilt `dist/` (the new PDFs had to
+be generated and the site rebuilt *before* `check:links` would pass, since
+it resolves each `<a download>` href against a real file in `dist/downloads/`
+- confirmed the check does catch a missing file: it failed with exactly the
+four expected broken links until the rebuild). Full `PW_EXECUTABLE_PATH=
+/opt/pw-browsers/chromium-1194/chrome-linux/chrome pnpm test:e2e` -
+**689/689 passing** (up from 685, the 4 new cases), confirming no regression
+anywhere in the complete suite.
+
+**Left for a future pass:** the standing candidates from prior runs are
+otherwise unchanged (source-link liveness infeasible, further
+content-accuracy spot-checks low-yield, flag-emoji idea rejected, CSP's
+`unsafe-inline` not worth revisiting, the Golden Boot reverse-lookup quiz
+type not pursued, `public/downloads/` PDF-bloat documented/intentional, full
+per-edition team participant lists blocked on sourcing, EURO podium cards
+structurally impossible, no host locator map for Ballon d'Or/Golden Boot -
+no host data to build from, the mobile menu drawer's lack of a true focus
+trap - acceptable for a disclosure widget, not required). With this entry,
+every page named across all three prior "left for a future pass" mentions of
+this specific gap is now closed.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
