@@ -10372,9 +10372,9 @@ WCAG 2.1 A/AA violation on any page/color-scheme/language combination axe
 already sweeps. Full `print-styles.spec.ts` - **125/125 passing** - confirms
 `no-print` actually hides the new nav in print media on every page type the
 suite covers, including the WCAG-in-print checks. Full
-`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` kicked off to
-confirm no regression across the complete suite; see the next entry or this
-run's commit history for its result if it surfaced anything to fix.
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` -
+**655/655 passing** (up from 652), confirming no regression anywhere in the
+complete suite.
 
 **Left for a future pass:** the standing candidates from prior runs are
 unchanged (source-link liveness infeasible, further content-accuracy
