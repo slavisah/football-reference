@@ -9,10 +9,19 @@ import AxeBuilder from '@axe-core/playwright';
 // quiz page's earlier aria-live gaps (see accessibility-quiz-states.spec.ts
 // and docs/PROJECT_STATUS.md) - so this file closes the same class of gap
 // for /compare specifically, for both languages and both color schemes.
+//
+// /compare-players (added 2026-08-21, after this file already existed) uses
+// the identical #compare-a/#compare-b/#compare-swap/#compare-status/
+// #compare-a-name/#compare-b-name DOM shape - see
+// src/pages/compare-players.astro - so it belongs in this same sweep. It was
+// never added when it shipped, leaving its own re-selected/swapped states
+// untested for exactly the gap this file exists to catch.
 
 const COMPARE_PAGES = [
   { label: 'English', path: 'compare' },
   { label: 'Croatian', path: 'hr/compare' },
+  { label: 'English players', path: 'compare-players' },
+  { label: 'Croatian players', path: 'hr/compare-players' },
 ];
 const COLOR_SCHEMES = ['light', 'dark'] as const;
 
