@@ -10,7 +10,10 @@ import type { HomeCompetitions } from '../../src/lib/homeCards';
 // let the module load outside of an Astro build.
 vi.mock('astro:content', () => ({ getEntry: vi.fn() }));
 
-const { buildHomeCards } = await import('../../src/lib/homeCards');
+const { getEntry } = await import('astro:content');
+const { buildHomeCards, loadHomeCompetitions } = await import('../../src/lib/homeCards');
+
+const mockGetEntry = vi.mocked(getEntry);
 
 function champion(displayName: string, titles = 1): ChampionSummary {
   return { id: displayName.toLowerCase(), displayName, titles, years: ['2024'], names: [displayName] };
@@ -121,5 +124,70 @@ describe('buildHomeCards', () => {
       '/competitions/ballon-dor',
       '/competitions/golden-boot',
     ]);
+  });
+});
+
+// loadHomeCompetitions() itself (as opposed to buildHomeCards(), which only
+// consumes its output) was never exercised by any test - a typo in one of
+// its six hard-coded content ids or `editionsHeading` values would silently
+// break only at build time, not here. Each fake body below uses the exact
+// heading loadHomeCompetitions() requests for that competition (see the
+// editionsHeading values in src/lib/homeCards.ts) so a wrong heading fails
+// this test the same way it would fail the real build.
+const table = (heading: string, rows: string): string => `# Test
+
+Intro.
+
+## ${heading}
+
+| Year | Winner |
+|---|---|
+${rows}
+`;
+
+describe('loadHomeCompetitions', () => {
+  it('loads all six competitions by their real content id, each under its own editionsHeading, into the matching key', async () => {
+    mockGetEntry.mockImplementation(async (_collection: string, id: string) => {
+      const bodies: Record<string, string> = {
+        'fifa-world-cup': table('Editions', '| 2022 | WorldCupWinner |'),
+        'uefa-euro': table('Editions', '| 2024 | EuroWinner |'),
+        'copa-america': table('Champions timeline', '| 2024 | CopaWinner |'),
+        'uefa-nations-league': table('Finals', '| 2024–25 | NationsLeagueWinner |'),
+        'ballon-dor': table('Winners', '| 2025 | BallonDorWinner |'),
+        'golden-boot': table('FIFA World Cup top scorers', '| 2026 | GoldenBootWinner |'),
+      };
+      const body = bodies[id];
+      if (!body) throw new Error(`Unexpected content id requested: "${id}"`);
+      return { data: { title: id, lastReviewed: '2026-01-01', status: 'verified' }, body };
+    });
+
+    const data = await loadHomeCompetitions();
+
+    expect(data.worldCup.champions[0]?.displayName).toBe('WorldCupWinner');
+    expect(data.euro.champions[0]?.displayName).toBe('EuroWinner');
+    expect(data.copaAmerica.champions[0]?.displayName).toBe('CopaWinner');
+    expect(data.nationsLeague.champions[0]?.displayName).toBe('NationsLeagueWinner');
+    expect(data.ballonDor.champions[0]?.displayName).toBe('BallonDorWinner');
+    expect(data.goldenBoot.champions[0]?.displayName).toBe('GoldenBootWinner');
+  });
+
+  it('passes allowDuplicateYears for Copa América only, matching its two same-year 1959 South American Championships', async () => {
+    const duplicateYearBody = table('Champions timeline', '| 1959 | A |\n| 1959 | B |');
+    mockGetEntry.mockImplementation(async (_collection: string, id: string) => {
+      if (id === 'copa-america') return { data: { title: id }, body: duplicateYearBody };
+      // Every other competition just needs a valid, unique-year table so
+      // Promise.all() doesn't reject on an unrelated id.
+      const bodies: Record<string, string> = {
+        'fifa-world-cup': table('Editions', '| 2022 | A |'),
+        'uefa-euro': table('Editions', '| 2024 | A |'),
+        'uefa-nations-league': table('Finals', '| 2024–25 | A |'),
+        'ballon-dor': table('Winners', '| 2025 | A |'),
+        'golden-boot': table('FIFA World Cup top scorers', '| 2026 | A |'),
+      };
+      return { data: { title: id, lastReviewed: '2026-01-01', status: 'verified' }, body: bodies[id] };
+    });
+
+    const data = await loadHomeCompetitions();
+    expect(data.copaAmerica.editions).toHaveLength(2);
   });
 });
