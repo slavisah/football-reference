@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { openMenu } from './menu';
 
 // The global "find a player" quick-jump widget (Nav.astro, both languages,
 // every built page) - the individual-award counterpart of "find a team"
@@ -18,6 +19,7 @@ import AxeBuilder from '@axe-core/playwright';
 // rather than a literal space.
 
 async function openAndType(page: import('@playwright/test').Page, query: string) {
+  await openMenu(page);
   const input = page.locator('#player-search-input');
   await input.click();
   await input.fill(query);
@@ -27,6 +29,7 @@ async function openAndType(page: import('@playwright/test').Page, query: string)
 test.describe('Find a player (English)', () => {
   test('is present, closed, on the home page', async ({ page }) => {
     await page.goto('');
+    await openMenu(page);
     const input = page.locator('#player-search-input');
     await expect(input).toBeVisible();
     await expect(input).toHaveAttribute('placeholder', 'Find a player…');
@@ -36,6 +39,7 @@ test.describe('Find a player (English)', () => {
 
   test('is present on a non-home page too (shared Nav.astro)', async ({ page }) => {
     await page.goto('quiz');
+    await openMenu(page);
     await expect(page.locator('#player-search-input')).toBeVisible();
   });
 
@@ -59,6 +63,7 @@ test.describe('Find a player (English)', () => {
     await page.goto('');
     await openAndType(page, 'messi');
     await expect(page.locator('#player-search-listbox')).toBeVisible();
+    await openMenu(page);
     await page.locator('#player-search-input').fill('');
     await expect(page.locator('#player-search-listbox')).toBeHidden();
   });
@@ -77,6 +82,9 @@ test.describe('Find a player (English)', () => {
   }) => {
     await page.goto('');
     await openAndType(page, 'lionel messi');
+    // The Croatian page's own loading label differs from the one openAndType
+    // waits on, so wait for a rendered option before driving the keyboard.
+    await expect(page.locator('#player-search-listbox [role="option"]').first()).toBeVisible();
     await page.keyboard.press('ArrowDown');
     await expect(page.locator('#player-search-listbox [role="option"].is-active')).toHaveText('Lionel Messi');
     await page.keyboard.press('Enter');
@@ -114,11 +122,15 @@ test.describe('Find a player (Croatian)', () => {
     page,
   }) => {
     await page.goto('hr/');
+    await openMenu(page);
     const input = page.locator('#player-search-input');
     await expect(input).toHaveAttribute('placeholder', 'Pronađi igrača…');
     await expect(page.locator('label[for="player-search-input"]')).toHaveText('Pronađi igrača');
 
     await openAndType(page, 'lionel messi');
+    // The Croatian page's own loading label differs from the one openAndType
+    // waits on, so wait for a rendered option before driving the keyboard.
+    await expect(page.locator('#player-search-listbox [role="option"]').first()).toBeVisible();
     await page.keyboard.press('ArrowDown');
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(/\/hr\/compare-players\?a=Lionel\+Messi(&|$)/);
@@ -155,6 +167,7 @@ test.describe('Find a player accessibility', () => {
 
   test('combobox exposes the expected ARIA wiring while open', async ({ page }) => {
     await page.goto('');
+    await openMenu(page);
     const input = page.locator('#player-search-input');
     await expect(input).toHaveAttribute('role', 'combobox');
     await expect(input).toHaveAttribute('aria-autocomplete', 'list');

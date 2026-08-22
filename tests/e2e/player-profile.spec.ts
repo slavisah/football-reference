@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { openMenu } from './menu';
 
 // The /players directory: an A-to-Z index (src/pages/players/index.astro)
 // plus one full award-history profile page per player
@@ -159,6 +160,7 @@ test.describe('Croatian /players index (/hr/players)', () => {
 
   test('the language switcher opens the English players index', async ({ page }) => {
     await page.goto('hr/players');
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/players\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -223,6 +225,7 @@ test.describe('Croatian player profile page (/hr/players/<slug>)', () => {
 
   test('the language switcher returns to the English profile page', async ({ page }) => {
     await page.goto('hr/players/gerd-muller');
+    await openMenu(page);
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/players\/gerd-muller\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
