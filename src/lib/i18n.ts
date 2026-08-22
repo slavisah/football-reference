@@ -20,6 +20,7 @@ const UI_STRINGS = {
   primaryNav: { en: 'Primary', hr: 'Glavna navigacija' },
   brand: { en: 'Football Reference', hr: 'Football Reference' },
   homeBreadcrumb: { en: 'Home', hr: 'Početna' },
+  breadcrumbNavLabel: { en: 'Breadcrumb', hr: 'Navigacijski put' },
   footerTagline: {
     en: 'The Ultimate Football Reference · a family-friendly, source-conscious history project. Content is the editorial source of truth; historical team names are preserved.',
     hr: 'The Ultimate Football Reference · obiteljski prijateljski projekt povijesti nogometa s naglaskom na izvore. Sadržaj je uređivački izvor istine; povijesni nazivi reprezentacija su sačuvani.',
