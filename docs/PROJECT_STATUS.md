@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 167 Vitest unit tests
+pnpm test                      # 431 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 242 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 685 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
                                           # and dark, across every page)
 ```
@@ -10654,8 +10654,18 @@ the counts are small integers where a bar adds decoration, not information.
   `/compare-players` (head-to-head Ballon d'Or/Golden Boot comparison), and
   `/glossary` (explains a.e.t., pens, and five other site terms) all have
   live pages in both English and Croatian now, all reachable from the
-  primary nav.
+  primary nav - which, below a 60rem viewport, is inside the header's
+  `#site-menu` drawer behind the menu button rather than on the page
+  itself (`Nav.astro`; see the 2026-08-22 mobile-first header entry). Any
+  new e2e test that clicks a nav link, either search widget, the language
+  switch or the theme toggle has to open that drawer first, via
+  `openMenu(page)` from `tests/e2e/menu.ts`.
 - Historical names appear as distinct winner-filter entries by design.
+- Both head-to-head panels (`/compare`, `/compare-players`) are single
+  "versus" tables - one row per statistic, both sides' values on it - not a
+  table per side. Anything added to them belongs in that shape; two stacked
+  per-entity tables is the layout this replaced, for being unusable on a
+  phone (see the 2026-08-22 entry).
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
   time out; re-running the deploy clears it (it did here).
 
