@@ -51,6 +51,50 @@ describe('t', () => {
     expect(t('hr', 'primaryNav')).toBe('Glavna navigacija');
     expect(t('en', 'primaryNav')).not.toBe(t('hr', 'primaryNav'));
   });
+
+  it('gives the breadcrumb nav landmark a distinct, non-empty aria-label per locale', () => {
+    expect(t('en', 'breadcrumbNavLabel')).toBe('Breadcrumb');
+    expect(t('hr', 'breadcrumbNavLabel')).toBe('Navigacijski put');
+    expect(t('en', 'breadcrumbNavLabel')).not.toBe(t('hr', 'breadcrumbNavLabel'));
+  });
+
+  it('gives the "find a team" search widget distinct, non-empty strings per locale', () => {
+    for (const key of [
+      'teamSearchLabel',
+      'teamSearchPlaceholder',
+      'teamSearchNoResults',
+      'teamSearchLoading',
+      'teamSearchError',
+    ] as const) {
+      expect(t('en', key).length).toBeGreaterThan(0);
+      expect(t('hr', key).length).toBeGreaterThan(0);
+      expect(t('en', key)).not.toBe(t('hr', key));
+    }
+  });
+
+  it('keeps the {query} placeholder in the no-results template for both locales', () => {
+    expect(t('en', 'teamSearchNoResults')).toContain('{query}');
+    expect(t('hr', 'teamSearchNoResults')).toContain('{query}');
+  });
+
+  it('gives the "find a player" search widget distinct, non-empty strings per locale', () => {
+    for (const key of [
+      'playerSearchLabel',
+      'playerSearchPlaceholder',
+      'playerSearchNoResults',
+      'playerSearchLoading',
+      'playerSearchError',
+    ] as const) {
+      expect(t('en', key).length).toBeGreaterThan(0);
+      expect(t('hr', key).length).toBeGreaterThan(0);
+      expect(t('en', key)).not.toBe(t('hr', key));
+    }
+  });
+
+  it('keeps the {query} placeholder in the player no-results template for both locales', () => {
+    expect(t('en', 'playerSearchNoResults')).toContain('{query}');
+    expect(t('hr', 'playerSearchNoResults')).toContain('{query}');
+  });
 });
 
 describe('alternatePath', () => {
@@ -80,6 +124,11 @@ describe('alternatePath', () => {
   it('maps the English compare page to its Croatian translation and back', () => {
     expect(alternatePath('/compare', 'en')).toBe('/hr/compare');
     expect(alternatePath('/hr/compare', 'hr')).toBe('/compare');
+  });
+
+  it('maps the English teams page to its Croatian translation and back', () => {
+    expect(alternatePath('/teams', 'en')).toBe('/hr/teams');
+    expect(alternatePath('/hr/teams', 'hr')).toBe('/teams');
   });
 
   it('maps the English quiz page to its Croatian translation and back', () => {

@@ -13,9 +13,22 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ChampionsTimeline from '../../components/ChampionsTimeline.astro';
 import ChampionsSummary from '../../components/ChampionsSummary.astro';
 import References from '../../components/References.astro';
+import PrintDownloadLink from '../../components/PrintDownloadLink.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
-import { buildTimeline } from '../../lib/editions';
-import { withBase } from '../../lib/url';
+import {
+  buildBiggestFinalMargins,
+  buildHomeSoilTitles,
+  buildHostsSummary,
+  buildLongestStreaks,
+  buildLongestTitleGaps,
+  buildNearlyFinalists,
+  buildRunnerUpsWithoutTitle,
+  buildTimeline,
+} from '../../lib/editions';
+import { buildFinalsMeetings, buildRivalries, type CompetitionEditions } from '../../lib/compare';
+import { teamProfileSlug } from '../../lib/teamProfile';
+import { absolutePageUrl, withBase } from '../../lib/url';
+import { buildChampionsItemList, buildRivalriesItemList, type JsonLdObject } from '../../lib/jsonLd';
 
 const meta = await loadPageMeta('records-and-timelines');
 
@@ -104,13 +117,131 @@ const lastReviewed = allLoaded
   .at(-1) as string;
 
 const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+// Croatian counterpart of the English page's "Fiercest rivalries" ranking -
+// same generated data (buildFinalsMeetings/buildRivalries), only the
+// section's own prose and table headers are translated.
+const finalsMeetingCompetitions: CompetitionEditions[] = competitions.map((c) => ({
+  title: c.label,
+  slug: c.key,
+  editions: c.data.editions,
+}));
+const rivalries = buildRivalries(buildFinalsMeetings(finalsMeetingCompetitions));
+
+// Croatian counterpart of src/pages/records.astro's jsonLd block - same
+// generated data, own Croatian ItemList names, matching how every other
+// translated competition page names its structured data (see
+// hr/competitions/copa-america.astro).
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd: JsonLdObject[] = [
+  ...competitions.map((c) =>
+    buildChampionsItemList(c.data.champions, { pageUrl, name: `${c.label} - najuspješnije reprezentacije` }),
+  ),
+  ...competitions.map((c) =>
+    buildChampionsItemList(buildHostsSummary(c.data.editions), {
+      pageUrl,
+      name: `${c.label} - najčešći domaćini`,
+      unit: ['put domaćin', 'puta domaćin'],
+    }),
+  ),
+  ...competitions.flatMap((c) => {
+    const homeSoil = buildHomeSoilTitles(c.data.editions);
+    return homeSoil.length > 0
+      ? [
+          buildChampionsItemList(homeSoil, {
+            pageUrl,
+            name: `${c.label} - naslovi osvojeni na domaćem terenu`,
+            unit: ['naslov na domaćem terenu', 'naslova na domaćem terenu'],
+          }),
+        ]
+      : [];
+  }),
+  ...allLoaded.flatMap((c) => {
+    const streaks = buildLongestStreaks(c.data.editions);
+    return streaks.length > 0
+      ? [
+          buildChampionsItemList(streaks, {
+            pageUrl,
+            name: `${c.label} - uzastopni prvaci`,
+            unit: ['uzastopno izdanje', 'uzastopna izdanja'],
+          }),
+        ]
+      : [];
+  }),
+  ...competitions.flatMap((c) => {
+    const nearlyChampions = buildRunnerUpsWithoutTitle(c.data.editions);
+    return nearlyChampions.length > 0
+      ? [
+          buildChampionsItemList(nearlyChampions, {
+            pageUrl,
+            name: `${c.label} - vječiti drugoplasirani`,
+            unit: ['finale bez naslova', 'finala bez naslova'],
+          }),
+        ]
+      : [];
+  }),
+  ...competitions.flatMap((c) => {
+    const nearlyFinalists = buildNearlyFinalists(c.data.editions);
+    return nearlyFinalists.length > 0
+      ? [
+          buildChampionsItemList(nearlyFinalists, {
+            pageUrl,
+            name: `${c.label} - vječiti polufinalisti`,
+            unit: ['polufinale bez finala', 'polufinala bez finala'],
+          }),
+        ]
+      : [];
+  }),
+  ...allLoaded.flatMap((c) => {
+    const gaps = buildLongestTitleGaps(c.data.editions);
+    return gaps.length > 0
+      ? [
+          buildChampionsItemList(gaps, {
+            pageUrl,
+            name: `${c.label} - najduže čekanje na novi naslov`,
+            unit: ['godina', 'godine'],
+          }),
+        ]
+      : [];
+  }),
+  ...competitions.flatMap((c) => {
+    const margins = buildBiggestFinalMargins(c.data.editions);
+    return margins.length > 0
+      ? [
+          buildChampionsItemList(margins, {
+            pageUrl,
+            name: `${c.label} - najveće pobjede u finalu`,
+            unit: ['gol', 'gola'],
+          }),
+        ]
+      : [];
+  }),
+  ...individualAwards.map((a) =>
+    buildChampionsItemList(a.data.champions, {
+      pageUrl,
+      name: `${a.label} - najviše nagrada`,
+      unit: ['nagrada', 'nagrade'],
+    }),
+  ),
+  ...(rivalries.length > 0
+    ? [
+        buildRivalriesItemList(rivalries, {
+          pageUrl,
+          name: 'Najveći rivaliteti',
+          describe: (r) =>
+            `${r.meetings} susreta (${r.teamADisplayName} ${r.teamAWins}, ${r.teamBDisplayName} ${r.teamBWins}) u natjecanjima: ${r.competitions.join(', ')} - posljednji susret: ${r.mostRecent.year}. (${r.mostRecent.competition})`,
+        }),
+      ]
+    : []),
+];
 ---
 
 <BaseLayout
   title="Rekordi i vremenska crta"
-  description="Vremenske crte prvaka i poredak najuspješnijih reprezentacija generirani iz tablica Svjetskog prvenstva, EURA, Copa Américe i Lige nacija, uz vremensku crtu i poredak za Zlatnu loptu i Zlatnu kopačku, te objašnjenje kako se grupiraju povijesni nazivi država."
+  description="Vremenske crte prvaka, poredak najuspješnijih reprezentacija, najčešći domaćini, naslovi osvojeni na domaćem terenu, uzastopni prvaci, vječiti drugoplasirani, vječiti polufinalisti, najduže čekanje na novi naslov i najveće pobjede u finalu generirani iz tablica Svjetskog prvenstva, EURA, Copa Américe i Lige nacija, uz vremensku crtu i poredak za Zlatnu loptu i Zlatnu kopačku, te objašnjenje kako se grupiraju povijesni nazivi država."
   locale="hr"
   alternateHref={withBase('/records')}
+  jsonLd={jsonLd}
 >
   <article class="records stack">
     <header class="records__header">
@@ -121,6 +252,11 @@ const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
         najuspješnijih reprezentacija i pojedinačnih nagrada - sve generirano
         izravno iz podataka koje već koriste stranice pojedinih natjecanja.
       </p>
+      <PrintDownloadLink
+        slug="records-hr"
+        label="Preuzmi PDF za ispis"
+        hint="A4 položeno, svi poredci i vremenske crte s ove stranice."
+      />
     </header>
 
     <section class="stack" aria-labelledby="timeline-heading">
@@ -169,6 +305,377 @@ const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
           ))
         }
       </div>
+    </section>
+
+    <section class="stack" aria-labelledby="hosts-heading">
+      <h2 id="hosts-heading">Najčešći domaćini</h2>
+      <p class="muted">
+        Koliko je puta svaka država bila domaćin, poredano zasebno po
+        natjecanju. Za razliku od zbroja naslova iznad, ovdje se Zapadna
+        Njemačka ne ubraja u Njemačku - domaćinstvo je činjenica o
+        pojedinom izdanju, a ne pitanje sportskog nasljednika, pa se Zapadna
+        Njemačka (SP 1974., EURO 1988.) i Njemačka (SP 2006., EURO 2024.)
+        vode zasebno. Izdanje sa zajedničkim domaćinstvom (npr. "Belgija i
+        Nizozemska") broji se kao jedan zajednički domaćin, isto kao što to
+        već čini filtar domaćina na stranici svakog natjecanja.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => (
+            <div>
+              <ChampionsSummary
+                id={`hosts-${c.key}`}
+                champions={buildHostsSummary(c.data.editions)}
+                scaleMax={c.data.editions.length}
+                heading={c.label}
+                description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
+                icon="🏟️"
+                unit={['put domaćin', 'puta domaćin']}
+                winningYearsLabel="Godine domaćinstva: "
+                ofLabel="od"
+              />
+              <a class="records__teams-link" href={c.href}>
+                Pogledajte cijelu tablicu - {c.label} &rarr;
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="home-soil-heading">
+      <h2 id="home-soil-heading">Naslovi osvojeni na domaćem terenu</h2>
+      <p class="muted">
+        Izdanja u kojima je prvak ujedno i domaćin tog izdanja, poredana po
+        broju - generirano uspoređivanjem stupaca "Pobjednik" i "Domaćin"
+        svake tablice, ne ručno odabrano. Zajednički naziv domaćina kod
+        izdanja sa zajedničkim domaćinstvom (npr. "Kanada, Meksiko i
+        Sjedinjene Američke Države") broji se kao pogodak samo uz točno
+        podudaranje, pa jedan od nekoliko zajedničkih domaćina koji na kraju
+        osvoji naslov ovdje nije uračunat - naslov Španjolske na SP-u 2026.,
+        čiji su domaćini bile tri druge države, upravo je takav stvaran
+        primjer. Grupirano na isti način na koji "Najuspješnije
+        reprezentacije" ubraja Zapadnu Njemačku u Njemačku.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => {
+            const homeSoil = buildHomeSoilTitles(c.data.editions);
+            return (
+              <div>
+                {homeSoil.length > 0 ? (
+                  <ChampionsSummary
+                    id={`home-soil-${c.key}`}
+                    champions={homeSoil}
+                    scaleMax={Math.max(...homeSoil.map((s) => s.titles))}
+                    heading={c.label}
+                    description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
+                    icon="🏠"
+                    unit={['naslov na domaćem terenu', 'naslova na domaćem terenu']}
+                    winningYearsLabel="Godine domaćeg naslova: "
+                    ofLabel="od"
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">Nijedan domaćin još nije osvojio vlastito izdanje.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  Pogledajte cijelu tablicu - {c.label} &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="streaks-heading">
+      <h2 id="streaks-heading">Uzastopni prvaci</h2>
+      <p class="muted">
+        Svaki niz od dva ili više <em>uzastopnih izdanja</em> koje je osvojila
+        ista reprezentacija, igrač ili skupina igrača s podijeljenom nagradom
+        - generirano iz istih tablica kao i ostatak ove stranice, ne ručno
+        odabrano. Godina bez rezultata (Zlatna lopta 2020.) prekida niz koji
+        bi je premostio, a Zapadna Njemačka i Njemačka i ovdje se vode
+        zasebno, isto kao u odjeljku "Najčešći domaćini" iznad.
+      </p>
+      <div class="records__teams-grid">
+        {
+          allLoaded.map((c) => {
+            const streaks = buildLongestStreaks(c.data.editions);
+            return (
+              <div>
+                {streaks.length > 0 ? (
+                  <ChampionsSummary
+                    id={`streaks-${c.key}`}
+                    champions={streaks}
+                    scaleMax={Math.max(...streaks.map((s) => s.titles))}
+                    heading={c.label}
+                    description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
+                    icon="🔥"
+                    unit={['uzastopno izdanje', 'uzastopna izdanja']}
+                    winningYearsLabel="Godine niza: "
+                    ofLabel="od"
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">Nitko još nije osvojio dva izdanja zaredom.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  Pogledajte cijelu tablicu - {c.label} &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="nearly-champions-heading">
+      <h2 id="nearly-champions-heading">Vječiti drugoplasirani</h2>
+      <p class="muted">
+        Reprezentacije koje su igrale finale - generirano iz stupca
+        "Drugo mjesto" svake tablice - ali nikada nisu osvojile natjecanje,
+        poredane po broju izgubljenih finala. Reprezentacija se briše s ovog
+        popisa čim jednom osvoji naslov, pa se ranije izgubljeno finale ne
+        "pripisuje" reprezentaciji koja je kasnije ipak osvojila trofej.
+        Grupirano na isti način na koji "Najuspješnije reprezentacije" iznad
+        ubraja Zapadnu Njemačku u Njemačku.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => {
+            const nearlyChampions = buildRunnerUpsWithoutTitle(c.data.editions);
+            return (
+              <div>
+                {nearlyChampions.length > 0 ? (
+                  <ChampionsSummary
+                    id={`nearly-champions-${c.key}`}
+                    champions={nearlyChampions}
+                    scaleMax={Math.max(...nearlyChampions.map((s) => s.titles))}
+                    heading={c.label}
+                    description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
+                    icon="🥈"
+                    unit={['finale bez naslova', 'finala bez naslova']}
+                    winningYearsLabel="Godine finala: "
+                    ofLabel="od"
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">Svaki dosadašnji finalist na kraju je osvojio naslov.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  Pogledajte cijelu tablicu - {c.label} &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="nearly-finalists-heading">
+      <h2 id="nearly-finalists-heading">Vječiti polufinalisti</h2>
+      <p class="muted">
+        Reprezentacije koje su barem jednom igrale polufinale - završile na
+        trećem, četvrtom ili drugom polufinalnom mjestu - ali nikada nisu
+        stigle do finala, poredane po broju polufinalnih nastupa.
+        Reprezentacija se briše s ovog popisa čim jednom stigne do finala,
+        bez obzira osvoji li ga na kraju ili ne. Izdanja Copa América prije
+        uvođenja doigravanja za treće mjesto nemaju taj stupac, pa ne
+        pridonose ovom popisu. Grupirano na isti način na koji "Najuspješnije
+        reprezentacije" iznad ubraja Zapadnu Njemačku u Njemačku.
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => {
+            const nearlyFinalists = buildNearlyFinalists(c.data.editions);
+            return (
+              <div>
+                {nearlyFinalists.length > 0 ? (
+                  <ChampionsSummary
+                    id={`nearly-finalists-${c.key}`}
+                    champions={nearlyFinalists}
+                    scaleMax={Math.max(...nearlyFinalists.map((s) => s.titles))}
+                    heading={c.label}
+                    description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
+                    icon="🥉"
+                    unit={['polufinale bez finala', 'polufinala bez finala']}
+                    winningYearsLabel="Godine polufinala: "
+                    ofLabel="od"
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">Svaki dosadašnji polufinalist na kraju je stigao do finala.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  Pogledajte cijelu tablicu - {c.label} &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="title-gaps-heading">
+      <h2 id="title-gaps-heading">Najduže čekanje na novi naslov</h2>
+      <p class="muted">
+        Za svaku reprezentaciju, igrača ili skupinu igrača s podijeljenom
+        nagradom koja ima barem dva naslova, najveći razmak u godinama između
+        dvije pobjede - generirano iz istih godina osvajanja kao i
+        "Najuspješnije reprezentacije" iznad, ne ručno odabrano. Suprotno
+        pitanje od "Uzastopnih prvaka": taj odjeljak traži najkraći mogući
+        razmak (sljedeće izdanje), a ovaj najduži razmak u karijeri
+        pojedinog naslova. Grupirano na isti način na koji "Najuspješnije
+        reprezentacije" ubraja Zapadnu Njemačku u Njemačku.
+      </p>
+      <div class="records__teams-grid">
+        {
+          allLoaded.map((c) => {
+            const gaps = buildLongestTitleGaps(c.data.editions);
+            return (
+              <div>
+                {gaps.length > 0 ? (
+                  <ChampionsSummary
+                    id={`title-gaps-${c.key}`}
+                    champions={gaps}
+                    scaleMax={Math.max(...gaps.map((g) => g.titles))}
+                    heading={c.label}
+                    description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
+                    icon="⏳"
+                    unit={['godina', 'godine']}
+                    winningYearsLabel="Razmak: "
+                    ofLabel="od"
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">Nitko to još nije osvojio dvaput.</p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  Pogledajte cijelu tablicu - {c.label} &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="final-margins-heading">
+      <h2 id="final-margins-heading">Najveće pobjede u finalu</h2>
+      <p class="muted">
+        Svako finale rangirano po razlici u pogocima, generirano izravno iz
+        retka "Finale" svake tablice - jedanaesterci se igraju samo nakon
+        neriješenog rezultata, pa finale odlučeno jedanaestercima ispravno
+        završava na dnu popisa s razlikom 0, umjesto da se rezultat
+        jedanaesteraca pogrešno računa kao razlika u pogocima. Tablica Copa
+        Américe nema stupac s rezultatom finala, pa nije rangirana ovdje
+        (detalje po utakmicama, gdje postoje, potražite na njezinoj
+        stranici).
+      </p>
+      <div class="records__teams-grid">
+        {
+          competitions.map((c) => {
+            const margins = buildBiggestFinalMargins(c.data.editions);
+            return (
+              <div>
+                {margins.length > 0 ? (
+                  <ChampionsSummary
+                    id={`final-margins-${c.key}`}
+                    champions={margins}
+                    scaleMax={Math.max(...margins.map((m) => m.titles))}
+                    heading={c.label}
+                    description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
+                    icon="⚽"
+                    unit={['gol', 'gola']}
+                    winningYearsLabel="Godina: "
+                    ofLabel="od"
+                  />
+                ) : (
+                  <>
+                    <h2>{c.label}</h2>
+                    <p class="muted">
+                      Tablica ovog natjecanja nema stupac s rezultatom finala pa se ne može rangirati po razlici u pogocima.
+                    </p>
+                  </>
+                )}
+                <a class="records__teams-link" href={c.href}>
+                  Pogledajte cijelu tablicu - {c.label} &rarr;
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="rivalries-heading">
+      <h2 id="rivalries-heading">Najveći rivaliteti</h2>
+      <p class="muted">
+        Svaki par reprezentacija koje su se 2 ili više puta susrele u finalu
+        FIFA Svjetskog prvenstva, UEFA Europskog prvenstva, Copa Américe ili
+        UEFA Lige nacija, rangiran po ukupnom broju susreta - generirano iz
+        stupaca Prvak/Drugo mjesto koji već postoje na stranici svakog
+        natjecanja, bez novog uredničkog sadržaja.
+      </p>
+      {
+        rivalries.length > 0 ? (
+          <div
+            class="t-wrap"
+            tabindex="0"
+            role="region"
+            aria-label="Najveći rivaliteti, rangirani po broju susreta u finalu"
+          >
+            <table class="records__rivalries-table">
+              <caption class="visually-hidden">Najveći rivaliteti, rangirani po broju susreta u finalu</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Poredak</th>
+                  <th scope="col">Rivalitet</th>
+                  <th scope="col">Susreti</th>
+                  <th scope="col">Međusobni omjer</th>
+                  <th scope="col">Natjecanja</th>
+                  <th scope="col">Posljednji susret</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rivalries.map((r, i) => (
+                  <tr>
+                    <td>{i + 1}</td>
+                    <th scope="row">
+                      <a href={withBase(`/teams/${teamProfileSlug(r.teamAId)}`)}>{r.teamADisplayName}</a>
+                      {' - '}
+                      <a href={withBase(`/teams/${teamProfileSlug(r.teamBId)}`)}>{r.teamBDisplayName}</a>
+                    </th>
+                    <td>{r.meetings}</td>
+                    <td>
+                      {r.teamAWins}-{r.teamBWins}
+                      {r.teamAWins === r.teamBWins ? '' : ` (vodi ${r.teamAWins > r.teamBWins ? r.teamADisplayName : r.teamBDisplayName})`}
+                    </td>
+                    <td>{r.competitions.join(', ')}</td>
+                    <td>
+                      {r.mostRecent.year} ({r.mostRecent.competition})
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p class="muted">Nijedan par reprezentacija još se nije susreo u više od jednog finala.</p>
+        )
+      }
     </section>
 
     <section class="stack" aria-labelledby="award-timeline-heading">
@@ -309,5 +816,38 @@ const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
     gap: 0.5rem;
     max-width: 68ch;
     padding-left: 1.2rem;
+  }
+
+  .t-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+  }
+
+  .records__rivalries-table {
+    width: 100%;
+    min-width: 34rem;
+    border-collapse: collapse;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .records__rivalries-table th,
+  .records__rivalries-table td {
+    padding: 0.55rem 0.7rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    white-space: nowrap;
+  }
+
+  .records__rivalries-table thead th {
+    background: var(--bg-subtle);
+    font-size: 0.85rem;
+  }
+
+  .records__rivalries-table tbody tr:last-child th,
+  .records__rivalries-table tbody tr:last-child td {
+    border-bottom: none;
   }
 </style>

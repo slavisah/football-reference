@@ -24,6 +24,18 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(row).toContainText('France');
   });
 
+  test('the Final column explains a.e.t. via a native abbr tooltip, linked to the Glossary', async ({
+    page,
+  }) => {
+    const row1934 = page.locator('tbody tr[data-year="1934"]');
+    const abbr = row1934.locator('td abbr');
+    await expect(abbr).toHaveText('a.e.t.');
+    await expect(abbr).toHaveAttribute('title', 'after extra time');
+
+    await page.goto('glossary');
+    await expect(page.locator('.glossary-page__entry dt', { hasText: 'a.e.t.' })).toBeVisible();
+  });
+
   test('filtering by Spain shows only Spain title years', async ({ page }) => {
     await page.selectOption('#world-cup-winner', 'Spain');
 
@@ -93,7 +105,7 @@ test.describe('World Cup page on a 360px phone', () => {
   });
 
   test('shows the last reviewed date and source links', async ({ page }) => {
-    await expect(page.locator('time[datetime="2026-08-11"]')).toBeVisible();
+    await expect(page.locator('time[datetime="2026-08-14"]')).toBeVisible();
     const sources = page.locator('.references__list a');
     await expect(sources.first()).toBeVisible();
     const count = await sources.count();
@@ -110,9 +122,13 @@ test.describe('World Cup page on a 360px phone', () => {
 
   test('shows the Memorable moments and Editorial notes sections from content/fifa-world-cup.md', async ({ page }) => {
     const notes = page.locator('.notes__card');
-    await expect(notes).toHaveCount(3);
+    await expect(notes).toHaveCount(4);
+    await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
+    await expect(page.getByText('The two semifinal winners meet in the final')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
-    await expect(page.getByText('Croatia reached its first final in 2018.')).toBeVisible();
+    // Scoped to the notes cards, not the table - the same sentence is now
+    // also joined onto its edition row as a "tap a year for a story" reveal.
+    await expect(notes.getByText('Croatia reached its first final in 2018.')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Editorial notes' })).toBeVisible();
     // *Maracanazo* renders as emphasis, not literal asterisks.
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
@@ -171,6 +187,60 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(page).toHaveURL(/\/hr\/competitions\/world-cup\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
+
+  test('shows a compact podium card for every edition, top four finishers only', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Podium by edition' })).toBeVisible();
+    const cards = page.locator('.podium__card');
+    await expect(cards).toHaveCount(23);
+    // Most recent edition first (2026: Spain beat Argentina, England third, France fourth).
+    const latest = cards.first();
+    await expect(latest.getByText('2026')).toBeVisible();
+    await expect(latest.getByText('Hosted by Canada, Mexico and United States')).toBeVisible();
+    await expect(latest).toContainText('Spain');
+    await expect(latest).toContainText('Argentina');
+    await expect(latest).toContainText('England');
+    await expect(latest).toContainText('France');
+  });
+
+  test('lets a reader tap a year to reveal its short story, closed by default', async ({ page }) => {
+    const storyCell = page.locator('tbody tr[data-year="2026"] td[data-label="Story"]');
+    const details = storyCell.locator('details.story-reveal');
+    await expect(details).toHaveJSProperty('open', false);
+    await expect(storyCell.getByText('Spain won its second title in 2026.')).toBeHidden();
+
+    await storyCell.locator('summary').click();
+    await expect(details).toHaveJSProperty('open', true);
+    await expect(storyCell.getByText('Spain won its second title in 2026.')).toBeVisible();
+
+    // An edition with no Memorable-moments bullet (e.g. 2014) shows an em dash, not an empty/broken cell.
+    const noStoryCell = page.locator('tbody tr[data-year="2014"] td[data-label="Story"]');
+    await expect(noStoryCell).toHaveText('—');
+  });
+
+  test('shows a host locator map grouped by region, with every host and its hosting years', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Where the tournament has been hosted' })).toBeVisible();
+    // Decorative - the real, accessible content is the region list below it.
+    await expect(page.locator('.host-map__svg')).toHaveAttribute('aria-hidden', 'true');
+    await expect(page.locator('.host-map__dot')).toHaveCount(19);
+
+    const regions = page.locator('.host-map__region');
+    await expect(regions).toHaveCount(5);
+    await expect(page.getByRole('heading', { name: 'South America', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Europe', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'North America', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Asia', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Africa', level: 4 })).toBeVisible();
+
+    // Brazil hosted twice, in South America.
+    const brazil = page.locator('.host-map__item', { hasText: 'Brazil' });
+    await expect(brazil.locator('.host-map__count')).toHaveText('2 times');
+    await expect(brazil.locator('.host-map__years')).toContainText('1950, 2014');
+
+    // The 2026 co-host cell is kept as one combined entry, matching the table's own host filter.
+    await expect(page.locator('.host-map__item', { hasText: 'Canada, Mexico and United States' })).toBeVisible();
+  });
 });
 
 test.describe('EURO page on a 360px phone', () => {
@@ -192,16 +262,44 @@ test.describe('EURO page on a 360px phone', () => {
   });
 
   test('shows the Historical format note as a paragraph and Memorable moments as a list', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
+    await expect(page.getByText('no third-place match has been played since 1980')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Historical format note' })).toBeVisible();
     await expect(page.locator('.notes__card p', { hasText: 'other semifinalist' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
-    await expect(page.getByText("Antonín Panenka's famous chipped penalty")).toBeVisible();
+    // Scoped to the notes cards, not the table - the same sentence is now
+    // also joined onto its edition row as a "tap a year for a story" reveal.
+    await expect(page.locator('.notes__card').getByText("Antonín Panenka's famous chipped penalty")).toBeVisible();
   });
 
   test('the language switcher opens the Croatian EURO page', async ({ page }) => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/competitions\/euro\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+
+  test('the delayed EURO 2020 edition gets its story, matched by its first-mentioned year', async ({ page }) => {
+    const storyCell = page.locator('tbody tr[data-year="2020"] td[data-label="Story"]');
+    await storyCell.locator('summary').click();
+    await expect(storyCell.getByText('The delayed EURO 2020 was played in 2021 across multiple countries.')).toBeVisible();
+  });
+
+  test('shows a host locator map with one Europe region, including the multi-city 2020 edition', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Where the tournament has been hosted' })).toBeVisible();
+    await expect(page.locator('.host-map__svg')).toHaveAttribute('aria-hidden', 'true');
+    await expect(page.locator('.host-map__dot')).toHaveCount(14);
+
+    const regions = page.locator('.host-map__region');
+    await expect(regions).toHaveCount(1);
+    await expect(page.getByRole('heading', { name: 'Europe', level: 4 })).toBeVisible();
+
+    // France hosted three times.
+    const france = page.locator('.host-map__item', { hasText: 'France' });
+    await expect(france.locator('.host-map__count')).toHaveText('3 times');
+    await expect(france.locator('.host-map__years')).toContainText('1960, 1984, 2016');
+
+    // 2020 has no single host country - still gets its own marker/entry.
+    await expect(page.locator('.host-map__item', { hasText: 'Eleven European cities' })).toBeVisible();
   });
 });
 
@@ -262,11 +360,17 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
   test('shows the translated Format milestones, Memorable moments and Editorial notes sections', async ({
     page,
   }) => {
-    await expect(page.locator('.notes__card')).toHaveCount(3);
+    await expect(page.locator('.notes__card')).toHaveCount(4);
+    await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
+    await expect(page.getByText('Pobjednici polufinala igraju finale')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Prekretnice formata' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Uredničke napomene' })).toBeVisible();
-    await expect(page.getByText('Hrvatska je 2018. stigla do svog prvog finala.')).toBeVisible();
+    // Scoped to the notes cards, not the table - the same sentence is now
+    // also joined onto its edition row as a "tap a year for a story" reveal.
+    await expect(
+      page.locator('.notes__card').getByText('Hrvatska je 2018. stigla do svog prvog finala.'),
+    ).toBeVisible();
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
   });
 
@@ -287,6 +391,34 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/competitions\/world-cup\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('shows the translated podium cards, one per edition', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Pobjednici po izdanju' })).toBeVisible();
+    const cards = page.locator('.podium__card');
+    await expect(cards).toHaveCount(23);
+    const latest = cards.first();
+    await expect(latest.getByText('2026')).toBeVisible();
+    await expect(latest.getByText('Domaćin: Canada, Mexico and United States')).toBeVisible();
+    await expect(latest).toContainText('Spain');
+    await expect(latest).toContainText('Argentina');
+  });
+
+  test('shows the translated host map with Croatian region headings and the same 19 hosts as the English page', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Gdje je Svjetsko prvenstvo igralo domaćinu' })).toBeVisible();
+    await expect(page.locator('.host-map__dot')).toHaveCount(19);
+    await expect(page.getByRole('heading', { name: 'Južna Amerika', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Europa', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Sjeverna Amerika', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Azija', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Afrika', level: 4 })).toBeVisible();
+
+    // Country names themselves stay untranslated, matching every other table/card on this page.
+    const brazil = page.locator('.host-map__item', { hasText: 'Brazil' });
+    await expect(brazil.locator('.host-map__count')).toHaveText('2 puta');
+    await expect(page.locator('.host-map__item', { hasText: 'Urugvaj' })).toHaveCount(0);
   });
 });
 
@@ -323,6 +455,8 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
   test('shows the Historical format note as a paragraph and Memorable moments as a translated list', async ({
     page,
   }) => {
+    await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
+    await expect(page.getByText('utakmica za treće mjesto nije se igrala od 1980')).toBeVisible();
     await expect(
       page.getByRole('heading', { name: 'Povijesna napomena o formatu' }),
     ).toBeVisible();
@@ -330,7 +464,9 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
       page.locator('.notes__card p', { hasText: 'drugi polufinalist' }),
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
-    await expect(page.getByText('Slavna "panenka" Antonína Panenke')).toBeVisible();
+    // Scoped to the notes cards, not the table - the same sentence is now
+    // also joined onto its edition row as a "tap a year for a story" reveal.
+    await expect(page.locator('.notes__card').getByText('Slavna "panenka" Antonína Panenke')).toBeVisible();
   });
 
   test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
@@ -350,6 +486,19 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/competitions\/euro\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('shows the translated host map with a Croatian region heading and the same 14 hosts as the English page', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Gdje je Europsko prvenstvo igralo domaćinu' })).toBeVisible();
+    await expect(page.locator('.host-map__dot')).toHaveCount(14);
+    await expect(page.getByRole('heading', { name: 'Europa', level: 4 })).toBeVisible();
+
+    // Country names themselves stay untranslated, matching every other table/card on this page.
+    const france = page.locator('.host-map__item', { hasText: 'France' });
+    await expect(france.locator('.host-map__count')).toHaveText('3 puta');
+    await expect(page.locator('.host-map__item', { hasText: 'Eleven European cities' })).toBeVisible();
   });
 });
 
@@ -375,7 +524,9 @@ test.describe('Golden Boot page on a 360px phone', () => {
   });
 
   test('shows the World Cup notes and EURO notes sections, one per table', async ({ page }) => {
-    await expect(page.locator('.notes__card')).toHaveCount(2);
+    await expect(page.locator('.notes__card')).toHaveCount(3);
+    await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
+    await expect(page.getByText('it is a personal scoring award, not the team championship')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'World Cup notes' })).toBeVisible();
     await expect(page.getByText("Just Fontaine's 13 goals in 1958 remain the record")).toBeVisible();
     await expect(page.getByRole('heading', { name: 'EURO notes' })).toBeVisible();
@@ -389,6 +540,37 @@ test.describe('Golden Boot page on a 360px phone', () => {
 
     const euroVisible = page.locator('#golden-boot-euro-table tbody tr:not([hidden])');
     await expect(euroVisible).toHaveCount(17);
+  });
+
+  test('the two tables write independently namespaced URL params, not one shared key', async ({ page }) => {
+    await page.selectOption('#golden-boot-world-cup-year', '1958');
+    await expect(page).toHaveURL(/world-cup-year=1958/);
+
+    // Filtering the EURO table must not clobber the World Cup table's own
+    // param under a bare, unprefixed "year" key shared by both instances.
+    await page.selectOption('#golden-boot-euro-year', '1984');
+    await expect(page).toHaveURL(/world-cup-year=1958/);
+    await expect(page).toHaveURL(/euro-year=1984/);
+    await expect(page).not.toHaveURL(/[?&]year=/);
+
+    // Both tables must still reflect their own filter, independently.
+    await expect(page.locator('#golden-boot-world-cup-year')).toHaveValue('1958');
+    await expect(page.locator('#golden-boot-euro-year')).toHaveValue('1984');
+  });
+
+  test('a shared link with both namespaced params restores each table independently', async ({ page, baseURL }) => {
+    await page.goto(
+      baseURL
+        ? `${baseURL}competitions/golden-boot?world-cup-year=1958&euro-year=1984`
+        : '/competitions/golden-boot?world-cup-year=1958&euro-year=1984',
+    );
+
+    await expect(page.locator('#golden-boot-world-cup-year')).toHaveValue('1958');
+    await expect(page.locator('#golden-boot-euro-year')).toHaveValue('1984');
+    const wcVisible = page.locator('#golden-boot-world-cup-table tbody tr:not([hidden])');
+    await expect(wcVisible).toHaveCount(1);
+    const euroVisible = page.locator('#golden-boot-euro-table tbody tr:not([hidden])');
+    await expect(euroVisible).toHaveCount(1);
   });
 
   test('sorting the World Cup table by Goals (most first) puts Just Fontaine\'s 1958 record first', async ({ page }) => {
@@ -449,7 +631,11 @@ test.describe('Croatian Golden Boot page (/hr/competitions/golden-boot) on a 360
   test('shows the translated World Cup notes and EURO notes sections, one per table', async ({
     page,
   }) => {
-    await expect(page.locator('.notes__card')).toHaveCount(2);
+    await expect(page.locator('.notes__card')).toHaveCount(3);
+    await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
+    await expect(
+      page.getByText('riječ je o osobnoj nagradi za golove, a ne o momčadskom naslovu prvaka'),
+    ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Napomene o Svjetskom prvenstvu' })).toBeVisible();
     await expect(page.getByText('13 golova Justa Fontainea 1958. ostaje rekord')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Napomene o EURU' })).toBeVisible();
@@ -463,6 +649,21 @@ test.describe('Croatian Golden Boot page (/hr/competitions/golden-boot) on a 360
 
     const euroVisible = page.locator('#golden-boot-euro-table tbody tr:not([hidden])');
     await expect(euroVisible).toHaveCount(17);
+  });
+
+  test('a shared link with both namespaced params restores each table independently', async ({ page, baseURL }) => {
+    await page.goto(
+      baseURL
+        ? `${baseURL}hr/competitions/golden-boot?world-cup-year=1958&euro-year=1984`
+        : '/hr/competitions/golden-boot?world-cup-year=1958&euro-year=1984',
+    );
+
+    await expect(page.locator('#golden-boot-world-cup-year')).toHaveValue('1958');
+    await expect(page.locator('#golden-boot-euro-year')).toHaveValue('1984');
+    const wcVisible = page.locator('#golden-boot-world-cup-table tbody tr:not([hidden])');
+    await expect(wcVisible).toHaveCount(1);
+    const euroVisible = page.locator('#golden-boot-euro-table tbody tr:not([hidden])');
+    await expect(euroVisible).toHaveCount(1);
   });
 
   test('shows the same World Cup award totals as the English page', async ({ page, baseURL }) => {
@@ -531,6 +732,13 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
     await expect(page.locator('.champions')).not.toContainText('Not awarded');
   });
 
+  test('shows the How it works section from content/ballon-dor.md', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
+    await expect(
+      page.getByText('it is not a team competition or a national-team trophy'),
+    ).toBeVisible();
+  });
+
   test("the language switcher opens the Croatian Ballon d'Or page", async ({ page }) => {
     await page.goto('competitions/ballon-dor');
     await page.locator('a.lang-switch').click();
@@ -595,6 +803,13 @@ test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360p
     await expect(page.getByText('Lev Jašin ostaje jedini vratar')).toBeVisible();
   });
 
+  test('shows the translated How it works section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
+    await expect(
+      page.getByText('nije riječ o momčadskom natjecanju ni nagradi za reprezentaciju'),
+    ).toBeVisible();
+  });
+
   test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
     page,
     request,
@@ -626,6 +841,13 @@ test.describe('Copa América page on a 360px phone', () => {
       return el.scrollWidth - el.clientWidth;
     });
     expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('shows the How it works section from content/copa-america.md', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
+    await expect(
+      page.getByText('has not always run on a fixed four-year cycle'),
+    ).toBeVisible();
   });
 
   test('shows an audited "Format" badge per edition', async ({ page }) => {
@@ -696,6 +918,51 @@ test.describe('Copa América page on a 360px phone', () => {
     await expect(page).toHaveURL(/\/hr\/competitions\/copa-america\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
+
+  test('shows a compact podium card for every edition, top four finishers only, omitting "—" placeholders', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Podium by edition' })).toBeVisible();
+    const cards = page.locator('.podium__card');
+    await expect(cards).toHaveCount(48);
+
+    // Most recent edition first (2024: Argentina beat Colombia, Uruguay third, Canada fourth).
+    const latest = cards.first();
+    await expect(latest.getByText('2024')).toBeVisible();
+    await expect(latest.getByText('Hosted by United States')).toBeVisible();
+    await expect(latest).toContainText('Argentina');
+    await expect(latest).toContainText('Colombia');
+    await expect(latest).toContainText('Uruguay');
+    await expect(latest).toContainText('Canada');
+
+    // The 1975 home-and-away edition has no standalone third-place match -
+    // its card must show champion/runner-up only, not a literal "—" name.
+    const cardsText = await cards.allTextContents();
+    const card1975 = cardsText.find((text) => text.includes('1975'));
+    expect(card1975).toContain('Peru');
+    expect(card1975).toContain('Colombia');
+    expect(card1975).not.toContain('—');
+  });
+
+  test('shows a host locator map grouped by South America then North America, skipping the Home-and-away editions', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Where the tournament has been hosted' })).toBeVisible();
+    await expect(page.locator('.host-map__dot')).toHaveCount(11);
+
+    const regions = page.locator('.host-map__region');
+    await expect(regions).toHaveCount(2);
+    await expect(page.getByRole('heading', { name: 'South America', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'North America', level: 4 })).toBeVisible();
+
+    // Uruguay hosted more than once.
+    const uruguay = page.locator('.host-map__item', { hasText: 'Uruguay' });
+    await expect(uruguay.locator('.host-map__count')).not.toHaveText('1 time');
+
+    // The three Home-and-away editions (1975, 1979, 1983) have no single host - no marker for them.
+    await expect(page.locator('.host-map__item', { hasText: 'Home-and-away' })).toHaveCount(0);
+    await expect(page.locator('.host-map__item', { hasText: 'United States' })).toBeVisible();
+  });
 });
 
 test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 360px phone', () => {
@@ -729,6 +996,15 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     );
   });
 
+  test('has a translated "Priča" story column with a Croatian tap-to-reveal story', async ({ page }) => {
+    await expect(page.getByRole('columnheader', { name: 'Priča', exact: true })).toBeVisible();
+    const storyCell = page.locator('tbody tr[data-year="2024"] td[data-label="Priča"]');
+    await storyCell.getByText('📖 Dodirni za priču').click();
+    await expect(
+      storyCell.getByText('Argentina je 2024. preuzela vodstvo kao najuspješnija reprezentacija natjecanja.'),
+    ).toBeVisible();
+  });
+
   test('filtering by prvak (winner) Uruguay updates the shareable URL and status text', async ({
     page,
   }) => {
@@ -751,7 +1027,16 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
 
   test('shows the translated Memorable moments section', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
-    await expect(page.getByText('Bolivija je osvojila svoju jedinu titulu')).toBeVisible();
+    // Scoped to the notes cards, not the table - the same sentence is now
+    // also joined onto its edition row as a "tap a year for a story" reveal.
+    await expect(page.locator('.notes__card').getByText('Bolivija je osvojila svoju jedinu titulu')).toBeVisible();
+  });
+
+  test('shows the translated How it works section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
+    await expect(
+      page.getByText('nije uvijek imala fiksni četverogodišnji ciklus'),
+    ).toBeVisible();
   });
 
   test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
@@ -772,6 +1057,25 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await expect(page).toHaveURL(/\/football-reference\/competitions\/copa-america\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });
+
+  test('shows the translated podium cards, one per edition', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Pobjednici po izdanju' })).toBeVisible();
+    const cards = page.locator('.podium__card');
+    await expect(cards).toHaveCount(48);
+    const latest = cards.first();
+    await expect(latest.getByText('2024')).toBeVisible();
+    await expect(latest.getByText('Domaćin: United States')).toBeVisible();
+    await expect(latest).toContainText('Argentina');
+    await expect(latest).toContainText('Colombia');
+  });
+
+  test('shows the translated host map with South America/North America region headings', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Gdje je Copa América igrala domaćinu' })).toBeVisible();
+    await expect(page.locator('.host-map__dot')).toHaveCount(11);
+    await expect(page.getByRole('heading', { name: 'Južna Amerika', level: 4 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Sjeverna Amerika', level: 4 })).toBeVisible();
+    await expect(page.locator('.host-map__item', { hasText: 'United States' })).toBeVisible();
+  });
 });
 
 test.describe('Nations League page on a 360px phone', () => {
@@ -791,6 +1095,50 @@ test.describe('Nations League page on a 360px phone', () => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/competitions\/nations-league\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+
+  test('shows the Key facts and Memorable moments sections from content/uefa-nations-league.md', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
+    await expect(page.getByText('Held every two years.')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Key facts' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
+    // Scoped to the notes cards, not the table - the same sentence is now
+    // also joined onto its edition row as a "tap a year for a story" reveal.
+    await expect(page.locator('.notes__card').getByText('Italy hosted the 2021 Finals')).toBeVisible();
+  });
+
+  test('joins a season row (e.g. "2018-19") to its story by the Finals year, not the season start year', async ({
+    page,
+  }) => {
+    const storyCell = page.locator('tbody tr[data-year="2018–19"] td[data-label="Story"]');
+    await storyCell.locator('summary').click();
+    await expect(storyCell.getByText('Portugal won the first-ever Nations League Finals in 2019')).toBeVisible();
+  });
+
+  test('shows a compact podium card for every edition, top four finishers only', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Podium by edition' })).toBeVisible();
+    const cards = page.locator('.podium__card');
+    await expect(cards).toHaveCount(4);
+    // Most recent edition first (2024-25: Portugal beat Spain, France third, Germany fourth).
+    const latest = cards.first();
+    await expect(latest.getByText('2024–25')).toBeVisible();
+    await expect(latest.getByText('Hosted by Germany')).toBeVisible();
+    await expect(latest).toContainText('Portugal');
+    await expect(latest).toContainText('Spain');
+    await expect(latest).toContainText('France');
+    await expect(latest).toContainText('Germany');
+  });
+
+  test('shows a host locator map with one Europe region and every Finals host', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Where the tournament has been hosted' })).toBeVisible();
+    await expect(page.locator('.host-map__dot')).toHaveCount(4);
+    await expect(page.getByRole('heading', { name: 'Europe', level: 4 })).toBeVisible();
+    await expect(page.locator('.host-map__item', { hasText: 'Portugal' })).toBeVisible();
+    await expect(page.locator('.host-map__item', { hasText: 'Germany' })).toBeVisible();
   });
 });
 
@@ -843,6 +1191,31 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
     await expect(page.getByText('Hrvatska je 2023. stigla do svog prvog finala')).toBeVisible();
   });
 
+  test('shows the translated How it works section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
+    await expect(page.getByText('Igra se svake dvije godine.')).toBeVisible();
+  });
+
+  test('shows the translated Memorable moments section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
+    // Scoped to the notes cards, not the table - the same sentence is now
+    // also joined onto its edition row as a "tap a year for a story" reveal.
+    await expect(
+      page.locator('.notes__card').getByText('Italija je 2021. bila domaćin Final Foura'),
+    ).toBeVisible();
+  });
+
+  test('shows the translated podium cards, one per edition', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Pobjednici po izdanju' })).toBeVisible();
+    const cards = page.locator('.podium__card');
+    await expect(cards).toHaveCount(4);
+    const latest = cards.first();
+    await expect(latest.getByText('2024–25')).toBeVisible();
+    await expect(latest.getByText('Domaćin: Germany')).toBeVisible();
+    await expect(latest).toContainText('Portugal');
+    await expect(latest).toContainText('Spain');
+  });
+
   test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
     page,
     request,
@@ -860,6 +1233,15 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/competitions\/nations-league\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('shows the translated host map with a Croatian region heading', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Gdje je Final Four Lige nacija igrao domaćinu' }),
+    ).toBeVisible();
+    await expect(page.locator('.host-map__dot')).toHaveCount(4);
+    await expect(page.getByRole('heading', { name: 'Europa', level: 4 })).toBeVisible();
+    await expect(page.locator('.host-map__item', { hasText: 'Portugal' })).toBeVisible();
   });
 });
 
@@ -1067,6 +1449,156 @@ test.describe('Records page on a 360px phone', () => {
     ).toBeVisible();
   });
 
+  test('shows a "Most frequent hosts" ranking per competition, keeping West Germany and Germany distinct', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Most frequent hosts' })).toBeVisible();
+    await expect(page.locator('#hosts-world-cup-heading')).toBeVisible();
+    await expect(page.locator('#hosts-nations-league-heading')).toBeVisible();
+
+    const worldCupHosts = page.locator('section.champions:has(#hosts-world-cup-heading) .champions__name');
+    await expect(worldCupHosts.filter({ hasText: 'West Germany' })).toBeVisible();
+    await expect(worldCupHosts.filter({ hasText: /^Germany$/ })).toBeVisible();
+  });
+
+  test('shows a "Titles won on home soil" ranking, excluding a co-host that went on to win', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Titles won on home soil' })).toBeVisible();
+
+    // Copa América has by far the most home-soil titles - Uruguay tops it
+    // with seven (1917, 1923, 1924, 1942, 1956, 1967, 1995).
+    const copaHomeSoil = page.locator('section.champions:has(#home-soil-copa-america-heading)');
+    await expect(copaHomeSoil.locator('.champions__name').first()).toHaveText('Uruguay');
+    await expect(copaHomeSoil.locator('.champions__count').first()).toHaveText(/7/);
+
+    // Spain won the co-hosted 2026 FIFA World Cup (hosted by Canada, Mexico
+    // and United States) - it is not one of the hosts, so it must not appear
+    // in the World Cup's home-soil ranking at all.
+    const worldCupHomeSoil = page.locator('section.champions:has(#home-soil-world-cup-heading)');
+    await expect(worldCupHomeSoil.locator('.champions__name').filter({ hasText: /^Spain$/ })).toHaveCount(0);
+    await expect(worldCupHomeSoil.locator('.champions__name').filter({ hasText: /^Uruguay$/ })).toBeVisible();
+  });
+
+  test('shows a "Back-to-back champions" streak ranking, including a competition with none yet', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Back-to-back champions' })).toBeVisible();
+
+    const ballonDorStreaks = page.locator('section.champions:has(#streaks-ballon-dor-heading)');
+    await expect(ballonDorStreaks.locator('.champions__name').filter({ hasText: 'Lionel Messi' })).toBeVisible();
+    await expect(ballonDorStreaks.locator('.champions__count').first()).toHaveText(/4/);
+    await expect(ballonDorStreaks.getByText('2009, 2010, 2011, 2012')).toBeVisible();
+
+    // UEFA Nations League has had four different champions in its four
+    // editions so far, so it falls back to the "no streak yet" message
+    // instead of an empty ranking list.
+    await expect(page.getByText('No one has won two editions in a row yet.').first()).toBeVisible();
+  });
+
+  test('shows a "Nearly champions" ranking of runner-up teams that have never won', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Nearly champions' })).toBeVisible();
+
+    const worldCupNearly = page.locator('section.champions:has(#nearly-champions-world-cup-heading)');
+    await expect(worldCupNearly.locator('.champions__name').filter({ hasText: 'Netherlands' })).toBeVisible();
+    await expect(worldCupNearly.locator('.champions__count').first()).toHaveText(/3/);
+    await expect(worldCupNearly.getByText('1974, 1978, 2010')).toBeVisible();
+
+    // Argentina has lost a World Cup final (1930, 1990) but has also won it
+    // three times, so it must not appear in this "never won" ranking at all.
+    await expect(worldCupNearly.locator('.champions__name').filter({ hasText: /^Argentina$/ })).toHaveCount(0);
+  });
+
+  test('shows a "Nearly finalists" ranking of semifinal teams that have never reached a final', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Nearly finalists' })).toBeVisible();
+
+    const worldCupNearly = page.locator('section.champions:has(#nearly-finalists-world-cup-heading)');
+    await expect(worldCupNearly.locator('.champions__name').filter({ hasText: 'Yugoslavia' })).toBeVisible();
+    await expect(worldCupNearly.locator('.champions__count').first()).toHaveText(/2/);
+    await expect(worldCupNearly.getByText('1930, 1962')).toBeVisible();
+
+    // The Netherlands has lost three World Cup finals (a "Nearly champions"
+    // entry above) but never a mere third/fourth-place finish without also
+    // reaching the final, so it must not appear in this one-tier-down ranking.
+    await expect(worldCupNearly.locator('.champions__name').filter({ hasText: /^Netherlands$/ })).toHaveCount(0);
+  });
+
+  test('shows a "Longest wait between titles" ranking, including a team whose two titles are back-to-back', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Longest wait between titles' })).toBeVisible();
+
+    const worldCupGaps = page.locator('section.champions:has(#title-gaps-world-cup-heading)');
+    await expect(worldCupGaps.locator('.champions__name').filter({ hasText: 'Italy' })).toBeVisible();
+    await expect(worldCupGaps.locator('.champions__count').first()).toHaveText(/44/);
+    await expect(worldCupGaps.getByText('1938, 1982')).toBeVisible();
+
+    // UEFA Nations League has only had one repeat champion so far (Portugal,
+    // 2018-19 and 2024-25) - it still gets an entry here, not the "hasn't
+    // happened yet" fallback the streaks section shows.
+    const nationsLeagueGaps = page.locator('section.champions:has(#title-gaps-nations-league-heading)');
+    await expect(nationsLeagueGaps.locator('.champions__name').filter({ hasText: 'Portugal' })).toBeVisible();
+  });
+
+  test('shows a "Biggest final wins" ranking by goal margin, with Copa América excluded for lacking a Final score column', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Biggest final wins' })).toBeVisible();
+
+    const worldCupMargins = page.locator('section.champions:has(#final-margins-world-cup-heading)');
+    await expect(worldCupMargins.locator('.champions__name').first()).toHaveText('Brazil 5–2 Sweden');
+    await expect(worldCupMargins.locator('.champions__count').first()).toHaveText(/3/);
+    await expect(worldCupMargins.getByText('1958')).toBeVisible();
+
+    const euroMargins = page.locator('section.champions:has(#final-margins-euro-heading)');
+    await expect(euroMargins.locator('.champions__name').first()).toHaveText('Spain 4–0 Italy');
+    await expect(euroMargins.locator('.champions__count').first()).toHaveText(/4/);
+
+    // A final decided on penalties (drawn after normal/extra time) ranks with
+    // a margin of 0, not the penalty shootout score.
+    await expect(worldCupMargins.getByText(/Brazil 0–0 Italy; 3–2 pens/)).toBeVisible();
+    const shootoutRow = worldCupMargins.locator('.champions__item').filter({ hasText: '0–0 Italy' });
+    await expect(shootoutRow.locator('.champions__count')).toHaveText(/0/);
+
+    // Copa América's source table has no "Final" score column, so it falls
+    // back to an explanatory message instead of an empty ranking.
+    await expect(
+      page.getByText('This competition\'s table has no "Final" score column to rank by margin.'),
+    ).toBeVisible();
+  });
+
+  test('shows a "Fiercest rivalries" ranking of pairs that have met 2+ times in a final, topped by Argentina vs Uruguay', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Fiercest rivalries' })).toBeVisible();
+
+    const rivalriesTable = page.locator('.records__rivalries-table');
+    const firstRow = rivalriesTable.locator('tbody tr').first();
+    await expect(firstRow).toContainText('Argentina');
+    await expect(firstRow).toContainText('Uruguay');
+    // Argentina and Uruguay have met more than any other pair across the four
+    // team competitions (mostly Copa América finals).
+    await expect(firstRow.locator('td').nth(1)).toHaveText(/^\d+$/);
+    const meetingsCount = Number(await firstRow.locator('td').nth(1).innerText());
+    expect(meetingsCount).toBeGreaterThan(5);
+
+    // Each team name links to its own /teams/<slug> profile.
+    await expect(firstRow.getByRole('link', { name: 'Argentina' })).toHaveAttribute(
+      'href',
+      /\/teams\/argentina\/?$/,
+    );
+
+    // West Germany and Germany merge into one rivalry pair (a France-vs-
+    // Germany or similar entry would double-count otherwise) - assert the
+    // merged display name appears at least once rather than a bare
+    // "West Germany" rivalry row existing separately from "Germany".
+    await expect(rivalriesTable.getByText('Germany (incl. West Germany)').first()).toBeVisible();
+  });
+
   test("shows a separate timeline and ranking for the Ballon d'Or and Golden Boot awards", async ({
     page,
   }) => {
@@ -1075,6 +1607,19 @@ test.describe('Records page on a 360px phone', () => {
     await expect(page.locator('#timeline-golden-boot-euro-heading')).toBeVisible();
     await expect(page.locator('#awards-ballon-dor-heading')).toBeVisible();
     await expect(page.getByText('Ousmane Dembélé').first()).toBeVisible();
+  });
+
+  test('offers a downloadable print PDF covering every ranking and timeline', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/records.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
   });
 
   test('the language switcher opens the Croatian records page', async ({ page }) => {
@@ -1135,6 +1680,146 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
     ).toBeVisible();
   });
 
+  test('shows the same "Most frequent hosts" World Cup ranking as the English page', async ({
+    page,
+    baseURL,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Najčešći domaćini' })).toBeVisible();
+    const hrTop = await page
+      .locator('section.champions:has(#hosts-world-cup-heading) .champions__name')
+      .first()
+      .textContent();
+
+    await page.goto(baseURL ? `${baseURL}records` : '/records');
+    const enTop = await page
+      .locator('section.champions:has(#hosts-world-cup-heading) .champions__name')
+      .first()
+      .textContent();
+
+    expect(hrTop).toBe(enTop);
+  });
+
+  test('shows the translated "Naslovi osvojeni na domaćem terenu" ranking, matching the English Copa América numbers', async ({
+    page,
+    baseURL,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Naslovi osvojeni na domaćem terenu' })).toBeVisible();
+
+    const hrTop = await page
+      .locator('section.champions:has(#home-soil-copa-america-heading) .champions__name')
+      .first()
+      .textContent();
+    const hrCount = await page
+      .locator('section.champions:has(#home-soil-copa-america-heading) .champions__count')
+      .first()
+      .textContent();
+
+    await page.goto(baseURL ? `${baseURL}records` : '/records');
+    const enTop = await page
+      .locator('section.champions:has(#home-soil-copa-america-heading) .champions__name')
+      .first()
+      .textContent();
+    const enCount = await page
+      .locator('section.champions:has(#home-soil-copa-america-heading) .champions__count')
+      .first()
+      .textContent();
+
+    expect(hrTop).toBe(enTop);
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
+  });
+
+  test('shows the translated "Uzastopni prvaci" streak ranking, including the no-streak-yet fallback', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Uzastopni prvaci' })).toBeVisible();
+
+    const ballonDorStreaks = page.locator('section.champions:has(#streaks-ballon-dor-heading)');
+    await expect(ballonDorStreaks.locator('.champions__name').filter({ hasText: 'Lionel Messi' })).toBeVisible();
+    await expect(ballonDorStreaks.getByText('2009, 2010, 2011, 2012')).toBeVisible();
+
+    await expect(page.getByText('Nitko još nije osvojio dva izdanja zaredom.').first()).toBeVisible();
+  });
+
+  test('shows the translated "Vječiti drugoplasirani" ranking, matching the English World Cup numbers', async ({
+    page,
+    baseURL,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Vječiti drugoplasirani' })).toBeVisible();
+
+    const hrTop = await page
+      .locator('section.champions:has(#nearly-champions-world-cup-heading) .champions__name')
+      .first()
+      .textContent();
+    const hrCount = await page
+      .locator('section.champions:has(#nearly-champions-world-cup-heading) .champions__count')
+      .first()
+      .textContent();
+
+    await page.goto(baseURL ? `${baseURL}records` : '/records');
+    const enTop = await page
+      .locator('section.champions:has(#nearly-champions-world-cup-heading) .champions__name')
+      .first()
+      .textContent();
+    const enCount = await page
+      .locator('section.champions:has(#nearly-champions-world-cup-heading) .champions__count')
+      .first()
+      .textContent();
+
+    expect(hrTop).toBe(enTop);
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
+  });
+
+  test('shows the translated "Najduže čekanje na novi naslov" ranking, matching the English World Cup numbers', async ({
+    page,
+    baseURL,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Najduže čekanje na novi naslov' })).toBeVisible();
+
+    const hrTop = await page
+      .locator('section.champions:has(#title-gaps-world-cup-heading) .champions__name')
+      .first()
+      .textContent();
+    const hrCount = await page
+      .locator('section.champions:has(#title-gaps-world-cup-heading) .champions__count')
+      .first()
+      .textContent();
+
+    await page.goto(baseURL ? `${baseURL}records` : '/records');
+    const enTop = await page
+      .locator('section.champions:has(#title-gaps-world-cup-heading) .champions__name')
+      .first()
+      .textContent();
+    const enCount = await page
+      .locator('section.champions:has(#title-gaps-world-cup-heading) .champions__count')
+      .first()
+      .textContent();
+
+    expect(hrTop).toBe(enTop);
+    expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
+  });
+
+  test('shows the translated "Najveći rivaliteti" ranking, matching the English page\'s top pair and meeting count', async ({
+    page,
+    baseURL,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Najveći rivaliteti' })).toBeVisible();
+
+    const hrFirstRow = page.locator('.records__rivalries-table tbody tr').first();
+    const hrText = await hrFirstRow.textContent();
+    const hrMeetings = await hrFirstRow.locator('td').nth(1).textContent();
+
+    await page.goto(baseURL ? `${baseURL}records` : '/records');
+    const enFirstRow = page.locator('.records__rivalries-table tbody tr').first();
+    const enText = await enFirstRow.textContent();
+    const enMeetings = await enFirstRow.locator('td').nth(1).textContent();
+
+    expect(hrText).toContain('Argentina');
+    expect(hrText).toContain('Uruguay');
+    expect(enText).toContain('Argentina');
+    expect(enText).toContain('Uruguay');
+    expect(hrMeetings).toBe(enMeetings);
+  });
+
   test('the language switcher returns to the English records page', async ({ page }) => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/records\/?$/);
@@ -1145,6 +1830,19 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
     const barLabel = await page.locator('.champions__bar').first().getAttribute('aria-label');
     expect(barLabel).toMatch(/^\d+ od \d+$/);
     expect(barLabel).not.toContain(' of ');
+  });
+
+  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/records-hr.pdf"]');
+    await expect(link).toContainText('Preuzmi PDF za ispis');
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
   });
 });
 
@@ -1291,6 +1989,38 @@ test.describe('Quiz page on a 360px phone', () => {
     expect(firstChoiceCount).toBeGreaterThanOrEqual(3);
   });
 
+  test('includes a "which year did {player} win the Ballon d\'Or" question, answerable like any other card', async ({
+    page,
+  }) => {
+    const yearCard = page
+      .locator('.quiz-card')
+      .filter({ hasText: /In which year did .+ win the Ballon d.Or\?/ })
+      .first();
+    await expect(yearCard).toBeVisible();
+
+    const answerIndex = Number(await yearCard.getAttribute('data-answer-index'));
+    await yearCard.locator('input[type="radio"]').nth(answerIndex).check();
+    await yearCard.locator('.quiz-card__check').click();
+    await expect(yearCard.locator('.quiz-card__feedback')).toHaveText('Correct!');
+  });
+
+  test('includes a "which year did {team} win {tournament}" question for a one-time champion', async ({
+    page,
+  }) => {
+    const yearCard = page
+      .locator('.quiz-card')
+      .filter({
+        hasText: /In which year did .+ win the (FIFA World Cup|UEFA EURO|Copa América|UEFA Nations League)\?/,
+      })
+      .first();
+    await expect(yearCard).toBeVisible();
+
+    const answerIndex = Number(await yearCard.getAttribute('data-answer-index'));
+    await yearCard.locator('input[type="radio"]').nth(answerIndex).check();
+    await yearCard.locator('.quiz-card__check').click();
+    await expect(yearCard.locator('.quiz-card__feedback')).toHaveText('Correct!');
+  });
+
   test('answering a question updates the score, and can be checked with the keyboard', async ({
     page,
   }) => {
@@ -1357,6 +2087,35 @@ test.describe('Quiz page on a 360px phone', () => {
     await expect(firstOrderCard.locator('.quiz-order__item.is-correct')).toHaveCount(rankCount);
   });
 
+  test('champion order challenge: assigning the same rank twice disables "Check order" with a warning', async ({
+    page,
+  }) => {
+    const firstOrderCard = page.locator('.quiz-card:has(.quiz-order__items)').first();
+    const ranks = firstOrderCard.locator('.quiz-order__rank');
+    const rankCount = await ranks.count();
+    expect(rankCount).toBeGreaterThanOrEqual(2);
+    const checkButton = firstOrderCard.locator('.quiz-order__check');
+    const feedback = firstOrderCard.locator('.quiz-card__feedback');
+
+    // Fill every select validly first, then collide the last two on the
+    // same rank - reproduces a reader re-picking an already-used number.
+    for (let i = 0; i < rankCount; i += 1) {
+      await ranks.nth(i).selectOption(String(i + 1));
+    }
+    await expect(checkButton).toBeEnabled();
+    await ranks.nth(rankCount - 1).selectOption('1');
+
+    await expect(checkButton).toBeDisabled();
+    await expect(feedback).toHaveText(
+      'Each rank can only be used once - two items currently share a number.',
+    );
+
+    // Resolving the collision re-enables the button and clears the warning.
+    await ranks.nth(rankCount - 1).selectOption(String(rankCount));
+    await expect(checkButton).toBeEnabled();
+    await expect(feedback).toHaveText('');
+  });
+
   test('champion order challenge is keyboard operable and has its own answer fallback', async ({
     page,
   }) => {
@@ -1387,6 +2146,9 @@ test.describe('Quiz page on a 360px phone', () => {
     await expect(page.getByText('Press "Restart quiz" to clear your answers and play again.')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Question types in this quiz' })).toBeVisible();
     await expect(page.getByText("Who won the Ballon d'Or in a given year?")).toBeVisible();
+    await expect(
+      page.getByText('In which year did a given team win a tournament, or a given Ballon d\'Or'),
+    ).toBeVisible();
   });
 });
 
@@ -1423,6 +2185,36 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
     await expect(page.locator('#quiz-score-value')).toHaveText('1');
   });
 
+  test('includes a "koje je godine ... osvojio Zlatnu loptu" question, answerable like any other card', async ({
+    page,
+  }) => {
+    const yearCard = page
+      .locator('.quiz-card')
+      .filter({ hasText: /Koje je godine .+ osvojio nagradu Zlatna lopta\?/ })
+      .first();
+    await expect(yearCard).toBeVisible();
+
+    const answerIndex = Number(await yearCard.getAttribute('data-answer-index'));
+    await yearCard.locator('input[type="radio"]').nth(answerIndex).check();
+    await yearCard.locator('.quiz-card__check').click();
+    await expect(yearCard.locator('.quiz-card__feedback')).toHaveText('Točno!');
+  });
+
+  test('includes a "koje je godine ... osvojio natjecanje" question for a one-time team champion', async ({
+    page,
+  }) => {
+    const yearCard = page
+      .locator('.quiz-card')
+      .filter({ hasText: /Koje je godine .+ osvojio natjecanje .+\?/ })
+      .first();
+    await expect(yearCard).toBeVisible();
+
+    const answerIndex = Number(await yearCard.getAttribute('data-answer-index'));
+    await yearCard.locator('input[type="radio"]').nth(answerIndex).check();
+    await yearCard.locator('.quiz-card__check').click();
+    await expect(yearCard.locator('.quiz-card__feedback')).toHaveText('Točno!');
+  });
+
   test('champion order challenge: a correct ranking shows Croatian feedback', async ({ page }) => {
     const firstOrderCard = page.locator('.quiz-card:has(.quiz-order__items)').first();
     const ranks = firstOrderCard.locator('.quiz-order__rank');
@@ -1437,6 +2229,24 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
     await firstOrderCard.locator('.quiz-order__check').click();
 
     await expect(firstOrderCard.locator('.quiz-card__feedback')).toHaveText('Točan redoslijed!');
+  });
+
+  test('champion order challenge: duplicate ranks show the Croatian warning', async ({ page }) => {
+    const firstOrderCard = page.locator('.quiz-card:has(.quiz-order__items)').first();
+    const ranks = firstOrderCard.locator('.quiz-order__rank');
+    const rankCount = await ranks.count();
+    expect(rankCount).toBeGreaterThanOrEqual(2);
+    const checkButton = firstOrderCard.locator('.quiz-order__check');
+
+    for (let i = 0; i < rankCount; i += 1) {
+      await ranks.nth(i).selectOption(String(i + 1));
+    }
+    await ranks.nth(rankCount - 1).selectOption('1');
+
+    await expect(checkButton).toBeDisabled();
+    await expect(firstOrderCard.locator('.quiz-card__feedback')).toHaveText(
+      'Svaki broj poretka smije se koristiti samo jednom - dvije stavke trenutačno dijele isti broj.',
+    );
   });
 
   test('the language switcher returns to the English quiz page', async ({ page }) => {
@@ -1456,6 +2266,9 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Vrste pitanja u ovom kvizu' })).toBeVisible();
     await expect(page.getByText('Tko je osvojio Zlatnu loptu u danoj godini?')).toBeVisible();
+    await expect(
+      page.getByText('Koje je godine dana reprezentacija osvojila natjecanje'),
+    ).toBeVisible();
   });
 });
 
@@ -1542,6 +2355,68 @@ test.describe('Croatian sources page (/hr/about/sources) on a 360px phone', () =
   });
 });
 
+test.describe('Glossary page on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('glossary');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('lists a.e.t. and pens with their plain-English explanations', async ({ page }) => {
+    const aetEntry = page.locator('.glossary-page__entry', { hasText: 'a.e.t.' });
+    await expect(aetEntry.locator('dt')).toHaveText('a.e.t.');
+    await expect(aetEntry.locator('dd')).toContainText('after extra time');
+
+    const pensEntry = page.locator('.glossary-page__entry', { hasText: 'pens' });
+    await expect(pensEntry.locator('dt')).toHaveText('pens');
+    await expect(pensEntry.locator('dd')).toContainText('penalty shoot-out');
+  });
+
+  test('is reachable from the nav', async ({ page }) => {
+    await page.goto('');
+    await expect(page.locator('nav a[href$="/glossary"]').first()).toBeVisible();
+  });
+
+  test('the language switcher opens the Croatian glossary page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/hr\/glossary$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+  });
+});
+
+test.describe('Croatian glossary page (/hr/glossary) on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('hr/glossary');
+  });
+
+  test('has no horizontal page overflow', async ({ page }) => {
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('renders translated chrome with the same glossary terms as English', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
+    await expect(page.getByRole('heading', { name: 'Pojmovnik', level: 1 })).toBeVisible();
+    const aetEntry = page.locator('.glossary-page__entry', { hasText: 'a.e.t.' });
+    await expect(aetEntry.locator('dt')).toHaveText('a.e.t.');
+  });
+
+  test('the language switcher returns to the English glossary page', async ({ page }) => {
+    await page.locator('a.lang-switch').click();
+    await expect(page).toHaveURL(/\/glossary$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+});
+
 test.describe('404 page on a 360px phone', () => {
   // GitHub Pages serves dist/404.html for any unmatched path under the
   // project's base path, in either language - there is no server-side
@@ -1583,7 +2458,7 @@ test.describe('404 page on a 360px phone', () => {
     const hrefs = await page.locator('.not-found__links a').evaluateAll((links) =>
       links.map((link) => (link as HTMLAnchorElement).getAttribute('href')),
     );
-    expect(hrefs.length).toBe(22); // 11 nav pages x 2 languages
+    expect(hrefs.length).toBe(30); // 15 nav pages x 2 languages
     for (const href of hrefs) {
       const response = await request.get(href!);
       expect(response.ok(), `expected ${href} to resolve`).toBe(true);
@@ -1618,6 +2493,24 @@ test.describe('Installability and offline reading', () => {
     expect(manifest.icons.some((icon: { purpose?: string }) => icon.purpose === 'maskable')).toBe(
       true,
     );
+  });
+
+  test('links a Croatian web app manifest that launches to the Croatian home page, not the English one', async ({
+    page,
+  }) => {
+    await page.goto('hr/');
+    const manifestHref = await page.locator('link[rel="manifest"]').getAttribute('href');
+    expect(manifestHref).toBe('/football-reference/hr/manifest.webmanifest');
+
+    const response = await page.request.get(manifestHref!);
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('manifest+json');
+
+    const manifest = await response.json();
+    expect(manifest.lang).toBe('hr');
+    expect(manifest.start_url).toBe('/football-reference/hr/');
+    expect(manifest.name).toBe('The Ultimate Football Reference');
+    expect(manifest.description).not.toContain('family-friendly');
   });
 
   test('sets a theme-color meta tag and an apple touch icon', async ({ page }) => {
@@ -1801,7 +2694,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     );
     await expect(page.locator('link[rel="alternate"][hreflang="hr"]')).toHaveAttribute(
       'href',
-      `${SITE}/hr/competitions/world-cup`,
+      `${SITE}/hr/competitions/world-cup/`,
     );
 
     await page.goto('hr/competitions/world-cup');
@@ -1815,7 +2708,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     );
     await expect(page.locator('link[rel="alternate"][hreflang="en"]')).toHaveAttribute(
       'href',
-      `${SITE}/competitions/world-cup`,
+      `${SITE}/competitions/world-cup/`,
     );
   });
 
@@ -1837,13 +2730,36 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(response.headers()['content-type']).toContain('xml');
     const body = await response.text();
 
-    // 11 nav pages x 2 languages.
-    expect(body.match(/<url>/g)?.length).toBe(22);
-    expect(body).toContain(`<loc>${SITE}/competitions/world-cup</loc>`);
-    expect(body).toContain(`<loc>${SITE}/hr/competitions/world-cup</loc>`);
+    // 15 nav pages x 2 languages (the index loop, now including /teams,
+    // /players, /compare-players and /glossary), plus 40 team profile pages
+    // x 2 languages (src/pages/teams/[slug].astro and its Croatian sibling)
+    // and 98 player profile pages x 2 languages (src/pages/players/[slug].astro
+    // and its Croatian sibling), each pair carrying reciprocal hreflang
+    // alternates - /glossary is a fully bilingual NAV_LINKS entry from launch
+    // (see docs/PROJECT_STATUS.md's Glossary entry), so it flows through the
+    // main loop like every other top-level page.
+    expect(body.match(/<url>/g)?.length).toBe(306);
+    expect(body).toContain(`<loc>${SITE}/glossary/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/glossary/</loc>`);
+    expect(body).toContain(`hreflang="hr" href="${SITE}/hr/glossary/"`);
+    expect(body).toContain(`<loc>${SITE}/compare-players/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/compare-players/</loc>`);
+    expect(body).toContain(`hreflang="hr" href="${SITE}/hr/compare-players/"`);
+    expect(body).toContain(`<loc>${SITE}/competitions/world-cup/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/competitions/world-cup/</loc>`);
     expect(body).toContain(
-      `hreflang="hr" href="${SITE}/hr/competitions/world-cup"`,
+      `hreflang="hr" href="${SITE}/hr/competitions/world-cup/"`,
     );
+    expect(body).toContain(`<loc>${SITE}/teams/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/teams/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/teams/brazil/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/teams/brazil/</loc>`);
+    expect(body).toContain(`hreflang="hr" href="${SITE}/hr/teams/brazil/"`);
+    expect(body).toContain(`<loc>${SITE}/players/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/players/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/players/gerd-muller/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/players/gerd-muller/</loc>`);
+    expect(body).toContain(`hreflang="hr" href="${SITE}/hr/players/gerd-muller/"`);
     expect(body).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
   });
 
@@ -1852,11 +2768,38 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     return raw.map((text) => JSON.parse(text));
   }
 
-  test('the home page has no JSON-LD (breadcrumb is skipped on the home page itself)', async ({
+  test('the home page carries a WebSite block instead of a breadcrumb (it has no parent page)', async ({
     page,
   }) => {
-    await page.goto('/');
-    expect(await page.locator('script[type="application/ld+json"]').count()).toBe(0);
+    // '' (not '/'), matching every other home-page test in this file: a
+    // leading slash resolves against the baseURL's *origin*, landing on the
+    // server root rather than the /football-reference/ base path, which the
+    // previous version of this test got away with only because "0 JSON-LD
+    // blocks" was also vacuously true on that 404 page.
+    await page.goto('');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks).toHaveLength(1);
+    expect(blocks[0]).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'The Ultimate Football Reference',
+      url: `${SITE}/`,
+      description:
+        'A family-friendly guide to the history of major international football competitions and awards.',
+      inLanguage: 'en',
+    });
+  });
+
+  test('the Croatian home page carries its own translated WebSite block', async ({ page }) => {
+    await page.goto('hr/');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks).toHaveLength(1);
+    expect(blocks[0]).toMatchObject({
+      '@type': 'WebSite',
+      url: `${SITE}/hr/`,
+      inLanguage: 'hr',
+    });
+    expect((blocks[0] as { description: string }).description).toContain('Nogometna povijest');
   });
 
   test('a competition page carries a BreadcrumbList, a champions ItemList and a SportsEvent for the latest edition', async ({
@@ -1917,6 +2860,378 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(blocks.find((b) => b['@type'] === 'ItemList').name).toBe(
       'FIFA Svjetsko prvenstvo - prvaci po broju naslova',
     );
+  });
+
+  test('/records carries a BreadcrumbList plus one ItemList per ranking section, skipping zero-streak fallbacks', async ({
+    page,
+  }) => {
+    await page.goto('records');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks).toHaveLength(40);
+    expect(blocks.filter((b) => b['@type'] === 'BreadcrumbList')).toHaveLength(1);
+
+    const lists = blocks.filter((b) => b['@type'] === 'ItemList');
+    expect(lists).toHaveLength(39);
+    expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Most successful teams');
+    expect(lists.map((l) => l.name)).toContain('Copa América - Most frequent hosts');
+    expect(lists.map((l) => l.name)).toContain('Golden Boot (World Cup) - Back-to-back champions');
+    expect(lists.map((l) => l.name)).toContain('Golden Boot (EURO) - Most awards');
+    expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Nearly champions');
+    expect(lists.map((l) => l.name)).toContain('UEFA Nations League - Nearly champions');
+    // "Nearly finalists" (semifinal but never a final) is populated for all
+    // four team competitions today - every one of them has at least one team
+    // stuck at that tier, so there's no empty-ranking fallback to skip here.
+    expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Nearly finalists');
+    expect(lists.map((l) => l.name)).toContain('Copa América - Nearly finalists');
+    // Same scope restriction as "Nearly champions" - individual awards have
+    // no Third/Fourth/semifinalist column to begin with.
+    expect(lists.map((l) => l.name)).not.toContain("Ballon d'Or - Nearly finalists");
+    // "Titles won on home soil" only covers the four team competitions - same
+    // scope as "Nearly champions" - and every one of them has at least one
+    // real home-soil title today, so there's no empty-ranking fallback case
+    // to skip.
+    expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Titles won on home soil');
+    expect(lists.map((l) => l.name)).toContain('Copa América - Titles won on home soil');
+    expect(lists.map((l) => l.name)).not.toContain("Ballon d'Or - Titles won on home soil");
+    // Nations League (4 different champions so far) and the EURO Golden Boot
+    // have no back-to-back streak, so records.astro renders a text fallback
+    // instead of a ranking for them - no ItemList should exist for either.
+    expect(lists.map((l) => l.name)).not.toContain('UEFA Nations League - Back-to-back champions');
+    expect(lists.map((l) => l.name)).not.toContain('Golden Boot (EURO) - Back-to-back champions');
+    // "Nearly champions" only covers the four team competitions - Ballon
+    // d'Or and Golden Boot recognize a player, not a team, and have no
+    // Runner-up column to begin with.
+    expect(lists.map((l) => l.name)).not.toContain("Ballon d'Or - Nearly champions");
+    // "Longest wait between titles" covers all seven loaded tables (unlike
+    // "Nearly champions", it applies to individual awards too) and every one
+    // of them today has at least one repeat title holder, so there's no
+    // zero-gap fallback case to skip.
+    expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Longest wait between titles');
+    expect(lists.map((l) => l.name)).toContain('UEFA Nations League - Longest wait between titles');
+    expect(lists.map((l) => l.name)).toContain("Ballon d'Or - Longest wait between titles");
+    expect(lists.map((l) => l.name)).toContain('Golden Boot (World Cup) - Longest wait between titles');
+    // "Biggest final wins" only covers the three team competitions whose
+    // table has a "Final" score column - Copa América has none (see
+    // buildTimeline's own doc comment), so it must not appear here.
+    expect(lists.map((l) => l.name)).toContain('FIFA World Cup - Biggest final wins');
+    expect(lists.map((l) => l.name)).toContain('UEFA EURO - Biggest final wins');
+    expect(lists.map((l) => l.name)).toContain('UEFA Nations League - Biggest final wins');
+    expect(lists.map((l) => l.name)).not.toContain('Copa América - Biggest final wins');
+
+    // "Fiercest rivalries" (added 2026-08-20) is populated today - Argentina
+    // and Uruguay alone have met 15+ times - so there's no empty-ranking
+    // fallback case live to exercise.
+    const rivalries = lists.find((l) => l.name === 'Fiercest rivalries');
+    expect(rivalries).toBeDefined();
+    expect(rivalries.itemListElement[0].item.name).toContain('Argentina');
+    expect(rivalries.itemListElement[0].item.name).toContain('Uruguay');
+    expect(rivalries.itemListElement[0].item.description).toMatch(/^\d+ meetings? \(/);
+  });
+
+  test('/hr/records carries its own Croatian ItemList names for every ranking section', async ({
+    page,
+  }) => {
+    await page.goto('hr/records');
+    const blocks = await jsonLdBlocks(page);
+    const lists = blocks.filter((b) => b['@type'] === 'ItemList');
+    expect(lists).toHaveLength(39);
+    expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - najuspješnije reprezentacije');
+    expect(lists.map((l) => l.name)).toContain('Zlatna lopta - uzastopni prvaci');
+    expect(lists.map((l) => l.name)).not.toContain('UEFA Liga nacija - uzastopni prvaci');
+    expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - vječiti drugoplasirani');
+    expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - vječiti polufinalisti');
+    expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - najduže čekanje na novi naslov');
+    expect(lists.map((l) => l.name)).toContain('Copa América - naslovi osvojeni na domaćem terenu');
+    expect(lists.map((l) => l.name)).not.toContain("Zlatna lopta - naslovi osvojeni na domaćem terenu");
+    expect(lists.map((l) => l.name)).toContain('FIFA Svjetsko prvenstvo - najveće pobjede u finalu');
+    expect(lists.map((l) => l.name)).not.toContain('Copa América - najveće pobjede u finalu');
+
+    const rivalries = lists.find((l) => l.name === 'Najveći rivaliteti');
+    expect(rivalries).toBeDefined();
+    expect(rivalries.itemListElement[0].item.description).toMatch(/^\d+ susreta \(/);
+  });
+
+  test('/compare carries a BreadcrumbList and one ItemList ranking every national team by combined record', async ({
+    page,
+  }) => {
+    await page.goto('compare');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList']);
+
+    const rowCount = await page.locator('.compare__table--all tbody tr').count();
+    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
+    expect(itemList.name).toBe(
+      'All national teams - combined World Cup, EURO, Copa América and Nations League record',
+    );
+    expect(itemList.itemListElement).toHaveLength(rowCount);
+    expect(itemList.itemListElement[0].item.description).toContain('across the World Cup, EURO, Copa América and Nations League');
+  });
+
+  test('/hr/compare carries its own Croatian ItemList name and description', async ({ page }) => {
+    await page.goto('hr/compare');
+    const blocks = await jsonLdBlocks(page);
+    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
+    expect(itemList.name).toBe(
+      'Sve reprezentacije - ukupan učinak na Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija',
+    );
+    expect(itemList.itemListElement[0].item.description).toContain('naslova');
+  });
+
+  test('/teams carries a BreadcrumbList and an ItemList of every national team, distinct from /compare\'s', async ({
+    page,
+  }) => {
+    await page.goto('teams');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList']);
+
+    const teamCount = await page.locator('.teams__grid .teams__link').count();
+    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
+    expect(itemList.name).toBe(
+      'National teams directory - combined World Cup, EURO, Copa América and Nations League record',
+    );
+    expect(itemList.itemListElement).toHaveLength(teamCount);
+    expect(itemList.itemListElement.some((item: { item: { name: string } }) => item.item.name === 'Brazil')).toBe(
+      true,
+    );
+  });
+
+  test('/hr/teams carries its own Croatian ItemList name and description', async ({ page }) => {
+    await page.goto('hr/teams');
+    const blocks = await jsonLdBlocks(page);
+    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
+    expect(itemList.name).toBe(
+      'Popis reprezentacija - ukupan učinak na Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija',
+    );
+    expect(itemList.itemListElement[0].item.description).toContain('naslova');
+  });
+
+  test('/teams/brazil carries a BreadcrumbList and an ItemList of its competition appearances, one Thing per competition', async ({
+    page,
+  }) => {
+    await page.goto('teams/brazil');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList']);
+
+    // A profile page is nested under its directory, so the breadcrumb is
+    // three levels deep (Home > Teams > Brazil) rather than the flat "Home >
+    // page" every other non-home page gets - see BaseLayout.astro's
+    // `breadcrumbTrail` prop.
+    const breadcrumb = blocks.find((b) => b['@type'] === 'BreadcrumbList');
+    expect(breadcrumb.itemListElement.map((i: { name: string }) => i.name)).toEqual([
+      'Home',
+      'Teams',
+      'Brazil - Full history',
+    ]);
+    expect(breadcrumb.itemListElement[1].item).toMatch(/\/teams\/$/);
+
+    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
+    expect(itemList.name).toBe('Brazil - competition appearances');
+    // Brazil has appeared in a tracked FIFA World Cup and Copa América final
+    // or semifinal, but never a EURO or Nations League one (national-team
+    // eligibility) - exactly two Things, matching the two <section> cards
+    // the page itself renders.
+    const sectionCount = await page.locator('.team-profile section.card.stack').count();
+    expect(itemList.itemListElement).toHaveLength(sectionCount);
+    const names = itemList.itemListElement.map((item: { item: { name: string } }) => item.item.name);
+    expect(names).toContain('FIFA World Cup');
+    expect(names).toContain('Copa América');
+    // The description reuses the exact role/year pairs the page's own <ol>
+    // renders (e.g. "Champion (1958)"), not an invented summary count.
+    const worldCupItem = itemList.itemListElement.find(
+      (item: { item: { name: string } }) => item.item.name === 'FIFA World Cup',
+    );
+    expect(worldCupItem.item.description).toContain('Champion (1958)');
+    expect(worldCupItem.item.description).toContain('Champion (2002)');
+  });
+
+  test('/hr/teams/brazil carries its own Croatian ItemList name, same appearance descriptions as the English page', async ({
+    page,
+  }) => {
+    await page.goto('teams/brazil');
+    const englishItemList = (await jsonLdBlocks(page)).find((b) => b['@type'] === 'ItemList');
+
+    await page.goto('hr/teams/brazil');
+    const itemList = (await jsonLdBlocks(page)).find((b) => b['@type'] === 'ItemList');
+    expect(itemList.name).toBe('Brazil - nastupi u natjecanjima');
+
+    // Role/year labels are the same untranslated source column labels the
+    // page's own <ol> already renders on both languages (see the Croatian
+    // page's own top-of-file note) - so beyond the ItemList's own `name`,
+    // every per-competition description should match the English page's
+    // exactly, not a re-translated wording.
+    expect(itemList.itemListElement.map((i: { item: { description: string } }) => i.item.description)).toEqual(
+      englishItemList.itemListElement.map((i: { item: { description: string } }) => i.item.description),
+    );
+  });
+
+  test('/players/lionel-messi carries a three-level BreadcrumbList (Home > Players > page), same nesting as /teams/<slug>', async ({
+    page,
+  }) => {
+    await page.goto('players/lionel-messi');
+    const breadcrumb = (await jsonLdBlocks(page)).find((b) => b['@type'] === 'BreadcrumbList');
+    expect(breadcrumb.itemListElement.map((i: { name: string }) => i.name)).toEqual([
+      'Home',
+      'Players',
+      'Lionel Messi - Full award history',
+    ]);
+    expect(breadcrumb.itemListElement[1].item).toMatch(/\/players\/$/);
+  });
+
+  test('/hr/players/lionel-messi carries its own Croatian three-level BreadcrumbList', async ({ page }) => {
+    await page.goto('hr/players/lionel-messi');
+    const breadcrumb = (await jsonLdBlocks(page)).find((b) => b['@type'] === 'BreadcrumbList');
+    expect(breadcrumb.itemListElement.map((i: { name: string }) => i.name)).toEqual([
+      'Početna',
+      'Igrači',
+      'Lionel Messi - cjelovita povijest nagrada',
+    ]);
+    expect(breadcrumb.itemListElement[1].item).toMatch(/\/hr\/players\/$/);
+  });
+
+  test('/teams/brazil renders a visible breadcrumb nav matching its BreadcrumbList, distinct from the primary nav', async ({
+    page,
+  }) => {
+    await page.goto('teams/brazil');
+    const nav = page.getByRole('navigation', { name: 'Breadcrumb' });
+    await expect(nav).toBeVisible();
+    const items = nav.locator('li');
+    await expect(items).toHaveCount(3);
+    await expect(items.nth(2)).toHaveAttribute('aria-current', 'page');
+    await expect(items.nth(2)).toHaveText('Brazil - Full history');
+
+    const teamsLink = nav.getByRole('link', { name: 'Teams' });
+    await expect(teamsLink).toHaveAttribute('href', /\/teams\/?$/);
+    await teamsLink.click();
+    await expect(page).toHaveURL(/\/teams\/?$/);
+  });
+
+  test('/hr/teams/brazil renders the same breadcrumb nav with Croatian labels', async ({ page }) => {
+    await page.goto('hr/teams/brazil');
+    const nav = page.getByRole('navigation', { name: 'Navigacijski put' });
+    await expect(nav).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Početna' })).toHaveAttribute('href', /\/hr\/$/);
+    await expect(nav.getByRole('link', { name: 'Reprezentacije' })).toHaveAttribute(
+      'href',
+      /\/hr\/teams\/?$/,
+    );
+    await expect(nav.locator('li').nth(2)).toHaveText('Brazil - cjelovita povijest');
+  });
+
+  test('a flat page like /records gets a two-item "Home > page" breadcrumb, and the home page gets none', async ({
+    page,
+  }) => {
+    await page.goto('records');
+    const nav = page.getByRole('navigation', { name: 'Breadcrumb' });
+    await expect(nav.locator('li')).toHaveCount(2);
+    await expect(nav.locator('li').nth(1)).toHaveText('Records and Timelines');
+    await expect(nav.getByRole('link', { name: 'Home' })).toHaveAttribute('href', /\/football-reference\/$/);
+
+    await page.goto('/');
+    await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toHaveCount(0);
+  });
+
+  test('/teams/germany omits an ItemList entry for a competition it has never reached a tracked final or semifinal in', async ({
+    page,
+  }) => {
+    // Germany/West Germany has no tracked Copa América appearance (a
+    // European team never enters it) - confirms the ItemList only lists
+    // competitions the team actually appears in, matching the page's own
+    // "only includes competitions the team actually appears in" behavior
+    // (tests/unit/teamProfile.test.ts covers the same rule at the data layer).
+    await page.goto('teams/germany');
+    const blocks = await jsonLdBlocks(page);
+    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
+    const names = itemList.itemListElement.map((item: { item: { name: string } }) => item.item.name);
+    expect(names).toContain('FIFA World Cup');
+    expect(names).not.toContain('Copa América');
+  });
+
+  test('/quiz carries a BreadcrumbList and a Quiz with one Question per rendered multiple-choice card', async ({
+    page,
+  }) => {
+    await page.goto('quiz');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'Quiz']);
+
+    // .quiz-card is shared by QuizCard.astro (multiple-choice) and
+    // QuizOrderCard.astro (chronological-order) - scope to the top-level
+    // <ol class="quiz__list"> only, since the order-question one is nested
+    // one level deeper inside .quiz__order-section.
+    const cardCount = await page.locator('.quiz > ol.quiz__list > li .quiz-card').count();
+    const quiz = blocks.find((b) => b['@type'] === 'Quiz');
+    expect(quiz.name).toBe('The Ultimate Football Reference - Family Quiz');
+    expect(quiz.hasPart).toHaveLength(cardCount);
+    for (const question of quiz.hasPart) {
+      expect(question['@type']).toBe('Question');
+      expect(question.acceptedAnswer['@type']).toBe('Answer');
+      expect(question.acceptedAnswer.text.length).toBeGreaterThan(0);
+    }
+  });
+
+  test('/hr/quiz carries its own Croatian Quiz name over the Croatian-language question pool', async ({
+    page,
+  }) => {
+    await page.goto('hr/quiz');
+    const blocks = await jsonLdBlocks(page);
+    const quiz = blocks.find((b) => b['@type'] === 'Quiz');
+    expect(quiz.name).toBe('Kompletna nogometna referenca - obiteljski kviz');
+    const cardCount = await page.locator('.quiz > ol.quiz__list > li .quiz-card').count();
+    expect(quiz.hasPart).toHaveLength(cardCount);
+  });
+});
+
+test.describe('Content-Security-Policy', () => {
+  const EXPECTED_CSP =
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';";
+
+  test('the meta tag is present with the expected directives on English and Croatian pages', async ({
+    page,
+  }) => {
+    for (const path of ['competitions/world-cup', 'hr/competitions/world-cup', 'quiz', 'records']) {
+      await page.goto(path);
+      await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveAttribute(
+        'content',
+        EXPECTED_CSP,
+      );
+    }
+  });
+
+  test('the policy does not block real interactivity: filters, sorting, theme toggle and the service worker', async ({
+    page,
+  }) => {
+    const cspViolations: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error' && /Content Security Policy|Refused to/i.test(msg.text())) {
+        cspViolations.push(msg.text());
+      }
+    });
+    page.on('pageerror', (err) => {
+      if (/Content Security Policy|Refused to/i.test(err.message)) {
+        cspViolations.push(err.message);
+      }
+    });
+
+    await page.goto('competitions/world-cup');
+    await page.selectOption('#world-cup-winner', 'Spain');
+    await page.selectOption('#world-cup-host', { index: 1 });
+    await page.selectOption('#world-cup-team', { index: 1 });
+    await page.locator('#world-cup-reset').click();
+    await page.locator('#theme-toggle').click();
+
+    await page.goto('quiz');
+    await page.locator('input[type="radio"]').first().check();
+
+    // The service worker only registers in production builds (this test
+    // runs against the built+previewed site), and only on window "load".
+    await page.waitForFunction(() => document.readyState === 'complete');
+    const swState = await page.evaluate(async () => {
+      if (!('serviceWorker' in navigator)) return 'unsupported';
+      const reg = await navigator.serviceWorker.getRegistration();
+      return reg ? 'registered' : 'not-registered';
+    });
+    expect(swState).not.toBe('not-registered');
+
+    expect(cspViolations).toEqual([]);
   });
 });
 

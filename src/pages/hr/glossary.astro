@@ -1,0 +1,125 @@
+---
+// Croatian translation of src/pages/glossary.astro. Loads the exact same
+// live content/glossary.md entries (loadGlossaryEntries), so a term's
+// definition can never drift between languages - only this page's own
+// chrome/prose is translated, matching every other Croatian page's
+// convention (content/*.md stays English-only per AGENTS.md).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { loadPageMeta } from '../../lib/competition';
+import { loadGlossaryEntries } from '../../lib/glossary';
+import { absolutePageUrl, withBase } from '../../lib/url';
+import { buildDefinedTermSet, type JsonLdObject } from '../../lib/jsonLd';
+
+const meta = await loadPageMeta('glossary');
+const entries = await loadGlossaryEntries();
+
+const jsonLd: JsonLdObject[] = [
+  buildDefinedTermSet(entries, {
+    pageUrl: absolutePageUrl(Astro.url, Astro.site),
+    name: 'Pojmovnik',
+  }),
+];
+
+const statusLabel = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+const reviewed = new Date(`${meta.lastReviewed}T00:00:00Z`);
+const reviewedLabel = Number.isNaN(reviewed.getTime())
+  ? meta.lastReviewed
+  : reviewed.toLocaleDateString('hr-HR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    });
+---
+
+<BaseLayout
+  title="Pojmovnik"
+  description="Kratka, obiteljima prilagođena objašnjenja kratica i pojmova koji se koriste u tablicama natjecanja na ovoj stranici, poput a.e.t., pens, poraženi finalist i polufinalist."
+  locale="hr"
+  alternateHref={withBase('/glossary')}
+  jsonLd={jsonLd}
+>
+  <article class="glossary-page stack">
+    <header class="glossary-page__header">
+      <p class="eyebrow badge">Priručnik</p>
+      <h1>Pojmovnik</h1>
+      <p class="glossary-page__intro">
+        Kratka, obiteljima prilagođena objašnjenja kratica i pojmova koji se
+        pojavljuju u tablicama natjecanja na ovoj stranici - napisana tako da
+        čitatelj nikada ne mora nagađati što neka kratica znači.
+      </p>
+      <p class="glossary-page__meta">
+        <span class="badge">Status: {statusLabel}</span>
+        <span class="review">
+          Zadnja provjera:
+          <time datetime={meta.lastReviewed}>{reviewedLabel}</time>
+        </span>
+      </p>
+    </header>
+
+    <section class="card stack" aria-labelledby="terms-heading">
+      <h2 id="terms-heading" class="visually-hidden">Pojmovi</h2>
+      <dl class="glossary-page__list">
+        {
+          entries.map((entry) => (
+            <div class="glossary-page__entry">
+              <dt id={`term-${entry.term.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>{entry.term}</dt>
+              <dd>{entry.definition}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .glossary-page__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .glossary-page__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .glossary-page__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .glossary-page__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .review {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .glossary-page__list {
+    display: grid;
+    gap: 1.25rem;
+    margin: 0;
+  }
+
+  .glossary-page__entry dt {
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .glossary-page__entry dd {
+    margin: 0.3rem 0 0;
+    max-width: 68ch;
+    color: var(--text-muted);
+  }
+</style>

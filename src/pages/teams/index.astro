@@ -1,0 +1,136 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import References from '../../components/References.astro';
+import { loadPageMeta } from '../../lib/competition';
+import { buildAllCountryRecords } from '../../lib/compare';
+import { loadTeamCompetitions } from '../../lib/teamCompetitions';
+import { teamProfileSlug } from '../../lib/teamProfile';
+import { absolutePageUrl, withBase } from '../../lib/url';
+import { buildCountryRecordsItemList, type JsonLdObject } from '../../lib/jsonLd';
+
+const meta = await loadPageMeta('teams');
+
+const { worldCup, euro, copaAmerica, nationsLeague, competitions } = await loadTeamCompetitions();
+
+const allRecords = buildAllCountryRecords(competitions);
+const sortedByName = [...allRecords].sort((a, b) => a.displayName.localeCompare(b.displayName));
+
+const sources = [worldCup, euro, copaAmerica, nationsLeague]
+  .flatMap((c) => c.sources)
+  .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+
+const lastReviewed = [worldCup, euro, copaAmerica, nationsLeague]
+  .map((c) => c.lastReviewed)
+  .concat(meta.lastReviewed)
+  .sort()
+  .at(-1) as string;
+
+// This directory had zero structured data - every other generated ranking on
+// the site (/records, /compare, the six competition/award pages) already
+// gets an ItemList, and /teams is the exact same CountryRecord[] shape
+// /compare's own ItemList already covers (buildAllCountryRecords()), so this
+// reuses that builder as-is rather than inventing a new shape. Named
+// distinctly from /compare's "All national teams..." block (same underlying
+// data, different page purpose: an A-Z directory vs. a ranked comparison
+// table) so a search engine sees two intentionally different lists, not a
+// duplicate.
+const jsonLd: JsonLdObject[] = [
+  buildCountryRecordsItemList(allRecords, {
+    pageUrl: absolutePageUrl(Astro.url, Astro.site),
+    name: 'National teams directory - combined World Cup, EURO, Copa América and Nations League record',
+  }),
+];
+---
+
+<BaseLayout
+  title={meta.title}
+  description="Every national team that has reached a World Cup, EURO, Copa América or Nations League final or semifinal, A to Z - pick one for its full year-by-year record."
+  alternateHref={withBase('/hr/teams')}
+  jsonLd={jsonLd}
+>
+  <article class="teams stack">
+    <header class="teams__header">
+      <p class="eyebrow badge">Generated from the competition tables</p>
+      <h1>{meta.title}</h1>
+      <p class="teams__intro">{meta.intro}</p>
+    </header>
+
+    <section class="stack" aria-labelledby="teams-list-heading">
+      <h2 id="teams-list-heading" class="visually-hidden">Teams A to Z</h2>
+      <ul class="teams__grid">
+        {
+          sortedByName.map((r) => (
+            <li>
+              <a class="teams__link" href={withBase(`/teams/${teamProfileSlug(r.id)}`)}>
+                <span class="teams__name">{r.displayName}</span>
+                <span class="teams__stat">
+                  {r.totalTitles} {r.totalTitles === 1 ? 'title' : 'titles'}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <References sources={sources} lastReviewed={lastReviewed} status={meta.status} />
+  </article>
+</BaseLayout>
+
+<style>
+  .teams__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .teams__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .teams__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .teams__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  }
+
+  .teams__link {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.7rem 0.9rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .teams__link:hover,
+  .teams__link:focus-visible {
+    border-color: var(--accent);
+  }
+
+  .teams__name {
+    font-weight: 600;
+  }
+
+  .teams__stat {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+</style>

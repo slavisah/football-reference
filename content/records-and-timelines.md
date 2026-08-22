@@ -1,8 +1,8 @@
 ---
 title: Records and Timelines
 slug: records-and-timelines
-lastReviewed: 2026-07-23
-status: draft
+lastReviewed: 2026-08-15
+status: verified
 ---
 
 # Records and Timelines

@@ -13,11 +13,15 @@
 // TournamentTable/PrintDownloadLink (defaulted to the original English text).
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import TournamentTable from '../../../components/TournamentTable.astro';
+import PodiumCards from '../../../components/PodiumCards.astro';
 import ChampionsSummary from '../../../components/ChampionsSummary.astro';
+import HostMap from '../../../components/HostMap.astro';
 import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
+import { buildPodiums, buildYearStories, buildHostMapPoints } from '../../../lib/editions';
+import { COPA_AMERICA_HOST_COORDINATES, COPA_AMERICA_REGION_ORDER } from '../../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
   buildChampionsItemList,
@@ -32,6 +36,13 @@ const data = await loadCompetition('copa-america', {
   allowDuplicateYears: ['1959'],
 });
 
+const podium = buildPodiums(data.editions);
+const hostMap = buildHostMapPoints(data.editions, COPA_AMERICA_HOST_COORDINATES, COPA_AMERICA_REGION_ORDER);
+const hostRegionLabels: Record<string, string> = {
+  'South America': 'Južna Amerika',
+  'North America': 'Sjeverna Amerika',
+};
+
 const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
@@ -43,12 +54,21 @@ const jsonLd = [
   buildLatestEditionSportsEvent(data.editions, data.title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 
-// Hand-translated from content/copa-america.md's "Memorable moments" section.
+// Hand-translated from content/copa-america.md's "How it works" and
+// "Memorable moments" sections.
 // content/ itself stays untouched and English (the single editorial source of
 // truth); this is presentation-layer text local to this page only, the same
 // way hr/records.astro hand-writes its own Croatian prose rather than
 // generating it from an English source at build time.
 const notes: NoteSection[] = [
+  {
+    heading: 'Kako funkcionira',
+    items: [
+      'Deset južnoameričkih reprezentacija članica CONMEBOL-a natječe se jedna protiv druge, a od 1993. povremeno im se pridružuju i pozvane gostujuće momčadi izvan regije.',
+      'Format natjecanja mijenjao se više nego kod ijednog drugog natjecanja na ovoj stranici: neka rana izdanja prvaka su određivala konačnim poretkom lige, druga dvomečem kod kuće i u gostima, a većina izdanja od 1990-ih skupnom fazom nakon koje slijedi nokaut sustav.',
+      'Copa América, za razliku od Svjetskog prvenstva ili EURA, nije uvijek imala fiksni četverogodišnji ciklus.',
+    ],
+  },
   {
     heading: 'Nezaboravni trenuci',
     items: [
@@ -60,6 +80,15 @@ const notes: NoteSection[] = [
     ],
   },
 ];
+
+// "Dodirni godinu za priču": joins the Croatian Memorable-moments bullets
+// above onto the matching edition row by year, same as the English page's
+// CompetitionView does with the English bullets - see buildYearStories() in
+// src/lib/editions.ts.
+const stories = buildYearStories(
+  data.editions,
+  notes.find((section) => section.heading === 'Nezaboravni trenuci')?.items ?? [],
+);
 
 const headerLabels: Record<string, string> = {
   Year: 'Godina',
@@ -125,6 +154,19 @@ const headerLabels: Record<string, string> = {
       bitTeamPrefix="reprezentacija"
       emptyText="Nijedno izdanje ne odgovara odabranim filterima."
       clearFiltersLabel="Očisti filtere"
+      storyColumn={stories.size > 0 ? { label: 'Priča', values: stories } : undefined}
+      storySummaryLabel="📖 Dodirni za priču"
+    />
+
+    <PodiumCards
+      entries={podium}
+      id="copa-america-podium"
+      heading="Pobjednici po izdanju"
+      hostedByLabel="Domaćin:"
+      championLabel="Prvak"
+      runnerUpLabel="Drugoplasirani"
+      thirdLabel="Treći"
+      fourthLabel="Četvrti"
     />
 
     <ChampionsSummary
@@ -135,6 +177,16 @@ const headerLabels: Record<string, string> = {
       unit={['naslov', 'naslova']}
       winningYearsLabel="Godine osvajanja: "
       ofLabel="od"
+    />
+
+    <HostMap
+      points={hostMap}
+      id="copa-america-host-map"
+      heading="Gdje je Copa América igrala domaćinu"
+      description="Približan položaj svakog domaćina na jednostavnoj mreži zemljopisne dužine i širine, grupiran po regijama u popisu ispod - ne tvrdimo točne granice, samo otprilike gdje se u svijetu igralo pojedino izdanje. Veće točke znače da je zemlja bila domaćin više puta."
+      unit={['put', 'puta']}
+      hostingYearsLabel="Godine domaćinstva: "
+      regionLabels={hostRegionLabels}
     />
 
     <EditorialNotes sections={notes} />

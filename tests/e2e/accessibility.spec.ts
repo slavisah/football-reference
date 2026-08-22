@@ -98,6 +98,89 @@ for (const colorScheme of COLOR_SCHEMES) {
   });
 }
 
+// The sweep above (SWEPT_PATHS) only enumerates NAV_LINKS/TRANSLATED_PATHS -
+// the fixed top-level pages, including /teams itself - so it already covers
+// the teams *index*. It has no way to reach the 40 individual dynamic
+// /teams/<slug> profile pages (src/pages/teams/[slug].astro, added
+// 2026-08-17): every route in NAV_LINKS is a static top-level path, and
+// [slug].astro is generated per-team at build time, so it was never in the
+// list this sweep was built from. accessibility-forced-colors.spec.ts and
+// print-styles.spec.ts both already added their own targeted /teams/<slug>
+// spot-check for exactly this reason (2026-08-18, intensive run); this sweep
+// - the main WCAG 2.1 A/AA pass, and the one most likely to catch a real
+// contrast or landmark issue since it's the only one of the three that
+// doesn't disable 'color-contrast' - had the identical gap and was missed in
+// that same pass. Spot-checked the same representative team (Brazil, same
+// choice the other two specs made) rather than one test per team.
+for (const colorScheme of COLOR_SCHEMES) {
+  test.describe(`team profile page, ${colorScheme} color scheme`, () => {
+    test.use({ colorScheme });
+
+    test('English /teams/brazil has no automatic WCAG 2.1 A/AA violations', async ({ page }) => {
+      await page.goto('teams/brazil');
+
+      const results = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .disableRules(['region'])
+        .analyze();
+
+      expect(results.violations, formatViolations(results.violations)).toEqual([]);
+    });
+
+    test('Croatian /hr/teams/brazil has no automatic WCAG 2.1 A/AA violations', async ({ page }) => {
+      await page.goto('hr/teams/brazil');
+
+      const results = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .disableRules(['region'])
+        .analyze();
+
+      expect(results.violations, formatViolations(results.violations)).toEqual([]);
+    });
+  });
+}
+
+// The gap above (team profile pages never being reachable from SWEPT_PATHS)
+// applies identically to the 98 individual dynamic /players/<slug> profile
+// pages (src/pages/players/[slug].astro, added 2026-08-20): NAV_LINKS only
+// contains the /players *index*, and [slug].astro is generated per-player at
+// build time, so this sweep - built the same way, from the same list - never
+// reached a single player profile either. Unlike /teams/<slug>, this was
+// missed from day one rather than caught and fixed in a later pass. Spot-
+// checked one representative player (Gerd Muller, the same slug the PDF
+// download Playwright coverage already uses) rather than one test per player.
+for (const colorScheme of COLOR_SCHEMES) {
+  test.describe(`player profile page, ${colorScheme} color scheme`, () => {
+    test.use({ colorScheme });
+
+    test('English /players/gerd-muller has no automatic WCAG 2.1 A/AA violations', async ({
+      page,
+    }) => {
+      await page.goto('players/gerd-muller');
+
+      const results = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .disableRules(['region'])
+        .analyze();
+
+      expect(results.violations, formatViolations(results.violations)).toEqual([]);
+    });
+
+    test('Croatian /hr/players/gerd-muller has no automatic WCAG 2.1 A/AA violations', async ({
+      page,
+    }) => {
+      await page.goto('hr/players/gerd-muller');
+
+      const results = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .disableRules(['region'])
+        .analyze();
+
+      expect(results.violations, formatViolations(results.violations)).toEqual([]);
+    });
+  });
+}
+
 // Turns axe's violation objects into a readable failure message instead of
 // Playwright's default full-object dump (each violation can carry dozens of
 // matching DOM nodes). Typed off AxeBuilder's own return type rather than an

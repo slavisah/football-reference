@@ -1,8 +1,8 @@
 ---
 title: Family Quiz
 slug: quiz
-lastReviewed: 2026-07-29
-status: draft
+lastReviewed: 2026-08-17
+status: verified
 ---
 
 # Family Quiz
@@ -29,5 +29,9 @@ the quiz stays in sync as new editions are added.
 - Who did the champion beat in the final?
 - Who was the tournament's top scorer (Golden Boot)?
 - Who won the Ballon d'Or in a given year?
+- In which year did a given team win a tournament, or a given Ballon d'Or
+  winner win it? (only asked about a one-time champion/winner)
+- Which team or player has won the most titles/awards in a competition
+  overall?
 - Put four champions from a tournament in chronological order (earliest
   first).

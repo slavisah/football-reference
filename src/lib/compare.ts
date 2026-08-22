@@ -9,25 +9,28 @@ import { summaryGroupFor, type Group } from './countries';
 // "Team"/"National team" cells can hold semicolon-separated ties (e.g. the
 // 1962 Golden Boot's six-way tie), which isn't safe to count as one country.
 
-const RUNNER_UP_COLUMN = /^runner-up$/i;
+// Exported so src/lib/teamProfile.ts can classify the same "Runner-up"/
+// "Third"/"Fourth"/"Other semifinalist" columns without redefining these
+// patterns a second time and risking the two drifting apart.
+export const RUNNER_UP_COLUMN = /^runner-up$/i;
 // World Cup: "Third", "Fourth / other semifinalist". EURO: "Other
 // semifinalist", "Other semifinalist / fourth". Nations League: "Third",
 // "Fourth". Copa América has the same "Third"/"Fourth" columns, but only for
 // the knockout-final era (1987, 1993 onward) - earlier editions had no
 // standalone third-place match, so those cells are the "—" placeholder
 // handled by isMissingCell() below rather than a real team name.
-const SEMIFINAL_COLUMN = /third|fourth|semifinalist/i;
+export const SEMIFINAL_COLUMN = /third|fourth|semifinalist/i;
 
 // The shared "no data for this row" marker used across every generic table
 // column (see TournamentTable.astro's own missing-cell check). A cell this
 // blank must never be treated as a country name, or it would show up as a
 // phantom "—" team on /compare.
-function isMissingCell(value: string | undefined): boolean {
+export function isMissingCell(value: string | undefined): boolean {
   const trimmed = (value ?? '').trim();
   return trimmed === '' || trimmed === '—';
 }
 
-function matchesGroup(value: string | undefined, groupId: string): boolean {
+export function matchesGroup(value: string | undefined, groupId: string): boolean {
   if (isMissingCell(value)) return false;
   return summaryGroupFor((value as string).trim()).id === groupId;
 }
@@ -166,4 +169,160 @@ export function buildAllCountryRecords(competitions: CompetitionEditions[]): Cou
         b.totalFinals - a.totalFinals ||
         a.displayName.localeCompare(b.displayName),
     );
+}
+
+export type TeamIndexEntry = { id: string; displayName: string };
+
+/**
+ * The id/displayName pairs the global "find a team" nav search widget
+ * (Nav.astro, fed by src/pages/team-index.json.ts) offers as autocomplete
+ * options - every country buildAllCountryRecords() already ranks, just
+ * alphabetically rather than by title count, since a searcher is typing a
+ * name rather than scanning a leaderboard.
+ */
+export function buildTeamIndex(records: CountryRecord[]): TeamIndexEntry[] {
+  return records
+    .map((r) => ({ id: r.id, displayName: r.displayName }))
+    .sort((a, b) => a.displayName.localeCompare(b.displayName));
+}
+
+const FINAL_SCORE_COLUMN = /^final$/i;
+
+export type FinalsMeeting = {
+  competition: string;
+  slug: string;
+  year: string;
+  yearSort: number;
+  winnerId: string;
+  /** Historical name as written for that edition (e.g. "West Germany"), never normalized. */
+  winnerName: string;
+  runnerUpId: string;
+  runnerUpName: string;
+  /** Score line as written (e.g. "Uruguay 4-2 Argentina"), when the table has a "Final" column. */
+  score?: string;
+};
+
+/**
+ * Every edition of the given competitions where the winner and runner-up
+ * cells are both real teams - i.e. every final actually played, one row per
+ * meeting. Grouped by `summaryGroupFor()` the same way the rest of this
+ * module groups titles (West Germany counts as Germany for matching a
+ * head-to-head pair), while `winnerName`/`runnerUpName` keep the exact
+ * historical name for display, matching AGENTS.md's "do not silently alter
+ * historical facts" rule. Powers /compare's "Finals meetings" panel: given
+ * two team ids, filter this list for rows where the pair is {winnerId,
+ * runnerUpId} in either order.
+ */
+export function buildFinalsMeetings(competitions: CompetitionEditions[]): FinalsMeeting[] {
+  const meetings: FinalsMeeting[] = [];
+  for (const { title, slug, editions } of competitions) {
+    for (const edition of editions) {
+      const winnerName = edition.winner.trim();
+      if (isMissingCell(winnerName)) continue;
+
+      const runnerUpCell = edition.cells.find((c) => RUNNER_UP_COLUMN.test(c.label.trim()));
+      const runnerUpName = runnerUpCell?.value.trim();
+      if (!runnerUpCell || isMissingCell(runnerUpName)) continue;
+
+      const scoreCell = edition.cells.find((c) => FINAL_SCORE_COLUMN.test(c.label.trim()));
+      const score = scoreCell && !isMissingCell(scoreCell.value) ? scoreCell.value.trim() : undefined;
+
+      meetings.push({
+        competition: title,
+        slug,
+        year: edition.year,
+        yearSort: edition.yearSort,
+        winnerId: summaryGroupFor(winnerName).id,
+        winnerName,
+        runnerUpId: summaryGroupFor(runnerUpName as string).id,
+        runnerUpName: runnerUpName as string,
+        score,
+      });
+    }
+  }
+  return meetings;
+}
+
+/** Every final two teams played against each other, oldest first. */
+export function finalsMeetingsBetween(
+  idA: string,
+  idB: string,
+  meetings: FinalsMeeting[],
+): FinalsMeeting[] {
+  return meetings
+    .filter(
+      (m) => (m.winnerId === idA && m.runnerUpId === idB) || (m.winnerId === idB && m.runnerUpId === idA),
+    )
+    .sort((a, b) => a.yearSort - b.yearSort);
+}
+
+export type Rivalry = {
+  teamAId: string;
+  teamADisplayName: string;
+  teamBId: string;
+  teamBDisplayName: string;
+  meetings: number;
+  teamAWins: number;
+  teamBWins: number;
+  /** Distinct competitions this pair has met in a final, in first-meeting order. */
+  competitions: string[];
+  mostRecent: FinalsMeeting;
+};
+
+/**
+ * Every pair of teams that has met in 2 or more finals across the given
+ * competitions, ranked by total meetings (ties broken by combined wins, then
+ * name) - a "most frequent rivalry" ranking built entirely from
+ * buildFinalsMeetings()'s existing per-meeting data, no new editorial
+ * content. West Germany/Germany meetings are merged under one pair via the
+ * same winnerId/runnerUpId grouping buildFinalsMeetings() already applies;
+ * the display name uses summaryGroupFor() so a merged pair reads "Germany
+ * (incl. West Germany)" exactly like every other generated ranking on this
+ * page, even though the individual FinalsMeeting rows keep each meeting's
+ * own historical name.
+ */
+export function buildRivalries(meetings: FinalsMeeting[]): Rivalry[] {
+  const byPair = new Map<string, FinalsMeeting[]>();
+  for (const meeting of meetings) {
+    const key = [meeting.winnerId, meeting.runnerUpId].sort().join('::');
+    const group = byPair.get(key);
+    if (group) {
+      group.push(meeting);
+    } else {
+      byPair.set(key, [meeting]);
+    }
+  }
+
+  const rivalries: Rivalry[] = [];
+  for (const group of byPair.values()) {
+    if (group.length < 2) continue;
+    const sorted = [...group].sort((a, b) => a.yearSort - b.yearSort);
+    const nameFor = (id: string) => {
+      const meeting = sorted.find((m) => m.winnerId === id || m.runnerUpId === id) as FinalsMeeting;
+      const raw = meeting.winnerId === id ? meeting.winnerName : meeting.runnerUpName;
+      return summaryGroupFor(raw).displayName;
+    };
+    const [idA, idB] = [sorted[0].winnerId, sorted[0].runnerUpId].sort((a, b) =>
+      nameFor(a).localeCompare(nameFor(b)),
+    );
+    const competitions = [...new Set(sorted.map((m) => m.competition))];
+    rivalries.push({
+      teamAId: idA,
+      teamADisplayName: nameFor(idA),
+      teamBId: idB,
+      teamBDisplayName: nameFor(idB),
+      meetings: sorted.length,
+      teamAWins: sorted.filter((m) => m.winnerId === idA).length,
+      teamBWins: sorted.filter((m) => m.winnerId === idB).length,
+      competitions,
+      mostRecent: sorted[sorted.length - 1],
+    });
+  }
+
+  return rivalries.sort(
+    (a, b) =>
+      b.meetings - a.meetings ||
+      b.teamAWins + b.teamBWins - (a.teamAWins + a.teamBWins) ||
+      a.teamADisplayName.localeCompare(b.teamADisplayName),
+  );
 }

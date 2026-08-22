@@ -2,7 +2,8 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
-import { buildTopScorerFacts } from '../../lib/editions';
+import { buildTopScorerFacts, buildPodiums, buildHostMapPoints } from '../../lib/editions';
+import { WORLD_CUP_HOST_COORDINATES, HOST_REGION_ORDER } from '../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import {
   buildChampionsItemList,
@@ -14,7 +15,7 @@ const [data, goldenBoot] = await Promise.all([
   loadCompetition('fifa-world-cup', {
     editionsHeading: 'Editions',
     sourcesHeading: 'FIFA World Cup',
-    noteHeadings: ['Format milestones', 'Memorable moments', 'Editorial notes'],
+    noteHeadings: ['How it works', 'Format milestones', 'Memorable moments', 'Editorial notes'],
   }),
   loadCompetition('golden-boot', {
     editionsHeading: 'FIFA World Cup top scorers',
@@ -23,6 +24,8 @@ const [data, goldenBoot] = await Promise.all([
 ]);
 
 const topScorers = buildTopScorerFacts(goldenBoot.editions);
+const podium = buildPodiums(data.editions);
+const hostMap = buildHostMapPoints(data.editions, WORLD_CUP_HOST_COORDINATES, HOST_REGION_ORDER);
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd = [
@@ -43,5 +46,8 @@ const jsonLd = [
     tableCaption="FIFA World Cup editions, 1930 onward"
     extraColumn={{ label: 'Top scorer', values: topScorers }}
     pdfSlug="world-cup"
+    podium={podium}
+    podiumHeading="Podium by edition"
+    hostMap={hostMap}
   />
 </BaseLayout>

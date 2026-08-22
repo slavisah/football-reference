@@ -264,6 +264,40 @@ Primary sources should be preferred.
     environment's egress policy for this run, so verification relied on
     WebSearch's synthesized snippets, per the same caveat prior audits in
     this file have already noted.
+- Host(s)/Teams second independent cross-check (2026-08-13, intensive
+  run): re-verified all 23 "Host(s)"/"Teams" entries (1930-2026) via two
+  parallel WebSearch passes split by era (1930-1970, 1974-2026),
+  deliberately drawing from a source mix distinct from the 2026-08-08
+  first pass (Wikipedia, RSSSF, footballhistory.org, FIFA.com,
+  topendsports.com, Sofascore): this pass used worldfootball.net,
+  Britannica, Liquipedia, Transfermarkt, 11v11.com, Grokipedia, NamuWiki,
+  soccergraph.com, and contemporary 2026 press coverage. **No
+  discrepancies found across any of the 23 editions.** Both historical
+  nuances already documented on the page were independently reconfirmed a
+  second time: 1938 (16 teams qualified, Austria's slot left vacant after
+  the Anschluss, 15 actually competed - reconfirmed via Grokipedia) and
+  1950 (16 qualified, Scotland/Turkey/India withdrew, 13 actually
+  competed). The 2026 edition's 48-team, three-host (Canada/Mexico/United
+  States) format was reconfirmed as the format actually played via
+  Britannica's dedicated 2026 article and multiple contemporary outlets
+  (Yahoo Sports, MLSSoccer, Sky Sports):
+  - https://www.worldfootball.net/competition/co139/fifa-world-cup/se2413/1966-england/all-matches/
+  - https://www.worldfootball.net/competition/co139/fifa-world-cup/se2414/1970-mexico/teams/
+  - https://www.worldfootball.net/competition/co139/fifa-world-cup/se2418/1986-mexico/teams/
+  - https://www.britannica.com/today-in-history/July-13-1930-First-FIFA-World-Cup
+  - https://www.britannica.com/event/2026-FIFA-World-Cup
+  - https://liquipedia.net/lab/Football/FIFA/World_Cup/1958
+  - https://liquipedia.net/lab/Football/FIFA/World_Cup/1974
+  - https://www.transfermarkt.us/mundial-de-qatar-2022/teilnehmer/pokalwettbewerb/wm22/sort/teilnahmen
+  - https://grokipedia.com/page/1938_FIFA_World_Cup
+  - https://www.fifa.com/en/tournaments/mens/worldcup/articles/number-teams-every-edition
+  - https://sports.yahoo.com/articles/why-2026-world-cup-spread-133500991.html
+  - https://www.mlssoccer.com/news/fifa-world-cup-2026-format-explained
+  - https://www.skysports.com/football/news/11095/13272067/2026-world-cup-dates-venues-host-cities-format-and-schedule-for-usa-canada-and-mexico-tournament
+  - Direct WebFetch to primary-source domains was blocked by this
+    environment's egress policy for this run, so verification relied on
+    WebSearch's synthesized snippets, per the same caveat prior audits in
+    this file have already noted.
 - Third/fourth-place second independent cross-check (2026-08-11, intensive
   run): the "Third"/"Fourth / other semifinalist" columns' only prior audit
   was their first pass (2026-08-04, above); this closes the standing "not
@@ -466,6 +500,29 @@ Primary sources should be preferred.
     environment's egress policy for this run, so verification relied on
     WebSearch's synthesized snippets, per the same caveat the FIFA World
     Cup Host(s)/Teams audit entry above (2026-08-08) already notes.
+- Host(s)/Teams second independent cross-check (2026-08-13, intensive
+  run): re-verified all 17 "Host(s)"/"Teams" entries (1960-2024) via two
+  parallel WebSearch passes split by era (1960-1992, 1996-2024),
+  deliberately drawing from a source mix distinct from the 2026-08-08
+  first pass (Wikipedia, UEFA.com, topendsports.com): this pass used
+  worldfootball.net, Liquipedia, 11v11.com, worldsoccer.com, and
+  NamuWiki. **No discrepancies found across any of the 17 editions**,
+  including every format-boundary edition: 1980 (first 8-team
+  expansion), 1992 (Denmark's late substitution for a UEFA-suspended
+  Yugoslavia left the host and 8-team count unaffected), 1996 (first
+  16-team expansion, reconfirmed via 11v11.com), 2016 (first 24-team
+  expansion), and 2020 (11-city pan-European hosting for UEFA's 60th
+  anniversary, reconfirmed as accurate, still 24 teams):
+  - https://www.worldfootball.net/competition/co36/uefa-euro/se2737/1996-england/teams/
+  - https://www.worldfootball.net/competition/co36/se3316/teams/
+  - https://liquipedia.net/lab/Football/UEFA/Euro/1996
+  - https://liquipedia.net/lab/Football/UEFA/Euro/2012
+  - https://www.11v11.com/matches/england-v-germany-26-june-1996-246651/
+  - https://www.worldsoccer.com/world-soccer-latest/european-championships-retrospective-england-1996-335236
+  - Direct WebFetch to primary-source domains was blocked by this
+    environment's egress policy for this run, so verification relied on
+    WebSearch's synthesized snippets, per the same caveat prior audits in
+    this file have already noted.
 - "Other semifinalist" columns - full audit closed (2026-08-11, intensive
   run): closes the last "first pass only" gap named in this file's own
   standing content-accuracy notes. Two parallel WebSearch passes: a second
@@ -599,6 +656,25 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_Finals
   - https://www.uefa.com/news-media/news/029a-1deb0169b106-2e1771fe5029-1000--welcome-to-the-2025-uefa-nations-league-finals/
   - https://allianz-arena.com/en/news/2025/03/allianz-arena-venue-for-uefa-nations-league-final-four
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    indexed snippets rather than direct page loads.
+- Finals-host second independent cross-check (2026-08-13, intensive run):
+  re-verified the "Finals host" column's only prior audit (2026-08-08, the
+  entry above) for all four completed editions, using a source mix
+  deliberately distinct from the first pass's UEFA.com/Wikipedia/Fotmob/
+  Allianz-Arena/Olympics.com pairing - national-federation sites (FIGC),
+  press/wire coverage (Inside World Football, footboom1.com, Bleacher
+  Report), and aggregate/wiki-style sources (Football Fandom Wiki,
+  Grokipedia). **No discrepancies found across any of the four editions.**
+  - https://www.figc.it/en/figc/news/milan-and-turin-candidates-to-host-uefa-nations-league-finals/
+  - https://www.insideworldfootball.com/2022/11/29/dutch-host-2023-nations-league-finals-rotterdam-enschede/
+  - https://www.besoccer.com/new/nations-league-final-four-to-be-played-in-the-netherlands-1207554
+  - https://www.insideworldfootball.com/2025/03/24/germany-host-final-four-uefas-nations-league-june/
+  - https://www.footboom1.com/en/news/football/2597104-uefa-nations-league-2025-final-phase-kicks-off-in-germany
+  - https://football.fandom.com/wiki/2019_UEFA_Nations_League_Finals
+  - https://grokipedia.com/page/2021_UEFA_Nations_League_Finals
+  - https://bleacherreport.com/articles/2839840-uefa-nations-league-2019-final-portugal-vs-team-schedule-and-preview
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     indexed snippets rather than direct page loads.
@@ -784,6 +860,66 @@ Primary sources should be preferred.
     some regional ESPN pages show 11 July due to timezone display - the US
     ESPN page and copaamerica.com's own recap agree on 10 July)
   - https://en.wikipedia.org/wiki/2024_Copa_Am%C3%A9rica_final (14 July 2024)
+- Final match dates second independent cross-check (2026-08-12, intensive
+  run): the "Final date" column's only prior audit was its first pass
+  (2026-08-08, the entry above), unlike Champion/Runner-up/Format/
+  Third-Fourth which each already had a second pass on record; this closes
+  that gap. Re-verified all 19 dated editions in four era-based WebSearch
+  passes (the five pre-1960 Final playoff deciders; 1987-1999; 2001-2011;
+  2015-2024), deliberately drawing on a source mix distinct from the first
+  pass (which leaned on Wikipedia/RSSSF/ESPN/Transfermarkt/11v11/
+  copaamerica.com): worldfootball.net, footballdatabase.eu, besoccer.com,
+  soccer365.net, athlet.org, topendsports.com, resultados-futbol.com,
+  official federation/CONMEBOL histories, and contemporary press/wire
+  coverage. **No discrepancies found.** Both cases the first pass flagged for
+  extra scrutiny were re-confirmed rather than resolved differently: 1999's
+  final (footballdatabase.eu's lone 17 July claim remains an outlier against
+  Transfermarkt and 11v11 independently agreeing on 18 July) and 2021's final
+  (US-dated wire/official sources again confirm 10 July over the 11 July
+  shown on some regional ESPN pages).
+  - https://www.11v11.com/matches/brazil-v-uruguay-29-may-1919-223092/ ;
+    https://www.footballdatabase.eu/en/match/overview/1052896-bresil-uruguay
+    (1919, 29 May)
+  - https://www.worldfootball.net/competition/co22/conmebol-copa-america/se3395/1922-brazil/matches-and-results/
+    (1922, 6 November - 11v11's own page for this fixture is mislabeled 22
+    October, inconsistent with every other source; treated as unreliable for
+    this date, not as evidence against it)
+  - https://www.11v11.com/matches/argentina-v-brazil-01-february-1937-224689/ ;
+    https://www.footballdatabase.eu/en/match/overview/1052820-argentine-bresil
+    (1937, 1 February)
+  - https://www.worldfootball.net/competition/co22/conmebol-copa-america/se3380/1949-brazil/matches-and-results/ ;
+    https://soccer365.net/competitions/618/1949/ (1949, 11 May)
+  - https://www.worldfootball.net/competition/co22/conmebol-copa-america/se3378/1953-peru/all-matches/ ;
+    https://www.topendsports.com/events/soccer/copa-america/hosts/1953.htm
+    (1953, 1 April)
+  - Transfermarkt match sheets (dated Jul 12 1987, Jul 4 1993, Jul 23 1995,
+    Jun 29 1997, Jul 18 1999) cross-checked against contemporary wire/press
+    archives (UPI 4 Jul 1993 recap; Washington Post 24 Jul 1995 and 30 Jun
+    1997 recaps) - all five 1987-1999 dates confirmed, no discrepancies
+  - https://www.espn.com/soccer/match/_/gameId/10576/mexico-colombia ;
+    https://www.transfermarkt.us/colombia_mexico/aufstellung/spielbericht/1022264
+    (2001, 29 July)
+  - https://www.espn.com/soccer/match/_/gameId/151955/brazil-argentina ;
+    https://copaamerica.com/en/news/final-of-the-2004-conmebol-copa-america-brazil-argentina-and-a-comeback-for-history
+    (2004, 25 July)
+  - https://www.espn.com/soccer/match/_/gameId/221083/argentina-brazil ;
+    https://copaamerica.com/en/news/brazil-3-0-argentina-the-heart-stopping-final-of-the-2007-conmebol-copa-america
+    (2007, 15 July)
+  - https://www.espn.com/soccer/match/_/gameId/317560/paraguay-uruguay ;
+    https://copaamerica.com/en/news/diego-forlan-in-the-2011-conmebol-copa-america-grand-final
+    (2011, 24 July)
+  - https://www.espn.com/soccer/match/_/gameId/424357 (2015, 4 July)
+  - https://athlet.org/football/copa-america/2016 (2016 centenary, 26 June)
+  - FoxSports boxscore (Jul 07 2019) and copaamerica.com's own recap (2019,
+    7 July)
+  - spokesman.com (AP wire, dated jul/10/2021) and FoxSports boxscore (Jul
+    10 2021) (2021, 10 July - reconfirms the US-dated source consensus)
+  - https://www.cnn.com (2024/07/14 dateline) and FoxSports boxscore (2024,
+    14 July)
+  - Note: this session's egress proxy blocked direct WebFetch to nearly
+    every one of these domains, so verification relied on WebSearch's
+    synthesized result snippets rather than a direct page read, the same
+    caveat noted by several prior audits in this file.
 - Champion/Runner-up audit (2026-08-05): every edition's Champion and
   Runner-up, 1916 through 2024 (49 editions), cross-checked against each
   edition's dedicated Wikipedia article and at least one of RSSSF, CONMEBOL's
@@ -948,6 +1084,58 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     indexed snippets rather than direct page loads.
+- Host-country second independent cross-check (2026-08-13, intensive run):
+  the "Host / format" column's host-country value had only its first pass
+  on record (2026-08-08, the entry above); this closes that gap. Re-verified
+  all 48 editions in two era-based WebSearch passes (1916-1957, 25 editions;
+  1959-2024, 23 editions including both 1959 tournaments), deliberately
+  drawing on a source mix distinct from the first pass (Wikipedia/RSSSF/
+  UEFA.com/CONMEBOL/Fotmob/aggregate host-list sites/federation histories/
+  press): worldfootball.net, footballdatabase.eu, besoccer.com, athlet.org,
+  topendsports.com, resultados-futbol.com, Transfermarkt, Grokipedia,
+  Liquipedia, sportsbrief.com, mapsofworld.com, and Spanish-language press
+  (El Universo, Goal.com es-mx/es-ar, AUF, opinion.com.bo). **No
+  discrepancies found across any of the 48 rows.** Grokipedia's aggregate
+  host-count summary (Argentina 9 editions, Uruguay/Chile 7 each, Brazil/
+  Peru 6 each, Ecuador 3, Bolivia/US/Paraguay/Colombia/Venezuela 1-2 each)
+  independently reconciles exactly with a manual count of the page's 48
+  rows, a useful whole-column sanity check. Both flagged edge cases were
+  reconfirmed: the two 1959 editions are not conflated (regular Campeonato
+  Sudamericano hosted by Argentina in Buenos Aires; separate one-off
+  "Extraordinario" edition hosted by Ecuador in Guayaquil to inaugurate the
+  Modelo stadium), and 1975/1979/1983 genuinely had no single host country
+  (two-legged home-and-away finals, confirmed via Liquipedia and Grokipedia
+  independently of the first pass's Wikipedia/footballhistory.org sources).
+  One search snippet briefly suggested "Argentina" for 2021 (referring to
+  the original, later-abandoned co-host plan with Colombia); a targeted
+  follow-up against ESPN, besoccer.com, and Fotmob confirmed the actual host
+  was Brazil, matching the page - not a discrepancy, a shorthand artifact.
+  - https://sportsbrief.com/football/67035-copa-rica-host-countries-a-list-countries-hosted-copa-rica/
+  - https://www.mapsofworld.com/sports/football/copa-america/host-countries.html
+  - https://www.topendsports.com/events/soccer/copa-america/hosts/index.htm
+  - https://athlet.org/football/copa-america
+  - https://www.worldfootball.net/competition/co22/conmebol-copa-america/records-winners-list/
+  - https://es.wikipedia.org/wiki/Campeonato_Sudamericano_1959_(Argentina) ;
+    https://www.resultados-futbol.com/noticia/xxvi-campeonato-sudamericano-argentina-1959 ;
+    https://www.opinion.com.bo/articulo/deportes/argentina-campeon-sudamericano-1959/20110617201700365996.html
+    (1959 regular edition, Argentina)
+  - https://www.auf.org.uy/copa-america-1959/ ;
+    https://www.resultados-futbol.com/noticia/xxvii-campeonato-sudamericano-ecuador-1959 ;
+    https://www.goal.com/es-mx/noticias/historia-de-la-copa-am%C3%A9rica-1959-ii-la-d%C3%A9cima-de-uruguay-se/blt7c041761adaefae3
+    (1959 Extraordinario edition, Ecuador/Guayaquil)
+  - https://www.footballdatabase.eu/en/competition/overall/7137-copa_america/1993
+    (1993, Ecuador)
+  - https://liquipedia.net/lab/Football/CONMEBOL/Copa_Am%C3%A9rica ;
+    https://grokipedia.com/page/Copa_Am%C3%A9rica_records_and_statistics
+    (1975/1979/1983 no-single-host confirmation; aggregate host-count
+    cross-check)
+  - https://www.espn.com/soccer/story/_/id/37617773/brazil-new-hosts-tournament-moved-argentina-colombia ;
+    https://www.besoccer.com/new/official-copa-america-2021-to-be-held-in-brazil-999585
+    (2021, Brazil - confirms actual host after Colombia/Argentina withdrew)
+  - Note: this session's egress proxy blocked direct WebFetch to nearly
+    every one of these domains, so verification relied on WebSearch's
+    synthesized result snippets rather than a direct page read, the same
+    caveat noted by several prior audits in this file.
 - Final-date audit (2026-08-08): the 19 dated rows in the "Final date"
   column (every edition decided by a single-match final-playoff/knockout-
   final/centenary format; the 30 "League table"/"Home-and-away" rows
@@ -1169,6 +1357,63 @@ Primary sources should be preferred.
   editorial note" section for the full explanation; the page's existing
   choice is kept as-is, since it's consistent with how every other pre-1990
   row is labeled.
+- Ceremony date second independent cross-check (2026-08-13, intensive run):
+  the "Ceremony date" column's only prior audit was its first pass
+  (2026-08-03) plus a narrow five-year follow-up (2026-08-04) - unlike
+  Winner/National team, which already had a full second pass across all 69
+  editions, this column had never had every row independently re-verified.
+  Re-verified all 69 dated editions (1956-2025, excluding the 2020
+  cancellation) in four era-based passes (1956-1973, 1974-1991, 1992-2009,
+  2010-2025), deliberately drawing on a source mix distinct from the first
+  pass (Wikipedia + France Football issue cover-dates + a Tuesday-publication
+  heuristic): RSSSF's per-year pages (`rsssf.org/miscellaneous/europa-poy*.html`),
+  Britannica, official club sites (SL Benfica, FC Dynamo Kyiv, AC Milan,
+  Paris Saint-Germain), UEFA.com, contemporaneous wire/press coverage (VOA
+  News, Jeune Afrique, Sky Sports, CNN, Al Jazeera, France24), and physical
+  France Football issue-cover-date listings surfaced via collector/auction
+  sites (PicClick, eBay, Amazon.fr) - a materially different evidence type
+  from the first pass's reliance on Wikipedia prose. **No discrepancies
+  found across any of the 69 dates.** Both years the first pass had flagged
+  as resting on a single corroborating source before its 2026-08-04
+  follow-up (1965, 1973) were independently re-confirmed with further
+  non-Wikipedia evidence (France Football issue-number listings, a club
+  retrospective). The long-contested 1986 date (30 December, vs. a 29
+  December figure some Dynamo Kyiv/Ukrainian-press retrospectives repeat)
+  was resolved with a genuine explanation this pass found rather than a
+  re-assertion: those retrospectives describe Igor Belanov being privately
+  notified of the result on 29 December, while France Football's own issue
+  (#2125) carrying the published result is dated 30 December - the page
+  tracks the publication date, so the two figures describe different
+  moments in the same story, not a factual conflict. Also newly discovered:
+  the Tuesday-publication heuristic that helped resolve earlier-era
+  conflicts (1965, 1973, 1978, 1986) stops holding from **2002 onward** -
+  12 December 2002 (Thursday), 22 December 2003 (Monday), and 13 December
+  2004 (Monday) are all confirmed correct despite breaking the pattern,
+  each independently corroborated (a contemporaneous BigSoccer forum
+  thread for 2002, a VOA News wire dateline for 2003, UEFA.com's own report
+  naming the weekday for 2004) - flagged so a future pass doesn't mistake
+  this real shift in France Football's release-day pattern for an error.
+  - https://www.rsssf.org/miscellaneous/europa-poy65.html (and the
+    equivalent per-year RSSSF page, 1956-1991)
+  - https://www.britannica.com/topic/Ballon-dOr (list of winners; also used
+    for individual-year cross-checks 1983-1985)
+  - https://www.jeuneafrique.com/381505/politique/jour-26-decembre-1995-george-weah-elu-ballon-dor/
+    (1995)
+  - https://www.voanews.com/ (2003 wire dateline, "Nedved Wins European
+    Football's Golden Ball - 2003-12-22")
+  - https://www.uefa.com/uefachampionsleague/news/ (per-year "wins Ballon
+    d'Or" report pages, 1992-2024, several naming the exact weekday)
+  - Official club sites: slbenfica.pt (1965 retrospective), fcdynamo.com/
+    dynamo.kiev.ua (1975, 1986), acmilan.com (2007), psg.fr (2025)
+  - Physical France Football issue-cover-date listings via collector/
+    auction sites (PicClick, eBay Italy, Amazon.fr), used as a primary-
+    source-adjacent check independent of any web article, for 1965, 1973,
+    1977, 1982, 1989, 1990
+  - Direct WebFetch to nearly every one of these domains (rsssf.org,
+    wikipedia.org, dynamo.kiev.ua, and others) was blocked by this
+    environment's egress policy for this run, so verification relied on
+    WebSearch's synthesized snippets rather than directly rendered pages,
+    per the same caveat noted throughout this file.
 
 ## Review policy
 

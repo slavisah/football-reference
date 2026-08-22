@@ -14,11 +14,13 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import TournamentTable from '../../../components/TournamentTable.astro';
 import ChampionsSummary from '../../../components/ChampionsSummary.astro';
+import HostMap from '../../../components/HostMap.astro';
 import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
-import { buildTopScorerFacts } from '../../../lib/editions';
+import { buildTopScorerFacts, buildYearStories, buildHostMapPoints } from '../../../lib/editions';
+import { EURO_HOST_COORDINATES } from '../../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
   buildChampionsItemList,
@@ -39,6 +41,8 @@ const [data, goldenBoot] = await Promise.all([
 ]);
 
 const topScorers = buildTopScorerFacts(goldenBoot.editions, 'hr');
+const hostMap = buildHostMapPoints(data.editions, EURO_HOST_COORDINATES);
+const hostRegionLabels: Record<string, string> = { Europe: 'Europa' };
 
 const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 
@@ -53,14 +57,23 @@ const jsonLd = [
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 
-// Hand-translated from content/uefa-euro.md's "Historical format note" (a
-// single paragraph, no bullets - same as the English page) and "Memorable
-// moments" sections, the same two headings the English page requests via
-// noteHeadings. content/ itself stays untouched and English (the single
+// Hand-translated from content/uefa-euro.md's "How it works", "Historical
+// format note" (a single paragraph, no bullets - same as the English page)
+// and "Memorable moments" sections, the same three headings the English page
+// requests via noteHeadings. content/ itself stays untouched and English (the single
 // editorial source of truth); this is presentation-layer text local to this
 // page only, the same way the earlier Croatian competition pages hand-write
 // their own Croatian prose.
 const notes: NoteSection[] = [
+  {
+    heading: 'Kako funkcionira',
+    items: [
+      'UEFA reprezentacije prolaze kvalifikacije kroz otprilike dvije godine skupnih utakmica prije završnice.',
+      'Završnica počinje skupnom fazom; najbolje plasirane momčadi iz svake skupine prolaze dalje.',
+      'Od četvrtfinala nadalje igra se izravni nokaut sustav: jedan poraz završava turnir za momčad.',
+      'Finale odlučuje prvaka; utakmica za treće mjesto nije se igrala od 1980. (pogledajte "Povijesnu napomenu o formatu" niže).',
+    ],
+  },
   {
     heading: 'Povijesna napomena o formatu',
     items: [
@@ -79,6 +92,17 @@ const notes: NoteSection[] = [
     ],
   },
 ];
+
+// "Dodirni godinu za priču": joins the Croatian Memorable-moments bullets
+// above onto the matching edition row by year, same as the English page's
+// CompetitionView does with the English bullets - see buildYearStories() in
+// src/lib/editions.ts. The "Odgođeni EURO 2020..." bullet's first mentioned
+// year (2020) is the edition's actual Year-column label, matching how the
+// English page's own "delayed EURO 2020...2021" bullet resolves.
+const stories = buildYearStories(
+  data.editions,
+  notes.find((section) => section.heading === 'Nezaboravni trenuci')?.items ?? [],
+);
 
 const headerLabels: Record<string, string> = {
   Year: 'Godina',
@@ -147,6 +171,8 @@ const headerLabels: Record<string, string> = {
       bitTeamPrefix="reprezentacija"
       emptyText="Nijedno izdanje ne odgovara odabranim filterima."
       clearFiltersLabel="Očisti filtere"
+      storyColumn={stories.size > 0 ? { label: 'Priča', values: stories } : undefined}
+      storySummaryLabel="📖 Dodirni za priču"
     />
 
     <ChampionsSummary
@@ -157,6 +183,16 @@ const headerLabels: Record<string, string> = {
       unit={['naslov', 'naslova']}
       winningYearsLabel="Godine osvajanja: "
       ofLabel="od"
+    />
+
+    <HostMap
+      points={hostMap}
+      id="euro-host-map"
+      heading="Gdje je Europsko prvenstvo igralo domaćinu"
+      description="Približan položaj svakog domaćina na jednostavnoj mreži zemljopisne dužine i širine, grupiran po regijama u popisu ispod - ne tvrdimo točne granice, samo otprilike gdje se u svijetu igralo pojedino izdanje. Veće točke znače da je zemlja bila domaćin više puta."
+      unit={['put', 'puta']}
+      hostingYearsLabel="Godine domaćinstva: "
+      regionLabels={hostRegionLabels}
     />
 
     <EditorialNotes sections={notes} />

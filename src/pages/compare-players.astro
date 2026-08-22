@@ -1,0 +1,562 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import References from '../components/References.astro';
+import { loadCompetition, loadPageMeta } from '../lib/competition';
+import { buildAllPlayerProfiles } from '../lib/playerProfile';
+import type { PlayerAwardSource } from '../lib/playerProfile';
+import {
+  buildAllComparePlayerRecords,
+  buildSharedAwardYears,
+  type ComparePlayerAwardDef,
+} from '../lib/comparePlayers';
+import { playerProfileSlug } from '../lib/playerProfile';
+import { absolutePageUrl, withBase } from '../lib/url';
+import { buildPlayersDirectoryItemList, type JsonLdObject } from '../lib/jsonLd';
+
+const meta = await loadPageMeta('compare-players');
+
+const [ballonDor, worldCupGoldenBoot, euroGoldenBoot] = await Promise.all([
+  loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),
+  loadCompetition('golden-boot', {
+    editionsHeading: 'FIFA World Cup top scorers',
+    sourcesHeading: 'FIFA World Cup',
+  }),
+  loadCompetition('golden-boot', {
+    editionsHeading: 'UEFA EURO top scorers',
+    sourcesHeading: 'UEFA EURO',
+  }),
+]);
+
+const sources: PlayerAwardSource[] = [
+  { title: "Ballon d'Or", slug: 'ballon-dor', editions: ballonDor.editions },
+  { title: 'FIFA World Cup Golden Boot', slug: 'golden-boot', editions: worldCupGoldenBoot.editions },
+  { title: 'UEFA EURO Golden Boot', slug: 'golden-boot', editions: euroGoldenBoot.editions },
+];
+
+const awardDefs: ComparePlayerAwardDef[] = sources.map((s) => ({ title: s.title, slug: s.slug }));
+
+const profiles = buildAllPlayerProfiles(sources);
+const sortedByName = [...profiles].sort((a, b) => a.displayName.localeCompare(b.displayName));
+
+const allRecords = buildAllComparePlayerRecords(profiles, awardDefs);
+
+// Default head-to-head pair: the two most-decorated players, so the panel
+// shows something meaningful before any JS runs or a URL param is read.
+const [defaultA, defaultB] = allRecords;
+const defaultSharedYears = buildSharedAwardYears(defaultA, defaultB);
+
+const combinedSources = [ballonDor.sources, worldCupGoldenBoot.sources, euroGoldenBoot.sources]
+  .flat()
+  .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+
+const lastReviewed = [ballonDor.lastReviewed, worldCupGoldenBoot.lastReviewed, euroGoldenBoot.lastReviewed]
+  .concat(meta.lastReviewed)
+  .sort()
+  .at(-1) as string;
+
+const recordsForClient = allRecords.map((r) => ({
+  id: r.id,
+  displayName: r.displayName,
+  totalAwards: r.totalAwards,
+  awards: r.awards.map((a) => ({ title: a.title, slug: a.slug, count: a.count, years: a.years })),
+}));
+
+// One ItemList for the "All players" ranking below, ranked by total awards -
+// the same buildPlayersDirectoryItemList() /players uses for its alphabetical
+// directory, just fed a differently-ordered profile list (there's no
+// award-count-shaped fact this ranking adds beyond what /players already
+// states per player, so no new describe() override is needed).
+const jsonLd: JsonLdObject[] = [
+  buildPlayersDirectoryItemList(profiles, {
+    pageUrl: absolutePageUrl(Astro.url, Astro.site),
+    name: "Players ranked by total Ballon d'Or/Golden Boot awards",
+  }),
+];
+---
+
+<BaseLayout
+  title={meta.title}
+  description="Compare two Men's Ballon d'Or or FIFA World Cup/UEFA EURO Golden Boot winners' award record head-to-head, generated from the same tables as the Players directory."
+  alternateHref={withBase('/hr/compare-players')}
+  jsonLd={jsonLd}
+>
+  <article class="compare stack">
+    <header class="compare__header">
+      <p class="eyebrow badge">Generated from the award tables</p>
+      <h1>{meta.title}</h1>
+      <p class="compare__intro">{meta.intro}</p>
+    </header>
+
+    <section class="card stack" aria-labelledby="head-to-head-heading">
+      <h2 id="head-to-head-heading">Head-to-head</h2>
+
+      <div class="compare__picker no-print">
+        <div class="compare__field">
+          <label for="compare-a">Player A</label>
+          <select id="compare-a" name="a">
+            {
+              sortedByName.map((p) => (
+                <option value={p.id} selected={p.id === defaultA.id}>
+                  {p.displayName}
+                </option>
+              ))
+            }
+          </select>
+        </div>
+
+        <button type="button" id="compare-swap" class="compare__swap" aria-label="Swap Player A and Player B">
+          &#8646; Swap
+        </button>
+
+        <div class="compare__field">
+          <label for="compare-b">Player B</label>
+          <select id="compare-b" name="b">
+            {
+              sortedByName.map((p) => (
+                <option value={p.id} selected={p.id === defaultB.id}>
+                  {p.displayName}
+                </option>
+              ))
+            }
+          </select>
+        </div>
+      </div>
+
+      <p
+        id="compare-status"
+        class="visually-hidden"
+        role="status"
+        aria-live="polite"
+        data-template="Comparing {a} vs {b}."
+      >
+        {`Comparing ${defaultA.displayName} vs ${defaultB.displayName}.`}
+      </p>
+
+      <div class="compare__panel">
+        {
+          (['a', 'b'] as const).map((side) => {
+            const record = side === 'a' ? defaultA : defaultB;
+            return (
+              <div class="compare__side">
+                <h3 id={`compare-${side}-name`}>{record.displayName}</h3>
+                <div
+                  class="t-wrap"
+                  tabindex="0"
+                  role="region"
+                  aria-label={`${record.displayName}'s award record`}
+                >
+                  <table class="compare__table">
+                    <caption class="visually-hidden">{record.displayName}'s award record</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Award</th>
+                        <th scope="col">Times won</th>
+                        <th scope="col">Years</th>
+                      </tr>
+                    </thead>
+                    <tbody id={`compare-${side}-body`}>
+                      {
+                        record.awards.map((a, index) => (
+                          <tr data-index={index}>
+                            <th scope="row">{a.title}</th>
+                            <td data-field="count">{a.count}</td>
+                            <td data-field="years">{a.years.map((y) => y.year).join(', ') || '—'}</td>
+                          </tr>
+                        ))
+                      }
+                    </tbody>
+                    <tfoot>
+                      <tr id={`compare-${side}-total`}>
+                        <th scope="row">Combined</th>
+                        <td data-field="count">{record.totalAwards}</td>
+                        <td data-field="years" aria-hidden="true"></td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            );
+          })
+        }
+      </div>
+
+      <p class="muted compare__note">
+        "Years" lists every year that player won the award in that row, oldest
+        first. National-team competitions (World Cup, EURO, Copa América,
+        Nations League titles) aren't included here: they recognize teams, not
+        individual players - see <a href={withBase('/compare')}>Compare</a> for that
+        comparison.
+      </p>
+    </section>
+
+    <section class="card stack" aria-labelledby="shared-years-heading">
+      <h2 id="shared-years-heading">Shared years</h2>
+      <p class="muted" id="shared-years-intro">
+        Every year <span id="shared-years-a-name">{defaultA.displayName}</span> and{' '}
+        <span id="shared-years-b-name">{defaultB.displayName}</span> both won an award, whether or not it
+        was the same one.
+      </p>
+      <div
+        id="shared-years-body"
+        data-empty-text="These two haven't both won an award in the same year."
+      >
+        {
+          defaultSharedYears.length === 0 ? (
+            <p class="muted" id="shared-years-empty">
+              These two haven't both won an award in the same year.
+            </p>
+          ) : (
+            <ol class="shared-years__list" id="shared-years-list">
+              {defaultSharedYears.map((s) => (
+                <li>
+                  <span class="shared-years__year">{s.year}</span>
+                  <span class="shared-years__detail">
+                    <strong>{defaultA.displayName}</strong>: {s.aAwards.join(', ')}
+                  </span>
+                  <span class="shared-years__detail">
+                    <strong>{defaultB.displayName}</strong>: {s.bAwards.join(', ')}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          )
+        }
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="all-players-heading">
+      <h2 id="all-players-heading">All players</h2>
+      <p class="muted">
+        Every Ballon d'Or or Golden Boot winner, ranked by total awards. Pick
+        any two above to compare them directly, or select a name below for
+        their full year-by-year record on{' '}
+        <a href={withBase('/players')}>the Players page</a>.
+      </p>
+      <div
+        class="t-wrap"
+        tabindex="0"
+        role="region"
+        aria-label="All players' combined award record, ranked by total awards"
+      >
+        <table class="compare__table compare__table--all">
+          <caption class="visually-hidden">All players' combined award record, ranked by total awards</caption>
+          <thead>
+            <tr>
+              <th scope="col">Rank</th>
+              <th scope="col">Player</th>
+              {awardDefs.map((a) => <th scope="col">{a.title}</th>)}
+              <th scope="col">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              allRecords.map((r, i) => (
+                <tr>
+                  <td>{i + 1}</td>
+                  <th scope="row">
+                    <a href={withBase(`/players/${playerProfileSlug(r.id)}`)}>{r.displayName}</a>
+                  </th>
+                  {r.awards.map((a) => (
+                    <td>{a.count}</td>
+                  ))}
+                  <td>{r.totalAwards}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <References sources={combinedSources} lastReviewed={lastReviewed} status={meta.status} />
+  </article>
+</BaseLayout>
+
+<style>
+  .compare__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .compare__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .compare__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .compare__picker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 0.75rem 1rem;
+    padding: 1rem;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .compare__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 12rem;
+    flex: 1 1 12rem;
+  }
+
+  .compare__field label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .compare__field select {
+    font: inherit;
+    padding: 0.5rem 0.6rem;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: 100%;
+  }
+
+  .compare__swap {
+    font: inherit;
+    padding: 0.55rem 0.9rem;
+    color: var(--text);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .compare__swap:hover {
+    border-color: var(--accent);
+  }
+
+  .compare__panel {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    align-items: start;
+  }
+
+  .compare__side h3 {
+    margin-bottom: 0.6rem;
+  }
+
+  .t-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+  }
+
+  .compare__table {
+    width: 100%;
+    min-width: 28rem;
+    border-collapse: collapse;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .compare__table--all {
+    min-width: 34rem;
+  }
+
+  .compare__table th,
+  .compare__table td {
+    padding: 0.55rem 0.7rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    white-space: nowrap;
+  }
+
+  .compare__table thead th {
+    background: var(--bg-subtle);
+    font-size: 0.85rem;
+  }
+
+  .compare__table tfoot th,
+  .compare__table tfoot td {
+    font-weight: 700;
+    border-top: 2px solid var(--border);
+    border-bottom: none;
+  }
+
+  .compare__table tbody tr:last-child th,
+  .compare__table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .compare__note {
+    font-size: 0.85rem;
+    max-width: 68ch;
+  }
+
+  .shared-years__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .shared-years__list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem 0.8rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .shared-years__year {
+    font-weight: 700;
+    min-width: 3.2rem;
+  }
+
+  .shared-years__detail {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+</style>
+
+<script is:inline define:vars={{ records: recordsForClient }}>
+  const selectA = document.getElementById('compare-a');
+  const selectB = document.getElementById('compare-b');
+  const swapBtn = document.getElementById('compare-swap');
+  const status = document.getElementById('compare-status');
+  const statusTemplate = status?.dataset.template ?? '{a} vs {b}';
+  const byId = new Map(records.map((r) => [r.id, r]));
+  const sharedYearsBody = document.getElementById('shared-years-body');
+  const sharedYearsEmptyText = sharedYearsBody?.dataset.emptyText ?? '';
+
+  function setCell(row, field, value) {
+    const cell = row && row.querySelector(`[data-field="${field}"]`);
+    if (cell) cell.textContent = String(value);
+  }
+
+  function fillSide(side, record) {
+    const heading = document.getElementById(`compare-${side}-name`);
+    if (heading) heading.textContent = record.displayName;
+
+    record.awards.forEach((award, index) => {
+      const row = document.querySelector(`#compare-${side}-body tr[data-index="${index}"]`);
+      if (!row) return;
+      setCell(row, 'count', award.count);
+      setCell(row, 'years', award.years.length ? award.years.map((y) => y.year).join(', ') : '—');
+    });
+
+    const totalRow = document.getElementById(`compare-${side}-total`);
+    setCell(totalRow, 'count', record.totalAwards);
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function sharedAwardYears(a, b) {
+    function yearsFor(record) {
+      const map = new Map();
+      for (const award of record.awards) {
+        for (const y of award.years) {
+          const entry = map.get(y.year) || { yearSort: y.yearSort, titles: [] };
+          entry.titles.push(award.title);
+          map.set(y.year, entry);
+        }
+      }
+      return map;
+    }
+    const aYears = yearsFor(a);
+    const bYears = yearsFor(b);
+    const shared = [];
+    for (const [year, aEntry] of aYears) {
+      const bEntry = bYears.get(year);
+      if (!bEntry) continue;
+      shared.push({ year, yearSort: aEntry.yearSort, aAwards: aEntry.titles, bAwards: bEntry.titles });
+    }
+    return shared.sort((x, y) => x.yearSort - y.yearSort);
+  }
+
+  function renderSharedYears(a, b) {
+    if (!sharedYearsBody) return;
+
+    const aName = document.getElementById('shared-years-a-name');
+    const bName = document.getElementById('shared-years-b-name');
+    if (aName) aName.textContent = a.displayName;
+    if (bName) bName.textContent = b.displayName;
+
+    const shared = sharedAwardYears(a, b);
+
+    if (shared.length === 0) {
+      sharedYearsBody.innerHTML = `<p class="muted" id="shared-years-empty">${escapeHtml(sharedYearsEmptyText)}</p>`;
+      return;
+    }
+
+    const items = shared
+      .map(
+        (s) =>
+          `<li><span class="shared-years__year">${escapeHtml(s.year)}</span><span class="shared-years__detail"><strong>${escapeHtml(a.displayName)}</strong>: ${escapeHtml(s.aAwards.join(', '))}</span><span class="shared-years__detail"><strong>${escapeHtml(b.displayName)}</strong>: ${escapeHtml(s.bAwards.join(', '))}</span></li>`,
+      )
+      .join('');
+    sharedYearsBody.innerHTML = `<ol class="shared-years__list" id="shared-years-list">${items}</ol>`;
+  }
+
+  function readParams() {
+    const p = new URLSearchParams(window.location.search);
+    return { a: p.get('a') || '', b: p.get('b') || '' };
+  }
+
+  function writeParams(a, b) {
+    const p = new URLSearchParams(window.location.search);
+    a ? p.set('a', a) : p.delete('a');
+    b ? p.set('b', b) : p.delete('b');
+    const qs = p.toString();
+    const url = window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash;
+    window.history.replaceState({}, '', url);
+  }
+
+  function render() {
+    const a = byId.get(selectA.value);
+    const b = byId.get(selectB.value);
+    if (a) fillSide('a', a);
+    if (b) fillSide('b', b);
+    if (a && b) renderSharedYears(a, b);
+    if (status && a && b) {
+      status.textContent = statusTemplate
+        .replace('{a}', a.displayName)
+        .replace('{b}', b.displayName);
+    }
+    writeParams(selectA.value, selectB.value);
+  }
+
+  // Restore a shared link's selection, if both ids are known.
+  const initial = readParams();
+  if (initial.a && byId.has(initial.a)) selectA.value = initial.a;
+  if (initial.b && byId.has(initial.b)) selectB.value = initial.b;
+
+  selectA.addEventListener('change', render);
+  selectB.addEventListener('change', render);
+  swapBtn?.addEventListener('click', () => {
+    const a = selectA.value;
+    selectA.value = selectB.value;
+    selectB.value = a;
+    render();
+  });
+
+  render();
+</script>

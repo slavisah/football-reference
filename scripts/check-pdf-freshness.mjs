@@ -24,7 +24,7 @@ import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PDF_PAGES } from './pdf-pages.mjs';
+import { PDF_PAGES, TEAM_PDF_SOURCES, PLAYER_PDF_SOURCES } from './pdf-pages.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const MANIFEST_PATH = path.join(ROOT, 'public', 'downloads', '.pdf-manifest.json');
@@ -33,13 +33,48 @@ const MANIFEST_PATH = path.join(ROOT, 'public', 'downloads', '.pdf-manifest.json
 // this can never drift from what scripts/generate-pdfs.mjs actually rendered.
 const PDF_SOURCES = Object.fromEntries(PDF_PAGES.map(({ slug, sources }) => [slug, sources]));
 
+// The ~80 `team-<slug>`/`team-<slug>-hr` PDFs aren't in PDF_PAGES (see
+// scripts/pdf-pages.mjs's TEAM_PDF_SOURCES doc comment for why: the team
+// roster is data, not a hand-typed list, and this script - unlike
+// generate-pdfs.mjs - has no running preview server to ask for the live
+// roster, since `pnpm check:pdfs` runs *before* `pnpm build` in CI). Instead,
+// this trusts whichever `team-*` keys the last `pnpm build:pdfs` already
+// recorded in the manifest, and re-hashes TEAM_PDF_SOURCES - the one fixed
+// file list every team PDF actually depends on - against each of them. A
+// content edit that adds/removes/renames a team necessarily edits one of
+// those same files, so it flags every existing team-* entry stale and forces
+// a regeneration; that regeneration is what discovers the new roster via the
+// live endpoint. A team that has never had a PDF generated for it at all
+// (brand new roster entry, manifest has no `team-*` key for it yet) has
+// nothing here to flag it missing - a real but narrow gap, no worse than the
+// one build:pdfs lag every other PDF already has between a content edit and
+// its next manual regeneration.
+function teamSourcesFromManifest(manifest) {
+  return Object.fromEntries(
+    Object.keys(manifest)
+      .filter((slug) => slug.startsWith('team-'))
+      .map((slug) => [slug, TEAM_PDF_SOURCES]),
+  );
+}
+
+// Same trust-the-manifest-keys strategy as teamSourcesFromManifest() above,
+// for the `player-<slug>`/`player-<slug>-hr` PDFs - see
+// scripts/pdf-pages.mjs's PLAYER_PDF_SOURCES doc comment.
+function playerSourcesFromManifest(manifest) {
+  return Object.fromEntries(
+    Object.keys(manifest)
+      .filter((slug) => slug.startsWith('player-'))
+      .map((slug) => [slug, PLAYER_PDF_SOURCES]),
+  );
+}
+
 async function hashFile(relativePath) {
   const contents = await readFile(path.join(ROOT, relativePath), 'utf8');
   return createHash('sha256').update(contents).digest('hex');
 }
 
-async function currentHashes() {
-  const files = [...new Set(Object.values(PDF_SOURCES).flat())];
+async function currentHashes(sources) {
+  const files = [...new Set(Object.values(sources).flat())];
   const entries = await Promise.all(
     files.map(async (file) => [file, await hashFile(file)]),
   );
@@ -66,10 +101,15 @@ async function main() {
     return;
   }
 
-  const current = await currentHashes();
+  const sources = {
+    ...PDF_SOURCES,
+    ...teamSourcesFromManifest(manifest),
+    ...playerSourcesFromManifest(manifest),
+  };
+  const current = await currentHashes(sources);
   const stale = [];
 
-  for (const [slug, files] of Object.entries(PDF_SOURCES)) {
+  for (const [slug, files] of Object.entries(sources)) {
     const recorded = manifest[slug] ?? {};
     const outOfDate = files.filter((file) => recorded[file] !== current[file]);
     if (outOfDate.length > 0) {
@@ -79,7 +119,7 @@ async function main() {
 
   if (stale.length === 0) {
     console.log(
-      `All ${Object.keys(PDF_SOURCES).length} PDFs in public/downloads/ are up to date with their source content.`,
+      `All ${Object.keys(sources).length} PDFs in public/downloads/ are up to date with their source content.`,
     );
     return;
   }

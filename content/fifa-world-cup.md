@@ -5,13 +5,21 @@ competitionType: international
 confederation: FIFA
 firstEdition: 1930
 lastCompletedEdition: 2026
-lastReviewed: 2026-08-11
-status: review
+lastReviewed: 2026-08-14
+status: verified
 ---
 
 # FIFA World Cup
 
 The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 because of the Second World War and its aftermath. The competition expanded over time from 13 teams in 1930 to 48 teams in 2026.
+
+## How it works
+
+- National teams first play years of qualifying matches within their own confederation to win one of a limited number of finals places.
+- The finals begin with a group stage, where each team plays the others in its group; the leading teams advance.
+- From the round of 16 onward, it is a straight knockout: one defeat and a team is out.
+- The two semifinal winners meet in the final to decide the champion.
+- The tournament has expanded several times since 1930 - see "Format milestones" below for exactly when.
 
 ## Editions
 

@@ -13,12 +13,15 @@
 // unchanged.
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import TournamentTable from '../../../components/TournamentTable.astro';
+import PodiumCards from '../../../components/PodiumCards.astro';
 import ChampionsSummary from '../../../components/ChampionsSummary.astro';
+import HostMap from '../../../components/HostMap.astro';
 import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
-import { buildTopScorerFacts } from '../../../lib/editions';
+import { buildTopScorerFacts, buildPodiums, buildYearStories, buildHostMapPoints } from '../../../lib/editions';
+import { WORLD_CUP_HOST_COORDINATES, HOST_REGION_ORDER } from '../../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
   buildChampionsItemList,
@@ -39,6 +42,15 @@ const [data, goldenBoot] = await Promise.all([
 ]);
 
 const topScorers = buildTopScorerFacts(goldenBoot.editions, 'hr');
+const podium = buildPodiums(data.editions);
+const hostMap = buildHostMapPoints(data.editions, WORLD_CUP_HOST_COORDINATES, HOST_REGION_ORDER);
+const hostRegionLabels: Record<string, string> = {
+  'South America': 'Južna Amerika',
+  Europe: 'Europa',
+  'North America': 'Sjeverna Amerika',
+  Asia: 'Azija',
+  Africa: 'Afrika',
+};
 
 const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 
@@ -53,13 +65,23 @@ const jsonLd = [
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 
-// Hand-translated from content/fifa-world-cup.md's "Format milestones",
-// "Memorable moments" and "Editorial notes" sections (the same three
-// headings the English page requests via noteHeadings). content/ itself
+// Hand-translated from content/fifa-world-cup.md's "How it works", "Format
+// milestones", "Memorable moments" and "Editorial notes" sections (the same
+// four headings the English page requests via noteHeadings). content/ itself
 // stays untouched and English (the single editorial source of truth); this
 // is presentation-layer text local to this page only, the same way the three
 // earlier Croatian competition pages hand-write their own Croatian prose.
 const notes: NoteSection[] = [
+  {
+    heading: 'Kako funkcionira',
+    items: [
+      'Reprezentacije najprije godinama igraju kvalifikacijske utakmice unutar svoje konfederacije kako bi osvojile jedno od ograničenog broja mjesta na završnici.',
+      'Završnica počinje skupnom fazom, u kojoj svaka momčad igra protiv ostalih u svojoj skupini; najbolje plasirane momčadi napreduju.',
+      'Od osmine finala nadalje igra se izravni nokaut sustav: jedan poraz i momčad ispada.',
+      'Pobjednici polufinala igraju finale koje odlučuje prvaka.',
+      'Turnir se od 1930. nekoliko puta proširio - pogledajte "Prekretnice formata" niže za točne godine.',
+    ],
+  },
   {
     heading: 'Prekretnice formata',
     items: [
@@ -90,6 +112,15 @@ const notes: NoteSection[] = [
     ],
   },
 ];
+
+// "Dodirni godinu za priču": joins the Croatian Memorable-moments bullets
+// above onto the matching edition row by year, same as the English page's
+// CompetitionView does with the English bullets - see buildYearStories() in
+// src/lib/editions.ts.
+const stories = buildYearStories(
+  data.editions,
+  notes.find((section) => section.heading === 'Nezaboravni trenuci')?.items ?? [],
+);
 
 const headerLabels: Record<string, string> = {
   Year: 'Godina',
@@ -158,6 +189,19 @@ const headerLabels: Record<string, string> = {
       bitTeamPrefix="reprezentacija"
       emptyText="Nijedno izdanje ne odgovara odabranim filterima."
       clearFiltersLabel="Očisti filtere"
+      storyColumn={stories.size > 0 ? { label: 'Priča', values: stories } : undefined}
+      storySummaryLabel="📖 Dodirni za priču"
+    />
+
+    <PodiumCards
+      entries={podium}
+      id="world-cup-podium"
+      heading="Pobjednici po izdanju"
+      hostedByLabel="Domaćin:"
+      championLabel="Prvak"
+      runnerUpLabel="Drugoplasirani"
+      thirdLabel="Treći"
+      fourthLabel="Četvrti"
     />
 
     <ChampionsSummary
@@ -168,6 +212,16 @@ const headerLabels: Record<string, string> = {
       unit={['naslov', 'naslova']}
       winningYearsLabel="Godine osvajanja: "
       ofLabel="od"
+    />
+
+    <HostMap
+      points={hostMap}
+      id="world-cup-host-map"
+      heading="Gdje je Svjetsko prvenstvo igralo domaćinu"
+      description="Približan položaj svakog domaćina na jednostavnoj mreži zemljopisne dužine i širine, grupiran po regijama u popisu ispod - ne tvrdimo točne granice, samo otprilike gdje se u svijetu igralo pojedino izdanje. Veće točke znače da je zemlja bila domaćin više puta."
+      unit={['put', 'puta']}
+      hostingYearsLabel="Godine domaćinstva: "
+      regionLabels={hostRegionLabels}
     />
 
     <EditorialNotes sections={notes} />

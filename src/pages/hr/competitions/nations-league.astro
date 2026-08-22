@@ -12,11 +12,15 @@
 // the locale props already added for the Copa América slice.
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import TournamentTable from '../../../components/TournamentTable.astro';
+import PodiumCards from '../../../components/PodiumCards.astro';
 import ChampionsSummary from '../../../components/ChampionsSummary.astro';
+import HostMap from '../../../components/HostMap.astro';
 import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
+import { buildPodiums, buildYearStories, buildHostMapPoints } from '../../../lib/editions';
+import { NATIONS_LEAGUE_HOST_COORDINATES } from '../../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
   buildChampionsItemList,
@@ -29,6 +33,10 @@ const data = await loadCompetition('uefa-nations-league', {
   editionsHeading: 'Finals',
   sourcesHeading: 'UEFA Nations League',
 });
+
+const podium = buildPodiums(data.editions);
+const hostMap = buildHostMapPoints(data.editions, NATIONS_LEAGUE_HOST_COORDINATES);
+const hostRegionLabels: Record<string, string> = { Europe: 'Europa' };
 
 const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 
@@ -43,11 +51,21 @@ const jsonLd = [
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 
-// Hand-translated from content/uefa-nations-league.md's "Key facts" section.
+// Hand-translated from content/uefa-nations-league.md's "How it works", "Key
+// facts" and "Memorable moments" sections.
 // content/ itself stays untouched and English (the single editorial source of
 // truth); this is presentation-layer text local to this page only, the same
 // way hr/competitions/copa-america.astro hand-writes its own Croatian prose.
 const notes: NoteSection[] = [
+  {
+    heading: 'Kako funkcionira',
+    items: [
+      'Svaka UEFA reprezentacija razvrstana je u jednu od četiri lige (A do D) prema jačini, a zatim podijeljena u male skupine unutar svoje lige.',
+      'Momčadi igraju jedna protiv druge u svojoj skupini; rezultati vode do napredovanja najboljih u višu ligu i ispadanja najslabijih u nižu, usporedno s odvojenim kvalifikacijama za Svjetsko prvenstvo/EURO.',
+      'Četiri pobjednika skupina Lige A napreduju na Final Four Lige nacija: dva polufinala, utakmica za treće mjesto i finale, sve na terenu jednog od četiri finalista.',
+      'Igra se svake dvije godine.',
+    ],
+  },
   {
     heading: 'Ključne činjenice',
     items: [
@@ -57,7 +75,27 @@ const notes: NoteSection[] = [
       'Natjecanje koristi sustav ispadanja i napredovanja između liga.',
     ],
   },
+  {
+    heading: 'Nezaboravni trenuci',
+    items: [
+      'Portugal je osvojio prvi Final Four Lige nacija 2019. godine, pobijedivši Nizozemsku 1:0 kao domaćin.',
+      'Italija je 2021. bila domaćin Final Foura, a da nije igrala u finalu - završila je treća, dok je Francuska svladala Španjolsku 2:1 za naslov.',
+      'Španjolska je naslov 2023. osvojila izvođenjem jedanaesteraca nakon 0:0 protiv Hrvatske.',
+      'Portugal je 2025. u finalu pobijedio Španjolsku izvođenjem jedanaesteraca i postao prvi dvostruki prvak natjecanja.',
+      'Domaćin je u svakom dosadašnjem izdanju završio među četiri najbolje rangirane reprezentacije, uključujući Njemačku, koja je 2025. bila četvrta.',
+    ],
+  },
 ];
+
+// "Dodirni sezonu za priču": joins the Croatian Memorable-moments bullets
+// above onto the matching edition row by (Finals) year, same as the English
+// page's CompetitionView does with the English bullets - see
+// buildYearStories() in src/lib/editions.ts, which resolves a "2018-19"
+// season label to its Finals year (2019) for this match.
+const stories = buildYearStories(
+  data.editions,
+  notes.find((section) => section.heading === 'Nezaboravni trenuci')?.items ?? [],
+);
 
 const headerLabels: Record<string, string> = {
   Season: 'Sezona',
@@ -124,6 +162,19 @@ const headerLabels: Record<string, string> = {
       bitTeamPrefix="reprezentacija"
       emptyText="Nijedno izdanje ne odgovara odabranim filterima."
       clearFiltersLabel="Očisti filtere"
+      storyColumn={stories.size > 0 ? { label: 'Priča', values: stories } : undefined}
+      storySummaryLabel="📖 Dodirni za priču"
+    />
+
+    <PodiumCards
+      entries={podium}
+      id="nations-league-podium"
+      heading="Pobjednici po izdanju"
+      hostedByLabel="Domaćin:"
+      championLabel="Prvak"
+      runnerUpLabel="Drugoplasirani"
+      thirdLabel="Treći"
+      fourthLabel="Četvrti"
     />
 
     <ChampionsSummary
@@ -134,6 +185,16 @@ const headerLabels: Record<string, string> = {
       unit={['naslov', 'naslova']}
       winningYearsLabel="Godine osvajanja: "
       ofLabel="od"
+    />
+
+    <HostMap
+      points={hostMap}
+      id="nations-league-host-map"
+      heading="Gdje je Final Four Lige nacija igrao domaćinu"
+      description="Približan položaj svakog domaćina na jednostavnoj mreži zemljopisne dužine i širine, grupiran po regijama u popisu ispod - ne tvrdimo točne granice, samo otprilike gdje se u svijetu igralo pojedino izdanje. Veće točke znače da je zemlja bila domaćin više puta."
+      unit={['put', 'puta']}
+      hostingYearsLabel="Godine domaćinstva: "
+      regionLabels={hostRegionLabels}
     />
 
     <EditorialNotes sections={notes} />
