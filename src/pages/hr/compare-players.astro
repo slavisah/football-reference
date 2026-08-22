@@ -71,6 +71,18 @@ const lastReviewed = [ballonDor.lastReviewed, worldCupGoldenBoot.lastReviewed, e
 
 const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
 
+// Panel "jedan protiv jednoga": jedan redak po statistici, s vrijednostima
+// obaju igrača jednu do druge (isti oblik kao engleska stranica i /compare).
+function leaderOf(a: number, b: number): 'a' | 'b' | 'tie' {
+  if (a > b) return 'a';
+  if (b > a) return 'b';
+  return 'tie';
+}
+
+function yearsText(years: { year: string }[]): string {
+  return years.map((y) => y.year).join(', ') || '—';
+}
+
 const recordsForClient = allRecords.map((r) => ({
   id: r.id,
   displayName: r.displayName,
@@ -157,52 +169,67 @@ const jsonLd: JsonLdObject[] = [
         {`Usporedba: ${defaultA.displayName} protiv ${defaultB.displayName}.`}
       </p>
 
-      <div class="compare__panel">
-        {
-          (['a', 'b'] as const).map((side) => {
-            const record = side === 'a' ? defaultA : defaultB;
-            return (
-              <div class="compare__side">
-                <h3 id={`compare-${side}-name`}>{record.displayName}</h3>
-                <div
-                  class="t-wrap"
-                  tabindex="0"
-                  role="region"
-                  aria-label={`Nagrade igrača ${record.displayName}`}
-                >
-                  <table class="compare__table">
-                    <caption class="visually-hidden">Nagrade igrača {record.displayName}</caption>
-                    <thead>
-                      <tr>
-                        <th scope="col">Nagrada</th>
-                        <th scope="col">Broj osvajanja</th>
-                        <th scope="col">Godine</th>
-                      </tr>
-                    </thead>
-                    <tbody id={`compare-${side}-body`}>
-                      {
-                        record.awards.map((a, index) => (
-                          <tr data-index={index}>
-                            <th scope="row">{a.title}</th>
-                            <td data-field="count">{a.count}</td>
-                            <td data-field="years">{a.years.map((y) => y.year).join(', ') || '—'}</td>
-                          </tr>
-                        ))
-                      }
-                    </tbody>
-                    <tfoot>
-                      <tr id={`compare-${side}-total`}>
-                        <th scope="row">Ukupno</th>
-                        <td data-field="count">{record.totalAwards}</td>
-                        <td data-field="years" aria-hidden="true"></td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-              </div>
-            );
-          })
-        }
+      <div class="vs" id="compare-panel">
+        <table class="vs__table">
+          <caption
+            class="visually-hidden"
+            id="compare-caption"
+            data-template="{a} u usporedbi s {b}, po nagradama"
+          >
+            {`${defaultA.displayName} u usporedbi s ${defaultB.displayName}, po nagradama`}
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col" class="vs__team" id="compare-a-name">{defaultA.displayName}</th>
+              <th scope="col" class="vs__stat-head">Nagrada</th>
+              <th scope="col" class="vs__team" id="compare-b-name">{defaultB.displayName}</th>
+            </tr>
+          </thead>
+          {
+            defaultA.awards.map((award, index) => {
+              const other = defaultB.awards[index];
+              // Dva igrača koja nikad nisu osvojila ovu nagradu svode se na
+              // jedan redak: reci s nulama i crticama na mobitelu su većina
+              // visine panela, a nijedna informacija.
+              const empty = award.count === 0 && other.count === 0;
+              return (
+                <tbody data-index={index} data-empty={String(empty)}>
+                  <tr class="vs__group">
+                    <th colspan="3" scope="colgroup">
+                      {award.title}
+                    </th>
+                  </tr>
+                  <tr class="vs__none">
+                    <td colspan="3">Nijedan igrač nije osvojio ovu nagradu.</td>
+                  </tr>
+                  <tr data-metric="count" data-leader={leaderOf(award.count, other.count)}>
+                    <td class="vs__value" data-side="a">{award.count}</td>
+                    <th scope="row" class="vs__stat">Broj osvajanja</th>
+                    <td class="vs__value" data-side="b">{other.count}</td>
+                  </tr>
+                  <tr data-metric="years" class="vs__years-row">
+                    <td class="vs__years" data-side="a">{yearsText(award.years)}</td>
+                    <th scope="row" class="vs__stat">Godine</th>
+                    <td class="vs__years" data-side="b">{yearsText(other.years)}</td>
+                  </tr>
+                </tbody>
+              );
+            })
+          }
+          <tbody data-index="combined" class="vs__combined" data-empty="false">
+            <tr class="vs__group">
+              <th colspan="3" scope="colgroup">Ukupno</th>
+            </tr>
+            <tr
+              data-metric="count"
+              data-leader={leaderOf(defaultA.totalAwards, defaultB.totalAwards)}
+            >
+              <td class="vs__value" data-side="a">{defaultA.totalAwards}</td>
+              <th scope="row" class="vs__stat">Ukupno nagrada</th>
+              <td class="vs__value" data-side="b">{defaultB.totalAwards}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <p class="muted compare__note">
@@ -379,15 +406,211 @@ const jsonLd: JsonLdObject[] = [
     border-color: var(--accent);
   }
 
-  .compare__panel {
-    display: grid;
-    gap: 1.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-    align-items: start;
+  /* "Versus" comparison table: one row per statistic, Team A's value on the
+     left, Team B's on the right, the metric label between them. Transposed
+     from the two separate per-team tables this panel used to render, which
+     put the two numbers a reader wants to compare on different screens at
+     360px - each table was wider than the viewport and they stacked
+     vertically. Three narrow columns fit any phone with no horizontal
+     scroll, so no .t-wrap wrapper is needed here (the "All national teams"
+     ranking below still has one - it genuinely has one column per award). */
+  .vs {
+    container-type: inline-size;
   }
 
-  .compare__side h3 {
-    margin-bottom: 0.6rem;
+  .vs__table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    table-layout: fixed;
+  }
+
+  .vs__table thead th {
+    position: sticky;
+    /* Sits directly under the sticky site header, whose real height varies
+       by viewport and locale - Nav.astro measures it into this property. */
+    top: var(--site-header-height, 3.5rem);
+    z-index: 1;
+    padding: 0.7rem 0.5rem;
+    background: var(--bg-subtle);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .vs__team {
+    width: 34%;
+    font-size: 1rem;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .vs__stat-head {
+    width: 32%;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .vs__group th {
+    padding: 0.55rem 0.7rem;
+    background: var(--bg-subtle);
+    border-block: 1px solid var(--border);
+    text-align: left;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .vs__table tbody tr:not(.vs__group) th,
+  .vs__table tbody tr:not(.vs__group) td {
+    padding: 0.6rem 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .vs__stat {
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .vs__value {
+    text-align: center;
+    font-size: 1.35rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The leading side. Weight, colour and a marker together, never colour
+     alone - the same rule global.css documents for the winner cell in
+     TournamentTable. */
+  .vs__table tr[data-leader='a'] .vs__value[data-side='a'],
+  .vs__table tr[data-leader='b'] .vs__value[data-side='b'] {
+    color: var(--accent);
+    font-weight: 800;
+  }
+
+  .vs__table tr[data-leader='a'] .vs__value[data-side='a']::after,
+  .vs__table tr[data-leader='b'] .vs__value[data-side='b']::after {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-inline-start: 0.35rem;
+    vertical-align: 0.15em;
+    border-inline: 0.3rem solid transparent;
+    border-bottom: 0.42rem solid currentColor;
+  }
+
+  @media (forced-colors: active) {
+    .vs__table tr[data-leader='a'] .vs__value[data-side='a'],
+    .vs__table tr[data-leader='b'] .vs__value[data-side='b'] {
+      outline: 1px solid CanvasText;
+      outline-offset: -3px;
+    }
+  }
+
+  .vs__combined tr:not(.vs__group) td,
+  .vs__combined tr:not(.vs__group) th {
+    font-size: 1.05rem;
+  }
+
+  .vs__combined .vs__value {
+    font-size: 1.5rem;
+  }
+
+  .vs__table tbody:last-child tr:last-child th,
+  .vs__table tbody:last-child tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Room for longer metric labels once the panel is wide enough. */
+  @container (min-width: 34rem) {
+    .vs__team {
+      font-size: 1.15rem;
+    }
+
+    .vs__stat {
+      font-size: 0.95rem;
+    }
+
+    .vs__table tbody tr:not(.vs__group) th,
+    .vs__table tbody tr:not(.vs__group) td {
+      padding: 0.7rem 1rem;
+    }
+  }
+
+  .vs__years {
+    text-align: center;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+  }
+
+  .vs__none {
+    display: none;
+  }
+
+  .vs__table tbody[data-empty='true'] tr[data-metric] {
+    display: none;
+  }
+
+  .vs__table tbody[data-empty='true'] .vs__none {
+    display: table-row;
+  }
+
+  .vs__none td {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .t-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+  }
+
+  .compare__table {
+    width: 100%;
+    min-width: 28rem;
+    border-collapse: collapse;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .compare__table--all {
+    min-width: 34rem;
+  }
+
+  .compare__table th,
+  .compare__table td {
+    padding: 0.55rem 0.7rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    white-space: nowrap;
+  }
+
+  .compare__table thead th {
+    background: var(--bg-subtle);
+    font-size: 0.85rem;
+  }
+
+  .compare__table tfoot th,
+  .compare__table tfoot td {
+    font-weight: 700;
+    border-top: 2px solid var(--border);
+    border-bottom: none;
+  }
+
+  .compare__table tbody tr:last-child th,
+  .compare__table tbody tr:last-child td {
+    border-bottom: none;
   }
 
   .t-wrap {
@@ -480,24 +703,63 @@ const jsonLd: JsonLdObject[] = [
   const sharedYearsBody = document.getElementById('shared-years-body');
   const sharedYearsEmptyText = sharedYearsBody?.dataset.emptyText ?? '';
 
-  function setCell(row, field, value) {
-    const cell = row && row.querySelector(`[data-field="${field}"]`);
-    if (cell) cell.textContent = String(value);
+  // Fills the versus table: each award is one tbody carrying data-index, so
+  // one pass sets both players' values and re-derives which side leads.
+  // Replaces the old fill-one-side-at-a-time pass, which had a table each.
+  const panel = document.getElementById('compare-panel');
+  const caption = document.getElementById('compare-caption');
+  const captionTemplate = caption?.dataset.template ?? '';
+
+  function yearsText(years) {
+    return years.length ? years.map((y) => y.year).join(', ') : '—';
   }
 
-  function fillSide(side, record) {
-    const heading = document.getElementById(`compare-${side}-name`);
-    if (heading) heading.textContent = record.displayName;
+  function setLeader(row, aValue, bValue) {
+    let leader = 'tie';
+    if (aValue > bValue) leader = 'a';
+    else if (bValue > aValue) leader = 'b';
+    row.dataset.leader = leader;
+  }
 
-    record.awards.forEach((award, index) => {
-      const row = document.querySelector(`#compare-${side}-body tr[data-index="${index}"]`);
-      if (!row) return;
-      setCell(row, 'count', award.count);
-      setCell(row, 'years', award.years.length ? award.years.map((y) => y.year).join(', ') : '—');
+  function fillVersus(a, b) {
+    const nameA = document.getElementById('compare-a-name');
+    const nameB = document.getElementById('compare-b-name');
+    if (nameA) nameA.textContent = a.displayName;
+    if (nameB) nameB.textContent = b.displayName;
+    if (caption && captionTemplate) {
+      caption.textContent = captionTemplate
+        .replace('{a}', a.displayName)
+        .replace('{b}', b.displayName);
+    }
+    if (!panel) return;
+
+    a.awards.forEach((award, index) => {
+      const other = b.awards[index];
+      const group = panel.querySelector(`tbody[data-index="${index}"]`);
+      if (!group || !other) return;
+
+      const countRow = group.querySelector('tr[data-metric="count"]');
+      if (countRow) {
+        countRow.querySelector('.vs__value[data-side="a"]').textContent = String(award.count);
+        countRow.querySelector('.vs__value[data-side="b"]').textContent = String(other.count);
+        setLeader(countRow, award.count, other.count);
+      }
+
+      const yearsRow = group.querySelector('tr[data-metric="years"]');
+      if (yearsRow) {
+        yearsRow.querySelector('.vs__years[data-side="a"]').textContent = yearsText(award.years);
+        yearsRow.querySelector('.vs__years[data-side="b"]').textContent = yearsText(other.years);
+      }
+
+      group.dataset.empty = award.count === 0 && other.count === 0 ? 'true' : 'false';
     });
 
-    const totalRow = document.getElementById(`compare-${side}-total`);
-    setCell(totalRow, 'count', record.totalAwards);
+    const combined = panel.querySelector('tbody[data-index="combined"] tr[data-metric="count"]');
+    if (combined) {
+      combined.querySelector('.vs__value[data-side="a"]').textContent = String(a.totalAwards);
+      combined.querySelector('.vs__value[data-side="b"]').textContent = String(b.totalAwards);
+      setLeader(combined, a.totalAwards, b.totalAwards);
+    }
   }
 
   function escapeHtml(value) {
@@ -571,9 +833,10 @@ const jsonLd: JsonLdObject[] = [
   function render() {
     const a = byId.get(selectA.value);
     const b = byId.get(selectB.value);
-    if (a) fillSide('a', a);
-    if (b) fillSide('b', b);
-    if (a && b) renderSharedYears(a, b);
+    if (a && b) {
+      fillVersus(a, b);
+      renderSharedYears(a, b);
+    }
     if (status && a && b) {
       status.textContent = statusTemplate
         .replace('{a}', a.displayName)
