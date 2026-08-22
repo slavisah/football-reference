@@ -83,6 +83,12 @@ const PODIUM_COMPONENT = 'src/components/PodiumCards.astro';
 const HOST_MAP_COMPONENT = 'src/components/HostMap.astro';
 const HOST_MAP_DATA = 'src/lib/hostCoordinates.ts';
 
+// /compare and /compare-players render their own custom "versus" layout by
+// hand (not TournamentTable/ChampionsSummary/EditorialNotes - see
+// docs/PROJECT_STATUS.md's 2026-08-22 "versus table" entry), so only
+// References.astro from the shared component set actually applies to them.
+const REFERENCES_COMPONENT = 'src/components/References.astro';
+
 export const PDF_PAGES = [
   {
     slug: 'world-cup',
@@ -198,7 +204,48 @@ export const PDF_PAGES = [
       'src/pages/records.astro',
     ],
   },
-  // Croatian counterparts of the six pages above. Same underlying editorial
+  // /compare's default-rendered pair (the two most-titled teams - see
+  // src/pages/compare.astro's own "before any JS runs" comment) is exactly
+  // what a printed page shows, the same progressive-enhancement precedent
+  // every other PDF here already relies on (a reader who never runs JS still
+  // gets a meaningful page). src/lib/teamCompetitions.ts is the shared loader
+  // /compare and /team-index.json.ts both call; src/lib/compare.ts is the
+  // ranking/head-to-head/finals-meetings logic itself.
+  {
+    slug: 'compare',
+    path: '/compare',
+    sources: [
+      'content/fifa-world-cup.md',
+      'content/uefa-euro.md',
+      'content/copa-america.md',
+      'content/uefa-nations-league.md',
+      SOURCES_MD,
+      ...COMPETITION_LIB,
+      'src/lib/teamCompetitions.ts',
+      'src/lib/compare.ts',
+      'src/lib/teamProfile.ts',
+      REFERENCES_COMPONENT,
+      'src/pages/compare.astro',
+    ],
+  },
+  // Same precedent as /compare above, for the individual-award head-to-head
+  // page. src/lib/comparePlayers.ts is the ranking/shared-award-years logic;
+  // src/lib/playerProfile.ts builds the per-player profiles it ranks.
+  {
+    slug: 'compare-players',
+    path: '/compare-players',
+    sources: [
+      'content/ballon-dor.md',
+      'content/golden-boot.md',
+      SOURCES_MD,
+      ...COMPETITION_LIB,
+      'src/lib/playerProfile.ts',
+      'src/lib/comparePlayers.ts',
+      REFERENCES_COMPONENT,
+      'src/pages/compare-players.astro',
+    ],
+  },
+  // Croatian counterparts of the eight pages above. Same underlying editorial
   // source files (content/ stays English-only, per AGENTS.md - only each
   // /hr/ page's own chrome is translated), but a distinct `/hr/...` page
   // path so the rendered PDF actually carries the Croatian labels/headers
@@ -303,6 +350,37 @@ export const PDF_PAGES = [
       'src/lib/compare.ts',
       'src/lib/teamProfile.ts',
       'src/pages/hr/records.astro',
+    ],
+  },
+  {
+    slug: 'compare-hr',
+    path: '/hr/compare',
+    sources: [
+      'content/fifa-world-cup.md',
+      'content/uefa-euro.md',
+      'content/copa-america.md',
+      'content/uefa-nations-league.md',
+      SOURCES_MD,
+      ...COMPETITION_LIB,
+      'src/lib/teamCompetitions.ts',
+      'src/lib/compare.ts',
+      'src/lib/teamProfile.ts',
+      REFERENCES_COMPONENT,
+      'src/pages/hr/compare.astro',
+    ],
+  },
+  {
+    slug: 'compare-players-hr',
+    path: '/hr/compare-players',
+    sources: [
+      'content/ballon-dor.md',
+      'content/golden-boot.md',
+      SOURCES_MD,
+      ...COMPETITION_LIB,
+      'src/lib/playerProfile.ts',
+      'src/lib/comparePlayers.ts',
+      REFERENCES_COMPONENT,
+      'src/pages/hr/compare-players.astro',
     ],
   },
 ];

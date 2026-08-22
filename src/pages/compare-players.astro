@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import References from '../components/References.astro';
+import PrintDownloadLink from '../components/PrintDownloadLink.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import { buildAllPlayerProfiles } from '../lib/playerProfile';
 import type { PlayerAwardSource } from '../lib/playerProfile';
@@ -98,6 +99,10 @@ const jsonLd: JsonLdObject[] = [
       <p class="eyebrow badge">Generated from the award tables</p>
       <h1>{meta.title}</h1>
       <p class="compare__intro">{meta.intro}</p>
+      <PrintDownloadLink
+        slug="compare-players"
+        hint="A4 landscape, the default pair shown below plus the full player ranking."
+      />
     </header>
 
     <section class="card stack" aria-labelledby="head-to-head-heading">
