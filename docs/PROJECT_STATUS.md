@@ -10584,6 +10584,68 @@ dialog would do. The desktop header above 60rem still wraps its fifteen nav
 links onto two rows; a grouped/overflow nav there is a separate design
 question this change deliberately left alone.
 
+### Head-to-head panels rebuilt as a "versus" table - `/compare` and `/compare-players`, both languages - added 2026-08-22 (later intensive run)
+
+**Problem.** Both head-to-head panels rendered one table per side: Team A's
+five-column record, then Team B's, stacked vertically inside
+`.compare__panel`. At the 360px viewport this project targets, each table was
+wider than the screen (`min-width: 28rem` inside a `.t-wrap` scroller) and
+they sat one above the other, so comparing two teams meant scrolling right in
+table A, memorising a number, scrolling down past the whole table, and
+scrolling right again in table B. The two numbers a reader opens this page to
+compare were never on screen together - which is the entire purpose of the
+page.
+
+**Fix - transpose it.** The panel is now one table with three columns: Team
+A's value, the statistic's name, Team B's value. One row per statistic, so
+both numbers are always side by side, and three narrow columns fit any phone
+with no horizontal scroll at all (the `.t-wrap` wrapper is gone from this
+panel; the "All national teams"/"All players" rankings below still have one,
+they genuinely are wide tables).
+
+- **Grouped, not flattened**: one `<tbody>` per competition (or award) with a
+  `<th scope="colgroup">` heading, ending in a "Combined" group. Semantics
+  stayed table semantics - metric as row header, team as column header - so
+  the panel still reads correctly cell by cell in a screen reader.
+- **The leader is marked per row**, in weight, colour *and* a triangle
+  marker, never colour alone, with a forced-colors outline - the same rule
+  `global.css` documents for `TournamentTable`'s winner cell. A tie marks
+  neither side. `data-leader="a" | "b" | "tie"` on the row is what the CSS and
+  the tests both key off.
+- **Empty groups collapse.** Argentina vs Uruguay used to render eight rows of
+  zeros for the EURO and the Nations League. A competition (or award) where
+  both sides have nothing now collapses to a single "Neither team has a record
+  here." line, roughly halving the panel on a typical pair. "Combined" is
+  exempt: it is the summary line, not one competition among several. Rows are
+  hidden in CSS rather than removed, so the client script only flips one
+  attribute per group when the pair changes.
+- **The pair header sticks** under the site header, using the same
+  `--site-header-height` custom property `Nav.astro` measures - so on a long
+  scroll you never lose track of which column is whom.
+- Applied to all four pages (`/compare`, `/hr/compare`, `/compare-players`,
+  `/hr/compare-players`); the Croatian pages keep their own translated
+  labels and reuse the identical, language-independent `fillVersus()`.
+
+**Tests:** the specs that reached into the old per-side DOM
+(`#compare-a-body`, `#compare-a-total`, `[data-field]`) now address the versus
+rows instead. Ten new cases: both values proven to sit on one row *and* inside
+the 360px viewport (a bounding-box assertion, which is the actual regression
+this change fixes), the panel's own `scrollWidth` proving no sideways scroll,
+leader marking surviving a swap, ties marking neither side, empty groups
+collapsing and re-expanding when the pair changes, and Combined keeping its
+numbers. `pnpm lint` - 0 errors/warnings/hints. `pnpm test` - **431/431**
+(unchanged - the change is presentational, no `src/lib` logic moved).
+`pnpm build` - 307 pages, and `check:perf`/`check:links`/`check:sitemap`/
+`check:precache`/`check:pdfs` all clean. Full `pnpm test:e2e` - **685/685**
+(up from 676).
+
+**Left for a future pass:** all four competitions currently track a
+semifinal/third-place column, so the "—" both-sides state the panel still
+renders for one that doesn't is unreachable from real content and has no test
+of its own (noted inline in `mobile.spec.ts`). The panel shows raw counts
+only; a proportional bar per row was considered and deliberately deferred -
+the counts are small integers where a bar adds decoration, not information.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
