@@ -14,11 +14,13 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import TournamentTable from '../../../components/TournamentTable.astro';
 import PodiumCards from '../../../components/PodiumCards.astro';
 import ChampionsSummary from '../../../components/ChampionsSummary.astro';
+import HostMap from '../../../components/HostMap.astro';
 import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
-import { buildPodiums, buildYearStories } from '../../../lib/editions';
+import { buildPodiums, buildYearStories, buildHostMapPoints } from '../../../lib/editions';
+import { NATIONS_LEAGUE_HOST_COORDINATES } from '../../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
   buildChampionsItemList,
@@ -33,6 +35,8 @@ const data = await loadCompetition('uefa-nations-league', {
 });
 
 const podium = buildPodiums(data.editions);
+const hostMap = buildHostMapPoints(data.editions, NATIONS_LEAGUE_HOST_COORDINATES);
+const hostRegionLabels: Record<string, string> = { Europe: 'Europa' };
 
 const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 
@@ -181,6 +185,16 @@ const headerLabels: Record<string, string> = {
       unit={['naslov', 'naslova']}
       winningYearsLabel="Godine osvajanja: "
       ofLabel="od"
+    />
+
+    <HostMap
+      points={hostMap}
+      id="nations-league-host-map"
+      heading="Gdje je Final Four Lige nacija igrao domaćinu"
+      description="Približan položaj svakog domaćina na jednostavnoj mreži zemljopisne dužine i širine, grupiran po regijama u popisu ispod - ne tvrdimo točne granice, samo otprilike gdje se u svijetu igralo pojedino izdanje. Veće točke znače da je zemlja bila domaćin više puta."
+      unit={['put', 'puta']}
+      hostingYearsLabel="Godine domaćinstva: "
+      regionLabels={hostRegionLabels}
     />
 
     <EditorialNotes sections={notes} />

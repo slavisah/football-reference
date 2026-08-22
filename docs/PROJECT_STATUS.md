@@ -10199,6 +10199,112 @@ terminology - content-safety, image sourcing) would be a reasonable next
 angle in this vein, though nothing turned up in this run's own read-through
 beyond the one gap closed here.
 
+### New feature: host locator map extended from World Cup to EURO, UEFA Nations League and Copa América - added 2026-08-22 (later intensive run)
+
+The World Cup's "Display a map of host countries" locator map (2026-08-19)
+was left as a World Cup-only feature - `CompetitionView.astro`'s own
+`hostMap` prop doc comment said so explicitly. The other three team
+competitions with a host column (EURO, UEFA Nations League, Copa América)
+had no map at all, even though `HostMap.astro` and `buildHostMapPoints()`
+were already fully generic - the only missing piece was a coordinate table
+per competition, the same shape `WORLD_CUP_HOST_COORDINATES` already
+provides.
+
+**`src/lib/hostCoordinates.ts`** gained three sibling tables, each keyed by
+that competition's exact host-column text (confirmed against the live
+content files via `distinctHosts()`, not guessed): `EURO_HOST_COORDINATES`
+(14 values, 1960-2024), `NATIONS_LEAGUE_HOST_COORDINATES` (4 values, every
+completed season so far), `COPA_AMERICA_HOST_COORDINATES` (11 country
+values) plus `COPA_AMERICA_REGION_ORDER` (South America before North
+America, since United States 2016/2024 is the one outlier). Two real edge
+cases, both resolved by extending the World Cup table's own existing
+conventions rather than inventing new ones:
+
+- **Copa América's three "Home-and-away" editions** (1975, 1979, 1983, no
+  single host country) needed no special-casing at all -
+  `buildHostsSummary()`'s existing `NOT_A_HOST` regex (shared with
+  `distinctHosts()` and `quiz.ts`'s host question) already excludes them
+  before `buildHostMapPoints()` is ever called, so the coordinate table only
+  needed the 11 real country hosts.
+- **EURO's 2020 edition** ("Eleven European cities" - Amsterdam, Baku,
+  Bilbao, Bucharest, Budapest, Copenhagen, Glasgow, London, Munich, Rome,
+  Saint Petersburg, genuinely no single host country) is a real edition, not
+  a placeholder like Copa América's home-and-away rows, so excluding it
+  would have quietly dropped a real host entry other pages
+  (`distinctHosts()`, the host filter, `buildHostsSummary()`'s "Most
+  frequent hosts" ranking on `/records`) still show correctly. Gave it one
+  symbolic marker at a rough centroid of the eleven cities instead - the
+  same "approximate marker, not a cartographic claim" policy the header
+  comment on this file already states for every other point, just applied
+  to a wider spread than a normal co-host pair.
+
+**Six pages wired up** (English `euro.astro`/`nations-league.astro`/
+`copa-america.astro` via `CompetitionView`'s existing `hostMap` prop - no
+component change needed - and their `/hr/` counterparts, which compose
+`HostMap.astro` by hand like the Croatian World Cup page already does, each
+with its own translated heading/description/region labels). EURO and
+Nations League both map to a single "Europe" region, so `HostMap.astro`'s
+existing region-grouping renders one section, not five - the component
+needed no change to handle that gracefully, since `regionGroups` is already
+just "however many distinct regions actually appear." Removed the
+now-stale "World Cup only for now" note from `CompetitionView.astro`'s
+`hostMap` prop doc comment.
+
+**`scripts/pdf-pages.mjs`** gained `HOST_MAP_COMPONENT`/`HOST_MAP_DATA` in
+the `euro`/`nations-league`/`copa-america` entries and their three `-hr`
+counterparts (six PDF slugs total), and its own header comment ("currently
+only opted into by the World Cup page") was corrected to describe the new,
+wider set - exactly the kind of rendering-code dependency this file's own
+header comment already warns is easy to silently miss. `pnpm check:pdfs`
+correctly flagged all nine affected PDFs (six new plus World Cup's own two,
+which picked up the corrected `hostCoordinates.ts` header comment) as stale
+before regeneration; every one of the 290 PDFs (unchanged count - no
+per-competition PDF was added or removed, all six already existed) was
+regenerated with `PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm
+build:pdfs` and confirmed clean after, the same full-regeneration behavior
+prior PDF-affecting entries in this file have already recorded (the tool
+has no incremental mode, so every PDF is rewritten on each run even where
+its own content didn't change).
+
+**Tests:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across 136
+files (no new page files - all six changed pages already existed). `pnpm
+test` - **425/425** (7 new in `tests/unit/editions.test.ts`: EURO's
+co-host/2020 resolution and 14-entry/region-validity checks, UEFA Nations
+League's 4-entry check, Copa América's South America/North America
+grouping-plus-Home-and-away-exclusion and 11-entry/region-validity checks).
+`pnpm build` - 307 pages (unchanged - no new page, only more content on six
+existing ones). `pnpm check:links`, `check:sitemap`, `check:precache` all
+pass unchanged. `pnpm check:perf` - all pages within the 510 KB budget
+(heaviest unchanged at `hr/records` 501.2 KB; the two Copa América pages
+grew the most from their 11-entry map, to 265.1 KB/262.7 KB, still well
+inside budget). 8 new Playwright cases at 360px covering all six changed
+pages (EURO: one Europe region, the "Eleven European cities" entry present;
+Nations League: one Europe region, every Finals host present; Copa América:
+South America/North America grouping, "Home-and-away" produces zero map
+entries, United States present; plus the three Croatian equivalents with
+translated headings/region labels). The accessibility sweeps
+(`accessibility.spec.ts`, `accessibility-forced-colors.spec.ts`) and
+`print-styles.spec.ts` are `NAV_LINKS`-driven against these same six
+existing pages, so they picked up the added content automatically with no
+per-page wiring, the same payoff every prior nav-content-addition entry in
+this file has already recorded for that mechanism.
+
+**Left for a future pass:** the standing candidates from prior runs are
+unchanged (source-link liveness infeasible, further content-accuracy
+spot-checks low-yield, the flag-emoji idea rejected, CSP's `'unsafe-inline'`
+not worth revisiting, the Golden Boot reverse-lookup quiz type not pursued,
+`public/downloads/` PDF-bloat documented/intentional, full per-edition team
+participant lists blocked on sourcing, `/compare-players` print PDF
+matching `/compare`'s own precedent). "EURO podium cards structurally
+impossible" is unaffected by this run (a locator map only needs one host
+cell per edition; a podium needs a ranked top-four, which EURO's
+"semifinalist" columns don't provide) and remains correctly listed above.
+Ballon d'Or and Golden Boot have no host column at all (individual awards),
+so a host locator map for either would need new editorial content this site
+doesn't have - not pursued, matching the same "no data to build from" reason
+the two individual awards are already excluded from `buildHomeSoilTitles()`
+and the "Most frequent hosts"/podium rankings elsewhere on this site.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

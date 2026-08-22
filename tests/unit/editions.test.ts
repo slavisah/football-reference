@@ -20,7 +20,14 @@ import {
   editionTeams,
   isPlaceholderWinner,
 } from '../../src/lib/editions';
-import { HOST_REGION_ORDER, WORLD_CUP_HOST_COORDINATES } from '../../src/lib/hostCoordinates';
+import {
+  COPA_AMERICA_HOST_COORDINATES,
+  COPA_AMERICA_REGION_ORDER,
+  EURO_HOST_COORDINATES,
+  HOST_REGION_ORDER,
+  NATIONS_LEAGUE_HOST_COORDINATES,
+  WORLD_CUP_HOST_COORDINATES,
+} from '../../src/lib/hostCoordinates';
 import type { MarkdownTable } from '../../src/lib/types';
 
 const table: MarkdownTable = {
@@ -337,6 +344,70 @@ describe('buildHostMapPoints', () => {
 
   it('has exactly one coordinate per distinct World Cup host, matching content/fifa-world-cup.md\'s 19 unique Host(s) values', () => {
     expect(Object.keys(WORLD_CUP_HOST_COORDINATES)).toHaveLength(19);
+  });
+
+  it('resolves every EURO edition (including the co-host and 2020 "Eleven European cities" rows) without throwing', () => {
+    const euroTable: MarkdownTable = {
+      headers: ['Year', 'Host(s)', 'Winner'],
+      rows: [
+        ['1960', 'France', 'Soviet Union'],
+        ['2000', 'Belgium and Netherlands', 'France'],
+        ['2008', 'Austria and Switzerland', 'Spain'],
+        ['2012', 'Poland and Ukraine', 'Spain'],
+        ['2020', 'Eleven European cities', 'Italy'],
+      ],
+    };
+    const points = buildHostMapPoints(buildEditions(euroTable), EURO_HOST_COORDINATES);
+    expect(points.map((p) => p.host)).toEqual([
+      'France',
+      'Belgium and Netherlands',
+      'Austria and Switzerland',
+      'Poland and Ukraine',
+      'Eleven European cities',
+    ]);
+  });
+
+  it('has exactly one coordinate per distinct EURO host, matching content/uefa-euro.md\'s 14 unique Host(s) values', () => {
+    expect(Object.keys(EURO_HOST_COORDINATES)).toHaveLength(14);
+  });
+
+  it('gives every EURO coordinate table entry the "Europe" region', () => {
+    for (const coordinate of Object.values(EURO_HOST_COORDINATES)) {
+      expect(coordinate.region).toBe('Europe');
+    }
+  });
+
+  it('has exactly one coordinate per distinct UEFA Nations League Finals host, matching content/uefa-nations-league.md\'s 4 unique values', () => {
+    expect(Object.keys(NATIONS_LEAGUE_HOST_COORDINATES)).toHaveLength(4);
+  });
+
+  it('resolves Copa América hosts, grouping South America before North America and skipping the Home-and-away editions', () => {
+    const copaTable: MarkdownTable = {
+      headers: ['Year', 'Host / format', 'Champion'],
+      rows: [
+        ['1916', 'Argentina', 'Uruguay'],
+        ['1975', 'Home-and-away', 'Peru'],
+        ['2016', 'United States', 'Chile'],
+      ],
+    };
+    const points = buildHostMapPoints(
+      buildEditions(copaTable),
+      COPA_AMERICA_HOST_COORDINATES,
+      COPA_AMERICA_REGION_ORDER,
+    );
+    expect(points.map((p) => p.host)).toEqual(['Argentina', 'United States']);
+    expect(points.find((p) => p.host === 'Argentina')?.region).toBe('South America');
+    expect(points.find((p) => p.host === 'United States')?.region).toBe('North America');
+  });
+
+  it('has exactly one coordinate per distinct Copa América host, matching content/copa-america.md\'s 11 unique non-"Home-and-away" values', () => {
+    expect(Object.keys(COPA_AMERICA_HOST_COORDINATES)).toHaveLength(11);
+  });
+
+  it('gives every Copa América coordinate table entry a region listed in COPA_AMERICA_REGION_ORDER', () => {
+    for (const coordinate of Object.values(COPA_AMERICA_HOST_COORDINATES)) {
+      expect(COPA_AMERICA_REGION_ORDER).toContain(coordinate.region);
+    }
   });
 });
 
