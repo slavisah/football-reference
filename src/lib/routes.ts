@@ -29,5 +29,6 @@ export const NAV_LINKS: NavLink[] = [
   { path: '/players', label: 'Players', labelHr: 'Igrači' },
   { path: '/compare-players', label: 'Compare Players', labelHr: 'Usporedi igrače' },
   { path: '/quiz', label: 'Quiz', labelHr: 'Kviz' },
+  { path: '/glossary', label: 'Glossary', labelHr: 'Pojmovnik' },
   { path: '/about/sources', label: 'Sources', labelHr: 'Izvori' },
 ];

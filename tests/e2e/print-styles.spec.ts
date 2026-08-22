@@ -153,6 +153,9 @@ test.describe('a screen-filtered row still prints', () => {
 // /compare-players (Croatian localization added 2026-08-21) is added here
 // too - it also has no TournamentTable, same exemption as /compare, /teams
 // and /players.
+//
+// /glossary (added 2026-08-22) joins the list for the same reason - a
+// definition list, no TournamentTable.
 const OTHER_PRINT_PAGES = [
   { label: 'English Home', path: '' },
   { label: 'Croatian Home', path: 'hr/' },
@@ -172,6 +175,8 @@ const OTHER_PRINT_PAGES = [
   { label: 'Croatian Player profile (Gerd Muller)', path: 'hr/players/gerd-muller' },
   { label: 'English Compare Players', path: 'compare-players' },
   { label: 'Croatian Compare Players', path: 'hr/compare-players' },
+  { label: 'English Glossary', path: 'glossary' },
+  { label: 'Croatian Glossary', path: 'hr/glossary' },
 ];
 
 for (const { label, path } of OTHER_PRINT_PAGES) {

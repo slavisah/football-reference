@@ -3,6 +3,7 @@ import type { Edition, MarkdownTable } from '../lib/types';
 import { buildSortOptions, defaultSortValue } from '../lib/tableSort';
 import { editionTeams } from '../lib/editions';
 import { renderInlineMarkdown } from '../lib/notes';
+import { abbreviateFinalScore, hasAbbreviation } from '../lib/glossary';
 import type { Locale } from '../lib/i18n';
 
 interface Props {
@@ -131,6 +132,12 @@ const winnerColIndex = table.headers.findIndex((header) =>
 // badge, matching the existing status badge style, rather than plain text.
 const formatColIndex = table.headers.findIndex((header) => /^format$/i.test(header.trim()));
 
+// The "Final" column (World Cup/EURO/Nations League only) can contain the
+// "a.e.t." or "pens" shorthand docs/EDITORIAL_GUIDE.md requires be explained
+// before use - wrapped in a native <abbr title> via abbreviateFinalScore()
+// below, rather than plain text, on those columns/rows only.
+const finalColIndex = table.headers.findIndex((header) => /^final$/i.test(header.trim()));
+
 // "Sort by" options: only the columns worth sorting by (Year/Season, Winner,
 // Host, a numeric quantity column), detected the same way `buildEditions`
 // derives those roles. Defaults to Year newest-first, matching the row order
@@ -246,7 +253,13 @@ const defaultSort = defaultSortValue(sortOptions);
                   aria-label={`${headerLabels[cell.label] ?? cell.label}: ${cell.value}`}
                   class={index === winnerColIndex ? 'is-winner' : undefined}
                 >
-                  {index === formatColIndex ? <span class="badge">{cell.value}</span> : cell.value}
+                  {index === formatColIndex ? (
+                    <span class="badge">{cell.value}</span>
+                  ) : index === finalColIndex && hasAbbreviation(cell.value) ? (
+                    <span set:html={abbreviateFinalScore(cell.value, locale)} />
+                  ) : (
+                    cell.value
+                  )}
                 </td>
               ))}
               {extraColumn && (

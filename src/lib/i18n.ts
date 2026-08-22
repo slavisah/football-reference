@@ -124,6 +124,7 @@ export const TRANSLATED_PATHS: Record<string, string> = {
   '/players': '/hr/players',
   '/compare-players': '/hr/compare-players',
   '/quiz': '/hr/quiz',
+  '/glossary': '/hr/glossary',
   '/competitions/copa-america': '/hr/competitions/copa-america',
   '/competitions/nations-league': '/hr/competitions/nations-league',
   '/competitions/ballon-dor': '/hr/competitions/ballon-dor',

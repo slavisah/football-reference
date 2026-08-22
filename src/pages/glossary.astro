@@ -1,0 +1,123 @@
+---
+// Satisfies a previously-unmet docs/EDITORIAL_GUIDE.md rule: "Use a.e.t.
+// only after explaining it means 'after extra time'" and the equivalent
+// rule for "pens" - both abbreviations appear in the FIFA World Cup, UEFA
+// EURO, and UEFA Nations League "Final" columns with no explanation
+// anywhere on the site before this page. TournamentTable.astro now also
+// wraps those two tokens in a native <abbr title> at the point of use (see
+// src/lib/glossary.ts's abbreviateFinalScore()); this page is the fuller,
+// standalone reference both that tooltip and any other page can point a
+// reader to.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { loadPageMeta } from '../lib/competition';
+import { loadGlossaryEntries } from '../lib/glossary';
+import { absolutePageUrl, withBase } from '../lib/url';
+import { buildDefinedTermSet, type JsonLdObject } from '../lib/jsonLd';
+
+const meta = await loadPageMeta('glossary');
+const entries = await loadGlossaryEntries();
+
+const jsonLd: JsonLdObject[] = [
+  buildDefinedTermSet(entries, {
+    pageUrl: absolutePageUrl(Astro.url, Astro.site),
+    name: meta.title,
+  }),
+];
+
+const reviewed = new Date(`${meta.lastReviewed}T00:00:00Z`);
+const reviewedLabel = Number.isNaN(reviewed.getTime())
+  ? meta.lastReviewed
+  : reviewed.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    });
+---
+
+<BaseLayout
+  title={meta.title}
+  description="Short, family-friendly explanations for the abbreviations and terms used across this site's tournament tables, such as a.e.t., pens, runner-up, and semifinalist."
+  locale="en"
+  alternateHref={withBase('/hr/glossary')}
+  jsonLd={jsonLd}
+>
+  <article class="glossary-page stack">
+    <header class="glossary-page__header">
+      <p class="eyebrow badge">Reference</p>
+      <h1>{meta.title}</h1>
+      <p class="glossary-page__intro">{meta.intro}</p>
+      <p class="glossary-page__meta">
+        <span class="badge">Status: {meta.status}</span>
+        <span class="review">
+          Last reviewed:
+          <time datetime={meta.lastReviewed}>{reviewedLabel}</time>
+        </span>
+      </p>
+    </header>
+
+    <section class="card stack" aria-labelledby="terms-heading">
+      <h2 id="terms-heading" class="visually-hidden">Terms</h2>
+      <dl class="glossary-page__list">
+        {
+          entries.map((entry) => (
+            <div class="glossary-page__entry">
+              <dt id={`term-${entry.term.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>{entry.term}</dt>
+              <dd>{entry.definition}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .glossary-page__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .glossary-page__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .glossary-page__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .glossary-page__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .review {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .glossary-page__list {
+    display: grid;
+    gap: 1.25rem;
+    margin: 0;
+  }
+
+  .glossary-page__entry dt {
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .glossary-page__entry dd {
+    margin: 0.3rem 0 0;
+    max-width: 68ch;
+    color: var(--text-muted);
+  }
+</style>

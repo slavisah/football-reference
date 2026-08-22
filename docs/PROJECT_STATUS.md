@@ -10088,14 +10088,126 @@ found no new gap - every Croatian page/component shipped since the last such
 audit (99c4ea6) already follows the site's established translation
 conventions correctly. No new gap identified beyond the two this run closed.
 
+### New page: `/glossary` - closes a real, previously-unmet `docs/EDITORIAL_GUIDE.md` rule - added 2026-08-22 (intensive run)
+
+With every roadmap backlog item complete and the standing "Left for a future
+pass" candidates all still infeasible/rejected/low-yield, this run re-read
+`docs/EDITORIAL_GUIDE.md` end to end rather than starting from the existing
+"Left for a future pass" list - the same kind of fresh-source sweep the
+2026-08-12 nav-`aria-label` and Croatian-PDF entries used - and found a
+genuine, previously-overlooked miss: the guide's own terminology rules say
+"Use **a.e.t.** only after explaining it means 'after extra time'" and "Use
+**pens** only after explaining it means a penalty shoot-out" - but a repo-wide
+grep confirmed neither abbreviation was explained anywhere on the live site.
+Both appear in the FIFA World Cup, UEFA EURO, and UEFA Nations League "Final"
+columns (9 rows total, e.g. "Italy 2-1 Czechoslovakia (a.e.t.)", "Brazil 0-0
+Italy; 3-2 pens") with nothing - no `<abbr>`, no footnote, no glossary -
+telling a first-time reader what either one means.
+
+**Two-part fix, closing the gap at both the point of use and as a standalone
+reference:**
+
+- **New `content/glossary.md`** (front matter matching every other simple
+  content page - `title`/`slug`/`lastReviewed`/`status`, no schema change
+  needed) with one `## Term` heading + paragraph per entry: `a.e.t.`, `pens`,
+  plus five more terms this site's own tables already rely on without ever
+  defining (`runner-up`, `semifinalist`, `third and fourth place`, `host`,
+  `confederation`) - each grounded in an existing `EDITORIAL_GUIDE.md` rule or
+  actual column usage, not invented scope.
+- **New `src/lib/glossary.ts`**: `parseGlossaryEntries()` (mirrors
+  `src/lib/notes.ts`'s `extractSection()` shape, but captures every H2 section
+  rather than one named heading, since the set of glossary terms is itself the
+  editorial content) and `loadGlossaryEntries()` (the `astro:content`
+  wrapper, same pattern as `competition.ts`'s `loadPageMeta()`). Also
+  `abbreviateFinalScore()`/`hasAbbreviation()`: wraps "a.e.t." and "pens" in a
+  native `<abbr title="...">` with a short English/Croatian explanation,
+  HTML-escaping the rest of the cell text first (same "escape, then inject
+  known-safe tags" pattern `renderInlineMarkdown()` already established).
+- **`src/components/TournamentTable.astro`** gained a `finalColIndex` column
+  detector (same shape as the existing `formatColIndex` one) and now renders
+  that column's cell through `abbreviateFinalScore()` - but only on the rows
+  that actually contain one of the two tokens (`hasAbbreviation()` guard), so
+  the other ~50 Final-column rows across the three tables stay
+  byte-identical plain text. This automatically covers all three affected
+  tables (World Cup, EURO, Nations League) and both languages, since they all
+  share this one component - no page-by-page wiring needed. Copa América,
+  Ballon d'Or, and Golden Boot have no "Final" column, so they're untouched.
+- **`src/pages/glossary.astro` + `src/pages/hr/glossary.astro`**: a definition
+  list (`<dl>`/`<dt>`/`<dd>`) page modeled directly on `/about/sources`'s
+  existing template (same header/`lastReviewed` shape), reading the exact
+  same live `content/glossary.md` entries via `loadGlossaryEntries()` on both
+  pages - a term's definition can never drift between languages, only the
+  page's own chrome is translated, the same content/chrome split every other
+  bilingual page already follows.
+- **New `buildDefinedTermSet()`** in `src/lib/jsonLd.ts` - a schema.org
+  `DefinedTermSet` with one `DefinedTerm` per entry, reusing the exact
+  `GlossaryEntry[]` the page renders so the structured data can never list a
+  term the visible page doesn't also explain.
+- **Nav/routing wiring**: added to `NAV_LINKS` (`src/lib/routes.ts`) and
+  `TRANSLATED_PATHS` (`src/lib/i18n.ts`) and `CONTENT_ID_BY_PATH`
+  (`src/pages/sitemap.xml.ts`) - the same three single-source-of-truth lists
+  every prior nav addition has updated, so the primary nav, the 404
+  popular-pages list, the offline precache list, and the sitemap all picked
+  this page up automatically, in both languages, with no other file needing
+  to change. No print PDF was added for `/glossary` - it has no
+  `TournamentTable`, matching `/compare`'s and `/compare-players`'s own
+  precedent for a page with nothing tabular to print.
+
+**Tests:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across 136
+files (4 new: `glossary.astro`, `hr/glossary.astro`, plus the two lib/page
+files above). `pnpm test` - **418/418** (13 new: 11 in the new
+`tests/unit/glossary.test.ts` covering `parseGlossaryEntries()`,
+`hasAbbreviation()`, and `abbreviateFinalScore()` including HTML-escaping and
+the Croatian title text; 2 in `tests/unit/jsonLd.test.ts` for
+`buildDefinedTermSet()`). `pnpm build` - **307 pages** (up from 305).
+`pnpm check:links` - 0 broken links across 311 built pages. `pnpm
+check:sitemap` - 306 sitemap entries (up from 304: `/glossary` moved the nav
+loop from 14 to 15 pages, net +2 bilingual) match the 311 built pages
+exactly, canonicals/hreflang agree. `pnpm check:precache` - 37 precached URLs
+(up from 35), every nav link covered. `pnpm check:perf` - all pages within
+the 510 KB budget (heaviest unchanged, `hr/records` at 501.2 KB - `/glossary`
+itself is a small page, nowhere near the budget). `pnpm check:pdfs` correctly
+flagged all 290 existing PDFs as stale (`TournamentTable.astro` is a
+rendering-code dependency of every PDF that has an Editions table) -
+regenerated with `PW_EXECUTABLE_PATH=<preinstalled Chromium> pnpm
+build:pdfs`, confirmed clean after; no new PDF was added, so the count stays
+290. `tests/e2e/mobile.spec.ts`'s hardcoded sitemap `<url>` count updated
+304 -> 306 and the 404 popular-links count 28 -> 30 (15 nav pages x 2
+languages, up from 14); new "Glossary page"/"Croatian glossary page" describe
+blocks mirroring the existing Sources-page test shape, plus a new World Cup
+page test confirming the 1934 row's `<abbr>` renders with the right `title`
+and links through to the glossary. `tests/e2e/print-styles.spec.ts`'s
+`OTHER_PRINT_PAGES` gained the English/Croatian glossary pages (no
+`TournamentTable`, same exemption as `/compare`/`/teams`/`/players`). The
+accessibility sweeps (`accessibility.spec.ts`,
+`accessibility-forced-colors.spec.ts`) are `NAV_LINKS`-driven and picked up
+both new pages automatically, with no per-page wiring - matching the exact
+payoff every prior nav-promotion entry in this file has already recorded for
+that mechanism.
+
+**Left for a future pass:** the standing candidates from prior runs are
+unchanged (source-link liveness infeasible, further content-accuracy
+spot-checks low-yield, the flag-emoji idea rejected, CSP's `'unsafe-inline'`
+not worth revisiting, the Golden Boot reverse-lookup quiz type not pursued,
+`public/downloads/` PDF-bloat documented/intentional, EURO podium cards
+structurally impossible, full per-edition team participant lists blocked on
+sourcing, `/compare-players` print PDF matching `/compare`'s own precedent).
+With this run, every abbreviation `docs/EDITORIAL_GUIDE.md` names is now
+explained both inline (`<abbr title>`) and on a dedicated reference page - a
+systematic sweep for any *other* unmet rule in that same document (beyond
+terminology - content-safety, image sourcing) would be a reasonable next
+angle in this vein, though nothing turned up in this run's own read-through
+beyond the one gap closed here.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
   Records and Timelines, Compare National Teams, the Family Quiz, the
   `/teams` national-team directory, the `/players` award-winner directory,
-  and `/compare-players` (head-to-head Ballon d'Or/Golden Boot comparison)
-  all have live pages in both English and Croatian now, all reachable from
-  the primary nav.
+  `/compare-players` (head-to-head Ballon d'Or/Golden Boot comparison), and
+  `/glossary` (explains a.e.t., pens, and five other site terms) all have
+  live pages in both English and Croatian now, all reachable from the
+  primary nav.
 - Historical names appear as distinct winner-filter entries by design.
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
   time out; re-running the deploy clears it (it did here).
