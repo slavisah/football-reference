@@ -31,8 +31,19 @@ const [defaultA, defaultB] = allRecords;
 const finalsMeetings = buildFinalsMeetings(competitions);
 const defaultMeetings = finalsMeetingsBetween(defaultA.id, defaultB.id, finalsMeetings);
 
-function semifinalDisplay(index: number, value: number): string {
-  return tracksSemifinal[index] ? String(value) : '—';
+// The head-to-head panel is a "versus" table: one row per statistic, with
+// Team A's value and Team B's value side by side on that same row (see
+// docs/PROJECT_STATUS.md). `null` means this competition doesn't track the
+// statistic at all, which is never a lead for either side.
+function leaderOf(a: number | null, b: number | null): 'a' | 'b' | 'tie' {
+  if (a === null || b === null) return 'tie';
+  if (a > b) return 'a';
+  if (b > a) return 'b';
+  return 'tie';
+}
+
+function cellText(value: number | null): string {
+  return value === null ? '—' : String(value);
 }
 
 const sources = [worldCup, euro, copaAmerica, nationsLeague]
@@ -142,60 +153,109 @@ const jsonLd: JsonLdObject[] = [
         {`Comparing ${defaultA.displayName} vs ${defaultB.displayName}.`}
       </p>
 
-      <div class="compare__panel">
-        {
-          (['a', 'b'] as const).map((side) => {
-            const record = side === 'a' ? defaultA : defaultB;
-            return (
-              <div class="compare__side">
-                <h3 id={`compare-${side}-name`}>{record.displayName}</h3>
-                <div
-                  class="t-wrap"
-                  tabindex="0"
-                  role="region"
-                  aria-label={`${record.displayName}'s record by competition`}
-                >
-                  <table class="compare__table">
-                    <caption class="visually-hidden">
-                      {record.displayName}'s record by competition
-                    </caption>
-                    <thead>
-                      <tr>
-                        <th scope="col">Competition</th>
-                        <th scope="col">Titles</th>
-                        <th scope="col">Runner-up</th>
-                        <th scope="col">Semifinal / 4th</th>
-                        <th scope="col">Finals reached</th>
-                      </tr>
-                    </thead>
-                    <tbody id={`compare-${side}-body`}>
-                      {
-                        record.competitions.map((c, index) => (
-                          <tr data-slug={c.slug} data-tracks-semifinal={tracksSemifinal[index]}>
-                            <th scope="row">{c.competition}</th>
-                            <td data-field="titles">{c.titles}</td>
-                            <td data-field="runnerUps">{c.runnerUps}</td>
-                            <td data-field="semifinals">{semifinalDisplay(index, c.semifinals)}</td>
-                            <td data-field="finals">{c.titles + c.runnerUps}</td>
-                          </tr>
-                        ))
-                      }
-                    </tbody>
-                    <tfoot>
-                      <tr id={`compare-${side}-total`}>
-                        <th scope="row">Combined</th>
-                        <td data-field="titles">{record.totalTitles}</td>
-                        <td data-field="runnerUps">{record.totalRunnerUps}</td>
-                        <td data-field="semifinals">{record.totalSemifinals}</td>
-                        <td data-field="finals">{record.totalFinals}</td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-              </div>
-            );
-          })
-        }
+      <div class="vs" id="compare-panel">
+        <table class="vs__table">
+          <caption
+            class="visually-hidden"
+            id="compare-caption"
+            data-template="{a} compared with {b}, by competition"
+          >
+            {`${defaultA.displayName} compared with ${defaultB.displayName}, by competition`}
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col" class="vs__team" id="compare-a-name">{defaultA.displayName}</th>
+              <th scope="col" class="vs__stat-head">Statistic</th>
+              <th scope="col" class="vs__team" id="compare-b-name">{defaultB.displayName}</th>
+            </tr>
+          </thead>
+          {
+            competitions.map((competition, index) => {
+              const a = defaultA.competitions[index];
+              const b = defaultB.competitions[index];
+              const tracks = tracksSemifinal[index];
+              const metrics = [
+                { field: 'titles', label: 'Titles', a: a.titles, b: b.titles },
+                { field: 'runnerUps', label: 'Runner-up', a: a.runnerUps, b: b.runnerUps },
+                {
+                  field: 'semifinals',
+                  label: 'Semifinal / 4th',
+                  a: tracks ? a.semifinals : null,
+                  b: tracks ? b.semifinals : null,
+                },
+                {
+                  field: 'finals',
+                  label: 'Finals reached',
+                  a: a.titles + a.runnerUps,
+                  b: b.titles + b.runnerUps,
+                },
+              ];
+              // A pair with nothing at all in this competition (every South
+              // American team on the EURO, say) collapses to one line instead
+              // of four rows of zeros - on a phone those rows are most of the
+              // panel's height and none of its information.
+              const empty = metrics.every((m) => (m.a ?? 0) === 0 && (m.b ?? 0) === 0);
+              return (
+                <tbody data-slug={a.slug} data-tracks-semifinal={tracks} data-empty={String(empty)}>
+                  <tr class="vs__group">
+                    <th colspan="3" scope="colgroup">
+                      {competition.title}
+                    </th>
+                  </tr>
+                  <tr class="vs__none">
+                    <td colspan="3">Neither team has a record here.</td>
+                  </tr>
+                  {metrics.map((metric) => (
+                    <tr data-metric={metric.field} data-leader={leaderOf(metric.a, metric.b)}>
+                      <td class="vs__value" data-side="a">{cellText(metric.a)}</td>
+                      <th scope="row" class="vs__stat">{metric.label}</th>
+                      <td class="vs__value" data-side="b">{cellText(metric.b)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              );
+            })
+          }
+          <tbody data-slug="combined" class="vs__combined">
+            <tr class="vs__group">
+              <th colspan="3" scope="colgroup">Combined</th>
+            </tr>
+            {
+              [
+                {
+                  field: 'titles',
+                  label: 'Titles',
+                  a: defaultA.totalTitles,
+                  b: defaultB.totalTitles,
+                },
+                {
+                  field: 'runnerUps',
+                  label: 'Runner-up',
+                  a: defaultA.totalRunnerUps,
+                  b: defaultB.totalRunnerUps,
+                },
+                {
+                  field: 'semifinals',
+                  label: 'Semifinal / 4th',
+                  a: defaultA.totalSemifinals,
+                  b: defaultB.totalSemifinals,
+                },
+                {
+                  field: 'finals',
+                  label: 'Finals reached',
+                  a: defaultA.totalFinals,
+                  b: defaultB.totalFinals,
+                },
+              ].map((metric) => (
+                <tr data-metric={metric.field} data-leader={leaderOf(metric.a, metric.b)}>
+                  <td class="vs__value" data-side="a">{cellText(metric.a)}</td>
+                  <th scope="row" class="vs__stat">{metric.label}</th>
+                  <td class="vs__value" data-side="b">{cellText(metric.b)}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
       </div>
 
       <p class="muted compare__note">
@@ -361,15 +421,162 @@ const jsonLd: JsonLdObject[] = [
     border-color: var(--accent);
   }
 
-  .compare__panel {
-    display: grid;
-    gap: 1.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-    align-items: start;
+  /* "Versus" comparison table: one row per statistic, Team A's value on the
+     left, Team B's on the right, the metric label between them. Transposed
+     from the two separate per-team tables this panel used to render, which
+     put the two numbers a reader wants to compare on different screens at
+     360px - each table was wider than the viewport and they stacked
+     vertically. Three narrow columns fit any phone with no horizontal
+     scroll, so no .t-wrap wrapper is needed here (the "All national teams"
+     ranking below still has one - it genuinely has six columns). */
+  .vs {
+    container-type: inline-size;
   }
 
-  .compare__side h3 {
-    margin-bottom: 0.6rem;
+  .vs__table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    table-layout: fixed;
+  }
+
+  .vs__table thead th {
+    position: sticky;
+    /* Sits directly under the sticky site header, whose real height varies
+       by viewport and locale - Nav.astro measures it into this property. */
+    top: var(--site-header-height, 3.5rem);
+    z-index: 1;
+    padding: 0.7rem 0.5rem;
+    background: var(--bg-subtle);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .vs__team {
+    width: 34%;
+    font-size: 1rem;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .vs__stat-head {
+    width: 32%;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .vs__group th {
+    padding: 0.55rem 0.7rem;
+    background: var(--bg-subtle);
+    border-block: 1px solid var(--border);
+    text-align: left;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .vs__table tbody tr:not(.vs__group) th,
+  .vs__table tbody tr:not(.vs__group) td {
+    padding: 0.6rem 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .vs__stat {
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .vs__value {
+    text-align: center;
+    font-size: 1.35rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The leading side. Weight, colour and a marker together, never colour
+     alone - the same rule global.css documents for the winner cell in
+     TournamentTable. */
+  .vs__table tr[data-leader='a'] .vs__value[data-side='a'],
+  .vs__table tr[data-leader='b'] .vs__value[data-side='b'] {
+    color: var(--accent);
+    font-weight: 800;
+  }
+
+  .vs__table tr[data-leader='a'] .vs__value[data-side='a']::after,
+  .vs__table tr[data-leader='b'] .vs__value[data-side='b']::after {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-inline-start: 0.35rem;
+    vertical-align: 0.15em;
+    border-inline: 0.3rem solid transparent;
+    border-bottom: 0.42rem solid currentColor;
+  }
+
+  @media (forced-colors: active) {
+    .vs__table tr[data-leader='a'] .vs__value[data-side='a'],
+    .vs__table tr[data-leader='b'] .vs__value[data-side='b'] {
+      outline: 1px solid CanvasText;
+      outline-offset: -3px;
+    }
+  }
+
+  /* Collapsed group: the four metric rows give way to one "nothing here"
+     line. Rows are hidden with CSS rather than removed so the client script
+     only has to flip one attribute when the pair changes. */
+  .vs__none {
+    display: none;
+  }
+
+  .vs__table tbody[data-empty='true'] tr[data-metric] {
+    display: none;
+  }
+
+  .vs__table tbody[data-empty='true'] .vs__none {
+    display: table-row;
+  }
+
+  .vs__none td {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .vs__combined tr:not(.vs__group) td,
+  .vs__combined tr:not(.vs__group) th {
+    font-size: 1.05rem;
+  }
+
+  .vs__combined .vs__value {
+    font-size: 1.5rem;
+  }
+
+  .vs__table tbody:last-child tr:last-child th,
+  .vs__table tbody:last-child tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Room for longer metric labels once the panel is wide enough. */
+  @container (min-width: 34rem) {
+    .vs__team {
+      font-size: 1.15rem;
+    }
+
+    .vs__stat {
+      font-size: 0.95rem;
+    }
+
+    .vs__table tbody tr:not(.vs__group) th,
+    .vs__table tbody tr:not(.vs__group) td {
+      padding: 0.7rem 1rem;
+    }
   }
 
   .t-wrap {
@@ -475,30 +682,74 @@ const jsonLd: JsonLdObject[] = [
   const finalsMeetingsBody = document.getElementById('finals-meetings-body');
   const finalsMeetingsEmptyText = finalsMeetingsBody?.dataset.emptyText ?? '';
 
-  function setCell(row, field, value) {
-    const cell = row && row.querySelector(`[data-field="${field}"]`);
-    if (cell) cell.textContent = String(value);
+  // Fills the versus table: every row carries data-slug (its competition, or
+  // "combined") and data-metric, so one pass over the rows can set both
+  // sides' values and re-derive which side leads. Replaces the old
+  // fill-one-side-at-a-time pass, which had a table per team.
+  const panel = document.getElementById('compare-panel');
+  const caption = document.getElementById('compare-caption');
+  const captionTemplate = caption?.dataset.template ?? '';
+
+  function metricsOf(record) {
+    const bySlug = { combined: {
+      titles: record.totalTitles,
+      runnerUps: record.totalRunnerUps,
+      semifinals: record.totalSemifinals,
+      finals: record.totalFinals,
+    } };
+    for (const comp of record.competitions) {
+      bySlug[comp.slug] = {
+        titles: comp.titles,
+        runnerUps: comp.runnerUps,
+        semifinals: comp.semifinals,
+        finals: comp.titles + comp.runnerUps,
+      };
+    }
+    return bySlug;
   }
 
-  function fillSide(side, record) {
-    const heading = document.getElementById(`compare-${side}-name`);
-    if (heading) heading.textContent = record.displayName;
-
-    for (const comp of record.competitions) {
-      const row = document.querySelector(`#compare-${side}-body tr[data-slug="${comp.slug}"]`);
-      if (!row) continue;
-      const tracksSemifinal = row.dataset.tracksSemifinal !== 'false';
-      setCell(row, 'titles', comp.titles);
-      setCell(row, 'runnerUps', comp.runnerUps);
-      setCell(row, 'semifinals', tracksSemifinal ? comp.semifinals : '—');
-      setCell(row, 'finals', comp.titles + comp.runnerUps);
+  function fillVersus(a, b) {
+    const nameA = document.getElementById('compare-a-name');
+    const nameB = document.getElementById('compare-b-name');
+    if (nameA) nameA.textContent = a.displayName;
+    if (nameB) nameB.textContent = b.displayName;
+    if (caption && captionTemplate) {
+      caption.textContent = captionTemplate
+        .replace('{a}', a.displayName)
+        .replace('{b}', b.displayName);
     }
+    if (!panel) return;
 
-    const totalRow = document.getElementById(`compare-${side}-total`);
-    setCell(totalRow, 'titles', record.totalTitles);
-    setCell(totalRow, 'runnerUps', record.totalRunnerUps);
-    setCell(totalRow, 'semifinals', record.totalSemifinals);
-    setCell(totalRow, 'finals', record.totalFinals);
+    const aMetrics = metricsOf(a);
+    const bMetrics = metricsOf(b);
+
+    for (const group of panel.querySelectorAll('tbody[data-slug]')) {
+      const slug = group.dataset.slug;
+      // A competition that doesn't track a semifinal/third-place column
+      // shows "—" on both sides, and neither side leads.
+      const tracksSemifinal = group.dataset.tracksSemifinal !== 'false';
+      let allZero = true;
+      for (const row of group.querySelectorAll('tr[data-metric]')) {
+        const metric = row.dataset.metric;
+        const untracked = metric === 'semifinals' && !tracksSemifinal;
+        const aValue = untracked ? null : aMetrics[slug]?.[metric] ?? null;
+        const bValue = untracked ? null : bMetrics[slug]?.[metric] ?? null;
+        const cellA = row.querySelector('.vs__value[data-side="a"]');
+        const cellB = row.querySelector('.vs__value[data-side="b"]');
+        if (cellA) cellA.textContent = aValue === null ? '—' : String(aValue);
+        if (cellB) cellB.textContent = bValue === null ? '—' : String(bValue);
+        let leader = 'tie';
+        if (aValue !== null && bValue !== null) {
+          if (aValue > bValue) leader = 'a';
+          else if (bValue > aValue) leader = 'b';
+        }
+        row.dataset.leader = leader;
+        if ((aValue ?? 0) !== 0 || (bValue ?? 0) !== 0) allZero = false;
+      }
+      // "Combined" always shows its numbers, even when both are zero: it is
+      // the panel's summary line, not one competition among several.
+      group.dataset.empty = slug !== 'combined' && allZero ? 'true' : 'false';
+    }
   }
 
   function escapeHtml(value) {
@@ -556,9 +807,10 @@ const jsonLd: JsonLdObject[] = [
   function render() {
     const a = byId.get(selectA.value);
     const b = byId.get(selectB.value);
-    if (a) fillSide('a', a);
-    if (b) fillSide('b', b);
-    if (a && b) renderFinalsMeetings(a, b);
+    if (a && b) {
+      fillVersus(a, b);
+      renderFinalsMeetings(a, b);
+    }
     if (status && a && b) {
       status.textContent = statusTemplate
         .replace('{a}', a.displayName)

@@ -1915,8 +1915,10 @@ test.describe('Compare page on a 360px phone', () => {
     // seven times across those editions (six knockout-era finishes plus
     // fourth in the 1991 closing group).
     await page.goto('compare?a=colombia&b=argentina');
-    const copaRow = page.locator('#compare-a-body tr[data-slug="copa-america"]');
-    await expect(copaRow.locator('[data-field="semifinals"]')).toHaveText('7');
+    const copaSemis = page.locator(
+      '#compare-panel tbody[data-slug="copa-america"] tr[data-metric="semifinals"]',
+    );
+    await expect(copaSemis.locator('.vs__value[data-side="a"]')).toHaveText('7');
   });
 
   test('the language switcher opens the Croatian compare page', async ({ page }) => {
@@ -1949,7 +1951,7 @@ test.describe('Croatian compare page (/hr/compare) on a 360px phone', () => {
     await expect(page.getByRole('heading', { name: 'Usporedi reprezentacije', level: 1 })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Izravna usporedba' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Sve reprezentacije' })).toBeVisible();
-    await expect(page.locator('#compare-a-body').getByText('UEFA Liga nacija')).toBeVisible();
+    await expect(page.locator('#compare-panel .vs__group').getByText('UEFA Liga nacija')).toBeVisible();
   });
 
   test('choosing a different team updates the panel and the URL, and swap works', async ({
@@ -3437,4 +3439,83 @@ test.describe('header menu on a 360px phone', () => {
     await toggle.click();
     await expect(toggle).toHaveAttribute('aria-label', 'Zatvori izbornik');
   });
+});
+
+// The head-to-head panel on /compare is a "versus" table: one row per
+// statistic with both teams' values on it. It replaced two separate per-team
+// tables, each wider than a 360px screen and stacked vertically, which meant
+// the two numbers a reader wants to compare were never on screen together.
+test.describe('compare panel on a 360px phone', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('compare?a=argentina&b=uruguay');
+  });
+
+  test('puts both teams\' values for one statistic on one visible row', async ({ page }) => {
+    const row = page.locator('#compare-panel tbody[data-slug="world-cup"] tr[data-metric="titles"]');
+    const a = row.locator('.vs__value[data-side="a"]');
+    const b = row.locator('.vs__value[data-side="b"]');
+    await expect(a).toHaveText('3');
+    await expect(b).toHaveText('2');
+
+    // The actual fix: both numbers share one row, so they are on screen at
+    // the same time and within the viewport's width.
+    const boxA = (await a.boundingBox())!;
+    const boxB = (await b.boundingBox())!;
+    expect(Math.abs(boxA.y - boxB.y)).toBeLessThan(2);
+    expect(boxB.x + boxB.width).toBeLessThanOrEqual(360);
+  });
+
+  test('the panel never scrolls sideways', async ({ page }) => {
+    const overflow = await page
+      .locator('#compare-panel')
+      .evaluate((el) => el.scrollWidth - el.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('marks the leading side, and the mark follows a swap', async ({ page }) => {
+    const titles = page.locator('#compare-panel tbody[data-slug="world-cup"] tr[data-metric="titles"]');
+    await expect(titles).toHaveAttribute('data-leader', 'a');
+    // Uruguay leads on Copa América semifinal/4th finishes - the leader is
+    // per row, not per team.
+    await expect(
+      page.locator('#compare-panel tbody[data-slug="copa-america"] tr[data-metric="semifinals"]'),
+    ).toHaveAttribute('data-leader', 'b');
+
+    await page.locator('#compare-swap').click();
+    await expect(page.locator('#compare-a-name')).toHaveText('Uruguay');
+    await expect(titles).toHaveAttribute('data-leader', 'b');
+  });
+
+  test('an equal statistic marks neither side', async ({ page }) => {
+    await page.selectOption('#compare-a', { label: 'Argentina' });
+    await page.selectOption('#compare-b', { label: 'Argentina' });
+    await expect(
+      page.locator('#compare-panel tbody[data-slug="world-cup"] tr[data-metric="titles"]'),
+    ).toHaveAttribute('data-leader', 'tie');
+  });
+
+  test('a competition neither team has played collapses to one line', async ({ page }) => {
+    const euro = page.locator('#compare-panel tbody[data-slug="euro"]');
+    await expect(euro).toHaveAttribute('data-empty', 'true');
+    await expect(euro.locator('.vs__none')).toBeVisible();
+    await expect(euro.locator('tr[data-metric="titles"]')).toBeHidden();
+
+    // ...and expands again for a pair that does have a EURO record.
+    await page.selectOption('#compare-a', { label: 'Germany (incl. West Germany)' });
+    await expect(euro).toHaveAttribute('data-empty', 'false');
+    await expect(euro.locator('tr[data-metric="titles"] .vs__value[data-side="a"]')).toHaveText('3');
+    await expect(euro.locator('.vs__none')).toBeHidden();
+  });
+
+  // Note: every one of the four competitions currently tracks a semifinal/
+  // third-place column, so the "—" state the panel still renders for a
+  // competition that doesn't is unreachable from real content and has no
+  // test here.
+  test('Combined keeps its numbers even when both totals would be zero', async ({ page }) => {
+    const combined = page.locator('#compare-panel tbody[data-slug="combined"]');
+    await expect(combined).toHaveAttribute('data-empty', 'false');
+    await expect(combined.locator('tr[data-metric="titles"] .vs__value[data-side="a"]')).toHaveText('19');
+    await expect(combined.locator('tr[data-metric="titles"] .vs__value[data-side="b"]')).toHaveText('17');
+  });
+
 });
