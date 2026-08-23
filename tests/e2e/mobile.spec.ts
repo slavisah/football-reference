@@ -3507,6 +3507,115 @@ test.describe('header menu on a 360px phone', () => {
   });
 });
 
+// The suite's one Playwright project runs at 360px (playwright.config.ts),
+// where the whole nav lives in the drawer above - so the header's own
+// >=60rem row layout (Nav.astro) had no coverage at all until this block,
+// which is exactly how it wrapped onto two rows unnoticed for two prior
+// intensive runs. 1280px is comfortably past 60rem (~960px at the default
+// 16px root) so this exercises the real desktop layout, not just the 360px
+// requirement from the brief.
+//
+// Scope check done while writing these tests: the header's own .container
+// is capped at --maxw (68rem), so even a much wider viewport never gives
+// the row more usable space than roughly 1024px of content width after
+// padding - not enough to also fit both search widgets, the language
+// switch and the theme toggle on the same line as the nav links, grouped
+// or not. The standing note this closes named the fifteen *nav links*
+// specifically ("wraps its fifteen nav links onto two rows"), not the
+// whole header, so that's the one row this menu makes true; the header as
+// a whole can still be two lines (nav row, then the search/lang/theme
+// row), which was already the case before this change and isn't a
+// regression it introduces.
+test.describe('desktop nav "More" menu (>=60rem)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('');
+  });
+
+  test('collapses the secondary links so the nav-links row itself is one line, with no page overflow', async ({
+    page,
+  }) => {
+    const toggle = page.locator('#nav-more-toggle');
+    await expect(toggle).toBeVisible();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator('#nav-more-menu')).toBeHidden();
+    // The mobile drawer's own toggle is gone at this width.
+    await expect(page.locator('#menu-toggle')).toBeHidden();
+
+    // Every visible top-level nav item (Home, the six competitions/awards,
+    // and the More toggle) shares one row - the actual fix, see the
+    // describe block's own comment for why this checks the nav row rather
+    // than the whole header.
+    const tops = await page
+      .locator('#nav-list > li')
+      .evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)));
+    expect(new Set(tops).size).toBe(1);
+
+    // The six competition/award pages plus Home stay inline...
+    await expect(page.locator('#nav-list > li > a', { hasText: 'World Cup' })).toBeVisible();
+    // ...while a "tool" page moved out of the row into the (closed) menu.
+    await expect(page.locator('#nav-list > li > a', { hasText: 'Records' })).toHaveCount(0);
+
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('the button opens the menu with every secondary nav destination in it', async ({ page }) => {
+    const toggle = page.locator('#nav-more-toggle');
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    const menu = page.locator('#nav-more-menu');
+    await expect(menu).toBeVisible();
+    const links = ['Records', 'Compare', 'Teams', 'Players', 'Compare Players', 'Quiz', 'Glossary', 'Sources'];
+    await expect(menu.getByRole('link')).toHaveCount(links.length);
+    for (const name of links) {
+      await expect(menu.getByRole('link', { name, exact: true })).toBeVisible();
+    }
+  });
+
+  test('a link inside the menu navigates', async ({ page }) => {
+    await page.locator('#nav-more-toggle').click();
+    await page.locator('#nav-more-menu a', { hasText: 'Glossary' }).click();
+    await expect(page).toHaveURL(/\/glossary\/?$/);
+  });
+
+  test('Escape closes the menu and returns focus to the button', async ({ page }) => {
+    const toggle = page.locator('#nav-more-toggle');
+    await toggle.click();
+    await expect(page.locator('#nav-more-menu')).toBeVisible();
+
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#nav-more-menu')).toBeHidden();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(toggle).toBeFocused();
+  });
+
+  test('a click outside closes the menu', async ({ page }) => {
+    await page.locator('#nav-more-toggle').click();
+    await expect(page.locator('#nav-more-menu')).toBeVisible();
+
+    await page.locator('footer .muted').first().click();
+    await expect(page.locator('#nav-more-menu')).toBeHidden();
+  });
+
+  test('the current secondary page is marked current inside the menu', async ({ page }) => {
+    await page.goto('records');
+    await page.locator('#nav-more-toggle').click();
+    await expect(page.locator('#nav-more-menu a[aria-current="page"]')).toHaveText('Records');
+  });
+
+  test('the Croatian header groups the same links, translated', async ({ page }) => {
+    await page.goto('hr/');
+    const toggle = page.locator('#nav-more-toggle');
+    await expect(toggle).toHaveText('Više');
+    await toggle.click();
+    await expect(page.locator('#nav-more-menu a', { hasText: 'Rekordi' })).toBeVisible();
+  });
+});
+
 // The head-to-head panel on /compare is a "versus" table: one row per
 // statistic with both teams' values on it. It replaced two separate per-team
 // tables, each wider than a 360px screen and stacked vertically, which meant

@@ -18,10 +18,34 @@ const { locale = 'en', alternateHref } = Astro.props;
 // stay in Croatian: same page, translated path and label, so a reader
 // browsing /hr/... never gets silently bounced back to the English site by
 // clicking a nav item other than the explicit language switch.
+//
+// At >=60rem the nav lays out as a single wrapping row (see the desktop
+// media query in the <style> below) rather than the mobile drawer, and
+// fifteen links plus both search widgets, the theme toggle and (on
+// translated pages) the language switch don't fit on one line even at the
+// container's own max-width - it wraps onto a second row instead. The six
+// competition/award pages are the site's primary content (the same six
+// cards the home page itself leads with), so they - plus Home - stay
+// directly visible; the rest collapse into a "More" menu at that
+// breakpoint. Below 60rem this grouping never applies - the mobile drawer
+// still shows every link flat, exactly as before.
+const SECONDARY_NAV_PATHS = new Set([
+  '/records',
+  '/compare',
+  '/teams',
+  '/players',
+  '/compare-players',
+  '/quiz',
+  '/glossary',
+  '/about/sources',
+]);
 const links = NAV_LINKS.map((link) => ({
   href: withBase(locale === 'hr' ? (TRANSLATED_PATHS[link.path] ?? link.path) : link.path),
   label: locale === 'hr' ? link.labelHr : link.label,
+  secondary: SECONDARY_NAV_PATHS.has(link.path),
 }));
+const primaryLinks = links.filter((link) => !link.secondary);
+const secondaryLinks = links.filter((link) => link.secondary);
 const homeHref = withBase(locale === 'hr' ? TRANSLATED_PATHS['/'] : '/');
 // Where the "find a team" search widget below sends a selected team - the
 // same /compare?a=<id> shareable param the page's own head-to-head picker
@@ -69,10 +93,37 @@ function isCurrent(href: string): boolean {
 
     <div id="site-menu" class="site-menu">
     <nav aria-label={t(locale, 'primaryNav')} class="site-menu__nav">
-      <ul class="nav-list">
+      <ul class="nav-list" id="nav-list">
         {
-          links.map((link) => (
+          primaryLinks.map((link) => (
             <li>
+              <a
+                href={link.href}
+                aria-current={isCurrent(link.href) ? 'page' : undefined}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+        <li class="nav-more-item">
+          <button
+            id="nav-more-toggle"
+            class="nav-more-toggle"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="nav-more-menu"
+            hidden
+          >
+            {t(locale, 'navMoreLabel')}
+            <span class="nav-more-toggle__caret" aria-hidden="true"></span>
+          </button>
+          <ul id="nav-more-menu" class="nav-more-menu" hidden></ul>
+        </li>
+        {
+          secondaryLinks.map((link) => (
+            <li data-nav-tier="secondary">
               <a
                 href={link.href}
                 aria-current={isCurrent(link.href) ? 'page' : undefined}
@@ -370,6 +421,107 @@ function isCurrent(href: string): boolean {
     background: color-mix(in srgb, var(--accent) 14%, transparent);
   }
 
+  /* Collapsed below 60rem regardless of JS - the mobile drawer already
+     shows every link flat via .nav-list above, this menu only exists for
+     the wide single-row layout. Hidden via `display: none` here (not the
+     `hidden` attribute) since the *button* is what carries `hidden` in
+     markup - see the no-JS note on .nav-more-toggle[hidden] below. */
+  .nav-more-item {
+    display: none;
+  }
+
+  .nav-more-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.7rem;
+    border: 0;
+    border-radius: var(--radius);
+    background: none;
+    color: var(--text-muted);
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+
+  /* Ships hidden in markup - only the script that wires up open/close
+     reveals it, the same no-JS-safe pattern .menu-toggle uses above. This
+     rule has to exist outside any media query so it always wins regardless
+     of the desktop display value set below. */
+  .nav-more-toggle[hidden] {
+    display: none;
+  }
+
+  .nav-more-toggle:hover,
+  .nav-more-toggle[aria-expanded='true'] {
+    color: var(--text);
+    background: var(--bg-subtle);
+  }
+
+  .nav-more-toggle__caret {
+    width: 0;
+    height: 0;
+    border-inline: 4px solid transparent;
+    border-block-start: 5px solid currentColor;
+  }
+
+  .nav-more-menu {
+    position: absolute;
+    inset-block-start: calc(100% + 0.3rem);
+    inset-inline-start: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    min-width: 11rem;
+    margin: 0;
+    padding: 0.3rem;
+    list-style: none;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  }
+
+  .nav-more-menu[hidden] {
+    display: none;
+  }
+
+  .nav-more-menu a {
+    display: block;
+    padding: 0.5rem 0.6rem;
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .nav-more-menu a:hover {
+    color: var(--text);
+    background: var(--bg-subtle);
+  }
+
+  .nav-more-menu a[aria-current='page'] {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+
+  /* Same "background/color alone loses its signal under forced-colors"
+     concern the team-search listbox's own active-option rule addresses
+     above. */
+  @media (forced-colors: active) {
+    .nav-more-toggle[aria-expanded='true'] {
+      outline: 1px solid CanvasText;
+      outline-offset: -2px;
+    }
+
+    .nav-more-menu a[aria-current='page'] {
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+    }
+  }
+
   /* Shared by both the "find a team" and "find a player" widgets above -
      the class name predates the player widget (added later, reusing this
      structural/visual styling as-is; nothing here is team-specific). */
@@ -548,6 +700,15 @@ function isCurrent(href: string): boolean {
 
     .menu-toggle {
       display: none;
+    }
+
+    /* The "More" menu only makes sense once the nav is laid out as a single
+       row rather than the mobile drawer - below this breakpoint the whole
+       .nav-more-item stays display:none (see the base rule above) and every
+       link renders flat, same as before this feature existed. */
+    .nav-more-item {
+      display: inline-flex;
+      position: relative;
     }
   }
 </style>
@@ -887,5 +1048,101 @@ function isCurrent(href: string): boolean {
         first.focus();
       }
     });
+  })();
+
+  // Desktop-only "More" overflow menu (#nav-more-toggle/#nav-more-menu) -
+  // see the frontmatter comment above SECONDARY_NAV_PATHS for why this
+  // exists. Lives in this bundled script rather than the is:inline one for
+  // the exact page-weight reason the focus trap above documents: this only
+  // affects layout at >=60rem, and the inline script is duplicated raw into
+  // every page's own HTML, which the site's heaviest pages (records,
+  // hr/records) can no longer absorb without real headroom to spare (see
+  // the 2026-08-23 focus-trap entry in docs/PROJECT_STATUS.md). The
+  // tradeoff: since this script runs after first paint rather than inline,
+  // a reader on a >=60rem viewport can see the un-collapsed, two-row nav
+  // for a brief instant before it snaps into the single-row grouped layout,
+  // instead of never seeing that state at all. Judged worth it - the
+  // alternative (duplicating this per page) risks tipping records/hr-records
+  // over check:perf's budget outright, a hard build failure, for a
+  // sub-frame cosmetic flash.
+  // Takes the elements as typed parameters (rather than reading them as
+  // closed-over consts from inside the outer null check) for the same
+  // reason initSearchWidget above does: TypeScript's flow narrowing from an
+  // outer `if` doesn't reliably persist into nested function declarations.
+  function initNavMore(list: HTMLElement, toggle: HTMLButtonElement, menu: HTMLElement, anchor: HTMLLIElement) {
+    const items = [...list.querySelectorAll<HTMLLIElement>('li[data-nav-tier="secondary"]')];
+    if (items.length === 0) return;
+
+    let collapsed = false;
+
+    function setOpen(open: boolean) {
+      menu.hidden = !open;
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    // Moves the real <li> nodes between the flat row and the dropdown
+    // rather than cloning them, so there is only ever one copy of each
+    // link in the DOM - no duplicated hrefs for a screen reader to
+    // announce twice, and no extra HTML weight either.
+    function collapse() {
+      if (collapsed) return;
+      collapsed = true;
+      for (const item of items) menu.appendChild(item);
+      toggle.hidden = false;
+    }
+
+    function expand() {
+      if (!collapsed) return;
+      collapsed = false;
+      setOpen(false);
+      for (const item of items) list.insertBefore(item, anchor);
+      toggle.hidden = true;
+    }
+
+    const query = window.matchMedia('(min-width: 60rem)');
+    function sync() {
+      if (query.matches) collapse();
+      else expand();
+    }
+
+    sync();
+    query.addEventListener('change', sync);
+
+    toggle.addEventListener('click', () => {
+      setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+    });
+
+    // Escape-to-close plus click-outside, the same non-modal disclosure
+    // pattern the mobile menu-toggle used before it grew a Tab-trap - this
+    // dropdown never covers the viewport the way the mobile drawer does, so
+    // per the WAI-ARIA APG it doesn't need one.
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      if (toggle.getAttribute('aria-expanded') !== 'true') return;
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (!menu.contains(target) && !toggle.contains(target)) setOpen(false);
+    });
+  }
+
+  (function initNavMoreById() {
+    const list = document.getElementById('nav-list');
+    const toggle = document.getElementById('nav-more-toggle');
+    const menu = document.getElementById('nav-more-menu');
+    const anchor = toggle?.closest('li');
+    if (
+      list instanceof HTMLElement &&
+      toggle instanceof HTMLButtonElement &&
+      menu instanceof HTMLElement &&
+      anchor instanceof HTMLLIElement
+    ) {
+      initNavMore(list, toggle, menu, anchor);
+    }
   })();
 </script>
