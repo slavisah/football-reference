@@ -10992,6 +10992,72 @@ most of its budget on elsewhere in the file, just not exhaustively finished.
 The header-as-a-whole two-line height note from the prior entry is
 unaffected by this pass (no UI/CSS touched).
 
+### Test-coverage sweep: `editions.ts` closed to 100%/100% (statements/branches) - added 2026-08-23 (later intensive run)
+
+The full backlog (`AGENTS.md`, `docs/WEBSITE_REQUIREMENTS.md`, this file's
+"Left to do") is complete - every item is checked off and every previously
+"left for a future pass" candidate is exhausted except the specific, concrete
+gap the prior entry (this same day's "Test-coverage sweep" run) named:
+`src/lib/editions.ts` still sat at 99.13%/94.44% (statements/branches), with
+four named-but-unclosed shapes - two more `.sort()` comparator tie-break
+chains, and "a couple of malformed-row edge cases in `buildEditions()` itself
+- a row shorter than its header row, or a table missing a Year/Winner/Host
+column outright." This run closed exactly that list, re-running
+`pnpm test:coverage` after each addition to confirm no new gap opened
+elsewhere.
+
+- **Tie-break arms**: `buildHostsSummary()`, `buildHostMapPoints()`,
+  `buildHomeSoilTitles()` and `buildLongestStreaks()` each sort by count/rank
+  desc, then earliest year, falling through to
+  `displayName.localeCompare()`/`host.localeCompare()` only when both of the
+  first two keys tie - a case no existing fixture had ever constructed. New
+  synthetic two-row fixtures (distinct display names, identical counts,
+  identical *leading* year via same-year-different-suffix labels like
+  `'1970 (zone A)'`/`'1970 (zone B)'`, and for the host-map case two same-
+  region `WORLD_CUP_HOST_COORDINATES` entries) force each function down its
+  final comparator arm and assert the alphabetical order it produces.
+- **`buildEditions()` malformed rows**: a row shorter than its header row
+  (trailing cells simply absent, not blank strings) previously never
+  exercised the `row[index] ?? ''` fallback on the Year/Host/Teams/Winner
+  branches - two new cases (trailing columns missing; leading columns
+  missing via a reordered header row) close all four. A table with **no**
+  Year/Season column at all (the `yearCol >= 0` ternary's `else` arm) was
+  also untested - a third new case closes it, confirming `year: ''` and
+  `yearSort: NaN` rather than a throw.
+- Two smaller, related gaps turned up by the same coverage pass, same shape
+  ("a documented-but-never-exercised fallback"), closed alongside the four
+  named ones rather than left for yet another pass: `finalMargin()`'s
+  `if (!match) return undefined` (a "Final" cell with no digit-dash-digit
+  score pair, e.g. an abandoned/unplayed match) and `editionStoryYear()`'s
+  turn-of-century season rollover (`end <= Number(season[1])`, e.g. a
+  `"1999-00"`-style label needing `+100` to land on `2000`, not yet
+  exercised by any real Nations League season which only starts at
+  `"2018-19"`), plus `buildLongestTitleGaps()`'s "every gap works out to
+  zero" skip (two titles sharing the same duplicate-labeled year, the
+  Copa América 1959 shape) - the file's own doc comment already named this
+  as the intentional "vanishingly unlikely" exclusion case, just never
+  tested.
+
+**Tests:** 9 new Vitest cases, all in `tests/unit/editions.test.ts`. `pnpm
+test` - **467/467** (up from 457). `pnpm test:coverage` - `editions.ts` is
+now **100%/100%** statements/branches (up from 99.13%/94.44%); whole-repo
+`src/lib` average unaffected elsewhere. `pnpm lint` (`astro check`) - 0
+errors/warnings/hints across 139 files. `pnpm build` - 307 pages (unchanged -
+test-only change, no page/component/content edits). `check:links`/
+`check:sitemap`/`check:perf`/`check:precache`/`check:pdfs` all clean. Playwright
+e2e was not re-run this pass (no UI-visible surface touched, same reasoning
+the prior entry gave for its own test-only change).
+
+**Left for a future pass:** the remaining sub-100%-branch files
+(`quiz.ts` line 283, `sources.ts` line 33, `tableSort.ts` line 22, `url.ts`
+line 8) are the ones the 2026-08-23 "Test-coverage sweep" entry above already
+classified as defensively unreachable given the code's own invariants, not
+undertested - left alone here for the same reason. With `editions.ts` now
+closed, no concrete, named test-coverage gap is currently on record; the next
+quality pass should re-run `pnpm test:coverage` from scratch to look for a
+freshly-introduced gap rather than assume one of these four is secretly
+reachable.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
