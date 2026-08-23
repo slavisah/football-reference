@@ -1555,4 +1555,20 @@ describe('buildYearStories', () => {
     ]);
     expect(stories.get('1999-00')).toContain('won the Finals in 2000');
   });
+
+  it('attributes a duplicate-labeled year (e.g. Copa América 1959) to only the first matching edition', () => {
+    const duplicateYearTable: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1959 (zone A)', 'Argentina'],
+        ['1959 (zone B)', 'Uruguay'],
+      ],
+    };
+    const stories = buildYearStories(buildEditions(duplicateYearTable), [
+      'Argentina and Uruguay both won a 1959 South American Championship.',
+    ]);
+    expect(stories.size).toBe(1);
+    expect(stories.get('1959 (zone A)')).toContain('South American Championship');
+    expect(stories.get('1959 (zone B)')).toBeUndefined();
+  });
 });

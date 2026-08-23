@@ -15,7 +15,7 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 467 Vitest unit tests
+pnpm test                      # 468 Vitest unit tests
 pnpm build                     # static build + all content validation
 PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 699 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
@@ -11099,6 +11099,75 @@ work through migration guides and re-validate incrementally, not a
 same-run addition alongside an unrelated maintenance sweep. The safe,
 in-range dependency bumps this run made are unaffected by that and stand on
 their own.
+
+### Dependency upgrade: Astro 5 → 7 and Vitest 2 → 4 - added 2026-08-23 (later intensive run)
+
+The prior "Maintenance: dependency currency sweep" entry deliberately left
+`astro` (5.18.2 → 7.2.4), `vitest`/`@vitest/coverage-v8` (2.1.9 → 4.1.11) and
+`typescript` (5.9.3 → 7.0.2) untouched, naming it as needing "a dedicated
+pass able to work through migration guides and re-validate incrementally."
+This run was that pass, done one dependency at a time with the full
+validation chain re-run after each step so a regression could be attributed
+to the change that caused it.
+
+- **`vitest`/`@vitest/coverage-v8` 2.1.9 → 4.1.11**: no config or test-code
+  changes needed - `vitest.config.ts`'s `v8` coverage provider and
+  `tests/unit/**/*.test.ts` glob both still apply as-is. The only surface
+  effect was in the coverage *engine* itself: the upgraded v8 provider now
+  instruments an implicit-else branch in `buildYearStories()`
+  (`src/lib/editions.ts`) that the old engine didn't count, dropping that
+  file from 100%/100% to 100%/99.43% (branches) with line 298 newly listed as
+  uncovered - not a change to the source, a change in what the tool measures.
+  Closed with one new test (`tests/unit/editions.test.ts`, "attributes a
+  duplicate-labeled year... to only the first matching edition"), using the
+  same synthetic-duplicate-year-label technique (`'1959 (zone A)'`/
+  `'1959 (zone B)'`) the file's own tie-break-arm tests already established,
+  since a real duplicate `storyYear` needs two editions sharing a label the
+  way the two 1959 South American Championship entries do. Back to
+  100%/100% on `editions.ts`.
+- **`astro` 5.18.2 → 7.2.4**: one real breaking change touched this repo.
+  Astro 7 deprecates the `z` re-export from `astro:content` in favor of
+  `import { z } from 'astro/zod'` (Astro 7 now uses zod v4 internally under
+  `astro/zod`, not the old `astro:schema`/`astro:content` re-export this repo
+  was on) - `astro check` surfaced it as 17 `ts(6385)` "deprecated" hints
+  against every `z.*()` call in `src/content.config.ts`, the one file in the
+  repo that imported `z` from `astro:content` (`getEntry` is still imported
+  from `astro:content` elsewhere and is unaffected). Fixed by splitting the
+  import: `defineCollection` stays from `astro:content`, `z` now comes from
+  `astro/zod`. `astro.config.mjs`'s `redirects`/`base`/`build.format` config
+  needed no changes - all three are still current APIs in v7. No other file
+  in `src/` imports anything from `astro:content` besides `getEntry`, and no
+  `.astro` file touches `z` at all.
+- **`typescript` 5.9.3 → 7.0.2 - not attempted, blocked**: `@astrojs/check`
+  (the package `pnpm lint` runs `astro check` through) pins
+  `peerDependencies.typescript` to `^5.0.0 || ^6.0.0` even at its own latest
+  published version (0.9.10, already installed here) - TypeScript 7 is not
+  in that range. Bumping `typescript` alone without a matching `@astrojs/check`
+  release would either break `pnpm lint` on the peer-dependency mismatch or,
+  worse, run `astro check`'s TS-compiler-API-dependent diagnostics against a
+  major TS version it was never validated against. Left at 5.9.3 until
+  `@astrojs/check` itself ships TS 7 support - re-check `npm view
+  @astrojs/check peerDependencies` on the next dependency pass rather than
+  assuming this is still blocked.
+
+**Validation:** full chain re-run after every step, not just at the end.
+`pnpm lint` (`astro check`) - 0 errors/warnings/hints across 139 files (down
+from 17 hints mid-upgrade, before the `z` import fix). `pnpm test` -
+**468/468** (up from 467, the one new coverage-closing test). `pnpm
+test:coverage` - back to the same 100%/99.35%-or-better per-file numbers as
+the pre-upgrade baseline, `editions.ts` restored to 100%/100%. `pnpm build`
+- **307 pages** (unchanged). `check:links`/`check:sitemap`/`check:perf`/
+`check:precache`/`check:pdfs` all clean. `pnpm dev` starts and stops cleanly
+(Astro 7's dev server now runs as a `pid`-reporting daemon controllable via
+`astro dev stop`/`astro dev status`/`astro dev logs` - noted here since it's
+a visible behavior change from Astro 5, though nothing in this repo's
+scripts or docs depended on the old foreground-process behavior). Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` -
+**699/699 passing**, unchanged.
+
+**Left for a future pass:** the `typescript` 7 upgrade, gated on
+`@astrojs/check` adding peer support - see above. No other astro/vitest
+follow-up is outstanding; both are now at their latest stable release.
 
 ## Known caveats
 
