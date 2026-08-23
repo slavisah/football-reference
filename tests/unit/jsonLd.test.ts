@@ -138,6 +138,18 @@ describe('buildLatestEditionSportsEvent', () => {
     const noYear: Edition[] = [{ year: 'TBD', yearSort: Number.NaN, winner: 'Unknown', cells: [] }];
     expect(buildLatestEditionSportsEvent(noYear, 'Test Cup')).toBeUndefined();
   });
+
+  it('keeps the running-latest edition when a later entry in the array is actually an earlier year', () => {
+    // 2026 is already the running max by the time 2019 is reached, so the
+    // reduce comparator must keep it rather than overwrite it.
+    const outOfOrder: Edition[] = [
+      { year: '2022', yearSort: 2022, winner: 'Argentina', cells: [] },
+      { year: '2026', yearSort: 2026, winner: 'Spain', cells: [] },
+      { year: '2019', yearSort: 2019, winner: 'Ousmane Dembélé', cells: [] },
+    ];
+    const event = buildLatestEditionSportsEvent(outOfOrder, 'FIFA World Cup');
+    expect(event?.name).toBe('2026 FIFA World Cup');
+  });
 });
 
 describe('buildCountryRecordsItemList', () => {
@@ -192,6 +204,31 @@ describe('buildCountryRecordsItemList', () => {
         },
       },
     ]);
+  });
+
+  it('uses the singular "runner-up finish" when totalRunnerUps is exactly 1', () => {
+    // The two fixture records above only ever hit 2 (plural) or 0 (also
+    // plural) runner-up finishes, never exactly 1 - this is the default
+    // description's one remaining singular/plural pair without its own case.
+    const oneRunnerUp: CountryRecord[] = [
+      {
+        id: 'croatia',
+        displayName: 'Croatia',
+        competitions: [],
+        totalTitles: 0,
+        totalRunnerUps: 1,
+        totalSemifinals: 0,
+        totalFinals: 1,
+      },
+    ];
+    const itemList = buildCountryRecordsItemList(oneRunnerUp, {
+      pageUrl: 'https://example.test/compare/',
+      name: 'All national teams',
+    });
+    const [first] = itemList.itemListElement as { item: { description: string } }[];
+    expect(first.item.description).toBe(
+      '0 titles, 1 runner-up finish, 1 final reached across the World Cup, EURO, Copa América and Nations League',
+    );
   });
 
   it('supports a describe() override for a translated page', () => {

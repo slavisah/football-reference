@@ -113,6 +113,10 @@ describe('defaultSortValue', () => {
     const options = buildSortOptions(['Winner', 'National team']);
     expect(defaultSortValue(options)).toBe(options[0].value);
   });
+
+  it('falls back to an empty string when there are no sort options at all', () => {
+    expect(defaultSortValue([])).toBe('');
+  });
 });
 
 describe('compareCellText', () => {

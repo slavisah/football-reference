@@ -149,6 +149,32 @@ describe('runnerUpByYearQuestions', () => {
       'Koga je pobijedio Uruguay u finalu natjecanja FIFA World Cup 1930. godine?',
     );
   });
+
+  it('skips every entry when the source table has no runner-up column at all (e.g. Ballon d\'Or)', () => {
+    const noRunnerUpTable: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['2020', 'Lionel Messi'],
+        ['2021', 'Robert Lewandowski'],
+      ],
+    };
+    const noRunnerUpTimeline = buildTimeline(buildEditions(noRunnerUpTable));
+    const questions = runnerUpByYearQuestions(noRunnerUpTimeline, "Ballon d'Or", 'ballon-dor');
+    expect(questions).toHaveLength(0);
+  });
+
+  it('skips every entry when fewer than 2 distinct runner-ups exist to draw distractors from', () => {
+    const sparseTable: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up'],
+      rows: [
+        ['2018', 'France', 'Croatia'],
+        ['2022', 'Argentina', 'Croatia'],
+      ],
+    };
+    const sparseTimeline = buildTimeline(buildEditions(sparseTable));
+    const questions = runnerUpByYearQuestions(sparseTimeline, 'Test Cup', 'test');
+    expect(questions).toHaveLength(0);
+  });
 });
 
 describe('topScorerByYearQuestions', () => {
@@ -342,6 +368,26 @@ describe('chronologicalOrderQuestions', () => {
     expect(questions).toHaveLength(0);
   });
 
+  it('drops an edition with a missing winner before sampling', () => {
+    const missingWinnerTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1930', 'Uruguay', 'Uruguay'],
+        ['1934', 'Italy', 'Italy'],
+        ['1938', 'France', 'Italy'],
+        // Missing winner: must not be counted as a distinct-year candidate.
+        ['1942', 'n/a', ''],
+        ['1950', 'Brazil', 'Uruguay'],
+      ],
+    };
+    const missingWinnerEditions = buildEditions(missingWinnerTable);
+    const questions = chronologicalOrderQuestions(missingWinnerEditions, 'FIFA World Cup', 'world-cup', label);
+    expect(questions).toHaveLength(1);
+    // The missing-winner 1942 row's host ("n/a") must never appear - proof
+    // it was dropped as a candidate rather than picked with a blank winner.
+    expect(questions[0].items.some((item) => item.includes('n/a'))).toBe(false);
+  });
+
   it('drops duplicate-year editions before sampling (e.g. Copa América 1959)', () => {
     const dupTable: MarkdownTable = {
       headers: ['Year', 'Host', 'Winner'],
@@ -409,6 +455,11 @@ describe('mostTitlesQuestion', () => {
   it('uses "awards" wording for an individual-award subject, e.g. Ballon d\'Or/Golden Boot', () => {
     const questions = mostTitlesQuestion(clearSummary, "Ballon d'Or", 'ballon-dor', 'player');
     expect(questions[0].prompt).toBe("Who has won the most Ballon d'Or awards?");
+  });
+
+  it('combines the Croatian prompt with individual-award wording (hr + player), e.g. the Croatian Ballon d\'Or quiz', () => {
+    const questions = mostTitlesQuestion(clearSummary, "Ballon d'Or", 'ballon-dor', 'player', 'hr');
+    expect(questions[0].prompt).toBe("Tko ima najviše nagrada na natjecanju Ballon d'Or?");
   });
 
   it('builds a Croatian prompt when locale is "hr", with the same answer as English', () => {

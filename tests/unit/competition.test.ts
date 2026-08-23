@@ -81,6 +81,14 @@ describe('loadPageMeta', () => {
     expect(meta.intro).toBe('');
   });
 
+  it('stops the intro paragraph at a heading that follows it directly, with no blank line between', async () => {
+    mockGetEntry.mockResolvedValueOnce(
+      entry('# Title\n\nActual intro text.\n## Next section heading right after\n\nMore text.'),
+    );
+    const meta = await loadPageMeta('heading-right-after');
+    expect(meta.intro).toBe('Actual intro text.');
+  });
+
   it('pulls requested note sections via noteHeadings', async () => {
     mockGetEntry.mockResolvedValueOnce(
       entry('# Title\n\nIntro.\n\n## Key facts\n\n- First fact.\n- Second fact.\n'),
@@ -135,6 +143,13 @@ describe('loadCompetition', () => {
     await expect(
       loadCompetition('missing', { sourcesHeading: 'x' }),
     ).rejects.toThrow('Content entry "missing" was not found in the pages collection.');
+  });
+
+  it('treats a missing body as empty rather than throwing a TypeError, failing on the missing table instead', async () => {
+    mockGetEntry.mockResolvedValueOnce(entry(undefined));
+    await expect(
+      loadCompetition('no-body', { sourcesHeading: 'x' }),
+    ).rejects.toThrow('Could not find a "Editions" table in content/no-body.md.');
   });
 
   it('rejects a duplicate year/season by default, but allows it via allowDuplicateYears', async () => {
