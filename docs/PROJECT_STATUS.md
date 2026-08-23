@@ -10720,6 +10720,71 @@ trap - acceptable for a disclosure widget, not required). With this entry,
 every page named across all three prior "left for a future pass" mentions of
 this specific gap is now closed.
 
+### Accessibility: the mobile nav drawer's Tab key now traps focus inside it while open - added 2026-08-23 (intensive run)
+
+**Problem.** `Nav.astro`'s `#site-menu` drawer (the collapsed header below
+60rem) has closed via Escape and outside-click since its 2026-08-22 launch,
+but never trapped Tab: focus could walk straight out of the open drawer into
+whatever followed it in the DOM - the page's own main content, then its
+footer - while the drawer itself stayed visually open on screen. A sighted
+mouse user never notices; a keyboard-only reader tabbing through the drawer's
+sixteen-plus controls (fifteen nav links, two search inputs, the language
+switch, the theme toggle) can walk clean off the interactive surface they can
+see into content behind it. Two entries already named this: the mobile-header
+launch's own "left for a future pass" note, and the 2026-08-22 PDF entry's
+standing-candidates list, which had logged it as "acceptable for a disclosure
+widget, not required" per the WAI-ARIA APG's own guidance for a non-modal
+disclosure. Revisited that call here: the site's own AGENTS.md commits to
+"accessible semantic HTML and keyboard-friendly controls" as a non-negotiable
+rule, the fix is small, and a drawer that visually covers the whole first
+screen at 360px behaves like a modal to anyone looking at it even if it isn't
+marked as one - so closing the gap properly beat leaving it deferred again.
+
+**Fix.** Tab/Shift+Tab now cycles the toggle button plus every focusable
+control inside the open drawer and wraps at either end, instead of walking
+out. Escape and the click-outside handler are unchanged. The trap itself
+lives in the bundled, `is:inline`-free `<script>` at the bottom of
+`Nav.astro` (the one that already initializes the team/player search
+widgets) rather than the small `is:inline` script that opens/closes the
+drawer - that inline script is duplicated raw into every page's own HTML for
+its own no-flash-of-wrong-state reason, while the bundled script is minified
+before landing in each page, and the trap only matters after a real Tab
+press, well after first paint, so it doesn't need the inline script's
+guarantee. Keeping it out of the inline copy matters concretely here:
+`hr/records` - the site's heaviest page - was already within about 800 bytes
+of `check:perf`'s 510 KB page-weight budget, and the first (unminified,
+inline) version of this trap alone pushed it over. The final, minified,
+bundled version leaves `hr/records` with real but thin headroom (about
+235 bytes) under the budget; any future editorial growth on that specific
+page needs to keep that in mind rather than assuming the old ~800 bytes of
+slack still exists.
+
+**Tests:** three new Playwright cases in `tests/e2e/mobile.spec.ts`
+("header menu on a 360px phone"): Tab from the last drawer control (the
+theme toggle) wraps back to the menu button, Shift+Tab from the menu button
+wraps to the last drawer control, and a full lap - one Tab per focusable
+stop, computed from `NAV_LINKS.length` rather than hardcoded - lands back on
+the toggle with the drawer still open, proving nothing outside the trap ever
+receives focus while it's up. `pnpm lint` - 0 errors/warnings/hints across
+138 files. `pnpm test` - **431/431** (unchanged - no `src/lib` logic
+touched). `pnpm build` - 307 pages (unchanged). `check:links`/`check:sitemap`/
+`check:precache`/`check:pdfs` all clean; `check:perf` clean with the
+thin-but-real headroom noted above. Full `PW_EXECUTABLE_PATH=
+/opt/pw-browsers/chromium pnpm test:e2e` - **692/692 passing** (up from 689,
+the 3 new cases).
+
+**Left for a future pass:** the standing candidates from prior runs are
+otherwise unchanged (source-link liveness infeasible, further
+content-accuracy spot-checks low-yield, flag-emoji idea rejected, CSP's
+`unsafe-inline` not worth revisiting, the Golden Boot reverse-lookup quiz
+type not pursued, `public/downloads/` PDF-bloat documented/intentional, full
+per-edition team participant lists blocked on sourcing, EURO podium cards
+structurally impossible, no host locator map for Ballon d'Or/Golden Boot -
+no host data to build from). The desktop header above 60rem still wraps its
+fifteen nav links onto two rows - a grouped/overflow nav there remains a
+separate design question this run deliberately left alone, same as the
+2026-08-22 entry that first named it.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

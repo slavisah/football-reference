@@ -580,7 +580,8 @@ function isCurrent(href: string): boolean {
     });
 
     // Escape closes and returns focus to the button, the usual disclosure
-    // behaviour; clicking outside closes without stealing focus.
+    // behaviour; clicking outside closes without stealing focus. (The
+    // drawer's Tab-trap lives in the bundled script below - see its comment.)
     document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
         setOpen(false);
@@ -854,4 +855,37 @@ function isCurrent(href: string): boolean {
 
   initWidgetById('team-search-input', 'team-search-listbox', 'team-search-status', 'team-search');
   initWidgetById('player-search-input', 'player-search-listbox', 'player-search-status', 'player-search');
+
+  // Focus trap for the mobile nav drawer (#site-menu, toggled by
+  // #menu-toggle in the is:inline script above - open/close and Escape stay
+  // there, for the no-flash reason its own comment gives). Tab/Shift+Tab
+  // cycles the toggle plus every focusable drawer control and wraps at
+  // either end, instead of walking out into the page behind it. Lives in
+  // this bundled, shared-across-pages script rather than the inline one: it
+  // only matters after interaction, well after first paint, and keeping it
+  // out of the per-page-duplicated inline script avoids growing every
+  // single page's own HTML weight against check:perf's budget. Above the
+  // 60rem breakpoint aria-expanded is always 'false' (see the inline
+  // script's matchMedia listener), so the trap never engages there - the
+  // nav is laid out inline at that width, not as a drawer overlay.
+  (function initMenuFocusTrap() {
+    const toggle = document.getElementById('menu-toggle');
+    if (!toggle) return;
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Tab' || toggle.getAttribute('aria-expanded') !== 'true') return;
+      const items = [
+        ...document.querySelectorAll<HTMLElement>('#menu-toggle,#site-menu :is(a,button,input)'),
+      ].filter((el) => el.offsetParent !== null);
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+  })();
 </script>

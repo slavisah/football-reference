@@ -3455,6 +3455,48 @@ test.describe('header menu on a 360px phone', () => {
     expect(await read()).toBeCloseTo(closed, 0);
   });
 
+  test('Tab from the last drawer control wraps to the menu button', async ({ page }) => {
+    const toggle = page.locator('#menu-toggle');
+    await toggle.click();
+    await expect(page.locator('#site-menu')).toBeVisible();
+
+    const themeToggle = page.locator('#theme-toggle');
+    await themeToggle.focus();
+    await expect(themeToggle).toBeFocused();
+
+    await page.keyboard.press('Tab');
+    await expect(toggle).toBeFocused();
+  });
+
+  test('Shift+Tab from the menu button wraps to the last drawer control', async ({ page }) => {
+    const toggle = page.locator('#menu-toggle');
+    await toggle.click();
+    await expect(page.locator('#site-menu')).toBeVisible();
+    await expect(toggle).toBeFocused();
+
+    await page.keyboard.press('Shift+Tab');
+    await expect(page.locator('#theme-toggle')).toBeFocused();
+  });
+
+  test('Tab never leaves the drawer while it is open', async ({ page }) => {
+    await page.locator('#menu-toggle').click();
+    await expect(page.locator('#site-menu')).toBeVisible();
+
+    // Home has a language switch, so the drawer's tab sequence is: toggle
+    // (1), every nav link (NAV_LINKS.length), both search inputs (2), the
+    // lang switch (1), the theme toggle (1). Starting focus is already on
+    // the toggle (the first stop), so pressing Tab exactly that many times
+    // must wrap all the way back around to it, proving nothing outside the
+    // trap - the footer, the brand link - ever receives focus while it is
+    // open.
+    const stops = 1 + NAV_LINKS.length + 2 + 1 + 1;
+    for (let i = 0; i < stops; i++) {
+      await page.keyboard.press('Tab');
+    }
+    await expect(page.locator('#menu-toggle')).toBeFocused();
+    await expect(page.locator('#site-menu')).toBeVisible();
+  });
+
   test('the Croatian header labels the menu in Croatian', async ({ page }) => {
     await page.goto('hr/');
     const toggle = page.locator('#menu-toggle');
