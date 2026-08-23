@@ -16,6 +16,7 @@
 // not UI chrome).
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import References from '../../components/References.astro';
+import PrintDownloadLink from '../../components/PrintDownloadLink.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import { buildAllPlayerProfiles } from '../../lib/playerProfile';
 import type { PlayerAwardSource } from '../../lib/playerProfile';
@@ -122,6 +123,11 @@ const jsonLd: JsonLdObject[] = [
         tablica nagrada kao i stranica "Igrači". Reprezentacije ovdje nisu
         uključene; za tu usporedbu pogledajte "Usporedba".
       </p>
+      <PrintDownloadLink
+        slug="compare-players-hr"
+        label="Preuzmi PDF za ispis"
+        hint="A4 položeno, zadani par prikazan ispod te cjelokupni poredak igrača."
+      />
     </header>
 
     <section class="card stack" aria-labelledby="head-to-head-heading">

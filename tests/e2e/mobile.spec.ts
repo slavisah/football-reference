@@ -1929,6 +1929,19 @@ test.describe('Compare page on a 360px phone', () => {
     await expect(page).toHaveURL(/\/hr\/compare(\?|$)/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
+
+  test('offers a downloadable print PDF covering the default pair and the all-teams ranking', async ({
+    page,
+    request,
+  }) => {
+    const link = page.locator('a[download][href$="downloads/compare.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
 });
 
 test.describe('Croatian compare page (/hr/compare) on a 360px phone', () => {
@@ -1988,6 +2001,17 @@ test.describe('Croatian compare page (/hr/compare) on a 360px phone', () => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/compare(\?|$)/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('offers a downloadable print PDF with translated labels', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/compare-hr.pdf"]');
+    await expect(link).toBeVisible();
+    await expect(link).toHaveText(/Preuzmi PDF za ispis/);
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
   });
 });
 
@@ -3431,6 +3455,48 @@ test.describe('header menu on a 360px phone', () => {
     expect(await read()).toBeCloseTo(closed, 0);
   });
 
+  test('Tab from the last drawer control wraps to the menu button', async ({ page }) => {
+    const toggle = page.locator('#menu-toggle');
+    await toggle.click();
+    await expect(page.locator('#site-menu')).toBeVisible();
+
+    const themeToggle = page.locator('#theme-toggle');
+    await themeToggle.focus();
+    await expect(themeToggle).toBeFocused();
+
+    await page.keyboard.press('Tab');
+    await expect(toggle).toBeFocused();
+  });
+
+  test('Shift+Tab from the menu button wraps to the last drawer control', async ({ page }) => {
+    const toggle = page.locator('#menu-toggle');
+    await toggle.click();
+    await expect(page.locator('#site-menu')).toBeVisible();
+    await expect(toggle).toBeFocused();
+
+    await page.keyboard.press('Shift+Tab');
+    await expect(page.locator('#theme-toggle')).toBeFocused();
+  });
+
+  test('Tab never leaves the drawer while it is open', async ({ page }) => {
+    await page.locator('#menu-toggle').click();
+    await expect(page.locator('#site-menu')).toBeVisible();
+
+    // Home has a language switch, so the drawer's tab sequence is: toggle
+    // (1), every nav link (NAV_LINKS.length), both search inputs (2), the
+    // lang switch (1), the theme toggle (1). Starting focus is already on
+    // the toggle (the first stop), so pressing Tab exactly that many times
+    // must wrap all the way back around to it, proving nothing outside the
+    // trap - the footer, the brand link - ever receives focus while it is
+    // open.
+    const stops = 1 + NAV_LINKS.length + 2 + 1 + 1;
+    for (let i = 0; i < stops; i++) {
+      await page.keyboard.press('Tab');
+    }
+    await expect(page.locator('#menu-toggle')).toBeFocused();
+    await expect(page.locator('#site-menu')).toBeVisible();
+  });
+
   test('the Croatian header labels the menu in Croatian', async ({ page }) => {
     await page.goto('hr/');
     const toggle = page.locator('#menu-toggle');
@@ -3438,6 +3504,115 @@ test.describe('header menu on a 360px phone', () => {
     await expect(toggle).toHaveAttribute('aria-label', 'Otvori izbornik');
     await toggle.click();
     await expect(toggle).toHaveAttribute('aria-label', 'Zatvori izbornik');
+  });
+});
+
+// The suite's one Playwright project runs at 360px (playwright.config.ts),
+// where the whole nav lives in the drawer above - so the header's own
+// >=60rem row layout (Nav.astro) had no coverage at all until this block,
+// which is exactly how it wrapped onto two rows unnoticed for two prior
+// intensive runs. 1280px is comfortably past 60rem (~960px at the default
+// 16px root) so this exercises the real desktop layout, not just the 360px
+// requirement from the brief.
+//
+// Scope check done while writing these tests: the header's own .container
+// is capped at --maxw (68rem), so even a much wider viewport never gives
+// the row more usable space than roughly 1024px of content width after
+// padding - not enough to also fit both search widgets, the language
+// switch and the theme toggle on the same line as the nav links, grouped
+// or not. The standing note this closes named the fifteen *nav links*
+// specifically ("wraps its fifteen nav links onto two rows"), not the
+// whole header, so that's the one row this menu makes true; the header as
+// a whole can still be two lines (nav row, then the search/lang/theme
+// row), which was already the case before this change and isn't a
+// regression it introduces.
+test.describe('desktop nav "More" menu (>=60rem)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('');
+  });
+
+  test('collapses the secondary links so the nav-links row itself is one line, with no page overflow', async ({
+    page,
+  }) => {
+    const toggle = page.locator('#nav-more-toggle');
+    await expect(toggle).toBeVisible();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator('#nav-more-menu')).toBeHidden();
+    // The mobile drawer's own toggle is gone at this width.
+    await expect(page.locator('#menu-toggle')).toBeHidden();
+
+    // Every visible top-level nav item (Home, the six competitions/awards,
+    // and the More toggle) shares one row - the actual fix, see the
+    // describe block's own comment for why this checks the nav row rather
+    // than the whole header.
+    const tops = await page
+      .locator('#nav-list > li')
+      .evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)));
+    expect(new Set(tops).size).toBe(1);
+
+    // The six competition/award pages plus Home stay inline...
+    await expect(page.locator('#nav-list > li > a', { hasText: 'World Cup' })).toBeVisible();
+    // ...while a "tool" page moved out of the row into the (closed) menu.
+    await expect(page.locator('#nav-list > li > a', { hasText: 'Records' })).toHaveCount(0);
+
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('the button opens the menu with every secondary nav destination in it', async ({ page }) => {
+    const toggle = page.locator('#nav-more-toggle');
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    const menu = page.locator('#nav-more-menu');
+    await expect(menu).toBeVisible();
+    const links = ['Records', 'Compare', 'Teams', 'Players', 'Compare Players', 'Quiz', 'Glossary', 'Sources'];
+    await expect(menu.getByRole('link')).toHaveCount(links.length);
+    for (const name of links) {
+      await expect(menu.getByRole('link', { name, exact: true })).toBeVisible();
+    }
+  });
+
+  test('a link inside the menu navigates', async ({ page }) => {
+    await page.locator('#nav-more-toggle').click();
+    await page.locator('#nav-more-menu a', { hasText: 'Glossary' }).click();
+    await expect(page).toHaveURL(/\/glossary\/?$/);
+  });
+
+  test('Escape closes the menu and returns focus to the button', async ({ page }) => {
+    const toggle = page.locator('#nav-more-toggle');
+    await toggle.click();
+    await expect(page.locator('#nav-more-menu')).toBeVisible();
+
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#nav-more-menu')).toBeHidden();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(toggle).toBeFocused();
+  });
+
+  test('a click outside closes the menu', async ({ page }) => {
+    await page.locator('#nav-more-toggle').click();
+    await expect(page.locator('#nav-more-menu')).toBeVisible();
+
+    await page.locator('footer .muted').first().click();
+    await expect(page.locator('#nav-more-menu')).toBeHidden();
+  });
+
+  test('the current secondary page is marked current inside the menu', async ({ page }) => {
+    await page.goto('records');
+    await page.locator('#nav-more-toggle').click();
+    await expect(page.locator('#nav-more-menu a[aria-current="page"]')).toHaveText('Records');
+  });
+
+  test('the Croatian header groups the same links, translated', async ({ page }) => {
+    await page.goto('hr/');
+    const toggle = page.locator('#nav-more-toggle');
+    await expect(toggle).toHaveText('Više');
+    await toggle.click();
+    await expect(page.locator('#nav-more-menu a', { hasText: 'Rekordi' })).toBeVisible();
   });
 });
 
