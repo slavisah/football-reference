@@ -23,16 +23,16 @@
     "check:precache": "node scripts/check-precache.mjs"
   },
   "dependencies": {
-    "astro": "^5.13.0"
+    "astro": "^5.18.2"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.4",
-    "@axe-core/playwright": "^4.12.1",
-    "@playwright/test": "^1.55.0",
-    "@types/node": "^26.1.1",
+    "@astrojs/check": "^0.9.10",
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.2.0",
     "@vitest/coverage-v8": "2.1.9",
-    "typescript": "^5.9.0",
-    "vitest": "^2.1.0"
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9"
   },
   "packageManager": "pnpm@9.15.9"
 }

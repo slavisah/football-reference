@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 431 Vitest unit tests
+pnpm test                      # 467 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 685 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 699 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
                                           # and dark, across every page)
 ```
@@ -11057,6 +11057,48 @@ closed, no concrete, named test-coverage gap is currently on record; the next
 quality pass should re-run `pnpm test:coverage` from scratch to look for a
 freshly-introduced gap rather than assume one of these four is secretly
 reachable.
+
+### Maintenance: dependency currency sweep, plus stale test counts in the "How to run" header fixed - added 2026-08-23 (later intensive run)
+
+With `editions.ts` closed to 100%/100% by the prior entry, this run re-ran
+the full validation chain from scratch looking for a fresh angle rather than
+repeat an already-exhausted category (content-accuracy passes, source-link
+liveness, and several UI ideas are all on record as low-yield or rejected -
+see the many "standing candidates" notes above). `pnpm test:coverage` came
+back identical to the prior entry (100%/99.48% stmts/branches, the same four
+single-line branches already classified as defensively unreachable) -
+confirming no new gap opened, not finding one. `pnpm build`, `pnpm lint`, and
+every `check:*` script were all clean.
+
+`pnpm outdated` turned up a angle no prior run had touched: the project's own
+`devDependencies`/`dependencies` had never been bumped since whichever run
+first pinned them, and four packages had newer versions available within
+their existing `^`-range (non-breaking): `@astrojs/check` 0.9.9 → 0.9.10,
+`@axe-core/playwright` 4.12.1 → 4.13.0, `@playwright/test` 1.62.0 → 1.62.1,
+`@types/node` 26.1.1 → 26.2.0. `pnpm update` applied exactly those four
+(`package.json`'s caret floors moved up to match, `pnpm-lock.yaml`
+regenerated). Re-ran the full chain afterward to confirm nothing regressed:
+`pnpm lint` - 0 errors, `pnpm test` - **467/467**, `pnpm build` - 307 pages,
+every `check:*` script clean, and the full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` -
+**699/699 passing** (the updated `@playwright/test`/`@axe-core/playwright`
+themselves ran the suite this time, not just the on-disk version bump).
+
+Also fixed, while in the file: the "How to run" section at the top of this
+document still quoted **431** Vitest tests and **685** Playwright tests -
+stale since several intensive runs ago (actual counts are 467/699). Updated
+both to the real, current numbers.
+
+**Left for a future pass:** `astro` (5.18.2 → 7.2.4), `vitest`/
+`@vitest/coverage-v8` (2.1.9 → 4.1.11) and `typescript` (5.9.3 → 7.0.2) are
+each two major versions behind. Deliberately left untouched this run - a
+multi-major upgrade of the framework and test runner carries real breaking-
+change risk (routing/content-collections/config API changes in Astro,
+reporter/config changes in Vitest) that deserves a dedicated pass able to
+work through migration guides and re-validate incrementally, not a
+same-run addition alongside an unrelated maintenance sweep. The safe,
+in-range dependency bumps this run made are unaffected by that and stand on
+their own.
 
 ## Known caveats
 
