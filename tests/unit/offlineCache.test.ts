@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { buildPrecacheUrls, withBasePath } from '../../src/lib/offlineCache';
 import { NAV_LINKS } from '../../src/lib/routes';
 import { TRANSLATED_PATHS } from '../../src/lib/i18n';
@@ -62,5 +62,30 @@ describe('withBasePath', () => {
   it('prefixes a path with the base path, matching buildPrecacheUrls own prefixing', () => {
     expect(withBasePath('/football-reference/', '/hr/')).toBe('/football-reference/hr/');
     expect(withBasePath('/', '/hr/')).toBe('/hr/');
+  });
+
+  it('falls back to "/" when both the base and the path are empty', () => {
+    expect(withBasePath('', '')).toBe('/');
+  });
+});
+
+describe('buildPrecacheUrls with an untranslated nav path', () => {
+  // Every real NAV_LINKS path currently has a Croatian translation (pinned by
+  // the "every NAV_LINKS path has a Croatian translation" test above), so
+  // buildPrecacheUrls()'s English-only fallback for a link with no hrPath is
+  // never exercised through real data - this mocks routes.ts with one
+  // untranslated link to reach that branch directly, the same way
+  // competition.test.ts mocks astro:content to reach its own edge cases.
+  it('precaches only the English URL for a nav link with no Croatian translation', async () => {
+    vi.resetModules();
+    vi.doMock('../../src/lib/routes', () => ({
+      NAV_LINKS: [{ path: '/only-english', label: 'Only English', labelHr: 'n/a' }],
+    }));
+    const { buildPrecacheUrls: buildPrecacheUrlsWithMock } = await import('../../src/lib/offlineCache');
+    const urls = buildPrecacheUrlsWithMock('/football-reference/');
+    expect(urls).toContain('/football-reference/only-english');
+    expect(urls).not.toContain('/football-reference/hr/only-english');
+    vi.doUnmock('../../src/lib/routes');
+    vi.resetModules();
   });
 });
