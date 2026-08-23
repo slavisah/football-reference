@@ -71,6 +71,33 @@ describe('buildPlayerProfile', () => {
     expect(profile.awards[0].appearances[0].detail).toBe('4 goals');
   });
 
+  it('falls back to the whole raw Team cell for a single winner whose cell count does not match', () => {
+    // A data anomaly (a single winner, but a Team cell with a mismatched
+    // "; "-joined count) - falls back to the whole cell verbatim rather than
+    // guessing which part is theirs.
+    const mismatchedSingleTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [['1998', 'Davor Šuker', 'Croatia; Yugoslavia', '6']],
+    };
+    const mismatchedSources: PlayerAwardSource[] = [
+      { title: 'World Cup Golden Boot', slug: 'golden-boot', editions: buildEditions(mismatchedSingleTable) },
+    ];
+    const profile = buildPlayerProfile('Davor Šuker', mismatchedSources);
+    expect(profile.awards[0].appearances[0].detail).toBe('Croatia; Yugoslavia · 6 goals');
+  });
+
+  it('omits the team entirely when a tie’s Team cell count disagrees with the tie count, with no "Multiple" placeholder', () => {
+    const mismatchedTieTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [['1990', 'Player A; Player B', 'Team X; Team Y; Team Z', '5']],
+    };
+    const mismatchedSources: PlayerAwardSource[] = [
+      { title: 'World Cup Golden Boot', slug: 'golden-boot', editions: buildEditions(mismatchedTieTable) },
+    ];
+    const profile = buildPlayerProfile('Player A', mismatchedSources);
+    expect(profile.awards[0].appearances[0].detail).toBe('5 goals');
+  });
+
   it('returns an empty profile for a player present in none of the sources', () => {
     const profile = buildPlayerProfile('Nobody At All', sources);
     expect(profile.awards).toEqual([]);

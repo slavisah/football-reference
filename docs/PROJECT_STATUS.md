@@ -10878,6 +10878,120 @@ closing it would mean shrinking or further collapsing the search widgets/
 language switch/theme toggle themselves, a different and larger design
 question than the nav-links wrap this run closed.
 
+### Test-coverage sweep: `loadTeamCompetitions()` was never unit-tested, plus real branch gaps closed across 11 `src/lib` files - added 2026-08-23 (later intensive run)
+
+With the two-row-wrap header note closed by the prior entry and every other
+standing "Left for a future pass" candidate already infeasible/rejected/
+low-yield (source-link liveness, a third content-accuracy pass, the
+flag-emoji idea, CSP `unsafe-inline`, the Golden Boot reverse-lookup quiz
+type, `public/downloads/` PDF-bloat, full per-edition participant lists,
+EURO podium cards, a Ballon d'Or/Golden Boot host map), this run re-ran
+`pnpm test:coverage` from scratch to find a fresh, genuinely new angle rather
+than repeat an already-exhausted category - the same "establish a real
+baseline before picking an angle" move the 2026-08-22 `loadHomeCompetitions()`/
+`loadGlossaryEntries()` entry made.
+
+That baseline surfaced the identical shape of gap that entry closed, in a
+sibling file: `src/lib/teamCompetitions.ts`'s `loadTeamCompetitions()` - the
+function `/compare`'s frontmatter *and* `src/pages/team-index.json.ts` (the
+"find a team" search widget's data endpoint) both call to load the same four
+team competitions under the same hard-coded ids/`editionsHeading`s - sat at
+**0% coverage**, never once exercised by a test. A typo in any of its four
+content ids, in Copa América's non-default `'Champions timeline'` heading, or
+in its own `allowDuplicateYears: ['1959']` wiring would have passed every
+existing unit test and only surfaced as a build failure, a silently empty
+`/compare` ranking, or a broken team-search endpoint.
+
+Beyond that one real integration gap, a full read of the coverage report's
+remaining uncovered lines turned up two different shapes:
+
+- **Genuinely reachable branches nobody had exercised** - mostly tie-break
+  paths in a same-length `.sort()` comparator chain (`titles/gap desc, then
+  earliest year, then name`) that every existing test for that function only
+  ever fed a single winning entry, so the tie-break arms themselves never
+  ran. `compare.ts`'s `buildRivalries()`, and `editions.ts`'s
+  `buildRunnerUpsWithoutTitle()` and `buildLongestTitleGaps()`, all share
+  this exact pattern. Also real: `buildFinalsMeetings()`'s own "skip a
+  missing winner/runner-up" test asserted a property that happened to be
+  true of every row in its fixture without any row actually missing either
+  value - a vacuously-passing test masking an actually-untested skip path,
+  fixed with a fixture that has one of each. Two `notes.ts`/`playerProfile.ts`
+  branches (a heading-with-no-content section, and a single-winner Golden
+  Boot row whose Team cell has a mismatched semicolon count) were the same
+  "one arm of a real branch never taken" shape. `quiz.ts` gained coverage for
+  a Croatian + individual-award prompt combination real pages already call
+  (`hr/quiz.astro`'s Ballon d'Or question) but no unit test had reached, plus
+  the "no runner-up column at all" (Ballon d'Or-shaped tables) and
+  "too-sparse distractor pool" skip paths in `runnerUpByYearQuestions()`, and
+  a missing-winner row being dropped before sampling in
+  `chronologicalOrderQuestions()`. `i18n.ts`'s `alternatePath()` gained the
+  Croatian-locale "no English equivalent" null case, and `jsonLd.ts` gained
+  the reduce-comparator's "keep the running-latest edition, don't overwrite
+  it with an earlier one appearing later in the array" arm plus the one
+  singular/plural pairing (`totalRunnerUps === 1`) the two fixture records
+  never happened to hit. `validate.ts` gained the "table has zero edition
+  rows at all" case and the row-label fallback for a row whose year cell is
+  itself blank. `offlineCache.ts` gained a direct `withBasePath('', '')`
+  case and - via a `vi.doMock('../../src/lib/routes', ...)` the same way
+  `competition.test.ts` mocks `astro:content` - the "nav link with no
+  Croatian translation" fallback branch real `NAV_LINKS` data can never
+  reach (every real entry has one, pinned by its own "every NAV_LINKS path
+  has a Croatian translation" test), so it needed a fake link to exercise at
+  all.
+- **Branches that are defensively unreachable given the code's own
+  invariants, not undertested** - left alone rather than forced with
+  contrived inputs. `sources.ts`'s `stripTrailingPunctuation()` only reaches
+  its `?? []` fallback on `result.match(/\)/g)` when `result` is already
+  known (by the enclosing `if`) to end in `)`, so that match can never
+  actually be `null`. `tableSort.ts`'s `slug()` `|| 'col'` fallback needs a
+  header whose text is simultaneously matched by a role regex (`/host/`,
+  `/winner|champion|player/`, etc. - meaning it contains real letters) and
+  slugifies to nothing - contradictory. `url.ts`'s `withBase()` `|| '/'`
+  fallback needs `${base}${clean}` to be empty, but `clean` is always
+  prefixed with `/` first, so it never is. `quiz.ts`'s `mostTitlesQuestion()`
+  `if (!choice) return []` needs `buildChoice()` to fail with fewer than 2
+  distinct distractors, but its pool is `ChampionSummary[]` display names,
+  which are unique by construction once `summary.length >= 3` has already
+  been checked two lines above - a duplicate-name collision would need two
+  different teams/players to share an identical display string, not modeled
+  by any real content. Faking any of these would mean asserting behavior no
+  real caller can trigger, the opposite of what this sweep is for.
+
+**Tests:** 26 new Vitest cases across 11 existing files, plus a new
+`tests/unit/teamCompetitions.test.ts` (3 cases, mirroring
+`homeCards.test.ts`'s `loadHomeCompetitions()` block: loads all four
+competitions by real content id under the real heading each one uses, builds
+the `competitions` array in the fixed World Cup/EURO/Copa América/Nations
+League order, and passes `allowDuplicateYears` for Copa América only).
+`pnpm test` - **457/457** (up from 431). `pnpm test:coverage` -
+whole-repo `src/lib` average rose from 98.21%/94.78% (statements/branches) to
+**99.82%/97.93%**; every touched file is now 100% on both except `editions.ts`
+(99.13%/94.44%, the four remaining defensively-unreachable-shaped statements
+noted above are ones this sweep did not get to) and the three genuinely
+unreachable single-line branches in `sources.ts`/`tableSort.ts`/`url.ts`
+described above, plus `quiz.ts`'s one unreachable line. `pnpm lint`
+(`astro check`) - 0 errors/warnings/hints across 139 files. `pnpm build` -
+307 pages (unchanged - test-only change, no page/component/content edits).
+`check:links`/`check:sitemap`/`check:perf`/`check:precache`/`check:pdfs` all
+clean. Full `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` -
+**699/699 passing** (unchanged from the prior entry - no e2e-visible surface
+touched; one run hit a transient `ECONNRESET` fetching a static PDF over the
+local dev server, gone on an immediate re-run of that one case, so treated as
+infrastructure noise rather than a real failure per this file's own
+"flake" criteria).
+
+**Left for a future pass:** the standing candidates from prior runs are
+otherwise unchanged (same list as above). `editions.ts` has four remaining
+statement gaps at similar tie-break/malformed-row shapes this run didn't
+reach (two more `.sort()` comparator chains in functions this sweep didn't
+get to, plus a couple of malformed-row edge cases in `buildEditions()`
+itself - a row shorter than its header row, or a table missing a
+Year/Winner/Host column outright); each is one or two lines in an
+already-100%-statement-coverage function, the same shape this sweep spent
+most of its budget on elsewhere in the file, just not exhaustively finished.
+The header-as-a-whole two-line height note from the prior entry is
+unaffected by this pass (no UI/CSS touched).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

@@ -22,6 +22,13 @@ describe('validateEditions', () => {
     ).not.toThrow();
   });
 
+  it('rejects a table with no edition rows at all', () => {
+    const table = tableOf([]);
+    expect(() =>
+      validateEditions({ competition: 'Test', table, editions: buildEditions(table) }),
+    ).toThrow(/no edition rows were found/);
+  });
+
   it('rejects a missing winner', () => {
     const table = tableOf([['1930', '13', '']]);
     expect(() =>
@@ -76,6 +83,18 @@ describe('validateEditions', () => {
     expect(() =>
       validateEditions({ competition: 'Test', table, editions: buildEditions(table) }),
     ).toThrow(/row 1 has 3 cells but the table has 2 columns/);
+  });
+
+  it('labels a problem row by its 1-based row number when the year cell itself is blank', () => {
+    const table = tableOf([['', '5', '']]);
+    try {
+      validateEditions({ competition: 'Test', table, editions: buildEditions(table) });
+      throw new Error('should have thrown');
+    } catch (error) {
+      const message = (error as Error).message;
+      expect(message).toContain('row 1 is missing a winner');
+      expect(message).toContain('row 1 has no parseable year/season');
+    }
   });
 
   it('reports every problem it finds in one error', () => {

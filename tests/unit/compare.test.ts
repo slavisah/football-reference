@@ -8,6 +8,7 @@ import {
   buildTeamIndex,
   distinctCountryGroups,
   finalsMeetingsBetween,
+  isMissingCell,
   tracksSemifinalColumn,
   type CompetitionEditions,
 } from '../../src/lib/compare';
@@ -76,6 +77,16 @@ const copaAmerica: CompetitionEditions = {
 };
 
 const competitions = [worldCup, euro, copaAmerica];
+
+describe('isMissingCell', () => {
+  it('treats undefined the same as an empty/placeholder cell', () => {
+    expect(isMissingCell(undefined)).toBe(true);
+  });
+
+  it('treats a real value as present', () => {
+    expect(isMissingCell('Argentina')).toBe(false);
+  });
+});
 
 describe('tracksSemifinalColumn', () => {
   it('is true when the table has a third/fourth/semifinalist column', () => {
@@ -259,6 +270,27 @@ describe('buildFinalsMeetings', () => {
     expect(meetings).toHaveLength(3);
     expect(meetings.every((m) => m.runnerUpName !== '—' && m.winnerName !== '—')).toBe(true);
   });
+
+  it('skips a row with a "—" placeholder winner or runner-up rather than inventing a phantom meeting', () => {
+    const missingTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner', 'Runner-up'],
+      rows: [
+        // Missing winner: never a real final (e.g. a cancelled/void edition).
+        ['1930', 'A', '—', 'Argentina'],
+        // Missing runner-up: real winner recorded but no opponent on file.
+        ['1940', 'B', 'Uruguay', '—'],
+        ['1950', 'C', 'Brazil', 'Uruguay'],
+      ],
+    };
+    const missing: CompetitionEditions = {
+      title: 'Test Cup',
+      slug: 'test-cup',
+      editions: buildEditions(missingTable),
+    };
+    const meetings = buildFinalsMeetings([missing]);
+    expect(meetings).toHaveLength(1);
+    expect(meetings[0]).toMatchObject({ year: '1950', winnerName: 'Brazil', runnerUpName: 'Uruguay' });
+  });
 });
 
 describe('finalsMeetingsBetween', () => {
@@ -435,5 +467,42 @@ describe('buildRivalries', () => {
 
   it('returns an empty list when no pair has met more than once', () => {
     expect(buildRivalries(buildFinalsMeetings([worldCup]))).toEqual([]);
+  });
+
+  it('breaks a tie in meeting count alphabetically by teamA display name', () => {
+    // Two unrelated pairs, each meeting exactly twice - every final has a
+    // winner, so combined wins always equal meeting count for both sides,
+    // meaning this comparator's second tiebreaker (combined wins) can never
+    // actually distinguish two same-length rivalries; alphabetical order is
+    // what decides ties in practice.
+    const franceItalyTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner', 'Runner-up'],
+      rows: [
+        ['1990', 'A', 'Italy', 'France'],
+        ['2000', 'B', 'France', 'Italy'],
+      ],
+    };
+    const franceItaly: CompetitionEditions = {
+      title: 'Test Cup',
+      slug: 'test-cup',
+      editions: buildEditions(franceItalyTable),
+    };
+    const argentinaBrazilTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner', 'Runner-up'],
+      rows: [
+        ['1995', 'C', 'Brazil', 'Argentina'],
+        ['2005', 'D', 'Argentina', 'Brazil'],
+      ],
+    };
+    const argentinaBrazil: CompetitionEditions = {
+      title: 'Other Cup',
+      slug: 'other-cup',
+      editions: buildEditions(argentinaBrazilTable),
+    };
+    const meetings = buildFinalsMeetings([franceItaly, argentinaBrazil]);
+    const rivalries = buildRivalries(meetings);
+    expect(rivalries.map((r) => r.meetings)).toEqual([2, 2]);
+    // "Argentina" sorts before "France" alphabetically.
+    expect(rivalries.map((r) => r.teamADisplayName)).toEqual(['Argentina', 'France']);
   });
 });

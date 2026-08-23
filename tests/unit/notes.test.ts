@@ -78,6 +78,18 @@ describe('extractSection', () => {
     expect(extractSection(doc, 'Nonexistent heading')).toBeNull();
   });
 
+  it('returns null for a heading that exists but whose section has no content at all', () => {
+    const emptyDoc = `# Title
+
+## Empty section
+
+## Next section
+
+Some text.
+`;
+    expect(extractSection(emptyDoc, 'Empty section')).toBeNull();
+  });
+
   it('keeps a lead-in paragraph before a bullet list as `intro`, not dropped', () => {
     const section = extractSection(mixedDoc, 'How to use the reference');
     expect(section).toEqual({

@@ -111,6 +111,10 @@ describe('alternatePath', () => {
     expect(alternatePath('/nonexistent-page', 'en')).toBeNull();
   });
 
+  it('returns null for a Croatian path with no English equivalent in TRANSLATED_PATHS', () => {
+    expect(alternatePath('/hr/nonexistent-page', 'hr')).toBeNull();
+  });
+
   it('maps the English sources page to its Croatian translation and back', () => {
     expect(alternatePath('/about/sources', 'en')).toBe('/hr/about/sources');
     expect(alternatePath('/hr/about/sources', 'hr')).toBe('/about/sources');
