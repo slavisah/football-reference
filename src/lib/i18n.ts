@@ -110,6 +110,7 @@ const UI_STRINGS = {
     en: 'Player list unavailable right now.',
     hr: 'Popis igrača trenutno nije dostupan.',
   },
+  navMoreLabel: { en: 'More', hr: 'Više' },
 } as const;
 
 export type UiStringKey = keyof typeof UI_STRINGS;

@@ -104,6 +104,20 @@ test.describe('Compare Players page', () => {
     const messiLink = page.locator('.compare__table--all a', { hasText: 'Lionel Messi' });
     await expect(messiLink).toHaveAttribute('href', /\/players\/lionel-messi\/?$/);
   });
+
+  test('offers a downloadable print PDF covering the default pair and the all-players ranking', async ({
+    page,
+    request,
+  }) => {
+    await page.goto('compare-players');
+    const link = page.locator('a[download][href$="downloads/compare-players.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
 });
 
 test.describe('Croatian Compare Players page (/hr/compare-players)', () => {
@@ -179,6 +193,18 @@ test.describe('Croatian Compare Players page (/hr/compare-players)', () => {
     // so the URL isn't bare - just check the path prefix.
     await expect(page).toHaveURL(/\/football-reference\/compare-players(\?|$)/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('offers a downloadable print PDF with translated labels', async ({ page, request }) => {
+    await page.goto('hr/compare-players');
+    const link = page.locator('a[download][href$="downloads/compare-players-hr.pdf"]');
+    await expect(link).toBeVisible();
+    await expect(link).toHaveText(/Preuzmi PDF za ispis/);
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
   });
 });
 

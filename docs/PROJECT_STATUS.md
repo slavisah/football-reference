@@ -10646,6 +10646,238 @@ of its own (noted inline in `mobile.spec.ts`). The panel shows raw counts
 only; a proportional bar per row was considered and deliberately deferred -
 the counts are small integers where a bar adds decoration, not information.
 
+### `/compare` and `/compare-players` gain a downloadable print PDF, closing the gap the 2026-08-17 entry named as a standing candidate - added 2026-08-22 (later intensive run)
+
+Every other reader-facing page with real content - the six competition/award
+pages, `/records`, every `/teams/<slug>` and `/players/<slug>` profile - has
+had a "Download printable PDF" link since 2026-07-31/2026-08-18/2026-08-20.
+The two head-to-head comparison pages never got one, despite being named
+explicitly as the natural next slice in three separate "Left for a future
+pass" notes (most recently the 2026-08-17 entry). Both pages already render a
+fully meaningful default view with zero JavaScript - `/compare`'s two
+most-titled teams, `/compare-players`'s two most-decorated players, per each
+page's own "before any JS runs" comment - which is exactly the
+progressive-enhancement precedent every other PDF here already relies on: the
+generator (`scripts/generate-pdfs.mjs`) just prints the live page under print
+media, no PDF-only layout of its own.
+
+Added four entries to the shared `scripts/pdf-pages.mjs` list (`compare`,
+`compare-players`, and their `/hr/` counterparts, following the exact
+Croatian-gets-its-own-page-path precedent every other bilingual PDF here
+uses) with their own accurate `sources` list - `src/lib/teamCompetitions.ts`/
+`src/lib/compare.ts`/`src/lib/teamProfile.ts` for `/compare`,
+`src/lib/playerProfile.ts`/`src/lib/comparePlayers.ts` for
+`/compare-players` - rather than reusing `TABLE_COMPONENTS`/
+`TIMELINE_COMPONENTS`, since neither page renders `TournamentTable`,
+`ChampionsSummary`, or `EditorialNotes` (they compose their own "versus"
+markup by hand); only `References.astro` actually applies, factored into a
+new shared `REFERENCES_COMPONENT` constant. `generate-pdfs.mjs` and
+`check-pdf-freshness.mjs` both already iterate this shared list generically
+(page path in, slug-named PDF out; source list in, staleness check out), so
+no change to either script was needed - the existing pattern absorbed four
+new pages for free. Wired the existing, reusable `PrintDownloadLink.astro`
+into all four pages' headers (English/Croatian labels, an A4-landscape hint
+naming what's on the printed page), the same call shape `/records` already
+uses for a multi-section aggregate page.
+
+Regenerated all 294 PDFs via `PW_EXECUTABLE_PATH=<preinstalled Chromium>
+pnpm build && pnpm build:pdfs` (the tool has no per-page filter, so a
+refreshed manifest always re-renders everything, the same full-regeneration
+precedent every prior PDF-tooling entry here has followed since the
+2026-08-06 "Automated PDF-freshness check" entry) and confirmed `pnpm
+check:pdfs` reports all 294 up to date (up from 290) against the new
+manifest.
+
+**Tests:** four new Playwright cases mirroring `/records`' own existing "PDF
+link resolves and serves a real PDF" test - one per new page/locale
+(`tests/e2e/mobile.spec.ts` for `/compare`/`/hr/compare`,
+`tests/e2e/compare-players.spec.ts` for `/compare-players`/
+`/hr/compare-players`), each asserting the link is visible, the Croatian
+pages show the translated label, and an actual `request.get()` against the
+href returns a 200 with a PDF content-type - not just that a link element
+exists. `pnpm lint` (`astro check`) - 0 errors/warnings/hints across 138
+files. `pnpm test` - **431/431** (unchanged - no `src/lib` logic changed,
+only the shared, already-tested `PrintDownloadLink.astro` reused). `pnpm
+build` - 307 pages (unchanged). `check:links`/`check:sitemap`/`check:perf`/
+`check:precache` all clean against the rebuilt `dist/` (the new PDFs had to
+be generated and the site rebuilt *before* `check:links` would pass, since
+it resolves each `<a download>` href against a real file in `dist/downloads/`
+- confirmed the check does catch a missing file: it failed with exactly the
+four expected broken links until the rebuild). Full `PW_EXECUTABLE_PATH=
+/opt/pw-browsers/chromium-1194/chrome-linux/chrome pnpm test:e2e` -
+**689/689 passing** (up from 685, the 4 new cases), confirming no regression
+anywhere in the complete suite.
+
+**Left for a future pass:** the standing candidates from prior runs are
+otherwise unchanged (source-link liveness infeasible, further
+content-accuracy spot-checks low-yield, flag-emoji idea rejected, CSP's
+`unsafe-inline` not worth revisiting, the Golden Boot reverse-lookup quiz
+type not pursued, `public/downloads/` PDF-bloat documented/intentional, full
+per-edition team participant lists blocked on sourcing, EURO podium cards
+structurally impossible, no host locator map for Ballon d'Or/Golden Boot -
+no host data to build from, the mobile menu drawer's lack of a true focus
+trap - acceptable for a disclosure widget, not required). With this entry,
+every page named across all three prior "left for a future pass" mentions of
+this specific gap is now closed.
+
+### Accessibility: the mobile nav drawer's Tab key now traps focus inside it while open - added 2026-08-23 (intensive run)
+
+**Problem.** `Nav.astro`'s `#site-menu` drawer (the collapsed header below
+60rem) has closed via Escape and outside-click since its 2026-08-22 launch,
+but never trapped Tab: focus could walk straight out of the open drawer into
+whatever followed it in the DOM - the page's own main content, then its
+footer - while the drawer itself stayed visually open on screen. A sighted
+mouse user never notices; a keyboard-only reader tabbing through the drawer's
+sixteen-plus controls (fifteen nav links, two search inputs, the language
+switch, the theme toggle) can walk clean off the interactive surface they can
+see into content behind it. Two entries already named this: the mobile-header
+launch's own "left for a future pass" note, and the 2026-08-22 PDF entry's
+standing-candidates list, which had logged it as "acceptable for a disclosure
+widget, not required" per the WAI-ARIA APG's own guidance for a non-modal
+disclosure. Revisited that call here: the site's own AGENTS.md commits to
+"accessible semantic HTML and keyboard-friendly controls" as a non-negotiable
+rule, the fix is small, and a drawer that visually covers the whole first
+screen at 360px behaves like a modal to anyone looking at it even if it isn't
+marked as one - so closing the gap properly beat leaving it deferred again.
+
+**Fix.** Tab/Shift+Tab now cycles the toggle button plus every focusable
+control inside the open drawer and wraps at either end, instead of walking
+out. Escape and the click-outside handler are unchanged. The trap itself
+lives in the bundled, `is:inline`-free `<script>` at the bottom of
+`Nav.astro` (the one that already initializes the team/player search
+widgets) rather than the small `is:inline` script that opens/closes the
+drawer - that inline script is duplicated raw into every page's own HTML for
+its own no-flash-of-wrong-state reason, while the bundled script is minified
+before landing in each page, and the trap only matters after a real Tab
+press, well after first paint, so it doesn't need the inline script's
+guarantee. Keeping it out of the inline copy matters concretely here:
+`hr/records` - the site's heaviest page - was already within about 800 bytes
+of `check:perf`'s 510 KB page-weight budget, and the first (unminified,
+inline) version of this trap alone pushed it over. The final, minified,
+bundled version leaves `hr/records` with real but thin headroom (about
+235 bytes) under the budget; any future editorial growth on that specific
+page needs to keep that in mind rather than assuming the old ~800 bytes of
+slack still exists.
+
+**Tests:** three new Playwright cases in `tests/e2e/mobile.spec.ts`
+("header menu on a 360px phone"): Tab from the last drawer control (the
+theme toggle) wraps back to the menu button, Shift+Tab from the menu button
+wraps to the last drawer control, and a full lap - one Tab per focusable
+stop, computed from `NAV_LINKS.length` rather than hardcoded - lands back on
+the toggle with the drawer still open, proving nothing outside the trap ever
+receives focus while it's up. `pnpm lint` - 0 errors/warnings/hints across
+138 files. `pnpm test` - **431/431** (unchanged - no `src/lib` logic
+touched). `pnpm build` - 307 pages (unchanged). `check:links`/`check:sitemap`/
+`check:precache`/`check:pdfs` all clean; `check:perf` clean with the
+thin-but-real headroom noted above. Full `PW_EXECUTABLE_PATH=
+/opt/pw-browsers/chromium pnpm test:e2e` - **692/692 passing** (up from 689,
+the 3 new cases).
+
+**Left for a future pass:** the standing candidates from prior runs are
+otherwise unchanged (source-link liveness infeasible, further
+content-accuracy spot-checks low-yield, flag-emoji idea rejected, CSP's
+`unsafe-inline` not worth revisiting, the Golden Boot reverse-lookup quiz
+type not pursued, `public/downloads/` PDF-bloat documented/intentional, full
+per-edition team participant lists blocked on sourcing, EURO podium cards
+structurally impossible, no host locator map for Ballon d'Or/Golden Boot -
+no host data to build from). The desktop header above 60rem still wraps its
+fifteen nav links onto two rows - a grouped/overflow nav there remains a
+separate design question this run deliberately left alone, same as the
+2026-08-22 entry that first named it.
+
+### UX: desktop nav gains a "More" menu, closing the standing two-row-wrap candidate - added 2026-08-23 (later intensive run)
+
+**Problem.** Two prior runs (2026-08-22's mobile-header launch, 2026-08-23's
+focus-trap entry above) named the same open item without picking it up: at
+>=60rem the primary nav lays out as a single wrapping row rather than the
+mobile drawer, and its fifteen links don't fit on one line, so they wrap
+onto a second row. Backlog-wise every competition/award page, every
+cross-cutting audit, and every other standing candidate was exhausted or
+already rejected (see the list above), which made this the one concrete,
+still-open item left to close this run.
+
+**Fix.** `Nav.astro` now splits `NAV_LINKS` into two tiers: the six
+competition/award pages plus Home - the same six the home page itself leads
+with - stay directly on the row; the eight "tool" pages (Records, Compare,
+Teams, Players, Compare Players, Quiz, Glossary, Sources) collapse behind a
+new "More" button at >=60rem. A `SECONDARY_NAV_PATHS` set local to `Nav.astro`
+decides the split (it doesn't touch `NAV_LINKS`/`routes.ts` itself, so the
+offline precache list and translated-paths map are unaffected); the markup
+renders every link exactly as before, just with a `data-nav-tier="secondary"`
+marker and one extra, initially-empty `<li class="nav-more-item">` between the
+two groups. A new bundled script (`initNavMore`, alongside the existing
+search-widget and focus-trap code at the bottom of `Nav.astro`) physically
+moves the real secondary `<li>` nodes between the flat row and the dropdown
+on a `matchMedia('(min-width: 60rem)')` change - not clones, so there is
+never a duplicated link for a screen reader to announce twice or extra HTML
+weight from a second copy. Below 60rem, or with JS disabled entirely, the
+`.nav-more-item` stays `display: none` and every link renders flat exactly as
+before - the mobile drawer (already fully correct per the Known caveats
+section) needed zero changes and gets zero new elements added to its own
+grid.
+
+Deliberately **not** built as an ARIA `role="menu"`/roving-tabindex widget:
+the button (`aria-haspopup`, `aria-expanded`, `aria-controls`) plus a plain
+`<ul>` of real links is the same "semantic HTML over a complex ARIA widget"
+choice the mobile drawer itself already makes, and Escape-to-close plus
+click-outside is the same non-modal disclosure pattern the drawer used
+before it grew a Tab-trap - this dropdown never covers the viewport the way
+the full-screen drawer does, so per the WAI-ARIA APG it doesn't need one.
+
+The new script - not `is:inline` - lives in the same bundled file the
+2026-08-23 focus-trap entry above put its own logic in, and for the same
+reason: `is:inline` scripts are duplicated raw into every page's HTML and
+count fully against `check:perf`'s budget, while a bundled `<script>` only
+adds its `src=` URL. `hr/records` had only ~235 bytes of headroom left after
+that same tradeoff; an `is:inline` version of this menu (a few hundred raw
+bytes) would likely have tipped it over outright. The real cost of that
+choice: since the script runs after first paint rather than inline, a >=60rem
+reader can see the un-collapsed, two-row nav for a brief instant before it
+snaps into the grouped layout, instead of never seeing that state at all -
+judged worth it against a hard `check:perf` build failure for a sub-frame
+cosmetic flash. (`check:perf` afterwards: `hr/records` measured slightly
+*lighter* than before this change, 509.1 KB vs. 509.8 KB - the shared CSS
+file's own minified output shifted enough to net out below the markup this
+adds; still real but thin headroom, not a reason to relax care on that page.)
+
+**Scope note, found while writing the tests below.** The header's own
+`.container` is capped at `--maxw` (68rem), so even a much wider viewport
+never gives the row more than roughly 1024px of usable content width after
+padding - not enough to also fit both search widgets, the language switch
+and the theme toggle on the same line as the nav links, grouped or not. The
+standing note this closes named the fifteen *nav links* specifically, not
+the whole header, so that's the one row this menu makes true (verified: all
+of Home, the six competitions/awards, and the More button now share one
+`getBoundingClientRect().top` at 1280px). The header as a whole can still be
+two lines tall - the nav row, then a second row for the search widgets/lang
+switch/theme toggle - exactly as it already was before this change; not a
+regression, just an honest boundary on what "closing the two-row-wrap note"
+actually means here.
+
+**Tests:** 7 new Playwright cases in `tests/e2e/mobile.spec.ts` (`desktop nav
+"More" menu (>=60rem)`, the suite's first coverage at any viewport other than
+the 360px project default, via `page.setViewportSize()`): the nav row is one
+line with no page overflow and the mobile toggle is gone; the button opens
+the menu with exactly the eight secondary links in it; a link inside the menu
+navigates; Escape closes and returns focus to the button; a click outside
+closes it; the current secondary page is marked `aria-current="page"` inside
+the (closed) menu; and the Croatian header groups and labels the same way
+("Više"). `pnpm lint` - 0 errors/warnings/hints across 138 files. `pnpm test`
+- **431/431** (unchanged - no `src/lib` logic touched; the new `navMoreLabel`
+i18n key is covered by the existing generic "every UI string has both
+locales" test). `pnpm build` - 307 pages (unchanged). `check:links`/
+`check:sitemap`/`check:precache`/`check:pdfs` all clean; `check:perf` clean,
+see the headroom note above. Full `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium
+pnpm test:e2e` - **699/699 passing** (up from 692, the 7 new cases).
+
+**Left for a future pass:** the standing candidates from prior runs are
+otherwise unchanged (same list as above). The header-as-a-whole two-line
+height on a >=60rem viewport (nav row plus search/lang/theme row) is now the
+one remaining, explicitly-scoped-out item from this entry's own note above -
+closing it would mean shrinking or further collapsing the search widgets/
+language switch/theme toggle themselves, a different and larger design
+question than the nav-links wrap this run closed.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
@@ -10668,6 +10900,15 @@ the counts are small integers where a bar adds decoration, not information.
   phone (see the 2026-08-22 entry).
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
   time out; re-running the deploy clears it (it did here).
+- At >=60rem the header's eight "tool" nav links (Records, Compare, Teams,
+  Players, Compare Players, Quiz, Glossary, Sources) live behind a "More"
+  button (`#nav-more-toggle`/`#nav-more-menu` in `Nav.astro`) rather than
+  inline - see the 2026-08-23 "desktop nav gains a 'More' menu" entry. The
+  Playwright project's default viewport is 360px, where this never applies
+  (the mobile drawer still shows every link flat); a test that needs the
+  >=60rem layout has to set its own viewport via `page.setViewportSize()`
+  first, the same way `tests/e2e/mobile.spec.ts`'s `desktop nav "More" menu`
+  block does.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
