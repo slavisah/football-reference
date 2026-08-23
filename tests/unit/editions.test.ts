@@ -689,6 +689,28 @@ describe('buildRunnerUpsWithoutTitle', () => {
     expect(buildRunnerUpsWithoutTitle(buildEditions(table))).toEqual([]);
   });
 
+  it('breaks a tie in runner-up count by earliest year, then alphabetically when even that ties', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up'],
+      rows: [
+        // Spain: 2 runner-up finishes, same count as France/Italy below, but
+        // its earliest year (1980) is later - so it must rank last by the
+        // second tiebreak despite an earlier alphabetical name.
+        ['1980', 'A', 'Spain'],
+        ['1985', 'B', 'Spain'],
+        // France and Italy: both exactly 2 runner-up finishes, both first
+        // appearing in the same (duplicate) 1959 year - ties the first two
+        // sort keys, leaving alphabetical order as the only distinguisher.
+        ['1959', 'C', 'Italy'],
+        ['1959', 'D', 'France'],
+        ['1965', 'E', 'France'],
+        ['1965', 'F', 'Italy'],
+      ],
+    };
+    const summary = buildRunnerUpsWithoutTitle(buildEditions(table));
+    expect(summary.map((s) => s.displayName)).toEqual(['France', 'Italy', 'Spain']);
+  });
+
   it('returns an empty list when the table has no Runner-up column', () => {
     const scorersTable: MarkdownTable = {
       headers: ['Year', 'Player(s)', 'Team', 'Goals'],
@@ -894,6 +916,27 @@ describe('buildLongestTitleGaps', () => {
         names: ['West Germany', 'Germany'],
       },
     ]);
+  });
+
+  it('breaks a tie in gap length by earliest gap-start year, then alphabetically when even that ties', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        // Brazil and Argentina: both a 4-year gap starting 1950 - ties the
+        // first two sort keys, leaving alphabetical order as the only
+        // distinguisher (Argentina before Brazil).
+        ['1950', 'Brazil'],
+        ['1950', 'Argentina'],
+        ['1954', 'Brazil'],
+        ['1954', 'Argentina'],
+        // Uruguay: also a 4-year gap, but starting later (1962) - same gap
+        // length, later start, so it must rank after both.
+        ['1962', 'Uruguay'],
+        ['1966', 'Uruguay'],
+      ],
+    };
+    const gaps = buildLongestTitleGaps(buildEditions(table));
+    expect(gaps.map((g) => g.displayName)).toEqual(['Argentina', 'Brazil', 'Uruguay']);
   });
 
   it('does not chain a gap across a placeholder "Not awarded" year, since that year is never a title', () => {
