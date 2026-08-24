@@ -318,6 +318,18 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/hr/compare-players.astro": "c5a3312b0b586d45a2e57d558402f4aae17d46a3a45cf77f5854feadc32bf986"
   },
+  "glossary": {
+    "content/glossary.md": "9df4f189fe6f21afe25c5a456db20a1c64d3e6ee436b317280fa75a39ff82223",
+    "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
+    "src/lib/glossary.ts": "076bddfbcce373b1f10cc0ce4a053d4eb42fdddfadc6f584946b1dbd33cd73d1",
+    "src/pages/glossary.astro": "376a4ac4aa8b6f4bba25669b91f5525a140343de80a2a2072bdfc32757019966"
+  },
+  "glossary-hr": {
+    "content/glossary.md": "9df4f189fe6f21afe25c5a456db20a1c64d3e6ee436b317280fa75a39ff82223",
+    "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
+    "src/lib/glossary.ts": "076bddfbcce373b1f10cc0ce4a053d4eb42fdddfadc6f584946b1dbd33cd73d1",
+    "src/pages/hr/glossary.astro": "c4ce5136d6603b24b102507e43fea76cd18556612a8110ee02b8fb475fefcf4d"
+  },
   "team-argentina": {
     "content/fifa-world-cup.md": "a25c75128ad4c22694f5718c03d52b59dd4a9d8b901f7a19103af8fb730548b6",
     "content/uefa-euro.md": "20cab38958ca196d8334ab9da94e0edc697be4cacc7f7d931d54d260d3e8c713",

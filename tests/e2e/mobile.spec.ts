@@ -2442,6 +2442,16 @@ test.describe('Glossary page on a 360px phone', () => {
     await expect(page).toHaveURL(/\/hr\/glossary$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
+
+  test('offers a downloadable print PDF of the glossary', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/glossary.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
 });
 
 test.describe('Croatian glossary page (/hr/glossary) on a 360px phone', () => {
@@ -2469,6 +2479,17 @@ test.describe('Croatian glossary page (/hr/glossary) on a 360px phone', () => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/glossary$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('offers a downloadable print PDF with translated labels', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/glossary-hr.pdf"]');
+    await expect(link).toBeVisible();
+    await expect(link).toHaveText(/Preuzmi PDF za ispis/);
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
   });
 });
 

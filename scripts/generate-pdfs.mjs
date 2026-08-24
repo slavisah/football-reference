@@ -22,7 +22,7 @@
 
 import { chromium } from '@playwright/test';
 import { createHash } from 'node:crypto';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -121,6 +121,19 @@ async function main() {
   const stopServer = () => {
     if (stopped) return;
     stopped = true;
+    // Astro 7 changed `astro preview` to fork its real server into a
+    // detached background daemon and let this immediate `server` process
+    // exit as soon as it's confirmed listening (see `astro preview
+    // status`/`stop`) - so by the time this runs, `server`'s own process
+    // (and therefore its process group) is typically already gone, and
+    // killing it no longer reaches the actual running server the way it did
+    // under Astro 5. Found as a real bug: a `pnpm build:pdfs` run that
+    // appeared to finish cleanly left an `astro preview` daemon still
+    // listening on PORT afterward. `astro preview stop` is the only
+    // reliable way to stop the daemon itself now; the process-group kill is
+    // kept alongside it as a harmless no-op once the daemon is Astro's own
+    // responsibility, in case a future Astro version reverts this.
+    spawnSync(astroBin, ['preview', 'stop'], { cwd: ROOT, stdio: 'inherit' });
     try {
       process.kill(-server.pid, 'SIGTERM');
     } catch {

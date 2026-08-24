@@ -383,6 +383,34 @@ export const PDF_PAGES = [
       'src/pages/hr/compare-players.astro',
     ],
   },
+  // /glossary renders content/glossary.md's own "## Term" sections as a plain
+  // definition list (src/lib/glossary.ts's parseGlossaryEntries) - no
+  // TournamentTable/ChampionsSummary/EditorialNotes/References, so none of
+  // TABLE_COMPONENTS or SOURCES_MD apply here (tests/e2e/print-styles.spec.ts
+  // already groups it with /compare and /teams for the same reason). Only
+  // loadPageMeta (front matter + intro, from src/lib/competition.ts) and
+  // parseGlossaryEntries (the term/definition list itself) determine what the
+  // page shows.
+  {
+    slug: 'glossary',
+    path: '/glossary',
+    sources: [
+      'content/glossary.md',
+      'src/lib/competition.ts',
+      'src/lib/glossary.ts',
+      'src/pages/glossary.astro',
+    ],
+  },
+  {
+    slug: 'glossary-hr',
+    path: '/hr/glossary',
+    sources: [
+      'content/glossary.md',
+      'src/lib/competition.ts',
+      'src/lib/glossary.ts',
+      'src/pages/hr/glossary.astro',
+    ],
+  },
 ];
 
 // /teams/<slug> and /hr/teams/<slug> (one PDF per national team, per
