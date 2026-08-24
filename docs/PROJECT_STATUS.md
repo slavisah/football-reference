@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 488 Vitest unit tests
+pnpm test                      # 493 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 756 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 771 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
                                           # and dark, across every page)
 ```
@@ -11589,6 +11589,109 @@ per-edition pages - a different shape (no host/placings, and Golden Boot has
 two tables per year: World Cup and EURO top scorers) than `EditionView` was
 built for, so they need their own template rather than reusing this one
 as-is.
+
+### New feature: per-edition pages for the Men's Ballon d'Or (EN + HR) - added 2026-08-24 (later intensive run)
+
+The prior entry left both individual awards (Ballon d'Or, Golden Boot) named
+as needing "their own edition-page template" rather than reusing
+`EditionView` as-is, since their "Winner" column names a *player*, not a
+*team* - `buildEditionProfiles()`'s existing fact-linking would have tried to
+resolve a name like "Lionel Messi" as if it were a national team. Turned out
+not to be true: `EditionView.astro` itself was already fully generic (it just
+renders whatever `EditionProfile.facts` it's given), so the actual gap was
+narrower than the "own template" framing suggested - only the *linking
+rules* needed a second mode, not a second component. This run built that and
+shipped the Ballon d'Or's 70 editions (1956-2025, including the 2020 "Not
+awarded" year), EN + HR, reached the same way every other edition page is -
+tapping a year cell in the award table.
+
+**The individual-award linking mode, in `src/lib/editionProfile.ts`:**
+`buildEditionProfiles()` gained a third, optional `individualAward` argument
+(`{ playerSlugs: Set<string> }`). When given, two new pattern sets -
+`PLAYER_WINNER_PATTERNS` (`/^winner$/i`, `/player/i`) and
+`TEAM_MEMBER_PATTERNS` (`/^(national team|team)$/i`) - replace
+`TEAM_PLACING_PATTERNS` for that call only: the "Winner" column links to
+`/players/<slug>` (via the existing `playerProfileSlug()` from
+`src/lib/playerProfile.ts`) and "National team" links to `/teams/<slug>`
+separately, both still gated on "only link a slug that actually has a
+generated page" the same way `teamSlugs` already gated team placings. Every
+existing team-competition call site (World Cup, Copa América, EURO, Nations
+League) omits the new argument and is byte-for-byte unaffected - verified by
+a new test asserting a team competition's own "Winner" column still links to
+a team, never a player, when `individualAward` isn't passed. `EditionFact`
+gained an optional `playerSlug` alongside its existing `teamSlug`.
+
+**`EditionView.astro`:** the fact-rendering `<dd>` gained a `fact.playerSlug`
+branch (checked after `teamSlug`, before the `Final`-abbreviation branch),
+linking to `/players/<slug>` with a new `playerProfileHintTemplate` prop
+(`'{player} — full award history'`, matching the hover-hint convention
+`teamProfileHintTemplate` already established) - both hr edition pages
+override it with the Croatian award-history phrase.
+
+**The "Not awarded" 2020 row:** unlike every team competition's edition
+pages, this table has a real "no winner" row (content/ballon-dor.md's 2020
+Ballon d'Or, not awarded because of the pandemic - same placeholder
+`isPlaceholderWinner()` already recognizes elsewhere on the site). That
+edition still gets its own page (`/competitions/ballon-dor/2020`) - the
+placeholder guard already in `buildEditionProfiles()`'s cell loop (shared
+with the team-competition path) simply never attaches a `playerSlug`/`teamSlug`
+to "Not awarded"/"—", so the page renders the fact as plain text with no
+broken link. Both the EN and HR pages special-case their meta description
+for this one row ("was not awarded" / "nije dodijeljena") rather than
+reading oddly as "Not awarded won".
+
+**Wiring:** new `src/pages/competitions/ballon-dor/[year].astro` and its
+Croatian sibling, modeled on the Copa América edition page's pattern (no
+host, no Golden Boot join - that only tracks the FIFA World Cup and EURO).
+`ballon-dor.astro` (EN, via `CompetitionView`) and its hr sibling (hand-rolled
+via `TournamentTable` directly) both gained the same `yearLinks` wiring the
+team competitions' pages already had - `CompetitionView` already forwarded a
+`yearLinks` prop with no component change needed, exactly as the EURO/Nations
+League entry above found. `sitemap.xml.ts` gained a Ballon d'Or edition loop,
+built with `individualAward` using the exact `playerProfiles` slug set
+already computed for the `/players/` loop just above it (guaranteeing the two
+loops can never link to a slug the other doesn't also serve).
+
+**Tests:** 5 new Vitest cases (`editionProfile.test.ts`, against a small
+inline table shaped like `content/ballon-dor.md`'s real columns, including a
+"Not awarded" row): the Winner column links to a player not a team, National
+team still links to a team, a player with no generated `/players/` page is
+left unlinked, the "Not awarded" placeholder is never linked, and a team
+competition's own Winner column is unaffected when `individualAward` is
+omitted - 493 Vitest total, up from 488. 15 new Playwright cases
+(`tests/e2e/ballon-dor-edition-page.spec.ts`): a normal year links straight
+through, the winner and national team link to their own separate profiles,
+the "Not awarded" 2020 page has no broken link, the pager, the oldest edition
+has no previous link, back-link, no 360px overflow, no WCAG violations, the
+language switch both ways, and the Croatian page's translated chrome/pager
+plus its own "Not awarded" case - plus one `mobile.spec.ts` sitemap-count
+assertion updated in place from 490 to 630 (+140 Ballon d'Or edition URLs, 70
+editions x 2 languages) with two new `<loc>`/hreflang spot-checks (Ballon
+d'Or 2018) alongside the existing per-competition ones. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` - **771/771
+passing** (up from 756, the 15 new edition-page cases).
+
+**Validation:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints. `pnpm
+test` - 493/493. `pnpm build` - **631 pages** (up from 491: +140 Ballon d'Or
+edition pages, 70 editions x 2 languages including the 2020 "Not awarded"
+year). `check:links` (635 pages), `check:sitemap` (630 entries), `check:perf`,
+`check:precache` all clean. `check:pdfs` flagged the two shared Ballon d'Or
+table pages (EN + HR) as stale once `yearLinks` touched them -
+`pnpm build:pdfs` regenerated all 296 PDFs (no new PDF pages added, same
+"no per-edition PDF yet" precedent every other edition-page rollout has
+established), `check:pdfs` clean afterward. Full `pnpm test:e2e` -
+**771/771 passing**.
+
+**Left for a future pass:** (1) the same "no downloadable PDF per edition"
+gap named by every prior edition-page entry now also applies to these 70 new
+pages. (2) Golden Boot is the only competition left without edition pages -
+harder than Ballon d'Or: one content file holds two tables (World Cup and
+EURO top scorers) sharing years, and ties have multiple joint winners
+("; "-separated names, e.g. 1962's six-way tie) that this run's
+`individualAward` mode does not yet split the way `playerProfile.ts`'s
+`teamFor()` already does for that exact case - `buildEditionProfiles()`
+would need the same index-aligned splitting before Golden Boot's edition
+pages can reuse it safely.
 
 ## Known caveats
 

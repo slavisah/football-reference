@@ -2819,13 +2819,17 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     // sibling - the two 1959 tournaments each get their own host-
     // disambiguated slug, see src/lib/editionProfile.ts), 17 UEFA EURO
     // edition pages x 2 languages (src/pages/competitions/euro/[year].astro
-    // and its Croatian sibling), and 4 UEFA Nations League Finals edition
-    // pages x 2 languages (src/pages/competitions/nations-league/[year].astro
-    // and its Croatian sibling), each pair carrying reciprocal hreflang
+    // and its Croatian sibling), 4 UEFA Nations League Finals edition pages
+    // x 2 languages (src/pages/competitions/nations-league/[year].astro and
+    // its Croatian sibling), and 70 Men's Ballon d'Or edition pages x 2
+    // languages (src/pages/competitions/ballon-dor/[year].astro and its
+    // Croatian sibling - the first individual-award edition pages, see
+    // `individualAward` in src/lib/editionProfile.ts; the 2020 "Not awarded"
+    // row still gets its own page), each pair carrying reciprocal hreflang
     // alternates - /glossary is a fully bilingual NAV_LINKS entry from launch
     // (see docs/PROJECT_STATUS.md's Glossary entry), so it flows through the
     // main loop like every other top-level page.
-    expect(body.match(/<url>/g)?.length).toBe(490);
+    expect(body.match(/<url>/g)?.length).toBe(630);
     expect(body).toContain(`<loc>${SITE}/glossary/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/glossary/</loc>`);
     expect(body).toContain(`hreflang="hr" href="${SITE}/hr/glossary/"`);
@@ -2848,6 +2852,9 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(body).toContain(
       `hreflang="hr" href="${SITE}/hr/competitions/nations-league/2022-23/"`,
     );
+    expect(body).toContain(`<loc>${SITE}/competitions/ballon-dor/2018/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/competitions/ballon-dor/2018/</loc>`);
+    expect(body).toContain(`hreflang="hr" href="${SITE}/hr/competitions/ballon-dor/2018/"`);
     expect(body).toContain(`<loc>${SITE}/teams/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/teams/</loc>`);
     expect(body).toContain(`<loc>${SITE}/teams/brazil/</loc>`);

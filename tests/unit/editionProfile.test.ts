@@ -44,6 +44,21 @@ const worldCupTable: MarkdownTable = {
 
 const worldCup = buildEditions(worldCupTable);
 
+// Shaped like content/ballon-dor.md's real columns: "Winner" names a player,
+// not a team, and "National team" names their team - the individual-award
+// case `individualAward` exists for. Includes a "Not awarded" row (2020's
+// real placeholder) to exercise the same "never link a placeholder" guard
+// team competitions already have.
+const ballonDorTable: MarkdownTable = {
+  headers: ['Year', 'Winner', 'National team', 'Ceremony date'],
+  rows: [
+    ['2018', 'Luka Modrić', 'Croatia', '3 December 2018'],
+    ['2019', 'Lionel Messi', 'Argentina', '2 December 2019'],
+    ['2020', 'Not awarded', '—', '—'],
+  ],
+};
+const ballonDor = buildEditions(ballonDorTable);
+
 describe('editionSlug', () => {
   it('leaves a plain year as-is', () => {
     expect(editionSlug('1930')).toBe('1930');
@@ -189,6 +204,51 @@ describe('buildEditionProfiles', () => {
       // The plain year alone (no host) resolves to neither - callers must key by host too.
       expect(links.has('1959')).toBe(false);
     });
+  });
+});
+
+describe('buildEditionProfiles with individualAward', () => {
+  it('links the Winner column to a player profile, not a team profile', () => {
+    const profiles = buildEditionProfiles(ballonDor, undefined, {
+      playerSlugs: new Set(['luka-modric', 'lionel-messi']),
+    });
+    const modric = profiles.find((p) => p.year === '2018')!;
+    const winnerFact = modric.facts.find((f) => f.label === 'Winner')!;
+    expect(winnerFact.playerSlug).toBe('luka-modric');
+    expect(winnerFact.teamSlug).toBeUndefined();
+  });
+
+  it('still links the National team column to a team profile', () => {
+    const profiles = buildEditionProfiles(
+      ballonDor,
+      new Set(['croatia', 'argentina']),
+      { playerSlugs: new Set(['luka-modric', 'lionel-messi']) },
+    );
+    const modric = profiles.find((p) => p.year === '2018')!;
+    expect(modric.facts.find((f) => f.label === 'National team')?.teamSlug).toBe('croatia');
+  });
+
+  it('omits the player link when the slug has no generated /players/ page', () => {
+    const profiles = buildEditionProfiles(ballonDor, undefined, {
+      playerSlugs: new Set(['lionel-messi']),
+    });
+    const modric = profiles.find((p) => p.year === '2018')!;
+    expect(modric.facts.find((f) => f.label === 'Winner')?.playerSlug).toBeUndefined();
+  });
+
+  it('never links a placeholder "Not awarded" winner', () => {
+    const profiles = buildEditionProfiles(ballonDor, undefined, {
+      playerSlugs: new Set(['luka-modric', 'lionel-messi', 'not-awarded']),
+    });
+    const notAwarded = profiles.find((p) => p.year === '2020')!;
+    expect(notAwarded.facts.find((f) => f.label === 'Winner')?.playerSlug).toBeUndefined();
+    expect(notAwarded.champion).toBe('Not awarded');
+  });
+
+  it('does not treat a team-competition Winner column as a player when individualAward is omitted', () => {
+    const [latest] = buildEditionProfiles(worldCup);
+    expect(latest.facts.find((f) => f.label === 'Winner')?.playerSlug).toBeUndefined();
+    expect(latest.facts.find((f) => f.label === 'Winner')?.teamSlug).toBe('france');
   });
 });
 

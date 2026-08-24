@@ -1,0 +1,106 @@
+---
+// Croatian translation of src/pages/competitions/ballon-dor/[year].astro -
+// one page per Men's Ballon d'Or edition. Loads the exact same content as
+// the English route so the winner and national team can't drift between
+// languages; only this page's own chrome (column labels, prose) is
+// Croatian, the same convention every other hr competition/edition page here
+// follows.
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import EditionView from '../../../../components/EditionView.astro';
+import References from '../../../../components/References.astro';
+import { loadCompetition } from '../../../../lib/competition';
+import { distinctWinners, isPlaceholderWinner } from '../../../../lib/editions';
+import { buildEditionProfiles, type EditionProfile } from '../../../../lib/editionProfile';
+import { buildAllCountryRecords } from '../../../../lib/compare';
+import { loadTeamCompetitions } from '../../../../lib/teamCompetitions';
+import { teamProfileSlug } from '../../../../lib/teamProfile';
+import { playerProfileSlug } from '../../../../lib/playerProfile';
+import type { SourceLink } from '../../../../lib/sources';
+import { withBase } from '../../../../lib/url';
+
+// Croatian column-label translations, matching hr/competitions/ballon-dor.astro's own headerLabels map.
+const HEADER_LABELS: Record<string, string> = {
+  Winner: 'Pobjednik',
+  'National team': 'Reprezentacija',
+  'Ceremony date': 'Datum svečanosti',
+};
+
+export async function getStaticPaths() {
+  const [data, teamData] = await Promise.all([
+    loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),
+    loadTeamCompetitions(),
+  ]);
+
+  const teamSlugs = new Set(
+    buildAllCountryRecords(teamData.competitions).map((record) => teamProfileSlug(record.id)),
+  );
+  const playerSlugs = new Set(distinctWinners(data.editions).map((name) => playerProfileSlug(name)));
+
+  return buildEditionProfiles(data.editions, teamSlugs, { playerSlugs }).map((profile) => ({
+    params: { year: profile.slug },
+    props: {
+      profile,
+      sources: data.sources,
+      lastReviewed: data.lastReviewed,
+      status: data.status,
+    },
+  }));
+}
+
+type Props = {
+  profile: EditionProfile;
+  sources: SourceLink[];
+  lastReviewed: string;
+  status: string;
+};
+
+const { profile, sources, lastReviewed, status } = Astro.props as Props;
+const statusText = status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+const nationalTeam = profile.facts.find((fact) => /national team/i.test(fact.label))?.value;
+const description = isPlaceholderWinner(profile.champion)
+  ? `Zlatna lopta ${profile.year}. nije dodijeljena. Puni podaci iz tablice dobitnika te godine.`
+  : [
+      `Zlatna lopta ${profile.year}.:`,
+      `pobjednik ${profile.champion}${nationalTeam && nationalTeam !== '—' ? ` (${nationalTeam})` : ''}.`,
+      'Puni podaci iz tablice nagrade, s poveznicom na potpunu povijest nagrada tog igrača.',
+    ].join(' ');
+---
+
+<BaseLayout
+  title={`Zlatna lopta ${profile.year}.`}
+  description={description}
+  locale="hr"
+  alternateHref={withBase(`/competitions/ballon-dor/${profile.slug}`)}
+  breadcrumbTrail={[{ name: 'Zlatna lopta', url: withBase('/hr/competitions/ballon-dor') }]}
+>
+  <EditionView
+    profile={profile}
+    competitionPath="/hr/competitions/ballon-dor"
+    competitionTitle="Zlatna lopta"
+    locale="hr"
+    headerLabels={HEADER_LABELS}
+    eyebrow="Generirano iz tablice nagrade"
+    headingTemplate="{competition} {year}."
+    introTemplate="Sve što tablica nagrade bilježi o izdanju {year}., s poveznicom na pobjednikovu potpunu povijest nagrada i na njegovu reprezentaciju."
+    pagerLabel="Ostala izdanja"
+    previousLabel="Prethodno izdanje"
+    nextLabel="Sljedeće izdanje"
+    backLabel="Sva izdanja natjecanja {competition}"
+    teamProfileHintTemplate="{team} — potpuna povijest"
+    playerProfileHintTemplate="{player} — potpuna povijest nagrada"
+    glanceHeading="Izdanje {year}. na prvi pogled"
+  >
+    <References
+      sources={sources}
+      lastReviewed={lastReviewed}
+      status={status}
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText={statusText}
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+    />
+  </EditionView>
+</BaseLayout>
