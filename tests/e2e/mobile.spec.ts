@@ -2814,15 +2814,18 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     // 98 player profile pages x 2 languages (src/pages/players/[slug].astro
     // and its Croatian sibling), 23 FIFA World Cup edition pages x 2
     // languages (src/pages/competitions/world-cup/[year].astro and its
-    // Croatian sibling), and 48 Copa América edition pages x 2 languages
+    // Croatian sibling), 48 Copa América edition pages x 2 languages
     // (src/pages/competitions/copa-america/[year].astro and its Croatian
     // sibling - the two 1959 tournaments each get their own host-
-    // disambiguated slug, see src/lib/editionProfile.ts), each pair carrying
-    // reciprocal hreflang alternates - /glossary is a fully bilingual
-    // NAV_LINKS entry from launch (see docs/PROJECT_STATUS.md's Glossary
-    // entry), so it flows through the main loop like every other top-level
-    // page.
-    expect(body.match(/<url>/g)?.length).toBe(448);
+    // disambiguated slug, see src/lib/editionProfile.ts), 17 UEFA EURO
+    // edition pages x 2 languages (src/pages/competitions/euro/[year].astro
+    // and its Croatian sibling), and 4 UEFA Nations League Finals edition
+    // pages x 2 languages (src/pages/competitions/nations-league/[year].astro
+    // and its Croatian sibling), each pair carrying reciprocal hreflang
+    // alternates - /glossary is a fully bilingual NAV_LINKS entry from launch
+    // (see docs/PROJECT_STATUS.md's Glossary entry), so it flows through the
+    // main loop like every other top-level page.
+    expect(body.match(/<url>/g)?.length).toBe(490);
     expect(body).toContain(`<loc>${SITE}/glossary/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/glossary/</loc>`);
     expect(body).toContain(`hreflang="hr" href="${SITE}/hr/glossary/"`);
@@ -2837,6 +2840,14 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(body).toContain(`<loc>${SITE}/competitions/world-cup/2018/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/competitions/world-cup/2018/</loc>`);
     expect(body).toContain(`hreflang="hr" href="${SITE}/hr/competitions/world-cup/2018/"`);
+    expect(body).toContain(`<loc>${SITE}/competitions/euro/2016/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/competitions/euro/2016/</loc>`);
+    expect(body).toContain(`hreflang="hr" href="${SITE}/hr/competitions/euro/2016/"`);
+    expect(body).toContain(`<loc>${SITE}/competitions/nations-league/2022-23/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/competitions/nations-league/2022-23/</loc>`);
+    expect(body).toContain(
+      `hreflang="hr" href="${SITE}/hr/competitions/nations-league/2022-23/"`,
+    );
     expect(body).toContain(`<loc>${SITE}/teams/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/teams/</loc>`);
     expect(body).toContain(`<loc>${SITE}/teams/brazil/</loc>`);

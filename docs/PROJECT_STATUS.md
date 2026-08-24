@@ -11498,6 +11498,97 @@ World Cup run both used. (3) The two individual awards (Ballon d'Or, Golden
 Boot) still need their own edition-page template - a different shape
 (no host/placings) than `EditionView` was built for.
 
+### New feature: per-edition pages for UEFA EURO and the UEFA Nations League Finals (EN + HR) - added 2026-08-24 (later intensive run)
+
+The prior two entries built per-edition pages for the FIFA World Cup and
+Copa América and named EURO/Nations League as the straightforward next step
+- both have unique Year/Season labels per edition, so `buildEditionProfiles()`
+needed no new disambiguation scheme, only the same wiring those two runs
+already established. This run shipped both: 17 UEFA EURO editions
+(1960-2024) and 4 UEFA Nations League Finals editions (2018-19 through
+2024-25), each in English and Croatian, reached the same way every other
+edition page is - tapping a year/season cell in the competition table.
+
+**EURO** (`src/pages/competitions/euro/[year].astro` + Croatian sibling):
+built directly on the World Cup edition page's pattern - same
+`teamSlugs`-gated `buildEditionProfiles()` call, same Golden Boot top-scorer
+join (`loadCompetition('golden-boot', { editionsHeading: 'UEFA EURO top
+scorers', ... })`). EURO's placing columns are named "Other semifinalist" /
+"Other semifinalist / fourth" rather than "Third"/"Fourth" (no third-place
+match has been played since 1980 - see the site's own "Historical format
+note"); `editionProfile.ts`'s `TEAM_PLACING_PATTERNS` already matches on
+`/finalist/i` unanchored, so both columns were linked correctly with no
+library change needed.
+
+**UEFA Nations League Finals**
+(`src/pages/competitions/nations-league/[year].astro` + Croatian sibling):
+built on the Copa América edition page's pattern instead (no Golden Boot
+join - that award only tracks the FIFA World Cup and EURO, so the
+`topScorer` prop is simply omitted, the same way Copa América's edition
+pages already do). The "Season" column carries labels like "2018–19"
+(en dash); `editionSlug()` already normalizes that to a plain-hyphen
+"2018-19" URL segment (the same normalization the World Cup edition page's
+own Vitest suite already covers for a season label), so no scheme work was
+needed there either. The "Finals host" column is a country name but not a
+placing, so - like every other competition's Host column - it is never
+linked, exercised by a dedicated "no top-scorer fact" test analogue asserting
+the Finals-host fact has no `<a>` child.
+
+**Wiring:** both competitions' own table pages
+(`src/pages/competitions/euro.astro`, `.../nations-league.astro`, and their
+Croatian siblings, which compose their layout by hand rather than through
+`CompetitionView`) gained the same `yearLinks` prop the Copa América table
+page already threads through, via `buildEditionLinks(buildEditionProfiles(...),
+basePath)`. `sitemap.xml.ts` gained two more per-edition loops, reusing the
+`euro`/`nationsLeague` `CompetitionData` already destructured from
+`loadTeamCompetitions()` for the `/teams` per-country loop just above them,
+rather than issuing two more redundant `loadCompetition()` calls.
+
+**Tests:** no library code changed (`editionProfile.ts` is fully generic
+already), so no new Vitest cases - `pnpm test` stays 488/488. 28 new
+Playwright cases: `tests/e2e/euro-edition-page.spec.ts` (14, mirroring the
+World Cup edition-page suite: year-cell link navigates, placings linked but
+host not, top scorer joined in from Golden Boot, pager forward, oldest
+edition has no previous link, back-link, no 360px overflow, no WCAG
+violations, the language switch both ways, and the Croatian page's
+translated chrome/back/pager) and
+`tests/e2e/nations-league-edition-page.spec.ts` (14, mirroring the same
+shape but asserting the *absence* of a top-scorer fact instead of its
+presence, and exercising the en-dash-season-to-hyphen-slug normalization via
+the "2022–23" row). `mobile.spec.ts`'s sitemap-count assertion updated in
+place from 448 to 490 (+34 EURO edition URLs, +8 Nations League edition
+URLs), plus four new `<loc>`/hreflang spot-checks (EURO 2016, Nations League
+2022-23) alongside the existing World Cup 2018 ones.
+
+**Validation:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across
+157 files. `pnpm test` - 488/488 (unchanged). `pnpm build` - **491 pages**
+(up from 449: +34 EURO + +8 Nations League edition pages). `check:links`
+(495 pages), `check:sitemap` (490 entries), `check:perf`, `check:precache`
+all clean. `check:pdfs` flagged the four shared table pages
+(`euro`/`nations-league`, both languages) as stale once `yearLinks` touched
+them - `pnpm build:pdfs` regenerated all 296 PDFs (no new PDF pages added,
+same "no per-edition PDF yet" precedent the World Cup and Copa América
+edition pages already established), `check:pdfs` clean afterward.
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` targeted runs of every new and
+touched Playwright suite are green: the new `euro-edition-page.spec.ts` (14)
+and `nations-league-edition-page.spec.ts` (14, one grammar fix to a Croatian
+h1 assertion after the first run - "UEFA Liga nacija" stays nominative in the
+edition-page heading, matching the competition's existing display name
+everywhere else on the site rather than the genitive this suite first
+guessed), the updated `mobile.spec.ts` sitemap test, and the existing
+EURO/Nations League table-page suites (30 cases, unaffected by the new
+`yearLinks` prop beyond the Year cell now rendering as a link). A full
+`pnpm test:e2e` run across all suites was also kicked off for this run.
+
+**Left for a future pass:** (1) the same "no downloadable PDF per edition"
+gap named for the World Cup and Copa América now also applies to these 21
+new edition pages (17 EURO + 4 Nations League). (2) The two individual
+awards (Ballon d'Or, Golden Boot) are the only competitions left without
+per-edition pages - a different shape (no host/placings, and Golden Boot has
+two tables per year: World Cup and EURO top scorers) than `EditionView` was
+built for, so they need their own template rather than reusing this one
+as-is.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
