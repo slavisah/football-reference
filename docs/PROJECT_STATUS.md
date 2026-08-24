@@ -17,7 +17,7 @@ pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
 pnpm test                      # 468 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 699 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 701 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
                                           # and dark, across every page)
 ```
@@ -11168,6 +11168,123 @@ scripts or docs depended on the old foreground-process behavior). Full
 **Left for a future pass:** the `typescript` 7 upgrade, gated on
 `@astrojs/check` adding peer support - see above. No other astro/vitest
 follow-up is outstanding; both are now at their latest stable release.
+
+### Bug fix: the Astro 5→7 upgrade silently broke `pnpm test:e2e` on every fresh checkout (i.e. every CI run), plus /glossary gains a downloadable print PDF - added 2026-08-24 (intensive run)
+
+Every named backlog item, "Left for a future pass" candidate, and nice-to-have
+was already closed going into this run (see the many entries above), so this
+run started from a full-repo health check rather than a specific named
+candidate - `pnpm lint`/`test`/`build`/`check:*` all came back clean, but
+running the full `PW_EXECUTABLE_PATH=... pnpm test:e2e` suite from a truly
+cold start (no server already running - the same starting condition
+`.github/workflows/ci.yml` has on every PR) immediately failed with `Error:
+Process from config.webServer exited early`, before a single test ran.
+
+**Root cause:** the 2026-08-23 "Astro 5 → 7" entry above already noted, as a
+side observation, that "Astro 7's dev server now runs as a `pid`-reporting
+daemon controllable via `astro dev stop`/`astro dev status`/`astro dev
+logs`" - but didn't follow that observation through to `astro preview`
+(which changed the same way) or to `playwright.config.ts`'s `webServer:
+{ command: 'pnpm build && pnpm preview --port 4321 --host', ... }`, which
+depends on that command staying alive in the foreground for the whole test
+run. Confirmed directly: running `astro preview --port 4321 --host` on its
+own now always forks the real server into a detached background daemon and
+returns immediately once it's listening (verified via `astro preview
+status` showing the daemon still running after the invoking command had
+already exited) - Playwright's `webServer` feature treats any exit of the
+command it spawned as fatal, regardless of exit code, so it aborted before
+even reaching its own URL health-check. This is why that same 2026-08-23
+entry's own validation still reported "699/699 passing" for `pnpm
+test:e2e`: `reuseExistingServer: !process.env.CI` (true outside CI) silently
+reused a preview server left running from earlier manual testing in that
+same local session, so a truly fresh spawn - the only kind CI ever does -
+was never actually exercised. Every PR's CI run since that upgrade would
+have failed on the "Mobile smoke test" step; this had not yet been hit
+because no PR had triggered `ci.yml` since 2026-08-23.
+
+**Fix:** new `scripts/test-preview-server.mjs`, referenced from
+`playwright.config.ts`'s `webServer.command` (now `pnpm build && node
+scripts/test-preview-server.mjs`, with `env: { PORT, BASE_PATH }` passed
+through so the two files can't drift on the port/base path). It starts the
+`astro preview` daemon, polls the URL until it answers (mirroring
+`scripts/generate-pdfs.mjs`'s existing `waitForServer()`), then blocks so
+Playwright sees a live foreground process; on SIGTERM/SIGINT it runs `astro
+preview stop` before exiting. The first version of this script blocked with
+a bare `await new Promise(() => {})`, which does **not** actually keep
+Node's event loop alive on its own - an unresolved promise with nothing
+else pending isn't a libuv handle, so the process exited a few hundred
+milliseconds after printing "ready" anyway, reproducing the exact same
+"exited early" failure. Confirmed the mechanism with a minimal standalone
+repro (`node -e`, timed with a real `kill -0` check, not just "no error
+printed") before and after switching to `await new Promise(() => {}
+setInterval(() => {}, 60_000))`, which does hold a real handle open.
+Verified the fix twice against a genuinely fresh spawn (`astro preview
+stop` run immediately beforehand both times): once with the local default
+(`reuseExistingServer: true`) and once with `CI=true` (matching
+`ci.yml` exactly, `reuseExistingServer: false`) - **701/701 passing** both
+times (up from 699 - the two new glossary PDF tests below).
+
+Also fixed the same underlying daemon-vs-foreground assumption in
+`scripts/generate-pdfs.mjs`'s own `stopServer()`, found while diagnosing the
+above: it killed `server`'s process *group* (`process.kill(-server.pid,
+'SIGTERM')`), which correctly reached the real server under Astro 5 (where
+`server` *was* the server, running in the foreground) but no longer does now
+that `server` is just the short-lived immediate CLI invocation that forks
+the real daemon and exits - confirmed as a live bug, not a theoretical one,
+by finding an `astro preview` process still listening on port 4399 after an
+unrelated `pnpm build:pdfs` run earlier in this same session had already
+finished and printed its manifest. `stopServer()` now also runs `astro
+preview stop` (`spawnSync`, kept alongside the now-mostly-inert
+process-group kill as a harmless no-op in case a future Astro version
+reverts this).
+
+One remaining, minor, non-blocking observation from this fix, left as-is
+rather than chased further: even after a fully green `pnpm test:e2e` run
+(both locally and under `CI=true`), the `astro preview` daemon it started is
+still running afterward (`astro preview status` shows it) - Playwright does
+not appear to signal `webServer.command` for teardown once tests finish, at
+least not in a way this script's SIGTERM handler observably reacted to. This
+doesn't affect correctness or CI's outcome (CI runners are destroyed after
+the job either way, and this exact "leave a server running for fast local
+iteration" outcome is what `reuseExistingServer: true` already intended
+locally) - it just means a leftover `astro preview` process needs manually
+stopping (`astro preview stop`) between local `pnpm test:e2e` runs now,
+same as it did for `astro dev` since 2026-08-23. Not investigated further
+this run since it doesn't block anything; worth a look if a future pass has
+reason to touch this area again.
+
+**Second change this run, independent of the fix above:** `/glossary` was
+the only reference page on the site without a downloadable print PDF -
+every other content page family (`/records`, `/compare`, `/compare-players`,
+`/teams/<slug>`, `/players/<slug>`, the six competition/award pages) already
+has one, and `tests/e2e/print-styles.spec.ts`'s own comment already grouped
+`/glossary` with `/compare`/`/teams`/`/players` as "no `TournamentTable`" -
+explaining why it prints cleanly but never explaining why it also lacked the
+PDF the other three do have. Closed the gap: `PrintDownloadLink` added to
+both `src/pages/glossary.astro` and `src/pages/hr/glossary.astro` (Croatian
+label/hint, matching every other localized page's convention), and two new
+entries in `scripts/pdf-pages.mjs`'s shared `PDF_PAGES` list (`glossary`/
+`glossary-hr`) - sourced from `content/glossary.md`,
+`src/lib/competition.ts` (front matter/intro) and `src/lib/glossary.ts` (the
+term list itself); no `TABLE_COMPONENTS`/`SOURCES_MD` dependency since this
+page has neither a `TournamentTable` nor a `References` section. `pnpm
+build:pdfs` regenerated all 296 PDFs (294 existing + the 2 new glossary
+ones - the existing 294 all show as changed in the diff for the same
+per-render-timestamp reason every prior `build:pdfs` run's entry already
+notes, not a content change). 2 new Playwright cases in
+`tests/e2e/mobile.spec.ts`'s existing Glossary/Croatian-glossary
+`describe` blocks (link visible + resolves with a `pdf` content-type,
+English and Croatian).
+
+**Validation:** `pnpm lint` - 0 errors/warnings/hints across 140 files.
+`pnpm test` - 468/468, unchanged (no `src/lib` code changed). `pnpm build` -
+307 pages, unchanged. `pnpm check:pdfs` - all 296 PDFs fresh. `check:links`/
+`check:sitemap`/`check:perf`/`check:precache` all clean. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` - **701/701
+passing**, verified twice (see above).
+
+**Left for a future pass:** the minor teardown observation noted above. No
+other gap is known; the standing "nothing left" list is otherwise unchanged.
 
 ## Known caveats
 
