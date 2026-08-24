@@ -202,6 +202,43 @@ export const GET: APIRoute = async ({ site, url }) => {
     urlEntries.push(`<url><loc>${xmlEscape(absolute(hrPath))}</loc>${copaAmericaEditionLastmodTag}${altLinks}</url>`);
   }
 
+  // Per-edition pages for EURO (src/pages/competitions/euro/[year].astro and
+  // its Croatian sibling), same shape as the FIFA World Cup loop above -
+  // EURO has unique Year labels per edition, so no disambiguation is needed.
+  const euroEditionLastmodTag = euro.lastReviewed ? `<lastmod>${euro.lastReviewed}</lastmod>` : '';
+  for (const profile of buildEditionProfiles(euro.editions)) {
+    const enPath = `/competitions/euro/${profile.slug}`;
+    const hrPath = `/hr/competitions/euro/${profile.slug}`;
+    const altLinks = [
+      `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
+      `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
+    ].join('');
+    urlEntries.push(`<url><loc>${xmlEscape(absolute(enPath))}</loc>${euroEditionLastmodTag}${altLinks}</url>`);
+    urlEntries.push(`<url><loc>${xmlEscape(absolute(hrPath))}</loc>${euroEditionLastmodTag}${altLinks}</url>`);
+  }
+
+  // Per-edition pages for the UEFA Nations League Finals
+  // (src/pages/competitions/nations-league/[year].astro and its Croatian
+  // sibling), same shape as the loops above - unique Season labels per
+  // edition, so no disambiguation is needed either.
+  const nationsLeagueEditionLastmodTag = nationsLeague.lastReviewed
+    ? `<lastmod>${nationsLeague.lastReviewed}</lastmod>`
+    : '';
+  for (const profile of buildEditionProfiles(nationsLeague.editions)) {
+    const enPath = `/competitions/nations-league/${profile.slug}`;
+    const hrPath = `/hr/competitions/nations-league/${profile.slug}`;
+    const altLinks = [
+      `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
+      `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
+    ].join('');
+    urlEntries.push(
+      `<url><loc>${xmlEscape(absolute(enPath))}</loc>${nationsLeagueEditionLastmodTag}${altLinks}</url>`,
+    );
+    urlEntries.push(
+      `<url><loc>${xmlEscape(absolute(hrPath))}</loc>${nationsLeagueEditionLastmodTag}${altLinks}</url>`,
+    );
+  }
+
   const xml =`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urlEntries.join('\n')}\n</urlset>\n`;
 
   return new Response(xml, {

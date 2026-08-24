@@ -1,0 +1,130 @@
+---
+// Croatian translation of src/pages/competitions/nations-league/[year].astro
+// - one page per UEFA Nations League Finals edition. Loads the exact same
+// content as the English route so the placings and final result can't drift
+// between languages; only this page's own chrome (column labels, prose) is
+// Croatian, the same convention every other hr competition/edition page here
+// follows.
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import EditionView from '../../../../components/EditionView.astro';
+import References from '../../../../components/References.astro';
+import { loadCompetition } from '../../../../lib/competition';
+import { buildYearStories } from '../../../../lib/editions';
+import { buildEditionProfiles, type EditionProfile } from '../../../../lib/editionProfile';
+import { buildAllCountryRecords } from '../../../../lib/compare';
+import { loadTeamCompetitions } from '../../../../lib/teamCompetitions';
+import { teamProfileSlug } from '../../../../lib/teamProfile';
+import type { SourceLink } from '../../../../lib/sources';
+import { withBase } from '../../../../lib/url';
+
+// Croatian column-label translations, matching
+// hr/competitions/nations-league.astro's own headerLabels map.
+const HEADER_LABELS: Record<string, string> = {
+  Season: 'Sezona',
+  'Finals host': 'Domaćin Final Foura',
+  Winner: 'Prvak',
+  'Runner-up': 'Drugoplasirani',
+  Third: 'Treći',
+  Fourth: 'Četvrti',
+  Final: 'Finale',
+  'Final date': 'Datum finala',
+};
+
+export async function getStaticPaths() {
+  // The Croatian Memorable-moments bullets, matching the hr competition
+  // page's own hand-translation ("Nezaboravni trenuci"). Declared inside
+  // getStaticPaths since Astro runs it in an isolated scope that can't see
+  // the module's other frontmatter consts.
+  const CROATIAN_MOMENTS = [
+    'Portugal je osvojio prvi Final Four Lige nacija 2019. godine, pobijedivši Nizozemsku 1:0 kao domaćin.',
+    'Italija je 2021. bila domaćin Final Foura, a da nije igrala u finalu - završila je treća, dok je Francuska svladala Španjolsku 2:1 za naslov.',
+    'Španjolska je naslov 2023. osvojila izvođenjem jedanaesteraca nakon 0:0 protiv Hrvatske.',
+    'Portugal je 2025. u finalu pobijedio Španjolsku izvođenjem jedanaesteraca i postao prvi dvostruki prvak natjecanja.',
+    'Domaćin je u svakom dosadašnjem izdanju završio među četiri najbolje rangirane reprezentacije, uključujući Njemačku, koja je 2025. bila četvrta.',
+  ];
+
+  const [data, teamData] = await Promise.all([
+    loadCompetition('uefa-nations-league', {
+      editionsHeading: 'Finals',
+      sourcesHeading: 'UEFA Nations League',
+    }),
+    loadTeamCompetitions(),
+  ]);
+
+  const teamSlugs = new Set(
+    buildAllCountryRecords(teamData.competitions).map((record) => teamProfileSlug(record.id)),
+  );
+  const stories = buildYearStories(data.editions, CROATIAN_MOMENTS);
+
+  return buildEditionProfiles(data.editions, teamSlugs).map((profile) => ({
+    params: { year: profile.slug },
+    props: {
+      profile,
+      story: stories.get(profile.year),
+      sources: data.sources,
+      lastReviewed: data.lastReviewed,
+      status: data.status,
+    },
+  }));
+}
+
+type Props = {
+  profile: EditionProfile;
+  story?: string;
+  sources: SourceLink[];
+  lastReviewed: string;
+  status: string;
+};
+
+const { profile, story, sources, lastReviewed, status } = Astro.props as Props;
+const statusText = status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+const runnerUp = profile.facts.find((fact) => /runner-up/i.test(fact.label))?.value;
+const description = [
+  `Final Four UEFA Lige nacija ${profile.year}.:`,
+  profile.champion ? `prvak ${profile.champion}${runnerUp ? `, drugoplasirani ${runnerUp}` : ''}.` : '',
+  profile.host ? `Domaćin: ${profile.host}.` : '',
+  'Potpuni plasmani i rezultat finala.',
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<BaseLayout
+  title={`Final Four UEFA Lige nacija ${profile.year}.`}
+  description={description}
+  locale="hr"
+  alternateHref={withBase(`/competitions/nations-league/${profile.slug}`)}
+  breadcrumbTrail={[{ name: 'UEFA Liga nacija', url: withBase('/hr/competitions/nations-league') }]}
+>
+  <EditionView
+    profile={profile}
+    competitionPath="/hr/competitions/nations-league"
+    competitionTitle="UEFA Liga nacija"
+    story={story}
+    locale="hr"
+    headerLabels={HEADER_LABELS}
+    eyebrow="Generirano iz tablice natjecanja"
+    headingTemplate="Final Four {competition} {year}."
+    introTemplate="Sve što tablica izdanja bilježi o Final Fouru {year}., uz poveznicu na potpunu povijest svake reprezentacije."
+    pagerLabel="Ostala izdanja"
+    previousLabel="Prethodno izdanje"
+    nextLabel="Sljedeće izdanje"
+    backLabel="Sva izdanja natjecanja {competition}"
+    teamProfileHintTemplate="{team} — potpuna povijest"
+    storyHeading="Priča o ovom izdanju"
+    glanceHeading="Final Four {year}. na prvi pogled"
+  >
+    <References
+      sources={sources}
+      lastReviewed={lastReviewed}
+      status={status}
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText={statusText}
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+    />
+  </EditionView>
+</BaseLayout>

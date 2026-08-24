@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
 import { buildTopScorerFacts, buildHostMapPoints } from '../../lib/editions';
+import { buildEditionLinks, buildEditionProfiles } from '../../lib/editionProfile';
 import { EURO_HOST_COORDINATES } from '../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import {
@@ -25,6 +26,7 @@ const [data, goldenBoot] = await Promise.all([
 
 const topScorers = buildTopScorerFacts(goldenBoot.editions);
 const hostMap = buildHostMapPoints(data.editions, EURO_HOST_COORDINATES);
+const yearLinks = buildEditionLinks(buildEditionProfiles(data.editions), '/competitions/euro');
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd = [
@@ -46,5 +48,6 @@ const jsonLd = [
     extraColumn={{ label: 'Top scorer', values: topScorers }}
     pdfSlug="euro"
     hostMap={hostMap}
+    yearLinks={yearLinks}
   />
 </BaseLayout>

@@ -1,0 +1,90 @@
+---
+// One page per UEFA Nations League Finals edition, mirroring
+// src/pages/competitions/world-cup/[year].astro's pattern. No Golden Boot
+// top-scorer join - that award only tracks the FIFA World Cup and UEFA
+// EURO (content/golden-boot.md), so this page simply omits the prop, the
+// same way the Copa América edition pages already do.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import EditionView from '../../../components/EditionView.astro';
+import References from '../../../components/References.astro';
+import { loadCompetition } from '../../../lib/competition';
+import { buildYearStories } from '../../../lib/editions';
+import { buildEditionProfiles, type EditionProfile } from '../../../lib/editionProfile';
+import { buildAllCountryRecords } from '../../../lib/compare';
+import { loadTeamCompetitions } from '../../../lib/teamCompetitions';
+import { teamProfileSlug } from '../../../lib/teamProfile';
+import type { SourceLink } from '../../../lib/sources';
+import { withBase } from '../../../lib/url';
+
+export async function getStaticPaths() {
+  const [data, teamData] = await Promise.all([
+    loadCompetition('uefa-nations-league', {
+      editionsHeading: 'Finals',
+      sourcesHeading: 'UEFA Nations League',
+      noteHeadings: ['Memorable moments'],
+    }),
+    loadTeamCompetitions(),
+  ]);
+
+  // Only link a placing whose /teams/<slug> page is actually generated, so
+  // this route can never emit a link check-internal-links.mjs would flag -
+  // same guard the World Cup, Copa América and EURO edition pages already use.
+  const teamSlugs = new Set(
+    buildAllCountryRecords(teamData.competitions).map((record) => teamProfileSlug(record.id)),
+  );
+
+  const stories = buildYearStories(
+    data.editions,
+    data.notes.find((section) => section.heading === 'Memorable moments')?.items ?? [],
+  );
+
+  return buildEditionProfiles(data.editions, teamSlugs).map((profile) => ({
+    params: { year: profile.slug },
+    props: {
+      profile,
+      story: stories.get(profile.year),
+      sources: data.sources,
+      lastReviewed: data.lastReviewed,
+      status: data.status,
+    },
+  }));
+}
+
+type Props = {
+  profile: EditionProfile;
+  story?: string;
+  sources: SourceLink[];
+  lastReviewed: string;
+  status: string;
+};
+
+const { profile, story, sources, lastReviewed, status } = Astro.props as Props;
+
+const runnerUp = profile.facts.find((fact) => /runner-up/i.test(fact.label))?.value;
+const description = [
+  `The ${profile.year} UEFA Nations League Finals:`,
+  profile.champion ? `${profile.champion} champion${runnerUp ? `, ${runnerUp} runner-up` : ''}.` : '',
+  profile.host ? `Hosted by ${profile.host}.` : '',
+  'Full placings and that edition’s final result.',
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<BaseLayout
+  title={`${profile.year} UEFA Nations League Finals`}
+  description={description}
+  alternateHref={withBase(`/hr/competitions/nations-league/${profile.slug}`)}
+  breadcrumbTrail={[{ name: 'UEFA Nations League', url: withBase('/competitions/nations-league') }]}
+>
+  <EditionView
+    profile={profile}
+    competitionPath="/competitions/nations-league"
+    competitionTitle="UEFA Nations League"
+    story={story}
+    headingTemplate="{year} {competition} Finals"
+    glanceHeading="{year} Finals at a glance"
+  >
+    <References sources={sources} lastReviewed={lastReviewed} status={status} />
+  </EditionView>
+</BaseLayout>
