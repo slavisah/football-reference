@@ -17,7 +17,7 @@ pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
 pnpm test                      # 488 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 728 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 756 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
                                           # and dark, across every page)
 ```
@@ -11577,8 +11577,9 @@ edition-page heading, matching the competition's existing display name
 everywhere else on the site rather than the genitive this suite first
 guessed), the updated `mobile.spec.ts` sitemap test, and the existing
 EURO/Nations League table-page suites (30 cases, unaffected by the new
-`yearLinks` prop beyond the Year cell now rendering as a link). A full
-`pnpm test:e2e` run across all suites was also kicked off for this run.
+`yearLinks` prop beyond the Year cell now rendering as a link). Full
+`pnpm test:e2e` - **756/756 passing** (up from 728, the 28 new edition-page
+cases).
 
 **Left for a future pass:** (1) the same "no downloadable PDF per edition"
 gap named for the World Cup and Copa América now also applies to these 21
