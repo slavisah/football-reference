@@ -1,0 +1,250 @@
+---
+import type { EditionProfile } from '../lib/editionProfile';
+import { renderInlineMarkdown } from '../lib/notes';
+import { abbreviateFinalScore, hasAbbreviation } from '../lib/glossary';
+import { withBase } from '../lib/url';
+import type { Locale } from '../lib/i18n';
+
+interface Props {
+  profile: EditionProfile;
+  /** Locale-correct competition path, e.g. "/competitions/world-cup". */
+  competitionPath: string;
+  /** The competition's own display title, e.g. "FIFA World Cup". */
+  competitionTitle: string;
+  /**
+   * That edition's "Memorable moments" bullet, if the competition has one for
+   * it - already locale-correct, since each page builds it from its own
+   * (hand-translated, for Croatian) bullet list via `buildYearStories()`.
+   */
+  story?: string;
+  /** That edition's Golden Boot top scorer, if tracked for this competition. */
+  topScorer?: string;
+  topScorerLabel?: string;
+  /**
+   * Overridable for localized pages; every default matches the English copy,
+   * the same convention every other component here follows.
+   */
+  locale?: Locale;
+  /** Display-only fact-label translations, keyed by the raw English column header. */
+  headerLabels?: Record<string, string>;
+  eyebrow?: string;
+  /** The visible h1; `{year}` and `{competition}` are filled in. Defaults to English word order. */
+  headingTemplate?: string;
+  introTemplate?: string;
+  pagerLabel?: string;
+  previousLabel?: string;
+  nextLabel?: string;
+  backLabel?: string;
+  teamProfileHintTemplate?: string;
+  storyHeading?: string;
+  /** Visually-hidden heading over the facts list; `{year}` is filled in. */
+  glanceHeading?: string;
+}
+
+const {
+  profile,
+  competitionPath,
+  competitionTitle,
+  story,
+  topScorer,
+  topScorerLabel = 'Top scorer',
+  locale = 'en',
+  headerLabels = {},
+  eyebrow = 'Generated from the competition table',
+  headingTemplate = '{year} {competition}',
+  introTemplate = 'Everything the {competition} edition table records about {year}, with each placing linked to that team’s full history.',
+  pagerLabel = 'Other editions',
+  previousLabel = 'Previous edition',
+  nextLabel = 'Next edition',
+  backLabel = 'All {competition} editions',
+  teamProfileHintTemplate = '{team} — full history',
+  storyHeading = 'The story of this edition',
+  glanceHeading = '{year} at a glance',
+} = Astro.props;
+
+const label = (raw: string) => headerLabels[raw] ?? raw;
+const fill = (template: string) =>
+  template.replace('{competition}', competitionTitle).replace('{year}', profile.year);
+
+// The "Final" column can carry the "a.e.t."/"pens" shorthand that
+// docs/EDITORIAL_GUIDE.md requires be explained before use - expanded into a
+// native <abbr title> exactly as TournamentTable.astro already does, rather
+// than shipping bare jargon on a page a child may land on directly.
+const isFinalLabel = (raw: string) => /^final$/i.test(raw.trim());
+---
+
+<article class="edition stack">
+  <header class="edition__header">
+    <p class="eyebrow badge">{eyebrow}</p>
+    <h1>{fill(headingTemplate)}</h1>
+    <p class="edition__intro">{fill(introTemplate)}</p>
+  </header>
+
+  <section class="card" aria-labelledby="edition-facts-heading">
+    <h2 id="edition-facts-heading" class="visually-hidden">{fill(glanceHeading)}</h2>
+    <dl class="edition__facts">
+      {
+        profile.facts.map((fact) => (
+          <div class="edition__fact">
+            <dt>{label(fact.label)}</dt>
+            <dd>
+              {fact.teamSlug ? (
+                <a
+                  href={withBase(`${locale === 'hr' ? '/hr' : ''}/teams/${fact.teamSlug}`)}
+                  title={teamProfileHintTemplate.replace('{team}', fact.value)}
+                >
+                  {fact.value}
+                </a>
+              ) : isFinalLabel(fact.label) && hasAbbreviation(fact.value) ? (
+                <span set:html={abbreviateFinalScore(fact.value, locale)} />
+              ) : (
+                fact.value
+              )}
+            </dd>
+          </div>
+        ))
+      }
+      {
+        topScorer && (
+          <div class="edition__fact">
+            <dt>{topScorerLabel}</dt>
+            <dd>{topScorer}</dd>
+          </div>
+        )
+      }
+    </dl>
+  </section>
+
+  {
+    story && (
+      <section class="card stack" aria-labelledby="edition-story-heading">
+        <h2 id="edition-story-heading">{storyHeading}</h2>
+        <p set:html={renderInlineMarkdown(story)} />
+      </section>
+    )
+  }
+
+  <nav class="edition__pager" aria-label={pagerLabel}>
+    {
+      profile.previous ? (
+        <a class="edition__pager-link" href={withBase(`${competitionPath}/${profile.previous.slug}`)}>
+          <span class="edition__pager-role">&larr; {previousLabel}</span>
+          <span class="edition__pager-year">{profile.previous.year}</span>
+        </a>
+      ) : (
+        <span />
+      )
+    }
+    {
+      profile.next ? (
+        <a class="edition__pager-link edition__pager-link--next" href={withBase(`${competitionPath}/${profile.next.slug}`)}>
+          <span class="edition__pager-role">{nextLabel} &rarr;</span>
+          <span class="edition__pager-year">{profile.next.year}</span>
+        </a>
+      ) : (
+        <span />
+      )
+    }
+  </nav>
+
+  <p class="edition__back">
+    <a href={withBase(competitionPath)}>{fill(backLabel)} &rarr;</a>
+  </p>
+
+  <slot />
+</article>
+
+<style>
+  .edition__header {
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .edition__header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+
+  .edition__intro {
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .edition__facts {
+    margin: 0;
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 34rem) {
+    .edition__facts {
+      grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    }
+  }
+
+  .edition__fact {
+    padding: 0.6rem 0.8rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .edition__fact dt {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .edition__fact dd {
+    margin: 0.2rem 0 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  .edition__pager {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .edition__pager-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    /* AGENTS.md: interactive targets are at least 44px in any touch-facing control. */
+    min-height: 44px;
+    justify-content: center;
+    padding: 0.5rem 0.9rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-decoration: none;
+  }
+
+  .edition__pager-link--next {
+    text-align: right;
+  }
+
+  .edition__pager-role {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .edition__pager-year {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .edition__back {
+    font-weight: 600;
+  }
+
+  @media print {
+    .edition__pager {
+      display: none;
+    }
+  }
+</style>

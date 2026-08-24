@@ -11286,6 +11286,109 @@ passing**, verified twice (see above).
 **Left for a future pass:** the minor teardown observation noted above. No
 other gap is known; the standing "nothing left" list is otherwise unchanged.
 
+### New feature: per-edition pages for the FIFA World Cup (`/competitions/world-cup/<year>`, EN + HR) - added 2026-08-24 (intensive run)
+
+The site had profile pages keyed by every entity that *spans* editions - a
+country (`/teams/<slug>`), a player (`/players/<slug>`) - but no page for a
+single edition itself, so a reader (or a search engine, or an inbound link)
+had no way to deep-link "the 2018 World Cup" as its own destination; the only
+view of one edition was a single row inside the big filterable table. This
+run added the missing perpendicular cut: one page per FIFA World Cup edition
+(23 editions, 1930-2026), in both languages, reached by tapping that
+edition's Year cell in the competition table.
+
+**Library:** new `src/lib/editionProfile.ts`. `buildEditionProfiles(editions,
+teamSlugs?)` turns each edition into a page-ready profile - every source
+column except Year kept as a fact in source order, with the four *placing*
+columns (Winner/Champion, Runner-up, Third, Fourth/other semifinalist)
+carrying a `/teams/<slug>` link resolved through `summaryGroupFor()` (so a
+historical name like "West Germany" links to the merged `germany` profile,
+matching every other title-grouping on the site) - plus a chronological
+`previous`/`next` neighbour for the pager. It deliberately links a placing
+*only* when its slug is in the passed `teamSlugs` set (the slugs
+`buildAllCountryRecords()` actually generates a page for), so the route can
+never emit a link `check-internal-links.mjs` would flag; and it *throws* on
+two editions sharing a slug rather than silently dropping one - the same
+"never ship a silent data problem" guard `/teams/[slug]`'s own
+`getStaticPaths` uses. That guard is why only the World Cup gets edition
+pages this run and not Copa América: Copa's two 1959 tournaments collide on
+the `1959` slug (real data, `allowDuplicateYears: ['1959']`), which needs a
+disambiguation scheme (e.g. `1959-i`/`1959-ii`) designed before its edition
+pages can be built - noted below.
+
+**Deliberately not a placing:** the Host column is a country name too, but it
+is not a finish, so it is never linked to a team profile (a host that isn't a
+World Cup finalist may have no profile at all). Missing-cell (`—`) and
+"not held"-style placeholder values are never linked either.
+
+**Wiring:** new shared `src/components/EditionView.astro` (a facts `<dl>`, an
+optional "story of this edition" card fed the same Memorable-moments bullet
+the table's tap-to-reveal uses, that edition's Golden Boot top scorer, a
+prev/next pager hidden in print, and a back-link) - fully localizable via
+props, the same convention every other component here follows, so the
+English page (`src/pages/competitions/world-cup/[year].astro`) and the
+hand-translated Croatian page (`src/pages/hr/competitions/world-cup/
+[year].astro`) share one component. `TournamentTable.astro` gained an
+optional `yearLinks` prop (a base-relative `edition.year -> path` map, wrapped
+in `withBase()` by the component itself when rendering the Year cell as a
+link); `CompetitionView.astro` threads it through; both World Cup table pages
+build it via `buildEditionLinks()`. Every other competition's table passes no
+`yearLinks` and renders its Year column as plain text exactly as before.
+`src/pages/sitemap.xml.ts` gained a per-edition loop (bilingual, reciprocal
+hreflang), the same shape its per-team and per-player loops already use. The
+edition pages carry an explicit `alternateHref`/`breadcrumbTrail` per page,
+so they need no entry in `TRANSLATED_PATHS`.
+
+**Real bug caught before shipping:** the first version passed the
+`buildEditionLinks()` path straight into the Year `<a href>` without
+`withBase()`, so under the site's `/football-reference` base path every
+in-table year link pointed at `/competitions/world-cup/2018` (a 404 on the
+deployed project site) instead of `/football-reference/competitions/...`.
+Caught by grepping the built HTML for the actual emitted href, not by the
+type checker or a naively-passing link check (dev has no base path). Fixed by
+applying `withBase()` inside `TournamentTable` where every other href it
+renders already is, and documenting the map's values as base-relative.
+
+**Deliberately no downloadable PDF this run.** Every other page family has a
+print PDF, but adding one per edition means 46 browser-rendered PDFs
+(23 x 2 languages) generated via `build:pdfs`' Playwright pass - a large,
+mechanical, browser-dependent addition. The edition pages already print
+cleanly through the existing print stylesheet (the pager is `display:none`
+in `@media print`; the facts list and References render as normal), so the
+"no PDF" state is a graceful one, not a broken one. Left as the one known
+follow-up for this feature (see below), the same way `/glossary` shipped
+without a PDF for a long time before that gap was closed.
+
+**Tests:** 14 new Vitest cases (`editionProfile`: slug normalization incl.
+the en-dash season case, newest-first ordering, facts-in-source-order, the
+four-placings-linked/host-and-data-columns-not case, successor-group
+resolution, the `teamSlugs` gating, prev/next chaining with open ends,
+missing-cell/placeholder non-linking, the duplicate-slug throw, and
+`buildEditionLinks` for both locales) - 482 Vitest total, up from 468. 14 new
+Playwright cases (`tests/e2e/edition-page.spec.ts`: year-cell link navigates,
+placings linked but host not, top scorer joined in, pager forward, oldest
+edition has no previous link, back-link, no 360px overflow, no WCAG
+violations, the language switch both ways, and the Croatian page's translated
+chrome/back/pager) plus 3 assertions added to `mobile.spec.ts`'s sitemap test
+(the count is now 352, up from 306: +46 edition URLs) - full suite green.
+
+**Validation:** `pnpm lint` - 0 errors/warnings/hints across 145 files.
+`pnpm test` - 482/482. `pnpm build` - 353 pages (up from 307: +46 edition
+pages). `check:links` (357 pages), `check:sitemap` (352 entries),
+`check:perf`, `check:precache` all clean. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` - all passing
+(714 + 14 new edition cases). `check:pdfs` untouched (no PDFs added).
+
+**Left for a future pass:** (1) a downloadable print PDF per edition, if the
+PDF-per-entity convention is judged worth the 46-file build cost - the pages
+print fine without one today. (2) Extend edition pages to the other
+competitions: EURO and Nations League are straightforward (unique year/season
+labels); Copa América first needs a slug-disambiguation scheme for its two
+1959 tournaments (`buildEditionProfiles` throws on the collision by design);
+the two individual awards (Ballon d'Or, Golden Boot) are a different shape
+(no host/placings) and would want their own edition-page template rather than
+reusing `EditionView` as-is.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

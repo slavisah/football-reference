@@ -2810,13 +2810,15 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
 
     // 15 nav pages x 2 languages (the index loop, now including /teams,
     // /players, /compare-players and /glossary), plus 40 team profile pages
-    // x 2 languages (src/pages/teams/[slug].astro and its Croatian sibling)
-    // and 98 player profile pages x 2 languages (src/pages/players/[slug].astro
-    // and its Croatian sibling), each pair carrying reciprocal hreflang
-    // alternates - /glossary is a fully bilingual NAV_LINKS entry from launch
-    // (see docs/PROJECT_STATUS.md's Glossary entry), so it flows through the
-    // main loop like every other top-level page.
-    expect(body.match(/<url>/g)?.length).toBe(306);
+    // x 2 languages (src/pages/teams/[slug].astro and its Croatian sibling),
+    // 98 player profile pages x 2 languages (src/pages/players/[slug].astro
+    // and its Croatian sibling), and 23 FIFA World Cup edition pages x 2
+    // languages (src/pages/competitions/world-cup/[year].astro and its
+    // Croatian sibling), each pair carrying reciprocal hreflang alternates -
+    // /glossary is a fully bilingual NAV_LINKS entry from launch (see
+    // docs/PROJECT_STATUS.md's Glossary entry), so it flows through the main
+    // loop like every other top-level page.
+    expect(body.match(/<url>/g)?.length).toBe(352);
     expect(body).toContain(`<loc>${SITE}/glossary/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/glossary/</loc>`);
     expect(body).toContain(`hreflang="hr" href="${SITE}/hr/glossary/"`);
@@ -2828,6 +2830,9 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(body).toContain(
       `hreflang="hr" href="${SITE}/hr/competitions/world-cup/"`,
     );
+    expect(body).toContain(`<loc>${SITE}/competitions/world-cup/2018/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/competitions/world-cup/2018/</loc>`);
+    expect(body).toContain(`hreflang="hr" href="${SITE}/hr/competitions/world-cup/2018/"`);
     expect(body).toContain(`<loc>${SITE}/teams/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/teams/</loc>`);
     expect(body).toContain(`<loc>${SITE}/teams/brazil/</loc>`);
