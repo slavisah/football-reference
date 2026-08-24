@@ -2,6 +2,7 @@ import type { Edition } from './types';
 import { summaryGroupFor } from './countries';
 import { isPlaceholderWinner } from './editions';
 import { teamProfileSlug } from './teamProfile';
+import { playerProfileSlug } from './playerProfile';
 
 // One tournament edition as its own reader-facing page: /competitions/
 // <competition>/<year>. Every other "profile" page on this site is keyed by
@@ -36,6 +37,27 @@ function isTeamPlacingLabel(label: string): boolean {
   return TEAM_PLACING_PATTERNS.some((re) => re.test(label.trim()));
 }
 
+/**
+ * Column labels naming the honoured player, for an individual award's
+ * edition page (Ballon d'Or's "Winner", Golden Boot's "Player(s)") - the
+ * individual-award equivalent of `TEAM_PLACING_PATTERNS` above. Only
+ * consulted when `buildEditionProfiles()` is called with `individualAward`,
+ * so a team competition's own "Winner"/"Champion" column (linked to a team
+ * via `TEAM_PLACING_PATTERNS` instead) is never affected by these.
+ */
+const PLAYER_WINNER_PATTERNS: RegExp[] = [/^winner$/i, /player/i];
+
+/** Column labels naming the player's national team, for an individual award. */
+const TEAM_MEMBER_PATTERNS: RegExp[] = [/^(national team|team)$/i];
+
+function isPlayerWinnerLabel(label: string): boolean {
+  return PLAYER_WINNER_PATTERNS.some((re) => re.test(label.trim()));
+}
+
+function isTeamMemberLabel(label: string): boolean {
+  return TEAM_MEMBER_PATTERNS.some((re) => re.test(label.trim()));
+}
+
 /** The Year/Season column, detected the same way `buildEditions()` detects it. */
 function isYearLabel(label: string): boolean {
   const lower = label.trim().toLowerCase();
@@ -48,6 +70,8 @@ export type EditionFact = {
   value: string;
   /** Set only when `value` names a national team with a `/teams/` profile. */
   teamSlug?: string;
+  /** Set only when `value` names a player with a `/players/` profile (individual-award edition pages only). */
+  playerSlug?: string;
 };
 
 export type EditionNeighbour = {
@@ -162,6 +186,20 @@ function assignEditionSlugs(ordered: Edition[]): Map<Edition, string> {
 }
 
 /**
+ * Individual-award edition pages (Ballon d'Or, Golden Boot) link two
+ * different kinds of cell instead of a team competition's team placings: the
+ * honoured player (`/players/<slug>`) and, separately, that player's national
+ * team (`/teams/<slug>`). Passing this switches `buildEditionProfiles()`'s
+ * fact-linking from `TEAM_PLACING_PATTERNS` (which would otherwise try to
+ * resolve a player's name, e.g. "Lionel Messi", as if it were a team) to
+ * `PLAYER_WINNER_PATTERNS`/`TEAM_MEMBER_PATTERNS` instead.
+ */
+export type IndividualAwardLinking = {
+  /** Set of slugs that actually have a `/players/<slug>` page, same "only link what was generated" contract as `teamSlugs`. */
+  playerSlugs: Set<string>;
+};
+
+/**
  * Build one page-ready profile per edition, newest first.
  *
  * `teamSlugs`, when given, is the set of slugs that actually have a
@@ -169,6 +207,10 @@ function assignEditionSlugs(ordered: Edition[]): Map<Edition, string> {
  * this can never emit a link to a profile that was not generated. Omit it to
  * link every placing unconditionally (unit tests, and any caller that has
  * already established the two sets agree).
+ *
+ * `individualAward`, when given, switches the fact-linking rules for an
+ * individual award's edition table (see `IndividualAwardLinking` above)
+ * instead of a team competition's placings.
  *
  * Throws on two editions sharing a slug rather than silently dropping one -
  * the same "never ship a silent data problem" guard `/teams/[slug]`'s own
@@ -179,6 +221,7 @@ function assignEditionSlugs(ordered: Edition[]): Map<Edition, string> {
 export function buildEditionProfiles(
   editions: Edition[],
   teamSlugs?: Set<string>,
+  individualAward?: IndividualAwardLinking,
 ): EditionProfile[] {
   const ordered = [...editions].sort((a, b) => a.yearSort - b.yearSort);
   const slugs = assignEditionSlugs(ordered);
@@ -195,7 +238,14 @@ export function buildEditionProfiles(
       if (isYearLabel(cell.label)) continue;
       const value = cell.value.trim();
       const fact: EditionFact = { label: cell.label.trim(), value };
-      if (value && value !== MISSING_CELL && !isPlaceholderWinner(value) && isTeamPlacingLabel(cell.label)) {
+      const isLinkable = value && value !== MISSING_CELL && !isPlaceholderWinner(value);
+      if (isLinkable && individualAward && isPlayerWinnerLabel(cell.label)) {
+        const slug = playerProfileSlug(value);
+        if (individualAward.playerSlugs.has(slug)) fact.playerSlug = slug;
+      } else if (isLinkable && individualAward && isTeamMemberLabel(cell.label)) {
+        const slug = teamProfileSlug(summaryGroupFor(value).id);
+        if (!teamSlugs || teamSlugs.has(slug)) fact.teamSlug = slug;
+      } else if (isLinkable && !individualAward && isTeamPlacingLabel(cell.label)) {
         const slug = teamProfileSlug(summaryGroupFor(value).id);
         if (!teamSlugs || teamSlugs.has(slug)) fact.teamSlug = slug;
       }

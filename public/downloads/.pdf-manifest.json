@@ -90,7 +90,7 @@
     "src/components/ChampionsSummary.astro": "2809a09ed5528dc1236fecaebc41bd3ff6f78881732cf9f8ebb367588337b3de",
     "src/components/EditorialNotes.astro": "47c2c11227600fb655f75e55f4e3d887eaf4082836013d83c881aba543b283f8",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/competitions/ballon-dor.astro": "a33b4bd275e58182642dbf58688c5b3127441c7bf1e318dc8c9ca5c67ca5799d"
+    "src/pages/competitions/ballon-dor.astro": "ed16b911c8ec3697c319e42161d6892296c3450756bd3166680f7a4debbbd0e1"
   },
   "golden-boot": {
     "content/golden-boot.md": "aad8e5e8d59ed1f4a913ec14427755162909f7a593f976f0f5a3b70aab9e0ca8",
@@ -247,7 +247,7 @@
     "src/components/ChampionsSummary.astro": "2809a09ed5528dc1236fecaebc41bd3ff6f78881732cf9f8ebb367588337b3de",
     "src/components/EditorialNotes.astro": "47c2c11227600fb655f75e55f4e3d887eaf4082836013d83c881aba543b283f8",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/hr/competitions/ballon-dor.astro": "533e686c7c6df63390ac7d84ffc33ca74d2361f8fe33a4d25c47d99607af5932"
+    "src/pages/hr/competitions/ballon-dor.astro": "9c503ab81c81cb62887220d4e7577edcf718b6fcd4e48ecfb12ff27096c253bc"
   },
   "golden-boot-hr": {
     "content/golden-boot.md": "aad8e5e8d59ed1f4a913ec14427755162909f7a593f976f0f5a3b70aab9e0ca8",

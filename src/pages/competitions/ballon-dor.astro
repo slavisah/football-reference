@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
+import { buildEditionLinks, buildEditionProfiles } from '../../lib/editionProfile';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import { buildChampionsItemList } from '../../lib/jsonLd';
 
@@ -10,6 +11,8 @@ const data = await loadCompetition('ballon-dor', {
   sourcesHeading: "Ballon d'Or",
   noteHeadings: ['How it works', 'Notes'],
 });
+
+const yearLinks = buildEditionLinks(buildEditionProfiles(data.editions), '/competitions/ballon-dor');
 
 // An individual award, not a tournament - no SportsEvent block here, only the
 // winners ranking (the same ItemList shape every team competition page uses).
@@ -30,6 +33,7 @@ const jsonLd = [
     tableId="ballon-dor"
     tableCaption="Men's Ballon d'Or winners, 1956 to present"
     pdfSlug="ballon-dor"
+    yearLinks={yearLinks}
   />
   <p class="ballon-dor__players-link no-print">
     <a href={withBase('/players')}>Browse every player's full award history &rarr;</a>

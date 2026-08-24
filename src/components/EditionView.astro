@@ -36,6 +36,8 @@ interface Props {
   nextLabel?: string;
   backLabel?: string;
   teamProfileHintTemplate?: string;
+  /** Same as `teamProfileHintTemplate`, for a fact linked to a `/players/` profile instead. */
+  playerProfileHintTemplate?: string;
   storyHeading?: string;
   /** Visually-hidden heading over the facts list; `{year}` is filled in. */
   glanceHeading?: string;
@@ -58,6 +60,7 @@ const {
   nextLabel = 'Next edition',
   backLabel = 'All {competition} editions',
   teamProfileHintTemplate = '{team} — full history',
+  playerProfileHintTemplate = '{player} — full award history',
   storyHeading = 'The story of this edition',
   glanceHeading = '{year} at a glance',
 } = Astro.props;
@@ -92,6 +95,13 @@ const isFinalLabel = (raw: string) => /^final$/i.test(raw.trim());
                 <a
                   href={withBase(`${locale === 'hr' ? '/hr' : ''}/teams/${fact.teamSlug}`)}
                   title={teamProfileHintTemplate.replace('{team}', fact.value)}
+                >
+                  {fact.value}
+                </a>
+              ) : fact.playerSlug ? (
+                <a
+                  href={withBase(`${locale === 'hr' ? '/hr' : ''}/players/${fact.playerSlug}`)}
+                  title={playerProfileHintTemplate.replace('{player}', fact.value)}
                 >
                   {fact.value}
                 </a>

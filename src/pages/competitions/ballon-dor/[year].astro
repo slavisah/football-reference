@@ -1,0 +1,88 @@
+---
+// One page per Men's Ballon d'Or edition, mirroring src/pages/competitions/
+// world-cup/[year].astro's pattern - but for an individual award rather than
+// a team competition. The two individual awards (Ballon d'Or, Golden Boot)
+// were the last competitions on the site without edition pages (see
+// docs/PROJECT_STATUS.md's "Left for a future pass" note on the EURO/Nations
+// League entry) because `buildEditionProfiles()` previously assumed every
+// "Winner"/"Champion" column named a *team*: this table's "Winner" column
+// names a *player*, and "National team" names their team - two different
+// entity kinds needing two different profile links (`/players/<slug>` and
+// `/teams/<slug>`). `buildEditionProfiles()`'s new optional `individualAward`
+// argument (src/lib/editionProfile.ts) switches its fact-linking rules to
+// match, so this page reuses the exact same `EditionProfile`/`EditionView`
+// machinery every team-competition edition page already does, no separate
+// template needed after all.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import EditionView from '../../../components/EditionView.astro';
+import References from '../../../components/References.astro';
+import { loadCompetition } from '../../../lib/competition';
+import { distinctWinners, isPlaceholderWinner } from '../../../lib/editions';
+import { buildEditionProfiles, type EditionProfile } from '../../../lib/editionProfile';
+import { buildAllCountryRecords } from '../../../lib/compare';
+import { loadTeamCompetitions } from '../../../lib/teamCompetitions';
+import { teamProfileSlug } from '../../../lib/teamProfile';
+import { playerProfileSlug } from '../../../lib/playerProfile';
+import type { SourceLink } from '../../../lib/sources';
+import { withBase } from '../../../lib/url';
+
+export async function getStaticPaths() {
+  const [data, teamData] = await Promise.all([
+    loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),
+    loadTeamCompetitions(),
+  ]);
+
+  // Only link a placing whose /teams/<slug> or /players/<slug> page is
+  // actually generated, so this route can never emit a link
+  // check-internal-links.mjs would flag - the same contract the team
+  // competitions' edition pages already follow for `teamSlugs`.
+  const teamSlugs = new Set(
+    buildAllCountryRecords(teamData.competitions).map((record) => teamProfileSlug(record.id)),
+  );
+  const playerSlugs = new Set(distinctWinners(data.editions).map((name) => playerProfileSlug(name)));
+
+  return buildEditionProfiles(data.editions, teamSlugs, { playerSlugs }).map((profile) => ({
+    params: { year: profile.slug },
+    props: {
+      profile,
+      sources: data.sources,
+      lastReviewed: data.lastReviewed,
+      status: data.status,
+    },
+  }));
+}
+
+type Props = {
+  profile: EditionProfile;
+  sources: SourceLink[];
+  lastReviewed: string;
+  status: string;
+};
+
+const { profile, sources, lastReviewed, status } = Astro.props as Props;
+
+const nationalTeam = profile.facts.find((fact) => /national team/i.test(fact.label))?.value;
+const description = isPlaceholderWinner(profile.champion)
+  ? `The ${profile.year} Men's Ballon d'Or was not awarded. Full details from that year's winners table.`
+  : [
+      `The ${profile.year} Men's Ballon d'Or:`,
+      `${profile.champion}${nationalTeam && nationalTeam !== '—' ? ` (${nationalTeam})` : ''} won.`,
+      'Full details from the award table, linked to the player’s complete award history.',
+    ].join(' ');
+---
+
+<BaseLayout
+  title={`${profile.year} Men's Ballon d'Or`}
+  description={description}
+  alternateHref={withBase(`/hr/competitions/ballon-dor/${profile.slug}`)}
+  breadcrumbTrail={[{ name: "Men's Ballon d'Or", url: withBase('/competitions/ballon-dor') }]}
+>
+  <EditionView
+    profile={profile}
+    competitionPath="/competitions/ballon-dor"
+    competitionTitle="Men's Ballon d'Or"
+    introTemplate="Everything the {competition} table records about {year}, with the winner linked to their full award history and their national team linked to its own record."
+  >
+    <References sources={sources} lastReviewed={lastReviewed} status={status} />
+  </EditionView>
+</BaseLayout>

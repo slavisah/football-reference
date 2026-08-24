@@ -140,6 +140,7 @@ export const GET: APIRoute = async ({ site, url }) => {
     { title: 'FIFA World Cup Golden Boot', slug: 'golden-boot', editions: worldCupGoldenBoot.editions },
     { title: 'UEFA EURO Golden Boot', slug: 'golden-boot', editions: euroGoldenBoot.editions },
   ];
+  const playerProfiles = buildAllPlayerProfiles(playerSources);
   const playersEntry = await getEntry('pages', 'players');
   const playersLastmod = [
     ballonDor.lastReviewed,
@@ -151,7 +152,7 @@ export const GET: APIRoute = async ({ site, url }) => {
     .sort()
     .at(-1);
   const playersLastmodTag = playersLastmod ? `<lastmod>${playersLastmod}</lastmod>` : '';
-  for (const profile of buildAllPlayerProfiles(playerSources)) {
+  for (const profile of playerProfiles) {
     const slug = playerProfileSlug(profile.id);
     const enPath = `/players/${slug}`;
     const hrPath = `/hr/players/${slug}`;
@@ -236,6 +237,32 @@ export const GET: APIRoute = async ({ site, url }) => {
     );
     urlEntries.push(
       `<url><loc>${xmlEscape(absolute(hrPath))}</loc>${nationsLeagueEditionLastmodTag}${altLinks}</url>`,
+    );
+  }
+
+  // Per-edition pages for the Men's Ballon d'Or
+  // (src/pages/competitions/ballon-dor/[year].astro and its Croatian
+  // sibling) - the first individual-award edition pages, so
+  // `buildEditionProfiles()` is called with its `individualAward` option
+  // (see src/lib/editionProfile.ts) rather than the plain team-competition
+  // form the loops above use. `playerProfiles` (built just above for the
+  // /players/ loop) already names every slug that has a `/players/` page.
+  const playerSlugs = new Set(playerProfiles.map((profile) => playerProfileSlug(profile.id)));
+  const ballonDorEditionLastmodTag = ballonDor.lastReviewed
+    ? `<lastmod>${ballonDor.lastReviewed}</lastmod>`
+    : '';
+  for (const profile of buildEditionProfiles(ballonDor.editions, undefined, { playerSlugs })) {
+    const enPath = `/competitions/ballon-dor/${profile.slug}`;
+    const hrPath = `/hr/competitions/ballon-dor/${profile.slug}`;
+    const altLinks = [
+      `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
+      `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
+    ].join('');
+    urlEntries.push(
+      `<url><loc>${xmlEscape(absolute(enPath))}</loc>${ballonDorEditionLastmodTag}${altLinks}</url>`,
+    );
+    urlEntries.push(
+      `<url><loc>${xmlEscape(absolute(hrPath))}</loc>${ballonDorEditionLastmodTag}${altLinks}</url>`,
     );
   }
 
