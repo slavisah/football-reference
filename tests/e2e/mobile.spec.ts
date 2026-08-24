@@ -2812,13 +2812,17 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     // /players, /compare-players and /glossary), plus 40 team profile pages
     // x 2 languages (src/pages/teams/[slug].astro and its Croatian sibling),
     // 98 player profile pages x 2 languages (src/pages/players/[slug].astro
-    // and its Croatian sibling), and 23 FIFA World Cup edition pages x 2
+    // and its Croatian sibling), 23 FIFA World Cup edition pages x 2
     // languages (src/pages/competitions/world-cup/[year].astro and its
-    // Croatian sibling), each pair carrying reciprocal hreflang alternates -
-    // /glossary is a fully bilingual NAV_LINKS entry from launch (see
-    // docs/PROJECT_STATUS.md's Glossary entry), so it flows through the main
-    // loop like every other top-level page.
-    expect(body.match(/<url>/g)?.length).toBe(352);
+    // Croatian sibling), and 48 Copa América edition pages x 2 languages
+    // (src/pages/competitions/copa-america/[year].astro and its Croatian
+    // sibling - the two 1959 tournaments each get their own host-
+    // disambiguated slug, see src/lib/editionProfile.ts), each pair carrying
+    // reciprocal hreflang alternates - /glossary is a fully bilingual
+    // NAV_LINKS entry from launch (see docs/PROJECT_STATUS.md's Glossary
+    // entry), so it flows through the main loop like every other top-level
+    // page.
+    expect(body.match(/<url>/g)?.length).toBe(448);
     expect(body).toContain(`<loc>${SITE}/glossary/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/glossary/</loc>`);
     expect(body).toContain(`hreflang="hr" href="${SITE}/hr/glossary/"`);

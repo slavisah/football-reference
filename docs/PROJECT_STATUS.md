@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 468 Vitest unit tests
+pnpm test                      # 488 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 701 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 728 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
                                           # and dark, across every page)
 ```
@@ -11388,6 +11388,115 @@ labels); Copa América first needs a slug-disambiguation scheme for its two
 the two individual awards (Ballon d'Or, Golden Boot) are a different shape
 (no host/placings) and would want their own edition-page template rather than
 reusing `EditionView` as-is.
+
+### New feature: per-edition pages for Copa América (`/competitions/copa-america/<slug>`, EN + HR) - added 2026-08-24 (later intensive run)
+
+The prior entry named Copa América as the next edition-page candidate but
+left it blocked on "a slug-disambiguation scheme" for its two 1959
+tournaments (Argentina-hosted, then Ecuador-hosted - see
+`content/copa-america.md`), since `buildEditionProfiles()` threw on the two
+editions colliding on the plain slug "1959" by design. This run built that
+scheme and shipped Copa América's edition pages on top of it - 48 editions
+(46 unique years + the two 1959 tournaments), EN + HR, reached the same way
+the FIFA World Cup's already are (tap a year cell in the competition table).
+
+**The disambiguation scheme, in `src/lib/editionProfile.ts`:** editions are
+first grouped by their plain-year slug; a group of one keeps that slug
+unchanged (every competition/year this site has ever had, minus one pair).
+A group of more than one is disambiguated by host - each edition's Host
+column value is slugified and appended ("1959" + "Argentina"/"Ecuador" ->
+`1959-argentina`/`1959-ecuador`) - and only if that produces a fully unique
+set of slugs within the group; otherwise `buildEditionProfiles()` still
+throws with the same "same edition slug" message as before, so a future
+competition with a genuine, unresolvable collision (no host column, or two
+editions at the same host) fails loudly at build time rather than silently
+merging two editions onto one page. This is why the fix generalizes past
+Copa América's specific case rather than hardcoding "1959": it's a real
+`Map<Edition, string>` slug-assignment pass, not a special case in an
+if-statement.
+
+**A second, related bug the same duplicate year exposed:** `TournamentTable`'s
+`yearLinks` prop (the Year-cell-to-edition-page map) was keyed by plain
+`edition.year` alone, which cannot represent "the same year linking two
+different pages" - both 1959 rows would have resolved to whichever map entry
+was written last. New `editionLinkKey(year, host?)`, exported from
+`editionProfile.ts` and used identically by both the producer
+(`buildEditionLinks`, keyed off `EditionProfile.host`) and the consumer
+(`TournamentTable`, keyed off `Edition.host`) - folds the host into the key
+whenever one is present, so a competition with unique years (World Cup,
+EURO, Nations League) is unaffected in behavior (its keys just happen to
+carry `::<host>` now) while Copa América's two 1959 rows each resolve to
+their own page. Caught before shipping by grepping the built HTML for both
+1959 rows' actual `href` values, not by a passing type check (`Map<string,
+string>` doesn't know its own keys should be unique per *page*, only per
+*string*).
+
+**Pager clarity:** the World Cup's `EditionNeighbour` type only carried a
+slug and a year, which is fine when a year is already unique - but the two
+1959 pages are chronological neighbours of each other, so the pager would
+have shown two indistinguishable "1959" links pointing at different pages.
+`EditionNeighbour` gained an optional `disambiguator` field, set only when a
+neighbour's slug required host disambiguation (a plain equality check against
+`editionSlug(neighbour.year)`, so every non-Copa-América page's pager is
+byte-identical to before); `EditionView.astro`'s pager renders it in
+parentheses ("1959 (Ecuador)") when present. The two 1959 pages' own
+`<h1>`/meta description also fold the host in the same way, computed in the
+page file itself (`profile.slug !== editionSlug(profile.year)`) rather than
+inside the shared component, since only Copa América needs it today.
+
+**Wiring:** new `src/pages/competitions/copa-america/[year].astro` and its
+Croatian sibling, modeled directly on the World Cup's edition-page files -
+same `EditionView`/`References` composition, same `getStaticPaths` shape.
+No Golden Boot top-scorer join (Golden Boot only tracks World Cup/EURO, so
+that prop is simply omitted). `copa-america.astro` (EN + HR) gained the same
+`yearLinks` wiring the World Cup competition page already had, threaded
+through `CompetitionView.astro`'s existing `yearLinks` prop (no component
+change needed there - it already forwarded the map to `TournamentTable`).
+`sitemap.xml.ts` gained a Copa América edition loop identical in shape to the
+World Cup one, using the same `buildEditionProfiles()` call (already needed
+`allowDuplicateYears: ['1959']`, already present from Copa América's original
+page build).
+
+**Tests:** 6 new Vitest cases (`editionProfile.test.ts`): the two 1959
+editions each get their own host-suffixed slug, non-colliding years are
+unaffected, previous/next chains correctly across both 1959 editions and
+their real neighbours with a disambiguator only where one is needed, the
+existing no-host-column duplicate-year case still throws, `editionLinkKey`'s
+three shapes (plain year, year+host, empty-host fallback), and
+`buildEditionLinks` resolving each 1959 row to its own page while the bare
+year resolves to neither - 488 Vitest total, up from 482. (World Cup's own
+`buildEditionLinks` tests were updated in place, not added to - `yearLinks`
+now keys by year+host, so those assertions look up `editionLinkKey('2018',
+'Russia')` rather than a bare `'2018'`, but the maps they check are the same
+size as before.) 13 new Playwright cases
+(`tests/e2e/copa-america-edition-page.spec.ts`): a normal year links straight
+through same as World Cup, both 1959 rows link to their own page rather than
+colliding, each 1959 page shows its own champion, the pager shows the host
+disambiguator only on the 1959<->1959 hop, back-link, no 360px overflow on
+either 1959 page, no WCAG violations, the language switch both ways, and the
+Croatian page's translated chrome/pager with the disambiguator carried
+through - 728 Playwright total, up from 715 (13 new cases here, plus one
+`mobile.spec.ts` sitemap-count assertion updated in place from 352 to 448:
++96 Copa América edition URLs, 48 editions x 2 languages).
+
+**Validation:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across
+149 files. `pnpm test` - 488/488. `pnpm build` - **449 pages** (up from 353:
++96 Copa América edition pages). `check:links` (453 pages), `check:sitemap`
+(448 entries), `check:perf`, `check:precache` all clean.
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` - **728/728
+passing**. `pnpm build:pdfs` regenerated all 296 PDFs (the shared
+`TournamentTable.astro`/`copa-america.astro` edits made `check:pdfs` report
+them stale, same as any change to those files does - no new PDF pages were
+added, matching the World Cup edition pages' own "no PDF" precedent below).
+
+**Left for a future pass:** (1) the same "no downloadable PDF per edition"
+gap the World Cup entry above left open, now also true for Copa América's 48
+edition pages. (2) Extend edition pages to EURO and Nations League next -
+both still have unique year/season labels per the prior entry's read, so
+should need no further scheme work, just the same wiring this run and the
+World Cup run both used. (3) The two individual awards (Ballon d'Or, Golden
+Boot) still need their own edition-page template - a different shape
+(no host/placings) than `EditionView` was built for.
 
 ## Known caveats
 

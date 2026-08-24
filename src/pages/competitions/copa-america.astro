@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
 import { buildPodiums, buildHostMapPoints } from '../../lib/editions';
+import { buildEditionLinks, buildEditionProfiles } from '../../lib/editionProfile';
 import { COPA_AMERICA_HOST_COORDINATES, COPA_AMERICA_REGION_ORDER } from '../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import {
@@ -20,6 +21,7 @@ const data = await loadCompetition('copa-america', {
 
 const podium = buildPodiums(data.editions);
 const hostMap = buildHostMapPoints(data.editions, COPA_AMERICA_HOST_COORDINATES, COPA_AMERICA_REGION_ORDER);
+const yearLinks = buildEditionLinks(buildEditionProfiles(data.editions), '/competitions/copa-america');
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd = [
@@ -42,5 +44,6 @@ const jsonLd = [
     podium={podium}
     podiumHeading="Podium by edition"
     hostMap={hostMap}
+    yearLinks={yearLinks}
   />
 </BaseLayout>
