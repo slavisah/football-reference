@@ -183,6 +183,25 @@ export const GET: APIRoute = async ({ site, url }) => {
     urlEntries.push(`<url><loc>${xmlEscape(absolute(hrPath))}</loc>${worldCupEditionLastmodTag}${altLinks}</url>`);
   }
 
+  // Per-edition pages for Copa América (src/pages/competitions/copa-america/
+  // [year].astro and its Croatian sibling), same shape as the FIFA World Cup
+  // loop above. `buildEditionProfiles()` disambiguates the two 1959 editions
+  // by host, so this naturally emits both "1959-argentina" and
+  // "1959-ecuador" as their own distinct URLs rather than colliding.
+  const copaAmericaEditionLastmodTag = copaAmerica.lastReviewed
+    ? `<lastmod>${copaAmerica.lastReviewed}</lastmod>`
+    : '';
+  for (const profile of buildEditionProfiles(copaAmerica.editions)) {
+    const enPath = `/competitions/copa-america/${profile.slug}`;
+    const hrPath = `/hr/competitions/copa-america/${profile.slug}`;
+    const altLinks = [
+      `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
+      `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
+    ].join('');
+    urlEntries.push(`<url><loc>${xmlEscape(absolute(enPath))}</loc>${copaAmericaEditionLastmodTag}${altLinks}</url>`);
+    urlEntries.push(`<url><loc>${xmlEscape(absolute(hrPath))}</loc>${copaAmericaEditionLastmodTag}${altLinks}</url>`);
+  }
+
   const xml =`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urlEntries.join('\n')}\n</urlset>\n`;
 
   return new Response(xml, {

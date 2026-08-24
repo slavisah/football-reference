@@ -129,7 +129,10 @@ const isFinalLabel = (raw: string) => /^final$/i.test(raw.trim());
       profile.previous ? (
         <a class="edition__pager-link" href={withBase(`${competitionPath}/${profile.previous.slug}`)}>
           <span class="edition__pager-role">&larr; {previousLabel}</span>
-          <span class="edition__pager-year">{profile.previous.year}</span>
+          <span class="edition__pager-year">
+            {profile.previous.year}
+            {profile.previous.disambiguator && ` (${profile.previous.disambiguator})`}
+          </span>
         </a>
       ) : (
         <span />
@@ -139,7 +142,10 @@ const isFinalLabel = (raw: string) => /^final$/i.test(raw.trim());
       profile.next ? (
         <a class="edition__pager-link edition__pager-link--next" href={withBase(`${competitionPath}/${profile.next.slug}`)}>
           <span class="edition__pager-role">{nextLabel} &rarr;</span>
-          <span class="edition__pager-year">{profile.next.year}</span>
+          <span class="edition__pager-year">
+            {profile.next.year}
+            {profile.next.disambiguator && ` (${profile.next.disambiguator})`}
+          </span>
         </a>
       ) : (
         <span />

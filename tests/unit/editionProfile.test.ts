@@ -3,9 +3,25 @@ import { buildEditions } from '../../src/lib/editions';
 import {
   buildEditionLinks,
   buildEditionProfiles,
+  editionLinkKey,
   editionSlug,
 } from '../../src/lib/editionProfile';
 import type { MarkdownTable } from '../../src/lib/types';
+
+// Shaped like Copa América's real 1916-1929 to 1959 stretch, condensed to the
+// three editions that matter for the duplicate-year case: the one right
+// before 1959, both 1959 tournaments (Argentina-hosted, then Ecuador-hosted -
+// same source order as content/copa-america.md), and the one right after.
+const copaAmerica1959Table: MarkdownTable = {
+  headers: ['Year', 'Host / format', 'Champion', 'Runner-up'],
+  rows: [
+    ['1957', 'Peru', 'Argentina', 'Brazil'],
+    ['1959', 'Argentina', 'Argentina', 'Brazil'],
+    ['1959', 'Ecuador', 'Uruguay', 'Argentina'],
+    ['1963', 'Bolivia', 'Bolivia', 'Paraguay'],
+  ],
+};
+const copaAmerica1959 = buildEditions(copaAmerica1959Table);
 
 const worldCupTable: MarkdownTable = {
   headers: [
@@ -39,6 +55,20 @@ describe('editionSlug', () => {
 
   it('is stable for a label that already uses a plain hyphen', () => {
     expect(editionSlug('2018-19')).toBe('2018-19');
+  });
+});
+
+describe('editionLinkKey', () => {
+  it('is the plain year when no host is given', () => {
+    expect(editionLinkKey('2018')).toBe('2018');
+  });
+
+  it('folds a trimmed host into the key when given', () => {
+    expect(editionLinkKey('1959', ' Ecuador ')).toBe('1959::Ecuador');
+  });
+
+  it('falls back to the plain year for an empty/whitespace-only host', () => {
+    expect(editionLinkKey('2018', '  ')).toBe('2018');
   });
 });
 
@@ -114,7 +144,7 @@ describe('buildEditionProfiles', () => {
     expect(profile.facts.find((f) => f.label === 'Third')?.value).toBe('—');
   });
 
-  it('throws rather than silently merging two editions onto one slug', () => {
+  it('throws rather than silently merging two editions onto one slug when there is no host to disambiguate them', () => {
     const duplicate = buildEditions({
       headers: ['Year', 'Champion'],
       rows: [
@@ -124,18 +154,54 @@ describe('buildEditionProfiles', () => {
     });
     expect(() => buildEditionProfiles(duplicate)).toThrow(/same edition slug/);
   });
+
+  describe('duplicate-year editions disambiguated by host (Copa América 1959)', () => {
+    it('gives each same-year edition its own host-suffixed slug', () => {
+      const profiles = buildEditionProfiles(copaAmerica1959);
+      const bySlug = new Map(profiles.map((p) => [p.slug, p]));
+      expect(bySlug.get('1959-argentina')?.champion).toBe('Argentina');
+      expect(bySlug.get('1959-ecuador')?.champion).toBe('Uruguay');
+      // Non-colliding years keep their plain slug, unaffected.
+      expect(bySlug.has('1957')).toBe(true);
+      expect(bySlug.has('1963')).toBe(true);
+    });
+
+    it('chains previous/next across both 1959 editions and their real neighbours, with a disambiguator only where needed', () => {
+      const profiles = buildEditionProfiles(copaAmerica1959);
+      const argentina1959 = profiles.find((p) => p.slug === '1959-argentina')!;
+      const ecuador1959 = profiles.find((p) => p.slug === '1959-ecuador')!;
+      const y1963 = profiles.find((p) => p.year === '1963')!;
+      const y1957 = profiles.find((p) => p.year === '1957')!;
+
+      expect(argentina1959.previous).toEqual({ slug: '1957', year: '1957', disambiguator: undefined });
+      expect(argentina1959.next).toEqual({ slug: '1959-ecuador', year: '1959', disambiguator: 'Ecuador' });
+      expect(ecuador1959.previous).toEqual({ slug: '1959-argentina', year: '1959', disambiguator: 'Argentina' });
+      expect(ecuador1959.next).toEqual({ slug: '1963', year: '1963', disambiguator: undefined });
+      expect(y1963.previous?.disambiguator).toBe('Ecuador');
+      expect(y1957.next?.disambiguator).toBe('Argentina');
+    });
+
+    it('does not link the Year column to a single edition, since both share edition.year', () => {
+      const profiles = buildEditionProfiles(copaAmerica1959);
+      const links = buildEditionLinks(profiles, '/competitions/copa-america');
+      expect(links.get(editionLinkKey('1959', 'Argentina'))).toBe('/competitions/copa-america/1959-argentina');
+      expect(links.get(editionLinkKey('1959', 'Ecuador'))).toBe('/competitions/copa-america/1959-ecuador');
+      // The plain year alone (no host) resolves to neither - callers must key by host too.
+      expect(links.has('1959')).toBe(false);
+    });
+  });
 });
 
 describe('buildEditionLinks', () => {
-  it('maps each edition year to its page under the given competition path', () => {
+  it('maps each edition (year + host) to its page under the given competition path', () => {
     const links = buildEditionLinks(buildEditionProfiles(worldCup), '/competitions/world-cup');
-    expect(links.get('2018')).toBe('/competitions/world-cup/2018');
-    expect(links.get('1954')).toBe('/competitions/world-cup/1954');
+    expect(links.get(editionLinkKey('2018', 'Russia'))).toBe('/competitions/world-cup/2018');
+    expect(links.get(editionLinkKey('1954', 'Switzerland'))).toBe('/competitions/world-cup/1954');
     expect(links.size).toBe(3);
   });
 
   it('honours a localized base path', () => {
     const links = buildEditionLinks(buildEditionProfiles(worldCup), '/hr/competitions/world-cup');
-    expect(links.get('2018')).toBe('/hr/competitions/world-cup/2018');
+    expect(links.get(editionLinkKey('2018', 'Russia'))).toBe('/hr/competitions/world-cup/2018');
   });
 });
