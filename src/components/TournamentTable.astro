@@ -4,6 +4,7 @@ import { buildSortOptions, defaultSortValue } from '../lib/tableSort';
 import { editionTeams } from '../lib/editions';
 import { renderInlineMarkdown } from '../lib/notes';
 import { abbreviateFinalScore, hasAbbreviation } from '../lib/glossary';
+import { withBase } from '../lib/url';
 import type { Locale } from '../lib/i18n';
 
 interface Props {
@@ -39,6 +40,15 @@ interface Props {
    */
   storyColumn?: { label: string; values: Map<string, string> };
   storySummaryLabel?: string;
+  /**
+   * Optional `edition.year -> path` map that turns the Year cell into a link
+   * to that edition's own page (see `buildEditionLinks()` in
+   * src/lib/editionProfile.ts). Values are base-relative site paths (e.g.
+   * "/competitions/world-cup/2018"); this component applies `withBase()`
+   * itself, the same as every other href it renders. Omit to keep the Year
+   * column as plain text (every page without per-edition pages, unchanged).
+   */
+  yearLinks?: Map<string, string>;
   /**
    * Overridable for localized pages; every default below matches the original
    * English copy, so existing call sites render byte-identical output.
@@ -91,6 +101,7 @@ const {
   extraColumn,
   storyColumn,
   storySummaryLabel = '📖 Tap to read the story',
+  yearLinks,
   paramPrefix = '',
   locale = 'en',
   headerLabels = {},
@@ -137,6 +148,10 @@ const formatColIndex = table.headers.findIndex((header) => /^format$/i.test(head
 // before use - wrapped in a native <abbr title> via abbreviateFinalScore()
 // below, rather than plain text, on those columns/rows only.
 const finalColIndex = table.headers.findIndex((header) => /^final$/i.test(header.trim()));
+
+// The Year/Season column, so a `yearLinks` map can turn just that cell into a
+// link to the edition's own page. Same detection `buildEditions()` uses.
+const yearColIndex = table.headers.findIndex((header) => /year|season/i.test(header));
 
 // "Sort by" options: only the columns worth sorting by (Year/Season, Winner,
 // Host, a numeric quantity column), detected the same way `buildEditions`
@@ -257,6 +272,8 @@ const defaultSort = defaultSortValue(sortOptions);
                     <span class="badge">{cell.value}</span>
                   ) : index === finalColIndex && hasAbbreviation(cell.value) ? (
                     <span set:html={abbreviateFinalScore(cell.value, locale)} />
+                  ) : index === yearColIndex && yearLinks?.has(edition.year) ? (
+                    <a href={withBase(yearLinks.get(edition.year)!)}>{cell.value}</a>
                   ) : (
                     cell.value
                   )}
