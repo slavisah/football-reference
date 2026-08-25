@@ -42,9 +42,27 @@ into a concrete plan - worth a look next time the health check above comes
 back clean:
 
 - Extend "Tap a year to reveal a short story" (currently the four
-  team-competition tables) to the two individual awards, if enough
-  editorial "Memorable moments" content exists for Ballon d'Or/Golden Boot
-  to support it.
-- A `/records`-style aggregate ranking specific to the individual awards
-  (e.g. "youngest winner", "most award years apart"), mirroring the
-  team-competition rankings already on `/records`.
+  team-competition tables) to the two individual awards. Checked
+  2026-08-25: `content/ballon-dor.md` and `content/golden-boot.md` have no
+  "Memorable moments" section (the four team-competition files each do),
+  so this is blocked on new editorial narrative content, not a code change
+  - see the "not pursued" note below for why that is not something to
+  fabricate in an unattended run.
+- **Correction (2026-08-25):** the `/records`-style individual-award
+  aggregate ranking this line used to ask for is **already live** - "most
+  award years apart" is the existing "Longest wait between titles" section,
+  which loops over `allLoaded` (every team competition *and* both
+  individual awards, see `src/pages/records.astro`) and already renders
+  `title-gaps-ballon-dor`/`title-gaps-golden-boot-world-cup`/
+  `title-gaps-golden-boot-euro` sections; "Back-to-back champions" is the
+  same story. The one genuinely open piece is **"youngest winner"**, which
+  needs a per-player birth date - data that exists nowhere in `content/`
+  today. **Not pursued this run:** fabricating ~130 players' birth dates
+  (70 Ballon d'Or + Golden Boot winners, several tied) from memory in an
+  unattended run, with no reliable per-player source cross-checked the way
+  every other fact on this site has been (see the many "second independent
+  cross-check" entries in `docs/PROJECT_STATUS.md`), risks shipping
+  confidently-wrong biographical history with no human review before
+  merge - the same caution that has already shelved the "by team" filter's
+  full participant lists and the flag-emoji idea in earlier runs. Left for
+  whenever someone sources that data deliberately.
