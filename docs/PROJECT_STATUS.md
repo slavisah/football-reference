@@ -11890,6 +11890,61 @@ new PDF-link cases).
 `docs/ROADMAP.md` (new this run) is now the short, current-state pointer for
 "what's next" - see that file rather than assuming a gap here.
 
+### Quality pass: full-repo health check, plus a stale ROADMAP.md correction - added 2026-08-25 (later intensive run)
+
+With `docs/ROADMAP.md`'s "Open backlog" empty and only two unscoped ideas
+left, this run followed that file's own instruction: a full-repo health
+check first, rather than assuming either idea was still concretely open.
+
+**Health check - everything clean, no code change needed:** `pnpm lint`
+(`astro check`) - 0 errors/warnings/hints across 164 files. `pnpm test` -
+497/497. `pnpm build` - 711 pages (unchanged). `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:perf` (heaviest page 498.8 KB, under
+the 510 KB budget), `check:precache` (37 URLs), `check:pdfs` (700 PDFs) -
+all clean. Full `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+test:e2e` from a cold start - **804/804 passing** in 8.1 minutes at the
+default worker count (2) - the `ERR_CONNECTION_REFUSED`-under-parallelism
+issue a 2026-08-19 entry hit at 2 workers in an earlier sandboxed session
+did not reproduce here, so no `--workers=1` workaround was needed this
+time; worth trying the default first in a future run before reaching for
+that flag.
+
+**Real gap found, in the docs rather than the code:** re-checked both
+`docs/ROADMAP.md` "ideas not yet scoped" against the live `/records` page
+and `content/`. One was stale - "a `/records`-style aggregate ranking
+specific to the individual awards" reads as a still-open ask, but
+"Longest wait between titles" and "Back-to-back champions" already loop
+over `allLoaded` (every team competition *and* both individual awards) in
+`src/pages/records.astro`, rendering `title-gaps-ballon-dor`/
+`title-gaps-golden-boot-world-cup`/`title-gaps-golden-boot-euro` sections
+today - confirmed by grepping the built `dist/records/index.html` for
+those ids. `docs/ROADMAP.md` corrected to say so, narrowing the genuinely
+open piece to "youngest winner", which needs per-player birth dates that
+exist nowhere in `content/`. The other idea (extending "Tap a year to
+reveal a short story" to the two individual awards) was re-checked too:
+`content/ballon-dor.md` and `content/golden-boot.md` still have no
+"Memorable moments" section, so it stays blocked on new editorial content,
+unchanged from when it was first raised.
+
+**Not pursued:** sourcing ~130 players' birth dates (70 Ballon d'Or +
+Golden Boot winners, several tied) to unblock "youngest winner", or
+writing new "Memorable moments" narrative content to unblock the
+"Tap a year" extension. Both need new, independently-verifiable editorial
+facts this run has no way to cross-check the way every other fact on this
+site has been (see the many "second independent cross-check" entries
+above) - the same caution that has already shelved the "by team" filter's
+full participant lists and the flag-emoji idea in earlier runs. Left for
+whenever someone sources that data deliberately.
+
+Full suite unchanged by this run's edits (documentation-only): **804
+Playwright passed**, **497 Vitest passed**, `pnpm lint`/`pnpm build`/
+`check:links`/`check:sitemap`/`check:perf`/`check:precache`/`check:pdfs`
+all clean.
+
+**Left for a future pass:** the "youngest winner" ranking and the
+individual-award "Tap a year" extension, both blocked on new sourced
+editorial content, not engineering effort. No other gap found.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
