@@ -11945,6 +11945,62 @@ all clean.
 individual-award "Tap a year" extension, both blocked on new sourced
 editorial content, not engineering effort. No other gap found.
 
+### Quality pass: fourth consecutive full-repo health check, plus an editorial-arithmetic spot-check across all six competition/award files - added 2026-08-25 (later intensive run)
+
+`docs/ROADMAP.md`'s open backlog was still empty going into this run (the
+2026-08-25 "later intensive run" entry above already closed the last named
+item and re-confirmed the two unscoped ideas stay blocked on new editorial
+content), so this run repeated the file's own instruction once more: a
+full-repo health check before assuming anything is quietly broken.
+
+**Health check - everything clean, no code change needed:** `pnpm install
+--frozen-lockfile`, `pnpm lint` (`astro check`) - 0 errors/warnings/hints
+across 164 files. `pnpm test` - 497/497. `pnpm build` - 711 pages
+(unchanged). `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:perf` (heaviest page still `hr/records` at 498.8 KB, under the 510 KB
+budget), `check:precache` (37 URLs), `check:pdfs` (700 PDFs) - all clean.
+Full `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` from a
+cold start - **804/804 passing** in 7.8 minutes at the default worker count,
+same as the immediately preceding run.
+
+**New this run, since a fourth identical "everything's clean" pass adds
+little on its own:** a manual editorial-arithmetic spot-check of all six
+competition/award content files (`fifa-world-cup.md`, `uefa-euro.md`,
+`copa-america.md`, `uefa-nations-league.md`, `ballon-dor.md`,
+`golden-boot.md`) - re-deriving every "Champions/Titles by nation" and
+"Multiple winners" summary table by hand-counting winners straight from
+each file's own edition/winners table, and cross-checking every prose claim
+in each file's "Memorable moments"/"Key facts"/notes sections against the
+same table. This checks internal arithmetic consistency (a hand-written
+summary table drifting from its own edition table after a content edit),
+not real-world historical accuracy, which the many "second independent
+cross-check" passes cited throughout this file already cover.
+
+**No discrepancies found.** Every nation/player title count matched a fresh
+count of that file's own table (Brazil 5 World Cup titles, Spain 4 EUROs,
+Argentina 16/Uruguay 15/Brazil 9 Copa América, Messi 8/Ronaldo 5 Ballon d'Or,
+etc.), every count summed back to that file's total edition count, and every
+narrative claim (Fontaine's 13 goals in 1958, Platini's 9 in 1984, Portugal
+as first two-time Nations League champion in 2025, Spain's "record fourth"
+EURO title in 2024, Argentina "moving ahead" as Copa América's most
+successful team in 2024, and others) held up against the table row it
+describes.
+
+Full suite unchanged by this run (no code or content edits made): **804
+Playwright passed**, **497 Vitest passed**, `pnpm lint`/`pnpm build`/
+`check:links`/`check:sitemap`/`check:perf`/`check:precache`/`check:pdfs`
+all clean.
+
+**Left for a future pass:** unchanged from the previous entry - the
+"youngest winner" ranking and the individual-award "Tap a year" extension,
+both blocked on new sourced editorial content. No other gap found across
+four consecutive intensive-run health checks; a future run might vary the
+approach further (e.g. an external link-liveness check of
+`docs/SOURCES.md`'s ~390 citation URLs) rather than repeating this one, but
+note that this environment's outbound network policy blocks direct requests
+to arbitrary external hosts, so that check would need to run from a session
+with broader network access than this one has.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
