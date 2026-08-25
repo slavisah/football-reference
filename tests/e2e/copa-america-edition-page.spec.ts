@@ -98,6 +98,17 @@ test.describe('Copa América edition page', () => {
     await expect(page).toHaveURL(/\/hr\/competitions\/copa-america\/1959-ecuador\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
+
+  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
+    await page.goto('competitions/copa-america/1959-argentina');
+    const link = page.locator('a[download][href$="downloads/edition-copa-america-1959-argentina.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
 });
 
 test.describe('Croatian Copa América edition page', () => {
@@ -139,5 +150,16 @@ test.describe('Croatian Copa América edition page', () => {
       .disableRules(['region'])
       .analyze();
     expect(results.violations).toEqual([]);
+  });
+
+  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
+    await page.goto('hr/competitions/copa-america/1959-argentina');
+    const link = page.locator('a[download][href$="downloads/edition-copa-america-1959-argentina-hr.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
   });
 });
