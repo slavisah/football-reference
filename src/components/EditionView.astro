@@ -4,6 +4,7 @@ import { renderInlineMarkdown } from '../lib/notes';
 import { abbreviateFinalScore, hasAbbreviation } from '../lib/glossary';
 import { withBase } from '../lib/url';
 import type { Locale } from '../lib/i18n';
+import PrintDownloadLink from './PrintDownloadLink.astro';
 
 interface Props {
   profile: EditionProfile;
@@ -55,6 +56,10 @@ interface Props {
   storyHeading?: string;
   /** Visually-hidden heading over the facts list; `{year}` is filled in. */
   glanceHeading?: string;
+  /** Slug of the pre-generated PDF at public/downloads/<pdfSlug>.pdf. Omit to hide the download link. */
+  pdfSlug?: string;
+  pdfLabel?: string;
+  pdfHint?: string;
 }
 
 const {
@@ -78,6 +83,9 @@ const {
   playerProfileHintTemplate = '{player} — full award history',
   storyHeading = 'The story of this edition',
   glanceHeading = '{year} at a glance',
+  pdfSlug,
+  pdfLabel,
+  pdfHint = 'A4 landscape, this edition’s full placings and final result.',
 } = Astro.props;
 
 const label = (raw: string) => headerLabels[raw] ?? raw;
@@ -96,6 +104,7 @@ const isFinalLabel = (raw: string) => /^final$/i.test(raw.trim());
     <p class="eyebrow badge">{eyebrow}</p>
     <h1>{fill(headingTemplate)}</h1>
     <p class="edition__intro">{fill(introTemplate)}</p>
+    {pdfSlug && <PrintDownloadLink slug={pdfSlug} label={pdfLabel} hint={pdfHint} />}
   </header>
 
   <section class="card" aria-labelledby="edition-facts-heading">

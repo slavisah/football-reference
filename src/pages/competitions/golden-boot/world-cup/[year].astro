@@ -103,6 +103,7 @@ const description = isPlaceholderWinner(profile.champion)
     competitionTitle="FIFA World Cup Golden Boot"
     headingTemplate="{year} {competition}"
     introTemplate="Everything the {competition} table records about {year}, with every scorer linked to their full award history and their team linked separately. Tied scorers are shown together, exactly as the source table lists them."
+    pdfSlug={`edition-golden-boot-world-cup-${profile.slug}`}
   >
     <References sources={sources} lastReviewed={lastReviewed} status={status} />
   </EditionView>

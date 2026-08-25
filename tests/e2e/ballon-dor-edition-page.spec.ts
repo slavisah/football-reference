@@ -93,6 +93,17 @@ test.describe('Ballon d\'Or edition page', () => {
     await expect(page).toHaveURL(/\/hr\/competitions\/ballon-dor\/2018\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
+
+  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
+    await page.goto('competitions/ballon-dor/2018');
+    const link = page.locator('a[download][href$="downloads/edition-ballon-dor-2018.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
 });
 
 test.describe("Croatian Ballon d'Or edition page", () => {
@@ -137,6 +148,17 @@ test.describe("Croatian Ballon d'Or edition page", () => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/competitions\/ballon-dor\/2018\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
+    await page.goto('hr/competitions/ballon-dor/2018');
+    const link = page.locator('a[download][href$="downloads/edition-ballon-dor-2018-hr.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
   });
 
   test('has no WCAG violations', async ({ page }) => {

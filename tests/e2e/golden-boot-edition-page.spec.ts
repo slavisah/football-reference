@@ -115,6 +115,17 @@ test.describe('Golden Boot edition page (FIFA World Cup)', () => {
     await expect(page).toHaveURL(/\/hr\/competitions\/golden-boot\/world-cup\/1958\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
+
+  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
+    await page.goto('competitions/golden-boot/world-cup/1994');
+    const link = page.locator('a[download][href$="downloads/edition-golden-boot-world-cup-1994.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
 });
 
 test.describe('Golden Boot edition page (UEFA EURO)', () => {
@@ -162,6 +173,17 @@ test.describe('Golden Boot edition page (UEFA EURO)', () => {
       .analyze();
     expect(results.violations).toEqual([]);
   });
+
+  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
+    await page.goto('competitions/golden-boot/euro/1996');
+    const link = page.locator('a[download][href$="downloads/edition-golden-boot-euro-1996.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
 });
 
 test.describe('Croatian Golden Boot edition page', () => {
@@ -207,5 +229,26 @@ test.describe('Croatian Golden Boot edition page', () => {
       .disableRules(['region'])
       .analyze();
     expect(results.violations).toEqual([]);
+  });
+
+  test('offers a downloadable print PDF that actually resolves, for both the World Cup and EURO races', async ({
+    page,
+    request,
+  }) => {
+    await page.goto('hr/competitions/golden-boot/world-cup/1994');
+    const worldCupLink = page.locator('a[download][href$="downloads/edition-golden-boot-world-cup-1994-hr.pdf"]');
+    await expect(worldCupLink).toBeVisible();
+    const worldCupHref = await worldCupLink.getAttribute('href');
+    const worldCupResponse = await request.get(new URL(worldCupHref!, page.url()).toString());
+    expect(worldCupResponse.ok()).toBe(true);
+    expect(worldCupResponse.headers()['content-type']).toContain('pdf');
+
+    await page.goto('hr/competitions/golden-boot/euro/1996');
+    const euroLink = page.locator('a[download][href$="downloads/edition-golden-boot-euro-1996-hr.pdf"]');
+    await expect(euroLink).toBeVisible();
+    const euroHref = await euroLink.getAttribute('href');
+    const euroResponse = await request.get(new URL(euroHref!, page.url()).toString());
+    expect(euroResponse.ok()).toBe(true);
+    expect(euroResponse.headers()['content-type']).toContain('pdf');
   });
 });

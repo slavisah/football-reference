@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 493 Vitest unit tests
+pnpm test                      # 497 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 771 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 804 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
                                           # and dark, across every page)
 ```
@@ -11806,6 +11806,90 @@ both languages) - a genuinely future pass, since it spans every edition
 family, not just this one. (2) No other backlog item is currently known;
 see `docs/ROADMAP.md` for what's next.
 
+### New feature: downloadable print PDF for every `/competitions/<competition>/<year>` edition page (all six families, EN + HR) - added 2026-08-25 (later intensive run)
+
+Closed the one standing gap every edition-page rollout above left open: a
+reader could view but not print/download any of the 202 edition pages this
+site now has. `docs/ROADMAP.md` (new this run, replacing a dangling
+"see docs/ROADMAP.md for what's next" pointer the previous entry left behind
+- that file never actually existed) named this as the only concrete item
+left, so it's what this run built.
+
+**`EditionView.astro` gained the same optional `pdfSlug`/`pdfLabel`/`pdfHint`
+props `CompetitionView.astro` already has**, rendering `PrintDownloadLink`
+right under the intro paragraph - the same header placement `/teams/<slug>`
+and `/players/<slug>` already use. All 12 edition-page files (six
+competitions/awards x English + Croatian) now pass a `pdfSlug` computed from
+`profile.slug` (e.g. `edition-world-cup-2018`, `edition-ballon-dor-1956-hr`);
+the six Croatian pages also pass the same `pdfLabel="Preuzmi PDF za ispis"`/
+localized hint text every other Croatian PDF link already uses.
+
+**Why a live `/edition-index.json` endpoint, not a hand-typed list, and why
+one per *family* rather than one shared list:** `scripts/generate-pdfs.mjs`
+runs under plain Node, not Vite, so it can't call `buildEditionProfiles()`
+itself (it needs `astro:content`, same reason `/team-index.json` and
+`/player-index.json` already exist for the team/player PDF families).
+Unlike those two, though, an edition's PDF sources aren't one fixed list
+shared by every entry - a Nations League edition PDF has nothing to do with
+`content/copa-america.md`. New `src/pages/edition-index.json.ts` returns
+every edition page's `{ pdfSlug, path, family }`, `family` being one of
+seven keys (`world-cup`, `euro`, `nations-league`, `copa-america`,
+`ballon-dor`, `golden-boot-world-cup`, `golden-boot-euro` - Golden Boot
+splits in two, mirroring its two separate route trees). New
+`EDITION_PDF_SOURCES` in `scripts/pdf-pages.mjs` maps each family to its own
+source list (that family's `content/*.md`, `docs/SOURCES.md`,
+`EditionView.astro`, `editionProfile.ts`, and both language variants of that
+family's `[year].astro`); `scripts/generate-pdfs.mjs` fetches the live index
+the same way it already fetches `/team-index.json`/`/player-index.json` and
+records `EDITION_PDF_SOURCES[family]` against each PDF's manifest entry.
+
+**`editionFamilyFromSlug()`, for the freshness check with no server to
+ask:** `scripts/check-pdf-freshness.mjs` runs before `pnpm build` in CI, so
+it can't fetch `/edition-index.json` the way `generate-pdfs.mjs` does -
+same constraint `teamSourcesFromManifest()`/`playerSourcesFromManifest()`
+already solved by trusting whichever `team-*`/`player-*` keys the last
+`pnpm build:pdfs` recorded. Editions need one more step: `editionSourcesFromManifest()`
+recovers *which* family list applies to a given `edition-<family>-<slug>[-hr]`
+key by calling `editionFamilyFromSlug()` (new export from `pdf-pages.mjs`),
+which matches the key against `EDITION_PDF_SOURCES`'s own keys,
+longest-prefix-first so `golden-boot-world-cup`/`golden-boot-euro` can never
+be shadowed by the shorter, unrelated `world-cup`/`euro` family names.
+
+**Scale:** 202 editions (23 World Cup + 17 EURO + 4 Nations League + 48 Copa
+América + 70 Ballon d'Or + 23 World Cup Golden Boot + 17 EURO Golden Boot),
+x 2 languages = 404 new PDFs, taking `public/downloads/` from 296 to 700
+files. `pnpm build:pdfs` (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`)
+ran clean end to end, renaming nothing and colliding on nothing -
+`buildEditionProfiles()`'s own duplicate-slug guard (already proven on Copa
+América's two 1959 editions) means `/edition-index.json` can never emit two
+entries sharing a `pdfSlug`.
+
+**Tests:** one new Playwright case per edition-page spec file (13 total:
+`edition-page.spec.ts`, `euro-`, `nations-league-`, `copa-america-`,
+`ballon-dor-edition-page.spec.ts` each gained one EN + one HR case;
+`golden-boot-edition-page.spec.ts` gained one EN case per race plus one
+combined HR case covering both races), each following the existing
+`player-profile.spec.ts`/`team-profile.spec.ts` pattern: the download link
+is visible, and an actual `request.get()` against its `href` resolves with
+an `application/pdf` content type.
+
+**Validation:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across
+164 files. `pnpm test` - 497/497. `pnpm build` - 711 pages (unchanged - this
+run adds no new page routes, only a link on 202 existing ones).
+`check:links` (715 pages) - clean once `pnpm build:pdfs` ran (404 links to
+not-yet-existing files is exactly what it caught first, confirming the
+wiring before the PDFs existed). `check:sitemap`, `check:perf`,
+`check:precache` all clean and unaffected (PDFs were never part of the
+sitemap, same as every earlier PDF family). `check:pdfs` - all 700 PDFs
+up to date with their source content. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` from a cold
+start - **804/804 passing** (up from 791, the 13
+new PDF-link cases).
+
+**Left for a future pass:** no other concrete, named backlog item is known.
+`docs/ROADMAP.md` (new this run) is now the short, current-state pointer for
+"what's next" - see that file rather than assuming a gap here.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
@@ -11828,6 +11912,13 @@ see `docs/ROADMAP.md` for what's next.
   phone (see the 2026-08-22 entry).
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
   time out; re-running the deploy clears it (it did here).
+- Every `/competitions/<competition>/<year>` edition page (202 editions x 2
+  languages) and every other PDF family (competition/award pages, `/records`,
+  `/compare`, `/compare-players`, every `/teams/<slug>` and `/players/<slug>`
+  profile, `/glossary`) now has a downloadable print PDF - `public/downloads/`
+  holds 700 files as of 2026-08-25. New editorial content still needs a
+  manual `pnpm build:pdfs` regeneration before its PDF matches, exactly the
+  same lag every PDF family has always had; `pnpm check:pdfs` catches drift.
 - At >=60rem the header's eight "tool" nav links (Records, Compare, Teams,
   Players, Compare Players, Quiz, Glossary, Sources) live behind a "More"
   button (`#nav-more-toggle`/`#nav-more-menu` in `Nav.astro`) rather than

@@ -82,6 +82,7 @@ const description = isPlaceholderWinner(profile.champion)
     competitionPath="/competitions/ballon-dor"
     competitionTitle="Men's Ballon d'Or"
     introTemplate="Everything the {competition} table records about {year}, with the winner linked to their full award history and their national team linked to its own record."
+    pdfSlug={`edition-ballon-dor-${profile.slug}`}
   >
     <References sources={sources} lastReviewed={lastReviewed} status={status} />
   </EditionView>

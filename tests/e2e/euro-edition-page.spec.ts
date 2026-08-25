@@ -84,6 +84,17 @@ test.describe('EURO edition page', () => {
     await expect(page).toHaveURL(/\/hr\/competitions\/euro\/2016\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
+
+  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
+    await page.goto('competitions/euro/2016');
+    const link = page.locator('a[download][href$="downloads/edition-euro-2016.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
 });
 
 test.describe('Croatian EURO edition page', () => {
@@ -125,5 +136,16 @@ test.describe('Croatian EURO edition page', () => {
       .disableRules(['region'])
       .analyze();
     expect(results.violations).toEqual([]);
+  });
+
+  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
+    await page.goto('hr/competitions/euro/2016');
+    const link = page.locator('a[download][href$="downloads/edition-euro-2016-hr.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
   });
 });

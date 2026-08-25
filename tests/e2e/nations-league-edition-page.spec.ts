@@ -90,6 +90,17 @@ test.describe('Nations League edition page', () => {
     await expect(page).toHaveURL(/\/hr\/competitions\/nations-league\/2022-23\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
+
+  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
+    await page.goto('competitions/nations-league/2022-23');
+    const link = page.locator('a[download][href$="downloads/edition-nations-league-2022-23.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
 });
 
 test.describe('Croatian Nations League edition page', () => {
@@ -122,6 +133,17 @@ test.describe('Croatian Nations League edition page', () => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/competitions\/nations-league\/2022-23\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
+    await page.goto('hr/competitions/nations-league/2022-23');
+    const link = page.locator('a[download][href$="downloads/edition-nations-league-2022-23-hr.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
   });
 
   test('has no WCAG violations', async ({ page }) => {
