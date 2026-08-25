@@ -16,7 +16,8 @@ import { loadTeamCompetitions } from '../../../../lib/teamCompetitions';
 import { teamProfileSlug } from '../../../../lib/teamProfile';
 import { playerProfileSlug } from '../../../../lib/playerProfile';
 import type { SourceLink } from '../../../../lib/sources';
-import { withBase } from '../../../../lib/url';
+import { absolutePageUrl, withBase } from '../../../../lib/url';
+import { buildEditionSportsEvent } from '../../../../lib/jsonLd';
 
 // Croatian column-label translations, matching hr/competitions/ballon-dor.astro's own headerLabels map.
 const HEADER_LABELS: Record<string, string> = {
@@ -58,6 +59,7 @@ const { profile, sources, lastReviewed, status } = Astro.props as Props;
 const statusText = status === 'verified' ? 'Provjereno' : 'U pregledu';
 
 const nationalTeam = profile.facts.find((fact) => /national team/i.test(fact.label))?.value;
+const title = `Zlatna lopta ${profile.year}.`;
 const description = isPlaceholderWinner(profile.champion)
   ? `Zlatna lopta ${profile.year}. nije dodijeljena. Puni podaci iz tablice dobitnika te godine.`
   : [
@@ -65,14 +67,18 @@ const description = isPlaceholderWinner(profile.champion)
       `pobjednik ${profile.champion}${nationalTeam && nationalTeam !== '—' ? ` (${nationalTeam})` : ''}.`,
       'Puni podaci iz tablice nagrade, s poveznicom na potpunu povijest nagrada tog igrača.',
     ].join(' ');
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
 ---
 
 <BaseLayout
-  title={`Zlatna lopta ${profile.year}.`}
+  title={title}
   description={description}
   locale="hr"
   alternateHref={withBase(`/competitions/ballon-dor/${profile.slug}`)}
   breadcrumbTrail={[{ name: 'Zlatna lopta', url: withBase('/hr/competitions/ballon-dor') }]}
+  jsonLd={jsonLd}
 >
   <EditionView
     profile={profile}

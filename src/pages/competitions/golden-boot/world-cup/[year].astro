@@ -26,7 +26,8 @@ import { loadTeamCompetitions } from '../../../../lib/teamCompetitions';
 import { teamProfileSlug } from '../../../../lib/teamProfile';
 import { buildAllPlayerProfiles, playerProfileSlug, type PlayerAwardSource } from '../../../../lib/playerProfile';
 import type { SourceLink } from '../../../../lib/sources';
-import { withBase } from '../../../../lib/url';
+import { absolutePageUrl, withBase } from '../../../../lib/url';
+import { buildEditionSportsEvent } from '../../../../lib/jsonLd';
 
 export async function getStaticPaths() {
   const [ballonDor, worldCupGoldenBoot, euroGoldenBoot, teamData] = await Promise.all([
@@ -81,6 +82,7 @@ type Props = {
 
 const { profile, sources, lastReviewed, status } = Astro.props as Props;
 
+const title = `${profile.year} FIFA World Cup Golden Boot`;
 const description = isPlaceholderWinner(profile.champion)
   ? `The ${profile.year} FIFA World Cup Golden Boot was not awarded. Full details from that year's top-scorers table.`
   : [
@@ -88,13 +90,17 @@ const description = isPlaceholderWinner(profile.champion)
       `${profile.champion} won.`,
       'Full details from the top-scorers table, linked to each player’s complete award history.',
     ].join(' ');
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
 ---
 
 <BaseLayout
-  title={`${profile.year} FIFA World Cup Golden Boot`}
+  title={title}
   description={description}
   alternateHref={withBase(`/hr/competitions/golden-boot/world-cup/${profile.slug}`)}
   breadcrumbTrail={[{ name: 'Golden Boot', url: withBase('/competitions/golden-boot') }]}
+  jsonLd={jsonLd}
 >
   <EditionView
     profile={profile}

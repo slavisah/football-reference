@@ -18,7 +18,8 @@ import { buildAllCountryRecords } from '../../../lib/compare';
 import { loadTeamCompetitions } from '../../../lib/teamCompetitions';
 import { teamProfileSlug } from '../../../lib/teamProfile';
 import type { SourceLink } from '../../../lib/sources';
-import { withBase } from '../../../lib/url';
+import { absolutePageUrl, withBase } from '../../../lib/url';
+import { buildEditionSportsEvent } from '../../../lib/jsonLd';
 
 export async function getStaticPaths() {
   const [data, teamData] = await Promise.all([
@@ -68,6 +69,7 @@ const isDisambiguated = profile.slug !== editionSlug(profile.year);
 const yearLabel = isDisambiguated && profile.host ? `${profile.year} (${profile.host})` : profile.year;
 
 const runnerUp = profile.facts.find((fact) => /runner-up/i.test(fact.label))?.value;
+const title = `${yearLabel} Copa América`;
 const description = [
   `The ${yearLabel} Copa América:`,
   profile.champion ? `${profile.champion} champion${runnerUp ? `, ${runnerUp} runner-up` : ''}.` : '',
@@ -76,13 +78,17 @@ const description = [
 ]
   .filter(Boolean)
   .join(' ');
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
 ---
 
 <BaseLayout
-  title={`${yearLabel} Copa América`}
+  title={title}
   description={description}
   alternateHref={withBase(`/hr/competitions/copa-america/${profile.slug}`)}
   breadcrumbTrail={[{ name: 'Copa América', url: withBase('/competitions/copa-america') }]}
+  jsonLd={jsonLd}
 >
   <EditionView
     profile={profile}

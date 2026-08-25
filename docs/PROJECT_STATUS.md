@@ -15,7 +15,7 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 497 Vitest unit tests
+pnpm test                      # 501 Vitest unit tests
 pnpm build                     # static build + all content validation
 PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 804 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
@@ -12000,6 +12000,94 @@ approach further (e.g. an external link-liveness check of
 note that this environment's outbound network policy blocks direct requests
 to arbitrary external hosts, so that check would need to run from a session
 with broader network access than this one has.
+
+### Quality pass: every `/competitions/<competition>/<year>` edition page gains its own SportsEvent JSON-LD, closing a gap the field's own comment predicted - added 2026-08-25 (fifth intensive run)
+
+This run tried the previous entry's suggested external link-liveness check
+first and confirmed it is genuinely blocked here: `WebFetch` against
+`en.wikipedia.org` returned `EGRESS_BLOCKED` ("blocked by the network
+egress proxy"), exactly the constraint the last four entries already
+flagged. Rather than log a fifth identical "everything's clean" health
+check, this run instead re-read `src/lib/editionProfile.ts`'s own
+`EditionProfile.champion` doc comment - "The champion, for the page title
+and JSON-LD" - and checked whether that JSON-LD half of the promise was
+ever actually kept. It wasn't: none of the 14 edition-page route files
+(7 competitions/awards x English/Croatian - World Cup, EURO, Nations
+League, Copa América, Ballon d'Or, and Golden Boot's two route trees)
+passed a `jsonLd` prop to `BaseLayout` at all, the same "a page family
+shipped without its own JSON-LD" gap this file's `buildTeamProfileItemList`/
+`buildPlayerProfileItemList` entries (2026-08-20) already closed once for
+the team and player profile families - just never re-applied when the six
+edition-page rollouts landed across 2026-08-24/25.
+
+**Added `buildEditionSportsEvent()`** (`src/lib/jsonLd.ts`) - the
+per-edition counterpart of the existing `buildLatestEditionSportsEvent()`
+(which only ever describes the single most recent edition, for a
+competition's index page). Takes an edition's `yearSort`/`champion`/`host`
+plus a caller-supplied `pageUrl` and `name`, reuses the same
+`isPlaceholderWinner()` guard the existing builder already uses so a
+"Not awarded" Ballon d'Or/Golden Boot year never surfaces a fake
+`competitor`, and includes a `url` field (the existing builder doesn't
+need one, since it's folded into a page that already has its own primary
+JSON-LD `url`; a per-edition SportsEvent has no other JSON-LD block to
+borrow one from). `name` is supplied by each page rather than composed
+from a competition-name string inside the builder, so it can match that
+page's own `<title>`/`<h1>` text exactly - several edition pages don't
+reduce to a plain "{year} {competition}" (Nations League's "... Finals"
+suffix, Croatian's "{competition} {year}." word order, Copa América's
+1959-disambiguation host suffix), and every one of those variants was
+already computed as a local `title`/`yearLabel` constant the page itself
+uses for its `<BaseLayout title>` prop - each of the 14 files now just
+reuses that same constant for the JSON-LD `name` instead of re-deriving it.
+4 new `buildEditionSportsEvent()` unit tests added to
+`tests/unit/jsonLd.test.ts` (basic shape, no-host individual award, a
+placeholder "Not awarded" champion, an empty-string champion).
+
+**Verified in the actual build output**, not just unit tests: `dist/
+competitions/world-cup/2022/index.html` now carries a `SportsEvent` block
+naming Argentina as `competitor` and Qatar as `location`; the Croatian
+sibling (`dist/hr/competitions/euro/2024/`) carries the same shape with a
+Croatian `name` ("UEFA Europsko prvenstvo 2024."); `dist/competitions/
+ballon-dor/2020/` (the one "Not awarded" year) correctly omits `competitor`
+entirely rather than inventing one.
+
+Regenerating every edition page's HTML changed its content hash, so
+`pnpm build:pdfs` (via `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`,
+`chromium` alone isn't on PATH in this environment) was re-run and all 700
+PDFs plus the manifest are included in this commit - the same
+mass-regeneration shape the 2026-08-25 "Regenerate PDFs stale" entry
+already established as normal (Playwright's print-to-pdf embeds
+non-deterministic metadata, so even a PDF whose *source* content hash is
+unchanged still comes out byte-different on every regeneration; the
+manifest's own hashes confirm only the 14 edited files' dependents actually
+changed content-wise).
+
+Full suite after the change: **pnpm lint** - 0 errors/warnings/hints across
+164 files. **pnpm test** - **501/501** (497 + the 4 new tests).
+**pnpm build** - 711 pages (unchanged - no new routes, only new `<script
+type="application/ld+json">` tags on existing pages). `check:links` (715
+pages), `check:sitemap` (710 entries), `check:perf` (heaviest page still
+`hr/records` at 498.8 KB), `check:precache` (37 URLs), `check:pdfs` (700
+PDFs, after the regeneration above) - all clean. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` from a cold
+start - **804/804 passing** in 9.1 minutes.
+
+**Left for a future pass:** unchanged - the "youngest winner" ranking and
+the individual-award "Tap a year" extension, both still blocked on new
+sourced editorial content. The external link-liveness check stays blocked
+by this environment's egress policy (confirmed again this run, not just
+asserted); it would need a session with broader outbound network access.
+No other JSON-LD gap found on this pass - the competition *index* pages'
+own `buildLatestEditionSportsEvent()` calls were already in place for four
+of six team competitions (World Cup, EURO, Nations League, Copa América);
+`ballon-dor.astro`/`golden-boot.astro` never had one even before this run
+(their `loadCompetition()` calls' generic content-frontmatter `title` -
+"Golden Boot" for both the World Cup and EURO tables - can't stand in for
+a single per-award SportsEvent name the way `data.title` does for the
+four team competitions), which is a separate, smaller gap than the one
+this entry closes; left as a candidate for a future pass rather than
+folded in here, to keep this entry's diff to the one clearly-scoped gap
+its opening paragraph described.
 
 ## Known caveats
 
