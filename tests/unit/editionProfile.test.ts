@@ -59,6 +59,28 @@ const ballonDorTable: MarkdownTable = {
 };
 const ballonDor = buildEditions(ballonDorTable);
 
+// Shaped like content/golden-boot.md's real columns: "Player(s)" and "Team"
+// are both "; "-joined when two or more players tie for the award, and the
+// two joined lists are index-aligned (playerProfile.ts's `teamFor()` already
+// relies on this same alignment for a player's own profile page). Includes
+// a single-winner row, a two-way tie with real team names, and a six-way tie
+// where the Team column falls back to the "Multiple" placeholder instead of
+// naming a team per player - the three shapes the real table actually has.
+const goldenBootTable: MarkdownTable = {
+  headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+  rows: [
+    ['1958', 'Just Fontaine', 'France', '13'],
+    ['1994', 'Hristo Stoichkov; Oleg Salenko', 'Bulgaria; Russia', '6'],
+    ['1962', 'Garrincha; Vavá; Leonel Sánchez; Flórián Albert; Valentin Ivanov; Dražan Jerković', 'Multiple', '4'],
+    // Real content/golden-boot.md row: three tied players but only two Team
+    // names (two of the three - Ferenc Bene, Dezső Novák - both play for
+    // Hungary, named once) - the tie counts disagree, so this must stay
+    // unlinked plain text rather than guess a wrong pairing.
+    ['1964', 'Ferenc Bene; Dezső Novák; Jesús María Pereda', 'Hungary; Spain', '2'],
+  ],
+};
+const goldenBoot = buildEditions(goldenBootTable);
+
 describe('editionSlug', () => {
   it('leaves a plain year as-is', () => {
     expect(editionSlug('1930')).toBe('1930');
@@ -249,6 +271,85 @@ describe('buildEditionProfiles with individualAward', () => {
     const [latest] = buildEditionProfiles(worldCup);
     expect(latest.facts.find((f) => f.label === 'Winner')?.playerSlug).toBeUndefined();
     expect(latest.facts.find((f) => f.label === 'Winner')?.teamSlug).toBe('france');
+  });
+
+  describe('tied scorers (Golden Boot)', () => {
+    const playerSlugs = new Set([
+      'just-fontaine',
+      'hristo-stoichkov',
+      'oleg-salenko',
+      // Deliberately omit one 1962 name (Valentin Ivanov) to exercise the
+      // "no /players/ page generated" gate on a tied part, same contract a
+      // single-winner row already has.
+      'garrincha',
+      'vava',
+      'leonel-sanchez',
+      'florian-albert',
+      'drazan-jerkovic',
+    ]);
+    const teamSlugs = new Set(['france', 'bulgaria', 'russia']);
+
+    it('leaves a single, untied winner exactly as before - no parts', () => {
+      const [profile] = buildEditionProfiles(goldenBoot, teamSlugs, { playerSlugs }).filter(
+        (p) => p.year === '1958',
+      );
+      const winner = profile.facts.find((f) => f.label === 'Player(s)')!;
+      expect(winner.parts).toBeUndefined();
+      expect(winner.playerSlug).toBe('just-fontaine');
+      const team = profile.facts.find((f) => f.label === 'Team')!;
+      expect(team.parts).toBeUndefined();
+      expect(team.teamSlug).toBe('france');
+    });
+
+    it('splits a two-way tie into index-aligned player/team parts', () => {
+      const [profile] = buildEditionProfiles(goldenBoot, teamSlugs, { playerSlugs }).filter(
+        (p) => p.year === '1994',
+      );
+      const winner = profile.facts.find((f) => f.label === 'Player(s)')!;
+      expect(winner.parts?.map((p) => [p.text, p.playerSlug])).toEqual([
+        ['Hristo Stoichkov', 'hristo-stoichkov'],
+        ['Oleg Salenko', 'oleg-salenko'],
+      ]);
+      const team = profile.facts.find((f) => f.label === 'Team')!;
+      expect(team.parts?.map((p) => [p.text, p.teamSlug])).toEqual([
+        ['Bulgaria', 'bulgaria'],
+        ['Russia', 'russia'],
+      ]);
+    });
+
+    it('splits every tied player individually but leaves a "Multiple" Team placeholder unlinked and unsplit', () => {
+      const [profile] = buildEditionProfiles(goldenBoot, teamSlugs, { playerSlugs }).filter(
+        (p) => p.year === '1962',
+      );
+      const winner = profile.facts.find((f) => f.label === 'Player(s)')!;
+      expect(winner.parts).toHaveLength(6);
+      expect(winner.parts?.[0]).toEqual({ text: 'Garrincha', playerSlug: 'garrincha' });
+      // Valentin Ivanov's slug was deliberately left out of playerSlugs above.
+      expect(winner.parts?.find((p) => p.text === 'Valentin Ivanov')).toEqual({ text: 'Valentin Ivanov' });
+
+      const team = profile.facts.find((f) => f.label === 'Team')!;
+      expect(team.parts).toBeUndefined();
+      expect(team.teamSlug).toBeUndefined();
+      expect(team.value).toBe('Multiple');
+    });
+
+    it('leaves the Team column unlinked plain text when its tie count disagrees with Player(s)', () => {
+      const [profile] = buildEditionProfiles(goldenBoot, teamSlugs, {
+        playerSlugs: new Set([...playerSlugs, 'ferenc-bene', 'dezso-novak', 'jesus-maria-pereda']),
+      }).filter((p) => p.year === '1964');
+
+      // Every tied player still links individually...
+      const winner = profile.facts.find((f) => f.label === 'Player(s)')!;
+      expect(winner.parts).toHaveLength(3);
+      expect(winner.parts?.every((p) => p.playerSlug)).toBe(true);
+
+      // ...but the two-name Team cell can't be aligned to three players, so
+      // it is neither split nor linked - just the plain joined text.
+      const team = profile.facts.find((f) => f.label === 'Team')!;
+      expect(team.parts).toBeUndefined();
+      expect(team.teamSlug).toBeUndefined();
+      expect(team.value).toBe('Hungary; Spain');
+    });
   });
 });
 

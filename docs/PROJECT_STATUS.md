@@ -11693,6 +11693,119 @@ EURO top scorers) sharing years, and ties have multiple joint winners
 would need the same index-aligned splitting before Golden Boot's edition
 pages can reuse it safely.
 
+### New feature: per-edition pages for the Golden Boot (FIFA World Cup + UEFA EURO, EN + HR) - added 2026-08-25 (intensive run)
+
+The last competition on the site without edition pages, and the one the
+prior entry flagged as harder than Ballon d'Or for two separate reasons -
+both resolved this run.
+
+**Two route trees instead of one.** `content/golden-boot.md` holds two
+tables that share years (World Cup 1930-2026, EURO 1960-2024), so a single
+`buildEditionProfiles()` call over one merged edition list would collide.
+Rather than force a disambiguation scheme the way Copa América's host suffix
+does, Golden Boot gets two independent route trees -
+`src/pages/competitions/golden-boot/world-cup/[year].astro` and
+`.../golden-boot/euro/[year].astro` (plus Croatian siblings) - each calling
+`buildEditionProfiles()` on its own table's editions only, the same two
+`loadCompetition('golden-boot', { editionsHeading: ... })` calls the parent
+`/competitions/golden-boot` page already makes. No slug collision is
+possible because the two races never share a URL prefix.
+
+**Tied scorers, via `EditionFact.parts` (`src/lib/editionProfile.ts`).**
+Golden Boot's "Player(s)" and "Team" columns are "; "-joined when multiple
+players tie (e.g. 1994's "Hristo Stoichkov; Oleg Salenko" / "Bulgaria;
+Russia", or 1962's six-way tie). The previous `individualAward` mode treated
+a tied cell as one unresolvable joined string; `buildEditionProfiles()` now
+splits it into one `EditionFactPart` per name when the cell contains "; ",
+each independently checked against `playerSlugs`/`teamSlugs` the same way a
+single-winner cell already was. The Team column is index-aligned against the
+Player(s) column's own split - mirroring `playerProfile.ts`'s `teamFor()`,
+which already solved this exact alignment problem for a player's own profile
+page - and is linked only when the two columns' tie counts agree; a
+mismatch (real data: 1964 EURO has three tied players but only two Team
+names, since two of them - Ferenc Bene, Dezső Novák - both play for Hungary
+and it's named once) is left as unlinked plain text rather than guessed,
+same "omit rather than guess" contract `teamFor()` already keeps. The
+"Multiple" placeholder (a tie too large to name a team per player, e.g.
+1962) is recognized via `TEAM_TIE_PLACEHOLDER`, now exported from
+`playerProfile.ts` rather than duplicated, and is never split or linked.
+`EditionFact` gained an optional `parts` array (`EditionFactPart[]`); every
+existing caller that never produces a tied cell (every team competition, and
+Ballon d'Or, which has no tie mechanic) leaves it `undefined` and is
+byte-for-byte unaffected. `EditionView.astro` renders `parts` when present -
+one linked or plain-text span per name, joined with "; " to match the source
+formatting - falling back to the pre-existing single `teamSlug`/`playerSlug`
+branches otherwise.
+
+**The shared back-link, via `EditionView`'s new `backPath` prop.** Every
+earlier edition-page family has its `competitionPath` serve double duty: the
+pager's prev/next base and the "back to all editions" link's target, because
+both point at that competition's one table. Golden Boot's two edition-page
+route trees need `competitionPath` to stay race-specific
+(`/competitions/golden-boot/world-cup`, so the pager doesn't cross-link World
+Cup and EURO years) but the actual competition page with both tables is one
+level up, at the shared `/competitions/golden-boot` - a path with no
+`getStaticPaths` route of its own, which is exactly what
+`docs/PROJECT_STATUS.md`'s `check:links` script caught on the first build
+here (a "back" link to a directory index that doesn't exist). `EditionView`
+gained an optional `backPath` prop that overrides just the back link,
+defaulting to `competitionPath` so every other caller (World Cup, EURO,
+Nations League, Copa América, Ballon d'Or) is unaffected.
+
+**Wiring:** `golden-boot.astro` (EN + HR) gained two `yearLinks` maps - one
+per race, each built with `buildEditionLinks(buildEditionProfiles(race.editions),
+'/competitions/golden-boot/<race>')` - threaded into each race's own
+`TournamentTable` instead of the single `yearLinks` prop every other
+competition page passes. `sitemap.xml.ts` gained two more edition loops
+(World Cup, EURO), reusing the `worldCupGoldenBoot`/`euroGoldenBoot` loads
+and the `playerSlugs` set already built for the `/players/` loop just above
+them.
+
+**Tests:** 8 new Vitest cases (`editionProfile.test.ts`, against a table
+shaped like the real content - a single-winner row, a clean two-way tie, a
+six-way tie with the "Multiple" team placeholder, and the real 1964
+count-mismatch row): an untied winner is unaffected (no `parts`), a two-way
+tie splits into index-aligned player/team parts, a six-way tie splits every
+player individually while leaving "Multiple" unsplit and unlinked, and the
+count-mismatch row leaves Team as plain unlinked text while every tied
+player still links - 496 Vitest total, up from 493 (one pre-existing
+`ballonDor` test file left unchanged). 20 new Playwright cases
+(`tests/e2e/golden-boot-edition-page.spec.ts`): per race - year-cell link
+navigates, an untied winner links player+team separately, a two-way tie
+links both names to their own profiles, a six-way tie links every player but
+leaves "Multiple" as plain text, the 1964 count-mismatch case, the pager,
+oldest-edition-has-no-previous, the back link resolves to the shared
+`/competitions/golden-boot` page (not a 404), no 360px overflow, no WCAG
+violations, and the language switch both ways, plus the Croatian page's
+translated chrome and back-link copy - plus one `mobile.spec.ts`
+sitemap-count assertion updated in place from 630 to 710 (+80 Golden Boot
+edition URLs, 40 editions x 2 languages) with two new `<loc>`/hreflang
+spot-checks (Golden Boot World Cup 1958, EURO 1996). Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` - **791/791
+passing** (up from 771, the 20 new edition-page cases).
+
+**Validation:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across
+163 files. `pnpm test` - 496/496. `pnpm build` - **711 pages** (up from 631:
++80 Golden Boot edition pages, 40 editions x 2 languages: 23 World Cup + 17
+EURO). `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:perf`, `check:precache` all clean. `check:pdfs` flagged every player
+PDF as stale (`playerProfile.ts` itself changed, to export
+`TEAM_TIE_PLACEHOLDER`) - `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+build:pdfs` regenerated all 296 PDFs (no new PDF pages added, same
+"no per-edition PDF yet" precedent every prior edition-page rollout has
+established), `check:pdfs` clean afterward. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` - **791/791
+passing**.
+
+**Left for a future pass:** every competition and both individual awards now
+have edition pages (World Cup, EURO, Nations League, Copa América, Ballon
+d'Or, Golden Boot) - the last item on the edition-pages backlog. (1) the
+same "no downloadable PDF per edition" gap named by every prior edition-page
+entry now also applies to these 80 new pages (World Cup + EURO Golden Boot,
+both languages) - a genuinely future pass, since it spans every edition
+family, not just this one. (2) No other backlog item is currently known;
+see `docs/ROADMAP.md` for what's next.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

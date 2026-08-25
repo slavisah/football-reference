@@ -2,7 +2,7 @@ import type { Edition } from './types';
 import { summaryGroupFor } from './countries';
 import { isPlaceholderWinner } from './editions';
 import { teamProfileSlug } from './teamProfile';
-import { playerProfileSlug } from './playerProfile';
+import { playerProfileSlug, TEAM_TIE_PLACEHOLDER } from './playerProfile';
 
 // One tournament edition as its own reader-facing page: /competitions/
 // <competition>/<year>. Every other "profile" page on this site is keyed by
@@ -64,6 +64,13 @@ function isYearLabel(label: string): boolean {
   return /year/.test(lower) || /season/.test(lower);
 }
 
+/** One name within a tied cell (see `EditionFact.parts`), linked independently of its siblings. */
+export type EditionFactPart = {
+  text: string;
+  teamSlug?: string;
+  playerSlug?: string;
+};
+
 export type EditionFact = {
   /** The raw source column label (e.g. "Runner-up"), so a localized page can translate it through its own `headerLabels` map. */
   label: string;
@@ -72,6 +79,16 @@ export type EditionFact = {
   teamSlug?: string;
   /** Set only when `value` names a player with a `/players/` profile (individual-award edition pages only). */
   playerSlug?: string;
+  /**
+   * Set only when `value` joins two or more names tied for the same award
+   * (Golden Boot's "Player(s)"/"Team" columns, e.g. 1962's six-way tie) -
+   * one linkable part per name, index-aligned with its sibling column the
+   * same way `playerProfile.ts`'s `teamFor()` already aligns Player(s) with
+   * Team for a player's own profile page. `value` is kept as the plain
+   * "; "-joined fallback text; a consumer that doesn't handle `parts` still
+   * renders something correct, just unlinked.
+   */
+  parts?: EditionFactPart[];
 };
 
 export type EditionNeighbour = {
@@ -233,18 +250,44 @@ export function buildEditionProfiles(
   };
 
   const profiles = ordered.map((edition, index) => {
+    const winnerNames = edition.winner.split(';').map((w) => w.trim());
     const facts: EditionFact[] = [];
     for (const cell of edition.cells) {
       if (isYearLabel(cell.label)) continue;
       const value = cell.value.trim();
       const fact: EditionFact = { label: cell.label.trim(), value };
       const isLinkable = value && value !== MISSING_CELL && !isPlaceholderWinner(value);
+      const tiedNames = isLinkable && value.includes(';') ? value.split(';').map((v) => v.trim()) : undefined;
+
       if (isLinkable && individualAward && isPlayerWinnerLabel(cell.label)) {
-        const slug = playerProfileSlug(value);
-        if (individualAward.playerSlugs.has(slug)) fact.playerSlug = slug;
+        if (tiedNames) {
+          fact.parts = tiedNames.map((name) => {
+            const slug = playerProfileSlug(name);
+            return individualAward.playerSlugs.has(slug) ? { text: name, playerSlug: slug } : { text: name };
+          });
+        } else {
+          const slug = playerProfileSlug(value);
+          if (individualAward.playerSlugs.has(slug)) fact.playerSlug = slug;
+        }
       } else if (isLinkable && individualAward && isTeamMemberLabel(cell.label)) {
-        const slug = teamProfileSlug(summaryGroupFor(value).id);
-        if (!teamSlugs || teamSlugs.has(slug)) fact.teamSlug = slug;
+        // "Multiple" is a tie-too-large-to-name-per-player placeholder (see
+        // TEAM_TIE_PLACEHOLDER), never a real team - leave it as plain text.
+        if (!TEAM_TIE_PLACEHOLDER.test(value)) {
+          // Index-aligned with the Player(s) column's own split, mirroring
+          // `playerProfile.ts`'s `teamFor()` - only linked when the two
+          // columns' tie counts actually agree (e.g. 1994's "Hristo
+          // Stoichkov; Oleg Salenko" / "Bulgaria; Russia"); a count mismatch
+          // is left as unlinked plain text rather than guessed.
+          if (tiedNames && tiedNames.length === winnerNames.length) {
+            fact.parts = tiedNames.map((name) => {
+              const slug = teamProfileSlug(summaryGroupFor(name).id);
+              return !teamSlugs || teamSlugs.has(slug) ? { text: name, teamSlug: slug } : { text: name };
+            });
+          } else if (!tiedNames) {
+            const slug = teamProfileSlug(summaryGroupFor(value).id);
+            if (!teamSlugs || teamSlugs.has(slug)) fact.teamSlug = slug;
+          }
+        }
       } else if (isLinkable && !individualAward && isTeamPlacingLabel(cell.label)) {
         const slug = teamProfileSlug(summaryGroupFor(value).id);
         if (!teamSlugs || teamSlugs.has(slug)) fact.teamSlug = slug;

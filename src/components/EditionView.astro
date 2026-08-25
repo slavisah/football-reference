@@ -7,8 +7,22 @@ import type { Locale } from '../lib/i18n';
 
 interface Props {
   profile: EditionProfile;
-  /** Locale-correct competition path, e.g. "/competitions/world-cup". */
+  /**
+   * Locale-correct competition path, e.g. "/competitions/world-cup" - both
+   * the pager's prev/next base (`${competitionPath}/${slug}`) and, by
+   * default, the "back to all editions" link's target.
+   */
   competitionPath: string;
+  /**
+   * Overrides just the "back to all editions" link's target when it isn't
+   * `competitionPath` itself - needed for Golden Boot, whose edition pages
+   * live under `/competitions/golden-boot/world-cup` and `/.../euro` (so the
+   * pager can tell the two races' years apart) but whose actual competition
+   * page, with both races' tables, is the shared `/competitions/golden-boot`
+   * one level up. Every other competition has one table at `competitionPath`
+   * itself, so leaves this unset and gets the old behaviour unchanged.
+   */
+  backPath?: string;
   /** The competition's own display title, e.g. "FIFA World Cup". */
   competitionTitle: string;
   /**
@@ -46,6 +60,7 @@ interface Props {
 const {
   profile,
   competitionPath,
+  backPath,
   competitionTitle,
   story,
   topScorer,
@@ -91,7 +106,30 @@ const isFinalLabel = (raw: string) => /^final$/i.test(raw.trim());
           <div class="edition__fact">
             <dt>{label(fact.label)}</dt>
             <dd>
-              {fact.teamSlug ? (
+              {fact.parts ? (
+                fact.parts.map((part, partIndex) => (
+                  <Fragment>
+                    {partIndex > 0 && '; '}
+                    {part.teamSlug ? (
+                      <a
+                        href={withBase(`${locale === 'hr' ? '/hr' : ''}/teams/${part.teamSlug}`)}
+                        title={teamProfileHintTemplate.replace('{team}', part.text)}
+                      >
+                        {part.text}
+                      </a>
+                    ) : part.playerSlug ? (
+                      <a
+                        href={withBase(`${locale === 'hr' ? '/hr' : ''}/players/${part.playerSlug}`)}
+                        title={playerProfileHintTemplate.replace('{player}', part.text)}
+                      >
+                        {part.text}
+                      </a>
+                    ) : (
+                      part.text
+                    )}
+                  </Fragment>
+                ))
+              ) : fact.teamSlug ? (
                 <a
                   href={withBase(`${locale === 'hr' ? '/hr' : ''}/teams/${fact.teamSlug}`)}
                   title={teamProfileHintTemplate.replace('{team}', fact.value)}
@@ -164,7 +202,7 @@ const isFinalLabel = (raw: string) => /^final$/i.test(raw.trim());
   </nav>
 
   <p class="edition__back">
-    <a href={withBase(competitionPath)}>{fill(backLabel)} &rarr;</a>
+    <a href={withBase(backPath ?? competitionPath)}>{fill(backLabel)} &rarr;</a>
   </p>
 
   <slot />
