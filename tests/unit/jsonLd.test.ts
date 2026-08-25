@@ -4,6 +4,7 @@ import {
   buildChampionsItemList,
   buildCountryRecordsItemList,
   buildDefinedTermSet,
+  buildEditionSportsEvent,
   buildLatestEditionSportsEvent,
   buildQuizJsonLd,
   buildRivalriesItemList,
@@ -149,6 +150,51 @@ describe('buildLatestEditionSportsEvent', () => {
     ];
     const event = buildLatestEditionSportsEvent(outOfOrder, 'FIFA World Cup');
     expect(event?.name).toBe('2026 FIFA World Cup');
+  });
+});
+
+describe('buildEditionSportsEvent', () => {
+  it('builds a SportsEvent for one edition, with its own page url and caller-supplied name', () => {
+    const event = buildEditionSportsEvent(
+      { yearSort: 2022, champion: 'Argentina', host: 'Qatar' },
+      { pageUrl: 'https://example.test/competitions/world-cup/2022/', name: '2022 FIFA World Cup' },
+    );
+
+    expect(event).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'SportsEvent',
+      name: '2022 FIFA World Cup',
+      url: 'https://example.test/competitions/world-cup/2022/',
+      startDate: '2022',
+      sport: 'Football',
+      location: { '@type': 'Place', name: 'Qatar' },
+      competitor: { '@type': 'SportsTeam', name: 'Argentina' },
+    });
+  });
+
+  it('omits location when the edition has no host (e.g. an individual award)', () => {
+    const event = buildEditionSportsEvent(
+      { yearSort: 2025, champion: 'Ousmane Dembélé' },
+      { pageUrl: 'https://example.test/competitions/ballon-dor/2025/', name: "2025 Men's Ballon d'Or" },
+    );
+    expect(event.location).toBeUndefined();
+    expect(event.competitor).toEqual({ '@type': 'SportsTeam', name: 'Ousmane Dembélé' });
+  });
+
+  it('omits competitor for a placeholder "Not awarded" champion', () => {
+    const event = buildEditionSportsEvent(
+      { yearSort: 1942, champion: 'Not awarded' },
+      { pageUrl: 'https://example.test/competitions/ballon-dor/1942/', name: "1942 Men's Ballon d'Or" },
+    );
+    expect(event.competitor).toBeUndefined();
+  });
+
+  it('omits competitor when the champion is an empty string', () => {
+    const event = buildEditionSportsEvent(
+      { yearSort: 2026, champion: '' },
+      { pageUrl: 'https://example.test/competitions/world-cup/2026/', name: '2026 FIFA World Cup' },
+    );
+    expect(event.competitor).toBeUndefined();
   });
 });
 

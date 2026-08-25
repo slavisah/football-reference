@@ -14,7 +14,8 @@ import { buildAllCountryRecords } from '../../../../lib/compare';
 import { loadTeamCompetitions } from '../../../../lib/teamCompetitions';
 import { teamProfileSlug } from '../../../../lib/teamProfile';
 import type { SourceLink } from '../../../../lib/sources';
-import { withBase } from '../../../../lib/url';
+import { absolutePageUrl, withBase } from '../../../../lib/url';
+import { buildEditionSportsEvent } from '../../../../lib/jsonLd';
 
 // Croatian column-label translations, the same map the hr world-cup table page uses.
 const HEADER_LABELS: Record<string, string> = {
@@ -83,6 +84,7 @@ const { profile, story, topScorer, sources, lastReviewed, status } = Astro.props
 const statusText = status === 'verified' ? 'Provjereno' : 'U pregledu';
 
 const runnerUp = profile.facts.find((fact) => /runner-up/i.test(fact.label))?.value;
+const title = `FIFA Svjetsko prvenstvo ${profile.year}.`;
 const description = [
   `FIFA Svjetsko prvenstvo ${profile.year}.:`,
   profile.champion ? `prvak ${profile.champion}${runnerUp ? `, drugoplasirani ${runnerUp}` : ''}.` : '',
@@ -91,14 +93,18 @@ const description = [
 ]
   .filter(Boolean)
   .join(' ');
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
 ---
 
 <BaseLayout
-  title={`FIFA Svjetsko prvenstvo ${profile.year}.`}
+  title={title}
   description={description}
   locale="hr"
   alternateHref={withBase(`/competitions/world-cup/${profile.slug}`)}
   breadcrumbTrail={[{ name: 'FIFA Svjetsko prvenstvo', url: withBase('/hr/competitions/world-cup') }]}
+  jsonLd={jsonLd}
 >
   <EditionView
     profile={profile}

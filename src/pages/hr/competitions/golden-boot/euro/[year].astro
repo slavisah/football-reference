@@ -19,7 +19,8 @@ import {
   type PlayerAwardSource,
 } from '../../../../../lib/playerProfile';
 import type { SourceLink } from '../../../../../lib/sources';
-import { withBase } from '../../../../../lib/url';
+import { absolutePageUrl, withBase } from '../../../../../lib/url';
+import { buildEditionSportsEvent } from '../../../../../lib/jsonLd';
 
 const HEADER_LABELS: Record<string, string> = {
   'Player(s)': 'Igrač(i)',
@@ -76,6 +77,7 @@ type Props = {
 const { profile, sources, lastReviewed, status } = Astro.props as Props;
 const statusText = status === 'verified' ? 'Provjereno' : 'U pregledu';
 
+const title = `Zlatna kopačka EURA ${profile.year}.`;
 const description = isPlaceholderWinner(profile.champion)
   ? `Zlatna kopačka EURA ${profile.year}. nije dodijeljena. Puni podaci iz tablice najboljih strijelaca te godine.`
   : [
@@ -83,14 +85,18 @@ const description = isPlaceholderWinner(profile.champion)
       `pobjednik ${profile.champion}.`,
       'Puni podaci iz tablice najboljih strijelaca, s poveznicom na potpunu povijest nagrada svakog igrača.',
     ].join(' ');
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
 ---
 
 <BaseLayout
-  title={`Zlatna kopačka EURA ${profile.year}.`}
+  title={title}
   description={description}
   locale="hr"
   alternateHref={withBase(`/competitions/golden-boot/euro/${profile.slug}`)}
   breadcrumbTrail={[{ name: 'Zlatna kopačka', url: withBase('/hr/competitions/golden-boot') }]}
+  jsonLd={jsonLd}
 >
   <EditionView
     profile={profile}

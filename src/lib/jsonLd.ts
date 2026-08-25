@@ -96,6 +96,47 @@ export function buildLatestEditionSportsEvent(
 }
 
 /**
+ * A single `/competitions/<competition>/<year>` edition page's own
+ * SportsEvent - the per-edition counterpart of
+ * `buildLatestEditionSportsEvent()` above, which only ever describes the
+ * single most recent edition (built for the competition index page, before
+ * any edition had a page of its own). Every edition now has its own page
+ * (`buildEditionProfiles()`), so the same facts that page already renders
+ * (year, host, champion) belong in that page's own structured data too -
+ * the same "a page family shipped without its own JSON-LD" gap this file's
+ * team/player profile builders already closed once for those two families.
+ * Takes just the three `EditionProfile` fields it needs rather than the
+ * whole type, so a unit test can pass a minimal fixture without importing
+ * `editionProfile.ts`. `name` is supplied by the caller (rather than built
+ * from a competition-name string here) so it can match that page's own
+ * visible `<h1>` text exactly, including the competitions whose heading
+ * doesn't reduce to a plain "{year} {competition}" (e.g. "Final Four UEFA
+ * Lige nacija 2024." or "{competition} {year}." on the Croatian pages).
+ */
+export function buildEditionSportsEvent(
+  profile: { yearSort: number; champion: string; host?: string },
+  options: { pageUrl: string; name: string },
+): JsonLdObject {
+  const { pageUrl, name } = options;
+  const event: JsonLdObject = {
+    '@context': 'https://schema.org',
+    '@type': 'SportsEvent',
+    name,
+    url: pageUrl,
+    startDate: String(profile.yearSort),
+    sport: 'Football',
+  };
+  if (profile.host) {
+    event.location = { '@type': 'Place', name: profile.host };
+  }
+  const champion = profile.champion.trim();
+  if (champion && !isPlaceholderWinner(champion)) {
+    event.competitor = { '@type': 'SportsTeam', name: champion };
+  }
+  return event;
+}
+
+/**
  * The /compare page's "All national teams" ranking (already sorted by
  * `buildAllCountryRecords()`) as an ItemList - the shape schema.org tooling
  * expects for any ranked list, same as `buildChampionsItemList()` above, but

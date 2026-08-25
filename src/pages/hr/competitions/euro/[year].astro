@@ -15,7 +15,8 @@ import { buildAllCountryRecords } from '../../../../lib/compare';
 import { loadTeamCompetitions } from '../../../../lib/teamCompetitions';
 import { teamProfileSlug } from '../../../../lib/teamProfile';
 import type { SourceLink } from '../../../../lib/sources';
-import { withBase } from '../../../../lib/url';
+import { absolutePageUrl, withBase } from '../../../../lib/url';
+import { buildEditionSportsEvent } from '../../../../lib/jsonLd';
 
 // Croatian column-label translations, matching hr/competitions/euro.astro's
 // own headerLabels map.
@@ -86,6 +87,7 @@ const { profile, story, topScorer, sources, lastReviewed, status } = Astro.props
 const statusText = status === 'verified' ? 'Provjereno' : 'U pregledu';
 
 const runnerUp = profile.facts.find((fact) => /runner-up/i.test(fact.label))?.value;
+const title = `UEFA Europsko prvenstvo ${profile.year}.`;
 const description = [
   `UEFA Europsko prvenstvo ${profile.year}.:`,
   profile.champion ? `prvak ${profile.champion}${runnerUp ? `, drugoplasirani ${runnerUp}` : ''}.` : '',
@@ -94,14 +96,18 @@ const description = [
 ]
   .filter(Boolean)
   .join(' ');
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
 ---
 
 <BaseLayout
-  title={`UEFA Europsko prvenstvo ${profile.year}.`}
+  title={title}
   description={description}
   locale="hr"
   alternateHref={withBase(`/competitions/euro/${profile.slug}`)}
   breadcrumbTrail={[{ name: 'UEFA Europsko prvenstvo', url: withBase('/hr/competitions/euro') }]}
+  jsonLd={jsonLd}
 >
   <EditionView
     profile={profile}

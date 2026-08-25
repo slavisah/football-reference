@@ -27,21 +27,34 @@ standing quirks.
   has a downloadable PDF, the same "Download printable PDF" convention every
   other page family already had. See `docs/PROJECT_STATUS.md`'s matching
   entry for the implementation.
+- **Per-edition SportsEvent JSON-LD**: closed 2026-08-25 (fifth intensive
+  run) - every `/competitions/<competition>/<year>` page (all 14 route
+  files, EN + HR) now carries its own `SportsEvent` structured-data block
+  via the new `buildEditionSportsEvent()` (`src/lib/jsonLd.ts`), closing a
+  gap `EditionProfile.champion`'s own doc comment had predicted since the
+  edition-page rollout but that was never actually wired up. See
+  `docs/PROJECT_STATUS.md`'s matching entry for the implementation.
+- A smaller, related gap surfaced while closing the item above but was left
+  open rather than folded in: the `ballon-dor.astro`/`golden-boot.astro`
+  competition *index* pages never got a `buildLatestEditionSportsEvent()`
+  call the way the four team-competition index pages (World Cup, EURO,
+  Nations League, Copa América) already have - blocked on picking a
+  per-award display name, since `loadCompetition()`'s generic
+  content-frontmatter `title` ("Golden Boot" for both the World Cup and
+  EURO tables) can't stand in for one directly. See that 2026-08-25 entry's
+  "Left for a future pass" note for detail.
 - No other concrete, named backlog item is currently known. The next
   intensive-run pass should start from a full-repo health check (`pnpm
   lint`/`test`/`build`/`check:*`, then the full `pnpm test:e2e` suite from a
   cold start) rather than assume one of the items above is secretly
   incomplete - the same approach the 2026-08-19 and 2026-08-24 "quality pass"
   entries in `docs/PROJECT_STATUS.md` already used successfully when the
-  named backlog ran dry. Confirmed clean a fourth consecutive time on
-  2026-08-25 (see that date's "fourth consecutive full-repo health check"
-  entry in `docs/PROJECT_STATUS.md`), this time paired with a hand-audit of
-  every competition/award file's summary-table arithmetic against its own
-  edition table - no discrepancies. If a fifth run also finds nothing, favor
-  a different angle over repeating the same check again (that entry
-  suggests an external link-liveness sweep of `docs/SOURCES.md`, but notes
-  it needs a session with broader outbound network access than this
-  environment's proxy policy allows).
+  named backlog ran dry. An external link-liveness sweep of
+  `docs/SOURCES.md` stays blocked by this environment's outbound network
+  policy - confirmed again 2026-08-25 (a direct `WebFetch` against
+  `en.wikipedia.org` returned `EGRESS_BLOCKED`), not just assumed from an
+  earlier note - so it still needs a session with broader network access
+  than this one has.
 
 ## Ideas not yet scoped as backlog
 

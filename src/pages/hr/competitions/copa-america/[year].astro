@@ -14,7 +14,8 @@ import { buildAllCountryRecords } from '../../../../lib/compare';
 import { loadTeamCompetitions } from '../../../../lib/teamCompetitions';
 import { teamProfileSlug } from '../../../../lib/teamProfile';
 import type { SourceLink } from '../../../../lib/sources';
-import { withBase } from '../../../../lib/url';
+import { absolutePageUrl, withBase } from '../../../../lib/url';
+import { buildEditionSportsEvent } from '../../../../lib/jsonLd';
 
 // Croatian column-label translations, matching hr/competitions/copa-america.astro's own map.
 const HEADER_LABELS: Record<string, string> = {
@@ -79,6 +80,7 @@ const isDisambiguated = profile.slug !== editionSlug(profile.year);
 const yearLabel = isDisambiguated && profile.host ? `${profile.year}. (${profile.host})` : `${profile.year}.`;
 
 const runnerUp = profile.facts.find((fact) => /runner-up/i.test(fact.label))?.value;
+const title = `Copa América ${yearLabel}`;
 const description = [
   `Copa América ${yearLabel}:`,
   profile.champion ? `prvak ${profile.champion}${runnerUp ? `, drugoplasirani ${runnerUp}` : ''}.` : '',
@@ -87,14 +89,18 @@ const description = [
 ]
   .filter(Boolean)
   .join(' ');
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
 ---
 
 <BaseLayout
-  title={`Copa América ${yearLabel}`}
+  title={title}
   description={description}
   locale="hr"
   alternateHref={withBase(`/competitions/copa-america/${profile.slug}`)}
   breadcrumbTrail={[{ name: 'Copa América', url: withBase('/hr/competitions/copa-america') }]}
+  jsonLd={jsonLd}
 >
   <EditionView
     profile={profile}

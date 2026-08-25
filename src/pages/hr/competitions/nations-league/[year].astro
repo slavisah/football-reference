@@ -15,7 +15,8 @@ import { buildAllCountryRecords } from '../../../../lib/compare';
 import { loadTeamCompetitions } from '../../../../lib/teamCompetitions';
 import { teamProfileSlug } from '../../../../lib/teamProfile';
 import type { SourceLink } from '../../../../lib/sources';
-import { withBase } from '../../../../lib/url';
+import { absolutePageUrl, withBase } from '../../../../lib/url';
+import { buildEditionSportsEvent } from '../../../../lib/jsonLd';
 
 // Croatian column-label translations, matching
 // hr/competitions/nations-league.astro's own headerLabels map.
@@ -80,6 +81,7 @@ const { profile, story, sources, lastReviewed, status } = Astro.props as Props;
 const statusText = status === 'verified' ? 'Provjereno' : 'U pregledu';
 
 const runnerUp = profile.facts.find((fact) => /runner-up/i.test(fact.label))?.value;
+const title = `Final Four UEFA Lige nacija ${profile.year}.`;
 const description = [
   `Final Four UEFA Lige nacija ${profile.year}.:`,
   profile.champion ? `prvak ${profile.champion}${runnerUp ? `, drugoplasirani ${runnerUp}` : ''}.` : '',
@@ -88,14 +90,18 @@ const description = [
 ]
   .filter(Boolean)
   .join(' ');
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
 ---
 
 <BaseLayout
-  title={`Final Four UEFA Lige nacija ${profile.year}.`}
+  title={title}
   description={description}
   locale="hr"
   alternateHref={withBase(`/competitions/nations-league/${profile.slug}`)}
   breadcrumbTrail={[{ name: 'UEFA Liga nacija', url: withBase('/hr/competitions/nations-league') }]}
+  jsonLd={jsonLd}
 >
   <EditionView
     profile={profile}
