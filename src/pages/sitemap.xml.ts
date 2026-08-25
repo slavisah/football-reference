@@ -266,6 +266,50 @@ export const GET: APIRoute = async ({ site, url }) => {
     );
   }
 
+  // Per-edition pages for the Golden Boot (src/pages/competitions/golden-boot/
+  // world-cup/[year].astro, .../euro/[year].astro and their Croatian
+  // siblings) - the last competition on the site to get edition pages.
+  // Golden Boot's one content file holds two tables sharing years (World
+  // Cup, EURO), so - unlike every other individualAward competition above -
+  // it gets two separate `buildEditionProfiles()` calls and two route trees
+  // rather than one, reusing the same `worldCupGoldenBoot`/`euroGoldenBoot`
+  // loads and `playerSlugs` set already built for the /players/ loop above.
+  const worldCupGoldenBootLastmodTag = worldCupGoldenBoot.lastReviewed
+    ? `<lastmod>${worldCupGoldenBoot.lastReviewed}</lastmod>`
+    : '';
+  for (const profile of buildEditionProfiles(worldCupGoldenBoot.editions, undefined, { playerSlugs })) {
+    const enPath = `/competitions/golden-boot/world-cup/${profile.slug}`;
+    const hrPath = `/hr/competitions/golden-boot/world-cup/${profile.slug}`;
+    const altLinks = [
+      `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
+      `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
+    ].join('');
+    urlEntries.push(
+      `<url><loc>${xmlEscape(absolute(enPath))}</loc>${worldCupGoldenBootLastmodTag}${altLinks}</url>`,
+    );
+    urlEntries.push(
+      `<url><loc>${xmlEscape(absolute(hrPath))}</loc>${worldCupGoldenBootLastmodTag}${altLinks}</url>`,
+    );
+  }
+
+  const euroGoldenBootLastmodTag = euroGoldenBoot.lastReviewed
+    ? `<lastmod>${euroGoldenBoot.lastReviewed}</lastmod>`
+    : '';
+  for (const profile of buildEditionProfiles(euroGoldenBoot.editions, undefined, { playerSlugs })) {
+    const enPath = `/competitions/golden-boot/euro/${profile.slug}`;
+    const hrPath = `/hr/competitions/golden-boot/euro/${profile.slug}`;
+    const altLinks = [
+      `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
+      `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
+    ].join('');
+    urlEntries.push(
+      `<url><loc>${xmlEscape(absolute(enPath))}</loc>${euroGoldenBootLastmodTag}${altLinks}</url>`,
+    );
+    urlEntries.push(
+      `<url><loc>${xmlEscape(absolute(hrPath))}</loc>${euroGoldenBootLastmodTag}${altLinks}</url>`,
+    );
+  }
+
   const xml =`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urlEntries.join('\n')}\n</urlset>\n`;
 
   return new Response(xml, {

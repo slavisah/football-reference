@@ -2829,7 +2829,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     // alternates - /glossary is a fully bilingual NAV_LINKS entry from launch
     // (see docs/PROJECT_STATUS.md's Glossary entry), so it flows through the
     // main loop like every other top-level page.
-    expect(body.match(/<url>/g)?.length).toBe(630);
+    expect(body.match(/<url>/g)?.length).toBe(710);
     expect(body).toContain(`<loc>${SITE}/glossary/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/glossary/</loc>`);
     expect(body).toContain(`hreflang="hr" href="${SITE}/hr/glossary/"`);
@@ -2865,6 +2865,12 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(body).toContain(`<loc>${SITE}/players/gerd-muller/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/players/gerd-muller/</loc>`);
     expect(body).toContain(`hreflang="hr" href="${SITE}/hr/players/gerd-muller/"`);
+    expect(body).toContain(`<loc>${SITE}/competitions/golden-boot/world-cup/1958/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/competitions/golden-boot/world-cup/1958/</loc>`);
+    expect(body).toContain(`hreflang="hr" href="${SITE}/hr/competitions/golden-boot/world-cup/1958/"`);
+    expect(body).toContain(`<loc>${SITE}/competitions/golden-boot/euro/1996/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/competitions/golden-boot/euro/1996/</loc>`);
+    expect(body).toContain(`hreflang="hr" href="${SITE}/hr/competitions/golden-boot/euro/1996/"`);
     expect(body).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
   });
 

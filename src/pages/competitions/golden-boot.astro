@@ -6,6 +6,7 @@ import EditorialNotes from '../../components/EditorialNotes.astro';
 import References from '../../components/References.astro';
 import PrintDownloadLink from '../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../lib/competition';
+import { buildEditionLinks, buildEditionProfiles } from '../../lib/editionProfile';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import { buildChampionsItemList } from '../../lib/jsonLd';
 
@@ -21,6 +22,19 @@ const [worldCup, euro] = await Promise.all([
     noteHeadings: ['EURO notes'],
   }),
 ]);
+
+// Each table gets its own edition-page route tree (golden-boot/world-cup vs
+// golden-boot/euro - see docs/PROJECT_STATUS.md), so each needs its own
+// `yearLinks` map keyed against its own editions, unlike every other
+// competition page here that only has one table to link.
+const worldCupYearLinks = buildEditionLinks(
+  buildEditionProfiles(worldCup.editions),
+  '/competitions/golden-boot/world-cup',
+);
+const euroYearLinks = buildEditionLinks(
+  buildEditionProfiles(euro.editions),
+  '/competitions/golden-boot/euro',
+);
 
 // Both loads read the same content file, so title/intro/status/review date are
 // identical; the source links differ because each table cites its own section
@@ -74,6 +88,7 @@ const jsonLd = [
         hosts={worldCup.hosts}
         teams={worldCup.teams}
         winnerLabel="Player"
+        yearLinks={worldCupYearLinks}
       />
       <ChampionsSummary
         id="golden-boot-world-cup-champions"
@@ -97,6 +112,7 @@ const jsonLd = [
         hosts={euro.hosts}
         teams={euro.teams}
         winnerLabel="Player"
+        yearLinks={euroYearLinks}
       />
       <ChampionsSummary
         id="golden-boot-euro-champions"
