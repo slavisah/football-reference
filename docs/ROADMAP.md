@@ -34,15 +34,18 @@ standing quirks.
   gap `EditionProfile.champion`'s own doc comment had predicted since the
   edition-page rollout but that was never actually wired up. See
   `docs/PROJECT_STATUS.md`'s matching entry for the implementation.
-- A smaller, related gap surfaced while closing the item above but was left
-  open rather than folded in: the `ballon-dor.astro`/`golden-boot.astro`
-  competition *index* pages never got a `buildLatestEditionSportsEvent()`
-  call the way the four team-competition index pages (World Cup, EURO,
-  Nations League, Copa América) already have - blocked on picking a
-  per-award display name, since `loadCompetition()`'s generic
-  content-frontmatter `title` ("Golden Boot" for both the World Cup and
-  EURO tables) can't stand in for one directly. See that 2026-08-25 entry's
-  "Left for a future pass" note for detail.
+- **Ballon d'Or/Golden Boot index-page SportsEvent**: closed 2026-08-25
+  (sixth intensive run) - `ballon-dor.astro` and `golden-boot.astro` (both
+  EN + HR) now call `buildLatestEditionSportsEvent()` the same way the four
+  team-competition index pages already did. Resolved the "generic title"
+  blocker by passing an explicit per-award name at each call site instead of
+  reusing `loadCompetition()`'s content-frontmatter `title`: Ballon d'Or
+  keeps `data.title`/the page's own Croatian `title` constant (already
+  unambiguous, one table per page), while Golden Boot's two same-titled
+  loads each get their own name ("FIFA World Cup Golden Boot"/"UEFA EURO
+  Golden Boot", "Zlatna kopačka Svjetskog prvenstva"/"Zlatna kopačka EURA"),
+  matching the convention the per-edition Golden Boot pages already
+  established. See `docs/PROJECT_STATUS.md`'s matching entry for detail.
 - No other concrete, named backlog item is currently known. The next
   intensive-run pass should start from a full-repo health check (`pnpm
   lint`/`test`/`build`/`check:*`, then the full `pnpm test:e2e` suite from a

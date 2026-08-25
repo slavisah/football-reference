@@ -20,7 +20,7 @@ import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
 import { buildEditionLinks, buildEditionProfiles } from '../../../lib/editionProfile';
 import { absolutePageUrl, withBase } from '../../../lib/url';
-import { buildChampionsItemList } from '../../../lib/jsonLd';
+import { buildChampionsItemList, buildLatestEditionSportsEvent, type JsonLdObject } from '../../../lib/jsonLd';
 import type { NoteSection } from '../../../lib/notes';
 
 const [worldCup, euro] = await Promise.all([
@@ -69,7 +69,9 @@ const jsonLd = [
     name: 'Najviše osvojenih zlatnih kopački - EURO',
     unit: ['nagrada', 'nagrade'],
   }),
-];
+  buildLatestEditionSportsEvent(worldCup.editions, 'Zlatna kopačka Svjetskog prvenstva'),
+  buildLatestEditionSportsEvent(euro.editions, 'Zlatna kopačka EURA'),
+].filter((item): item is JsonLdObject => item !== undefined);
 
 // Hand-translated from content/golden-boot.md's "How it works", "World Cup
 // notes" and "EURO notes" sections. content/ itself stays untouched and English (the single

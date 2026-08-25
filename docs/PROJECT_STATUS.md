@@ -12089,6 +12089,95 @@ this entry closes; left as a candidate for a future pass rather than
 folded in here, to keep this entry's diff to the one clearly-scoped gap
 its opening paragraph described.
 
+### Quality pass: Ballon d'Or/Golden Boot index pages gain the SportsEvent JSON-LD their four team-competition siblings already had - added 2026-08-25 (sixth intensive run)
+
+Closed the smaller gap the previous entry's "Left for a future pass" note
+named rather than folding in: `ballon-dor.astro` and `golden-boot.astro`
+(both EN + HR - four files) never called `buildLatestEditionSportsEvent()`,
+even though every one of the four team-competition index pages (World Cup,
+EURO, Nations League, Copa América) already had. The English Ballon d'Or
+page even carried an explicit comment justifying the omission ("An
+individual award, not a tournament - no SportsEvent block here") - true
+when it was written (2026-08-15 SEO pass, before individual awards had any
+SportsEvent anywhere on the site), but stale after this file's own
+2026-08-25 "per-edition SportsEvent JSON-LD" entry gave every Ballon
+d'Or/Golden Boot *edition* page a `SportsEvent` block: the index pages were
+the one remaining inconsistency.
+
+The named blocker was real, not imagined: `loadCompetition()`'s generic
+content-frontmatter `title` is `"Golden Boot Winners"` for **both** of
+`golden-boot.astro`'s two `loadCompetition()` calls (World Cup top scorers,
+EURO top scorers - one shared content file), so passing `data.title`
+straight through the way the four team-competition pages do would have
+produced two identical, ambiguous SportsEvent names. Resolved the same way
+the per-edition Golden Boot pages already resolved the identical problem
+(see `src/pages/competitions/golden-boot/{world-cup,euro}/[year].astro`):
+each `buildLatestEditionSportsEvent()` call now takes an explicit name
+literal instead of a loaded title - `'FIFA World Cup Golden Boot'`/`'UEFA
+EURO Golden Boot'` (English), `'Zlatna kopačka Svjetskog
+prvenstva'`/`'Zlatna kopačka EURA'` (Croatian, matching the existing
+`hr/competitions/golden-boot/*/[year].astro` titles). Ballon d'Or needed no
+such workaround - `loadCompetition('ballon-dor', ...)` is called once, so
+its own `data.title` ("Men's Ballon d'Or") and the Croatian page's existing
+`title` constant ("Zlatna lopta") were already unambiguous; both now feed
+`buildLatestEditionSportsEvent()` directly, same as the four team
+competitions. No changes to `src/lib/jsonLd.ts` were needed - the existing
+builder already omits `location` when an edition has no host, which every
+Ballon d'Or/Golden Boot edition satisfies, so no individual-award-specific
+branch was required.
+
+**Verified in the actual build output**, not just by reasoning about the
+call sites: `dist/competitions/ballon-dor/index.html` carries `{"@type":
+"SportsEvent","name":"2025 Men's Ballon d'Or", ...,"competitor":{"@type":
+"SportsTeam","name":"Ousmane Dembélé"}}` with no `location` field;
+`dist/hr/competitions/ballon-dor/index.html` carries the same shape with
+`"name":"2025 Zlatna lopta"`; `dist/competitions/golden-boot/index.html`
+carries two `SportsEvent` blocks, `"2026 FIFA World Cup Golden Boot"`
+(competitor Kylian Mbappé) and `"2024 UEFA EURO Golden Boot"` (competitor
+the full six-way-tie string, exactly as the table itself records it); the
+Croatian sibling carries the matching `"Zlatna kopačka Svjetskog
+prvenstva"`/`"Zlatna kopačka EURA"` names.
+
+Updated the two `tests/e2e/mobile.spec.ts` cases that asserted the *old*
+behavior rather than adding parallel new ones: `'an individual award page
+carries an ItemList but no SportsEvent'` is now `'... carries an ItemList
+and a SportsEvent for the latest edition'` (asserts the block set is
+`['BreadcrumbList', 'ItemList', 'SportsEvent']`, the SportsEvent name, and
+that `location` is `undefined`); `'the Golden Boot page carries one
+ItemList per table'` is now `'... carries one ItemList and one SportsEvent
+per table'` (asserts both SportsEvent names and the World Cup table's
+`competitor`). No other test in the suite asserted the old zero-SportsEvent
+count for these two pages.
+
+Regenerating `ballon-dor.astro`/`golden-boot.astro`'s HTML (all four files)
+changed their content hash, so `pnpm build:pdfs` (via
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) was re-run per the standing
+convention (`check-pdf-freshness.mjs` tracks source-file changes, not just
+visible content) and all 700 PDFs plus the manifest are included in this
+commit.
+
+Full suite after the change: **pnpm lint** - 0 errors/warnings/hints
+across 164 files. **pnpm test** - **501/501** (unchanged - no new unit
+tests; the builder itself was already fully covered by the existing
+`buildLatestEditionSportsEvent` cases). **pnpm build** - 711 pages
+(unchanged - no new routes). `check:links` (715 pages), `check:sitemap`
+(710 entries), `check:perf` (heaviest page still `hr/records` at 498.8 KB,
+unchanged), `check:precache` (37 URLs), `check:pdfs` (700 PDFs, after the
+regeneration above) - all clean. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` from a cold
+start - **804/804 passing** in 6.8 minutes.
+
+**Left for a future pass:** with this gap closed, every live page on the
+site that has an edition/appearance to describe now carries the matching
+SportsEvent/ItemList structured data - no other named JSON-LD gap is known.
+The standing candidates are otherwise unchanged from the previous several
+entries: the "youngest winner" ranking and the individual-award "Tap a
+year" extension stay blocked on new sourced editorial content (birth dates,
+narrative "Memorable moments" prose) not present in `content/` today and
+deliberately not fabricated in an unattended run; the external
+link-liveness sweep of `docs/SOURCES.md` stays blocked by this
+environment's outbound network policy.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
