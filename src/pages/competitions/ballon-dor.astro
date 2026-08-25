@@ -4,7 +4,7 @@ import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
 import { buildEditionLinks, buildEditionProfiles } from '../../lib/editionProfile';
 import { absolutePageUrl, withBase } from '../../lib/url';
-import { buildChampionsItemList } from '../../lib/jsonLd';
+import { buildChampionsItemList, buildLatestEditionSportsEvent, type JsonLdObject } from '../../lib/jsonLd';
 
 const data = await loadCompetition('ballon-dor', {
   editionsHeading: 'Winners',
@@ -14,12 +14,16 @@ const data = await loadCompetition('ballon-dor', {
 
 const yearLinks = buildEditionLinks(buildEditionProfiles(data.editions), '/competitions/ballon-dor');
 
-// An individual award, not a tournament - no SportsEvent block here, only the
-// winners ranking (the same ItemList shape every team competition page uses).
+// Unlike the four team competitions, an individual award has no host - the
+// shared builder already omits `location` when none is given, so the same
+// call the World Cup/EURO/Nations League/Copa América index pages use works
+// here unchanged. `data.title` ("Men's Ballon d'Or") is unambiguous for this
+// page, unlike golden-boot.astro's two same-titled loads below.
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd = [
   buildChampionsItemList(data.champions, { pageUrl, name: `${data.title} - Most awards` }),
-];
+  buildLatestEditionSportsEvent(data.editions, data.title),
+].filter((item): item is JsonLdObject => item !== undefined);
 ---
 
 <BaseLayout

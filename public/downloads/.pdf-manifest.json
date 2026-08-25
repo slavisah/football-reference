@@ -90,7 +90,7 @@
     "src/components/ChampionsSummary.astro": "2809a09ed5528dc1236fecaebc41bd3ff6f78881732cf9f8ebb367588337b3de",
     "src/components/EditorialNotes.astro": "47c2c11227600fb655f75e55f4e3d887eaf4082836013d83c881aba543b283f8",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/competitions/ballon-dor.astro": "ed16b911c8ec3697c319e42161d6892296c3450756bd3166680f7a4debbbd0e1"
+    "src/pages/competitions/ballon-dor.astro": "3f59aa0fc50cedc6fd03288776c81849adae6336f453c716a920e8b2b6e2269c"
   },
   "golden-boot": {
     "content/golden-boot.md": "aad8e5e8d59ed1f4a913ec14427755162909f7a593f976f0f5a3b70aab9e0ca8",
@@ -105,7 +105,7 @@
     "src/components/ChampionsSummary.astro": "2809a09ed5528dc1236fecaebc41bd3ff6f78881732cf9f8ebb367588337b3de",
     "src/components/EditorialNotes.astro": "47c2c11227600fb655f75e55f4e3d887eaf4082836013d83c881aba543b283f8",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/competitions/golden-boot.astro": "786fa0b7acd8d883248dc9ffb46e9e7787dc6409af2e8aef87badaea56b1e4a5"
+    "src/pages/competitions/golden-boot.astro": "810b667bf898df4a5d2a475da9d5ded6ee9c9cef8b4d79e02ae4a69293a8f97e"
   },
   "records": {
     "content/fifa-world-cup.md": "a25c75128ad4c22694f5718c03d52b59dd4a9d8b901f7a19103af8fb730548b6",
@@ -247,7 +247,7 @@
     "src/components/ChampionsSummary.astro": "2809a09ed5528dc1236fecaebc41bd3ff6f78881732cf9f8ebb367588337b3de",
     "src/components/EditorialNotes.astro": "47c2c11227600fb655f75e55f4e3d887eaf4082836013d83c881aba543b283f8",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/hr/competitions/ballon-dor.astro": "9c503ab81c81cb62887220d4e7577edcf718b6fcd4e48ecfb12ff27096c253bc"
+    "src/pages/hr/competitions/ballon-dor.astro": "78eb6c157cea2e7dbb5de7b940e0ec551d93ece094cc31c6e8fbe50ef91009d5"
   },
   "golden-boot-hr": {
     "content/golden-boot.md": "aad8e5e8d59ed1f4a913ec14427755162909f7a593f976f0f5a3b70aab9e0ca8",
@@ -262,7 +262,7 @@
     "src/components/ChampionsSummary.astro": "2809a09ed5528dc1236fecaebc41bd3ff6f78881732cf9f8ebb367588337b3de",
     "src/components/EditorialNotes.astro": "47c2c11227600fb655f75e55f4e3d887eaf4082836013d83c881aba543b283f8",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/hr/competitions/golden-boot.astro": "c090cd0031d09953354cc33dda7e03d766b431fc933a1b5de66dc31ef24f7aaa"
+    "src/pages/hr/competitions/golden-boot.astro": "2f94c1b483cc5f2d55e3abbc0bf306e912e1d57955aac03784da4e6f2ee13da6"
   },
   "records-hr": {
     "content/fifa-world-cup.md": "a25c75128ad4c22694f5718c03d52b59dd4a9d8b901f7a19103af8fb730548b6",

@@ -2942,14 +2942,21 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(sportsEvent.competitor).toEqual({ '@type': 'SportsTeam', name: 'Spain' });
   });
 
-  test('an individual award page carries an ItemList but no SportsEvent', async ({ page }) => {
+  test('an individual award page carries an ItemList and a SportsEvent for the latest edition', async ({
+    page,
+  }) => {
     await page.goto('competitions/ballon-dor');
     const blocks = await jsonLdBlocks(page);
-    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList']);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList', 'SportsEvent']);
     expect(blocks.find((b) => b['@type'] === 'ItemList').name).toContain('Most awards');
+
+    const sportsEvent = blocks.find((b) => b['@type'] === 'SportsEvent');
+    expect(sportsEvent.name).toBe("2025 Men's Ballon d'Or");
+    expect(sportsEvent.location).toBeUndefined();
+    expect(sportsEvent.competitor).toEqual({ '@type': 'SportsTeam', name: 'Ousmane Dembélé' });
   });
 
-  test('the Golden Boot page carries one ItemList per table', async ({ page }) => {
+  test('the Golden Boot page carries one ItemList and one SportsEvent per table', async ({ page }) => {
     await page.goto('competitions/golden-boot');
     const blocks = await jsonLdBlocks(page);
     const lists = blocks.filter((b) => b['@type'] === 'ItemList');
@@ -2958,6 +2965,14 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
       'Most World Cup Golden Boots',
       'Most EURO top-scorer awards',
     ]);
+
+    const sportsEvents = blocks.filter((b) => b['@type'] === 'SportsEvent');
+    expect(sportsEvents).toHaveLength(2);
+    expect(sportsEvents.map((e) => e.name)).toEqual([
+      '2026 FIFA World Cup Golden Boot',
+      '2024 UEFA EURO Golden Boot',
+    ]);
+    expect(sportsEvents[0].competitor).toEqual({ '@type': 'SportsTeam', name: 'Kylian Mbappé' });
   });
 
   test('a translated competition page carries its own Croatian BreadcrumbList/ItemList names', async ({
