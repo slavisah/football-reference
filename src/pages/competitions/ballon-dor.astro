@@ -9,7 +9,7 @@ import { buildChampionsItemList, buildLatestEditionSportsEvent, type JsonLdObjec
 const data = await loadCompetition('ballon-dor', {
   editionsHeading: 'Winners',
   sourcesHeading: "Ballon d'Or",
-  noteHeadings: ['How it works', 'Notes'],
+  noteHeadings: ['How it works', 'Memorable moments', 'Notes'],
 });
 
 const yearLinks = buildEditionLinks(buildEditionProfiles(data.editions), '/competitions/ballon-dor');

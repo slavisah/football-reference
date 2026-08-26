@@ -18,6 +18,7 @@ import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
+import { buildYearStories } from '../../../lib/editions';
 import { buildEditionLinks, buildEditionProfiles } from '../../../lib/editionProfile';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import { buildChampionsItemList, buildLatestEditionSportsEvent, type JsonLdObject } from '../../../lib/jsonLd';
@@ -74,10 +75,24 @@ const jsonLd = [
 ].filter((item): item is JsonLdObject => item !== undefined);
 
 // Hand-translated from content/golden-boot.md's "How it works", "World Cup
-// notes" and "EURO notes" sections. content/ itself stays untouched and English (the single
+// notes"/"World Cup memorable moments" and "EURO notes"/"EURO memorable
+// moments" sections. content/ itself stays untouched and English (the single
 // editorial source of truth); this is presentation-layer text local to this
 // page only, the same way every earlier Croatian competition page hand-writes
 // its own Croatian prose.
+const WORLD_CUP_MOMENTS = [
+  'Guillermo Stábile osvojio je prvu ikad dodijeljenu Zlatnu kopačku Svjetskog prvenstva 1930., s osam golova za Argentinu.',
+  'Just Fontaine postigao je 13 golova za Francusku 1958., što je i dalje rekordan broj golova jednog igrača na jednom Svjetskom prvenstvu.',
+  'Šest igrača izjednačilo se na vrhu ljestvice strijelaca 1962. s po četiri gola - najveća skupina zajedničkih pobjednika u povijesti Zlatne kopačke Svjetskog prvenstva.',
+  'Kylian Mbappé osvojio je Zlatnu kopačku Svjetskog prvenstva 2022. i ponovno 2026., jedini igrač koji je to učinio u dva uzastopna izdanja od 1930., s deset golova 2026. - svojim najboljim rezultatom.',
+];
+const EURO_MOMENTS = [
+  'Prva ikad dodijeljena Zlatna kopačka EURA, 1960., podijeljena je između pet igrača s po dva gola.',
+  'Devet golova Michela Platinija u pet utakmica za Francusku 1984. i danas je rekordan broj golova jednog igrača na jednom EURU.',
+  'Cristiano Ronaldo osvojio je Zlatnu kopačku EURA 2020. s pet golova, na turniru odgođenom za 2021.',
+  'Šest igrača podijelilo je Zlatnu kopačku EURA 2024. s po tri gola - najnovije izdanje ovog natjecanja.',
+];
+
 const notes: NoteSection[] = [
   {
     heading: 'Kako funkcionira',
@@ -97,13 +112,28 @@ const notes: NoteSection[] = [
     ],
   },
   {
+    heading: 'Nezaboravni trenuci - Svjetsko prvenstvo',
+    items: WORLD_CUP_MOMENTS,
+  },
+  {
     heading: 'Napomene o EURU',
     items: [
       'Michel Platini postigao je devet golova u pet utakmica 1984.',
       'UEFA-ina pravila za dodjelu nagrade mijenjala su se tijekom vremena; dijeljeni najbolji strijelci (označeni s "Multiple" u stupcu Reprezentacija) prikazani su izjednačeno, bez jedinstvenog službenog pobjednika za to izdanje.',
     ],
   },
+  {
+    heading: 'Nezaboravni trenuci - EURO',
+    items: EURO_MOMENTS,
+  },
 ];
+
+// "Dodirni godinu za priču", built the same hand-written way this page
+// already builds worldCupYearLinks/euroYearLinks - see the English
+// golden-boot.astro's matching worldCupStories/euroStories for why this
+// can't go through the shared CompetitionView.
+const worldCupStories = buildYearStories(worldCup.editions, WORLD_CUP_MOMENTS);
+const euroStories = buildYearStories(euro.editions, EURO_MOMENTS);
 
 const headerLabels: Record<string, string> = {
   Year: 'Godina',
@@ -167,6 +197,8 @@ const headerLabels: Record<string, string> = {
         bitTeamPrefix="reprezentacija"
         emptyText="Nijedno izdanje ne odgovara odabranim filterima."
         clearFiltersLabel="Očisti filtere"
+        storyColumn={worldCupStories.size > 0 ? { label: 'Priča', values: worldCupStories } : undefined}
+        storySummaryLabel="📖 Dodirni za priču"
         yearLinks={worldCupYearLinks}
       />
       <ChampionsSummary
@@ -210,6 +242,8 @@ const headerLabels: Record<string, string> = {
         bitTeamPrefix="reprezentacija"
         emptyText="Nijedno izdanje ne odgovara odabranim filterima."
         clearFiltersLabel="Očisti filtere"
+        storyColumn={euroStories.size > 0 ? { label: 'Priča', values: euroStories } : undefined}
+        storySummaryLabel="📖 Dodirni za priču"
         yearLinks={euroYearLinks}
       />
       <ChampionsSummary

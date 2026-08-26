@@ -95,6 +95,37 @@ standing quirks.
   pass look past this same health-check shape (dead-code sweep, or a fresh
   read of `docs/WEBSITE_REQUIREMENTS.md` against the live site) since
   repeat clean health checks add less each time.
+- **"Tap a year to reveal a short story" for the two individual awards**:
+  closed 2026-08-26 (eleventh intensive run) - `content/ballon-dor.md` and
+  `content/golden-boot.md` (the latter split into "World Cup memorable
+  moments"/"EURO memorable moments", one per table) now carry a "Memorable
+  moments" section each, extending the feature the four team-competition
+  pages already had. Every bullet is a fact already cross-checked
+  elsewhere in the same content file (the table itself, the "Multiple
+  winners"/"Notes" sections, or the existing team-competition EURO-2020-delay
+  note) rather than new unverified biographical claims - the caution the
+  "not pursued" note below still applies to (birth dates), this doesn't.
+  Wired into both index pages (`ballon-dor.astro`'s `noteHeadings`;
+  `golden-boot.astro`'s hand-built `buildYearStories()`/`storyColumn`, since
+  that page composes its own two-table layout rather than using
+  `CompetitionView`) and all four edition-page route trees
+  (`ballon-dor/[year].astro`, `golden-boot/world-cup/[year].astro`,
+  `golden-boot/euro/[year].astro`, plus their Croatian siblings with
+  hand-translated `CROATIAN_MOMENTS`/`storyColumn` wiring kept in sync with
+  each hr index page's own notes). All 700 PDFs regenerated
+  (`pnpm build:pdfs`) and reverified with `pnpm check:pdfs` (zero drift);
+  full health check (lint/test/build/`check:links`/`check:sitemap`/
+  `check:precache`/`check:perf`) also clean: 505/505 unit tests, 711 pages
+  built, no page-weight or link regressions. The full `pnpm test:e2e` suite
+  (804 tests) was run from a cold start too: it first caught two pre-existing
+  Golden Boot notes-count assertions (`tests/e2e/mobile.spec.ts`) that
+  hardcoded 3 `.notes__card` sections and needed updating to 5 now that each
+  table has its own new moments section, plus a Croatian wording collision
+  (this page's new EURO moment and the pre-existing EURO note both opened
+  with "Michel Platini postigao je devet golova...", so a `getByText` match
+  in the existing test became ambiguous) - reworded that one bullet's word
+  order rather than the test, since the fact stands on its own without
+  echoing the note verbatim. All 804 e2e tests pass after those two fixes.
 
 ## Ideas not yet scoped as backlog
 
@@ -102,13 +133,6 @@ Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned
 into a concrete plan - worth a look next time the health check above comes
 back clean:
 
-- Extend "Tap a year to reveal a short story" (currently the four
-  team-competition tables) to the two individual awards. Checked
-  2026-08-25: `content/ballon-dor.md` and `content/golden-boot.md` have no
-  "Memorable moments" section (the four team-competition files each do),
-  so this is blocked on new editorial narrative content, not a code change
-  - see the "not pursued" note below for why that is not something to
-  fabricate in an unattended run.
 - **Correction (2026-08-25):** the `/records`-style individual-award
   aggregate ranking this line used to ask for is **already live** - "most
   award years apart" is the existing "Longest wait between titles" section,

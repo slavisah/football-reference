@@ -6,6 +6,7 @@ import EditorialNotes from '../../components/EditorialNotes.astro';
 import References from '../../components/References.astro';
 import PrintDownloadLink from '../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../lib/competition';
+import { buildYearStories } from '../../lib/editions';
 import { buildEditionLinks, buildEditionProfiles } from '../../lib/editionProfile';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import { buildChampionsItemList, buildLatestEditionSportsEvent, type JsonLdObject } from '../../lib/jsonLd';
@@ -14,14 +15,27 @@ const [worldCup, euro] = await Promise.all([
   loadCompetition('golden-boot', {
     editionsHeading: 'FIFA World Cup top scorers',
     sourcesHeading: 'FIFA World Cup',
-    noteHeadings: ['How it works', 'World Cup notes'],
+    noteHeadings: ['How it works', 'World Cup notes', 'World Cup memorable moments'],
   }),
   loadCompetition('golden-boot', {
     editionsHeading: 'UEFA EURO top scorers',
     sourcesHeading: 'UEFA EURO',
-    noteHeadings: ['EURO notes'],
+    noteHeadings: ['EURO notes', 'EURO memorable moments'],
   }),
 ]);
+
+// "Tap a year to reveal a short story", same convention CompetitionView
+// applies for every other competition - built by hand here since this page
+// composes its own layout (two tables, not the shared CompetitionView) the
+// same way it already hand-builds worldCupYearLinks/euroYearLinks below.
+const worldCupStories = buildYearStories(
+  worldCup.editions,
+  worldCup.notes.find((section) => section.heading === 'World Cup memorable moments')?.items ?? [],
+);
+const euroStories = buildYearStories(
+  euro.editions,
+  euro.notes.find((section) => section.heading === 'EURO memorable moments')?.items ?? [],
+);
 
 // Each table gets its own edition-page route tree (golden-boot/world-cup vs
 // golden-boot/euro - see docs/PROJECT_STATUS.md), so each needs its own
@@ -97,6 +111,7 @@ const jsonLd = [
         hosts={worldCup.hosts}
         teams={worldCup.teams}
         winnerLabel="Player"
+        storyColumn={worldCupStories.size > 0 ? { label: 'Story', values: worldCupStories } : undefined}
         yearLinks={worldCupYearLinks}
       />
       <ChampionsSummary
@@ -121,6 +136,7 @@ const jsonLd = [
         hosts={euro.hosts}
         teams={euro.teams}
         winnerLabel="Player"
+        storyColumn={euroStories.size > 0 ? { label: 'Story', values: euroStories } : undefined}
         yearLinks={euroYearLinks}
       />
       <ChampionsSummary

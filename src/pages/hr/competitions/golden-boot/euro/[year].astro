@@ -8,7 +8,7 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
 import EditionView from '../../../../../components/EditionView.astro';
 import References from '../../../../../components/References.astro';
 import { loadCompetition } from '../../../../../lib/competition';
-import { isPlaceholderWinner } from '../../../../../lib/editions';
+import { buildYearStories, isPlaceholderWinner } from '../../../../../lib/editions';
 import { buildEditionProfiles, type EditionProfile } from '../../../../../lib/editionProfile';
 import { buildAllCountryRecords } from '../../../../../lib/compare';
 import { loadTeamCompetitions } from '../../../../../lib/teamCompetitions';
@@ -29,6 +29,18 @@ const HEADER_LABELS: Record<string, string> = {
 };
 
 export async function getStaticPaths() {
+  // The Croatian Memorable-moments bullets, matching the hr golden-boot
+  // page's own hand-translation (kept in sync with that page's
+  // `Nezaboravni trenuci - EURO`). Declared inside getStaticPaths since
+  // Astro runs it in an isolated scope that can't see the module's other
+  // frontmatter consts.
+  const CROATIAN_MOMENTS = [
+    'Prva ikad dodijeljena Zlatna kopačka EURA, 1960., podijeljena je između pet igrača s po dva gola.',
+    'Devet golova Michela Platinija u pet utakmica za Francusku 1984. i danas je rekordan broj golova jednog igrača na jednom EURU.',
+    'Cristiano Ronaldo osvojio je Zlatnu kopačku EURA 2020. s pet golova, na turniru odgođenom za 2021.',
+    'Šest igrača podijelilo je Zlatnu kopačku EURA 2024. s po tri gola - najnovije izdanje ovog natjecanja.',
+  ];
+
   const [ballonDor, worldCupGoldenBoot, euroGoldenBoot, teamData] = await Promise.all([
     loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),
     loadCompetition('golden-boot', {
@@ -55,11 +67,13 @@ export async function getStaticPaths() {
   );
 
   const data = euroGoldenBoot;
+  const stories = buildYearStories(data.editions, CROATIAN_MOMENTS);
 
   return buildEditionProfiles(data.editions, teamSlugs, { playerSlugs }).map((profile) => ({
     params: { year: profile.slug },
     props: {
       profile,
+      story: stories.get(profile.year),
       sources: data.sources,
       lastReviewed: data.lastReviewed,
       status: data.status,
@@ -69,12 +83,13 @@ export async function getStaticPaths() {
 
 type Props = {
   profile: EditionProfile;
+  story?: string;
   sources: SourceLink[];
   lastReviewed: string;
   status: string;
 };
 
-const { profile, sources, lastReviewed, status } = Astro.props as Props;
+const { profile, story, sources, lastReviewed, status } = Astro.props as Props;
 const statusText = status === 'verified' ? 'Provjereno' : 'U pregledu';
 
 const title = `Zlatna kopačka EURA ${profile.year}.`;
@@ -103,6 +118,7 @@ const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
     competitionPath="/hr/competitions/golden-boot/euro"
     backPath="/hr/competitions/golden-boot"
     competitionTitle="Zlatna kopačka EURA"
+    story={story}
     locale="hr"
     headerLabels={HEADER_LABELS}
     eyebrow="Generirano iz tablice nagrade"
@@ -114,6 +130,7 @@ const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
     backLabel="Sva izdanja natjecanja {competition}"
     teamProfileHintTemplate="{team} — potpuna povijest"
     playerProfileHintTemplate="{player} — potpuna povijest nagrada"
+    storyHeading="Priča o ovom izdanju"
     glanceHeading="Izdanje {year}. na prvi pogled"
     pdfSlug={`edition-golden-boot-euro-${profile.slug}-hr`}
     pdfLabel="Preuzmi PDF za ispis"

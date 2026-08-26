@@ -21,6 +21,7 @@ import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
+import { buildYearStories } from '../../../lib/editions';
 import { buildEditionLinks, buildEditionProfiles } from '../../../lib/editionProfile';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import { buildChampionsItemList, buildLatestEditionSportsEvent, type JsonLdObject } from '../../../lib/jsonLd';
@@ -46,12 +47,21 @@ const jsonLd = [
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 
-// Hand-translated from content/ballon-dor.md's "How it works" and "Notes"
-// sections. content/
-// itself stays untouched and English (the single editorial source of truth);
-// this is presentation-layer text local to this page only, the same way
-// hr/competitions/copa-america.astro and hr/competitions/nations-league.astro
-// hand-write their own Croatian prose.
+// Hand-translated from content/ballon-dor.md's "How it works", "Memorable
+// moments" and "Notes" sections. content/ itself stays untouched and English
+// (the single editorial source of truth); this is presentation-layer text
+// local to this page only, the same way hr/competitions/copa-america.astro
+// and hr/competitions/nations-league.astro hand-write their own Croatian
+// prose.
+const CROATIAN_MOMENTS = [
+  'Stanley Matthews osvojio je prvu ikad dodijeljenu Zlatnu loptu 1956. godine.',
+  'George Weah je 1995. postao prvi afrički dobitnik Zlatne lopte.',
+  'Kaká je 2007. osvojio Zlatnu loptu prve godine u kojoj je nagrada postala u potpunosti globalna, otvorena igračima bilo koje nacionalnosti i kluba.',
+  'Lionel Messi osvojio je 2009. prvu od svojih osam Zlatnih lopti - više nego ijedan drugi igrač u povijesti nagrade.',
+  'Luka Modrić je 2018. postao jedini hrvatski dobitnik Zlatne lopte.',
+  'Zlatna lopta za 2020. godinu jedino je izdanje koje nije dodijeljeno otkako je nagrada pokrenuta 1956.',
+];
+
 const notes: NoteSection[] = [
   {
     heading: 'Kako funkcionira',
@@ -61,6 +71,10 @@ const notes: NoteSection[] = [
       'Uvjeti prihvatljivosti proširivali su se tijekom vremena: isprva samo Europljani, zatim od 1995. igrači bilo koje nacionalnosti u europskim klubovima, a od 2007. nagrada je potpuno globalna (pogledajte uvod iznad).',
       'Pobjednik se objavljuje na svečanosti krajem godine koju organizira magazin France Football.',
     ],
+  },
+  {
+    heading: 'Nezaboravni trenuci',
+    items: CROATIAN_MOMENTS,
   },
   {
     heading: 'Napomene',
@@ -73,6 +87,12 @@ const notes: NoteSection[] = [
     ],
   },
 ];
+
+// "Dodirni godinu za priču": joins the Croatian Memorable-moments bullets
+// above onto the matching edition row by year, same as the English page's
+// CompetitionView does with the English bullets - see buildYearStories() in
+// src/lib/editions.ts.
+const stories = buildYearStories(data.editions, CROATIAN_MOMENTS);
 
 const headerLabels: Record<string, string> = {
   Year: 'Godina',
@@ -135,6 +155,8 @@ const headerLabels: Record<string, string> = {
       bitTeamPrefix="reprezentacija"
       emptyText="Nijedno izdanje ne odgovara odabranim filterima."
       clearFiltersLabel="Očisti filtere"
+      storyColumn={stories.size > 0 ? { label: 'Priča', values: stories } : undefined}
+      storySummaryLabel="📖 Dodirni za priču"
     />
 
     <ChampionsSummary

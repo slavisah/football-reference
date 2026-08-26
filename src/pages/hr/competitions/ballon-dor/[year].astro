@@ -9,7 +9,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import EditionView from '../../../../components/EditionView.astro';
 import References from '../../../../components/References.astro';
 import { loadCompetition } from '../../../../lib/competition';
-import { distinctWinners, isPlaceholderWinner } from '../../../../lib/editions';
+import { buildYearStories, distinctWinners, isPlaceholderWinner } from '../../../../lib/editions';
 import { buildEditionProfiles, type EditionProfile } from '../../../../lib/editionProfile';
 import { buildAllCountryRecords } from '../../../../lib/compare';
 import { loadTeamCompetitions } from '../../../../lib/teamCompetitions';
@@ -27,6 +27,19 @@ const HEADER_LABELS: Record<string, string> = {
 };
 
 export async function getStaticPaths() {
+  // The Croatian Memorable-moments bullets, matching the hr competition
+  // page's own hand-translation (kept in sync with that page's `Nezaboravni
+  // trenuci`). Declared inside getStaticPaths since Astro runs it in an
+  // isolated scope that can't see the module's other frontmatter consts.
+  const CROATIAN_MOMENTS = [
+    'Stanley Matthews osvojio je prvu ikad dodijeljenu Zlatnu loptu 1956. godine.',
+    'George Weah je 1995. postao prvi afrički dobitnik Zlatne lopte.',
+    'Kaká je 2007. osvojio Zlatnu loptu prve godine u kojoj je nagrada postala u potpunosti globalna, otvorena igračima bilo koje nacionalnosti i kluba.',
+    'Lionel Messi osvojio je 2009. prvu od svojih osam Zlatnih lopti - više nego ijedan drugi igrač u povijesti nagrade.',
+    'Luka Modrić je 2018. postao jedini hrvatski dobitnik Zlatne lopte.',
+    'Zlatna lopta za 2020. godinu jedino je izdanje koje nije dodijeljeno otkako je nagrada pokrenuta 1956.',
+  ];
+
   const [data, teamData] = await Promise.all([
     loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),
     loadTeamCompetitions(),
@@ -36,11 +49,13 @@ export async function getStaticPaths() {
     buildAllCountryRecords(teamData.competitions).map((record) => teamProfileSlug(record.id)),
   );
   const playerSlugs = new Set(distinctWinners(data.editions).map((name) => playerProfileSlug(name)));
+  const stories = buildYearStories(data.editions, CROATIAN_MOMENTS);
 
   return buildEditionProfiles(data.editions, teamSlugs, { playerSlugs }).map((profile) => ({
     params: { year: profile.slug },
     props: {
       profile,
+      story: stories.get(profile.year),
       sources: data.sources,
       lastReviewed: data.lastReviewed,
       status: data.status,
@@ -50,12 +65,13 @@ export async function getStaticPaths() {
 
 type Props = {
   profile: EditionProfile;
+  story?: string;
   sources: SourceLink[];
   lastReviewed: string;
   status: string;
 };
 
-const { profile, sources, lastReviewed, status } = Astro.props as Props;
+const { profile, story, sources, lastReviewed, status } = Astro.props as Props;
 const statusText = status === 'verified' ? 'Provjereno' : 'U pregledu';
 
 const nationalTeam = profile.facts.find((fact) => /national team/i.test(fact.label))?.value;
@@ -84,6 +100,7 @@ const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
     profile={profile}
     competitionPath="/hr/competitions/ballon-dor"
     competitionTitle="Zlatna lopta"
+    story={story}
     locale="hr"
     headerLabels={HEADER_LABELS}
     eyebrow="Generirano iz tablice nagrade"
@@ -95,6 +112,7 @@ const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
     backLabel="Sva izdanja natjecanja {competition}"
     teamProfileHintTemplate="{team} — potpuna povijest"
     playerProfileHintTemplate="{player} — potpuna povijest nagrada"
+    storyHeading="Priča o ovom izdanju"
     glanceHeading="Izdanje {year}. na prvi pogled"
     pdfSlug={`edition-ballon-dor-${profile.slug}-hr`}
     pdfLabel="Preuzmi PDF za ispis"
