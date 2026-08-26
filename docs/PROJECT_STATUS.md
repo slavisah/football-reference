@@ -12247,6 +12247,55 @@ pass should re-run `pnpm test:coverage` from scratch to look for one freshly
 opened by new code rather than assume the four standing lines are secretly
 reachable.
 
+### Quality pass: eighth full-repo health check (cold-start Playwright e2e included) - added 2026-08-26 (eighth intensive run)
+
+With the prior entry's own coverage sweep turning up nothing further to
+close and `docs/ROADMAP.md`'s "Open backlog" still empty, this run took the
+file's own standing advice literally: a fresh full-repo health check from a
+cold start, rather than assume the seventh run's "no concrete gap remains"
+conclusion was still current.
+
+**Everything came back clean, no code change needed:** `pnpm lint`
+(`astro check`) - 0 errors/warnings/hints across 164 files. `pnpm test` -
+**505/505**. `pnpm test:coverage` - whole-repo `src/lib` average
+**99.91%/99.42%** (statements/branches), identical to the 2026-08-26
+"editionProfile.ts/comparePlayers.ts/playerProfile.ts" entry immediately
+above - the same four single-line branches (`quiz.ts` line 283, `sources.ts`
+line 33, `tableSort.ts` line 22, `url.ts` line 8) remain the only gap, and
+re-reading that entry's per-line reasoning again still holds: each needs an
+input no real caller constructs. `pnpm build` - 711 pages. `check:links`
+(715 pages), `check:sitemap` (710 entries), `check:perf` (heaviest page
+still `hr/records` at 498.8 KB, under the 510 KB budget), `check:precache`
+(37 URLs), `check:pdfs` (700 PDFs) - all clean. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` from a cold
+start - **804/804 passing** in 10.6 minutes at the default worker count (2);
+no `--workers=1` workaround needed, consistent with the 2026-08-25 entry
+that first found the default worker count sufficient in this environment.
+(Note for future runs: the bare `/opt/pw-browsers/chromium` symlink *is*
+the Chrome binary - appending `/chrome-linux/chrome` to it, as if it were
+the versioned `chromium-1194/` directory, fails with "executable doesn't
+exist"; this run hit that once before finding the path this entry and the
+2026-08-25 entry both already record.)
+
+**Standing blockers re-confirmed, not just assumed:** the `typescript` 7
+upgrade is still gated on `@astrojs/check` - `npm view @astrojs/check@latest
+peerDependencies` shows `{ typescript: '^5.0.0 || ^6.0.0' }` as of today, and
+0.9.10 (installed) is still the latest published version, so there is no
+newer release to pick up. The `docs/SOURCES.md` link-liveness sweep is still
+blocked by this environment's outbound network policy - a direct `curl` to
+`https://en.wikipedia.org` returned a `403` from the egress proxy's CONNECT
+tunnel, the same shape of block the 2026-08-25 entry's `WebFetch` attempt
+hit.
+
+**Left for a future pass:** unchanged - the "youngest winner" ranking and
+the individual-award "Tap a year" extension stay blocked on new sourced
+editorial content; the link-liveness sweep and the `typescript` 7 upgrade
+stay blocked on this environment's network policy and `@astrojs/check`'s
+own peer-dependency ceiling, respectively, neither of which this run can
+change. No concrete, named backlog item or test-coverage gap remains on
+record; a future pass should repeat this same health-check-first approach
+before assuming otherwise.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
