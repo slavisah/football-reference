@@ -65,13 +65,13 @@ function isYearLabel(label: string): boolean {
 }
 
 /** One name within a tied cell (see `EditionFact.parts`), linked independently of its siblings. */
-export type EditionFactPart = {
+type EditionFactPart = {
   text: string;
   teamSlug?: string;
   playerSlug?: string;
 };
 
-export type EditionFact = {
+type EditionFact = {
   /** The raw source column label (e.g. "Runner-up"), so a localized page can translate it through its own `headerLabels` map. */
   label: string;
   value: string;
@@ -91,7 +91,7 @@ export type EditionFact = {
   parts?: EditionFactPart[];
 };
 
-export type EditionNeighbour = {
+type EditionNeighbour = {
   slug: string;
   year: string;
   /**

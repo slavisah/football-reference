@@ -127,6 +127,22 @@ standing quirks.
   order rather than the test, since the fact stands on its own without
   echoing the note verbatim. All 804 e2e tests pass after those two fixes.
 
+- **Dead-code/unused-export sweep**: closed 2026-08-26 (twelfth intensive
+  run) - ran `pnpm dlx knip --no-config-hints` (the tenth run's own
+  suggestion for a pass that isn't another repeat health check) and fixed
+  what it found: deleted the genuinely-unused `DEFAULT_LOCALE` constant
+  (`src/lib/i18n.ts`) and dropped the unneeded `export` keyword from nine
+  types across `comparePlayers.ts`, `editionProfile.ts`, `playerProfile.ts`,
+  `tableSort.ts`, `teamProfile.ts` and `types.ts` that are used only inside
+  their own file. One `knip`-flagged "unused file"
+  (`scripts/test-preview-server.mjs`) was a false positive - it's invoked
+  as a shell string from `playwright.config.ts`'s `webServer.command`,
+  which static import-graph analysis can't see - confirmed and left as-is.
+  All 700 PDFs regenerated and reverified clean after the edit (source
+  files changed bytes even though behavior didn't). Full health check
+  clean: 505/505 unit tests, 99.91%/99.42% coverage (unchanged), 711 pages
+  built. See `docs/PROJECT_STATUS.md`'s matching entry for detail.
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

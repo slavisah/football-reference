@@ -9,7 +9,7 @@ export type MarkdownTable = {
 };
 
 /** One column value of an edition row, keeping its original column label. */
-export type EditionCell = {
+type EditionCell = {
   label: string;
   value: string;
 };

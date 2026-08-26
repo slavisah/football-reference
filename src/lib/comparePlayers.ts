@@ -7,7 +7,7 @@ import type { PlayerProfile } from './playerProfile';
 // explicitly excludes Ballon d'Or and Golden Boot ("they recognize players,
 // not national teams"), so this page is where that comparison lives instead.
 
-export type ComparePlayerAward = {
+type ComparePlayerAward = {
   title: string;
   slug: string;
   count: number;

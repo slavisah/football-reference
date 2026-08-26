@@ -12413,6 +12413,80 @@ rather than against `docs/ROADMAP.md`'s own summary of it - since a fourth
 or fifth consecutive "everything is clean" health check adds
 proportionally less than the first one did.
 
+### Dead-code/unused-export sweep - added 2026-08-26 (twelfth intensive run)
+
+With the backlog still empty, this run took the tenth run's own suggestion
+to look past the standing health-check shape: ran `pnpm dlx knip
+--no-config-hints` (not installed as a dependency; knip needs no project
+config to do a useful first pass) to find unused files and exported
+symbols the four/five consecutive clean health checks wouldn't surface,
+since none of them look for exports nothing imports.
+
+**Findings, each verified by hand before touching anything (knip's static
+analysis can false-positive on strings and comments):**
+
+- `scripts/test-preview-server.mjs` flagged as an "unused file" - false
+  positive. It's invoked from `playwright.config.ts`'s
+  `webServer.command` as a shell string (`'pnpm build && node
+  scripts/test-preview-server.mjs'`), which knip's import-graph analysis
+  doesn't parse. Confirmed by reading `playwright.config.ts` directly; left
+  untouched.
+- `DEFAULT_LOCALE` (`src/lib/i18n.ts`) - genuinely dead. `grep`ing the
+  whole repo (not just `src/`) found only its own declaration; every
+  locale-aware component defaults its own `locale` prop to the `'en'`
+  literal directly, exactly as `i18n.ts`'s own top-of-file comment already
+  documented ("every component that takes a `locale` prop defaults to
+  'en'"), so this constant never had a caller. Deleted.
+- Eight exported types (`ComparePlayerAward` in `comparePlayers.ts`;
+  `EditionFactPart`/`EditionFact`/`EditionNeighbour` in `editionProfile.ts`;
+  `PlayerAppearance` in `playerProfile.ts`; `SortRole` in `tableSort.ts`;
+  `TeamAppearance` in `teamProfile.ts`; `EditionCell` in `types.ts`) - each
+  genuinely used, but only inside the file that declares it; nothing
+  anywhere else imports any of them (`grep -rn "\b<Name>\b"` across
+  `src/`, `tests/`, and every `.astro`/`.ts`/`.mjs` file turned up no
+  `import` site for any of the eight, only same-file uses and, for
+  `EditionFact`, two doc-comment mentions in unrelated route files). Kept
+  every type exactly as-is and only dropped the unneeded `export` keyword
+  on each - the type itself is still doing real work as an internal alias,
+  it just never needed to be part of the module's public surface. A second
+  `knip` pass after the first fix caught a ninth (`EditionFact` itself,
+  masked by `EditionFactPart`'s export on the first pass) - same treatment,
+  confirmed the same way.
+
+No behavioral change: same public API for every module a page or another
+`src/lib` file actually imports from. Full health check re-run after the
+edits: `pnpm dlx knip --no-config-hints` clean except the one confirmed
+false positive above; `pnpm lint` (`astro check`) - 0
+errors/warnings/hints across 164 files; `pnpm test` - **505/505**; `pnpm
+test:coverage` - **99.91%/99.42%** statements/branches, byte-identical to
+every prior run's baseline (same four single-line branches: `quiz.ts` line
+283, `sources.ts` line 33, `tableSort.ts` line 22, `url.ts` line 8); `pnpm
+build` - 711 pages, unchanged; `check:links` (715 pages), `check:sitemap`
+(710 entries), `check:perf` (heaviest page still `hr/records` at 498.8 KB)
+- all clean, all unchanged. `check:pdfs` initially flagged every PDF
+derived from `editionProfile.ts`/`playerProfile.ts`/`comparePlayers.ts`/
+`teamProfile.ts`/`tableSort.ts`/`i18n.ts` as stale, since the PDF-freshness
+manifest hashes source files rather than their compiled output and this
+run edited those files' bytes even though their behavior didn't change;
+regenerated with `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+build:pdfs` (the pinned `chromium_headless_shell` build the plain
+`pnpm build:pdfs` invocation looks for isn't the one installed in this
+environment, the same override `tests/e2e` and the eleventh run's own PDF
+regeneration already needed) and reverified with `pnpm check:pdfs` -
+zero drift after regeneration.
+
+**Left for a future pass:** the `typescript` 7 upgrade and the
+`docs/SOURCES.md` link-liveness sweep stay blocked on `@astrojs/check`'s
+peer-dependency ceiling and this environment's outbound network policy,
+respectively - neither checked again this run since nothing here would
+change either. The "youngest winner" ranking stays blocked on unsourced
+birth-date data, unchanged. `knip` is not installed as a project
+dependency (this run reached it via `pnpm dlx`, once); a future pass could
+add project-specific config (entry points, ignored patterns) to make a
+committed `knip` script part of the standing health check rather than a
+one-off, if repeat dead-code drift turns out to be common enough to
+justify it.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
