@@ -24,7 +24,13 @@ import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PDF_PAGES, TEAM_PDF_SOURCES, PLAYER_PDF_SOURCES } from './pdf-pages.mjs';
+import {
+  PDF_PAGES,
+  TEAM_PDF_SOURCES,
+  PLAYER_PDF_SOURCES,
+  EDITION_PDF_SOURCES,
+  editionFamilyFromSlug,
+} from './pdf-pages.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const MANIFEST_PATH = path.join(ROOT, 'public', 'downloads', '.pdf-manifest.json');
@@ -68,6 +74,23 @@ function playerSourcesFromManifest(manifest) {
   );
 }
 
+// Same trust-the-manifest-keys strategy as teamSourcesFromManifest() above,
+// for the `edition-<family>-<slug>[-hr]` PDFs - see scripts/pdf-pages.mjs's
+// EDITION_PDF_SOURCES doc comment. Unlike the team/player cases, there isn't
+// one shared source list for every entry - `family` (recovered from the key
+// itself via editionFamilyFromSlug()) picks which one applies. A key that
+// somehow doesn't resolve to a known family (should be impossible - every
+// key in the manifest was written by generate-pdfs.mjs from EDITION_PDF_SOURCES'
+// own keys) is skipped rather than crashing the whole check.
+function editionSourcesFromManifest(manifest) {
+  return Object.fromEntries(
+    Object.keys(manifest)
+      .filter((slug) => slug.startsWith('edition-'))
+      .map((slug) => [slug, EDITION_PDF_SOURCES[editionFamilyFromSlug(slug)]])
+      .filter(([, sources]) => sources !== undefined),
+  );
+}
+
 async function hashFile(relativePath) {
   const contents = await readFile(path.join(ROOT, relativePath), 'utf8');
   return createHash('sha256').update(contents).digest('hex');
@@ -105,6 +128,7 @@ async function main() {
     ...PDF_SOURCES,
     ...teamSourcesFromManifest(manifest),
     ...playerSourcesFromManifest(manifest),
+    ...editionSourcesFromManifest(manifest),
   };
   const current = await currentHashes(sources);
   const stale = [];

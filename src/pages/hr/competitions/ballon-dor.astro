@@ -21,14 +21,17 @@ import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
+import { buildEditionLinks, buildEditionProfiles } from '../../../lib/editionProfile';
 import { absolutePageUrl, withBase } from '../../../lib/url';
-import { buildChampionsItemList } from '../../../lib/jsonLd';
+import { buildChampionsItemList, buildLatestEditionSportsEvent, type JsonLdObject } from '../../../lib/jsonLd';
 import type { NoteSection } from '../../../lib/notes';
 
 const data = await loadCompetition('ballon-dor', {
   editionsHeading: 'Winners',
   sourcesHeading: "Ballon d'Or",
 });
+
+const yearLinks = buildEditionLinks(buildEditionProfiles(data.editions), '/hr/competitions/ballon-dor');
 
 const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 
@@ -40,7 +43,8 @@ const title = 'Zlatna lopta';
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd = [
   buildChampionsItemList(data.champions, { pageUrl, name: `${title} - najviše nagrada` }),
-];
+  buildLatestEditionSportsEvent(data.editions, title),
+].filter((item): item is JsonLdObject => item !== undefined);
 
 // Hand-translated from content/ballon-dor.md's "How it works" and "Notes"
 // sections. content/
@@ -112,6 +116,7 @@ const headerLabels: Record<string, string> = {
       winners={data.winners}
       hosts={data.hosts}
       teams={data.teams}
+      yearLinks={yearLinks}
       locale="hr"
       headerLabels={headerLabels}
       winnerLabel="Pobjednik"

@@ -9,6 +9,7 @@
 // standalone reference both that tooltip and any other page can point a
 // reader to.
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PrintDownloadLink from '../components/PrintDownloadLink.astro';
 import { loadPageMeta } from '../lib/competition';
 import { loadGlossaryEntries } from '../lib/glossary';
 import { absolutePageUrl, withBase } from '../lib/url';
@@ -54,6 +55,7 @@ const reviewedLabel = Number.isNaN(reviewed.getTime())
           <time datetime={meta.lastReviewed}>{reviewedLabel}</time>
         </span>
       </p>
+      <PrintDownloadLink slug="glossary" hint="A4, same terms as this page." />
     </header>
 
     <section class="card stack" aria-labelledby="terms-heading">

@@ -1,0 +1,104 @@
+---
+// One page per Copa América edition, mirroring src/pages/competitions/
+// world-cup/[year].astro's pattern. The one real difference: Copa América
+// played two tournaments in 1959 (Argentina-hosted, then Ecuador-hosted -
+// see content/copa-america.md), so `buildEditionProfiles()` disambiguates
+// that pair's slugs by host ("1959-argentina"/"1959-ecuador" rather than a
+// collision on plain "1959") and this page folds the host into its title/
+// description/heading whenever `profile.slug` isn't just the plain year, so
+// the two 1959 pages read as distinct destinations rather than two
+// identical-looking "1959 Copa América" pages.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import EditionView from '../../../components/EditionView.astro';
+import References from '../../../components/References.astro';
+import { loadCompetition } from '../../../lib/competition';
+import { buildYearStories } from '../../../lib/editions';
+import { buildEditionProfiles, editionSlug, type EditionProfile } from '../../../lib/editionProfile';
+import { buildAllCountryRecords } from '../../../lib/compare';
+import { loadTeamCompetitions } from '../../../lib/teamCompetitions';
+import { teamProfileSlug } from '../../../lib/teamProfile';
+import type { SourceLink } from '../../../lib/sources';
+import { absolutePageUrl, withBase } from '../../../lib/url';
+import { buildEditionSportsEvent } from '../../../lib/jsonLd';
+
+export async function getStaticPaths() {
+  const [data, teamData] = await Promise.all([
+    loadCompetition('copa-america', {
+      editionsHeading: 'Champions timeline',
+      sourcesHeading: 'Copa América',
+      allowDuplicateYears: ['1959'],
+      noteHeadings: ['Memorable moments'],
+    }),
+    loadTeamCompetitions(),
+  ]);
+
+  const teamSlugs = new Set(
+    buildAllCountryRecords(teamData.competitions).map((record) => teamProfileSlug(record.id)),
+  );
+
+  const stories = buildYearStories(
+    data.editions,
+    data.notes.find((section) => section.heading === 'Memorable moments')?.items ?? [],
+  );
+
+  return buildEditionProfiles(data.editions, teamSlugs).map((profile) => ({
+    params: { year: profile.slug },
+    props: {
+      profile,
+      story: stories.get(profile.year),
+      sources: data.sources,
+      lastReviewed: data.lastReviewed,
+      status: data.status,
+    },
+  }));
+}
+
+type Props = {
+  profile: EditionProfile;
+  story?: string;
+  sources: SourceLink[];
+  lastReviewed: string;
+  status: string;
+};
+
+const { profile, story, sources, lastReviewed, status } = Astro.props as Props;
+
+// True only for the two 1959 editions - every other Copa América year has a
+// plain, unambiguous slug.
+const isDisambiguated = profile.slug !== editionSlug(profile.year);
+const yearLabel = isDisambiguated && profile.host ? `${profile.year} (${profile.host})` : profile.year;
+
+const runnerUp = profile.facts.find((fact) => /runner-up/i.test(fact.label))?.value;
+const title = `${yearLabel} Copa América`;
+const description = [
+  `The ${yearLabel} Copa América:`,
+  profile.champion ? `${profile.champion} champion${runnerUp ? `, ${runnerUp} runner-up` : ''}.` : '',
+  profile.host ? `Hosted by ${profile.host}.` : '',
+  'Full placings and that edition’s final result.',
+]
+  .filter(Boolean)
+  .join(' ');
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  alternateHref={withBase(`/hr/competitions/copa-america/${profile.slug}`)}
+  breadcrumbTrail={[{ name: 'Copa América', url: withBase('/competitions/copa-america') }]}
+  jsonLd={jsonLd}
+>
+  <EditionView
+    profile={profile}
+    competitionPath="/competitions/copa-america"
+    competitionTitle="Copa América"
+    story={story}
+    headingTemplate={`${yearLabel} {competition}`}
+    glanceHeading={`${yearLabel} at a glance`}
+    pdfSlug={`edition-copa-america-${profile.slug}`}
+  >
+    <References sources={sources} lastReviewed={lastReviewed} status={status} />
+  </EditionView>
+</BaseLayout>

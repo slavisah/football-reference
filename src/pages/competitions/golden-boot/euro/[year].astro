@@ -1,0 +1,100 @@
+---
+// One page per UEFA EURO Golden Boot edition - the EURO half of Golden
+// Boot's edition-page rollout; see golden-boot/world-cup/[year].astro (its
+// sibling route) for the full context on why Golden Boot needed both a
+// second route tree (two tables sharing years) and `EditionFact.parts`
+// (tied scorers) before it could get edition pages at all.
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import EditionView from '../../../../components/EditionView.astro';
+import References from '../../../../components/References.astro';
+import { loadCompetition } from '../../../../lib/competition';
+import { isPlaceholderWinner } from '../../../../lib/editions';
+import { buildEditionProfiles, type EditionProfile } from '../../../../lib/editionProfile';
+import { buildAllCountryRecords } from '../../../../lib/compare';
+import { loadTeamCompetitions } from '../../../../lib/teamCompetitions';
+import { teamProfileSlug } from '../../../../lib/teamProfile';
+import { buildAllPlayerProfiles, playerProfileSlug, type PlayerAwardSource } from '../../../../lib/playerProfile';
+import type { SourceLink } from '../../../../lib/sources';
+import { absolutePageUrl, withBase } from '../../../../lib/url';
+import { buildEditionSportsEvent } from '../../../../lib/jsonLd';
+
+export async function getStaticPaths() {
+  const [ballonDor, worldCupGoldenBoot, euroGoldenBoot, teamData] = await Promise.all([
+    loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'FIFA World Cup top scorers',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'UEFA EURO top scorers',
+      sourcesHeading: 'UEFA EURO',
+    }),
+    loadTeamCompetitions(),
+  ]);
+
+  const teamSlugs = new Set(
+    buildAllCountryRecords(teamData.competitions).map((record) => teamProfileSlug(record.id)),
+  );
+  const playerSources: PlayerAwardSource[] = [
+    { title: "Ballon d'Or", slug: 'ballon-dor', editions: ballonDor.editions },
+    { title: 'FIFA World Cup Golden Boot', slug: 'golden-boot', editions: worldCupGoldenBoot.editions },
+    { title: 'UEFA EURO Golden Boot', slug: 'golden-boot', editions: euroGoldenBoot.editions },
+  ];
+  const playerSlugs = new Set(
+    buildAllPlayerProfiles(playerSources).map((profile) => playerProfileSlug(profile.id)),
+  );
+
+  const data = euroGoldenBoot;
+
+  return buildEditionProfiles(data.editions, teamSlugs, { playerSlugs }).map((profile) => ({
+    params: { year: profile.slug },
+    props: {
+      profile,
+      sources: data.sources,
+      lastReviewed: data.lastReviewed,
+      status: data.status,
+    },
+  }));
+}
+
+type Props = {
+  profile: EditionProfile;
+  sources: SourceLink[];
+  lastReviewed: string;
+  status: string;
+};
+
+const { profile, sources, lastReviewed, status } = Astro.props as Props;
+
+const title = `${profile.year} UEFA EURO Golden Boot`;
+const description = isPlaceholderWinner(profile.champion)
+  ? `The ${profile.year} UEFA EURO Golden Boot was not awarded. Full details from that year's top-scorers table.`
+  : [
+      `The ${profile.year} UEFA EURO Golden Boot:`,
+      `${profile.champion} won.`,
+      'Full details from the top-scorers table, linked to each player’s complete award history.',
+    ].join(' ');
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  alternateHref={withBase(`/hr/competitions/golden-boot/euro/${profile.slug}`)}
+  breadcrumbTrail={[{ name: 'Golden Boot', url: withBase('/competitions/golden-boot') }]}
+  jsonLd={jsonLd}
+>
+  <EditionView
+    profile={profile}
+    competitionPath="/competitions/golden-boot/euro"
+    backPath="/competitions/golden-boot"
+    competitionTitle="UEFA EURO Golden Boot"
+    headingTemplate="{year} {competition}"
+    introTemplate="Everything the {competition} table records about {year}, with every scorer linked to their full award history and their team linked separately. Tied scorers are shown together, exactly as the source table lists them."
+    pdfSlug={`edition-golden-boot-euro-${profile.slug}`}
+  >
+    <References sources={sources} lastReviewed={lastReviewed} status={status} />
+  </EditionView>
+</BaseLayout>

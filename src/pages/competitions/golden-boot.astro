@@ -6,8 +6,9 @@ import EditorialNotes from '../../components/EditorialNotes.astro';
 import References from '../../components/References.astro';
 import PrintDownloadLink from '../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../lib/competition';
+import { buildEditionLinks, buildEditionProfiles } from '../../lib/editionProfile';
 import { absolutePageUrl, withBase } from '../../lib/url';
-import { buildChampionsItemList } from '../../lib/jsonLd';
+import { buildChampionsItemList, buildLatestEditionSportsEvent, type JsonLdObject } from '../../lib/jsonLd';
 
 const [worldCup, euro] = await Promise.all([
   loadCompetition('golden-boot', {
@@ -22,6 +23,19 @@ const [worldCup, euro] = await Promise.all([
   }),
 ]);
 
+// Each table gets its own edition-page route tree (golden-boot/world-cup vs
+// golden-boot/euro - see docs/PROJECT_STATUS.md), so each needs its own
+// `yearLinks` map keyed against its own editions, unlike every other
+// competition page here that only has one table to link.
+const worldCupYearLinks = buildEditionLinks(
+  buildEditionProfiles(worldCup.editions),
+  '/competitions/golden-boot/world-cup',
+);
+const euroYearLinks = buildEditionLinks(
+  buildEditionProfiles(euro.editions),
+  '/competitions/golden-boot/euro',
+);
+
 // Both loads read the same content file, so title/intro/status/review date are
 // identical; the source links differ because each table cites its own section
 // of docs/SOURCES.md.
@@ -30,7 +44,14 @@ const sources = [...worldCup.sources, ...euro.sources].filter(
 );
 
 // Two separate ItemLists, matching how ChampionsSummary itself is duplicated
-// below - one Golden Boot ranking per competition, not a merged one.
+// below - one Golden Boot ranking per competition, not a merged one. Same
+// story for the SportsEvent blocks: `worldCup.title`/`euro.title` are both
+// the generic content-frontmatter "Golden Boot Winners" (one shared source
+// file), which can't stand in for a single per-award name the way
+// `data.title` does on the other five index pages, so each call gets an
+// explicit name here instead - the same "FIFA World Cup Golden Boot"/"UEFA
+// EURO Golden Boot" convention the per-edition pages already established
+// (see src/pages/competitions/golden-boot/{world-cup,euro}/[year].astro).
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd = [
   buildChampionsItemList(worldCup.champions, {
@@ -43,7 +64,9 @@ const jsonLd = [
     name: 'Most EURO top-scorer awards',
     unit: ['award', 'awards'],
   }),
-];
+  buildLatestEditionSportsEvent(worldCup.editions, 'FIFA World Cup Golden Boot'),
+  buildLatestEditionSportsEvent(euro.editions, 'UEFA EURO Golden Boot'),
+].filter((item): item is JsonLdObject => item !== undefined);
 ---
 
 <BaseLayout
@@ -74,6 +97,7 @@ const jsonLd = [
         hosts={worldCup.hosts}
         teams={worldCup.teams}
         winnerLabel="Player"
+        yearLinks={worldCupYearLinks}
       />
       <ChampionsSummary
         id="golden-boot-world-cup-champions"
@@ -97,6 +121,7 @@ const jsonLd = [
         hosts={euro.hosts}
         teams={euro.teams}
         winnerLabel="Player"
+        yearLinks={euroYearLinks}
       />
       <ChampionsSummary
         id="golden-boot-euro-champions"

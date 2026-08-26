@@ -2442,6 +2442,16 @@ test.describe('Glossary page on a 360px phone', () => {
     await expect(page).toHaveURL(/\/hr\/glossary$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
+
+  test('offers a downloadable print PDF of the glossary', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/glossary.pdf"]');
+    await expect(link).toBeVisible();
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
+  });
 });
 
 test.describe('Croatian glossary page (/hr/glossary) on a 360px phone', () => {
@@ -2469,6 +2479,17 @@ test.describe('Croatian glossary page (/hr/glossary) on a 360px phone', () => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/glossary$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('offers a downloadable print PDF with translated labels', async ({ page, request }) => {
+    const link = page.locator('a[download][href$="downloads/glossary-hr.pdf"]');
+    await expect(link).toBeVisible();
+    await expect(link).toHaveText(/Preuzmi PDF za ispis/);
+
+    const href = await link.getAttribute('href');
+    const response = await request.get(new URL(href!, page.url()).toString());
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('pdf');
   });
 });
 
@@ -2789,13 +2810,26 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
 
     // 15 nav pages x 2 languages (the index loop, now including /teams,
     // /players, /compare-players and /glossary), plus 40 team profile pages
-    // x 2 languages (src/pages/teams/[slug].astro and its Croatian sibling)
-    // and 98 player profile pages x 2 languages (src/pages/players/[slug].astro
-    // and its Croatian sibling), each pair carrying reciprocal hreflang
+    // x 2 languages (src/pages/teams/[slug].astro and its Croatian sibling),
+    // 98 player profile pages x 2 languages (src/pages/players/[slug].astro
+    // and its Croatian sibling), 23 FIFA World Cup edition pages x 2
+    // languages (src/pages/competitions/world-cup/[year].astro and its
+    // Croatian sibling), 48 Copa América edition pages x 2 languages
+    // (src/pages/competitions/copa-america/[year].astro and its Croatian
+    // sibling - the two 1959 tournaments each get their own host-
+    // disambiguated slug, see src/lib/editionProfile.ts), 17 UEFA EURO
+    // edition pages x 2 languages (src/pages/competitions/euro/[year].astro
+    // and its Croatian sibling), 4 UEFA Nations League Finals edition pages
+    // x 2 languages (src/pages/competitions/nations-league/[year].astro and
+    // its Croatian sibling), and 70 Men's Ballon d'Or edition pages x 2
+    // languages (src/pages/competitions/ballon-dor/[year].astro and its
+    // Croatian sibling - the first individual-award edition pages, see
+    // `individualAward` in src/lib/editionProfile.ts; the 2020 "Not awarded"
+    // row still gets its own page), each pair carrying reciprocal hreflang
     // alternates - /glossary is a fully bilingual NAV_LINKS entry from launch
     // (see docs/PROJECT_STATUS.md's Glossary entry), so it flows through the
     // main loop like every other top-level page.
-    expect(body.match(/<url>/g)?.length).toBe(306);
+    expect(body.match(/<url>/g)?.length).toBe(710);
     expect(body).toContain(`<loc>${SITE}/glossary/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/glossary/</loc>`);
     expect(body).toContain(`hreflang="hr" href="${SITE}/hr/glossary/"`);
@@ -2807,6 +2841,20 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(body).toContain(
       `hreflang="hr" href="${SITE}/hr/competitions/world-cup/"`,
     );
+    expect(body).toContain(`<loc>${SITE}/competitions/world-cup/2018/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/competitions/world-cup/2018/</loc>`);
+    expect(body).toContain(`hreflang="hr" href="${SITE}/hr/competitions/world-cup/2018/"`);
+    expect(body).toContain(`<loc>${SITE}/competitions/euro/2016/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/competitions/euro/2016/</loc>`);
+    expect(body).toContain(`hreflang="hr" href="${SITE}/hr/competitions/euro/2016/"`);
+    expect(body).toContain(`<loc>${SITE}/competitions/nations-league/2022-23/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/competitions/nations-league/2022-23/</loc>`);
+    expect(body).toContain(
+      `hreflang="hr" href="${SITE}/hr/competitions/nations-league/2022-23/"`,
+    );
+    expect(body).toContain(`<loc>${SITE}/competitions/ballon-dor/2018/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/competitions/ballon-dor/2018/</loc>`);
+    expect(body).toContain(`hreflang="hr" href="${SITE}/hr/competitions/ballon-dor/2018/"`);
     expect(body).toContain(`<loc>${SITE}/teams/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/teams/</loc>`);
     expect(body).toContain(`<loc>${SITE}/teams/brazil/</loc>`);
@@ -2817,6 +2865,12 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(body).toContain(`<loc>${SITE}/players/gerd-muller/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/players/gerd-muller/</loc>`);
     expect(body).toContain(`hreflang="hr" href="${SITE}/hr/players/gerd-muller/"`);
+    expect(body).toContain(`<loc>${SITE}/competitions/golden-boot/world-cup/1958/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/competitions/golden-boot/world-cup/1958/</loc>`);
+    expect(body).toContain(`hreflang="hr" href="${SITE}/hr/competitions/golden-boot/world-cup/1958/"`);
+    expect(body).toContain(`<loc>${SITE}/competitions/golden-boot/euro/1996/</loc>`);
+    expect(body).toContain(`<loc>${SITE}/hr/competitions/golden-boot/euro/1996/</loc>`);
+    expect(body).toContain(`hreflang="hr" href="${SITE}/hr/competitions/golden-boot/euro/1996/"`);
     expect(body).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
   });
 
@@ -2888,14 +2942,21 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(sportsEvent.competitor).toEqual({ '@type': 'SportsTeam', name: 'Spain' });
   });
 
-  test('an individual award page carries an ItemList but no SportsEvent', async ({ page }) => {
+  test('an individual award page carries an ItemList and a SportsEvent for the latest edition', async ({
+    page,
+  }) => {
     await page.goto('competitions/ballon-dor');
     const blocks = await jsonLdBlocks(page);
-    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList']);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList', 'SportsEvent']);
     expect(blocks.find((b) => b['@type'] === 'ItemList').name).toContain('Most awards');
+
+    const sportsEvent = blocks.find((b) => b['@type'] === 'SportsEvent');
+    expect(sportsEvent.name).toBe("2025 Men's Ballon d'Or");
+    expect(sportsEvent.location).toBeUndefined();
+    expect(sportsEvent.competitor).toEqual({ '@type': 'SportsTeam', name: 'Ousmane Dembélé' });
   });
 
-  test('the Golden Boot page carries one ItemList per table', async ({ page }) => {
+  test('the Golden Boot page carries one ItemList and one SportsEvent per table', async ({ page }) => {
     await page.goto('competitions/golden-boot');
     const blocks = await jsonLdBlocks(page);
     const lists = blocks.filter((b) => b['@type'] === 'ItemList');
@@ -2904,6 +2965,14 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
       'Most World Cup Golden Boots',
       'Most EURO top-scorer awards',
     ]);
+
+    const sportsEvents = blocks.filter((b) => b['@type'] === 'SportsEvent');
+    expect(sportsEvents).toHaveLength(2);
+    expect(sportsEvents.map((e) => e.name)).toEqual([
+      '2026 FIFA World Cup Golden Boot',
+      '2024 UEFA EURO Golden Boot',
+    ]);
+    expect(sportsEvents[0].competitor).toEqual({ '@type': 'SportsTeam', name: 'Kylian Mbappé' });
   });
 
   test('a translated competition page carries its own Croatian BreadcrumbList/ItemList names', async ({

@@ -38,9 +38,16 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm build && pnpm preview --port 4321 --host',
+    // scripts/test-preview-server.mjs wraps `astro preview`: Astro 7 made
+    // `astro preview` always fork into a detached background daemon and
+    // return immediately once it's listening, which Playwright's webServer
+    // treats as "exited early" on a fresh spawn (see that script's own doc
+    // comment for the full story and why the 2026-08-23 Astro upgrade
+    // didn't catch this).
+    command: 'pnpm build && node scripts/test-preview-server.mjs',
     url: `http://localhost:${PORT}${BASE}/`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    env: { PORT: String(PORT), BASE_PATH: BASE },
   },
 });

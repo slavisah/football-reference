@@ -1,0 +1,147 @@
+---
+// Croatian translation of src/pages/competitions/euro/[year].astro - one page
+// per UEFA European Championship edition. Loads the exact same content as the
+// English route so the placings, final result and top scorer can't drift
+// between languages; only this page's own chrome (column labels, prose) is
+// Croatian, the same convention every other hr competition/edition page here
+// follows.
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import EditionView from '../../../../components/EditionView.astro';
+import References from '../../../../components/References.astro';
+import { loadCompetition } from '../../../../lib/competition';
+import { buildTopScorerFacts, buildYearStories } from '../../../../lib/editions';
+import { buildEditionProfiles, type EditionProfile } from '../../../../lib/editionProfile';
+import { buildAllCountryRecords } from '../../../../lib/compare';
+import { loadTeamCompetitions } from '../../../../lib/teamCompetitions';
+import { teamProfileSlug } from '../../../../lib/teamProfile';
+import type { SourceLink } from '../../../../lib/sources';
+import { absolutePageUrl, withBase } from '../../../../lib/url';
+import { buildEditionSportsEvent } from '../../../../lib/jsonLd';
+
+// Croatian column-label translations, matching hr/competitions/euro.astro's
+// own headerLabels map.
+const HEADER_LABELS: Record<string, string> = {
+  'Host(s)': 'Domaćin(i)',
+  Teams: 'Momčadi',
+  Winner: 'Prvak',
+  'Runner-up': 'Drugoplasirani',
+  'Other semifinalist': 'Drugi polufinalist',
+  'Other semifinalist / fourth': 'Drugi polufinalist / četvrti',
+  Final: 'Finale',
+  'Final date': 'Datum finala',
+};
+
+export async function getStaticPaths() {
+  // The Croatian Memorable-moments bullets, matching the hr competition
+  // page's own hand-translation ("Nezaboravni trenuci"). Declared inside
+  // getStaticPaths since Astro runs it in an isolated scope that can't see
+  // the module's other frontmatter consts - same convention the World Cup
+  // edition page's own CROATIAN_MOMENTS constant uses.
+  const CROATIAN_MOMENTS = [
+    'Slavna "panenka" Antonína Panenke odlučila je izvođenje jedanaesteraca 1976.',
+    'Danska je na turnir 1992. ušla naknadno i na kraju ga osvojila.',
+    'Grčka je 2004. priredila jedno od najvećih iznenađenja u povijesti međunarodnog nogometa.',
+    'Španjolska je 2012. postala prva reprezentacija koja je obranila naslov EURA.',
+    'Odgođeni EURO 2020. odigran je 2021. u više zemalja.',
+    'Španjolska je 2024. osvojila rekordni četvrti naslov.',
+  ];
+
+  const [data, goldenBoot, teamData] = await Promise.all([
+    loadCompetition('uefa-euro', { editionsHeading: 'Editions', sourcesHeading: 'UEFA EURO' }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'UEFA EURO top scorers',
+      sourcesHeading: 'UEFA EURO',
+    }),
+    loadTeamCompetitions(),
+  ]);
+
+  const teamSlugs = new Set(
+    buildAllCountryRecords(teamData.competitions).map((record) => teamProfileSlug(record.id)),
+  );
+  const stories = buildYearStories(data.editions, CROATIAN_MOMENTS);
+  const topScorers = buildTopScorerFacts(goldenBoot.editions, 'hr');
+
+  return buildEditionProfiles(data.editions, teamSlugs).map((profile) => ({
+    params: { year: profile.slug },
+    props: {
+      profile,
+      story: stories.get(profile.year),
+      topScorer: topScorers.get(profile.year),
+      sources: data.sources,
+      lastReviewed: data.lastReviewed,
+      status: data.status,
+    },
+  }));
+}
+
+type Props = {
+  profile: EditionProfile;
+  story?: string;
+  topScorer?: string;
+  sources: SourceLink[];
+  lastReviewed: string;
+  status: string;
+};
+
+const { profile, story, topScorer, sources, lastReviewed, status } = Astro.props as Props;
+const statusText = status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+const runnerUp = profile.facts.find((fact) => /runner-up/i.test(fact.label))?.value;
+const title = `UEFA Europsko prvenstvo ${profile.year}.`;
+const description = [
+  `UEFA Europsko prvenstvo ${profile.year}.:`,
+  profile.champion ? `prvak ${profile.champion}${runnerUp ? `, drugoplasirani ${runnerUp}` : ''}.` : '',
+  profile.host ? `Domaćin: ${profile.host}.` : '',
+  'Potpuni plasmani, rezultat finala i najbolji strijelac tog izdanja.',
+]
+  .filter(Boolean)
+  .join(' ');
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  locale="hr"
+  alternateHref={withBase(`/competitions/euro/${profile.slug}`)}
+  breadcrumbTrail={[{ name: 'UEFA Europsko prvenstvo', url: withBase('/hr/competitions/euro') }]}
+  jsonLd={jsonLd}
+>
+  <EditionView
+    profile={profile}
+    competitionPath="/hr/competitions/euro"
+    competitionTitle="UEFA Europsko prvenstvo"
+    story={story}
+    topScorer={topScorer}
+    topScorerLabel="Najbolji strijelac"
+    locale="hr"
+    headerLabels={HEADER_LABELS}
+    eyebrow="Generirano iz tablice natjecanja"
+    headingTemplate="{competition} {year}."
+    introTemplate="Sve što tablica izdanja bilježi o izdanju {year}., uz poveznicu na potpunu povijest svake reprezentacije."
+    pagerLabel="Ostala izdanja"
+    previousLabel="Prethodno izdanje"
+    nextLabel="Sljedeće izdanje"
+    backLabel="Sva izdanja natjecanja {competition}"
+    teamProfileHintTemplate="{team} — potpuna povijest"
+    storyHeading="Priča o ovom izdanju"
+    glanceHeading="Izdanje {year}. na prvi pogled"
+    pdfSlug={`edition-euro-${profile.slug}-hr`}
+    pdfLabel="Preuzmi PDF za ispis"
+    pdfHint="A4 položeno, potpuni plasmani i rezultat finala ovog izdanja."
+  >
+    <References
+      sources={sources}
+      lastReviewed={lastReviewed}
+      status={status}
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText={statusText}
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+    />
+  </EditionView>
+</BaseLayout>

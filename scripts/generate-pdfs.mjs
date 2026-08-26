@@ -22,11 +22,11 @@
 
 import { chromium } from '@playwright/test';
 import { createHash } from 'node:crypto';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PDF_PAGES as PAGES, TEAM_PDF_SOURCES, PLAYER_PDF_SOURCES } from './pdf-pages.mjs';
+import { PDF_PAGES as PAGES, TEAM_PDF_SOURCES, PLAYER_PDF_SOURCES, EDITION_PDF_SOURCES } from './pdf-pages.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const PORT = 4399;
@@ -121,6 +121,19 @@ async function main() {
   const stopServer = () => {
     if (stopped) return;
     stopped = true;
+    // Astro 7 changed `astro preview` to fork its real server into a
+    // detached background daemon and let this immediate `server` process
+    // exit as soon as it's confirmed listening (see `astro preview
+    // status`/`stop`) - so by the time this runs, `server`'s own process
+    // (and therefore its process group) is typically already gone, and
+    // killing it no longer reaches the actual running server the way it did
+    // under Astro 5. Found as a real bug: a `pnpm build:pdfs` run that
+    // appeared to finish cleanly left an `astro preview` daemon still
+    // listening on PORT afterward. `astro preview stop` is the only
+    // reliable way to stop the daemon itself now; the process-group kill is
+    // kept alongside it as a harmless no-op once the daemon is Astro's own
+    // responsibility, in case a future Astro version reverts this.
+    spawnSync(astroBin, ['preview', 'stop'], { cwd: ROOT, stdio: 'inherit' });
     try {
       process.kill(-server.pid, 'SIGTERM');
     } catch {
@@ -131,6 +144,7 @@ async function main() {
 
   let teamEntries = [];
   let playerEntries = [];
+  let editionEntries = [];
 
   try {
     await waitForServer(`${ORIGIN}${BASE}/`);
@@ -247,6 +261,34 @@ async function main() {
       }
 
       playerEntries = playerManifestEntries;
+
+      // One PDF pair (English + Croatian) per tournament/award edition - see
+      // scripts/pdf-pages.mjs's EDITION_PDF_SOURCES doc comment. Unlike the
+      // team/player loops above, each entry already carries its own `path`
+      // (both languages) and `family` (the EDITION_PDF_SOURCES key), so
+      // there's no slug-collision guard to duplicate here - buildEditionProfiles()
+      // itself already throws at content-load time on an unresolvable
+      // collision (see editionProfile.ts), so /edition-index.json can never
+      // return two entries for the same pdfSlug.
+      console.log('Fetching live edition list from /edition-index.json...');
+      const editionIndexRes = await fetch(`${ORIGIN}${BASE}/edition-index.json`);
+      if (!editionIndexRes.ok) {
+        throw new Error(`GET /edition-index.json returned ${editionIndexRes.status}`);
+      }
+      const editionIndex = await editionIndexRes.json();
+      console.log(`Found ${editionIndex.length} edition pages.`);
+
+      const editionManifestEntries = [];
+      for (const { pdfSlug, path: pagePath, family } of editionIndex) {
+        const url = `${ORIGIN}${BASE}${pagePath}`;
+        await page.goto(url, { waitUntil: 'networkidle' });
+        const outFile = path.join(OUT_DIR, `${pdfSlug}.pdf`);
+        await page.pdf(pdfOptions(outFile));
+        editionManifestEntries.push({ slug: pdfSlug, sources: EDITION_PDF_SOURCES[family] });
+      }
+      console.log(`Wrote ${editionManifestEntries.length} edition PDFs.`);
+
+      editionEntries = editionManifestEntries;
     } finally {
       await browser.close();
     }
@@ -254,7 +296,7 @@ async function main() {
     stopServer();
   }
 
-  const manifest = await buildManifest([...PAGES, ...teamEntries, ...playerEntries]);
+  const manifest = await buildManifest([...PAGES, ...teamEntries, ...playerEntries, ...editionEntries]);
   await writeFile(MANIFEST_PATH, `${JSON.stringify(manifest, null, 2)}\n`);
   console.log(`Wrote ${path.relative(ROOT, MANIFEST_PATH)}`);
 }

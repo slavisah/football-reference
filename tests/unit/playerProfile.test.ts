@@ -98,6 +98,25 @@ describe('buildPlayerProfile', () => {
     expect(profile.awards[0].appearances[0].detail).toBe('5 goals');
   });
 
+  it('sorts a repeat winner’s appearances oldest-first even when the source table lists a later win before an earlier one', () => {
+    // Real content is chronological already (e.g. Lionel Messi's Ballon d'Or
+    // rows in content/ballon-dor.md run 2021 then 2023), but appearancesFor()
+    // sorts unconditionally rather than trusting row order - this table is
+    // deliberately reversed to prove that, not to model a real data shape.
+    const repeatWinnerTable: MarkdownTable = {
+      headers: ['Year', 'Winner', 'National team', 'Ceremony date'],
+      rows: [
+        ['2023', 'Lionel Messi', 'Argentina', '30 October 2023'],
+        ['2021', 'Lionel Messi', 'Argentina', '29 November 2021'],
+      ],
+    };
+    const repeatSources: PlayerAwardSource[] = [
+      { title: "Ballon d'Or", slug: 'ballon-dor', editions: buildEditions(repeatWinnerTable) },
+    ];
+    const profile = buildPlayerProfile('Lionel Messi', repeatSources);
+    expect(profile.awards[0].appearances.map((a) => a.year)).toEqual(['2021', '2023']);
+  });
+
   it('returns an empty profile for a player present in none of the sources', () => {
     const profile = buildPlayerProfile('Nobody At All', sources);
     expect(profile.awards).toEqual([]);

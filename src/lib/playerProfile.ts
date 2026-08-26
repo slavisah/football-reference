@@ -41,7 +41,9 @@ function cellValue(edition: Edition, matcher: RegExp): string | undefined {
 // Golden Boot's Team column uses "Multiple" as a placeholder when a tie has
 // too many scorers to name one team each (e.g. 1962's six-way tie) - not a
 // real team name, so it must not be shown as if it were this player's team.
-const TEAM_TIE_PLACEHOLDER = /^multiple$/i;
+// Exported for editionProfile.ts's own tied-scorer splitting, which needs
+// the exact same guard.
+export const TEAM_TIE_PLACEHOLDER = /^multiple$/i;
 
 /**
  * This player's team for one edition, aligning a "; "-joined Team cell with
