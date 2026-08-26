@@ -12333,6 +12333,86 @@ test-coverage gap remains on record; re-run `pnpm outdated` and this same
 health check next time rather than assume either conclusion is still
 current.
 
+### Quality pass: tenth full-repo health check plus three targeted audits (contrast, "Last reviewed" coverage, heaviest-page composition) - added 2026-08-26 (tenth intensive run)
+
+With the backlog still empty and three consecutive runs having already
+confirmed a clean baseline, this run repeated the standing full health
+check (`pnpm outdated`, `lint`, `test`, `test:coverage`, `build`, all four
+`check:*` scripts, and a cold-start `pnpm test:e2e`) and, since that alone
+would be the fourth identical confirmation in a row, also ran three
+targeted audits the immediately preceding runs hadn't covered, rather than
+just re-assert their "no concrete gap remains" conclusion a fourth time.
+
+**Health check:** `pnpm outdated` - nothing new (the same `typescript`
+5.9.3 -> 7.0.2 major jump as every prior run, still blocked -
+`@astrojs/check@latest`'s `peerDependencies` still reports
+`{ typescript: '^5.0.0 || ^6.0.0' }`, re-confirmed via `npm view` again
+this run). `pnpm lint` - 0 errors/warnings/hints across 164 files. `pnpm
+test` - **505/505**. `pnpm test:coverage` - **99.91%/99.42%**
+statements/branches, byte-identical to the ninth run's baseline (the same
+four single-line branches: `quiz.ts` line 283, `sources.ts` line 33,
+`tableSort.ts` line 22, `url.ts` line 8). `pnpm build` - 711 pages.
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:perf`
+(heaviest page still `hr/records` at 498.8 KB), `check:precache` (37
+URLs), `check:pdfs` (700 PDFs) - all clean, all unchanged.
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` from a cold
+start - **804/804 passing** in 9.1 minutes. The `docs/SOURCES.md`
+link-liveness sweep is still blocked - re-confirmed again this run via a
+direct `curl` to `https://en.wikipedia.org`, which the egress proxy still
+rejects with a `403` on the CONNECT tunnel (`recentRelayFailures` in
+`$HTTPS_PROXY/__agentproxy/status` records the same denial).
+
+**Contrast-ratio audit (accessibility):** computed WCAG relative-luminance
+contrast for every light/dark theme color pair in `src/styles/global.css`
+(`--text`/`--text-muted`/`--accent`/`--accent-contrast`/`--danger`/
+`--focus` against `--bg`/`--bg-elevated`, plus the `--highlight` mark
+background) - 17 pairs total, both themes. All comfortably clear WCAG AA:
+the tightest is light-mode `--focus` on `--bg` at 4.36:1, still above the
+3:1 UI-component threshold that pair actually needs (it is an outline
+color, not body text); every text pair clears 5.8:1. Confirms, rather than
+just relies on, `tests/e2e/accessibility*.spec.ts`'s automated axe sweep
+(which checks rendered contrast per-page but doesn't enumerate the token
+pairs directly) - no gap found, no change needed.
+
+**"Last reviewed" coverage audit:** `AGENTS.md`'s definition of done
+requires "a visible 'Last reviewed' date on each page." Grepped all 49
+`src/pages/**/*.astro` files for the string; 7 didn't match directly -
+`404.astro`, `index.astro`/`hr/index.astro` (the home page, not itself
+dated editorial content, same as the site's other non-competition utility
+pages), and the five English competition landing pages
+(`world-cup.astro`, `euro.astro`, `copa-america.astro`,
+`nations-league.astro`, `ballon-dor.astro`). Traced the five landing pages
+to `CompetitionView.astro`, the shared component they all render through -
+it calls `<References lastReviewed={data.lastReviewed}>` itself, so the
+date is present in the output, just not as a literal string in those five
+route files. No gap: every editorial content page has one.
+
+**Heaviest-page composition check (performance):** `hr/records` sits at
+498.8 KB against the 510 KB `check:perf` budget - 97.8% of budget, the
+closest margin of any page, worth understanding rather than assuming it is
+fine. Broke down the built HTML: 40 `application/ld+json` `ItemList`
+blocks (one per all-time-record category across all six
+competitions/awards) total ~50 KB, inline `<script>` tags ~55 KB, one
+`<style>` block ~4 KB - the remaining ~370 KB is the page's own record-list
+markup, which is inherent to its scope (an aggregate ranking across every
+competition and award the site covers) rather than duplication or an
+optimization target. Not a bug; left as-is.
+
+**Left for a future pass:** unchanged from the ninth run - the
+`typescript` 7 upgrade and the `docs/SOURCES.md` link-liveness sweep stay
+blocked on `@astrojs/check`'s peer-dependency ceiling and this
+environment's outbound network policy respectively; the "youngest winner"
+ranking and the individual-award "Tap a year" extension stay blocked on
+new sourced editorial content the same way the 2026-08-25 entry declined
+to fabricate it. No concrete, named backlog item, test-coverage gap,
+contrast failure, missing "Last reviewed" date, or page-weight problem
+remains on record. A future pass might look past this same standing
+health-check shape entirely - e.g. a dead-code/unused-export sweep, or
+re-reading `docs/WEBSITE_REQUIREMENTS.md` end-to-end against the live site
+rather than against `docs/ROADMAP.md`'s own summary of it - since a fourth
+or fifth consecutive "everything is clean" health check adds
+proportionally less than the first one did.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

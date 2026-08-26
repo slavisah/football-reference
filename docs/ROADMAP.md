@@ -80,6 +80,21 @@ standing quirks.
   ceiling is still the blocker on the `typescript` 7 upgrade (re-confirmed
   via `npm view @astrojs/check@latest peerDependencies` this run too). See
   `docs/PROJECT_STATUS.md`'s matching entry.
+- **Tenth-run health check plus three targeted audits**: closed 2026-08-26
+  (tenth intensive run) - the standing full health check (`pnpm outdated`
+  through cold-start `pnpm test:e2e`) came back byte-identical to the ninth
+  run's baseline again (505/505 unit, 804/804 e2e, 99.91%/99.42% coverage,
+  711 pages), so this run also ran a WCAG contrast-ratio audit of every
+  light/dark theme color-token pair (all clear AA), a "Last reviewed" date
+  coverage audit across all 49 page templates (complete - the five EN
+  competition landing pages carry it via `CompetitionView.astro`'s
+  `References` component), and a composition check of the heaviest built
+  page (`hr/records`, 498.8/510 KB) confirming its size is legitimate
+  JSON-LD/content, not bloat. No code change needed; see
+  `docs/PROJECT_STATUS.md`'s matching entry, which also suggests a future
+  pass look past this same health-check shape (dead-code sweep, or a fresh
+  read of `docs/WEBSITE_REQUIREMENTS.md` against the live site) since
+  repeat clean health checks add less each time.
 
 ## Ideas not yet scoped as backlog
 
