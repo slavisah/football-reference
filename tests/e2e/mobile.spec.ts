@@ -530,13 +530,21 @@ test.describe('Golden Boot page on a 360px phone', () => {
   });
 
   test('shows the World Cup notes and EURO notes sections, one per table', async ({ page }) => {
-    await expect(page.locator('.notes__card')).toHaveCount(3);
+    await expect(page.locator('.notes__card')).toHaveCount(5);
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('it is a personal scoring award, not the team championship')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'World Cup notes' })).toBeVisible();
     await expect(page.getByText("Just Fontaine's 13 goals in 1958 remain the record")).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'World Cup memorable moments' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Guillermo Stábile won the first-ever FIFA World Cup Golden Boot'),
+    ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'EURO notes' })).toBeVisible();
     await expect(page.getByText('Michel Platini scored nine goals in five matches in 1984.')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'EURO memorable moments' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('The first-ever EURO Golden Boot, in 1960, was shared'),
+    ).toBeVisible();
   });
 
   test('the two tables filter independently by player', async ({ page }) => {
@@ -638,15 +646,23 @@ test.describe('Croatian Golden Boot page (/hr/competitions/golden-boot) on a 360
   test('shows the translated World Cup notes and EURO notes sections, one per table', async ({
     page,
   }) => {
-    await expect(page.locator('.notes__card')).toHaveCount(3);
+    await expect(page.locator('.notes__card')).toHaveCount(5);
     await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
     await expect(
       page.getByText('riječ je o osobnoj nagradi za golove, a ne o momčadskom naslovu prvaka'),
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Napomene o Svjetskom prvenstvu' })).toBeVisible();
     await expect(page.getByText('13 golova Justa Fontainea 1958. ostaje rekord')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci - Svjetsko prvenstvo' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Guillermo Stábile osvojio je prvu ikad dodijeljenu Zlatnu kopačku'),
+    ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Napomene o EURU' })).toBeVisible();
     await expect(page.getByText('Michel Platini postigao je devet golova')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci - EURO' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Prva ikad dodijeljena Zlatna kopačka EURA, 1960.'),
+    ).toBeVisible();
   });
 
   test('the two tables filter independently by player', async ({ page }) => {

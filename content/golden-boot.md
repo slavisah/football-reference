@@ -51,6 +51,13 @@ The name and tie-breaking rules of top-scorer awards have changed over time. Thi
 - Modern tie-breakers may separate players with the same number of goals using assists and minutes played.
 - Earlier editions often recognized multiple joint top scorers.
 
+## World Cup memorable moments
+
+- Guillermo Stábile won the first-ever FIFA World Cup Golden Boot in 1930, scoring eight goals for Argentina.
+- Just Fontaine scored 13 goals for France in 1958, still the most any player has scored at a single World Cup.
+- Six players finished level on four goals each in 1962 - the largest group of joint winners in FIFA World Cup Golden Boot history.
+- Kylian Mbappé won the World Cup Golden Boot in both 2022 and 2026, the only player to win it in consecutive editions since 1930, scoring ten goals in 2026 for a personal best.
+
 # UEFA EURO top scorers
 
 | Year | Player(s) | Team | Goals |
@@ -77,3 +84,10 @@ The name and tie-breaking rules of top-scorer awards have changed over time. Thi
 
 - Michel Platini scored nine goals in five matches in 1984.
 - UEFA's award rules have changed over time; joint leading scorers (marked “Multiple” in the Team column) are shown tied, with no single official winner for that edition.
+
+## EURO memorable moments
+
+- The first-ever EURO Golden Boot, in 1960, was shared by five players tied on two goals each.
+- Michel Platini scored nine goals in five matches for France in 1984, still the most any player has scored at a single EURO.
+- Cristiano Ronaldo won the 2020 EURO Golden Boot with five goals, in the tournament delayed to 2021.
+- Six players shared the 2024 EURO Golden Boot on three goals each, the tournament's most recent edition.
