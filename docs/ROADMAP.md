@@ -54,18 +54,22 @@ standing quirks.
   line 8) stay as-is, unchanged from the 2026-08-23 sweep that classified
   them as defensively unreachable given the code's own invariants, not
   undertested - see `docs/PROJECT_STATUS.md`'s matching entry.
-- No other concrete, named backlog item is currently known. The next
-  intensive-run pass should start from a full-repo health check (`pnpm
-  lint`/`test`/`build`/`check:*`, then the full `pnpm test:e2e` suite from a
-  cold start) rather than assume one of the items above is secretly
-  incomplete - the same approach the 2026-08-19 and 2026-08-24 "quality pass"
-  entries in `docs/PROJECT_STATUS.md` already used successfully when the
-  named backlog ran dry. An external link-liveness sweep of
-  `docs/SOURCES.md` stays blocked by this environment's outbound network
-  policy - confirmed again 2026-08-25 (a direct `WebFetch` against
-  `en.wikipedia.org` returned `EGRESS_BLOCKED`), not just assumed from an
-  earlier note - so it still needs a session with broader network access
-  than this one has.
+- No other concrete, named backlog item is currently known. An eighth
+  full-repo health check (`pnpm lint`/`test`/`test:coverage`/`build`/
+  `check:*`, plus the full `pnpm test:e2e` suite from a cold start) ran clean
+  2026-08-26 - 505/505 unit, 804/804 e2e, coverage unchanged at
+  99.91%/99.42%, no code change needed. The next intensive-run pass should
+  repeat that same health-check-first approach rather than assume this
+  conclusion is still current - the same standing advice the 2026-08-19 and
+  2026-08-24 "quality pass" entries in `docs/PROJECT_STATUS.md` set. An
+  external link-liveness sweep of `docs/SOURCES.md` stays blocked by this
+  environment's outbound network policy - confirmed again 2026-08-26 (a
+  direct `curl` to `en.wikipedia.org` was rejected with a `403` by the
+  egress proxy), not just assumed from an earlier note - so it still needs a
+  session with broader network access than this one has. The `typescript` 7
+  upgrade is also still blocked, confirmed again 2026-08-26: `@astrojs/check`
+  0.9.10 (latest published) only declares `typescript: '^5.0.0 || ^6.0.0'` as
+  a peer dependency.
 
 ## Ideas not yet scoped as backlog
 
