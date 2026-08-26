@@ -12178,6 +12178,75 @@ deliberately not fabricated in an unattended run; the external
 link-liveness sweep of `docs/SOURCES.md` stays blocked by this
 environment's outbound network policy.
 
+### Test-coverage sweep: `editionProfile.ts`, `comparePlayers.ts` and `playerProfile.ts` closed to 100%/100% - added 2026-08-26 (seventh intensive run)
+
+With the named backlog and every JSON-LD gap already closed, this run
+re-read the 2026-08-23 "Test-coverage sweep" entries rather than repeat an
+eighth full-repo health check: that pass had explicitly left four
+single-line branches (`quiz.ts` line 283, `sources.ts` line 33, `tableSort.ts`
+line 22, `url.ts` line 8) as "defensively unreachable given the code's own
+invariants, not undertested," but the individual-award edition-page rollout
+and `/compare-players` both landed *after* that sweep, so a fresh
+`pnpm test:coverage` was worth running to check whether either had opened a
+new, genuinely-reachable gap rather than assume the four-line list was still
+exhaustive.
+
+It had: **`editionProfile.ts`** sat at 97.29% branches (lines 284/288, both
+inside `buildEditionProfiles()`'s individual-award "Team member" linking
+arm) - every existing test that exercises that arm always passes an
+explicit `teamSlugs` Set, so the function's own documented default ("Omit
+[teamSlugs] to link every placing unconditionally") was never actually
+exercised for this arm, and separately no test ever supplied a `teamSlugs`
+Set that *excludes* one linked team's slug for this arm the way the plain
+team-placing case already does. **`comparePlayers.ts`** (96.29%/90%
+statements/functions) and **`playerProfile.ts`** (97.82%/94.73%) each had
+one `.sort()` comparator - `buildSharedAwardYears()`'s year-sort and
+`appearancesFor()`'s appearance-sort - that no existing fixture ever called
+with more than one element, so the comparator itself had literally never
+run; both are real, reachable shapes (a repeat award winner - the site's
+own data has several - or two players sharing more than one award year),
+just never modeled by a fixture before.
+
+Four new tests, all in the same "no contrived inputs" spirit the
+2026-08-23 sweep set: `editionProfile.test.ts` gained two cases in the
+existing `tied scorers (Golden Boot)` block (omitting `teamSlugs` entirely
+for both a single winner and a tie; supplying a `teamSlugs` Set missing one
+tied part's country); `comparePlayers.test.ts` gained a case with two
+players sharing two different years, deliberately listed with the later
+year first in the source table so a correct oldest-first result only comes
+from the `.sort()` actually running, not row order; `playerProfile.test.ts`
+gained the same shape for a single repeat winner across two out-of-order
+rows. The other four lines the 2026-08-23 entry named stay untouched -
+re-reading that entry's own reasoning for each (a duplicate `ChampionSummary`
+display name, a header that is simultaneously letters-only and slug-empty, a
+`withBase()` result that is empty before its own `/` prefix, a
+`stripTrailingPunctuation()` regex match guaranteed non-null by its enclosing
+`if`) still holds; forcing any of them would need an input no real caller
+constructs, exactly what that sweep declined to do.
+
+**Tests:** 4 new Vitest cases across 3 files. `pnpm test` - **505/505** (up
+from 501). `pnpm test:coverage` - whole-repo `src/lib` average rose from
+99.73%/99.13% to **99.91%/99.42%** (statements/branches); `editionProfile.ts`,
+`comparePlayers.ts` and `playerProfile.ts` are now all 100%/100%, leaving
+only the same four single-line branches the 2026-08-23 sweep already
+classified as defensively unreachable. `pnpm lint` - 0 errors/warnings/hints
+across 164 files. `pnpm build` - 711 pages (unchanged - test-only change, no
+page/component/content edits). `check:links` (715 pages), `check:sitemap`
+(710 entries), `check:perf` (heaviest page still `hr/records` at 498.8 KB),
+`check:precache` (37 URLs), `check:pdfs` (700 PDFs) - all clean, all
+unchanged from the prior entry. Playwright e2e was not re-run this pass - no
+UI-visible surface touched, same reasoning the 2026-08-23 sweep gave for its
+own test-only change.
+
+**Left for a future pass:** unchanged from the prior entry - the "youngest
+winner" ranking and the individual-award "Tap a year" extension stay blocked
+on new sourced editorial content; the external link-liveness sweep of
+`docs/SOURCES.md` stays blocked by this environment's outbound network
+policy. No concrete, named test-coverage gap remains on record; a future
+pass should re-run `pnpm test:coverage` from scratch to look for one freshly
+opened by new code rather than assume the four standing lines are secretly
+reachable.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
