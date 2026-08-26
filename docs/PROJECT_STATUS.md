@@ -12296,6 +12296,43 @@ change. No concrete, named backlog item or test-coverage gap remains on
 record; a future pass should repeat this same health-check-first approach
 before assuming otherwise.
 
+### Dependency patch bump: astro 7.2.4 -> 7.2.7, @types/node 26.2.0 -> 26.3.0 - added 2026-08-26 (ninth intensive run)
+
+With the backlog still empty and the eighth run's health check only three
+and a half hours old, this run looked for an angle that check hadn't
+covered: `pnpm outdated` against the freshly-installed `node_modules`
+(this environment starts with none, so `pnpm install` runs cold every
+time). It turned up two in-range releases newer than the pinned versions:
+`astro` 7.2.4 -> 7.2.7 (patch) and `@types/node` 26.2.0 -> 26.3.0 (minor,
+still `^26`). Every other dependency was already at latest. `typescript`
+itself shows a `7.0.2` "latest" in that same `pnpm outdated` listing, but
+`npm view @astrojs/check@latest peerDependencies` still reports
+`{ typescript: '^5.0.0 || ^6.0.0' }` as of today - re-confirming, not just
+assuming, that the standing blocker from the 2026-08-23/24/25/26 entries
+hasn't moved.
+
+Bumped both in `package.json`, ran `pnpm install` to refresh
+`pnpm-lock.yaml`, then repeated the full health check the eighth run had
+just established as the standing routine: `pnpm lint` (`astro check`) - 0
+errors/warnings/hints across 164 files. `pnpm test` - **505/505**. `pnpm
+test:coverage` - **99.91%/99.42%** statements/branches, byte-identical to
+the pre-bump baseline (same four single-line branches: `quiz.ts` line 283,
+`sources.ts` line 33, `tableSort.ts` line 22, `url.ts` line 8). `pnpm
+build` - 711 pages, unchanged. `check:links` (715 pages), `check:sitemap`
+(710 entries), `check:perf` (heaviest page still `hr/records` at 498.8 KB),
+`check:precache` (37 URLs), `check:pdfs` (700 PDFs) - all clean, all
+unchanged. `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e`
+from the same cold start the eighth run used - **804/804 passing** in 9.3
+minutes, matching the eighth run's 804/804 result.
+
+**Left for a future pass:** the `typescript` 7 upgrade stays gated on
+`@astrojs/check`'s peer-dependency ceiling until a newer `@astrojs/check`
+release widens it; the link-liveness sweep stays gated on this
+environment's outbound network policy. No concrete, named backlog item or
+test-coverage gap remains on record; re-run `pnpm outdated` and this same
+health check next time rather than assume either conclusion is still
+current.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

@@ -70,6 +70,16 @@ standing quirks.
   upgrade is also still blocked, confirmed again 2026-08-26: `@astrojs/check`
   0.9.10 (latest published) only declares `typescript: '^5.0.0 || ^6.0.0'` as
   a peer dependency.
+- **Dependency patch bump (astro 7.2.4 -> 7.2.7, @types/node 26.2.0 ->
+  26.3.0)**: closed 2026-08-26 (ninth intensive run) - `pnpm outdated` turned
+  up two in-range patch/minor releases; both installed cleanly, and a full
+  health check (lint/test/coverage/build/all four `check:*` scripts/full
+  cold-start `pnpm test:e2e`) came back identical to the eighth run's
+  baseline: 505/505 unit, 804/804 e2e, coverage unchanged at 99.91%/99.42%,
+  711 pages built. `@astrojs/check`'s `typescript: '^5.0.0 || ^6.0.0'` peer
+  ceiling is still the blocker on the `typescript` 7 upgrade (re-confirmed
+  via `npm view @astrojs/check@latest peerDependencies` this run too). See
+  `docs/PROJECT_STATUS.md`'s matching entry.
 
 ## Ideas not yet scoped as backlog
 
