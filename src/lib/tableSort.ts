@@ -2,7 +2,7 @@ import { findColumn } from './editions';
 import { t, type Locale } from './i18n';
 
 export type SortDirection = 'asc' | 'desc';
-export type SortRole = 'year' | 'quantity' | 'text';
+type SortRole = 'year' | 'quantity' | 'text';
 
 export type SortOption = {
   /** Stable key for the URL query param and the <option> value, e.g. "year-desc". */

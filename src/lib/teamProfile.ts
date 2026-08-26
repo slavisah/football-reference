@@ -14,7 +14,7 @@ import {
 // exactly the same winner/runner-up/semifinal matching compare.ts's own
 // CountryRecord totals are built from, so the two can never disagree.
 
-export type TeamAppearance = {
+type TeamAppearance = {
   year: string;
   yearSort: number;
   /**
