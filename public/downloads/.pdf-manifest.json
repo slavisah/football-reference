@@ -262,7 +262,7 @@
     "src/components/ChampionsSummary.astro": "2809a09ed5528dc1236fecaebc41bd3ff6f78881732cf9f8ebb367588337b3de",
     "src/components/EditorialNotes.astro": "47c2c11227600fb655f75e55f4e3d887eaf4082836013d83c881aba543b283f8",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/hr/competitions/golden-boot.astro": "9f7a2d7f266e2a1477bb1b234ed2d0454ea9d017e5cd5d0a611351ccb73cc758"
+    "src/pages/hr/competitions/golden-boot.astro": "5557d227f8c6c08db498156257552e2cae464481a070e4e2f318555d8c1f2fc8"
   },
   "records-hr": {
     "content/fifa-world-cup.md": "a25c75128ad4c22694f5718c03d52b59dd4a9d8b901f7a19103af8fb730548b6",
@@ -10667,7 +10667,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-2024-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10684,7 +10684,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-2020": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10701,7 +10701,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-2020-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10718,7 +10718,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-2016": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10735,7 +10735,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-2016-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10752,7 +10752,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-2012": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10769,7 +10769,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-2012-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10786,7 +10786,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-2008": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10803,7 +10803,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-2008-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10820,7 +10820,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-2004": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10837,7 +10837,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-2004-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10854,7 +10854,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-2000": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10871,7 +10871,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-2000-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10888,7 +10888,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1996": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10905,7 +10905,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1996-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10922,7 +10922,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1992": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10939,7 +10939,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1992-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10956,7 +10956,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1988": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10973,7 +10973,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1988-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -10990,7 +10990,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1984": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -11007,7 +11007,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1984-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -11024,7 +11024,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1980": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -11041,7 +11041,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1980-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -11058,7 +11058,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1976": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -11075,7 +11075,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1976-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -11092,7 +11092,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1972": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -11109,7 +11109,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1972-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -11126,7 +11126,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1968": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -11143,7 +11143,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1968-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -11160,7 +11160,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1964": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -11177,7 +11177,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1964-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -11194,7 +11194,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1960": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -11211,7 +11211,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   },
   "edition-golden-boot-euro-1960-hr": {
     "content/golden-boot.md": "d5f3cbc98bc720fd5fb86e80329a503bd0e284aec8d296207e79a3c9e3244f24",
@@ -11228,6 +11228,6 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/playerProfile.ts": "8309cc54976b5cb2b56f23263d6f8dc499023c6b97754527ddaf12bad9db4288",
     "src/pages/competitions/golden-boot/euro/[year].astro": "6ef682481f9ade877f1ee7f8a241813f0fa44836108503caf6eb0a0f813c2f43",
-    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "f6d7ba9974f8d7cc863df6e7dc81ac1ff3e33d7b53c667d2ee6ba72ec526d40c"
+    "src/pages/hr/competitions/golden-boot/euro/[year].astro": "6877b22060a1b891c2f5c54d8fc716940d8b9a45cc4b6bfc84aeca90785bd5d4"
   }
 }
