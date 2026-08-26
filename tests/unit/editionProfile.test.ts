@@ -333,6 +333,43 @@ describe('buildEditionProfiles with individualAward', () => {
       expect(team.value).toBe('Multiple');
     });
 
+    it('omits the Team link, single winner and tied part alike, when its slug has no generated team page', () => {
+      // Mirrors the plain team-competition "omits a link when the slug has
+      // no generated team page" test above, for the individual-award
+      // team-member column's two shapes: a single winner (1958, no /teams/
+      // page for France) and one part of a tie (1994, no page for Russia -
+      // Bulgaria still links, since each tied part is gated independently).
+      const sparseTeamSlugs = new Set(['bulgaria']);
+      const profiles = buildEditionProfiles(goldenBoot, sparseTeamSlugs, { playerSlugs });
+      const single = profiles.find((p) => p.year === '1958')!;
+      expect(single.facts.find((f) => f.label === 'Team')?.teamSlug).toBeUndefined();
+
+      const tied = profiles.find((p) => p.year === '1994')!;
+      const tiedTeam = tied.facts.find((f) => f.label === 'Team')!;
+      expect(tiedTeam.parts?.map((p) => [p.text, p.teamSlug])).toEqual([
+        ['Bulgaria', 'bulgaria'],
+        ['Russia', undefined],
+      ]);
+    });
+
+    it('links every Team member unconditionally when teamSlugs is omitted, single winner and tie alike', () => {
+      // Mirrors the plain team-competition case's "omits a link when the slug
+      // has no generated team page" test above (which passes an explicit
+      // Set) by testing the opposite, documented default: omitting teamSlugs
+      // entirely links every team unconditionally, for the individual-award
+      // team-member column too (buildEditionProfiles()'s own doc comment:
+      // "Omit it to link every placing unconditionally").
+      const profiles = buildEditionProfiles(goldenBoot, undefined, { playerSlugs });
+      const singleWinner = profiles.find((p) => p.year === '1958')!;
+      const tiedWinner = profiles.find((p) => p.year === '1994')!;
+      expect(singleWinner.facts.find((f) => f.label === 'Team')?.teamSlug).toBe('france');
+      const tiedTeam = tiedWinner.facts.find((f) => f.label === 'Team')!;
+      expect(tiedTeam.parts?.map((p) => [p.text, p.teamSlug])).toEqual([
+        ['Bulgaria', 'bulgaria'],
+        ['Russia', 'russia'],
+      ]);
+    });
+
     it('leaves the Team column unlinked plain text when its tie count disagrees with Player(s)', () => {
       const [profile] = buildEditionProfiles(goldenBoot, teamSlugs, {
         playerSlugs: new Set([...playerSlugs, 'ferenc-bene', 'dezso-novak', 'jesus-maria-pereda']),

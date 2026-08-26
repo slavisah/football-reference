@@ -46,6 +46,14 @@ standing quirks.
   Golden Boot", "Zlatna kopačka Svjetskog prvenstva"/"Zlatna kopačka EURA"),
   matching the convention the per-edition Golden Boot pages already
   established. See `docs/PROJECT_STATUS.md`'s matching entry for detail.
+- **Test-coverage sweep (edition/player/compare-player linking)**: closed
+  2026-08-26 (seventh intensive run) - `src/lib/editionProfile.ts`,
+  `comparePlayers.ts` and `playerProfile.ts` are now 100%/100%
+  statement/branch coverage; the four remaining sub-100%-branch lines
+  (`quiz.ts` line 283, `sources.ts` line 33, `tableSort.ts` line 22, `url.ts`
+  line 8) stay as-is, unchanged from the 2026-08-23 sweep that classified
+  them as defensively unreachable given the code's own invariants, not
+  undertested - see `docs/PROJECT_STATUS.md`'s matching entry.
 - No other concrete, named backlog item is currently known. The next
   intensive-run pass should start from a full-repo health check (`pnpm
   lint`/`test`/`build`/`check:*`, then the full `pnpm test:e2e` suite from a
