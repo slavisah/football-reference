@@ -23,6 +23,8 @@ interface Props {
   podiumHeading?: string;
   /** Optional "where it's been hosted" locator map, shown after the champions summary. */
   hostMap?: HostMapPoint[];
+  /** Optional `edition.year -> href` map linking the Year cell to each edition's own page. */
+  yearLinks?: Map<string, string>;
 }
 
 const {
@@ -34,6 +36,7 @@ const {
   podium,
   podiumHeading = 'Podium by edition',
   hostMap,
+  yearLinks,
 } = Astro.props;
 
 // "Tap a year to reveal a short story": joins the page's own "Memorable
@@ -65,6 +68,7 @@ const stories = memorableMoments
     teams={data.teams}
     extraColumn={extraColumn}
     storyColumn={stories.size > 0 ? { label: 'Story', values: stories } : undefined}
+    yearLinks={yearLinks}
   />
 
   {podium && podium.length > 0 && (

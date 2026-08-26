@@ -20,6 +20,7 @@ import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
 import { buildTopScorerFacts, buildYearStories, buildHostMapPoints } from '../../../lib/editions';
+import { buildEditionLinks, buildEditionProfiles } from '../../../lib/editionProfile';
 import { EURO_HOST_COORDINATES } from '../../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
@@ -42,6 +43,7 @@ const [data, goldenBoot] = await Promise.all([
 
 const topScorers = buildTopScorerFacts(goldenBoot.editions, 'hr');
 const hostMap = buildHostMapPoints(data.editions, EURO_HOST_COORDINATES);
+const yearLinks = buildEditionLinks(buildEditionProfiles(data.editions), '/hr/competitions/euro');
 const hostRegionLabels: Record<string, string> = { Europe: 'Europa' };
 
 const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
@@ -173,6 +175,7 @@ const headerLabels: Record<string, string> = {
       clearFiltersLabel="Očisti filtere"
       storyColumn={stories.size > 0 ? { label: 'Priča', values: stories } : undefined}
       storySummaryLabel="📖 Dodirni za priču"
+      yearLinks={yearLinks}
     />
 
     <ChampionsSummary

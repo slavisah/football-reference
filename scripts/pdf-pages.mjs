@@ -383,6 +383,34 @@ export const PDF_PAGES = [
       'src/pages/hr/compare-players.astro',
     ],
   },
+  // /glossary renders content/glossary.md's own "## Term" sections as a plain
+  // definition list (src/lib/glossary.ts's parseGlossaryEntries) - no
+  // TournamentTable/ChampionsSummary/EditorialNotes/References, so none of
+  // TABLE_COMPONENTS or SOURCES_MD apply here (tests/e2e/print-styles.spec.ts
+  // already groups it with /compare and /teams for the same reason). Only
+  // loadPageMeta (front matter + intro, from src/lib/competition.ts) and
+  // parseGlossaryEntries (the term/definition list itself) determine what the
+  // page shows.
+  {
+    slug: 'glossary',
+    path: '/glossary',
+    sources: [
+      'content/glossary.md',
+      'src/lib/competition.ts',
+      'src/lib/glossary.ts',
+      'src/pages/glossary.astro',
+    ],
+  },
+  {
+    slug: 'glossary-hr',
+    path: '/hr/glossary',
+    sources: [
+      'content/glossary.md',
+      'src/lib/competition.ts',
+      'src/lib/glossary.ts',
+      'src/pages/hr/glossary.astro',
+    ],
+  },
 ];
 
 // /teams/<slug> and /hr/teams/<slug> (one PDF per national team, per
@@ -457,3 +485,122 @@ export const PLAYER_PDF_SOURCES = [
   'src/pages/players/[slug].astro',
   'src/pages/hr/players/[slug].astro',
 ];
+
+// One PDF pair (English + Croatian) per tournament/award edition - the
+// per-edition counterpart of TEAM_PDF_SOURCES/PLAYER_PDF_SOURCES above, for
+// the same reason: an edition's slug is derived from its content/*.md row at
+// build time (buildEditionProfiles(), src/lib/editionProfile.ts), not a
+// fixed, hand-typeable list, so it can't be listed per-entry in PDF_PAGES
+// the way the six competition pages and /records are.
+//
+// Unlike TEAM_PDF_SOURCES/PLAYER_PDF_SOURCES (one shared file list for every
+// team/player, since every /teams/<slug> or /players/<slug> page is built
+// from the exact same fixed set of content files regardless of which team or
+// player it is), each edition family below reads from a *different*
+// content/*.md table - a Nations League edition's PDF has nothing to do
+// with content/copa-america.md - so this is a map keyed by the same `family`
+// string src/pages/edition-index.json.ts stamps on every entry it returns,
+// one source list per family instead of one list for all of them.
+//
+// scripts/generate-pdfs.mjs asks the running preview server for the live
+// edition list (GET /edition-index.json) and renders one PDF pair per entry
+// it finds, recording EDITION_PDF_SOURCES[family] against each
+// `edition-<family>-<slug>`/`edition-<family>-<slug>-hr` manifest key.
+// scripts/check-pdf-freshness.mjs applies the same trust-the-manifest-keys
+// strategy TEAM_PDF_SOURCES's own doc comment explains, recovering `family`
+// from the manifest key itself via editionFamilyFromSlug() below (the
+// `family` string is always a valid, non-ambiguous prefix of the full
+// `edition-<family>-...` key - see that function's own comment).
+const EDITION_VIEW = 'src/components/EditionView.astro';
+const EDITION_LIB = 'src/lib/editionProfile.ts';
+
+export const EDITION_PDF_SOURCES = {
+  'world-cup': [
+    'content/fifa-world-cup.md',
+    'content/golden-boot.md',
+    SOURCES_MD,
+    ...COMPETITION_LIB,
+    EDITION_LIB,
+    EDITION_VIEW,
+    REFERENCES_COMPONENT,
+    'src/pages/competitions/world-cup/[year].astro',
+    'src/pages/hr/competitions/world-cup/[year].astro',
+  ],
+  euro: [
+    'content/uefa-euro.md',
+    'content/golden-boot.md',
+    SOURCES_MD,
+    ...COMPETITION_LIB,
+    EDITION_LIB,
+    EDITION_VIEW,
+    REFERENCES_COMPONENT,
+    'src/pages/competitions/euro/[year].astro',
+    'src/pages/hr/competitions/euro/[year].astro',
+  ],
+  'nations-league': [
+    'content/uefa-nations-league.md',
+    SOURCES_MD,
+    ...COMPETITION_LIB,
+    EDITION_LIB,
+    EDITION_VIEW,
+    REFERENCES_COMPONENT,
+    'src/pages/competitions/nations-league/[year].astro',
+    'src/pages/hr/competitions/nations-league/[year].astro',
+  ],
+  'copa-america': [
+    'content/copa-america.md',
+    SOURCES_MD,
+    ...COMPETITION_LIB,
+    EDITION_LIB,
+    EDITION_VIEW,
+    REFERENCES_COMPONENT,
+    'src/pages/competitions/copa-america/[year].astro',
+    'src/pages/hr/competitions/copa-america/[year].astro',
+  ],
+  'ballon-dor': [
+    'content/ballon-dor.md',
+    SOURCES_MD,
+    ...COMPETITION_LIB,
+    EDITION_LIB,
+    EDITION_VIEW,
+    REFERENCES_COMPONENT,
+    'src/lib/playerProfile.ts',
+    'src/pages/competitions/ballon-dor/[year].astro',
+    'src/pages/hr/competitions/ballon-dor/[year].astro',
+  ],
+  'golden-boot-world-cup': [
+    'content/golden-boot.md',
+    'content/ballon-dor.md',
+    SOURCES_MD,
+    ...COMPETITION_LIB,
+    EDITION_LIB,
+    EDITION_VIEW,
+    REFERENCES_COMPONENT,
+    'src/lib/playerProfile.ts',
+    'src/pages/competitions/golden-boot/world-cup/[year].astro',
+    'src/pages/hr/competitions/golden-boot/world-cup/[year].astro',
+  ],
+  'golden-boot-euro': [
+    'content/golden-boot.md',
+    'content/ballon-dor.md',
+    SOURCES_MD,
+    ...COMPETITION_LIB,
+    EDITION_LIB,
+    EDITION_VIEW,
+    REFERENCES_COMPONENT,
+    'src/lib/playerProfile.ts',
+    'src/pages/competitions/golden-boot/euro/[year].astro',
+    'src/pages/hr/competitions/golden-boot/euro/[year].astro',
+  ],
+};
+
+// Recovers an EDITION_PDF_SOURCES key from a `edition-<family>-<slug>[-hr]`
+// manifest key, for scripts/check-pdf-freshness.mjs (no running server, so it
+// can't ask /edition-index.json which family a given entry belongs to).
+// Longest-prefix-first avoids "golden-boot-world-cup"/"golden-boot-euro"
+// ever being shadowed by a shorter, unrelated family name.
+export function editionFamilyFromSlug(slug) {
+  if (!slug.startsWith('edition-')) return undefined;
+  const families = Object.keys(EDITION_PDF_SOURCES).sort((a, b) => b.length - a.length);
+  return families.find((family) => slug.startsWith(`edition-${family}-`));
+}

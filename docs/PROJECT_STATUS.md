@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 431 Vitest unit tests
+pnpm test                      # 501 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 685 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 804 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1 A/AA sweep, light
                                           # and dark, across every page)
 ```
@@ -10992,6 +10992,1347 @@ most of its budget on elsewhere in the file, just not exhaustively finished.
 The header-as-a-whole two-line height note from the prior entry is
 unaffected by this pass (no UI/CSS touched).
 
+### Test-coverage sweep: `editions.ts` closed to 100%/100% (statements/branches) - added 2026-08-23 (later intensive run)
+
+The full backlog (`AGENTS.md`, `docs/WEBSITE_REQUIREMENTS.md`, this file's
+"Left to do") is complete - every item is checked off and every previously
+"left for a future pass" candidate is exhausted except the specific, concrete
+gap the prior entry (this same day's "Test-coverage sweep" run) named:
+`src/lib/editions.ts` still sat at 99.13%/94.44% (statements/branches), with
+four named-but-unclosed shapes - two more `.sort()` comparator tie-break
+chains, and "a couple of malformed-row edge cases in `buildEditions()` itself
+- a row shorter than its header row, or a table missing a Year/Winner/Host
+column outright." This run closed exactly that list, re-running
+`pnpm test:coverage` after each addition to confirm no new gap opened
+elsewhere.
+
+- **Tie-break arms**: `buildHostsSummary()`, `buildHostMapPoints()`,
+  `buildHomeSoilTitles()` and `buildLongestStreaks()` each sort by count/rank
+  desc, then earliest year, falling through to
+  `displayName.localeCompare()`/`host.localeCompare()` only when both of the
+  first two keys tie - a case no existing fixture had ever constructed. New
+  synthetic two-row fixtures (distinct display names, identical counts,
+  identical *leading* year via same-year-different-suffix labels like
+  `'1970 (zone A)'`/`'1970 (zone B)'`, and for the host-map case two same-
+  region `WORLD_CUP_HOST_COORDINATES` entries) force each function down its
+  final comparator arm and assert the alphabetical order it produces.
+- **`buildEditions()` malformed rows**: a row shorter than its header row
+  (trailing cells simply absent, not blank strings) previously never
+  exercised the `row[index] ?? ''` fallback on the Year/Host/Teams/Winner
+  branches - two new cases (trailing columns missing; leading columns
+  missing via a reordered header row) close all four. A table with **no**
+  Year/Season column at all (the `yearCol >= 0` ternary's `else` arm) was
+  also untested - a third new case closes it, confirming `year: ''` and
+  `yearSort: NaN` rather than a throw.
+- Two smaller, related gaps turned up by the same coverage pass, same shape
+  ("a documented-but-never-exercised fallback"), closed alongside the four
+  named ones rather than left for yet another pass: `finalMargin()`'s
+  `if (!match) return undefined` (a "Final" cell with no digit-dash-digit
+  score pair, e.g. an abandoned/unplayed match) and `editionStoryYear()`'s
+  turn-of-century season rollover (`end <= Number(season[1])`, e.g. a
+  `"1999-00"`-style label needing `+100` to land on `2000`, not yet
+  exercised by any real Nations League season which only starts at
+  `"2018-19"`), plus `buildLongestTitleGaps()`'s "every gap works out to
+  zero" skip (two titles sharing the same duplicate-labeled year, the
+  Copa América 1959 shape) - the file's own doc comment already named this
+  as the intentional "vanishingly unlikely" exclusion case, just never
+  tested.
+
+**Tests:** 9 new Vitest cases, all in `tests/unit/editions.test.ts`. `pnpm
+test` - **467/467** (up from 457). `pnpm test:coverage` - `editions.ts` is
+now **100%/100%** statements/branches (up from 99.13%/94.44%); whole-repo
+`src/lib` average unaffected elsewhere. `pnpm lint` (`astro check`) - 0
+errors/warnings/hints across 139 files. `pnpm build` - 307 pages (unchanged -
+test-only change, no page/component/content edits). `check:links`/
+`check:sitemap`/`check:perf`/`check:precache`/`check:pdfs` all clean. Playwright
+e2e was not re-run this pass (no UI-visible surface touched, same reasoning
+the prior entry gave for its own test-only change).
+
+**Left for a future pass:** the remaining sub-100%-branch files
+(`quiz.ts` line 283, `sources.ts` line 33, `tableSort.ts` line 22, `url.ts`
+line 8) are the ones the 2026-08-23 "Test-coverage sweep" entry above already
+classified as defensively unreachable given the code's own invariants, not
+undertested - left alone here for the same reason. With `editions.ts` now
+closed, no concrete, named test-coverage gap is currently on record; the next
+quality pass should re-run `pnpm test:coverage` from scratch to look for a
+freshly-introduced gap rather than assume one of these four is secretly
+reachable.
+
+### Maintenance: dependency currency sweep, plus stale test counts in the "How to run" header fixed - added 2026-08-23 (later intensive run)
+
+With `editions.ts` closed to 100%/100% by the prior entry, this run re-ran
+the full validation chain from scratch looking for a fresh angle rather than
+repeat an already-exhausted category (content-accuracy passes, source-link
+liveness, and several UI ideas are all on record as low-yield or rejected -
+see the many "standing candidates" notes above). `pnpm test:coverage` came
+back identical to the prior entry (100%/99.48% stmts/branches, the same four
+single-line branches already classified as defensively unreachable) -
+confirming no new gap opened, not finding one. `pnpm build`, `pnpm lint`, and
+every `check:*` script were all clean.
+
+`pnpm outdated` turned up a angle no prior run had touched: the project's own
+`devDependencies`/`dependencies` had never been bumped since whichever run
+first pinned them, and four packages had newer versions available within
+their existing `^`-range (non-breaking): `@astrojs/check` 0.9.9 → 0.9.10,
+`@axe-core/playwright` 4.12.1 → 4.13.0, `@playwright/test` 1.62.0 → 1.62.1,
+`@types/node` 26.1.1 → 26.2.0. `pnpm update` applied exactly those four
+(`package.json`'s caret floors moved up to match, `pnpm-lock.yaml`
+regenerated). Re-ran the full chain afterward to confirm nothing regressed:
+`pnpm lint` - 0 errors, `pnpm test` - **467/467**, `pnpm build` - 307 pages,
+every `check:*` script clean, and the full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` -
+**699/699 passing** (the updated `@playwright/test`/`@axe-core/playwright`
+themselves ran the suite this time, not just the on-disk version bump).
+
+Also fixed, while in the file: the "How to run" section at the top of this
+document still quoted **431** Vitest tests and **685** Playwright tests -
+stale since several intensive runs ago (actual counts are 467/699). Updated
+both to the real, current numbers.
+
+**Left for a future pass:** `astro` (5.18.2 → 7.2.4), `vitest`/
+`@vitest/coverage-v8` (2.1.9 → 4.1.11) and `typescript` (5.9.3 → 7.0.2) are
+each two major versions behind. Deliberately left untouched this run - a
+multi-major upgrade of the framework and test runner carries real breaking-
+change risk (routing/content-collections/config API changes in Astro,
+reporter/config changes in Vitest) that deserves a dedicated pass able to
+work through migration guides and re-validate incrementally, not a
+same-run addition alongside an unrelated maintenance sweep. The safe,
+in-range dependency bumps this run made are unaffected by that and stand on
+their own.
+
+### Dependency upgrade: Astro 5 → 7 and Vitest 2 → 4 - added 2026-08-23 (later intensive run)
+
+The prior "Maintenance: dependency currency sweep" entry deliberately left
+`astro` (5.18.2 → 7.2.4), `vitest`/`@vitest/coverage-v8` (2.1.9 → 4.1.11) and
+`typescript` (5.9.3 → 7.0.2) untouched, naming it as needing "a dedicated
+pass able to work through migration guides and re-validate incrementally."
+This run was that pass, done one dependency at a time with the full
+validation chain re-run after each step so a regression could be attributed
+to the change that caused it.
+
+- **`vitest`/`@vitest/coverage-v8` 2.1.9 → 4.1.11**: no config or test-code
+  changes needed - `vitest.config.ts`'s `v8` coverage provider and
+  `tests/unit/**/*.test.ts` glob both still apply as-is. The only surface
+  effect was in the coverage *engine* itself: the upgraded v8 provider now
+  instruments an implicit-else branch in `buildYearStories()`
+  (`src/lib/editions.ts`) that the old engine didn't count, dropping that
+  file from 100%/100% to 100%/99.43% (branches) with line 298 newly listed as
+  uncovered - not a change to the source, a change in what the tool measures.
+  Closed with one new test (`tests/unit/editions.test.ts`, "attributes a
+  duplicate-labeled year... to only the first matching edition"), using the
+  same synthetic-duplicate-year-label technique (`'1959 (zone A)'`/
+  `'1959 (zone B)'`) the file's own tie-break-arm tests already established,
+  since a real duplicate `storyYear` needs two editions sharing a label the
+  way the two 1959 South American Championship entries do. Back to
+  100%/100% on `editions.ts`.
+- **`astro` 5.18.2 → 7.2.4**: one real breaking change touched this repo.
+  Astro 7 deprecates the `z` re-export from `astro:content` in favor of
+  `import { z } from 'astro/zod'` (Astro 7 now uses zod v4 internally under
+  `astro/zod`, not the old `astro:schema`/`astro:content` re-export this repo
+  was on) - `astro check` surfaced it as 17 `ts(6385)` "deprecated" hints
+  against every `z.*()` call in `src/content.config.ts`, the one file in the
+  repo that imported `z` from `astro:content` (`getEntry` is still imported
+  from `astro:content` elsewhere and is unaffected). Fixed by splitting the
+  import: `defineCollection` stays from `astro:content`, `z` now comes from
+  `astro/zod`. `astro.config.mjs`'s `redirects`/`base`/`build.format` config
+  needed no changes - all three are still current APIs in v7. No other file
+  in `src/` imports anything from `astro:content` besides `getEntry`, and no
+  `.astro` file touches `z` at all.
+- **`typescript` 5.9.3 → 7.0.2 - not attempted, blocked**: `@astrojs/check`
+  (the package `pnpm lint` runs `astro check` through) pins
+  `peerDependencies.typescript` to `^5.0.0 || ^6.0.0` even at its own latest
+  published version (0.9.10, already installed here) - TypeScript 7 is not
+  in that range. Bumping `typescript` alone without a matching `@astrojs/check`
+  release would either break `pnpm lint` on the peer-dependency mismatch or,
+  worse, run `astro check`'s TS-compiler-API-dependent diagnostics against a
+  major TS version it was never validated against. Left at 5.9.3 until
+  `@astrojs/check` itself ships TS 7 support - re-check `npm view
+  @astrojs/check peerDependencies` on the next dependency pass rather than
+  assuming this is still blocked.
+
+**Validation:** full chain re-run after every step, not just at the end.
+`pnpm lint` (`astro check`) - 0 errors/warnings/hints across 139 files (down
+from 17 hints mid-upgrade, before the `z` import fix). `pnpm test` -
+**468/468** (up from 467, the one new coverage-closing test). `pnpm
+test:coverage` - back to the same 100%/99.35%-or-better per-file numbers as
+the pre-upgrade baseline, `editions.ts` restored to 100%/100%. `pnpm build`
+- **307 pages** (unchanged). `check:links`/`check:sitemap`/`check:perf`/
+`check:precache`/`check:pdfs` all clean. `pnpm dev` starts and stops cleanly
+(Astro 7's dev server now runs as a `pid`-reporting daemon controllable via
+`astro dev stop`/`astro dev status`/`astro dev logs` - noted here since it's
+a visible behavior change from Astro 5, though nothing in this repo's
+scripts or docs depended on the old foreground-process behavior). Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` -
+**699/699 passing**, unchanged.
+
+**Left for a future pass:** the `typescript` 7 upgrade, gated on
+`@astrojs/check` adding peer support - see above. No other astro/vitest
+follow-up is outstanding; both are now at their latest stable release.
+
+### Bug fix: the Astro 5→7 upgrade silently broke `pnpm test:e2e` on every fresh checkout (i.e. every CI run), plus /glossary gains a downloadable print PDF - added 2026-08-24 (intensive run)
+
+Every named backlog item, "Left for a future pass" candidate, and nice-to-have
+was already closed going into this run (see the many entries above), so this
+run started from a full-repo health check rather than a specific named
+candidate - `pnpm lint`/`test`/`build`/`check:*` all came back clean, but
+running the full `PW_EXECUTABLE_PATH=... pnpm test:e2e` suite from a truly
+cold start (no server already running - the same starting condition
+`.github/workflows/ci.yml` has on every PR) immediately failed with `Error:
+Process from config.webServer exited early`, before a single test ran.
+
+**Root cause:** the 2026-08-23 "Astro 5 → 7" entry above already noted, as a
+side observation, that "Astro 7's dev server now runs as a `pid`-reporting
+daemon controllable via `astro dev stop`/`astro dev status`/`astro dev
+logs`" - but didn't follow that observation through to `astro preview`
+(which changed the same way) or to `playwright.config.ts`'s `webServer:
+{ command: 'pnpm build && pnpm preview --port 4321 --host', ... }`, which
+depends on that command staying alive in the foreground for the whole test
+run. Confirmed directly: running `astro preview --port 4321 --host` on its
+own now always forks the real server into a detached background daemon and
+returns immediately once it's listening (verified via `astro preview
+status` showing the daemon still running after the invoking command had
+already exited) - Playwright's `webServer` feature treats any exit of the
+command it spawned as fatal, regardless of exit code, so it aborted before
+even reaching its own URL health-check. This is why that same 2026-08-23
+entry's own validation still reported "699/699 passing" for `pnpm
+test:e2e`: `reuseExistingServer: !process.env.CI` (true outside CI) silently
+reused a preview server left running from earlier manual testing in that
+same local session, so a truly fresh spawn - the only kind CI ever does -
+was never actually exercised. Every PR's CI run since that upgrade would
+have failed on the "Mobile smoke test" step; this had not yet been hit
+because no PR had triggered `ci.yml` since 2026-08-23.
+
+**Fix:** new `scripts/test-preview-server.mjs`, referenced from
+`playwright.config.ts`'s `webServer.command` (now `pnpm build && node
+scripts/test-preview-server.mjs`, with `env: { PORT, BASE_PATH }` passed
+through so the two files can't drift on the port/base path). It starts the
+`astro preview` daemon, polls the URL until it answers (mirroring
+`scripts/generate-pdfs.mjs`'s existing `waitForServer()`), then blocks so
+Playwright sees a live foreground process; on SIGTERM/SIGINT it runs `astro
+preview stop` before exiting. The first version of this script blocked with
+a bare `await new Promise(() => {})`, which does **not** actually keep
+Node's event loop alive on its own - an unresolved promise with nothing
+else pending isn't a libuv handle, so the process exited a few hundred
+milliseconds after printing "ready" anyway, reproducing the exact same
+"exited early" failure. Confirmed the mechanism with a minimal standalone
+repro (`node -e`, timed with a real `kill -0` check, not just "no error
+printed") before and after switching to `await new Promise(() => {}
+setInterval(() => {}, 60_000))`, which does hold a real handle open.
+Verified the fix twice against a genuinely fresh spawn (`astro preview
+stop` run immediately beforehand both times): once with the local default
+(`reuseExistingServer: true`) and once with `CI=true` (matching
+`ci.yml` exactly, `reuseExistingServer: false`) - **701/701 passing** both
+times (up from 699 - the two new glossary PDF tests below).
+
+Also fixed the same underlying daemon-vs-foreground assumption in
+`scripts/generate-pdfs.mjs`'s own `stopServer()`, found while diagnosing the
+above: it killed `server`'s process *group* (`process.kill(-server.pid,
+'SIGTERM')`), which correctly reached the real server under Astro 5 (where
+`server` *was* the server, running in the foreground) but no longer does now
+that `server` is just the short-lived immediate CLI invocation that forks
+the real daemon and exits - confirmed as a live bug, not a theoretical one,
+by finding an `astro preview` process still listening on port 4399 after an
+unrelated `pnpm build:pdfs` run earlier in this same session had already
+finished and printed its manifest. `stopServer()` now also runs `astro
+preview stop` (`spawnSync`, kept alongside the now-mostly-inert
+process-group kill as a harmless no-op in case a future Astro version
+reverts this).
+
+One remaining, minor, non-blocking observation from this fix, left as-is
+rather than chased further: even after a fully green `pnpm test:e2e` run
+(both locally and under `CI=true`), the `astro preview` daemon it started is
+still running afterward (`astro preview status` shows it) - Playwright does
+not appear to signal `webServer.command` for teardown once tests finish, at
+least not in a way this script's SIGTERM handler observably reacted to. This
+doesn't affect correctness or CI's outcome (CI runners are destroyed after
+the job either way, and this exact "leave a server running for fast local
+iteration" outcome is what `reuseExistingServer: true` already intended
+locally) - it just means a leftover `astro preview` process needs manually
+stopping (`astro preview stop`) between local `pnpm test:e2e` runs now,
+same as it did for `astro dev` since 2026-08-23. Not investigated further
+this run since it doesn't block anything; worth a look if a future pass has
+reason to touch this area again.
+
+**Second change this run, independent of the fix above:** `/glossary` was
+the only reference page on the site without a downloadable print PDF -
+every other content page family (`/records`, `/compare`, `/compare-players`,
+`/teams/<slug>`, `/players/<slug>`, the six competition/award pages) already
+has one, and `tests/e2e/print-styles.spec.ts`'s own comment already grouped
+`/glossary` with `/compare`/`/teams`/`/players` as "no `TournamentTable`" -
+explaining why it prints cleanly but never explaining why it also lacked the
+PDF the other three do have. Closed the gap: `PrintDownloadLink` added to
+both `src/pages/glossary.astro` and `src/pages/hr/glossary.astro` (Croatian
+label/hint, matching every other localized page's convention), and two new
+entries in `scripts/pdf-pages.mjs`'s shared `PDF_PAGES` list (`glossary`/
+`glossary-hr`) - sourced from `content/glossary.md`,
+`src/lib/competition.ts` (front matter/intro) and `src/lib/glossary.ts` (the
+term list itself); no `TABLE_COMPONENTS`/`SOURCES_MD` dependency since this
+page has neither a `TournamentTable` nor a `References` section. `pnpm
+build:pdfs` regenerated all 296 PDFs (294 existing + the 2 new glossary
+ones - the existing 294 all show as changed in the diff for the same
+per-render-timestamp reason every prior `build:pdfs` run's entry already
+notes, not a content change). 2 new Playwright cases in
+`tests/e2e/mobile.spec.ts`'s existing Glossary/Croatian-glossary
+`describe` blocks (link visible + resolves with a `pdf` content-type,
+English and Croatian).
+
+**Validation:** `pnpm lint` - 0 errors/warnings/hints across 140 files.
+`pnpm test` - 468/468, unchanged (no `src/lib` code changed). `pnpm build` -
+307 pages, unchanged. `pnpm check:pdfs` - all 296 PDFs fresh. `check:links`/
+`check:sitemap`/`check:perf`/`check:precache` all clean. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` - **701/701
+passing**, verified twice (see above).
+
+**Left for a future pass:** the minor teardown observation noted above. No
+other gap is known; the standing "nothing left" list is otherwise unchanged.
+
+### New feature: per-edition pages for the FIFA World Cup (`/competitions/world-cup/<year>`, EN + HR) - added 2026-08-24 (intensive run)
+
+The site had profile pages keyed by every entity that *spans* editions - a
+country (`/teams/<slug>`), a player (`/players/<slug>`) - but no page for a
+single edition itself, so a reader (or a search engine, or an inbound link)
+had no way to deep-link "the 2018 World Cup" as its own destination; the only
+view of one edition was a single row inside the big filterable table. This
+run added the missing perpendicular cut: one page per FIFA World Cup edition
+(23 editions, 1930-2026), in both languages, reached by tapping that
+edition's Year cell in the competition table.
+
+**Library:** new `src/lib/editionProfile.ts`. `buildEditionProfiles(editions,
+teamSlugs?)` turns each edition into a page-ready profile - every source
+column except Year kept as a fact in source order, with the four *placing*
+columns (Winner/Champion, Runner-up, Third, Fourth/other semifinalist)
+carrying a `/teams/<slug>` link resolved through `summaryGroupFor()` (so a
+historical name like "West Germany" links to the merged `germany` profile,
+matching every other title-grouping on the site) - plus a chronological
+`previous`/`next` neighbour for the pager. It deliberately links a placing
+*only* when its slug is in the passed `teamSlugs` set (the slugs
+`buildAllCountryRecords()` actually generates a page for), so the route can
+never emit a link `check-internal-links.mjs` would flag; and it *throws* on
+two editions sharing a slug rather than silently dropping one - the same
+"never ship a silent data problem" guard `/teams/[slug]`'s own
+`getStaticPaths` uses. That guard is why only the World Cup gets edition
+pages this run and not Copa América: Copa's two 1959 tournaments collide on
+the `1959` slug (real data, `allowDuplicateYears: ['1959']`), which needs a
+disambiguation scheme (e.g. `1959-i`/`1959-ii`) designed before its edition
+pages can be built - noted below.
+
+**Deliberately not a placing:** the Host column is a country name too, but it
+is not a finish, so it is never linked to a team profile (a host that isn't a
+World Cup finalist may have no profile at all). Missing-cell (`—`) and
+"not held"-style placeholder values are never linked either.
+
+**Wiring:** new shared `src/components/EditionView.astro` (a facts `<dl>`, an
+optional "story of this edition" card fed the same Memorable-moments bullet
+the table's tap-to-reveal uses, that edition's Golden Boot top scorer, a
+prev/next pager hidden in print, and a back-link) - fully localizable via
+props, the same convention every other component here follows, so the
+English page (`src/pages/competitions/world-cup/[year].astro`) and the
+hand-translated Croatian page (`src/pages/hr/competitions/world-cup/
+[year].astro`) share one component. `TournamentTable.astro` gained an
+optional `yearLinks` prop (a base-relative `edition.year -> path` map, wrapped
+in `withBase()` by the component itself when rendering the Year cell as a
+link); `CompetitionView.astro` threads it through; both World Cup table pages
+build it via `buildEditionLinks()`. Every other competition's table passes no
+`yearLinks` and renders its Year column as plain text exactly as before.
+`src/pages/sitemap.xml.ts` gained a per-edition loop (bilingual, reciprocal
+hreflang), the same shape its per-team and per-player loops already use. The
+edition pages carry an explicit `alternateHref`/`breadcrumbTrail` per page,
+so they need no entry in `TRANSLATED_PATHS`.
+
+**Real bug caught before shipping:** the first version passed the
+`buildEditionLinks()` path straight into the Year `<a href>` without
+`withBase()`, so under the site's `/football-reference` base path every
+in-table year link pointed at `/competitions/world-cup/2018` (a 404 on the
+deployed project site) instead of `/football-reference/competitions/...`.
+Caught by grepping the built HTML for the actual emitted href, not by the
+type checker or a naively-passing link check (dev has no base path). Fixed by
+applying `withBase()` inside `TournamentTable` where every other href it
+renders already is, and documenting the map's values as base-relative.
+
+**Deliberately no downloadable PDF this run.** Every other page family has a
+print PDF, but adding one per edition means 46 browser-rendered PDFs
+(23 x 2 languages) generated via `build:pdfs`' Playwright pass - a large,
+mechanical, browser-dependent addition. The edition pages already print
+cleanly through the existing print stylesheet (the pager is `display:none`
+in `@media print`; the facts list and References render as normal), so the
+"no PDF" state is a graceful one, not a broken one. Left as the one known
+follow-up for this feature (see below), the same way `/glossary` shipped
+without a PDF for a long time before that gap was closed.
+
+**Tests:** 14 new Vitest cases (`editionProfile`: slug normalization incl.
+the en-dash season case, newest-first ordering, facts-in-source-order, the
+four-placings-linked/host-and-data-columns-not case, successor-group
+resolution, the `teamSlugs` gating, prev/next chaining with open ends,
+missing-cell/placeholder non-linking, the duplicate-slug throw, and
+`buildEditionLinks` for both locales) - 482 Vitest total, up from 468. 14 new
+Playwright cases (`tests/e2e/edition-page.spec.ts`: year-cell link navigates,
+placings linked but host not, top scorer joined in, pager forward, oldest
+edition has no previous link, back-link, no 360px overflow, no WCAG
+violations, the language switch both ways, and the Croatian page's translated
+chrome/back/pager) plus 3 assertions added to `mobile.spec.ts`'s sitemap test
+(the count is now 352, up from 306: +46 edition URLs) - full suite green.
+
+**Validation:** `pnpm lint` - 0 errors/warnings/hints across 145 files.
+`pnpm test` - 482/482. `pnpm build` - 353 pages (up from 307: +46 edition
+pages). `check:links` (357 pages), `check:sitemap` (352 entries),
+`check:perf`, `check:precache` all clean. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` - all passing
+(714 + 14 new edition cases). `check:pdfs` untouched (no PDFs added).
+
+**Left for a future pass:** (1) a downloadable print PDF per edition, if the
+PDF-per-entity convention is judged worth the 46-file build cost - the pages
+print fine without one today. (2) Extend edition pages to the other
+competitions: EURO and Nations League are straightforward (unique year/season
+labels); Copa América first needs a slug-disambiguation scheme for its two
+1959 tournaments (`buildEditionProfiles` throws on the collision by design);
+the two individual awards (Ballon d'Or, Golden Boot) are a different shape
+(no host/placings) and would want their own edition-page template rather than
+reusing `EditionView` as-is.
+
+### New feature: per-edition pages for Copa América (`/competitions/copa-america/<slug>`, EN + HR) - added 2026-08-24 (later intensive run)
+
+The prior entry named Copa América as the next edition-page candidate but
+left it blocked on "a slug-disambiguation scheme" for its two 1959
+tournaments (Argentina-hosted, then Ecuador-hosted - see
+`content/copa-america.md`), since `buildEditionProfiles()` threw on the two
+editions colliding on the plain slug "1959" by design. This run built that
+scheme and shipped Copa América's edition pages on top of it - 48 editions
+(46 unique years + the two 1959 tournaments), EN + HR, reached the same way
+the FIFA World Cup's already are (tap a year cell in the competition table).
+
+**The disambiguation scheme, in `src/lib/editionProfile.ts`:** editions are
+first grouped by their plain-year slug; a group of one keeps that slug
+unchanged (every competition/year this site has ever had, minus one pair).
+A group of more than one is disambiguated by host - each edition's Host
+column value is slugified and appended ("1959" + "Argentina"/"Ecuador" ->
+`1959-argentina`/`1959-ecuador`) - and only if that produces a fully unique
+set of slugs within the group; otherwise `buildEditionProfiles()` still
+throws with the same "same edition slug" message as before, so a future
+competition with a genuine, unresolvable collision (no host column, or two
+editions at the same host) fails loudly at build time rather than silently
+merging two editions onto one page. This is why the fix generalizes past
+Copa América's specific case rather than hardcoding "1959": it's a real
+`Map<Edition, string>` slug-assignment pass, not a special case in an
+if-statement.
+
+**A second, related bug the same duplicate year exposed:** `TournamentTable`'s
+`yearLinks` prop (the Year-cell-to-edition-page map) was keyed by plain
+`edition.year` alone, which cannot represent "the same year linking two
+different pages" - both 1959 rows would have resolved to whichever map entry
+was written last. New `editionLinkKey(year, host?)`, exported from
+`editionProfile.ts` and used identically by both the producer
+(`buildEditionLinks`, keyed off `EditionProfile.host`) and the consumer
+(`TournamentTable`, keyed off `Edition.host`) - folds the host into the key
+whenever one is present, so a competition with unique years (World Cup,
+EURO, Nations League) is unaffected in behavior (its keys just happen to
+carry `::<host>` now) while Copa América's two 1959 rows each resolve to
+their own page. Caught before shipping by grepping the built HTML for both
+1959 rows' actual `href` values, not by a passing type check (`Map<string,
+string>` doesn't know its own keys should be unique per *page*, only per
+*string*).
+
+**Pager clarity:** the World Cup's `EditionNeighbour` type only carried a
+slug and a year, which is fine when a year is already unique - but the two
+1959 pages are chronological neighbours of each other, so the pager would
+have shown two indistinguishable "1959" links pointing at different pages.
+`EditionNeighbour` gained an optional `disambiguator` field, set only when a
+neighbour's slug required host disambiguation (a plain equality check against
+`editionSlug(neighbour.year)`, so every non-Copa-América page's pager is
+byte-identical to before); `EditionView.astro`'s pager renders it in
+parentheses ("1959 (Ecuador)") when present. The two 1959 pages' own
+`<h1>`/meta description also fold the host in the same way, computed in the
+page file itself (`profile.slug !== editionSlug(profile.year)`) rather than
+inside the shared component, since only Copa América needs it today.
+
+**Wiring:** new `src/pages/competitions/copa-america/[year].astro` and its
+Croatian sibling, modeled directly on the World Cup's edition-page files -
+same `EditionView`/`References` composition, same `getStaticPaths` shape.
+No Golden Boot top-scorer join (Golden Boot only tracks World Cup/EURO, so
+that prop is simply omitted). `copa-america.astro` (EN + HR) gained the same
+`yearLinks` wiring the World Cup competition page already had, threaded
+through `CompetitionView.astro`'s existing `yearLinks` prop (no component
+change needed there - it already forwarded the map to `TournamentTable`).
+`sitemap.xml.ts` gained a Copa América edition loop identical in shape to the
+World Cup one, using the same `buildEditionProfiles()` call (already needed
+`allowDuplicateYears: ['1959']`, already present from Copa América's original
+page build).
+
+**Tests:** 6 new Vitest cases (`editionProfile.test.ts`): the two 1959
+editions each get their own host-suffixed slug, non-colliding years are
+unaffected, previous/next chains correctly across both 1959 editions and
+their real neighbours with a disambiguator only where one is needed, the
+existing no-host-column duplicate-year case still throws, `editionLinkKey`'s
+three shapes (plain year, year+host, empty-host fallback), and
+`buildEditionLinks` resolving each 1959 row to its own page while the bare
+year resolves to neither - 488 Vitest total, up from 482. (World Cup's own
+`buildEditionLinks` tests were updated in place, not added to - `yearLinks`
+now keys by year+host, so those assertions look up `editionLinkKey('2018',
+'Russia')` rather than a bare `'2018'`, but the maps they check are the same
+size as before.) 13 new Playwright cases
+(`tests/e2e/copa-america-edition-page.spec.ts`): a normal year links straight
+through same as World Cup, both 1959 rows link to their own page rather than
+colliding, each 1959 page shows its own champion, the pager shows the host
+disambiguator only on the 1959<->1959 hop, back-link, no 360px overflow on
+either 1959 page, no WCAG violations, the language switch both ways, and the
+Croatian page's translated chrome/pager with the disambiguator carried
+through - 728 Playwright total, up from 715 (13 new cases here, plus one
+`mobile.spec.ts` sitemap-count assertion updated in place from 352 to 448:
++96 Copa América edition URLs, 48 editions x 2 languages).
+
+**Validation:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across
+149 files. `pnpm test` - 488/488. `pnpm build` - **449 pages** (up from 353:
++96 Copa América edition pages). `check:links` (453 pages), `check:sitemap`
+(448 entries), `check:perf`, `check:precache` all clean.
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` - **728/728
+passing**. `pnpm build:pdfs` regenerated all 296 PDFs (the shared
+`TournamentTable.astro`/`copa-america.astro` edits made `check:pdfs` report
+them stale, same as any change to those files does - no new PDF pages were
+added, matching the World Cup edition pages' own "no PDF" precedent below).
+
+**Left for a future pass:** (1) the same "no downloadable PDF per edition"
+gap the World Cup entry above left open, now also true for Copa América's 48
+edition pages. (2) Extend edition pages to EURO and Nations League next -
+both still have unique year/season labels per the prior entry's read, so
+should need no further scheme work, just the same wiring this run and the
+World Cup run both used. (3) The two individual awards (Ballon d'Or, Golden
+Boot) still need their own edition-page template - a different shape
+(no host/placings) than `EditionView` was built for.
+
+### New feature: per-edition pages for UEFA EURO and the UEFA Nations League Finals (EN + HR) - added 2026-08-24 (later intensive run)
+
+The prior two entries built per-edition pages for the FIFA World Cup and
+Copa América and named EURO/Nations League as the straightforward next step
+- both have unique Year/Season labels per edition, so `buildEditionProfiles()`
+needed no new disambiguation scheme, only the same wiring those two runs
+already established. This run shipped both: 17 UEFA EURO editions
+(1960-2024) and 4 UEFA Nations League Finals editions (2018-19 through
+2024-25), each in English and Croatian, reached the same way every other
+edition page is - tapping a year/season cell in the competition table.
+
+**EURO** (`src/pages/competitions/euro/[year].astro` + Croatian sibling):
+built directly on the World Cup edition page's pattern - same
+`teamSlugs`-gated `buildEditionProfiles()` call, same Golden Boot top-scorer
+join (`loadCompetition('golden-boot', { editionsHeading: 'UEFA EURO top
+scorers', ... })`). EURO's placing columns are named "Other semifinalist" /
+"Other semifinalist / fourth" rather than "Third"/"Fourth" (no third-place
+match has been played since 1980 - see the site's own "Historical format
+note"); `editionProfile.ts`'s `TEAM_PLACING_PATTERNS` already matches on
+`/finalist/i` unanchored, so both columns were linked correctly with no
+library change needed.
+
+**UEFA Nations League Finals**
+(`src/pages/competitions/nations-league/[year].astro` + Croatian sibling):
+built on the Copa América edition page's pattern instead (no Golden Boot
+join - that award only tracks the FIFA World Cup and EURO, so the
+`topScorer` prop is simply omitted, the same way Copa América's edition
+pages already do). The "Season" column carries labels like "2018–19"
+(en dash); `editionSlug()` already normalizes that to a plain-hyphen
+"2018-19" URL segment (the same normalization the World Cup edition page's
+own Vitest suite already covers for a season label), so no scheme work was
+needed there either. The "Finals host" column is a country name but not a
+placing, so - like every other competition's Host column - it is never
+linked, exercised by a dedicated "no top-scorer fact" test analogue asserting
+the Finals-host fact has no `<a>` child.
+
+**Wiring:** both competitions' own table pages
+(`src/pages/competitions/euro.astro`, `.../nations-league.astro`, and their
+Croatian siblings, which compose their layout by hand rather than through
+`CompetitionView`) gained the same `yearLinks` prop the Copa América table
+page already threads through, via `buildEditionLinks(buildEditionProfiles(...),
+basePath)`. `sitemap.xml.ts` gained two more per-edition loops, reusing the
+`euro`/`nationsLeague` `CompetitionData` already destructured from
+`loadTeamCompetitions()` for the `/teams` per-country loop just above them,
+rather than issuing two more redundant `loadCompetition()` calls.
+
+**Tests:** no library code changed (`editionProfile.ts` is fully generic
+already), so no new Vitest cases - `pnpm test` stays 488/488. 28 new
+Playwright cases: `tests/e2e/euro-edition-page.spec.ts` (14, mirroring the
+World Cup edition-page suite: year-cell link navigates, placings linked but
+host not, top scorer joined in from Golden Boot, pager forward, oldest
+edition has no previous link, back-link, no 360px overflow, no WCAG
+violations, the language switch both ways, and the Croatian page's
+translated chrome/back/pager) and
+`tests/e2e/nations-league-edition-page.spec.ts` (14, mirroring the same
+shape but asserting the *absence* of a top-scorer fact instead of its
+presence, and exercising the en-dash-season-to-hyphen-slug normalization via
+the "2022–23" row). `mobile.spec.ts`'s sitemap-count assertion updated in
+place from 448 to 490 (+34 EURO edition URLs, +8 Nations League edition
+URLs), plus four new `<loc>`/hreflang spot-checks (EURO 2016, Nations League
+2022-23) alongside the existing World Cup 2018 ones.
+
+**Validation:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across
+157 files. `pnpm test` - 488/488 (unchanged). `pnpm build` - **491 pages**
+(up from 449: +34 EURO + +8 Nations League edition pages). `check:links`
+(495 pages), `check:sitemap` (490 entries), `check:perf`, `check:precache`
+all clean. `check:pdfs` flagged the four shared table pages
+(`euro`/`nations-league`, both languages) as stale once `yearLinks` touched
+them - `pnpm build:pdfs` regenerated all 296 PDFs (no new PDF pages added,
+same "no per-edition PDF yet" precedent the World Cup and Copa América
+edition pages already established), `check:pdfs` clean afterward.
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` targeted runs of every new and
+touched Playwright suite are green: the new `euro-edition-page.spec.ts` (14)
+and `nations-league-edition-page.spec.ts` (14, one grammar fix to a Croatian
+h1 assertion after the first run - "UEFA Liga nacija" stays nominative in the
+edition-page heading, matching the competition's existing display name
+everywhere else on the site rather than the genitive this suite first
+guessed), the updated `mobile.spec.ts` sitemap test, and the existing
+EURO/Nations League table-page suites (30 cases, unaffected by the new
+`yearLinks` prop beyond the Year cell now rendering as a link). Full
+`pnpm test:e2e` - **756/756 passing** (up from 728, the 28 new edition-page
+cases).
+
+**Left for a future pass:** (1) the same "no downloadable PDF per edition"
+gap named for the World Cup and Copa América now also applies to these 21
+new edition pages (17 EURO + 4 Nations League). (2) The two individual
+awards (Ballon d'Or, Golden Boot) are the only competitions left without
+per-edition pages - a different shape (no host/placings, and Golden Boot has
+two tables per year: World Cup and EURO top scorers) than `EditionView` was
+built for, so they need their own template rather than reusing this one
+as-is.
+
+### New feature: per-edition pages for the Men's Ballon d'Or (EN + HR) - added 2026-08-24 (later intensive run)
+
+The prior entry left both individual awards (Ballon d'Or, Golden Boot) named
+as needing "their own edition-page template" rather than reusing
+`EditionView` as-is, since their "Winner" column names a *player*, not a
+*team* - `buildEditionProfiles()`'s existing fact-linking would have tried to
+resolve a name like "Lionel Messi" as if it were a national team. Turned out
+not to be true: `EditionView.astro` itself was already fully generic (it just
+renders whatever `EditionProfile.facts` it's given), so the actual gap was
+narrower than the "own template" framing suggested - only the *linking
+rules* needed a second mode, not a second component. This run built that and
+shipped the Ballon d'Or's 70 editions (1956-2025, including the 2020 "Not
+awarded" year), EN + HR, reached the same way every other edition page is -
+tapping a year cell in the award table.
+
+**The individual-award linking mode, in `src/lib/editionProfile.ts`:**
+`buildEditionProfiles()` gained a third, optional `individualAward` argument
+(`{ playerSlugs: Set<string> }`). When given, two new pattern sets -
+`PLAYER_WINNER_PATTERNS` (`/^winner$/i`, `/player/i`) and
+`TEAM_MEMBER_PATTERNS` (`/^(national team|team)$/i`) - replace
+`TEAM_PLACING_PATTERNS` for that call only: the "Winner" column links to
+`/players/<slug>` (via the existing `playerProfileSlug()` from
+`src/lib/playerProfile.ts`) and "National team" links to `/teams/<slug>`
+separately, both still gated on "only link a slug that actually has a
+generated page" the same way `teamSlugs` already gated team placings. Every
+existing team-competition call site (World Cup, Copa América, EURO, Nations
+League) omits the new argument and is byte-for-byte unaffected - verified by
+a new test asserting a team competition's own "Winner" column still links to
+a team, never a player, when `individualAward` isn't passed. `EditionFact`
+gained an optional `playerSlug` alongside its existing `teamSlug`.
+
+**`EditionView.astro`:** the fact-rendering `<dd>` gained a `fact.playerSlug`
+branch (checked after `teamSlug`, before the `Final`-abbreviation branch),
+linking to `/players/<slug>` with a new `playerProfileHintTemplate` prop
+(`'{player} — full award history'`, matching the hover-hint convention
+`teamProfileHintTemplate` already established) - both hr edition pages
+override it with the Croatian award-history phrase.
+
+**The "Not awarded" 2020 row:** unlike every team competition's edition
+pages, this table has a real "no winner" row (content/ballon-dor.md's 2020
+Ballon d'Or, not awarded because of the pandemic - same placeholder
+`isPlaceholderWinner()` already recognizes elsewhere on the site). That
+edition still gets its own page (`/competitions/ballon-dor/2020`) - the
+placeholder guard already in `buildEditionProfiles()`'s cell loop (shared
+with the team-competition path) simply never attaches a `playerSlug`/`teamSlug`
+to "Not awarded"/"—", so the page renders the fact as plain text with no
+broken link. Both the EN and HR pages special-case their meta description
+for this one row ("was not awarded" / "nije dodijeljena") rather than
+reading oddly as "Not awarded won".
+
+**Wiring:** new `src/pages/competitions/ballon-dor/[year].astro` and its
+Croatian sibling, modeled on the Copa América edition page's pattern (no
+host, no Golden Boot join - that only tracks the FIFA World Cup and EURO).
+`ballon-dor.astro` (EN, via `CompetitionView`) and its hr sibling (hand-rolled
+via `TournamentTable` directly) both gained the same `yearLinks` wiring the
+team competitions' pages already had - `CompetitionView` already forwarded a
+`yearLinks` prop with no component change needed, exactly as the EURO/Nations
+League entry above found. `sitemap.xml.ts` gained a Ballon d'Or edition loop,
+built with `individualAward` using the exact `playerProfiles` slug set
+already computed for the `/players/` loop just above it (guaranteeing the two
+loops can never link to a slug the other doesn't also serve).
+
+**Tests:** 5 new Vitest cases (`editionProfile.test.ts`, against a small
+inline table shaped like `content/ballon-dor.md`'s real columns, including a
+"Not awarded" row): the Winner column links to a player not a team, National
+team still links to a team, a player with no generated `/players/` page is
+left unlinked, the "Not awarded" placeholder is never linked, and a team
+competition's own Winner column is unaffected when `individualAward` is
+omitted - 493 Vitest total, up from 488. 15 new Playwright cases
+(`tests/e2e/ballon-dor-edition-page.spec.ts`): a normal year links straight
+through, the winner and national team link to their own separate profiles,
+the "Not awarded" 2020 page has no broken link, the pager, the oldest edition
+has no previous link, back-link, no 360px overflow, no WCAG violations, the
+language switch both ways, and the Croatian page's translated chrome/pager
+plus its own "Not awarded" case - plus one `mobile.spec.ts` sitemap-count
+assertion updated in place from 490 to 630 (+140 Ballon d'Or edition URLs, 70
+editions x 2 languages) with two new `<loc>`/hreflang spot-checks (Ballon
+d'Or 2018) alongside the existing per-competition ones. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` - **771/771
+passing** (up from 756, the 15 new edition-page cases).
+
+**Validation:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints. `pnpm
+test` - 493/493. `pnpm build` - **631 pages** (up from 491: +140 Ballon d'Or
+edition pages, 70 editions x 2 languages including the 2020 "Not awarded"
+year). `check:links` (635 pages), `check:sitemap` (630 entries), `check:perf`,
+`check:precache` all clean. `check:pdfs` flagged the two shared Ballon d'Or
+table pages (EN + HR) as stale once `yearLinks` touched them -
+`pnpm build:pdfs` regenerated all 296 PDFs (no new PDF pages added, same
+"no per-edition PDF yet" precedent every other edition-page rollout has
+established), `check:pdfs` clean afterward. Full `pnpm test:e2e` -
+**771/771 passing**.
+
+**Left for a future pass:** (1) the same "no downloadable PDF per edition"
+gap named by every prior edition-page entry now also applies to these 70 new
+pages. (2) Golden Boot is the only competition left without edition pages -
+harder than Ballon d'Or: one content file holds two tables (World Cup and
+EURO top scorers) sharing years, and ties have multiple joint winners
+("; "-separated names, e.g. 1962's six-way tie) that this run's
+`individualAward` mode does not yet split the way `playerProfile.ts`'s
+`teamFor()` already does for that exact case - `buildEditionProfiles()`
+would need the same index-aligned splitting before Golden Boot's edition
+pages can reuse it safely.
+
+### New feature: per-edition pages for the Golden Boot (FIFA World Cup + UEFA EURO, EN + HR) - added 2026-08-25 (intensive run)
+
+The last competition on the site without edition pages, and the one the
+prior entry flagged as harder than Ballon d'Or for two separate reasons -
+both resolved this run.
+
+**Two route trees instead of one.** `content/golden-boot.md` holds two
+tables that share years (World Cup 1930-2026, EURO 1960-2024), so a single
+`buildEditionProfiles()` call over one merged edition list would collide.
+Rather than force a disambiguation scheme the way Copa América's host suffix
+does, Golden Boot gets two independent route trees -
+`src/pages/competitions/golden-boot/world-cup/[year].astro` and
+`.../golden-boot/euro/[year].astro` (plus Croatian siblings) - each calling
+`buildEditionProfiles()` on its own table's editions only, the same two
+`loadCompetition('golden-boot', { editionsHeading: ... })` calls the parent
+`/competitions/golden-boot` page already makes. No slug collision is
+possible because the two races never share a URL prefix.
+
+**Tied scorers, via `EditionFact.parts` (`src/lib/editionProfile.ts`).**
+Golden Boot's "Player(s)" and "Team" columns are "; "-joined when multiple
+players tie (e.g. 1994's "Hristo Stoichkov; Oleg Salenko" / "Bulgaria;
+Russia", or 1962's six-way tie). The previous `individualAward` mode treated
+a tied cell as one unresolvable joined string; `buildEditionProfiles()` now
+splits it into one `EditionFactPart` per name when the cell contains "; ",
+each independently checked against `playerSlugs`/`teamSlugs` the same way a
+single-winner cell already was. The Team column is index-aligned against the
+Player(s) column's own split - mirroring `playerProfile.ts`'s `teamFor()`,
+which already solved this exact alignment problem for a player's own profile
+page - and is linked only when the two columns' tie counts agree; a
+mismatch (real data: 1964 EURO has three tied players but only two Team
+names, since two of them - Ferenc Bene, Dezső Novák - both play for Hungary
+and it's named once) is left as unlinked plain text rather than guessed,
+same "omit rather than guess" contract `teamFor()` already keeps. The
+"Multiple" placeholder (a tie too large to name a team per player, e.g.
+1962) is recognized via `TEAM_TIE_PLACEHOLDER`, now exported from
+`playerProfile.ts` rather than duplicated, and is never split or linked.
+`EditionFact` gained an optional `parts` array (`EditionFactPart[]`); every
+existing caller that never produces a tied cell (every team competition, and
+Ballon d'Or, which has no tie mechanic) leaves it `undefined` and is
+byte-for-byte unaffected. `EditionView.astro` renders `parts` when present -
+one linked or plain-text span per name, joined with "; " to match the source
+formatting - falling back to the pre-existing single `teamSlug`/`playerSlug`
+branches otherwise.
+
+**The shared back-link, via `EditionView`'s new `backPath` prop.** Every
+earlier edition-page family has its `competitionPath` serve double duty: the
+pager's prev/next base and the "back to all editions" link's target, because
+both point at that competition's one table. Golden Boot's two edition-page
+route trees need `competitionPath` to stay race-specific
+(`/competitions/golden-boot/world-cup`, so the pager doesn't cross-link World
+Cup and EURO years) but the actual competition page with both tables is one
+level up, at the shared `/competitions/golden-boot` - a path with no
+`getStaticPaths` route of its own, which is exactly what
+`docs/PROJECT_STATUS.md`'s `check:links` script caught on the first build
+here (a "back" link to a directory index that doesn't exist). `EditionView`
+gained an optional `backPath` prop that overrides just the back link,
+defaulting to `competitionPath` so every other caller (World Cup, EURO,
+Nations League, Copa América, Ballon d'Or) is unaffected.
+
+**Wiring:** `golden-boot.astro` (EN + HR) gained two `yearLinks` maps - one
+per race, each built with `buildEditionLinks(buildEditionProfiles(race.editions),
+'/competitions/golden-boot/<race>')` - threaded into each race's own
+`TournamentTable` instead of the single `yearLinks` prop every other
+competition page passes. `sitemap.xml.ts` gained two more edition loops
+(World Cup, EURO), reusing the `worldCupGoldenBoot`/`euroGoldenBoot` loads
+and the `playerSlugs` set already built for the `/players/` loop just above
+them.
+
+**Tests:** 8 new Vitest cases (`editionProfile.test.ts`, against a table
+shaped like the real content - a single-winner row, a clean two-way tie, a
+six-way tie with the "Multiple" team placeholder, and the real 1964
+count-mismatch row): an untied winner is unaffected (no `parts`), a two-way
+tie splits into index-aligned player/team parts, a six-way tie splits every
+player individually while leaving "Multiple" unsplit and unlinked, and the
+count-mismatch row leaves Team as plain unlinked text while every tied
+player still links - 496 Vitest total, up from 493 (one pre-existing
+`ballonDor` test file left unchanged). 20 new Playwright cases
+(`tests/e2e/golden-boot-edition-page.spec.ts`): per race - year-cell link
+navigates, an untied winner links player+team separately, a two-way tie
+links both names to their own profiles, a six-way tie links every player but
+leaves "Multiple" as plain text, the 1964 count-mismatch case, the pager,
+oldest-edition-has-no-previous, the back link resolves to the shared
+`/competitions/golden-boot` page (not a 404), no 360px overflow, no WCAG
+violations, and the language switch both ways, plus the Croatian page's
+translated chrome and back-link copy - plus one `mobile.spec.ts`
+sitemap-count assertion updated in place from 630 to 710 (+80 Golden Boot
+edition URLs, 40 editions x 2 languages) with two new `<loc>`/hreflang
+spot-checks (Golden Boot World Cup 1958, EURO 1996). Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` - **791/791
+passing** (up from 771, the 20 new edition-page cases).
+
+**Validation:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across
+163 files. `pnpm test` - 496/496. `pnpm build` - **711 pages** (up from 631:
++80 Golden Boot edition pages, 40 editions x 2 languages: 23 World Cup + 17
+EURO). `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:perf`, `check:precache` all clean. `check:pdfs` flagged every player
+PDF as stale (`playerProfile.ts` itself changed, to export
+`TEAM_TIE_PLACEHOLDER`) - `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+build:pdfs` regenerated all 296 PDFs (no new PDF pages added, same
+"no per-edition PDF yet" precedent every prior edition-page rollout has
+established), `check:pdfs` clean afterward. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` - **791/791
+passing**.
+
+**Left for a future pass:** every competition and both individual awards now
+have edition pages (World Cup, EURO, Nations League, Copa América, Ballon
+d'Or, Golden Boot) - the last item on the edition-pages backlog. (1) the
+same "no downloadable PDF per edition" gap named by every prior edition-page
+entry now also applies to these 80 new pages (World Cup + EURO Golden Boot,
+both languages) - a genuinely future pass, since it spans every edition
+family, not just this one. (2) No other backlog item is currently known;
+see `docs/ROADMAP.md` for what's next.
+
+### New feature: downloadable print PDF for every `/competitions/<competition>/<year>` edition page (all six families, EN + HR) - added 2026-08-25 (later intensive run)
+
+Closed the one standing gap every edition-page rollout above left open: a
+reader could view but not print/download any of the 202 edition pages this
+site now has. `docs/ROADMAP.md` (new this run, replacing a dangling
+"see docs/ROADMAP.md for what's next" pointer the previous entry left behind
+- that file never actually existed) named this as the only concrete item
+left, so it's what this run built.
+
+**`EditionView.astro` gained the same optional `pdfSlug`/`pdfLabel`/`pdfHint`
+props `CompetitionView.astro` already has**, rendering `PrintDownloadLink`
+right under the intro paragraph - the same header placement `/teams/<slug>`
+and `/players/<slug>` already use. All 12 edition-page files (six
+competitions/awards x English + Croatian) now pass a `pdfSlug` computed from
+`profile.slug` (e.g. `edition-world-cup-2018`, `edition-ballon-dor-1956-hr`);
+the six Croatian pages also pass the same `pdfLabel="Preuzmi PDF za ispis"`/
+localized hint text every other Croatian PDF link already uses.
+
+**Why a live `/edition-index.json` endpoint, not a hand-typed list, and why
+one per *family* rather than one shared list:** `scripts/generate-pdfs.mjs`
+runs under plain Node, not Vite, so it can't call `buildEditionProfiles()`
+itself (it needs `astro:content`, same reason `/team-index.json` and
+`/player-index.json` already exist for the team/player PDF families).
+Unlike those two, though, an edition's PDF sources aren't one fixed list
+shared by every entry - a Nations League edition PDF has nothing to do with
+`content/copa-america.md`. New `src/pages/edition-index.json.ts` returns
+every edition page's `{ pdfSlug, path, family }`, `family` being one of
+seven keys (`world-cup`, `euro`, `nations-league`, `copa-america`,
+`ballon-dor`, `golden-boot-world-cup`, `golden-boot-euro` - Golden Boot
+splits in two, mirroring its two separate route trees). New
+`EDITION_PDF_SOURCES` in `scripts/pdf-pages.mjs` maps each family to its own
+source list (that family's `content/*.md`, `docs/SOURCES.md`,
+`EditionView.astro`, `editionProfile.ts`, and both language variants of that
+family's `[year].astro`); `scripts/generate-pdfs.mjs` fetches the live index
+the same way it already fetches `/team-index.json`/`/player-index.json` and
+records `EDITION_PDF_SOURCES[family]` against each PDF's manifest entry.
+
+**`editionFamilyFromSlug()`, for the freshness check with no server to
+ask:** `scripts/check-pdf-freshness.mjs` runs before `pnpm build` in CI, so
+it can't fetch `/edition-index.json` the way `generate-pdfs.mjs` does -
+same constraint `teamSourcesFromManifest()`/`playerSourcesFromManifest()`
+already solved by trusting whichever `team-*`/`player-*` keys the last
+`pnpm build:pdfs` recorded. Editions need one more step: `editionSourcesFromManifest()`
+recovers *which* family list applies to a given `edition-<family>-<slug>[-hr]`
+key by calling `editionFamilyFromSlug()` (new export from `pdf-pages.mjs`),
+which matches the key against `EDITION_PDF_SOURCES`'s own keys,
+longest-prefix-first so `golden-boot-world-cup`/`golden-boot-euro` can never
+be shadowed by the shorter, unrelated `world-cup`/`euro` family names.
+
+**Scale:** 202 editions (23 World Cup + 17 EURO + 4 Nations League + 48 Copa
+América + 70 Ballon d'Or + 23 World Cup Golden Boot + 17 EURO Golden Boot),
+x 2 languages = 404 new PDFs, taking `public/downloads/` from 296 to 700
+files. `pnpm build:pdfs` (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`)
+ran clean end to end, renaming nothing and colliding on nothing -
+`buildEditionProfiles()`'s own duplicate-slug guard (already proven on Copa
+América's two 1959 editions) means `/edition-index.json` can never emit two
+entries sharing a `pdfSlug`.
+
+**Tests:** one new Playwright case per edition-page spec file (13 total:
+`edition-page.spec.ts`, `euro-`, `nations-league-`, `copa-america-`,
+`ballon-dor-edition-page.spec.ts` each gained one EN + one HR case;
+`golden-boot-edition-page.spec.ts` gained one EN case per race plus one
+combined HR case covering both races), each following the existing
+`player-profile.spec.ts`/`team-profile.spec.ts` pattern: the download link
+is visible, and an actual `request.get()` against its `href` resolves with
+an `application/pdf` content type.
+
+**Validation:** `pnpm lint` (`astro check`) - 0 errors/warnings/hints across
+164 files. `pnpm test` - 497/497. `pnpm build` - 711 pages (unchanged - this
+run adds no new page routes, only a link on 202 existing ones).
+`check:links` (715 pages) - clean once `pnpm build:pdfs` ran (404 links to
+not-yet-existing files is exactly what it caught first, confirming the
+wiring before the PDFs existed). `check:sitemap`, `check:perf`,
+`check:precache` all clean and unaffected (PDFs were never part of the
+sitemap, same as every earlier PDF family). `check:pdfs` - all 700 PDFs
+up to date with their source content. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` from a cold
+start - **804/804 passing** (up from 791, the 13
+new PDF-link cases).
+
+**Left for a future pass:** no other concrete, named backlog item is known.
+`docs/ROADMAP.md` (new this run) is now the short, current-state pointer for
+"what's next" - see that file rather than assuming a gap here.
+
+### Quality pass: full-repo health check, plus a stale ROADMAP.md correction - added 2026-08-25 (later intensive run)
+
+With `docs/ROADMAP.md`'s "Open backlog" empty and only two unscoped ideas
+left, this run followed that file's own instruction: a full-repo health
+check first, rather than assuming either idea was still concretely open.
+
+**Health check - everything clean, no code change needed:** `pnpm lint`
+(`astro check`) - 0 errors/warnings/hints across 164 files. `pnpm test` -
+497/497. `pnpm build` - 711 pages (unchanged). `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:perf` (heaviest page 498.8 KB, under
+the 510 KB budget), `check:precache` (37 URLs), `check:pdfs` (700 PDFs) -
+all clean. Full `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+test:e2e` from a cold start - **804/804 passing** in 8.1 minutes at the
+default worker count (2) - the `ERR_CONNECTION_REFUSED`-under-parallelism
+issue a 2026-08-19 entry hit at 2 workers in an earlier sandboxed session
+did not reproduce here, so no `--workers=1` workaround was needed this
+time; worth trying the default first in a future run before reaching for
+that flag.
+
+**Real gap found, in the docs rather than the code:** re-checked both
+`docs/ROADMAP.md` "ideas not yet scoped" against the live `/records` page
+and `content/`. One was stale - "a `/records`-style aggregate ranking
+specific to the individual awards" reads as a still-open ask, but
+"Longest wait between titles" and "Back-to-back champions" already loop
+over `allLoaded` (every team competition *and* both individual awards) in
+`src/pages/records.astro`, rendering `title-gaps-ballon-dor`/
+`title-gaps-golden-boot-world-cup`/`title-gaps-golden-boot-euro` sections
+today - confirmed by grepping the built `dist/records/index.html` for
+those ids. `docs/ROADMAP.md` corrected to say so, narrowing the genuinely
+open piece to "youngest winner", which needs per-player birth dates that
+exist nowhere in `content/`. The other idea (extending "Tap a year to
+reveal a short story" to the two individual awards) was re-checked too:
+`content/ballon-dor.md` and `content/golden-boot.md` still have no
+"Memorable moments" section, so it stays blocked on new editorial content,
+unchanged from when it was first raised.
+
+**Not pursued:** sourcing ~130 players' birth dates (70 Ballon d'Or +
+Golden Boot winners, several tied) to unblock "youngest winner", or
+writing new "Memorable moments" narrative content to unblock the
+"Tap a year" extension. Both need new, independently-verifiable editorial
+facts this run has no way to cross-check the way every other fact on this
+site has been (see the many "second independent cross-check" entries
+above) - the same caution that has already shelved the "by team" filter's
+full participant lists and the flag-emoji idea in earlier runs. Left for
+whenever someone sources that data deliberately.
+
+Full suite unchanged by this run's edits (documentation-only): **804
+Playwright passed**, **497 Vitest passed**, `pnpm lint`/`pnpm build`/
+`check:links`/`check:sitemap`/`check:perf`/`check:precache`/`check:pdfs`
+all clean.
+
+**Left for a future pass:** the "youngest winner" ranking and the
+individual-award "Tap a year" extension, both blocked on new sourced
+editorial content, not engineering effort. No other gap found.
+
+### Quality pass: fourth consecutive full-repo health check, plus an editorial-arithmetic spot-check across all six competition/award files - added 2026-08-25 (later intensive run)
+
+`docs/ROADMAP.md`'s open backlog was still empty going into this run (the
+2026-08-25 "later intensive run" entry above already closed the last named
+item and re-confirmed the two unscoped ideas stay blocked on new editorial
+content), so this run repeated the file's own instruction once more: a
+full-repo health check before assuming anything is quietly broken.
+
+**Health check - everything clean, no code change needed:** `pnpm install
+--frozen-lockfile`, `pnpm lint` (`astro check`) - 0 errors/warnings/hints
+across 164 files. `pnpm test` - 497/497. `pnpm build` - 711 pages
+(unchanged). `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:perf` (heaviest page still `hr/records` at 498.8 KB, under the 510 KB
+budget), `check:precache` (37 URLs), `check:pdfs` (700 PDFs) - all clean.
+Full `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` from a
+cold start - **804/804 passing** in 7.8 minutes at the default worker count,
+same as the immediately preceding run.
+
+**New this run, since a fourth identical "everything's clean" pass adds
+little on its own:** a manual editorial-arithmetic spot-check of all six
+competition/award content files (`fifa-world-cup.md`, `uefa-euro.md`,
+`copa-america.md`, `uefa-nations-league.md`, `ballon-dor.md`,
+`golden-boot.md`) - re-deriving every "Champions/Titles by nation" and
+"Multiple winners" summary table by hand-counting winners straight from
+each file's own edition/winners table, and cross-checking every prose claim
+in each file's "Memorable moments"/"Key facts"/notes sections against the
+same table. This checks internal arithmetic consistency (a hand-written
+summary table drifting from its own edition table after a content edit),
+not real-world historical accuracy, which the many "second independent
+cross-check" passes cited throughout this file already cover.
+
+**No discrepancies found.** Every nation/player title count matched a fresh
+count of that file's own table (Brazil 5 World Cup titles, Spain 4 EUROs,
+Argentina 16/Uruguay 15/Brazil 9 Copa América, Messi 8/Ronaldo 5 Ballon d'Or,
+etc.), every count summed back to that file's total edition count, and every
+narrative claim (Fontaine's 13 goals in 1958, Platini's 9 in 1984, Portugal
+as first two-time Nations League champion in 2025, Spain's "record fourth"
+EURO title in 2024, Argentina "moving ahead" as Copa América's most
+successful team in 2024, and others) held up against the table row it
+describes.
+
+Full suite unchanged by this run (no code or content edits made): **804
+Playwright passed**, **497 Vitest passed**, `pnpm lint`/`pnpm build`/
+`check:links`/`check:sitemap`/`check:perf`/`check:precache`/`check:pdfs`
+all clean.
+
+**Left for a future pass:** unchanged from the previous entry - the
+"youngest winner" ranking and the individual-award "Tap a year" extension,
+both blocked on new sourced editorial content. No other gap found across
+four consecutive intensive-run health checks; a future run might vary the
+approach further (e.g. an external link-liveness check of
+`docs/SOURCES.md`'s ~390 citation URLs) rather than repeating this one, but
+note that this environment's outbound network policy blocks direct requests
+to arbitrary external hosts, so that check would need to run from a session
+with broader network access than this one has.
+
+### Quality pass: every `/competitions/<competition>/<year>` edition page gains its own SportsEvent JSON-LD, closing a gap the field's own comment predicted - added 2026-08-25 (fifth intensive run)
+
+This run tried the previous entry's suggested external link-liveness check
+first and confirmed it is genuinely blocked here: `WebFetch` against
+`en.wikipedia.org` returned `EGRESS_BLOCKED` ("blocked by the network
+egress proxy"), exactly the constraint the last four entries already
+flagged. Rather than log a fifth identical "everything's clean" health
+check, this run instead re-read `src/lib/editionProfile.ts`'s own
+`EditionProfile.champion` doc comment - "The champion, for the page title
+and JSON-LD" - and checked whether that JSON-LD half of the promise was
+ever actually kept. It wasn't: none of the 14 edition-page route files
+(7 competitions/awards x English/Croatian - World Cup, EURO, Nations
+League, Copa América, Ballon d'Or, and Golden Boot's two route trees)
+passed a `jsonLd` prop to `BaseLayout` at all, the same "a page family
+shipped without its own JSON-LD" gap this file's `buildTeamProfileItemList`/
+`buildPlayerProfileItemList` entries (2026-08-20) already closed once for
+the team and player profile families - just never re-applied when the six
+edition-page rollouts landed across 2026-08-24/25.
+
+**Added `buildEditionSportsEvent()`** (`src/lib/jsonLd.ts`) - the
+per-edition counterpart of the existing `buildLatestEditionSportsEvent()`
+(which only ever describes the single most recent edition, for a
+competition's index page). Takes an edition's `yearSort`/`champion`/`host`
+plus a caller-supplied `pageUrl` and `name`, reuses the same
+`isPlaceholderWinner()` guard the existing builder already uses so a
+"Not awarded" Ballon d'Or/Golden Boot year never surfaces a fake
+`competitor`, and includes a `url` field (the existing builder doesn't
+need one, since it's folded into a page that already has its own primary
+JSON-LD `url`; a per-edition SportsEvent has no other JSON-LD block to
+borrow one from). `name` is supplied by each page rather than composed
+from a competition-name string inside the builder, so it can match that
+page's own `<title>`/`<h1>` text exactly - several edition pages don't
+reduce to a plain "{year} {competition}" (Nations League's "... Finals"
+suffix, Croatian's "{competition} {year}." word order, Copa América's
+1959-disambiguation host suffix), and every one of those variants was
+already computed as a local `title`/`yearLabel` constant the page itself
+uses for its `<BaseLayout title>` prop - each of the 14 files now just
+reuses that same constant for the JSON-LD `name` instead of re-deriving it.
+4 new `buildEditionSportsEvent()` unit tests added to
+`tests/unit/jsonLd.test.ts` (basic shape, no-host individual award, a
+placeholder "Not awarded" champion, an empty-string champion).
+
+**Verified in the actual build output**, not just unit tests: `dist/
+competitions/world-cup/2022/index.html` now carries a `SportsEvent` block
+naming Argentina as `competitor` and Qatar as `location`; the Croatian
+sibling (`dist/hr/competitions/euro/2024/`) carries the same shape with a
+Croatian `name` ("UEFA Europsko prvenstvo 2024."); `dist/competitions/
+ballon-dor/2020/` (the one "Not awarded" year) correctly omits `competitor`
+entirely rather than inventing one.
+
+Regenerating every edition page's HTML changed its content hash, so
+`pnpm build:pdfs` (via `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`,
+`chromium` alone isn't on PATH in this environment) was re-run and all 700
+PDFs plus the manifest are included in this commit - the same
+mass-regeneration shape the 2026-08-25 "Regenerate PDFs stale" entry
+already established as normal (Playwright's print-to-pdf embeds
+non-deterministic metadata, so even a PDF whose *source* content hash is
+unchanged still comes out byte-different on every regeneration; the
+manifest's own hashes confirm only the 14 edited files' dependents actually
+changed content-wise).
+
+Full suite after the change: **pnpm lint** - 0 errors/warnings/hints across
+164 files. **pnpm test** - **501/501** (497 + the 4 new tests).
+**pnpm build** - 711 pages (unchanged - no new routes, only new `<script
+type="application/ld+json">` tags on existing pages). `check:links` (715
+pages), `check:sitemap` (710 entries), `check:perf` (heaviest page still
+`hr/records` at 498.8 KB), `check:precache` (37 URLs), `check:pdfs` (700
+PDFs, after the regeneration above) - all clean. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` from a cold
+start - **804/804 passing** in 9.1 minutes.
+
+**Left for a future pass:** unchanged - the "youngest winner" ranking and
+the individual-award "Tap a year" extension, both still blocked on new
+sourced editorial content. The external link-liveness check stays blocked
+by this environment's egress policy (confirmed again this run, not just
+asserted); it would need a session with broader outbound network access.
+No other JSON-LD gap found on this pass - the competition *index* pages'
+own `buildLatestEditionSportsEvent()` calls were already in place for four
+of six team competitions (World Cup, EURO, Nations League, Copa América);
+`ballon-dor.astro`/`golden-boot.astro` never had one even before this run
+(their `loadCompetition()` calls' generic content-frontmatter `title` -
+"Golden Boot" for both the World Cup and EURO tables - can't stand in for
+a single per-award SportsEvent name the way `data.title` does for the
+four team competitions), which is a separate, smaller gap than the one
+this entry closes; left as a candidate for a future pass rather than
+folded in here, to keep this entry's diff to the one clearly-scoped gap
+its opening paragraph described.
+
+### Quality pass: Ballon d'Or/Golden Boot index pages gain the SportsEvent JSON-LD their four team-competition siblings already had - added 2026-08-25 (sixth intensive run)
+
+Closed the smaller gap the previous entry's "Left for a future pass" note
+named rather than folding in: `ballon-dor.astro` and `golden-boot.astro`
+(both EN + HR - four files) never called `buildLatestEditionSportsEvent()`,
+even though every one of the four team-competition index pages (World Cup,
+EURO, Nations League, Copa América) already had. The English Ballon d'Or
+page even carried an explicit comment justifying the omission ("An
+individual award, not a tournament - no SportsEvent block here") - true
+when it was written (2026-08-15 SEO pass, before individual awards had any
+SportsEvent anywhere on the site), but stale after this file's own
+2026-08-25 "per-edition SportsEvent JSON-LD" entry gave every Ballon
+d'Or/Golden Boot *edition* page a `SportsEvent` block: the index pages were
+the one remaining inconsistency.
+
+The named blocker was real, not imagined: `loadCompetition()`'s generic
+content-frontmatter `title` is `"Golden Boot Winners"` for **both** of
+`golden-boot.astro`'s two `loadCompetition()` calls (World Cup top scorers,
+EURO top scorers - one shared content file), so passing `data.title`
+straight through the way the four team-competition pages do would have
+produced two identical, ambiguous SportsEvent names. Resolved the same way
+the per-edition Golden Boot pages already resolved the identical problem
+(see `src/pages/competitions/golden-boot/{world-cup,euro}/[year].astro`):
+each `buildLatestEditionSportsEvent()` call now takes an explicit name
+literal instead of a loaded title - `'FIFA World Cup Golden Boot'`/`'UEFA
+EURO Golden Boot'` (English), `'Zlatna kopačka Svjetskog
+prvenstva'`/`'Zlatna kopačka EURA'` (Croatian, matching the existing
+`hr/competitions/golden-boot/*/[year].astro` titles). Ballon d'Or needed no
+such workaround - `loadCompetition('ballon-dor', ...)` is called once, so
+its own `data.title` ("Men's Ballon d'Or") and the Croatian page's existing
+`title` constant ("Zlatna lopta") were already unambiguous; both now feed
+`buildLatestEditionSportsEvent()` directly, same as the four team
+competitions. No changes to `src/lib/jsonLd.ts` were needed - the existing
+builder already omits `location` when an edition has no host, which every
+Ballon d'Or/Golden Boot edition satisfies, so no individual-award-specific
+branch was required.
+
+**Verified in the actual build output**, not just by reasoning about the
+call sites: `dist/competitions/ballon-dor/index.html` carries `{"@type":
+"SportsEvent","name":"2025 Men's Ballon d'Or", ...,"competitor":{"@type":
+"SportsTeam","name":"Ousmane Dembélé"}}` with no `location` field;
+`dist/hr/competitions/ballon-dor/index.html` carries the same shape with
+`"name":"2025 Zlatna lopta"`; `dist/competitions/golden-boot/index.html`
+carries two `SportsEvent` blocks, `"2026 FIFA World Cup Golden Boot"`
+(competitor Kylian Mbappé) and `"2024 UEFA EURO Golden Boot"` (competitor
+the full six-way-tie string, exactly as the table itself records it); the
+Croatian sibling carries the matching `"Zlatna kopačka Svjetskog
+prvenstva"`/`"Zlatna kopačka EURA"` names.
+
+Updated the two `tests/e2e/mobile.spec.ts` cases that asserted the *old*
+behavior rather than adding parallel new ones: `'an individual award page
+carries an ItemList but no SportsEvent'` is now `'... carries an ItemList
+and a SportsEvent for the latest edition'` (asserts the block set is
+`['BreadcrumbList', 'ItemList', 'SportsEvent']`, the SportsEvent name, and
+that `location` is `undefined`); `'the Golden Boot page carries one
+ItemList per table'` is now `'... carries one ItemList and one SportsEvent
+per table'` (asserts both SportsEvent names and the World Cup table's
+`competitor`). No other test in the suite asserted the old zero-SportsEvent
+count for these two pages.
+
+Regenerating `ballon-dor.astro`/`golden-boot.astro`'s HTML (all four files)
+changed their content hash, so `pnpm build:pdfs` (via
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) was re-run per the standing
+convention (`check-pdf-freshness.mjs` tracks source-file changes, not just
+visible content) and all 700 PDFs plus the manifest are included in this
+commit.
+
+Full suite after the change: **pnpm lint** - 0 errors/warnings/hints
+across 164 files. **pnpm test** - **501/501** (unchanged - no new unit
+tests; the builder itself was already fully covered by the existing
+`buildLatestEditionSportsEvent` cases). **pnpm build** - 711 pages
+(unchanged - no new routes). `check:links` (715 pages), `check:sitemap`
+(710 entries), `check:perf` (heaviest page still `hr/records` at 498.8 KB,
+unchanged), `check:precache` (37 URLs), `check:pdfs` (700 PDFs, after the
+regeneration above) - all clean. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` from a cold
+start - **804/804 passing** in 6.8 minutes.
+
+**Left for a future pass:** with this gap closed, every live page on the
+site that has an edition/appearance to describe now carries the matching
+SportsEvent/ItemList structured data - no other named JSON-LD gap is known.
+The standing candidates are otherwise unchanged from the previous several
+entries: the "youngest winner" ranking and the individual-award "Tap a
+year" extension stay blocked on new sourced editorial content (birth dates,
+narrative "Memorable moments" prose) not present in `content/` today and
+deliberately not fabricated in an unattended run; the external
+link-liveness sweep of `docs/SOURCES.md` stays blocked by this
+environment's outbound network policy.
+
+### Test-coverage sweep: `editionProfile.ts`, `comparePlayers.ts` and `playerProfile.ts` closed to 100%/100% - added 2026-08-26 (seventh intensive run)
+
+With the named backlog and every JSON-LD gap already closed, this run
+re-read the 2026-08-23 "Test-coverage sweep" entries rather than repeat an
+eighth full-repo health check: that pass had explicitly left four
+single-line branches (`quiz.ts` line 283, `sources.ts` line 33, `tableSort.ts`
+line 22, `url.ts` line 8) as "defensively unreachable given the code's own
+invariants, not undertested," but the individual-award edition-page rollout
+and `/compare-players` both landed *after* that sweep, so a fresh
+`pnpm test:coverage` was worth running to check whether either had opened a
+new, genuinely-reachable gap rather than assume the four-line list was still
+exhaustive.
+
+It had: **`editionProfile.ts`** sat at 97.29% branches (lines 284/288, both
+inside `buildEditionProfiles()`'s individual-award "Team member" linking
+arm) - every existing test that exercises that arm always passes an
+explicit `teamSlugs` Set, so the function's own documented default ("Omit
+[teamSlugs] to link every placing unconditionally") was never actually
+exercised for this arm, and separately no test ever supplied a `teamSlugs`
+Set that *excludes* one linked team's slug for this arm the way the plain
+team-placing case already does. **`comparePlayers.ts`** (96.29%/90%
+statements/functions) and **`playerProfile.ts`** (97.82%/94.73%) each had
+one `.sort()` comparator - `buildSharedAwardYears()`'s year-sort and
+`appearancesFor()`'s appearance-sort - that no existing fixture ever called
+with more than one element, so the comparator itself had literally never
+run; both are real, reachable shapes (a repeat award winner - the site's
+own data has several - or two players sharing more than one award year),
+just never modeled by a fixture before.
+
+Four new tests, all in the same "no contrived inputs" spirit the
+2026-08-23 sweep set: `editionProfile.test.ts` gained two cases in the
+existing `tied scorers (Golden Boot)` block (omitting `teamSlugs` entirely
+for both a single winner and a tie; supplying a `teamSlugs` Set missing one
+tied part's country); `comparePlayers.test.ts` gained a case with two
+players sharing two different years, deliberately listed with the later
+year first in the source table so a correct oldest-first result only comes
+from the `.sort()` actually running, not row order; `playerProfile.test.ts`
+gained the same shape for a single repeat winner across two out-of-order
+rows. The other four lines the 2026-08-23 entry named stay untouched -
+re-reading that entry's own reasoning for each (a duplicate `ChampionSummary`
+display name, a header that is simultaneously letters-only and slug-empty, a
+`withBase()` result that is empty before its own `/` prefix, a
+`stripTrailingPunctuation()` regex match guaranteed non-null by its enclosing
+`if`) still holds; forcing any of them would need an input no real caller
+constructs, exactly what that sweep declined to do.
+
+**Tests:** 4 new Vitest cases across 3 files. `pnpm test` - **505/505** (up
+from 501). `pnpm test:coverage` - whole-repo `src/lib` average rose from
+99.73%/99.13% to **99.91%/99.42%** (statements/branches); `editionProfile.ts`,
+`comparePlayers.ts` and `playerProfile.ts` are now all 100%/100%, leaving
+only the same four single-line branches the 2026-08-23 sweep already
+classified as defensively unreachable. `pnpm lint` - 0 errors/warnings/hints
+across 164 files. `pnpm build` - 711 pages (unchanged - test-only change, no
+page/component/content edits). `check:links` (715 pages), `check:sitemap`
+(710 entries), `check:perf` (heaviest page still `hr/records` at 498.8 KB),
+`check:precache` (37 URLs), `check:pdfs` (700 PDFs) - all clean, all
+unchanged from the prior entry. Playwright e2e was not re-run this pass - no
+UI-visible surface touched, same reasoning the 2026-08-23 sweep gave for its
+own test-only change.
+
+**Left for a future pass:** unchanged from the prior entry - the "youngest
+winner" ranking and the individual-award "Tap a year" extension stay blocked
+on new sourced editorial content; the external link-liveness sweep of
+`docs/SOURCES.md` stays blocked by this environment's outbound network
+policy. No concrete, named test-coverage gap remains on record; a future
+pass should re-run `pnpm test:coverage` from scratch to look for one freshly
+opened by new code rather than assume the four standing lines are secretly
+reachable.
+
+### Quality pass: eighth full-repo health check (cold-start Playwright e2e included) - added 2026-08-26 (eighth intensive run)
+
+With the prior entry's own coverage sweep turning up nothing further to
+close and `docs/ROADMAP.md`'s "Open backlog" still empty, this run took the
+file's own standing advice literally: a fresh full-repo health check from a
+cold start, rather than assume the seventh run's "no concrete gap remains"
+conclusion was still current.
+
+**Everything came back clean, no code change needed:** `pnpm lint`
+(`astro check`) - 0 errors/warnings/hints across 164 files. `pnpm test` -
+**505/505**. `pnpm test:coverage` - whole-repo `src/lib` average
+**99.91%/99.42%** (statements/branches), identical to the 2026-08-26
+"editionProfile.ts/comparePlayers.ts/playerProfile.ts" entry immediately
+above - the same four single-line branches (`quiz.ts` line 283, `sources.ts`
+line 33, `tableSort.ts` line 22, `url.ts` line 8) remain the only gap, and
+re-reading that entry's per-line reasoning again still holds: each needs an
+input no real caller constructs. `pnpm build` - 711 pages. `check:links`
+(715 pages), `check:sitemap` (710 entries), `check:perf` (heaviest page
+still `hr/records` at 498.8 KB, under the 510 KB budget), `check:precache`
+(37 URLs), `check:pdfs` (700 PDFs) - all clean. Full
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` from a cold
+start - **804/804 passing** in 10.6 minutes at the default worker count (2);
+no `--workers=1` workaround needed, consistent with the 2026-08-25 entry
+that first found the default worker count sufficient in this environment.
+(Note for future runs: the bare `/opt/pw-browsers/chromium` symlink *is*
+the Chrome binary - appending `/chrome-linux/chrome` to it, as if it were
+the versioned `chromium-1194/` directory, fails with "executable doesn't
+exist"; this run hit that once before finding the path this entry and the
+2026-08-25 entry both already record.)
+
+**Standing blockers re-confirmed, not just assumed:** the `typescript` 7
+upgrade is still gated on `@astrojs/check` - `npm view @astrojs/check@latest
+peerDependencies` shows `{ typescript: '^5.0.0 || ^6.0.0' }` as of today, and
+0.9.10 (installed) is still the latest published version, so there is no
+newer release to pick up. The `docs/SOURCES.md` link-liveness sweep is still
+blocked by this environment's outbound network policy - a direct `curl` to
+`https://en.wikipedia.org` returned a `403` from the egress proxy's CONNECT
+tunnel, the same shape of block the 2026-08-25 entry's `WebFetch` attempt
+hit.
+
+**Left for a future pass:** unchanged - the "youngest winner" ranking and
+the individual-award "Tap a year" extension stay blocked on new sourced
+editorial content; the link-liveness sweep and the `typescript` 7 upgrade
+stay blocked on this environment's network policy and `@astrojs/check`'s
+own peer-dependency ceiling, respectively, neither of which this run can
+change. No concrete, named backlog item or test-coverage gap remains on
+record; a future pass should repeat this same health-check-first approach
+before assuming otherwise.
+
+### Dependency patch bump: astro 7.2.4 -> 7.2.7, @types/node 26.2.0 -> 26.3.0 - added 2026-08-26 (ninth intensive run)
+
+With the backlog still empty and the eighth run's health check only three
+and a half hours old, this run looked for an angle that check hadn't
+covered: `pnpm outdated` against the freshly-installed `node_modules`
+(this environment starts with none, so `pnpm install` runs cold every
+time). It turned up two in-range releases newer than the pinned versions:
+`astro` 7.2.4 -> 7.2.7 (patch) and `@types/node` 26.2.0 -> 26.3.0 (minor,
+still `^26`). Every other dependency was already at latest. `typescript`
+itself shows a `7.0.2` "latest" in that same `pnpm outdated` listing, but
+`npm view @astrojs/check@latest peerDependencies` still reports
+`{ typescript: '^5.0.0 || ^6.0.0' }` as of today - re-confirming, not just
+assuming, that the standing blocker from the 2026-08-23/24/25/26 entries
+hasn't moved.
+
+Bumped both in `package.json`, ran `pnpm install` to refresh
+`pnpm-lock.yaml`, then repeated the full health check the eighth run had
+just established as the standing routine: `pnpm lint` (`astro check`) - 0
+errors/warnings/hints across 164 files. `pnpm test` - **505/505**. `pnpm
+test:coverage` - **99.91%/99.42%** statements/branches, byte-identical to
+the pre-bump baseline (same four single-line branches: `quiz.ts` line 283,
+`sources.ts` line 33, `tableSort.ts` line 22, `url.ts` line 8). `pnpm
+build` - 711 pages, unchanged. `check:links` (715 pages), `check:sitemap`
+(710 entries), `check:perf` (heaviest page still `hr/records` at 498.8 KB),
+`check:precache` (37 URLs), `check:pdfs` (700 PDFs) - all clean, all
+unchanged. `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e`
+from the same cold start the eighth run used - **804/804 passing** in 9.3
+minutes, matching the eighth run's 804/804 result.
+
+**Left for a future pass:** the `typescript` 7 upgrade stays gated on
+`@astrojs/check`'s peer-dependency ceiling until a newer `@astrojs/check`
+release widens it; the link-liveness sweep stays gated on this
+environment's outbound network policy. No concrete, named backlog item or
+test-coverage gap remains on record; re-run `pnpm outdated` and this same
+health check next time rather than assume either conclusion is still
+current.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
@@ -11014,6 +12355,13 @@ unaffected by this pass (no UI/CSS touched).
   phone (see the 2026-08-22 entry).
 - First-ever Pages deploy can hang in GitHub's `updating_pages` provisioning and
   time out; re-running the deploy clears it (it did here).
+- Every `/competitions/<competition>/<year>` edition page (202 editions x 2
+  languages) and every other PDF family (competition/award pages, `/records`,
+  `/compare`, `/compare-players`, every `/teams/<slug>` and `/players/<slug>`
+  profile, `/glossary`) now has a downloadable print PDF - `public/downloads/`
+  holds 700 files as of 2026-08-25. New editorial content still needs a
+  manual `pnpm build:pdfs` regeneration before its PDF matches, exactly the
+  same lag every PDF family has always had; `pnpm check:pdfs` catches drift.
 - At >=60rem the header's eight "tool" nav links (Records, Compare, Teams,
   Players, Compare Players, Quiz, Glossary, Sources) live behind a "More"
   button (`#nav-more-toggle`/`#nav-more-menu` in `Nav.astro`) rather than

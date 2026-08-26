@@ -1,5 +1,6 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
 
 // The Markdown in /content is the editorial source of truth. We load every file
 // with the content-layer glob loader and validate its front matter with zod.

@@ -1,0 +1,98 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import EditionView from '../../../components/EditionView.astro';
+import References from '../../../components/References.astro';
+import { loadCompetition } from '../../../lib/competition';
+import { buildTopScorerFacts, buildYearStories } from '../../../lib/editions';
+import { buildEditionProfiles, type EditionProfile } from '../../../lib/editionProfile';
+import { buildAllCountryRecords } from '../../../lib/compare';
+import { loadTeamCompetitions } from '../../../lib/teamCompetitions';
+import { teamProfileSlug } from '../../../lib/teamProfile';
+import type { SourceLink } from '../../../lib/sources';
+import { absolutePageUrl, withBase } from '../../../lib/url';
+import { buildEditionSportsEvent } from '../../../lib/jsonLd';
+
+export async function getStaticPaths() {
+  const [data, goldenBoot, teamData] = await Promise.all([
+    loadCompetition('uefa-euro', {
+      editionsHeading: 'Editions',
+      sourcesHeading: 'UEFA EURO',
+      noteHeadings: ['Memorable moments'],
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'UEFA EURO top scorers',
+      sourcesHeading: 'UEFA EURO',
+    }),
+    loadTeamCompetitions(),
+  ]);
+
+  // Only link a placing whose /teams/<slug> page is actually generated, so
+  // this route can never emit a link check-internal-links.mjs would flag -
+  // same guard the World Cup and Copa América edition pages already use.
+  const teamSlugs = new Set(
+    buildAllCountryRecords(teamData.competitions).map((record) => teamProfileSlug(record.id)),
+  );
+
+  const stories = buildYearStories(
+    data.editions,
+    data.notes.find((section) => section.heading === 'Memorable moments')?.items ?? [],
+  );
+  const topScorers = buildTopScorerFacts(goldenBoot.editions);
+
+  return buildEditionProfiles(data.editions, teamSlugs).map((profile) => ({
+    params: { year: profile.slug },
+    props: {
+      profile,
+      story: stories.get(profile.year),
+      topScorer: topScorers.get(profile.year),
+      sources: data.sources,
+      lastReviewed: data.lastReviewed,
+      status: data.status,
+    },
+  }));
+}
+
+type Props = {
+  profile: EditionProfile;
+  story?: string;
+  topScorer?: string;
+  sources: SourceLink[];
+  lastReviewed: string;
+  status: string;
+};
+
+const { profile, story, topScorer, sources, lastReviewed, status } = Astro.props as Props;
+
+const runnerUp = profile.facts.find((fact) => /runner-up/i.test(fact.label))?.value;
+const title = `${profile.year} UEFA European Championship`;
+const description = [
+  `The ${profile.year} UEFA European Championship:`,
+  profile.champion ? `${profile.champion} champion${runnerUp ? `, ${runnerUp} runner-up` : ''}.` : '',
+  profile.host ? `Hosted by ${profile.host}.` : '',
+  'Full placings, the final result and that edition’s top scorer.',
+]
+  .filter(Boolean)
+  .join(' ');
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  alternateHref={withBase(`/hr/competitions/euro/${profile.slug}`)}
+  breadcrumbTrail={[{ name: 'UEFA EURO', url: withBase('/competitions/euro') }]}
+  jsonLd={jsonLd}
+>
+  <EditionView
+    profile={profile}
+    competitionPath="/competitions/euro"
+    competitionTitle="UEFA European Championship"
+    story={story}
+    topScorer={topScorer}
+    pdfSlug={`edition-euro-${profile.slug}`}
+  >
+    <References sources={sources} lastReviewed={lastReviewed} status={status} />
+  </EditionView>
+</BaseLayout>

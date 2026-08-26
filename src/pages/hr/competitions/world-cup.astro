@@ -21,6 +21,7 @@ import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
 import { buildTopScorerFacts, buildPodiums, buildYearStories, buildHostMapPoints } from '../../../lib/editions';
+import { buildEditionLinks, buildEditionProfiles } from '../../../lib/editionProfile';
 import { WORLD_CUP_HOST_COORDINATES, HOST_REGION_ORDER } from '../../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
@@ -44,6 +45,7 @@ const [data, goldenBoot] = await Promise.all([
 const topScorers = buildTopScorerFacts(goldenBoot.editions, 'hr');
 const podium = buildPodiums(data.editions);
 const hostMap = buildHostMapPoints(data.editions, WORLD_CUP_HOST_COORDINATES, HOST_REGION_ORDER);
+const yearLinks = buildEditionLinks(buildEditionProfiles(data.editions), '/hr/competitions/world-cup');
 const hostRegionLabels: Record<string, string> = {
   'South America': 'Južna Amerika',
   Europe: 'Europa',
@@ -191,6 +193,7 @@ const headerLabels: Record<string, string> = {
       clearFiltersLabel="Očisti filtere"
       storyColumn={stories.size > 0 ? { label: 'Priča', values: stories } : undefined}
       storySummaryLabel="📖 Dodirni za priču"
+      yearLinks={yearLinks}
     />
 
     <PodiumCards

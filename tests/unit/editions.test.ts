@@ -74,6 +74,41 @@ describe('buildEditions', () => {
       host: undefined,
     });
   });
+
+  it('falls back to an empty cell for a malformed row shorter than its own header row', () => {
+    const shortRowTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Teams', 'Winner'],
+      // Trailing "Teams"/"Winner" cells are simply missing, not blank strings -
+      // buildEditions must not throw on `row[index]` being undefined.
+      rows: [['1930', 'Uruguay']],
+    };
+    const [edition] = buildEditions(shortRowTable);
+    expect(edition).toMatchObject({ year: '1930', host: 'Uruguay', winner: '', teams: undefined });
+    expect(edition.cells).toEqual([
+      { label: 'Year', value: '1930' },
+      { label: 'Host', value: 'Uruguay' },
+      { label: 'Teams', value: '' },
+      { label: 'Winner', value: '' },
+    ]);
+  });
+
+  it('falls back to an empty Year/Host too when those columns are the ones missing from a short row', () => {
+    const shortRowTable: MarkdownTable = {
+      headers: ['Winner', 'Teams', 'Year', 'Host'],
+      rows: [['Spain', '32']],
+    };
+    const [edition] = buildEditions(shortRowTable);
+    expect(edition).toMatchObject({ year: '', yearSort: Number.NaN, host: '', winner: 'Spain', teams: 32 });
+  });
+
+  it('falls back to an empty year (and NaN yearSort) for a table with no Year/Season column at all', () => {
+    const noYearTable: MarkdownTable = {
+      headers: ['Winner', 'Host'],
+      rows: [['Spain', 'Qatar']],
+    };
+    const [edition] = buildEditions(noYearTable);
+    expect(edition).toMatchObject({ year: '', yearSort: Number.NaN, winner: 'Spain', host: 'Qatar' });
+  });
 });
 
 describe('buildChampionsSummary', () => {
@@ -297,6 +332,22 @@ describe('buildHostsSummary', () => {
     };
     expect(buildHostsSummary(buildEditions(scorersTable))).toEqual([]);
   });
+
+  it('tie-breaks on host name alphabetically when times-hosted and earliest year both match', () => {
+    const tiedTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1970 (zone A)', 'Zebraland', 'Zebraland'],
+        ['1970 (zone B)', 'Appleland', 'Appleland'],
+      ],
+    };
+    // Both hosted exactly once with the same leading year (1970) - only the
+    // final `displayName.localeCompare` arm can separate them.
+    expect(buildHostsSummary(buildEditions(tiedTable)).map((s) => s.displayName)).toEqual([
+      'Appleland',
+      'Zebraland',
+    ]);
+  });
 });
 
 describe('buildHostMapPoints', () => {
@@ -409,6 +460,21 @@ describe('buildHostMapPoints', () => {
       expect(COPA_AMERICA_REGION_ORDER).toContain(coordinate.region);
     }
   });
+
+  it('tie-breaks on host name alphabetically when region and earliest hosting year both match', () => {
+    const tiedTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1930 (zone A)', 'Italy', 'Italy'],
+        ['1930 (zone B)', 'France', 'France'],
+      ],
+    };
+    // France and Italy are both WORLD_CUP_HOST_COORDINATES "Europe" entries,
+    // each hosting once with the same leading year (1930) - only the final
+    // `host.localeCompare` arm can separate them.
+    const points = buildHostMapPoints(buildEditions(tiedTable), WORLD_CUP_HOST_COORDINATES, HOST_REGION_ORDER);
+    expect(points.map((p) => p.host)).toEqual(['France', 'Italy']);
+  });
 });
 
 describe('buildHomeSoilTitles', () => {
@@ -501,6 +567,22 @@ describe('buildHomeSoilTitles', () => {
     const summary = buildHomeSoilTitles(buildEditions(table));
     expect(summary.map((s) => s.displayName)).toEqual(['Uruguay', 'Argentina', 'Peru']);
     expect(summary[0]).toMatchObject({ titles: 2, years: ['1917', '1923'] });
+  });
+
+  it('tie-breaks on name alphabetically when home-soil title count and earliest year both match', () => {
+    const tiedTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1970 (zone A)', 'Zebraland', 'Zebraland'],
+        ['1970 (zone B)', 'Appleland', 'Appleland'],
+      ],
+    };
+    // Both won at home exactly once with the same leading year (1970) - only
+    // the final `displayName.localeCompare` arm can separate them.
+    expect(buildHomeSoilTitles(buildEditions(tiedTable)).map((s) => s.displayName)).toEqual([
+      'Appleland',
+      'Zebraland',
+    ]);
   });
 });
 
@@ -610,6 +692,25 @@ describe('buildLongestStreaks', () => {
     };
     expect(buildLongestStreaks(buildEditions(outOfOrder))).toEqual([
       { id: 'Italy-1934', displayName: 'Italy', titles: 2, years: ['1934', '1938'], names: ['Italy'] },
+    ]);
+  });
+
+  it('tie-breaks on name alphabetically when streak length and earliest start year both match', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1958 (zone A)', 'Zebraland'],
+        ['1958 (zone A, cont.)', 'Zebraland'],
+        ['1958 (zone B)', 'Appleland'],
+        ['1958 (zone B, cont.)', 'Appleland'],
+      ],
+    };
+    // Both streaks are length 2 with the same leading start year (1958),
+    // since every label starts with the same four digits - only the final
+    // `displayName.localeCompare` arm can separate them.
+    expect(buildLongestStreaks(buildEditions(table)).map((s) => s.displayName)).toEqual([
+      'Appleland',
+      'Zebraland',
     ]);
   });
 });
@@ -879,6 +980,20 @@ describe('buildLongestTitleGaps', () => {
         ['1934', 'Italy'],
       ],
     };
+    expect(buildLongestTitleGaps(buildEditions(table))).toEqual([]);
+  });
+
+  it('excludes a team whose two titles fall in the same duplicate-labeled year (a zero-length gap), e.g. Copa América 1959', () => {
+    const table: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1959 (Argentina)', 'Argentina'],
+        ['1959 (Ecuador)', 'Argentina'],
+      ],
+    };
+    // Both titles share the same leading year (1959), so widestGap works out
+    // to 0 - the "vanishingly unlikely" case this function's own doc comment
+    // says to exclude rather than show a meaningless zero-year gap.
     expect(buildLongestTitleGaps(buildEditions(table))).toEqual([]);
   });
 
@@ -1307,6 +1422,18 @@ describe('buildBiggestFinalMargins', () => {
   it('returns an empty list when the table has no "Final" column', () => {
     expect(buildBiggestFinalMargins(buildEditions(table))).toEqual([]);
   });
+
+  it('skips a "Final" cell with no digit-dash-digit score pair to parse', () => {
+    const abandonedTable: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Final'],
+      rows: [
+        ['1930', 'Uruguay', 'Uruguay 4-2 Argentina'],
+        ['1942', 'Not held', 'Match not played'],
+      ],
+    };
+    const margins = buildBiggestFinalMargins(buildEditions(abandonedTable));
+    expect(margins).toEqual([{ id: '1930', displayName: 'Uruguay 4-2 Argentina', titles: 2, years: ['1930'], names: [] }]);
+  });
 });
 
 describe('buildTopScorerFacts', () => {
@@ -1415,5 +1542,33 @@ describe('buildYearStories', () => {
   it('skips a bullet with no 4-digit year and returns an empty map for no bullets', () => {
     expect(buildYearStories(buildEditions(table), ['A bullet with no year mentioned at all.']).size).toBe(0);
     expect(buildYearStories(buildEditions(table), []).size).toBe(0);
+  });
+
+  it('rolls a turn-of-century season label (e.g. "1999-00") over into the next century for its Finals year', () => {
+    const seasonTable: MarkdownTable = {
+      headers: ['Season', 'Winner'],
+      rows: [['1999-00', 'Portugal']],
+    };
+    // century=1900, naive end=1900+00=1900 <= 1999, so it must roll to 2000.
+    const stories = buildYearStories(buildEditions(seasonTable), [
+      'Portugal won the Finals in 2000 to become champion.',
+    ]);
+    expect(stories.get('1999-00')).toContain('won the Finals in 2000');
+  });
+
+  it('attributes a duplicate-labeled year (e.g. Copa América 1959) to only the first matching edition', () => {
+    const duplicateYearTable: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1959 (zone A)', 'Argentina'],
+        ['1959 (zone B)', 'Uruguay'],
+      ],
+    };
+    const stories = buildYearStories(buildEditions(duplicateYearTable), [
+      'Argentina and Uruguay both won a 1959 South American Championship.',
+    ]);
+    expect(stories.size).toBe(1);
+    expect(stories.get('1959 (zone A)')).toContain('South American Championship');
+    expect(stories.get('1959 (zone B)')).toBeUndefined();
   });
 });

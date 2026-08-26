@@ -1,0 +1,136 @@
+---
+// Croatian translation of ../../../../competitions/golden-boot/world-cup/
+// [year].astro - one page per FIFA World Cup Golden Boot edition. Loads the
+// exact same content as the English route so the scorers, teams and goal
+// counts can't drift between languages; only this page's own chrome (column
+// labels, prose) is Croatian, the same convention every other hr edition
+// page here follows.
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+import EditionView from '../../../../../components/EditionView.astro';
+import References from '../../../../../components/References.astro';
+import { loadCompetition } from '../../../../../lib/competition';
+import { isPlaceholderWinner } from '../../../../../lib/editions';
+import { buildEditionProfiles, type EditionProfile } from '../../../../../lib/editionProfile';
+import { buildAllCountryRecords } from '../../../../../lib/compare';
+import { loadTeamCompetitions } from '../../../../../lib/teamCompetitions';
+import { teamProfileSlug } from '../../../../../lib/teamProfile';
+import {
+  buildAllPlayerProfiles,
+  playerProfileSlug,
+  type PlayerAwardSource,
+} from '../../../../../lib/playerProfile';
+import type { SourceLink } from '../../../../../lib/sources';
+import { absolutePageUrl, withBase } from '../../../../../lib/url';
+import { buildEditionSportsEvent } from '../../../../../lib/jsonLd';
+
+// Croatian column-label translations, matching hr/competitions/golden-boot.astro's own headerLabels map.
+const HEADER_LABELS: Record<string, string> = {
+  'Player(s)': 'Igrač(i)',
+  Team: 'Reprezentacija',
+  Goals: 'Golovi',
+};
+
+export async function getStaticPaths() {
+  const [ballonDor, worldCupGoldenBoot, euroGoldenBoot, teamData] = await Promise.all([
+    loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'FIFA World Cup top scorers',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'UEFA EURO top scorers',
+      sourcesHeading: 'UEFA EURO',
+    }),
+    loadTeamCompetitions(),
+  ]);
+
+  const teamSlugs = new Set(
+    buildAllCountryRecords(teamData.competitions).map((record) => teamProfileSlug(record.id)),
+  );
+  const playerSources: PlayerAwardSource[] = [
+    { title: "Ballon d'Or", slug: 'ballon-dor', editions: ballonDor.editions },
+    { title: 'FIFA World Cup Golden Boot', slug: 'golden-boot', editions: worldCupGoldenBoot.editions },
+    { title: 'UEFA EURO Golden Boot', slug: 'golden-boot', editions: euroGoldenBoot.editions },
+  ];
+  const playerSlugs = new Set(
+    buildAllPlayerProfiles(playerSources).map((profile) => playerProfileSlug(profile.id)),
+  );
+
+  const data = worldCupGoldenBoot;
+
+  return buildEditionProfiles(data.editions, teamSlugs, { playerSlugs }).map((profile) => ({
+    params: { year: profile.slug },
+    props: {
+      profile,
+      sources: data.sources,
+      lastReviewed: data.lastReviewed,
+      status: data.status,
+    },
+  }));
+}
+
+type Props = {
+  profile: EditionProfile;
+  sources: SourceLink[];
+  lastReviewed: string;
+  status: string;
+};
+
+const { profile, sources, lastReviewed, status } = Astro.props as Props;
+const statusText = status === 'verified' ? 'Provjereno' : 'U pregledu';
+
+const title = `Zlatna kopačka Svjetskog prvenstva ${profile.year}.`;
+const description = isPlaceholderWinner(profile.champion)
+  ? `Zlatna kopačka Svjetskog prvenstva ${profile.year}. nije dodijeljena. Puni podaci iz tablice najboljih strijelaca te godine.`
+  : [
+      `Zlatna kopačka Svjetskog prvenstva ${profile.year}.:`,
+      `pobjednik ${profile.champion}.`,
+      'Puni podaci iz tablice najboljih strijelaca, s poveznicom na potpunu povijest nagrada svakog igrača.',
+    ].join(' ');
+
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  locale="hr"
+  alternateHref={withBase(`/competitions/golden-boot/world-cup/${profile.slug}`)}
+  breadcrumbTrail={[{ name: 'Zlatna kopačka', url: withBase('/hr/competitions/golden-boot') }]}
+  jsonLd={jsonLd}
+>
+  <EditionView
+    profile={profile}
+    competitionPath="/hr/competitions/golden-boot/world-cup"
+    backPath="/hr/competitions/golden-boot"
+    competitionTitle="Zlatna kopačka Svjetskog prvenstva"
+    locale="hr"
+    headerLabels={HEADER_LABELS}
+    eyebrow="Generirano iz tablice nagrade"
+    headingTemplate="{competition} {year}."
+    introTemplate="Sve što tablica najboljih strijelaca bilježi o izdanju {year}., sa svakim strijelcem povezanim na njegovu potpunu povijest nagrada i reprezentaciju odvojeno. Izjednačeni strijelci prikazani su zajedno, točno onako kako ih navodi izvorna tablica."
+    pagerLabel="Ostala izdanja"
+    previousLabel="Prethodno izdanje"
+    nextLabel="Sljedeće izdanje"
+    backLabel="Sva izdanja natjecanja {competition}"
+    teamProfileHintTemplate="{team} — potpuna povijest"
+    playerProfileHintTemplate="{player} — potpuna povijest nagrada"
+    glanceHeading="Izdanje {year}. na prvi pogled"
+    pdfSlug={`edition-golden-boot-world-cup-${profile.slug}-hr`}
+    pdfLabel="Preuzmi PDF za ispis"
+    pdfHint="A4 položeno, potpuni podaci ovog izdanja nagrade."
+  >
+    <References
+      sources={sources}
+      lastReviewed={lastReviewed}
+      status={status}
+      heading="Izvori i provjera"
+      statusPrefix="Status:"
+      statusText={statusText}
+      lastReviewedPrefix="Zadnja provjera:"
+      dateLocale="hr-HR"
+      noSourcesText="Za ovu stranicu još nisu navedene poveznice na izvore."
+    />
+  </EditionView>
+</BaseLayout>

@@ -5,6 +5,7 @@
 // chrome/prose is translated, matching every other Croatian page's
 // convention (content/*.md stays English-only per AGENTS.md).
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PrintDownloadLink from '../../components/PrintDownloadLink.astro';
 import { loadPageMeta } from '../../lib/competition';
 import { loadGlossaryEntries } from '../../lib/glossary';
 import { absolutePageUrl, withBase } from '../../lib/url';
@@ -56,6 +57,11 @@ const reviewedLabel = Number.isNaN(reviewed.getTime())
           <time datetime={meta.lastReviewed}>{reviewedLabel}</time>
         </span>
       </p>
+      <PrintDownloadLink
+        slug="glossary-hr"
+        label="Preuzmi PDF za ispis"
+        hint="A4, isti pojmovi kao na ovoj stranici."
+      />
     </header>
 
     <section class="card stack" aria-labelledby="terms-heading">

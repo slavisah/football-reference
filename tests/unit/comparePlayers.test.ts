@@ -96,4 +96,33 @@ describe('buildSharedAwardYears', () => {
     const messi = records.find((r) => r.displayName === 'Lionel Messi')!;
     expect(buildSharedAwardYears(muller, messi)).toEqual([]);
   });
+
+  it('sorts more than one shared year oldest-first, even when the later shared year is found first', () => {
+    // aYears is a Map built by iterating this table's rows in source order,
+    // so listing the later shared year (2002) before the earlier one (1998)
+    // here means buildSharedAwardYears() only comes back chronological if its
+    // own .sort() actually runs, not just because of table row order.
+    const ballonDorTable: MarkdownTable = {
+      headers: ['Year', 'Winner', 'National team', 'Ceremony date'],
+      rows: [
+        ['2002', 'Player X', 'Country', '1 December 2002'],
+        ['1998', 'Player X', 'Country', '1 December 1998'],
+      ],
+    };
+    const goldenBootTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team', 'Goals'],
+      rows: [
+        ['1998', 'Player Y', 'Country', '6'],
+        ['2002', 'Player Y', 'Country', '8'],
+      ],
+    };
+    const localSources: PlayerAwardSource[] = [
+      { title: "Ballon d'Or", slug: 'ballon-dor', editions: buildEditions(ballonDorTable) },
+      { title: 'FIFA World Cup Golden Boot', slug: 'golden-boot', editions: buildEditions(goldenBootTable) },
+    ];
+    const localAwardDefs = localSources.map((s) => ({ title: s.title, slug: s.slug }));
+    const x = buildComparePlayerRecord(buildPlayerProfile('Player X', localSources), localAwardDefs);
+    const y = buildComparePlayerRecord(buildPlayerProfile('Player Y', localSources), localAwardDefs);
+    expect(buildSharedAwardYears(x, y).map((s) => s.year)).toEqual(['1998', '2002']);
+  });
 });
