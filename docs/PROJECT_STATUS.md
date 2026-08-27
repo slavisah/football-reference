@@ -12739,6 +12739,56 @@ minutes).
 prior entry (both re-confirmed this run). No concrete, named backlog item
 remains on record.
 
+### Lighthouse coverage for the competition-landing-page shape - 2026-08-27 (eighteenth intensive run)
+
+`pnpm outdated` again found nothing new beyond the still-blocked `typescript`
+7 entry (re-confirmed via `npm view @astrojs/check@latest peerDependencies`
+once more); `pnpm audit` reported no known vulnerabilities; a direct `curl`
+to `en.wikipedia.org` was again rejected with a 403 by the egress proxy,
+re-confirming the `docs/SOURCES.md` link-liveness sweep is still blocked. A
+fresh `pnpm dlx knip --no-config-hints` pass matched the twelfth/sixteenth
+runs' baseline exactly (the one flagged "unused file",
+`scripts/test-preview-server.mjs`, remains the same confirmed false
+positive - invoked as a shell string from `playwright.config.ts`'s
+`webServer.command`, invisible to static import-graph analysis).
+
+Rather than repeat the standing health check verbatim as its own
+deliverable again, this run looked for a genuinely uncovered page shape in
+`check-lighthouse.mjs`'s own audit list. All 16 pages from the sixteenth/
+seventeenth runs were either the home page, `/records` (both languages), a
+single-edition page (one table, one year, for every competition/award
+family), a head-to-head comparison tool, `/glossary`, `/quiz`, or a single
+profile page - never a competition *landing* page, the page at
+`/competitions/<competition>/` itself that renders the full multi-edition
+table plus the winner/year/host/team filter controls
+(`CompetitionView.astro`). That is not a minor gap: `pnpm check:perf`'s own
+output ranks `competitions/copa-america` (270.4 KB EN / 272.9 KB HR) as the
+third-heaviest page family on the entire site, behind only `/records` - yet
+it had never been through a Lighthouse pass. The `/teams` and `/players`
+directory index pages (a third shape: a plain alphabetical list built from
+every team/player slug, with a live count) were similarly never audited.
+
+Added three pages to `PAGES_TO_AUDIT`: the Copa América landing page (EN;
+its HR sibling shares the same template and filter logic, and `/records`
+already covers both languages above), `/players/`, and `/teams/` - 19 pages
+total, up from 16. Ran `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+check:lighthouse` against a fresh `pnpm build`: all 19 pages scored a
+perfect 1.00/1.00/1.00/1.00, exit code 0. Full standing health check also
+run and clean: `pnpm lint` (0 errors/warnings/hints), `pnpm test`
+(505/505), `pnpm build` (711 pages), `check:links` (715 pages, no broken
+links), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+`check:perf` (heaviest page still `hr/records` at 498.8 KB, within the 510
+KB budget), `check:pdfs` (all 700 PDFs current - no editorial content
+changed this run), and the full cold-start `pnpm test:e2e` suite (804/804,
+6.7 minutes).
+
+**Left for a future pass:** same two environment-blocked items as every
+prior entry (both re-confirmed this run). No concrete, named backlog item
+remains on record. `check:lighthouse` still doesn't cover every one of the
+711 built pages (by design); a future pass could widen it further (e.g. a
+World Cup or EURO landing page - Copa América is now the only landing page
+covered) if a page shape not yet represented turns out to matter.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
