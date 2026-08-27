@@ -12655,6 +12655,54 @@ this run's own network check reconfirmed `en.wikipedia.org` is still 403'd
 by the egress proxy, so that data still needs a session with broader network
 access than any of these fifteen runs have had.
 
+### Widened `pnpm check:lighthouse` to cover every competition/award family - 2026-08-27 (sixteenth intensive run)
+
+`pnpm outdated` again found nothing new (still just the blocked `typescript`
+7 entry, re-confirmed via `npm view @astrojs/check@latest peerDependencies`
+once more), `pnpm audit` reported no known vulnerabilities, and a fresh
+`pnpm dlx knip --no-config-hints` pass matched the twelfth run's baseline
+exactly (the one flagged "unused file",
+`scripts/test-preview-server.mjs`, is the same confirmed false positive -
+it's invoked as a shell string from `playwright.config.ts`'s
+`webServer.command`, invisible to static import-graph analysis). Rather
+than repeat the health check verbatim again, this run looked at the
+fifteenth run's own new tool with a critical eye: `PAGES_TO_AUDIT` in
+`scripts/check-lighthouse.mjs` audited seven diverse *page shapes*, but only
+one of them was an edition page, and it was always Copa América's. World
+Cup, EURO, Nations League, Ballon d'Or and both Golden Boot edition trees
+had never had their own layout run through Lighthouse - a regression
+specific to, say, the Golden Boot's two-table "Memorable moments" layout
+(see the eleventh intensive run) wouldn't be caught by auditing Copa
+América alone. `/compare`, `/glossary` and the English `/records` (only its
+Croatian sibling was audited) were similarly uncovered.
+
+Widened `PAGES_TO_AUDIT` from 7 to 16 pages: the latest completed edition of
+each of the five previously-unaudited families
+(`/competitions/world-cup/2026/`, `/competitions/euro/2024/`,
+`/competitions/nations-league/2024-25/`, `/competitions/ballon-dor/2025/`,
+`/competitions/golden-boot/world-cup/2026/`,
+`/competitions/golden-boot/euro/2024/`), plus `/records/`, `/compare/` and
+`/glossary/`. Ran `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+check:lighthouse` against a fresh `pnpm build`: all 16 pages scored a
+perfect 1.00/1.00/1.00/1.00, exit code 0, in 2m33s (up from the
+seven-page run's 1m23s - still well within reach for a manual/intensive-run
+tool that isn't wired into CI). Full standing health check also run and
+clean: `pnpm lint` (0 errors/warnings/hints), `pnpm test` (505/505), `pnpm
+build` (711 pages), `check:perf` (heaviest page still `hr/records` at 498.8
+KB, within the 510 KB budget), `check:links` (715 pages, no broken links),
+`check:sitemap` (710 entries), `check:precache` (37 URLs), `check:pdfs` (all
+700 PDFs current - no content changed this run, so no regeneration needed),
+and the full cold-start `pnpm test:e2e` suite.
+
+**Left for a future pass:** the `typescript` 7 upgrade and the
+`docs/SOURCES.md` link-liveness sweep stay blocked for the same reasons as
+every prior entry (both re-confirmed this run). No concrete, named backlog
+item remains on record. `check:lighthouse` still doesn't cover every one of
+the 711 built pages (by design - see that script's own doc comment); a
+future pass could widen it further (e.g. one profile-heavy `/players/`
+entry with a very long award list) if a page shape not yet represented
+turns out to matter.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
