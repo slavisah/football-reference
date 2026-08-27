@@ -176,6 +176,18 @@ standing quirks.
   run could turn the manual Lighthouse invocation into a committed
   `check:lighthouse` script if repeat manual runs turn out to be common
   enough to justify automating it.
+- **`pnpm check:lighthouse` script**: closed 2026-08-27 (fifteenth intensive
+  run) - the fourteenth run's suggestion, above, acted on: a committed
+  `scripts/check-lighthouse.mjs` now runs the same seven-page Lighthouse
+  audit against a `MIN_SCORE = 0.9`-per-category budget, reusing the `astro
+  preview` daemon dance and Playwright's already-installed Chromium (driven
+  over CDP) rather than adding a second browser-launch path. Deliberately
+  not wired into CI (slow, pulls in `puppeteer-core` transitively) - stays a
+  manual/intensive-run tool like `test:e2e:install`. Ran clean: all seven
+  pages 1.00 across the board, matching the fourteenth run's manual
+  baseline; full standing health check (including cold-start `pnpm
+  test:e2e`) also clean. See `docs/PROJECT_STATUS.md`'s matching entry for
+  detail.
 
 ## Ideas not yet scoped as backlog
 

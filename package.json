@@ -20,7 +20,8 @@
     "check:perf": "node scripts/check-page-weight.mjs",
     "check:links": "node scripts/check-internal-links.mjs",
     "check:sitemap": "node scripts/check-sitemap.mjs",
-    "check:precache": "node scripts/check-precache.mjs"
+    "check:precache": "node scripts/check-precache.mjs",
+    "check:lighthouse": "node scripts/check-lighthouse.mjs"
   },
   "dependencies": {
     "astro": "^7.2.8"
@@ -31,6 +32,7 @@
     "@playwright/test": "^1.62.1",
     "@types/node": "^26.4.0",
     "@vitest/coverage-v8": "4.1.11",
+    "lighthouse": "^13.4.1",
     "typescript": "^5.9.3",
     "vitest": "^4.1.11"
   },
