@@ -156,6 +156,26 @@ standing quirks.
   environment's outbound network policy (a direct `curl` to
   `en.wikipedia.org` was again rejected with a 403 by the egress proxy).
   See `docs/PROJECT_STATUS.md`'s matching entry.
+- **Lighthouse audit (new verification method) plus standing health
+  check**: closed 2026-08-27 (fourteenth intensive run) - `pnpm outdated`
+  found nothing new (still just the blocked `typescript` 7 entry), and a
+  fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live route tree
+  and a spot-check of the hand-written "Champions by titles" content
+  tables against the generated `buildChampionsSummary()` output turned up
+  nothing missing or wrong. Rather than repeat the prior five runs'
+  identical health check verbatim, this run ran a **Lighthouse audit** (a
+  method no prior run had used) against seven diverse pages (home,
+  `hr/records` [heaviest page], a Copa América edition page,
+  `/compare-players`, `/quiz`, a player profile, a team profile): every
+  page scored a perfect 1.00/1.00/1.00/1.00
+  (performance/accessibility/best-practices/SEO) - no audit fired anywhere.
+  The standing health check (lint/test/`check:links`/`check:sitemap`/
+  `check:perf`/`check:precache`/`check:pdfs`) also came back clean and
+  unchanged from the thirteenth run's baseline. No code change needed. See
+  `docs/PROJECT_STATUS.md`'s matching entry, which also suggests a future
+  run could turn the manual Lighthouse invocation into a committed
+  `check:lighthouse` script if repeat manual runs turn out to be common
+  enough to justify automating it.
 
 ## Ideas not yet scoped as backlog
 
