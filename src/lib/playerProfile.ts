@@ -10,7 +10,7 @@ import type { Edition } from './types';
 // awards ... are not included here since they recognize players, not
 // national teams").
 
-export type PlayerAppearance = {
+type PlayerAppearance = {
   year: string;
   yearSort: number;
   /** Human-readable facts for this award (team, goals, ceremony date), already joined - empty when the source table has none of those columns. */

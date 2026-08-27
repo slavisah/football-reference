@@ -17,7 +17,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import EditionView from '../../../components/EditionView.astro';
 import References from '../../../components/References.astro';
 import { loadCompetition } from '../../../lib/competition';
-import { distinctWinners, isPlaceholderWinner } from '../../../lib/editions';
+import { buildYearStories, distinctWinners, isPlaceholderWinner } from '../../../lib/editions';
 import { buildEditionProfiles, type EditionProfile } from '../../../lib/editionProfile';
 import { buildAllCountryRecords } from '../../../lib/compare';
 import { loadTeamCompetitions } from '../../../lib/teamCompetitions';
@@ -29,7 +29,11 @@ import { buildEditionSportsEvent } from '../../../lib/jsonLd';
 
 export async function getStaticPaths() {
   const [data, teamData] = await Promise.all([
-    loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),
+    loadCompetition('ballon-dor', {
+      editionsHeading: 'Winners',
+      sourcesHeading: "Ballon d'Or",
+      noteHeadings: ['Memorable moments'],
+    }),
     loadTeamCompetitions(),
   ]);
 
@@ -41,11 +45,16 @@ export async function getStaticPaths() {
     buildAllCountryRecords(teamData.competitions).map((record) => teamProfileSlug(record.id)),
   );
   const playerSlugs = new Set(distinctWinners(data.editions).map((name) => playerProfileSlug(name)));
+  const stories = buildYearStories(
+    data.editions,
+    data.notes.find((section) => section.heading === 'Memorable moments')?.items ?? [],
+  );
 
   return buildEditionProfiles(data.editions, teamSlugs, { playerSlugs }).map((profile) => ({
     params: { year: profile.slug },
     props: {
       profile,
+      story: stories.get(profile.year),
       sources: data.sources,
       lastReviewed: data.lastReviewed,
       status: data.status,
@@ -55,12 +64,13 @@ export async function getStaticPaths() {
 
 type Props = {
   profile: EditionProfile;
+  story?: string;
   sources: SourceLink[];
   lastReviewed: string;
   status: string;
 };
 
-const { profile, sources, lastReviewed, status } = Astro.props as Props;
+const { profile, story, sources, lastReviewed, status } = Astro.props as Props;
 
 const nationalTeam = profile.facts.find((fact) => /national team/i.test(fact.label))?.value;
 const title = `${profile.year} Men's Ballon d'Or`;
@@ -87,6 +97,7 @@ const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
     profile={profile}
     competitionPath="/competitions/ballon-dor"
     competitionTitle="Men's Ballon d'Or"
+    story={story}
     introTemplate="Everything the {competition} table records about {year}, with the winner linked to their full award history and their national team linked to its own record."
     pdfSlug={`edition-ballon-dor-${profile.slug}`}
   >

@@ -125,6 +125,15 @@ A second, independent cross-check of the **Ceremony date** column (2026-08-13, i
 
 See `docs/SOURCES.md` for the per-year citation list.
 
+## Memorable moments
+
+- Stanley Matthews won the first-ever Ballon d'Or in 1956.
+- George Weah became the first African player to win the Ballon d'Or in 1995.
+- Kaká won the 2007 Ballon d'Or, the first year the award opened to any nationality at any club worldwide.
+- Lionel Messi won the first of his eight Ballon d'Or titles in 2009, more than any other player in the award's history.
+- Luka Modrić became the only Croatian winner of the Ballon d'Or in 2018.
+- The 2020 Ballon d'Or was the only edition since the award's creation in 1956 not to be presented.
+
 ## Notes
 
 - Lev Yashin remains the only goalkeeper to win the men's award.

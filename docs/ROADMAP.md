@@ -80,6 +80,114 @@ standing quirks.
   ceiling is still the blocker on the `typescript` 7 upgrade (re-confirmed
   via `npm view @astrojs/check@latest peerDependencies` this run too). See
   `docs/PROJECT_STATUS.md`'s matching entry.
+- **Tenth-run health check plus three targeted audits**: closed 2026-08-26
+  (tenth intensive run) - the standing full health check (`pnpm outdated`
+  through cold-start `pnpm test:e2e`) came back byte-identical to the ninth
+  run's baseline again (505/505 unit, 804/804 e2e, 99.91%/99.42% coverage,
+  711 pages), so this run also ran a WCAG contrast-ratio audit of every
+  light/dark theme color-token pair (all clear AA), a "Last reviewed" date
+  coverage audit across all 49 page templates (complete - the five EN
+  competition landing pages carry it via `CompetitionView.astro`'s
+  `References` component), and a composition check of the heaviest built
+  page (`hr/records`, 498.8/510 KB) confirming its size is legitimate
+  JSON-LD/content, not bloat. No code change needed; see
+  `docs/PROJECT_STATUS.md`'s matching entry, which also suggests a future
+  pass look past this same health-check shape (dead-code sweep, or a fresh
+  read of `docs/WEBSITE_REQUIREMENTS.md` against the live site) since
+  repeat clean health checks add less each time.
+- **"Tap a year to reveal a short story" for the two individual awards**:
+  closed 2026-08-26 (eleventh intensive run) - `content/ballon-dor.md` and
+  `content/golden-boot.md` (the latter split into "World Cup memorable
+  moments"/"EURO memorable moments", one per table) now carry a "Memorable
+  moments" section each, extending the feature the four team-competition
+  pages already had. Every bullet is a fact already cross-checked
+  elsewhere in the same content file (the table itself, the "Multiple
+  winners"/"Notes" sections, or the existing team-competition EURO-2020-delay
+  note) rather than new unverified biographical claims - the caution the
+  "not pursued" note below still applies to (birth dates), this doesn't.
+  Wired into both index pages (`ballon-dor.astro`'s `noteHeadings`;
+  `golden-boot.astro`'s hand-built `buildYearStories()`/`storyColumn`, since
+  that page composes its own two-table layout rather than using
+  `CompetitionView`) and all four edition-page route trees
+  (`ballon-dor/[year].astro`, `golden-boot/world-cup/[year].astro`,
+  `golden-boot/euro/[year].astro`, plus their Croatian siblings with
+  hand-translated `CROATIAN_MOMENTS`/`storyColumn` wiring kept in sync with
+  each hr index page's own notes). All 700 PDFs regenerated
+  (`pnpm build:pdfs`) and reverified with `pnpm check:pdfs` (zero drift);
+  full health check (lint/test/build/`check:links`/`check:sitemap`/
+  `check:precache`/`check:perf`) also clean: 505/505 unit tests, 711 pages
+  built, no page-weight or link regressions. The full `pnpm test:e2e` suite
+  (804 tests) was run from a cold start too: it first caught two pre-existing
+  Golden Boot notes-count assertions (`tests/e2e/mobile.spec.ts`) that
+  hardcoded 3 `.notes__card` sections and needed updating to 5 now that each
+  table has its own new moments section, plus a Croatian wording collision
+  (this page's new EURO moment and the pre-existing EURO note both opened
+  with "Michel Platini postigao je devet golova...", so a `getByText` match
+  in the existing test became ambiguous) - reworded that one bullet's word
+  order rather than the test, since the fact stands on its own without
+  echoing the note verbatim. All 804 e2e tests pass after those two fixes.
+
+- **Dead-code/unused-export sweep**: closed 2026-08-26 (twelfth intensive
+  run) - ran `pnpm dlx knip --no-config-hints` (the tenth run's own
+  suggestion for a pass that isn't another repeat health check) and fixed
+  what it found: deleted the genuinely-unused `DEFAULT_LOCALE` constant
+  (`src/lib/i18n.ts`) and dropped the unneeded `export` keyword from nine
+  types across `comparePlayers.ts`, `editionProfile.ts`, `playerProfile.ts`,
+  `tableSort.ts`, `teamProfile.ts` and `types.ts` that are used only inside
+  their own file. One `knip`-flagged "unused file"
+  (`scripts/test-preview-server.mjs`) was a false positive - it's invoked
+  as a shell string from `playwright.config.ts`'s `webServer.command`,
+  which static import-graph analysis can't see - confirmed and left as-is.
+  All 700 PDFs regenerated and reverified clean after the edit (source
+  files changed bytes even though behavior didn't). Full health check
+  clean: 505/505 unit tests, 99.91%/99.42% coverage (unchanged), 711 pages
+  built. See `docs/PROJECT_STATUS.md`'s matching entry for detail.
+- **Dependency patch bump (astro 7.2.7 -> 7.2.8, @types/node 26.3.0 ->
+  26.4.0)**: closed 2026-08-27 (thirteenth intensive run) - `pnpm outdated`
+  turned up two more in-range patch releases since the ninth run's bump;
+  both installed cleanly and a full health check (lint/test/coverage/build/
+  all four `check:*` scripts/full cold-start `pnpm test:e2e`) came back
+  identical to the twelfth run's baseline: 505/505 unit, 804/804 e2e (6.6
+  minutes), coverage unchanged at 99.91%/99.42%, 711 pages built. The
+  `typescript` 7 upgrade is still blocked on `@astrojs/check`'s
+  `typescript: '^5.0.0 || ^6.0.0'` peer ceiling (re-confirmed via `npm view
+  @astrojs/check@latest peerDependencies` this run too); the
+  `docs/SOURCES.md` link-liveness sweep is still blocked by this
+  environment's outbound network policy (a direct `curl` to
+  `en.wikipedia.org` was again rejected with a 403 by the egress proxy).
+  See `docs/PROJECT_STATUS.md`'s matching entry.
+- **Lighthouse audit (new verification method) plus standing health
+  check**: closed 2026-08-27 (fourteenth intensive run) - `pnpm outdated`
+  found nothing new (still just the blocked `typescript` 7 entry), and a
+  fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live route tree
+  and a spot-check of the hand-written "Champions by titles" content
+  tables against the generated `buildChampionsSummary()` output turned up
+  nothing missing or wrong. Rather than repeat the prior five runs'
+  identical health check verbatim, this run ran a **Lighthouse audit** (a
+  method no prior run had used) against seven diverse pages (home,
+  `hr/records` [heaviest page], a Copa América edition page,
+  `/compare-players`, `/quiz`, a player profile, a team profile): every
+  page scored a perfect 1.00/1.00/1.00/1.00
+  (performance/accessibility/best-practices/SEO) - no audit fired anywhere.
+  The standing health check (lint/test/`check:links`/`check:sitemap`/
+  `check:perf`/`check:precache`/`check:pdfs`) also came back clean and
+  unchanged from the thirteenth run's baseline. No code change needed. See
+  `docs/PROJECT_STATUS.md`'s matching entry, which also suggests a future
+  run could turn the manual Lighthouse invocation into a committed
+  `check:lighthouse` script if repeat manual runs turn out to be common
+  enough to justify automating it.
+- **`pnpm check:lighthouse` script**: closed 2026-08-27 (fifteenth intensive
+  run) - the fourteenth run's suggestion, above, acted on: a committed
+  `scripts/check-lighthouse.mjs` now runs the same seven-page Lighthouse
+  audit against a `MIN_SCORE = 0.9`-per-category budget, reusing the `astro
+  preview` daemon dance and Playwright's already-installed Chromium (driven
+  over CDP) rather than adding a second browser-launch path. Deliberately
+  not wired into CI (slow, pulls in `puppeteer-core` transitively) - stays a
+  manual/intensive-run tool like `test:e2e:install`. Ran clean: all seven
+  pages 1.00 across the board, matching the fourteenth run's manual
+  baseline; full standing health check (including cold-start `pnpm
+  test:e2e`) also clean. See `docs/PROJECT_STATUS.md`'s matching entry for
+  detail.
 
 ## Ideas not yet scoped as backlog
 
@@ -87,13 +195,6 @@ Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned
 into a concrete plan - worth a look next time the health check above comes
 back clean:
 
-- Extend "Tap a year to reveal a short story" (currently the four
-  team-competition tables) to the two individual awards. Checked
-  2026-08-25: `content/ballon-dor.md` and `content/golden-boot.md` have no
-  "Memorable moments" section (the four team-competition files each do),
-  so this is blocked on new editorial narrative content, not a code change
-  - see the "not pursued" note below for why that is not something to
-  fabricate in an unattended run.
 - **Correction (2026-08-25):** the `/records`-style individual-award
   aggregate ranking this line used to ask for is **already live** - "most
   award years apart" is the existing "Longest wait between titles" section,

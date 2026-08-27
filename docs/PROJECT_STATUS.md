@@ -12333,6 +12333,328 @@ test-coverage gap remains on record; re-run `pnpm outdated` and this same
 health check next time rather than assume either conclusion is still
 current.
 
+### Quality pass: tenth full-repo health check plus three targeted audits (contrast, "Last reviewed" coverage, heaviest-page composition) - added 2026-08-26 (tenth intensive run)
+
+With the backlog still empty and three consecutive runs having already
+confirmed a clean baseline, this run repeated the standing full health
+check (`pnpm outdated`, `lint`, `test`, `test:coverage`, `build`, all four
+`check:*` scripts, and a cold-start `pnpm test:e2e`) and, since that alone
+would be the fourth identical confirmation in a row, also ran three
+targeted audits the immediately preceding runs hadn't covered, rather than
+just re-assert their "no concrete gap remains" conclusion a fourth time.
+
+**Health check:** `pnpm outdated` - nothing new (the same `typescript`
+5.9.3 -> 7.0.2 major jump as every prior run, still blocked -
+`@astrojs/check@latest`'s `peerDependencies` still reports
+`{ typescript: '^5.0.0 || ^6.0.0' }`, re-confirmed via `npm view` again
+this run). `pnpm lint` - 0 errors/warnings/hints across 164 files. `pnpm
+test` - **505/505**. `pnpm test:coverage` - **99.91%/99.42%**
+statements/branches, byte-identical to the ninth run's baseline (the same
+four single-line branches: `quiz.ts` line 283, `sources.ts` line 33,
+`tableSort.ts` line 22, `url.ts` line 8). `pnpm build` - 711 pages.
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:perf`
+(heaviest page still `hr/records` at 498.8 KB), `check:precache` (37
+URLs), `check:pdfs` (700 PDFs) - all clean, all unchanged.
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` from a cold
+start - **804/804 passing** in 9.1 minutes. The `docs/SOURCES.md`
+link-liveness sweep is still blocked - re-confirmed again this run via a
+direct `curl` to `https://en.wikipedia.org`, which the egress proxy still
+rejects with a `403` on the CONNECT tunnel (`recentRelayFailures` in
+`$HTTPS_PROXY/__agentproxy/status` records the same denial).
+
+**Contrast-ratio audit (accessibility):** computed WCAG relative-luminance
+contrast for every light/dark theme color pair in `src/styles/global.css`
+(`--text`/`--text-muted`/`--accent`/`--accent-contrast`/`--danger`/
+`--focus` against `--bg`/`--bg-elevated`, plus the `--highlight` mark
+background) - 17 pairs total, both themes. All comfortably clear WCAG AA:
+the tightest is light-mode `--focus` on `--bg` at 4.36:1, still above the
+3:1 UI-component threshold that pair actually needs (it is an outline
+color, not body text); every text pair clears 5.8:1. Confirms, rather than
+just relies on, `tests/e2e/accessibility*.spec.ts`'s automated axe sweep
+(which checks rendered contrast per-page but doesn't enumerate the token
+pairs directly) - no gap found, no change needed.
+
+**"Last reviewed" coverage audit:** `AGENTS.md`'s definition of done
+requires "a visible 'Last reviewed' date on each page." Grepped all 49
+`src/pages/**/*.astro` files for the string; 7 didn't match directly -
+`404.astro`, `index.astro`/`hr/index.astro` (the home page, not itself
+dated editorial content, same as the site's other non-competition utility
+pages), and the five English competition landing pages
+(`world-cup.astro`, `euro.astro`, `copa-america.astro`,
+`nations-league.astro`, `ballon-dor.astro`). Traced the five landing pages
+to `CompetitionView.astro`, the shared component they all render through -
+it calls `<References lastReviewed={data.lastReviewed}>` itself, so the
+date is present in the output, just not as a literal string in those five
+route files. No gap: every editorial content page has one.
+
+**Heaviest-page composition check (performance):** `hr/records` sits at
+498.8 KB against the 510 KB `check:perf` budget - 97.8% of budget, the
+closest margin of any page, worth understanding rather than assuming it is
+fine. Broke down the built HTML: 40 `application/ld+json` `ItemList`
+blocks (one per all-time-record category across all six
+competitions/awards) total ~50 KB, inline `<script>` tags ~55 KB, one
+`<style>` block ~4 KB - the remaining ~370 KB is the page's own record-list
+markup, which is inherent to its scope (an aggregate ranking across every
+competition and award the site covers) rather than duplication or an
+optimization target. Not a bug; left as-is.
+
+**Left for a future pass:** unchanged from the ninth run - the
+`typescript` 7 upgrade and the `docs/SOURCES.md` link-liveness sweep stay
+blocked on `@astrojs/check`'s peer-dependency ceiling and this
+environment's outbound network policy respectively; the "youngest winner"
+ranking and the individual-award "Tap a year" extension stay blocked on
+new sourced editorial content the same way the 2026-08-25 entry declined
+to fabricate it. No concrete, named backlog item, test-coverage gap,
+contrast failure, missing "Last reviewed" date, or page-weight problem
+remains on record. A future pass might look past this same standing
+health-check shape entirely - e.g. a dead-code/unused-export sweep, or
+re-reading `docs/WEBSITE_REQUIREMENTS.md` end-to-end against the live site
+rather than against `docs/ROADMAP.md`'s own summary of it - since a fourth
+or fifth consecutive "everything is clean" health check adds
+proportionally less than the first one did.
+
+### Dead-code/unused-export sweep - added 2026-08-26 (twelfth intensive run)
+
+With the backlog still empty, this run took the tenth run's own suggestion
+to look past the standing health-check shape: ran `pnpm dlx knip
+--no-config-hints` (not installed as a dependency; knip needs no project
+config to do a useful first pass) to find unused files and exported
+symbols the four/five consecutive clean health checks wouldn't surface,
+since none of them look for exports nothing imports.
+
+**Findings, each verified by hand before touching anything (knip's static
+analysis can false-positive on strings and comments):**
+
+- `scripts/test-preview-server.mjs` flagged as an "unused file" - false
+  positive. It's invoked from `playwright.config.ts`'s
+  `webServer.command` as a shell string (`'pnpm build && node
+  scripts/test-preview-server.mjs'`), which knip's import-graph analysis
+  doesn't parse. Confirmed by reading `playwright.config.ts` directly; left
+  untouched.
+- `DEFAULT_LOCALE` (`src/lib/i18n.ts`) - genuinely dead. `grep`ing the
+  whole repo (not just `src/`) found only its own declaration; every
+  locale-aware component defaults its own `locale` prop to the `'en'`
+  literal directly, exactly as `i18n.ts`'s own top-of-file comment already
+  documented ("every component that takes a `locale` prop defaults to
+  'en'"), so this constant never had a caller. Deleted.
+- Eight exported types (`ComparePlayerAward` in `comparePlayers.ts`;
+  `EditionFactPart`/`EditionFact`/`EditionNeighbour` in `editionProfile.ts`;
+  `PlayerAppearance` in `playerProfile.ts`; `SortRole` in `tableSort.ts`;
+  `TeamAppearance` in `teamProfile.ts`; `EditionCell` in `types.ts`) - each
+  genuinely used, but only inside the file that declares it; nothing
+  anywhere else imports any of them (`grep -rn "\b<Name>\b"` across
+  `src/`, `tests/`, and every `.astro`/`.ts`/`.mjs` file turned up no
+  `import` site for any of the eight, only same-file uses and, for
+  `EditionFact`, two doc-comment mentions in unrelated route files). Kept
+  every type exactly as-is and only dropped the unneeded `export` keyword
+  on each - the type itself is still doing real work as an internal alias,
+  it just never needed to be part of the module's public surface. A second
+  `knip` pass after the first fix caught a ninth (`EditionFact` itself,
+  masked by `EditionFactPart`'s export on the first pass) - same treatment,
+  confirmed the same way.
+
+No behavioral change: same public API for every module a page or another
+`src/lib` file actually imports from. Full health check re-run after the
+edits: `pnpm dlx knip --no-config-hints` clean except the one confirmed
+false positive above; `pnpm lint` (`astro check`) - 0
+errors/warnings/hints across 164 files; `pnpm test` - **505/505**; `pnpm
+test:coverage` - **99.91%/99.42%** statements/branches, byte-identical to
+every prior run's baseline (same four single-line branches: `quiz.ts` line
+283, `sources.ts` line 33, `tableSort.ts` line 22, `url.ts` line 8); `pnpm
+build` - 711 pages, unchanged; `check:links` (715 pages), `check:sitemap`
+(710 entries), `check:perf` (heaviest page still `hr/records` at 498.8 KB)
+- all clean, all unchanged. `check:pdfs` initially flagged every PDF
+derived from `editionProfile.ts`/`playerProfile.ts`/`comparePlayers.ts`/
+`teamProfile.ts`/`tableSort.ts`/`i18n.ts` as stale, since the PDF-freshness
+manifest hashes source files rather than their compiled output and this
+run edited those files' bytes even though their behavior didn't change;
+regenerated with `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+build:pdfs` (the pinned `chromium_headless_shell` build the plain
+`pnpm build:pdfs` invocation looks for isn't the one installed in this
+environment, the same override `tests/e2e` and the eleventh run's own PDF
+regeneration already needed) and reverified with `pnpm check:pdfs` -
+zero drift after regeneration.
+
+**Left for a future pass:** the `typescript` 7 upgrade and the
+`docs/SOURCES.md` link-liveness sweep stay blocked on `@astrojs/check`'s
+peer-dependency ceiling and this environment's outbound network policy,
+respectively - neither checked again this run since nothing here would
+change either. The "youngest winner" ranking stays blocked on unsourced
+birth-date data, unchanged. `knip` is not installed as a project
+dependency (this run reached it via `pnpm dlx`, once); a future pass could
+add project-specific config (entry points, ignored patterns) to make a
+committed `knip` script part of the standing health check rather than a
+one-off, if repeat dead-code drift turns out to be common enough to
+justify it.
+
+### Dependency patch bump: astro 7.2.7 -> 7.2.8, @types/node 26.3.0 -> 26.4.0 - added 2026-08-27 (thirteenth intensive run)
+
+With the backlog still empty after the twelfth run's dead-code sweep, this
+run repeated the ninth run's `pnpm outdated` check against a fresh
+`pnpm install` (this environment starts with no `node_modules`, so the
+lockfile's actual resolved versions only surface after installing cold).
+It turned up two more in-range patch releases past the ninth run's bump:
+`astro` 7.2.7 -> 7.2.8 and `@types/node` 26.3.0 -> 26.4.0 (both still
+within their `package.json` caret ranges). Every other dependency was
+already at latest. `typescript` again shows a newer `7.0.2` "latest" in
+that same listing, but `npm view @astrojs/check@latest peerDependencies`
+still reports `{ typescript: '^5.0.0 || ^6.0.0' }` as of today -
+re-confirming the standing blocker from every prior entry back to
+2026-08-23 hasn't moved. A direct `curl --max-time 10 https://en.wikipedia.org/`
+was also re-tried for the `docs/SOURCES.md` link-liveness sweep and again
+came back with a `403` from the egress proxy (confirmed via
+`/root/.ccr/README.md`'s guidance as an organization policy denial, not a
+config problem to route around) - still blocked, unchanged.
+
+Bumped both versions in `package.json`, ran `pnpm install` to refresh
+`pnpm-lock.yaml`, then repeated the full standing health check: `pnpm
+lint` (`astro check`) - 0 errors/warnings/hints across 164 files. `pnpm
+test` - **505/505**. `pnpm test:coverage` - **99.91%/99.42%**
+statements/branches, byte-identical to the pre-bump baseline (same four
+single-line branches: `quiz.ts` line 283, `sources.ts` line 33,
+`tableSort.ts` line 22, `url.ts` line 8). `pnpm build` - 711 pages,
+unchanged. `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:perf` (heaviest page still `hr/records` at 498.8 KB),
+`check:precache` (37 URLs), `check:pdfs` (700 PDFs) - all clean, all
+unchanged. `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e`
+from a cold start - **804/804 passing** in 6.6 minutes.
+
+**Left for a future pass:** the `typescript` 7 upgrade stays gated on
+`@astrojs/check`'s peer-dependency ceiling; the link-liveness sweep stays
+gated on this environment's outbound network policy. No concrete, named
+backlog item or test-coverage gap remains on record; re-run `pnpm
+outdated` and this same health check next time rather than assume either
+conclusion is still current.
+
+### Lighthouse audit (new verification method) plus standing health check - added 2026-08-27 (fourteenth intensive run)
+
+With the backlog still empty after the thirteenth run, this run first
+repeated `pnpm outdated`: no new bump available (`typescript` is still the
+only entry, blocked on `@astrojs/check`'s peer-dependency ceiling as
+before), so the standing dependency-bump path found nothing this time. A
+fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live route tree
+turned up nothing missing either - every required page resolves (including
+`/awards/ballon-dor` and `/awards/golden-boot` via the redirects the
+2026-08-20-era run already added), and the "Champions by titles" tables
+hand-written in `content/*.md` were spot-checked against the generated
+`buildChampionsSummary()` output for the FIFA World Cup table (Uruguay 2,
+Italy 4, Germany-incl.-West-Germany 4, Brazil 5, England 1, Argentina 3,
+France 2, Spain 2 = 23, matching all 23 completed editions) - correct, and
+moot for drift risk regardless since `loadCompetition()` never reads that
+hand-written table (`src/lib/competition.ts` line 135 generates it fresh
+from `editions`, exactly as `IMPLEMENTATION_NOTES.md` already documented).
+
+Rather than repeat the ninth-through-thirteenth runs' identical health
+check verbatim, this run added a genuinely new verification angle: a
+**Lighthouse audit**, which none of the eleven prior "quality pass" runs
+had used. The existing checks cover raw page weight (`check:perf`, a
+byte-count budget only) and WCAG rule violations (`@axe-core/playwright`,
+wired into `tests/e2e/accessibility*.spec.ts`); neither measures Core Web
+Vitals (FCP/LCP/TBT/CLS), Lighthouse's separate "best practices" rule set
+(HTTPS, console errors, image aspect ratios, deprecated APIs, etc.), or its
+SEO checks (meta descriptions, crawlability, tap-target sizing). Built the
+site (`pnpm build`, 711 pages, clean) and served it via the same
+`node scripts/test-preview-server.mjs` Playwright itself uses (port 4321,
+`/football-reference/` base), then ran `npx --yes lighthouse` (resolved
+13.4.1 from the registry - this environment's egress proxy allows the npm
+registry even though it blocks arbitrary websites like `en.wikipedia.org`,
+confirmed again this run) with `CHROME_PATH=/opt/pw-browsers/chromium` and
+`--chrome-flags="--headless=new --no-sandbox"` against seven pages chosen
+for diversity: `/` (home), `/hr/records` (the heaviest built page, 498.8 KB),
+`/competitions/copa-america/1993` (a per-edition page, the copa-america
+family being the second-heaviest page family per `check:perf`),
+`/compare-players`, `/quiz`, `/players/lionel-messi` and `/teams/brazil`.
+
+**Result: every page scored a perfect 1.00/1.00/1.00/1.00**
+(performance/accessibility/best-practices/SEO) - no audit fired on any of
+the seven pages. This is a meaningfully independent confirmation beyond the
+tenth run's manual WCAG contrast-ratio pass: Lighthouse's accessibility
+category runs axe-core's ruleset too, but performance/best-practices/SEO
+are new dimensions no prior run had measured. No code change was needed or
+made.
+
+Then ran the full standing health check for completeness: `pnpm lint`
+(`astro check`) - 0 errors/warnings/hints across 164 files; `pnpm test` -
+**505/505**; `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:perf` (heaviest page still `hr/records` at 498.8 KB),
+`check:precache` (37 URLs), `check:pdfs` (700 PDFs, via
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) - all clean, all unchanged
+from the thirteenth run's baseline. `test:coverage` and the full
+`test:e2e` suite were not re-run this run (unchanged since the thirteenth
+run's cold-start pass with no source edits in between); a future run
+should still re-run them rather than assume that holds indefinitely.
+
+**Left for a future pass:** the `typescript` 7 upgrade and the
+`docs/SOURCES.md` link-liveness sweep stay blocked for the same reasons as
+every prior entry. No concrete, named backlog item remains on record. A
+future pass could turn this run's one-off Lighthouse invocation into a
+committed `check:lighthouse` script (with a scored-page allowlist and a
+budget assertion) if repeat manual runs like this one turn out to be
+common enough to justify automating - left as a suggestion, not started,
+since a single clean manual pass does not yet establish that need.
+
+### New tool: `pnpm check:lighthouse`, automating the fourteenth run's manual Lighthouse audit - added 2026-08-27 (fifteenth intensive run)
+
+`pnpm outdated` again found nothing new (still just the blocked `typescript`
+7 entry, re-confirmed via `npm view @astrojs/check@latest peerDependencies`),
+and the route tree still matches every page family in `content/` (Copa
+América, Nations League, Ballon d'Or and Golden Boot pages the routine's own
+priority order asks about are all long since live - see this file's "Known
+caveats" section). So this run acted on the fourteenth run's own suggestion:
+turned its one-off manual Lighthouse invocation into a committed
+`scripts/check-lighthouse.mjs` (`pnpm check:lighthouse`), since a second
+intensive run reaching for the same manual command establishes the repeat
+need that entry said would justify it.
+
+The script builds on the same `astro preview` daemon dance
+`scripts/test-preview-server.mjs` already worked out (duplicated rather than
+imported - that script's "block forever until SIGTERM" shape is specific to
+being a Playwright `webServer.command`, and 804 e2e tests already depend on
+it unchanged), launches Chromium via `@playwright/test` (already a
+devDependency) with an explicit `--remote-debugging-port` so the Lighthouse
+Node API (added as a new devDependency, `lighthouse@13.4.1`) can drive it
+over CDP without needing its own `chrome-launcher`-managed browser, and
+audits the same seven-page spread the fourteenth run picked by hand (home,
+`/hr/records`, one Copa América edition page, `/compare-players`, `/quiz`,
+one player profile, one team profile) against a `MIN_SCORE = 0.9` budget per
+category - headroom for performance-metric timing noise while still failing
+loudly on a real regression, the same considered-budget shape
+`check-page-weight.mjs`'s `PAGE_WEIGHT_BUDGET_BYTES` already established.
+Chromium launch honors the same `PW_EXECUTABLE_PATH`/`PW_CHROME_CHANNEL`
+overrides `playwright.config.ts` already exposes for a pinned Playwright
+version whose bundled browser build doesn't match what's on disk (this
+sandbox's case); a normal contributor machine or CI runner that ran `pnpm
+test:e2e:install` needs neither.
+
+Deliberately **not** wired into `.github/workflows/ci.yml`: a full
+page-load-plus-Lighthouse-audit run per page is much slower than this
+repo's other `check:*` scripts and pulls in `puppeteer-core`/`chrome-launcher`
+transitively, so it stays a manual/intensive-run tool the same way
+`test:e2e:install` is manual infrastructure rather than a required PR gate.
+
+Ran it end to end (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+check:lighthouse`) against a fresh `pnpm build`: all seven pages scored a
+perfect 1.00/1.00/1.00/1.00 again, matching the fourteenth run's manual
+baseline exactly, exit code 0, preview daemon cleanly stopped afterward.
+Full standing health check also run and clean: `pnpm lint` (0
+errors/warnings/hints), `pnpm test` (505/505), `pnpm build` (711 pages),
+`check:perf` (heaviest page still `hr/records` at 498.8 KB, within the 510
+KB budget), `check:links` (715 pages, no broken links), `check:sitemap` (710
+entries), `check:precache` (37 URLs), `check:pdfs` (all 700 PDFs current -
+no content changed this run, so no regeneration needed), and the full
+cold-start `pnpm test:e2e` suite (804 tests via the same
+`PW_EXECUTABLE_PATH` override).
+
+**Left for a future pass:** the `typescript` 7 upgrade and the
+`docs/SOURCES.md` link-liveness sweep stay blocked for the same reasons as
+every prior entry (both re-confirmed this run). No concrete, named backlog
+item remains on record; the "youngest winner" birth-date idea in
+`docs/ROADMAP.md`'s "Ideas not yet scoped" section stays not-pursued for the
+same unattended-fabrication-risk reason the fourteenth-run-era note gives -
+this run's own network check reconfirmed `en.wikipedia.org` is still 403'd
+by the egress proxy, so that data still needs a session with broader network
+access than any of these fifteen runs have had.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

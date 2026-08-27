@@ -19,7 +19,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import EditionView from '../../../../components/EditionView.astro';
 import References from '../../../../components/References.astro';
 import { loadCompetition } from '../../../../lib/competition';
-import { isPlaceholderWinner } from '../../../../lib/editions';
+import { buildYearStories, isPlaceholderWinner } from '../../../../lib/editions';
 import { buildEditionProfiles, type EditionProfile } from '../../../../lib/editionProfile';
 import { buildAllCountryRecords } from '../../../../lib/compare';
 import { loadTeamCompetitions } from '../../../../lib/teamCompetitions';
@@ -35,6 +35,7 @@ export async function getStaticPaths() {
     loadCompetition('golden-boot', {
       editionsHeading: 'FIFA World Cup top scorers',
       sourcesHeading: 'FIFA World Cup',
+      noteHeadings: ['World Cup memorable moments'],
     }),
     loadCompetition('golden-boot', {
       editionsHeading: 'UEFA EURO top scorers',
@@ -61,11 +62,16 @@ export async function getStaticPaths() {
   );
 
   const data = worldCupGoldenBoot;
+  const stories = buildYearStories(
+    data.editions,
+    data.notes.find((section) => section.heading === 'World Cup memorable moments')?.items ?? [],
+  );
 
   return buildEditionProfiles(data.editions, teamSlugs, { playerSlugs }).map((profile) => ({
     params: { year: profile.slug },
     props: {
       profile,
+      story: stories.get(profile.year),
       sources: data.sources,
       lastReviewed: data.lastReviewed,
       status: data.status,
@@ -75,12 +81,13 @@ export async function getStaticPaths() {
 
 type Props = {
   profile: EditionProfile;
+  story?: string;
   sources: SourceLink[];
   lastReviewed: string;
   status: string;
 };
 
-const { profile, sources, lastReviewed, status } = Astro.props as Props;
+const { profile, story, sources, lastReviewed, status } = Astro.props as Props;
 
 const title = `${profile.year} FIFA World Cup Golden Boot`;
 const description = isPlaceholderWinner(profile.champion)
@@ -107,6 +114,7 @@ const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
     competitionPath="/competitions/golden-boot/world-cup"
     backPath="/competitions/golden-boot"
     competitionTitle="FIFA World Cup Golden Boot"
+    story={story}
     headingTemplate="{year} {competition}"
     introTemplate="Everything the {competition} table records about {year}, with every scorer linked to their full award history and their team linked separately. Tied scorers are shown together, exactly as the source table lists them."
     pdfSlug={`edition-golden-boot-world-cup-${profile.slug}`}
