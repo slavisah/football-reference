@@ -215,6 +215,23 @@ standing quirks.
   Lighthouse category >= 0.9 (all but home's 0.99 performance a perfect
   1.00), no broken links/sitemap/precache/PDF drift. See
   `docs/PROJECT_STATUS.md`'s matching entry for detail.
+- **Lighthouse coverage for the competition-landing-page shape**: closed
+  2026-08-27 (eighteenth intensive run) - `pnpm outdated` found nothing new
+  beyond the still-blocked `typescript` 7 entry, and `pnpm dlx knip
+  --no-config-hints` matched the twelfth/sixteenth runs' baseline exactly
+  (same one confirmed false positive). `check:lighthouse`'s 16 pages had
+  covered every *edition* page shape and both `/records` languages, but
+  never a competition *landing* page - the full multi-edition table with
+  winner/year/host/team filter controls
+  (`CompetitionView.astro`) - even though `check:perf` ranks
+  `competitions/copa-america` as the third-heaviest page family on the
+  site (270-273 KB), behind only `/records`. Added that page plus the
+  `/teams` and `/players` directory index pages (another previously-unaudited
+  shape: a plain alphabetical list with a live count) - 19 pages total, up
+  from 16. All 19 scored a perfect 1.00/1.00/1.00/1.00. Full standing health
+  check also clean: 505/505 unit, 804/804 e2e (6.7 min), 711 pages built,
+  no broken links/sitemap/precache/PDF drift. See `docs/PROJECT_STATUS.md`'s
+  matching entry for detail.
 
 ## Ideas not yet scoped as backlog
 

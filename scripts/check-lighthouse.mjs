@@ -66,10 +66,27 @@ const CDP_PORT = 9223;
 // player profile's "awards" section (src/lib/playerProfile.ts) only ever
 // renders Ballon d'Or/Golden Boot rows, so Messi's eight-row table is a
 // meaningfully longer render than Di Stéfano's two-row one.
+//
+// The eighteenth intensive run closed a different gap: every prior pass
+// audited *edition* pages (one table, one year) and /records, but never a
+// competition *landing* page - the full multi-edition table with the
+// winner/year/host/team filter controls (`CompetitionView.astro`). That
+// shape is not a minor omission: `pnpm check:perf`'s own output ranks
+// `competitions/copa-america` (270.4 KB EN / 272.9 KB HR) as the
+// third-heaviest page family on the whole site, behind only /records - yet
+// it had zero Lighthouse coverage. Added the Copa América landing page
+// (EN; the HR sibling shares the same template and filter logic, and
+// /records already has both languages covered above) plus the /teams and
+// /players directory index pages, another shape (a plain alphabetical list
+// with a live count) this list had never included.
 export const PAGES_TO_AUDIT = [
   { label: 'home', path: '/' },
   { label: 'records (heaviest page family, EN)', path: '/records/' },
   { label: 'hr/records (heaviest built page)', path: '/hr/records/' },
+  {
+    label: 'copa-america landing page (3rd-heaviest page family, filterable table)',
+    path: '/competitions/copa-america/',
+  },
   { label: 'copa-america/2024 edition page', path: '/competitions/copa-america/2024/' },
   { label: 'world-cup/2026 edition page', path: '/competitions/world-cup/2026/' },
   { label: 'euro/2024 edition page', path: '/competitions/euro/2024/' },
@@ -86,6 +103,8 @@ export const PAGES_TO_AUDIT = [
   { label: '/quiz', path: '/quiz/' },
   { label: 'player profile (lionel-messi, 8 Ballon d\'Or wins)', path: '/players/lionel-messi/' },
   { label: 'team profile (argentina)', path: '/teams/argentina/' },
+  { label: '/players directory index', path: '/players/' },
+  { label: '/teams directory index', path: '/teams/' },
 ];
 
 const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo'];
