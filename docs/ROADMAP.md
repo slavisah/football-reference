@@ -142,6 +142,20 @@ standing quirks.
   files changed bytes even though behavior didn't). Full health check
   clean: 505/505 unit tests, 99.91%/99.42% coverage (unchanged), 711 pages
   built. See `docs/PROJECT_STATUS.md`'s matching entry for detail.
+- **Dependency patch bump (astro 7.2.7 -> 7.2.8, @types/node 26.3.0 ->
+  26.4.0)**: closed 2026-08-27 (thirteenth intensive run) - `pnpm outdated`
+  turned up two more in-range patch releases since the ninth run's bump;
+  both installed cleanly and a full health check (lint/test/coverage/build/
+  all four `check:*` scripts/full cold-start `pnpm test:e2e`) came back
+  identical to the twelfth run's baseline: 505/505 unit, 804/804 e2e (6.6
+  minutes), coverage unchanged at 99.91%/99.42%, 711 pages built. The
+  `typescript` 7 upgrade is still blocked on `@astrojs/check`'s
+  `typescript: '^5.0.0 || ^6.0.0'` peer ceiling (re-confirmed via `npm view
+  @astrojs/check@latest peerDependencies` this run too); the
+  `docs/SOURCES.md` link-liveness sweep is still blocked by this
+  environment's outbound network policy (a direct `curl` to
+  `en.wikipedia.org` was again rejected with a 403 by the egress proxy).
+  See `docs/PROJECT_STATUS.md`'s matching entry.
 
 ## Ideas not yet scoped as backlog
 

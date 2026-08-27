@@ -12487,6 +12487,45 @@ committed `knip` script part of the standing health check rather than a
 one-off, if repeat dead-code drift turns out to be common enough to
 justify it.
 
+### Dependency patch bump: astro 7.2.7 -> 7.2.8, @types/node 26.3.0 -> 26.4.0 - added 2026-08-27 (thirteenth intensive run)
+
+With the backlog still empty after the twelfth run's dead-code sweep, this
+run repeated the ninth run's `pnpm outdated` check against a fresh
+`pnpm install` (this environment starts with no `node_modules`, so the
+lockfile's actual resolved versions only surface after installing cold).
+It turned up two more in-range patch releases past the ninth run's bump:
+`astro` 7.2.7 -> 7.2.8 and `@types/node` 26.3.0 -> 26.4.0 (both still
+within their `package.json` caret ranges). Every other dependency was
+already at latest. `typescript` again shows a newer `7.0.2` "latest" in
+that same listing, but `npm view @astrojs/check@latest peerDependencies`
+still reports `{ typescript: '^5.0.0 || ^6.0.0' }` as of today -
+re-confirming the standing blocker from every prior entry back to
+2026-08-23 hasn't moved. A direct `curl --max-time 10 https://en.wikipedia.org/`
+was also re-tried for the `docs/SOURCES.md` link-liveness sweep and again
+came back with a `403` from the egress proxy (confirmed via
+`/root/.ccr/README.md`'s guidance as an organization policy denial, not a
+config problem to route around) - still blocked, unchanged.
+
+Bumped both versions in `package.json`, ran `pnpm install` to refresh
+`pnpm-lock.yaml`, then repeated the full standing health check: `pnpm
+lint` (`astro check`) - 0 errors/warnings/hints across 164 files. `pnpm
+test` - **505/505**. `pnpm test:coverage` - **99.91%/99.42%**
+statements/branches, byte-identical to the pre-bump baseline (same four
+single-line branches: `quiz.ts` line 283, `sources.ts` line 33,
+`tableSort.ts` line 22, `url.ts` line 8). `pnpm build` - 711 pages,
+unchanged. `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:perf` (heaviest page still `hr/records` at 498.8 KB),
+`check:precache` (37 URLs), `check:pdfs` (700 PDFs) - all clean, all
+unchanged. `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e`
+from a cold start - **804/804 passing** in 6.6 minutes.
+
+**Left for a future pass:** the `typescript` 7 upgrade stays gated on
+`@astrojs/check`'s peer-dependency ceiling; the link-liveness sweep stays
+gated on this environment's outbound network policy. No concrete, named
+backlog item or test-coverage gap remains on record; re-run `pnpm
+outdated` and this same health check next time rather than assume either
+conclusion is still current.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

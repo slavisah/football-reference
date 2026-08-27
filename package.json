@@ -23,13 +23,13 @@
     "check:precache": "node scripts/check-precache.mjs"
   },
   "dependencies": {
-    "astro": "^7.2.7"
+    "astro": "^7.2.8"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.62.1",
-    "@types/node": "^26.3.0",
+    "@types/node": "^26.4.0",
     "@vitest/coverage-v8": "4.1.11",
     "typescript": "^5.9.3",
     "vitest": "^4.1.11"
