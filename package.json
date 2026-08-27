@@ -24,7 +24,7 @@
     "check:lighthouse": "node scripts/check-lighthouse.mjs"
   },
   "dependencies": {
-    "astro": "^7.2.8"
+    "astro": "^7.2.9"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",

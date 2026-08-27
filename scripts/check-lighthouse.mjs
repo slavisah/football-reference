@@ -57,7 +57,15 @@ const CDP_PORT = 9223;
 // edition page per remaining family (the latest completed edition of
 // each), plus the English /records (previously only its Croatian sibling
 // ran), /glossary and /compare - still nowhere near all 711 pages, but wide
-// enough now to cover every page family's own layout at least once.
+// enough now to cover every page family's own layout at least once. The
+// seventeenth intensive run swapped the player-profile pick from Alfredo Di
+// Stéfano (2 Ballon d'Or wins, 1957 + 1959) to Lionel Messi (8 Ballon d'Or
+// wins, the most of any player - see content/ballon-dor.md's "Multiple
+// winners" table) since that sixteenth-run entry's own suggested next step
+// was "one profile-heavy /players/ entry with a very long award list": a
+// player profile's "awards" section (src/lib/playerProfile.ts) only ever
+// renders Ballon d'Or/Golden Boot rows, so Messi's eight-row table is a
+// meaningfully longer render than Di Stéfano's two-row one.
 export const PAGES_TO_AUDIT = [
   { label: 'home', path: '/' },
   { label: 'records (heaviest page family, EN)', path: '/records/' },
@@ -76,7 +84,7 @@ export const PAGES_TO_AUDIT = [
   { label: '/compare-players', path: '/compare-players/' },
   { label: '/glossary', path: '/glossary/' },
   { label: '/quiz', path: '/quiz/' },
-  { label: 'player profile (alfredo-di-stefano)', path: '/players/alfredo-di-stefano/' },
+  { label: 'player profile (lionel-messi, 8 Ballon d\'Or wins)', path: '/players/lionel-messi/' },
   { label: 'team profile (argentina)', path: '/teams/argentina/' },
 ];
 

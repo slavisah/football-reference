@@ -201,6 +201,20 @@ standing quirks.
   health check (lint/unit test/`check:links`/`check:sitemap`/
   `check:precache`/`check:perf`/`check:pdfs`/cold-start `pnpm test:e2e`) is
   also clean. See `docs/PROJECT_STATUS.md`'s matching entry for detail.
+- **Dependency patch bump (astro 7.2.8 -> 7.2.9) plus a genuinely
+  profile-heavy Lighthouse pick**: closed 2026-08-27 (seventeenth intensive
+  run) - `pnpm outdated` found one new in-range patch release; installed
+  cleanly. The sixteenth run's own suggested next step ("one profile-heavy
+  `/players/` entry with a very long award list") turned out not to be met
+  by its own pick: Alfredo Di Stéfano has only 2 Ballon d'Or wins, not the
+  long list intended. Swapped `check:lighthouse`'s player-profile page to
+  Lionel Messi (8 Ballon d'Or wins, the most of any player), whose profile
+  renders four times as many award rows. Full standing health check plus
+  the widened 16-page Lighthouse audit (including the new Messi pick) all
+  clean: 505/505 unit, 804/804 e2e (11.4 min), 711 pages built, every
+  Lighthouse category >= 0.9 (all but home's 0.99 performance a perfect
+  1.00), no broken links/sitemap/precache/PDF drift. See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail.
 
 ## Ideas not yet scoped as backlog
 
