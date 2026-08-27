@@ -7,8 +7,6 @@
 
 export type Locale = 'en' | 'hr';
 
-export const DEFAULT_LOCALE: Locale = 'en';
-
 export const LOCALES: { code: Locale; label: string; htmlLang: string }[] = [
   { code: 'en', label: 'English', htmlLang: 'en' },
   { code: 'hr', label: 'Hrvatski', htmlLang: 'hr' },
