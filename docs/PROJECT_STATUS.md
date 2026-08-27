@@ -12526,6 +12526,73 @@ backlog item or test-coverage gap remains on record; re-run `pnpm
 outdated` and this same health check next time rather than assume either
 conclusion is still current.
 
+### Lighthouse audit (new verification method) plus standing health check - added 2026-08-27 (fourteenth intensive run)
+
+With the backlog still empty after the thirteenth run, this run first
+repeated `pnpm outdated`: no new bump available (`typescript` is still the
+only entry, blocked on `@astrojs/check`'s peer-dependency ceiling as
+before), so the standing dependency-bump path found nothing this time. A
+fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live route tree
+turned up nothing missing either - every required page resolves (including
+`/awards/ballon-dor` and `/awards/golden-boot` via the redirects the
+2026-08-20-era run already added), and the "Champions by titles" tables
+hand-written in `content/*.md` were spot-checked against the generated
+`buildChampionsSummary()` output for the FIFA World Cup table (Uruguay 2,
+Italy 4, Germany-incl.-West-Germany 4, Brazil 5, England 1, Argentina 3,
+France 2, Spain 2 = 23, matching all 23 completed editions) - correct, and
+moot for drift risk regardless since `loadCompetition()` never reads that
+hand-written table (`src/lib/competition.ts` line 135 generates it fresh
+from `editions`, exactly as `IMPLEMENTATION_NOTES.md` already documented).
+
+Rather than repeat the ninth-through-thirteenth runs' identical health
+check verbatim, this run added a genuinely new verification angle: a
+**Lighthouse audit**, which none of the eleven prior "quality pass" runs
+had used. The existing checks cover raw page weight (`check:perf`, a
+byte-count budget only) and WCAG rule violations (`@axe-core/playwright`,
+wired into `tests/e2e/accessibility*.spec.ts`); neither measures Core Web
+Vitals (FCP/LCP/TBT/CLS), Lighthouse's separate "best practices" rule set
+(HTTPS, console errors, image aspect ratios, deprecated APIs, etc.), or its
+SEO checks (meta descriptions, crawlability, tap-target sizing). Built the
+site (`pnpm build`, 711 pages, clean) and served it via the same
+`node scripts/test-preview-server.mjs` Playwright itself uses (port 4321,
+`/football-reference/` base), then ran `npx --yes lighthouse` (resolved
+13.4.1 from the registry - this environment's egress proxy allows the npm
+registry even though it blocks arbitrary websites like `en.wikipedia.org`,
+confirmed again this run) with `CHROME_PATH=/opt/pw-browsers/chromium` and
+`--chrome-flags="--headless=new --no-sandbox"` against seven pages chosen
+for diversity: `/` (home), `/hr/records` (the heaviest built page, 498.8 KB),
+`/competitions/copa-america/1993` (a per-edition page, the copa-america
+family being the second-heaviest page family per `check:perf`),
+`/compare-players`, `/quiz`, `/players/lionel-messi` and `/teams/brazil`.
+
+**Result: every page scored a perfect 1.00/1.00/1.00/1.00**
+(performance/accessibility/best-practices/SEO) - no audit fired on any of
+the seven pages. This is a meaningfully independent confirmation beyond the
+tenth run's manual WCAG contrast-ratio pass: Lighthouse's accessibility
+category runs axe-core's ruleset too, but performance/best-practices/SEO
+are new dimensions no prior run had measured. No code change was needed or
+made.
+
+Then ran the full standing health check for completeness: `pnpm lint`
+(`astro check`) - 0 errors/warnings/hints across 164 files; `pnpm test` -
+**505/505**; `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:perf` (heaviest page still `hr/records` at 498.8 KB),
+`check:precache` (37 URLs), `check:pdfs` (700 PDFs, via
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) - all clean, all unchanged
+from the thirteenth run's baseline. `test:coverage` and the full
+`test:e2e` suite were not re-run this run (unchanged since the thirteenth
+run's cold-start pass with no source edits in between); a future run
+should still re-run them rather than assume that holds indefinitely.
+
+**Left for a future pass:** the `typescript` 7 upgrade and the
+`docs/SOURCES.md` link-liveness sweep stay blocked for the same reasons as
+every prior entry. No concrete, named backlog item remains on record. A
+future pass could turn this run's one-off Lighthouse invocation into a
+committed `check:lighthouse` script (with a scored-page allowlist and a
+budget assertion) if repeat manual runs like this one turn out to be
+common enough to justify automating - left as a suggestion, not started,
+since a single clean manual pass does not yet establish that need.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
