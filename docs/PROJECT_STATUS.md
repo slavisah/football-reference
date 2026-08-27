@@ -12593,6 +12593,68 @@ budget assertion) if repeat manual runs like this one turn out to be
 common enough to justify automating - left as a suggestion, not started,
 since a single clean manual pass does not yet establish that need.
 
+### New tool: `pnpm check:lighthouse`, automating the fourteenth run's manual Lighthouse audit - added 2026-08-27 (fifteenth intensive run)
+
+`pnpm outdated` again found nothing new (still just the blocked `typescript`
+7 entry, re-confirmed via `npm view @astrojs/check@latest peerDependencies`),
+and the route tree still matches every page family in `content/` (Copa
+América, Nations League, Ballon d'Or and Golden Boot pages the routine's own
+priority order asks about are all long since live - see this file's "Known
+caveats" section). So this run acted on the fourteenth run's own suggestion:
+turned its one-off manual Lighthouse invocation into a committed
+`scripts/check-lighthouse.mjs` (`pnpm check:lighthouse`), since a second
+intensive run reaching for the same manual command establishes the repeat
+need that entry said would justify it.
+
+The script builds on the same `astro preview` daemon dance
+`scripts/test-preview-server.mjs` already worked out (duplicated rather than
+imported - that script's "block forever until SIGTERM" shape is specific to
+being a Playwright `webServer.command`, and 804 e2e tests already depend on
+it unchanged), launches Chromium via `@playwright/test` (already a
+devDependency) with an explicit `--remote-debugging-port` so the Lighthouse
+Node API (added as a new devDependency, `lighthouse@13.4.1`) can drive it
+over CDP without needing its own `chrome-launcher`-managed browser, and
+audits the same seven-page spread the fourteenth run picked by hand (home,
+`/hr/records`, one Copa América edition page, `/compare-players`, `/quiz`,
+one player profile, one team profile) against a `MIN_SCORE = 0.9` budget per
+category - headroom for performance-metric timing noise while still failing
+loudly on a real regression, the same considered-budget shape
+`check-page-weight.mjs`'s `PAGE_WEIGHT_BUDGET_BYTES` already established.
+Chromium launch honors the same `PW_EXECUTABLE_PATH`/`PW_CHROME_CHANNEL`
+overrides `playwright.config.ts` already exposes for a pinned Playwright
+version whose bundled browser build doesn't match what's on disk (this
+sandbox's case); a normal contributor machine or CI runner that ran `pnpm
+test:e2e:install` needs neither.
+
+Deliberately **not** wired into `.github/workflows/ci.yml`: a full
+page-load-plus-Lighthouse-audit run per page is much slower than this
+repo's other `check:*` scripts and pulls in `puppeteer-core`/`chrome-launcher`
+transitively, so it stays a manual/intensive-run tool the same way
+`test:e2e:install` is manual infrastructure rather than a required PR gate.
+
+Ran it end to end (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+check:lighthouse`) against a fresh `pnpm build`: all seven pages scored a
+perfect 1.00/1.00/1.00/1.00 again, matching the fourteenth run's manual
+baseline exactly, exit code 0, preview daemon cleanly stopped afterward.
+Full standing health check also run and clean: `pnpm lint` (0
+errors/warnings/hints), `pnpm test` (505/505), `pnpm build` (711 pages),
+`check:perf` (heaviest page still `hr/records` at 498.8 KB, within the 510
+KB budget), `check:links` (715 pages, no broken links), `check:sitemap` (710
+entries), `check:precache` (37 URLs), `check:pdfs` (all 700 PDFs current -
+no content changed this run, so no regeneration needed), and the full
+cold-start `pnpm test:e2e` suite (804 tests via the same
+`PW_EXECUTABLE_PATH` override).
+
+**Left for a future pass:** the `typescript` 7 upgrade and the
+`docs/SOURCES.md` link-liveness sweep stay blocked for the same reasons as
+every prior entry (both re-confirmed this run). No concrete, named backlog
+item remains on record; the "youngest winner" birth-date idea in
+`docs/ROADMAP.md`'s "Ideas not yet scoped" section stays not-pursued for the
+same unattended-fabrication-risk reason the fourteenth-run-era note gives -
+this run's own network check reconfirmed `en.wikipedia.org` is still 403'd
+by the egress proxy, so that data still needs a session with broader network
+access than any of these fifteen runs have had.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
