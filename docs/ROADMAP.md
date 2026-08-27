@@ -188,6 +188,19 @@ standing quirks.
   baseline; full standing health check (including cold-start `pnpm
   test:e2e`) also clean. See `docs/PROJECT_STATUS.md`'s matching entry for
   detail.
+- **Lighthouse audit coverage for every competition/award family**: closed
+  2026-08-27 (sixteenth intensive run) - `PAGES_TO_AUDIT` in
+  `scripts/check-lighthouse.mjs` only ever audited one edition-page shape
+  (Copa América), leaving World Cup, EURO, Nations League, Ballon d'Or and
+  both Golden Boot trees with no Lighthouse coverage of their own page
+  layout. Added one edition page per remaining family (the latest completed
+  edition of each) plus the English `/records` (previously only its
+  Croatian sibling ran), `/compare` and `/glossary` - 16 pages total, up
+  from 7. All 16 scored a perfect 1.00/1.00/1.00/1.00. `pnpm outdated` found
+  nothing new (still just the blocked `typescript` 7 entry); the standing
+  health check (lint/unit test/`check:links`/`check:sitemap`/
+  `check:precache`/`check:perf`/`check:pdfs`/cold-start `pnpm test:e2e`) is
+  also clean. See `docs/PROJECT_STATUS.md`'s matching entry for detail.
 
 ## Ideas not yet scoped as backlog
 
