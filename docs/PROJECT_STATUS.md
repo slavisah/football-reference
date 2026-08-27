@@ -12703,6 +12703,42 @@ future pass could widen it further (e.g. one profile-heavy `/players/`
 entry with a very long award list) if a page shape not yet represented
 turns out to matter.
 
+### Dependency patch bump (astro 7.2.8 -> 7.2.9) plus a profile-heavy Lighthouse pick - 2026-08-27 (seventeenth intensive run)
+
+`pnpm outdated` turned up one new in-range patch release (`astro` 7.2.8 ->
+7.2.9); `pnpm audit` reported no known vulnerabilities. The `typescript` 7
+upgrade is still blocked on `@astrojs/check`'s `typescript: '^5.0.0 ||
+^6.0.0'` peer ceiling (re-confirmed via `npm view @astrojs/check@latest
+peerDependencies` again this run), and the `docs/SOURCES.md` link-liveness
+sweep is still blocked by this environment's outbound network policy (a
+direct `curl` to `en.wikipedia.org` was again rejected with a 403 by the
+egress proxy).
+
+Rather than repeat the standing health check verbatim as its own
+deliverable, this run acted on the sixteenth run's own suggested next step:
+`check:lighthouse`'s player-profile pick (Alfredo Di Stéfano, 2 Ballon d'Or
+wins) wasn't actually the "very long award list" case that entry called
+for. Swapped it for Lionel Messi (8 Ballon d'Or wins, the most of any
+player - see `content/ballon-dor.md`'s "Multiple winners" table), whose
+profile page renders four times as many award rows through
+`src/lib/playerProfile.ts`'s award-list section as Di Stéfano's did.
+
+After the astro bump and the `check-lighthouse.mjs` edit, ran the full
+standing health check plus the widened Lighthouse audit: `pnpm lint` (0
+errors/warnings/hints), `pnpm test` (505/505), `pnpm build` (711 pages),
+`check:links` (715 pages, no broken links), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`
+at 498.8 KB, within the 510 KB budget), `check:pdfs` (all 700 PDFs current -
+no editorial content changed this run), `pnpm check:lighthouse` (all 16
+pages, including the new Messi profile pick, scored >= 0.9 in every
+category - home's performance came in at 0.99, everything else a perfect
+1.00), and the full cold-start `pnpm test:e2e` suite (804/804, 11.4
+minutes).
+
+**Left for a future pass:** same two environment-blocked items as every
+prior entry (both re-confirmed this run). No concrete, named backlog item
+remains on record.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
