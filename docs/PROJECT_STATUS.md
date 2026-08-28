@@ -12789,6 +12789,68 @@ remains on record. `check:lighthouse` still doesn't cover every one of the
 World Cup or EURO landing page - Copa América is now the only landing page
 covered) if a page shape not yet represented turns out to matter.
 
+### Accessibility: `prefers-reduced-motion` was never actually collapsing the site's transitions - added 2026-08-28 (nineteenth intensive run)
+
+Rather than extend `check:lighthouse` again per the eighteenth run's own
+suggestion (a fourth consecutive run touching that one script felt like
+exactly the diminishing-returns pattern the tenth/fourteenth run entries
+warned against), this run looked for a page-shape-independent gap instead -
+one that no per-page audit (Lighthouse or the WCAG A/AA axe sweep) can
+catch, because both only ever inspect a page's *resting* state, never
+whether its declared transitions actually honor the reader's OS motion
+preference.
+
+The 2026-08-14 forced-colors entry's own preamble asserted
+`prefers-reduced-motion` was already "handled" site-wide, but a fresh
+`grep -rn "transition:\|animation:\|@keyframes"` across every `.astro` and
+`.css` file found exactly three transition declarations - the skip-link's
+reveal (`global.css`), and the `.comp-card` hover effect duplicated
+verbatim in both `index.astro` and `hr/index.astro` - and none of them were
+covered by `global.css`'s existing `@media (prefers-reduced-motion:
+reduce)` block, which only ever reset `scroll-behavior` to `auto`. A reader
+with that OS setting on (a real accommodation for vestibular disorders,
+not a cosmetic preference) still got the full-speed 0.12-0.15s motion on
+every one of the three.
+
+Fixed with one blanket rule inside the existing media block rather than
+patching each site individually - `*, *::before, *::after { animation-duration:
+0.01ms !important; animation-iteration-count: 1 !important;
+transition-duration: 0.01ms !important; }` (0.01ms rather than 0s so
+browsers still fire `transitionend`, the same reasoning `check:lighthouse`
+authoring style calls out elsewhere) - so it stays correct if a fourth
+transition or animation is ever added without anyone remembering this
+entry. Added `tests/e2e/accessibility-reduced-motion.spec.ts`, the site's
+first dedicated coverage of this media feature (previously only ever
+exercised implicitly, never with its own assertion): four tests emulating
+`reducedMotion: 'reduce'` via `page.emulateMedia()` (the same mechanism
+`accessibility-forced-colors.spec.ts` already established for
+`forcedColors`, since `reducedMotion` isn't a `test.use()`-able
+`PlaywrightTestOption` in the pinned Playwright 1.62.1) confirm both the
+skip-link and both language variants of the home-page card collapse to a
+near-zero `transitionDuration`, plus one baseline test (no preference
+emulated) proving the fixtures carry a real, non-zero transition in the
+first place - so the reduced-motion assertions can't pass vacuously if the
+selector or CSS ever drifts.
+
+Full standing health check: `pnpm outdated` found nothing new beyond the
+still-blocked `typescript` 7 entry (the only in-range update was
+`typescript` itself, still capped by `@astrojs/check`'s `typescript:
+'^5.0.0 || ^6.0.0'` peer range); `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (505/505 unit tests), `pnpm build` (711 pages), `check:links`
+(715 pages, no broken links), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`
+at 499.0 KB, within the 510 KB budget), `check:pdfs` (all 700 PDFs current
+- no editorial content changed this run), and the full cold-start `pnpm
+test:e2e` suite all pass - see the run's own command output for the final
+test count.
+
+**Left for a future pass:** same two environment-blocked items as every
+prior entry (a direct connection to `en.wikipedia.org` was tried again this
+run via both `curl` and the `WebFetch` tool - both still rejected with
+`EGRESS_BLOCKED`/403 - confirming the block applies at the network-policy
+layer regardless of which tool makes the request, not just to raw `curl`).
+No concrete, named backlog item remains on record.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

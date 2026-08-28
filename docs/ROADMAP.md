@@ -188,6 +188,30 @@ standing quirks.
   baseline; full standing health check (including cold-start `pnpm
   test:e2e`) also clean. See `docs/PROJECT_STATUS.md`'s matching entry for
   detail.
+- **`check:lighthouse` widened three more times (sixteenth-eighteenth
+  intensive runs, 2026-08-27)**: every competition/award family's edition
+  page, the Copa América landing page, and the `/teams`/`/players`
+  directory indexes are now all in `PAGES_TO_AUDIT` (19 pages total, up from
+  7) - all score a perfect 1.00 across every category. See
+  `docs/PROJECT_STATUS.md`'s three matching entries for detail.
+- **Accessibility: `prefers-reduced-motion` actually collapses every
+  transition now**: closed 2026-08-28 (nineteenth intensive run) - rather
+  than extend `check:lighthouse` a fourth consecutive run, this run found a
+  genuine, previously-unfixed gap: the site's only `prefers-reduced-motion`
+  rule (`global.css`) reset `scroll-behavior` but never touched any of the
+  three real `transition` declarations in the codebase (the skip-link
+  reveal, and the `.comp-card` hover effect on both language home pages), so
+  a reader with that OS accommodation on still got full-speed motion from
+  all three. Fixed with one blanket `*, *::before, *::after` override inside
+  the existing media block, plus the site's first dedicated e2e coverage of
+  this media feature (`tests/e2e/accessibility-reduced-motion.spec.ts`, four
+  tests using `page.emulateMedia()` the same way the forced-colors spec
+  already established, since `reducedMotion` isn't a `test.use()`-able
+  option in the pinned Playwright version). Full standing health check
+  (lint/test/build/all `check:*` scripts/cold-start `pnpm test:e2e`) clean;
+  `pnpm outdated` and a fresh `WebFetch`/`curl` retry against
+  `en.wikipedia.org` both re-confirmed the same two standing environment
+  blockers. See `docs/PROJECT_STATUS.md`'s matching entry for detail.
 - **Lighthouse audit coverage for every competition/award family**: closed
   2026-08-27 (sixteenth intensive run) - `PAGES_TO_AUDIT` in
   `scripts/check-lighthouse.mjs` only ever audited one edition-page shape
