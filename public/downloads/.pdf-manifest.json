@@ -126,7 +126,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/compare.ts": "9192fca6c619321799bf16067aefd908050d3c02a82465e4775a9b4767579364",
     "src/lib/teamProfile.ts": "2d096cc6371aa2a5995f4ffcfcdbbf9e5f6c9f4d10fa25f66d61549021473d2f",
-    "src/pages/records.astro": "023c4f41952e5b338ef461c14afb3384a36fbfafb5685ca9789b9d83fcf857cf"
+    "src/pages/records.astro": "2d79aefa71cae3a957202375c05d3f30b795438c30721d29559ade99260d11a4"
   },
   "compare": {
     "content/fifa-world-cup.md": "a25c75128ad4c22694f5718c03d52b59dd4a9d8b901f7a19103af8fb730548b6",
@@ -144,7 +144,7 @@
     "src/lib/compare.ts": "9192fca6c619321799bf16067aefd908050d3c02a82465e4775a9b4767579364",
     "src/lib/teamProfile.ts": "2d096cc6371aa2a5995f4ffcfcdbbf9e5f6c9f4d10fa25f66d61549021473d2f",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/compare.astro": "e83049ee16c90fefddeae6f0a05999290c31584ba617f0bb1358b7772d56cc88"
+    "src/pages/compare.astro": "a9c2b8444c5e46b2ce4a08fa6c8de2a4ec768451a5b9ef1c513c280ee8b5def5"
   },
   "compare-players": {
     "content/ballon-dor.md": "313fbe1d646ff4a0b120485a83f3024548c7ef2110136363178893d3d9005dc9",
@@ -159,7 +159,7 @@
     "src/lib/playerProfile.ts": "3bf44a54f9725a99de617f2c9311ff81ea1a0da3edb532b053ff734c5eb279f9",
     "src/lib/comparePlayers.ts": "e80c328e79e514f0e9f69550a887d019b60184c6aae2a6549fdc5d6dfc0d16d1",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/compare-players.astro": "7e15d74aa8892eb4a262936d05e1e07bd4eee5cd86917b135455e349df90cb09"
+    "src/pages/compare-players.astro": "101b7e15ded3196bc2954aaa3d213a2037a4b41cfc6f462b7cf422bf1650354a"
   },
   "world-cup-hr": {
     "content/fifa-world-cup.md": "a25c75128ad4c22694f5718c03d52b59dd4a9d8b901f7a19103af8fb730548b6",
@@ -178,7 +178,7 @@
     "src/components/PodiumCards.astro": "3380e418f37cd63e8bd3ea649d09b5672826fd3d3bba195006381863aca17d2b",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
-    "src/pages/hr/competitions/world-cup.astro": "2b20def4c54e45503b1ce54d880fea7dd9a38517eb4f4e10da5124cd6c83869c"
+    "src/pages/hr/competitions/world-cup.astro": "d9361d852f0b494e92c9cf24b35c22e1db91fee8d9e0e58ba6d8e79021f9b3f7"
   },
   "euro-hr": {
     "content/uefa-euro.md": "20cab38958ca196d8334ab9da94e0edc697be4cacc7f7d931d54d260d3e8c713",
@@ -196,7 +196,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
-    "src/pages/hr/competitions/euro.astro": "c5da93494b1c609c06e08bdf9cdab93a4c2e2371e2c5f60aef1d9792f26a1d50"
+    "src/pages/hr/competitions/euro.astro": "e2071d73388fdb380233800b1cd96593a6101047f8f888116a21e533b636ac60"
   },
   "nations-league-hr": {
     "content/uefa-nations-league.md": "acb2f8e782c940e1e1cfe1792757c70bde2ded4ed452ff6ceb58c727f691f1bd",
@@ -262,7 +262,7 @@
     "src/components/ChampionsSummary.astro": "2809a09ed5528dc1236fecaebc41bd3ff6f78881732cf9f8ebb367588337b3de",
     "src/components/EditorialNotes.astro": "47c2c11227600fb655f75e55f4e3d887eaf4082836013d83c881aba543b283f8",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/hr/competitions/golden-boot.astro": "5557d227f8c6c08db498156257552e2cae464481a070e4e2f318555d8c1f2fc8"
+    "src/pages/hr/competitions/golden-boot.astro": "b5a3764d790afd4f6c0f0e656c327dc7e6f8d05daa0f00c996dfa7d4ec3d402c"
   },
   "records-hr": {
     "content/fifa-world-cup.md": "a25c75128ad4c22694f5718c03d52b59dd4a9d8b901f7a19103af8fb730548b6",
@@ -283,7 +283,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/compare.ts": "9192fca6c619321799bf16067aefd908050d3c02a82465e4775a9b4767579364",
     "src/lib/teamProfile.ts": "2d096cc6371aa2a5995f4ffcfcdbbf9e5f6c9f4d10fa25f66d61549021473d2f",
-    "src/pages/hr/records.astro": "adff79f7bd6abb8111f9572afb057a617c4655e208ea0e0350385353694be8ed"
+    "src/pages/hr/records.astro": "a549aa7ad0c7cf13c61986dea7c5fc5bfd18f0a60b091cef42a46c4f1bf89d6d"
   },
   "compare-hr": {
     "content/fifa-world-cup.md": "a25c75128ad4c22694f5718c03d52b59dd4a9d8b901f7a19103af8fb730548b6",
@@ -301,7 +301,7 @@
     "src/lib/compare.ts": "9192fca6c619321799bf16067aefd908050d3c02a82465e4775a9b4767579364",
     "src/lib/teamProfile.ts": "2d096cc6371aa2a5995f4ffcfcdbbf9e5f6c9f4d10fa25f66d61549021473d2f",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/hr/compare.astro": "9adb238e1d61ad41fb12e423a6bf96494586db302498dd4d2b68fd0ae85978bc"
+    "src/pages/hr/compare.astro": "bd4f45e6ce0ea6890ca1270120a33fec86e886b5225f9b66bf76d4b72c2f5505"
   },
   "compare-players-hr": {
     "content/ballon-dor.md": "313fbe1d646ff4a0b120485a83f3024548c7ef2110136363178893d3d9005dc9",
@@ -322,13 +322,13 @@
     "content/glossary.md": "9df4f189fe6f21afe25c5a456db20a1c64d3e6ee436b317280fa75a39ff82223",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
     "src/lib/glossary.ts": "076bddfbcce373b1f10cc0ce4a053d4eb42fdddfadc6f584946b1dbd33cd73d1",
-    "src/pages/glossary.astro": "376a4ac4aa8b6f4bba25669b91f5525a140343de80a2a2072bdfc32757019966"
+    "src/pages/glossary.astro": "0aafbc67af928f0df946ecfdbd4691984cdea726e858667d74bc9ff1d8cd0def"
   },
   "glossary-hr": {
     "content/glossary.md": "9df4f189fe6f21afe25c5a456db20a1c64d3e6ee436b317280fa75a39ff82223",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
     "src/lib/glossary.ts": "076bddfbcce373b1f10cc0ce4a053d4eb42fdddfadc6f584946b1dbd33cd73d1",
-    "src/pages/hr/glossary.astro": "c4ce5136d6603b24b102507e43fea76cd18556612a8110ee02b8fb475fefcf4d"
+    "src/pages/hr/glossary.astro": "31fd2bb04f7f9fb9acb6889b936c8862eae9337594a0db565279d2c9670ad4ec"
   },
   "team-argentina": {
     "content/fifa-world-cup.md": "a25c75128ad4c22694f5718c03d52b59dd4a9d8b901f7a19103af8fb730548b6",

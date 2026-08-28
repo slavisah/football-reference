@@ -22,6 +22,15 @@ PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 808 Playwright tests at 360px (mobile
                                           # light and dark, across every page)
 ```
 
+Some environments have no `chrome` channel installed at all (`PW_CHROME_CHANNEL=chrome`
+then fails with "Chromium distribution 'chrome' is not found") - in that case fall back to
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` instead, the same escape hatch
+`pnpm build:pdfs`/`check:lighthouse` already document below. Confirmed 2026-08-28
+(twenty-fourth intensive run): this session's container has `/opt/pw-browsers/chromium`
+but no `chrome` channel, so every `chrome`-channel attempt failed the same way for every
+single test (browser launch error, not a real regression) before the `PW_EXECUTABLE_PATH`
+form worked.
+
 Publishing: push to `main`; the Pages workflow builds and deploys.
 
 ## Done - Milestone 1 (complete and verified)
@@ -13164,6 +13173,78 @@ concrete content-accuracy angle is currently open on Golden Boot; a future
 run could apply this same "tie-resolution consistency" lens to the World
 Cup Golden Boot table's own tiebreak years (2006, 2010) or to any future
 Ballon d'Or/team-competition tiebreak edge cases, if one ever appears.
+
+### SEO: meta description length audit - 13 over-160-character descriptions trimmed - added 2026-08-28 (twenty-fourth intensive run)
+
+`pnpm outdated` found nothing new (still just the blocked `typescript` 7
+entry), and `pnpm dlx knip --no-config-hints` matched every prior run's
+baseline exactly (the same one confirmed false positive). All six
+competition/award page families, every edition/landing/profile/directory
+page, and the full content set were re-confirmed present and accurate
+(spot-checked the 2026 World Cup final and 2025 Ballon d'Or rows against
+`content/fifa-world-cup.md`/`content/ballon-dor.md` directly, matching the
+twenty-first run's independently WebSearch-verified facts), and a targeted
+Croatian-translation proofreading pass over the hand-written prose in
+`src/pages/hr/competitions/nations-league.astro` and the "Memorable
+moments"/`CROATIAN_MOMENTS` blocks in `hr/competitions/ballon-dor.astro`
+and `hr/competitions/golden-boot.astro` found no grammar or terminology
+errors - a never-before-tried angle (every prior translation-related run
+audited factual sync between languages, not prose quality).
+
+Rather than repeat another automated-tooling or content-accuracy pass with
+no new ground to cover, this run checked a genuinely new SEO angle: every
+page's `<BaseLayout description="...">` prop (the `<meta name="description">`
+and Open Graph/Twitter description text search engines and chat-app link
+previews show) against the standard ~50-160 character guideline search
+engines typically truncate around. A small Python scan of all 49 `.astro`
+page files' `BaseLayout` calls (scoped to the `<BaseLayout ...>` opening tag
+specifically, since several pages also pass an unrelated `description` prop
+to on-page components like `ChampionsSummary`/`HostMap` that share the same
+prop name but aren't SEO metadata) found 13 of 30 static descriptions
+over 160 characters - one as long as 436 - that had never been checked for
+length before (every existing `check:lighthouse`/`check:perf` audit checks
+that a description *exists*, not how long it is; a search for "meta
+description"/"155"/"160 char" across `docs/ROADMAP.md`/
+`docs/PROJECT_STATUS.md` turned up no prior mention of length specifically).
+
+Trimmed all 13 (`src/pages/{compare,records,compare-players,glossary,quiz}.astro`
+and `src/pages/hr/{compare,records,glossary,quiz,competitions/euro,
+competitions/world-cup,competitions/golden-boot}.astro`,
+`src/pages/hr/teams/index.astro`) to fit the 50-160 range while keeping
+every fact that remained accurate - no new claims added, just shorter
+sentences (e.g. `records.astro`'s 387-character list of every ranking
+section on the page down to a 146-character summary naming the six source
+competitions/awards; the three-founding-year mentions in
+`hr/competitions/{euro,world-cup}.astro` dropped, matching the English
+`euro.astro`/`world-cup.astro` pages, which never stated a founding year in
+their own descriptions either). Re-ran the same length scan afterward: 0 of
+30 out of the 50-160 range.
+
+Verified with the full standing health check: `pnpm lint` (0/0/0 across 166
+files), `pnpm test` (505/505 unit, coverage unchanged), `pnpm build` (711
+pages), `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`,
+within budget). Also ran a full cold-start `pnpm test:e2e` (808/808,
+9.2 minutes) - this environment's container has no `chrome` browser channel
+installed, so the `PW_CHROME_CHANNEL=chrome` form documented at the top of
+this file failed every single test identically (a browser-launch error, not
+a real regression) until switched to the `PW_EXECUTABLE_PATH=/opt/pw-browsers
+/chromium` escape hatch `pnpm build:pdfs`/`check:lighthouse` already use -
+see this file's "How to run" section for the added fallback note. All 700
+PDFs regenerated (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+build:pdfs`) and reverified clean (`pnpm check:pdfs`) - every PDF's title
+tag/meta reflects the same `description` text as its page, so the 13-file
+edit marked all 700 stale the same way a `docs/SOURCES.md` edit does.
+
+**Left for a future pass:** same two environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). No other
+concrete quality angle is currently open; a future run could look at
+whether the same 30 pages' `<title>`/`og:title` text could use a similar
+length pass (Google typically truncates page titles around 50-60
+characters), though a first spot check of the shortest and longest titles
+on record suggests they are already close to that range by construction
+(`{name} - The Ultimate Football Reference`-style titles, per
+`BaseLayout.astro`'s `fullTitle`).
 
 ## Known caveats
 
