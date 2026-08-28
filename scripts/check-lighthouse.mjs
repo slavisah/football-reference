@@ -88,6 +88,14 @@ const CDP_PORT = 9223;
 // (104.3 KB) and Nations League (72.4 KB) - had never been audited at all.
 // Added one entry per family so every landing-page shape on the site now has
 // Lighthouse coverage, not just the single heaviest one.
+//
+// The twenty-first intensive run closed the one remaining unaudited page
+// shape: `/about/sources` (155.3 KB built) - the site's reference/citations
+// page, a long flat list of external `<a>` links grouped under headings
+// rather than a data table or a form. Every other page shape (landing pages,
+// edition pages, directories, profiles, comparison tools, the quiz) already
+// had at least one entry above; this was the only page family with zero
+// Lighthouse coverage of its own layout.
 export const PAGES_TO_AUDIT = [
   { label: 'home', path: '/' },
   { label: 'records (heaviest page family, EN)', path: '/records/' },
@@ -122,6 +130,7 @@ export const PAGES_TO_AUDIT = [
   { label: 'team profile (argentina)', path: '/teams/argentina/' },
   { label: '/players directory index', path: '/players/' },
   { label: '/teams directory index', path: '/teams/' },
+  { label: '/about/sources (long external-link list, own page shape)', path: '/about/sources/' },
 ];
 
 const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo'];

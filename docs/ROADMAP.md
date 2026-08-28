@@ -266,6 +266,32 @@ standing quirks.
   1.00/1.00/1.00/1.00. Full standing health check also clean: 505/505 unit,
   808/808 e2e (6.8 min), 711 pages built, no broken links/sitemap/precache/
   PDF drift. See `docs/PROJECT_STATUS.md`'s matching entry for detail.
+- **`check:lighthouse` closes its last uncovered page shape (`/about/sources`)
+  plus a standing health check**: closed 2026-08-28 (twenty-first intensive
+  run) - `pnpm outdated` found nothing new (still just the blocked
+  `typescript` 7 entry, re-confirmed), and a fresh content-accuracy spot
+  check via `WebSearch` (which this run confirmed still works even though
+  direct `WebFetch`/`curl` to specific domains like `en.wikipedia.org`
+  remains egress-blocked, re-confirmed again this run) on the site's two
+  newest, least-reviewed facts - the 2026 World Cup final (Spain 1-0
+  Argentina a.e.t., Ferran Torres, 19 July 2026) and the 2025 Ballon d'Or
+  winner (Ousmane Dembélé, France, 22 September 2025) - matched the site
+  exactly, no discrepancy. `PAGES_TO_AUDIT` in `scripts/check-lighthouse.mjs`
+  covered every landing-page and edition-page shape already but had never
+  once audited `/about/sources` (155.3 KB built), the site's long
+  external-link reference list - a distinct DOM shape from every table/form/
+  profile page already covered. Added it; all 25 pages (up from 24) scored a
+  perfect 1.00/1.00/1.00/1.00. Full standing health check also clean:
+  `pnpm lint` (0/0/0 across 166 files), `pnpm test` (505/505 unit,
+  99.91%/99.42% coverage unchanged), `pnpm build` (711 pages), `check:links`
+  (715 pages), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+  `check:perf` (heaviest page still `hr/records`, within budget),
+  `check:pdfs` (700 PDFs), full cold-start `pnpm test:e2e` (808/808, 8.0
+  min), and `pnpm dlx knip --no-config-hints` (same one confirmed false
+  positive as every prior run). No other backlog item found - the six
+  competition/award page families, every edition/landing/profile/directory
+  page, and the full content set (through the 2026 World Cup and 2025
+  Ballon d'Or) are all live and independently re-verified accurate this run.
 
 ## Ideas not yet scoped as backlog
 
