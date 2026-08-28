@@ -12898,6 +12898,94 @@ add the Croatian sibling of a landing page, or a second edition-page vintage
 per family, if a shape-specific regression ever turns up that this
 selection would have caught.
 
+### `check:lighthouse` closes its last uncovered page shape (`/about/sources`), plus a standing health check and a WebSearch content spot-check - added 2026-08-28 (twenty-first intensive run)
+
+`pnpm outdated` turned up nothing new - still just the `typescript` 7 entry,
+blocked on `@astrojs/check`'s `typescript: '^5.0.0 || ^6.0.0'` peer ceiling
+(re-confirmed via `npm view @astrojs/check@latest peerDependencies` again
+this run). `pnpm dlx knip --no-config-hints` matched every prior run's
+baseline exactly (the one confirmed false positive,
+`scripts/test-preview-server.mjs`, invoked as a shell string from
+`playwright.config.ts` so static analysis can't see it).
+
+Before picking an angle, this run re-tested the standing "link-liveness
+sweep is blocked" note with both mechanisms available: a direct `curl` to
+`en.wikipedia.org` still failed with the egress proxy's `403` (`CONNECT
+tunnel failed`), and `WebFetch` against the same URL failed with
+`EGRESS_BLOCKED` - both re-confirm the note is still accurate for
+domain-specific fetches. `WebSearch`, however, **does** work in this
+environment (it always has - every "verified via WebSearch" audit already
+in this file used it) and is a different mechanism entirely - it queries
+rather than loading a specific page - so it doesn't unblock link-liveness
+checking, but it does support fresh content-accuracy spot checks. Ran one
+against the site's two newest, least-reviewed facts:
+
+- The 2026 World Cup final: `content/fifa-world-cup.md`'s "Spain 1–0
+  Argentina (a.e.t.)" / 19 July 2026 / Spain's second title matches
+  real-world results exactly - Ferran Torres's extra-time winner, confirmed
+  by CBS News, NPR, and FIFA.com's own final-tournament-standings page.
+- The 2025 Ballon d'Or: `content/ballon-dor.md`'s "Ousmane Dembélé, France,
+  22 September 2025" matches exactly - confirmed by Yahoo Sports, Sports
+  Illustrated, and Soccerway's own winners rundown (also cross-checking the
+  women's Ballon d'Or Féminin winner, Aitana Bonmatí, which the site
+  correctly doesn't track - `content/ballon-dor.md` is explicitly the men's
+  award only).
+
+No discrepancy in either - both were already independently cross-checked
+twice in `docs/SOURCES.md` (2026-08-04 and 2026-08-07 for the World Cup;
+the Ballon d'Or table's own two-pass audit), so this is a third
+confirmation rather than a new finding, and not grounds for a broader
+re-audit sweep given every other data column already has 2-3 independent
+passes on record with zero discrepancies found (see `docs/SOURCES.md`) -
+repeating that shape of check again would be exactly the low-yield
+repetition the ninth/tenth/fourteenth runs already flagged.
+
+Turned instead to `scripts/check-lighthouse.mjs`'s own scoping note: every
+landing-page and edition-page shape has coverage (fifteenth-twentieth
+runs), but `/about/sources` - the site's long external-link reference list,
+grouped under headings rather than a data table, form, or profile - had
+never been audited at all. Measured its built weight first (155.3 KB EN,
+155.7 KB HR - moderate, not among the top 5 heaviest pages but a genuinely
+different DOM shape: hundreds of plain `<a href>` citations rather than a
+`<table>`). Added the EN page to `PAGES_TO_AUDIT` (matching the established
+convention of auditing one language per shape, per the eighteenth/
+twentieth runs' own reasoning - the Croatian sibling shares the same
+template).
+
+Ran `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome
+pnpm check:lighthouse` against a fresh `pnpm build`: all 25 pages (up from
+24) scored a perfect 1.00/1.00/1.00/1.00, including the new
+`/about/sources` entry. Full standing health check also clean: `pnpm lint`
+(0 errors/warnings/hints across 166 files), `pnpm test` (505/505 unit
+tests, coverage unchanged at 99.91%/99.42% - the same four lines flagged
+defensively unreachable since the 2026-08-23 sweep), `pnpm build` (711
+pages), `check:links` (715 pages, no broken links/fragments),
+`check:sitemap` (710 entries, canonicals/hreflang agree), `check:precache`
+(37 URLs), `check:perf` (heaviest page still `hr/records` at 499.0 KB,
+within the 510 KB budget - no page-weight regression from this run's
+comment-only script change), `check:pdfs` (all 700 PDFs fresh, unchanged -
+no content edited this run), and the full cold-start `pnpm test:e2e` suite:
+**808/808 passing, 8.0 minutes**.
+
+`PAGES_TO_AUDIT` now covers every distinct page shape on the site at least
+once: home, every landing page, every edition-page family, both directory
+indexes, both comparison tools, the quiz, both profile types, `/glossary`,
+and now `/about/sources`.
+
+**Left for a future pass:** the same two environment-blocked items as every
+prior entry (typescript 7 upgrade, docs/SOURCES.md link-liveness sweep -
+both re-confirmed blocked again this run, the latter via two different
+mechanisms this time). No other concrete backlog item was found - every
+required/nice-to-have page from `docs/WEBSITE_REQUIREMENTS.md` is live in
+both languages, every competition/award family's data runs through the
+2026 World Cup / 2025 Ballon d'Or / 2024-25 Nations League Finals / 2024
+Copa América, and this run's spot check found the newest entries accurate.
+A future run could widen the WebSearch spot-check to a data column that has
+only ever had one audit pass (Golden Boot's `content/golden-boot.md` "World
+Cup notes"/"EURO notes" prose bullets, rather than the tables themselves,
+have not been through a dedicated audit) if it wants a genuinely new angle
+rather than another repeat health check.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
