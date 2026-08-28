@@ -330,6 +330,22 @@ standing quirks.
   section depends on it, so any edit marks all of them stale, by design -
   `pnpm build:pdfs` then `pnpm check:pdfs`). See
   `docs/PROJECT_STATUS.md`'s matching entry for detail.
+- **SEO: meta description length audit**: closed 2026-08-28 (twenty-fourth
+  intensive run) - a never-before-checked angle: 13 of the site's 30 static
+  `<BaseLayout description="...">` values (the `<meta name="description">`/
+  Open Graph text) were over the ~160-character length search engines
+  typically truncate at, one as long as 436 characters. Trimmed all 13 to
+  fit 50-160 characters without adding or dropping any fact, across
+  `compare`, `records`, `compare-players`, `glossary`, `quiz`, `teams`
+  (Croatian only) and the Croatian `euro`/`world-cup`/`golden-boot`
+  landing pages, both languages. Also ran a Croatian-translation
+  proofreading pass (prose quality, not factual sync - never tried before)
+  over the Nations League/Ballon d'Or/Golden Boot hand-written Croatian
+  text: no errors found. Full standing health check clean, including a
+  cold-start `pnpm test:e2e` (808/808) and PDF regeneration/reverification
+  (700 PDFs). See `docs/PROJECT_STATUS.md`'s matching entry for detail,
+  including a documented `PW_EXECUTABLE_PATH` fallback for environments
+  with no `chrome` browser channel installed.
 
 ## Ideas not yet scoped as backlog
 
