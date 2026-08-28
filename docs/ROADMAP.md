@@ -188,6 +188,74 @@ standing quirks.
   baseline; full standing health check (including cold-start `pnpm
   test:e2e`) also clean. See `docs/PROJECT_STATUS.md`'s matching entry for
   detail.
+- **`check:lighthouse` widened three more times (sixteenth-eighteenth
+  intensive runs, 2026-08-27)**: every competition/award family's edition
+  page, the Copa América landing page, and the `/teams`/`/players`
+  directory indexes are now all in `PAGES_TO_AUDIT` (19 pages total, up from
+  7) - all score a perfect 1.00 across every category. See
+  `docs/PROJECT_STATUS.md`'s three matching entries for detail.
+- **Accessibility: `prefers-reduced-motion` actually collapses every
+  transition now**: closed 2026-08-28 (nineteenth intensive run) - rather
+  than extend `check:lighthouse` a fourth consecutive run, this run found a
+  genuine, previously-unfixed gap: the site's only `prefers-reduced-motion`
+  rule (`global.css`) reset `scroll-behavior` but never touched any of the
+  three real `transition` declarations in the codebase (the skip-link
+  reveal, and the `.comp-card` hover effect on both language home pages), so
+  a reader with that OS accommodation on still got full-speed motion from
+  all three. Fixed with one blanket `*, *::before, *::after` override inside
+  the existing media block, plus the site's first dedicated e2e coverage of
+  this media feature (`tests/e2e/accessibility-reduced-motion.spec.ts`, four
+  tests using `page.emulateMedia()` the same way the forced-colors spec
+  already established, since `reducedMotion` isn't a `test.use()`-able
+  option in the pinned Playwright version). Full standing health check
+  (lint/test/build/all `check:*` scripts/cold-start `pnpm test:e2e`) clean;
+  `pnpm outdated` and a fresh `WebFetch`/`curl` retry against
+  `en.wikipedia.org` both re-confirmed the same two standing environment
+  blockers. See `docs/PROJECT_STATUS.md`'s matching entry for detail.
+- **Lighthouse audit coverage for every competition/award family**: closed
+  2026-08-27 (sixteenth intensive run) - `PAGES_TO_AUDIT` in
+  `scripts/check-lighthouse.mjs` only ever audited one edition-page shape
+  (Copa América), leaving World Cup, EURO, Nations League, Ballon d'Or and
+  both Golden Boot trees with no Lighthouse coverage of their own page
+  layout. Added one edition page per remaining family (the latest completed
+  edition of each) plus the English `/records` (previously only its
+  Croatian sibling ran), `/compare` and `/glossary` - 16 pages total, up
+  from 7. All 16 scored a perfect 1.00/1.00/1.00/1.00. `pnpm outdated` found
+  nothing new (still just the blocked `typescript` 7 entry); the standing
+  health check (lint/unit test/`check:links`/`check:sitemap`/
+  `check:precache`/`check:perf`/`check:pdfs`/cold-start `pnpm test:e2e`) is
+  also clean. See `docs/PROJECT_STATUS.md`'s matching entry for detail.
+- **Dependency patch bump (astro 7.2.8 -> 7.2.9) plus a genuinely
+  profile-heavy Lighthouse pick**: closed 2026-08-27 (seventeenth intensive
+  run) - `pnpm outdated` found one new in-range patch release; installed
+  cleanly. The sixteenth run's own suggested next step ("one profile-heavy
+  `/players/` entry with a very long award list") turned out not to be met
+  by its own pick: Alfredo Di Stéfano has only 2 Ballon d'Or wins, not the
+  long list intended. Swapped `check:lighthouse`'s player-profile page to
+  Lionel Messi (8 Ballon d'Or wins, the most of any player), whose profile
+  renders four times as many award rows. Full standing health check plus
+  the widened 16-page Lighthouse audit (including the new Messi pick) all
+  clean: 505/505 unit, 804/804 e2e (11.4 min), 711 pages built, every
+  Lighthouse category >= 0.9 (all but home's 0.99 performance a perfect
+  1.00), no broken links/sitemap/precache/PDF drift. See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail.
+- **Lighthouse coverage for the competition-landing-page shape**: closed
+  2026-08-27 (eighteenth intensive run) - `pnpm outdated` found nothing new
+  beyond the still-blocked `typescript` 7 entry, and `pnpm dlx knip
+  --no-config-hints` matched the twelfth/sixteenth runs' baseline exactly
+  (same one confirmed false positive). `check:lighthouse`'s 16 pages had
+  covered every *edition* page shape and both `/records` languages, but
+  never a competition *landing* page - the full multi-edition table with
+  winner/year/host/team filter controls
+  (`CompetitionView.astro`) - even though `check:perf` ranks
+  `competitions/copa-america` as the third-heaviest page family on the
+  site (270-273 KB), behind only `/records`. Added that page plus the
+  `/teams` and `/players` directory index pages (another previously-unaudited
+  shape: a plain alphabetical list with a live count) - 19 pages total, up
+  from 16. All 19 scored a perfect 1.00/1.00/1.00/1.00. Full standing health
+  check also clean: 505/505 unit, 804/804 e2e (6.7 min), 711 pages built,
+  no broken links/sitemap/precache/PDF drift. See `docs/PROJECT_STATUS.md`'s
+  matching entry for detail.
 
 ## Ideas not yet scoped as backlog
 

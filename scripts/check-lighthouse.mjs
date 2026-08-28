@@ -43,21 +43,68 @@ const BASE = process.env.BASE_PATH ?? '/football-reference';
 const ORIGIN = `http://localhost:${PORT}`;
 const CDP_PORT = 9223;
 
-// The same seven-page spread the fourteenth intensive run's manual audit
-// used: the home page, the single heaviest built page (Croatian /records -
-// see PAGE_WEIGHT_BUDGET_BYTES's doc comment in check-page-weight.mjs), one
+// The fourteenth intensive run's manual audit picked seven diverse page
+// shapes (table-heavy, form controls, long-form content): the home page,
+// the single heaviest built page (Croatian /records - see
+// PAGE_WEIGHT_BUDGET_BYTES's doc comment in check-page-weight.mjs), one
 // per-edition page, both head-to-head comparison tools, one player profile
-// and one team profile - diverse enough page shapes (table-heavy, form
-// controls, long-form content) to catch a regression specific to any one of
-// them without auditing all 711 pages every run.
+// and one team profile. That left five of the six competition/award
+// families (World Cup, EURO, Nations League, Ballon d'Or, both Golden Boot
+// trees) with no edition-page coverage of their own - only Copa América's
+// shape was ever audited, so a regression specific to, say, the Golden
+// Boot's two-table "Memorable moments" layout (see the eleventh intensive
+// run) wouldn't be caught here. The sixteenth intensive run added one
+// edition page per remaining family (the latest completed edition of
+// each), plus the English /records (previously only its Croatian sibling
+// ran), /glossary and /compare - still nowhere near all 711 pages, but wide
+// enough now to cover every page family's own layout at least once. The
+// seventeenth intensive run swapped the player-profile pick from Alfredo Di
+// Stéfano (2 Ballon d'Or wins, 1957 + 1959) to Lionel Messi (8 Ballon d'Or
+// wins, the most of any player - see content/ballon-dor.md's "Multiple
+// winners" table) since that sixteenth-run entry's own suggested next step
+// was "one profile-heavy /players/ entry with a very long award list": a
+// player profile's "awards" section (src/lib/playerProfile.ts) only ever
+// renders Ballon d'Or/Golden Boot rows, so Messi's eight-row table is a
+// meaningfully longer render than Di Stéfano's two-row one.
+//
+// The eighteenth intensive run closed a different gap: every prior pass
+// audited *edition* pages (one table, one year) and /records, but never a
+// competition *landing* page - the full multi-edition table with the
+// winner/year/host/team filter controls (`CompetitionView.astro`). That
+// shape is not a minor omission: `pnpm check:perf`'s own output ranks
+// `competitions/copa-america` (270.4 KB EN / 272.9 KB HR) as the
+// third-heaviest page family on the whole site, behind only /records - yet
+// it had zero Lighthouse coverage. Added the Copa América landing page
+// (EN; the HR sibling shares the same template and filter logic, and
+// /records already has both languages covered above) plus the /teams and
+// /players directory index pages, another shape (a plain alphabetical list
+// with a live count) this list had never included.
 export const PAGES_TO_AUDIT = [
   { label: 'home', path: '/' },
+  { label: 'records (heaviest page family, EN)', path: '/records/' },
   { label: 'hr/records (heaviest built page)', path: '/hr/records/' },
+  {
+    label: 'copa-america landing page (3rd-heaviest page family, filterable table)',
+    path: '/competitions/copa-america/',
+  },
   { label: 'copa-america/2024 edition page', path: '/competitions/copa-america/2024/' },
+  { label: 'world-cup/2026 edition page', path: '/competitions/world-cup/2026/' },
+  { label: 'euro/2024 edition page', path: '/competitions/euro/2024/' },
+  { label: 'nations-league/2024-25 edition page', path: '/competitions/nations-league/2024-25/' },
+  { label: "ballon-dor/2025 edition page", path: '/competitions/ballon-dor/2025/' },
+  {
+    label: 'golden-boot/world-cup/2026 edition page',
+    path: '/competitions/golden-boot/world-cup/2026/',
+  },
+  { label: 'golden-boot/euro/2024 edition page', path: '/competitions/golden-boot/euro/2024/' },
+  { label: '/compare', path: '/compare/' },
   { label: '/compare-players', path: '/compare-players/' },
+  { label: '/glossary', path: '/glossary/' },
   { label: '/quiz', path: '/quiz/' },
-  { label: 'player profile (alfredo-di-stefano)', path: '/players/alfredo-di-stefano/' },
+  { label: 'player profile (lionel-messi, 8 Ballon d\'Or wins)', path: '/players/lionel-messi/' },
   { label: 'team profile (argentina)', path: '/teams/argentina/' },
+  { label: '/players directory index', path: '/players/' },
+  { label: '/teams directory index', path: '/teams/' },
 ];
 
 const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo'];
