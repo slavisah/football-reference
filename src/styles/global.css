@@ -142,6 +142,21 @@ html {
   html {
     scroll-behavior: auto;
   }
+
+  /* Every transition/animation on the site (the skip-link's reveal, the two
+     home-page card hover effects in index.astro/hr/index.astro) is purely
+     decorative motion, not a state change a reader needs to see happen - so
+     collapsing it to near-zero here is safe for every one of them without
+     auditing each site individually, and covers whatever gets added next
+     too. Not literally 0s: some browsers skip the transitionend event
+     entirely at 0s, which would break a script relying on it. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* --- Forced-colors mode (Windows/OS high-contrast themes) ---

@@ -12655,6 +12655,202 @@ this run's own network check reconfirmed `en.wikipedia.org` is still 403'd
 by the egress proxy, so that data still needs a session with broader network
 access than any of these fifteen runs have had.
 
+### Widened `pnpm check:lighthouse` to cover every competition/award family - 2026-08-27 (sixteenth intensive run)
+
+`pnpm outdated` again found nothing new (still just the blocked `typescript`
+7 entry, re-confirmed via `npm view @astrojs/check@latest peerDependencies`
+once more), `pnpm audit` reported no known vulnerabilities, and a fresh
+`pnpm dlx knip --no-config-hints` pass matched the twelfth run's baseline
+exactly (the one flagged "unused file",
+`scripts/test-preview-server.mjs`, is the same confirmed false positive -
+it's invoked as a shell string from `playwright.config.ts`'s
+`webServer.command`, invisible to static import-graph analysis). Rather
+than repeat the health check verbatim again, this run looked at the
+fifteenth run's own new tool with a critical eye: `PAGES_TO_AUDIT` in
+`scripts/check-lighthouse.mjs` audited seven diverse *page shapes*, but only
+one of them was an edition page, and it was always Copa América's. World
+Cup, EURO, Nations League, Ballon d'Or and both Golden Boot edition trees
+had never had their own layout run through Lighthouse - a regression
+specific to, say, the Golden Boot's two-table "Memorable moments" layout
+(see the eleventh intensive run) wouldn't be caught by auditing Copa
+América alone. `/compare`, `/glossary` and the English `/records` (only its
+Croatian sibling was audited) were similarly uncovered.
+
+Widened `PAGES_TO_AUDIT` from 7 to 16 pages: the latest completed edition of
+each of the five previously-unaudited families
+(`/competitions/world-cup/2026/`, `/competitions/euro/2024/`,
+`/competitions/nations-league/2024-25/`, `/competitions/ballon-dor/2025/`,
+`/competitions/golden-boot/world-cup/2026/`,
+`/competitions/golden-boot/euro/2024/`), plus `/records/`, `/compare/` and
+`/glossary/`. Ran `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+check:lighthouse` against a fresh `pnpm build`: all 16 pages scored a
+perfect 1.00/1.00/1.00/1.00, exit code 0, in 2m33s (up from the
+seven-page run's 1m23s - still well within reach for a manual/intensive-run
+tool that isn't wired into CI). Full standing health check also run and
+clean: `pnpm lint` (0 errors/warnings/hints), `pnpm test` (505/505), `pnpm
+build` (711 pages), `check:perf` (heaviest page still `hr/records` at 498.8
+KB, within the 510 KB budget), `check:links` (715 pages, no broken links),
+`check:sitemap` (710 entries), `check:precache` (37 URLs), `check:pdfs` (all
+700 PDFs current - no content changed this run, so no regeneration needed),
+and the full cold-start `pnpm test:e2e` suite.
+
+**Left for a future pass:** the `typescript` 7 upgrade and the
+`docs/SOURCES.md` link-liveness sweep stay blocked for the same reasons as
+every prior entry (both re-confirmed this run). No concrete, named backlog
+item remains on record. `check:lighthouse` still doesn't cover every one of
+the 711 built pages (by design - see that script's own doc comment); a
+future pass could widen it further (e.g. one profile-heavy `/players/`
+entry with a very long award list) if a page shape not yet represented
+turns out to matter.
+
+### Dependency patch bump (astro 7.2.8 -> 7.2.9) plus a profile-heavy Lighthouse pick - 2026-08-27 (seventeenth intensive run)
+
+`pnpm outdated` turned up one new in-range patch release (`astro` 7.2.8 ->
+7.2.9); `pnpm audit` reported no known vulnerabilities. The `typescript` 7
+upgrade is still blocked on `@astrojs/check`'s `typescript: '^5.0.0 ||
+^6.0.0'` peer ceiling (re-confirmed via `npm view @astrojs/check@latest
+peerDependencies` again this run), and the `docs/SOURCES.md` link-liveness
+sweep is still blocked by this environment's outbound network policy (a
+direct `curl` to `en.wikipedia.org` was again rejected with a 403 by the
+egress proxy).
+
+Rather than repeat the standing health check verbatim as its own
+deliverable, this run acted on the sixteenth run's own suggested next step:
+`check:lighthouse`'s player-profile pick (Alfredo Di Stéfano, 2 Ballon d'Or
+wins) wasn't actually the "very long award list" case that entry called
+for. Swapped it for Lionel Messi (8 Ballon d'Or wins, the most of any
+player - see `content/ballon-dor.md`'s "Multiple winners" table), whose
+profile page renders four times as many award rows through
+`src/lib/playerProfile.ts`'s award-list section as Di Stéfano's did.
+
+After the astro bump and the `check-lighthouse.mjs` edit, ran the full
+standing health check plus the widened Lighthouse audit: `pnpm lint` (0
+errors/warnings/hints), `pnpm test` (505/505), `pnpm build` (711 pages),
+`check:links` (715 pages, no broken links), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`
+at 498.8 KB, within the 510 KB budget), `check:pdfs` (all 700 PDFs current -
+no editorial content changed this run), `pnpm check:lighthouse` (all 16
+pages, including the new Messi profile pick, scored >= 0.9 in every
+category - home's performance came in at 0.99, everything else a perfect
+1.00), and the full cold-start `pnpm test:e2e` suite (804/804, 11.4
+minutes).
+
+**Left for a future pass:** same two environment-blocked items as every
+prior entry (both re-confirmed this run). No concrete, named backlog item
+remains on record.
+
+### Lighthouse coverage for the competition-landing-page shape - 2026-08-27 (eighteenth intensive run)
+
+`pnpm outdated` again found nothing new beyond the still-blocked `typescript`
+7 entry (re-confirmed via `npm view @astrojs/check@latest peerDependencies`
+once more); `pnpm audit` reported no known vulnerabilities; a direct `curl`
+to `en.wikipedia.org` was again rejected with a 403 by the egress proxy,
+re-confirming the `docs/SOURCES.md` link-liveness sweep is still blocked. A
+fresh `pnpm dlx knip --no-config-hints` pass matched the twelfth/sixteenth
+runs' baseline exactly (the one flagged "unused file",
+`scripts/test-preview-server.mjs`, remains the same confirmed false
+positive - invoked as a shell string from `playwright.config.ts`'s
+`webServer.command`, invisible to static import-graph analysis).
+
+Rather than repeat the standing health check verbatim as its own
+deliverable again, this run looked for a genuinely uncovered page shape in
+`check-lighthouse.mjs`'s own audit list. All 16 pages from the sixteenth/
+seventeenth runs were either the home page, `/records` (both languages), a
+single-edition page (one table, one year, for every competition/award
+family), a head-to-head comparison tool, `/glossary`, `/quiz`, or a single
+profile page - never a competition *landing* page, the page at
+`/competitions/<competition>/` itself that renders the full multi-edition
+table plus the winner/year/host/team filter controls
+(`CompetitionView.astro`). That is not a minor gap: `pnpm check:perf`'s own
+output ranks `competitions/copa-america` (270.4 KB EN / 272.9 KB HR) as the
+third-heaviest page family on the entire site, behind only `/records` - yet
+it had never been through a Lighthouse pass. The `/teams` and `/players`
+directory index pages (a third shape: a plain alphabetical list built from
+every team/player slug, with a live count) were similarly never audited.
+
+Added three pages to `PAGES_TO_AUDIT`: the Copa América landing page (EN;
+its HR sibling shares the same template and filter logic, and `/records`
+already covers both languages above), `/players/`, and `/teams/` - 19 pages
+total, up from 16. Ran `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+check:lighthouse` against a fresh `pnpm build`: all 19 pages scored a
+perfect 1.00/1.00/1.00/1.00, exit code 0. Full standing health check also
+run and clean: `pnpm lint` (0 errors/warnings/hints), `pnpm test`
+(505/505), `pnpm build` (711 pages), `check:links` (715 pages, no broken
+links), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+`check:perf` (heaviest page still `hr/records` at 498.8 KB, within the 510
+KB budget), `check:pdfs` (all 700 PDFs current - no editorial content
+changed this run), and the full cold-start `pnpm test:e2e` suite (804/804,
+6.7 minutes).
+
+**Left for a future pass:** same two environment-blocked items as every
+prior entry (both re-confirmed this run). No concrete, named backlog item
+remains on record. `check:lighthouse` still doesn't cover every one of the
+711 built pages (by design); a future pass could widen it further (e.g. a
+World Cup or EURO landing page - Copa América is now the only landing page
+covered) if a page shape not yet represented turns out to matter.
+
+### Accessibility: `prefers-reduced-motion` was never actually collapsing the site's transitions - added 2026-08-28 (nineteenth intensive run)
+
+Rather than extend `check:lighthouse` again per the eighteenth run's own
+suggestion (a fourth consecutive run touching that one script felt like
+exactly the diminishing-returns pattern the tenth/fourteenth run entries
+warned against), this run looked for a page-shape-independent gap instead -
+one that no per-page audit (Lighthouse or the WCAG A/AA axe sweep) can
+catch, because both only ever inspect a page's *resting* state, never
+whether its declared transitions actually honor the reader's OS motion
+preference.
+
+The 2026-08-14 forced-colors entry's own preamble asserted
+`prefers-reduced-motion` was already "handled" site-wide, but a fresh
+`grep -rn "transition:\|animation:\|@keyframes"` across every `.astro` and
+`.css` file found exactly three transition declarations - the skip-link's
+reveal (`global.css`), and the `.comp-card` hover effect duplicated
+verbatim in both `index.astro` and `hr/index.astro` - and none of them were
+covered by `global.css`'s existing `@media (prefers-reduced-motion:
+reduce)` block, which only ever reset `scroll-behavior` to `auto`. A reader
+with that OS setting on (a real accommodation for vestibular disorders,
+not a cosmetic preference) still got the full-speed 0.12-0.15s motion on
+every one of the three.
+
+Fixed with one blanket rule inside the existing media block rather than
+patching each site individually - `*, *::before, *::after { animation-duration:
+0.01ms !important; animation-iteration-count: 1 !important;
+transition-duration: 0.01ms !important; }` (0.01ms rather than 0s so
+browsers still fire `transitionend`, the same reasoning `check:lighthouse`
+authoring style calls out elsewhere) - so it stays correct if a fourth
+transition or animation is ever added without anyone remembering this
+entry. Added `tests/e2e/accessibility-reduced-motion.spec.ts`, the site's
+first dedicated coverage of this media feature (previously only ever
+exercised implicitly, never with its own assertion): four tests emulating
+`reducedMotion: 'reduce'` via `page.emulateMedia()` (the same mechanism
+`accessibility-forced-colors.spec.ts` already established for
+`forcedColors`, since `reducedMotion` isn't a `test.use()`-able
+`PlaywrightTestOption` in the pinned Playwright 1.62.1) confirm both the
+skip-link and both language variants of the home-page card collapse to a
+near-zero `transitionDuration`, plus one baseline test (no preference
+emulated) proving the fixtures carry a real, non-zero transition in the
+first place - so the reduced-motion assertions can't pass vacuously if the
+selector or CSS ever drifts.
+
+Full standing health check: `pnpm outdated` found nothing new beyond the
+still-blocked `typescript` 7 entry (the only in-range update was
+`typescript` itself, still capped by `@astrojs/check`'s `typescript:
+'^5.0.0 || ^6.0.0'` peer range); `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (505/505 unit tests), `pnpm build` (711 pages), `check:links`
+(715 pages, no broken links), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`
+at 499.0 KB, within the 510 KB budget), `check:pdfs` (all 700 PDFs current
+- no editorial content changed this run), and the full cold-start `pnpm
+test:e2e` suite: 808/808 (804 plus the four new reduced-motion tests),
+7.0 minutes.
+
+**Left for a future pass:** same two environment-blocked items as every
+prior entry (a direct connection to `en.wikipedia.org` was tried again this
+run via both `curl` and the `WebFetch` tool - both still rejected with
+`EGRESS_BLOCKED`/403 - confirming the block applies at the network-policy
+layer regardless of which tool makes the request, not just to raw `curl`).
+No concrete, named backlog item remains on record.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
