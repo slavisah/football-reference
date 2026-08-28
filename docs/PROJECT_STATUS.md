@@ -12841,8 +12841,8 @@ still-blocked `typescript` 7 entry (the only in-range update was
 `check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`
 at 499.0 KB, within the 510 KB budget), `check:pdfs` (all 700 PDFs current
 - no editorial content changed this run), and the full cold-start `pnpm
-test:e2e` suite all pass - see the run's own command output for the final
-test count.
+test:e2e` suite: 808/808 (804 plus the four new reduced-motion tests),
+7.0 minutes.
 
 **Left for a future pass:** same two environment-blocked items as every
 prior entry (a direct connection to `en.wikipedia.org` was tried again this
