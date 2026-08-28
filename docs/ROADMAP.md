@@ -292,6 +292,20 @@ standing quirks.
   competition/award page families, every edition/landing/profile/directory
   page, and the full content set (through the 2026 World Cup and 2025
   Ballon d'Or) are all live and independently re-verified accurate this run.
+- **WCAG 2.2 AA (`target-size`) coverage plus a real skip-link/header-logo
+  overlap fix**: closed 2026-08-28 (twenty-second intensive run) - every
+  prior accessibility sweep only ever checked WCAG 2.1 tags; added
+  `wcag22aa` to all 37 `AxeBuilder.withTags()` call sites across
+  `tests/e2e/`, which caught a real bug: the focused skip link overlapped
+  the header's `.brand` logo (both anchored to the same top-left corner),
+  failing the new `target-offset`/`target-size` check with only ~2.8px of
+  clearance instead of the required 24px. Fixed in `global.css` by pushing
+  `.site-header` down by the skip link's own footprint while it's focused.
+  Full standing health check plus a full cold-start `pnpm test:e2e` both
+  clean: 505/505 unit, 808/808 e2e (unchanged count - existing checks
+  widened, no new test cases), 25/25 Lighthouse pages still a perfect
+  1.00 across every category. See `docs/PROJECT_STATUS.md`'s matching
+  entry for detail.
 
 ## Ideas not yet scoped as backlog
 

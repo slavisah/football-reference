@@ -4,7 +4,7 @@ import { NAV_LINKS } from '../../src/lib/routes';
 import { TRANSLATED_PATHS } from '../../src/lib/i18n';
 import { openMenu } from './menu';
 
-// Automated WCAG 2.1 A/AA sweep across every live page (English and Croatian),
+// Automated WCAG 2.1/2.2 A/AA sweep across every live page (English and Croatian),
 // on top of the hand-written keyboard/filter checks in mobile.spec.ts. Runs at
 // the same 360px viewport as the rest of the suite (playwright.config.ts) so
 // it also catches issues that only show up in the mobile card layout, and
@@ -15,6 +15,11 @@ import { openMenu } from './menu';
 // 'region' is disabled site-wide: axe wants every visible element inside a
 // landmark, but the skip-link's target anchor deliberately sits just before
 // <main>, which is correct, not a bug.
+//
+// 'wcag22aa' adds axe-core's one WCAG 2.2 AA rule ('target-size', SC 2.5.8 -
+// interactive targets need a 24x24 CSS px hit area, with narrow exceptions):
+// every prior sweep across this repo's history only ever requested 2.1 tags,
+// so this rule had never actually run against the site until now.
 
 const ENGLISH_PATHS = NAV_LINKS.map((link) => link.path);
 const CROATIAN_PATHS = Object.values(TRANSLATED_PATHS);
@@ -34,12 +39,12 @@ for (const colorScheme of COLOR_SCHEMES) {
     test.use({ colorScheme });
 
     for (const path of SWEPT_PATHS) {
-      test(`${path || '/'} has no automatic WCAG 2.1 A/AA violations`, async ({ page }) => {
+      test(`${path || '/'} has no automatic WCAG 2.1/2.2 A/AA violations`, async ({ page }) => {
         const target = path === '/' ? '' : path.replace(/^\//, '');
         await page.goto(target);
 
         const results = await new AxeBuilder({ page })
-          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
           .disableRules(['region'])
           .analyze();
 
@@ -65,7 +70,7 @@ for (const colorScheme of COLOR_SCHEMES) {
         await expect(page.locator('#site-menu')).toHaveClass(/is-open/);
 
         const results = await new AxeBuilder({ page })
-          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
           .disableRules(['region'])
           .analyze();
 
@@ -106,7 +111,7 @@ for (const colorScheme of COLOR_SCHEMES) {
 
     for (const { label: dateLabel, date } of ON_THIS_DAY_DATES) {
       for (const { label: pageLabel, path } of ON_THIS_DAY_HOME_PAGES) {
-        test(`${pageLabel} home page, ${dateLabel}, has no WCAG 2.1 A/AA violations`, async ({
+        test(`${pageLabel} home page, ${dateLabel}, has no WCAG 2.1/2.2 A/AA violations`, async ({
           page,
         }) => {
           await page.clock.setFixedTime(new Date(date));
@@ -114,7 +119,7 @@ for (const colorScheme of COLOR_SCHEMES) {
 
           const results = await new AxeBuilder({ page })
             .include('.on-this-day')
-            .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+            .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
             .disableRules(['region'])
             .analyze();
 
@@ -134,7 +139,7 @@ for (const colorScheme of COLOR_SCHEMES) {
 // list this sweep was built from. accessibility-forced-colors.spec.ts and
 // print-styles.spec.ts both already added their own targeted /teams/<slug>
 // spot-check for exactly this reason (2026-08-18, intensive run); this sweep
-// - the main WCAG 2.1 A/AA pass, and the one most likely to catch a real
+// - the main WCAG 2.1/2.2 A/AA pass, and the one most likely to catch a real
 // contrast or landmark issue since it's the only one of the three that
 // doesn't disable 'color-contrast' - had the identical gap and was missed in
 // that same pass. Spot-checked the same representative team (Brazil, same
@@ -143,22 +148,22 @@ for (const colorScheme of COLOR_SCHEMES) {
   test.describe(`team profile page, ${colorScheme} color scheme`, () => {
     test.use({ colorScheme });
 
-    test('English /teams/brazil has no automatic WCAG 2.1 A/AA violations', async ({ page }) => {
+    test('English /teams/brazil has no automatic WCAG 2.1/2.2 A/AA violations', async ({ page }) => {
       await page.goto('teams/brazil');
 
       const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
         .disableRules(['region'])
         .analyze();
 
       expect(results.violations, formatViolations(results.violations)).toEqual([]);
     });
 
-    test('Croatian /hr/teams/brazil has no automatic WCAG 2.1 A/AA violations', async ({ page }) => {
+    test('Croatian /hr/teams/brazil has no automatic WCAG 2.1/2.2 A/AA violations', async ({ page }) => {
       await page.goto('hr/teams/brazil');
 
       const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
         .disableRules(['region'])
         .analyze();
 
@@ -180,26 +185,26 @@ for (const colorScheme of COLOR_SCHEMES) {
   test.describe(`player profile page, ${colorScheme} color scheme`, () => {
     test.use({ colorScheme });
 
-    test('English /players/gerd-muller has no automatic WCAG 2.1 A/AA violations', async ({
+    test('English /players/gerd-muller has no automatic WCAG 2.1/2.2 A/AA violations', async ({
       page,
     }) => {
       await page.goto('players/gerd-muller');
 
       const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
         .disableRules(['region'])
         .analyze();
 
       expect(results.violations, formatViolations(results.violations)).toEqual([]);
     });
 
-    test('Croatian /hr/players/gerd-muller has no automatic WCAG 2.1 A/AA violations', async ({
+    test('Croatian /hr/players/gerd-muller has no automatic WCAG 2.1/2.2 A/AA violations', async ({
       page,
     }) => {
       await page.goto('hr/players/gerd-muller');
 
       const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
         .disableRules(['region'])
         .analyze();
 
