@@ -79,14 +79,31 @@ const CDP_PORT = 9223;
 // /records already has both languages covered above) plus the /teams and
 // /players directory index pages, another shape (a plain alphabetical list
 // with a live count) this list had never included.
+//
+// The twentieth intensive run finished that landing-page sweep: Copa América
+// was the *heaviest* landing page (270.5 KB built), but the other five
+// competition/award families' own landing pages - World Cup (144.4 KB),
+// Golden Boot (168.4 KB, `golden-boot.astro`'s own hand-built two-table
+// layout rather than `CompetitionView.astro`), Ballon d'Or (135.9 KB), EURO
+// (104.3 KB) and Nations League (72.4 KB) - had never been audited at all.
+// Added one entry per family so every landing-page shape on the site now has
+// Lighthouse coverage, not just the single heaviest one.
 export const PAGES_TO_AUDIT = [
   { label: 'home', path: '/' },
   { label: 'records (heaviest page family, EN)', path: '/records/' },
   { label: 'hr/records (heaviest built page)', path: '/hr/records/' },
   {
-    label: 'copa-america landing page (3rd-heaviest page family, filterable table)',
+    label: 'copa-america landing page (heaviest landing page, filterable table)',
     path: '/competitions/copa-america/',
   },
+  {
+    label: 'golden-boot landing page (2nd-heaviest landing page, own two-table layout)',
+    path: '/competitions/golden-boot/',
+  },
+  { label: 'world-cup landing page', path: '/competitions/world-cup/' },
+  { label: "ballon-dor landing page", path: '/competitions/ballon-dor/' },
+  { label: 'euro landing page', path: '/competitions/euro/' },
+  { label: 'nations-league landing page (lightest landing page)', path: '/competitions/nations-league/' },
   { label: 'copa-america/2024 edition page', path: '/competitions/copa-america/2024/' },
   { label: 'world-cup/2026 edition page', path: '/competitions/world-cup/2026/' },
   { label: 'euro/2024 edition page', path: '/competitions/euro/2024/' },

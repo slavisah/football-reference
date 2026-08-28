@@ -256,6 +256,16 @@ standing quirks.
   check also clean: 505/505 unit, 804/804 e2e (6.7 min), 711 pages built,
   no broken links/sitemap/precache/PDF drift. See `docs/PROJECT_STATUS.md`'s
   matching entry for detail.
+- **`check:lighthouse` widened to every competition/award landing page**:
+  closed 2026-08-28 (twentieth intensive run) - the eighteenth run's own
+  entry above only covered Copa América's landing page; World Cup, EURO,
+  Nations League, Ballon d'Or and Golden Boot landing pages had none.
+  Measured each family's built page weight first, then added all five to
+  `scripts/check-lighthouse.mjs`'s `PAGES_TO_AUDIT` with that context in the
+  label - 24 pages total, up from 19. All 24 scored a perfect
+  1.00/1.00/1.00/1.00. Full standing health check also clean: 505/505 unit,
+  808/808 e2e (6.8 min), 711 pages built, no broken links/sitemap/precache/
+  PDF drift. See `docs/PROJECT_STATUS.md`'s matching entry for detail.
 
 ## Ideas not yet scoped as backlog
 
