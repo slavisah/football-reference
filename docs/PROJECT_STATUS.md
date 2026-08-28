@@ -17,9 +17,9 @@ pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
 pnpm test                      # 501 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 804 Playwright tests at 360px (mobile
-                                          # smoke + a WCAG 2.1 A/AA sweep, light
-                                          # and dark, across every page)
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 808 Playwright tests at 360px (mobile
+                                          # smoke + a WCAG 2.1/2.2 A/AA sweep,
+                                          # light and dark, across every page)
 ```
 
 Publishing: push to `main`; the Pages workflow builds and deploys.
@@ -12986,6 +12986,79 @@ Cup notes"/"EURO notes" prose bullets, rather than the tables themselves,
 have not been through a dedicated audit) if it wants a genuinely new angle
 rather than another repeat health check.
 
+### WCAG 2.2 AA coverage (`target-size`) plus a real overlap bug it found: the focused skip link sat on top of the header logo - added 2026-08-28 (twenty-second intensive run)
+
+Every prior accessibility pass in this file's history - the original sweep,
+forced-colors, reduced-motion, the many table/quiz/compare-state additions -
+only ever requested axe-core's `wcag2a`/`wcag2aa`/`wcag21a`/`wcag21aa` tags.
+`pnpm outdated` found nothing new (still just the blocked `typescript` 7
+entry), and `pnpm dlx knip --no-config-hints` matched every prior run's
+baseline (same one confirmed false positive), so this run looked for a
+genuinely new verification angle rather than repeat one of the last several
+runs' Lighthouse-widening or health-check shape. Checking installed
+`axe-core@4.13.0` directly (`axe.getRules(['wcag22aa'])`) confirmed it ships
+exactly one WCAG 2.2 AA rule, `target-size` (SC 2.5.8 - interactive targets
+need a 24x24 CSS px hit area, or 24px clearance from their neighbors, with
+narrow exceptions) - a rule that had literally never run against this site.
+
+Added `'wcag22aa'` to every `withTags([...])` call across all 20 files under
+`tests/e2e/` that use `AxeBuilder` (37 call sites; `accessibility.spec.ts`
+and `accessibility-forced-colors.spec.ts` also had their doc comments/test
+titles' "WCAG 2.1 A/AA" wording updated to "WCAG 2.1/2.2 A/AA" for
+accuracy), plus the top-of-file `docs/PROJECT_STATUS.md` "How to run" note.
+
+This surfaced one real, previously-undetected bug: on the home page in
+forced-colors mode, tabbing to the skip link (`tests/e2e/
+accessibility-forced-colors.spec.ts`'s "the focused skip link keeps a real,
+non-transparent border" test) failed axe's new `target-offset`/`target-size`
+checks on `.brand` (the header logo link) - "Safe clickable space has a
+diameter of 2.8px instead of at least 24px". A geometry probe (`page.locator
+(...).boundingBox()`) confirmed why: `.skip-link` is the first element in
+`<body>`, `position: absolute` with no positioned ancestor before the sticky
+`.site-header`, so its focused box (`top: 0.5rem; left: 0.5rem`) resolves
+against the viewport and lands almost exactly on top of `.brand`'s own
+top-left position in the header - a real overlapping-hit-target bug for
+anyone who tabs to the skip link and then reaches for a nearby element with
+a pointer or switch device, not an axe false positive (this file's own
+preamble already documents one real forced-colors false positive it
+deliberately disables - `color-contrast` - so this rule was checked by hand
+against that same bar before trusting it: the overlap is real, reproducible,
+and unrelated to the color-mismatch mechanism that false positive comes
+from).
+
+Fixed in `global.css`: `.skip-link:focus + .site-header { margin-top:
+3.5rem; }` (reusing `Nav.astro`'s own `--site-header-height: 3.5rem`
+fallback constant for consistency) pushes the header - and `.brand` inside
+it - down by the skip link's own footprint only while the skip link is
+focused, so the two never overlap; unfocused, the header sits exactly where
+it always has. Deliberately no `transition` added on the new `margin-top` -
+`tests/e2e/accessibility-reduced-motion.spec.ts`'s own doc comment counts
+"the three real transition declarations in the codebase" by name, and this
+fix doesn't need a fourth one to be correct, so it stays out rather than
+force an unrelated test file's count out of date.
+
+Verified with a targeted Playwright run (`accessibility-forced-colors`,
+`accessibility`, `accessibility-reduced-motion`, `print-styles`,
+`mobile.spec.ts` - 560 tests, all passing, including the previously-failing
+one) before the full suite. Full standing health check: `pnpm lint` (0/0/0
+across 166 files), `pnpm test` (505/505 unit, coverage unchanged at
+99.91%/99.42%), `pnpm build` (711 pages), `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache` (37 URLs), `check:perf`
+(heaviest page still `hr/records`, within budget), `check:pdfs` (700 PDFs,
+no content changed this run), `check:lighthouse` (all 25 pages still a
+perfect 1.00/1.00/1.00/1.00 with the wider axe tags active on every page it
+also runs an accessibility category against), and the full cold-start `pnpm
+test:e2e` suite - **808/808 passing** (unchanged count; this run widened
+existing checks' tag lists and fixed a real bug, it didn't add new test
+cases). `pnpm outdated` and a fresh `en.wikipedia.org` `curl` both
+re-confirmed the same two standing environment blockers (`typescript` 7,
+`docs/SOURCES.md` link-liveness).
+
+**Left for a future pass:** the sixteenth run's own suggestion (a
+Golden Boot prose-notes content-accuracy spot check) is still open if a
+future run wants a content-side angle instead of another automated-tooling
+one.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
@@ -13024,6 +13097,19 @@ rather than another repeat health check.
   >=60rem layout has to set its own viewport via `page.setViewportSize()`
   first, the same way `tests/e2e/mobile.spec.ts`'s `desktop nav "More" menu`
   block does.
+- Every `AxeBuilder` sweep under `tests/e2e/` checks WCAG 2.1 AND 2.2 A/AA
+  tags (`wcag2a`/`wcag2aa`/`wcag21a`/`wcag21aa`/`wcag22aa`) - see the
+  2026-08-28 "WCAG 2.2 AA coverage" entry. Installed `axe-core` currently
+  ships only one `wcag22aa` rule (`target-size`); a future `axe-core`
+  upgrade could add more WCAG 2.2 rules to that same tag automatically,
+  worth a quick check next time `pnpm outdated` shows one.
+- The focused skip link (`.skip-link:focus`) pushes `.site-header` down via
+  a `margin-top` rule keyed off the adjacent-sibling selector `.skip-link:
+  focus + .site-header` in `global.css`, so it never visually overlaps the
+  header's `.brand` logo - see the same 2026-08-28 entry. That selector
+  depends on `.skip-link` and `<Nav />`'s root `<header class="site-header">`
+  staying direct siblings in `BaseLayout.astro`'s markup; if either ever
+  gets wrapped in another element, this rule silently stops matching.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

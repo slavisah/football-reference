@@ -32,7 +32,7 @@ test.describe('Teams index', () => {
   test('has no WCAG violations', async ({ page }) => {
     await page.goto('teams');
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .disableRules(['region'])
       .analyze();
     expect(results.violations).toEqual([]);
@@ -82,7 +82,7 @@ test.describe('Team profile page', () => {
   test('has no WCAG violations', async ({ page }) => {
     await page.goto('teams/brazil');
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .disableRules(['region'])
       .analyze();
     expect(results.violations).toEqual([]);
@@ -133,7 +133,7 @@ test.describe('Croatian /teams index (/hr/teams)', () => {
   test('has no WCAG violations', async ({ page }) => {
     await page.goto('hr/teams');
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .disableRules(['region'])
       .analyze();
     expect(results.violations).toEqual([]);
@@ -191,7 +191,7 @@ test.describe('Croatian team profile page (/hr/teams/<slug>)', () => {
   test('has no WCAG violations', async ({ page }) => {
     await page.goto('hr/teams/brazil');
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .disableRules(['region'])
       .analyze();
     expect(results.violations).toEqual([]);

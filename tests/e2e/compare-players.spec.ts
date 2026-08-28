@@ -25,7 +25,7 @@ test.describe('Compare Players page', () => {
   test('has no WCAG violations', async ({ page }) => {
     await page.goto('compare-players');
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .disableRules(['region'])
       .analyze();
     expect(results.violations).toEqual([]);
@@ -133,7 +133,7 @@ test.describe('Croatian Compare Players page (/hr/compare-players)', () => {
   test('has no WCAG violations', async ({ page }) => {
     await page.goto('hr/compare-players');
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .disableRules(['region'])
       .analyze();
     expect(results.violations).toEqual([]);

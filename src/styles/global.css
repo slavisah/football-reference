@@ -255,6 +255,20 @@ h3 {
   top: 0.5rem;
 }
 
+/* The skip link is the first element in <body>, positioned absolutely
+   against the viewport rather than inside the sticky header - so once
+   focused it lands directly on top of the header's brand logo, both
+   anchored to the same top-left corner. A WCAG 2.2 AA "target-size" sweep
+   (tests/e2e/accessibility.spec.ts) confirmed the overlap for real: the two
+   links' safe clickable areas were only ~2.8px apart instead of the
+   required 24px, a genuine hit-target clash for anyone who tabs to the
+   skip link and then reaches for it with a pointer or switch device.
+   Pushing the header down by the skip link's own footprint while it's
+   focused keeps both fully visible and separated instead. */
+.skip-link:focus + .site-header {
+  margin-top: 3.5rem;
+}
+
 main {
   flex: 1 0 auto;
   padding-block: clamp(1.25rem, 4vw, 2.5rem);

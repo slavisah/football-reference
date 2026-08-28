@@ -102,7 +102,7 @@ test.describe('Golden Boot edition page (FIFA World Cup)', () => {
   test('has no WCAG violations', async ({ page }) => {
     await page.goto('competitions/golden-boot/world-cup/1994');
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .disableRules(['region'])
       .analyze();
     expect(results.violations).toEqual([]);
@@ -168,7 +168,7 @@ test.describe('Golden Boot edition page (UEFA EURO)', () => {
   test('has no WCAG violations', async ({ page }) => {
     await page.goto('competitions/golden-boot/euro/1996');
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .disableRules(['region'])
       .analyze();
     expect(results.violations).toEqual([]);
@@ -225,7 +225,7 @@ test.describe('Croatian Golden Boot edition page', () => {
   test('has no WCAG violations', async ({ page }) => {
     await page.goto('hr/competitions/golden-boot/world-cup/1994');
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .disableRules(['region'])
       .analyze();
     expect(results.violations).toEqual([]);
