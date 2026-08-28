@@ -12851,6 +12851,53 @@ run via both `curl` and the `WebFetch` tool - both still rejected with
 layer regardless of which tool makes the request, not just to raw `curl`).
 No concrete, named backlog item remains on record.
 
+### `check:lighthouse` widened to cover every competition/award landing page - added 2026-08-28 (twentieth intensive run)
+
+The eighteenth run's own "left for a future pass" note named the gap
+directly: Copa América was the only competition *landing* page
+(`/competitions/<slug>/`, the full multi-edition table plus filter
+controls) ever audited by `check:lighthouse`, even though it shares that
+exact page shape with five other families - World Cup, EURO, Nations
+League, Ballon d'Or and Golden Boot - none of which had a landing page of
+their own in `PAGES_TO_AUDIT`.
+
+Measured each family's built landing-page weight first (`du -k` against a
+fresh `pnpm build`'s `dist/`) to see whether Copa América's 270.5 KB was
+representative or an outlier: Golden Boot landing (168.4 KB - its own
+hand-built two-table layout in `golden-boot.astro` rather than
+`CompetitionView.astro`, per the eleventh run's "Memorable moments" entry)
+and World Cup (144.4 KB) are both substantial; Ballon d'Or (135.9 KB), EURO
+(104.3 KB) and Nations League (72.4 KB) are lighter, roughly tracking each
+family's edition count. Added all five to `scripts/check-lighthouse.mjs`'s
+`PAGES_TO_AUDIT` (English only, matching the eighteenth run's own reasoning
+for Copa América - the Croatian sibling shares the same template and filter
+logic) with the same page-weight context in each label. `PAGES_TO_AUDIT` is
+now 24 pages, up from 19, and every one of the site's six competition/award
+families has both an edition-page and a landing-page audited.
+
+Ran `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm check:lighthouse`
+against a fresh `pnpm build`: all 24 pages scored a perfect
+1.00/1.00/1.00/1.00 (performance/accessibility/best-practices/SEO), exit
+code 0 - including the five new pages. `pnpm outdated` found nothing new
+beyond the still-blocked `typescript` 7 entry (`@astrojs/check`'s
+`typescript: '^5.0.0 || ^6.0.0'` peer ceiling, re-confirmed via `npm view
+@astrojs/check@latest peerDependencies`). Full standing health check also
+clean: `pnpm lint` (0 errors/warnings/hints), `pnpm test` (505/505 unit
+tests), `pnpm build` (711 pages), `check:links` (715 pages, no broken
+links), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+`check:perf` (heaviest page still `hr/records`, within the 510 KB budget,
+no PDF or content changes so `check:pdfs` also clean), and the full
+cold-start `pnpm test:e2e` suite: 808/808, 6.8 minutes.
+
+**Left for a future pass:** the same two environment-blocked items as
+every prior entry (both still blocked, not re-tried with a new mechanism
+this run). `check:lighthouse` now covers every landing-page and
+edition-page shape at least once but still doesn't reach all 711 built
+pages by design (per the fifteenth run's own scoping) - a future pass could
+add the Croatian sibling of a landing page, or a second edition-page vintage
+per family, if a shape-specific regression ever turns up that this
+selection would have caught.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
