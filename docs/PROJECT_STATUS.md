@@ -13059,6 +13059,112 @@ Golden Boot prose-notes content-accuracy spot check) is still open if a
 future run wants a content-side angle instead of another automated-tooling
 one.
 
+### Golden Boot tie-resolution consistency audit: a documentation bug found and fixed, and one long-standing tension traced and confirmed correct - added 2026-08-28 (twenty-third intensive run)
+
+`pnpm outdated` found nothing new (still just the blocked `typescript` 7
+entry, re-confirmed via `npm view @astrojs/check@latest peerDependencies`),
+and `pnpm dlx knip --no-config-hints` matched every prior run's baseline
+exactly (the same one confirmed false positive). Rather than repeat another
+automated-tooling pass, this run acted on the twenty-second run's own
+"Left for a future pass" suggestion: a content-side angle, specifically the
+Golden Boot prose-notes accuracy spot check first proposed by the sixteenth
+run's entry.
+
+Both of Golden Boot's tables already had two independent name/goal-count/
+diacritic audit passes on record (2026-08-04, 2026-08-07 - see
+`docs/SOURCES.md`), so re-running that same check a third time would have
+been low-yield. Instead this run checked a genuinely different angle
+neither prior pass targeted: *whether showing an EURO edition as a named
+multi-player tie versus crediting a single winner actually matches that
+edition's real UEFA award history*, since UEFA's own tiebreak rules
+(assists, then minutes played) have changed over the competition's history
+and the table's "Multiple" marker is only accurate where no such tiebreak
+applied.
+
+WebSearched every EURO edition where the goal counts leave genuine tiebreak
+room - 2000, 1992, 2012, 2020, 2024 - plus a reconfirmation of the newest
+World Cup row, 2026:
+
+- **2000, 1992:** no UEFA tiebreak was ever applied either year; both
+  remain genuinely joint (Kluivert/Milošević; Bergkamp/Brolin/Larsen/
+  Riedle), matching the table's existing "Multiple" rows. No change.
+- **2024:** independently confirmed UEFA *changed policy* for this
+  specific edition - contemporary reporting (ESPN, Fox Sports) states UEFA
+  moved away from the assist tiebreak it had used in 2012/2020 and shared
+  the award six ways instead when the final produced no clear winner. The
+  table's "Multiple" row reflects a real rule change, not an unresolved
+  tie. No change.
+- **2020:** confirmed Cristiano Ronaldo the sole official winner via
+  assist tiebreak over Patrik Schick (both on 5 goals) - exactly what the
+  table already shows. The only finding here was that the 2026-08-07
+  `docs/SOURCES.md` audit entry had *mis-described* this same row as a
+  "Ronaldo/Schick tie" shown the tied way - checked the file's own git
+  history (`git log --follow -p -- content/golden-boot.md`) and confirmed
+  the row has credited Ronaldo alone since it was first added, so this was
+  a documentation-writing error from the moment that audit entry was
+  written, not a stale note describing a since-changed table. Corrected
+  the entry in `docs/SOURCES.md` and added a dated correction note rather
+  than silently rewriting the historical audit record.
+- **2012:** the one row where the table visibly diverges from the "credit
+  the tiebreak winner" pattern 2020 and the World Cup's own 2010 Thomas
+  Müller row both follow - UEFA's own site (uefa.com) headlines Fernando
+  Torres alone as the Golden Boot winner via tiebreak, yet the table still
+  shows all six 3-goal scorers tied as "Multiple". The prior two audit
+  passes already found and flagged this exact tension and chose to leave
+  it, reasoning it "matches the page's own stated methodology" - this run
+  went one step further and traced *why* that's actually the safer choice
+  beyond methodology-as-stated: `src/lib/editions.ts`'s
+  `buildChampionsSummary()` carries a doc comment (lines 72-86) describing
+  a real bug it fixes by relying on the 2012 row staying a parsed six-way
+  tie - splitting it lets Cristiano Ronaldo's share of that 2012 tie
+  combine with his outright 2020 win, giving him the correct "2 EURO
+  Golden Boots" total in the site's "Most awards" ranking on `/records`.
+  Crediting Torres alone would silently undercount Ronaldo back to 1 award
+  in that ranking. So the 2012 "Multiple" row is load-bearing for a live
+  feature's correctness, not an unexamined leftover from an earlier pass -
+  confirmed correct and left unchanged, this time with the reasoning
+  recorded rather than just re-flagged.
+- **2026 World Cup (Mbappé, 10 goals):** reconfirmed sole winner, two
+  goals clear of Lionel Messi's 8, per FIFA.com's own award page plus six
+  further independent outlets (ESPN, Sky Sports, Fox Sports, Britannica,
+  Olympics.com, Goal.com) - matches the existing row exactly. No change.
+
+Net result: one real documentation bug found and fixed (the 2020
+mis-description in `docs/SOURCES.md`), one long-standing tension (2012)
+understood and confirmed correctly load-bearing rather than an oversight,
+and every other checked row reconfirmed accurate against fresh independent
+sourcing. **No `content/golden-boot.md` data changed this run** - the only
+content-tree edit was `docs/SOURCES.md` itself (the correction plus a new
+dated audit entry recording this pass, with sources).
+
+That one-file `docs/SOURCES.md` edit still had a real downstream effect
+worth recording for a future run: `scripts/generate-pdfs.mjs`'s own doc
+comment explains every PDF's shared References section is built from
+`docs/SOURCES.md`, so `pnpm check:pdfs` correctly flagged **all 700 PDFs**
+as stale off a single-file docs-only change with zero visible content
+change on any page - not a bug, but worth knowing before assuming a small
+`docs/`-only diff is PDF-regeneration-free. Regenerated with `pnpm
+build:pdfs` (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` - the pinned
+Playwright version's expected `chromium_headless_shell` build isn't the
+one preinstalled in this environment, the same substitution
+`docs/PROJECT_STATUS.md`'s own e2e-running notes already use) and
+reverified clean with `pnpm check:pdfs`. Full standing health check clean:
+`pnpm lint` (0/0/0 across 166 files), `pnpm test` (505/505 unit, coverage
+unchanged), `pnpm build` (711 pages), `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache` (37 URLs), `check:perf`
+(heaviest page still `hr/records`, within budget). `pnpm test:e2e` and
+`check:lighthouse` were not re-run this pass - no `src/`, `tests/`, or
+`content/` file changed, only `docs/`, so neither page behavior nor page
+weight/DOM shape could have shifted; a future run touching actual site
+code should still run both from a cold start per the standing convention.
+
+**Left for a future pass:** same two environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). No other
+concrete content-accuracy angle is currently open on Golden Boot; a future
+run could apply this same "tie-resolution consistency" lens to the World
+Cup Golden Boot table's own tiebreak years (2006, 2010) or to any future
+Ballon d'Or/team-competition tiebreak edge cases, if one ever appears.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

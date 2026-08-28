@@ -417,9 +417,15 @@ Primary sources should be preferred.
   four-way tie, 2012's and 2024's six-way ties) with every individual name
   and diacritic re-checked for completeness and correct spelling. As with
   the first pass, 2012's six-way tie (rather than crediting Fernando
-  Torres alone, despite his UEFA tiebreak award) and 2020's Ronaldo/Schick
-  tie both match the page's stated methodology of showing joint leading
-  scorers tied with no single official winner - not discrepancies. Direct
+  Torres alone, despite his UEFA tiebreak award) matches the page's stated
+  methodology of showing joint leading scorers tied with no single official
+  winner - not a discrepancy. **Correction (2026-08-28, 23rd intensive
+  run):** this entry originally also described 2020 as a "Ronaldo/Schick
+  tie" shown that same tied way - that was never true of the table, which
+  has credited Cristiano Ronaldo alone (5 goals, Portugal) since the row
+  was first added, matching UEFA's own tiebreak decision (Ronaldo's one
+  assist over Patrik Schick's none); see that run's entry below for the
+  full tie-resolution consistency check this mistake prompted. Direct
   WebFetch to primary-source domains was blocked by this environment's
   egress policy for this run (as it was for the World Cup half of this
   pass, see above), so verification relied on WebSearch's synthesized
@@ -427,6 +433,53 @@ Primary sources should be preferred.
   Boot second-source audit for the UEFA EURO table - both of Golden Boot's
   tables, and now every competition/award table on the site, have at
   least two independent audit passes on record.
+- Golden Boot tie-resolution consistency audit (2026-08-28, 23rd intensive
+  run): the prior two Golden Boot passes above verified every row's names,
+  teams and goal counts twice each, but neither one specifically checked
+  *whether showing an edition as a named tie vs. a single credited winner
+  matches that edition's real award history* - the angle that surfaced the
+  2020 description bug fixed just above. This run WebSearched each EURO
+  edition where the table's own goal counts leave genuine tiebreak room
+  (2000, 1992, 2012, 2020, 2024) plus a reconfirmation of the newest World
+  Cup row (2026): **2000** (Kluivert/Milošević, 5 goals each) - UEFA never
+  applied a tiebreak that year; both remain officially joint winners,
+  matching the table's "Multiple" row. **1992** (Bergkamp/Brolin/Larsen/
+  Riedle, 3 each) - same, no tiebreak applied, four-way share confirmed.
+  **2012** (six players on 3 each) - UEFA's own site (uefa.com) headlines
+  Fernando Torres alone as the Golden Boot winner via tiebreak (assists,
+  then fewest minutes), a genuine tension with the table's "Multiple" row
+  the two prior passes already flagged and chose to keep as-is. This run
+  traced *why* rather than just re-flagging it: `src/lib/editions.ts`'s
+  `buildChampionsSummary()` doc comment (lines 72-86) documents a real bug
+  it once fixed by relying on 2012 staying a parsed six-way tie - Cristiano
+  Ronaldo's own share of that tie combines with his outright 2020 win to
+  give him the correct "2 EURO Golden Boots" total in the site's "Most
+  awards" ranking; crediting Torres alone would silently undercount Ronaldo
+  back to 1. So the "Multiple" row for 2012 is load-bearing for that
+  feature's correctness, not an unexamined leftover - left unchanged,
+  correctly this time. **2020** (Ronaldo/Schick, 5 each) - confirmed
+  Ronaldo the sole official winner via assist tiebreak, matching the
+  table's existing solo row; the only find this run's own re-check made was
+  that the 2026-08-07 entry above had *mis-described* this same table row
+  as tied, corrected there. **2024** (six players on 3 each) - independently
+  confirmed UEFA explicitly changed policy for this edition specifically:
+  reporting at the time (ESPN, Fox Sports) states UEFA moved away from the
+  assist tiebreak it used in 2012/2020 and shared the award six ways
+  instead, so 2024's "Multiple" row reflects an actual rule change, not
+  just an unresolved tie. **2026 World Cup** (Mbappé, 10 goals) -
+  reconfirmed sole winner, 2 clear of Messi's 8, per FIFA.com's own award
+  page and six further outlets (ESPN, Sky Sports, Fox Sports, Britannica,
+  Olympics.com, Goal.com) - matches the existing row exactly, no change.
+  Net result: one real bug found and fixed (the 2020 mis-description
+  above), one long-standing tension (2012) understood and confirmed
+  correctly load-bearing rather than an error, and every other checked row
+  reconfirmed accurate. No `content/golden-boot.md` data changed this run.
+  - https://www.uefa.com/uefaeuro/history/news/0252-0cd3fae4b774-6f83b86556ad-1000--late-surge-earns-torres-adidas-golden-boot/
+  - https://www.espn.com/soccer/story/_/id/37618965/cristiano-ronaldo-wins-euro-2020-golden-boot
+  - https://www.goal.com/en/news/ronaldo-wins-euro-2020-golden-boot-on-tie-breaker-over-schick/wzri2apw8gef1bnfwv1uauvhf
+  - https://www.espn.com/soccer/story/_/id/40558317/euro-2024-golden-boot-harry-kane-dani-olmo-6-winners
+  - https://www.espn.com/soccer/story/_/id/49397919/kylian-mbappe-wins-golden-boot-2026-world-cup-lionel-messi-goalless-final
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/adidas-golden-boot-race-top-scorer
 - Champion/Runner-up/Final-score audit (2026-08-05, intensive run): the core
   **Winner**, **Runner-up**, and **Final** (score line) columns in
   `content/uefa-euro.md`'s Editions table - the first dedicated cross-check
