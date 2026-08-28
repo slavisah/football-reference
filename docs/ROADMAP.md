@@ -306,6 +306,30 @@ standing quirks.
   widened, no new test cases), 25/25 Lighthouse pages still a perfect
   1.00 across every category. See `docs/PROJECT_STATUS.md`'s matching
   entry for detail.
+- **Golden Boot tie-resolution consistency audit**: closed 2026-08-28
+  (twenty-third intensive run) - acted on the twenty-second run's own
+  suggestion (a content-side angle: the Golden Boot prose-notes
+  accuracy spot check). Rather than re-check names/goals/diacritics a
+  third time (already double-audited), this run checked a different,
+  never-audited angle: whether each EURO edition's "shown as a tie" vs.
+  "shown as a single winner" choice in `content/golden-boot.md` matches
+  that edition's real award history. Found and fixed one real
+  documentation bug (a 2026-08-07 `docs/SOURCES.md` audit entry had
+  mis-described the table's 2020 row as a Ronaldo/Schick tie; it has
+  always credited Ronaldo alone, correctly). Also traced *why* 2012's
+  row is deliberately still a six-way "Multiple" tie despite Fernando
+  Torres's official UEFA tiebreak award: `src/lib/editions.ts`'s
+  `buildChampionsSummary()` doc comment shows this is load-bearing for
+  Cristiano Ronaldo's "2 EURO Golden Boots" total in the site's "Most
+  awards" ranking (his 2012 tie-share plus his outright 2020 win) - not
+  an unexamined leftover, so left unchanged, this time with the reasoning
+  on record. No `content/golden-boot.md` data changed. Full standing
+  health check clean (lint/unit test/build/`check:links`/`check:sitemap`/
+  `check:precache`/`check:perf`); all 700 PDFs regenerated and reverified
+  clean after the `docs/SOURCES.md` edit (every PDF's shared References
+  section depends on it, so any edit marks all of them stale, by design -
+  `pnpm build:pdfs` then `pnpm check:pdfs`). See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail.
 
 ## Ideas not yet scoped as backlog
 
