@@ -13599,14 +13599,24 @@ so `CollectionPage` doesn't fit them the same way.
 
 Added three new unit tests (`tests/unit/jsonLd.test.ts`) covering the single-
 `ItemList` shape, the optional `description` field, and the array-`mainEntity`
-shape `golden-boot.astro` needs. Full standing health check clean: `pnpm
+shape `golden-boot.astro` needs. Six pre-existing e2e assertions
+(`tests/e2e/mobile.spec.ts`) had baked in the old top-level-`ItemList` shape
+for exactly these six pages (world-cup, ballon-dor, golden-boot,
+hr/world-cup, /teams, /hr/teams) and needed updating to look for
+`CollectionPage`/read `.mainEntity` instead - caught by a full cold-start
+`pnpm test:e2e` run, not by `pnpm test` or `pnpm build` (neither exercises
+rendered JSON-LD script tags). Full standing health check clean: `pnpm
 lint` (0 errors/warnings/hints), `pnpm test` (513/513 unit, three new),
 `pnpm build` (711 pages), `check:links` (715 pages)/`check:sitemap` (710
 entries)/`check:precache` (37 URLs) all clean, `check:perf` (heaviest page
 still `hr/records`, well within budget - the new JSON-LD adds a few hundred
 bytes to the twelve competition pages, nowhere near the 510 KB budget). All
 700 PDFs regenerated (every one of the twelve edited competition-page PDFs
-had gone stale, per `check:pdfs`) and reverified clean.
+had gone stale, per `check:pdfs`) and reverified clean. Full cold-start
+`pnpm test:e2e` (809/809, 8.6 min, `PW_EXECUTABLE_PATH=/opt/pw-browsers/
+chromium`) and `check:lighthouse` (all 25 pages still >= 0.9, most a perfect
+1.00) both clean after the test fix; `pnpm dlx knip --no-config-hints` back
+to the one confirmed false positive.
 
 **Left for a future pass:** same two environment-blocked items as every
 recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). The
