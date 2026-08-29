@@ -6,7 +6,7 @@ import { buildAllCountryRecords } from '../../lib/compare';
 import { loadTeamCompetitions } from '../../lib/teamCompetitions';
 import { teamProfileSlug } from '../../lib/teamProfile';
 import { absolutePageUrl, withBase } from '../../lib/url';
-import { buildCountryRecordsItemList, type JsonLdObject } from '../../lib/jsonLd';
+import { buildCollectionPageJsonLd, buildCountryRecordsItemList, type JsonLdObject } from '../../lib/jsonLd';
 
 const meta = await loadPageMeta('teams');
 
@@ -34,11 +34,13 @@ const lastReviewed = [worldCup, euro, copaAmerica, nationsLeague]
 // data, different page purpose: an A-Z directory vs. a ranked comparison
 // table) so a search engine sees two intentionally different lists, not a
 // duplicate.
+const teamsPageUrl = absolutePageUrl(Astro.url, Astro.site);
+const teamsName = 'National teams directory - combined World Cup, EURO, Copa América and Nations League record';
 const jsonLd: JsonLdObject[] = [
-  buildCountryRecordsItemList(allRecords, {
-    pageUrl: absolutePageUrl(Astro.url, Astro.site),
-    name: 'National teams directory - combined World Cup, EURO, Copa América and Nations League record',
-  }),
+  buildCollectionPageJsonLd(
+    buildCountryRecordsItemList(allRecords, { pageUrl: teamsPageUrl, name: teamsName }),
+    { pageUrl: teamsPageUrl, name: teamsName },
+  ),
 ];
 ---
 

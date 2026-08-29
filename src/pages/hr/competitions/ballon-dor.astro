@@ -24,7 +24,12 @@ import { loadCompetition } from '../../../lib/competition';
 import { buildYearStories } from '../../../lib/editions';
 import { buildEditionLinks, buildEditionProfiles } from '../../../lib/editionProfile';
 import { absolutePageUrl, withBase } from '../../../lib/url';
-import { buildChampionsItemList, buildLatestEditionSportsEvent, type JsonLdObject } from '../../../lib/jsonLd';
+import {
+  buildChampionsItemList,
+  buildCollectionPageJsonLd,
+  buildLatestEditionSportsEvent,
+  type JsonLdObject,
+} from '../../../lib/jsonLd';
 import type { NoteSection } from '../../../lib/notes';
 
 const data = await loadCompetition('ballon-dor', {
@@ -42,8 +47,12 @@ const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 const title = 'Zlatna lopta';
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const championsName = `${title} - najviše nagrada`;
 const jsonLd = [
-  buildChampionsItemList(data.champions, { pageUrl, name: `${title} - najviše nagrada` }),
+  buildCollectionPageJsonLd(buildChampionsItemList(data.champions, { pageUrl, name: championsName }), {
+    pageUrl,
+    name: championsName,
+  }),
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 

@@ -4,7 +4,7 @@ import References from '../../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import { buildAllPlayerProfiles, playerProfileSlug, type PlayerAwardSource } from '../../lib/playerProfile';
 import { absolutePageUrl, withBase } from '../../lib/url';
-import { buildPlayersDirectoryItemList, type JsonLdObject } from '../../lib/jsonLd';
+import { buildCollectionPageJsonLd, buildPlayersDirectoryItemList, type JsonLdObject } from '../../lib/jsonLd';
 
 const meta = await loadPageMeta('players');
 
@@ -37,10 +37,12 @@ const lastReviewed = [ballonDor.lastReviewed, worldCupGoldenBoot.lastReviewed, e
   .sort()
   .at(-1) as string;
 
+const playersPageUrl = absolutePageUrl(Astro.url, Astro.site);
+const playersName = "Players directory - every Men's Ballon d'Or and FIFA World Cup/UEFA EURO Golden Boot winner";
 const jsonLd: JsonLdObject[] = [
-  buildPlayersDirectoryItemList(profiles, {
-    pageUrl: absolutePageUrl(Astro.url, Astro.site),
-    name: "Players directory - every Men's Ballon d'Or and FIFA World Cup/UEFA EURO Golden Boot winner",
+  buildCollectionPageJsonLd(buildPlayersDirectoryItemList(profiles, { pageUrl: playersPageUrl, name: playersName }), {
+    pageUrl: playersPageUrl,
+    name: playersName,
   }),
 ];
 ---

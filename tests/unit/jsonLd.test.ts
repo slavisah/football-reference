@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildBreadcrumbList,
   buildChampionsItemList,
+  buildCollectionPageJsonLd,
   buildCountryRecordsItemList,
   buildDefinedTermSet,
   buildEditionSportsEvent,
@@ -803,5 +804,72 @@ describe('buildWebSiteJsonLd', () => {
     });
 
     expect(website.inLanguage).toBe('hr');
+  });
+});
+
+describe('buildCollectionPageJsonLd', () => {
+  const champions: ChampionSummary[] = [
+    { id: 'brazil', displayName: 'Brazil', titles: 5, years: ['1958', '1962', '1970', '1994', '2002'], names: ['Brazil'] },
+  ];
+
+  it('wraps a single ItemList as mainEntity, stripping the inner "@context"', () => {
+    const itemList = buildChampionsItemList(champions, {
+      pageUrl: 'https://example.test/competitions/world-cup/',
+      name: 'FIFA World Cup - Champions by titles',
+    });
+
+    const page = buildCollectionPageJsonLd(itemList, {
+      pageUrl: 'https://example.test/competitions/world-cup/',
+      name: 'FIFA World Cup - Champions by titles',
+    });
+
+    expect(page).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: 'FIFA World Cup - Champions by titles',
+      url: 'https://example.test/competitions/world-cup/',
+      mainEntity: {
+        '@type': 'ItemList',
+        name: 'FIFA World Cup - Champions by titles',
+        url: 'https://example.test/competitions/world-cup/',
+        itemListElement: itemList.itemListElement,
+      },
+    });
+  });
+
+  it('includes an optional description when provided', () => {
+    const itemList = buildChampionsItemList(champions, {
+      pageUrl: 'https://example.test/players/',
+      name: 'Players directory',
+    });
+
+    const page = buildCollectionPageJsonLd(itemList, {
+      pageUrl: 'https://example.test/players/',
+      name: 'Players directory',
+      description: 'Every award winner, A to Z.',
+    });
+
+    expect(page.description).toBe('Every award winner, A to Z.');
+  });
+
+  it('accepts an array of ItemLists for a page with more than one table (Golden Boot: World Cup + EURO)', () => {
+    const worldCup = buildChampionsItemList(champions, {
+      pageUrl: 'https://example.test/competitions/golden-boot/',
+      name: 'Most World Cup Golden Boots',
+    });
+    const euro = buildChampionsItemList(champions, {
+      pageUrl: 'https://example.test/competitions/golden-boot/',
+      name: 'Most EURO top-scorer awards',
+    });
+
+    const page = buildCollectionPageJsonLd([worldCup, euro], {
+      pageUrl: 'https://example.test/competitions/golden-boot/',
+      name: 'Golden Boot Winners',
+    });
+
+    expect(page.mainEntity).toEqual([
+      { '@type': 'ItemList', name: worldCup.name, url: worldCup.url, itemListElement: worldCup.itemListElement },
+      { '@type': 'ItemList', name: euro.name, url: euro.url, itemListElement: euro.itemListElement },
+    ]);
   });
 });

@@ -12,7 +12,7 @@ import References from '../../../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../../../lib/competition';
 import { buildAllPlayerProfiles, playerProfileSlug, type PlayerAwardSource } from '../../../lib/playerProfile';
 import { absolutePageUrl, withBase } from '../../../lib/url';
-import { buildPlayersDirectoryItemList, type JsonLdObject } from '../../../lib/jsonLd';
+import { buildCollectionPageJsonLd, buildPlayersDirectoryItemList, type JsonLdObject } from '../../../lib/jsonLd';
 
 const meta = await loadPageMeta('players');
 
@@ -52,13 +52,18 @@ const statusText = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';
 // directory ItemList. "nagrada"/"nagrade" follows the site's established
 // two-form convention for that noun (see hr/records.astro's own
 // `unit: ['nagrada', 'nagrade']`).
+const playersPageUrl = absolutePageUrl(Astro.url, Astro.site);
+const playersName = 'Popis igrača - svaki dobitnik muške Zlatne lopte i Zlatne kopačke Svjetskog prvenstva/EURA';
 const jsonLd: JsonLdObject[] = [
-  buildPlayersDirectoryItemList(profiles, {
-    pageUrl: absolutePageUrl(Astro.url, Astro.site),
-    name: 'Popis igrača - svaki dobitnik muške Zlatne lopte i Zlatne kopačke Svjetskog prvenstva/EURA',
-    describe: (profile) =>
-      `${profile.totalAwards} ${profile.totalAwards === 1 ? 'nagrada' : 'nagrade'} u muškoj Zlatnoj lopti i Zlatnoj kopački Svjetskog prvenstva/EURA`,
-  }),
+  buildCollectionPageJsonLd(
+    buildPlayersDirectoryItemList(profiles, {
+      pageUrl: playersPageUrl,
+      name: playersName,
+      describe: (profile) =>
+        `${profile.totalAwards} ${profile.totalAwards === 1 ? 'nagrada' : 'nagrade'} u muškoj Zlatnoj lopti i Zlatnoj kopački Svjetskog prvenstva/EURA`,
+    }),
+    { pageUrl: playersPageUrl, name: playersName },
+  ),
 ];
 ---
 

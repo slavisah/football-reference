@@ -450,6 +450,17 @@ standing quirks.
   for detail, including why `content/index.md`'s own out-of-order date was
   deliberately left alone (a squash-merge artifact, not the same bug).
 
+- **CollectionPage schema for directory/landing pages**: closed 2026-08-29
+  (twenty-ninth intensive run) - the idea the twenty-sixth run raised and the
+  twenty-seventh/twenty-eighth runs both declined to scope (see the "Ideas
+  not yet scoped as backlog" entry below, now resolved) is implemented:
+  `/teams`, `/players` and all six competition/award landing pages (EN + HR,
+  16 pages total) now wrap their directory/champions `ItemList` in a
+  `CollectionPage` via the new `buildCollectionPageJsonLd()`
+  (`src/lib/jsonLd.ts`). `/records`, `/compare` and `/compare-players` stay
+  unwrapped by design (multiple independent rankings, not a single list the
+  page *is*). See `docs/PROJECT_STATUS.md`'s matching entry for detail.
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned
