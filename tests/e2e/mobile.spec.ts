@@ -2959,9 +2959,11 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
       },
     ]);
 
-    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
-    expect(itemList.name).toBe('FIFA World Cup - Champions by titles');
-    expect(itemList.url).toBe(`${SITE}/competitions/world-cup/`);
+    const collectionPage = blocks.find((b) => b['@type'] === 'CollectionPage');
+    expect(collectionPage.name).toBe('FIFA World Cup - Champions by titles');
+    expect(collectionPage.url).toBe(`${SITE}/competitions/world-cup/`);
+    const itemList = collectionPage.mainEntity;
+    expect(itemList['@type']).toBe('ItemList');
     expect(itemList.itemListElement[0].item.name).toBe('Brazil');
 
     const sportsEvent = blocks.find((b) => b['@type'] === 'SportsEvent');
@@ -2975,8 +2977,8 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
   }) => {
     await page.goto('competitions/ballon-dor');
     const blocks = await jsonLdBlocks(page);
-    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList', 'SportsEvent']);
-    expect(blocks.find((b) => b['@type'] === 'ItemList').name).toContain('Most awards');
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'CollectionPage', 'SportsEvent']);
+    expect(blocks.find((b) => b['@type'] === 'CollectionPage').name).toContain('Most awards');
 
     const sportsEvent = blocks.find((b) => b['@type'] === 'SportsEvent');
     expect(sportsEvent.name).toBe("2025 Men's Ballon d'Or");
@@ -2987,7 +2989,8 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
   test('the Golden Boot page carries one ItemList and one SportsEvent per table', async ({ page }) => {
     await page.goto('competitions/golden-boot');
     const blocks = await jsonLdBlocks(page);
-    const lists = blocks.filter((b) => b['@type'] === 'ItemList');
+    const collectionPage = blocks.find((b) => b['@type'] === 'CollectionPage');
+    const lists: { name: string }[] = collectionPage.mainEntity;
     expect(lists).toHaveLength(2);
     expect(lists.map((l) => l.name)).toEqual([
       'Most World Cup Golden Boots',
@@ -3011,7 +3014,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     const breadcrumb = blocks.find((b) => b['@type'] === 'BreadcrumbList');
     expect(breadcrumb.itemListElement[0].name).toBe('Početna');
     expect(breadcrumb.itemListElement[1].name).toBe('FIFA Svjetsko prvenstvo');
-    expect(blocks.find((b) => b['@type'] === 'ItemList').name).toBe(
+    expect(blocks.find((b) => b['@type'] === 'CollectionPage').name).toBe(
       'FIFA Svjetsko prvenstvo - prvaci po broju naslova',
     );
   });
@@ -3136,13 +3139,15 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
   }) => {
     await page.goto('teams');
     const blocks = await jsonLdBlocks(page);
-    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList']);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'CollectionPage']);
 
     const teamCount = await page.locator('.teams__grid .teams__link').count();
-    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
-    expect(itemList.name).toBe(
+    const collectionPage = blocks.find((b) => b['@type'] === 'CollectionPage');
+    expect(collectionPage.name).toBe(
       'National teams directory - combined World Cup, EURO, Copa América and Nations League record',
     );
+    const itemList = collectionPage.mainEntity;
+    expect(itemList['@type']).toBe('ItemList');
     expect(itemList.itemListElement).toHaveLength(teamCount);
     expect(itemList.itemListElement.some((item: { item: { name: string } }) => item.item.name === 'Brazil')).toBe(
       true,
@@ -3152,11 +3157,11 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
   test('/hr/teams carries its own Croatian ItemList name and description', async ({ page }) => {
     await page.goto('hr/teams');
     const blocks = await jsonLdBlocks(page);
-    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
-    expect(itemList.name).toBe(
+    const collectionPage = blocks.find((b) => b['@type'] === 'CollectionPage');
+    expect(collectionPage.name).toBe(
       'Popis reprezentacija - ukupan učinak na Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija',
     );
-    expect(itemList.itemListElement[0].item.description).toContain('naslova');
+    expect(collectionPage.mainEntity.itemListElement[0].item.description).toContain('naslova');
   });
 
   test('/teams/brazil carries a BreadcrumbList, an ItemList of its competition appearances (one Thing per competition), and a SportsTeam entity block', async ({
