@@ -3147,12 +3147,20 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(itemList.itemListElement[0].item.description).toContain('naslova');
   });
 
-  test('/teams/brazil carries a BreadcrumbList and an ItemList of its competition appearances, one Thing per competition', async ({
+  test('/teams/brazil carries a BreadcrumbList, an ItemList of its competition appearances (one Thing per competition), and a SportsTeam entity block', async ({
     page,
   }) => {
     await page.goto('teams/brazil');
     const blocks = await jsonLdBlocks(page);
-    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList']);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList', 'SportsTeam']);
+
+    // The SportsTeam block only lists Brazil's actual World Cup/Copa América
+    // title wins, not the runner-up/semifinal results the ItemList above
+    // also lists - see buildTeamSportsTeamJsonLd's own "Champion-only" rule.
+    const sportsTeam = blocks.find((b) => b['@type'] === 'SportsTeam');
+    expect(sportsTeam.name).toBe('Brazil');
+    expect(sportsTeam.award).toContain('FIFA World Cup 1958');
+    expect(sportsTeam.award).toContain('FIFA World Cup 2002');
 
     // A profile page is nested under its directory, so the breadcrumb is
     // three levels deep (Home > Teams > Brazil) rather than the flat "Home >
@@ -3217,6 +3225,20 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
       'Lionel Messi - Full award history',
     ]);
     expect(breadcrumb.itemListElement[1].item).toMatch(/\/players\/$/);
+  });
+
+  test('/players/lionel-messi also carries a Person entity block listing every Ballon d\'Or year he actually won', async ({
+    page,
+  }) => {
+    await page.goto('players/lionel-messi');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList', 'Person']);
+
+    const person = blocks.find((b) => b['@type'] === 'Person');
+    expect(person.name).toBe('Lionel Messi');
+    // Messi has won the Ballon d'Or a record eight times.
+    const ballonDorAwards = (person.award as string[]).filter((a) => a.startsWith("Ballon d'Or"));
+    expect(ballonDorAwards).toHaveLength(8);
   });
 
   test('/hr/players/lionel-messi carries its own Croatian three-level BreadcrumbList', async ({ page }) => {

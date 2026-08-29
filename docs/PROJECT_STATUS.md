@@ -13319,6 +13319,102 @@ same standing choice every recent "clean audit" run has faced: repeat the
 standing health check, or find another genuinely new angle the way this
 run and the twenty-fourth did.
 
+### Person/SportsTeam structured-data entity blocks for `/players/<slug>` and `/teams/<slug>` - added 2026-08-29 (twenty-sixth intensive run)
+
+`pnpm outdated` found nothing new (still just the blocked `typescript` 7
+peer-dependency ceiling on `@astrojs/check`). Every generated-ranking page
+family on the site already carries its own `ItemList` JSON-LD block (see
+the many prior structured-data entries in this file), but the two
+profile-page families - `/players/<slug>` (a Ballon d'Or/Golden Boot
+winner's full award history) and `/teams/<slug>` (a national team's full
+tournament history) - only ever emitted that generic `ItemList` of their
+awards/appearances, never a real schema.org entity type for the *subject*
+the page is actually about. Search engines can associate a `Person` or
+`SportsTeam` block with a Knowledge Graph entry the way a generic
+`ItemList` of `Thing`s never is, so this was a genuine, previously-unfilled
+gap in the site's structured-data coverage - not a repeat of ground any of
+the twenty-five prior runs' JSON-LD work (`SportsEvent`, `ItemList`,
+`Quiz`, `DefinedTermSet`, `WebSite`, `BreadcrumbList`) had already covered.
+
+Added two builders to `src/lib/jsonLd.ts`:
+
+- `buildPlayerPersonJsonLd(profile, { pageUrl })` - a `Person` block whose
+  `award` array lists every award the player has actually won, one
+  `"<Award title> <Year>"` string per appearance (chronological), reusing
+  `PlayerProfile.awards` exactly as `buildPlayerProfileItemList()` already
+  does - no new computation, no invented fact. Deliberately omits
+  `birthDate`/`nationality`: neither exists anywhere in `content/` today,
+  the same reason `docs/ROADMAP.md`'s "youngest winner" backlog entry gives
+  for not fabricating player birth dates from memory in an unattended run.
+- `buildTeamSportsTeamJsonLd(profile, { pageUrl })` - a `SportsTeam` block
+  whose `award` array lists only the team's actual title wins
+  (`"<Competition title> <Year>"`), filtered to `appearance.role ===
+  'Champion'` - a `TeamProfileCompetition`'s appearances also include
+  runner-up and semifinal finishes (see `buildTeamProfileItemList()`'s own
+  `ItemList`, which lists all of them), and a runner-up finish is a result,
+  not an award, so it must not appear in a `Person`/`SportsTeam`-style
+  `award` property. This filtered array's length always exactly equals
+  `profile.totalTitles` (the same figure `buildTeamProfile()` itself
+  computes from the identical appearances), so the two can never disagree.
+
+Wired into all four page files - `src/pages/players/[slug].astro`,
+`src/pages/hr/players/[slug].astro`, `src/pages/teams/[slug].astro`,
+`src/pages/hr/teams/[slug].astro` - alongside each page's existing
+`ItemList` block (both blocks now render together via `BaseLayout.astro`'s
+`jsonLd` prop, which already accepts an array), not replacing it: the two
+are complementary, one a ranked list of the awards, the other a named
+entity that happens to have won them. Both new builders take a bare
+`{ pageUrl }` option with no `describe()`-style override, since (like the
+Croatian `ItemList` calls on these same four pages) the `award` strings are
+untranslated source-derived facts, the same "only UI chrome is translated"
+rule the Croatian pages already apply to the `ItemList` descriptions.
+
+New unit test coverage in `tests/unit/jsonLd.test.ts`: a
+`buildTeamSportsTeamJsonLd` block (Germany, mixing title wins with a
+runner-up and a semifinal finish, confirming the `award` array contains
+only the three actual World Cup titles) and a `buildPlayerPersonJsonLd`
+block (Gerd Müller's 1970 Ballon d'Or/Golden Boot double, plus a
+multi-win and an empty-awards case). New e2e coverage in
+`tests/e2e/mobile.spec.ts`: the existing `/teams/brazil` exact-JSON-LD-
+type-list assertion (`['BreadcrumbList', 'ItemList']`) updated to
+`['BreadcrumbList', 'ItemList', 'SportsTeam']` plus a check that the new
+block's `award` array contains Brazil's 1958/2002 World Cup wins but not
+any of its Copa América runner-up finishes; a new test on
+`/players/lionel-messi` confirms his `Person` block's `award` array
+contains exactly eight `"Ballon d'Or <Year>"` entries, matching his real
+record.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then
+`pnpm check:pdfs`) - the four edited `.astro` files are PDF sources for
+every player and team PDF (`scripts/pdf-pages.mjs`'s
+`TEAM_PDF_SOURCES`/`PLAYER_PDF_SOURCES`), so editing them marks every one
+of those PDFs stale even though the change is JSON-LD-only and invisible
+in the printed page itself. `pnpm build:pdfs` needed the same
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` override this file's "How
+to run" section already documents for `pnpm test:e2e` in this environment
+- the default Playwright Chromium build it otherwise tries to launch
+(`chromium_headless_shell`) isn't installed here.
+
+Full standing health check clean: `pnpm lint` (0/0/0 across 166 files),
+`pnpm test` (510/510 unit, up from 505 - the new jsonLd.ts test cases;
+coverage unchanged at 99.91%/99.42%), `pnpm build` (711 pages), `check:links`
+(715 pages), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+`check:perf` (heaviest page still `hr/records`, within budget), `check:pdfs`
+(700 PDFs, all fresh after regeneration), `pnpm dlx knip --no-config-hints`
+(same one confirmed false positive every prior run has found). Full
+cold-start `pnpm test:e2e`: 809/809 (8.4 min, up from 808 - the one new
+Messi `Person`-block test), no other test needed updating beyond the one
+exact-type-list assertion above.
+
+**Left for a future pass:** same two environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). A future run
+could look for other page families still missing their most specific
+schema.org entity type the same way this run found the gap here - the
+directory index pages (`/players`, `/teams`) and the six competition/award
+landing pages are more naturally `CollectionPage`/`ItemList` shapes than a
+single entity, so they're not the same kind of gap, but worth a deliberate
+look rather than assuming this run's fix was the only one.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

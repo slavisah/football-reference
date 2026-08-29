@@ -370,6 +370,35 @@ standing quirks.
   (700 PDFs). See `docs/PROJECT_STATUS.md`'s matching entry for detail,
   including a documented `PW_EXECUTABLE_PATH` fallback for environments
   with no `chrome` browser channel installed.
+- **Person/SportsTeam structured-data entity blocks for profile pages**:
+  closed 2026-08-29 (twenty-sixth intensive run) - `pnpm outdated` found
+  nothing new (still just the blocked `typescript` 7 entry). Every
+  generated-ranking page family already carries its own `ItemList` JSON-LD
+  (see `docs/PROJECT_STATUS.md`'s many prior structured-data entries), but
+  `/players/<slug>` and `/teams/<slug>` never emitted a real schema.org
+  entity type for the player/team the page is actually about - only the
+  generic `ItemList` of their awards/appearances. Added
+  `buildPlayerPersonJsonLd()` (`Person`, `award` = every award this player
+  has actually won, "<Award title> <Year>") and `buildTeamSportsTeamJsonLd()`
+  (`SportsTeam`, `award` = only this team's actual title wins, filtered to
+  `role === 'Champion'` so a runner-up/semifinal finish is never
+  misrepresented as an award) in `src/lib/jsonLd.ts`, wired into all four
+  page files (`players/[slug].astro`, `hr/players/[slug].astro`,
+  `teams/[slug].astro`, `hr/teams/[slug].astro`) alongside their existing
+  `ItemList` block, not replacing it. Deliberately no `birthDate`/
+  `nationality` on the `Person` block: that data doesn't exist in `content/`
+  today, the same reason this file's "Ideas not yet scoped" section below
+  already gives for not pursuing "youngest winner". New unit test coverage
+  in `tests/unit/jsonLd.test.ts` (both builders) plus e2e coverage in
+  `tests/e2e/mobile.spec.ts` (`/teams/brazil`'s exact JSON-LD type list
+  updated to include `SportsTeam`; a new `/players/lionel-messi` test
+  checks his `Person` block lists all eight Ballon d'Or wins). All 700 PDFs
+  regenerated and reverified clean (the four edited `.astro` files are PDF
+  sources for every player/team PDF). Full standing health check clean:
+  510/510 unit tests (up from 505, same 99.91%/99.42% coverage), 711 pages
+  built, no broken links/sitemap/precache/PDF drift, full cold-start `pnpm
+  test:e2e` 809/809 (8.4 min, up from 808 - the one new Messi test). See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail.
 
 ## Ideas not yet scoped as backlog
 
