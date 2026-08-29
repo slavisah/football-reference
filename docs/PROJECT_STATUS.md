@@ -13497,6 +13497,69 @@ concluded that page shape isn't the same kind of gap as a genuinely missing
 entity type, so it stays a "worth a deliberate look" idea rather than a
 concrete backlog item.
 
+### Stale `lastReviewed` fix for six content files - closed 2026-08-29 (twenty-eighth intensive run)
+
+`pnpm outdated` found nothing new (still just the blocked `typescript` 7
+entry). Rather than repeat the standing health check's own conclusion
+again, this run re-read `docs/ADDING_CONTENT.md`'s own content-authoring
+checklist against every `content/*.md` file's actual git history - an
+angle no prior run had checked - and found a real, previously-unnoticed
+violation of its own documented rule ("Update `lastReviewed` whenever you
+revise a page"): six of the fifteen content files had a `lastReviewed` date
+that **predated** a later commit that added genuine new editorial prose to
+that same file, which is self-contradictory - a page cannot have been
+"last reviewed" on a date before content that still appears on it today was
+even written.
+
+Specifically: `content/copa-america.md`, `content/fifa-world-cup.md`,
+`content/uefa-euro.md` and `content/uefa-nations-league.md` each gained a
+new "How it works" section on 2026-08-19 (see that entry above) but kept
+`lastReviewed: 2026-08-14`, five days earlier; `content/ballon-dor.md` and
+`content/golden-boot.md` each gained a new "Memorable moments" section on
+2026-08-26 (see that entry above) but also kept `lastReviewed: 2026-08-14`,
+twelve days earlier. Confirmed this wasn't an artifact of this repo's
+squash-merged git history (which does make some files' full commit log
+unreliable - `content/index.md`'s only visible commit is a "new file" diff
+containing years of already-reviewed prose, so it was deliberately left
+alone) by checking that these six files' relevant commits are genuine
+incremental diffs on top of stable, already-existing files, not a squash
+artifact.
+
+This bug is directly visible to readers: `data.lastReviewed` flows straight
+from `content/*.md` frontmatter into every page's `<References>`
+component's "Last reviewed: <date>" line (`CompetitionView.astro`,
+`src/lib/competition.ts`) with no other validation, and also feeds the
+`/teams/<slug>` and `/teams` pages' own "Last reviewed" line, which takes
+the max (most recent) `lastReviewed` across all four team-competition files
+(`src/pages/teams/[slug].astro`) - so the World Cup/EURO/Nations League
+staleness was silently understating every team profile page's freshness
+claim too, not just the four competition pages themselves.
+
+Fixed by bumping each file's `lastReviewed` to the date of its actual last
+substantive revision: `copa-america.md`/`fifa-world-cup.md`/`uefa-euro.md`/
+`uefa-nations-league.md` to `2026-08-19`; `ballon-dor.md`/`golden-boot.md`
+to `2026-08-26`. Also fixed one hardcoded e2e assertion that had baked in
+the old date (`tests/e2e/mobile.spec.ts`'s "shows the last reviewed date
+and source links" World Cup test, `time[datetime="2026-08-14"]` ->
+`"2026-08-19"`) - a search for every other hardcoded `lastReviewed` date
+string across `tests/` turned up no other instances needing the same fix.
+All 700 PDFs regenerated (every PDF's shared References section depends on
+this field, so this edit marks all of them stale, the same
+"every PDF regenerates" story every prior `docs/SOURCES.md`/frontmatter
+edit has had) and reverified clean with `pnpm check:pdfs`. Full standing
+health check clean: `pnpm lint` (0/0/0), `pnpm test` (510/510 unit,
+unchanged coverage), `pnpm build` (711 pages), `check:links`/`check:sitemap`/
+`check:precache`/`check:perf` all clean, full cold-start `pnpm test:e2e`,
+`pnpm dlx knip --no-config-hints` (same one confirmed false positive).
+
+**Left for a future pass:** same two environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). Worth noting
+for whoever picks up `content/index.md` next: its `lastReviewed:
+2026-07-23` predates its own only visible git commit (2026-08-16), an
+artifact of this repo's squash-merged PR history rather than a real
+staleness bug like the six above - left unchanged, but flagged here so a
+future run doesn't have to re-derive that reasoning from scratch.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

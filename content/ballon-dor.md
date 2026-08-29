@@ -4,7 +4,7 @@ slug: ballon-dor
 awardType: individual
 firstEdition: 1956
 lastCompletedEdition: 2025
-lastReviewed: 2026-08-14
+lastReviewed: 2026-08-26
 status: verified
 ---
 
