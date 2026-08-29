@@ -9,7 +9,9 @@ import {
   buildQuizJsonLd,
   buildRivalriesItemList,
   buildTeamProfileItemList,
+  buildTeamSportsTeamJsonLd,
   buildPlayerProfileItemList,
+  buildPlayerPersonJsonLd,
   buildPlayersDirectoryItemList,
   buildWebSiteJsonLd,
 } from '../../src/lib/jsonLd';
@@ -463,6 +465,60 @@ describe('buildTeamProfileItemList', () => {
   });
 });
 
+describe('buildTeamSportsTeamJsonLd', () => {
+  const profile: TeamProfile = {
+    id: 'germany',
+    displayName: 'Germany',
+    competitions: [
+      {
+        title: 'FIFA World Cup',
+        slug: 'world-cup',
+        appearances: [
+          { year: '1954', yearSort: 1954, role: 'Champion' },
+          { year: '1974', yearSort: 1974, role: 'Champion' },
+          { year: '2014', yearSort: 2014, role: 'Champion' },
+        ],
+      },
+      {
+        title: 'UEFA EURO',
+        slug: 'euro',
+        appearances: [
+          { year: '2016', yearSort: 2016, role: 'Other semifinalist' },
+          { year: '2020', yearSort: 2020, role: 'Runner-up' },
+        ],
+      },
+    ],
+    totalTitles: 3,
+    totalRunnerUps: 1,
+    totalSemifinals: 1,
+    totalFinals: 4,
+  };
+
+  it('produces a SportsTeam naming only the titles this team has actually won, not runner-up/semifinal results', () => {
+    const sportsTeam = buildTeamSportsTeamJsonLd(profile, { pageUrl: 'https://example.test/teams/germany/' });
+
+    expect(sportsTeam['@type']).toBe('SportsTeam');
+    expect(sportsTeam.name).toBe('Germany');
+    expect(sportsTeam.url).toBe('https://example.test/teams/germany/');
+    expect(sportsTeam.award).toEqual(['FIFA World Cup 1954', 'FIFA World Cup 1974', 'FIFA World Cup 2014']);
+  });
+
+  it("returns an empty award list for a team that has never won a tracked competition's title", () => {
+    const runnerUpOnly: TeamProfile = {
+      ...profile,
+      competitions: [
+        {
+          title: 'Copa América',
+          slug: 'copa-america',
+          appearances: [{ year: '2024', yearSort: 2024, role: 'Runner-up' }],
+        },
+      ],
+    };
+    const sportsTeam = buildTeamSportsTeamJsonLd(runnerUpOnly, { pageUrl: 'https://example.test/teams/colombia/' });
+    expect(sportsTeam.award).toEqual([]);
+  });
+});
+
 describe('buildPlayerProfileItemList', () => {
   const profile: PlayerProfile = {
     id: 'Gerd Müller',
@@ -549,6 +605,59 @@ describe('buildPlayerProfileItemList', () => {
       name: 'Nobody',
     });
     expect(itemList.itemListElement).toEqual([]);
+  });
+});
+
+describe('buildPlayerPersonJsonLd', () => {
+  const profile: PlayerProfile = {
+    id: 'Gerd Müller',
+    displayName: 'Gerd Müller',
+    awards: [
+      {
+        title: "Ballon d'Or",
+        slug: 'ballon-dor',
+        appearances: [{ year: '1970', yearSort: 1970, detail: 'West Germany · 29 December 1970' }],
+      },
+      {
+        title: 'FIFA World Cup Golden Boot',
+        slug: 'golden-boot',
+        appearances: [{ year: '1970', yearSort: 1970, detail: 'West Germany · 10 goals' }],
+      },
+    ],
+    totalAwards: 2,
+  };
+
+  it('produces a Person naming every award this player has actually won, as "<Award title> <Year>" strings', () => {
+    const person = buildPlayerPersonJsonLd(profile, { pageUrl: 'https://example.test/players/gerd-muller/' });
+
+    expect(person['@type']).toBe('Person');
+    expect(person.name).toBe('Gerd Müller');
+    expect(person.url).toBe('https://example.test/players/gerd-muller/');
+    expect(person.award).toEqual(["Ballon d'Or 1970", 'FIFA World Cup Golden Boot 1970']);
+  });
+
+  it('lists every appearance when a player has won the same award more than once', () => {
+    const multiWinner: PlayerProfile = {
+      ...profile,
+      awards: [
+        {
+          title: "Ballon d'Or",
+          slug: 'ballon-dor',
+          appearances: [
+            { year: '2009', yearSort: 2009, detail: '' },
+            { year: '2010', yearSort: 2010, detail: '' },
+          ],
+        },
+      ],
+    };
+    const person = buildPlayerPersonJsonLd(multiWinner, { pageUrl: 'https://example.test/players/x/' });
+    expect(person.award).toEqual(["Ballon d'Or 2009", "Ballon d'Or 2010"]);
+  });
+
+  it('returns an empty award list for a player with no awards', () => {
+    const empty: PlayerProfile = { ...profile, awards: [], totalAwards: 0 };
+    const person = buildPlayerPersonJsonLd(empty, { pageUrl: 'https://example.test/players/nobody/' });
+    expect(person.award).toEqual([]);
   });
 });
 

@@ -5,7 +5,7 @@ import References from '../../components/References.astro';
 import { buildAllCountryRecords, type CompetitionEditions, type CountryRecord } from '../../lib/compare';
 import { loadTeamCompetitions } from '../../lib/teamCompetitions';
 import { buildTeamProfile, teamProfileSlug } from '../../lib/teamProfile';
-import { buildTeamProfileItemList, type JsonLdObject } from '../../lib/jsonLd';
+import { buildTeamProfileItemList, buildTeamSportsTeamJsonLd, type JsonLdObject } from '../../lib/jsonLd';
 import type { SourceLink } from '../../lib/sources';
 import { absolutePageUrl, withBase } from '../../lib/url';
 
@@ -57,6 +57,7 @@ const jsonLd: JsonLdObject[] =
           pageUrl,
           name: `${profile.displayName} - competition appearances`,
         }),
+        buildTeamSportsTeamJsonLd(profile, { pageUrl }),
       ]
     : [];
 ---

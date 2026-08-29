@@ -318,6 +318,63 @@ export function buildPlayerProfileItemList(
 }
 
 /**
+ * A /players/<slug> page's player as a schema.org Person - a real named
+ * entity, distinct from buildPlayerProfileItemList()'s ItemList above (a
+ * ranked list of that entity's awards). Search engines can associate a
+ * Person block with a Knowledge Graph entry the way a generic ItemList
+ * never is, so the two blocks are complementary and both are emitted
+ * together, not one replacing the other. `award` lists exactly the awards
+ * this player has actually won ("<Award title> <Year>", chronological, one
+ * string per appearance) - the same facts the page's own <ol> already
+ * renders, no new computation. Deliberately no `birthDate`/`nationality`:
+ * that data doesn't exist anywhere in content/ today, and
+ * docs/ROADMAP.md's "youngest winner" backlog entry already explains why
+ * fabricating it from memory in an unattended run isn't safe to do.
+ */
+export function buildPlayerPersonJsonLd(
+  profile: PlayerProfile,
+  options: { pageUrl: string },
+): JsonLdObject {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: profile.displayName,
+    url: options.pageUrl,
+    award: profile.awards.flatMap((award) =>
+      award.appearances.map((appearance) => `${award.title} ${appearance.year}`),
+    ),
+  };
+}
+
+/**
+ * A /teams/<slug> page's national team as a schema.org SportsTeam - the
+ * team-profile counterpart of buildPlayerPersonJsonLd() above, same
+ * "complements the ItemList rather than replacing it" reasoning. `award`
+ * only lists this team's actual title wins ("<Competition title> <Year>"),
+ * filtered to `role === 'Champion'` appearances - a runner-up or semifinal
+ * finish is a result, not an award, and this filtered list's length already
+ * always equals `profile.totalTitles` (buildTeamProfile()'s own count from
+ * the same appearances), so this can never disagree with what the page
+ * already shows.
+ */
+export function buildTeamSportsTeamJsonLd(
+  profile: TeamProfile,
+  options: { pageUrl: string },
+): JsonLdObject {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'SportsTeam',
+    name: profile.displayName,
+    url: options.pageUrl,
+    award: profile.competitions.flatMap((competition) =>
+      competition.appearances
+        .filter((appearance) => appearance.role === 'Champion')
+        .map((appearance) => `${competition.title} ${appearance.year}`),
+    ),
+  };
+}
+
+/**
  * The /players directory (an A-Z index of every Ballon d'Or/Golden Boot
  * winner, buildAllPlayerProfiles()) as an ItemList - the individual-award
  * counterpart of the /teams directory's buildCountryRecordsItemList() block,
