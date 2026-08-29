@@ -13246,6 +13246,79 @@ on record suggests they are already close to that range by construction
 (`{name} - The Ultimate Football Reference`-style titles, per
 `BaseLayout.astro`'s `fullTitle`).
 
+### Croatian translation audit: factual sync (all six families) plus prose quality for the three families never proofread this way - closed 2026-08-29 (twenty-fifth intensive run)
+
+`pnpm outdated` found nothing new (still just the blocked `typescript` 7
+entry, re-confirmed), and `pnpm dlx knip --no-config-hints` matched every
+prior run's baseline exactly (the same one confirmed false positive). With
+the original backlog (`docs/ROADMAP.md`) still showing every competition/
+award page family, page shape, and requirement as live, this run picked a
+genuinely new angle: the twenty-fourth run's own note that "every prior
+translation-related run audited factual sync between languages, not prose
+quality" only got as far as proofreading three of the six competition/
+award families (Nations League, Ballon d'Or, Golden Boot) for grammar - and
+no run, including that one, had ever checked the hand-translated Croatian
+"How it works"/"Format milestones"/"Historical format note"/"Key facts"/
+"Memorable moments"/"Editorial notes" prose blocks in the six `hr/
+competitions/*.astro` index pages for **factual sync** against their
+English `content/*.md` source paragraph-by-paragraph (as opposed to the
+many existing audits that verify the underlying table data itself, which
+both languages already share from one `loadCompetition()` call and can
+never drift).
+
+Read all six English `content/*.md` files and all six `hr/competitions/
+*.astro` index pages in full and cross-checked every hand-translated note
+section against its English source, sentence by sentence: FIFA
+World Cup (5 "How it works" + 5 "Format milestones" + 6 "Memorable
+moments" + 3 "Editorial notes" bullets), UEFA EURO (4 + 1 "Historical
+format note" paragraph + 6), UEFA Nations League (4 + 4 "Key facts" + 5),
+Copa América (3 + 5), Ballon d'Or (4 + 6 + 5 "Notes"), and Golden Boot (4 +
+3 "World Cup notes" + 4 "World Cup memorable moments" + 2 "EURO notes" + 4
+"EURO memorable moments") - every number, year, score, and named fact
+(team counts, host-expansion years, tie-break player counts, goal tallies)
+matched its English source exactly. Also confirmed each of the six
+edition-page route trees' own `CROATIAN_MOMENTS`/`WORLD_CUP_MOMENTS`/
+`EURO_MOMENTS` constants (`hr/competitions/{world-cup,euro,copa-america,
+nations-league,ballon-dor,golden-boot/{world-cup,euro}}/[year].astro`) are
+byte-identical to the already-verified index-page "Nezaboravni trenuci"
+bullets they were copied from, so no separate edition-page audit pass was
+needed - the two copies cannot have silently diverged.
+
+Extended the twenty-fourth run's prose-quality proofreading pass (grammar,
+declension, terminology - not facts) to the three families it never
+covered - FIFA World Cup, UEFA EURO, and Copa América - across the same
+six index pages' full hand-translated note text (not just the "Memorable
+moments" sections). No grammar, spelling, or declension errors found,
+including the trickier cases: foreign personal-name declension in genitive
+case (`hr/competitions/euro.astro`'s "Antonína Panenke", `hr/competitions/
+ballon-dor.astro`'s "Lev Jašin" transliteration), gendered verb agreement
+with country-name subjects standing in for national teams (`hr/
+competitions/copa-america.astro`'s "Čile je osvojio..." - Čile takes
+masculine agreement in Croatian - and multi-subject plural agreement in
+`hr/competitions/world-cup.astro`'s "Argentina i Francuska odigrale su
+finale..."), and numeral-noun agreement (`hr/competitions/world-cup.astro`'s
+"tri Svjetska prvenstva").
+
+**Net result: zero discrepancies found**, factual or grammatical, across
+all six families - no `content/*.md` or `.astro` file needed a change.
+Full standing health check clean: `pnpm lint` (0/0/0 across 166 files),
+`pnpm test` (505/505 unit, 99.91%/99.42% coverage unchanged), `pnpm build`
+(711 pages), `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`,
+within budget), `check:pdfs` (700 PDFs, no regeneration needed since no
+content changed). Full cold-start `pnpm test:e2e` also run (see this
+file's "How to run" section for the `PW_EXECUTABLE_PATH=/opt/pw-browsers/
+chromium` fallback this environment needs).
+
+**Left for a future pass:** same two environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). This closes
+out the last un-audited angle on the six competition/award families'
+Croatian text that this run's own research turned up; no further concrete
+translation-quality gap is currently known. A future run is back to the
+same standing choice every recent "clean audit" run has faced: repeat the
+standing health check, or find another genuinely new angle the way this
+run and the twenty-fourth did.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
