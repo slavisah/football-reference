@@ -13625,6 +13625,86 @@ a judgment call, not a settled rule - worth revisiting if a future run finds
 a schema.org pattern that fits a multi-ranking page better than leaving it
 as a bare `WebPage` (the BaseLayout default, implicit rather than emitted).
 
+### `check:lighthouse` widened to Croatian pages - closed 2026-08-29 (thirtieth intensive run)
+
+`pnpm outdated` found nothing new (still just the blocked `typescript` 7
+entry), and `pnpm dlx knip --no-config-hints` matched every prior run's
+baseline exactly (the same one confirmed false positive,
+`scripts/test-preview-server.mjs`). A fresh read of `docs/WEBSITE_REQUIREMENTS.md`
+against the live route tree found nothing missing either - every required and
+nice-to-have capability it lists is live, matching every recent run's own
+re-check.
+
+`PAGES_TO_AUDIT` in `scripts/check-lighthouse.mjs` had grown across the
+sixteenth-to-twenty-first runs to cover every distinct page *shape* on the
+site - but only in English, plus one solitary Croatian page (`hr/records`,
+added because it was the single heaviest *built* page on the whole site).
+Every other `hr/*` route - all six landing pages, every edition-page family,
+`/compare`, `/compare-players`, `/glossary`, `/quiz`, the player/team profile
+pages, the `/players`/`/teams` directory indexes, and `/about/sources` - had
+never once been audited in Croatian, even though these are the exact same
+Astro components rendering longer Croatian strings (diacritics, longer
+declined words for headings, labels and column headers) that could in
+principle wrap, overflow or shift layout differently than their English
+counterparts, the same reasoning `tests/e2e/` already applies when it runs
+its own English/Croatian pairs of layout-overflow and WCAG checks side by
+side.
+
+Added one Croatian entry per remaining shape (12 pages, `PAGES_TO_AUDIT`
+25 -> 37), picking the heaviest candidate per `check:perf` output wherever
+more than one existed within a shape, the same way every prior "widen
+check:lighthouse" run has:
+
+- `hr/competitions/copa-america` (landing page shape) - measuring it turned
+  up a small surprise: at 273.3 KB it is the single heaviest *landing* page
+  on the entire site, English included (the English sibling is 270.8 KB;
+  Croatian's slightly longer prose accounts for the gap).
+- `hr/competitions/golden-boot` (the award's own hand-built two-table
+  layout, distinct from `CompetitionView.astro`).
+- `hr/competitions/copa-america/2024` (edition-page shape).
+- `hr/compare`, `hr/compare-players`, `hr/glossary`, `hr/quiz`.
+- `hr/players/lionel-messi` (profile shape, matching the English pick already
+  used for its heaviest-award-list property), `hr/teams/argentina`.
+- `hr/players`, `hr/teams` (directory-index shape).
+- `hr/about/sources`.
+
+All 37 pages scored a perfect 1.00 across every category (performance,
+accessibility, best-practices, SEO); home's pre-existing 0.99 performance
+score is unchanged and unrelated to this run's edit. No code or content
+change was needed anywhere else - this was purely an audit-coverage gap, not
+a bug the wider net caught.
+
+Also hit, and worked around, an environment-specific browser-launch snag on
+both `check:lighthouse` and a from-scratch `pnpm test:e2e`: this container's
+`@playwright/test` looks for a `chromium_headless_shell` binary by default,
+which isn't installed here - only the full `chromium-1194` build under
+`/opt/pw-browsers/`. `playwright.config.ts` already reads a
+`PW_EXECUTABLE_PATH` override (documented since the twenty-fourth run's
+entry), so both commands just need
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` exported first; without it
+both fail at browser launch before running a single check, which reads
+identically to a real failure if the reporter output is truncated -
+worth remembering for a future run that sees an unexplained `test:e2e` exit
+code 1 with no failing-test summary attached.
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints
+across 167 files), `pnpm test` (513/513 unit, unchanged, coverage unchanged
+at 99.91%/99.42%), `pnpm build` (711 pages), `check:links` (715 pages)/
+`check:sitemap` (710 entries)/`check:precache` (37 URLs)/`check:perf`
+(heaviest page still `hr/records`, within budget) all clean, `check:pdfs`
+(700 PDFs, unaffected - `scripts/check-lighthouse.mjs` isn't a PDF source),
+full cold-start `pnpm test:e2e` (809/809, `PW_EXECUTABLE_PATH` set as
+above).
+
+**Left for a future pass:** same two environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness).
+`check:lighthouse` now has at least one entry per page shape in both
+languages - a future run could still go further (auditing every remaining
+landing/edition page pair, the way `check:perf`/`check:links`/`check:sitemap`
+already check every built page unconditionally) if repeat clean audits ever
+stop finding anything, the same "diminishing returns" note the tenth and
+fourteenth runs left about the standing health check itself.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

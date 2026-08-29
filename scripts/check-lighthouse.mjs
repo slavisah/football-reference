@@ -96,6 +96,20 @@ const CDP_PORT = 9223;
 // edition pages, directories, profiles, comparison tools, the quiz) already
 // had at least one entry above; this was the only page family with zero
 // Lighthouse coverage of its own layout.
+//
+// The thirtieth intensive run found the next real gap: every page shape had
+// an English entry, but only one Croatian page (`hr/records`) was ever
+// audited - every other `hr/*` route (landing pages, edition pages,
+// directories, profiles, the comparison tools, the quiz, `/about/sources`)
+// had zero Lighthouse coverage of its own layout, even though the same
+// Astro components render longer Croatian strings (diacritics, longer
+// declined words) that could in principle overflow or shift layout
+// differently than their English counterparts. Added one Croatian entry per
+// remaining shape (12 pages), picking the heaviest option per `check:perf`
+// where more than one candidate existed the way every prior "widen
+// check:lighthouse" run has:
+// `hr/competitions/copa-america` (273.3 KB) is in fact the single heaviest
+// *landing* page on the whole site, EN included.
 export const PAGES_TO_AUDIT = [
   { label: 'home', path: '/' },
   { label: 'records (heaviest page family, EN)', path: '/records/' },
@@ -131,6 +145,24 @@ export const PAGES_TO_AUDIT = [
   { label: '/players directory index', path: '/players/' },
   { label: '/teams directory index', path: '/teams/' },
   { label: '/about/sources (long external-link list, own page shape)', path: '/about/sources/' },
+  {
+    label: 'hr/competitions/copa-america landing page (heaviest landing page on the site, EN included)',
+    path: '/hr/competitions/copa-america/',
+  },
+  {
+    label: 'hr/competitions/golden-boot landing page (own two-table layout, Croatian)',
+    path: '/hr/competitions/golden-boot/',
+  },
+  { label: 'hr/competitions/copa-america/2024 edition page', path: '/hr/competitions/copa-america/2024/' },
+  { label: 'hr/compare', path: '/hr/compare/' },
+  { label: 'hr/compare-players', path: '/hr/compare-players/' },
+  { label: 'hr/glossary', path: '/hr/glossary/' },
+  { label: 'hr/quiz', path: '/hr/quiz/' },
+  { label: 'hr player profile (lionel-messi)', path: '/hr/players/lionel-messi/' },
+  { label: 'hr team profile (argentina)', path: '/hr/teams/argentina/' },
+  { label: 'hr/players directory index', path: '/hr/players/' },
+  { label: 'hr/teams directory index', path: '/hr/teams/' },
+  { label: 'hr/about/sources', path: '/hr/about/sources/' },
 ];
 
 const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo'];
