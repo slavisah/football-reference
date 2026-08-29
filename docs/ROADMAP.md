@@ -433,6 +433,23 @@ standing quirks.
   the new script as a `pnpm` command). See `docs/PROJECT_STATUS.md`'s
   matching entry for detail.
 
+- **Stale `lastReviewed` fix for six content files**: closed 2026-08-29
+  (twenty-eighth intensive run) - `docs/ADDING_CONTENT.md` says "Update
+  `lastReviewed` whenever you revise a page," but six of the fifteen
+  `content/*.md` files had a `lastReviewed` date that predated a later
+  commit which added real new editorial prose still on the page today
+  (`copa-america.md`/`fifa-world-cup.md`/`uefa-euro.md`/
+  `uefa-nations-league.md`'s 2026-08-19 "How it works" sections;
+  `ballon-dor.md`/`golden-boot.md`'s 2026-08-26 "Memorable moments"
+  sections) - a previously-unaudited angle no prior health check had
+  checked. This is visible to readers (the "Last reviewed" line on every
+  page, and the `/teams` pages' max-across-competitions version of it) and
+  a `docs/ADDING_CONTENT.md` rule violation, not just a cosmetic nit. Fixed
+  all six dates, one stale hardcoded e2e assertion, regenerated and
+  reverified all 700 PDFs. See `docs/PROJECT_STATUS.md`'s matching entry
+  for detail, including why `content/index.md`'s own out-of-order date was
+  deliberately left alone (a squash-merge artifact, not the same bug).
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned
