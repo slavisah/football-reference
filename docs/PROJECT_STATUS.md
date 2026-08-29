@@ -13560,6 +13560,61 @@ artifact of this repo's squash-merged PR history rather than a real
 staleness bug like the six above - left unchanged, but flagged here so a
 future run doesn't have to re-derive that reasoning from scratch.
 
+### CollectionPage schema for directory/landing pages - closed 2026-08-29 (twenty-ninth intensive run)
+
+`pnpm outdated` found nothing new (still just the blocked `typescript` 7
+entry). Rather than run the standing health check's own repeat conclusion an
+eighth time, this run picked up the idea the twenty-sixth run first raised
+and the twenty-seventh and twenty-eighth runs both explicitly declined to
+pursue (see this file's two "not the same kind of gap"/"stays a 'worth a
+deliberate look' idea" notes above): the `/teams` and `/players` directory
+indexes and all six competition/award landing pages
+(`fifa-world-cup`/`uefa-euro`/`uefa-nations-league`/`copa-america`/
+`ballon-dor`/`golden-boot`) render an `ItemList` as their only
+page-describing structured data, when schema.org's more specific shape for
+"this entire page is a list of things" is `CollectionPage` with that
+`ItemList` as its `mainEntity` - the gap the earlier runs correctly
+identified but left unscoped.
+
+Added `buildCollectionPageJsonLd()` (`src/lib/jsonLd.ts`) - takes one
+`ItemList` object (or an array of them, for `golden-boot.astro`'s two tables:
+World Cup and EURO top scorers both belong to the one page, so `mainEntity`
+takes an array there) plus the same `{ pageUrl, name }` the inner `ItemList`
+builder already received, and returns a `CollectionPage` node wrapping it.
+Each inner `ItemList`'s own now-redundant `"@context"` key is stripped before
+nesting (a nested JSON-LD node keeps its `"@type"` - a consumer still needs
+to know what kind of thing `mainEntity` is - but `"@context"` is
+document-level and doesn't belong repeated on a child). Wired into all 16
+pages (`/teams`, `/players` and the six competition/award pages, EN + HR):
+each site replaces its own `buildXxxItemList(...)` call, previously pushed
+straight into the page's `jsonLd` array, with
+`buildCollectionPageJsonLd(buildXxxItemList(...), { pageUrl, name })` using
+the exact same `pageUrl`/`name` values already computed for that page - no
+new facts, no new IDs, purely a more specific wrapper around data every one
+of these pages already publishes. `/records`, `/compare` and
+`/compare-players` were deliberately left unwrapped, matching the scope the
+twenty-sixth run's own note drew: those pages mix multiple independent
+rankings/comparisons rather than being a single list the whole page *is*,
+so `CollectionPage` doesn't fit them the same way.
+
+Added three new unit tests (`tests/unit/jsonLd.test.ts`) covering the single-
+`ItemList` shape, the optional `description` field, and the array-`mainEntity`
+shape `golden-boot.astro` needs. Full standing health check clean: `pnpm
+lint` (0 errors/warnings/hints), `pnpm test` (513/513 unit, three new),
+`pnpm build` (711 pages), `check:links` (715 pages)/`check:sitemap` (710
+entries)/`check:precache` (37 URLs) all clean, `check:perf` (heaviest page
+still `hr/records`, well within budget - the new JSON-LD adds a few hundred
+bytes to the twelve competition pages, nowhere near the 510 KB budget). All
+700 PDFs regenerated (every one of the twelve edited competition-page PDFs
+had gone stale, per `check:pdfs`) and reverified clean.
+
+**Left for a future pass:** same two environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). The
+`/records`/`/compare`/`/compare-players` "not the same shape" call above is
+a judgment call, not a settled rule - worth revisiting if a future run finds
+a schema.org pattern that fits a multi-ranking page better than leaving it
+as a bare `WebPage` (the BaseLayout default, implicit rather than emitted).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

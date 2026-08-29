@@ -26,6 +26,7 @@ import { WORLD_CUP_HOST_COORDINATES, HOST_REGION_ORDER } from '../../../lib/host
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
   buildChampionsItemList,
+  buildCollectionPageJsonLd,
   buildLatestEditionSportsEvent,
   type JsonLdObject,
 } from '../../../lib/jsonLd';
@@ -62,8 +63,12 @@ const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 const title = 'FIFA Svjetsko prvenstvo';
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const championsName = `${title} - prvaci po broju naslova`;
 const jsonLd = [
-  buildChampionsItemList(data.champions, { pageUrl, name: `${title} - prvaci po broju naslova` }),
+  buildCollectionPageJsonLd(buildChampionsItemList(data.champions, { pageUrl, name: championsName }), {
+    pageUrl,
+    name: championsName,
+  }),
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 

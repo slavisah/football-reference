@@ -4,7 +4,12 @@ import CompetitionView from '../../components/CompetitionView.astro';
 import { loadCompetition } from '../../lib/competition';
 import { buildEditionLinks, buildEditionProfiles } from '../../lib/editionProfile';
 import { absolutePageUrl, withBase } from '../../lib/url';
-import { buildChampionsItemList, buildLatestEditionSportsEvent, type JsonLdObject } from '../../lib/jsonLd';
+import {
+  buildChampionsItemList,
+  buildCollectionPageJsonLd,
+  buildLatestEditionSportsEvent,
+  type JsonLdObject,
+} from '../../lib/jsonLd';
 
 const data = await loadCompetition('ballon-dor', {
   editionsHeading: 'Winners',
@@ -20,8 +25,12 @@ const yearLinks = buildEditionLinks(buildEditionProfiles(data.editions), '/compe
 // here unchanged. `data.title` ("Men's Ballon d'Or") is unambiguous for this
 // page, unlike golden-boot.astro's two same-titled loads below.
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const championsName = `${data.title} - Most awards`;
 const jsonLd = [
-  buildChampionsItemList(data.champions, { pageUrl, name: `${data.title} - Most awards` }),
+  buildCollectionPageJsonLd(buildChampionsItemList(data.champions, { pageUrl, name: championsName }), {
+    pageUrl,
+    name: championsName,
+  }),
   buildLatestEditionSportsEvent(data.editions, data.title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 ---

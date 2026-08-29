@@ -25,6 +25,7 @@ import { NATIONS_LEAGUE_HOST_COORDINATES } from '../../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
   buildChampionsItemList,
+  buildCollectionPageJsonLd,
   buildLatestEditionSportsEvent,
   type JsonLdObject,
 } from '../../../lib/jsonLd';
@@ -48,8 +49,12 @@ const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 const title = 'UEFA Liga nacija';
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const championsName = `${title} - prvaci po broju naslova`;
 const jsonLd = [
-  buildChampionsItemList(data.champions, { pageUrl, name: `${title} - prvaci po broju naslova` }),
+  buildCollectionPageJsonLd(buildChampionsItemList(data.champions, { pageUrl, name: championsName }), {
+    pageUrl,
+    name: championsName,
+  }),
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 

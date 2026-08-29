@@ -502,3 +502,37 @@ export function buildWebSiteJsonLd(options: {
     inLanguage,
   };
 }
+
+/**
+ * Wraps a directory/landing page's own ItemList(s) as the `mainEntity` of a
+ * CollectionPage node - the more specific schema.org shape for a page whose
+ * entire content *is* a list of things (the `/teams`/`/players` A-Z
+ * directories, and each of the six competition/award landing pages' champions
+ * ranking) rather than a single entity the page happens to also list. Left
+ * open as an idea across three prior runs (see docs/PROJECT_STATUS.md's
+ * "CollectionPage" notes) before this one scoped and built it. `mainEntity`
+ * accepts either one ItemList or an array (golden-boot.astro's two tables -
+ * World Cup and EURO top scorers - both belong to the one page). Strips each
+ * inner object's own "@context"/"@type": 'ItemList' pairing down to just the
+ * "@context" removal - nesting keeps its own "@type" (still 'ItemList') since
+ * that's what tells a consumer what kind of mainEntity it's looking at; only
+ * "@context" is document-level and doesn't belong repeated on a nested node.
+ */
+export function buildCollectionPageJsonLd(
+  mainEntity: JsonLdObject | JsonLdObject[],
+  options: { pageUrl: string; name: string; description?: string },
+): JsonLdObject {
+  const { pageUrl, name, description } = options;
+  const stripContext = (item: JsonLdObject): JsonLdObject => {
+    const { '@context': _context, ...rest } = item;
+    return rest;
+  };
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name,
+    url: pageUrl,
+    ...(description ? { description } : {}),
+    mainEntity: Array.isArray(mainEntity) ? mainEntity.map(stripContext) : stripContext(mainEntity),
+  };
+}

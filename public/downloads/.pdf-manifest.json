@@ -17,7 +17,7 @@
     "src/components/PodiumCards.astro": "3380e418f37cd63e8bd3ea649d09b5672826fd3d3bba195006381863aca17d2b",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
-    "src/pages/competitions/world-cup.astro": "2c776e549faa7558336d2214e550a07b57d6cca6b19c2e1f35f726f101456524"
+    "src/pages/competitions/world-cup.astro": "e46d0e6ef8d7ffb03f57b40c792560e8a9d927c27bb9ab0953907dc52ee2de1e"
   },
   "euro": {
     "content/uefa-euro.md": "a13415cb540fce511ceaad043cec112a7a49f37c0914e5173e4b334252098d0f",
@@ -36,7 +36,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
-    "src/pages/competitions/euro.astro": "da0f70a4ffb15040fc100651eac8644a8524d16484e7b35c4d4994092d7a96f7"
+    "src/pages/competitions/euro.astro": "782f67e1eb4b67861acb7387b578302f5c5ba8f3ab7a0316e683b106208cc78a"
   },
   "nations-league": {
     "content/uefa-nations-league.md": "b0fe558ac87eb0d5e39400c2dbd709d0e94e12ae9505a02c02a50209cb393141",
@@ -55,7 +55,7 @@
     "src/components/PodiumCards.astro": "3380e418f37cd63e8bd3ea649d09b5672826fd3d3bba195006381863aca17d2b",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
-    "src/pages/competitions/nations-league.astro": "6a5222bab98f85e8539e1e7679dfcf80d233e7d5c4168638c4f2c8f24d3d58c2"
+    "src/pages/competitions/nations-league.astro": "e3b1147594c52cad9467389944971416ea32262fd908d90ea0f92a7be488c5f9"
   },
   "copa-america": {
     "content/copa-america.md": "650060f29185ba5671baed1a4e709a91d848d691fb2486e29af4dd76b6b67977",
@@ -74,7 +74,7 @@
     "src/components/PodiumCards.astro": "3380e418f37cd63e8bd3ea649d09b5672826fd3d3bba195006381863aca17d2b",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
-    "src/pages/competitions/copa-america.astro": "19f9da4ff0c2745f1c7674f36a76c0162442abd427e2d249faa276c7dc76ddf3"
+    "src/pages/competitions/copa-america.astro": "5aff5feb6480a2269ee4428835947631272497163685181fa7f92e592eefbf23"
   },
   "ballon-dor": {
     "content/ballon-dor.md": "28c46db712b5b59651b027e2dc49675c7933713a5693470188f5dcfad2c8b341",
@@ -90,7 +90,7 @@
     "src/components/ChampionsSummary.astro": "2809a09ed5528dc1236fecaebc41bd3ff6f78881732cf9f8ebb367588337b3de",
     "src/components/EditorialNotes.astro": "47c2c11227600fb655f75e55f4e3d887eaf4082836013d83c881aba543b283f8",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/competitions/ballon-dor.astro": "a0802838d66f1fe41e689c645845652ef7d81bce7962892a8b20c1b478e46aeb"
+    "src/pages/competitions/ballon-dor.astro": "5318b0b8d340ce77448be309bc42ce46c9d18351629b05ba24f1a1c11e416730"
   },
   "golden-boot": {
     "content/golden-boot.md": "6894defb1687f47d4ef2e3863d670dd9c90b2e8c66e7fbb653eb155213b6df05",
@@ -105,7 +105,7 @@
     "src/components/ChampionsSummary.astro": "2809a09ed5528dc1236fecaebc41bd3ff6f78881732cf9f8ebb367588337b3de",
     "src/components/EditorialNotes.astro": "47c2c11227600fb655f75e55f4e3d887eaf4082836013d83c881aba543b283f8",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/competitions/golden-boot.astro": "7a5045cb6ce07dff94257b12f60556eeef605b7856c70ae5c353f0e0fe998690"
+    "src/pages/competitions/golden-boot.astro": "84c0c76425c9d74f813687319fd04b55b305e5f1851ddbab86eff595ae9d03be"
   },
   "records": {
     "content/fifa-world-cup.md": "90494f8a0823d7247ee79212f0b77b46b2d5227bb92da4eb60f22cbb8286e5a1",
@@ -178,7 +178,7 @@
     "src/components/PodiumCards.astro": "3380e418f37cd63e8bd3ea649d09b5672826fd3d3bba195006381863aca17d2b",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
-    "src/pages/hr/competitions/world-cup.astro": "d9361d852f0b494e92c9cf24b35c22e1db91fee8d9e0e58ba6d8e79021f9b3f7"
+    "src/pages/hr/competitions/world-cup.astro": "273ebafe97e823bd21a37d348ea2d34d1c5952573552165df7fd6e3aabe3b32c"
   },
   "euro-hr": {
     "content/uefa-euro.md": "a13415cb540fce511ceaad043cec112a7a49f37c0914e5173e4b334252098d0f",
@@ -196,7 +196,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
-    "src/pages/hr/competitions/euro.astro": "e2071d73388fdb380233800b1cd96593a6101047f8f888116a21e533b636ac60"
+    "src/pages/hr/competitions/euro.astro": "eb2caf307a51b593523960c7b6117c967a6d5f5d7d424d2061cc503510825e4f"
   },
   "nations-league-hr": {
     "content/uefa-nations-league.md": "b0fe558ac87eb0d5e39400c2dbd709d0e94e12ae9505a02c02a50209cb393141",
@@ -214,7 +214,7 @@
     "src/components/PodiumCards.astro": "3380e418f37cd63e8bd3ea649d09b5672826fd3d3bba195006381863aca17d2b",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
-    "src/pages/hr/competitions/nations-league.astro": "d15b3879435c02518acfaa92bcb741e0b4bbba38691619f31fab9d7dfc81d3c8"
+    "src/pages/hr/competitions/nations-league.astro": "e44a716efda98d030001c2c4a85172dc67c2e378ca570f80ea92cb85548c9cb6"
   },
   "copa-america-hr": {
     "content/copa-america.md": "650060f29185ba5671baed1a4e709a91d848d691fb2486e29af4dd76b6b67977",
@@ -232,7 +232,7 @@
     "src/components/PodiumCards.astro": "3380e418f37cd63e8bd3ea649d09b5672826fd3d3bba195006381863aca17d2b",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
-    "src/pages/hr/competitions/copa-america.astro": "d8aba6bb8ded4993f6009502c65bede746664e9e05bb700ae66e50b50db980ef"
+    "src/pages/hr/competitions/copa-america.astro": "b8f998cf211c047bd6d7b338ad7231971a1eb72ef77f6ea31be3d55826798962"
   },
   "ballon-dor-hr": {
     "content/ballon-dor.md": "28c46db712b5b59651b027e2dc49675c7933713a5693470188f5dcfad2c8b341",
@@ -247,7 +247,7 @@
     "src/components/ChampionsSummary.astro": "2809a09ed5528dc1236fecaebc41bd3ff6f78881732cf9f8ebb367588337b3de",
     "src/components/EditorialNotes.astro": "47c2c11227600fb655f75e55f4e3d887eaf4082836013d83c881aba543b283f8",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/hr/competitions/ballon-dor.astro": "808244fd200160a4586f2a4cea9812a099245d704962c4ce1b754caecddf5cba"
+    "src/pages/hr/competitions/ballon-dor.astro": "00568981b42c0d6c3e236198060cdebf6af6e16da35568d50a66a2f7e789f076"
   },
   "golden-boot-hr": {
     "content/golden-boot.md": "6894defb1687f47d4ef2e3863d670dd9c90b2e8c66e7fbb653eb155213b6df05",
@@ -262,7 +262,7 @@
     "src/components/ChampionsSummary.astro": "2809a09ed5528dc1236fecaebc41bd3ff6f78881732cf9f8ebb367588337b3de",
     "src/components/EditorialNotes.astro": "47c2c11227600fb655f75e55f4e3d887eaf4082836013d83c881aba543b283f8",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/hr/competitions/golden-boot.astro": "b5a3764d790afd4f6c0f0e656c327dc7e6f8d05daa0f00c996dfa7d4ec3d402c"
+    "src/pages/hr/competitions/golden-boot.astro": "1b4e839cb28fa516a566055f6d4763bee5cfacef01d1ce465edbea4cb468e52f"
   },
   "records-hr": {
     "content/fifa-world-cup.md": "90494f8a0823d7247ee79212f0b77b46b2d5227bb92da4eb60f22cbb8286e5a1",
