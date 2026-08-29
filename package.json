@@ -16,6 +16,7 @@
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install --with-deps chromium",
     "build:pdfs": "node scripts/generate-pdfs.mjs",
+    "generate:og-image": "node scripts/generate-og-image.mjs",
     "check:pdfs": "node scripts/check-pdf-freshness.mjs",
     "check:perf": "node scripts/check-page-weight.mjs",
     "check:links": "node scripts/check-internal-links.mjs",
@@ -33,6 +34,7 @@
     "@types/node": "^26.4.0",
     "@vitest/coverage-v8": "4.1.11",
     "lighthouse": "^13.4.1",
+    "sharp": "0.35.4",
     "typescript": "^5.9.3",
     "vitest": "^4.1.11"
   },

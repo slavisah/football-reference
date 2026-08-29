@@ -13415,6 +13415,88 @@ landing pages are more naturally `CollectionPage`/`ItemList` shapes than a
 single entity, so they're not the same kind of gap, but worth a deliberate
 look rather than assuming this run's fix was the only one.
 
+### Dedicated Open Graph/Twitter Card image (1200x630) - added 2026-08-29 (twenty-seventh intensive run)
+
+`pnpm outdated` found nothing new (still just the blocked `typescript` 7
+peer-dependency ceiling). Before looking for a new gap, this run also
+spot-checked every competition/award file's `lastCompletedEdition`
+front-matter field against the real-world record (FIFA World Cup 2026,
+UEFA EURO 2024, Copa América 2024, UEFA Nations League 2024-25, Ballon d'Or
+2025) - all five already match, no content gap found there.
+
+The 2026-08-01 SEO-essentials entry (this file, above) that first added
+`og:image`/`twitter:image` meta tags made a deliberate, explicit tradeoff at
+the time: point both at the existing square `icons/icon-512.png` PWA icon
+"rather than requiring new per-page social images." That entry's own wording
+only ruled out *per-page* images, not a single dedicated *site-wide* one -
+and a square 512x512 icon is a genuinely bad fit for the ~1.91:1 aspect
+ratio essentially every link-unfurl surface expects (Slack, Discord,
+iMessage, and X/Twitter's `summary_large_image` card all crop or letterbox a
+square image awkwardly), so this was a real, still-open gap rather than
+re-litigating a settled decision.
+
+Added `scripts/generate-og-image.mjs` (wired up as `pnpm generate:og-image`,
+matching every other `scripts/*.mjs` file's convention of a corresponding
+`package.json` script) - a one-time/on-demand generator, not a build step,
+the same way the PWA icons themselves are static committed files rather than
+generated on every build. It renders one 1200x630 SVG - the exact ball mark
+from `public/favicon.svg`, scaled up and reused via a small `ballMark()`
+helper rather than redrawn by hand so the two stay visually identical, the
+site name in two lines, a one-line tagline, and a two-line list of all six
+competition/award families - on a gradient built from `global.css`'s own
+`--light-accent`/`--light-text` tokens, then rasterizes it to
+`public/og-image.png` with `sharp`. `sharp` was already present as a
+transitive dependency of Astro's own image pipeline (confirmed importable
+from `node_modules/.pnpm` before relying on it) but not hoisted to a
+top-level import path, so it's now an explicit devDependency pinned to the
+exact version already resolved (`0.35.4`) rather than a fragile deep-import.
+The tagline lines use SVG's `textLength`/`lengthAdjust="spacingAndGlyphs"` to
+pin their rendered width exactly to the safe column width, rather than
+guessing a font-size that happens to fit - the first draft (one long
+tagline line, no `textLength`) visibly overflowed past the ball mark and off
+the right edge when actually rendered and inspected, which is what led to
+this fix.
+
+`BaseLayout.astro`'s `ogImageURL` now points at `/og-image.png` instead of
+`/icons/icon-512.png`, plus two new meta tags, `og:image:width="1200"` and
+`og:image:height="630"` (a best practice that lets consumers size the
+preview without fetching the image first), and `twitter:card` upgraded from
+`summary` (small square thumbnail) to `summary_large_image` (full-width
+preview) now that there's a real large image worth showing at that size.
+`tests/e2e/mobile.spec.ts`'s existing Open Graph/Twitter Card assertions on
+the World Cup page updated to match the new URL and card type, plus new
+assertions for the two `og:image` dimension tags and `twitter:image`.
+`src/lib/offlineCache.ts`'s PWA precache list was deliberately left
+unchanged - `og-image.png` is only ever referenced from `<meta>` tags read
+by external link-unfurl bots, never rendered inside the app UI itself, so an
+offline reader has no reason to need it cached.
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints
+across 167 files), `pnpm test` (510/510 unit, unchanged coverage), `pnpm
+build` (711 pages), `check:links` (715 pages), `check:sitemap` (710
+entries), `check:precache` (37 URLs - unchanged, by design per above),
+`check:perf` (heaviest page still `hr/records`, within budget), `check:pdfs`
+(700 PDFs, all still fresh - `BaseLayout.astro` isn't a PDF source file for
+any page family, so this edit doesn't mark any PDF stale, unlike the
+twenty-sixth run's `.astro`-page-body edit), full cold-start `pnpm test:e2e`
+(809/809, 8.3 min, no count change - only existing assertions were updated),
+`check:lighthouse` (all 25 pages still a perfect 1.00/1.00/1.00/1.00 - the
+new image adds ~75 KB but only to two `<meta>` tags' `content`, never
+fetched by the page itself, so it costs nothing against `check:perf`'s
+per-page HTML/asset budget), and `pnpm dlx knip --no-config-hints` (one
+initially-new "unused file" flag for the generator script itself, resolved
+by registering it as a `pnpm` script the same way every sibling script
+already is - back to the one confirmed false positive every prior run has
+found).
+
+**Left for a future pass:** same two environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus the
+twenty-sixth run's own suggestion above (`CollectionPage` schema for
+directory/landing pages) - not pursued this run since it deliberately
+concluded that page shape isn't the same kind of gap as a genuinely missing
+entity type, so it stays a "worth a deliberate look" idea rather than a
+concrete backlog item.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

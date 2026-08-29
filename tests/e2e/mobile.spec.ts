@@ -2772,11 +2772,23 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     );
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
       'content',
-      `${SITE}/icons/icon-512.png`,
+      `${SITE}/og-image.png`,
+    );
+    await expect(page.locator('meta[property="og:image:width"]')).toHaveAttribute(
+      'content',
+      '1200',
+    );
+    await expect(page.locator('meta[property="og:image:height"]')).toHaveAttribute(
+      'content',
+      '630',
     );
     await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
       'content',
-      'summary',
+      'summary_large_image',
+    );
+    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute(
+      'content',
+      `${SITE}/og-image.png`,
     );
   });
 

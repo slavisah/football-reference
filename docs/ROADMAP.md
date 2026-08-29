@@ -400,6 +400,39 @@ standing quirks.
   test:e2e` 809/809 (8.4 min, up from 808 - the one new Messi test). See
   `docs/PROJECT_STATUS.md`'s matching entry for detail.
 
+- **Dedicated 1200x630 Open Graph/Twitter Card image**: closed 2026-08-29
+  (twenty-seventh intensive run) - `pnpm outdated` found nothing new (still
+  just the blocked `typescript` 7 entry), and content accuracy re-checked
+  (Copa América/Nations League/Ballon d'Or/World Cup `lastCompletedEdition`
+  values all match the real-world record, no gap). The 2026-08-01
+  SEO-essentials entry that first added `og:image`/`twitter:image`
+  deliberately pointed both at the square `icons/icon-512.png` PWA icon
+  rather than build a dedicated social-card image - a genuine, still-open
+  gap, since a square image gets cropped or letterboxed by most link-unfurl
+  surfaces (Slack, Discord, iMessage, X/Twitter's `summary_large_image`
+  card), which expect roughly a 1.91:1 image. Added
+  `scripts/generate-og-image.mjs` (`pnpm generate:og-image`), a one-time/
+  on-demand generator - not a build step, output committed to
+  `public/og-image.png` the same way `public/icons/icon-*.png` already are -
+  that renders one SVG (the favicon's ball mark enlarged, the site name, a
+  tagline listing all six competition/award families, on the site's own
+  `--light-accent` green) and rasterizes it with `sharp` (already a
+  transitive dependency of Astro's own image pipeline; added as an explicit
+  devDependency for this script). `BaseLayout.astro`'s `ogImageURL` now
+  points at it, plus new `og:image:width`/`og:image:height` meta tags and
+  `twitter:card` upgraded from `summary` to `summary_large_image` now that
+  there's a real large image to show. `tests/e2e/mobile.spec.ts`'s existing
+  Open Graph/Twitter Card test updated to match. Full standing health check
+  clean: `pnpm lint` (0/0/0), `pnpm test` (510/510 unit, unchanged
+  coverage), `pnpm build` (711 pages), `check:links`/`check:sitemap`/
+  `check:precache`/`check:perf` all clean, `check:pdfs` unaffected (700
+  PDFs still fresh - `BaseLayout.astro` isn't a PDF source file), full
+  cold-start `pnpm test:e2e` (809/809, 8.3 min), `check:lighthouse` (25/25
+  pages still a perfect 1.00 across every category), `pnpm dlx knip
+  --no-config-hints` (same one confirmed false positive, after registering
+  the new script as a `pnpm` command). See `docs/PROJECT_STATUS.md`'s
+  matching entry for detail.
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

@@ -62,7 +62,13 @@ const canonicalURL = new URL(withTrailingSlash(Astro.url.pathname), siteOrigin);
 const alternateURL = alternateHref
   ? new URL(withTrailingSlash(alternateHref), siteOrigin)
   : undefined;
-const ogImageURL = new URL(withBase('/icons/icon-512.png'), siteOrigin);
+// A dedicated 1200x630 (1.91:1) social-card image (scripts/generate-og-image.mjs),
+// not the square PWA icon this used to point at - most link-unfurl surfaces
+// (Slack, Discord, iMessage, X/Twitter's "summary_large_image" card) expect
+// roughly this aspect ratio and crop or letterbox a square image badly. See
+// docs/PROJECT_STATUS.md's 2026-08-01 SEO-essentials entry, which deferred a
+// dedicated image at the time.
+const ogImageURL = new URL(withBase('/og-image.png'), siteOrigin);
 const ogLocale = locale === 'hr' ? 'hr_HR' : 'en_US';
 const ogLocaleAlternate = locale === 'hr' ? 'en_US' : 'hr_HR';
 
@@ -162,7 +168,9 @@ const structuredData = [breadcrumb, website, ...jsonLd].filter((item): item is J
     <meta property="og:locale" content={ogLocale} />
     {alternateHref && <meta property="og:locale:alternate" content={ogLocaleAlternate} />}
     <meta property="og:image" content={ogImageURL} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     {description && <meta name="twitter:description" content={description} />}
     <meta name="twitter:image" content={ogImageURL} />
