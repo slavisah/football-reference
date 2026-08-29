@@ -330,6 +330,30 @@ standing quirks.
   section depends on it, so any edit marks all of them stale, by design -
   `pnpm build:pdfs` then `pnpm check:pdfs`). See
   `docs/PROJECT_STATUS.md`'s matching entry for detail.
+- **Croatian translation audit: factual sync (all six families) plus prose
+  quality for the three families never proofread this way**: closed
+  2026-08-29 (twenty-fifth intensive run) - `pnpm outdated`/`pnpm dlx knip
+  --no-config-hints` found nothing new (same blocked `typescript` 7 entry,
+  same one confirmed false positive). Read all six English `content/*.md`
+  files and all six `hr/competitions/*.astro` index pages in full and
+  cross-checked every hand-translated "How it works"/"Format milestones"/
+  "Historical format note"/"Key facts"/"Memorable moments"/"Editorial
+  notes" note section against its English source - a factual-sync check no
+  prior run had done for this hand-duplicated bilingual prose (as opposed
+  to the table data itself, which both languages already share from one
+  `loadCompetition()` call and can't drift). Also extended the
+  twenty-fourth run's prose-quality (grammar/declension) proofreading pass
+  to the three families it never covered - FIFA World Cup, UEFA EURO, Copa
+  América. Confirmed the six edition-page route trees'
+  `CROATIAN_MOMENTS`/`WORLD_CUP_MOMENTS`/`EURO_MOMENTS` constants are
+  byte-identical to their already-checked index-page counterparts, so no
+  separate edition-page pass was needed. **Zero discrepancies found**,
+  factual or grammatical - no `content/*.md` or `.astro` file needed a
+  change. Full standing health check plus a full cold-start `pnpm test:e2e`
+  both clean. See `docs/PROJECT_STATUS.md`'s matching entry for detail,
+  including the specific grammar edge cases checked (foreign-name genitive
+  declension, gendered/plural verb agreement with country-name subjects,
+  numeral-noun agreement).
 - **SEO: meta description length audit**: closed 2026-08-28 (twenty-fourth
   intensive run) - a never-before-checked angle: 13 of the site's 30 static
   `<BaseLayout description="...">` values (the `<meta name="description">`/
