@@ -461,6 +461,31 @@ standing quirks.
   unwrapped by design (multiple independent rankings, not a single list the
   page *is*). See `docs/PROJECT_STATUS.md`'s matching entry for detail.
 
+- **`check:lighthouse` widened to Croatian pages**: closed 2026-08-29
+  (thirtieth intensive run) - `pnpm outdated` found nothing new (still just
+  the blocked `typescript` 7 entry), and `pnpm dlx knip --no-config-hints`
+  matched every prior run's baseline (same one confirmed false positive).
+  `PAGES_TO_AUDIT` in `scripts/check-lighthouse.mjs` had grown to cover every
+  page *shape* in English across the sixteenth-to-twenty-first runs, but only
+  one Croatian page (`hr/records`) had ever been audited - every other `hr/*`
+  route (landing pages, edition pages, `/compare`, `/compare-players`,
+  `/glossary`, `/quiz`, player/team profiles and directories,
+  `/about/sources`) had zero Lighthouse coverage of its own layout, even
+  though the same components render longer Croatian strings that could in
+  principle lay out differently. Added one Croatian entry per remaining
+  shape (12 pages, 25 -> 37 total) - `hr/competitions/copa-america` turned
+  out to be the single heaviest *landing* page on the whole site, EN
+  included (273.3 KB vs. its English sibling's 270.8 KB). All 37 pages
+  scored a perfect 1.00 across every category (home's pre-existing 0.99
+  performance unchanged). Full standing health check also clean: `pnpm lint`
+  (0/0/0), `pnpm test` (513/513 unit, unchanged, coverage unchanged at
+  99.91%/99.42%), `pnpm build` (711 pages), `check:links`/`check:sitemap`/
+  `check:precache`/`check:perf`/`check:pdfs` all clean, full cold-start
+  `pnpm test:e2e` (809/809, `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`,
+  the same env var this environment's Chromium has needed since the
+  twenty-fourth run's entry first documented it). See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail.
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned
