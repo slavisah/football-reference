@@ -651,6 +651,23 @@ Primary sources should be preferred.
     run, so verification relied on WebSearch's synthesized snippets rather
     than directly rendered pages, per every prior audit's caveat in this
     file.
+- Player of the Tournament winners (added 2026-08-30, intensive run): a new
+  "Player of the Tournament winners" note section on `content/uefa-euro.md`
+  listing every winner since UEFA officially introduced the award in 1996
+  (no equivalent award existed at the four earlier 16-or-fewer-team
+  editions) - the same treatment the World Cup's Golden Ball/Golden Glove
+  sections got the previous two intensive runs. Verified via two
+  independent WebSearch passes: the first confirmed all eight winners
+  (1996-2024) via topendsports.com's dedicated award-history page and a
+  general round-up of every "Player of the Tournament" news article; the
+  second specifically re-checked the full name-and-year list a second time
+  against khelnow.com's dedicated list article and UEFA.com's own EURO 2024
+  and EURO 2020 award announcements. **No discrepancies found:**
+  - https://www.uefa.com/uefaeuro/history/news/028f-1b5e5d20015d-63e00bbe0723-1000--rodri-named-euro-2024-player-of-the-tournament/
+  - https://www.nationalworld.com/sport/football/euro-2020-who-won-uefa-player-of-the-tournament-award-3305024
+  - https://www.topendsports.com/events/soccer/uefa-euros/player-of-the-tournament.htm
+  - https://khelnow.com/football/world-football-uefa-euro-list-of-all-player-of-the-tournament-award-winners-202407
+  - https://www.footballfancast.com/every-player-of-the-tournament-european-championship/
 
 ## UEFA Nations League
 

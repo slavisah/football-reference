@@ -65,12 +65,13 @@ const jsonLd = [
 ].filter((item): item is JsonLdObject => item !== undefined);
 
 // Hand-translated from content/uefa-euro.md's "How it works", "Historical
-// format note" (a single paragraph, no bullets - same as the English page)
-// and "Memorable moments" sections, the same three headings the English page
-// requests via noteHeadings. content/ itself stays untouched and English (the single
-// editorial source of truth); this is presentation-layer text local to this
-// page only, the same way the earlier Croatian competition pages hand-write
-// their own Croatian prose.
+// format note" (a single paragraph, no bullets - same as the English page),
+// "Player of the Tournament winners" and "Memorable moments" sections, the
+// same four headings the English page requests via noteHeadings. content/
+// itself stays untouched and English (the single editorial source of
+// truth); this is presentation-layer text local to this page only, the same
+// way the earlier Croatian competition pages hand-write their own Croatian
+// prose.
 const notes: NoteSection[] = [
   {
     heading: 'Kako funkcionira',
@@ -85,6 +86,20 @@ const notes: NoteSection[] = [
     heading: 'Povijesna napomena o formatu',
     items: [
       'Utakmica za treće mjesto igrala se do 1980. Od 1984. UEFA priznaje oba poražena polufinalista bez rangiranja na treće i četvrto mjesto. Stoga tablica koristi neutralni izraz "drugi polufinalist".',
+    ],
+  },
+  {
+    heading: 'Dobitnici nagrade za igrača turnira',
+    items: [
+      'UEFA dodjeljuje nagradu za najboljeg igrača na svakom EURU od 1996.; ekvivalentna nagrada nije postojala na četiri ranija izdanja.',
+      '1996.: Matthias Sammer (Njemačka).',
+      '2000.: Zinedine Zidane (Francuska).',
+      '2004.: Theodoros Zagorakis (Grčka) - kapetan iznenađujućih prvaka 2004.',
+      '2008.: Xavi Hernández (Španjolska).',
+      '2012.: Andrés Iniesta (Španjolska).',
+      '2016.: Antoine Griezmann (Francuska) - drugoplasirani s Francuskom, jedini dobitnik nagrade koji te godine nije osvojio naslov.',
+      '2020.: Gianluigi Donnarumma (Italija) - prvi vratar koji je osvojio ovu nagradu.',
+      '2024.: Rodri (Španjolska).',
     ],
   },
   {

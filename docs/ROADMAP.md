@@ -567,6 +567,41 @@ standing quirks.
   needed updating" pattern several prior content-adding runs have hit. See
   `docs/PROJECT_STATUS.md`'s matching entry for detail.
 
+- **UEFA EURO Player of the Tournament winners**: closed 2026-08-30
+  (thirty-third intensive run) - the thirty-second run's own "left for a
+  future pass" note (in `docs/PROJECT_STATUS.md`) flagged EURO's "Player of
+  the Tournament" award as unresearched. Investigated via two independent
+  WebSearch passes and found it a clean fit for the same treatment as the
+  World Cup's Golden Ball/Golden Glove sections: a single official UEFA
+  award, continuous since 1996 (not 2020, correcting an inaccurate date in
+  that same prior note - 2020 was only when a goalkeeper first won it, per
+  UEFA.com's own EURO 2024 award article), with no partial/unofficial years
+  to navigate the way EURO's still-out-of-scope goalkeeper award has. Added
+  a new "Player of the Tournament winners" note section to
+  `content/uefa-euro.md` listing all eight winners (Matthias Sammer 1996
+  through Rodri 2024), wired into `euro.astro`'s `noteHeadings` (English)
+  and hand-translated into `hr/competitions/euro.astro`'s own `notes` array
+  as "Dobitnici nagrade za igrača turnira" (Croatian, matching the page's
+  existing hand-translated-notes convention). `content/uefa-euro.md`'s
+  `lastReviewed` bumped to 2026-08-30. All 700 PDFs regenerated and
+  reverified clean (`pnpm build:pdfs` then `pnpm check:pdfs`, since this
+  content edit and the `docs/SOURCES.md` addition both mark every PDF's
+  shared References section stale, by design). Full standing health check
+  clean: `pnpm lint` (0/0/0), `pnpm test` (513/513 unit, unchanged), `pnpm
+  build` (711 pages), `check:links` (715 pages), `check:sitemap` (710
+  entries), `check:precache` (37 URLs), `check:perf` (heaviest page still
+  `hr/records`, within budget), `pnpm dlx knip --no-config-hints` (same one
+  confirmed false positive as every prior run), full cold-start `pnpm
+  test:e2e` after updating two pre-existing `tests/e2e/mobile.spec.ts` EURO
+  assertions (English and Croatian pages' Historical-format-note test) to
+  also check the new section's heading and a "Rodri" excerpt. See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a future
+  pass:** Copa América and UEFA Nations League don't yet have an equivalent
+  individual "best player of the tournament" note section - worth
+  researching next, following this same two-independent-source pattern, if
+  each has a similarly clean, continuous, single-name-per-edition award
+  history.
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned
