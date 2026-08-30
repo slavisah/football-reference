@@ -11,6 +11,24 @@ Primary sources should be preferred.
   - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/award-winners
 - FIFA historical top scorers:
   - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/fontaine-mbappe-ronaldo-and-more-every-world-cup-top-scorer
+- Golden Glove (best goalkeeper) winners (added 2026-08-30, intensive run): a
+  new "Golden Glove winners" note section on `content/fifa-world-cup.md`
+  listing every winner since the award's 1994 introduction (no equivalent
+  award existed at earlier editions). Verified via two independent WebSearch
+  passes: the first confirmed all nine winners (1994-2026) via FIFA.com,
+  ESPN, Goal.com and Sports Illustrated round-ups; the second specifically
+  re-checked the 2026 winner (Unai Simón, Spain, a record seven clean
+  sheets) via FIFA.com's own dedicated article plus ESPN, and separately
+  re-confirmed Oliver Kahn's 2002 award and Iker Casillas's 2010 award (the
+  year the award was renamed from the "Lev Yashin Award" to "Golden Glove")
+  via NZ Herald, FIFA+, and Goal.com. **No discrepancies found:**
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/unai-simon-adidas-golden-glove
+  - https://www.espn.com/soccer/story/_/id/49024760/2026-world-cup-awards-golden-ball-golden-boot-golden-glove-trophies-revealed
+  - https://www.si.com/soccer/every-world-cup-golden-glove-winner
+  - https://www.goal.com/en/news/list-of-fifa-world-cup-golden-glove-winners/blt81d4e6d207efc5ff
+  - https://www.nzherald.co.nz/sport/football/football-world-cup/soccer-germanys-kahn-named-best-goalkeeper-at-cup/TK3UHH6DI4DUUQFZEXZRTYUKR4/
+  - https://www.plus.fifa.com/en/content/oliver-kahn-lev-yashin-award-2002-fifa-world-cup-korea-japan/235d069a-542f-4d26-8b91-f3ab2dc42649
+  - https://www.goal.com/en/news/world-cup-2010-spains-iker-casillas-wins-golden-glove-ahead/bltf926cf07eb87996a
 - Final match dates audit (2026-08-02): the calendar date of each edition's
   decisive final match, used for the "On this day in football history" widget
   on the home page. Verified via WebSearch against each edition's dedicated

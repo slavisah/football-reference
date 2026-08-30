@@ -13705,6 +13705,103 @@ already check every built page unconditionally) if repeat clean audits ever
 stop finding anything, the same "diminishing returns" note the tenth and
 fourteenth runs left about the standing health check itself.
 
+### FIFA World Cup Golden Glove (best goalkeeper) winners - closed 2026-08-30 (thirty-first intensive run)
+
+`pnpm outdated` found nothing new (still just the blocked `typescript` 7
+entry, re-confirmed via `npm view @astrojs/check@latest peerDependencies`
+again this run), and `pnpm dlx knip --no-config-hints` matched every prior
+run's baseline exactly (the same one confirmed false positive,
+`scripts/test-preview-server.mjs`). Rather than repeat another Lighthouse-
+widening or health-check-only pass, this run acted on a genuine, previously-
+named gap: the 2026-07-29 "Add tournament-level best scorer facts" entry
+above (twenty-sixth calendar-week run) built its `extraColumn` mechanism
+"reusable for a future 'best goalkeeper' fact if that content is ever
+added" and explicitly flagged that no such content existed yet. It still
+didn't - `content/`, `docs/PROJECT_STATUS.md` and `docs/SOURCES.md` had zero
+mentions of "Golden Glove"/"best goalkeeper"/"Yashin" outside that one
+passing note and the Ballon d'Or page's unrelated "Lev Yashin remains the
+only goalkeeper to win the men's award" line.
+
+Researched and added the FIFA World Cup's Golden Glove (originally the "Lev
+Yashin Award", renamed in 2010) - an official FIFA award at every World Cup
+since its 1994 introduction, so unlike the shelved "youngest winner" idea
+(which would need ~130 unsourced player birth dates) this is a single,
+well-documented award per tournament with a short, verifiable list. Verified
+via two independent WebSearch passes:
+
+- **First pass** (all nine winners, 1994-2026): FIFA.com, ESPN, Goal.com and
+  Sports Illustrated round-ups agreed on all nine names - Michel
+  Preud'homme (1994), Fabien Barthez (1998), Oliver Kahn (2002), Gianluigi
+  Buffon (2006), Iker Casillas (2010), Manuel Neuer (2014), Thibaut Courtois
+  (2018), Emiliano Martínez (2022), Unai Simón (2026).
+- **Second pass** (targeted re-checks): the 2026 winner - the newest,
+  highest-risk entry, beyond this session's knowledge cutoff - was
+  re-confirmed via FIFA.com's own dedicated article plus ESPN, both citing a
+  record seven clean sheets in the tournament (matching the site's own
+  2026 final result, Spain 1-0 Argentina a.e.t., already on the page).
+  Also spot-checked Oliver Kahn's 2002 award (NZ Herald, FIFA+) and Iker
+  Casillas's 2010 award (Goal.com) - 2010 is also the year the award was
+  renamed from "Lev Yashin Award" to "Golden Glove", confirmed by the same
+  sources. **No discrepancies found.** See `docs/SOURCES.md`'s new "Golden
+  Glove (best goalkeeper) winners" entry under "FIFA World Cup" for the full
+  citation list.
+
+Implemented as a new "Golden Glove winners" prose note section in
+`content/fifa-world-cup.md` (nine dated bullets plus a lead-in line noting
+no equivalent award existed before 1994), placed between "Format milestones"
+and "Memorable moments" - **not** as a second `TournamentTable` `extraColumn`
+alongside the existing "Top scorer" column, a deliberate scope call: the
+award only covers 9 of the page's 23 editions (every pre-1994 row would show
+an em dash), and `TournamentTable`'s `extraColumn` prop is a single shared
+slot already wired into 8 call sites across both team-competition families
+(World Cup and EURO, landing and edition pages, both languages) - widening
+its contract to a second column for one family's mostly-empty data was a
+larger, riskier change than this fact warranted. A prose note section reuses
+the exact mechanism "Format milestones"/"Editorial notes" already use for
+partial-coverage facts, with zero changes to any shared component.
+
+Wired into `src/pages/competitions/world-cup.astro`'s `noteHeadings` array
+(English) and hand-translated into `src/pages/hr/competitions/world-cup.astro`'s
+own hand-written `notes` array as "Dobitnici Zlatne rukavice" (Croatian) -
+that page composes its own layout rather than requesting sections via
+`loadCompetition`'s `noteHeadings` option (see its own file comment), the
+same hand-translation convention its "Prekretnice formata"/"Nezaboravni
+trenuci"/"Uredničke napomene" sections already established. The per-edition
+`/competitions/world-cup/<year>` route trees were deliberately left alone -
+they only ever request the "Memorable moments" section via their own
+`noteHeadings: ['Memorable moments']` call, unrelated to this addition.
+`content/fifa-world-cup.md`'s `lastReviewed` bumped to 2026-08-30 per
+`docs/ADDING_CONTENT.md` section 9.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`) - both the content edit and the `docs/SOURCES.md` addition mark
+every PDF's shared References section stale, by design, the same lag every
+prior content/sources edit in this log has needed a regeneration pass for.
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints
+across 167 files), `pnpm test` (513/513 unit, unchanged - no new unit-
+testable logic, this is presentation-layer content), `pnpm build` (711
+pages, unchanged page count - no new route), `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache` (37 URLs), `check:perf`
+(heaviest page still `hr/records`, within budget) all clean, full cold-start
+`pnpm test:e2e` (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`, per the
+thirtieth run's documented environment workaround) - first cold-start run
+caught three pre-existing `tests/e2e/mobile.spec.ts` World Cup assertions
+that had gone stale: a hardcoded `time[datetime="2026-08-19"]` (the page's
+old `lastReviewed` value, now `2026-08-30`) and two `.notes__card` counts
+hardcoded to 4 (now 5, English and Croatian). Updated all three (also
+asserting the new section's heading and an "Unai Simón" excerpt renders);
+a second cold-start run then passed clean at 809/809 (unchanged test
+count - existing checks widened in place, no new test cases added).
+
+**Left for a future pass:** the same two environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). EURO's own
+goalkeeper-award history is less consistently documented across editions
+than the World Cup's uninterrupted FIFA award - deliberately left out of
+this run's scope rather than risk a less-verifiable per-edition claim; a
+candidate for a future run if that data turns out to be reliably
+sourceable via the same two-pass WebSearch approach used here.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
