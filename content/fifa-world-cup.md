@@ -70,6 +70,22 @@ The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 b
 - **1998:** the field expanded to 32 teams.
 - **2026:** the field expanded to 48 teams and was hosted by three countries for the first time.
 
+## Golden Ball winners
+
+- FIFA has named a best-player award at every World Cup since 1982; no equivalent award existed at earlier editions.
+- **1982:** Paolo Rossi (Italy) - the award's first winner.
+- **1986:** Diego Maradona (Argentina).
+- **1990:** Salvatore Schillaci (Italy).
+- **1994:** Romário (Brazil).
+- **1998:** Ronaldo (Brazil).
+- **2002:** Oliver Kahn (Germany) - the only goalkeeper to date to also win the award.
+- **2006:** Zinedine Zidane (France).
+- **2010:** Diego Forlán (Uruguay).
+- **2014:** Lionel Messi (Argentina) - the first of his two wins, still the only player to win the award more than once.
+- **2018:** Luka Modrić (Croatia).
+- **2022:** Lionel Messi (Argentina) - his second win.
+- **2026:** Rodri (Spain) - the first Spain player to win the award.
+
 ## Golden Glove winners
 
 - FIFA has named a best-goalkeeper award at every World Cup since 1994; no equivalent award existed in earlier editions.

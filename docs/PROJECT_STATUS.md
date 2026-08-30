@@ -13802,6 +13802,96 @@ this run's scope rather than risk a less-verifiable per-edition claim; a
 candidate for a future run if that data turns out to be reliably
 sourceable via the same two-pass WebSearch approach used here.
 
+### FIFA World Cup Golden Ball (best player) winners - closed 2026-08-30 (thirty-second intensive run)
+
+`pnpm outdated` and `pnpm dlx knip --no-config-hints` found nothing new
+(still just the blocked `typescript` 7 entry and the same one confirmed
+false positive, `scripts/test-preview-server.mjs`). Investigated the
+thirty-first run's own flagged idea first - a EURO "best goalkeeper"
+equivalent - via `WebSearch` and confirmed the caution behind leaving it
+out was right: UEFA's own goalkeeper recognition was unofficial from 1984
+through 1992 (Gianluigi Donnarumma's 2020 award is described by multiple
+sources as the first *official* one), with no single stable award name
+across the tournament's history the way the World Cup's Golden Glove has
+had since 2010. Not pursued this run either, for the same reason.
+
+While researching that, found a cleaner, better-scoped gap: the thirty-first
+run added a "Golden Glove winners" note section for the World Cup's
+best-*goalkeeper* award, but the page had never had a section for FIFA's
+other permanent individual award, the Golden Ball (best *player*) - even
+though `content/fifa-world-cup.md`'s existing Golden Glove note already
+name-drops it in passing ("Oliver Kahn... the only goalkeeper to date to
+also win the tournament's Golden Ball as best overall player"). Unlike the
+EURO goalkeeper idea, the Golden Ball has been a single, continuously-named,
+officially FIFA-run award at every World Cup since 1982, with a stable
+one-winner-per-tournament record - the same shape of fact the Golden Glove
+note already handled cleanly.
+
+Verified via two independent WebSearch passes:
+
+- **First pass** (all twelve winners, 1982-2026): FOX Sports, Wego, Sports
+  Illustrated and Olympics.com round-ups agreed on all twelve names - Paolo
+  Rossi (1982), Diego Maradona (1986), Salvatore Schillaci (1990), Romário
+  (1994), Ronaldo (1998), Oliver Kahn (2002), Zinedine Zidane (2006), Diego
+  Forlán (2010), Lionel Messi (2014 and 2022, the only repeat winner), Luka
+  Modrić (2018), Rodri (2026).
+- **Second pass** (targeted re-checks): the 2026 winner - the newest,
+  highest-risk entry, beyond this session's knowledge cutoff, and one
+  several outlets described as contested against Messi's tournament stats
+  (eight goals, four assists, versus Rodri's none) - was re-confirmed as
+  FIFA's actual award via FIFA.com's own dedicated article plus ESPN and
+  beIN Sports; the debate itself is real commentary, not a discrepancy in
+  who actually won. Separately re-confirmed the full 1982-2026 table,
+  including both of Messi's wins, via topendsports.com's dedicated award
+  history page. **No discrepancies found.** See `docs/SOURCES.md`'s new
+  "Golden Ball (best player) winners" entry under "FIFA World Cup" for the
+  full citation list.
+
+Implemented as a new "Golden Ball winners" prose note section in
+`content/fifa-world-cup.md` (twelve dated bullets plus a lead-in line noting
+no equivalent award existed before 1982), placed immediately before the
+existing "Golden Glove winners" section - the headline best-player award
+ahead of the specialist goalkeeper one, matching the order FIFA's own
+end-of-tournament award announcements use. Same scope call as the Golden
+Glove precedent: a prose note, not a second `TournamentTable` `extraColumn`
+(the award only covers 12 of the page's 23 editions; widening the shared
+`extraColumn` slot used across 8 call sites for one family's partial data
+was already rejected for the Golden Glove and applies identically here).
+
+Wired into `src/pages/competitions/world-cup.astro`'s `noteHeadings` array
+(English, ahead of `'Golden Glove winners'`) and hand-translated into
+`src/pages/hr/competitions/world-cup.astro`'s own `notes` array as
+"Dobitnici Zlatne lopte" (Croatian), immediately before "Dobitnici Zlatne
+rukavice" - the same hand-translation convention its other note sections
+already use. The per-edition `/competitions/world-cup/<year>` route trees
+were left alone, as with the Golden Glove addition - they only request
+"Memorable moments". `content/fifa-world-cup.md`'s `lastReviewed` was
+already 2026-08-30 from the prior run's edit to the same file, so not
+bumped again.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`) - both the content edit and the `docs/SOURCES.md` addition mark
+every PDF's shared References section stale, by design.
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints
+across 167 files), `pnpm test` (513/513 unit, unchanged - presentation-layer
+content, no new unit-testable logic), `pnpm build` (711 pages, unchanged -
+no new route), `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`,
+within budget) all clean, full cold-start `pnpm test:e2e`
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`, per the thirtieth run's
+documented environment workaround) after updating two pre-existing
+`tests/e2e/mobile.spec.ts` World Cup assertions that had gone stale: the
+`.notes__card` counts hardcoded to 5 (now 6, English and Croatian page),
+also asserting the new section's heading and a "Rodri" excerpt renders.
+
+**Left for a future pass:** the same two environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). EURO's
+goalkeeper-award history stays out of scope for the reason re-confirmed
+above; its Player of the Tournament / Best Young Player awards (officially
+run by UEFA since EURO 2020) were not investigated this run and are a
+candidate for a future pass.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

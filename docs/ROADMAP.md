@@ -527,6 +527,45 @@ standing quirks.
   out of this run's scope rather than risk a less-verifiable per-edition
   claim - a candidate for a future run if that data turns out to be
   reliably sourceable.
+- **FIFA World Cup Golden Ball (best player) winners**: closed 2026-08-30
+  (thirty-second intensive run) - `pnpm outdated` and `pnpm dlx knip
+  --no-config-hints` found nothing new (still just the blocked `typescript`
+  7 entry, same one confirmed false positive). Investigated the
+  thirty-first run's own flagged idea (a EURO "best goalkeeper" equivalent)
+  first via `WebSearch` and confirmed its caution was correct: UEFA's EURO
+  goalkeeper award was unofficial for 1984-1992 and has no single
+  consistent name across sources, so it stays out of scope. Found a
+  cleaner, better-scoped gap instead while researching that: the World Cup
+  had a "Golden Glove" note section (added last run) but no equivalent for
+  the Golden Ball (best player) - FIFA's other permanent individual award,
+  continuous and unambiguous since 1982, with no partial/unofficial years
+  to navigate. Added a new "Golden Ball winners" note section to
+  `content/fifa-world-cup.md` listing all twelve winners (Paolo Rossi
+  1982 through Rodri 2026), each verified via two independent WebSearch
+  passes (see `docs/SOURCES.md`'s matching new entry for the full citation
+  list) - the second pass specifically re-checked the newest, least-settled
+  fact (Rodri's 2026 win, which several outlets called contested against
+  Messi's tournament stats) against FIFA.com's own award article to confirm
+  it was FIFA's actual pick regardless of the surrounding debate. Placed
+  before the existing "Golden Glove winners" section (headline best-player
+  award ahead of the specialist goalkeeper one) in both the section itself
+  and `world-cup.astro`'s `noteHeadings`; hand-translated into
+  `hr/competitions/world-cup.astro`'s own `notes` array as "Dobitnici
+  Zlatne lopte", matching the page's existing hand-translated-notes
+  convention. `content/fifa-world-cup.md`'s `lastReviewed` was already
+  2026-08-30 from the prior run, so left unchanged. All 700 PDFs
+  regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+  check:pdfs`, since this content edit and the `docs/SOURCES.md` addition
+  both mark every PDF's shared References section stale, by design). Full
+  standing health check clean: `pnpm lint` (0/0/0), `pnpm test` (513/513
+  unit, unchanged), `pnpm build` (711 pages), `check:links` (715 pages),
+  `check:sitemap` (710 entries), `check:precache` (37 URLs), `check:perf`
+  (heaviest page still `hr/records`, within budget), full cold-start `pnpm
+  test:e2e` after updating two pre-existing `tests/e2e/mobile.spec.ts`
+  World Cup `.notes__card` count assertions (EN and HR pages, 5 -> 6) to
+  account for the new section - the same "existing hardcoded assertion
+  needed updating" pattern several prior content-adding runs have hit. See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail.
 
 ## Ideas not yet scoped as backlog
 
