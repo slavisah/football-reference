@@ -124,9 +124,11 @@ test.describe('World Cup page on a 360px phone', () => {
 
   test('shows the Memorable moments and Editorial notes sections from content/fifa-world-cup.md', async ({ page }) => {
     const notes = page.locator('.notes__card');
-    await expect(notes).toHaveCount(5);
+    await expect(notes).toHaveCount(6);
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('The two semifinal winners meet in the final')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Golden Ball winners' })).toBeVisible();
+    await expect(notes.getByText('Rodri (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Golden Glove winners' })).toBeVisible();
     await expect(notes.getByText('Unai Simón (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
@@ -366,10 +368,12 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
   test('shows the translated Format milestones, Memorable moments and Editorial notes sections', async ({
     page,
   }) => {
-    await expect(page.locator('.notes__card')).toHaveCount(5);
+    await expect(page.locator('.notes__card')).toHaveCount(6);
     await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
     await expect(page.getByText('Pobjednici polufinala igraju finale')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Prekretnice formata' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Dobitnici Zlatne lopte' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Rodri (Španjolska)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Dobitnici Zlatne rukavice' })).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('Unai Simón (Španjolska)'),

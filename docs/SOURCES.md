@@ -11,6 +11,26 @@ Primary sources should be preferred.
   - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/award-winners
 - FIFA historical top scorers:
   - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/fontaine-mbappe-ronaldo-and-more-every-world-cup-top-scorer
+- Golden Ball (best player) winners (added 2026-08-30, intensive run): a new
+  "Golden Ball winners" note section on `content/fifa-world-cup.md` listing
+  every winner since the award's 1982 introduction (no equivalent award
+  existed at earlier editions). Verified via two independent WebSearch
+  passes: the first confirmed all twelve winners (1982-2026) via FOX Sports,
+  Wego, Sports Illustrated and Olympics.com round-ups; the second
+  specifically re-checked the 2026 winner (Rodri, Spain, ahead of Messi's
+  Silver Ball and Mbappé's Bronze Ball) via FIFA.com's own article plus ESPN
+  and beIN Sports, and separately re-confirmed the full 1982-2026 table
+  (including Messi's two wins, 2014 and 2022, still the only repeat winner)
+  via topendsports.com's dedicated award history page. **No discrepancies
+  found:**
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/rodri-earns-adidas-golden-ball
+  - https://www.espn.com/soccer/story/_/id/49404995/2026-world-cup-golden-ball-spain-unai-simon-pau-cubarsi
+  - https://www.beinsports.com/en-us/soccer/fifa-world-cup-2026/articles/why-did-the-world-cup-golden-ball-end-up-in-rodri-s-hands-2026-07-22
+  - https://www.olympics.com/en/news/fifa-world-cup-2026-messi-mbappe-bellingham-rodri-golden-ball-football
+  - https://www.foxsports.com/stories/soccer/2026-fifa-mens-world-cup-every-world-cup-golden-ball-winner-since-1982
+  - https://blog.wego.com/world-cup-golden-ball-winners/
+  - https://www.si.com/soccer/world-cup-golden-ball-full-list-winners
+  - https://www.topendsports.com/events/worldcupsoccer/golden-ball.htm
 - Golden Glove (best goalkeeper) winners (added 2026-08-30, intensive run): a
   new "Golden Glove winners" note section on `content/fifa-world-cup.md`
   listing every winner since the award's 1994 introduction (no equivalent
