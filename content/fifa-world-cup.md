@@ -99,6 +99,16 @@ The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 b
 - **2022:** Emiliano Martínez (Argentina).
 - **2026:** Unai Simón (Spain) - a record seven clean sheets across the tournament.
 
+## Young Player Award winners
+
+- FIFA has named a best-player-aged-21-or-under award at every World Cup since 2006; no equivalent award existed at earlier editions.
+- **2006:** Lukas Podolski (Germany) - the award's first winner.
+- **2010:** Thomas Müller (Germany).
+- **2014:** Paul Pogba (France).
+- **2018:** Kylian Mbappé (France).
+- **2022:** Enzo Fernández (Argentina).
+- **2026:** Pau Cubarsí (Spain) - the first defender to win the award.
+
 ## Memorable moments
 
 - Uruguay defeated Brazil in the decisive 1950 match at the Maracanã, a result remembered as the *Maracanazo*.

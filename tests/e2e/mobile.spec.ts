@@ -124,13 +124,15 @@ test.describe('World Cup page on a 360px phone', () => {
 
   test('shows the Memorable moments and Editorial notes sections from content/fifa-world-cup.md', async ({ page }) => {
     const notes = page.locator('.notes__card');
-    await expect(notes).toHaveCount(6);
+    await expect(notes).toHaveCount(7);
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('The two semifinal winners meet in the final')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Golden Ball winners' })).toBeVisible();
     await expect(notes.getByText('Rodri (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Golden Glove winners' })).toBeVisible();
     await expect(notes.getByText('Unai Simón (Spain)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Young Player Award winners' })).toBeVisible();
+    await expect(notes.getByText('Pau Cubarsí (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.
@@ -273,8 +275,12 @@ test.describe('EURO page on a 360px phone', () => {
     await expect(page.getByText('no third-place match has been played since 1980')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Historical format note' })).toBeVisible();
     await expect(page.locator('.notes__card p', { hasText: 'other semifinalist' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Player of the Tournament winners' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Player of the Tournament winners', exact: true }),
+    ).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Rodri (Spain)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Young Player of the Tournament winners' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Lamine Yamal (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.
@@ -370,7 +376,7 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
   test('shows the translated Format milestones, Memorable moments and Editorial notes sections', async ({
     page,
   }) => {
-    await expect(page.locator('.notes__card')).toHaveCount(6);
+    await expect(page.locator('.notes__card')).toHaveCount(7);
     await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
     await expect(page.getByText('Pobjednici polufinala igraju finale')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Prekretnice formata' })).toBeVisible();
@@ -379,6 +385,12 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     await expect(page.getByRole('heading', { name: 'Dobitnici Zlatne rukavice' })).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('Unai Simón (Španjolska)'),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade za najboljeg mladog igrača' }),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Pau Cubarsí (Španjolska)'),
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Uredničke napomene' })).toBeVisible();
@@ -484,6 +496,10 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
       page.getByRole('heading', { name: 'Dobitnici nagrade za igrača turnira' }),
     ).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Rodri (Španjolska)').first()).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade za najboljeg mladog igrača turnira' }),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Lamine Yamal (Španjolska)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.

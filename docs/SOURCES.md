@@ -49,6 +49,28 @@ Primary sources should be preferred.
   - https://www.nzherald.co.nz/sport/football/football-world-cup/soccer-germanys-kahn-named-best-goalkeeper-at-cup/TK3UHH6DI4DUUQFZEXZRTYUKR4/
   - https://www.plus.fifa.com/en/content/oliver-kahn-lev-yashin-award-2002-fifa-world-cup-korea-japan/235d069a-542f-4d26-8b91-f3ab2dc42649
   - https://www.goal.com/en/news/world-cup-2010-spains-iker-casillas-wins-golden-glove-ahead/bltf926cf07eb87996a
+- Young Player Award (best player aged 21 or under) winners (added
+  2026-08-30, intensive run): a new "Young Player Award winners" note
+  section on `content/fifa-world-cup.md` listing every winner since the
+  award's 2006 introduction (no equivalent award existed at earlier
+  editions) - the same treatment as the World Cup's Golden Ball/Golden Glove
+  and EURO's Player of the Tournament sections. Verified via two independent
+  WebSearch passes: the first confirmed all six winners (2006-2026) via
+  FIFA.com's own "Young Player Award winners" round-up plus ESPN, Yahoo
+  Sports, khelnow.com and topendsports.com; the second specifically
+  re-checked the newest, least-settled fact (Pau Cubarsí's 2026 win, the
+  first defender to win the award) via FIFA.com's dedicated 2026 award
+  article plus FOX Sports and Yahoo Sports, and separately re-confirmed the
+  award's 2006 introduction and first winner (Lukas Podolski) via the same
+  FIFA.com round-up. **No discrepancies found:**
+  - https://www.fifa.com/en/tournaments/mens/worldcup/articles/young-player-award-winners-highlights
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/pau-cubarsi-fifa-young-player-award
+  - https://www.foxsports.com/stories/soccer/world-cup-pau-cubarsi-spain-young-player-award
+  - https://sports.yahoo.com/articles/barcelona-star-pau-cubarsi-wins-000000915.html
+  - https://sports.yahoo.com/articles/young-player-award-winners-fifa-121400761.html
+  - https://www.espn.com/soccer/story/_/id/48760910/who-won-young-player-award-world-cup
+  - https://khelnow.com/football/fifa-world-cup-list-of-best-young-player-award-winners
+  - https://www.topendsports.com/events/worldcupsoccer/best-young-player.htm
 - Final match dates audit (2026-08-02): the calendar date of each edition's
   decisive final match, used for the "On this day in football history" widget
   on the home page. Verified via WebSearch against each edition's dedicated
@@ -668,6 +690,24 @@ Primary sources should be preferred.
   - https://www.topendsports.com/events/soccer/uefa-euros/player-of-the-tournament.htm
   - https://khelnow.com/football/world-football-uefa-euro-list-of-all-player-of-the-tournament-award-winners-202407
   - https://www.footballfancast.com/every-player-of-the-tournament-european-championship/
+- Young Player of the Tournament winners (added 2026-08-30, intensive run):
+  a new "Young Player of the Tournament winners" note section on
+  `content/uefa-euro.md` listing every winner since the award was
+  introduced in 2016 (no equivalent award existed at earlier editions) -
+  the same treatment as the World Cup's Young Player Award section added
+  the same run. Verified via two independent WebSearch passes: the first
+  confirmed all three winners (2016-2024) via UEFA.com's own EURO 2024
+  award announcement plus FOX Sports, footballwhispers.com and
+  fcbarcelona.com round-ups; the second specifically re-checked the newest
+  fact (Lamine Yamal's 2024 win at age 17, the youngest of the three) via
+  UEFA.com's dedicated article and khelnow.com's list, and separately
+  re-confirmed the award's 2016 introduction and first winner (Renato
+  Sanches) via the same khelnow.com list. **No discrepancies found:**
+  - https://www.uefa.com/uefaeuro/history/news/028f-1b5e5e91b6e6-b9784b9e13fb-1000--lamine-yamal-named-euro-2024-young-player-of-the-tournament/
+  - https://www.foxsports.com/stories/soccer/euro-2024-awards-rodri-wins-best-player-yamal-takes-home-best-young-player
+  - https://footballwhispers.com/blog/euro-best-young-players/
+  - https://www.fcbarcelona.com/en/football/first-team/news/2187958/pedri-best-young-player-at-euro-2020
+  - https://khelnow.com/football/world-football-uefa-euro-list-of-all-young-player-of-the-tournament-award-winners-202407
 
 ## UEFA Nations League
 
