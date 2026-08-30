@@ -786,6 +786,26 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     indexed snippets rather than direct page loads.
+- Player of the Finals winners (added 2026-08-30, intensive run): a new
+  "Player of the Finals winners" note section on
+  `content/uefa-nations-league.md` listing every winner across all four
+  completed editions (2019-2025), the same treatment already given to the
+  World Cup's and EURO's individual-award note sections. Verified via two
+  independent WebSearch passes: the first confirmed all four winners
+  (Bernardo Silva 2019, Sergio Busquets 2021, Rodri 2023, Nuno Mendes 2025)
+  via UEFA.com's own award-announcement articles; the second specifically
+  re-checked the award's name, which changed between editions - UEFA's own
+  2019 article calls Bernardo Silva "Player of the Tournament", while its
+  2021, 2023 and 2025 articles all call the award "Player of the Finals" -
+  confirmed as a genuine rename rather than a reporting inconsistency, since
+  every 2021+ source (UEFA.com, Barça Blaugranes, AllFootballApp) agrees on
+  the new name. **No discrepancies found:**
+  - https://www.uefa.com/uefanationsleague/news/0253-0d81efc3f60a-0d39c305041d-1000--bernardo-silva-and-frenkie-de-jong-win-nations-league-awards/
+  - https://www.uefa.com/uefanationsleague/news/026e-13729be1c1c0-e25470c0a0f1-1000--sergio-busquets-named-2021-uefa-nations-league-player-of-
+  - https://www.uefa.com/uefanationsleague/news/0282-1849de0ccdfe-e28eb8d71909-1000--rodri-named-2023-uefa-nations-league-player-of-the-finals
+  - https://www.uefa.com/uefanationsleague/news/029a-1df453c49ada-5d8aff31f9c2-1000--nuno-mendes-named-2025-uefa-nations-league-player-of-the-f/
+  - https://www.barcablaugranes.com/2021/10/11/22720363/sergio-busquets-named-nations-league-player-of-the-finals
+  - https://m.allfootballapp.com/news/EPL/Sergio-Busquets-has-been-named-2021-UEFA-Nations-League-Player-of-the-Finals/2697091
 
 ## Copa América
 
@@ -1345,6 +1365,36 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     indexed snippets rather than direct page loads.
+- Best Player winners (added 2026-08-30, intensive run): a new "Best Player
+  winners" note section on `content/copa-america.md` listing every winner
+  since the award's 1987 introduction (no equivalent award existed at the 32
+  earlier editions), the same treatment already given to the World Cup's
+  Golden Ball/Golden Glove and EURO's Player of the Tournament sections.
+  Verified via two independent WebSearch passes covering all 16 editions
+  (1987-2024): the first pass confirmed 1987 (Valderrama), 1989 (Sosa), 2004
+  (Adriano), 2007 (Robinho), 2011 (Suárez), 2015 (Messi), 2016 (Sánchez),
+  2019 (Dani Alves), 2021 (Messi) and 2024 (James Rodríguez) via a mix of
+  Wikipedia-sourced summaries and news round-ups; the second pass filled in
+  and independently re-confirmed the remaining six editions (1991 Leonardo
+  Rodríguez, 1993 Goycochea, 1995 Francescoli, 1997 Ronaldo, 1999 Rivaldo,
+  2001 Guevara) plus a second confirmation of every edition from the first
+  pass. **No discrepancies found:**
+  - https://copaamerica.com/en/news/james-rodriguez-colombia-best-player-copa-america-2024-award
+  - https://www.espn.com/soccer/chile/story/2902957/chiles-alexis-sanchez-named-best-player-at-copa-america-centenario
+  - https://www.thestatesman.com/sports/copa-america-2019-dani-alves-adjudged-player-tournament-1502775166.html
+  - http://www.xinhuanet.com/english/2019-07/08/c_138207222.htm
+  - https://copaamerica.com/en/news/adriano-champion-and-top-scorer-of-the-conmebol-copa-america
+  - https://www.givemesport.com/every-copa-america-best-player-award-winner/
+  - https://www.elheraldo.hn/deportes/honduras-records-marcas-copa-america-2001-mvp-amado-guevara-tercer-lugar-HJ20380788
+  - https://en.wikipedia.org/wiki/Amado_Guevara
+  - https://en.wikipedia.org/wiki/1991_Copa_Am%C3%A9rica
+  - https://en.wikipedia.org/wiki/1993_Copa_Am%C3%A9rica
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages (including Wikipedia's
+    per-edition articles) rather than direct page loads, since direct
+    WebFetch to wikipedia.org and several other sports-reference domains
+    (topendsports.com, khelnow.com) was again blocked for this run.
 
 ## Ballon d'Or
 

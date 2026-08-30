@@ -5,7 +5,7 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-08-19
+lastReviewed: 2026-08-30
 status: verified
 ---
 
@@ -137,6 +137,26 @@ A **second, independent cross-check** (2026-08-07, intensive run) re-verified th
 The **Final date** column (added 2026-08-03, intensive run) records the calendar date of each edition's single decisive match, for the "On this day in football history" widget on the home page - the same widget already covers the FIFA World Cup and UEFA EURO. It is filled in only for the 19 editions with one clearly identifiable decisive match: the five **Final playoff** deciders (1919, 1922, 1937, 1949, 1953), the 13 **Knockout final** editions (1987, and 1993 onward except 2016), and the 2016 centenary final. The remaining editions keep "—": the **League table** era had no single title match (the champion was whoever led the final standings after the last round of group games, sometimes played across several cities on the same date), and the three **Home-and-away** finals (1975, 1979, 1983) were decided over two legs on two different dates, so neither has one date to record without an arbitrary choice. See `docs/SOURCES.md` for the per-edition citations.
 
 A **second, independent cross-check** of the Final date column (2026-08-12, intensive run) re-verified all 19 dated editions in four era-based WebSearch passes (the five pre-1960 Final playoff deciders; the 1987-1999 knockout-final era; 2001-2011; 2015-2024), deliberately drawing on a source mix distinct from the 2026-08-08 first pass - worldfootball.net, footballdatabase.eu, besoccer.com, soccer365.net, athlet.org, topendsports.com, 11v11.com, Transfermarkt, resultados-futbol.com, official federation/CONMEBOL histories, and contemporary press/wire coverage (UPI, Washington Post, AP via spokesman.com, CNN) rather than Wikipedia/RSSSF/ESPN alone. **No discrepancies found** across any of the 19 dates, including the two cases the first pass flagged for extra scrutiny: 1999's final (footballdatabase.eu's lone 17 July claim was reconfirmed as an outlier against Transfermarkt and 11v11's independently agreeing 18 July) and 2021's final (US-dated wire and official sources again confirmed 10 July over the 11 July shown on some regional ESPN pages). One additional soft note: 11v11.com's own listing for the 1922 play-off carries a mislabeled 22 October date inconsistent with every other source for that match, including 11v11's own site elsewhere - a source-reliability flag, not a contradiction of the page's 6 November 1922 date, which every other source (including worldfootball.net, checked specifically for this pass) confirms. See `docs/SOURCES.md` for the full per-era citation list.
+
+## Best Player winners
+
+- CONMEBOL has named a best-player award at every Copa América since 1987; no equivalent award existed at the 32 earlier editions.
+- **1987:** Carlos Valderrama (Colombia) - the award's first winner, on a Colombia team that finished third.
+- **1989:** Rubén Sosa (Uruguay).
+- **1991:** Leonardo Rodríguez (Argentina).
+- **1993:** Sergio Goycochea (Argentina) - a goalkeeper, one of the few to win the award.
+- **1995:** Enzo Francescoli (Uruguay).
+- **1997:** Ronaldo (Brazil).
+- **1999:** Rivaldo (Brazil).
+- **2001:** Amado Guevara (Honduras) - the only winner from a guest nation outside CONMEBOL, on a Honduras team that finished third.
+- **2004:** Adriano (Brazil).
+- **2007:** Robinho (Brazil).
+- **2011:** Luis Suárez (Uruguay).
+- **2015:** Lionel Messi (Argentina) - the first of his two wins, still the only player to win the award more than once.
+- **2016:** Alexis Sánchez (Chile) - Copa América Centenario.
+- **2019:** Dani Alves (Brazil).
+- **2021:** Lionel Messi (Argentina) - his second win.
+- **2024:** James Rodríguez (Colombia) - runner-up with Colombia, one of the few winners not to lift the trophy that year.
 
 ## Memorable moments
 

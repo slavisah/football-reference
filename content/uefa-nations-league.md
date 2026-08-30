@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 2018-19
 lastCompletedEdition: 2024-25
-lastReviewed: 2026-08-19
+lastReviewed: 2026-08-30
 status: verified
 ---
 
@@ -35,6 +35,14 @@ UEFA introduced the Nations League to replace many international friendlies with
 - Portugal became the first two-time champion in 2025.
 - Croatia reached its first Nations League final in 2023.
 - The competition uses promotion and relegation between leagues.
+
+## Player of the Finals winners
+
+- UEFA has named a best-player award at every Nations League Finals since the competition's 2019 launch, initially called "Player of the Tournament" before being renamed "Player of the Finals" from 2021 onward.
+- **2019:** Bernardo Silva (Portugal).
+- **2021:** Sergio Busquets (Spain).
+- **2023:** Rodri (Spain).
+- **2025:** Nuno Mendes (Portugal).
 
 ## Memorable moments
 

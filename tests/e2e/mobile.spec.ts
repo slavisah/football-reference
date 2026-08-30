@@ -892,6 +892,11 @@ test.describe('Copa América page on a 360px phone', () => {
     ).toBeVisible();
   });
 
+  test('shows the Best Player winners section from content/copa-america.md', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Best Player winners' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('James Rodríguez (Colombia)')).toBeVisible();
+  });
+
   test('shows an audited "Format" badge per edition', async ({ page }) => {
     await expect(page.getByRole('columnheader', { name: 'Format', exact: true })).toBeVisible();
 
@@ -1082,6 +1087,11 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     ).toBeVisible();
   });
 
+  test('shows the translated Best Player winners section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Dobitnici nagrade za najboljeg igrača' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('James Rodríguez (Kolumbija)')).toBeVisible();
+  });
+
   test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
     page,
     request,
@@ -1148,6 +1158,8 @@ test.describe('Nations League page on a 360px phone', () => {
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('Held every two years.')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Key facts' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Player of the Finals winners' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Nuno Mendes (Portugal)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.
@@ -1234,6 +1246,13 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
   test('shows the translated Key facts section', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Ključne činjenice' })).toBeVisible();
     await expect(page.getByText('Hrvatska je 2023. stigla do svog prvog finala')).toBeVisible();
+  });
+
+  test('shows the translated Player of the Finals winners section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade za najboljeg igrača Final Foura' }),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Nuno Mendes (Portugal)')).toBeVisible();
   });
 
   test('shows the translated How it works section', async ({ page }) => {
