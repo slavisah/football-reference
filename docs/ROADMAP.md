@@ -486,6 +486,48 @@ standing quirks.
   twenty-fourth run's entry first documented it). See
   `docs/PROJECT_STATUS.md`'s matching entry for detail.
 
+- **FIFA World Cup Golden Glove (best goalkeeper) winners**: closed
+  2026-08-30 (thirty-first intensive run) - `pnpm outdated` found nothing new
+  (still just the blocked `typescript` 7 entry, re-confirmed), and `pnpm dlx
+  knip --no-config-hints` matched every prior run's baseline (same one
+  confirmed false positive). The twenty-sixth run's own "Add tournament-level
+  best scorer facts" entry (2026-07-29, see `docs/PROJECT_STATUS.md`) had
+  explicitly left "best goalkeeper" unimplemented, noting "no goalkeeper-award
+  editorial content exists in `content/` yet, would need that added first" -
+  a genuine, previously-flagged gap rather than a repeat health check. Added
+  a new "Golden Glove winners" note section to `content/fifa-world-cup.md`
+  listing all nine winners since the award's 1994 introduction (Michel
+  Preud'homme through 2026's Unai Simón), each verified via two independent
+  WebSearch passes (see `docs/SOURCES.md`'s matching new entry for the full
+  citation list) - deliberately scoped to a prose note section rather than
+  extending `TournamentTable`'s shared `extraColumn` mechanism to a second
+  column, since the award only covers 9 of the page's 23 editions (no
+  pre-1994 equivalent existed) and a prose list avoids touching the shared
+  component's contract used by all four team-competition landing/edition
+  pages. Wired into `world-cup.astro`'s `noteHeadings` (English) and
+  hand-translated into `hr/competitions/world-cup.astro`'s own `notes` array
+  as "Dobitnici Zlatne rukavice" (Croatian, matching the page's existing
+  hand-translated-notes convention). `content/fifa-world-cup.md`'s
+  `lastReviewed` bumped to 2026-08-30. All 700 PDFs regenerated and
+  reverified clean (`pnpm build:pdfs` then `pnpm check:pdfs`, since this
+  content edit and the `docs/SOURCES.md` addition both mark every PDF's
+  shared References section stale, by design). Full standing health check
+  clean: `pnpm lint` (0/0/0), `pnpm test` (513/513 unit, unchanged),
+  `pnpm build` (711 pages), `check:links` (715 pages), `check:sitemap` (710
+  entries), `check:precache` (37 URLs), `check:perf` (heaviest page still
+  `hr/records`, within budget), full cold-start `pnpm test:e2e` (809/809,
+  after updating three pre-existing `tests/e2e/mobile.spec.ts` World Cup
+  assertions - a stale `lastReviewed` date and two `.notes__card` counts
+  hardcoded to 4 - to account for the new section, the same "existing
+  hardcoded assertion needed updating" pattern several prior content-adding
+  runs have hit). See `docs/PROJECT_STATUS.md`'s matching entry for detail.
+  EURO's own
+  goalkeeper-award history is less consistently documented across editions
+  than the World Cup's uninterrupted FIFA award, so was deliberately left
+  out of this run's scope rather than risk a less-verifiable per-edition
+  claim - a candidate for a future run if that data turns out to be
+  reliably sourceable.
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

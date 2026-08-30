@@ -5,7 +5,7 @@ competitionType: international
 confederation: FIFA
 firstEdition: 1930
 lastCompletedEdition: 2026
-lastReviewed: 2026-08-19
+lastReviewed: 2026-08-30
 status: verified
 ---
 
@@ -69,6 +69,19 @@ The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 b
 - **1982:** the field expanded from 16 to 24 teams.
 - **1998:** the field expanded to 32 teams.
 - **2026:** the field expanded to 48 teams and was hosted by three countries for the first time.
+
+## Golden Glove winners
+
+- FIFA has named a best-goalkeeper award at every World Cup since 1994; no equivalent award existed in earlier editions.
+- **1994:** Michel Preud'homme (Belgium) - the award's first winner, then named the Lev Yashin Award.
+- **1998:** Fabien Barthez (France).
+- **2002:** Oliver Kahn (Germany) - the only goalkeeper to date to also win the tournament's Golden Ball as best overall player.
+- **2006:** Gianluigi Buffon (Italy).
+- **2010:** Iker Casillas (Spain) - the first winner under the award's current "Golden Glove" name, adopted that year.
+- **2014:** Manuel Neuer (Germany).
+- **2018:** Thibaut Courtois (Belgium).
+- **2022:** Emiliano Martínez (Argentina).
+- **2026:** Unai Simón (Spain) - a record seven clean sheets across the tournament.
 
 ## Memorable moments
 
