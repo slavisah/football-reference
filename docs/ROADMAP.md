@@ -602,6 +602,35 @@ standing quirks.
   each has a similarly clean, continuous, single-name-per-edition award
   history.
 
+- **Copa América Best Player winners and UEFA Nations League Player of the
+  Finals winners**: closed 2026-08-30 (thirty-fourth intensive run) - acted
+  on the thirty-third run's own "left for a future pass" note directly
+  above. Both competitions turned out to be a clean fit for the same
+  treatment as the World Cup's Golden Ball/Golden Glove and EURO's Player of
+  the Tournament sections. Added a "Best Player winners" section to
+  `content/copa-america.md` (16 winners, one per edition since the award's
+  1987 introduction - Carlos Valderrama 1987 through James Rodríguez 2024)
+  and a "Player of the Finals winners" section to
+  `content/uefa-nations-league.md` (all four completed editions - Bernardo
+  Silva 2019 through Nuno Mendes 2025, documenting the award's real
+  mid-competition rename from "Player of the Tournament" to "Player of the
+  Finals" after 2019), each verified via two independent WebSearch passes.
+  Wired into `copa-america.astro`'s/`nations-league.astro`'s `noteHeadings`
+  and hand-translated into both Croatian sibling pages. Both content files'
+  `lastReviewed` bumped to 2026-08-30. All 700 PDFs regenerated and
+  reverified clean; full standing health check clean: `pnpm lint` (0/0/0),
+  `pnpm test` (513/513 unit), `pnpm build` (711 pages), `check:links`/
+  `check:sitemap`/`check:precache`/`check:perf` all clean, full cold-start
+  `pnpm test:e2e` after adding new EN+HR assertions for both new sections.
+  See `docs/PROJECT_STATUS.md`'s matching entry for detail, including why
+  1993's goalkeeper winner and the two non-champion winners (Guevara 2001,
+  James Rodríguez 2024) got extra scrutiny. **Left for a future pass:** the
+  same environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness). Every competition/award family now has
+  its own individual best-player-style note section wherever the award has
+  a clean, continuous history to draw on - the next content-gap pass likely
+  needs a genuinely new angle rather than another award-history section.
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

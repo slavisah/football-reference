@@ -13961,6 +13961,93 @@ two-independent-WebSearch-pass pattern used here and for the World Cup's
 Golden Ball/Golden Glove, if each competition turns out to have a similarly
 clean, continuous, single-name-per-edition award history.
 
+### Copa América Best Player winners and UEFA Nations League Player of the Finals winners - closed 2026-08-30 (thirty-fourth intensive run)
+
+`pnpm outdated` found nothing new (still just the blocked `typescript` 7
+entry, re-confirmed). Directly acted on the thirty-third run's own "left for
+a future pass" note above: researched both Copa América and UEFA Nations
+League for an equivalent individual best-player award, and found both were
+a clean fit for the same treatment already given to the World Cup's Golden
+Ball/Golden Glove and EURO's Player of the Tournament sections.
+
+**Copa América Best Player**, added to `content/copa-america.md`: CONMEBOL
+has run this award continuously since 1987 (no equivalent award existed at
+the 32 earlier editions), 16 winners across 16 editions. Verified via two
+independent WebSearch passes: the first confirmed the ten most recent/
+best-documented editions (1987 Valderrama, 1989 Sosa, 2004 Adriano, 2007
+Robinho, 2011 Suárez, 2015 Messi, 2016 Sánchez, 2019 Dani Alves, 2021 Messi,
+2024 James Rodríguez); the second filled in and independently confirmed the
+six remaining editions (1991 Leonardo Rodríguez, 1993 Goycochea, 1995
+Francescoli, 1997 Ronaldo, 1999 Rivaldo, 2001 Guevara) plus a second
+confirmation of every edition from the first pass, drawing on a source mix
+that included CONMEBOL's own copaamerica.com award-announcement articles
+(2024, 2004), official-adjacent wire coverage (Xinhua, The Statesman for
+2019), and per-player Wikipedia-sourced summaries for the older editions.
+**No discrepancies found**, including two notable non-champion winners worth
+calling out in the note itself: Amado Guevara (Honduras, 2001) is the only
+winner from a guest nation outside CONMEBOL, and James Rodríguez (Colombia,
+2024) is a runner-up winner, matching the pattern the EURO Player of the
+Tournament section already documented for Antoine Griezmann's 2016 award.
+1993's winner (Sergio Goycochea, a goalkeeper) was double-checked given how
+unusual a keeper winning a "best player" award is - held up on both passes.
+See `docs/SOURCES.md`'s matching new "Copa América" entry for the full
+citation list.
+
+**UEFA Nations League Player of the Finals**, added to
+`content/uefa-nations-league.md`: UEFA has run this award at every edition
+since the competition's 2019 launch (all four completed editions covered -
+the smallest, cleanest dataset of the site's individual-award sections).
+Verified via two independent WebSearch passes, both anchored on UEFA.com's
+own award-announcement articles for all four editions (Bernardo Silva 2019,
+Sergio Busquets 2021, Rodri 2023, Nuno Mendes 2025). The second pass
+specifically re-checked the award's exact name after noticing it differs by
+edition: UEFA's own 2019 article names it "Player of the Tournament", while
+its 2021/2023/2025 articles all say "Player of the Finals" - confirmed as a
+genuine mid-competition rename (not a reporting inconsistency) since every
+2021-onward source agrees on the new name, so the note section documents
+both names the same way the World Cup's Golden Glove section already
+documents its own 2010 rename from the "Lev Yashin Award". **No
+discrepancies found.** See `docs/SOURCES.md`'s matching new "UEFA Nations
+League" entry for the full citation list.
+
+Both sections placed immediately before each page's existing "Memorable
+moments" section (matching every prior individual-award section's
+placement), wired into `copa-america.astro`'s and `nations-league.astro`'s
+`noteHeadings`, and hand-translated into `hr/competitions/copa-america.astro`
+("Dobitnici nagrade za najboljeg igrača") and
+`hr/competitions/nations-league.astro` ("Dobitnici nagrade za najboljeg
+igrača Final Foura"), matching each page's existing hand-translated-notes
+convention. `content/copa-america.md` and `content/uefa-nations-league.md`
+both had their `lastReviewed` bumped from 2026-08-19 to 2026-08-30.
+Deliberately scoped to the two landing pages only, not their per-edition
+route trees - the same scope every prior individual-award section used.
+Added new `tests/e2e/mobile.spec.ts` coverage (EN + HR) asserting each new
+heading renders with a spot-checked winner, following the same pattern the
+Golden Ball/Golden Glove/Player of the Tournament sections' tests used.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`) - both content edits and the `docs/SOURCES.md` additions mark
+every PDF's shared References section stale, by design.
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints
+across 167 files), `pnpm test` (513/513 unit, unchanged - presentation-layer
+content, no new unit-testable logic), `pnpm build` (711 pages, unchanged -
+no new route), `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page now
+`hr/competitions/copa-america` at 278.0 KB, still well within the 510 KB
+budget - `hr/records` remains heaviest overall) all clean, full cold-start
+`pnpm test:e2e` (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`, per the
+thirtieth run's documented environment workaround).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). Every
+competition/award family now has its own individual best-player-style note
+section where one has a clean, continuous, single-name-per-edition award
+history to draw on (EURO's goalkeeper award and pre-1994 World Cup remain
+the two deliberately-out-of-scope exceptions, both already documented in
+earlier entries above) - the next content-gap pass may need a genuinely new
+angle rather than another award-history section.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
