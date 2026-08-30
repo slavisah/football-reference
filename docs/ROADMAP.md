@@ -670,6 +670,42 @@ standing quirks.
   well-known continuous "best young player" equivalent the way World
   Cup/EURO do - worth checking again if one turns up, but not assumed here.
 
+- **Copa América Golden Glove (best goalkeeper) winners**: closed 2026-08-30
+  (thirty-sixth intensive run) - `pnpm outdated` found nothing new (still
+  just the blocked `typescript` 7 entry, re-confirmed), and `pnpm dlx knip
+  --no-config-hints` matched every prior run's baseline (same one confirmed
+  false positive). CONMEBOL introduced a Golden Glove for Copa América in
+  2011 - a genuinely different, previously-uncovered award from this same
+  page's existing Best Player winners section, and (unlike EURO's still
+  out-of-scope goalkeeper award) continuous and unambiguous across all six
+  editions since its introduction (2011, 2015, 2016, 2019, 2021, 2024), the
+  same clean-fit pattern that has driven every award-history addition since
+  the thirty-first run. Added a new "Golden Glove winners" note section to
+  `content/copa-america.md`, each winner verified via two independent
+  WebSearch passes (see `docs/SOURCES.md`'s matching new entry for the full
+  citation list). Wired into `copa-america.astro`'s `noteHeadings` (English)
+  and hand-translated into `hr/competitions/copa-america.astro`'s own
+  `notes` array as "Dobitnici nagrade za najboljeg vratara" (Croatian,
+  matching the page's existing hand-translated-notes convention).
+  `content/copa-america.md`'s `lastReviewed` was already 2026-08-30 from an
+  earlier run this same day, so left unchanged. New e2e coverage in
+  `tests/e2e/mobile.spec.ts` (EN + HR heading/content assertions for the new
+  section). All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs`
+  then `pnpm check:pdfs`, since this content edit and the `docs/SOURCES.md`
+  addition both mark every PDF's shared References section stale, by
+  design). Full standing health check clean: `pnpm lint` (0/0/0), `pnpm
+  test` (513/513 unit, unchanged), `pnpm build` (711 pages), `check:links`
+  (715 pages), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+  `check:perf` (heaviest page still `hr/records`, within budget). See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a future
+  pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness). Nations League's own
+  individual-award landscape (only four completed Finals editions, and a
+  Golden Glove/Best Young Player mention found for 2021 only in passing
+  during this run's research) is murkier than Copa América's clean
+  continuous history - worth a dedicated look next time, but not assumed
+  here without stronger multi-source confirmation.
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

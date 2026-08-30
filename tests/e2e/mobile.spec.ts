@@ -913,6 +913,14 @@ test.describe('Copa América page on a 360px phone', () => {
     await expect(page.locator('.notes__card').getByText('James Rodríguez (Colombia)')).toBeVisible();
   });
 
+  test('shows the Golden Glove winners section from content/copa-america.md', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Golden Glove winners' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Justo Villar (Paraguay)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Emiliano Martínez (Argentina) - his second win.'),
+    ).toBeVisible();
+  });
+
   test('shows an audited "Format" badge per edition', async ({ page }) => {
     await expect(page.getByRole('columnheader', { name: 'Format', exact: true })).toBeVisible();
 
@@ -1075,6 +1083,16 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await page.selectOption('#copa-america-winner', 'Uruguay');
     await expect(page).toHaveURL(/winner=Uruguay/);
     await expect(page.locator('#copa-america-status')).toContainText('prvak Uruguay');
+  });
+
+  test('shows the translated Golden Glove winners section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade za najboljeg vratara' }),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Justo Villar (Paragvaj)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Emiliano Martínez (Argentina) - njegova druga nagrada.'),
+    ).toBeVisible();
   });
 
   test('shows the same champion totals as the English page', async ({ page, baseURL }) => {
