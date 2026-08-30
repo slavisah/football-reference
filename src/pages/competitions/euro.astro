@@ -17,7 +17,12 @@ const [data, goldenBoot] = await Promise.all([
   loadCompetition('uefa-euro', {
     editionsHeading: 'Editions',
     sourcesHeading: 'UEFA EURO',
-    noteHeadings: ['How it works', 'Historical format note', 'Memorable moments'],
+    noteHeadings: [
+      'How it works',
+      'Historical format note',
+      'Player of the Tournament winners',
+      'Memorable moments',
+    ],
   }),
   loadCompetition('golden-boot', {
     editionsHeading: 'UEFA EURO top scorers',

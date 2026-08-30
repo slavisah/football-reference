@@ -13892,6 +13892,75 @@ above; its Player of the Tournament / Best Young Player awards (officially
 run by UEFA since EURO 2020) were not investigated this run and are a
 candidate for a future pass.
 
+### UEFA EURO Player of the Tournament winners - closed 2026-08-30 (thirty-third intensive run)
+
+`pnpm outdated` found nothing new (still just the blocked `typescript` 7
+entry, re-confirmed). Followed up on the thirty-second run's own "left for a
+future pass" note directly above, which named EURO's Player of the
+Tournament award as unresearched - and, while checking it, turned up an
+inaccuracy in that same note: it's official since **1996**, not 2020.
+Two independent `WebSearch` passes (the first a general round-up of every
+edition's award announcement plus topendsports.com's dedicated
+award-history page; the second specifically re-checking the full
+name-and-year list against khelnow.com's dedicated list article and
+UEFA.com's own EURO 2024 and EURO 2020 award-announcement pages) confirmed:
+UEFA has run the award continuously since EURO 1996 (Matthias Sammer,
+Germany, the first winner); 2020 is only when Gianluigi Donnarumma became
+the first *goalkeeper* to win it, not when the award itself started - the
+1984/1988/1992 "unofficial" picks published on UEFA's own site predate the
+official award and were correctly left out. **No discrepancies found**
+across all eight official winners: 1996 Matthias Sammer (Germany), 2000
+Zinedine Zidane (France), 2004 Theodoros Zagorakis (Greece), 2008 Xavi
+Hernández (Spain), 2012 Andrés Iniesta (Spain), 2016 Antoine Griezmann
+(France, the only winner not to lift the trophy that year - France lost the
+final to Portugal), 2020 Gianluigi Donnarumma (Italy), 2024 Rodri (Spain).
+See `docs/SOURCES.md`'s matching new "UEFA EURO" entry for the full citation
+list.
+
+This is a clean fit for the same treatment the World Cup's Golden Ball/
+Golden Glove sections got the previous two runs: a single official
+continuous UEFA award with no partial/unofficial years to navigate the way
+EURO's still-out-of-scope goalkeeper award has (see the thirty-first and
+thirty-second runs' entries above for why that one stays out). Added a new
+"Player of the Tournament winners" note section to `content/uefa-euro.md`
+(placed between "Historical format note" and "Memorable moments", the
+existing section order), wired into `euro.astro`'s `noteHeadings` (English)
+and hand-translated into `hr/competitions/euro.astro`'s own `notes` array as
+"Dobitnici nagrade za igrača turnira" (Croatian, matching the page's
+existing hand-translated-notes convention, and updating that file's own
+top-of-notes comment from "three headings" to "four headings").
+`content/uefa-euro.md`'s `lastReviewed` bumped from 2026-08-19 to
+2026-08-30. Deliberately scoped to the EURO landing page only, not its
+per-edition route trees - the same scope the World Cup's Golden Ball/Golden
+Glove sections used, since neither extends `TournamentTable`'s shared
+`extraColumn` mechanism or touches the edition pages' own `noteHeadings`
+(`['Memorable moments']` only).
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`) - both the content edit and the `docs/SOURCES.md` addition mark
+every PDF's shared References section stale, by design.
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints
+across 167 files), `pnpm test` (513/513 unit, unchanged - presentation-layer
+content, no new unit-testable logic), `pnpm build` (711 pages, unchanged -
+no new route), `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`,
+within budget) all clean, `pnpm dlx knip --no-config-hints` (same one
+confirmed false positive, `scripts/test-preview-server.mjs`), full
+cold-start `pnpm test:e2e` (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`,
+per the thirtieth run's documented environment workaround) after updating
+two pre-existing `tests/e2e/mobile.spec.ts` EURO assertions (the English and
+Croatian "Historical format note" tests) to also check the new section's
+heading and a "Rodri" excerpt renders.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). Copa América
+and UEFA Nations League don't yet have an equivalent individual "best player
+of the tournament" note section - worth researching next via the same
+two-independent-WebSearch-pass pattern used here and for the World Cup's
+Golden Ball/Golden Glove, if each competition turns out to have a similarly
+clean, continuous, single-name-per-edition award history.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

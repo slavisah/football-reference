@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-08-19
+lastReviewed: 2026-08-30
 status: verified
 ---
 
@@ -60,6 +60,18 @@ The European Championship began in 1960 as the European Nations' Cup. Early fina
 ## Historical format note
 
 A third-place match was played through 1980. From 1984 onward, UEFA recognizes both defeated semifinalists without ranking them third and fourth. The table therefore uses neutral “other semifinalist” wording.
+
+## Player of the Tournament winners
+
+- UEFA has named a best-player award at every EURO since 1996; no equivalent award existed at the four earlier editions.
+- **1996:** Matthias Sammer (Germany).
+- **2000:** Zinedine Zidane (France).
+- **2004:** Theodoros Zagorakis (Greece) - captain of the surprise 2004 champions.
+- **2008:** Xavi Hernández (Spain).
+- **2012:** Andrés Iniesta (Spain).
+- **2016:** Antoine Griezmann (France) - runner-up with France, the only winner of the award not to lift the trophy that year.
+- **2020:** Gianluigi Donnarumma (Italy) - the first goalkeeper to win the award.
+- **2024:** Rodri (Spain).
 
 ## Memorable moments
 

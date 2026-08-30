@@ -268,11 +268,13 @@ test.describe('EURO page on a 360px phone', () => {
     await expect(row2016.locator('td[data-label="Top scorer"]')).toContainText('Antoine Griezmann');
   });
 
-  test('shows the Historical format note as a paragraph and Memorable moments as a list', async ({ page }) => {
+  test('shows the Historical format note as a paragraph, Player of the Tournament winners and Memorable moments as a list', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('no third-place match has been played since 1980')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Historical format note' })).toBeVisible();
     await expect(page.locator('.notes__card p', { hasText: 'other semifinalist' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Player of the Tournament winners' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Rodri (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.
@@ -467,7 +469,7 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
     await expect(row2016.locator('td[data-label="Najbolji strijelac"]')).toContainText('golova');
   });
 
-  test('shows the Historical format note as a paragraph and Memorable moments as a translated list', async ({
+  test('shows the Historical format note as a paragraph, translated Player of the Tournament winners and Memorable moments as a translated list', async ({
     page,
   }) => {
     await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
@@ -478,6 +480,10 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
     await expect(
       page.locator('.notes__card p', { hasText: 'drugi polufinalist' }),
     ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade za igrača turnira' }),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Rodri (Španjolska)').first()).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.
