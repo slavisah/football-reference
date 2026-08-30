@@ -73,6 +73,13 @@ A third-place match was played through 1980. From 1984 onward, UEFA recognizes b
 - **2020:** Gianluigi Donnarumma (Italy) - the first goalkeeper to win the award.
 - **2024:** Rodri (Spain).
 
+## Young Player of the Tournament winners
+
+- UEFA has named a best-player-aged-21-or-under award at every EURO since 2016; no equivalent award existed at earlier editions.
+- **2016:** Renato Sanches (Portugal).
+- **2020:** Pedri (Spain).
+- **2024:** Lamine Yamal (Spain).
+
 ## Memorable moments
 
 - Antonín Panenka's famous chipped penalty decided the 1976 shoot-out.

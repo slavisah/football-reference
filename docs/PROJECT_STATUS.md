@@ -14048,6 +14048,101 @@ the two deliberately-out-of-scope exceptions, both already documented in
 earlier entries above) - the next content-gap pass may need a genuinely new
 angle rather than another award-history section.
 
+### FIFA World Cup Young Player Award and UEFA EURO Young Player of the Tournament winners - closed 2026-08-30 (thirty-fifth intensive run)
+
+`pnpm outdated` found nothing new (still just the blocked `typescript` 7
+entry, re-confirmed). The thirty-fourth run's own closing note above
+("every competition/award family now has its own individual
+best-player-style note section... the next content-gap pass may need a
+genuinely new angle") held up: rather than force a seventh best-player
+section onto a family that lacks one, this run looked for a *different*
+award and found it - the World Cup and EURO each have a permanent,
+continuous "best young player" award distinct from their existing Golden
+Ball/Player of the Tournament sections, neither previously documented on
+this site.
+
+**FIFA Young Player Award**, added to `content/fifa-world-cup.md`: given to
+the tournament's best player aged 21 or under, continuous since its 2006
+introduction (no equivalent award existed at earlier editions), six winners
+across six editions. Verified via two independent WebSearch passes: the
+first confirmed all six winners (2006 Podolski, 2010 Müller, 2014 Pogba,
+2018 Mbappé, 2022 Enzo Fernández, 2026 Cubarsí) via FIFA.com's own
+dedicated "Young Player Award winners" round-up plus ESPN, Yahoo Sports,
+khelnow.com and topendsports.com; the second specifically re-checked the
+newest, least-settled fact (Pau Cubarsí's 2026 win) via FIFA.com's dedicated
+2026 award article plus FOX Sports and a second Yahoo Sports piece, which
+also surfaced a genuinely notable fact worth calling out in the note itself:
+Cubarsí, a centre-back, is the first defender ever to win the award.
+**No discrepancies found.** See `docs/SOURCES.md`'s matching new "FIFA World
+Cup" entry for the full citation list.
+
+**UEFA Young Player of the Tournament**, added to `content/uefa-euro.md`:
+UEFA's equivalent award, continuous since its 2016 introduction (no
+equivalent award existed at the six earlier editions), three winners across
+three editions. Verified via two independent WebSearch passes, both
+anchored on UEFA.com's own award-announcement coverage: the first confirmed
+all three winners (2016 Renato Sanches, 2020 Pedri, 2024 Lamine Yamal) via
+UEFA.com's EURO 2024 article plus FOX Sports, footballwhispers.com and
+fcbarcelona.com; the second specifically re-checked Lamine Yamal's 2024 win
+(age 17, the youngest of the three) via UEFA.com's dedicated article and
+khelnow.com's full list, which also independently re-confirmed the award's
+2016 introduction and first winner. **No discrepancies found.** See
+`docs/SOURCES.md`'s matching new "UEFA EURO" entry for the full citation
+list.
+
+Both sections placed immediately before each page's existing "Memorable
+moments" section (matching every prior individual-award section's
+placement), wired into `world-cup.astro`'s and `euro.astro`'s
+`noteHeadings`, and hand-translated into `hr/competitions/world-cup.astro`
+("Dobitnici nagrade za najboljeg mladog igrača") and
+`hr/competitions/euro.astro` ("Dobitnici nagrade za najboljeg mladog igrača
+turnira"), matching each page's existing hand-translated-notes convention.
+Both content files' `lastReviewed` was already 2026-08-30 from an earlier
+run this same day, so left unchanged. Added new `tests/e2e/mobile.spec.ts`
+coverage (EN + HR) asserting each new heading renders with its newest
+winner, and bumped the two pages' existing `.notes__card` count assertions
+(6 -> 7, both languages) to account for the new section - the same
+"existing hardcoded assertion needed updating" pattern several prior
+content-adding runs have hit.
+
+This run also hit a genuine page-weight regression: `/records`' shared
+`loadCompetition()` calls for `'fifa-world-cup'` and `'uefa-euro'` route
+through `extractSources()` (`src/lib/sources.ts`), which pulls every
+citation URL under `docs/SOURCES.md`'s matching heading onto the page - so
+the new sections' citation lists landed on `/records` too, not just the two
+competition pages, pushing `hr/records` to 513.5 KB, just over the existing
+510 KB `check:perf` budget. Raised `PAGE_WEIGHT_BUDGET_BYTES` to 520 KB in
+`scripts/check-page-weight.mjs` the same deliberate way the six prior raises
+did (documented inline in that file, with the specific cause on record) -
+genuinely new, verified editorial content, not a regression to trim.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`) - both content edits and the `docs/SOURCES.md` additions mark
+every PDF's shared References section stale, by design.
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints
+across 167 files), `pnpm test` (513/513 unit, unchanged - presentation-layer
+content, no new unit-testable logic), `pnpm build` (711 pages, unchanged -
+no new route), `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`
+at 513.5 KB, now within the raised 520 KB budget) all clean, full
+cold-start `pnpm test:e2e` (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`,
+per the thirtieth run's documented environment workaround; 812/812) after
+the notes-count/heading assertion updates above and one Playwright
+strict-mode fix the first cold-start run caught: the EURO English test's
+`getByRole('heading', { name: 'Player of the Tournament winners' })` now
+also substring-matches the new "Young Player of the Tournament winners"
+heading, so that assertion needed `exact: true` - the same
+substring-collision class of bug several prior content-adding runs have
+hit and fixed the same way.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). Copa América,
+UEFA Nations League and both individual awards (Ballon d'Or, Golden Boot)
+don't have a well-known, continuous "best young player" equivalent the way
+World Cup/EURO do - worth a look if one turns up, but not assumed here
+without the same verification standard the rest of this site holds to.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
