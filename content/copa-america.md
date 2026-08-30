@@ -158,6 +158,16 @@ A **second, independent cross-check** of the Final date column (2026-08-12, inte
 - **2021:** Lionel Messi (Argentina) - his second win.
 - **2024:** James Rodríguez (Colombia) - runner-up with Colombia, one of the few winners not to lift the trophy that year.
 
+## Golden Glove winners
+
+- CONMEBOL has named a best-goalkeeper award at every Copa América since 2011; no equivalent award existed at earlier editions.
+- **2011:** Justo Villar (Paraguay) - the award's first winner, on a Paraguay team that finished runner-up.
+- **2015:** Claudio Bravo (Chile) - the first of his two wins.
+- **2016:** Claudio Bravo (Chile) - his second win, Copa América Centenario.
+- **2019:** Alisson Becker (Brazil).
+- **2021:** Emiliano Martínez (Argentina) - the first of his two wins.
+- **2024:** Emiliano Martínez (Argentina) - his second win.
+
 ## Memorable moments
 
 - Argentina, Brazil, Chile, and Uruguay played the first edition in 1916.

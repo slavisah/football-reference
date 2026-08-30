@@ -14143,6 +14143,63 @@ don't have a well-known, continuous "best young player" equivalent the way
 World Cup/EURO do - worth a look if one turns up, but not assumed here
 without the same verification standard the rest of this site holds to.
 
+### Copa América Golden Glove (best goalkeeper) winners - closed 2026-08-30 (thirty-sixth intensive run)
+
+`pnpm outdated` found nothing new (still just the blocked `typescript` 7
+entry, re-confirmed), and `pnpm dlx knip --no-config-hints` matched every
+prior run's baseline (same one confirmed false positive).
+
+CONMEBOL introduced a Golden Glove for Copa América's best goalkeeper in
+2011 - a genuinely different, previously-uncovered award from this same
+page's existing Best Player winners section (added the thirty-fourth run),
+and unlike EURO's still out-of-scope goalkeeper award (unofficial for
+1984-1992, no single consistent name across sources), continuous and
+unambiguous across all six editions since its introduction: 2011, 2015,
+2016 (Copa América Centenario), 2019, 2021, 2024. Verified via two
+independent WebSearch passes: the first confirmed all six winners (2011
+Justo Villar, 2015/2016 Claudio Bravo - two wins, 2019 Alisson Becker, 2021/
+2024 Emiliano Martínez - two wins) via a mix of award-recap articles
+(givemesport.com, khelnow.com, foottheball.com); the second independently
+re-confirmed the same six against a distinct source mix (sportskeeda.com,
+90min.com, mykhel.com, Wikipedia's "Copa América awards" article). **No
+discrepancies found.** See `docs/SOURCES.md`'s matching new "Copa América"
+entry for the full citation list.
+
+Placed immediately after the page's existing "Best Player winners" section
+and before "Memorable moments" (matching every prior individual-award
+section's placement convention), wired into `copa-america.astro`'s
+`noteHeadings`, and hand-translated into
+`hr/competitions/copa-america.astro` as "Dobitnici nagrade za najboljeg
+vratara", matching the page's existing hand-translated-notes convention.
+`content/copa-america.md`'s `lastReviewed` was already 2026-08-30 from an
+earlier run this same day, so left unchanged. Added new
+`tests/e2e/mobile.spec.ts` coverage (EN + HR) asserting the new heading
+renders with its first and most recent winners; no existing `.notes__card`
+count assertion needed updating since this page (unlike World Cup/EURO)
+never had one.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`) - both the content edit and the `docs/SOURCES.md` addition
+mark every PDF's shared References section stale, by design.
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints
+across 167 files), `pnpm test` (513/513 unit, unchanged - presentation-layer
+content, no new unit-testable logic), `pnpm build` (711 pages, unchanged -
+no new route), `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`,
+within the 520 KB budget) all clean, full cold-start `pnpm test:e2e`
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`, per the thirtieth run's
+documented environment workaround).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). UEFA Nations
+League's own individual-award landscape looks murkier than Copa América's:
+only four completed Finals editions, and this run's research surfaced only
+a passing, single-source mention of a Golden Glove/Best Young Player for
+2021 specifically, not the two-independent-source, all-editions
+confirmation this site's standard requires - worth a dedicated look next
+time, but not assumed here.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

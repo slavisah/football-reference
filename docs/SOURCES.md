@@ -1435,6 +1435,29 @@ Primary sources should be preferred.
     per-edition articles) rather than direct page loads, since direct
     WebFetch to wikipedia.org and several other sports-reference domains
     (topendsports.com, khelnow.com) was again blocked for this run.
+- Golden Glove winners (added 2026-08-30, intensive run): a new "Golden Glove
+  winners" note section on `content/copa-america.md` listing every winner
+  since the award's 2011 introduction (no equivalent award existed at
+  earlier editions), the same treatment already given to the World Cup's
+  Golden Ball/Golden Glove, EURO's Player of the Tournament, and this same
+  page's own Best Player winners sections. Verified via two independent
+  WebSearch passes covering all six editions the award has been given at
+  (2011, 2015, 2016, 2019, 2021, 2024): the first pass found 2011 (Justo
+  Villar), 2015/2016 (Claudio Bravo, two wins), 2019 (Alisson Becker), 2021
+  and 2024 (Emiliano Martínez, two wins) via a mix of award-recap articles;
+  the second pass independently re-confirmed all six editions against a
+  distinct source mix. **No discrepancies found:**
+  - https://www.givemesport.com/every-copa-america-best-player-award-winner/
+  - https://khelnow.com/football/world-football-copa-america-list-of-all-golden-glove-winners-202407
+  - https://www.foottheball.com/copa-america/golden-glove-winners-alisson-claudio-bravo-villar-chile-brazil-paraguay/
+  - https://www.sportskeeda.com/football/list-of-copa-america-golden-glove-winners
+  - https://www.90min.com/posts/copa-america-2024-awards-golden-boot-glove-and-ball-winners
+  - https://www.mykhel.com/football/copa-america-2024-awards-golden-boot-golden-glove-and-more-complete-list-of-award-winners-293743.html
+  - https://en.wikipedia.org/wiki/Copa_Am%C3%A9rica_awards
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads,
+    since direct WebFetch to wikipedia.org remains blocked for this run.
 
 ## Ballon d'Or
 
