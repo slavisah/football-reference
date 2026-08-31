@@ -16,7 +16,13 @@ import {
 const data = await loadCompetition('uefa-nations-league', {
   editionsHeading: 'Finals',
   sourcesHeading: 'UEFA Nations League',
-  noteHeadings: ['How it works', 'Key facts', 'Player of the Finals winners', 'Memorable moments'],
+  noteHeadings: [
+    'How it works',
+    'Key facts',
+    'Player of the Finals winners',
+    'Winning managers',
+    'Memorable moments',
+  ],
 });
 
 const podium = buildPodiums(data.editions);

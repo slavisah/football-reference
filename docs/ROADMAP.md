@@ -840,6 +840,54 @@ standing quirks.
   SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live
   site) rather than another award-history section.
 
+- **FIFA World Cup and UEFA Nations League winning managers**: closed
+  2026-08-31 (fortieth intensive run) - a standing health check first (`pnpm
+  install` to restore missing `node_modules`, then lint/unit test/build/
+  `check:links`/`check:sitemap`/`check:precache`/`check:perf`/`pnpm dlx knip
+  --no-config-hints` all clean, matching the thirty-ninth run's baseline
+  exactly: 513/513 unit tests, 711 pages built, same one confirmed knip false
+  positive). The thirty-ninth run's own closing note asked for "a genuinely
+  different angle" now that every family has either a full individual-award
+  set or a documented reason one isn't sourceable - found one: **who managed
+  the winning team**, a fact never added anywhere on the site despite every
+  team-competition landing page already listing the winning *team*. Added a
+  new "Winning managers" note section to `content/fifa-world-cup.md` (all 23
+  champions, 1930-2026, verified via four independent WebSearch passes across
+  three era blocks plus a dedicated 2026 re-check) and to
+  `content/uefa-nations-league.md` (all four completed Finals, 2019-2025,
+  verified via two independent passes) - see `docs/SOURCES.md`'s two matching
+  new entries for the full citation list and methodology. Deliberately did
+  **not** attempt this for Copa América despite its top billing in this
+  routine's own priority order: an initial WebSearch pass for its 48 editions
+  (1916-2024) returned specific manager names for the 1916-1924 span that the
+  search tool's own summary explicitly flagged as incomplete/unconfirmed
+  coverage - the same "no reliable per-fact source" caution that has already
+  kept fabricated birth dates out of the site (see "Ideas not yet scoped"
+  below) - so left alone rather than risk shipping unverified early-20th-
+  century names unattended. Wired into `world-cup.astro`'s/
+  `nations-league.astro`'s `noteHeadings` and hand-translated into both
+  Croatian sibling pages as "Izbornici prvaka". New e2e coverage (EN + HR
+  heading/content assertions for both pages; World Cup's `.notes__card` count
+  bumped 8 -> 9 for both languages, Nations League has no fixed count
+  assertion to update). `content/uefa-nations-league.md`'s `lastReviewed`
+  bumped to 2026-08-31; `content/fifa-world-cup.md`'s was already 2026-08-31
+  from the thirty-eighth run, so left unchanged. All 700 PDFs regenerated and
+  reverified clean (`pnpm build:pdfs` then `pnpm check:pdfs`, using the
+  `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback this environment's
+  Chromium needs). Full standing health check clean: `pnpm lint` (0/0/0),
+  `pnpm test` (513/513 unit), `pnpm build` (711 pages), `check:links` (715
+  pages), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+  `check:perf` (heaviest page still `hr/records`, 528.7 KB, within the 540 KB
+  budget). **Left for a future pass:** the same environment-blocked items as
+  every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus
+  Copa América winning managers specifically - worth revisiting only if a
+  more authoritative, fully-attributable source for the 1916-1950s span turns
+  up (e.g. a dedicated RSSSF or CONMEBOL history page reachable despite the
+  standing egress block), not by trusting an unqualified WebSearch summary
+  for names that old. EURO winning managers (8 editions, 1960-2024) remain
+  unresearched and are likely a safe, well-documented follow-up given the
+  World Cup/Nations League experience this run.
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned
