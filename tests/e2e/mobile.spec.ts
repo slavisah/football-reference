@@ -949,6 +949,16 @@ test.describe('Copa América page on a 360px phone', () => {
     ).toBeVisible();
   });
 
+  test('shows the Golden Boot winners section from content/copa-america.md', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Golden Boot winners' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Isabelino Gradín (Uruguay) - 3 goals'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText("Guerrero's third win, the most of any player."),
+    ).toBeVisible();
+  });
+
   test('shows an audited "Format" badge per edition', async ({ page }) => {
     await expect(page.getByRole('columnheader', { name: 'Format', exact: true })).toBeVisible();
 
@@ -1120,6 +1130,16 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await expect(page.locator('.notes__card').getByText('Justo Villar (Paragvaj)')).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('Emiliano Martínez (Argentina) - njegova druga nagrada.'),
+    ).toBeVisible();
+  });
+
+  test('shows the translated Golden Boot winners section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Dobitnici Zlatne kopačke' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Isabelino Gradín (Urugvaj) - 3 gola'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Guerrerova treća nagrada, najviše od svih igrača.'),
     ).toBeVisible();
   });
 
