@@ -5,7 +5,7 @@ competitionType: international
 confederation: FIFA
 firstEdition: 1930
 lastCompletedEdition: 2026
-lastReviewed: 2026-08-30
+lastReviewed: 2026-08-31
 status: verified
 ---
 
@@ -85,6 +85,22 @@ The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 b
 - **2018:** Luka Modrić (Croatia).
 - **2022:** Lionel Messi (Argentina) - his second win.
 - **2026:** Rodri (Spain) - the first Spain player to win the award.
+
+## Silver Ball and Bronze Ball winners
+
+- The two runners-up in the Golden Ball voting receive the Silver Ball and Bronze Ball; both have been awarded alongside the Golden Ball at every World Cup since 1982.
+- **1982:** Falcão (Brazil) won the Silver Ball; Karl-Heinz Rummenigge (West Germany) won the Bronze Ball.
+- **1986:** Harald Schumacher (West Germany) won the Silver Ball; Preben Elkjær (Denmark) won the Bronze Ball.
+- **1990:** Lothar Matthäus (West Germany) won the Silver Ball; Diego Maradona (Argentina) won the Bronze Ball.
+- **1994:** Roberto Baggio (Italy) won the Silver Ball; Hristo Stoichkov (Bulgaria) won the Bronze Ball.
+- **1998:** Davor Šuker (Croatia) won the Silver Ball; Lilian Thuram (France) won the Bronze Ball.
+- **2002:** Ronaldo (Brazil) won the Silver Ball; Hong Myung-bo (South Korea) won the Bronze Ball.
+- **2006:** Fabio Cannavaro (Italy) won the Silver Ball; Andrea Pirlo (Italy) won the Bronze Ball.
+- **2010:** Wesley Sneijder (Netherlands) won the Silver Ball; David Villa (Spain) won the Bronze Ball.
+- **2014:** Thomas Müller (Germany) won the Silver Ball; Arjen Robben (Netherlands) won the Bronze Ball.
+- **2018:** Eden Hazard (Belgium) won the Silver Ball; Antoine Griezmann (France) won the Bronze Ball.
+- **2022:** Kylian Mbappé (France) won the Silver Ball; Luka Modrić (Croatia) won the Bronze Ball.
+- **2026:** Lionel Messi (Argentina) won the Silver Ball despite Argentina's final defeat; Kylian Mbappé (France) won the Bronze Ball.
 
 ## Golden Glove winners
 
