@@ -99,6 +99,32 @@ Primary sources should be preferred.
   - https://www.espn.com/soccer/story/_/id/48760910/who-won-young-player-award-world-cup
   - https://khelnow.com/football/fifa-world-cup-list-of-best-young-player-award-winners
   - https://www.topendsports.com/events/worldcupsoccer/best-young-player.htm
+- Winning managers (added 2026-08-31, intensive run): a new "Winning managers"
+  note section on `content/fifa-world-cup.md` listing the head coach of every
+  champion across all 23 editions (1930-2026) - a genuinely new angle (who led
+  the winning team, not another individual-player award) rather than a repeat
+  of the Golden Ball/Golden Glove/Young Player Award pattern already covering
+  this page. Verified via four independent WebSearch passes covering the full
+  span in three blocks (1930-1966, 1970-1990, 1994-2018, plus a dedicated pass
+  for 2022/2026): the earliest span (Suppici, the two Pozzo wins, López
+  Fontana, Herberger, Feola, Moreira, Ramsey) cross-referenced Wikipedia's
+  dedicated manager biography pages against a FIFA-winning-managers round-up;
+  the middle two spans (Zagallo through Deschamps) cross-referenced 90min,
+  beIN Sports and a dedicated "unbroken pact" feature confirming every winning
+  manager has shared the champion's own nationality; the newest, least-settled
+  fact (Luis de la Fuente's 2026 win, the oldest winning manager in World Cup
+  history at 65) was independently re-checked via aninews.in, FIFA.com's own
+  coaching-method feature and ESPN. **No discrepancies found:**
+  - https://worldsoccertalk.com/world-cup/list-of-world-cup-winning-coaches-every-manager-to-win-the-trophy-by-year/
+  - https://www.myfootballfacts.com/world-football/fifa/world-cup/fifa-all-time-world-cup/fifa-world-cup-winning-managers/
+  - https://www.beinsports.com/en-us/soccer/fifa-world-cup-2026/articles/all-fifa-world-cup-winning-coaches-in-history-complete-list-and-finals-2026-05-06
+  - https://en.wikipedia.org/wiki/Juan_L%C3%B3pez_Fontana
+  - https://en.wikipedia.org/wiki/Aymor%C3%A9_Moreira
+  - https://www.tbsnews.net/sports/unbroken-pact-how-every-world-cup-champion-has-been-led-one-their-own-1461436
+  - https://www.90min.com/posts/the-most-successful-world-cup-managers-ever
+  - https://www.aninews.in/news/sports/football/fifa-world-cup-2026-spains-luis-de-la-fuente-becomes-oldest-coach-to-win-global-tournament20260720035714/
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/luis-de-la-fuente-method-coaching
+  - https://www.espn.com/soccer/story/_/id/49406168/luis-de-la-fuentes-team-ethos-won-world-cup-spain
 - Final match dates audit (2026-08-02): the calendar date of each edition's
   decisive final match, used for the "On this day in football history" widget
   on the home page. Verified via WebSearch against each edition's dedicated
@@ -874,6 +900,25 @@ Primary sources should be preferred.
   - https://www.uefa.com/uefanationsleague/news/029a-1df453c49ada-5d8aff31f9c2-1000--nuno-mendes-named-2025-uefa-nations-league-player-of-the-f/
   - https://www.barcablaugranes.com/2021/10/11/22720363/sergio-busquets-named-nations-league-player-of-the-finals
   - https://m.allfootballapp.com/news/EPL/Sergio-Busquets-has-been-named-2021-UEFA-Nations-League-Player-of-the-Finals/2697091
+- Winning managers (added 2026-08-31, intensive run): a new "Winning managers"
+  note section on `content/uefa-nations-league.md` listing the head coach of
+  every Finals winner across all four completed editions (2019-2025) - the
+  same new angle as the matching World Cup addition this run. Verified via
+  two independent WebSearch passes: the first confirmed all four (Fernando
+  Santos 2019, Didier Deschamps 2021, Luis de la Fuente 2023, Roberto
+  Martínez 2025) via a topendsports.com winners round-up plus each manager's
+  own tenure coverage (Sky Sports, France 24, Squawka, FIFA.com); the second
+  specifically re-checked the two entries most likely to be confused with a
+  successor - Luis de la Fuente, still Spain's manager as of this same run's
+  World Cup addition, and Roberto Martínez, who succeeded Fernando Santos
+  partway through Portugal's cycle - via dedicated profile pieces for each.
+  **No discrepancies found:**
+  - https://www.topendsports.com/events/soccer/uefa-nations/winners.htm
+  - https://www.skysports.com/football/news/13954/12768875/fernando-santos-steps-down-as-portugal-head-coach-after-world-cup-exit
+  - https://www.france24.com/en/tv-shows/france-in-focus/20260616-who-is-didier-deschamps-the-france-coach-aiming-for-a-third-world-cup-title
+  - https://www.squawka.com/us/news/luis-de-la-fuente/
+  - https://www.fifa.com/en/articles/portugal-appoint-former-belgium-boss-roberto-martinez-as-fernando-santos-successor
+  - https://www.squawka.com/us/news/roberto-martinez/
 
 ## Copa América
 

@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 2018-19
 lastCompletedEdition: 2024-25
-lastReviewed: 2026-08-30
+lastReviewed: 2026-08-31
 status: verified
 ---
 
@@ -43,6 +43,13 @@ UEFA introduced the Nations League to replace many international friendlies with
 - **2021:** Sergio Busquets (Spain).
 - **2023:** Rodri (Spain).
 - **2025:** Nuno Mendes (Portugal).
+
+## Winning managers
+
+- **2019:** Fernando Santos (Portugal).
+- **2021:** Didier Deschamps (France).
+- **2023:** Luis de la Fuente (Spain) - the same season he took charge of Spain, before also winning EURO 2024 and the 2026 World Cup with them.
+- **2025:** Roberto Martínez (Portugal) - his first trophy since taking over from Fernando Santos.
 
 ## Memorable moments
 

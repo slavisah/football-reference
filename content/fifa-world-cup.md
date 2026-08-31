@@ -125,6 +125,33 @@ The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 b
 - **2022:** Enzo Fernández (Argentina).
 - **2026:** Pau Cubarsí (Spain) - the first defender to win the award.
 
+## Winning managers
+
+- Every World Cup-winning team has been led by a manager of the same nationality as the team itself, a pattern unbroken across all 23 editions.
+- **1930:** Alberto Suppici (Uruguay) - the youngest winning manager in World Cup history, aged 31.
+- **1934:** Vittorio Pozzo (Italy).
+- **1938:** Vittorio Pozzo (Italy) - still the only manager to win the World Cup twice, and the only one to win it back-to-back.
+- **1950:** Juan López Fontana (Uruguay).
+- **1954:** Sepp Herberger (West Germany).
+- **1958:** Vicente Feola (Brazil).
+- **1962:** Aymoré Moreira (Brazil).
+- **1966:** Alf Ramsey (England).
+- **1970:** Mário Zagallo (Brazil) - also won the trophy as a player in 1958 and 1962.
+- **1974:** Helmut Schön (West Germany).
+- **1978:** César Luis Menotti (Argentina).
+- **1982:** Enzo Bearzot (Italy).
+- **1986:** Carlos Bilardo (Argentina).
+- **1990:** Franz Beckenbauer (West Germany) - also won the trophy as a player in 1974, one of only three men to win it as both player and manager.
+- **1994:** Carlos Alberto Parreira (Brazil).
+- **1998:** Aimé Jacquet (France).
+- **2002:** Luiz Felipe Scolari (Brazil).
+- **2006:** Marcello Lippi (Italy).
+- **2010:** Vicente del Bosque (Spain).
+- **2014:** Joachim Löw (Germany).
+- **2018:** Didier Deschamps (France) - also won the trophy as a player in 1998, joining Zagallo and Beckenbauer as a player-and-manager winner.
+- **2022:** Lionel Scaloni (Argentina).
+- **2026:** Luis de la Fuente (Spain) - the oldest winning manager in World Cup history, aged 65, and Spain's second title alongside 2010.
+
 ## Memorable moments
 
 - Uruguay defeated Brazil in the decisive 1950 match at the Maracanã, a result remembered as the *Maracanazo*.
