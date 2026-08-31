@@ -31,6 +31,34 @@ Primary sources should be preferred.
   - https://blog.wego.com/world-cup-golden-ball-winners/
   - https://www.si.com/soccer/world-cup-golden-ball-full-list-winners
   - https://www.topendsports.com/events/worldcupsoccer/golden-ball.htm
+- Silver Ball and Bronze Ball (Golden Ball runners-up) winners (added
+  2026-08-31, intensive run): a new "Silver Ball and Bronze Ball winners"
+  note section on `content/fifa-world-cup.md`, the companion award to the
+  Golden Ball section above - both have been awarded at every World Cup
+  since the Golden Ball's 1982 introduction. Verified via three independent
+  WebSearch passes: the first returned a complete 1982-2026 table (Falcão/
+  Rummenigge in 1982 through Messi/Mbappé in 2026) cross-referencing
+  FBref.com's and Wego's award-history round-ups; the second specifically
+  re-checked the two entries a single search result could plausibly get
+  wrong - 1986 (Harald Schumacher, a goalkeeper, winning the Silver Ball;
+  Preben Elkjær the Bronze) and 1990 (Lothar Matthäus's Silver Ball; Diego
+  Maradona's Bronze Ball despite Argentina losing the final) - via RSSSF's
+  dedicated FIFA-awards pages for both years plus FIFA.com's own Schillaci
+  tribute; the third re-checked every remaining edition (1994, 1998, 2002,
+  2006, 2010, 2014) plus the newest, least-settled 2026 result (Messi's
+  Silver Ball, Mbappé's Bronze Ball, both behind Rodri's Golden Ball) via
+  FIFA+'s own award pages, Britannica, thesoccerworldcups.com and ESPN's
+  2026 award round-up. **No discrepancies found:**
+  - https://fbref.com/en/awards/wc_silver_ball/FIFA-World-Cup-Silver-Ball
+  - https://blog.wego.com/world-cup-golden-ball-winners/
+  - https://www.rsssf.org/miscellaneous/fifa-gb86.html
+  - https://www.rsssf.org/miscellaneous/fifa-gb90.html
+  - https://www.fifa.com/en/news/articles/salvatore-schillaci-tribute-italy
+  - https://www.plus.fifa.com/en/content/davor-suker-silver-ball-award-1998-fifa-world-cup-france/838db664-5cec-40cd-9a3d-0bda1b858a49
+  - https://www.plus.fifa.com/en/content/lilian-thuram-bronze-ball-award-1998-fifa-world-cup-france/552e8ebd-16b7-487b-a861-b1ee4e43f6ab
+  - https://www.thesoccerworldcups.com/world_cups/2010_awards.php
+  - https://www.espn.com/soccer/story/_/id/49404995/2026-world-cup-golden-ball-spain-unai-simon-pau-cubarsi
+  - https://sports.yahoo.com/articles/every-award-winner-2026-world-233500005.html
 - Golden Glove (best goalkeeper) winners (added 2026-08-30, intensive run): a
   new "Golden Glove winners" note section on `content/fifa-world-cup.md`
   listing every winner since the award's 1994 introduction (no equivalent

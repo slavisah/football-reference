@@ -26,22 +26,22 @@ const DIST_DIR = path.join(ROOT, 'dist');
 // (2026-08-16, a later intensive run), and the "Nearly finalists" ranking
 // added 2026-08-18 (intensive run) - genuinely the densest page on the site,
 // not bloat) weighs ~489.0 KB of HTML + CSS - over the previous 480 KB
-// budget. Raised to 510 KB (itself raised six times already, from an initial
-// ~234 KB measurement, then 300 KB, then 360 KB, then 400 KB, then 420 KB,
-// then 440 KB, then 480 KB) the same deliberate way this script's own
-// guidance recommends: real new generated content, not a regression. Raised
-// again to 520 KB on 2026-08-30 (intensive run): the World Cup's "Young
-// Player Award winners" and EURO's "Young Player of the Tournament winners"
-// note sections each added several new `docs/SOURCES.md` citation URLs
-// under the "FIFA World Cup"/"UEFA EURO" headings, which `extractSources()`
-// (`src/lib/sources.ts`) pulls into every page keyed to those headings,
-// including `/records` (it loads both competitions' full source lists) -
-// pushing `hr/records` to 513.5 KB, just over the 510 KB budget. This
-// budget leaves headroom for that content to keep growing while still
-// catching an accidental multi-page regression (a stray large asset, a
-// duplicated script block, an unminified debug dump) well before it reaches
+// budget. Raised to 520 KB (itself raised seven times already, from an
+// initial ~234 KB measurement, then 300 KB, then 360 KB, then 400 KB, then
+// 420 KB, then 440 KB, then 480 KB, then 510 KB) the same deliberate way
+// this script's own guidance recommends: real new generated content, not a
+// regression. Raised again to 540 KB on 2026-08-31 (intensive run): the
+// World Cup's new "Silver Ball and Bronze Ball winners" note section added
+// ten more `docs/SOURCES.md` citation URLs under the "FIFA World Cup"
+// heading, which `extractSources()` (`src/lib/sources.ts`) pulls into every
+// page keyed to that heading, including `/records` (it loads every
+// competition's full source list) - pushing `hr/records` to 519.8 KB,
+// leaving only 0.2 KB of headroom under the old 520 KB budget. This budget
+// leaves more room for that content to keep growing while still catching an
+// accidental multi-page regression (a stray large asset, a duplicated
+// script block, an unminified debug dump) well before it reaches
 // production.
-export const PAGE_WEIGHT_BUDGET_BYTES = 520 * 1024;
+export const PAGE_WEIGHT_BUDGET_BYTES = 540 * 1024;
 
 /** Every same-origin CSS asset path (e.g. "/football-reference/_astro/foo.css") referenced by an HTML page. */
 export function findCssRefs(html) {

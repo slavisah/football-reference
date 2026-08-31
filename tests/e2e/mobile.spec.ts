@@ -107,7 +107,7 @@ test.describe('World Cup page on a 360px phone', () => {
   });
 
   test('shows the last reviewed date and source links', async ({ page }) => {
-    await expect(page.locator('time[datetime="2026-08-30"]')).toBeVisible();
+    await expect(page.locator('time[datetime="2026-08-31"]')).toBeVisible();
     const sources = page.locator('.references__list a');
     await expect(sources.first()).toBeVisible();
     const count = await sources.count();
@@ -124,11 +124,13 @@ test.describe('World Cup page on a 360px phone', () => {
 
   test('shows the Memorable moments and Editorial notes sections from content/fifa-world-cup.md', async ({ page }) => {
     const notes = page.locator('.notes__card');
-    await expect(notes).toHaveCount(7);
+    await expect(notes).toHaveCount(8);
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('The two semifinal winners meet in the final')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Golden Ball winners' })).toBeVisible();
     await expect(notes.getByText('Rodri (Spain)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Silver Ball and Bronze Ball winners' })).toBeVisible();
+    await expect(notes.getByText('Lionel Messi (Argentina) won the Silver Ball')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Golden Glove winners' })).toBeVisible();
     await expect(notes.getByText('Unai Simón (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Young Player Award winners' })).toBeVisible();
@@ -376,12 +378,18 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
   test('shows the translated Format milestones, Memorable moments and Editorial notes sections', async ({
     page,
   }) => {
-    await expect(page.locator('.notes__card')).toHaveCount(7);
+    await expect(page.locator('.notes__card')).toHaveCount(8);
     await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
     await expect(page.getByText('Pobjednici polufinala igraju finale')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Prekretnice formata' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Dobitnici Zlatne lopte' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Rodri (Španjolska)')).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici Srebrne i Brončane lopte' }),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Lionel Messi (Argentina) osvojio je Srebrnu loptu'),
+    ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Dobitnici Zlatne rukavice' })).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('Unai Simón (Španjolska)'),
