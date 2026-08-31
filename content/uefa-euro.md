@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-08-30
+lastReviewed: 2026-08-31
 status: verified
 ---
 
@@ -79,6 +79,26 @@ A third-place match was played through 1980. From 1984 onward, UEFA recognizes b
 - **2016:** Renato Sanches (Portugal).
 - **2020:** Pedri (Spain).
 - **2024:** Lamine Yamal (Spain).
+
+## Winning managers
+
+- **1960:** Gavriil Kachalin (Soviet Union).
+- **1964:** José Villalonga (Spain).
+- **1968:** Ferruccio Valcareggi (Italy).
+- **1972:** Helmut Schön (West Germany) - also won the 1974 World Cup with West Germany, one of only a handful of managers to hold both titles.
+- **1976:** Václav Ježek (Czechoslovakia).
+- **1980:** Jupp Derwall (West Germany).
+- **1984:** Michel Hidalgo (France).
+- **1988:** Rinus Michels (Netherlands) - the architect of "Total Football", coaching the Dutch golden generation to their only European Championship title.
+- **1992:** Richard Møller Nielsen (Denmark) - led a team that only entered the tournament after Yugoslavia's late disqualification.
+- **1996:** Berti Vogts (Germany) - also won the title as a player in 1972, joining a small group of player-and-manager EURO winners.
+- **2000:** Roger Lemerre (France).
+- **2004:** Otto Rehhagel (Greece) - the German manager behind one of international football's biggest surprises.
+- **2008:** Luis Aragonés (Spain).
+- **2012:** Vicente del Bosque (Spain).
+- **2016:** Fernando Santos (Portugal).
+- **2020:** Roberto Mancini (Italy).
+- **2024:** Luis de la Fuente (Spain) - the same manager who went on to win the 2026 World Cup with Spain.
 
 ## Memorable moments
 

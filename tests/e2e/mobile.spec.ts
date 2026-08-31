@@ -285,6 +285,8 @@ test.describe('EURO page on a 360px phone', () => {
     await expect(page.locator('.notes__card').getByText('Rodri (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Young Player of the Tournament winners' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Lamine Yamal (Spain)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Luis de la Fuente (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.
@@ -514,6 +516,8 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
       page.getByRole('heading', { name: 'Dobitnici nagrade za najboljeg mladog igrača turnira' }),
     ).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Lamine Yamal (Španjolska)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Izbornici prvaka' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Luis de la Fuente (Španjolska)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.
