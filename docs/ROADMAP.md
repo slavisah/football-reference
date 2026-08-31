@@ -888,6 +888,47 @@ standing quirks.
   unresearched and are likely a safe, well-documented follow-up given the
   World Cup/Nations League experience this run.
 
+- **UEFA EURO winning managers**: closed 2026-08-31 (forty-first intensive
+  run) - a standing health check first (`pnpm install` to restore missing
+  `node_modules`, then lint/unit test/build/`check:links`/`check:sitemap`/
+  `check:precache`/`check:perf` all clean, matching the fortieth run's
+  baseline: 513/513 unit tests, 711 pages built). Acted directly on the
+  fortieth run's own closing note ("EURO winning managers... likely a safe,
+  well-documented follow-up"). Added a new "Winning managers" note section to
+  `content/uefa-euro.md` listing the head coach of every champion across all
+  17 editions (1960-2024), verified via three independent WebSearch passes
+  across three era blocks plus a dedicated fourth pass for 1988's winner
+  (Rinus Michels, whose name didn't surface in the first block's round-up
+  excerpt) - see `docs/SOURCES.md`'s matching new entry for the full citation
+  list and methodology, including the cross-check of Berti Vogts's
+  player-and-manager double (1972 as a player, 1996 as Germany's manager),
+  the same pattern World Cup winners Zagallo/Beckenbauer/Deschamps already
+  document. Wired into `euro.astro`'s `noteHeadings` (English) and
+  hand-translated into `hr/competitions/euro.astro`'s own `notes` array as
+  "Izbornici prvaka" (also refreshed that file's own stale top-of-array
+  comment, which still said "four headings" despite already carrying six).
+  `content/uefa-euro.md`'s `lastReviewed` bumped to 2026-08-31. New e2e
+  coverage (EN + HR heading/content assertions) in `tests/e2e/mobile.spec.ts`;
+  the EURO page has no fixed `.notes__card` count assertion to bump (unlike
+  World Cup's). All 700 PDFs regenerated and reverified clean (`pnpm
+  build:pdfs` then `pnpm check:pdfs`, using the
+  `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback this environment's
+  Chromium needs). Full standing health check clean: `pnpm lint` (0/0/0),
+  `pnpm test` (513/513 unit), `pnpm build` (711 pages), `check:links` (715
+  pages), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+  `check:perf` (heaviest page still `hr/records`, 531.5 KB, within the 540 KB
+  budget), `pnpm dlx knip --no-config-hints` (same one confirmed false
+  positive as every prior run), full cold-start `pnpm test:e2e` (819/819,
+  9.0 minutes). **Left for a future pass:** the
+  same environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness), plus Copa América winning managers
+  specifically (still blocked on the same unreliable-early-span sourcing the
+  fortieth run found). With World Cup, Nations League and now EURO all
+  carrying a winning-managers section, the next content-gap pass likely
+  needs either a fresh crack at Copa América's sourcing problem or a
+  genuinely different angle (accessibility, performance, SEO, or a fresh read
+  of `docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

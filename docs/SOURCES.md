@@ -762,6 +762,39 @@ Primary sources should be preferred.
   - https://footballwhispers.com/blog/euro-best-young-players/
   - https://www.fcbarcelona.com/en/football/first-team/news/2187958/pedri-best-young-player-at-euro-2020
   - https://khelnow.com/football/world-football-uefa-euro-list-of-all-young-player-of-the-tournament-award-winners-202407
+- Winning managers (added 2026-08-31, intensive run): a new "Winning
+  managers" note section on `content/uefa-euro.md` listing the head coach of
+  every champion across all 17 editions (1960-2024) - the same new angle as
+  the matching World Cup/Nations League additions from the fortieth
+  intensive run, following up on that run's own suggestion that EURO was
+  "likely a safe, well-documented follow-up". Verified via three
+  independent WebSearch passes covering the full span in three era blocks
+  (1960-1980, 1984-2004, 2008-2024): the earliest block (Kachalin,
+  Villalonga, Valcareggi, Schön, Ježek, Derwall) and middle block (Hidalgo
+  through Rehhagel) both cross-referenced Wikipedia's dedicated manager
+  category page, olympics.com's and myfootballfacts.com's winners
+  round-ups, and UEFA.com's own "every EURO coach" retrospective; the
+  newest block (Aragonés through de la Fuente) cross-referenced Sky Sports,
+  Bleacher Report and each manager's own tenure coverage. A fourth,
+  dedicated pass specifically re-checked 1988's winner - the initial
+  round-up surfaced the year but not an explicit name in its excerpt - via
+  Britannica's and GiveMeSport's dedicated Rinus Michels profiles, both
+  confirming he coached the Netherlands' 1988 title. Also independently
+  re-verified Berti Vogts's player-and-manager double (1972 EURO winner as
+  a player, 1996 EURO winner as Germany's manager) via These Football Times
+  and a Vogts biography, matching the same "won it as player and manager"
+  pattern already documented for World Cup winners Zagallo, Beckenbauer and
+  Deschamps. **No discrepancies found:**
+  - https://en.wikipedia.org/wiki/Category:UEFA_European_Championship_managers
+  - https://www.olympics.com/en/news/uefa-european-championships-euro-winners-list-champions
+  - https://www.myfootballfacts.com/uefa/uefa-nations/uefa-european-championships-winning-managers/
+  - https://www.uefa.com/uefaeuro/history/news/025f-0fe8a7c0f17c-8bf54913a5bd-1000--every-euro-coach/
+  - https://www.britannica.com/biography/Rinus-Michels
+  - https://www.givemesport.com/1704902-rinus-michels-how-the-godfather-of-dutch-football-delivered-the-netherlands-euro-1988/
+  - https://thesefootballtimes.co/2016/06/08/how-berti-vogts-inspired-germany-to-win-euro-96/
+  - https://bleacherreport.com/articles/1944540-luis-aragones-spains-euro-2008-winning-coach-dies-aged-75
+  - https://www.skysports.com/football/news/13954/10498347/fernando-santos-hails-portugal-team-spirit-after-euro-2016-win
+  - https://sports.yahoo.com/articles/euro-2020-winning-coach-roberto-183025212.html
 
 ## UEFA Nations League
 
