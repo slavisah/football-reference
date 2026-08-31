@@ -4,7 +4,7 @@ slug: ballon-dor
 awardType: individual
 firstEdition: 1956
 lastCompletedEdition: 2025
-lastReviewed: 2026-08-26
+lastReviewed: 2026-08-31
 status: verified
 ---
 
@@ -108,6 +108,18 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 | Kevin Keegan | 2 |
 | Karl-Heinz Rummenigge | 2 |
 | Ronaldo | 2 |
+
+## Kopa Trophy winners
+
+- France Football has presented the Kopa Trophy, a companion "best young player" award for the world's best player aged 21 or under, alongside the Ballon d'Or every year since 2018; it was not awarded in 2020, the one year the Ballon d'Or itself was cancelled.
+- **2018:** Kylian Mbappé (France) - the trophy's first winner.
+- **2019:** Matthijs de Ligt (Netherlands).
+- **2020:** Not awarded.
+- **2021:** Pedri (Spain).
+- **2022:** Gavi (Spain).
+- **2023:** Jude Bellingham (England).
+- **2024:** Lamine Yamal (Spain).
+- **2025:** Lamine Yamal (Spain) - the first player to win the Kopa Trophy twice.
 
 ## Important editorial note
 

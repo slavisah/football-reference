@@ -1635,6 +1635,31 @@ Primary sources should be preferred.
     environment's egress policy for this run, so verification relied on
     WebSearch's synthesized snippets rather than directly rendered pages,
     per the same caveat noted throughout this file.
+- Kopa Trophy winners (added 2026-08-31, intensive run): a new "Kopa Trophy
+  winners" note section on `content/ballon-dor.md` listing every winner of
+  France Football's companion "best young player" (under-21) award since its
+  2018 introduction (not awarded in 2020, the one year the Ballon d'Or
+  itself was cancelled) - the same treatment already given to the World
+  Cup's Golden Ball/Golden Glove/Young Player Award, EURO's Player of the
+  Tournament/Young Player of the Tournament, and Copa América/Nations
+  League's Best Player/Player of the Finals sections. Verified via two
+  independent WebSearch passes covering all seven awarded editions
+  (2018-2019, 2021-2025): both passes agreed exactly on every year - Kylian
+  Mbappé (2018), Matthijs de Ligt (2019), Pedri (2021), Gavi (2022), Jude
+  Bellingham (2023), and Lamine Yamal (2024 and 2025, the first player to
+  win it twice). **No discrepancies found:**
+  - https://www.si.com/soccer/what-is-the-kopa-trophy-past-winners-nominees-2025
+  - https://www.90min.com/what-is-kopa-trophy-past-winners-nominees
+  - https://www.topendsports.com/sport/soccer/awards/kopa-trophy.htm
+  - https://www.sportsdunia.com/football-analysis/list-of-kopa-trophy-winners
+  - https://www.chaseyoursport.com/football/list-of-kopa-trophy-winners/8061
+  - https://www.givemesport.com/every-winner-kopa-trophy-ranked/
+  - https://en.wikipedia.org/wiki/Kopa_Trophy
+  - https://www.fcbarcelona.com/en/football/first-team/news/4367534/lamine-yamal-retains-kopa-trophy/featured
+  - https://www.tntsports.co.uk/football/ballon-d-or/2025/lamine-yamal-retains-kopa-trophy-for-best-young-player-vicky-lopez-takes-inaugural-womens-prize_sto23224406/story.shtml
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Review policy
 

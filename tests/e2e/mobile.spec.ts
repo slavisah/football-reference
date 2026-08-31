@@ -795,6 +795,16 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
     ).toBeVisible();
   });
 
+  test('shows the Kopa Trophy winners section, including the 2025 repeat winner', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Kopa Trophy winners' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Kylian Mbappé (France)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('the first player to win the Kopa Trophy twice'),
+    ).toBeVisible();
+  });
+
   test("the language switcher opens the Croatian Ballon d'Or page", async ({ page }) => {
     await page.goto('competitions/ballon-dor');
     await openMenu(page);
@@ -864,6 +874,16 @@ test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360p
     await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
     await expect(
       page.getByText('nije riječ o momčadskom natjecanju ni nagradi za reprezentaciju'),
+    ).toBeVisible();
+  });
+
+  test('shows the translated Kopa Trophy winners section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade Kopa Trophy' }),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Kylian Mbappé (Francuska)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('prvi igrač koji je nagradu Kopa Trophy osvojio dva puta'),
     ).toBeVisible();
   });
 
