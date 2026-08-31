@@ -784,6 +784,62 @@ standing quirks.
   angle entirely, the same fork the thirty-seventh run's note already
   named.
 
+- **Copa América Golden Boot (top scorer) winners**: closed 2026-08-31
+  (thirty-ninth intensive run) - a standing health check first (`pnpm
+  install` to restore missing `node_modules`, then lint/unit test/build/
+  `check:links`/`check:sitemap`/`check:precache`/`check:perf` all clean:
+  513/513 unit tests, 711 pages built, heaviest page still `hr/records`
+  within the 540 KB budget). Investigated the thirty-eighth run's own
+  closing note (a new award family or a different quality angle) and found
+  a clean fit next to Copa América's existing Best Player and Golden Glove
+  sections: CONMEBOL's top-scorer award, colloquially the "Golden Boot" the
+  same way this site's dedicated Golden Boot page already labels the World
+  Cup/EURO scoring races - and, unlike Best Player (1987-) and Golden Glove
+  (2011-), derivable for every edition back to the first in 1916, not just
+  from a formal introduction year. Ruled out the symmetric UEFA Nations
+  League idea first: its four completed Finals mini-tournaments have no
+  formally named top-scorer trophy and resolve to messy multi-way ties (14
+  players tied on 1 goal in the 2023 Finals) rather than a clean single
+  fact per edition - the same "not a reliable single-name award" reasoning
+  that already shelved that competition's Golden Glove/Young Player ideas
+  twice (thirty-sixth and thirty-seventh runs), so left alone again. Added
+  a "Golden Boot winners" note section to `content/copa-america.md`
+  covering all 48 editions (1916-2024, both 1959 tournaments), each
+  verified via four era-based WebSearch passes plus a second, independent
+  cross-check pass using Spanish-language sources for the earliest span and
+  two targeted re-checks (1937's winner's correct name; 1959 Argentina's
+  edition specifically) - see `docs/SOURCES.md`'s matching new entry for
+  the full citation list and methodology. Wired into
+  `copa-america.astro`'s `noteHeadings` (English) and hand-translated into
+  `hr/competitions/copa-america.astro`'s own `notes` array as "Dobitnici
+  Zlatne kopačke" (Croatian, matching the page's existing
+  hand-translated-notes convention and the World Cup/EURO Golden Boot
+  page's own Croatian label). `content/copa-america.md`'s `lastReviewed`
+  bumped to 2026-08-31. New e2e coverage (EN + HR heading/content
+  assertions) in `tests/e2e/mobile.spec.ts`. All 700 PDFs regenerated and
+  reverified clean (`pnpm build:pdfs` then `pnpm check:pdfs`, using the
+  `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback this environment's
+  Chromium needs, since this content edit and the `docs/SOURCES.md`
+  addition both mark every PDF's shared References section stale, by
+  design). Full standing health check clean: `pnpm lint` (0/0/0), `pnpm
+  test` (513/513 unit), `pnpm build` (711 pages), `check:links` (715
+  pages), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+  `check:perf` (heaviest page still `hr/records`, within the 540 KB
+  budget). **Left for a future pass:** the same environment-blocked items as
+  every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). With
+  Copa América's own top-scorer gap now closed and the Nations League
+  equivalent confirmed a third time as not viable, every competition/award
+  family on the site now has either a full individual-award set (World Cup:
+  Golden Ball, Silver/Bronze Ball, Golden Glove, Young Player Award; EURO:
+  Player of the Tournament, Young Player of the Tournament; Copa América:
+  Best Player, Golden Glove, Golden Boot; Ballon d'Or: Kopa Trophy) or a
+  documented, twice-to-thrice-confirmed reason why a given individual award
+  isn't reliably sourceable (EURO's goalkeeper award; Nations League's
+  goalkeeper/young-player/top-scorer awards) - the next content-gap pass
+  likely needs a genuinely different angle (accessibility, performance,
+  SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live
+  site) rather than another award-history section.
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

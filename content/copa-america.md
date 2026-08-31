@@ -5,7 +5,7 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-08-30
+lastReviewed: 2026-08-31
 status: verified
 ---
 
@@ -167,6 +167,59 @@ A **second, independent cross-check** of the Final date column (2026-08-12, inte
 - **2019:** Alisson Becker (Brazil).
 - **2021:** Emiliano Martínez (Argentina) - the first of his two wins.
 - **2024:** Emiliano Martínez (Argentina) - his second win.
+
+## Golden Boot winners
+
+- The Copa América's top goalscorer at each edition is recorded here as its Golden Boot winner - the same convenience label the site's dedicated Golden Boot page already uses for the FIFA World Cup and UEFA EURO. Unlike the Best Player and Golden Glove awards above, a top scorer can be identified for every edition since the first in 1916, whether or not CONMEBOL held a formal award ceremony for it that year.
+- **1916:** Isabelino Gradín (Uruguay) - 3 goals - the tournament's first Golden Boot.
+- **1917:** Ángel Romano (Uruguay) - 4 goals - the first of his two wins.
+- **1919:** Arthur Friedenreich; Neco (both Brazil) - 4 goals each.
+- **1920:** Ángel Romano (Uruguay) - 4 goals - his second win.
+- **1921:** Julio Libonatti (Argentina) - 3 goals.
+- **1922:** Juan Francia (Argentina) - 4 goals.
+- **1923:** Vicente Aguirre (Argentina); Pedro Petrone (Uruguay) - 3 goals each.
+- **1924:** Pedro Petrone (Uruguay) - 4 goals.
+- **1925:** Manuel Seoane (Argentina) - 6 goals.
+- **1926:** David Arellano (Chile) - 7 goals.
+- **1927:** Roberto Figueroa (Uruguay) - 4 goals.
+- **1929:** Aurelio González (Paraguay) - 5 goals.
+- **1935:** Herminio Masantonio (Argentina) - 4 goals - the first of his two wins.
+- **1937:** Raúl Toro (Chile) - 7 goals.
+- **1939:** Teodoro Fernández (Peru) - 7 goals.
+- **1941:** Juan Marvezzi (Argentina) - 5 goals.
+- **1942:** Herminio Masantonio; José Manuel Moreno (both Argentina) - 7 goals each - Masantonio's second win.
+- **1945:** Norberto Méndez (Argentina); Heleno de Freitas (Brazil) - 6 goals each.
+- **1946:** José María Medina (Uruguay) - 7 goals.
+- **1947:** Nicolás Falero (Uruguay) - 8 goals.
+- **1949:** Jair (Brazil) - 9 goals - shares the single-edition scoring record.
+- **1953:** Francisco Molina (Chile) - 7 goals.
+- **1955:** Rodolfo Micheli (Argentina) - 8 goals.
+- **1956:** Enrique Hormazábal (Chile) - 4 goals.
+- **1957:** Humberto Maschio (Argentina); Javier Ambrois (Uruguay) - 9 goals each - shares the single-edition scoring record with Jair.
+- **1959 (Argentina):** Pelé (Brazil) - 8 goals.
+- **1959 (Ecuador):** José Sanfilippo (Argentina) - 6 goals.
+- **1963:** Carlos Alberto Raffo (Ecuador) - 6 goals - the only Ecuadorian to ever win an individual Copa América award.
+- **1967:** Luis Artime (Argentina) - 5 goals.
+- **1975:** Leopoldo Luque (Argentina); Ernesto Díaz (Colombia) - 4 goals each.
+- **1979:** Jorge Peredo (Chile); Eugenio Morel (Paraguay) - 4 goals each.
+- **1983:** Jorge Burruchaga (Argentina); Roberto Dinamite (Brazil); Carlos Aguilera (Uruguay) - 3 goals each.
+- **1987:** Arnoldo Iguarán (Colombia) - 4 goals.
+- **1989:** Bebeto (Brazil) - 6 goals.
+- **1991:** Gabriel Batistuta (Argentina) - 6 goals - the first of his two wins.
+- **1993:** José Luis Dolgetta (Venezuela) - 4 goals.
+- **1995:** Gabriel Batistuta (Argentina); Luis García (Mexico) - 4 goals each - Batistuta's second win.
+- **1997:** Luis Hernández (Mexico) - 6 goals.
+- **1999:** Rivaldo; Ronaldo (both Brazil) - 5 goals each.
+- **2001:** Víctor Aristizábal (Colombia) - 6 goals.
+- **2004:** Adriano (Brazil) - 7 goals.
+- **2007:** Robinho (Brazil) - 6 goals.
+- **2011:** Paolo Guerrero (Peru) - 5 goals - the first of his three wins.
+- **2015:** Eduardo Vargas (Chile); Paolo Guerrero (Peru) - 4 goals each - Guerrero's second win, the first of Vargas's two.
+- **2016:** Eduardo Vargas (Chile) - 6 goals - Copa América Centenario, his second consecutive win.
+- **2019:** Everton (Brazil); Paolo Guerrero (Peru) - 3 goals each - Guerrero's third win, the most of any player.
+- **2021:** Lionel Messi (Argentina); Luis Díaz (Colombia) - 4 goals each.
+- **2024:** Lautaro Martínez (Argentina) - 5 goals.
+- Paolo Guerrero's three wins (2011, 2015, 2019) are the most by any player; Eduardo Vargas is the only player to win in consecutive editions (2015 and 2016).
 
 ## Memorable moments
 

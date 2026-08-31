@@ -1486,6 +1486,50 @@ Primary sources should be preferred.
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads,
     since direct WebFetch to wikipedia.org remains blocked for this run.
+- Golden Boot winners (added 2026-08-31, intensive run): a new "Golden Boot
+  winners" note section on `content/copa-america.md` listing the top
+  goalscorer of every edition, 1916 through 2024 (48 editions, including both
+  1959 tournaments) - unlike the Best Player and Golden Glove awards above,
+  which only exist from their real introduction years, a top scorer can be
+  derived for every edition, the same "convenient modern label" framing the
+  site's dedicated Golden Boot page already uses for the FIFA World Cup and
+  UEFA EURO. Verified via four era-based WebSearch passes (1916-1929,
+  1935-1967 including both 1959 tournaments, 1975-1991, 1993-2024), then a
+  second, independent cross-check pass drawing on Spanish-language sources
+  (ESPN Deportes, El Economista, Bolavip, BeSoccer, Depor) for the
+  1916-1922 span specifically, plus two targeted re-checks: 1937's winner
+  (confirming "Raúl Toro" as the correct name, not the garbled "Raúl Toro
+  Julio" some summaries ran together - Toro's actual middle/second surname)
+  and 1959's Argentina-hosted edition specifically (Pelé, 8 goals, matching
+  a dedicated copaamerica.com retrospective article about that exact win).
+  **No discrepancies found** across either pass. Every joint-winner tie
+  already on the page (1919, 1923, 1942, 1945, 1957, 1975, 1979, 1983, 1995,
+  1999, 2015, 2019, 2021) came back identically tied in both passes,
+  including the two ties that jointly hold the single-edition scoring record
+  (Jair's solo 9 in 1949; Maschio and Ambrois's shared 9 each in 1957):
+  - https://copaamerica.com/en/news/top-scorer-every-edition-conmebol-copa-america
+  - https://copaamerica.com/en/news/the-all-time-top-goalscorers-in-conmebol-copa-america
+  - https://copaamerica.com/en/news/pele-king-top-scorer-copa-america-1959
+  - https://copaamerica.com/en/news/paolo-guerrero-on-his-way-to-be-the-tournaments-top-scorer
+  - https://www.nbcsports.com/soccer/news/2015-copa-america-awards-vargas-guerrero-beat-aguero-vidal-to-top-scorer
+  - https://en.wikipedia.org/wiki/Ra%C3%BAl_Toro_(footballer,_born_1911)
+  - https://www.worldfootball.net/competition/co22/conmebol-copa-america/records-all-time-goals/
+  - https://bolavip.com/en/copa-america/copa-america-top-scorers-history-best-players-and-the-golden-boot
+  - https://bolavip.com/copa-america/quienes-son-los-maximos-goleadores-historicos-de-la-copa-america
+  - https://espndeportes.espn.com/noticias/nota?id=579173&s=gen&type=story
+  - https://eleconomista.com.ar/deportes/historia-copa-america-1917-1929-n73487
+  - https://es.besoccer.com/competicion/historico-temporada/copa_america/goleadores
+  - https://depor.com/futbol-internacional/copa-america-resultados-campeones-goleadores-historial-estadisticas-torneo-1916-92434/
+  - https://www.besoccer.com/competition/historical-ranking/copa_america/top-scorers
+  - https://theanalyst.com/articles/copa-america-top-scorers-all-time
+  - https://theanalyst.com/articles/most-goals-scored-at-a-single-copa-america-players
+  - https://en.wikipedia.org/wiki/1959_South_American_Championship_(Argentina)
+  - https://en.wikipedia.org/wiki/1959_South_American_Championship_(Ecuador)
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads,
+    since direct WebFetch to wikipedia.org and copaamerica.com remains
+    blocked for this run.
 
 ## Ballon d'Or
 
