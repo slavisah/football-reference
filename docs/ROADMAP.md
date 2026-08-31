@@ -706,6 +706,37 @@ standing quirks.
   continuous history - worth a dedicated look next time, but not assumed
   here without stronger multi-source confirmation.
 
+- **UEFA Nations League individual-award re-check (confirmed still not
+  viable) plus Ballon d'Or Kopa Trophy winners**: closed 2026-08-31
+  (thirty-seventh intensive run) - re-investigated the thirty-sixth run's
+  flagged Nations League Golden Glove/Young Player of the Finals idea via
+  two fresh independent WebSearch passes: **still not viable** - UEFA has
+  never presented a Nations League Finals Golden Glove at all (only Team of
+  the Tournament/Player of the Match selections), and the Young Player of
+  the Finals award has a confirmed name/winner for only one of four
+  completed editions (2019, Frenkie de Jong). Not pursued, same reasoning
+  as before - this closes the loop rather than leaving it open, and a
+  future pass shouldn't re-attempt it without a genuinely new source lead.
+  Found a real gap instead: the Ballon d'Or's own companion "best young
+  player" prize, the **Kopa Trophy** (continuous since 2018, skipping only
+  the cancelled 2020), had never been added. Verified via two independent
+  WebSearch passes across all seven awarded editions - Kylian Mbappé (2018)
+  through Lamine Yamal (2024 and 2025, the first repeat winner) - no
+  discrepancies. Added a "Kopa Trophy winners" section to
+  `content/ballon-dor.md`, wired into `competitions/ballon-dor.astro`'s
+  `noteHeadings` and hand-translated into
+  `hr/competitions/ballon-dor.astro`. New e2e coverage (EN + HR). All 700
+  PDFs regenerated and reverified clean (twice - content edit, then the
+  `docs/SOURCES.md` addition). Full standing health check clean including a
+  full cold-start `pnpm test:e2e`: 816/816 passed (11.8 min, up from 812).
+  See `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a
+  future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness). With the Nations
+  League gap now confirmed twice as not viable and the Kopa Trophy closing
+  the site's last reachable "best young player" gap, the next content-gap
+  pass likely needs a genuinely new award family or a different quality
+  angle (accessibility, performance, SEO) entirely.
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

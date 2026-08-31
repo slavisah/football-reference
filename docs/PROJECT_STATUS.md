@@ -14200,6 +14200,99 @@ a passing, single-source mention of a Golden Glove/Best Young Player for
 confirmation this site's standard requires - worth a dedicated look next
 time, but not assumed here.
 
+### UEFA Nations League individual-award re-check (still not viable) plus Ballon d'Or Kopa Trophy winners - closed 2026-08-31 (thirty-seventh intensive run)
+
+Before starting fresh work, this run rebased the accumulated
+`intensive/football-reference` branch (six unmerged commits: World Cup
+Golden Glove/Golden Ball/Young Player Award, EURO Player of the
+Tournament/Young Player of the Tournament, Copa América Best
+Player/Golden Glove, Nations League Player of the Finals) onto the latest
+`main` and re-ran the full standing health check first: `pnpm lint` (0/0/0),
+`pnpm test` (513/513 unit), `pnpm build` (711 pages), `check:links` (715
+pages), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+`check:perf` (within budget), `check:pdfs` (700 PDFs fresh), `pnpm outdated`
+(still just the blocked `typescript` 7 entry) and `pnpm dlx knip
+--no-config-hints` (same one confirmed false positive) - all clean, no drift
+from the accumulated commits.
+
+**1. UEFA Nations League individual awards, re-investigated (confirms the
+thirty-sixth run's caution - still not viable).** Two independent WebSearch
+passes specifically targeted the gap the prior run flagged: a Nations League
+Finals "Golden Glove" and "Young Player of the Finals" award. Neither holds
+up to this site's two-independent-source, all-editions standard - a
+**genuinely different outcome from every other award-history addition since
+the thirty-first run**, worth recording rather than silently dropping. The
+Golden Glove search found no evidence UEFA has ever presented one at the
+Nations League Finals - only Team of the Tournament goalkeeper selections
+and per-match Player of the Match awards, not a single-winner "best
+goalkeeper" prize the way the World Cup/Copa América/pre-1994 competitions
+have. The Young Player award search confirmed only one of four completed
+Finals editions (2019: Frenkie de Jong) with any name and year attached;
+2021, 2023 and 2025 turned up nothing. **Not pursued** - same reasoning as
+the thirty-sixth run: fabricating or guessing the missing years would
+violate the sourcing bar every other award section on this site has met.
+This closes the loop on the open item rather than leaving it as an
+assumption - a future pass should not re-attempt this without a
+genuinely new source lead, since two runs now have confirmed the gap.
+
+**2. Ballon d'Or Kopa Trophy winners (real gap found and closed).** The
+thirty-fifth run's own note ("Both individual awards... don't have a
+well-known continuous 'best young player' equivalent... worth checking again
+if one turns up") turned out to be checking the wrong award family: the
+Ballon d'Or itself has run its own companion "best young player"
+prize - the **Kopa Trophy** - continuously since 2018 (skipping only 2020,
+the one year the Ballon d'Or itself was cancelled), a genuinely clean fit
+for the same treatment already given to every other competition/award page.
+Verified via two independent WebSearch passes covering all seven awarded
+editions (2018-2019, 2021-2025): both passes agreed exactly on every
+year - Kylian Mbappé (2018), Matthijs de Ligt (2019), Pedri (2021), Gavi
+(2022), Jude Bellingham (2023), and Lamine Yamal (2024 and **2025**, the
+first player to win the trophy twice). **No discrepancies found.** See
+`docs/SOURCES.md`'s matching new "Kopa Trophy winners" entry under Ballon
+d'Or for the full citation list.
+
+Added a new "Kopa Trophy winners" section to `content/ballon-dor.md`,
+placed after "Multiple winners" and before "Important editorial note" (the
+content file's own internal order doesn't drive rendering - `noteHeadings`
+does), wired into `competitions/ballon-dor.astro`'s `noteHeadings` between
+"How it works" and "Memorable moments" (matching the World Cup/EURO
+placement convention: award-history sections before Memorable moments), and
+hand-translated into `hr/competitions/ballon-dor.astro`'s own `notes` array
+as "Dobitnici nagrade Kopa Trophy", matching the page's existing
+hand-translated-notes convention. `content/ballon-dor.md`'s `lastReviewed`
+bumped to 2026-08-31. New e2e coverage in `tests/e2e/mobile.spec.ts` (EN +
+HR) asserts the new heading renders with the first winner (Mbappé) and the
+2025 "won it twice" fact; no existing `.notes__card` count assertion needed
+updating since this page, like Copa América's Golden Glove addition, never
+had one.
+
+All 700 PDFs regenerated and reverified clean twice this run - once after
+the `content/ballon-dor.md`/`.astro` edits, and again after the
+`docs/SOURCES.md` addition (which independently marks every PDF's shared
+References section stale, by design, the same two-pass pattern every
+content-adding run since the thirty-first has followed).
+
+Full standing health check re-run after the change, all clean: `pnpm lint`
+(0 errors/warnings/hints), `pnpm test` (513/513 unit, unchanged -
+presentation-layer content, no new unit-testable logic), `pnpm build` (711
+pages, unchanged - no new route), `check:links` (715 pages), `check:sitemap`
+(710 entries), `check:precache` (37 URLs), `check:perf` (heaviest page
+still `hr/records`, within the 520 KB budget), `check:pdfs` (700 PDFs
+fresh), and the full cold-start `pnpm test:e2e` suite
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`, per the thirtieth run's
+documented environment workaround): **816/816 passed (11.8 minutes)**, up
+from 812 - the four new Kopa Trophy assertions (EN heading/first-winner,
+EN 2025-repeat fact, HR heading/first-winner, HR 2025-repeat fact).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). With Nations
+League's individual-award gap now confirmed twice as not viable and the
+Kopa Trophy closing the last "best young player" gap this site's content
+model can support without new data, the next content-gap pass likely needs
+either a genuinely new award family (if one turns up with the same
+sourcing standard) or a different quality angle entirely (accessibility,
+performance, SEO) rather than another award-history section.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
