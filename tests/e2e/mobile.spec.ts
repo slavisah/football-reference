@@ -1004,6 +1004,14 @@ test.describe('Copa América page on a 360px phone', () => {
     ).toBeVisible();
   });
 
+  test('shows the Winning managers section from content/copa-america.md', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Marcos Calderón (Peru)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Lionel Scaloni (Argentina) - his second, back-to-back.'),
+    ).toBeVisible();
+  });
+
   test('shows an audited "Format" badge per edition', async ({ page }) => {
     await expect(page.getByRole('columnheader', { name: 'Format', exact: true })).toBeVisible();
 
@@ -1185,6 +1193,14 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     ).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('Guerrerova treća nagrada, najviše od svih igrača.'),
+    ).toBeVisible();
+  });
+
+  test('shows the translated Winning managers section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Izbornici prvaka' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Marcos Calderón (Peru)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Lionel Scaloni (Argentina) - njegova druga, uzastopna.'),
     ).toBeVisible();
   });
 

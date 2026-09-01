@@ -5,7 +5,7 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-08-31
+lastReviewed: 2026-09-01
 status: verified
 ---
 
@@ -220,6 +220,30 @@ A **second, independent cross-check** of the Final date column (2026-08-12, inte
 - **2021:** Lionel Messi (Argentina); Luis Díaz (Colombia) - 4 goals each.
 - **2024:** Lautaro Martínez (Argentina) - 5 goals.
 - Paolo Guerrero's three wins (2011, 2015, 2019) are the most by any player; Eduardo Vargas is the only player to win in consecutive editions (2015 and 2016).
+
+## Winning managers
+
+- Every Copa América-winning team has had a manager, but two independent research passes in earlier intensive-development runs found contradictory manager names for several editions in the 1916-1924 span of the old South American Championship era, so this section is deliberately scoped to the tournament's post-1975 editions - the year it adopted the Copa América name and its modern home-and-away/knockout formats, where sourcing is reliably cross-confirmed. The pre-1975 span is left out rather than risk an unverified name.
+- **1975:** Marcos Calderón (Peru).
+- **1979:** Ranulfo Miranda (Paraguay).
+- **1983:** Omar Borrás (Uruguay).
+- **1987:** Roberto Fleitas (Uruguay).
+- **1989:** Sebastião Lazaroni (Brazil).
+- **1991:** Alfio Basile (Argentina) - the first of his two consecutive title-winning editions.
+- **1993:** Alfio Basile (Argentina) - his second, back-to-back.
+- **1995:** Héctor Núñez (Uruguay).
+- **1997:** Mário Zagallo (Brazil) - also won the FIFA World Cup as Brazil's manager in 1970 and as a player in 1958 and 1962.
+- **1999:** Vanderlei Luxemburgo (Brazil).
+- **2001:** Francisco Maturana (Colombia) - Colombia's only Copa América title, won undefeated.
+- **2004:** Carlos Alberto Parreira (Brazil) - also won the FIFA World Cup as Brazil's manager in 1994.
+- **2007:** Dunga (Brazil).
+- **2011:** Óscar Tabárez (Uruguay).
+- **2015:** Jorge Sampaoli (Chile) - Chile's first title.
+- **2016:** Juan Antonio Pizzi (Chile) - Copa América Centenario, Chile's second consecutive title.
+- **2019:** Tite (Brazil).
+- **2021:** Lionel Scaloni (Argentina) - the first of his two consecutive title-winning editions.
+- **2024:** Lionel Scaloni (Argentina) - his second, back-to-back.
+- Alfio Basile and Lionel Scaloni are the only managers on this list to win back-to-back editions with Argentina.
 
 ## Memorable moments
 
