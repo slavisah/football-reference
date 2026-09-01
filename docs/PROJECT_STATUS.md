@@ -14665,9 +14665,15 @@ unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
 `check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
 (37 URLs), `check:perf` (heaviest page still `hr/records`, 540.8 KB, within
 the new 560 KB budget), `check:pdfs` (700 PDFs fresh). A full cold-start
-`pnpm test:e2e` (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) was run to
-verify the four new assertions alongside the full suite; see the addendum
-below for its result.
+`pnpm test:e2e` (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) confirmed
+the new assertions: **822/822 passed (13.2 minutes)**, up from the
+forty-third run's 821/821 - the one new `test()` block (the Croatian Nations
+League "Winning captains" test) plus three new assertions added inside
+already-existing tests (EURO EN/HR, Nations League EN). No pre-existing
+assertion needed updating this run - unlike several prior content-adding
+runs, neither `content/uefa-euro.md` nor `content/uefa-nations-league.md`
+has a hardcoded `time[datetime=...]` `lastReviewed` assertion in
+`tests/e2e/mobile.spec.ts` to go stale.
 
 **Left for a future pass:** the same environment-blocked items as every
 recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
