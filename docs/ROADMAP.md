@@ -1144,6 +1144,54 @@ standing quirks.
   angle (accessibility, performance, SEO, or a fresh read of
   `docs/WEBSITE_REQUIREMENTS.md` against the live site).
 
+- **`prefers-contrast: more` support plus a dependency patch bump**: closed
+  2026-09-01 (forty-seventh intensive run) - `pnpm outdated` found one new
+  in-range patch release (`@types/node` 26.4.0 -> 26.4.1, installed),
+  `pnpm dlx knip --no-config-hints` matched every prior run's baseline, and
+  `pnpm audit` reported no known vulnerabilities. Tried the content angle
+  first per the forty-sixth run's closing note: two independent WebSearch
+  passes each investigated a Copa América "Best Young Player" award and a
+  Copa América "Fair Play Award" as new sections - both confirmed
+  unreliable (the former only awarded "intermittently" per its own
+  Wikipedia summary; the latter returned a winner for only one of six
+  candidate editions), so neither was pursued, matching the standing
+  "don't ship a partial/unreliable per-edition dataset" rule. Pivoted to
+  accessibility and found a genuine gap: `global.css` already handles
+  `prefers-reduced-motion` and `forced-colors` but never
+  `prefers-contrast: more`. Added four new contrast-mode color tokens
+  (`--light-contrast-border`/`--light-contrast-text-muted`/
+  `--dark-contrast-border`/`--dark-contrast-text-muted`), each chosen by
+  computing exact WCAG ratios against every background token (light border
+  1.29:1 -> 5.15:1, light text-muted 5.80:1 -> 9.05:1 AAA, dark border
+  1.59:1 -> 5.72:1, dark text-muted 8.30:1 -> 11.95:1), wired through a new
+  `@media (prefers-contrast: more)` block that mirrors the existing
+  four-block color-scheme resolution shape exactly (default, OS-dark
+  override, explicit light, explicit dark) to avoid the same split-theme
+  bug class the `--danger` token comment already documents. New
+  `tests/e2e/accessibility-prefers-contrast.spec.ts` (6 cases) covers all
+  four color-scheme x contrast combinations plus two no-preference
+  baselines. No PDF regeneration needed (`global.css` isn't a tracked PDF
+  source file). Full standing health check clean: `pnpm lint` (0/0/0),
+  `pnpm test` (513/513 unit, unchanged), `pnpm build` (711 pages,
+  unchanged), `check:links` (715 pages), `check:sitemap` (710 entries),
+  `check:precache` (37 URLs), `check:perf` (heaviest page `hr/records`,
+  547.0 KB, within the 560 KB budget), `pnpm audit` clean, full cold-start
+  `pnpm test:e2e` - 832/832 passed (up from the forty-fourth run's 822/822
+  baseline, +10: this run's 6 new `accessibility-prefers-contrast.spec.ts`
+  cases plus a few the forty-fifth/forty-sixth content-only runs added; 2
+  tests flaked with a transient `net::ERR_CONNECTION_REFUSED` against the
+  preview server on the full run, both confirmed passing on an isolated
+  16/16 re-run of their file, not a regression from this run's change).
+  See `docs/PROJECT_STATUS.md`'s matching entry for the full reasoning,
+  including why the two content-angle ideas were rejected.
+  **Left for a future pass:** the same environment-blocked items as every
+  recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+  América winning captains for 1975-2010 (needs a genuinely different
+  verification path). `prefers-reduced-data` is the only remaining
+  standing OS accessibility media-feature preference left unexamined,
+  though likely low-yield given this site has very little heavy media to
+  begin with.
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned
