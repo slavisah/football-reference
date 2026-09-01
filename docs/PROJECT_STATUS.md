@@ -14398,6 +14398,90 @@ next content-gap pass likely needs either a genuinely new award family
 elsewhere or a different quality angle entirely, the same fork the
 thirty-seventh run's closing note already named.
 
+### Ballon d'Or Yashin Trophy (best goalkeeper) winners - added 2026-09-01 (forty-second intensive run)
+
+Started with the standing health check the last several run entries all
+recommend running first: `pnpm install` restored missing `node_modules`
+(this container started fresh), `pnpm outdated` found only one new in-range
+patch release (astro 7.2.9 -> 7.2.10, installed this run) beyond the
+already-blocked `typescript` 7 entry, and `pnpm dlx knip --no-config-hints`
+matched every prior run's baseline exactly (the one confirmed false
+positive, `scripts/test-preview-server.mjs`).
+
+The forty-first run's own closing note asked for "either a fresh crack at
+Copa América's sourcing problem or a genuinely different angle." Tried the
+former first: two independent `WebSearch` passes for Copa América's early
+(1916-1921) winning-team managers came back **contradicting each other on
+three of five years** (1916, 1917 and 1920 each got a different manager
+name from each pass) - direct confirmation that the fortieth run's original
+caution (an "incomplete/unconfirmed coverage" flag on that same span) was
+correct, not overcautious. Left Copa América managers alone again rather
+than trust either contradicting source.
+
+Found a genuinely different angle instead: the Ballon d'Or has its own
+companion "best goalkeeper" award, the **Yashin Trophy** (named after Lev
+Yashin, continuous since 2019, skipping only the cancelled 2020 - the exact
+same shape as the already-added Kopa Trophy section on the same page), which
+had never been added despite the page's existing unrelated "Lev Yashin
+remains the only goalkeeper to win the men's award" note (about the Ballon
+d'Or itself, a different fact). Verified all six awarded editions via two
+independent WebSearch passes (2019, 2021-2025): both agreed exactly -
+Alisson (2019, first winner), Gianluigi Donnarumma (2021), Thibaut Courtois
+(2022), Emiliano Martínez (2023 and 2024, the first goalkeeper to win it in
+consecutive years), and Donnarumma again (2025, becoming the second
+goalkeeper - after Martínez - to win it more than once). A third pass
+specifically re-checked the two facts most likely to be conflated with a
+different Ballon d'Or-night storyline (Courtois's 2022 win vs. his separate
+podium placing; the Martínez back-to-back). **No discrepancies found** - see
+`docs/SOURCES.md`'s matching new entry for the full citation list.
+
+Added the "Yashin Trophy winners" section to `content/ballon-dor.md`
+(bumping its `lastReviewed` to 2026-09-01), placed directly after the
+existing "Kopa Trophy winners" section (both are France Football's
+companion individual awards, headline young-player one first, same order the
+World Cup's Golden Ball family already established for its own multi-section
+pages). Wired into `competitions/ballon-dor.astro`'s `noteHeadings` array and
+hand-translated into `hr/competitions/ballon-dor.astro`'s own `notes` array
+as "Dobitnici nagrade Yashin Trophy" (keeping "Yashin Trophy" as an
+untranslated proper noun, the same convention "Kopa Trophy" already uses on
+that same Croatian page).
+
+New e2e coverage in `tests/e2e/mobile.spec.ts`: EN heading/content assertions
+for the new section (first winner, the 2023-24 consecutive-win note, and the
+2025 repeat-winner note) and matching HR assertions. The Ballon d'Or page has
+no fixed `.notes__card` count assertion to bump (unlike World Cup's).
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs, since this content edit and the
+`docs/SOURCES.md` addition both mark every PDF's shared References section
+stale, by design).
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page still `hr/records`, 534.7 KB, within
+the 540 KB budget), `check:pdfs` (700 PDFs fresh), and the full cold-start
+`pnpm test:e2e` suite (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`):
+**821/821 passed (12.7 minutes)**, up from the forty-first run's 819/819
+baseline - the two new EN/HR Yashin Trophy assertions, no other test count
+changes.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7 - `@astrojs/check`'s `typescript: '^5.0.0 ||
+^6.0.0'` peer ceiling re-confirmed again this run; `docs/SOURCES.md`
+link-liveness), plus Copa América winning managers specifically, now
+confirmed a second time as genuinely contradictory-sourced for its earliest
+span rather than just thinly sourced - a future pass shouldn't re-attempt it
+without a source lead better than general WebSearch summaries (e.g. a
+dedicated CONMEBOL or RSSSF history page reachable despite the standing
+egress block). With the Ballon d'Or's own individual-award companions now
+complete (Kopa Trophy, Yashin Trophy) alongside every other family's already-
+covered set, the next content-gap pass likely needs a genuinely new angle
+again - accessibility, performance, SEO, or a fresh read of
+`docs/WEBSITE_REQUIREMENTS.md` against the live site.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
