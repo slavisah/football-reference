@@ -1,7 +1,16 @@
 /* Design tokens + light/dark themes.
    Theme resolution order:
    1. prefers-color-scheme provides the default,
-   2. a data-theme attribute set by the toggle (persisted in localStorage) wins. */
+   2. a data-theme attribute set by the toggle (persisted in localStorage) wins.
+   Independently of that, a `prefers-contrast: more` reader (the OS-level "more
+   contrast" accessibility setting; unlike color-scheme, there is no in-page
+   toggle for it) strengthens --border and --text-muted - the two tokens
+   deliberately kept subtle by design (a barely-there 1.29:1 card/table divider,
+   a 5.80:1 muted caption) - to combat the well-known real problem with subtle
+   dividers and low-emphasis text: readers with low vision or in bright light
+   often cannot see a 1.3:1 border at all. See the --light-contrast-border and
+   --dark-contrast-border tokens' own comments below for the measured
+   ratios. */
 
 :root {
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
@@ -40,6 +49,14 @@
      just under AA. */
   --light-danger: #b3261e;
   --light-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 4px 12px rgba(16, 24, 40, 0.06);
+  /* prefers-contrast: more replacements for --light-border/--light-text-muted.
+     Measured against --light-bg (#f7f8fa): border goes from an almost-invisible
+     1.29:1 to 5.15:1 (comfortably above the 3:1 WCAG 1.4.11 non-text minimum);
+     text-muted goes from an already-AA-passing 5.80:1 to 9.05:1 (AAA). Also
+     checked against every other light background token this pair sits on
+     (--light-bg-elevated 5.47:1, --light-bg-subtle 4.83:1) - all clear. */
+  --light-contrast-border: #5c6b7a;
+  --light-contrast-text-muted: #3b4652;
 
   --dark-bg: #0f1520;
   --dark-bg-elevated: #172233;
@@ -55,6 +72,13 @@
      a major AA failure, not just marginal. */
   --dark-danger: #ff7b72;
   --dark-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 16px rgba(0, 0, 0, 0.4);
+  /* prefers-contrast: more replacements for --dark-border/--dark-text-muted.
+     Measured against --dark-bg (#0f1520): border goes from 1.59:1 to 5.72:1;
+     text-muted (already AAA at 8.30:1) goes to 11.95:1. Also checked against
+     --dark-bg-elevated (5.00:1) and --dark-bg-subtle (4.48:1) - both clear of
+     the 3:1 non-text minimum too. */
+  --dark-contrast-border: #7d92ab;
+  --dark-contrast-text-muted: #c7d2e0;
 
   /* Resolved tokens components actually read. Default (no JS, no OS
      preference reported) is light. */
@@ -117,6 +141,39 @@
   --focus: var(--dark-focus);
   --danger: var(--dark-danger);
   --shadow: var(--dark-shadow);
+}
+
+/* prefers-contrast: more overrides --border/--text-muted on top of whichever
+   theme block above already resolved (mirrors that same four-block shape -
+   default, OS-dark override, explicit light, explicit dark - deliberately,
+   since color-scheme has no in-page toggle to re-trigger this, and getting
+   one of the four combinations wrong here would repeat the exact split-theme
+   bug documented in the --danger comment above, just for a preference no
+   toggle click can ever surface to a reader testing by hand). */
+@media (prefers-contrast: more) {
+  :root {
+    --border: var(--light-contrast-border);
+    --text-muted: var(--light-contrast-text-muted);
+  }
+}
+
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --border: var(--dark-contrast-border);
+    --text-muted: var(--dark-contrast-text-muted);
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root[data-theme='light'] {
+    --border: var(--light-contrast-border);
+    --text-muted: var(--light-contrast-text-muted);
+  }
+
+  :root[data-theme='dark'] {
+    --border: var(--dark-contrast-border);
+    --text-muted: var(--dark-contrast-text-muted);
+  }
 }
 
 *,

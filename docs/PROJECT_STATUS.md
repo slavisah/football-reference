@@ -14790,6 +14790,116 @@ the next content-gap pass likely needs either that better source lead or
 a genuinely different quality angle (accessibility, performance, SEO, or a
 fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live site).
 
+### `prefers-contrast: more` support plus a dependency patch bump - added 2026-09-01 (forty-seventh intensive run)
+
+Started with the standing health check: `pnpm install` (fresh container),
+`pnpm outdated` found one new in-range patch release (`@types/node` 26.4.0
+-> 26.4.1, installed this run), `pnpm dlx knip --no-config-hints` matched
+every prior run's baseline (same one confirmed false positive), and
+`pnpm audit` reported no known vulnerabilities. The `typescript` 7 upgrade
+is still blocked, re-confirmed via `npm view @astrojs/check@latest
+peerDependencies` (`^5.0.0 || ^6.0.0`), and the `docs/SOURCES.md`
+link-liveness sweep is still blocked (a direct `curl` to
+`en.wikipedia.org` was again rejected with a 403 by the egress proxy).
+
+The forty-sixth run's own closing note asked for "that better source lead
+or a genuinely different quality angle" now that every reliably-sourceable
+individual-award/personnel angle across all six competition/award families
+is shipped. Tried the content angle first: two independent WebSearch
+passes investigated a Copa América "Best Young Player" award and a Copa
+América "Fair Play Award" as candidate new sections. Both turned out
+unreliable the same way prior "not pursued" ideas in this file already
+were - the Best Young Player award's own Wikipedia summary describes it as
+awarded only "intermittently" (not a clean per-edition fact), and the Fair
+Play Award returned a confirmed winner for only one of six candidate
+editions (2024) despite two search passes. Neither was pursued, matching
+this file's standing "don't ship a partial or unreliable per-edition
+dataset" rule.
+
+Pivoted to the accessibility angle instead and found a genuine, previously
+unaddressed gap: `global.css` has handled `prefers-reduced-motion` (see
+the 2026-08-28 entry) and `forced-colors` for a while, but never
+`prefers-contrast: more` - the OS-level "increase contrast" accessibility
+setting, distinct from both. Two of the site's own design tokens are
+deliberately subtle by design: `--border` (a card/table divider measured
+at just 1.29:1 against `--light-bg`/1.59:1 against `--dark-bg` - barely
+visible, decorative only) and `--text-muted` (already AA at 5.80:1/8.30:1
+but not AAA in the light theme). A reader with low vision or using the
+site in bright light who has this OS setting on gets no benefit from it
+today.
+
+Added four new palette tokens (`--light-contrast-border`,
+`--light-contrast-text-muted`, `--dark-contrast-border`,
+`--dark-contrast-text-muted`) in `global.css`, each color chosen by
+computing exact WCAG contrast ratios against every background token it can
+sit on (`--bg`, `--bg-elevated`, `--bg-subtle`) rather than eyeballing:
+light border 1.29:1 -> 5.15:1 (clear of the 3:1 WCAG 1.4.11 non-text
+minimum, checked against all three light backgrounds too - 5.47:1/4.83:1);
+light text-muted 5.80:1 -> 9.05:1 (AAA); dark border 1.59:1 -> 5.72:1
+(5.00:1/4.48:1 against the other two dark backgrounds); dark text-muted
+8.30:1 -> 11.95:1. A new `@media (prefers-contrast: more)` block overrides
+`--border`/`--text-muted` to these tokens - deliberately mirroring the
+existing four-block color-scheme resolution shape (default, `@media
+(prefers-color-scheme: dark)`, `[data-theme='light']`,
+`[data-theme='dark']`) with one contrast-scoped block per combination,
+rather than a single global override, for the same reason
+`theme-token-parity.spec.ts` exists: getting one of the four combinations
+wrong here would repeat the exact split-theme bug the `--danger` comment
+in `global.css` already documents (a fix landing in only one of the
+resolution blocks), except for a preference with no in-page toggle a
+tester could click to notice the gap by hand.
+
+**Tests:** new `tests/e2e/accessibility-prefers-contrast.spec.ts` (6
+cases, mirroring `accessibility-reduced-motion.spec.ts`'s
+`page.emulateMedia()`-based pattern since `contrast` isn't a
+`test.use()`-able Playwright option in the pinned version either) - all
+four color-scheme x contrast combinations (OS light/dark, each with and
+without an explicit toggle override to the other theme) resolve to the
+correct token values, plus two baseline cases confirming the normal subtle
+tokens are unaffected without the preference.
+
+No PDF regeneration needed - `global.css` isn't a tracked PDF source file
+(`scripts/pdf-pages.mjs`'s per-family source lists are content/`.astro`
+files only), and this change doesn't touch default/print rendering, only
+an OS accessibility preference's screen rendering - matching the
+2026-08-28 `prefers-reduced-motion` entry, which also needed no PDF
+regeneration.
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - CSS-only + a new e2e spec, no unit-
+testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 547.0 KB, within the
+560 KB budget). A full cold-start `pnpm test:e2e` initially showed 2
+failures in `accessibility-compare-states.spec.ts`, both
+`net::ERR_CONNECTION_REFUSED` against the preview server rather than a
+real assertion failure; an isolated re-run of just that file passed
+16/16, confirming a transient dev-server hiccup rather than a regression
+from this run's change (an unrelated CSS/token edit couldn't plausibly
+cause a connection-refused error) - the same "died before any test body
+ran" flake shape this repo's own babysitting conventions call for a
+single re-run to confirm, not a code fix. Full suite: **832 passed**
+(counting the isolated re-run's 16 in place of the 2 flaked failures),
+up from the forty-fourth run's 822 baseline (+10: this run's 6 new
+`accessibility-prefers-contrast.spec.ts` cases plus a handful the
+forty-fifth/forty-sixth content-only runs added without a matching
+ROADMAP.md total callout).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still needs a genuinely different
+verification path per the forty-sixth run's note). The Best Young
+Player/Fair Play Award ideas this run investigated and declined are now
+closed the same way the Nations League individual-award ideas were -
+don't re-attempt either without a materially better source lead. With
+`prefers-reduced-motion`, `forced-colors` and now `prefers-contrast: more`
+all handled, `prefers-reduced-data` (a less widely supported media
+feature, mostly relevant to a heavier media site than this one) is the
+only standing OS accessibility preference left unexamined - worth a quick
+look next time this angle comes up again, though this site has very
+little heavy media to begin with (no video/large images beyond the OG
+card and PWA icons), so it may turn out to be low-yield.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
