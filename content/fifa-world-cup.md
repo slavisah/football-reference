@@ -5,7 +5,7 @@ competitionType: international
 confederation: FIFA
 firstEdition: 1930
 lastCompletedEdition: 2026
-lastReviewed: 2026-08-31
+lastReviewed: 2026-09-01
 status: verified
 ---
 
@@ -151,6 +151,33 @@ The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 b
 - **2018:** Didier Deschamps (France) - also won the trophy as a player in 1998, joining Zagallo and Beckenbauer as a player-and-manager winner.
 - **2022:** Lionel Scaloni (Argentina).
 - **2026:** Luis de la Fuente (Spain) - the oldest winning manager in World Cup history, aged 65, and Spain's second title alongside 2010.
+
+## Winning captains
+
+- The captain is the player who lifts the trophy on the podium; every World Cup-winning team has had one across all 23 editions.
+- **1930:** José Nasazzi (Uruguay).
+- **1934:** Gianpiero Combi (Italy).
+- **1938:** Giuseppe Meazza (Italy).
+- **1950:** Obdulio Varela (Uruguay).
+- **1954:** Fritz Walter (West Germany).
+- **1958:** Hilderaldo Bellini (Brazil).
+- **1962:** Mauro Ramos (Brazil).
+- **1966:** Bobby Moore (England).
+- **1970:** Carlos Alberto Torres (Brazil).
+- **1974:** Franz Beckenbauer (West Germany) - also went on to win the trophy as a manager in 1990, one of only three men to win it as both player and manager (see "Winning managers" above).
+- **1978:** Daniel Passarella (Argentina).
+- **1982:** Dino Zoff (Italy) - at 40 years old, still the oldest player to captain a World Cup-winning team.
+- **1986:** Diego Maradona (Argentina).
+- **1990:** Lothar Matthäus (West Germany).
+- **1994:** Dunga (Brazil).
+- **1998:** Didier Deschamps (France) - also went on to win the trophy as a manager in 2018, joining Beckenbauer as a player-and-manager winner (see "Winning managers" above).
+- **2002:** Cafu (Brazil) - the only player to appear in three consecutive World Cup finals (1994, 1998 and 2002).
+- **2006:** Fabio Cannavaro (Italy).
+- **2010:** Iker Casillas (Spain).
+- **2014:** Philipp Lahm (Germany).
+- **2018:** Hugo Lloris (France).
+- **2022:** Lionel Messi (Argentina).
+- **2026:** Rodri (Spain) - also named the tournament's Golden Ball winner the same year (see "Golden Ball winners" above).
 
 ## Memorable moments
 

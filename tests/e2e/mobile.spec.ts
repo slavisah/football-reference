@@ -124,11 +124,11 @@ test.describe('World Cup page on a 360px phone', () => {
 
   test('shows the Memorable moments and Editorial notes sections from content/fifa-world-cup.md', async ({ page }) => {
     const notes = page.locator('.notes__card');
-    await expect(notes).toHaveCount(9);
+    await expect(notes).toHaveCount(10);
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('The two semifinal winners meet in the final')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Golden Ball winners' })).toBeVisible();
-    await expect(notes.getByText('Rodri (Spain)')).toBeVisible();
+    await expect(notes.getByText('Rodri (Spain) - the first Spain player to win the award')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Silver Ball and Bronze Ball winners' })).toBeVisible();
     await expect(notes.getByText('Lionel Messi (Argentina) won the Silver Ball')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Golden Glove winners' })).toBeVisible();
@@ -137,6 +137,8 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(notes.getByText('Pau Cubarsí (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
     await expect(notes.getByText('Luis de la Fuente (Spain)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Winning captains' })).toBeVisible();
+    await expect(notes.getByText('Cafu (Brazil) - the only player to appear in three consecutive')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.
@@ -382,12 +384,14 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
   test('shows the translated Format milestones, Memorable moments and Editorial notes sections', async ({
     page,
   }) => {
-    await expect(page.locator('.notes__card')).toHaveCount(9);
+    await expect(page.locator('.notes__card')).toHaveCount(10);
     await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
     await expect(page.getByText('Pobjednici polufinala igraju finale')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Prekretnice formata' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Dobitnici Zlatne lopte' })).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('Rodri (Španjolska)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Rodri (Španjolska) - prvi španjolski igrač'),
+    ).toBeVisible();
     await expect(
       page.getByRole('heading', { name: 'Dobitnici Srebrne i Brončane lopte' }),
     ).toBeVisible();
@@ -407,6 +411,10 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     await expect(page.getByRole('heading', { name: 'Izbornici prvaka' })).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('Luis de la Fuente (Španjolska)').first(),
+    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Kapetani prvaka' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Cafu (Brazil) - jedini igrač koji je nastupio'),
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Uredničke napomene' })).toBeVisible();

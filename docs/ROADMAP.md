@@ -965,6 +965,35 @@ standing quirks.
   performance, SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md`
   against the live site).
 
+- **FIFA World Cup winning captains**: closed 2026-09-01 (forty-third
+  intensive run) - a standing health check first (`pnpm install`, `pnpm
+  outdated`/`pnpm dlx knip --no-config-hints` found nothing new, full
+  lint/test/build/`check:*` suite matched the forty-second run's baseline).
+  The forty-second run's own closing note asked for "a genuinely new angle";
+  found one next to the existing "Winning managers" sections: who captained
+  the winning team, never recorded anywhere on the site. Scoped to the World
+  Cup only this run (23 editions, 1930-2026, verified via two independent
+  WebSearch passes with zero discrepancies - see `docs/SOURCES.md`'s
+  matching entry). Added a "Winning captains" section to
+  `content/fifa-world-cup.md`, wired into `world-cup.astro`'s `noteHeadings`
+  and hand-translated into `hr/competitions/world-cup.astro` as "Kapetani
+  prvaka". New e2e coverage (EN + HR, `.notes__card` counts 9 -> 10). All
+  700 PDFs regenerated and reverified clean; full standing health check
+  clean including a cold-start `pnpm test:e2e`. See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a future
+  pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa América
+  winning managers specifically (still blocked on contradictory early
+  sourcing). **Next up:** UEFA EURO and UEFA Nations League winning
+  captains - both already have a proven-sourceable "Winning managers"
+  section to sit alongside, the same low-risk pattern. Copa América
+  captains would face the same early-span sourcing risk already documented
+  for its managers, so should wait for a better source lead. `hr/records`'s
+  page weight is at 537.7 KB against the 540 KB budget (2.3 KB headroom) -
+  the next content addition that grows `docs/SOURCES.md` further will
+  likely need another deliberate budget raise in
+  `scripts/check-page-weight.mjs`.
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

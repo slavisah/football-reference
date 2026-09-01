@@ -11,6 +11,40 @@ Primary sources should be preferred.
   - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/award-winners
 - FIFA historical top scorers:
   - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/fontaine-mbappe-ronaldo-and-more-every-world-cup-top-scorer
+- Winning captains (added 2026-09-01, intensive run): a new "Winning
+  captains" note section on `content/fifa-world-cup.md` listing the captain
+  who lifted the trophy at every one of the 23 editions (1930-2026),
+  mirroring the existing "Winning managers" section's shape and sitting
+  next to it. Verified via two independent WebSearch passes covering all 23
+  years - the first via Betway Insider and FIFAWorldCupNews.com's dedicated
+  captain-list round-ups plus Wikipedia/RSSSF player pages for the 1930
+  edge case (José Nasazzi); the second via RSSSF's own champions-squads page
+  and Sportsbrief's independent round-up - both passes agreed on all 22
+  completed editions through 2022 with no discrepancy. The 2026 captain
+  (Rodri, Spain) was confirmed separately via Yahoo Sports, UEFA.com and
+  FIFA.com's own squad-announcement article (de la Fuente handed Rodri the
+  armband), matching the page's existing Golden Ball entry for the same
+  player. Two supporting facts were each independently re-verified before
+  being added as bullet annotations: Dino Zoff's 1982 record as the oldest
+  captain to lift the trophy (40 years old, via FIFA.com's own "40-year-old
+  king" article and Guinness World Records) and Cafu's run of three
+  consecutive World Cup finals as a player, 1994/1998/2002 (via FIFA.com and
+  Laureus). **No discrepancies found:**
+  - https://blog.betway.com/football/world-cup/football-world-cup-winning-captains/
+  - https://www.fifaworldcupnews.com/fifa-world-cup-winning-captains-country/
+  - https://www.rsssf.org/miscellaneous/wcwinners.html
+  - https://sportsbrief.com/football/60580-a-list-world-cup-winning-captains-fifa-world-cup-history/
+  - https://sports.yahoo.com/videos/la-fuente-hands-rodri-spains-011309531.html
+  - https://www.uefa.com/european-qualifiers/news/02a6-20d159556fdf-60d8385f463f-1000--spain-at-the-world-cup-2026-squad-fixtures-group-and-history/
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/spain-squad-announcement-luis-de-la-fuente
+  - https://www.fifa.com/en/tournaments/mens/worldcup/articles/dino-zoff-italy-oldest-winner
+  - https://www.guinnessworldrecords.com/world-records/116281-oldest-player-to-appear-in-a-football-soccer-fifa-world-cup-final
+  - https://inside.fifa.com/tournaments/mens/worldcup/qatar2022/news/cafu-the-memory-of-2002-will-stay-with-me-forever
+  - https://www.laureus.com/world-sports-academy/members/cafu
+  - Direct WebFetch to primary-source domains was blocked by this
+    environment's egress policy for this run, so verification relied on
+    WebSearch's synthesized snippets, per the same caveat prior audits in
+    this file have already noted.
 - Golden Ball (best player) winners (added 2026-08-30, intensive run): a new
   "Golden Ball winners" note section on `content/fifa-world-cup.md` listing
   every winner since the award's 1982 introduction (no equivalent award
