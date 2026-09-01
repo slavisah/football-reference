@@ -40,8 +40,12 @@ const DIST_DIR = path.join(ROOT, 'dist');
 // leaves more room for that content to keep growing while still catching an
 // accidental multi-page regression (a stray large asset, a duplicated
 // script block, an unminified debug dump) well before it reaches
-// production.
-export const PAGE_WEIGHT_BUDGET_BYTES = 540 * 1024;
+// production. Raised again to 560 KB on 2026-09-01 (intensive run): the new
+// EURO "Winning captains" and Nations League "Winning captains" note
+// sections added two more `docs/SOURCES.md` citation blocks under the "UEFA
+// EURO"/"UEFA Nations League" headings, pushing `hr/records` to 540.8 KB,
+// just over the 540 KB budget (the ninth such deliberate raise).
+export const PAGE_WEIGHT_BUDGET_BYTES = 560 * 1024;
 
 /** Every same-origin CSS asset path (e.g. "/football-reference/_astro/foo.css") referenced by an HTML page. */
 export function findCssRefs(html) {

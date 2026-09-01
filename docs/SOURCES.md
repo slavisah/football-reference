@@ -829,6 +829,33 @@ Primary sources should be preferred.
   - https://bleacherreport.com/articles/1944540-luis-aragones-spains-euro-2008-winning-coach-dies-aged-75
   - https://www.skysports.com/football/news/13954/10498347/fernando-santos-hails-portugal-team-spirit-after-euro-2016-win
   - https://sports.yahoo.com/articles/euro-2020-winning-coach-roberto-183025212.html
+- Winning captains (added 2026-09-01, intensive run): a new "Winning
+  captains" note section on `content/uefa-euro.md` listing the captain who
+  lifted the trophy at every one of the 17 editions (1960-2024), mirroring
+  the World Cup's own "Winning captains" section (forty-third intensive run)
+  and sitting next to the existing "Winning managers" section on this same
+  page. Verified via two independent WebSearch passes covering the full
+  span: the first via a dedicated UEFA.com EURO-winning-captains
+  retrospective (which itself names Chiellini, Ronaldo and Casillas) plus
+  FourFourTwo's and Olympics.com's own winning-captains round-ups for the
+  remaining years; the second specifically re-checked the earliest and least
+  commonly cross-referenced span (1960-1980) via gameofthepeople.com's
+  dedicated Euros history piece and a Wikipedia cross-check, plus the two
+  facts most likely to be conflated with a different EURO-winning-captain
+  storyline (Bernard Dietz's 1980 captaincy, easily confused with the more
+  famous Karl-Heinz Rummenigge from the same squad; and Jordi Alba's 2023
+  Nations League captaincy, cross-checked separately below to make sure it
+  wasn't mixed up with this page's own 2023 entry, which doesn't exist since
+  EURO wasn't played that year). **No discrepancies found:**
+  - https://www.uefa.com/uefaeuro/history/news/025f-0fd29745df66-f9507a69f615-1000--euro-winning-captains/
+  - https://www.fourfourtwo.com/features/european-championship-winning-captains
+  - https://www.olympics.com/en/news/uefa-european-championships-euro-winners-list-champions
+  - https://gameofthepeople.com/2021/06/06/the-euros-1960-to-1972-from-netto-to-netzer/
+  - https://en.wikipedia.org/wiki/List_of_UEFA_European_Championship_winning_players
+  - https://en.wikipedia.org/wiki/Bernard_Dietz
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## UEFA Nations League
 
@@ -986,6 +1013,33 @@ Primary sources should be preferred.
   - https://www.squawka.com/us/news/luis-de-la-fuente/
   - https://www.fifa.com/en/articles/portugal-appoint-former-belgium-boss-roberto-martinez-as-fernando-santos-successor
   - https://www.squawka.com/us/news/roberto-martinez/
+- Winning captains (added 2026-09-01, intensive run): a new "Winning
+  captains" note section on `content/uefa-nations-league.md` listing the
+  captain who lifted the trophy at every one of the four completed editions
+  (2019-2025) - the same new angle as the matching World Cup and EURO
+  additions from the forty-third and this same run. Verified via two
+  independent WebSearch passes: the first confirmed Ronaldo (2019 and 2025,
+  the only repeat) via Sky Sports and Olympics.com's own Ronaldo-focused
+  2025-final coverage, Hugo Lloris (2021) via ESPN.in's own Lloris
+  retirement retrospective, and Jordi Alba (2023) via Football España's
+  dedicated "did not expect to be named captain" article; the second
+  specifically re-checked why Alba, not Spain's more regular captain Álvaro
+  Morata, held the armband that Finals - Football España's article confirms
+  de la Fuente made the choice but neither pass turned up an explicit
+  stated reason (e.g. injury), so the section's own note stops at the
+  attributable fact (who gave him the armband) rather than guessing why.
+  Also independently re-verified that Ronaldo's 2025 win made him the first
+  captain to lift the trophy twice, via ESPN and SI's own final-reaction
+  coverage. **No discrepancies found:**
+  - https://www.skysports.com/football/news/36166/13380437/nations-league-final-portugal-2-2-spain-5-3-pens-cristiano-ronaldo-helps-portugal-to-reclaim-title
+  - https://www.olympics.com/en/news/emotional-cristiano-ronaldo-reacts-portugal-2025-uefa-nations-league-trophy-win
+  - https://www.espn.in/football/story/_/id/37635382/france-captain-hugo-lloris-announces-retirement-international-football
+  - https://www.football-espana.net/2023/06/10/jordi-alba-did-not-expected-to-be-named-spain-captain-for-uefa-nations-league-finals
+  - https://www.espn.com/soccer/story/_/id/45476228/ronaldo-portugal-nations-league-win
+  - https://www.si.com/soccer/cristiano-ronaldo-leads-portugal-to-glory-takeaways-from-nations-league-final
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Copa América
 

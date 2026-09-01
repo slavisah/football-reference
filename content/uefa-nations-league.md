@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 2018-19
 lastCompletedEdition: 2024-25
-lastReviewed: 2026-08-31
+lastReviewed: 2026-09-01
 status: verified
 ---
 
@@ -50,6 +50,14 @@ UEFA introduced the Nations League to replace many international friendlies with
 - **2021:** Didier Deschamps (France).
 - **2023:** Luis de la Fuente (Spain) - the same season he took charge of Spain, before also winning EURO 2024 and the 2026 World Cup with them.
 - **2025:** Roberto Martínez (Portugal) - his first trophy since taking over from Fernando Santos.
+
+## Winning captains
+
+- The captain is the player who lifts the trophy on the podium; every Nations League Finals winner has had one across all four completed editions.
+- **2019:** Cristiano Ronaldo (Portugal).
+- **2021:** Hugo Lloris (France).
+- **2023:** Jordi Alba (Spain) - given the captaincy for the Finals by manager Luis de la Fuente.
+- **2025:** Cristiano Ronaldo (Portugal) - the first captain to lift the Nations League trophy twice.
 
 ## Memorable moments
 
