@@ -929,6 +929,42 @@ standing quirks.
   genuinely different angle (accessibility, performance, SEO, or a fresh read
   of `docs/WEBSITE_REQUIREMENTS.md` against the live site).
 
+- **Ballon d'Or Yashin Trophy (best goalkeeper) winners**: closed 2026-09-01
+  (forty-second intensive run) - a standing health check first (`pnpm
+  install` to restore missing `node_modules`; `pnpm outdated` found one new
+  in-range patch release, astro 7.2.9 -> 7.2.10, installed this run; `pnpm
+  dlx knip --no-config-hints` matched every prior run's baseline). Tried the
+  forty-first run's first suggestion (a fresh crack at Copa América's
+  winning-manager sourcing) and confirmed it's still not viable: two
+  independent WebSearch passes for the 1916-1921 span **contradicted each
+  other** on three of five years, validating rather than overturning the
+  earlier caution. Found a genuinely different, well-scoped gap instead: the
+  Ballon d'Or's own companion "best goalkeeper" award, the Yashin Trophy
+  (continuous since 2019, skipping only the cancelled 2020) - the same shape
+  as the already-added Kopa Trophy section on the same page, and distinct
+  from the page's existing unrelated "Lev Yashin remains the only goalkeeper
+  to win the men's award" note. Verified all six awarded editions (2019,
+  2021-2025) via two independent WebSearch passes plus a third targeted
+  re-check of the two facts most easily conflated with other Ballon d'Or-
+  night storylines - no discrepancies. Added a "Yashin Trophy winners"
+  section to `content/ballon-dor.md`, wired into
+  `competitions/ballon-dor.astro`'s `noteHeadings` and hand-translated into
+  `hr/competitions/ballon-dor.astro`. New e2e coverage (EN + HR). All 700
+  PDFs regenerated and reverified clean. Full standing health check clean:
+  `pnpm lint` (0/0/0), `pnpm test` (513/513 unit), `pnpm build` (711 pages),
+  `check:links`/`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs`
+  all clean, full cold-start `pnpm test:e2e`. See `docs/PROJECT_STATUS.md`'s
+  matching entry for detail. **Left for a future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness), plus Copa América winning managers
+  specifically - now confirmed twice as genuinely contradictory-sourced for
+  its earliest span, not just thinly sourced, so a future pass needs a
+  better source lead than general WebSearch summaries before retrying. With
+  the Ballon d'Or's own individual-award companions now complete, the next
+  content-gap pass likely needs a genuinely different angle (accessibility,
+  performance, SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md`
+  against the live site).
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

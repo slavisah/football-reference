@@ -823,6 +823,19 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
     ).toBeVisible();
   });
 
+  test('shows the Yashin Trophy winners section, including the 2025 repeat winner', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Yashin Trophy winners' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Alisson (Brazil)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('the first goalkeeper to win the Yashin Trophy in consecutive years'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('second goalkeeper (after Martínez) to win it more than once'),
+    ).toBeVisible();
+  });
+
   test("the language switcher opens the Croatian Ballon d'Or page", async ({ page }) => {
     await page.goto('competitions/ballon-dor');
     await openMenu(page);
@@ -902,6 +915,16 @@ test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360p
     await expect(page.locator('.notes__card').getByText('Kylian Mbappé (Francuska)')).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('prvi igrač koji je nagradu Kopa Trophy osvojio dva puta'),
+    ).toBeVisible();
+  });
+
+  test('shows the translated Yashin Trophy winners section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade Yashin Trophy' }),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Alisson (Brazil)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('prvi vratar koji je nagradu Yashin Trophy osvojio dvije uzastopne godine'),
     ).toBeVisible();
   });
 

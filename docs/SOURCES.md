@@ -1810,6 +1810,39 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Yashin Trophy winners (added 2026-09-01, intensive run): a new "Yashin
+  Trophy winners" note section on `content/ballon-dor.md` listing every
+  winner of France Football's companion "best goalkeeper" award, named after
+  Lev Yashin, since its 2019 introduction (not awarded in 2020, the one year
+  the Ballon d'Or itself was cancelled) - the same treatment already given to
+  the Kopa Trophy section directly above it, and a genuinely different award
+  from the "Lev Yashin remains the only goalkeeper to win the men's award"
+  note already on this same page (which is about the Ballon d'Or itself, not
+  this companion trophy). Verified via two independent WebSearch passes
+  covering all six awarded editions (2019, 2021-2025): both passes agreed
+  exactly on every year - Alisson (2019, the trophy's first winner),
+  Gianluigi Donnarumma (2021), Thibaut Courtois (2022), Emiliano Martínez
+  (2023 and 2024, the first goalkeeper to win it in consecutive years), and
+  Donnarumma again (2025, becoming the second goalkeeper - after Martínez -
+  to win the trophy more than once). A dedicated third pass specifically
+  re-checked the 2022 (Courtois, not to be confused with his separate
+  Ballon d'Or podium placing that year) and 2023/2024 Martínez back-to-back
+  wins, since those are the two facts most likely to be conflated with a
+  different Ballon d'Or-night storyline. **No discrepancies found:**
+  - https://www.topendsports.com/sport/soccer/awards/yashin-trophy.htm
+  - https://www.premierleague.com/en/news/4420829/donnarumma-and-gyokeres-win-awards-at-2025-ballon-dor
+  - https://goaltheball.com/yashin-trophy-winners-list/
+  - https://www.fotmob.com/el/news/x3syvn394xhu179pkuk2k9k4y/ballon-d'or-2019-liverpool-goalkeeper-alisson-wins-inaugural-yachine-trophy
+  - https://www.goal.com/en-ca/lists/aston-villa-and-argentina-goalkeeper-emiliano-martinez-retains-yashin-trophy-as-world-s-best-goalkeeper-in-2024/blt47f77564722f26b5
+  - https://fr.wikipedia.org/wiki/Troph%C3%A9e_Yachine
+  - https://www.footmercato.net/a7278391082899020163-ballon-dor-2025-gianluigi-donnarumma-remporte-le-trophee-yachine
+  - https://www.realmadrid.com/en-US/news/football/first-team/special-features/courtois-yashin-trophy-winner-2022
+  - https://www.tntsports.co.uk/football/ballon-d-or/2022/ballon-dor-2022-thibaut-courtois-wins-yashin-trophy-for-best-goalkeeper-after-real-madrid-heroics-la_sto9191911/story.shtml
+  - https://www.90min.com/posts/emiliano-martinez-wins-2023-yashin-trophy
+  - https://www.besoccer.com/new/emiliano-martinez-wins-back-to-back-yachine-trophy-awards-1335839
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Review policy
 
