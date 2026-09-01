@@ -1081,6 +1081,69 @@ standing quirks.
   contradictory-sourced three times now: fortieth, forty-second and this
   run's own decision not to retry).
 
+- **Copa América winning captains (2011-2024, narrowly scoped)**: closed
+  2026-09-01 (forty-sixth intensive run) - a standing health check first
+  (`pnpm install`, `pnpm outdated` found nothing new beyond the still-blocked
+  `typescript` 7 entry, `pnpm dlx knip --no-config-hints` matched every prior
+  run's baseline, full lint/unit/build all clean). Acted on the
+  forty-fifth run's own "natural next step" note (captains for the same
+  1975-2024 span the Winning managers section now covers) and found the
+  premise didn't hold: captain identification is a materially harder fact
+  to source than manager identification, not the same reliable pattern.
+  A first WebSearch pass found plausible names for 1975 and 1979 but
+  repeatedly failed for 1983, 1987 and 1989 - one attempt for 1987 returned
+  an outright fabricated answer (a former Uruguayan head of state's name,
+  not a footballer). A second, more rigorous cross-check pass then
+  **directly contradicted** two editions this run had initially logged as
+  confirmed: 1995 (one pass said Bengoechea captained "in Francescoli's
+  absence"; a second, sourced from an ESPN Deportes retrospective, said
+  Francescoli himself was captain and lifted the trophy) and 2004 (a
+  summary naming Alex as 2004 captain also, in the same breath, wrongly
+  credited him with the 1999 captaincy independently attributed to Cafu).
+  Given two directly contradictory results on facts already logged as
+  confirmed, the entire 1975-2010 span was dropped rather than ship any of
+  it unverified - not just the outright-fabricated years. Narrowed instead
+  to the same six editions the page's own Golden Glove section already
+  covers (2011-2024), each re-verified against an unambiguous source (an
+  official CONMEBOL/copaamerica.com article, a multi-outlet-corroborated
+  news event, or undisputed public record for the two Messi editions) with
+  no contradiction across any of them: 2011 Diego Lugano, 2015/2016 Claudio
+  Bravo, 2019 Dani Alves (took the armband from Neymar after an off-field
+  incident), 2021/2024 Lionel Messi. See `docs/SOURCES.md`'s matching new
+  entry for the full citation list and methodology, including the specific
+  contradictions found. Wired into `copa-america.astro`'s `noteHeadings`
+  (English) and hand-translated into `hr/competitions/copa-america.astro`'s
+  own `notes` array as "Kapetani prvaka", matching the World Cup/EURO/
+  Nations League pages' existing convention for this exact section name,
+  with its own scoping note explaining the narrower range (unlike those
+  three pages' captains sections, which cover their full winning-managers
+  span). `content/copa-america.md`'s `lastReviewed` was already
+  2026-09-01 from the forty-fifth run, so left unchanged. New e2e coverage
+  (EN + HR heading/content assertions) in `tests/e2e/mobile.spec.ts`. All
+  700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+  check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+  fallback this environment's Chromium needs, since this content edit and
+  the `docs/SOURCES.md` addition both mark every PDF's shared References
+  section stale, by design). Full standing health check clean: `pnpm lint`
+  (0/0/0), `pnpm test` (513/513 unit, unchanged - presentation-layer
+  content, no new unit-testable logic), `pnpm build` (711 pages, unchanged
+  - no new route), `check:links` (715 pages), `check:sitemap` (710
+  entries), `check:precache` (37 URLs), `check:perf` (heaviest page
+  `hr/records`, 546.4 KB, within the 560 KB budget - 13.6 KB of headroom
+  left). **Left for a future pass:** the same environment-blocked items as
+  every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus
+  Copa América winning captains for 1975-2010 specifically - this run's
+  finding is that this span isn't safely recoverable via WebSearch-only
+  verification (two independent passes actively disagreed, not just gaps),
+  so a future pass would need a genuinely better source lead (e.g. direct
+  Wikipedia squad-page or RSSSF access, both still egress-blocked here)
+  rather than another round of the same search method. With every
+  reliably-sourceable individual-award and personnel angle across all six
+  competition/award families now shipped, the next content-gap pass likely
+  needs either that better source lead or a genuinely different quality
+  angle (accessibility, performance, SEO, or a fresh read of
+  `docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

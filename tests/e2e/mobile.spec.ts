@@ -1012,6 +1012,16 @@ test.describe('Copa América page on a 360px phone', () => {
     ).toBeVisible();
   });
 
+  test('shows the Winning captains section from content/copa-america.md', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Winning captains' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Diego Lugano (Uruguay)')).toBeVisible();
+    await expect(
+      page
+        .locator('.notes__card')
+        .getByText('Lionel Messi (Argentina) - his second, back-to-back, though an injury'),
+    ).toBeVisible();
+  });
+
   test('shows an audited "Format" badge per edition', async ({ page }) => {
     await expect(page.getByRole('columnheader', { name: 'Format', exact: true })).toBeVisible();
 
@@ -1201,6 +1211,16 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await expect(page.locator('.notes__card').getByText('Marcos Calderón (Peru)')).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('Lionel Scaloni (Argentina) - njegova druga, uzastopna.'),
+    ).toBeVisible();
+  });
+
+  test('shows the translated Winning captains section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Kapetani prvaka' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Diego Lugano (Urugvaj)')).toBeVisible();
+    await expect(
+      page
+        .locator('.notes__card')
+        .getByText('Lionel Messi (Argentina) - njegova druga, uzastopna titula'),
     ).toBeVisible();
   });
 
