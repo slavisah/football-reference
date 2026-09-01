@@ -5,7 +5,7 @@ competitionType: international
 confederation: FIFA
 firstEdition: 1930
 lastCompletedEdition: 2026
-lastReviewed: 2026-08-14
+lastReviewed: 2026-09-01
 status: verified
 ---
 
@@ -69,6 +69,115 @@ The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 b
 - **1982:** the field expanded from 16 to 24 teams.
 - **1998:** the field expanded to 32 teams.
 - **2026:** the field expanded to 48 teams and was hosted by three countries for the first time.
+
+## Golden Ball winners
+
+- FIFA has named a best-player award at every World Cup since 1982; no equivalent award existed at earlier editions.
+- **1982:** Paolo Rossi (Italy) - the award's first winner.
+- **1986:** Diego Maradona (Argentina).
+- **1990:** Salvatore Schillaci (Italy).
+- **1994:** Romário (Brazil).
+- **1998:** Ronaldo (Brazil).
+- **2002:** Oliver Kahn (Germany) - the only goalkeeper to date to also win the award.
+- **2006:** Zinedine Zidane (France).
+- **2010:** Diego Forlán (Uruguay).
+- **2014:** Lionel Messi (Argentina) - the first of his two wins, still the only player to win the award more than once.
+- **2018:** Luka Modrić (Croatia).
+- **2022:** Lionel Messi (Argentina) - his second win.
+- **2026:** Rodri (Spain) - the first Spain player to win the award.
+
+## Silver Ball and Bronze Ball winners
+
+- The two runners-up in the Golden Ball voting receive the Silver Ball and Bronze Ball; both have been awarded alongside the Golden Ball at every World Cup since 1982.
+- **1982:** Falcão (Brazil) won the Silver Ball; Karl-Heinz Rummenigge (West Germany) won the Bronze Ball.
+- **1986:** Harald Schumacher (West Germany) won the Silver Ball; Preben Elkjær (Denmark) won the Bronze Ball.
+- **1990:** Lothar Matthäus (West Germany) won the Silver Ball; Diego Maradona (Argentina) won the Bronze Ball.
+- **1994:** Roberto Baggio (Italy) won the Silver Ball; Hristo Stoichkov (Bulgaria) won the Bronze Ball.
+- **1998:** Davor Šuker (Croatia) won the Silver Ball; Lilian Thuram (France) won the Bronze Ball.
+- **2002:** Ronaldo (Brazil) won the Silver Ball; Hong Myung-bo (South Korea) won the Bronze Ball.
+- **2006:** Fabio Cannavaro (Italy) won the Silver Ball; Andrea Pirlo (Italy) won the Bronze Ball.
+- **2010:** Wesley Sneijder (Netherlands) won the Silver Ball; David Villa (Spain) won the Bronze Ball.
+- **2014:** Thomas Müller (Germany) won the Silver Ball; Arjen Robben (Netherlands) won the Bronze Ball.
+- **2018:** Eden Hazard (Belgium) won the Silver Ball; Antoine Griezmann (France) won the Bronze Ball.
+- **2022:** Kylian Mbappé (France) won the Silver Ball; Luka Modrić (Croatia) won the Bronze Ball.
+- **2026:** Lionel Messi (Argentina) won the Silver Ball despite Argentina's final defeat; Kylian Mbappé (France) won the Bronze Ball.
+
+## Golden Glove winners
+
+- FIFA has named a best-goalkeeper award at every World Cup since 1994; no equivalent award existed in earlier editions.
+- **1994:** Michel Preud'homme (Belgium) - the award's first winner, then named the Lev Yashin Award.
+- **1998:** Fabien Barthez (France).
+- **2002:** Oliver Kahn (Germany) - the only goalkeeper to date to also win the tournament's Golden Ball as best overall player.
+- **2006:** Gianluigi Buffon (Italy).
+- **2010:** Iker Casillas (Spain) - the first winner under the award's current "Golden Glove" name, adopted that year.
+- **2014:** Manuel Neuer (Germany).
+- **2018:** Thibaut Courtois (Belgium).
+- **2022:** Emiliano Martínez (Argentina).
+- **2026:** Unai Simón (Spain) - a record seven clean sheets across the tournament.
+
+## Young Player Award winners
+
+- FIFA has named a best-player-aged-21-or-under award at every World Cup since 2006; no equivalent award existed at earlier editions.
+- **2006:** Lukas Podolski (Germany) - the award's first winner.
+- **2010:** Thomas Müller (Germany).
+- **2014:** Paul Pogba (France).
+- **2018:** Kylian Mbappé (France).
+- **2022:** Enzo Fernández (Argentina).
+- **2026:** Pau Cubarsí (Spain) - the first defender to win the award.
+
+## Winning managers
+
+- Every World Cup-winning team has been led by a manager of the same nationality as the team itself, a pattern unbroken across all 23 editions.
+- **1930:** Alberto Suppici (Uruguay) - the youngest winning manager in World Cup history, aged 31.
+- **1934:** Vittorio Pozzo (Italy).
+- **1938:** Vittorio Pozzo (Italy) - still the only manager to win the World Cup twice, and the only one to win it back-to-back.
+- **1950:** Juan López Fontana (Uruguay).
+- **1954:** Sepp Herberger (West Germany).
+- **1958:** Vicente Feola (Brazil).
+- **1962:** Aymoré Moreira (Brazil).
+- **1966:** Alf Ramsey (England).
+- **1970:** Mário Zagallo (Brazil) - also won the trophy as a player in 1958 and 1962.
+- **1974:** Helmut Schön (West Germany).
+- **1978:** César Luis Menotti (Argentina).
+- **1982:** Enzo Bearzot (Italy).
+- **1986:** Carlos Bilardo (Argentina).
+- **1990:** Franz Beckenbauer (West Germany) - also won the trophy as a player in 1974, one of only three men to win it as both player and manager.
+- **1994:** Carlos Alberto Parreira (Brazil).
+- **1998:** Aimé Jacquet (France).
+- **2002:** Luiz Felipe Scolari (Brazil).
+- **2006:** Marcello Lippi (Italy).
+- **2010:** Vicente del Bosque (Spain).
+- **2014:** Joachim Löw (Germany).
+- **2018:** Didier Deschamps (France) - also won the trophy as a player in 1998, joining Zagallo and Beckenbauer as a player-and-manager winner.
+- **2022:** Lionel Scaloni (Argentina).
+- **2026:** Luis de la Fuente (Spain) - the oldest winning manager in World Cup history, aged 65, and Spain's second title alongside 2010.
+
+## Winning captains
+
+- The captain is the player who lifts the trophy on the podium; every World Cup-winning team has had one across all 23 editions.
+- **1930:** José Nasazzi (Uruguay).
+- **1934:** Gianpiero Combi (Italy).
+- **1938:** Giuseppe Meazza (Italy).
+- **1950:** Obdulio Varela (Uruguay).
+- **1954:** Fritz Walter (West Germany).
+- **1958:** Hilderaldo Bellini (Brazil).
+- **1962:** Mauro Ramos (Brazil).
+- **1966:** Bobby Moore (England).
+- **1970:** Carlos Alberto Torres (Brazil).
+- **1974:** Franz Beckenbauer (West Germany) - also went on to win the trophy as a manager in 1990, one of only three men to win it as both player and manager (see "Winning managers" above).
+- **1978:** Daniel Passarella (Argentina).
+- **1982:** Dino Zoff (Italy) - at 40 years old, still the oldest player to captain a World Cup-winning team.
+- **1986:** Diego Maradona (Argentina).
+- **1990:** Lothar Matthäus (West Germany).
+- **1994:** Dunga (Brazil).
+- **1998:** Didier Deschamps (France) - also went on to win the trophy as a manager in 2018, joining Beckenbauer as a player-and-manager winner (see "Winning managers" above).
+- **2002:** Cafu (Brazil) - the only player to appear in three consecutive World Cup finals (1994, 1998 and 2002).
+- **2006:** Fabio Cannavaro (Italy).
+- **2010:** Iker Casillas (Spain).
+- **2014:** Philipp Lahm (Germany).
+- **2018:** Hugo Lloris (France).
+- **2022:** Lionel Messi (Argentina).
+- **2026:** Rodri (Spain) - also named the tournament's Golden Ball winner the same year (see "Golden Ball winners" above).
 
 ## Memorable moments
 

@@ -11,6 +11,154 @@ Primary sources should be preferred.
   - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/award-winners
 - FIFA historical top scorers:
   - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/fontaine-mbappe-ronaldo-and-more-every-world-cup-top-scorer
+- Winning captains (added 2026-09-01, intensive run): a new "Winning
+  captains" note section on `content/fifa-world-cup.md` listing the captain
+  who lifted the trophy at every one of the 23 editions (1930-2026),
+  mirroring the existing "Winning managers" section's shape and sitting
+  next to it. Verified via two independent WebSearch passes covering all 23
+  years - the first via Betway Insider and FIFAWorldCupNews.com's dedicated
+  captain-list round-ups plus Wikipedia/RSSSF player pages for the 1930
+  edge case (José Nasazzi); the second via RSSSF's own champions-squads page
+  and Sportsbrief's independent round-up - both passes agreed on all 22
+  completed editions through 2022 with no discrepancy. The 2026 captain
+  (Rodri, Spain) was confirmed separately via Yahoo Sports, UEFA.com and
+  FIFA.com's own squad-announcement article (de la Fuente handed Rodri the
+  armband), matching the page's existing Golden Ball entry for the same
+  player. Two supporting facts were each independently re-verified before
+  being added as bullet annotations: Dino Zoff's 1982 record as the oldest
+  captain to lift the trophy (40 years old, via FIFA.com's own "40-year-old
+  king" article and Guinness World Records) and Cafu's run of three
+  consecutive World Cup finals as a player, 1994/1998/2002 (via FIFA.com and
+  Laureus). **No discrepancies found:**
+  - https://blog.betway.com/football/world-cup/football-world-cup-winning-captains/
+  - https://www.fifaworldcupnews.com/fifa-world-cup-winning-captains-country/
+  - https://www.rsssf.org/miscellaneous/wcwinners.html
+  - https://sportsbrief.com/football/60580-a-list-world-cup-winning-captains-fifa-world-cup-history/
+  - https://sports.yahoo.com/videos/la-fuente-hands-rodri-spains-011309531.html
+  - https://www.uefa.com/european-qualifiers/news/02a6-20d159556fdf-60d8385f463f-1000--spain-at-the-world-cup-2026-squad-fixtures-group-and-history/
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/spain-squad-announcement-luis-de-la-fuente
+  - https://www.fifa.com/en/tournaments/mens/worldcup/articles/dino-zoff-italy-oldest-winner
+  - https://www.guinnessworldrecords.com/world-records/116281-oldest-player-to-appear-in-a-football-soccer-fifa-world-cup-final
+  - https://inside.fifa.com/tournaments/mens/worldcup/qatar2022/news/cafu-the-memory-of-2002-will-stay-with-me-forever
+  - https://www.laureus.com/world-sports-academy/members/cafu
+  - Direct WebFetch to primary-source domains was blocked by this
+    environment's egress policy for this run, so verification relied on
+    WebSearch's synthesized snippets, per the same caveat prior audits in
+    this file have already noted.
+- Golden Ball (best player) winners (added 2026-08-30, intensive run): a new
+  "Golden Ball winners" note section on `content/fifa-world-cup.md` listing
+  every winner since the award's 1982 introduction (no equivalent award
+  existed at earlier editions). Verified via two independent WebSearch
+  passes: the first confirmed all twelve winners (1982-2026) via FOX Sports,
+  Wego, Sports Illustrated and Olympics.com round-ups; the second
+  specifically re-checked the 2026 winner (Rodri, Spain, ahead of Messi's
+  Silver Ball and Mbappé's Bronze Ball) via FIFA.com's own article plus ESPN
+  and beIN Sports, and separately re-confirmed the full 1982-2026 table
+  (including Messi's two wins, 2014 and 2022, still the only repeat winner)
+  via topendsports.com's dedicated award history page. **No discrepancies
+  found:**
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/rodri-earns-adidas-golden-ball
+  - https://www.espn.com/soccer/story/_/id/49404995/2026-world-cup-golden-ball-spain-unai-simon-pau-cubarsi
+  - https://www.beinsports.com/en-us/soccer/fifa-world-cup-2026/articles/why-did-the-world-cup-golden-ball-end-up-in-rodri-s-hands-2026-07-22
+  - https://www.olympics.com/en/news/fifa-world-cup-2026-messi-mbappe-bellingham-rodri-golden-ball-football
+  - https://www.foxsports.com/stories/soccer/2026-fifa-mens-world-cup-every-world-cup-golden-ball-winner-since-1982
+  - https://blog.wego.com/world-cup-golden-ball-winners/
+  - https://www.si.com/soccer/world-cup-golden-ball-full-list-winners
+  - https://www.topendsports.com/events/worldcupsoccer/golden-ball.htm
+- Silver Ball and Bronze Ball (Golden Ball runners-up) winners (added
+  2026-08-31, intensive run): a new "Silver Ball and Bronze Ball winners"
+  note section on `content/fifa-world-cup.md`, the companion award to the
+  Golden Ball section above - both have been awarded at every World Cup
+  since the Golden Ball's 1982 introduction. Verified via three independent
+  WebSearch passes: the first returned a complete 1982-2026 table (Falcão/
+  Rummenigge in 1982 through Messi/Mbappé in 2026) cross-referencing
+  FBref.com's and Wego's award-history round-ups; the second specifically
+  re-checked the two entries a single search result could plausibly get
+  wrong - 1986 (Harald Schumacher, a goalkeeper, winning the Silver Ball;
+  Preben Elkjær the Bronze) and 1990 (Lothar Matthäus's Silver Ball; Diego
+  Maradona's Bronze Ball despite Argentina losing the final) - via RSSSF's
+  dedicated FIFA-awards pages for both years plus FIFA.com's own Schillaci
+  tribute; the third re-checked every remaining edition (1994, 1998, 2002,
+  2006, 2010, 2014) plus the newest, least-settled 2026 result (Messi's
+  Silver Ball, Mbappé's Bronze Ball, both behind Rodri's Golden Ball) via
+  FIFA+'s own award pages, Britannica, thesoccerworldcups.com and ESPN's
+  2026 award round-up. **No discrepancies found:**
+  - https://fbref.com/en/awards/wc_silver_ball/FIFA-World-Cup-Silver-Ball
+  - https://blog.wego.com/world-cup-golden-ball-winners/
+  - https://www.rsssf.org/miscellaneous/fifa-gb86.html
+  - https://www.rsssf.org/miscellaneous/fifa-gb90.html
+  - https://www.fifa.com/en/news/articles/salvatore-schillaci-tribute-italy
+  - https://www.plus.fifa.com/en/content/davor-suker-silver-ball-award-1998-fifa-world-cup-france/838db664-5cec-40cd-9a3d-0bda1b858a49
+  - https://www.plus.fifa.com/en/content/lilian-thuram-bronze-ball-award-1998-fifa-world-cup-france/552e8ebd-16b7-487b-a861-b1ee4e43f6ab
+  - https://www.thesoccerworldcups.com/world_cups/2010_awards.php
+  - https://www.espn.com/soccer/story/_/id/49404995/2026-world-cup-golden-ball-spain-unai-simon-pau-cubarsi
+  - https://sports.yahoo.com/articles/every-award-winner-2026-world-233500005.html
+- Golden Glove (best goalkeeper) winners (added 2026-08-30, intensive run): a
+  new "Golden Glove winners" note section on `content/fifa-world-cup.md`
+  listing every winner since the award's 1994 introduction (no equivalent
+  award existed at earlier editions). Verified via two independent WebSearch
+  passes: the first confirmed all nine winners (1994-2026) via FIFA.com,
+  ESPN, Goal.com and Sports Illustrated round-ups; the second specifically
+  re-checked the 2026 winner (Unai Simón, Spain, a record seven clean
+  sheets) via FIFA.com's own dedicated article plus ESPN, and separately
+  re-confirmed Oliver Kahn's 2002 award and Iker Casillas's 2010 award (the
+  year the award was renamed from the "Lev Yashin Award" to "Golden Glove")
+  via NZ Herald, FIFA+, and Goal.com. **No discrepancies found:**
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/unai-simon-adidas-golden-glove
+  - https://www.espn.com/soccer/story/_/id/49024760/2026-world-cup-awards-golden-ball-golden-boot-golden-glove-trophies-revealed
+  - https://www.si.com/soccer/every-world-cup-golden-glove-winner
+  - https://www.goal.com/en/news/list-of-fifa-world-cup-golden-glove-winners/blt81d4e6d207efc5ff
+  - https://www.nzherald.co.nz/sport/football/football-world-cup/soccer-germanys-kahn-named-best-goalkeeper-at-cup/TK3UHH6DI4DUUQFZEXZRTYUKR4/
+  - https://www.plus.fifa.com/en/content/oliver-kahn-lev-yashin-award-2002-fifa-world-cup-korea-japan/235d069a-542f-4d26-8b91-f3ab2dc42649
+  - https://www.goal.com/en/news/world-cup-2010-spains-iker-casillas-wins-golden-glove-ahead/bltf926cf07eb87996a
+- Young Player Award (best player aged 21 or under) winners (added
+  2026-08-30, intensive run): a new "Young Player Award winners" note
+  section on `content/fifa-world-cup.md` listing every winner since the
+  award's 2006 introduction (no equivalent award existed at earlier
+  editions) - the same treatment as the World Cup's Golden Ball/Golden Glove
+  and EURO's Player of the Tournament sections. Verified via two independent
+  WebSearch passes: the first confirmed all six winners (2006-2026) via
+  FIFA.com's own "Young Player Award winners" round-up plus ESPN, Yahoo
+  Sports, khelnow.com and topendsports.com; the second specifically
+  re-checked the newest, least-settled fact (Pau Cubarsí's 2026 win, the
+  first defender to win the award) via FIFA.com's dedicated 2026 award
+  article plus FOX Sports and Yahoo Sports, and separately re-confirmed the
+  award's 2006 introduction and first winner (Lukas Podolski) via the same
+  FIFA.com round-up. **No discrepancies found:**
+  - https://www.fifa.com/en/tournaments/mens/worldcup/articles/young-player-award-winners-highlights
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/pau-cubarsi-fifa-young-player-award
+  - https://www.foxsports.com/stories/soccer/world-cup-pau-cubarsi-spain-young-player-award
+  - https://sports.yahoo.com/articles/barcelona-star-pau-cubarsi-wins-000000915.html
+  - https://sports.yahoo.com/articles/young-player-award-winners-fifa-121400761.html
+  - https://www.espn.com/soccer/story/_/id/48760910/who-won-young-player-award-world-cup
+  - https://khelnow.com/football/fifa-world-cup-list-of-best-young-player-award-winners
+  - https://www.topendsports.com/events/worldcupsoccer/best-young-player.htm
+- Winning managers (added 2026-08-31, intensive run): a new "Winning managers"
+  note section on `content/fifa-world-cup.md` listing the head coach of every
+  champion across all 23 editions (1930-2026) - a genuinely new angle (who led
+  the winning team, not another individual-player award) rather than a repeat
+  of the Golden Ball/Golden Glove/Young Player Award pattern already covering
+  this page. Verified via four independent WebSearch passes covering the full
+  span in three blocks (1930-1966, 1970-1990, 1994-2018, plus a dedicated pass
+  for 2022/2026): the earliest span (Suppici, the two Pozzo wins, López
+  Fontana, Herberger, Feola, Moreira, Ramsey) cross-referenced Wikipedia's
+  dedicated manager biography pages against a FIFA-winning-managers round-up;
+  the middle two spans (Zagallo through Deschamps) cross-referenced 90min,
+  beIN Sports and a dedicated "unbroken pact" feature confirming every winning
+  manager has shared the champion's own nationality; the newest, least-settled
+  fact (Luis de la Fuente's 2026 win, the oldest winning manager in World Cup
+  history at 65) was independently re-checked via aninews.in, FIFA.com's own
+  coaching-method feature and ESPN. **No discrepancies found:**
+  - https://worldsoccertalk.com/world-cup/list-of-world-cup-winning-coaches-every-manager-to-win-the-trophy-by-year/
+  - https://www.myfootballfacts.com/world-football/fifa/world-cup/fifa-all-time-world-cup/fifa-world-cup-winning-managers/
+  - https://www.beinsports.com/en-us/soccer/fifa-world-cup-2026/articles/all-fifa-world-cup-winning-coaches-in-history-complete-list-and-finals-2026-05-06
+  - https://en.wikipedia.org/wiki/Juan_L%C3%B3pez_Fontana
+  - https://en.wikipedia.org/wiki/Aymor%C3%A9_Moreira
+  - https://www.tbsnews.net/sports/unbroken-pact-how-every-world-cup-champion-has-been-led-one-their-own-1461436
+  - https://www.90min.com/posts/the-most-successful-world-cup-managers-ever
+  - https://www.aninews.in/news/sports/football/fifa-world-cup-2026-spains-luis-de-la-fuente-becomes-oldest-coach-to-win-global-tournament20260720035714/
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/luis-de-la-fuente-method-coaching
+  - https://www.espn.com/soccer/story/_/id/49406168/luis-de-la-fuentes-team-ethos-won-world-cup-spain
 - Final match dates audit (2026-08-02): the calendar date of each edition's
   decisive final match, used for the "On this day in football history" widget
   on the home page. Verified via WebSearch against each edition's dedicated
@@ -417,9 +565,15 @@ Primary sources should be preferred.
   four-way tie, 2012's and 2024's six-way ties) with every individual name
   and diacritic re-checked for completeness and correct spelling. As with
   the first pass, 2012's six-way tie (rather than crediting Fernando
-  Torres alone, despite his UEFA tiebreak award) and 2020's Ronaldo/Schick
-  tie both match the page's stated methodology of showing joint leading
-  scorers tied with no single official winner - not discrepancies. Direct
+  Torres alone, despite his UEFA tiebreak award) matches the page's stated
+  methodology of showing joint leading scorers tied with no single official
+  winner - not a discrepancy. **Correction (2026-08-28, 23rd intensive
+  run):** this entry originally also described 2020 as a "Ronaldo/Schick
+  tie" shown that same tied way - that was never true of the table, which
+  has credited Cristiano Ronaldo alone (5 goals, Portugal) since the row
+  was first added, matching UEFA's own tiebreak decision (Ronaldo's one
+  assist over Patrik Schick's none); see that run's entry below for the
+  full tie-resolution consistency check this mistake prompted. Direct
   WebFetch to primary-source domains was blocked by this environment's
   egress policy for this run (as it was for the World Cup half of this
   pass, see above), so verification relied on WebSearch's synthesized
@@ -427,6 +581,53 @@ Primary sources should be preferred.
   Boot second-source audit for the UEFA EURO table - both of Golden Boot's
   tables, and now every competition/award table on the site, have at
   least two independent audit passes on record.
+- Golden Boot tie-resolution consistency audit (2026-08-28, 23rd intensive
+  run): the prior two Golden Boot passes above verified every row's names,
+  teams and goal counts twice each, but neither one specifically checked
+  *whether showing an edition as a named tie vs. a single credited winner
+  matches that edition's real award history* - the angle that surfaced the
+  2020 description bug fixed just above. This run WebSearched each EURO
+  edition where the table's own goal counts leave genuine tiebreak room
+  (2000, 1992, 2012, 2020, 2024) plus a reconfirmation of the newest World
+  Cup row (2026): **2000** (Kluivert/Milošević, 5 goals each) - UEFA never
+  applied a tiebreak that year; both remain officially joint winners,
+  matching the table's "Multiple" row. **1992** (Bergkamp/Brolin/Larsen/
+  Riedle, 3 each) - same, no tiebreak applied, four-way share confirmed.
+  **2012** (six players on 3 each) - UEFA's own site (uefa.com) headlines
+  Fernando Torres alone as the Golden Boot winner via tiebreak (assists,
+  then fewest minutes), a genuine tension with the table's "Multiple" row
+  the two prior passes already flagged and chose to keep as-is. This run
+  traced *why* rather than just re-flagging it: `src/lib/editions.ts`'s
+  `buildChampionsSummary()` doc comment (lines 72-86) documents a real bug
+  it once fixed by relying on 2012 staying a parsed six-way tie - Cristiano
+  Ronaldo's own share of that tie combines with his outright 2020 win to
+  give him the correct "2 EURO Golden Boots" total in the site's "Most
+  awards" ranking; crediting Torres alone would silently undercount Ronaldo
+  back to 1. So the "Multiple" row for 2012 is load-bearing for that
+  feature's correctness, not an unexamined leftover - left unchanged,
+  correctly this time. **2020** (Ronaldo/Schick, 5 each) - confirmed
+  Ronaldo the sole official winner via assist tiebreak, matching the
+  table's existing solo row; the only find this run's own re-check made was
+  that the 2026-08-07 entry above had *mis-described* this same table row
+  as tied, corrected there. **2024** (six players on 3 each) - independently
+  confirmed UEFA explicitly changed policy for this edition specifically:
+  reporting at the time (ESPN, Fox Sports) states UEFA moved away from the
+  assist tiebreak it used in 2012/2020 and shared the award six ways
+  instead, so 2024's "Multiple" row reflects an actual rule change, not
+  just an unresolved tie. **2026 World Cup** (Mbappé, 10 goals) -
+  reconfirmed sole winner, 2 clear of Messi's 8, per FIFA.com's own award
+  page and six further outlets (ESPN, Sky Sports, Fox Sports, Britannica,
+  Olympics.com, Goal.com) - matches the existing row exactly, no change.
+  Net result: one real bug found and fixed (the 2020 mis-description
+  above), one long-standing tension (2012) understood and confirmed
+  correctly load-bearing rather than an error, and every other checked row
+  reconfirmed accurate. No `content/golden-boot.md` data changed this run.
+  - https://www.uefa.com/uefaeuro/history/news/0252-0cd3fae4b774-6f83b86556ad-1000--late-surge-earns-torres-adidas-golden-boot/
+  - https://www.espn.com/soccer/story/_/id/37618965/cristiano-ronaldo-wins-euro-2020-golden-boot
+  - https://www.goal.com/en/news/ronaldo-wins-euro-2020-golden-boot-on-tie-breaker-over-schick/wzri2apw8gef1bnfwv1uauvhf
+  - https://www.espn.com/soccer/story/_/id/40558317/euro-2024-golden-boot-harry-kane-dani-olmo-6-winners
+  - https://www.espn.com/soccer/story/_/id/49397919/kylian-mbappe-wins-golden-boot-2026-world-cup-lionel-messi-goalless-final
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/adidas-golden-boot-race-top-scorer
 - Champion/Runner-up/Final-score audit (2026-08-05, intensive run): the core
   **Winner**, **Runner-up**, and **Final** (score line) columns in
   `content/uefa-euro.md`'s Editions table - the first dedicated cross-check
@@ -560,6 +761,101 @@ Primary sources should be preferred.
     run, so verification relied on WebSearch's synthesized snippets rather
     than directly rendered pages, per every prior audit's caveat in this
     file.
+- Player of the Tournament winners (added 2026-08-30, intensive run): a new
+  "Player of the Tournament winners" note section on `content/uefa-euro.md`
+  listing every winner since UEFA officially introduced the award in 1996
+  (no equivalent award existed at the four earlier 16-or-fewer-team
+  editions) - the same treatment the World Cup's Golden Ball/Golden Glove
+  sections got the previous two intensive runs. Verified via two
+  independent WebSearch passes: the first confirmed all eight winners
+  (1996-2024) via topendsports.com's dedicated award-history page and a
+  general round-up of every "Player of the Tournament" news article; the
+  second specifically re-checked the full name-and-year list a second time
+  against khelnow.com's dedicated list article and UEFA.com's own EURO 2024
+  and EURO 2020 award announcements. **No discrepancies found:**
+  - https://www.uefa.com/uefaeuro/history/news/028f-1b5e5d20015d-63e00bbe0723-1000--rodri-named-euro-2024-player-of-the-tournament/
+  - https://www.nationalworld.com/sport/football/euro-2020-who-won-uefa-player-of-the-tournament-award-3305024
+  - https://www.topendsports.com/events/soccer/uefa-euros/player-of-the-tournament.htm
+  - https://khelnow.com/football/world-football-uefa-euro-list-of-all-player-of-the-tournament-award-winners-202407
+  - https://www.footballfancast.com/every-player-of-the-tournament-european-championship/
+- Young Player of the Tournament winners (added 2026-08-30, intensive run):
+  a new "Young Player of the Tournament winners" note section on
+  `content/uefa-euro.md` listing every winner since the award was
+  introduced in 2016 (no equivalent award existed at earlier editions) -
+  the same treatment as the World Cup's Young Player Award section added
+  the same run. Verified via two independent WebSearch passes: the first
+  confirmed all three winners (2016-2024) via UEFA.com's own EURO 2024
+  award announcement plus FOX Sports, footballwhispers.com and
+  fcbarcelona.com round-ups; the second specifically re-checked the newest
+  fact (Lamine Yamal's 2024 win at age 17, the youngest of the three) via
+  UEFA.com's dedicated article and khelnow.com's list, and separately
+  re-confirmed the award's 2016 introduction and first winner (Renato
+  Sanches) via the same khelnow.com list. **No discrepancies found:**
+  - https://www.uefa.com/uefaeuro/history/news/028f-1b5e5e91b6e6-b9784b9e13fb-1000--lamine-yamal-named-euro-2024-young-player-of-the-tournament/
+  - https://www.foxsports.com/stories/soccer/euro-2024-awards-rodri-wins-best-player-yamal-takes-home-best-young-player
+  - https://footballwhispers.com/blog/euro-best-young-players/
+  - https://www.fcbarcelona.com/en/football/first-team/news/2187958/pedri-best-young-player-at-euro-2020
+  - https://khelnow.com/football/world-football-uefa-euro-list-of-all-young-player-of-the-tournament-award-winners-202407
+- Winning managers (added 2026-08-31, intensive run): a new "Winning
+  managers" note section on `content/uefa-euro.md` listing the head coach of
+  every champion across all 17 editions (1960-2024) - the same new angle as
+  the matching World Cup/Nations League additions from the fortieth
+  intensive run, following up on that run's own suggestion that EURO was
+  "likely a safe, well-documented follow-up". Verified via three
+  independent WebSearch passes covering the full span in three era blocks
+  (1960-1980, 1984-2004, 2008-2024): the earliest block (Kachalin,
+  Villalonga, Valcareggi, Schön, Ježek, Derwall) and middle block (Hidalgo
+  through Rehhagel) both cross-referenced Wikipedia's dedicated manager
+  category page, olympics.com's and myfootballfacts.com's winners
+  round-ups, and UEFA.com's own "every EURO coach" retrospective; the
+  newest block (Aragonés through de la Fuente) cross-referenced Sky Sports,
+  Bleacher Report and each manager's own tenure coverage. A fourth,
+  dedicated pass specifically re-checked 1988's winner - the initial
+  round-up surfaced the year but not an explicit name in its excerpt - via
+  Britannica's and GiveMeSport's dedicated Rinus Michels profiles, both
+  confirming he coached the Netherlands' 1988 title. Also independently
+  re-verified Berti Vogts's player-and-manager double (1972 EURO winner as
+  a player, 1996 EURO winner as Germany's manager) via These Football Times
+  and a Vogts biography, matching the same "won it as player and manager"
+  pattern already documented for World Cup winners Zagallo, Beckenbauer and
+  Deschamps. **No discrepancies found:**
+  - https://en.wikipedia.org/wiki/Category:UEFA_European_Championship_managers
+  - https://www.olympics.com/en/news/uefa-european-championships-euro-winners-list-champions
+  - https://www.myfootballfacts.com/uefa/uefa-nations/uefa-european-championships-winning-managers/
+  - https://www.uefa.com/uefaeuro/history/news/025f-0fe8a7c0f17c-8bf54913a5bd-1000--every-euro-coach/
+  - https://www.britannica.com/biography/Rinus-Michels
+  - https://www.givemesport.com/1704902-rinus-michels-how-the-godfather-of-dutch-football-delivered-the-netherlands-euro-1988/
+  - https://thesefootballtimes.co/2016/06/08/how-berti-vogts-inspired-germany-to-win-euro-96/
+  - https://bleacherreport.com/articles/1944540-luis-aragones-spains-euro-2008-winning-coach-dies-aged-75
+  - https://www.skysports.com/football/news/13954/10498347/fernando-santos-hails-portugal-team-spirit-after-euro-2016-win
+  - https://sports.yahoo.com/articles/euro-2020-winning-coach-roberto-183025212.html
+- Winning captains (added 2026-09-01, intensive run): a new "Winning
+  captains" note section on `content/uefa-euro.md` listing the captain who
+  lifted the trophy at every one of the 17 editions (1960-2024), mirroring
+  the World Cup's own "Winning captains" section (forty-third intensive run)
+  and sitting next to the existing "Winning managers" section on this same
+  page. Verified via two independent WebSearch passes covering the full
+  span: the first via a dedicated UEFA.com EURO-winning-captains
+  retrospective (which itself names Chiellini, Ronaldo and Casillas) plus
+  FourFourTwo's and Olympics.com's own winning-captains round-ups for the
+  remaining years; the second specifically re-checked the earliest and least
+  commonly cross-referenced span (1960-1980) via gameofthepeople.com's
+  dedicated Euros history piece and a Wikipedia cross-check, plus the two
+  facts most likely to be conflated with a different EURO-winning-captain
+  storyline (Bernard Dietz's 1980 captaincy, easily confused with the more
+  famous Karl-Heinz Rummenigge from the same squad; and Jordi Alba's 2023
+  Nations League captaincy, cross-checked separately below to make sure it
+  wasn't mixed up with this page's own 2023 entry, which doesn't exist since
+  EURO wasn't played that year). **No discrepancies found:**
+  - https://www.uefa.com/uefaeuro/history/news/025f-0fd29745df66-f9507a69f615-1000--euro-winning-captains/
+  - https://www.fourfourtwo.com/features/european-championship-winning-captains
+  - https://www.olympics.com/en/news/uefa-european-championships-euro-winners-list-champions
+  - https://gameofthepeople.com/2021/06/06/the-euros-1960-to-1972-from-netto-to-netzer/
+  - https://en.wikipedia.org/wiki/List_of_UEFA_European_Championship_winning_players
+  - https://en.wikipedia.org/wiki/Bernard_Dietz
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## UEFA Nations League
 
@@ -678,6 +974,72 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     indexed snippets rather than direct page loads.
+- Player of the Finals winners (added 2026-08-30, intensive run): a new
+  "Player of the Finals winners" note section on
+  `content/uefa-nations-league.md` listing every winner across all four
+  completed editions (2019-2025), the same treatment already given to the
+  World Cup's and EURO's individual-award note sections. Verified via two
+  independent WebSearch passes: the first confirmed all four winners
+  (Bernardo Silva 2019, Sergio Busquets 2021, Rodri 2023, Nuno Mendes 2025)
+  via UEFA.com's own award-announcement articles; the second specifically
+  re-checked the award's name, which changed between editions - UEFA's own
+  2019 article calls Bernardo Silva "Player of the Tournament", while its
+  2021, 2023 and 2025 articles all call the award "Player of the Finals" -
+  confirmed as a genuine rename rather than a reporting inconsistency, since
+  every 2021+ source (UEFA.com, Barça Blaugranes, AllFootballApp) agrees on
+  the new name. **No discrepancies found:**
+  - https://www.uefa.com/uefanationsleague/news/0253-0d81efc3f60a-0d39c305041d-1000--bernardo-silva-and-frenkie-de-jong-win-nations-league-awards/
+  - https://www.uefa.com/uefanationsleague/news/026e-13729be1c1c0-e25470c0a0f1-1000--sergio-busquets-named-2021-uefa-nations-league-player-of-
+  - https://www.uefa.com/uefanationsleague/news/0282-1849de0ccdfe-e28eb8d71909-1000--rodri-named-2023-uefa-nations-league-player-of-the-finals
+  - https://www.uefa.com/uefanationsleague/news/029a-1df453c49ada-5d8aff31f9c2-1000--nuno-mendes-named-2025-uefa-nations-league-player-of-the-f/
+  - https://www.barcablaugranes.com/2021/10/11/22720363/sergio-busquets-named-nations-league-player-of-the-finals
+  - https://m.allfootballapp.com/news/EPL/Sergio-Busquets-has-been-named-2021-UEFA-Nations-League-Player-of-the-Finals/2697091
+- Winning managers (added 2026-08-31, intensive run): a new "Winning managers"
+  note section on `content/uefa-nations-league.md` listing the head coach of
+  every Finals winner across all four completed editions (2019-2025) - the
+  same new angle as the matching World Cup addition this run. Verified via
+  two independent WebSearch passes: the first confirmed all four (Fernando
+  Santos 2019, Didier Deschamps 2021, Luis de la Fuente 2023, Roberto
+  Martínez 2025) via a topendsports.com winners round-up plus each manager's
+  own tenure coverage (Sky Sports, France 24, Squawka, FIFA.com); the second
+  specifically re-checked the two entries most likely to be confused with a
+  successor - Luis de la Fuente, still Spain's manager as of this same run's
+  World Cup addition, and Roberto Martínez, who succeeded Fernando Santos
+  partway through Portugal's cycle - via dedicated profile pieces for each.
+  **No discrepancies found:**
+  - https://www.topendsports.com/events/soccer/uefa-nations/winners.htm
+  - https://www.skysports.com/football/news/13954/12768875/fernando-santos-steps-down-as-portugal-head-coach-after-world-cup-exit
+  - https://www.france24.com/en/tv-shows/france-in-focus/20260616-who-is-didier-deschamps-the-france-coach-aiming-for-a-third-world-cup-title
+  - https://www.squawka.com/us/news/luis-de-la-fuente/
+  - https://www.fifa.com/en/articles/portugal-appoint-former-belgium-boss-roberto-martinez-as-fernando-santos-successor
+  - https://www.squawka.com/us/news/roberto-martinez/
+- Winning captains (added 2026-09-01, intensive run): a new "Winning
+  captains" note section on `content/uefa-nations-league.md` listing the
+  captain who lifted the trophy at every one of the four completed editions
+  (2019-2025) - the same new angle as the matching World Cup and EURO
+  additions from the forty-third and this same run. Verified via two
+  independent WebSearch passes: the first confirmed Ronaldo (2019 and 2025,
+  the only repeat) via Sky Sports and Olympics.com's own Ronaldo-focused
+  2025-final coverage, Hugo Lloris (2021) via ESPN.in's own Lloris
+  retirement retrospective, and Jordi Alba (2023) via Football España's
+  dedicated "did not expect to be named captain" article; the second
+  specifically re-checked why Alba, not Spain's more regular captain Álvaro
+  Morata, held the armband that Finals - Football España's article confirms
+  de la Fuente made the choice but neither pass turned up an explicit
+  stated reason (e.g. injury), so the section's own note stops at the
+  attributable fact (who gave him the armband) rather than guessing why.
+  Also independently re-verified that Ronaldo's 2025 win made him the first
+  captain to lift the trophy twice, via ESPN and SI's own final-reaction
+  coverage. **No discrepancies found:**
+  - https://www.skysports.com/football/news/36166/13380437/nations-league-final-portugal-2-2-spain-5-3-pens-cristiano-ronaldo-helps-portugal-to-reclaim-title
+  - https://www.olympics.com/en/news/emotional-cristiano-ronaldo-reacts-portugal-2025-uefa-nations-league-trophy-win
+  - https://www.espn.in/football/story/_/id/37635382/france-captain-hugo-lloris-announces-retirement-international-football
+  - https://www.football-espana.net/2023/06/10/jordi-alba-did-not-expected-to-be-named-spain-captain-for-uefa-nations-league-finals
+  - https://www.espn.com/soccer/story/_/id/45476228/ronaldo-portugal-nations-league-win
+  - https://www.si.com/soccer/cristiano-ronaldo-leads-portugal-to-glory-takeaways-from-nations-league-final
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Copa América
 
@@ -1237,6 +1599,103 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     indexed snippets rather than direct page loads.
+- Best Player winners (added 2026-08-30, intensive run): a new "Best Player
+  winners" note section on `content/copa-america.md` listing every winner
+  since the award's 1987 introduction (no equivalent award existed at the 32
+  earlier editions), the same treatment already given to the World Cup's
+  Golden Ball/Golden Glove and EURO's Player of the Tournament sections.
+  Verified via two independent WebSearch passes covering all 16 editions
+  (1987-2024): the first pass confirmed 1987 (Valderrama), 1989 (Sosa), 2004
+  (Adriano), 2007 (Robinho), 2011 (Suárez), 2015 (Messi), 2016 (Sánchez),
+  2019 (Dani Alves), 2021 (Messi) and 2024 (James Rodríguez) via a mix of
+  Wikipedia-sourced summaries and news round-ups; the second pass filled in
+  and independently re-confirmed the remaining six editions (1991 Leonardo
+  Rodríguez, 1993 Goycochea, 1995 Francescoli, 1997 Ronaldo, 1999 Rivaldo,
+  2001 Guevara) plus a second confirmation of every edition from the first
+  pass. **No discrepancies found:**
+  - https://copaamerica.com/en/news/james-rodriguez-colombia-best-player-copa-america-2024-award
+  - https://www.espn.com/soccer/chile/story/2902957/chiles-alexis-sanchez-named-best-player-at-copa-america-centenario
+  - https://www.thestatesman.com/sports/copa-america-2019-dani-alves-adjudged-player-tournament-1502775166.html
+  - http://www.xinhuanet.com/english/2019-07/08/c_138207222.htm
+  - https://copaamerica.com/en/news/adriano-champion-and-top-scorer-of-the-conmebol-copa-america
+  - https://www.givemesport.com/every-copa-america-best-player-award-winner/
+  - https://www.elheraldo.hn/deportes/honduras-records-marcas-copa-america-2001-mvp-amado-guevara-tercer-lugar-HJ20380788
+  - https://en.wikipedia.org/wiki/Amado_Guevara
+  - https://en.wikipedia.org/wiki/1991_Copa_Am%C3%A9rica
+  - https://en.wikipedia.org/wiki/1993_Copa_Am%C3%A9rica
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages (including Wikipedia's
+    per-edition articles) rather than direct page loads, since direct
+    WebFetch to wikipedia.org and several other sports-reference domains
+    (topendsports.com, khelnow.com) was again blocked for this run.
+- Golden Glove winners (added 2026-08-30, intensive run): a new "Golden Glove
+  winners" note section on `content/copa-america.md` listing every winner
+  since the award's 2011 introduction (no equivalent award existed at
+  earlier editions), the same treatment already given to the World Cup's
+  Golden Ball/Golden Glove, EURO's Player of the Tournament, and this same
+  page's own Best Player winners sections. Verified via two independent
+  WebSearch passes covering all six editions the award has been given at
+  (2011, 2015, 2016, 2019, 2021, 2024): the first pass found 2011 (Justo
+  Villar), 2015/2016 (Claudio Bravo, two wins), 2019 (Alisson Becker), 2021
+  and 2024 (Emiliano Martínez, two wins) via a mix of award-recap articles;
+  the second pass independently re-confirmed all six editions against a
+  distinct source mix. **No discrepancies found:**
+  - https://www.givemesport.com/every-copa-america-best-player-award-winner/
+  - https://khelnow.com/football/world-football-copa-america-list-of-all-golden-glove-winners-202407
+  - https://www.foottheball.com/copa-america/golden-glove-winners-alisson-claudio-bravo-villar-chile-brazil-paraguay/
+  - https://www.sportskeeda.com/football/list-of-copa-america-golden-glove-winners
+  - https://www.90min.com/posts/copa-america-2024-awards-golden-boot-glove-and-ball-winners
+  - https://www.mykhel.com/football/copa-america-2024-awards-golden-boot-golden-glove-and-more-complete-list-of-award-winners-293743.html
+  - https://en.wikipedia.org/wiki/Copa_Am%C3%A9rica_awards
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads,
+    since direct WebFetch to wikipedia.org remains blocked for this run.
+- Golden Boot winners (added 2026-08-31, intensive run): a new "Golden Boot
+  winners" note section on `content/copa-america.md` listing the top
+  goalscorer of every edition, 1916 through 2024 (48 editions, including both
+  1959 tournaments) - unlike the Best Player and Golden Glove awards above,
+  which only exist from their real introduction years, a top scorer can be
+  derived for every edition, the same "convenient modern label" framing the
+  site's dedicated Golden Boot page already uses for the FIFA World Cup and
+  UEFA EURO. Verified via four era-based WebSearch passes (1916-1929,
+  1935-1967 including both 1959 tournaments, 1975-1991, 1993-2024), then a
+  second, independent cross-check pass drawing on Spanish-language sources
+  (ESPN Deportes, El Economista, Bolavip, BeSoccer, Depor) for the
+  1916-1922 span specifically, plus two targeted re-checks: 1937's winner
+  (confirming "Raúl Toro" as the correct name, not the garbled "Raúl Toro
+  Julio" some summaries ran together - Toro's actual middle/second surname)
+  and 1959's Argentina-hosted edition specifically (Pelé, 8 goals, matching
+  a dedicated copaamerica.com retrospective article about that exact win).
+  **No discrepancies found** across either pass. Every joint-winner tie
+  already on the page (1919, 1923, 1942, 1945, 1957, 1975, 1979, 1983, 1995,
+  1999, 2015, 2019, 2021) came back identically tied in both passes,
+  including the two ties that jointly hold the single-edition scoring record
+  (Jair's solo 9 in 1949; Maschio and Ambrois's shared 9 each in 1957):
+  - https://copaamerica.com/en/news/top-scorer-every-edition-conmebol-copa-america
+  - https://copaamerica.com/en/news/the-all-time-top-goalscorers-in-conmebol-copa-america
+  - https://copaamerica.com/en/news/pele-king-top-scorer-copa-america-1959
+  - https://copaamerica.com/en/news/paolo-guerrero-on-his-way-to-be-the-tournaments-top-scorer
+  - https://www.nbcsports.com/soccer/news/2015-copa-america-awards-vargas-guerrero-beat-aguero-vidal-to-top-scorer
+  - https://en.wikipedia.org/wiki/Ra%C3%BAl_Toro_(footballer,_born_1911)
+  - https://www.worldfootball.net/competition/co22/conmebol-copa-america/records-all-time-goals/
+  - https://bolavip.com/en/copa-america/copa-america-top-scorers-history-best-players-and-the-golden-boot
+  - https://bolavip.com/copa-america/quienes-son-los-maximos-goleadores-historicos-de-la-copa-america
+  - https://espndeportes.espn.com/noticias/nota?id=579173&s=gen&type=story
+  - https://eleconomista.com.ar/deportes/historia-copa-america-1917-1929-n73487
+  - https://es.besoccer.com/competicion/historico-temporada/copa_america/goleadores
+  - https://depor.com/futbol-internacional/copa-america-resultados-campeones-goleadores-historial-estadisticas-torneo-1916-92434/
+  - https://www.besoccer.com/competition/historical-ranking/copa_america/top-scorers
+  - https://theanalyst.com/articles/copa-america-top-scorers-all-time
+  - https://theanalyst.com/articles/most-goals-scored-at-a-single-copa-america-players
+  - https://en.wikipedia.org/wiki/1959_South_American_Championship_(Argentina)
+  - https://en.wikipedia.org/wiki/1959_South_American_Championship_(Ecuador)
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads,
+    since direct WebFetch to wikipedia.org and copaamerica.com remains
+    blocked for this run.
 
 ## Ballon d'Or
 
@@ -1414,6 +1873,64 @@ Primary sources should be preferred.
     environment's egress policy for this run, so verification relied on
     WebSearch's synthesized snippets rather than directly rendered pages,
     per the same caveat noted throughout this file.
+- Kopa Trophy winners (added 2026-08-31, intensive run): a new "Kopa Trophy
+  winners" note section on `content/ballon-dor.md` listing every winner of
+  France Football's companion "best young player" (under-21) award since its
+  2018 introduction (not awarded in 2020, the one year the Ballon d'Or
+  itself was cancelled) - the same treatment already given to the World
+  Cup's Golden Ball/Golden Glove/Young Player Award, EURO's Player of the
+  Tournament/Young Player of the Tournament, and Copa América/Nations
+  League's Best Player/Player of the Finals sections. Verified via two
+  independent WebSearch passes covering all seven awarded editions
+  (2018-2019, 2021-2025): both passes agreed exactly on every year - Kylian
+  Mbappé (2018), Matthijs de Ligt (2019), Pedri (2021), Gavi (2022), Jude
+  Bellingham (2023), and Lamine Yamal (2024 and 2025, the first player to
+  win it twice). **No discrepancies found:**
+  - https://www.si.com/soccer/what-is-the-kopa-trophy-past-winners-nominees-2025
+  - https://www.90min.com/what-is-kopa-trophy-past-winners-nominees
+  - https://www.topendsports.com/sport/soccer/awards/kopa-trophy.htm
+  - https://www.sportsdunia.com/football-analysis/list-of-kopa-trophy-winners
+  - https://www.chaseyoursport.com/football/list-of-kopa-trophy-winners/8061
+  - https://www.givemesport.com/every-winner-kopa-trophy-ranked/
+  - https://en.wikipedia.org/wiki/Kopa_Trophy
+  - https://www.fcbarcelona.com/en/football/first-team/news/4367534/lamine-yamal-retains-kopa-trophy/featured
+  - https://www.tntsports.co.uk/football/ballon-d-or/2025/lamine-yamal-retains-kopa-trophy-for-best-young-player-vicky-lopez-takes-inaugural-womens-prize_sto23224406/story.shtml
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Yashin Trophy winners (added 2026-09-01, intensive run): a new "Yashin
+  Trophy winners" note section on `content/ballon-dor.md` listing every
+  winner of France Football's companion "best goalkeeper" award, named after
+  Lev Yashin, since its 2019 introduction (not awarded in 2020, the one year
+  the Ballon d'Or itself was cancelled) - the same treatment already given to
+  the Kopa Trophy section directly above it, and a genuinely different award
+  from the "Lev Yashin remains the only goalkeeper to win the men's award"
+  note already on this same page (which is about the Ballon d'Or itself, not
+  this companion trophy). Verified via two independent WebSearch passes
+  covering all six awarded editions (2019, 2021-2025): both passes agreed
+  exactly on every year - Alisson (2019, the trophy's first winner),
+  Gianluigi Donnarumma (2021), Thibaut Courtois (2022), Emiliano Martínez
+  (2023 and 2024, the first goalkeeper to win it in consecutive years), and
+  Donnarumma again (2025, becoming the second goalkeeper - after Martínez -
+  to win the trophy more than once). A dedicated third pass specifically
+  re-checked the 2022 (Courtois, not to be confused with his separate
+  Ballon d'Or podium placing that year) and 2023/2024 Martínez back-to-back
+  wins, since those are the two facts most likely to be conflated with a
+  different Ballon d'Or-night storyline. **No discrepancies found:**
+  - https://www.topendsports.com/sport/soccer/awards/yashin-trophy.htm
+  - https://www.premierleague.com/en/news/4420829/donnarumma-and-gyokeres-win-awards-at-2025-ballon-dor
+  - https://goaltheball.com/yashin-trophy-winners-list/
+  - https://www.fotmob.com/el/news/x3syvn394xhu179pkuk2k9k4y/ballon-d'or-2019-liverpool-goalkeeper-alisson-wins-inaugural-yachine-trophy
+  - https://www.goal.com/en-ca/lists/aston-villa-and-argentina-goalkeeper-emiliano-martinez-retains-yashin-trophy-as-world-s-best-goalkeeper-in-2024/blt47f77564722f26b5
+  - https://fr.wikipedia.org/wiki/Troph%C3%A9e_Yachine
+  - https://www.footmercato.net/a7278391082899020163-ballon-dor-2025-gianluigi-donnarumma-remporte-le-trophee-yachine
+  - https://www.realmadrid.com/en-US/news/football/first-team/special-features/courtois-yashin-trophy-winner-2022
+  - https://www.tntsports.co.uk/football/ballon-d-or/2022/ballon-dor-2022-thibaut-courtois-wins-yashin-trophy-for-best-goalkeeper-after-real-madrid-heroics-la_sto9191911/story.shtml
+  - https://www.90min.com/posts/emiliano-martinez-wins-2023-yashin-trophy
+  - https://www.besoccer.com/new/emiliano-martinez-wins-back-to-back-yachine-trophy-awards-1335839
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Review policy
 

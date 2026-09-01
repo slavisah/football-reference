@@ -77,7 +77,7 @@ test.describe('Nations League edition page', () => {
   test('has no WCAG violations', async ({ page }) => {
     await page.goto('competitions/nations-league/2022-23');
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .disableRules(['region'])
       .analyze();
     expect(results.violations).toEqual([]);
@@ -149,7 +149,7 @@ test.describe('Croatian Nations League edition page', () => {
   test('has no WCAG violations', async ({ page }) => {
     await page.goto('hr/competitions/nations-league/2022-23');
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .disableRules(['region'])
       .analyze();
     expect(results.violations).toEqual([]);

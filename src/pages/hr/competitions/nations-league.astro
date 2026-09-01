@@ -25,6 +25,7 @@ import { NATIONS_LEAGUE_HOST_COORDINATES } from '../../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
   buildChampionsItemList,
+  buildCollectionPageJsonLd,
   buildLatestEditionSportsEvent,
   type JsonLdObject,
 } from '../../../lib/jsonLd';
@@ -48,8 +49,12 @@ const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 const title = 'UEFA Liga nacija';
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const championsName = `${title} - prvaci po broju naslova`;
 const jsonLd = [
-  buildChampionsItemList(data.champions, { pageUrl, name: `${title} - prvaci po broju naslova` }),
+  buildCollectionPageJsonLd(buildChampionsItemList(data.champions, { pageUrl, name: championsName }), {
+    pageUrl,
+    name: championsName,
+  }),
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 
@@ -75,6 +80,35 @@ const notes: NoteSection[] = [
       'Portugal je 2025. postao prvi dvostruki prvak natjecanja.',
       'Hrvatska je 2023. stigla do svog prvog finala Lige nacija.',
       'Natjecanje koristi sustav ispadanja i napredovanja između liga.',
+    ],
+  },
+  {
+    heading: 'Dobitnici nagrade za najboljeg igrača Final Foura',
+    items: [
+      'UEFA od pokretanja natjecanja 2019. dodjeljuje nagradu za najboljeg igrača Final Foura Lige nacija; isprva se zvala "Igrač turnira", a od 2021. preimenovana je u "Igrač Final Foura".',
+      '2019.: Bernardo Silva (Portugal).',
+      '2021.: Sergio Busquets (Španjolska).',
+      '2023.: Rodri (Španjolska).',
+      '2025.: Nuno Mendes (Portugal).',
+    ],
+  },
+  {
+    heading: 'Izbornici prvaka',
+    items: [
+      '2019.: Fernando Santos (Portugal).',
+      '2021.: Didier Deschamps (Francuska).',
+      '2023.: Luis de la Fuente (Španjolska) - iste sezone u kojoj je preuzeo Španjolsku, prije nego što je s njom osvojio i EURO 2024. i Svjetsko prvenstvo 2026.',
+      '2025.: Roberto Martínez (Portugal) - prvi trofej otkako je preuzeo momčad od Fernanda Santosa.',
+    ],
+  },
+  {
+    heading: 'Kapetani prvaka',
+    items: [
+      'Kapetan je igrač koji na podiju podiže pehar; svaki pobjednik Final Foura Lige nacija imao je kapetana na sva četiri dosad odigrana izdanja.',
+      '2019.: Cristiano Ronaldo (Portugal).',
+      '2021.: Hugo Lloris (Francuska).',
+      '2023.: Jordi Alba (Španjolska) - kapetansku vrpcu za Final Four dobio je od izbornika Luisa de la Fuentea.',
+      '2025.: Cristiano Ronaldo (Portugal) - prvi kapetan koji je dvaput podigao pehar Lige nacija.',
     ],
   },
   {

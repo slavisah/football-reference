@@ -26,6 +26,7 @@ import { WORLD_CUP_HOST_COORDINATES, HOST_REGION_ORDER } from '../../../lib/host
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
   buildChampionsItemList,
+  buildCollectionPageJsonLd,
   buildLatestEditionSportsEvent,
   type JsonLdObject,
 } from '../../../lib/jsonLd';
@@ -62,14 +63,17 @@ const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 const title = 'FIFA Svjetsko prvenstvo';
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const championsName = `${title} - prvaci po broju naslova`;
 const jsonLd = [
-  buildChampionsItemList(data.champions, { pageUrl, name: `${title} - prvaci po broju naslova` }),
+  buildCollectionPageJsonLd(buildChampionsItemList(data.champions, { pageUrl, name: championsName }), {
+    pageUrl,
+    name: championsName,
+  }),
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 
-// Hand-translated from content/fifa-world-cup.md's "How it works", "Format
-// milestones", "Memorable moments" and "Editorial notes" sections (the same
-// four headings the English page requests via noteHeadings). content/ itself
+// Hand-translated from content/fifa-world-cup.md's note sections (the same
+// headings the English page requests via noteHeadings). content/ itself
 // stays untouched and English (the single editorial source of truth); this
 // is presentation-layer text local to this page only, the same way the three
 // earlier Croatian competition pages hand-write their own Croatian prose.
@@ -92,6 +96,127 @@ const notes: NoteSection[] = [
       '1982.: broj momčadi povećan je s 16 na 24.',
       '1998.: broj momčadi povećan je na 32.',
       '2026.: broj momčadi povećan je na 48, a natjecanje je prvi put ugostilo tri zemlje.',
+    ],
+  },
+  {
+    heading: 'Dobitnici Zlatne lopte',
+    items: [
+      'FIFA od 1982. na svakom Svjetskom prvenstvu dodjeljuje nagradu za najboljeg igrača; ranija izdanja nisu imala tu nagradu.',
+      '1982.: Paolo Rossi (Italija) - prvi dobitnik nagrade.',
+      '1986.: Diego Maradona (Argentina).',
+      '1990.: Salvatore Schillaci (Italija).',
+      '1994.: Romário (Brazil).',
+      '1998.: Ronaldo (Brazil).',
+      '2002.: Oliver Kahn (Njemačka) - jedini vratar koji je do sada osvojio i tu nagradu.',
+      '2006.: Zinedine Zidane (Francuska).',
+      '2010.: Diego Forlán (Urugvaj).',
+      '2014.: Lionel Messi (Argentina) - prva od njegove dvije nagrade, i dalje jedini igrač koji je nagradu osvojio više puta.',
+      '2018.: Luka Modrić (Hrvatska).',
+      '2022.: Lionel Messi (Argentina) - njegova druga nagrada.',
+      '2026.: Rodri (Španjolska) - prvi španjolski igrač koji je osvojio nagradu.',
+    ],
+  },
+  {
+    heading: 'Dobitnici Srebrne i Brončane lopte',
+    items: [
+      'Dvojica drugoplasiranih u glasovanju za Zlatnu loptu dobivaju Srebrnu i Brončanu loptu; obje se dodjeljuju uz Zlatnu loptu na svakom Svjetskom prvenstvu od 1982.',
+      '1982.: Falcão (Brazil) osvojio je Srebrnu loptu; Karl-Heinz Rummenigge (Zapadna Njemačka) osvojio je Brončanu loptu.',
+      '1986.: Harald Schumacher (Zapadna Njemačka) osvojio je Srebrnu loptu; Preben Elkjær (Danska) osvojio je Brončanu loptu.',
+      '1990.: Lothar Matthäus (Zapadna Njemačka) osvojio je Srebrnu loptu; Diego Maradona (Argentina) osvojio je Brončanu loptu.',
+      '1994.: Roberto Baggio (Italija) osvojio je Srebrnu loptu; Hristo Stoičkov (Bugarska) osvojio je Brončanu loptu.',
+      '1998.: Davor Šuker (Hrvatska) osvojio je Srebrnu loptu; Lilian Thuram (Francuska) osvojio je Brončanu loptu.',
+      '2002.: Ronaldo (Brazil) osvojio je Srebrnu loptu; Hong Myung-bo (Južna Koreja) osvojio je Brončanu loptu.',
+      '2006.: Fabio Cannavaro (Italija) osvojio je Srebrnu loptu; Andrea Pirlo (Italija) osvojio je Brončanu loptu.',
+      '2010.: Wesley Sneijder (Nizozemska) osvojio je Srebrnu loptu; David Villa (Španjolska) osvojio je Brončanu loptu.',
+      '2014.: Thomas Müller (Njemačka) osvojio je Srebrnu loptu; Arjen Robben (Nizozemska) osvojio je Brončanu loptu.',
+      '2018.: Eden Hazard (Belgija) osvojio je Srebrnu loptu; Antoine Griezmann (Francuska) osvojio je Brončanu loptu.',
+      '2022.: Kylian Mbappé (Francuska) osvojio je Srebrnu loptu; Luka Modrić (Hrvatska) osvojio je Brončanu loptu.',
+      '2026.: Lionel Messi (Argentina) osvojio je Srebrnu loptu unatoč porazu Argentine u finalu; Kylian Mbappé (Francuska) osvojio je Brončanu loptu.',
+    ],
+  },
+  {
+    heading: 'Dobitnici Zlatne rukavice',
+    items: [
+      'FIFA od 1994. na svakom Svjetskom prvenstvu dodjeljuje nagradu za najboljeg vratara; ranija izdanja nisu imala tu nagradu.',
+      '1994.: Michel Preud\'homme (Belgija) - prvi dobitnik nagrade, tada nazvane nagrada Lava Jašina.',
+      '1998.: Fabien Barthez (Francuska).',
+      '2002.: Oliver Kahn (Njemačka) - jedini vratar koji je do sada osvojio i Zlatnu loptu za najboljeg igrača turnira.',
+      '2006.: Gianluigi Buffon (Italija).',
+      '2010.: Iker Casillas (Španjolska) - prvi dobitnik nagrade pod današnjim nazivom "Zlatna rukavica", uvedenim te godine.',
+      '2014.: Manuel Neuer (Njemačka).',
+      '2018.: Thibaut Courtois (Belgija).',
+      '2022.: Emiliano Martínez (Argentina).',
+      '2026.: Unai Simón (Španjolska) - rekordnih sedam utakmica bez primljenog gola na turniru.',
+    ],
+  },
+  {
+    heading: 'Dobitnici nagrade za najboljeg mladog igrača',
+    items: [
+      'FIFA od 2006. na svakom Svjetskom prvenstvu dodjeljuje nagradu za najboljeg igrača do 21 godine starosti; ranija izdanja nisu imala tu nagradu.',
+      '2006.: Lukas Podolski (Njemačka) - prvi dobitnik nagrade.',
+      '2010.: Thomas Müller (Njemačka).',
+      '2014.: Paul Pogba (Francuska).',
+      '2018.: Kylian Mbappé (Francuska).',
+      '2022.: Enzo Fernández (Argentina).',
+      '2026.: Pau Cubarsí (Španjolska) - prvi obrambeni igrač koji je osvojio nagradu.',
+    ],
+  },
+  {
+    heading: 'Izbornici prvaka',
+    items: [
+      'Svaku momčad koja je osvojila Svjetsko prvenstvo vodio je izbornik iste nacionalnosti kao i momčad, obrazac koji se nije prekinuo ni na jednom od svih 23 izdanja.',
+      '1930.: Alberto Suppici (Urugvaj) - najmlađi pobjednički izbornik u povijesti Svjetskog prvenstva, u dobi od 31 godine.',
+      '1934.: Vittorio Pozzo (Italija).',
+      '1938.: Vittorio Pozzo (Italija) - i dalje jedini izbornik koji je Svjetsko prvenstvo osvojio dvaput, i to uzastopno.',
+      '1950.: Juan López Fontana (Urugvaj).',
+      '1954.: Sepp Herberger (Zapadna Njemačka).',
+      '1958.: Vicente Feola (Brazil).',
+      '1962.: Aymoré Moreira (Brazil).',
+      '1966.: Alf Ramsey (Engleska).',
+      '1970.: Mário Zagallo (Brazil) - naslov je osvojio i kao igrač 1958. i 1962.',
+      '1974.: Helmut Schön (Zapadna Njemačka).',
+      '1978.: César Luis Menotti (Argentina).',
+      '1982.: Enzo Bearzot (Italija).',
+      '1986.: Carlos Bilardo (Argentina).',
+      '1990.: Franz Beckenbauer (Zapadna Njemačka) - naslov je osvojio i kao igrač 1974., jedan od samo tri čovjeka koji su naslov osvojili i kao igrač i kao izbornik.',
+      '1994.: Carlos Alberto Parreira (Brazil).',
+      '1998.: Aimé Jacquet (Francuska).',
+      '2002.: Luiz Felipe Scolari (Brazil).',
+      '2006.: Marcello Lippi (Italija).',
+      '2010.: Vicente del Bosque (Španjolska).',
+      '2014.: Joachim Löw (Njemačka).',
+      '2018.: Didier Deschamps (Francuska) - naslov je osvojio i kao igrač 1998., pridruživši se Zagallu i Beckenbaueru kao pobjednik i u igračkoj i u izborničkoj ulozi.',
+      '2022.: Lionel Scaloni (Argentina).',
+      '2026.: Luis de la Fuente (Španjolska) - najstariji pobjednički izbornik u povijesti Svjetskog prvenstva, u dobi od 65 godina, i drugi naslov Španjolske uz onaj iz 2010.',
+    ],
+  },
+  {
+    heading: 'Kapetani prvaka',
+    items: [
+      'Kapetan je igrač koji na podiju podiže pehar; svaka pobjednička momčad imala je kapetana na svih 23 izdanja.',
+      '1930.: José Nasazzi (Urugvaj).',
+      '1934.: Gianpiero Combi (Italija).',
+      '1938.: Giuseppe Meazza (Italija).',
+      '1950.: Obdulio Varela (Urugvaj).',
+      '1954.: Fritz Walter (Zapadna Njemačka).',
+      '1958.: Hilderaldo Bellini (Brazil).',
+      '1962.: Mauro Ramos (Brazil).',
+      '1966.: Bobby Moore (Engleska).',
+      '1970.: Carlos Alberto Torres (Brazil).',
+      '1974.: Franz Beckenbauer (Zapadna Njemačka) - naslov je kasnije osvojio i kao izbornik 1990., jedan od samo tri čovjeka koji su naslov osvojili i kao igrač i kao izbornik (vidi "Izbornici prvaka" iznad).',
+      '1978.: Daniel Passarella (Argentina).',
+      '1982.: Dino Zoff (Italija) - u dobi od 40 godina i dalje najstariji igrač koji je kao kapetan osvojio Svjetsko prvenstvo.',
+      '1986.: Diego Maradona (Argentina).',
+      '1990.: Lothar Matthäus (Zapadna Njemačka).',
+      '1994.: Dunga (Brazil).',
+      '1998.: Didier Deschamps (Francuska) - naslov je kasnije osvojio i kao izbornik 2018., pridruživši se Beckenbaueru kao pobjednik i u igračkoj i u izborničkoj ulozi (vidi "Izbornici prvaka" iznad).',
+      '2002.: Cafu (Brazil) - jedini igrač koji je nastupio u tri uzastopna finala Svjetskog prvenstva (1994., 1998. i 2002.).',
+      '2006.: Fabio Cannavaro (Italija).',
+      '2010.: Iker Casillas (Španjolska).',
+      '2014.: Philipp Lahm (Njemačka).',
+      '2018.: Hugo Lloris (Francuska).',
+      '2022.: Lionel Messi (Argentina).',
+      '2026.: Rodri (Španjolska) - iste je godine proglašen i dobitnikom Zlatne lopte turnira (vidi "Dobitnici Zlatne lopte" iznad).',
     ],
   },
   {
@@ -139,7 +264,7 @@ const headerLabels: Record<string, string> = {
 
 <BaseLayout
   title={title}
-  description="Svako izdanje FIFA Svjetskog prvenstva od 1930., domaćini, finalisti i prvaci, uz generirani broj naslova. Filtriraj po prvaku, godini, domaćinu i reprezentaciji."
+  description="Svako izdanje FIFA Svjetskog prvenstva, domaćini, finalisti i prvaci, uz generirani broj naslova. Filtriraj po prvaku, godini, domaćinu i reprezentaciji."
   locale="hr"
   alternateHref={withBase('/competitions/world-cup')}
   jsonLd={jsonLd}

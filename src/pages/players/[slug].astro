@@ -11,7 +11,7 @@ import {
 } from '../../lib/playerProfile';
 import type { SourceLink } from '../../lib/sources';
 import { absolutePageUrl, withBase } from '../../lib/url';
-import { buildPlayerProfileItemList, type JsonLdObject } from '../../lib/jsonLd';
+import { buildPlayerPersonJsonLd, buildPlayerProfileItemList, type JsonLdObject } from '../../lib/jsonLd';
 
 export async function getStaticPaths() {
   const [ballonDor, worldCupGoldenBoot, euroGoldenBoot] = await Promise.all([
@@ -69,16 +69,20 @@ const slug = playerProfileSlug(profile.id);
 
 // One ItemList per player profile - the same structured-data parity every
 // other generated-ranking page family on the site already has (see
-// buildPlayerProfileItemList in jsonLd.ts). Only emitted when the player has
-// at least one award (every built profile does, but this guards the empty
-// case the same way /teams/<slug> does).
+// buildPlayerProfileItemList in jsonLd.ts) - plus a Person entity block
+// (buildPlayerPersonJsonLd) so search engines can associate this page with
+// the player as a real named entity, not just a ranked list. Only emitted
+// when the player has at least one award (every built profile does, but
+// this guards the empty case the same way /teams/<slug> does).
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd: JsonLdObject[] =
   profile.awards.length > 0
     ? [
         buildPlayerProfileItemList(profile, {
-          pageUrl: absolutePageUrl(Astro.url, Astro.site),
+          pageUrl,
           name: `${profile.displayName} - full award history`,
         }),
+        buildPlayerPersonJsonLd(profile, { pageUrl }),
       ]
     : [];
 ---

@@ -8,6 +8,7 @@ import { WORLD_CUP_HOST_COORDINATES, HOST_REGION_ORDER } from '../../lib/hostCoo
 import { absolutePageUrl, withBase } from '../../lib/url';
 import {
   buildChampionsItemList,
+  buildCollectionPageJsonLd,
   buildLatestEditionSportsEvent,
   type JsonLdObject,
 } from '../../lib/jsonLd';
@@ -16,7 +17,18 @@ const [data, goldenBoot] = await Promise.all([
   loadCompetition('fifa-world-cup', {
     editionsHeading: 'Editions',
     sourcesHeading: 'FIFA World Cup',
-    noteHeadings: ['How it works', 'Format milestones', 'Memorable moments', 'Editorial notes'],
+    noteHeadings: [
+      'How it works',
+      'Format milestones',
+      'Golden Ball winners',
+      'Silver Ball and Bronze Ball winners',
+      'Golden Glove winners',
+      'Young Player Award winners',
+      'Winning managers',
+      'Winning captains',
+      'Memorable moments',
+      'Editorial notes',
+    ],
   }),
   loadCompetition('golden-boot', {
     editionsHeading: 'FIFA World Cup top scorers',
@@ -30,8 +42,12 @@ const hostMap = buildHostMapPoints(data.editions, WORLD_CUP_HOST_COORDINATES, HO
 const yearLinks = buildEditionLinks(buildEditionProfiles(data.editions), '/competitions/world-cup');
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const championsName = `${data.title} - Champions by titles`;
 const jsonLd = [
-  buildChampionsItemList(data.champions, { pageUrl, name: `${data.title} - Champions by titles` }),
+  buildCollectionPageJsonLd(buildChampionsItemList(data.champions, { pageUrl, name: championsName }), {
+    pageUrl,
+    name: championsName,
+  }),
   buildLatestEditionSportsEvent(data.editions, data.title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 ---
