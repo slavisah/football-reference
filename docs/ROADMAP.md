@@ -1024,9 +1024,10 @@ standing quirks.
   build` (711 pages), `check:links` (715 pages), `check:sitemap` (710
   entries), `check:precache` (37 URLs), `check:perf` (heaviest page
   `hr/records`, within the new 560 KB budget), `check:pdfs` (700/700 fresh).
-  A full cold-start `pnpm test:e2e` was kicked off to verify the new
-  assertions; see `docs/PROJECT_STATUS.md`'s matching entry, updated once
-  that run finished, for the final pass count. **Left for a future pass:**
+  A full cold-start `pnpm test:e2e` confirmed the new assertions: 822/822
+  passed (13.2 minutes), up from the forty-third run's 821/821, with no
+  pre-existing assertion needing an update. See `docs/PROJECT_STATUS.md`'s
+  matching entry for detail. **Left for a future pass:**
   the same environment-blocked items as every recent run (`typescript` 7,
   `docs/SOURCES.md` link-liveness), plus Copa América winning
   managers/captains specifically (still blocked on contradictory early
