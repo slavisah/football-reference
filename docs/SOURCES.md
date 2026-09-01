@@ -1735,6 +1735,49 @@ Primary sources should be preferred.
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages (including Wikipedia's
     per-manager and per-edition articles) rather than direct page loads.
+- Winning captains (added 2026-09-01, intensive run): a new "Winning
+  captains" note section on `content/copa-america.md`, deliberately scoped
+  to the same six editions as the page's own Golden Glove section
+  (2011-2024) rather than the full post-1975 span the Winning managers
+  section above covers. Captain identification proved a materially harder
+  fact to source than manager identification: a first WebSearch pass found
+  plausible captain names for 1975 (Héctor Chumpitaz) and 1979 (Hugo
+  Talavera) but repeatedly failed to surface any reliable name for 1983,
+  1987 or 1989 - one attempt for 1987 returned a fabricated answer (a
+  former Uruguayan head of state's name, not a footballer). A second,
+  more rigorous cross-check pass on two editions this run had initially
+  treated as reliably in range then directly **contradicted** the first
+  pass: 1995 (first pass: Pablo Bengoechea captained "in Francescoli's
+  absence"; second pass, sourced from an ESPN Deportes retrospective:
+  Francescoli himself captained and lifted the trophy, Bengoechea only
+  scored the equalizer off the bench) and 2004 (a summary that named Alex
+  as captain also, in the same breath, incorrectly credited him with the
+  1999 captaincy that the 1999 Golden Boot/Winning-managers-era research
+  had already independently attributed to Cafu). Given two directly
+  contradictory results on facts this run had initially logged as
+  confirmed, the whole 1975-2010 span was dropped rather than risk
+  shipping any of it unverified, not just the editions that produced an
+  outright fabrication. The six 2011-2024 editions that remained were each
+  re-verified against an unambiguous primary-ish source (an official
+  CONMEBOL/copaamerica.com article, a multi-outlet-corroborated news event,
+  or common, undisputed public record for the two Messi editions) with no
+  contradiction across any of them:
+  - https://www.conmebol.com/noticias/diego-lugano-la-copa-america-2011-ubico-otra-vez-uruguay-en-los-primeros-planos-mundiales/
+  - https://copaamerica.com/en/news/claudio-bravo-captain-and-two-time-champion-with-la-roja
+  - https://www.si.com/soccer/2019/05/28/neymar-loses-brazil-captaincy-dani-alves-copa-america
+  - http://www.xinhuanet.com/english/2019-05/28/c_138095784.htm
+  - https://www.mlssoccer.com/news/lionel-messi-repeats-as-copa-america-champion-with-argentina
+  - https://copaamerica.com/en/news/messi-records-history-conmebol-copa-america
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied entirely on
+    WebSearch's synthesized summaries rather than direct page loads, which
+    is very likely why this particular fact proved harder to pin down than
+    manager identification - a future pass with direct access to a
+    structured source (e.g. Wikipedia's per-edition squad list pages,
+    which mark captains inline, or RSSSF) could very plausibly recover the
+    1975-2010 span this run left out. Not re-attempted without a better
+    source lead, the same standing caution already applied to Copa
+    América's pre-1975 managers/captains.
 
 ## Ballon d'Or
 

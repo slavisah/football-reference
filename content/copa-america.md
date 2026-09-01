@@ -245,6 +245,17 @@ A **second, independent cross-check** of the Final date column (2026-08-12, inte
 - **2024:** Lionel Scaloni (Argentina) - his second, back-to-back.
 - Alfio Basile and Lionel Scaloni are the only managers on this list to win back-to-back editions with Argentina.
 
+## Winning captains
+
+- The captain is the player who lifts the trophy on the podium. Unlike the "Winning managers" section above, which is reliably sourced back to 1975, independent research passes for this section found captain identification only consistently confirmable across the same six editions this page's own Golden Glove award has existed for - 2011 onward. Earlier editions produced contradictory or unconfirmed captain names even for otherwise well-documented finals, so this section is deliberately scoped to that span rather than risk an unverified or contested name.
+- **2011:** Diego Lugano (Uruguay) - wore the armband in all six of Uruguay's matches, lifting the trophy after a 3-0 final win over Paraguay.
+- **2015:** Claudio Bravo (Chile) - the first of his two title-winning editions as captain, saving a penalty in the final shootout against Argentina.
+- **2016:** Claudio Bravo (Chile) - his second, back-to-back, Copa América Centenario.
+- **2019:** Dani Alves (Brazil) - given the armband by manager Tite after Neymar was stripped of the captaincy following an off-field incident.
+- **2021:** Lionel Messi (Argentina) - the first of his two consecutive title-winning editions, his first major trophy with the senior Argentina team.
+- **2024:** Lionel Messi (Argentina) - his second, back-to-back, though an injury forced him off before the trophy lift.
+- Claudio Bravo and Lionel Messi are the only captains on this list to win back-to-back editions - Bravo as a goalkeeper, a rarer position for the honor.
+
 ## Memorable moments
 
 - Argentina, Brazil, Chile, and Uruguay played the first edition in 1916.
