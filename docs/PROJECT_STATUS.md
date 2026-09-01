@@ -14561,8 +14561,16 @@ unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
 the 540 KB budget but only 2.3 KB of headroom left - the ninth deliberate
 raise of `PAGE_WEIGHT_BUDGET_BYTES` is likely due soon if another World Cup
 or Ballon d'Or section adds more `docs/SOURCES.md` citations), `check:pdfs`
-(700 PDFs fresh), and the full cold-start `pnpm test:e2e` suite
-(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`).
+(700 PDFs fresh). The full cold-start `pnpm test:e2e` suite
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) first caught one
+pre-existing stale hardcoded assertion - `tests/e2e/mobile.spec.ts`'s "shows
+the last reviewed date and source links" test still expected
+`time[datetime="2026-08-31"]`, made stale by this run's own `lastReviewed`
+bump to 2026-09-01 - fixed to the new date, the same "existing hardcoded
+assertion needed updating" pattern several prior content-adding runs have
+hit. **821/821 passed** after the fix (12.1 minutes), unchanged from the
+forty-second run's baseline count - a like-for-like heading/count update
+plus the new captains assertions, no other new test cases.
 
 **Left for a future pass:** the same environment-blocked items as every
 recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
