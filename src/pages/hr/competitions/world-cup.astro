@@ -72,9 +72,8 @@ const jsonLd = [
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 
-// Hand-translated from content/fifa-world-cup.md's "How it works", "Format
-// milestones", "Memorable moments" and "Editorial notes" sections (the same
-// four headings the English page requests via noteHeadings). content/ itself
+// Hand-translated from content/fifa-world-cup.md's note sections (the same
+// headings the English page requests via noteHeadings). content/ itself
 // stays untouched and English (the single editorial source of truth); this
 // is presentation-layer text local to this page only, the same way the three
 // earlier Croatian competition pages hand-write their own Croatian prose.
@@ -189,6 +188,35 @@ const notes: NoteSection[] = [
       '2018.: Didier Deschamps (Francuska) - naslov je osvojio i kao igrač 1998., pridruživši se Zagallu i Beckenbaueru kao pobjednik i u igračkoj i u izborničkoj ulozi.',
       '2022.: Lionel Scaloni (Argentina).',
       '2026.: Luis de la Fuente (Španjolska) - najstariji pobjednički izbornik u povijesti Svjetskog prvenstva, u dobi od 65 godina, i drugi naslov Španjolske uz onaj iz 2010.',
+    ],
+  },
+  {
+    heading: 'Kapetani prvaka',
+    items: [
+      'Kapetan je igrač koji na podiju podiže pehar; svaka pobjednička momčad imala je kapetana na svih 23 izdanja.',
+      '1930.: José Nasazzi (Urugvaj).',
+      '1934.: Gianpiero Combi (Italija).',
+      '1938.: Giuseppe Meazza (Italija).',
+      '1950.: Obdulio Varela (Urugvaj).',
+      '1954.: Fritz Walter (Zapadna Njemačka).',
+      '1958.: Hilderaldo Bellini (Brazil).',
+      '1962.: Mauro Ramos (Brazil).',
+      '1966.: Bobby Moore (Engleska).',
+      '1970.: Carlos Alberto Torres (Brazil).',
+      '1974.: Franz Beckenbauer (Zapadna Njemačka) - naslov je kasnije osvojio i kao izbornik 1990., jedan od samo tri čovjeka koji su naslov osvojili i kao igrač i kao izbornik (vidi "Izbornici prvaka" iznad).',
+      '1978.: Daniel Passarella (Argentina).',
+      '1982.: Dino Zoff (Italija) - u dobi od 40 godina i dalje najstariji igrač koji je kao kapetan osvojio Svjetsko prvenstvo.',
+      '1986.: Diego Maradona (Argentina).',
+      '1990.: Lothar Matthäus (Zapadna Njemačka).',
+      '1994.: Dunga (Brazil).',
+      '1998.: Didier Deschamps (Francuska) - naslov je kasnije osvojio i kao izbornik 2018., pridruživši se Beckenbaueru kao pobjednik i u igračkoj i u izborničkoj ulozi (vidi "Izbornici prvaka" iznad).',
+      '2002.: Cafu (Brazil) - jedini igrač koji je nastupio u tri uzastopna finala Svjetskog prvenstva (1994., 1998. i 2002.).',
+      '2006.: Fabio Cannavaro (Italija).',
+      '2010.: Iker Casillas (Španjolska).',
+      '2014.: Philipp Lahm (Njemačka).',
+      '2018.: Hugo Lloris (Francuska).',
+      '2022.: Lionel Messi (Argentina).',
+      '2026.: Rodri (Španjolska) - iste je godine proglašen i dobitnikom Zlatne lopte turnira (vidi "Dobitnici Zlatne lopte" iznad).',
     ],
   },
   {

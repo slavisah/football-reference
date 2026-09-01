@@ -14482,6 +14482,101 @@ covered set, the next content-gap pass likely needs a genuinely new angle
 again - accessibility, performance, SEO, or a fresh read of
 `docs/WEBSITE_REQUIREMENTS.md` against the live site.
 
+### FIFA World Cup Winning captains - added 2026-09-01 (forty-third intensive run)
+
+Started with the standing health check: `pnpm install` (fresh container),
+`pnpm outdated` found nothing new beyond the still-blocked `typescript` 7
+entry, and a full `pnpm lint`/`pnpm test`/`pnpm build`/`check:links`/
+`check:sitemap`/`check:precache`/`check:perf`/`pnpm dlx knip --no-config-hints`
+pass came back identical to the forty-second run's baseline (513/513 unit,
+711 pages, same one confirmed knip false positive).
+
+The forty-second run's own closing note pointed at "a genuinely new angle" now
+that both individual-award companion pages (Kopa Trophy, Yashin Trophy) are
+complete. Found one directly adjacent to the existing "Winning managers"
+sections on the World Cup and Nations League pages: **who captained the
+winning team** - the player who actually lifted the trophy - a fact the site
+had never recorded despite already tracking the winning manager for three of
+its four team competitions. Scoped this run to the World Cup specifically
+(23 completed editions, 1930-2026): its "Winning managers" section already
+proved this shape of one-fact-per-edition content is reliably sourceable for
+every edition back to 1930, unlike Copa América's still-unresolved early-span
+sourcing problem for managers.
+
+Verified all 23 captains via two independent WebSearch passes covering the
+full 1930-2022 span: the first via Betway Insider's and FIFAWorldCupNews.com's
+dedicated captain round-ups (cross-checking 1930's José Nasazzi and 1958's
+Hilderaldo Bellini against their own Wikipedia pages, since round-up articles
+sometimes drop the earliest editions); the second, independently, via
+RSSSF's own "World Cup Champions Squads" page and Sportsbrief's separate
+round-up. **Both passes agreed on all 22 completed editions through 2022 with
+zero discrepancies.** The 2026 captain (Rodri, Spain) was confirmed via three
+sources distinct from the Golden Ball research already on the page (Yahoo
+Sports, UEFA.com, and FIFA.com's own squad-announcement article reporting
+that de la Fuente handed Rodri the armband) - a pleasing cross-reference
+with the page's existing Golden Ball section, since Rodri also won that
+award the same year. Two supporting facts were each independently
+re-verified before being added as bullet annotations, the same "extra
+scrutiny for the standout claim" pattern prior award-history entries have
+used: Dino Zoff's 1982 record as the oldest player to captain a World
+Cup-winning team, aged 40 (FIFA.com's own "40-year-old king" article plus
+Guinness World Records) and Cafu's run of three consecutive World Cup finals
+as a player, 1994/1998/2002, only the last as captain (FIFA.com and
+Laureus). See `docs/SOURCES.md`'s matching new entry for the full citation
+list.
+
+Added the "Winning captains" section to `content/fifa-world-cup.md`, placed
+directly after the existing "Winning managers" section (bumping
+`lastReviewed` to 2026-09-01). Wired into `competitions/world-cup.astro`'s
+`noteHeadings` array and hand-translated into
+`hr/competitions/world-cup.astro`'s own `notes` array as "Kapetani prvaka",
+cross-referencing the existing "Izbornici prvaka" (winning managers) and
+"Dobitnici Zlatne lopte" (Golden Ball) sections the same way the English
+copy does. Also refreshed that Croatian file's own stale top-of-array
+comment, which still said "the same four headings the English page
+requests" despite the page having grown to eight note sections already
+before this run - the same kind of drifted comment the forty-first run fixed
+on the EURO page.
+
+New e2e coverage in `tests/e2e/mobile.spec.ts`: both the English and
+Croatian World Cup tests' `.notes__card` count bumped 9 -> 10, plus a new
+heading/content assertion pair for each language (anchored on the Cafu
+three-finals fact, since it's a unique substring - Rodri's name already
+appears in the page's Golden Ball section, so the pre-existing Golden
+Ball/Golden Ball-Croatian assertions needed tightening to a longer, still-true
+substring to stay unambiguous now that "Rodri (Spain)"/"Rodri (Španjolska)"
+also appears in the new captains section).
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs, since this content edit and the
+`docs/SOURCES.md` addition both mark every PDF's shared References section
+stale, by design).
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page still `hr/records`, 537.7 KB, within
+the 540 KB budget but only 2.3 KB of headroom left - the ninth deliberate
+raise of `PAGE_WEIGHT_BUDGET_BYTES` is likely due soon if another World Cup
+or Ballon d'Or section adds more `docs/SOURCES.md` citations), `check:pdfs`
+(700 PDFs fresh), and the full cold-start `pnpm test:e2e` suite
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning managers specifically (still blocked on contradictory early
+sourcing). With World Cup winning captains now added, the natural next slice
+is **UEFA EURO and UEFA Nations League winning captains** - both already
+have a proven-sourceable "Winning managers" section to sit alongside, the
+same low-risk follow-up pattern that took EURO's winning managers from the
+World Cup/Nations League precedent in the forty-first run. Copa América
+captains would face the same early-span sourcing risk already documented for
+its managers, so should wait for a better source lead rather than being
+attempted from general WebSearch summaries. `hr/records`'s shrinking page-
+weight headroom is also worth watching at the start of the next run.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
