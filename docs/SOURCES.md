@@ -1696,6 +1696,88 @@ Primary sources should be preferred.
     synthesized summaries of indexed pages rather than direct page loads,
     since direct WebFetch to wikipedia.org and copaamerica.com remains
     blocked for this run.
+- Winning managers (added 2026-09-01, intensive run): a new "Winning
+  managers" note section on `content/copa-america.md`, deliberately scoped
+  to the 19 editions from 1975 onward (when the tournament adopted the Copa
+  América name and its modern format) rather than the full 1916-2024 span -
+  two independent WebSearch passes in earlier intensive runs (fortieth and
+  forty-second) found contradictory manager names for several editions in
+  the pre-1975 South American Championship era, so this section leaves that
+  span out rather than risk an unverified name, the same scoping already
+  applied to the Best Player (1987-) and Golden Glove (2011-) sections
+  above. Verified all 19 post-1975 editions via two independent WebSearch
+  passes: the first pass found and confirmed the more commonly documented
+  entries (1975 Calderón, 1983 Borrás, 1987 Fleitas, 1989 Lazaroni, 1991/1993
+  Basile, 2001 Maturana, 2004 Parreira, 2007 Dunga, 2011 Tabárez, 2015
+  Sampaoli, 2016 Pizzi, 2019 Tite, 2021/2024 Scaloni); the second pass
+  specifically targeted the sparser entries the first pass's summaries
+  didn't fully resolve (1979 Miranda, 1995 Núñez, 1997 Zagallo, 1999
+  Luxemburgo), each independently re-confirmed against a distinct source.
+  **No discrepancies found** across either pass:
+  - https://copaamerica.com/en/news/jack-greenwell-the-only-european-coach-champion-of-america
+  - https://en.wikipedia.org/wiki/1975_Copa_Am%C3%A9rica_final
+  - https://www.conmebol.com/galeria-historica/paraguay-campeon-de-america-1979-juan-espinola-juan-b-torales-flaminio-sosa-carlos-kiese/
+  - https://www.infobae.com/america/deportes/2022/10/20/profundo-dolor-en-el-futbol-uruguayo-murio-a-los-93-anos-omar-borras-el-dt-que-llevo-a-la-celeste-al-mundial-de-1986-y-a-ganar-la-copa-america-de-1983/
+  - https://en.wikipedia.org/wiki/Roberto_Fleitas
+  - https://en.wikipedia.org/wiki/Sebasti%C3%A3o_Lazaroni
+  - https://khelnow.com/football/copa-america-2021-five-most-successful-managers
+  - https://en.wikipedia.org/wiki/H%C3%A9ctor_N%C3%BA%C3%B1ez
+  - https://www.chinadailyhk.com/hk/article/370061
+  - https://en.wikipedia.org/wiki/Vanderlei_Luxemburgo
+  - https://colombiaone.com/2024/10/17/colombia-copa-america-win/
+  - https://en.wikipedia.org/wiki/Carlos_Alberto_Parreira
+  - https://copaamerica.com/en/news/dunga-and-his-great-record-at-conmebol-copa-america
+  - https://copaamerica.com/en/news/the-conmebol-copa-america-coaches-lionel-scaloni
+  - https://en.wikipedia.org/wiki/Jorge_Sampaoli
+  - https://en.wikipedia.org/wiki/Juan_Antonio_Pizzi
+  - https://www.coachesvoice.com/world-cup-brazil-tite-neymar/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages (including Wikipedia's
+    per-manager and per-edition articles) rather than direct page loads.
+- Winning captains (added 2026-09-01, intensive run): a new "Winning
+  captains" note section on `content/copa-america.md`, deliberately scoped
+  to the same six editions as the page's own Golden Glove section
+  (2011-2024) rather than the full post-1975 span the Winning managers
+  section above covers. Captain identification proved a materially harder
+  fact to source than manager identification: a first WebSearch pass found
+  plausible captain names for 1975 (Héctor Chumpitaz) and 1979 (Hugo
+  Talavera) but repeatedly failed to surface any reliable name for 1983,
+  1987 or 1989 - one attempt for 1987 returned a fabricated answer (a
+  former Uruguayan head of state's name, not a footballer). A second,
+  more rigorous cross-check pass on two editions this run had initially
+  treated as reliably in range then directly **contradicted** the first
+  pass: 1995 (first pass: Pablo Bengoechea captained "in Francescoli's
+  absence"; second pass, sourced from an ESPN Deportes retrospective:
+  Francescoli himself captained and lifted the trophy, Bengoechea only
+  scored the equalizer off the bench) and 2004 (a summary that named Alex
+  as captain also, in the same breath, incorrectly credited him with the
+  1999 captaincy that the 1999 Golden Boot/Winning-managers-era research
+  had already independently attributed to Cafu). Given two directly
+  contradictory results on facts this run had initially logged as
+  confirmed, the whole 1975-2010 span was dropped rather than risk
+  shipping any of it unverified, not just the editions that produced an
+  outright fabrication. The six 2011-2024 editions that remained were each
+  re-verified against an unambiguous primary-ish source (an official
+  CONMEBOL/copaamerica.com article, a multi-outlet-corroborated news event,
+  or common, undisputed public record for the two Messi editions) with no
+  contradiction across any of them:
+  - https://www.conmebol.com/noticias/diego-lugano-la-copa-america-2011-ubico-otra-vez-uruguay-en-los-primeros-planos-mundiales/
+  - https://copaamerica.com/en/news/claudio-bravo-captain-and-two-time-champion-with-la-roja
+  - https://www.si.com/soccer/2019/05/28/neymar-loses-brazil-captaincy-dani-alves-copa-america
+  - http://www.xinhuanet.com/english/2019-05/28/c_138095784.htm
+  - https://www.mlssoccer.com/news/lionel-messi-repeats-as-copa-america-champion-with-argentina
+  - https://copaamerica.com/en/news/messi-records-history-conmebol-copa-america
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied entirely on
+    WebSearch's synthesized summaries rather than direct page loads, which
+    is very likely why this particular fact proved harder to pin down than
+    manager identification - a future pass with direct access to a
+    structured source (e.g. Wikipedia's per-edition squad list pages,
+    which mark captains inline, or RSSSF) could very plausibly recover the
+    1975-2010 span this run left out. Not re-attempted without a better
+    source lead, the same standing caution already applied to Copa
+    América's pre-1975 managers/captains.
 
 ## Ballon d'Or
 
