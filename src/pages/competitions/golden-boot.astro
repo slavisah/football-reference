@@ -9,7 +9,12 @@ import { loadCompetition } from '../../lib/competition';
 import { buildYearStories } from '../../lib/editions';
 import { buildEditionLinks, buildEditionProfiles } from '../../lib/editionProfile';
 import { absolutePageUrl, withBase } from '../../lib/url';
-import { buildChampionsItemList, buildLatestEditionSportsEvent, type JsonLdObject } from '../../lib/jsonLd';
+import {
+  buildChampionsItemList,
+  buildCollectionPageJsonLd,
+  buildLatestEditionSportsEvent,
+  type JsonLdObject,
+} from '../../lib/jsonLd';
 
 const [worldCup, euro] = await Promise.all([
   loadCompetition('golden-boot', {
@@ -68,16 +73,21 @@ const sources = [...worldCup.sources, ...euro.sources].filter(
 // (see src/pages/competitions/golden-boot/{world-cup,euro}/[year].astro).
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd = [
-  buildChampionsItemList(worldCup.champions, {
-    pageUrl,
-    name: 'Most World Cup Golden Boots',
-    unit: ['award', 'awards'],
-  }),
-  buildChampionsItemList(euro.champions, {
-    pageUrl,
-    name: 'Most EURO top-scorer awards',
-    unit: ['award', 'awards'],
-  }),
+  buildCollectionPageJsonLd(
+    [
+      buildChampionsItemList(worldCup.champions, {
+        pageUrl,
+        name: 'Most World Cup Golden Boots',
+        unit: ['award', 'awards'],
+      }),
+      buildChampionsItemList(euro.champions, {
+        pageUrl,
+        name: 'Most EURO top-scorer awards',
+        unit: ['award', 'awards'],
+      }),
+    ],
+    { pageUrl, name: worldCup.title },
+  ),
   buildLatestEditionSportsEvent(worldCup.editions, 'FIFA World Cup Golden Boot'),
   buildLatestEditionSportsEvent(euro.editions, 'UEFA EURO Golden Boot'),
 ].filter((item): item is JsonLdObject => item !== undefined);

@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-08-14
+lastReviewed: 2026-09-01
 status: verified
 ---
 
@@ -60,6 +60,66 @@ The European Championship began in 1960 as the European Nations' Cup. Early fina
 ## Historical format note
 
 A third-place match was played through 1980. From 1984 onward, UEFA recognizes both defeated semifinalists without ranking them third and fourth. The table therefore uses neutral “other semifinalist” wording.
+
+## Player of the Tournament winners
+
+- UEFA has named a best-player award at every EURO since 1996; no equivalent award existed at the four earlier editions.
+- **1996:** Matthias Sammer (Germany).
+- **2000:** Zinedine Zidane (France).
+- **2004:** Theodoros Zagorakis (Greece) - captain of the surprise 2004 champions.
+- **2008:** Xavi Hernández (Spain).
+- **2012:** Andrés Iniesta (Spain).
+- **2016:** Antoine Griezmann (France) - runner-up with France, the only winner of the award not to lift the trophy that year.
+- **2020:** Gianluigi Donnarumma (Italy) - the first goalkeeper to win the award.
+- **2024:** Rodri (Spain).
+
+## Young Player of the Tournament winners
+
+- UEFA has named a best-player-aged-21-or-under award at every EURO since 2016; no equivalent award existed at earlier editions.
+- **2016:** Renato Sanches (Portugal).
+- **2020:** Pedri (Spain).
+- **2024:** Lamine Yamal (Spain).
+
+## Winning managers
+
+- **1960:** Gavriil Kachalin (Soviet Union).
+- **1964:** José Villalonga (Spain).
+- **1968:** Ferruccio Valcareggi (Italy).
+- **1972:** Helmut Schön (West Germany) - also won the 1974 World Cup with West Germany, one of only a handful of managers to hold both titles.
+- **1976:** Václav Ježek (Czechoslovakia).
+- **1980:** Jupp Derwall (West Germany).
+- **1984:** Michel Hidalgo (France).
+- **1988:** Rinus Michels (Netherlands) - the architect of "Total Football", coaching the Dutch golden generation to their only European Championship title.
+- **1992:** Richard Møller Nielsen (Denmark) - led a team that only entered the tournament after Yugoslavia's late disqualification.
+- **1996:** Berti Vogts (Germany) - also won the title as a player in 1972, joining a small group of player-and-manager EURO winners.
+- **2000:** Roger Lemerre (France).
+- **2004:** Otto Rehhagel (Greece) - the German manager behind one of international football's biggest surprises.
+- **2008:** Luis Aragonés (Spain).
+- **2012:** Vicente del Bosque (Spain).
+- **2016:** Fernando Santos (Portugal).
+- **2020:** Roberto Mancini (Italy).
+- **2024:** Luis de la Fuente (Spain) - the same manager who went on to win the 2026 World Cup with Spain.
+
+## Winning captains
+
+- The captain is the player who lifts the trophy on the podium; every EURO-winning team has had one across all 17 editions.
+- **1960:** Igor Netto (Soviet Union).
+- **1964:** Ferran Olivella (Spain).
+- **1968:** Giacinto Facchetti (Italy).
+- **1972:** Franz Beckenbauer (West Germany) - also captained West Germany to the 1974 World Cup title, one of only a handful of players to captain a team to both trophies.
+- **1976:** Anton Ondruš (Czechoslovakia).
+- **1980:** Bernard Dietz (West Germany).
+- **1984:** Michel Platini (France).
+- **1988:** Ruud Gullit (Netherlands).
+- **1992:** Lars Olsen (Denmark).
+- **1996:** Jürgen Klinsmann (Germany).
+- **2000:** Didier Deschamps (France) - also captained France to the 1998 World Cup title, then went on to win the 2018 World Cup as manager (see "Winning managers" above).
+- **2004:** Theodoros Zagorakis (Greece).
+- **2008:** Iker Casillas (Spain).
+- **2012:** Iker Casillas (Spain) - the only player to captain a team through consecutive EURO titles, also captaining Spain to the 2010 World Cup between them.
+- **2016:** Cristiano Ronaldo (Portugal).
+- **2020:** Giorgio Chiellini (Italy).
+- **2024:** Álvaro Morata (Spain).
 
 ## Memorable moments
 

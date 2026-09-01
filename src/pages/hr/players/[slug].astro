@@ -22,7 +22,7 @@ import {
   type PlayerAwardSource,
   type PlayerProfile,
 } from '../../../lib/playerProfile';
-import { buildPlayerProfileItemList, type JsonLdObject } from '../../../lib/jsonLd';
+import { buildPlayerPersonJsonLd, buildPlayerProfileItemList, type JsonLdObject } from '../../../lib/jsonLd';
 import type { SourceLink } from '../../../lib/sources';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 
@@ -77,13 +77,18 @@ type Props = {
 const { profile, sources, lastReviewed } = Astro.props as Props;
 const slug = playerProfileSlug(profile.id);
 
+// The Person entity block's own `award` list is source-derived award/year
+// strings, same "only UI chrome is translated" rule as the ItemList's
+// per-award detail text, so it needs no separate Croatian wiring here.
+const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd: JsonLdObject[] =
   profile.awards.length > 0
     ? [
         buildPlayerProfileItemList(profile, {
-          pageUrl: absolutePageUrl(Astro.url, Astro.site),
+          pageUrl,
           name: `${profile.displayName} - cjelovita povijest nagrada`,
         }),
+        buildPlayerPersonJsonLd(profile, { pageUrl }),
       ]
     : [];
 ---

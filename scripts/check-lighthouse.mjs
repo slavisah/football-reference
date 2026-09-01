@@ -79,14 +79,53 @@ const CDP_PORT = 9223;
 // /records already has both languages covered above) plus the /teams and
 // /players directory index pages, another shape (a plain alphabetical list
 // with a live count) this list had never included.
+//
+// The twentieth intensive run finished that landing-page sweep: Copa América
+// was the *heaviest* landing page (270.5 KB built), but the other five
+// competition/award families' own landing pages - World Cup (144.4 KB),
+// Golden Boot (168.4 KB, `golden-boot.astro`'s own hand-built two-table
+// layout rather than `CompetitionView.astro`), Ballon d'Or (135.9 KB), EURO
+// (104.3 KB) and Nations League (72.4 KB) - had never been audited at all.
+// Added one entry per family so every landing-page shape on the site now has
+// Lighthouse coverage, not just the single heaviest one.
+//
+// The twenty-first intensive run closed the one remaining unaudited page
+// shape: `/about/sources` (155.3 KB built) - the site's reference/citations
+// page, a long flat list of external `<a>` links grouped under headings
+// rather than a data table or a form. Every other page shape (landing pages,
+// edition pages, directories, profiles, comparison tools, the quiz) already
+// had at least one entry above; this was the only page family with zero
+// Lighthouse coverage of its own layout.
+//
+// The thirtieth intensive run found the next real gap: every page shape had
+// an English entry, but only one Croatian page (`hr/records`) was ever
+// audited - every other `hr/*` route (landing pages, edition pages,
+// directories, profiles, the comparison tools, the quiz, `/about/sources`)
+// had zero Lighthouse coverage of its own layout, even though the same
+// Astro components render longer Croatian strings (diacritics, longer
+// declined words) that could in principle overflow or shift layout
+// differently than their English counterparts. Added one Croatian entry per
+// remaining shape (12 pages), picking the heaviest option per `check:perf`
+// where more than one candidate existed the way every prior "widen
+// check:lighthouse" run has:
+// `hr/competitions/copa-america` (273.3 KB) is in fact the single heaviest
+// *landing* page on the whole site, EN included.
 export const PAGES_TO_AUDIT = [
   { label: 'home', path: '/' },
   { label: 'records (heaviest page family, EN)', path: '/records/' },
   { label: 'hr/records (heaviest built page)', path: '/hr/records/' },
   {
-    label: 'copa-america landing page (3rd-heaviest page family, filterable table)',
+    label: 'copa-america landing page (heaviest landing page, filterable table)',
     path: '/competitions/copa-america/',
   },
+  {
+    label: 'golden-boot landing page (2nd-heaviest landing page, own two-table layout)',
+    path: '/competitions/golden-boot/',
+  },
+  { label: 'world-cup landing page', path: '/competitions/world-cup/' },
+  { label: "ballon-dor landing page", path: '/competitions/ballon-dor/' },
+  { label: 'euro landing page', path: '/competitions/euro/' },
+  { label: 'nations-league landing page (lightest landing page)', path: '/competitions/nations-league/' },
   { label: 'copa-america/2024 edition page', path: '/competitions/copa-america/2024/' },
   { label: 'world-cup/2026 edition page', path: '/competitions/world-cup/2026/' },
   { label: 'euro/2024 edition page', path: '/competitions/euro/2024/' },
@@ -105,6 +144,25 @@ export const PAGES_TO_AUDIT = [
   { label: 'team profile (argentina)', path: '/teams/argentina/' },
   { label: '/players directory index', path: '/players/' },
   { label: '/teams directory index', path: '/teams/' },
+  { label: '/about/sources (long external-link list, own page shape)', path: '/about/sources/' },
+  {
+    label: 'hr/competitions/copa-america landing page (heaviest landing page on the site, EN included)',
+    path: '/hr/competitions/copa-america/',
+  },
+  {
+    label: 'hr/competitions/golden-boot landing page (own two-table layout, Croatian)',
+    path: '/hr/competitions/golden-boot/',
+  },
+  { label: 'hr/competitions/copa-america/2024 edition page', path: '/hr/competitions/copa-america/2024/' },
+  { label: 'hr/compare', path: '/hr/compare/' },
+  { label: 'hr/compare-players', path: '/hr/compare-players/' },
+  { label: 'hr/glossary', path: '/hr/glossary/' },
+  { label: 'hr/quiz', path: '/hr/quiz/' },
+  { label: 'hr player profile (lionel-messi)', path: '/hr/players/lionel-messi/' },
+  { label: 'hr team profile (argentina)', path: '/hr/teams/argentina/' },
+  { label: 'hr/players directory index', path: '/hr/players/' },
+  { label: 'hr/teams directory index', path: '/hr/teams/' },
+  { label: 'hr/about/sources', path: '/hr/about/sources/' },
 ];
 
 const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo'];

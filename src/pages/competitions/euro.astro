@@ -8,6 +8,7 @@ import { EURO_HOST_COORDINATES } from '../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import {
   buildChampionsItemList,
+  buildCollectionPageJsonLd,
   buildLatestEditionSportsEvent,
   type JsonLdObject,
 } from '../../lib/jsonLd';
@@ -16,7 +17,15 @@ const [data, goldenBoot] = await Promise.all([
   loadCompetition('uefa-euro', {
     editionsHeading: 'Editions',
     sourcesHeading: 'UEFA EURO',
-    noteHeadings: ['How it works', 'Historical format note', 'Memorable moments'],
+    noteHeadings: [
+      'How it works',
+      'Historical format note',
+      'Player of the Tournament winners',
+      'Young Player of the Tournament winners',
+      'Winning managers',
+      'Winning captains',
+      'Memorable moments',
+    ],
   }),
   loadCompetition('golden-boot', {
     editionsHeading: 'UEFA EURO top scorers',
@@ -29,8 +38,12 @@ const hostMap = buildHostMapPoints(data.editions, EURO_HOST_COORDINATES);
 const yearLinks = buildEditionLinks(buildEditionProfiles(data.editions), '/competitions/euro');
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const championsName = `${data.title} - Champions by titles`;
 const jsonLd = [
-  buildChampionsItemList(data.champions, { pageUrl, name: `${data.title} - Champions by titles` }),
+  buildCollectionPageJsonLd(buildChampionsItemList(data.champions, { pageUrl, name: championsName }), {
+    pageUrl,
+    name: championsName,
+  }),
   buildLatestEditionSportsEvent(data.editions, data.title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 ---

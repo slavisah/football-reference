@@ -80,7 +80,7 @@ test.describe('Ballon d\'Or edition page', () => {
   test('has no WCAG violations', async ({ page }) => {
     await page.goto('competitions/ballon-dor/2018');
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .disableRules(['region'])
       .analyze();
     expect(results.violations).toEqual([]);
@@ -164,7 +164,7 @@ test.describe("Croatian Ballon d'Or edition page", () => {
   test('has no WCAG violations', async ({ page }) => {
     await page.goto('hr/competitions/ballon-dor/2018');
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .disableRules(['region'])
       .analyze();
     expect(results.violations).toEqual([]);

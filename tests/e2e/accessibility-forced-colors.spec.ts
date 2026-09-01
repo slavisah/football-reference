@@ -37,11 +37,11 @@ import { TRANSLATED_PATHS } from '../../src/lib/i18n';
 // node reproduces the mismatch on every custom-property-driven button, not
 // just one page - a known class of axe-core/forced-colors false positive,
 // not a site bug. The three targeted tests below (and every path in the
-// full-site sweep) still get every other WCAG 2.1 A/AA rule, including the
+// full-site sweep) still get every other WCAG 2.1/2.2 A/AA rule, including the
 // checks that already caught the two real bugs this file exists to guard.
 async function runAxe(page: Page) {
   const results = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
     .disableRules(['region', 'color-contrast'])
     .analyze();
   expect(results.violations, formatViolations(results.violations)).toEqual([]);
@@ -233,7 +233,7 @@ for (const colorScheme of COLOR_SCHEMES) {
     test.use({ colorScheme });
 
     for (const path of SWEPT_PATHS) {
-      test(`${path || '/'} has no WCAG 2.1 A/AA violations under forced-colors`, async ({
+      test(`${path || '/'} has no WCAG 2.1/2.2 A/AA violations under forced-colors`, async ({
         page,
       }) => {
         const target = path === '/' ? '' : path.replace(/^\//, '');

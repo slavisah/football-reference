@@ -107,7 +107,7 @@ test.describe('World Cup page on a 360px phone', () => {
   });
 
   test('shows the last reviewed date and source links', async ({ page }) => {
-    await expect(page.locator('time[datetime="2026-08-14"]')).toBeVisible();
+    await expect(page.locator('time[datetime="2026-09-01"]')).toBeVisible();
     const sources = page.locator('.references__list a');
     await expect(sources.first()).toBeVisible();
     const count = await sources.count();
@@ -124,9 +124,21 @@ test.describe('World Cup page on a 360px phone', () => {
 
   test('shows the Memorable moments and Editorial notes sections from content/fifa-world-cup.md', async ({ page }) => {
     const notes = page.locator('.notes__card');
-    await expect(notes).toHaveCount(4);
+    await expect(notes).toHaveCount(10);
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('The two semifinal winners meet in the final')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Golden Ball winners' })).toBeVisible();
+    await expect(notes.getByText('Rodri (Spain) - the first Spain player to win the award')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Silver Ball and Bronze Ball winners' })).toBeVisible();
+    await expect(notes.getByText('Lionel Messi (Argentina) won the Silver Ball')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Golden Glove winners' })).toBeVisible();
+    await expect(notes.getByText('Unai Simón (Spain)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Young Player Award winners' })).toBeVisible();
+    await expect(notes.getByText('Pau Cubarsí (Spain)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
+    await expect(notes.getByText('Luis de la Fuente (Spain)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Winning captains' })).toBeVisible();
+    await expect(notes.getByText('Cafu (Brazil) - the only player to appear in three consecutive')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.
@@ -264,11 +276,21 @@ test.describe('EURO page on a 360px phone', () => {
     await expect(row2016.locator('td[data-label="Top scorer"]')).toContainText('Antoine Griezmann');
   });
 
-  test('shows the Historical format note as a paragraph and Memorable moments as a list', async ({ page }) => {
+  test('shows the Historical format note as a paragraph, Player of the Tournament winners and Memorable moments as a list', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('no third-place match has been played since 1980')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Historical format note' })).toBeVisible();
     await expect(page.locator('.notes__card p', { hasText: 'other semifinalist' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Player of the Tournament winners', exact: true }),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Rodri (Spain)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Young Player of the Tournament winners' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Lamine Yamal (Spain)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Luis de la Fuente (Spain)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Winning captains' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Álvaro Morata (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.
@@ -364,10 +386,38 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
   test('shows the translated Format milestones, Memorable moments and Editorial notes sections', async ({
     page,
   }) => {
-    await expect(page.locator('.notes__card')).toHaveCount(4);
+    await expect(page.locator('.notes__card')).toHaveCount(10);
     await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
     await expect(page.getByText('Pobjednici polufinala igraju finale')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Prekretnice formata' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Dobitnici Zlatne lopte' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Rodri (Španjolska) - prvi španjolski igrač'),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici Srebrne i Brončane lopte' }),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Lionel Messi (Argentina) osvojio je Srebrnu loptu'),
+    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Dobitnici Zlatne rukavice' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Unai Simón (Španjolska)'),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade za najboljeg mladog igrača' }),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Pau Cubarsí (Španjolska)'),
+    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Izbornici prvaka' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Luis de la Fuente (Španjolska)').first(),
+    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Kapetani prvaka' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Cafu (Brazil) - jedini igrač koji je nastupio'),
+    ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Uredničke napomene' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
@@ -457,7 +507,7 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
     await expect(row2016.locator('td[data-label="Najbolji strijelac"]')).toContainText('golova');
   });
 
-  test('shows the Historical format note as a paragraph and Memorable moments as a translated list', async ({
+  test('shows the Historical format note as a paragraph, translated Player of the Tournament winners and Memorable moments as a translated list', async ({
     page,
   }) => {
     await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
@@ -468,6 +518,18 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
     await expect(
       page.locator('.notes__card p', { hasText: 'drugi polufinalist' }),
     ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade za igrača turnira' }),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Rodri (Španjolska)').first()).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade za najboljeg mladog igrača turnira' }),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Lamine Yamal (Španjolska)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Izbornici prvaka' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Luis de la Fuente (Španjolska)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Kapetani prvaka' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Álvaro Morata (Španjolska)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.
@@ -763,6 +825,29 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
     ).toBeVisible();
   });
 
+  test('shows the Kopa Trophy winners section, including the 2025 repeat winner', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Kopa Trophy winners' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Kylian Mbappé (France)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('the first player to win the Kopa Trophy twice'),
+    ).toBeVisible();
+  });
+
+  test('shows the Yashin Trophy winners section, including the 2025 repeat winner', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Yashin Trophy winners' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Alisson (Brazil)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('the first goalkeeper to win the Yashin Trophy in consecutive years'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('second goalkeeper (after Martínez) to win it more than once'),
+    ).toBeVisible();
+  });
+
   test("the language switcher opens the Croatian Ballon d'Or page", async ({ page }) => {
     await page.goto('competitions/ballon-dor');
     await openMenu(page);
@@ -835,6 +920,26 @@ test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360p
     ).toBeVisible();
   });
 
+  test('shows the translated Kopa Trophy winners section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade Kopa Trophy' }),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Kylian Mbappé (Francuska)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('prvi igrač koji je nagradu Kopa Trophy osvojio dva puta'),
+    ).toBeVisible();
+  });
+
+  test('shows the translated Yashin Trophy winners section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade Yashin Trophy' }),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Alisson (Brazil)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('prvi vratar koji je nagradu Yashin Trophy osvojio dvije uzastopne godine'),
+    ).toBeVisible();
+  });
+
   test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
     page,
     request,
@@ -873,6 +978,29 @@ test.describe('Copa América page on a 360px phone', () => {
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(
       page.getByText('has not always run on a fixed four-year cycle'),
+    ).toBeVisible();
+  });
+
+  test('shows the Best Player winners section from content/copa-america.md', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Best Player winners' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('James Rodríguez (Colombia)')).toBeVisible();
+  });
+
+  test('shows the Golden Glove winners section from content/copa-america.md', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Golden Glove winners' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Justo Villar (Paraguay)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Emiliano Martínez (Argentina) - his second win.'),
+    ).toBeVisible();
+  });
+
+  test('shows the Golden Boot winners section from content/copa-america.md', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Golden Boot winners' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Isabelino Gradín (Uruguay) - 3 goals'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText("Guerrero's third win, the most of any player."),
     ).toBeVisible();
   });
 
@@ -1040,6 +1168,26 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await expect(page.locator('#copa-america-status')).toContainText('prvak Uruguay');
   });
 
+  test('shows the translated Golden Glove winners section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade za najboljeg vratara' }),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Justo Villar (Paragvaj)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Emiliano Martínez (Argentina) - njegova druga nagrada.'),
+    ).toBeVisible();
+  });
+
+  test('shows the translated Golden Boot winners section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Dobitnici Zlatne kopačke' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Isabelino Gradín (Urugvaj) - 3 gola'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Guerrerova treća nagrada, najviše od svih igrača.'),
+    ).toBeVisible();
+  });
+
   test('shows the same champion totals as the English page', async ({ page, baseURL }) => {
     const hrTop = await page.locator('.champions__name').first().textContent();
     const hrCount = await page.locator('.champions__count').first().textContent();
@@ -1064,6 +1212,11 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await expect(
       page.getByText('nije uvijek imala fiksni četverogodišnji ciklus'),
     ).toBeVisible();
+  });
+
+  test('shows the translated Best Player winners section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Dobitnici nagrade za najboljeg igrača' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('James Rodríguez (Kolumbija)')).toBeVisible();
   });
 
   test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
@@ -1132,6 +1285,12 @@ test.describe('Nations League page on a 360px phone', () => {
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('Held every two years.')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Key facts' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Player of the Finals winners' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Nuno Mendes (Portugal)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Roberto Martínez (Portugal)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Winning captains' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('the first captain to lift the Nations League trophy twice')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.
@@ -1218,6 +1377,25 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
   test('shows the translated Key facts section', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Ključne činjenice' })).toBeVisible();
     await expect(page.getByText('Hrvatska je 2023. stigla do svog prvog finala')).toBeVisible();
+  });
+
+  test('shows the translated Player of the Finals winners section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade za najboljeg igrača Final Foura' }),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Nuno Mendes (Portugal)')).toBeVisible();
+  });
+
+  test('shows the translated Winning managers section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Izbornici prvaka' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Roberto Martínez (Portugal)')).toBeVisible();
+  });
+
+  test('shows the translated Winning captains section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Kapetani prvaka' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('prvi kapetan koji je dvaput podigao pehar Lige nacija'),
+    ).toBeVisible();
   });
 
   test('shows the translated How it works section', async ({ page }) => {
@@ -2772,11 +2950,23 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     );
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
       'content',
-      `${SITE}/icons/icon-512.png`,
+      `${SITE}/og-image.png`,
+    );
+    await expect(page.locator('meta[property="og:image:width"]')).toHaveAttribute(
+      'content',
+      '1200',
+    );
+    await expect(page.locator('meta[property="og:image:height"]')).toHaveAttribute(
+      'content',
+      '630',
     );
     await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
       'content',
-      'summary',
+      'summary_large_image',
+    );
+    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute(
+      'content',
+      `${SITE}/og-image.png`,
     );
   });
 
@@ -2947,9 +3137,11 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
       },
     ]);
 
-    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
-    expect(itemList.name).toBe('FIFA World Cup - Champions by titles');
-    expect(itemList.url).toBe(`${SITE}/competitions/world-cup/`);
+    const collectionPage = blocks.find((b) => b['@type'] === 'CollectionPage');
+    expect(collectionPage.name).toBe('FIFA World Cup - Champions by titles');
+    expect(collectionPage.url).toBe(`${SITE}/competitions/world-cup/`);
+    const itemList = collectionPage.mainEntity;
+    expect(itemList['@type']).toBe('ItemList');
     expect(itemList.itemListElement[0].item.name).toBe('Brazil');
 
     const sportsEvent = blocks.find((b) => b['@type'] === 'SportsEvent');
@@ -2963,8 +3155,8 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
   }) => {
     await page.goto('competitions/ballon-dor');
     const blocks = await jsonLdBlocks(page);
-    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList', 'SportsEvent']);
-    expect(blocks.find((b) => b['@type'] === 'ItemList').name).toContain('Most awards');
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'CollectionPage', 'SportsEvent']);
+    expect(blocks.find((b) => b['@type'] === 'CollectionPage').name).toContain('Most awards');
 
     const sportsEvent = blocks.find((b) => b['@type'] === 'SportsEvent');
     expect(sportsEvent.name).toBe("2025 Men's Ballon d'Or");
@@ -2975,7 +3167,8 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
   test('the Golden Boot page carries one ItemList and one SportsEvent per table', async ({ page }) => {
     await page.goto('competitions/golden-boot');
     const blocks = await jsonLdBlocks(page);
-    const lists = blocks.filter((b) => b['@type'] === 'ItemList');
+    const collectionPage = blocks.find((b) => b['@type'] === 'CollectionPage');
+    const lists: { name: string }[] = collectionPage.mainEntity;
     expect(lists).toHaveLength(2);
     expect(lists.map((l) => l.name)).toEqual([
       'Most World Cup Golden Boots',
@@ -2999,7 +3192,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     const breadcrumb = blocks.find((b) => b['@type'] === 'BreadcrumbList');
     expect(breadcrumb.itemListElement[0].name).toBe('Početna');
     expect(breadcrumb.itemListElement[1].name).toBe('FIFA Svjetsko prvenstvo');
-    expect(blocks.find((b) => b['@type'] === 'ItemList').name).toBe(
+    expect(blocks.find((b) => b['@type'] === 'CollectionPage').name).toBe(
       'FIFA Svjetsko prvenstvo - prvaci po broju naslova',
     );
   });
@@ -3124,13 +3317,15 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
   }) => {
     await page.goto('teams');
     const blocks = await jsonLdBlocks(page);
-    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList']);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'CollectionPage']);
 
     const teamCount = await page.locator('.teams__grid .teams__link').count();
-    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
-    expect(itemList.name).toBe(
+    const collectionPage = blocks.find((b) => b['@type'] === 'CollectionPage');
+    expect(collectionPage.name).toBe(
       'National teams directory - combined World Cup, EURO, Copa América and Nations League record',
     );
+    const itemList = collectionPage.mainEntity;
+    expect(itemList['@type']).toBe('ItemList');
     expect(itemList.itemListElement).toHaveLength(teamCount);
     expect(itemList.itemListElement.some((item: { item: { name: string } }) => item.item.name === 'Brazil')).toBe(
       true,
@@ -3140,19 +3335,27 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
   test('/hr/teams carries its own Croatian ItemList name and description', async ({ page }) => {
     await page.goto('hr/teams');
     const blocks = await jsonLdBlocks(page);
-    const itemList = blocks.find((b) => b['@type'] === 'ItemList');
-    expect(itemList.name).toBe(
+    const collectionPage = blocks.find((b) => b['@type'] === 'CollectionPage');
+    expect(collectionPage.name).toBe(
       'Popis reprezentacija - ukupan učinak na Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija',
     );
-    expect(itemList.itemListElement[0].item.description).toContain('naslova');
+    expect(collectionPage.mainEntity.itemListElement[0].item.description).toContain('naslova');
   });
 
-  test('/teams/brazil carries a BreadcrumbList and an ItemList of its competition appearances, one Thing per competition', async ({
+  test('/teams/brazil carries a BreadcrumbList, an ItemList of its competition appearances (one Thing per competition), and a SportsTeam entity block', async ({
     page,
   }) => {
     await page.goto('teams/brazil');
     const blocks = await jsonLdBlocks(page);
-    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList']);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList', 'SportsTeam']);
+
+    // The SportsTeam block only lists Brazil's actual World Cup/Copa América
+    // title wins, not the runner-up/semifinal results the ItemList above
+    // also lists - see buildTeamSportsTeamJsonLd's own "Champion-only" rule.
+    const sportsTeam = blocks.find((b) => b['@type'] === 'SportsTeam');
+    expect(sportsTeam.name).toBe('Brazil');
+    expect(sportsTeam.award).toContain('FIFA World Cup 1958');
+    expect(sportsTeam.award).toContain('FIFA World Cup 2002');
 
     // A profile page is nested under its directory, so the breadcrumb is
     // three levels deep (Home > Teams > Brazil) rather than the flat "Home >
@@ -3217,6 +3420,20 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
       'Lionel Messi - Full award history',
     ]);
     expect(breadcrumb.itemListElement[1].item).toMatch(/\/players\/$/);
+  });
+
+  test('/players/lionel-messi also carries a Person entity block listing every Ballon d\'Or year he actually won', async ({
+    page,
+  }) => {
+    await page.goto('players/lionel-messi');
+    const blocks = await jsonLdBlocks(page);
+    expect(blocks.map((b) => b['@type']).sort()).toEqual(['BreadcrumbList', 'ItemList', 'Person']);
+
+    const person = blocks.find((b) => b['@type'] === 'Person');
+    expect(person.name).toBe('Lionel Messi');
+    // Messi has won the Ballon d'Or a record eight times.
+    const ballonDorAwards = (person.award as string[]).filter((a) => a.startsWith("Ballon d'Or"));
+    expect(ballonDorAwards).toHaveLength(8);
   });
 
   test('/hr/players/lionel-messi carries its own Croatian three-level BreadcrumbList', async ({ page }) => {

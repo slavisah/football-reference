@@ -25,6 +25,7 @@ import { EURO_HOST_COORDINATES } from '../../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import {
   buildChampionsItemList,
+  buildCollectionPageJsonLd,
   buildLatestEditionSportsEvent,
   type JsonLdObject,
 } from '../../../lib/jsonLd';
@@ -54,18 +55,23 @@ const statusText = data.status === 'verified' ? 'Provjereno' : 'U pregledu';
 const title = 'UEFA Europsko prvenstvo';
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const championsName = `${title} - prvaci po broju naslova`;
 const jsonLd = [
-  buildChampionsItemList(data.champions, { pageUrl, name: `${title} - prvaci po broju naslova` }),
+  buildCollectionPageJsonLd(buildChampionsItemList(data.champions, { pageUrl, name: championsName }), {
+    pageUrl,
+    name: championsName,
+  }),
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 
 // Hand-translated from content/uefa-euro.md's "How it works", "Historical
-// format note" (a single paragraph, no bullets - same as the English page)
-// and "Memorable moments" sections, the same three headings the English page
-// requests via noteHeadings. content/ itself stays untouched and English (the single
-// editorial source of truth); this is presentation-layer text local to this
-// page only, the same way the earlier Croatian competition pages hand-write
-// their own Croatian prose.
+// format note" (a single paragraph, no bullets - same as the English page),
+// "Player of the Tournament winners", "Young Player of the Tournament
+// winners", "Winning managers" and "Memorable moments" sections, the same
+// six headings the English page requests via noteHeadings. content/ itself
+// stays untouched and English (the single editorial source of truth); this
+// is presentation-layer text local to this page only, the same way the
+// earlier Croatian competition pages hand-write their own Croatian prose.
 const notes: NoteSection[] = [
   {
     heading: 'Kako funkcionira',
@@ -80,6 +86,74 @@ const notes: NoteSection[] = [
     heading: 'Povijesna napomena o formatu',
     items: [
       'Utakmica za treće mjesto igrala se do 1980. Od 1984. UEFA priznaje oba poražena polufinalista bez rangiranja na treće i četvrto mjesto. Stoga tablica koristi neutralni izraz "drugi polufinalist".',
+    ],
+  },
+  {
+    heading: 'Dobitnici nagrade za igrača turnira',
+    items: [
+      'UEFA dodjeljuje nagradu za najboljeg igrača na svakom EURU od 1996.; ekvivalentna nagrada nije postojala na četiri ranija izdanja.',
+      '1996.: Matthias Sammer (Njemačka).',
+      '2000.: Zinedine Zidane (Francuska).',
+      '2004.: Theodoros Zagorakis (Grčka) - kapetan iznenađujućih prvaka 2004.',
+      '2008.: Xavi Hernández (Španjolska).',
+      '2012.: Andrés Iniesta (Španjolska).',
+      '2016.: Antoine Griezmann (Francuska) - drugoplasirani s Francuskom, jedini dobitnik nagrade koji te godine nije osvojio naslov.',
+      '2020.: Gianluigi Donnarumma (Italija) - prvi vratar koji je osvojio ovu nagradu.',
+      '2024.: Rodri (Španjolska).',
+    ],
+  },
+  {
+    heading: 'Dobitnici nagrade za najboljeg mladog igrača turnira',
+    items: [
+      'UEFA od 2016. na svakom EURU dodjeljuje nagradu za najboljeg igrača do 21 godine starosti; ranija izdanja nisu imala tu nagradu.',
+      '2016.: Renato Sanches (Portugal).',
+      '2020.: Pedri (Španjolska).',
+      '2024.: Lamine Yamal (Španjolska).',
+    ],
+  },
+  {
+    heading: 'Izbornici prvaka',
+    items: [
+      '1960.: Gavriil Kačalin (Sovjetski Savez).',
+      '1964.: José Villalonga (Španjolska).',
+      '1968.: Ferruccio Valcareggi (Italija).',
+      '1972.: Helmut Schön (Zapadna Njemačka) - osvojio je i Svjetsko prvenstvo 1974. sa Zapadnom Njemačkom, jedan od rijetkih izbornika s oba naslova.',
+      '1976.: Václav Ježek (Čehoslovačka).',
+      '1980.: Jupp Derwall (Zapadna Njemačka).',
+      '1984.: Michel Hidalgo (Francuska).',
+      '1988.: Rinus Michels (Nizozemska) - tvorac "totalnog nogometa", doveo je nizozemsku zlatnu generaciju do njezinog jedinog naslova prvaka Europe.',
+      '1992.: Richard Møller Nielsen (Danska) - vodio je momčad koja je na turnir ušla tek nakon kasne diskvalifikacije Jugoslavije.',
+      '1996.: Berti Vogts (Njemačka) - naslov je osvojio i kao igrač 1972., pridruživši se malobrojnoj skupini izbornika koji su EURO osvojili i kao igrači.',
+      '2000.: Roger Lemerre (Francuska).',
+      '2004.: Otto Rehhagel (Grčka) - njemački izbornik iza jednog od najvećih iznenađenja u povijesti međunarodnog nogometa.',
+      '2008.: Luis Aragonés (Španjolska).',
+      '2012.: Vicente del Bosque (Španjolska).',
+      '2016.: Fernando Santos (Portugal).',
+      '2020.: Roberto Mancini (Italija).',
+      '2024.: Luis de la Fuente (Španjolska) - isti izbornik koji je kasnije sa Španjolskom osvojio i Svjetsko prvenstvo 2026.',
+    ],
+  },
+  {
+    heading: 'Kapetani prvaka',
+    items: [
+      'Kapetan je igrač koji na podiju podiže pehar; svaka pobjednička momčad EURA imala je kapetana na svih 17 izdanja.',
+      '1960.: Igor Netto (Sovjetski Savez).',
+      '1964.: Ferran Olivella (Španjolska).',
+      '1968.: Giacinto Facchetti (Italija).',
+      '1972.: Franz Beckenbauer (Zapadna Njemačka) - kao kapetan je osvojio i Svjetsko prvenstvo 1974. sa Zapadnom Njemačkom, jedan je od rijetkih igrača koji su kao kapetani osvojili oba naslova.',
+      '1976.: Anton Ondruš (Čehoslovačka).',
+      '1980.: Bernard Dietz (Zapadna Njemačka).',
+      '1984.: Michel Platini (Francuska).',
+      '1988.: Ruud Gullit (Nizozemska).',
+      '1992.: Lars Olsen (Danska).',
+      '1996.: Jürgen Klinsmann (Njemačka).',
+      '2000.: Didier Deschamps (Francuska) - kao kapetan je osvojio i Svjetsko prvenstvo 1998., a kasnije je kao izbornik osvojio i Svjetsko prvenstvo 2018. (vidi "Izbornici prvaka" iznad).',
+      '2004.: Theodoros Zagorakis (Grčka).',
+      '2008.: Iker Casillas (Španjolska).',
+      '2012.: Iker Casillas (Španjolska) - jedini je igrač koji je kao kapetan osvojio uzastopne naslove EURA, a između njih je kao kapetan osvojio i Svjetsko prvenstvo 2010.',
+      '2016.: Cristiano Ronaldo (Portugal).',
+      '2020.: Giorgio Chiellini (Italija).',
+      '2024.: Álvaro Morata (Španjolska).',
     ],
   },
   {
@@ -121,7 +195,7 @@ const headerLabels: Record<string, string> = {
 
 <BaseLayout
   title={title}
-  description="Svako izdanje UEFA Europskog prvenstva od 1960., domaćini, finalisti i prvaci, uz generirani broj naslova. Filtriraj po prvaku, godini, domaćinu i reprezentaciji."
+  description="Svako izdanje UEFA Europskog prvenstva, domaćini, finalisti i prvaci, uz generirani broj naslova. Filtriraj po prvaku, godini, domaćinu i reprezentaciji."
   locale="hr"
   alternateHref={withBase('/competitions/euro')}
   jsonLd={jsonLd}

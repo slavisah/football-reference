@@ -15,7 +15,7 @@ import { openMenu } from './menu';
 
 async function runAxe(page: Page) {
   const results = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
     .disableRules(['region'])
     .analyze();
   expect(results.violations, formatViolations(results.violations)).toEqual([]);

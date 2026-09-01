@@ -20,7 +20,7 @@ import {
 } from '../../../lib/compare';
 import { loadTeamCompetitions } from '../../../lib/teamCompetitions';
 import { buildTeamProfile, teamProfileSlug } from '../../../lib/teamProfile';
-import { buildTeamProfileItemList, type JsonLdObject } from '../../../lib/jsonLd';
+import { buildTeamProfileItemList, buildTeamSportsTeamJsonLd, type JsonLdObject } from '../../../lib/jsonLd';
 import type { SourceLink } from '../../../lib/sources';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 
@@ -75,6 +75,10 @@ const slug = teamProfileSlug(record.id);
 // column labels or team/competition names) - so the default English-shaped
 // "Role (Year), ..." join from buildTeamProfileItemList() needs no describe()
 // override here; there is no Croatian word in it to translate.
+// The SportsTeam entity block's `award` list is source-derived competition
+// title/year strings (untranslated, same rule the comment above already
+// applies to the ItemList's descriptions), so it needs no describe()-style
+// override here either.
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd: JsonLdObject[] =
   profile.competitions.length > 0
@@ -83,6 +87,7 @@ const jsonLd: JsonLdObject[] =
           pageUrl,
           name: `${profile.displayName} - nastupi u natjecanjima`,
         }),
+        buildTeamSportsTeamJsonLd(profile, { pageUrl }),
       ]
     : [];
 ---

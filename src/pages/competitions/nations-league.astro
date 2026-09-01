@@ -8,6 +8,7 @@ import { NATIONS_LEAGUE_HOST_COORDINATES } from '../../lib/hostCoordinates';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import {
   buildChampionsItemList,
+  buildCollectionPageJsonLd,
   buildLatestEditionSportsEvent,
   type JsonLdObject,
 } from '../../lib/jsonLd';
@@ -15,7 +16,14 @@ import {
 const data = await loadCompetition('uefa-nations-league', {
   editionsHeading: 'Finals',
   sourcesHeading: 'UEFA Nations League',
-  noteHeadings: ['How it works', 'Key facts', 'Memorable moments'],
+  noteHeadings: [
+    'How it works',
+    'Key facts',
+    'Player of the Finals winners',
+    'Winning managers',
+    'Winning captains',
+    'Memorable moments',
+  ],
 });
 
 const podium = buildPodiums(data.editions);
@@ -23,8 +31,12 @@ const hostMap = buildHostMapPoints(data.editions, NATIONS_LEAGUE_HOST_COORDINATE
 const yearLinks = buildEditionLinks(buildEditionProfiles(data.editions), '/competitions/nations-league');
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
+const championsName = `${data.title} - Champions by titles`;
 const jsonLd = [
-  buildChampionsItemList(data.champions, { pageUrl, name: `${data.title} - Champions by titles` }),
+  buildCollectionPageJsonLd(buildChampionsItemList(data.champions, { pageUrl, name: championsName }), {
+    pageUrl,
+    name: championsName,
+  }),
   buildLatestEditionSportsEvent(data.editions, data.title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 ---
