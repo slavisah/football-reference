@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-08-31
+lastReviewed: 2026-09-01
 status: verified
 ---
 
@@ -99,6 +99,27 @@ A third-place match was played through 1980. From 1984 onward, UEFA recognizes b
 - **2016:** Fernando Santos (Portugal).
 - **2020:** Roberto Mancini (Italy).
 - **2024:** Luis de la Fuente (Spain) - the same manager who went on to win the 2026 World Cup with Spain.
+
+## Winning captains
+
+- The captain is the player who lifts the trophy on the podium; every EURO-winning team has had one across all 17 editions.
+- **1960:** Igor Netto (Soviet Union).
+- **1964:** Ferran Olivella (Spain).
+- **1968:** Giacinto Facchetti (Italy).
+- **1972:** Franz Beckenbauer (West Germany) - also captained West Germany to the 1974 World Cup title, one of only a handful of players to captain a team to both trophies.
+- **1976:** Anton Ondruš (Czechoslovakia).
+- **1980:** Bernard Dietz (West Germany).
+- **1984:** Michel Platini (France).
+- **1988:** Ruud Gullit (Netherlands).
+- **1992:** Lars Olsen (Denmark).
+- **1996:** Jürgen Klinsmann (Germany).
+- **2000:** Didier Deschamps (France) - also captained France to the 1998 World Cup title, then went on to win the 2018 World Cup as manager (see "Winning managers" above).
+- **2004:** Theodoros Zagorakis (Greece).
+- **2008:** Iker Casillas (Spain).
+- **2012:** Iker Casillas (Spain) - the only player to captain a team through consecutive EURO titles, also captaining Spain to the 2010 World Cup between them.
+- **2016:** Cristiano Ronaldo (Portugal).
+- **2020:** Giorgio Chiellini (Italy).
+- **2024:** Álvaro Morata (Spain).
 
 ## Memorable moments
 

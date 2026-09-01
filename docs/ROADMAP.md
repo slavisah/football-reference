@@ -994,6 +994,48 @@ standing quirks.
   likely need another deliberate budget raise in
   `scripts/check-page-weight.mjs`.
 
+- **UEFA EURO and UEFA Nations League winning captains**: closed 2026-09-01
+  (forty-fourth intensive run) - a standing health check first (`pnpm
+  install`, `pnpm outdated` found nothing new beyond the still-blocked
+  `typescript` 7 entry, `pnpm dlx knip --no-config-hints` matched every prior
+  run's baseline). Acted directly on the forty-third run's own "Next up"
+  note: added a "Winning captains" section to `content/uefa-euro.md` (all 17
+  editions, 1960-2024) and `content/uefa-nations-league.md` (all four
+  completed editions, 2019-2025), the same shape as the World Cup's own
+  section from the prior run, verified via two independent WebSearch passes
+  per competition (see `docs/SOURCES.md`'s two matching new entries for the
+  full citation list and methodology, including the specific re-check of
+  Bernard Dietz's 1980 EURO captaincy and Jordi Alba's 2023 Nations League
+  captaincy). Wired into `euro.astro`'s/`nations-league.astro`'s
+  `noteHeadings` and hand-translated into both Croatian sibling pages as
+  "Kapetani prvaka". `content/uefa-euro.md`'s and
+  `content/uefa-nations-league.md`'s `lastReviewed` bumped to 2026-09-01.
+  New e2e coverage (EN + HR heading/content assertions for both pages) in
+  `tests/e2e/mobile.spec.ts`. `hr/records`'s page weight crossed the 540 KB
+  budget (540.8 KB) because `/records`' `sourcesHeading`-keyed
+  `extractSources()` call pulls in the two new `docs/SOURCES.md` citation
+  blocks - raised `PAGE_WEIGHT_BUDGET_BYTES` to 560 KB in
+  `scripts/check-page-weight.mjs` (the ninth such deliberate raise, reasoning
+  on record in that file's own comment). All 700 PDFs regenerated and
+  reverified clean (`pnpm build:pdfs` then `pnpm check:pdfs`, since these
+  content edits and the `docs/SOURCES.md` additions both mark every PDF's
+  shared References section stale, by design). Full standing health check
+  clean: `pnpm lint` (0/0/0), `pnpm test` (513/513 unit, unchanged), `pnpm
+  build` (711 pages), `check:links` (715 pages), `check:sitemap` (710
+  entries), `check:precache` (37 URLs), `check:perf` (heaviest page
+  `hr/records`, within the new 560 KB budget), `check:pdfs` (700/700 fresh).
+  A full cold-start `pnpm test:e2e` was kicked off to verify the new
+  assertions; see `docs/PROJECT_STATUS.md`'s matching entry, updated once
+  that run finished, for the final pass count. **Left for a future pass:**
+  the same environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness), plus Copa América winning
+  managers/captains specifically (still blocked on contradictory early
+  sourcing). With World Cup, EURO and Nations League all carrying a
+  "Winning captains" section, the next content-gap pass likely needs either
+  a fresh crack at Copa América's sourcing problem or a genuinely different
+  angle (accessibility, performance, SEO, or a fresh read of
+  `docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

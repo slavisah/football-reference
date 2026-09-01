@@ -289,6 +289,8 @@ test.describe('EURO page on a 360px phone', () => {
     await expect(page.locator('.notes__card').getByText('Lamine Yamal (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Luis de la Fuente (Spain)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Winning captains' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Álvaro Morata (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.
@@ -526,6 +528,8 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
     await expect(page.locator('.notes__card').getByText('Lamine Yamal (Španjolska)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Izbornici prvaka' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Luis de la Fuente (Španjolska)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Kapetani prvaka' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Álvaro Morata (Španjolska)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Nezaboravni trenuci' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.
@@ -1285,6 +1289,8 @@ test.describe('Nations League page on a 360px phone', () => {
     await expect(page.locator('.notes__card').getByText('Nuno Mendes (Portugal)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Roberto Martínez (Portugal)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Winning captains' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('the first captain to lift the Nations League trophy twice')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Memorable moments' })).toBeVisible();
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.
@@ -1383,6 +1389,13 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
   test('shows the translated Winning managers section', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Izbornici prvaka' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Roberto Martínez (Portugal)')).toBeVisible();
+  });
+
+  test('shows the translated Winning captains section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Kapetani prvaka' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('prvi kapetan koji je dvaput podigao pehar Lige nacija'),
+    ).toBeVisible();
   });
 
   test('shows the translated How it works section', async ({ page }) => {
