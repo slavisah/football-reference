@@ -1696,6 +1696,45 @@ Primary sources should be preferred.
     synthesized summaries of indexed pages rather than direct page loads,
     since direct WebFetch to wikipedia.org and copaamerica.com remains
     blocked for this run.
+- Winning managers (added 2026-09-01, intensive run): a new "Winning
+  managers" note section on `content/copa-america.md`, deliberately scoped
+  to the 19 editions from 1975 onward (when the tournament adopted the Copa
+  América name and its modern format) rather than the full 1916-2024 span -
+  two independent WebSearch passes in earlier intensive runs (fortieth and
+  forty-second) found contradictory manager names for several editions in
+  the pre-1975 South American Championship era, so this section leaves that
+  span out rather than risk an unverified name, the same scoping already
+  applied to the Best Player (1987-) and Golden Glove (2011-) sections
+  above. Verified all 19 post-1975 editions via two independent WebSearch
+  passes: the first pass found and confirmed the more commonly documented
+  entries (1975 Calderón, 1983 Borrás, 1987 Fleitas, 1989 Lazaroni, 1991/1993
+  Basile, 2001 Maturana, 2004 Parreira, 2007 Dunga, 2011 Tabárez, 2015
+  Sampaoli, 2016 Pizzi, 2019 Tite, 2021/2024 Scaloni); the second pass
+  specifically targeted the sparser entries the first pass's summaries
+  didn't fully resolve (1979 Miranda, 1995 Núñez, 1997 Zagallo, 1999
+  Luxemburgo), each independently re-confirmed against a distinct source.
+  **No discrepancies found** across either pass:
+  - https://copaamerica.com/en/news/jack-greenwell-the-only-european-coach-champion-of-america
+  - https://en.wikipedia.org/wiki/1975_Copa_Am%C3%A9rica_final
+  - https://www.conmebol.com/galeria-historica/paraguay-campeon-de-america-1979-juan-espinola-juan-b-torales-flaminio-sosa-carlos-kiese/
+  - https://www.infobae.com/america/deportes/2022/10/20/profundo-dolor-en-el-futbol-uruguayo-murio-a-los-93-anos-omar-borras-el-dt-que-llevo-a-la-celeste-al-mundial-de-1986-y-a-ganar-la-copa-america-de-1983/
+  - https://en.wikipedia.org/wiki/Roberto_Fleitas
+  - https://en.wikipedia.org/wiki/Sebasti%C3%A3o_Lazaroni
+  - https://khelnow.com/football/copa-america-2021-five-most-successful-managers
+  - https://en.wikipedia.org/wiki/H%C3%A9ctor_N%C3%BA%C3%B1ez
+  - https://www.chinadailyhk.com/hk/article/370061
+  - https://en.wikipedia.org/wiki/Vanderlei_Luxemburgo
+  - https://colombiaone.com/2024/10/17/colombia-copa-america-win/
+  - https://en.wikipedia.org/wiki/Carlos_Alberto_Parreira
+  - https://copaamerica.com/en/news/dunga-and-his-great-record-at-conmebol-copa-america
+  - https://copaamerica.com/en/news/the-conmebol-copa-america-coaches-lionel-scaloni
+  - https://en.wikipedia.org/wiki/Jorge_Sampaoli
+  - https://en.wikipedia.org/wiki/Juan_Antonio_Pizzi
+  - https://www.coachesvoice.com/world-cup-brazil-tite-neymar/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages (including Wikipedia's
+    per-manager and per-edition articles) rather than direct page loads.
 
 ## Ballon d'Or
 

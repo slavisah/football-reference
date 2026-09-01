@@ -1037,6 +1037,50 @@ standing quirks.
   angle (accessibility, performance, SEO, or a fresh read of
   `docs/WEBSITE_REQUIREMENTS.md` against the live site).
 
+- **Copa América winning managers (1975-2024, scoped)**: closed 2026-09-01
+  (forty-fifth intensive run) - a standing health check first (`pnpm
+  install`, `pnpm outdated` found nothing new beyond the still-blocked
+  `typescript` 7 entry, `pnpm dlx knip --no-config-hints` matched every prior
+  run's baseline, full lint/unit/build/`check:links`/`check:sitemap`/
+  `check:precache`/`check:perf`/`check:pdfs` all clean). Acted on the
+  forty-fourth run's own closing note ("a fresh crack at Copa América's
+  sourcing problem or a genuinely different angle"): rather than retry the
+  full 1916-2024 span a third time (already found contradictory in the
+  fortieth and forty-second runs), scoped the new "Winning managers" section
+  to the 19 editions from 1975 onward - the year Copa América adopted its
+  current name and modern home-and-away/knockout format - where sourcing
+  proved reliably cross-confirmed, the same "since the era/award actually
+  started" scoping this page's own Best Player (1987-) and Golden Glove
+  (2011-) sections already use. Verified all 19 post-1975 editions via two
+  independent WebSearch passes with zero discrepancies (see
+  `docs/SOURCES.md`'s matching new entry for the full citation list and
+  methodology). Wired into `copa-america.astro`'s `noteHeadings` (English)
+  and hand-translated into `hr/competitions/copa-america.astro`'s own
+  `notes` array as "Izbornici prvaka", matching the World Cup/EURO/Nations
+  League pages' existing convention for this exact section name.
+  `content/copa-america.md`'s `lastReviewed` bumped to 2026-09-01. New e2e
+  coverage (EN + HR heading/content assertions) in `tests/e2e/mobile.spec.ts`.
+  All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+  check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+  fallback this environment's Chromium needs, since this content edit and the
+  `docs/SOURCES.md` addition both mark every PDF's shared References section
+  stale, by design). Full standing health check clean: `pnpm lint` (0/0/0),
+  `pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+  unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+  `check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+  (37 URLs), `check:perf` (heaviest page `hr/records`, 544.7 KB, within the
+  560 KB budget - 15.3 KB of headroom left). **Left for a future pass:** the
+  same environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness), plus Copa América winning **captains**
+  specifically - not attempted this run since the managers-only scope was
+  already a full vertical slice; captains for the same 1975-2024 span are the
+  natural next step now that the sourcing pattern for this era is proven
+  reliable, following the same World Cup/EURO/Nations League
+  managers-then-captains order already established. Copa América's own
+  pre-1975 managers/captains stay out of scope entirely (confirmed
+  contradictory-sourced three times now: fortieth, forty-second and this
+  run's own decision not to retry).
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned
