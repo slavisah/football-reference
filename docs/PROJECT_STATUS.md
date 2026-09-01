@@ -14684,6 +14684,112 @@ needs either a fresh crack at Copa América's sourcing problem or a
 genuinely different angle (accessibility, performance, SEO, or a fresh read
 of `docs/WEBSITE_REQUIREMENTS.md` against the live site).
 
+### Copa América winning captains (2011-2024, narrowly scoped) - added 2026-09-01 (forty-sixth intensive run)
+
+Started with the standing health check: `pnpm install` (fresh container),
+`pnpm outdated` found nothing new beyond the still-blocked `typescript` 7
+entry, `pnpm dlx knip --no-config-hints` matched every prior run's baseline
+(same one confirmed false positive), and `pnpm lint`/`pnpm test`/`pnpm
+build`/`check:links`/`check:sitemap`/`check:precache`/`check:perf` all
+matched the forty-fifth run's baseline.
+
+Acted on the forty-fifth run's own closing note: Copa América winning
+captains, framed there as the "natural next step" now that the Winning
+managers section proved the 1975-2024 span reliably sourceable. That
+premise turned out not to hold for captains specifically.
+
+A first WebSearch pass found plausible names for 1975 (Héctor Chumpitaz)
+and 1979 (Hugo Talavera), matching the pattern the managers research found.
+But the same approach repeatedly failed to surface a captain for 1983,
+1987 or 1989 - multiple targeted re-queries for Uruguay's 1983/1987 squads
+and Brazil's 1989 squad came back either empty or, in one 1987 attempt,
+with a fabricated answer (a name belonging to a former Uruguayan head of
+state, not a footballer on that squad). That alone would have been reason
+enough to scope the pre-1990 span out, matching the same caution the
+managers section already applied to the pre-1975 South American
+Championship era.
+
+The more significant finding came from double-checking editions this run
+had *already* logged as reliably confirmed. Two independent WebSearch
+passes on 1995 gave directly contradictory answers: the first said Pablo
+Bengoechea captained Uruguay "in Francescoli's absence"; the second, this
+time explicitly sourced from an ESPN Deportes retrospective article, said
+Enzo Francescoli himself was captain and lifted the trophy, with
+Bengoechea only coming off the bench to score the equalizer. Separately, a
+pass on 2004 named Alex as that year's captain but, in the same summary,
+also credited him with the 1999 captaincy - which the earlier verification
+pass had already independently and specifically attributed to Cafu (an
+IMDb episode-credit listing him as "Brazil Captain" for that final). Two
+contradictions on facts already treated as settled is a different and more
+serious problem than a gap: it means the search method itself cannot be
+trusted to self-report which answers are reliable, not just that some
+years lack coverage. Given that, the entire 1975-2010 span was dropped
+rather than ship any of it - including the editions (1975, 1979, 1991,
+1993, 1997, 1999, 2001, 2007) that individually still looked solid, since
+there was no remaining way to tell which ones without a source this
+environment can actually reach.
+
+The six editions that remained - 2011 through 2024 - happen to be exactly
+the same span the page's own Golden Glove section already covers (that
+award began in 2011). Each was re-verified against a source specific
+enough to leave little room for the same kind of error: an official
+CONMEBOL/copaamerica.com article, a multi-outlet-corroborated news event,
+or, for the two Messi editions, essentially undisputed public record. 2011
+Diego Lugano (CONMEBOL's own site quotes him discussing wearing the
+armband all six matches); 2015 and 2016 Claudio Bravo (copaamerica.com's
+own article is literally titled "Claudio Bravo: captain and two-time
+champion with 'La Roja'"); 2019 Dani Alves (Sports Illustrated, Xinhua and
+CBS Sports all independently reported Tite stripping Neymar of the
+armband and giving it to Alves ahead of the tournament); 2021 and 2024
+Lionel Messi (MLSSoccer.com and copaamerica.com's own retrospective, with
+no contradicting source found for either edition). **No discrepancies
+found across any of these six.** See `docs/SOURCES.md`'s matching new
+entry for the full citation list and the contradiction details.
+
+Added a "Winning captains" section to `content/copa-america.md`, placed
+directly after the existing "Winning managers" section, with its own
+scoping note explaining the narrower 2011-2024 range - deliberately
+different framing from the equivalent World Cup/EURO/Nations League
+sections, which all cover their page's full winning-managers span, since
+this is the first "Winning captains" section on the site that doesn't.
+`lastReviewed` was already 2026-09-01 from the forty-fifth run, so left
+unchanged. Wired into `copa-america.astro`'s `noteHeadings` and
+hand-translated into `hr/competitions/copa-america.astro`'s own `notes`
+array as "Kapetani prvaka", placed directly after "Izbornici prvaka"
+(winning managers), matching the World Cup/EURO/Nations League pages'
+naming convention for this exact section even though the scope differs.
+
+New e2e coverage in `tests/e2e/mobile.spec.ts`: one new heading/content
+assertion pair for each of the two page variants (EN/HR).
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then
+`pnpm check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs, since this content edit and
+the `docs/SOURCES.md` addition both mark every PDF's shared References
+section stale, by design).
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 546.4 KB, within the
+560 KB budget - 13.6 KB of headroom left), `check:pdfs` (700 PDFs fresh).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 specifically. Unlike prior "not
+pursued" notes in this file, this one isn't a sourcing gap - it's a
+sourcing method that produced two directly contradictory answers on facts
+already believed settled. A future pass needs a genuinely different
+verification path (direct Wikipedia squad-page access, which marks
+captains inline, or RSSSF - both still egress-blocked in this
+environment) before retrying, not another round of WebSearch-only
+cross-checking. With every reliably-sourceable individual-award and
+personnel angle across all six competition/award families now shipped,
+the next content-gap pass likely needs either that better source lead or
+a genuinely different quality angle (accessibility, performance, SEO, or a
+fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
