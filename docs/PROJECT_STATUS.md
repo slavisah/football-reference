@@ -15020,6 +15020,133 @@ page weight has only 6.8 KB of headroom left against the 560 KB budget - a
 future content addition that grows `docs/SOURCES.md` further will likely
 need another deliberate budget raise in `scripts/check-page-weight.mjs`.
 
+### Copa América Fair Play Award winners - added 2026-09-02 (fiftieth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` found
+nothing new beyond the still-blocked `typescript` 7 entry, `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline, full
+lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+`check:pdfs` all clean (513/513 unit tests, 711 pages built).
+
+Investigated two Copa América leads via WebSearch: a team Fair Play award
+(the same shape as the FIFA World Cup's own already-added section) and an
+individual "Best Young Player" award. The Fair Play award was a clean fit -
+CONMEBOL introduced it in 2011, continuous across all six editions since
+(2011, 2015, 2016, 2019, 2021, 2024), the same span this page's own Golden
+Glove section already covers - while Best Young Player was confirmed only
+intermittently awarded since its 2007 introduction (three editions to
+date), so left unpursued, the same "not a reliable single-fact-per-edition
+award" caution already applied to several Nations League/EURO ideas.
+
+Added a "Fair Play Award winners" section to `content/copa-america.md`,
+each of the six winners verified via two independent WebSearch passes with
+no contradictions. Wired into `copa-america.astro`'s `noteHeadings`
+(English) and hand-translated into `hr/competitions/copa-america.astro`'s
+own `notes` array as "Dobitnici nagrade Fair Play". `content/copa-
+america.md`'s `lastReviewed` bumped to 2026-09-02. New e2e coverage (EN +
+HR heading/content assertions) in `tests/e2e/mobile.spec.ts`.
+
+All 700 PDFs regenerated and reverified clean. Full standing health check
+clean: `pnpm lint` (0/0/0), `pnpm test` (513/513 unit, unchanged), `pnpm
+build` (711 pages, unchanged), `check:links` (715 pages), `check:sitemap`
+(710 entries), `check:precache` (37 URLs), `check:perf` (heaviest page
+`hr/records`, 555.8 KB, within the 560 KB budget - only 4.2 KB of headroom
+left, the tightest margin yet), `check:pdfs` (700/700 fresh). A full
+cold-start `pnpm test:e2e` confirmed the new assertions: 836/836 passed
+(9.3 minutes, up from 834), with no pre-existing assertion needing an
+update this time.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 specifically (still needs a
+genuinely different verification path than general WebSearch summaries).
+With Copa América's own individual/team award set now covering Best
+Player, Golden Glove, Golden Boot and Fair Play, and its personnel facts
+covering Winning managers (1975-2024) and Winning captains (2011-2024),
+the next content-gap pass likely needs either a fresh source lead for the
+remaining Copa América captain span or a genuinely different quality angle
+(accessibility, performance, SEO, or a fresh read of
+`docs/WEBSITE_REQUIREMENTS.md` against the live site). `hr/records`'s page
+weight has only 4.2 KB of headroom left against the 560 KB budget - the
+next content addition that grows `docs/SOURCES.md` further will very
+likely need another deliberate budget raise in
+`scripts/check-page-weight.mjs`.
+
+### Ballon d'Or Johan Cruyff Trophy (Men's Coach of the Year) winners - added 2026-09-02 (fifty-first intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` found
+nothing new beyond the still-blocked `typescript` 7 entry (`@astrojs/
+check@latest` still declares `typescript: '^5.0.0 || ^6.0.0'`), `pnpm dlx
+knip --no-config-hints` matched every prior run's baseline (same one
+confirmed false positive), full lint/unit/build/`check:links`/
+`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs` all clean
+(513/513 unit tests, 711 pages built, `hr/records` at 555.8 KB within the
+560 KB budget).
+
+Following this routine's own priority order (Copa América > Nations League
+> Ballon d'Or), re-checked the Copa América winning-captains 1975-2010 gap
+first: no new source lead has appeared since the forty-sixth run's
+two-independent-pass contradiction (Bengoechea vs. Francescoli for 1995,
+a wrongly-attributed 1999/2004 captaincy), so it stays out of scope,
+confirmed rather than re-attempted with the same method. Moved to the
+Ballon d'Or tier and found the one companion trophy at the gala the site's
+existing Kopa/Yashin/Gerd Müller Trophy sections hadn't covered: the
+**Johan Cruyff Trophy**, France Football's "best men's coach" award,
+introduced in 2024 - only two editions awarded to date (2024, 2025), the
+youngest and shortest of the four companion-award histories on this page,
+but a real, continuous, unambiguous award with no partial/unofficial years
+to navigate, the same bar every other companion-award addition on this
+page has cleared. Verified both editions via two independent WebSearch
+passes each with no discrepancies: Carlo Ancelotti (Real Madrid, 2024, for
+the La Liga/UEFA Champions League double) and Luis Enrique (Paris
+Saint-Germain, 2025, for the Ligue 1/Coupe de France/first-ever Champions
+League treble) - see `docs/SOURCES.md`'s matching new entry for the full
+citation list.
+
+Added a "Johan Cruyff Trophy winners" section to `content/ballon-dor.md`
+(between "Gerd Müller Trophy winners" and "Important editorial note",
+matching the page's existing award-then-editorial-note ordering), wired
+into `competitions/ballon-dor.astro`'s `noteHeadings` (English) and
+hand-translated into `hr/competitions/ballon-dor.astro`'s own `notes`
+array as "Dobitnici nagrade Johan Cruyff Trophy" (Croatian, matching the
+page's existing hand-translated Kopa/Yashin/Gerd Müller Trophy section
+naming convention). `content/ballon-dor.md`'s `lastReviewed` was already
+2026-09-02 from an earlier run this same day, so left unchanged.
+
+**Tests:** new EN + HR heading/content assertions in
+`tests/e2e/mobile.spec.ts` mirroring the Kopa/Yashin/Gerd Müller sections'
+own assertion shape (both winner names, scoped to `.notes__card` text);
+this page has no fixed `.notes__card` count assertion to bump, unlike
+World Cup's.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then
+`pnpm check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs), since this content edit and
+the `docs/SOURCES.md` addition both mark every PDF's shared References
+section stale, by design.
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 558.3 KB, within the
+560 KB budget - only 1.7 KB of headroom left, the tightest margin yet),
+`check:pdfs` (700/700 fresh).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still needs a genuinely different
+verification path). With the Ballon d'Or's own companion-award set now
+covering all four gala trophies (Kopa, Yashin, Gerd Müller, Johan Cruyff),
+the next content-gap pass likely needs either a fresh source lead for Copa
+América's captain-sourcing problem or a genuinely different quality angle
+(accessibility, performance, SEO, or a fresh read of
+`docs/WEBSITE_REQUIREMENTS.md` against the live site). `hr/records`'s page
+weight has only 1.7 KB of headroom left against the 560 KB budget - the
+very next content addition that grows `docs/SOURCES.md` further will need
+a deliberate budget raise in `scripts/check-page-weight.mjs` before it
+lands, not after.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

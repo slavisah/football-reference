@@ -1383,6 +1383,44 @@ standing quirks.
   performance, SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md`
   against the live site).
 
+- **Ballon d'Or Johan Cruyff Trophy (Men's Coach of the Year) winners**:
+  closed 2026-09-02 (fifty-first intensive run) - a standing health check
+  first (`pnpm install`, `pnpm outdated` found nothing new beyond the
+  still-blocked `typescript` 7 entry, `pnpm dlx knip --no-config-hints`
+  matched every prior run's baseline, full lint/unit/build/`check:links`/
+  `check:sitemap`/`check:precache`/`check:perf`/`check:pdfs` all clean,
+  513/513 unit tests, 711 pages built). Re-checked the Copa América winning
+  captains 1975-2010 gap first per this routine's own priority order - no
+  new source lead since the forty-sixth run's contradictory findings, so
+  still out of scope. Moved to the Ballon d'Or tier and found the one
+  companion trophy this page's existing Kopa/Yashin/Gerd Müller Trophy
+  sections hadn't covered: the **Johan Cruyff Trophy**, France Football's
+  "best men's coach" award, introduced in 2024 - only two editions to date
+  (2024, 2025), the youngest and shortest companion-award history on this
+  page, but real, continuous and unambiguous, verified via two independent
+  WebSearch passes with no discrepancies (Carlo Ancelotti, Real Madrid,
+  2024; Luis Enrique, Paris Saint-Germain, 2025). Added a "Johan Cruyff
+  Trophy winners" section to `content/ballon-dor.md`, wired into
+  `competitions/ballon-dor.astro`'s `noteHeadings` and hand-translated into
+  `hr/competitions/ballon-dor.astro` as "Dobitnici nagrade Johan Cruyff
+  Trophy". `content/ballon-dor.md`'s `lastReviewed` was already 2026-09-02
+  from an earlier run this same day, so left unchanged. New e2e coverage
+  (EN + HR). All 700 PDFs regenerated and reverified clean; full standing
+  health check clean including a cold-start `pnpm test:e2e`. See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a future
+  pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa América
+  winning captains for 1975-2010. With the Ballon d'Or's own companion-award
+  set now covering all four gala trophies (Kopa, Yashin, Gerd Müller, Johan
+  Cruyff), the next content-gap pass likely needs either a fresh source
+  lead for Copa América's captain-sourcing problem or a genuinely different
+  quality angle (accessibility, performance, SEO, or a fresh read of
+  `docs/WEBSITE_REQUIREMENTS.md` against the live site). `hr/records`'s
+  page weight has only 1.7 KB of headroom left against the 560 KB budget -
+  the very next content addition that grows `docs/SOURCES.md` further will
+  need a deliberate budget raise in `scripts/check-page-weight.mjs` before
+  it lands, not after.
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

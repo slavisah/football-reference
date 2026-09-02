@@ -141,6 +141,12 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 - **2024:** Harry Kane (England) and Kylian Mbappé (France) - the trophy's first tie, both credited as joint winners on the same goal tally.
 - **2025:** Viktor Gyökeres (Sweden).
 
+## Johan Cruyff Trophy winners
+
+- France Football has also presented the Johan Cruyff Trophy, a companion "best men's coach" award named after the Netherlands great (three-time Ballon d'Or winner, see the Winners table above), alongside the Ballon d'Or every year since 2024 - the newest of the three companion trophies on this page, with no gap year since it started after the Kopa/Yashin/Gerd Müller trophies had already established the pattern.
+- **2024:** Carlo Ancelotti (Real Madrid) - the trophy's first winner, honored for Real Madrid's La Liga and UEFA Champions League double.
+- **2025:** Luis Enrique (Paris Saint-Germain) - honored for PSG's Ligue 1, Coupe de France and first-ever UEFA Champions League title.
+
 ## Important editorial note
 
 The **Ceremony date** column (added 2026-08-03, intensive run) records the calendar date each year's winner was announced, for the "On this day in football history" widget on the home page - the same widget already covers the FIFA World Cup, UEFA EURO, Copa América and UEFA Nations League. Unlike those four tournaments, the Ballon d'Or has no match to date; the value recorded here is the France Football magazine announcement/ceremony date each year (1956-2015), or the gala date from 2016 onward.
