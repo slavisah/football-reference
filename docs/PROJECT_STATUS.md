@@ -14988,8 +14988,22 @@ Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
 unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
 `check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
 (37 URLs), `check:perf` (heaviest page `hr/records`, 553.2 KB, within the
-560 KB budget - 6.8 KB of headroom left), `check:pdfs` (700/700 fresh), a
-full cold-start `pnpm test:e2e`.
+560 KB budget - 6.8 KB of headroom left), `check:pdfs` (700/700 fresh).
+
+A first push to CI caught a real bug this run's local checks hadn't run
+yet: both new `.notes__card` name locators (`getByText('Kylian Mbappé
+(France)')` and `getByText('Robert Lewandowski (Poland)')`, plus their
+Croatian equivalents) hit Playwright's strict-mode "resolved to multiple
+elements" error, because both names already appear elsewhere on the same
+page - Mbappé is also the Kopa Trophy's 2018 winner, and Lewandowski wins
+in both 2021 and 2022 within the new section itself. Scoped each with
+`.first()`, matching the DOM-order-is-the-intended-match convention this
+file's own `Luis de la Fuente (Španjolska)').first()` (2026-08-30, EURO
+winning-managers entry) already established for the same collision shape.
+Pushed the fix, then a full cold-start `pnpm test:e2e` confirmed it: 834
+passed (up from the forty-seventh run's 832 baseline, +2: this run's two
+new EN/HR Gerd Müller Trophy sections), and CI's `test` check went green
+on the fix commit.
 
 **Left for a future pass:** the same environment-blocked items as every
 recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa

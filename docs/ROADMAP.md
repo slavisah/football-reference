@@ -1309,9 +1309,14 @@ standing quirks.
   content, no new unit-testable logic), `pnpm build` (711 pages, unchanged -
   no new route), `check:links` (715 pages), `check:sitemap` (710 entries),
   `check:precache` (37 URLs), `check:perf` (heaviest page `hr/records`,
-  553.2 KB, within the 560 KB budget - 6.8 KB of headroom left), full
-  cold-start `pnpm test:e2e`. See `docs/PROJECT_STATUS.md`'s matching entry
-  for detail. **Left for a future pass:** the same environment-blocked items
+  553.2 KB, within the 560 KB budget - 6.8 KB of headroom left). A first
+  push to CI caught a real strict-mode locator bug in two of the new e2e
+  assertions (both "Kylian Mbappé (France)" and "Robert Lewandowski
+  (Poland)" collided with an existing mention elsewhere on the same page);
+  fixed with `.first()` and reverified both locally (full cold-start `pnpm
+  test:e2e`, 834/834, up from 832) and on CI (green on the fix commit). See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a future
+  pass:** the same environment-blocked items
   as every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness),
   plus Copa América winning captains for 1975-2010 (needs a genuinely
   different verification path). With EURO's Fair Play idea now definitively
