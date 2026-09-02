@@ -837,7 +837,9 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
     page,
   }) => {
     await expect(page.getByRole('heading', { name: 'Kopa Trophy winners' })).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('Kylian Mbappé (France)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Kylian Mbappé (France)').first(),
+    ).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('the first player to win the Kopa Trophy twice'),
     ).toBeVisible();
@@ -863,7 +865,7 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
       page.getByRole('heading', { name: 'Gerd Müller Trophy winners' }),
     ).toBeVisible();
     await expect(
-      page.locator('.notes__card').getByText('Robert Lewandowski (Poland)'),
+      page.locator('.notes__card').getByText('Robert Lewandowski (Poland)').first(),
     ).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText("the trophy's first tie"),
@@ -946,7 +948,9 @@ test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360p
     await expect(
       page.getByRole('heading', { name: 'Dobitnici nagrade Kopa Trophy' }),
     ).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('Kylian Mbappé (Francuska)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Kylian Mbappé (Francuska)').first(),
+    ).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('prvi igrač koji je nagradu Kopa Trophy osvojio dva puta'),
     ).toBeVisible();
@@ -967,7 +971,7 @@ test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360p
       page.getByRole('heading', { name: 'Dobitnici nagrade Gerd Müller Trophy' }),
     ).toBeVisible();
     await expect(
-      page.locator('.notes__card').getByText('Robert Lewandowski (Poljska)'),
+      page.locator('.notes__card').getByText('Robert Lewandowski (Poljska)').first(),
     ).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('prvo dijeljenje nagrade'),
