@@ -14900,6 +14900,112 @@ look next time this angle comes up again, though this site has very
 little heavy media to begin with (no video/large images beyond the OG
 card and PWA icons), so it may turn out to be low-yield.
 
+### Ballon d'Or Gerd Müller Trophy (top goalscorer) winners - added 2026-09-02 (forty-ninth intensive run)
+
+Started with the standing health check: `pnpm install` (fresh container,
+`node_modules` missing again), `pnpm outdated` found nothing new beyond the
+still-blocked `typescript` 7 entry (`@astrojs/check@latest` still declares
+`typescript: '^5.0.0 || ^6.0.0'`), `pnpm dlx knip --no-config-hints` matched
+every prior run's baseline (same one confirmed false positive), and a
+direct `curl` to `en.wikipedia.org`/`www.fifa.com` was again rejected by
+the egress proxy - the `docs/SOURCES.md` link-liveness sweep stays blocked.
+Full lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/
+`check:perf` all clean before any content change: 513/513 unit tests, 711
+pages built, `hr/records` at 550.4 KB (within the 560 KB budget).
+
+Investigated the closing note left by the run before this one (World
+Cup's Fair Play Award, 2026-09-02): "a fresh look at whether EURO or Copa
+América has an equally reliable, continuous team-level award never yet
+checked (Fair Play or otherwise)". Two targeted WebSearch passes settled
+this definitively for EURO: unlike the earlier "unofficial/inconsistent
+naming" caution already on record for EURO's goalkeeper award, EURO simply
+**has no team Fair Play award at all** - its five official post-tournament
+awards are Player of the Tournament, Top Scorer, Young Player of the
+Tournament, Man of the Match and Team of the Tournament; Fair Play isn't
+one of them (UEFA's Respect Fair Play ranking is a separate,
+qualification-cycle-long mechanism across national associations, not a
+per-tournament team award like the World Cup's). Also re-tried the
+Nations League Finals top-scorer idea with a fresh WebSearch pass (the
+thirty-ninth run's own reasoning for shelving it, now independently
+reconfirmed): 2019 Cristiano Ronaldo (3 goals, clean), 2021 a three-way
+share, 2023 a fourteen-way share on 1 goal each, 2025 a three-way share -
+still not a reliable single-name-per-edition award, matching the existing
+"not a reliable single-name award" finding exactly.
+
+Rather than force either of those, kept reading around the Ballon d'Or
+page's own existing Kopa/Yashin Trophy sections (added 2026-08-31/
+2026-09-01) and found a third companion award neither of those entries had
+investigated: the **Gerd Müller Trophy**, France Football's award for the
+year's top goalscorer (club and country combined), presented alongside the
+Ballon d'Or every year since 2021. Two independent WebSearch passes agreed
+exactly on all five awarded editions with zero discrepancies:
+
+- **2021:** Robert Lewandowski (Poland) - the award's first winner, under
+  its original name, "Striker of the Year".
+- **2022:** Robert Lewandowski (Poland) - the first winner under the
+  renamed Gerd Müller Trophy, and the trophy's first repeat winner.
+- **2023:** Erling Haaland (Norway).
+- **2024:** Harry Kane (England) and Kylian Mbappé (France) - the trophy's
+  only tie so far, both credited as joint winners on the same goal tally.
+- **2025:** Viktor Gyökeres (Sweden).
+
+Both passes also agreed on a genuine naming nuance worth recording rather
+than glossing over: the award wasn't called the Gerd Müller Trophy in its
+first year. It was first presented in 2021 (while Müller was still alive)
+as "Striker of the Year"; after Müller's death in August 2021, France
+Football renamed it in his honor starting with the October 2022 ceremony -
+several contemporaneous sources (FC Barcelona's own site among them) call
+the 2022 award "inaugural" even though Lewandowski had already won the
+differently-named 2021 edition. This is the same shape of rename this
+site's Nations League page already documents ("Player of the Tournament"
+becoming "Player of the Finals" after 2019, see the thirty-fourth run's
+entry), so it's presented the same way: both years included, with the
+rename called out in the section's own intro bullet rather than silently
+merged or split into two separate award histories.
+
+Added a "Gerd Müller Trophy winners" section to `content/ballon-dor.md`
+(between "Yashin Trophy winners" and "Important editorial note", matching
+the page's existing award-then-editorial-note ordering), wired into
+`competitions/ballon-dor.astro`'s `noteHeadings` (English) and
+hand-translated into `hr/competitions/ballon-dor.astro`'s own `notes` array
+as "Dobitnici nagrade Gerd Müller Trophy" (Croatian, matching the page's
+existing hand-translated Kopa/Yashin Trophy section naming convention).
+`content/ballon-dor.md`'s `lastReviewed` bumped to 2026-09-02.
+
+**Tests:** new EN + HR heading/content assertions in
+`tests/e2e/mobile.spec.ts` (the 2024 tie and the Poland/Poljska national
+team, mirroring the Kopa/Yashin sections' own assertion shape); this page
+has no fixed `.notes__card` count assertion to bump, unlike World Cup's.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then
+`pnpm check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs), since this content edit and
+the `docs/SOURCES.md` addition both mark every PDF's shared References
+section stale, by design.
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 553.2 KB, within the
+560 KB budget - 6.8 KB of headroom left), `check:pdfs` (700/700 fresh), a
+full cold-start `pnpm test:e2e`.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still needs a genuinely different
+verification path). EURO's Fair Play idea is now definitively closed (not
+an official award at all, not just less reliably sourced) and the Nations
+League top-scorer idea is reconfirmed unviable a second time - neither
+should be re-attempted without a materially different source lead. With
+the Ballon d'Or's own companion-award set now complete (Kopa, Yashin, Gerd
+Müller), the next content-gap pass likely needs either a fresh source lead
+for Copa América's pre-1975/1975-2010 sourcing problems or a genuinely
+different quality angle (accessibility, performance, SEO). `hr/records`'s
+page weight has only 6.8 KB of headroom left against the 560 KB budget - a
+future content addition that grows `docs/SOURCES.md` further will likely
+need another deliberate budget raise in `scripts/check-page-weight.mjs`.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
