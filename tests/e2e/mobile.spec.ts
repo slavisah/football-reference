@@ -1047,7 +1047,9 @@ test.describe('Copa América page on a 360px phone', () => {
 
   test('shows the Best Player winners section from content/copa-america.md', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Best Player winners' })).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('James Rodríguez (Colombia)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('James Rodríguez (Colombia) - runner-up with Colombia'),
+    ).toBeVisible();
   });
 
   test('shows the Golden Glove winners section from content/copa-america.md', async ({ page }) => {
@@ -1075,6 +1077,16 @@ test.describe('Copa América page on a 360px phone', () => {
     ).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('Colombia - the tournament\'s runner-up.'),
+    ).toBeVisible();
+  });
+
+  test('shows the Team of the Tournament winners section from content/copa-america.md', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Team of the Tournament winners' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Claudio Bravo (Chile, goalkeeper); Nicolás Otamendi'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Lionel Messi is the only player named in four of the five editions'),
     ).toBeVisible();
   });
 
@@ -1290,6 +1302,16 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     ).toBeVisible();
   });
 
+  test('shows the translated Team of the Tournament winners section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Idealna momčad turnira' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Claudio Bravo (Čile, vratar); Nicolás Otamendi'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Lionel Messi jedini je igrač uvršten u četiri od pet izdanja'),
+    ).toBeVisible();
+  });
+
   test('shows the translated Winning managers section', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Izbornici prvaka' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Marcos Calderón (Peru)')).toBeVisible();
@@ -1336,7 +1358,9 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
 
   test('shows the translated Best Player winners section', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Dobitnici nagrade za najboljeg igrača' })).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('James Rodríguez (Kolumbija)')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('James Rodríguez (Kolumbija) - drugoplasirani s Kolumbijom'),
+    ).toBeVisible();
   });
 
   test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({

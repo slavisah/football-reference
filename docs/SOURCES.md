@@ -1844,6 +1844,53 @@ Primary sources should be preferred.
     "not a reliable single-fact-per-edition award" caution that has
     already kept UEFA Nations League's goalkeeper/young-player/top-scorer
     ideas and EURO's goalkeeper award out of scope.
+- Team of the Tournament winners (added 2026-09-02, fifty-second intensive
+  run): a new "Team of the Tournament winners" note section on
+  `content/copa-america.md` listing CONMEBOL's Technical Study Group-selected
+  official Best XI at every edition from 2015 through 2024 (five editions).
+  The 2011 edition was investigated and excluded: independent sources
+  disagreed on as many as half the outfield names (one widely-cited AFP-
+  sourced list names Justo Villar of Paraguay in goal with four Uruguayans,
+  three Venezuelans, one Paraguayan, one Peruvian, one Brazilian and one
+  Colombian outfield, while other sources describe a differently-composed
+  eleven) - the same kind of contradiction that already scoped this page's
+  own "Winning captains" section away from its earlier editions. Every
+  2015-2024 roster was cross-checked against at least two independent
+  sources per edition, resolving one internal disagreement along the way:
+  a single AI-search-summary line misattributed 2021 defender Pervis
+  Estupiñán to Colombia, contradicted by the same source's own "four
+  Argentina, three Brazil, one each Colombia/Peru/Chile/Ecuador"
+  nationality breakdown (Luis Díaz already accounts for Colombia's one
+  slot; Estupiñán is Ecuadorian) - resolved in favor of the internally
+  consistent breakdown. The 2015 edition needed a third cross-check for
+  the same reason: one fan-listicle roster disagreed with the
+  CONMEBOL-attributed list on roughly half the outfield names, resolved by
+  confirming the "Chile supplied five of the eleven, the most of any team"
+  fact (reported independently by two more outlets) against each candidate
+  roster - only the CONMEBOL-attributed list actually contains five Chile
+  players, settling which one was official:
+  - https://copaamerica.com/en/news/best-xi-team-tournament-copa-america-2024
+  - https://www.90min.com/posts/copa-america-2024-team-of-the-tournament-best-xi
+  - https://espndeportes.espn.com/futbol/copa-america/nota/_/id/13979283/equipo-ideal-copa-america-2024-cuenta-jugador-uruguayo-manuel-ugarte
+  - https://www.diariouno.com.ar/ovacion/futbol/copa-america-2021-este-es-el-equipo-ideal-n846894
+  - https://www.lanacion.com.ar/deportes/futbol/hay-cuatro-jugadores-argentinos-en-el-equipo-ideal-de-la-copa-america-publicado-por-la-conmebol-nid13072021/
+  - https://copaamerica.com/en/news/one-by-one-the-team-of-the-conmebol-copa-america-chosen-by-get
+  - https://www.thestatesman.com/sports/copa-america-2019-best-xi-lionel-messi-left-out-five-brazil-players-selected-1502775848.html
+  - https://bleacherreport.com/articles/2844971-dani-alves-headlines-copa-america-best-xi-gabriel-jesus-lionel-messi-miss-out
+  - https://copaamerica.com/en/news/the-best-of-2019-conmebol-copa-america-
+  - https://www.americatv.com.pe/deportes/futbol-mundial/copa-america-2016-este-equipo-ideal-torneo-centenario-n236649
+  - https://www.conmebol.com/noticias/once-sudamericanos-componen-el-equipo-ideal-de-la-copa-america-centenario/
+  - https://cooperativa.cl/noticias/deportes/copa-america/chile-2015/cinco-chilenos-integran-el-equipo-ideal-de-la-copa-america/2015-07-05/121549.html
+  - https://www.lanacion.com.ar/deportes/futbol/tres-argentinos-integran-el-equipo-ideal-de-la-copa-america-chile-2015-nid1807883/
+  - https://copaamerica.com/en/news/the-best-of-2015-conmebol-copa-america
+  - https://www.soccerway.com/news/soccer-copa-america-copa-america-team-of-the-tournament-messi-impresses-but-james-the-star-man/KCIPe5rI
+  - https://www.infobae.com/america/deportes/2021/01/28/polemica-por-el-equipo-ideal-sudamericano-de-la-ultima-decada-no-hay-uruguayos-colombianos-ni-chilenos/
+    (2011 exclusion context)
+  - https://diariodecuyo.com.ar/pasiondeportiva/Conmebol-dejo-afuera-a-Lionel-Messi-del-equipo-ideal-de-la-Copa-America-20190709-0067.html
+    (2011 exclusion context)
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Ballon d'Or
 
