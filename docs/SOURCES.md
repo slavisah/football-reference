@@ -2112,6 +2112,35 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Johan Cruyff Trophy winners (added 2026-09-02, fifty-first intensive run):
+  a new "Johan Cruyff Trophy winners" note section on
+  `content/ballon-dor.md` listing every winner of France Football's
+  companion "best men's coach" award, the fourth and newest of the Ballon
+  d'Or gala's individual companion trophies (after Kopa, Yashin and Gerd
+  Müller) - only two editions awarded to date (2024, 2025), since the
+  trophy was only introduced in 2024, unlike its three older siblings. A
+  standing health check first confirmed nothing else had opened up (still
+  just the blocked `typescript` 7 entry); investigated the Copa América
+  captains 1975-2010 gap once more and confirmed it remains not safely
+  recoverable via WebSearch alone (no new source lead), so moved to the
+  Ballon d'Or tier of the routine's own priority order instead. Verified
+  both awarded editions via two independent WebSearch passes each with no
+  discrepancies: Carlo Ancelotti (Real Madrid, 2024, for the La
+  Liga/Champions League double) and Luis Enrique (Paris Saint-Germain,
+  2025, for the Ligue 1/Coupe de France/first-ever Champions League
+  treble). **No discrepancies found:**
+  - https://en.wikipedia.org/wiki/Johan_Cruyff_Trophy_(France_Football)
+  - https://www.goal.com/en-us/lists/carlo-ancelotti-men-s-coach-of-year-ballon-d-or-ceremony-xabi-alonso-pep-guardiola/blt4f9630905d966f8d
+  - https://www.besoccer.com/new/real-madrid-boss-ancelotti-wins-men-s-johan-cruyff-trophy-1335838
+  - https://www.beinsports.com/en-us/soccer/articles-video/ancelotti-is-the-best-coach-of-the-year-2024-10-28
+  - https://www.managingmadrid.com/2024/10/28/24282158/carlo-ancelotti-wins-coach-of-the-year-award
+  - https://sports.yahoo.com/article/psg-head-coach-luis-enrique-193800045.html
+  - https://www.besoccer.com/new/luis-enrique-wins-2025-johan-cruyff-trophy-for-world-s-best-coach-1374497
+  - https://www.caughtoffside.com/2025/09/22/ballon-dor-2025-luis-enrique-best-coach/
+  - https://tribuna.com/en/news/2025-09-22-luis-enrique-wins-johan-cruyff-trophy-at-2025-ballon-dor/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Review policy
 

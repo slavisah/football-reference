@@ -872,6 +872,20 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
     ).toBeVisible();
   });
 
+  test('shows the Johan Cruyff Trophy winners section, including both winners', async ({
+    page,
+  }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Johan Cruyff Trophy winners' }),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Carlo Ancelotti (Real Madrid)'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Luis Enrique (Paris Saint-Germain)'),
+    ).toBeVisible();
+  });
+
   test("the language switcher opens the Croatian Ballon d'Or page", async ({ page }) => {
     await page.goto('competitions/ballon-dor');
     await openMenu(page);
@@ -975,6 +989,18 @@ test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360p
     ).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('prvo dijeljenje nagrade'),
+    ).toBeVisible();
+  });
+
+  test('shows the translated Johan Cruyff Trophy winners section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade Johan Cruyff Trophy' }),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Carlo Ancelotti (Real Madrid)'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Luis Enrique (Paris Saint-Germain)'),
     ).toBeVisible();
   });
 
