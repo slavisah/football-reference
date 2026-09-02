@@ -479,6 +479,43 @@ Primary sources should be preferred.
     environment's egress policy for this run, so verification relied on
     WebSearch's synthesized snippets, per the same caveat prior audits in
     this file have already noted.
+- Fair Play Award winners (added 2026-09-02, intensive run): a new "Fair
+  Play Award winners" note section on `content/fifa-world-cup.md` listing
+  every winner of FIFA's team disciplinary-record award since its 1970
+  introduction, sitting between the "Young Player Award winners" and
+  "Winning managers" sections. Verified via four independent WebSearch
+  passes. The first pass returned the full 1970-2018 list (13 award
+  instances) but its summary implied the award had been discontinued after
+  2018 - a claim the second pass directly contradicted, confirming England
+  won it in 2022; a third, more targeted pass confirmed the Netherlands won
+  in 2026 (cross-checked against an NL Times article and FIFA's own
+  Facebook announcement, including the supporting detail that the
+  Netherlands conceded only three yellow cards, all in their opening match
+  against Japan) and independently reproduced the entire 1970-2026 list via
+  topendsports.com/FIFA.com/Wikipedia/EssentiallySports sources, agreeing
+  exactly with the first pass on every pre-2022 year; a fourth pass
+  specifically re-checked the award's only two shared/tied years (1998:
+  England and France; 2006: Brazil and Spain). **No discrepancies found**
+  once the discontinuation claim from the first pass's own summary (not
+  its year-by-year list) was set aside as a misreading rather than a
+  sourced fact:
+  - https://www.fifa.com/en/tournaments/mens/worldcup/articles/fair-play-award-winners
+  - https://www.espn.com/soccer/story/_/id/48685223/who-won-fair-play-award-world-cup
+  - https://www.topendsports.com/events/worldcupsoccer/fair-play-trophy.htm
+  - https://www.topendsports.com/sport/soccer/awards/fair-play.htm
+  - https://en.wikipedia.org/wiki/FIFA_Fair_Play_Award
+  - https://en.wikipedia.org/wiki/FIFA_World_Cup_awards
+  - https://www.essentiallysports.com/soccer-news-what-is-the-fifa-world-cup-fair-play-award-all-you-need-to-know-about-how-the-winner-is-selected-and-why-it-matters/
+  - https://nltimes.nl/2026/07/20/oranje-awareded-fair-play-award-fifa-world-cup
+  - https://www.facebook.com/fifaworldcup/posts/the-netherlands-are-the-winners-of-the-fifa-fair-play-award-presented-by-mcdonal/1625186688971278/
+  - https://www.planetsport.com/soccer/news/world-cup-2022-awards-messi-wins-golden-ball-mbappe-wins-golden-boot-england-win-fair-play
+  - https://www.mykhel.com/football/world-cup-2022-england-win-the-fair-play-award-here-s-why-204815.html
+  - https://www.hitc.com/hierros-spain-in-2018-among-all-15-world-cup-fair-play-trophy-winners/
+  - Direct WebFetch/curl to these domains remains blocked by this
+    environment's egress policy, the same standing caveat every recent
+    audit in this file has noted; verification relied entirely on
+    WebSearch's synthesized snippets, cross-checked across independent
+    passes and source domains rather than a single query's summary.
 
 ## UEFA EURO
 

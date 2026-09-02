@@ -1192,6 +1192,77 @@ standing quirks.
   though likely low-yield given this site has very little heavy media to
   begin with.
 
+- **FIFA World Cup Fair Play Award winners**: closed 2026-09-02
+  (forty-eighth intensive run) - a standing health check first (`pnpm
+  install`, `pnpm outdated` found nothing new beyond the still-blocked
+  `typescript` 7 entry, `pnpm dlx knip --no-config-hints` matched every
+  prior run's baseline, full lint/unit/build clean: 513/513 unit tests, 711
+  pages built). The forty-seventh run investigated a Copa América "Fair
+  Play Award" and found it unreliable (a winner for only one of six
+  candidate editions); this run found a distinct, well-scoped gap right on
+  the World Cup's own page instead - FIFA's own team Fair Play Award,
+  continuous since 1970 (unlike Copa América's intermittent one), never
+  added despite sitting next to five other individual/team award sections
+  already on `content/fifa-world-cup.md`. Verified via four independent
+  WebSearch passes covering all 15 award instances (1970-2026): the first
+  pass's own summary implied a post-2018 discontinuation that a second pass
+  directly contradicted (England won in 2022); a third pass confirmed the
+  2026 winner (Netherlands, cross-checked against an NL Times article and
+  FIFA's own Facebook announcement) and independently reproduced the full
+  1970-2026 list with no disagreement on any pre-2022 year; a fourth pass
+  re-checked the award's only two shared/tied years (1998: England and
+  France; 2006: Brazil and Spain) - see `docs/SOURCES.md`'s matching new
+  entry for the full citation list and methodology, including why the
+  first pass's discontinuation claim was set aside as a misreading rather
+  than a sourced fact. Added a "Fair Play Award winners" section to
+  `content/fifa-world-cup.md` between "Young Player Award winners" and
+  "Winning managers", wired into `world-cup.astro`'s `noteHeadings`
+  (English) and hand-translated into `hr/competitions/world-cup.astro`'s
+  own `notes` array as "Dobitnici nagrade Fair Play". `content/fifa-world-
+  cup.md`'s `lastReviewed` bumped to 2026-09-02. Also removed two stale,
+  never-rendered planning notes found while reading the six competition
+  content files end to end: `content/uefa-nations-league.md`'s "Website
+  idea" section (a podium-card-plus-league-explanation suggestion that
+  `PodiumCards`/the page's own "How it works" section had already fully
+  implemented) and `content/fifa-world-cup.md`'s "Suggested child-friendly
+  features" section (all three ideas - tap-a-year stories, a champion-guess
+  quiz question, and a visual title-count comparison - already live via the
+  edition-page "Memorable moments" reveal, `championByYearQuestions`/
+  `hostByYearQuestions` in `src/lib/quiz.ts`, and `ChampionsSummary.astro`'s
+  bar chart respectively); neither heading was ever wired into a page's
+  `noteHeadings`, so removing them changes no rendered page.
+  `content/uefa-nations-league.md`'s `lastReviewed` was left unchanged (no
+  reader-visible fact changed, only dead scaffolding text removed). New e2e
+  coverage (EN + HR heading/content assertions, `.notes__card` counts 10 ->
+  11 for both languages) in `tests/e2e/mobile.spec.ts`. All 700 PDFs
+  regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+  check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+  fallback this environment's Chromium needs, since these content edits and
+  the `docs/SOURCES.md` addition both mark every PDF's shared References
+  section stale, by design). Full standing health check clean: `pnpm lint`
+  (0/0/0), `pnpm test` (513/513 unit, unchanged - presentation-layer
+  content, no new unit-testable logic), `pnpm build` (711 pages,
+  unchanged), `check:links` (715 pages), `check:sitemap` (710 entries),
+  `check:precache` (37 URLs), `check:perf` (heaviest page `hr/records`,
+  550.4 KB, within the 560 KB budget), `check:pdfs` (700/700 fresh). A full
+  cold-start `pnpm test:e2e` first caught one pre-existing hardcoded
+  assertion needing an update - `tests/e2e/mobile.spec.ts`'s World Cup
+  "last reviewed" date locator was still pinned to `2026-09-01` - the same
+  "existing hardcoded assertion needed updating" pattern several prior
+  content-adding runs have hit; fixed, then a clean re-run passed 832/832
+  (matching the forty-seventh run's own 832/832 baseline unchanged - this
+  run's new assertions extended existing `test()` blocks rather than adding
+  new ones). **Left for a future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness), plus Copa América winning captains for
+  1975-2010 (needs a genuinely different verification path). With the
+  World Cup's own individual/team award set now also covering Fair Play,
+  the next content-gap pass likely needs either a fresh look at whether
+  EURO or Copa América has an equally reliable, continuous team-level award
+  never yet checked (Fair Play or otherwise), or a genuinely different
+  quality angle (accessibility, performance, SEO, or a fresh read of
+  `docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

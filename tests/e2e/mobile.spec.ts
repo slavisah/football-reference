@@ -107,7 +107,7 @@ test.describe('World Cup page on a 360px phone', () => {
   });
 
   test('shows the last reviewed date and source links', async ({ page }) => {
-    await expect(page.locator('time[datetime="2026-09-01"]')).toBeVisible();
+    await expect(page.locator('time[datetime="2026-09-02"]')).toBeVisible();
     const sources = page.locator('.references__list a');
     await expect(sources.first()).toBeVisible();
     const count = await sources.count();
@@ -124,7 +124,7 @@ test.describe('World Cup page on a 360px phone', () => {
 
   test('shows the Memorable moments and Editorial notes sections from content/fifa-world-cup.md', async ({ page }) => {
     const notes = page.locator('.notes__card');
-    await expect(notes).toHaveCount(10);
+    await expect(notes).toHaveCount(11);
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('The two semifinal winners meet in the final')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Golden Ball winners' })).toBeVisible();
@@ -135,6 +135,10 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(notes.getByText('Unai Simón (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Young Player Award winners' })).toBeVisible();
     await expect(notes.getByText('Pau Cubarsí (Spain)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Fair Play Award winners' })).toBeVisible();
+    await expect(
+      notes.getByText('the only team to win both the World Cup and the Fair Play Award'),
+    ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
     await expect(notes.getByText('Luis de la Fuente (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Winning captains' })).toBeVisible();
@@ -386,7 +390,7 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
   test('shows the translated Format milestones, Memorable moments and Editorial notes sections', async ({
     page,
   }) => {
-    await expect(page.locator('.notes__card')).toHaveCount(10);
+    await expect(page.locator('.notes__card')).toHaveCount(11);
     await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
     await expect(page.getByText('Pobjednici polufinala igraju finale')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Prekretnice formata' })).toBeVisible();
@@ -409,6 +413,10 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     ).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('Pau Cubarsí (Španjolska)'),
+    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Dobitnici nagrade Fair Play' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('jedina momčad koja je na istom turniru'),
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Izbornici prvaka' })).toBeVisible();
     await expect(

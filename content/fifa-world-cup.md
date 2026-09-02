@@ -5,7 +5,7 @@ competitionType: international
 confederation: FIFA
 firstEdition: 1930
 lastCompletedEdition: 2026
-lastReviewed: 2026-09-01
+lastReviewed: 2026-09-02
 status: verified
 ---
 
@@ -125,6 +125,25 @@ The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 b
 - **2022:** Enzo Fernández (Argentina).
 - **2026:** Pau Cubarsí (Spain) - the first defender to win the award.
 
+## Fair Play Award winners
+
+- FIFA has named a team Fair Play Award, based on each squad's on-field disciplinary record, at every World Cup since 1970; no equivalent award existed at the four earlier editions. Awarded to a single team except in 1998 and 2006, the only two editions with a tie.
+- **1970:** Peru - the award's first winner.
+- **1974:** West Germany.
+- **1978:** Argentina.
+- **1982:** Brazil.
+- **1986:** Brazil.
+- **1990:** England.
+- **1994:** Brazil.
+- **1998:** England and France - the award's first of two shared years.
+- **2002:** Belgium.
+- **2006:** Brazil and Spain - the award's second and, to date, final shared year.
+- **2010:** Spain - the only team to win both the World Cup and the Fair Play Award at the same tournament.
+- **2014:** Colombia.
+- **2018:** Spain.
+- **2022:** England.
+- **2026:** Netherlands.
+
 ## Winning managers
 
 - Every World Cup-winning team has been led by a manager of the same nationality as the team itself, a pattern unbroken across all 23 editions.
@@ -193,10 +212,4 @@ The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 b
 - The 1930 tournament did not include a third-place match. FIFA's historical ranking places the United States third and Yugoslavia fourth.
 - The 1950 final positions came from a four-team final group rather than semifinals and a final.
 - “Germany” totals conventionally include West Germany's results.
-
-## Suggested child-friendly features
-
-- Tap a year to reveal a short story.
-- Guess the champion from the host and finalists.
-- Compare title counts visually.
 - Display a map of host countries without using protected tournament logos.
