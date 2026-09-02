@@ -2050,6 +2050,39 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Gerd Müller Trophy winners (added 2026-09-02, forty-ninth intensive run): a
+  new "Gerd Müller Trophy winners" note section on `content/ballon-dor.md`
+  listing every winner of France Football's companion "top goalscorer"
+  award since its 2021 introduction - the same treatment as the Kopa Trophy
+  and Yashin Trophy sections directly above it, and a genuinely different,
+  previously-uncovered award found while investigating whether EURO or Copa
+  América had a reliable team-level award never yet checked (they don't -
+  see this run's `docs/PROJECT_STATUS.md` entry). Verified via two
+  independent WebSearch passes covering all five awarded editions
+  (2021-2025): both passes agreed exactly on every year - Robert
+  Lewandowski (2021 and 2022, the only repeat winner), Erling Haaland
+  (2023), Harry Kane and Kylian Mbappé jointly (2024, the trophy's only
+  tie), and Viktor Gyökeres (2025). Both passes also agreed the award was
+  first presented in 2021 under the name "Striker of the Year" and renamed
+  the Gerd Müller Trophy from 2022 onward, after Müller's death in August
+  2021 - a genuine naming nuance worth recording (multiple 2022 sources
+  call that year's award "inaugural" even though Lewandowski had already
+  won the differently-named 2021 edition), the same kind of rename this
+  site's Nations League "Player of the Tournament" -> "Player of the
+  Finals" section already documents. **No discrepancies found:**
+  - https://www.topendsports.com/sport/soccer/awards/striker-of-the-year.htm
+  - https://www.90min.com/what-is-gerd-muller-trophy-past-winners-nominees
+  - https://www.gamereactor.eu/what-is-the-gerd-muller-trophy-and-who-will-win-this-year-at-ballon-dor-2025-1605433/
+  - https://www.arsenal.com/news/viktor-gyokeres-wins-gerd-muller-trophy
+  - https://fcbayern.com/en/news/2022/10/muller-trophy-for-year%E2%80%99s-best-striker-awarded-for-the-first-time-at-the-ballon-dor-ceremony
+  - https://en.wikipedia.org/wiki/Gerd_M%C3%BCller_Trophy
+  - https://www.bavarianfootballworks.com/2022/10/18/23409746/robert-lewandowski-striker-award-2022-gerd-muller-fc-barcelona-bayern-munich-alum-haaland-benzema
+  - https://www.fcbarcelona.com/en/news/2858120/lewandowski-wins-inaugural-gerd-muller-trophy/featured
+  - https://www.fourfourtwo.com/features/ballon-dor-what-is-the-gerd-muller-trophy
+  - https://sports.yahoo.com/article/won-gerd-muller-trophy-2025-201726350.html
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Review policy
 

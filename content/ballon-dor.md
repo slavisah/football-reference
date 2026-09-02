@@ -4,7 +4,7 @@ slug: ballon-dor
 awardType: individual
 firstEdition: 1956
 lastCompletedEdition: 2025
-lastReviewed: 2026-09-01
+lastReviewed: 2026-09-02
 status: verified
 ---
 
@@ -131,6 +131,15 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 - **2023:** Emiliano Martínez (Argentina).
 - **2024:** Emiliano Martínez (Argentina) - the first goalkeeper to win the Yashin Trophy in consecutive years.
 - **2025:** Gianluigi Donnarumma (Italy) - his second Yashin Trophy, making him the second goalkeeper (after Martínez) to win it more than once.
+
+## Gerd Müller Trophy winners
+
+- France Football has also presented an award for the year's top goalscorer (club and country combined) alongside the Ballon d'Or every year since 2021; it was first awarded under the name "Striker of the Year" and renamed the Gerd Müller Trophy from 2022 onward, honoring the West Germany and Bayern Munich forward (1970 Ballon d'Or winner, see the Winners table above) after his death in August 2021 - unlike the Kopa and Yashin trophies above, it has no gap year, since it started the year after the 2020 cancellation rather than before it.
+- **2021:** Robert Lewandowski (Poland) - the award's first winner, under its original name.
+- **2022:** Robert Lewandowski (Poland) - the first winner under the renamed Gerd Müller Trophy, and the trophy's first repeat winner.
+- **2023:** Erling Haaland (Norway).
+- **2024:** Harry Kane (England) and Kylian Mbappé (France) - the trophy's first tie, both credited as joint winners on the same goal tally.
+- **2025:** Viktor Gyökeres (Sweden).
 
 ## Important editorial note
 

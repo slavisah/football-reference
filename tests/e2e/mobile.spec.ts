@@ -856,6 +856,20 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
     ).toBeVisible();
   });
 
+  test('shows the Gerd Müller Trophy winners section, including the 2024 tie', async ({
+    page,
+  }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Gerd Müller Trophy winners' }),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Robert Lewandowski (Poland)'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText("the trophy's first tie"),
+    ).toBeVisible();
+  });
+
   test("the language switcher opens the Croatian Ballon d'Or page", async ({ page }) => {
     await page.goto('competitions/ballon-dor');
     await openMenu(page);
@@ -945,6 +959,18 @@ test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360p
     await expect(page.locator('.notes__card').getByText('Alisson (Brazil)')).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('prvi vratar koji je nagradu Yashin Trophy osvojio dvije uzastopne godine'),
+    ).toBeVisible();
+  });
+
+  test('shows the translated Gerd Müller Trophy winners section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade Gerd Müller Trophy' }),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Robert Lewandowski (Poljska)'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('prvo dijeljenje nagrade'),
     ).toBeVisible();
   });
 
