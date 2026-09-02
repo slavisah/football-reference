@@ -1465,6 +1465,37 @@ standing quirks.
   (accessibility, performance, SEO, or a fresh read of
   `docs/WEBSITE_REQUIREMENTS.md` against the live site).
 
+- **FIFA World Cup Silver Boot and Bronze Boot winners**: closed 2026-09-02
+  (fifty-third intensive run) - a standing health check first (`pnpm
+  install`, `pnpm outdated`/`pnpm dlx knip --no-config-hints` found nothing
+  new, full lint/unit/build clean, matching the fifty-second run's baseline).
+  Following this routine's Copa América > Nations League > Ballon d'Or >
+  Golden Boot priority order, moved to Golden Boot and found a clean fit:
+  FIFA has awarded the Silver Boot and Bronze Boot to the World Cup's second-
+  and third-highest goalscorers at every edition since 2010 (the same year
+  the award itself was renamed from "Golden Shoe" to "Golden Boot"), the same
+  "runner-up recognition never added" gap the World Cup page's own Silver
+  Ball/Bronze Ball section had already closed for the Golden Ball. Added a
+  "World Cup Silver Boot and Bronze Boot winners" section to
+  `content/golden-boot.md` covering all five editions (2010-2026), each
+  verified via WebSearch with a second independent cross-check for the two
+  tightest calls (2010's four-way five-goal tie, resolved by the same
+  assists-then-minutes tiebreakers as the Golden Boot itself; 2022's
+  Álvarez-over-Giroud assist tiebreak). Wired into `golden-boot.astro`'s
+  World Cup `noteHeadings` and hand-translated into
+  `hr/competitions/golden-boot.astro`. New e2e coverage (EN + HR,
+  `.notes__card` counts 5 -> 6). No page-weight budget raise needed this run
+  (568.8 KB vs. the 590 KB budget). All 700 PDFs regenerated and reverified
+  clean; full standing health check clean including a cold-start `pnpm
+  test:e2e`. See `docs/PROJECT_STATUS.md`'s matching entry for detail.
+  **Left for a future pass:** the same environment-blocked items as every
+  recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+  América winning captains for 1975-2010, plus whether EURO has any
+  equivalent runner-up scoring recognition worth researching (not yet
+  checked). The next content-gap pass likely needs either of those or a
+  genuinely different quality angle (accessibility, performance, SEO, or a
+  fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned
