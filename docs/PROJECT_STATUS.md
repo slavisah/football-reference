@@ -15147,6 +15147,141 @@ very next content addition that grows `docs/SOURCES.md` further will need
 a deliberate budget raise in `scripts/check-page-weight.mjs` before it
 lands, not after.
 
+### Copa América Team of the Tournament winners - added 2026-09-02 (fifty-second intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` found nothing
+new beyond the still-blocked `typescript` 7 entry (`@astrojs/check@latest`
+still declares `typescript: '^5.0.0 || ^6.0.0'`), `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline (same one confirmed
+false positive), full lint/unit/build/`check:links`/`check:sitemap`/
+`check:precache`/`check:perf`/`check:pdfs` all clean (513/513 unit tests,
+711 pages built, `hr/records` at 558.3 KB, matching the fifty-first run's
+own baseline).
+
+Following this routine's own priority order (Copa América > Nations
+League), dispatched a research pass covering both tiers before writing
+anything. It confirmed two ideas as not viable, matching or extending prior
+findings: UEFA Nations League Finals has never had its own Fair Play award
+(distinct from UEFA's unrelated season-long club/federation "Respect Fair
+Play ranking"), and its Finals "Team of the Tournament" selection is
+confirmed for 2019 only, with no equivalent full-XI selection found for
+2021, 2023 or 2025 - the same 1-of-4 pattern that already ruled out Nations
+League's Young Player of the Finals idea. It then found a genuinely new,
+well-scoped gap on the Copa América page instead: CONMEBOL's Technical
+Study Group has named an official **Team of the Tournament** ("equipo
+ideal") at every edition since 2015, a real team-selection award distinct
+from the page's existing Best Player/Golden Glove/Golden Boot/Fair Play
+sections.
+
+Verified all five editions (2015, 2016, 2019, 2021, 2024) personally via
+targeted `WebSearch` cross-checks beyond the research pass's own findings,
+resolving two genuine discrepancies along the way rather than shipping
+either roster on a single pass:
+
+- **2021:** one AI-search-summary sentence mislabeled defender Pervis
+  Estupiñán as Colombian, directly contradicted by the same source's own
+  "four Argentina, three Brazil, one each Colombia/Peru/Chile/Ecuador"
+  nationality breakdown two sentences later (Luis Díaz already fills
+  Colombia's one slot; Estupiñán is Ecuadorian) - resolved in favor of the
+  internally consistent breakdown, not the mislabeled inline text.
+- **2015:** one fan-listicle roster (Sportskeeda) disagreed with the
+  CONMEBOL-attributed roster (Cooperativa.cl and others) on roughly half
+  the outfield names - Luis Advíncula and Charles Aránguiz vs. Jeison
+  Murillo, Marcelo Díaz and Eduardo Vargas. Resolved by checking both
+  candidate rosters against an independently-reported fact both La Nación
+  and another outlet gave without reference to either full list: "Chile
+  supplied five of the eleven, the most of any team." Only the
+  CONMEBOL-attributed roster actually contains five Chile players (Bravo,
+  Medel, Vidal, Díaz, Vargas); the fan-listicle roster has three. Settled
+  in favor of the roster the independent fact corroborates.
+
+**2011 was investigated and excluded**, the same caution this page's own
+"Winning captains" section (2011-2024 only) already applies: independent
+sources disagree on as much as half the outfield names - one
+widely-syndicated AFP-sourced list names Justo Villar of Paraguay in goal
+with four Uruguayans, three Venezuelans, one Paraguayan, one Peruvian, one
+Brazilian and one Colombian outfield, while other sources describe a
+differently-composed eleven, with no way to determine which (if either) is
+the actual CONMEBOL-attributed selection via WebSearch alone. Rather than
+ship a contested roster, the section starts at 2015 instead, the same
+scoping pattern (start where sourcing is reliably cross-confirmed, not at
+the award's true origin) already established by Golden Glove and Fair Play
+on this same page.
+
+Added a "Team of the Tournament winners" section to `content/copa-america.md`
+(between "Fair Play Award winners" and "Winning managers" - a team-selection
+award sits naturally with the page's other team/individual award sections
+rather than with the personnel sections that follow), wired into
+`copa-america.astro`'s `noteHeadings` (English) and hand-translated into
+`hr/competitions/copa-america.astro`'s own `notes` array as "Idealna momčad
+turnira" (Croatian - the standard Croatian football-media phrase for a
+tournament's ideal/best XI, distinct from the "Dobitnici nagrade ..."
+phrasing used for the page's single-winner-per-year awards, since this
+section names eleven players per edition rather than one). `content/
+copa-america.md`'s `lastReviewed` was already 2026-09-02 from an earlier
+run this same day, so left unchanged.
+
+**Tests:** new EN + HR heading/content assertions in `tests/e2e/
+mobile.spec.ts`, matching the Fair Play Award section's own assertion shape
+(heading visibility plus two distinct `.notes__card` text excerpts); this
+page has no fixed `.notes__card` count assertion to bump, unlike World
+Cup's.
+
+**Page-weight budget raised**: a five-edition, eleven-player-per-edition
+roster needed far more `docs/SOURCES.md` citation URLs under the "Copa
+América" heading than any single-winner-per-year section before it, and
+`extractSources()` (`src/lib/sources.ts`) pulls that whole list into
+`/records` (every competition's full source list). `hr/records` reached
+563.4 KB, just over the previous 560 KB budget - the fifty-first run had
+already flagged only 1.7 KB of headroom remained. Raised
+`PAGE_WEIGHT_BUDGET_BYTES` (`scripts/check-page-weight.mjs`) to 590 KB (the
+tenth such deliberate raise), further than the strict minimum needed, since
+this section's multi-player-roster shape is denser than prior additions and
+likely to recur if a similar award turns up on another page.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs), since this content edit,
+`docs/SOURCES.md` addition and the page-weight budget comment update all
+mark every PDF's shared References section stale, by design (the budget
+comment change alone doesn't affect PDF content, but the content/SOURCES.md
+edits do).
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 563.4 KB, within the
+new 590 KB budget), `check:pdfs` (700/700 fresh).
+
+A first cold-start `pnpm test:e2e` caught a real strict-mode locator
+collision: the new section's 2024 entry includes "James Rodríguez
+(Colombia)", the same text the page's pre-existing "Best Player winners"
+test (EN) and its Croatian sibling test both matched loosely, so each
+locator started resolving to three elements (the pre-existing match plus
+two lines inside the new section that also mention that player). Fixed by
+narrowing both pre-existing assertions to their section's actual full
+sentence ("James Rodríguez (Colombia) - runner-up with Colombia"/Croatian
+equivalent) rather than adding `.first()`, since a name-only match was
+always going to be fragile on a page that now lists full rosters - the
+same underlying lesson the forty-ninth run's `.first()` fix for the Ballon
+d'Or Gerd Müller Trophy section already hit, applied here with a more
+specific locator instead of an ordinal one. A clean re-run passed 840/840
+(9.7 minutes, up from the fiftieth/fifty-first runs' 836/836 baseline: +2
+from this run's own new Team of the Tournament assertions).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still needs a genuinely different
+verification path than general WebSearch summaries). With Nations League's
+Fair Play and Team of the Tournament ideas both now definitively ruled out,
+and Copa América's own award set covering Best Player, Golden Glove, Golden
+Boot, Fair Play and now Team of the Tournament, the next content-gap pass
+likely needs either a fresh source lead for Copa América's captain-sourcing
+problem or a genuinely different quality angle (accessibility, performance,
+SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live
+site).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

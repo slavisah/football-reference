@@ -1421,6 +1421,50 @@ standing quirks.
   need a deliberate budget raise in `scripts/check-page-weight.mjs` before
   it lands, not after.
 
+- **Copa América Team of the Tournament winners**: closed 2026-09-02
+  (fifty-second intensive run) - a standing health check first (`pnpm
+  outdated`/`pnpm dlx knip --no-config-hints` found nothing new, full
+  lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/
+  `check:perf`/`check:pdfs` clean, matching the fifty-first run's baseline).
+  A research pass confirmed two Nations League ideas not viable (a Finals
+  Fair Play award doesn't exist; its Finals "Team of the Tournament" is
+  confirmed for 2019 only, not the other three editions) before finding a
+  genuinely new, well-scoped Copa América gap: CONMEBOL's Technical Study
+  Group has named an official Team of the Tournament ("equipo ideal") at
+  every edition since 2015. Personally re-verified all five editions
+  (2015-2024) via targeted `WebSearch` cross-checks, resolving two real
+  discrepancies (a mislabeled 2021 defender nationality; two disagreeing
+  2015 rosters, settled via an independently-reported "Chile supplied five
+  of the eleven" fact that only one candidate roster actually matches).
+  2011 investigated and excluded - sources disagree on roughly half the
+  outfield names, the same contradiction pattern that already scoped
+  "Winning captains" away from pre-2011 editions. Added a "Team of the
+  Tournament winners" section to `content/copa-america.md`, wired into
+  `copa-america.astro`'s `noteHeadings` and hand-translated into
+  `hr/competitions/copa-america.astro` as "Idealna momčad turnira". New e2e
+  coverage (EN + HR). Raised `PAGE_WEIGHT_BUDGET_BYTES` (`scripts/
+  check-page-weight.mjs`) from 560 KB to 590 KB (the tenth deliberate
+  raise) - this section's five-editions x eleven-players-per-edition
+  citation list pushed `hr/records` to 563.4 KB, just over budget. All 700
+  PDFs regenerated and reverified clean; full standing health check clean
+  including `check:perf` against the new budget. A first cold-start `pnpm
+  test:e2e` caught a real strict-mode locator collision (the new section's
+  2024 entry repeats "James Rodríguez (Colombia)" from the pre-existing
+  Best Player winners section), fixed by narrowing both the EN and HR
+  pre-existing assertions to their section's full sentence rather than an
+  ordinal `.first()`; a clean re-run passed 840/840 (9.7 min, up from
+  836/836). See `docs/PROJECT_STATUS.md`'s matching entry for detail,
+  including the full discrepancy-resolution methodology. **Left for a
+  future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness), plus Copa América winning captains for
+  1975-2010. With Nations League's remaining individual/team-award ideas
+  now all ruled out and Copa América's own award set essentially complete,
+  the next content-gap pass likely needs either a fresh source lead for the
+  captain-sourcing problem or a genuinely different quality angle
+  (accessibility, performance, SEO, or a fresh read of
+  `docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

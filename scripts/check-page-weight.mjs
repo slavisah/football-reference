@@ -44,8 +44,17 @@ const DIST_DIR = path.join(ROOT, 'dist');
 // EURO "Winning captains" and Nations League "Winning captains" note
 // sections added two more `docs/SOURCES.md` citation blocks under the "UEFA
 // EURO"/"UEFA Nations League" headings, pushing `hr/records` to 540.8 KB,
-// just over the 540 KB budget (the ninth such deliberate raise).
-export const PAGE_WEIGHT_BUDGET_BYTES = 560 * 1024;
+// just over the 540 KB budget (the ninth such deliberate raise). Raised again
+// to 590 KB on 2026-09-02 (fifty-second intensive run): the new Copa América
+// "Team of the Tournament winners" note section added a large batch of new
+// `docs/SOURCES.md` citation URLs under the "Copa América" heading (a
+// five-edition, eleven-player-per-edition roster needs many more source
+// links than the single-winner-per-year sections that came before it),
+// pushing `hr/records` to 563.4 KB, just over the 560 KB budget (the tenth
+// such deliberate raise). Raised further than the minimum needed this time
+// specifically because this section's shape (multi-player rosters) is
+// denser than prior additions and likely to recur.
+export const PAGE_WEIGHT_BUDGET_BYTES = 590 * 1024;
 
 /** Every same-origin CSS asset path (e.g. "/football-reference/_astro/foo.css") referenced by an HTML page. */
 export function findCssRefs(html) {
