@@ -1042,6 +1042,16 @@ test.describe('Copa América page on a 360px phone', () => {
     ).toBeVisible();
   });
 
+  test('shows the Fair Play Award winners section from content/copa-america.md', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Fair Play Award winners' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText("Uruguay - the award's first winner"),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Colombia - the tournament\'s runner-up.'),
+    ).toBeVisible();
+  });
+
   test('shows the Winning managers section from content/copa-america.md', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Marcos Calderón (Peru)')).toBeVisible();
@@ -1241,6 +1251,16 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     ).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('Guerrerova treća nagrada, najviše od svih igrača.'),
+    ).toBeVisible();
+  });
+
+  test('shows the translated Fair Play Award winners section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Dobitnici nagrade Fair Play' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('prvi dobitnik nagrade, u momčadi koja je i osvojila'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Kolumbija - drugoplasirana momčad natjecanja.'),
     ).toBeVisible();
   });
 

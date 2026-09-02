@@ -1330,6 +1330,59 @@ standing quirks.
   content addition that grows `docs/SOURCES.md` further will likely need
   another deliberate budget raise in `scripts/check-page-weight.mjs`.
 
+- **Copa América Fair Play Award winners**: closed 2026-09-02 (fiftieth
+  intensive run) - a standing health check first (`pnpm install`, `pnpm
+  outdated` found nothing new beyond the still-blocked `typescript` 7 entry,
+  `pnpm dlx knip --no-config-hints` matched every prior run's baseline, full
+  lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+  `check:pdfs` all clean, 513/513 unit tests, 711 pages built). Investigated
+  two Copa América leads via WebSearch: a team Fair Play award (the same
+  shape as the FIFA World Cup's own already-added section) and an individual
+  "Best Young Player" award. The Fair Play award turned out to be a clean
+  fit - CONMEBOL introduced it in 2011, continuous across all six editions
+  since (2011, 2015, 2016, 2019, 2021, 2024), the exact same span this page's
+  own Golden Glove section already covers - while Best Young Player was
+  confirmed, by contrast, to have been given out only intermittently since
+  its 2007 introduction (three editions to date), the same
+  "not a reliable single-fact-per-edition award" caution that has already
+  kept several Nations League/EURO ideas out of scope, so left unpursued.
+  Added a "Fair Play Award winners" section to `content/copa-america.md`,
+  each of the six winners verified via two independent WebSearch passes with
+  no contradictions (see `docs/SOURCES.md`'s matching new entry for the full
+  citation list). Wired into `copa-america.astro`'s `noteHeadings` (English)
+  and hand-translated into `hr/competitions/copa-america.astro`'s own `notes`
+  array as "Dobitnici nagrade Fair Play", matching the World Cup page's own
+  Croatian label for the same award. `content/copa-america.md`'s
+  `lastReviewed` bumped to 2026-09-02. New e2e coverage (EN + HR
+  heading/content assertions) in `tests/e2e/mobile.spec.ts`. All 700 PDFs
+  regenerated and reverified clean (`pnpm build:pdfs` then `pnpm check:pdfs`,
+  using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback this
+  environment's Chromium needs, since this content edit and the
+  `docs/SOURCES.md` addition both mark every PDF's shared References section
+  stale, by design). Full standing health check clean: `pnpm lint` (0/0/0),
+  `pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+  unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+  `check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+  (37 URLs), `check:perf` (heaviest page `hr/records`, 555.8 KB, within the
+  560 KB budget - only 4.2 KB of headroom left, the tightest margin yet; the
+  next content addition that grows `docs/SOURCES.md` further will very
+  likely need another deliberate budget raise in
+  `scripts/check-page-weight.mjs`), `check:pdfs` (700/700 fresh). A full
+  cold-start `pnpm test:e2e` confirmed the new assertions: 836/836 passed
+  (9.3 minutes, up from 834), with no pre-existing assertion needing an
+  update this time. **Left for a future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness), plus Copa América winning captains for
+  1975-2010 specifically (still needs a genuinely different verification
+  path than general WebSearch summaries). With Copa América's own
+  individual/team award set now covering Best Player, Golden Glove, Golden
+  Boot and Fair Play, and its personnel facts covering Winning managers
+  (1975-2024) and Winning captains (2011-2024), the next content-gap pass
+  likely needs either a fresh source lead for the remaining Copa América
+  captain span or a genuinely different quality angle (accessibility,
+  performance, SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md`
+  against the live site).
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

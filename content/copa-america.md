@@ -5,7 +5,7 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-09-01
+lastReviewed: 2026-09-02
 status: verified
 ---
 
@@ -220,6 +220,16 @@ A **second, independent cross-check** of the Final date column (2026-08-12, inte
 - **2021:** Lionel Messi (Argentina); Luis Díaz (Colombia) - 4 goals each.
 - **2024:** Lautaro Martínez (Argentina) - 5 goals.
 - Paolo Guerrero's three wins (2011, 2015, 2019) are the most by any player; Eduardo Vargas is the only player to win in consecutive editions (2015 and 2016).
+
+## Fair Play Award winners
+
+- CONMEBOL has named a team Fair Play Award, based on each squad's on-field disciplinary record, at every Copa América since 2011 - the same span this page's own Golden Glove award has existed for; no equivalent award existed at earlier editions.
+- **2011:** Uruguay - the award's first winner, on the team that also won the tournament.
+- **2015:** Peru.
+- **2016:** Argentina - Copa América Centenario.
+- **2019:** Brazil - the tournament's host and eventual champion.
+- **2021:** Brazil.
+- **2024:** Colombia - the tournament's runner-up.
 
 ## Winning managers
 

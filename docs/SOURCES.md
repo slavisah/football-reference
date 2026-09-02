@@ -1815,6 +1815,35 @@ Primary sources should be preferred.
     1975-2010 span this run left out. Not re-attempted without a better
     source lead, the same standing caution already applied to Copa
     América's pre-1975 managers/captains.
+- Fair Play Award winners (added 2026-09-02, intensive run): a new "Fair
+  Play Award winners" note section on `content/copa-america.md`, the same
+  shape as the FIFA World Cup's own "Fair Play Award winners" section.
+  CONMEBOL introduced a team Fair Play Award at the 2011 Copa América,
+  continuous across all six editions since (2011, 2015, 2016, 2019, 2021,
+  2024) - the same span this page's own Golden Glove section already
+  covers, and a cleaner fit than the page's still-unpursued "Best Young
+  Player" idea, which by contrast has been awarded only intermittently
+  since its 2007 introduction. Each of the six winners was verified via
+  two independent WebSearch passes with no contradictions:
+  - https://copaamerica.com/en/news/uruguay-and-its-history-in-the-conmebol-copa-america
+  - https://www.americatv.com.pe/deportes/copa-america-2015/peru-gano-premio-fair-play-copa-america-chile-2015-n188167
+  - https://elcomercio.pe/deporte-total/copa-america-2015/peru-obtuvo-premio-fair-play-copa-america-2015-279875
+  - https://www.soccerwire.com/news/copa-america-centenario-awards-best-xi-announced/
+  - https://bleacherreport.com/articles/2648646-copa-america-2016-award-winners-prize-money-and-final-reaction
+  - https://en.wikipedia.org/wiki/2019_Copa_Am%C3%A9rica
+  - https://en.wikipedia.org/wiki/2021_Copa_Am%C3%A9rica
+  - https://www.mykhel.com/football/copa-america-2021-full-list-of-award-winners-golden-boot-prize-money-records-and-statistics-170429.html
+  - https://khelnow.com/football/world-football-copa-america-list-of-all-award-winners-202407
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+    Not pursued this run: Copa América's own "Best Young Player" award,
+    confirmed via the same research to have been given out only
+    intermittently since 2007 (three editions to date per its own
+    Wikipedia-sourced summary) rather than at every edition - the same
+    "not a reliable single-fact-per-edition award" caution that has
+    already kept UEFA Nations League's goalkeeper/young-player/top-scorer
+    ideas and EURO's goalkeeper award out of scope.
 
 ## Ballon d'Or
 
