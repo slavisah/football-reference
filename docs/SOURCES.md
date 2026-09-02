@@ -516,6 +516,49 @@ Primary sources should be preferred.
     audit in this file has noted; verification relied entirely on
     WebSearch's synthesized snippets, cross-checked across independent
     passes and source domains rather than a single query's summary.
+- World Cup Silver Boot and Bronze Boot winners (added 2026-09-02, intensive
+  run): a new "World Cup Silver Boot and Bronze Boot winners" note section on
+  `content/golden-boot.md`, listing the tournament's second- and
+  third-highest goalscorers at every World Cup since 2010 (the year FIFA
+  introduced formal podium recognition alongside the top-scorer award's
+  rename from "Golden Shoe" to "Golden Boot"), sitting between "World Cup
+  notes" and "World Cup memorable moments". Verified via five independent
+  WebSearch passes, one per edition (2010, 2014, 2018, 2022, 2026), plus a
+  targeted follow-up confirming the official "since 2010" introduction date
+  itself. The 2010 podium needed the most care: four players (Müller, Villa,
+  Sneijder, Forlán) finished level on five goals, resolved by the same
+  assists-then-minutes-played tiebreakers that decided the Golden Boot
+  itself (Müller's three assists to the others' one each; Villa's fewer
+  minutes than Sneijder took the Silver Boot over him, leaving Sneijder off
+  the three-player podium entirely). The 2022 Bronze Boot (Julián Álvarez
+  over a goals-level Olivier Giroud, on the assist tiebreaker) and the still
+  very recent 2026 podium (Messi's Silver Boot, Bellingham's Bronze Boot)
+  were each cross-checked against a second independent source. **No
+  discrepancies found** across any of the five editions:
+  - https://www.fox13news.com/news/what-is-fifa-world-cup-golden-boot-look-last-7-winners-trophy
+  - https://sports.yahoo.com/articles/world-cup-golden-boot-rules-070001347.html
+  - https://surprisesports.com/football/fifa-world-cup/world-cup-golden-boot-winners-list/
+  - https://www.sportbible.com/football/football-news/fifa-world-cup/what-happened-four-players-tied-for-golden-boot-at-2010-world-cup-644890-20260717
+  - https://www.goal.com/en-za/news/world-cup-2010-germanys-thomas-mueller-wins-golden-boot-ahead-of-/bltfd547e46c9b6f090
+  - https://sports.yahoo.com/articles/golden-boot-tiebreakers-explained-happens-051002346.html
+  - https://bleacherreport.com/articles/2128333-world-cup-2014-winner-golden-boot-stats-and-awards-results
+  - https://www.thesoccerworldcups.com/world_cups/2014_awards.php
+  - https://latinspotlight.wordpress.com/2014/07/13/2014-world-cup-golden-boot-and-other-awards/
+  - https://www.soccerbible.com/news/2018/06/adidas-reveal-2018-world-cup-golden-boot-ball-glove-trophies/
+  - https://www.goal.com/en/news/what-is-world-cup-golden-boot/blt8e5fea3ddfa5eea7
+  - https://steemit.com/fifa/@awaisquarni/world-cup-2018-awards-or-all-winner-list-world-cup-2018-or-golden-ball-boot-gloves-winner-fifa-18
+  - https://www.hitc.com/golden-boot-2022-world-cup-final-standings-as-mbappe-beats-messi-giroud-alvarez/
+  - https://www.si.com/soccer/2022/12/14/world-cup-golden-boot-argentina-france-mbappe-messi-alvarez-giroud
+  - https://www.aljazeera.com/sports/2022/12/18/kylian-mbappe-awarded-golden-boot-after-world-cup-finals
+  - https://www.britannica.com/question/Who-won-the-Golden-Ball-Golden-Boot-and-Golden-Glove-awards-at-the-2026-FIFA-World-Cup
+  - https://www.givemesport.com/world-cup-2026-awards/
+  - https://sports.yahoo.com/articles/2026-world-cup-award-winners-225707815.html
+  - https://www.nbcsports.com/soccer/news/2026-world-cup-award-winners-golden-boot-golden-ball-best-young-player-golden-glove
+  - Direct WebFetch/curl to these domains remains blocked by this
+    environment's egress policy, the same standing caveat every recent
+    audit in this file has noted; verification relied entirely on
+    WebSearch's synthesized snippets, cross-checked across independent
+    passes and source domains rather than a single query's summary.
 
 ## UEFA EURO
 

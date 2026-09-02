@@ -2,7 +2,7 @@
 title: Golden Boot Winners
 slug: golden-boot
 awardType: scoring
-lastReviewed: 2026-08-26
+lastReviewed: 2026-09-02
 status: verified
 ---
 
@@ -50,6 +50,15 @@ The name and tie-breaking rules of top-scorer awards have changed over time. Thi
 - Just Fontaine's 13 goals in 1958 remain the record for one edition.
 - Modern tie-breakers may separate players with the same number of goals using assists and minutes played.
 - Earlier editions often recognized multiple joint top scorers.
+
+## World Cup Silver Boot and Bronze Boot winners
+
+- FIFA has awarded the Silver Boot and Bronze Boot to the tournament's second- and third-highest goalscorers at every World Cup since 2010, the same year the top-scorer award was renamed from "Golden Shoe" to "Golden Boot" - no equivalent podium recognition existed at earlier editions.
+- **2010:** David Villa (Spain) won the Silver Boot; Diego Forlán (Uruguay) won the Bronze Boot - both level with Golden Boot winner Thomas Müller on five goals, separated from him and each other by the same assists-then-minutes-played tiebreakers.
+- **2014:** Thomas Müller (Germany) won the Silver Boot with five goals; Neymar (Brazil) won the Bronze Boot with four.
+- **2018:** Antoine Griezmann (France) won the Silver Boot; Romelu Lukaku (Belgium) won the Bronze Boot - both on four goals.
+- **2022:** Lionel Messi (Argentina) won the Silver Boot with seven goals; Julián Álvarez (Argentina) won the Bronze Boot on the assist tiebreaker over Olivier Giroud, both level on four goals.
+- **2026:** Lionel Messi (Argentina) won the Silver Boot with eight goals; Jude Bellingham (England) won the Bronze Boot with seven.
 
 ## World Cup memorable moments
 

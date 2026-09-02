@@ -15282,6 +15282,103 @@ problem or a genuinely different quality angle (accessibility, performance,
 SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live
 site).
 
+### FIFA World Cup Silver Boot and Bronze Boot winners - added 2026-09-02 (fifty-third intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` found nothing
+new beyond the still-blocked `typescript` 7 entry (`@astrojs/check@latest`
+still declares `typescript: '^5.0.0 || ^6.0.0'`), `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline (same one confirmed
+false positive), full lint/unit/build clean (513/513 unit tests, 711 pages
+built).
+
+Following this routine's own priority order (Copa América > Nations League
+> Ballon d'Or > Golden Boot), the fifty-second run's own closing note left
+two open threads: a fresh source lead for Copa América's 1975-2010 captain
+gap (still none found - re-checked, no new lead), or a genuinely different
+angle. Moved to the Golden Boot tier, the next family in the routine's
+priority order that hadn't had a content addition in this recent
+award-history streak, and found a clean fit right on the page's own World
+Cup table: FIFA has awarded the **Silver Boot and Bronze Boot** to the
+tournament's second- and third-highest goalscorers at every World Cup since
+2010 - the same year the top-scorer award itself was renamed from "Golden
+Shoe" to "Golden Boot" - but this page's existing World Cup table only ever
+listed the single Golden Boot winner per edition, the same "runner-up
+recognition never added" gap the FIFA World Cup page's own "Silver Ball and
+Bronze Ball winners" section (forty-first run's predecessor, thirty-eighth
+intensive run) already closed for the Golden Ball award.
+
+Verified all five editions (2010, 2014, 2018, 2022, 2026) via one WebSearch
+pass per edition plus a dedicated pass confirming the 2010 introduction
+date itself. The 2010 podium needed the most care: four players (Müller,
+Villa, Sneijder, Forlán) finished level on five goals apiece, split by the
+same assists-then-minutes-played tiebreakers that decided the Golden Boot
+itself - Müller's three assists (vs. one each for the other three) won him
+the Golden Boot outright, Villa's fewer minutes than Sneijder's took the
+Silver Boot, leaving Sneijder off the three-player podium entirely and
+Forlán the Bronze Boot. The 2022 Bronze Boot (Julián Álvarez over a
+goals-level Olivier Giroud, on the assist tiebreaker) and the still very
+recent 2026 podium (Messi's Silver Boot, Bellingham's Bronze Boot) were each
+independently cross-checked with a second source. **No discrepancies found**
+across any of the five editions - see `docs/SOURCES.md`'s matching new entry
+for the full citation list and methodology.
+
+Added a "World Cup Silver Boot and Bronze Boot winners" section to
+`content/golden-boot.md`, between "World Cup notes" and "World Cup memorable
+moments" (matching where the FIFA World Cup page's own "Silver Ball and
+Bronze Ball" section sits relative to its Golden Ball section), wired into
+`competitions/golden-boot.astro`'s World Cup `noteHeadings` (English) and
+hand-translated into `hr/competitions/golden-boot.astro`'s own `notes` array
+as "Dobitnici Srebrne i Brončane kopačke - Svjetsko prvenstvo" (Croatian,
+matching the World Cup page's own "Srebrna"/"Brončana" terminology for the
+equivalent Ball awards). Deliberately scoped to the World Cup table only:
+EURO's top-scorer table has no equivalent official Silver/Bronze Boot
+concept researched or added anywhere else on this site, and would need its
+own separate verification pass rather than being assumed from the World
+Cup's pattern. `content/golden-boot.md`'s `lastReviewed` bumped to
+2026-09-02.
+
+**Tests:** new EN + HR heading/content assertions in `tests/e2e/
+mobile.spec.ts`, extending the page's existing "shows the World Cup notes
+and EURO notes sections" test (`.notes__card` count 5 -> 6 for both
+languages) rather than adding a new `test()` block, matching that test's
+existing shape (one heading-visibility check plus one distinct text-excerpt
+check per section).
+
+No page-weight budget raise needed this run: a five-edition,
+one-winner-per-boot section is far smaller than the fifty-second run's
+five-edition/eleven-player-per-edition Team of the Tournament roster.
+`hr/records` came in at 568.8 KB, still within the 590 KB budget (21.2 KB of
+headroom left, up from the fifty-second run's tighter margin since that run
+had already raised the budget further than its own strict minimum).
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs, since this content edit and the
+`docs/SOURCES.md` addition both mark every PDF's shared References section
+stale, by design).
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 568.8 KB, within the
+590 KB budget), `check:pdfs` (700/700 fresh), full cold-start `pnpm
+test:e2e` (840/840 passed, 14.2 minutes, unchanged count - this run extended
+two existing `test()` blocks rather than adding new ones, matching the
+fifty-second run's own 840/840 baseline exactly). No pre-existing assertion
+needed updating this time.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still needs a genuinely different
+verification path than general WebSearch summaries). With the World Cup's
+own Golden Boot table now also carrying its runner-up podium, the next
+content-gap pass likely needs either a fresh source lead for Copa América's
+captain-sourcing problem, an EURO-specific investigation into whether any
+equivalent runner-up scoring recognition exists there, or a genuinely
+different quality angle (accessibility, performance, SEO, or a fresh read of
+`docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
