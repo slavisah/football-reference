@@ -1547,6 +1547,42 @@ standing quirks.
   (accessibility, performance, SEO, or a fresh read of
   `docs/WEBSITE_REQUIREMENTS.md` against the live site).
 
+- **Ballon d'Or Socrates Award winners**: closed 2026-09-03 (fifty-fifth
+  intensive run) - a standing health check first (`pnpm install`, `pnpm
+  outdated`/`pnpm dlx knip --no-config-hints` found nothing new, full
+  lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/`check:perf`
+  all clean, matching the fifty-fourth run's baseline). Re-checked the Copa
+  América winning captains 1975-2010 gap once more with no new source lead,
+  so moved to the Ballon d'Or tier and found a genuinely new gap next to the
+  page's existing Kopa/Yashin/Gerd Müller/Johan Cruyff companion-trophy
+  sections: the **Socrates Award**, France Football's humanitarian prize
+  presented with Peace and Sport every year since 2022. Unlike its four
+  siblings (all men's-football-performance awards), this one is not
+  restricted to male footballers - it has gone to a female player (Jennifer
+  Hermoso, 2024) and, in 2025, to a charitable foundation (the Xana
+  Foundation, founded by 2025 Johan Cruyff Trophy winner Luis Enrique) rather
+  than an individual - flagged explicitly in the new section rather than
+  smoothed over. Verified all four awarded editions (Sadio Mané 2022,
+  Vinícius Júnior 2023, Jennifer Hermoso 2024, Xana Foundation 2025) via two
+  independent WebSearch passes each with no discrepancies. Wired into
+  `competitions/ballon-dor.astro`'s `noteHeadings` and hand-translated into
+  `hr/competitions/ballon-dor.astro`'s own `notes` array as "Dobitnici
+  nagrade Sócrates". `content/ballon-dor.md`'s `lastReviewed` bumped to
+  2026-09-03. New e2e coverage (EN + HR). No page-weight budget raise needed
+  (`hr/records` at 574.1 KB, within the 590 KB budget, ~16 KB headroom left).
+  All 700 PDFs regenerated and reverified clean; full standing health check
+  clean including a full cold-start `pnpm test:e2e` (842/842 passed, 9.8
+  minutes, up from 840). See `docs/PROJECT_STATUS.md`'s matching entry for
+  detail. **Left for a future pass:** the same environment-blocked items as
+  every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus
+  Copa América winning captains for 1975-2010. With the Ballon d'Or's own
+  companion-award set now covering all five gala trophies, the next
+  content-gap pass likely
+  needs either a fresh source lead for Copa América's captain-sourcing
+  problem or a genuinely different quality angle (accessibility, performance,
+  SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live
+  site).
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned
