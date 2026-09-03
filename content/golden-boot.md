@@ -2,7 +2,7 @@
 title: Golden Boot Winners
 slug: golden-boot
 awardType: scoring
-lastReviewed: 2026-08-26
+lastReviewed: 2026-09-03
 status: verified
 ---
 
@@ -51,6 +51,15 @@ The name and tie-breaking rules of top-scorer awards have changed over time. Thi
 - Modern tie-breakers may separate players with the same number of goals using assists and minutes played.
 - Earlier editions often recognized multiple joint top scorers.
 
+## World Cup Silver Boot and Bronze Boot winners
+
+- FIFA has awarded the Silver Boot and Bronze Boot to the tournament's second- and third-highest goalscorers at every World Cup since 2010, the same year the top-scorer award was renamed from "Golden Shoe" to "Golden Boot" - no equivalent podium recognition existed at earlier editions.
+- **2010:** David Villa (Spain) won the Silver Boot; Diego Forlán (Uruguay) won the Bronze Boot - both level with Golden Boot winner Thomas Müller on five goals, separated from him and each other by the same assists-then-minutes-played tiebreakers.
+- **2014:** Thomas Müller (Germany) won the Silver Boot with five goals; Neymar (Brazil) won the Bronze Boot with four.
+- **2018:** Antoine Griezmann (France) won the Silver Boot; Romelu Lukaku (Belgium) won the Bronze Boot - both on four goals.
+- **2022:** Lionel Messi (Argentina) won the Silver Boot with seven goals; Julián Álvarez (Argentina) won the Bronze Boot on the assist tiebreaker over Olivier Giroud, both level on four goals.
+- **2026:** Lionel Messi (Argentina) won the Silver Boot with eight goals; Jude Bellingham (England) won the Bronze Boot with seven.
+
 ## World Cup memorable moments
 
 - Guillermo Stábile won the first-ever FIFA World Cup Golden Boot in 1930, scoring eight goals for Argentina.
@@ -84,6 +93,13 @@ The name and tie-breaking rules of top-scorer awards have changed over time. Thi
 
 - Michel Platini scored nine goals in five matches in 1984.
 - UEFA's award rules have changed over time; joint leading scorers (marked “Multiple” in the Team column) are shown tied, with no single official winner for that edition.
+
+## EURO Silver Boot and Bronze Boot winners
+
+- UEFA named a ranked Golden Boot/Silver Boot/Bronze Boot podium at only three EUROs - 2012, 2016 and 2020 - the editions where a single Golden Boot winner was chosen by tiebreak; before 2012 and from 2024 onward the award reverts to full joint winners, with no runner-up ranking to show.
+- **2012:** not shown here even though UEFA's own tiebreak (assists, then fewest minutes) named Fernando Torres the outright winner ahead of Mario Gómez's Silver Boot and Alan Dzagoev's Bronze Boot - this page's own table above intentionally keeps 2012 as a six-way "Multiple" tie (see the EURO table's tie-resolution history in `docs/SOURCES.md`), so listing a distinguished 2012 podium here would contradict that row.
+- **2016:** Antoine Griezmann (France) won the Golden Boot with six goals; Cristiano Ronaldo (Portugal) won the Silver Boot with three goals and three assists; Olivier Giroud (France) won the Bronze Boot with three goals and two assists, level with fellow Frenchman Dimitri Payet on both counts but ahead of him on fewer minutes played.
+- **2020:** Patrik Schick (Czech Republic) won the Silver Boot with five goals, level with Golden Boot winner Cristiano Ronaldo but without his tiebreak assist; Karim Benzema (France) won the Bronze Boot with four goals, ahead of three other players level on four (Harry Kane, Emil Forsberg, Romelu Lukaku) on fewest minutes played.
 
 ## EURO memorable moments
 

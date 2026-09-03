@@ -14790,6 +14790,967 @@ the next content-gap pass likely needs either that better source lead or
 a genuinely different quality angle (accessibility, performance, SEO, or a
 fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live site).
 
+### `prefers-contrast: more` support plus a dependency patch bump - added 2026-09-01 (forty-seventh intensive run)
+
+Started with the standing health check: `pnpm install` (fresh container),
+`pnpm outdated` found one new in-range patch release (`@types/node` 26.4.0
+-> 26.4.1, installed this run), `pnpm dlx knip --no-config-hints` matched
+every prior run's baseline (same one confirmed false positive), and
+`pnpm audit` reported no known vulnerabilities. The `typescript` 7 upgrade
+is still blocked, re-confirmed via `npm view @astrojs/check@latest
+peerDependencies` (`^5.0.0 || ^6.0.0`), and the `docs/SOURCES.md`
+link-liveness sweep is still blocked (a direct `curl` to
+`en.wikipedia.org` was again rejected with a 403 by the egress proxy).
+
+The forty-sixth run's own closing note asked for "that better source lead
+or a genuinely different quality angle" now that every reliably-sourceable
+individual-award/personnel angle across all six competition/award families
+is shipped. Tried the content angle first: two independent WebSearch
+passes investigated a Copa América "Best Young Player" award and a Copa
+América "Fair Play Award" as candidate new sections. Both turned out
+unreliable the same way prior "not pursued" ideas in this file already
+were - the Best Young Player award's own Wikipedia summary describes it as
+awarded only "intermittently" (not a clean per-edition fact), and the Fair
+Play Award returned a confirmed winner for only one of six candidate
+editions (2024) despite two search passes. Neither was pursued, matching
+this file's standing "don't ship a partial or unreliable per-edition
+dataset" rule.
+
+Pivoted to the accessibility angle instead and found a genuine, previously
+unaddressed gap: `global.css` has handled `prefers-reduced-motion` (see
+the 2026-08-28 entry) and `forced-colors` for a while, but never
+`prefers-contrast: more` - the OS-level "increase contrast" accessibility
+setting, distinct from both. Two of the site's own design tokens are
+deliberately subtle by design: `--border` (a card/table divider measured
+at just 1.29:1 against `--light-bg`/1.59:1 against `--dark-bg` - barely
+visible, decorative only) and `--text-muted` (already AA at 5.80:1/8.30:1
+but not AAA in the light theme). A reader with low vision or using the
+site in bright light who has this OS setting on gets no benefit from it
+today.
+
+Added four new palette tokens (`--light-contrast-border`,
+`--light-contrast-text-muted`, `--dark-contrast-border`,
+`--dark-contrast-text-muted`) in `global.css`, each color chosen by
+computing exact WCAG contrast ratios against every background token it can
+sit on (`--bg`, `--bg-elevated`, `--bg-subtle`) rather than eyeballing:
+light border 1.29:1 -> 5.15:1 (clear of the 3:1 WCAG 1.4.11 non-text
+minimum, checked against all three light backgrounds too - 5.47:1/4.83:1);
+light text-muted 5.80:1 -> 9.05:1 (AAA); dark border 1.59:1 -> 5.72:1
+(5.00:1/4.48:1 against the other two dark backgrounds); dark text-muted
+8.30:1 -> 11.95:1. A new `@media (prefers-contrast: more)` block overrides
+`--border`/`--text-muted` to these tokens - deliberately mirroring the
+existing four-block color-scheme resolution shape (default, `@media
+(prefers-color-scheme: dark)`, `[data-theme='light']`,
+`[data-theme='dark']`) with one contrast-scoped block per combination,
+rather than a single global override, for the same reason
+`theme-token-parity.spec.ts` exists: getting one of the four combinations
+wrong here would repeat the exact split-theme bug the `--danger` comment
+in `global.css` already documents (a fix landing in only one of the
+resolution blocks), except for a preference with no in-page toggle a
+tester could click to notice the gap by hand.
+
+**Tests:** new `tests/e2e/accessibility-prefers-contrast.spec.ts` (6
+cases, mirroring `accessibility-reduced-motion.spec.ts`'s
+`page.emulateMedia()`-based pattern since `contrast` isn't a
+`test.use()`-able Playwright option in the pinned version either) - all
+four color-scheme x contrast combinations (OS light/dark, each with and
+without an explicit toggle override to the other theme) resolve to the
+correct token values, plus two baseline cases confirming the normal subtle
+tokens are unaffected without the preference.
+
+No PDF regeneration needed - `global.css` isn't a tracked PDF source file
+(`scripts/pdf-pages.mjs`'s per-family source lists are content/`.astro`
+files only), and this change doesn't touch default/print rendering, only
+an OS accessibility preference's screen rendering - matching the
+2026-08-28 `prefers-reduced-motion` entry, which also needed no PDF
+regeneration.
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - CSS-only + a new e2e spec, no unit-
+testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 547.0 KB, within the
+560 KB budget). A full cold-start `pnpm test:e2e` initially showed 2
+failures in `accessibility-compare-states.spec.ts`, both
+`net::ERR_CONNECTION_REFUSED` against the preview server rather than a
+real assertion failure; an isolated re-run of just that file passed
+16/16, confirming a transient dev-server hiccup rather than a regression
+from this run's change (an unrelated CSS/token edit couldn't plausibly
+cause a connection-refused error) - the same "died before any test body
+ran" flake shape this repo's own babysitting conventions call for a
+single re-run to confirm, not a code fix. Full suite: **832 passed**
+(counting the isolated re-run's 16 in place of the 2 flaked failures),
+up from the forty-fourth run's 822 baseline (+10: this run's 6 new
+`accessibility-prefers-contrast.spec.ts` cases plus a handful the
+forty-fifth/forty-sixth content-only runs added without a matching
+ROADMAP.md total callout).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still needs a genuinely different
+verification path per the forty-sixth run's note). The Best Young
+Player/Fair Play Award ideas this run investigated and declined are now
+closed the same way the Nations League individual-award ideas were -
+don't re-attempt either without a materially better source lead. With
+`prefers-reduced-motion`, `forced-colors` and now `prefers-contrast: more`
+all handled, `prefers-reduced-data` (a less widely supported media
+feature, mostly relevant to a heavier media site than this one) is the
+only standing OS accessibility preference left unexamined - worth a quick
+look next time this angle comes up again, though this site has very
+little heavy media to begin with (no video/large images beyond the OG
+card and PWA icons), so it may turn out to be low-yield.
+
+### Ballon d'Or Gerd Müller Trophy (top goalscorer) winners - added 2026-09-02 (forty-ninth intensive run)
+
+Started with the standing health check: `pnpm install` (fresh container,
+`node_modules` missing again), `pnpm outdated` found nothing new beyond the
+still-blocked `typescript` 7 entry (`@astrojs/check@latest` still declares
+`typescript: '^5.0.0 || ^6.0.0'`), `pnpm dlx knip --no-config-hints` matched
+every prior run's baseline (same one confirmed false positive), and a
+direct `curl` to `en.wikipedia.org`/`www.fifa.com` was again rejected by
+the egress proxy - the `docs/SOURCES.md` link-liveness sweep stays blocked.
+Full lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/
+`check:perf` all clean before any content change: 513/513 unit tests, 711
+pages built, `hr/records` at 550.4 KB (within the 560 KB budget).
+
+Investigated the closing note left by the run before this one (World
+Cup's Fair Play Award, 2026-09-02): "a fresh look at whether EURO or Copa
+América has an equally reliable, continuous team-level award never yet
+checked (Fair Play or otherwise)". Two targeted WebSearch passes settled
+this definitively for EURO: unlike the earlier "unofficial/inconsistent
+naming" caution already on record for EURO's goalkeeper award, EURO simply
+**has no team Fair Play award at all** - its five official post-tournament
+awards are Player of the Tournament, Top Scorer, Young Player of the
+Tournament, Man of the Match and Team of the Tournament; Fair Play isn't
+one of them (UEFA's Respect Fair Play ranking is a separate,
+qualification-cycle-long mechanism across national associations, not a
+per-tournament team award like the World Cup's). Also re-tried the
+Nations League Finals top-scorer idea with a fresh WebSearch pass (the
+thirty-ninth run's own reasoning for shelving it, now independently
+reconfirmed): 2019 Cristiano Ronaldo (3 goals, clean), 2021 a three-way
+share, 2023 a fourteen-way share on 1 goal each, 2025 a three-way share -
+still not a reliable single-name-per-edition award, matching the existing
+"not a reliable single-name award" finding exactly.
+
+Rather than force either of those, kept reading around the Ballon d'Or
+page's own existing Kopa/Yashin Trophy sections (added 2026-08-31/
+2026-09-01) and found a third companion award neither of those entries had
+investigated: the **Gerd Müller Trophy**, France Football's award for the
+year's top goalscorer (club and country combined), presented alongside the
+Ballon d'Or every year since 2021. Two independent WebSearch passes agreed
+exactly on all five awarded editions with zero discrepancies:
+
+- **2021:** Robert Lewandowski (Poland) - the award's first winner, under
+  its original name, "Striker of the Year".
+- **2022:** Robert Lewandowski (Poland) - the first winner under the
+  renamed Gerd Müller Trophy, and the trophy's first repeat winner.
+- **2023:** Erling Haaland (Norway).
+- **2024:** Harry Kane (England) and Kylian Mbappé (France) - the trophy's
+  only tie so far, both credited as joint winners on the same goal tally.
+- **2025:** Viktor Gyökeres (Sweden).
+
+Both passes also agreed on a genuine naming nuance worth recording rather
+than glossing over: the award wasn't called the Gerd Müller Trophy in its
+first year. It was first presented in 2021 (while Müller was still alive)
+as "Striker of the Year"; after Müller's death in August 2021, France
+Football renamed it in his honor starting with the October 2022 ceremony -
+several contemporaneous sources (FC Barcelona's own site among them) call
+the 2022 award "inaugural" even though Lewandowski had already won the
+differently-named 2021 edition. This is the same shape of rename this
+site's Nations League page already documents ("Player of the Tournament"
+becoming "Player of the Finals" after 2019, see the thirty-fourth run's
+entry), so it's presented the same way: both years included, with the
+rename called out in the section's own intro bullet rather than silently
+merged or split into two separate award histories.
+
+Added a "Gerd Müller Trophy winners" section to `content/ballon-dor.md`
+(between "Yashin Trophy winners" and "Important editorial note", matching
+the page's existing award-then-editorial-note ordering), wired into
+`competitions/ballon-dor.astro`'s `noteHeadings` (English) and
+hand-translated into `hr/competitions/ballon-dor.astro`'s own `notes` array
+as "Dobitnici nagrade Gerd Müller Trophy" (Croatian, matching the page's
+existing hand-translated Kopa/Yashin Trophy section naming convention).
+`content/ballon-dor.md`'s `lastReviewed` bumped to 2026-09-02.
+
+**Tests:** new EN + HR heading/content assertions in
+`tests/e2e/mobile.spec.ts` (the 2024 tie and the Poland/Poljska national
+team, mirroring the Kopa/Yashin sections' own assertion shape); this page
+has no fixed `.notes__card` count assertion to bump, unlike World Cup's.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then
+`pnpm check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs), since this content edit and
+the `docs/SOURCES.md` addition both mark every PDF's shared References
+section stale, by design.
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 553.2 KB, within the
+560 KB budget - 6.8 KB of headroom left), `check:pdfs` (700/700 fresh).
+
+A first push to CI caught a real bug this run's local checks hadn't run
+yet: both new `.notes__card` name locators (`getByText('Kylian Mbappé
+(France)')` and `getByText('Robert Lewandowski (Poland)')`, plus their
+Croatian equivalents) hit Playwright's strict-mode "resolved to multiple
+elements" error, because both names already appear elsewhere on the same
+page - Mbappé is also the Kopa Trophy's 2018 winner, and Lewandowski wins
+in both 2021 and 2022 within the new section itself. Scoped each with
+`.first()`, matching the DOM-order-is-the-intended-match convention this
+file's own `Luis de la Fuente (Španjolska)').first()` (2026-08-30, EURO
+winning-managers entry) already established for the same collision shape.
+Pushed the fix, then a full cold-start `pnpm test:e2e` confirmed it: 834
+passed (up from the forty-seventh run's 832 baseline, +2: this run's two
+new EN/HR Gerd Müller Trophy sections), and CI's `test` check went green
+on the fix commit.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still needs a genuinely different
+verification path). EURO's Fair Play idea is now definitively closed (not
+an official award at all, not just less reliably sourced) and the Nations
+League top-scorer idea is reconfirmed unviable a second time - neither
+should be re-attempted without a materially different source lead. With
+the Ballon d'Or's own companion-award set now complete (Kopa, Yashin, Gerd
+Müller), the next content-gap pass likely needs either a fresh source lead
+for Copa América's pre-1975/1975-2010 sourcing problems or a genuinely
+different quality angle (accessibility, performance, SEO). `hr/records`'s
+page weight has only 6.8 KB of headroom left against the 560 KB budget - a
+future content addition that grows `docs/SOURCES.md` further will likely
+need another deliberate budget raise in `scripts/check-page-weight.mjs`.
+
+### Copa América Fair Play Award winners - added 2026-09-02 (fiftieth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` found
+nothing new beyond the still-blocked `typescript` 7 entry, `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline, full
+lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+`check:pdfs` all clean (513/513 unit tests, 711 pages built).
+
+Investigated two Copa América leads via WebSearch: a team Fair Play award
+(the same shape as the FIFA World Cup's own already-added section) and an
+individual "Best Young Player" award. The Fair Play award was a clean fit -
+CONMEBOL introduced it in 2011, continuous across all six editions since
+(2011, 2015, 2016, 2019, 2021, 2024), the same span this page's own Golden
+Glove section already covers - while Best Young Player was confirmed only
+intermittently awarded since its 2007 introduction (three editions to
+date), so left unpursued, the same "not a reliable single-fact-per-edition
+award" caution already applied to several Nations League/EURO ideas.
+
+Added a "Fair Play Award winners" section to `content/copa-america.md`,
+each of the six winners verified via two independent WebSearch passes with
+no contradictions. Wired into `copa-america.astro`'s `noteHeadings`
+(English) and hand-translated into `hr/competitions/copa-america.astro`'s
+own `notes` array as "Dobitnici nagrade Fair Play". `content/copa-
+america.md`'s `lastReviewed` bumped to 2026-09-02. New e2e coverage (EN +
+HR heading/content assertions) in `tests/e2e/mobile.spec.ts`.
+
+All 700 PDFs regenerated and reverified clean. Full standing health check
+clean: `pnpm lint` (0/0/0), `pnpm test` (513/513 unit, unchanged), `pnpm
+build` (711 pages, unchanged), `check:links` (715 pages), `check:sitemap`
+(710 entries), `check:precache` (37 URLs), `check:perf` (heaviest page
+`hr/records`, 555.8 KB, within the 560 KB budget - only 4.2 KB of headroom
+left, the tightest margin yet), `check:pdfs` (700/700 fresh). A full
+cold-start `pnpm test:e2e` confirmed the new assertions: 836/836 passed
+(9.3 minutes, up from 834), with no pre-existing assertion needing an
+update this time.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 specifically (still needs a
+genuinely different verification path than general WebSearch summaries).
+With Copa América's own individual/team award set now covering Best
+Player, Golden Glove, Golden Boot and Fair Play, and its personnel facts
+covering Winning managers (1975-2024) and Winning captains (2011-2024),
+the next content-gap pass likely needs either a fresh source lead for the
+remaining Copa América captain span or a genuinely different quality angle
+(accessibility, performance, SEO, or a fresh read of
+`docs/WEBSITE_REQUIREMENTS.md` against the live site). `hr/records`'s page
+weight has only 4.2 KB of headroom left against the 560 KB budget - the
+next content addition that grows `docs/SOURCES.md` further will very
+likely need another deliberate budget raise in
+`scripts/check-page-weight.mjs`.
+
+### Ballon d'Or Johan Cruyff Trophy (Men's Coach of the Year) winners - added 2026-09-02 (fifty-first intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` found
+nothing new beyond the still-blocked `typescript` 7 entry (`@astrojs/
+check@latest` still declares `typescript: '^5.0.0 || ^6.0.0'`), `pnpm dlx
+knip --no-config-hints` matched every prior run's baseline (same one
+confirmed false positive), full lint/unit/build/`check:links`/
+`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs` all clean
+(513/513 unit tests, 711 pages built, `hr/records` at 555.8 KB within the
+560 KB budget).
+
+Following this routine's own priority order (Copa América > Nations League
+> Ballon d'Or), re-checked the Copa América winning-captains 1975-2010 gap
+first: no new source lead has appeared since the forty-sixth run's
+two-independent-pass contradiction (Bengoechea vs. Francescoli for 1995,
+a wrongly-attributed 1999/2004 captaincy), so it stays out of scope,
+confirmed rather than re-attempted with the same method. Moved to the
+Ballon d'Or tier and found the one companion trophy at the gala the site's
+existing Kopa/Yashin/Gerd Müller Trophy sections hadn't covered: the
+**Johan Cruyff Trophy**, France Football's "best men's coach" award,
+introduced in 2024 - only two editions awarded to date (2024, 2025), the
+youngest and shortest of the four companion-award histories on this page,
+but a real, continuous, unambiguous award with no partial/unofficial years
+to navigate, the same bar every other companion-award addition on this
+page has cleared. Verified both editions via two independent WebSearch
+passes each with no discrepancies: Carlo Ancelotti (Real Madrid, 2024, for
+the La Liga/UEFA Champions League double) and Luis Enrique (Paris
+Saint-Germain, 2025, for the Ligue 1/Coupe de France/first-ever Champions
+League treble) - see `docs/SOURCES.md`'s matching new entry for the full
+citation list.
+
+Added a "Johan Cruyff Trophy winners" section to `content/ballon-dor.md`
+(between "Gerd Müller Trophy winners" and "Important editorial note",
+matching the page's existing award-then-editorial-note ordering), wired
+into `competitions/ballon-dor.astro`'s `noteHeadings` (English) and
+hand-translated into `hr/competitions/ballon-dor.astro`'s own `notes`
+array as "Dobitnici nagrade Johan Cruyff Trophy" (Croatian, matching the
+page's existing hand-translated Kopa/Yashin/Gerd Müller Trophy section
+naming convention). `content/ballon-dor.md`'s `lastReviewed` was already
+2026-09-02 from an earlier run this same day, so left unchanged.
+
+**Tests:** new EN + HR heading/content assertions in
+`tests/e2e/mobile.spec.ts` mirroring the Kopa/Yashin/Gerd Müller sections'
+own assertion shape (both winner names, scoped to `.notes__card` text);
+this page has no fixed `.notes__card` count assertion to bump, unlike
+World Cup's.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then
+`pnpm check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs), since this content edit and
+the `docs/SOURCES.md` addition both mark every PDF's shared References
+section stale, by design.
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 558.3 KB, within the
+560 KB budget - only 1.7 KB of headroom left, the tightest margin yet),
+`check:pdfs` (700/700 fresh).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still needs a genuinely different
+verification path). With the Ballon d'Or's own companion-award set now
+covering all four gala trophies (Kopa, Yashin, Gerd Müller, Johan Cruyff),
+the next content-gap pass likely needs either a fresh source lead for Copa
+América's captain-sourcing problem or a genuinely different quality angle
+(accessibility, performance, SEO, or a fresh read of
+`docs/WEBSITE_REQUIREMENTS.md` against the live site). `hr/records`'s page
+weight has only 1.7 KB of headroom left against the 560 KB budget - the
+very next content addition that grows `docs/SOURCES.md` further will need
+a deliberate budget raise in `scripts/check-page-weight.mjs` before it
+lands, not after.
+
+### Copa América Team of the Tournament winners - added 2026-09-02 (fifty-second intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` found nothing
+new beyond the still-blocked `typescript` 7 entry (`@astrojs/check@latest`
+still declares `typescript: '^5.0.0 || ^6.0.0'`), `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline (same one confirmed
+false positive), full lint/unit/build/`check:links`/`check:sitemap`/
+`check:precache`/`check:perf`/`check:pdfs` all clean (513/513 unit tests,
+711 pages built, `hr/records` at 558.3 KB, matching the fifty-first run's
+own baseline).
+
+Following this routine's own priority order (Copa América > Nations
+League), dispatched a research pass covering both tiers before writing
+anything. It confirmed two ideas as not viable, matching or extending prior
+findings: UEFA Nations League Finals has never had its own Fair Play award
+(distinct from UEFA's unrelated season-long club/federation "Respect Fair
+Play ranking"), and its Finals "Team of the Tournament" selection is
+confirmed for 2019 only, with no equivalent full-XI selection found for
+2021, 2023 or 2025 - the same 1-of-4 pattern that already ruled out Nations
+League's Young Player of the Finals idea. It then found a genuinely new,
+well-scoped gap on the Copa América page instead: CONMEBOL's Technical
+Study Group has named an official **Team of the Tournament** ("equipo
+ideal") at every edition since 2015, a real team-selection award distinct
+from the page's existing Best Player/Golden Glove/Golden Boot/Fair Play
+sections.
+
+Verified all five editions (2015, 2016, 2019, 2021, 2024) personally via
+targeted `WebSearch` cross-checks beyond the research pass's own findings,
+resolving two genuine discrepancies along the way rather than shipping
+either roster on a single pass:
+
+- **2021:** one AI-search-summary sentence mislabeled defender Pervis
+  Estupiñán as Colombian, directly contradicted by the same source's own
+  "four Argentina, three Brazil, one each Colombia/Peru/Chile/Ecuador"
+  nationality breakdown two sentences later (Luis Díaz already fills
+  Colombia's one slot; Estupiñán is Ecuadorian) - resolved in favor of the
+  internally consistent breakdown, not the mislabeled inline text.
+- **2015:** one fan-listicle roster (Sportskeeda) disagreed with the
+  CONMEBOL-attributed roster (Cooperativa.cl and others) on roughly half
+  the outfield names - Luis Advíncula and Charles Aránguiz vs. Jeison
+  Murillo, Marcelo Díaz and Eduardo Vargas. Resolved by checking both
+  candidate rosters against an independently-reported fact both La Nación
+  and another outlet gave without reference to either full list: "Chile
+  supplied five of the eleven, the most of any team." Only the
+  CONMEBOL-attributed roster actually contains five Chile players (Bravo,
+  Medel, Vidal, Díaz, Vargas); the fan-listicle roster has three. Settled
+  in favor of the roster the independent fact corroborates.
+
+**2011 was investigated and excluded**, the same caution this page's own
+"Winning captains" section (2011-2024 only) already applies: independent
+sources disagree on as much as half the outfield names - one
+widely-syndicated AFP-sourced list names Justo Villar of Paraguay in goal
+with four Uruguayans, three Venezuelans, one Paraguayan, one Peruvian, one
+Brazilian and one Colombian outfield, while other sources describe a
+differently-composed eleven, with no way to determine which (if either) is
+the actual CONMEBOL-attributed selection via WebSearch alone. Rather than
+ship a contested roster, the section starts at 2015 instead, the same
+scoping pattern (start where sourcing is reliably cross-confirmed, not at
+the award's true origin) already established by Golden Glove and Fair Play
+on this same page.
+
+Added a "Team of the Tournament winners" section to `content/copa-america.md`
+(between "Fair Play Award winners" and "Winning managers" - a team-selection
+award sits naturally with the page's other team/individual award sections
+rather than with the personnel sections that follow), wired into
+`copa-america.astro`'s `noteHeadings` (English) and hand-translated into
+`hr/competitions/copa-america.astro`'s own `notes` array as "Idealna momčad
+turnira" (Croatian - the standard Croatian football-media phrase for a
+tournament's ideal/best XI, distinct from the "Dobitnici nagrade ..."
+phrasing used for the page's single-winner-per-year awards, since this
+section names eleven players per edition rather than one). `content/
+copa-america.md`'s `lastReviewed` was already 2026-09-02 from an earlier
+run this same day, so left unchanged.
+
+**Tests:** new EN + HR heading/content assertions in `tests/e2e/
+mobile.spec.ts`, matching the Fair Play Award section's own assertion shape
+(heading visibility plus two distinct `.notes__card` text excerpts); this
+page has no fixed `.notes__card` count assertion to bump, unlike World
+Cup's.
+
+**Page-weight budget raised**: a five-edition, eleven-player-per-edition
+roster needed far more `docs/SOURCES.md` citation URLs under the "Copa
+América" heading than any single-winner-per-year section before it, and
+`extractSources()` (`src/lib/sources.ts`) pulls that whole list into
+`/records` (every competition's full source list). `hr/records` reached
+563.4 KB, just over the previous 560 KB budget - the fifty-first run had
+already flagged only 1.7 KB of headroom remained. Raised
+`PAGE_WEIGHT_BUDGET_BYTES` (`scripts/check-page-weight.mjs`) to 590 KB (the
+tenth such deliberate raise), further than the strict minimum needed, since
+this section's multi-player-roster shape is denser than prior additions and
+likely to recur if a similar award turns up on another page.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs), since this content edit,
+`docs/SOURCES.md` addition and the page-weight budget comment update all
+mark every PDF's shared References section stale, by design (the budget
+comment change alone doesn't affect PDF content, but the content/SOURCES.md
+edits do).
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 563.4 KB, within the
+new 590 KB budget), `check:pdfs` (700/700 fresh).
+
+A first cold-start `pnpm test:e2e` caught a real strict-mode locator
+collision: the new section's 2024 entry includes "James Rodríguez
+(Colombia)", the same text the page's pre-existing "Best Player winners"
+test (EN) and its Croatian sibling test both matched loosely, so each
+locator started resolving to three elements (the pre-existing match plus
+two lines inside the new section that also mention that player). Fixed by
+narrowing both pre-existing assertions to their section's actual full
+sentence ("James Rodríguez (Colombia) - runner-up with Colombia"/Croatian
+equivalent) rather than adding `.first()`, since a name-only match was
+always going to be fragile on a page that now lists full rosters - the
+same underlying lesson the forty-ninth run's `.first()` fix for the Ballon
+d'Or Gerd Müller Trophy section already hit, applied here with a more
+specific locator instead of an ordinal one. A clean re-run passed 840/840
+(9.7 minutes, up from the fiftieth/fifty-first runs' 836/836 baseline: +2
+from this run's own new Team of the Tournament assertions).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still needs a genuinely different
+verification path than general WebSearch summaries). With Nations League's
+Fair Play and Team of the Tournament ideas both now definitively ruled out,
+and Copa América's own award set covering Best Player, Golden Glove, Golden
+Boot, Fair Play and now Team of the Tournament, the next content-gap pass
+likely needs either a fresh source lead for Copa América's captain-sourcing
+problem or a genuinely different quality angle (accessibility, performance,
+SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live
+site).
+
+### FIFA World Cup Silver Boot and Bronze Boot winners - added 2026-09-02 (fifty-third intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` found nothing
+new beyond the still-blocked `typescript` 7 entry (`@astrojs/check@latest`
+still declares `typescript: '^5.0.0 || ^6.0.0'`), `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline (same one confirmed
+false positive), full lint/unit/build clean (513/513 unit tests, 711 pages
+built).
+
+Following this routine's own priority order (Copa América > Nations League
+> Ballon d'Or > Golden Boot), the fifty-second run's own closing note left
+two open threads: a fresh source lead for Copa América's 1975-2010 captain
+gap (still none found - re-checked, no new lead), or a genuinely different
+angle. Moved to the Golden Boot tier, the next family in the routine's
+priority order that hadn't had a content addition in this recent
+award-history streak, and found a clean fit right on the page's own World
+Cup table: FIFA has awarded the **Silver Boot and Bronze Boot** to the
+tournament's second- and third-highest goalscorers at every World Cup since
+2010 - the same year the top-scorer award itself was renamed from "Golden
+Shoe" to "Golden Boot" - but this page's existing World Cup table only ever
+listed the single Golden Boot winner per edition, the same "runner-up
+recognition never added" gap the FIFA World Cup page's own "Silver Ball and
+Bronze Ball winners" section (forty-first run's predecessor, thirty-eighth
+intensive run) already closed for the Golden Ball award.
+
+Verified all five editions (2010, 2014, 2018, 2022, 2026) via one WebSearch
+pass per edition plus a dedicated pass confirming the 2010 introduction
+date itself. The 2010 podium needed the most care: four players (Müller,
+Villa, Sneijder, Forlán) finished level on five goals apiece, split by the
+same assists-then-minutes-played tiebreakers that decided the Golden Boot
+itself - Müller's three assists (vs. one each for the other three) won him
+the Golden Boot outright, Villa's fewer minutes than Sneijder's took the
+Silver Boot, leaving Sneijder off the three-player podium entirely and
+Forlán the Bronze Boot. The 2022 Bronze Boot (Julián Álvarez over a
+goals-level Olivier Giroud, on the assist tiebreaker) and the still very
+recent 2026 podium (Messi's Silver Boot, Bellingham's Bronze Boot) were each
+independently cross-checked with a second source. **No discrepancies found**
+across any of the five editions - see `docs/SOURCES.md`'s matching new entry
+for the full citation list and methodology.
+
+Added a "World Cup Silver Boot and Bronze Boot winners" section to
+`content/golden-boot.md`, between "World Cup notes" and "World Cup memorable
+moments" (matching where the FIFA World Cup page's own "Silver Ball and
+Bronze Ball" section sits relative to its Golden Ball section), wired into
+`competitions/golden-boot.astro`'s World Cup `noteHeadings` (English) and
+hand-translated into `hr/competitions/golden-boot.astro`'s own `notes` array
+as "Dobitnici Srebrne i Brončane kopačke - Svjetsko prvenstvo" (Croatian,
+matching the World Cup page's own "Srebrna"/"Brončana" terminology for the
+equivalent Ball awards). Deliberately scoped to the World Cup table only:
+EURO's top-scorer table has no equivalent official Silver/Bronze Boot
+concept researched or added anywhere else on this site, and would need its
+own separate verification pass rather than being assumed from the World
+Cup's pattern. `content/golden-boot.md`'s `lastReviewed` bumped to
+2026-09-02.
+
+**Tests:** new EN + HR heading/content assertions in `tests/e2e/
+mobile.spec.ts`, extending the page's existing "shows the World Cup notes
+and EURO notes sections" test (`.notes__card` count 5 -> 6 for both
+languages) rather than adding a new `test()` block, matching that test's
+existing shape (one heading-visibility check plus one distinct text-excerpt
+check per section).
+
+No page-weight budget raise needed this run: a five-edition,
+one-winner-per-boot section is far smaller than the fifty-second run's
+five-edition/eleven-player-per-edition Team of the Tournament roster.
+`hr/records` came in at 568.8 KB, still within the 590 KB budget (21.2 KB of
+headroom left, up from the fifty-second run's tighter margin since that run
+had already raised the budget further than its own strict minimum).
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs, since this content edit and the
+`docs/SOURCES.md` addition both mark every PDF's shared References section
+stale, by design).
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 568.8 KB, within the
+590 KB budget), `check:pdfs` (700/700 fresh), full cold-start `pnpm
+test:e2e` (840/840 passed, 14.2 minutes, unchanged count - this run extended
+two existing `test()` blocks rather than adding new ones, matching the
+fifty-second run's own 840/840 baseline exactly). No pre-existing assertion
+needed updating this time.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still needs a genuinely different
+verification path than general WebSearch summaries). With the World Cup's
+own Golden Boot table now also carrying its runner-up podium, the next
+content-gap pass likely needs either a fresh source lead for Copa América's
+captain-sourcing problem, an EURO-specific investigation into whether any
+equivalent runner-up scoring recognition exists there, or a genuinely
+different quality angle (accessibility, performance, SEO, or a fresh read of
+`docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
+### UEFA EURO Silver Boot and Bronze Boot winners - added 2026-09-03 (fifty-fourth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` found nothing
+new beyond the still-blocked `typescript` 7 entry, `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline (same one confirmed
+false positive), full lint/unit/build/`check:links`/`check:sitemap`/
+`check:precache`/`check:perf`/`check:pdfs` all clean (513/513 unit tests, 711
+pages built).
+
+Acted directly on the fifty-third run's own closing note: whether EURO has
+any equivalent runner-up scoring recognition worth researching. Several
+WebSearch passes confirmed UEFA did name a Silver Boot/Bronze Boot podium at
+EURO, but only for the three editions where a single Golden Boot winner was
+ever chosen by tiebreak - 2012, 2016 and 2020; before 2012 and from 2024
+onward the award reverts to full joint winners, with no runner-up ranking to
+show (2024's own six-way tie for the Golden Boot itself confirms this - there
+is no "second place" to speak of that year either).
+
+**2012 needed a judgment call.** UEFA's own tiebreak (assists, then fewest
+minutes) named Fernando Torres the outright 2012 Golden Boot winner, with
+Mario Gómez taking the Silver Boot and Alan Dzagoev the Bronze Boot - all
+confirmed via WebSearch. But this page's own EURO table has, since the
+2026-08-04/2026-08-07 Golden Boot audits, deliberately shown 2012 as a
+six-way "Multiple" tie rather than crediting Torres alone - the 2026-08-28
+tie-resolution audit traced this to `buildChampionsSummary()`'s doc comment
+in `src/lib/editions.ts`, which documents that 2012's tie-share is
+load-bearing for Cristiano Ronaldo's correct "2 EURO Golden Boots" count (his
+2012 share plus his outright 2020 win) in the site's "Most awards" ranking.
+Naming a distinguished Torres/Gómez/Dzagoev podium in a new note section on
+the same page would directly contradict that same-page table row - a
+different kind of inconsistency than any prior Silver/Bronze Boot section
+has had to navigate, since the World Cup's own table never disputes a single
+year's winner. Rather than reopen a settled, documented tension, this run
+left 2012 out of the new section entirely, with the reasoning spelled out
+inline (see below) rather than silently.
+
+Verified 2016 and 2020 via two independent WebSearch passes each, plus a
+third targeted re-check of 2020's four-way tie on four goals (Harry Kane,
+Karim Benzema, Emil Forsberg, Romelu Lukaku): every source agreed Benzema's
+Bronze Boot came down to fewest minutes played (349, ahead of Forsberg's 371,
+Lukaku's 444 and Kane's 649) among the four. **No discrepancies found** for
+either edition - see `docs/SOURCES.md`'s matching new entry for the full
+citation list and methodology.
+
+Added an "EURO Silver Boot and Bronze Boot winners" section to
+`content/golden-boot.md`, between "EURO notes" and "EURO memorable moments"
+(mirroring where the World Cup's own equivalent section sits relative to its
+neighbors):
+- An opening bullet states the three-edition scope and why the award reverts
+  to joint winners outside it.
+- **2012:** its own bullet explains the exclusion and points to the tie's
+  documented load-bearing role, rather than just omitting the year silently.
+- **2016:** Antoine Griezmann (Golden), Cristiano Ronaldo (Silver, 3 goals/3
+  assists), Olivier Giroud (Bronze, 3 goals/2 assists, fewer minutes than a
+  tied Dimitri Payet).
+- **2020:** Patrik Schick (Silver, 5 goals, no tiebreak assist against
+  Ronaldo's one), Karim Benzema (Bronze, 4 goals, fewest minutes among the
+  four tied scorers).
+
+Wired into `competitions/golden-boot.astro`'s EURO `noteHeadings` (English)
+and hand-translated into `hr/competitions/golden-boot.astro`'s own `notes`
+array as "Dobitnici Srebrne i Brončane kopačke - EURO" (Croatian, matching
+the page's existing "Srebrna"/"Brončana kopačka" terminology from its World
+Cup equivalent section), including the same 2012 exclusion reasoning
+translated in full. `content/golden-boot.md`'s `lastReviewed` bumped to
+2026-09-03.
+
+**Tests:** new EN + HR heading/content assertions in `tests/e2e/
+mobile.spec.ts`, extending the page's existing "shows the World Cup notes and
+EURO notes sections" test (`.notes__card` count 6 -> 7 for both languages)
+rather than adding a new `test()` block, matching that test's existing shape.
+
+No page-weight budget raise needed this run: a two-edition, three-name
+section is smaller than the World Cup's own five-edition section.
+`hr/records` came in at 570.9 KB, still within the 590 KB budget (~19 KB of
+headroom left).
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs, since this content edit and the
+`docs/SOURCES.md` addition both mark every PDF's shared References section
+stale, by design).
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 570.9 KB, within the
+590 KB budget), `check:pdfs` (700/700 fresh), full cold-start `pnpm
+test:e2e` (840/840 passed, 10.4 minutes, unchanged count - this run extended
+two existing `test()` blocks rather than adding new ones, matching the
+fifty-third run's own 840/840 baseline exactly). No pre-existing assertion
+needed updating this time.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still needs a genuinely different
+verification path than general WebSearch summaries). With both the World
+Cup's and EURO's Golden Boot tables now carrying every reliably-sourceable
+runner-up podium, the next content-gap pass likely needs either a fresh
+source lead for Copa América's captain-sourcing problem or a genuinely
+different quality angle (accessibility, performance, SEO, or a fresh read of
+`docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
+### Ballon d'Or Socrates Award winners - added 2026-09-03 (fifty-fifth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` found nothing
+new beyond the still-blocked `typescript` 7 entry, `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline (same one confirmed
+false positive), full `pnpm lint`/`pnpm test`/`pnpm build`/`check:links`/
+`check:sitemap`/`check:precache`/`check:perf` all clean (513/513 unit tests,
+711 pages built).
+
+Re-checked the fifty-fourth run's own closing note first - Copa América
+winning captains for 1975-2010 - and found no new source lead, so this stays
+out of scope per the same three-times-confirmed contradictory-sourcing
+reasoning. Moved to the Ballon d'Or tier of this routine's own priority
+order (Copa América > Nations League > Ballon d'Or > Golden Boot) and found
+a genuinely new gap: `content/ballon-dor.md` already carries four companion
+trophies (Kopa, Yashin, Gerd Müller, Johan Cruyff) but none for the gala's
+humanitarian prize, the **Socrates Award** (formally the Sócrates Award),
+presented by France Football with Peace and Sport every year since 2022.
+
+This award is a genuinely different shape from its four siblings on the same
+page - all of which are strictly men's-football-performance awards (best
+young player, best goalkeeper, top scorer, best coach). The Socrates Award
+is not: it has gone to a female footballer (2024) and, in 2025, to a
+charitable foundation rather than an individual player at all. Rather than
+treat that as disqualifying, this run verified it carefully and noted the
+distinction explicitly in the new section's opening bullet, the same way
+other note sections flag scope quirks rather than silently smoothing them
+over.
+
+Verified all four awarded editions via two independent WebSearch passes each
+with no discrepancies:
+- **2022:** Sadio Mané (Senegal) - the inaugural winner, honored for funding
+  a hospital, a secondary school and other infrastructure in his home
+  village of Bambali, Senegal.
+- **2023:** Vinícius Júnior (Brazil) - honored for Instituto Vini Jr.'s work
+  against racism and educational inequality in Brazil.
+- **2024:** Jennifer Hermoso (Spain) - the award's first female recipient,
+  honored for her advocacy against sexual abuse and harassment in sport.
+- **2025:** Xana Foundation - not an individual player. Founded by 2025
+  Johan Cruyff Trophy winner Luis Enrique (already on this same page, see
+  the Johan Cruyff Trophy section) and his wife Elena Cullell in memory of
+  their daughter Xana, who died in 2019 aged nine; the foundation supports
+  hospitalized children with serious illnesses. This cross-reference between
+  two sections on the same page (Luis Enrique winning one companion award as
+  a coach in 2025, then his foundation winning a different one the same
+  night) was independently confirmed across multiple sources, not assumed
+  from the coincidence of names.
+
+See `docs/SOURCES.md`'s matching new entry for the full citation list and
+methodology.
+
+Added a "Socrates Award winners" section to `content/ballon-dor.md`, placed
+after "Johan Cruyff Trophy winners" (chronologically last-introduced of the
+five companion awards to be documented, though the award itself predates the
+Cruyff Trophy by two years). Wired into `competitions/ballon-dor.astro`'s
+`noteHeadings` (English) and hand-translated into
+`hr/competitions/ballon-dor.astro`'s own `notes` array as "Dobitnici nagrade
+Sócrates" (Croatian). `content/ballon-dor.md`'s `lastReviewed` bumped to
+2026-09-03.
+
+**Tests:** new EN + HR `test()` blocks in `tests/e2e/mobile.spec.ts`
+asserting the section heading and all four winners are visible, matching the
+existing per-trophy test shape already used for Kopa/Yashin/Gerd
+Müller/Johan Cruyff.
+
+No page-weight budget raise needed this run: `hr/records` came in at 574.1
+KB, still within the 590 KB budget (~16 KB of headroom left).
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs, since this content edit and the
+`docs/SOURCES.md` addition both mark every PDF's shared References section
+stale, by design).
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 574.1 KB, within the
+590 KB budget), `check:pdfs` (700/700 fresh), full cold-start `pnpm
+test:e2e` (842/842 passed, 9.8 minutes, up from 840 - this run's two new
+`test()` blocks).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still needs a genuinely different
+verification path than general WebSearch summaries). With the Ballon d'Or's
+own companion-award set now covering all five gala trophies (Kopa, Yashin,
+Gerd Müller, Johan Cruyff, Socrates), the next content-gap pass likely needs
+either a fresh source lead for Copa América's captain-sourcing problem or a
+genuinely different quality angle (accessibility, performance, SEO, or a
+fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
+### Save-Data-aware service worker precaching - added 2026-09-03 (fifty-sixth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` found nothing
+new beyond the still-blocked `typescript` 7 entry, `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline (same one confirmed
+false positive).
+
+Tried the content angle first, per this routine's own Copa América > Nations
+League > Ballon d'Or > Golden Boot priority order and the fifty-fifth run's
+own closing note. Re-checked Copa América winning captains 1975-2010 - no new
+source lead, stays out of scope (three-times-confirmed contradictory
+sourcing). Then re-checked UEFA Nations League's top-scorer idea one more
+time with a fresh edition to test it against: a WebSearch for the 2025
+Finals (the most recently completed edition, held after the thirty-ninth
+run's original 2023-based "not viable" finding) turned up a three-way tie -
+Kylian Mbappé, Cristiano Ronaldo and Lamine Yamal, 2 goals each - the same
+multi-way-tie shape that has now ruled this idea out for every completed
+edition checked (2023, now 2025). With that confirmed a fourth time and
+every other individual-award/personnel idea across all six families already
+either shipped or documented as not viable (see the fifty-fifth run's own
+closing note), the content-mining angle is genuinely exhausted for now, not
+just this run's opinion of it.
+
+Pivoted to the quality-angle fork the last several runs' closing notes have
+pointed at. The forty-seventh run's own note had flagged
+`prefers-reduced-data` (the CSS media feature) as the last unexamined OS
+accessibility preference, but judged it likely low-yield: this site has
+almost no heavy media (no video, no large images beyond the OG card and PWA
+icons) for a CSS-level "don't load this background image" rule to act on.
+That judgment held up - but looking for the actual substantive equivalent
+of "the reader has told their browser they're on a metered or slow
+connection" turned up a real, previously-unexamined gap: the Network
+Information API's `navigator.connection.saveData` signal (the real Save-Data
+preference; the CSS media feature is a thin, less-supported wrapper around
+the same underlying browser setting) as it applies to this site's own PWA
+offline mode.
+
+`src/pages/sw.js.ts` generates the site's service worker, which precaches 37
+URLs on install - every nav page in both languages, plus the manifests and
+icons (`buildPrecacheUrls()` in `src/lib/offlineCache.ts`) - completely
+unconditionally, for every visitor, the instant the service worker installs.
+That is a genuine, real conflict with a reader who has explicitly told their
+browser to minimize data use: this site was downloading ~37 pages' worth of
+HTML to their device whether they asked for offline reading or not, with no
+way to opt out short of not installing the PWA at all.
+
+**The fix:** added `selectInstallCacheUrls(precacheUrls, homeUrlEn,
+homeUrlHr, saveData)` to `src/lib/offlineCache.ts` - returns just the two
+home-page URLs (English + Croatian, deduped if ever identical) when
+`saveData` is true, the full precache list otherwise. `saveData` being
+`undefined` (every browser that doesn't support the Network Information API)
+resolves to the full list too, the same as today's existing behavior, so
+this is purely additive - nobody's offline experience gets worse, only a
+Save-Data reader's first-load data use gets smaller. Since the generated
+`sw.js` script is a template string with no module imports (it has to run as
+plain, dependency-free JS in the service worker's own global scope), the
+same decision is mirrored inline as a new `installCacheUrls()` function in
+`src/pages/sw.js.ts`'s generated script, checking
+`self.navigator.connection.saveData` at install time and falling back to
+`PRECACHE_URLS` when that chain is falsy/unsupported. Nothing a Save-Data
+reader skips at install is gone forever: the fetch handler's existing
+cache-on-read behavior still caches any page the moment they actually visit
+it, so offline reading keeps working for everything they've opened - they
+just don't get every page silently pre-downloaded in the background for
+pages they may never read.
+
+Bumped `CACHE_VERSION` from `v3` to `v4` so the `activate` handler's existing
+stale-cache-eviction logic clears out any existing installs' old
+unconditionally-precached cache and replaces it under the new logic, rather
+than leaving two caches side by side.
+
+**Tests:** 4 new `describe('selectInstallCacheUrls', ...)` cases in
+`tests/unit/offlineCache.test.ts` (Save-Data off -> full list, Save-Data
+`undefined` -> full list, Save-Data on -> two home URLs, Save-Data on with
+identical EN/HR home URLs -> deduped to one). A real
+`navigator.connection.saveData` override isn't something Playwright can
+inject into a service worker's own global scope (unlike a page's `window`,
+which `addInitScript` can reach) - rather than skip e2e coverage entirely,
+added one new test in `tests/e2e/mobile.spec.ts` that fetches the generated
+`/football-reference/sw.js` directly and asserts the Save-Data branch and
+`installCacheUrls()` wiring are actually present in what ships, while the
+unit tests above cover the decision logic itself with full confidence.
+
+No `content/*.md` file was touched, so no PDF regeneration was needed -
+neither `src/lib/offlineCache.ts` nor `src/pages/sw.js.ts` is a tracked PDF
+source file.
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints
+across 168 files), `pnpm test` (**517/517** unit, up from 513 - this run's 4
+new cases), `pnpm build` (711 pages, unchanged), `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache` (37 URLs, unchanged - the
+precache *list* itself didn't change, only when the service worker uses all
+of it vs. just the two home pages), `check:perf` (heaviest page
+`hr/records`, 574.1 KB, unchanged - no content edit this run), `check:pdfs`
+(700/700 fresh, unaffected). A full cold-start `PW_EXECUTABLE_PATH=/opt/
+pw-browsers/chromium pnpm test:e2e` run: **843/843 passed** (10.9 minutes,
+up from 842 - the one new sw.js-content test), no pre-existing assertion
+needed updating.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still needs a genuinely different
+verification path than general WebSearch summaries - now unchanged since the
+forty-sixth run's findings). With content-mining confirmed exhausted across
+every competition/award family (this run's own Nations League re-check makes
+a fourth independent confirmation) and this run's own flagged accessibility
+gap now closed, the next intensive run likely needs either a fresh source
+lead for the captain-sourcing problem or another genuinely different quality
+angle (performance, SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md`
+against the live site) - simply repeating the standing health check with no
+new angle is the weakest fallback at this point, given how many consecutive
+runs have already come back byte-identical.
+
+### Astro dependency bump (7.2.10 -> 7.3.1) - added 2026-09-03 (fifty-seventh intensive run)
+
+Followed this routine's own Copa América > Nations League > Ballon d'Or >
+Golden Boot priority order first: `WebSearch` for Copa América's 1979 and
+1983 winning-captain names (Paraguay, Uruguay) turned up the same
+unresolved gap every prior attempt has hit - source snippets confirm the
+champion nation and the year but not who wore the armband, even when
+searching with a `"(c)"` Wikipedia-squad-list-style query aimed
+specifically at surfacing a captain marker. No new source lead; stays out
+of scope, unchanged since the forty-sixth run's original finding. UEFA
+Nations League's individual-award ideas are already confirmed not viable
+four times over (see the fifty-sixth run's entry above), and Ballon
+d'Or/Golden Boot's companion-award sets are both already complete per the
+fifty-fifth/fifty-fourth runs' closing notes - so, per this file's own
+"don't repeat a confirmed-exhausted angle" standing advice, moved straight
+to the dependency/quality fork instead of re-running those same checks a
+fifth time.
+
+`pnpm outdated` (after a fresh `pnpm install`) showed one new in-range
+release beyond the standing blocked entries: `astro` `7.2.10` -> `7.3.1`
+(a minor bump, still inside the `^7.2.10` semver range already declared in
+`package.json`). `@vitest`/`vitest` `4.1.11` -> `5.0.0` and `typescript`
+`5.9.3` -> `7.0.2` are both major-version jumps outside their declared
+ranges - `typescript` 7 is the same standing blocker re-confirmed via `npm
+view @astrojs/check@latest peerDependencies` (still `^5.0.0 || ^6.0.0`),
+and a Vitest 4 -> 5 major bump is exactly the kind of higher-risk change
+this routine's own "small, verifiable slice per run" shape argues against
+taking unreviewed - left for a future run to evaluate deliberately (its own
+changelog/breaking-changes pass) rather than folding it into this same
+astro-patch commit.
+
+Ran `pnpm update astro`, which bumped both `package.json`'s
+`"astro": "^7.2.10"` -> `"^7.3.1"` and the lockfile. Astro 7.3 is a minor
+release within the already-adopted major (Astro's own upgrade-guide
+breaking changes are all scoped to major version boundaries, not this one),
+so no source-level migration was expected or needed - confirmed by a full
+health check afterward finding zero code changes required.
+
+Full standing health check clean: `pnpm lint` (**0 errors/warnings/hints**
+across 168 files), `pnpm test` (**517/517** unit, unchanged), `pnpm build`
+(711 pages, unchanged), `check:links` (715 pages), `check:sitemap` (710
+entries), `check:precache` (37 URLs), `check:perf` (heaviest page still
+`hr/records`, 574.1 KB, unchanged - no content edit this run), `check:pdfs`
+(700/700 fresh, unaffected - no content or PDF-source file touched), `pnpm
+dlx knip --no-config-hints` (same one confirmed false positive as every
+prior run). A full cold-start `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium
+pnpm test:e2e` run: **843/843 passed** (8.4 minutes), unchanged count, no
+pre-existing assertion needed updating - confirms the astro bump introduced
+no behavioral regression anywhere in the site.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (re-checked again this run, still no
+new source lead) and a deliberate look at the Vitest 4 -> 5 major-version
+upgrade this run found available but didn't take unreviewed. With content-
+mining confirmed exhausted across every competition/award family and this
+run's own dependency angle now also addressed, the next intensive run
+likely needs either a fresh source lead for the captain-sourcing problem,
+a deliberate look at the Vitest 5 upgrade, or another genuinely different
+quality angle (performance, SEO, or a fresh read of
+`docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
@@ -14841,6 +15802,13 @@ fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live site).
   depends on `.skip-link` and `<Nav />`'s root `<header class="site-header">`
   staying direct siblings in `BaseLayout.astro`'s markup; if either ever
   gets wrapped in another element, this rule silently stops matching.
+- The service worker (`src/pages/sw.js.ts`) only precaches every nav page on
+  install for a reader whose browser reports `navigator.connection.saveData`
+  as falsy/unsupported; with Save-Data on, install only caches the two home
+  pages - see the 2026-09-03 "Save-Data-aware service worker precaching"
+  entry. Anything else still gets cached the moment it's actually visited via
+  the existing fetch-handler cache-on-read path, so offline reading for
+  already-opened pages is unaffected either way. `CACHE_VERSION` is `v4`.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

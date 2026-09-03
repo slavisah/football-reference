@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { buildPrecacheUrls, withBasePath } from '../../src/lib/offlineCache';
+import { buildPrecacheUrls, selectInstallCacheUrls, withBasePath } from '../../src/lib/offlineCache';
 import { NAV_LINKS } from '../../src/lib/routes';
 import { TRANSLATED_PATHS } from '../../src/lib/i18n';
 
@@ -66,6 +66,31 @@ describe('withBasePath', () => {
 
   it('falls back to "/" when both the base and the path are empty', () => {
     expect(withBasePath('', '')).toBe('/');
+  });
+});
+
+describe('selectInstallCacheUrls', () => {
+  const precacheUrls = buildPrecacheUrls('/football-reference/');
+  const homeUrlEn = '/football-reference/';
+  const homeUrlHr = '/football-reference/hr/';
+
+  it('returns the full precache list when Save-Data is off', () => {
+    expect(selectInstallCacheUrls(precacheUrls, homeUrlEn, homeUrlHr, false)).toBe(precacheUrls);
+  });
+
+  it('returns the full precache list when Save-Data is unsupported (undefined)', () => {
+    expect(selectInstallCacheUrls(precacheUrls, homeUrlEn, homeUrlHr, undefined)).toBe(precacheUrls);
+  });
+
+  it('returns only the two home pages when Save-Data is on', () => {
+    expect(selectInstallCacheUrls(precacheUrls, homeUrlEn, homeUrlHr, true)).toEqual([
+      homeUrlEn,
+      homeUrlHr,
+    ]);
+  });
+
+  it('dedupes if the English and Croatian home URLs are ever identical (e.g. an untranslated setup)', () => {
+    expect(selectInstallCacheUrls(precacheUrls, homeUrlEn, homeUrlEn, true)).toEqual([homeUrlEn]);
   });
 });
 
