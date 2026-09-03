@@ -916,6 +916,26 @@ test.describe("Ballon d'Or page on a 360px phone", () => {
     ).toBeVisible();
   });
 
+  test('shows the Socrates Award winners section, including all four winners', async ({
+    page,
+  }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Socrates Award winners' }),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Sadio Mané (Senegal)'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Vinícius Júnior (Brazil)'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Jennifer Hermoso (Spain)'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Xana Foundation'),
+    ).toBeVisible();
+  });
+
   test("the language switcher opens the Croatian Ballon d'Or page", async ({ page }) => {
     await page.goto('competitions/ballon-dor');
     await openMenu(page);
@@ -1031,6 +1051,26 @@ test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360p
     ).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('Luis Enrique (Paris Saint-Germain)'),
+    ).toBeVisible();
+  });
+
+  test('shows the translated Socrates Award winners section, including all four winners', async ({
+    page,
+  }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Dobitnici nagrade Sócrates' }),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Sadio Mané (Senegal)'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Vinícius Júnior (Brazil)'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Jennifer Hermoso (Španjolska)'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Xana Foundation'),
     ).toBeVisible();
   });
 

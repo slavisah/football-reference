@@ -15483,6 +15483,99 @@ source lead for Copa América's captain-sourcing problem or a genuinely
 different quality angle (accessibility, performance, SEO, or a fresh read of
 `docs/WEBSITE_REQUIREMENTS.md` against the live site).
 
+### Ballon d'Or Socrates Award winners - added 2026-09-03 (fifty-fifth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` found nothing
+new beyond the still-blocked `typescript` 7 entry, `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline (same one confirmed
+false positive), full `pnpm lint`/`pnpm test`/`pnpm build`/`check:links`/
+`check:sitemap`/`check:precache`/`check:perf` all clean (513/513 unit tests,
+711 pages built).
+
+Re-checked the fifty-fourth run's own closing note first - Copa América
+winning captains for 1975-2010 - and found no new source lead, so this stays
+out of scope per the same three-times-confirmed contradictory-sourcing
+reasoning. Moved to the Ballon d'Or tier of this routine's own priority
+order (Copa América > Nations League > Ballon d'Or > Golden Boot) and found
+a genuinely new gap: `content/ballon-dor.md` already carries four companion
+trophies (Kopa, Yashin, Gerd Müller, Johan Cruyff) but none for the gala's
+humanitarian prize, the **Socrates Award** (formally the Sócrates Award),
+presented by France Football with Peace and Sport every year since 2022.
+
+This award is a genuinely different shape from its four siblings on the same
+page - all of which are strictly men's-football-performance awards (best
+young player, best goalkeeper, top scorer, best coach). The Socrates Award
+is not: it has gone to a female footballer (2024) and, in 2025, to a
+charitable foundation rather than an individual player at all. Rather than
+treat that as disqualifying, this run verified it carefully and noted the
+distinction explicitly in the new section's opening bullet, the same way
+other note sections flag scope quirks rather than silently smoothing them
+over.
+
+Verified all four awarded editions via two independent WebSearch passes each
+with no discrepancies:
+- **2022:** Sadio Mané (Senegal) - the inaugural winner, honored for funding
+  a hospital, a secondary school and other infrastructure in his home
+  village of Bambali, Senegal.
+- **2023:** Vinícius Júnior (Brazil) - honored for Instituto Vini Jr.'s work
+  against racism and educational inequality in Brazil.
+- **2024:** Jennifer Hermoso (Spain) - the award's first female recipient,
+  honored for her advocacy against sexual abuse and harassment in sport.
+- **2025:** Xana Foundation - not an individual player. Founded by 2025
+  Johan Cruyff Trophy winner Luis Enrique (already on this same page, see
+  the Johan Cruyff Trophy section) and his wife Elena Cullell in memory of
+  their daughter Xana, who died in 2019 aged nine; the foundation supports
+  hospitalized children with serious illnesses. This cross-reference between
+  two sections on the same page (Luis Enrique winning one companion award as
+  a coach in 2025, then his foundation winning a different one the same
+  night) was independently confirmed across multiple sources, not assumed
+  from the coincidence of names.
+
+See `docs/SOURCES.md`'s matching new entry for the full citation list and
+methodology.
+
+Added a "Socrates Award winners" section to `content/ballon-dor.md`, placed
+after "Johan Cruyff Trophy winners" (chronologically last-introduced of the
+five companion awards to be documented, though the award itself predates the
+Cruyff Trophy by two years). Wired into `competitions/ballon-dor.astro`'s
+`noteHeadings` (English) and hand-translated into
+`hr/competitions/ballon-dor.astro`'s own `notes` array as "Dobitnici nagrade
+Sócrates" (Croatian). `content/ballon-dor.md`'s `lastReviewed` bumped to
+2026-09-03.
+
+**Tests:** new EN + HR `test()` blocks in `tests/e2e/mobile.spec.ts`
+asserting the section heading and all four winners are visible, matching the
+existing per-trophy test shape already used for Kopa/Yashin/Gerd
+Müller/Johan Cruyff.
+
+No page-weight budget raise needed this run: `hr/records` came in at 574.1
+KB, still within the 590 KB budget (~16 KB of headroom left).
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs, since this content edit and the
+`docs/SOURCES.md` addition both mark every PDF's shared References section
+stale, by design).
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 574.1 KB, within the
+590 KB budget), `check:pdfs` (700/700 fresh), full cold-start `pnpm
+test:e2e` (842/842 passed, 9.8 minutes, up from 840 - this run's two new
+`test()` blocks).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still needs a genuinely different
+verification path than general WebSearch summaries). With the Ballon d'Or's
+own companion-award set now covering all five gala trophies (Kopa, Yashin,
+Gerd Müller, Johan Cruyff, Socrates), the next content-gap pass likely needs
+either a fresh source lead for Copa América's captain-sourcing problem or a
+genuinely different quality angle (accessibility, performance, SEO, or a
+fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,

@@ -2267,6 +2267,41 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Socrates Award winners (added 2026-09-03, fifty-fifth intensive run): a new
+  "Socrates Award winners" note section on `content/ballon-dor.md`, the fifth
+  companion award on the Ballon d'Or page (after Kopa, Yashin, Gerd Müller and
+  Johan Cruyff) and a genuinely different shape from the other four: it is a
+  humanitarian award, not a football-performance one, and is not restricted to
+  men's football at all - its four editions since introduction in 2022 include
+  a female recipient (2024) and a charitable foundation rather than an
+  individual (2025). A standing health check first confirmed nothing else had
+  opened up (`pnpm outdated`/`pnpm dlx knip --no-config-hints` matched every
+  prior run's baseline); re-checked the Copa América captains 1975-2010 gap
+  once more with no new source lead, so moved to the Ballon d'Or tier per this
+  routine's own priority order. Verified all four awarded editions via two
+  independent WebSearch passes each with no discrepancies: Sadio Mané
+  (Senegal, 2022, the inaugural winner, honored for hospital/school
+  infrastructure funded in his home village of Bambali), Vinícius Júnior
+  (Brazil, 2023, honored for Instituto Vini Jr.'s anti-racism and education
+  work), Jennifer Hermoso (Spain, 2024, the award's first female recipient,
+  honored for advocacy against sexual abuse and harassment in sport), and the
+  Xana Foundation (2025, founded by 2025 Johan Cruyff Trophy winner Luis
+  Enrique and his wife Elena Cullell in memory of their daughter Xana, who
+  died in 2019). **No discrepancies found:**
+  - https://en.wikipedia.org/wiki/S%C3%B3crates_Award
+  - https://www.peace-sport.org/socrates-award/
+  - https://www.peace-sport.org/news/the-senegalese-sadio-mane-becomes-the-first-winner-of-the-socrates-award-at-the-2022-ballon-dor-ceremony/
+  - https://fcbayern.com/en/news/2022/10/sadio-mane-the-inaugural-winner-of-the-socrates-award
+  - https://www.peace-sport.org/news/vinicius-junior-wins-socrates-award-at-the-2023-ballon-dor-ceremony/
+  - https://www.besoccer.com/new/vinicius-wins-socrates-2023-award-for-his-humanitarian-work-1287586
+  - https://www.90min.com/what-is-socrates-award-past-winners-nominees
+  - https://www.olympics.com/en/news/ballon-dor-2025-all-winners-all-awards-complete-list-live-updates
+  - https://www.peace-sport.org/news/h-s-h-prince-albert-ii-and-peace-and-sport-welcome-the-xana-foundation-winner-of-the-2025-socrates-award-in-monaco-2/
+  - https://www.monaco-tribune.com/en/2025/09/ballon-dor-2025-ceremony-princess-charlene-presents-socrates-prize-to-xana-foundation/
+  - https://www.gamereactor.eu/luis-enriques-xana-foundation-named-after-his-late-daughter-wins-socrates-award-for-humanitarian-work-1605953/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Review policy
 
