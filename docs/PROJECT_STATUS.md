@@ -15576,6 +15576,119 @@ either a fresh source lead for Copa América's captain-sourcing problem or a
 genuinely different quality angle (accessibility, performance, SEO, or a
 fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live site).
 
+### Save-Data-aware service worker precaching - added 2026-09-03 (fifty-sixth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` found nothing
+new beyond the still-blocked `typescript` 7 entry, `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline (same one confirmed
+false positive).
+
+Tried the content angle first, per this routine's own Copa América > Nations
+League > Ballon d'Or > Golden Boot priority order and the fifty-fifth run's
+own closing note. Re-checked Copa América winning captains 1975-2010 - no new
+source lead, stays out of scope (three-times-confirmed contradictory
+sourcing). Then re-checked UEFA Nations League's top-scorer idea one more
+time with a fresh edition to test it against: a WebSearch for the 2025
+Finals (the most recently completed edition, held after the thirty-ninth
+run's original 2023-based "not viable" finding) turned up a three-way tie -
+Kylian Mbappé, Cristiano Ronaldo and Lamine Yamal, 2 goals each - the same
+multi-way-tie shape that has now ruled this idea out for every completed
+edition checked (2023, now 2025). With that confirmed a fourth time and
+every other individual-award/personnel idea across all six families already
+either shipped or documented as not viable (see the fifty-fifth run's own
+closing note), the content-mining angle is genuinely exhausted for now, not
+just this run's opinion of it.
+
+Pivoted to the quality-angle fork the last several runs' closing notes have
+pointed at. The forty-seventh run's own note had flagged
+`prefers-reduced-data` (the CSS media feature) as the last unexamined OS
+accessibility preference, but judged it likely low-yield: this site has
+almost no heavy media (no video, no large images beyond the OG card and PWA
+icons) for a CSS-level "don't load this background image" rule to act on.
+That judgment held up - but looking for the actual substantive equivalent
+of "the reader has told their browser they're on a metered or slow
+connection" turned up a real, previously-unexamined gap: the Network
+Information API's `navigator.connection.saveData` signal (the real Save-Data
+preference; the CSS media feature is a thin, less-supported wrapper around
+the same underlying browser setting) as it applies to this site's own PWA
+offline mode.
+
+`src/pages/sw.js.ts` generates the site's service worker, which precaches 37
+URLs on install - every nav page in both languages, plus the manifests and
+icons (`buildPrecacheUrls()` in `src/lib/offlineCache.ts`) - completely
+unconditionally, for every visitor, the instant the service worker installs.
+That is a genuine, real conflict with a reader who has explicitly told their
+browser to minimize data use: this site was downloading ~37 pages' worth of
+HTML to their device whether they asked for offline reading or not, with no
+way to opt out short of not installing the PWA at all.
+
+**The fix:** added `selectInstallCacheUrls(precacheUrls, homeUrlEn,
+homeUrlHr, saveData)` to `src/lib/offlineCache.ts` - returns just the two
+home-page URLs (English + Croatian, deduped if ever identical) when
+`saveData` is true, the full precache list otherwise. `saveData` being
+`undefined` (every browser that doesn't support the Network Information API)
+resolves to the full list too, the same as today's existing behavior, so
+this is purely additive - nobody's offline experience gets worse, only a
+Save-Data reader's first-load data use gets smaller. Since the generated
+`sw.js` script is a template string with no module imports (it has to run as
+plain, dependency-free JS in the service worker's own global scope), the
+same decision is mirrored inline as a new `installCacheUrls()` function in
+`src/pages/sw.js.ts`'s generated script, checking
+`self.navigator.connection.saveData` at install time and falling back to
+`PRECACHE_URLS` when that chain is falsy/unsupported. Nothing a Save-Data
+reader skips at install is gone forever: the fetch handler's existing
+cache-on-read behavior still caches any page the moment they actually visit
+it, so offline reading keeps working for everything they've opened - they
+just don't get every page silently pre-downloaded in the background for
+pages they may never read.
+
+Bumped `CACHE_VERSION` from `v3` to `v4` so the `activate` handler's existing
+stale-cache-eviction logic clears out any existing installs' old
+unconditionally-precached cache and replaces it under the new logic, rather
+than leaving two caches side by side.
+
+**Tests:** 4 new `describe('selectInstallCacheUrls', ...)` cases in
+`tests/unit/offlineCache.test.ts` (Save-Data off -> full list, Save-Data
+`undefined` -> full list, Save-Data on -> two home URLs, Save-Data on with
+identical EN/HR home URLs -> deduped to one). A real
+`navigator.connection.saveData` override isn't something Playwright can
+inject into a service worker's own global scope (unlike a page's `window`,
+which `addInitScript` can reach) - rather than skip e2e coverage entirely,
+added one new test in `tests/e2e/mobile.spec.ts` that fetches the generated
+`/football-reference/sw.js` directly and asserts the Save-Data branch and
+`installCacheUrls()` wiring are actually present in what ships, while the
+unit tests above cover the decision logic itself with full confidence.
+
+No `content/*.md` file was touched, so no PDF regeneration was needed -
+neither `src/lib/offlineCache.ts` nor `src/pages/sw.js.ts` is a tracked PDF
+source file.
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints
+across 168 files), `pnpm test` (**517/517** unit, up from 513 - this run's 4
+new cases), `pnpm build` (711 pages, unchanged), `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache` (37 URLs, unchanged - the
+precache *list* itself didn't change, only when the service worker uses all
+of it vs. just the two home pages), `check:perf` (heaviest page
+`hr/records`, 574.1 KB, unchanged - no content edit this run), `check:pdfs`
+(700/700 fresh, unaffected). A full cold-start `PW_EXECUTABLE_PATH=/opt/
+pw-browsers/chromium pnpm test:e2e` run: **843/843 passed** (10.9 minutes,
+up from 842 - the one new sw.js-content test), no pre-existing assertion
+needed updating.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still needs a genuinely different
+verification path than general WebSearch summaries - now unchanged since the
+forty-sixth run's findings). With content-mining confirmed exhausted across
+every competition/award family (this run's own Nations League re-check makes
+a fourth independent confirmation) and this run's own flagged accessibility
+gap now closed, the next intensive run likely needs either a fresh source
+lead for the captain-sourcing problem or another genuinely different quality
+angle (performance, SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md`
+against the live site) - simply repeating the standing health check with no
+new angle is the weakest fallback at this point, given how many consecutive
+runs have already come back byte-identical.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
@@ -15627,6 +15740,13 @@ fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live site).
   depends on `.skip-link` and `<Nav />`'s root `<header class="site-header">`
   staying direct siblings in `BaseLayout.astro`'s markup; if either ever
   gets wrapped in another element, this rule silently stops matching.
+- The service worker (`src/pages/sw.js.ts`) only precaches every nav page on
+  install for a reader whose browser reports `navigator.connection.saveData`
+  as falsy/unsupported; with Save-Data on, install only caches the two home
+  pages - see the 2026-09-03 "Save-Data-aware service worker precaching"
+  entry. Anything else still gets cached the moment it's actually visited via
+  the existing fetch-handler cache-on-read path, so offline reading for
+  already-opened pages is unaffected either way. `CACHE_VERSION` is `v4`.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

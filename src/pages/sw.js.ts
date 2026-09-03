@@ -8,7 +8,7 @@ export const prerender = true;
 // activate handler evicts the old cache instead of leaving stale pages
 // behind forever. Plain string, not a build timestamp, so rebuilds without
 // a real change don't force every visitor to re-download everything.
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 
 // A tiny offline-reading service worker, generated at build time so it can
 // bake in the real BASE_PATH (see astro.config.mjs) and the current nav
@@ -19,7 +19,9 @@ const CACHE_VERSION = 'v3';
 // then the cached home page for that same language, when offline.
 // Everything else (CSS, images, the manifest) is cache-first, filled in as
 // pages are visited, so a reader who has opened a page once can reopen it
-// offline later.
+// offline later. A reader with the browser's Save-Data preference on skips
+// the eager on-install download of every nav page - see installCacheUrls()
+// below and selectInstallCacheUrls() in src/lib/offlineCache.ts.
 export const GET: APIRoute = () => {
   const precacheUrls = buildPrecacheUrls(import.meta.env.BASE_URL);
   // The home page is always the first precached URL (see buildPrecacheUrls) -
@@ -45,11 +47,22 @@ function homeUrlFor(pathname) {
   return pathname === HR_PREFIX || pathname.startsWith(HR_PREFIX + '/') ? HOME_URL_HR : HOME_URL_EN;
 }
 
+function installCacheUrls() {
+  // A reader with the browser's Save-Data preference on (metered/slow
+  // connection) only gets the two home pages precached, not every nav page
+  // in both languages - see selectInstallCacheUrls() in
+  // src/lib/offlineCache.ts, which this mirrors. self.navigator.connection
+  // is unsupported in some browsers, so this stays undefined (falsy) there,
+  // the same as today's full-precache behavior.
+  const saveData = Boolean(self.navigator && self.navigator.connection && self.navigator.connection.saveData);
+  return saveData ? Array.from(new Set([HOME_URL_EN, HOME_URL_HR])) : PRECACHE_URLS;
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .then((cache) => cache.addAll(installCacheUrls()))
       .then(() => self.skipWaiting())
   );
 });
