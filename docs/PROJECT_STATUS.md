@@ -15751,6 +15751,111 @@ a deliberate look at the Vitest 5 upgrade, or another genuinely different
 quality angle (performance, SEO, or a fresh read of
 `docs/WEBSITE_REQUIREMENTS.md` against the live site).
 
+### Vitest 4 -> 5 major-version upgrade - added 2026-09-03 (fifty-eighth intensive run)
+
+Followed this routine's own Copa América > Nations League > Ballon d'Or >
+Golden Boot priority order first: re-checked Copa América's 1975-2010
+winning-captain gap once more via `WebSearch`, and this time it surfaced a
+real, multi-source-corroborated lead for 1979 that no prior run's search
+phrasing had turned up - CONMEBOL's own site and Hugo Talavera's Wikipedia
+page both independently describe him as Paraguay's national-team captain
+during that campaign, and several Paraguayan outlets (ABC Color, Diario HOY,
+La Nación, La Tribuna) cover his captaincy in detail, including that he
+scored in the semi-final second leg against Brazil. It stops short of
+confirming him for this page's own "lifts the trophy on the podium"
+definition, though: the same sources also describe him picking up an injury
+mid-tournament and being replaced by Julio César Romero for the second
+Brazil semi-final, and none of the search results pinned down who was on
+the pitch - Talavera or a stand-in - for the actual trophy lift after the
+decisive 0-0 play-off in Buenos Aires on 11 December 1979 (a three-match
+final format: Paraguay won the first leg 3-0, Chile the second 1-0, then a
+neutral-venue play-off Paraguay won by some means the search snippets don't
+specify - possibly penalties or a countback rule). A follow-up search on
+1983 found only that Uruguay's goalkeeper Rodolfo Rodríguez is listed first
+in CONMEBOL's own historical squad photo caption, with no source calling
+him or anyone else the captain. Given this page's own standing caution
+about "contradictory or unconfirmed captain names" for pre-2011 editions,
+neither is solid enough to add this run - but 1979 is now a concrete,
+narrower research question for next time (who lifted the trophy on 11
+December 1979) rather than the fully-open gap every prior run has re-hit,
+so it's worth a dedicated pass rather than a repeat of this same broad
+query. Nations League's individual-award ideas are already confirmed not
+viable four times over and Ballon d'Or/Golden Boot's companion-award sets
+are both already complete, so per this file's own "don't repeat a
+confirmed-exhausted angle" standing advice, moved to the dependency/quality
+fork - specifically the fifty-seventh run's own closing note flagging the
+available Vitest 4 -> 5 major upgrade as "found but didn't take
+unreviewed."
+
+`WebSearch` for Vitest 5's breaking changes turned up the headline items:
+`test.sequential`/`describe.sequential` removed (use `concurrent: false`
+instead), `clearMocks` now defaults to `true` (mock call history is reset
+before every test, though implementations are left intact), browser-mode
+locators now serialize as an object instead of a bare selector string, and
+a new Node.js >=22.12.0 / Vite >=6.4.0 floor. None apply here:
+`vitest.config.ts` has no `sequential` usage, no workspace file, and no
+browser-mode config; this environment's `node --version` is `v22.22.2`,
+already above the new floor. The one item worth checking by hand was
+`clearMocks` - a behavior change, not just a removed option - so grepped
+`tests/unit/` for `vi.fn`/`vi.mock`/`vi.spyOn` (8 call sites across 4 files:
+`competition.test.ts`, `teamCompetitions.test.ts`, `homeCards.test.ts`,
+`glossary.test.ts`) and confirmed none of them depends on a mock's call
+history surviving into a later test - each sets up and asserts its mock
+within the same `it()` block, so the new default is a no-op for this suite.
+
+Ran `pnpm add -D vitest@5.0.0 @vitest/coverage-v8@5.0.0` (kept both packages
+in lockstep, as they've always needed to be - a mismatched
+vitest/coverage-v8 major pairing is Vitest's own most common upgrade
+footgun, avoided here by bumping both in the same command). `pnpm test`
+(517/517 unit) and `pnpm test:coverage` both passed with **zero source or
+config changes required** - no test file uses a v5-removed API, and
+`vitest.config.ts`'s `defineConfig` shape type-checks unchanged.
+Coverage held at 99.91% statements / 100% functions / 100% lines; the
+branch figure prints as 99.43% now (698/702) rather than v4's 99.42% - the
+same 698/702 branches covered, just v5's reporter rounding the identical
+fraction one hundredth of a percent differently, not a real change (the
+four uncovered lines are the same `quiz.ts`/`sources.ts`/`tableSort.ts`/
+`url.ts` lines every audit since 2026-08-23 has classified as defensively
+unreachable).
+
+Full standing health check clean: `pnpm lint` (**0 errors/warnings/hints**
+across 168 files), `pnpm build` (711 pages, unchanged), `check:links` (715
+pages), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+`check:perf` (heaviest page still `hr/records`, 574.1 KB, unchanged - no
+content edit this run), `check:pdfs` (700/700 fresh, unaffected - neither
+`vitest.config.ts` nor any test file is a PDF source), `pnpm dlx knip
+--no-config-hints` (same one confirmed false positive as every prior run).
+A full cold-start `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+test:e2e` run (Playwright, unaffected by this change but re-run anyway as
+this routine's standing practice): **843/843 passed** (13.7 minutes),
+unchanged count, no pre-existing assertion needed updating - confirms the
+Vitest major bump introduced no behavioral regression anywhere in the site
+or its test suites.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7 - still blocked on `@astrojs/check`'s `typescript:
+'^5.0.0 || ^6.0.0'` peer ceiling, re-confirmed via `npm view
+@astrojs/check@latest peerDependencies` this run too - and `docs/SOURCES.md`
+link-liveness, still blocked by this environment's outbound network policy
+against `en.wikipedia.org` specifically), plus the narrower Copa América
+1979 captain question this run's own research turned up: search specifically
+for who was on the pitch to lift the trophy after the 11 December 1979
+neutral-venue play-off in Buenos Aires (Paraguay 0-0 Chile, Paraguay
+champion) - Hugo Talavera is well-corroborated as Paraguay's captain that
+year but is also documented as injured and substituted during the
+semi-finals, so it needs one more targeted source before it can be added,
+not a repeat of this run's broader query. 1983's captain is still fully
+open - no source this run found named anyone as Uruguay's captain, only
+that goalkeeper Rodolfo Rodríguez led the historical squad photo caption.
+With content-mining confirmed exhausted across every competition/award
+family and this run's own flagged dependency angle now also addressed, the
+next intensive run likely needs either that narrowed 1979 lookup or a
+genuinely different quality angle (performance, SEO, or a fresh read of
+`docs/WEBSITE_REQUIREMENTS.md` against the live site) - simply repeating the
+standing health check with no new angle is the weakest fallback at this
+point, given how many consecutive runs
+have already come back byte-identical.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
