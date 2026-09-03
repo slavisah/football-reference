@@ -1583,6 +1583,73 @@ standing quirks.
   SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live
   site).
 
+- **Save-Data-aware service worker precaching**: closed 2026-09-03 (fifty-sixth
+  intensive run) - a standing health check first (`pnpm install`, `pnpm
+  outdated` found nothing new beyond the still-blocked `typescript` 7 entry,
+  `pnpm dlx knip --no-config-hints` matched every prior run's baseline). Tried
+  the content angle first per this routine's own priority order and this
+  entry's own closing note: confirmed the 2025 UEFA Nations League Finals top
+  scorer is a fresh three-way tie (Mbappé/Ronaldo/Yamal, 2 goals each) via
+  WebSearch, reconfirming a fourth time that Nations League has no reliable
+  single-name top-scorer award across any completed edition; Copa América
+  winning captains 1975-2010 still has no new source lead. With the
+  content-mining angle now exhausted across all six competition/award
+  families (every reliably-sourceable individual-award and personnel section
+  is live, per the fifty-fifth run's own closing note), pivoted to the
+  quality-angle fork instead. Found a genuine, previously-flagged gap: the
+  forty-seventh run's own note identified `prefers-reduced-data` (the CSS
+  media feature) as the one standing OS accessibility preference left
+  unexamined but judged it likely low-yield since the site has almost no
+  heavy media. The real substantive equivalent turned out to be the Network
+  Information API's `navigator.connection.saveData` signal (the actual
+  Save-Data browser preference, of which the CSS media feature is a thin,
+  poorly-supported wrapper) applied to the PWA's own offline service worker
+  (`src/pages/sw.js.ts`): its install handler unconditionally downloads and
+  caches all 37 precached URLs (every nav page in both languages, plus
+  static assets) for every visitor on first load, regardless of whether
+  they've told the browser they're on a metered or slow connection - a real
+  conflict with a data-conscious reader that a heavier-media site wouldn't
+  even need this analysis to find. Added `selectInstallCacheUrls()` to
+  `src/lib/offlineCache.ts` (returns just the two home-page URLs when
+  Save-Data is on, the full precache list otherwise, falling back to the
+  full list when the API is unsupported/`undefined` so this is purely
+  additive) and mirrored the same logic inline in the generated `sw.js`
+  script's new `installCacheUrls()` function (checking
+  `self.navigator.connection.saveData` at install time), since the SW's
+  script is baked into a template string with no module imports. Everything
+  a Save-Data reader skips at install still gets cached the moment they
+  actually visit it, via the fetch handler's existing cache-on-read
+  behavior - offline reading still works for anything they've opened, just
+  isn't pre-downloaded for pages they may never visit. Bumped `CACHE_VERSION`
+  to `v4` so the `activate` handler evicts the old unconditional-precache
+  entry for existing installs. New unit tests (4 cases) in
+  `tests/unit/offlineCache.test.ts` covering the on/off/unsupported/dedup
+  branches. A real `navigator.connection.saveData` emulation isn't
+  controllable from Playwright, so the new e2e test in
+  `tests/e2e/mobile.spec.ts` instead fetches the generated `/sw.js` and
+  asserts its Save-Data branch and `installCacheUrls()` wiring are present -
+  the actual decision logic is what the unit tests cover with full
+  confidence. No content file touched, so no PDF regeneration needed (neither
+  `src/lib/offlineCache.ts` nor `src/pages/sw.js.ts` is a PDF source file).
+  Full standing health check clean: `pnpm lint` (0/0/0), `pnpm test`
+  (517/517 unit, up from 513 - the 4 new cases), `pnpm build` (711 pages,
+  unchanged), `check:links` (715 pages), `check:sitemap` (710 entries),
+  `check:precache` (37 URLs, unchanged - the precache *list* didn't change,
+  only when it's used), `check:perf` (heaviest page `hr/records`, 574.1 KB,
+  unchanged - no content edit), `check:pdfs` (700/700 fresh, unaffected),
+  full cold-start `pnpm test:e2e` (843/843 passed, 10.9 minutes, up from 842
+  - the one new sw.js-content test). **Left for a future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness), plus Copa América winning captains for
+  1975-2010. With content-mining now confirmed exhausted across every
+  competition/award family and this run's own accessibility-preference gap
+  now closed, the next pass likely needs either a fresh source lead for the
+  captain-sourcing problem or another genuinely different quality angle
+  (performance, SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md`
+  against the live site) - a repeat standing health check alone, with no new
+  angle, is the weakest fallback at this point given how many consecutive
+  runs have already come back clean.
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

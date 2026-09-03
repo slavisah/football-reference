@@ -45,3 +45,25 @@ export function buildPrecacheUrls(basePath: string): string[] {
 
   return Array.from(new Set(urls));
 }
+
+/**
+ * Picks which URLs the service worker's install handler should eagerly
+ * download and cache. A reader with the browser's Save-Data preference on
+ * (`navigator.connection.saveData`, the Network Information API's signal for
+ * "I'm on a metered or slow connection, don't fetch more than I asked for")
+ * gets only the two home pages instead of every nav page in both languages -
+ * everything else still gets cached the moment they actually visit it, via
+ * the fetch handler's existing cache-on-read behavior, so offline reading
+ * still works for anything they've opened, just not pre-downloaded for pages
+ * they may never visit. `saveData` is `undefined` in every browser that
+ * doesn't support the API, which this treats the same as `false` (today's
+ * existing full-precache behavior), so this is purely additive.
+ */
+export function selectInstallCacheUrls(
+  precacheUrls: string[],
+  homeUrlEn: string,
+  homeUrlHr: string,
+  saveData: boolean | undefined,
+): string[] {
+  return saveData ? Array.from(new Set([homeUrlEn, homeUrlHr])) : precacheUrls;
+}
