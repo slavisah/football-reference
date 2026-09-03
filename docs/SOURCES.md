@@ -707,6 +707,42 @@ Primary sources should be preferred.
   - https://www.goal.com/en/news/ronaldo-wins-euro-2020-golden-boot-on-tie-breaker-over-schick/wzri2apw8gef1bnfwv1uauvhf
   - https://www.espn.com/soccer/story/_/id/40558317/euro-2024-golden-boot-harry-kane-dani-olmo-6-winners
   - https://www.espn.com/soccer/story/_/id/49397919/kylian-mbappe-wins-golden-boot-2026-world-cup-lionel-messi-goalless-final
+- EURO Silver Boot and Bronze Boot winners (added 2026-09-03, intensive run):
+  a new "EURO Silver Boot and Bronze Boot winners" note section on
+  `content/golden-boot.md`, the EURO-side companion to the 2026-09-02 World
+  Cup Silver/Bronze Boot section, following up on that run's own "whether
+  EURO has any equivalent runner-up scoring recognition" open question.
+  Scoped to only the three editions where a single Golden Boot winner was
+  ever named by tiebreak (2012, 2016, 2020) - before 2012 and since 2024 the
+  award reverts to full joint winners with no ranked runner-up to show, the
+  same "since the era actually started" scoping this page's own World Cup
+  section and several other award-history sections across the site already
+  use. **2012 deliberately excluded even though UEFA's own tiebreak named a
+  single winner:** this page's EURO table intentionally keeps 2012 as a
+  six-way "Multiple" tie (see the 2026-08-28 tie-resolution audit entry
+  above, which found this load-bearing for `buildChampionsSummary()`'s
+  Cristiano Ronaldo award count) - listing Fernando Torres/Mario Gómez/Alan
+  Dzagoev as a distinguished 2012 podium in this new section would directly
+  contradict that row on the same page, so this run left 2012 out rather
+  than reopen that settled tension. Verified 2016 (Griezmann/Ronaldo/Giroud)
+  and 2020 (Ronaldo/Schick/Benzema) via two independent WebSearch passes
+  each, with a third targeted re-check of 2020's four-way tie on four goals
+  (Kane, Benzema, Forsberg, Lukaku) - each source agreed Benzema's Bronze
+  Boot came down to fewest minutes played (349, ahead of Forsberg's 371,
+  Lukaku's 444 and Kane's 649) among the four. **No discrepancies found**
+  across either edition:
+  - https://bleacherreport.com/articles/2651265-antoine-griezmann-wins-euro-2016-golden-boot-stats-comments-and-reaction
+  - https://www.goal.com/en-in/news/ronaldo-gives-nani-his-euro-2016-silver-boot-award/1lc2rzjm24u8g1kug006wglrce
+  - https://grokipedia.com/page/UEFA_European_Championship_awards
+  - https://www.mykhel.com/football/euro-2020-full-list-of-award-winners-golden-boot-prize-money-records-and-statistics-170481.html
+  - https://www.goal.com/en/news/ronaldo-wins-euro-2020-golden-boot-on-tie-breaker-over/wzri2apw8gef1bnfwv1uauvhf
+  - https://onefootball.com/en/news/kane-lukaku-benzema-who-were-top-scorers-as-ronaldo-clinched-euro-2020-golden-boot-33360900
+  - https://www.givemesport.com/1720157-kane-lukaku-benzema-who-were-top-scorers-as-ronaldo-clinched-euro-2020-golden-boot/
+  - Direct WebFetch/curl to primary-source domains remains blocked by this
+    environment's egress policy, the same standing caveat every recent audit
+    in this file has noted; verification relied on WebSearch's synthesized
+    snippets, cross-checked across independent queries and source domains
+    rather than a single query's summary.
   - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/adidas-golden-boot-race-top-scorer
 - Champion/Runner-up/Final-score audit (2026-08-05, intensive run): the core
   **Winner**, **Runner-up**, and **Final** (score line) columns in

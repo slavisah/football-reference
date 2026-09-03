@@ -1496,6 +1496,57 @@ standing quirks.
   genuinely different quality angle (accessibility, performance, SEO, or a
   fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live site).
 
+- **UEFA EURO Silver Boot and Bronze Boot winners**: closed 2026-09-03
+  (fifty-fourth intensive run) - a standing health check first (`pnpm
+  install`, `pnpm outdated` found nothing new beyond the still-blocked
+  `typescript` 7 entry, `pnpm dlx knip --no-config-hints` matched every prior
+  run's baseline, full lint/unit/build/`check:links`/`check:sitemap`/
+  `check:precache`/`check:perf`/`check:pdfs` all clean, 513/513 unit tests,
+  711 pages built). Acted directly on the fifty-third run's own open question
+  ("whether EURO has any equivalent runner-up scoring recognition worth
+  researching"): confirmed via several WebSearch passes that UEFA did name a
+  Silver Boot/Bronze Boot podium at EURO, but only for the three editions
+  where a single Golden Boot winner was ever chosen by tiebreak (2012, 2016,
+  2020) - before 2012 and since 2024 the award reverts to full joint winners
+  with no ranked runner-up, the same "since the era actually started" scoping
+  several other award-history sections already use. **2012 deliberately
+  excluded from the new section** even though UEFA's own tiebreak named a
+  single winner (Fernando Torres, ahead of Mario Gómez's Silver Boot and Alan
+  Dzagoev's Bronze Boot): this page's own EURO table intentionally keeps 2012
+  as a six-way "Multiple" tie (the 2026-08-28 tie-resolution audit found this
+  load-bearing for `buildChampionsSummary()`'s Cristiano Ronaldo award
+  count), so naming a distinguished 2012 podium in the new section would
+  directly contradict that row on the same page - left out rather than
+  reopen that settled tension. Added an "EURO Silver Boot and Bronze Boot
+  winners" section to `content/golden-boot.md` covering 2016 (Griezmann/
+  Ronaldo/Giroud) and 2020 (Ronaldo/Schick/Benzema), each verified via two
+  independent WebSearch passes plus a third targeted re-check of 2020's
+  four-way tie on four goals (Kane, Benzema, Forsberg, Lukaku), resolved by
+  Benzema's fewest minutes played (349) among them. Wired into
+  `golden-boot.astro`'s EURO `noteHeadings` and hand-translated into
+  `hr/competitions/golden-boot.astro`. `content/golden-boot.md`'s
+  `lastReviewed` bumped to 2026-09-03. New e2e coverage (EN + HR,
+  `.notes__card` counts 6 -> 7 on both language pages). No page-weight budget
+  raise needed this run (570.9 KB vs. the 590 KB budget, ~19 KB headroom
+  left). All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs`
+  then `pnpm check:pdfs`, using the
+  `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback this environment's
+  Chromium needs, since this content edit and the `docs/SOURCES.md` addition
+  both mark every PDF's shared References section stale, by design). Full
+  standing health check clean including a full cold-start `pnpm test:e2e`:
+  840/840 passed (10.4 minutes, unchanged count - this run extended two
+  existing `test()` blocks rather than adding new ones, matching the
+  fifty-third run's own 840/840 baseline). See `docs/PROJECT_STATUS.md`'s
+  matching entry for detail. **Left for a future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness), plus Copa América winning captains for
+  1975-2010. With both the World Cup's and EURO's Golden Boot tables now
+  carrying every reliably-sourceable runner-up podium, the next content-gap
+  pass likely needs either a fresh source lead for Copa América's
+  captain-sourcing problem or a genuinely different quality angle
+  (accessibility, performance, SEO, or a fresh read of
+  `docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

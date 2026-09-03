@@ -15379,6 +15379,110 @@ equivalent runner-up scoring recognition exists there, or a genuinely
 different quality angle (accessibility, performance, SEO, or a fresh read of
 `docs/WEBSITE_REQUIREMENTS.md` against the live site).
 
+### UEFA EURO Silver Boot and Bronze Boot winners - added 2026-09-03 (fifty-fourth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` found nothing
+new beyond the still-blocked `typescript` 7 entry, `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline (same one confirmed
+false positive), full lint/unit/build/`check:links`/`check:sitemap`/
+`check:precache`/`check:perf`/`check:pdfs` all clean (513/513 unit tests, 711
+pages built).
+
+Acted directly on the fifty-third run's own closing note: whether EURO has
+any equivalent runner-up scoring recognition worth researching. Several
+WebSearch passes confirmed UEFA did name a Silver Boot/Bronze Boot podium at
+EURO, but only for the three editions where a single Golden Boot winner was
+ever chosen by tiebreak - 2012, 2016 and 2020; before 2012 and from 2024
+onward the award reverts to full joint winners, with no runner-up ranking to
+show (2024's own six-way tie for the Golden Boot itself confirms this - there
+is no "second place" to speak of that year either).
+
+**2012 needed a judgment call.** UEFA's own tiebreak (assists, then fewest
+minutes) named Fernando Torres the outright 2012 Golden Boot winner, with
+Mario Gómez taking the Silver Boot and Alan Dzagoev the Bronze Boot - all
+confirmed via WebSearch. But this page's own EURO table has, since the
+2026-08-04/2026-08-07 Golden Boot audits, deliberately shown 2012 as a
+six-way "Multiple" tie rather than crediting Torres alone - the 2026-08-28
+tie-resolution audit traced this to `buildChampionsSummary()`'s doc comment
+in `src/lib/editions.ts`, which documents that 2012's tie-share is
+load-bearing for Cristiano Ronaldo's correct "2 EURO Golden Boots" count (his
+2012 share plus his outright 2020 win) in the site's "Most awards" ranking.
+Naming a distinguished Torres/Gómez/Dzagoev podium in a new note section on
+the same page would directly contradict that same-page table row - a
+different kind of inconsistency than any prior Silver/Bronze Boot section
+has had to navigate, since the World Cup's own table never disputes a single
+year's winner. Rather than reopen a settled, documented tension, this run
+left 2012 out of the new section entirely, with the reasoning spelled out
+inline (see below) rather than silently.
+
+Verified 2016 and 2020 via two independent WebSearch passes each, plus a
+third targeted re-check of 2020's four-way tie on four goals (Harry Kane,
+Karim Benzema, Emil Forsberg, Romelu Lukaku): every source agreed Benzema's
+Bronze Boot came down to fewest minutes played (349, ahead of Forsberg's 371,
+Lukaku's 444 and Kane's 649) among the four. **No discrepancies found** for
+either edition - see `docs/SOURCES.md`'s matching new entry for the full
+citation list and methodology.
+
+Added an "EURO Silver Boot and Bronze Boot winners" section to
+`content/golden-boot.md`, between "EURO notes" and "EURO memorable moments"
+(mirroring where the World Cup's own equivalent section sits relative to its
+neighbors):
+- An opening bullet states the three-edition scope and why the award reverts
+  to joint winners outside it.
+- **2012:** its own bullet explains the exclusion and points to the tie's
+  documented load-bearing role, rather than just omitting the year silently.
+- **2016:** Antoine Griezmann (Golden), Cristiano Ronaldo (Silver, 3 goals/3
+  assists), Olivier Giroud (Bronze, 3 goals/2 assists, fewer minutes than a
+  tied Dimitri Payet).
+- **2020:** Patrik Schick (Silver, 5 goals, no tiebreak assist against
+  Ronaldo's one), Karim Benzema (Bronze, 4 goals, fewest minutes among the
+  four tied scorers).
+
+Wired into `competitions/golden-boot.astro`'s EURO `noteHeadings` (English)
+and hand-translated into `hr/competitions/golden-boot.astro`'s own `notes`
+array as "Dobitnici Srebrne i Brončane kopačke - EURO" (Croatian, matching
+the page's existing "Srebrna"/"Brončana kopačka" terminology from its World
+Cup equivalent section), including the same 2012 exclusion reasoning
+translated in full. `content/golden-boot.md`'s `lastReviewed` bumped to
+2026-09-03.
+
+**Tests:** new EN + HR heading/content assertions in `tests/e2e/
+mobile.spec.ts`, extending the page's existing "shows the World Cup notes and
+EURO notes sections" test (`.notes__card` count 6 -> 7 for both languages)
+rather than adding a new `test()` block, matching that test's existing shape.
+
+No page-weight budget raise needed this run: a two-edition, three-name
+section is smaller than the World Cup's own five-edition section.
+`hr/records` came in at 570.9 KB, still within the 590 KB budget (~19 KB of
+headroom left).
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs, since this content edit and the
+`docs/SOURCES.md` addition both mark every PDF's shared References section
+stale, by design).
+
+Full standing health check clean: `pnpm lint` (0 errors/warnings/hints),
+`pnpm test` (513/513 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 570.9 KB, within the
+590 KB budget), `check:pdfs` (700/700 fresh), full cold-start `pnpm
+test:e2e` (840/840 passed, 10.4 minutes, unchanged count - this run extended
+two existing `test()` blocks rather than adding new ones, matching the
+fifty-third run's own 840/840 baseline exactly). No pre-existing assertion
+needed updating this time.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still needs a genuinely different
+verification path than general WebSearch summaries). With both the World
+Cup's and EURO's Golden Boot tables now carrying every reliably-sourceable
+runner-up podium, the next content-gap pass likely needs either a fresh
+source lead for Copa América's captain-sourcing problem or a genuinely
+different quality angle (accessibility, performance, SEO, or a fresh read of
+`docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
