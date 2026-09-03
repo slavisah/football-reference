@@ -1674,6 +1674,28 @@ standing quirks.
   winning captains for 1975-2010, plus a deliberate look at the available
   Vitest 4 -> 5 major upgrade (not taken unreviewed this run).
 
+- **Vitest 4 -> 5 major-version upgrade**: closed 2026-09-03 (fifty-eighth
+  intensive run) - the fifty-seventh run's own closing note ("a deliberate
+  look at the Vitest 4 -> 5 major-version upgrade this run found available
+  but didn't take unreviewed") acted on. `WebSearch` for the breaking-changes
+  list confirmed none apply to this repo (`sequential` removed, `clearMocks`
+  now defaults `true`, browser-mode locator serialization, Node >=22.12.0 -
+  this environment is already on `v22.22.2`); manually grepped the 8
+  `vi.fn`/`vi.mock`/`vi.spyOn` call sites across 4 test files to confirm the
+  `clearMocks` default change is a no-op here (no test relies on mock call
+  history surviving into a later test). Bumped `vitest`/`@vitest/coverage-v8`
+  together (4.1.11 -> 5.0.0) via `pnpm add -D`. Zero source or config changes
+  needed: `pnpm test` (517/517 unit, unchanged), `pnpm test:coverage`
+  (99.91%/99.43% - same 698/702 branches as before, only the printed
+  percentage's rounding changed), full standing health check
+  (lint/build/`check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+  `check:pdfs`/`knip`) and a full cold-start `pnpm test:e2e` (843/843, 13.7
+  min, unchanged count) all clean. See `docs/PROJECT_STATUS.md`'s matching
+  entry for detail, including a genuinely new but not-yet-conclusive Copa
+  América 1979 captain lead (Hugo Talavera) this run's research turned up
+  while re-checking the standing captain-sourcing gap - narrowed to one
+  specific follow-up question rather than closed, left for next time.
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned
