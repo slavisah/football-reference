@@ -1650,6 +1650,30 @@ standing quirks.
   angle, is the weakest fallback at this point given how many consecutive
   runs have already come back clean.
 
+- **Astro dependency bump (7.2.10 -> 7.3.1)**: closed 2026-09-03
+  (fifty-seventh intensive run) - re-checked Copa América winning captains
+  1975-2010 once more (still no new source lead) and confirmed Nations
+  League/Ballon d'Or/Golden Boot content angles already exhausted per prior
+  runs' closing notes, so moved to the dependency/quality fork. `pnpm
+  outdated` found one new in-range release, `astro` 7.2.10 -> 7.3.1 (a minor
+  bump within the already-declared `^7.2.10` range); installed via `pnpm
+  update astro`. `@vitest`/`vitest` 4.1.11 -> 5.0.0 and `typescript` 5.9.3 ->
+  7.0.2 are both major-version jumps outside their declared ranges - left for
+  a future run to evaluate deliberately rather than bundling into this same
+  patch commit; `typescript` 7 is still blocked by `@astrojs/check`'s
+  `typescript: '^5.0.0 || ^6.0.0'` peer ceiling, re-confirmed. Full standing
+  health check clean and unchanged from the fifty-sixth run's baseline:
+  `pnpm lint` (0/0/0), `pnpm test` (517/517 unit), `pnpm build` (711 pages),
+  `check:links`/`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs`
+  all clean, `pnpm dlx knip --no-config-hints` (same one confirmed false
+  positive), full cold-start `pnpm test:e2e` (843/843 passed, 8.4 minutes,
+  unchanged count) - confirms no regression from the astro bump. See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a future
+  pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa América
+  winning captains for 1975-2010, plus a deliberate look at the available
+  Vitest 4 -> 5 major upgrade (not taken unreviewed this run).
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned
