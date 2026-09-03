@@ -15689,6 +15689,68 @@ against the live site) - simply repeating the standing health check with no
 new angle is the weakest fallback at this point, given how many consecutive
 runs have already come back byte-identical.
 
+### Astro dependency bump (7.2.10 -> 7.3.1) - added 2026-09-03 (fifty-seventh intensive run)
+
+Followed this routine's own Copa América > Nations League > Ballon d'Or >
+Golden Boot priority order first: `WebSearch` for Copa América's 1979 and
+1983 winning-captain names (Paraguay, Uruguay) turned up the same
+unresolved gap every prior attempt has hit - source snippets confirm the
+champion nation and the year but not who wore the armband, even when
+searching with a `"(c)"` Wikipedia-squad-list-style query aimed
+specifically at surfacing a captain marker. No new source lead; stays out
+of scope, unchanged since the forty-sixth run's original finding. UEFA
+Nations League's individual-award ideas are already confirmed not viable
+four times over (see the fifty-sixth run's entry above), and Ballon
+d'Or/Golden Boot's companion-award sets are both already complete per the
+fifty-fifth/fifty-fourth runs' closing notes - so, per this file's own
+"don't repeat a confirmed-exhausted angle" standing advice, moved straight
+to the dependency/quality fork instead of re-running those same checks a
+fifth time.
+
+`pnpm outdated` (after a fresh `pnpm install`) showed one new in-range
+release beyond the standing blocked entries: `astro` `7.2.10` -> `7.3.1`
+(a minor bump, still inside the `^7.2.10` semver range already declared in
+`package.json`). `@vitest`/`vitest` `4.1.11` -> `5.0.0` and `typescript`
+`5.9.3` -> `7.0.2` are both major-version jumps outside their declared
+ranges - `typescript` 7 is the same standing blocker re-confirmed via `npm
+view @astrojs/check@latest peerDependencies` (still `^5.0.0 || ^6.0.0`),
+and a Vitest 4 -> 5 major bump is exactly the kind of higher-risk change
+this routine's own "small, verifiable slice per run" shape argues against
+taking unreviewed - left for a future run to evaluate deliberately (its own
+changelog/breaking-changes pass) rather than folding it into this same
+astro-patch commit.
+
+Ran `pnpm update astro`, which bumped both `package.json`'s
+`"astro": "^7.2.10"` -> `"^7.3.1"` and the lockfile. Astro 7.3 is a minor
+release within the already-adopted major (Astro's own upgrade-guide
+breaking changes are all scoped to major version boundaries, not this one),
+so no source-level migration was expected or needed - confirmed by a full
+health check afterward finding zero code changes required.
+
+Full standing health check clean: `pnpm lint` (**0 errors/warnings/hints**
+across 168 files), `pnpm test` (**517/517** unit, unchanged), `pnpm build`
+(711 pages, unchanged), `check:links` (715 pages), `check:sitemap` (710
+entries), `check:precache` (37 URLs), `check:perf` (heaviest page still
+`hr/records`, 574.1 KB, unchanged - no content edit this run), `check:pdfs`
+(700/700 fresh, unaffected - no content or PDF-source file touched), `pnpm
+dlx knip --no-config-hints` (same one confirmed false positive as every
+prior run). A full cold-start `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium
+pnpm test:e2e` run: **843/843 passed** (8.4 minutes), unchanged count, no
+pre-existing assertion needed updating - confirms the astro bump introduced
+no behavioral regression anywhere in the site.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (re-checked again this run, still no
+new source lead) and a deliberate look at the Vitest 4 -> 5 major-version
+upgrade this run found available but didn't take unreviewed. With content-
+mining confirmed exhausted across every competition/award family and this
+run's own dependency angle now also addressed, the next intensive run
+likely needs either a fresh source lead for the captain-sourcing problem,
+a deliberate look at the Vitest 5 upgrade, or another genuinely different
+quality angle (performance, SEO, or a fresh read of
+`docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
