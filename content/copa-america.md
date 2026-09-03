@@ -5,7 +5,7 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-09-01
+lastReviewed: 2026-09-02
 status: verified
 ---
 
@@ -220,6 +220,26 @@ A **second, independent cross-check** of the Final date column (2026-08-12, inte
 - **2021:** Lionel Messi (Argentina); Luis Díaz (Colombia) - 4 goals each.
 - **2024:** Lautaro Martínez (Argentina) - 5 goals.
 - Paolo Guerrero's three wins (2011, 2015, 2019) are the most by any player; Eduardo Vargas is the only player to win in consecutive editions (2015 and 2016).
+
+## Fair Play Award winners
+
+- CONMEBOL has named a team Fair Play Award, based on each squad's on-field disciplinary record, at every Copa América since 2011 - the same span this page's own Golden Glove award has existed for; no equivalent award existed at earlier editions.
+- **2011:** Uruguay - the award's first winner, on the team that also won the tournament.
+- **2015:** Peru.
+- **2016:** Argentina - Copa América Centenario.
+- **2019:** Brazil - the tournament's host and eventual champion.
+- **2021:** Brazil.
+- **2024:** Colombia - the tournament's runner-up.
+
+## Team of the Tournament winners
+
+- CONMEBOL's Technical Study Group has named an official Team of the Tournament (a "Best XI") at every Copa América since 2015, based on player performances across the whole competition. The 2011 edition's own ideal-team reporting was contradictory across sources (rival lists disagreed on as many as half the outfield names), so - the same caution behind this page's own Winning captains scoping - it is excluded rather than shipped unverified.
+- **2015:** Claudio Bravo (Chile, goalkeeper); Nicolás Otamendi (Argentina), Gary Medel (Chile), Jeison Murillo (Colombia), Marcelo Díaz (Chile), Javier Mascherano (Argentina), Arturo Vidal (Chile), Christian Cueva (Peru), Lionel Messi (Argentina), Paolo Guerrero (Peru), Eduardo Vargas (Chile) - hosts and champions Chile supplied five of the eleven, the most of any team.
+- **2016:** Claudio Bravo (Chile, goalkeeper); Mauricio Isla (Chile), Nicolás Otamendi (Argentina), Gary Medel (Chile), Jean Beausejour (Chile), Javier Mascherano (Argentina), Arturo Vidal (Chile), Charles Aránguiz (Chile), Lionel Messi (Argentina), Alexis Sánchez (Chile), Eduardo Vargas (Chile) - Copa América Centenario; the two finalists, Chile and Argentina, filled the entire eleven between them, Chile supplying eight.
+- **2019:** Alisson (Brazil, goalkeeper); Dani Alves (Brazil), Thiago Silva (Brazil), José Giménez (Uruguay), Miguel Trauco (Peru), Arthur (Brazil), Leandro Paredes (Argentina), Arturo Vidal (Chile), James Rodríguez (Colombia), Paolo Guerrero (Peru), Everton (Brazil) - champions Brazil supplied five, the most of any team; Lionel Messi's Argentina was left out entirely.
+- **2021:** Emiliano Martínez (Argentina, goalkeeper); Pervis Estupiñán (Ecuador), Marquinhos (Brazil), Cristian Romero (Argentina), Mauricio Isla (Chile), Yoshimar Yotún (Peru), Casemiro (Brazil), Rodrigo De Paul (Argentina), Luis Díaz (Colombia), Neymar (Brazil), Lionel Messi (Argentina) - champions Argentina supplied four, the most of any team.
+- **2024:** Emiliano Martínez (Argentina, goalkeeper); Alistair Johnston (Canada), Cristian Romero (Argentina), Davinson Sánchez (Colombia), Piero Hincapié (Ecuador), Rodrigo De Paul (Argentina), Manuel Ugarte (Uruguay), James Rodríguez (Colombia), Lionel Messi (Argentina), Lautaro Martínez (Argentina), Raphinha (Brazil) - champions Argentina supplied five, the most of any team.
+- Lionel Messi is the only player named in four of the five editions on this list, missing only 2019, when the selection panel left him out entirely despite Argentina reaching that tournament's semifinals. Claudio Bravo (2015 and 2016, both as champion with Chile) and Emiliano Martínez (2021 and 2024, both as champion with Argentina) are the only goalkeepers named in consecutive editions.
 
 ## Winning managers
 

@@ -4,7 +4,7 @@ slug: ballon-dor
 awardType: individual
 firstEdition: 1956
 lastCompletedEdition: 2025
-lastReviewed: 2026-09-01
+lastReviewed: 2026-09-03
 status: verified
 ---
 
@@ -131,6 +131,29 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 - **2023:** Emiliano Martínez (Argentina).
 - **2024:** Emiliano Martínez (Argentina) - the first goalkeeper to win the Yashin Trophy in consecutive years.
 - **2025:** Gianluigi Donnarumma (Italy) - his second Yashin Trophy, making him the second goalkeeper (after Martínez) to win it more than once.
+
+## Gerd Müller Trophy winners
+
+- France Football has also presented an award for the year's top goalscorer (club and country combined) alongside the Ballon d'Or every year since 2021; it was first awarded under the name "Striker of the Year" and renamed the Gerd Müller Trophy from 2022 onward, honoring the West Germany and Bayern Munich forward (1970 Ballon d'Or winner, see the Winners table above) after his death in August 2021 - unlike the Kopa and Yashin trophies above, it has no gap year, since it started the year after the 2020 cancellation rather than before it.
+- **2021:** Robert Lewandowski (Poland) - the award's first winner, under its original name.
+- **2022:** Robert Lewandowski (Poland) - the first winner under the renamed Gerd Müller Trophy, and the trophy's first repeat winner.
+- **2023:** Erling Haaland (Norway).
+- **2024:** Harry Kane (England) and Kylian Mbappé (France) - the trophy's first tie, both credited as joint winners on the same goal tally.
+- **2025:** Viktor Gyökeres (Sweden).
+
+## Johan Cruyff Trophy winners
+
+- France Football has also presented the Johan Cruyff Trophy, a companion "best men's coach" award named after the Netherlands great (three-time Ballon d'Or winner, see the Winners table above), alongside the Ballon d'Or every year since 2024 - the newest of the three companion trophies on this page, with no gap year since it started after the Kopa/Yashin/Gerd Müller trophies had already established the pattern.
+- **2024:** Carlo Ancelotti (Real Madrid) - the trophy's first winner, honored for Real Madrid's La Liga and UEFA Champions League double.
+- **2025:** Luis Enrique (Paris Saint-Germain) - honored for PSG's Ligue 1, Coupe de France and first-ever UEFA Champions League title.
+
+## Socrates Award winners
+
+- France Football has also presented the Sócrates Award, a companion humanitarian award named after Brazilian great Sócrates and presented in partnership with Peace and Sport, alongside the Ballon d'Or every year since 2022 - unlike the Kopa, Yashin, Gerd Müller and Johan Cruyff trophies above, it is not restricted to men's football performance: it has gone to a female footballer and, in 2025, to a charitable foundation rather than an individual player.
+- **2022:** Sadio Mané (Senegal) - the award's first winner, honored for funding a hospital, a secondary school and other infrastructure in his home village of Bambali.
+- **2023:** Vinícius Júnior (Brazil) - honored for Instituto Vini Jr.'s work against racism and educational inequality in Brazil.
+- **2024:** Jennifer Hermoso (Spain) - the award's first female recipient, honored for her advocacy against sexual abuse and harassment in sport.
+- **2025:** Xana Foundation - founded by Johan Cruyff Trophy winner Luis Enrique (see above) and his wife Elena Cullell in memory of their daughter Xana, who died in 2019; the award's first winner that is not an individual footballer.
 
 ## Important editorial note
 

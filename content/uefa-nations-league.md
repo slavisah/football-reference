@@ -66,7 +66,3 @@ UEFA introduced the Nations League to replace many international friendlies with
 - Spain won the 2023 final on penalties after a goalless draw with Croatia.
 - Portugal beat Spain on penalties in the 2025 final to become the competition's first two-time champion.
 - The host nation has finished in the Finals' top four in every edition so far, including Germany finishing fourth in 2025.
-
-## Website idea
-
-Show a compact podium card for each edition and a separate explanation of the league system. Avoid overwhelming younger readers with every group-stage result on the main page.

@@ -479,6 +479,86 @@ Primary sources should be preferred.
     environment's egress policy for this run, so verification relied on
     WebSearch's synthesized snippets, per the same caveat prior audits in
     this file have already noted.
+- Fair Play Award winners (added 2026-09-02, intensive run): a new "Fair
+  Play Award winners" note section on `content/fifa-world-cup.md` listing
+  every winner of FIFA's team disciplinary-record award since its 1970
+  introduction, sitting between the "Young Player Award winners" and
+  "Winning managers" sections. Verified via four independent WebSearch
+  passes. The first pass returned the full 1970-2018 list (13 award
+  instances) but its summary implied the award had been discontinued after
+  2018 - a claim the second pass directly contradicted, confirming England
+  won it in 2022; a third, more targeted pass confirmed the Netherlands won
+  in 2026 (cross-checked against an NL Times article and FIFA's own
+  Facebook announcement, including the supporting detail that the
+  Netherlands conceded only three yellow cards, all in their opening match
+  against Japan) and independently reproduced the entire 1970-2026 list via
+  topendsports.com/FIFA.com/Wikipedia/EssentiallySports sources, agreeing
+  exactly with the first pass on every pre-2022 year; a fourth pass
+  specifically re-checked the award's only two shared/tied years (1998:
+  England and France; 2006: Brazil and Spain). **No discrepancies found**
+  once the discontinuation claim from the first pass's own summary (not
+  its year-by-year list) was set aside as a misreading rather than a
+  sourced fact:
+  - https://www.fifa.com/en/tournaments/mens/worldcup/articles/fair-play-award-winners
+  - https://www.espn.com/soccer/story/_/id/48685223/who-won-fair-play-award-world-cup
+  - https://www.topendsports.com/events/worldcupsoccer/fair-play-trophy.htm
+  - https://www.topendsports.com/sport/soccer/awards/fair-play.htm
+  - https://en.wikipedia.org/wiki/FIFA_Fair_Play_Award
+  - https://en.wikipedia.org/wiki/FIFA_World_Cup_awards
+  - https://www.essentiallysports.com/soccer-news-what-is-the-fifa-world-cup-fair-play-award-all-you-need-to-know-about-how-the-winner-is-selected-and-why-it-matters/
+  - https://nltimes.nl/2026/07/20/oranje-awareded-fair-play-award-fifa-world-cup
+  - https://www.facebook.com/fifaworldcup/posts/the-netherlands-are-the-winners-of-the-fifa-fair-play-award-presented-by-mcdonal/1625186688971278/
+  - https://www.planetsport.com/soccer/news/world-cup-2022-awards-messi-wins-golden-ball-mbappe-wins-golden-boot-england-win-fair-play
+  - https://www.mykhel.com/football/world-cup-2022-england-win-the-fair-play-award-here-s-why-204815.html
+  - https://www.hitc.com/hierros-spain-in-2018-among-all-15-world-cup-fair-play-trophy-winners/
+  - Direct WebFetch/curl to these domains remains blocked by this
+    environment's egress policy, the same standing caveat every recent
+    audit in this file has noted; verification relied entirely on
+    WebSearch's synthesized snippets, cross-checked across independent
+    passes and source domains rather than a single query's summary.
+- World Cup Silver Boot and Bronze Boot winners (added 2026-09-02, intensive
+  run): a new "World Cup Silver Boot and Bronze Boot winners" note section on
+  `content/golden-boot.md`, listing the tournament's second- and
+  third-highest goalscorers at every World Cup since 2010 (the year FIFA
+  introduced formal podium recognition alongside the top-scorer award's
+  rename from "Golden Shoe" to "Golden Boot"), sitting between "World Cup
+  notes" and "World Cup memorable moments". Verified via five independent
+  WebSearch passes, one per edition (2010, 2014, 2018, 2022, 2026), plus a
+  targeted follow-up confirming the official "since 2010" introduction date
+  itself. The 2010 podium needed the most care: four players (Müller, Villa,
+  Sneijder, Forlán) finished level on five goals, resolved by the same
+  assists-then-minutes-played tiebreakers that decided the Golden Boot
+  itself (Müller's three assists to the others' one each; Villa's fewer
+  minutes than Sneijder took the Silver Boot over him, leaving Sneijder off
+  the three-player podium entirely). The 2022 Bronze Boot (Julián Álvarez
+  over a goals-level Olivier Giroud, on the assist tiebreaker) and the still
+  very recent 2026 podium (Messi's Silver Boot, Bellingham's Bronze Boot)
+  were each cross-checked against a second independent source. **No
+  discrepancies found** across any of the five editions:
+  - https://www.fox13news.com/news/what-is-fifa-world-cup-golden-boot-look-last-7-winners-trophy
+  - https://sports.yahoo.com/articles/world-cup-golden-boot-rules-070001347.html
+  - https://surprisesports.com/football/fifa-world-cup/world-cup-golden-boot-winners-list/
+  - https://www.sportbible.com/football/football-news/fifa-world-cup/what-happened-four-players-tied-for-golden-boot-at-2010-world-cup-644890-20260717
+  - https://www.goal.com/en-za/news/world-cup-2010-germanys-thomas-mueller-wins-golden-boot-ahead-of-/bltfd547e46c9b6f090
+  - https://sports.yahoo.com/articles/golden-boot-tiebreakers-explained-happens-051002346.html
+  - https://bleacherreport.com/articles/2128333-world-cup-2014-winner-golden-boot-stats-and-awards-results
+  - https://www.thesoccerworldcups.com/world_cups/2014_awards.php
+  - https://latinspotlight.wordpress.com/2014/07/13/2014-world-cup-golden-boot-and-other-awards/
+  - https://www.soccerbible.com/news/2018/06/adidas-reveal-2018-world-cup-golden-boot-ball-glove-trophies/
+  - https://www.goal.com/en/news/what-is-world-cup-golden-boot/blt8e5fea3ddfa5eea7
+  - https://steemit.com/fifa/@awaisquarni/world-cup-2018-awards-or-all-winner-list-world-cup-2018-or-golden-ball-boot-gloves-winner-fifa-18
+  - https://www.hitc.com/golden-boot-2022-world-cup-final-standings-as-mbappe-beats-messi-giroud-alvarez/
+  - https://www.si.com/soccer/2022/12/14/world-cup-golden-boot-argentina-france-mbappe-messi-alvarez-giroud
+  - https://www.aljazeera.com/sports/2022/12/18/kylian-mbappe-awarded-golden-boot-after-world-cup-finals
+  - https://www.britannica.com/question/Who-won-the-Golden-Ball-Golden-Boot-and-Golden-Glove-awards-at-the-2026-FIFA-World-Cup
+  - https://www.givemesport.com/world-cup-2026-awards/
+  - https://sports.yahoo.com/articles/2026-world-cup-award-winners-225707815.html
+  - https://www.nbcsports.com/soccer/news/2026-world-cup-award-winners-golden-boot-golden-ball-best-young-player-golden-glove
+  - Direct WebFetch/curl to these domains remains blocked by this
+    environment's egress policy, the same standing caveat every recent
+    audit in this file has noted; verification relied entirely on
+    WebSearch's synthesized snippets, cross-checked across independent
+    passes and source domains rather than a single query's summary.
 
 ## UEFA EURO
 
@@ -627,6 +707,42 @@ Primary sources should be preferred.
   - https://www.goal.com/en/news/ronaldo-wins-euro-2020-golden-boot-on-tie-breaker-over-schick/wzri2apw8gef1bnfwv1uauvhf
   - https://www.espn.com/soccer/story/_/id/40558317/euro-2024-golden-boot-harry-kane-dani-olmo-6-winners
   - https://www.espn.com/soccer/story/_/id/49397919/kylian-mbappe-wins-golden-boot-2026-world-cup-lionel-messi-goalless-final
+- EURO Silver Boot and Bronze Boot winners (added 2026-09-03, intensive run):
+  a new "EURO Silver Boot and Bronze Boot winners" note section on
+  `content/golden-boot.md`, the EURO-side companion to the 2026-09-02 World
+  Cup Silver/Bronze Boot section, following up on that run's own "whether
+  EURO has any equivalent runner-up scoring recognition" open question.
+  Scoped to only the three editions where a single Golden Boot winner was
+  ever named by tiebreak (2012, 2016, 2020) - before 2012 and since 2024 the
+  award reverts to full joint winners with no ranked runner-up to show, the
+  same "since the era actually started" scoping this page's own World Cup
+  section and several other award-history sections across the site already
+  use. **2012 deliberately excluded even though UEFA's own tiebreak named a
+  single winner:** this page's EURO table intentionally keeps 2012 as a
+  six-way "Multiple" tie (see the 2026-08-28 tie-resolution audit entry
+  above, which found this load-bearing for `buildChampionsSummary()`'s
+  Cristiano Ronaldo award count) - listing Fernando Torres/Mario Gómez/Alan
+  Dzagoev as a distinguished 2012 podium in this new section would directly
+  contradict that row on the same page, so this run left 2012 out rather
+  than reopen that settled tension. Verified 2016 (Griezmann/Ronaldo/Giroud)
+  and 2020 (Ronaldo/Schick/Benzema) via two independent WebSearch passes
+  each, with a third targeted re-check of 2020's four-way tie on four goals
+  (Kane, Benzema, Forsberg, Lukaku) - each source agreed Benzema's Bronze
+  Boot came down to fewest minutes played (349, ahead of Forsberg's 371,
+  Lukaku's 444 and Kane's 649) among the four. **No discrepancies found**
+  across either edition:
+  - https://bleacherreport.com/articles/2651265-antoine-griezmann-wins-euro-2016-golden-boot-stats-comments-and-reaction
+  - https://www.goal.com/en-in/news/ronaldo-gives-nani-his-euro-2016-silver-boot-award/1lc2rzjm24u8g1kug006wglrce
+  - https://grokipedia.com/page/UEFA_European_Championship_awards
+  - https://www.mykhel.com/football/euro-2020-full-list-of-award-winners-golden-boot-prize-money-records-and-statistics-170481.html
+  - https://www.goal.com/en/news/ronaldo-wins-euro-2020-golden-boot-on-tie-breaker-over/wzri2apw8gef1bnfwv1uauvhf
+  - https://onefootball.com/en/news/kane-lukaku-benzema-who-were-top-scorers-as-ronaldo-clinched-euro-2020-golden-boot-33360900
+  - https://www.givemesport.com/1720157-kane-lukaku-benzema-who-were-top-scorers-as-ronaldo-clinched-euro-2020-golden-boot/
+  - Direct WebFetch/curl to primary-source domains remains blocked by this
+    environment's egress policy, the same standing caveat every recent audit
+    in this file has noted; verification relied on WebSearch's synthesized
+    snippets, cross-checked across independent queries and source domains
+    rather than a single query's summary.
   - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/adidas-golden-boot-race-top-scorer
 - Champion/Runner-up/Final-score audit (2026-08-05, intensive run): the core
   **Winner**, **Runner-up**, and **Final** (score line) columns in
@@ -1778,6 +1894,82 @@ Primary sources should be preferred.
     1975-2010 span this run left out. Not re-attempted without a better
     source lead, the same standing caution already applied to Copa
     América's pre-1975 managers/captains.
+- Fair Play Award winners (added 2026-09-02, intensive run): a new "Fair
+  Play Award winners" note section on `content/copa-america.md`, the same
+  shape as the FIFA World Cup's own "Fair Play Award winners" section.
+  CONMEBOL introduced a team Fair Play Award at the 2011 Copa América,
+  continuous across all six editions since (2011, 2015, 2016, 2019, 2021,
+  2024) - the same span this page's own Golden Glove section already
+  covers, and a cleaner fit than the page's still-unpursued "Best Young
+  Player" idea, which by contrast has been awarded only intermittently
+  since its 2007 introduction. Each of the six winners was verified via
+  two independent WebSearch passes with no contradictions:
+  - https://copaamerica.com/en/news/uruguay-and-its-history-in-the-conmebol-copa-america
+  - https://www.americatv.com.pe/deportes/copa-america-2015/peru-gano-premio-fair-play-copa-america-chile-2015-n188167
+  - https://elcomercio.pe/deporte-total/copa-america-2015/peru-obtuvo-premio-fair-play-copa-america-2015-279875
+  - https://www.soccerwire.com/news/copa-america-centenario-awards-best-xi-announced/
+  - https://bleacherreport.com/articles/2648646-copa-america-2016-award-winners-prize-money-and-final-reaction
+  - https://en.wikipedia.org/wiki/2019_Copa_Am%C3%A9rica
+  - https://en.wikipedia.org/wiki/2021_Copa_Am%C3%A9rica
+  - https://www.mykhel.com/football/copa-america-2021-full-list-of-award-winners-golden-boot-prize-money-records-and-statistics-170429.html
+  - https://khelnow.com/football/world-football-copa-america-list-of-all-award-winners-202407
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+    Not pursued this run: Copa América's own "Best Young Player" award,
+    confirmed via the same research to have been given out only
+    intermittently since 2007 (three editions to date per its own
+    Wikipedia-sourced summary) rather than at every edition - the same
+    "not a reliable single-fact-per-edition award" caution that has
+    already kept UEFA Nations League's goalkeeper/young-player/top-scorer
+    ideas and EURO's goalkeeper award out of scope.
+- Team of the Tournament winners (added 2026-09-02, fifty-second intensive
+  run): a new "Team of the Tournament winners" note section on
+  `content/copa-america.md` listing CONMEBOL's Technical Study Group-selected
+  official Best XI at every edition from 2015 through 2024 (five editions).
+  The 2011 edition was investigated and excluded: independent sources
+  disagreed on as many as half the outfield names (one widely-cited AFP-
+  sourced list names Justo Villar of Paraguay in goal with four Uruguayans,
+  three Venezuelans, one Paraguayan, one Peruvian, one Brazilian and one
+  Colombian outfield, while other sources describe a differently-composed
+  eleven) - the same kind of contradiction that already scoped this page's
+  own "Winning captains" section away from its earlier editions. Every
+  2015-2024 roster was cross-checked against at least two independent
+  sources per edition, resolving one internal disagreement along the way:
+  a single AI-search-summary line misattributed 2021 defender Pervis
+  Estupiñán to Colombia, contradicted by the same source's own "four
+  Argentina, three Brazil, one each Colombia/Peru/Chile/Ecuador"
+  nationality breakdown (Luis Díaz already accounts for Colombia's one
+  slot; Estupiñán is Ecuadorian) - resolved in favor of the internally
+  consistent breakdown. The 2015 edition needed a third cross-check for
+  the same reason: one fan-listicle roster disagreed with the
+  CONMEBOL-attributed list on roughly half the outfield names, resolved by
+  confirming the "Chile supplied five of the eleven, the most of any team"
+  fact (reported independently by two more outlets) against each candidate
+  roster - only the CONMEBOL-attributed list actually contains five Chile
+  players, settling which one was official:
+  - https://copaamerica.com/en/news/best-xi-team-tournament-copa-america-2024
+  - https://www.90min.com/posts/copa-america-2024-team-of-the-tournament-best-xi
+  - https://espndeportes.espn.com/futbol/copa-america/nota/_/id/13979283/equipo-ideal-copa-america-2024-cuenta-jugador-uruguayo-manuel-ugarte
+  - https://www.diariouno.com.ar/ovacion/futbol/copa-america-2021-este-es-el-equipo-ideal-n846894
+  - https://www.lanacion.com.ar/deportes/futbol/hay-cuatro-jugadores-argentinos-en-el-equipo-ideal-de-la-copa-america-publicado-por-la-conmebol-nid13072021/
+  - https://copaamerica.com/en/news/one-by-one-the-team-of-the-conmebol-copa-america-chosen-by-get
+  - https://www.thestatesman.com/sports/copa-america-2019-best-xi-lionel-messi-left-out-five-brazil-players-selected-1502775848.html
+  - https://bleacherreport.com/articles/2844971-dani-alves-headlines-copa-america-best-xi-gabriel-jesus-lionel-messi-miss-out
+  - https://copaamerica.com/en/news/the-best-of-2019-conmebol-copa-america-
+  - https://www.americatv.com.pe/deportes/futbol-mundial/copa-america-2016-este-equipo-ideal-torneo-centenario-n236649
+  - https://www.conmebol.com/noticias/once-sudamericanos-componen-el-equipo-ideal-de-la-copa-america-centenario/
+  - https://cooperativa.cl/noticias/deportes/copa-america/chile-2015/cinco-chilenos-integran-el-equipo-ideal-de-la-copa-america/2015-07-05/121549.html
+  - https://www.lanacion.com.ar/deportes/futbol/tres-argentinos-integran-el-equipo-ideal-de-la-copa-america-chile-2015-nid1807883/
+  - https://copaamerica.com/en/news/the-best-of-2015-conmebol-copa-america
+  - https://www.soccerway.com/news/soccer-copa-america-copa-america-team-of-the-tournament-messi-impresses-but-james-the-star-man/KCIPe5rI
+  - https://www.infobae.com/america/deportes/2021/01/28/polemica-por-el-equipo-ideal-sudamericano-de-la-ultima-decada-no-hay-uruguayos-colombianos-ni-chilenos/
+    (2011 exclusion context)
+  - https://diariodecuyo.com.ar/pasiondeportiva/Conmebol-dejo-afuera-a-Lionel-Messi-del-equipo-ideal-de-la-Copa-America-20190709-0067.html
+    (2011 exclusion context)
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Ballon d'Or
 
@@ -2010,6 +2202,103 @@ Primary sources should be preferred.
   - https://www.tntsports.co.uk/football/ballon-d-or/2022/ballon-dor-2022-thibaut-courtois-wins-yashin-trophy-for-best-goalkeeper-after-real-madrid-heroics-la_sto9191911/story.shtml
   - https://www.90min.com/posts/emiliano-martinez-wins-2023-yashin-trophy
   - https://www.besoccer.com/new/emiliano-martinez-wins-back-to-back-yachine-trophy-awards-1335839
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Gerd Müller Trophy winners (added 2026-09-02, forty-ninth intensive run): a
+  new "Gerd Müller Trophy winners" note section on `content/ballon-dor.md`
+  listing every winner of France Football's companion "top goalscorer"
+  award since its 2021 introduction - the same treatment as the Kopa Trophy
+  and Yashin Trophy sections directly above it, and a genuinely different,
+  previously-uncovered award found while investigating whether EURO or Copa
+  América had a reliable team-level award never yet checked (they don't -
+  see this run's `docs/PROJECT_STATUS.md` entry). Verified via two
+  independent WebSearch passes covering all five awarded editions
+  (2021-2025): both passes agreed exactly on every year - Robert
+  Lewandowski (2021 and 2022, the only repeat winner), Erling Haaland
+  (2023), Harry Kane and Kylian Mbappé jointly (2024, the trophy's only
+  tie), and Viktor Gyökeres (2025). Both passes also agreed the award was
+  first presented in 2021 under the name "Striker of the Year" and renamed
+  the Gerd Müller Trophy from 2022 onward, after Müller's death in August
+  2021 - a genuine naming nuance worth recording (multiple 2022 sources
+  call that year's award "inaugural" even though Lewandowski had already
+  won the differently-named 2021 edition), the same kind of rename this
+  site's Nations League "Player of the Tournament" -> "Player of the
+  Finals" section already documents. **No discrepancies found:**
+  - https://www.topendsports.com/sport/soccer/awards/striker-of-the-year.htm
+  - https://www.90min.com/what-is-gerd-muller-trophy-past-winners-nominees
+  - https://www.gamereactor.eu/what-is-the-gerd-muller-trophy-and-who-will-win-this-year-at-ballon-dor-2025-1605433/
+  - https://www.arsenal.com/news/viktor-gyokeres-wins-gerd-muller-trophy
+  - https://fcbayern.com/en/news/2022/10/muller-trophy-for-year%E2%80%99s-best-striker-awarded-for-the-first-time-at-the-ballon-dor-ceremony
+  - https://en.wikipedia.org/wiki/Gerd_M%C3%BCller_Trophy
+  - https://www.bavarianfootballworks.com/2022/10/18/23409746/robert-lewandowski-striker-award-2022-gerd-muller-fc-barcelona-bayern-munich-alum-haaland-benzema
+  - https://www.fcbarcelona.com/en/news/2858120/lewandowski-wins-inaugural-gerd-muller-trophy/featured
+  - https://www.fourfourtwo.com/features/ballon-dor-what-is-the-gerd-muller-trophy
+  - https://sports.yahoo.com/article/won-gerd-muller-trophy-2025-201726350.html
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Johan Cruyff Trophy winners (added 2026-09-02, fifty-first intensive run):
+  a new "Johan Cruyff Trophy winners" note section on
+  `content/ballon-dor.md` listing every winner of France Football's
+  companion "best men's coach" award, the fourth and newest of the Ballon
+  d'Or gala's individual companion trophies (after Kopa, Yashin and Gerd
+  Müller) - only two editions awarded to date (2024, 2025), since the
+  trophy was only introduced in 2024, unlike its three older siblings. A
+  standing health check first confirmed nothing else had opened up (still
+  just the blocked `typescript` 7 entry); investigated the Copa América
+  captains 1975-2010 gap once more and confirmed it remains not safely
+  recoverable via WebSearch alone (no new source lead), so moved to the
+  Ballon d'Or tier of the routine's own priority order instead. Verified
+  both awarded editions via two independent WebSearch passes each with no
+  discrepancies: Carlo Ancelotti (Real Madrid, 2024, for the La
+  Liga/Champions League double) and Luis Enrique (Paris Saint-Germain,
+  2025, for the Ligue 1/Coupe de France/first-ever Champions League
+  treble). **No discrepancies found:**
+  - https://en.wikipedia.org/wiki/Johan_Cruyff_Trophy_(France_Football)
+  - https://www.goal.com/en-us/lists/carlo-ancelotti-men-s-coach-of-year-ballon-d-or-ceremony-xabi-alonso-pep-guardiola/blt4f9630905d966f8d
+  - https://www.besoccer.com/new/real-madrid-boss-ancelotti-wins-men-s-johan-cruyff-trophy-1335838
+  - https://www.beinsports.com/en-us/soccer/articles-video/ancelotti-is-the-best-coach-of-the-year-2024-10-28
+  - https://www.managingmadrid.com/2024/10/28/24282158/carlo-ancelotti-wins-coach-of-the-year-award
+  - https://sports.yahoo.com/article/psg-head-coach-luis-enrique-193800045.html
+  - https://www.besoccer.com/new/luis-enrique-wins-2025-johan-cruyff-trophy-for-world-s-best-coach-1374497
+  - https://www.caughtoffside.com/2025/09/22/ballon-dor-2025-luis-enrique-best-coach/
+  - https://tribuna.com/en/news/2025-09-22-luis-enrique-wins-johan-cruyff-trophy-at-2025-ballon-dor/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Socrates Award winners (added 2026-09-03, fifty-fifth intensive run): a new
+  "Socrates Award winners" note section on `content/ballon-dor.md`, the fifth
+  companion award on the Ballon d'Or page (after Kopa, Yashin, Gerd Müller and
+  Johan Cruyff) and a genuinely different shape from the other four: it is a
+  humanitarian award, not a football-performance one, and is not restricted to
+  men's football at all - its four editions since introduction in 2022 include
+  a female recipient (2024) and a charitable foundation rather than an
+  individual (2025). A standing health check first confirmed nothing else had
+  opened up (`pnpm outdated`/`pnpm dlx knip --no-config-hints` matched every
+  prior run's baseline); re-checked the Copa América captains 1975-2010 gap
+  once more with no new source lead, so moved to the Ballon d'Or tier per this
+  routine's own priority order. Verified all four awarded editions via two
+  independent WebSearch passes each with no discrepancies: Sadio Mané
+  (Senegal, 2022, the inaugural winner, honored for hospital/school
+  infrastructure funded in his home village of Bambali), Vinícius Júnior
+  (Brazil, 2023, honored for Instituto Vini Jr.'s anti-racism and education
+  work), Jennifer Hermoso (Spain, 2024, the award's first female recipient,
+  honored for advocacy against sexual abuse and harassment in sport), and the
+  Xana Foundation (2025, founded by 2025 Johan Cruyff Trophy winner Luis
+  Enrique and his wife Elena Cullell in memory of their daughter Xana, who
+  died in 2019). **No discrepancies found:**
+  - https://en.wikipedia.org/wiki/S%C3%B3crates_Award
+  - https://www.peace-sport.org/socrates-award/
+  - https://www.peace-sport.org/news/the-senegalese-sadio-mane-becomes-the-first-winner-of-the-socrates-award-at-the-2022-ballon-dor-ceremony/
+  - https://fcbayern.com/en/news/2022/10/sadio-mane-the-inaugural-winner-of-the-socrates-award
+  - https://www.peace-sport.org/news/vinicius-junior-wins-socrates-award-at-the-2023-ballon-dor-ceremony/
+  - https://www.besoccer.com/new/vinicius-wins-socrates-2023-award-for-his-humanitarian-work-1287586
+  - https://www.90min.com/what-is-socrates-award-past-winners-nominees
+  - https://www.olympics.com/en/news/ballon-dor-2025-all-winners-all-awards-complete-list-live-updates
+  - https://www.peace-sport.org/news/h-s-h-prince-albert-ii-and-peace-and-sport-welcome-the-xana-foundation-winner-of-the-2025-socrates-award-in-monaco-2/
+  - https://www.monaco-tribune.com/en/2025/09/ballon-dor-2025-ceremony-princess-charlene-presents-socrates-prize-to-xana-foundation/
+  - https://www.gamereactor.eu/luis-enriques-xana-foundation-named-after-his-late-daughter-wins-socrates-award-for-humanitarian-work-1605953/
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
