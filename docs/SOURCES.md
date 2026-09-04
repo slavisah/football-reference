@@ -972,6 +972,52 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Team of the Tournament winners (added 2026-09-04, intensive run): a new
+  "Team of the Tournament winners" note section on `content/uefa-euro.md`,
+  the same shape as Copa América's own "Team of the Tournament winners"
+  section (fifty-second intensive run) - UEFA's Technical Study Group has
+  named an official Team of the Tournament at every EURO since 1996.
+  Deliberately scoped to six of the eight editions in that span: research
+  found that 2000 and 2012 are genuinely different in kind, not just less
+  documented - UEFA published a 22-player squad-of-the-tournament in 2000
+  and a full 23-player squad (including three goalkeepers, matching that
+  year's expanded national-squad size) in 2012, rather than naming one clean
+  eleven, so there is no single XI to report without an arbitrary editorial
+  pick. Each of the six included editions (1996, 2004, 2008, 2016, 2020,
+  2024) was independently verified via two WebSearch passes: the first
+  round located each edition's official UEFA.com "Team of the Tournament"
+  article or the UEFA EURO account's own X/Twitter post naming the XI in
+  strict goalkeeper/defenders/midfielders/forwards order (used for 2004 and
+  2008); the second round cross-checked each roster against Wikipedia's
+  "Template:UEFA Euro `<year>` Team of the Tournament" page and, for 1996,
+  independently confirmed the full eleven (Köpke; Blanc, Desailly, Sammer,
+  Maldini; Gascoigne, Poborský, Eilts; Shearer, Stoichkov, Šuker) since no
+  single source's excerpt listed all eleven names at once. A third,
+  targeted pass specifically confirmed the 2000/2012 extended-squad finding
+  itself (searching for *why* UEFA named 23 rather than 11 in 2012, which
+  turned up UEFA's own explanation that the Team of the Tournament that year
+  matched the tournament's 23-player national-squad size). **No
+  discrepancies found across any of the six included editions:**
+  - https://www.uefa.com/uefaeuro/history/news/0253-0d7bd19d9827-e42f39bafcd8-1000--euro-1996-team-of-the-tournament/
+  - https://en.wikipedia.org/wiki/Template:UEFA_Euro_1996_Team_of_the_Tournament
+  - https://x.com/UEFAEURO/status/731134736593264641
+  - https://en.wikipedia.org/wiki/Template:UEFA_Euro_2004_Team_of_the_Tournament
+  - https://x.com/UEFAEURO/status/732572996976660481
+  - https://www.uefa.com/news-media/news/0253-0d7c22bc5467-00c3bda04e75-1000--uefa-euro-2008tm-team-of-the-tournament/
+  - https://bleacherreport.com/articles/2651447-uefa-euro-2016-team-of-the-tournament-announced-full-lineup-comments-reaction
+  - https://www.uefa.com/news-media/news/022f-0f8e2faefb55-7394f0e79e79-1000--uefa-euro-2016-team-of-the-tournament
+  - https://www.uefa.com/insideuefa/mediaservices/mediareleases/news/026b-12be976defd3-914f913b0653-1000--uefa-euro-2020-team-of-the-tournament/
+  - https://www.uefa.com/uefaeuro/history/news/028f-1b61a0e91074-427664e9bbfe-1000--uefa-euro-2024-team-of-the-tournament/
+  - https://en.wikipedia.org/wiki/Template:UEFA_Euro_2000_Team_of_the_Tournament
+    (2000's own 22-player-squad finding)
+  - https://www.uefa.com/uefaeuro/history/news/0254-0d7ed20b7bd1-cded9ff294f6-1000--ten-spain-players-in-team-of-the-tournament/
+    (2012's own 23-player-squad finding)
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages (including official UEFA.com
+    articles and the UEFA EURO account's own X/Twitter posts, both indexed
+    and reachable via WebSearch even though direct WebFetch to uefa.com and
+    x.com is not) rather than direct page loads.
 
 ## UEFA Nations League
 

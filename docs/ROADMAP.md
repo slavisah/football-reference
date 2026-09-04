@@ -1720,3 +1720,76 @@ back clean:
   merge - the same caution that has already shelved the "by team" filter's
   full participant lists and the flag-emoji idea in earlier runs. Left for
   whenever someone sources that data deliberately.
+
+- **UEFA EURO Team of the Tournament winners**: closed 2026-09-04
+  (fifty-ninth intensive run) - a standing health check first (`pnpm
+  install`, `pnpm outdated` found nothing new beyond the still-blocked
+  `typescript` 7 entry, `pnpm dlx knip --no-config-hints` matched every prior
+  run's baseline, full lint/unit/build/`check:links`/`check:sitemap`/
+  `check:precache`/`check:perf`/`check:pdfs` all clean, 517/517 unit tests,
+  711 pages built). Followed up on the fifty-eighth run's own narrowed Copa
+  América 1979 captain lead first: two WebSearch passes resolved it
+  negatively rather than positively - Hugo Talavera, though well-documented
+  as Paraguay's captain and recovered from his semi-final injury, was
+  controversially benched by federation president Nicolás Leoz just before
+  the decisive 11 December 1979 play-off over an unrelated pay dispute (a
+  bogus "ruled out by the medical department" excuse the same reporting
+  calls out directly), so he did not lift the trophy; no source names who
+  did in his place. This closes the specific question rather than leaving it
+  open, but doesn't add a name - the 1975-2010 Copa América captain span
+  stays out of scope, unchanged. Moved to "other roadmap items" per this
+  routine's own priority order (Nations League/Ballon d'Or/Golden Boot
+  content-mining already confirmed exhausted) and found a genuinely new,
+  well-scoped gap: UEFA's Technical Study Group has named an official Team
+  of the Tournament at every EURO since 1996, the same shape as Copa
+  América's own "Team of the Tournament winners" section (fifty-second
+  intensive run), but EURO never had one. Research surfaced a real
+  complication two editions in: 2000 and 2012 are genuinely different in
+  kind, not just less documented - UEFA published an extended
+  squad-of-the-tournament (22 players in 2000, 23 including three
+  goalkeepers in 2012, confirmed via UEFA's own explanation that the 2012
+  selection matched that year's national-squad size) rather than one clean
+  eleven, so there is no single XI to report without an arbitrary editorial
+  pick - deliberately excluded, the same "no reliable single fact" reasoning
+  already applied to Copa América's own 2011 exclusion from this section.
+  Added a "Team of the Tournament winners" section to `content/uefa-euro.md`
+  covering the six editions with an unambiguous official XI (1996, 2004,
+  2008, 2016, 2020, 2024), each verified via two independent WebSearch
+  passes (official UEFA.com articles and the UEFA EURO account's own
+  X/Twitter posts, cross-checked against Wikipedia's per-year "Team of the
+  Tournament" template pages), plus a third pass confirming the 2000/2012
+  extended-squad finding itself. Wired into `euro.astro`'s `noteHeadings`
+  (English) and hand-translated into `hr/competitions/euro.astro`'s own
+  `notes` array as "Idealna momčad turnira", matching Copa América's own
+  Croatian label for this section; also corrected that file's own stale
+  top-of-array comment (still said "six headings", already six years out of
+  date - it didn't even list the existing "Winning captains" section) while
+  editing next to it. `content/uefa-euro.md`'s `lastReviewed` bumped to
+  2026-09-04. New e2e coverage (EN + HR heading/content assertions) in
+  `tests/e2e/mobile.spec.ts`; adding "Rodri (Spain/Španjolska)" and "Lamine
+  Yamal (Spain/Španjolska)" to the new 2024 entry collided with two
+  pre-existing assertions for those exact strings in the "Player of the
+  Tournament"/"Young Player of the Tournament" sections above - fixed with
+  `.first()` the same way an earlier run's Copa América addition hit an
+  identical collision. All 700 PDFs regenerated and reverified clean (`pnpm
+  build:pdfs` then `pnpm check:pdfs`, using the
+  `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback this environment's
+  Chromium needs). No page-weight budget raise needed this run (577.5 KB vs.
+  the 590 KB budget, ~12.5 KB headroom left). Full standing health check
+  clean: `pnpm lint` (0/0/0), `pnpm test` (517/517 unit, unchanged -
+  presentation-layer content, no new unit-testable logic), `pnpm build` (711
+  pages, unchanged - no new route), `check:links` (715 pages),
+  `check:sitemap` (710 entries), `check:precache` (37 URLs), `check:perf`
+  (heaviest page `hr/records`, within budget), `check:pdfs` (700/700 fresh),
+  full cold-start `pnpm test:e2e` (843/843 passed, 13.2 minutes, unchanged
+  count - this run extended two existing `test()` blocks rather than adding
+  new ones). See `docs/PROJECT_STATUS.md`'s matching entry for detail.
+  **Left for a future pass:** the same environment-blocked items as every
+  recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+  América winning captains for 1975-2010 (the 1979 sub-question is now
+  closed negatively; 1983 and the rest of the span remain fully open with no
+  new source lead). With EURO's own individual/team-award set now also
+  covering Team of the Tournament, the next content-gap pass likely needs
+  either a fresh source lead for the Copa América captain-sourcing problem
+  or a genuinely different quality angle (accessibility, performance, SEO,
+  or a fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live site).
