@@ -1793,3 +1793,33 @@ back clean:
   either a fresh source lead for the Copa América captain-sourcing problem
   or a genuinely different quality angle (accessibility, performance, SEO,
   or a fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live site).
+
+- **Content-gap investigations closed negatively (EURO Fair Play Award,
+  Nations League top scorer)**: closed 2026-09-04 (sixtieth intensive run) -
+  a structural `## ` heading comparison across all six `content/*.md` files
+  found two candidate gaps (EURO lacks a Fair Play Award section World Cup
+  and Copa América both have; Nations League lacks a top-scorer section the
+  other four team competitions have), but three WebSearch passes on each
+  confirmed neither is a clean fit: UEFA's EURO fair-play recognition has no
+  single tracked award with a findable per-edition winner (unlike FIFA's and
+  CONMEBOL's), and UEFA's Nations League "Top Scorer trophy" is scored
+  across the whole two-year league phase, not the four-team Finals this
+  page's content is scoped to, with the Finals-only goal counts themselves
+  inconsistent across editions. Both left unpursued, same reasoning as the
+  already-declined EURO 2000/2012 Team of the Tournament squads and the
+  Nations League Golden Glove/Young Player of the Finals. Also cross-checked
+  Ballon d'Or's "Multiple winners" table against its own "Winners" table by
+  hand (all ten counts correct) and confirmed Golden Boot's lack of an
+  equivalent section is a presentation gap only, not a missing fact
+  (`/records`' generated "Most awards" ranking already covers it) - not
+  pursued as a content gap. Full standing health check clean (unchanged from
+  the fifty-ninth run's baseline). See `docs/PROJECT_STATUS.md`'s matching
+  entry for detail. **Left for a future pass:** the same environment-blocked
+  items as every recent run (`typescript` 7, `docs/SOURCES.md`
+  link-liveness), plus Copa América winning captains for 1975-2010. Every
+  award-history angle across all six families has now been checked at least
+  once - the next content-gap pass likely needs a genuinely different
+  quality angle (accessibility, performance, SEO, or a fresh
+  `docs/WEBSITE_REQUIREMENTS.md` read against the live site) rather than
+  another award-name search, unless a new Copa América captain source lead
+  surfaces.

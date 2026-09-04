@@ -15999,6 +15999,105 @@ problem or a genuinely different quality angle (accessibility, performance,
 SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live
 site).
 
+### Content-gap investigations closed negatively: EURO Fair Play, Nations League top scorer - added 2026-09-04 (sixtieth intensive run)
+
+A standing health check first: `pnpm install --frozen-lockfile`, `pnpm
+outdated` found nothing new beyond the still-blocked `typescript` 7 entry
+(`@astrojs/check@latest`'s `peerDependencies` re-checked directly via `npm
+view`, still `typescript: '^5.0.0 || ^6.0.0'`), `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline (same one confirmed
+false positive, `scripts/test-preview-server.mjs`). Full
+lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+`check:pdfs` all clean and byte-identical to the fifty-ninth run's baseline:
+`pnpm lint` (0 errors/warnings/hints, 168 files), `pnpm test` (517/517
+unit), `pnpm build` (711 pages), `check:links` (715 pages), `check:sitemap`
+(710 entries), `check:precache` (37 URLs), `check:perf` (heaviest page
+`hr/records`, 577.5 KB, within the 590 KB budget), `check:pdfs` (700/700
+fresh). Full cold-start `pnpm test:e2e` also run this pass: 843/843 passed
+(13.3 minutes), matching the fifty-ninth run's baseline exactly - no
+regressions from this run's investigations, which needed no code or content
+change either way.
+
+Following this routine's own priority order (Copa América > Nations League
+> Ballon d'Or > Golden Boot > other roadmap items), this run first looked
+for a structural gap in the two competitions that have historically yielded
+new award-history sections: a page-by-page `## ` heading comparison across
+all six `content/*.md` files turned up a real candidate - unlike FIFA World
+Cup and Copa América, `content/uefa-euro.md` has no "Fair Play Award
+winners" section, even though both sibling team-competition pages do.
+
+**UEFA EURO Fair Play Award: investigated, not pursued.** Three WebSearch
+passes (a general year-by-year list search, a targeted "Euro 2024 Fair Play
+award winner" search, and a search specifically for the Wikipedia "UEFA
+European Championship awards" page) all agree on the same negative finding:
+Wikipedia's own dedicated "UEFA European Championship awards" article lists
+exactly five official post-tournament awards (Player of the Tournament, Top
+Scorer, Young Player of the Tournament, Man of the Match, Team of the
+Tournament) and does not include a Fair Play Award among them - unlike
+FIFA's World Cup award (continuous since 1970, one FIFA.com article per
+edition) and CONMEBOL's Copa América award (continuous since 2011), UEFA's
+EURO fair-play recognition is not a single tracked award with one
+findable winner per edition; one source (footballwhispers.com, previewing
+Euro 2024) describes it only as "handed to the nation with the best
+disciplinary record", but no source surfaced who actually won it at any
+specific edition, 2024 included. This is the same "no single reliable fact
+to report" shape as the already-declined EURO 2000/2012 Team of the
+Tournament extended squads and the already-declined Nations League
+Golden Glove/Young Player of the Finals - not pursued, matching this site's
+standing rule of leaving a gap open rather than shipping a guess.
+
+**UEFA Nations League top scorer: investigated, not pursued.** Looked for a
+Golden-Boot-style companion section for Nations League (all four other team
+competitions - World Cup, EURO, and now via the `content/golden-boot.md`
+page - already have a top-scorer award; Nations League does not). Two
+WebSearch passes found that UEFA does present a sponsored "Top Scorer
+trophy presented by Alipay+", but it is scored across the *entire* two-year
+league phase (all four divisions, every UEFA national team), not the
+four-team Finals this page's own `## Finals` table and every other section
+on this page (`Player of the Finals`, `Winning managers`, `Winning
+captains`) are scoped to - a genuine scope mismatch, not just a sourcing
+gap. Separately, the *Finals*-only scoring picture is itself inconsistent
+across the two editions checked (2018-19: Cristiano Ronaldo led with 3 in
+the Finals; 2020-21: three players tied on 2 Finals goals each, a different
+stat entirely from that season's overall 6-goal leaders). Adding this would
+either misrepresent a season-long sponsor stat as a Finals award or require
+reconciling numbers that don't share a consistent scope across editions -
+not pursued. This confirms and extends the thirty-sixth/thirty-seventh
+runs' own conclusion that "Nations League's own individual-award landscape
+is murkier than the other five families' clean continuous histories."
+
+**Also revisited: Golden Boot "Multiple winners" parity with Ballon d'Or.**
+`content/ballon-dor.md` has a "Multiple winners through 2025" summary
+table that `content/golden-boot.md` lacks. Cross-checked by hand-tallying
+every name in the Ballon d'Or "Winners" table against its own "Multiple
+winners" table - all ten counts (Messi 8, Ronaldo 5, Cruyff/Platini/van
+Basten 3 each, five players on 2) matched exactly, so no accuracy bug
+either way. But `/records`'s existing generated "Most awards" ranking
+(`src/pages/records.astro`, `buildChampionsSummary()`) already computes
+this exact ranking from the same table data for both Ballon d'Or and each
+Golden Boot race - a hand-written duplicate in `content/golden-boot.md`
+would be presentation-only, not a missing fact, so not pursued as a content
+gap; noted here in case a future run wants it purely for the "vertical
+slice" of prose-page parity with Ballon d'Or, not because a reader is
+currently missing this information.
+
+None of the above needed a `content/*.md` edit, so no PDF regeneration was
+needed this run (`pnpm check:pdfs` above already confirmed all 700 still
+fresh from the fifty-ninth run's edits).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still fully open beyond the
+negatively-resolved 1979 sub-question). With EURO Fair Play and Nations
+League top scorer now both closed negatively alongside the already-closed
+Nations League Golden Glove/Young Player of the Finals, every remaining
+award-history angle across all six competition/award families has now been
+checked at least once - the next content-gap pass most likely needs a
+genuinely different quality angle (accessibility, performance, SEO, or a
+fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live site) rather
+than another award-name search, unless a new source lead surfaces for the
+Copa América captains.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
