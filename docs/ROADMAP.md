@@ -1823,3 +1823,52 @@ back clean:
   `docs/WEBSITE_REQUIREMENTS.md` read against the live site) rather than
   another award-name search, unless a new Copa América captain source lead
   surfaces.
+
+- **Copa América winning captains, 1975-2010 span recovered**: closed
+  2026-09-04 (sixty-first intensive run) - a standing health check first
+  (`pnpm outdated`/`pnpm dlx knip --no-config-hints` found nothing new, full
+  lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/`check:perf`
+  all clean, matching the sixtieth run's baseline). Re-attempted the
+  forty-sixth run's dropped 1975-2010 Copa América winning-captains span -
+  this routine's own top content priority (Copa América first) and the one
+  gap every recent run's closing note has kept pointing back to - with a
+  stricter method: every candidate checked against at least two independent
+  sources before acceptance, each edition judged on its own rather than the
+  whole span rising or falling together. Recovered 10 of the 14 editions:
+  1975 (Héctor Chumpitaz, Peru), 1989 (Ricardo Gomes, Brazil), 1991 and 1993
+  (Oscar Ruggeri, Argentina), 1995 (Enzo Francescoli, Uruguay - this run
+  reproduced the forty-sixth run's own initial wrong answer, Bengoechea, on
+  a first pass, then caught and corrected it on a second, more targeted
+  pass), 1997 (Dunga, Brazil), 1999 (Cafu, Brazil), 2001 (Iván Córdoba,
+  Colombia), 2004 (Alex, Brazil - specifically re-checked for the earlier
+  Alex/Cafu-1999 conflation and found clean this time), and 2007 (Lúcio,
+  Brazil). Three editions stay excluded, each for a specific confirmed
+  reason: 1979 (already closed negatively by the fifty-eighth run), 1983
+  (a plausible captain, Rodolfo Rodríguez, but no source confirms the
+  captaincy itself), and 1987 (a genuine two-way sourcing conflict - Perdomo
+  and Francescoli each turn up as both the player sent off and the captain
+  who lifted the trophy, in different searches). `content/copa-america.md`'s
+  "Winning captains" section intro rewritten to explain the recovered span
+  and name all three still-excluded editions with their specific reasons,
+  rather than the old single "scoped to 2011 onward" line; hand-translated
+  into `hr/competitions/copa-america.astro`. `lastReviewed` bumped to
+  2026-09-04. New e2e coverage (EN + HR, extended the existing test blocks
+  with two more assertions each rather than new blocks). All 700 PDFs
+  regenerated and reverified clean. Full standing health check clean:
+  517/517 unit tests (unchanged), 711 pages built (unchanged - no new
+  route), `check:links`/`check:sitemap`/`check:precache` all clean,
+  `check:perf` heaviest page `hr/records` now at 581.1 KB (590 KB budget,
+  ~9 KB headroom left - worth watching). See `docs/PROJECT_STATUS.md`'s
+  matching entry and `docs/SOURCES.md`'s matching entry (full citation list)
+  for detail. **Left for a future pass:** the same environment-blocked items
+  as every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness),
+  plus the two still-open Copa América captain editions (1983, 1987) -
+  neither re-attempted without a new source lead resolving the conflict
+  already found. `hr/records`'s shrinking page-weight headroom is worth
+  watching: the next content-adding run that pushes it over 590 KB should
+  raise `PAGE_WEIGHT_BUDGET_BYTES` in `scripts/check-page-weight.mjs`, the
+  same way seven prior additions already have. With the Copa América
+  captain gap now down to two genuinely unresolvable-without-a-new-source
+  editions, the next content-gap pass likely needs a genuinely different
+  quality angle (accessibility, performance, SEO, or a fresh
+  `docs/WEBSITE_REQUIREMENTS.md` read against the live site).

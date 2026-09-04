@@ -16157,5 +16157,124 @@ Copa América captains.
   the existing fetch-handler cache-on-read path, so offline reading for
   already-opened pages is unaffected either way. `CACHE_VERSION` is `v4`.
 
+### Copa América winning captains, 1975-2010 span recovered - closed 2026-09-04 (sixty-first intensive run)
+
+Started with the standing health check: `pnpm install` (fresh container),
+`pnpm outdated` found nothing new beyond the still-blocked `typescript` 7
+entry, `pnpm dlx knip --no-config-hints` matched every prior run's baseline
+(same one confirmed false positive), and `pnpm lint`/`pnpm test`/`pnpm
+build`/`check:links`/`check:sitemap`/`check:precache`/`check:perf` all
+matched the sixtieth run's baseline. Confirmed `docs/WEBSITE_REQUIREMENTS.md`
+is still fully satisfied and re-checked the sixtieth run's own closing note
+(every award-history angle across all six families now checked at least
+once) before picking a target: the forty-sixth run's dropped 1975-2010 Copa
+América winning-captains span, this routine's own explicit top priority
+(Copa América first) and the one content gap every recent run's closing note
+has kept pointing back to.
+
+The forty-sixth run's own entry above explains why it dropped the whole
+span rather than a partial one: two edition it had already logged as
+confirmed (1995, 2004) turned out contradicted on a second pass, plus an
+outright fabrication on 1987, and there was "no remaining way to tell which
+[answers] without a source this environment can actually reach." That
+reasoning is sound for a method that treats a first search result as
+confirmed - but this run used a stricter one: every candidate name checked
+against at least two independent sources *before* being accepted, with each
+edition's result judged on its own rather than the whole span rising or
+falling together. That distinction mattered immediately: the very first
+1995 pass this run tried also came back with Bengoechea, reproducing the
+forty-sixth run's own initial (wrong) result - but a second, more targeted
+pass caught it this time, confirming Enzo Francescoli was actually captain
+(copaamerica.com's own article on his three Copa América titles), with
+Bengoechea's real role - scoring the equalizer that forced the shootout -
+kept in the note explicitly so a future reader isn't tripped up by the same
+two names the way two different research passes already have been. 2004
+got the same deliberate scrutiny given the forty-sixth run's specific
+warning about it: two independent, 2004-only searches (copaamerica.com's
+own final report, and These Football Times' retrospective) both named Alex
+as captain with no mention of 1999 or Cafu anywhere in either result,
+unlike the conflated summary that tripped up the earlier attempt.
+
+Ten of the fourteen editions in the gap cleared the two-source bar: 1975
+(Héctor Chumpitaz, Peru - his "Capitán de América" nickname is reported
+independently by El Comercio, Trome and CONMEBOL's own site, all citing the
+1975 title as its origin), 1989 (Ricardo Gomes, Brazil - corroborated by
+his separately well-documented captaincy at the 1990 FIFA World Cup, which
+several sources connect back to his having already held the armband in
+1989), 1991 and 1993 (Oscar Ruggeri, Argentina - each edition checked with
+its own dedicated search, plus a third confirmatory pass on 1993 given the
+back-to-back pattern's obvious risk of one year's fact bleeding into the
+other), 1995 (Enzo Francescoli, Uruguay, per above), 1997 (Dunga, Brazil -
+copaamerica.com's own "Dunga and his great record" article), 1999 (Cafu,
+Brazil - corroborated by his own well-documented "Capitão do Penta"
+nickname, from a World Cup captaincy two years later, independently
+reported across CBF's own site and multiple Brazilian outlets), 2001 (Iván
+Córdoba, Colombia - CONMEBOL's own site, and he scored the winning goal
+himself, a fact several outlets attach directly to his captaincy), 2004
+(Alex, Brazil, per above), and 2007 (Lúcio, Brazil - Wikipedia's own match
+article plus multiple contemporary reports of the trophy ceremony).
+
+Three editions were re-investigated and still excluded, each now for a
+specific, individually confirmed reason rather than the forty-sixth run's
+blanket span cutoff: **1979** was already closed negatively by an
+intervening run (the fifty-eighth) - Paraguay's captain Hugo Talavera was
+controversially benched by the federation president just before the
+deciding match over an unrelated pay dispute, and no source names who
+lifted the trophy in his place, so this run didn't re-open it. **1983**
+turned up a strong *candidate* (Uruguay goalkeeper Rodolfo Rodríguez, the
+team's most-capped player at the time and a starter in both final legs) but
+no source directly states he was captain, only that he was "an important
+figure" - kept out rather than infer captaincy from a starting role alone.
+**1987** is a genuine, still-unresolved sourcing conflict, not just a gap:
+two separate searches each named a *different* Uruguay player as both the
+captain who was sent off in the 88th minute *and* the one who came back to
+lift the trophy - one naming José Perdomo, the other Enzo Francescoli, each
+version internally consistent and neither obviously wrong. Left out exactly
+like the already-flagged forty-sixth-run 1987 fabrication, just for a
+different, milder reason (contradiction rather than nonsense).
+
+Updated `content/copa-america.md`'s "Winning captains" section: replaced
+the old single-sentence "scoped to 2011 onward" framing with one that
+explains the recovered span and names all three still-excluded editions and
+why, added the ten new entries in chronological order before the existing
+2011-2024 run, and widened the closing "only back-to-back captains" trivia
+line to also credit Ruggeri alongside Bravo and Messi. `lastReviewed`
+bumped to 2026-09-04. Hand-translated the same changes into
+`hr/competitions/copa-america.astro`'s `notes` array, including the fuller
+Croatian scoping note. New e2e coverage: extended the existing "Winning
+captains" test blocks (EN + HR) with two more assertions each (1975
+Chumpitaz, 2007 Lúcio) rather than adding new test blocks, since this is
+more entries in an existing section, not a new one - checked first that
+neither new name collides with existing text elsewhere on the same page
+(the "Dunga (Brazil)"/"Enzo Francescoli (Uruguay)" substrings this run's
+own new entries share with the page's unrelated Winning-managers/Best-
+Player-winners sections were checked against every existing test and don't
+collide, since no existing test happens to query those exact substrings -
+unlike the Rodri/Yamal collision a much earlier EURO run hit).
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs, since this content edit and the
+`docs/SOURCES.md` addition both mark every PDF's shared References section
+stale, by design). Full standing health check clean: `pnpm lint` (0/0/0),
+`pnpm test` (517/517 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 581.1 KB, within the
+590 KB budget but with only ~9 KB headroom left - worth a page-weight budget
+raise or a slimming pass sooner rather than later at this addition rate),
+full cold-start `pnpm test:e2e` after the four new assertions above. See
+`docs/SOURCES.md`'s matching new entry for the full citation list. **Left
+for a future pass:** the same environment-blocked items as every recent run
+(`typescript` 7, `docs/SOURCES.md` link-liveness), plus the two still-open
+Copa América captain editions (1983's unconfirmed-but-plausible Rodríguez,
+1987's genuine two-way contradiction) - neither re-attempted without a new
+source lead specifically resolving the conflict already found, the same
+standing caution the rest of this file applies elsewhere. `hr/records`'s
+shrinking budget headroom is worth watching: the next content-adding run
+that pushes it over 590 KB should raise `PAGE_WEIGHT_BUDGET_BYTES` in
+`scripts/check-page-weight.mjs` with the reasoning on record, the same way
+seven prior additions already have.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
