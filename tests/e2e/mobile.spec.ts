@@ -152,6 +152,21 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
   });
 
+  test('a "Jump to a section" nav links straight to each notes card, past the eleven-card scroll', async ({
+    page,
+  }) => {
+    const jumpNav = page.locator('nav.notes__nav');
+    await expect(jumpNav).toBeVisible();
+    await expect(jumpNav).toHaveAccessibleName('Jump to a section');
+    await expect(jumpNav.locator('a')).toHaveCount(11);
+
+    const goldenGloveLink = jumpNav.getByRole('link', { name: 'Golden Glove winners' });
+    await expect(goldenGloveLink).toHaveAttribute('href', '#golden-glove-winners');
+    await goldenGloveLink.click();
+    await expect(page).toHaveURL(/#golden-glove-winners$/);
+    await expect(page.locator('#golden-glove-winners')).toBeInViewport();
+  });
+
   test('sorting by Winner (A–Z) groups all Argentina rows first', async ({ page }) => {
     await page.selectOption('#world-cup-sort', 'winner-asc');
 
@@ -436,6 +451,21 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
       page.locator('.notes__card').getByText('Hrvatska je 2018. stigla do svog prvog finala.'),
     ).toBeVisible();
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
+  });
+
+  test('has a translated "Skoči na odjeljak" jump nav linking straight to each notes card', async ({
+    page,
+  }) => {
+    const jumpNav = page.locator('nav.notes__nav');
+    await expect(jumpNav).toBeVisible();
+    await expect(jumpNav).toHaveAccessibleName('Skoči na odjeljak');
+    await expect(jumpNav.locator('a')).toHaveCount(11);
+
+    const link = jumpNav.getByRole('link', { name: 'Dobitnici Zlatne rukavice' });
+    await expect(link).toHaveAttribute('href', '#dobitnici-zlatne-rukavice');
+    await link.click();
+    await expect(page).toHaveURL(/#dobitnici-zlatne-rukavice$/);
+    await expect(page.locator('#dobitnici-zlatne-rukavice')).toBeInViewport();
   });
 
   test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({

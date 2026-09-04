@@ -1924,3 +1924,34 @@ back clean:
   the next content-gap pass likely needs a genuinely different quality angle
   (accessibility, performance, SEO, or a fresh `docs/WEBSITE_REQUIREMENTS.md`
   read against the live site) rather than another source-lead search.
+
+- **Notes jump nav**: closed 2026-09-04 (sixty-third intensive run) - took
+  the sixty-second run's own suggested quality-angle fork rather than
+  another award-name search. Sixty-two runs of award-history additions left
+  every competition/award page's shared `EditorialNotes.astro` note-card
+  list much longer than when it was first built (11 cards on FIFA World Cup,
+  9 on Copa América, 8 each on UEFA EURO and Ballon d'Or) with no way to
+  reach a specific card except scrolling past every one before it - a real,
+  previously-unaddressed UX gap the content work created as a side effect,
+  not something any prior Lighthouse/WCAG/SEO pass would have flagged (all
+  scored perfect already; this is a navigation gap, not a violation). Added
+  a "Jump to a section"/"Skoči na odjeljak" in-page nav, wired into the one
+  shared component so all six competition/award pages (EN + HR) plus `home`/
+  `quiz` get it automatically (the latter two stay under the new 4-section
+  threshold and don't render it): `src/lib/notes.ts` gained
+  `slugifyHeading()`/`slugifyHeadings()` (NFD-strip diacritics, a manual
+  đ/Đ->d step since that Croatian letter doesn't decompose under NFD the way
+  č/ć/š/ž do, plus de-duped suffixing), each note card got a stable
+  slug-based `id`, and `EditorialNotes.astro` renders a wrapping,
+  44px-tap-target pill-link nav above the cards, `no-print`-hidden, no
+  JavaScript (fragment links plus the page's pre-existing
+  `scroll-padding-top` rule already handle the sticky header offset). New
+  unit tests (517 -> 524) and one EN/HR e2e pair on the World Cup page. All
+  700 PDFs regenerated and reverified clean. Full standing health check
+  clean. See `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left
+  for a future pass:** the same environment-blocked items as every recent
+  run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa América's
+  1979 captain exclusion (unchanged, not re-attempted). Having found one
+  genuine UX gap on the quality-angle fork, a future run could look for more
+  of the same shape rather than assume repeat Lighthouse/WCAG sweeps are the
+  only quality angle left.
