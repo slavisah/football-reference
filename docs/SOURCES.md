@@ -2085,6 +2085,44 @@ Primary sources should be preferred.
     (e.g. Wikipedia's own per-edition squad templates, which several other
     editions' entries above were confirmed against) becomes reachable.
 
+- Winning captains, 1983 and 1987 resolved (added 2026-09-04, intensive run):
+  the entry above left these two editions open for "a future pass if a
+  structured, captain-tagged source becomes reachable" - re-attempted with
+  more targeted queries rather than the general per-edition searches the
+  prior pass used, and both resolved cleanly. **1983**: the prior pass had
+  Rodolfo Rodríguez only as "an important figure", not confirmed as captain -
+  his own Spanish Wikipedia biography states directly that he was "capitán
+  absoluto de la selección uruguaya entre 1980 y 1986" (Uruguay's outright
+  national-team captain from 1980 to 1986) and names the 1983 Copa América
+  specifically among the titles he captained; a second, independent source -
+  AHIFU's (Asociación de Historiadores e Investigadores del Fútbol Uruguayo)
+  dedicated "Los capitanes de la Celeste" history of Uruguay's national-team
+  captains - corroborates him for the same span. **1987**: the prior pass
+  found direct disagreement over who was even sent off in the final, with
+  both José Perdomo and Enzo Francescoli described as "the player sent off
+  and the captain" in different searches - this run's more targeted queries
+  found the actual explanation: both were sent off, at different minutes
+  (Francescoli in the 27th, Perdomo in the 88th), which is why either name
+  surfaced under "sent off" depending on which source a prior search
+  happened to draw from. Only Perdomo captained the side; the AUF (Uruguay's
+  own football association) confirms he "received the trophy" ("recibió el
+  trofeo") after a fan-favorite detail - the trophy's base came loose in his
+  hands as he lifted it - that only a source specifically about the
+  presentation, not just the match report, would carry. A second, independent
+  lineup source lists him explicitly as "(15, Captain)" in the same match.
+  Both facts cleared the two-independent-source bar this run's own re-check
+  method (see the 2026-09-04 entry above) already established, closing the
+  Copa América winning-captains span down to a single remaining gap (1979,
+  already closed negatively for its own separate, documented reason).
+  - https://es.wikipedia.org/wiki/Rodolfo_Rodr%C3%ADguez
+  - http://ahifu.uy/2022/06/16/los-capitanes-de-la-celeste-parte-2/
+  - https://www.auf.org.uy/uruguay-conquisto-la-copa-america-en-buenos-aires-venciendo-a-chile-en-la-final/
+  - https://en.wikipedia.org/wiki/Jos%C3%A9_Perdomo
+  - Note: the same egress-blocked-domains caveat applies (WebSearch synthesized
+    summaries only, no direct page loads); the AUF and AHIFU domains above are
+    the sites' own canonical URLs as returned by WebSearch, not independently
+    fetched.
+
 ## Ballon d'Or
 
 - Official winners and rankings:

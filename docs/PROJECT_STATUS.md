@@ -16276,5 +16276,101 @@ that pushes it over 590 KB should raise `PAGE_WEIGHT_BUDGET_BYTES` in
 `scripts/check-page-weight.mjs` with the reasoning on record, the same way
 seven prior additions already have.
 
+### Copa América winning captains, 1983 and 1987 resolved - closed 2026-09-04 (sixty-second intensive run)
+
+Started with the standing health check: `pnpm install` (fresh container),
+`pnpm outdated` found nothing new beyond the still-blocked `typescript` 7
+entry, `pnpm dlx knip --no-config-hints` matched every prior run's baseline
+(same one confirmed false positive), and `pnpm lint`/`pnpm test`/`pnpm
+build`/`check:links`/`check:sitemap`/`check:precache`/`check:perf` all
+matched the sixty-first run's baseline.
+
+Re-attempted the sixty-first run's own two remaining Copa América captain
+gaps (1983, 1987) directly, rather than picking a new topic - the sixty-first
+run's own closing note explicitly left them open "without a new source lead
+resolving the conflict already found", and this run found one for each by
+querying more specifically than the general per-edition searches the prior
+pass used (e.g. the player's own biography page, or the match final's own
+dedicated recap, rather than a generic "Copa América 1983 captain" search).
+
+**1983**: the sixty-first run had Rodolfo Rodríguez only as "an important
+figure... only a key player", not confirmed as captain. A `WebSearch` for
+Rodríguez's own biography surfaced two things a generic per-edition search
+hadn't: his Spanish Wikipedia page states directly that he was "capitán
+absoluto de la selección uruguaya entre 1980 y 1986" (Uruguay's outright
+national-team captain from 1980 to 1986) and separately names the 1983 Copa
+América among the titles he captained; a second, independent source - AHIFU
+(Asociación de Historiadores e Investigadores del Fútbol Uruguayo), a
+Uruguayan football-history research association, in a dedicated "Los
+capitanes de la Celeste" (The captains of the Celeste) piece cataloguing the
+national team's captains by era - corroborates him for the same span. Two
+independent sources, the same bar every other note section on this page
+uses, both specifically about captaincy rather than about the match or the
+player's career generally - a stronger fit than the sixty-first run's
+"important figure" finding.
+
+**1987**: the sixty-first run found "sources directly disagree on who was
+even sent off in the final's 88th minute, let alone who captained... both
+José Perdomo and Enzo Francescoli turn up described as Uruguay's captain,
+sent off, and the one who lifted the trophy, in different searches". A
+targeted search on the final's own recap resolved this cleanly: it wasn't a
+contradiction at all, just two separate, both-true expulsions - Francescoli
+was sent off in the 27th minute, Perdomo in the 88th, so a source that only
+reported one of the two expulsions could plausibly have been asked about by
+an earlier, less specific search and returned the wrong one as "the" player
+sent off. Only Perdomo captained the side. The AUF (Uruguay's own football
+association) explicitly confirms he "recibió el trofeo" (received the
+trophy) after full time - and specifically that the trophy's base came
+loose in his hands as he lifted it, a level of detail only a source about
+the actual presentation, not just the match result, would carry. A second,
+independent lineup source lists him explicitly as "(15, Captain)" in the
+same match. Both facts clear the two-independent-source bar.
+
+This leaves the Copa América winning-captains span down to a single
+remaining gap: 1979, already closed negatively for its own separate,
+documented reason (Talavera benched by the federation president just before
+the deciding match, no source names who lifted the trophy in his place) -
+not re-opened this run.
+
+Updated `content/copa-america.md`'s "Winning captains" section: rewrote the
+intro to describe recovering two more editions and narrowing the exclusion
+list to just 1979 (also correcting the sixty-first run's "fourteen editions"
+count to the accurate "thirteen" - 10 recovered + 3 excluded then, not 10 +
+4), and inserted the two new dated bullets in chronological order between
+the existing 1975 and 1989 entries. `lastReviewed` was already 2026-09-04
+from the sixty-first run earlier today, so left unchanged - this run's edit
+lands the same day. Hand-translated the same changes into
+`hr/competitions/copa-america.astro`'s `notes` array. No existing e2e
+assertion needed updating: the "Winning captains" test blocks (EN + HR)
+check specific already-present names (Chumpitaz, Lugano, Messi, Lúcio), not
+the excluded-editions list, so neither test needed a new assertion nor
+collided with the two new names.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs, since this content edit and the
+`docs/SOURCES.md` addition both mark every PDF's shared References section
+stale, by design). Full standing health check clean: `pnpm lint` (0/0/0),
+`pnpm test` (517/517 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page still `hr/records`, 581.1 KB,
+unchanged from the sixty-first run's measurement, within the 590 KB budget),
+full cold-start `pnpm test:e2e` (843/843 passed, 9.5 minutes, unchanged
+count since no new test cases were needed). See `docs/SOURCES.md`'s matching
+new entry for the full citation list.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). With the Copa
+América captain gap now down to a single, specifically-reasoned exclusion
+(1979), the next content-gap pass likely needs a genuinely different quality
+angle (accessibility, performance, SEO, or a fresh
+`docs/WEBSITE_REQUIREMENTS.md` read against the live site) rather than
+another source-lead search - this routine's own priority order (Copa
+América/Nations League/Ballon d'Or/Golden Boot content first) has now had
+every reliably-sourceable angle checked at least once across all four,
+repeatedly, so the next several runs likely belong on the quality-angle
+fork by default unless a new lead surfaces on its own.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
