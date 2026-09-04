@@ -16156,6 +16156,124 @@ Copa América captains.
   entry. Anything else still gets cached the moment it's actually visited via
   the existing fetch-handler cache-on-read path, so offline reading for
   already-opened pages is unaffected either way. `CACHE_VERSION` is `v4`.
+- `EditorialNotes.astro` renders a "Jump to a section"/"Skoči na odjeljak"
+  in-page nav (`.notes__nav`, hidden via the existing `.no-print` class on
+  paper) whenever a page hands it 4 or more note sections
+  (`JUMP_NAV_MIN_SECTIONS` in that file) - see the 2026-09-04 "notes jump
+  nav" entry below. Each card's own anchor id comes from
+  `slugifyHeading()`/`slugifyHeadings()` (`src/lib/notes.ts`), derived from
+  the section heading text itself rather than its array index, so it stays
+  stable if sections are reordered; `slugifyHeadings()` de-dupes with a
+  `-2`/`-3` suffix if two headings ever produce the same slug on one page
+  (not currently the case anywhere, including golden-boot.astro's two merged
+  note arrays).
+
+### Notes jump nav: an in-page "Jump to a section" link list for every long note-card list - closed 2026-09-04 (sixty-third intensive run)
+
+A standing health check first (`pnpm install`, `pnpm outdated` found nothing
+new beyond the still-blocked `typescript` 7 entry, full
+lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/`check:perf`
+all clean, matching the sixty-second run's baseline). The sixty-second run's
+own closing note said the Copa América captain gap is now down to a single,
+specifically-reasoned exclusion (1979) and "the next content-gap pass likely
+needs a genuinely different quality angle" - so this run moved to that fork
+rather than another award-name search, per this routine's own priority order
+(Copa América/Nations League/Ballon d'Or/Golden Boot content, then other
+roadmap items, then general quality).
+
+Sixty-two runs of steady award-history additions have left every
+competition/award page with far more note-card sections than the site had
+when `EditorialNotes.astro` (the single shared component every
+competition/award/home/quiz page uses to render "Memorable moments",
+"Winning captains", and now a dozen more award-history sections) was first
+built: FIFA World Cup has 11 note cards, Copa América 9, UEFA EURO 8, Ballon
+d'Or 8, Nations League 6, both Golden Boot tables 6 combined - all with
+nothing but a long vertical scroll to get from the top of the page to, say,
+"Golden Glove winners" past ten unrelated cards first. This is a genuine,
+previously-unaddressed UX gap the content-mining runs created as a side
+effect of their own success, not a repeat of any prior accessibility/SEO/
+Lighthouse pass (all of which scored perfect already; the gap here is
+navigation, not a violation any automated audit flags).
+
+Added a "Jump to a section" in-page nav to `EditorialNotes.astro` - the one
+shared component, so every page that uses it (all six competition/award
+pages in both languages, `home`/`quiz` too, though those stay under the
+threshold) benefits from a single change:
+
+- `src/lib/notes.ts` gained `slugifyHeading()`/`slugifyHeadings()`: an
+  NFD-normalize-and-strip-combining-marks slug, plus a manual `đ/Đ -> d`
+  step since that Croatian letter is a distinct glyph, not a base letter
+  with a combining diacritic, so NFD alone leaves it untouched (unlike
+  č/ć/š/ž, which do decompose that way). `slugifyHeadings()` de-dupes
+  repeated slugs with a `-2`/`-3` suffix, for golden-boot.astro's two merged
+  note arrays even though no actual collision exists there today.
+- `EditorialNotes.astro` gives each `<section class="notes__card">` a stable
+  `id` from that slug (the `<h2>` keeps its existing index-based
+  `note-heading-N` id/`aria-labelledby` pairing, untouched) and renders a
+  `<nav class="notes__nav card no-print" aria-label="...">` right above the
+  cards, only when `sections.length >= 4` (`JUMP_NAV_MIN_SECTIONS`) - short
+  pages like `/quiz` (2 sections) and the home page (2 sections) don't get
+  a nav that would outweigh the content it points to.
+- The nav is a wrapping pill list (`.notes__nav-list`, `flex-wrap: wrap`),
+  mobile-first per `AGENTS.md`'s own conventions - no horizontal overflow at
+  360px, each link a `min-height: 2.75rem` (44px) touch target per the same
+  file's "Interactive targets are at least 44px" rule, themed via the
+  existing `--border`/`--bg-subtle`/`--accent` tokens so light/dark and
+  `forced-colors` all inherit correctly with no new rules needed there. No
+  JavaScript: fragment links plus the page's pre-existing global
+  `scroll-padding-top: var(--site-header-height, ...)` rule (`global.css`)
+  already accounts for the sticky header's height on any anchor jump, the
+  same mechanism every other in-page navigation already relies on. Hidden on
+  paper via the existing shared `.no-print` class - PDFs render unaffected.
+- `jumpNavLabel` is an overridable prop (English default "Jump to a
+  section"), matching `References.astro`'s own established
+  overridable-prop-with-English-default convention (not `t()`/`UI_STRINGS`,
+  which that component also doesn't use) - each of the six Croatian
+  competition/award pages now passes `jumpNavLabel="Skoči na odjeljak"` at
+  its own `<EditorialNotes>` call site, the same way they already hand
+  `References` a hardcoded Croatian `heading` prop. `CompetitionView.astro`
+  (used only by the English competition pages) needed no change - its
+  callers get the English default automatically.
+
+New unit tests in `tests/unit/notes.test.ts` for both new functions,
+including the č/ć/š/ž-vs-đ/Đ distinction and the golden-boot.astro-style
+de-dupe case (517 -> 524 unit tests, coverage unchanged at
+99.91%/99.43% - the new code is fully covered). New e2e coverage in
+`tests/e2e/mobile.spec.ts`: one test on the English World Cup page (nav
+visible, correct `aria-label`, 11 links, clicking "Golden Glove winners"
+updates the URL hash and scrolls `#golden-glove-winners` into the
+viewport) and its Croatian mirror on `hr/competitions/world-cup`
+(`aria-label="Skoči na odjeljak"`, clicking "Dobitnici Zlatne rukavice"
+lands on `#dobitnici-zlatne-rukavice`) - one EN/HR pair is enough coverage
+for a shared-component feature rather than repeating the same assertions on
+all twelve pages that render it. `check:links`'s existing fragment-target
+validation (`scripts/check-internal-links.mjs`) already double-checks every
+new `href="#..."` resolves to a real id across all 715 built pages, so no
+extra link-integrity tooling was needed for this.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs) - `EditorialNotes.astro` is a
+PDF source file for every page family. `check:perf`'s heaviest page,
+`hr/records`, moved from 581.1 KB to 582.1 KB (still comfortably inside the
+590 KB budget - this page doesn't itself render `EditorialNotes`, the extra
+weight is `/records`' own JSON-LD/content, unrelated to this change; no page
+that does render the nav crossed a new heaviest-page rank). Full standing
+health check clean: `pnpm lint` (0/0/0), `pnpm test` (524/524 unit,
+coverage unchanged), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (within budget), full cold-start `pnpm test:e2e`
+(845/845 passed, 9.0 minutes, up from 843/843 - the two new jump-nav tests).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América's own single remaining captain exclusion (1979, already closed
+negatively, not re-attempted without a new source lead). With this run
+having found and closed a real UX gap on the quality-angle fork, a future
+run could look for more of the same shape (a genuine, previously-unnoticed
+usability issue) rather than assume another Lighthouse/WCAG-tag sweep is
+the only quality angle left, since those have both scored perfect
+repeatedly.
 
 ### Copa América winning captains, 1975-2010 span recovered - closed 2026-09-04 (sixty-first intensive run)
 
