@@ -1872,3 +1872,55 @@ back clean:
   editions, the next content-gap pass likely needs a genuinely different
   quality angle (accessibility, performance, SEO, or a fresh
   `docs/WEBSITE_REQUIREMENTS.md` read against the live site).
+
+- **Copa América winning captains, 1983 and 1987 resolved**: closed
+  2026-09-04 (sixty-second intensive run) - a standing health check first
+  (`pnpm outdated` found nothing new beyond the still-blocked `typescript` 7
+  entry, `pnpm dlx knip --no-config-hints` matched every prior run's
+  baseline, full lint/unit/build/`check:links`/`check:sitemap`/
+  `check:precache`/`check:perf` all clean, matching the sixty-first run's
+  baseline). Re-attempted the sixty-first run's own two remaining Copa
+  América captain gaps with more targeted queries (rather than the general
+  per-edition searches the prior pass used) and both resolved cleanly this
+  time. **1983**: Rodolfo Rodríguez's own Spanish Wikipedia biography states
+  directly he was Uruguay's outright national-team captain from 1980 to 1986
+  and names the 1983 Copa América specifically among the titles he
+  captained; a second, independent source - AHIFU's (Asociación de
+  Historiadores e Investigadores del Fútbol Uruguayo) dedicated "Los
+  capitanes de la Celeste" history of Uruguay's national-team captains -
+  corroborates him for the same span, clearing the two-independent-source bar
+  the sixty-first run's own "important figure, not confirmed as captain"
+  caution had failed. **1987**: the sixty-first run's "sources directly
+  disagree on who was even sent off" turned out to have a simple explanation
+  - both José Perdomo and Enzo Francescoli were sent off in that final, at
+  different minutes (Francescoli 27th, Perdomo 88th) - which is why either
+  name surfaced under "sent off" depending on which source a prior search
+  drew from. Only Perdomo captained the side and returned to the podium to
+  lift the trophy, confirmed independently by the AUF's (Uruguay's own
+  football association) own match report and a second lineup source listing
+  him explicitly as captain. This leaves the Copa América winning-captains
+  span down to a single remaining gap: 1979, already closed negatively for
+  its own separate, documented reason (Talavera benched, no source names his
+  replacement). `content/copa-america.md`'s "Winning captains" section intro
+  and two new dated bullets updated accordingly; hand-translated into
+  `hr/competitions/copa-america.astro`. `content/copa-america.md`'s
+  `lastReviewed` was already 2026-09-04 from the sixty-first run earlier
+  today, so left unchanged. All 700 PDFs regenerated and reverified clean
+  (`pnpm build:pdfs` then `pnpm check:pdfs`, using the
+  `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback this environment's
+  Chromium needs). No existing e2e assertion needed updating this run (the
+  "Winning captains" tests check specific names already present -
+  Chumpitaz/Lugano/Messi/Lúcio - not the excluded-editions list), so the full
+  cold-start `pnpm test:e2e` count stayed unchanged at 843/843 (9.5 minutes).
+  Full standing health check clean: `pnpm lint` (0/0/0), `pnpm test`
+  (517/517 unit, unchanged), `pnpm build` (711 pages, unchanged),
+  `check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+  (37 URLs), `check:perf` (heaviest page still `hr/records`, 581.1 KB, within
+  the 590 KB budget). See `docs/PROJECT_STATUS.md`'s matching entry and
+  `docs/SOURCES.md`'s matching entry (full citation list) for detail. **Left
+  for a future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness). With the Copa América
+  captain gap now down to a single, specifically-reasoned exclusion (1979),
+  the next content-gap pass likely needs a genuinely different quality angle
+  (accessibility, performance, SEO, or a fresh `docs/WEBSITE_REQUIREMENTS.md`
+  read against the live site) rather than another source-lead search.
