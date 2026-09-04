@@ -2016,6 +2016,74 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Winning captains, 1975-2010 span recovered (added 2026-09-04, intensive
+  run): the 2026-09-01 entry above dropped the entire 1975-2010 span after
+  cross-checks contradicted two editions (1995, 2004) it had first logged as
+  confirmed, plus an outright fabrication on 1987. This run re-attempted that
+  span with a stricter method - every candidate verified against at least two
+  independent sources before being accepted, and any edition producing a
+  contradiction between passes dropped individually rather than risking the
+  whole span again. Ten of the fourteen editions cleared that bar: 1975
+  (Héctor Chumpitaz, Peru - corroborated by his own "Capitán de América"
+  nickname, reported independently across multiple Peruvian outlets), 1989
+  (Ricardo Gomes, Brazil - corroborated by his later, well-documented 1990
+  World Cup captaincy), 1991 and 1993 (Oscar Ruggeri, Argentina - each
+  confirmed by three separate passes given the back-to-back-title pattern's
+  own risk of one edition's fact bleeding into the other), 1995 (Enzo
+  Francescoli, Uruguay - this run repeated the exact contradiction the prior
+  entry found, an initial pass returning Pablo Bengoechea, then confirmed
+  Francescoli via two more targeted passes; Bengoechea's real role, scoring
+  the equalizer that forced the shootout, is kept in the note so the two
+  names aren't confused by a future reader either), 1997 (Dunga, Brazil), 1999
+  (Cafu, Brazil - his "Capitão do Penta" nickname, from a World Cup captaincy
+  two years later, independently corroborates his 1999 captaincy in Brazilian
+  outlets), 2001 (Iván Córdoba, Colombia - he also scored the winning goal),
+  2004 (Alex, Brazil - this run specifically re-checked for the prior
+  fabrication risk of 2004 being conflated with 1999's Cafu and found no such
+  conflation across two independent, dedicated 2004 searches), and 2007
+  (Lúcio, Brazil). Three editions were re-investigated and still excluded,
+  each for a specific, now-documented reason rather than the prior entry's
+  blanket span cutoff: **1979** (already closed negatively by an intervening
+  run - Paraguay's captain Hugo Talavera was controversially benched by the
+  federation president just before the deciding match, and no source names
+  who lifted the trophy instead), **1983** (Uruguay goalkeeper Rodolfo
+  Rodríguez is a plausible captain - he was the team's most-capped player and
+  started every final - but no source directly confirms his captaincy, only
+  that he was "an important figure"), and **1987** (sources directly
+  disagree on who was even sent off in the final's 88th minute, let alone who
+  captained and lifted the trophy - both José Perdomo and Enzo Francescoli
+  turn up described as Uruguay's captain, sent off, and the one who lifted
+  the trophy, in different searches). `content/copa-america.md`'s "Winning
+  captains" section intro now explains this three-edition exclusion
+  explicitly rather than describing a single pre-2011 cutoff, and the "only
+  back-to-back captains" trivia line now also credits Ruggeri alongside Bravo
+  and Messi.
+  - https://www.conmebol.com/noticias/hector-chumpitaz-el-capitan-de-america-que-vencio-al-mejor-xi-europeo/
+  - https://trome.com/deportes/futbol-peruano/hector-chumpitaz-se-quiebra-al-recordar-titulo-de-la-copa-america-1975-video-seleccion-peruana-noticia/
+  - https://www.ocuriosodofutebol.com.br/2023/12/ricardo-gomes-e-sua-historia-com-camisa.html
+  - https://en.wikipedia.org/wiki/Ricardo_Gomes
+  - https://www.eltribuno.com/deportes/2024-7-15-20-9-0-dos-copa-america-y-un-mundial-quienes-igualaron-el-record-de-oscar-ruggeri
+  - https://memoriasdelfutbol.com/copa-america-chile-1991/
+  - https://www.byfarthegreatestteam.com/posts/argentina-1993-copa-america/
+  - https://en.wikipedia.org/wiki/1993_Copa_Am%C3%A9rica_final
+  - https://copaamerica.com/en/news/uruguay-stays-undefeated-at-home-again-in-1995
+  - https://copaamerica.com/en/news/enzo-francescoli-three-time-conmebol-copa-america-champion
+  - https://copaamerica.com/en/news/dunga-and-his-great-record-at-conmebol-copa-america
+  - https://en.wikipedia.org/wiki/1997_Copa_Am%C3%A9rica_final
+  - https://en.wikipedia.org/wiki/1999_Copa_Am%C3%A9rica_final
+  - https://www.cbf.com.br/selecao-brasileira/noticias/noticias-selecao-base-masculina/a/cafu-faz-55-anos-capitao-do-penta-simbolo-da-selecao-e-eterno-camisa-2-do-brasil
+  - https://copaamerica.com/en/news/when-ivan-cordoba-scored-the-title-winning-goal-for-colombia-in-2001
+  - https://en.wikipedia.org/wiki/Ivan_Cordoba
+  - https://copaamerica.com/en/news/final-of-the-2004-conmebol-copa-america-brazil-argentina-and-a-comeback-for-history
+  - https://thesefootballtimes.co/2021/06/10/when-the-emperor-conquered-the-continent-adriano-and-the-2004-copa-america/
+  - https://en.wikipedia.org/wiki/2007_Copa_Am%C3%A9rica_final
+  - https://copaamerica.com/en/news/brazil-3-0-argentina-the-heart-stopping-final-of-the-2007-conmebol-copa-america
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied entirely on
+    WebSearch's synthesized summaries rather than direct page loads. 1983 and
+    1987 stay open for a future pass if a structured, captain-tagged source
+    (e.g. Wikipedia's own per-edition squad templates, which several other
+    editions' entries above were confirmed against) becomes reachable.
 
 ## Ballon d'Or
 

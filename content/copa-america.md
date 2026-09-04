@@ -5,7 +5,7 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-09-02
+lastReviewed: 2026-09-04
 status: verified
 ---
 
@@ -267,14 +267,24 @@ A **second, independent cross-check** of the Final date column (2026-08-12, inte
 
 ## Winning captains
 
-- The captain is the player who lifts the trophy on the podium. Unlike the "Winning managers" section above, which is reliably sourced back to 1975, independent research passes for this section found captain identification only consistently confirmable across the same six editions this page's own Golden Glove award has existed for - 2011 onward. Earlier editions produced contradictory or unconfirmed captain names even for otherwise well-documented finals, so this section is deliberately scoped to that span rather than risk an unverified or contested name.
+- The captain is the player who lifts the trophy on the podium. Unlike the "Winning managers" section above, which is reliably sourced back to 1975, captain identification proved a materially harder fact to source for this competition: an earlier research pass found the whole 1975-2010 span too unreliable to ship, after independent cross-checks directly contradicted two editions it had first logged as confirmed. A later, more rigorous pass - cross-checking every edition against at least two independent sources, the same bar every other note section on this page uses - recovered ten of those fourteen editions. Three editions stay out for a specific, confirmed reason rather than a blanket pre-2011 cutoff: **1979** (Paraguay's captain, Hugo Talavera, was controversially benched by the federation president just before the deciding match over an unrelated dispute, and no source names who lifted the trophy in his place), **1983** (Uruguay's likely captain, goalkeeper Rodolfo Rodríguez, could not be confirmed as captain by any source found, only as a key player), and **1987** (sources directly disagree on who was even sent off in the final, let alone who captained and lifted the trophy - Perdomo and Francescoli each turn up as both).
+- **1975:** Héctor Chumpitaz (Peru) - nicknamed "Capitán de América" for his two decades leading the national team; also captained Peru at the 1970 and 1978 FIFA World Cups.
+- **1989:** Ricardo Gomes (Brazil) - went on to captain Brazil again at the 1990 FIFA World Cup.
+- **1991:** Oscar Ruggeri (Argentina) - the first of his two consecutive title-winning editions.
+- **1993:** Oscar Ruggeri (Argentina) - his second, back-to-back, scoring in the final itself.
+- **1995:** Enzo Francescoli (Uruguay) - his third and final Copa América title, though it was Pablo Bengoechea's late equalizer that forced the penalty shootout Uruguay went on to win.
+- **1997:** Dunga (Brazil) - Brazil's first title won away from home soil.
+- **1999:** Cafu (Brazil) - the same armband he wore to a World Cup title two years later, earning him Brazil's nickname "Capitão do Penta" (captain of the fifth World Cup star).
+- **2001:** Iván Córdoba (Colombia) - scored the only goal of the final himself, Colombia's only Copa América title.
+- **2004:** Alex (Brazil) - also set a tournament assists record that edition.
+- **2007:** Lúcio (Brazil).
 - **2011:** Diego Lugano (Uruguay) - wore the armband in all six of Uruguay's matches, lifting the trophy after a 3-0 final win over Paraguay.
 - **2015:** Claudio Bravo (Chile) - the first of his two title-winning editions as captain, saving a penalty in the final shootout against Argentina.
 - **2016:** Claudio Bravo (Chile) - his second, back-to-back, Copa América Centenario.
 - **2019:** Dani Alves (Brazil) - given the armband by manager Tite after Neymar was stripped of the captaincy following an off-field incident.
 - **2021:** Lionel Messi (Argentina) - the first of his two consecutive title-winning editions, his first major trophy with the senior Argentina team.
 - **2024:** Lionel Messi (Argentina) - his second, back-to-back, though an injury forced him off before the trophy lift.
-- Claudio Bravo and Lionel Messi are the only captains on this list to win back-to-back editions - Bravo as a goalkeeper, a rarer position for the honor.
+- Oscar Ruggeri, Claudio Bravo and Lionel Messi are the only captains on this list to win back-to-back editions - Bravo as a goalkeeper, a rarer position for the honor.
 
 ## Memorable moments
 

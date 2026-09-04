@@ -1182,6 +1182,10 @@ test.describe('Copa América page on a 360px phone', () => {
         .locator('.notes__card')
         .getByText('Lionel Messi (Argentina) - his second, back-to-back, though an injury'),
     ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Héctor Chumpitaz (Peru)'),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Lúcio (Brazil).')).toBeVisible();
   });
 
   test('shows an audited "Format" badge per edition', async ({ page }) => {
@@ -1404,6 +1408,10 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
         .locator('.notes__card')
         .getByText('Lionel Messi (Argentina) - njegova druga, uzastopna titula'),
     ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Héctor Chumpitaz (Peru)'),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Lúcio (Brazil).')).toBeVisible();
   });
 
   test('shows the same champion totals as the English page', async ({ page, baseURL }) => {
