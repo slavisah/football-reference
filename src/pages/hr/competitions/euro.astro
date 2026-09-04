@@ -67,11 +67,12 @@ const jsonLd = [
 // Hand-translated from content/uefa-euro.md's "How it works", "Historical
 // format note" (a single paragraph, no bullets - same as the English page),
 // "Player of the Tournament winners", "Young Player of the Tournament
-// winners", "Winning managers" and "Memorable moments" sections, the same
-// six headings the English page requests via noteHeadings. content/ itself
-// stays untouched and English (the single editorial source of truth); this
-// is presentation-layer text local to this page only, the same way the
-// earlier Croatian competition pages hand-write their own Croatian prose.
+// winners", "Team of the Tournament winners", "Winning managers", "Winning
+// captains" and "Memorable moments" sections, the same eight headings the
+// English page requests via noteHeadings. content/ itself stays untouched
+// and English (the single editorial source of truth); this is
+// presentation-layer text local to this page only, the same way the earlier
+// Croatian competition pages hand-write their own Croatian prose.
 const notes: NoteSection[] = [
   {
     heading: 'Kako funkcionira',
@@ -109,6 +110,18 @@ const notes: NoteSection[] = [
       '2016.: Renato Sanches (Portugal).',
       '2020.: Pedri (Španjolska).',
       '2024.: Lamine Yamal (Španjolska).',
+    ],
+  },
+  {
+    heading: 'Idealna momčad turnira',
+    items: [
+      'Tehnička skupina UEFA-e bira službenu idealnu momčad ("Best XI") na većini EURA od 1996.; dva izdanja u tom razdoblju - 2000. i 2012. - namjerno su izostavljena, jer je UEFA te godine objavila prošireni popis (22 igrača 2000., a 2012. čak 23 igrača uključujući tri vratara) umjesto jedne jasne postave od jedanaest igrača.',
+      '1996.: Andreas Köpke (Njemačka, vratar); Laurent Blanc (Francuska), Marcel Desailly (Francuska), Matthias Sammer (Njemačka), Paolo Maldini (Italija); Paul Gascoigne (Engleska), Karel Poborský (Češka), Dieter Eilts (Njemačka); Alan Shearer (Engleska), Hristo Stoičkov (Bugarska), Davor Šuker (Hrvatska).',
+      '2004.: Petr Čech (Češka, vratar); Traianos Dellas (Grčka), Ricardo Carvalho (Portugal), Giourkas Seitaridis (Grčka), Gianluca Zambrotta (Italija); Maniche (Portugal), Pavel Nedvěd (Češka), Theodoros Zagorakis (Grčka); Cristiano Ronaldo (Portugal), Milan Baroš (Češka), Wayne Rooney (Engleska).',
+      '2008.: Iker Casillas (Španjolska, vratar); Philipp Lahm (Njemačka), Carles Puyol (Španjolska), Carlos Marchena (Španjolska), Jurij Žirkov (Rusija); Luka Modrić (Hrvatska), Marcos Senna (Španjolska), Xavi Hernández (Španjolska), Hamit Altıntop (Turska); Andrej Aršavin (Rusija), David Villa (Španjolska).',
+      '2016.: Rui Patrício (Portugal, vratar); Joshua Kimmich (Njemačka), Jérôme Boateng (Njemačka), Pepe (Portugal), Raphaël Guerreiro (Portugal); Toni Kroos (Njemačka), Joe Allen (Wales); Antoine Griezmann (Francuska), Aaron Ramsey (Wales), Dimitri Payet (Francuska), Cristiano Ronaldo (Portugal).',
+      '2020.: Gianluigi Donnarumma (Italija, vratar); Kyle Walker (Engleska), Leonardo Bonucci (Italija), Harry Maguire (Engleska), Leonardo Spinazzola (Italija); Jorginho (Italija), Pierre-Emile Højbjerg (Danska), Pedri (Španjolska); Federico Chiesa (Italija), Romelu Lukaku (Belgija), Raheem Sterling (Engleska).',
+      '2024.: Mike Maignan (Francuska, vratar); Kyle Walker (Engleska), William Saliba (Francuska), Manuel Akanji (Švicarska), Marc Cucurella (Španjolska); Rodri (Španjolska), Dani Olmo (Španjolska), Fabián Ruiz (Španjolska); Lamine Yamal (Španjolska), Jamal Musiala (Njemačka), Nico Williams (Španjolska) - Kyle Walker jedini je igrač uvršten u obje uzastopne momčadi (2020. i 2024.), iako Engleska nijednu od tih godina nije osvojila.',
     ],
   },
   {

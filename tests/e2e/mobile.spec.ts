@@ -288,9 +288,11 @@ test.describe('EURO page on a 360px phone', () => {
     await expect(
       page.getByRole('heading', { name: 'Player of the Tournament winners', exact: true }),
     ).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('Rodri (Spain)')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Rodri (Spain)').first()).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Young Player of the Tournament winners' })).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('Lamine Yamal (Spain)')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Lamine Yamal (Spain)').first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Team of the Tournament winners' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Andreas Köpke (Germany, goalkeeper)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Luis de la Fuente (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Winning captains' })).toBeVisible();
@@ -533,7 +535,11 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
     await expect(
       page.getByRole('heading', { name: 'Dobitnici nagrade za najboljeg mladog igrača turnira' }),
     ).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('Lamine Yamal (Španjolska)')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Lamine Yamal (Španjolska)').first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Idealna momčad turnira' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Andreas Köpke (Njemačka, vratar)'),
+    ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Izbornici prvaka' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Luis de la Fuente (Španjolska)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Kapetani prvaka' })).toBeVisible();

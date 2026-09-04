@@ -15856,6 +15856,149 @@ standing health check with no new angle is the weakest fallback at this
 point, given how many consecutive runs
 have already come back byte-identical.
 
+### UEFA EURO Team of the Tournament winners - added 2026-09-04 (fifty-ninth intensive run)
+
+A standing health check first (`pnpm install`, `pnpm outdated` found nothing
+new beyond the still-blocked `typescript` 7 entry, `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline, full
+lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+`check:pdfs` all clean, 517/517 unit tests, 711 pages built).
+
+**The narrowed Copa América 1979 captain lead, resolved negatively.** The
+fifty-eighth run's own research had narrowed the standing Copa América
+1975-2010 winning-captain gap to one specific question: who was on the pitch
+to lift the trophy after the 11 December 1979 play-off, given Hugo Talavera
+was well-documented as Paraguay's captain but also reported injured and
+substituted during the semi-finals. Two fresh WebSearch passes this run
+answered it, but not the way the open question assumed: Talavera had in fact
+recovered from that injury in time for the final, but was controversially
+excluded from the squad by Paraguayan federation president Nicolás Leoz four
+days before the first final match, after Talavera demanded payment of
+overdue prize money and a raise contingent on the title. Leoz's own public
+justification - "Talavera is ruled out by the medical department; he will not
+recover from his injury" - is directly contradicted by Diario HOY's and ABC
+Color's own reporting that he had recovered by that point, both outlets
+framing it as a pay dispute dressed up as a medical exclusion. CONMEBOL's own
+historical squad-photo caption for the champion team (`conmebol.com`) lists
+eleven names and does not include Talavera among them, independently
+corroborating that he did not play the decisive 11 December 0-0 play-off
+against Chile. No source found by either pass names who wore the armband in
+his place. This closes the specific sub-question the fifty-eighth run raised
+(Talavera did not lift the trophy) without producing a name to add - the
+1975-2010 Copa América captain span stays exactly as scoped by the
+forty-sixth run, unchanged.
+
+- https://www.hoy.com.py/deportes/el-dia-en-que-nicolas-leoz-echo-a-hugo-talavera-de-la-seleccion
+- https://www.abc.com.py/deportes/futbol/cuando-echaron-a-hugo-talavera-de-la-seleccion-1762564.html
+- https://www.versus.com.py/versus/2024/10/31/el-dia-que-nicolas-leoz-expulso-a-hugo-ricardo-talavera-de-la-albirroja/
+- https://www.conmebol.com/galeria-historica/paraguay-campeon-de-america-1979-juan-espinola-juan-b-torales-flaminio-sosa-carlos-kiese/
+- https://www.hoy.com.py/deportes/el-ultimo-titulo-paraguay-campeon-de-america-en-1979
+- https://www.abc.com.py/deportes/futbol/paraguay-campeon-de-america-en-1979-1767925.html
+
+**UEFA EURO Team of the Tournament winners.** With Nations League/Ballon
+d'Or/Golden Boot content-mining already confirmed exhausted by prior runs'
+own closing notes, moved to "other roadmap items" per this routine's own
+priority order and found a genuinely new, well-scoped gap: UEFA's Technical
+Study Group has named an official Team of the Tournament at every EURO since
+1996, the same kind of award as Copa América's own "Team of the Tournament
+winners" section (fifty-second intensive run), but EURO's own page never had
+an equivalent.
+
+Research surfaced a real complication in two of the eight eligible editions:
+2000 and 2012 are genuinely different in kind from the other six, not just
+less documented. UEFA published an extended squad-of-the-tournament that
+year in both cases - 22 players in 2000, a full 23-player squad including
+three goalkeepers in 2012 - rather than naming one clean eleven. A dedicated
+follow-up search confirmed *why*: UEFA's own reporting on the 2012 selection
+states the Team of the Tournament that year matched the tournament's
+23-player national-squad size rather than picking a starting XI. Since there
+is no single eleven to report for either year without an arbitrary editorial
+pick, both are deliberately excluded - the same "no single reliable fact per
+edition" reasoning already used to exclude Copa América's 2011 edition from
+its own equivalent section.
+
+The remaining six editions (1996, 2004, 2008, 2016, 2020, 2024) were each
+independently verified via two WebSearch passes: the first round located
+each edition's official UEFA.com "Team of the Tournament" article, or (for
+2004 and 2008, where UEFA.com's own article text didn't surface a complete
+eleven in the search excerpt) the official UEFA EURO X/Twitter account's own
+post naming the full XI in strict goalkeeper/defenders/midfielders/forwards
+order; the second round cross-checked each roster against Wikipedia's
+per-year "Template:UEFA Euro `<year>` Team of the Tournament" page. 1996
+needed a third targeted pass, since no single source's excerpt listed all
+eleven names at once - two independent searches (one via UEFA.com's own
+retrospective article, one via a Bundesliga.com Germany-EURO-96 piece)
+converged on the same eleven: Andreas Köpke (Germany, goalkeeper); Laurent
+Blanc, Marcel Desailly, Matthias Sammer, Paolo Maldini; Paul Gascoigne, Karel
+Poborský, Dieter Eilts; Alan Shearer, Hristo Stoichkov, Davor Šuker. **No
+discrepancies found across any of the six included editions:**
+
+- https://www.uefa.com/uefaeuro/history/news/0253-0d7bd19d9827-e42f39bafcd8-1000--euro-1996-team-of-the-tournament/
+- https://en.wikipedia.org/wiki/Template:UEFA_Euro_1996_Team_of_the_Tournament
+- https://x.com/UEFAEURO/status/731134736593264641 (2004)
+- https://en.wikipedia.org/wiki/Template:UEFA_Euro_2004_Team_of_the_Tournament
+- https://x.com/UEFAEURO/status/732572996976660481 (2008)
+- https://www.uefa.com/news-media/news/0253-0d7c22bc5467-00c3bda04e75-1000--uefa-euro-2008tm-team-of-the-tournament/
+- https://bleacherreport.com/articles/2651447-uefa-euro-2016-team-of-the-tournament-announced-full-lineup-comments-reaction
+- https://www.uefa.com/news-media/news/022f-0f8e2faefb55-7394f0e79e79-1000--uefa-euro-2016-team-of-the-tournament
+- https://www.uefa.com/insideuefa/mediaservices/mediareleases/news/026b-12be976defd3-914f913b0653-1000--uefa-euro-2020-team-of-the-tournament/
+- https://www.uefa.com/uefaeuro/history/news/028f-1b61a0e91074-427664e9bbfe-1000--uefa-euro-2024-team-of-the-tournament/
+- https://en.wikipedia.org/wiki/Template:UEFA_Euro_2000_Team_of_the_Tournament (2000's own 22-player-squad finding)
+- https://www.uefa.com/uefaeuro/history/news/0254-0d7ed20b7bd1-cded9ff294f6-1000--ten-spain-players-in-team-of-the-tournament/ (2012's own 23-player-squad finding)
+
+Wired into `euro.astro`'s `noteHeadings` (English) and hand-translated into
+`hr/competitions/euro.astro`'s own `notes` array as "Idealna momčad
+turnira", matching Copa América's own Croatian label for this exact section
+name. While editing that array, also corrected its own stale top-of-array
+comment: it still said "six headings" and didn't even list the "Winning
+captains" section already present, dating back to a partial fix in the
+forty-fourth run's own entry - now lists all eight headings the page
+actually requests.
+
+`content/uefa-euro.md`'s `lastReviewed` bumped to 2026-09-04. New e2e
+coverage (EN + HR heading/content assertions) in `tests/e2e/mobile.spec.ts`.
+Including "Rodri (Spain)" and "Lamine Yamal (Spain)" (and their Croatian
+equivalents) in the new 2024 entry collided with two pre-existing
+`getByText()` assertions for those exact strings in the "Player of the
+Tournament winners"/"Young Player of the Tournament winners" sections above
+- Playwright's strict mode caught this on the first cold-start `test:e2e`
+run (`Rodri (Spain)` resolving to two elements); fixed with `.first()`,
+matching the same collision-and-fix pattern several earlier content-adding
+runs have hit (e.g. the fifty-second run's Copa América "James Rodríguez"
+collision, the forty-ninth run's Ballon d'Or Mbappé/Lewandowski collision).
+A clean re-run then passed 843/843 (13.2 minutes), matching the fifty-eighth
+run's own baseline unchanged - two existing `test()` blocks were extended
+rather than a new one added.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs, since this content edit and the
+`docs/SOURCES.md` addition both mark every PDF's shared References section
+stale, by design). No page-weight budget raise needed this run (577.5 KB vs.
+the 590 KB budget, ~12.5 KB headroom left - the tightest margin since the
+fifty-second run's own 15.3 KB note, so the next content addition that grows
+`docs/SOURCES.md` further will likely need one). Full standing health check
+clean: `pnpm lint` (0/0/0), `pnpm test` (517/517 unit, unchanged -
+presentation-layer content, no new unit-testable logic), `pnpm build` (711
+pages, unchanged - no new route), `check:links` (715 pages), `check:sitemap`
+(710 entries), `check:precache` (37 URLs), `check:perf` (heaviest page
+`hr/records`, within budget), `check:pdfs` (700/700 fresh), `pnpm dlx knip
+--no-config-hints` (same one confirmed false positive as every prior run),
+full cold-start `pnpm test:e2e` (843/843 passed, 13.2 minutes).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (the 1979 sub-question is now closed
+negatively - Talavera did not lift the trophy, and no replacement name
+surfaced; 1983 and the rest of the span remain fully open with no new source
+lead, and there is no indication a similar "excluded captain" storyline
+explains the other missing years). With EURO's own individual/team-award set
+now also covering Team of the Tournament, the next content-gap pass likely
+needs either a fresh source lead for the Copa América captain-sourcing
+problem or a genuinely different quality angle (accessibility, performance,
+SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live
+site).
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
