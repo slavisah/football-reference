@@ -219,19 +219,12 @@ export function yearByWinnerQuestions(
   locale: Locale = 'en',
   subject: 'team' | 'player' = 'player',
 ): QuizQuestion[] {
-  const winnerCounts = new Map<string, number>();
-  for (const edition of editions) {
-    const winner = edition.winner.trim();
-    if (!winner || isPlaceholderWinner(winner) || winner.includes(';')) continue;
-    winnerCounts.set(winner, (winnerCounts.get(winner) ?? 0) + 1);
-  }
-
+  const oneTimeWinners = new Set(uniqueWinnerEditions(editions).map((e) => e.winner.trim()));
   const pool = [...new Set(editions.map((e) => e.year))];
   const questions: QuizQuestion[] = [];
   for (const edition of editions) {
     const winner = edition.winner.trim();
-    if (!winner || isPlaceholderWinner(winner) || winner.includes(';')) continue;
-    if (winnerCounts.get(winner) !== 1) continue;
+    if (!oneTimeWinners.has(winner)) continue;
     const id = `${seedPrefix}:year-by-winner:${edition.year}`;
     const choice = buildChoice(id, edition.year, pool);
     if (!choice) continue;
@@ -248,6 +241,35 @@ export function yearByWinnerQuestions(
     });
   }
   return questions;
+}
+
+/**
+ * Editions whose winner is a single (non-tied) name that doesn't repeat
+ * anywhere else in the given list - the subset safe to sample for a
+ * chronological-order question about an individual award. Ordering four
+ * champions works even when a country wins more than once, because each
+ * card also shows its host (see quiz.astro's `hostedByLabel`) - but an
+ * individual award has no such second attribute, so a repeat winner (e.g.
+ * Kylian Mbappé's two Golden Boots) or a joint-tie row (e.g. the World Cup
+ * Golden Boot's 1962 six-way tie) would put two identical-looking cards in
+ * the shuffle with no way to tell them apart without giving away the year
+ * itself - the exact fact the question is testing. Also backs
+ * `yearByWinnerQuestions`, which needs the identical one-time-winner
+ * filter for the same underlying reason (no single correct year for a
+ * repeat winner).
+ */
+export function uniqueWinnerEditions(editions: Edition[]): Edition[] {
+  const counts = new Map<string, number>();
+  for (const edition of editions) {
+    const winner = edition.winner.trim();
+    if (!winner || isPlaceholderWinner(winner) || winner.includes(';')) continue;
+    counts.set(winner, (counts.get(winner) ?? 0) + 1);
+  }
+  return editions.filter((edition) => {
+    const winner = edition.winner.trim();
+    if (!winner || isPlaceholderWinner(winner) || winner.includes(';')) return false;
+    return counts.get(winner) === 1;
+  });
 }
 
 /**

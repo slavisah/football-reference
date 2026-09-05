@@ -16676,5 +16676,126 @@ different quality angle (accessibility, performance, SEO, or a fresh
 `docs/WEBSITE_REQUIREMENTS.md`/live-site read) rather than another
 award-name search.
 
+### Family Quiz: chronological-order questions for the three individual awards, plus a Nations League Team of the Tournament investigation closed negatively - closed 2026-09-05 (sixty-sixth intensive run)
+
+A standing health check first: `pnpm install` (fresh container), `pnpm
+outdated` found nothing new beyond the still-blocked `typescript` 7 entry
+(the sixty-fifth run's own `@playwright/test` bump already landed), `pnpm
+dlx knip --no-config-hints` matched every prior run's baseline (the same
+one confirmed `scripts/test-preview-server.mjs` false positive), and `pnpm
+lint`/`pnpm test`/`pnpm build`/`check:links`/`check:sitemap`/
+`check:precache`/`check:perf`/`check:pdfs` all matched the sixty-fifth
+run's baseline exactly (524/524 unit, 711 pages, 715 links, 710 sitemap
+entries, 37 precache URLs, heaviest pages `hr/records` 584.3 KB and
+`records` 579.2 KB, 700/700 PDFs fresh).
+
+**Content-gap research, closed negatively:** per this routine's own
+priority order, re-checked Copa América's 1979 captain exclusion first via
+two fresh `WebSearch` passes - still no source names who lifted the trophy
+in Hugo Talavera's place; unchanged. Investigated a new lead instead: every
+other team competition now has a "Team of the Tournament" note section
+(EURO since the fifty-ninth run, Copa América since the fifty-second,
+World Cup investigated and declined in the sixty-fifth run) except UEFA
+Nations League. Three `WebSearch` passes found a confirmable, complete
+official XI for only the inaugural 2019 Finals (UEFA's own announcement
+names all eleven); 2021, 2023 and 2025 have plenty of coverage of that
+edition's Player of the Finals but no discoverable full Team of the
+Tournament lineup, and this environment's outbound network policy still
+blocks a direct fetch of UEFA.com's own roundup article
+(`www.uefa.com` - confirmed blocked again this run via `WebFetch`) that
+might otherwise settle it. One confirmed edition out of four completed
+Finals is the same "no single reliable shape across every edition" gap
+that already excluded the World Cup's Team of the Tournament (sixty-fifth
+run) and EURO's own 2000/2012 extended squads (fifty-ninth run) - not
+pursued. No `content/*.md` file touched by this investigation.
+
+**Family Quiz: individual-award ordering questions, a real structural gap
+rather than another award-name search.** The Family Quiz's "chronological
+order" ranking question type (`chronologicalOrderQuestions()`,
+`src/lib/quiz.ts`) has existed since its own rollout for the four team
+competitions only (FIFA World Cup, UEFA EURO, Copa América, UEFA Nations
+League) - `quiz.astro`'s own comment explained why the three individual
+awards (Ballon d'Or, both Golden Boot tables) were left out: ordering a
+team champion works even when the same country wins twice, because each
+card's label also shows its host (`hostedByLabel`), but an individual
+award's only per-edition attribute is the winner's name itself, so a
+repeat winner (e.g. Kylian Mbappé's two Golden Boots) or a joint-tie row
+(e.g. the 1962 World Cup Golden Boot's six-way tie) would put two
+identical-looking cards in the same shuffle with no way to tell them apart
+without revealing the year - the exact fact being tested. That reasoning
+is sound for the *whole* table, but not for a *filtered* one: a new
+exported `uniqueWinnerEditions()` (`src/lib/quiz.ts`) returns only the
+editions whose winner is a single, non-tied name that doesn't repeat
+anywhere else in the list, which is exactly the subset a fair ordering
+question can safely draw from. `yearByWinnerQuestions()` needed the
+identical one-time-winner filter for its own, already-documented reason
+(no single correct year for a repeat winner) - refactored to call the new
+shared function instead of re-implementing the same counting logic inline,
+with no behavior change (its own existing unit tests pass unmodified).
+
+Wired into both `quiz.astro` and `hr/quiz.astro`: three more
+`chronologicalOrderQuestions()` calls each (Ballon d'Or, World Cup Golden
+Boot, EURO Golden Boot), fed `uniqueWinnerEditions(...)` instead of the raw
+table and a plain `winnerLabel` (just the name - no host to append) instead
+of `hostedByLabel`. All three tables have well over the four one-time
+winners a question needs (Ballon d'Or has 70 editions with only a handful
+of repeat winners; both Golden Boot tables similarly), so real questions
+generate every build. The order-question section grew from 4 to 7 cards
+per language, confirmed by inspecting the built HTML directly
+(`quiz-order__items` occurrences inside `.quiz__order-section`) rather than
+assumed. Renamed the section from "Champion order challenge"/"Izazov:
+poredaj prvake" to "Order challenge"/"Izazov: poredaj" (`quizOrderHeading`/
+`quizOrderIntro` in `src/lib/i18n.ts`, plus the matching English/Croatian
+prose in `content/quiz.md` and `hr/quiz.astro`'s own hand-written notes)
+since "champion" no longer describes every card in the section - updated
+the two existing e2e assertions that matched the old heading text
+verbatim. `content/quiz.md`'s `lastReviewed` bumped to 2026-09-05.
+
+New unit test coverage in `tests/unit/quiz.test.ts`: a dedicated
+`uniqueWinnerEditions` describe block (keeps only one-time winners, drops
+a "Not awarded" placeholder, drops a joint-tie row even when it occurs only
+once, excludes *every* occurrence of a repeat winner rather than just the
+extras) plus two integration tests under `chronologicalOrderQuestions`
+proving the combination actually prevents the ambiguity it's meant to -
+one showing a repeat winner (Messi, sampled twice in a six-edition Golden
+Ball fixture) is fully excluded from the built question with no duplicate
+item labels, the other showing the shared World-Cup fixture (only one
+true one-time champion) correctly yields no question at all once filtered,
+same as before this change (524 -> 530 unit tests, coverage unchanged at
+99.91%/99.43% - the one pre-existing uncovered branch this file already
+carried, `mostTitlesQuestion`'s own `!choice` guard, simply moved to a new
+line number from the code added above it, per the twenty-sixth run's
+already-documented "coverage sweep" classification of it as defensively
+unreachable, not undertested).
+
+`/quiz` isn't a PDF-source page (`scripts/pdf-pages.mjs` has no entry for
+it), so `check:pdfs` needed no regeneration - confirmed still 700/700
+fresh. Page weight grew from 333.9/337.0 KB to 344.6/348.0 KB (EN/HR) from
+the extra question cards, comfortably inside the 590 KB budget with no
+raise needed. Full standing health check clean: `pnpm lint` (0/0/0), `pnpm
+test` (530/530 unit), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest pages unchanged - `hr/records`/`records`
+still the top two), `check:pdfs` (700/700 fresh), `pnpm dlx knip
+--no-config-hints` (same one confirmed false positive), `check:lighthouse`
+(all 37 pages still a perfect 1.00 across every category, `/quiz`/`hr/quiz`
+included despite the added content), full cold-start `pnpm test:e2e`
+(847/847 passed, 8.3 minutes, unchanged count - this run extended existing
+`test()` assertions and added unit coverage rather than new e2e cases).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América's 1979 captain exclusion (unchanged, not re-attempted) and UEFA
+Nations League's own Team of the Tournament (confirmable for 2019 only,
+not pursued for the other three editions without a source lead that gets
+past this environment's `www.uefa.com` block). With every reachable
+award-history angle across all six families now checked at least once and
+the quiz's own individual-award ordering gap closed, a future run's best
+leads are either a fresh source for one of the two remaining
+sourcing-blocked facts above, or another genuinely new structural gap of
+the same shape as this run's (a feature that quietly excluded part of the
+site's own content for a reason later found to be fixable with a narrower
+filter, rather than a wholesale redesign).
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

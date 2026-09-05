@@ -30,6 +30,7 @@ import {
   mostTitlesQuestion,
   runnerUpByYearQuestions,
   topScorerByYearQuestions,
+  uniqueWinnerEditions,
   yearByWinnerQuestions,
   selectQuiz,
   type QuizPool,
@@ -50,7 +51,7 @@ const notes: NoteSection[] = [
       'Odaberi odgovor, a zatim pritisni "Provjeri odgovor" da vidiš jesi li točno pogodio/la i dodaš bod svom rezultatu.',
       'Otvori "Samo mi pokaži odgovor" na bilo kojem pitanju da pogledaš rješenje bez igranja.',
       'Pritisni "Ponovno pokreni kviz" da obrišeš odgovore i igraš ponovno.',
-      '"Izazov: poredaj prvake" niže na stranici funkcionira drugačije: poredaj svakog prvaka pomoću padajućeg izbornika, a zatim pritisni "Provjeri redoslijed".',
+      '"Izazov: poredaj" niže na stranici funkcionira drugačije: poredaj svakog prvaka ili dobitnika nagrade pomoću padajućeg izbornika, a zatim pritisni "Provjeri redoslijed".',
     ],
   },
   {
@@ -63,7 +64,7 @@ const notes: NoteSection[] = [
       'Tko je osvojio Zlatnu loptu u danoj godini?',
       'Koje je godine dana reprezentacija osvojila natjecanje, ili dani igrač osvojio Zlatnu loptu? (pita se samo o jednokratnim prvacima/dobitnicima)',
       'Koja reprezentacija ili igrač ima najviše naslova/nagrada na natjecanju?',
-      'Poredaj četiri prvaka natjecanja kronološkim redoslijedom (od najranijeg).',
+      'Poredaj četiri prvaka natjecanja, ili četiri dobitnika pojedinačne nagrade (Zlatna lopta, Zlatna kopačka), kronološkim redoslijedom (od najranijeg).',
     ],
   },
 ];
@@ -279,8 +280,11 @@ const pools: QuizPool[] = [
 const questions = selectQuiz(pools, 'family-quiz:v1');
 
 // Same "chronological order" ranking questions as the English page, with a
-// Croatian item label and locale: 'hr' for the Croatian prompt wording.
+// Croatian item label and locale: 'hr' for the Croatian prompt wording. The
+// three individual awards sample only uniqueWinnerEditions() the same way
+// the English page does - see that page's own comment for why.
 const hostedByLabel = (edition: Edition) => `${edition.winner} (domaćin: ${edition.host ?? '—'})`;
+const winnerLabel = (edition: Edition) => edition.winner;
 const orderQuestions = [
   ...chronologicalOrderQuestions(worldCup.editions, WORLD_CUP_NAME, 'world-cup', hostedByLabel, 4, 'hr'),
   ...chronologicalOrderQuestions(euro.editions, EURO_NAME, 'euro', hostedByLabel, 4, 'hr'),
@@ -290,6 +294,30 @@ const orderQuestions = [
     NATIONS_LEAGUE_NAME,
     'nations-league',
     hostedByLabel,
+    4,
+    'hr',
+  ),
+  ...chronologicalOrderQuestions(
+    uniqueWinnerEditions(ballonDor.editions),
+    BALLON_DOR_NAME,
+    'ballon-dor',
+    winnerLabel,
+    4,
+    'hr',
+  ),
+  ...chronologicalOrderQuestions(
+    uniqueWinnerEditions(goldenBootWorldCup.editions),
+    GOLDEN_BOOT_WORLD_CUP_NAME,
+    'golden-boot-world-cup',
+    winnerLabel,
+    4,
+    'hr',
+  ),
+  ...chronologicalOrderQuestions(
+    uniqueWinnerEditions(goldenBootEuro.editions),
+    GOLDEN_BOOT_EURO_NAME,
+    'golden-boot-euro',
+    winnerLabel,
     4,
     'hr',
   ),
