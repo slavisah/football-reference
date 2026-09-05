@@ -2123,6 +2123,39 @@ Primary sources should be preferred.
     the sites' own canonical URLs as returned by WebSearch, not independently
     fetched.
 
+- Winning captains, 1979 resolved (added 2026-09-05, intensive run): the two
+  entries above closed the Copa América winning-captains span down to a
+  single remaining gap - 1979, where Paraguay's regular captain, Hugo
+  Talavera, was controversially benched by the federation president just
+  before the deciding match, with no prior pass finding a source naming his
+  replacement. A fresh round of WebSearch passes, including Spanish-language
+  queries specifically targeting Paraguayan press coverage of the 1979 title,
+  found the replacement: **Aldo Florentín**. His own dedicated English
+  Wikipedia biography states directly that he "served as captain of the
+  Paraguayan team that won the Copa América in 1979"; independently, Paraguay's
+  ABC Color newspaper (a distinct source from Wikipedia, the same
+  two-independent-source bar every edition on this list already clears)
+  states he "wore the captain's armband and received the Copa in 1979".
+  CONMEBOL's own historical-gallery caption for the champion squad also lists
+  him among the players. One early search result surfaced a conflicting
+  narrative - that star player Julio César Romero ("Romerito") physically
+  lifted the trophy rather than Florentín - but three follow-up passes using
+  different phrasings never reproduced that claim, while every other result
+  (including the two independent, named sources above) consistently credits
+  Florentín with both the armband and the trophy presentation; treated as an
+  uncorroborated outlier rather than a genuine source conflict, the same
+  judgment call the 1987 entry above had to make explicit before it resolved
+  cleanly. This closes the Copa América winning-captains section completely -
+  every edition from 1975 to 2024 now has a named, two-source-confirmed
+  captain.
+  - https://en.wikipedia.org/wiki/Aldo_Florent%C3%ADn
+  - https://www.abc.com.py/deportes/futbol/paraguay-campeon-de-america-en-1979-1767925.html
+  - https://www.conmebol.com/galeria-historica/paraguay-campeon-de-america-1979-juan-espinola-juan-b-torales-flaminio-sosa-carlos-kiese/
+  - https://www.hoy.com.py/deportes/el-ultimo-titulo-paraguay-campeon-de-america-en-1979
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied entirely on
+    WebSearch's synthesized summaries rather than direct page loads.
+
 ## Ballon d'Or
 
 - Official winners and rankings:
