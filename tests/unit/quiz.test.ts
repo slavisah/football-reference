@@ -9,6 +9,7 @@ import {
   runnerUpByYearQuestions,
   selectQuiz,
   topScorerByYearQuestions,
+  uniqueWinnerEditions,
   yearByWinnerQuestions,
 } from '../../src/lib/quiz';
 import type { ChampionSummary, Edition, MarkdownTable } from '../../src/lib/types';
@@ -318,6 +319,54 @@ describe('yearByWinnerQuestions', () => {
   });
 });
 
+describe('uniqueWinnerEditions', () => {
+  const ballonDorTable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'National team'],
+    rows: [
+      ['2016', 'Cristiano Ronaldo', 'Portugal'],
+      ['2017', 'Cristiano Ronaldo', 'Portugal'],
+      ['2018', 'Luka Modrić', 'Croatia'],
+      ['2019', 'Lionel Messi', 'Argentina'],
+      ['2020', 'Not awarded', '—'],
+      ['2021', 'Lionel Messi', 'Argentina'],
+      ['2022', 'Karim Benzema', 'France'],
+    ],
+  };
+  const ballonDorEditions = buildEditions(ballonDorTable);
+
+  it('keeps only editions whose winner appears exactly once', () => {
+    const result = uniqueWinnerEditions(ballonDorEditions);
+    expect(result.map((e) => e.year)).toEqual(['2018', '2022']);
+  });
+
+  it('drops a "Not awarded" placeholder row', () => {
+    const result = uniqueWinnerEditions(ballonDorEditions);
+    expect(result.some((e) => e.winner === 'Not awarded')).toBe(false);
+  });
+
+  it('drops a joint-tie row even when it occurs only once', () => {
+    const tieTable: MarkdownTable = {
+      headers: ['Year', 'Player(s)', 'Team'],
+      rows: [
+        ['1962', 'Garrincha; Vavá', 'Multiple'],
+        ['1966', 'Eusébio', 'Portugal'],
+        ['1970', 'Gerd Müller', 'West Germany'],
+      ],
+    };
+    const tieEditions = buildEditions(tieTable);
+    const result = uniqueWinnerEditions(tieEditions);
+    expect(result.map((e) => e.year)).toEqual(['1966', '1970']);
+  });
+
+  it('excludes every occurrence of a repeat winner, not just the extras', () => {
+    // From the shared World Cup `editions` fixture above: Uruguay (1930,
+    // 1950) and Italy (1934, 1938) each won twice, so only West Germany
+    // (1954) is a one-time champion.
+    const result = uniqueWinnerEditions(editions);
+    expect(result.map((e) => e.year)).toEqual(['1954']);
+  });
+});
+
 describe('chronologicalOrderQuestions', () => {
   const label = (edition: Edition) => `${edition.winner} (host: ${edition.host ?? '—'})`;
 
@@ -413,6 +462,47 @@ describe('chronologicalOrderQuestions', () => {
     );
     expect(hrQuestions[0].items).toEqual(enQuestions[0].items);
     expect(hrQuestions[0].correctRanks).toEqual(enQuestions[0].correctRanks);
+  });
+
+  it('combined with uniqueWinnerEditions(), builds an individual-award ordering question with no duplicate labels', () => {
+    const goldenBallTable: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Team'],
+      rows: [
+        ['1982', 'Paolo Rossi', 'Italy'],
+        ['1986', 'Diego Maradona', 'Argentina'],
+        ['1990', 'Salvatore Schillaci', 'Italy'],
+        ['1994', 'Romário', 'Brazil'],
+        ['2014', 'Lionel Messi', 'Argentina'],
+        ['2022', 'Lionel Messi', 'Argentina'],
+      ],
+    };
+    const goldenBallEditions = buildEditions(goldenBallTable);
+    const winnerLabel = (edition: Edition) => edition.winner;
+    const questions = chronologicalOrderQuestions(
+      uniqueWinnerEditions(goldenBallEditions),
+      'Golden Ball',
+      'golden-ball',
+      winnerLabel,
+    );
+    expect(questions).toHaveLength(1);
+    // Messi's two wins (2014, 2022) must both be excluded, not just one -
+    // otherwise two cards could show the identical "Lionel Messi" label with
+    // no way to tell which is which.
+    expect(questions[0].items).not.toContain('Lionel Messi');
+    expect(new Set(questions[0].items).size).toBe(questions[0].items.length);
+  });
+
+  it('skips an individual award with too few one-time winners once repeats are filtered out', () => {
+    // Only West Germany (1954) is a one-time champion in the shared fixture,
+    // one short of the default itemCount of 4.
+    const winnerLabel = (edition: Edition) => edition.winner;
+    const questions = chronologicalOrderQuestions(
+      uniqueWinnerEditions(editions),
+      'FIFA World Cup',
+      'world-cup',
+      winnerLabel,
+    );
+    expect(questions).toHaveLength(0);
   });
 });
 

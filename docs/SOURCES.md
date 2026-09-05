@@ -972,6 +972,52 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Team of the Tournament winners (added 2026-09-04, intensive run): a new
+  "Team of the Tournament winners" note section on `content/uefa-euro.md`,
+  the same shape as Copa América's own "Team of the Tournament winners"
+  section (fifty-second intensive run) - UEFA's Technical Study Group has
+  named an official Team of the Tournament at every EURO since 1996.
+  Deliberately scoped to six of the eight editions in that span: research
+  found that 2000 and 2012 are genuinely different in kind, not just less
+  documented - UEFA published a 22-player squad-of-the-tournament in 2000
+  and a full 23-player squad (including three goalkeepers, matching that
+  year's expanded national-squad size) in 2012, rather than naming one clean
+  eleven, so there is no single XI to report without an arbitrary editorial
+  pick. Each of the six included editions (1996, 2004, 2008, 2016, 2020,
+  2024) was independently verified via two WebSearch passes: the first
+  round located each edition's official UEFA.com "Team of the Tournament"
+  article or the UEFA EURO account's own X/Twitter post naming the XI in
+  strict goalkeeper/defenders/midfielders/forwards order (used for 2004 and
+  2008); the second round cross-checked each roster against Wikipedia's
+  "Template:UEFA Euro `<year>` Team of the Tournament" page and, for 1996,
+  independently confirmed the full eleven (Köpke; Blanc, Desailly, Sammer,
+  Maldini; Gascoigne, Poborský, Eilts; Shearer, Stoichkov, Šuker) since no
+  single source's excerpt listed all eleven names at once. A third,
+  targeted pass specifically confirmed the 2000/2012 extended-squad finding
+  itself (searching for *why* UEFA named 23 rather than 11 in 2012, which
+  turned up UEFA's own explanation that the Team of the Tournament that year
+  matched the tournament's 23-player national-squad size). **No
+  discrepancies found across any of the six included editions:**
+  - https://www.uefa.com/uefaeuro/history/news/0253-0d7bd19d9827-e42f39bafcd8-1000--euro-1996-team-of-the-tournament/
+  - https://en.wikipedia.org/wiki/Template:UEFA_Euro_1996_Team_of_the_Tournament
+  - https://x.com/UEFAEURO/status/731134736593264641
+  - https://en.wikipedia.org/wiki/Template:UEFA_Euro_2004_Team_of_the_Tournament
+  - https://x.com/UEFAEURO/status/732572996976660481
+  - https://www.uefa.com/news-media/news/0253-0d7c22bc5467-00c3bda04e75-1000--uefa-euro-2008tm-team-of-the-tournament/
+  - https://bleacherreport.com/articles/2651447-uefa-euro-2016-team-of-the-tournament-announced-full-lineup-comments-reaction
+  - https://www.uefa.com/news-media/news/022f-0f8e2faefb55-7394f0e79e79-1000--uefa-euro-2016-team-of-the-tournament
+  - https://www.uefa.com/insideuefa/mediaservices/mediareleases/news/026b-12be976defd3-914f913b0653-1000--uefa-euro-2020-team-of-the-tournament/
+  - https://www.uefa.com/uefaeuro/history/news/028f-1b61a0e91074-427664e9bbfe-1000--uefa-euro-2024-team-of-the-tournament/
+  - https://en.wikipedia.org/wiki/Template:UEFA_Euro_2000_Team_of_the_Tournament
+    (2000's own 22-player-squad finding)
+  - https://www.uefa.com/uefaeuro/history/news/0254-0d7ed20b7bd1-cded9ff294f6-1000--ten-spain-players-in-team-of-the-tournament/
+    (2012's own 23-player-squad finding)
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages (including official UEFA.com
+    articles and the UEFA EURO account's own X/Twitter posts, both indexed
+    and reachable via WebSearch even though direct WebFetch to uefa.com and
+    x.com is not) rather than direct page loads.
 
 ## UEFA Nations League
 
@@ -1970,6 +2016,112 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Winning captains, 1975-2010 span recovered (added 2026-09-04, intensive
+  run): the 2026-09-01 entry above dropped the entire 1975-2010 span after
+  cross-checks contradicted two editions (1995, 2004) it had first logged as
+  confirmed, plus an outright fabrication on 1987. This run re-attempted that
+  span with a stricter method - every candidate verified against at least two
+  independent sources before being accepted, and any edition producing a
+  contradiction between passes dropped individually rather than risking the
+  whole span again. Ten of the fourteen editions cleared that bar: 1975
+  (Héctor Chumpitaz, Peru - corroborated by his own "Capitán de América"
+  nickname, reported independently across multiple Peruvian outlets), 1989
+  (Ricardo Gomes, Brazil - corroborated by his later, well-documented 1990
+  World Cup captaincy), 1991 and 1993 (Oscar Ruggeri, Argentina - each
+  confirmed by three separate passes given the back-to-back-title pattern's
+  own risk of one edition's fact bleeding into the other), 1995 (Enzo
+  Francescoli, Uruguay - this run repeated the exact contradiction the prior
+  entry found, an initial pass returning Pablo Bengoechea, then confirmed
+  Francescoli via two more targeted passes; Bengoechea's real role, scoring
+  the equalizer that forced the shootout, is kept in the note so the two
+  names aren't confused by a future reader either), 1997 (Dunga, Brazil), 1999
+  (Cafu, Brazil - his "Capitão do Penta" nickname, from a World Cup captaincy
+  two years later, independently corroborates his 1999 captaincy in Brazilian
+  outlets), 2001 (Iván Córdoba, Colombia - he also scored the winning goal),
+  2004 (Alex, Brazil - this run specifically re-checked for the prior
+  fabrication risk of 2004 being conflated with 1999's Cafu and found no such
+  conflation across two independent, dedicated 2004 searches), and 2007
+  (Lúcio, Brazil). Three editions were re-investigated and still excluded,
+  each for a specific, now-documented reason rather than the prior entry's
+  blanket span cutoff: **1979** (already closed negatively by an intervening
+  run - Paraguay's captain Hugo Talavera was controversially benched by the
+  federation president just before the deciding match, and no source names
+  who lifted the trophy instead), **1983** (Uruguay goalkeeper Rodolfo
+  Rodríguez is a plausible captain - he was the team's most-capped player and
+  started every final - but no source directly confirms his captaincy, only
+  that he was "an important figure"), and **1987** (sources directly
+  disagree on who was even sent off in the final's 88th minute, let alone who
+  captained and lifted the trophy - both José Perdomo and Enzo Francescoli
+  turn up described as Uruguay's captain, sent off, and the one who lifted
+  the trophy, in different searches). `content/copa-america.md`'s "Winning
+  captains" section intro now explains this three-edition exclusion
+  explicitly rather than describing a single pre-2011 cutoff, and the "only
+  back-to-back captains" trivia line now also credits Ruggeri alongside Bravo
+  and Messi.
+  - https://www.conmebol.com/noticias/hector-chumpitaz-el-capitan-de-america-que-vencio-al-mejor-xi-europeo/
+  - https://trome.com/deportes/futbol-peruano/hector-chumpitaz-se-quiebra-al-recordar-titulo-de-la-copa-america-1975-video-seleccion-peruana-noticia/
+  - https://www.ocuriosodofutebol.com.br/2023/12/ricardo-gomes-e-sua-historia-com-camisa.html
+  - https://en.wikipedia.org/wiki/Ricardo_Gomes
+  - https://www.eltribuno.com/deportes/2024-7-15-20-9-0-dos-copa-america-y-un-mundial-quienes-igualaron-el-record-de-oscar-ruggeri
+  - https://memoriasdelfutbol.com/copa-america-chile-1991/
+  - https://www.byfarthegreatestteam.com/posts/argentina-1993-copa-america/
+  - https://en.wikipedia.org/wiki/1993_Copa_Am%C3%A9rica_final
+  - https://copaamerica.com/en/news/uruguay-stays-undefeated-at-home-again-in-1995
+  - https://copaamerica.com/en/news/enzo-francescoli-three-time-conmebol-copa-america-champion
+  - https://copaamerica.com/en/news/dunga-and-his-great-record-at-conmebol-copa-america
+  - https://en.wikipedia.org/wiki/1997_Copa_Am%C3%A9rica_final
+  - https://en.wikipedia.org/wiki/1999_Copa_Am%C3%A9rica_final
+  - https://www.cbf.com.br/selecao-brasileira/noticias/noticias-selecao-base-masculina/a/cafu-faz-55-anos-capitao-do-penta-simbolo-da-selecao-e-eterno-camisa-2-do-brasil
+  - https://copaamerica.com/en/news/when-ivan-cordoba-scored-the-title-winning-goal-for-colombia-in-2001
+  - https://en.wikipedia.org/wiki/Ivan_Cordoba
+  - https://copaamerica.com/en/news/final-of-the-2004-conmebol-copa-america-brazil-argentina-and-a-comeback-for-history
+  - https://thesefootballtimes.co/2021/06/10/when-the-emperor-conquered-the-continent-adriano-and-the-2004-copa-america/
+  - https://en.wikipedia.org/wiki/2007_Copa_Am%C3%A9rica_final
+  - https://copaamerica.com/en/news/brazil-3-0-argentina-the-heart-stopping-final-of-the-2007-conmebol-copa-america
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied entirely on
+    WebSearch's synthesized summaries rather than direct page loads. 1983 and
+    1987 stay open for a future pass if a structured, captain-tagged source
+    (e.g. Wikipedia's own per-edition squad templates, which several other
+    editions' entries above were confirmed against) becomes reachable.
+
+- Winning captains, 1983 and 1987 resolved (added 2026-09-04, intensive run):
+  the entry above left these two editions open for "a future pass if a
+  structured, captain-tagged source becomes reachable" - re-attempted with
+  more targeted queries rather than the general per-edition searches the
+  prior pass used, and both resolved cleanly. **1983**: the prior pass had
+  Rodolfo Rodríguez only as "an important figure", not confirmed as captain -
+  his own Spanish Wikipedia biography states directly that he was "capitán
+  absoluto de la selección uruguaya entre 1980 y 1986" (Uruguay's outright
+  national-team captain from 1980 to 1986) and names the 1983 Copa América
+  specifically among the titles he captained; a second, independent source -
+  AHIFU's (Asociación de Historiadores e Investigadores del Fútbol Uruguayo)
+  dedicated "Los capitanes de la Celeste" history of Uruguay's national-team
+  captains - corroborates him for the same span. **1987**: the prior pass
+  found direct disagreement over who was even sent off in the final, with
+  both José Perdomo and Enzo Francescoli described as "the player sent off
+  and the captain" in different searches - this run's more targeted queries
+  found the actual explanation: both were sent off, at different minutes
+  (Francescoli in the 27th, Perdomo in the 88th), which is why either name
+  surfaced under "sent off" depending on which source a prior search
+  happened to draw from. Only Perdomo captained the side; the AUF (Uruguay's
+  own football association) confirms he "received the trophy" ("recibió el
+  trofeo") after a fan-favorite detail - the trophy's base came loose in his
+  hands as he lifted it - that only a source specifically about the
+  presentation, not just the match report, would carry. A second, independent
+  lineup source lists him explicitly as "(15, Captain)" in the same match.
+  Both facts cleared the two-independent-source bar this run's own re-check
+  method (see the 2026-09-04 entry above) already established, closing the
+  Copa América winning-captains span down to a single remaining gap (1979,
+  already closed negatively for its own separate, documented reason).
+  - https://es.wikipedia.org/wiki/Rodolfo_Rodr%C3%ADguez
+  - http://ahifu.uy/2022/06/16/los-capitanes-de-la-celeste-parte-2/
+  - https://www.auf.org.uy/uruguay-conquisto-la-copa-america-en-buenos-aires-venciendo-a-chile-en-la-final/
+  - https://en.wikipedia.org/wiki/Jos%C3%A9_Perdomo
+  - Note: the same egress-blocked-domains caveat applies (WebSearch synthesized
+    summaries only, no direct page loads); the AUF and AHIFU domains above are
+    the sites' own canonical URLs as returned by WebSearch, not independently
+    fetched.
 
 ## Ballon d'Or
 

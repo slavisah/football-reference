@@ -15751,6 +15751,353 @@ a deliberate look at the Vitest 5 upgrade, or another genuinely different
 quality angle (performance, SEO, or a fresh read of
 `docs/WEBSITE_REQUIREMENTS.md` against the live site).
 
+### Vitest 4 -> 5 major-version upgrade - added 2026-09-03 (fifty-eighth intensive run)
+
+Followed this routine's own Copa América > Nations League > Ballon d'Or >
+Golden Boot priority order first: re-checked Copa América's 1975-2010
+winning-captain gap once more via `WebSearch`, and this time it surfaced a
+real, multi-source-corroborated lead for 1979 that no prior run's search
+phrasing had turned up - CONMEBOL's own site and Hugo Talavera's Wikipedia
+page both independently describe him as Paraguay's national-team captain
+during that campaign, and several Paraguayan outlets (ABC Color, Diario HOY,
+La Nación, La Tribuna) cover his captaincy in detail, including that he
+scored in the semi-final second leg against Brazil. It stops short of
+confirming him for this page's own "lifts the trophy on the podium"
+definition, though: the same sources also describe him picking up an injury
+mid-tournament and being replaced by Julio César Romero for the second
+Brazil semi-final, and none of the search results pinned down who was on
+the pitch - Talavera or a stand-in - for the actual trophy lift after the
+decisive 0-0 play-off in Buenos Aires on 11 December 1979 (a three-match
+final format: Paraguay won the first leg 3-0, Chile the second 1-0, then a
+neutral-venue play-off Paraguay won by some means the search snippets don't
+specify - possibly penalties or a countback rule). A follow-up search on
+1983 found only that Uruguay's goalkeeper Rodolfo Rodríguez is listed first
+in CONMEBOL's own historical squad photo caption, with no source calling
+him or anyone else the captain. Given this page's own standing caution
+about "contradictory or unconfirmed captain names" for pre-2011 editions,
+neither is solid enough to add this run - but 1979 is now a concrete,
+narrower research question for next time (who lifted the trophy on 11
+December 1979) rather than the fully-open gap every prior run has re-hit,
+so it's worth a dedicated pass rather than a repeat of this same broad
+query. Nations League's individual-award ideas are already confirmed not
+viable four times over and Ballon d'Or/Golden Boot's companion-award sets
+are both already complete, so per this file's own "don't repeat a
+confirmed-exhausted angle" standing advice, moved to the dependency/quality
+fork - specifically the fifty-seventh run's own closing note flagging the
+available Vitest 4 -> 5 major upgrade as "found but didn't take
+unreviewed."
+
+`WebSearch` for Vitest 5's breaking changes turned up the headline items:
+`test.sequential`/`describe.sequential` removed (use `concurrent: false`
+instead), `clearMocks` now defaults to `true` (mock call history is reset
+before every test, though implementations are left intact), browser-mode
+locators now serialize as an object instead of a bare selector string, and
+a new Node.js >=22.12.0 / Vite >=6.4.0 floor. None apply here:
+`vitest.config.ts` has no `sequential` usage, no workspace file, and no
+browser-mode config; this environment's `node --version` is `v22.22.2`,
+already above the new floor. The one item worth checking by hand was
+`clearMocks` - a behavior change, not just a removed option - so grepped
+`tests/unit/` for `vi.fn`/`vi.mock`/`vi.spyOn` (8 call sites across 4 files:
+`competition.test.ts`, `teamCompetitions.test.ts`, `homeCards.test.ts`,
+`glossary.test.ts`) and confirmed none of them depends on a mock's call
+history surviving into a later test - each sets up and asserts its mock
+within the same `it()` block, so the new default is a no-op for this suite.
+
+Ran `pnpm add -D vitest@5.0.0 @vitest/coverage-v8@5.0.0` (kept both packages
+in lockstep, as they've always needed to be - a mismatched
+vitest/coverage-v8 major pairing is Vitest's own most common upgrade
+footgun, avoided here by bumping both in the same command). `pnpm test`
+(517/517 unit) and `pnpm test:coverage` both passed with **zero source or
+config changes required** - no test file uses a v5-removed API, and
+`vitest.config.ts`'s `defineConfig` shape type-checks unchanged.
+Coverage held at 99.91% statements / 100% functions / 100% lines; the
+branch figure prints as 99.43% now (698/702) rather than v4's 99.42% - the
+same 698/702 branches covered, just v5's reporter rounding the identical
+fraction one hundredth of a percent differently, not a real change (the
+four uncovered lines are the same `quiz.ts`/`sources.ts`/`tableSort.ts`/
+`url.ts` lines every audit since 2026-08-23 has classified as defensively
+unreachable).
+
+Full standing health check clean: `pnpm lint` (**0 errors/warnings/hints**
+across 168 files), `pnpm build` (711 pages, unchanged), `check:links` (715
+pages), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+`check:perf` (heaviest page still `hr/records`, 574.1 KB, unchanged - no
+content edit this run), `check:pdfs` (700/700 fresh, unaffected - neither
+`vitest.config.ts` nor any test file is a PDF source), `pnpm dlx knip
+--no-config-hints` (same one confirmed false positive as every prior run).
+A full cold-start `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+test:e2e` run (Playwright, unaffected by this change but re-run anyway as
+this routine's standing practice): **843/843 passed** (13.7 minutes),
+unchanged count, no pre-existing assertion needed updating - confirms the
+Vitest major bump introduced no behavioral regression anywhere in the site
+or its test suites.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7 - still blocked on `@astrojs/check`'s `typescript:
+'^5.0.0 || ^6.0.0'` peer ceiling, re-confirmed via `npm view
+@astrojs/check@latest peerDependencies` this run too - and `docs/SOURCES.md`
+link-liveness, still blocked by this environment's outbound network policy
+against `en.wikipedia.org` specifically), plus the narrower Copa América
+1979 captain question this run's own research turned up: search specifically
+for who was on the pitch to lift the trophy after the 11 December 1979
+neutral-venue play-off in Buenos Aires (Paraguay 0-0 Chile, Paraguay
+champion) - Hugo Talavera is well-corroborated as Paraguay's captain that
+year but is also documented as injured and substituted during the
+semi-finals, so it needs one more targeted source before it can be added,
+not a repeat of this run's broader query. 1983's captain is still fully
+open - no source this run found named anyone as Uruguay's captain, only
+that goalkeeper Rodolfo Rodríguez led the historical squad photo caption.
+With content-mining confirmed exhausted across every competition/award
+family and this run's own flagged dependency angle now also addressed, the
+next intensive run likely needs either that narrowed 1979 lookup or a
+genuinely different quality angle (performance, SEO, or a fresh read of
+`docs/WEBSITE_REQUIREMENTS.md` against the live site) - simply repeating the
+standing health check with no new angle is the weakest fallback at this
+point, given how many consecutive runs
+have already come back byte-identical.
+
+### UEFA EURO Team of the Tournament winners - added 2026-09-04 (fifty-ninth intensive run)
+
+A standing health check first (`pnpm install`, `pnpm outdated` found nothing
+new beyond the still-blocked `typescript` 7 entry, `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline, full
+lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+`check:pdfs` all clean, 517/517 unit tests, 711 pages built).
+
+**The narrowed Copa América 1979 captain lead, resolved negatively.** The
+fifty-eighth run's own research had narrowed the standing Copa América
+1975-2010 winning-captain gap to one specific question: who was on the pitch
+to lift the trophy after the 11 December 1979 play-off, given Hugo Talavera
+was well-documented as Paraguay's captain but also reported injured and
+substituted during the semi-finals. Two fresh WebSearch passes this run
+answered it, but not the way the open question assumed: Talavera had in fact
+recovered from that injury in time for the final, but was controversially
+excluded from the squad by Paraguayan federation president Nicolás Leoz four
+days before the first final match, after Talavera demanded payment of
+overdue prize money and a raise contingent on the title. Leoz's own public
+justification - "Talavera is ruled out by the medical department; he will not
+recover from his injury" - is directly contradicted by Diario HOY's and ABC
+Color's own reporting that he had recovered by that point, both outlets
+framing it as a pay dispute dressed up as a medical exclusion. CONMEBOL's own
+historical squad-photo caption for the champion team (`conmebol.com`) lists
+eleven names and does not include Talavera among them, independently
+corroborating that he did not play the decisive 11 December 0-0 play-off
+against Chile. No source found by either pass names who wore the armband in
+his place. This closes the specific sub-question the fifty-eighth run raised
+(Talavera did not lift the trophy) without producing a name to add - the
+1975-2010 Copa América captain span stays exactly as scoped by the
+forty-sixth run, unchanged.
+
+- https://www.hoy.com.py/deportes/el-dia-en-que-nicolas-leoz-echo-a-hugo-talavera-de-la-seleccion
+- https://www.abc.com.py/deportes/futbol/cuando-echaron-a-hugo-talavera-de-la-seleccion-1762564.html
+- https://www.versus.com.py/versus/2024/10/31/el-dia-que-nicolas-leoz-expulso-a-hugo-ricardo-talavera-de-la-albirroja/
+- https://www.conmebol.com/galeria-historica/paraguay-campeon-de-america-1979-juan-espinola-juan-b-torales-flaminio-sosa-carlos-kiese/
+- https://www.hoy.com.py/deportes/el-ultimo-titulo-paraguay-campeon-de-america-en-1979
+- https://www.abc.com.py/deportes/futbol/paraguay-campeon-de-america-en-1979-1767925.html
+
+**UEFA EURO Team of the Tournament winners.** With Nations League/Ballon
+d'Or/Golden Boot content-mining already confirmed exhausted by prior runs'
+own closing notes, moved to "other roadmap items" per this routine's own
+priority order and found a genuinely new, well-scoped gap: UEFA's Technical
+Study Group has named an official Team of the Tournament at every EURO since
+1996, the same kind of award as Copa América's own "Team of the Tournament
+winners" section (fifty-second intensive run), but EURO's own page never had
+an equivalent.
+
+Research surfaced a real complication in two of the eight eligible editions:
+2000 and 2012 are genuinely different in kind from the other six, not just
+less documented. UEFA published an extended squad-of-the-tournament that
+year in both cases - 22 players in 2000, a full 23-player squad including
+three goalkeepers in 2012 - rather than naming one clean eleven. A dedicated
+follow-up search confirmed *why*: UEFA's own reporting on the 2012 selection
+states the Team of the Tournament that year matched the tournament's
+23-player national-squad size rather than picking a starting XI. Since there
+is no single eleven to report for either year without an arbitrary editorial
+pick, both are deliberately excluded - the same "no single reliable fact per
+edition" reasoning already used to exclude Copa América's 2011 edition from
+its own equivalent section.
+
+The remaining six editions (1996, 2004, 2008, 2016, 2020, 2024) were each
+independently verified via two WebSearch passes: the first round located
+each edition's official UEFA.com "Team of the Tournament" article, or (for
+2004 and 2008, where UEFA.com's own article text didn't surface a complete
+eleven in the search excerpt) the official UEFA EURO X/Twitter account's own
+post naming the full XI in strict goalkeeper/defenders/midfielders/forwards
+order; the second round cross-checked each roster against Wikipedia's
+per-year "Template:UEFA Euro `<year>` Team of the Tournament" page. 1996
+needed a third targeted pass, since no single source's excerpt listed all
+eleven names at once - two independent searches (one via UEFA.com's own
+retrospective article, one via a Bundesliga.com Germany-EURO-96 piece)
+converged on the same eleven: Andreas Köpke (Germany, goalkeeper); Laurent
+Blanc, Marcel Desailly, Matthias Sammer, Paolo Maldini; Paul Gascoigne, Karel
+Poborský, Dieter Eilts; Alan Shearer, Hristo Stoichkov, Davor Šuker. **No
+discrepancies found across any of the six included editions:**
+
+- https://www.uefa.com/uefaeuro/history/news/0253-0d7bd19d9827-e42f39bafcd8-1000--euro-1996-team-of-the-tournament/
+- https://en.wikipedia.org/wiki/Template:UEFA_Euro_1996_Team_of_the_Tournament
+- https://x.com/UEFAEURO/status/731134736593264641 (2004)
+- https://en.wikipedia.org/wiki/Template:UEFA_Euro_2004_Team_of_the_Tournament
+- https://x.com/UEFAEURO/status/732572996976660481 (2008)
+- https://www.uefa.com/news-media/news/0253-0d7c22bc5467-00c3bda04e75-1000--uefa-euro-2008tm-team-of-the-tournament/
+- https://bleacherreport.com/articles/2651447-uefa-euro-2016-team-of-the-tournament-announced-full-lineup-comments-reaction
+- https://www.uefa.com/news-media/news/022f-0f8e2faefb55-7394f0e79e79-1000--uefa-euro-2016-team-of-the-tournament
+- https://www.uefa.com/insideuefa/mediaservices/mediareleases/news/026b-12be976defd3-914f913b0653-1000--uefa-euro-2020-team-of-the-tournament/
+- https://www.uefa.com/uefaeuro/history/news/028f-1b61a0e91074-427664e9bbfe-1000--uefa-euro-2024-team-of-the-tournament/
+- https://en.wikipedia.org/wiki/Template:UEFA_Euro_2000_Team_of_the_Tournament (2000's own 22-player-squad finding)
+- https://www.uefa.com/uefaeuro/history/news/0254-0d7ed20b7bd1-cded9ff294f6-1000--ten-spain-players-in-team-of-the-tournament/ (2012's own 23-player-squad finding)
+
+Wired into `euro.astro`'s `noteHeadings` (English) and hand-translated into
+`hr/competitions/euro.astro`'s own `notes` array as "Idealna momčad
+turnira", matching Copa América's own Croatian label for this exact section
+name. While editing that array, also corrected its own stale top-of-array
+comment: it still said "six headings" and didn't even list the "Winning
+captains" section already present, dating back to a partial fix in the
+forty-fourth run's own entry - now lists all eight headings the page
+actually requests.
+
+`content/uefa-euro.md`'s `lastReviewed` bumped to 2026-09-04. New e2e
+coverage (EN + HR heading/content assertions) in `tests/e2e/mobile.spec.ts`.
+Including "Rodri (Spain)" and "Lamine Yamal (Spain)" (and their Croatian
+equivalents) in the new 2024 entry collided with two pre-existing
+`getByText()` assertions for those exact strings in the "Player of the
+Tournament winners"/"Young Player of the Tournament winners" sections above
+- Playwright's strict mode caught this on the first cold-start `test:e2e`
+run (`Rodri (Spain)` resolving to two elements); fixed with `.first()`,
+matching the same collision-and-fix pattern several earlier content-adding
+runs have hit (e.g. the fifty-second run's Copa América "James Rodríguez"
+collision, the forty-ninth run's Ballon d'Or Mbappé/Lewandowski collision).
+A clean re-run then passed 843/843 (13.2 minutes), matching the fifty-eighth
+run's own baseline unchanged - two existing `test()` blocks were extended
+rather than a new one added.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs, since this content edit and the
+`docs/SOURCES.md` addition both mark every PDF's shared References section
+stale, by design). No page-weight budget raise needed this run (577.5 KB vs.
+the 590 KB budget, ~12.5 KB headroom left - the tightest margin since the
+fifty-second run's own 15.3 KB note, so the next content addition that grows
+`docs/SOURCES.md` further will likely need one). Full standing health check
+clean: `pnpm lint` (0/0/0), `pnpm test` (517/517 unit, unchanged -
+presentation-layer content, no new unit-testable logic), `pnpm build` (711
+pages, unchanged - no new route), `check:links` (715 pages), `check:sitemap`
+(710 entries), `check:precache` (37 URLs), `check:perf` (heaviest page
+`hr/records`, within budget), `check:pdfs` (700/700 fresh), `pnpm dlx knip
+--no-config-hints` (same one confirmed false positive as every prior run),
+full cold-start `pnpm test:e2e` (843/843 passed, 13.2 minutes).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (the 1979 sub-question is now closed
+negatively - Talavera did not lift the trophy, and no replacement name
+surfaced; 1983 and the rest of the span remain fully open with no new source
+lead, and there is no indication a similar "excluded captain" storyline
+explains the other missing years). With EURO's own individual/team-award set
+now also covering Team of the Tournament, the next content-gap pass likely
+needs either a fresh source lead for the Copa América captain-sourcing
+problem or a genuinely different quality angle (accessibility, performance,
+SEO, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live
+site).
+
+### Content-gap investigations closed negatively: EURO Fair Play, Nations League top scorer - added 2026-09-04 (sixtieth intensive run)
+
+A standing health check first: `pnpm install --frozen-lockfile`, `pnpm
+outdated` found nothing new beyond the still-blocked `typescript` 7 entry
+(`@astrojs/check@latest`'s `peerDependencies` re-checked directly via `npm
+view`, still `typescript: '^5.0.0 || ^6.0.0'`), `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline (same one confirmed
+false positive, `scripts/test-preview-server.mjs`). Full
+lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+`check:pdfs` all clean and byte-identical to the fifty-ninth run's baseline:
+`pnpm lint` (0 errors/warnings/hints, 168 files), `pnpm test` (517/517
+unit), `pnpm build` (711 pages), `check:links` (715 pages), `check:sitemap`
+(710 entries), `check:precache` (37 URLs), `check:perf` (heaviest page
+`hr/records`, 577.5 KB, within the 590 KB budget), `check:pdfs` (700/700
+fresh). Full cold-start `pnpm test:e2e` also run this pass: 843/843 passed
+(13.3 minutes), matching the fifty-ninth run's baseline exactly - no
+regressions from this run's investigations, which needed no code or content
+change either way.
+
+Following this routine's own priority order (Copa América > Nations League
+> Ballon d'Or > Golden Boot > other roadmap items), this run first looked
+for a structural gap in the two competitions that have historically yielded
+new award-history sections: a page-by-page `## ` heading comparison across
+all six `content/*.md` files turned up a real candidate - unlike FIFA World
+Cup and Copa América, `content/uefa-euro.md` has no "Fair Play Award
+winners" section, even though both sibling team-competition pages do.
+
+**UEFA EURO Fair Play Award: investigated, not pursued.** Three WebSearch
+passes (a general year-by-year list search, a targeted "Euro 2024 Fair Play
+award winner" search, and a search specifically for the Wikipedia "UEFA
+European Championship awards" page) all agree on the same negative finding:
+Wikipedia's own dedicated "UEFA European Championship awards" article lists
+exactly five official post-tournament awards (Player of the Tournament, Top
+Scorer, Young Player of the Tournament, Man of the Match, Team of the
+Tournament) and does not include a Fair Play Award among them - unlike
+FIFA's World Cup award (continuous since 1970, one FIFA.com article per
+edition) and CONMEBOL's Copa América award (continuous since 2011), UEFA's
+EURO fair-play recognition is not a single tracked award with one
+findable winner per edition; one source (footballwhispers.com, previewing
+Euro 2024) describes it only as "handed to the nation with the best
+disciplinary record", but no source surfaced who actually won it at any
+specific edition, 2024 included. This is the same "no single reliable fact
+to report" shape as the already-declined EURO 2000/2012 Team of the
+Tournament extended squads and the already-declined Nations League
+Golden Glove/Young Player of the Finals - not pursued, matching this site's
+standing rule of leaving a gap open rather than shipping a guess.
+
+**UEFA Nations League top scorer: investigated, not pursued.** Looked for a
+Golden-Boot-style companion section for Nations League (all four other team
+competitions - World Cup, EURO, and now via the `content/golden-boot.md`
+page - already have a top-scorer award; Nations League does not). Two
+WebSearch passes found that UEFA does present a sponsored "Top Scorer
+trophy presented by Alipay+", but it is scored across the *entire* two-year
+league phase (all four divisions, every UEFA national team), not the
+four-team Finals this page's own `## Finals` table and every other section
+on this page (`Player of the Finals`, `Winning managers`, `Winning
+captains`) are scoped to - a genuine scope mismatch, not just a sourcing
+gap. Separately, the *Finals*-only scoring picture is itself inconsistent
+across the two editions checked (2018-19: Cristiano Ronaldo led with 3 in
+the Finals; 2020-21: three players tied on 2 Finals goals each, a different
+stat entirely from that season's overall 6-goal leaders). Adding this would
+either misrepresent a season-long sponsor stat as a Finals award or require
+reconciling numbers that don't share a consistent scope across editions -
+not pursued. This confirms and extends the thirty-sixth/thirty-seventh
+runs' own conclusion that "Nations League's own individual-award landscape
+is murkier than the other five families' clean continuous histories."
+
+**Also revisited: Golden Boot "Multiple winners" parity with Ballon d'Or.**
+`content/ballon-dor.md` has a "Multiple winners through 2025" summary
+table that `content/golden-boot.md` lacks. Cross-checked by hand-tallying
+every name in the Ballon d'Or "Winners" table against its own "Multiple
+winners" table - all ten counts (Messi 8, Ronaldo 5, Cruyff/Platini/van
+Basten 3 each, five players on 2) matched exactly, so no accuracy bug
+either way. But `/records`'s existing generated "Most awards" ranking
+(`src/pages/records.astro`, `buildChampionsSummary()`) already computes
+this exact ranking from the same table data for both Ballon d'Or and each
+Golden Boot race - a hand-written duplicate in `content/golden-boot.md`
+would be presentation-only, not a missing fact, so not pursued as a content
+gap; noted here in case a future run wants it purely for the "vertical
+slice" of prose-page parity with Ballon d'Or, not because a reader is
+currently missing this information.
+
+None of the above needed a `content/*.md` edit, so no PDF regeneration was
+needed this run (`pnpm check:pdfs` above already confirmed all 700 still
+fresh from the fifty-ninth run's edits).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América winning captains for 1975-2010 (still fully open beyond the
+negatively-resolved 1979 sub-question). With EURO Fair Play and Nations
+League top scorer now both closed negatively alongside the already-closed
+Nations League Golden Glove/Young Player of the Finals, every remaining
+award-history angle across all six competition/award families has now been
+checked at least once - the next content-gap pass most likely needs a
+genuinely different quality angle (accessibility, performance, SEO, or a
+fresh read of `docs/WEBSITE_REQUIREMENTS.md` against the live site) rather
+than another award-name search, unless a new source lead surfaces for the
+Copa América captains.
+
 ## Known caveats
 
 - World Cup, EURO, Nations League, Copa América, Ballon d'Or, Golden Boot,
@@ -15809,6 +16156,646 @@ quality angle (performance, SEO, or a fresh read of
   entry. Anything else still gets cached the moment it's actually visited via
   the existing fetch-handler cache-on-read path, so offline reading for
   already-opened pages is unaffected either way. `CACHE_VERSION` is `v4`.
+- `EditorialNotes.astro` renders a "Jump to a section"/"Skoči na odjeljak"
+  in-page nav (`.notes__nav`, hidden via the existing `.no-print` class on
+  paper) whenever a page hands it 4 or more note sections
+  (`JUMP_NAV_MIN_SECTIONS` in that file) - see the 2026-09-04 "notes jump
+  nav" entry below. Each card's own anchor id comes from
+  `slugifyHeading()`/`slugifyHeadings()` (`src/lib/notes.ts`), derived from
+  the section heading text itself rather than its array index, so it stays
+  stable if sections are reordered; `slugifyHeadings()` de-dupes with a
+  `-2`/`-3` suffix if two headings ever produce the same slug on one page
+  (not currently the case anywhere, including golden-boot.astro's two merged
+  note arrays).
+
+### Notes jump nav: an in-page "Jump to a section" link list for every long note-card list - closed 2026-09-04 (sixty-third intensive run)
+
+A standing health check first (`pnpm install`, `pnpm outdated` found nothing
+new beyond the still-blocked `typescript` 7 entry, full
+lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/`check:perf`
+all clean, matching the sixty-second run's baseline). The sixty-second run's
+own closing note said the Copa América captain gap is now down to a single,
+specifically-reasoned exclusion (1979) and "the next content-gap pass likely
+needs a genuinely different quality angle" - so this run moved to that fork
+rather than another award-name search, per this routine's own priority order
+(Copa América/Nations League/Ballon d'Or/Golden Boot content, then other
+roadmap items, then general quality).
+
+Sixty-two runs of steady award-history additions have left every
+competition/award page with far more note-card sections than the site had
+when `EditorialNotes.astro` (the single shared component every
+competition/award/home/quiz page uses to render "Memorable moments",
+"Winning captains", and now a dozen more award-history sections) was first
+built: FIFA World Cup has 11 note cards, Copa América 9, UEFA EURO 8, Ballon
+d'Or 8, Nations League 6, both Golden Boot tables 6 combined - all with
+nothing but a long vertical scroll to get from the top of the page to, say,
+"Golden Glove winners" past ten unrelated cards first. This is a genuine,
+previously-unaddressed UX gap the content-mining runs created as a side
+effect of their own success, not a repeat of any prior accessibility/SEO/
+Lighthouse pass (all of which scored perfect already; the gap here is
+navigation, not a violation any automated audit flags).
+
+Added a "Jump to a section" in-page nav to `EditorialNotes.astro` - the one
+shared component, so every page that uses it (all six competition/award
+pages in both languages, `home`/`quiz` too, though those stay under the
+threshold) benefits from a single change:
+
+- `src/lib/notes.ts` gained `slugifyHeading()`/`slugifyHeadings()`: an
+  NFD-normalize-and-strip-combining-marks slug, plus a manual `đ/Đ -> d`
+  step since that Croatian letter is a distinct glyph, not a base letter
+  with a combining diacritic, so NFD alone leaves it untouched (unlike
+  č/ć/š/ž, which do decompose that way). `slugifyHeadings()` de-dupes
+  repeated slugs with a `-2`/`-3` suffix, for golden-boot.astro's two merged
+  note arrays even though no actual collision exists there today.
+- `EditorialNotes.astro` gives each `<section class="notes__card">` a stable
+  `id` from that slug (the `<h2>` keeps its existing index-based
+  `note-heading-N` id/`aria-labelledby` pairing, untouched) and renders a
+  `<nav class="notes__nav card no-print" aria-label="...">` right above the
+  cards, only when `sections.length >= 4` (`JUMP_NAV_MIN_SECTIONS`) - short
+  pages like `/quiz` (2 sections) and the home page (2 sections) don't get
+  a nav that would outweigh the content it points to.
+- The nav is a wrapping pill list (`.notes__nav-list`, `flex-wrap: wrap`),
+  mobile-first per `AGENTS.md`'s own conventions - no horizontal overflow at
+  360px, each link a `min-height: 2.75rem` (44px) touch target per the same
+  file's "Interactive targets are at least 44px" rule, themed via the
+  existing `--border`/`--bg-subtle`/`--accent` tokens so light/dark and
+  `forced-colors` all inherit correctly with no new rules needed there. No
+  JavaScript: fragment links plus the page's pre-existing global
+  `scroll-padding-top: var(--site-header-height, ...)` rule (`global.css`)
+  already accounts for the sticky header's height on any anchor jump, the
+  same mechanism every other in-page navigation already relies on. Hidden on
+  paper via the existing shared `.no-print` class - PDFs render unaffected.
+- `jumpNavLabel` is an overridable prop (English default "Jump to a
+  section"), matching `References.astro`'s own established
+  overridable-prop-with-English-default convention (not `t()`/`UI_STRINGS`,
+  which that component also doesn't use) - each of the six Croatian
+  competition/award pages now passes `jumpNavLabel="Skoči na odjeljak"` at
+  its own `<EditorialNotes>` call site, the same way they already hand
+  `References` a hardcoded Croatian `heading` prop. `CompetitionView.astro`
+  (used only by the English competition pages) needed no change - its
+  callers get the English default automatically.
+
+New unit tests in `tests/unit/notes.test.ts` for both new functions,
+including the č/ć/š/ž-vs-đ/Đ distinction and the golden-boot.astro-style
+de-dupe case (517 -> 524 unit tests, coverage unchanged at
+99.91%/99.43% - the new code is fully covered). New e2e coverage in
+`tests/e2e/mobile.spec.ts`: one test on the English World Cup page (nav
+visible, correct `aria-label`, 11 links, clicking "Golden Glove winners"
+updates the URL hash and scrolls `#golden-glove-winners` into the
+viewport) and its Croatian mirror on `hr/competitions/world-cup`
+(`aria-label="Skoči na odjeljak"`, clicking "Dobitnici Zlatne rukavice"
+lands on `#dobitnici-zlatne-rukavice`) - one EN/HR pair is enough coverage
+for a shared-component feature rather than repeating the same assertions on
+all twelve pages that render it. `check:links`'s existing fragment-target
+validation (`scripts/check-internal-links.mjs`) already double-checks every
+new `href="#..."` resolves to a real id across all 715 built pages, so no
+extra link-integrity tooling was needed for this.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs) - `EditorialNotes.astro` is a
+PDF source file for every page family. `check:perf`'s heaviest page,
+`hr/records`, moved from 581.1 KB to 582.1 KB (still comfortably inside the
+590 KB budget - this page doesn't itself render `EditorialNotes`, the extra
+weight is `/records`' own JSON-LD/content, unrelated to this change; no page
+that does render the nav crossed a new heaviest-page rank). Full standing
+health check clean: `pnpm lint` (0/0/0), `pnpm test` (524/524 unit,
+coverage unchanged), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (within budget), full cold-start `pnpm test:e2e`
+(845/845 passed, 9.0 minutes, up from 843/843 - the two new jump-nav tests).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América's own single remaining captain exclusion (1979, already closed
+negatively, not re-attempted without a new source lead). With this run
+having found and closed a real UX gap on the quality-angle fork, a future
+run could look for more of the same shape (a genuine, previously-unnoticed
+usability issue) rather than assume another Lighthouse/WCAG-tag sweep is
+the only quality angle left, since those have both scored perfect
+repeatedly.
+
+### Copa América winning captains, 1975-2010 span recovered - closed 2026-09-04 (sixty-first intensive run)
+
+Started with the standing health check: `pnpm install` (fresh container),
+`pnpm outdated` found nothing new beyond the still-blocked `typescript` 7
+entry, `pnpm dlx knip --no-config-hints` matched every prior run's baseline
+(same one confirmed false positive), and `pnpm lint`/`pnpm test`/`pnpm
+build`/`check:links`/`check:sitemap`/`check:precache`/`check:perf` all
+matched the sixtieth run's baseline. Confirmed `docs/WEBSITE_REQUIREMENTS.md`
+is still fully satisfied and re-checked the sixtieth run's own closing note
+(every award-history angle across all six families now checked at least
+once) before picking a target: the forty-sixth run's dropped 1975-2010 Copa
+América winning-captains span, this routine's own explicit top priority
+(Copa América first) and the one content gap every recent run's closing note
+has kept pointing back to.
+
+The forty-sixth run's own entry above explains why it dropped the whole
+span rather than a partial one: two edition it had already logged as
+confirmed (1995, 2004) turned out contradicted on a second pass, plus an
+outright fabrication on 1987, and there was "no remaining way to tell which
+[answers] without a source this environment can actually reach." That
+reasoning is sound for a method that treats a first search result as
+confirmed - but this run used a stricter one: every candidate name checked
+against at least two independent sources *before* being accepted, with each
+edition's result judged on its own rather than the whole span rising or
+falling together. That distinction mattered immediately: the very first
+1995 pass this run tried also came back with Bengoechea, reproducing the
+forty-sixth run's own initial (wrong) result - but a second, more targeted
+pass caught it this time, confirming Enzo Francescoli was actually captain
+(copaamerica.com's own article on his three Copa América titles), with
+Bengoechea's real role - scoring the equalizer that forced the shootout -
+kept in the note explicitly so a future reader isn't tripped up by the same
+two names the way two different research passes already have been. 2004
+got the same deliberate scrutiny given the forty-sixth run's specific
+warning about it: two independent, 2004-only searches (copaamerica.com's
+own final report, and These Football Times' retrospective) both named Alex
+as captain with no mention of 1999 or Cafu anywhere in either result,
+unlike the conflated summary that tripped up the earlier attempt.
+
+Ten of the fourteen editions in the gap cleared the two-source bar: 1975
+(Héctor Chumpitaz, Peru - his "Capitán de América" nickname is reported
+independently by El Comercio, Trome and CONMEBOL's own site, all citing the
+1975 title as its origin), 1989 (Ricardo Gomes, Brazil - corroborated by
+his separately well-documented captaincy at the 1990 FIFA World Cup, which
+several sources connect back to his having already held the armband in
+1989), 1991 and 1993 (Oscar Ruggeri, Argentina - each edition checked with
+its own dedicated search, plus a third confirmatory pass on 1993 given the
+back-to-back pattern's obvious risk of one year's fact bleeding into the
+other), 1995 (Enzo Francescoli, Uruguay, per above), 1997 (Dunga, Brazil -
+copaamerica.com's own "Dunga and his great record" article), 1999 (Cafu,
+Brazil - corroborated by his own well-documented "Capitão do Penta"
+nickname, from a World Cup captaincy two years later, independently
+reported across CBF's own site and multiple Brazilian outlets), 2001 (Iván
+Córdoba, Colombia - CONMEBOL's own site, and he scored the winning goal
+himself, a fact several outlets attach directly to his captaincy), 2004
+(Alex, Brazil, per above), and 2007 (Lúcio, Brazil - Wikipedia's own match
+article plus multiple contemporary reports of the trophy ceremony).
+
+Three editions were re-investigated and still excluded, each now for a
+specific, individually confirmed reason rather than the forty-sixth run's
+blanket span cutoff: **1979** was already closed negatively by an
+intervening run (the fifty-eighth) - Paraguay's captain Hugo Talavera was
+controversially benched by the federation president just before the
+deciding match over an unrelated pay dispute, and no source names who
+lifted the trophy in his place, so this run didn't re-open it. **1983**
+turned up a strong *candidate* (Uruguay goalkeeper Rodolfo Rodríguez, the
+team's most-capped player at the time and a starter in both final legs) but
+no source directly states he was captain, only that he was "an important
+figure" - kept out rather than infer captaincy from a starting role alone.
+**1987** is a genuine, still-unresolved sourcing conflict, not just a gap:
+two separate searches each named a *different* Uruguay player as both the
+captain who was sent off in the 88th minute *and* the one who came back to
+lift the trophy - one naming José Perdomo, the other Enzo Francescoli, each
+version internally consistent and neither obviously wrong. Left out exactly
+like the already-flagged forty-sixth-run 1987 fabrication, just for a
+different, milder reason (contradiction rather than nonsense).
+
+Updated `content/copa-america.md`'s "Winning captains" section: replaced
+the old single-sentence "scoped to 2011 onward" framing with one that
+explains the recovered span and names all three still-excluded editions and
+why, added the ten new entries in chronological order before the existing
+2011-2024 run, and widened the closing "only back-to-back captains" trivia
+line to also credit Ruggeri alongside Bravo and Messi. `lastReviewed`
+bumped to 2026-09-04. Hand-translated the same changes into
+`hr/competitions/copa-america.astro`'s `notes` array, including the fuller
+Croatian scoping note. New e2e coverage: extended the existing "Winning
+captains" test blocks (EN + HR) with two more assertions each (1975
+Chumpitaz, 2007 Lúcio) rather than adding new test blocks, since this is
+more entries in an existing section, not a new one - checked first that
+neither new name collides with existing text elsewhere on the same page
+(the "Dunga (Brazil)"/"Enzo Francescoli (Uruguay)" substrings this run's
+own new entries share with the page's unrelated Winning-managers/Best-
+Player-winners sections were checked against every existing test and don't
+collide, since no existing test happens to query those exact substrings -
+unlike the Rodri/Yamal collision a much earlier EURO run hit).
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs, since this content edit and the
+`docs/SOURCES.md` addition both mark every PDF's shared References section
+stale, by design). Full standing health check clean: `pnpm lint` (0/0/0),
+`pnpm test` (517/517 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page `hr/records`, 581.1 KB, within the
+590 KB budget but with only ~9 KB headroom left - worth a page-weight budget
+raise or a slimming pass sooner rather than later at this addition rate),
+full cold-start `pnpm test:e2e` after the four new assertions above. See
+`docs/SOURCES.md`'s matching new entry for the full citation list. **Left
+for a future pass:** the same environment-blocked items as every recent run
+(`typescript` 7, `docs/SOURCES.md` link-liveness), plus the two still-open
+Copa América captain editions (1983's unconfirmed-but-plausible Rodríguez,
+1987's genuine two-way contradiction) - neither re-attempted without a new
+source lead specifically resolving the conflict already found, the same
+standing caution the rest of this file applies elsewhere. `hr/records`'s
+shrinking budget headroom is worth watching: the next content-adding run
+that pushes it over 590 KB should raise `PAGE_WEIGHT_BUDGET_BYTES` in
+`scripts/check-page-weight.mjs` with the reasoning on record, the same way
+seven prior additions already have.
+
+### Copa América winning captains, 1983 and 1987 resolved - closed 2026-09-04 (sixty-second intensive run)
+
+Started with the standing health check: `pnpm install` (fresh container),
+`pnpm outdated` found nothing new beyond the still-blocked `typescript` 7
+entry, `pnpm dlx knip --no-config-hints` matched every prior run's baseline
+(same one confirmed false positive), and `pnpm lint`/`pnpm test`/`pnpm
+build`/`check:links`/`check:sitemap`/`check:precache`/`check:perf` all
+matched the sixty-first run's baseline.
+
+Re-attempted the sixty-first run's own two remaining Copa América captain
+gaps (1983, 1987) directly, rather than picking a new topic - the sixty-first
+run's own closing note explicitly left them open "without a new source lead
+resolving the conflict already found", and this run found one for each by
+querying more specifically than the general per-edition searches the prior
+pass used (e.g. the player's own biography page, or the match final's own
+dedicated recap, rather than a generic "Copa América 1983 captain" search).
+
+**1983**: the sixty-first run had Rodolfo Rodríguez only as "an important
+figure... only a key player", not confirmed as captain. A `WebSearch` for
+Rodríguez's own biography surfaced two things a generic per-edition search
+hadn't: his Spanish Wikipedia page states directly that he was "capitán
+absoluto de la selección uruguaya entre 1980 y 1986" (Uruguay's outright
+national-team captain from 1980 to 1986) and separately names the 1983 Copa
+América among the titles he captained; a second, independent source - AHIFU
+(Asociación de Historiadores e Investigadores del Fútbol Uruguayo), a
+Uruguayan football-history research association, in a dedicated "Los
+capitanes de la Celeste" (The captains of the Celeste) piece cataloguing the
+national team's captains by era - corroborates him for the same span. Two
+independent sources, the same bar every other note section on this page
+uses, both specifically about captaincy rather than about the match or the
+player's career generally - a stronger fit than the sixty-first run's
+"important figure" finding.
+
+**1987**: the sixty-first run found "sources directly disagree on who was
+even sent off in the final's 88th minute, let alone who captained... both
+José Perdomo and Enzo Francescoli turn up described as Uruguay's captain,
+sent off, and the one who lifted the trophy, in different searches". A
+targeted search on the final's own recap resolved this cleanly: it wasn't a
+contradiction at all, just two separate, both-true expulsions - Francescoli
+was sent off in the 27th minute, Perdomo in the 88th, so a source that only
+reported one of the two expulsions could plausibly have been asked about by
+an earlier, less specific search and returned the wrong one as "the" player
+sent off. Only Perdomo captained the side. The AUF (Uruguay's own football
+association) explicitly confirms he "recibió el trofeo" (received the
+trophy) after full time - and specifically that the trophy's base came
+loose in his hands as he lifted it, a level of detail only a source about
+the actual presentation, not just the match result, would carry. A second,
+independent lineup source lists him explicitly as "(15, Captain)" in the
+same match. Both facts clear the two-independent-source bar.
+
+This leaves the Copa América winning-captains span down to a single
+remaining gap: 1979, already closed negatively for its own separate,
+documented reason (Talavera benched by the federation president just before
+the deciding match, no source names who lifted the trophy in his place) -
+not re-opened this run.
+
+Updated `content/copa-america.md`'s "Winning captains" section: rewrote the
+intro to describe recovering two more editions and narrowing the exclusion
+list to just 1979 (also correcting the sixty-first run's "fourteen editions"
+count to the accurate "thirteen" - 10 recovered + 3 excluded then, not 10 +
+4), and inserted the two new dated bullets in chronological order between
+the existing 1975 and 1989 entries. `lastReviewed` was already 2026-09-04
+from the sixty-first run earlier today, so left unchanged - this run's edit
+lands the same day. Hand-translated the same changes into
+`hr/competitions/copa-america.astro`'s `notes` array. No existing e2e
+assertion needed updating: the "Winning captains" test blocks (EN + HR)
+check specific already-present names (Chumpitaz, Lugano, Messi, Lúcio), not
+the excluded-editions list, so neither test needed a new assertion nor
+collided with the two new names.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs, since this content edit and the
+`docs/SOURCES.md` addition both mark every PDF's shared References section
+stale, by design). Full standing health check clean: `pnpm lint` (0/0/0),
+`pnpm test` (517/517 unit, unchanged - presentation-layer content, no new
+unit-testable logic), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page still `hr/records`, 581.1 KB,
+unchanged from the sixty-first run's measurement, within the 590 KB budget),
+full cold-start `pnpm test:e2e` (843/843 passed, 9.5 minutes, unchanged
+count since no new test cases were needed). See `docs/SOURCES.md`'s matching
+new entry for the full citation list.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness). With the Copa
+América captain gap now down to a single, specifically-reasoned exclusion
+(1979), the next content-gap pass likely needs a genuinely different quality
+angle (accessibility, performance, SEO, or a fresh
+`docs/WEBSITE_REQUIREMENTS.md` read against the live site) rather than
+another source-lead search - this routine's own priority order (Copa
+América/Nations League/Ballon d'Or/Golden Boot content first) has now had
+every reliably-sourceable angle checked at least once across all four,
+repeatedly, so the next several runs likely belong on the quality-angle
+fork by default unless a new lead surfaces on its own.
+
+### `/records` and `/hr/records` gain their own "Jump to a section" nav - added 2026-09-05 (sixty-fourth intensive run)
+
+A standing health check first: `pnpm outdated` found only the still-blocked
+`typescript` 7 entry plus one new in-range `@playwright/test` patch (1.62.1 ->
+1.63.0), left unbundled for a future dependency-bump run rather than mixed
+into this one; `pnpm dlx knip --no-config-hints` matched every prior run's
+baseline (the same one confirmed `scripts/test-preview-server.mjs` false
+positive).
+
+Acted on the sixty-third run's own closing note ("a future run could look for
+more of the same shape [of UX gap] rather than assume repeat Lighthouse/WCAG
+sweeps are the only quality angle left") rather than another award-name
+search. `/records`/`/hr/records` turned out to be a sharper version of the
+exact gap that run closed for `EditorialNotes.astro`'s note cards: this page
+is the heaviest on the whole site and has by far the most top-level sections
+of any page - thirteen (`Champions timeline`, `Most successful teams`, `Most
+frequent hosts`, `Titles won on home soil`, `Back-to-back champions`, `Nearly
+champions`, `Nearly finalists`, `Longest wait between titles`, `Biggest final
+wins`, `Fiercest rivalries`, `Individual award winners timeline`, `Most
+awards`, and the historical-names note) - yet had no jump nav at all, so a
+reader wanting, say, "Fiercest rivalries" had to scroll past twelve other
+sections' worth of grids and tables first.
+
+Rather than duplicate the sixty-third run's pill-nav markup and CSS a second
+time, extracted it out of `EditorialNotes.astro` into a new shared
+`src/components/SectionJumpNav.astro`: a small presentational component
+taking `sections: {id, label}[]` and an optional localized `label` (the
+`aria-label`), rendering the same `no-print`, 44px-tap-target pill-link `<nav>`
+either caller already had. Deliberately not tied to `slugifyHeading()` from
+`src/lib/notes.ts` - that helper derives an id from a heading string for
+`EditorialNotes.astro`'s dynamically-loaded note sections, but `/records`'
+thirteen sections already carry stable, hand-written `<h2 id="...">`s
+(`timeline-heading`, `teams-heading`, etc.), so `SectionJumpNav.astro` just
+takes whatever id the caller already has - `check:internal-links.mjs`'s
+existing fragment-target check (part of `check:links`) already verifies every
+`href="#..."` this component renders actually resolves, the same safety net
+any other in-page link on the site already has.
+
+`EditorialNotes.astro` was refactored to call the new component instead of
+rendering its own copy of the nav markup, with identical behavior (same
+4-section `JUMP_NAV_MIN_SECTIONS` threshold, same props). `records.astro`/
+`hr/records.astro` each gained a `jumpSections` array (English/Croatian
+labels, same thirteen shared heading ids - the ids don't change per language,
+only the labels do) and a `<SectionJumpNav sections={jumpSections} />` call
+right after the header's `PrintDownloadLink`, before the first section.
+
+The refactor's only externally-visible change is a CSS class rename
+(`notes__nav`/`notes__nav-list` -> `jump-nav`/`jump-nav__list`, since the
+component is no longer notes-specific) - updated the two existing
+`tests/e2e/mobile.spec.ts` assertions (English and Croatian World Cup jump-nav
+tests) that selected on the old class name.
+
+`scripts/pdf-pages.mjs`'s two shared component lists both needed the new file
+added so `check:pdfs` keeps tracking it: `TABLE_COMPONENTS` (since
+`EditorialNotes.astro`, which every competition/award PDF already depends on,
+now imports it) and `TIMELINE_COMPONENTS` (since `records.astro`/
+`hr/records.astro` render it directly).
+
+**Tests:** two new e2e cases (`tests/e2e/mobile.spec.ts`, English and
+Croatian records pages), the same shape as the sixty-third run's own World
+Cup jump-nav test: pill count (13), the nav's accessible name, one pill's
+`href`, and that clicking it actually scrolls the target section
+`toBeInViewport()`. No new `src/lib` logic (the ids/labels are hand-written
+data, not derived), so `pnpm test` stayed at **524/524**.
+
+`pnpm dlx knip --no-config-hints` flagged one new item after the initial
+edit - `SectionJumpNav.astro`'s own `JumpNavSection` interface, exported but
+never imported by another file (both callers use inline object-literal
+types) - fixed by dropping the `export` keyword, the same "unused export on a
+type used only in its own file" shape the twelfth run's dead-code sweep
+already established the fix for. All 700 PDFs regenerated and reverified
+clean **twice** - once after the component/page changes, once more after that
+`export`-keyword fix, since both edits touch `SectionJumpNav.astro` and it is
+now a dependency of every PDF page.
+
+Full standing health check clean: `pnpm lint` (0/0/0 across 169 files), `pnpm
+test` (524/524 unit, unchanged), `pnpm build` (711 pages, unchanged - no new
+route), `check:links` (715 pages, including the 26 new fragment links across
+both languages), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+`check:perf` (heaviest pages now `hr/records` at 584.3 KB and `records` at
+579.2 KB - both grew a few KB from the new nav markup but stay within the 590
+KB budget, with roughly 6-11 KB headroom left), `check:pdfs` (700/700 fresh),
+full cold-start `pnpm test:e2e` (**847/847 passed**, 13.6 minutes, up from 843
+- the four new jump-nav test cases across both languages).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América's 1979 captain exclusion (unchanged, not re-attempted this run), plus
+the new in-range `@playwright/test` 1.63.0 patch bump found by this run's own
+`pnpm outdated` check but deliberately not taken here (a dependency bump
+deserves its own reviewed commit, not a bundle-in with a UX feature).
+`hr/records`'s and `records`' page-weight headroom is shrinking as they've
+become the two heaviest pages on the site - the next content- or
+feature-adding run that pushes either over the 590 KB budget should raise
+`PAGE_WEIGHT_BUDGET_BYTES` in `scripts/check-page-weight.mjs`, the same way
+eight prior additions already have.
+
+### Dependency patch bump (`@playwright/test` 1.62.1 -> 1.63.0) plus two content-gap investigations closed negatively - closed 2026-09-05 (sixty-fifth intensive run)
+
+A standing health check first: `pnpm install` (fresh container), `pnpm
+outdated` found exactly the sixty-fourth run's own flagged item - the
+in-range `@playwright/test` 1.62.1 -> 1.63.0 patch, deliberately left
+unbundled from that run's UX-feature commit - plus the still-blocked
+`typescript` 7 entry (re-confirmed via `npm view @astrojs/check@latest
+peerDependencies`: still `'^5.0.0 || ^6.0.0'`). `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline (the same one
+confirmed `scripts/test-preview-server.mjs` false positive), and
+`pnpm lint`/`pnpm test`/`pnpm build`/`check:links`/`check:sitemap`/
+`check:precache`/`check:perf`/`check:pdfs` all matched the sixty-fourth
+run's baseline exactly (524/524 unit, 711 pages, 715 links, 710 sitemap
+entries, 37 precache URLs, heaviest pages `hr/records` 584.3 KB and
+`records` 579.2 KB, 700/700 PDFs fresh).
+
+**Dependency bump:** took the sixty-fourth run's own deferred
+`@playwright/test` bump as its own reviewed commit - `pnpm add -D
+@playwright/test@1.63.0` - then re-ran the full standing health check
+against the new version (all identical to the pre-bump baseline above) plus
+a full cold-start `pnpm test:e2e` to catch any Playwright-version-specific
+regression directly: **847/847 passed** (10.6 minutes), matching the
+sixty-fourth run's own count exactly - no test needed updating for the new
+Playwright version.
+
+**Content-gap research, both closed negatively:** per this routine's own
+priority order, re-checked Copa América's 1979 captain exclusion first (no
+new source lead since the fifty-eighth run's negative closure, unchanged)
+before researching two genuinely new leads via `WebSearch` - a documented
+negative result is still useful under this file's own established
+convention (see the sixtieth run's matching "closed negatively" entry): it
+stops a future run from re-spending research effort reaching the same dead
+end.
+
+- **FIFA World Cup Team of the Tournament / All-Star Team.** Every other
+  team competition already has a "Team of the Tournament" note section
+  (UEFA EURO since the fifty-ninth run, Copa América since the fifty-second)
+  except the World Cup, which had never been checked - a genuine gap in
+  coverage, not a repeat. Three `WebSearch` passes found the award existed
+  historically but never in one consistent shape: a media-journalist panel
+  picked an eleven from 1930 to 1994; FIFA's own Technical Study Group then
+  took over and expanded it to a 16-player squad for 1998 and 2002, then a
+  23-player squad for 2006; and the award was discontinued entirely after
+  2006, with nothing resembling it at any World Cup since (2010 through
+  2026 have only the individual Golden Ball/Golden Glove/Young Player/Fair
+  Play awards this page already covers, plus 2026's own FIFA+ fan-voted
+  "Dream XI", which is an app poll rather than an official technical-body
+  award and post-dates the last real one by two decades). Three
+  incompatible squad sizes (11/16/23) across the award's own lifetime, plus
+  a 20-year gap with no modern equivalent, is the same "no single reliable
+  shape across editions" reasoning that already excluded EURO's own
+  2000/2012 extended squads from that page's own Team of the Tournament
+  section (fifty-ninth run) - not pursued.
+- **Copa América Silver Boot and Bronze Boot.** The World Cup's and EURO's
+  Golden Boot tables (`content/golden-boot.md`) both already carry a
+  Silver/Bronze Boot runners-up section for the specific eras a single
+  tiebreak winner was named (fifty-third and fifty-fourth runs). Copa
+  América's own "Golden Boot winners" section (`content/copa-america.md`)
+  is explicit that even its own Golden Boot label is this site's own
+  convenience naming, not CONMEBOL's official award - "the same convenience
+  label the site's dedicated Golden Boot page already uses... whether or
+  not CONMEBOL held a formal award ceremony for it that year." Two
+  `WebSearch` passes covering the two most recent editions (2021, 2024)
+  turned up reporting on the Golden Boot race itself but no evidence
+  CONMEBOL has ever named a Silver Boot or Bronze Boot at any edition -
+  unlike the World Cup/EURO, where the runner-up podium is an official
+  named award, Copa América's top-scorer list is entirely table-derived
+  from goal counts with no second/third-place recognition to report at all.
+  Not pursued - doubly unofficial (no formal Golden Boot ceremony most
+  years to begin with, and no Silver/Bronze equivalent at any year).
+
+Neither investigation touched a `content/*.md` file, so no `lastReviewed`
+bump, no `docs/SOURCES.md` entry, and no PDF regeneration was needed - only
+`package.json`/`pnpm-lock.yaml` (the dependency bump) and `docs/ROADMAP.md`/
+this file changed. See `docs/ROADMAP.md`'s matching entry for the
+backlog-facing summary.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América's 1979 captain exclusion (unchanged, not re-attempted). With the
+World Cup's and Copa América's own last plausible "new award family" leads
+now both closed negatively, and every reliably-sourceable award-history
+angle across all six competition/award families checked at least once
+(several more than once), the next content-gap pass likely needs either a
+fresh source lead on the Copa América 1979 captain question or a genuinely
+different quality angle (accessibility, performance, SEO, or a fresh
+`docs/WEBSITE_REQUIREMENTS.md`/live-site read) rather than another
+award-name search.
+
+### Family Quiz: chronological-order questions for the three individual awards, plus a Nations League Team of the Tournament investigation closed negatively - closed 2026-09-05 (sixty-sixth intensive run)
+
+A standing health check first: `pnpm install` (fresh container), `pnpm
+outdated` found nothing new beyond the still-blocked `typescript` 7 entry
+(the sixty-fifth run's own `@playwright/test` bump already landed), `pnpm
+dlx knip --no-config-hints` matched every prior run's baseline (the same
+one confirmed `scripts/test-preview-server.mjs` false positive), and `pnpm
+lint`/`pnpm test`/`pnpm build`/`check:links`/`check:sitemap`/
+`check:precache`/`check:perf`/`check:pdfs` all matched the sixty-fifth
+run's baseline exactly (524/524 unit, 711 pages, 715 links, 710 sitemap
+entries, 37 precache URLs, heaviest pages `hr/records` 584.3 KB and
+`records` 579.2 KB, 700/700 PDFs fresh).
+
+**Content-gap research, closed negatively:** per this routine's own
+priority order, re-checked Copa América's 1979 captain exclusion first via
+two fresh `WebSearch` passes - still no source names who lifted the trophy
+in Hugo Talavera's place; unchanged. Investigated a new lead instead: every
+other team competition now has a "Team of the Tournament" note section
+(EURO since the fifty-ninth run, Copa América since the fifty-second,
+World Cup investigated and declined in the sixty-fifth run) except UEFA
+Nations League. Three `WebSearch` passes found a confirmable, complete
+official XI for only the inaugural 2019 Finals (UEFA's own announcement
+names all eleven); 2021, 2023 and 2025 have plenty of coverage of that
+edition's Player of the Finals but no discoverable full Team of the
+Tournament lineup, and this environment's outbound network policy still
+blocks a direct fetch of UEFA.com's own roundup article
+(`www.uefa.com` - confirmed blocked again this run via `WebFetch`) that
+might otherwise settle it. One confirmed edition out of four completed
+Finals is the same "no single reliable shape across every edition" gap
+that already excluded the World Cup's Team of the Tournament (sixty-fifth
+run) and EURO's own 2000/2012 extended squads (fifty-ninth run) - not
+pursued. No `content/*.md` file touched by this investigation.
+
+**Family Quiz: individual-award ordering questions, a real structural gap
+rather than another award-name search.** The Family Quiz's "chronological
+order" ranking question type (`chronologicalOrderQuestions()`,
+`src/lib/quiz.ts`) has existed since its own rollout for the four team
+competitions only (FIFA World Cup, UEFA EURO, Copa América, UEFA Nations
+League) - `quiz.astro`'s own comment explained why the three individual
+awards (Ballon d'Or, both Golden Boot tables) were left out: ordering a
+team champion works even when the same country wins twice, because each
+card's label also shows its host (`hostedByLabel`), but an individual
+award's only per-edition attribute is the winner's name itself, so a
+repeat winner (e.g. Kylian Mbappé's two Golden Boots) or a joint-tie row
+(e.g. the 1962 World Cup Golden Boot's six-way tie) would put two
+identical-looking cards in the same shuffle with no way to tell them apart
+without revealing the year - the exact fact being tested. That reasoning
+is sound for the *whole* table, but not for a *filtered* one: a new
+exported `uniqueWinnerEditions()` (`src/lib/quiz.ts`) returns only the
+editions whose winner is a single, non-tied name that doesn't repeat
+anywhere else in the list, which is exactly the subset a fair ordering
+question can safely draw from. `yearByWinnerQuestions()` needed the
+identical one-time-winner filter for its own, already-documented reason
+(no single correct year for a repeat winner) - refactored to call the new
+shared function instead of re-implementing the same counting logic inline,
+with no behavior change (its own existing unit tests pass unmodified).
+
+Wired into both `quiz.astro` and `hr/quiz.astro`: three more
+`chronologicalOrderQuestions()` calls each (Ballon d'Or, World Cup Golden
+Boot, EURO Golden Boot), fed `uniqueWinnerEditions(...)` instead of the raw
+table and a plain `winnerLabel` (just the name - no host to append) instead
+of `hostedByLabel`. All three tables have well over the four one-time
+winners a question needs (Ballon d'Or has 70 editions with only a handful
+of repeat winners; both Golden Boot tables similarly), so real questions
+generate every build. The order-question section grew from 4 to 7 cards
+per language, confirmed by inspecting the built HTML directly
+(`quiz-order__items` occurrences inside `.quiz__order-section`) rather than
+assumed. Renamed the section from "Champion order challenge"/"Izazov:
+poredaj prvake" to "Order challenge"/"Izazov: poredaj" (`quizOrderHeading`/
+`quizOrderIntro` in `src/lib/i18n.ts`, plus the matching English/Croatian
+prose in `content/quiz.md` and `hr/quiz.astro`'s own hand-written notes)
+since "champion" no longer describes every card in the section - updated
+the two existing e2e assertions that matched the old heading text
+verbatim. `content/quiz.md`'s `lastReviewed` bumped to 2026-09-05.
+
+New unit test coverage in `tests/unit/quiz.test.ts`: a dedicated
+`uniqueWinnerEditions` describe block (keeps only one-time winners, drops
+a "Not awarded" placeholder, drops a joint-tie row even when it occurs only
+once, excludes *every* occurrence of a repeat winner rather than just the
+extras) plus two integration tests under `chronologicalOrderQuestions`
+proving the combination actually prevents the ambiguity it's meant to -
+one showing a repeat winner (Messi, sampled twice in a six-edition Golden
+Ball fixture) is fully excluded from the built question with no duplicate
+item labels, the other showing the shared World-Cup fixture (only one
+true one-time champion) correctly yields no question at all once filtered,
+same as before this change (524 -> 530 unit tests, coverage unchanged at
+99.91%/99.43% - the one pre-existing uncovered branch this file already
+carried, `mostTitlesQuestion`'s own `!choice` guard, simply moved to a new
+line number from the code added above it, per the twenty-sixth run's
+already-documented "coverage sweep" classification of it as defensively
+unreachable, not undertested).
+
+`/quiz` isn't a PDF-source page (`scripts/pdf-pages.mjs` has no entry for
+it), so `check:pdfs` needed no regeneration - confirmed still 700/700
+fresh. Page weight grew from 333.9/337.0 KB to 344.6/348.0 KB (EN/HR) from
+the extra question cards, comfortably inside the 590 KB budget with no
+raise needed. Full standing health check clean: `pnpm lint` (0/0/0), `pnpm
+test` (530/530 unit), `pnpm build` (711 pages, unchanged - no new route),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest pages unchanged - `hr/records`/`records`
+still the top two), `check:pdfs` (700/700 fresh), `pnpm dlx knip
+--no-config-hints` (same one confirmed false positive), `check:lighthouse`
+(all 37 pages still a perfect 1.00 across every category, `/quiz`/`hr/quiz`
+included despite the added content), full cold-start `pnpm test:e2e`
+(847/847 passed, 8.3 minutes, unchanged count - this run extended existing
+`test()` assertions and added unit coverage rather than new e2e cases).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América's 1979 captain exclusion (unchanged, not re-attempted) and UEFA
+Nations League's own Team of the Tournament (confirmable for 2019 only,
+not pursued for the other three editions without a source lead that gets
+past this environment's `www.uefa.com` block). With every reachable
+award-history angle across all six families now checked at least once and
+the quiz's own individual-award ordering gap closed, a future run's best
+leads are either a fresh source for one of the two remaining
+sourcing-blocked facts above, or another genuinely new structural gap of
+the same shape as this run's (a feature that quietly excluded part of the
+site's own content for a reason later found to be fixable with a narrower
+filter, rather than a wholesale redesign).
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

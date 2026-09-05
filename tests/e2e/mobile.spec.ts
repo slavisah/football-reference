@@ -152,6 +152,21 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
   });
 
+  test('a "Jump to a section" nav links straight to each notes card, past the eleven-card scroll', async ({
+    page,
+  }) => {
+    const jumpNav = page.locator('nav.jump-nav');
+    await expect(jumpNav).toBeVisible();
+    await expect(jumpNav).toHaveAccessibleName('Jump to a section');
+    await expect(jumpNav.locator('a')).toHaveCount(11);
+
+    const goldenGloveLink = jumpNav.getByRole('link', { name: 'Golden Glove winners' });
+    await expect(goldenGloveLink).toHaveAttribute('href', '#golden-glove-winners');
+    await goldenGloveLink.click();
+    await expect(page).toHaveURL(/#golden-glove-winners$/);
+    await expect(page.locator('#golden-glove-winners')).toBeInViewport();
+  });
+
   test('sorting by Winner (A–Z) groups all Argentina rows first', async ({ page }) => {
     await page.selectOption('#world-cup-sort', 'winner-asc');
 
@@ -288,9 +303,11 @@ test.describe('EURO page on a 360px phone', () => {
     await expect(
       page.getByRole('heading', { name: 'Player of the Tournament winners', exact: true }),
     ).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('Rodri (Spain)')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Rodri (Spain)').first()).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Young Player of the Tournament winners' })).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('Lamine Yamal (Spain)')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Lamine Yamal (Spain)').first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Team of the Tournament winners' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Andreas Köpke (Germany, goalkeeper)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Luis de la Fuente (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Winning captains' })).toBeVisible();
@@ -436,6 +453,21 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
   });
 
+  test('has a translated "Skoči na odjeljak" jump nav linking straight to each notes card', async ({
+    page,
+  }) => {
+    const jumpNav = page.locator('nav.jump-nav');
+    await expect(jumpNav).toBeVisible();
+    await expect(jumpNav).toHaveAccessibleName('Skoči na odjeljak');
+    await expect(jumpNav.locator('a')).toHaveCount(11);
+
+    const link = jumpNav.getByRole('link', { name: 'Dobitnici Zlatne rukavice' });
+    await expect(link).toHaveAttribute('href', '#dobitnici-zlatne-rukavice');
+    await link.click();
+    await expect(page).toHaveURL(/#dobitnici-zlatne-rukavice$/);
+    await expect(page.locator('#dobitnici-zlatne-rukavice')).toBeInViewport();
+  });
+
   test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
     page,
     request,
@@ -533,7 +565,11 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
     await expect(
       page.getByRole('heading', { name: 'Dobitnici nagrade za najboljeg mladog igrača turnira' }),
     ).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('Lamine Yamal (Španjolska)')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Lamine Yamal (Španjolska)').first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Idealna momčad turnira' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Andreas Köpke (Njemačka, vratar)'),
+    ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Izbornici prvaka' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Luis de la Fuente (Španjolska)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Kapetani prvaka' })).toBeVisible();
@@ -1176,6 +1212,10 @@ test.describe('Copa América page on a 360px phone', () => {
         .locator('.notes__card')
         .getByText('Lionel Messi (Argentina) - his second, back-to-back, though an injury'),
     ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Héctor Chumpitaz (Peru)'),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Lúcio (Brazil).')).toBeVisible();
   });
 
   test('shows an audited "Format" badge per edition', async ({ page }) => {
@@ -1398,6 +1438,10 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
         .locator('.notes__card')
         .getByText('Lionel Messi (Argentina) - njegova druga, uzastopna titula'),
     ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Héctor Chumpitaz (Peru)'),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Lúcio (Brazil).')).toBeVisible();
   });
 
   test('shows the same champion totals as the English page', async ({ page, baseURL }) => {
@@ -1860,6 +1904,21 @@ test.describe('Records page on a 360px phone', () => {
     expect(overflow).toBeLessThanOrEqual(1);
   });
 
+  test('a "Jump to a section" nav links straight to each of the page\'s thirteen sections', async ({
+    page,
+  }) => {
+    const jumpNav = page.locator('nav.jump-nav');
+    await expect(jumpNav).toBeVisible();
+    await expect(jumpNav).toHaveAccessibleName('Jump to a section');
+    await expect(jumpNav.locator('a')).toHaveCount(13);
+
+    const rivalriesLink = jumpNav.getByRole('link', { name: 'Fiercest rivalries' });
+    await expect(rivalriesLink).toHaveAttribute('href', '#rivalries-heading');
+    await rivalriesLink.click();
+    await expect(page).toHaveURL(/#rivalries-heading$/);
+    await expect(page.locator('#rivalries-heading')).toBeInViewport();
+  });
+
   test('shows a champions timeline card and a title-ranking list per competition', async ({
     page,
   }) => {
@@ -2068,6 +2127,21 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
       return el.scrollWidth - el.clientWidth;
     });
     expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('has a translated "Skoči na odjeljak" jump nav linking straight to each of the thirteen sections', async ({
+    page,
+  }) => {
+    const jumpNav = page.locator('nav.jump-nav');
+    await expect(jumpNav).toBeVisible();
+    await expect(jumpNav).toHaveAccessibleName('Skoči na odjeljak');
+    await expect(jumpNav.locator('a')).toHaveCount(13);
+
+    const link = jumpNav.getByRole('link', { name: 'Najveći rivaliteti' });
+    await expect(link).toHaveAttribute('href', '#rivalries-heading');
+    await link.click();
+    await expect(page).toHaveURL(/#rivalries-heading$/);
+    await expect(page.locator('#rivalries-heading')).toBeInViewport();
   });
 
   test('renders translated chrome and headings', async ({ page }) => {
@@ -2518,7 +2592,7 @@ test.describe('Quiz page on a 360px phone', () => {
   test('champion order challenge: ranking correctly and incorrectly both surface feedback', async ({
     page,
   }) => {
-    const heading = page.getByRole('heading', { name: 'Champion order challenge' });
+    const heading = page.getByRole('heading', { name: 'Order challenge' });
     await expect(heading).toBeVisible();
 
     const firstOrderCard = page.locator('.quiz-card:has(.quiz-order__items)').first();
@@ -2624,7 +2698,7 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
   test('renders translated chrome, prompts and controls', async ({ page }) => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
     await expect(page.getByRole('heading', { name: 'Obiteljski kviz', level: 1 })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Izazov: poredaj prvake' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Izazov: poredaj' })).toBeVisible();
     const firstCard = page.locator('.quiz-card').first();
     await expect(firstCard.locator('.quiz-card__prompt')).toContainText('godine?');
     await expect(firstCard.locator('.quiz-card__check')).toHaveText('Provjeri odgovor');
