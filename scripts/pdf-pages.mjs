@@ -54,14 +54,19 @@ const TABLE_COMPONENTS = [
   'src/components/TournamentTable.astro',
   'src/components/ChampionsSummary.astro',
   'src/components/EditorialNotes.astro',
+  'src/components/SectionJumpNav.astro',
   'src/components/References.astro',
 ];
 
 // /records and /hr/records skip the per-edition TournamentTable/EditorialNotes
-// entirely in favor of the aggregate ChampionsTimeline view.
+// entirely in favor of the aggregate ChampionsTimeline view, but render their
+// own SectionJumpNav.astro directly (the same "Jump to a section" component
+// EditorialNotes.astro uses, one pill per top-level ranking section instead
+// of one per note card).
 const TIMELINE_COMPONENTS = [
   'src/components/ChampionsTimeline.astro',
   'src/components/ChampionsSummary.astro',
+  'src/components/SectionJumpNav.astro',
   'src/components/References.astro',
 ];
 

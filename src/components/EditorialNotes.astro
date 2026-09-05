@@ -1,4 +1,5 @@
 ---
+import SectionJumpNav from './SectionJumpNav.astro';
 import { renderInlineMarkdown, slugifyHeadings, type NoteSection } from '../lib/notes';
 
 interface Props {
@@ -27,15 +28,10 @@ const JUMP_NAV_MIN_SECTIONS = 4;
   sections.length > 0 && (
     <div class="notes stack">
       {sections.length >= JUMP_NAV_MIN_SECTIONS && (
-        <nav class="notes__nav card no-print" aria-label={jumpNavLabel}>
-          <ul class="notes__nav-list">
-            {sections.map((section, index) => (
-              <li>
-                <a href={`#${ids[index]}`}>{section.heading}</a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <SectionJumpNav
+          label={jumpNavLabel}
+          sections={sections.map((section, index) => ({ id: ids[index], label: section.heading }))}
+        />
       )}
       {sections.map((section, index) => (
         <section class="notes__card card" id={ids[index]} aria-labelledby={`note-heading-${index}`}>
@@ -60,34 +56,6 @@ const JUMP_NAV_MIN_SECTIONS = 4;
 }
 
 <style>
-  .notes__nav-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .notes__nav-list a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-    padding: 0.4rem 0.9rem;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: var(--bg-subtle);
-    color: var(--text);
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  .notes__nav-list a:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
   .notes__card h2 {
     font-size: 1.15rem;
     display: flex;

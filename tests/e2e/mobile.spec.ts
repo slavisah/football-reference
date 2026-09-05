@@ -155,7 +155,7 @@ test.describe('World Cup page on a 360px phone', () => {
   test('a "Jump to a section" nav links straight to each notes card, past the eleven-card scroll', async ({
     page,
   }) => {
-    const jumpNav = page.locator('nav.notes__nav');
+    const jumpNav = page.locator('nav.jump-nav');
     await expect(jumpNav).toBeVisible();
     await expect(jumpNav).toHaveAccessibleName('Jump to a section');
     await expect(jumpNav.locator('a')).toHaveCount(11);
@@ -456,7 +456,7 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
   test('has a translated "Skoči na odjeljak" jump nav linking straight to each notes card', async ({
     page,
   }) => {
-    const jumpNav = page.locator('nav.notes__nav');
+    const jumpNav = page.locator('nav.jump-nav');
     await expect(jumpNav).toBeVisible();
     await expect(jumpNav).toHaveAccessibleName('Skoči na odjeljak');
     await expect(jumpNav.locator('a')).toHaveCount(11);
@@ -1904,6 +1904,21 @@ test.describe('Records page on a 360px phone', () => {
     expect(overflow).toBeLessThanOrEqual(1);
   });
 
+  test('a "Jump to a section" nav links straight to each of the page\'s thirteen sections', async ({
+    page,
+  }) => {
+    const jumpNav = page.locator('nav.jump-nav');
+    await expect(jumpNav).toBeVisible();
+    await expect(jumpNav).toHaveAccessibleName('Jump to a section');
+    await expect(jumpNav.locator('a')).toHaveCount(13);
+
+    const rivalriesLink = jumpNav.getByRole('link', { name: 'Fiercest rivalries' });
+    await expect(rivalriesLink).toHaveAttribute('href', '#rivalries-heading');
+    await rivalriesLink.click();
+    await expect(page).toHaveURL(/#rivalries-heading$/);
+    await expect(page.locator('#rivalries-heading')).toBeInViewport();
+  });
+
   test('shows a champions timeline card and a title-ranking list per competition', async ({
     page,
   }) => {
@@ -2112,6 +2127,21 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
       return el.scrollWidth - el.clientWidth;
     });
     expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('has a translated "Skoči na odjeljak" jump nav linking straight to each of the thirteen sections', async ({
+    page,
+  }) => {
+    const jumpNav = page.locator('nav.jump-nav');
+    await expect(jumpNav).toBeVisible();
+    await expect(jumpNav).toHaveAccessibleName('Skoči na odjeljak');
+    await expect(jumpNav.locator('a')).toHaveCount(13);
+
+    const link = jumpNav.getByRole('link', { name: 'Najveći rivaliteti' });
+    await expect(link).toHaveAttribute('href', '#rivalries-heading');
+    await link.click();
+    await expect(page).toHaveURL(/#rivalries-heading$/);
+    await expect(page.locator('#rivalries-heading')).toBeInViewport();
   });
 
   test('renders translated chrome and headings', async ({ page }) => {
