@@ -2011,3 +2011,85 @@ back clean:
   590 KB should raise `PAGE_WEIGHT_BUDGET_BYTES` in
   `scripts/check-page-weight.mjs`, the same way eight prior additions
   already have.
+
+- **Dependency patch bump (`@playwright/test` 1.62.1 -> 1.63.0) plus two
+  content-gap investigations closed negatively (World Cup Team of the
+  Tournament, Copa América Silver/Bronze Boot)**: closed 2026-09-05
+  (sixty-fifth intensive run) - a standing health check first (`pnpm
+  install`, `pnpm outdated` found the sixty-fourth run's own flagged
+  `@playwright/test` 1.62.1 -> 1.63.0 patch as the only new item besides the
+  still-blocked `typescript` 7 entry, `pnpm dlx knip --no-config-hints`
+  matched every prior run's baseline, full lint/unit/build/`check:links`/
+  `check:sitemap`/`check:precache`/`check:perf`/`check:pdfs` all clean,
+  524/524 unit tests, 711 pages built). Took the sixty-fourth run's own
+  deferred bump as its own reviewed commit: `pnpm add -D
+  @playwright/test@1.63.0`, then a full cold-start `pnpm test:e2e` to confirm
+  no regression from the Playwright version change itself.
+
+  Per this routine's own priority order, re-checked Copa América first (the
+  1979 captain exclusion - no new source lead, unchanged) before researching
+  two genuinely new, previously-uninvestigated leads via `WebSearch`, both of
+  which came back negative rather than positive - a real, useful result in
+  its own right per this file's own established convention (see the
+  sixtieth run's matching "closed negatively" entry): a documented negative
+  closure stops a future run from re-spending research effort on the same
+  dead end.
+
+  **FIFA World Cup Team of the Tournament / All-Star Team:** every other
+  team competition on the site now has a "Team of the Tournament" note
+  section (EURO since the fifty-ninth run, Copa América since the
+  fifty-second) except the World Cup, which had never been checked. Three
+  WebSearch passes found the award existed but not in the continuous,
+  single-shape form this site requires: a media-journalist panel selected an
+  XI from 1930 to 1994, FIFA's own Technical Study Group then expanded it to
+  a 16-player squad for 1998 and 2002, then a 23-player squad for 2006 - and
+  it was discontinued entirely after 2006, with no equivalent at any World
+  Cup since (2010-2026 have only the individual Golden Ball/Glove/Young
+  Player/Fair Play awards this page already covers). Three incompatible
+  squad sizes across its own lifetime plus a 20-year gap with no modern
+  equivalent is the same "no single reliable shape across editions" reasoning
+  that already excluded EURO's own 2000/2012 extended squads from that page's
+  Team of the Tournament section - not pursued.
+
+  **Copa América Silver Boot and Bronze Boot:** the World Cup and EURO
+  Golden Boot tables (`content/golden-boot.md`) both already carry a
+  Silver/Bronze Boot runners-up section for the eras a single tiebreak winner
+  was named. Copa América's own "Golden Boot winners" section
+  (`content/copa-america.md`) is explicit that the label itself is this
+  site's own convenience naming, not CONMEBOL's - "the same convenience label
+  the site's dedicated Golden Boot page already uses... whether or not
+  CONMEBOL held a formal award ceremony for it that year." Two WebSearch
+  passes (covering the two most recent editions, 2021 and 2024) turned up no
+  evidence CONMEBOL has ever named a Silver Boot or Bronze Boot at all, at
+  any edition - unlike the World Cup/EURO, where the podium is officially
+  named, Copa América's top-scorer list is table-derived from goal counts
+  with no official second/third-place recognition to report. Not pursued -
+  doubly unofficial (no formal Golden Boot ceremony most years, and no
+  Silver/Bronze equivalent at any year).
+
+  Neither investigation touched a `content/*.md` file, so no `lastReviewed`
+  bump, `docs/SOURCES.md` entry, or PDF regeneration was needed - only the
+  dependency bump (`package.json`/`pnpm-lock.yaml`) and this file changed.
+  Full standing health check clean and unchanged from the pre-bump baseline:
+  `pnpm lint` (0/0/0), `pnpm test` (524/524 unit, unchanged), `pnpm build`
+  (711 pages, unchanged), `check:links` (715 pages), `check:sitemap` (710
+  entries), `check:precache` (37 URLs), `check:perf` (heaviest pages
+  unchanged - `hr/records` 584.3 KB, `records` 579.2 KB, both within the 590
+  KB budget), `check:pdfs` (700/700 fresh, unaffected - no PDF source file
+  changed), `pnpm dlx knip --no-config-hints` (same one confirmed false
+  positive as every prior run), full cold-start `pnpm test:e2e` on the new
+  Playwright version (see `docs/PROJECT_STATUS.md`'s matching entry for the
+  exact pass count). See that same entry for full detail.
+
+  **Left for a future pass:** the same environment-blocked items as every
+  recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+  América's 1979 captain exclusion (unchanged, not re-attempted). With the
+  World Cup's and Copa América's own last plausible "new award family" leads
+  now both closed negatively, and every reliably-sourceable award-history
+  angle across all six competition/award families checked at least once
+  (several more than once), the next content-gap pass likely needs either a
+  fresh source lead on the Copa América 1979 captain question or a genuinely
+  different quality angle (accessibility, performance, SEO, or a fresh
+  `docs/WEBSITE_REQUIREMENTS.md`/live-site read) rather than another
+  award-name search - the same fork this file's last several entries have
+  each pointed to.
