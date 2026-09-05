@@ -2093,3 +2093,42 @@ back clean:
   `docs/WEBSITE_REQUIREMENTS.md`/live-site read) rather than another
   award-name search - the same fork this file's last several entries have
   each pointed to.
+
+- **Family Quiz gains chronological-order questions for the three
+  individual awards**: closed 2026-09-05 (sixty-sixth intensive run) - a
+  standing health check first (nothing new beyond the still-blocked
+  `typescript` 7 entry; full lint/unit/build/`check:links`/`check:sitemap`/
+  `check:precache`/`check:perf`/`check:pdfs` all clean). Re-checked Copa
+  América's 1979 captain exclusion (no new lead, unchanged) and
+  investigated a UEFA Nations League Team of the Tournament section the
+  same way EURO/Copa América/World Cup already have one or were checked -
+  closed negatively: only the inaugural 2019 Finals has a confirmable full
+  official XI; 2021/2023/2025 don't, and this environment's outbound
+  network policy still blocks a direct fetch of UEFA.com's own roundup
+  that might otherwise settle it. Rather than stop there, found a real
+  structural gap in the quiz itself: `chronologicalOrderQuestions()` only
+  ever ran for the four team competitions, because an individual award's
+  repeat winner or tie row can't be told apart in the ordering game without
+  revealing the year. Fixed with a new `uniqueWinnerEditions()`
+  (`src/lib/quiz.ts`) that filters to one-time, non-tied winners - exactly
+  the safe subset - and reused it to also de-duplicate
+  `yearByWinnerQuestions()`'s own identical existing filter. Wired into
+  both `quiz.astro`/`hr/quiz.astro`: Ballon d'Or and both Golden Boot
+  tables now get their own ordering question (4 -> 7 cards per language).
+  Renamed the section "Champion order challenge" -> "Order challenge"
+  ("Izazov: poredaj prvake" -> "Izazov: poredaj" in Croatian) since it no
+  longer only holds champions. New unit tests (524 -> 530, coverage
+  unchanged at 99.91%/99.43%); full standing health check plus
+  `check:lighthouse` (37/37 pages still a perfect 1.00, `/quiz`/`hr/quiz`
+  included) and a full cold-start `pnpm test:e2e` (847/847, unchanged
+  count) all clean. `/quiz` isn't a PDF-source page, so no PDF
+  regeneration was needed. See `docs/PROJECT_STATUS.md`'s matching entry
+  for full detail. **Left for a future pass:** the same environment-blocked
+  items as ever (`typescript` 7, `docs/SOURCES.md` link-liveness), plus
+  Copa América's 1979 captain exclusion and Nations League's Team of the
+  Tournament for 2021/2023/2025 (both unchanged, no new source lead). The
+  next pass's best angle is likely a fresh source lead on either blocked
+  fact, or another structural gap of this run's shape - a feature that
+  quietly excluded part of the site's own content for a reason a narrower
+  fix can address, rather than another award-name search or repeat
+  Lighthouse/WCAG sweep.

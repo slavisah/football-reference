@@ -2592,7 +2592,7 @@ test.describe('Quiz page on a 360px phone', () => {
   test('champion order challenge: ranking correctly and incorrectly both surface feedback', async ({
     page,
   }) => {
-    const heading = page.getByRole('heading', { name: 'Champion order challenge' });
+    const heading = page.getByRole('heading', { name: 'Order challenge' });
     await expect(heading).toBeVisible();
 
     const firstOrderCard = page.locator('.quiz-card:has(.quiz-order__items)').first();
@@ -2698,7 +2698,7 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
   test('renders translated chrome, prompts and controls', async ({ page }) => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
     await expect(page.getByRole('heading', { name: 'Obiteljski kviz', level: 1 })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Izazov: poredaj prvake' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Izazov: poredaj' })).toBeVisible();
     const firstCard = page.locator('.quiz-card').first();
     await expect(firstCard.locator('.quiz-card__prompt')).toContainText('godine?');
     await expect(firstCard.locator('.quiz-card__check')).toHaveText('Provjeri odgovor');
