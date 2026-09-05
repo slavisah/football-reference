@@ -4,6 +4,7 @@ import ChampionsTimeline from '../components/ChampionsTimeline.astro';
 import ChampionsSummary from '../components/ChampionsSummary.astro';
 import References from '../components/References.astro';
 import PrintDownloadLink from '../components/PrintDownloadLink.astro';
+import SectionJumpNav from '../components/SectionJumpNav.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import {
   buildBiggestFinalMargins,
@@ -221,6 +222,28 @@ const jsonLd: JsonLdObject[] = [
     ? [buildRivalriesItemList(rivalries, { pageUrl, name: 'Fiercest rivalries' })]
     : []),
 ];
+
+// One pill per top-level section below, reusing each section's own existing
+// heading id rather than deriving a new one - this page's thirteen sections
+// (twelve rankings/timelines plus the identity note) have grown one at a
+// time over many runs with no way to reach one without scrolling past every
+// section before it, the same gap EditorialNotes.astro's own "Jump to a
+// section" nav closed for competition/award pages' note cards.
+const jumpSections = [
+  { id: 'timeline-heading', label: 'Champions timeline' },
+  { id: 'teams-heading', label: 'Most successful teams' },
+  { id: 'hosts-heading', label: 'Most frequent hosts' },
+  { id: 'home-soil-heading', label: 'Titles won on home soil' },
+  { id: 'streaks-heading', label: 'Back-to-back champions' },
+  { id: 'nearly-champions-heading', label: 'Nearly champions' },
+  { id: 'nearly-finalists-heading', label: 'Nearly finalists' },
+  { id: 'title-gaps-heading', label: 'Longest wait between titles' },
+  { id: 'final-margins-heading', label: 'Biggest final wins' },
+  { id: 'rivalries-heading', label: 'Fiercest rivalries' },
+  { id: 'award-timeline-heading', label: 'Individual award winners timeline' },
+  { id: 'award-rankings-heading', label: 'Most awards' },
+  { id: 'identity-heading', label: 'How historical nation names are handled' },
+];
 ---
 
 <BaseLayout
@@ -239,6 +262,8 @@ const jsonLd: JsonLdObject[] = [
         hint="A4 landscape, every ranking and timeline on this page."
       />
     </header>
+
+    <SectionJumpNav sections={jumpSections} />
 
     <section class="stack" aria-labelledby="timeline-heading">
       <h2 id="timeline-heading">Champions timeline</h2>

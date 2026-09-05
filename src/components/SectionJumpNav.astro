@@ -1,0 +1,65 @@
+---
+// A "Jump to a section" pill-nav, linking straight to an in-page heading by
+// id - shared by EditorialNotes.astro (one pill per note card) and
+// records.astro/hr/records.astro (one pill per top-level ranking section).
+// Both pages already have real per-section ids; this component only ever
+// renders the nav, never derives the ids itself, so it stays usable by any
+// caller with its own id scheme (slugified headings, or hand-written ones).
+
+interface JumpNavSection {
+  id: string;
+  label: string;
+}
+
+interface Props {
+  sections: JumpNavSection[];
+  /** Localized aria-label for the nav landmark; defaults to English. */
+  label?: string;
+}
+
+const { sections, label = 'Jump to a section' } = Astro.props;
+---
+
+{
+  sections.length > 0 && (
+    <nav class="jump-nav card no-print" aria-label={label}>
+      <ul class="jump-nav__list">
+        {sections.map((section) => (
+          <li>
+            <a href={`#${section.id}`}>{section.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<style>
+  .jump-nav__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .jump-nav__list a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg-subtle);
+    color: var(--text);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .jump-nav__list a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+</style>

@@ -1955,3 +1955,59 @@ back clean:
   genuine UX gap on the quality-angle fork, a future run could look for more
   of the same shape rather than assume repeat Lighthouse/WCAG sweeps are the
   only quality angle left.
+
+- **`/records` and `/hr/records` gain their own "Jump to a section" nav**:
+  closed 2026-09-05 (sixty-fourth intensive run) - a standing health check
+  first (`pnpm outdated` found only the still-blocked `typescript` 7 entry
+  plus a new in-range `@playwright/test` 1.62.1 -> 1.63.0 patch, left for a
+  future run rather than bundled into this one; `pnpm dlx knip
+  --no-config-hints` matched every prior run's baseline). Acted on the
+  sixty-third run's own closing note directly above ("look for more of the
+  same shape" of UX gap) rather than another award-name search or a repeat
+  Lighthouse/WCAG sweep: `/records`/`/hr/records` - the site's heaviest page
+  and the one with by far the most top-level sections (thirteen: twelve
+  rankings/timelines plus the historical-names note) - had no jump nav at
+  all, an even sharper version of the gap `EditorialNotes.astro`'s note cards
+  had before the sixty-third run fixed it there. Extracted the sixty-third
+  run's inline pill-nav markup/CSS out of `EditorialNotes.astro` into a new
+  shared `src/components/SectionJumpNav.astro` (`{id, label}[]` in, a
+  `no-print` pill nav out - deliberately not tied to `slugifyHeading()`,
+  since `/records`' thirteen sections already carry stable, hand-written
+  heading ids `check:links`'s fragment-target check already verifies) and
+  wired it into both `EditorialNotes.astro` (unchanged behavior, same
+  4-section threshold) and `records.astro`/`hr/records.astro` directly,
+  reusing each section's existing `<h2 id="...">` rather than inventing new
+  ids. The refactor's only externally-visible change is the CSS class name
+  (`notes__nav`/`notes__nav-list` -> `jump-nav`/`jump-nav__list`, since the
+  component is no longer notes-specific) - updated the two existing e2e
+  assertions that selected on it. `scripts/pdf-pages.mjs`'s `TABLE_COMPONENTS`/
+  `TIMELINE_COMPONENTS` shared lists both gained the new file so
+  `check:pdfs` keeps tracking it correctly for every page that renders it.
+  New e2e coverage: one EN + one HR test on `/records`/`/hr/records`
+  (pill count, accessible name, a link's href, and that clicking it actually
+  scrolls the target section into view) - the same shape as the sixty-third
+  run's own World Cup jump-nav test. No new `src/lib` logic, so `pnpm test`
+  stayed at 524/524. All 700 PDFs regenerated and reverified clean (twice -
+  once after the component/page changes, once more after dropping an unused
+  `export` keyword `knip` flagged on the new component's own type, the same
+  "unused export" shape the twelfth run's dead-code sweep already
+  established the fix for). Full standing health check clean: `pnpm lint`
+  (0/0/0 across 169 files), `pnpm test` (524/524 unit, unchanged), `pnpm
+  build` (711 pages, unchanged), `check:links` (715 pages, including the 26
+  new fragment links), `check:sitemap` (710 entries), `check:precache` (37
+  URLs), `check:perf` (heaviest pages now `hr/records` 584.3 KB and
+  `records` 579.2 KB, both still within the 590 KB budget - roughly 6-11 KB
+  headroom left, worth watching), `check:pdfs` (700/700 fresh), full
+  cold-start `pnpm test:e2e` (847/847 passed, 13.6 minutes, up from 843 - the
+  four new jump-nav test cases). See `docs/PROJECT_STATUS.md`'s matching
+  entry for detail. **Left for a future pass:** the same environment-blocked
+  items as every recent run (`typescript` 7, `docs/SOURCES.md`
+  link-liveness), plus Copa América's 1979 captain exclusion (unchanged), plus
+  the new in-range `@playwright/test` 1.63.0 patch bump found this run but not
+  taken (reviewed together with a dependency-bump run rather than bundled
+  into a UX-feature commit). `hr/records`'s and `records`' shrinking
+  page-weight headroom (now the two heaviest pages on the site) is worth
+  watching - the next content- or feature-adding run that pushes either over
+  590 KB should raise `PAGE_WEIGHT_BUDGET_BYTES` in
+  `scripts/check-page-weight.mjs`, the same way eight prior additions
+  already have.

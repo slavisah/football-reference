@@ -16490,5 +16490,102 @@ every reliably-sourceable angle checked at least once across all four,
 repeatedly, so the next several runs likely belong on the quality-angle
 fork by default unless a new lead surfaces on its own.
 
+### `/records` and `/hr/records` gain their own "Jump to a section" nav - added 2026-09-05 (sixty-fourth intensive run)
+
+A standing health check first: `pnpm outdated` found only the still-blocked
+`typescript` 7 entry plus one new in-range `@playwright/test` patch (1.62.1 ->
+1.63.0), left unbundled for a future dependency-bump run rather than mixed
+into this one; `pnpm dlx knip --no-config-hints` matched every prior run's
+baseline (the same one confirmed `scripts/test-preview-server.mjs` false
+positive).
+
+Acted on the sixty-third run's own closing note ("a future run could look for
+more of the same shape [of UX gap] rather than assume repeat Lighthouse/WCAG
+sweeps are the only quality angle left") rather than another award-name
+search. `/records`/`/hr/records` turned out to be a sharper version of the
+exact gap that run closed for `EditorialNotes.astro`'s note cards: this page
+is the heaviest on the whole site and has by far the most top-level sections
+of any page - thirteen (`Champions timeline`, `Most successful teams`, `Most
+frequent hosts`, `Titles won on home soil`, `Back-to-back champions`, `Nearly
+champions`, `Nearly finalists`, `Longest wait between titles`, `Biggest final
+wins`, `Fiercest rivalries`, `Individual award winners timeline`, `Most
+awards`, and the historical-names note) - yet had no jump nav at all, so a
+reader wanting, say, "Fiercest rivalries" had to scroll past twelve other
+sections' worth of grids and tables first.
+
+Rather than duplicate the sixty-third run's pill-nav markup and CSS a second
+time, extracted it out of `EditorialNotes.astro` into a new shared
+`src/components/SectionJumpNav.astro`: a small presentational component
+taking `sections: {id, label}[]` and an optional localized `label` (the
+`aria-label`), rendering the same `no-print`, 44px-tap-target pill-link `<nav>`
+either caller already had. Deliberately not tied to `slugifyHeading()` from
+`src/lib/notes.ts` - that helper derives an id from a heading string for
+`EditorialNotes.astro`'s dynamically-loaded note sections, but `/records`'
+thirteen sections already carry stable, hand-written `<h2 id="...">`s
+(`timeline-heading`, `teams-heading`, etc.), so `SectionJumpNav.astro` just
+takes whatever id the caller already has - `check:internal-links.mjs`'s
+existing fragment-target check (part of `check:links`) already verifies every
+`href="#..."` this component renders actually resolves, the same safety net
+any other in-page link on the site already has.
+
+`EditorialNotes.astro` was refactored to call the new component instead of
+rendering its own copy of the nav markup, with identical behavior (same
+4-section `JUMP_NAV_MIN_SECTIONS` threshold, same props). `records.astro`/
+`hr/records.astro` each gained a `jumpSections` array (English/Croatian
+labels, same thirteen shared heading ids - the ids don't change per language,
+only the labels do) and a `<SectionJumpNav sections={jumpSections} />` call
+right after the header's `PrintDownloadLink`, before the first section.
+
+The refactor's only externally-visible change is a CSS class rename
+(`notes__nav`/`notes__nav-list` -> `jump-nav`/`jump-nav__list`, since the
+component is no longer notes-specific) - updated the two existing
+`tests/e2e/mobile.spec.ts` assertions (English and Croatian World Cup jump-nav
+tests) that selected on the old class name.
+
+`scripts/pdf-pages.mjs`'s two shared component lists both needed the new file
+added so `check:pdfs` keeps tracking it: `TABLE_COMPONENTS` (since
+`EditorialNotes.astro`, which every competition/award PDF already depends on,
+now imports it) and `TIMELINE_COMPONENTS` (since `records.astro`/
+`hr/records.astro` render it directly).
+
+**Tests:** two new e2e cases (`tests/e2e/mobile.spec.ts`, English and
+Croatian records pages), the same shape as the sixty-third run's own World
+Cup jump-nav test: pill count (13), the nav's accessible name, one pill's
+`href`, and that clicking it actually scrolls the target section
+`toBeInViewport()`. No new `src/lib` logic (the ids/labels are hand-written
+data, not derived), so `pnpm test` stayed at **524/524**.
+
+`pnpm dlx knip --no-config-hints` flagged one new item after the initial
+edit - `SectionJumpNav.astro`'s own `JumpNavSection` interface, exported but
+never imported by another file (both callers use inline object-literal
+types) - fixed by dropping the `export` keyword, the same "unused export on a
+type used only in its own file" shape the twelfth run's dead-code sweep
+already established the fix for. All 700 PDFs regenerated and reverified
+clean **twice** - once after the component/page changes, once more after that
+`export`-keyword fix, since both edits touch `SectionJumpNav.astro` and it is
+now a dependency of every PDF page.
+
+Full standing health check clean: `pnpm lint` (0/0/0 across 169 files), `pnpm
+test` (524/524 unit, unchanged), `pnpm build` (711 pages, unchanged - no new
+route), `check:links` (715 pages, including the 26 new fragment links across
+both languages), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+`check:perf` (heaviest pages now `hr/records` at 584.3 KB and `records` at
+579.2 KB - both grew a few KB from the new nav markup but stay within the 590
+KB budget, with roughly 6-11 KB headroom left), `check:pdfs` (700/700 fresh),
+full cold-start `pnpm test:e2e` (**847/847 passed**, 13.6 minutes, up from 843
+- the four new jump-nav test cases across both languages).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus Copa
+América's 1979 captain exclusion (unchanged, not re-attempted this run), plus
+the new in-range `@playwright/test` 1.63.0 patch bump found by this run's own
+`pnpm outdated` check but deliberately not taken here (a dependency bump
+deserves its own reviewed commit, not a bundle-in with a UX feature).
+`hr/records`'s and `records`' page-weight headroom is shrinking as they've
+become the two heaviest pages on the site - the next content- or
+feature-adding run that pushes either over the 590 KB budget should raise
+`PAGE_WEIGHT_BUDGET_BYTES` in `scripts/check-page-weight.mjs`, the same way
+eight prior additions already have.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

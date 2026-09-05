@@ -14,6 +14,7 @@ import ChampionsTimeline from '../../components/ChampionsTimeline.astro';
 import ChampionsSummary from '../../components/ChampionsSummary.astro';
 import References from '../../components/References.astro';
 import PrintDownloadLink from '../../components/PrintDownloadLink.astro';
+import SectionJumpNav from '../../components/SectionJumpNav.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import {
   buildBiggestFinalMargins,
@@ -234,6 +235,25 @@ const jsonLd: JsonLdObject[] = [
       ]
     : []),
 ];
+
+// Croatian translation of records.astro's own jumpSections - same thirteen
+// heading ids (shared between languages, only the labels are translated),
+// same reasoning for why this page needs the nav at all.
+const jumpSections = [
+  { id: 'timeline-heading', label: 'Vremenska crta prvaka' },
+  { id: 'teams-heading', label: 'Najuspješnije reprezentacije' },
+  { id: 'hosts-heading', label: 'Najčešći domaćini' },
+  { id: 'home-soil-heading', label: 'Naslovi osvojeni na domaćem terenu' },
+  { id: 'streaks-heading', label: 'Uzastopni prvaci' },
+  { id: 'nearly-champions-heading', label: 'Vječiti drugoplasirani' },
+  { id: 'nearly-finalists-heading', label: 'Vječiti polufinalisti' },
+  { id: 'title-gaps-heading', label: 'Najduže čekanje na novi naslov' },
+  { id: 'final-margins-heading', label: 'Najveće pobjede u finalu' },
+  { id: 'rivalries-heading', label: 'Najveći rivaliteti' },
+  { id: 'award-timeline-heading', label: 'Vremenska crta pojedinačnih nagrada' },
+  { id: 'award-rankings-heading', label: 'Najviše nagrada' },
+  { id: 'identity-heading', label: 'Kako se postupa s povijesnim nazivima država' },
+];
 ---
 
 <BaseLayout
@@ -258,6 +278,8 @@ const jsonLd: JsonLdObject[] = [
         hint="A4 položeno, svi poredci i vremenske crte s ove stranice."
       />
     </header>
+
+    <SectionJumpNav sections={jumpSections} label="Skoči na odjeljak" />
 
     <section class="stack" aria-labelledby="timeline-heading">
       <h2 id="timeline-heading">Vremenska crta prvaka</h2>
