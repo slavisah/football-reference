@@ -2132,3 +2132,55 @@ back clean:
   quietly excluded part of the site's own content for a reason a narrower
   fix can address, rather than another award-name search or repeat
   Lighthouse/WCAG sweep.
+
+- **Copa América's 1979 winning-captain gap finally resolved**: closed
+  2026-09-05 (sixty-seventh intensive run) - a standing health check first
+  (`pnpm install`, `pnpm outdated` found only the still-blocked `typescript`
+  7 entry, `pnpm lint` clean across all files). Re-checked the sixty-sixth
+  run's two open leads before searching for anything new: UEFA Nations
+  League Team of the Tournament for 2021/2023/2025 stays blocked (a fresh
+  `WebFetch` attempt against a UEFA.com recap article this run confirmed the
+  egress proxy still rejects `www.uefa.com` outright, not just Wikipedia).
+  Took a genuinely different approach to Copa América's own long-standing
+  1979 captain gap instead of repeating the general-English-source searches
+  every prior attempt had used: targeted Spanish-language `WebSearch`
+  queries aimed specifically at Paraguayan press retrospectives of the 1979
+  title. That surfaced a name no prior pass had found - **Aldo Florentín**,
+  who took the armband after regular captain Hugo Talavera was
+  controversially benched by the federation president just before the
+  series decider - confirmed by two independent, named sources (his own
+  dedicated English Wikipedia biography, and Paraguay's ABC Color newspaper),
+  clearing the same two-independent-source bar every other edition on this
+  list already meets. One early search result suggested a conflicting
+  narrative (that Julio César Romero, not Florentín, physically lifted the
+  trophy); three follow-up passes with different phrasings never reproduced
+  that claim while every other result kept crediting Florentín with both the
+  armband and the presentation, so it was treated as an uncorroborated
+  outlier rather than a genuine source conflict - the same judgment call the
+  1987 edition's own entry already had to make explicit. Added a **1979**
+  bullet to `content/copa-america.md`'s "Winning captains" section (between
+  1975 and 1983, chronological order) and rewrote the section's intro bullet
+  to describe all three resolved gaps (1983, 1987, 1979) instead of naming
+  1979 as a standing exclusion - this closes the section completely, every
+  edition from 1975 to 2024 now has a named, two-source-confirmed captain.
+  Hand-translated into `hr/competitions/copa-america.astro`'s own `notes`
+  array. `content/copa-america.md`'s `lastReviewed` bumped to 2026-09-05. New
+  e2e coverage (one EN + one HR assertion) in `tests/e2e/mobile.spec.ts`. All
+  700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+  check:pdfs`, since this content edit and the `docs/SOURCES.md` addition
+  both mark every PDF's shared References section stale, by design). Full
+  standing health check clean: `pnpm lint` (0/0/0), `pnpm test` (unit tests
+  unchanged - no `src/lib` logic touched), `pnpm build` (711 pages,
+  unchanged), `check:links`/`check:sitemap`/`check:precache`/`check:perf`
+  all clean, full cold-start `pnpm test:e2e` after the two new assertions.
+  See `docs/PROJECT_STATUS.md`'s matching entry and `docs/SOURCES.md`'s
+  matching entry (full citation list, including the outlier-claim caveat)
+  for detail. **Left for a future pass:** the same environment-blocked items
+  as every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness), plus
+  Nations League's Team of the Tournament for 2021/2023/2025 (unchanged, no
+  new source lead - and now confirmed directly egress-blocked at the
+  UEFA.com domain level, not just at Wikipedia). With every named captain gap
+  across all four team competitions now closed, the next content-gap pass
+  likely needs a genuinely different quality angle (accessibility,
+  performance, SEO, or a fresh `docs/WEBSITE_REQUIREMENTS.md`/live-site read)
+  rather than another award-name or personnel search.

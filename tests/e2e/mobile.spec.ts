@@ -1215,6 +1215,9 @@ test.describe('Copa América page on a 360px phone', () => {
     await expect(
       page.locator('.notes__card').getByText('Héctor Chumpitaz (Peru)'),
     ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Aldo Florentín (Paraguay) - stepped into the armband'),
+    ).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Lúcio (Brazil).')).toBeVisible();
   });
 
@@ -1440,6 +1443,9 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     ).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('Héctor Chumpitaz (Peru)'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Aldo Florentín (Paragvaj) - preuzeo je vrpcu'),
     ).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Lúcio (Brazil).')).toBeVisible();
   });
