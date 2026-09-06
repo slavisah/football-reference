@@ -2443,3 +2443,67 @@ back clean:
   angle - actually using the site's own interactive controls (filters,
   sort, quiz, compare tools) with real long-tail data, not just running
   another automated sweep - before falling back to a repeat health check.
+
+- **Health check plus a wider negative-result investigation (no code change
+  needed)**: closed 2026-09-06 (seventy-first intensive run) - a standing
+  health check first: `pnpm install`, `pnpm outdated` (still just the
+  blocked `typescript` 7 entry), `pnpm audit` (no known vulnerabilities),
+  `pnpm dlx knip --no-config-hints` (same one confirmed false positive as
+  every prior run), full `pnpm lint`/`pnpm test` (533/533 unit)/`pnpm build`
+  (711 pages)/`check:links` (715 pages)/`check:sitemap` (710
+  entries)/`check:precache` (37 URLs)/`check:perf` (heaviest page
+  `hr/records` 583.0 KB, within the 590 KB budget)/`check:pdfs` (700/700
+  fresh) all clean and unchanged from the seventieth run's baseline.
+
+  Per this routine's own priority order, re-checked Nations League's Team of
+  the Tournament for 2021/2023/2025 first with two more targeted
+  `WebSearch` passes: still nothing beyond the already-documented 2019 XI -
+  confirmed unavailable for a fourth consecutive run.
+
+  Rather than repeat the sixty-ninth/seventieth runs' own "inspect the live
+  site with real interaction and long-tail data" method verbatim, widened it
+  into several sub-checks not tried before, all via a local `astro preview`
+  driven by Playwright: (1) the four team-competition filter forms driven
+  with their own longest-tail winner/host/team values plus a deliberately
+  contradictory winner+host combination, to exercise the empty state and
+  its "Clear filters" recovery button; (2) `/compare` and `/compare-players`,
+  in **both** languages, with each page's own two *longest* option values
+  (not the specific well-known names the existing e2e suite already covers)
+  at the 360px viewport; (3) the header's team/player search combobox driven
+  by keyboard only - type, ArrowDown/Up, Escape-then-retype, Enter-to-navigate,
+  click-outside-to-close; (4) a direct proxy-level re-verification of the
+  standing network block (`curl -v` through the agent proxy against
+  `en.wikipedia.org` plus 22 other `docs/SOURCES.md` domains, all rejected
+  with an explicit 403 from the egress gateway itself, confirmed via
+  `$HTTPS_PROXY/__agentproxy/status`'s own `recentRelayFailures` log).
+
+  All four came back clean: filters correctly intersect and recover from a
+  zero-result state, both compare tools handle their longest real values
+  without overflow in either language, and the search combobox's keyboard
+  contract behaves as designed. One early apparent finding - the filters
+  looked completely inert in an initial pass - turned out to be a bug in
+  the *test script*, not the site: it counted `<tr>` elements regardless of
+  the `hidden` attribute the real filtering logic sets, instead of only
+  visible rows; corrected and re-verified filtering works correctly before
+  this was ever treated as a real finding, worth recording so a future
+  run's own quick Playwright check doesn't repeat the same measurement
+  mistake. Also re-derived, then found already independently documented
+  (`docs/PROJECT_STATUS.md` line 7666), the "team names are never
+  translated into Croatian, anywhere on the site" pattern the `hr/compare`
+  pages' English-language option lists surfaced - confirmed deliberate and
+  pre-existing, not a fresh gap.
+
+  No `content/*.md`, `src/`, or `tests/` file needed a change this run.
+  **Left for a future pass:** the same environment-blocked items as every
+  recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+  League's Team of the Tournament for 2021/2023/2025, now re-checked across
+  four consecutive runs with no new lead), plus Copa América winning
+  captains for 1975-2010 (unchanged), plus the available Vitest 4 -> 5
+  upgrade flagged two runs back (still not taken). Having swept filters,
+  both comparison tools in both languages, and the header search widget's
+  full keyboard contract this run with nothing to fix, a future pass
+  looking for more UX gaps by direct inspection should try a still-untried
+  surface - the Family Quiz's actual answer-checking interaction (not just
+  its content or print rendering, both already covered), or the PWA
+  install/offline-navigation path with a real simulated offline network -
+  rather than another filter/compare/search sweep.
