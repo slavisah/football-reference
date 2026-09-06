@@ -2507,3 +2507,99 @@ back clean:
   its content or print rendering, both already covered), or the PWA
   install/offline-navigation path with a real simulated offline network -
   rather than another filter/compare/search sweep.
+
+- **Family Quiz interaction sweep (clean) plus a stale-boilerplate fix in
+  this file's own standing "left for a future pass" note**: closed
+  2026-09-06 (seventy-second intensive run) - a standing health check first
+  (`pnpm install`, `pnpm outdated` found nothing new beyond the still-blocked
+  `typescript` 7 entry, `pnpm dlx knip --no-config-hints` matched every prior
+  run's baseline, `pnpm lint` 0/0/0, `pnpm test` 533/533 unit unchanged,
+  `pnpm build` 711 pages, `check:links`/`check:sitemap`/`check:precache`/
+  `check:perf`/`check:pdfs` all clean and matching the seventy-first run's
+  baseline exactly).
+
+  Acted on the seventy-first run's own suggested untried surface: built the
+  site and drove the live Family Quiz (`/quiz`, `/hr/quiz`) with Playwright
+  against a local `astro preview`, actually answering questions rather than
+  only reading `QuizScript.astro`/content. Covered: the score bar's total
+  vs. the real multiple-choice card count; every multiple-choice card's
+  check-button disabled/enabled state before and after selecting an option;
+  a deliberate mix of correct and incorrect answers checked against the
+  live running score; that radios lock and feedback text renders after
+  answering; every order-challenge card's duplicate-rank guard (assigning
+  the same rank twice must keep "Check order" disabled with a visible
+  warning) and its correct-order path; the restart button fully resetting
+  both card types (radios unchecked/enabled, order selects cleared, check
+  buttons re-shown, score back to 0); a keyboard-only path (focus a radio,
+  arrow to a choice, tab to the check button, Enter to submit); and a
+  Croatian-page smoke check. Two apparent findings on the first pass turned
+  out to be bugs in the *test script*: `.quiz-card` is a class shared by
+  both multiple-choice and order-challenge cards (`QuizOrderCard.astro`
+  reuses the wrapper), so a naive `.quiz-card` count and a naive "closest
+  ancestor whose class contains quiz-card" XPath (which matched the inner
+  `quiz-card__fieldset` by substring before the real outer card) both gave
+  wrong answers; corrected to mirror the site's own logic
+  (`.quiz-card:not(:has(.quiz-order__items))` for multiple-choice-only, and
+  `element.closest('.quiz-card')` via `evaluateAll` for the real ancestor)
+  before treating anything as a finding - the same "measurement mistake,
+  not a site bug" lesson the seventy-first run's own filter-count bug
+  already flagged, now hit again on a different page. Once corrected, every
+  real check passed with no site bug found: the quiz's answer-checking
+  interaction is fully correct end to end. No `content/*.md`, `src/`, or
+  `tests/` file needed a change for this part.
+
+  While cross-referencing this file's own recurring "Left for a future
+  pass" boilerplate before writing this entry, found and fixed a real
+  documentation-accuracy bug: this note has named "Copa América winning
+  captains for 1975-2010" as still outstanding in every entry since the
+  fifty-sixth run, but `content/copa-america.md`'s "Winning captains"
+  section (checked directly, line by line) has in fact carried a complete
+  entry for every edition from 1975 through 2024 since the sixty-first
+  run closed that exact gap on 2026-09-04 (see
+  `docs/PROJECT_STATUS.md`'s "Copa América winning captains, 1975-2010 span
+  recovered" entry) - eleven consecutive runs (sixty-second through
+  seventy-first) copied the same stale "left for a future pass" line
+  forward without re-checking it against the actual content file. The same
+  thing happened to "the available Vitest 4 -> 5 major upgrade" note, first
+  flagged as pending after the fifty-seventh run: it was actually completed
+  in the fifty-eighth run (`docs/PROJECT_STATUS.md`'s "Vitest 4 -> 5
+  major-version upgrade" entry, 2026-09-03) and `package.json`/`pnpm-lock.yaml`
+  have pinned `vitest`/`@vitest/coverage-v8` at `5.0.0` ever since (reverified
+  this run via `pnpm install` and `pnpm test`'s own "v5.0.0" banner) - twelve
+  more runs (fifty-ninth through seventy-first) repeated the stale line after
+  the fix landed. Both are corrected here rather than silently dropped, since
+  this file is meant to be read forward (not re-diffed against
+  `docs/PROJECT_STATUS.md`) by whichever run picks up next - a future run
+  trusting this note's own words would otherwise waste a cycle re-verifying
+  (or worse, re-researching from scratch) two gaps that have been closed for
+  8-16 runs already. This file's own append-only convention (see this file's
+  opening paragraph) is about the backlog history, not about perpetuating a
+  factually wrong standing note indefinitely, so the fix is this new entry
+  correcting the record going forward, not a rewrite of the older entries'
+  own text (which stays as an accurate account of what that run itself did
+  and believed at the time).
+
+  Full standing health check re-confirmed clean after this file-only edit
+  (no `src/`/`content/` change, so no rebuild/PDF regeneration was needed):
+  `pnpm lint` (0/0/0), `pnpm test` (533/533 unit, unchanged), a full
+  cold-start `pnpm test:e2e` (847/847 passed, confirming the quiz sweep
+  above found nothing to fix). See `docs/PROJECT_STATUS.md`'s matching entry
+  for the full quiz-sweep methodology and the stale-note audit detail.
+
+  **Left for a future pass:** the same genuinely-still-open
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, Nations League's Team of the Tournament
+  for 2021/2023/2025, now unconfirmed for five consecutive runs). With the
+  quiz interaction now swept clean and both stale-boilerplate items
+  corrected, a future pass looking for more UX gaps by direct inspection
+  should try the PWA install/offline-navigation path with a real simulated
+  offline network (the seventy-first run's other still-untried suggestion,
+  not yet acted on - though note `tests/e2e/mobile.spec.ts`'s existing
+  "Installability and offline reading" block already covers `setOffline()`
+  navigation fairly thoroughly, so this may also turn out to already be
+  well-covered rather than a fresh gap), the print/PDF path's actual visual
+  rendering under print-media emulation (not just `check:pdfs`' freshness
+  check), or a fresh line-by-line audit of this file's own remaining
+  "left for a future pass" carry-forward notes against the real repo state,
+  the same angle that found today's two stale items - now confirmed a real,
+  recurring failure mode worth checking periodically rather than a one-off.
