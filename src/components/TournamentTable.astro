@@ -1,6 +1,6 @@
 ---
 import type { Edition, MarkdownTable } from '../lib/types';
-import { buildSortOptions, defaultSortValue } from '../lib/tableSort';
+import { buildSortOptions, defaultSortValue, selectMinWidthRem } from '../lib/tableSort';
 import { editionTeams } from '../lib/editions';
 import { editionLinkKey } from '../lib/editionProfile';
 import { renderInlineMarkdown } from '../lib/notes';
@@ -162,6 +162,15 @@ const yearColIndex = table.headers.findIndex((header) => /year|season/i.test(hea
 // already rendered below, so no client-side re-sort is needed on first load.
 const sortOptions = buildSortOptions(table.headers, { locale, headerLabels });
 const defaultSort = defaultSortValue(sortOptions);
+
+// Per-field minimum widths so a long selected value (a full player name, a
+// multi-country host list) never gets silently clipped inside its own
+// closed <select> - see selectMinWidthRem()'s own doc comment.
+const winnerMinWidth = selectMinWidthRem([winnerAllLabel, ...winners]);
+const yearMinWidth = selectMinWidthRem([yearAllLabel, ...years.map(String)]);
+const hostMinWidth = selectMinWidthRem([hostAllLabel, ...hosts]);
+const teamMinWidth = selectMinWidthRem([teamAllLabel, ...teams]);
+const sortMinWidth = selectMinWidthRem(sortOptions.map((option) => option.label));
 ---
 
 {/*
@@ -187,7 +196,7 @@ const defaultSort = defaultSortValue(sortOptions);
     role="search"
     aria-label={filterAriaLabel}
   >
-    <div class="filters__field">
+    <div class="filters__field" style={`min-width: ${winnerMinWidth}rem`}>
       <label for={`${id}-winner`}>{winnerLabel}</label>
       <select id={`${id}-winner`} name="winner">
         <option value="">{winnerAllLabel}</option>
@@ -195,7 +204,7 @@ const defaultSort = defaultSortValue(sortOptions);
       </select>
     </div>
 
-    <div class="filters__field">
+    <div class="filters__field" style={`min-width: ${yearMinWidth}rem`}>
       <label for={`${id}-year`}>{yearLabel}</label>
       <select id={`${id}-year`} name="year">
         <option value="">{yearAllLabel}</option>
@@ -205,7 +214,7 @@ const defaultSort = defaultSortValue(sortOptions);
 
     {
       hosts.length > 0 && (
-        <div class="filters__field">
+        <div class="filters__field" style={`min-width: ${hostMinWidth}rem`}>
           <label for={`${id}-host`}>{hostLabel}</label>
           <select id={`${id}-host`} name="host">
             <option value="">{hostAllLabel}</option>
@@ -217,7 +226,7 @@ const defaultSort = defaultSortValue(sortOptions);
 
     {
       teams.length > 0 && (
-        <div class="filters__field">
+        <div class="filters__field" style={`min-width: ${teamMinWidth}rem`}>
           <label for={`${id}-team`}>{teamLabel}</label>
           <select id={`${id}-team`} name="team">
             <option value="">{teamAllLabel}</option>
@@ -229,7 +238,7 @@ const defaultSort = defaultSortValue(sortOptions);
 
     {
       sortOptions.length > 0 && (
-        <div class="filters__field">
+        <div class="filters__field" style={`min-width: ${sortMinWidth}rem`}>
           <label for={`${id}-sort`}>{sortByLabel}</label>
           <select id={`${id}-sort`} name="sort">
             {sortOptions.map((option) => (

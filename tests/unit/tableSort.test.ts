@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { buildSortOptions, compareCellText, defaultSortValue } from '../../src/lib/tableSort';
+import {
+  buildSortOptions,
+  compareCellText,
+  defaultSortValue,
+  selectMinWidthRem,
+} from '../../src/lib/tableSort';
 
 describe('buildSortOptions', () => {
   it('offers Year, Winner, Host and a quantity column when all are present', () => {
@@ -142,5 +147,28 @@ describe('compareCellText', () => {
     expect(compareCellText('—', 'France', 'desc')).toBeGreaterThan(0);
     expect(compareCellText('France', '—', 'asc')).toBeLessThan(0);
     expect(compareCellText('—', '—', 'asc')).toBe(0);
+  });
+});
+
+describe('selectMinWidthRem', () => {
+  it('never goes below the 9rem floor every short-option filter already used', () => {
+    expect(selectMinWidthRem([])).toBe(9);
+    expect(selectMinWidthRem(['All hosts', 'Spain', 'Brazil'])).toBe(9);
+  });
+
+  it('grows with the longest value, not the average or the total count', () => {
+    const short = selectMinWidthRem(['All winners', 'Pelé']);
+    const long = selectMinWidthRem(['All winners', 'Karl-Heinz Rummenigge']);
+    expect(long).toBeGreaterThan(short);
+    // A single long outlier among many short values still drives the result.
+    expect(selectMinWidthRem(['a', 'b', 'c', 'Karl-Heinz Rummenigge'])).toBe(long);
+  });
+
+  it('gives real multi-country hosts and full player names enough room in practice', () => {
+    // Regression case: the 2026 World Cup's three-country host list and the
+    // Ballon d'Or's longest winner name used to get clipped inside their
+    // closed <select> at this site's typical desktop filter-row width.
+    expect(selectMinWidthRem(['Canada, Mexico and United States'])).toBeGreaterThan(20);
+    expect(selectMinWidthRem(['Karl-Heinz Rummenigge'])).toBeGreaterThan(14);
   });
 });

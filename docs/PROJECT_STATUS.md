@@ -17176,5 +17176,164 @@ sixty-fourth runs' jump-nav gaps were found) rather than another
 automated-tool sweep, or a fresh read of `docs/WEBSITE_REQUIREMENTS.md`
 against the live site.
 
+### Bug fix: filter `<select>` fields were clipping their own long selected values - closed 2026-09-06 (seventieth intensive run)
+
+A standing health check first (`pnpm install`, `pnpm outdated` found nothing
+new beyond the still-blocked `typescript` 7 entry, `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline, full
+lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+`check:pdfs` all clean: 530/530 unit tests, 711 pages built). Content-mining
+across every competition/award family and every automated sweep angle
+(WCAG tag families, Lighthouse, dependency updates, `knip`) are confirmed
+exhausted per the last several runs' own closing notes - the sixty-ninth
+run's own suggestion was that a future pass "likely needs either a real
+user-facing gap noticed by inspection... rather than another automated-tool
+sweep." Acted on that directly instead of repeating a health check with no
+new angle.
+
+**Method.** Built the site (`pnpm build`) and ran it under `astro preview`,
+then drove it with a headless Chromium (Playwright's own, already installed
+at `/opt/pw-browsers/chromium`) rather than any test framework - full-page
+and targeted screenshots across the home page, every competition/award
+landing page, `/compare`, `/compare-players`, `/records`, `/quiz`, and the
+nav drawer, at both the 375px mobile and 1280px desktop viewports, in both
+light and dark mode. Most of what this turned up was cosmetic clipping in my
+own screenshot tooling (a non-fullPage viewport capture cutting off text
+mid-sentence) rather than a real bug - worth naming so a future run doesn't
+mistake the same artifact for a finding. The one genuine hit: a desktop
+screenshot of `/competitions/copa-america` showed its "Sort by" filter
+reading "Year (newest fir" - visibly cut off with no ellipsis.
+
+**Root cause.** `TournamentTable.astro` renders up to five filter
+`<select>` fields (Winner/Year/Host/Team/Sort) inside a `display: flex;
+flex-wrap: wrap` row, and every field shared one CSS rule:
+`.filters__field { min-width: 9rem; flex: 1 1 9rem; }`. That's sized for the
+shortest realistic case (a short "All winners"-style placeholder) - fine for
+most fields most of the time, since flex-grow distributes the row's leftover
+width roughly evenly across all fields regardless of which one actually
+needs it. A native `<select>` gives no visual cue when its own selected-option
+text doesn't fit - no ellipsis, no wrap, no overflow scrollbar - it just
+silently clips, so a reader has no way to tell anything was cut off. Once
+confirmed clipping in one field, I wrote a small script (`page.evaluate()`
+building a `<canvas>` and calling `measureText()` on each `<select>`'s
+current option text, compared against `sel.clientWidth`) and ran it against
+all 18 competition/compare/glossary pages in both languages, covering every
+`<select>`'s full option list, not just its default state. That surfaced a
+much bigger picture than the one field I'd spotted by eye:
+
+| Field | Page | Value | Overflow |
+|---|---|---|---|
+| Host | `/competitions/world-cup` | "Canada, Mexico and United States" (the 2026 host) | ~177px |
+| Host | `/competitions/euro` | "Belgium and Netherlands" | ~105px |
+| Winner | `/competitions/ballon-dor` | "Karl-Heinz Rummenigge" (longest winner name) | ~55-57px |
+| Team | `/hr/competitions/*` (4 pages) | "Sve reprezentacije" (Croatian "All teams") | ~32px |
+| Winner | `/(hr/)competitions/golden-boot` | "Georges Mikautadze" | ~4-27px |
+| Sort | every competition page | "Year (newest first)" / "Godina (najnoviji prvi)" | ~6-9px |
+
+Every one of these is a value a reader can actually select through the UI,
+or land on directly via this site's own shareable `?winner=`/`?host=`/etc.
+URL query parameters (`AGENTS.md`'s non-negotiable rule 9) - not a
+hypothetical edge case dreamed up for a bug report. The World Cup's own
+2026 host list is the single most visible case: any reader who filters that
+table by host and picks the newest, most-searched-for edition sees a
+silently truncated value.
+
+**Fix.** Rather than hand-picking a bigger fixed width for the fields that
+happened to be measured as too narrow today (which would drift stale the
+next time an even-longer host list or player name is added to `content/`),
+added a small pure function, `selectMinWidthRem()` in `src/lib/tableSort.ts`,
+that computes a field's own required minimum width from its own real option
+data:
+
+```ts
+const SELECT_MIN_WIDTH_REM = 9;
+const SELECT_REM_PER_CHAR = 0.55;
+const SELECT_FIXED_REM = 3;
+
+export function selectMinWidthRem(values: string[]): number {
+  const longest = Math.max(0, ...values.map((v) => v.length));
+  return Math.max(SELECT_MIN_WIDTH_REM, longest * SELECT_REM_PER_CHAR + SELECT_FIXED_REM);
+}
+```
+
+`0.55rem`/character plus a fixed `3rem` allowance (the select's own padding
+plus the native dropdown arrow) is a proportional-font average calibrated
+directly against the canvas `measureText()` numbers gathered above - checked
+against both the moderate case ("Year (newest first)", 20 characters) and
+the two extreme real cases ("Canada, Mexico and United States", 33
+characters; "Karl-Heinz Rummenigge", 22 characters) rather than picked
+arbitrarily. The existing `9rem` floor is preserved via `Math.max()` so no
+already-fitting field (most of them, most of the time) gets smaller.
+`TournamentTable.astro` calls it once per field - `winners`/`years`/
+`hosts`/`teams`/`sortOptions.map(o => o.label)`, each list including that
+field's own translated "All ..." placeholder string alongside its real
+values - and applies the result via a per-field inline `style="min-width:
+...rem"`, replacing the one shared class rule. `flex-basis` (still `9rem`
+from the class's `flex: 1 1 9rem` shorthand) is left alone: `min-width`
+always wins over `flex-basis` in layout regardless of the gap between them,
+so no other change was needed there.
+
+**Verification.** Re-ran the exact same canvas-measurement sweep after the
+fix: every previously-clipped case now has margin to spare (the closest,
+"Karl-Heinz Rummenigge", went from ~55px short to ~6px of *headroom*).
+Additionally verified visually with fresh Playwright screenshots of the
+real rendered pages - including deep-linking to
+`/competitions/world-cup/?host=Canada%2C+Mexico+and+United+States` and
+using `page.selectOption()` to select "Karl-Heinz Rummenigge" and "Georges
+Mikautadze" directly - across both desktop (1280px) and mobile (375px)
+viewports, both languages. The mobile layout is unaffected: each field
+already wraps to its own full-width row below `60rem` (see `AGENTS.md`'s
+mobile-first conventions), so a larger `min-width` there just means "already
+full width" stays "full width." At 1280px desktop, the affected fields now
+sometimes wrap onto a second row within the filter panel instead of
+squeezing into one row and clipping - a strictly better outcome than
+silently losing text.
+
+New unit test coverage in `tests/unit/tableSort.test.ts`, three cases:
+the `9rem` floor holds for every value list that doesn't need more; the
+*longest* value in the list drives the result (not the average, not the
+count - a single long outlier among many short values still wins); and the
+two real regression cases from the table above (the World Cup host list,
+the Ballon d'Or's longest winner name) each clear the specific threshold a
+future accidental revert of the constants would actually violate.
+
+All 700 PDFs regenerated (`pnpm build:pdfs`) and reverified clean
+(`pnpm check:pdfs`) - `TournamentTable.astro` is a shared PDF-source file
+for every competition/award/compare page family, even though the specific
+lines that changed (the `.filters` form and its `<style>` block) carry the
+existing `no-print` class and never appear in the PDF output itself; only
+the table markup the same file renders does, so the manifest correctly
+still treats an edit to this file as PDF-affecting even when the actual
+visual diff in the PDF is nil. (The background `pnpm build:pdfs` run this
+required took several minutes longer than a typical foreground wait allows -
+noted here since a future run hitting the same 700-PDF regeneration should
+expect to let it run to completion in the background rather than assume a
+short timeout means something is stuck.)
+
+Full standing health check clean: `pnpm lint` (0/0/0), `pnpm test`
+(533/533 unit, up from 530 - the 3 new cases, coverage unchanged at
+99.91%/99.43% - a presentation-layer/pure-function change with the new
+function itself fully covered), `pnpm build` (711 pages, unchanged),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page still `hr/records`, within the 590 KB
+budget, essentially unchanged), `check:pdfs` (700/700 fresh). A full
+cold-start `pnpm test:e2e` run was started to confirm no regression (this is
+a CSS/inline-style and pure-function change with no new interactive
+behavior added, so no new e2e test case was needed) - update this entry
+with the final pass count once that run completes.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025), plus Copa América
+winning captains for 1975-2010, plus a deliberate look at the available
+Vitest 4 -> 5 major upgrade some runs back. Having found one genuine,
+previously-unflagged bug this run by actually driving the site's own
+interactive controls with real long-tail data (rather than only reading
+`content/*.md` or running an automated a11y/perf sweep), a future run should
+try that same angle again first - the quiz's own interaction flow, the
+compare tools' team/player pickers, the theme toggle plus language switch
+combined - before falling back to a repeat standing health check with no
+new angle.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
