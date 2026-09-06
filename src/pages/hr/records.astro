@@ -293,6 +293,7 @@ const jumpSections = [
           <ChampionsTimeline
             id={`timeline-${c.key}`}
             heading={c.label}
+            landmark={false}
             entries={buildTimeline(c.data.editions)}
             hostedByLabel="Domaćin:"
             runnerUpLabel="Drugo mjesto:"
@@ -316,6 +317,7 @@ const jumpSections = [
                 champions={c.data.champions}
                 scaleMax={c.data.editions.length}
                 heading={c.label}
+                landmark={false}
                 description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                 winningYearsLabel="Godine osvajanja: "
                 ofLabel="od"
@@ -350,6 +352,7 @@ const jumpSections = [
                 champions={buildHostsSummary(c.data.editions)}
                 scaleMax={c.data.editions.length}
                 heading={c.label}
+                landmark={false}
                 description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                 icon="🏟️"
                 unit={['put domaćin', 'puta domaćin']}
@@ -391,6 +394,7 @@ const jumpSections = [
                     champions={homeSoil}
                     scaleMax={Math.max(...homeSoil.map((s) => s.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                     icon="🏠"
                     unit={['naslov na domaćem terenu', 'naslova na domaćem terenu']}
@@ -435,6 +439,7 @@ const jumpSections = [
                     champions={streaks}
                     scaleMax={Math.max(...streaks.map((s) => s.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                     icon="🔥"
                     unit={['uzastopno izdanje', 'uzastopna izdanja']}
@@ -480,6 +485,7 @@ const jumpSections = [
                     champions={nearlyChampions}
                     scaleMax={Math.max(...nearlyChampions.map((s) => s.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                     icon="🥈"
                     unit={['finale bez naslova', 'finala bez naslova']}
@@ -526,6 +532,7 @@ const jumpSections = [
                     champions={nearlyFinalists}
                     scaleMax={Math.max(...nearlyFinalists.map((s) => s.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                     icon="🥉"
                     unit={['polufinale bez finala', 'polufinala bez finala']}
@@ -572,6 +579,7 @@ const jumpSections = [
                     champions={gaps}
                     scaleMax={Math.max(...gaps.map((g) => g.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                     icon="⏳"
                     unit={['godina', 'godine']}
@@ -618,6 +626,7 @@ const jumpSections = [
                     champions={margins}
                     scaleMax={Math.max(...margins.map((m) => m.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                     icon="⚽"
                     unit={['gol', 'gola']}
@@ -712,6 +721,7 @@ const jumpSections = [
           <ChampionsTimeline
             id={`timeline-${a.key}`}
             heading={a.label}
+            landmark={false}
             entries={buildTimeline(a.data.editions)}
             hostedByLabel="Domaćin:"
             runnerUpLabel="Drugo mjesto:"
@@ -735,6 +745,7 @@ const jumpSections = [
                 champions={a.data.champions}
                 scaleMax={a.data.editions.length}
                 heading={a.label}
+                landmark={false}
                 description={`Generirano iz ${a.data.editions.length} izdanja nagrade ${a.label}.`}
                 unit={['nagrada', 'nagrade']}
                 winningYearsLabel="Godine osvajanja: "
