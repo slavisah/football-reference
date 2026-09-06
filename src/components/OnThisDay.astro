@@ -40,7 +40,7 @@ const dateLabel = formatOnThisDayDate(buildDate.getMonth() + 1, buildDate.getDat
 
 <section class="on-this-day card" aria-labelledby="on-this-day-heading">
   <h2 id="on-this-day-heading">{resolvedHeading}</h2>
-  <p class="on-this-day__date" id="on-this-day-date">{dateLabel}</p>
+  <h3 class="on-this-day__date" id="on-this-day-date">{dateLabel}</h3>
   <p class="on-this-day__hint" id="on-this-day-hint" hidden={!isFallback}>
     {t(locale, 'onThisDayHint')}
   </p>
