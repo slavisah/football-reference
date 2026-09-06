@@ -16167,6 +16167,15 @@ Copa América captains.
   `-2`/`-3` suffix if two headings ever produce the same slug on one page
   (not currently the case anywhere, including golden-boot.astro's two merged
   note arrays).
+- `ChampionsSummary.astro`/`ChampionsTimeline.astro` accept an optional
+  `landmark` prop (default `true`). `records.astro`/`hr/records.astro` pass
+  `landmark={false}` at every per-competition/award call site (11 each) to
+  avoid a wall of identically-named ARIA `region` landmarks - see the
+  2026-09-06 "`landmark-unique` fix" entry below. Every other call site
+  (one instance per page) keeps the default and is unaffected.
+- Every `AxeBuilder` sweep under `tests/e2e/` also checks `axe-core`'s
+  `best-practice` tag now, alongside the WCAG tags - see the same
+  2026-09-06 entry.
 
 ### Notes jump nav: an in-page "Jump to a section" link list for every long note-card list - closed 2026-09-04 (sixty-third intensive run)
 
@@ -16900,6 +16909,120 @@ next content-gap pass likely needs a genuinely different quality angle
 (accessibility, performance, SEO, or a fresh
 `docs/WEBSITE_REQUIREMENTS.md`/live-site read) rather than another
 award-name or personnel search.
+
+### Accessibility: `landmark-unique` fix, plus `axe-core`'s `best-practice` tag added to every e2e sweep - closed 2026-09-06 (sixty-eighth intensive run)
+
+A standing health check first (`pnpm install`, `pnpm outdated` found nothing
+new beyond the still-blocked `typescript` 7 entry, `pnpm dlx knip
+--no-config-hints` matched every prior run's baseline, full
+lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+`check:pdfs` all clean: 530/530 unit tests, 711 pages built). Per this
+routine's own priority order, re-checked UEFA Nations League's Team of the
+Tournament for 2021/2023/2025 first with two fresh `WebSearch` passes -
+still nothing beyond the confirmed-official 2019 XI, the same standing block
+every recent run has hit.
+
+Every accessibility sweep across the prior 67 runs - the WCAG 2.2 AA
+`target-size` widening (twenty-second run), the `prefers-reduced-motion`
+fix (nineteenth run), all of them - only ever exercised `axe-core`'s WCAG
+tags (`wcag2a`/`wcag2aa`/`wcag21a`/`wcag21aa`/`wcag22aa`). `axe-core` also
+ships a `best-practice` tag: rules that are real usability problems but
+aren't tied to a specific WCAG success criterion, so no WCAG-tagged sweep
+would ever catch them (`landmark-unique`, `heading-order`, `region`, and a
+handful of others). No prior run had tried it. A throwaway spike script
+(`chromium.launch()` against the built site's preview server,
+`AxeBuilder.withTags(['best-practice']).analyze()`) run against every page
+shape - all six competition/award landing pages (EN + HR), `/records` (EN +
+HR), an edition page, `/compare`, `/compare-players`, `/quiz`, `/glossary`,
+`/teams`, `/players`, a team profile, a player profile, `/about/sources` -
+found two genuine, previously-unflagged `landmark-unique` violations, both
+real (not edge-case-only) issues on pages every visitor loads:
+
+1. **`TournamentTable.astro`** (the shared table+filters component every
+   competition landing page and every generated table on `/records` uses):
+   its wrapping `<section class="filters-and-table"
+   aria-labelledby={`${id}-heading`}>` and its own inner scrollable
+   `<div class="t-wrap" tabindex="0" role="region" aria-label={caption}>`
+   both had the exact same accessible name (`caption`, e.g. "Copa América
+   champions, 1916 to present") - two nested ARIA `region` landmarks,
+   identically named, on every page that renders a table. A screen-reader
+   user browsing the landmark list would see two entries reading the same
+   thing with no way to tell which one holds the filter form and which
+   holds just the table.
+2. **`records.astro`/`hr/records.astro`**: both render `ChampionsSummary`/
+   `ChampionsTimeline` roughly ten times per competition/award - one
+   instance per ranking category (champions timeline, most titles, most
+   hosts, home-soil titles, back-to-back streaks, nearly-champions,
+   nearly-finalists, title gaps, final margins) - each passing
+   `heading={c.label}` (or `a.label` for the two individual awards). So,
+   e.g., "Ballon d'Or" became the accessible name of roughly ten different
+   `region` landmarks scattered across one page, each with completely
+   different content (a timeline vs. a bar-chart ranking vs. another
+   bar-chart ranking) but indistinguishable from each other via
+   landmark-based navigation.
+
+Fixed both without changing anything visible:
+
+- Added an optional `landmark` prop (default `true`) to both
+  `ChampionsSummary.astro` and `ChampionsTimeline.astro`. Every existing
+  single-instance call site (`CompetitionView.astro`'s bare
+  `<ChampionsSummary champions={data.champions} .../>`, both
+  `golden-boot.astro` tables' two differently-headed instances,
+  `ballon-dor.astro`, every other competition/award landing page) keeps the
+  default and renders byte-identical output - none of those collide with
+  anything else on their own page. Passed `landmark={false}` at all 11
+  per-competition/award call sites in both `records.astro` and
+  `hr/records.astro` (the ones reusing `c.label`/`a.label` as the heading
+  across categories): the wrapping `<section>` then omits its
+  `aria-labelledby` and stops being an ARIA `region` landmark, while the
+  visible `<h2>`/`<h3>` heading (and its stable `id`, still usable for
+  heading-based screen-reader navigation and any future anchor) renders
+  exactly the same as before.
+- `TournamentTable.astro` needed no new prop: the outer
+  `<section class="filters-and-table">` simply dropped its own
+  `aria-labelledby` (a code comment now explains why, in place, for future
+  readers). The visually-hidden `<h2 id={`${id}-heading`}>{caption}</h2>`
+  stays untouched, still giving heading-list navigation a way to jump
+  straight to "Copa América champions, 1916 to present" - only the
+  redundant *landmark* role is gone. The table's own scrollable wrapper div
+  keeps its `aria-label`, since that's the element a keyboard user actually
+  tabs to via `tabindex="0"` and needs identified as its own landmark.
+
+Re-ran the spike after the fix against every page shape listed above: zero
+`best-practice` violations anywhere, confirming both fixes and that neither
+introduced a new collision elsewhere. Extended all 38
+`AxeBuilder.withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa',
+'wcag22aa'])` call sites across `tests/e2e/` to also include
+`'best-practice'` going forward - the same "extend every call site rather
+than add narrow one-off coverage" approach the twenty-second run's WCAG 2.2
+AA widening already established - so this class of issue stays caught
+automatically rather than needing another manual spike next time.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs) -
+`ChampionsSummary.astro`/`ChampionsTimeline.astro`/`TournamentTable.astro`
+are shared PDF-source files for nearly every page family on the site, so
+this markup-only change marked all of them stale, by design. Full standing
+health check clean: `pnpm lint` (0/0/0 across 169 files), `pnpm test`
+(530/530 unit, unchanged - this is a presentation-layer markup change with
+no new unit-testable `src/lib` logic), `pnpm build` (711 pages, unchanged -
+no new route), `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page `hr/records` 582.9
+KB, within the 590 KB budget, essentially unchanged from the sixty-seventh
+run's baseline), `check:pdfs` (700/700 fresh), `pnpm dlx knip
+--no-config-hints` (same one confirmed false positive as every prior run),
+full cold-start `pnpm test:e2e` with the widened `best-practice` tag on
+every one of the 38 axe sweeps.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, UEFA Nations
+League's Team of the Tournament for 2021/2023/2025). Having found two
+genuine, previously-unflagged issues on a tag no prior run had ever tried,
+a future run could look for more of the same shape - `axe-core` also ships
+`experimental` and `ACT` rule tags never tried on this site - before
+assuming the WCAG-tag sweeps' repeated "perfect score" result means every
+automated-audit angle is exhausted.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

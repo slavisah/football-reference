@@ -164,7 +164,21 @@ const sortOptions = buildSortOptions(table.headers, { locale, headerLabels });
 const defaultSort = defaultSortValue(sortOptions);
 ---
 
-<section class="filters-and-table" aria-labelledby={`${id}-heading`}>
+{/*
+  This wrapping <section> deliberately has no aria-labelledby of its own: the
+  visually-hidden <h2> below still gives it a heading-navigation landmark
+  (screen-reader users can jump straight to "<caption>" via the heading
+  list), but making the *section* an ARIA region with that same name would
+  duplicate the accessible name the scrollable table wrapper below already
+  carries (`.t-wrap[role="region"][aria-label={caption}]`) - two identically
+  named "region" landmarks nested inside each other, a real `landmark-unique`
+  violation `axe-core`'s `best-practice` tag catches (not covered by any
+  `wcag2*`/`wcag21*`/`wcag22aa` tag, which is why 60+ prior WCAG-tagged
+  sweeps never flagged it). The table's own scrollable wrapper is the one
+  that needs the name, since that's the element a keyboard user actually
+  tabs to and needs identified.
+*/}
+<section class="filters-and-table">
   <h2 id={`${id}-heading`} class="visually-hidden">{caption}</h2>
 
   <form

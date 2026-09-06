@@ -276,6 +276,7 @@ const jumpSections = [
           <ChampionsTimeline
             id={`timeline-${c.key}`}
             heading={c.label}
+            landmark={false}
             entries={buildTimeline(c.data.editions)}
           />
         ))
@@ -297,6 +298,7 @@ const jumpSections = [
                 champions={c.data.champions}
                 scaleMax={c.data.editions.length}
                 heading={c.label}
+                landmark={false}
                 description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
               />
               <a class="records__teams-link" href={c.href}>
@@ -329,6 +331,7 @@ const jumpSections = [
                 champions={buildHostsSummary(c.data.editions)}
                 scaleMax={c.data.editions.length}
                 heading={c.label}
+                landmark={false}
                 description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
                 icon="🏟️"
                 unit={['time hosted', 'times hosted']}
@@ -368,6 +371,7 @@ const jumpSections = [
                     champions={homeSoil}
                     scaleMax={Math.max(...homeSoil.map((s) => s.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
                     icon="🏠"
                     unit={['home-soil title', 'home-soil titles']}
@@ -411,6 +415,7 @@ const jumpSections = [
                     champions={streaks}
                     scaleMax={Math.max(...streaks.map((s) => s.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
                     icon="🔥"
                     unit={['edition in a row', 'editions in a row']}
@@ -454,6 +459,7 @@ const jumpSections = [
                     champions={nearlyChampions}
                     scaleMax={Math.max(...nearlyChampions.map((s) => s.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
                     icon="🥈"
                     unit={['runner-up finish', 'runner-up finishes']}
@@ -499,6 +505,7 @@ const jumpSections = [
                     champions={nearlyFinalists}
                     scaleMax={Math.max(...nearlyFinalists.map((s) => s.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
                     icon="🥉"
                     unit={['semifinal finish', 'semifinal finishes']}
@@ -544,6 +551,7 @@ const jumpSections = [
                     champions={gaps}
                     scaleMax={Math.max(...gaps.map((g) => g.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
                     icon="⏳"
                     unit={['year', 'years']}
@@ -588,6 +596,7 @@ const jumpSections = [
                     champions={margins}
                     scaleMax={Math.max(...margins.map((m) => m.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
                     icon="⚽"
                     unit={['goal', 'goals']}
@@ -673,6 +682,7 @@ const jumpSections = [
           <ChampionsTimeline
             id={`timeline-${a.key}`}
             heading={a.label}
+            landmark={false}
             entries={buildTimeline(a.data.editions)}
           />
         ))
@@ -694,6 +704,7 @@ const jumpSections = [
                 champions={a.data.champions}
                 scaleMax={a.data.editions.length}
                 heading={a.label}
+                landmark={false}
                 description={`Generated from the ${a.data.editions.length} ${a.label} editions.`}
                 unit={['award', 'awards']}
               />

@@ -8,6 +8,18 @@ interface Props {
   /** Overridable for localized pages; default text matches the original English copy. */
   hostedByLabel?: string;
   runnerUpLabel?: string;
+  /**
+   * Whether this section's own heading also makes it an ARIA `region`
+   * landmark (via `aria-labelledby`). Default `true` (unchanged behavior for
+   * every single-instance call site). records.astro renders one instance per
+   * competition/award with `heading={c.label}`, the same name several other
+   * per-competition rankings on that same page already use for their own
+   * section - passed `false` there to avoid a wall of identically named
+   * `region` landmarks (a real `landmark-unique` violation). The visible
+   * heading (and its `id`, for heading-based navigation) renders exactly the
+   * same either way.
+   */
+  landmark?: boolean;
 }
 
 const {
@@ -16,12 +28,13 @@ const {
   heading,
   hostedByLabel = 'Hosted by',
   runnerUpLabel = 'Runner-up:',
+  landmark = true,
 } = Astro.props;
 const headingId = `${id}-heading`;
 const sorted = [...entries].sort((a, b) => b.yearSort - a.yearSort);
 ---
 
-<section class="timeline" aria-labelledby={headingId}>
+<section class="timeline" aria-labelledby={landmark ? headingId : undefined}>
   <h3 id={headingId}>{heading}</h3>
   <ul class="timeline__list">
     {
