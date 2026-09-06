@@ -2428,11 +2428,11 @@ back clean:
   530 - the 3 new cases, coverage unchanged at 99.91%/99.43%), `pnpm build`
   (711 pages), `check:links` (715 pages), `check:sitemap` (710 entries),
   `check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`,
-  within the 590 KB budget, unchanged), `check:pdfs` (700/700 fresh). A full
-  cold-start `pnpm test:e2e` run was kicked off to confirm no regression (a
-  CSS/inline-style and pure-function change with no new interactive
-  behavior, so no new e2e case was added) - see `docs/PROJECT_STATUS.md`'s
-  matching entry, updated with the final pass count once that run completes.
+  within the 590 KB budget, unchanged), `check:pdfs` (700/700 fresh), full
+  cold-start `pnpm test:e2e` (847/847 passed, 15.9 minutes, unchanged count -
+  confirms no regression from a CSS/inline-style and pure-function change
+  with no new interactive behavior). See `docs/PROJECT_STATUS.md`'s matching
+  entry for full detail.
 
   **Left for a future pass:** the same environment-blocked items as every
   recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
