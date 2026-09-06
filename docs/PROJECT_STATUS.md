@@ -17316,11 +17316,11 @@ Full standing health check clean: `pnpm lint` (0/0/0), `pnpm test`
 function itself fully covered), `pnpm build` (711 pages, unchanged),
 `check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
 (37 URLs), `check:perf` (heaviest page still `hr/records`, within the 590 KB
-budget, essentially unchanged), `check:pdfs` (700/700 fresh). A full
-cold-start `pnpm test:e2e` run was started to confirm no regression (this is
-a CSS/inline-style and pure-function change with no new interactive
-behavior added, so no new e2e test case was needed) - update this entry
-with the final pass count once that run completes.
+budget, essentially unchanged), `check:pdfs` (700/700 fresh), full
+cold-start `pnpm test:e2e` (847/847 passed, 15.9 minutes, unchanged count -
+confirms no regression; this is a CSS/inline-style and pure-function change
+with no new interactive behavior added, so no new e2e test case was
+needed).
 
 **Left for a future pass:** the same environment-blocked items as every
 recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
