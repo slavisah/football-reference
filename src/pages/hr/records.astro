@@ -883,4 +883,26 @@ const jumpSections = [
   .records__rivalries-table tbody tr:last-child td {
     border-bottom: none;
   }
+
+  /* Same paper-clipping bug global.css's `.t-table` print rules fix, on this
+     page's own separately-styled rivalries table: the screen-only `nowrap`/
+     `min-width: 34rem`/`.t-wrap`'s horizontal scrollbar have no paper
+     equivalent, so content past the page's right edge was silently clipped
+     in the downloaded PDF instead of wrapping. */
+  @media print {
+    .t-wrap {
+      overflow-x: visible;
+    }
+
+    .records__rivalries-table {
+      min-width: 0;
+      table-layout: fixed;
+    }
+
+    .records__rivalries-table th,
+    .records__rivalries-table td {
+      white-space: normal;
+      overflow-wrap: break-word;
+    }
+  }
 </style>

@@ -2603,3 +2603,45 @@ back clean:
   "left for a future pass" carry-forward notes against the real repo state,
   the same angle that found today's two stale items - now confirmed a real,
   recurring failure mode worth checking periodically rather than a one-off.
+
+- **Bug fix: wide print tables were silently clipped past the printable page
+  edge**: closed 2026-09-06 (seventy-third intensive run) - acted directly on
+  the seventy-first/seventy-second runs' own repeated suggestion (print-media
+  visual rendering, never actually checked before - only `check:pdfs`'
+  freshness). Built a Playwright check that emulates `@media print` at the
+  real A4-landscape printable content width (~1032px, matching
+  `scripts/generate-pdfs.mjs`'s own `@page` rule) across 38 diverse pages and
+  found a genuine bug in the *actual shipped PDFs*: `.t-wrap`'s screen-only
+  `overflow-x: auto` had no print override, and `.t-table` used
+  `table-layout: auto` with an unconditional `nowrap` header rule - so any
+  column past the page's right edge (World Cup/EURO's 10-column English
+  tables, Nations League/Copa América's longer Croatian labels, and
+  `/records`' separately-styled rivalries table) was silently invisible in
+  the downloaded PDF, not just scrollable as it looks on screen. Fixed with
+  `table-layout: fixed` plus wrapping cells in `src/styles/global.css`'s
+  print block, plus a matching override inside `TournamentTable.astro`'s own
+  *scoped* `<style>` (its `nowrap` rule's Astro scoping-attribute specificity
+  meant the global override alone couldn't win the cascade - confirmed by
+  inspecting the actual built CSS, not assumed) and the equivalent fix in
+  `records.astro`/`hr/records.astro` for their own table. Also closed a
+  related PDF-freshness blind spot: `src/styles/global.css` (every PDF's
+  print-layout source) was tracked as a dependency of *zero* of the 700
+  PDFs in `scripts/pdf-pages.mjs` - added a `GLOBAL_STYLES` constant to every
+  entry (`PDF_PAGES`, `TEAM_PDF_SOURCES`, `PLAYER_PDF_SOURCES`,
+  `EDITION_PDF_SOURCES`) so a future print-CSS-only change can never again
+  silently go unnoticed by `check:pdfs`. All 700 PDFs regenerated and
+  reverified clean. New e2e regression coverage in
+  `tests/e2e/print-styles.spec.ts` (a dedicated wide-viewport print-overflow
+  check across the eight affected pages, since every existing print test in
+  that file ran at the suite's default 360px mobile viewport and could never
+  have caught this). Full standing health check clean including a full
+  cold-start `pnpm test:e2e` (847/847 passed). See `docs/PROJECT_STATUS.md`'s
+  matching entry for full detail. **Left for a future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, Nations League's Team of the Tournament
+  for 2021/2023/2025), plus Copa América winning captains for 1975-2010, plus
+  the available Vitest 4 -> 5 upgrade. A future pass looking for more
+  under-tested rendering paths could extend every *other* print-styles test
+  in this file to a print-realistic viewport width too (they all still run
+  at 360px), or try the PWA install/offline-navigation path with a real
+  simulated offline network (still not directly acted on).
