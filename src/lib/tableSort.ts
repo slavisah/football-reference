@@ -94,6 +94,31 @@ export function defaultSortValue(options: SortOption[]): string {
   return yearDesc?.value ?? options[0]?.value ?? '';
 }
 
+const SELECT_MIN_WIDTH_REM = 9;
+const SELECT_REM_PER_CHAR = 0.55;
+const SELECT_FIXED_REM = 3;
+
+/**
+ * A closed native `<select>` silently clips its own selected-option text
+ * once the field is narrower than that text needs - unlike an `<input>`,
+ * there's no visible overflow cue, so a reader can lose the tail of a long
+ * value ("Canada, Mexico and Unite...", "Karl-Heinz Rummeni...") with no
+ * sign anything was cut off. Sized per field from that field's own real
+ * option strings (its "All ..." placeholder included) rather than one
+ * shared guess, since a name-heavy award page's Winner filter and a
+ * multi-country host list need very different room. ~0.55rem per character
+ * plus a fixed 3rem allowance for the select's own padding and native
+ * dropdown arrow (a proportional-font average, calibrated against this
+ * site's own longest values - the Ballon d'Or's "Karl-Heinz Rummenigge",
+ * the 2026 World Cup's "Canada, Mexico and United States") is a safe,
+ * slightly generous estimate; never shrinks a field below the 9rem floor
+ * every other (short-option) filter field already used.
+ */
+export function selectMinWidthRem(values: string[]): number {
+  const longest = Math.max(0, ...values.map((v) => v.length));
+  return Math.max(SELECT_MIN_WIDTH_REM, longest * SELECT_REM_PER_CHAR + SELECT_FIXED_REM);
+}
+
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
 /**

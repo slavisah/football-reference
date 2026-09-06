@@ -2362,3 +2362,84 @@ back clean:
   the sixty-third/sixty-fourth runs' jump-nav gaps were found) rather than
   another automated-tool sweep, or a fresh look at `docs/WEBSITE_REQUIREMENTS.md`
   against the live site.
+
+- **Bug fix: filter `<select>` fields were clipping their own long selected
+  values**: closed 2026-09-06 (seventieth intensive run) - acted directly on
+  the sixty-ninth run's own closing suggestion (a real user-facing gap found
+  by inspection, not another automated-tool sweep). A standing health check
+  first (`pnpm install`, `pnpm outdated` found nothing new beyond the
+  still-blocked `typescript` 7 entry, `pnpm dlx knip --no-config-hints`
+  matched every prior run's baseline, full lint/unit/build/`check:links`/
+  `check:sitemap`/`check:precache`/`check:perf`/`check:pdfs` all clean,
+  530/530 unit tests, 711 pages built). Content-mining and every automated
+  sweep angle (WCAG tag families, Lighthouse, `pnpm outdated`, `knip`) are
+  confirmed exhausted per the last several runs' own closing notes, so this
+  run instead built and visually inspected the live site with Playwright
+  screenshots across every competition/award family, both languages, light
+  and dark mode, mobile and desktop widths - the sixty-ninth run's own
+  suggested next step.
+
+  Found a genuine, previously-unflagged bug: every `TournamentTable.astro`
+  filter row's five `<select>` fields (Winner/Year/Host/Team/Sort) shared one
+  `.filters__field { min-width: 9rem }` CSS rule sized for the shortest case
+  (a short "All winners"-style placeholder). A native `<select>` silently
+  clips its own selected-option text with no ellipsis or overflow cue once
+  the field is narrower than that text needs - so at this site's typical
+  desktop filter-row width, several real, currently-selectable values were
+  being cut off: the "Sort by" field's own "Year (newest first)"/Croatian
+  "Godina (najnoviji prvi)" labels (confirmed first, via a canvas
+  `measureText()` script against the live built site), then - once a
+  systematic sweep across all 18 competition/compare/glossary pages in both
+  languages was run the same way - much larger cases: the 2026 World Cup's
+  three-country host "Canada, Mexico and United States" (clipped by ~177px),
+  EURO's co-host "Belgium and Netherlands" (~105px), the Ballon d'Or's
+  longest winner name "Karl-Heinz Rummenigge" (~55px), and the Croatian
+  "Team" filter's own default placeholder "Sve reprezentacije" (~32px) -
+  every one of these is a value a reader can actually select (or land on via
+  this site's own shareable `?winner=`/`?host=`/etc. URL query params, an
+  `AGENTS.md` non-negotiable rule), not a hypothetical edge case.
+
+  Fixed with a new `selectMinWidthRem()` in `src/lib/tableSort.ts`: computes
+  each field's own minimum width from its own real option data (every value
+  in `winners`/`years`/`hosts`/`teams`/`sortOptions`, plus that field's own
+  translated "All ..." placeholder) rather than one shared guess, using a
+  proportional-font character-width estimate (~0.55rem/character plus a
+  fixed 3rem allowance for the select's own padding and native dropdown
+  arrow, calibrated against this site's own longest real values) with the
+  existing 9rem floor preserved as a minimum. `TournamentTable.astro` applies
+  the result per field via inline `style="min-width: ...rem"`, replacing the
+  one-size-fits-all class rule. Re-ran the same canvas-measurement sweep
+  after the fix: every previously-clipped case now fits with margin to
+  spare, confirmed additionally with Playwright screenshots of the actual
+  rendered pages (including selecting the longest values via
+  `page.selectOption()`) across desktop and mobile viewports, both
+  languages - the mobile (360-375px) layout is unaffected since each field
+  already wraps to its own full-width row there.
+
+  New unit test coverage in `tests/unit/tableSort.test.ts` (the 9rem floor,
+  that the longest value drives the result rather than the average or count,
+  and the two real regression cases - the World Cup host list and the Ballon
+  d'Or winner name). All 700 PDFs regenerated and reverified clean
+  (`TournamentTable.astro` is a shared PDF-source file for every
+  competition/award/compare page, even though its own `.filters` form
+  carries the existing `no-print` class and never appears in the PDF output
+  itself - only the table markup the same file renders does). Full standing
+  health check clean: `pnpm lint` (0/0/0), `pnpm test` (533/533 unit, up from
+  530 - the 3 new cases, coverage unchanged at 99.91%/99.43%), `pnpm build`
+  (711 pages), `check:links` (715 pages), `check:sitemap` (710 entries),
+  `check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`,
+  within the 590 KB budget, unchanged), `check:pdfs` (700/700 fresh). A full
+  cold-start `pnpm test:e2e` run was kicked off to confirm no regression (a
+  CSS/inline-style and pure-function change with no new interactive
+  behavior, so no new e2e case was added) - see `docs/PROJECT_STATUS.md`'s
+  matching entry, updated with the final pass count once that run completes.
+
+  **Left for a future pass:** the same environment-blocked items as every
+  recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+  League's Team of the Tournament for 2021/2023/2025), plus Copa América
+  winning captains for 1975-2010, plus a deliberate look at the available
+  Vitest 4 -> 5 major upgrade some runs back. Having found one genuine bug by
+  direct inspection this run, a future run should keep trying that same
+  angle - actually using the site's own interactive controls (filters,
+  sort, quiz, compare tools) with real long-tail data, not just running
+  another automated sweep - before falling back to a repeat health check.
