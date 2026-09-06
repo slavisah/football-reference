@@ -15,7 +15,7 @@
     "src/components/EditorialNotes.astro": "66382057cc2ee777cdb362c082eeda26f6bace17510393ae1aab62902c7422fe",
     "src/components/SectionJumpNav.astro": "3be9279d99c0100b099560bdb44d87ddf3dcebf5eba0296991694ea9431109b4",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/components/PodiumCards.astro": "3380e418f37cd63e8bd3ea649d09b5672826fd3d3bba195006381863aca17d2b",
+    "src/components/PodiumCards.astro": "edd24bb458ca41c8c16260ed932e454919737be8034c07dfbce30bd3ed2f8e7c",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
     "src/pages/competitions/world-cup.astro": "e1e12e39f80165f6d819f1a7d3bc8a6c5b6e6e287a1b946ad5535fdf75df45c4"
@@ -55,7 +55,7 @@
     "src/components/EditorialNotes.astro": "66382057cc2ee777cdb362c082eeda26f6bace17510393ae1aab62902c7422fe",
     "src/components/SectionJumpNav.astro": "3be9279d99c0100b099560bdb44d87ddf3dcebf5eba0296991694ea9431109b4",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/components/PodiumCards.astro": "3380e418f37cd63e8bd3ea649d09b5672826fd3d3bba195006381863aca17d2b",
+    "src/components/PodiumCards.astro": "edd24bb458ca41c8c16260ed932e454919737be8034c07dfbce30bd3ed2f8e7c",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
     "src/pages/competitions/nations-league.astro": "383339005a7245ea8b52d09f2cf6ba0a85fc3b240d39ae8b329d8234ed3b818c"
@@ -75,7 +75,7 @@
     "src/components/EditorialNotes.astro": "66382057cc2ee777cdb362c082eeda26f6bace17510393ae1aab62902c7422fe",
     "src/components/SectionJumpNav.astro": "3be9279d99c0100b099560bdb44d87ddf3dcebf5eba0296991694ea9431109b4",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/components/PodiumCards.astro": "3380e418f37cd63e8bd3ea649d09b5672826fd3d3bba195006381863aca17d2b",
+    "src/components/PodiumCards.astro": "edd24bb458ca41c8c16260ed932e454919737be8034c07dfbce30bd3ed2f8e7c",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
     "src/pages/competitions/copa-america.astro": "b1cdb0d76d358ab9012eaa4e90b59fde2b1979f012b73aced2fe8c1aa956ddbf"
@@ -183,7 +183,7 @@
     "src/components/EditorialNotes.astro": "66382057cc2ee777cdb362c082eeda26f6bace17510393ae1aab62902c7422fe",
     "src/components/SectionJumpNav.astro": "3be9279d99c0100b099560bdb44d87ddf3dcebf5eba0296991694ea9431109b4",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/components/PodiumCards.astro": "3380e418f37cd63e8bd3ea649d09b5672826fd3d3bba195006381863aca17d2b",
+    "src/components/PodiumCards.astro": "edd24bb458ca41c8c16260ed932e454919737be8034c07dfbce30bd3ed2f8e7c",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
     "src/pages/hr/competitions/world-cup.astro": "a064d7b647e5ef686d0b8e6a06891a6d637bd2451eb51d810fd2be9fb5f0a1f4"
@@ -221,7 +221,7 @@
     "src/components/EditorialNotes.astro": "66382057cc2ee777cdb362c082eeda26f6bace17510393ae1aab62902c7422fe",
     "src/components/SectionJumpNav.astro": "3be9279d99c0100b099560bdb44d87ddf3dcebf5eba0296991694ea9431109b4",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/components/PodiumCards.astro": "3380e418f37cd63e8bd3ea649d09b5672826fd3d3bba195006381863aca17d2b",
+    "src/components/PodiumCards.astro": "edd24bb458ca41c8c16260ed932e454919737be8034c07dfbce30bd3ed2f8e7c",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
     "src/pages/hr/competitions/nations-league.astro": "53fd81b095526d42b6b2771d6dec8161e7e670717b76877c6c44d5d233813882"
@@ -240,7 +240,7 @@
     "src/components/EditorialNotes.astro": "66382057cc2ee777cdb362c082eeda26f6bace17510393ae1aab62902c7422fe",
     "src/components/SectionJumpNav.astro": "3be9279d99c0100b099560bdb44d87ddf3dcebf5eba0296991694ea9431109b4",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/components/PodiumCards.astro": "3380e418f37cd63e8bd3ea649d09b5672826fd3d3bba195006381863aca17d2b",
+    "src/components/PodiumCards.astro": "edd24bb458ca41c8c16260ed932e454919737be8034c07dfbce30bd3ed2f8e7c",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
     "src/pages/hr/competitions/copa-america.astro": "b79b70c57422960b5d1fec84ff91a52c8bb4cfb5d2b32f8692aca38eb933a936"

@@ -2254,3 +2254,111 @@ back clean:
   could look for more `best-practice` rules worth a dedicated check (e.g.
   `axe-core` also ships `experimental`/`ACT` rule tags never tried here)
   before assuming this angle is exhausted the way the WCAG-tag sweeps are.
+
+- **Accessibility: `axe-core`'s `experimental`/`ACT`/`review-item` tags added
+  to every e2e sweep, plus two genuine fixes they found**: closed 2026-09-06
+  (sixty-ninth intensive run) - a standing health check first (`pnpm
+  install`, `pnpm outdated` found nothing new beyond the still-blocked
+  `typescript` 7 entry, full lint/unit/build/`check:links`/`check:sitemap`/
+  `check:precache`/`check:perf`/`check:pdfs` all clean: 530/530 unit tests,
+  711 pages built). Re-checked Nations League's Team of the Tournament for
+  2021/2023/2025 first per this routine's own priority order - three fresh
+  `WebSearch` passes (English, then Italian/Dutch/German press specifically
+  for the 2021/2023/2025 host countries, the same language-targeted technique
+  that resolved Copa América's own 1979 captain gap in the sixty-seventh run)
+  found nothing new: still confirmed unavailable.
+
+  Acted on the sixty-eighth run's own closing suggestion directly: `axe-core`
+  ships `experimental`, `ACT` and `review-item` rule tags no prior run had
+  ever tried (only `wcag2a`/`wcag2aa`/`wcag21a`/`wcag21aa`/`wcag22aa`/
+  `best-practice` had been swept). A throwaway spike against 20 page shapes
+  in default light mode found zero violations, but widening all 39
+  `AxeBuilder.withTags()` call sites across `tests/e2e/` (also trying
+  `wcag2aaa`, since it was cheap to test alongside) and running the full
+  cold-start suite turned up real, previously-unseen failures the narrow
+  spike had missed by not exercising every color-scheme/forced-colors/
+  dynamic-state combination the real suite does:
+
+  1. **`wcag2aaa` was the wrong bar for this site and got reverted, not
+     fixed**: `color-contrast-enhanced` (the AAA-level 7:1 contrast rule) is
+     tagged both `wcag2aaa` *and* `ACT`, so it fired site-wide (182 failures)
+     the moment either tag was added. This project's own stated target is
+     WCAG 2.1/2.2 **AA** (see `PROJECT_STATUS.md`'s "How to run" section) -
+     AAA contrast was never a design goal, and chasing full AAA compliance
+     would need a broader color-token redesign, not a same-run fix. Dropped
+     `wcag2aaa` from every call site and instead added `color-contrast-enhanced`
+     to each site's existing `disableRules(['region'])` (or, in
+     `accessibility-forced-colors.spec.ts`, the existing `disableRules(['region',
+     'color-contrast'])`) - the same "keep the tag family for its other real
+     rules, disable only the one rule that's out of scope" pattern this file's
+     forced-colors entry already used for `color-contrast`'s own false
+     positive.
+  2. **`p-as-heading` (an `experimental` rule): two genuine, previously-unflagged
+     issues, fixed properly rather than suppressed**: `PodiumCards.astro`'s
+     `<p class="podium__year">{entry.year}</p>` (bold, accent-colored, the most
+     visually prominent text in each podium card) and `OnThisDay.astro`'s
+     `<p class="on-this-day__date" id="on-this-day-date">` (bold, larger,
+     accent-colored, directly under the widget's own `<h2>`) both visually
+     read as headings for the content that follows them without being marked
+     up as one - a real gap for heading-based screen-reader navigation, only
+     surfaced under forced-colors mode's `full site sweep` test (removing the
+     other visual differentiators apparently pushed both past axe's
+     heading-likeness threshold). Both identify a genuine unit of content (a
+     specific edition's podium; a specific date's "on this day" matches), so
+     converting them to real headings is a navigation improvement, not just a
+     rule-satisfying relabel: `podium__year` -> `<h4>` (nested correctly under
+     the podium section's own `<h3>`), `on-this-day-date` -> `<h3>` (nested
+     under the widget's `<h2>`). Neither change altered CSS, visible text, or
+     any class name, so no visual regression; both classes/ids stayed the
+     same, so no test needed updating for that alone.
+  3. **`label-content-name-mismatch` (an `experimental` rule): one genuine,
+     previously-unflagged bug, in `ThemeToggle.astro`**: the toggle button's
+     visible label swaps to the current-theme word ("Light"/"Dark",
+     "Svijetla"/"Tamna") via its client-side `sync()` script, but the button's
+     `aria-label` stayed a static instructional sentence
+     ("Switch between light and dark theme" / "Promijeni između svijetle i
+     tamne teme") for the button's entire lifetime. English happened to pass
+     by coincidence (the sentence's own words "light"/"dark" contain the
+     visible label as a substring), but Croatian genuinely failed: "svijetle"/
+     "tamne" are grammatically *declined* forms of the adjective, not the same
+     word as the visible nominative "Svijetla"/"Tamna" - a screen-reader user
+     hears an accessible name that never actually contains the word displayed
+     on screen, and a voice-control user saying "click Svijetla" has nothing
+     to match. Fixed by having `sync()` also update `aria-label` on every
+     toggle, to `${themeWord}: ${word}` (e.g. "Tema: Svijetla" / "Theme:
+     Light") - reusing the already-translated, grammatically invariant
+     `themeLabel` string rather than risking a new hand-translated sentence
+     that literally contains the nominative form, the same "don't invent
+     unreviewed Croatian grammar" caution this file's other entries have
+     applied to content prose. `aria-pressed` (already present) continues to
+     convey the toggle affordance to assistive tech, so the shorter
+     state-first label doesn't lose the "this is a toggle" information.
+
+  No other `experimental`/`ACT`/`review-item` rule fired anywhere across the
+  full cold-start suite once these three fixes landed. Extended all 39 call
+  sites to keep `experimental`, `ACT` and `review-item` (not `wcag2aaa`) going
+  forward, the same "extend every call site" approach the twenty-second and
+  sixty-eighth runs already established for their own tag widenings. All 700
+  PDFs regenerated and reverified clean (`PodiumCards.astro` is a shared
+  PDF-source file for every team-competition landing/edition page family).
+  Full standing health check clean: `pnpm lint` (0/0/0), `pnpm test` (530/530
+  unit, unchanged - presentation-layer markup and one script-logic tweak, no
+  new unit-testable `src/lib` function), `pnpm build` (711 pages, unchanged),
+  `check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+  (37 URLs), `check:perf` (heaviest page `hr/records` 583.0 KB, within the 590
+  KB budget), `check:pdfs` (700/700 fresh), `pnpm dlx knip --no-config-hints`
+  (same one confirmed false positive as every prior run), `check:lighthouse`
+  (37/37 pages still a perfect 1.00 across every category), full cold-start
+  `pnpm test:e2e` (847/847 passed, 12.0 minutes).
+
+  **Left for a future pass:** the same environment-blocked items as every
+  recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+  League's Team of the Tournament for 2021/2023/2025, now re-checked in
+  three languages across two consecutive runs with no new lead). Having
+  swept every `axe-core` tag family this site can reasonably target (WCAG
+  2.1/2.2 A/AA, `best-practice`, `experimental`, `ACT`, `review-item` - AAA
+  deliberately excluded as out of scope), a future accessibility-angle run
+  likely needs either a real user-facing gap noticed by inspection (the way
+  the sixty-third/sixty-fourth runs' jump-nav gaps were found) rather than
+  another automated-tool sweep, or a fresh look at `docs/WEBSITE_REQUIREMENTS.md`
+  against the live site.

@@ -15,6 +15,7 @@ const { locale = 'en' } = Astro.props;
 // values it needs from the server render.
 const lightLabel = t(locale, 'themeLight');
 const darkLabel = t(locale, 'themeDark');
+const themeWord = t(locale, 'themeLabel');
 ---
 
 <button
@@ -25,6 +26,7 @@ const darkLabel = t(locale, 'themeDark');
   aria-pressed="false"
   data-light-label={lightLabel}
   data-dark-label={darkLabel}
+  data-theme-word={themeWord}
 >
   <span class="theme-toggle__icon" aria-hidden="true"></span>
   <span class="theme-toggle__label">{t(locale, 'themeLabel')}</span>
@@ -79,10 +81,20 @@ const darkLabel = t(locale, 'themeDark');
   function sync() {
     const theme = current();
     btn?.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    const word = (theme === 'dark' ? btn?.dataset.darkLabel : btn?.dataset.lightLabel) ?? '';
     const label = btn?.querySelector('.theme-toggle__label');
     if (label) {
-      label.textContent =
-        (theme === 'dark' ? btn?.dataset.darkLabel : btn?.dataset.lightLabel) ?? '';
+      label.textContent = word;
+    }
+    // The visible label swaps to the current-theme word ("Light"/"Dark") above,
+    // so the accessible name has to include that same word too (WCAG 2.5.3
+    // Label in Name) - the original static aria-label sentence describes the
+    // action in prose ("Switch between light and dark theme" / Croatian's
+    // declined "svijetle"/"tamne"), which doesn't literally contain the
+    // nominative "Light"/"Svijetla" form the visible label shows, especially
+    // in Croatian where the two forms are grammatically distinct words.
+    if (btn && word) {
+      btn.setAttribute('aria-label', `${btn.dataset.themeWord}: ${word}`);
     }
   }
 
