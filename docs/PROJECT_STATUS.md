@@ -17335,5 +17335,117 @@ compare tools' team/player pickers, the theme toggle plus language switch
 combined - before falling back to a repeat standing health check with no
 new angle.
 
+### Bug fix: wide print tables were silently clipped past the printable page edge - closed 2026-09-06 (seventy-third intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` (still just
+the blocked `typescript` 7 entry), `pnpm dlx knip --no-config-hints` (same
+one confirmed false positive as every prior run), full `pnpm lint`/`pnpm
+test` (533/533 unit)/`pnpm build` (711 pages)/`check:links` (715
+pages)/`check:sitemap` (710 entries)/`check:precache` (37 URLs)/`check:perf`
+(heaviest page `hr/records`, within the 590 KB budget)/`check:pdfs` (700/700
+fresh) all clean and unchanged from the seventy-second run's baseline. A
+direct proxy re-check (`curl` to `en.wikipedia.org`) reconfirmed the
+`docs/SOURCES.md` link-liveness sweep is still blocked by this
+environment's egress policy (403 from the gateway).
+
+Acted directly on the seventy-first/seventy-second runs' own repeated
+suggestion: "the print/PDF path's actual visual rendering under print-media
+emulation (not just `check:pdfs`' freshness check)" - a genuinely untried
+angle. `pnpm check:pdfs` only ever hashes source file content for
+freshness; nothing in the repo had ever rendered a page under real print
+media and inspected whether the *layout* actually fits the page. Built a
+one-off Playwright script that emulates `@media print` at the exact width
+`scripts/generate-pdfs.mjs`'s `@page` rule lays a page out at (A4 landscape,
+297mm wide, 12mm margins each side = 273mm ~= 1032px of usable content) and
+checks whether any element's right edge exceeds that width, across 38 pages
+(every competition/award landing and edition-page shape, `/records`,
+`/compare`, `/compare-players`, `/quiz`, `/glossary`, `/about/sources`, a
+team profile, a player profile, both directory indexes, EN + HR).
+
+Found a real, previously-unflagged bug affecting the *actual shipped
+downloadable PDFs*, not just a hypothetical: `TournamentTable.astro`'s
+`.t-wrap` div carries a screen-only `overflow-x: auto` (the small-screen
+horizontal-scroll affordance) with no print override, and `.t-table` used
+`table-layout: auto` with an unconditional `thead th { white-space: nowrap
+}`. On paper there's no scrollbar - a reader can't scroll a printed page -
+so any column past the page's right edge was simply invisible in the
+rendered PDF. Confirmed on every wide table: `world-cup.pdf`/`euro.pdf`
+(10-column English tables, ~1320-1390px wide vs. ~1032px available),
+`nations-league-hr.pdf`/`copa-america-hr.pdf` (longer Croatian labels push
+otherwise-fitting tables over), and `records.pdf`/`records-hr.pdf`'s
+separately-styled `.records__rivalries-table` (its own `min-width: 34rem`
+plus an unconditional `white-space: nowrap` on every cell, not just
+headers). Every one of these tables was quietly losing its right-most one to
+several columns (e.g. World Cup's "Final date"/"Top scorer"/"Story") in the
+actual PDF a reader downloads - `pnpm check:pdfs`'s freshness-only check had
+no way to ever catch this, and no existing e2e test drove print media at a
+print-realistic viewport width (the suite's existing print-styles tests all
+run at the default 360px mobile viewport, narrower than the print
+stylesheet's own mobile-card breakpoint, so they never exercised the real
+table layout either).
+
+Fixed in `src/styles/global.css`'s `@media print` block: `.t-wrap {
+overflow-x: visible }` plus `.t-table { table-layout: fixed }` and
+`white-space: normal; overflow-wrap: break-word` on cells, so every column
+shares the page width and wraps its own content instead of growing past it.
+The unconditional `thead th { white-space: nowrap }` rule lives in
+`TournamentTable.astro`'s own *scoped* `<style>` block, though, and Astro's
+per-component scoping attribute gives it higher CSS specificity than a
+plain global-stylesheet selector can ever match - confirmed by inspecting
+the actual built HTML/CSS output, not just assumed - so the matching header
+override had to be added there too, in that component's own scope, to
+actually win the cascade. `src/pages/records.astro` and
+`src/pages/hr/records.astro` got the equivalent fix for their own
+independently-styled `.records__rivalries-table` (min-width removed,
+`table-layout: fixed`, cells no longer forced to `nowrap`). Re-verified with
+the same measurement script (zero overflow across all 38 pages) and with
+actual Playwright screenshots of the print-emulated World Cup and
+`/records` pages at the real print content width - every previously
+clipped/invisible column now renders, readable, inside the page.
+
+Also closed a related, previously-unnoticed blind spot in the PDF-freshness
+system itself, the same "content-only hashing had a real, confirmed blind
+spot" story `scripts/pdf-pages.mjs`'s own header comment already tells for a
+past `src/lib/editions.ts` rendering bug: `src/styles/global.css` - the file
+that defines every PDF's `@page` size and print layout - was not listed as
+a source for *any* of the 700 PDFs, so a print-CSS-only change like this
+one would have altered every PDF's real rendered output while `pnpm
+check:pdfs` kept calling all of them fresh. Added a new `GLOBAL_STYLES`
+constant to `scripts/pdf-pages.mjs` and spliced it into every entry in
+`PDF_PAGES`, plus `TEAM_PDF_SOURCES`, `PLAYER_PDF_SOURCES` and every
+`EDITION_PDF_SOURCES` family (700/700 PDFs now correctly depend on it,
+verified programmatically). This immediately (and correctly) flagged all
+700 PDFs as stale; regenerated with `pnpm build:pdfs` and reverified clean
+with `pnpm check:pdfs`. `world-cup.pdf`/`world-cup-hr.pdf` grew ~60-65 KB
+(the extra wrapped-header/cell lines each row now needs); every other PDF's
+byte size is materially unchanged (the fix is layout-only, not content).
+
+New e2e regression coverage in `tests/e2e/print-styles.spec.ts`: a
+`Wide tables fit the printable page width, not just the screen` block sets
+the viewport to the same ~1032px print content width (rather than the
+suite's default 360px), emulates print media, and asserts no element on
+each of the eight previously-affected pages exceeds it - the same
+measurement approach the investigation script used, now committed rather
+than thrown away. Full standing health check re-run clean after all fixes:
+`pnpm lint` (0/0/0), `pnpm test` (533/533 unit, unchanged), `pnpm build`
+(711 pages), `check:links`/`check:sitemap`/`check:precache`/`check:perf`
+all clean, `check:pdfs` (700/700 fresh), full cold-start `pnpm test:e2e`
+(847/847 passed, 13.0 minutes, unchanged count - the new print-overflow
+tests replaced ad-hoc scratch scripts rather than growing the suite's own
+page-shape coverage).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025), plus Copa América
+winning captains for 1975-2010, plus the available Vitest 4 -> 5 major
+upgrade. Having found a second genuine, previously-unflagged bug by direct
+inspection of a rendering path no automated check ever exercised (print
+layout, after the seventieth run's filter-`<select>`-width fix in the same
+vein), a future run should keep trying real, under-tested rendering paths
+first - this run's own screen-media default-viewport gap in every existing
+print-styles test being one candidate, or the PWA install/offline-navigation
+path with a real simulated offline network (still not directly acted on) -
+before falling back to a repeat standing health check with no new angle.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

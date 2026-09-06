@@ -33,6 +33,20 @@
 // 2026-08-17 entry, "Left for a future pass"). These lists close that gap.
 const SOURCES_MD = 'docs/SOURCES.md';
 
+// Same "content-only hashing had a real, confirmed blind spot" story as the
+// paragraph above, found the same way (a rendering-logic bug, not a
+// content/*.md edit, changing what a PDF actually shows): every PDF here is
+// generate-pdfs.mjs printing the live page under `@media print`, and every
+// page's print layout - hiding the site header/footer/filters, the A4-
+// landscape `@page` size, and (until the seventy-third intensive run fixed
+// a real "table wider than the printable page silently clips on paper"
+// bug) the tournament-table print rules themselves - comes from this one
+// shared stylesheet, not from any page- or component-specific file already
+// listed below. It was missing from every `sources` list, so a print-CSS-
+// only fix like that one would have changed every PDF's real rendered
+// output while `pnpm check:pdfs` kept calling all 700 of them fresh.
+const GLOBAL_STYLES = 'src/styles/global.css';
+
 // Shared by every page: turns a content/*.md table into the CompetitionData
 // (or PageMeta) each page renders. src/lib/competition.ts pulls in each of
 // these itself; listed individually (rather than just competition.ts) so a
@@ -102,6 +116,7 @@ export const PDF_PAGES = [
       'content/fifa-world-cup.md',
       'content/golden-boot.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       'src/components/CompetitionView.astro',
       ...TABLE_COMPONENTS,
@@ -118,6 +133,7 @@ export const PDF_PAGES = [
       'content/uefa-euro.md',
       'content/golden-boot.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       'src/components/CompetitionView.astro',
       ...TABLE_COMPONENTS,
@@ -132,6 +148,7 @@ export const PDF_PAGES = [
     sources: [
       'content/uefa-nations-league.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       'src/components/CompetitionView.astro',
       ...TABLE_COMPONENTS,
@@ -147,6 +164,7 @@ export const PDF_PAGES = [
     sources: [
       'content/copa-america.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       'src/components/CompetitionView.astro',
       ...TABLE_COMPONENTS,
@@ -162,6 +180,7 @@ export const PDF_PAGES = [
     sources: [
       'content/ballon-dor.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       'src/components/CompetitionView.astro',
       ...TABLE_COMPONENTS,
@@ -174,6 +193,7 @@ export const PDF_PAGES = [
     sources: [
       'content/golden-boot.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       ...TABLE_COMPONENTS,
       'src/pages/competitions/golden-boot.astro',
@@ -202,6 +222,7 @@ export const PDF_PAGES = [
       'content/ballon-dor.md',
       'content/golden-boot.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       ...TIMELINE_COMPONENTS,
       'src/lib/compare.ts',
@@ -225,6 +246,7 @@ export const PDF_PAGES = [
       'content/copa-america.md',
       'content/uefa-nations-league.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       'src/lib/teamCompetitions.ts',
       'src/lib/compare.ts',
@@ -243,6 +265,7 @@ export const PDF_PAGES = [
       'content/ballon-dor.md',
       'content/golden-boot.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       'src/lib/playerProfile.ts',
       'src/lib/comparePlayers.ts',
@@ -267,6 +290,7 @@ export const PDF_PAGES = [
       'content/fifa-world-cup.md',
       'content/golden-boot.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       ...TABLE_COMPONENTS,
       PODIUM_COMPONENT,
@@ -282,6 +306,7 @@ export const PDF_PAGES = [
       'content/uefa-euro.md',
       'content/golden-boot.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       ...TABLE_COMPONENTS,
       HOST_MAP_COMPONENT,
@@ -295,6 +320,7 @@ export const PDF_PAGES = [
     sources: [
       'content/uefa-nations-league.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       ...TABLE_COMPONENTS,
       PODIUM_COMPONENT,
@@ -309,6 +335,7 @@ export const PDF_PAGES = [
     sources: [
       'content/copa-america.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       ...TABLE_COMPONENTS,
       PODIUM_COMPONENT,
@@ -323,6 +350,7 @@ export const PDF_PAGES = [
     sources: [
       'content/ballon-dor.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       ...TABLE_COMPONENTS,
       'src/pages/hr/competitions/ballon-dor.astro',
@@ -334,6 +362,7 @@ export const PDF_PAGES = [
     sources: [
       'content/golden-boot.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       ...TABLE_COMPONENTS,
       'src/pages/hr/competitions/golden-boot.astro',
@@ -350,6 +379,7 @@ export const PDF_PAGES = [
       'content/ballon-dor.md',
       'content/golden-boot.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       ...TIMELINE_COMPONENTS,
       'src/lib/compare.ts',
@@ -366,6 +396,7 @@ export const PDF_PAGES = [
       'content/copa-america.md',
       'content/uefa-nations-league.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       'src/lib/teamCompetitions.ts',
       'src/lib/compare.ts',
@@ -381,6 +412,7 @@ export const PDF_PAGES = [
       'content/ballon-dor.md',
       'content/golden-boot.md',
       SOURCES_MD,
+      GLOBAL_STYLES,
       ...COMPETITION_LIB,
       'src/lib/playerProfile.ts',
       'src/lib/comparePlayers.ts',
@@ -395,12 +427,16 @@ export const PDF_PAGES = [
   // already groups it with /compare and /teams for the same reason). Only
   // loadPageMeta (front matter + intro, from src/lib/competition.ts) and
   // parseGlossaryEntries (the term/definition list itself) determine what the
-  // page shows.
+  // page shows - but GLOBAL_STYLES still applies, the same as every other
+  // entry in this file: its print rules (hiding the site header/footer, the
+  // A4-landscape `@page` size) shape this page's PDF just as much as any
+  // table-heavy one.
   {
     slug: 'glossary',
     path: '/glossary',
     sources: [
       'content/glossary.md',
+      GLOBAL_STYLES,
       'src/lib/competition.ts',
       'src/lib/glossary.ts',
       'src/pages/glossary.astro',
@@ -411,6 +447,7 @@ export const PDF_PAGES = [
     path: '/hr/glossary',
     sources: [
       'content/glossary.md',
+      GLOBAL_STYLES,
       'src/lib/competition.ts',
       'src/lib/glossary.ts',
       'src/pages/hr/glossary.astro',
@@ -455,6 +492,7 @@ export const TEAM_PDF_SOURCES = [
   'content/copa-america.md',
   'content/uefa-nations-league.md',
   SOURCES_MD,
+  GLOBAL_STYLES,
   ...COMPETITION_LIB,
   'src/lib/compare.ts',
   'src/lib/teamCompetitions.ts',
@@ -484,6 +522,7 @@ export const PLAYER_PDF_SOURCES = [
   'content/ballon-dor.md',
   'content/golden-boot.md',
   SOURCES_MD,
+  GLOBAL_STYLES,
   ...COMPETITION_LIB,
   'src/lib/playerProfile.ts',
   'src/components/References.astro',
@@ -524,6 +563,7 @@ export const EDITION_PDF_SOURCES = {
     'content/fifa-world-cup.md',
     'content/golden-boot.md',
     SOURCES_MD,
+    GLOBAL_STYLES,
     ...COMPETITION_LIB,
     EDITION_LIB,
     EDITION_VIEW,
@@ -535,6 +575,7 @@ export const EDITION_PDF_SOURCES = {
     'content/uefa-euro.md',
     'content/golden-boot.md',
     SOURCES_MD,
+    GLOBAL_STYLES,
     ...COMPETITION_LIB,
     EDITION_LIB,
     EDITION_VIEW,
@@ -545,6 +586,7 @@ export const EDITION_PDF_SOURCES = {
   'nations-league': [
     'content/uefa-nations-league.md',
     SOURCES_MD,
+    GLOBAL_STYLES,
     ...COMPETITION_LIB,
     EDITION_LIB,
     EDITION_VIEW,
@@ -555,6 +597,7 @@ export const EDITION_PDF_SOURCES = {
   'copa-america': [
     'content/copa-america.md',
     SOURCES_MD,
+    GLOBAL_STYLES,
     ...COMPETITION_LIB,
     EDITION_LIB,
     EDITION_VIEW,
@@ -565,6 +608,7 @@ export const EDITION_PDF_SOURCES = {
   'ballon-dor': [
     'content/ballon-dor.md',
     SOURCES_MD,
+    GLOBAL_STYLES,
     ...COMPETITION_LIB,
     EDITION_LIB,
     EDITION_VIEW,
@@ -577,6 +621,7 @@ export const EDITION_PDF_SOURCES = {
     'content/golden-boot.md',
     'content/ballon-dor.md',
     SOURCES_MD,
+    GLOBAL_STYLES,
     ...COMPETITION_LIB,
     EDITION_LIB,
     EDITION_VIEW,
@@ -589,6 +634,7 @@ export const EDITION_PDF_SOURCES = {
     'content/golden-boot.md',
     'content/ballon-dor.md',
     SOURCES_MD,
+    GLOBAL_STYLES,
     ...COMPETITION_LIB,
     EDITION_LIB,
     EDITION_VIEW,

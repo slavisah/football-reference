@@ -544,6 +544,25 @@ const sortMinWidth = selectMinWidthRem(sortOptions.map((option) => option.label)
       background: color-mix(in srgb, var(--accent) 9%, transparent);
     }
   }
+
+  /* global.css's `@media print` block already resets most of `.t-table`
+     for paper (table-layout: fixed, wrapping cells, no horizontal-scroll
+     clipping - see that file's own comment for the full "silently clipped
+     on paper" bug this fixes). Its plain `.t-table thead th` selector can't
+     win the cascade against this component's own scoped
+     `.t-table[data-astro-cid-*] thead[data-astro-cid-*] th[data-astro-cid-*]`
+     `white-space: nowrap` rule above (Astro's scoping attribute adds
+     specificity a global, unscoped selector can never match) - so the
+     override has to live here too, in this component's own scope, to
+     actually take effect. Without this, a long column header (e.g. "Fourth
+     / other semifinalist") still forced its column wider than the fixed
+     layout could give it, printing truncated/overlapping text. */
+  @media print {
+    .t-table thead th {
+      white-space: normal;
+      font-size: 0.78rem;
+    }
+  }
 </style>
 
 <script
