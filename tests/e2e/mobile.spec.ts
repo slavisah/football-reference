@@ -2556,6 +2556,21 @@ test.describe('Quiz page on a 360px phone', () => {
     await expect(yearCard.locator('.quiz-card__feedback')).toHaveText('Correct!');
   });
 
+  test('includes a "who did the champion beat in the final" question for the UEFA Nations League - previously the one team competition missing this question type, now matching its three siblings (FIFA World Cup, UEFA EURO, Copa América), all four of which have a runner-up column in their Finals/editions table', async ({
+    page,
+  }) => {
+    const runnerUpCard = page
+      .locator('.quiz-card')
+      .filter({ hasText: /Who did .+ beat in the \S+ UEFA Nations League final\?/ })
+      .first();
+    await expect(runnerUpCard).toBeVisible();
+
+    const answerIndex = Number(await runnerUpCard.getAttribute('data-answer-index'));
+    await runnerUpCard.locator('input[type="radio"]').nth(answerIndex).check();
+    await runnerUpCard.locator('.quiz-card__check').click();
+    await expect(runnerUpCard.locator('.quiz-card__feedback')).toHaveText('Correct!');
+  });
+
   test('answering a question updates the score, and can be checked with the keyboard', async ({
     page,
   }) => {
@@ -2706,9 +2721,16 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
     await expect(page.getByRole('heading', { name: 'Obiteljski kviz', level: 1 })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Izazov: poredaj' })).toBeVisible();
     const firstCard = page.locator('.quiz-card').first();
-    await expect(firstCard.locator('.quiz-card__prompt')).toContainText('godine?');
     await expect(firstCard.locator('.quiz-card__check')).toHaveText('Provjeri odgovor');
     await expect(firstCard.locator('.quiz-card__reveal summary')).toHaveText('Samo mi pokaži odgovor');
+    // The final quiz order is a seeded shuffle across every pool, so which
+    // question type lands first shifts whenever any pool's question count
+    // changes (e.g. the new UEFA Nations League runner-up pool added below) -
+    // not every card's prompt ends in "godine?" (mostTitlesQuestion's Croatian
+    // prompt doesn't), so check a "by year" card wherever it lands instead of
+    // assuming it's first.
+    const yearCard = page.locator('.quiz-card').filter({ hasText: /godine\?/ }).first();
+    await expect(yearCard).toBeVisible();
   });
 
   test('answering a question shows Croatian feedback and updates the score', async ({ page }) => {
@@ -2749,6 +2771,21 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
     await yearCard.locator('input[type="radio"]').nth(answerIndex).check();
     await yearCard.locator('.quiz-card__check').click();
     await expect(yearCard.locator('.quiz-card__feedback')).toHaveText('Točno!');
+  });
+
+  test('includes a "koga je pobijedio ... u finalu natjecanja UEFA Liga nacija" question, the Croatian mirror of the new UEFA Nations League runner-up quiz question', async ({
+    page,
+  }) => {
+    const runnerUpCard = page
+      .locator('.quiz-card')
+      .filter({ hasText: /Koga je pobijedio .+ u finalu natjecanja UEFA Liga nacija \S+\. godine\?/ })
+      .first();
+    await expect(runnerUpCard).toBeVisible();
+
+    const answerIndex = Number(await runnerUpCard.getAttribute('data-answer-index'));
+    await runnerUpCard.locator('input[type="radio"]').nth(answerIndex).check();
+    await runnerUpCard.locator('.quiz-card__check').click();
+    await expect(runnerUpCard.locator('.quiz-card__feedback')).toHaveText('Točno!');
   });
 
   test('champion order challenge: a correct ranking shows Croatian feedback', async ({ page }) => {

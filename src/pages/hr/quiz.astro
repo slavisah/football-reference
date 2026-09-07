@@ -209,6 +209,16 @@ const pools: QuizPool[] = [
     seed: 'pick:nations-league:host',
   },
   {
+    questions: runnerUpByYearQuestions(
+      buildTimeline(nationsLeague.editions),
+      NATIONS_LEAGUE_NAME,
+      'nations-league',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:runner-up',
+  },
+  {
     questions: mostTitlesQuestion(nationsLeague.champions, NATIONS_LEAGUE_NAME, 'nations-league', 'team', 'hr'),
     take: 1,
     seed: 'pick:nations-league:most-titles',

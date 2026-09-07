@@ -17,7 +17,7 @@ pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
 pnpm test                      # 533 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 866 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 868 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1/2.2 A/AA sweep,
                                           # light and dark, across every page)
 ```
@@ -17831,6 +17831,200 @@ that turns out more reachable than assumed (the same "actually try it before
 believing the standing claim" method that worked here), or return to a
 carry-forward-note audit of this file's and `docs/ROADMAP.md`'s own "left for
 a future pass" sections.
+
+### Family quiz gains a UEFA Nations League runner-up question, closing a four-competition feature-parity gap - closed 2026-09-07 (seventy-eighth intensive run)
+
+A standing health check first: fresh `pnpm install`, `pnpm outdated` (one new
+entry beyond the still-blocked `typescript` 7: a trivial `@types/node` patch
+bump, 26.4.1 -> 26.5.0 - not applied, kept out of scope for this run;
+`typescript` 7 itself re-confirmed still capped via `npm view
+@astrojs/check@latest peerDependencies`, which still reports `{ typescript:
+'^5.0.0 || ^6.0.0' }`), `pnpm dlx knip --no-config-hints` (same
+`scripts/test-preview-server.mjs` false positive every prior run has hit),
+`pnpm lint` (0 errors/0 warnings/0 hints across 170 files), `pnpm test`
+(533/533 unit), `pnpm build` (711 pages), `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache` (37 URLs), `check:perf`
+(heaviest page `hr/records` 583.4 KB, within the 590 KB budget), `check:pdfs`
+(700/700 fresh) - all clean and byte-for-byte unchanged from the
+seventy-seventh run's baseline.
+
+**Investigation, per this routine's own priority order (Copa América > Nations
+League > Ballon d'Or > Golden Boot > other roadmap items > general quality).**
+Rather than assume a content gap existed, read every `content/*.md`
+competition/award file's own note-section headings directly:
+
+- FIFA World Cup: 11 note-card sections (How it works, Format milestones,
+  Golden Ball, Silver/Bronze Ball, Golden Glove, Young Player Award, Fair
+  Play Award, Winning managers, Winning captains, Memorable moments,
+  Editorial notes).
+- Copa América: 9 (How it works, Best Player, Golden Glove, Golden Boot,
+  Fair Play Award, Team of the Tournament, Winning managers, Winning
+  captains, Memorable moments) - already the most complete of the four team
+  competitions, including its own in-page Golden Boot/Fair Play/Team of the
+  Tournament sections that Nations League still lacks.
+- UEFA EURO: 8 (How it works, Historical format note, Player of the
+  Tournament, Young Player of the Tournament, Team of the Tournament,
+  Winning managers, Winning captains, Memorable moments).
+- Ballon d'Or: 8 top-level sections plus five named sub-award sections (Kopa
+  Trophy, Yashin Trophy, Gerd Müller Trophy, Johan Cruyff Trophy, Socrates
+  Award).
+- UEFA Nations League: only 6 (How it works, Key facts, Player of the
+  Finals, Winning managers, Winning captains, Memorable moments) - visibly
+  the thinnest of the four, but not necessarily a gap on its own; the
+  question was whether anything *missing* from it is real and sourceable.
+
+Cross-checked whether EURO's own note-section list is actually missing a
+"Fair Play Award" section the way World Cup and Copa América both have one
+(a plausible-looking gap from a pure heading diff), and whether Nations
+League is missing a top-scorer section the way the other team competitions
+effectively have via `content/golden-boot.md`/their own in-page sections.
+Two WebSearch queries on EURO ("UEFA European Championship 'Fair Play' award
+winner history EURO" and a follow-up on the exact awards Wikipedia's "UEFA
+European Championship awards" page lists) and four more on Nations League's
+"Top Scorer Trophy presented by Alipay" (Ronaldo's outright 2019 win,
+Mbappé's outright 2021 win, then the 2023/2025 multi-way ties and the
+inconsistent Finals-only-vs-season-long scoping across different query
+phrasings) reproduced findings that, on checking `git log` afterward, turned
+out to **already be on record**: this exact pair of candidates was
+identified and closed negatively by the sixtieth intensive run (2026-09-04,
+commit `31bedbd1`, "Close two content-gap investigations closed negatively
+(EURO Fair Play Award, Nations League top scorer)", and the matching
+`docs/ROADMAP.md` entry at the time) - EURO has no official Fair Play Award
+at all (its real award list is Player of the Tournament/Top Scorer/Young
+Player of the Tournament/Man of the Match/Team of the Tournament, unlike
+FIFA's World Cup trophy since 1978 or CONMEBOL's Copa América award), and
+Nations League's top-scorer trophy is scored across the whole two-year
+league phase rather than the four-team Finals `content/uefa-nations-league.md`
+is scoped to, with the Finals-only figures themselves inconsistent across
+editions regardless. **This run's own searches only re-confirmed a finding
+that was already four runs settled** (sixtieth through sixty-third runs
+worth of distance) - this session should have grepped `docs/ROADMAP.md`/
+`docs/PROJECT_STATUS.md` or `git log` for "Fair Play" and "top scorer"
+*before* spending WebSearch calls on either, not after. No new information
+resulted from either query pass; both stay unpursued, unchanged from the
+sixtieth run's original close. Left here mainly as a note to a future run
+(and a note to this routine's own process) rather than as a genuine new
+finding.
+
+**The real gap, found via a different angle: feature parity across the
+generated family quiz.** `src/lib/quiz.ts`'s `runnerUpByYearQuestions()`
+("Who did {champion} beat in the {year} {competition} final?") is wired up
+in `src/pages/quiz.astro` and its Croatian mirror `src/pages/hr/quiz.astro`
+for the FIFA World Cup, UEFA EURO and Copa América pools - all three built
+from `buildTimeline(editions)` (`src/lib/editions.ts`), which reads each
+competition's own "Runner-up" (or "Finalist") table column via a
+case-insensitive regex match, generic across every competition. UEFA
+Nations League's own pool list in both files had `championByYearQuestions`,
+`hostByYearQuestions`, `mostTitlesQuestion` and `yearByWinnerQuestions` -
+every other pool type - but no `runnerUpByYearQuestions`, despite
+`content/uefa-nations-league.md`'s own "Finals" table already carrying a
+"Runner-up" column identical in shape to the other three competitions'
+tables (`| Season | Finals host | Winner | Runner-up | Third | Fourth |
+Final | Final date |`). Checked whether the omission might be a genuine data
+limitation rather than an oversight: `runnerUpByYearQuestions()`'s
+`buildChoice()` helper requires `MIN_DISTRACTORS = 2` after excluding the
+correct answer from the year's own distractor pool. Nations League's four
+completed Finals runner-ups are Netherlands (2019), Spain (2021), Croatia
+(2023) and Spain again (2025) - 3 distinct values - so every single edition's
+question would have exactly 2 distractors available (the other two distinct
+values), clearing the minimum with no margin to spare but clearing it
+nonetheless. This confirmed the omission was a plain oversight, not an
+intentional exclusion for insufficient data.
+
+**Implementation.** Added one new pool entry to both `src/pages/quiz.astro`
+and `src/pages/hr/quiz.astro`, positioned identically to how EURO/Copa
+América's own runner-up pools sit (immediately after each competition's host
+pool, before its most-titles pool), using the exact same `take: 1` /
+`buildTimeline(...)` / seed-naming (`pick:nations-league:runner-up`)
+conventions the three sibling pools already use - `buildTimeline` was
+already imported in both files, so no new import was needed. Verified
+against the actual built HTML rather than trusting the wiring alone: the
+English page's generated JSON-LD now includes `"Who did France beat in the
+2020–21 UEFA Nations League final?","acceptedAnswer":{"@type":"Answer",
+"text":"Spain"}` (2021's real Finals result: France 2-1 Spain), and the
+Croatian mirror renders `"Koga je pobijedio France u finalu natjecanja UEFA
+Liga nacija 2020–21. godine?"` with the same answer.
+
+**A stale test assertion this content change exposed, and fixed.** Adding a
+fourth competition's runner-up pool changes the total shape of the array
+`selectQuiz()` shuffles (`src/lib/quiz.ts`) before slicing each pool's
+`take`, which shifts which question ends up first in the final seeded
+order. `tests/e2e/mobile.spec.ts`'s Croatian `renders translated chrome,
+prompts and controls` test asserted the *first* rendered `.quiz-card`'s
+prompt always contained the substring `"godine?"` (a "by year" question
+type) - true only because of the old pool arrangement, not because every
+Croatian quiz prompt actually ends that way (`mostTitlesQuestion`'s Croatian
+prompt, "Koja reprezentacija ima najviše naslova na natjecanju...?", never
+contains it). The first cold-start `pnpm test:e2e` run this session caught
+this as a real failure once the new pool shifted the shuffle order, exactly
+the way `AGENTS.md`'s own history has repeatedly warned a content change
+can expose a hardcoded assertion. Fixed by asserting a "by year" card exists
+*somewhere* on the page (`page.locator('.quiz-card').filter({ hasText:
+/godine\?/ }).first()`), the same "find by content, not by position"
+pattern every other card-locating test in this file already uses, rather
+than assuming position. Re-ran just that test in isolation to confirm the
+fix, then the full suite.
+
+New e2e coverage added (not counting the stale-assertion fix, which edited
+an existing test rather than adding one): two new tests in
+`tests/e2e/mobile.spec.ts`, one per language, each locating the new
+Nations-League-runner-up card by its prompt pattern
+(`/Who did .+ beat in the \S+ UEFA Nations League final\?/` for English,
+`/Koga je pobijedio .+ u finalu natjecanja UEFA Liga nacija \S+\. godine\?/`
+for Croatian), selecting the correct radio via the card's own
+`data-answer-index` attribute, and asserting the "Correct!"/"Točno!"
+feedback - mirroring the existing "which year did..." test pattern already
+used for every other pool.
+
+No `content/*.md` file was touched (this was a code/test-only change - the
+question text and answer are both derived from data already in
+`content/uefa-nations-league.md`, unchanged). No PDF-source file was
+touched either: the quiz page has no downloadable PDF at all (confirmed by
+grepping `scripts/pdf-pages.mjs` for any `quiz` entry - none exists), so
+`pnpm build:pdfs` was not needed and `check:pdfs` stayed at 700/700
+throughout.
+
+**Full standing health check, re-run after the code and test changes:**
+`pnpm lint` (0/0/0 across 170 files, unchanged), `pnpm test` (533/533 unit,
+unchanged - no unit-testable logic changed; `runnerUpByYearQuestions()`
+itself was already covered by `tests/unit/quiz.test.ts` before this run),
+`pnpm build` (711 pages, unchanged - no new route), `check:links` (715
+pages), `check:sitemap` (710 entries), `check:precache` (37 URLs), all
+unchanged; `check:perf` shows both quiz pages grew slightly from the one
+extra question (`hr/quiz` 349.0 KB -> 351.0 KB, `quiz` 345.6 KB -> 347.6 KB)
+but both stay ranked below `hr/records`/`records` and comfortably inside the
+590 KB budget; `check:pdfs` (700/700 fresh, unchanged). A full cold-start
+`pnpm test:e2e`: first attempt **867 passed / 1 failed** (the stale
+Croatian-quiz assertion above, caught live rather than assumed away); after
+the fix, a second full cold-start run: **868/868 passed** (9.7 minutes, up
+from the seventy-seventh run's 866 - net +2, the two new runner-up tests;
+the stale-assertion fix itself edited an existing test rather than adding
+one, so it contributed no count change of its own).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run - `typescript` 7 (still capped at `^5.0.0 || ^6.0.0` by
+`@astrojs/check`'s peer range, re-confirmed this run via `npm view`),
+`docs/SOURCES.md` link-liveness (still blocked on this environment's
+outbound egress policy; not re-attempted this run since the seventy-fifth
+run's finding that `WebSearch` cannot substitute for a real per-URL check
+already stands and nothing new changes that), and Nations League's Team of
+the Tournament for 2021/2023/2025 (still unconfirmed across six runs; not
+re-attempted this run). Also worth flagging explicitly: this run spent real
+WebSearch effort independently re-discovering the sixtieth run's
+already-closed "EURO Fair Play Award"/"Nations League top scorer" findings
+(see the correction above) simply because it didn't check `git log`/these
+two files for prior closures before searching - a future run picking a
+content-gap candidate from a pure heading diff should grep both docs (and
+`git log --oneline -S "<candidate name>"`) for a prior closure *first*, the
+same discipline this file's own carry-forward-note-audit entries already
+apply to stale claims, just not yet to candidate selection itself. A future
+run's best options: repeat this run's "feature-parity diff" method on
+another angle (systematically compare what each of the four
+team-competition families' generated quiz pools, note sections, or
+page-level features has versus its three siblings - this run found its one
+genuinely new gap this way, not via another content-history search), or
+return to a periodic carry-forward-note audit of this file's and
+`docs/ROADMAP.md`'s own "left for a future pass" sections.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
