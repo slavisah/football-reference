@@ -2785,3 +2785,44 @@ back clean:
   or a fresh line-by-line audit of this file's own carry-forward notes
   against the real repo state (the seventy-second run's own suggestion,
   not repeated since).
+
+- **Stale-note correction: PWA offline-navigation testing was already real,
+  not "unacted on"**: closed 2026-09-07 (seventy-sixth intensive run) - a
+  standing health check first (clean, byte-for-byte unchanged from the
+  seventy-fifth run's baseline: `pnpm outdated` still just the blocked
+  `typescript` 7 entry, `pnpm dlx knip --no-config-hints` same one confirmed
+  false positive, 533/533 unit, 711 pages, `hr/records` 583.4 KB within
+  budget, 700/700 PDFs fresh). Acted on the seventy-fifth run's own
+  suggestion: a fresh line-by-line audit of this file's (and
+  `docs/PROJECT_STATUS.md`'s) carry-forward "Left for a future pass" notes
+  against the real repo state. Found that the "PWA install/offline-navigation
+  path with a real simulated offline network" note directly above - repeated
+  by every closing note since the seventy-third run - is false: real
+  `context.setOffline(true)` e2e coverage (not a mocked `fetch`) already
+  exists for exactly that path, six tests in `tests/e2e/mobile.spec.ts`'s
+  `'Installability and offline reading'` describe block, tracing back via
+  `git log -S setOffline` to commit `dbcb23a8`, dated 2026-08-17 - three and
+  a half weeks before the claim first appeared. The claim itself traces (via
+  `git log -S"PWA install/offline-navigation path"`) to commit `aee2be71`
+  ("docs: audit and fix two stale roadmap notes"), which introduced this
+  inaccuracy while fixing two different ones, then got hand-copied forward by
+  every run since - the same "closing note copied instead of re-derived"
+  failure mode the seventy-fourth run already named for a different stale
+  pair. The five prior entries repeating this claim are left unchanged (they
+  accurately reflect what each run believed at the time); this entry corrects
+  the record going forward, the same approach the seventy-second/seventy-
+  fourth runs established. No `content/*.md`, `src/`, or `tests/` file needed
+  a change - only the doc claim was wrong, not the code. Full standing health
+  check re-confirmed clean including a full cold-start `pnpm test:e2e`:
+  865/865 passed (12.2 minutes, count unchanged). See `docs/PROJECT_STATUS.md`'s
+  matching entry for the full git-archaeology detail. **Left for a future
+  pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025). The carry-forward-note audit itself is
+  worth repeating periodically (it has now caught real staleness twice); a
+  concrete new quality-angle candidate for a future run is a real emulated
+  Save-Data-mode e2e check (via Playwright's CDP network-conditions API,
+  since `navigator.connection.saveData` can't be set directly) - the
+  service worker's Save-Data branch is currently only unit-tested plus
+  checked indirectly via the generated script's source text, never through
+  an actual emulated `saveData: true` connection end-to-end.
