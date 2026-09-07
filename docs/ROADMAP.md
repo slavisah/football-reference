@@ -2869,3 +2869,127 @@ back clean:
   well-explored items. A future pass could look for another Chromium-CDP
   capability like `Emulation.setDataSaverOverride` that turned out more
   reachable than assumed, or return to the carry-forward-note audit.
+
+- **Family quiz gains a UEFA Nations League "who did the champion beat in the
+  final" question, closing a four-competition feature-parity gap**: closed
+  2026-09-07 (seventy-eighth intensive run) - a
+  standing health check first (`pnpm install`; `pnpm outdated` showed one new
+  entry beyond the still-blocked `typescript` 7 (`^5.0.0 || ^6.0.0` peer
+  ceiling re-confirmed via `npm view @astrojs/check@latest peerDependencies`):
+  a trivial `@types/node` patch bump (26.4.1 -> 26.5.0), left unapplied to
+  keep this run's scope on its content/feature target; `pnpm dlx knip
+  --no-config-hints` matched every prior run's baseline
+  (`scripts/test-preview-server.mjs`, a confirmed false positive); `pnpm lint`
+  (0 errors/0 warnings/0 hints across 170 files), `pnpm test` (533/533 unit),
+  `pnpm build` (711 pages), `check:links` (715 pages), `check:sitemap` (710
+  entries), `check:precache` (37 URLs), `check:perf` (heaviest page
+  `hr/records` 583.4 KB, within the 590 KB budget), `check:pdfs` (700/700
+  fresh) - all clean and byte-for-byte unchanged from the seventy-seventh
+  run's baseline.
+
+  Per this routine's own priority order (Copa América > Nations League >
+  Ballon d'Or > Golden Boot > other roadmap items > general quality), read
+  every competition's `content/*.md` note-section headings directly rather
+  than assume a gap: FIFA World Cup (11 sections), Copa América (9, including
+  its own Golden Boot/Fair Play/Team of the Tournament sections), UEFA EURO
+  (8) and Ballon d'Or (8, plus five named sub-award sections) are all
+  comprehensive against their own official award lists. This surfaced the
+  same two candidates a structural heading diff would always surface - EURO
+  appears to lack the Fair Play Award section World Cup/Copa América both
+  have, and Nations League appears to lack a top-scorer section the other
+  team competitions have - and both were investigated with fresh WebSearch
+  queries before realizing, via `git log`, that **this exact pair was
+  already closed negatively by the sixtieth intensive run** (2026-09-04,
+  commit `31bedbd1`): EURO has no official Fair Play Award at all (UEFA's
+  real EURO award list is Player/Young Player/Team of the Tournament/Top
+  Scorer/Man of the Match, re-confirmed again this run), and Nations
+  League's "Top Scorer Trophy presented by Alipay" scores goals across the
+  whole two-year league phase, not the four-team Finals this page's content
+  is scoped to, with search results inconsistently conflating that
+  season-long figure with a separate, Finals-only stat and a multi-way tie
+  in two of the four editions (14 players level on 1 goal in 2023; a
+  three-way tie in 2025) either way. Both re-confirmed unpursued - this run
+  adds nothing new to that finding, and should have checked `git log`/this
+  file for prior closures on both candidates *before* re-running the
+  WebSearch queries, not after. Left on record here mainly so a third future
+  run recognizes both as already-closed rather than repeating the same
+  search a third time.
+
+  The real, structural gap turned up on the "does every family support the
+  same interaction" angle instead: `src/pages/quiz.astro`/`hr/quiz.astro`'s
+  generated family quiz already has a `runnerUpByYearQuestions` pool ("Who
+  did {champion} beat in the {year} final?") for the FIFA World Cup, UEFA
+  EURO and Copa América - all three built from `buildTimeline()`, which reads
+  each competition's own "Runner-up" table column - but UEFA Nations League
+  was missing this pool despite its own Finals table already having the same
+  "Runner-up" column (`content/uefa-nations-league.md`) and easily enough
+  distinct runner-ups (Netherlands/Spain/Croatia/Spain across its four
+  completed Finals - 3 distinct values, always leaving the required
+  `MIN_DISTRACTORS = 2` after excluding the correct answer) to generate a
+  valid question for every edition. This was a plain oversight, not an
+  intentional exclusion - Nations League already had every other pool type
+  (champion/host/most-titles/year-by-winner).
+
+  Added the missing pool to both `src/pages/quiz.astro` and
+  `src/pages/hr/quiz.astro`, in the same position and `take: 1` convention
+  EURO/Copa América already use, wired through the same
+  `buildTimeline(nationsLeague.editions)` helper (already imported in both
+  files - no new dependency). Verified against the built output: the English
+  page now generates "Who did France beat in the 2020–21 UEFA Nations League
+  final?" (correct answer: Spain, matching the Finals table), and the
+  Croatian mirror the equivalent phrasing. New e2e coverage in
+  `tests/e2e/mobile.spec.ts`: one test per language locating the new question
+  by its prompt pattern and answering it correctly, mirroring the existing
+  "which year did..." test pattern already used for the other pools.
+
+  Adding this pool shifted the quiz's overall seeded shuffle order (a new
+  pool changes the array `selectQuiz` shuffles before its final shuffle),
+  which surfaced a genuinely stale, pre-existing test assumption: the
+  Croatian quiz's `renders translated chrome, prompts and controls` test
+  asserted the *first* rendered card's prompt always contained "godine?" (a
+  "by year" question) - true only by coincidence of the old pool order, since
+  `mostTitlesQuestion`'s Croatian prompt never contains that word. Fixed by
+  asserting a "by year" card exists anywhere on the page (via
+  `.filter({ hasText: /godine\?/ })`, the same pattern every other
+  card-locating test in this file already uses) rather than assuming it
+  lands first - exactly the "stale hardcoded assertion broken by a content
+  change" pattern this routine's own history has hit before, caught this
+  time by the cold-start `pnpm test:e2e` run rather than shipped unnoticed.
+
+  No `content/*.md` or PDF-source file was touched (the quiz page has no
+  downloadable PDF, confirmed against `scripts/pdf-pages.mjs`), so no `pnpm
+  build:pdfs` regeneration was needed; `check:pdfs` stayed clean at 700/700
+  throughout. Full standing health check re-run clean: `pnpm lint` (0/0/0),
+  `pnpm test` (533/533 unit, unchanged), `pnpm build` (711 pages, unchanged),
+  `check:links`/`check:sitemap`/`check:precache` unchanged, `check:perf`
+  (both quiz pages grew slightly - `hr/quiz` 349.0 KB -> 351.0 KB, `quiz`
+  345.6 KB -> 347.6 KB - still ranked below `hr/records`/`records` and
+  comfortably inside the 590 KB budget), `check:pdfs` (700/700 fresh,
+  unchanged), plus a full cold-start `pnpm test:e2e`: **868/868 passed** (9.7
+  minutes, up from 866 - the two new Nations League runner-up quiz tests;
+  the stale-assertion fix is a same-test edit, not a new test, so it added no
+  count of its own). The first cold-start run this session actually caught
+  the stale assertion as a real failure (867 passed/1 failed, out of 868)
+  before the fix landed - left here on record as the one non-trivial thing
+  this run's own health check found, not swept under a bare "clean" claim.
+
+  **Left for a future pass:** the same environment-blocked items as every
+  recent run - `typescript` 7 (still capped by `@astrojs/check`'s `^5.0.0 ||
+  ^6.0.0` peer range, re-confirmed this run), `docs/SOURCES.md`
+  link-liveness (still blocked on outbound egress, not re-attempted this run
+  since the seventy-fifth run's `WebSearch`-is-not-a-substitute finding
+  already stands), and Nations League's Team of the Tournament for
+  2021/2023/2025 (still unconfirmed across six runs, not re-attempted this
+  run). Also worth naming plainly: this run burned several WebSearch calls
+  re-deriving the sixtieth run's already-closed EURO Fair Play
+  Award/Nations League top-scorer finding from scratch, purely because it
+  picked those two candidates from a heading diff without first checking
+  `git log`/this file for a prior closure - a future run choosing a
+  content-gap candidate this way should search for that first, not after. A
+  future run could look for more feature-parity gaps the same way this one
+  eventually did - systematically diffing what each of the four
+  team-competition families' generated quiz pools, note sections, or page
+  features has versus its three siblings, rather than starting from a
+  content-history angle that 78 runs have now searched hard - this specific
+  EURO Fair Play/Nations League top-scorer pair twice, across the sixtieth
+  and this run - or return to the carry-forward-note audit.
