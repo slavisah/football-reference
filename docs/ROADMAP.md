@@ -2639,9 +2639,83 @@ back clean:
   matching entry for full detail. **Left for a future pass:** the same
   environment-blocked items as every recent run (`typescript` 7,
   `docs/SOURCES.md` link-liveness, Nations League's Team of the Tournament
-  for 2021/2023/2025), plus Copa América winning captains for 1975-2010, plus
-  the available Vitest 4 -> 5 upgrade. A future pass looking for more
-  under-tested rendering paths could extend every *other* print-styles test
-  in this file to a print-realistic viewport width too (they all still run
-  at 360px), or try the PWA install/offline-navigation path with a real
-  simulated offline network (still not directly acted on).
+  for 2021/2023/2025). A future pass looking for more under-tested rendering
+  paths could extend every *other* print-styles test in this file to a
+  print-realistic viewport width too (they all still run at 360px), or try
+  the PWA install/offline-navigation path with a real simulated offline
+  network (still not directly acted on). **Correction (seventy-fourth run):**
+  this note originally also listed "Copa América winning captains for
+  1975-2010" and "the available Vitest 4 -> 5 upgrade" as left open - both
+  were already closed before this entry was even written (captains:
+  sixty-first/sixty-second runs; Vitest: fifty-eighth run), the exact stale
+  pair the seventy-second run's own entry above had *just* corrected one
+  entry earlier. Removed here rather than left to mislead a future run a
+  third time; see the seventy-fourth run's own entry below for why this kept
+  happening.
+
+- **`check:lighthouse`/print-styles regression-coverage audit plus a
+  recurring stale-note correction (no code bug found)**: closed 2026-09-07
+  (seventy-fourth intensive run) - a standing health check first (`pnpm
+  install`, `pnpm outdated` still just the blocked `typescript` 7 entry,
+  `pnpm dlx knip --no-config-hints` same one confirmed false positive,
+  lint/unit/build/`check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+  `check:pdfs` all clean and unchanged from the seventy-third run's baseline:
+  533/533 unit, 711 pages, `hr/records` 583.4 KB within the 590 KB budget,
+  700/700 PDFs fresh).
+
+  Per this routine's own priority order, re-verified the competition-content
+  angle is still exhausted by reading `content/copa-america.md`'s "Winning
+  captains" section directly (complete, 1975-2024) and confirming
+  `package.json` still pins `vitest`/`@vitest/coverage-v8` at `5.0.0` -
+  both already closed, and both immediately caught the seventy-third run's
+  own closing note (directly above) reintroducing exactly those two stale
+  claims right after the seventy-second run had corrected the same pair one
+  entry earlier. This is now a confirmed **recurring failure mode** (caught
+  and reintroduced within a single run cycle, not an occasional slip): each
+  run's closing note gets hand-copied forward, so any staleness already
+  sitting in the copied line ships again unless the next run re-diffs it
+  against the real repo state instead of trusting the previous entry's
+  words. Corrected in place in `docs/PROJECT_STATUS.md`'s matching entry
+  with the reasoning on record, the same non-destructive "new entry
+  corrects the record, old entry keeps its own account" approach the
+  seventy-second run established.
+
+  Then closed a real, previously-unaudited regression-coverage gap: the
+  seventy-third run's own print-overflow fix (`.t-wrap`/`.t-table` in
+  `src/styles/global.css`) is global, but its own regression test
+  (`tests/e2e/print-styles.spec.ts`'s `WIDE_TABLE_PRINT_PAGES`) only ever
+  covered the eight page/table shapes that run's own bug investigation had
+  confirmed clipped - Ballon d'Or, Golden Boot (both languages) and the
+  other-language halves of Nations League/Copa América share the exact same
+  `TournamentTable`/`.t-table` markup and were just as capable of clipping,
+  with zero coverage of their own. Also checked a genuinely different table
+  class while at it: `/compare`/`/compare-players`' "All national
+  teams"/"All players" table (`.compare__table--all`) sits inside the same
+  `.t-wrap` wrapper the fix touches, but is styled via its own class, not
+  `.t-table` - so the fix's `table-layout: fixed` rule was never actually
+  proven to reach it. Widened `WIDE_TABLE_PRINT_PAGES` from 8 to 18 pages
+  (the six remaining competition/award pages plus `compare`/`hr/compare`/
+  `compare-players`/`hr/compare-players`) and ran it: **all 18 pass, no
+  overflow found** - the fix does generalize correctly, and
+  `.compare__table--all` turns out narrow enough at print width regardless
+  of its different class. No CSS change needed; the value is closing a gap
+  where the fix's scope had only been proven by luck on ten previously
+  unchecked pages, not by a verified test.
+
+  Full standing health check re-run clean after the test-only edit
+  (unchanged unit/build/links/sitemap/precache/perf/pdfs counts - a test-only
+  change touches no PDF source or page output) plus a full cold-start `pnpm
+  test:e2e`: **865/865 passed** (12.2 minutes, up from 847 - the 18 new
+  `WIDE_TABLE_PRINT_PAGES` cases). Also corrected
+  `docs/PROJECT_STATUS.md`'s "How to run" section's own long-stale
+  Vitest/Playwright test counts (501/808, both many runs out of date) to the
+  real current 533/865 while fixing the other stale note in the same file,
+  the same "drifted for many runs, nobody re-verified it" pattern. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a future pass:** the same environment-blocked items
+  as every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  Nations League's Team of the Tournament for 2021/2023/2025). A future run
+  should re-derive its own closing note from the real repo state rather than
+  copying the previous entry's line forward (the specific failure this run
+  named), and keep trying under-tested rendering paths - the PWA
+  install/offline-navigation path with a real simulated offline network is
+  still the standing suggestion, unacted on across four consecutive runs.
