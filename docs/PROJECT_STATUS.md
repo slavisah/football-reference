@@ -17556,5 +17556,102 @@ and (b) keep pursuing under-tested rendering paths - the PWA
 install/offline-navigation path with a real simulated offline network is
 still the standing suggestion, unacted on across four consecutive runs now.
 
+### `WebSearch`-as-link-liveness-workaround investigated and closed negatively, plus a sixth Nations League Team of the Tournament re-check (no code change needed) - closed 2026-09-07 (seventy-fifth intensive run)
+
+A standing health check first: fresh `pnpm install`, `pnpm outdated` (still
+just the blocked `typescript` 7 entry, re-confirmed via `npm view
+@astrojs/check@latest peerDependencies` - `{ typescript: '^5.0.0 ||
+^6.0.0' }`, unchanged), `pnpm dlx knip --no-config-hints` (same one
+confirmed `scripts/test-preview-server.mjs` false positive as every prior
+run), `pnpm lint` (0/0/0 across 169 files), `pnpm test` (533/533 unit,
+unchanged), `pnpm build` (711 pages), `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache` (37 URLs), `check:perf`
+(heaviest page `hr/records` 583.4 KB, within the 590 KB budget), `check:pdfs`
+(700/700 fresh) - all clean and byte-for-byte unchanged from the
+seventy-fourth run's baseline.
+
+**Investigation 1: is the `docs/SOURCES.md` link-liveness block really
+unavoidable, or has nobody tried a workaround?** Every prior run's "left for
+a future pass" note on this item only ever re-confirmed the same direct-fetch
+block, via `curl` or `WebFetch`, against a domain like `en.wikipedia.org`.
+Re-confirmed that block still holds this run too: `WebFetch` itself (not just
+a raw `curl` through the agent proxy) returned an explicit structured error -
+`{"error_type":"EGRESS_BLOCKED","domain":"en.wikipedia.org","message":"Access
+to en.wikipedia.org is blocked by the network egress proxy."}` - for the same
+URL every prior run has tried. Rather than stop there for a twelfth time,
+tested a genuinely different question: since `WebSearch` (not `WebFetch`) has
+been confirmed working in this environment since the twenty-first run's own
+content-accuracy spot checks, could it stand in as an *indirect* liveness
+signal for the citations `WebFetch`/`curl` can't reach directly?
+
+Ran eight sample `WebSearch` queries against a representative slice of
+`docs/SOURCES.md`'s own citations, chosen to span its most-cited domains
+(274 `en.wikipedia.org` links, 53 `uefa.com`, 45 `rsssf.org`, 31
+`copaamerica.com`, 23 `fifa.com`, plus dozens of smaller ones spanning 30+
+distinct domains total - confirmed via a `grep`/`sort`/`uniq -c` pass over
+every URL in the file): the FIFA World Cup 2026 Golden Ball citation
+(`fifa.com`'s Rodri award article), RSSSF's own winning-captains archive
+domain, and the Copa América 2024 Golden Glove citation
+(`conmebol.com`/`beinsports.com`). Every query successfully surfaced the
+underlying fact as still reported by multiple outlets (Rodri's Golden Ball,
+`rsssf.org` still live and indexed as a real archive, Emiliano Martínez's
+2024 Golden Glove). **But this doesn't answer the actual question a
+"link-liveness" check needs answered:** a `WebSearch` snippet confirming a
+*topic* is still covered somewhere on the web says nothing about whether one
+*specific cited URL* still resolves with a 200 rather than a 404, a redirect,
+or a paywall - the tool has no mechanism to surface a dead link the way an
+actual HTTP status check would, only a synthesized answer to a natural-
+language query. **Conclusion, closed negatively: `WebSearch` is not a valid
+substitute for the blocked direct-fetch link-liveness check** - the two
+methods answer categorically different questions (content-accuracy
+corroboration, which every content-adding run already does via `WebSearch`,
+versus URL-resolution liveness, which needs an actual fetch). This
+environment's `docs/SOURCES.md` link-liveness gap stays genuinely blocked on
+its outbound network policy, with this specific reasoning now on record so a
+future run doesn't spend a cycle re-discovering the same dead end - the
+useful next step for whoever eventually unblocks this is a scripted HTTP
+`HEAD`/`GET` sweep of all ~700+ URLs in the file, not another manual
+`WebSearch` sampling pass.
+
+**Investigation 2: Nations League's Team of the Tournament, a sixth
+re-check.** Per this routine's own priority order (Copa América/Nations
+League/Ballon d'Or/Golden Boot content first), re-checked the standing
+"confirmable for 2019 only" gap - unconfirmed across five consecutive runs
+(sixty-sixth through seventy-fourth) - a sixth time, this run with a
+deliberately different query shape from every prior attempt (`"Nations
+League Finals" 2025 "Team of the Tournament" UEFA technical observers
+squad`, targeting UEFA's own post-tournament technical-observer reporting
+process by name, rather than a generic "team of the tournament" search).
+The search surfaced only Wikipedia's own 2025 Finals/squads articles and the
+already-documented Player of the Finals winner (Nuno Mendes) - no discoverable
+full XI for 2021, 2023, or 2025 turned up. Unchanged from every prior
+attempt; not pursued further without a genuinely new source lead, now
+reconfirmed a sixth time with a different search strategy having been tried
+and still coming up empty.
+
+No `content/*.md`, `src/`, or `tests/` file needed a change this run - both
+investigations closed negatively, with no dead link actually found or fixed
+(the `WebSearch` method used couldn't have found one either way, per the
+conclusion above). Full standing health check re-confirmed clean after
+these investigation-only findings (no rebuild or PDF regeneration needed -
+no source file changed), including a full cold-start `pnpm test:e2e`:
+**865/865 passed** (10.9 minutes, unchanged - matching the seventy-fourth
+run's count exactly, confirming zero regression from a run that touched no
+`src/`/`content/`/`tests/` file).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7; `docs/SOURCES.md` link-liveness, now confirmed
+not solvable via `WebSearch` either - a real scripted HTTP sweep needs an
+environment with broader egress than this one; Nations League's Team of the
+Tournament for 2021/2023/2025, now unconfirmed across six consecutive runs
+with two different query strategies tried). With both of this run's own
+leads closed and no new angle surfaced by trying them, a future pass's best
+options are the PWA install/offline-navigation path with a real simulated
+offline network (the standing suggestion, unacted on across five consecutive
+runs now), or a fresh line-by-line audit of this file's own "left for a
+future pass" carry-forward notes against the real repo state (the
+seventy-second run's own suggestion, not repeated since, and the same method
+that caught two stale claims that run).
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
