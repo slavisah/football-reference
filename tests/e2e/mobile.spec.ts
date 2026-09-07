@@ -20,6 +20,31 @@ test.describe('World Cup page on a 360px phone', () => {
     expect(overflow).toBeLessThanOrEqual(1);
   });
 
+  test('has no horizontal page overflow at a 320px reflow width, even with the longest host selected', async ({
+    page,
+  }) => {
+    // WCAG 2.1 SC 1.4.10 Reflow's canonical test width (320 CSS px, the
+    // equivalent of 400% zoom on a 1280px viewport) is narrower than this
+    // site's own 360px phone design baseline every other test in this file
+    // uses - and it's a real device width too (first-generation iPhone SE).
+    // Regression case: `selectMinWidthRem()` (src/lib/tableSort.ts) sizes
+    // this page's host filter from its longest real value, the 2026 World
+    // Cup's "Canada, Mexico and United States" - generous enough (~21rem)
+    // that the field's own inline `min-width` used to exceed the entire
+    // viewport at 320px, pushing the page itself into horizontal overflow
+    // regardless of `.filters`' own `flex-wrap`, which only redistributes
+    // multiple fields across lines and can't shrink one field below its own
+    // min-width. Fixed by capping each field's inline min-width at
+    // `min(...rem, 100%)` so it never exceeds its own row's available width.
+    await page.setViewportSize({ width: 320, height: 740 });
+    await page.locator('#world-cup-host').selectOption({ label: 'Canada, Mexico and United States' });
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
   test('a reader can find the 2018 champion', async ({ page }) => {
     const row = page.locator('tbody tr[data-year="2018"]');
     await expect(row).toBeVisible();

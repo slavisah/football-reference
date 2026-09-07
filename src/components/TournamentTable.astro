@@ -196,7 +196,7 @@ const sortMinWidth = selectMinWidthRem(sortOptions.map((option) => option.label)
     role="search"
     aria-label={filterAriaLabel}
   >
-    <div class="filters__field" style={`min-width: ${winnerMinWidth}rem`}>
+    <div class="filters__field" style={`min-width: min(${winnerMinWidth}rem, 100%)`}>
       <label for={`${id}-winner`}>{winnerLabel}</label>
       <select id={`${id}-winner`} name="winner">
         <option value="">{winnerAllLabel}</option>
@@ -204,7 +204,7 @@ const sortMinWidth = selectMinWidthRem(sortOptions.map((option) => option.label)
       </select>
     </div>
 
-    <div class="filters__field" style={`min-width: ${yearMinWidth}rem`}>
+    <div class="filters__field" style={`min-width: min(${yearMinWidth}rem, 100%)`}>
       <label for={`${id}-year`}>{yearLabel}</label>
       <select id={`${id}-year`} name="year">
         <option value="">{yearAllLabel}</option>
@@ -214,7 +214,7 @@ const sortMinWidth = selectMinWidthRem(sortOptions.map((option) => option.label)
 
     {
       hosts.length > 0 && (
-        <div class="filters__field" style={`min-width: ${hostMinWidth}rem`}>
+        <div class="filters__field" style={`min-width: min(${hostMinWidth}rem, 100%)`}>
           <label for={`${id}-host`}>{hostLabel}</label>
           <select id={`${id}-host`} name="host">
             <option value="">{hostAllLabel}</option>
@@ -226,7 +226,7 @@ const sortMinWidth = selectMinWidthRem(sortOptions.map((option) => option.label)
 
     {
       teams.length > 0 && (
-        <div class="filters__field" style={`min-width: ${teamMinWidth}rem`}>
+        <div class="filters__field" style={`min-width: min(${teamMinWidth}rem, 100%)`}>
           <label for={`${id}-team`}>{teamLabel}</label>
           <select id={`${id}-team`} name="team">
             <option value="">{teamAllLabel}</option>
@@ -238,7 +238,7 @@ const sortMinWidth = selectMinWidthRem(sortOptions.map((option) => option.label)
 
     {
       sortOptions.length > 0 && (
-        <div class="filters__field" style={`min-width: ${sortMinWidth}rem`}>
+        <div class="filters__field" style={`min-width: min(${sortMinWidth}rem, 100%)`}>
           <label for={`${id}-sort`}>{sortByLabel}</label>
           <select id={`${id}-sort`} name="sort">
             {sortOptions.map((option) => (

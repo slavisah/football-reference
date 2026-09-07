@@ -16176,6 +16176,14 @@ Copa América captains.
 - Every `AxeBuilder` sweep under `tests/e2e/` also checks `axe-core`'s
   `best-practice` tag now, alongside the WCAG tags - see the same
   2026-09-06 entry.
+- Every `TournamentTable.astro` filter field's inline `min-width` (from
+  `selectMinWidthRem()`, `src/lib/tableSort.ts`) is wrapped in CSS
+  `min(...rem, 100%)`, not the bare `rem` value - see the 2026-09-07
+  "320px reflow overflow" entry below. A long enough option list (the 2026
+  World Cup's "Canada, Mexico and United States" host) can otherwise exceed
+  a narrow phone's entire viewport width regardless of `.filters`' own
+  `flex-wrap`, which only redistributes *multiple* fields across lines and
+  can't shrink a single field below its own min-width.
 
 ### Notes jump nav: an in-page "Jump to a section" link list for every long note-card list - closed 2026-09-04 (sixty-third intensive run)
 
@@ -18025,6 +18033,144 @@ page-level features has versus its three siblings - this run found its one
 genuinely new gap this way, not via another content-history search), or
 return to a periodic carry-forward-note audit of this file's and
 `docs/ROADMAP.md`'s own "left for a future pass" sections.
+
+### 320px reflow overflow in the filter select min-width fix, plus a routine dependency bump - closed 2026-09-07 (seventy-ninth intensive run)
+
+A standing health check first: fresh `pnpm install` (398 packages), `pnpm
+outdated` showed the same two entries every recent run has recorded -
+`typescript` still capped at `^5.0.0 || ^6.0.0` by `@astrojs/check` 0.9.10's
+own peer range, and a trivial `@types/node` patch bump (26.4.1 -> 26.5.0,
+applied this run - see below). `pnpm lint` (0/0/0 across 170 files), `pnpm
+test` (533/533 unit), `pnpm build` (711 pages), `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache` (37 URLs), `check:perf`
+(heaviest page `hr/records` 583.4 KB, within the 590 KB budget), `check:pdfs`
+(700/700 fresh), and `pnpm dlx knip --no-config-hints` (one unused-file hit,
+`scripts/test-preview-server.mjs`, the same confirmed false positive every
+prior run has recorded) all matched the seventy-eighth run's baseline
+exactly - no regressions carried in from the 22 commits already queued on
+`intensive/football-reference` ahead of this run.
+
+Per this routine's own priority order (Copa América/Nations League/Ballon
+d'Or/Golden Boot content first, then other roadmap items, then general
+quality), re-checked every recently-closed content-gap candidate for a new
+source lead first: none turned up for Copa América's 1979/1983/1987
+winning-captain gaps or Nations League's Team of the Tournament
+(2021/2023/2025, unconfirmed across six prior runs with two different query
+strategies), and every award-history angle across all six competition/award
+families has already been checked at least once per the seventy-fourth
+through seventy-eighth runs' own closing notes - not re-attempted without a
+new lead, per that same standing guidance. Also re-verified the quiz-pool
+and note-section feature-parity diff the seventy-eighth run's own closing
+note suggested continuing: all four team competitions now have identical
+quiz pool shapes (champion/host/runner-up/most-titles/year-by-winner, since
+the seventy-eighth run's own Nations League runner-up addition), and UEFA
+EURO's missing "Podium by edition" feature (present on the other three team
+competitions) turned out to be a correct, deliberate omission rather than a
+gap - EURO has played no third-place match since 1980, and its own
+`content/uefa-euro.md` "Editions" table never ranks the two losing
+semifinalists relative to each other (`Other semifinalist`/`Other
+semifinalist / fourth`, both nominally fourth), so `buildPodiums()`'s
+1st/2nd/3rd ranking has no real data to render for this competition. Neither
+lead panned out, so this run moved to the quality-angle fork instead.
+
+**The real find:** a hands-on Playwright check at a 320px viewport width -
+narrower than this site's own 360px phone design baseline every existing
+`tests/e2e/mobile.spec.ts` assertion uses, but the canonical WCAG 2.1 SC
+1.4.10 Reflow test width (the CSS-pixel equivalent of 400% zoom on a 1280px
+viewport) and a real device width (first-generation iPhone SE) - surfaced a
+genuine, previously-untested horizontal-overflow bug on
+`/competitions/world-cup`: 40px of overflow, traced to the page's own Host
+filter `<select>`. The seventy-second run's "Fix filter `<select>` fields
+clipping long selected values" fix (`selectMinWidthRem()` in
+`src/lib/tableSort.ts`, commit `b46ada6c`) sizes each filter field's inline
+`min-width` from that field's own longest real option string - correct and
+necessary (a closed `<select>` silently clips its own selected text with no
+visible cue once its box is narrower than the text needs), but the 2026
+World Cup host list's longest value, "Canada, Mexico and United States" (33
+characters), produces a ~21.15rem (~338px) estimate that alone exceeds the
+entire content width of a 320px viewport - and unlike multiple short fields,
+which `.filters`' own `flex-wrap: wrap` can redistribute across lines, a
+*single* field's own min-width can't be shrunk by flex-wrap at all, so the
+page itself overflowed regardless of how many other fields wrapped out of
+the way. No other page hit this at 320px (checked all six competition/award
+index pages, `/records`, `/compare`, `/compare-players`, `/quiz`, `/teams`,
+`/players`, `/glossary`, `/about/sources`, one team profile, one player
+profile, one edition page, and their Croatian mirrors) - the World Cup's
+three-country 2026 host name is this site's single longest filter-option
+value by a wide margin.
+
+Fixed at the five `TournamentTable.astro` call sites that apply a
+`selectMinWidthRem()` result as an inline style, wrapping each in CSS
+`min(...rem, 100%)` rather than changing the function itself - deliberately
+a render-site cap, not a change to the "ideal width" calculation, since
+`selectMinWidthRem()`'s own unit tests describe an ideal, viewport-agnostic
+estimate that a static-generation build has no way to bound correctly for
+every possible reader viewport; only CSS can react to the real available
+width at render time. Verified the fix doesn't reintroduce the original
+clipping bug it was layered on top of: with "Canada, Mexico and United
+States" selected, the closed select's actual rendered text (`scrollWidth`)
+still fits inside its own (now-capped) box at both 360px and 320px, in every
+case checked - `selectMinWidthRem()`'s own ~0.55rem/character estimate is
+deliberately generous relative to real proportional-font metrics, so the
+100% cap only ever discards headroom the estimate didn't actually need, not
+real fitted width. Added a doc-comment cross-reference in
+`tableSort.ts`'s own `selectMinWidthRem()` comment pointing at this
+render-site cap, so a future reader of the "ideal width" function isn't
+left thinking it alone governs the field's final rendered size.
+
+New regression coverage in `tests/e2e/mobile.spec.ts`'s existing "World Cup
+page on a 360px phone" describe block: a test that resizes to 320px,
+explicitly selects "Canada, Mexico and United States" in the host filter
+(the exact value that reproduced the bug), and asserts zero horizontal page
+overflow - reproduced the original 40px failure against the pre-fix code,
+confirmed passing after. No `content/*.md` file was touched (a
+component/test-only fix), so no `lastReviewed` bump or `docs/SOURCES.md`
+entry was needed; `TournamentTable.astro` is a PDF source file for every
+page family though, so all 700 PDFs were regenerated (`pnpm build:pdfs`,
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) and reverified clean
+(`check:pdfs`, 700/700 fresh) even though the fix is CSS-only and produces
+no visible difference in a PDF's own fixed-width print layout.
+
+Also applied the trivial `@types/node` 26.4.1 -> 26.5.0 patch bump flagged
+by this run's own `pnpm outdated` (the same one every recent run has left
+unapplied while scoping itself to a content/feature target) - safe,
+in-range, and zero-risk to bundle alongside a code fix rather than defer
+again. `typescript` 7 stays blocked, re-confirmed via `npm view
+@astrojs/check@latest peerDependencies`.
+
+**Full standing health check re-run after all changes:** `pnpm lint`
+(0/0/0, unchanged), `pnpm test` (533/533 unit, unchanged - this is a
+CSS/markup fix with no new unit-testable logic; `selectMinWidthRem()`
+itself is unchanged and stays covered by its own existing tests), `pnpm
+build` (711 pages, unchanged - no new route), `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache` (37 URLs), `check:perf`
+(heaviest page still `hr/records` at 583.4 KB, unchanged - a CSS-only fix
+adds no bytes to any page's own content), `check:pdfs` (700/700 fresh after
+regeneration), all clean. A full cold-start `pnpm test:e2e`: **869/869
+passed** (12.9 minutes, up from the seventy-eighth run's 868 - the one new
+320px reflow regression test).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7; `docs/SOURCES.md` link-liveness; Nations
+League's Team of the Tournament for 2021/2023/2025, still unconfirmed
+across six consecutive runs, not re-attempted this run without a new
+source lead), plus Copa América's winning captains for 1983 and 1987
+(unchanged). This run's own method - a hands-on Playwright check at a
+narrower-than-baseline viewport, rather than another automated
+lint/axe/Lighthouse sweep (all of which have scored perfect repeatedly) or
+another content-history search (six-plus runs deep on the two remaining
+leads) - found a real bug none of those would have caught, the same shape
+of win as the sixty-third run's "Jump to a section" nav discovery. A future
+run could extend this specific angle further (a systematic 320px sweep of
+every per-edition page - 202 editions x 2 languages - rather than the
+sampled set this run checked; every one uses the same shared
+`TournamentTable.astro`/`CompetitionView.astro` components already fixed
+here, so a further find there is unlikely but unconfirmed), or look for
+another manually-discoverable UX/layout edge case the automated suite's own
+fixed assertions don't exercise (e.g. very long dynamic content at extreme
+zoom, `prefers-reduced-motion`, RTL-adjacent text direction edge cases -
+though this site has no RTL locale today) rather than repeat either
+saturated angle again.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
