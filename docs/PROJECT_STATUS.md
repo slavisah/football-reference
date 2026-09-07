@@ -17653,5 +17653,88 @@ future pass" carry-forward notes against the real repo state (the
 seventy-second run's own suggestion, not repeated since, and the same method
 that caught two stale claims that run).
 
+### Stale-note correction: PWA offline-navigation testing was already real, not "unacted on" - closed 2026-09-07 (seventy-sixth intensive run)
+
+A standing health check first: fresh `pnpm install` (`astro` already at
+7.3.1, no other change), `pnpm outdated` (still just the blocked
+`typescript` 7 entry, re-confirmed via `npm view @astrojs/check@latest
+peerDependencies` - `{ typescript: '^5.0.0 || ^6.0.0' }`, unchanged), `pnpm
+dlx knip --no-config-hints` (same one confirmed
+`scripts/test-preview-server.mjs` false positive as every prior run), `pnpm
+lint` (0/0/0 across 169 files), `pnpm test` (533/533 unit, unchanged),
+`pnpm build` (711 pages), `check:links` (715 pages), `check:sitemap` (710
+entries), `check:precache` (37 URLs), `check:perf` (heaviest page
+`hr/records` 583.4 KB, within the 590 KB budget), `check:pdfs` (700/700
+fresh) - all clean and byte-for-byte unchanged from the seventy-fifth run's
+baseline. `@axe-core/playwright`/`axe-core` are also already at the latest
+published `4.13.0` (the "Known caveats" bullet about a future `axe-core`
+upgrade adding more WCAG 2.2 rules has nothing new to check yet).
+
+Acted directly on the seventy-fifth run's own closing suggestion: a fresh
+line-by-line audit of this file's (and `docs/ROADMAP.md`'s) own "left for a
+future pass" carry-forward notes against the real repo state, the method the
+seventy-second run originated and that caught two stale claims that run.
+This run's audit found a third: every run since the seventy-third run's own
+closing note has repeated some form of "the PWA install/offline-navigation
+path with a real simulated offline network is still the standing
+suggestion, unacted on across N consecutive runs" - but that claim is false.
+`tests/e2e/mobile.spec.ts`'s `'Installability and offline reading'` describe
+block already has six tests using Playwright's real `context.setOffline(true)`
+(not a mocked `fetch`) against the actual service worker
+(`src/pages/sw.js.ts`): a previously-visited page staying readable offline,
+an uncached URL falling back to the cached home page, a never-individually-
+visited Croatian page working offline because every nav page is precached on
+install, and the Croatian-specific home-page-fallback case, plus manifest/
+service-worker-registration checks in the same `describe` block. `git log -S
+setOffline -- tests/e2e/mobile.spec.ts` traces this coverage back to commit
+`dbcb23a8` ("Add downloadable print PDF for /records and /hr/records"),
+dated **2026-08-17** - three and a half weeks before the seventy-third run's
+2026-09-06 note first claimed this was still unacted on. `git log -S"PWA
+install/offline-navigation path" -- docs/ROADMAP.md` shows the inaccurate
+claim actually originated in commit `aee2be71` ("docs: audit and fix two
+stale roadmap notes; verify quiz interaction") - a stale-note-fixing commit
+itself introducing a new one, then repeated forward by every closing note
+since (seventy-third through seventy-fifth) because each run's "Left for a
+future pass" section gets hand-copied from the previous one rather than
+re-derived from the real repo state, exactly the recurring failure mode the
+seventy-fourth run's own entry already named for a different pair of stale
+claims.
+
+Corrected in `docs/ROADMAP.md`'s matching entry with this reasoning on
+record, the same non-destructive "new entry corrects the record, old entries
+keep their own account" approach the seventy-second/seventy-fourth runs
+established - the five prior entries repeating the stale claim are left
+as-is rather than rewritten, since they accurately describe what each of
+those runs believed at the time.
+
+No `content/*.md`, `src/`, or `tests/` file needed a change this run - the
+offline-navigation coverage this audit went looking for already exists and
+already passes; only the two stale doc claims needed fixing. Full standing
+health check re-confirmed clean after the doc-only edit (no rebuild or PDF
+regeneration needed - no source file changed), including a full cold-start
+`pnpm test:e2e`: **865/865 passed** (12.2 minutes; count unchanged from the
+seventy-fourth/seventy-fifth runs, confirming zero regression from a
+docs-only run).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7; `docs/SOURCES.md` link-liveness, confirmed not
+solvable via `WebSearch` either - needs a scripted HTTP sweep from an
+environment with broader egress; Nations League's Team of the Tournament for
+2021/2023/2025, unconfirmed across six consecutive runs with two different
+query strategies tried). With the PWA-offline-testing item now closed as
+already-done rather than genuinely open, and this run's own line-by-line
+audit finding nothing else stale in either file's carry-forward notes, a
+future pass's best options are: repeating this same carry-forward-note audit
+periodically (it has now caught real staleness twice, on the seventy-second
+and this run), or a genuinely new quality angle this routine hasn't tried
+yet - a Save-Data-mode e2e check (`navigator.connection.saveData` is
+currently only unit-tested per `tests/unit/offlineCache.test.ts` and checked
+indirectly via the generated script's source text in
+`tests/e2e/mobile.spec.ts`'s `'the service worker skips eager precaching for
+a Save-Data reader'` test, never through a real emulated `saveData: true`
+connection end-to-end) is one concrete candidate, since Playwright's CDP
+network-conditions API can emulate it where `navigator.connection` itself
+cannot be set directly.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
