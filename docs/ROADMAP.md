@@ -2719,3 +2719,69 @@ back clean:
   named), and keep trying under-tested rendering paths - the PWA
   install/offline-navigation path with a real simulated offline network is
   still the standing suggestion, unacted on across four consecutive runs.
+
+- **`WebSearch`-as-link-liveness-workaround investigated and closed
+  negatively, plus a sixth re-check of Nations League's Team of the
+  Tournament (no code change needed)**: closed 2026-09-07 (seventy-fifth
+  intensive run) - a standing health check first (fresh `pnpm install`,
+  `pnpm outdated` still just the blocked `typescript` 7 entry, re-confirmed
+  via `npm view @astrojs/check@latest peerDependencies`; `pnpm dlx knip
+  --no-config-hints` same one confirmed false positive; `pnpm lint`
+  (0/0/0), `pnpm test` (533/533 unit), `pnpm build` (711 pages),
+  `check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+  (37 URLs), `check:perf` (heaviest page `hr/records` 583.4 KB, within the
+  590 KB budget), `check:pdfs` (700/700 fresh) - all clean and byte-for-byte
+  unchanged from the seventy-fourth run's baseline).
+
+  Every prior run's "`docs/SOURCES.md` link-liveness" note only ever
+  re-confirmed the same block via direct `curl`/`WebFetch` to a domain like
+  `en.wikipedia.org`. This run tried a genuinely new angle: re-confirmed the
+  direct-fetch block still holds (`WebFetch` itself, not just `curl` through
+  the proxy, returned an explicit `EGRESS_BLOCKED` error for
+  `en.wikipedia.org`), then tested whether `WebSearch` - already confirmed
+  working in this environment since the twenty-first run - could stand in as
+  an indirect liveness check instead. Ran eight sample `WebSearch` queries
+  against a cross-section of `docs/SOURCES.md`'s citations spanning its most-
+  cited domains (`fifa.com`, `rsssf.org`, `conmebol.com`/`beinsports.com` for
+  Copa América, plus a fresh Nations League query below): every query
+  successfully found the underlying fact still reported (Rodri's 2026 Golden
+  Ball, `rsssf.org`'s continued indexing, Emiliano Martínez's 2024 Copa
+  América Golden Glove), but none of it constitutes a real per-URL liveness
+  check - a `WebSearch` snippet confirms a *topic* is still covered
+  somewhere, not that one specific cited URL still returns 200 rather than a
+  404 or a moved/paywalled page, since the tool has no way to surface a dead
+  link the way an HTTP status check would. **Conclusion: `WebSearch` is not a
+  substitute for the blocked direct-fetch check** - the two are answering
+  different questions - so this environment's `docs/SOURCES.md` link-liveness
+  gap stays genuinely blocked, now with this specific reasoning on record so
+  a future run doesn't spend a cycle re-discovering the same dead end.
+
+  Per this routine's own priority order, also re-checked Nations League's
+  Team of the Tournament for 2021/2023/2025 - unconfirmed for five
+  consecutive runs (sixty-sixth through seventy-fourth) - a sixth time, this
+  run with a different query shape (`"Nations League Finals" 2025 "Team of
+  the Tournament" UEFA technical observers squad` rather than a generic
+  award-name search). Still no discoverable full XI beyond the already-
+  documented 2019 selection; the search surfaced only the already-known
+  Player of the Finals winner (Nuno Mendes, 2025). Unchanged from prior
+  findings - not pursued further without a genuinely new source lead, now
+  reconfirmed a sixth time.
+
+  No `content/*.md`, `src/`, or `tests/` file needed a change this run - both
+  investigations closed negatively. Full standing health check re-confirmed
+  clean, including a full cold-start `pnpm test:e2e`: **865/865 passed**
+  (10.9 minutes, unchanged - matching the seventy-fourth run's count exactly,
+  confirming no regression from an investigation-only run with zero code
+  changes). See `docs/PROJECT_STATUS.md`'s matching entry for full detail.
+
+  **Left for a future pass:** the same environment-blocked items as every
+  recent run (`typescript` 7, `docs/SOURCES.md` link-liveness - now
+  confirmed not solvable via `WebSearch` either, Nations League's Team of
+  the Tournament for 2021/2023/2025 - now unconfirmed across six
+  consecutive runs). With both of this run's own leads closed and no new
+  angle surfaced by trying them, a future pass's best options are the PWA
+  install/offline-navigation path with a real simulated offline network
+  (the standing suggestion, unacted on across five consecutive runs now),
+  or a fresh line-by-line audit of this file's own carry-forward notes
+  against the real repo state (the seventy-second run's own suggestion,
+  not repeated since).
