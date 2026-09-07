@@ -2993,3 +2993,33 @@ back clean:
   content-history angle that 78 runs have now searched hard - this specific
   EURO Fair Play/Nations League top-scorer pair twice, across the sixtieth
   and this run - or return to the carry-forward-note audit.
+- **320px reflow overflow fix (filter select min-width), plus a routine
+  dependency bump**: closed 2026-09-07 (seventy-ninth intensive run) - the
+  quiz-pool/note-section feature-parity diff the seventy-eighth run
+  suggested continuing turned up nothing new (all four team competitions
+  now have identical quiz pool shapes; UEFA EURO's missing "Podium by
+  edition" feature is a correct omission, not a gap - it has played no
+  third-place match since 1980, and its content has no ranked 3rd/4th to
+  render), so this run moved to a genuinely new angle: a hands-on
+  Playwright check at 320px (WCAG 1.4.10 Reflow's canonical test width),
+  narrower than every existing e2e test's 360px baseline. Found and fixed a
+  real 40px horizontal-overflow bug on `/competitions/world-cup` - the
+  seventy-second run's filter-select min-width fix sizes each field from
+  its longest option, and the 2026 World Cup's "Canada, Mexico and United
+  States" host value alone exceeds a 320px viewport's content width, which
+  `.filters`' `flex-wrap` can't fix for a single field. Fixed by capping
+  each field's inline min-width at CSS `min(...rem, 100%)` in
+  `TournamentTable.astro`, verified the original clipping fix still holds,
+  and added a 320px regression test to `tests/e2e/mobile.spec.ts`. Also
+  applied the standing `@types/node` 26.4.1 -> 26.5.0 patch bump. All 700
+  PDFs regenerated (component is a shared PDF source). Full health check
+  clean: 533/533 unit, 711 pages, all `check:*` scripts clean, 869/869 e2e
+  (up from 868). See `docs/PROJECT_STATUS.md`'s matching entry for detail.
+  **Left for a future pass:** the same environment-blocked items as every
+  recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+  League's Team of the Tournament for 2021/2023/2025), plus Copa América's
+  1983/1987 winning captains. A future run could extend this run's
+  "hands-on layout check at a narrower-than-baseline viewport" method
+  further (e.g. a systematic 320px sweep of the 202 per-edition pages) or
+  look for another manually-discoverable UX edge case (extreme zoom,
+  `prefers-reduced-motion`) the automated suite doesn't exercise.

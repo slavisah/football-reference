@@ -113,6 +113,13 @@ const SELECT_FIXED_REM = 3;
  * the 2026 World Cup's "Canada, Mexico and United States") is a safe,
  * slightly generous estimate; never shrinks a field below the 9rem floor
  * every other (short-option) filter field already used.
+ *
+ * This is the field's *ideal* width, not its final rendered one - a value
+ * long enough (the 2026 World Cup host list) can exceed a narrow phone's
+ * entire viewport, so `TournamentTable.astro` wraps every use in CSS
+ * `min(...rem, 100%)` to cap it at the field's own row width and never push
+ * the page into horizontal overflow. See that file's `.filters__field`
+ * style attributes and `tests/e2e/mobile.spec.ts`'s 320px reflow test.
  */
 export function selectMinWidthRem(values: string[]): number {
   const longest = Math.max(0, ...values.map((v) => v.length));
