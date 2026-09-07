@@ -17,7 +17,7 @@ pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
 pnpm test                      # 533 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 865 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 866 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1/2.2 A/AA sweep,
                                           # light and dark, across every page)
 ```
@@ -17735,6 +17735,102 @@ a Save-Data reader'` test, never through a real emulated `saveData: true`
 connection end-to-end) is one concrete candidate, since Playwright's CDP
 network-conditions API can emulate it where `navigator.connection` itself
 cannot be set directly.
+
+### Real CDP-emulated Save-Data e2e test for the service worker's install-time branch - closed 2026-09-07 (seventy-seventh intensive run)
+
+A standing health check first: fresh `pnpm install`, `pnpm outdated` (still
+just the blocked `typescript` 7 entry), `pnpm dlx knip --no-config-hints`
+(same one confirmed `scripts/test-preview-server.mjs` false positive), `pnpm
+lint` (0/0/0), `pnpm test` (533/533 unit, unchanged), `pnpm build` (711
+pages), `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page `hr/records` 583.4
+KB, within the 590 KB budget), `check:pdfs` (700/700 fresh) - all clean and
+byte-for-byte unchanged from the seventy-sixth run's baseline.
+
+Acted on the seventy-sixth run's own flagged candidate (see that entry's
+"Left for a future pass"): a real emulated Save-Data e2e check, since
+`self.navigator.connection.saveData` (the signal `installCacheUrls()` in
+`src/pages/sw.js.ts` reads to decide whether to eagerly precache every nav
+page or just the two home pages) was previously only unit-tested
+(`tests/unit/offlineCache.test.ts`'s `selectInstallCacheUrls()` coverage)
+plus checked indirectly via a source-text assertion in
+`tests/e2e/mobile.spec.ts`. That assertion's own comment claimed "Real
+`navigator.connection.saveData` emulation isn't controllable from
+Playwright" - a claim never actually re-tested by any prior run, just
+inherited. It turned out to be **only half true**, confirmed by direct
+experimentation against a live Chromium instance (a throwaway spike script,
+deleted once its finding was captured here and in code comments):
+
+- `Emulation.setDataSaverOverride` is a real Chrome DevTools Protocol command
+  (found via `grep -in savedata` over `playwright-core`'s bundled
+  `protocol.d.ts`, not something documented in Playwright's own API). Sending
+  it over a page's own `context.newCDPSession(page)` genuinely flips that
+  page's `navigator.connection.saveData` from `false` to `true` - so the
+  literal claim "isn't controllable from Playwright" was wrong.
+- But the override only applies to the CDP target it's sent to. A service
+  worker runs in its own separate execution context with its own CDP target,
+  which Playwright's public API has no way to reach (`context.newCDPSession()`
+  only accepts a `Page`/`Frame`). Confirmed empirically: overriding the page's
+  session, then registering the service worker, still precached the full
+  37-URL list - the override never reached the worker's own
+  `self.navigator.connection.saveData` read.
+- Reaching the worker's own target *is* possible, just not through
+  Playwright's public API: connecting a raw `WebSocket` directly to the
+  browser's own devtools endpoint (`chromium.launch({ args:
+  ['--remote-debugging-port=<port>'] })`, the same pattern
+  `scripts/check-lighthouse.mjs` already uses for its own CDP port, just a
+  different one so the two scripts can never collide), then
+  `Target.setAutoAttach` with `waitForDebuggerOnStart: true` pauses every
+  newly created target (including the service worker's) right at creation,
+  before it processes its `install` event. Applying
+  `Emulation.setDataSaverOverride` to that specific paused target's session
+  (found via its `Target.attachedToTarget` event, `targetInfo.type ===
+  'service_worker'`) before resuming it via `Runtime.runIfWaitingForDebugger`
+  means the worker's very first read of `self.navigator.connection.saveData`
+  sees the overridden value. Verified: with this in place, only the two home
+  pages get cached on install, matching `installCacheUrls()`'s real Save-Data
+  branch exactly.
+
+Landed as a new `tests/e2e/pwa-savedata.spec.ts` file, kept separate from
+`tests/e2e/mobile.spec.ts` to contain the low-level CDP plumbing rather than
+mixing it into the main smoke-test file. Two tests: the real CDP-driven one
+above, and a fast companion that keeps the old source-text assertion (both
+`self.navigator.connection.saveData` and the exact `saveData ? [...] :
+PRECACHE_URLS` line appear in the generated script) so an accidental deletion
+of the whole mechanism is still caught without a second browser launch on
+every run. The old test of the same name/shape in `tests/e2e/mobile.spec.ts`
+was removed and replaced with a one-line pointer comment, rather than kept
+as a third near-duplicate.
+
+**Verified this is real, not vacuously passing**: temporarily hardcoded
+`const saveData = false;` in `src/pages/sw.js.ts` (bypassing the real
+`self.navigator.connection.saveData` read), rebuilt, and re-ran
+`tests/e2e/pwa-savedata.spec.ts` - both tests failed as expected (the real
+test got the full 37-URL precache list instead of the two home pages it
+expected; the source-text test failed because the literal `saveData ? ... :
+PRECACHE_URLS` line no longer matched). Reverted the temporary change
+immediately after confirming the failure, then rebuilt clean before the real
+health check below.
+
+Full standing health check re-run after the real edit: `pnpm lint` (0/0/0
+across 170 files, up from 169 - the one new test file), `pnpm test`
+(533/533 unit, unchanged - no unit-test file touched), `pnpm build` (711
+pages, unchanged), `check:links`/`check:sitemap`/`check:precache`/
+`check:perf`/`check:pdfs` all clean and unchanged (no `content/` or PDF-source
+file touched by a test-only change), full cold-start `pnpm test:e2e`:
+**866/866 passed** (12.0 minutes; up from 865 - net +1: the two new tests in
+`tests/e2e/pwa-savedata.spec.ts` minus the one old test removed from
+`tests/e2e/mobile.spec.ts`).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025) - with this run's own
+candidate closed, these three are now the only well-explored items still
+genuinely open. A future pass could look for another Chromium CDP capability
+that turns out more reachable than assumed (the same "actually try it before
+believing the standing claim" method that worked here), or return to a
+carry-forward-note audit of this file's and `docs/ROADMAP.md`'s own "left for
+a future pass" sections.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

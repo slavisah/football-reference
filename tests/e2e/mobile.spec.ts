@@ -3095,20 +3095,10 @@ test.describe('Installability and offline reading', () => {
     expect(scope).toBe('http://localhost:4321/football-reference/');
   });
 
-  test('the service worker skips eager precaching for a Save-Data reader', async ({ page }) => {
-    // Real navigator.connection.saveData emulation isn't controllable from
-    // Playwright, so this checks the generated script's own install-time
-    // logic directly (mirrors selectInstallCacheUrls() in
-    // tests/unit/offlineCache.test.ts, which covers the actual decision).
-    await page.goto('');
-    const swSource = await page.evaluate(async () => {
-      const response = await fetch('/football-reference/sw.js');
-      return response.text();
-    });
-    expect(swSource).toContain('self.navigator.connection.saveData');
-    expect(swSource).toContain('cache.addAll(installCacheUrls())');
-    expect(swSource).toMatch(/return saveData \? Array\.from\(new Set\(\[HOME_URL_EN, HOME_URL_HR\]\)\) : PRECACHE_URLS;/);
-  });
+  // A real, CDP-driven end-to-end check of this same Save-Data install-time
+  // behavior (not just a source-text assertion) lives in
+  // tests/e2e/pwa-savedata.spec.ts, which also carries the source-text
+  // check this file used to have here.
 
   test('a previously visited page keeps working offline', async ({ page, context }) => {
     await page.goto('');

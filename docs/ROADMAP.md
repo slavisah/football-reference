@@ -2826,3 +2826,46 @@ back clean:
   service worker's Save-Data branch is currently only unit-tested plus
   checked indirectly via the generated script's source text, never through
   an actual emulated `saveData: true` connection end-to-end.
+
+- **Real CDP-emulated Save-Data e2e test for the service worker's install-time
+  branch**: closed 2026-09-07 (seventy-seventh intensive run) - a standing
+  health check first (`pnpm install`, `pnpm outdated` still just the blocked
+  `typescript` 7 entry, `pnpm dlx knip --no-config-hints` same one confirmed
+  false positive, `pnpm lint`/`pnpm test` (533/533 unit)/`pnpm build` (711
+  pages)/`check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+  `check:pdfs` all clean and unchanged from the seventy-sixth run's baseline).
+
+  Acted on the seventy-sixth run's own flagged candidate: `Save-Data` was
+  previously only unit-tested (`tests/unit/offlineCache.test.ts`) plus checked
+  indirectly via a source-text assertion in `tests/e2e/mobile.spec.ts`, whose
+  own comment claimed "real `navigator.connection.saveData` emulation isn't
+  controllable from Playwright." **That claim turned out to be only half
+  true and is now corrected.** `Emulation.setDataSaverOverride` is a real CDP
+  command (confirmed via a spike script against a live Chromium instance) that
+  does flip a *page's* `navigator.connection.saveData` - but a page-level
+  `context.newCDPSession(page)` override does not propagate to the *service
+  worker's own* execution context, a separate CDP target, which is what
+  `installCacheUrls()` in `src/pages/sw.js.ts` actually reads via
+  `self.navigator.connection.saveData`. Reaching the worker's own target isn't
+  exposed by Playwright's public API, so `tests/e2e/pwa-savedata.spec.ts` (new
+  file) drives the devtools websocket directly: pause every new CDP target on
+  creation (`Target.setAutoAttach` with `waitForDebuggerOnStart`), apply the
+  override to the service-worker target specifically before releasing it, let
+  every other target resume immediately. Verified genuinely real (not
+  vacuously passing) by temporarily forcing `saveData = false` in
+  `src/pages/sw.js.ts` and confirming the new test fails, then reverting.
+
+  Replaced the old source-text-only test in `tests/e2e/mobile.spec.ts` with a
+  pointer comment to the new file, which keeps an equivalent fast source-text
+  check alongside the new real behavioral one (defense in depth: the fast
+  check still catches an accidental deletion of the whole mechanism without
+  needing a second browser launch). No `content/*.md` or PDF-source file
+  touched, so no PDF regeneration was needed. Full standing health check
+  clean including a full cold-start `pnpm test:e2e`; see
+  `docs/PROJECT_STATUS.md`'s matching entry for the exact pass count. **Left
+  for a future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025) - now the only genuinely open, previously
+  well-explored items. A future pass could look for another Chromium-CDP
+  capability like `Emulation.setDataSaverOverride` that turned out more
+  reachable than assumed, or return to the carry-forward-note audit.
