@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 501 Vitest unit tests
+pnpm test                      # 533 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 808 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 865 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1/2.2 A/AA sweep,
                                           # light and dark, across every page)
 ```
@@ -17436,16 +17436,125 @@ page-shape coverage).
 
 **Left for a future pass:** the same environment-blocked items as every
 recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
-League's Team of the Tournament for 2021/2023/2025), plus Copa América
-winning captains for 1975-2010, plus the available Vitest 4 -> 5 major
-upgrade. Having found a second genuine, previously-unflagged bug by direct
-inspection of a rendering path no automated check ever exercised (print
-layout, after the seventieth run's filter-`<select>`-width fix in the same
-vein), a future run should keep trying real, under-tested rendering paths
-first - this run's own screen-media default-viewport gap in every existing
-print-styles test being one candidate, or the PWA install/offline-navigation
-path with a real simulated offline network (still not directly acted on) -
-before falling back to a repeat standing health check with no new angle.
+League's Team of the Tournament for 2021/2023/2025). Having found a second
+genuine, previously-unflagged bug by direct inspection of a rendering path
+no automated check ever exercised (print layout, after the seventieth run's
+filter-`<select>`-width fix in the same vein), a future run should keep
+trying real, under-tested rendering paths first - this run's own
+screen-media default-viewport gap in every existing print-styles test being
+one candidate, or the PWA install/offline-navigation path with a real
+simulated offline network (still not directly acted on) - before falling
+back to a repeat standing health check with no new angle.
+
+**Correction:** this note's own "plus Copa América winning captains for
+1975-2010, plus the available Vitest 4 -> 5 major upgrade" line above was
+stale the moment it was written - both were already closed (captains:
+sixty-first/sixty-second runs, 2026-09-04; Vitest: fifty-eighth run,
+2026-09-03), and the seventy-second run's own entry (directly below in this
+file) had *already* caught and corrected the exact same two stale claims one
+entry earlier, only for this entry to reintroduce them immediately after.
+See that entry for the full detail on why each is actually closed. Removed
+from the line above rather than left to propagate a third time - a future
+run copying this file's "left for a future pass" phrasing forward should
+paste the corrected line above, not re-derive it from an older entry further
+back in this file.
+
+### `check:lighthouse`/print-styles regression-coverage audit plus a recurring stale-note correction (no code bug found) - closed 2026-09-07 (seventy-fourth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` (still just
+the blocked `typescript` 7 entry), `pnpm dlx knip --no-config-hints` (same
+one confirmed false positive as every prior run), `pnpm lint` (0 errors/0
+warnings/0 hints across 169 files), `pnpm test` (533/533 unit, unchanged),
+`pnpm build` (711 pages), `check:links` (715 pages), `check:sitemap` (710
+entries), `check:precache` (37 URLs), `check:perf` (heaviest page still
+`hr/records`, 583.4 KB, within the 590 KB budget), `check:pdfs` (700/700
+fresh) - all clean and unchanged from the seventy-third run's baseline.
+
+Per this routine's own priority order, re-verified the Copa América/Nations
+League/Ballon d'Or/Golden Boot content-gap angle is still exhausted before
+picking a quality angle: directly read `content/copa-america.md`'s "Winning
+captains" section (complete, 1975-2024, confirming it, not the stale
+roadmap note) and confirmed `package.json`/`pnpm-lock.yaml` still pin
+`vitest`/`@vitest/coverage-v8` at `5.0.0`. Both confirmations matter beyond
+just re-verifying old facts: this file's own **immediately preceding entry**
+(the seventy-third run, directly above) closed its "Left for a future pass"
+note with "plus Copa América winning captains for 1975-2010, plus the
+available Vitest 4 -> 5 major upgrade" - the *exact* two stale claims the
+seventy-second run had already caught and corrected one entry earlier
+(2026-09-06, "Family Quiz interaction sweep... plus a stale-boilerplate fix"
+entry above), reintroduced immediately after by the very next run. Corrected
+the seventy-third run's note in place, just above, with an explanation
+rather than silently dropping it - the same non-destructive "new entry
+corrects the record, old entry's own text stays as its own account" approach
+the seventy-second run itself established. This is now confirmed a **real,
+recurring failure mode** (caught and reintroduced within a single run cycle,
+not just occasionally), not a one-off: each run's own closing note gets
+hand-copied forward from the previous one, and a run that copies without
+re-diffing against the actual repo state re-ships whatever staleness was
+already sitting in the copied line. A future run's own closing note should
+be re-derived by checking each claim against the real repo/content state,
+never copy-pasted from the immediately preceding entry.
+
+Then acted on the seventy-third run's own still-untried suggestion: extend
+the print-overflow regression check itself, which it had only ever run
+against the eight page/table shapes actually confirmed clipped by that same
+run's own bug investigation (World Cup, EURO, one language each of Nations
+League/Copa América, and `/records`) - not because the underlying CSS fix
+(`.t-wrap`/`.t-table` in `src/styles/global.css`) was narrower than that,
+but because the regression list was simply never widened to match. Ballon
+d'Or and Golden Boot (both languages) and the other, not-yet-covered
+language of Nations League/Copa América all render the exact same
+`TournamentTable`/`.t-table` markup and were just as capable of clipping in
+their own downloaded PDF, with zero regression coverage confirming the fix
+actually covers them. Also checked a genuinely different table shape while
+at it: `/compare` and `/compare-players`' "All national teams"/"All
+players" table (`.compare__table--all`) sits inside the same `.t-wrap`
+wrapper class the fix touches, but is styled via its own `.compare__table`
+class, not `.t-table` - so the fix's `table-layout: fixed` rule, scoped
+specifically to `.t-table`, was never actually proven to apply to it at all
+(a distinct class name, not just an unaudited page).
+
+Widened `tests/e2e/print-styles.spec.ts`'s `WIDE_TABLE_PRINT_PAGES` from 8
+to 18 entries: the remaining six competition/award pages
+(`competitions/nations-league`, `competitions/copa-america`,
+`competitions/ballon-dor`/`hr/competitions/ballon-dor`,
+`competitions/golden-boot`/`hr/competitions/golden-boot`) plus
+`compare`/`hr/compare`/`compare-players`/`hr/compare-players`. Ran the
+widened check (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium npx playwright
+test tests/e2e/print-styles.spec.ts -g "Wide tables fit"`): **all 18 pages
+pass, no overflow found** - the seventy-third run's fix does generalize
+correctly to every `.t-table` page and, despite the different class name, to
+`.compare__table--all` too (its own `.t-wrap` ancestor already gets
+`overflow-x: visible`, and its columns turn out narrow enough at print width
+regardless of `table-layout: auto`). No CSS change was needed; the value
+here is closing a real regression-coverage gap that let a fix generalize by
+luck (`compare__table--all`'s narrow columns) rather than by a verified
+contract, and permanently guarding against a future content/CSS change that
+widens any of the ten pages that were completely unchecked before this run.
+
+Full standing health check re-run clean after the test-only edit: `pnpm
+lint` (0/0/0), `pnpm test` (533/533 unit, unchanged - no unit-testable logic
+changed), `pnpm build` (711 pages, unchanged), `check:links`/`check:sitemap`/
+`check:precache`/`check:perf`/`check:pdfs` all unchanged (a test-only file
+touches no PDF source and no page output). A full cold-start `pnpm test:e2e`
+also ran clean - **865/865 passed** (12.2 minutes, up from 847 - the 18 new
+`WIDE_TABLE_PRINT_PAGES` cases, no other change), confirming no regression
+from the widened test file (see this run's own test-count note in "How to
+run" above, corrected in the same pass as this entry for the same reason as
+the captains/Vitest correction above - it had drifted out of date across
+many runs and nobody had
+re-verified it against the actual current suite).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025). With every `.t-table`/
+`.compare__table--all` page shape now under print-width regression coverage
+and the recurring stale-note failure mode now named explicitly (not just
+fixed twice), a future run should (a) re-derive its own closing note from
+the real repo state rather than copying the previous entry's line forward,
+and (b) keep pursuing under-tested rendering paths - the PWA
+install/offline-navigation path with a real simulated offline network is
+still the standing suggestion, unacted on across four consecutive runs now.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

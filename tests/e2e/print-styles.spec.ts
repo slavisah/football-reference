@@ -403,15 +403,38 @@ test.describe('World Cup story reveal in print media', () => {
 // already established for a different clipping bug.
 const PRINT_CONTENT_WIDTH_PX = Math.round((273 * 96) / 25.4); // ~1032px
 
+// The seventy-third run's own fix (`.t-wrap`/`.t-table` in global.css) is
+// global, but its regression list only covered the eight page/table shapes
+// that were confirmed clipped at the time (World Cup, EURO, one language
+// each of Nations League/Copa América, and /records) - Ballon d'Or, Golden
+// Boot, and the other language of Nations League/Copa América all share the
+// exact same `TournamentTable`/`.t-table` markup and were just as capable of
+// clipping, but had zero regression coverage of their own. Widened to every
+// competition/award page in both languages, plus /compare and
+// /compare-players' "All national teams"/"All players" table
+// (`.compare__table--all`, also wrapped in `.t-wrap` per that page's own
+// styles) - a different table class from `.t-table` that the original fix's
+// `table-layout: fixed` rule never actually touched, so it needed checking
+// on its own merits rather than assumed covered by the same fix.
 const WIDE_TABLE_PRINT_PAGES = [
   'competitions/world-cup',
   'hr/competitions/world-cup',
   'competitions/euro',
   'hr/competitions/euro',
+  'competitions/nations-league',
   'hr/competitions/nations-league',
+  'competitions/copa-america',
   'hr/competitions/copa-america',
+  'competitions/ballon-dor',
+  'hr/competitions/ballon-dor',
+  'competitions/golden-boot',
+  'hr/competitions/golden-boot',
   'records',
   'hr/records',
+  'compare',
+  'hr/compare',
+  'compare-players',
+  'hr/compare-players',
 ];
 
 test.describe('Wide tables fit the printable page width, not just the screen', () => {
