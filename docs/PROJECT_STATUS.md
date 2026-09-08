@@ -18839,8 +18839,10 @@ pages, unchanged), `check:links` (715 pages), `check:sitemap` (710 entries),
 (0 issues across 15 files), `check:reflow` (711/711 pages clean at 320px),
 `check:text-zoom` (711/711 pages clean at 200% zoom), `check:print-width`
 (711/711 pages clean in print media), `check:lighthouse` (37/37 pages still
-a perfect 1.00 across every category), and a full cold-start `pnpm test:e2e`
-(see this entry's own final count once the run completes).
+a perfect 1.00 across every category), and a full cold-start `pnpm test:e2e`:
+**939/939 passed** (17.3 minutes, count unchanged from the eighty-fourth
+run's baseline - a content/tooling-only change adds no new Playwright test
+cases of its own).
 
 **Left for a future pass:** the same environment-blocked items as every
 recent run - `typescript` 7 (still capped by `@astrojs/check`'s `^5.0.0 ||
