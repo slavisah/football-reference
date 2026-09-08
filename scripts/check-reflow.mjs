@@ -1,21 +1,26 @@
 // A systematic WCAG 2.1 SC 1.4.10 Reflow sweep at the canonical 320 CSS px
-// test width, across every per-edition page on the site (both languages) -
-// the follow-up the seventy-ninth intensive run's own closing note
-// suggested after it found and fixed a real 320px overflow bug on the
-// `/competitions/world-cup` *landing* page (a filter-select field sized from
-// its longest option, "Canada, Mexico and United States", exceeding the
-// viewport - see `tests/e2e/mobile.spec.ts`'s matching regression test).
-// That fix was landing-page-specific (`TournamentTable.astro`'s filter
-// controls); it was never checked whether any of the ~200 *edition* pages
-// (`/competitions/<family>/<year>/`, no filter controls, but their own
-// tables/notes/long team or player names) have an equivalent problem at the
-// same width - this script closes that gap by loading every one of them
-// (both languages) at 320px and checking for horizontal overflow, the same
-// `scrollWidth - clientWidth` measurement every hand-written 320px/360px
-// e2e test in `tests/e2e/mobile.spec.ts` already uses.
+// test width, across every page on the site (both languages).
+//
+// The seventy-ninth intensive run found and fixed a real 320px overflow bug
+// on the `/competitions/world-cup` *landing* page (a filter-select field
+// sized from its longest option, "Canada, Mexico and United States",
+// exceeding the viewport - see `tests/e2e/mobile.spec.ts`'s matching
+// regression test). The eightieth run then swept every *edition* page
+// (`/competitions/<family>/<year>/`) the same way and found none - but that
+// still left the remaining ~300 non-edition pages (landing pages, player/team
+// profiles, `/records`, `/compare`, `/compare-players`, `/glossary`, `/quiz`,
+// the directory indexes, `/about/sources`) with no 320px coverage of their
+// own layout, each a genuinely different DOM shape from the edition-page
+// template that was swept clean. This run closes that gap by loading every
+// built HTML page (both languages) at 320px - except the four legacy
+// `/awards/*` meta-refresh redirect stubs, which have no rendered layout of
+// their own (see `isRedirectStubHtml()`) - and checking for horizontal
+// overflow, the same `scrollWidth - clientWidth` measurement every
+// hand-written 320px/360px e2e test in `tests/e2e/mobile.spec.ts` already
+// uses.
 //
 // Not wired into .github/workflows/ci.yml, the same reasoning
-// `check:lighthouse` documents: a full per-page-load sweep (~400 pages) is
+// `check:lighthouse` documents: a full per-page-load sweep (~700 pages) is
 // much slower than this repo's other `check:*` scripts, so it stays a
 // manual/intensive-run tool rather than a required PR gate. Run manually
 // (`pnpm check:reflow`) after `pnpm build`.
@@ -24,13 +29,15 @@
 // `scripts/check-lighthouse.mjs` already worked out (see that script's own
 // doc comment for the full "Astro 7 forks preview into a background daemon"
 // story and the PW_EXECUTABLE_PATH/PW_CHROME_CHANNEL fallbacks this
-// sandbox's pre-installed Chromium needs).
+// sandbox's pre-installed Chromium needs), and the site-wide HTML file walk
+// `scripts/check-internal-links.mjs` already established (`listHtmlFiles()`).
 
-import { readdir } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
+import { listHtmlFiles } from './check-internal-links.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const DIST_DIR = path.join(ROOT, 'dist');
@@ -39,46 +46,42 @@ const PORT = process.env.PORT ?? '4321';
 const BASE = process.env.BASE_PATH ?? '/football-reference';
 const ORIGIN = `http://localhost:${PORT}`;
 
-// Every edition-page directory lives under one of these roots, one level
-// (team competitions/individual awards) or two levels (Golden Boot's
-// world-cup/euro split) below it, and is named after its edition - always
-// starting with a digit (a year, or a season like "2018-19", or a
-// disambiguated year like "1959-argentina") - which is exactly what tells
-// it apart from a sibling landing-page directory (named after the family,
-// e.g. "world-cup") at the same depth.
-const EDITION_ROOTS = ['competitions', 'hr/competitions'];
-
-/** An edition directory is named after its edition, which always starts with a digit. */
-export function isEditionDirName(name) {
-  return /^\d/.test(name);
+/**
+ * Convert an on-disk dist/ HTML file path into the site-relative URL path
+ * used to request it. Astro's `format: 'directory'` output means almost
+ * every page is `<route>/index.html` (served at `/<route>/`); the one
+ * exception on this site is the flat `404.html`, served at its own literal
+ * path with no trailing-slash directory semantics.
+ */
+export function htmlFileToPagePath(distDir, filePath) {
+  const rel = path.relative(distDir, filePath).split(path.sep).join('/');
+  if (rel === 'index.html') return '/';
+  if (rel.endsWith('/index.html')) return `/${rel.slice(0, -'index.html'.length)}`;
+  return `/${rel}`;
 }
 
-/** Convert an on-disk dist/ directory path into the site-relative URL path used to request it. */
-export function dirToPagePath(distDir, dir) {
-  return `/${path.relative(distDir, dir).split(path.sep).join('/')}/`;
+/**
+ * The site's four legacy `/awards/*` URLs (both languages) are
+ * `<meta http-equiv="refresh" content="0;url=...">` redirect stubs to their
+ * new `/competitions/*` home - a real page in dist/, but one whose whole
+ * purpose is to navigate away immediately, with no rendered layout of its
+ * own worth checking for 320px overflow (and whose immediate client-side
+ * navigation destroys Playwright's execution context mid-`page.evaluate()`
+ * if visited the same way as a real content page).
+ */
+export function isRedirectStubHtml(html) {
+  return /<meta\s+http-equiv="refresh"/i.test(html);
 }
 
-async function findEditionDirs(dir) {
-  const entries = await readdir(dir, { withFileTypes: true });
-  const results = [];
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    const full = path.join(dir, entry.name);
-    if (isEditionDirName(entry.name)) {
-      results.push(full);
-    } else {
-      results.push(...(await findEditionDirs(full)));
-    }
-  }
-  return results;
-}
-
-async function listEditionPages() {
-  const dirs = [];
-  for (const root of EDITION_ROOTS) {
-    dirs.push(...(await findEditionDirs(path.join(DIST_DIR, root))));
-  }
-  return dirs.map((dir) => dirToPagePath(DIST_DIR, dir)).sort();
+async function listAllPages() {
+  const files = await listHtmlFiles(DIST_DIR);
+  const pages = await Promise.all(
+    files.map(async (file) => {
+      const html = await readFile(file, 'utf8');
+      return isRedirectStubHtml(html) ? null : htmlFileToPagePath(DIST_DIR, file);
+    }),
+  );
+  return pages.filter((page) => page !== null).sort();
 }
 
 function stopPreviewDaemon() {
@@ -135,8 +138,8 @@ async function measureOverflow(page, pagePath) {
 }
 
 async function main() {
-  const pagePaths = await listEditionPages();
-  console.log(`Found ${pagePaths.length} edition pages to sweep at 320px.`);
+  const pagePaths = await listAllPages();
+  console.log(`Found ${pagePaths.length} pages to sweep at 320px.`);
 
   await startPreviewDaemon();
   const browser = await launchChromium();
@@ -160,19 +163,30 @@ async function main() {
   const failures = pagesOverflowing(measurements);
 
   if (failures.length === 0) {
-    console.log(`\nAll ${pagePaths.length} edition pages have no horizontal overflow at 320px.`);
+    console.log(`\nAll ${pagePaths.length} pages have no horizontal overflow at 320px.`);
     return;
   }
 
-  console.error(`\n${failures.length} edition page(s) overflow at 320px:\n`);
+  console.error(`\n${failures.length} page(s) overflow at 320px:\n`);
   for (const { pagePath, overflow } of failures) {
     console.error(`  ${pagePath}: ${overflow}px`);
   }
   process.exitCode = 1;
 }
 
-main().catch((error) => {
-  console.error(error);
-  stopPreviewDaemon();
-  process.exitCode = 1;
-});
+// Guarded so importing htmlFileToPagePath/pagesOverflowing from
+// tests/unit/checkReflow.test.ts doesn't also re-run the full 320px sweep as
+// a side effect of the import (it did, silently, before this guard was
+// added - see docs/PROJECT_STATUS.md's matching entry for how that surfaced:
+// a second, concurrent main() invocation racing the real one for the same
+// preview-server port, destroying page contexts mid-navigation) - only run
+// main() when this file is the actual entry point (`pnpm check:reflow` /
+// `node scripts/check-reflow.mjs`), the same guard check-internal-links.mjs
+// already established.
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((error) => {
+    console.error(error);
+    stopPreviewDaemon();
+    process.exitCode = 1;
+  });
+}
