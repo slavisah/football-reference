@@ -9,6 +9,20 @@ interface Props {
   id?: string;
   heading?: string;
   description?: string;
+  /**
+   * Whether this section's own heading also makes it an ARIA `region`
+   * landmark (via `aria-labelledby`). Default `true` (unchanged behavior for
+   * every single-instance call site). Pages that render many instances with
+   * the same `heading` text side by side (records.astro's per-competition
+   * grid, one instance per ranking category) pass `false` on all of them:
+   * an ARIA `region` needs a *unique* accessible name to be useful for
+   * landmark-based navigation, and reusing a competition's name across a
+   * dozen different rankings on one page produces a wall of identically
+   * named regions instead - a real `landmark-unique` violation, not a
+   * hypothetical one. The visible heading (and its `id`, for heading-based
+   * navigation) renders exactly the same either way.
+   */
+  landmark?: boolean;
   /** Decorative heading icon (aria-hidden); defaults to the trophy used for titles/awards. */
   icon?: string;
   /** Singular/plural noun for a count, e.g. ["award", "awards"]. */
@@ -31,12 +45,13 @@ const {
   unit = ['title', 'titles'],
   winningYearsLabel = 'Winning years: ',
   ofLabel = 'of',
+  landmark = true,
 } = Astro.props;
 const max = scaleMax ?? Math.max(1, ...champions.map((c) => c.titles));
 const headingId = `${id}-heading`;
 ---
 
-<section class="champions" aria-labelledby={headingId}>
+<section class="champions" aria-labelledby={landmark ? headingId : undefined}>
   <h2 id={headingId}><span aria-hidden="true">{icon}</span> {heading}</h2>
   <p class="muted">{description}</p>
 

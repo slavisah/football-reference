@@ -158,7 +158,18 @@ async function main() {
   process.exitCode = 1;
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+// Guarded so importing this file's pure budget-check functions from
+// tests/unit/checkPageWeight.test.ts doesn't also re-run the full dist/
+// weight scan as a side effect of the import - only run main() when this
+// file is the actual entry point (`pnpm check:perf` /
+// `node scripts/check-page-weight.mjs`), the same guard
+// check-internal-links.mjs already established (see this file's sibling
+// check-reflow.mjs for a case where the same missing guard caused a real,
+// user-visible bug: two concurrent main() invocations racing the same
+// preview-server port).
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}

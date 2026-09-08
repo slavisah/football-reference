@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { extractSection, extractSections, renderInlineMarkdown } from '../../src/lib/notes';
+import {
+  extractSection,
+  extractSections,
+  renderInlineMarkdown,
+  slugifyHeading,
+  slugifyHeadings,
+} from '../../src/lib/notes';
 
 const doc = `# FIFA World Cup
 
@@ -192,6 +198,49 @@ Intro paragraph.
     // Merged the way golden-boot.astro merges them - "How it works" appears once.
     const merged = [...worldCupSections, ...euroSections];
     expect(merged.filter((s) => s.heading === 'How it works')).toHaveLength(1);
+  });
+});
+
+describe('slugifyHeading', () => {
+  it('lowercases and hyphenates plain English headings', () => {
+    expect(slugifyHeading('Golden Ball winners')).toBe('golden-ball-winners');
+    expect(slugifyHeading('Silver Ball and Bronze Ball winners')).toBe(
+      'silver-ball-and-bronze-ball-winners',
+    );
+  });
+
+  it('strips accents that decompose under NFD (e.g. ü)', () => {
+    expect(slugifyHeading('Gerd Müller Trophy winners')).toBe('gerd-muller-trophy-winners');
+  });
+
+  it('strips Croatian diacritics that decompose under NFD (č, ć, š, ž)', () => {
+    expect(slugifyHeading('Idealna momčad turnira')).toBe('idealna-momcad-turnira');
+    expect(slugifyHeading('Dobitnici nagrade Fair Play')).toBe('dobitnici-nagrade-fair-play');
+  });
+
+  it('maps đ/Đ, which does not decompose under NFD, to d', () => {
+    expect(slugifyHeading('Đavo u detaljima')).toBe('davo-u-detaljima');
+  });
+
+  it('collapses punctuation and whitespace into single hyphens with no leading/trailing hyphen', () => {
+    expect(slugifyHeading("Ballon d'Or: Kopa Trophy winners!")).toBe('ballon-d-or-kopa-trophy-winners');
+  });
+});
+
+describe('slugifyHeadings', () => {
+  it('slugifies each heading independently', () => {
+    expect(slugifyHeadings(['How it works', 'Memorable moments'])).toEqual([
+      'how-it-works',
+      'memorable-moments',
+    ]);
+  });
+
+  it('suffixes a repeated slug so every id stays unique, the way golden-boot.astro merges two note arrays', () => {
+    expect(slugifyHeadings(['World Cup notes', 'EURO notes', 'World Cup notes'])).toEqual([
+      'world-cup-notes',
+      'euro-notes',
+      'world-cup-notes-2',
+    ]);
   });
 });
 

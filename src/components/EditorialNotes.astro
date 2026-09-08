@@ -1,11 +1,14 @@
 ---
-import { renderInlineMarkdown, type NoteSection } from '../lib/notes';
+import SectionJumpNav from './SectionJumpNav.astro';
+import { renderInlineMarkdown, slugifyHeadings, type NoteSection } from '../lib/notes';
 
 interface Props {
   sections: NoteSection[];
+  /** Localized label for the jump-nav heading; defaults to English. */
+  jumpNavLabel?: string;
 }
 
-const { sections } = Astro.props;
+const { sections, jumpNavLabel = 'Jump to a section' } = Astro.props;
 
 // Decorative-only accent per section type; screen readers get the plain heading text.
 function iconFor(heading: string): string {
@@ -13,16 +16,25 @@ function iconFor(heading: string): string {
   if (/how it works|kako funkcionira/i.test(heading)) return 'ℹ️';
   return '📝';
 }
+
+const ids = slugifyHeadings(sections.map((section) => section.heading));
+
+// A short page (home, quiz) has too few cards for a jump nav to earn its
+// keep; every competition/award page has well past this many.
+const JUMP_NAV_MIN_SECTIONS = 4;
 ---
 
 {
   sections.length > 0 && (
     <div class="notes stack">
+      {sections.length >= JUMP_NAV_MIN_SECTIONS && (
+        <SectionJumpNav
+          label={jumpNavLabel}
+          sections={sections.map((section, index) => ({ id: ids[index], label: section.heading }))}
+        />
+      )}
       {sections.map((section, index) => (
-        <section
-          class="notes__card card"
-          aria-labelledby={`note-heading-${index}`}
-        >
+        <section class="notes__card card" id={ids[index]} aria-labelledby={`note-heading-${index}`}>
           <h2 id={`note-heading-${index}`}>
             <span aria-hidden="true">{iconFor(section.heading)}</span>{' '}
             {section.heading}

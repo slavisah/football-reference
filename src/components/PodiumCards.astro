@@ -39,7 +39,7 @@ const sorted = [...entries].sort((a, b) => b.yearSort - a.yearSort);
     {
       sorted.map((entry) => (
         <li class="podium__card">
-          <p class="podium__year">{entry.year}</p>
+          <h4 class="podium__year">{entry.year}</h4>
           {entry.host && <p class="podium__host">{hostedByLabel} {entry.host}</p>}
           <ol class="podium__ranks">
             <li class="podium__rank podium__rank--gold">

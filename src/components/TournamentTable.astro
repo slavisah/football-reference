@@ -1,6 +1,6 @@
 ---
 import type { Edition, MarkdownTable } from '../lib/types';
-import { buildSortOptions, defaultSortValue } from '../lib/tableSort';
+import { buildSortOptions, defaultSortValue, selectMinWidthRem } from '../lib/tableSort';
 import { editionTeams } from '../lib/editions';
 import { editionLinkKey } from '../lib/editionProfile';
 import { renderInlineMarkdown } from '../lib/notes';
@@ -162,9 +162,32 @@ const yearColIndex = table.headers.findIndex((header) => /year|season/i.test(hea
 // already rendered below, so no client-side re-sort is needed on first load.
 const sortOptions = buildSortOptions(table.headers, { locale, headerLabels });
 const defaultSort = defaultSortValue(sortOptions);
+
+// Per-field minimum widths so a long selected value (a full player name, a
+// multi-country host list) never gets silently clipped inside its own
+// closed <select> - see selectMinWidthRem()'s own doc comment.
+const winnerMinWidth = selectMinWidthRem([winnerAllLabel, ...winners]);
+const yearMinWidth = selectMinWidthRem([yearAllLabel, ...years.map(String)]);
+const hostMinWidth = selectMinWidthRem([hostAllLabel, ...hosts]);
+const teamMinWidth = selectMinWidthRem([teamAllLabel, ...teams]);
+const sortMinWidth = selectMinWidthRem(sortOptions.map((option) => option.label));
 ---
 
-<section class="filters-and-table" aria-labelledby={`${id}-heading`}>
+{/*
+  This wrapping <section> deliberately has no aria-labelledby of its own: the
+  visually-hidden <h2> below still gives it a heading-navigation landmark
+  (screen-reader users can jump straight to "<caption>" via the heading
+  list), but making the *section* an ARIA region with that same name would
+  duplicate the accessible name the scrollable table wrapper below already
+  carries (`.t-wrap[role="region"][aria-label={caption}]`) - two identically
+  named "region" landmarks nested inside each other, a real `landmark-unique`
+  violation `axe-core`'s `best-practice` tag catches (not covered by any
+  `wcag2*`/`wcag21*`/`wcag22aa` tag, which is why 60+ prior WCAG-tagged
+  sweeps never flagged it). The table's own scrollable wrapper is the one
+  that needs the name, since that's the element a keyboard user actually
+  tabs to and needs identified.
+*/}
+<section class="filters-and-table">
   <h2 id={`${id}-heading`} class="visually-hidden">{caption}</h2>
 
   <form
@@ -173,7 +196,7 @@ const defaultSort = defaultSortValue(sortOptions);
     role="search"
     aria-label={filterAriaLabel}
   >
-    <div class="filters__field">
+    <div class="filters__field" style={`min-width: min(${winnerMinWidth}rem, 100%)`}>
       <label for={`${id}-winner`}>{winnerLabel}</label>
       <select id={`${id}-winner`} name="winner">
         <option value="">{winnerAllLabel}</option>
@@ -181,7 +204,7 @@ const defaultSort = defaultSortValue(sortOptions);
       </select>
     </div>
 
-    <div class="filters__field">
+    <div class="filters__field" style={`min-width: min(${yearMinWidth}rem, 100%)`}>
       <label for={`${id}-year`}>{yearLabel}</label>
       <select id={`${id}-year`} name="year">
         <option value="">{yearAllLabel}</option>
@@ -191,7 +214,7 @@ const defaultSort = defaultSortValue(sortOptions);
 
     {
       hosts.length > 0 && (
-        <div class="filters__field">
+        <div class="filters__field" style={`min-width: min(${hostMinWidth}rem, 100%)`}>
           <label for={`${id}-host`}>{hostLabel}</label>
           <select id={`${id}-host`} name="host">
             <option value="">{hostAllLabel}</option>
@@ -203,7 +226,7 @@ const defaultSort = defaultSortValue(sortOptions);
 
     {
       teams.length > 0 && (
-        <div class="filters__field">
+        <div class="filters__field" style={`min-width: min(${teamMinWidth}rem, 100%)`}>
           <label for={`${id}-team`}>{teamLabel}</label>
           <select id={`${id}-team`} name="team">
             <option value="">{teamAllLabel}</option>
@@ -215,7 +238,7 @@ const defaultSort = defaultSortValue(sortOptions);
 
     {
       sortOptions.length > 0 && (
-        <div class="filters__field">
+        <div class="filters__field" style={`min-width: min(${sortMinWidth}rem, 100%)`}>
           <label for={`${id}-sort`}>{sortByLabel}</label>
           <select id={`${id}-sort`} name="sort">
             {sortOptions.map((option) => (
@@ -519,6 +542,25 @@ const defaultSort = defaultSortValue(sortOptions);
 
     .t-table td.is-winner {
       background: color-mix(in srgb, var(--accent) 9%, transparent);
+    }
+  }
+
+  /* global.css's `@media print` block already resets most of `.t-table`
+     for paper (table-layout: fixed, wrapping cells, no horizontal-scroll
+     clipping - see that file's own comment for the full "silently clipped
+     on paper" bug this fixes). Its plain `.t-table thead th` selector can't
+     win the cascade against this component's own scoped
+     `.t-table[data-astro-cid-*] thead[data-astro-cid-*] th[data-astro-cid-*]`
+     `white-space: nowrap` rule above (Astro's scoping attribute adds
+     specificity a global, unscoped selector can never match) - so the
+     override has to live here too, in this component's own scope, to
+     actually take effect. Without this, a long column header (e.g. "Fourth
+     / other semifinalist") still forced its column wider than the fixed
+     layout could give it, printing truncated/overlapping text. */
+  @media print {
+    .t-table thead th {
+      white-space: normal;
+      font-size: 0.78rem;
     }
   }
 </style>

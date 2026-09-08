@@ -14,6 +14,7 @@ import ChampionsTimeline from '../../components/ChampionsTimeline.astro';
 import ChampionsSummary from '../../components/ChampionsSummary.astro';
 import References from '../../components/References.astro';
 import PrintDownloadLink from '../../components/PrintDownloadLink.astro';
+import SectionJumpNav from '../../components/SectionJumpNav.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import {
   buildBiggestFinalMargins,
@@ -234,6 +235,25 @@ const jsonLd: JsonLdObject[] = [
       ]
     : []),
 ];
+
+// Croatian translation of records.astro's own jumpSections - same thirteen
+// heading ids (shared between languages, only the labels are translated),
+// same reasoning for why this page needs the nav at all.
+const jumpSections = [
+  { id: 'timeline-heading', label: 'Vremenska crta prvaka' },
+  { id: 'teams-heading', label: 'Najuspješnije reprezentacije' },
+  { id: 'hosts-heading', label: 'Najčešći domaćini' },
+  { id: 'home-soil-heading', label: 'Naslovi osvojeni na domaćem terenu' },
+  { id: 'streaks-heading', label: 'Uzastopni prvaci' },
+  { id: 'nearly-champions-heading', label: 'Vječiti drugoplasirani' },
+  { id: 'nearly-finalists-heading', label: 'Vječiti polufinalisti' },
+  { id: 'title-gaps-heading', label: 'Najduže čekanje na novi naslov' },
+  { id: 'final-margins-heading', label: 'Najveće pobjede u finalu' },
+  { id: 'rivalries-heading', label: 'Najveći rivaliteti' },
+  { id: 'award-timeline-heading', label: 'Vremenska crta pojedinačnih nagrada' },
+  { id: 'award-rankings-heading', label: 'Najviše nagrada' },
+  { id: 'identity-heading', label: 'Kako se postupa s povijesnim nazivima država' },
+];
 ---
 
 <BaseLayout
@@ -259,6 +279,8 @@ const jsonLd: JsonLdObject[] = [
       />
     </header>
 
+    <SectionJumpNav sections={jumpSections} label="Skoči na odjeljak" />
+
     <section class="stack" aria-labelledby="timeline-heading">
       <h2 id="timeline-heading">Vremenska crta prvaka</h2>
       <p class="muted">
@@ -271,6 +293,7 @@ const jsonLd: JsonLdObject[] = [
           <ChampionsTimeline
             id={`timeline-${c.key}`}
             heading={c.label}
+            landmark={false}
             entries={buildTimeline(c.data.editions)}
             hostedByLabel="Domaćin:"
             runnerUpLabel="Drugo mjesto:"
@@ -294,6 +317,7 @@ const jsonLd: JsonLdObject[] = [
                 champions={c.data.champions}
                 scaleMax={c.data.editions.length}
                 heading={c.label}
+                landmark={false}
                 description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                 winningYearsLabel="Godine osvajanja: "
                 ofLabel="od"
@@ -328,6 +352,7 @@ const jsonLd: JsonLdObject[] = [
                 champions={buildHostsSummary(c.data.editions)}
                 scaleMax={c.data.editions.length}
                 heading={c.label}
+                landmark={false}
                 description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                 icon="🏟️"
                 unit={['put domaćin', 'puta domaćin']}
@@ -369,6 +394,7 @@ const jsonLd: JsonLdObject[] = [
                     champions={homeSoil}
                     scaleMax={Math.max(...homeSoil.map((s) => s.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                     icon="🏠"
                     unit={['naslov na domaćem terenu', 'naslova na domaćem terenu']}
@@ -413,6 +439,7 @@ const jsonLd: JsonLdObject[] = [
                     champions={streaks}
                     scaleMax={Math.max(...streaks.map((s) => s.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                     icon="🔥"
                     unit={['uzastopno izdanje', 'uzastopna izdanja']}
@@ -458,6 +485,7 @@ const jsonLd: JsonLdObject[] = [
                     champions={nearlyChampions}
                     scaleMax={Math.max(...nearlyChampions.map((s) => s.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                     icon="🥈"
                     unit={['finale bez naslova', 'finala bez naslova']}
@@ -504,6 +532,7 @@ const jsonLd: JsonLdObject[] = [
                     champions={nearlyFinalists}
                     scaleMax={Math.max(...nearlyFinalists.map((s) => s.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                     icon="🥉"
                     unit={['polufinale bez finala', 'polufinala bez finala']}
@@ -550,6 +579,7 @@ const jsonLd: JsonLdObject[] = [
                     champions={gaps}
                     scaleMax={Math.max(...gaps.map((g) => g.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                     icon="⏳"
                     unit={['godina', 'godine']}
@@ -596,6 +626,7 @@ const jsonLd: JsonLdObject[] = [
                     champions={margins}
                     scaleMax={Math.max(...margins.map((m) => m.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generirano iz ${c.data.editions.length} izdanja natjecanja ${c.label}.`}
                     icon="⚽"
                     unit={['gol', 'gola']}
@@ -690,6 +721,7 @@ const jsonLd: JsonLdObject[] = [
           <ChampionsTimeline
             id={`timeline-${a.key}`}
             heading={a.label}
+            landmark={false}
             entries={buildTimeline(a.data.editions)}
             hostedByLabel="Domaćin:"
             runnerUpLabel="Drugo mjesto:"
@@ -713,6 +745,7 @@ const jsonLd: JsonLdObject[] = [
                 champions={a.data.champions}
                 scaleMax={a.data.editions.length}
                 heading={a.label}
+                landmark={false}
                 description={`Generirano iz ${a.data.editions.length} izdanja nagrade ${a.label}.`}
                 unit={['nagrada', 'nagrade']}
                 winningYearsLabel="Godine osvajanja: "
@@ -849,5 +882,27 @@ const jsonLd: JsonLdObject[] = [
   .records__rivalries-table tbody tr:last-child th,
   .records__rivalries-table tbody tr:last-child td {
     border-bottom: none;
+  }
+
+  /* Same paper-clipping bug global.css's `.t-table` print rules fix, on this
+     page's own separately-styled rivalries table: the screen-only `nowrap`/
+     `min-width: 34rem`/`.t-wrap`'s horizontal scrollbar have no paper
+     equivalent, so content past the page's right edge was silently clipped
+     in the downloaded PDF instead of wrapping. */
+  @media print {
+    .t-wrap {
+      overflow-x: visible;
+    }
+
+    .records__rivalries-table {
+      min-width: 0;
+      table-layout: fixed;
+    }
+
+    .records__rivalries-table th,
+    .records__rivalries-table td {
+      white-space: normal;
+      overflow-wrap: break-word;
+    }
   }
 </style>
