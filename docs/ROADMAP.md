@@ -3129,3 +3129,60 @@ back clean:
   Lighthouse coverage both now genuinely full-site, a future run likely
   needs a different manually-discoverable UX edge case (extreme zoom) or a
   fresh content/quality angle.
+- **`check:text-zoom`: a new WCAG 1.4.4 (Resize Text) full-site sweep**:
+  closed 2026-09-08 (eighty-second intensive run) - a standing health check
+  first (`pnpm install`; `pnpm outdated` still shows only the blocked
+  `typescript` 7 entry, re-confirmed; `pnpm dlx knip --no-config-hints`
+  matched the standing baseline; `pnpm lint` 0/0/0). Per this routine's own
+  priority order, Copa América has no open captain gap left and Nations
+  League's Team of the Tournament for 2021/2023/2025 has now been
+  re-confirmed unavailable across six consecutive prior runs with no new
+  source lead - re-attempting it a seventh time with no new angle would just
+  repeat the seventy-eighth run's own documented mistake, so this run took
+  the eighty-first run's own suggested "extreme zoom" quality angle instead.
+  `check:reflow`/`check:lighthouse` both now cover every page at a *narrow
+  viewport* (WCAG 1.4.10 Reflow), but no check on this site had ever
+  exercised WCAG 1.4.4 Resize Text - a reader increasing their browser/OS
+  text size at an ordinary desktop width, a genuinely different failure mode
+  from narrowing the viewport (relative units can still clip if a fixed-width
+  sibling or a min-width rule doesn't scale with the text around it).
+  Manually spot-checked 11 representative pages (home, `hr/records`, a World
+  Cup landing page, a Copa América edition page, `/compare`,
+  `/compare-players`, `/quiz`, a player profile, a team profile, `/glossary`,
+  `/about/sources`) at 200% root font-size on a 1280x800 viewport before
+  building any tooling, to confirm there was a real signal to automate rather
+  than build a script around a hunch - zero overflow on all 11, consistent
+  with `AGENTS.md`'s own mobile-first/relative-unit conventions already
+  paying off here the same way they did for the 320px reflow sweeps.
+  Added `scripts/check-text-zoom.mjs` (`pnpm check:text-zoom`), reusing
+  `check-reflow.mjs`'s exported `htmlFileToPagePath`/`isRedirectStubHtml`/
+  `pagesOverflowing` and `check-internal-links.mjs`'s `listHtmlFiles` rather
+  than duplicating already-tested pure logic - the only genuinely new step is
+  *how* each page is stressed (`document.documentElement.style.fontSize =
+  '200%'` at a standard desktop viewport, not a narrower one) before the same
+  `scrollWidth - clientWidth` measurement every reflow check already uses.
+  Carries the same import-side-effect entry-point guard `check-reflow.mjs`
+  established (the eighty-first run's own fixed bug), so Vitest importing
+  this file's re-exports can't accidentally trigger a real sweep. Ran it
+  against all 711 real content pages (both languages): **zero overflow
+  found** - matches the manual spot-check, no code fix needed this run, but
+  now a permanent, reusable script like `check:lighthouse`/`check:reflow` so
+  a future layout or content change that breaks text-only resize gets caught.
+  No new pure logic needed unit tests of its own (every function it uses is
+  already covered in `tests/unit/checkReflow.test.ts`), matching
+  `check-lighthouse.mjs`'s own precedent for a script with no pure logic to
+  extract. No `content/*.md` or PDF-source file touched, so `check:pdfs`
+  stayed clean at 700/700 throughout with no regeneration needed. Full
+  standing health check clean: `pnpm lint` (0/0/0), `pnpm test` (542/542
+  unit, unchanged - no new pure logic), `pnpm build` (711 pages, unchanged),
+  `check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+  (37 URLs), `check:perf` (heaviest page still `hr/records`, 583.4 KB,
+  unchanged), `check:pdfs` (700/700 fresh), the new `check:text-zoom`
+  (711/711 pages clean), full cold-start `pnpm test:e2e` also run (see
+  `docs/PROJECT_STATUS.md`'s matching entry for the final count). **Left for
+  a future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025, still not re-attempted without a
+  genuinely new source lead). With reflow, Lighthouse and text-zoom all now
+  full-site clean, a future run could look at `prefers-contrast`/
+  `forced-colors` coverage depth, or another fresh content/quality angle.
