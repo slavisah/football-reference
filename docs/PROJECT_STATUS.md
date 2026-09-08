@@ -18317,5 +18317,124 @@ for genuinely full-site 320px coverage, or pick a different
 manually-discoverable UX edge case the automated suite doesn't exercise yet
 (extreme zoom, `prefers-reduced-motion`).
 
+### `check:reflow` widened to a genuinely full-site 320px sweep, plus a real bug fix it surfaced along the way - closed 2026-09-08 (eighty-first intensive run)
+
+Took the eightieth run's own suggested next step directly: `check:reflow`
+only ever swept the ~400 per-edition pages (`/competitions/<family>/<year>/`,
+both languages); the remaining ~300 non-edition pages - the six landing
+pages, `/records`, `/compare`, `/compare-players`, `/glossary`, `/quiz`,
+`/teams`/`/players` directories and profiles, `/about/sources` - had never
+been checked for horizontal overflow at the WCAG 1.4.10 canonical 320px test
+width.
+
+Rewrote `scripts/check-reflow.mjs`'s page-discovery from a hand-rolled
+edition-directory walk (`isEditionDirName`/`findEditionDirs`, one level or
+two below `competitions`/`hr/competitions`) to reuse
+`check-internal-links.mjs`'s already-established site-wide HTML file walk
+(newly exported `listHtmlFiles()`), converting each `dist/**/index.html`
+file path back into its site-relative URL with a new pure
+`htmlFileToPagePath()` (replacing `dirToPagePath()`). This is a strict
+superset of the old edition-only sweep, not a parallel script, so
+`isEditionDirName`/`dirToPagePath`/`findEditionDirs` and their four unit
+tests were deleted rather than kept alongside the new logic.
+
+Two real things turned up while making that switch actually pass, not just
+compile:
+
+1. **A latent bug in the script's own entry-point guard.** Every one of this
+   repo's other `check:*` scripts with pure functions worth unit-testing
+   (`check-internal-links.mjs`) or a Vitest file importing them
+   (`check-page-weight.mjs`) has a real bug in common: `main()` was called
+   unconditionally at module scope, so importing the file's pure functions
+   from a Vitest test - exactly what `tests/unit/checkReflow.test.ts` and
+   `tests/unit/checkPageWeight.test.ts` both do - silently re-ran the *real*
+   script as a side effect of the import, every single time `pnpm test`
+   runs. For `check-page-weight.mjs` this was cheap and harmless (a
+   synchronous read of already-built file sizes). For the newly-rewritten
+   `check-reflow.mjs` it was not: `pnpm test` now spun up a real `astro
+   preview` daemon and Chromium in the background on every unit-test run,
+   and - worse - running `pnpm check:reflow` from the command line while a
+   leftover background invocation from an earlier `pnpm test` was still
+   alive raced both `main()` calls against the same preview-server port,
+   which is what first surfaced this: `/awards/ballon-dor/` and
+   `/awards/golden-boot/` failed with `page.evaluate: Execution context was
+   destroyed, most likely because of a navigation` as one invocation's
+   `astro preview stop` killed the server the other was mid-request against.
+   `check-internal-links.mjs` had already solved exactly this with an
+   `if (import.meta.url === \`file://${process.argv[1]}\`)` guard around its
+   own `main()` call; applied the identical guard to both
+   `check-reflow.mjs` and `check-page-weight.mjs` (the only two other
+   scripts with the same unconditional-`main()`-plus-importable-pure-logic
+   shape - `check-lighthouse.mjs` has no pure functions to extract and no
+   Vitest file imports it, so was left as-is rather than guarded
+   speculatively).
+2. **A real, still-reproducing failure even with the race fixed.** With only
+   one `main()` running at a time, `/awards/ballon-dor/` and
+   `/awards/golden-boot/` (both languages - 4 pages total) still failed the
+   same way: they're genuine `<meta http-equiv="refresh" content="0;...">`
+   redirect stubs for the site's old pre-rename `/awards/*` URLs (see
+   `docs/PROJECT_STATUS.md`'s much earlier entry introducing them), and a
+   0-second meta-refresh fires its navigation before `page.evaluate()` can
+   read `document.documentElement`'s scroll width - genuinely destroying the
+   execution context, no race required. These four pages have no rendered
+   layout of their own to check (their whole content is one redirect link),
+   so measuring them for overflow was never meaningful to begin with. Added
+   a small pure `isRedirectStubHtml()` check (reads each file's HTML,
+   already fetched for `listHtmlFiles()`'s own traversal, and tests for the
+   `http-equiv="refresh"` meta tag) that excludes exactly these four from
+   the sweep, with new unit test coverage for both the recognized and
+   not-recognized case.
+
+With both fixed, the real sweep ran clean: **all 711 pages** (715 built HTML
+files minus the four redirect stubs) **have no horizontal overflow at
+320px** - the full-site coverage this run set out for, and (like the
+eightieth run's edition-only sweep) a genuinely clean result rather than
+another bug to fix.
+
+`tests/unit/checkReflow.test.ts` rewritten to match: `isEditionDirName`/
+`dirToPagePath` (4 tests) replaced with `htmlFileToPagePath` (4 tests,
+including the `404.html` flat-file case the old edition-only walk never had
+to handle) plus the new `isRedirectStubHtml` (2 tests) - net 9 → 9 (was
+briefly 7 mid-edit before the redirect-stub tests were added back), still
+independently testable pure logic, the same I/O-vs-pure-logic split
+`check-page-weight.mjs`/`checkPageWeight.test.ts` established and the
+eightieth run's own entry already documents for this file.
+
+No `content/*.md` or PDF-source file was touched (two dev-tooling scripts
+and their tests only), so no `pnpm build:pdfs` regeneration was needed;
+`check:pdfs` stayed clean at 700/700 throughout.
+
+**Full standing health check re-run after all changes:** fresh `pnpm
+install` (398 packages), `pnpm outdated` (still only the blocked
+`typescript` 7 entry), `pnpm dlx knip --no-config-hints` (same one confirmed
+false positive), `pnpm lint` (0/0/0), `pnpm test` (**542/542 unit**, up from
+533 - net +9 from the rewritten `checkReflow.test.ts`, matching the
+eightieth run's own count exactly since both runs added 9 cases to this same
+file), `pnpm build` (711 pages, unchanged), `check:links` (715 pages)/
+`check:sitemap` (710 entries)/`check:precache` (37 URLs)/`check:perf`
+(heaviest page `hr/records`, 583.4 KB, unchanged - no content edit)/
+`check:pdfs` (700/700 fresh) all clean and byte-for-byte unchanged from this
+run's own opening baseline, the widened `pnpm check:reflow` itself (711/711
+pages clean, full site rather than just editions), `check:lighthouse`
+(37/37 pages still a perfect 1.00 across every category, unchanged), and a
+full cold-start `pnpm test:e2e`: **869/869 passed** (13.0 minutes, unchanged
+count - this run's fix is a dev-tooling script correctness fix with new
+Vitest coverage, not a Playwright-visible behavior change).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run - `typescript` 7 (still capped by `@astrojs/check`'s `^5.0.0 ||
+^6.0.0` peer range, re-confirmed this run), `docs/SOURCES.md` link-liveness
+(still blocked on outbound egress, not re-attempted this run), and Nations
+League's Team of the Tournament for 2021/2023/2025 (still unconfirmed across
+seven-plus prior runs, not re-attempted this run without a new source lead).
+With `check:reflow` now covering every single page on the site rather than
+just editions, a future run could pick a different manually-discoverable UX
+edge case the automated suite doesn't exercise yet (extreme zoom,
+`prefers-reduced-motion` - though that was already fixed site-wide by the
+nineteenth run, so re-check it's still holding rather than assuming a fresh
+gap), or return to a genuinely new content/quality angle now that both the
+320px-reflow and Lighthouse-coverage angles are fully closed out across
+every page shape.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

@@ -3100,3 +3100,32 @@ back clean:
   the comparison tools) for full-site 320px coverage, or pick a different
   manually-discoverable UX edge case (extreme zoom, `prefers-reduced-motion`)
   the automated suite doesn't exercise yet.
+- **`check:reflow` widened to a genuinely full-site 320px sweep**: closed
+  2026-09-08 (eighty-first intensive run) - acted on the eightieth run's own
+  suggested next step directly above. Rewrote `scripts/check-reflow.mjs`'s
+  page discovery to reuse `check-internal-links.mjs`'s site-wide HTML walk
+  instead of its old edition-only directory scan, so every one of the site's
+  715 built pages (both languages) is now covered, not just the ~400
+  per-edition ones. Along the way, fixed a real latent bug this rewrite
+  surfaced: `main()` ran unconditionally at module scope, so importing the
+  script's pure functions from its own Vitest test silently kicked off a
+  second, real `astro preview` + Chromium sweep in the background on every
+  `pnpm test` run - applied the same entry-point guard
+  `check-internal-links.mjs` already used, to both `check-reflow.mjs` and
+  `check-page-weight.mjs` (the only other script with the same shape). Also
+  excluded the site's four `<meta http-equiv="refresh">` legacy `/awards/*`
+  redirect stubs from the sweep (they have no rendered layout of their own,
+  and their 0-second redirect was destroying Playwright's execution context
+  mid-measurement). Result: **all 711 real content pages have no horizontal
+  overflow at 320px** - genuinely full-site coverage, no bug found. Full
+  standing health check clean: 542/542 unit, 711 pages built, all `check:*`
+  scripts (including the widened `check:reflow` and `check:lighthouse`,
+  still 37/37 perfect) clean, full cold-start `pnpm test:e2e` 869/869
+  (unchanged count - a dev-tooling fix, no Playwright-visible behavior
+  change). See `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left
+  for a future pass:** the same environment-blocked items as every recent
+  run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's
+  Team of the Tournament for 2021/2023/2025). With 320px reflow and
+  Lighthouse coverage both now genuinely full-site, a future run likely
+  needs a different manually-discoverable UX edge case (extreme zoom) or a
+  fresh content/quality angle.
