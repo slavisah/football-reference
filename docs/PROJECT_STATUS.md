@@ -16184,6 +16184,21 @@ Copa América captains.
   a narrow phone's entire viewport width regardless of `.filters`' own
   `flex-wrap`, which only redistributes *multiple* fields across lines and
   can't shrink a single field below its own min-width.
+- Copa América's "Winning captains" section (`content/copa-america.md`) is
+  fully resolved for every edition from 1975 to 2024 - 1979, 1983 and 1987
+  included - as of the sixty-second and sixty-seventh intensive runs
+  (2026-09-04/05). Several later runs' own "left for a future pass" notes
+  (through the seventy-ninth) kept re-listing 1983/1987 as still open, a
+  copy-paste error corrected 2026-09-08 (eightieth intensive run) - see
+  that entry below. There is no remaining Copa América captain gap.
+- `pnpm check:reflow` (`scripts/check-reflow.mjs`, added 2026-09-08,
+  eightieth intensive run) loads every per-edition page (both languages) at
+  a 320px viewport and fails on any horizontal overflow, the same
+  `scrollWidth - clientWidth` measurement `tests/e2e/mobile.spec.ts`'s own
+  reflow assertions use. Like `check:lighthouse`, it's a manual/intensive-run
+  tool (a ~400-page-load sweep, too slow for a required PR gate) rather than
+  part of `.github/workflows/ci.yml` - run it by hand after `pnpm build`
+  when a layout or content change might affect narrow-viewport reflow.
 
 ### Notes jump nav: an in-page "Jump to a section" link list for every long note-card list - closed 2026-09-04 (sixty-third intensive run)
 
@@ -18171,6 +18186,136 @@ fixed assertions don't exercise (e.g. very long dynamic content at extreme
 zoom, `prefers-reduced-motion`, RTL-adjacent text direction edge cases -
 though this site has no RTL locale today) rather than repeat either
 saturated angle again.
+
+### Systematic 320px reflow sweep of every per-edition page, plus a stale Copa América note correction - closed 2026-09-08 (eightieth intensive run)
+
+A standing health check first: fresh `pnpm install` (398 packages), `pnpm
+outdated` showed only the same still-blocked `typescript` entry every recent
+run has recorded (re-confirmed via `npm view @astrojs/check@latest
+peerDependencies`: `typescript: '^5.0.0 || ^6.0.0'`, `typescript` itself at
+5.9.3 with 7.0.2 available), `pnpm dlx knip --no-config-hints` matched the
+standing baseline (`scripts/test-preview-server.mjs`, the same confirmed
+false positive), `pnpm lint` (0/0/0 across 170 files), `pnpm test` (533/533
+unit), `pnpm build` (711 pages), `check:links` (715 pages), `check:sitemap`
+(710 entries), `check:precache` (37 URLs), `check:perf` (heaviest page
+`hr/records` 583.4 KB, within the 590 KB budget), `check:pdfs` (700/700
+fresh) - all clean and byte-for-byte unchanged from the seventy-ninth run's
+baseline, confirming the branch it rebased onto (23 commits) introduced no
+regression.
+
+Per this routine's own priority order, re-checked Copa América's own
+content-gap history before picking a target - and found the actual state
+disagreed with what the last several runs' own closing notes claimed.
+Tracing the "Winning captains" section's history directly (rather than
+trusting the copied-forward "left for a future pass" line) showed the
+sixty-second run (2026-09-04) resolved both 1983 (Rodolfo Rodríguez, two
+independent sources) and 1987 (José Perdomo, ditto), and the very next
+run - the sixty-seventh (2026-09-05), not the sixty-third as this run first
+assumed before re-reading it - resolved the section's last gap, 1979 (Aldo
+Florentín), closing it completely for 1975-2024. Every run from the
+sixty-eighth through the seventy-ninth (twelve runs) kept re-listing
+"Copa América's 1983/1987 winning captains" as still open in its own
+closing note anyway - a copy-paste error that was never actually re-checked
+against `content/copa-america.md` itself in that whole span. Corrected in
+`docs/ROADMAP.md` (a dated correction bullet, not a silent rewrite of the
+old entries) and in this file's "Known caveats" list above, so a future run
+reading either file stops re-deriving or re-stating a already-closed gap.
+
+With that content angle now fully retired and Nations League/Ballon
+d'Or/Golden Boot content-mining already confirmed exhausted by prior runs,
+moved to the quality-angle fork the seventy-ninth run's own closing note
+suggested directly: that run found and fixed a real 320px horizontal-overflow
+bug, but only on the `/competitions/world-cup` *landing* page (a filter-select
+field sized from its longest option) - and explicitly flagged that the
+~200 per-edition pages (`/competitions/<family>/<year>/`, a different
+template with no filter controls at all) had never been checked at that
+width, sampled or systematically.
+
+**Built `pnpm check:reflow`** (`scripts/check-reflow.mjs`), modeled on
+`check-lighthouse.mjs`'s own `astro preview` daemon dance and
+`PW_EXECUTABLE_PATH`/`PW_CHROME_CHANNEL` Chromium-launch fallbacks (this
+sandbox needs the former). It discovers every edition-page directory under
+`dist/competitions/` and `dist/hr/competitions/` by name alone - any
+directory starting with a digit (a plain year, a season slug like
+"2018-19", or a disambiguated year like "1959-argentina") as opposed to a
+sibling landing-page directory named after its family (e.g. "world-cup") at
+the same depth - recursing through Golden Boot's extra `world-cup`/`euro`
+split along the way. For each discovered page it opens a fresh
+320x740 viewport, navigates, and measures `document.documentElement.
+scrollWidth - clientWidth`, the exact same overflow measurement every
+hand-written reflow assertion in `tests/e2e/mobile.spec.ts` already uses,
+with the same 1px rounding tolerance.
+
+Ran it against the full, real edition-page set: **404 pages** (202
+editions x 2 languages, matching this file's own long-standing "202
+editions x 2 languages" PDF-count note above). **Every single one passed -
+zero horizontal overflow found.** So this run's own hypothesis (a distinct
+per-edition-page bug, the same shape as the landing-page one) didn't pan
+out; the seventy-ninth run's own closing-note caveat turned out to be
+right; that no-bug-found result is recorded here rather than treated as
+nothing having happened, since the sweep itself - now a standing,
+re-runnable tool - is the actual output of this run's work, the same way
+several earlier "investigated and closed negatively" entries in this file
+are (e.g. the sixtieth run's EURO Fair Play/Nations League top-scorer
+close-out, or the seventy-fifth run's `WebSearch`-link-liveness-workaround
+finding).
+
+Kept `check:reflow` as a permanent script (wired into `package.json` as
+`pnpm check:reflow`) rather than a one-off manual audit, so a future
+content or component change that introduces a real 320px regression on any
+edition page - a longer team/player name, a new note-card layout, a wider
+generated table - gets caught by re-running it, without needing another
+from-scratch investigation. Not wired into `.github/workflows/ci.yml`, the
+same reasoning `check:lighthouse` already documents in its own file header:
+a ~400-page-load sweep (each a full navigation plus a Chromium `evaluate`
+call) is much slower than this repo's other `check:*` scripts, so both stay
+manual/intensive-run tools rather than required PR gates.
+
+Extracted the script's pure logic into three exported, independently
+testable functions - `isEditionDirName` (digit-prefix check),
+`dirToPagePath` (dist-path-to-URL conversion, forward-slash-joined
+regardless of platform path separator) and `pagesOverflowing` (the
+budget-style filter, mirroring `check-page-weight.mjs`'s own `overBudget`)
+- with 9 new unit test cases in `tests/unit/checkReflow.test.ts`, following
+the same I/O-vs-pure-logic split `check-page-weight.mjs`/
+`checkPageWeight.test.ts` already established. `check-lighthouse.mjs` has
+no equivalent unit test file because it has no pure functions to extract
+(every audit score comes from a live Lighthouse run against a real
+browser); `check-reflow.mjs`'s directory-discovery and overflow-filtering
+logic, by contrast, factors cleanly out of the I/O.
+
+No `content/*.md` or PDF-source file was touched (a new dev-tooling script
+plus a documentation correction only), so no `pnpm build:pdfs` regeneration
+was needed; `check:pdfs` stayed clean at 700/700 throughout.
+
+**Full standing health check re-run after all changes:** `pnpm lint`
+(0/0/0, unchanged), `pnpm test` (**542/542 unit, up from 533** - the 9 new
+`checkReflow.test.ts` cases), `pnpm build` (711 pages, unchanged - no new
+route), `check:links` (715 pages)/`check:sitemap` (710 entries)/
+`check:precache` (37 URLs)/`check:perf` (heaviest page `hr/records`, 583.4
+KB, unchanged - no content edit)/`check:pdfs` (700/700 fresh) all clean and
+byte-for-byte unchanged from this run's own opening baseline, plus the new
+`pnpm check:reflow` itself (404/404 edition pages clean, ~1-2 minutes). A
+full cold-start `pnpm test:e2e`: **869/869 passed** (10.7 minutes, unchanged
+count from the seventy-ninth run - this run added no new Playwright test,
+only a separate standalone script and its own Vitest unit coverage).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run - `typescript` 7 (still capped by `@astrojs/check`'s `^5.0.0 ||
+^6.0.0` peer range, re-confirmed this run) and `docs/SOURCES.md`
+link-liveness (still blocked on outbound egress, not re-attempted this run)
+- plus Nations League's Team of the Tournament for 2021/2023/2025 (still
+unconfirmed across six-plus prior runs, not re-attempted this run without a
+new source lead). Copa América's own captain list is fully closed per the
+correction above and should stop appearing on this list. With the 320px
+reflow angle now swept clean across every edition page too (landing pages
+already fixed by the seventy-ninth run), a future run could extend
+`check:reflow` to cover the remaining non-edition page shapes (the six
+landing pages, `/records`, both comparison tools, profile/directory pages,
+the quiz, `/about/sources` - roughly 200 more pages across both languages)
+for genuinely full-site 320px coverage, or pick a different
+manually-discoverable UX edge case the automated suite doesn't exercise yet
+(extreme zoom, `prefers-reduced-motion`).
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

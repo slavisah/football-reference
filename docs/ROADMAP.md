@@ -3023,3 +3023,80 @@ back clean:
   further (e.g. a systematic 320px sweep of the 202 per-edition pages) or
   look for another manually-discoverable UX edge case (extreme zoom,
   `prefers-reduced-motion`) the automated suite doesn't exercise.
+- **Correction (2026-09-08):** the line directly above, and the sixtieth
+  through seventy-eighth runs' own closing notes before it, kept
+  re-listing "Copa América's 1983/1987 winning captains" as left for a
+  future pass. That's stale by two runs: the sixty-second run (2026-09-04)
+  resolved both 1983 (Rodolfo Rodríguez) and 1987 (José Perdomo) with
+  two independent sources each, and the very next run resolved the
+  section's last remaining gap, 1979 (Aldo Florentín), closing the
+  "Winning captains" section completely for every edition 1975-2024 -
+  see the `content/copa-america.md` bullets themselves and this file's own
+  2026-09-05 entry a page up describing that close-out. Left here as a
+  correction rather than silently edited into the old entries, the same
+  way the 2026-08-25 correction above it in this file's "Ideas not yet
+  scoped" section was handled.
+- **Systematic 320px reflow sweep of every per-edition page**: closed
+  2026-09-08 (eightieth intensive run) - a standing health check first
+  (`pnpm install`; `pnpm outdated` still shows only the blocked `typescript`
+  7 entry, re-confirmed via `npm view @astrojs/check@latest
+  peerDependencies`; `pnpm dlx knip --no-config-hints` matched the standing
+  baseline; `pnpm lint` 0/0/0 across 170 files; `pnpm test` 533/533 unit;
+  `pnpm build` 711 pages; `check:links`/`check:sitemap`/`check:precache`/
+  `check:perf`/`check:pdfs` all clean and byte-for-byte unchanged from the
+  seventy-ninth run's baseline). Took the seventy-ninth run's own suggested
+  next step directly: that run fixed one real 320px overflow bug on the
+  `/competitions/world-cup` *landing* page but never checked whether any of
+  the site's ~200 per-edition pages (`/competitions/<family>/<year>/`, a
+  different template with no filter controls) have an equivalent problem at
+  the same width.
+  Added a new `pnpm check:reflow` script (`scripts/check-reflow.mjs`,
+  modeled on `check-lighthouse.mjs`'s `astro preview` daemon dance and
+  Chromium-launch fallbacks) that discovers every edition-page directory
+  under `dist/competitions/` and `dist/hr/competitions/` by name (any
+  directory starting with a digit - a year, a season like "2018-19", or a
+  disambiguated year like "1959-argentina" - as opposed to a sibling
+  landing-page directory named after its family), loads each one at the
+  same 320px viewport and `scrollWidth - clientWidth` measurement every
+  hand-written reflow assertion in `tests/e2e/mobile.spec.ts` already uses,
+  and reports any page that overflows. Ran it against all 404 edition pages
+  (202 per language x 2 - EN/HR): **zero overflow found** on every single
+  one, so no content or component fix was needed this run - the World Cup
+  landing page's filter-select bug the seventy-ninth run fixed was specific
+  to that page's own form controls, not a shape every edition page shares.
+  Kept as a permanent, reusable script (not a one-off finding) so a future
+  layout or content change that introduces a real 320px regression on any
+  edition page gets caught by running it again, the same standing-tool
+  reasoning `check:lighthouse` already established; not wired into
+  `.github/workflows/ci.yml` for the same reason `check:lighthouse` isn't -
+  a ~400-page-load sweep is much slower than this repo's other `check:*`
+  scripts, so both stay manual/intensive-run tools rather than required PR
+  gates. Extracted the script's pure logic (`isEditionDirName`,
+  `dirToPagePath`, `pagesOverflowing`) into exported functions with new unit
+  tests in `tests/unit/checkReflow.test.ts` (9 cases), the same
+  I/O-vs-pure-logic split `check-page-weight.mjs`/`checkPageWeight.test.ts`
+  already established, rather than leaving the whole script untested the
+  way `check-lighthouse.mjs` (no pure functions to extract - every audit
+  score comes from a live Lighthouse run) is. No `content/*.md` or
+  PDF-source file touched, so no `pnpm build:pdfs` regeneration was needed;
+  `check:pdfs` stayed clean at 700/700 throughout. While researching Copa
+  América's own next open captain question (this routine's own top content
+  priority), found and corrected the stale "1983/1987 winning captains"
+  note the entry directly above documents. Full standing health check
+  clean: `pnpm lint` (0/0/0), `pnpm test` (542/542 unit, up from 533 - the 9
+  new cases), `pnpm build` (711 pages, unchanged), `check:links`
+  (715 pages)/`check:sitemap` (710 entries)/`check:precache` (37 URLs)/
+  `check:perf` (heaviest page `hr/records`, 583.4 KB, unchanged - no content
+  edit)/`check:pdfs` (700/700 fresh) all clean and unchanged from this run's
+  own opening baseline, full cold-start `pnpm test:e2e` also run (see
+  `docs/PROJECT_STATUS.md`'s matching entry for the final count). **Left for
+  a future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025) - Copa América's own captain list is
+  now fully closed, per the correction above, so it drops off this list
+  entirely. With the 320px reflow angle now swept clean across every
+  edition page too, a future run could extend the same script to cover the
+  remaining ~200 non-edition pages (landing pages, profiles, `/records`,
+  the comparison tools) for full-site 320px coverage, or pick a different
+  manually-discoverable UX edge case (extreme zoom, `prefers-reduced-motion`)
+  the automated suite doesn't exercise yet.
