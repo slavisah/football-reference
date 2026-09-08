@@ -435,8 +435,27 @@ main {
     display: revert !important;
   }
 
+  /* `.t-wrap`'s screen-only `overflow-x: auto` (the small-screen horizontal
+     scrollbar) has no paper equivalent - a reader can't scroll a printed
+     page, so anything past its right edge was silently clipped instead of
+     wrapping onto the page. Confirmed as a real bug in the shipped
+     downloadable PDFs for every wide table (World Cup, EURO, Nations League
+     HR, Copa América HR, the /records rivalries table): `pnpm check:pdfs`
+     only hashes source content for freshness, never checks the rendered
+     layout actually fits the A4-landscape page, so this had no automated
+     coverage. `table-layout: fixed` plus wrapping cells makes every column
+     share the page width and wrap its own content instead of growing past
+     it - TournamentTable.astro's own scoped `<style>` block carries the
+     matching header-`white-space` override this needs (its `thead th`
+     `nowrap` rule has scoping-attribute specificity a plain selector here
+     can never outrank, see that file's own comment). */
+  .t-wrap {
+    overflow-x: visible;
+  }
+
   .t-table {
     width: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
   }
 
@@ -444,6 +463,8 @@ main {
   .t-table td {
     border: 1px solid #999;
     padding: 4px 6px;
+    white-space: normal;
+    overflow-wrap: break-word;
   }
 
   .t-table td::before {

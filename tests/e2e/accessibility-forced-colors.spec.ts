@@ -41,8 +41,8 @@ import { TRANSLATED_PATHS } from '../../src/lib/i18n';
 // checks that already caught the two real bugs this file exists to guard.
 async function runAxe(page: Page) {
   const results = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-    .disableRules(['region', 'color-contrast'])
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice', 'experimental', 'ACT', 'review-item'])
+    .disableRules(['region', 'color-contrast', 'color-contrast-enhanced'])
     .analyze();
   expect(results.violations, formatViolations(results.violations)).toEqual([]);
 }

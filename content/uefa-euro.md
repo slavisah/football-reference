@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-09-01
+lastReviewed: 2026-09-04
 status: verified
 ---
 
@@ -79,6 +79,16 @@ A third-place match was played through 1980. From 1984 onward, UEFA recognizes b
 - **2016:** Renato Sanches (Portugal).
 - **2020:** Pedri (Spain).
 - **2024:** Lamine Yamal (Spain).
+
+## Team of the Tournament winners
+
+- UEFA's Technical Study Group has named an official Team of the Tournament (a "Best XI") at most EUROs since 1996, based on player performances across the whole competition. Two editions in that span - 2000 and 2012 - are deliberately excluded: UEFA published an extended squad-of-the-tournament (22 players in 2000, a full 23-player squad including three goalkeepers in 2012) rather than naming a single eleven that year, so there is no one clean XI to list without picking an arbitrary subset.
+- **1996:** Andreas Köpke (Germany, goalkeeper); Laurent Blanc (France), Marcel Desailly (France), Matthias Sammer (Germany), Paolo Maldini (Italy); Paul Gascoigne (England), Karel Poborský (Czech Republic), Dieter Eilts (Germany); Alan Shearer (England), Hristo Stoichkov (Bulgaria), Davor Šuker (Croatia) - champions Germany supplied three, the most of any team, despite Italy's Maldini making the cut even though Italy itself was eliminated in the group stage.
+- **2004:** Petr Čech (Czech Republic, goalkeeper); Traianos Dellas (Greece), Ricardo Carvalho (Portugal), Giourkas Seitaridis (Greece), Gianluca Zambrotta (Italy); Maniche (Portugal), Pavel Nedvěd (Czech Republic), Theodoros Zagorakis (Greece); Cristiano Ronaldo (Portugal), Milan Baroš (Czech Republic), Wayne Rooney (England) - champions Greece supplied three, including Zagorakis, both captain and Player of the Tournament that year (see the sections above and below).
+- **2008:** Iker Casillas (Spain, goalkeeper); Philipp Lahm (Germany), Carles Puyol (Spain), Carlos Marchena (Spain), Yuri Zhirkov (Russia); Luka Modrić (Croatia), Marcos Senna (Spain), Xavi Hernández (Spain), Hamit Altıntop (Türkiye); Andrei Arshavin (Russia), David Villa (Spain) - champions Spain supplied six, the most of any team in this section.
+- **2016:** Rui Patrício (Portugal, goalkeeper); Joshua Kimmich (Germany), Jérôme Boateng (Germany), Pepe (Portugal), Raphaël Guerreiro (Portugal); Toni Kroos (Germany), Joe Allen (Wales); Antoine Griezmann (France), Aaron Ramsey (Wales), Dimitri Payet (France), Cristiano Ronaldo (Portugal) - champions Portugal supplied four, the most of any team; Cristiano Ronaldo's second selection on this list, twelve years after 2004.
+- **2020:** Gianluigi Donnarumma (Italy, goalkeeper); Kyle Walker (England), Leonardo Bonucci (Italy), Harry Maguire (England), Leonardo Spinazzola (Italy); Jorginho (Italy), Pierre-Emile Højbjerg (Denmark), Pedri (Spain); Federico Chiesa (Italy), Romelu Lukaku (Belgium), Raheem Sterling (England) - champions Italy supplied five, the most of any team.
+- **2024:** Mike Maignan (France, goalkeeper); Kyle Walker (England), William Saliba (France), Manuel Akanji (Switzerland), Marc Cucurella (Spain); Rodri (Spain), Dani Olmo (Spain), Fabián Ruiz (Spain); Lamine Yamal (Spain), Jamal Musiala (Germany), Nico Williams (Spain) - champions Spain supplied six, the most of any team; Kyle Walker's second consecutive selection, the only player named in both 2020 and 2024 despite England not winning either tournament.
 
 ## Winning managers
 

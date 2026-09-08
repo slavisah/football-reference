@@ -177,8 +177,8 @@ test.describe('Find a team accessibility', () => {
       await page.keyboard.press('ArrowDown');
 
       const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-        .disableRules(['region'])
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice', 'experimental', 'ACT', 'review-item'])
+        .disableRules(['region', 'color-contrast-enhanced'])
         .analyze();
       expect(results.violations).toEqual([]);
     });

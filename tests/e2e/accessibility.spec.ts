@@ -44,8 +44,8 @@ for (const colorScheme of COLOR_SCHEMES) {
         await page.goto(target);
 
         const results = await new AxeBuilder({ page })
-          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-          .disableRules(['region'])
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice', 'experimental', 'ACT', 'review-item'])
+          .disableRules(['region', 'color-contrast-enhanced'])
           .analyze();
 
         expect(results.violations, formatViolations(results.violations)).toEqual([]);
@@ -70,8 +70,8 @@ for (const colorScheme of COLOR_SCHEMES) {
         await expect(page.locator('#site-menu')).toHaveClass(/is-open/);
 
         const results = await new AxeBuilder({ page })
-          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-          .disableRules(['region'])
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice', 'experimental', 'ACT', 'review-item'])
+          .disableRules(['region', 'color-contrast-enhanced'])
           .analyze();
 
         expect(results.violations, formatViolations(results.violations)).toEqual([]);
@@ -119,8 +119,8 @@ for (const colorScheme of COLOR_SCHEMES) {
 
           const results = await new AxeBuilder({ page })
             .include('.on-this-day')
-            .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-            .disableRules(['region'])
+            .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice', 'experimental', 'ACT', 'review-item'])
+            .disableRules(['region', 'color-contrast-enhanced'])
             .analyze();
 
           expect(results.violations, formatViolations(results.violations)).toEqual([]);
@@ -152,8 +152,8 @@ for (const colorScheme of COLOR_SCHEMES) {
       await page.goto('teams/brazil');
 
       const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-        .disableRules(['region'])
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice', 'experimental', 'ACT', 'review-item'])
+        .disableRules(['region', 'color-contrast-enhanced'])
         .analyze();
 
       expect(results.violations, formatViolations(results.violations)).toEqual([]);
@@ -163,8 +163,8 @@ for (const colorScheme of COLOR_SCHEMES) {
       await page.goto('hr/teams/brazil');
 
       const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-        .disableRules(['region'])
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice', 'experimental', 'ACT', 'review-item'])
+        .disableRules(['region', 'color-contrast-enhanced'])
         .analyze();
 
       expect(results.violations, formatViolations(results.violations)).toEqual([]);
@@ -191,8 +191,8 @@ for (const colorScheme of COLOR_SCHEMES) {
       await page.goto('players/gerd-muller');
 
       const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-        .disableRules(['region'])
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice', 'experimental', 'ACT', 'review-item'])
+        .disableRules(['region', 'color-contrast-enhanced'])
         .analyze();
 
       expect(results.violations, formatViolations(results.violations)).toEqual([]);
@@ -204,8 +204,8 @@ for (const colorScheme of COLOR_SCHEMES) {
       await page.goto('hr/players/gerd-muller');
 
       const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-        .disableRules(['region'])
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice', 'experimental', 'ACT', 'review-item'])
+        .disableRules(['region', 'color-contrast-enhanced'])
         .analyze();
 
       expect(results.violations, formatViolations(results.violations)).toEqual([]);

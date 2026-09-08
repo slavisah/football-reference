@@ -1,7 +1,7 @@
 ---
 title: Family Quiz
 slug: quiz
-lastReviewed: 2026-08-17
+lastReviewed: 2026-09-05
 status: verified
 ---
 
@@ -19,8 +19,8 @@ the quiz stays in sync as new editions are added.
   add it to your score.
 - Open "Just show me the answer" on any question to peek without playing.
 - Press "Restart quiz" to clear your answers and play again.
-- The "Champion order challenge" further down works differently: rank each
-  champion with its dropdown, then press "Check order".
+- The "Order challenge" further down works differently: rank each champion
+  or award winner with its dropdown, then press "Check order".
 
 ## Question types in this quiz
 
@@ -33,5 +33,6 @@ the quiz stays in sync as new editions are added.
   winner win it? (only asked about a one-time champion/winner)
 - Which team or player has won the most titles/awards in a competition
   overall?
-- Put four champions from a tournament in chronological order (earliest
+- Put four champions from a tournament, or four winners of an individual
+  award (Ballon d'Or, Golden Boot), in chronological order (earliest
   first).

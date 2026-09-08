@@ -85,8 +85,8 @@ test.describe('Copa América edition page', () => {
   test('has no WCAG violations', async ({ page }) => {
     await page.goto('competitions/copa-america/1959-ecuador');
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-      .disableRules(['region'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice', 'experimental', 'ACT', 'review-item'])
+      .disableRules(['region', 'color-contrast-enhanced'])
       .analyze();
     expect(results.violations).toEqual([]);
   });
@@ -146,8 +146,8 @@ test.describe('Croatian Copa América edition page', () => {
   test('has no WCAG violations', async ({ page }) => {
     await page.goto('hr/competitions/copa-america/1959-ecuador');
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-      .disableRules(['region'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice', 'experimental', 'ACT', 'review-item'])
+      .disableRules(['region', 'color-contrast-enhanced'])
       .analyze();
     expect(results.violations).toEqual([]);
   });

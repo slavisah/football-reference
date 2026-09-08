@@ -69,6 +69,41 @@ export function extractSections(markdown: string, headings: string[]): NoteSecti
 }
 
 /**
+ * A URL-fragment-safe id for a note heading, so EditorialNotes.astro's "Jump
+ * to a section" nav can link straight to a card instead of a reader having to
+ * scroll past a dozen unrelated ones. Handles the Croatian letters this
+ * site's hand-translated headings use: NFD normalization strips the
+ * combining diacritic off č/ć/š/ž (and their uppercase forms) since those
+ * decompose to a plain Latin letter plus a mark, but đ/Đ don't decompose at
+ * all (it's a distinct letter, not a base letter with a mark), so it needs
+ * its own replacement.
+ */
+export function slugifyHeading(heading: string): string {
+  return heading
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/gi, 'd')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/**
+ * slugifyHeading() for every section, guaranteeing a unique id per call even
+ * if two headings would otherwise collide (e.g. golden-boot.astro merging
+ * two content files' note arrays) by suffixing repeats with -2, -3, etc.
+ */
+export function slugifyHeadings(headings: string[]): string[] {
+  const seen = new Map<string, number>();
+  return headings.map((heading) => {
+    const base = slugifyHeading(heading);
+    const count = seen.get(base) ?? 0;
+    seen.set(base, count + 1);
+    return count === 0 ? base : `${base}-${count + 1}`;
+  });
+}
+
+/**
  * Minimal inline Markdown -> safe HTML for **bold**, *italic* and `code`
  * only - not a general Markdown parser. content/*.md notes only use these
  * three inline forms, and the source is trusted editorial content, but the

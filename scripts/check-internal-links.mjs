@@ -78,7 +78,7 @@ export function candidateDistPaths(internalPath) {
   return hasExtension ? [trimmed] : [`${trimmed}/index.html`, `${trimmed}.html`];
 }
 
-async function listHtmlFiles(dir) {
+export async function listHtmlFiles(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
   const files = await Promise.all(
     entries.map(async (entry) => {

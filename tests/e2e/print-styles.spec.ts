@@ -17,8 +17,8 @@ import AxeBuilder from '@axe-core/playwright';
 
 async function runAxe(page: Page) {
   const results = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-    .disableRules(['region'])
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice', 'experimental', 'ACT', 'review-item'])
+    .disableRules(['region', 'color-contrast-enhanced'])
     .analyze();
   expect(results.violations, formatViolations(results.violations)).toEqual([]);
 }
@@ -380,4 +380,82 @@ test.describe('World Cup story reveal in print media', () => {
     await expect(reveal.locator('p')).toBeVisible();
     await expect(reveal.locator('p')).toContainText('Spain won its second title in 2026.');
   });
+});
+
+// Regression coverage for a real bug the seventy-third intensive run found
+// by direct inspection, not by any existing automated check: `.t-wrap`'s
+// screen-only `overflow-x: auto` (the small-screen horizontal scrollbar) had
+// no paper equivalent, and every wide `.t-table` (7+ columns, e.g. World Cup's
+// Year/Host(s)/Teams/Winner/Runner-up/Third/Fourth/Final/Final date/Top
+// scorer/Story) rendered wider than the printable A4-landscape page - so
+// content past the page's right edge was silently clipped in the actual
+// downloaded PDF, not just scrollable as it is on screen. `pnpm check:pdfs`
+// only ever hashed source content for freshness, and every other test in
+// this file runs at the suite's default 360px mobile viewport, which is
+// narrower than the print stylesheet's own mobile-card breakpoint and so
+// never exercised the real table layout at all - neither one could ever have
+// caught this. This test approximates the actual print-to-PDF layout width
+// (scripts/generate-pdfs.mjs's `@page` rule: A4 landscape, 297mm wide, 12mm
+// margins each side = 273mm of usable content) by setting the viewport to
+// that same width before emulating print media, then confirms every element
+// on the page fits inside it - the same measurement approach the site's own
+// filter-`<select>`-width fix (docs/ROADMAP.md, seventieth intensive run)
+// already established for a different clipping bug.
+const PRINT_CONTENT_WIDTH_PX = Math.round((273 * 96) / 25.4); // ~1032px
+
+// The seventy-third run's own fix (`.t-wrap`/`.t-table` in global.css) is
+// global, but its regression list only covered the eight page/table shapes
+// that were confirmed clipped at the time (World Cup, EURO, one language
+// each of Nations League/Copa América, and /records) - Ballon d'Or, Golden
+// Boot, and the other language of Nations League/Copa América all share the
+// exact same `TournamentTable`/`.t-table` markup and were just as capable of
+// clipping, but had zero regression coverage of their own. Widened to every
+// competition/award page in both languages, plus /compare and
+// /compare-players' "All national teams"/"All players" table
+// (`.compare__table--all`, also wrapped in `.t-wrap` per that page's own
+// styles) - a different table class from `.t-table` that the original fix's
+// `table-layout: fixed` rule never actually touched, so it needed checking
+// on its own merits rather than assumed covered by the same fix.
+const WIDE_TABLE_PRINT_PAGES = [
+  'competitions/world-cup',
+  'hr/competitions/world-cup',
+  'competitions/euro',
+  'hr/competitions/euro',
+  'competitions/nations-league',
+  'hr/competitions/nations-league',
+  'competitions/copa-america',
+  'hr/competitions/copa-america',
+  'competitions/ballon-dor',
+  'hr/competitions/ballon-dor',
+  'competitions/golden-boot',
+  'hr/competitions/golden-boot',
+  'records',
+  'hr/records',
+  'compare',
+  'hr/compare',
+  'compare-players',
+  'hr/compare-players',
+];
+
+test.describe('Wide tables fit the printable page width, not just the screen', () => {
+  for (const path of WIDE_TABLE_PRINT_PAGES) {
+    test(`/${path} has no element wider than the printable A4-landscape page`, async ({ page }) => {
+      await page.setViewportSize({ width: PRINT_CONTENT_WIDTH_PX, height: 1000 });
+      await page.goto(path);
+      await page.emulateMedia({ media: 'print' });
+
+      const overflowing = await page.evaluate((maxRight) => {
+        return [...document.querySelectorAll('body *')]
+          .filter((el) => {
+            const rect = el.getBoundingClientRect();
+            if (rect.width <= 0 || rect.height <= 0) return false;
+            if (getComputedStyle(el).display === 'none') return false;
+            return rect.right > maxRight + 2;
+          })
+          .map((el) => `${el.tagName}.${el.className}`);
+      }, PRINT_CONTENT_WIDTH_PX);
+
+      expect(overflowing).toEqual([]);
+    });
+  }
 });

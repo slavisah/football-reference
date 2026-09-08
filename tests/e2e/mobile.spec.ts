@@ -20,6 +20,31 @@ test.describe('World Cup page on a 360px phone', () => {
     expect(overflow).toBeLessThanOrEqual(1);
   });
 
+  test('has no horizontal page overflow at a 320px reflow width, even with the longest host selected', async ({
+    page,
+  }) => {
+    // WCAG 2.1 SC 1.4.10 Reflow's canonical test width (320 CSS px, the
+    // equivalent of 400% zoom on a 1280px viewport) is narrower than this
+    // site's own 360px phone design baseline every other test in this file
+    // uses - and it's a real device width too (first-generation iPhone SE).
+    // Regression case: `selectMinWidthRem()` (src/lib/tableSort.ts) sizes
+    // this page's host filter from its longest real value, the 2026 World
+    // Cup's "Canada, Mexico and United States" - generous enough (~21rem)
+    // that the field's own inline `min-width` used to exceed the entire
+    // viewport at 320px, pushing the page itself into horizontal overflow
+    // regardless of `.filters`' own `flex-wrap`, which only redistributes
+    // multiple fields across lines and can't shrink one field below its own
+    // min-width. Fixed by capping each field's inline min-width at
+    // `min(...rem, 100%)` so it never exceeds its own row's available width.
+    await page.setViewportSize({ width: 320, height: 740 });
+    await page.locator('#world-cup-host').selectOption({ label: 'Canada, Mexico and United States' });
+    const overflow = await page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollWidth - el.clientWidth;
+    });
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
   test('a reader can find the 2018 champion', async ({ page }) => {
     const row = page.locator('tbody tr[data-year="2018"]');
     await expect(row).toBeVisible();
@@ -150,6 +175,21 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(page.getByRole('heading', { name: 'Editorial notes' })).toBeVisible();
     // *Maracanazo* renders as emphasis, not literal asterisks.
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
+  });
+
+  test('a "Jump to a section" nav links straight to each notes card, past the eleven-card scroll', async ({
+    page,
+  }) => {
+    const jumpNav = page.locator('nav.jump-nav');
+    await expect(jumpNav).toBeVisible();
+    await expect(jumpNav).toHaveAccessibleName('Jump to a section');
+    await expect(jumpNav.locator('a')).toHaveCount(11);
+
+    const goldenGloveLink = jumpNav.getByRole('link', { name: 'Golden Glove winners' });
+    await expect(goldenGloveLink).toHaveAttribute('href', '#golden-glove-winners');
+    await goldenGloveLink.click();
+    await expect(page).toHaveURL(/#golden-glove-winners$/);
+    await expect(page.locator('#golden-glove-winners')).toBeInViewport();
   });
 
   test('sorting by Winner (A–Z) groups all Argentina rows first', async ({ page }) => {
@@ -288,9 +328,11 @@ test.describe('EURO page on a 360px phone', () => {
     await expect(
       page.getByRole('heading', { name: 'Player of the Tournament winners', exact: true }),
     ).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('Rodri (Spain)')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Rodri (Spain)').first()).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Young Player of the Tournament winners' })).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('Lamine Yamal (Spain)')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Lamine Yamal (Spain)').first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Team of the Tournament winners' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Andreas Köpke (Germany, goalkeeper)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Luis de la Fuente (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Winning captains' })).toBeVisible();
@@ -436,6 +478,21 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
   });
 
+  test('has a translated "Skoči na odjeljak" jump nav linking straight to each notes card', async ({
+    page,
+  }) => {
+    const jumpNav = page.locator('nav.jump-nav');
+    await expect(jumpNav).toBeVisible();
+    await expect(jumpNav).toHaveAccessibleName('Skoči na odjeljak');
+    await expect(jumpNav.locator('a')).toHaveCount(11);
+
+    const link = jumpNav.getByRole('link', { name: 'Dobitnici Zlatne rukavice' });
+    await expect(link).toHaveAttribute('href', '#dobitnici-zlatne-rukavice');
+    await link.click();
+    await expect(page).toHaveURL(/#dobitnici-zlatne-rukavice$/);
+    await expect(page.locator('#dobitnici-zlatne-rukavice')).toBeInViewport();
+  });
+
   test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
     page,
     request,
@@ -533,7 +590,11 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
     await expect(
       page.getByRole('heading', { name: 'Dobitnici nagrade za najboljeg mladog igrača turnira' }),
     ).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('Lamine Yamal (Španjolska)')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Lamine Yamal (Španjolska)').first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Idealna momčad turnira' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Andreas Köpke (Njemačka, vratar)'),
+    ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Izbornici prvaka' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Luis de la Fuente (Španjolska)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Kapetani prvaka' })).toBeVisible();
@@ -1176,6 +1237,13 @@ test.describe('Copa América page on a 360px phone', () => {
         .locator('.notes__card')
         .getByText('Lionel Messi (Argentina) - his second, back-to-back, though an injury'),
     ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Héctor Chumpitaz (Peru)'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Aldo Florentín (Paraguay) - stepped into the armband'),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Lúcio (Brazil).')).toBeVisible();
   });
 
   test('shows an audited "Format" badge per edition', async ({ page }) => {
@@ -1398,6 +1466,13 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
         .locator('.notes__card')
         .getByText('Lionel Messi (Argentina) - njegova druga, uzastopna titula'),
     ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Héctor Chumpitaz (Peru)'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Aldo Florentín (Paragvaj) - preuzeo je vrpcu'),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Lúcio (Brazil).')).toBeVisible();
   });
 
   test('shows the same champion totals as the English page', async ({ page, baseURL }) => {
@@ -1860,6 +1935,21 @@ test.describe('Records page on a 360px phone', () => {
     expect(overflow).toBeLessThanOrEqual(1);
   });
 
+  test('a "Jump to a section" nav links straight to each of the page\'s thirteen sections', async ({
+    page,
+  }) => {
+    const jumpNav = page.locator('nav.jump-nav');
+    await expect(jumpNav).toBeVisible();
+    await expect(jumpNav).toHaveAccessibleName('Jump to a section');
+    await expect(jumpNav.locator('a')).toHaveCount(13);
+
+    const rivalriesLink = jumpNav.getByRole('link', { name: 'Fiercest rivalries' });
+    await expect(rivalriesLink).toHaveAttribute('href', '#rivalries-heading');
+    await rivalriesLink.click();
+    await expect(page).toHaveURL(/#rivalries-heading$/);
+    await expect(page.locator('#rivalries-heading')).toBeInViewport();
+  });
+
   test('shows a champions timeline card and a title-ranking list per competition', async ({
     page,
   }) => {
@@ -2068,6 +2158,21 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
       return el.scrollWidth - el.clientWidth;
     });
     expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('has a translated "Skoči na odjeljak" jump nav linking straight to each of the thirteen sections', async ({
+    page,
+  }) => {
+    const jumpNav = page.locator('nav.jump-nav');
+    await expect(jumpNav).toBeVisible();
+    await expect(jumpNav).toHaveAccessibleName('Skoči na odjeljak');
+    await expect(jumpNav.locator('a')).toHaveCount(13);
+
+    const link = jumpNav.getByRole('link', { name: 'Najveći rivaliteti' });
+    await expect(link).toHaveAttribute('href', '#rivalries-heading');
+    await link.click();
+    await expect(page).toHaveURL(/#rivalries-heading$/);
+    await expect(page.locator('#rivalries-heading')).toBeInViewport();
   });
 
   test('renders translated chrome and headings', async ({ page }) => {
@@ -2476,6 +2581,21 @@ test.describe('Quiz page on a 360px phone', () => {
     await expect(yearCard.locator('.quiz-card__feedback')).toHaveText('Correct!');
   });
 
+  test('includes a "who did the champion beat in the final" question for the UEFA Nations League - previously the one team competition missing this question type, now matching its three siblings (FIFA World Cup, UEFA EURO, Copa América), all four of which have a runner-up column in their Finals/editions table', async ({
+    page,
+  }) => {
+    const runnerUpCard = page
+      .locator('.quiz-card')
+      .filter({ hasText: /Who did .+ beat in the \S+ UEFA Nations League final\?/ })
+      .first();
+    await expect(runnerUpCard).toBeVisible();
+
+    const answerIndex = Number(await runnerUpCard.getAttribute('data-answer-index'));
+    await runnerUpCard.locator('input[type="radio"]').nth(answerIndex).check();
+    await runnerUpCard.locator('.quiz-card__check').click();
+    await expect(runnerUpCard.locator('.quiz-card__feedback')).toHaveText('Correct!');
+  });
+
   test('answering a question updates the score, and can be checked with the keyboard', async ({
     page,
   }) => {
@@ -2518,7 +2638,7 @@ test.describe('Quiz page on a 360px phone', () => {
   test('champion order challenge: ranking correctly and incorrectly both surface feedback', async ({
     page,
   }) => {
-    const heading = page.getByRole('heading', { name: 'Champion order challenge' });
+    const heading = page.getByRole('heading', { name: 'Order challenge' });
     await expect(heading).toBeVisible();
 
     const firstOrderCard = page.locator('.quiz-card:has(.quiz-order__items)').first();
@@ -2624,11 +2744,18 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
   test('renders translated chrome, prompts and controls', async ({ page }) => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
     await expect(page.getByRole('heading', { name: 'Obiteljski kviz', level: 1 })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Izazov: poredaj prvake' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Izazov: poredaj' })).toBeVisible();
     const firstCard = page.locator('.quiz-card').first();
-    await expect(firstCard.locator('.quiz-card__prompt')).toContainText('godine?');
     await expect(firstCard.locator('.quiz-card__check')).toHaveText('Provjeri odgovor');
     await expect(firstCard.locator('.quiz-card__reveal summary')).toHaveText('Samo mi pokaži odgovor');
+    // The final quiz order is a seeded shuffle across every pool, so which
+    // question type lands first shifts whenever any pool's question count
+    // changes (e.g. the new UEFA Nations League runner-up pool added below) -
+    // not every card's prompt ends in "godine?" (mostTitlesQuestion's Croatian
+    // prompt doesn't), so check a "by year" card wherever it lands instead of
+    // assuming it's first.
+    const yearCard = page.locator('.quiz-card').filter({ hasText: /godine\?/ }).first();
+    await expect(yearCard).toBeVisible();
   });
 
   test('answering a question shows Croatian feedback and updates the score', async ({ page }) => {
@@ -2669,6 +2796,21 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
     await yearCard.locator('input[type="radio"]').nth(answerIndex).check();
     await yearCard.locator('.quiz-card__check').click();
     await expect(yearCard.locator('.quiz-card__feedback')).toHaveText('Točno!');
+  });
+
+  test('includes a "koga je pobijedio ... u finalu natjecanja UEFA Liga nacija" question, the Croatian mirror of the new UEFA Nations League runner-up quiz question', async ({
+    page,
+  }) => {
+    const runnerUpCard = page
+      .locator('.quiz-card')
+      .filter({ hasText: /Koga je pobijedio .+ u finalu natjecanja UEFA Liga nacija \S+\. godine\?/ })
+      .first();
+    await expect(runnerUpCard).toBeVisible();
+
+    const answerIndex = Number(await runnerUpCard.getAttribute('data-answer-index'));
+    await runnerUpCard.locator('input[type="radio"]').nth(answerIndex).check();
+    await runnerUpCard.locator('.quiz-card__check').click();
+    await expect(runnerUpCard.locator('.quiz-card__feedback')).toHaveText('Točno!');
   });
 
   test('champion order challenge: a correct ranking shows Croatian feedback', async ({ page }) => {
@@ -3015,20 +3157,10 @@ test.describe('Installability and offline reading', () => {
     expect(scope).toBe('http://localhost:4321/football-reference/');
   });
 
-  test('the service worker skips eager precaching for a Save-Data reader', async ({ page }) => {
-    // Real navigator.connection.saveData emulation isn't controllable from
-    // Playwright, so this checks the generated script's own install-time
-    // logic directly (mirrors selectInstallCacheUrls() in
-    // tests/unit/offlineCache.test.ts, which covers the actual decision).
-    await page.goto('');
-    const swSource = await page.evaluate(async () => {
-      const response = await fetch('/football-reference/sw.js');
-      return response.text();
-    });
-    expect(swSource).toContain('self.navigator.connection.saveData');
-    expect(swSource).toContain('cache.addAll(installCacheUrls())');
-    expect(swSource).toMatch(/return saveData \? Array\.from\(new Set\(\[HOME_URL_EN, HOME_URL_HR\]\)\) : PRECACHE_URLS;/);
-  });
+  // A real, CDP-driven end-to-end check of this same Save-Data install-time
+  // behavior (not just a source-text assertion) lives in
+  // tests/e2e/pwa-savedata.spec.ts, which also carries the source-text
+  // check this file used to have here.
 
   test('a previously visited page keeps working offline', async ({ page, context }) => {
     await page.goto('');

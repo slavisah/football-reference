@@ -4,6 +4,7 @@ import ChampionsTimeline from '../components/ChampionsTimeline.astro';
 import ChampionsSummary from '../components/ChampionsSummary.astro';
 import References from '../components/References.astro';
 import PrintDownloadLink from '../components/PrintDownloadLink.astro';
+import SectionJumpNav from '../components/SectionJumpNav.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import {
   buildBiggestFinalMargins,
@@ -221,6 +222,28 @@ const jsonLd: JsonLdObject[] = [
     ? [buildRivalriesItemList(rivalries, { pageUrl, name: 'Fiercest rivalries' })]
     : []),
 ];
+
+// One pill per top-level section below, reusing each section's own existing
+// heading id rather than deriving a new one - this page's thirteen sections
+// (twelve rankings/timelines plus the identity note) have grown one at a
+// time over many runs with no way to reach one without scrolling past every
+// section before it, the same gap EditorialNotes.astro's own "Jump to a
+// section" nav closed for competition/award pages' note cards.
+const jumpSections = [
+  { id: 'timeline-heading', label: 'Champions timeline' },
+  { id: 'teams-heading', label: 'Most successful teams' },
+  { id: 'hosts-heading', label: 'Most frequent hosts' },
+  { id: 'home-soil-heading', label: 'Titles won on home soil' },
+  { id: 'streaks-heading', label: 'Back-to-back champions' },
+  { id: 'nearly-champions-heading', label: 'Nearly champions' },
+  { id: 'nearly-finalists-heading', label: 'Nearly finalists' },
+  { id: 'title-gaps-heading', label: 'Longest wait between titles' },
+  { id: 'final-margins-heading', label: 'Biggest final wins' },
+  { id: 'rivalries-heading', label: 'Fiercest rivalries' },
+  { id: 'award-timeline-heading', label: 'Individual award winners timeline' },
+  { id: 'award-rankings-heading', label: 'Most awards' },
+  { id: 'identity-heading', label: 'How historical nation names are handled' },
+];
 ---
 
 <BaseLayout
@@ -240,6 +263,8 @@ const jsonLd: JsonLdObject[] = [
       />
     </header>
 
+    <SectionJumpNav sections={jumpSections} />
+
     <section class="stack" aria-labelledby="timeline-heading">
       <h2 id="timeline-heading">Champions timeline</h2>
       <p class="muted">
@@ -251,6 +276,7 @@ const jsonLd: JsonLdObject[] = [
           <ChampionsTimeline
             id={`timeline-${c.key}`}
             heading={c.label}
+            landmark={false}
             entries={buildTimeline(c.data.editions)}
           />
         ))
@@ -272,6 +298,7 @@ const jsonLd: JsonLdObject[] = [
                 champions={c.data.champions}
                 scaleMax={c.data.editions.length}
                 heading={c.label}
+                landmark={false}
                 description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
               />
               <a class="records__teams-link" href={c.href}>
@@ -304,6 +331,7 @@ const jsonLd: JsonLdObject[] = [
                 champions={buildHostsSummary(c.data.editions)}
                 scaleMax={c.data.editions.length}
                 heading={c.label}
+                landmark={false}
                 description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
                 icon="🏟️"
                 unit={['time hosted', 'times hosted']}
@@ -343,6 +371,7 @@ const jsonLd: JsonLdObject[] = [
                     champions={homeSoil}
                     scaleMax={Math.max(...homeSoil.map((s) => s.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
                     icon="🏠"
                     unit={['home-soil title', 'home-soil titles']}
@@ -386,6 +415,7 @@ const jsonLd: JsonLdObject[] = [
                     champions={streaks}
                     scaleMax={Math.max(...streaks.map((s) => s.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
                     icon="🔥"
                     unit={['edition in a row', 'editions in a row']}
@@ -429,6 +459,7 @@ const jsonLd: JsonLdObject[] = [
                     champions={nearlyChampions}
                     scaleMax={Math.max(...nearlyChampions.map((s) => s.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
                     icon="🥈"
                     unit={['runner-up finish', 'runner-up finishes']}
@@ -474,6 +505,7 @@ const jsonLd: JsonLdObject[] = [
                     champions={nearlyFinalists}
                     scaleMax={Math.max(...nearlyFinalists.map((s) => s.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
                     icon="🥉"
                     unit={['semifinal finish', 'semifinal finishes']}
@@ -519,6 +551,7 @@ const jsonLd: JsonLdObject[] = [
                     champions={gaps}
                     scaleMax={Math.max(...gaps.map((g) => g.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
                     icon="⏳"
                     unit={['year', 'years']}
@@ -563,6 +596,7 @@ const jsonLd: JsonLdObject[] = [
                     champions={margins}
                     scaleMax={Math.max(...margins.map((m) => m.titles))}
                     heading={c.label}
+                    landmark={false}
                     description={`Generated from the ${c.data.editions.length} ${c.label} editions.`}
                     icon="⚽"
                     unit={['goal', 'goals']}
@@ -648,6 +682,7 @@ const jsonLd: JsonLdObject[] = [
           <ChampionsTimeline
             id={`timeline-${a.key}`}
             heading={a.label}
+            landmark={false}
             entries={buildTimeline(a.data.editions)}
           />
         ))
@@ -669,6 +704,7 @@ const jsonLd: JsonLdObject[] = [
                 champions={a.data.champions}
                 scaleMax={a.data.editions.length}
                 heading={a.label}
+                landmark={false}
                 description={`Generated from the ${a.data.editions.length} ${a.label} editions.`}
                 unit={['award', 'awards']}
               />
@@ -791,5 +827,27 @@ const jsonLd: JsonLdObject[] = [
   .records__rivalries-table tbody tr:last-child th,
   .records__rivalries-table tbody tr:last-child td {
     border-bottom: none;
+  }
+
+  /* Same paper-clipping bug global.css's `.t-table` print rules fix, on this
+     page's own separately-styled rivalries table: the screen-only `nowrap`/
+     `min-width: 34rem`/`.t-wrap`'s horizontal scrollbar have no paper
+     equivalent, so content past the page's right edge was silently clipped
+     in the downloaded PDF instead of wrapping. */
+  @media print {
+    .t-wrap {
+      overflow-x: visible;
+    }
+
+    .records__rivalries-table {
+      min-width: 0;
+      table-layout: fixed;
+    }
+
+    .records__rivalries-table th,
+    .records__rivalries-table td {
+      white-space: normal;
+      overflow-wrap: break-word;
+    }
   }
 </style>
