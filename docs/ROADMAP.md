@@ -3186,3 +3186,71 @@ back clean:
   genuinely new source lead). With reflow, Lighthouse and text-zoom all now
   full-site clean, a future run could look at `prefers-contrast`/
   `forced-colors` coverage depth, or another fresh content/quality angle.
+- **`check:print-width`: a new full-site print-media width sweep**: closed
+  2026-09-08 (eighty-third intensive run) - a standing health check first
+  (`pnpm install`; `pnpm outdated` still shows only the blocked `typescript`
+  7 entry, re-confirmed; `pnpm dlx knip --no-config-hints` matched the
+  standing baseline; `pnpm lint` 0/0/0; `pnpm test` 542/542 unit; `pnpm build`
+  711 pages; `check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+  `check:pdfs` all clean and byte-for-byte unchanged from the eighty-second
+  run's baseline). Per this routine's own priority order, Copa América's
+  captain gap is fully closed and Nations League's Team of the Tournament for
+  2021/2023/2025 has now been re-confirmed unavailable across six consecutive
+  prior runs with no new source lead - re-attempting either would just repeat
+  a documented mistake, so this run took the eighty-second run's own closing
+  suggestion and looked for another quality angle.
+  `check:reflow`/`check:text-zoom` both widened their own stress axis (narrow
+  viewport, then doubled text size) to a genuinely full-site sweep across the
+  seventy-ninth through eighty-second runs, but the site's third stress axis -
+  print media, the rendering path all 700 downloadable PDFs actually depend
+  on - was still only covered by `tests/e2e/print-styles.spec.ts`'s
+  hand-curated `WIDE_TABLE_PRINT_PAGES` list (18 pages: the six competition/
+  award landing pages, `/records`, `/compare` and `/compare-players`, both
+  languages). Confirmed via `grep -rl '<table' src/` that this list is in
+  fact already exhaustive for the one bug class that motivated it (a real
+  HTML `<table>` overflowing the printable A4-landscape content width) - no
+  other `src/` file renders a raw `<table>` - so this wasn't a live bug the
+  way the seventy-third run's original filter-select/table-width fixes were.
+  What was still missing was the same "permanent full-site tool, not a fixed
+  manually-curated list" gap `check:reflow`/`check:text-zoom` already closed
+  for their own axes: a future content or component change could introduce
+  overflow at print width on any of the site's other ~700 pages (per-edition
+  pages, player/team profiles, the quiz, the directories, `/glossary`,
+  `/about/sources`) that `WIDE_TABLE_PRINT_PAGES` was never scoped to cover,
+  with nothing in place to catch it.
+  Added `scripts/check-print-width.mjs` (`pnpm check:print-width`), reusing
+  `check-reflow.mjs`'s page discovery/redirect-stub filtering and
+  `pagesOverflowing`/`OVERFLOW_TOLERANCE_PX` budget check rather than
+  duplicating already-tested pure logic - the only genuinely new step is
+  emulating print media (`page.emulateMedia({ media: 'print' })`) at the same
+  ~1032px usable A4-landscape content width `print-styles.spec.ts`'s own
+  `PRINT_CONTENT_WIDTH_PX` constant already uses, before the same
+  `scrollWidth - clientWidth` measurement every stress sweep in this repo
+  already uses. Carries the same import-side-effect entry-point guard
+  `check-reflow.mjs`/`check-text-zoom.mjs` established. New unit test
+  (`tests/unit/checkPrintWidth.test.ts`) pins the exported
+  `PRINT_CONTENT_WIDTH_PX` constant to both its derivation and the literal
+  1032px value, so it can't silently drift from `print-styles.spec.ts`'s own
+  copy. Ran it against all 711 real content pages (both languages): **zero
+  overflow found** - matches the hand-written spec's own clean result, no
+  code fix needed this run, but now a permanent, reusable script like
+  `check:lighthouse`/`check:reflow`/`check:text-zoom` so a future layout or
+  content change that breaks print-width layout anywhere on the site gets
+  caught. Not wired into `.github/workflows/ci.yml`, the same reasoning the
+  other three full-site sweeps document (a ~700-page-load sweep is too slow
+  for a required PR gate). No `content/*.md` or PDF-source file touched, so
+  `check:pdfs` stayed clean at 700/700 throughout with no regeneration
+  needed. Full standing health check clean: `pnpm lint` (0/0/0), `pnpm test`
+  (543/543 unit, up from 542 - the one new pure-constant test), `pnpm build`
+  (711 pages, unchanged), `check:links` (715 pages), `check:sitemap` (710
+  entries), `check:precache` (37 URLs), `check:perf` (heaviest page still
+  `hr/records`, 583.4 KB, unchanged), `check:pdfs` (700/700 fresh), the new
+  `check:print-width` (711/711 pages clean), full cold-start `pnpm test:e2e`
+  also run (see `docs/PROJECT_STATUS.md`'s matching entry for the final
+  count). **Left for a future pass:** the same environment-blocked items as
+  every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+  League's Team of the Tournament for 2021/2023/2025). With reflow,
+  Lighthouse, text-zoom and now print-width all full-site clean, a future run
+  could look at `prefers-contrast`/`forced-colors` coverage depth (still the
+  eighty-second run's own suggestion, not yet acted on), or another fresh
+  content/quality angle.
