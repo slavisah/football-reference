@@ -16192,13 +16192,20 @@ Copa América captains.
   copy-paste error corrected 2026-09-08 (eightieth intensive run) - see
   that entry below. There is no remaining Copa América captain gap.
 - `pnpm check:reflow` (`scripts/check-reflow.mjs`, added 2026-09-08,
-  eightieth intensive run) loads every per-edition page (both languages) at
-  a 320px viewport and fails on any horizontal overflow, the same
+  eightieth intensive run; widened to every one of the site's 711 pages by
+  the eighty-first run) loads every page (both languages) at a 320px
+  viewport and fails on any horizontal overflow, the same
   `scrollWidth - clientWidth` measurement `tests/e2e/mobile.spec.ts`'s own
   reflow assertions use. Like `check:lighthouse`, it's a manual/intensive-run
-  tool (a ~400-page-load sweep, too slow for a required PR gate) rather than
+  tool (a ~700-page-load sweep, too slow for a required PR gate) rather than
   part of `.github/workflows/ci.yml` - run it by hand after `pnpm build`
   when a layout or content change might affect narrow-viewport reflow.
+- `pnpm check:text-zoom` (`scripts/check-text-zoom.mjs`, added 2026-09-08,
+  eighty-second intensive run) is `check:reflow`'s WCAG 1.4.4 (Resize Text)
+  counterpart: same full-site page discovery and overflow measurement, but
+  at a standard 1280x800 desktop viewport with the root font-size doubled to
+  200%, instead of a narrower viewport at the default font size. Also a
+  manual/intensive-run tool, not a CI gate, for the same reason.
 
 ### Notes jump nav: an in-page "Jump to a section" link list for every long note-card list - closed 2026-09-04 (sixty-third intensive run)
 
@@ -18435,6 +18442,98 @@ nineteenth run, so re-check it's still holding rather than assuming a fresh
 gap), or return to a genuinely new content/quality angle now that both the
 320px-reflow and Lighthouse-coverage angles are fully closed out across
 every page shape.
+
+### `check:text-zoom`: a new WCAG 1.4.4 (Resize Text) full-site sweep - closed 2026-09-08 (eighty-second intensive run)
+
+A standing health check first (`pnpm install`, `pnpm outdated` still shows
+only the blocked `typescript` 7 entry, re-confirmed via `npm view
+@astrojs/check@latest peerDependencies`; `pnpm dlx knip --no-config-hints`
+matched every prior run's baseline - same one confirmed false positive;
+`pnpm lint` 0/0/0). Per this routine's own priority order (Copa América,
+then Nations League, then Ballon d'Or, then Golden Boot, then other roadmap
+items, then general quality), checked both content angles first: Copa
+América's winning-captains span has had no remaining gap since the
+sixty-second/sixty-seventh runs (see this file's "Known caveats" correction
+entry), and Nations League's Team of the Tournament for 2021/2023/2025 has
+now been independently re-confirmed unavailable across six consecutive
+prior runs (sixty-sixth through eighty-first), each with a genuinely
+different search strategy (English, then Italian/Dutch/German press, then a
+different query shape entirely). The seventy-eighth run's own closing note
+already named the failure mode a seventh attempt would repeat: picking a
+candidate without first checking whether it was already closed, burning
+WebSearch calls re-deriving a known dead end. With no new source lead, this
+run didn't re-attempt it a seventh time.
+
+Moved instead to the eighty-first run's own suggested next step: "a
+different manually-discoverable UX edge case (extreme zoom)." `check:reflow`
+and `check:lighthouse` both now cover every page on the site, but both stress
+the same axis - a *narrower viewport* (WCAG 1.4.10 Reflow, 320px). Neither
+exercises WCAG 1.4.4 Resize Text: a reader increasing their browser/OS text
+size at an *ordinary* desktop width, a distinct failure mode from narrowing
+the window - a fixed-width sibling element or a `min-width` rule that
+doesn't scale with the text around it can clip content under 1.4.4 even on
+a page that reflows perfectly at 320px, since nothing there depends on font
+size.
+
+Before writing any tooling, manually spot-checked whether there was a real
+signal to automate: a one-off Playwright script (not committed) loaded 11
+representative pages - home, `hr/records` (heaviest page), a World Cup
+landing page, a Copa América edition page, `/compare`, `/compare-players`,
+`/quiz`, a player profile (Messi), a team profile (Brazil), `/glossary`, and
+`/about/sources` - at a 1280x800 viewport with
+`document.documentElement.style.fontSize = '200%'`, and measured
+`scrollWidth - clientWidth`. All 11 came back at 0px overflow, consistent
+with `AGENTS.md`'s own mobile-first/relative-unit conventions (rem-based
+sizing throughout) already paying off here the same way they did for the
+320px reflow sweeps - a real signal worth building a permanent full-site
+check around, not a hunch that would have found nothing.
+
+Added `scripts/check-text-zoom.mjs` (`pnpm check:text-zoom`), modeled
+directly on `check-reflow.mjs`'s structure and reusing its exported
+`htmlFileToPagePath`/`isRedirectStubHtml`/`pagesOverflowing` plus
+`check-internal-links.mjs`'s `listHtmlFiles`, rather than duplicating
+already-tested pure logic - the only genuinely new step is *how* each page
+is stressed (font-size at a standard desktop viewport, not a narrower one)
+before the same overflow measurement every reflow check already uses.
+Carries the identical import-side-effect entry-point guard the eighty-first
+run's own fix established for `check-reflow.mjs`
+(`if (import.meta.url === \`file://${process.argv[1]}\`)`), so a future
+Vitest file importing this script's re-exports can't accidentally trigger a
+real `astro preview` + Chromium sweep as a side effect.
+
+Ran it against all 711 real content pages (both languages, same
+redirect-stub exclusion `check:reflow` already established): **zero
+overflow found** - matches the manual spot-check exactly, so no code fix was
+needed this run, but `check:text-zoom` is now a permanent, reusable script
+like `check:lighthouse`/`check:reflow`, so a future layout or content change
+that breaks text-only resize gets caught rather than silently shipped. No
+new pure logic needed unit tests of its own - every function the script
+calls is already covered by `tests/unit/checkReflow.test.ts` - matching
+`check-lighthouse.mjs`'s own precedent for a script with no pure logic to
+extract.
+
+No `content/*.md` or PDF-source file was touched this run, so `check:pdfs`
+stayed clean at 700/700 throughout with no regeneration needed.
+
+**Full standing health check:** `pnpm lint` (0/0/0), `pnpm test` (542/542
+unit, unchanged - no new pure logic to test), `pnpm build` (711 pages,
+unchanged), `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`,
+583.4 KB, unchanged - no content edit), `check:pdfs` (700/700 fresh), the new
+`check:text-zoom` (711/711 pages clean), and a full cold-start `pnpm
+test:e2e`: **869/869 passed** (unchanged count - a new dev-tooling script
+with no Playwright-visible behavior change, the same shape as the
+eighty-first run's own `check:reflow` widening).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run - `typescript` 7 (still capped by `@astrojs/check`'s `^5.0.0 ||
+^6.0.0` peer range), `docs/SOURCES.md` link-liveness (still blocked on
+outbound egress), and Nations League's Team of the Tournament for
+2021/2023/2025 (unconfirmed across six-plus prior runs, not re-attempted
+this run without a new source lead). With reflow, Lighthouse and text-zoom
+all now genuinely full-site and clean, a future run could look at
+`forced-colors`/`prefers-contrast` coverage depth, or return to a fresh
+content/quality angle entirely.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
