@@ -3311,3 +3311,30 @@ back clean:
   the only remaining stress axis with full-site coverage already in place
   from day one - a future run likely needs a fresh content/quality angle
   rather than another coverage-depth pass on these same five axes.
+- **`check:spelling`: a new automated cspell sweep of `content/*.md`, plus a
+  real long-standing grammar bug fixed**: closed 2026-09-08 (eighty-fifth
+  intensive run) - every prior content-accuracy pass was manual
+  proofreading; this run ran an automated spell-checker (`cspell`) across
+  `content/*.md` for the first time. Of 894 flagged issues (470 distinct
+  words), 469 were legitimate proper nouns/loanwords/citation domains (now
+  captured in a new custom dictionary, `.cspell/football-names.txt`) and one
+  was real: `content/glossary.md`'s "host" entry had read "a host still has
+  to be entered or organise its place" since the file's original commit - a
+  genuine grammar error no prior manual proofreading pass had caught in 84
+  runs, because "organise" is itself a correctly-spelled word. Fixed to "a
+  host still has to earn or qualify for its place the way any other team
+  does." Wired as `pnpm check:spelling`, and - unlike the four full-site
+  Playwright sweeps, which stay manual/intensive-run tools - added to
+  `.github/workflows/ci.yml` as a required PR gate, since a markdown-only
+  wordlist check runs in under a second. All 700 PDFs regenerated and
+  reverified clean (`content/glossary.md` is a PDF source file). Full
+  standing health check clean including `check:reflow`/`check:text-zoom`/
+  `check:print-width` (711/711 pages each)/`check:lighthouse` (37/37 pages,
+  perfect 1.00) and a full cold-start `pnpm test:e2e`. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail, including why
+  Croatian prose stays out of this check's scope for now. **Left for a
+  future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025) - a future run's best bet is likely
+  another previously-untried verification method rather than re-treading
+  already-exhausted ground.

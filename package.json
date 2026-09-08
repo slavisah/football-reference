@@ -25,7 +25,8 @@
     "check:lighthouse": "node scripts/check-lighthouse.mjs",
     "check:reflow": "node scripts/check-reflow.mjs",
     "check:text-zoom": "node scripts/check-text-zoom.mjs",
-    "check:print-width": "node scripts/check-print-width.mjs"
+    "check:print-width": "node scripts/check-print-width.mjs",
+    "check:spelling": "cspell --no-progress \"content/**/*.md\""
   },
   "dependencies": {
     "astro": "^7.3.2"
@@ -36,6 +37,7 @@
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.5.0",
     "@vitest/coverage-v8": "5.0.0",
+    "cspell": "^10.3.0",
     "lighthouse": "^13.4.1",
     "sharp": "0.35.4",
     "typescript": "^5.9.3",

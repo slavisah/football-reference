@@ -48,7 +48,7 @@ those two positions are ranked rather than tied.
 
 The country, or countries, that staged a tournament. Hosting does not grant
 an automatic spot in the tournament for most competitions covered here - a
-host still has to be entered or organise its place the way any other team
+host still has to earn or qualify for its place the way any other team
 does.
 
 ## confederation
