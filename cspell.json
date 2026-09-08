@@ -1,0 +1,14 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "dictionaryDefinitions": [
+    {
+      "name": "football-names",
+      "path": "./.cspell/football-names.txt",
+      "addWords": false
+    }
+  ],
+  "dictionaries": ["football-names"],
+  "files": ["content/**/*.md"],
+  "ignorePaths": ["node_modules", "dist"]
+}

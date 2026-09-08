@@ -45,6 +45,9 @@ jobs:
       - name: PDF freshness check
         run: pnpm check:pdfs
 
+      - name: Spelling check (content/*.md)
+        run: pnpm check:spelling
+
       - name: Build
         run: pnpm build
 

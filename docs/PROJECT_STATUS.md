@@ -16214,6 +16214,20 @@ Copa América captains.
   A4-landscape content width `tests/e2e/print-styles.spec.ts`'s own
   `PRINT_CONTENT_WIDTH_PX` constant already uses. Also a manual/intensive-run
   tool, not a CI gate, for the same reason.
+- `pnpm check:spelling` (`cspell.json`, added 2026-09-08, eighty-fifth
+  intensive run) runs `cspell` against every `content/*.md` file - the site's
+  first automated spelling check, as opposed to the several prior
+  hand-proofreading passes. Its custom dictionary
+  (`.cspell/football-names.txt`) lists every proper noun (player/manager/
+  captain/place name), football loanword and source-citation domain name
+  already verified in that content, so a real clean run reports zero issues;
+  a new content edit that introduces an unrecognized word needs either a
+  genuine typo fix or, for a newly-added verified proper noun, a new entry in
+  that dictionary file - never a blanket ignore. Unlike
+  `check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`,
+  this one *is* wired into `.github/workflows/ci.yml` as a required PR gate:
+  a markdown-only wordlist check runs in well under a second, nothing like
+  those tools' ~700-page-load sweeps.
 
 ### Notes jump nav: an in-page "Jump to a section" link list for every long note-card list - closed 2026-09-04 (sixty-third intensive run)
 
@@ -18737,6 +18751,116 @@ print-width and now prefers-contrast all genuinely full-site and clean,
 `forced-colors` is the only remaining stress axis that already had full-site
 coverage from day one - a future run likely needs a fresh content/quality
 angle rather than another coverage-depth pass on these same five axes.
+
+### `check:spelling`: a new automated cspell sweep of `content/*.md`, plus a real long-standing grammar bug fixed - closed 2026-09-08 (eighty-fifth intensive run)
+
+A standing health check first (`pnpm install`; `pnpm outdated` still shows
+only the blocked `typescript` 7 entry, re-confirmed via `npm view
+@astrojs/check@latest peerDependencies`; `pnpm dlx knip --no-config-hints`
+matched the standing baseline - the one confirmed false positive; `pnpm
+lint` 0/0/0; `pnpm test` 543/543 unit; `pnpm build` 711 pages;
+`check:links`/`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs` all
+clean and byte-for-byte unchanged from the eighty-fourth run's baseline).
+
+Per this routine's own priority order, re-confirmed Copa América's captain
+gap is fully closed and Nations League's Team of the Tournament for
+2021/2023/2025 is still unconfirmed across seven-plus prior runs with no new
+source lead - re-attempting either without a genuinely new angle would just
+repeat a documented mistake. The eighty-fourth run's own closing note named
+the real open question directly: with reflow, Lighthouse, text-zoom,
+print-width and prefers-contrast all now genuinely full-site and clean, a
+future run needs a fresh content/quality angle rather than another
+coverage-depth pass on those same axes.
+
+Every prior content-accuracy pass on this site (see the many "Croatian
+translation audit"/"content accuracy spot check" entries above) was manual
+proofreading - nobody had ever run an automated spell-checker across
+`content/*.md`, the site's own editorial source of truth per `AGENTS.md`
+rule 1. Installed `cspell` (`^10.3.0`) and ran it against all 15
+`content/*.md` files with no configuration: 894 flagged issues, but a full
+manual review of all 470 distinct unknown words found only one genuine
+problem - the rest are player/manager/captain/place names, football
+loanwords (Chilena, Dinamite, Capitán/Capitão) and source-citation domain
+names (`rsssf`, `todor66.com`/`todor`, `Grokipedia`, `Liquipedia`,
+`besoccer`, etc.) already verified correct by this routine's many prior
+research passes, just never taught to a spell-checker before.
+
+**The one real find:** `content/glossary.md`'s "host" entry has read "a
+host still has to be entered or organise its place the way any other team
+does" since the file's very first commit (confirmed via `git log -p
+--follow`) - a genuine grammatical error nobody had caught in 84 prior
+runs of manual proofreading, because "organise" is a real, correctly-spelled
+word on its own; only a spell-checker forcing a line-by-line look at every
+flagged token surfaced the sentence around it as broken. Fixed to "a host
+still has to earn or qualify for its place the way any other team does.",
+preserving the entry's original point (hosting doesn't automatically grant a
+tournament berth for most of the competitions this site covers) without
+changing the underlying fact.
+
+Rather than a one-off fix, built this into a permanent, reusable tool the
+same way `check:lighthouse`/`check:reflow`/`check:text-zoom`/
+`check:print-width` were each built from a first finding: `cspell.json`
+(project root) scopes the check to `content/**/*.md` and loads a new custom
+dictionary, `.cspell/football-names.txt` (471 entries, one per line, with a
+header comment explaining the file is only for already-verified proper
+nouns/loanwords/citation domains, never a blanket way to silence a real
+typo), covering every legitimate word this run's review confirmed. Wired as
+`pnpm check:spelling` in `package.json`. Re-ran after the dictionary and fix
+landed: **zero issues across all 15 files.**
+
+Unlike the four full-site Playwright sweeps (`check:lighthouse`/
+`check:reflow`/`check:text-zoom`/`check:print-width`), which stay
+manual/intensive-run tools because a ~700-page-load browser sweep is too
+slow for a required PR gate, `check:spelling` is a markdown-only wordlist
+check that runs in well under a second - so this run also added it to
+`.github/workflows/ci.yml` as a real required gate (right after the existing
+PDF-freshness check), the first of this routine's `check:*` scripts to
+become part of CI rather than a manual tool. A future content edit that
+introduces a genuine typo now fails CI directly instead of waiting for
+another manual proofreading pass to catch it; a future edit that adds a new,
+correctly-spelled proper noun needs one new line in
+`.cspell/football-names.txt`, the same low-friction pattern
+`docs/ADDING_CONTENT.md` already documents for other site conventions.
+
+`content/glossary.md`'s `lastReviewed` was already current
+(no other content in that file changed), so left unchanged - only the one
+sentence's wording was touched, not a substantive fact requiring a bumped
+review date. All 700 PDFs regenerated and reverified clean
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs` then `pnpm
+check:pdfs`), since `content/glossary.md` is a PDF source file (its own
+glossary PDF, plus every PDF whose shared References/definitions section
+quotes it).
+
+**Full standing health check after the fix:** `pnpm lint` (0/0/0), `pnpm
+test` (543/543 unit, unchanged - no new pure logic), `pnpm build` (711
+pages, unchanged), `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`,
+583.4 KB, unchanged), `check:pdfs` (700/700 fresh), the new `check:spelling`
+(0 issues across 15 files), `check:reflow` (711/711 pages clean at 320px),
+`check:text-zoom` (711/711 pages clean at 200% zoom), `check:print-width`
+(711/711 pages clean in print media), `check:lighthouse` (37/37 pages still
+a perfect 1.00 across every category), and a full cold-start `pnpm test:e2e`
+(see this entry's own final count once the run completes).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run - `typescript` 7 (still capped by `@astrojs/check`'s `^5.0.0 ||
+^6.0.0` peer range), `docs/SOURCES.md` link-liveness (still blocked on
+outbound egress), and Nations League's Team of the Tournament for
+2021/2023/2025 (unconfirmed across seven-plus prior runs, not re-attempted
+this run without a new source lead). `check:spelling` only covers
+`content/*.md`'s English prose - the site's actual editorial source of
+truth, and the only place with substantial English prose duplicated nowhere
+else (confirmed this run: no `.astro` file duplicates English note prose the
+way the Croatian route trees duplicate their own hand-translated
+`*_MOMENTS` constants) - so a future run could look at whether an
+Croatian-aware spell-checker (a `hr` cspell dictionary, or a different tool
+entirely) is worth adding for the hand-translated `hr/` prose, though the
+twenty-fifth run's manual Croatian proofreading pass already found zero
+errors there. With one genuine content bug found this run via a tool this
+site had never tried before, a future run's best bet is likely another
+previously-untried verification method (the same reasoning that first
+justified adding Lighthouse, then reflow, then text-zoom, then print-width)
+rather than another manual re-read of already-exhausted ground.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
