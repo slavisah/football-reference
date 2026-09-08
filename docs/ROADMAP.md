@@ -3254,3 +3254,60 @@ back clean:
   could look at `prefers-contrast`/`forced-colors` coverage depth (still the
   eighty-second run's own suggestion, not yet acted on), or another fresh
   content/quality angle.
+- **`prefers-contrast: more` full-site WCAG sweep**: closed 2026-09-08
+  (eighty-fourth intensive run) - a standing health check first (`pnpm
+  install`; `pnpm outdated` found one new in-range patch release, `astro`
+  7.3.1 -> 7.3.2, installed cleanly; `typescript` 7 re-confirmed still blocked
+  via `npm view @astrojs/check@latest peerDependencies`; `pnpm lint` 0/0/0;
+  `pnpm test` 543/543 unit; `pnpm build` 711 pages; `check:links`/
+  `check:sitemap`/`check:precache`/`check:perf`/`check:pdfs` all clean and
+  byte-for-byte unchanged from the eighty-third run's baseline). Per this
+  routine's own priority order, Copa América's captain gap is fully closed
+  and Nations League's Team of the Tournament for 2021/2023/2025 has been
+  re-confirmed unavailable across six-plus prior runs with no new source
+  lead, so re-attempting it again without a genuinely new angle would repeat
+  a documented mistake - acted on the eighty-second/eighty-third runs' own
+  standing suggestion instead: `prefers-contrast`/`forced-colors` coverage
+  depth.
+  `accessibility-forced-colors.spec.ts` already had a full-site axe sweep
+  (every `NAV_LINKS`/`TRANSLATED_PATHS` page, both color schemes, plus
+  spot-checked `/teams/<slug>` and `/players/<slug>` profiles) built the same
+  run its two real forced-colors bugs were found and fixed. By contrast,
+  `accessibility-prefers-contrast.spec.ts` - open since that mode's
+  higher-contrast `--border`/`--text-muted` tokens first landed - only ever
+  pinned the exact resolved token values on the home page across four
+  contrast x color-scheme combinations; it never once drove axe across the
+  rest of the site with `prefers-contrast: more` active, even though
+  `global.css`'s contrast-token overrides apply everywhere, not just the
+  home page. A real, previously-untested gap, not a repeat of either prior
+  full-site sweep's own axis.
+  Extended `accessibility-prefers-contrast.spec.ts` with the same full-site
+  sweep shape `accessibility.spec.ts`/`accessibility-forced-colors.spec.ts`
+  already established (`SWEPT_PATHS` = deduped `NAV_LINKS` + `TRANSLATED_PATHS`
+  + the 404 page, both color schemes) plus the same `/teams/brazil`/
+  `/players/gerd-muller` (EN + HR) profile-page spot-check both those files
+  already use. Since `contrast` isn't a `test.use()`-able Playwright option in
+  the pinned version (the file's own existing top-of-file comment already
+  established this for its four targeted tests), every new test opens its own
+  `browser.newContext({ colorScheme, contrast: 'more' })` rather than
+  `page.emulateMedia()` on the shared `page` fixture. Ran the new spec in
+  isolation first (76 tests, 4.8 minutes): **zero WCAG 2.1/2.2 A/AA
+  violations found anywhere** - the contrast tokens are clean across every
+  page, no CSS fix needed this run, unlike forced-colors' two real bugs.
+  Also applied the standing `astro` 7.3.1 -> 7.3.2 patch bump found by this
+  run's own `pnpm outdated` check. No `content/*.md` or PDF-source file
+  touched, so `check:pdfs` stayed clean at 700/700 throughout with no
+  regeneration needed. Full standing health check clean: `pnpm lint`
+  (0/0/0), `pnpm test` (543/543 unit, unchanged - no new pure logic),
+  `pnpm build` (711 pages, unchanged), `check:links`/`check:sitemap`/
+  `check:precache`/`check:perf`/`check:pdfs` all clean and unchanged, full
+  cold-start `pnpm test:e2e`: **939/939 passed** (21.5 minutes, up from 869 -
+  the 70 new prefers-contrast full-site sweep and profile-page tests).
+  **Left for a future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, Nations League's Team of the Tournament
+  for 2021/2023/2025). With reflow, Lighthouse, text-zoom, print-width and
+  now prefers-contrast all genuinely full-site and clean, `forced-colors` is
+  the only remaining stress axis with full-site coverage already in place
+  from day one - a future run likely needs a fresh content/quality angle
+  rather than another coverage-depth pass on these same five axes.

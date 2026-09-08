@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 533 Vitest unit tests
+pnpm test                      # 543 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 868 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 939 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1/2.2 A/AA sweep,
                                           # light and dark, across every page)
 ```
@@ -18646,6 +18646,97 @@ now print-width all genuinely full-site and clean, a future run could look
 at `forced-colors`/`prefers-contrast` coverage depth (still the
 eighty-second run's own suggestion, not yet acted on), or return to a fresh
 content/quality angle entirely.
+
+### `prefers-contrast: more` full-site WCAG sweep - closed 2026-09-08 (eighty-fourth intensive run)
+
+A standing health check first (`pnpm install`; `pnpm outdated` found one new
+in-range patch release, `astro` 7.3.1 -> 7.3.2, installed cleanly; `npm view
+@astrojs/check@latest peerDependencies` re-confirmed `typescript` 7 is still
+blocked by `@astrojs/check`'s `^5.0.0 || ^6.0.0` peer range; `pnpm lint`
+0/0/0; `pnpm test` 543/543 unit; `pnpm build` 711 pages; `check:links`
+(715 pages)/`check:sitemap` (710 entries)/`check:precache` (37 URLs)/
+`check:perf` (heaviest page still `hr/records`, 583.4 KB)/`check:pdfs`
+(700/700 fresh) all clean and byte-for-byte unchanged from the eighty-third
+run's baseline).
+
+Per this routine's own priority order (Copa América/Nations League/Ballon
+d'Or/Golden Boot content first, then other roadmap items, then general
+quality), Copa América's winning-captains gap is fully closed and Nations
+League's Team of the Tournament for 2021/2023/2025 has now been re-confirmed
+unavailable across six-plus prior runs with no new source lead - re-
+attempting it again without a genuinely new angle would just repeat the
+seventy-eighth run's own documented mistake, so this run acted on the
+eighty-second/eighty-third runs' own standing suggestion instead:
+`prefers-contrast`/`forced-colors` coverage depth.
+
+`tests/e2e/accessibility-forced-colors.spec.ts` already had a genuine
+full-site axe sweep (every `NAV_LINKS`/`TRANSLATED_PATHS` page, both color
+schemes, plus a spot-checked `/teams/<slug>` and `/players/<slug>` profile
+page each) - built the same run its two real forced-colors bugs (the
+`.is-winner` cell and the skip link, both relying on color alone for their
+signal) were found and fixed. `tests/e2e/accessibility-prefers-contrast.spec.ts`,
+open since that mode's higher-contrast `--border`/`--text-muted` tokens
+first landed, never got the same treatment: its eight targeted tests only
+ever pinned the exact resolved custom-property values on the home page
+across four contrast x color-scheme combinations. It never once drove
+axe-core across the rest of the site with `prefers-contrast: more` active -
+a real, previously-untested gap, not a repeat of either prior full-site
+sweep's own stress axis, even though `global.css`'s contrast-token overrides
+apply site-wide, not just to the home page.
+
+Extended `accessibility-prefers-contrast.spec.ts` with the same full-site
+sweep shape `accessibility.spec.ts` (baseline) and
+`accessibility-forced-colors.spec.ts` already established: `SWEPT_PATHS` =
+the deduped union of `NAV_LINKS` and `TRANSLATED_PATHS` plus the 404 page,
+run under both color schemes, with the same axe tag set
+(`wcag2a`/`wcag2aa`/`wcag21a`/`wcag21aa`/`wcag22aa`/`best-practice`/
+`experimental`/`ACT`/`review-item`) and the same `region`/
+`color-contrast-enhanced` disabled-rules pair the baseline sweep uses (not
+forced-colors' extra `color-contrast` exclusion - that one exists only for a
+forced-colors-specific axe false positive documented in this file's own
+header comment, which doesn't apply here since `prefers-contrast: more`
+doesn't replace author colors with a fixed OS palette the way forced-colors
+does). Also added the same `/teams/brazil`/`/players/gerd-muller` (English +
+Croatian) profile-page spot-check both prior sweeps already use, for the
+same reason: `SWEPT_PATHS` only reaches static top-level routes, not the
+dynamic `[slug].astro` profile pages.
+
+Since `contrast` isn't a `test.use()`-able Playwright option in the pinned
+version - the file's own pre-existing top-of-file comment already
+established this for its eight targeted tests - every new sweep test opens
+its own `browser.newContext({ colorScheme, contrast: 'more' })` and closes it
+after the axe run, rather than `page.emulateMedia()` on the shared `page`
+fixture the other two full-site sweeps use.
+
+Ran the extended spec in isolation first, before the full suite: **76 tests,
+all passing, 4.8 minutes - zero WCAG 2.1/2.2 A/AA violations found on any
+page under `prefers-contrast: more`**. Unlike forced-colors, this axis
+turned up no real bug: the contrast tokens are clean everywhere they apply,
+so no CSS fix was needed this run.
+
+Also applied the standing `astro` 7.3.1 -> 7.3.2 patch bump this run's own
+`pnpm outdated` check found. No `content/*.md` or PDF-source file was
+touched, so `check:pdfs` stayed clean at 700/700 throughout with no
+regeneration needed.
+
+**Full standing health check:** `pnpm lint` (0/0/0), `pnpm test` (543/543
+unit, unchanged - no new pure logic, only e2e coverage), `pnpm build` (711
+pages, unchanged), `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`,
+583.4 KB, unchanged - no content edit), `check:pdfs` (700/700 fresh), and a
+full cold-start `pnpm test:e2e`: **939/939 passed** (21.5 minutes, up from
+869 - the 70 new prefers-contrast full-site sweep and profile-page tests).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run - `typescript` 7 (still capped by `@astrojs/check`'s `^5.0.0 ||
+^6.0.0` peer range), `docs/SOURCES.md` link-liveness (still blocked on
+outbound egress), and Nations League's Team of the Tournament for
+2021/2023/2025 (unconfirmed across six-plus prior runs, not re-attempted
+this run without a new source lead). With reflow, Lighthouse, text-zoom,
+print-width and now prefers-contrast all genuinely full-site and clean,
+`forced-colors` is the only remaining stress axis that already had full-site
+coverage from day one - a future run likely needs a fresh content/quality
+angle rather than another coverage-depth pass on these same five axes.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
