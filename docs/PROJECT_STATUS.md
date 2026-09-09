@@ -19274,14 +19274,11 @@ unchanged), `check:links` (715 pages), `check:sitemap` (710 entries),
 583.4 KB, unchanged), `check:pdfs` (700/700 fresh), `check:spelling` (0
 issues), `check:html` (711/711 pages valid), `check:jsonld` (1,783/1,783
 blocks valid), the new `check:meta` (710/710 indexable pages clean, no
-missing or same-language-duplicate title/description found). A full
-cold-start `pnpm test:e2e` was kicked off as this entry was written; since
-this run touched no page/component/content file (only a new standalone
-script, its test file, `package.json`, and the CI workflow), no e2e
-regression is expected - the actual pass count is recorded in a short
-follow-up commit once that run finishes, the same convention the
-eighty-seventh run's own health check used
-(`git log`: "Record eighty-seventh run's cold-start e2e result").
+missing or same-language-duplicate title/description found), and a full
+cold-start `pnpm test:e2e`: **939/939 passed** (13.4 minutes, count and
+timing unchanged from the eighty-seventh run's baseline - expected, since
+this run touched no page/component/content file, only a new standalone
+script, its test file, `package.json`, and the CI workflow).
 
 **Left for a future pass:** the same environment-blocked items as every
 recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
