@@ -63,6 +63,9 @@ jobs:
       - name: JSON-LD structural-validity check
         run: pnpm check:jsonld
 
+      - name: Title/meta-description integrity check
+        run: pnpm check:meta
+
       - name: Offline install (manifest/service worker) integrity check
         run: pnpm check:precache
 
