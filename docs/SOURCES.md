@@ -1202,6 +1202,37 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Final venues (added 2026-09-09, eighty-ninth intensive run): a new "Final
+  venues" note section on `content/uefa-nations-league.md` naming the
+  specific stadium and city that staged the one-off final match at each of
+  the four completed Finals - distinct from the existing "Finals-host audit"
+  above, which only verifies the *hosting country*, not which of its
+  stadiums the final itself was played at (the 2023 Netherlands edition used
+  two different stadiums across its Finals). Verified via two independent
+  WebSearch passes: the first confirmed all four venues (Estádio do Dragão,
+  Porto 2019; San Siro, Milan 2021; De Kuip, Rotterdam 2023; Allianz Arena,
+  Munich 2025) via Wikipedia's and ESPN's per-final match reports; the second
+  specifically re-checked 2019 and 2021 with a distinct source mix
+  (France 24, UEFA.com's own final preview). Also independently corroborated
+  a genuinely interesting fact this pass turned up: De Kuip hosted the 2023
+  final only because Amsterdam's larger Johan Cruyff Arena, the country's
+  biggest stadium, was unavailable due to a scheduled concert - confirmed via
+  a dedicated Grokipedia recap that quotes the stadium-selection reasoning
+  directly, now included in the note's own 2023 bullet. **No discrepancies
+  found:**
+  - https://en.wikipedia.org/wiki/2019_UEFA_Nations_League_final
+  - https://www.dailysabah.com/football/2019/06/09/portugal-edges-netherlands-to-clinch-nations-league-title
+  - https://www.france24.com/en/20190609-portugal-beat-netherlands-win-first-nations-league-title
+  - https://en.wikipedia.org/wiki/2021_UEFA_Nations_League_final
+  - https://www.uefa.com/uefanationsleague/news/026e-136dcc8cc076-b6b335904e38-1000--final-preview-spain-vs-france/
+  - https://www.france24.com/en/sport/20211010-france-wins-nations-league-in-late-scoring-2-1-final-against-spain
+  - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_final
+  - https://grokipedia.com/page/2023_UEFA_Nations_League_Finals
+  - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
+  - https://www.euronews.com/2025/06/08/portugal-beats-spain-to-win-the-nations-league
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Copa América
 
