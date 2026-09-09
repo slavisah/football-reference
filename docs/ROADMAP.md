@@ -3453,3 +3453,25 @@ back clean:
   full-site and clean, a future run's best bet is likely a fresh content- or
   feature-parity angle, or yet another previously-untried verification
   method if one turns up.
+- **`check:meta`: a new full-site `<title>`/meta-description integrity
+  sweep**: closed 2026-09-09 (eighty-eighth intensive run) - a standing
+  health check first (clean, byte-for-byte unchanged from the eighty-seventh
+  run's baseline), then another previously-untried verification method: the
+  twenty-fourth run's meta-description audit only ever checked *length* on
+  the `.astro` source, not the built output, and never checked `<title>` at
+  all or looked for missing/duplicate values. Added
+  `scripts/check-meta.mjs` (`pnpm check:meta`): flags any indexable page with
+  a missing/empty title or description, and any two pages in the *same*
+  language sharing identical title/description text (a real duplicate-content
+  signal) - cross-locale matches (an untranslated proper noun like "Copa
+  América") are deliberately excluded as expected, not a bug. Ran clean: all
+  710 indexable pages have both fields, and the only two same-text matches
+  found (Copa América's identical EN/HR title; the home page's shared bare
+  title) are both intentional. Wired into CI as a required gate, matching
+  `check:jsonld`/`check:spelling`'s sub-second-check precedent. New unit
+  tests (18 cases). See `docs/PROJECT_STATUS.md`'s matching entry for detail.
+  **Left for a future pass:** the same environment-blocked items as every
+  recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+  League's Team of the Tournament for 2021/2023/2025), plus the `long-title`
+  brand-suffix decision. A future run's best bet is likely a fresh content- or
+  feature-parity angle, or yet another previously-untried verification method.

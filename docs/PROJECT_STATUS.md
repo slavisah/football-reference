@@ -19183,5 +19183,116 @@ clean, a future run's best bet is likely a fresh content- or
 feature-parity angle again, or yet another previously-untried verification
 method if one turns up.
 
+### `check:meta`: a new full-site `<title>`/meta-description integrity sweep - closed 2026-09-09 (eighty-eighth intensive run)
+
+A standing health check first (`pnpm install`; `pnpm outdated` still shows
+only the blocked `typescript` 7 entry, re-confirmed; `pnpm dlx knip
+--no-config-hints` matched the standing baseline - the same one confirmed
+false positive as every prior run; `pnpm lint` 0/0/0; `pnpm test` 565/565
+unit; `pnpm build` 711 pages; `check:links`/`check:sitemap`/`check:precache`/
+`check:perf`/`check:pdfs`/`check:spelling`/`check:html`/`check:jsonld` all
+clean and byte-for-byte unchanged from the eighty-seventh run's baseline).
+Per this routine's own priority order, every award-history content angle
+across all six competition/award families remains exhaustively mined (no new
+source lead for Nations League's Team of the Tournament for
+2021/2023/2025), so - per the eighty-seventh run's own closing suggestion -
+this run looked for another previously-untried verification method rather
+than re-attempting an already-exhausted content search.
+
+The twenty-fourth intensive run audited every static
+`<BaseLayout description="...">` value for *length* (trimming 13 over the
+~160-character search-engine truncation point), but that was a source-level
+audit of the `.astro` call sites, not a check of the actual rendered
+`<title>`/meta-description output on the built site - and it only ever
+checked length, not the two other failure modes search engines (and Google
+Search Console specifically) flag: a page shipping with no title or
+description at all, and two *different* pages accidentally sharing the exact
+same title or description text (a real "duplicate content" signal, and
+usually a copy-paste bug in a page's `<BaseLayout>` call). Nothing on this
+site had ever checked either angle against the real built HTML: `check:html`
+validates markup structure, not text content; `check:jsonld` only looks
+inside `<script type="application/ld+json">` blocks; `check:sitemap` checks
+that a page's canonical/hreflang tags agree with `sitemap.xml`, not what its
+`<title>`/description actually say.
+
+Added `scripts/check-meta.mjs` (`pnpm check:meta`): walks every built page
+(reusing `check-internal-links.mjs`'s `listHtmlFiles()` and
+`check-reflow.mjs`'s `htmlFileToPagePath()`/`isRedirectStubHtml()` for page
+discovery, the same reuse-over-duplication convention every recent full-site
+sweep has followed) and, for every indexable page (excluding the four legacy
+`/awards/*` redirect stubs and any `noindex` page, the same exclusion
+`check:sitemap` already applies to its own "every indexable page" pass):
+flags a missing/empty `<title>` or meta description, then groups every
+page's title and description by language (`/hr/...` vs. everything else) and
+flags any value two or more pages in the *same* language share. Cross-locale
+duplicates are deliberately not flagged - an untranslated proper noun (e.g.
+"Copa América" reads the same in Croatian) legitimately produces the same
+title on that family's English and Croatian landing pages, the same
+intentional case `BaseLayout.astro`'s own no-branded-suffix special case
+produces for the bare "The Ultimate Football Reference" title shared by `/`
+and `/hr/`. Verified the duplicate-detection logic actually catches a
+same-language collision (not just trivially passing) with hand-built test
+fixtures before trusting a clean run against the real site.
+
+Ran clean: all 710 indexable pages have a non-empty title and description,
+and the only two same-*text* matches found across the whole site (Copa
+América's identical EN/HR title; the home page's shared bare title) are both
+the expected, deliberate cross-locale/no-suffix cases already reasoned about
+above, not a bug - the same "confirm a real signal, but keep the tool
+permanent" result `check:reflow`/`check:text-zoom`/`check:print-width`/
+`check:jsonld` all had on their own first full-site run.
+
+Unlike the four full-site Playwright sweeps or `check:html`'s `html-validate`
+parse, this is plain regex extraction over already-built HTML - a couple of
+seconds for all 711 pages, the same territory as `check:links`/
+`check:sitemap`/`check:jsonld` - so it *is* wired into
+`.github/workflows/ci.yml` as a required PR gate (after the JSON-LD check),
+the same reasoning `check:jsonld`/`check:spelling` document for their own
+sub-second checks, rather than joining the four slower sweeps as a
+manual/intensive-run-only tool.
+
+New unit tests in `tests/unit/checkMeta.test.ts` (18 cases covering
+extraction of a present/missing/empty title and description, `noindex`
+detection, locale classification - including a case confirming a path that
+merely starts with the letters "hr" as a segment prefix, e.g.
+`/hrvatska-something/`, is correctly *not* misclassified as Croatian - and
+`findDuplicates()`'s grouping: no groups when everything is unique, a
+same-locale title collision, a same-locale description collision, a
+cross-locale match correctly left unflagged, null values correctly ignored
+when grouping, and a three-or-more-page group reporting every page in it).
+565 -> 583 unit tests, all passing.
+
+No `content/*.md` or PDF-source file was touched (the new script, its test
+file, `package.json`, and `.github/workflows/ci.yml` are the only changes),
+so `check:pdfs` stayed clean at 700/700 throughout with no `pnpm build:pdfs`
+regeneration needed.
+
+**Full standing health check:** `pnpm lint` (0/0/0), `pnpm test` (583/583
+unit, up from 565 - the 18 new `checkMeta` cases), `pnpm build` (711 pages,
+unchanged), `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:precache` (37 URLs), `check:perf` (heaviest page still `hr/records`,
+583.4 KB, unchanged), `check:pdfs` (700/700 fresh), `check:spelling` (0
+issues), `check:html` (711/711 pages valid), `check:jsonld` (1,783/1,783
+blocks valid), the new `check:meta` (710/710 indexable pages clean, no
+missing or same-language-duplicate title/description found). A full
+cold-start `pnpm test:e2e` was kicked off as this entry was written; since
+this run touched no page/component/content file (only a new standalone
+script, its test file, `package.json`, and the CI workflow), no e2e
+regression is expected - the actual pass count is recorded in a short
+follow-up commit once that run finishes, the same convention the
+eighty-seventh run's own health check used
+(`git log`: "Record eighty-seventh run's cold-start e2e result").
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025), plus the `long-title`
+brand-suffix decision the eighty-sixth run flagged (still needs human
+sign-off, not attempted here). With markup validity, JSON-LD structural
+validity, title/meta-description integrity, accessibility semantics
+(Lighthouse, axe), and three layout axes (reflow, text-zoom, print-width)
+all now genuinely full-site and clean, a future run's best bet is likely a
+fresh content- or feature-parity angle again, or yet another
+previously-untried verification method if one turns up.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
