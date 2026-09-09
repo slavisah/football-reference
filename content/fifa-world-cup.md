@@ -5,7 +5,7 @@ competitionType: international
 confederation: FIFA
 firstEdition: 1930
 lastCompletedEdition: 2026
-lastReviewed: 2026-09-02
+lastReviewed: 2026-09-09
 status: verified
 ---
 
@@ -20,6 +20,34 @@ The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 b
 - From the round of 16 onward, it is a straight knockout: one defeat and a team is out.
 - The two semifinal winners meet in the final to decide the champion.
 - The tournament has expanded several times since 1930 - see "Format milestones" below for exactly when.
+
+## Final venues
+
+Every World Cup edition has decided its champion in one match at one stadium, including 1950's final-group decider between Uruguay and Brazil (see "Format milestones" below) - unlike Copa América, no era of this competition has settled the title by league table or a two-legged tie.
+
+- **1930:** Estadio Centenario, Montevideo (Uruguay).
+- **1934:** Stadio Nazionale PNF, Rome (Italy).
+- **1938:** Stade Olympique de Colombes, Colombes, near Paris (France).
+- **1950:** Estádio do Maracanã, Rio de Janeiro (Brazil).
+- **1954:** Wankdorf Stadium, Bern (Switzerland).
+- **1958:** Råsunda Stadium, Solna, near Stockholm (Sweden).
+- **1962:** Estadio Nacional, Santiago (Chile).
+- **1966:** Wembley Stadium, London (England).
+- **1970:** Estadio Azteca, Mexico City (Mexico).
+- **1974:** Olympiastadion, Munich (West Germany).
+- **1978:** Estadio Monumental, Buenos Aires (Argentina).
+- **1982:** Santiago Bernabéu, Madrid (Spain).
+- **1986:** Estadio Azteca, Mexico City (Mexico) - the same stadium as the 1970 final, the first to host two World Cup finals.
+- **1990:** Stadio Olimpico, Rome (Italy).
+- **1994:** Rose Bowl, Pasadena, California (United States).
+- **1998:** Stade de France, Saint-Denis (France).
+- **2002:** International Stadium Yokohama, Yokohama (Japan).
+- **2006:** Olympiastadion, Berlin (Germany).
+- **2010:** Soccer City, Johannesburg (South Africa) - renamed FNB Stadium after the tournament.
+- **2014:** Estádio do Maracanã, Rio de Janeiro (Brazil) - the same stadium as the 1950 final.
+- **2018:** Luzhniki Stadium, Moscow (Russia).
+- **2022:** Lusail Stadium, Lusail (Qatar).
+- **2026:** MetLife Stadium, East Rutherford, New Jersey (United States).
 
 ## Editions
 

@@ -559,6 +559,46 @@ Primary sources should be preferred.
     audit in this file has noted; verification relied entirely on
     WebSearch's synthesized snippets, cross-checked across independent
     passes and source domains rather than a single query's summary.
+- Final venues, all 23 editions (added 2026-09-09, intensive run): extending
+  UEFA Nations League's and Copa América's existing "Final venues" sections to
+  the FIFA World Cup - unlike Copa América, every World Cup edition (including
+  1950's final-group decider between Uruguay and Brazil, resolved without a
+  standalone final match) has one single decisive match at one stadium, so no
+  scoping/exclusion was needed. Verified in batches via independent WebSearch
+  passes covering different sets of editions, cross-checked against each
+  edition's own dedicated Wikipedia final article and, for 2026, FIFA's own
+  and news coverage of the MetLife Stadium (marketed during the tournament as
+  "New York New Jersey Stadium" under FIFA's sponsorship-neutral naming
+  policy) announcement. Two repeat-venue facts confirmed rather than assumed:
+  Estadio Azteca, Mexico City hosted both 1970 and 1986 (the first stadium to
+  host two World Cup finals), and the Maracanã, Rio de Janeiro hosted both
+  1950 and 2014. The 2010 stadium's post-tournament rename (Soccer City to FNB
+  Stadium) and 1958's Råsunda Stadium being in Solna, a municipality within
+  Greater Stockholm rather than Stockholm proper, were each independently
+  confirmed. **No discrepancies found**:
+  - https://en.wikipedia.org/wiki/1930_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1938_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1954_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1958_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/R%C3%A5sunda_Stadium
+  - https://footballgroundguide.com/news/world-cup-final-stadiums.html
+  - https://www.fourfourtwo.com/features/stadiums-that-hosted-world-cup-finals
+  - https://www.topendsports.com/events/worldcupsoccer/stadiums.htm
+  - https://www.thissportlife.com/sports/football-soccer/world-cup-men/venues/final-stadiums.htm
+  - https://en.wikipedia.org/wiki/1978_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1974_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1986_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1990_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/2002_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_final
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/new-york-new-jersey-stadium-host-world-cup-2026-final
+  - https://www.npr.org/2024/02/04/1229073496/2026-world-cup-final-nyc-nj-metlife-stadium
+  - Direct WebFetch/curl to these domains remains blocked by this
+    environment's egress policy, the same standing caveat every recent
+    audit in this file has noted; verification relied entirely on
+    WebSearch's synthesized snippets, cross-checked across independent
+    passes and source domains rather than a single query's summary.
 
 ## UEFA EURO
 
