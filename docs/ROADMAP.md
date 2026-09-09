@@ -3377,3 +3377,78 @@ back clean:
   and clean, a future run's best bet is likely a fresh content- or
   feature-parity angle again, or yet another previously-untried verification
   method if one turns up.
+- **`check:jsonld`: a new full-site schema.org structural-validity sweep**:
+  closed 2026-09-09 (eighty-seventh intensive run) - a standing health check
+  first (`pnpm install`; `pnpm outdated` still shows only the blocked
+  `typescript` 7 entry, re-confirmed; `pnpm dlx knip --no-config-hints`
+  matched the standing baseline; `pnpm lint` 0/0/0; `pnpm test` 546/546 unit;
+  `pnpm build` 711 pages; `check:links`/`check:sitemap`/`check:precache`/
+  `check:perf`/`check:pdfs`/`check:spelling` all clean and byte-for-byte
+  unchanged from the eighty-sixth run's baseline). Per this routine's own
+  priority order, every award-history angle across all six families has been
+  exhaustively mined (Copa América's captain gap fully closed; Nations
+  League's Team of the Tournament for 2021/2023/2025 re-confirmed
+  unavailable across six-plus prior runs), so this run took the eighty-sixth
+  run's own suggestion (a fresh verification method) rather than re-running
+  an exhausted search.
+  This site has invested heavily in schema.org structured data across ~30
+  prior intensive-run entries (`ItemList`/`SportsEvent`/`Person`/
+  `SportsTeam`/`CollectionPage`/`BreadcrumbList`/`WebSite`/`Quiz`/
+  `DefinedTermSet` builders in `src/lib/jsonLd.ts`, ~1,783 rendered
+  `<script type="application/ld+json">` blocks across the built site), but
+  nothing had ever verified the *actual built output* is structurally sound
+  JSON-LD - `tests/unit/jsonLd.test.ts` only calls each builder directly with
+  a hand-built fixture, `check:html` treats a JSON-LD script's body as opaque
+  text the same way a browser does, and `check:lighthouse`'s SEO category
+  doesn't parse structured data at the field level. A future edit that slips
+  a relative URL into a builder call site, or maps `itemListElement` from a
+  pre-filtered array without re-deriving `position` from the new index, would
+  ship unnoticed by any existing check.
+  Added `scripts/check-jsonld.mjs` (`pnpm check:jsonld`): extracts every
+  JSON-LD block from each built page via regex (reusing
+  `check-internal-links.mjs`'s `listHtmlFiles()` and `check-reflow.mjs`'s
+  `htmlFileToPagePath()`/`isRedirectStubHtml()` for page discovery, the same
+  reuse-over-duplication convention every recent full-site sweep has
+  followed), parses each as JSON, and recursively validates: a real
+  `@context`/"https://schema.org" and non-empty `@type` at the root (and at
+  every nested node that declares one), every `itemListElement` a non-empty
+  array whose `position` values are exactly `1..N` with no gap or duplicate,
+  and every `url`/`item` URL string an absolute link starting with the site's
+  own configured origin (`SITE_URL`+`BASE_PATH`, the same env vars
+  `check:reflow`/`check:lighthouse` already read) rather than a relative path
+  or a foreign domain. Verified the logic actually catches real regressions
+  (not just trivially passing) with four hand-built broken fixtures - a
+  missing `@context`, a position gap, a duplicate position, and a relative
+  URL - before trusting a clean run against the real site. Ran clean: **all
+  1,783 JSON-LD blocks across all 711 pages are structurally valid** - no bug
+  found, the same "confirm a real signal, but keep the tool permanent" result
+  `check:reflow`/`check:text-zoom`/`check:print-width` all had on their own
+  first full-site run, since every existing builder already derives
+  `position` from a live array index.
+  Unlike the four full-site Playwright sweeps or even `check:html`'s ~45s
+  `html-validate` parse, this is plain regex-plus-`JSON.parse` over
+  already-built HTML - about 3 seconds for all 711 pages, the same territory
+  as `check:links`/`check:sitemap` - so it *is* wired into
+  `.github/workflows/ci.yml` as a required PR gate (after the sitemap check),
+  the same reasoning `check:spelling` documents for its own sub-second check,
+  rather than joining the four slower sweeps as a manual/intensive-run-only
+  tool. New unit tests in `tests/unit/checkJsonLd.test.ts` (19 cases covering
+  extraction, root/nested validation, position-sequence gaps and duplicates,
+  and absolute-URL enforcement) - 546 -> 565 unit tests, all passing. No
+  `content/*.md` or PDF-source file touched, so `check:pdfs` stayed clean at
+  700/700 throughout with no regeneration needed. Full standing health check
+  clean: `pnpm lint` (0/0/0), `pnpm test` (565/565 unit), `pnpm build` (711
+  pages, unchanged), `check:links` (715 pages), `check:sitemap` (710
+  entries), `check:precache` (37 URLs), `check:perf` (heaviest page still
+  `hr/records`, 583.4 KB, unchanged), `check:pdfs` (700/700 fresh), the new
+  `check:jsonld` (1,783/1,783 blocks clean), full cold-start `pnpm test:e2e`
+  also run (see `docs/PROJECT_STATUS.md`'s matching entry for the final
+  count). **Left for a future pass:** the same environment-blocked items as
+  every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  Nations League's Team of the Tournament for 2021/2023/2025), plus the
+  `long-title`/brand-suffix decision the eighty-sixth run flagged (still
+  needs human sign-off, not attempted here). With markup validity, JSON-LD
+  structural validity, accessibility semantics, and three layout axes all now
+  full-site and clean, a future run's best bet is likely a fresh content- or
+  feature-parity angle, or yet another previously-untried verification
+  method if one turns up.

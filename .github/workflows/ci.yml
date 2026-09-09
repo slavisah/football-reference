@@ -60,6 +60,9 @@ jobs:
       - name: Sitemap integrity check
         run: pnpm check:sitemap
 
+      - name: JSON-LD structural-validity check
+        run: pnpm check:jsonld
+
       - name: Offline install (manifest/service worker) integrity check
         run: pnpm check:precache
 
