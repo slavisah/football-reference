@@ -102,6 +102,7 @@ Dinamite
 Dolgetta
 Donnarumma
 Dragan
+Dragão
 Dražan
 Dunga
 Dzagoev
@@ -113,6 +114,7 @@ Elkjær
 Emiliano
 Enzo
 Erling
+Estádio
 Estupiñán
 Eusébio
 Everton
@@ -224,6 +226,7 @@ Kluivert
 Kocsis
 Kopa
 Kroos
+Kuip
 Kylian
 Köpke
 Lahm
@@ -393,6 +396,7 @@ Sepp
 Shevchenko
 Simonsen
 Simón
+Siro
 Sneijder
 Spinazzola
 Stoichkov

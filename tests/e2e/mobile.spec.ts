@@ -1578,6 +1578,8 @@ test.describe('Nations League page on a 360px phone', () => {
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('Held every two years.')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Key facts' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Final venues' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Allianz Arena, Munich (Germany)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Player of the Finals winners' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Nuno Mendes (Portugal)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
@@ -1670,6 +1672,11 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
   test('shows the translated Key facts section', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Ključne činjenice' })).toBeVisible();
     await expect(page.getByText('Hrvatska je 2023. stigla do svog prvog finala')).toBeVisible();
+  });
+
+  test('shows the translated Final venues section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Stadioni finala' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Allianz Arena, München (Njemačka)')).toBeVisible();
   });
 
   test('shows the translated Player of the Finals winners section', async ({ page }) => {

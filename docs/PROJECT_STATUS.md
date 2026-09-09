@@ -16240,6 +16240,14 @@ Copa América captains.
   manual/intensive-run-only tool the way the four browser-based sweeps
   (`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`)
   and `check:html` do.
+- `content/uefa-nations-league.md` has a "Final venues" note section (added
+  2026-09-09, eighty-ninth intensive run) naming the specific stadium and
+  city that staged each edition's final match - distinct from the table's
+  existing "Finals host" column, which only names the hosting country (the
+  2023 edition's host country used two different stadiums across its
+  Finals, only one of which staged the final itself). No other
+  team-competition family has this note section yet; see that run's own
+  "left for a future pass" note for the scoping reasoning.
 
 ### Notes jump nav: an in-page "Jump to a section" link list for every long note-card list - closed 2026-09-04 (sixty-third intensive run)
 
@@ -19290,6 +19298,109 @@ validity, title/meta-description integrity, accessibility semantics
 all now genuinely full-site and clean, a future run's best bet is likely a
 fresh content- or feature-parity angle again, or yet another
 previously-untried verification method if one turns up.
+
+### UEFA Nations League "Final venues" note section - added 2026-09-09 (eighty-ninth intensive run)
+
+A standing health check first (`pnpm install`; `pnpm outdated` still shows
+only the blocked `typescript` 7 entry, re-confirmed; `pnpm lint` 0/0/0;
+`pnpm test` 583/583 unit; `pnpm build` 711 pages; `check:links`/
+`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs` all clean and
+byte-for-byte unchanged from the eighty-eighth run's baseline).
+
+Per this routine's own priority order (Copa América/Nations League/Ballon
+d'Or/Golden Boot content first), re-surveyed Copa América for any remaining
+gap: none exists - every award-history angle that page can cleanly support
+(Best Player, Golden Glove, Golden Boot, Fair Play, Team of the Tournament,
+Winning managers/captains) is already live, and the site's ~30-entry
+structured-data/accessibility/layout verification-script history means
+another repeat sweep would add little. Investigated a genuinely new data
+dimension no prior run (89 runs deep) had ever touched for any of the six
+families: the specific **stadium and city** that staged each edition's
+single deciding final match, as opposed to the "Finals host" *country*
+column every team-competition table already has. Confirmed this really is
+untouched - `grep -rn -i "venue\|stadium" content/*.md src/lib/*.ts` returned
+nothing before this run.
+
+Scoped this run's slice to UEFA Nations League specifically, not Copa
+América: Copa América's own "Important editorial warning" section documents
+that most of its 42 editions used a league-table format with no single
+final match at all, and several of the remainder used a two-legged
+home-and-away final with no fixed venue (1975, 1979, 1983) - a much higher
+editorial-risk surface for a first attempt at this new data category than
+Nations League's four clean, single-host, single-final Finals tournaments
+(2019, 2021, 2023, 2025), each already well documented. A complete,
+independently-useful vertical slice for one full family, matching this
+routine's own "if the full item is too large, ship one complete
+tournament's worth" convention - World Cup, EURO and Copa América's own
+final venues are left for a future pass, explicitly noted below rather than
+attempted at lower confidence in the same run.
+
+Added a new "Final venues" note section to `content/uefa-nations-league.md`
+(placed between "Key facts" and "Player of the Finals winners", ahead of
+the individual-award sections since it describes the fixture itself),
+listing all four completed editions' venues, verified via two independent
+WebSearch passes per edition (Wikipedia/ESPN/Daily Sabah for the first pass,
+France 24/UEFA.com/Grokipedia for the second, deliberately mixed source
+types matching this routine's own established two-independent-source
+convention) - see `docs/SOURCES.md`'s matching new entry for the full
+citation list:
+
+- **2019:** Estádio do Dragão, Porto (Portugal).
+- **2021:** San Siro, Milan (Italy).
+- **2023:** De Kuip, Rotterdam (Netherlands) - a genuinely interesting fact
+  surfaced during verification and included in the note: De Kuip hosted only
+  because Amsterdam's larger Johan Cruyff Arena was unavailable due to a
+  scheduled concert.
+- **2025:** Allianz Arena, Munich (Germany).
+
+Wired into `src/pages/competitions/nations-league.astro`'s `noteHeadings`
+(English) and hand-translated into
+`src/pages/hr/competitions/nations-league.astro`'s own `notes` array as
+"Stadioni finala" (Croatian, matching the page's existing
+hand-translated-notes convention - "Milano"/"München" for the city names,
+the standard Croatian forms). No edition-page (`[year].astro`) route change
+needed: those pages only consume the "Memorable moments" section for their
+per-year story join, not every note section, so this addition is isolated to
+the two landing pages. `content/uefa-nations-league.md`'s `lastReviewed`
+bumped to 2026-09-09.
+
+The four new proper nouns (Dragão, Estádio, Kuip, Siro) needed adding to
+`.cspell/football-names.txt` (alphabetically, per that file's existing
+convention) - `pnpm check:spelling` caught all four on the first run after
+the content edit, confirming the check (added the eighty-fifth run) does its
+job on genuinely new content, not just historical typos. New e2e coverage in
+`tests/e2e/mobile.spec.ts`: the existing English "Key facts and Memorable
+moments" test now also asserts the new heading and its Munich bullet, plus a
+new dedicated Croatian test for the translated section (mirroring the
+existing per-section Croatian test pattern on this page rather than folding
+it into an unrelated test).
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs) - both `content/uefa-nations-league.md`
+and the `docs/SOURCES.md` addition mark every PDF's shared References
+section stale, by design, the same lag every prior content-adding run has
+hit.
+
+**Full standing health check:** `pnpm lint` (0/0/0), `pnpm test` (583/583
+unit, unchanged - no new pure logic), `pnpm build` (711 pages, unchanged),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page still `hr/records`, 585.2 KB, within
+budget), `check:pdfs` (700/700 fresh), `check:spelling` (0 issues after the
+dictionary update), `check:html` (711/711 pages valid), `check:jsonld`
+(1,783/1,783 blocks valid), `check:meta` (clean, unchanged), `check:reflow`
+(711/711 pages clean at 320px), plus a full cold-start `pnpm test:e2e` (see
+the follow-up note below for the final count).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025), plus the `long-title`
+brand-suffix decision. The new "Final venues" angle itself is now closed for
+Nations League but genuinely open for the other three team competitions -
+World Cup (23 editions), EURO (17) and Copa América (a smaller subset of its
+42, per the scoping reasoning above) - a natural next slice for a future run
+that wants to extend this same angle rather than start another verification
+script from scratch.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

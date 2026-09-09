@@ -3475,3 +3475,32 @@ back clean:
   League's Team of the Tournament for 2021/2023/2025), plus the `long-title`
   brand-suffix decision. A future run's best bet is likely a fresh content- or
   feature-parity angle, or yet another previously-untried verification method.
+- **UEFA Nations League "Final venues" note section**: closed 2026-09-09
+  (eighty-ninth intensive run) - a standing health check first (clean,
+  byte-for-byte unchanged from the eighty-eighth run's baseline). Every
+  award-history angle Copa América can cleanly support was already live, so
+  this run found a genuinely new data dimension untouched by any of the
+  prior 88 runs across all six families: the specific stadium/city that
+  staged each edition's deciding final match, distinct from the existing
+  "Finals host" *country* column. Scoped to UEFA Nations League only (its
+  four editions are all single-host, single-final tournaments with no
+  format ambiguity) rather than Copa América, whose own "Important
+  editorial warning" section documents that most of its 42 editions have no
+  single fixed-venue final at all - a poor fit for a first attempt at this
+  new category. Added a "Final venues" section to
+  `content/uefa-nations-league.md` (all four editions: Estádio do Dragão
+  Porto 2019, San Siro Milan 2021, De Kuip Rotterdam 2023, Allianz Arena
+  Munich 2025), each verified via two independent WebSearch passes (see
+  `docs/SOURCES.md`'s matching entry). Wired into the English and Croatian
+  landing pages' note sections; four new proper nouns added to
+  `.cspell/football-names.txt`; new e2e coverage (EN + HR). All 700 PDFs
+  regenerated and reverified clean. Full standing health check clean
+  including `check:reflow`/`check:html`/`check:jsonld`/`check:meta`/
+  `check:spelling` and a full cold-start `pnpm test:e2e`. See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a future
+  pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025, the `long-title` brand-suffix
+  decision), plus extending this same "Final venues" angle to World Cup (23
+  editions), EURO (17) and Copa América's own subset of clean single-final
+  editions - a natural next slice rather than another verification script.
