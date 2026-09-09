@@ -18864,5 +18864,154 @@ previously-untried verification method (the same reasoning that first
 justified adding Lighthouse, then reflow, then text-zoom, then print-width)
 rather than another manual re-read of already-exhausted ground.
 
+### `check:html`: a new full-site HTML5 markup-validity sweep, plus a real `aria-label`-has-no-effect bug it found - closed 2026-09-09 (eighty-sixth intensive run)
+
+A standing health check first (`pnpm install`; `pnpm outdated` still shows
+only the blocked `typescript` 7 entry, re-confirmed; `pnpm dlx knip
+--no-config-hints` matched the standing baseline, same one confirmed false
+positive; `pnpm lint` 0/0/0; `pnpm test` 543/543 unit; `pnpm build` 711
+pages; `check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+`check:pdfs`/`check:spelling` all clean and byte-for-byte unchanged from the
+eighty-fifth run's baseline). Per this routine's own priority order, Copa
+América's captain gap is fully closed and Nations League's Team of the
+Tournament for 2021/2023/2025 has been re-confirmed unavailable across
+seven-plus prior runs with no new source lead, so re-attempting either
+without a genuinely new angle would repeat a documented mistake. The
+eighty-fifth run's own closing note pointed at "another previously-untried
+verification method" as the best next move - the same reasoning that
+justified Lighthouse, then reflow, then text-zoom, then print-width, then
+prefers-contrast depth, then cspell.
+
+This run tried `html-validate`, an HTML5 markup-conformance linter - a
+genuinely different axis from every existing tool: `axe-core` (via
+`check:lighthouse` and the seven `accessibility*.spec.ts` files) checks
+accessibility *semantics* (contrast, ARIA usage, focus), and
+`check:reflow`/`check:text-zoom`/`check:print-width` check visual *layout*,
+but nothing on this site had ever checked whether the markup itself is
+structurally valid HTML5 - duplicate `id`s, dangling `aria-*` references,
+invalid element nesting, missing required attributes. Followed the same
+spot-check-before-automating method `check:text-zoom`/`check:spelling`
+already used: ran `html-validate:recommended` (its default ruleset) against
+all 711 built pages first, before writing any permanent tooling, to see if
+there was real signal. It found six distinct rule IDs. Investigated each
+by reading the actual flagged markup rather than trusting the rule name
+alone:
+
+- `wcag/h32` ("form must have a submit button") - every filter/search
+  `<form role="search">` on the site (team/player search, the four
+  team-competition landing pages' year/host/winner filters) is a live
+  client-side filter with no submission step by design - a deliberate,
+  long-standing convention, not a missing feature.
+- `prefer-native-element` - flags the header's custom team/player search
+  combobox for not being a native `<select>`; it's a deliberate ARIA
+  authoring-practices widget (live-filtered, keyboard-navigable
+  suggestions) a `<select>` structurally can't offer.
+- `no-inline-style` - the four files using `style={...}`
+  (`TournamentTable.astro`, `ChampionsSummary.astro`, both `index.astro`
+  home pages) all set a per-instance computed value (a bar-chart width
+  percentage) with no static class to express - the standard accepted
+  pattern for data-driven inline styles.
+- `doctype-style` - Astro's compiler itself emits `<!DOCTYPE html>`
+  (uppercase); no `.astro` file declares its own doctype to fix, and both
+  cases are equally valid HTML5 - cosmetic only.
+- `long-title` - 133 pages exceed the rule's 70-character budget, but every
+  one follows `<specific name> - <suffix> · The Ultimate Football
+  Reference`, a deliberate site-wide branded-suffix convention
+  (`BaseLayout.astro`), not a per-page slip. Shortening the brand suffix
+  site-wide is a branding decision needing human sign-off, not something an
+  unattended run should silently change - left as a documented, consciously
+  investigated and not-pursued finding rather than silently disabling the
+  rule with no trace.
+- **`aria-label-misuse` - a real, previously-undetected bug.**
+  `TournamentTable.astro`'s empty "story" table cell wrapped its `aria-label`
+  in a bare `<span aria-label={...}>—</span>`. A `<span>`'s implicit ARIA
+  role is `generic`, and per the ARIA-in-HTML spec, `generic` prohibits an
+  author-supplied accessible name - the `aria-label` had **no effect at
+  all**, silently. `axe-core` has no rule that catches this specific
+  misuse (confirmed: none of this site's many `axe` sweeps, including the
+  eighty-fourth run's dedicated `prefers-contrast` full-site pass, had ever
+  flagged it), so it slipped past every prior accessibility audit. Traced
+  *why* the attribute was there in the first place: `data-label={...}` on
+  each table cell feeds a `content: attr(data-label)` CSS rule
+  (`TournamentTable.astro` line 537) that renders a mobile card-view label
+  sighted phone users see - but CSS generated content is invisible to most
+  assistive tech, so the two sibling `<td>` cells in the same row
+  (`headerLabels`/`extraColumn`) correctly compensate with their own
+  `aria-label` directly on the `<td>` (role `cell`, which *does* support an
+  author-supplied name). The "story" cell's empty-state branch alone missed
+  this pattern, wrapping the label in an inert `<span>` instead - meaning a
+  screen reader user on a narrow viewport, in the one specific case where a
+  memorable-moments story doesn't exist for that year, heard only a bare
+  em dash with no "Story: —" context, silently, since this cell's original
+  commit.
+
+  Fixed by moving the `aria-label` from the `<span>` up to the enclosing
+  `<td>` (conditionally, only for the empty-story case, matching the
+  original's own conditional structure) and dropping the now-redundant
+  `<span>` wrapper entirely, matching the exact pattern its two sibling
+  `<td>`s in the same component already used correctly two lines above. No
+  CSS or JS in the codebase targeted that bare `<span>` (confirmed via
+  `grep`), and no existing test asserted on it directly (`tests/e2e/
+  mobile.spec.ts`'s story-reveal tests target `td[data-label="Story"]`/
+  `.story-reveal`, not the removed `<span>`), so this was a clean,
+  self-contained fix with no fallout.
+
+Built `scripts/check-html-validity.mjs` (`pnpm check:html`) as a permanent
+tool, not a one-off finding: `html-validate:recommended` with the five
+confirmed-deliberate rules above explicitly disabled (each with the
+reasoning above recorded in the script's own `DISABLED_RULES` comment), run
+against every real content page the same way `check:reflow`/`check:print-width`
+discover pages (`check-internal-links.mjs`'s `listHtmlFiles()`, skipping the
+four `/awards/*` meta-refresh redirect stubs via the already-exported
+`isRedirectStubHtml()` from `check-reflow.mjs` - no duplicated logic). New
+unit test (`tests/unit/checkHtmlValidity.test.ts`, 3 cases) for the one pure
+function extracted (`reportToFailures`), the same I/O-vs-pure-logic split
+`check-reflow.mjs`/`check-page-weight.mjs` already established. Ran clean
+after the fix: **all 711 pages are valid HTML5, zero violations.** Not wired
+into `.github/workflows/ci.yml`: re-parsing all 711 pages takes ~45 seconds,
+closer to `check:lighthouse`/`check:reflow`'s territory than
+`check:spelling`'s sub-second run, so it stays a manual/intensive-run tool
+like the four browser-based sweeps rather than a required PR gate.
+
+All 700 PDFs regenerated and reverified clean (`TournamentTable.astro` is a
+shared PDF-source component for every competition/award family's PDFs -
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs` then `pnpm
+check:pdfs`). New e2e coverage: extended `tests/e2e/mobile.spec.ts`'s
+existing story-reveal test file with an assertion that an empty-story
+`<td>` itself now carries the `aria-label` (`td[data-label="Story"]` with
+no `.story-reveal` child has `aria-label` ending in `: —`), so a future
+regression back to the bare-`<span>` shape fails a real Playwright
+assertion, not just a manual `check:html` run.
+
+**Full standing health check after the fix:** `pnpm lint` (0/0/0), `pnpm
+test` (546/546 unit, up from 543 - the 3 new `checkHtmlValidity` cases),
+`pnpm build` (711 pages, unchanged), `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache` (37 URLs), `check:perf`
+(heaviest page still `hr/records`, unchanged), `check:pdfs` (700/700
+fresh), `check:spelling` (0 issues), the new `check:html` (711/711 pages
+valid), `check:reflow`/`check:text-zoom`/`check:print-width` (711/711 pages
+each, unchanged), `check:lighthouse` (37/37 pages still a perfect 1.00
+across every category), and a full cold-start `pnpm test:e2e`: **939/939
+passed** (20.5 minutes, count unchanged from the eighty-fifth run's
+baseline - the new assertion extended an existing `test()` block rather
+than adding a new one).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025). The `long-title`
+finding above is a real, documented, consciously-not-pursued gap - 133
+pages with a `<title>` over ~70 characters, all from the deliberate branded
+suffix - worth a human decision on whether to shorten
+`BaseLayout.astro`'s `· The Ultimate Football Reference` suffix or accept
+it, rather than an unattended run guessing at a brand-identity change. A
+future run could also look at whether a Croatian-aware markup pass over the
+hand-translated `hr/` route trees would surface anything `check:html`'s
+English-plus-structure-only sweep can't, though since markup validity is
+language-agnostic (this check already covers every `hr/*` page's HTML
+structure, just not its prose), that's likely already fully covered - the
+next genuinely fresh angle is probably content- or feature-parity-shaped
+again, the same well this routine's own history keeps returning to
+successfully.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

@@ -26,6 +26,7 @@
     "check:reflow": "node scripts/check-reflow.mjs",
     "check:text-zoom": "node scripts/check-text-zoom.mjs",
     "check:print-width": "node scripts/check-print-width.mjs",
+    "check:html": "node scripts/check-html-validity.mjs",
     "check:spelling": "cspell --no-progress \"content/**/*.md\""
   },
   "dependencies": {
@@ -38,6 +39,7 @@
     "@types/node": "^26.5.0",
     "@vitest/coverage-v8": "5.0.0",
     "cspell": "^10.3.0",
+    "html-validate": "^11.15.0",
     "lighthouse": "^13.4.1",
     "sharp": "0.35.4",
     "typescript": "^5.9.3",

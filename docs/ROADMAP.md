@@ -3338,3 +3338,42 @@ back clean:
   the Tournament for 2021/2023/2025) - a future run's best bet is likely
   another previously-untried verification method rather than re-treading
   already-exhausted ground.
+- **`check:html`: a new full-site HTML5 markup-validity sweep, plus a real
+  `aria-label`-has-no-effect bug it found**: closed 2026-09-09 (eighty-sixth
+  intensive run) - acted on the eighty-fifth run's own suggestion (another
+  previously-untried verification method). Ran `html-validate` against every
+  built page for the first time: nothing on this site had ever checked HTML5
+  markup *structural* validity (duplicate ids, dangling `aria-*` references,
+  invalid nesting) as distinct from `axe-core`'s accessibility-*semantics*
+  checks or the reflow/text-zoom/print-width *layout* sweeps. Found and fixed
+  a real bug: `TournamentTable.astro`'s empty "story" cell put its
+  `aria-label` on a bare `<span>` (role `generic`, which the ARIA spec
+  prohibits from carrying an author-supplied name) instead of the enclosing
+  `<td>` (role `cell`, which supports one) - the same pattern its two sibling
+  `<td>`s in the same row already used correctly. The label was meant to
+  compensate for the mobile card-view's `content: attr(data-label)` CSS,
+  which most assistive tech can't see - so a screen reader user on a narrow
+  viewport, on any year with no memorable-moments story, silently heard just
+  "—" with no context, since this cell's original commit. Fixed by moving the
+  `aria-label` up to the `<td>` and dropping the now-redundant `<span>`.
+  Added `scripts/check-html-validity.mjs` (`pnpm check:html`) as a permanent
+  tool (`html-validate:recommended` minus five rules confirmed to be
+  deliberate site conventions, not bugs - see the script's own
+  `DISABLED_RULES` comment for each one's reasoning). New e2e regression
+  coverage in `tests/e2e/mobile.spec.ts` and a new unit test file
+  (`tests/unit/checkHtmlValidity.test.ts`). All 700 PDFs regenerated and
+  reverified clean (`TournamentTable.astro` is a shared PDF-source
+  component). See `docs/PROJECT_STATUS.md`'s matching entry for full detail,
+  including the other five rules investigated and why each is a false
+  positive, not a bug (one - `long-title`, 133 pages over ~70 characters
+  from the deliberate branded title suffix - is a genuine, consciously
+  not-pursued finding needing human sign-off on a brand-identity change, not
+  an automated fix). **Left for a future pass:** the same environment-blocked
+  items as every recent run (`typescript` 7, `docs/SOURCES.md`
+  link-liveness, Nations League's Team of the Tournament for
+  2021/2023/2025), plus the `long-title`/brand-suffix decision above. With
+  markup validity, accessibility semantics (Lighthouse, axe), and three
+  layout axes (reflow, text-zoom, print-width) all now genuinely full-site
+  and clean, a future run's best bet is likely a fresh content- or
+  feature-parity angle again, or yet another previously-untried verification
+  method if one turns up.
