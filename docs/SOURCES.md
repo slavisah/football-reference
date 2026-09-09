@@ -2187,6 +2187,38 @@ Primary sources should be preferred.
     file has noted applies here too; verification relied entirely on
     WebSearch's synthesized summaries rather than direct page loads.
 
+- Final venues, all 19 single-decisive-match editions (added 2026-09-09,
+  intensive run): extending UEFA Nations League's existing "Final venues"
+  section to Copa América, scoped to the same 19 editions that already carry
+  a Final date (the five Final playoff deciders, 13 Knockout final editions,
+  and the 2016 centenary final) - every other edition has no single-venue
+  final to record (League table standings across several cities, or a
+  two-legged Home-and-away decider). Each stadium/city verified via two
+  independent WebSearch passes; two facts corrected an initial working
+  assumption rather than confirming it - 1995's final was in Montevideo
+  (Estadio Centenario), not Paysandú, which hosted group games only; 2001's
+  final was in Bogotá (Estadio El Campín), not Barranquilla. Both corrections
+  confirmed by Wikipedia's dedicated per-edition final articles plus a
+  second, independent source each (11v11/CONMEBOL for 1995, ESPN for 2001).
+  The five pre-1960 venues (1919/1922 Estádio das Laranjeiras, 1937 Estádio
+  Gasómetro, 1949 Estádio São Januário, 1953 Estadio Nacional Lima) also each
+  cleared two independent sources despite their age - Laranjeiras and São
+  Januário are well-documented historic Rio de Janeiro venues, and Gasómetro
+  (San Lorenzo's home ground until its 1983 demolition) is well covered by
+  Argentine sports press retrospectives of the 1937 playoff.
+  - https://en.wikipedia.org/wiki/1919_South_American_Championship_play-off
+  - https://en.wikipedia.org/wiki/1922_South_American_Championship_play-off
+  - https://en.wikipedia.org/wiki/1937_South_American_Championship_play-off
+  - https://abrilacancha.com.ar/2021/07/10/copa-america-1937-la-inolvidable-final-ante-brasil/
+  - https://en.wikipedia.org/wiki/1995_Copa_Am%C3%A9rica_final
+  - https://copaamerica.com/en/news/uruguay-stays-undefeated-at-home-again-in-1995
+  - https://en.wikipedia.org/wiki/2001_Copa_Am%C3%A9rica_final
+  - https://es.wikipedia.org/wiki/Anexo:Final_de_la_Copa_Am%C3%A9rica_2001
+  - https://en.wikipedia.org/wiki/Estadio_Centenario
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied entirely on
+    WebSearch's synthesized summaries rather than direct page loads.
+
 ## Ballon d'Or
 
 - Official winners and rankings:

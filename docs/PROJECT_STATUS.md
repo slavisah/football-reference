@@ -19404,5 +19404,127 @@ World Cup (23 editions), EURO (17) and Copa América (a smaller subset of its
 that wants to extend this same angle rather than start another verification
 script from scratch.
 
+### Copa América "Final venues" note section - added 2026-09-09 (ninetieth intensive run)
+
+A standing health check first (`pnpm install`; `pnpm outdated` still shows
+only the blocked `typescript` 7 entry, re-confirmed via `npm view
+@astrojs/check@latest peerDependencies`; `pnpm dlx knip --no-config-hints`
+matched the standing baseline - same one confirmed false positive; `pnpm
+lint` 0/0/0; `pnpm test` 583/583 unit; `pnpm build` 711 pages;
+`check:links`/`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs`/
+`check:jsonld`/`check:html`/`check:meta`/`check:spelling` all clean and
+matching the eighty-ninth run's baseline).
+
+Acted directly on the eighty-ninth run's own closing note: it deliberately
+scoped "Final venues" to UEFA Nations League only and named "Copa América's
+own subset of clean single-final editions" as a natural next slice - this
+routine's own priority order also ranks Copa América above the other three
+team competitions for content work, so this run closes that specific gap
+rather than moving to World Cup or EURO.
+
+Copa América's own "Important editorial warning" section (`content/copa-america.md`)
+already scopes exactly the right subset for this feature: the 19 editions
+that carry a "Final date" - the five **Final playoff** deciders (1919, 1922,
+1937, 1949, 1953), the 13 **Knockout final** editions (1987, and 1993
+onward except 2016), and the 2016 **Special centenary edition** final - are
+precisely the editions with one single decisive match at one venue. The
+**League table** era (no single title match, sometimes played across
+several cities on the same date) and the three **Home-and-away** finals
+(1975, 1979, 1983, decided over two legs in two different countries) have no
+single venue to record, the same reasoning that Format column's own
+documentation already gives for those editions' "-" Final date cells - so no
+new editorial judgment call was needed to draw this scope, only reapplying
+one the page had already made.
+
+Delegated the venue research to a subagent first (stadium + city for all 19
+finals, two-source verification per fact), then independently re-verified
+the two facts that corrected this run's own initial working assumptions
+directly via a second round of `WebSearch` before trusting them: 1995's
+final was in Montevideo (Estadio Centenario), not Paysandú, which hosted
+only group-stage matches; 2001's final was in Bogotá (Estadio El Campín),
+not Barranquilla. Also spot-verified two of the oldest, hardest-to-source
+entries (1919 Estádio das Laranjeiras, 1937 Estádio Gasómetro) directly -
+both confirmed by Wikipedia's dedicated per-edition final articles plus a
+second, independent source each, despite their age; Gasómetro (San Lorenzo's
+home ground until its 1983 demolition) is well covered by Argentine sports
+press retrospectives of the 1937 playoff. See `docs/SOURCES.md`'s matching
+new entry for the full citation list, including the note that two editions
+share a stadium with a later final (1953/2004 both at Estadio Nacional,
+Lima; 1987/2011 both at Estadio Monumental, Buenos Aires; 2019/2021 both at
+Estádio do Maracanã, Rio de Janeiro) - called out in the content prose
+itself as a genuinely interesting fact, not hidden as a coincidence.
+
+Added a new "Final venues" note section to `content/copa-america.md`,
+placed right after "How it works" (before the "Champions timeline" table) -
+matching UEFA Nations League's own ordering, which places its equivalent
+section right after "How it works"/"Key facts" and ahead of the
+individual-award sections, since it describes tournament logistics rather
+than a personal award. `content/copa-america.md`'s `lastReviewed` bumped to
+2026-09-09.
+
+Wired into `src/pages/competitions/copa-america.astro`'s `noteHeadings`
+(English, inserted right after `'How it works'`) and hand-translated into
+`src/pages/hr/competitions/copa-america.astro`'s own `notes` array as
+"Domaćini finala" (Croatian, matching the page's existing
+hand-translated-notes convention - inserted at the same position, right
+after "Kako funkcionira"). No edition-page (`[year].astro`) route change
+needed: those pages only consume the "Memorable moments" section for their
+per-year story join, the same reasoning the eighty-ninth run's Nations
+League entry already gives, and this addition follows the identical
+pattern.
+
+Ten new proper nouns (Campín, Defensores, Gasómetro, Hernando, Januário,
+Laranjeiras, Nacional, Pachencho, Prádanos, Siles) needed adding to
+`.cspell/football-names.txt` (alphabetically, per that file's existing
+convention) - `pnpm check:spelling` caught all ten on the first run after
+the content edit. New e2e coverage in `tests/e2e/mobile.spec.ts`: a new
+dedicated English test (asserting the heading, the first venue and the last)
+and a new dedicated Croatian test mirroring it, following this page's
+existing per-section test pattern rather than folding the new section into
+an existing test. No `.notes__card` count assertion exists for this page
+(unlike World Cup/EURO/Golden Boot), so no count needed bumping.
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+check:pdfs`, using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`
+fallback this environment's Chromium needs this run - the specific versioned
+subdirectory rather than the unversioned `chromium` symlink some prior runs'
+notes reference, since this environment's Playwright install expected a
+newer bundled revision than the pre-installed browser's `chromium_headless_shell`
+directory provides) - both `content/copa-america.md` and the
+`docs/SOURCES.md` addition mark every PDF's shared References section
+stale, by design, the same lag every prior content-adding run has hit.
+
+**Full standing health check:** `pnpm lint` (0/0/0), `pnpm test` (583/583
+unit, unchanged - no new pure logic), `pnpm build` (711 pages, unchanged),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page still `hr/records`, 585.9 KB, within
+the 590 KB budget), `check:pdfs` (700/700 fresh), `check:spelling` (0
+issues after the dictionary update), `check:html` (711/711 pages valid),
+`check:jsonld` (1,783/1,783 blocks valid), `check:meta` (clean, unchanged),
+`check:reflow`/`check:text-zoom`/`check:print-width` (711/711 pages clean on
+all three), the targeted Copa América e2e subset (40/40 passed) run first
+before the full suite, plus a full cold-start `pnpm test:e2e`: **942/942
+passed** (14.5 minutes, up from 940 - the two new Final-venues tests, EN and
+HR). One operational note worth recording: the first full-suite attempt this
+run reported 850 failures, every one an `ERR_CONNECTION_REFUSED` against
+`localhost:4321` - not a real regression, but this run's own mistake running
+the `check:reflow`/`check:text-zoom`/`check:print-width` sweep concurrently
+in the background with `pnpm test:e2e`, both of which independently start an
+`astro preview` server on the same port 4321 (`playwright.config.ts`'s
+`webServer` and `check-reflow.mjs`'s own preview-server dance), so the two
+processes stomped on each other's server. Re-ran `pnpm test:e2e` alone,
+cleanly, with nothing else touching port 4321: 942/942 passed. A future run
+should not run another script that launches its own `astro preview` (any of
+the four full-site sweeps, `check:lighthouse`, `build:pdfs`) at the same time
+as `pnpm test:e2e`.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025), plus the `long-title`
+brand-suffix decision. The "Final venues" angle is now closed for UEFA
+Nations League and Copa América but still genuinely open for World Cup (23
+editions) and EURO (17) - the natural next slice for a future run wanting to
+continue this same angle.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
