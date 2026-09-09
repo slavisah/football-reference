@@ -19389,8 +19389,10 @@ unit, unchanged - no new pure logic), `pnpm build` (711 pages, unchanged),
 budget), `check:pdfs` (700/700 fresh), `check:spelling` (0 issues after the
 dictionary update), `check:html` (711/711 pages valid), `check:jsonld`
 (1,783/1,783 blocks valid), `check:meta` (clean, unchanged), `check:reflow`
-(711/711 pages clean at 320px), plus a full cold-start `pnpm test:e2e` (see
-the follow-up note below for the final count).
+(711/711 pages clean at 320px), plus a full cold-start `pnpm test:e2e`:
+**940/940 passed** (14.4 minutes, up from 939 - the one new Croatian "Final
+venues" test; the English assertion was folded into an existing test rather
+than added as a new one).
 
 **Left for a future pass:** the same environment-blocked items as every
 recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
