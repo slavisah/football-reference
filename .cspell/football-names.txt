@@ -33,6 +33,7 @@ Arshavin
 Artime
 Aránguiz
 Aymoré
+Azteca
 Baggio
 Balotelli
 Bambali
@@ -50,6 +51,7 @@ Benfica
 Bengoechea
 Benzema
 Bergkamp
+Bernabéu
 Berti
 Bilardo
 Blokhin
@@ -258,8 +260,10 @@ Luka
 Lukaku
 Lukas
 Luque
+Lusail
 Luxemburgo
 Luís
+Luzhniki
 López
 Lúcio
 Maguire
@@ -307,6 +311,7 @@ Müller
 Nación
 Nacional
 Nasazzi
+Nazionale
 Neco
 Nedvěd
 Nejedlý
@@ -321,8 +326,11 @@ Núñez
 Obdulio
 Oldřich
 Oleg
+Olimpico
 Olivella
 Olmo
+Olympiastadion
+Olympique
 Ondruš
 Otamendi
 Ousmane
@@ -367,6 +375,7 @@ Ranulfo
 Raphaël
 Raphinha
 Raúl
+Råsunda
 Rehhagel
 Renato
 Riedle
@@ -408,7 +417,10 @@ Simonsen
 Simón
 Siro
 Sneijder
+Solna
 Spinazzola
+Stade
+Stadio
 Stoichkov
 Stábile
 Stéfano
@@ -446,6 +458,7 @@ Vittorio
 Vogts
 Václav
 Víctor
+Wankdorf
 Weah
 Xana
 Xavi

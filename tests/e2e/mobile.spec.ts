@@ -132,7 +132,7 @@ test.describe('World Cup page on a 360px phone', () => {
   });
 
   test('shows the last reviewed date and source links', async ({ page }) => {
-    await expect(page.locator('time[datetime="2026-09-02"]')).toBeVisible();
+    await expect(page.locator('time[datetime="2026-09-09"]')).toBeVisible();
     const sources = page.locator('.references__list a');
     await expect(sources.first()).toBeVisible();
     const count = await sources.count();
@@ -149,9 +149,11 @@ test.describe('World Cup page on a 360px phone', () => {
 
   test('shows the Memorable moments and Editorial notes sections from content/fifa-world-cup.md', async ({ page }) => {
     const notes = page.locator('.notes__card');
-    await expect(notes).toHaveCount(11);
+    await expect(notes).toHaveCount(12);
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('The two semifinal winners meet in the final')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Final venues' })).toBeVisible();
+    await expect(notes.getByText('MetLife Stadium, East Rutherford, New Jersey')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Golden Ball winners' })).toBeVisible();
     await expect(notes.getByText('Rodri (Spain) - the first Spain player to win the award')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Silver Ball and Bronze Ball winners' })).toBeVisible();
@@ -177,13 +179,13 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
   });
 
-  test('a "Jump to a section" nav links straight to each notes card, past the eleven-card scroll', async ({
+  test('a "Jump to a section" nav links straight to each notes card, past the twelve-card scroll', async ({
     page,
   }) => {
     const jumpNav = page.locator('nav.jump-nav');
     await expect(jumpNav).toBeVisible();
     await expect(jumpNav).toHaveAccessibleName('Jump to a section');
-    await expect(jumpNav.locator('a')).toHaveCount(11);
+    await expect(jumpNav.locator('a')).toHaveCount(12);
 
     const goldenGloveLink = jumpNav.getByRole('link', { name: 'Golden Glove winners' });
     await expect(goldenGloveLink).toHaveAttribute('href', '#golden-glove-winners');
@@ -436,9 +438,13 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
   test('shows the translated Format milestones, Memorable moments and Editorial notes sections', async ({
     page,
   }) => {
-    await expect(page.locator('.notes__card')).toHaveCount(11);
+    await expect(page.locator('.notes__card')).toHaveCount(12);
     await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
     await expect(page.getByText('Pobjednici polufinala igraju finale')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Mjesta finala' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('MetLife Stadium, East Rutherford, New Jersey'),
+    ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Prekretnice formata' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Dobitnici Zlatne lopte' })).toBeVisible();
     await expect(
@@ -488,7 +494,7 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     const jumpNav = page.locator('nav.jump-nav');
     await expect(jumpNav).toBeVisible();
     await expect(jumpNav).toHaveAccessibleName('Skoči na odjeljak');
-    await expect(jumpNav.locator('a')).toHaveCount(11);
+    await expect(jumpNav.locator('a')).toHaveCount(12);
 
     const link = jumpNav.getByRole('link', { name: 'Dobitnici Zlatne rukavice' });
     await expect(link).toHaveAttribute('href', '#dobitnici-zlatne-rukavice');

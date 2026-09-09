@@ -3538,3 +3538,44 @@ back clean:
   `long-title` brand-suffix decision), plus extending "Final venues" to
   World Cup (23 editions) and EURO (17) - the last two team-competition
   families still uncovered by this angle.
+- **FIFA World Cup "Final venues" note section**: closed 2026-09-09
+  (ninety-first intensive run) - acted directly on the ninetieth run's own
+  closing note, extending "Final venues" to World Cup, this routine's
+  top-priority content family. Unlike Copa América, no scoping/exclusion was
+  needed: every one of the 23 World Cup editions (including 1950's
+  final-group decider between Uruguay and Brazil) has one single decisive
+  match at one stadium. Added a "Final venues" section to
+  `content/fifa-world-cup.md` (all 23 editions, 1930-2026), each verified via
+  independent WebSearch passes batched across editions, cross-checked against
+  each edition's own dedicated Wikipedia final article; two repeat-venue
+  facts (Estadio Azteca hosting both 1970 and 1986; the Maracanã hosting both
+  1950 and 2014) and 2010's post-tournament stadium rename (Soccer City to
+  FNB Stadium) each independently confirmed. Wired into `world-cup.astro`'s
+  `noteHeadings` (English, right after "How it works") and hand-translated
+  into `hr/competitions/world-cup.astro`'s own `notes` array as "Mjesta
+  finala" (Croatian, matching the page's existing hand-translated-notes
+  convention). Thirteen new proper nouns added to
+  `.cspell/football-names.txt`. `content/fifa-world-cup.md`'s `lastReviewed`
+  bumped to 2026-09-09. New e2e coverage (EN + HR heading/content assertions,
+  `.notes__card`/jump-nav counts bumped 11 -> 12 for both languages). All 700
+  PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+  check:pdfs`, since this content edit and the `docs/SOURCES.md` addition
+  both mark every PDF's shared References section stale, by design). Full
+  standing health check clean: `pnpm lint` (0/0/0), `pnpm test` (583/583
+  unit), `pnpm build` (711 pages), `check:links` (715 pages), `check:sitemap`
+  (710 entries), `check:precache` (37 URLs), `check:perf` (heaviest page
+  still `hr/records`, within the 590 KB budget), `check:jsonld` (1,783/1,783
+  blocks clean), `check:meta` (710/710 pages clean), `check:html` (711/711
+  pages clean), `check:spelling` (0 issues). See `docs/PROJECT_STATUS.md`'s
+  matching entry for detail. **Left for a future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, Nations League's Team of the Tournament
+  for 2021/2023/2025, the `long-title` brand-suffix decision), plus
+  extending "Final venues" to EURO (17 editions) - the last team-competition
+  family still uncovered by this angle - and a full cold-start `pnpm
+  test:e2e` re-run (this run's environment needed a
+  `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`
+  override for `pnpm build:pdfs` since the pinned Playwright version expects
+  a `chromium_headless_shell` binary not present under `/opt/pw-browsers/`;
+  the `pnpm test:e2e` suite itself already documents its own
+  `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` convention separately).
