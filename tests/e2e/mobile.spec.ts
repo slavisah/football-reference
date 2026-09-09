@@ -276,6 +276,10 @@ test.describe('World Cup page on a 360px phone', () => {
     // An edition with no Memorable-moments bullet (e.g. 2014) shows an em dash, not an empty/broken cell.
     const noStoryCell = page.locator('tbody tr[data-year="2014"] td[data-label="Story"]');
     await expect(noStoryCell).toHaveText('—');
+    // The aria-label belongs on the <td> itself (role "cell" supports an author-supplied
+    // name), not a wrapping <span> (role "generic", which the ARIA spec prohibits from
+    // carrying one) - a real bug the eighty-sixth intensive run's check:html found and fixed.
+    await expect(noStoryCell).toHaveAttribute('aria-label', 'Story: —');
   });
 
   test('shows a host locator map grouped by region, with every host and its hosting years', async ({ page }) => {
