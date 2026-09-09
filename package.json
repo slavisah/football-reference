@@ -27,6 +27,7 @@
     "check:text-zoom": "node scripts/check-text-zoom.mjs",
     "check:print-width": "node scripts/check-print-width.mjs",
     "check:html": "node scripts/check-html-validity.mjs",
+    "check:jsonld": "node scripts/check-jsonld.mjs",
     "check:spelling": "cspell --no-progress \"content/**/*.md\""
   },
   "dependencies": {

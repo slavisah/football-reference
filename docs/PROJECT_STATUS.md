@@ -16228,6 +16228,18 @@ Copa América captains.
   this one *is* wired into `.github/workflows/ci.yml` as a required PR gate:
   a markdown-only wordlist check runs in well under a second, nothing like
   those tools' ~700-page-load sweeps.
+- `pnpm check:jsonld` (`scripts/check-jsonld.mjs`, added 2026-09-09,
+  eighty-seventh intensive run) parses every `<script type="application/ld+json">`
+  block on every built page and checks it structurally: a real
+  `@context`/`@type` pair at the root (and at every nested node that
+  declares one), every `itemListElement`'s `position` values exactly
+  `1..N` with no gap or duplicate, and every `url`/`item` string an
+  absolute URL under this site's own origin. Like `check:spelling`, it's
+  fast enough (~3s for all 711 pages) to be wired into
+  `.github/workflows/ci.yml` as a required PR gate rather than staying a
+  manual/intensive-run-only tool the way the four browser-based sweeps
+  (`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`)
+  and `check:html` do.
 
 ### Notes jump nav: an in-page "Jump to a section" link list for every long note-card list - closed 2026-09-04 (sixty-third intensive run)
 
@@ -19012,6 +19024,163 @@ structure, just not its prose), that's likely already fully covered - the
 next genuinely fresh angle is probably content- or feature-parity-shaped
 again, the same well this routine's own history keeps returning to
 successfully.
+
+### `check:jsonld`: a new full-site schema.org structural-validity sweep - closed 2026-09-09 (eighty-seventh intensive run)
+
+A standing health check first (`pnpm install`; `pnpm outdated` still shows
+only the blocked `typescript` 7 entry, re-confirmed; `pnpm dlx knip
+--no-config-hints` matched the standing baseline; `pnpm lint` 0/0/0; `pnpm
+test` 546/546 unit; `pnpm build` 711 pages; `check:links`/`check:sitemap`/
+`check:precache`/`check:perf`/`check:pdfs`/`check:spelling` all clean and
+byte-for-byte unchanged from the eighty-sixth run's baseline). Per this
+routine's own priority order (Copa América/Nations League/Ballon
+d'Or/Golden Boot content first, then other roadmap items, then general
+quality), every award-history angle across all six competition/award
+families has been exhaustively mined across 86 prior runs - Copa América's
+winning-captains gap is fully closed for 1975-2024, and Nations League's
+Team of the Tournament for 2021/2023/2025 has been re-confirmed unavailable
+across six-plus prior runs with no new source lead, so re-attempting either
+without a genuinely new angle would just repeat a documented mistake. Took
+the eighty-sixth run's own closing suggestion instead: a fresh,
+previously-untried verification method.
+
+This site has invested heavily in schema.org structured data across roughly
+thirty prior intensive-run entries: `ItemList` for every generated ranking
+(champions, country records, rivalries, team/player profile appearances,
+directories), `SportsEvent` for every edition and each family's latest
+edition, `Person`/`SportsTeam` entity blocks for player/team profiles,
+`CollectionPage` wrapping directory/landing-page `ItemList`s,
+`BreadcrumbList` on every non-home page, `WebSite` on the home page, `Quiz`
+on `/quiz`, and `DefinedTermSet` on `/glossary` - all built in
+`src/lib/jsonLd.ts` and rendered as one `<script type="application/ld+json">`
+tag per block by `BaseLayout.astro`. The built site currently carries 1,783
+such blocks across its 711 real content pages. But nothing had ever verified
+the *actual built output* is structurally sound JSON-LD, as opposed to
+verifying each builder function in isolation:
+`tests/unit/jsonLd.test.ts` only ever calls each builder directly with a
+small hand-built fixture; `check:html` (`html-validate`) treats a
+`<script type="application/ld+json">` body as opaque text content, the same
+way a browser's HTML parser does, so it can't see inside; and
+`check:lighthouse`'s SEO category audit doesn't parse structured data at the
+field level either (Lighthouse's own structured-data audit was deprecated
+upstream years before this repo's pinned version). A future edit that slips
+a relative URL into a builder call site, or maps `itemListElement` from an
+already-filtered array without re-deriving `position` from the new index, or
+introduces a typo that breaks the JSON itself, would ship completely
+unnoticed by any check this site already had.
+
+Added `scripts/check-jsonld.mjs` (`pnpm check:jsonld`). Page discovery reuses
+`check-internal-links.mjs`'s `listHtmlFiles()` and `check-reflow.mjs`'s
+`htmlFileToPagePath()`/`isRedirectStubHtml()` rather than duplicating
+already-tested logic, the same reuse-over-duplication convention every
+full-site sweep since `check:reflow` has followed. For each page:
+
+- `extractJsonLdBlocks()` pulls every `<script type="application/ld+json">`
+  body out via regex, in document order.
+- Each block is `JSON.parse()`d; a parse failure is reported with the page
+  path and block index rather than crashing the sweep.
+- `validateJsonLdObject()` recursively walks the parsed tree and checks:
+  the root has `"@context": "https://schema.org"` and a non-empty `@type`
+  string (checked at every node that declares an `@type`, not just the
+  root, since a nested node with a present-but-empty `@type` is just as
+  wrong); every `itemListElement` array is non-empty and its items'
+  `position` values are exactly `1..N` with no gap or duplicate; and every
+  `url`/`item` value that's a string is an absolute URL starting with this
+  site's own configured origin (`SITE_URL` + `BASE_PATH`, the same env vars
+  `check:reflow`/`check:lighthouse` already read for their own origin/base
+  handling) rather than a relative path or, worse, a foreign domain a
+  template-string typo could produce.
+- A page with zero JSON-LD blocks at all is itself flagged - every real page
+  on this site is supposed to carry at least a `BreadcrumbList` (non-home)
+  or `WebSite` block (home), per `BaseLayout.astro`'s own
+  `structuredData` wiring (see the 2026-08-29 "home page has no JSON-LD" fix
+  this reasoning traces back to).
+
+Before trusting a clean run against the real site, verified the validation
+logic actually catches real regressions rather than trivially passing
+everything: ran it by hand against four deliberately broken fixtures (a
+missing `@context`, an `itemListElement` with a position gap, one with a
+duplicate position, and a relative URL in a `BreadcrumbList` item) and
+confirmed each produced the expected, specific failure message - the same
+"confirm there's a real signal before trusting a clean automated run"
+discipline `check:text-zoom`'s eleven-page manual spot-check and
+`check:html`'s "run the generic ruleset first, then read what it actually
+flagged" method both already established for this class of tool.
+
+Ran the finished script against the real build: **all 1,783 JSON-LD blocks
+across all 711 pages are structurally valid** - no bug found, matching the
+same "clean first run, but keep the tool permanent for the next regression"
+result `check:reflow`/`check:text-zoom`/`check:print-width` each had on
+their own first full-site sweep. This isn't surprising in hindsight - every
+one of this site's `ItemList`/`BreadcrumbList` builders derives `position`
+by mapping straight off a live array's own index
+(`.map((x, index) => ({ position: index + 1, ... }))`), so a gap or
+duplicate could only happen if a future edit changed that pattern - which is
+exactly the regression this tool now exists to catch automatically instead
+of relying on a human noticing a subtly wrong search-result rich snippet
+after the fact.
+
+Unlike the four full-site Playwright sweeps (`check:lighthouse`/
+`check:reflow`/`check:text-zoom`/`check:print-width`, each a real browser
+page load) or even `check:html`'s ~45-second `html-validate` parse, this is
+plain regex extraction plus `JSON.parse` over already-built static HTML -
+about 3 seconds for all 711 pages, timing much closer to
+`check:links`/`check:sitemap` than to the browser-based sweeps. So rather
+than joining those four as a manual/intensive-run-only tool, it *is* wired
+into `.github/workflows/ci.yml` as a required PR gate (added right after the
+sitemap-integrity step), the same "fast enough to gate every PR" reasoning
+`check:spelling` documents for its own sub-second `cspell` run.
+
+New unit tests in `tests/unit/checkJsonLd.test.ts` (19 cases): block
+extraction (single block, multiple blocks in order, no blocks, an unrelated
+non-JSON-LD `<script>` correctly ignored), root-level validation (a
+well-formed `ItemList` accepted; a nested `CollectionPage.mainEntity` that
+keeps its own `@type` but correctly has no `@context` of its own also
+accepted, matching `buildCollectionPageJsonLd()`'s deliberate
+`stripContext()` behavior; a non-object root rejected; missing/wrong
+`@context` and missing/empty `@type` each flagged individually so the
+duplicate-message bug caught during development - see below - can't silently
+regress), `itemListElement` position-sequence checks (a gap, a duplicate, and
+an empty array each flagged with a specific message), absolute-URL
+enforcement (a relative path and a foreign domain both flagged), and
+`checkPageJsonLd()`'s page-level aggregation (a clean page, a page with zero
+blocks, an invalid-JSON block tagged with the right block index, and the
+correct block index reported when the *second* of two blocks on a page is
+the broken one). Writing that last group of root-level tests caught a real
+bug in the first draft: an early version checked `@type` twice for the root
+node (once in a root-specific check, once again inside the generic recursive
+walk that also runs over the root), so a missing/empty root `@type` produced
+two identical failure messages instead of one - fixed by removing the
+redundant root-specific check and letting the single recursive walk (which
+already handles every non-root node) cover the root too, verified by
+re-running the test suite before trusting the "no bug found" full-site
+result above. 546 -> 565 unit tests, all passing.
+
+No `content/*.md` or PDF-source file was touched (the new script and its
+test file are the only changes), so `check:pdfs` stayed clean at 700/700
+throughout with no `pnpm build:pdfs` regeneration needed.
+
+**Full standing health check:** `pnpm lint` (0/0/0), `pnpm test` (565/565
+unit, up from 546 - the 19 new `checkJsonLd` cases), `pnpm build` (711
+pages, unchanged), `check:links` (715 pages), `check:sitemap` (710
+entries), `check:precache` (37 URLs), `check:perf` (heaviest page still
+`hr/records`, 583.4 KB, unchanged), `check:pdfs` (700/700 fresh),
+`check:spelling` (0 issues), the new `check:jsonld` (1,783/1,783 blocks
+valid across 711 pages), and a full cold-start `pnpm test:e2e` (see the
+final count recorded once that run finishes, appended below).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025), plus the `long-title`
+brand-suffix decision the eighty-sixth run flagged (still needs human
+sign-off on whether to shorten `BaseLayout.astro`'s branded title suffix,
+not attempted here since it's an editorial/brand decision, not a bug). With
+markup validity (`check:html`), JSON-LD structural validity
+(`check:jsonld`), accessibility semantics (Lighthouse, axe), and three
+layout axes (reflow, text-zoom, print-width) all now genuinely full-site and
+clean, a future run's best bet is likely a fresh content- or
+feature-parity angle again, or yet another previously-untried verification
+method if one turns up.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
