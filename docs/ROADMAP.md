@@ -3442,8 +3442,9 @@ back clean:
   entries), `check:precache` (37 URLs), `check:perf` (heaviest page still
   `hr/records`, 583.4 KB, unchanged), `check:pdfs` (700/700 fresh), the new
   `check:jsonld` (1,783/1,783 blocks clean), full cold-start `pnpm test:e2e`
-  also run (see `docs/PROJECT_STATUS.md`'s matching entry for the final
-  count). **Left for a future pass:** the same environment-blocked items as
+  **939/939 passed** (14.4 minutes, count unchanged from the eighty-sixth
+  run's baseline - unit tests only added this run). **Left for a future
+  pass:** the same environment-blocked items as
   every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
   Nations League's Team of the Tournament for 2021/2023/2025), plus the
   `long-title`/brand-suffix decision the eighty-sixth run flagged (still

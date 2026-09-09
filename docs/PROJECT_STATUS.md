@@ -19166,8 +19166,9 @@ pages, unchanged), `check:links` (715 pages), `check:sitemap` (710
 entries), `check:precache` (37 URLs), `check:perf` (heaviest page still
 `hr/records`, 583.4 KB, unchanged), `check:pdfs` (700/700 fresh),
 `check:spelling` (0 issues), the new `check:jsonld` (1,783/1,783 blocks
-valid across 711 pages), and a full cold-start `pnpm test:e2e` (see the
-final count recorded once that run finishes, appended below).
+valid across 711 pages), and a full cold-start `pnpm test:e2e`:
+**939/939 passed** (14.4 minutes, count unchanged from the eighty-sixth
+run's baseline - this run added unit tests only, no new e2e cases).
 
 **Left for a future pass:** the same environment-blocked items as every
 recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
