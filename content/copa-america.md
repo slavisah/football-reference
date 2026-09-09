@@ -5,7 +5,7 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-09-05
+lastReviewed: 2026-09-09
 status: verified
 ---
 
@@ -20,6 +20,30 @@ Its history is less uniform than the World Cup or EURO. Some editions used a fin
 - CONMEBOL's ten South American national teams compete, sometimes joined by invited guest teams from outside the region since 1993.
 - The tournament's format has varied more than any other on this site: some early editions crowned a champion by final league-table standings, others by a home-and-away final, and most editions since the 1990s by a group stage into a knockout bracket.
 - Copa América has not always run on a fixed four-year cycle, unlike the World Cup or EURO.
+
+## Final venues
+
+Unlike UEFA Nations League, most Copa América editions have no single fixed-venue final to record - the League table era (1916-1967, minus the five playoff deciders below) crowned a champion by final standings across several cities, and the three Home-and-away editions (1975, 1979, 1983) split the decider over two legs in two different countries. This section is scoped to the same 19 editions that already carry a Final date above: the five Final playoff deciders and the 13 Knockout final editions plus the 2016 centenary final, each a single decisive match played at one stadium.
+
+- **1919:** Estádio das Laranjeiras, Rio de Janeiro (Brazil).
+- **1922:** Estádio das Laranjeiras, Rio de Janeiro (Brazil).
+- **1937:** Estádio Gasómetro, Buenos Aires (Argentina) - home of San Lorenzo, demolished in 1983.
+- **1949:** Estádio São Januário, Rio de Janeiro (Brazil).
+- **1953:** Estadio Nacional, Lima (Peru).
+- **1987:** Estadio Monumental, Buenos Aires (Argentina).
+- **1993:** Estadio Monumental (Isidro Romero Carbo), Guayaquil (Ecuador).
+- **1995:** Estadio Centenario, Montevideo (Uruguay).
+- **1997:** Estadio Hernando Siles, La Paz (Bolivia).
+- **1999:** Estadio Defensores del Chaco, Asunción (Paraguay).
+- **2001:** Estadio El Campín, Bogotá (Colombia).
+- **2004:** Estadio Nacional, Lima (Peru) - the same stadium as the 1953 final.
+- **2007:** Estadio José Pachencho Romero, Maracaibo (Venezuela).
+- **2011:** Estadio Monumental, Buenos Aires (Argentina) - the same stadium as the 1987 final.
+- **2015:** Estadio Nacional Julio Martínez Prádanos, Santiago (Chile).
+- **2016:** MetLife Stadium, East Rutherford, New Jersey (United States) - Copa América Centenario.
+- **2019:** Estádio do Maracanã, Rio de Janeiro (Brazil).
+- **2021:** Estádio do Maracanã, Rio de Janeiro (Brazil) - the same stadium as the 2019 final.
+- **2024:** Hard Rock Stadium, Miami Gardens, Florida (United States).
 
 ## Champions timeline
 

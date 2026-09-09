@@ -63,6 +63,7 @@ CONCACAF
 CONMEBOL
 Cafu
 Calderón
+Campín
 Cannavaro
 Capitán
 Capitão
@@ -89,6 +90,7 @@ César
 Dani
 Davinson
 Davor
+Defensores
 Dellas
 Dembélé
 Derwall
@@ -148,6 +150,7 @@ Galić
 García
 Garrincha
 Gascoigne
+Gasómetro
 Gavi
 Gavriil
 Gerd
@@ -181,6 +184,7 @@ Herberger
 Herminio
 Hermoso
 Hernández
+Hernando
 Heutte
 Hilderaldo
 Hincapié
@@ -198,6 +202,7 @@ Ivanov
 Iván
 Jacquet
 Jair
+Januário
 Jazeera
 Jeison
 Jerković
@@ -231,6 +236,7 @@ Kylian
 Köpke
 Lahm
 Lamine
+Laranjeiras
 Lato
 Lautaro
 Lazaroni
@@ -299,6 +305,7 @@ Méndez
 Møller
 Müller
 Nación
+Nacional
 Nasazzi
 Neco
 Nedvěd
@@ -319,6 +326,7 @@ Olmo
 Ondruš
 Otamendi
 Ousmane
+Pachencho
 Panenka
 Paolo
 Papin
@@ -348,6 +356,7 @@ Podolski
 Pogba
 Ponedelnik
 Pozzo
+Prádanos
 Preben
 Preud'homme
 Puyol
@@ -394,6 +403,7 @@ Seitaridis
 Seoane
 Sepp
 Shevchenko
+Siles
 Simonsen
 Simón
 Siro

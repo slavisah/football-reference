@@ -1180,6 +1180,16 @@ test.describe('Copa América page on a 360px phone', () => {
     ).toBeVisible();
   });
 
+  test('shows the Final venues section from content/copa-america.md', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Final venues' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Estádio das Laranjeiras, Rio de Janeiro (Brazil)').first(),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Hard Rock Stadium, Miami Gardens, Florida (United States).'),
+    ).toBeVisible();
+  });
+
   test('shows the Best Player winners section from content/copa-america.md', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Best Player winners' })).toBeVisible();
     await expect(
@@ -1502,6 +1512,16 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
     await expect(
       page.getByText('nije uvijek imala fiksni četverogodišnji ciklus'),
+    ).toBeVisible();
+  });
+
+  test('shows the translated Final venues section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Domaćini finala' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Estádio das Laranjeiras, Rio de Janeiro (Brazil).').first(),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Hard Rock Stadium, Miami Gardens, Florida (Sjedinjene Američke Države).'),
     ).toBeVisible();
   });
 

@@ -3504,3 +3504,37 @@ back clean:
   decision), plus extending this same "Final venues" angle to World Cup (23
   editions), EURO (17) and Copa América's own subset of clean single-final
   editions - a natural next slice rather than another verification script.
+- **Copa América "Final venues" note section**: closed 2026-09-09 (ninetieth
+  intensive run) - a standing health check first (clean, byte-for-byte
+  unchanged from the eighty-ninth run's baseline). Acted directly on the
+  eighty-ninth run's own closing note, which named "Copa América's own
+  subset of clean single-final editions" as the natural next slice - also
+  this routine's own top content priority. That subset turned out to be
+  already scoped by the page's own "Important editorial warning" section:
+  the 19 editions that already carry a "Final date" (five Final playoff
+  deciders, 13 Knockout final editions, the 2016 centenary final) are
+  exactly the editions with one single decisive match at one venue; the
+  League table and Home-and-away eras have none, the same reasoning that
+  section already gives for those editions' "-" Final date cells. Added a
+  "Final venues" section to `content/copa-america.md` (all 19 editions,
+  1919-2024), each verified via a subagent's two-independent-source research
+  pass plus this run's own direct re-verification of the two facts that
+  corrected an initial working assumption (1995 was Montevideo, not
+  Paysandú; 2001 was Bogotá, not Barranquilla) and two of the oldest, hardest
+  -to-source entries (1919, 1937). Wired into `copa-america.astro`'s
+  `noteHeadings` (English) and hand-translated into
+  `hr/competitions/copa-america.astro`. Ten new proper nouns added to
+  `.cspell/football-names.txt`. New e2e coverage (EN + HR). All 700 PDFs
+  regenerated and reverified clean. Full standing health check clean
+  including `check:reflow`/`check:text-zoom`/`check:print-width`/
+  `check:jsonld`/`check:html`/`check:meta`/`check:spelling` and a full
+  cold-start `pnpm test:e2e` (942/942 passed, after re-running it in
+  isolation - the first attempt overlapped with the reflow/text-zoom/
+  print-width sweep on the same preview-server port and reported 850 false
+  failures, all `ERR_CONNECTION_REFUSED`, not a real regression). See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a future pass:** the same environment-blocked items
+  as every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  Nations League's Team of the Tournament for 2021/2023/2025, the
+  `long-title` brand-suffix decision), plus extending "Final venues" to
+  World Cup (23 editions) and EURO (17) - the last two team-competition
+  families still uncovered by this angle.
