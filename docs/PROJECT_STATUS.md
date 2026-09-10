@@ -19674,5 +19674,80 @@ exhausted - a future run's best bet is either a fresh content-gap lead
 (Copa América's still-open winning-captains-1975-2010 gap) or another
 genuinely different quality/verification angle.
 
+### Croatian "Final venues" heading reconciled to "Mjesta finala" - fixed 2026-09-10 (ninety-third intensive run)
+
+A standing health check first (`pnpm install`; `pnpm outdated` still shows
+only the blocked `typescript` 7 entry, re-confirmed; `pnpm dlx knip
+--no-config-hints` matched the standing baseline - the one confirmed false
+positive, `scripts/test-preview-server.mjs`). Per this routine's own
+priority order, every award-history and "Final venues" content angle across
+all four team-competition families was already exhaustively mined by the
+ninety-second run, so this run acted directly on that run's own closing
+note: a pre-existing Croatian-heading naming inconsistency across the four
+"Final venues" sections it had noticed but explicitly left unreconciled.
+
+The English source (`content/*.md`) uses one identical `## Final venues`
+heading across all four files (`fifa-world-cup.md`, `uefa-euro.md`,
+`uefa-nations-league.md`, `copa-america.md`), but the four Croatian
+sibling pages had each hand-translated it independently: `world-cup.astro`
+and `euro.astro` both landed on "Mjesta finala" (a literal, direct
+translation - "venues/places of the final(s)"), while
+`nations-league.astro` used "Stadioni finala" ("stadiums of the final")
+and `copa-america.astro` used "Domaćini finala" ("hosts of the final" -
+also a poor fit here, since "Final venues" and the existing "Final date"/
+host-country columns are already distinct concepts on that page, and
+"Domaćini" duplicates the meaning of "hosts"). Reconciled all four to
+"Mjesta finala", the majority (2 of 4) and most literal choice, by editing
+`src/pages/hr/competitions/nations-league.astro` and
+`src/pages/hr/competitions/copa-america.astro`'s own `notes` array
+`heading` fields - a presentation-layer-only change, no `content/*.md`
+edit needed since the English source was never inconsistent.
+
+Updated the two matching hardcoded heading assertions in
+`tests/e2e/mobile.spec.ts` ("shows the translated Final venues section",
+Nations League and Copa América) to expect "Mjesta finala" instead of the
+old wording - the same "existing hardcoded assertion needed updating"
+pattern several prior content/heading-edit runs have hit. No new test
+cases needed (the assertions already existed per-page, just needed new
+expected text) and no `.notes__card` count changed on either page.
+
+Both edited `.astro` files are PDF-source files for their respective
+Croatian PDFs (`nations-league-hr.pdf`, `copa-america-hr.pdf`), so all 700
+PDFs were regenerated (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+build:pdfs`) and reverified clean via `pnpm check:pdfs` (700/700 fresh),
+the same lag every prior `.astro`-editing run has hit.
+
+**Full standing health check:** `pnpm lint` (0/0/0), `pnpm test` (583/583
+unit, unchanged - no pure logic touched, this is a presentation-string +
+e2e change only), `pnpm build` (711 pages, unchanged), `check:links` (715
+pages), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+`check:perf` (heaviest page still `hr/records`, 590.5 KB, within the 610 KB
+budget, unchanged), `check:pdfs` (700/700 fresh), `check:jsonld`
+(1,783/1,783 blocks valid), `check:meta` (710/710 pages clean), `check:html`
+(711/711 pages valid), `check:spelling` (0 issues - this check only covers
+`content/*.md`, which wasn't touched), `pnpm dlx knip --no-config-hints`
+(the one standing false positive, unchanged), plus a full cold-start `pnpm
+test:e2e`: **944/944 passed** (15.2 minutes, count unchanged from the
+ninety-second run's baseline - two existing assertions updated in place,
+no tests added or removed).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025), plus the `long-title`
+brand-suffix decision. Note: the ninety-second run's own closing note
+re-listed "Copa América's still-open winning-captains-1975-2010 gap" as a
+future-pass candidate - that gap has in fact been fully closed since the
+sixty-seventh run (2026-09-05, "Copa América's 1979 winning-captain gap
+finally resolved"; re-confirmed closed in multiple later runs' own closing
+notes, e.g. "Copa América's captain gap is fully closed"), so that closing
+note was itself stale, a copy-paste leftover rather than a real open item;
+not chased this run for that reason, and this entry corrects the record
+rather than repeating the error forward. With every "Final
+venues" section now live and internally consistent across languages, and
+every award-history angle this routine has identified exhausted, a future
+run's best bet is either the `long-title` brand-suffix decision (needs
+human sign-off, so more of an escalation than a fix) or a genuinely new
+verification method / content-accuracy angle.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
