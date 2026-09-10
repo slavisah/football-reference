@@ -3663,3 +3663,44 @@ back clean:
   `long-title` brand-suffix decision), plus the 15 named still-unverified
   final-attendance editions and extending this angle to World Cup/EURO once
   the underlying page-fetch-access constraint is addressed.
+- **Confirmation health check, no new content angle found** - closed
+  2026-09-10 (ninety-fifth intensive run). This run's own session had
+  independently started the same EURO "Final venues" work the regularly
+  scheduled ninety-second run also did (both began from the same
+  566965eb base within minutes of each other, most likely because this
+  session's container restarted mid-run and the schedule's next slot fired
+  normally in the meantime) - discarded this run's own now-redundant local
+  commit in favor of the already-pushed, already-superseded-again (by the
+  ninety-third/ninety-fourth runs) version rather than force-pushing over
+  real work, then searched for a genuinely new, well-scoped task before
+  resuming: re-checked `pnpm outdated` (still only the blocked `typescript`
+  7 entry), re-read `docs/WEBSITE_REQUIREMENTS.md` against the live route
+  tree (nothing missing), re-ran `pnpm test:coverage` (99.91%/99.43%,
+  unchanged from the seventh run's "defensively unreachable" classification),
+  and checked `scripts/check-lighthouse.mjs`'s `PAGES_TO_AUDIT` (already
+  covers every page shape in both languages). Confirmed the ninety-fourth
+  run's own closing note is correct that the final-attendance angle isn't
+  worth re-attempting without better page-fetch access, and that every other
+  "left for a future pass" item is genuinely blocked (human sign-off,
+  environment egress, an upstream peer-dependency ceiling, or a
+  already-exhausted award-history search). Rather than force a speculative
+  content change, ran a full independent confirmation health check against
+  the current tip instead: `pnpm install`, `pnpm lint` (0/0/0), `pnpm test`
+  (583/583 unit), `pnpm test:coverage` (99.91%/99.43%, unchanged), `pnpm
+  build` (711 pages), `check:links` (715 pages), `check:sitemap` (710
+  entries), `check:precache` (37 URLs), `check:perf` (`hr/records` 591.4 KB,
+  within the 610 KB budget), `check:pdfs` (700/700 fresh), `check:jsonld`
+  (1,783/1,783 blocks valid), `check:meta` (710/710 clean), `check:html`
+  (711/711 valid), `check:spelling` (0 issues), `check:reflow`/
+  `check:text-zoom`/`check:print-width` (711/711 pages clean on all three),
+  `pnpm dlx knip --no-config-hints` (the one standing false positive,
+  unchanged), plus a full cold-start `pnpm test:e2e`: **944/944 passed**
+  (23.1 minutes, matching the ninety-fourth run's own count exactly - no
+  regression from anything in between). No code change needed; this entry
+  itself is the run's only diff. **Left for a future pass:** unchanged from
+  the ninety-fourth run's list above - the same environment-blocked items,
+  the 15 still-unverified final-attendance editions, and a note for anyone
+  reviewing run history: if another same-slot duplicate firing happens
+  again, the fix is exactly what this run did (defer to whichever version is
+  already on the shared branch, discard the redundant local commit, don't
+  force-push) rather than treating it as an error to correct.
