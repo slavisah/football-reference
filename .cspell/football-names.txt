@@ -84,6 +84,7 @@ Courtois
 Cristian
 Cristiano
 Cruyff
+Crvena
 Cubarsí
 Cucurella
 Cueva
@@ -180,6 +181,7 @@ Gyökeres
 Gómez
 Haaland
 Hamit
+Happel
 Harald
 Heleno
 Herberger
@@ -188,6 +190,7 @@ Hermoso
 Hernández
 Hernando
 Heutte
+Heysel
 Hilderaldo
 Hincapié
 Hormazábal
@@ -327,6 +330,7 @@ Obdulio
 Oldřich
 Oleg
 Olimpico
+Olimpiyskiy
 Olivella
 Olmo
 Olympiastadion
@@ -421,6 +425,7 @@ Solna
 Spinazzola
 Stade
 Stadio
+Stadion
 Stoichkov
 Stábile
 Stéfano
@@ -443,6 +448,7 @@ Transfermarkt
 Trauco
 Türkiye
 Ugarte
+Ullevi
 Unai
 Valcareggi
 Valderrama
@@ -486,6 +492,7 @@ soccernostalgia
 todor
 topendsports
 worldfootball
+zvezda
 Álvarez
 Álvaro
 Ángel

@@ -326,6 +326,18 @@ test.describe('EURO page on a 360px phone', () => {
     await expect(row2016.locator('td[data-label="Top scorer"]')).toContainText('Antoine Griezmann');
   });
 
+  test('shows the Final venues section from content/uefa-euro.md', async ({ page }) => {
+    const notes = page.locator('.notes__card');
+    await expect(page.getByRole('heading', { name: 'Final venues' })).toBeVisible();
+    await expect(notes.getByText('Olympiastadion, Berlin (Germany)')).toBeVisible();
+    await expect(
+      notes.getByText('Wembley Stadium, London (England) - the same stadium as the 1996 final'),
+    ).toBeVisible();
+    await expect(
+      notes.getByText('Stadio Olimpico, Rome (Italy) - the same stadium as the 1968 final'),
+    ).toBeVisible();
+  });
+
   test('shows the Historical format note as a paragraph, Player of the Tournament winners and Memorable moments as a list', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('no third-place match has been played since 1980')).toBeVisible();
@@ -580,6 +592,18 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
       'Antoine Griezmann',
     );
     await expect(row2016.locator('td[data-label="Najbolji strijelac"]')).toContainText('golova');
+  });
+
+  test('shows the translated Final venues section', async ({ page }) => {
+    const notes = page.locator('.notes__card');
+    await expect(page.getByRole('heading', { name: 'Mjesta finala' })).toBeVisible();
+    await expect(notes.getByText('Olympiastadion, Berlin (Njemačka)')).toBeVisible();
+    await expect(
+      notes.getByText('Wembley Stadium, London (Engleska) - isti stadion kao finale 1996.'),
+    ).toBeVisible();
+    await expect(
+      notes.getByText('Stadio Olimpico, Rim (Italija) - isti stadion kao finale 1968.'),
+    ).toBeVisible();
   });
 
   test('shows the Historical format note as a paragraph, translated Player of the Tournament winners and Memorable moments as a translated list', async ({

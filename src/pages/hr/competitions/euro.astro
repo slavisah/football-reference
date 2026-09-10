@@ -64,12 +64,13 @@ const jsonLd = [
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 
-// Hand-translated from content/uefa-euro.md's "How it works", "Historical
-// format note" (a single paragraph, no bullets - same as the English page),
-// "Player of the Tournament winners", "Young Player of the Tournament
-// winners", "Team of the Tournament winners", "Winning managers", "Winning
-// captains" and "Memorable moments" sections, the same eight headings the
-// English page requests via noteHeadings. content/ itself stays untouched
+// Hand-translated from content/uefa-euro.md's "How it works", "Final
+// venues", "Historical format note" (a single paragraph, no bullets - same
+// as the English page), "Player of the Tournament winners", "Young Player of
+// the Tournament winners", "Team of the Tournament winners", "Winning
+// managers", "Winning captains" and "Memorable moments" sections, the same
+// nine headings the English page requests via noteHeadings. content/ itself
+// stays untouched
 // and English (the single editorial source of truth); this is
 // presentation-layer text local to this page only, the same way the earlier
 // Croatian competition pages hand-write their own Croatian prose.
@@ -81,6 +82,29 @@ const notes: NoteSection[] = [
       'Završnica počinje skupnom fazom; najbolje plasirane momčadi iz svake skupine prolaze dalje.',
       'Od četvrtfinala nadalje igra se izravni nokaut sustav: jedan poraz završava turnir za momčad.',
       'Finale odlučuje prvaka; utakmica za treće mjesto nije se igrala od 1980. (pogledajte "Povijesnu napomenu o formatu" niže).',
+    ],
+  },
+  {
+    heading: 'Mjesta finala',
+    items: [
+      'Svako izdanje EURA prvaka je odredilo u jednoj utakmici na jednom stadionu - čak je i izdanje 2020., čije su skupne i doigravačke utakmice bile raspoređene po jedanaest gradova domaćina u povodu 60. obljetnice natjecanja, prvaka odredilo na jednom stadionu kao i svako drugo izdanje.',
+      '1960.: Parc des Princes, Pariz (Francuska).',
+      '1964.: Santiago Bernabéu, Madrid (Španjolska) - isti stadion kasnije je ugostio finale Svjetskog prvenstva 1982.',
+      '1968.: Stadio Olimpico, Rim (Italija) - prva utakmica završila je 1:1, pa je repriza odigrana dva dana kasnije na istom stadionu.',
+      '1972.: Heysel Stadium, Bruxelles (Belgija).',
+      '1976.: Stadion Crvena zvezda, Beograd (Jugoslavija).',
+      '1980.: Stadio Olimpico, Rim (Italija) - isti stadion kao finale 1968., prvi koji je ugostio dva finala EURA.',
+      '1984.: Parc des Princes, Pariz (Francuska) - isti stadion kao finale 1960.',
+      '1988.: Olympiastadion, München (Zapadna Njemačka).',
+      '1992.: Ullevi, Göteborg (Švedska).',
+      '1996.: Wembley Stadium, London (Engleska).',
+      '2000.: De Kuip, Rotterdam (Nizozemska).',
+      '2004.: Estádio da Luz, Lisabon (Portugal).',
+      '2008.: Ernst-Happel-Stadion, Beč (Austrija).',
+      '2012.: NSC Olimpiyskiy, Kijev (Ukrajina).',
+      '2016.: Stade de France, Saint-Denis (Francuska).',
+      '2020.: Wembley Stadium, London (Engleska) - isti stadion kao finale 1996., drugi koji je ugostio dva finala EURA.',
+      '2024.: Olympiastadion, Berlin (Njemačka).',
     ],
   },
   {
