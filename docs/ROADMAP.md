@@ -3637,3 +3637,29 @@ back clean:
   best bet is a genuinely new verification method or content-accuracy angle
   - the "Final venues" content-mining angle and every award-history angle
   this routine has identified are now exhausted.
+- **Final attendance for Copa América (Knockout-final era) and UEFA Nations
+  League**: mostly closed negatively 2026-09-10 (ninety-fourth intensive
+  run) - a genuinely new content angle (never attempted by any prior run):
+  match-day attendance for the finals whose venue is already documented in
+  each page's "Final venues" section. Held to this file's own
+  two-independent-source verification bar, only 3 of 18 editions researched
+  cleared it: UEFA Nations League 2019 (43,199), Copa América 2011 (65,921),
+  and Copa América 2021 (6,500, a COVID-19-restricted behind-closed-doors
+  final). Added as annotations to those three editions' existing "Final
+  venues" bullets (not a new, mostly-empty section - would have been an
+  obvious stub) in `content/copa-america.md`/`content/uefa-nations-league.md`
+  and their Croatian `.astro` siblings. The other 15 editions were left
+  out - either only one confirmable source could be found (WebSearch mostly
+  routes back to Wikipedia alone in this environment, since direct
+  match-report page fetches are egress-blocked) or sources genuinely
+  disagree (Copa América 2001, 2007) - documented in `docs/PROJECT_STATUS.md`
+  and `docs/SOURCES.md` so a future pass with better page-fetch access knows
+  exactly which 15 editions are still open, rather than re-researching all
+  18 from scratch. Full standing health check clean including a full
+  cold-start `pnpm test:e2e`. See `docs/PROJECT_STATUS.md`'s matching entry
+  for detail. **Left for a future pass:** the same environment-blocked items
+  as every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  Nations League's Team of the Tournament for 2021/2023/2025, the
+  `long-title` brand-suffix decision), plus the 15 named still-unverified
+  final-attendance editions and extending this angle to World Cup/EURO once
+  the underlying page-fetch-access constraint is addressed.

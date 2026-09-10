@@ -19749,5 +19749,89 @@ run's best bet is either the `long-title` brand-suffix decision (needs
 human sign-off, so more of an escalation than a fix) or a genuinely new
 verification method / content-accuracy angle.
 
+### Final attendance: a genuinely new content angle, mostly closed negatively - closed 2026-09-10 (ninety-fourth intensive run)
+
+A standing health check first (`pnpm install`; `pnpm outdated` still shows
+only the blocked `typescript` 7 entry; `pnpm lint`/`pnpm test`/`pnpm build`/
+`check:links`/`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs`/
+`check:jsonld`/`check:meta`/`check:html`/`check:spelling`/`pnpm dlx knip
+--no-config-hints` all clean, byte-for-byte matching the ninety-third run's
+baseline: 583/583 unit, 711 pages, 715 links, 710 sitemap entries, 37
+precache URLs, heaviest page `hr/records` 590.5 KB, 700/700 PDFs fresh, one
+confirmed false positive).
+
+Per the ninety-third run's own closing note ("a genuinely new verification
+method / content-accuracy angle"), and this routine's own priority order
+(Copa América, then Nations League), tried a genuinely new data dimension
+never attempted by any of the prior 93 runs: match-day **attendance**
+figures for the finals whose venue this routine has already documented -
+Copa América's 14 Knockout-final-era editions (1987-2024; the five older
+Final playoff deciders were left out of scope as an even harder
+verification case) and all four UEFA Nations League Finals.
+
+Delegated the research to a subagent with WebSearch access, held to this
+file's own established two-independent-source bar. The result was mostly a
+**negative closure**, and an instructive one: only 3 of 18 editions cleared
+the bar - UEFA Nations League 2019 (43,199, Wikipedia + zerozero.pt
+independently agreeing), Copa América 2011 (65,921, an exact quote from
+CONMEBOL's own official recap article), and Copa América 2021 (6,500, a
+COVID-19-restricted behind-closed-doors final corroborated by multiple
+independent contemporary news wires). Every other edition either had only a
+single confirmable source (WebSearch routes almost every query back to
+Wikipedia as the one page whose text it can synthesize, since WebFetch/curl
+are egress-blocked in this environment for match-report pages specifically)
+or genuinely conflicting figures across sources (Copa América 2001:
+47,000/48,600/50,699 all cited; 2007: 40,000/38,100 both cited) - left out
+rather than published on one source or an unresolved conflict, the same
+caution this file already applies to unsourced biographical facts (see
+`docs/ROADMAP.md`'s "Ideas not yet scoped" section on birth dates). See
+`docs/SOURCES.md`'s two new matching entries (UEFA Nations League and Copa
+América sections) for the full per-edition reasoning and citation list, so
+a future run with better page-fetch access doesn't have to re-derive which
+15 editions are still open.
+
+**Content added:** the 3 editions that did clear the bar are now annotated
+directly on the existing "Final venues" bullet for that year in
+`content/copa-america.md` and `content/uefa-nations-league.md` (rather than
+a new, mostly-empty "Final attendance" section, which would have been an
+obvious stub - this routine's own established anti-stub convention), each
+section's own intro sentence extended to explain the scoping (attendance
+shown only where two-source-confirmed). Hand-translated into
+`hr/competitions/copa-america.astro`'s and
+`hr/competitions/nations-league.astro`'s own `notes` arrays. Both content
+files' `lastReviewed` bumped to 2026-09-10. New/extended e2e assertions in
+`tests/e2e/mobile.spec.ts` (EN + HR, both pages) check for the three new
+attendance figures inside the existing "Final venues" test blocks - no new
+test cases needed, no `.notes__card` count changed on either page (the
+figures are appended to existing bullets, not new bullets). All 700 PDFs
+regenerated and reverified clean (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium
+pnpm build:pdfs` then `pnpm check:pdfs`), since the content edits and the
+two new `docs/SOURCES.md` entries both mark every PDF's shared References
+section stale, by design.
+
+**Full standing health check:** `pnpm lint` (0/0/0), `pnpm test` (583/583
+unit, unchanged - presentation-layer content, no new unit-testable logic),
+`pnpm build` (711 pages, unchanged), `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache` (37 URLs), `check:perf`
+(heaviest page still `hr/records`, within the 610 KB budget, +0.9 KB from
+the new prose/citations), `check:pdfs` (700/700 fresh), `check:jsonld`
+(1,783/1,783 blocks valid), `check:meta` (710/710 pages clean), `check:html`
+(711/711 pages valid), `check:spelling` (0 issues), `pnpm dlx knip
+--no-config-hints` (the one standing false positive, unchanged), plus a
+full cold-start `pnpm test:e2e`.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025, the `long-title`
+brand-suffix decision), plus the 15 still-unverified Copa América/Nations
+League final-attendance editions this run's own `docs/SOURCES.md` entries
+name specifically - a good candidate for a future pass with direct
+page-fetch access (a UEFA.com/CONMEBOL match-report fetch, not a WebSearch
+synthesis, would likely resolve most of them). Extending "Final attendance"
+to World Cup/EURO was deliberately not attempted this run, since this
+run's own result shows the verification bar - not the research effort - is
+the real constraint, and widening scope before that constraint is
+addressed would just produce more single-source figures to leave out.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

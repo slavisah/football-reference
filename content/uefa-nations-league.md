@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 2018-19
 lastCompletedEdition: 2024-25
-lastReviewed: 2026-09-09
+lastReviewed: 2026-09-10
 status: verified
 ---
 
@@ -38,8 +38,8 @@ UEFA introduced the Nations League to replace many international friendlies with
 
 ## Final venues
 
-- All four teams that reach the Nations League Finals host a semifinal, but only one stadium in the host nation stages the final itself.
-- **2019:** Estádio do Dragão, Porto (Portugal).
+- All four teams that reach the Nations League Finals host a semifinal, but only one stadium in the host nation stages the final itself. A reported attendance figure is added only where it could be confirmed via two independent sources (2019 so far) - the other three editions' figures could not be reliably cross-checked and are left out rather than guessed.
+- **2019:** Estádio do Dragão, Porto (Portugal) - a reported attendance of 43,199.
 - **2021:** San Siro, Milan (Italy).
 - **2023:** De Kuip, Rotterdam (Netherlands) - stepped in for the larger Johan Cruyff Arena in Amsterdam, which was unavailable because of a concert booking.
 - **2025:** Allianz Arena, Munich (Germany).
