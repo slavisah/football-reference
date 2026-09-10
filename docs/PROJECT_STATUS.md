@@ -19984,9 +19984,12 @@ change block count or position sequencing), `check:meta` (710/710 clean),
 `check:html` (711/711 valid), `check:spelling` (0 issues), a targeted
 `playwright test -g "SportsTeam entity block"` run first to confirm the
 updated assertion passes before trusting a full suite run, then a full
-cold-start `pnpm test:e2e` (see the exact count logged alongside this run's
-commit - unchanged from the ninety-fourth/ninety-fifth runs' 944, since this
-run extended one existing `test()` block rather than adding a new one).
+cold-start `pnpm test:e2e`: **944/944 passed** (13.0 minutes), unchanged from
+the ninety-fourth/ninety-fifth runs' count - this run extended one existing
+`test()` block rather than adding a new one. `check:reflow`/`check:text-zoom`/
+`check:print-width` (run sequentially after `test:e2e` finished, not
+concurrently, to avoid the port-4321 collision the ninety-fifth run's own
+entry documents) all stayed clean too: 711/711 pages on all three.
 
 **Left for a future pass:** the same environment-blocked items as every
 recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
