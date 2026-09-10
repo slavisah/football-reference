@@ -3787,6 +3787,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     // also lists - see buildTeamSportsTeamJsonLd's own "Champion-only" rule.
     const sportsTeam = blocks.find((b) => b['@type'] === 'SportsTeam');
     expect(sportsTeam.name).toBe('Brazil');
+    expect(sportsTeam.sport).toBe('Football');
     expect(sportsTeam.award).toContain('FIFA World Cup 1958');
     expect(sportsTeam.award).toContain('FIFA World Cup 2002');
 

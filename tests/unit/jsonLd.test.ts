@@ -501,6 +501,7 @@ describe('buildTeamSportsTeamJsonLd', () => {
     expect(sportsTeam['@type']).toBe('SportsTeam');
     expect(sportsTeam.name).toBe('Germany');
     expect(sportsTeam.url).toBe('https://example.test/teams/germany/');
+    expect(sportsTeam.sport).toBe('Football');
     expect(sportsTeam.award).toEqual(['FIFA World Cup 1954', 'FIFA World Cup 1974', 'FIFA World Cup 2014']);
   });
 

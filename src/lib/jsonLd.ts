@@ -349,8 +349,11 @@ export function buildPlayerPersonJsonLd(
 /**
  * A /teams/<slug> page's national team as a schema.org SportsTeam - the
  * team-profile counterpart of buildPlayerPersonJsonLd() above, same
- * "complements the ItemList rather than replacing it" reasoning. `award`
- * only lists this team's actual title wins ("<Competition title> <Year>"),
+ * "complements the ItemList rather than replacing it" reasoning. `sport`
+ * uses the same literal 'Football' value the SportsEvent builders below
+ * already set, closing a gap where SportsTeam was the only sports-schema
+ * type on the site missing it. `award` only lists this team's actual title
+ * wins ("<Competition title> <Year>"),
  * filtered to `role === 'Champion'` appearances - a runner-up or semifinal
  * finish is a result, not an award, and this filtered list's length already
  * always equals `profile.totalTitles` (buildTeamProfile()'s own count from
@@ -366,6 +369,7 @@ export function buildTeamSportsTeamJsonLd(
     '@type': 'SportsTeam',
     name: profile.displayName,
     url: options.pageUrl,
+    sport: 'Football',
     award: profile.competitions.flatMap((competition) =>
       competition.appearances
         .filter((appearance) => appearance.role === 'Champion')
