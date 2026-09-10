@@ -19833,5 +19833,83 @@ run's own result shows the verification bar - not the research effort - is
 the real constraint, and widening scope before that constraint is
 addressed would just produce more single-source figures to leave out.
 
+### Confirmation health check, no new content angle found - closed 2026-09-10 (ninety-fifth intensive run)
+
+This run's own session had, independently and concurrently, started the
+exact same UEFA EURO "Final venues" work the regularly scheduled
+ninety-second run also completed - both sessions began from the same
+`566965eb` base within minutes of each other. The most likely explanation:
+this session's container was restarted mid-run (a background `pnpm
+test:e2e` invocation was lost mid-flight), and the routine's normal 4-hour
+schedule fired its next slot while this session was still working, landing
+on the same starting commit. On attempting to push, `git fetch` showed
+`origin/intensive/football-reference` had already moved three commits
+ahead: the ninety-second run's own EURO "Final venues" commit (functionally
+identical to this session's independently-written version - same content
+shape, same "Mjesta finala" Croatian heading choice, same budget-raise
+pattern), the ninety-third run's Croatian-heading reconciliation, and the
+ninety-fourth run's final-attendance work.
+
+**Resolution:** rather than force-pushing this session's redundant local
+commit over three commits of real, already-pushed work, `git reset --hard
+origin/intensive/football-reference` discarded it entirely and adopted the
+shared branch's current state. This is the correct response to this
+specific failure mode - a same-slot duplicate firing - and is called out
+explicitly in case it recurs: defer to whichever version already landed on
+the shared branch, discard the redundant local commit, never force-push
+over commits this session didn't create.
+
+With the branch already caught up through the ninety-fourth run, this run
+searched for a new, well-scoped task before just re-running the ninety-first
+through ninety-fourth runs' own health checks: re-checked `pnpm outdated`
+(still only the blocked `typescript` 7 entry), re-read
+`docs/WEBSITE_REQUIREMENTS.md` against the live route tree (every required
+and nice-to-have capability still live, nothing missing), re-ran `pnpm
+test:coverage` (99.91%/99.43%, unchanged from the seventh run's
+"defensively unreachable" classification of the four remaining sub-100%
+lines), and checked `scripts/check-lighthouse.mjs`'s `PAGES_TO_AUDIT`
+(already covers every page shape in both languages, extended across the
+sixteenth-eighteenth and thirtieth runs). Confirmed the ninety-fourth run's
+own closing note is right that re-attempting the 15 remaining
+final-attendance editions isn't worth it without better page-fetch access
+(the verification bar, not research effort, is the real constraint), and
+that every other standing "left for a future pass" item is genuinely
+blocked for a reason outside this run's control: human sign-off
+(`long-title` brand-suffix), environment egress (`docs/SOURCES.md`
+link-liveness), an upstream peer-dependency ceiling (`typescript` 7), or an
+already-exhausted award-history search (Nations League Team of the
+Tournament, re-confirmed unavailable across 6+ prior runs).
+
+Rather than force a speculative or duplicate content change, ran a full
+independent confirmation health check against the current tip instead -
+this run's genuinely useful contribution, per this routine's own standing
+instruction to fall back to a quality pass when the backlog is complete:
+`pnpm install` (no lockfile changes), `pnpm lint` (0/0/0), `pnpm test`
+(583/583 unit), `pnpm test:coverage` (99.91% statements / 99.43% branches,
+byte-for-byte unchanged), `pnpm build` (711 pages), `check:links` (715
+pages), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+`check:perf` (`hr/records` 591.4 KB, within the 610 KB budget),
+`check:pdfs` (700/700 fresh), `check:jsonld` (1,783/1,783 blocks valid),
+`check:meta` (710/710 pages clean), `check:html` (711/711 pages valid),
+`check:spelling` (0 issues), `check:reflow`/`check:text-zoom`/
+`check:print-width` (711/711 pages clean on all three, run sequentially -
+not concurrently with `pnpm test:e2e` - to avoid the port-4321 collision a
+much earlier run hit), `pnpm dlx knip --no-config-hints` (the one standing
+false positive, `scripts/test-preview-server.mjs`, unchanged), plus a full
+cold-start `pnpm test:e2e`: **944/944 passed** (23.1 minutes), matching the
+ninety-fourth run's own count exactly - no regression introduced by
+anything since. No code change needed beyond this documentation entry
+itself.
+
+**Left for a future pass:** unchanged from the ninety-fourth run's list -
+the same environment-blocked items (`typescript` 7, `docs/SOURCES.md`
+link-liveness, Nations League's Team of the Tournament for 2021/2023/2025,
+the `long-title` brand-suffix decision), plus the 15 still-unverified Copa
+América/Nations League final-attendance editions named in that run's
+`docs/SOURCES.md` entries. A future run should keep checking for a genuinely
+new content or verification angle rather than re-running this same
+confirmation pass on autopilot - repeat clean health checks add less each
+time, the same caution the tenth run's own entry already gives.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
