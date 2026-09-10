@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-09-04
+lastReviewed: 2026-09-10
 status: verified
 ---
 
@@ -19,6 +19,28 @@ The European Championship began in 1960 as the European Nations' Cup. Early fina
 - The finals open with a group stage; the best-placed teams in each group move on.
 - From the quarterfinals onward it is a straight knockout: a single loss ends a team's tournament.
 - The final decides the champion; no third-place match has been played since 1980 (see "Historical format note" below).
+
+## Final venues
+
+Every EURO edition has decided its champion in one match at one stadium - even 2020, whose group and knockout matches were split across eleven host cities to mark the competition's 60th anniversary, still settled the title at a single venue like every other year.
+
+- **1960:** Parc des Princes, Paris (France).
+- **1964:** Santiago Bernabéu, Madrid (Spain) - the same stadium later hosted the 1982 FIFA World Cup final.
+- **1968:** Stadio Olimpico, Rome (Italy) - the original final finished 1-1, so the replay was played two days later at the same stadium.
+- **1972:** Heysel Stadium, Brussels (Belgium).
+- **1976:** Stadion Crvena zvezda (Red Star Stadium), Belgrade (Yugoslavia).
+- **1980:** Stadio Olimpico, Rome (Italy) - the same stadium as the 1968 final, the first to host two EURO finals.
+- **1984:** Parc des Princes, Paris (France) - the same stadium as the 1960 final.
+- **1988:** Olympiastadion, Munich (West Germany).
+- **1992:** Ullevi, Gothenburg (Sweden).
+- **1996:** Wembley Stadium, London (England).
+- **2000:** De Kuip, Rotterdam (Netherlands).
+- **2004:** Estádio da Luz, Lisbon (Portugal).
+- **2008:** Ernst-Happel-Stadion, Vienna (Austria).
+- **2012:** NSC Olimpiyskiy, Kyiv (Ukraine).
+- **2016:** Stade de France, Saint-Denis (France).
+- **2020:** Wembley Stadium, London (England) - the same stadium as the 1996 final, the second to host two EURO finals.
+- **2024:** Olympiastadion, Berlin (Germany).
 
 ## Editions
 

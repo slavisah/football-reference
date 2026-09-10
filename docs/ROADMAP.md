@@ -3579,3 +3579,40 @@ back clean:
   a `chromium_headless_shell` binary not present under `/opt/pw-browsers/`;
   the `pnpm test:e2e` suite itself already documents its own
   `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` convention separately).
+- **UEFA EURO "Final venues" note section**: closed 2026-09-10 (ninety-second
+  intensive run) - acted directly on the ninety-first run's own closing note
+  (backfilled into `docs/PROJECT_STATUS.md` this run, since that run's own
+  detailed entry there was missing), extending "Final venues" to UEFA EURO,
+  the last of the four team-competition families still uncovered by this
+  angle. Every one of EURO's 17 editions, including the pandemic-delayed,
+  eleven-city 2020 edition, settled its title in one match at one stadium, so
+  no scoping was needed. Added a "Final venues" section to
+  `content/uefa-euro.md` (all 17 editions, 1960-2024), each verified via
+  WebSearch passes batched by era and cross-checked against each edition's
+  own dedicated Wikipedia final article, with targeted follow-up queries
+  confirming three specific facts (the 1968 replay venue, 1992's Gothenburg
+  - not Stockholm - venue, the Ernst-Happel-Stadion's exact spelling) rather
+  than assuming them. Wired into `euro.astro`'s `noteHeadings` (English) and
+  hand-translated into `hr/competitions/euro.astro`'s own `notes` array as
+  "Mjesta finala" (Croatian). Seven new proper nouns added to
+  `.cspell/football-names.txt`. `content/uefa-euro.md`'s `lastReviewed`
+  bumped to 2026-09-10. New e2e coverage (EN + HR). `hr/records` pushed the
+  590 KB page-weight budget to 590.5 KB from the new `docs/SOURCES.md`
+  citations, so `PAGE_WEIGHT_BUDGET_BYTES` was raised to 610 KB (the
+  eleventh such deliberate raise). All 700 PDFs regenerated and reverified
+  clean. Full standing health check clean: `pnpm lint`/`test`/`build`/
+  `check:links`/`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs`/
+  `check:jsonld`/`check:meta`/`check:html`/`check:spelling`/`knip` all
+  clean, plus a full cold-start `pnpm test:e2e` (944/944 passed, 15.2
+  minutes, up from 942). See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a future
+  pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025, the `long-title` brand-suffix decision),
+  plus a pre-existing Croatian-heading naming inconsistency across the four
+  "Final venues" sections ("Mjesta finala" for World Cup/EURO vs "Stadioni
+  finala" for Nations League vs "Domaćini finala" for Copa América) this run
+  noticed but left unreconciled. With "Final venues" now live for all four
+  team-competition families, this content angle is exhausted - a future run's
+  best bet is either the still-open Copa América winning-captains-1975-2010
+  gap or a genuinely different quality/verification angle.

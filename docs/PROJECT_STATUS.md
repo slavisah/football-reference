@@ -19526,5 +19526,153 @@ Nations League and Copa América but still genuinely open for World Cup (23
 editions) and EURO (17) - the natural next slice for a future run wanting to
 continue this same angle.
 
+### FIFA World Cup "Final venues" note section - added 2026-09-09 (ninety-first intensive run, backfilled)
+
+**Backfill note:** this entry was never written by the ninety-first run
+itself - `docs/ROADMAP.md`'s own matching entry documents the work in full,
+but no corresponding entry existed here, breaking this file's append-only
+"one entry per change" convention. Reconstructed from `docs/ROADMAP.md`'s
+existing account by the ninety-second run, below, rather than left missing.
+
+Acted directly on the ninetieth run's own closing note, extending "Final
+venues" to the FIFA World Cup, this routine's top-priority content family.
+Unlike Copa América, no scoping/exclusion was needed: every one of the 23
+World Cup editions (including 1950's final-group decider between Uruguay
+and Brazil) has one single decisive match at one stadium. Added a "Final
+venues" section to `content/fifa-world-cup.md` (all 23 editions,
+1930-2026), each verified via independent WebSearch passes batched across
+editions, cross-checked against each edition's own dedicated Wikipedia
+final article; two repeat-venue facts (Estadio Azteca hosting both 1970 and
+1986; the Maracanã hosting both 1950 and 2014) and 2010's post-tournament
+stadium rename (Soccer City to FNB Stadium) each independently confirmed.
+Wired into `world-cup.astro`'s `noteHeadings` (English) and
+hand-translated into `hr/competitions/world-cup.astro`'s own `notes` array
+as "Mjesta finala" (Croatian). Thirteen new proper nouns added to
+`.cspell/football-names.txt`. `content/fifa-world-cup.md`'s `lastReviewed`
+bumped to 2026-09-09. New e2e coverage (EN + HR heading/content assertions,
+`.notes__card`/jump-nav counts bumped 11 -> 12 for both languages). All 700
+PDFs regenerated and reverified clean. Full standing health check clean:
+`pnpm lint` (0/0/0), `pnpm test` (583/583 unit), `pnpm build` (711 pages),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page still `hr/records`, within the 590 KB
+budget), `check:jsonld` (1,783/1,783 blocks clean), `check:meta` (710/710
+pages clean), `check:html` (711/711 pages clean), `check:spelling` (0
+issues). See `docs/SOURCES.md`'s matching entry for the citation list.
+
+**Left for a future pass (per `docs/ROADMAP.md`'s own record):** the same
+environment-blocked items as every recent run (`typescript` 7,
+`docs/SOURCES.md` link-liveness, Nations League's Team of the Tournament for
+2021/2023/2025, the `long-title` brand-suffix decision), plus extending
+"Final venues" to EURO (17 editions) - the last team-competition family
+still uncovered by this angle.
+
+### UEFA EURO "Final venues" note section - added 2026-09-10 (ninety-second intensive run)
+
+A standing health check first (`pnpm install`; `pnpm outdated` still shows
+only the blocked `typescript` 7 entry; `pnpm lint` 0/0/0; `pnpm test`
+583/583 unit; `pnpm build` 711 pages; `check:links`/`check:sitemap`/
+`check:precache`/`check:jsonld`/`check:html`/`check:meta`/`check:spelling`
+all clean and matching the ninety-first run's baseline; `pnpm dlx knip
+--no-config-hints` matched the standing one-false-positive baseline).
+
+Acted directly on the ninety-first run's own closing note (see the backfilled
+entry above): extended the "Final venues" angle - already live for UEFA
+Nations League, Copa América and the FIFA World Cup - to UEFA EURO, the last
+of the four team-competition families and this routine's own top content
+priority. Unlike Copa América, no scoping/exclusion was needed: every one of
+EURO's 17 editions, including the pandemic-delayed, eleven-city 2020
+edition, settled its title in one match at one stadium.
+
+Verified all 17 finals' venues via four independent WebSearch passes
+batched by era (1960-1976, 1980-1996, 2000-2016, 2020-2024), each
+cross-checked against the edition's own dedicated Wikipedia final article,
+plus three targeted follow-up queries confirming facts rather than assuming
+them: 1968's replay was played at the same Stadio Olimpico as the original
+drawn match, not a different Rome venue; 1992's final was at Ullevi in
+Gothenburg, not Stockholm (a plausible mix-up, since Stockholm hosted the
+1958 World Cup final); and the Ernst-Happel-Stadion's exact hyphenated
+spelling, confirmed against its own Wikipedia article. Three repeat-venue
+facts, matching the style the FIFA World Cup and UEFA Nations League
+sections already established, called out explicitly rather than left as a
+coincidence: Stadio Olimpico, Rome hosted both 1968 and 1980 (the first
+stadium to host two EURO finals); Parc des Princes, Paris hosted both 1960
+and 1984; Wembley Stadium, London hosted both 1996 and 2020 (the second
+stadium to host two EURO finals). See `docs/SOURCES.md`'s matching new
+entry, under the "UEFA EURO" heading, for the full citation list.
+
+Added a new "Final venues" note section to `content/uefa-euro.md`, placed
+right after "How it works" (before the "Editions" table) - matching where
+the FIFA World Cup's equivalent section sits (UEFA Nations League and Copa
+América place theirs slightly differently, ahead of their individual-award
+sections, but EURO's own heading order already put "Historical format note"
+immediately after "Editions"/"Champions by titles", so "Final venues"
+belongs with the other "how the tournament works" material at the top, the
+same reasoning the World Cup entry gives). `content/uefa-euro.md`'s
+`lastReviewed` bumped to 2026-09-10.
+
+Wired into `src/pages/competitions/euro.astro`'s `noteHeadings` (English,
+inserted right after `'How it works'`) and hand-translated into
+`src/pages/hr/competitions/euro.astro`'s own `notes` array as "Mjesta
+finala" (Croatian, matching the FIFA World Cup Croatian page's own choice of
+translation for this same section name, rather than the "Stadioni
+finala"/"Domaćini finala" wording the Nations League/Copa América Croatian
+pages independently landed on for their own equivalent sections - a
+pre-existing three-way inconsistency across those two, not introduced by
+this run, left as-is since reconciling it isn't in scope for a content-add
+run). Updated that page's own top-of-file doc comment (heading count and
+list) to match.
+
+Seven new proper nouns (Crvena, Happel, Heysel, Olimpiyskiy, Stadion,
+Ullevi, zvezda) needed adding to `.cspell/football-names.txt` (inserted at
+their correct alphabetical position, matching that file's existing
+convention) - `pnpm check:spelling` caught all seven on the first run after
+the content edit; the `-hr` translation doesn't get spell-checked (that
+script only covers `content/**/*.md`), so no additional Croatian-specific
+entries were needed there. New e2e coverage in `tests/e2e/mobile.spec.ts`:
+one new dedicated English test (heading, first entry, and both repeat-venue
+notes) and one new dedicated Croatian test mirroring it, following the same
+per-section test pattern the Copa América entry's own note already
+documents (no `.notes__card` count assertion exists for the EURO page,
+unlike World Cup/Golden Boot, so nothing needed bumping there).
+
+`hr/records` (which aggregates every competition's full `docs/SOURCES.md`
+citation list, EURO's included) grew past the existing 590 KB page-weight
+budget - 590.5 KB, 0.5 KB over - purely from this section's 18 new citation
+URLs under the "UEFA EURO" heading in `docs/SOURCES.md`. Raised
+`PAGE_WEIGHT_BUDGET_BYTES` in `scripts/check-page-weight.mjs` to 610 KB (the
+eleventh such deliberate raise, documented inline in that script's own
+comment the same way each of the prior ten was), rather than trim genuine
+new editorial content.
+
+All 700 PDFs regenerated (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium
+pnpm build:pdfs`) and reverified clean via `pnpm check:pdfs` (700/700
+fresh) - both `content/uefa-euro.md` and the `docs/SOURCES.md` addition
+mark every PDF's shared References section stale, by design, the same lag
+every prior content-adding run has hit.
+
+**Full standing health check:** `pnpm lint` (0/0/0), `pnpm test` (583/583
+unit, unchanged - no new pure logic, this is a content + e2e change only),
+`pnpm build` (711 pages, unchanged), `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache` (37 URLs), `check:perf`
+(heaviest page `hr/records`, 590.5 KB, within the newly-raised 610 KB
+budget), `check:pdfs` (700/700 fresh), `check:spelling` (0 issues after the
+dictionary update), `check:html` (711/711 pages valid), `check:jsonld`
+(1,783/1,783 blocks valid), `check:meta` (clean, unchanged), `pnpm dlx knip
+--no-config-hints` (the one standing false positive, unchanged), plus a
+full cold-start `pnpm test:e2e`: **944/944 passed** (15.2 minutes, up from
+942 - the two new Final-venues tests, EN and HR).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025), plus the `long-title`
+brand-suffix decision and the pre-existing "Mjesta finala"/"Stadioni
+finala"/"Domaćini finala" Croatian-heading inconsistency this run's own
+notes flagged above. With "Final venues" now live for all four
+team-competition families (UEFA Nations League, Copa América, FIFA World
+Cup, UEFA EURO), the content-mining angle for this specific idea is
+exhausted - a future run's best bet is either a fresh content-gap lead
+(Copa América's still-open winning-captains-1975-2010 gap) or another
+genuinely different quality/verification angle.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

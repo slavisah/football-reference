@@ -1058,6 +1058,46 @@ Primary sources should be preferred.
     articles and the UEFA EURO account's own X/Twitter posts, both indexed
     and reachable via WebSearch even though direct WebFetch to uefa.com and
     x.com is not) rather than direct page loads.
+- Final venues, all 17 editions (added 2026-09-10, ninety-second intensive
+  run): extending the "Final venues" angle - already live for UEFA Nations
+  League, Copa América and the FIFA World Cup - to UEFA EURO, the last
+  team-competition family it hadn't yet covered. Every EURO edition has one
+  single decisive match at one stadium, including 2020's eleven-city edition
+  (only its final was fixed to Wembley), so no scoping/exclusion was needed.
+  Verified in batches via independent WebSearch passes covering different
+  sets of editions, cross-checked against each edition's own dedicated
+  Wikipedia final article, with targeted follow-up queries confirming three
+  specific facts rather than assuming them: 1968's replay was played at the
+  same Stadio Olimpico as the original drawn match (not a different Rome
+  venue), 1992's final was at Ullevi (Nya Ullevi) in Gothenburg (not
+  Stockholm), and the Ernst-Happel-Stadion's exact hyphenated spelling.
+  Three repeat-venue facts confirmed: Stadio Olimpico, Rome hosted both 1968
+  and 1980 (the first stadium to host two EURO finals); Parc des Princes,
+  Paris hosted both 1960 and 1984; Wembley Stadium, London hosted both 1996
+  and 2020 (the second stadium to host two EURO finals). **No discrepancies
+  found**:
+  - https://en.wikipedia.org/wiki/1960_European_Nations%27_Cup_final
+  - https://en.wikipedia.org/wiki/1964_European_Nations%27_Cup_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1968_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1972_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1976_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1980_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1984_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1988_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1992_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1996_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2000_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2004_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2008_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2012_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2016_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2020_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2024_final
+  - https://en.wikipedia.org/wiki/Ernst-Happel-Stadion
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed Wikipedia pages rather than direct page
+    loads.
 
 ## UEFA Nations League
 
