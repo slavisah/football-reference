@@ -1546,7 +1546,7 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
   });
 
   test('shows the translated Final venues section', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: 'Domaćini finala' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Mjesta finala' })).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('Estádio das Laranjeiras, Rio de Janeiro (Brazil).').first(),
     ).toBeVisible();
@@ -1725,7 +1725,7 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
   });
 
   test('shows the translated Final venues section', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: 'Stadioni finala' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Mjesta finala' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Allianz Arena, München (Njemačka)')).toBeVisible();
   });
 

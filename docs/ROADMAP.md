@@ -3616,3 +3616,24 @@ back clean:
   team-competition families, this content angle is exhausted - a future run's
   best bet is either the still-open Copa América winning-captains-1975-2010
   gap or a genuinely different quality/verification angle.
+- **Croatian "Final venues" heading reconciled to "Mjesta finala"**: fixed
+  2026-09-10 (ninety-third intensive run) - acted directly on the
+  ninety-second run's own closing note above. Standardized all four
+  Croatian "Final venues" section headings to "Mjesta finala" (the majority
+  and most literal choice) by editing `nations-league.astro`'s and
+  `copa-america.astro`'s `heading` fields; updated the two matching
+  hardcoded e2e assertions. All 700 PDFs regenerated and reverified clean.
+  Full standing health check clean including a full cold-start `pnpm
+  test:e2e` (944/944, unchanged count). Also corrected a stale, repeatedly
+  copy-pasted closing note: "Copa América's winning-captains-1975-2010 gap"
+  has actually been fully closed since the sixty-seventh run (2026-09-05)
+  but kept getting re-listed as still-open in several later runs' closing
+  notes, including the ninety-second run's own directly above - not a real
+  open item, so not chased. See `docs/PROJECT_STATUS.md`'s matching entry
+  for detail. **Left for a future pass:** the same environment-blocked items
+  as every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  Nations League's Team of the Tournament for 2021/2023/2025), plus the
+  `long-title` brand-suffix decision (needs human sign-off). A future run's
+  best bet is a genuinely new verification method or content-accuracy angle
+  - the "Final venues" content-mining angle and every award-history angle
+  this routine has identified are now exhausted.
