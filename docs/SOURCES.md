@@ -1313,6 +1313,27 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Final attendance investigation (added 2026-09-10, ninety-fourth intensive
+  run): tried to extend "Final venues" with a reported attendance figure for
+  all four editions, the same content-mining pattern used for every prior
+  award-history/venue addition. Held to this file's own established
+  two-independent-source bar, only the 2019 final cleared it - Wikipedia and
+  zerozero.pt both independently state 43,199. 2021, 2023 and 2025 each
+  turned up a single consistently repeated figure (31,511; 41,110; 65,852
+  respectively) but no second, genuinely independent domain that stated the
+  number outright rather than mirroring Wikipedia - left out of
+  `content/uefa-nations-league.md` rather than published on one source, per
+  the same caution this file already applies to unsourced biographical facts
+  (see `docs/ROADMAP.md`'s "Ideas not yet scoped" section on birth dates).
+  This gap is left open for a future pass with direct page-fetch access
+  (WebFetch/curl are egress-blocked in this environment for match-report
+  pages specifically, unlike the Wikipedia article summaries WebSearch can
+  synthesize) rather than assumed unresolvable:
+  - https://en.wikipedia.org/wiki/2019_UEFA_Nations_League_final
+  - https://www.zerozero.pt/jogo/2019-06-09-portugal-paises-baixos/6894430
+  - https://en.wikipedia.org/wiki/2021_UEFA_Nations_League_final
+  - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_final
+  - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
 
 ## Copa América
 
@@ -2298,6 +2319,35 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied entirely on
     WebSearch's synthesized summaries rather than direct page loads.
+- Final attendance investigation (added 2026-09-10, ninety-fourth intensive
+  run): tried to extend "Final venues" with a reported attendance figure for
+  all 14 Knockout-final-era editions (1987-2024; the five older Final
+  playoff deciders were deliberately left out of scope as an even harder
+  verification case). Held to this file's own established
+  two-independent-source bar, only two cleared it: 2011 (65,921, an exact
+  quote from CONMEBOL's own official recap article, the strongest
+  confirmation of the batch) and 2021 (6,500, a COVID-19-restricted,
+  behind-closed-doors final corroborated by multiple independent
+  contemporary news wires reporting the same restricted-crowd figure). Every
+  other edition either had a single consistently repeated figure with no
+  second independent domain confirming it directly (1987, 1993, 1995, 1997,
+  1999, 2004, 2015, 2016, 2019, 2024), or genuinely conflicting figures
+  across sources (2001: 47,000/48,600/50,699 all cited; 2007: 40,000/38,100
+  both cited) - left out of `content/copa-america.md` rather than published
+  on a single source or an unresolved conflict, the same caution this file
+  already applies to unsourced biographical facts (see `docs/ROADMAP.md`'s
+  "Ideas not yet scoped" section on birth dates). This gap is left open for
+  a future pass with direct page-fetch access (WebFetch/curl are
+  egress-blocked in this environment for match-report pages specifically,
+  unlike the Wikipedia article summaries WebSearch can synthesize) rather
+  than assumed unresolvable - a good next attempt would specifically target
+  the official CONMEBOL recap articles and RSSSF tables this pass could only
+  see indexed, not fetch, for 1987, 1993, 2004, 2016 and 2019:
+  - https://en.wikipedia.org/wiki/2011_Copa_Am%C3%A9rica_final
+  - https://copaamerica.com/en/news/uruguay-become-champions-during-argentina-2011
+  - https://en.wikipedia.org/wiki/2021_Copa_Am%C3%A9rica_final
+  - https://news.cgtn.com/news/2021-07-10/Maracana-Stadium-opens-to-10-of-fans-for-Copa-America-final-11MGbAUmCn6/index.html
+  - https://www.outlookindia.com/website/story/sports-news-copa-america-final-rio-de-janeiro-officials-open-10-maracana-stadium-for-argentina-brazil-title-clash/387697
 
 ## Ballon d'Or
 

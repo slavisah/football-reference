@@ -5,7 +5,7 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-09-09
+lastReviewed: 2026-09-10
 status: verified
 ---
 
@@ -23,7 +23,7 @@ Its history is less uniform than the World Cup or EURO. Some editions used a fin
 
 ## Final venues
 
-Unlike UEFA Nations League, most Copa América editions have no single fixed-venue final to record - the League table era (1916-1967, minus the five playoff deciders below) crowned a champion by final standings across several cities, and the three Home-and-away editions (1975, 1979, 1983) split the decider over two legs in two different countries. This section is scoped to the same 19 editions that already carry a Final date above: the five Final playoff deciders and the 13 Knockout final editions plus the 2016 centenary final, each a single decisive match played at one stadium.
+Unlike UEFA Nations League, most Copa América editions have no single fixed-venue final to record - the League table era (1916-1967, minus the five playoff deciders below) crowned a champion by final standings across several cities, and the three Home-and-away editions (1975, 1979, 1983) split the decider over two legs in two different countries. This section is scoped to the same 19 editions that already carry a Final date above: the five Final playoff deciders and the 13 Knockout final editions plus the 2016 centenary final, each a single decisive match played at one stadium. A reported attendance figure is added only where it could be confirmed via two independent sources (2011, 2021) - unlike the venue itself, match-day attendance for most other editions could not be reliably cross-checked and is left out rather than guessed.
 
 - **1919:** Estádio das Laranjeiras, Rio de Janeiro (Brazil).
 - **1922:** Estádio das Laranjeiras, Rio de Janeiro (Brazil).
@@ -38,11 +38,11 @@ Unlike UEFA Nations League, most Copa América editions have no single fixed-ven
 - **2001:** Estadio El Campín, Bogotá (Colombia).
 - **2004:** Estadio Nacional, Lima (Peru) - the same stadium as the 1953 final.
 - **2007:** Estadio José Pachencho Romero, Maracaibo (Venezuela).
-- **2011:** Estadio Monumental, Buenos Aires (Argentina) - the same stadium as the 1987 final.
+- **2011:** Estadio Monumental, Buenos Aires (Argentina) - the same stadium as the 1987 final; a reported crowd of 65,921.
 - **2015:** Estadio Nacional Julio Martínez Prádanos, Santiago (Chile).
 - **2016:** MetLife Stadium, East Rutherford, New Jersey (United States) - Copa América Centenario.
 - **2019:** Estádio do Maracanã, Rio de Janeiro (Brazil).
-- **2021:** Estádio do Maracanã, Rio de Janeiro (Brazil) - the same stadium as the 2019 final.
+- **2021:** Estádio do Maracanã, Rio de Janeiro (Brazil) - the same stadium as the 2019 final; played behind closed doors under COVID-19 restrictions, with a reported attendance of just 6,500 (a small fraction of the stadium's usual capacity), one of the emptiest finals in the competition's history.
 - **2024:** Hard Rock Stadium, Miami Gardens, Florida (United States).
 
 ## Champions timeline

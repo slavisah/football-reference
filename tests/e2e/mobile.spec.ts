@@ -1218,6 +1218,12 @@ test.describe('Copa América page on a 360px phone', () => {
     await expect(
       page.locator('.notes__card').getByText('Hard Rock Stadium, Miami Gardens, Florida (United States).'),
     ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('a reported crowd of 65,921'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('reported attendance of just 6,500'),
+    ).toBeVisible();
   });
 
   test('shows the Best Player winners section from content/copa-america.md', async ({ page }) => {
@@ -1553,6 +1559,9 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await expect(
       page.locator('.notes__card').getByText('Hard Rock Stadium, Miami Gardens, Florida (Sjedinjene Američke Države).'),
     ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('prijavljeno 65.921 gledatelja'),
+    ).toBeVisible();
   });
 
   test('shows the translated Best Player winners section', async ({ page }) => {
@@ -1630,6 +1639,7 @@ test.describe('Nations League page on a 360px phone', () => {
     await expect(page.getByRole('heading', { name: 'Key facts' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Final venues' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Allianz Arena, Munich (Germany)')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('43,199')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Player of the Finals winners' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Nuno Mendes (Portugal)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
@@ -1727,6 +1737,7 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
   test('shows the translated Final venues section', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Mjesta finala' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Allianz Arena, München (Njemačka)')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('43.199')).toBeVisible();
   });
 
   test('shows the translated Player of the Finals winners section', async ({ page }) => {
