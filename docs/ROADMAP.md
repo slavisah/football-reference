@@ -3739,3 +3739,31 @@ back clean:
   file end to end looking for cross-builder inconsistencies" method that
   found the `sport` gap here - e.g. whether every JSON-LD builder that
   reasonably could set `inLanguage` does.
+- **`inLanguage` extended to every eligible JSON-LD block**: closed
+  2026-09-10 (ninety-seventh intensive run) - acted on the ninety-sixth
+  run's own closing note. `buildWebSiteJsonLd()` was the only builder in
+  `src/lib/jsonLd.ts` that ever set `inLanguage`, even though schema.org's
+  own `inLanguage` property (`WebSearch`-verified against schema.org's live
+  docs) declares `CreativeWork`/`Event` in its `domainIncludes` and four
+  other builders' types qualify: `SportsEvent`, `Quiz`, `DefinedTermSet` and
+  `CollectionPage` (each individually type-hierarchy-verified, not assumed);
+  `ItemList`/`BreadcrumbList`/`Person`/`SportsTeam` don't and were correctly
+  left alone. Added one new pure function, `withInLanguage(items, locale)`,
+  called once from `BaseLayout.astro` over the shared
+  `[breadcrumb, website, ...jsonLd]` array every page already assembles,
+  rather than touching ~44 call sites across `src/pages/` by hand - the same
+  "one canonical place" pattern the breadcrumb/`WebSite` blocks already use.
+  Five new unit tests plus extended/new e2e coverage (EN + HR) confirm both
+  the pure function and the real built pages. All 700 PDFs unaffected (no
+  content file touched). Full standing health check clean including a full
+  cold-start `pnpm test:e2e`. See `docs/PROJECT_STATUS.md`'s matching entry
+  for detail. **Left for a future pass:** the same environment-blocked items
+  as every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  Nations League's Team of the Tournament for 2021/2023/2025, the
+  `long-title` brand-suffix decision), plus the Nations League 2023
+  attendance conflict (41,110 vs. 41,500) and 2021/2025's still-unconfirmed
+  figures. A future pass's best bet is a fresh source lead on that
+  attendance conflict, another "read a shared library file end to end" pass
+  over a different file, or a genuinely different quality angle
+  (accessibility, performance, SEO, or a fresh `docs/WEBSITE_REQUIREMENTS.md`
+  read against the live site).
