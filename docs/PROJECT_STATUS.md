@@ -19911,5 +19911,96 @@ new content or verification angle rather than re-running this same
 confirmation pass on autopilot - repeat clean health checks add less each
 time, the same caution the tenth run's own entry already gives.
 
+### SportsTeam JSON-LD gains `sport: 'Football'`; Nations League attendance re-investigated - closed 2026-09-10 (ninety-sixth intensive run)
+
+A standing health check first: `pnpm install` (no lockfile changes), `pnpm
+outdated` (still only the blocked `typescript` 7 entry - re-confirmed via
+`npm view @astrojs/check@latest peerDependencies`, unchanged `^5.0.0 ||
+^6.0.0` ceiling), `pnpm dlx knip --no-config-hints` (the one standing false
+positive, `scripts/test-preview-server.mjs`, unchanged). Also re-tested
+whether this environment's outbound egress block on direct page fetches
+(`curl`/`WebFetch` to `en.wikipedia.org`) had changed since the last check -
+it hadn't (`CONNECT tunnel failed, response 403`, same as every prior run).
+
+**Content angle attempted first, closed negatively (again):** the
+ninety-fourth/ninety-fifth runs both left the three remaining UEFA Nations
+League final-attendance editions (2021, 2023, 2025) open, citing the same
+single-source-only gap for each. Re-attempted with several differently
+worded `WebSearch` queries per edition, specifically hunting for a domain
+that isn't Wikipedia or a Wikipedia mirror (Grokipedia, Fandom) stating the
+figure directly. The result is more informative than a bare repeat: 2021 and
+2025 still only ever produce the exact same single figures already on
+record (31,511; 65,852) - UEFA.com's own match pages and a national
+broadcaster site surface in the search results alongside Wikipedia, but nothing
+demonstrates the number was read off those pages independently rather than
+attributed to them by the search tool's own synthesis, so the
+cannot-confirm-independence verdict stands. 2023 turned up something new
+instead of a repeat: RFEF's own match report (`rfef.es`, Spain's football
+federation, run for a team that played in this exact final) describes the
+crowd as "a full house with 41,500 spectators" - not the 41,110 Wikipedia
+gives. That's not corroboration, it's a genuine two-source conflict, the
+same shape as Copa América's already-excluded 2001/2007 editions rather than
+Nations League's own previously-cleared 2019 (two sources agreeing exactly).
+All three stay out of `content/uefa-nations-league.md`, unchanged from the
+ninety-fourth run's decision - but the 2023 finding means a future pass
+should treat it as a sourced discrepancy to resolve, not an unconfirmed
+figure to keep re-searching for. See `docs/SOURCES.md`'s matching new entry
+under "UEFA Nations League" for the full citation list.
+
+**Real gap found and fixed instead:** while re-reading `src/lib/jsonLd.ts`
+end to end looking for the re-investigation's second source (checking
+whether `buildLatestEditionSportsEvent`/`buildEditionSportsEvent` already
+had anything worth cross-referencing), noticed both `SportsEvent` builders
+set `sport: 'Football'` but `buildTeamSportsTeamJsonLd()` (added the
+twenty-sixth run, 2026-08-29) never did, even though `SportsTeam` inherits
+the same `sport` property from schema.org's `SportsOrganization` - a
+genuine, previously-unnoticed inconsistency between two sports-schema
+builders in the same file, not a new feature requiring research or
+editorial judgment. Added `sport: 'Football'` to
+`buildTeamSportsTeamJsonLd()`'s return value, reusing the exact literal
+string the `SportsEvent` builders already use rather than introducing a
+second spelling ("Soccer" never appears anywhere else in this codebase's own
+component/library code - the two stadium-name occurrences in
+`content/fifa-world-cup.md`/its Croatian sibling are the "Soccer City"
+proper noun, not the sport). Updated the matching unit test
+(`tests/unit/jsonLd.test.ts`) and the one e2e assertion that reads the exact
+`/teams/brazil` `SportsTeam` block (`tests/e2e/mobile.spec.ts`) to also check
+the new field; `/teams/<slug>` and `/hr/teams/<slug>` share the same builder
+so no separate Croatian assertion was needed. Confirmed via `git grep
+buildTeamSportsTeamJsonLd` that both call sites (`teams/[slug].astro`,
+`hr/teams/[slug].astro`) need no changes of their own - the field flows
+through automatically.
+
+Full standing health check clean: `pnpm lint` (0/0/0 across 181 files),
+`pnpm test` (583/583 unit, unchanged count - one existing test extended, no
+new test added), `pnpm build` (711 pages, unchanged), `check:links` (715
+pages), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+`check:perf` (heaviest page still `hr/records`, 591.4 KB, unchanged - no
+content edit), `check:pdfs` (700/700 fresh - `src/lib/jsonLd.ts` and the two
+`teams/[slug].astro` files are not PDF source files, confirmed against
+`scripts/pdf-pages.mjs`, so no regeneration was needed), `check:jsonld`
+(1,783/1,783 blocks still structurally valid - a new object property doesn't
+change block count or position sequencing), `check:meta` (710/710 clean),
+`check:html` (711/711 valid), `check:spelling` (0 issues), a targeted
+`playwright test -g "SportsTeam entity block"` run first to confirm the
+updated assertion passes before trusting a full suite run, then a full
+cold-start `pnpm test:e2e` (see the exact count logged alongside this run's
+commit - unchanged from the ninety-fourth/ninety-fifth runs' 944, since this
+run extended one existing `test()` block rather than adding a new one).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix decision needing human sign-off, Nations League's
+Team of the Tournament for 2021/2023/2025 still unavailable across 6+ prior
+runs), plus the three Nations League final-attendance editions - 2021/2025
+unconfirmed as before, and 2023 now specifically a sourced 41,110-vs-41,500
+conflict rather than an unconfirmed single figure. A future run's best bet
+is either resolving that specific 2023 conflict with a new source lead, or
+another `git grep`-style cross-builder consistency pass like this run's
+`sport` field find - the same "read the file end to end looking for
+something else and notice a real inconsistency" method that surfaced it here
+worked once and may still have more to find (e.g. whether every JSON-LD
+builder that could reasonably set `inLanguage` does).
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

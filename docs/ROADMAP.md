@@ -3704,3 +3704,38 @@ back clean:
   again, the fix is exactly what this run did (defer to whichever version is
   already on the shared branch, discard the redundant local commit, don't
   force-push) rather than treating it as an error to correct.
+- **`SportsTeam` JSON-LD `sport` field plus a Nations League attendance
+  re-investigation**: closed 2026-09-10 (ninety-sixth intensive run) - a
+  standing health check first (`pnpm outdated`/`pnpm dlx knip
+  --no-config-hints` unchanged from the ninety-fifth run's baseline).
+  Re-attempted the three still-open Nations League final-attendance editions
+  (2021/2023/2025) with differently worded searches aimed specifically at
+  finding a non-Wikipedia-mirroring source: 2021 and 2025 still only produce
+  the same single repeated figures as before (unconfirmed, unchanged), but
+  2023 turned up a genuine new finding - RFEF's own match report states "a
+  full house with 41,500 spectators," conflicting with Wikipedia's 41,110,
+  the same kind of source disagreement that already excludes Copa América's
+  2001/2007 editions from this section. All three stay out of
+  `content/uefa-nations-league.md`, but 2023 is now a documented conflict
+  rather than an unconfirmed single source - see `docs/SOURCES.md`'s new
+  entry. While re-reading `src/lib/jsonLd.ts` for that investigation, found a
+  real, previously-unnoticed inconsistency: both `SportsEvent` builders set
+  `sport: 'Football'`, but `buildTeamSportsTeamJsonLd()` never did, even
+  though `SportsTeam` inherits the same schema.org property. Fixed by adding
+  the field (matching the site's own existing spelling, never "Soccer"),
+  with matching unit and e2e test updates. Full standing health check clean:
+  `pnpm lint` (0/0/0), `pnpm test` (583/583 unit, unchanged count), `pnpm
+  build` (711 pages), `check:links`/`check:sitemap`/`check:precache`/
+  `check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/`check:html`/
+  `check:spelling` all clean, plus a full cold-start `pnpm test:e2e`. See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a future
+  pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025, the `long-title` brand-suffix decision),
+  plus the Nations League 2023 attendance conflict (41,110 vs. 41,500) as a
+  specific, sourced discrepancy to resolve rather than an unconfirmed figure
+  to keep re-searching for, and 2021/2025's attendance staying genuinely
+  unconfirmed. A future run could also try the same "read a shared library
+  file end to end looking for cross-builder inconsistencies" method that
+  found the `sport` gap here - e.g. whether every JSON-LD builder that
+  reasonably could set `inLanguage` does.

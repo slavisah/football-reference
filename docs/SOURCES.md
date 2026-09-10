@@ -1334,6 +1334,37 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/2021_UEFA_Nations_League_final
   - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_final
   - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
+- Final attendance re-investigation (added 2026-09-10, ninety-sixth intensive
+  run): re-attempted the three editions the ninety-fourth run's entry above
+  left open, specifically looking for a genuinely independent (non-Wikipedia-
+  mirroring) domain that states each figure outright, the exact gap that
+  entry named. Found the opposite of a resolution for 2023: RFEF's own match
+  report describes De Kuip as "a full house with 41,500 spectators," a
+  different figure from Wikipedia's 41,110 - not corroboration, a genuine
+  two-source conflict, the same "sources disagree" shape as Copa América's
+  already-excluded 2001/2007 editions. 2021 and 2025 still only ever
+  surfaced the same single repeated figure (31,511; 65,852) with UEFA.com and
+  a national federation/broadcaster site appearing in search results
+  alongside Wikipedia but never demonstrably the direct source of the number
+  itself, once search-result snippets were re-checked rather than trusting
+  the search tool's own synthesized attribution - the same
+  cannot-confirm-independence gap as before, now confirmed a second time
+  rather than merely repeated. All three stay out of
+  `content/uefa-nations-league.md`; this re-confirms the ninety-fourth run's
+  caution rather than reversing it, and additionally establishes that 2023
+  is now a genuine conflict, not just an unconfirmed single source, so a
+  future pass should not spend another cycle on 2023 specifically without a
+  new source lead that resolves the 41,110/41,500 discrepancy one way or the
+  other:
+  - https://en.wikipedia.org/wiki/2021_UEFA_Nations_League_final
+  - https://www.uefa.com/uefanationsleague/news/026e-1372278f4851-1d09f7df609b-1000--fortress-san-siro-venue-for-the-2021-uefa-nations-league-final/
+  - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_final
+  - https://rfef.es/en/noticias/match-report-spain-crowned-champions-in-a-memorable-final-decided-by-penalties-0-0-and-4-5
+  - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
+  - https://muenchen.t-online.de/region/muenchen/id_101224878/muenchen-dfb-team-bestreitet-nations-league-spiel-in-der-allianz-arena.html
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Copa América
 
