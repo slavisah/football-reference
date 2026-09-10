@@ -15,6 +15,7 @@ import {
   buildPlayerPersonJsonLd,
   buildPlayersDirectoryItemList,
   buildWebSiteJsonLd,
+  withInLanguage,
 } from '../../src/lib/jsonLd';
 import type { ChampionSummary, Edition } from '../../src/lib/types';
 import type { CountryRecord, FinalsMeeting, Rivalry } from '../../src/lib/compare';
@@ -872,5 +873,60 @@ describe('buildCollectionPageJsonLd', () => {
       { '@type': 'ItemList', name: worldCup.name, url: worldCup.url, itemListElement: worldCup.itemListElement },
       { '@type': 'ItemList', name: euro.name, url: euro.url, itemListElement: euro.itemListElement },
     ]);
+  });
+});
+
+describe('withInLanguage', () => {
+  it('adds inLanguage to a SportsEvent, Quiz, DefinedTermSet and CollectionPage block', () => {
+    const items = [
+      { '@context': 'https://schema.org', '@type': 'SportsEvent', name: '2026 FIFA World Cup' },
+      { '@context': 'https://schema.org', '@type': 'Quiz', name: 'Family Quiz' },
+      { '@context': 'https://schema.org', '@type': 'DefinedTermSet', name: 'Glossary' },
+      { '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'FIFA World Cup - Champions' },
+    ];
+
+    const result = withInLanguage(items, 'hr');
+
+    expect(result.every((item) => item.inLanguage === 'hr')).toBe(true);
+  });
+
+  it('leaves types with no inLanguage in schema.org\'s own vocabulary untouched (ItemList, BreadcrumbList, Person, SportsTeam)', () => {
+    const items = [
+      { '@context': 'https://schema.org', '@type': 'ItemList', name: 'Most successful teams' },
+      { '@context': 'https://schema.org', '@type': 'BreadcrumbList' },
+      { '@context': 'https://schema.org', '@type': 'Person', name: 'Gerd Müller' },
+      { '@context': 'https://schema.org', '@type': 'SportsTeam', name: 'Brazil' },
+    ];
+
+    const result = withInLanguage(items, 'en');
+
+    expect(result.every((item) => !('inLanguage' in item))).toBe(true);
+    // Untouched items are returned as-is, not cloned, since nothing changed.
+    result.forEach((item, index) => expect(item).toBe(items[index]));
+  });
+
+  it('does not overwrite a WebSite block\'s own already-set inLanguage (WebSite is deliberately not in the matched type set)', () => {
+    const website = { '@context': 'https://schema.org', '@type': 'WebSite', inLanguage: 'en' };
+
+    const result = withInLanguage([website], 'en');
+
+    expect(result[0]).toBe(website);
+  });
+
+  it('leaves a CollectionPage\'s own nested mainEntity ItemList untouched, only tagging the top-level block', () => {
+    const collectionPage = {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      mainEntity: { '@type': 'ItemList', name: 'Champions by titles' },
+    };
+
+    const [result] = withInLanguage([collectionPage], 'hr');
+
+    expect(result.inLanguage).toBe('hr');
+    expect(result.mainEntity).toEqual({ '@type': 'ItemList', name: 'Champions by titles' });
+  });
+
+  it('returns an empty array unchanged', () => {
+    expect(withInLanguage([], 'en')).toEqual([]);
   });
 });

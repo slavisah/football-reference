@@ -3573,14 +3573,20 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     const collectionPage = blocks.find((b) => b['@type'] === 'CollectionPage');
     expect(collectionPage.name).toBe('FIFA World Cup - Champions by titles');
     expect(collectionPage.url).toBe(`${SITE}/competitions/world-cup/`);
+    expect(collectionPage.inLanguage).toBe('en');
     const itemList = collectionPage.mainEntity;
     expect(itemList['@type']).toBe('ItemList');
     expect(itemList.itemListElement[0].item.name).toBe('Brazil');
+    // The nested mainEntity ItemList isn't a schema.org document root, so it
+    // doesn't get inLanguage even though its wrapping CollectionPage does -
+    // ItemList isn't in schema.org's own inLanguage domainIncludes anyway.
+    expect(itemList.inLanguage).toBeUndefined();
 
     const sportsEvent = blocks.find((b) => b['@type'] === 'SportsEvent');
     expect(sportsEvent.name).toBe('2026 FIFA World Cup');
     expect(sportsEvent.location).toEqual({ '@type': 'Place', name: 'Canada, Mexico and United States' });
     expect(sportsEvent.competitor).toEqual({ '@type': 'SportsTeam', name: 'Spain' });
+    expect(sportsEvent.inLanguage).toBe('en');
   });
 
   test('an individual award page carries an ItemList and a SportsEvent for the latest edition', async ({
@@ -3628,6 +3634,8 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(blocks.find((b) => b['@type'] === 'CollectionPage').name).toBe(
       'FIFA Svjetsko prvenstvo - prvaci po broju naslova',
     );
+    expect(blocks.find((b) => b['@type'] === 'CollectionPage').inLanguage).toBe('hr');
+    expect(blocks.find((b) => b['@type'] === 'SportsEvent').inLanguage).toBe('hr');
   });
 
   test('/records carries a BreadcrumbList plus one ItemList per ranking section, skipping zero-streak fallbacks', async ({
@@ -3953,6 +3961,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     const cardCount = await page.locator('.quiz > ol.quiz__list > li .quiz-card').count();
     const quiz = blocks.find((b) => b['@type'] === 'Quiz');
     expect(quiz.name).toBe('The Ultimate Football Reference - Family Quiz');
+    expect(quiz.inLanguage).toBe('en');
     expect(quiz.hasPart).toHaveLength(cardCount);
     for (const question of quiz.hasPart) {
       expect(question['@type']).toBe('Question');
@@ -3968,8 +3977,24 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     const blocks = await jsonLdBlocks(page);
     const quiz = blocks.find((b) => b['@type'] === 'Quiz');
     expect(quiz.name).toBe('Kompletna nogometna referenca - obiteljski kviz');
+    expect(quiz.inLanguage).toBe('hr');
     const cardCount = await page.locator('.quiz > ol.quiz__list > li .quiz-card').count();
     expect(quiz.hasPart).toHaveLength(cardCount);
+  });
+
+  test('/glossary and /hr/glossary each carry a DefinedTermSet tagged with their own inLanguage', async ({
+    page,
+  }) => {
+    await page.goto('glossary');
+    const enBlocks = await jsonLdBlocks(page);
+    const enTermSet = enBlocks.find((b) => b['@type'] === 'DefinedTermSet');
+    expect(enTermSet.inLanguage).toBe('en');
+    expect(enTermSet.hasDefinedTerm.length).toBeGreaterThan(0);
+
+    await page.goto('hr/glossary');
+    const hrBlocks = await jsonLdBlocks(page);
+    const hrTermSet = hrBlocks.find((b) => b['@type'] === 'DefinedTermSet');
+    expect(hrTermSet.inLanguage).toBe('hr');
   });
 });
 

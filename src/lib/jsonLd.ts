@@ -508,6 +508,40 @@ export function buildWebSiteJsonLd(options: {
 }
 
 /**
+ * Schema.org's `inLanguage` property only declares `CreativeWork` and
+ * `Event` in its own `domainIncludes` (confirmed against schema.org's live
+ * docs, not assumed) - not `ItemList`/`BreadcrumbList` (both `Intangible`),
+ * `Person`, or `Organization`/`SportsTeam`. Of every type this file builds,
+ * that puts `SportsEvent` (an `Event`), `Quiz` and `DefinedTermSet` (both
+ * `CreativeWork`), and `CollectionPage` (a `WebPage`, also `CreativeWork`)
+ * in scope; `WebSite` (also `CreativeWork`) already takes its own explicit
+ * `inLanguage` option via `buildWebSiteJsonLd()` above, called once from
+ * BaseLayout.astro, so it's deliberately left out of this set rather than
+ * matched a second time. `BaseLayout.astro` calls this once over every
+ * structured-data block a page assembles (its own `jsonLd` prop plus the
+ * shared breadcrumb/WebSite blocks) rather than requiring each of this
+ * file's ~15 builder call sites to opt in individually and each of the
+ * ~90 page files that call them to pass a matching locale by hand - the same
+ * "one canonical place" pattern this file's own WebSite/breadcrumb doc
+ * comments already describe. A type not in the eligible set passes through
+ * unchanged; nested objects (e.g. a `CollectionPage`'s own `mainEntity`
+ * `ItemList`) are untouched too, since only this array's own top-level
+ * blocks are schema.org document roots - `inLanguage` on a nested `ItemList`
+ * would still be invalid there even though the wrapping `CollectionPage`
+ * correctly carries it.
+ */
+const TYPES_WITH_IN_LANGUAGE = new Set(['SportsEvent', 'Quiz', 'DefinedTermSet', 'CollectionPage']);
+
+export function withInLanguage(items: JsonLdObject[], locale: string): JsonLdObject[] {
+  return items.map((item) => {
+    const type = item['@type'];
+    return typeof type === 'string' && TYPES_WITH_IN_LANGUAGE.has(type)
+      ? { ...item, inLanguage: locale }
+      : item;
+  });
+}
+
+/**
  * Wraps a directory/landing page's own ItemList(s) as the `mainEntity` of a
  * CollectionPage node - the more specific schema.org shape for a page whose
  * entire content *is* a list of things (the `/teams`/`/players` A-Z

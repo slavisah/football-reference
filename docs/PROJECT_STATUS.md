@@ -20005,5 +20005,116 @@ something else and notice a real inconsistency" method that surfaced it here
 worked once and may still have more to find (e.g. whether every JSON-LD
 builder that could reasonably set `inLanguage` does).
 
+### `inLanguage` extended to every eligible JSON-LD block (SportsEvent/Quiz/DefinedTermSet/CollectionPage) - closed 2026-09-10 (ninety-seventh intensive run)
+
+A standing health check first: `pnpm install` (no lockfile changes), `pnpm
+outdated` (still only the blocked `typescript` 7 entry), `pnpm lint`
+(0/0/0), `pnpm test` (583/583 unit, matching the ninety-sixth run's
+baseline before this run's own new tests).
+
+Acted directly on the ninety-sixth run's own closing note - the second half
+of its "read a shared library file end to end looking for cross-builder
+inconsistencies" suggestion, specifically "whether every JSON-LD builder
+that reasonably could set `inLanguage` does." It didn't: `buildWebSiteJsonLd()`
+(closed 2026-08-2x, called once from `BaseLayout.astro` for the home page)
+is the only builder in `src/lib/jsonLd.ts` that has ever set `inLanguage`,
+even though the site is fully bilingual (every page ships an English and a
+Croatian version) and schema.org's own `inLanguage` property declares
+`CreativeWork` and `Event` in its `domainIncludes` - confirmed against
+schema.org's live docs via `WebSearch` rather than assumed, since getting
+this wrong (tagging a type schema.org doesn't actually support) would be a
+new inaccuracy, not a fix. Checked each of this file's eleven other builders'
+schema.org type against that domain one at a time (also `WebSearch`-verified
+per type rather than guessed from memory): `SportsEvent` (an `Event`
+subtype - `buildLatestEditionSportsEvent()`/`buildEditionSportsEvent()`),
+`Quiz` (`CreativeWork` > `LearningResource` > `Quiz` -
+`buildQuizJsonLd()`), `DefinedTermSet` (`CreativeWork` > `DefinedTermSet` -
+`buildDefinedTermSet()`), and `CollectionPage` (`CreativeWork` > `WebPage` >
+`CollectionPage` - `buildCollectionPageJsonLd()`) all qualify; `ItemList`/
+`BreadcrumbList` (both `Intangible`, not `CreativeWork`), `Person`, and
+`SportsTeam`/`Organization` do not, per schema.org's own `inLanguage`
+`domainIncludes` list - so `buildChampionsItemList()`,
+`buildCountryRecordsItemList()`, `buildRivalriesItemList()`,
+`buildTeamProfileItemList()`, `buildPlayerProfileItemList()`,
+`buildPlayersDirectoryItemList()`, `buildBreadcrumbList()`,
+`buildPlayerPersonJsonLd()` and `buildTeamSportsTeamJsonLd()` were correctly
+left alone rather than over-applying the fix everywhere.
+
+Rather than adding an `inLanguage` option to each of those four builders
+individually and updating all ~44 call sites across `src/pages/` (14 for
+`buildEditionSportsEvent`, 12 for `buildLatestEditionSportsEvent`, 2 for
+`buildQuizJsonLd`, 2 for `buildDefinedTermSet`, 16 for
+`buildCollectionPageJsonLd`) to pass a matching `'en'`/`'hr'` literal by
+hand - a change with real room for a typo-swapped locale on some page nobody
+would notice at review time - added one new pure function,
+`withInLanguage(items, locale)`, to `src/lib/jsonLd.ts`. It maps over an
+already-built array of top-level JSON-LD objects and adds `inLanguage:
+locale` only to items whose `@type` is in the eligible four-type set,
+leaving everything else (including a `WebSite` block, which already carries
+its own explicit `inLanguage`) untouched and unmutated. `BaseLayout.astro`
+- which already centrally builds the shared `BreadcrumbList`/`WebSite`
+blocks every page gets for free and already knows the page's own `locale`
+prop - now wraps its existing `[breadcrumb, website, ...jsonLd].filter(...)`
+array in this one call before rendering, so every page in both languages
+gets this for free with no page-level changes at all, the same "one
+canonical place" pattern the breadcrumb/`WebSite` blocks already
+established. Deliberately only tags top-level document-root objects, not a
+`CollectionPage`'s own nested `mainEntity` `ItemList` - that nested object
+still isn't a schema.org document root and `ItemList` still isn't in the
+eligible type set either way, so adding `inLanguage` there would just be a
+second, separately-wrong mistake.
+
+Five new unit tests in `tests/unit/jsonLd.test.ts` cover `withInLanguage()`
+directly: tags all four eligible types, leaves `ItemList`/`BreadcrumbList`/
+`Person`/`SportsTeam` untouched (and returns the exact same object
+reference when nothing changed, not a needless clone), doesn't double-set
+or disturb a `WebSite` block's own pre-existing `inLanguage`, leaves a
+`CollectionPage`'s nested `mainEntity` `ItemList` untouched while tagging
+the wrapping object, and passes an empty array through unchanged. New e2e
+coverage in `tests/e2e/mobile.spec.ts` (extended four existing tests plus
+one new test) confirms the real thing end to end: the English/Croatian
+`/competitions/world-cup` pages' `CollectionPage`/`SportsEvent` blocks carry
+`inLanguage: 'en'`/`'hr'` respectively (and the nested `mainEntity`
+`ItemList` still doesn't), `/quiz`/`/hr/quiz`'s `Quiz` blocks do too, and a
+new test confirms `/glossary`/`/hr/glossary`'s `DefinedTermSet` blocks do as
+well (the first e2e coverage of that block's JSON-LD at all - it had none
+before this run). No content file touched, so no PDF regeneration was
+needed (`src/lib/jsonLd.ts`, `src/layouts/BaseLayout.astro` and the two test
+files are not PDF source files, confirmed against `scripts/pdf-pages.mjs`).
+
+Full standing health check clean: `pnpm lint` (0/0/0 across 181 files),
+`pnpm test` (588/588 unit, up from 583 - the five new `withInLanguage`
+cases), `pnpm build` (711 pages, unchanged), `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache` (37 URLs), `check:perf`
+(heaviest page still `hr/records`, 592.3 KB, within the 610 KB budget,
+unchanged from content - the tiny byte shift is `inLanguage: "hr"` being
+added to that page's own `CollectionPage`-wrapped blocks, well within
+budget), `check:pdfs` (700/700 fresh, unaffected), `check:jsonld`
+(1,783/1,783 blocks still structurally valid - the generic structural sweep
+has no opinion on which optional properties a block carries), `check:meta`
+(710/710 clean), `check:html` (711/711 valid), `check:spelling` (0 issues),
+`pnpm dlx knip --no-config-hints` (the one standing false positive,
+unchanged), and a manual spot-check of the built `dist/` output (parsing
+every JSON-LD block on `world-cup`/`quiz`/`glossary`/`teams/brazil` in both
+languages) confirming the field lands exactly where intended and nowhere
+else, before trusting the full suite. A full cold-start `pnpm test:e2e` ran
+last: **945/945 passed** (16.8 minutes), up from 944 - the one new
+`DefinedTermSet` test. `check:reflow`/`check:text-zoom`/`check:print-width`
+ran sequentially after (not concurrently, to avoid the port-4321 collision
+the ninety-fifth run's own entry documents): 711/711 pages clean on all
+three.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix decision needing human sign-off, Nations League's
+Team of the Tournament for 2021/2023/2025), plus the Nations League 2023
+attendance conflict (41,110 vs. 41,500) and 2021/2025's still-unconfirmed
+figures. With this run closing the `inLanguage` gap the ninety-sixth run's
+own "cross-builder consistency" method surfaced, a future pass's best bet is
+either a fresh source lead on the 2023 attendance conflict, another pass of
+that same "read a shared library file end to end" method over a different
+file, or a genuinely different quality angle (accessibility, performance,
+SEO, or a fresh `docs/WEBSITE_REQUIREMENTS.md` read against the live site).
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
