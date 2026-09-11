@@ -196,7 +196,7 @@
     "src/components/PodiumCards.astro": "edd24bb458ca41c8c16260ed932e454919737be8034c07dfbce30bd3ed2f8e7c",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
-    "src/pages/hr/competitions/world-cup.astro": "e5b43cf0ca6f3d118668f0e72ad8f9fbbb042dc4e86f3a8aa59e7d18498c85a3"
+    "src/pages/hr/competitions/world-cup.astro": "b87e86f00477cff766bdbf968be33d74d7da52ea31aac8fc6919d94b19462521"
   },
   "euro-hr": {
     "content/uefa-euro.md": "415b442fd68fea6305e5fe7302441bc119824ae5632a7944986cb92299b4bf02",
@@ -216,7 +216,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
-    "src/pages/hr/competitions/euro.astro": "27398ba08c6c691090bc3b3ff7bb85a8d8c27204ebdd7d998ad478acd9c3c4dd"
+    "src/pages/hr/competitions/euro.astro": "cec775e639b4e5a2c88ef7d247d5eac35185277bb112a7c585f467a8df623e4c"
   },
   "nations-league-hr": {
     "content/uefa-nations-league.md": "eafb7d0fa2702060610c9279c6cfd437e4a6a9704bef34c13532a1714a880ba7",
@@ -256,7 +256,7 @@
     "src/components/PodiumCards.astro": "edd24bb458ca41c8c16260ed932e454919737be8034c07dfbce30bd3ed2f8e7c",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
-    "src/pages/hr/competitions/copa-america.astro": "4e43f9dc179ca7fac131fb859fb6c6db94f4edcd5b669b3877796c9af0c040a8"
+    "src/pages/hr/competitions/copa-america.astro": "1da7d8a3c5b26a43ce995d3412e3bdd73b278f061db22fd4e4c164ffc481a684"
   },
   "ballon-dor-hr": {
     "content/ballon-dor.md": "f756b67123d4d720e5c1256f40fcae92f371f944bcbd8bbff3d32064c76acafb",

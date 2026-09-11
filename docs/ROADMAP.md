@@ -1772,6 +1772,53 @@ standing quirks.
   this same "read a shared library file end to end looking for an
   unchecked cross-table invariant" method to a different file/table pair,
   or a genuinely different quality angle (accessibility, performance, SEO).
+- **`check:i18n-notes`: automated English/Croatian note-section parity
+  check, plus two real bugs it caught**: closed 2026-09-11 (hundredth
+  intensive run) - a standing health check first (all clean, matching the
+  ninety-ninth run's baseline). Extended this run's own "read a shared
+  library file/component end to end looking for an unchecked cross-language
+  invariant" method (the one that already found the `jsonLd.ts`
+  `sport`/`inLanguage` gaps and the tally-table gap `check:award-tallies`
+  guards) to every Croatian competition/award page's hand-written
+  `NoteSection[]` array versus its English counterpart's `content/*.md`
+  note sections - structurally never cross-checked before, only spot-checked
+  by a handful of hardcoded `.notes__card` count assertions. Found and fixed
+  two real, live bugs before the check even existed: `content/fifa-world-cup.md`'s
+  "Editorial notes" fourth bullet ("Display a map of host countries...") was
+  simply missing from the Croatian page's array (a dropped fact, not a
+  markup issue), and the World Cup/EURO/Copa América "Final venues" sections'
+  English lead-in paragraph (a proper `NoteSection.intro`, its own
+  `<p class="notes__intro">` on the English page) had been folded into the
+  Croatian arrays' `items[0]` instead, misrepresenting a methodology caveat
+  as a bogus extra final-venue bullet on all three Croatian pages. Fixed all
+  three by moving the sentence into the array's already-typed `intro:` field;
+  Nations League's own "Final venues" was correctly unaffected (its English
+  source opens with a bullet, not a lead-in paragraph). New permanent tool,
+  `scripts/check-i18n-notes.mjs` (`pnpm check:i18n-notes`): compares every
+  built English page with note cards against its Croatian counterpart -
+  same section count, same "has an intro paragraph" flag, same item count
+  per section - without comparing text (the two languages are meant to
+  differ there). Fast, dist-based regex parsing like `check:jsonld`/
+  `check:meta`/`check:award-tallies`, so wired into CI as a required PR
+  gate. 13 new unit tests; verified the check actually catches both bug
+  shapes by re-introducing each into a built page, confirming the right
+  error, then reconfirming clean. New e2e coverage extends four existing
+  test blocks (no new cases). All 700 PDFs regenerated and reverified clean.
+  Full standing health check clean: 615/615 unit (13 new), 711 pages,
+  every other `check:*` clean including the new `check:i18n-notes` itself (7
+  page pairs, 0 problems), plus a full cold-start `pnpm test:e2e` (945/945
+  passed, 17.3 minutes, unchanged count). See `docs/PROJECT_STATUS.md`'s
+  matching entry for full detail. **Left for a
+  future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025, the `long-title` brand-suffix
+  decision), plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed Nations League figures, and EURO 1996/2020's/World Cup
+  1930/1950's excluded attendance figures. A future pass could extend this
+  same cross-language structural-parity method to other shared
+  components/pages (table headers, filter labels, `alt` text), chase a fresh
+  source lead on any open attendance/captain gap, or take a genuinely
+  different quality angle (performance, SEO).
 
 ## Ideas not yet scoped as backlog
 
