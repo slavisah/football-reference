@@ -20809,5 +20809,66 @@ future run's best bet: extend the "read end to end" method to a
 `src/pages/` route family (not yet swept this way), or a fresh
 `docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.
 
+### CI-caught stale PDFs from the hundred-and-third run's `References.astro` fix - closed 2026-09-11 (hundred-and-fourth intensive run)
+
+This run started from a GitHub Actions notification, not a fresh backlog
+pick: the `test` check on the open PR (`slavisah/football-reference#53`)
+failed on the hundred-and-third run's own commit
+(`77f925c37b614315f98a9ac4709f30bc95676135`, "Fix Croatian edition pages
+rendering References note in English"). That commit's own closing note
+claimed "No content file touched, so no PDF regeneration or `lastReviewed`
+bump was needed" - reasonable-sounding, but wrong: `scripts/
+check-pdf-freshness.mjs` (`check:pdfs`) compares each PDF's stored content
+hash against a hash of its *source page's rendered output*, not the
+Markdown content file - see `scripts/generate-pdfs.mjs`/`check-pdf-
+freshness.mjs` for the mechanism this repo has used since the print-PDF
+feature shipped. `References.astro`'s `noteText` fix changed the rendered
+HTML of exactly the pages it targeted (all seven Croatian per-edition
+route families), so every PDF sourced from those pages went stale the
+instant that commit landed on the shared branch - both the Croatian PDF
+itself (the actual text change) and its English sibling (the same source
+page pair `check:pdfs` always tracks together), across all seven families
+(World Cup, EURO, Copa América, Nations League, Ballon d'Or, and both
+Golden Boot route trees).
+
+Fix: pulled the branch, confirmed the failure locally (`pnpm check:pdfs`
+reproduced the exact same stale-file list CI reported), then regenerated
+with `pnpm build && pnpm build:pdfs`. `build:pdfs` (`scripts/
+generate-pdfs.mjs`) launches its own headless browser via
+`chromium.launch()` from `@playwright/test` - a separate concern from
+Astro's own static build - which needed this environment's
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback to find a browser
+binary at all, the same fallback `pnpm test:e2e` has needed since the
+ninety-second run (this is the first run to discover `build:pdfs` has the
+identical requirement; earlier runs that touched PDFs presumably ran in a
+container where Playwright's own bundled browser download had already
+succeeded). Reverified `check:pdfs` clean (700/700) after regenerating.
+
+Full standing health check re-run after the fix: `pnpm lint` (0/0/0),
+`pnpm test` (616/616 unit, unchanged - no unit-testable logic changed),
+`pnpm build` (711 pages), `check:links`/`check:sitemap`/`check:precache`/
+`check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/`check:html`/
+`check:spelling`/`check:award-tallies`/`check:i18n-notes` all clean.
+
+**Correction for future runs:** "no content file touched" is not, by
+itself, sufficient reason to skip a PDF regen. The real question is "did
+any *rendered page* this PDF is sourced from change" - a shared component
+edit (as here), a layout change, or a JSON-LD/meta change can all trigger
+that just as easily as an edit to `content/*.md`. `check:pdfs` is fast and
+needs no browser to *check* (only to *fix*), so the safe default is running
+it before closing out any run that touched `src/components/`, `src/
+layouts/`, or `src/pages/`, not only when a content file changed.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League 2023
+attendance conflict, 2021/2025's still-unconfirmed Nations League figures,
+and World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures. The
+"read end to end" method has now covered all of `src/lib/` and all of
+`src/components/`; a future run's best bet is extending it to a `src/
+pages/` route family, or a fresh `docs/WEBSITE_REQUIREMENTS.md` re-read
+against the live site.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
