@@ -20254,5 +20254,128 @@ library file end to end" pass over a different file, or a genuinely
 different quality angle (accessibility, performance, SEO, or a fresh
 `docs/WEBSITE_REQUIREMENTS.md` read against the live site).
 
+### `check:award-tallies`: automated cross-check of every hand-authored title-tally table against its own source table - closed 2026-09-11 (ninety-ninth intensive run)
+
+A standing health check first (`pnpm install`, `pnpm outdated` unchanged:
+only the blocked `typescript` 7 entry; `pnpm lint`/`test`/`build`/
+`check:links`/`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs`/
+`check:jsonld`/`check:meta`/`check:html`/`check:spelling` all clean,
+matching the ninety-eighth run's baseline). Every award-history
+content-mining angle across all six competition/award families is
+exhausted per the ninety-eighth run's own closing note, so this run took
+the standing "genuinely different quality angle" fork instead of another
+source search: a `pnpm dlx knip --no-config-hints` pass (unchanged, the one
+standing false positive) plus a fresh read of `src/lib/validate.ts` - the
+one file that build-time-validates editorial content - to look for an
+invariant nothing currently checks.
+
+That read surfaced a real gap. `content/fifa-world-cup.md`'s "Champions by
+titles after 2026", `content/uefa-euro.md`'s "Champions by titles",
+`content/copa-america.md`'s "Titles after 2024" and `content/ballon-dor.md`'s
+"Multiple winners through 2025" are each a second, independently
+hand-maintained summary table. Unlike `/records`' own generated rankings
+(`src/lib/editions.ts`'s `buildChampionsSummary`, computed at build time
+from the same `Edition[]` array the main table renders from, so it can't
+drift), these four tables are hand-typed separately from the "Editions"/
+"Champions timeline"/"Winners" table each summarizes. `validateEditions()`
+(`src/lib/validate.ts`) only checks the source table's own structural shape
+(no duplicate headers, every row the right width, a non-empty winner and a
+parseable year, no duplicate year unless allow-listed) - it has never once
+compared a tally table against the table it tallies. No unit or e2e test
+did either. A future edit that adds a new year to the source table but
+forgets the tally table (or vice versa), or a stray typo in a count, would
+ship silently.
+
+Added `scripts/check-award-tallies.mjs`, wired up as `pnpm
+check:award-tallies`. It parses each source table and its matching tally
+table with the same Markdown pipe-table parsing logic
+`src/lib/markdownTable.ts` uses at build time (kept as a small local copy
+rather than an import - every other `check:*` script is plain
+dependency-free Node ESM with no TypeScript import, and this follows the
+same convention), recomputes each tally directly from the source table, and
+diffs it against the hand-authored table. Recomputation applies the one
+known nation-name merge both World Cup's and EURO's tally tables already
+make - "West Germany" folded into "Germany, including West Germany" - and
+skips placeholder rows ("Not awarded", an em dash) the same way a human
+reader would. The diff checks: every count matches; every name the source
+table implies appears in the tally table (or, for Ballon d'Or's "multiple
+winners" table specifically, every name with 2 or more awards appears and
+no single-time winner is wrongly included); and, for World Cup's tally
+table alone, its extra "Winning years" column matches too.
+
+Deliberately does **not** enforce row order. Copa América's own tie-break
+order among nations tied on the same title count doesn't follow any single
+derivable rule - checked by hand against the source table before writing
+this: Paraguay/Chile/Peru are all tied at 2 titles and listed in an order
+that matches neither "earliest title year" (Peru's single title, 1939, is
+the earliest of the three but Peru is listed last) nor "most recent title"
+(Chile's 2016 is the most recent but Chile isn't listed first). World
+Cup/EURO's own tie-break order *does* follow a clean rule ("earliest title
+year" ascending - verified against every tied group in both tables), but
+enforcing an unwritten, inconsistently-followed convention here would risk
+a false positive on a legitimate future edit rather than catch a real bug,
+so the check only verifies the set of names and their counts, never order.
+
+Verified the check actually catches real regressions rather than being a
+clean-by-construction no-op: manually broke a count (Messi's Ballon d'Or
+tally, 8 -> 9), added a phantom nation to a tally table, and blanked a real
+title row out of a source table, one change at a time - each broke the
+check with the expected, specific message - then restored every file
+(`git status`/`git diff` on `content/` clean afterward, confirmed before
+touching anything for real).
+
+14 new unit tests (`tests/unit/checkAwardTallies.test.ts`) cover the table
+parser, the tally computation (alias merging, skipping placeholder rows),
+and every diff scenario the real check can hit: a clean match, a count
+mismatch, a phantom entry, a source winner missing from a "full" tally
+table, a single-time winner correctly excluded from (and, separately,
+wrongly included in) a "multiple" tally table, and a requested-but-absent
+column. One implementation wrinkle the first draft's own `pnpm lint` caught:
+TypeScript's usage-based inference for an unannotated destructured
+parameter treated `yearsColumn` as required (inferred from the one call
+site inside the script itself that always passes it), which the test
+file's other call sites - correctly omitting it - then failed against;
+fixed by giving `yearsColumn` an explicit default (`= ''`), the same
+pattern `aliases = {}` on `computeTally` already used, rather than a
+JSDoc annotation (tried first; TypeScript didn't associate an anonymous
+destructured parameter's type with a `@param` tag reliably here).
+
+Like `check:spelling`/`check:jsonld`/`check:meta`, this is plain content
+parsing with no build or browser needed - well under a second for all four
+files - so it is wired into `.github/workflows/ci.yml` as a required PR
+gate rather than joining the four slower Playwright-based sweeps as a
+manual/intensive-run-only tool.
+
+A genuinely clean first run, as expected - the same "confirm there's a real
+signal, but keep the tool permanent" reasoning `check:reflow`/`check:jsonld`
+already established for their own clean first runs. No content was wrong
+today, but the next edit to any of these eight tables (four source, four
+tally) now has an automated backstop it didn't have before.
+
+Full standing health check clean after the change: `pnpm lint` (0/0/0),
+`pnpm test` (602/602 unit, up from 588 - the 14 new tests), `pnpm build`
+(711 pages, unchanged - no new route), `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache` (37 URLs), `check:perf`
+(heaviest page `hr/records`, unchanged, within the 610 KB budget),
+`check:pdfs` (700/700 fresh - no content file touched, so no regeneration
+needed), `check:jsonld` (1,783/1,783 blocks valid), `check:meta` (710/710
+clean), `check:html` (711/711 valid), `check:spelling` (0 issues),
+`check:award-tallies` (4 checked, 0 problems), and `pnpm dlx knip
+--no-config-hints` (the one standing false positive, unchanged).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League 2023
+attendance conflict (41,110 vs. 41,500), 2021/2025's still-unconfirmed
+Nations League figures, and World Cup 1930/1950's/EURO 1996/2020's excluded
+attendance figures. A future pass's best bet is a fresh source lead on any
+of those, extending this same "read a shared library file end to end
+looking for an unchecked cross-table invariant" method to a different
+file/table pair (a real, repeatable technique this run demonstrates, distinct
+from the exhausted award-history search), or a genuinely different quality
+angle (accessibility, performance, SEO, or a fresh
+`docs/WEBSITE_REQUIREMENTS.md` read against the live site).
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

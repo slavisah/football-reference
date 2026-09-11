@@ -1696,6 +1696,83 @@ standing quirks.
   while re-checking the standing captain-sourcing gap - narrowed to one
   specific follow-up question rather than closed, left for next time.
 
+- **`check:award-tallies`: automated cross-check of every hand-authored
+  title-tally table against its own source table**: closed 2026-09-11
+  (ninety-ninth intensive run) - a standing health check first (`pnpm
+  install`, `pnpm outdated` unchanged: only the blocked `typescript` 7
+  entry; `pnpm lint`/`test`/`build`/`check:links`/`check:sitemap`/
+  `check:precache`/`check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/
+  `check:html`/`check:spelling` all clean, matching the ninety-eighth run's
+  baseline). Every award-history content-mining angle across all six
+  competition/award families is exhausted (per the ninety-eighth run's own
+  closing note), so this run took the standing "genuinely different quality
+  angle" fork instead: a `pnpm dlx knip --no-config-hints` pass and a fresh
+  read of `src/lib/validate.ts` (the one file that build-time-validates
+  editorial content) surfaced a real, previously-unchecked gap.
+  `content/fifa-world-cup.md`'s "Champions by titles after 2026",
+  `content/uefa-euro.md`'s "Champions by titles", `content/copa-america.md`'s
+  "Titles after 2024" and `content/ballon-dor.md`'s "Multiple winners through
+  2025" are each a second, independently hand-maintained summary table -
+  unlike `/records`' own generated rankings (`src/lib/editions.ts`'s
+  `buildChampionsSummary`), these four are not derived at build time from
+  the "Editions"/"Champions timeline"/"Winners" table they summarize, so a
+  future edit to either table (a new year added to one but not the other, a
+  typo'd count) could drift silently - `validateEditions()` only checks the
+  source table's own structural shape, and no unit or e2e test reads these
+  two tables against each other. Added `scripts/check-award-tallies.mjs`
+  (wired up as `pnpm check:award-tallies`): parses each source table and its
+  matching tally table with the same Markdown pipe-table parser
+  `src/lib/markdownTable.ts` uses (kept local rather than imported, matching
+  every other `check:*` script's self-contained-Node-ESM convention),
+  recomputes each tally from the source table (applying the one known
+  nation-name merge, "West Germany" folded into "Germany, including West
+  Germany", both for World Cup and EURO), and diffs it against the
+  hand-authored table: every count must match, every name the source table
+  implies must appear (or, for Ballon d'Or's "multiple winners" table
+  specifically, every name with 2+ awards must appear and no single-time
+  winner may be wrongly included), and World Cup's extra "Winning years"
+  column must match too. Deliberately does not enforce row order - Copa
+  América's own tie-break order among same-count nations doesn't follow any
+  single derivable rule (checked by hand against the source table before
+  writing this), unlike World Cup/EURO's "earliest title year" ordering, so
+  enforcing an unwritten convention there would risk false positives on a
+  future legitimate edit rather than catch a real bug. Verified the check
+  actually catches real regressions (not just a clean-by-construction
+  no-op): manually broke a count, added a phantom nation, and removed a real
+  title from a source table one at a time, confirmed each broke the check
+  with the right message, then restored the files (`git status`/`git diff`
+  clean afterward). 14 new unit tests
+  (`tests/unit/checkAwardTallies.test.ts`) cover the parser, the tally
+  computation (including alias merging and skipping placeholder rows like
+  "Not awarded"/"—"), and every diff scenario (match, count mismatch,
+  phantom entry, missing entry, and the "multiple" mode's single-winner
+  exclusion). Like `check:spelling`/`check:jsonld`/`check:meta`, this is
+  plain content parsing with no build or browser needed (well under a
+  second for all four files), so it's wired into `.github/workflows/ci.yml`
+  as a required PR gate rather than joining the four slower
+  Playwright-based sweeps as a manual/intensive-run-only tool. A genuinely
+  clean first run, as expected (the same "confirm there's a real signal,
+  but keep the tool permanent" reasoning `check:reflow`/`check:jsonld`
+  already established) - no content was wrong today, but the next edit to
+  any of these eight tables now has an automated backstop it didn't have
+  before. Full standing health check clean after the change: `pnpm lint`
+  (0/0/0), `pnpm test` (602/602 unit, up from 588 - 14 new), `pnpm build`
+  (711 pages, unchanged), `check:links`/`check:sitemap`/`check:precache`/
+  `check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/`check:html`/
+  `check:spelling`/`check:award-tallies` all clean, `pnpm dlx knip
+  --no-config-hints` unchanged (the one standing false positive). No
+  content file touched, so no PDF regeneration or `lastReviewed` bump was
+  needed. **Left for a future pass:** the same environment-blocked items as
+  every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  Nations League's Team of the Tournament for 2021/2023/2025, the
+  `long-title` brand-suffix decision), plus the Nations League 2023
+  attendance conflict, 2021/2025's still-unconfirmed Nations League figures,
+  and EURO 1996/2020's/World Cup 1930/1950's excluded attendance figures. A
+  future pass's best bet is a fresh source lead on any of those, extending
+  this same "read a shared library file end to end looking for an
+  unchecked cross-table invariant" method to a different file/table pair,
+  or a genuinely different quality angle (accessibility, performance, SEO).
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned

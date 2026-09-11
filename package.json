@@ -29,6 +29,7 @@
     "check:html": "node scripts/check-html-validity.mjs",
     "check:jsonld": "node scripts/check-jsonld.mjs",
     "check:meta": "node scripts/check-meta.mjs",
+    "check:award-tallies": "node scripts/check-award-tallies.mjs",
     "check:spelling": "cspell --no-progress \"content/**/*.md\""
   },
   "dependencies": {
