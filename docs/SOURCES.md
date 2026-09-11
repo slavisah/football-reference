@@ -599,6 +599,75 @@ Primary sources should be preferred.
     audit in this file has noted; verification relied entirely on
     WebSearch's synthesized snippets, cross-checked across independent
     passes and source domains rather than a single query's summary.
+- Final attendance, 21 of 23 editions (added 2026-09-11, ninety-eighth
+  intensive run): extending "Final venues" with a reported attendance figure
+  for each final match, the same angle already applied to UEFA Nations
+  League and Copa América (see their own matching entries below), now
+  reaching a family where the finals themselves are famous enough that
+  genuinely independent corroboration (not just a Wikipedia figure
+  confirmed by rephrasing the same search) turned out to be available for
+  almost every edition. Two research passes: a first broad pass across all
+  23 editions, then a second pass specifically targeting the editions the
+  first pass could only tie to Wikipedia, aimed at finding a real second
+  domain (FIFA.com, a national federation, ESPN, ESPN, Guinness World
+  Records, a stadium database, a historical-football-site, etc.). 21
+  editions cleared the two-independent-source bar; **1930 and 1950 are
+  deliberately excluded, not just unconfirmed** - both are genuinely
+  disputed rather than under-sourced. 1930 splits between an official
+  68,346 and contemporary press estimates around 90,000-100,000 (gates were
+  reportedly opened early with an uncounted crowd let in); 1950's Maracanã
+  final splits between FIFA/Guinness's own recognized paid-attendance record
+  of 173,850 and the commonly cited ~199,854 total persons physically in the
+  stadium - a paid-vs-total-present definitional split, not a sourcing gap,
+  so no single number is presented as fact for either edition. 1986's
+  114,600 is confirmed as the largest attendance of any World Cup final
+  (also independently corroborated by Guinness World Records). 1998's final
+  has a low-reliability ~75,000 figure circulating on one wiki-mirror site;
+  it traces to no independent source and is not used, only the
+  four-independently-confirmed 80,000:
+  - https://en.wikipedia.org/wiki/1934_FIFA_World_Cup_final
+  - https://www.worldfootball.net/report/wm-1934-finale-italien-tschechoslowakei/
+  - https://en.wikipedia.org/wiki/1938_FIFA_World_Cup_final
+  - https://fbref.com/en/matches/1938-world-cup-final
+  - https://en.wikipedia.org/wiki/1954_FIFA_World_Cup_final
+  - https://www.fifa.com/en/tournaments/mens/worldcup/switzerland1954
+  - https://footballhistory.org/tournament/world-cup-1954.html
+  - https://en.wikipedia.org/wiki/1958_FIFA_World_Cup_final
+  - https://www.fifa.com/en/tournaments/mens/worldcup/sweden1958
+  - https://en.wikipedia.org/wiki/1962_FIFA_World_Cup_final
+  - https://www.sofascore.com/brazil-czechoslovakia/1962-06-17
+  - https://en.wikipedia.org/wiki/1966_FIFA_World_Cup_final
+  - https://www.fifa.com/en/tournaments/mens/worldcup/englandworldcup1966
+  - https://en.wikipedia.org/wiki/1970_FIFA_World_Cup_final
+  - https://www.fifa.com/en/tournaments/mens/worldcup/mexico1970
+  - https://en.wikipedia.org/wiki/1974_FIFA_World_Cup_final
+  - https://guides.loc.gov/soccer/world-cup-history (1974 attendance)
+  - https://www.topendsports.com/events/worldcupsoccer/attendances.htm
+  - https://en.wikipedia.org/wiki/1978_FIFA_World_Cup_final
+  - https://footballhistory.org/tournament/world-cup-1978.html
+  - https://en.wikipedia.org/wiki/1982_FIFA_World_Cup_final
+  - https://www.guinnessworldrecords.com/world-records/484076-highest-attendance-at-a-fifa-world-cup-final
+  - https://en.wikipedia.org/wiki/1986_FIFA_World_Cup_final
+  - https://www.guinnessworldrecords.com/world-records/90679-highest-attendance-at-a-fifa-world-cup-match
+  - https://en.wikipedia.org/wiki/1990_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1994_FIFA_World_Cup_final
+  - https://www.fifa.com/en/tournaments/mens/worldcup/usa1994
+  - https://en.wikipedia.org/wiki/1998_FIFA_World_Cup_final
+  - https://www.abc.net.au/news (1998 final attendance recap)
+  - https://www.foxnews.com (1998 final attendance recap)
+  - https://en.wikipedia.org/wiki/2002_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/2006_FIFA_World_Cup_final
+  - https://www.espn.com/soccer/match/_/gameId/191983
+  - https://en.wikipedia.org/wiki/2010_FIFA_World_Cup_final
+  - https://www.espn.com/soccer/match/_/gameId/264123
+  - https://en.wikipedia.org/wiki/2014_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/2018_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_final
+  - https://sports.yahoo.com (2026 final attendance recap)
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## UEFA EURO
 
@@ -1098,6 +1167,51 @@ Primary sources should be preferred.
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed Wikipedia pages rather than direct page
     loads.
+- Final attendance, 15 of 17 editions (added 2026-09-11, ninety-eighth
+  intensive run): the same "Final attendance" extension added to the FIFA
+  World Cup's "Final venues" section this run (see that entry above),
+  applied to UEFA EURO. A first broad pass covered all 17 editions; a
+  second, targeted pass specifically re-checked every edition the first pass
+  could only tie to Wikipedia, this time finding UEFA.com's own official
+  per-match pages for several editions (1972, 1976, 1980, 1992, 2000) -
+  genuinely independent, primary-source confirmation rather than a second
+  Wikipedia-derived mirror. 15 editions cleared the two-independent-source
+  bar. **1996 and 2020 are left out**: both have one consistently repeated
+  figure (73,611 and 67,173) but neither pass could tie it to a first-tier
+  independent outlet (a UEFA.com match page could not be located for either,
+  unlike the five editions above) - a single-source situation, not a
+  discrepancy, so treated the same as this file's other single-source
+  exclusions (UEFA Nations League 2021/2025 below) rather than published.
+  1968's replay attendance (32,886) is additionally corroborated against the
+  original drawn match's own separately reported crowd (68,817), both
+  confirmed via the same source set:
+  - https://en.wikipedia.org/wiki/1960_European_Nations%27_Cup_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1964_final
+  - https://www.11v11.com/matches/spain-v-soviet-union-21-june-1964-105023
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1968_final
+  - https://www.uefa.com/uefaeuro/history/
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1972_final
+  - https://www.uefa.com/uefaeuro/match/3838--west-germany-vs-ussr/matchinfo/
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1976_final
+  - https://www.uefa.com/uefaeuro/match/3693--czechoslovakia-vs-west-germany/
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1980_final
+  - https://www.uefa.com/uefaeuro/match/3585--belgium-vs-west-germany/matchinfo/
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1984_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1988_final
+  - https://www.uefa.com/uefaeuro/history/ (1988 final)
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1992_final
+  - https://www.uefa.com/uefaeuro/match/6098--denmark-vs-germany/
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2000_final
+  - https://www.uefa.com/uefaeuro/history/news/ (EURO 2000 recap)
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2004_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2008_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2012_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2016_final
+  - https://www.espn.co.uk/football/match/_/gameId/438154
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2024_final
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## UEFA Nations League
 
