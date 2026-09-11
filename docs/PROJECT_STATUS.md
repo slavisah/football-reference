@@ -20649,5 +20649,86 @@ runs' own passes have covered yet, or a genuinely different quality angle
 quick standing check on a future run: re-verify `docs/ROADMAP.md` and this
 file haven't drifted apart again the way this run found them to have.
 
+### Full `src/lib/*.ts` audit sweep completed; standing health check re-confirmed clean - closed 2026-09-11 (hundred-and-second intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` (still only
+the blocked `typescript` 7 entry), `pnpm lint` (0/0/0), `pnpm test`
+(616/616 unit), `pnpm build` (711 pages), `check:links`/`check:sitemap`/
+`check:precache`/`check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/
+`check:html`/`check:spelling`/`check:award-tallies`/`check:i18n-notes` all
+clean, matching the hundred-and-first run's baseline exactly. A full
+cold-start `pnpm test:e2e` initially showed all 946 tests failing in
+milliseconds each - not a regression, but this session's bundled
+`@playwright/test` (1.63.0) expecting a `chromium_headless_shell` revision
+this container's pre-installed browser doesn't have. Re-ran with
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` (the exact fallback
+`playwright.config.ts` already wires up via that env var, and the same one
+several earlier runs' own entries document needing in this environment):
+**946/946 passed** (17.2 minutes). `check:reflow`/`check:text-zoom`/
+`check:print-width` (run sequentially after, not concurrently, per the
+ninety-fifth run's port-4321-collision caution): 711/711 pages clean on all
+three. `pnpm dlx knip --no-config-hints`: the one standing false positive
+(`scripts/test-preview-server.mjs`, invoked as a shell string Knip's
+static import graph can't see), unchanged.
+
+With every recently-tried research/sourcing angle re-confirmed exhausted
+across 6+ prior attempts each, continued the "read a shared library file
+end to end looking for an unchecked cross-builder invariant" method the
+ninety-sixth/ninety-seventh/ninety-ninth/hundred-and-first runs used - this
+run finished the sweep rather than sampling a few more files. Read every
+remaining `src/lib/*.ts` file not yet covered by any prior run's own pass:
+`sources.ts`, `manifest.ts`, `onThisDay.ts`, `routes.ts`, `countries.ts`,
+`hostCoordinates.ts`, `competition.ts`, `teamCompetitions.ts`,
+`glossary.ts`, `comparePlayers.ts`, `validate.ts`, `markdownTable.ts`,
+`i18n.ts`, `tableSort.ts`, `offlineCache.ts` and `url.ts` (16 files, on top
+of `editions.ts`/`compare.ts`/`editionProfile.ts`/`quiz.ts`/
+`teamProfile.ts`/`playerProfile.ts`/`notes.ts`/`jsonLd.ts`/`homeCards.ts`
+already covered by earlier runs). All read clean: no cross-builder
+inconsistency, no dead branch, no mismatched invariant, no drift from the
+data each module's doc comment claims to guarantee (e.g.
+`hostCoordinates.ts`'s claim that a missing host throws at build time was
+verified against `buildHostMapPoints()`'s actual throw in `editions.ts`,
+not just taken on faith). This closes the "read a lib file end to end"
+method as exhausted across the *entire* `src/lib/` directory - every file
+in it has now been read this way by at least one run - rather than leaving
+it partially applied; a future run wanting to keep using this same
+technique productively should point it at `src/components/*.astro` or a
+`src/pages/` route family instead, neither of which has had this same
+file-by-file treatment yet.
+
+Also re-attempted the standing Nations League final-attendance gaps (2023's
+41,110-vs-41,500 conflict; 2021/2025 still unconfirmed) via `WebSearch`,
+since this session's own tool access was untested territory rather than
+assumed identical to earlier runs'. `WebSearch` itself works normally here
+and returns synthesized figures (matching the already-recorded 31,511 /
+41,110 / 65,852 numbers), but a direct `WebFetch` of the underlying pages -
+tried against both `en.wikipedia.org` and `www.11v11.com` (a genuinely
+independent stats site that surfaced in search results as a second
+candidate source for 2021) - returned `EGRESS_BLOCKED` from the network
+proxy for both domains. So no directly-quoted, verifiably-independent
+second source could be confirmed for any of the three editions this run
+either: this re-confirms the ninety-sixth run's finding rather than
+reversing it, now additionally ruling out `www.11v11.com` specifically as a
+usable second source (it was never tried by name before).
+
+No code change this run - given the density of the last 101 runs'
+cumulative audits (every `src/lib` file, every `check:*` script, full e2e,
+accessibility, reflow, text-zoom, print-width, JSON-LD, meta, spelling, and
+award-tally/i18n-notes cross-checks all passing identically to baseline),
+a clean confirmation plus a genuinely completed audit sweep is itself the
+useful output, the same standing fallback this routine's own instructions
+call for when the backlog is complete.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League 2023
+attendance conflict, 2021/2025's still-unconfirmed Nations League figures,
+and World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures. A
+future run's best bet: extend the "read end to end" method to
+`src/components/*.astro` (not yet swept the same file-by-file way lib
+files have been) or a `src/pages/` route family, or a fresh
+`docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
