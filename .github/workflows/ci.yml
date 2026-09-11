@@ -48,6 +48,9 @@ jobs:
       - name: Spelling check (content/*.md)
         run: pnpm check:spelling
 
+      - name: Title-tally integrity check (content/*.md)
+        run: pnpm check:award-tallies
+
       - name: Build
         run: pnpm build
 
