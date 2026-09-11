@@ -20514,5 +20514,140 @@ a fresh source lead on any of the open attendance/captain gaps, or a
 genuinely different quality angle (performance, SEO, or a fresh
 `docs/WEBSITE_REQUIREMENTS.md` read against the live site).
 
+### Home page Golden Boot card silently dropped the entire EURO Golden Boot dataset, plus two missing `docs/ROADMAP.md` backlog entries restored - closed 2026-09-11 (hundred-and-first intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` (still only
+the blocked `typescript` 7 entry), `pnpm lint` (0/0/0), `pnpm test`
+(615/615 unit), `pnpm build` (711 pages), `check:links`/`check:sitemap`/
+`check:precache`/`check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/
+`check:html`/`check:spelling`/`check:award-tallies`/`check:i18n-notes` all
+clean, matching the hundredth run's baseline. Before starting new work,
+noticed `docs/ROADMAP.md`'s open-backlog section had no closing entry for
+either the ninety-ninth (`check:award-tallies`) or hundredth
+(`check:i18n-notes`) run, even though both are fully documented in this
+file - a real drift between the two files' "what's been closed" record.
+Restored both missing `docs/ROADMAP.md` entries (condensed summaries
+pointing back here, matching every other entry's convention) before adding
+this run's own.
+
+Every recently-tried research/sourcing angle (Nations League Team of the
+Tournament, the various attendance gaps) is re-confirmed exhausted across
+6+ prior attempts each, so re-trying any of them again without a new lead
+would just restate the same "still blocked" conclusion. Continued the
+"read a shared library file end to end looking for an unchecked
+cross-builder invariant" method instead - the one that found the `sport`
+field gap and `inLanguage` gap in `src/lib/jsonLd.ts` (ninety-sixth/
+ninety-seventh runs) and the tally-table gap `check:award-tallies` now
+guards (ninety-ninth run) - this time on `src/lib/homeCards.ts`, the module
+behind the home page's six competition/award summary cards.
+
+**Real bug found.** `loadHomeCompetitions()` called `loadCompetition('golden-boot',
+{ editionsHeading: 'FIFA World Cup top scorers', sourcesHeading: 'FIFA
+World Cup' })` exactly once and used that single result directly as the
+`goldenBoot` card data. `content/golden-boot.md` explicitly tracks "two
+separate Golden Boot races, one for the FIFA World Cup and one for UEFA
+EURO, each with its own table of winners" (23 and 17 editions
+respectively), and every other consumer of that content loads both tables
+as two separate `loadCompetition()` calls: `src/pages/records.astro`,
+`src/pages/quiz.astro`, `src/pages/sitemap.xml.ts`,
+`src/pages/players/[slug].astro`, `src/pages/player-index.json.ts`, and
+`src/pages/competitions/golden-boot.astro` itself. `homeCards.ts` was the
+one place in the codebase that only ever loaded the World Cup half.
+
+Concretely wrong on the built home page (`src/pages/index.astro`,
+`src/pages/hr/index.astro`) before this fix: the Golden Boot card's own
+blurb ("World Cup and EURO top-scorer awards, tournament by tournament")
+and `href` (`/competitions/golden-boot`) both explicitly cover both races,
+but its "Editions" stat showed **23** (the World Cup table's own length)
+instead of the true **40** (23 + 17), and its "Most awards" stat showed
+**Kylian Mbappé (2)** - correct for the World Cup table alone (2022 and
+2026), but presented as if it were the combined leader across both races,
+which it is not: combining both tables' champions (hand-verified by
+reading every row of both tables in `content/golden-boot.md`) actually
+produces a six-way tie at 2 awards each - Mbappé (2022/2026 WC), Gerd
+Müller (1970 WC + 1972 EURO), Harry Kane (2018 WC + 2024 EURO), Cristiano
+Ronaldo (2012 + 2020 EURO, invisible to the home card since EURO was never
+loaded at all), and the two shares of the 1962 WC/1960 EURO ties (Valentin
+Ivanov and Dražan Jerković appear in both tournaments' tied-winner lists).
+
+**Fix, and why it doesn't just merge the two rankings.** Added the missing
+second `loadCompetition('golden-boot', { editionsHeading: 'UEFA EURO top
+scorers', sourcesHeading: 'UEFA EURO' })` call to `loadHomeCompetitions()`
+and combined both `editions` arrays for the card's edition count (now
+correctly 40). Deliberately did **not** compute a merged champions ranking
+to populate "Most awards" the way the six-way-tie calculation above would
+suggest: `competitions/golden-boot.astro` already has an explicit,
+pre-existing code comment establishing that World Cup and EURO Golden Boot
+stay as **two separate rankings everywhere on the site** - two separate
+`ChampionsSummary` widgets, two separate `ItemList` JSON-LD blocks, two
+separate `SportsEvent` names - specifically so no single combined "Golden
+Boot champion" concept is ever presented, since the two races have never
+been treated as one competition. Inventing a merged ranking for the home
+card alone would contradict that established, deliberate editorial policy,
+not just be inconsistent styling. Instead, `goldenBoot.champions` is set
+to `[]`, which `buildHomeCards()` already handles correctly and
+without a special case: `card.topChampion` becomes `undefined`, and
+`index.astro`'s existing `{card.topChampion && (...)}` guard (already used
+for exactly this "no stat to show" case) simply omits the "Most awards" row
+for this one card, rather than showing a number that misrepresents which
+race it's from.
+
+**Tests.** `tests/unit/homeCards.test.ts`: the existing "loads all six
+competitions..." test's `golden-boot` fake body gained a second table (the
+mock now needs both `# FIFA World Cup top scorers` and `# UEFA EURO top
+scorers` headings, matching the real content file's shape, since
+`loadHomeCompetitions()` now reads the id twice under two different
+headings) via a small `goldenBootBody()` helper; a new test asserts the
+combined edition count (2 World Cup + 1 EURO = 3 in the fixture) and that
+`champions` stays `[]` even when one of the fake winners would obviously
+lead a combined tally, guarding the "don't invent a merged ranking"
+decision itself, not just the count. The pre-existing "leaves topChampion
+undefined when a competition has no champions yet" test in the
+`buildHomeCards()` describe block (which already used a `goldenBoot:
+competition({ champions: [] })` fixture, coincidentally reusing the empty-
+array code path for an unrelated original reason) needed no change - it
+now also accurately documents the card's real, intentional behavior.
+`tests/e2e/mobile.spec.ts` gained one new test in the "Home page on a 360px
+phone" block asserting the rendered card shows exactly one stat ("Editions:
+40") and no "Most"-prefixed stat row; verified against the real built HTML
+for both `dist/index.html` and `dist/hr/index.html` by hand before writing
+the test (`40`/`Editions`/`Izdanja` present, "Most awards"/"Najviše
+nagrada" absent) since `buildHomeCards()` shares the same underlying data
+across both locales and the existing Croatian-parity test only ever checks
+the World Cup card, not Golden Boot.
+
+Full standing health check clean after the change: `pnpm lint` (0/0/0),
+`pnpm test` (616/616 unit, up from 615 - the one new `loadHomeCompetitions`
+case), `pnpm build` (711 pages, unchanged), `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache` (37 URLs), `check:perf`
+(all pages within the 610 KB budget, heaviest `records/index.html` 595.5
+KB), `check:pdfs` (700/700 fresh - no content file touched), `check:jsonld`
+(1,783/1,783 blocks valid, unchanged), `check:meta` (710/710 clean),
+`check:html` (711/711 valid), `check:spelling` (0 issues), `check:award-
+tallies` (4 checked, 0 problems, unchanged), `check:i18n-notes` (7 page
+pairs checked, 0 problems, unchanged - this run's fix touches no note
+section), plus a full cold-start `pnpm test:e2e`: **946/946 passed** (one
+more than the hundredth run's 945, the one new home-page test), confirming
+no regression anywhere else on the site from the `homeCards.ts` change.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League 2023
+attendance conflict (41,110 vs. 41,500), 2021/2025's still-unconfirmed
+Nations League figures, and World Cup 1930/1950's/EURO 1996/2020's excluded
+attendance figures. This run's own method - reading a not-yet-audited
+`src/lib/*.ts` file end to end for cross-builder inconsistencies - is worth
+repeating on a different file next: `src/lib/editions.ts`, `compare.ts`,
+`editionProfile.ts`, `quiz.ts`, `teamProfile.ts`/`playerProfile.ts` (checked
+against each other for asymmetry) and `notes.ts` were all read this run too
+but came back internally consistent, so a future pass should pick a file
+none of the ninety-sixth/ninety-seventh/ninety-ninth/hundred-and-first
+runs' own passes have covered yet, or a genuinely different quality angle
+(accessibility, performance, SEO, or a fresh
+`docs/WEBSITE_REQUIREMENTS.md` read against the live site). Also worth a
+quick standing check on a future run: re-verify `docs/ROADMAP.md` and this
+file haven't drifted apart again the way this run found them to have.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
