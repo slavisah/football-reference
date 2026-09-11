@@ -69,6 +69,9 @@ jobs:
       - name: Title/meta-description integrity check
         run: pnpm check:meta
 
+      - name: English/Croatian note-section parity check
+        run: pnpm check:i18n-notes
+
       - name: Offline install (manifest/service worker) integrity check
         run: pnpm check:precache
 

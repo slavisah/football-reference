@@ -467,6 +467,9 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     await expect(
       page.locator('.notes__card').getByText('1930.: Estadio Centenario, Montevideo (Urugvaj).'),
     ).toBeVisible();
+    // The section's lead-in methodology sentence renders as its own intro
+    // paragraph, not as a bogus first list item among the actual venues.
+    await expect(page.locator('.notes__intro', { hasText: 'Svako izdanje Svjetskog prvenstva' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Prekretnice formata' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Dobitnici Zlatne lopte' })).toBeVisible();
     await expect(
@@ -508,6 +511,9 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
       page.locator('.notes__card').getByText('Hrvatska je 2018. stigla do svog prvog finala.'),
     ).toBeVisible();
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Prikazati kartu zemalja domaćina'),
+    ).toBeVisible();
   });
 
   test('has a translated "Skoči na odjeljak" jump nav linking straight to each notes card', async ({
@@ -616,6 +622,9 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
     ).toBeVisible();
     await expect(notes.getByText('prijavljeno 65.600 gledatelja')).toBeVisible();
     await expect(notes.getByText('1996.: Wembley Stadium, London (Engleska).')).toBeVisible();
+    // The section's lead-in methodology sentence renders as its own intro
+    // paragraph, not as a bogus first list item among the actual venues.
+    await expect(page.locator('.notes__intro', { hasText: 'Svako izdanje EURA' })).toBeVisible();
   });
 
   test('shows the Historical format note as a paragraph, translated Player of the Tournament winners and Memorable moments as a translated list', async ({
@@ -1574,6 +1583,9 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await expect(
       page.locator('.notes__card').getByText('prijavljeno 65.921 gledatelja'),
     ).toBeVisible();
+    // The section's lead-in methodology sentence renders as its own intro
+    // paragraph, not as a bogus first list item among the actual venues.
+    await expect(page.locator('.notes__intro', { hasText: 'Za razliku od UEFA Lige nacija' })).toBeVisible();
   });
 
   test('shows the translated Best Player winners section', async ({ page }) => {

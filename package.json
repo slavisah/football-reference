@@ -30,6 +30,7 @@
     "check:jsonld": "node scripts/check-jsonld.mjs",
     "check:meta": "node scripts/check-meta.mjs",
     "check:award-tallies": "node scripts/check-award-tallies.mjs",
+    "check:i18n-notes": "node scripts/check-i18n-notes.mjs",
     "check:spelling": "cspell --no-progress \"content/**/*.md\""
   },
   "dependencies": {

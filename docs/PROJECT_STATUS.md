@@ -20377,5 +20377,142 @@ from the exhausted award-history search), or a genuinely different quality
 angle (accessibility, performance, SEO, or a fresh
 `docs/WEBSITE_REQUIREMENTS.md` read against the live site).
 
+### `check:i18n-notes`: automated English/Croatian note-section parity check, plus two real bugs it caught - closed 2026-09-11 (hundredth intensive run)
+
+A standing health check first: `pnpm install` (no lockfile changes), `pnpm
+outdated` (still only the blocked `typescript` 7 entry), `pnpm lint`
+(0/0/0), `pnpm test` (602/602 unit), `pnpm build` (711 pages),
+`check:links`/`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs`/
+`check:jsonld`/`check:meta`/`check:html`/`check:award-tallies`/
+`check:spelling` all clean, `pnpm check:lighthouse` re-run for the first
+time in several runs (all 37 audited pages still a perfect 1.00/1.00/1.00/
+1.00, unchanged from its last run).
+
+Every award-history content-mining angle across all six competition/award
+families is exhausted (per several prior runs' own closing notes), the
+Nations League attendance/Team-of-the-Tournament gaps are genuinely blocked
+on this environment's egress (re-confirmed unnecessary to re-check again
+this run - the ninety-sixth run's own re-test is only 4 runs old), and the
+`long-title`/`typescript` 7 items need human sign-off or an upstream release
+respectively - so this run took the standing "genuinely different quality
+angle" fork. Rather than repeat a Lighthouse/accessibility/SEO pass that
+has come back perfect every time it's been tried, extended this run's own
+"read a shared library file end to end looking for an unchecked
+cross-builder invariant" method (the same one that found the `sport`
+field gap and the `inLanguage` gap in `src/lib/jsonLd.ts`, and the tally-table
+gap `check:award-tallies` now guards) to a genuinely different question:
+every Croatian competition/award page hand-writes its own `NoteSection[]`
+array as a translation of the English page's `content/*.md` note sections
+(by design - see each Croatian page's own top-of-file comment), but nothing
+before this run ever checked that the two arrays stay *structurally*
+consistent, only that individual, hand-picked pages/sections had the right
+*content* (a handful of hardcoded `.notes__card` count assertions in
+`tests/e2e/mobile.spec.ts`, none of them exhaustive across all twelve
+language/family combinations).
+
+**Two real, live bugs found and fixed, both in Croatian pages, before the
+check was even written:** a first pass comparing built-HTML `<li>` counts
+between each English page and its Croatian counterpart (a throwaway Node
+script, not yet the committed tool) surfaced four mismatches:
+
+1. `content/fifa-world-cup.md`'s "Editorial notes" section has four bullets;
+   `src/pages/hr/competitions/world-cup.astro`'s "Uredničke napomene" array
+   only had three - the fourth ("Display a map of host countries without
+   using protected tournament logos.") was simply missing, a genuine dropped
+   fact rather than a markup issue. Added the translated bullet ("Prikazati
+   kartu zemalja domaćina bez upotrebe zaštićenih logotipa turnira.").
+2. The World Cup, EURO and Copa América "Final venues" sections each open
+   with a lead-in explanatory paragraph before the per-edition bullets in
+   their English `content/*.md` source - `src/lib/notes.ts`'s
+   `extractSection()` already splits that into a `NoteSection.intro`
+   (rendered as its own `<p class="notes__intro">` by
+   `EditorialNotes.astro`, not a list item), and the English pages render it
+   correctly. All three Croatian pages' hand-written arrays instead folded
+   that same sentence into `items[0]`, so it rendered as a spurious extra
+   `<li>` - the Croatian reader saw the methodology caveat listed as if it
+   were one more World Cup/EURO/Copa América final venue, ahead of 1930/
+   1960/1919's real first entry. Fixed by moving each of the three
+   sentences into the array's own (already-typed, already-imported, simply
+   unused-until-now) `intro:` field instead of `items[0]`.
+   `src/pages/hr/competitions/nations-league.astro`'s own "Final venues"
+   section was correctly unaffected: its English source deliberately opens
+   with a bullet rather than a lead-in paragraph, so there's no `intro` to
+   lose there in the first place - confirming this is a real, narrow,
+   previously-invisible gap rather than a systemic one across every
+   section.
+
+**The permanent tool.** Wrote `scripts/check-i18n-notes.mjs`
+(`pnpm check:i18n-notes`): for every built English page with at least one
+`.notes__card` section, finds its Croatian counterpart (`/hr` + the same
+path) and compares, section by section: the same count of sections, the
+same "has an `intro` lead-in paragraph" flag, and the same item count
+(bullet count, or 1 for a single-paragraph section). Deliberately does
+**not** compare heading or item *text* - the two languages are meant to
+differ there; enforcing text equality would flag every legitimate
+translation as a bug. Operates on already-built HTML via plain regex, the
+same territory as `check:links`/`check:jsonld`/`check:meta`/
+`check:award-tallies` (well under a second for all 711 pages), so it's
+wired into `.github/workflows/ci.yml` as a required PR gate rather than a
+manual/intensive-run-only tool. 13 new unit tests
+(`tests/unit/checkI18nNotes.test.ts`) cover the extraction (single-item vs.
+multi-item sections, intro detection and exclusion from the item count,
+icon-span stripping, multiple sections in document order, a page with no
+note cards at all) and the diff (a clean match, a section-count mismatch,
+an item-count mismatch, an intro-presence mismatch, and both at once).
+Verified the check actually catches regressions, not just a clean-by-
+construction no-op: manually re-introduced each of the two real bugs above
+into a *built* page one at a time (a missing `<li>`, a removed
+`<p class="notes__intro">`), confirmed the tool reported the exact right
+problem with the exact right location, then rebuilt clean and reconfirmed a
+passing run - the same verification discipline `check:award-tallies`'s own
+entry established.
+
+New e2e coverage extends four existing test blocks in
+`tests/e2e/mobile.spec.ts` (World Cup/EURO/Copa América Croatian "Final
+venues" tests each gained a `.notes__intro` visibility assertion; the World
+Cup Croatian "Editorial notes" test gained an assertion for the newly-added
+fourth bullet) rather than adding new test cases, matching how prior
+content-only edits have extended rather than duplicated coverage. All 700
+PDFs regenerated (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+build:pdfs`) and reverified clean (`pnpm check:pdfs`), since the three
+touched Croatian page files are each a declared PDF source
+(`scripts/pdf-pages.mjs`) for their family's Croatian PDF.
+
+Full standing health check clean after the change: `pnpm lint` (0/0/0),
+`pnpm test` (615/615 unit, up from 602 - 13 new `checkI18nNotes` cases),
+`pnpm build` (711 pages, unchanged), `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache` (37 URLs), `check:perf`
+(heaviest page `hr/records`, 600.5 KB, unchanged - the touched Croatian
+pages aren't the heaviest, and the edit only moved text between an `intro`
+field and an `items` array plus one added bullet), `check:pdfs` (700/700
+fresh), `check:jsonld` (1,783/1,783 blocks valid, unchanged), `check:meta`
+(710/710 clean), `check:html` (711/711 valid), `check:award-tallies` (4
+checked, 0 problems, unchanged - this run's fix didn't touch a tally
+table), `check:spelling` (0 issues - the one new Croatian sentence uses
+only already-verified vocabulary), `check:i18n-notes` (7 page pairs
+checked, 0 problems - the new tool's own first clean run against the fixed
+content), `check:reflow`/`check:text-zoom`/`check:print-width` (711/711
+pages clean on all three), plus a full cold-start `pnpm test:e2e`:
+**945/945 passed** (17.3 minutes), matching the ninety-eighth run's own
+count exactly - this run only extended four existing `test()` blocks with
+extra assertions, adding no new cases.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League 2023
+attendance conflict (41,110 vs. 41,500), 2021/2025's still-unconfirmed
+Nations League figures, and World Cup 1930/1950's/EURO 1996/2020's excluded
+attendance figures. With `check:i18n-notes` now guarding note-section
+structure the same way `check:award-tallies` guards tally tables, a future
+pass extending this same "read a shared library file/component end to end
+looking for an unchecked cross-language or cross-builder invariant" method
+to a different file/component pair (e.g. whether every Croatian page's own
+table-column headers, filter labels, or `alt` text stay in step with their
+English counterparts the same structural way) is a good candidate, alongside
+a fresh source lead on any of the open attendance/captain gaps, or a
+genuinely different quality angle (performance, SEO, or a fresh
+`docs/WEBSITE_REQUIREMENTS.md` read against the live site).
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
