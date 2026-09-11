@@ -4085,3 +4085,34 @@ back clean:
   all of `src/lib/` and all of `src/components/` - a future pass's best bet
   is extending it to a `src/pages/` route family (not yet swept this way),
   or a fresh `docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.
+- **CI-caught stale PDFs from the hundred-and-third run's `References.astro`
+  fix**: closed 2026-09-11 (hundred-and-fourth intensive run) - that run's own
+  closing note claimed "no content file touched, so no PDF regen ...
+  needed," which was wrong: `check:pdfs` compares each PDF against its
+  *rendered page* output, not just the source content file, and
+  `References.astro`'s `noteText` fix changed the rendered HTML of every
+  Croatian per-edition page (the exact pages the fix targeted), so their
+  print PDFs went stale the moment that commit landed - caught immediately by
+  this repo's own `test` GitHub Actions check on the open PR (`check:pdfs`
+  failing with 56 stale World Cup/Golden Boot Croatian+English edition
+  PDFs). Regenerated with `pnpm build && pnpm build:pdfs`
+  (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`, the same fallback
+  `pnpm test:e2e` already needs in this environment - `build:pdfs` launches
+  its own `chromium.launch()` via `@playwright/test`, unrelated to Astro's
+  own build) and reverified `check:pdfs` clean (700/700). Full standing
+  health check re-run after: lint (0/0/0), 616/616 unit tests, build (711
+  pages), all 11 `check:*` scripts clean. **Correction for future runs:**
+  "no content file touched" is not sufficient reason to skip a PDF regen -
+  the real test is "did any *rendered page* this PDF is sourced from change,"
+  which a shared component edit can trigger just as easily as a content-file
+  edit; when in doubt, run `check:pdfs` (fast, no browser needed) before
+  closing out a run, not just when a content file was touched. **Left for a
+  future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025, the `long-title` brand-suffix decision),
+  plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed Nations League figures, and EURO 1996/2020's/World Cup
+  1930/1950's excluded attendance figures. The "read end to end" method has
+  covered all of `src/lib/` and all of `src/components/`; a future pass's
+  best bet is extending it to a `src/pages/` route family, or a fresh
+  `docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.
