@@ -20730,5 +20730,84 @@ future run's best bet: extend the "read end to end" method to
 files have been) or a `src/pages/` route family, or a fresh
 `docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.
 
+### Every Croatian per-edition page was silently rendering its References note in English - closed 2026-09-11 (hundred-and-third intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` (still only
+the blocked `typescript` 7 entry), `pnpm lint` (0/0/0), `pnpm test`
+(616/616 unit), `pnpm build` (711 pages), `check:links`/`check:sitemap`/
+`check:precache`/`check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/
+`check:html`/`check:spelling`/`check:award-tallies`/`check:i18n-notes`/
+`check:reflow`/`check:text-zoom`/`check:print-width` all clean, matching
+the hundred-and-second run's baseline exactly (the three browser-based
+checks needed this environment's `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback to launch at all, the same one `pnpm test:e2e` has needed since the
+ninety-second run).
+
+Per the hundred-and-second run's own closing suggestion, extended the
+"read a shared file end to end for a cross-builder inconsistency" method -
+already exhausted across all of `src/lib/*.ts` - to `src/components/*.astro`,
+the 18 shared Astro components every page composes from. Read all 18
+completely, then cross-checked every call site across `src/pages/**/*.astro`
+(English and Croatian) for props that differ between callers in a way that
+looks like an oversight rather than a documented, intentional difference.
+
+Found one real, live bug: `References.astro` accepts an optional `noteText`
+prop (added specifically so Croatian pages can translate the component's
+closing disclaimer paragraph - see the 2026-07-31 `/records` entry above)
+with an English-language default. Every Croatian page passing `<References>`
+overrides it with the translated sentence ("Prednost imaju primarni
+izvori...") - except the seven per-edition `[year].astro` route families
+(`hr/competitions/{world-cup,euro,copa-america,nations-league,ballon-dor,
+golden-boot/world-cup,golden-boot/euro}/[year].astro`), which translate
+every *other* `References` prop (`heading`, `statusPrefix`, `statusText`,
+`lastReviewedPrefix`, `dateLocale`, `noSourcesText`) but simply omitted
+`noteText`, so every one of the hundreds of Croatian edition pages this
+site generates (23 World Cup x 2 not counted twice, ~17 EURO, ~48 Copa
+América, several Nations League/Ballon d'Or/Golden Boot editions) rendered
+one paragraph of English text at the bottom of an otherwise fully Croatian
+page. Fixed by adding the same `noteText="Prednost imaju primarni izvori.
+Povijesni formati i nazivi reprezentacija bilježe se onako kako su
+korišteni u to vrijeme; kontekst potražite u napomenama uz svako izdanje."`
+line already used by all 14 other Croatian `<References>` call sites to
+each of the seven files. Verified against the built output (`pnpm build`
+then `grep` for the English fallback sentence across every
+`dist/hr/competitions/**/index.html` edition page): zero matches remain,
+and the Croatian sentence renders correctly on a sample page from each of
+the seven families.
+
+Read the other 17 components equally carefully and found no further bugs;
+several near-miss leads (Golden Boot's untranslated `hostLabel` props on
+`TournamentTable`, `EditionView`'s unused-looking `parts`/`isFinalLabel`
+branch, `EditorialNotes`' untranslated `jumpNavLabel` on two pages) were
+each individually verified to be unreachable given the data those callers
+actually pass, not live bugs. This closes the "read a component file end to
+end" method as applied to every file in `src/components/`, the same way the
+hundred-and-second run closed it out for `src/lib/`; a future run wanting
+to keep using this technique should point it at a `src/pages/` route family
+next, which hasn't had this same file-by-file treatment.
+
+New e2e coverage: extended the existing "renders translated chrome" (or
+equivalent first) test in each of the six per-family edition-page spec
+files (`edition-page.spec.ts`, `euro-edition-page.spec.ts`,
+`copa-america-edition-page.spec.ts`, `nations-league-edition-page.spec.ts`,
+`ballon-dor-edition-page.spec.ts`, `golden-boot-edition-page.spec.ts` - the
+last covering both the World Cup and EURO Golden Boot route families, one
+assertion in each) with a `.references__note` assertion checking for the
+Croatian text, rather than adding new test blocks - the same "extend an
+existing block" convention prior i18n-parity fixes have used. No content
+file touched (this is a presentation-layer prop, not editorial content), so
+no PDF regeneration or `lastReviewed` bump was needed, and no new
+unit-testable logic was added (`pnpm test` stays at 616/616).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League 2023
+attendance conflict, 2021/2025's still-unconfirmed Nations League figures,
+and World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures. A
+future run's best bet: extend the "read end to end" method to a
+`src/pages/` route family (not yet swept this way), or a fresh
+`docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

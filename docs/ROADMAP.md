@@ -4053,3 +4053,35 @@ back clean:
   source (`www.11v11.com`); still blocked - direct `WebFetch` of both that
   domain and Wikipedia returned `EGRESS_BLOCKED`. No code change. See
   `docs/PROJECT_STATUS.md`'s matching entry for full detail.
+- **Every Croatian per-edition page was silently rendering its References
+  note in English**: closed 2026-09-11 (hundred-and-third intensive run) - a
+  standing health check first (all clean, matching the hundred-and-second
+  run's baseline). Extended the "read a shared file end to end" method to
+  `src/components/*.astro` (the 18 shared components, not yet swept this way)
+  and found a real bug: `References.astro`'s `noteText` prop - added so
+  Croatian pages can translate its closing disclaimer sentence - was
+  correctly overridden at all 14 non-edition Croatian call sites but silently
+  omitted at all seven per-edition `[year].astro` route families (World Cup,
+  EURO, Copa América, Nations League, Ballon d'Or, and both Golden Boot
+  variants), each of which translated every *other* `References` prop but
+  missed this one. Every Croatian edition page (hundreds of them) was
+  rendering one paragraph of English text on an otherwise fully Croatian
+  page. Fixed by adding the same translated `noteText` line the other 14
+  call sites already use to all seven files; verified against the built
+  `dist/hr/competitions/**/index.html` output that the English fallback no
+  longer appears anywhere. New e2e coverage extends the existing
+  "translated chrome" test in each of the six per-family edition-page spec
+  files (Golden Boot's covers both its World Cup and EURO route families) -
+  no new test blocks. No content file touched, so no PDF regen or
+  `lastReviewed` bump needed; `pnpm test` stays at 616/616 (presentation-only
+  fix, no new unit-testable logic). See `docs/PROJECT_STATUS.md`'s matching
+  entry for full detail. **Left for a future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, Nations League's Team of the Tournament
+  for 2021/2023/2025, the `long-title` brand-suffix decision), plus the
+  Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+  Nations League figures, and EURO 1996/2020's/World Cup 1930/1950's
+  excluded attendance figures. The "read end to end" method has now covered
+  all of `src/lib/` and all of `src/components/` - a future pass's best bet
+  is extending it to a `src/pages/` route family (not yet swept this way),
+  or a fresh `docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.

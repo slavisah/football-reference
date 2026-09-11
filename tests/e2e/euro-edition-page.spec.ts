@@ -107,6 +107,7 @@ test.describe('Croatian EURO edition page', () => {
       'href',
       /\/hr\/teams\/portugal\/?$/,
     );
+    await expect(page.locator('.references__note')).toContainText('Prednost imaju primarni izvori');
   });
 
   test('the Croatian competition table links each year to the Croatian edition page', async ({ page }) => {
