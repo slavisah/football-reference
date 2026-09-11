@@ -1903,6 +1903,24 @@ test.describe('Home page on a 360px phone', () => {
     await expect(page.locator('#on-this-day-hint')).toBeHidden();
   });
 
+  test('the Golden Boot card combines World Cup and EURO editions, with no merged "Most awards" stat', async ({
+    page,
+  }) => {
+    // Regression test for a real bug: the card used to load only the World
+    // Cup Golden Boot table (23 editions) even though its own blurb and
+    // href cover both races - see src/lib/homeCards.ts's
+    // loadHomeCompetitions() for the combined-count fix and why "Most
+    // awards" is deliberately left off rather than merging two rankings
+    // that stay separate everywhere else on the site (e.g.
+    // competitions/golden-boot.astro's two ChampionsSummary widgets).
+    const card = page.locator('.comp-card', { hasText: 'Golden Boot' });
+    const stats = card.locator('.comp-card__stats dt');
+    await expect(stats).toHaveCount(1);
+    await expect(stats.first()).toHaveText('Editions');
+    await expect(card.locator('.comp-card__stats dd').first()).toHaveText('40');
+    await expect(card.locator('.comp-card__stats dt', { hasText: 'Most' })).toHaveCount(0);
+  });
+
   test('shows the "How to use the reference" and "Important historical naming note" sections from content/index.md', async ({
     page,
   }) => {

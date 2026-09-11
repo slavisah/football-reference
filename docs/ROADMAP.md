@@ -3950,3 +3950,87 @@ back clean:
   future pass's best bet is a fresh source lead on any of those, or a
   genuinely different quality angle (accessibility, performance, SEO, or a
   fresh `docs/WEBSITE_REQUIREMENTS.md` read against the live site).
+- **`check:award-tallies`: automated cross-check of every hand-authored
+  title-tally table against its own source table**: closed 2026-09-11
+  (ninety-ninth intensive run) - `src/lib/validate.ts` only ever checked
+  each source table's own structural shape, never that
+  `content/fifa-world-cup.md`/`uefa-euro.md`/`copa-america.md`/
+  `ballon-dor.md`'s four hand-authored "titles" tally tables actually match
+  the table each one summarizes. Added `scripts/check-award-tallies.mjs`
+  (`pnpm check:award-tallies`, wired into CI), which recomputes each tally
+  from its source table and diffs it; a genuinely clean first run (no
+  existing drift), but a real backstop against a future one. This entry was
+  missing from this file until the hundred-and-first run added it
+  retroactively - it shipped and was fully documented in
+  `docs/PROJECT_STATUS.md` at the time, just never mirrored here. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail.
+- **`check:i18n-notes`: automated English/Croatian note-section parity
+  check, plus two real bugs it caught**: closed 2026-09-11 (hundredth
+  intensive run) - extended the "read a shared library file end to end"
+  method to a new question: do the hand-translated Croatian `NoteSection[]`
+  arrays on each `src/pages/hr/competitions/*.astro` page stay
+  *structurally* in sync with the English `content/*.md` sections they
+  translate? They didn't, in two real, live ways: `hr/competitions/
+  world-cup.astro`'s "Editorial notes" was silently missing its fourth
+  English bullet, and the World Cup/EURO/Copa América Croatian "Final
+  venues" sections each folded their lead-in paragraph into the bullet list
+  as a spurious extra item instead of using the existing `intro` field.
+  Both fixed, plus the permanent `scripts/check-i18n-notes.mjs` check (`pnpm
+  check:i18n-notes`, wired into CI) so neither class of drift can recur
+  silently. Like the `check:award-tallies` entry above, this entry was
+  missing from this file until the hundred-and-first run added it
+  retroactively. See `docs/PROJECT_STATUS.md`'s matching entry for full
+  detail.
+- **Home page Golden Boot card silently dropped the entire EURO Golden Boot
+  dataset**: closed 2026-09-11 (hundred-and-first intensive run) - a
+  standing health check first (`pnpm install`, `pnpm outdated` unchanged:
+  only the blocked `typescript` 7 entry; `pnpm lint`/`test`/`build`/`check:links`/
+  `check:sitemap`/`check:precache`/`check:perf`/`check:pdfs`/`check:jsonld`/
+  `check:meta`/`check:html`/`check:spelling`/`check:award-tallies`/
+  `check:i18n-notes` all clean). With every recently-tried research/sourcing
+  angle re-confirmed exhausted rather than re-attempted again, this run tried
+  the "read a shared library file end to end for cross-builder
+  inconsistencies" method (the same one that found the `sport`/`inLanguage`
+  JSON-LD gaps in the ninety-sixth/ninety-seventh runs) on `src/lib/homeCards.ts`
+  and found a real bug: `loadHomeCompetitions()` only ever called
+  `loadCompetition('golden-boot', ...)` once, with `editionsHeading: 'FIFA
+  World Cup top scorers'` - so the home page's Golden Boot card silently
+  never loaded the UEFA EURO half of `content/golden-boot.md` at all, even
+  though every other consumer of that content (`records.astro`,
+  `quiz.astro`, `players/[slug].astro`, `competitions/golden-boot.astro`,
+  `sitemap.xml.ts`, `player-index.json.ts`) loads both tables. The card's own
+  blurb ("World Cup and EURO top-scorer awards, tournament by tournament")
+  and href (`/competitions/golden-boot`) both cover both races, but its
+  "Editions" stat showed 23 instead of the true 40 (23 World Cup + 17 EURO),
+  and its "Most awards" stat showed only the World Cup leader (Kylian Mbappé,
+  2) as if it were the combined leader. Fixed by loading both tables and
+  combining their `editions` arrays for the count; deliberately did **not**
+  synthesize a merged champions ranking to fill "Most awards" - that would
+  contradict `competitions/golden-boot.astro`'s own explicit,
+  already-documented editorial policy of keeping World Cup and EURO Golden
+  Boot as two separate rankings everywhere on the site (two separate
+  `ChampionsSummary` widgets and `ItemList` JSON-LD blocks, never merged) -
+  so the card now drops the "Most awards" row entirely for Golden Boot only,
+  reusing the `topChampion === undefined` rendering path `buildHomeCards()`
+  already had. New unit test coverage in `tests/unit/homeCards.test.ts`
+  (`loadHomeCompetitions()` combining both tables into one edition count with
+  an empty, not merged, champions array) and a new e2e assertion in
+  `tests/e2e/mobile.spec.ts` on the rendered home page card (40 editions, no
+  "Most" stat row) - both EN and HR checked, since `buildHomeCards()` shares
+  the same underlying data across locales. 616/616 unit tests (was 615),
+  711 pages built, full standing `check:*` suite clean, plus a full
+  cold-start `pnpm test:e2e` (946 tests, was 945) confirming no regressions.
+  See `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a
+  future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025, the `long-title` brand-suffix decision),
+  plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed Nations League figures, and EURO 1996/2020's/World Cup
+  1930/1950's excluded attendance figures. This run's own method (reading a
+  not-yet-audited `src/lib/*.ts` file end to end for cross-builder
+  inconsistencies) is worth repeating on a different file next -
+  `src/lib/editions.ts`, `compare.ts`, `editionProfile.ts`, `quiz.ts`,
+  `teamProfile.ts`/`playerProfile.ts` and `notes.ts` were all checked this
+  run too but came back internally consistent, so a future pass should pick
+  files not yet covered by either this run or the ninety-sixth/
+  ninety-seventh runs' own passes over `jsonLd.ts`.
