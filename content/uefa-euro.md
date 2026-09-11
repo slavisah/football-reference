@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-09-10
+lastReviewed: 2026-09-11
 status: verified
 ---
 
@@ -22,25 +22,25 @@ The European Championship began in 1960 as the European Nations' Cup. Early fina
 
 ## Final venues
 
-Every EURO edition has decided its champion in one match at one stadium - even 2020, whose group and knockout matches were split across eleven host cities to mark the competition's 60th anniversary, still settled the title at a single venue like every other year.
+Every EURO edition has decided its champion in one match at one stadium - even 2020, whose group and knockout matches were split across eleven host cities to mark the competition's 60th anniversary, still settled the title at a single venue like every other year. A reported attendance figure is added below where it could be confirmed via two independent sources - 15 of the 17 editions clear that bar; 1996 and 2020 could not be tied to a second, genuinely independent source beyond a single widely repeated figure and are left out rather than published on one source.
 
-- **1960:** Parc des Princes, Paris (France).
-- **1964:** Santiago Bernabéu, Madrid (Spain) - the same stadium later hosted the 1982 FIFA World Cup final.
-- **1968:** Stadio Olimpico, Rome (Italy) - the original final finished 1-1, so the replay was played two days later at the same stadium.
-- **1972:** Heysel Stadium, Brussels (Belgium).
-- **1976:** Stadion Crvena zvezda (Red Star Stadium), Belgrade (Yugoslavia).
-- **1980:** Stadio Olimpico, Rome (Italy) - the same stadium as the 1968 final, the first to host two EURO finals.
-- **1984:** Parc des Princes, Paris (France) - the same stadium as the 1960 final.
-- **1988:** Olympiastadion, Munich (West Germany).
-- **1992:** Ullevi, Gothenburg (Sweden).
+- **1960:** Parc des Princes, Paris (France) - a reported attendance of 17,966.
+- **1964:** Santiago Bernabéu, Madrid (Spain) - the same stadium later hosted the 1982 FIFA World Cup final; a reported attendance of 79,115.
+- **1968:** Stadio Olimpico, Rome (Italy) - the original final finished 1-1 in front of 68,817 spectators, so the replay was played two days later at the same stadium, with a reported attendance of 32,886.
+- **1972:** Heysel Stadium, Brussels (Belgium) - a reported attendance of 43,437.
+- **1976:** Stadion Crvena zvezda (Red Star Stadium), Belgrade (Yugoslavia) - a reported attendance of 30,790.
+- **1980:** Stadio Olimpico, Rome (Italy) - the same stadium as the 1968 final, the first to host two EURO finals, with a reported attendance of 47,860.
+- **1984:** Parc des Princes, Paris (France) - the same stadium as the 1960 final; a reported attendance of 47,368.
+- **1988:** Olympiastadion, Munich (West Germany) - a reported attendance of 62,770.
+- **1992:** Ullevi, Gothenburg (Sweden) - a reported attendance of 37,800.
 - **1996:** Wembley Stadium, London (England).
-- **2000:** De Kuip, Rotterdam (Netherlands).
-- **2004:** Estádio da Luz, Lisbon (Portugal).
-- **2008:** Ernst-Happel-Stadion, Vienna (Austria).
-- **2012:** NSC Olimpiyskiy, Kyiv (Ukraine).
-- **2016:** Stade de France, Saint-Denis (France).
+- **2000:** De Kuip, Rotterdam (Netherlands) - a reported attendance of 48,100.
+- **2004:** Estádio da Luz, Lisbon (Portugal) - a reported attendance of 62,865.
+- **2008:** Ernst-Happel-Stadion, Vienna (Austria) - a reported attendance of 51,428.
+- **2012:** NSC Olimpiyskiy, Kyiv (Ukraine) - a reported attendance of 63,170.
+- **2016:** Stade de France, Saint-Denis (France) - a reported attendance of 75,868.
 - **2020:** Wembley Stadium, London (England) - the same stadium as the 1996 final, the second to host two EURO finals.
-- **2024:** Olympiastadion, Berlin (Germany).
+- **2024:** Olympiastadion, Berlin (Germany) - a reported attendance of 65,600.
 
 ## Editions
 

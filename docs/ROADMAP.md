@@ -3767,3 +3767,62 @@ back clean:
   over a different file, or a genuinely different quality angle
   (accessibility, performance, SEO, or a fresh `docs/WEBSITE_REQUIREMENTS.md`
   read against the live site).
+- **FIFA World Cup and UEFA EURO "Final attendance"**: closed 2026-09-11
+  (ninety-eighth intensive run) - a standing health check first (`pnpm
+  install`, `pnpm outdated` unchanged: only the blocked `typescript` 7 entry;
+  `pnpm lint`/`test`/`build`/`check:links`/`check:sitemap`/`check:precache`/
+  `check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/`check:html`/
+  `check:spelling` all clean and a full cold-start `pnpm test:e2e`, 945/945
+  passed, matching the ninety-seventh run's baseline). Extended the "Final
+  attendance" angle - live for UEFA Nations League and Copa América since
+  the ninety-fourth/ninety-sixth runs - to the two team-competition families
+  it hadn't reached yet, this routine's own top content priority. Unlike
+  Nations League's finals, World Cup and EURO finals are famous enough that
+  genuinely independent corroboration (not just a Wikipedia figure
+  reconfirmed by rephrasing a search) turned out to be available for almost
+  every edition: two research passes (a broad first pass, then a second
+  pass targeted specifically at every edition the first pass could only tie
+  to Wikipedia, aimed at finding one more genuinely independent domain)
+  cleared 21 of 23 World Cup editions and 15 of 17 EURO editions. Added a
+  reported attendance figure to each cleared edition's existing "Final
+  venues" bullet in `content/fifa-world-cup.md`/`content/uefa-euro.md` (not
+  a new section - the same annotation-not-a-stub approach the ninety-fourth
+  run's Nations League/Copa América work used) and hand-translated into
+  `hr/competitions/world-cup.astro`'s and `hr/competitions/euro.astro`'s own
+  `notes` arrays. Four editions were deliberately left out, for two
+  different reasons: 1930 and 1950 (World Cup) are genuinely **disputed**
+  rather than under-sourced - 1930 splits between an official 68,346 and
+  contemporary press estimates around 90,000-100,000, and 1950's Maracanã
+  final splits between FIFA/Guinness's own recognized paid-attendance record
+  of 173,850 and the commonly cited ~199,854 total persons physically in the
+  stadium, a paid-vs-total-present definitional split, not a sourcing gap;
+  1996 and 2020 (EURO) have one consistently repeated figure each but
+  neither pass could tie it to a first-tier independent outlet, the same
+  single-source caution that already excludes Nations League's
+  2021/2023/2025 figures. 1986's 114,600 is also flagged as the largest
+  attendance of any World Cup final (independently corroborated by Guinness
+  World Records), and 1968's EURO final replay's 32,886 is presented
+  alongside the original drawn match's own separately reported 68,817.
+  `lastReviewed` bumped to 2026-09-11 on both content files. New e2e
+  coverage (EN + HR) spot-checks one confirmed and one deliberately-excluded
+  edition per page. All 700 PDFs regenerated and reverified clean. Full
+  standing health check clean again after the edit: `pnpm lint` (0/0/0),
+  `pnpm test` (588/588 unit, unchanged - presentation-layer content, no new
+  unit-testable logic), `pnpm build` (711 pages), `check:links` (715
+  pages), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+  `check:perf` (heaviest page `hr/records` 600.5 KB, within the 610 KB
+  budget), `check:pdfs` (700/700 fresh), `check:jsonld` (1,783/1,783 blocks
+  valid), `check:meta` (710/710 clean), `check:html` (711/711 valid),
+  `check:spelling` (0 issues - no new proper nouns, only numbers), plus a
+  full cold-start `pnpm test:e2e`. See `docs/PROJECT_STATUS.md`'s matching
+  entry for detail. **Left for a future pass:** the same environment-blocked
+  items as every recent run (`typescript` 7, `docs/SOURCES.md`
+  link-liveness, Nations League's Team of the Tournament for
+  2021/2023/2025, the `long-title` brand-suffix decision), plus the
+  Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+  Nations League figures, and now also EURO 1996/2020's and World Cup
+  1930/1950's excluded attendance figures as specific, named gaps rather
+  than an unconfirmed blank spot to keep re-researching from scratch. A
+  future pass's best bet is a fresh source lead on any of those, or a
+  genuinely different quality angle (accessibility, performance, SEO, or a
+  fresh `docs/WEBSITE_REQUIREMENTS.md` read against the live site).

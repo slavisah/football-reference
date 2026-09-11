@@ -154,6 +154,9 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(page.getByText('The two semifinal winners meet in the final')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Final venues' })).toBeVisible();
     await expect(notes.getByText('MetLife Stadium, East Rutherford, New Jersey')).toBeVisible();
+    await expect(notes.getByText('a reported attendance of 80,663')).toBeVisible();
+    // 1930 and 1950 stay without one - genuinely disputed, not just unconfirmed.
+    await expect(notes.getByText('Estadio Centenario, Montevideo (Uruguay).')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Golden Ball winners' })).toBeVisible();
     await expect(notes.getByText('Rodri (Spain) - the first Spain player to win the award')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Silver Ball and Bronze Ball winners' })).toBeVisible();
@@ -336,6 +339,9 @@ test.describe('EURO page on a 360px phone', () => {
     await expect(
       notes.getByText('Stadio Olimpico, Rome (Italy) - the same stadium as the 1968 final'),
     ).toBeVisible();
+    await expect(notes.getByText('a reported attendance of 65,600')).toBeVisible();
+    // 1996 and 2020 stay without one - only a single, unconfirmable source.
+    await expect(notes.getByText('Wembley Stadium, London (England).')).toBeVisible();
   });
 
   test('shows the Historical format note as a paragraph, Player of the Tournament winners and Memorable moments as a list', async ({ page }) => {
@@ -456,6 +462,10 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     await expect(page.getByRole('heading', { name: 'Mjesta finala' })).toBeVisible();
     await expect(
       page.locator('.notes__card').getByText('MetLife Stadium, East Rutherford, New Jersey'),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('prijavljeno 80.663 gledatelja')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('1930.: Estadio Centenario, Montevideo (Urugvaj).'),
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Prekretnice formata' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Dobitnici Zlatne lopte' })).toBeVisible();
@@ -604,6 +614,8 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
     await expect(
       notes.getByText('Stadio Olimpico, Rim (Italija) - isti stadion kao finale 1968.'),
     ).toBeVisible();
+    await expect(notes.getByText('prijavljeno 65.600 gledatelja')).toBeVisible();
+    await expect(notes.getByText('1996.: Wembley Stadium, London (Engleska).')).toBeVisible();
   });
 
   test('shows the Historical format note as a paragraph, translated Player of the Tournament winners and Memorable moments as a translated list', async ({
