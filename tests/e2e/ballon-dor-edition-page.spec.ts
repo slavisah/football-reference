@@ -120,6 +120,7 @@ test.describe("Croatian Ballon d'Or edition page", () => {
       'href',
       /\/hr\/teams\/croatia\/?$/,
     );
+    await expect(page.locator('.references__note')).toContainText('Prednost imaju primarni izvori');
   });
 
   test('the "Not awarded" 2020 edition reads correctly in Croatian', async ({ page }) => {

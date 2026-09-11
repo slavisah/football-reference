@@ -199,6 +199,7 @@ test.describe('Croatian Golden Boot edition page', () => {
       'href',
       /\/hr\/teams\/bulgaria\/?$/,
     );
+    await expect(page.locator('.references__note')).toContainText('Prednost imaju primarni izvori');
   });
 
   test('the Croatian table links each year to the Croatian edition page', async ({ page }) => {
@@ -212,6 +213,7 @@ test.describe('Croatian Golden Boot edition page', () => {
     const back = page.locator('.edition__back a');
     await expect(back).toContainText('Sva izdanja natjecanja');
     await expect(back).toHaveAttribute('href', /\/hr\/competitions\/golden-boot\/?$/);
+    await expect(page.locator('.references__note')).toContainText('Prednost imaju primarni izvori');
   });
 
   test('the language switcher returns to the English edition page', async ({ page }) => {
