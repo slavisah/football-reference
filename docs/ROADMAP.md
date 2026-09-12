@@ -4303,3 +4303,35 @@ back clean:
   subtree and `scripts/`; `tests/` itself is the one remaining large,
   unswept source directory if a future run wants to extend the same method
   once more.
+- **`tests/` end-to-end audit**: closed 2026-09-12 (hundred-and-ninth
+  intensive run) - a standing health check first (all clean, matching the
+  hundred-eighth run's baseline: `pnpm lint` 0/0/0, `pnpm test` 627/627,
+  `pnpm build` 711 pages, all `check:*` scripts clean). Extended the
+  directory-level "read end to end, compare shared logic/constants across
+  files" method to `tests/` (47 files, ~16,435 lines), the one large
+  source directory the hundred-eighth run's own closing note had left
+  unswept. Found a real bug in the same shape as that run's own
+  `OVERFLOW_TOLERANCE_PX` find: `scripts/check-print-width.mjs` exports
+  `PRINT_CONTENT_WIDTH_PX` specifically so other files can share the A4
+  print-width constant, and `tests/unit/checkPrintWidth.test.ts` correctly
+  imports it, but `tests/e2e/print-styles.spec.ts` independently re-typed
+  the identical formula as its own local constant instead of importing it
+  - so a future `@page` geometry change could silently desync the e2e
+  spec's viewport from the script's own sweep. Fixed by importing the
+  shared constant; verified with a clean 143/143 run of
+  `print-styles.spec.ts` alone (same 1032px value, behavior-preserving)
+  and a full cold-start `pnpm test:e2e`. Two other candidates (Croatian
+  edition-page `<h1>` word order across all six per-family spec files;
+  every header-drawer-driving e2e test calling `openMenu(page)` first)
+  were checked and confirmed already consistent, not bugs. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
+  future pass:** the same environment-blocked items as ever (`typescript`
+  7, `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix
+  decision), plus the Nations League 2023 attendance conflict and
+  2021/2025's still-unconfirmed figures, and EURO 1996/2020's/World Cup
+  1930/1950's excluded attendance figures. The directory-level "read end
+  to end" method has now covered every large source directory on the site
+  (`src/` subtrees, `scripts/`, `tests/`) at least once - a future run's
+  best bet is a fresh source lead on the open attendance/brand-suffix
+  items, or a second pass over an already-swept directory with a
+  genuinely different lens than shared-constant drift.
