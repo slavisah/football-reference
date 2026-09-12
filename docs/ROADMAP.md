@@ -4233,7 +4233,10 @@ back clean:
   needed (meta tags aren't part of either PDF's printed output). Full
   standing health check clean: `pnpm lint` (0/0/0), `pnpm test` (627/627),
   `pnpm build` (711 pages), all 14 `check:*` scripts, the 37-page
-  `check:lighthouse` audit (all 1.00), and a full cold-start `pnpm test:e2e`.
+  `check:lighthouse` audit (all 1.00), and a full cold-start `pnpm test:e2e`
+  (947/947, 16.0 minutes, run alone after a first concurrent attempt hit an
+  unrelated port collision with this same run's own `check:lighthouse` - see
+  `docs/PROJECT_STATUS.md`'s matching entry for that correction).
   See `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
   future pass:** the same environment-blocked items as every recent run
   (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
