@@ -21166,7 +21166,7 @@ double-quoted attribute) and applied it in `extractMetaDescription()`
 before both the length check and the pre-existing duplicate-detection
 logic, which benefits the same way.
 
-18 new unit tests: 7 for `truncateDescription`
+11 new unit tests: 7 for `truncateDescription`
 (`tests/unit/text.test.ts` - unchanged-under-limit, exact-at-limit,
 word-boundary cutting including on the real 1960 Golden Boot description
 above, dangling-punctuation stripping, a custom `maxLength`, and the
@@ -21194,8 +21194,26 @@ Full standing health check re-run after the fix: `pnpm lint` (0/0/0),
 `check:spelling`/`check:award-tallies`/`check:i18n-notes`/`check:reflow`/
 `check:text-zoom`/`check:print-width`, the three browser-based sweeps
 again needing this environment's `PW_EXECUTABLE_PATH=/opt/pw-browsers/
-chromium` fallback), the 25-page `check:lighthouse` audit, and a full
-cold-start `pnpm test:e2e`.
+chromium` fallback), the 37-page `check:lighthouse` audit (all four
+categories a perfect 1.00 on every page), and a full cold-start `pnpm
+test:e2e` - 947/947 passed (16.0 minutes). That e2e run needed a second
+attempt: the first one was started in the background concurrently with
+this same run's own `check:lighthouse` invocation, and both spin up an
+`astro preview` server on the same port - the e2e run's webServer lost
+that race and every test failed with `net::ERR_CONNECTION_REFUSED`
+against `localhost:4321` (741 of 947, confirmed from
+`test-results/.last-run.json` and one failing test's `error-context.md`
+after the first attempt's own truncated log made the scale of the
+failure look worse than it was). Not a real regression - re-run alone,
+with nothing else touching port 4321, it passed clean on the first try.
+**Correction for future runs:** never run `check:lighthouse` (or
+`check:reflow`/`check:text-zoom`/`check:print-width`) in the background
+concurrently with `pnpm test:e2e` - all of them manage their own `astro
+preview` server on the same default port, so only run one at a time; and
+don't pipe a long-running command's output through `tail` when capturing
+it to a file for later inspection - redirect with `>`/`2>&1` directly so
+a real failure's full detail (not just its last N lines) is still there
+to read afterward.
 
 **Left for a future pass:** the same environment-blocked items as every
 recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
