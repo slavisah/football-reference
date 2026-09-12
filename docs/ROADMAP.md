@@ -4116,3 +4116,46 @@ back clean:
   covered all of `src/lib/` and all of `src/components/`; a future pass's
   best bet is extending it to a `src/pages/` route family, or a fresh
   `docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.
+- **`/hr/records`'s "Most successful teams" section silently used the
+  English "title"/"titles" unit noun**: closed 2026-09-12 (hundred-and-fifth
+  intensive run) - a standing health check first (all clean, matching the
+  hundred-and-fourth run's baseline; `pnpm outdated` still only the blocked
+  `typescript` 7 entry). Took the hundred-and-fourth run's own suggestion and
+  extended the "read a shared component plus every one of its call sites end
+  to end" method to `src/pages/` (not yet swept this way): comparing every
+  component prop passed at each EN/HR page-pair call site
+  (`index`/`quiz`/`compare`/`compare-players`/`records`/`glossary`/
+  `players/[slug]`/`teams/[slug]`/`about/sources`) found a real bug in
+  `ChampionsSummary.astro`'s nine call sites inside `hr/records.astro`: eight
+  correctly override the component's `unit` prop (`['title', 'titles']`
+  by default) with a Croatian singular/plural pair, but the very first one
+  (`teams-${c.key}`, the "Najuspješnije reprezentacije" section) omitted it,
+  so every team's title-count bar on the Croatian records page carried the
+  English words "title"/"titles" in its `visually-hidden` screen-reader-only
+  span, on an otherwise fully Croatian page, across all six competitions.
+  Fixed with `unit={['naslov', 'naslova']}`, matching the singular/plural
+  pair the same file's neighboring "home-soil" section already uses for this
+  exact word. New e2e coverage (`tests/e2e/mobile.spec.ts`) asserts the
+  rendered unit text matches `/naslov/` and not `/title/i`. No content file
+  touched (this is a presentation-layer prop on a page component, not
+  editorial content), so `pnpm test` stays at 616/616, but `check:pdfs`
+  correctly caught `records-hr.pdf` as stale (the hundred-and-fourth run's
+  own "check rendered output, not just content files" correction paying
+  off immediately) - regenerated and reverified with `pnpm build:pdfs`/
+  `pnpm check:pdfs` (700/700 fresh). Full standing health check clean:
+  `pnpm lint` (0/0/0), `pnpm test` (616/616), `pnpm build` (711 pages), all
+  11 `check:*` scripts clean, full cold-start `pnpm test:e2e` (947/947,
+  one new test). See `docs/PROJECT_STATUS.md`'s matching entry for full
+  detail. **Left for a future pass:** the same environment-blocked items as
+  every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  Nations League's Team of the Tournament for 2021/2023/2025, the
+  `long-title` brand-suffix decision), plus the Nations League 2023
+  attendance conflict, 2021/2025's still-unconfirmed Nations League figures,
+  and EURO 1996/2020's/World Cup 1930/1950's excluded attendance figures.
+  The "read end to end" prop-diff method just started on `src/pages/` and
+  only covered the nine EN/HR page-pairs outside the per-edition
+  `[year].astro` route trees and `robots.txt.ts`/`sitemap.xml.ts`/
+  `manifest.webmanifest.ts`/the `*-index.json.ts` endpoints - a future pass
+  could extend the same method to the seven per-family edition-page route
+  trees (a different shape: many generated pages per family rather than one
+  static page), or pick a genuinely different quality angle.
