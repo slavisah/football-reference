@@ -5,7 +5,7 @@ competitionType: international
 confederation: FIFA
 firstEdition: 1930
 lastCompletedEdition: 2026
-lastReviewed: 2026-09-02
+lastReviewed: 2026-09-11
 status: verified
 ---
 
@@ -20,6 +20,34 @@ The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 b
 - From the round of 16 onward, it is a straight knockout: one defeat and a team is out.
 - The two semifinal winners meet in the final to decide the champion.
 - The tournament has expanded several times since 1930 - see "Format milestones" below for exactly when.
+
+## Final venues
+
+Every World Cup edition has decided its champion in one match at one stadium, including 1950's final-group decider between Uruguay and Brazil (see "Format milestones" below) - unlike Copa América, no era of this competition has settled the title by league table or a two-legged tie. A reported attendance figure is added below where it could be confirmed via two independent sources - 21 of the 23 editions clear that bar. 1930 and 1950 are left without one despite being extensively documented: both are genuinely disputed rather than merely unconfirmed, since their most commonly cited figures split between an official/paid count and a larger total-inside-the-stadium estimate, and no single number can be presented as fact.
+
+- **1930:** Estadio Centenario, Montevideo (Uruguay).
+- **1934:** Stadio Nazionale PNF, Rome (Italy) - a reported attendance of 55,000.
+- **1938:** Stade Olympique de Colombes, Colombes, near Paris (France) - a reported attendance of 45,000.
+- **1950:** Estádio do Maracanã, Rio de Janeiro (Brazil).
+- **1954:** Wankdorf Stadium, Bern (Switzerland) - a reported attendance of 62,500.
+- **1958:** Råsunda Stadium, Solna, near Stockholm (Sweden) - a reported attendance of 49,737.
+- **1962:** Estadio Nacional, Santiago (Chile) - a reported attendance of 68,679.
+- **1966:** Wembley Stadium, London (England) - a reported attendance of 96,924.
+- **1970:** Estadio Azteca, Mexico City (Mexico) - a reported attendance of 107,412.
+- **1974:** Olympiastadion, Munich (West Germany) - a reported attendance of 78,200.
+- **1978:** Estadio Monumental, Buenos Aires (Argentina) - a reported attendance of 71,483.
+- **1982:** Santiago Bernabéu, Madrid (Spain) - a reported attendance of 90,089.
+- **1986:** Estadio Azteca, Mexico City (Mexico) - the same stadium as the 1970 final, the first to host two World Cup finals, with a reported attendance of 114,600, the largest of any World Cup final.
+- **1990:** Stadio Olimpico, Rome (Italy) - a reported attendance of 73,603.
+- **1994:** Rose Bowl, Pasadena, California (United States) - a reported attendance of 94,194.
+- **1998:** Stade de France, Saint-Denis (France) - a reported attendance of 80,000.
+- **2002:** International Stadium Yokohama, Yokohama (Japan) - a reported attendance of 69,029.
+- **2006:** Olympiastadion, Berlin (Germany) - a reported attendance of 69,000.
+- **2010:** Soccer City, Johannesburg (South Africa) - renamed FNB Stadium after the tournament, with a reported attendance of 84,490.
+- **2014:** Estádio do Maracanã, Rio de Janeiro (Brazil) - the same stadium as the 1950 final, with a reported attendance of 74,738.
+- **2018:** Luzhniki Stadium, Moscow (Russia) - a reported attendance of 78,011.
+- **2022:** Lusail Stadium, Lusail (Qatar) - a reported attendance of 88,966.
+- **2026:** MetLife Stadium, East Rutherford, New Jersey (United States) - a reported attendance of 80,663.
 
 ## Editions
 

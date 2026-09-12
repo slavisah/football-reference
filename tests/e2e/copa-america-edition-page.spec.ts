@@ -117,6 +117,7 @@ test.describe('Croatian Copa América edition page', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
     await expect(page.locator('h1')).toHaveText('1959. (Argentina) Copa América');
     await expect(page.locator('.edition__fact', { hasText: 'Prvak' })).toContainText('Argentina');
+    await expect(page.locator('.references__note')).toContainText('Prednost imaju primarni izvori');
   });
 
   test('the Croatian competition table links both 1959 rows to their own Croatian edition page', async ({

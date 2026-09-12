@@ -1696,6 +1696,130 @@ standing quirks.
   while re-checking the standing captain-sourcing gap - narrowed to one
   specific follow-up question rather than closed, left for next time.
 
+- **`check:award-tallies`: automated cross-check of every hand-authored
+  title-tally table against its own source table**: closed 2026-09-11
+  (ninety-ninth intensive run) - a standing health check first (`pnpm
+  install`, `pnpm outdated` unchanged: only the blocked `typescript` 7
+  entry; `pnpm lint`/`test`/`build`/`check:links`/`check:sitemap`/
+  `check:precache`/`check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/
+  `check:html`/`check:spelling` all clean, matching the ninety-eighth run's
+  baseline). Every award-history content-mining angle across all six
+  competition/award families is exhausted (per the ninety-eighth run's own
+  closing note), so this run took the standing "genuinely different quality
+  angle" fork instead: a `pnpm dlx knip --no-config-hints` pass and a fresh
+  read of `src/lib/validate.ts` (the one file that build-time-validates
+  editorial content) surfaced a real, previously-unchecked gap.
+  `content/fifa-world-cup.md`'s "Champions by titles after 2026",
+  `content/uefa-euro.md`'s "Champions by titles", `content/copa-america.md`'s
+  "Titles after 2024" and `content/ballon-dor.md`'s "Multiple winners through
+  2025" are each a second, independently hand-maintained summary table -
+  unlike `/records`' own generated rankings (`src/lib/editions.ts`'s
+  `buildChampionsSummary`), these four are not derived at build time from
+  the "Editions"/"Champions timeline"/"Winners" table they summarize, so a
+  future edit to either table (a new year added to one but not the other, a
+  typo'd count) could drift silently - `validateEditions()` only checks the
+  source table's own structural shape, and no unit or e2e test reads these
+  two tables against each other. Added `scripts/check-award-tallies.mjs`
+  (wired up as `pnpm check:award-tallies`): parses each source table and its
+  matching tally table with the same Markdown pipe-table parser
+  `src/lib/markdownTable.ts` uses (kept local rather than imported, matching
+  every other `check:*` script's self-contained-Node-ESM convention),
+  recomputes each tally from the source table (applying the one known
+  nation-name merge, "West Germany" folded into "Germany, including West
+  Germany", both for World Cup and EURO), and diffs it against the
+  hand-authored table: every count must match, every name the source table
+  implies must appear (or, for Ballon d'Or's "multiple winners" table
+  specifically, every name with 2+ awards must appear and no single-time
+  winner may be wrongly included), and World Cup's extra "Winning years"
+  column must match too. Deliberately does not enforce row order - Copa
+  América's own tie-break order among same-count nations doesn't follow any
+  single derivable rule (checked by hand against the source table before
+  writing this), unlike World Cup/EURO's "earliest title year" ordering, so
+  enforcing an unwritten convention there would risk false positives on a
+  future legitimate edit rather than catch a real bug. Verified the check
+  actually catches real regressions (not just a clean-by-construction
+  no-op): manually broke a count, added a phantom nation, and removed a real
+  title from a source table one at a time, confirmed each broke the check
+  with the right message, then restored the files (`git status`/`git diff`
+  clean afterward). 14 new unit tests
+  (`tests/unit/checkAwardTallies.test.ts`) cover the parser, the tally
+  computation (including alias merging and skipping placeholder rows like
+  "Not awarded"/"—"), and every diff scenario (match, count mismatch,
+  phantom entry, missing entry, and the "multiple" mode's single-winner
+  exclusion). Like `check:spelling`/`check:jsonld`/`check:meta`, this is
+  plain content parsing with no build or browser needed (well under a
+  second for all four files), so it's wired into `.github/workflows/ci.yml`
+  as a required PR gate rather than joining the four slower
+  Playwright-based sweeps as a manual/intensive-run-only tool. A genuinely
+  clean first run, as expected (the same "confirm there's a real signal,
+  but keep the tool permanent" reasoning `check:reflow`/`check:jsonld`
+  already established) - no content was wrong today, but the next edit to
+  any of these eight tables now has an automated backstop it didn't have
+  before. Full standing health check clean after the change: `pnpm lint`
+  (0/0/0), `pnpm test` (602/602 unit, up from 588 - 14 new), `pnpm build`
+  (711 pages, unchanged), `check:links`/`check:sitemap`/`check:precache`/
+  `check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/`check:html`/
+  `check:spelling`/`check:award-tallies` all clean, `pnpm dlx knip
+  --no-config-hints` unchanged (the one standing false positive). No
+  content file touched, so no PDF regeneration or `lastReviewed` bump was
+  needed. **Left for a future pass:** the same environment-blocked items as
+  every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  Nations League's Team of the Tournament for 2021/2023/2025, the
+  `long-title` brand-suffix decision), plus the Nations League 2023
+  attendance conflict, 2021/2025's still-unconfirmed Nations League figures,
+  and EURO 1996/2020's/World Cup 1930/1950's excluded attendance figures. A
+  future pass's best bet is a fresh source lead on any of those, extending
+  this same "read a shared library file end to end looking for an
+  unchecked cross-table invariant" method to a different file/table pair,
+  or a genuinely different quality angle (accessibility, performance, SEO).
+- **`check:i18n-notes`: automated English/Croatian note-section parity
+  check, plus two real bugs it caught**: closed 2026-09-11 (hundredth
+  intensive run) - a standing health check first (all clean, matching the
+  ninety-ninth run's baseline). Extended this run's own "read a shared
+  library file/component end to end looking for an unchecked cross-language
+  invariant" method (the one that already found the `jsonLd.ts`
+  `sport`/`inLanguage` gaps and the tally-table gap `check:award-tallies`
+  guards) to every Croatian competition/award page's hand-written
+  `NoteSection[]` array versus its English counterpart's `content/*.md`
+  note sections - structurally never cross-checked before, only spot-checked
+  by a handful of hardcoded `.notes__card` count assertions. Found and fixed
+  two real, live bugs before the check even existed: `content/fifa-world-cup.md`'s
+  "Editorial notes" fourth bullet ("Display a map of host countries...") was
+  simply missing from the Croatian page's array (a dropped fact, not a
+  markup issue), and the World Cup/EURO/Copa América "Final venues" sections'
+  English lead-in paragraph (a proper `NoteSection.intro`, its own
+  `<p class="notes__intro">` on the English page) had been folded into the
+  Croatian arrays' `items[0]` instead, misrepresenting a methodology caveat
+  as a bogus extra final-venue bullet on all three Croatian pages. Fixed all
+  three by moving the sentence into the array's already-typed `intro:` field;
+  Nations League's own "Final venues" was correctly unaffected (its English
+  source opens with a bullet, not a lead-in paragraph). New permanent tool,
+  `scripts/check-i18n-notes.mjs` (`pnpm check:i18n-notes`): compares every
+  built English page with note cards against its Croatian counterpart -
+  same section count, same "has an intro paragraph" flag, same item count
+  per section - without comparing text (the two languages are meant to
+  differ there). Fast, dist-based regex parsing like `check:jsonld`/
+  `check:meta`/`check:award-tallies`, so wired into CI as a required PR
+  gate. 13 new unit tests; verified the check actually catches both bug
+  shapes by re-introducing each into a built page, confirming the right
+  error, then reconfirming clean. New e2e coverage extends four existing
+  test blocks (no new cases). All 700 PDFs regenerated and reverified clean.
+  Full standing health check clean: 615/615 unit (13 new), 711 pages,
+  every other `check:*` clean including the new `check:i18n-notes` itself (7
+  page pairs, 0 problems), plus a full cold-start `pnpm test:e2e` (945/945
+  passed, 17.3 minutes, unchanged count). See `docs/PROJECT_STATUS.md`'s
+  matching entry for full detail. **Left for a
+  future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025, the `long-title` brand-suffix
+  decision), plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed Nations League figures, and EURO 1996/2020's/World Cup
+  1930/1950's excluded attendance figures. A future pass could extend this
+  same cross-language structural-parity method to other shared
+  components/pages (table headers, filter labels, `alt` text), chase a fresh
+  source lead on any open attendance/captain gap, or take a genuinely
+  different quality angle (performance, SEO).
+
 ## Ideas not yet scoped as backlog
 
 Raised in passing across `docs/PROJECT_STATUS.md` entries but never turned
@@ -3186,3 +3310,852 @@ back clean:
   genuinely new source lead). With reflow, Lighthouse and text-zoom all now
   full-site clean, a future run could look at `prefers-contrast`/
   `forced-colors` coverage depth, or another fresh content/quality angle.
+- **`check:print-width`: a new full-site print-media width sweep**: closed
+  2026-09-08 (eighty-third intensive run) - a standing health check first
+  (`pnpm install`; `pnpm outdated` still shows only the blocked `typescript`
+  7 entry, re-confirmed; `pnpm dlx knip --no-config-hints` matched the
+  standing baseline; `pnpm lint` 0/0/0; `pnpm test` 542/542 unit; `pnpm build`
+  711 pages; `check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+  `check:pdfs` all clean and byte-for-byte unchanged from the eighty-second
+  run's baseline). Per this routine's own priority order, Copa América's
+  captain gap is fully closed and Nations League's Team of the Tournament for
+  2021/2023/2025 has now been re-confirmed unavailable across six consecutive
+  prior runs with no new source lead - re-attempting either would just repeat
+  a documented mistake, so this run took the eighty-second run's own closing
+  suggestion and looked for another quality angle.
+  `check:reflow`/`check:text-zoom` both widened their own stress axis (narrow
+  viewport, then doubled text size) to a genuinely full-site sweep across the
+  seventy-ninth through eighty-second runs, but the site's third stress axis -
+  print media, the rendering path all 700 downloadable PDFs actually depend
+  on - was still only covered by `tests/e2e/print-styles.spec.ts`'s
+  hand-curated `WIDE_TABLE_PRINT_PAGES` list (18 pages: the six competition/
+  award landing pages, `/records`, `/compare` and `/compare-players`, both
+  languages). Confirmed via `grep -rl '<table' src/` that this list is in
+  fact already exhaustive for the one bug class that motivated it (a real
+  HTML `<table>` overflowing the printable A4-landscape content width) - no
+  other `src/` file renders a raw `<table>` - so this wasn't a live bug the
+  way the seventy-third run's original filter-select/table-width fixes were.
+  What was still missing was the same "permanent full-site tool, not a fixed
+  manually-curated list" gap `check:reflow`/`check:text-zoom` already closed
+  for their own axes: a future content or component change could introduce
+  overflow at print width on any of the site's other ~700 pages (per-edition
+  pages, player/team profiles, the quiz, the directories, `/glossary`,
+  `/about/sources`) that `WIDE_TABLE_PRINT_PAGES` was never scoped to cover,
+  with nothing in place to catch it.
+  Added `scripts/check-print-width.mjs` (`pnpm check:print-width`), reusing
+  `check-reflow.mjs`'s page discovery/redirect-stub filtering and
+  `pagesOverflowing`/`OVERFLOW_TOLERANCE_PX` budget check rather than
+  duplicating already-tested pure logic - the only genuinely new step is
+  emulating print media (`page.emulateMedia({ media: 'print' })`) at the same
+  ~1032px usable A4-landscape content width `print-styles.spec.ts`'s own
+  `PRINT_CONTENT_WIDTH_PX` constant already uses, before the same
+  `scrollWidth - clientWidth` measurement every stress sweep in this repo
+  already uses. Carries the same import-side-effect entry-point guard
+  `check-reflow.mjs`/`check-text-zoom.mjs` established. New unit test
+  (`tests/unit/checkPrintWidth.test.ts`) pins the exported
+  `PRINT_CONTENT_WIDTH_PX` constant to both its derivation and the literal
+  1032px value, so it can't silently drift from `print-styles.spec.ts`'s own
+  copy. Ran it against all 711 real content pages (both languages): **zero
+  overflow found** - matches the hand-written spec's own clean result, no
+  code fix needed this run, but now a permanent, reusable script like
+  `check:lighthouse`/`check:reflow`/`check:text-zoom` so a future layout or
+  content change that breaks print-width layout anywhere on the site gets
+  caught. Not wired into `.github/workflows/ci.yml`, the same reasoning the
+  other three full-site sweeps document (a ~700-page-load sweep is too slow
+  for a required PR gate). No `content/*.md` or PDF-source file touched, so
+  `check:pdfs` stayed clean at 700/700 throughout with no regeneration
+  needed. Full standing health check clean: `pnpm lint` (0/0/0), `pnpm test`
+  (543/543 unit, up from 542 - the one new pure-constant test), `pnpm build`
+  (711 pages, unchanged), `check:links` (715 pages), `check:sitemap` (710
+  entries), `check:precache` (37 URLs), `check:perf` (heaviest page still
+  `hr/records`, 583.4 KB, unchanged), `check:pdfs` (700/700 fresh), the new
+  `check:print-width` (711/711 pages clean), full cold-start `pnpm test:e2e`
+  also run (see `docs/PROJECT_STATUS.md`'s matching entry for the final
+  count). **Left for a future pass:** the same environment-blocked items as
+  every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+  League's Team of the Tournament for 2021/2023/2025). With reflow,
+  Lighthouse, text-zoom and now print-width all full-site clean, a future run
+  could look at `prefers-contrast`/`forced-colors` coverage depth (still the
+  eighty-second run's own suggestion, not yet acted on), or another fresh
+  content/quality angle.
+- **`prefers-contrast: more` full-site WCAG sweep**: closed 2026-09-08
+  (eighty-fourth intensive run) - a standing health check first (`pnpm
+  install`; `pnpm outdated` found one new in-range patch release, `astro`
+  7.3.1 -> 7.3.2, installed cleanly; `typescript` 7 re-confirmed still blocked
+  via `npm view @astrojs/check@latest peerDependencies`; `pnpm lint` 0/0/0;
+  `pnpm test` 543/543 unit; `pnpm build` 711 pages; `check:links`/
+  `check:sitemap`/`check:precache`/`check:perf`/`check:pdfs` all clean and
+  byte-for-byte unchanged from the eighty-third run's baseline). Per this
+  routine's own priority order, Copa América's captain gap is fully closed
+  and Nations League's Team of the Tournament for 2021/2023/2025 has been
+  re-confirmed unavailable across six-plus prior runs with no new source
+  lead, so re-attempting it again without a genuinely new angle would repeat
+  a documented mistake - acted on the eighty-second/eighty-third runs' own
+  standing suggestion instead: `prefers-contrast`/`forced-colors` coverage
+  depth.
+  `accessibility-forced-colors.spec.ts` already had a full-site axe sweep
+  (every `NAV_LINKS`/`TRANSLATED_PATHS` page, both color schemes, plus
+  spot-checked `/teams/<slug>` and `/players/<slug>` profiles) built the same
+  run its two real forced-colors bugs were found and fixed. By contrast,
+  `accessibility-prefers-contrast.spec.ts` - open since that mode's
+  higher-contrast `--border`/`--text-muted` tokens first landed - only ever
+  pinned the exact resolved token values on the home page across four
+  contrast x color-scheme combinations; it never once drove axe across the
+  rest of the site with `prefers-contrast: more` active, even though
+  `global.css`'s contrast-token overrides apply everywhere, not just the
+  home page. A real, previously-untested gap, not a repeat of either prior
+  full-site sweep's own axis.
+  Extended `accessibility-prefers-contrast.spec.ts` with the same full-site
+  sweep shape `accessibility.spec.ts`/`accessibility-forced-colors.spec.ts`
+  already established (`SWEPT_PATHS` = deduped `NAV_LINKS` + `TRANSLATED_PATHS`
+  + the 404 page, both color schemes) plus the same `/teams/brazil`/
+  `/players/gerd-muller` (EN + HR) profile-page spot-check both those files
+  already use. Since `contrast` isn't a `test.use()`-able Playwright option in
+  the pinned version (the file's own existing top-of-file comment already
+  established this for its four targeted tests), every new test opens its own
+  `browser.newContext({ colorScheme, contrast: 'more' })` rather than
+  `page.emulateMedia()` on the shared `page` fixture. Ran the new spec in
+  isolation first (76 tests, 4.8 minutes): **zero WCAG 2.1/2.2 A/AA
+  violations found anywhere** - the contrast tokens are clean across every
+  page, no CSS fix needed this run, unlike forced-colors' two real bugs.
+  Also applied the standing `astro` 7.3.1 -> 7.3.2 patch bump found by this
+  run's own `pnpm outdated` check. No `content/*.md` or PDF-source file
+  touched, so `check:pdfs` stayed clean at 700/700 throughout with no
+  regeneration needed. Full standing health check clean: `pnpm lint`
+  (0/0/0), `pnpm test` (543/543 unit, unchanged - no new pure logic),
+  `pnpm build` (711 pages, unchanged), `check:links`/`check:sitemap`/
+  `check:precache`/`check:perf`/`check:pdfs` all clean and unchanged, full
+  cold-start `pnpm test:e2e`: **939/939 passed** (21.5 minutes, up from 869 -
+  the 70 new prefers-contrast full-site sweep and profile-page tests).
+  **Left for a future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, Nations League's Team of the Tournament
+  for 2021/2023/2025). With reflow, Lighthouse, text-zoom, print-width and
+  now prefers-contrast all genuinely full-site and clean, `forced-colors` is
+  the only remaining stress axis with full-site coverage already in place
+  from day one - a future run likely needs a fresh content/quality angle
+  rather than another coverage-depth pass on these same five axes.
+- **`check:spelling`: a new automated cspell sweep of `content/*.md`, plus a
+  real long-standing grammar bug fixed**: closed 2026-09-08 (eighty-fifth
+  intensive run) - every prior content-accuracy pass was manual
+  proofreading; this run ran an automated spell-checker (`cspell`) across
+  `content/*.md` for the first time. Of 894 flagged issues (470 distinct
+  words), 469 were legitimate proper nouns/loanwords/citation domains (now
+  captured in a new custom dictionary, `.cspell/football-names.txt`) and one
+  was real: `content/glossary.md`'s "host" entry had read "a host still has
+  to be entered or organise its place" since the file's original commit - a
+  genuine grammar error no prior manual proofreading pass had caught in 84
+  runs, because "organise" is itself a correctly-spelled word. Fixed to "a
+  host still has to earn or qualify for its place the way any other team
+  does." Wired as `pnpm check:spelling`, and - unlike the four full-site
+  Playwright sweeps, which stay manual/intensive-run tools - added to
+  `.github/workflows/ci.yml` as a required PR gate, since a markdown-only
+  wordlist check runs in under a second. All 700 PDFs regenerated and
+  reverified clean (`content/glossary.md` is a PDF source file). Full
+  standing health check clean including `check:reflow`/`check:text-zoom`/
+  `check:print-width` (711/711 pages each)/`check:lighthouse` (37/37 pages,
+  perfect 1.00) and a full cold-start `pnpm test:e2e`. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail, including why
+  Croatian prose stays out of this check's scope for now. **Left for a
+  future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025) - a future run's best bet is likely
+  another previously-untried verification method rather than re-treading
+  already-exhausted ground.
+- **`check:html`: a new full-site HTML5 markup-validity sweep, plus a real
+  `aria-label`-has-no-effect bug it found**: closed 2026-09-09 (eighty-sixth
+  intensive run) - acted on the eighty-fifth run's own suggestion (another
+  previously-untried verification method). Ran `html-validate` against every
+  built page for the first time: nothing on this site had ever checked HTML5
+  markup *structural* validity (duplicate ids, dangling `aria-*` references,
+  invalid nesting) as distinct from `axe-core`'s accessibility-*semantics*
+  checks or the reflow/text-zoom/print-width *layout* sweeps. Found and fixed
+  a real bug: `TournamentTable.astro`'s empty "story" cell put its
+  `aria-label` on a bare `<span>` (role `generic`, which the ARIA spec
+  prohibits from carrying an author-supplied name) instead of the enclosing
+  `<td>` (role `cell`, which supports one) - the same pattern its two sibling
+  `<td>`s in the same row already used correctly. The label was meant to
+  compensate for the mobile card-view's `content: attr(data-label)` CSS,
+  which most assistive tech can't see - so a screen reader user on a narrow
+  viewport, on any year with no memorable-moments story, silently heard just
+  "—" with no context, since this cell's original commit. Fixed by moving the
+  `aria-label` up to the `<td>` and dropping the now-redundant `<span>`.
+  Added `scripts/check-html-validity.mjs` (`pnpm check:html`) as a permanent
+  tool (`html-validate:recommended` minus five rules confirmed to be
+  deliberate site conventions, not bugs - see the script's own
+  `DISABLED_RULES` comment for each one's reasoning). New e2e regression
+  coverage in `tests/e2e/mobile.spec.ts` and a new unit test file
+  (`tests/unit/checkHtmlValidity.test.ts`). All 700 PDFs regenerated and
+  reverified clean (`TournamentTable.astro` is a shared PDF-source
+  component). See `docs/PROJECT_STATUS.md`'s matching entry for full detail,
+  including the other five rules investigated and why each is a false
+  positive, not a bug (one - `long-title`, 133 pages over ~70 characters
+  from the deliberate branded title suffix - is a genuine, consciously
+  not-pursued finding needing human sign-off on a brand-identity change, not
+  an automated fix). **Left for a future pass:** the same environment-blocked
+  items as every recent run (`typescript` 7, `docs/SOURCES.md`
+  link-liveness, Nations League's Team of the Tournament for
+  2021/2023/2025), plus the `long-title`/brand-suffix decision above. With
+  markup validity, accessibility semantics (Lighthouse, axe), and three
+  layout axes (reflow, text-zoom, print-width) all now genuinely full-site
+  and clean, a future run's best bet is likely a fresh content- or
+  feature-parity angle again, or yet another previously-untried verification
+  method if one turns up.
+- **`check:jsonld`: a new full-site schema.org structural-validity sweep**:
+  closed 2026-09-09 (eighty-seventh intensive run) - a standing health check
+  first (`pnpm install`; `pnpm outdated` still shows only the blocked
+  `typescript` 7 entry, re-confirmed; `pnpm dlx knip --no-config-hints`
+  matched the standing baseline; `pnpm lint` 0/0/0; `pnpm test` 546/546 unit;
+  `pnpm build` 711 pages; `check:links`/`check:sitemap`/`check:precache`/
+  `check:perf`/`check:pdfs`/`check:spelling` all clean and byte-for-byte
+  unchanged from the eighty-sixth run's baseline). Per this routine's own
+  priority order, every award-history angle across all six families has been
+  exhaustively mined (Copa América's captain gap fully closed; Nations
+  League's Team of the Tournament for 2021/2023/2025 re-confirmed
+  unavailable across six-plus prior runs), so this run took the eighty-sixth
+  run's own suggestion (a fresh verification method) rather than re-running
+  an exhausted search.
+  This site has invested heavily in schema.org structured data across ~30
+  prior intensive-run entries (`ItemList`/`SportsEvent`/`Person`/
+  `SportsTeam`/`CollectionPage`/`BreadcrumbList`/`WebSite`/`Quiz`/
+  `DefinedTermSet` builders in `src/lib/jsonLd.ts`, ~1,783 rendered
+  `<script type="application/ld+json">` blocks across the built site), but
+  nothing had ever verified the *actual built output* is structurally sound
+  JSON-LD - `tests/unit/jsonLd.test.ts` only calls each builder directly with
+  a hand-built fixture, `check:html` treats a JSON-LD script's body as opaque
+  text the same way a browser does, and `check:lighthouse`'s SEO category
+  doesn't parse structured data at the field level. A future edit that slips
+  a relative URL into a builder call site, or maps `itemListElement` from a
+  pre-filtered array without re-deriving `position` from the new index, would
+  ship unnoticed by any existing check.
+  Added `scripts/check-jsonld.mjs` (`pnpm check:jsonld`): extracts every
+  JSON-LD block from each built page via regex (reusing
+  `check-internal-links.mjs`'s `listHtmlFiles()` and `check-reflow.mjs`'s
+  `htmlFileToPagePath()`/`isRedirectStubHtml()` for page discovery, the same
+  reuse-over-duplication convention every recent full-site sweep has
+  followed), parses each as JSON, and recursively validates: a real
+  `@context`/"https://schema.org" and non-empty `@type` at the root (and at
+  every nested node that declares one), every `itemListElement` a non-empty
+  array whose `position` values are exactly `1..N` with no gap or duplicate,
+  and every `url`/`item` URL string an absolute link starting with the site's
+  own configured origin (`SITE_URL`+`BASE_PATH`, the same env vars
+  `check:reflow`/`check:lighthouse` already read) rather than a relative path
+  or a foreign domain. Verified the logic actually catches real regressions
+  (not just trivially passing) with four hand-built broken fixtures - a
+  missing `@context`, a position gap, a duplicate position, and a relative
+  URL - before trusting a clean run against the real site. Ran clean: **all
+  1,783 JSON-LD blocks across all 711 pages are structurally valid** - no bug
+  found, the same "confirm a real signal, but keep the tool permanent" result
+  `check:reflow`/`check:text-zoom`/`check:print-width` all had on their own
+  first full-site run, since every existing builder already derives
+  `position` from a live array index.
+  Unlike the four full-site Playwright sweeps or even `check:html`'s ~45s
+  `html-validate` parse, this is plain regex-plus-`JSON.parse` over
+  already-built HTML - about 3 seconds for all 711 pages, the same territory
+  as `check:links`/`check:sitemap` - so it *is* wired into
+  `.github/workflows/ci.yml` as a required PR gate (after the sitemap check),
+  the same reasoning `check:spelling` documents for its own sub-second check,
+  rather than joining the four slower sweeps as a manual/intensive-run-only
+  tool. New unit tests in `tests/unit/checkJsonLd.test.ts` (19 cases covering
+  extraction, root/nested validation, position-sequence gaps and duplicates,
+  and absolute-URL enforcement) - 546 -> 565 unit tests, all passing. No
+  `content/*.md` or PDF-source file touched, so `check:pdfs` stayed clean at
+  700/700 throughout with no regeneration needed. Full standing health check
+  clean: `pnpm lint` (0/0/0), `pnpm test` (565/565 unit), `pnpm build` (711
+  pages, unchanged), `check:links` (715 pages), `check:sitemap` (710
+  entries), `check:precache` (37 URLs), `check:perf` (heaviest page still
+  `hr/records`, 583.4 KB, unchanged), `check:pdfs` (700/700 fresh), the new
+  `check:jsonld` (1,783/1,783 blocks clean), full cold-start `pnpm test:e2e`
+  **939/939 passed** (14.4 minutes, count unchanged from the eighty-sixth
+  run's baseline - unit tests only added this run). **Left for a future
+  pass:** the same environment-blocked items as
+  every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  Nations League's Team of the Tournament for 2021/2023/2025), plus the
+  `long-title`/brand-suffix decision the eighty-sixth run flagged (still
+  needs human sign-off, not attempted here). With markup validity, JSON-LD
+  structural validity, accessibility semantics, and three layout axes all now
+  full-site and clean, a future run's best bet is likely a fresh content- or
+  feature-parity angle, or yet another previously-untried verification
+  method if one turns up.
+- **`check:meta`: a new full-site `<title>`/meta-description integrity
+  sweep**: closed 2026-09-09 (eighty-eighth intensive run) - a standing
+  health check first (clean, byte-for-byte unchanged from the eighty-seventh
+  run's baseline), then another previously-untried verification method: the
+  twenty-fourth run's meta-description audit only ever checked *length* on
+  the `.astro` source, not the built output, and never checked `<title>` at
+  all or looked for missing/duplicate values. Added
+  `scripts/check-meta.mjs` (`pnpm check:meta`): flags any indexable page with
+  a missing/empty title or description, and any two pages in the *same*
+  language sharing identical title/description text (a real duplicate-content
+  signal) - cross-locale matches (an untranslated proper noun like "Copa
+  América") are deliberately excluded as expected, not a bug. Ran clean: all
+  710 indexable pages have both fields, and the only two same-text matches
+  found (Copa América's identical EN/HR title; the home page's shared bare
+  title) are both intentional. Wired into CI as a required gate, matching
+  `check:jsonld`/`check:spelling`'s sub-second-check precedent. New unit
+  tests (18 cases). See `docs/PROJECT_STATUS.md`'s matching entry for detail.
+  **Left for a future pass:** the same environment-blocked items as every
+  recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+  League's Team of the Tournament for 2021/2023/2025), plus the `long-title`
+  brand-suffix decision. A future run's best bet is likely a fresh content- or
+  feature-parity angle, or yet another previously-untried verification method.
+- **UEFA Nations League "Final venues" note section**: closed 2026-09-09
+  (eighty-ninth intensive run) - a standing health check first (clean,
+  byte-for-byte unchanged from the eighty-eighth run's baseline). Every
+  award-history angle Copa América can cleanly support was already live, so
+  this run found a genuinely new data dimension untouched by any of the
+  prior 88 runs across all six families: the specific stadium/city that
+  staged each edition's deciding final match, distinct from the existing
+  "Finals host" *country* column. Scoped to UEFA Nations League only (its
+  four editions are all single-host, single-final tournaments with no
+  format ambiguity) rather than Copa América, whose own "Important
+  editorial warning" section documents that most of its 42 editions have no
+  single fixed-venue final at all - a poor fit for a first attempt at this
+  new category. Added a "Final venues" section to
+  `content/uefa-nations-league.md` (all four editions: Estádio do Dragão
+  Porto 2019, San Siro Milan 2021, De Kuip Rotterdam 2023, Allianz Arena
+  Munich 2025), each verified via two independent WebSearch passes (see
+  `docs/SOURCES.md`'s matching entry). Wired into the English and Croatian
+  landing pages' note sections; four new proper nouns added to
+  `.cspell/football-names.txt`; new e2e coverage (EN + HR). All 700 PDFs
+  regenerated and reverified clean. Full standing health check clean
+  including `check:reflow`/`check:html`/`check:jsonld`/`check:meta`/
+  `check:spelling` and a full cold-start `pnpm test:e2e`. See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a future
+  pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025, the `long-title` brand-suffix
+  decision), plus extending this same "Final venues" angle to World Cup (23
+  editions), EURO (17) and Copa América's own subset of clean single-final
+  editions - a natural next slice rather than another verification script.
+- **Copa América "Final venues" note section**: closed 2026-09-09 (ninetieth
+  intensive run) - a standing health check first (clean, byte-for-byte
+  unchanged from the eighty-ninth run's baseline). Acted directly on the
+  eighty-ninth run's own closing note, which named "Copa América's own
+  subset of clean single-final editions" as the natural next slice - also
+  this routine's own top content priority. That subset turned out to be
+  already scoped by the page's own "Important editorial warning" section:
+  the 19 editions that already carry a "Final date" (five Final playoff
+  deciders, 13 Knockout final editions, the 2016 centenary final) are
+  exactly the editions with one single decisive match at one venue; the
+  League table and Home-and-away eras have none, the same reasoning that
+  section already gives for those editions' "-" Final date cells. Added a
+  "Final venues" section to `content/copa-america.md` (all 19 editions,
+  1919-2024), each verified via a subagent's two-independent-source research
+  pass plus this run's own direct re-verification of the two facts that
+  corrected an initial working assumption (1995 was Montevideo, not
+  Paysandú; 2001 was Bogotá, not Barranquilla) and two of the oldest, hardest
+  -to-source entries (1919, 1937). Wired into `copa-america.astro`'s
+  `noteHeadings` (English) and hand-translated into
+  `hr/competitions/copa-america.astro`. Ten new proper nouns added to
+  `.cspell/football-names.txt`. New e2e coverage (EN + HR). All 700 PDFs
+  regenerated and reverified clean. Full standing health check clean
+  including `check:reflow`/`check:text-zoom`/`check:print-width`/
+  `check:jsonld`/`check:html`/`check:meta`/`check:spelling` and a full
+  cold-start `pnpm test:e2e` (942/942 passed, after re-running it in
+  isolation - the first attempt overlapped with the reflow/text-zoom/
+  print-width sweep on the same preview-server port and reported 850 false
+  failures, all `ERR_CONNECTION_REFUSED`, not a real regression). See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a future pass:** the same environment-blocked items
+  as every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  Nations League's Team of the Tournament for 2021/2023/2025, the
+  `long-title` brand-suffix decision), plus extending "Final venues" to
+  World Cup (23 editions) and EURO (17) - the last two team-competition
+  families still uncovered by this angle.
+- **FIFA World Cup "Final venues" note section**: closed 2026-09-09
+  (ninety-first intensive run) - acted directly on the ninetieth run's own
+  closing note, extending "Final venues" to World Cup, this routine's
+  top-priority content family. Unlike Copa América, no scoping/exclusion was
+  needed: every one of the 23 World Cup editions (including 1950's
+  final-group decider between Uruguay and Brazil) has one single decisive
+  match at one stadium. Added a "Final venues" section to
+  `content/fifa-world-cup.md` (all 23 editions, 1930-2026), each verified via
+  independent WebSearch passes batched across editions, cross-checked against
+  each edition's own dedicated Wikipedia final article; two repeat-venue
+  facts (Estadio Azteca hosting both 1970 and 1986; the Maracanã hosting both
+  1950 and 2014) and 2010's post-tournament stadium rename (Soccer City to
+  FNB Stadium) each independently confirmed. Wired into `world-cup.astro`'s
+  `noteHeadings` (English, right after "How it works") and hand-translated
+  into `hr/competitions/world-cup.astro`'s own `notes` array as "Mjesta
+  finala" (Croatian, matching the page's existing hand-translated-notes
+  convention). Thirteen new proper nouns added to
+  `.cspell/football-names.txt`. `content/fifa-world-cup.md`'s `lastReviewed`
+  bumped to 2026-09-09. New e2e coverage (EN + HR heading/content assertions,
+  `.notes__card`/jump-nav counts bumped 11 -> 12 for both languages). All 700
+  PDFs regenerated and reverified clean (`pnpm build:pdfs` then `pnpm
+  check:pdfs`, since this content edit and the `docs/SOURCES.md` addition
+  both mark every PDF's shared References section stale, by design). Full
+  standing health check clean: `pnpm lint` (0/0/0), `pnpm test` (583/583
+  unit), `pnpm build` (711 pages), `check:links` (715 pages), `check:sitemap`
+  (710 entries), `check:precache` (37 URLs), `check:perf` (heaviest page
+  still `hr/records`, within the 590 KB budget), `check:jsonld` (1,783/1,783
+  blocks clean), `check:meta` (710/710 pages clean), `check:html` (711/711
+  pages clean), `check:spelling` (0 issues). See `docs/PROJECT_STATUS.md`'s
+  matching entry for detail. **Left for a future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, Nations League's Team of the Tournament
+  for 2021/2023/2025, the `long-title` brand-suffix decision), plus
+  extending "Final venues" to EURO (17 editions) - the last team-competition
+  family still uncovered by this angle - and a full cold-start `pnpm
+  test:e2e` re-run (this run's environment needed a
+  `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`
+  override for `pnpm build:pdfs` since the pinned Playwright version expects
+  a `chromium_headless_shell` binary not present under `/opt/pw-browsers/`;
+  the `pnpm test:e2e` suite itself already documents its own
+  `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` convention separately).
+- **UEFA EURO "Final venues" note section**: closed 2026-09-10 (ninety-second
+  intensive run) - acted directly on the ninety-first run's own closing note
+  (backfilled into `docs/PROJECT_STATUS.md` this run, since that run's own
+  detailed entry there was missing), extending "Final venues" to UEFA EURO,
+  the last of the four team-competition families still uncovered by this
+  angle. Every one of EURO's 17 editions, including the pandemic-delayed,
+  eleven-city 2020 edition, settled its title in one match at one stadium, so
+  no scoping was needed. Added a "Final venues" section to
+  `content/uefa-euro.md` (all 17 editions, 1960-2024), each verified via
+  WebSearch passes batched by era and cross-checked against each edition's
+  own dedicated Wikipedia final article, with targeted follow-up queries
+  confirming three specific facts (the 1968 replay venue, 1992's Gothenburg
+  - not Stockholm - venue, the Ernst-Happel-Stadion's exact spelling) rather
+  than assuming them. Wired into `euro.astro`'s `noteHeadings` (English) and
+  hand-translated into `hr/competitions/euro.astro`'s own `notes` array as
+  "Mjesta finala" (Croatian). Seven new proper nouns added to
+  `.cspell/football-names.txt`. `content/uefa-euro.md`'s `lastReviewed`
+  bumped to 2026-09-10. New e2e coverage (EN + HR). `hr/records` pushed the
+  590 KB page-weight budget to 590.5 KB from the new `docs/SOURCES.md`
+  citations, so `PAGE_WEIGHT_BUDGET_BYTES` was raised to 610 KB (the
+  eleventh such deliberate raise). All 700 PDFs regenerated and reverified
+  clean. Full standing health check clean: `pnpm lint`/`test`/`build`/
+  `check:links`/`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs`/
+  `check:jsonld`/`check:meta`/`check:html`/`check:spelling`/`knip` all
+  clean, plus a full cold-start `pnpm test:e2e` (944/944 passed, 15.2
+  minutes, up from 942). See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a future
+  pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025, the `long-title` brand-suffix decision),
+  plus a pre-existing Croatian-heading naming inconsistency across the four
+  "Final venues" sections ("Mjesta finala" for World Cup/EURO vs "Stadioni
+  finala" for Nations League vs "Domaćini finala" for Copa América) this run
+  noticed but left unreconciled. With "Final venues" now live for all four
+  team-competition families, this content angle is exhausted - a future run's
+  best bet is either the still-open Copa América winning-captains-1975-2010
+  gap or a genuinely different quality/verification angle.
+- **Croatian "Final venues" heading reconciled to "Mjesta finala"**: fixed
+  2026-09-10 (ninety-third intensive run) - acted directly on the
+  ninety-second run's own closing note above. Standardized all four
+  Croatian "Final venues" section headings to "Mjesta finala" (the majority
+  and most literal choice) by editing `nations-league.astro`'s and
+  `copa-america.astro`'s `heading` fields; updated the two matching
+  hardcoded e2e assertions. All 700 PDFs regenerated and reverified clean.
+  Full standing health check clean including a full cold-start `pnpm
+  test:e2e` (944/944, unchanged count). Also corrected a stale, repeatedly
+  copy-pasted closing note: "Copa América's winning-captains-1975-2010 gap"
+  has actually been fully closed since the sixty-seventh run (2026-09-05)
+  but kept getting re-listed as still-open in several later runs' closing
+  notes, including the ninety-second run's own directly above - not a real
+  open item, so not chased. See `docs/PROJECT_STATUS.md`'s matching entry
+  for detail. **Left for a future pass:** the same environment-blocked items
+  as every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  Nations League's Team of the Tournament for 2021/2023/2025), plus the
+  `long-title` brand-suffix decision (needs human sign-off). A future run's
+  best bet is a genuinely new verification method or content-accuracy angle
+  - the "Final venues" content-mining angle and every award-history angle
+  this routine has identified are now exhausted.
+- **Final attendance for Copa América (Knockout-final era) and UEFA Nations
+  League**: mostly closed negatively 2026-09-10 (ninety-fourth intensive
+  run) - a genuinely new content angle (never attempted by any prior run):
+  match-day attendance for the finals whose venue is already documented in
+  each page's "Final venues" section. Held to this file's own
+  two-independent-source verification bar, only 3 of 18 editions researched
+  cleared it: UEFA Nations League 2019 (43,199), Copa América 2011 (65,921),
+  and Copa América 2021 (6,500, a COVID-19-restricted behind-closed-doors
+  final). Added as annotations to those three editions' existing "Final
+  venues" bullets (not a new, mostly-empty section - would have been an
+  obvious stub) in `content/copa-america.md`/`content/uefa-nations-league.md`
+  and their Croatian `.astro` siblings. The other 15 editions were left
+  out - either only one confirmable source could be found (WebSearch mostly
+  routes back to Wikipedia alone in this environment, since direct
+  match-report page fetches are egress-blocked) or sources genuinely
+  disagree (Copa América 2001, 2007) - documented in `docs/PROJECT_STATUS.md`
+  and `docs/SOURCES.md` so a future pass with better page-fetch access knows
+  exactly which 15 editions are still open, rather than re-researching all
+  18 from scratch. Full standing health check clean including a full
+  cold-start `pnpm test:e2e`. See `docs/PROJECT_STATUS.md`'s matching entry
+  for detail. **Left for a future pass:** the same environment-blocked items
+  as every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  Nations League's Team of the Tournament for 2021/2023/2025, the
+  `long-title` brand-suffix decision), plus the 15 named still-unverified
+  final-attendance editions and extending this angle to World Cup/EURO once
+  the underlying page-fetch-access constraint is addressed.
+- **Confirmation health check, no new content angle found** - closed
+  2026-09-10 (ninety-fifth intensive run). This run's own session had
+  independently started the same EURO "Final venues" work the regularly
+  scheduled ninety-second run also did (both began from the same
+  566965eb base within minutes of each other, most likely because this
+  session's container restarted mid-run and the schedule's next slot fired
+  normally in the meantime) - discarded this run's own now-redundant local
+  commit in favor of the already-pushed, already-superseded-again (by the
+  ninety-third/ninety-fourth runs) version rather than force-pushing over
+  real work, then searched for a genuinely new, well-scoped task before
+  resuming: re-checked `pnpm outdated` (still only the blocked `typescript`
+  7 entry), re-read `docs/WEBSITE_REQUIREMENTS.md` against the live route
+  tree (nothing missing), re-ran `pnpm test:coverage` (99.91%/99.43%,
+  unchanged from the seventh run's "defensively unreachable" classification),
+  and checked `scripts/check-lighthouse.mjs`'s `PAGES_TO_AUDIT` (already
+  covers every page shape in both languages). Confirmed the ninety-fourth
+  run's own closing note is correct that the final-attendance angle isn't
+  worth re-attempting without better page-fetch access, and that every other
+  "left for a future pass" item is genuinely blocked (human sign-off,
+  environment egress, an upstream peer-dependency ceiling, or a
+  already-exhausted award-history search). Rather than force a speculative
+  content change, ran a full independent confirmation health check against
+  the current tip instead: `pnpm install`, `pnpm lint` (0/0/0), `pnpm test`
+  (583/583 unit), `pnpm test:coverage` (99.91%/99.43%, unchanged), `pnpm
+  build` (711 pages), `check:links` (715 pages), `check:sitemap` (710
+  entries), `check:precache` (37 URLs), `check:perf` (`hr/records` 591.4 KB,
+  within the 610 KB budget), `check:pdfs` (700/700 fresh), `check:jsonld`
+  (1,783/1,783 blocks valid), `check:meta` (710/710 clean), `check:html`
+  (711/711 valid), `check:spelling` (0 issues), `check:reflow`/
+  `check:text-zoom`/`check:print-width` (711/711 pages clean on all three),
+  `pnpm dlx knip --no-config-hints` (the one standing false positive,
+  unchanged), plus a full cold-start `pnpm test:e2e`: **944/944 passed**
+  (23.1 minutes, matching the ninety-fourth run's own count exactly - no
+  regression from anything in between). No code change needed; this entry
+  itself is the run's only diff. **Left for a future pass:** unchanged from
+  the ninety-fourth run's list above - the same environment-blocked items,
+  the 15 still-unverified final-attendance editions, and a note for anyone
+  reviewing run history: if another same-slot duplicate firing happens
+  again, the fix is exactly what this run did (defer to whichever version is
+  already on the shared branch, discard the redundant local commit, don't
+  force-push) rather than treating it as an error to correct.
+- **`SportsTeam` JSON-LD `sport` field plus a Nations League attendance
+  re-investigation**: closed 2026-09-10 (ninety-sixth intensive run) - a
+  standing health check first (`pnpm outdated`/`pnpm dlx knip
+  --no-config-hints` unchanged from the ninety-fifth run's baseline).
+  Re-attempted the three still-open Nations League final-attendance editions
+  (2021/2023/2025) with differently worded searches aimed specifically at
+  finding a non-Wikipedia-mirroring source: 2021 and 2025 still only produce
+  the same single repeated figures as before (unconfirmed, unchanged), but
+  2023 turned up a genuine new finding - RFEF's own match report states "a
+  full house with 41,500 spectators," conflicting with Wikipedia's 41,110,
+  the same kind of source disagreement that already excludes Copa América's
+  2001/2007 editions from this section. All three stay out of
+  `content/uefa-nations-league.md`, but 2023 is now a documented conflict
+  rather than an unconfirmed single source - see `docs/SOURCES.md`'s new
+  entry. While re-reading `src/lib/jsonLd.ts` for that investigation, found a
+  real, previously-unnoticed inconsistency: both `SportsEvent` builders set
+  `sport: 'Football'`, but `buildTeamSportsTeamJsonLd()` never did, even
+  though `SportsTeam` inherits the same schema.org property. Fixed by adding
+  the field (matching the site's own existing spelling, never "Soccer"),
+  with matching unit and e2e test updates. Full standing health check clean:
+  `pnpm lint` (0/0/0), `pnpm test` (583/583 unit, unchanged count), `pnpm
+  build` (711 pages), `check:links`/`check:sitemap`/`check:precache`/
+  `check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/`check:html`/
+  `check:spelling` all clean, plus a full cold-start `pnpm test:e2e`. See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a future
+  pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025, the `long-title` brand-suffix decision),
+  plus the Nations League 2023 attendance conflict (41,110 vs. 41,500) as a
+  specific, sourced discrepancy to resolve rather than an unconfirmed figure
+  to keep re-searching for, and 2021/2025's attendance staying genuinely
+  unconfirmed. A future run could also try the same "read a shared library
+  file end to end looking for cross-builder inconsistencies" method that
+  found the `sport` gap here - e.g. whether every JSON-LD builder that
+  reasonably could set `inLanguage` does.
+- **`inLanguage` extended to every eligible JSON-LD block**: closed
+  2026-09-10 (ninety-seventh intensive run) - acted on the ninety-sixth
+  run's own closing note. `buildWebSiteJsonLd()` was the only builder in
+  `src/lib/jsonLd.ts` that ever set `inLanguage`, even though schema.org's
+  own `inLanguage` property (`WebSearch`-verified against schema.org's live
+  docs) declares `CreativeWork`/`Event` in its `domainIncludes` and four
+  other builders' types qualify: `SportsEvent`, `Quiz`, `DefinedTermSet` and
+  `CollectionPage` (each individually type-hierarchy-verified, not assumed);
+  `ItemList`/`BreadcrumbList`/`Person`/`SportsTeam` don't and were correctly
+  left alone. Added one new pure function, `withInLanguage(items, locale)`,
+  called once from `BaseLayout.astro` over the shared
+  `[breadcrumb, website, ...jsonLd]` array every page already assembles,
+  rather than touching ~44 call sites across `src/pages/` by hand - the same
+  "one canonical place" pattern the breadcrumb/`WebSite` blocks already use.
+  Five new unit tests plus extended/new e2e coverage (EN + HR) confirm both
+  the pure function and the real built pages. All 700 PDFs unaffected (no
+  content file touched). Full standing health check clean including a full
+  cold-start `pnpm test:e2e`. See `docs/PROJECT_STATUS.md`'s matching entry
+  for detail. **Left for a future pass:** the same environment-blocked items
+  as every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  Nations League's Team of the Tournament for 2021/2023/2025, the
+  `long-title` brand-suffix decision), plus the Nations League 2023
+  attendance conflict (41,110 vs. 41,500) and 2021/2025's still-unconfirmed
+  figures. A future pass's best bet is a fresh source lead on that
+  attendance conflict, another "read a shared library file end to end" pass
+  over a different file, or a genuinely different quality angle
+  (accessibility, performance, SEO, or a fresh `docs/WEBSITE_REQUIREMENTS.md`
+  read against the live site).
+- **FIFA World Cup and UEFA EURO "Final attendance"**: closed 2026-09-11
+  (ninety-eighth intensive run) - a standing health check first (`pnpm
+  install`, `pnpm outdated` unchanged: only the blocked `typescript` 7 entry;
+  `pnpm lint`/`test`/`build`/`check:links`/`check:sitemap`/`check:precache`/
+  `check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/`check:html`/
+  `check:spelling` all clean and a full cold-start `pnpm test:e2e`, 945/945
+  passed, matching the ninety-seventh run's baseline). Extended the "Final
+  attendance" angle - live for UEFA Nations League and Copa América since
+  the ninety-fourth/ninety-sixth runs - to the two team-competition families
+  it hadn't reached yet, this routine's own top content priority. Unlike
+  Nations League's finals, World Cup and EURO finals are famous enough that
+  genuinely independent corroboration (not just a Wikipedia figure
+  reconfirmed by rephrasing a search) turned out to be available for almost
+  every edition: two research passes (a broad first pass, then a second
+  pass targeted specifically at every edition the first pass could only tie
+  to Wikipedia, aimed at finding one more genuinely independent domain)
+  cleared 21 of 23 World Cup editions and 15 of 17 EURO editions. Added a
+  reported attendance figure to each cleared edition's existing "Final
+  venues" bullet in `content/fifa-world-cup.md`/`content/uefa-euro.md` (not
+  a new section - the same annotation-not-a-stub approach the ninety-fourth
+  run's Nations League/Copa América work used) and hand-translated into
+  `hr/competitions/world-cup.astro`'s and `hr/competitions/euro.astro`'s own
+  `notes` arrays. Four editions were deliberately left out, for two
+  different reasons: 1930 and 1950 (World Cup) are genuinely **disputed**
+  rather than under-sourced - 1930 splits between an official 68,346 and
+  contemporary press estimates around 90,000-100,000, and 1950's Maracanã
+  final splits between FIFA/Guinness's own recognized paid-attendance record
+  of 173,850 and the commonly cited ~199,854 total persons physically in the
+  stadium, a paid-vs-total-present definitional split, not a sourcing gap;
+  1996 and 2020 (EURO) have one consistently repeated figure each but
+  neither pass could tie it to a first-tier independent outlet, the same
+  single-source caution that already excludes Nations League's
+  2021/2023/2025 figures. 1986's 114,600 is also flagged as the largest
+  attendance of any World Cup final (independently corroborated by Guinness
+  World Records), and 1968's EURO final replay's 32,886 is presented
+  alongside the original drawn match's own separately reported 68,817.
+  `lastReviewed` bumped to 2026-09-11 on both content files. New e2e
+  coverage (EN + HR) spot-checks one confirmed and one deliberately-excluded
+  edition per page. All 700 PDFs regenerated and reverified clean. Full
+  standing health check clean again after the edit: `pnpm lint` (0/0/0),
+  `pnpm test` (588/588 unit, unchanged - presentation-layer content, no new
+  unit-testable logic), `pnpm build` (711 pages), `check:links` (715
+  pages), `check:sitemap` (710 entries), `check:precache` (37 URLs),
+  `check:perf` (heaviest page `hr/records` 600.5 KB, within the 610 KB
+  budget), `check:pdfs` (700/700 fresh), `check:jsonld` (1,783/1,783 blocks
+  valid), `check:meta` (710/710 clean), `check:html` (711/711 valid),
+  `check:spelling` (0 issues - no new proper nouns, only numbers), plus a
+  full cold-start `pnpm test:e2e`. See `docs/PROJECT_STATUS.md`'s matching
+  entry for detail. **Left for a future pass:** the same environment-blocked
+  items as every recent run (`typescript` 7, `docs/SOURCES.md`
+  link-liveness, Nations League's Team of the Tournament for
+  2021/2023/2025, the `long-title` brand-suffix decision), plus the
+  Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+  Nations League figures, and now also EURO 1996/2020's and World Cup
+  1930/1950's excluded attendance figures as specific, named gaps rather
+  than an unconfirmed blank spot to keep re-researching from scratch. A
+  future pass's best bet is a fresh source lead on any of those, or a
+  genuinely different quality angle (accessibility, performance, SEO, or a
+  fresh `docs/WEBSITE_REQUIREMENTS.md` read against the live site).
+- **`check:award-tallies`: automated cross-check of every hand-authored
+  title-tally table against its own source table**: closed 2026-09-11
+  (ninety-ninth intensive run) - `src/lib/validate.ts` only ever checked
+  each source table's own structural shape, never that
+  `content/fifa-world-cup.md`/`uefa-euro.md`/`copa-america.md`/
+  `ballon-dor.md`'s four hand-authored "titles" tally tables actually match
+  the table each one summarizes. Added `scripts/check-award-tallies.mjs`
+  (`pnpm check:award-tallies`, wired into CI), which recomputes each tally
+  from its source table and diffs it; a genuinely clean first run (no
+  existing drift), but a real backstop against a future one. This entry was
+  missing from this file until the hundred-and-first run added it
+  retroactively - it shipped and was fully documented in
+  `docs/PROJECT_STATUS.md` at the time, just never mirrored here. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail.
+- **`check:i18n-notes`: automated English/Croatian note-section parity
+  check, plus two real bugs it caught**: closed 2026-09-11 (hundredth
+  intensive run) - extended the "read a shared library file end to end"
+  method to a new question: do the hand-translated Croatian `NoteSection[]`
+  arrays on each `src/pages/hr/competitions/*.astro` page stay
+  *structurally* in sync with the English `content/*.md` sections they
+  translate? They didn't, in two real, live ways: `hr/competitions/
+  world-cup.astro`'s "Editorial notes" was silently missing its fourth
+  English bullet, and the World Cup/EURO/Copa América Croatian "Final
+  venues" sections each folded their lead-in paragraph into the bullet list
+  as a spurious extra item instead of using the existing `intro` field.
+  Both fixed, plus the permanent `scripts/check-i18n-notes.mjs` check (`pnpm
+  check:i18n-notes`, wired into CI) so neither class of drift can recur
+  silently. Like the `check:award-tallies` entry above, this entry was
+  missing from this file until the hundred-and-first run added it
+  retroactively. See `docs/PROJECT_STATUS.md`'s matching entry for full
+  detail.
+- **Home page Golden Boot card silently dropped the entire EURO Golden Boot
+  dataset**: closed 2026-09-11 (hundred-and-first intensive run) - a
+  standing health check first (`pnpm install`, `pnpm outdated` unchanged:
+  only the blocked `typescript` 7 entry; `pnpm lint`/`test`/`build`/`check:links`/
+  `check:sitemap`/`check:precache`/`check:perf`/`check:pdfs`/`check:jsonld`/
+  `check:meta`/`check:html`/`check:spelling`/`check:award-tallies`/
+  `check:i18n-notes` all clean). With every recently-tried research/sourcing
+  angle re-confirmed exhausted rather than re-attempted again, this run tried
+  the "read a shared library file end to end for cross-builder
+  inconsistencies" method (the same one that found the `sport`/`inLanguage`
+  JSON-LD gaps in the ninety-sixth/ninety-seventh runs) on `src/lib/homeCards.ts`
+  and found a real bug: `loadHomeCompetitions()` only ever called
+  `loadCompetition('golden-boot', ...)` once, with `editionsHeading: 'FIFA
+  World Cup top scorers'` - so the home page's Golden Boot card silently
+  never loaded the UEFA EURO half of `content/golden-boot.md` at all, even
+  though every other consumer of that content (`records.astro`,
+  `quiz.astro`, `players/[slug].astro`, `competitions/golden-boot.astro`,
+  `sitemap.xml.ts`, `player-index.json.ts`) loads both tables. The card's own
+  blurb ("World Cup and EURO top-scorer awards, tournament by tournament")
+  and href (`/competitions/golden-boot`) both cover both races, but its
+  "Editions" stat showed 23 instead of the true 40 (23 World Cup + 17 EURO),
+  and its "Most awards" stat showed only the World Cup leader (Kylian Mbappé,
+  2) as if it were the combined leader. Fixed by loading both tables and
+  combining their `editions` arrays for the count; deliberately did **not**
+  synthesize a merged champions ranking to fill "Most awards" - that would
+  contradict `competitions/golden-boot.astro`'s own explicit,
+  already-documented editorial policy of keeping World Cup and EURO Golden
+  Boot as two separate rankings everywhere on the site (two separate
+  `ChampionsSummary` widgets and `ItemList` JSON-LD blocks, never merged) -
+  so the card now drops the "Most awards" row entirely for Golden Boot only,
+  reusing the `topChampion === undefined` rendering path `buildHomeCards()`
+  already had. New unit test coverage in `tests/unit/homeCards.test.ts`
+  (`loadHomeCompetitions()` combining both tables into one edition count with
+  an empty, not merged, champions array) and a new e2e assertion in
+  `tests/e2e/mobile.spec.ts` on the rendered home page card (40 editions, no
+  "Most" stat row) - both EN and HR checked, since `buildHomeCards()` shares
+  the same underlying data across locales. 616/616 unit tests (was 615),
+  711 pages built, full standing `check:*` suite clean, plus a full
+  cold-start `pnpm test:e2e` (946 tests, was 945) confirming no regressions.
+  See `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a
+  future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025, the `long-title` brand-suffix decision),
+  plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed Nations League figures, and EURO 1996/2020's/World Cup
+  1930/1950's excluded attendance figures. This run's own method (reading a
+  not-yet-audited `src/lib/*.ts` file end to end for cross-builder
+  inconsistencies) is worth repeating on a different file next -
+  `src/lib/editions.ts`, `compare.ts`, `editionProfile.ts`, `quiz.ts`,
+  `teamProfile.ts`/`playerProfile.ts` and `notes.ts` were all checked this
+  run too but came back internally consistent, so a future pass should pick
+  files not yet covered by either this run or the ninety-sixth/
+  ninety-seventh runs' own passes over `jsonLd.ts`.
+- **Full `src/lib/*.ts` audit sweep completed; standing health check
+  re-confirmed clean**: closed 2026-09-11 (hundred-and-second intensive
+  run) - read every remaining `src/lib/*.ts` file not yet covered by a
+  prior run's "read end to end" pass (16 files: `sources.ts`,
+  `manifest.ts`, `onThisDay.ts`, `routes.ts`, `countries.ts`,
+  `hostCoordinates.ts`, `competition.ts`, `teamCompetitions.ts`,
+  `glossary.ts`, `comparePlayers.ts`, `validate.ts`, `markdownTable.ts`,
+  `i18n.ts`, `tableSort.ts`, `offlineCache.ts`, `url.ts`) - all clean, no
+  new bug found, closing this method out as exhausted across the entire
+  `src/lib/` directory. Standing health check (lint/test/build/all 11
+  `check:*` scripts/full cold-start `pnpm test:e2e`/`check:reflow`/
+  `check:text-zoom`/`check:print-width`/`knip`) all clean, matching the
+  hundred-and-first run's baseline exactly - `pnpm test:e2e` needed this
+  environment's `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback to
+  run at all (946/946 passed once applied). Re-attempted the Nations
+  League final-attendance gaps via `WebSearch`, including a new candidate
+  source (`www.11v11.com`); still blocked - direct `WebFetch` of both that
+  domain and Wikipedia returned `EGRESS_BLOCKED`. No code change. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail.
+- **Every Croatian per-edition page was silently rendering its References
+  note in English**: closed 2026-09-11 (hundred-and-third intensive run) - a
+  standing health check first (all clean, matching the hundred-and-second
+  run's baseline). Extended the "read a shared file end to end" method to
+  `src/components/*.astro` (the 18 shared components, not yet swept this way)
+  and found a real bug: `References.astro`'s `noteText` prop - added so
+  Croatian pages can translate its closing disclaimer sentence - was
+  correctly overridden at all 14 non-edition Croatian call sites but silently
+  omitted at all seven per-edition `[year].astro` route families (World Cup,
+  EURO, Copa América, Nations League, Ballon d'Or, and both Golden Boot
+  variants), each of which translated every *other* `References` prop but
+  missed this one. Every Croatian edition page (hundreds of them) was
+  rendering one paragraph of English text on an otherwise fully Croatian
+  page. Fixed by adding the same translated `noteText` line the other 14
+  call sites already use to all seven files; verified against the built
+  `dist/hr/competitions/**/index.html` output that the English fallback no
+  longer appears anywhere. New e2e coverage extends the existing
+  "translated chrome" test in each of the six per-family edition-page spec
+  files (Golden Boot's covers both its World Cup and EURO route families) -
+  no new test blocks. No content file touched, so no PDF regen or
+  `lastReviewed` bump needed; `pnpm test` stays at 616/616 (presentation-only
+  fix, no new unit-testable logic). See `docs/PROJECT_STATUS.md`'s matching
+  entry for full detail. **Left for a future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, Nations League's Team of the Tournament
+  for 2021/2023/2025, the `long-title` brand-suffix decision), plus the
+  Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+  Nations League figures, and EURO 1996/2020's/World Cup 1930/1950's
+  excluded attendance figures. The "read end to end" method has now covered
+  all of `src/lib/` and all of `src/components/` - a future pass's best bet
+  is extending it to a `src/pages/` route family (not yet swept this way),
+  or a fresh `docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.
+- **CI-caught stale PDFs from the hundred-and-third run's `References.astro`
+  fix**: closed 2026-09-11 (hundred-and-fourth intensive run) - that run's own
+  closing note claimed "no content file touched, so no PDF regen ...
+  needed," which was wrong: `check:pdfs` compares each PDF against its
+  *rendered page* output, not just the source content file, and
+  `References.astro`'s `noteText` fix changed the rendered HTML of every
+  Croatian per-edition page (the exact pages the fix targeted), so their
+  print PDFs went stale the moment that commit landed - caught immediately by
+  this repo's own `test` GitHub Actions check on the open PR (`check:pdfs`
+  failing with 56 stale World Cup/Golden Boot Croatian+English edition
+  PDFs). Regenerated with `pnpm build && pnpm build:pdfs`
+  (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`, the same fallback
+  `pnpm test:e2e` already needs in this environment - `build:pdfs` launches
+  its own `chromium.launch()` via `@playwright/test`, unrelated to Astro's
+  own build) and reverified `check:pdfs` clean (700/700). Full standing
+  health check re-run after: lint (0/0/0), 616/616 unit tests, build (711
+  pages), all 11 `check:*` scripts clean. **Correction for future runs:**
+  "no content file touched" is not sufficient reason to skip a PDF regen -
+  the real test is "did any *rendered page* this PDF is sourced from change,"
+  which a shared component edit can trigger just as easily as a content-file
+  edit; when in doubt, run `check:pdfs` (fast, no browser needed) before
+  closing out a run, not just when a content file was touched. **Left for a
+  future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025, the `long-title` brand-suffix decision),
+  plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed Nations League figures, and EURO 1996/2020's/World Cup
+  1930/1950's excluded attendance figures. The "read end to end" method has
+  covered all of `src/lib/` and all of `src/components/`; a future pass's
+  best bet is extending it to a `src/pages/` route family, or a fresh
+  `docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.
+- **`/hr/records`'s "Most successful teams" section silently used the
+  English "title"/"titles" unit noun**: closed 2026-09-12 (hundred-and-fifth
+  intensive run) - a standing health check first (all clean, matching the
+  hundred-and-fourth run's baseline; `pnpm outdated` still only the blocked
+  `typescript` 7 entry). Took the hundred-and-fourth run's own suggestion and
+  extended the "read a shared component plus every one of its call sites end
+  to end" method to `src/pages/` (not yet swept this way): comparing every
+  component prop passed at each EN/HR page-pair call site
+  (`index`/`quiz`/`compare`/`compare-players`/`records`/`glossary`/
+  `players/[slug]`/`teams/[slug]`/`about/sources`) found a real bug in
+  `ChampionsSummary.astro`'s nine call sites inside `hr/records.astro`: eight
+  correctly override the component's `unit` prop (`['title', 'titles']`
+  by default) with a Croatian singular/plural pair, but the very first one
+  (`teams-${c.key}`, the "Najuspješnije reprezentacije" section) omitted it,
+  so every team's title-count bar on the Croatian records page carried the
+  English words "title"/"titles" in its `visually-hidden` screen-reader-only
+  span, on an otherwise fully Croatian page, across all six competitions.
+  Fixed with `unit={['naslov', 'naslova']}`, matching the singular/plural
+  pair the same file's neighboring "home-soil" section already uses for this
+  exact word. New e2e coverage (`tests/e2e/mobile.spec.ts`) asserts the
+  rendered unit text matches `/naslov/` and not `/title/i`. No content file
+  touched (this is a presentation-layer prop on a page component, not
+  editorial content), so `pnpm test` stays at 616/616, but `check:pdfs`
+  correctly caught `records-hr.pdf` as stale (the hundred-and-fourth run's
+  own "check rendered output, not just content files" correction paying
+  off immediately) - regenerated and reverified with `pnpm build:pdfs`/
+  `pnpm check:pdfs` (700/700 fresh). Full standing health check clean:
+  `pnpm lint` (0/0/0), `pnpm test` (616/616), `pnpm build` (711 pages), all
+  11 `check:*` scripts clean, full cold-start `pnpm test:e2e` (947/947,
+  one new test). See `docs/PROJECT_STATUS.md`'s matching entry for full
+  detail. **Left for a future pass:** the same environment-blocked items as
+  every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  Nations League's Team of the Tournament for 2021/2023/2025, the
+  `long-title` brand-suffix decision), plus the Nations League 2023
+  attendance conflict, 2021/2025's still-unconfirmed Nations League figures,
+  and EURO 1996/2020's/World Cup 1930/1950's excluded attendance figures.
+  The "read end to end" prop-diff method just started on `src/pages/` and
+  only covered the nine EN/HR page-pairs outside the per-edition
+  `[year].astro` route trees and `robots.txt.ts`/`sitemap.xml.ts`/
+  `manifest.webmanifest.ts`/the `*-index.json.ts` endpoints - a future pass
+  could extend the same method to the seven per-family edition-page route
+  trees (a different shape: many generated pages per family rather than one
+  static page), or pick a genuinely different quality angle.

@@ -64,12 +64,13 @@ const jsonLd = [
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
 
-// Hand-translated from content/uefa-euro.md's "How it works", "Historical
-// format note" (a single paragraph, no bullets - same as the English page),
-// "Player of the Tournament winners", "Young Player of the Tournament
-// winners", "Team of the Tournament winners", "Winning managers", "Winning
-// captains" and "Memorable moments" sections, the same eight headings the
-// English page requests via noteHeadings. content/ itself stays untouched
+// Hand-translated from content/uefa-euro.md's "How it works", "Final
+// venues", "Historical format note" (a single paragraph, no bullets - same
+// as the English page), "Player of the Tournament winners", "Young Player of
+// the Tournament winners", "Team of the Tournament winners", "Winning
+// managers", "Winning captains" and "Memorable moments" sections, the same
+// nine headings the English page requests via noteHeadings. content/ itself
+// stays untouched
 // and English (the single editorial source of truth); this is
 // presentation-layer text local to this page only, the same way the earlier
 // Croatian competition pages hand-write their own Croatian prose.
@@ -81,6 +82,30 @@ const notes: NoteSection[] = [
       'Završnica počinje skupnom fazom; najbolje plasirane momčadi iz svake skupine prolaze dalje.',
       'Od četvrtfinala nadalje igra se izravni nokaut sustav: jedan poraz završava turnir za momčad.',
       'Finale odlučuje prvaka; utakmica za treće mjesto nije se igrala od 1980. (pogledajte "Povijesnu napomenu o formatu" niže).',
+    ],
+  },
+  {
+    heading: 'Mjesta finala',
+    intro:
+      'Svako izdanje EURA prvaka je odredilo u jednoj utakmici na jednom stadionu - čak je i izdanje 2020., čije su skupne i doigravačke utakmice bile raspoređene po jedanaest gradova domaćina u povodu 60. obljetnice natjecanja, prvaka odredilo na jednom stadionu kao i svako drugo izdanje. Broj gledatelja naveden je niže samo tamo gdje ga je bilo moguće potvrditi iz dva neovisna izvora - u pitanju je 15 od 17 izdanja; 1996. i 2020. nije bilo moguće povezati s drugim, doista neovisnim izvorom osim jednog često ponavljanog broja, pa su izostavljena umjesto objave broja iz samo jednog izvora.',
+    items: [
+      '1960.: Parc des Princes, Pariz (Francuska) - prijavljeno 17.966 gledatelja.',
+      '1964.: Santiago Bernabéu, Madrid (Španjolska) - isti stadion kasnije je ugostio finale Svjetskog prvenstva 1982.; prijavljeno 79.115 gledatelja.',
+      '1968.: Stadio Olimpico, Rim (Italija) - prva utakmica završila je 1:1 pred 68.817 gledatelja, pa je repriza odigrana dva dana kasnije na istom stadionu, uz prijavljenih 32.886 gledatelja.',
+      '1972.: Heysel Stadium, Bruxelles (Belgija) - prijavljeno 43.437 gledatelja.',
+      '1976.: Stadion Crvena zvezda, Beograd (Jugoslavija) - prijavljeno 30.790 gledatelja.',
+      '1980.: Stadio Olimpico, Rim (Italija) - isti stadion kao finale 1968., prvi koji je ugostio dva finala EURA, uz prijavljenih 47.860 gledatelja.',
+      '1984.: Parc des Princes, Pariz (Francuska) - isti stadion kao finale 1960.; prijavljeno 47.368 gledatelja.',
+      '1988.: Olympiastadion, München (Zapadna Njemačka) - prijavljeno 62.770 gledatelja.',
+      '1992.: Ullevi, Göteborg (Švedska) - prijavljeno 37.800 gledatelja.',
+      '1996.: Wembley Stadium, London (Engleska).',
+      '2000.: De Kuip, Rotterdam (Nizozemska) - prijavljeno 48.100 gledatelja.',
+      '2004.: Estádio da Luz, Lisabon (Portugal) - prijavljeno 62.865 gledatelja.',
+      '2008.: Ernst-Happel-Stadion, Beč (Austrija) - prijavljeno 51.428 gledatelja.',
+      '2012.: NSC Olimpiyskiy, Kijev (Ukrajina) - prijavljeno 63.170 gledatelja.',
+      '2016.: Stade de France, Saint-Denis (Francuska) - prijavljeno 75.868 gledatelja.',
+      '2020.: Wembley Stadium, London (Engleska) - isti stadion kao finale 1996., drugi koji je ugostio dva finala EURA.',
+      '2024.: Olympiastadion, Berlin (Njemačka) - prijavljeno 65.600 gledatelja.',
     ],
   },
   {
