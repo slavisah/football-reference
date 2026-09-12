@@ -313,7 +313,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/lib/compare.ts": "9192fca6c619321799bf16067aefd908050d3c02a82465e4775a9b4767579364",
     "src/lib/teamProfile.ts": "2d096cc6371aa2a5995f4ffcfcdbbf9e5f6c9f4d10fa25f66d61549021473d2f",
-    "src/pages/hr/records.astro": "5f22507a5d2f443655e42a6f9003a583d9fd89c6426004af853e8e6fbff05c36"
+    "src/pages/hr/records.astro": "33e24928c5b851305f6b0014abf640cf1b4eca28ab8542e368e29bff6360ae40"
   },
   "compare-hr": {
     "content/fifa-world-cup.md": "0c8e58371ffd6c5ce01873e388f3f2189141a6b005c17cecfb5b988043722621",
