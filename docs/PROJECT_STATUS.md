@@ -21466,5 +21466,106 @@ for shared-constant drift and stale word-order/text assumptions; a future
 pass could instead look for, e.g., duplicated test fixtures or
 assertions that no longer match their own describe-block's stated intent).
 
+### Non-page-component endpoint sweep (`robots.txt.ts`/`sitemap.xml.ts`/`manifest.webmanifest.ts`/the three `*-index.json.ts` files) - closed 2026-09-12 (hundred-and-tenth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` (still only
+the blocked `typescript` 7 entry), `pnpm lint` (0/0/0), `pnpm test`
+(627/627, matching the hundred-and-ninth run's baseline), `pnpm build`
+(711 pages), and the full set of `check:*` scripts clean
+(`check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+`check:pdfs`/`check:jsonld`/`check:meta`/`check:html`/
+`check:award-tallies`/`check:i18n-notes`/`check:reflow`/`check:text-zoom`/
+`check:print-width`, the last three needing this environment's
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback). Also re-ran
+`pnpm test:coverage` (99.91%/99.44%, unchanged - the same four
+defensively-unreachable branch lines the eighth run's sweep classified as
+not undertested) and `pnpm dlx knip --no-config-hints` (one unchanged
+false-positive, `scripts/test-preview-server.mjs`, invoked as a shell
+string from `playwright.config.ts` that static analysis can't see). A
+full cold-start `pnpm test:e2e` also matched the baseline exactly:
+**947/947 passed (14.4 minutes)**.
+
+**Where this run looked:** the hundred-and-fifth run's own closing note
+(and every run since) explicitly named one corner the "read a shared
+component/directory end to end" method had never reached: the small set
+of `src/pages/*.ts` API-route files that aren't page components at
+all - `robots.txt.ts`, `sitemap.xml.ts`, `manifest.webmanifest.ts` (both
+the English and Croatian copies), and `team-index.json.ts`/
+`player-index.json.ts`/`edition-index.json.ts`. With the directory-level
+sweep of `src/lib/`, `src/components/`, every `src/pages/` page shape,
+`scripts/` and `tests/` all closed out by the hundred-second through
+hundred-and-ninth runs, this was the last named gap of this kind left on
+the site, so this run read all seven files in full rather than picking a
+new unrelated angle.
+
+**What was checked:**
+
+- `manifest.webmanifest.ts` and `hr/manifest.webmanifest.ts` both call the
+  same `buildManifest(locale)` helper (`src/lib/manifest.ts`, already
+  swept clean in the hundred-and-second run's `src/lib/` pass) with only
+  the locale argument differing - no field is hand-duplicated between the
+  two files for a future edit to desync.
+- `robots.txt.ts` builds its `Sitemap:` line from `withBase()` and the
+  request's `site`/`url` origin, the same origin-resolution convention
+  every other generated endpoint (`sitemap.xml.ts`, the manifests) already
+  uses - no hardcoded host.
+- `team-index.json.ts`, `player-index.json.ts` and `edition-index.json.ts`
+  are explicitly written and commented as mirrors of one another (each
+  doc comment says so): same `{id, displayName}[]`-shaped or
+  `{pdfSlug, path, family}[]`-shaped JSON response, same
+  `Cache-Control: public, max-age=3600` header, same reason for
+  existing - letting `scripts/generate-pdfs.mjs` enumerate team/player/
+  edition slugs it has no other way to derive at build time. Read all
+  three side by side: no divergence in response shape or headers.
+  `edition-index.json.ts`'s own comment additionally claims its `family`
+  values match the prefix convention `scripts/pdf-pages.mjs`'s
+  `EDITION_PDF_SOURCES` map is keyed by (`world-cup`, `euro`,
+  `nations-league`, `copa-america`, `ballon-dor`,
+  `golden-boot-world-cup`, `golden-boot-euro`) - cross-checked against
+  `pdf-pages.mjs` directly and confirmed exact; this is also
+  transitively verified on every run by `check:pdfs`'s clean 700/700
+  result, which depends on exactly this mapping being correct.
+
+No bug found - unlike the hundred-second through hundred-and-ninth runs'
+same method applied elsewhere, every file here was already internally
+consistent. This closes out the "read end to end" method's coverage of
+every large source directory *and* every remaining page/endpoint shape on
+the site named as a gap by a prior run's closing note; no further
+"unswept area" of this specific kind is currently known.
+
+**Also re-attempted:** the standing Nations League attendance gaps
+(2021/2023/2025 final attendances). `WebSearch` again independently
+surfaced 31,511 (2021, San Siro, Milan)/41,110 (2023)/65,852 (2025), and,
+new this run, turned up a specific `uefa.com` match-events page URL for
+the 2021 final (`uefa.com/uefanationsleague/match/2030761--spain-vs-
+france/events/`) that could in principle have served as a source
+independent of Wikipedia. `WebFetch` of that URL failed with
+`EGRESS_BLOCKED` - the same result this environment has returned for
+`uefa.com`/`en.wikipedia.org` on every prior attempt (ninety-sixth
+through hundred-and-eighth runs) - so the "two independently-read
+sources" bar this site's own convention requires still isn't cleared,
+and these three figures stay out of `content/uefa-nations-league.md`.
+
+No code or content file was changed this run (the endpoint sweep found
+everything already correct, and the attendance research came back
+inconclusive again), so no PDF regeneration was needed - confirmed via a
+clean `check:pdfs` (700/700) rather than assumed, per the
+hundred-and-fourth run's "check the rendered output, don't just infer
+from whether a content file changed" correction. `pnpm test` stayed at
+627/627.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League
+2023 attendance conflict and 2021/2025's still-unconfirmed figures, and
+World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures. With
+both the directory-level sweep and the page/endpoint-shape sweep now
+exhausted, a future run's best bet is a fresh source lead on the open
+attendance/brand-suffix items, a second pass over an already-swept area
+with a genuinely different lens (duplicated test fixtures, stale
+describe-block assumptions, or similar), or a quality dimension not yet
+tried by any of the prior 109 runs (e.g. a from-scratch manual UX
+walkthrough of a user journey rather than a code-reading audit).
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
