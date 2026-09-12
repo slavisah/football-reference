@@ -20870,5 +20870,109 @@ and World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures. The
 pages/` route family, or a fresh `docs/WEBSITE_REQUIREMENTS.md` re-read
 against the live site.
 
+### `/hr/records`'s "Most successful teams" section silently used the English "title"/"titles" unit noun - closed 2026-09-12 (hundred-and-fifth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` (still only
+the blocked `typescript` 7 entry), `pnpm lint` (0/0/0), `pnpm test`
+(616/616 unit), `pnpm build` (711 pages), `check:links`/`check:sitemap`/
+`check:precache`/`check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/
+`check:html`/`check:spelling`/`check:award-tallies`/`check:i18n-notes`/
+`check:reflow`/`check:text-zoom`/`check:print-width` all clean (the three
+browser-based checks again needed this environment's
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback), `pnpm dlx knip
+--no-config-hints` matching every prior run's baseline (the one confirmed
+false positive).
+
+Per the hundred-and-fourth run's own closing suggestion, extended the "read
+a shared component plus every one of its call sites end to end" method -
+already exhausted across `src/lib/` and `src/components/` - to
+`src/pages/`, starting with the nine EN/HR page-pairs outside the
+per-edition `[year].astro` route trees (`index`, `quiz`, `compare`,
+`compare-players`, `records`, `glossary`, `players/[slug]`,
+`teams/[slug]`, `about/sources`). Wrote a small script to parse every
+Astro component tag in each EN/HR file pair and diff the sorted prop names
+passed at each position, so a translation prop present on one side and
+missing on the other stands out immediately (the same shape of bug the
+hundred-and-third run's `References.astro`/`noteText` fix found by hand).
+
+Found one real, live bug: `hr/records.astro` calls `ChampionsSummary.astro`
+nine times (one per top-level ranking section - team titles, hosts,
+home-soil titles, title streaks, runners-up, semi-final exits, title-gap
+years, final-margin goals, and individual-award totals). The component's
+`unit` prop (a `[singular, plural]` pair rendered inside a
+`visually-hidden` span next to each count, for screen readers) defaults to
+the English `['title', 'titles']`. Eight of the nine call sites correctly
+override it with a Croatian pair (`['put domaćin', 'puta domaćin']`,
+`['naslov na domaćem terenu', 'naslova na domaćem terenu']`, `['uzastopno
+izdanje', 'uzastopna izdanja']`, `['finale bez naslova', 'finala bez
+naslova']`, `['polufinale bez finala', 'polufinala bez finala']`,
+`['godina', 'godine']`, `['gol', 'gola']`, `['nagrada', 'nagrade']`) - but
+the very first one, the "Najuspješnije reprezentacije" (Most successful
+teams) section's `teams-${c.key}` instance, omitted `unit` entirely, so
+every one of the six competitions' team-title-count bars on the Croatian
+records page announced "title"/"titles" in English to screen-reader users,
+on an otherwise fully Croatian page. The equivalent English `records.astro`
+call site correctly has no `unit` override (the English default is already
+correct there), which is exactly why this one was easy to miss by eye but
+caught immediately by a positional prop diff against the other eight
+Croatian call sites in the same file.
+
+Fixed with `unit={['naslov', 'naslova']}`, the singular/plural pair for
+"title" already established two sections down in the same file's
+"home-soil" `unit` override (`'naslov na domaćem terenu'`/`'naslova na
+domaćem terenu'` uses the identical `naslov`/`naslova` pairing). Verified
+against the built output (`grep` for the fix's `visually-hidden` span in
+`dist/hr/records/index.html`): renders "naslova" for Brazil's 5 FIFA World
+Cup titles, matching every other section's Croatian unit noun.
+
+New e2e coverage: one new test in `tests/e2e/mobile.spec.ts`'s "Croatian
+records page" describe block, asserting the "Most successful teams"
+section's `visually-hidden` unit text matches `/naslov/` and not
+`/title/i` - a new test rather than extending an existing one, since no
+prior test in that block inspected this specific span. No content file
+touched (this is a presentation-layer prop on a page component, not
+editorial content), so no `lastReviewed` bump was needed and `pnpm test`
+stays at 616/616 (no new unit-testable logic). `check:pdfs` did correctly
+flag `records-hr.pdf` as stale immediately after the fix - the
+hundred-and-fourth run's own "check the rendered page, not just whether a
+content file changed" correction paying off on the very next run that
+touched a page component. Regenerated with `pnpm build:pdfs`
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) and reverified
+`check:pdfs` clean (700/700).
+
+Full standing health check re-run after the fix: `pnpm lint` (0/0/0),
+`pnpm test` (616/616), `pnpm build` (711 pages), all 11 `check:*` scripts
+clean, plus a full cold-start `pnpm test:e2e` (947/947 passed, one new
+test, no regressions).
+
+Read the same nine page-pairs' component prop lists in full (not just the
+one mismatch) looking for further gaps; every other difference found
+(`BaseLayout`'s `locale`, `PrintDownloadLink`'s `label`, `SectionJumpNav`'s
+`label`, `ChampionsTimeline`'s `hostedByLabel`/`runnerUpLabel`,
+`References`' full translated prop set) is present at every Croatian call
+site that needs it - confirmed by checking `hr/quiz.astro`'s and
+`hr/index.astro`'s own `EditorialNotes` calls (which correctly omit
+`jumpNavLabel`, since both pages' note sections stay under
+`EditorialNotes.astro`'s own `JUMP_NAV_MIN_SECTIONS = 4` threshold, so the
+jump nav - and its label - never renders there at all) and every other
+`ChampionsSummary`/`ChampionsTimeline` call site across the six Croatian
+competition/award landing pages (each already passes its own `unit`
+override). No other bug found this run.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League 2023
+attendance conflict, 2021/2025's still-unconfirmed Nations League figures,
+and World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures. The
+"read end to end" prop-diff method has now covered every EN/HR page pair
+outside the seven per-edition `[year].astro` route trees and the
+non-page-component endpoints (`robots.txt.ts`, `sitemap.xml.ts`,
+`manifest.webmanifest.ts`, the `*-index.json.ts` files) - a future run's
+best bet is extending the same method to those seven per-family
+edition-page route trees (a different shape: many generated pages per
+family, sharing one `[year].astro` template, rather than one static page
+per language), or a genuinely different quality angle.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

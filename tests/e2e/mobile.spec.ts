@@ -2325,6 +2325,17 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
     ).toBeVisible();
   });
 
+  test('translates the "Most successful teams" title-count unit, not just the ranking labels', async ({
+    page,
+  }) => {
+    const unitText = await page
+      .locator('section.champions:has(#teams-world-cup-heading) .champions__count .visually-hidden')
+      .first()
+      .textContent();
+    expect(unitText).toMatch(/naslov/);
+    expect(unitText).not.toMatch(/title/i);
+  });
+
   test('shows the same "Most frequent hosts" World Cup ranking as the English page', async ({
     page,
     baseURL,
