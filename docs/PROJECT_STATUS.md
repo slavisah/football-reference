@@ -20974,5 +20974,114 @@ edition-page route trees (a different shape: many generated pages per
 family, sharing one `[year].astro` template, rather than one static page
 per language), or a genuinely different quality angle.
 
+### Croatian Copa América edition pages' `<h1>`/`<title>` word-order mismatch - closed 2026-09-12 (hundred-and-sixth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` (still only
+the blocked `typescript` 7 entry), `pnpm lint` (0/0/0), `pnpm test`
+(616/616 unit), `pnpm build` (711 pages), all clean, matching the
+hundred-and-fifth run's baseline.
+
+Per the hundred-and-fifth run's own closing suggestion, extended the "read
+a shared component plus every one of its call sites end to end" method to
+the last unswept page shape on the site: the seven per-family
+edition-page `[year].astro` route trees (`competitions/world-cup`,
+`competitions/euro`, `competitions/copa-america`,
+`competitions/nations-league`, `competitions/ballon-dor`,
+`competitions/golden-boot/world-cup`, `competitions/golden-boot/euro`, each
+with its `hr/` sibling). Unlike the nine page-pairs the previous run swept,
+these all share one component (`EditionView.astro`/`References.astro`)
+rather than each having its own bespoke markup, so the check here was
+threefold: (1) diff every `EditionView`/`References` prop passed at each
+Croatian call site against the same six props' English defaults and
+against its six sibling Croatian pages, (2) cross-check every page's
+`HEADER_LABELS` map against that competition's actual source-table column
+headers (`content/*.md`'s Editions/Winners table), and (3) - since
+`EditionView`'s `headingTemplate`/`glanceHeading` and each page's own
+`<title>`/meta description are two independent hand-written strings that
+must agree on word order - diff each page's `<title>` word order against
+its own `headingTemplate`'s word order, and against the same two strings
+on all six sibling competitions.
+
+The first two checks came back clean: every Croatian `HEADER_LABELS` map
+covers exactly the columns its competition's source table has (World Cup's
+9-column table, EURO's 9, Copa América's 8, Nations League's 8, Ballon
+d'Or's 4, both Golden Boot races' 4), and every `EditionView`/`References`
+translatable prop the hundred-third/hundred-fourth runs had already fixed
+(`noteText`, `topScorerLabel`, `pdfLabel`, `locale`, all seven `References`
+props) is present everywhere it needs to be.
+
+The third check found one real, live bug: five of the six team-competition
+Croatian pages (World Cup, EURO, Nations League, Ballon d'Or, and both
+Golden Boot races - i.e. every one except Copa América) put the
+competition's name first and the year last in both their `<title>` and
+their `headingTemplate`/`glanceHeading` ("FIFA Svjetsko prvenstvo 2026.",
+"Zlatna lopta 2024.", "Final Four UEFA Lige nacija 2024." - the natural
+Croatian phrasing, year as a trailing date-like element with a period).
+Copa América's Croatian page's `<title>` correctly followed this same
+convention (`` `Copa América ${yearLabel}` ``), but its
+`headingTemplate`/`glanceHeading` had been left at the English page's
+year-first order (`` `${yearLabel} {competition}` ``/`` `${yearLabel} na
+prvi pogled` ``, copied from `src/pages/competitions/copa-america/
+[year].astro` rather than translated), so the visible `<h1>` read "1959.
+(Argentina) Copa América" - year and competition in the opposite order
+from the same page's own `<title>` ("Copa América 1959. (Argentina)"), and
+the only one of the six Croatian edition-page families whose `<h1>` and
+`<title>` disagreed on word order. The visually-hidden glance heading had
+the matching issue plus a smaller gap: it also dropped the "Izdanje"
+("Edition") lead-in word every sibling page's glance heading has
+("Izdanje {year}. na prvi pogled"), reading just "1959. na prvi pogled"
+instead.
+
+Fixed both in `src/pages/hr/competitions/copa-america/[year].astro`:
+`headingTemplate={`{competition} ${yearLabel}`}` and
+`glanceHeading={`Izdanje ${yearLabel} na prvi pogled`}`, matching the
+other five families' word order and the "Izdanje" lead-in. Verified
+against the built `dist/hr/competitions/copa-america/1959-argentina/
+index.html` and `.../2024/index.html` output: `<h1>` now reads "Copa
+América 1959. (Argentina)" and "Copa América 2024." respectively, both
+matching their pages' `<title>`, and the glance heading reads "Izdanje
+1959. (Argentina) na prvi pogled".
+
+One e2e assertion had encoded the old (wrong) order -
+`tests/e2e/copa-america-edition-page.spec.ts`'s "renders translated chrome
+with the host disambiguator carried through" test asserted `<h1>` text
+`'1959. (Argentina) Copa América'`; updated to `'Copa América 1959.
+(Argentina)'`. No other test referenced the old order (checked every
+`h1`/`glanceHeading`/"na prvi pogled" reference across `tests/`). No
+content file touched (this is a presentation-layer template string on a
+page component, not editorial content), so `pnpm test` stays at 616/616 -
+no new unit-testable logic, same as the hundred-fifth run's equivalent
+presentation-only fix.
+
+`check:pdfs` did correctly flag the affected Croatian Copa América PDFs as
+stale immediately after the fix (52 of them: every edition year plus both
+disambiguated 1959 pages), the hundred-fourth run's own "check the
+rendered page, not just whether a content file changed" correction paying
+off for the third run running. Regenerated with `pnpm build:pdfs`
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) and reverified
+`check:pdfs` clean (700/700).
+
+Full standing health check re-run after the fix: `pnpm lint` (0/0/0),
+`pnpm test` (616/616), `pnpm build` (711 pages), all 14 `check:*` scripts
+clean (`check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+`check:pdfs`/`check:jsonld`/`check:meta`/`check:html`/`check:spelling`/
+`check:award-tallies`/`check:i18n-notes`/`check:reflow`/`check:text-zoom`/
+`check:print-width`, the three browser-based sweeps again needing this
+environment's `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback),
+plus a full cold-start `pnpm test:e2e`.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League
+2023 attendance conflict, 2021/2025's still-unconfirmed Nations League
+figures, and World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+figures. The "read end to end" prop-diff method has now covered every
+EN/HR page shape on the site - every page-pair outside the per-edition
+route trees (hundred-fifth run) and, this run, all seven per-edition
+`[year].astro` route trees themselves. A future run's best bet is a
+genuinely different quality angle (accessibility, performance, SEO) or a
+fresh source lead on one of the open attendance/captain gaps above.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
