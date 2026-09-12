@@ -132,7 +132,7 @@ test.describe('World Cup page on a 360px phone', () => {
   });
 
   test('shows the last reviewed date and source links', async ({ page }) => {
-    await expect(page.locator('time[datetime="2026-09-02"]')).toBeVisible();
+    await expect(page.locator('time[datetime="2026-09-11"]')).toBeVisible();
     const sources = page.locator('.references__list a');
     await expect(sources.first()).toBeVisible();
     const count = await sources.count();
@@ -149,9 +149,14 @@ test.describe('World Cup page on a 360px phone', () => {
 
   test('shows the Memorable moments and Editorial notes sections from content/fifa-world-cup.md', async ({ page }) => {
     const notes = page.locator('.notes__card');
-    await expect(notes).toHaveCount(11);
+    await expect(notes).toHaveCount(12);
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('The two semifinal winners meet in the final')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Final venues' })).toBeVisible();
+    await expect(notes.getByText('MetLife Stadium, East Rutherford, New Jersey')).toBeVisible();
+    await expect(notes.getByText('a reported attendance of 80,663')).toBeVisible();
+    // 1930 and 1950 stay without one - genuinely disputed, not just unconfirmed.
+    await expect(notes.getByText('Estadio Centenario, Montevideo (Uruguay).')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Golden Ball winners' })).toBeVisible();
     await expect(notes.getByText('Rodri (Spain) - the first Spain player to win the award')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Silver Ball and Bronze Ball winners' })).toBeVisible();
@@ -177,13 +182,13 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
   });
 
-  test('a "Jump to a section" nav links straight to each notes card, past the eleven-card scroll', async ({
+  test('a "Jump to a section" nav links straight to each notes card, past the twelve-card scroll', async ({
     page,
   }) => {
     const jumpNav = page.locator('nav.jump-nav');
     await expect(jumpNav).toBeVisible();
     await expect(jumpNav).toHaveAccessibleName('Jump to a section');
-    await expect(jumpNav.locator('a')).toHaveCount(11);
+    await expect(jumpNav.locator('a')).toHaveCount(12);
 
     const goldenGloveLink = jumpNav.getByRole('link', { name: 'Golden Glove winners' });
     await expect(goldenGloveLink).toHaveAttribute('href', '#golden-glove-winners');
@@ -276,6 +281,10 @@ test.describe('World Cup page on a 360px phone', () => {
     // An edition with no Memorable-moments bullet (e.g. 2014) shows an em dash, not an empty/broken cell.
     const noStoryCell = page.locator('tbody tr[data-year="2014"] td[data-label="Story"]');
     await expect(noStoryCell).toHaveText('—');
+    // The aria-label belongs on the <td> itself (role "cell" supports an author-supplied
+    // name), not a wrapping <span> (role "generic", which the ARIA spec prohibits from
+    // carrying one) - a real bug the eighty-sixth intensive run's check:html found and fixed.
+    await expect(noStoryCell).toHaveAttribute('aria-label', 'Story: —');
   });
 
   test('shows a host locator map grouped by region, with every host and its hosting years', async ({ page }) => {
@@ -318,6 +327,21 @@ test.describe('EURO page on a 360px phone', () => {
   test('shows each edition\'s top scorer, joined in from the Golden Boot data', async ({ page }) => {
     const row2016 = page.locator('tbody tr[data-year="2016"]');
     await expect(row2016.locator('td[data-label="Top scorer"]')).toContainText('Antoine Griezmann');
+  });
+
+  test('shows the Final venues section from content/uefa-euro.md', async ({ page }) => {
+    const notes = page.locator('.notes__card');
+    await expect(page.getByRole('heading', { name: 'Final venues' })).toBeVisible();
+    await expect(notes.getByText('Olympiastadion, Berlin (Germany)')).toBeVisible();
+    await expect(
+      notes.getByText('Wembley Stadium, London (England) - the same stadium as the 1996 final'),
+    ).toBeVisible();
+    await expect(
+      notes.getByText('Stadio Olimpico, Rome (Italy) - the same stadium as the 1968 final'),
+    ).toBeVisible();
+    await expect(notes.getByText('a reported attendance of 65,600')).toBeVisible();
+    // 1996 and 2020 stay without one - only a single, unconfirmable source.
+    await expect(notes.getByText('Wembley Stadium, London (England).')).toBeVisible();
   });
 
   test('shows the Historical format note as a paragraph, Player of the Tournament winners and Memorable moments as a list', async ({ page }) => {
@@ -432,9 +456,20 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
   test('shows the translated Format milestones, Memorable moments and Editorial notes sections', async ({
     page,
   }) => {
-    await expect(page.locator('.notes__card')).toHaveCount(11);
+    await expect(page.locator('.notes__card')).toHaveCount(12);
     await expect(page.getByRole('heading', { name: 'Kako funkcionira' })).toBeVisible();
     await expect(page.getByText('Pobjednici polufinala igraju finale')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Mjesta finala' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('MetLife Stadium, East Rutherford, New Jersey'),
+    ).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('prijavljeno 80.663 gledatelja')).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('1930.: Estadio Centenario, Montevideo (Urugvaj).'),
+    ).toBeVisible();
+    // The section's lead-in methodology sentence renders as its own intro
+    // paragraph, not as a bogus first list item among the actual venues.
+    await expect(page.locator('.notes__intro', { hasText: 'Svako izdanje Svjetskog prvenstva' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Prekretnice formata' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Dobitnici Zlatne lopte' })).toBeVisible();
     await expect(
@@ -476,6 +511,9 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
       page.locator('.notes__card').getByText('Hrvatska je 2018. stigla do svog prvog finala.'),
     ).toBeVisible();
     await expect(page.locator('.notes__card em', { hasText: 'Maracanazo' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Prikazati kartu zemalja domaćina'),
+    ).toBeVisible();
   });
 
   test('has a translated "Skoči na odjeljak" jump nav linking straight to each notes card', async ({
@@ -484,7 +522,7 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     const jumpNav = page.locator('nav.jump-nav');
     await expect(jumpNav).toBeVisible();
     await expect(jumpNav).toHaveAccessibleName('Skoči na odjeljak');
-    await expect(jumpNav.locator('a')).toHaveCount(11);
+    await expect(jumpNav.locator('a')).toHaveCount(12);
 
     const link = jumpNav.getByRole('link', { name: 'Dobitnici Zlatne rukavice' });
     await expect(link).toHaveAttribute('href', '#dobitnici-zlatne-rukavice');
@@ -570,6 +608,23 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
       'Antoine Griezmann',
     );
     await expect(row2016.locator('td[data-label="Najbolji strijelac"]')).toContainText('golova');
+  });
+
+  test('shows the translated Final venues section', async ({ page }) => {
+    const notes = page.locator('.notes__card');
+    await expect(page.getByRole('heading', { name: 'Mjesta finala' })).toBeVisible();
+    await expect(notes.getByText('Olympiastadion, Berlin (Njemačka)')).toBeVisible();
+    await expect(
+      notes.getByText('Wembley Stadium, London (Engleska) - isti stadion kao finale 1996.'),
+    ).toBeVisible();
+    await expect(
+      notes.getByText('Stadio Olimpico, Rim (Italija) - isti stadion kao finale 1968.'),
+    ).toBeVisible();
+    await expect(notes.getByText('prijavljeno 65.600 gledatelja')).toBeVisible();
+    await expect(notes.getByText('1996.: Wembley Stadium, London (Engleska).')).toBeVisible();
+    // The section's lead-in methodology sentence renders as its own intro
+    // paragraph, not as a bogus first list item among the actual venues.
+    await expect(page.locator('.notes__intro', { hasText: 'Svako izdanje EURA' })).toBeVisible();
   });
 
   test('shows the Historical format note as a paragraph, translated Player of the Tournament winners and Memorable moments as a translated list', async ({
@@ -1176,6 +1231,22 @@ test.describe('Copa América page on a 360px phone', () => {
     ).toBeVisible();
   });
 
+  test('shows the Final venues section from content/copa-america.md', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Final venues' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Estádio das Laranjeiras, Rio de Janeiro (Brazil)').first(),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Hard Rock Stadium, Miami Gardens, Florida (United States).'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('a reported crowd of 65,921'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('reported attendance of just 6,500'),
+    ).toBeVisible();
+  });
+
   test('shows the Best Player winners section from content/copa-america.md', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Best Player winners' })).toBeVisible();
     await expect(
@@ -1501,6 +1572,22 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     ).toBeVisible();
   });
 
+  test('shows the translated Final venues section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Mjesta finala' })).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Estádio das Laranjeiras, Rio de Janeiro (Brazil).').first(),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('Hard Rock Stadium, Miami Gardens, Florida (Sjedinjene Američke Države).'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.notes__card').getByText('prijavljeno 65.921 gledatelja'),
+    ).toBeVisible();
+    // The section's lead-in methodology sentence renders as its own intro
+    // paragraph, not as a bogus first list item among the actual venues.
+    await expect(page.locator('.notes__intro', { hasText: 'Za razliku od UEFA Lige nacija' })).toBeVisible();
+  });
+
   test('shows the translated Best Player winners section', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Dobitnici nagrade za najboljeg igrača' })).toBeVisible();
     await expect(
@@ -1574,6 +1661,9 @@ test.describe('Nations League page on a 360px phone', () => {
     await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(page.getByText('Held every two years.')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Key facts' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Final venues' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Allianz Arena, Munich (Germany)')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('43,199')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Player of the Finals winners' })).toBeVisible();
     await expect(page.locator('.notes__card').getByText('Nuno Mendes (Portugal)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
@@ -1666,6 +1756,12 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
   test('shows the translated Key facts section', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Ključne činjenice' })).toBeVisible();
     await expect(page.getByText('Hrvatska je 2023. stigla do svog prvog finala')).toBeVisible();
+  });
+
+  test('shows the translated Final venues section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Mjesta finala' })).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Allianz Arena, München (Njemačka)')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('43.199')).toBeVisible();
   });
 
   test('shows the translated Player of the Finals winners section', async ({ page }) => {
@@ -1805,6 +1901,24 @@ test.describe('Home page on a 360px phone', () => {
     await expect(list).toContainText('Cristiano Ronaldo won the award.');
     await expect(list).not.toContainText('won the final');
     await expect(page.locator('#on-this-day-hint')).toBeHidden();
+  });
+
+  test('the Golden Boot card combines World Cup and EURO editions, with no merged "Most awards" stat', async ({
+    page,
+  }) => {
+    // Regression test for a real bug: the card used to load only the World
+    // Cup Golden Boot table (23 editions) even though its own blurb and
+    // href cover both races - see src/lib/homeCards.ts's
+    // loadHomeCompetitions() for the combined-count fix and why "Most
+    // awards" is deliberately left off rather than merging two rankings
+    // that stay separate everywhere else on the site (e.g.
+    // competitions/golden-boot.astro's two ChampionsSummary widgets).
+    const card = page.locator('.comp-card', { hasText: 'Golden Boot' });
+    const stats = card.locator('.comp-card__stats dt');
+    await expect(stats).toHaveCount(1);
+    await expect(stats.first()).toHaveText('Editions');
+    await expect(card.locator('.comp-card__stats dd').first()).toHaveText('40');
+    await expect(card.locator('.comp-card__stats dt', { hasText: 'Most' })).toHaveCount(0);
   });
 
   test('shows the "How to use the reference" and "Important historical naming note" sections from content/index.md', async ({
@@ -2209,6 +2323,17 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
     await expect(
       page.getByText('Sovjetski Savez i Rusija se ne spajaju.'),
     ).toBeVisible();
+  });
+
+  test('translates the "Most successful teams" title-count unit, not just the ranking labels', async ({
+    page,
+  }) => {
+    const unitText = await page
+      .locator('section.champions:has(#teams-world-cup-heading) .champions__count .visually-hidden')
+      .first()
+      .textContent();
+    expect(unitText).toMatch(/naslov/);
+    expect(unitText).not.toMatch(/title/i);
   });
 
   test('shows the same "Most frequent hosts" World Cup ranking as the English page', async ({
@@ -3501,14 +3626,20 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     const collectionPage = blocks.find((b) => b['@type'] === 'CollectionPage');
     expect(collectionPage.name).toBe('FIFA World Cup - Champions by titles');
     expect(collectionPage.url).toBe(`${SITE}/competitions/world-cup/`);
+    expect(collectionPage.inLanguage).toBe('en');
     const itemList = collectionPage.mainEntity;
     expect(itemList['@type']).toBe('ItemList');
     expect(itemList.itemListElement[0].item.name).toBe('Brazil');
+    // The nested mainEntity ItemList isn't a schema.org document root, so it
+    // doesn't get inLanguage even though its wrapping CollectionPage does -
+    // ItemList isn't in schema.org's own inLanguage domainIncludes anyway.
+    expect(itemList.inLanguage).toBeUndefined();
 
     const sportsEvent = blocks.find((b) => b['@type'] === 'SportsEvent');
     expect(sportsEvent.name).toBe('2026 FIFA World Cup');
     expect(sportsEvent.location).toEqual({ '@type': 'Place', name: 'Canada, Mexico and United States' });
     expect(sportsEvent.competitor).toEqual({ '@type': 'SportsTeam', name: 'Spain' });
+    expect(sportsEvent.inLanguage).toBe('en');
   });
 
   test('an individual award page carries an ItemList and a SportsEvent for the latest edition', async ({
@@ -3556,6 +3687,8 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(blocks.find((b) => b['@type'] === 'CollectionPage').name).toBe(
       'FIFA Svjetsko prvenstvo - prvaci po broju naslova',
     );
+    expect(blocks.find((b) => b['@type'] === 'CollectionPage').inLanguage).toBe('hr');
+    expect(blocks.find((b) => b['@type'] === 'SportsEvent').inLanguage).toBe('hr');
   });
 
   test('/records carries a BreadcrumbList plus one ItemList per ranking section, skipping zero-streak fallbacks', async ({
@@ -3715,6 +3848,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     // also lists - see buildTeamSportsTeamJsonLd's own "Champion-only" rule.
     const sportsTeam = blocks.find((b) => b['@type'] === 'SportsTeam');
     expect(sportsTeam.name).toBe('Brazil');
+    expect(sportsTeam.sport).toBe('Football');
     expect(sportsTeam.award).toContain('FIFA World Cup 1958');
     expect(sportsTeam.award).toContain('FIFA World Cup 2002');
 
@@ -3880,6 +4014,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     const cardCount = await page.locator('.quiz > ol.quiz__list > li .quiz-card').count();
     const quiz = blocks.find((b) => b['@type'] === 'Quiz');
     expect(quiz.name).toBe('The Ultimate Football Reference - Family Quiz');
+    expect(quiz.inLanguage).toBe('en');
     expect(quiz.hasPart).toHaveLength(cardCount);
     for (const question of quiz.hasPart) {
       expect(question['@type']).toBe('Question');
@@ -3895,8 +4030,24 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     const blocks = await jsonLdBlocks(page);
     const quiz = blocks.find((b) => b['@type'] === 'Quiz');
     expect(quiz.name).toBe('Kompletna nogometna referenca - obiteljski kviz');
+    expect(quiz.inLanguage).toBe('hr');
     const cardCount = await page.locator('.quiz > ol.quiz__list > li .quiz-card').count();
     expect(quiz.hasPart).toHaveLength(cardCount);
+  });
+
+  test('/glossary and /hr/glossary each carry a DefinedTermSet tagged with their own inLanguage', async ({
+    page,
+  }) => {
+    await page.goto('glossary');
+    const enBlocks = await jsonLdBlocks(page);
+    const enTermSet = enBlocks.find((b) => b['@type'] === 'DefinedTermSet');
+    expect(enTermSet.inLanguage).toBe('en');
+    expect(enTermSet.hasDefinedTerm.length).toBeGreaterThan(0);
+
+    await page.goto('hr/glossary');
+    const hrBlocks = await jsonLdBlocks(page);
+    const hrTermSet = hrBlocks.find((b) => b['@type'] === 'DefinedTermSet');
+    expect(hrTermSet.inLanguage).toBe('hr');
   });
 });
 

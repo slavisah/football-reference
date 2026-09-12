@@ -53,8 +53,14 @@ const DIST_DIR = path.join(ROOT, 'dist');
 // pushing `hr/records` to 563.4 KB, just over the 560 KB budget (the tenth
 // such deliberate raise). Raised further than the minimum needed this time
 // specifically because this section's shape (multi-player rosters) is
-// denser than prior additions and likely to recur.
-export const PAGE_WEIGHT_BUDGET_BYTES = 590 * 1024;
+// denser than prior additions and likely to recur. Raised again to 610 KB
+// on 2026-09-10 (ninety-second intensive run): the new UEFA EURO "Final
+// venues" note section (the last of the four "Final venues" sections -
+// Nations League, Copa América and the FIFA World Cup already had theirs)
+// added 18 more `docs/SOURCES.md` citation URLs under the "UEFA EURO"
+// heading, pushing `hr/records` to 590.5 KB, just over the 590 KB budget
+// (the eleventh such deliberate raise).
+export const PAGE_WEIGHT_BUDGET_BYTES = 610 * 1024;
 
 /** Every same-origin CSS asset path (e.g. "/football-reference/_astro/foo.css") referenced by an HTML page. */
 export function findCssRefs(html) {

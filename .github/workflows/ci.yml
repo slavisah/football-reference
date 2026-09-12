@@ -45,6 +45,12 @@ jobs:
       - name: PDF freshness check
         run: pnpm check:pdfs
 
+      - name: Spelling check (content/*.md)
+        run: pnpm check:spelling
+
+      - name: Title-tally integrity check (content/*.md)
+        run: pnpm check:award-tallies
+
       - name: Build
         run: pnpm build
 
@@ -56,6 +62,15 @@ jobs:
 
       - name: Sitemap integrity check
         run: pnpm check:sitemap
+
+      - name: JSON-LD structural-validity check
+        run: pnpm check:jsonld
+
+      - name: Title/meta-description integrity check
+        run: pnpm check:meta
+
+      - name: English/Croatian note-section parity check
+        run: pnpm check:i18n-notes
 
       - name: Offline install (manifest/service worker) integrity check
         run: pnpm check:precache

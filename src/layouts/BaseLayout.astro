@@ -5,7 +5,7 @@ import Footer from '../components/Footer.astro';
 import Breadcrumb from '../components/Breadcrumb.astro';
 import { withBase } from '../lib/url';
 import { t, type Locale } from '../lib/i18n';
-import { buildBreadcrumbList, buildWebSiteJsonLd, type JsonLdObject } from '../lib/jsonLd';
+import { buildBreadcrumbList, buildWebSiteJsonLd, withInLanguage, type JsonLdObject } from '../lib/jsonLd';
 
 interface Props {
   title: string;
@@ -102,8 +102,15 @@ const website = isHome
       inLanguage: locale,
     })
   : undefined;
-const structuredData = [breadcrumb, website, ...jsonLd].filter((item): item is JsonLdObject =>
-  Boolean(item),
+// `withInLanguage()` adds `inLanguage: locale` to every block here whose
+// schema.org type actually declares that property (SportsEvent/Quiz/
+// DefinedTermSet/CollectionPage) - see its own doc comment in jsonLd.ts for
+// why this is done centrally, once, rather than at each page's own builder
+// call site. `website` already carries its own explicit `inLanguage` (set
+// above) and isn't in that type set, so it passes through unchanged here.
+const structuredData = withInLanguage(
+  [breadcrumb, website, ...jsonLd].filter((item): item is JsonLdObject => Boolean(item)),
+  locale,
 );
 ---
 

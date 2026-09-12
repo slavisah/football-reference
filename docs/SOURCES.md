@@ -559,6 +559,115 @@ Primary sources should be preferred.
     audit in this file has noted; verification relied entirely on
     WebSearch's synthesized snippets, cross-checked across independent
     passes and source domains rather than a single query's summary.
+- Final venues, all 23 editions (added 2026-09-09, intensive run): extending
+  UEFA Nations League's and Copa América's existing "Final venues" sections to
+  the FIFA World Cup - unlike Copa América, every World Cup edition (including
+  1950's final-group decider between Uruguay and Brazil, resolved without a
+  standalone final match) has one single decisive match at one stadium, so no
+  scoping/exclusion was needed. Verified in batches via independent WebSearch
+  passes covering different sets of editions, cross-checked against each
+  edition's own dedicated Wikipedia final article and, for 2026, FIFA's own
+  and news coverage of the MetLife Stadium (marketed during the tournament as
+  "New York New Jersey Stadium" under FIFA's sponsorship-neutral naming
+  policy) announcement. Two repeat-venue facts confirmed rather than assumed:
+  Estadio Azteca, Mexico City hosted both 1970 and 1986 (the first stadium to
+  host two World Cup finals), and the Maracanã, Rio de Janeiro hosted both
+  1950 and 2014. The 2010 stadium's post-tournament rename (Soccer City to FNB
+  Stadium) and 1958's Råsunda Stadium being in Solna, a municipality within
+  Greater Stockholm rather than Stockholm proper, were each independently
+  confirmed. **No discrepancies found**:
+  - https://en.wikipedia.org/wiki/1930_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1938_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1954_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1958_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/R%C3%A5sunda_Stadium
+  - https://footballgroundguide.com/news/world-cup-final-stadiums.html
+  - https://www.fourfourtwo.com/features/stadiums-that-hosted-world-cup-finals
+  - https://www.topendsports.com/events/worldcupsoccer/stadiums.htm
+  - https://www.thissportlife.com/sports/football-soccer/world-cup-men/venues/final-stadiums.htm
+  - https://en.wikipedia.org/wiki/1978_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1974_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1986_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1990_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/2002_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_final
+  - https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/new-york-new-jersey-stadium-host-world-cup-2026-final
+  - https://www.npr.org/2024/02/04/1229073496/2026-world-cup-final-nyc-nj-metlife-stadium
+  - Direct WebFetch/curl to these domains remains blocked by this
+    environment's egress policy, the same standing caveat every recent
+    audit in this file has noted; verification relied entirely on
+    WebSearch's synthesized snippets, cross-checked across independent
+    passes and source domains rather than a single query's summary.
+- Final attendance, 21 of 23 editions (added 2026-09-11, ninety-eighth
+  intensive run): extending "Final venues" with a reported attendance figure
+  for each final match, the same angle already applied to UEFA Nations
+  League and Copa América (see their own matching entries below), now
+  reaching a family where the finals themselves are famous enough that
+  genuinely independent corroboration (not just a Wikipedia figure
+  confirmed by rephrasing the same search) turned out to be available for
+  almost every edition. Two research passes: a first broad pass across all
+  23 editions, then a second pass specifically targeting the editions the
+  first pass could only tie to Wikipedia, aimed at finding a real second
+  domain (FIFA.com, a national federation, ESPN, ESPN, Guinness World
+  Records, a stadium database, a historical-football-site, etc.). 21
+  editions cleared the two-independent-source bar; **1930 and 1950 are
+  deliberately excluded, not just unconfirmed** - both are genuinely
+  disputed rather than under-sourced. 1930 splits between an official
+  68,346 and contemporary press estimates around 90,000-100,000 (gates were
+  reportedly opened early with an uncounted crowd let in); 1950's Maracanã
+  final splits between FIFA/Guinness's own recognized paid-attendance record
+  of 173,850 and the commonly cited ~199,854 total persons physically in the
+  stadium - a paid-vs-total-present definitional split, not a sourcing gap,
+  so no single number is presented as fact for either edition. 1986's
+  114,600 is confirmed as the largest attendance of any World Cup final
+  (also independently corroborated by Guinness World Records). 1998's final
+  has a low-reliability ~75,000 figure circulating on one wiki-mirror site;
+  it traces to no independent source and is not used, only the
+  four-independently-confirmed 80,000:
+  - https://en.wikipedia.org/wiki/1934_FIFA_World_Cup_final
+  - https://www.worldfootball.net/report/wm-1934-finale-italien-tschechoslowakei/
+  - https://en.wikipedia.org/wiki/1938_FIFA_World_Cup_final
+  - https://fbref.com/en/matches/1938-world-cup-final
+  - https://en.wikipedia.org/wiki/1954_FIFA_World_Cup_final
+  - https://www.fifa.com/en/tournaments/mens/worldcup/switzerland1954
+  - https://footballhistory.org/tournament/world-cup-1954.html
+  - https://en.wikipedia.org/wiki/1958_FIFA_World_Cup_final
+  - https://www.fifa.com/en/tournaments/mens/worldcup/sweden1958
+  - https://en.wikipedia.org/wiki/1962_FIFA_World_Cup_final
+  - https://www.sofascore.com/brazil-czechoslovakia/1962-06-17
+  - https://en.wikipedia.org/wiki/1966_FIFA_World_Cup_final
+  - https://www.fifa.com/en/tournaments/mens/worldcup/englandworldcup1966
+  - https://en.wikipedia.org/wiki/1970_FIFA_World_Cup_final
+  - https://www.fifa.com/en/tournaments/mens/worldcup/mexico1970
+  - https://en.wikipedia.org/wiki/1974_FIFA_World_Cup_final
+  - https://guides.loc.gov/soccer/world-cup-history (1974 attendance)
+  - https://www.topendsports.com/events/worldcupsoccer/attendances.htm
+  - https://en.wikipedia.org/wiki/1978_FIFA_World_Cup_final
+  - https://footballhistory.org/tournament/world-cup-1978.html
+  - https://en.wikipedia.org/wiki/1982_FIFA_World_Cup_final
+  - https://www.guinnessworldrecords.com/world-records/484076-highest-attendance-at-a-fifa-world-cup-final
+  - https://en.wikipedia.org/wiki/1986_FIFA_World_Cup_final
+  - https://www.guinnessworldrecords.com/world-records/90679-highest-attendance-at-a-fifa-world-cup-match
+  - https://en.wikipedia.org/wiki/1990_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/1994_FIFA_World_Cup_final
+  - https://www.fifa.com/en/tournaments/mens/worldcup/usa1994
+  - https://en.wikipedia.org/wiki/1998_FIFA_World_Cup_final
+  - https://www.abc.net.au/news (1998 final attendance recap)
+  - https://www.foxnews.com (1998 final attendance recap)
+  - https://en.wikipedia.org/wiki/2002_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/2006_FIFA_World_Cup_final
+  - https://www.espn.com/soccer/match/_/gameId/191983
+  - https://en.wikipedia.org/wiki/2010_FIFA_World_Cup_final
+  - https://www.espn.com/soccer/match/_/gameId/264123
+  - https://en.wikipedia.org/wiki/2014_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/2018_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final
+  - https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_final
+  - https://sports.yahoo.com (2026 final attendance recap)
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## UEFA EURO
 
@@ -1018,6 +1127,91 @@ Primary sources should be preferred.
     articles and the UEFA EURO account's own X/Twitter posts, both indexed
     and reachable via WebSearch even though direct WebFetch to uefa.com and
     x.com is not) rather than direct page loads.
+- Final venues, all 17 editions (added 2026-09-10, ninety-second intensive
+  run): extending the "Final venues" angle - already live for UEFA Nations
+  League, Copa América and the FIFA World Cup - to UEFA EURO, the last
+  team-competition family it hadn't yet covered. Every EURO edition has one
+  single decisive match at one stadium, including 2020's eleven-city edition
+  (only its final was fixed to Wembley), so no scoping/exclusion was needed.
+  Verified in batches via independent WebSearch passes covering different
+  sets of editions, cross-checked against each edition's own dedicated
+  Wikipedia final article, with targeted follow-up queries confirming three
+  specific facts rather than assuming them: 1968's replay was played at the
+  same Stadio Olimpico as the original drawn match (not a different Rome
+  venue), 1992's final was at Ullevi (Nya Ullevi) in Gothenburg (not
+  Stockholm), and the Ernst-Happel-Stadion's exact hyphenated spelling.
+  Three repeat-venue facts confirmed: Stadio Olimpico, Rome hosted both 1968
+  and 1980 (the first stadium to host two EURO finals); Parc des Princes,
+  Paris hosted both 1960 and 1984; Wembley Stadium, London hosted both 1996
+  and 2020 (the second stadium to host two EURO finals). **No discrepancies
+  found**:
+  - https://en.wikipedia.org/wiki/1960_European_Nations%27_Cup_final
+  - https://en.wikipedia.org/wiki/1964_European_Nations%27_Cup_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1968_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1972_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1976_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1980_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1984_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1988_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1992_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1996_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2000_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2004_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2008_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2012_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2016_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2020_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2024_final
+  - https://en.wikipedia.org/wiki/Ernst-Happel-Stadion
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed Wikipedia pages rather than direct page
+    loads.
+- Final attendance, 15 of 17 editions (added 2026-09-11, ninety-eighth
+  intensive run): the same "Final attendance" extension added to the FIFA
+  World Cup's "Final venues" section this run (see that entry above),
+  applied to UEFA EURO. A first broad pass covered all 17 editions; a
+  second, targeted pass specifically re-checked every edition the first pass
+  could only tie to Wikipedia, this time finding UEFA.com's own official
+  per-match pages for several editions (1972, 1976, 1980, 1992, 2000) -
+  genuinely independent, primary-source confirmation rather than a second
+  Wikipedia-derived mirror. 15 editions cleared the two-independent-source
+  bar. **1996 and 2020 are left out**: both have one consistently repeated
+  figure (73,611 and 67,173) but neither pass could tie it to a first-tier
+  independent outlet (a UEFA.com match page could not be located for either,
+  unlike the five editions above) - a single-source situation, not a
+  discrepancy, so treated the same as this file's other single-source
+  exclusions (UEFA Nations League 2021/2025 below) rather than published.
+  1968's replay attendance (32,886) is additionally corroborated against the
+  original drawn match's own separately reported crowd (68,817), both
+  confirmed via the same source set:
+  - https://en.wikipedia.org/wiki/1960_European_Nations%27_Cup_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1964_final
+  - https://www.11v11.com/matches/spain-v-soviet-union-21-june-1964-105023
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1968_final
+  - https://www.uefa.com/uefaeuro/history/
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1972_final
+  - https://www.uefa.com/uefaeuro/match/3838--west-germany-vs-ussr/matchinfo/
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1976_final
+  - https://www.uefa.com/uefaeuro/match/3693--czechoslovakia-vs-west-germany/
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1980_final
+  - https://www.uefa.com/uefaeuro/match/3585--belgium-vs-west-germany/matchinfo/
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1984_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1988_final
+  - https://www.uefa.com/uefaeuro/history/ (1988 final)
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1992_final
+  - https://www.uefa.com/uefaeuro/match/6098--denmark-vs-germany/
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2000_final
+  - https://www.uefa.com/uefaeuro/history/news/ (EURO 2000 recap)
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2004_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2008_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2012_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2016_final
+  - https://www.espn.co.uk/football/match/_/gameId/438154
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2024_final
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## UEFA Nations League
 
@@ -1199,6 +1393,89 @@ Primary sources should be preferred.
   - https://www.football-espana.net/2023/06/10/jordi-alba-did-not-expected-to-be-named-spain-captain-for-uefa-nations-league-finals
   - https://www.espn.com/soccer/story/_/id/45476228/ronaldo-portugal-nations-league-win
   - https://www.si.com/soccer/cristiano-ronaldo-leads-portugal-to-glory-takeaways-from-nations-league-final
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Final venues (added 2026-09-09, eighty-ninth intensive run): a new "Final
+  venues" note section on `content/uefa-nations-league.md` naming the
+  specific stadium and city that staged the one-off final match at each of
+  the four completed Finals - distinct from the existing "Finals-host audit"
+  above, which only verifies the *hosting country*, not which of its
+  stadiums the final itself was played at (the 2023 Netherlands edition used
+  two different stadiums across its Finals). Verified via two independent
+  WebSearch passes: the first confirmed all four venues (Estádio do Dragão,
+  Porto 2019; San Siro, Milan 2021; De Kuip, Rotterdam 2023; Allianz Arena,
+  Munich 2025) via Wikipedia's and ESPN's per-final match reports; the second
+  specifically re-checked 2019 and 2021 with a distinct source mix
+  (France 24, UEFA.com's own final preview). Also independently corroborated
+  a genuinely interesting fact this pass turned up: De Kuip hosted the 2023
+  final only because Amsterdam's larger Johan Cruyff Arena, the country's
+  biggest stadium, was unavailable due to a scheduled concert - confirmed via
+  a dedicated Grokipedia recap that quotes the stadium-selection reasoning
+  directly, now included in the note's own 2023 bullet. **No discrepancies
+  found:**
+  - https://en.wikipedia.org/wiki/2019_UEFA_Nations_League_final
+  - https://www.dailysabah.com/football/2019/06/09/portugal-edges-netherlands-to-clinch-nations-league-title
+  - https://www.france24.com/en/20190609-portugal-beat-netherlands-win-first-nations-league-title
+  - https://en.wikipedia.org/wiki/2021_UEFA_Nations_League_final
+  - https://www.uefa.com/uefanationsleague/news/026e-136dcc8cc076-b6b335904e38-1000--final-preview-spain-vs-france/
+  - https://www.france24.com/en/sport/20211010-france-wins-nations-league-in-late-scoring-2-1-final-against-spain
+  - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_final
+  - https://grokipedia.com/page/2023_UEFA_Nations_League_Finals
+  - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
+  - https://www.euronews.com/2025/06/08/portugal-beats-spain-to-win-the-nations-league
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Final attendance investigation (added 2026-09-10, ninety-fourth intensive
+  run): tried to extend "Final venues" with a reported attendance figure for
+  all four editions, the same content-mining pattern used for every prior
+  award-history/venue addition. Held to this file's own established
+  two-independent-source bar, only the 2019 final cleared it - Wikipedia and
+  zerozero.pt both independently state 43,199. 2021, 2023 and 2025 each
+  turned up a single consistently repeated figure (31,511; 41,110; 65,852
+  respectively) but no second, genuinely independent domain that stated the
+  number outright rather than mirroring Wikipedia - left out of
+  `content/uefa-nations-league.md` rather than published on one source, per
+  the same caution this file already applies to unsourced biographical facts
+  (see `docs/ROADMAP.md`'s "Ideas not yet scoped" section on birth dates).
+  This gap is left open for a future pass with direct page-fetch access
+  (WebFetch/curl are egress-blocked in this environment for match-report
+  pages specifically, unlike the Wikipedia article summaries WebSearch can
+  synthesize) rather than assumed unresolvable:
+  - https://en.wikipedia.org/wiki/2019_UEFA_Nations_League_final
+  - https://www.zerozero.pt/jogo/2019-06-09-portugal-paises-baixos/6894430
+  - https://en.wikipedia.org/wiki/2021_UEFA_Nations_League_final
+  - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_final
+  - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
+- Final attendance re-investigation (added 2026-09-10, ninety-sixth intensive
+  run): re-attempted the three editions the ninety-fourth run's entry above
+  left open, specifically looking for a genuinely independent (non-Wikipedia-
+  mirroring) domain that states each figure outright, the exact gap that
+  entry named. Found the opposite of a resolution for 2023: RFEF's own match
+  report describes De Kuip as "a full house with 41,500 spectators," a
+  different figure from Wikipedia's 41,110 - not corroboration, a genuine
+  two-source conflict, the same "sources disagree" shape as Copa América's
+  already-excluded 2001/2007 editions. 2021 and 2025 still only ever
+  surfaced the same single repeated figure (31,511; 65,852) with UEFA.com and
+  a national federation/broadcaster site appearing in search results
+  alongside Wikipedia but never demonstrably the direct source of the number
+  itself, once search-result snippets were re-checked rather than trusting
+  the search tool's own synthesized attribution - the same
+  cannot-confirm-independence gap as before, now confirmed a second time
+  rather than merely repeated. All three stay out of
+  `content/uefa-nations-league.md`; this re-confirms the ninety-fourth run's
+  caution rather than reversing it, and additionally establishes that 2023
+  is now a genuine conflict, not just an unconfirmed single source, so a
+  future pass should not spend another cycle on 2023 specifically without a
+  new source lead that resolves the 41,110/41,500 discrepancy one way or the
+  other:
+  - https://en.wikipedia.org/wiki/2021_UEFA_Nations_League_final
+  - https://www.uefa.com/uefanationsleague/news/026e-1372278f4851-1d09f7df609b-1000--fortress-san-siro-venue-for-the-2021-uefa-nations-league-final/
+  - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_final
+  - https://rfef.es/en/noticias/match-report-spain-crowned-champions-in-a-memorable-final-decided-by-penalties-0-0-and-4-5
+  - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
+  - https://muenchen.t-online.de/region/muenchen/id_101224878/muenchen-dfb-team-bestreitet-nations-league-spiel-in-der-allianz-arena.html
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
@@ -2155,6 +2432,67 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied entirely on
     WebSearch's synthesized summaries rather than direct page loads.
+
+- Final venues, all 19 single-decisive-match editions (added 2026-09-09,
+  intensive run): extending UEFA Nations League's existing "Final venues"
+  section to Copa América, scoped to the same 19 editions that already carry
+  a Final date (the five Final playoff deciders, 13 Knockout final editions,
+  and the 2016 centenary final) - every other edition has no single-venue
+  final to record (League table standings across several cities, or a
+  two-legged Home-and-away decider). Each stadium/city verified via two
+  independent WebSearch passes; two facts corrected an initial working
+  assumption rather than confirming it - 1995's final was in Montevideo
+  (Estadio Centenario), not Paysandú, which hosted group games only; 2001's
+  final was in Bogotá (Estadio El Campín), not Barranquilla. Both corrections
+  confirmed by Wikipedia's dedicated per-edition final articles plus a
+  second, independent source each (11v11/CONMEBOL for 1995, ESPN for 2001).
+  The five pre-1960 venues (1919/1922 Estádio das Laranjeiras, 1937 Estádio
+  Gasómetro, 1949 Estádio São Januário, 1953 Estadio Nacional Lima) also each
+  cleared two independent sources despite their age - Laranjeiras and São
+  Januário are well-documented historic Rio de Janeiro venues, and Gasómetro
+  (San Lorenzo's home ground until its 1983 demolition) is well covered by
+  Argentine sports press retrospectives of the 1937 playoff.
+  - https://en.wikipedia.org/wiki/1919_South_American_Championship_play-off
+  - https://en.wikipedia.org/wiki/1922_South_American_Championship_play-off
+  - https://en.wikipedia.org/wiki/1937_South_American_Championship_play-off
+  - https://abrilacancha.com.ar/2021/07/10/copa-america-1937-la-inolvidable-final-ante-brasil/
+  - https://en.wikipedia.org/wiki/1995_Copa_Am%C3%A9rica_final
+  - https://copaamerica.com/en/news/uruguay-stays-undefeated-at-home-again-in-1995
+  - https://en.wikipedia.org/wiki/2001_Copa_Am%C3%A9rica_final
+  - https://es.wikipedia.org/wiki/Anexo:Final_de_la_Copa_Am%C3%A9rica_2001
+  - https://en.wikipedia.org/wiki/Estadio_Centenario
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied entirely on
+    WebSearch's synthesized summaries rather than direct page loads.
+- Final attendance investigation (added 2026-09-10, ninety-fourth intensive
+  run): tried to extend "Final venues" with a reported attendance figure for
+  all 14 Knockout-final-era editions (1987-2024; the five older Final
+  playoff deciders were deliberately left out of scope as an even harder
+  verification case). Held to this file's own established
+  two-independent-source bar, only two cleared it: 2011 (65,921, an exact
+  quote from CONMEBOL's own official recap article, the strongest
+  confirmation of the batch) and 2021 (6,500, a COVID-19-restricted,
+  behind-closed-doors final corroborated by multiple independent
+  contemporary news wires reporting the same restricted-crowd figure). Every
+  other edition either had a single consistently repeated figure with no
+  second independent domain confirming it directly (1987, 1993, 1995, 1997,
+  1999, 2004, 2015, 2016, 2019, 2024), or genuinely conflicting figures
+  across sources (2001: 47,000/48,600/50,699 all cited; 2007: 40,000/38,100
+  both cited) - left out of `content/copa-america.md` rather than published
+  on a single source or an unresolved conflict, the same caution this file
+  already applies to unsourced biographical facts (see `docs/ROADMAP.md`'s
+  "Ideas not yet scoped" section on birth dates). This gap is left open for
+  a future pass with direct page-fetch access (WebFetch/curl are
+  egress-blocked in this environment for match-report pages specifically,
+  unlike the Wikipedia article summaries WebSearch can synthesize) rather
+  than assumed unresolvable - a good next attempt would specifically target
+  the official CONMEBOL recap articles and RSSSF tables this pass could only
+  see indexed, not fetch, for 1987, 1993, 2004, 2016 and 2019:
+  - https://en.wikipedia.org/wiki/2011_Copa_Am%C3%A9rica_final
+  - https://copaamerica.com/en/news/uruguay-become-champions-during-argentina-2011
+  - https://en.wikipedia.org/wiki/2021_Copa_Am%C3%A9rica_final
+  - https://news.cgtn.com/news/2021-07-10/Maracana-Stadium-opens-to-10-of-fans-for-Copa-America-final-11MGbAUmCn6/index.html
+  - https://www.outlookindia.com/website/story/sports-news-copa-america-final-rio-de-janeiro-officials-open-10-maracana-stadium-for-argentina-brazil-title-clash/387697
 
 ## Ballon d'Or
 

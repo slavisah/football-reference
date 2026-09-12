@@ -314,14 +314,17 @@ const sortMinWidth = selectMinWidthRem(sortOptions.map((option) => option.label)
                 </td>
               )}
               {storyColumn && (
-                <td data-label={storyColumn.label}>
+                <td
+                  data-label={storyColumn.label}
+                  aria-label={storyColumn.values.has(edition.year) ? undefined : `${storyColumn.label}: —`}
+                >
                   {storyColumn.values.has(edition.year) ? (
                     <details class="story-reveal">
                       <summary>{storySummaryLabel}</summary>
                       <p set:html={renderInlineMarkdown(storyColumn.values.get(edition.year)!)} />
                     </details>
                   ) : (
-                    <span aria-label={`${storyColumn.label}: —`}>—</span>
+                    '—'
                   )}
                 </td>
               )}

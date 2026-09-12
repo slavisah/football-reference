@@ -145,6 +145,29 @@ Intro.
 ${rows}
 `;
 
+// content/golden-boot.md holds both races (World Cup and EURO top scorers)
+// as two tables in one file, each under its own top-level heading - loading
+// the 'golden-boot' id twice with a different editionsHeading (as
+// loadHomeCompetitions(), players/[slug].astro and competitions/golden-boot
+// all do) reads the same body twice for the two different tables, so the fake
+// body needs both headings present, matching the real file's shape.
+const goldenBootBody = (worldCupRow: string, euroRow: string): string => `# Test
+
+Intro.
+
+# FIFA World Cup top scorers
+
+| Year | Winner |
+|---|---|
+${worldCupRow}
+
+# UEFA EURO top scorers
+
+| Year | Winner |
+|---|---|
+${euroRow}
+`;
+
 describe('loadHomeCompetitions', () => {
   it('loads all six competitions by their real content id, each under its own editionsHeading, into the matching key', async () => {
     mockGetEntry.mockImplementation(async (_collection: string, id: string) => {
@@ -154,7 +177,10 @@ describe('loadHomeCompetitions', () => {
         'copa-america': table('Champions timeline', '| 2024 | CopaWinner |'),
         'uefa-nations-league': table('Finals', '| 2024–25 | NationsLeagueWinner |'),
         'ballon-dor': table('Winners', '| 2025 | BallonDorWinner |'),
-        'golden-boot': table('FIFA World Cup top scorers', '| 2026 | GoldenBootWinner |'),
+        'golden-boot': goldenBootBody(
+          '| 2026 | GoldenBootWorldCupWinner |',
+          '| 2024 | GoldenBootEuroWinner |',
+        ),
       };
       const body = bodies[id];
       if (!body) throw new Error(`Unexpected content id requested: "${id}"`);
@@ -168,7 +194,32 @@ describe('loadHomeCompetitions', () => {
     expect(data.copaAmerica.champions[0]?.displayName).toBe('CopaWinner');
     expect(data.nationsLeague.champions[0]?.displayName).toBe('NationsLeagueWinner');
     expect(data.ballonDor.champions[0]?.displayName).toBe('BallonDorWinner');
-    expect(data.goldenBoot.champions[0]?.displayName).toBe('GoldenBootWinner');
+  });
+
+  it('combines World Cup and EURO Golden Boot editions into one count, without inventing a merged champion', async () => {
+    mockGetEntry.mockImplementation(async (_collection: string, id: string) => {
+      const bodies: Record<string, string> = {
+        'fifa-world-cup': table('Editions', '| 2022 | A |'),
+        'uefa-euro': table('Editions', '| 2024 | A |'),
+        'copa-america': table('Champions timeline', '| 2024 | A |'),
+        'uefa-nations-league': table('Finals', '| 2024–25 | A |'),
+        'ballon-dor': table('Winners', '| 2025 | A |'),
+        'golden-boot': goldenBootBody(
+          '| 2022 | WorldCupWinner |\n| 2026 | WorldCupWinner |',
+          '| 2024 | EuroWinner |',
+        ),
+      };
+      return { data: { title: id, lastReviewed: '2026-01-01', status: 'verified' }, body: bodies[id] };
+    });
+
+    const data = await loadHomeCompetitions();
+
+    // 2 World Cup editions + 1 EURO edition = 3, not the World-Cup-only 2 the
+    // old single-load version would have reported.
+    expect(data.goldenBoot.editions).toHaveLength(3);
+    // No merged "Most awards" ranking, even though WorldCupWinner alone would
+    // top a combined tally - see loadHomeCompetitions()'s own comment on why.
+    expect(data.goldenBoot.champions).toEqual([]);
   });
 
   it('passes allowDuplicateYears for Copa América only, matching its two same-year 1959 South American Championships', async () => {
@@ -182,7 +233,7 @@ describe('loadHomeCompetitions', () => {
         'uefa-euro': table('Editions', '| 2024 | A |'),
         'uefa-nations-league': table('Finals', '| 2024–25 | A |'),
         'ballon-dor': table('Winners', '| 2025 | A |'),
-        'golden-boot': table('FIFA World Cup top scorers', '| 2026 | A |'),
+        'golden-boot': goldenBootBody('| 2026 | A |', '| 2024 | A |'),
       };
       return { data: { title: id, lastReviewed: '2026-01-01', status: 'verified' }, body: bodies[id] };
     });

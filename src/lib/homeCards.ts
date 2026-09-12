@@ -16,34 +16,63 @@ export type HomeCompetitions = {
 };
 
 export async function loadHomeCompetitions(): Promise<HomeCompetitions> {
-  const [worldCup, euro, copaAmerica, nationsLeague, ballonDor, goldenBoot] =
-    await Promise.all([
-      loadCompetition('fifa-world-cup', {
-        editionsHeading: 'Editions',
-        sourcesHeading: 'FIFA World Cup',
-      }),
-      loadCompetition('uefa-euro', {
-        editionsHeading: 'Editions',
-        sourcesHeading: 'UEFA EURO',
-      }),
-      loadCompetition('copa-america', {
-        editionsHeading: 'Champions timeline',
-        sourcesHeading: 'Copa América',
-        allowDuplicateYears: ['1959'],
-      }),
-      loadCompetition('uefa-nations-league', {
-        editionsHeading: 'Finals',
-        sourcesHeading: 'UEFA Nations League',
-      }),
-      loadCompetition('ballon-dor', {
-        editionsHeading: 'Winners',
-        sourcesHeading: "Ballon d'Or",
-      }),
-      loadCompetition('golden-boot', {
-        editionsHeading: 'FIFA World Cup top scorers',
-        sourcesHeading: 'FIFA World Cup',
-      }),
-    ]);
+  const [
+    worldCup,
+    euro,
+    copaAmerica,
+    nationsLeague,
+    ballonDor,
+    goldenBootWorldCup,
+    goldenBootEuro,
+  ] = await Promise.all([
+    loadCompetition('fifa-world-cup', {
+      editionsHeading: 'Editions',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('uefa-euro', {
+      editionsHeading: 'Editions',
+      sourcesHeading: 'UEFA EURO',
+    }),
+    loadCompetition('copa-america', {
+      editionsHeading: 'Champions timeline',
+      sourcesHeading: 'Copa América',
+      allowDuplicateYears: ['1959'],
+    }),
+    loadCompetition('uefa-nations-league', {
+      editionsHeading: 'Finals',
+      sourcesHeading: 'UEFA Nations League',
+    }),
+    loadCompetition('ballon-dor', {
+      editionsHeading: 'Winners',
+      sourcesHeading: "Ballon d'Or",
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'FIFA World Cup top scorers',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'UEFA EURO top scorers',
+      sourcesHeading: 'UEFA EURO',
+    }),
+  ]);
+
+  // The card's own blurb ("World Cup and EURO top-scorer awards, tournament
+  // by tournament") and its href (/competitions/golden-boot) cover both
+  // races, so its edition count needs to as well - this used to only load
+  // the World Cup table, undercounting 23 editions instead of the true 40
+  // (23 World Cup + 17 EURO). `champions` stays deliberately empty rather
+  // than a merge of the two rankings: competitions/golden-boot.astro keeps
+  // World Cup and EURO as two separate ChampionsSummary widgets/ItemLists on
+  // purpose (see that file's own comment) precisely so a combined "Most
+  // awards" leader is never invented, so this card drops the "Most awards"
+  // stat row entirely instead (buildHomeCards() already renders nothing
+  // there when topChampion is undefined).
+  const goldenBoot: CompetitionData = {
+    ...goldenBootWorldCup,
+    editions: [...goldenBootWorldCup.editions, ...goldenBootEuro.editions],
+    champions: [],
+  };
+
   return { worldCup, euro, copaAmerica, nationsLeague, ballonDor, goldenBoot };
 }
 

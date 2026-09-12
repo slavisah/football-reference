@@ -113,6 +113,7 @@ test.describe('Croatian Nations League edition page', () => {
       'href',
       /\/hr\/teams\/spain\/?$/,
     );
+    await expect(page.locator('.references__note')).toContainText('Prednost imaju primarni izvori');
   });
 
   test('the Croatian competition table links each season to the Croatian edition page', async ({ page }) => {
