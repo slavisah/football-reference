@@ -4210,3 +4210,34 @@ back clean:
   future pass's best bet is a genuinely different quality angle
   (accessibility, performance, SEO) or a fresh source lead on any of the
   open attendance/captain gaps above.
+- **SEO: meta descriptions built from editorial data could exceed 160
+  characters; now clamped sitewide**: closed 2026-09-12 (hundred-and-seventh
+  intensive run) - a standing health check first (all clean, matching the
+  hundred-sixth run's baseline). The twenty-fourth run's own SEO length audit
+  (2026-08-28) only scanned literal `<BaseLayout description="...">` strings
+  in page source, which can't see a description *built* at build time from
+  editorial data - scanning the built `dist/` output directly found 63 pages
+  over 160 characters (up to 235), all in the golden-boot/euro,
+  golden-boot/world-cup, euro and world-cup edition-page families (long
+  country names or, worse, a multi-way Golden Boot tie listing every
+  co-winner) plus the `teams/germany` profile pages. Fixed centrally: a new
+  `truncateDescription()` (`src/lib/text.ts`, word-boundary-safe, appends an
+  ellipsis) wired into `BaseLayout.astro` once, covering
+  `<meta name="description">`/`og:description`/`twitter:description` for
+  every current and future page rather than patching each of the ~14
+  per-family templates that build one. `check:meta` now also enforces the
+  160-character limit against built HTML as a permanent regression guard
+  (plus a new `decodeAttributeEntities()` fix so an escaped `&`/`"` doesn't
+  inflate the measured length past what a reader actually sees). 11 new unit
+  tests (627/627 total). `check:pdfs` reverified clean with no regeneration
+  needed (meta tags aren't part of either PDF's printed output). Full
+  standing health check clean: `pnpm lint` (0/0/0), `pnpm test` (627/627),
+  `pnpm build` (711 pages), all 14 `check:*` scripts, the 37-page
+  `check:lighthouse` audit (all 1.00), and a full cold-start `pnpm test:e2e`.
+  See `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
+  future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025, the `long-title` brand-suffix decision),
+  plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed Nations League figures, and EURO 1996/2020's/World Cup
+  1930/1950's excluded attendance figures.

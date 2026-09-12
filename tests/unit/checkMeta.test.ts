@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   extractTitle,
   extractMetaDescription,
+  decodeAttributeEntities,
   isNoindexHtml,
   localeOf,
   findDuplicates,
@@ -38,6 +39,39 @@ describe('extractMetaDescription', () => {
 
   it('returns null for an empty meta description', () => {
     expect(extractMetaDescription('<meta name="description" content="">')).toBeNull();
+  });
+
+  it('decodes HTML entities so the returned length reflects the real text', () => {
+    expect(
+      extractMetaDescription(
+        '<meta name="description" content="Bosnia &amp; Herzegovina&#39;s &quot;golden&quot; generation">',
+      ),
+    ).toBe('Bosnia & Herzegovina&#39;s "golden" generation');
+  });
+});
+
+describe('MAX_DESCRIPTION_LENGTH enforcement (via extractMetaDescription + decode)', () => {
+  it('an entity-heavy description decodes to a shorter, accurate character count', () => {
+    // "&amp;" (5 chars) decodes to "&" (1 char): a description sitting right
+    // at the escaped-length boundary must not be flagged as over budget just
+    // because its raw HTML attribute text is longer than what actually
+    // renders in a search result or link preview.
+    const raw = `${'a'.repeat(150)} &amp; more`;
+    const decoded = extractMetaDescription(`<meta name="description" content="${raw}">`);
+    expect(decoded.length).toBeLessThan(raw.length);
+    expect(decoded).toBe(`${'a'.repeat(150)} & more`);
+  });
+});
+
+describe('decodeAttributeEntities', () => {
+  it('decodes &amp;, &lt;, &gt; and &quot;', () => {
+    expect(decodeAttributeEntities('A &amp; B &lt;tag&gt; &quot;quoted&quot;')).toBe(
+      'A & B <tag> "quoted"',
+    );
+  });
+
+  it('leaves text with no entities unchanged', () => {
+    expect(decodeAttributeEntities('Plain text.')).toBe('Plain text.');
   });
 });
 

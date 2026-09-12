@@ -6,6 +6,7 @@ import Breadcrumb from '../components/Breadcrumb.astro';
 import { withBase } from '../lib/url';
 import { t, type Locale } from '../lib/i18n';
 import { buildBreadcrumbList, buildWebSiteJsonLd, withInLanguage, type JsonLdObject } from '../lib/jsonLd';
+import { truncateDescription } from '../lib/text';
 
 interface Props {
   title: string;
@@ -69,6 +70,14 @@ const alternateURL = alternateHref
 // docs/PROJECT_STATUS.md's 2026-08-01 SEO-essentials entry, which deferred a
 // dedicated image at the time.
 const ogImageURL = new URL(withBase('/og-image.png'), siteOrigin);
+// Most callers pass a short, already-in-budget literal string, but a
+// per-edition page builds this from editorial data (champion/runner-up
+// names, a Golden Boot tie's full co-winner list) that can push it past the
+// ~160-character guideline search engines and link-preview surfaces
+// truncate around - see src/lib/text.ts's doc comment for how that gap was
+// found. Clamping once here, rather than in each such page, covers every
+// current and future caller.
+const metaDescription = description ? truncateDescription(description) : undefined;
 const ogLocale = locale === 'hr' ? 'hr_HR' : 'en_US';
 const ogLocaleAlternate = locale === 'hr' ? 'en_US' : 'hr_HR';
 
@@ -138,7 +147,7 @@ const structuredData = withInLanguage(
     />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
-    {description && <meta name="description" content={description} />}
+    {metaDescription && <meta name="description" content={metaDescription} />}
     <meta name="generator" content={Astro.generator} />
     <link rel="canonical" href={canonicalURL} />
     {noindex && <meta name="robots" content="noindex" />}
@@ -170,7 +179,7 @@ const structuredData = withInLanguage(
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="The Ultimate Football Reference" />
     <meta property="og:title" content={fullTitle} />
-    {description && <meta property="og:description" content={description} />}
+    {metaDescription && <meta property="og:description" content={metaDescription} />}
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:locale" content={ogLocale} />
     {alternateHref && <meta property="og:locale:alternate" content={ogLocaleAlternate} />}
@@ -179,7 +188,7 @@ const structuredData = withInLanguage(
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
-    {description && <meta name="twitter:description" content={description} />}
+    {metaDescription && <meta name="twitter:description" content={metaDescription} />}
     <meta name="twitter:image" content={ogImageURL} />
 
     {/* schema.org structured data: an automatic Home > page BreadcrumbList (or,
