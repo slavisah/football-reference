@@ -16254,6 +16254,16 @@ Copa América captains.
   source - World Cup 1930/1950, EURO 1996/2020, and Nations League
   2021/2023/2025 - see each run's own entry below for exactly why each was
   excluded.
+- `BaseLayout.astro` clamps every page's `description` prop to 160
+  characters (`truncateDescription()`, `src/lib/text.ts`) before using it
+  for `<meta name="description">`/`og:description`/`twitter:description` -
+  see the 2026-09-12 "SEO: meta descriptions built from editorial data"
+  entry below. A description over that limit is cut at the last word
+  boundary and gets an ellipsis appended; `check:meta` enforces the same
+  160-character limit against the built HTML as a permanent regression
+  guard. JSON-LD is unaffected - `buildEditionSportsEvent()` and friends
+  (`src/lib/jsonLd.ts`) build their own `description`/`competitor` fields
+  independently of this prop.
 
 ### Notes jump nav: an in-page "Jump to a section" link list for every long note-card list - closed 2026-09-04 (sixty-third intensive run)
 
@@ -20973,6 +20983,488 @@ best bet is extending the same method to those seven per-family
 edition-page route trees (a different shape: many generated pages per
 family, sharing one `[year].astro` template, rather than one static page
 per language), or a genuinely different quality angle.
+
+### Croatian Copa América edition pages' `<h1>`/`<title>` word-order mismatch - closed 2026-09-12 (hundred-and-sixth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` (still only
+the blocked `typescript` 7 entry), `pnpm lint` (0/0/0), `pnpm test`
+(616/616 unit), `pnpm build` (711 pages), all clean, matching the
+hundred-and-fifth run's baseline.
+
+Per the hundred-and-fifth run's own closing suggestion, extended the "read
+a shared component plus every one of its call sites end to end" method to
+the last unswept page shape on the site: the seven per-family
+edition-page `[year].astro` route trees (`competitions/world-cup`,
+`competitions/euro`, `competitions/copa-america`,
+`competitions/nations-league`, `competitions/ballon-dor`,
+`competitions/golden-boot/world-cup`, `competitions/golden-boot/euro`, each
+with its `hr/` sibling). Unlike the nine page-pairs the previous run swept,
+these all share one component (`EditionView.astro`/`References.astro`)
+rather than each having its own bespoke markup, so the check here was
+threefold: (1) diff every `EditionView`/`References` prop passed at each
+Croatian call site against the same six props' English defaults and
+against its six sibling Croatian pages, (2) cross-check every page's
+`HEADER_LABELS` map against that competition's actual source-table column
+headers (`content/*.md`'s Editions/Winners table), and (3) - since
+`EditionView`'s `headingTemplate`/`glanceHeading` and each page's own
+`<title>`/meta description are two independent hand-written strings that
+must agree on word order - diff each page's `<title>` word order against
+its own `headingTemplate`'s word order, and against the same two strings
+on all six sibling competitions.
+
+The first two checks came back clean: every Croatian `HEADER_LABELS` map
+covers exactly the columns its competition's source table has (World Cup's
+9-column table, EURO's 9, Copa América's 8, Nations League's 8, Ballon
+d'Or's 4, both Golden Boot races' 4), and every `EditionView`/`References`
+translatable prop the hundred-third/hundred-fourth runs had already fixed
+(`noteText`, `topScorerLabel`, `pdfLabel`, `locale`, all seven `References`
+props) is present everywhere it needs to be.
+
+The third check found one real, live bug: five of the six team-competition
+Croatian pages (World Cup, EURO, Nations League, Ballon d'Or, and both
+Golden Boot races - i.e. every one except Copa América) put the
+competition's name first and the year last in both their `<title>` and
+their `headingTemplate`/`glanceHeading` ("FIFA Svjetsko prvenstvo 2026.",
+"Zlatna lopta 2024.", "Final Four UEFA Lige nacija 2024." - the natural
+Croatian phrasing, year as a trailing date-like element with a period).
+Copa América's Croatian page's `<title>` correctly followed this same
+convention (`` `Copa América ${yearLabel}` ``), but its
+`headingTemplate`/`glanceHeading` had been left at the English page's
+year-first order (`` `${yearLabel} {competition}` ``/`` `${yearLabel} na
+prvi pogled` ``, copied from `src/pages/competitions/copa-america/
+[year].astro` rather than translated), so the visible `<h1>` read "1959.
+(Argentina) Copa América" - year and competition in the opposite order
+from the same page's own `<title>` ("Copa América 1959. (Argentina)"), and
+the only one of the six Croatian edition-page families whose `<h1>` and
+`<title>` disagreed on word order. The visually-hidden glance heading had
+the matching issue plus a smaller gap: it also dropped the "Izdanje"
+("Edition") lead-in word every sibling page's glance heading has
+("Izdanje {year}. na prvi pogled"), reading just "1959. na prvi pogled"
+instead.
+
+Fixed both in `src/pages/hr/competitions/copa-america/[year].astro`:
+`headingTemplate={`{competition} ${yearLabel}`}` and
+`glanceHeading={`Izdanje ${yearLabel} na prvi pogled`}`, matching the
+other five families' word order and the "Izdanje" lead-in. Verified
+against the built `dist/hr/competitions/copa-america/1959-argentina/
+index.html` and `.../2024/index.html` output: `<h1>` now reads "Copa
+América 1959. (Argentina)" and "Copa América 2024." respectively, both
+matching their pages' `<title>`, and the glance heading reads "Izdanje
+1959. (Argentina) na prvi pogled".
+
+One e2e assertion had encoded the old (wrong) order -
+`tests/e2e/copa-america-edition-page.spec.ts`'s "renders translated chrome
+with the host disambiguator carried through" test asserted `<h1>` text
+`'1959. (Argentina) Copa América'`; updated to `'Copa América 1959.
+(Argentina)'`. No other test referenced the old order (checked every
+`h1`/`glanceHeading`/"na prvi pogled" reference across `tests/`). No
+content file touched (this is a presentation-layer template string on a
+page component, not editorial content), so `pnpm test` stays at 616/616 -
+no new unit-testable logic, same as the hundred-fifth run's equivalent
+presentation-only fix.
+
+`check:pdfs` did correctly flag the affected Croatian Copa América PDFs as
+stale immediately after the fix (52 of them: every edition year plus both
+disambiguated 1959 pages), the hundred-fourth run's own "check the
+rendered page, not just whether a content file changed" correction paying
+off for the third run running. Regenerated with `pnpm build:pdfs`
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) and reverified
+`check:pdfs` clean (700/700).
+
+Full standing health check re-run after the fix: `pnpm lint` (0/0/0),
+`pnpm test` (616/616), `pnpm build` (711 pages), all 14 `check:*` scripts
+clean (`check:links`/`check:sitemap`/`check:precache`/`check:perf`/
+`check:pdfs`/`check:jsonld`/`check:meta`/`check:html`/`check:spelling`/
+`check:award-tallies`/`check:i18n-notes`/`check:reflow`/`check:text-zoom`/
+`check:print-width`, the three browser-based sweeps again needing this
+environment's `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback),
+plus a full cold-start `pnpm test:e2e`.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League
+2023 attendance conflict, 2021/2025's still-unconfirmed Nations League
+figures, and World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+figures. The "read end to end" prop-diff method has now covered every
+EN/HR page shape on the site - every page-pair outside the per-edition
+route trees (hundred-fifth run) and, this run, all seven per-edition
+`[year].astro` route trees themselves. A future run's best bet is a
+genuinely different quality angle (accessibility, performance, SEO) or a
+fresh source lead on one of the open attendance/captain gaps above.
+
+### SEO: meta descriptions built from editorial data could exceed the 160-character guideline; now clamped sitewide - closed 2026-09-12 (hundred-and-seventh intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` (still only
+the blocked `typescript` 7 entry), `pnpm lint` (0/0/0), `pnpm test`
+(616/616 unit), `pnpm build` (711 pages), `check:links`/`check:sitemap`/
+`check:precache`/`check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/
+`check:html`/`check:spelling`/`check:award-tallies`/`check:i18n-notes`
+all clean, `pnpm dlx knip --no-config-hints` unchanged (the one confirmed
+false positive) - matching the hundred-sixth run's baseline.
+
+The hundred-sixth run's own closing note flagged the "read end to end"
+prop-diff method as having covered every page shape, with a genuinely
+different quality angle as the best next bet. The twenty-fourth intensive
+run (2026-08-28) had already run one SEO angle - a source-code scan of
+every literal `<BaseLayout description="...">` string against the
+~50-160-character guideline search engines and link-preview surfaces
+truncate around - and trimmed the 13 static descriptions that were too
+long. That scan had a structural blind spot it never surfaced: a
+per-edition page doesn't pass a literal description string, it *builds*
+one at build time from editorial data (a champion/runner-up name, a
+Golden Boot tie's full list of co-winners), so no static scan of the
+`.astro` source could ever see how long the *rendered* result actually
+is. Scanning the built `dist/` output directly (a small Node script over
+every `index.html`'s `<meta name="description">`) found 63 pages over
+160 characters - up to 235 - across the golden-boot/euro,
+golden-boot/world-cup, euro and world-cup edition-page families (long
+country names inflate the World Cup/EURO template; a multi-way Golden
+Boot tie inflates the golden-boot templates far more, since every
+co-winner's name gets listed) plus both `teams/germany`/`hr/teams/germany`
+profile pages. Confirmed real by reading the underlying `.astro` files
+(`src/pages/competitions/{euro,world-cup,golden-boot/euro,golden-boot/
+world-cup}/[year].astro` and their `hr/` siblings): each builds
+`description` by joining a fixed boilerplate sentence with interpolated
+data, with nothing capping the combined length - e.g. the 1960 UEFA EURO
+Golden Boot page's 207-character description lists all five players who
+shared that year's award (Milan Galić, Dražan Jerković, Valentin Ivanov,
+François Heutte, Viktor Ponedelnik) before the fixed closing sentence.
+
+Fixed centrally rather than patching each of the ~14 per-family templates
+that build a description: added `src/lib/text.ts`'s
+`truncateDescription(text, maxLength = 160)`, which returns text
+unchanged under the limit and otherwise cuts at the last word boundary
+before it (never mid-word) and appends an ellipsis, then wired it into
+`src/layouts/BaseLayout.astro` once - `metaDescription =
+description ? truncateDescription(description) : undefined` - used for
+all three of `<meta name="description">`, `og:description` and
+`twitter:description` (the same `description` prop feeds all three, so a
+single clamp covers all three consumers and every current and future
+page that passes a `description` prop, not just the ones already found
+too long). Verified this doesn't touch structured data: `buildEditionSportsEvent()`
+(`src/lib/jsonLd.ts`) builds its own `SportsEvent.competitor`/`location`
+fields independently and never reads the page's meta `description` prop,
+so JSON-LD keeps the full, untruncated facts regardless of what the meta
+tag shows.
+
+Added a permanent regression guard rather than treating this as a
+one-time trim: extended `check:meta` (`scripts/check-meta.mjs`) with a
+length check against the same 160-character limit, run against the
+*built* HTML the same way its existing existence/duplicate checks
+already are - this verifies the clamp actually took effect on real output
+and would catch any future page that bypasses `BaseLayout` entirely (a
+raw `<meta>` tag), not just a regression in `truncateDescription` itself.
+Doing this correctly needed one more fix: `extractMetaDescription()`
+previously returned the raw, still-HTML-escaped attribute text, so a
+description containing a literal `&` or `"` would count `&amp;`/`&quot;`
+(5 chars) instead of the one real character an actual search result or
+link preview shows - inflating the measured length past what a reader
+ever sees. Added `decodeAttributeEntities()` (decodes `&amp;`/`&lt;`/
+`&gt;`/`&quot;`, the only entities Astro's serializer emits inside a
+double-quoted attribute) and applied it in `extractMetaDescription()`
+before both the length check and the pre-existing duplicate-detection
+logic, which benefits the same way.
+
+11 new unit tests: 7 for `truncateDescription`
+(`tests/unit/text.test.ts` - unchanged-under-limit, exact-at-limit,
+word-boundary cutting including on the real 1960 Golden Boot description
+above, dangling-punctuation stripping, a custom `maxLength`, and the
+hard-cut fallback when no space exists before the limit) and 4 more for
+`check-meta.mjs`'s new `decodeAttributeEntities` plus the entity-decoding
+behavior of `extractMetaDescription` (`tests/unit/checkMeta.test.ts`).
+`pnpm test`: 627/627 (up from 616).
+
+Rebuilt and reverified: `check:meta` now reports "every description is
+within 160 characters" (0 problems, down from the 63 this run's initial
+`dist/` scan found before the fix landed). Re-checked `check:pdfs` rather
+than assuming a presentation-only, non-content change needs no PDF
+regen (the hundred-fourth run's own correction: check the *rendered
+page*, not just whether a content file changed) - stayed clean at
+700/700 with no regeneration needed, confirming meta tags aren't part of
+either PDF generation's visible/printed output, unlike the
+`References.astro`/`ChampionsSummary.astro` fixes the hundred-third/
+hundred-fifth runs had to regenerate PDFs for. No content file touched,
+so no `lastReviewed` bump was needed either.
+
+Full standing health check re-run after the fix: `pnpm lint` (0/0/0),
+`pnpm test` (627/627, 11 new), `pnpm build` (711 pages), all 14
+`check:*` scripts clean (`check:links`/`check:sitemap`/`check:precache`/
+`check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/`check:html`/
+`check:spelling`/`check:award-tallies`/`check:i18n-notes`/`check:reflow`/
+`check:text-zoom`/`check:print-width`, the three browser-based sweeps
+again needing this environment's `PW_EXECUTABLE_PATH=/opt/pw-browsers/
+chromium` fallback), the 37-page `check:lighthouse` audit (all four
+categories a perfect 1.00 on every page), and a full cold-start `pnpm
+test:e2e` - 947/947 passed (16.0 minutes). That e2e run needed a second
+attempt: the first one was started in the background concurrently with
+this same run's own `check:lighthouse` invocation, and both spin up an
+`astro preview` server on the same port - the e2e run's webServer lost
+that race and every test failed with `net::ERR_CONNECTION_REFUSED`
+against `localhost:4321` (741 of 947, confirmed from
+`test-results/.last-run.json` and one failing test's `error-context.md`
+after the first attempt's own truncated log made the scale of the
+failure look worse than it was). Not a real regression - re-run alone,
+with nothing else touching port 4321, it passed clean on the first try.
+**Correction for future runs:** never run `check:lighthouse` (or
+`check:reflow`/`check:text-zoom`/`check:print-width`) in the background
+concurrently with `pnpm test:e2e` - all of them manage their own `astro
+preview` server on the same default port, so only run one at a time; and
+don't pipe a long-running command's output through `tail` when capturing
+it to a file for later inspection - redirect with `>`/`2>&1` directly so
+a real failure's full detail (not just its last N lines) is still there
+to read afterward.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League
+2023 attendance conflict, 2021/2025's still-unconfirmed Nations League
+figures, and World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+figures. This run's own method (scanning built `dist/` output directly
+rather than page source) is itself worth remembering as a category: any
+future per-page-data-driven prop (not just `description`) could have the
+same "looks fine in the template, only wrong once real data is
+interpolated" blind spot a source-only read can't catch.
+
+### `scripts/` end-to-end audit: hardcoded overflow-tolerance literal fixed; Nations League "Team of the Tournament" backlog item resolved as not applicable - closed 2026-09-12 (hundred-and-eighth intensive run)
+
+A standing health check first: `pnpm install` (no lockfile changes), `pnpm
+outdated` (still only the blocked `typescript` 7 entry), `pnpm lint`
+(0/0/0), `pnpm test` (627/627, matching the hundred-seventh run's
+baseline), `pnpm build` (711 pages), all 14 `check:*` scripts clean
+(`check:links`/`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs`/
+`check:jsonld`/`check:meta`/`check:html`/`check:spelling`/
+`check:award-tallies`/`check:i18n-notes`/`check:reflow`/`check:text-zoom`/
+`check:print-width`, the browser-based ones needing this environment's
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback), and the 37-page
+`check:lighthouse` audit (all four categories a perfect 1.00 on every
+page).
+
+**Content angle re-attempted, still blocked, but one item resolved:** this
+environment's direct `curl`/`WebFetch` egress to `en.wikipedia.org`/
+`www.uefa.com` is still a `403` from the egress proxy, unchanged from
+every prior run. `WebSearch` (which routes through Anthropic's own
+infrastructure rather than this session's local proxy) does work here,
+so re-attempted the standing Nations League figures with it. Several
+independently worded queries per edition all converged on the same
+numbers already on record or previously found by other means (2021:
+31,511; 2023: 41,110; 2025: 65,852), but per the ninety-sixth run's own
+standard (see that entry) this still doesn't prove the figure was read
+off an independent page rather than synthesized from the same underlying
+Wikipedia text every search tool surfaces - `WebSearch` returns a
+model-written summary of snippets, not a quotable page fetch, so it can't
+clear this project's two-independent-sources bar any better than the
+ninety-sixth run's own `WebSearch` attempts did. The 2023
+41,110-vs-41,500 conflict that run found (RFEF's own match report says
+41,500) stays unresolved; all three editions stay out of
+`content/uefa-nations-league.md`.
+
+One line item did get resolved, though: `WebSearch` for a Nations League
+Finals "Team of the Tournament"/"Squad of the Tournament" turned up no
+such award in any edition, only "Player of the Tournament"/"Player of the
+Finals" (already in this file, since 2019), a "Best Young Player" given
+once (2019, Frenkie de Jong, per UEFA's own contemporaneous
+"Bernardo Silva and Frenkie de Jong win Nations League awards" article
+title) and never repeated in 2021/2023/2025 search results, and a Top
+Scorer. This backlog line has appeared in every "Left for a future pass"
+list since roughly the ninety-fourth run without ever being checked
+against whether the award exists at all; it likely doesn't for this
+competition (UEFA's Technical Study Group "Team of the Tournament"
+tradition is a World Cup/EURO/Copa América thing, not something UEFA has
+extended to the newer Nations League Finals format), so it's dropped from
+this run's "Left for a future pass" list rather than carried forward
+again. If a future run finds solid evidence the award does exist for one
+of these four editions, it should of course be added back.
+
+**Real fix found instead, via a new angle:** the "read a directory
+end-to-end, compare shared logic/constants across its files" method that
+prior runs used on `src/lib/` (ninety-sixth run onward), `src/components/`
+and every `src/pages/` shape (hundred-second through hundred-sixth runs)
+had never been pointed at `scripts/` (18 files, ~3,858 lines: the thirteen
+`check:*` scripts, `pdf-pages.mjs`, `generate-pdfs.mjs`,
+`generate-og-image.mjs`, `test-preview-server.mjs`). Ran a dedicated
+read-only audit of the whole directory. First cleared up something that
+looked like it might be a bug: `check:links` reports "Checked 715 pages",
+`check:sitemap` reports "710 sitemap entries against 715 built pages", but
+`pnpm build` itself reports "711 page(s) built" - three different numbers
+for what sounds like the same thing. All three are correct and mutually
+consistent, not a bug: 715 is every built `.html` file under `dist/`
+(`listHtmlFiles()`, duplicated identically in `check-internal-links.mjs`
+and `check-sitemap.mjs`); 711 is Astro's own count, which doesn't include
+the 4 static redirect-stub HTML files `astro.config.mjs`'s `redirects`
+block generates for `/awards/ballon-dor`/`/awards/golden-boot` (EN + HR) -
+715 minus those 4 is 711, and `check-jsonld.mjs`/`check-html-validity.mjs`
+independently arrive at the same 711 by excluding those same 4 via
+`isRedirectStubHtml()` (`check-reflow.mjs`); 710 is the sitemap's own
+count, which additionally excludes `dist/404.html` (a real Astro page, not
+a redirect stub, but marked `noindex`) - 715 minus 5 is 710.
+
+The genuine find: `check-reflow.mjs` exports `OVERFLOW_TOLERANCE_PX = 1`
+specifically so its two near-identical siblings can share one threshold,
+and its own live per-page "FAIL" line already reads the constant
+(`if (overflow > OVERFLOW_TOLERANCE_PX)`). `check-text-zoom.mjs` and
+`check-print-width.mjs` both correctly import `pagesOverflowing` from
+`check-reflow.mjs` (which itself defaults to the shared constant) for
+their final pass/fail verdict, but each independently hardcoded the same
+threshold as a bare `if (overflow > 1)` in their own live progress-log
+line instead of importing `OVERFLOW_TOLERANCE_PX` too - a real,
+previously unnoticed inconsistency between three files meant to share one
+number, in the same shape as the ninety-sixth run's `sport` field find and
+the hundred-fifth run's unit-noun leak. **Failure scenario this would have
+caused:** if a future run ever revised `OVERFLOW_TOLERANCE_PX` (plausible;
+`check-page-weight.mjs`'s own budget constant next door has already been
+revised repeatedly for exactly this kind of reason), the live "FAIL
+<page> (Npx overflow)" log line on these two scripts would keep firing for
+any page between the old and new tolerance even after the final summary
+line - now using the updated constant - stopped counting that page as a
+failure, so a human skimming the live log would see phantom failures the
+exit code and final summary silently disagree with. Fixed both files to
+import `OVERFLOW_TOLERANCE_PX` from `./check-reflow.mjs` and use it in
+place of the literal `1`. Re-ran both checks after the fix: `check:text-zoom`
+and `check:print-width` both still report all 711 pages clean, confirming
+the fix is behavior-preserving at the current tolerance value. `pnpm test`
+stayed at 627/627 (no unit test exercises these two scripts' console
+output). No content file touched and neither script is a PDF source, so no
+`check:pdfs` regeneration was needed (confirmed clean, 700/700, unchanged).
+
+**A self-inflicted repeat of the hundred-seventh run's own documented
+mistake, caught and corrected:** while re-verifying `check:text-zoom`/
+`check:print-width` after the fix, this run ran them in the background
+concurrently with a `pnpm test:e2e` cold start already in progress - the
+exact anti-pattern the hundred-seventh run's entry above explicitly warns
+against ("never run `check:reflow`/`check:text-zoom`/`check:print-width`
+... concurrently with `pnpm test:e2e`"), and separately piped that same
+`test:e2e` run through `tail` while capturing it to a file, the second
+explicitly-warned-against mistake from that same entry. The result was
+identical to what that entry predicts: the e2e run's `astro preview`
+webServer lost the port-4321 race and 844 of 947 tests failed with
+`ERR_CONNECTION_REFUSED`-shaped failures, and the truncated `tail`-piped
+log only showed the last 40 lines, hiding the real scale until
+`test-results/.last-run.json` was checked directly. Not a real
+regression - re-run alone, with output redirected straight to a file
+(`> file 2>&1`, no `tail`) and nothing else touching port 4321, this
+document is being written while that clean re-run is still in progress;
+see the next entry (or this same entry's own follow-up note, if the
+re-run had already finished by the time of this writing) for the final
+count. **Correction for future runs, restated because it was ignored
+once already:** treat "nothing else touching port 4321" as a hard
+precondition to check (`ps aux | grep -E "astro preview|playwright.*cli.js
+test"`) before starting any of `check:lighthouse`/`check:reflow`/
+`check:text-zoom`/`check:print-width`/`pnpm test:e2e`, not just something
+to remember in the abstract - and always redirect a long-running
+background command's output directly to a file, never through `tail`,
+so a real failure's full log is inspectable afterward rather than only
+its last N lines.
+
+Full standing health check: `pnpm lint` (0/0/0), `pnpm test` (627/627),
+`pnpm build` (711 pages), `check:text-zoom`/`check:print-width` (711/711
+each, post-fix), and this run's earlier pre-fix baseline pass of the
+remaining twelve `check:*` scripts plus `check:lighthouse` (37/37 pages,
+all four categories 1.00 - unaffected by this run's fix, not re-run
+post-fix). The cold-start `pnpm test:e2e` confirms the first attempt's 844
+failures were exactly the port-collision artifact diagnosed above and not
+a code regression: re-run alone immediately afterward, with output
+redirected straight to a file and nothing else touching port 4321, it
+passed clean at **947/947** (16.3 minutes) - identical to the
+hundred-seventh run's own baseline count.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League
+2023 attendance conflict, 2021/2025's still-unconfirmed Nations League
+figures, and World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+figures. The directory-level "read end to end" method has now covered
+every `src/` subtree and `scripts/`; `tests/` itself (not yet swept this
+way) is the one remaining large source directory if a future run wants to
+extend the same method once more.
+
+### `tests/` end-to-end audit: `print-styles.spec.ts` re-derived a shared print-width constant instead of importing it - closed 2026-09-12 (hundred-and-ninth intensive run)
+
+A standing health check first: `pnpm install` (no lockfile changes; the
+container's `node_modules` had to be reinstalled from scratch this run -
+`pnpm lint` (0/0/0), `pnpm test` (627/627, matching the hundred-eighth
+run's baseline), `pnpm build` (711 pages), and the full set of `check:*`
+scripts clean (`check:links`/`check:sitemap`/`check:precache`/
+`check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/`check:html`/
+`check:award-tallies`/`check:i18n-notes`/`check:reflow`/`check:text-zoom`/
+`check:print-width`, the last three needing this environment's
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback).
+
+**Real fix found via the last remaining directory:** the hundred-eighth
+run's own closing note named `tests/` as the one large source directory
+the "read a directory end-to-end, compare shared logic/constants across
+its files" method (already applied to `src/lib/`, `src/components/`,
+every `src/pages/` shape, and `scripts/`) had never covered. Delegated a
+dedicated read-only audit of all 47 files (27 `tests/unit/*.test.ts`, 19
+`tests/e2e/*.spec.ts`, plus the shared `tests/e2e/menu.ts` helper,
+~16,435 lines total).
+
+The audit first cleared two plausible-looking candidates as not bugs:
+every one of the six near-identical per-family Croatian edition-page
+`<h1>`/`<title>` word-order assertions (World Cup, EURO, Copa América,
+Ballon d'Or, both Golden Boot races, Nations League) already consistently
+puts the competition name first - the hundred-sixth run's fix was the
+last holdout and it's already reflected in
+`copa-america-edition-page.spec.ts`, so this exact bug class (calibration
+example for the audit) is fully closed, not a live gap. Likewise, every
+e2e spec that drives a header-drawer control (`#theme-toggle`,
+`a.lang-switch`, `#team-search-input`, `#player-search-input`) across all
+19 spec files is already preceded by `openMenu(page)` per AGENTS.md's own
+rule - no violation found.
+
+The genuine find: `scripts/check-print-width.mjs` exports
+`PRINT_CONTENT_WIDTH_PX = Math.round((273 * 96) / 25.4)` (~1032px, the A4
+landscape usable content width after `scripts/generate-pdfs.mjs`'s
+`@page` margins) specifically so other files can share the one number,
+and `tests/unit/checkPrintWidth.test.ts` correctly imports it to pin the
+value. But `tests/e2e/print-styles.spec.ts` never imported it - it
+independently re-typed the identical formula as its own local
+`const PRINT_CONTENT_WIDTH_PX = Math.round((273 * 96) / 25.4)` (line 405)
+and used that copy to size the Playwright viewport for its 18-page "wide
+tables fit the printable page" sweep. The script's own doc comment even
+already described the e2e spec's copy as an established fact ("...that
+`tests/e2e/print-styles.spec.ts`'s `PRINT_CONTENT_WIDTH_PX` already
+uses...") rather than flagging it as duplication to remove - the same
+"shared constant hardcoded a second time" shape as the hundred-eighth
+run's `OVERFLOW_TOLERANCE_PX` find, just crossing a script/spec,
+`.mjs`/`.ts` boundary instead of two sibling scripts. **Failure scenario
+this would have caused:** if `generate-pdfs.mjs`'s `@page` geometry ever
+changed, a future run updating `check-print-width.mjs`'s exported
+constant (and its own unit test) would have no reason to notice this
+spec's independent copy 340+ lines into a different file - the "wide
+tables" sweep would keep silently testing against the *old* printable
+width instead of failing loudly, the opposite of what a page-width
+regression test exists to do.
+
+Fixed by importing `PRINT_CONTENT_WIDTH_PX` from
+`../../scripts/check-print-width.mjs` in `print-styles.spec.ts` instead of
+re-deriving it, the same way the unit test already imports it
+successfully across the same `.mjs`/`.ts` boundary. Updated the file's own
+comment to document the import instead of the formula. Verified with a
+full run of `print-styles.spec.ts` alone (143/143 passed, including all
+18 "wide tables" assertions at the same 1032px width as before - a
+behavior-preserving fix at the current geometry) and a full cold-start
+`pnpm test:e2e`.
+
+No content file touched and this fix isn't a PDF source, so `check:pdfs`
+needed no regeneration (confirmed unchanged). `pnpm test` stayed at
+627/627 (no unit test exercises this e2e spec).
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League
+2023 attendance conflict, 2021/2025's still-unconfirmed Nations League
+figures, and World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+figures. The directory-level "read end to end" method has now covered
+every `src/` subtree, `scripts/`, and `tests/` - every large source
+directory on the site has been swept at least once this way. A future
+run's best bet is either a fresh source lead on the open attendance/
+brand-suffix items above, or a second pass over an already-swept
+directory with a genuinely different lens (the method has so far looked
+for shared-constant drift and stale word-order/text assumptions; a future
+pass could instead look for, e.g., duplicated test fixtures or
+assertions that no longer match their own describe-block's stated intent).
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

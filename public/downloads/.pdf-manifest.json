@@ -6602,7 +6602,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2024-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6618,7 +6618,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2021": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6634,7 +6634,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2021-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6650,7 +6650,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2019": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6666,7 +6666,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2019-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6682,7 +6682,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2016": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6698,7 +6698,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2016-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6714,7 +6714,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2015": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6730,7 +6730,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2015-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6746,7 +6746,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2011": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6762,7 +6762,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2011-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6778,7 +6778,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2007": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6794,7 +6794,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2007-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6810,7 +6810,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2004": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6826,7 +6826,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2004-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6842,7 +6842,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2001": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6858,7 +6858,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-2001-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6874,7 +6874,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1999": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6890,7 +6890,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1999-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6906,7 +6906,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1997": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6922,7 +6922,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1997-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6938,7 +6938,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1995": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6954,7 +6954,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1995-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6970,7 +6970,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1993": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -6986,7 +6986,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1993-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7002,7 +7002,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1991": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7018,7 +7018,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1991-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7034,7 +7034,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1989": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7050,7 +7050,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1989-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7066,7 +7066,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1987": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7082,7 +7082,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1987-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7098,7 +7098,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1983": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7114,7 +7114,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1983-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7130,7 +7130,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1979": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7146,7 +7146,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1979-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7162,7 +7162,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1975": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7178,7 +7178,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1975-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7194,7 +7194,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1967": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7210,7 +7210,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1967-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7226,7 +7226,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1963": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7242,7 +7242,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1963-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7258,7 +7258,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1959-ecuador": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7274,7 +7274,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1959-ecuador-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7290,7 +7290,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1959-argentina": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7306,7 +7306,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1959-argentina-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7322,7 +7322,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1957": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7338,7 +7338,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1957-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7354,7 +7354,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1956": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7370,7 +7370,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1956-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7386,7 +7386,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1955": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7402,7 +7402,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1955-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7418,7 +7418,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1953": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7434,7 +7434,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1953-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7450,7 +7450,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1949": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7466,7 +7466,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1949-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7482,7 +7482,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1947": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7498,7 +7498,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1947-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7514,7 +7514,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1946": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7530,7 +7530,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1946-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7546,7 +7546,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1945": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7562,7 +7562,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1945-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7578,7 +7578,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1942": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7594,7 +7594,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1942-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7610,7 +7610,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1941": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7626,7 +7626,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1941-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7642,7 +7642,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1939": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7658,7 +7658,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1939-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7674,7 +7674,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1937": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7690,7 +7690,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1937-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7706,7 +7706,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1935": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7722,7 +7722,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1935-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7738,7 +7738,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1929": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7754,7 +7754,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1929-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7770,7 +7770,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1927": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7786,7 +7786,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1927-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7802,7 +7802,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1926": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7818,7 +7818,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1926-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7834,7 +7834,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1925": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7850,7 +7850,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1925-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7866,7 +7866,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1924": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7882,7 +7882,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1924-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7898,7 +7898,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1923": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7914,7 +7914,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1923-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7930,7 +7930,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1922": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7946,7 +7946,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1922-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7962,7 +7962,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1921": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7978,7 +7978,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1921-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -7994,7 +7994,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1920": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -8010,7 +8010,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1920-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -8026,7 +8026,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1919": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -8042,7 +8042,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1919-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -8058,7 +8058,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1917": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -8074,7 +8074,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1917-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -8090,7 +8090,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1916": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -8106,7 +8106,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-copa-america-1916-hr": {
     "content/copa-america.md": "e2a3f2b155e762a70c001a4f7543ae0f65bc682995e4daf3712bfcb74927db50",
@@ -8122,7 +8122,7 @@
     "src/components/EditionView.astro": "38040955e76bc863a991ea279307a814eb49289b22ab9595b87432026de54148",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/pages/competitions/copa-america/[year].astro": "3ddbb0d70bc3e7f6d6c27d4de79d8497b6571829a9a9b09e7befaf5b988c0ffb",
-    "src/pages/hr/competitions/copa-america/[year].astro": "8f07acd62fef7233c7f7acfba1a46169052cf8d7cd187335f7555c9331a53591"
+    "src/pages/hr/competitions/copa-america/[year].astro": "e9d3e6519a319d9083b035ec9bde2e1270d1fc54487e3f6f9098726cef62f8c9"
   },
   "edition-ballon-dor-2025": {
     "content/ballon-dor.md": "f756b67123d4d720e5c1256f40fcae92f371f944bcbd8bbff3d32064c76acafb",

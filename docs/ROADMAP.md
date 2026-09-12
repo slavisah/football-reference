@@ -4159,3 +4159,179 @@ back clean:
   could extend the same method to the seven per-family edition-page route
   trees (a different shape: many generated pages per family rather than one
   static page), or pick a genuinely different quality angle.
+- **Croatian Copa América edition pages: `<h1>`/`<title>` word-order
+  mismatch**: closed 2026-09-12 (hundred-and-sixth intensive run) - a
+  standing health check first (all clean, matching the hundred-and-fifth
+  run's baseline). Per the hundred-and-fifth run's own suggestion, extended
+  the "read a shared component plus every one of its call sites end to end"
+  method to the last unswept page shape: the seven per-family edition-page
+  `[year].astro` route trees (World Cup, EURO, Copa América, Nations
+  League, Ballon d'Or, and both Golden Boot races). Diffed every
+  `EditionView`/`References` prop, every `HEADER_LABELS` map against its
+  competition's actual source-table columns, and each page's `<title>`
+  word order against its own `headingTemplate`/`glanceHeading` word order
+  across all seven Croatian pages. Six were already fully consistent (fixed
+  by the hundred-third/hundred-fourth/hundred-fifth runs); Copa América's
+  Croatian page was the one holdout: its `<title>` correctly read
+  "Copa América {year}." (competition name first, matching every other
+  Croatian edition page's convention) but its `headingTemplate` and
+  `glanceHeading` still used the English page's year-first order
+  (`${yearLabel} {competition}`), so the visible `<h1>` read "1959.
+  (Argentina) Copa América" - competition and year in the opposite order
+  from the page's own `<title>` and from all six sibling competitions'
+  Croatian `<h1>`s. Fixed both templates to
+  `` `{competition} ${yearLabel}` ``/`` `Izdanje ${yearLabel} na prvi
+  pogled` ``, matching the sitewide Croatian convention (confirmed against
+  World Cup/EURO/Ballon d'Or/Golden Boot's own "Izdanje {year}. na prvi
+  pogled" glance heading). Updated the one e2e assertion that had encoded
+  the old (wrong) order (`tests/e2e/copa-america-edition-page.spec.ts`) to
+  the corrected text; verified against the built
+  `dist/hr/competitions/copa-america/1959-argentina/index.html` output that
+  `<h1>` now reads "Copa América 1959. (Argentina)", matching `<title>`.
+  `check:pdfs` correctly caught the affected Croatian Copa América PDFs (52,
+  every year plus the two disambiguated 1959 editions) as stale immediately
+  after the fix, per the hundred-fourth run's "check the rendered page, not
+  just whether a content file changed" correction; regenerated with `pnpm
+  build:pdfs` and reverified `check:pdfs` clean (700/700). No content file
+  touched, so `pnpm test` stays at 616/616. Full standing health check clean
+  after: `pnpm lint` (0/0/0), `pnpm test` (616/616), `pnpm build` (711
+  pages), all 14 `check:*` scripts clean (including the three
+  browser-based sweeps, `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`),
+  full cold-start `pnpm test:e2e`. See `docs/PROJECT_STATUS.md`'s matching
+  entry for full detail. **Left for a future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, Nations League's Team of the Tournament
+  for 2021/2023/2025, the `long-title` brand-suffix decision), plus the
+  Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+  Nations League figures, and EURO 1996/2020's/World Cup 1930/1950's
+  excluded attendance figures. The "read end to end" prop-diff method has
+  now covered every EN/HR page shape on the site (all pages outside
+  `[year].astro`, and now all seven `[year].astro` route trees too) - a
+  future pass's best bet is a genuinely different quality angle
+  (accessibility, performance, SEO) or a fresh source lead on any of the
+  open attendance/captain gaps above.
+- **SEO: meta descriptions built from editorial data could exceed 160
+  characters; now clamped sitewide**: closed 2026-09-12 (hundred-and-seventh
+  intensive run) - a standing health check first (all clean, matching the
+  hundred-sixth run's baseline). The twenty-fourth run's own SEO length audit
+  (2026-08-28) only scanned literal `<BaseLayout description="...">` strings
+  in page source, which can't see a description *built* at build time from
+  editorial data - scanning the built `dist/` output directly found 63 pages
+  over 160 characters (up to 235), all in the golden-boot/euro,
+  golden-boot/world-cup, euro and world-cup edition-page families (long
+  country names or, worse, a multi-way Golden Boot tie listing every
+  co-winner) plus the `teams/germany` profile pages. Fixed centrally: a new
+  `truncateDescription()` (`src/lib/text.ts`, word-boundary-safe, appends an
+  ellipsis) wired into `BaseLayout.astro` once, covering
+  `<meta name="description">`/`og:description`/`twitter:description` for
+  every current and future page rather than patching each of the ~14
+  per-family templates that build one. `check:meta` now also enforces the
+  160-character limit against built HTML as a permanent regression guard
+  (plus a new `decodeAttributeEntities()` fix so an escaped `&`/`"` doesn't
+  inflate the measured length past what a reader actually sees). 11 new unit
+  tests (627/627 total). `check:pdfs` reverified clean with no regeneration
+  needed (meta tags aren't part of either PDF's printed output). Full
+  standing health check clean: `pnpm lint` (0/0/0), `pnpm test` (627/627),
+  `pnpm build` (711 pages), all 14 `check:*` scripts, the 37-page
+  `check:lighthouse` audit (all 1.00), and a full cold-start `pnpm test:e2e`
+  (947/947, 16.0 minutes, run alone after a first concurrent attempt hit an
+  unrelated port collision with this same run's own `check:lighthouse` - see
+  `docs/PROJECT_STATUS.md`'s matching entry for that correction).
+  See `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
+  future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025, the `long-title` brand-suffix decision),
+  plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed Nations League figures, and EURO 1996/2020's/World Cup
+  1930/1950's excluded attendance figures.
+- **`scripts/` end-to-end audit finds a hardcoded overflow-tolerance literal
+  out of sync with its own shared constant**: closed 2026-09-12
+  (hundred-and-eighth intensive run) - a standing health check first (all
+  clean, matching the hundred-seventh run's baseline: `pnpm lint` 0/0/0,
+  `pnpm test` 627/627, `pnpm build` 711 pages, `pnpm outdated` still only the
+  blocked `typescript` 7 entry, all 14 `check:*` scripts and the 37-page
+  `check:lighthouse` audit clean). Re-attempted the standing Nations League
+  content gaps with `WebSearch` (this environment's direct `curl`/`WebFetch`
+  egress to `en.wikipedia.org`/`uefa.com` is still blocked, confirmed again
+  with a fresh `403`): the 2021/2025 final-attendance figures
+  (31,511/65,852) and the 2023 figure (41,110) came back consistently across
+  several independently worded queries, but per the ninety-sixth run's own
+  standard this still can't prove the number was read independently rather
+  than synthesized from the same Wikipedia text `WebSearch` itself surfaces,
+  so the 2023 41,110-vs-41,500 conflict stays unresolved and all three stay
+  out of `content/uefa-nations-league.md`. One genuine resolution, though:
+  searching specifically for a Nations League Finals "Team of the
+  Tournament"/"Squad of the Tournament" turned up no such award in any
+  edition - only "Player of the Tournament/Finals", a "Best Young Player"
+  given once (2019, Frenkie de Jong) and never repeated, and a Top Scorer -
+  so that line item in this file's own "Left for a future pass" list across
+  6+ prior runs was chasing an award that doesn't exist; dropped from this
+  and future entries rather than left open indefinitely.
+
+  Extended the "read a directory end-to-end, compare shared logic across
+  its files" method (already run against `src/lib/`, `src/components/` and
+  every `src/pages/` shape) to `scripts/` (18 files, ~3,858 lines) for the
+  first time, via a dedicated read-only audit. First confirmed the
+  711-vs-715-vs-710 page counts different scripts report are all correct
+  and mutually consistent (715 = every built `.html` file; 711 = Astro's own
+  page count, excluding the 4 `astro.config.mjs` redirect stubs; 710 = the
+  sitemap count, excluding those same 4 plus `404.html`'s `noindex`) - not a
+  bug. The real find: `check-reflow.mjs` exports `OVERFLOW_TOLERANCE_PX = 1`
+  precisely so sibling sweeps share one threshold, and its own live
+  "FAIL"-line check already used the constant, but `check-text-zoom.mjs` and
+  `check-print-width.mjs` each hardcoded the same threshold as a bare `1` in
+  their own live progress line while still importing `pagesOverflowing` (the
+  shared constant's consumer) for the final verdict - so if a future run
+  ever revised `OVERFLOW_TOLERANCE_PX`, the live per-page "FAIL" log and the
+  final pass/fail summary could visibly disagree on those two scripts.
+  Fixed both to import and use `OVERFLOW_TOLERANCE_PX` instead of the
+  literal. Re-ran both checks after the fix (711/711 pages clean on each)
+  and `pnpm test` (627/627, unchanged - no unit test covers these scripts'
+  console output). Full standing health check re-confirmed after: `pnpm
+  lint` (0/0/0), `pnpm test` (627/627), `pnpm build` (711 pages),
+  `check:text-zoom`/`check:print-width` (711/711 each), plus this run's
+  earlier pre-fix baseline pass of the remaining `check:*` scripts and
+  `check:lighthouse` (37/37 pages, all four categories 1.00 - unaffected by
+  this run's fix, so not re-run), and a full cold-start `pnpm test:e2e`.
+  See `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for
+  a future pass:** the same environment-blocked
+  items as ever (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+  `long-title` brand-suffix decision), plus the Nations League 2023
+  attendance conflict and 2021/2025's still-unconfirmed figures, and EURO
+  1996/2020's/World Cup 1930/1950's excluded attendance figures. The
+  directory-level "read end to end" method has now covered every `src/`
+  subtree and `scripts/`; `tests/` itself is the one remaining large,
+  unswept source directory if a future run wants to extend the same method
+  once more.
+- **`tests/` end-to-end audit**: closed 2026-09-12 (hundred-and-ninth
+  intensive run) - a standing health check first (all clean, matching the
+  hundred-eighth run's baseline: `pnpm lint` 0/0/0, `pnpm test` 627/627,
+  `pnpm build` 711 pages, all `check:*` scripts clean). Extended the
+  directory-level "read end to end, compare shared logic/constants across
+  files" method to `tests/` (47 files, ~16,435 lines), the one large
+  source directory the hundred-eighth run's own closing note had left
+  unswept. Found a real bug in the same shape as that run's own
+  `OVERFLOW_TOLERANCE_PX` find: `scripts/check-print-width.mjs` exports
+  `PRINT_CONTENT_WIDTH_PX` specifically so other files can share the A4
+  print-width constant, and `tests/unit/checkPrintWidth.test.ts` correctly
+  imports it, but `tests/e2e/print-styles.spec.ts` independently re-typed
+  the identical formula as its own local constant instead of importing it
+  - so a future `@page` geometry change could silently desync the e2e
+  spec's viewport from the script's own sweep. Fixed by importing the
+  shared constant; verified with a clean 143/143 run of
+  `print-styles.spec.ts` alone (same 1032px value, behavior-preserving)
+  and a full cold-start `pnpm test:e2e`. Two other candidates (Croatian
+  edition-page `<h1>` word order across all six per-family spec files;
+  every header-drawer-driving e2e test calling `openMenu(page)` first)
+  were checked and confirmed already consistent, not bugs. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
+  future pass:** the same environment-blocked items as ever (`typescript`
+  7, `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix
+  decision), plus the Nations League 2023 attendance conflict and
+  2021/2025's still-unconfirmed figures, and EURO 1996/2020's/World Cup
+  1930/1950's excluded attendance figures. The directory-level "read end
+  to end" method has now covered every large source directory on the site
+  (`src/` subtrees, `scripts/`, `tests/`) at least once - a future run's
+  best bet is a fresh source lead on the open attendance/brand-suffix
+  items, or a second pass over an already-swept directory with a
+  genuinely different lens than shared-constant drift.
