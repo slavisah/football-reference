@@ -4244,3 +4244,62 @@ back clean:
   plus the Nations League 2023 attendance conflict, 2021/2025's
   still-unconfirmed Nations League figures, and EURO 1996/2020's/World Cup
   1930/1950's excluded attendance figures.
+- **`scripts/` end-to-end audit finds a hardcoded overflow-tolerance literal
+  out of sync with its own shared constant**: closed 2026-09-12
+  (hundred-and-eighth intensive run) - a standing health check first (all
+  clean, matching the hundred-seventh run's baseline: `pnpm lint` 0/0/0,
+  `pnpm test` 627/627, `pnpm build` 711 pages, `pnpm outdated` still only the
+  blocked `typescript` 7 entry, all 14 `check:*` scripts and the 37-page
+  `check:lighthouse` audit clean). Re-attempted the standing Nations League
+  content gaps with `WebSearch` (this environment's direct `curl`/`WebFetch`
+  egress to `en.wikipedia.org`/`uefa.com` is still blocked, confirmed again
+  with a fresh `403`): the 2021/2025 final-attendance figures
+  (31,511/65,852) and the 2023 figure (41,110) came back consistently across
+  several independently worded queries, but per the ninety-sixth run's own
+  standard this still can't prove the number was read independently rather
+  than synthesized from the same Wikipedia text `WebSearch` itself surfaces,
+  so the 2023 41,110-vs-41,500 conflict stays unresolved and all three stay
+  out of `content/uefa-nations-league.md`. One genuine resolution, though:
+  searching specifically for a Nations League Finals "Team of the
+  Tournament"/"Squad of the Tournament" turned up no such award in any
+  edition - only "Player of the Tournament/Finals", a "Best Young Player"
+  given once (2019, Frenkie de Jong) and never repeated, and a Top Scorer -
+  so that line item in this file's own "Left for a future pass" list across
+  6+ prior runs was chasing an award that doesn't exist; dropped from this
+  and future entries rather than left open indefinitely.
+
+  Extended the "read a directory end-to-end, compare shared logic across
+  its files" method (already run against `src/lib/`, `src/components/` and
+  every `src/pages/` shape) to `scripts/` (18 files, ~3,858 lines) for the
+  first time, via a dedicated read-only audit. First confirmed the
+  711-vs-715-vs-710 page counts different scripts report are all correct
+  and mutually consistent (715 = every built `.html` file; 711 = Astro's own
+  page count, excluding the 4 `astro.config.mjs` redirect stubs; 710 = the
+  sitemap count, excluding those same 4 plus `404.html`'s `noindex`) - not a
+  bug. The real find: `check-reflow.mjs` exports `OVERFLOW_TOLERANCE_PX = 1`
+  precisely so sibling sweeps share one threshold, and its own live
+  "FAIL"-line check already used the constant, but `check-text-zoom.mjs` and
+  `check-print-width.mjs` each hardcoded the same threshold as a bare `1` in
+  their own live progress line while still importing `pagesOverflowing` (the
+  shared constant's consumer) for the final verdict - so if a future run
+  ever revised `OVERFLOW_TOLERANCE_PX`, the live per-page "FAIL" log and the
+  final pass/fail summary could visibly disagree on those two scripts.
+  Fixed both to import and use `OVERFLOW_TOLERANCE_PX` instead of the
+  literal. Re-ran both checks after the fix (711/711 pages clean on each)
+  and `pnpm test` (627/627, unchanged - no unit test covers these scripts'
+  console output). Full standing health check re-confirmed after: `pnpm
+  lint` (0/0/0), `pnpm test` (627/627), `pnpm build` (711 pages),
+  `check:text-zoom`/`check:print-width` (711/711 each), plus this run's
+  earlier pre-fix baseline pass of the remaining `check:*` scripts and
+  `check:lighthouse` (37/37 pages, all four categories 1.00 - unaffected by
+  this run's fix, so not re-run), and a full cold-start `pnpm test:e2e`.
+  See `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for
+  a future pass:** the same environment-blocked
+  items as ever (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+  `long-title` brand-suffix decision), plus the Nations League 2023
+  attendance conflict and 2021/2025's still-unconfirmed figures, and EURO
+  1996/2020's/World Cup 1930/1950's excluded attendance figures. The
+  directory-level "read end to end" method has now covered every `src/`
+  subtree and `scripts/`; `tests/` itself is the one remaining large,
+  unswept source directory if a future run wants to extend the same method
+  once more.
