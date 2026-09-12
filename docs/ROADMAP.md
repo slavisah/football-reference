@@ -4159,3 +4159,54 @@ back clean:
   could extend the same method to the seven per-family edition-page route
   trees (a different shape: many generated pages per family rather than one
   static page), or pick a genuinely different quality angle.
+- **Croatian Copa América edition pages: `<h1>`/`<title>` word-order
+  mismatch**: closed 2026-09-12 (hundred-and-sixth intensive run) - a
+  standing health check first (all clean, matching the hundred-and-fifth
+  run's baseline). Per the hundred-and-fifth run's own suggestion, extended
+  the "read a shared component plus every one of its call sites end to end"
+  method to the last unswept page shape: the seven per-family edition-page
+  `[year].astro` route trees (World Cup, EURO, Copa América, Nations
+  League, Ballon d'Or, and both Golden Boot races). Diffed every
+  `EditionView`/`References` prop, every `HEADER_LABELS` map against its
+  competition's actual source-table columns, and each page's `<title>`
+  word order against its own `headingTemplate`/`glanceHeading` word order
+  across all seven Croatian pages. Six were already fully consistent (fixed
+  by the hundred-third/hundred-fourth/hundred-fifth runs); Copa América's
+  Croatian page was the one holdout: its `<title>` correctly read
+  "Copa América {year}." (competition name first, matching every other
+  Croatian edition page's convention) but its `headingTemplate` and
+  `glanceHeading` still used the English page's year-first order
+  (`${yearLabel} {competition}`), so the visible `<h1>` read "1959.
+  (Argentina) Copa América" - competition and year in the opposite order
+  from the page's own `<title>` and from all six sibling competitions'
+  Croatian `<h1>`s. Fixed both templates to
+  `` `{competition} ${yearLabel}` ``/`` `Izdanje ${yearLabel} na prvi
+  pogled` ``, matching the sitewide Croatian convention (confirmed against
+  World Cup/EURO/Ballon d'Or/Golden Boot's own "Izdanje {year}. na prvi
+  pogled" glance heading). Updated the one e2e assertion that had encoded
+  the old (wrong) order (`tests/e2e/copa-america-edition-page.spec.ts`) to
+  the corrected text; verified against the built
+  `dist/hr/competitions/copa-america/1959-argentina/index.html` output that
+  `<h1>` now reads "Copa América 1959. (Argentina)", matching `<title>`.
+  `check:pdfs` correctly caught the affected Croatian Copa América PDFs (52,
+  every year plus the two disambiguated 1959 editions) as stale immediately
+  after the fix, per the hundred-fourth run's "check the rendered page, not
+  just whether a content file changed" correction; regenerated with `pnpm
+  build:pdfs` and reverified `check:pdfs` clean (700/700). No content file
+  touched, so `pnpm test` stays at 616/616. Full standing health check clean
+  after: `pnpm lint` (0/0/0), `pnpm test` (616/616), `pnpm build` (711
+  pages), all 14 `check:*` scripts clean (including the three
+  browser-based sweeps, `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`),
+  full cold-start `pnpm test:e2e`. See `docs/PROJECT_STATUS.md`'s matching
+  entry for full detail. **Left for a future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, Nations League's Team of the Tournament
+  for 2021/2023/2025, the `long-title` brand-suffix decision), plus the
+  Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+  Nations League figures, and EURO 1996/2020's/World Cup 1930/1950's
+  excluded attendance figures. The "read end to end" prop-diff method has
+  now covered every EN/HR page shape on the site (all pages outside
+  `[year].astro`, and now all seven `[year].astro` route trees too) - a
+  future pass's best bet is a genuinely different quality angle
+  (accessibility, performance, SEO) or a fresh source lead on any of the
+  open attendance/captain gaps above.
