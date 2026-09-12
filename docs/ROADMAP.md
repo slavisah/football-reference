@@ -4335,3 +4335,57 @@ back clean:
   best bet is a fresh source lead on the open attendance/brand-suffix
   items, or a second pass over an already-swept directory with a
   genuinely different lens than shared-constant drift.
+- **Non-page-component endpoint sweep (`robots.txt.ts`/`sitemap.xml.ts`/
+  `manifest.webmanifest.ts`/the three `*-index.json.ts` files); standing
+  health check re-confirmed clean**: closed 2026-09-12 (hundred-and-tenth
+  intensive run) - a standing health check first (`pnpm install`, `pnpm
+  outdated` still only the blocked `typescript` 7 entry, `pnpm lint`
+  0/0/0, `pnpm test` 627/627, `pnpm build` 711 pages, all 14 `check:*`
+  scripts clean including the three browser-based sweeps and
+  `check:lighthouse`, `pnpm test:coverage` unchanged at 99.91%/99.44%,
+  `pnpm dlx knip` unchanged, and a full cold-start `pnpm test:e2e`,
+  947/947, 14.4 minutes) - all matching the hundred-and-ninth run's
+  baseline exactly. Closed out the one item every recent run's own
+  closing note had explicitly left unswept: `robots.txt.ts`,
+  `sitemap.xml.ts`, `manifest.webmanifest.ts` (both the English and
+  Croatian copies), and `team-index.json.ts`/`player-index.json.ts`/
+  `edition-index.json.ts` - the handful of `src/pages/*.ts` API routes
+  that sit outside every page-component shape the "read end to end"
+  method had already covered. Read all seven files in full: the two
+  `manifest.webmanifest.ts` copies already share every field via one
+  `buildManifest(locale)` helper (`src/lib/manifest.ts`, itself already
+  swept in the `src/lib/` pass); `robots.txt.ts` builds its `Sitemap:`
+  line from the same `withBase()`/`site` origin every other generated
+  endpoint uses; and the three `*-index.json.ts` files are explicitly
+  written and commented as mirrors of one another (same response shape,
+  same `Cache-Control`, same reason for existing - letting
+  `scripts/generate-pdfs.mjs` enumerate slugs it can't derive any other
+  way) and were cross-checked line by line against each other and against
+  `scripts/pdf-pages.mjs`'s `EDITION_PDF_SOURCES` family-slug convention,
+  which `edition-index.json.ts`'s own doc comment says it must match - no
+  drift found. This closes the "read end to end" method's coverage of
+  every large source directory *and* every remaining page/endpoint shape
+  on the site; no genuinely unswept area of this kind is left. Also
+  re-attempted the standing Nations League attendance gaps: `WebSearch`
+  again independently surfaced 31,511 (2021)/41,110 (2023)/65,852 (2025)
+  and, new this run, a specific `uefa.com` match-events page URL for the
+  2021 final that could have served as a source independent of
+  Wikipedia - but `WebFetch` of that URL failed with the same
+  `EGRESS_BLOCKED` result this environment has given for `uefa.com`/
+  `en.wikipedia.org` on every prior attempt, so the "two independent,
+  independently-read sources" bar still isn't cleared and these stay out
+  of `content/uefa-nations-league.md`. No code or content change was
+  needed this run (the endpoint sweep found the files already correct,
+  and PDF/e2e/coverage counts are all unchanged), so no PDF regeneration
+  was required either - confirmed via a clean `check:pdfs` (700/700)
+  rather than assumed. **Left for a future pass:** the same
+  environment-blocked items as ever (`typescript` 7, `docs/SOURCES.md`
+  link-liveness, the `long-title` brand-suffix decision needing human
+  sign-off), plus the Nations League 2023 attendance conflict and
+  2021/2025's still-unconfirmed figures, and EURO 1996/2020's/World Cup
+  1930/1950's excluded attendance figures. With both the directory-level
+  and the page/endpoint-shape sweeps now exhausted, a future run's best
+  bet is a fresh source lead on the open attendance/brand-suffix items,
+  a second pass over an already-swept area with a genuinely different
+  lens, or picking a new quality dimension not yet tried (e.g. a from-
+  scratch UX walkthrough rather than a code-reading audit).
