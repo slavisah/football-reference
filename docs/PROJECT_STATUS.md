@@ -21362,10 +21362,12 @@ Full standing health check: `pnpm lint` (0/0/0), `pnpm test` (627/627),
 each, post-fix), and this run's earlier pre-fix baseline pass of the
 remaining twelve `check:*` scripts plus `check:lighthouse` (37/37 pages,
 all four categories 1.00 - unaffected by this run's fix, not re-run
-post-fix). The cold-start `pnpm test:e2e` result is pending a clean
-re-run at the time of writing; the first attempt's 844 failures are
-confirmed port-collision artifacts, not a code regression, per the
-detailed account above.
+post-fix). The cold-start `pnpm test:e2e` confirms the first attempt's 844
+failures were exactly the port-collision artifact diagnosed above and not
+a code regression: re-run alone immediately afterward, with output
+redirected straight to a file and nothing else touching port 4321, it
+passed clean at **947/947** (16.3 minutes) - identical to the
+hundred-seventh run's own baseline count.
 
 **Left for a future pass:** the same environment-blocked items as ever
 (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
