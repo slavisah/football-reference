@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { PRINT_CONTENT_WIDTH_PX } from '../../scripts/check-print-width.mjs';
 
 // AGENTS.md rule 7 requires accessible print styles, and the site has had a
 // dedicated `@media print` sheet (src/styles/global.css) since Milestone 1 -
@@ -400,8 +401,12 @@ test.describe('World Cup story reveal in print media', () => {
 // that same width before emulating print media, then confirms every element
 // on the page fits inside it - the same measurement approach the site's own
 // filter-`<select>`-width fix (docs/ROADMAP.md, seventieth intensive run)
-// already established for a different clipping bug.
-const PRINT_CONTENT_WIDTH_PX = Math.round((273 * 96) / 25.4); // ~1032px
+// already established for a different clipping bug. `PRINT_CONTENT_WIDTH_PX`
+// is imported from `scripts/check-print-width.mjs`, the shared source of
+// truth `tests/unit/checkPrintWidth.test.ts` already pins to 1032, rather
+// than re-derived here - keeping the formula in one place so a future
+// `@page` geometry change can't silently desync this spec's viewport from
+// that script's own full-site sweep.
 
 // The seventy-third run's own fix (`.t-wrap`/`.t-table` in global.css) is
 // global, but its regression list only covered the eight page/table shapes

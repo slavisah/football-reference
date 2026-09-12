@@ -21379,5 +21379,92 @@ every `src/` subtree and `scripts/`; `tests/` itself (not yet swept this
 way) is the one remaining large source directory if a future run wants to
 extend the same method once more.
 
+### `tests/` end-to-end audit: `print-styles.spec.ts` re-derived a shared print-width constant instead of importing it - closed 2026-09-12 (hundred-and-ninth intensive run)
+
+A standing health check first: `pnpm install` (no lockfile changes; the
+container's `node_modules` had to be reinstalled from scratch this run -
+`pnpm lint` (0/0/0), `pnpm test` (627/627, matching the hundred-eighth
+run's baseline), `pnpm build` (711 pages), and the full set of `check:*`
+scripts clean (`check:links`/`check:sitemap`/`check:precache`/
+`check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/`check:html`/
+`check:award-tallies`/`check:i18n-notes`/`check:reflow`/`check:text-zoom`/
+`check:print-width`, the last three needing this environment's
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback).
+
+**Real fix found via the last remaining directory:** the hundred-eighth
+run's own closing note named `tests/` as the one large source directory
+the "read a directory end-to-end, compare shared logic/constants across
+its files" method (already applied to `src/lib/`, `src/components/`,
+every `src/pages/` shape, and `scripts/`) had never covered. Delegated a
+dedicated read-only audit of all 47 files (27 `tests/unit/*.test.ts`, 19
+`tests/e2e/*.spec.ts`, plus the shared `tests/e2e/menu.ts` helper,
+~16,435 lines total).
+
+The audit first cleared two plausible-looking candidates as not bugs:
+every one of the six near-identical per-family Croatian edition-page
+`<h1>`/`<title>` word-order assertions (World Cup, EURO, Copa América,
+Ballon d'Or, both Golden Boot races, Nations League) already consistently
+puts the competition name first - the hundred-sixth run's fix was the
+last holdout and it's already reflected in
+`copa-america-edition-page.spec.ts`, so this exact bug class (calibration
+example for the audit) is fully closed, not a live gap. Likewise, every
+e2e spec that drives a header-drawer control (`#theme-toggle`,
+`a.lang-switch`, `#team-search-input`, `#player-search-input`) across all
+19 spec files is already preceded by `openMenu(page)` per AGENTS.md's own
+rule - no violation found.
+
+The genuine find: `scripts/check-print-width.mjs` exports
+`PRINT_CONTENT_WIDTH_PX = Math.round((273 * 96) / 25.4)` (~1032px, the A4
+landscape usable content width after `scripts/generate-pdfs.mjs`'s
+`@page` margins) specifically so other files can share the one number,
+and `tests/unit/checkPrintWidth.test.ts` correctly imports it to pin the
+value. But `tests/e2e/print-styles.spec.ts` never imported it - it
+independently re-typed the identical formula as its own local
+`const PRINT_CONTENT_WIDTH_PX = Math.round((273 * 96) / 25.4)` (line 405)
+and used that copy to size the Playwright viewport for its 18-page "wide
+tables fit the printable page" sweep. The script's own doc comment even
+already described the e2e spec's copy as an established fact ("...that
+`tests/e2e/print-styles.spec.ts`'s `PRINT_CONTENT_WIDTH_PX` already
+uses...") rather than flagging it as duplication to remove - the same
+"shared constant hardcoded a second time" shape as the hundred-eighth
+run's `OVERFLOW_TOLERANCE_PX` find, just crossing a script/spec,
+`.mjs`/`.ts` boundary instead of two sibling scripts. **Failure scenario
+this would have caused:** if `generate-pdfs.mjs`'s `@page` geometry ever
+changed, a future run updating `check-print-width.mjs`'s exported
+constant (and its own unit test) would have no reason to notice this
+spec's independent copy 340+ lines into a different file - the "wide
+tables" sweep would keep silently testing against the *old* printable
+width instead of failing loudly, the opposite of what a page-width
+regression test exists to do.
+
+Fixed by importing `PRINT_CONTENT_WIDTH_PX` from
+`../../scripts/check-print-width.mjs` in `print-styles.spec.ts` instead of
+re-deriving it, the same way the unit test already imports it
+successfully across the same `.mjs`/`.ts` boundary. Updated the file's own
+comment to document the import instead of the formula. Verified with a
+full run of `print-styles.spec.ts` alone (143/143 passed, including all
+18 "wide tables" assertions at the same 1032px width as before - a
+behavior-preserving fix at the current geometry) and a full cold-start
+`pnpm test:e2e`.
+
+No content file touched and this fix isn't a PDF source, so `check:pdfs`
+needed no regeneration (confirmed unchanged). `pnpm test` stayed at
+627/627 (no unit test exercises this e2e spec).
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League
+2023 attendance conflict, 2021/2025's still-unconfirmed Nations League
+figures, and World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+figures. The directory-level "read end to end" method has now covered
+every `src/` subtree, `scripts/`, and `tests/` - every large source
+directory on the site has been swept at least once this way. A future
+run's best bet is either a fresh source lead on the open attendance/
+brand-suffix items above, or a second pass over an already-swept
+directory with a genuinely different lens (the method has so far looked
+for shared-constant drift and stale word-order/text assumptions; a future
+pass could instead look for, e.g., duplicated test fixtures or
+assertions that no longer match their own describe-block's stated intent).
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
