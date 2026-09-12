@@ -16254,6 +16254,16 @@ Copa América captains.
   source - World Cup 1930/1950, EURO 1996/2020, and Nations League
   2021/2023/2025 - see each run's own entry below for exactly why each was
   excluded.
+- `BaseLayout.astro` clamps every page's `description` prop to 160
+  characters (`truncateDescription()`, `src/lib/text.ts`) before using it
+  for `<meta name="description">`/`og:description`/`twitter:description` -
+  see the 2026-09-12 "SEO: meta descriptions built from editorial data"
+  entry below. A description over that limit is cut at the last word
+  boundary and gets an ellipsis appended; `check:meta` enforces the same
+  160-character limit against the built HTML as a permanent regression
+  guard. JSON-LD is unaffected - `buildEditionSportsEvent()` and friends
+  (`src/lib/jsonLd.ts`) build their own `description`/`competitor` fields
+  independently of this prop.
 
 ### Notes jump nav: an in-page "Jump to a section" link list for every long note-card list - closed 2026-09-04 (sixty-third intensive run)
 
@@ -21082,6 +21092,122 @@ route trees (hundred-fifth run) and, this run, all seven per-edition
 `[year].astro` route trees themselves. A future run's best bet is a
 genuinely different quality angle (accessibility, performance, SEO) or a
 fresh source lead on one of the open attendance/captain gaps above.
+
+### SEO: meta descriptions built from editorial data could exceed the 160-character guideline; now clamped sitewide - closed 2026-09-12 (hundred-and-seventh intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` (still only
+the blocked `typescript` 7 entry), `pnpm lint` (0/0/0), `pnpm test`
+(616/616 unit), `pnpm build` (711 pages), `check:links`/`check:sitemap`/
+`check:precache`/`check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/
+`check:html`/`check:spelling`/`check:award-tallies`/`check:i18n-notes`
+all clean, `pnpm dlx knip --no-config-hints` unchanged (the one confirmed
+false positive) - matching the hundred-sixth run's baseline.
+
+The hundred-sixth run's own closing note flagged the "read end to end"
+prop-diff method as having covered every page shape, with a genuinely
+different quality angle as the best next bet. The twenty-fourth intensive
+run (2026-08-28) had already run one SEO angle - a source-code scan of
+every literal `<BaseLayout description="...">` string against the
+~50-160-character guideline search engines and link-preview surfaces
+truncate around - and trimmed the 13 static descriptions that were too
+long. That scan had a structural blind spot it never surfaced: a
+per-edition page doesn't pass a literal description string, it *builds*
+one at build time from editorial data (a champion/runner-up name, a
+Golden Boot tie's full list of co-winners), so no static scan of the
+`.astro` source could ever see how long the *rendered* result actually
+is. Scanning the built `dist/` output directly (a small Node script over
+every `index.html`'s `<meta name="description">`) found 63 pages over
+160 characters - up to 235 - across the golden-boot/euro,
+golden-boot/world-cup, euro and world-cup edition-page families (long
+country names inflate the World Cup/EURO template; a multi-way Golden
+Boot tie inflates the golden-boot templates far more, since every
+co-winner's name gets listed) plus both `teams/germany`/`hr/teams/germany`
+profile pages. Confirmed real by reading the underlying `.astro` files
+(`src/pages/competitions/{euro,world-cup,golden-boot/euro,golden-boot/
+world-cup}/[year].astro` and their `hr/` siblings): each builds
+`description` by joining a fixed boilerplate sentence with interpolated
+data, with nothing capping the combined length - e.g. the 1960 UEFA EURO
+Golden Boot page's 207-character description lists all five players who
+shared that year's award (Milan Galić, Dražan Jerković, Valentin Ivanov,
+François Heutte, Viktor Ponedelnik) before the fixed closing sentence.
+
+Fixed centrally rather than patching each of the ~14 per-family templates
+that build a description: added `src/lib/text.ts`'s
+`truncateDescription(text, maxLength = 160)`, which returns text
+unchanged under the limit and otherwise cuts at the last word boundary
+before it (never mid-word) and appends an ellipsis, then wired it into
+`src/layouts/BaseLayout.astro` once - `metaDescription =
+description ? truncateDescription(description) : undefined` - used for
+all three of `<meta name="description">`, `og:description` and
+`twitter:description` (the same `description` prop feeds all three, so a
+single clamp covers all three consumers and every current and future
+page that passes a `description` prop, not just the ones already found
+too long). Verified this doesn't touch structured data: `buildEditionSportsEvent()`
+(`src/lib/jsonLd.ts`) builds its own `SportsEvent.competitor`/`location`
+fields independently and never reads the page's meta `description` prop,
+so JSON-LD keeps the full, untruncated facts regardless of what the meta
+tag shows.
+
+Added a permanent regression guard rather than treating this as a
+one-time trim: extended `check:meta` (`scripts/check-meta.mjs`) with a
+length check against the same 160-character limit, run against the
+*built* HTML the same way its existing existence/duplicate checks
+already are - this verifies the clamp actually took effect on real output
+and would catch any future page that bypasses `BaseLayout` entirely (a
+raw `<meta>` tag), not just a regression in `truncateDescription` itself.
+Doing this correctly needed one more fix: `extractMetaDescription()`
+previously returned the raw, still-HTML-escaped attribute text, so a
+description containing a literal `&` or `"` would count `&amp;`/`&quot;`
+(5 chars) instead of the one real character an actual search result or
+link preview shows - inflating the measured length past what a reader
+ever sees. Added `decodeAttributeEntities()` (decodes `&amp;`/`&lt;`/
+`&gt;`/`&quot;`, the only entities Astro's serializer emits inside a
+double-quoted attribute) and applied it in `extractMetaDescription()`
+before both the length check and the pre-existing duplicate-detection
+logic, which benefits the same way.
+
+18 new unit tests: 7 for `truncateDescription`
+(`tests/unit/text.test.ts` - unchanged-under-limit, exact-at-limit,
+word-boundary cutting including on the real 1960 Golden Boot description
+above, dangling-punctuation stripping, a custom `maxLength`, and the
+hard-cut fallback when no space exists before the limit) and 4 more for
+`check-meta.mjs`'s new `decodeAttributeEntities` plus the entity-decoding
+behavior of `extractMetaDescription` (`tests/unit/checkMeta.test.ts`).
+`pnpm test`: 627/627 (up from 616).
+
+Rebuilt and reverified: `check:meta` now reports "every description is
+within 160 characters" (0 problems, down from the 63 this run's initial
+`dist/` scan found before the fix landed). Re-checked `check:pdfs` rather
+than assuming a presentation-only, non-content change needs no PDF
+regen (the hundred-fourth run's own correction: check the *rendered
+page*, not just whether a content file changed) - stayed clean at
+700/700 with no regeneration needed, confirming meta tags aren't part of
+either PDF generation's visible/printed output, unlike the
+`References.astro`/`ChampionsSummary.astro` fixes the hundred-third/
+hundred-fifth runs had to regenerate PDFs for. No content file touched,
+so no `lastReviewed` bump was needed either.
+
+Full standing health check re-run after the fix: `pnpm lint` (0/0/0),
+`pnpm test` (627/627, 11 new), `pnpm build` (711 pages), all 14
+`check:*` scripts clean (`check:links`/`check:sitemap`/`check:precache`/
+`check:perf`/`check:pdfs`/`check:jsonld`/`check:meta`/`check:html`/
+`check:spelling`/`check:award-tallies`/`check:i18n-notes`/`check:reflow`/
+`check:text-zoom`/`check:print-width`, the three browser-based sweeps
+again needing this environment's `PW_EXECUTABLE_PATH=/opt/pw-browsers/
+chromium` fallback), the 25-page `check:lighthouse` audit, and a full
+cold-start `pnpm test:e2e`.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations
+League's Team of the Tournament for 2021/2023/2025, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League
+2023 attendance conflict, 2021/2025's still-unconfirmed Nations League
+figures, and World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+figures. This run's own method (scanning built `dist/` output directly
+rather than page source) is itself worth remembering as a category: any
+future per-page-data-driven prop (not just `description`) could have the
+same "looks fine in the template, only wrong once real data is
+interpolated" blind spot a source-only read can't catch.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
