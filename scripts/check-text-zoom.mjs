@@ -29,7 +29,12 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
 import { listHtmlFiles } from './check-internal-links.mjs';
-import { htmlFileToPagePath, isRedirectStubHtml, pagesOverflowing } from './check-reflow.mjs';
+import {
+  htmlFileToPagePath,
+  isRedirectStubHtml,
+  OVERFLOW_TOLERANCE_PX,
+  pagesOverflowing,
+} from './check-reflow.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const DIST_DIR = path.join(ROOT, 'dist');
@@ -116,7 +121,7 @@ async function main() {
     for (const pagePath of pagePaths) {
       const overflow = await measureOverflow(page, pagePath);
       measurements.push({ pagePath, overflow });
-      if (overflow > 1) {
+      if (overflow > OVERFLOW_TOLERANCE_PX) {
         console.log(`  FAIL  ${pagePath}  (${overflow}px overflow)`);
       }
     }

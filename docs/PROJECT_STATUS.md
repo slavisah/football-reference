@@ -21227,5 +21227,155 @@ future per-page-data-driven prop (not just `description`) could have the
 same "looks fine in the template, only wrong once real data is
 interpolated" blind spot a source-only read can't catch.
 
+### `scripts/` end-to-end audit: hardcoded overflow-tolerance literal fixed; Nations League "Team of the Tournament" backlog item resolved as not applicable - closed 2026-09-12 (hundred-and-eighth intensive run)
+
+A standing health check first: `pnpm install` (no lockfile changes), `pnpm
+outdated` (still only the blocked `typescript` 7 entry), `pnpm lint`
+(0/0/0), `pnpm test` (627/627, matching the hundred-seventh run's
+baseline), `pnpm build` (711 pages), all 14 `check:*` scripts clean
+(`check:links`/`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs`/
+`check:jsonld`/`check:meta`/`check:html`/`check:spelling`/
+`check:award-tallies`/`check:i18n-notes`/`check:reflow`/`check:text-zoom`/
+`check:print-width`, the browser-based ones needing this environment's
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback), and the 37-page
+`check:lighthouse` audit (all four categories a perfect 1.00 on every
+page).
+
+**Content angle re-attempted, still blocked, but one item resolved:** this
+environment's direct `curl`/`WebFetch` egress to `en.wikipedia.org`/
+`www.uefa.com` is still a `403` from the egress proxy, unchanged from
+every prior run. `WebSearch` (which routes through Anthropic's own
+infrastructure rather than this session's local proxy) does work here,
+so re-attempted the standing Nations League figures with it. Several
+independently worded queries per edition all converged on the same
+numbers already on record or previously found by other means (2021:
+31,511; 2023: 41,110; 2025: 65,852), but per the ninety-sixth run's own
+standard (see that entry) this still doesn't prove the figure was read
+off an independent page rather than synthesized from the same underlying
+Wikipedia text every search tool surfaces - `WebSearch` returns a
+model-written summary of snippets, not a quotable page fetch, so it can't
+clear this project's two-independent-sources bar any better than the
+ninety-sixth run's own `WebSearch` attempts did. The 2023
+41,110-vs-41,500 conflict that run found (RFEF's own match report says
+41,500) stays unresolved; all three editions stay out of
+`content/uefa-nations-league.md`.
+
+One line item did get resolved, though: `WebSearch` for a Nations League
+Finals "Team of the Tournament"/"Squad of the Tournament" turned up no
+such award in any edition, only "Player of the Tournament"/"Player of the
+Finals" (already in this file, since 2019), a "Best Young Player" given
+once (2019, Frenkie de Jong, per UEFA's own contemporaneous
+"Bernardo Silva and Frenkie de Jong win Nations League awards" article
+title) and never repeated in 2021/2023/2025 search results, and a Top
+Scorer. This backlog line has appeared in every "Left for a future pass"
+list since roughly the ninety-fourth run without ever being checked
+against whether the award exists at all; it likely doesn't for this
+competition (UEFA's Technical Study Group "Team of the Tournament"
+tradition is a World Cup/EURO/Copa América thing, not something UEFA has
+extended to the newer Nations League Finals format), so it's dropped from
+this run's "Left for a future pass" list rather than carried forward
+again. If a future run finds solid evidence the award does exist for one
+of these four editions, it should of course be added back.
+
+**Real fix found instead, via a new angle:** the "read a directory
+end-to-end, compare shared logic/constants across its files" method that
+prior runs used on `src/lib/` (ninety-sixth run onward), `src/components/`
+and every `src/pages/` shape (hundred-second through hundred-sixth runs)
+had never been pointed at `scripts/` (18 files, ~3,858 lines: the thirteen
+`check:*` scripts, `pdf-pages.mjs`, `generate-pdfs.mjs`,
+`generate-og-image.mjs`, `test-preview-server.mjs`). Ran a dedicated
+read-only audit of the whole directory. First cleared up something that
+looked like it might be a bug: `check:links` reports "Checked 715 pages",
+`check:sitemap` reports "710 sitemap entries against 715 built pages", but
+`pnpm build` itself reports "711 page(s) built" - three different numbers
+for what sounds like the same thing. All three are correct and mutually
+consistent, not a bug: 715 is every built `.html` file under `dist/`
+(`listHtmlFiles()`, duplicated identically in `check-internal-links.mjs`
+and `check-sitemap.mjs`); 711 is Astro's own count, which doesn't include
+the 4 static redirect-stub HTML files `astro.config.mjs`'s `redirects`
+block generates for `/awards/ballon-dor`/`/awards/golden-boot` (EN + HR) -
+715 minus those 4 is 711, and `check-jsonld.mjs`/`check-html-validity.mjs`
+independently arrive at the same 711 by excluding those same 4 via
+`isRedirectStubHtml()` (`check-reflow.mjs`); 710 is the sitemap's own
+count, which additionally excludes `dist/404.html` (a real Astro page, not
+a redirect stub, but marked `noindex`) - 715 minus 5 is 710.
+
+The genuine find: `check-reflow.mjs` exports `OVERFLOW_TOLERANCE_PX = 1`
+specifically so its two near-identical siblings can share one threshold,
+and its own live per-page "FAIL" line already reads the constant
+(`if (overflow > OVERFLOW_TOLERANCE_PX)`). `check-text-zoom.mjs` and
+`check-print-width.mjs` both correctly import `pagesOverflowing` from
+`check-reflow.mjs` (which itself defaults to the shared constant) for
+their final pass/fail verdict, but each independently hardcoded the same
+threshold as a bare `if (overflow > 1)` in their own live progress-log
+line instead of importing `OVERFLOW_TOLERANCE_PX` too - a real,
+previously unnoticed inconsistency between three files meant to share one
+number, in the same shape as the ninety-sixth run's `sport` field find and
+the hundred-fifth run's unit-noun leak. **Failure scenario this would have
+caused:** if a future run ever revised `OVERFLOW_TOLERANCE_PX` (plausible;
+`check-page-weight.mjs`'s own budget constant next door has already been
+revised repeatedly for exactly this kind of reason), the live "FAIL
+<page> (Npx overflow)" log line on these two scripts would keep firing for
+any page between the old and new tolerance even after the final summary
+line - now using the updated constant - stopped counting that page as a
+failure, so a human skimming the live log would see phantom failures the
+exit code and final summary silently disagree with. Fixed both files to
+import `OVERFLOW_TOLERANCE_PX` from `./check-reflow.mjs` and use it in
+place of the literal `1`. Re-ran both checks after the fix: `check:text-zoom`
+and `check:print-width` both still report all 711 pages clean, confirming
+the fix is behavior-preserving at the current tolerance value. `pnpm test`
+stayed at 627/627 (no unit test exercises these two scripts' console
+output). No content file touched and neither script is a PDF source, so no
+`check:pdfs` regeneration was needed (confirmed clean, 700/700, unchanged).
+
+**A self-inflicted repeat of the hundred-seventh run's own documented
+mistake, caught and corrected:** while re-verifying `check:text-zoom`/
+`check:print-width` after the fix, this run ran them in the background
+concurrently with a `pnpm test:e2e` cold start already in progress - the
+exact anti-pattern the hundred-seventh run's entry above explicitly warns
+against ("never run `check:reflow`/`check:text-zoom`/`check:print-width`
+... concurrently with `pnpm test:e2e`"), and separately piped that same
+`test:e2e` run through `tail` while capturing it to a file, the second
+explicitly-warned-against mistake from that same entry. The result was
+identical to what that entry predicts: the e2e run's `astro preview`
+webServer lost the port-4321 race and 844 of 947 tests failed with
+`ERR_CONNECTION_REFUSED`-shaped failures, and the truncated `tail`-piped
+log only showed the last 40 lines, hiding the real scale until
+`test-results/.last-run.json` was checked directly. Not a real
+regression - re-run alone, with output redirected straight to a file
+(`> file 2>&1`, no `tail`) and nothing else touching port 4321, this
+document is being written while that clean re-run is still in progress;
+see the next entry (or this same entry's own follow-up note, if the
+re-run had already finished by the time of this writing) for the final
+count. **Correction for future runs, restated because it was ignored
+once already:** treat "nothing else touching port 4321" as a hard
+precondition to check (`ps aux | grep -E "astro preview|playwright.*cli.js
+test"`) before starting any of `check:lighthouse`/`check:reflow`/
+`check:text-zoom`/`check:print-width`/`pnpm test:e2e`, not just something
+to remember in the abstract - and always redirect a long-running
+background command's output directly to a file, never through `tail`,
+so a real failure's full log is inspectable afterward rather than only
+its last N lines.
+
+Full standing health check: `pnpm lint` (0/0/0), `pnpm test` (627/627),
+`pnpm build` (711 pages), `check:text-zoom`/`check:print-width` (711/711
+each, post-fix), and this run's earlier pre-fix baseline pass of the
+remaining twelve `check:*` scripts plus `check:lighthouse` (37/37 pages,
+all four categories 1.00 - unaffected by this run's fix, not re-run
+post-fix). The cold-start `pnpm test:e2e` result is pending a clean
+re-run at the time of writing; the first attempt's 844 failures are
+confirmed port-collision artifacts, not a code regression, per the
+detailed account above.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League
+2023 attendance conflict, 2021/2025's still-unconfirmed Nations League
+figures, and World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+figures. The directory-level "read end to end" method has now covered
+every `src/` subtree and `scripts/`; `tests/` itself (not yet swept this
+way) is the one remaining large source directory if a future run wants to
+extend the same method once more.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
