@@ -32,6 +32,7 @@
     "check:award-tallies": "node scripts/check-award-tallies.mjs",
     "check:edition-header-labels": "node scripts/check-edition-header-labels.mjs",
     "check:i18n-notes": "node scripts/check-i18n-notes.mjs",
+    "check:link-names": "node scripts/check-link-names.mjs",
     "check:spelling": "cspell --no-progress \"content/**/*.md\""
   },
   "dependencies": {
@@ -43,7 +44,7 @@
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.5.1",
     "@vitest/coverage-v8": "5.0.0",
-    "cspell": "^10.3.0",
+    "cspell": "^10.3.1",
     "html-validate": "^11.15.0",
     "lighthouse": "^13.4.1",
     "sharp": "0.35.4",

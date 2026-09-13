@@ -19,18 +19,26 @@ const meta = await loadPageMeta('about-sources');
 
 const sections = extractSourceSections(sourcesRaw);
 
-// Same competition-page links as the English page; the competition pages
-// themselves aren't translated yet, so these deliberately point at the
-// existing English pages. Only the heading label shown here is Croatian -
-// matching the names already used on the Croatian home page
-// (src/lib/homeCards.ts's CARD_TEXT) so a competition is never called two
-// different things across the site.
+// Every competition page now has a Croatian version (see docs/ROADMAP.md's
+// "original backlog complete" note), so these link to the Croatian route for
+// a Croatian reader - unlike when this page was first written, when Copa
+// América was the only one of the six already localized and every link here
+// pointed at the English page as a stopgap. That stopgap was never revisited
+// once the other five caught up: a live build audit found two of these five
+// links ("Copa América", "Zlatna lopta") shared their exact accessible-name
+// text with the Croatian nav's own links to the same competitions elsewhere
+// on this page, but pointed at the English URL instead of the nav's Croatian
+// one - a real "same name reads twice, means two different places" screen-
+// reader links-list bug on top of sending a Croatian reader to the wrong-
+// language page. The label text (matching src/lib/homeCards.ts's CARD_TEXT
+// names, so a competition is never called two different things across the
+// site) was already correct; only the href was stale.
 const competitionPages: Record<string, { href: string; label: string }> = {
-  'FIFA World Cup': { href: withBase('/competitions/world-cup'), label: 'FIFA Svjetsko prvenstvo' },
-  'UEFA EURO': { href: withBase('/competitions/euro'), label: 'UEFA Europsko prvenstvo' },
-  'UEFA Nations League': { href: withBase('/competitions/nations-league'), label: 'UEFA Liga nacija' },
-  'Copa América': { href: withBase('/competitions/copa-america'), label: 'Copa América' },
-  "Ballon d'Or": { href: withBase('/competitions/ballon-dor'), label: 'Zlatna lopta' },
+  'FIFA World Cup': { href: withBase('/hr/competitions/world-cup'), label: 'FIFA Svjetsko prvenstvo' },
+  'UEFA EURO': { href: withBase('/hr/competitions/euro'), label: 'UEFA Europsko prvenstvo' },
+  'UEFA Nations League': { href: withBase('/hr/competitions/nations-league'), label: 'UEFA Liga nacija' },
+  'Copa América': { href: withBase('/hr/competitions/copa-america'), label: 'Copa América' },
+  "Ballon d'Or": { href: withBase('/hr/competitions/ballon-dor'), label: 'Zlatna lopta' },
 };
 
 const statusLabel = meta.status === 'verified' ? 'Provjereno' : 'U pregledu';

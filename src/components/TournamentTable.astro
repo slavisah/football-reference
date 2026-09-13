@@ -156,6 +156,19 @@ const finalColIndex = table.headers.findIndex((header) => /^final$/i.test(header
 // link to the edition's own page. Same detection `buildEditions()` uses.
 const yearColIndex = table.headers.findIndex((header) => /year|season/i.test(header));
 
+// Years shared by more than one edition (Copa América's two 1959 tournaments
+// are the only known case, see editionLinkKey()'s doc comment) render two
+// year-link <a>s with byte-identical visible/accessible text ("1959") pointing
+// at two different edition pages - invisible in the table itself (the Host
+// column tells the rows apart), but exactly the "same name, different
+// destination" problem a screen reader's links list has no way to resolve,
+// the same bug class the References-section disambiguation fix addressed.
+// Disambiguated with the edition's own host, matching the "-argentina"/
+// "-ecuador" slug suffix already used to tell their edition pages apart.
+const duplicateYears = new Set(
+  editions.map((edition) => edition.year).filter((year, index, all) => all.indexOf(year) !== index),
+);
+
 // "Sort by" options: only the columns worth sorting by (Year/Season, Winner,
 // Host, a numeric quantity column), detected the same way `buildEditions`
 // derives those roles. Defaults to Year newest-first, matching the row order
@@ -299,7 +312,16 @@ const sortMinWidth = selectMinWidthRem(sortOptions.map((option) => option.label)
                   ) : index === finalColIndex && hasAbbreviation(cell.value) ? (
                     <span set:html={abbreviateFinalScore(cell.value, locale)} />
                   ) : index === yearColIndex && yearLinks?.has(editionLinkKey(edition.year, edition.host)) ? (
-                    <a href={withBase(yearLinks.get(editionLinkKey(edition.year, edition.host))!)}>{cell.value}</a>
+                    <a
+                      href={withBase(yearLinks.get(editionLinkKey(edition.year, edition.host))!)}
+                      aria-label={
+                        duplicateYears.has(edition.year) && edition.host
+                          ? `${cell.value} (${edition.host})`
+                          : undefined
+                      }
+                    >
+                      {cell.value}
+                    </a>
                   ) : (
                     cell.value
                   )}

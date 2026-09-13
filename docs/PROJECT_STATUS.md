@@ -22020,5 +22020,162 @@ page pairs, and the seven per-family edition-page route trees - a future
 run's best bet is likely the still-untried screen-reader emulation pass, or
 a fresh `docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.
 
+### Screen-reader "links list" audit: `check:link-names`, plus three real same-name-different-destination bugs it caught - closed 2026-09-13 (hundred-and-fifteenth intensive run)
+
+Standing health check first: `pnpm install`, `pnpm outdated` turned up
+nothing beyond the still-blocked `typescript` 7 entry (`@astrojs/check`
+0.9.10's `typescript: '^5.0.0 || ^6.0.0'` peer ceiling) and a `cspell`
+10.3.0 -> 10.3.1 patch release, applied immediately (`pnpm update cspell`,
+`check:spelling` clean afterward, 15 files/0 issues) rather than deferred,
+since it was in-range and free. `pnpm lint` (190 files, 0/0/0), `pnpm test`
+(635/635 unit), `pnpm build` (711 pages), and all 12 `check:*` scripts
+clean, matching the hundred-and-fourteenth run's baseline exactly.
+
+The hundred-and-thirteenth and hundred-and-fourteenth runs both flagged a
+genuine screen-reader emulation pass as still untried. Took that
+suggestion, but in a concretely testable form rather than a manual
+walkthrough: a real screen reader's "links list" (NVDA/JAWS/VoiceOver all
+offer one) shows every link on a page by its accessible name alone, with no
+visual/table/heading context - so the actual bug class worth auditing is
+"two links on the same page reading identically but going different
+places," the exact defect the hundred-and-twelfth run's References-section
+`disambiguateLabels()` fix addressed, but only for merged citation lists.
+Wrote a one-off script that parses every built page's `<a>` tags (aria-label
+when present, else text content with any `aria-hidden="true"` descendant
+stripped) and flags any accessible name shared by more than one distinct
+href on the same page, then ran it against a real `pnpm build` output
+(715 files) before deciding whether it was worth keeping.
+
+It found three real, previously-unchecked bugs, one accepted non-issue, and
+nothing else across the entire site:
+
+1. **`/about/sources` and `/hr/about/sources` cross-heading label collision.**
+   `extractSourceSections()` (`src/lib/sources.ts`) reuses `extractSources()`
+   per `##` heading, and that function already disambiguates same-label
+   citations *within* one heading - but `/about/sources` is the only page
+   that puts every heading's citation list on one page (each competition's
+   own References section only ever shows its own heading), so a label that
+   only collided within its own heading could collide *again* with an
+   unrelated citation from a different heading. Confirmed live: three
+   headings (FIFA World Cup, UEFA EURO, UEFA Nations League) each cite a
+   bullet reading the byte-identical "Final match dates second independent
+   cross-check (2026-08-09, intensive ..." text, so all three sections'
+   "(source 1 of 3)" links read the same to a links list while pointing at
+   three unrelated URLs (`docs/SOURCES.md` bullets recorded during the
+   hundred-and-first run's Final-match-dates audit). Fixed by re-running
+   `disambiguateLabels()` across the flattened, already-disambiguated set
+   inside `extractSourceSections()` - safe because that function already
+   strips any existing "(source i of n)" suffix before recomputing (see its
+   own doc comment), the same "disambiguate again after merging" convention
+   every combined-References page (compare/records/players/teams/quiz/
+   golden-boot) already follows for the identical reason.
+2. **Copa América's two 1959 Year-column links.** `TournamentTable.astro`
+   renders the Year cell as a link to the edition page whenever a
+   `yearLinks` map is supplied, with the cell's own text (just "1959") as
+   its only accessible name - fine for every competition except Copa
+   América, whose two 1959 tournaments (Argentina-hosted, then
+   Ecuador-hosted; see `editionLinkKey()`'s own doc comment) render two such
+   links with byte-identical visible/accessible text pointing at two
+   different edition pages. Invisible on screen (the Host column tells the
+   rows apart) but exactly the "same name, different destination" problem a
+   links list can't resolve. Fixed with a conditional `aria-label` -
+   `` `${cell.value} (${edition.host})` ``, e.g. "1959 (Argentina)"/"1959
+   (Ecuador)" - added only when `editions` actually contains more than one
+   row for that year, so every other competition's year links keep their
+   plain-text accessible name unchanged.
+3. **`/hr/about/sources`'s five competition-heading links all pointed at the
+   English competition pages.** Beyond the accessible-name angle: this
+   file's `competitionPages` map hardcoded every href to
+   `withBase('/competitions/<slug>')` with a comment claiming "the
+   competition pages themselves aren't translated yet" - true when Copa
+   América was the only one of six done, but stale by the time this page was
+   even first written (`git log` shows the Croatian Copa América page
+   predates this file), and long since false: `docs/ROADMAP.md`'s "original
+   backlog complete" note confirms all six now have a Croatian route. A
+   Croatian reader clicking any of these five heading links landed on the
+   English page. Two of the five (Copa América, Zlatna lopta) also happened
+   to share their exact accessible-name text with the header nav's own
+   Croatian links to those same competitions elsewhere on the page - a
+   links-list ambiguity on top of the wrong-language bug, and how this
+   surfaced in the audit. Fixed all five hrefs to `/hr/competitions/<slug>`;
+   the label text was already correct Croatian (matching
+   `src/lib/homeCards.ts`'s `CARD_TEXT` names) and needed no change.
+
+The one remaining case the audit surfaced, deliberately left as-is:
+`404.html`'s "Popular pages"/"Popularne stranice" cards both link every
+competition, and two names spelled identically in English and Croatian
+("EURO", "Copa América") collide across the two language cards on that one
+page - unavoidable given GitHub Pages serves this single static file for
+any unmatched URL regardless of language (see `src/pages/404.astro`'s own
+doc comment), and each pair sits under its own `<h2>` with the Croatian
+card marked `lang="hr"`, satisfying WCAG 2.4.4's "or programmatically
+determined context" clause (2.4.9, the link-text-alone variant, is AAA-only
+and not a target here). Documented as a reviewed exception in the new
+script rather than silently excluded.
+
+New permanent tool, `scripts/check-link-names.mjs` (`pnpm
+check:link-names`): plain regex extraction over already-built HTML, the
+same territory as `check:links`/`check:sitemap`/`check:jsonld`/`check:meta`/
+`check:i18n-notes` (well under a second for all 715 files), so it's wired
+into `.github/workflows/ci.yml` as a required PR gate right after
+`check:i18n-notes`. 12 new unit tests (`tests/unit/checkLinkNames.test.ts`)
+cover `extractAnchors()` (text content, `aria-label` precedence, the
+aria-hidden-descendant strip, entity decoding, multiple anchors, no-href/
+no-name skips) and `findAmbiguousLinkNames()` (unique names, same name/same
+href, same name/different hrefs, 3+-way collisions, independent names). Two
+new unit tests in `tests/unit/sources.test.ts` cover the cross-heading
+`extractSourceSections()` fix directly (a same-label collision that only
+exists once both headings share a page, and confirmation that a
+within-one-heading-only collision is untouched). Extended e2e coverage
+rather than adding new spec files: `tests/e2e/copa-america-edition-page.spec.ts`
+gained a dedicated aria-label assertion (both English 1959 links, the
+Croatian Ecuador link, and a check that a normal non-duplicate year like
+2024 gets no aria-label at all) and `tests/e2e/mobile.spec.ts` gained a
+test asserting all five `/hr/about/sources` heading links now resolve to
+their `/hr/competitions/<slug>` counterpart, replacing what turned out to
+be a too-loose existing assertion (`/competitions\/world-cup$/` matches
+both the English and Croatian URL, since the regex has no start anchor - it
+never actually caught the stale-href bug it appeared to guard against).
+
+All 700 PDFs regenerated (`pnpm build && pnpm build:pdfs`, using the
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback this environment's
+Chromium needs) since both `src/lib/sources.ts` and
+`src/components/TournamentTable.astro` are shared dependencies of nearly
+every PDF, and reverified `check:pdfs` clean (700/700) - as with the
+hundred-and-fourteenth run's dead-key removal, most of these PDFs have no
+visibly different rendered output (an `aria-label` isn't visible print
+content), but the check hashes source files, not rendered pixels, so a
+regen was required regardless. No `lastReviewed` bump needed anywhere -
+every fix here is a presentation/accessibility/i18n-routing correction, not
+an editorial content change.
+
+Full standing health check re-run clean after the change: `pnpm lint` (190
+files, 0/0/0), `pnpm test` (649/649 unit, up from 635 - 14 new), `pnpm
+build` (711 pages, unchanged), all 13 `check:*` scripts clean including the
+new `check:link-names` itself (710 pages, 0 problems), `pnpm dlx knip
+--no-config-hints` unchanged (the one standing false positive,
+`scripts/test-preview-server.mjs`). The targeted specs for every touched
+page (`copa-america-edition-page.spec.ts`'s full file, plus the
+`/about/sources`+`/hr/about/sources` blocks in `mobile.spec.ts`) were run
+directly and passed (26 tests, including the new aria-label/href
+assertions); a full cold-start `pnpm test:e2e` was also run to confirm no
+regression elsewhere sitewide (matching every prior run's standard) and
+passed 952/952 (up from 950 - the two new e2e assertions), 29.1 minutes.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League 2023
+attendance conflict, 2021/2025's still-unconfirmed figures, Nations
+League's Team of the Tournament for 2021/2023/2025, and World Cup
+1930/1950's/EURO 1996/2020's excluded attendance figures. The "read a
+shared component/file end to end" method has now been applied to
+accessible-name/link-purpose specifically, on top of every prior structural
+pass (`src/lib/`, `src/components/`, the top-level EN/HR page pairs, the
+seven per-family edition-page route trees) - a future run's best bet is
+either a fresh source lead on the open attendance/captain gaps, or a
+genuinely different quality angle (a first Lighthouse/`check:lighthouse`
+pass hasn't been logged in recent runs' own history, worth confirming still
+clean).
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

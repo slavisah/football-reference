@@ -3074,6 +3074,35 @@ test.describe('Croatian sources page (/hr/about/sources) on a 360px phone', () =
     await expect(worldCupGroup.locator('a[href^="https://www.fifa.com"]').first()).toBeVisible();
   });
 
+  // Every heading link used to point at the English competition page
+  // regardless of language (a stopgap from before all six competitions had a
+  // Croatian version) - fixed to link to the Croatian page a Croatian reader
+  // is already on. Two of the five (Copa América, Zlatna lopta) also happened
+  // to collide, by accessible-name text, with the header nav's own Croatian
+  // links to those same competitions elsewhere on this page: same text,
+  // English destination vs. the nav's Croatian one - a real screen-reader
+  // links-list ambiguity on top of the wrong-language bug. Explicitly
+  // requires the `/hr/` prefix (anchored to the end of the href) so this
+  // regresses loudly if the hrefs are ever pointed back at the English pages.
+  test('every competition heading links to the Croatian competition page, not the English one', async ({
+    page,
+  }) => {
+    const cases: [string, string][] = [
+      ['FIFA Svjetsko prvenstvo', 'world-cup'],
+      ['UEFA Europsko prvenstvo', 'euro'],
+      ['UEFA Liga nacija', 'nations-league'],
+      ['Copa América', 'copa-america'],
+      ['Zlatna lopta', 'ballon-dor'],
+    ];
+    for (const [heading, slug] of cases) {
+      const group = page.locator('.sources-page__group', { hasText: heading });
+      await expect(group.getByRole('link', { name: heading, exact: true })).toHaveAttribute(
+        'href',
+        new RegExp(`/hr/competitions/${slug}$`),
+      );
+    }
+  });
+
   test('the language switcher returns to the English sources page', async ({ page }) => {
     await openMenu(page);
     await page.locator('a.lang-switch').click();
