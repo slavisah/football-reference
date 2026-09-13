@@ -4575,7 +4575,9 @@ back clean:
   unit, up from 631 - 4 new), `pnpm build` (711 pages, unchanged), all 12
   `check:*` scripts clean including the new one itself (7 families, 0
   problems), `pnpm dlx knip --no-config-hints` unchanged (the one standing
-  false positive). See `docs/PROJECT_STATUS.md`'s matching entry for full
+  false positive). A full cold-start `pnpm test:e2e` also passed 950/950
+  (17.3 minutes, unchanged count), confirming no regression. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full
   detail. **Left for a future pass:** the same environment-blocked items as
   every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
   `long-title` brand-suffix decision), plus the Nations League 2023
