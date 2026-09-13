@@ -139,6 +139,24 @@ export type SourceSection = {
  * parser) so the /about/sources index can never drift from what each
  * competition's own References section shows. Headings with no links (e.g.
  * "Review policy", which is prose, not a source list) are skipped.
+ *
+ * extractSources() already disambiguates labels within one heading, but this
+ * is the only reader that puts every heading's list on the same page (each
+ * competition's own References section only ever shows its own heading) - so
+ * a label that collided only within its own heading (e.g. "Final match dates
+ * second independent cross-check ... (source 1 of 3)") can collide *again*
+ * with an unrelated link of the same name from a different competition's
+ * heading, exactly as confirmed against a live build: three headings (World
+ * Cup, EURO, Nations League) each cite a bullet reading the identical "Final
+ * match dates second independent cross-check (2026-08-09, intensive ..."
+ * text, so all three sections' "(source 1 of 3)" links read the same to a
+ * screen reader's links list while pointing at three unrelated URLs. Fixed
+ * by re-running disambiguateLabels() across the flattened, already-
+ * disambiguated set - safe because it strips any existing "(source i of n)"
+ * suffix before recomputing (see its own doc comment), the same "disambiguate
+ * again after merging" convention every combined-References page (compare/
+ * records/players/teams/quiz/golden-boot) already follows for the same
+ * reason.
  */
 export function extractSourceSections(markdown: string): SourceSection[] {
   const headings: string[] = [];
@@ -147,9 +165,17 @@ export function extractSourceSections(markdown: string): SourceSection[] {
     if (headingMatch) headings.push(headingMatch[1].trim());
   }
 
-  return headings
+  const sections = headings
     .map((heading) => ({ heading, links: extractSources(markdown, heading) }))
     .filter((section) => section.links.length > 0);
+
+  const flattened = disambiguateLabels(sections.flatMap((section) => section.links));
+  let cursor = 0;
+  return sections.map((section) => {
+    const links = flattened.slice(cursor, cursor + section.links.length);
+    cursor += section.links.length;
+    return { heading: section.heading, links };
+  });
 }
 
 /**

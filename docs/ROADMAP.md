@@ -4589,3 +4589,55 @@ back clean:
   route trees - a future run's best bet is a genuine screen-reader
   emulation pass (still untried), or a fresh
   `docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.
+- **Screen-reader "links list" audit: `check:link-names`, plus three real
+  same-name-different-destination bugs it caught**: closed 2026-09-13
+  (hundred-and-fifteenth intensive run) - a standing health check first (all
+  clean, matching the hundred-and-fourteenth run's baseline; also applied
+  the one available `cspell` 10.3.0 -> 10.3.1 patch bump). Took the
+  screen-reader-emulation suggestion left by the two prior runs, scoped as
+  an automated "does any link on a page share another link's accessible
+  name while pointing somewhere else" sweep - the exact defect class a
+  screen reader's links list (which shows every link by name alone, no
+  visual context) can't resolve, and the same bug class the
+  hundred-and-twelfth run's References `disambiguateLabels()` fix addressed
+  for merged citation lists specifically. Found and fixed three real,
+  previously-unchecked bugs: (1) `/about/sources`/`/hr/about/sources`
+  disambiguated citation labels only within each `##` heading, so a label
+  colliding only within its own heading could still collide with an
+  unrelated citation from a different heading once every heading landed on
+  one page - fixed by re-running `disambiguateLabels()` across the
+  flattened set in `extractSourceSections()`; (2) Copa América's two 1959
+  Year-column links (`TournamentTable.astro`) shared byte-identical
+  accessible text ("1959") pointing at two different edition pages - fixed
+  with a conditional `aria-label` ("1959 (Argentina)"/"1959 (Ecuador)"),
+  added only when a year actually has more than one edition; (3)
+  `/hr/about/sources`'s five competition-heading links all pointed at the
+  English competition page even though every competition now has a
+  Croatian one (a stale stopgap from when Copa América was the only one
+  translated) - fixed to link to the Croatian route, which also happened to
+  resolve two of the accessible-name collisions the audit itself flagged.
+  One case reviewed and deliberately left as-is: `404.html`'s bilingual
+  "Popular pages" cards share two competition names ("EURO", "Copa
+  América") spelled identically in both languages - unavoidable given
+  GitHub Pages serves one static 404 file for both languages, and each
+  language's card has its own heading/`lang` attribute, satisfying WCAG
+  2.4.4's in-context clause. New permanent tool, `scripts/check-link-names.mjs`
+  (`pnpm check:link-names`), wired into CI right after `check:i18n-notes`;
+  12 new unit tests for it, 2 more extending `sources.test.ts` for the
+  cross-heading fix directly, plus extended (not new) e2e coverage in
+  `copa-america-edition-page.spec.ts` and `mobile.spec.ts`. All 700 PDFs
+  regenerated and reverified clean (both changed files are shared
+  dependencies of nearly every PDF, even though most have no visibly
+  different rendered output). Full health check clean after the change:
+  649/649 unit (14 new), 711 pages, all 13 `check:*` scripts clean
+  including the new one itself, plus a full cold-start `pnpm test:e2e`
+  (952/952, up from 950 - the two new e2e assertions). See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a future pass:** the same environment-blocked
+  items as ever (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+  `long-title` brand-suffix decision), plus the Nations League 2023
+  attendance conflict, 2021/2025's still-unconfirmed figures, Nations
+  League's Team of the Tournament for 2021/2023/2025, and World Cup
+  1930/1950's/EURO 1996/2020's excluded attendance figures. A future run's
+  best bet is a fresh source lead on any of those, or a different quality
+  angle - `check:lighthouse` hasn't had a logged run recently, worth
+  confirming still clean.

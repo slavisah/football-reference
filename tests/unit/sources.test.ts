@@ -199,4 +199,40 @@ describe('extractSourceSections', () => {
     const sections = extractSourceSections(withPolicy);
     expect(sections.some((s) => s.heading === 'Review policy')).toBe(false);
   });
+
+  it('disambiguates a label that collides only across headings, not within either one', () => {
+    // Each heading has exactly one link under this bullet, so extractSources()
+    // per heading leaves both un-suffixed - the collision only exists once
+    // both headings' lists sit on the same page (/about/sources), which is
+    // exactly the bug a live build caught: three headings independently
+    // reusing the same "Final match dates second independent cross-check"
+    // bullet each rendered a plain, identical, unnumbered link.
+    const withCrossHeadingDuplicate = `# Sources
+
+## FIFA World Cup
+
+- Final match dates cross-check:
+  - https://example.com/world-cup-final
+
+## UEFA EURO
+
+- Final match dates cross-check:
+  - https://example.com/euro-final
+`;
+    const sections = extractSourceSections(withCrossHeadingDuplicate);
+    expect(sections.flatMap((s) => s.links.map((l) => l.label))).toEqual([
+      'Final match dates cross-check (source 1 of 2)',
+      'Final match dates cross-check (source 2 of 2)',
+    ]);
+  });
+
+  it('leaves a label alone when it only collides within its own heading, not across headings', () => {
+    const sections = extractSourceSections(doc);
+    const worldCup = sections.find((s) => s.heading === 'FIFA World Cup');
+    expect(worldCup?.links.map((l) => l.label)).toEqual([
+      'FIFA tournament history and champions (source 1 of 2)',
+      'FIFA tournament history and champions (source 2 of 2)',
+      'FIFA 2026 awards',
+    ]);
+  });
 });
