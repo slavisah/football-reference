@@ -59,8 +59,19 @@ const DIST_DIR = path.join(ROOT, 'dist');
 // Nations League, Copa América and the FIFA World Cup already had theirs)
 // added 18 more `docs/SOURCES.md` citation URLs under the "UEFA EURO"
 // heading, pushing `hr/records` to 590.5 KB, just over the 590 KB budget
-// (the eleventh such deliberate raise).
-export const PAGE_WEIGHT_BUDGET_BYTES = 610 * 1024;
+// (the eleventh such deliberate raise). Raised again to 640 KB on
+// 2026-09-13 (intensive run): a from-scratch manual UX walkthrough found
+// every `References` section's citation links inheriting the same label
+// whenever one `docs/SOURCES.md` bullet cited several corroborating URLs
+// (a real WCAG 2.4.4/2.4.9 problem - a screen reader's links list can't
+// tell them apart), fixed by `disambiguateLabels()` (`src/lib/sources.ts`)
+// appending "(source i of n)" to each link in an affected group.
+// `hr/records` combines every competition's full source list, so it
+// carries by far the largest share of the roughly 968 relabeled links
+// site-wide, pushing it to 613.0 KB, just over the 610 KB budget (the
+// twelfth such deliberate raise) - genuinely necessary accessibility
+// markup, not a regression.
+export const PAGE_WEIGHT_BUDGET_BYTES = 640 * 1024;
 
 /** Every same-origin CSS asset path (e.g. "/football-reference/_astro/foo.css") referenced by an HTML page. */
 export function findCssRefs(html) {
