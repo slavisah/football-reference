@@ -4463,3 +4463,75 @@ back clean:
   Croatian award pages, the glossary's interactive states, the "On this
   day" widget) or to a different interaction mode (keyboard-only navigation,
   a screen reader emulation pass) rather than another code-reading sweep.
+
+- **Keyboard-only navigation walkthrough plus a new permanent test for the
+  one deliberate focus-outline suppression on the site**: closed 2026-09-13
+  (hundred-and-thirteenth intensive run) - a standing health check first
+  (`pnpm install`, `pnpm outdated` found one new in-range patch,
+  `@types/node` 26.5.0 -> 26.5.1, installed; `typescript` 7 still blocked by
+  `@astrojs/check`'s peer ceiling, re-confirmed via `npm view
+  @astrojs/check@latest peerDependencies`). `pnpm lint`/`test`/`build`/
+  `check:links`/`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs`/
+  `check:jsonld`/`check:meta`/`check:html`/`check:award-tallies`/
+  `check:i18n-notes`/`check:spelling` and `pnpm dlx knip --no-config-hints`
+  all clean, matching the hundred-and-twelfth run's baseline. Acted on that
+  run's own suggestion (keyboard-only navigation, untried by any prior run)
+  with a genuine from-scratch pass: drove a real headless Chromium
+  Tab-by-Tab across 13 English and 12 Croatian page families (every
+  competition/award landing and edition page, both search pages, the quiz,
+  glossary, `/about/sources`, `/records`, and the home page's "On this day"
+  widget), reading `document.activeElement` at each stop rather than running
+  another axe-core/Lighthouse sweep - neither tool audits WCAG 2.4.7 Focus
+  Visible or genuine tab-order sanity. Two apparent findings turned out to be
+  false positives on closer inspection (Tab exhausting a page's focusable
+  elements lands briefly on `<body>` before wrapping - normal headless-Chromium
+  behavior with no browser chrome to tab into, not a trap; the "On this day"
+  widget has no interactive elements at all, so nothing to check there) and
+  are recorded here so a future run doesn't re-investigate the same two
+  dead ends. One real, previously-untested invariant did turn up: `grep -rn
+  "outline: none" src/` confirms `.team-search__input:focus-visible {
+  outline: none }` (`Nav.astro`) is the *only* place on the whole site a
+  focus outline is deliberately suppressed on the element that actually has
+  focus - relied on because the wrapping `.team-search__field:focus-within`
+  rule paints the visible ring around the whole field (icon + input)
+  instead. No test anywhere asserted this actually happens, so a future edit
+  removing the wrapper's `outline` rule without a replacement would silently
+  leave keyboard users with zero visible focus indicator on both search
+  widgets - not the kind of regression `check:html`/`check:jsonld`-style
+  content checks or axe-core's ruleset would ever catch. Added
+  `tests/e2e/accessibility-keyboard-focus.spec.ts` (3 tests: team search,
+  player search, and the Croatian home page) asserting both halves of the
+  pattern - the input's own `outline-style` computes to `none`, the
+  ancestor `.team-search__field`'s does not and has a non-zero width -
+  verified to actually catch the regression (temporarily deleted the
+  wrapper's `outline`/`outline-offset` declarations, confirmed all three new
+  tests fail with the expected message, restored the file, confirmed
+  `git diff` clean and the tests pass again). Also verified this run's own
+  test infrastructure gotcha for whoever hits it next: Playwright's
+  `webServer` config (`reuseExistingServer: !CI`) silently reuses *any*
+  already-listening `localhost:4321`, including a stale preview server left
+  running from an unrelated manual `pnpm preview`/prior test run with an
+  older build - a locally-run `pnpm test:e2e` after editing source can look
+  green (or wrongly red) against yesterday's build unless that port is freed
+  first (`lsof -i :4321`, kill the PID) before every fresh run; this run's
+  first attempt at the break/restore verification above was fooled by
+  exactly that. No page-weight, PDF, or `lastReviewed` changes needed - this
+  is a test-only, presentation-unrelated fix, matching every other
+  `accessibility-*.spec.ts` file's own convention. Full standing health
+  check re-run clean after the change (`pnpm lint` 188 files/0 errors,
+  `pnpm test` 631/631 unit, unchanged - e2e-only coverage, `pnpm build` 711
+  pages, every `check:*` script clean), plus a full cold-start `pnpm
+  test:e2e` confirming no regression elsewhere. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
+  future pass:** the same environment-blocked items as ever (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix decision),
+  plus the Nations League 2023 attendance conflict (re-confirmed again this
+  run via WebSearch: both 41,110 and 41,500 still appear across sources with
+  no way to tell which is authoritative) and 2021/2025's still-unconfirmed
+  figures, Nations League's Team of the Tournament for 2021/2023/2025 (also
+  re-checked this run, still no complete official XI turned up), and World
+  Cup 1930/1950's/EURO 1996/2020's excluded attendance figures. The keyboard
+  walkthrough this run opened covered every page family at the site's one
+  test viewport (360px) plus a 1280px desktop check during manual
+  investigation - a future run could extend it to a screen-reader emulation
+  pass (untried by any prior run) or a different quality angle entirely.
