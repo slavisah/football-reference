@@ -83,7 +83,49 @@ export function extractSources(markdown: string, heading: string): SourceLink[] 
     }
   }
 
-  return links;
+  return disambiguateLabels(links);
+}
+
+const SOURCE_SUFFIX_PATTERN = / \(source \d+ of \d+\)$/;
+
+/**
+ * One editorial audit bullet routinely cites several corroborating URLs
+ * (nested bullets under one description, or several bare URLs on
+ * continuation lines) - extractSources() correctly turns each into its own
+ * link, but they all inherit the same `lastLabel`, so the References
+ * section rendered several links in a row with byte-identical visible/
+ * accessible text pointing at different destinations (a reader, especially
+ * one using a screen reader's "links list", has no way to tell them apart).
+ * Appends a "(source i of n)" suffix to every label used by more than one
+ * link in the given list, in the order they appear; a label used once is
+ * left untouched (or, if it already carried a suffix that no longer applies,
+ * has it stripped).
+ *
+ * Idempotent, and safe to call again after merging several already-
+ * disambiguated lists (e.g. /compare's four-competition References list):
+ * strips any existing "(source i of n)" suffix before regrouping, so a
+ * label that collided only within its own competition's list and a label
+ * that collides again after merging both end up with one clean, correctly-
+ * counted suffix rather than two stacked ones.
+ */
+export function disambiguateLabels(links: SourceLink[]): SourceLink[] {
+  const baseLabel = (label: string) => label.replace(SOURCE_SUFFIX_PATTERN, '');
+
+  const counts = new Map<string, number>();
+  for (const { label } of links) {
+    const base = baseLabel(label);
+    counts.set(base, (counts.get(base) ?? 0) + 1);
+  }
+
+  const seen = new Map<string, number>();
+  return links.map((link) => {
+    const base = baseLabel(link.label);
+    const total = counts.get(base) ?? 1;
+    if (total <= 1) return { ...link, label: base };
+    const index = (seen.get(base) ?? 0) + 1;
+    seen.set(base, index);
+    return { ...link, label: `${base} (source ${index} of ${total})` };
+  });
 }
 
 export type SourceSection = {

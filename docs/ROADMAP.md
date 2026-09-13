@@ -4408,3 +4408,58 @@ back clean:
   1996/2020's excluded attendance figures. A from-scratch manual UX
   walkthrough of a full user journey is still untried by any prior run and
   remains a good candidate for a future pass.
+- **References & review sections rendered many links in a row with
+  byte-identical text pointing at different URLs**: closed 2026-09-13
+  (hundred-and-twelfth intensive run) - took the hundred-and-eleventh run's
+  own suggestion and ran a genuine from-scratch manual UX walkthrough (built
+  and served the site, drove a real headless browser across ~16 page
+  families at both 360px and 1280px, read the actual rendered screenshots
+  rather than another internal-consistency code sweep). Found a real, sitewide
+  defect no prior run's automated a11y/lint/Lighthouse tooling had caught,
+  because it isn't a rule axe-core or Lighthouse check for: `extractSources()`
+  (`src/lib/sources.ts`) labels every citation link with the nearest bullet
+  text, but one editorial audit in `docs/SOURCES.md` routinely cites several
+  corroborating URLs (nested bullets under one description) - each became its
+  own link, correctly, but all inherited the exact same label, so the
+  References section rendered runs of 2-52 consecutive links reading
+  identically (e.g. "Final match dates audit (2026-08-02): the calendar
+  date of each edition's" repeated 4 times in a row, each pointing at a
+  different Wikipedia final-match page). Measured before fixing: 968 of the
+  980 total source links across `docs/SOURCES.md` (99%) fell into a
+  duplicate-label group. This is a real WCAG 2.4.4/2.4.9 problem (a reader,
+  especially one using a screen reader's "links list", has no way to tell
+  same-text links apart) as well as a plain scanability issue for a sighted
+  reader. Fixed centrally: a new exported `disambiguateLabels()` in
+  `src/lib/sources.ts`, called from `extractSources()`, appends a
+  "(source i of n)" suffix to every label shared by more than one link
+  within a list, in appearance order; a label used once is untouched. Built
+  idempotent (strips any existing suffix before regrouping) specifically
+  because 18 separate call sites across `/compare`, `/compare-players`,
+  `/records`, `/teams`, `/players`, `/quiz` and the combined Golden Boot
+  page (both languages of each) merge several competitions' already-
+  disambiguated source lists into one combined References section - without
+  idempotency, two different competitions' citations that each happened to
+  resolve to "(source 1 of 3)" independently would collide again after
+  merging. All 18 merge sites updated to wrap their existing URL-dedup
+  `.filter()` in `disambiguateLabels()`. Verified against the real built
+  output, not just the unit tests: a scan of all 715 built HTML files found
+  zero pages with any remaining duplicate link text in a `.references__list`
+  (down from 968 duplicated links across the site pre-fix). 4 new unit tests
+  in `tests/unit/sources.test.ts` (631/631 total) covering the untouched
+  single-link case, in-section numbering, cross-section scoping, and the
+  fallback-hostname-label case. Every content-embedding PDF regenerated
+  (`pnpm build:pdfs`) since the References section is printed into each one;
+  `check:pdfs` reverified clean after. Full standing health check clean:
+  `pnpm lint` (0/0/0), `pnpm test` (631/631), `pnpm build` (711 pages),
+  `check:links`/`check:html`/`check:jsonld`/`check:meta`/`check:pdfs` all
+  clean. See `docs/PROJECT_STATUS.md`'s matching entry for full detail.
+  **Left for a future pass:** the same environment-blocked items as ever
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+  brand-suffix decision), plus the Nations League 2023 attendance conflict
+  and 2021/2025's still-unconfirmed figures, and World Cup 1930/1950's/EURO
+  1996/2020's excluded attendance figures. The manual UX walkthrough this
+  run opened only covered a first pass across ~16 page families at two
+  viewports - a future run could extend it to pages not yet walked (the
+  Croatian award pages, the glossary's interactive states, the "On this
+  day" widget) or to a different interaction mode (keyboard-only navigation,
+  a screen reader emulation pass) rather than another code-reading sweep.
