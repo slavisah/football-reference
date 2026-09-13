@@ -21875,8 +21875,8 @@ gap it closes in its own header comment. Full standing health check
 re-run clean after adding the test: `pnpm lint` (188 files, 0 errors),
 `pnpm test` (631/631 unit, unchanged - this is e2e-only coverage), `pnpm
 build` (711 pages, unchanged), every `check:*` script clean again. A full
-cold-start `pnpm test:e2e` also confirmed no regression elsewhere on top
-of the three new tests passing.
+cold-start `pnpm test:e2e` passed 950/950 (up from 947 - the three new
+tests), 16.7 minutes, confirming no regression elsewhere.
 
 Also re-checked, via `WebSearch`, the two standing Nations League content
 gaps in case a fresh query surfaced something new: the 2023 Finals
