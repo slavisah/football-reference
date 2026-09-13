@@ -4389,3 +4389,22 @@ back clean:
   a second pass over an already-swept area with a genuinely different
   lens, or picking a new quality dimension not yet tried (e.g. a from-
   scratch UX walkthrough rather than a code-reading audit).
+- **Missing `x-default` hreflang alternate**: closed 2026-09-13
+  (hundred-and-eleventh intensive run) - a standing health check first (all
+  clean, matching the hundred-tenth run's baseline), then a fresh
+  SEO-specific read of `BaseLayout.astro`/`sitemap.xml.ts`'s hreflang
+  wiring rather than another internal-consistency sweep. Every bilingual
+  page and sitemap entry carried only `en`/`hr` alternates, missing the
+  `x-default` alternate Google's hreflang guidance recommends for a reader
+  whose browser locale matches neither - added to both (pointing at the
+  English version, this site's primary language), and factored
+  `sitemap.xml.ts`'s eight duplicated two-tag alternate blocks into one
+  shared `buildAltLinks()` helper in the process. See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a
+  future pass:** the same environment-blocked items as ever (`typescript`
+  7, `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix
+  decision), plus the Nations League 2023 attendance conflict and
+  2021/2025's still-unconfirmed figures, and World Cup 1930/1950's/EURO
+  1996/2020's excluded attendance figures. A from-scratch manual UX
+  walkthrough of a full user journey is still untried by any prior run and
+  remains a good candidate for a future pass.
