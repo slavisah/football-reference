@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 543 Vitest unit tests
+pnpm test                      # 649 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 939 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 952 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1/2.2 A/AA sweep,
                                           # light and dark, across every page)
 ```
@@ -22176,6 +22176,95 @@ either a fresh source lead on the open attendance/captain gaps, or a
 genuinely different quality angle (a first Lighthouse/`check:lighthouse`
 pass hasn't been logged in recent runs' own history, worth confirming still
 clean).
+
+### `pnpm audit` found 3 real dependency vulnerabilities for the first time (js-yaml/svgo, both transitive via `astro`); pinned via `pnpm.overrides` - closed 2026-09-13 (hundred-and-sixteenth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` (still only
+the blocked `typescript` 7 entry - re-confirmed via `npm view
+@astrojs/check@latest peerDependencies`, unchanged `^5.0.0 || ^6.0.0`
+ceiling), `pnpm lint` (0/0/0), `pnpm test` (649/649 unit), `pnpm build` (711
+pages), `pnpm test:coverage` (unchanged 99.91%/99.3%, the same four
+defensively-unreachable lines), all 13 `check:*` scripts clean, `pnpm dlx
+knip --no-config-hints` unchanged (the one standing false positive),
+`check:lighthouse` (all 37 sampled pages still 1.00/1.00/1.00/1.00 across
+every category - hadn't had a logged run since the fifty-ninth intensive
+run, per the hundred-and-fifteenth run's own suggestion), and
+`check:reflow`/`check:text-zoom`/`check:print-width` (711/711 pages clean on
+all three) - every number matching the hundred-and-fifteenth run's baseline
+exactly.
+
+**Re-attempted the standing content gaps once more, no change:** Nations
+League final attendance for 2021/2023/2025 and the Team of the Tournament
+question were re-checked via several fresh `WebSearch` queries. Result is
+identical to the ninety-sixth/hundred-and-second runs' own findings, not new
+information: 2021 (31,511) and 2025 (65,852) still only ever trace back to
+search-tool-synthesized answers that can't be shown to come from a second,
+genuinely independent domain rather than a Wikipedia mirror; 2023 still
+shows the same Wikipedia-vs-RFEF (41,110-vs-41,500) conflict; no official
+Nations League Finals "Team of the Tournament" surfaced anywhere (already
+closed as not-applicable in the hundred-and-eighth run - UEFA doesn't
+appear to publish one for the four-team Finals the way it does for EURO/the
+World Cup/Copa América). Also re-tried direct egress once more, this time
+with a bare `curl` rather than `WebFetch`, against `en.wikipedia.org`:
+still `CONNECT tunnel failed, response 403` - confirms the block sits at
+the network-proxy layer itself, not inside any one tool. All of this
+content stays out of `content/uefa-nations-league.md`, unchanged.
+
+**New finding, and the run's actual fix:** `pnpm audit` - last logged as
+clean in this file's own history - now reports 3 vulnerabilities, all
+transitive through `astro@7.3.2` (already the latest 7.x release, so no
+simple version bump fixes them): `js-yaml@4.3.1` (high; CVE covering
+`maxTotalMergeKeys` not limiting CPU use for empty merge sources on
+untrusted YAML, patched at `>=4.3.2`) pulled in via
+`@astrojs/internal-helpers`, and `svgo@4.0.2` (one high, one moderate;
+`removeScripts` incompletely sanitizing executable HTML/links in SVG
+`foreignObject`/namespace/control-character contexts, patched at `>=4.1.0`)
+pulled in directly by `astro`. Neither package is imported anywhere in this
+repo's own code (confirmed via `grep -rn "svgo\|js-yaml"` across
+`scripts/`, `src/`, `astro.config.mjs` - zero hits), and this is a static
+build with no untrusted end-user YAML/SVG input at runtime, so the
+practical exposure is low - but both are real, easily-patched advisories
+worth closing rather than leaving for a future run to rediscover. Added a
+`pnpm.overrides` block to `package.json`:
+`{ "js-yaml@<4.3.2": "^4.3.2", "svgo@<4.1.0": "^4.1.0" }`. Deliberately
+scoped each override to a caret range within the same major version astro's
+own code was written against, rather than an open-ended `>=` range - a first
+attempt with `>=4.3.2` resolved `js-yaml` all the way to `5.4.2` (a major
+version jump pnpm's resolver is free to pick from an open range), which
+risked breaking `@astrojs/internal-helpers`'s own `js-yaml` v4 API usage;
+narrowing to `^4.3.2` keeps the patched fix within the same major line
+astro ships against. `pnpm audit` now reports "No known vulnerabilities
+found". Verified the override didn't silently change build output: `pnpm
+lint` (0/0/0, unchanged), `pnpm test` (649/649, unchanged), `pnpm build`
+(711 pages, unchanged), `check:links`/`check:sitemap`/`check:pdfs`/
+`check:jsonld`/`check:meta`/`check:html` all re-run clean after the
+`pnpm install`, and a full cold-start `pnpm test:e2e`: **952/952 passed**
+(15.0 minutes) - confirming the dependency swap changed nothing observable
+about the site itself, only its build-time supply chain.
+
+**Also fixed:** `docs/PROJECT_STATUS.md`'s own "How to run" quick-start
+block had drifted stale - it still read "543 Vitest unit tests" and "939
+Playwright tests", numbers this file's own later entries show grew past
+long ago (649/952 as of this run). Updated both to the current counts.
+
+Full standing health check re-confirmed clean after both changes (see
+counts above). No editorial content changed, so no PDF regeneration was
+needed (`check:pdfs` confirmed 700/700 fresh without running
+`build:pdfs`).
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness - now also confirmed
+blocked at the network layer via direct `curl`, not just `WebFetch`, the
+`long-title` brand-suffix decision needing human sign-off), plus the
+Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+figures, and World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+figures. With every research/content-mining angle re-confirmed exhausted
+across 7+ prior attempts each, and this run's own `pnpm audit` sweep now
+also clean, a future run's best bet is either a fresh source lead on the
+open attendance items, or picking a genuinely new lens on the existing
+site - `pnpm audit` itself is now worth adding to the standing health-check
+list every future run runs, the same way `check:lighthouse` was folded in
+after the fifty-ninth run first tried it.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

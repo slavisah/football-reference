@@ -51,5 +51,11 @@
     "typescript": "^5.9.3",
     "vitest": "^5.0.0"
   },
-  "packageManager": "pnpm@9.15.9"
+  "packageManager": "pnpm@9.15.9",
+  "pnpm": {
+    "overrides": {
+      "js-yaml@<4.3.2": "^4.3.2",
+      "svgo@<4.1.0": "^4.1.0"
+    }
+  }
 }

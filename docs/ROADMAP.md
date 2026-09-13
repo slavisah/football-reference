@@ -4641,3 +4641,31 @@ back clean:
   best bet is a fresh source lead on any of those, or a different quality
   angle - `check:lighthouse` hasn't had a logged run recently, worth
   confirming still clean.
+- **`pnpm audit` dependency vulnerabilities (js-yaml/svgo, both transitive
+  via `astro`)**: closed 2026-09-13 (hundred-and-sixteenth intensive run) -
+  a standing health check first (all clean, matching the
+  hundred-and-fifteenth run's baseline exactly, including a fresh
+  `check:lighthouse` run per that run's own suggestion - still
+  1.00/1.00/1.00/1.00 on all 37 sampled pages). `pnpm audit`, last logged
+  clean, turned up 3 real advisories (`js-yaml@4.3.1` high-severity CPU-DoS,
+  `svgo@4.0.2` one high/one moderate executable-content sanitization bypass)
+  - both transitive through `astro@7.3.2` (already latest), neither imported
+  directly anywhere in this repo. Fixed with a `pnpm.overrides` block in
+  `package.json` pinned to a same-major-version caret range
+  (`^4.3.2`/`^4.1.0`) rather than an open `>=` range, after a first attempt
+  with `>=` jumped `js-yaml` to an unwanted major version 5. `pnpm audit`
+  now clean; full standing health check (lint/test/build/all `check:*`/a
+  cold-start `pnpm test:e2e`, 952/952) re-confirmed nothing else changed.
+  Also fixed a stale pair of test counts in `docs/PROJECT_STATUS.md`'s "How
+  to run" section (543/939, long since outgrown - now 649/952). Re-attempted
+  the standing Nations League attendance/Team-of-the-Tournament gaps once
+  more; no new information, same conclusion as the ninety-sixth/
+  hundred-and-second/hundred-and-eighth runs. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
+  future pass:** the same environment-blocked items as ever (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix decision),
+  plus the Nations League 2023 attendance conflict and 2021/2025's
+  still-unconfirmed figures, and World Cup 1930/1950's/EURO 1996/2020's
+  excluded attendance figures. `pnpm audit` is now worth adding to every
+  future run's own standing health-check list, the same way
+  `check:lighthouse` was folded in after its first manual run.
