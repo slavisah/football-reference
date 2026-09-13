@@ -4521,7 +4521,8 @@ back clean:
   check re-run clean after the change (`pnpm lint` 188 files/0 errors,
   `pnpm test` 631/631 unit, unchanged - e2e-only coverage, `pnpm build` 711
   pages, every `check:*` script clean), plus a full cold-start `pnpm
-  test:e2e` confirming no regression elsewhere. See
+  test:e2e` (950/950 passed, up from 947, 16.7 minutes) confirming no
+  regression elsewhere. See
   `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
   future pass:** the same environment-blocked items as ever (`typescript` 7,
   `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix decision),
