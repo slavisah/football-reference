@@ -18,6 +18,7 @@ import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
 import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
+import { disambiguateLabels } from '../../../lib/sources';
 import { buildYearStories } from '../../../lib/editions';
 import { buildEditionLinks, buildEditionProfiles } from '../../../lib/editionProfile';
 import { absolutePageUrl, withBase } from '../../../lib/url';
@@ -52,8 +53,10 @@ const euroYearLinks = buildEditionLinks(
 // Both loads read the same content file, so status/review date are
 // identical; the source links differ because each table cites its own
 // section of docs/SOURCES.md, same as the English page.
-const sources = [...worldCup.sources, ...euro.sources].filter(
-  (source, index, all) => all.findIndex((s) => s.url === source.url) === index,
+const sources = disambiguateLabels(
+  [...worldCup.sources, ...euro.sources].filter(
+    (source, index, all) => all.findIndex((s) => s.url === source.url) === index,
+  ),
 );
 
 const statusText = worldCup.status === 'verified' ? 'Provjereno' : 'U pregledu';

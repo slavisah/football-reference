@@ -31,7 +31,10 @@ describe('extractSources', () => {
 
   it('labels links with the nearest bullet text', () => {
     const links = extractSources(doc, 'FIFA World Cup');
-    expect(links[0].label).toBe('FIFA tournament history and champions');
+    // The first bullet cites two URLs, so both inherit its text; see the
+    // "disambiguates" tests below for why they aren't identical.
+    expect(links[0].label).toBe('FIFA tournament history and champions (source 1 of 2)');
+    expect(links[1].label).toBe('FIFA tournament history and champions (source 2 of 2)');
     expect(links[2].label).toBe('FIFA 2026 awards');
   });
 
@@ -87,6 +90,49 @@ describe('extractSources', () => {
       label: 'https://example.com:abc/page',
       url: 'https://example.com:abc/page',
     });
+  });
+
+  it('leaves a label untouched when only one link uses it', () => {
+    const single = `## Copa América\n\n- Golden Boot winners:\n  - https://example.com/golden-boot\n`;
+    const links = extractSources(single, 'Copa América');
+    expect(links[0].label).toBe('Golden Boot winners');
+  });
+
+  it('numbers every link that shares a label with at least one other link in the same section, in appearance order', () => {
+    const manySources = `## Copa América\n\n- Third/fourth-place audit, full pre-1975 era:\n  - https://example.com/1916\n  - https://example.com/1917\n  - https://example.com/1919\n`;
+    const links = extractSources(manySources, 'Copa América');
+    expect(links.map((l) => l.label)).toEqual([
+      'Third/fourth-place audit, full pre-1975 era (source 1 of 3)',
+      'Third/fourth-place audit, full pre-1975 era (source 2 of 3)',
+      'Third/fourth-place audit, full pre-1975 era (source 3 of 3)',
+    ]);
+  });
+
+  it('scopes duplicate-label numbering to one heading section, not the whole document', () => {
+    const twoSections = `## FIFA World Cup\n\n- Champions:\n  - https://example.com/a\n  - https://example.com/b\n\n## UEFA EURO\n\n- Champions:\n  - https://example.com/c\n  - https://example.com/d\n`;
+    const worldCup = extractSources(twoSections, 'FIFA World Cup');
+    const euro = extractSources(twoSections, 'UEFA EURO');
+    expect(worldCup.map((l) => l.label)).toEqual([
+      'Champions (source 1 of 2)',
+      'Champions (source 2 of 2)',
+    ]);
+    expect(euro.map((l) => l.label)).toEqual([
+      'Champions (source 1 of 2)',
+      'Champions (source 2 of 2)',
+    ]);
+  });
+
+  it('does not renumber two links that share a label only because both fell back to the same hostname', () => {
+    const sameHost = `## Copa América\n\n- https://example.com/page-one\n- https://example.com/page-two\n`;
+    const links = extractSources(sameHost, 'Copa América');
+    // Both labels fall back to the bare hostname "example.com" (no bullet
+    // text precedes either URL), so they are genuinely identical and both
+    // get numbered - this pins that fallback-label duplicates are treated
+    // the same as bullet-text duplicates, not skipped.
+    expect(links.map((l) => l.label)).toEqual([
+      'example.com (source 1 of 2)',
+      'example.com (source 2 of 2)',
+    ]);
   });
 });
 

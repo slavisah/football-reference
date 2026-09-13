@@ -6,16 +6,18 @@ import { buildAllCountryRecords, type CompetitionEditions, type CountryRecord } 
 import { loadTeamCompetitions } from '../../lib/teamCompetitions';
 import { buildTeamProfile, teamProfileSlug } from '../../lib/teamProfile';
 import { buildTeamProfileItemList, buildTeamSportsTeamJsonLd, type JsonLdObject } from '../../lib/jsonLd';
-import type { SourceLink } from '../../lib/sources';
+import { disambiguateLabels, type SourceLink } from '../../lib/sources';
 import { absolutePageUrl, withBase } from '../../lib/url';
 
 export async function getStaticPaths() {
   const { worldCup, euro, copaAmerica, nationsLeague, competitions } = await loadTeamCompetitions();
   const records = buildAllCountryRecords(competitions);
 
-  const sources = [worldCup, euro, copaAmerica, nationsLeague]
-    .flatMap((c) => c.sources)
-    .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+  const sources = disambiguateLabels(
+    [worldCup, euro, copaAmerica, nationsLeague]
+      .flatMap((c) => c.sources)
+      .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index),
+  );
   const lastReviewed = [worldCup, euro, copaAmerica, nationsLeague]
     .map((c) => c.lastReviewed)
     .sort()

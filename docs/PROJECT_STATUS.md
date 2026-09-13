@@ -21657,5 +21657,112 @@ rather than several), structured-data `sameAs` links, or a genuine
 from-scratch manual UX walkthrough of a full user journey, still untried
 by any of the prior 110 runs.
 
+### References & review sections rendered runs of links with byte-identical text pointing at different URLs - closed 2026-09-13 (hundred-and-twelfth intensive run)
+
+Took the hundred-and-eleventh run's own closing suggestion literally: a
+genuine from-scratch manual UX walkthrough, not another code-reading
+sweep. Built the site (`pnpm build`, 711 pages) and served it
+(`pnpm preview`), then drove a real headless Chromium instance
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) across ~16 page families
+- home, both languages of a Copa América/Nations League landing and
+edition page, `/compare`, `/compare-players`, `/records`, `/glossary`,
+`/quiz`, a team profile, a player profile - at both 360px and 1280px,
+capturing screenshots at the top, a mid-scroll point and the bottom of
+each and reading them, plus checking for browser console/page errors.
+Zero console errors anywhere. One screenshot (`/compare` at 360px,
+mid-scroll) showed a large blank gap above the sticky header; chasing it
+down first confirmed it was an artifact of the walkthrough script's own
+`window.scrollTo()` racing `global.css`'s sitewide `scroll-behavior:
+smooth` (line 187) rather than a site bug - an instant-scroll re-test to
+the same offset rendered cleanly, so not written up as a finding.
+
+**The real find**, surfaced by that same instant-scroll screenshot: the
+"References & review" section (`References.astro`) showed several
+consecutive links reading identically - e.g. "Final match dates audit
+(2026-08-02): the calendar date of each edition's" repeated four times in
+a row, each with a different `href`. Root cause in `extractSources()`
+(`src/lib/sources.ts`): it labels every citation link with the nearest
+preceding bullet's text (`lastLabel`), and one editorial audit in
+`docs/SOURCES.md` routinely cites several corroborating URLs for one
+claim (a bullet's own nested `- https://...` lines, or several bare URLs
+on the paragraph's continuation lines) - each URL correctly became its
+own `SourceLink`, but all of them inherited the same `lastLabel`, since
+nothing resets it until the next bullet-start line. A one-off script
+running the same section-scoped extraction logic against the live
+`docs/SOURCES.md` found this wasn't a rare edge case: 968 of the file's
+980 total source links (99%) fell into a duplicate-label group, the
+largest a single 52-link run (Copa América's "Third/fourth-place audit").
+This is a real WCAG 2.4.4/2.4.9 problem - a reader relying on a screen
+reader's "links list" navigation has no way to distinguish 52
+identically-worded links - and a plain scanability problem for anyone
+else, and it had gone uncaught through 111 prior runs' worth of
+axe-core/Lighthouse/html-validate sweeps because "several links share
+identical accessible text but different destinations" isn't a rule any
+of those tools check automatically; it only surfaces by actually reading
+rendered link text end to end, which is exactly what a from-scratch UX
+walkthrough (rather than another internal-consistency-of-data or
+shared-constant-drift sweep) is for.
+
+**The fix:** a new exported `disambiguateLabels()` in `src/lib/sources.ts`,
+called from inside `extractSources()`, appends a "(source i of n)" suffix
+to every label shared by more than one link in the given list, in
+appearance order; a label used once is left untouched. Built idempotent
+on purpose - it strips any existing "(source i of n)" suffix before
+regrouping - because `extractSources()`'s own per-heading-section
+disambiguation isn't the whole picture: 18 separate call sites (`/compare`,
+`/compare-players`, `/records`, `/teams` index and profile pages,
+`/players` index and profile pages, `/quiz`, and the combined Golden Boot
+page - both languages of each) each merge several competitions' or
+awards' already-disambiguated `sources` arrays into one combined
+References list (deduplicated by URL only). Without idempotency, two
+different competitions' citations that each happened to resolve to, say,
+"(source 1 of 3)" independently within their own section could collide
+again after merging; the strip-then-regroup design instead produces one
+clean "(source 1 of 6)"-style count across the merged set. All 18 sites
+updated to wrap their existing URL-dedup `.filter()`/`.flat()` chain in
+`disambiguateLabels()`.
+
+Verified against the real built output, not just unit tests: a scan of
+all 715 built HTML files' `.references__list` sections found zero pages
+with any remaining duplicate link text (down from 968 duplicated links
+site-wide pre-fix), and a re-run of the same live-`docs/SOURCES.md`
+duplicate-count script against the browser-rendered `/compare` page
+(which merges four competitions' citations) confirmed the pre-fix 15
+residual cross-section collisions were gone after wiring in
+`disambiguateLabels()` there too. 4 new unit tests in
+`tests/unit/sources.test.ts` (631/631 total): a label used once stays
+untouched, three links sharing a label get numbered "(source 1 of 3)"
+through "(source 3 of 3)" in order, numbering is scoped per call (two
+different headings each with their own 2-link duplicate don't cross-count
+to 4), and two links that only coincidentally share a label because both
+fell back to the same bare hostname (no bullet text precedes either URL)
+are still numbered, not skipped. One existing test's hardcoded
+expectation (`'labels links with the nearest bullet text'`) updated to
+the new, correct two-link output rather than the old byte-identical pair
+it had asserted without ever actually checking uniqueness.
+
+Every content-embedding PDF regenerated (`pnpm build:pdfs`) since the
+References section is printed into each of the 700 PDFs; `pnpm
+check:pdfs` reverified clean afterward rather than assumed. Full standing
+health check clean: `pnpm lint` (0/0/0), `pnpm test` (631/631), `pnpm
+build` (711 pages), `check:links` (715 pages, no broken internal
+links/fragments), `check:html` (711/711 valid HTML5), `check:jsonld`
+(1783 blocks across 711 pages, all structurally valid), `check:meta`
+(710/710 indexable pages, titles/descriptions all within limits),
+`check:pdfs` (700/700 fresh after regeneration).
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League
+2023 attendance conflict and 2021/2025's still-unconfirmed figures, and
+World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures. This
+run's manual UX walkthrough covered only a first pass across ~16 page
+families at two viewports (360px/1280px) - a future run could extend it
+to page families not yet walked this way (the Croatian award pages'
+edition tables, the glossary's interactive states, the "On this day"
+widget, the quiz's answer-checking flow) or to a different interaction
+mode entirely (keyboard-only navigation, an actual screen-reader
+emulation pass) rather than defaulting back to a code-reading sweep.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
