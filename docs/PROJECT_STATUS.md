@@ -22002,7 +22002,11 @@ Full standing health check re-run clean after the change: `pnpm lint` (190
 files, 0/0/0), `pnpm test` (635/635 unit, up from 631 - 4 new), `pnpm
 build` (711 pages, unchanged), all 12 `check:*` scripts clean including the
 new `check:edition-header-labels` itself (7 families, 0 problems), `pnpm
-dlx knip --no-config-hints` unchanged (the one standing false positive).
+dlx knip --no-config-hints` unchanged (the one standing false positive). A
+full cold-start `pnpm test:e2e` also passed 950/950 (17.3 minutes, unchanged
+count - this run's only test additions are the 4 unit tests for
+`parseHeaderLabelKeys()`, not new e2e coverage), confirming no regression
+elsewhere.
 
 **Left for a future pass:** the same environment-blocked items as ever
 (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
