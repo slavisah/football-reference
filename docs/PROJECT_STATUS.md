@@ -21900,5 +21900,121 @@ investigation - a future run could extend this same method to a genuine
 screen-reader emulation pass (untried by any prior run) or pick a
 different quality angle entirely.
 
+### `check:edition-header-labels`: new permanent check for the seven per-family edition-page `HEADER_LABELS` translation maps, plus one real dead-key bug it caught - closed 2026-09-13 (hundred-and-fourteenth intensive run)
+
+Standing health check first: `pnpm install`, `pnpm outdated` turned up
+nothing new beyond the still-blocked `typescript` 7 entry (`@astrojs/check`
+0.9.10's `typescript: '^5.0.0 || ^6.0.0'` peer ceiling, re-confirmed via
+`npm view @astrojs/check@latest peerDependencies`). `pnpm lint` (188 files,
+0/0/0), `pnpm test` (631/631 unit), `pnpm build` (711 pages),
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:precache`
+(37 URLs), `check:perf` (heaviest page still `hr/records`, within the
+640 KB budget), `check:pdfs` (700/700 fresh), `check:jsonld` (1783 blocks,
+711 pages), `check:meta` (710/710 pages), `check:html` (711/711 valid
+HTML5), `check:award-tallies` (4/4 tables match), `check:i18n-notes` (7
+page pairs, 0 problems), `check:spelling` (15 files, 0 issues) and `pnpm
+dlx knip --no-config-hints` (the one standing false positive,
+`scripts/test-preview-server.mjs`) all clean, matching the
+hundred-and-thirteenth run's baseline exactly.
+
+The hundred-and-thirteenth run's own closing note suggested either a
+screen-reader emulation pass or "a different quality angle entirely"; a
+still-open, more concretely-scoped suggestion from further back (the
+hundred-and-eighth run) was extending the "read a shared component plus
+every one of its call sites end to end" method - the same method that found
+the `hr/records` unit-noun bug (hundred-and-fifth run) and the Croatian
+References `noteText` bug (hundred-and-twelfth run) - to the seven
+per-family `src/pages/hr/competitions/**/[year].astro` route trees, a
+different shape (many generated pages per family) the top-level EN/HR
+page-pair sweep never reached. Took that suggestion.
+
+Each of the seven Croatian edition-page route trees (World Cup, EURO,
+Nations League, Copa América, Ballon d'Or, and Golden Boot's World Cup and
+EURO races) hand-maintains its own `HEADER_LABELS: Record<string, string>`
+object, translating that competition's raw English column headers for
+`EditionView.astro`'s `label = (raw) => headerLabels[raw] ?? raw` helper.
+That `?? raw` fallback is exactly the shape that produced both prior bugs
+this method found: a missing key doesn't error, it silently renders the
+untranslated English string on an otherwise fully Croatian page. Read all
+seven `HEADER_LABELS` objects against their live source table's header row
+in `content/*.md` (`fifa-world-cup.md`'s "Editions" table,
+`uefa-euro.md`'s "Editions", `uefa-nations-league.md`'s "Finals",
+`copa-america.md`'s "Champions timeline", `ballon-dor.md`'s "Winners", and
+`golden-boot.md`'s two identically-shaped "FIFA World Cup top scorers"/"UEFA
+EURO top scorers" tables), excluding the Year/Season column the same way
+`src/lib/editionProfile.ts`'s own `isYearLabel()` does (that column never
+becomes an `EditionProfile.facts` entry, so it's never looked up through
+`headerLabels`).
+
+Six of the seven maps were already complete - every non-Year column header
+has a Croatian translation, matching what a manual read confirmed before
+writing the check. The seventh, UEFA Nations League's map, carried a
+`Season: 'Sezona'` entry that doesn't correspond to any key `label()` would
+ever actually look up: `EditionProfile.facts` excludes the Year/Season
+column from every competition, so this key has been silently dead since the
+Nations League edition-page route was first written. Harmless today (dead
+code, not a wrong-language leak - there is no rendered `<dt>` for it to
+mislabel), but exactly the kind of maintenance trap that could confuse a
+future editor into thinking a `Season` fact is rendered somewhere it isn't,
+or into copy-pasting the entry into a *new* family's map by habit where it
+would also be silently ignored. Removed it (`src/pages/hr/competitions/
+nations-league/[year].astro`) - confirmed it's genuinely unused by checking
+the sibling `hr/competitions/nations-league.astro` *index* page, which
+legitimately needs its own `Season: 'Sezona'` key (it renders the raw
+editions table via `TournamentTable.astro`, where Season *is* a visible
+column) - the two files' maps are independent, not shared, so removing the
+dead key from the edition-page file doesn't touch the index page's
+legitimate one.
+
+New permanent tool, `scripts/check-edition-header-labels.mjs`
+(`pnpm check:edition-header-labels`): for each of the seven families, parses
+the source table's header row (reusing `check-award-tallies.mjs`'s
+`parseMarkdownTables()` rather than a second Markdown-table parser) and the
+`.astro` file's `HEADER_LABELS` object literal's keys (`parseHeaderLabelKeys()`,
+a small regex over the frontmatter block, quoted or bare-identifier keys
+alike), then flags both directions: a source column with no matching key
+(a future missing-translation bug, the shape that matters most) and a key
+with no matching source column (a future dead/stale entry, the shape this
+run actually found). Plain regex/string parsing, no build or browser
+needed - the same territory as `check:award-tallies`/`check:spelling`,
+well under a second - so wired into `.github/workflows/ci.yml` as a
+required PR gate right after the Title-tally integrity check. 4 new unit
+tests (`tests/unit/checkEditionHeaderLabels.test.ts`) for
+`parseHeaderLabelKeys()`: single-quoted keys, bare-identifier keys mixed
+with quoted ones, a file with no `HEADER_LABELS` object (returns `null`),
+and unrelated surrounding code (an import, a string literal containing a
+colon) not confusing the key extraction.
+
+All 8 PDFs sourced from the edited file
+(`edition-nations-league-<season>[-hr].pdf` for all four Finals seasons,
+EN + HR) came back stale per `check:pdfs` even though no rendered `<dt>`
+text changed - the check hashes the source `.astro` file itself, not just
+its rendered output, the same "check rendered output, not just content
+files" lesson the hundred-and-fourth run's own correction already
+generalized to "any file the PDF is sourced from." Regenerated with `pnpm
+build:pdfs` (using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+fallback this environment's Chromium needs) and reverified `check:pdfs`
+clean (700/700). No `lastReviewed` bump needed - this is a presentation/
+translation-map fix, not an editorial content change, matching the
+hundred-and-fifth run's own reasoning for its own unit-noun fix.
+
+Full standing health check re-run clean after the change: `pnpm lint` (190
+files, 0/0/0), `pnpm test` (635/635 unit, up from 631 - 4 new), `pnpm
+build` (711 pages, unchanged), all 12 `check:*` scripts clean including the
+new `check:edition-header-labels` itself (7 families, 0 problems), `pnpm
+dlx knip --no-config-hints` unchanged (the one standing false positive).
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League 2023
+attendance conflict, 2021/2025's still-unconfirmed figures, Nations
+League's Team of the Tournament for 2021/2023/2025, and World Cup
+1930/1950's/EURO 1996/2020's excluded attendance figures. The "read a
+shared component/file plus every call site end to end" method has now
+covered all of `src/lib/`, all of `src/components/`, the top-level EN/HR
+page pairs, and the seven per-family edition-page route trees - a future
+run's best bet is likely the still-untried screen-reader emulation pass, or
+a fresh `docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

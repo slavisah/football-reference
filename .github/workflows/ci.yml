@@ -51,6 +51,9 @@ jobs:
       - name: Title-tally integrity check (content/*.md)
         run: pnpm check:award-tallies
 
+      - name: Edition-page header-label translation check
+        run: pnpm check:edition-header-labels
+
       - name: Build
         run: pnpm build
 
