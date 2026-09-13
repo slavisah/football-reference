@@ -63,6 +63,13 @@ const canonicalURL = new URL(withTrailingSlash(Astro.url.pathname), siteOrigin);
 const alternateURL = alternateHref
   ? new URL(withTrailingSlash(alternateHref), siteOrigin)
   : undefined;
+// Google's hreflang guidance recommends an "x-default" alternate alongside
+// the language-specific ones, for a reader whose browser locale matches
+// neither en nor hr - it should resolve to this site's primary language
+// (English, the un-prefixed root) rather than leaving search engines to
+// guess. Only meaningful once both language versions of a page exist, the
+// same condition the two language-specific tags below already require.
+const defaultURL = alternateURL ? (locale === 'en' ? canonicalURL : alternateURL) : undefined;
 // A dedicated 1200x630 (1.91:1) social-card image (scripts/generate-og-image.mjs),
 // not the square PWA icon this used to point at - most link-unfurl surfaces
 // (Slack, Discord, iMessage, X/Twitter's "summary_large_image" card) expect
@@ -160,6 +167,7 @@ const structuredData = withInLanguage(
             hreflang={locale === 'hr' ? 'en' : 'hr'}
             href={alternateURL}
           />
+          <link rel="alternate" hreflang="x-default" href={defaultURL} />
         </>
       )
     }

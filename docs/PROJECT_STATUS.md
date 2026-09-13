@@ -21567,5 +21567,95 @@ describe-block assumptions, or similar), or a quality dimension not yet
 tried by any of the prior 109 runs (e.g. a from-scratch manual UX
 walkthrough of a user journey rather than a code-reading audit).
 
+### Missing `x-default` hreflang alternate on every bilingual page and in `sitemap.xml` - closed 2026-09-13 (hundred-and-eleventh intensive run)
+
+A standing health check first (`pnpm install`, `pnpm outdated` still only
+the blocked `typescript` 7 entry, `pnpm lint` 0/0/0, `pnpm test` 627/627,
+`pnpm build` 711 pages, all `check:*` scripts clean) - matching the
+hundred-and-tenth run's baseline. That run's own closing note said the
+directory-level and page/endpoint-shape sweeps are now both exhausted and
+a future run's best bet is either a fresh source lead on the open
+attendance/brand-suffix items (still blocked - re-confirmed this run with
+a direct `curl` to `en.wikipedia.org`/`www.uefa.com`, both rejected by the
+egress proxy with `connect_rejected`) or "a quality dimension not yet
+tried by any of the prior 109 runs". This run took the second fork: a
+fresh SEO-specific read of `BaseLayout.astro`'s `<head>` and
+`sitemap.xml.ts`'s hreflang wiring - both already swept for internal
+consistency by prior runs, but never checked against external hreflang
+best practice rather than just internal agreement.
+
+**The gap:** every bilingual page emits exactly two `<link rel="alternate"
+hreflang="...">` tags (`en` and `hr`, `BaseLayout.astro`), and
+`sitemap.xml.ts` mirrors the same two per `<url>` block. Google's own
+hreflang documentation recommends a third, `x-default`, alternate
+alongside language-specific ones - the one a reader whose browser locale
+matches neither `en` nor `hr` (e.g. `de`, `fr`, `ja`) resolves to, rather
+than leaving a search engine to guess which of the two to show such a
+reader. No page or sitemap entry on the site carried one.
+
+**The fix:**
+
+- `BaseLayout.astro` gained a third `defaultURL` computed alongside the
+  existing `canonicalURL`/`alternateURL` (only when both language versions
+  of a page exist, the same condition the two language-specific tags
+  already require) and a matching third `<link rel="alternate"
+  hreflang="x-default">` tag pointing at the English version always - this
+  site's un-prefixed root is the primary language, the same convention
+  `homeURL`/`ogLocale` already treat as the default elsewhere in this same
+  file.
+- `sitemap.xml.ts` had the identical two-tag `<xhtml:link rel="alternate">`
+  string built by hand at eight separate call sites (the main `NAV_LINKS`
+  loop, plus one each for `/teams/<slug>`, `/players/<slug>`, and the six
+  per-edition-family loops). Rather than re-typing a third line at all
+  eight, extracted the shared shape into one `buildAltLinks(enPath, hrPath,
+  absolute)` helper (now returning `en`/`hr`/`x-default`) and had all eight
+  call it - the same "one shared helper instead of eight independently-
+  maintained copies" fix this file's own doc comments already praise
+  elsewhere in this codebase's history (e.g. the `OVERFLOW_TOLERANCE_PX`/
+  `PRINT_CONTENT_WIDTH_PX` finds from the hundred-eighth/hundred-ninth
+  runs), and one this file itself hadn't had applied to its own repeated
+  hreflang-block string until now.
+
+`scripts/check-sitemap.mjs`'s reciprocity check (every alternate's target
+page must list the original page back) needed no change: `x-default`
+always resolves to the same English URL the page's own `en` alternate
+already points to, so the existing per-`<url>` `sameAlternates()` and
+reciprocity logic pass through unaffected once both sides of the
+comparison gained the same third tag - confirmed by running
+`pnpm check:sitemap` after the fix (710/710 sitemap entries, all
+canonicals/hreflang agreeing, zero problems) rather than assumed from
+reading the check's logic alone.
+
+Verified: `pnpm lint` (0/0/0), `pnpm test` (627/627, `tests/unit/
+checkSitemap.test.ts`'s own fixture-based tests unaffected since they
+construct their own two-tag sample data rather than reading the real
+build), `pnpm build` (711 pages), `pnpm check:sitemap`/`check:html`/
+`check:links`/`check:jsonld`/`check:meta`/`check:pdfs`/`check:award-
+tallies`/`check:i18n-notes`/`check:precache`/`check:perf` all clean, and
+the two hreflang-specific Playwright cases in `tests/e2e/mobile.spec.ts`
+("a translated page pair carries matching hreflang alternate links",
+"sitemap.xml lists every page in both languages with hreflang
+alternates") passing against the real build (via
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`, this sandbox's
+pre-installed Chromium, since `playwright install`'s default download is
+blocked by the same egress policy as ever - `playwright.config.ts`'s
+existing `PW_EXECUTABLE_PATH` escape hatch, added for exactly this
+situation, needed no change). No content file changed, so no PDF
+regeneration was needed - confirmed via a clean `check:pdfs` rather than
+assumed.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League
+2023 attendance conflict and 2021/2025's still-unconfirmed figures, and
+World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures. The
+"fresh SEO/UX read rather than another internal-consistency sweep" angle
+this run opened has more left in it than just `x-default` - a future run
+could look at `hreflang` region-qualified tags (`en-US` vs plain `en`,
+not needed here since the site targets one English-speaking audience
+rather than several), structured-data `sameAs` links, or a genuine
+from-scratch manual UX walkthrough of a full user journey, still untried
+by any of the prior 110 runs.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
