@@ -4788,3 +4788,59 @@ back clean:
   present since the PDF feature's first commit, never audited by any prior
   run) is a reminder that this routine's own tooling, not just the site's
   pages, can still hide an unchecked angle.
+- **Standing health check clean; EditionView/References translated-prop
+  parity swept across all seven per-edition route families**: closed
+  2026-09-14 (hundred-and-twentieth intensive run) - the full standing
+  health check (`pnpm install`/`outdated`/`lint`/`test`/`test:coverage`/
+  `build`/all 16 `check:*` scripts/`pnpm audit`/`knip`/`check:lighthouse`/
+  `check:reflow`/`check:text-zoom`/`check:print-width`/a cold-start `pnpm
+  test:e2e`) came back byte-identical to the hundred-and-nineteenth run's
+  baseline: 657/657 unit, 99.91%/99.3% coverage, 711 pages, all 37 sampled
+  Lighthouse pages still 1.00/1.00/1.00/1.00, zero `pnpm audit`
+  vulnerabilities, and **952/952 e2e** passed (22.5 minutes).
+  Extended the "read a shared component plus every call site end to end"
+  method - already applied to `src/lib/`, `src/components/`, and nine
+  EN/HR page-pairs outside the per-edition trees - to the one area every
+  recent run's own closing note had flagged as not yet covered by it: the
+  seven per-family `[year].astro` route trees (World Cup, EURO, Nations
+  League, Copa América, Ballon d'Or, and both Golden Boot race variants).
+  Precisely diffed, per file pair, exactly which `EditionView`/`References`
+  props each EN vs. HR call site sets (not just a file-wide prop-name
+  union, which produces false positives from components with multiple
+  instances) - the same two components every one of these 14 pages
+  shares, and the exact components the hundred-and-third/hundred-and-fifth
+  runs' own real bugs (the missing Croatian `noteText`/`unit` overrides)
+  came from. All seven pairs came back completely consistent: every
+  translatable prop with an English default (`eyebrow`, `headingTemplate`,
+  `introTemplate`, `pagerLabel`, `previousLabel`, `nextLabel`, `backLabel`,
+  `teamProfileHintTemplate`, `playerProfileHintTemplate`, `storyHeading`,
+  `glanceHeading`, `topScorerLabel`, `headerLabels`, `locale`, plus
+  References' `dateLocale`/`heading`/`lastReviewedPrefix`/`noSourcesText`/
+  `noteText`/`statusPrefix`/`statusText`) is correctly overridden at every
+  Croatian call site with no gaps - closing this method's queue, first
+  raised by the hundred-and-third run's own "a future pass could extend
+  the same method to the seven per-family edition-page route trees" note
+  and repeated by the hundred-and-fifth/hundred-and-nineteenth runs since.
+  Two shared strings that looked like candidate untranslated-text bugs at
+  first pass (`'FIFA World Cup Golden Boot'`/`'UEFA EURO Golden Boot'`
+  appearing identically in both the EN and HR Golden Boot `[year].astro`
+  files) were traced through `playerProfile.ts`'s `PlayerAwardSource.title`
+  and confirmed to be internal slug-building keys that are never rendered,
+  not a translation gap. No code or content changed this run. **Left for a
+  future pass:** the same environment-blocked items as ever (`typescript`
+  7, `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix
+  decision), plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed figures, the Team of the Tournament sourcing question,
+  and World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures -
+  this run re-confirmed `WebSearch` still can't demonstrate independent
+  sourcing for any of these beyond what the ninety-sixth/hundred-and-
+  seventeenth runs already established (direct `WebFetch`/`curl` to
+  Wikipedia/UEFA/fandom mirrors remains `EGRESS_BLOCKED` in this
+  environment), so this remains a dead end absent a session with broader
+  network access. The "read end to end" method has now covered
+  `src/lib/`, `src/components/`, and every `src/pages/` shape (the nine
+  flat EN/HR page-pairs and all seven per-edition route trees) - a future
+  pass's best bet is a genuinely different quality lens (the
+  hundred-and-seventeenth run's axe-core-rule-tag-gap/visual-order/
+  alt-text-quality angle is one template for what that can look like), or
+  a fresh `docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.
