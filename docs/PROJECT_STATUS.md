@@ -15,7 +15,7 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 649 Vitest unit tests
+pnpm test                      # 657 Vitest unit tests
 pnpm build                     # static build + all content validation
 PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 952 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1/2.2 A/AA sweep,
@@ -22435,6 +22435,142 @@ for a quiet-fallback bug" method has now been applied to `EditionView`'s
 future run's best bet is still a fresh source lead from a session with
 working external network access, or a genuinely new quality lens not yet
 tried on this codebase.
+
+### `scripts/pdf-metadata.mjs`: every downloadable PDF now carries an `/Author` entry, added as a byte-safe incremental update after a full PDF-library rewrite was found to silently destroy the tagged/PDF-UA structure - closed 2026-09-14 (hundred-and-nineteenth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` (still only
+the blocked `typescript` 7 entry - `@astrojs/check@0.9.10`'s
+`typescript: '^5.0.0 || ^6.0.0'` peer ceiling re-confirmed unchanged),
+`pnpm lint` (192 files, 0/0/0), `pnpm test` (649/649 unit), `pnpm
+test:coverage` (99.91%/99.3%, the same four defensively-unreachable
+lines), `pnpm build` (711 pages), all 16 `check:*` scripts, `pnpm audit`
+("No known vulnerabilities found"), `pnpm dlx knip --no-config-hints`
+(the one standing false positive, `scripts/test-preview-server.mjs`), and
+`check:lighthouse` (all 37 sampled pages 1.00/1.00/1.00/1.00) - every
+number matched the hundred-and-eighteenth run's baseline exactly. One
+lighthouse run this session did score "hr team profile (argentina)" at
+best-practices 0.96 instead of a clean 1.00 - alarming at first, but a
+second, isolated `check:lighthouse` run (nothing else running, following
+the hundred-and-eighteenth run's own "CPU contention produces misleading
+failures, re-run alone before concluding a regression" lesson) scored that
+same page a perfect 1.00 again, along with all other 36 pages - a flaky
+single-run Lighthouse metric-timing blip, not a real regression. Noted
+here so a future run doesn't need to re-litigate a single one-off
+best-practices dip on this specific page.
+
+**New defect-class investigation, and this run's actual fix.** Following
+this routine's own "read a shared file end to end for an unchecked
+invariant" method, read `scripts/generate-pdfs.mjs` end to end (one of the
+few remaining files never audited this way) looking for a metadata gap
+none of the many prior SEO/accessibility sweeps had checked, since every
+prior PDF pass focused on the print-CSS layout and the PDF/UA tagged
+structure (added in an earlier, pre-numbered run on 2026-08-12 - "downloadable
+PDFs are now tagged (PDF/UA-style)"), not the PDF document-info dictionary
+itself. Extracted a PDF's raw bytes by
+hand (Python, since neither `pdfinfo`/`exiftool`/`qpdf` nor a working
+Python PDF library - `pypdf` installed but crashed on a broken
+`cryptography`/`_cffi_backend` binding in this sandbox - were available)
+and found: `/Title` is already correct on every PDF, set automatically by
+Chromium's print-to-PDF from the live page's own `<title>`; the document
+catalog's `/Lang` is likewise already correct and per-language (`en` on
+English PDFs, `hr` on Croatian ones), set automatically from the page's
+`<html lang>`. But `/Author` was entirely absent from all 700 PDFs -
+unlike every other place this site names itself (`og:site_name`, every
+page's own `<title>` suffix - see `BaseLayout.astro`), the downloadable
+PDF a reader saves never says who it's from.
+
+Playwright's `page.pdf()` (a thin wrapper over Chromium's
+`Page.printToPDF` CDP command) has no author-metadata parameter, so this
+can only be fixed by editing the file Chromium already wrote. **First
+attempt, rejected after testing against a real generated PDF:** added
+`pdf-lib@1.17.1`, loaded `public/downloads/ballon-dor.pdf`, and called
+`doc.setAuthor(...)` - the re-saved file shrank from 513,927 to 279,375
+bytes and silently dropped `/StructTreeRoot`, `/MarkInfo`, `/Marked true`,
+`/Lang` and `/Outlines` entirely: exactly the PDF/UA accessibility
+structure that 2026-08-12 run's `tagged`/`outline` addition exists to
+produce. Fixing a cosmetic metadata gap by silently destroying a
+previously-shipped accessibility feature would be a strictly worse trade,
+so `pdf-lib` was removed again rather than used.
+
+**The actual fix**, `scripts/pdf-metadata.mjs` (`addAuthorMetadata()`),
+performs a standard PDF *incremental update* instead - the same
+append-only mechanism Adobe Acrobat itself uses to edit an existing PDF's
+properties: it appends a new revision of the existing Info object (its
+object number read from the trailer's own `/Info` entry, never assumed to
+be `1 0 obj`) carrying the added `/Author` key, followed by a minimal xref
+section for just that one object and a new trailer whose `/Prev` points at
+the original file's own xref offset. Every byte of the original file -
+including the entire tagged/outline structure - stays untouched; every
+PDF 1.4+ reader (Chrome, Adobe Reader, pdf.js, and the screen readers
+built on them) resolves the newest trailer first and falls back to `/Prev`
+for any object it doesn't override. Verified by hand against a real
+generated PDF before wiring it in: the patched file grew by exactly the
+appended bytes, `/StructTreeRoot`/`/MarkInfo`/`/Marked true`/`/Lang`/
+`/Outlines` counts stayed byte-for-byte identical to the original, the new
+`/Author` appeared exactly once, and every new xref offset resolved to a
+genuinely well-formed `N 0 obj` at that exact byte position. Wired into
+`scripts/generate-pdfs.mjs` via a `writePdfWithMetadata()` helper used at
+all four PDF-writing call sites (the fixed page list, and the team/player/
+edition loops). Author string is `PDF_AUTHOR = 'The Ultimate Football
+Reference'` - reused for both languages, matching `og:site_name` not
+varying by locale either (the brand name is deliberately left
+untranslated on Croatian pages too).
+
+8 new unit tests (`tests/unit/pdfMetadata.test.ts`, following
+`checkHtmlValidity.test.ts`'s precedent of importing a pure function
+straight out of a `scripts/*.mjs` file) against a hand-built but
+structurally accurate fake PDF fixture: the happy path (byte-preserving
+append, exactly one new `/Author`), the `/Prev`-chain and new-xref-offset
+resolving correctly, a non-`1 0 obj` Info object number being honored
+rather than hardcoded, idempotent no-op when `/Author` already exists,
+PDF-literal-string escaping (backslash and both parentheses), and three
+thrown-error cases (no trailer, trailer missing required keys, Info object
+unresolvable). Verified against the real, live-generated PDFs too, not
+just the fixture: spot-checked `public/downloads/world-cup.pdf` and
+`public/downloads/team-argentina-hr.pdf` after a full `pnpm build:pdfs` -
+both carry exactly one `/Author (The Ultimate Football Reference)`
+alongside their pre-existing, untouched `/StructTreeRoot`/`/Lang`/
+`/Outlines`.
+
+All 700 PDFs regenerated (`PW_EXECUTABLE_PATH=/opt/pw-browsers/
+chromium-1194/chrome-linux/chrome pnpm build:pdfs`) and reverified
+(`pnpm check:pdfs`) - `scripts/pdf-pages.mjs`'s tracked `sources` lists
+were deliberately left unchanged, the same precedent the 2026-08-12
+`tagged`/`outline` addition set: a `generate-pdfs.mjs` tooling
+change is not editorial content, so it doesn't belong in the
+content-hash-based freshness check, and every PDF still needed a one-time
+manual regeneration to pick up the new metadata regardless.
+
+Full standing health check re-confirmed clean after the change: `pnpm
+lint` (194 files, 0/0/0), `pnpm test` (657/657 unit, up from 649 - the 8
+new `pdfMetadata` cases), `pnpm test:coverage` (99.91%/99.3%, unchanged -
+`scripts/*.mjs` sits outside the coverage-tracked `src/` tree, matching
+`check-html-validity.mjs`'s own precedent), `pnpm build` (711 pages,
+unchanged), all 16 `check:*` scripts including a fresh `check:pdfs`
+(700/700 fresh again after the regeneration), `pnpm audit` (still clean),
+`pnpm dlx knip --no-config-hints` (still only the one standing false
+positive - `pdf-metadata.mjs` is correctly recognized as used, imported by
+`generate-pdfs.mjs`), and a full cold-start `pnpm test:e2e` run alone (per
+the hundred-and-eighteenth run's own contention lesson): **952/952
+passed** (22.1 minutes), zero failures throughout.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League
+2023 attendance conflict, 2021/2025's still-unconfirmed figures, the Team
+of the Tournament sourcing question, and World Cup 1930/1950's/EURO
+1996/2020's excluded attendance figures. PDF metadata itself is now fully
+audited - `/Title`/`/Lang`/`/Author` all correct and per-language; `/Subject`/
+`/Keywords` were considered but left out (no existing per-page "subject"
+or keyword concept exists anywhere else on the site - JSON-LD, meta tags,
+OG tags - to draw from without inventing one from scratch, unlike Author,
+which directly reuses the already-established `og:site_name`). A future
+run's best bet is still a fresh source lead from a session with working
+external network access, or a genuinely new quality lens - the metadata
+gap this run found (present since the very first PDF was generated) suggests
+there may be other never-audited angles
+left in tooling this routine writes itself, not just in the site's own
+pages.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

@@ -4733,3 +4733,58 @@ back clean:
   applied to `EditionView`'s `label()` helper, References' `noteText`,
   `hr/records`' unit nouns, and now `HostMap`'s `regionLabels`, all of
   which are either fixed or confirmed clean.
+
+- **PDF metadata: every downloadable PDF now carries an `/Author`, added
+  without disturbing the existing tagged/PDF-UA structure**: closed
+  2026-09-14 (hundred-and-nineteenth intensive run) - a standing health
+  check first (all clean, matching the hundred-and-eighteenth run's
+  baseline exactly; one `check:lighthouse` run scored a single page 0.96
+  on best-practices instead of 1.00, but a clean isolated re-run scored it
+  a perfect 1.00 again - flaky metric-timing noise, not a regression, the
+  same "re-run alone before concluding a regression" lesson the
+  hundred-and-eighteenth run's own e2e contention already established).
+  Read `scripts/generate-pdfs.mjs` end to end and found a gap no prior PDF
+  pass had checked: `/Title` and the document catalog's `/Lang` are both
+  already correct and per-language on every PDF (set automatically by
+  Chromium's print-to-PDF from the live page's own `<title>`/`<html
+  lang>`), but `/Author` was entirely absent from all 700 PDFs - the only
+  place on the whole site that doesn't say who it's from, unlike
+  `og:site_name`/every page's own `<title>` suffix. A first-attempt fix
+  with `pdf-lib` was tested against a real generated PDF and rejected: it
+  shrank the file by almost half and silently dropped `/StructTreeRoot`/
+  `/MarkInfo`/`/Lang`/`/Outlines` entirely - exactly the PDF/UA
+  accessibility structure an earlier (2026-08-12) run's `tagged`/`outline`
+  addition exists to produce. The actual fix, `scripts/pdf-metadata.mjs`,
+  performs a standard PDF incremental update instead (the same append-only
+  mechanism Adobe Acrobat uses to edit a PDF's own properties): appends a
+  new revision of the Info object carrying `/Author`, plus a minimal xref
+  section and trailer whose `/Prev` points at the original file's xref -
+  every byte of the original, tagged/outlined file stays untouched.
+  Verified by hand against a real PDF (byte-for-byte identical structure
+  counts before/after, new `/Author` resolves correctly) before wiring it
+  into all four PDF-writing call sites in `generate-pdfs.mjs`. 8 new unit
+  tests (`tests/unit/pdfMetadata.test.ts`) against a structurally accurate
+  fixture, covering the happy path, xref/offset correctness, a non-`1 0
+  obj` Info object number, idempotency, literal-string escaping, and three
+  thrown-error cases. All 700 PDFs regenerated and reverified
+  (`check:pdfs` 700/700 fresh); spot-checked two live-generated PDFs by
+  hand to confirm the real output matches the fixture-tested behavior.
+  Full standing health check clean after: 657/657 unit (8 new), 711 pages,
+  every `check:*` clean, and a full cold-start `pnpm test:e2e` run alone
+  (**952/952 passed**, 22.1 minutes). See
+  `docs/PROJECT_STATUS.md`'s matching entry for the full byte-level
+  detail. **Left for a future pass:** the same environment-blocked items
+  as ever (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+  `long-title` brand-suffix decision), plus the Nations League 2023
+  attendance conflict, 2021/2025's still-unconfirmed figures, the Team of
+  the Tournament sourcing question, and World Cup 1930/1950's/EURO
+  1996/2020's excluded attendance figures. PDF `/Subject`/`/Keywords` were
+  considered and deliberately left out - no existing per-page "subject" or
+  keyword concept exists anywhere else on the site to draw from without
+  inventing one from scratch, unlike `/Author`, which directly reuses the
+  already-established `og:site_name`. A future run's best bet is still a
+  fresh source lead from a session with working external network access,
+  or a genuinely new quality lens - this run's own finding (a metadata gap
+  present since the PDF feature's first commit, never audited by any prior
+  run) is a reminder that this routine's own tooling, not just the site's
+  pages, can still hide an unchecked angle.
