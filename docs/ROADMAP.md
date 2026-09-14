@@ -4669,3 +4669,30 @@ back clean:
   excluded attendance figures. `pnpm audit` is now worth adding to every
   future run's own standing health-check list, the same way
   `check:lighthouse` was folded in after its first manual run.
+- **Standing health check plus three fresh defect-class investigations**:
+  closed 2026-09-14 (hundred-and-seventeenth intensive run) - the full
+  standing health check (lint/test/coverage/build/all 16 `check:*`
+  scripts/`pnpm audit`/`knip`/`check:lighthouse`/`check:reflow`/
+  `check:text-zoom`/`check:print-width`/a cold-start `pnpm test:e2e`) came
+  back byte-identical to the hundred-and-sixteenth run's baseline: 649/649
+  unit, 99.91%/99.3% coverage, 711 pages, 952/952 e2e (16.5 minutes), zero
+  vulnerabilities. Investigated three fresh potential defect classes none
+  of the existing tooling checks - an `axe-core` rule-tag gap analysis, a
+  CSS visual-order-vs-DOM-order (WCAG 1.3.2) sweep, and an alt-text-quality
+  audit - and ruled out each with evidence rather than assuming (see
+  `docs/PROJECT_STATUS.md`'s matching entry for exactly what was checked
+  and why each is a non-issue here, not a gap). Also re-attempted the
+  Nations League Team of the Tournament research once more: found a named
+  Wikipedia "Team of the Tournament" page exists for the 2019 Finals
+  specifically, narrowing the hundred-and-eighth run's "UEFA doesn't
+  publish one" framing to "not readable from this session" - `WebFetch`
+  against both `en.wikipedia.org` and a fandom mirror still returned
+  `EGRESS_BLOCKED`, so nothing was added given the site's two-independent-
+  source bar. No code or content changed this run. **Left for a future
+  pass:** the same environment-blocked items as ever (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix decision),
+  plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed figures, the re-scoped Team of the Tournament sourcing
+  question, and World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+  figures. A future run's best bet is a fresh source lead from a session
+  with working external network access, or a genuinely new quality lens.

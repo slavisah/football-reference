@@ -22266,5 +22266,99 @@ site - `pnpm audit` itself is now worth adding to the standing health-check
 list every future run runs, the same way `check:lighthouse` was folded in
 after the fifty-ninth run first tried it.
 
+### Standing health check clean; three fresh defect-class investigations tried and ruled out; Nations League Team of the Tournament sourcing re-scoped - 2026-09-14 (hundred-and-seventeenth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` (still only
+the blocked `typescript` 7 entry - `@astrojs/check@0.9.10`'s
+`typescript: '^5.0.0 || ^6.0.0'` peer ceiling re-confirmed unchanged),
+`pnpm lint` (190 files, 0/0/0), `pnpm test` (649/649 unit), `pnpm
+test:coverage` (99.91%/99.3%, the same four defensively-unreachable
+lines), `pnpm build` (711 pages), all 16 `check:*` scripts, `pnpm audit`
+("No known vulnerabilities found"), `pnpm dlx knip --no-config-hints`
+(the one standing false positive, `scripts/test-preview-server.mjs`), a
+fresh `check:lighthouse` pass (all 37 sampled pages still
+1.00/1.00/1.00/1.00), `check:reflow`/`check:text-zoom`/`check:print-width`
+(711/711 pages clean on all three), and a full cold-start `pnpm test:e2e`
+(**952/952 passed**, 16.5 minutes) - every number matches the
+hundred-and-sixteenth run's baseline exactly, no regression.
+
+This session's sandboxed container only had Playwright browser revision
+1194 installed while the pinned `playwright-core@1.63.0` expects revision
+1243, so `check:reflow`/`check:text-zoom`/`check:print-width`/
+`check:lighthouse` initially failed with "Executable doesn't exist"
+until re-run with `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` - the
+same escape hatch this file's own "How to run" section has documented
+since the twenty-fourth intensive run. Not a repo bug, no code change;
+noted here only because it cost this run some time to rediscover.
+
+**Three fresh defect-class investigations, all ruled out (not bugs):**
+
+1. Compared every `axe-core@4.13.0` rule's own tags against the tag set
+   `tests/e2e/accessibility*.spec.ts` actually requests
+   (`wcag2a`/`wcag2aa`/`wcag21a`/`wcag21aa`/`wcag22aa`/`best-practice`/
+   `experimental`/`ACT`/`review-item`) to find any rule silently excluded
+   from every sweep. Four turned up, all legitimately out of scope:
+   `duplicate-id`/`duplicate-id-active` are deprecated axe rules,
+   superseded by `check:html`'s `html-validate:recommended` ruleset (which
+   includes `no-dup-id` and already runs on every page);
+   `identical-links-same-purpose` (WCAG 2.4.9, AAA) ships `enabled: false`
+   in axe-core itself - a heuristic, review-only rule Deque doesn't run by
+   default - and the site's own `check:link-names` (hundred-and-fifteenth
+   run) already covers the concrete, precise version of the same concern
+   (same accessible name, different destination) without the false-positive
+   risk; `meta-refresh-no-exceptions` doesn't apply - the site has no
+   `<meta http-equiv="refresh">` anywhere (`grep -rn` confirmed zero hits).
+   No rule gap worth closing.
+2. Checked for CSS-driven visual-order-vs-DOM-order mismatches (WCAG 1.3.2
+   Meaningful Sequence, a defect class no accessibility linter in this
+   repo's toolchain checks): `grep -rn` for `order:`/`flex-direction:\s*
+   (row|column)-reverse` across every `.astro`/`.css` file found zero
+   matches sitewide - no flexbox/grid `order` property or reversed flow
+   direction anywhere, so this defect class cannot occur here. Confirmed
+   absence, not assumed.
+3. Considered an alt-text-quality audit (presence-only checks like axe's
+   `image-alt` can't judge whether alt text is actually meaningful) but
+   found it inapplicable: `grep -rn "<img"` across `src/` returns zero
+   matches - this is a pure text/table reference site with no `<img>`
+   elements anywhere, so there is no alt text to audit.
+
+**Nations League Team of the Tournament: re-scoped, not resolved.** The
+hundred-and-eighth run's own note reads "no official Nations League
+Finals Team of the Tournament surfaced anywhere... UEFA doesn't appear to
+publish one." A fresh `WebSearch` this run turned up a
+`Template:2019 UEFA Nations League Finals Team of the Tournament` page on
+English Wikipedia - so a named "Team of the Tournament" for at least the
+2019 Finals does exist somewhere, which slightly narrows that framing (the
+open question is sourcing access, not flat non-existence). But
+`WebSearch`'s own result snippets don't include the actual player list,
+and fetching the page directly to read it is still blocked: `WebFetch`
+against both `en.wikipedia.org` and `football.fandom.com` (a mirror that
+sometimes has the same content) both returned `EGRESS_BLOCKED` from this
+session's network proxy, the same failure every prior run's direct-fetch
+attempts have hit. Without being able to read a primary source, and this
+site's own two-independent-source bar for editorial content, nothing was
+added to `content/uefa-nations-league.md`. Left for a future pass with
+either broader network access or a different research path (e.g. a
+session with `gh`/API access to a source that mirrors the Wikipedia
+template's rendered content).
+
+No code or content changed this run - every investigation either found
+the existing coverage already sufficient or hit the same network-egress
+wall every recent run has documented. `check:pdfs` confirmed 700/700
+fresh without needing `pnpm build:pdfs`.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League
+2023 attendance conflict, 2021/2025's still-unconfirmed figures, the
+re-scoped Team of the Tournament sourcing question above, and World Cup
+1930/1950's/EURO 1996/2020's excluded attendance figures. With markup
+validity, accessibility semantics, three layout axes, dependency security,
+and now an axe-rule-tag gap analysis, a CSS reading-order check, and an
+alt-text applicability check all clean or not applicable, a future run's
+best bet is either a fresh source lead on the open content gaps (ideally
+from a session with working external network access), or a genuinely new
+quality lens not yet tried on this codebase.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
