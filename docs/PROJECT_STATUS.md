@@ -22360,5 +22360,81 @@ best bet is either a fresh source lead on the open content gaps (ideally
 from a session with working external network access), or a genuinely new
 quality lens not yet tried on this codebase.
 
+### Standing health check clean; `HostMap` region-label quiet-fallback audited and ruled out - 2026-09-14 (hundred-and-eighteenth intensive run)
+
+A standing health check first: `pnpm install`, `pnpm outdated` (still only
+the blocked `typescript` 7 entry - `@astrojs/check@0.9.10`'s
+`typescript: '^5.0.0 || ^6.0.0'` peer ceiling re-confirmed unchanged via
+`npm view @astrojs/check@latest peerDependencies`), `pnpm lint` (192
+files, 0/0/0), `pnpm test` (649/649 unit), `pnpm test:coverage`
+(99.91%/99.3%, the same four defensively-unreachable lines), `pnpm build`
+(711 pages), all 16 `check:*` scripts, `pnpm audit` ("No known
+vulnerabilities found"), `pnpm dlx knip --no-config-hints` (the one
+standing false positive, `scripts/test-preview-server.mjs`), and a fresh
+`check:lighthouse` pass (all 37 sampled pages still
+1.00/1.00/1.00/1.00) - every number matches the hundred-and-seventeenth
+run's baseline exactly.
+
+This session again only had Playwright browser revision 1194 installed
+against the pinned `playwright-core@1.63.0`'s expected revision 1243, so
+`check:reflow`/`check:text-zoom`/`check:print-width`/`check:lighthouse`
+needed the same `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`
+escape hatch the hundred-and-seventeenth run also hit - not a repo bug.
+
+**A cold-start `pnpm test:e2e` run kicked off while other standing-health-check
+commands (`test:coverage`, `outdated`, `knip`, `check:spelling`) were still
+running concurrently came back with real failures** (a `team-search.spec.ts`/
+`team-profile.spec.ts`/`theme-token-parity.spec.ts` cluster, ~75 tests
+reported passed before the run aborted) - alarming at first glance, but a
+clean, isolated re-run of the exact same cold-start `pnpm test:e2e` (nothing
+else running) passed **952/952** (21.5 minutes), matching the baseline
+exactly. This was CPU contention from this run's own overlapping commands,
+not a regression - noted here so a future run doesn't need to rediscover
+that launching the full e2e suite alongside other heavy `pnpm` commands can
+produce flaky, misleading failures; run it in isolation.
+
+**New defect-class investigation, ruled out (not a bug):** `HostMap.astro`'s
+grouped-region heading (line 105) reads `regionLabels?.[region] ?? region` -
+falling back to the raw English region name whenever a Croatian page's
+`hostRegionLabels` prop is missing a key. This is the exact same "quiet
+fallback to English on a missing translation key" shape that produced two
+real, previously-shipped bugs: the `hr/records` unit-noun bug (hundred-and-fifth
+run) and the Croatian References `noteText` bug (hundred-and-twelfth run) -
+and unlike `EditionView`'s `label()` helper (swept by
+`check:edition-header-labels`, hundred-and-fourteenth run), nothing had ever
+checked this specific lookup directly. Traced every value `region` can
+actually take at each of the four host-map-bearing competitions' call sites:
+`region` always comes from `HostCoordinate.region` in the matching table in
+`src/lib/hostCoordinates.ts` (`WORLD_CUP_HOST_COORDINATES`,
+`EURO_HOST_COORDINATES`, `NATIONS_LEAGUE_HOST_COORDINATES`,
+`COPA_AMERICA_HOST_COORDINATES`), so the fix-or-confirm question is simply
+whether each Croatian page's own `hostRegionLabels` object (defined next to
+its `buildHostMapPoints()` call in `src/pages/hr/competitions/*.astro`)
+has a key for every region value that table can produce. Checked all four
+by hand: World Cup's table uses all five regions in `HOST_REGION_ORDER`
+('South America', 'Europe', 'North America', 'Asia', 'Africa') and its
+`hostRegionLabels` has all five; EURO's and Nations League's tables are
+100% 'Europe' and each page's map has exactly that one key; Copa América's
+table is 'South America' plus 'North America' (the 2016/2024 United States
+editions) and its map has both. No gap anywhere - this defect class cannot
+currently occur on this site, confirmed rather than assumed. No code
+changed.
+
+No content changed this run either - `check:pdfs` confirmed 700/700 fresh
+without needing `pnpm build:pdfs`.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League 2023
+attendance conflict, 2021/2025's still-unconfirmed figures, the Team of the
+Tournament sourcing question, and World Cup 1930/1950's/EURO 1996/2020's
+excluded attendance figures. The "read a shared component/map end to end
+for a quiet-fallback bug" method has now been applied to `EditionView`'s
+`label()` helper, References' `noteText`, `hr/records`' unit nouns, and now
+`HostMap`'s `regionLabels` - all either already fixed or confirmed clean. A
+future run's best bet is still a fresh source lead from a session with
+working external network access, or a genuinely new quality lens not yet
+tried on this codebase.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

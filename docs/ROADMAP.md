@@ -4696,3 +4696,40 @@ back clean:
   question, and World Cup 1930/1950's/EURO 1996/2020's excluded attendance
   figures. A future run's best bet is a fresh source lead from a session
   with working external network access, or a genuinely new quality lens.
+- **Standing health check clean; host-map region-label fallback audited and
+  ruled out**: closed 2026-09-14 (hundred-and-eighteenth intensive run) -
+  the full standing health check (`pnpm install`/`outdated`/`lint`/`test`/
+  `test:coverage`/`build`/all 16 `check:*` scripts/`pnpm audit`/`knip`/
+  `check:lighthouse`/a cold-start `pnpm test:e2e`) came back byte-identical
+  to the hundred-and-seventeenth run's baseline: 649/649 unit,
+  99.91%/99.3% coverage, 711 pages, all 37 sampled Lighthouse pages still
+  1.00/1.00/1.00/1.00, zero `pnpm audit` vulnerabilities, and **952/952
+  e2e** passed on a clean re-run in isolation (an initial attempt run
+  concurrently with other health-check commands genuinely failed several
+  tests under CPU contention - not a repo bug, just this run's own mistake
+  running too much at once; re-run alone came back fully clean). Audited a
+  fresh defect-class hypothesis: `HostMap.astro`'s `regionLabels?.[region]
+  ?? region` lookup (line 105) is the exact same "quiet fallback to raw
+  English on a missing translation key" shape that produced the
+  `hr/records` unit-noun bug (hundred-and-fifth run) and the Croatian
+  References `noteText` bug (hundred-and-twelfth run), and had never been
+  checked directly. Cross-referenced every region value each of the four
+  host-map-bearing competitions' own coordinate table
+  (`WORLD_CUP_HOST_COORDINATES`/`EURO_HOST_COORDINATES`/
+  `NATIONS_LEAGUE_HOST_COORDINATES`/`COPA_AMERICA_HOST_COORDINATES` in
+  `src/lib/hostCoordinates.ts`) can actually produce against each Croatian
+  page's own `hostRegionLabels` map: all four are complete (World Cup's
+  five regions, EURO/Nations League's one region each, Copa América's two),
+  so this defect class cannot currently occur here - ruled out, not a bug.
+  No code or content changed this run. **Left for a future pass:** the same
+  environment-blocked items as ever (`typescript` 7, `docs/SOURCES.md`
+  link-liveness, the `long-title` brand-suffix decision), plus the Nations
+  League 2023 attendance conflict, 2021/2025's still-unconfirmed figures,
+  the Team of the Tournament sourcing question, and World Cup 1930/1950's/
+  EURO 1996/2020's excluded attendance figures. A future run's best bet is
+  still a fresh source lead from a session with working external network
+  access, or a genuinely new quality lens - the "read a shared
+  component/map end to end for a quiet-fallback bug" method has now been
+  applied to `EditionView`'s `label()` helper, References' `noteText`,
+  `hr/records`' unit nouns, and now `HostMap`'s `regionLabels`, all of
+  which are either fixed or confirmed clean.
