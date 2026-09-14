@@ -4844,3 +4844,55 @@ back clean:
   hundred-and-seventeenth run's axe-core-rule-tag-gap/visual-order/
   alt-text-quality angle is one template for what that can look like), or
   a fresh `docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.
+- **Standing health check clean; open-backlog and PR state re-confirmed
+  empty**: closed 2026-09-14 (hundred-and-twenty-first intensive run) - the
+  full standing health check (`pnpm install`/`outdated`/`lint`/`test`/
+  `test:coverage`/`build`/all 17 `check:*` scripts/`pnpm audit`/`knip`/
+  `check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/a
+  cold-start `pnpm test:e2e`) came back byte-identical to the
+  hundred-and-twentieth run's baseline: 657/657 unit, 99.91%/99.3%
+  coverage, 711 pages, zero `pnpm audit` vulnerabilities, one standing
+  `knip` false positive (`scripts/test-preview-server.mjs`), all 37 sampled
+  Lighthouse pages still 1.00/1.00/1.00/1.00, and **952/952 e2e** passed
+  (14.8 minutes). This run also checked something no prior run's own
+  entry mentions doing explicitly: the open PR itself
+  (github.com/slavisah/football-reference/pull/54) - confirmed green CI on
+  its current head, zero open review threads, and zero unaddressed PR
+  comments, so there was no reviewer feedback this run needed to act on.
+  Re-verified this routine's own full backlog history in `docs/ROADMAP.md`
+  line by line: every named item, from the original six-competition
+  milestone through all 120 prior intensive-run entries, is marked closed;
+  none reopened. Beyond the health check, tried several additional angles
+  looking for genuinely new work before concluding none exists: a
+  `target="_blank"` audit (every instance already carries
+  `rel="nofollow noopener external"`, `References.astro` plus both
+  `about/sources` pages), a PWA-installability re-check of
+  `src/lib/manifest.ts` (both maskable and non-maskable 192/512 icons,
+  `display: standalone`, `theme_color`/`background_color` all already
+  present), confirming `BreadcrumbList` JSON-LD is already wired
+  site-wide, and a fresh structural `## `-heading comparison across all
+  six `content/*.md` files - Copa América/Nations League's lack of a
+  "Young Player" award section was the one new-looking candidate, but both
+  are already-closed questions, not a fresh gap: the forty-seventh run
+  closed Copa América's "Best Young Player" award negatively (awarded only
+  "intermittently," not a clean per-edition fact), and the thirty-seventh
+  run closed Nations League's "Young Player of the Finals" the same way
+  (only one of four editions had a findable name) - re-ran both queries
+  fresh rather than trust either prior run's note alone, and both
+  reproduced the identical conclusion. Also re-tested the standing Nations
+  League attendance question via `WebSearch` once more (still available;
+  direct `WebFetch`/`curl` to `en.wikipedia.org` still `EGRESS_BLOCKED`):
+  the queries converged on the exact same figures already on record
+  (31,511; 41,110; 65,852), matching the hundred-and-twentieth run's own
+  re-test byte-for-byte - not new information. No code or content changed
+  this run. **Left for a future
+  pass:** the same environment-blocked items as ever (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix decision
+  needing human sign-off), plus the Nations League 2023 attendance
+  conflict, 2021/2025's still-unconfirmed figures, the Team of the
+  Tournament sourcing question, and World Cup 1930/1950's/EURO 1996/2020's
+  excluded attendance figures. With the backlog, the PR's own review
+  state, and every structural/accessibility/PWA angle tried so far all
+  coming back clean, a future run's best bet is still either a fresh
+  source lead from a session with broader network access, or a genuinely
+  new quality lens not yet listed in this file's own closed-item history.

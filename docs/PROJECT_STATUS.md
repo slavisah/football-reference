@@ -22687,5 +22687,103 @@ visual-order/alt-text-quality investigations are one template for what
 that looks like), or a fresh `docs/WEBSITE_REQUIREMENTS.md` re-read
 against the live site.
 
+### Standing health check clean; open-backlog and PR state re-confirmed empty - closed 2026-09-14 (hundred-and-twenty-first intensive run)
+
+A full standing health check first, the same shape every recent run has
+used: `pnpm install`, `pnpm outdated` (nothing beyond the still-blocked
+`typescript` 7 entry - `@astrojs/check` 0.9.10 still only declares
+`typescript: '^5.0.0 || ^6.0.0'`), `pnpm lint` (194 files, 0/0/0), `pnpm
+test` (657/657 unit, unchanged), `pnpm test:coverage` (99.91%/99.3%,
+unchanged - the same four defensively-unreachable lines in `quiz.ts`/
+`sources.ts`/`tableSort.ts`/`url.ts`), `pnpm build` (711 pages,
+unchanged), all 17 `check:*` scripts (`links`/`sitemap`/`precache`/
+`perf`/`pdfs`/`html`/`jsonld`/`meta`/`award-tallies`/
+`edition-header-labels`/`i18n-notes`/`link-names`/`spelling`/`reflow`/
+`text-zoom`/`print-width`/`lighthouse`), `pnpm audit` (zero
+vulnerabilities), and `pnpm dlx knip --no-config-hints` (the one standing
+false positive, `scripts/test-preview-server.mjs`) - every result
+byte-identical to the hundred-and-twentieth run's baseline. The three
+browser-based sweeps (`check:reflow`/`check:text-zoom`/`check:print-width`)
+needed the same `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback
+this environment's Chromium has always needed for any Playwright-driven
+tool; without it they fail immediately with a "Playwright Team" launch
+error rather than running (a documented environment quirk, not a
+regression). A full cold-start `pnpm test:e2e` also passed clean:
+**952/952** in 14.8 minutes, matching the hundred-and-twentieth run's
+count exactly.
+
+Beyond the standard health check, this run tried three things no prior
+run's own entry records doing:
+
+1. **Checked the open PR itself.** Every prior run's own text talks about
+   the *branch's* content but none mentions actually reading
+   `github.com/slavisah/football-reference/pull/54`'s live review state.
+   Confirmed: green CI on the current head (`test`/`open-pr` both
+   `success`), zero open review threads (`get_review_comments`), and zero
+   PR-level comments (`get_comments`) - nothing a reviewer has flagged
+   that this run needed to act on.
+2. **Re-verified the backlog file itself has no open item.** Grepped every
+   `^- **...**:` bullet in `docs/ROADMAP.md`'s "Open backlog" section (81
+   matches) - every single one reads "closed" with a date and run number;
+   none is open, and the "Ideas not yet scoped as backlog" section below it
+   is the same story (each idea is either closed or explicitly deferred to
+   a named external blocker). This confirms the "original backlog complete"
+   status line at the top of that file is still accurate, not stale.
+3. **Tried several bounded quality angles looking for a genuinely new
+   defect**, each checked and ruled out rather than assumed clean:
+   - Every `target="_blank"` link site-wide (`References.astro`, both
+     `about/sources` pages - the only three call sites) already carries
+     `rel="nofollow noopener external"`, so no tabnabbing/referrer-leak gap
+     exists.
+   - `src/lib/manifest.ts` (both web app manifests) already declares all
+     four PWA-installability icon entries (192/512, `any`/`maskable`
+     purpose each), `display: standalone`, and both `theme_color`/
+     `background_color` - installability was never actually in question,
+     confirming rather than extending the "PWA/offline mode" line item.
+   - `BreadcrumbList` JSON-LD (`src/lib/jsonLd.ts`) is already wired into
+     `BaseLayout.astro` site-wide - not a gap.
+   - A fresh `## `-heading structural comparison across all six
+     `content/*.md` files (the same method the sixtieth run used to close
+     the EURO Fair Play/Nations League top-scorer questions negatively):
+     Copa América and Nations League both lack a "Young Player" award
+     section that World Cup ("Young Player Award") and EURO ("Young
+     Player of the Tournament") both have. Looked like a fresh candidate
+     gap at first, but both are already-closed questions from earlier in
+     this file's own history, not a new one: the forty-seventh run closed
+     Copa América's "Best Young Player" award negatively (its own
+     WebSearch found the award is presented only "intermittently," not a
+     clean per-edition fact), and the thirty-seventh run closed Nations
+     League's "Young Player of the Finals" the same way (only the 2019
+     edition - Frenkie de Jong - had a findable name; 2021/2023/2025
+     turned up nothing). Re-ran both queries fresh rather than trust
+     either prior run's note alone given how much time has passed since:
+     the Copa América search reproduced the same three-edition sporadic
+     pattern (2007, 2011, 2015 only), and the Nations League search
+     reproduced the same result (each Finals' "Best Player" is well
+     documented - Busquets 2021, Rodri 2023, Nuno Mendes 2025 - but no
+     separate "Young Player" award surfaced for any of the three). Both
+     closures stand confirmed, not reopened.
+   - Re-tested the standing Nations League attendance question via
+     `WebSearch` once more (still available and working this session;
+     direct `WebFetch` to `en.wikipedia.org` still returns
+     `EGRESS_BLOCKED`): several queries per edition converged on the exact
+     same figures already on record (31,511 for 2021; 41,110 for 2023,
+     with the standing 41,500 RFEF conflict unresolved; 65,852 for 2025) -
+     byte-for-byte the same result the hundred-and-twentieth run's own
+     re-test found, not new information.
+
+No code or content changed this run - every check confirmed the existing
+state rather than finding something to fix. **Left for a future pass:**
+the same environment-blocked items as ever (`typescript` 7,
+`docs/SOURCES.md` link-liveness, the `long-title` brand-suffix decision
+needing human sign-off), plus the Nations League 2023 attendance conflict,
+2021/2025's still-unconfirmed figures, the Team of the Tournament sourcing
+question, and World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+figures. With the backlog file, the open PR's review state, and every
+accessibility/PWA/structural angle tried so far all confirmed clean, a
+future run's best bet is still either a fresh source lead from a session
+with broader network access than this one has, or a genuinely new quality
+lens not already covered by this file's 121 prior run entries.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
