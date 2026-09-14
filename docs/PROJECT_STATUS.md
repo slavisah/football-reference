@@ -22785,5 +22785,102 @@ future run's best bet is still either a fresh source lead from a session
 with broader network access than this one has, or a genuinely new quality
 lens not already covered by this file's 121 prior run entries.
 
+### `check:heading-outline`: new permanent check for the site's `<h1>`-`<h6>` structure - closed 2026-09-14 (hundred-and-twenty-second intensive run)
+
+A full standing health check first: `pnpm install`, `pnpm outdated`
+(nothing beyond the still-blocked `typescript` 7 entry - `@astrojs/check`
+0.9.10 still only declares `typescript: '^5.0.0 || ^6.0.0'`, re-confirmed
+via `npm view @astrojs/check@latest peerDependencies`), `pnpm lint` (194
+files, 0/0/0), `pnpm test` (657/657 unit), `pnpm test:coverage`
+(99.91%/99.3%, unchanged), and `pnpm build` (711 pages) all clean, matching
+the hundred-and-twenty-first run's baseline.
+
+The hundred-and-twenty-first run's own closing note asked for "a genuinely
+new quality lens not already covered by this file's 121 prior run
+entries." Delegated a survey of every distinct accessibility/SEO/
+performance/content-accuracy/tooling angle this routine has already closed
+(the full `docs/ROADMAP.md` history plus a section-header skim of this
+file) to find one that genuinely doesn't overlap. The angle picked: no
+logged run has ever validated the site's heading *outline* - the
+`<h1>`-`<h6>` hierarchy a screen-reader user's "jump by heading level"
+navigation depends on - as opposed to heading *content* (checked via
+`check:award-tallies`/`check:edition-header-labels`) or general markup
+validity. `check:html`'s `html-validate` pass accepts a `<h4>` nested
+directly inside a `<h2>` as valid HTML5 (heading-level sequencing isn't a
+markup-validity rule), `check:lighthouse` samples 37 pages' accessibility
+*score* rather than parsing heading structure, and this repo's `axe-core`
+sweeps (run across `tests/e2e/`) have no rule that fails on a skipped
+heading level either - a genuine three-way gap, not a restatement of any
+existing check.
+
+New tool: `scripts/check-heading-outline.mjs` (`pnpm check:heading-outline`).
+`extractHeadings()` pulls every `<h1>`-`<h6>` out of a page's raw built
+HTML via regex (tags/attributes ignored, nested markup stripped from the
+heading's text for reporting, matching `check-jsonld.mjs`'s established
+"regex-extract from already-built HTML" approach rather than pulling in a
+full DOM parser this repo doesn't otherwise depend on). `checkHeadingOutline()`
+validates two invariants: exactly one `<h1>` per page, and no heading level
+jumping more than one past the highest level already seen anywhere earlier
+on the page (the same rule axe's own `heading-order` rule and WAVE use,
+deliberately tracking the *highest level seen so far* rather than just the
+immediately preceding heading, so a page that goes `h1 -> h2 -> h3 -> h2 ->
+h3` is correctly accepted - a naive "compare only to the previous heading"
+implementation would wrongly flag that second `h3` as a jump from `h2`).
+Plain regex/string parsing over already-built HTML, the same territory as
+`check:jsonld`/`check:links` - a couple of seconds for all 711 pages, no
+build or browser needed - so wired into `.github/workflows/ci.yml` as a
+required PR gate immediately after the JSON-LD structural-validity check.
+
+Ran clean against the live build on the first pass: 711/711 pages, each
+with exactly one `<h1>` and no level skip. This site's shared layout
+(`BaseLayout.astro` places the page's one `<h1>`) and section components
+already step heading levels down one at a time, so a clean result was the
+expected outcome going in - the same "confirm there's a real signal, but
+keep the tool permanent" reasoning `check:jsonld`'s own first run
+documented. It exists to catch the *next* regression (a future edit that
+drops a wrapping `<h2>` from a shared section component, silently turning
+every `<h3>` under it into a level skip for every page that renders it),
+not to report one today.
+
+12 new unit tests (`tests/unit/checkHeadingOutline.test.ts`): heading
+extraction (attributes ignored, nested markup stripped and whitespace
+collapsed in the reported text, empty array for a heading-free page) and
+outline validation (a clean step-deeper outline, a clean "return to an
+already-seen shallower level," a missing `<h1>`, more than one `<h1>`, a
+level skip with the from/to levels and offending heading text named in the
+message, a level skip with no text label when the heading is empty, and -
+the case that most directly tests the "highest seen, not just previous"
+design decision above - no false positive when a page returns to a deeper
+level it had already reached in an earlier section).
+
+Full standing health check re-run clean after adding the tool: `pnpm lint`
+(196 files, 0/0/0), `pnpm test` (669/669 unit, up from 657 - 12 new),
+`pnpm build` (711 pages, unchanged), `check:links` (715 pages, clean),
+`check:sitemap` (710 entries, clean), `pnpm test:coverage` unchanged at
+99.91%/99.3% (the new `scripts/check-heading-outline.mjs` isn't
+instrumented for coverage, matching every other `scripts/check-*.mjs`
+tool - none of them are), and `pnpm dlx knip --no-config-hints` still shows
+only its one standing false positive (`scripts/test-preview-server.mjs`).
+No editorial content changed this run, so no `lastReviewed` bump and no PDF
+regeneration was needed.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League 2023
+attendance conflict, 2021/2025's still-unconfirmed figures, the Team of the
+Tournament sourcing question, and World Cup 1930/1950's/EURO 1996/2020's
+excluded attendance figures. The same survey that found this run's angle
+also surfaced two runner-up candidates not yet executed, ranked below it
+because both are more involved to implement correctly: a non-text UI
+component contrast audit (WCAG 1.4.11 - border/focus-ring/icon contrast
+against adjacent backgrounds across light/dark/forced-colors themes, a
+success criterion `axe-core`'s default ruleset only partially covers,
+distinct from every prior *text*-contrast pass this file already logs) and
+a `<table>` caption/`aria-describedby` completeness sweep for tables
+outside the per-edition/`TournamentTable` component trees (e.g. any
+ad-hoc tables in `/glossary`, `/about/sources`) that the existing
+table-focused checks don't reach. Either is a reasonable next angle for a
+future run once this one is reviewed.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
