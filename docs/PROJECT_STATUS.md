@@ -22572,5 +22572,120 @@ there may be other never-audited angles
 left in tooling this routine writes itself, not just in the site's own
 pages.
 
+### Standing health check clean; `EditionView`/`References` translated-prop parity swept across all seven per-edition route families - closed 2026-09-14 (hundred-and-twentieth intensive run)
+
+A standing health check first: `pnpm install` (no lockfile changes), `pnpm
+outdated` (still only the blocked `typescript` 7 entry -
+`@astrojs/check@0.9.10`'s `typescript: '^5.0.0 || ^6.0.0'` peer ceiling
+re-confirmed unchanged via `npm view @astrojs/check@latest
+peerDependencies`), `pnpm lint` (194 files, 0/0/0), `pnpm test` (657/657
+unit), `pnpm test:coverage` (99.91%/99.3%, the same four
+defensively-unreachable lines as every recent run - `quiz.ts:305`,
+`sources.ts:33,123`, `tableSort.ts:22`, `url.ts:8`), `pnpm build` (711
+pages), all 16 `check:*` scripts, `pnpm audit` ("No known vulnerabilities
+found"), `pnpm dlx knip --no-config-hints` (the one standing false
+positive, `scripts/test-preview-server.mjs`, unchanged), `check:reflow`/
+`check:text-zoom`/`check:print-width` (711/711 pages clean on all three),
+`check:lighthouse` (all 37 sampled pages a clean 1.00/1.00/1.00/1.00, no
+repeat of the hundred-and-nineteenth run's one-off flaky dip), and a full
+cold-start `pnpm test:e2e` run alone (following the
+hundred-and-eighteenth run's own "don't run it concurrently with other
+health-check commands" lesson): **952/952 passed** (22.5 minutes) - every
+number byte-identical to the hundred-and-nineteenth run's baseline.
+
+**This run's actual work.** The last three runs' own closing notes
+(hundred-and-third, hundred-and-fifth, hundred-and-nineteenth) all named
+the same specific gap in this routine's "read a shared file end to end for
+a quiet-fallback/missing-override bug" method - the method that found two
+real, shipped bugs this way (the `hr/records` "title"/"titles" English
+unit-noun leak, hundred-and-fifth run; the Croatian `References.astro`
+`noteText` prop silently omitted on every per-edition page, hundred-and-third
+run) - had been applied to all of `src/lib/` (hundred-and-second run) and
+all of `src/components/` (hundred-and-third run), and to nine of the
+site's EN/HR page-pairs outside the per-edition route trees
+(hundred-and-fifth run: `index`/`quiz`/`compare`/`compare-players`/
+`records`/`glossary`/`players/[slug]`/`teams/[slug]`/`about/sources`), but
+never to the seven per-family `[year].astro` route trees themselves -
+World Cup, EURO, Nations League, Copa América, Ballon d'Or, and the two
+Golden Boot race variants (`golden-boot/world-cup`, `golden-boot/euro`).
+Each of those 14 files (7 English + 7 Croatian) imports only two shared
+components, `EditionView.astro` and `References.astro` - the exact two
+components both prior real bugs came from - so this run closed that gap.
+
+Rather than repeat the file-wide "union of every prop name used anywhere
+in the file" comparison the earlier `ChampionsSummary`/`References` sweeps
+used (which works when a component appears once per file, but produces
+false negatives here since `EditionView` wraps `References` as a child,
+so a naive grep conflates both components' props into one set), this run
+located each pair's exact `<EditionView ...>` and `<References ...>` tag
+boundaries by line number first, then diffed only the props set inside
+each tag's own line range, per file, per component - precise enough to
+catch a gap at one specific call site even if every other call site in
+the same file is correct (the same precision the hundred-and-fifth run's
+own nine-call-site `ChampionsSummary` bug needed).
+
+The result, for all seven pairs: completely consistent, no gap found.
+Every English-default prop `EditionView.astro`'s own `Props` interface
+declares (`eyebrow`, `headingTemplate`, `introTemplate`, `pagerLabel`,
+`previousLabel`, `nextLabel`, `backLabel`, `teamProfileHintTemplate`,
+`playerProfileHintTemplate` where applicable, `storyHeading`,
+`glanceHeading`, `topScorerLabel` where applicable, `headerLabels`,
+`locale`) is overridden with its Croatian translation at every one of the
+seven Croatian call sites, and `References.astro`'s equivalent set
+(`dateLocale`, `heading`, `lastReviewedPrefix`, `noSourcesText`,
+`noteText`, `statusPrefix`, `statusText`) likewise - confirming the
+hundred-and-third/hundred-and-fourth runs' `noteText` fix is still in
+place and complete, and that no sibling gap exists among any of
+`EditionView`'s other translatable props.
+
+Two shared strings looked like plausible untranslated-text candidates on
+a first pass - `'FIFA World Cup Golden Boot'`/`'UEFA EURO Golden Boot'`
+appear as identical literal strings in both
+`competitions/golden-boot/{world-cup,euro}/[year].astro` and their
+Croatian siblings, where every other shared multi-word string between an
+EN/HR pair turned out to be either a markdown-table-heading lookup key
+(`editionsHeading`, matched against the shared English `content/*.md`
+source and therefore correctly identical by necessity in both locales) or
+genuinely rendered prose (which was already translated everywhere).
+Traced this one through `src/lib/playerProfile.ts`: both strings are used
+only as the `title` field of a `PlayerAwardSource` object fed into
+`buildAllPlayerProfiles(playerSources).map((profile) =>
+playerProfileSlug(profile.id))`, which discards every field except each
+profile's `id` to build a `Set` of valid player slugs for internal
+cross-referencing - `title` is read in `buildPlayerProfile()` but that
+function's own result is never constructed or used in this call path, so
+the value genuinely never reaches any rendered output on these two pages.
+Confirmed a false positive, not a bug; no code change needed for it.
+
+No code or content changed this run. **Left for a future pass:** the same
+environment-blocked items as ever (`typescript` 7, `docs/SOURCES.md`
+link-liveness, the `long-title` brand-suffix decision needing human
+sign-off), plus the Nations League 2023 attendance conflict, 2021/2025's
+still-unconfirmed figures, the Team of the Tournament sourcing question,
+and World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures.
+This run re-tested whether `WebSearch` (available and working in this
+session, unlike direct `WebFetch`/`curl` to `en.wikipedia.org`,
+`www.11v11.com` and `www.rsssf.org`, which all still return
+`EGRESS_BLOCKED`/`403` from the egress proxy) could add anything new to
+the 2021/2023/2025 Nations League Finals attendance question: several
+queries per edition all converged on the same single figures already on
+record (31,511; 41,110; 65,852), with UEFA.com's own match pages
+surfacing alongside Wikipedia in the result list - but exactly as the
+ninety-sixth and hundred-and-seventeenth runs already found, nothing
+available through this tool demonstrates a figure was read independently
+off a specific page rather than attributed to it by the search tool's own
+synthesis, so the cannot-confirm-independence verdict (and the standing
+41,110-vs-41,500 RFEF conflict for 2023) stands unchanged. Recorded here
+only to save a future run from re-attempting the identical query shapes
+again - the network-access blocker, not the query wording, is what's
+missing. The "read a shared file end to end" method has now covered all
+of `src/lib/`, all of `src/components/`, and every shape of
+`src/pages/` (the nine flat EN/HR page-pairs and all seven per-edition
+route trees) - a future run's best bet is a genuinely different quality
+lens (the hundred-and-seventeenth run's axe-core-rule-tag-gap/
+visual-order/alt-text-quality investigations are one template for what
+that looks like), or a fresh `docs/WEBSITE_REQUIREMENTS.md` re-read
+against the live site.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
