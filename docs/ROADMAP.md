@@ -4896,3 +4896,45 @@ back clean:
   coming back clean, a future run's best bet is still either a fresh
   source lead from a session with broader network access, or a genuinely
   new quality lens not yet listed in this file's own closed-item history.
+- **`check:heading-outline`: new permanent check for the site's `<h1>`-`<h6>`
+  structure**: closed 2026-09-14 (hundred-and-twenty-second intensive run) -
+  found a genuinely new quality lens after the hundred-and-twenty-first
+  run's own closing note: every accessibility pass logged so far went
+  through axe-core or Lighthouse, and neither rule set validates that a
+  page's heading levels form a correct outline (exactly one `<h1>`, no level
+  skipped ahead of the highest level seen so far) - `check:html`'s
+  `html-validate` pass accepts a `<h4>` nested straight inside a `<h2>` as
+  valid HTML5, so nothing on this site had ever checked that shape. New tool
+  `scripts/check-heading-outline.mjs` (`pnpm check:heading-outline`) parses
+  every heading on every built page via plain regex, the same territory as
+  `check:jsonld`/`check:links` (a couple of seconds, no browser needed), and
+  is wired into `.github/workflows/ci.yml` as a required PR gate. Ran clean
+  on the first pass (711/711 pages, exactly one `<h1>` each, no skips) - the
+  same "confirm a real signal, keep the tool permanent" outcome
+  `check:jsonld` itself had, so it exists to catch the next regression, not
+  to report one now. 12 new unit tests
+  (`tests/unit/checkHeadingOutline.test.ts`) cover heading extraction (text
+  stripped of nested markup, whitespace collapsed) and outline validation
+  (missing `<h1>`, duplicate `<h1>`, a level skip named with its from/to
+  levels and offending heading text, and the "already seen deeper, so no
+  skip" case a naive "compare consecutive headings only" check would get
+  wrong). Full standing health check re-run clean: `pnpm lint` (196 files,
+  0/0/0), `pnpm test` (669/669 unit, up from 657 - 12 new), `pnpm build`
+  (711 pages), `check:links` (715 pages), `check:sitemap` (710 entries),
+  `pnpm test:coverage` unchanged at 99.91%/99.3% (the new script isn't
+  instrumented, matching every other `scripts/check-*.mjs` tool), and `pnpm
+  dlx knip --no-config-hints` still shows only its one standing false
+  positive (`scripts/test-preview-server.mjs`). See
+  `docs/PROJECT_STATUS.md`'s matching entry for the full detail. **Left for
+  a future pass:** the same environment-blocked items as ever (`typescript`
+  7, `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix decision
+  needing human sign-off), plus the Nations League 2023 attendance
+  conflict, 2021/2025's still-unconfirmed figures, the Team of the
+  Tournament sourcing question, and World Cup 1930/1950's/EURO 1996/2020's
+  excluded attendance figures. Two runner-up angles a future run could take
+  next, surfaced but not yet executed: a non-text UI component contrast
+  audit (WCAG 1.4.11 - borders/focus rings/icons against their adjacent
+  background, a success criterion axe-core's default ruleset only partially
+  covers) and a `<table>` caption/`aria-describedby` completeness sweep for
+  tables outside the per-edition/`TournamentTable` trees (e.g. any ad-hoc
+  tables in `/glossary`, `/about/sources`).
