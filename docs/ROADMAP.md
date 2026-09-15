@@ -5155,3 +5155,71 @@ back clean:
   cheap to repeat - a future run could extend it to pages this run didn't
   cover (team/player profile pages, the print stylesheet's rendered output,
   dark mode specifically) rather than assuming this one pass exhausted it.
+- **Manual walkthrough of the Family Quiz's answered state finds and fixes
+  two real, previously untested bugs**: closed 2026-09-15 (hundred-and-
+  twenty-seventh intensive run) - a standing health check first (`pnpm
+  install --frozen-lockfile`, `pnpm lint`/`test`/`build`, all sixteen
+  `check:*` scripts), all byte-identical to the hundred-and-twenty-sixth
+  run's baseline: 703/703 unit, 711 pages, no drift on any check. Picked up
+  the hundred-and-twenty-sixth run's own closing suggestion to extend last
+  run's manual-screenshot method to pages it hadn't covered yet: rendered
+  player profile pages (including the three longest player-name slugs, to
+  stress-test wrapping) and a team profile in both languages/themes/
+  viewports (all clean, no defect), the print stylesheet's actual rendered
+  output for the World Cup competition page, `/records` and the head-to-head
+  compare panel (also clean - the host-country map, tables and page-break
+  behavior all render correctly on paper), and then - following the same
+  run's own explicit "family quiz's interactive answered/revealed states"
+  suggestion - the quiz's answered-question state, which no prior manual
+  walkthrough had actually looked at. Found two real, live bugs there, both
+  present since whenever these features first shipped and both slipping
+  through every unit/e2e test because no existing assertion checked the
+  exact text they broke: (1) the score bar's `{t(locale, 'quizScoreLabel')}`
+  expression sat on its own line above the following `<strong>` in both
+  `quiz.astro` and `hr/quiz.astro` - Astro's template compiler drops that
+  kind of whitespace-only line between an expression and the next tag, so
+  the built HTML read `Score:<strong>` with no space, rendering as
+  "Score:0 / 40"/"Rezultat:0 / 40" instead of "Score: 0 / 40"/"Rezultat: 0 /
+  40"; and (2) far more substantively, `QuizScript.astro`'s shared `check()`
+  function built its "Not quite - the answer is "X"." feedback sentence by
+  reading `labels[answerIndex].textContent` *after* that same function had
+  already written the "✓ correct" result badge into a sibling `<span>`
+  inside that label, so `textContent` picked up both and every incorrect
+  answer on every multiple-choice question, in both languages, read "the
+  answer is "Portugal✓ correct"." instead of "the answer is "Portugal".".
+  Existing e2e coverage never caught this because `mobile.spec.ts`'s one
+  incorrect-answer assertion only checked `.not.toBeEmpty()`, never the
+  actual string. Fixed the score-bar gap with an explicit `{' '}` in both
+  route files, and the feedback-text bug by reading the correct choice's
+  text from `label.querySelector('span:not(.quiz-card__result-badge)')`
+  instead of the whole label, with a comment explaining why (both in
+  `src/components/QuizScript.astro`, shared by the English and Croatian
+  quiz pages, so one fix covers both languages). Added two new regression
+  tests per language to `tests/e2e/mobile.spec.ts` (four total) that
+  deliberately pick a wrong answer and assert the exact feedback string,
+  plus assert the score-bar text matches `/^Score: \d+ \/ \d+$/` (English)
+  and `/^Rezultat: \d+ \/ \d+$/` (Croatian) - neither existed before, so
+  this defect class now has a permanent regression guard. Verified visually
+  with Playwright screenshots before and after (mobile, dark mode) showing
+  the exact "Portugal✓ correct" bug and its fix. Full health check re-run
+  clean after the change: `pnpm lint` (0/0/0), `pnpm test` (703/703,
+  unchanged - no unit-testable logic touched), `pnpm build` (711 pages,
+  unchanged), all sixteen `check:*` scripts clean, and the full quiz e2e
+  spec (27/27, including the 4 new tests) passing standalone. A full
+  cold-start `pnpm test:e2e` (954 tests, up from 952) was launched to
+  confirm no regression sitewide - see the next entry/a following commit
+  for its confirmed result once it finishes. No content file touched, so no
+  PDF regeneration was needed. **Left for a future pass:** the same
+  environment-blocked items as ever (`typescript` 7, `docs/SOURCES.md`
+  link-liveness, the `long-title` brand-suffix decision, the Nations League
+  Team of the Tournament sourcing question), the Nations League 2023
+  attendance conflict, 2021/2025's still-unconfirmed figures, World Cup
+  1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+  hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+  re-check on a real browser. The manual-walkthrough method has now found a
+  real bug two runs in a row - a future pass could extend it further to the
+  quiz's "just show me the answer" reveal state and the order-challenge's
+  answered state, which this run still didn't look at, or to team/player
+  profile pages' own print output, which this run's print pass didn't cover
+  (only the print stylesheet's shared table/map/page-break mechanics on
+  three other page types).

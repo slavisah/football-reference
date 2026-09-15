@@ -23423,5 +23423,160 @@ actual rendered output, dark mode specifically, the family quiz's
 interactive answered/revealed states) rather than assuming one pass
 exhausted it.
 
+### Manual walkthrough of the Family Quiz's answered state finds and fixes two real, previously untested bugs - closed 2026-09-15 (hundred-and-twenty-seventh intensive run)
+
+A standing health check first: `pnpm install --frozen-lockfile` clean,
+`pnpm lint` (0 errors/warnings/hints), `pnpm test` (703/703 unit), `pnpm
+build` (711 pages), and all sixteen `check:*` scripts (`links`, `sitemap`,
+`precache`, `perf`, `pdfs`, `jsonld`, `meta`, `html`, `award-tallies`,
+`edition-header-labels`, `i18n-notes`, `link-names`, `image-dimensions`,
+`locale-consistency`, `heading-outline`, `reachability`) - all clean,
+byte-identical to the hundred-and-twenty-sixth run's baseline.
+
+**Continuing the manual-screenshot-walkthrough method, not another
+`check:*` script.** The hundred-and-twenty-sixth run's own closing note
+named three areas it hadn't covered: team/player profile pages in full, the
+print stylesheet's actual rendered output, and the family quiz's
+interactive answered/revealed states. This run worked through all three
+with Playwright directly (not through `pnpm test:e2e`), rendering real
+pages and looking at the resulting screenshots rather than asserting a
+specific property:
+
+- **Player/team profile pages**: the three longest player-name slugs
+  (`karl-heinz-rummenigge`, `salvatore-schillaci`, `jesus-maria-pereda`,
+  chosen specifically to stress-test name wrapping), `georges-mikautadze`,
+  `alfredo-di-stefano`, `cristiano-ronaldo`, and `czechoslovakia`/
+  `united-states` (the longest team names), each in English and Croatian
+  where applicable, at both 360px and 1280px, light and dark. All rendered
+  cleanly - these are simple award-history pages (no tables, unlike the
+  team-competition pages), so there was less surface for a wrapping bug to
+  hide in than `/compare`'s `.vs__team` panel had.
+- **Print stylesheet rendered output**: `/competitions/world-cup` (both
+  languages), `/competitions/world-cup/2022`, `/records` and `/compare`
+  (with `?a=argentina&b=netherlands` to force the head-to-head panel to
+  render) under `page.emulateMedia({ media: 'print' })`. All rendered
+  correctly - tables convert to real `<table>` markup as the print CSS
+  intends, the host-country SVG map (`HostMap.astro`) renders its dots and
+  grid lines fine on paper, and nothing overflows or clips. Also
+  specifically re-checked the hundred-and-twenty-sixth run's own open
+  caveat (whether `hyphens: auto` actually hyphenates "Argentina" in this
+  environment's browser): confirmed again, in both screen and print
+  rendering, that this session's Playwright-bundled Chromium still produces
+  the bare "Argentin"/"a" split with no hyphen character - same result as
+  last run, not a regression, but still unconfirmed on a real browser.
+- **The quiz's answered state**: this is where the manual method paid off
+  again. Answering a question incorrectly on a phone-width, dark-mode
+  screenshot of `/quiz` showed the feedback sentence reading `Not quite -
+  the answer is "Portugal✓ correct".` - visibly wrong, since "✓ correct" is
+  the result badge meant to sit next to the choice on-screen, not be quoted
+  as part of the answer text. The same screenshot also showed the score bar
+  reading `Score:0 / 40` with no space after the colon.
+
+**Root causes, both in code that had never actually been read end-to-end
+by a prior run:**
+
+1. `src/pages/quiz.astro` and `src/pages/hr/quiz.astro` both wrote the score
+   label as `{t(locale, 'quizScoreLabel')}` on its own line, followed by a
+   line break and then `<strong id="quiz-score-value">`. Astro's template
+   compiler treats a newline-and-indentation-only text node between an
+   expression and the next tag as insignificant whitespace and drops it
+   entirely (the same class of behavior JSX has), so the built HTML read
+   `Score:<strong>` with zero characters between them - confirmed directly
+   in `dist/quiz/index.html` before touching anything, not just inferred
+   from a screenshot.
+2. `src/components/QuizScript.astro`'s shared `check()` function (used by
+   both the English and Croatian quiz pages) builds the incorrect-answer
+   feedback sentence with `labels[answerIndex]?.textContent?.trim()` - but
+   by the time that line runs, the `labels.forEach` loop directly above it
+   has already written `resultCorrectLabel` ("✓ correct") into a
+   `.quiz-card__result-badge` `<span>` that lives *inside* that same
+   `<label>`, as a sibling of the plain `<span>{choice}</span>` holding the
+   visible choice text. `textContent` on the label picks up both spans
+   concatenated with no separator, so the correct choice's own on-screen
+   badge text leaked into the feedback sentence. This is a real, currently-
+   shipping-in-production bug, not a hypothetical: `dist/quiz/index.html`'s
+   client-side script has behaved this way since the answered/badge
+   feedback feature was first built, and it fires on every single incorrect
+   answer, in both languages, every time a reader actually uses the quiz.
+
+Neither bug had any test coverage: `tests/e2e/mobile.spec.ts`'s one
+existing incorrect-answer-adjacent assertion (`answering a question updates
+the score...`) only asserted `.quiz-card__feedback` `.not.toBeEmpty()`,
+never the actual string, and no test anywhere asserted the score bar's
+exact text. This is exactly the same shape of gap the hundred-and-twenty-
+sixth run's own compare-panel bug had (a real defect with no automated
+guard because nothing had ever asserted the specific property that broke).
+
+**Fixes, both minimal:**
+
+- Added an explicit `{' '}` between the label expression and the following
+  `<strong>` in both `quiz.astro` (line ~300) and `hr/quiz.astro` (line
+  ~398) - the standard Astro/JSX idiom for a whitespace character the
+  compiler would otherwise treat as insignificant.
+- Changed the feedback-text line in `QuizScript.astro`'s `check()` to read
+  `labels[answerIndex]?.querySelector('span:not(.quiz-card__result-badge)')
+  ?.textContent?.trim()` instead of `labels[answerIndex]?.textContent?.trim()`,
+  with a comment explaining why the whole-label read was wrong. This is
+  correct regardless of whether the badge-writing loop above it runs first
+  (it always does, but the fix doesn't depend on that ordering either way -
+  it simply never reads the badge's own text). One shared file, so the fix
+  covers the Croatian quiz page too without a second edit.
+
+**New regression coverage**, one new test per language plus one strengthened
+assertion per language in `tests/e2e/mobile.spec.ts` (2 new tests, 954 total
+up from 952): `answering a question updates the score...`'s English test
+gained an
+assertion that `#quiz-score p` matches `/^Score: \d+ \/ \d+$/`; its Croatian
+sibling (`answering a question shows Croatian feedback...`) gained the same
+against `/^Rezultat: \d+ \/ \d+$/`. Two new dedicated tests - "an incorrect
+answer's feedback text names only the correct choice, not its result
+badge" (English) and its Croatian mirror - deliberately pick the *wrong*
+radio option (whichever index isn't `data-answer-index`), then assert the
+feedback text exactly equals `Not quite - the answer is "<correct choice
+text>".`/`Netočno - odgovor je "<correct choice text>".`, reading the
+correct choice's expected text the same bug-safe way the fix itself does
+(`span:not(.quiz-card__result-badge)`), so the assertion would have failed
+against the old, buggy behavior. Ran `PW_EXECUTABLE_PATH=/opt/pw-browsers/
+chromium npx playwright test tests/e2e/mobile.spec.ts -g "quiz|Quiz"`
+standalone first: all 27 quiz-related tests passed, confirming both fixes
+and no regression in the surrounding quiz suite before running anything
+wider.
+
+Verified both bugs and both fixes visually with ad hoc Playwright
+screenshots (mobile viewport, dark mode) - one clearly showing the original
+"Score:0 / 40" and "the answer is "Portugal✓ correct"." text, a second
+after the fix showing "Score: 0 / 40" and "the answer is "Portugal".", and
+a third confirming the Croatian page's equivalent fix ("Rezultat: 0 / 40",
+"Netočno - odgovor je "Portugal"."). All scratch screenshots and the
+one-off scripts that generated them were discarded after review - they
+were verification aids, not deliverables.
+
+Full standing health check re-run clean after the change: `pnpm lint`
+(0/0/0), `pnpm test` (703/703 unit, unchanged - no unit-testable logic was
+touched, only a template whitespace fix and a DOM-query fix that only e2e
+can exercise), `pnpm build` (711 pages, unchanged), and all sixteen
+`check:*` scripts clean with identical output to this run's own opening
+baseline. No content file was touched, so no PDF regeneration or
+`lastReviewed` bump was needed. A full cold-start `pnpm test:e2e` (954
+tests) was launched to confirm no regression sitewide beyond the quiz spec
+already re-run standalone - see the following commit for its confirmed
+result.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision, the Nations League Team of the Tournament sourcing
+question), the Nations League 2023 attendance conflict, 2021/2025's
+still-unconfirmed figures, World Cup 1930/1950's/EURO 1996/2020's excluded
+attendance figures, and the hundred-and-twenty-sixth run's still-open
+hyphenation-rendering visual re-check on a real browser (re-confirmed
+unchanged this run, still not resolved). The manual-walkthrough method has
+now found a real, user-facing bug two runs running - a future pass should
+keep treating it as a first-class method rather than a one-off, and could
+extend it specifically to the quiz's "just show me the answer" reveal
+state and the order-challenge's answered state (neither looked at this
+run), or to team/player profile pages' own print output (this run's print
+pass only covered the print stylesheet's shared table/map/page-break
+mechanics on three other page types).
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

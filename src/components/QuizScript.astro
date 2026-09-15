@@ -74,9 +74,18 @@
           }
         });
         if (feedback) {
+          // Read the choice's own text, not the whole label - by the time we
+          // get here the loop above has already written the result badge
+          // (e.g. "✓ correct") into a sibling span inside that same label,
+          // so `label.textContent` would pull in "Portugal✓ correct" instead
+          // of just "Portugal".
+          const correctChoiceText =
+            labels[answerIndex]
+              ?.querySelector('span:not(.quiz-card__result-badge)')
+              ?.textContent?.trim() ?? '';
           feedback.textContent = correct
             ? correctText
-            : `${incorrectPrefix}${labels[answerIndex]?.textContent?.trim() ?? ''}${incorrectSuffix}`;
+            : `${incorrectPrefix}${correctChoiceText}${incorrectSuffix}`;
         }
         if (checkBtn) checkBtn.hidden = true;
         card.dataset.answered = correct ? 'correct' : 'incorrect';
