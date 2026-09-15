@@ -23235,12 +23235,12 @@ instrumented, matching every other `scripts/check-*.mjs` tool), and `pnpm
 dlx knip --no-config-hints` still only its one standing false positive
 (`scripts/test-preview-server.mjs`). No content file touched, so no PDF
 regeneration or `lastReviewed` bump was needed. A cold-start `PW_
-EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` run was kicked off
-to confirm the new tool doesn't affect the e2e suite (it shouldn't - a
-static `dist/` HTML regex check with no page-rendering or routing surface,
-the same reasoning `check:image-dimensions`/`check:heading-outline` already
-established for their own additions); this run's own PR CI is the
-authoritative confirmation once it runs.
+EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` run confirmed the
+new tool doesn't affect the e2e suite, as expected (a static `dist/` HTML
+regex check with no page-rendering or routing surface, the same reasoning
+`check:image-dimensions`/`check:heading-outline` already established for
+their own additions): **952/952 passed, 15.2 minutes**, matching every
+recent run's baseline exactly.
 
 Also made one fresh, targeted WebSearch attempt at the standing Nations
 League 2021 Finals attendance gap (a different query shape than the
