@@ -23265,5 +23265,161 @@ transitively by `check:sitemap`, so a future run's best bet is again either
 a fresh source lead, or a genuinely new quality lens not yet listed in this
 file's history.
 
+### Manual browser walkthrough finds and fixes a real head-to-head table word-break bug; dependency patch bump - closed 2026-09-15 (hundred-and-twenty-sixth intensive run)
+
+A standing health check first: `pnpm install --frozen-lockfile` (clean),
+`pnpm outdated` turned up three in-range patch releases beyond the still-
+blocked `typescript` 7 entry (`vitest`/`@vitest/coverage-v8` 5.0.0 -> 5.0.1,
+`cspell` 10.3.1 -> 10.3.2); all three installed cleanly. `npm view
+@astrojs/check@latest peerDependencies` re-confirmed `typescript: '^5.0.0 ||
+^6.0.0'` is still the ceiling (latest published `@astrojs/check` is still
+0.9.10), so that upgrade stays blocked exactly as every run since the
+seventy-somethingth has found. Full baseline re-run before touching
+anything: `pnpm lint` (0/0/0), `pnpm test` (703/703), `pnpm build` (711
+pages), every `check:*` script, `pnpm test:coverage` (99.91%/99.3%), `pnpm
+audit` (no known vulnerabilities), `pnpm dlx knip --no-config-hints` (still
+only its one standing false positive) - all byte-identical to the
+hundred-and-twenty-fifth run's baseline.
+
+**A genuinely new method, not another `check:*` script.** The last several
+dozen runs' own closing notes kept suggesting the same fork without anyone
+taking it: the hundred-and-ninth run's note in particular said a future pass
+could try "a from-scratch manual UX walkthrough of a user journey rather
+than a code-reading audit." Every recent run instead read a shared source
+file end to end looking for an unvalidated invariant (which is how
+`check:image-dimensions`/`check:locale-consistency` and several before them
+got found) - a real method, but not the same one, and this repo's own
+automated suite (axe-core, `check:reflow`/`check:text-zoom`/
+`check:print-width`, `check:html`) already covers most of what static
+analysis can catch. This run instead used Playwright directly (not through
+`pnpm test:e2e`) to render about twenty real pages - both languages, mobile
+(360px) and desktop (1280px) viewports, the homepage, quiz, compare,
+compare-players, records, a competition page, a competition edition page, a
+team profile, the glossary and the 404 page - and actually looked at the
+resulting screenshots, rather than asserting a specific property against
+them.
+
+Most of what this turned up confirmed existing work is solid: the mobile nav
+drawer, the quiz's 88-question generated page (long, but legitimately so -
+one section per competition/award, nothing duplicated or broken), the
+World Cup page's "Jump to a section" nav and its eleven note cards, the
+mobile card-based responsive table layout - all rendered as intended.
+
+**But one genuine, previously unnoticed bug turned up:** on `/compare` and
+`/compare-players` (and their Croatian siblings), the selected teams'/
+players' names render in a `.vs__team` table-header cell sized to `width:
+34%` of the head-to-head panel, with `overflow-wrap: anywhere` as the only
+line-breaking control. That's correct for a multi-word name (it wraps at
+the space, like "United States" already does cleanly) but for a single word
+too long for the ~85px of usable width at a 360px viewport - "Argentina" is
+the example that surfaced it, at 1rem/700-weight - `anywhere` breaks it
+literally anywhere, with no hyphen: it rendered as "Argentin" on one line
+and "a" on the next. This defect class has no automated coverage anywhere
+in the repo: `check:reflow`/`check:text-zoom`/`check:print-width` all
+measure `scrollWidth` overflow, which `overflow-wrap: anywhere` prevents by
+definition (that's exactly what it's for), and axe-core has no rule that
+judges word-break placement, only overflow/contrast/semantics. It took
+actually looking at a rendered screenshot to see it.
+
+**Fix:** added `hyphens: auto` (and `-webkit-hyphens: auto` ahead of it, the
+same belt-and-suspenders vendor-prefix pattern `global.css` already uses for
+`-webkit-text-size-adjust`) before the existing `overflow-wrap: anywhere`
+rule, in all four places this exact CSS block is duplicated -
+`src/pages/compare.astro`, `src/pages/hr/compare.astro`,
+`src/pages/compare-players.astro` and `src/pages/hr/compare-players.astro`
+(this panel's styles were hand-copied into each of the four pages rather
+than shared through one component, so all four needed the identical edit).
+`hyphens: auto` only needs the `lang` attribute every page already carries
+(confirmed sitewide by the hundred-and-twenty-fifth run's own
+`check:locale-consistency`), is standard and spec-correct (Chrome, Firefox
+and Safari have all supported the unprefixed property since around 2021),
+and is strictly non-regressive even in a browser that ignores it - the
+existing `overflow-wrap: anywhere` fallback still applies exactly as before
+if hyphenation isn't available.
+
+**One honest caveat, surfaced by trying to verify the fix visually rather
+than assuming it worked:** this session's own Playwright-bundled headless
+Chromium (`/opt/pw-browsers/chromium`, reported version 141.0.7390.37)
+could not be made to show a hyphen at all. An isolated test page (`hyphens:
+auto` on a narrow box, correct `lang="en"`, both a `<div>` and a `<th>`)
+with "Argentina" still broke with the exact same bare "Argenti"/"na" split
+as before the fix, and a much more obviously hyphenatable word
+("internationalization") produced no break-with-hyphen either - it simply
+overflowed its box uncut when no `overflow-wrap` fallback was present. That
+pattern (zero hyphenation on any word, not just borderline ones) points to
+this specific browser binary missing the ICU hyphenation-pattern data
+regular desktop/mobile Chrome ships with, likely a deliberate size trim in
+the Playwright browser distribution rather than a real spec-support gap -
+but this run had no way to install real hyphenation data or swap in a
+different browser to confirm that theory further. `check:reflow`/
+`check:text-zoom`/`check:print-width` (all re-run with `PW_EXECUTABLE_PATH`
+after the change, 711/711 clean on each) confirm the fix introduces no
+horizontal-overflow regression either way, but whether the hyphen itself
+actually renders for a real reader is unconfirmed from inside this
+environment. **Left for a future pass or a human check:** open `/compare` on
+a real desktop or mobile browser at a narrow width and confirm "Argentina"
+now reads as a proper hyphenated break, not the old bare split.
+
+All 700 PDFs regenerated (`pnpm build:pdfs`, needed since all four touched
+`.astro` files each feed a PDF) and reverified fresh (`check:pdfs` 700/700).
+Full health check re-run clean after the change: `pnpm lint` (0/0/0), `pnpm
+test` (703/703, unchanged - no unit-testable logic changed, only CSS),
+`pnpm build` (711 pages), every `check:*` script including the three
+browser-based ones above, `pnpm test:coverage` unchanged at 99.91%/99.3%.
+This session's first `pnpm test:e2e` cold-start attempt was invalidated by
+this run's own process mistake, not a real failure: a `pnpm build` was run
+partway through to verify the CSS fix while an earlier `test:e2e` was still
+mid-suite against the same `dist/` output, corrupting the pages the running
+suite was reading mid-request (a cluster of failures appeared right around
+that rebuild, all fast near-instant failures rather than real timing
+issues). Killed everything, rebuilt clean, and re-ran the full validation
+sequence strictly one thing at a time (no concurrent rebuild or overlapping
+browser-based check) before restarting `pnpm test:e2e` from a genuinely
+clean `dist/`. That clean cold-start run was still in progress as this entry
+was written; its result is recorded in a follow-up commit on this same
+branch rather than guessed at here. **Left as a note for whoever runs the
+next intensive pass:**
+never rebuild `dist/` while `pnpm test:e2e` (or any other script serving
+from it) is still running - run browser-based scripts one at a time, not
+concurrently, in this 4-core environment; the CPU contention from running
+several Playwright/Chromium instances at once was severe enough on its own
+(load average approaching 10 on 4 cores) to explain the earlier run's
+misleadingly slow per-test pace, before the corruption made it fail outright.
+
+Also made one more `WebSearch` attempt at the standing Nations League "Team
+of the Tournament" sourcing gap (last touched by the hundred-and-seventeenth
+run). This time the query surfaced what reads as a complete, specific 2019
+lineup (Pickford; Semedo, Dias, Van Dijk, Blind; Fernandes, de Jong,
+Wijnaldum; Bernardo Silva, Shaqiri, Ronaldo), apparently traceable to a
+`kickoff.com` article among the result snippets. But `WebSearch` only ever
+returns a synthesized answer over search-result snippets, not the actual
+page text, and `WebFetch` against every candidate source - `en.wikipedia.
+org`, `football.fandom.com`, and this run's own new lead, `kickoff.com` -
+still returns `EGRESS_BLOCKED` from this session's network proxy, the same
+wall every prior run's attempt has hit. Without being able to read a single
+primary source directly, there is no way to cross-check that synthesized
+list against anything, so - per this site's own standing two-independent-
+source bar for editorial content - nothing was added to
+`content/uefa-nations-league.md`. Recorded specifically so a future run
+doesn't mistake a `WebSearch`-synthesized answer for a verified one: the
+list above reads as plausible and specific, which is exactly the kind of
+result that's tempting to trust without a primary-source read, but "plausible
+and specific" is not the same bar this site's own convention requires.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League 2023
+attendance conflict, 2021/2025's still-unconfirmed figures, the Team of the
+Tournament sourcing question (with the caveat above about the un-verifiable
+`kickoff.com` lead), World Cup 1930/1950's/EURO 1996/2020's excluded
+attendance figures, and the hyphenation-rendering visual re-check noted
+above. The manual-screenshot-walkthrough method itself proved out - it found
+a real bug none of the last several dozen runs' automated methods could have
+caught - and is cheap to repeat; a future run could extend it to pages this
+one didn't cover (team/player profile pages in full, the print stylesheet's
+actual rendered output, dark mode specifically, the family quiz's
+interactive answered/revealed states) rather than assuming one pass
+exhausted it.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

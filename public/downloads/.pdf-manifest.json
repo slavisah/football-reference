@@ -159,7 +159,7 @@
     "src/lib/compare.ts": "9192fca6c619321799bf16067aefd908050d3c02a82465e4775a9b4767579364",
     "src/lib/teamProfile.ts": "2d096cc6371aa2a5995f4ffcfcdbbf9e5f6c9f4d10fa25f66d61549021473d2f",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/compare.astro": "c408808a145c2999e0236894bd7be6212db7970a708c239f5fbb99478d3938c0"
+    "src/pages/compare.astro": "b7ba4e178269d93457d82e6cc5571be7c8478758adfba9c688fd2d32c6b13775"
   },
   "compare-players": {
     "content/ballon-dor.md": "f756b67123d4d720e5c1256f40fcae92f371f944bcbd8bbff3d32064c76acafb",
@@ -175,7 +175,7 @@
     "src/lib/playerProfile.ts": "3bf44a54f9725a99de617f2c9311ff81ea1a0da3edb532b053ff734c5eb279f9",
     "src/lib/comparePlayers.ts": "e80c328e79e514f0e9f69550a887d019b60184c6aae2a6549fdc5d6dfc0d16d1",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/compare-players.astro": "5f3bdd8e71f7686b1f42968566c2897ed1b75a78e08c95caab5fcd73430fcb21"
+    "src/pages/compare-players.astro": "5862f5a535ac857725f769c07036c974bc40cc07b99857877e1f45e255bffd20"
   },
   "world-cup-hr": {
     "content/fifa-world-cup.md": "0c8e58371ffd6c5ce01873e388f3f2189141a6b005c17cecfb5b988043722621",
@@ -332,7 +332,7 @@
     "src/lib/compare.ts": "9192fca6c619321799bf16067aefd908050d3c02a82465e4775a9b4767579364",
     "src/lib/teamProfile.ts": "2d096cc6371aa2a5995f4ffcfcdbbf9e5f6c9f4d10fa25f66d61549021473d2f",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/hr/compare.astro": "c579de9e954294264acef7bd5e42bbb0e1bd47b515649d5111c12ddc8dac7ed6"
+    "src/pages/hr/compare.astro": "72c9a9dbab9ee86a84d923facf510d04fd5bb5b19d3dcf4da3f39e83321d7738"
   },
   "compare-players-hr": {
     "content/ballon-dor.md": "f756b67123d4d720e5c1256f40fcae92f371f944bcbd8bbff3d32064c76acafb",
@@ -348,7 +348,7 @@
     "src/lib/playerProfile.ts": "3bf44a54f9725a99de617f2c9311ff81ea1a0da3edb532b053ff734c5eb279f9",
     "src/lib/comparePlayers.ts": "e80c328e79e514f0e9f69550a887d019b60184c6aae2a6549fdc5d6dfc0d16d1",
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
-    "src/pages/hr/compare-players.astro": "1f4a5cf9257681716abd9e1af66ba45c1d2496371770789a1b902b5338ed3e8a"
+    "src/pages/hr/compare-players.astro": "83d264566f5dee077b341c93c8c72e4ffd11726779604d02c122b53625ac7995"
   },
   "glossary": {
     "content/glossary.md": "0afc5ffd385b56c0b861f13b1eb4622b5c052cc8396042add33ab5b512da4ec8",

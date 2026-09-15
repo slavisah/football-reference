@@ -47,13 +47,13 @@
     "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.5.1",
-    "@vitest/coverage-v8": "5.0.0",
-    "cspell": "^10.3.1",
+    "@vitest/coverage-v8": "5.0.1",
+    "cspell": "^10.3.2",
     "html-validate": "^11.15.0",
     "lighthouse": "^13.4.1",
     "sharp": "0.35.4",
     "typescript": "^5.9.3",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.1"
   },
   "packageManager": "pnpm@9.15.9",
   "pnpm": {
