@@ -5073,9 +5073,8 @@ back clean:
   from 691 - 12 new), `pnpm build` (711 pages), every `check:*` script, `pnpm
   test:coverage` unchanged at 99.91%/99.3%, `pnpm dlx knip --no-config-hints`
   still only its one standing false positive, and a cold-start `pnpm
-  test:e2e` kicked off (not expected to be affected - see
-  `docs/PROJECT_STATUS.md`'s matching entry). Also made one fresh,
-  Wikipedia-excluded WebSearch attempt
+  test:e2e` clean (**952/952 passed, 15.2 minutes**, matching every recent
+  run's baseline). Also made one fresh, Wikipedia-excluded WebSearch attempt
   at the Nations League 2021 attendance gap - no new source lead surfaced,
   so 2021/2025 stay unconfirmed and 2023 stays a conflict, per the
   ninety-sixth run's standing caution. See `docs/PROJECT_STATUS.md`'s
