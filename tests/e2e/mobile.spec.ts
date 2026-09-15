@@ -2862,6 +2862,31 @@ test.describe('Quiz page on a 360px phone', () => {
     await expect(reveal.locator('p')).not.toBeEmpty();
   });
 
+  test('the order challenge rank <select> is wide enough not to clip its own placeholder text', async ({
+    page,
+  }) => {
+    // Regression test: a native <select> silently clips its own option text
+    // with no ellipsis once the box is narrower than the text needs (the
+    // same defect class the seventieth intensive run fixed for
+    // TournamentTable's filter row via selectMinWidthRem() - this select is
+    // a separate, fixed-width component that fix never touched). The
+    // Croatian "Poredak..." placeholder is the longest text this select ever
+    // holds; confirm it fits inside the select's own content box.
+    const select = page.locator('.quiz-order__rank').first();
+    const fits = await select.evaluate((el: HTMLSelectElement) => {
+      const cs = getComputedStyle(el);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      const contentWidth =
+        el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      return Array.from(el.options).every(
+        (option) => ctx.measureText(option.textContent ?? '').width <= contentWidth,
+      );
+    });
+    expect(fits).toBe(true);
+  });
+
   test('the language switcher opens the Croatian quiz page', async ({ page }) => {
     await openMenu(page);
     await page.locator('a.lang-switch').click();
@@ -3030,6 +3055,27 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
     await expect(firstOrderCard.locator('.quiz-card__feedback')).toHaveText(
       'Svaki broj poretka smije se koristiti samo jednom - dvije stavke trenutačno dijele isti broj.',
     );
+  });
+
+  test('the order challenge rank <select> is wide enough not to clip the Croatian "Poredak..." placeholder', async ({
+    page,
+  }) => {
+    // Regression test: see the matching English-page test's comment - the
+    // Croatian placeholder is the longest text this select ever holds, so
+    // this is the case that was actually clipped before the fix.
+    const select = page.locator('.quiz-order__rank').first();
+    const fits = await select.evaluate((el: HTMLSelectElement) => {
+      const cs = getComputedStyle(el);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      const contentWidth =
+        el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      return Array.from(el.options).every(
+        (option) => ctx.measureText(option.textContent ?? '').width <= contentWidth,
+      );
+    });
+    expect(fits).toBe(true);
   });
 
   test('the language switcher returns to the English quiz page', async ({ page }) => {

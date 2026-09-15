@@ -23579,5 +23579,136 @@ run), or to team/player profile pages' own print output (this run's print
 pass only covered the print stylesheet's shared table/map/page-break
 mechanics on three other page types).
 
+### Manual walkthrough of the quiz's order-challenge answered/reveal states finds and fixes a real, previously untested `<select>`-clipping bug - closed 2026-09-15 (hundred-and-twenty-eighth intensive run)
+
+A standing health check first: `pnpm install --frozen-lockfile`, `pnpm
+lint` (0/0/0), `pnpm test` (703/703 unit), `pnpm build` (711 pages), and
+all sixteen `check:*` scripts - all byte-identical to the
+hundred-and-twenty-seventh run's own closing baseline, confirming no drift
+since. Rather than another automated-tool sweep, this run picked up that
+same run's own closing suggestion directly: extend the now twice-proven
+manual-screenshot method to the two Family Quiz states neither of the last
+two runs had actually looked at - the order-challenge's *answered* state
+(the multiple-choice card's answered state was the hundred-and-twenty-
+seventh run's own find) and the "just show me the answer" reveal
+`<details>` on both card types - rendered with Playwright at a 390px
+mobile viewport, both languages, both light content states (unanswered and
+answered).
+
+**What was found:** a genuine, previously-unflagged bug, and it's the same
+defect class the seventieth intensive run fixed for
+`TournamentTable.astro`'s five filter `<select>` fields - a native
+`<select>` silently clips its own option text with no ellipsis or overflow
+cue once its box is narrower than the text needs - but in a completely
+separate, fixed-width component that fix never touched.
+`QuizOrderCard.astro`'s `.quiz-order__rank` rank-picker `<select>` (the
+`<select>` a reader uses to assign rank 1..N to each item in a
+"put these champions in chronological order" question) was styled at a
+flat `width: 5rem` in its own scoped `<style>` block. That width was
+apparently sized against the English `quizRankPlaceholder` string
+("Rank...") - which just barely fits - but never re-checked against the
+Croatian translation (`quizRankPlaceholder: { hr: 'Poredak...' }` in
+`src/lib/i18n.ts`), which is three characters longer. Measured directly
+with the same canvas `measureText()` technique the seventieth run's own
+fix used (`ctx.font` set from the select's real computed
+font/weight/size/family, compared against `clientWidth` minus computed
+padding): the English placeholder measures ~55px against a ~65px content
+box (fits, barely); the Croatian placeholder measures ~79px against that
+same ~65px box (clipped by ~14px). Confirmed visually too: a Playwright
+screenshot of `/hr/quiz`'s order-challenge cards at 390px showed every
+unanswered rank `<select>` reading the truncated "Pored" instead of
+"Poredak...", with nothing (no ellipsis, no visual cue) indicating text
+was missing - a reader would have no way to know the placeholder was even
+supposed to say more. The English page was never affected (its own
+placeholder fits, if narrowly), which is exactly why no prior run's manual
+pass over the English quiz surfaced it, and why no existing automated
+check would either: `check:reflow`/`check:print-width`/`check:text-zoom`
+all measure page-level `scrollWidth` overflow, which a `<select>`'s
+internal text clipping doesn't produce (a native `<select>`'s own
+`scrollWidth` equals its `clientWidth` regardless of whether its selected/
+placeholder option text is fully visible - confirmed this directly against
+the live built page before writing the fix, which is also why this defect
+class needs the canvas-measurement approach rather than the site's usual
+`scrollWidth - clientWidth` overflow-detection idiom used everywhere else
+in this codebase). axe-core has no rule for this either (a `<select>`'s
+accessible name/value is exposed to assistive tech regardless of visual
+clipping, so this is a purely sighted-user defect).
+
+Every other angle this run's walkthrough covered came back clean in both
+languages: the order-challenge's answered state (badges, feedback text,
+layout) at 390px, and the "just show me the answer" reveal `<details>` on
+both the multiple-choice and order-challenge card types - no clipping,
+concatenation, or spacing defect found in any of those, unlike the
+hundred-and-twenty-sixth and -seventh runs' equivalent passes.
+
+**The fix:** widened `.quiz-order__rank` from `5rem` to `7rem` in
+`QuizOrderCard.astro`'s scoped styles, with a comment explaining why (the
+Croatian placeholder is the longest text this select ever holds - the
+rank options themselves are always single/double-digit numbers, so no
+other string in this component needs more room). This is a small,
+fixed-width component with a known, non-data-driven content set (unlike
+`TournamentTable.astro`'s filters, which hold real competition data and so
+needed the seventieth run's `selectMinWidthRem()` computed-width function),
+so a literal CSS width bump is the proportionate fix here rather than
+introducing similar computation machinery for a two-string component.
+Re-measured with the same canvas technique after the change: the Croatian
+placeholder's ~79px now fits comfortably inside the widened ~97px content
+box. Re-screenshotted both languages at 390px: the full "Poredak..."
+placeholder now renders, and the wider select doesn't overflow or wrap
+awkwardly against the card's other content (the order-challenge card's
+flex layout already wraps to full-width rows on narrow screens, so a
+2rem-wider select had no other layout consequence to check for).
+
+**New regression coverage:** one test per language in `tests/e2e/
+mobile.spec.ts` (2 new) - "the order challenge rank `<select>` is wide
+enough not to clip its own placeholder text" (English) and its Croatian
+mirror - that locate the first order-challenge card's rank `<select>`,
+read its real computed font and padding, and assert via
+`canvas.measureText()` that every one of its `<option>`s (not just the
+placeholder - a cheap way to also cover the rank-number options, though
+those were never at risk) fits inside the select's own content-box width.
+This directly encodes the same measurement this run used to find the bug,
+so it would have failed against the pre-fix `5rem` width and now guards
+against a future translation-string change (or width regression)
+reintroducing the same clipping.
+
+`check:reflow` and `check:print-width` both re-ran clean (711/711 pages
+each) after the change, confirming no overflow regression at either the
+320px mobile-reflow floor or the 1032px print-media width. No content
+file was touched and the quiz page isn't part of `build:pdfs`'s route
+set, so no PDF regeneration or `lastReviewed` bump was needed.
+
+Full standing health check clean after the change: `pnpm lint` (0/0/0),
+`pnpm test` (703/703, unchanged - a CSS-only component fix touching no
+`.ts` logic), `pnpm build` (711 pages, unchanged), and all sixteen
+`check:*` scripts clean with output identical to this run's own opening
+baseline. Ran the full quiz e2e subset standalone first
+(`tests/e2e/mobile.spec.ts -g "quiz|Quiz"`: 29/29 passed, including the 2
+new tests), then a full cold-start `pnpm exec playwright test`:
+**956/956 passed, 16.4 minutes** (up from 954/954 by exactly the two new
+tests added this run, and comfortably within this site's normal
+15-25-minute baseline range - no slowdown this run, unlike the
+hundred-and-twenty-fourth run's own cold-start outlier).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7 still blocked on `@astrojs/check@0.9.10`'s
+`^5.0.0 || ^6.0.0` constraint, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix decision needing human sign-off), the Nations
+League 2023 attendance conflict, 2021/2025's still-unconfirmed figures,
+the Nations League Team of the Tournament sourcing question, World Cup
+1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+re-check on a real browser (unchanged this run - still not independently
+re-verified). The manual-walkthrough method has now found a real,
+user-facing bug in three consecutive runs (the hyphenation gap two runs
+ago, the score-bar/feedback-text bugs last run, and this run's
+select-clipping bug) - a future pass should keep treating it as a
+first-class method rather than fall back to repeat automated sweeps, and
+could extend it next to team/player profile pages' own print output
+(still not covered by any run's manual pass, only the print stylesheet's
+shared table/map/page-break mechanics on other page types), or the home
+page's interactive widgets (team/player search, theme toggle) at
+interaction states beyond what the accessibility specs already exercise.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

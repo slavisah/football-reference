@@ -5223,3 +5223,78 @@ back clean:
   profile pages' own print output, which this run's print pass didn't cover
   (only the print stylesheet's shared table/map/page-break mechanics on
   three other page types).
+- **Manual walkthrough of the quiz's order-challenge answered/reveal states
+  finds and fixes a real, previously untested `<select>`-clipping bug**:
+  closed 2026-09-15 (hundred-and-twenty-eighth intensive run) - a standing
+  health check first (`pnpm install --frozen-lockfile`, `pnpm lint`/`test`/
+  `build`, all sixteen `check:*` scripts), all byte-identical to the
+  hundred-and-twenty-seventh run's baseline: 703/703 unit, 711 pages, no
+  drift on any check. Picked up that same run's own closing suggestion:
+  extended the manual-screenshot method to the two quiz states it hadn't
+  covered yet, the order-challenge's answered state and the "just show me
+  the answer" reveal `<details>` on both card types, in both languages, at
+  a 390px mobile viewport.
+
+  Found a genuine, previously-unflagged bug, the same defect class the
+  seventieth intensive run fixed for `TournamentTable.astro`'s filter row
+  (a native `<select>` silently clips its own option text with no ellipsis
+  once the box is narrower than the text needs) but in a component that fix
+  never touched: `QuizOrderCard.astro`'s `.quiz-order__rank` rank-picker
+  `<select>` was fixed at `width: 5rem`, sized to fit the English
+  `quizRankPlaceholder` ("Rank...") with only a few px to spare, but the
+  longer Croatian translation ("Poredak...") measured ~79px against a
+  ~65px-wide content box (confirmed with the same canvas `measureText()`
+  technique the seventieth run used) - so on `/hr/quiz`, every unanswered
+  order-challenge item showed a silently truncated "Pored" instead of
+  "Poredak...", with no ellipsis or other cue that text was missing.
+  English wasn't broken, so no existing check or prior manual pass (this
+  quiz feature's states were only first walked manually last run, and that
+  pass covered the *answered* state, not an *unanswered* select's own
+  placeholder) had reason to catch it. Confirmed by rendering both
+  language's order cards with Playwright at 390px and reading the actual
+  select text.
+
+  Fixed by widening `.quiz-order__rank` from `5rem` to `7rem` - comfortably
+  fits the Croatian placeholder (a component-local, known-small string set:
+  the rank options themselves are always single/double-digit numbers) with
+  margin for the browser's own native dropdown-arrow reserve, re-confirmed
+  with the same canvas measurement and re-screenshotted at 390px on both
+  languages showing no overflow or wrapping regression. New regression
+  coverage: one test per language in `tests/e2e/mobile.spec.ts` (2 new)
+  that measures every rank `<select>`'s own option text against its content
+  box width via `canvas.measureText()` against the select's real computed
+  font/padding - the same technique used to find the bug, now a permanent
+  guard (a `scrollWidth`/`clientWidth` comparison, this codebase's usual
+  overflow-detection pattern, doesn't work for a native `<select>`'s
+  internal option text, which is why the original seventieth-run fix also
+  needed the canvas-measurement approach rather than that faster pattern).
+  Every other angle covered this run - the reveal `<details>` on both card
+  types, and the order-challenge answered state's badge/feedback text and
+  layout at 390px - came back clean in both languages, no defect found.
+
+  `check:reflow`/`check:print-width` both re-ran clean (711/711 each) after
+  the width change, confirming no overflow regression at 320px screen or
+  1032px print width. No content file or PDF-source `.astro` touched (the
+  quiz page isn't part of `build:pdfs`'s route set), so no PDF regeneration
+  was needed. Full standing health check clean after the change: `pnpm
+  lint` (0/0/0), `pnpm test` (703/703, unchanged - a CSS-only component fix
+  has no unit-testable logic), `pnpm build` (711 pages, unchanged), all
+  sixteen `check:*` scripts clean. Ran the full quiz e2e subset standalone
+  first (29/29, including the 2 new tests), then a full cold-start `pnpm
+  test:e2e`: **956/956 passed, 16.4 minutes** (up from 954/954 by exactly
+  the two new tests added this run, and within this site's normal 15-25
+  minute baseline range).
+
+  **Left for a future pass:** the same environment-blocked items as ever
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+  brand-suffix decision, the Nations League Team of the Tournament sourcing
+  question), the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed figures, World Cup 1930/1950's/EURO 1996/2020's
+  excluded attendance figures, and the hundred-and-twenty-sixth run's
+  still-open hyphenation-rendering visual re-check on a real browser
+  (unchanged this run). The manual-walkthrough method has now found a real,
+  user-facing bug in three consecutive runs - a future pass should keep
+  treating it as a first-class method and extend it to team/player profile
+  pages' own print output (still not covered by any run's manual pass) or
+  the home page's own interactive widgets (team/player search, theme
+  toggle) at states beyond what the accessibility specs already exercise.
