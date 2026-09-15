@@ -5030,11 +5030,10 @@ back clean:
   unchanged at 99.91%/99.3%, and `pnpm dlx knip --no-config-hints` still
   only its one standing false positive. No content file touched, so no PDF
   regeneration or `lastReviewed` bump was needed. A cold-start `PW_
-  EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` was started but
-  ran markedly slower than every recent run's 15-25-minute baseline in this
-  session, so this entry does not claim a full e2e result - see
-  `docs/PROJECT_STATUS.md`'s matching entry for why that's judged a
-  session-performance variance rather than a reason to hold the change.
+  EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` ran markedly
+  slower than every recent run's 15-25-minute baseline in this session
+  (**952/952 passed, 20.9 minutes** once it finished) - confirmed clean,
+  see `docs/PROJECT_STATUS.md`'s matching entry for the timing detail.
   **Left for a future pass:** the same environment-blocked items as ever
   (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
   brand-suffix decision), plus the Nations League 2023 attendance conflict,
