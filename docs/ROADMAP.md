@@ -5088,3 +5088,70 @@ back clean:
   ruled out or confirmed covered, a future run's best bet is again either a
   fresh source lead, or a genuinely new quality lens not yet listed in this
   file's history.
+- **Dependency patch bump (vitest/`@vitest/coverage-v8` 5.0.0 -> 5.0.1, cspell
+  10.3.1 -> 10.3.2) plus a manual browser walkthrough that found and fixed a
+  real mid-word-break bug in the head-to-head comparison tables**: closed
+  2026-09-15 (hundred-and-twenty-sixth intensive run) - `typescript` 7 is
+  still blocked (`@astrojs/check@0.9.10` still only declares `typescript:
+  '^5.0.0 || ^6.0.0'`, re-confirmed). Rather than another `check:*`-script
+  pass, this run tried the "from-scratch manual UX walkthrough" angle the
+  hundred-and-ninth run's own closing note first suggested and no run since
+  had picked up: rendered ~20 real pages (both languages, mobile and desktop
+  viewports) with Playwright and actually looked at the screenshots, instead
+  of reading source or running an automated assertion. Found a genuine,
+  previously-unnoticed defect this way: `/compare`, `/compare-players` and
+  their Croatian pages render the selected teams'/players' names as a
+  `.vs__team` table-header cell sized to ~34% of the panel width, with
+  `overflow-wrap: anywhere` as its only wrap control - fine for multi-word
+  names (they break at the space) but for a single long word that doesn't
+  fit one line, `anywhere` breaks mid-word with no hyphen at all ("Argentina"
+  rendered as "Argentin" / "a" at 360px). No existing check catches this:
+  `check:reflow`/`check:text-zoom`/`check:print-width` only measure
+  `scrollWidth` overflow, which mid-word breaking prevents by design, and
+  axe-core has no rule for word-break quality. Added `hyphens: auto` (plus
+  `-webkit-hyphens: auto`, matching `global.css`'s existing
+  `-webkit-text-size-adjust` precedent for a belt-and-suspenders vendor
+  prefix) ahead of the existing `overflow-wrap: anywhere` fallback in all
+  four `.vs__team` rules (`compare.astro`, `hr/compare.astro`,
+  `compare-players.astro`, `hr/compare-players.astro` - the panel's CSS is
+  hand-duplicated across all four rather than shared, so each needed the
+  same edit). This is a correct, spec-standard fix (Chrome/Firefox/Safari
+  have all supported unprefixed `hyphens: auto` since roughly 2021, and it
+  only needs the `lang` attribute already present on every page since the
+  hundred-and-twenty-fifth run's own `check:locale-consistency` addition),
+  and strictly non-regressive even where unsupported (the existing
+  `overflow-wrap: anywhere` fallback still applies exactly as before). **One
+  honest caveat:** this session's own headless Chromium build could not be
+  used to visually confirm the hyphen actually renders - an isolated
+  `hyphens: auto` test page in this same browser produced no hyphenation
+  break at all, on this or any other test word, even where a normal
+  (non-`anywhere`) box would otherwise overflow, suggesting this specific
+  Playwright-bundled Chromium binary lacks the ICU hyphenation-pattern data
+  real desktop/mobile Chrome ships with - not something this run had a way
+  to work around. `check:reflow`/`check:text-zoom`/`check:print-width` all
+  stayed clean (711/711 each) after the change, confirming no overflow
+  regression at least, but a future run with a differently-provisioned
+  browser (or a human on a real device) should visually re-check that
+  `/compare`'s "Argentina"/`/hr/compare`'s "Nizozemska" etc. actually
+  hyphenate rather than raw-break now. All 700 PDFs regenerated
+  (`pnpm build:pdfs`) and reverified clean (`check:pdfs` 700/700) since the
+  four touched `.astro` files each feed a PDF. Full standing health check
+  clean: `pnpm lint` (0/0/0), `pnpm test` (703/703, unchanged), `pnpm build`
+  (711 pages), every `check:*` script, `pnpm test:coverage` unchanged at
+  99.91%/99.3%. A cold-start `pnpm test:e2e` was run to confirm - see
+  `docs/PROJECT_STATUS.md`'s matching entry for the result. Also made one
+  more `WebSearch` attempt at the Nations League Team of the Tournament gap;
+  it surfaced a specific-looking 2019 lineup, but with `WebFetch` still
+  `EGRESS_BLOCKED` against every source that could confirm it (as every
+  prior run's attempt), it stays unadded per this site's own two-source
+  standard - see that entry for detail on why this shouldn't be re-tried the
+  same way again. **Left for a future pass:** the same environment-blocked
+  items as ever (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+  `long-title` brand-suffix decision), the Nations League 2023 attendance
+  conflict, 2021/2025's still-unconfirmed figures, the Team of the
+  Tournament sourcing question, World Cup 1930/1950's/EURO 1996/2020's
+  excluded attendance figures, and the hyphenation-rendering re-check noted
+  above. The manual-screenshot-walkthrough method itself worked well and is
+  cheap to repeat - a future run could extend it to pages this run didn't
+  cover (team/player profile pages, the print stylesheet's rendered output,
+  dark mode specifically) rather than assuming this one pass exhausted it.
