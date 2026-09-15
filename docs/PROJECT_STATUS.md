@@ -23375,9 +23375,11 @@ that rebuild, all fast near-instant failures rather than real timing
 issues). Killed everything, rebuilt clean, and re-ran the full validation
 sequence strictly one thing at a time (no concurrent rebuild or overlapping
 browser-based check) before restarting `pnpm test:e2e` from a genuinely
-clean `dist/`. That clean cold-start run was still in progress as this entry
-was written; its result is recorded in a follow-up commit on this same
-branch rather than guessed at here. **Left as a note for whoever runs the
+clean `dist/`. That clean cold-start run finished after the rest of this
+entry was first written and committed: **952/952 passed in 21.7 minutes, 0
+failures** - confirms the `hyphens: auto` change (and the dependency bump)
+introduced no regression anywhere in the suite, and matches every recent
+run's baseline pass count. **Left as a note for whoever runs the
 next intensive pass:**
 never rebuild `dist/` while `pnpm test:e2e` (or any other script serving
 from it) is still running - run browser-based scripts one at a time, not

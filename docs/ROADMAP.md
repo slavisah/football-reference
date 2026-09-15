@@ -5138,8 +5138,8 @@ back clean:
   four touched `.astro` files each feed a PDF. Full standing health check
   clean: `pnpm lint` (0/0/0), `pnpm test` (703/703, unchanged), `pnpm build`
   (711 pages), every `check:*` script, `pnpm test:coverage` unchanged at
-  99.91%/99.3%. A cold-start `pnpm test:e2e` was run to confirm - see
-  `docs/PROJECT_STATUS.md`'s matching entry for the result. Also made one
+  99.91%/99.3%. A cold-start `pnpm test:e2e` confirmed clean: **952/952
+  passed, 21.7 minutes**, matching every recent run's baseline. Also made one
   more `WebSearch` attempt at the Nations League Team of the Tournament gap;
   it surfaced a specific-looking 2019 lineup, but with `WebFetch` still
   `EGRESS_BLOCKED` against every source that could confirm it (as every
