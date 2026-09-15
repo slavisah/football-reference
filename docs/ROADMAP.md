@@ -5045,3 +5045,47 @@ back clean:
   individually resolve correctly), and whether `robots.txt`'s Allow/Disallow
   directives stay consistent with which pages actually carry a `noindex`
   tag.
+- **`check:locale-consistency`: new permanent check that every page's
+  `<html lang>` matches its own URL**: closed 2026-09-15
+  (hundred-and-twenty-fifth intensive run) - ruled out both of the
+  hundred-and-twenty-fourth run's runner-up angles first: `og:url`/canonical
+  can never disagree (same `canonicalURL` expression rendered twice in
+  `BaseLayout.astro`, not two independently computed values), and
+  `robots.txt` has no `Disallow` lines at all to disagree with a page's
+  `noindex` tag. Also confirmed hreflang reciprocity - the other candidate
+  considered - is already covered transitively by `check:sitemap.mjs`, so
+  not a fresh gap either. Found a genuinely new one instead: `locale` (which
+  drives `<html lang={locale}>`) is a per-page prop each route file passes
+  by hand, unlike canonical/hreflang which derive straight from the URL - a
+  copy-pasted new Croatian page that forgot `locale="hr"` would build at a
+  `/hr/...` URL with `lang="en"`, invisible to every existing check
+  (`check:sitemap`/`check:links` verify hrefs, not language; axe-core's
+  `html-has-lang`/`html-lang-valid` only check the attribute is
+  present/well-formed, never that it matches the URL). New tool
+  `scripts/check-locale-consistency.mjs` (`pnpm check:locale-consistency`)
+  checks every built page's `<html lang>` against its own URL. Ran clean on
+  the first pass (711/711); verified it catches a real regression by
+  temporarily flipping a built page's `lang` in `dist/` only, confirmed it
+  failed, then restored it. 12 new unit tests
+  (`tests/unit/checkLocaleConsistency.test.ts`). Wired into
+  `.github/workflows/ci.yml` as a required PR gate. Full standing health
+  check re-run clean: `pnpm lint` (0/0/0), `pnpm test` (703/703 unit, up
+  from 691 - 12 new), `pnpm build` (711 pages), every `check:*` script, `pnpm
+  test:coverage` unchanged at 99.91%/99.3%, `pnpm dlx knip --no-config-hints`
+  still only its one standing false positive, and a cold-start `pnpm
+  test:e2e` kicked off (not expected to be affected - see
+  `docs/PROJECT_STATUS.md`'s matching entry). Also made one fresh,
+  Wikipedia-excluded WebSearch attempt
+  at the Nations League 2021 attendance gap - no new source lead surfaced,
+  so 2021/2025 stay unconfirmed and 2023 stays a conflict, per the
+  ninety-sixth run's standing caution. See `docs/PROJECT_STATUS.md`'s
+  matching entry for full detail. **Left for a future pass:** the same
+  environment-blocked items as ever (`typescript` 7, `docs/SOURCES.md`
+  link-liveness, the `long-title` brand-suffix decision needing human
+  sign-off), plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed figures, the Team of the Tournament sourcing question,
+  and World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures.
+  With og:url/canonical, robots.txt/noindex and hreflang reciprocity all now
+  ruled out or confirmed covered, a future run's best bet is again either a
+  fresh source lead, or a genuinely new quality lens not yet listed in this
+  file's history.

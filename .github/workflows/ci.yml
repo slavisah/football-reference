@@ -90,6 +90,9 @@ jobs:
       - name: Image-dimension integrity check (manifest icons, og:image/twitter:image)
         run: pnpm check:image-dimensions
 
+      - name: Locale-consistency check (<html lang> vs URL)
+        run: pnpm check:locale-consistency
+
       - name: Install Playwright browser
         run: pnpm test:e2e:install
 
