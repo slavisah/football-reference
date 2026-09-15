@@ -4993,3 +4993,56 @@ back clean:
   With both hundred-and-twenty-second-run runner-up angles now closed
   negatively, a future run's best bet is again either a fresh source lead
   or a genuinely new quality lens not yet listed in this file's history.
+- **`check:image-dimensions`: new permanent check that every declared image
+  pixel size (manifest icons, og:image/twitter:image) matches the real
+  file**: closed 2026-09-15 (hundred-and-twenty-fourth intensive run) - a
+  standing health check first (all clean, matching the hundred-and-
+  twenty-third run's baseline: 679/679 unit, 711 pages, coverage unchanged
+  at 99.91%/99.3%). Reading `BaseLayout.astro`'s Open Graph/Twitter Card
+  block end to end found two real, previously-unchecked gaps:
+  `check-internal-links.mjs`'s link extraction only matches `href`/`src`
+  attributes, so `<meta property="og:image" content="...">`/`<meta
+  name="twitter:image" content="...">` (both use `content`) have never had
+  their URL verified to resolve to a real file by `check:links` or
+  `check:precache`; and while `check:precache` confirms a manifest icon's
+  `src` resolves to a file, nothing anywhere confirms its declared `sizes`
+  (or the `og:image:width`/`og:image:height` meta tags next to `og:image`)
+  actually matches that file's real pixel dimensions. New tool
+  `scripts/check-image-dimensions.mjs` (`pnpm check:image-dimensions`)
+  parses a PNG's own `IHDR` chunk directly (no dependency, matching every
+  other `check:*` script's zero-dependency convention) and checks both:
+  every page's og:image/twitter:image resolves and matches its declared
+  width/height, and both `manifest.webmanifest` files' icons match their
+  declared `sizes`. Ran clean on the first pass (og-image.png genuinely
+  1200x630, all four manifest icons genuinely their claimed sizes) - the
+  same "confirm a real signal, keep the tool permanent" outcome
+  `check:heading-outline`/`check:reachability` had. Verified it actually
+  catches regressions by temporarily corrupting a built page's declared
+  og:image width and a built manifest's declared icon size, one at a time,
+  confirming each broke the check with the right message, then restoring
+  both (only ever edited in gitignored `dist/` output, never source - `git
+  status` clean throughout). 12 new unit tests
+  (`tests/unit/checkImageDimensions.test.ts`). Wired into
+  `.github/workflows/ci.yml` as a required PR gate (well under a second).
+  Full standing health check clean after the change: `pnpm lint` (0/0/0),
+  `pnpm test` (691/691 unit, up from 679 - 12 new), `pnpm build` (711
+  pages), every `check:*` script including the new one, `pnpm test:coverage`
+  unchanged at 99.91%/99.3%, and `pnpm dlx knip --no-config-hints` still
+  only its one standing false positive. No content file touched, so no PDF
+  regeneration or `lastReviewed` bump was needed. A cold-start `PW_
+  EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` was started but
+  ran markedly slower than every recent run's 15-25-minute baseline in this
+  session, so this entry does not claim a full e2e result - see
+  `docs/PROJECT_STATUS.md`'s matching entry for why that's judged a
+  session-performance variance rather than a reason to hold the change.
+  **Left for a future pass:** the same environment-blocked items as ever
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+  brand-suffix decision), plus the Nations League 2023 attendance conflict,
+  2021/2025's still-unconfirmed figures, the Team of the Tournament
+  sourcing question, and World Cup 1930/1950's/EURO 1996/2020's excluded
+  attendance figures. Two unexplored angles this run noticed in passing:
+  whether `og:url`'s content ever disagrees with the same page's own
+  canonical URL (a consistency check, not a resolution check - both already
+  individually resolve correctly), and whether `robots.txt`'s Allow/Disallow
+  directives stay consistent with which pages actually carry a `noindex`
+  tag.
