@@ -2740,6 +2740,37 @@ test.describe('Quiz page on a 360px phone', () => {
 
     const scoreValue = page.locator('#quiz-score-value');
     await expect(scoreValue).toHaveText(/0|1/);
+
+    // Regression test: the score label and its value used to render glued
+    // together ("Score:0 / 40") because the whitespace-only line between the
+    // {t(...)} expression and the following <strong> was compiled away.
+    await expect(page.locator('#quiz-score p')).toHaveText(/^Score: \d+ \/ \d+$/);
+  });
+
+  test('an incorrect answer\'s feedback text names only the correct choice, not its result badge', async ({
+    page,
+  }) => {
+    // Regression test: `check()` used to read the correct choice's whole
+    // label text (including the "✓ correct" badge it had just written into a
+    // sibling span) instead of just the choice text, so a wrong guess's
+    // feedback read `the answer is "Portugal✓ correct".` instead of
+    // `the answer is "Portugal".`.
+    const firstCard = page.locator('.quiz-card').first();
+    const answerIndex = Number(await firstCard.getAttribute('data-answer-index'));
+    const wrongIndex = answerIndex === 0 ? 1 : 0;
+
+    const correctChoiceText = await firstCard
+      .locator('.quiz-card__choice')
+      .nth(answerIndex)
+      .locator('span:not(.quiz-card__result-badge)')
+      .textContent();
+
+    await firstCard.locator('input[type="radio"]').nth(wrongIndex).check();
+    await firstCard.locator('.quiz-card__check').click();
+
+    await expect(firstCard.locator('.quiz-card__feedback')).toHaveText(
+      `Not quite - the answer is "${correctChoiceText!.trim()}".`
+    );
   });
 
   test('restart clears answers and resets the score', async ({ page }) => {
@@ -2831,6 +2862,31 @@ test.describe('Quiz page on a 360px phone', () => {
     await expect(reveal.locator('p')).not.toBeEmpty();
   });
 
+  test('the order challenge rank <select> is wide enough not to clip its own placeholder text', async ({
+    page,
+  }) => {
+    // Regression test: a native <select> silently clips its own option text
+    // with no ellipsis once the box is narrower than the text needs (the
+    // same defect class the seventieth intensive run fixed for
+    // TournamentTable's filter row via selectMinWidthRem() - this select is
+    // a separate, fixed-width component that fix never touched). The
+    // Croatian "Poredak..." placeholder is the longest text this select ever
+    // holds; confirm it fits inside the select's own content box.
+    const select = page.locator('.quiz-order__rank').first();
+    const fits = await select.evaluate((el: HTMLSelectElement) => {
+      const cs = getComputedStyle(el);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      const contentWidth =
+        el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      return Array.from(el.options).every(
+        (option) => ctx.measureText(option.textContent ?? '').width <= contentWidth,
+      );
+    });
+    expect(fits).toBe(true);
+  });
+
   test('the language switcher opens the Croatian quiz page', async ({ page }) => {
     await openMenu(page);
     await page.locator('a.lang-switch').click();
@@ -2891,6 +2947,35 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
 
     await expect(firstCard.locator('.quiz-card__feedback')).toHaveText('Točno!');
     await expect(page.locator('#quiz-score-value')).toHaveText('1');
+
+    // Regression test: same "Score:0 / 40"-style spacing bug as the English
+    // quiz page, since both share the same {t(...)}\n<strong> template shape.
+    await expect(page.locator('#quiz-score p')).toHaveText(/^Rezultat: \d+ \/ \d+$/);
+  });
+
+  test('an incorrect answer\'s Croatian feedback text names only the correct choice, not its result badge', async ({
+    page,
+  }) => {
+    // Regression test: same result-badge-bleed bug as the English quiz page
+    // (both share QuizScript.astro's check() function) - a wrong guess's
+    // feedback used to read `odgovor je "Portugal✓ točno".` instead of
+    // `odgovor je "Portugal".`.
+    const firstCard = page.locator('.quiz-card').first();
+    const answerIndex = Number(await firstCard.getAttribute('data-answer-index'));
+    const wrongIndex = answerIndex === 0 ? 1 : 0;
+
+    const correctChoiceText = await firstCard
+      .locator('.quiz-card__choice')
+      .nth(answerIndex)
+      .locator('span:not(.quiz-card__result-badge)')
+      .textContent();
+
+    await firstCard.locator('input[type="radio"]').nth(wrongIndex).check();
+    await firstCard.locator('.quiz-card__check').click();
+
+    await expect(firstCard.locator('.quiz-card__feedback')).toHaveText(
+      `Netočno - odgovor je "${correctChoiceText!.trim()}".`
+    );
   });
 
   test('includes a "koje je godine ... osvojio Zlatnu loptu" question, answerable like any other card', async ({
@@ -2970,6 +3055,27 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
     await expect(firstOrderCard.locator('.quiz-card__feedback')).toHaveText(
       'Svaki broj poretka smije se koristiti samo jednom - dvije stavke trenutačno dijele isti broj.',
     );
+  });
+
+  test('the order challenge rank <select> is wide enough not to clip the Croatian "Poredak..." placeholder', async ({
+    page,
+  }) => {
+    // Regression test: see the matching English-page test's comment - the
+    // Croatian placeholder is the longest text this select ever holds, so
+    // this is the case that was actually clipped before the fix.
+    const select = page.locator('.quiz-order__rank').first();
+    const fits = await select.evaluate((el: HTMLSelectElement) => {
+      const cs = getComputedStyle(el);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      const contentWidth =
+        el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      return Array.from(el.options).every(
+        (option) => ctx.measureText(option.textContent ?? '').width <= contentWidth,
+      );
+    });
+    expect(fits).toBe(true);
   });
 
   test('the language switcher returns to the English quiz page', async ({ page }) => {
@@ -3072,6 +3178,35 @@ test.describe('Croatian sources page (/hr/about/sources) on a 360px phone', () =
       worldCupGroup.getByRole('link', { name: 'FIFA Svjetsko prvenstvo' }),
     ).toHaveAttribute('href', /competitions\/world-cup$/);
     await expect(worldCupGroup.locator('a[href^="https://www.fifa.com"]').first()).toBeVisible();
+  });
+
+  // Every heading link used to point at the English competition page
+  // regardless of language (a stopgap from before all six competitions had a
+  // Croatian version) - fixed to link to the Croatian page a Croatian reader
+  // is already on. Two of the five (Copa América, Zlatna lopta) also happened
+  // to collide, by accessible-name text, with the header nav's own Croatian
+  // links to those same competitions elsewhere on this page: same text,
+  // English destination vs. the nav's Croatian one - a real screen-reader
+  // links-list ambiguity on top of the wrong-language bug. Explicitly
+  // requires the `/hr/` prefix (anchored to the end of the href) so this
+  // regresses loudly if the hrefs are ever pointed back at the English pages.
+  test('every competition heading links to the Croatian competition page, not the English one', async ({
+    page,
+  }) => {
+    const cases: [string, string][] = [
+      ['FIFA Svjetsko prvenstvo', 'world-cup'],
+      ['UEFA Europsko prvenstvo', 'euro'],
+      ['UEFA Liga nacija', 'nations-league'],
+      ['Copa América', 'copa-america'],
+      ['Zlatna lopta', 'ballon-dor'],
+    ];
+    for (const [heading, slug] of cases) {
+      const group = page.locator('.sources-page__group', { hasText: heading });
+      await expect(group.getByRole('link', { name: heading, exact: true })).toHaveAttribute(
+        'href',
+        new RegExp(`/hr/competitions/${slug}$`),
+      );
+    }
   });
 
   test('the language switcher returns to the English sources page', async ({ page }) => {

@@ -6,6 +6,7 @@ import QuizScript from '../components/QuizScript.astro';
 import References from '../components/References.astro';
 import EditorialNotes from '../components/EditorialNotes.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
+import { disambiguateLabels } from '../lib/sources';
 import { buildTimeline } from '../lib/editions';
 import { t } from '../lib/i18n';
 import { absolutePageUrl, withBase } from '../lib/url';
@@ -243,15 +244,17 @@ const orderQuestions = [
   ),
 ];
 
-const sources = [
-  ...worldCup.sources,
-  ...euro.sources,
-  ...copaAmerica.sources,
-  ...nationsLeague.sources,
-  ...ballonDor.sources,
-  ...goldenBootWorldCup.sources,
-  ...goldenBootEuro.sources,
-].filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+const sources = disambiguateLabels(
+  [
+    ...worldCup.sources,
+    ...euro.sources,
+    ...copaAmerica.sources,
+    ...nationsLeague.sources,
+    ...ballonDor.sources,
+    ...goldenBootWorldCup.sources,
+    ...goldenBootEuro.sources,
+  ].filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index),
+);
 
 const lastReviewed = [
   worldCup.lastReviewed,
@@ -294,7 +297,7 @@ const jsonLd: JsonLdObject[] = [
 
     <div class="quiz__score card no-print" id="quiz-score" hidden>
       <p>
-        {t('en', 'quizScoreLabel')}
+        {t('en', 'quizScoreLabel')}{' '}
         <strong id="quiz-score-value">0</strong> / <span id="quiz-score-total">{questions.length}</span>
       </p>
       <button type="button" id="quiz-restart">{t('en', 'quizRestart')}</button>

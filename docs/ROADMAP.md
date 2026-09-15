@@ -4159,3 +4159,1142 @@ back clean:
   could extend the same method to the seven per-family edition-page route
   trees (a different shape: many generated pages per family rather than one
   static page), or pick a genuinely different quality angle.
+- **Croatian Copa América edition pages: `<h1>`/`<title>` word-order
+  mismatch**: closed 2026-09-12 (hundred-and-sixth intensive run) - a
+  standing health check first (all clean, matching the hundred-and-fifth
+  run's baseline). Per the hundred-and-fifth run's own suggestion, extended
+  the "read a shared component plus every one of its call sites end to end"
+  method to the last unswept page shape: the seven per-family edition-page
+  `[year].astro` route trees (World Cup, EURO, Copa América, Nations
+  League, Ballon d'Or, and both Golden Boot races). Diffed every
+  `EditionView`/`References` prop, every `HEADER_LABELS` map against its
+  competition's actual source-table columns, and each page's `<title>`
+  word order against its own `headingTemplate`/`glanceHeading` word order
+  across all seven Croatian pages. Six were already fully consistent (fixed
+  by the hundred-third/hundred-fourth/hundred-fifth runs); Copa América's
+  Croatian page was the one holdout: its `<title>` correctly read
+  "Copa América {year}." (competition name first, matching every other
+  Croatian edition page's convention) but its `headingTemplate` and
+  `glanceHeading` still used the English page's year-first order
+  (`${yearLabel} {competition}`), so the visible `<h1>` read "1959.
+  (Argentina) Copa América" - competition and year in the opposite order
+  from the page's own `<title>` and from all six sibling competitions'
+  Croatian `<h1>`s. Fixed both templates to
+  `` `{competition} ${yearLabel}` ``/`` `Izdanje ${yearLabel} na prvi
+  pogled` ``, matching the sitewide Croatian convention (confirmed against
+  World Cup/EURO/Ballon d'Or/Golden Boot's own "Izdanje {year}. na prvi
+  pogled" glance heading). Updated the one e2e assertion that had encoded
+  the old (wrong) order (`tests/e2e/copa-america-edition-page.spec.ts`) to
+  the corrected text; verified against the built
+  `dist/hr/competitions/copa-america/1959-argentina/index.html` output that
+  `<h1>` now reads "Copa América 1959. (Argentina)", matching `<title>`.
+  `check:pdfs` correctly caught the affected Croatian Copa América PDFs (52,
+  every year plus the two disambiguated 1959 editions) as stale immediately
+  after the fix, per the hundred-fourth run's "check the rendered page, not
+  just whether a content file changed" correction; regenerated with `pnpm
+  build:pdfs` and reverified `check:pdfs` clean (700/700). No content file
+  touched, so `pnpm test` stays at 616/616. Full standing health check clean
+  after: `pnpm lint` (0/0/0), `pnpm test` (616/616), `pnpm build` (711
+  pages), all 14 `check:*` scripts clean (including the three
+  browser-based sweeps, `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`),
+  full cold-start `pnpm test:e2e`. See `docs/PROJECT_STATUS.md`'s matching
+  entry for full detail. **Left for a future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, Nations League's Team of the Tournament
+  for 2021/2023/2025, the `long-title` brand-suffix decision), plus the
+  Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+  Nations League figures, and EURO 1996/2020's/World Cup 1930/1950's
+  excluded attendance figures. The "read end to end" prop-diff method has
+  now covered every EN/HR page shape on the site (all pages outside
+  `[year].astro`, and now all seven `[year].astro` route trees too) - a
+  future pass's best bet is a genuinely different quality angle
+  (accessibility, performance, SEO) or a fresh source lead on any of the
+  open attendance/captain gaps above.
+- **SEO: meta descriptions built from editorial data could exceed 160
+  characters; now clamped sitewide**: closed 2026-09-12 (hundred-and-seventh
+  intensive run) - a standing health check first (all clean, matching the
+  hundred-sixth run's baseline). The twenty-fourth run's own SEO length audit
+  (2026-08-28) only scanned literal `<BaseLayout description="...">` strings
+  in page source, which can't see a description *built* at build time from
+  editorial data - scanning the built `dist/` output directly found 63 pages
+  over 160 characters (up to 235), all in the golden-boot/euro,
+  golden-boot/world-cup, euro and world-cup edition-page families (long
+  country names or, worse, a multi-way Golden Boot tie listing every
+  co-winner) plus the `teams/germany` profile pages. Fixed centrally: a new
+  `truncateDescription()` (`src/lib/text.ts`, word-boundary-safe, appends an
+  ellipsis) wired into `BaseLayout.astro` once, covering
+  `<meta name="description">`/`og:description`/`twitter:description` for
+  every current and future page rather than patching each of the ~14
+  per-family templates that build one. `check:meta` now also enforces the
+  160-character limit against built HTML as a permanent regression guard
+  (plus a new `decodeAttributeEntities()` fix so an escaped `&`/`"` doesn't
+  inflate the measured length past what a reader actually sees). 11 new unit
+  tests (627/627 total). `check:pdfs` reverified clean with no regeneration
+  needed (meta tags aren't part of either PDF's printed output). Full
+  standing health check clean: `pnpm lint` (0/0/0), `pnpm test` (627/627),
+  `pnpm build` (711 pages), all 14 `check:*` scripts, the 37-page
+  `check:lighthouse` audit (all 1.00), and a full cold-start `pnpm test:e2e`
+  (947/947, 16.0 minutes, run alone after a first concurrent attempt hit an
+  unrelated port collision with this same run's own `check:lighthouse` - see
+  `docs/PROJECT_STATUS.md`'s matching entry for that correction).
+  See `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
+  future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, Nations League's Team of
+  the Tournament for 2021/2023/2025, the `long-title` brand-suffix decision),
+  plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed Nations League figures, and EURO 1996/2020's/World Cup
+  1930/1950's excluded attendance figures.
+- **`scripts/` end-to-end audit finds a hardcoded overflow-tolerance literal
+  out of sync with its own shared constant**: closed 2026-09-12
+  (hundred-and-eighth intensive run) - a standing health check first (all
+  clean, matching the hundred-seventh run's baseline: `pnpm lint` 0/0/0,
+  `pnpm test` 627/627, `pnpm build` 711 pages, `pnpm outdated` still only the
+  blocked `typescript` 7 entry, all 14 `check:*` scripts and the 37-page
+  `check:lighthouse` audit clean). Re-attempted the standing Nations League
+  content gaps with `WebSearch` (this environment's direct `curl`/`WebFetch`
+  egress to `en.wikipedia.org`/`uefa.com` is still blocked, confirmed again
+  with a fresh `403`): the 2021/2025 final-attendance figures
+  (31,511/65,852) and the 2023 figure (41,110) came back consistently across
+  several independently worded queries, but per the ninety-sixth run's own
+  standard this still can't prove the number was read independently rather
+  than synthesized from the same Wikipedia text `WebSearch` itself surfaces,
+  so the 2023 41,110-vs-41,500 conflict stays unresolved and all three stay
+  out of `content/uefa-nations-league.md`. One genuine resolution, though:
+  searching specifically for a Nations League Finals "Team of the
+  Tournament"/"Squad of the Tournament" turned up no such award in any
+  edition - only "Player of the Tournament/Finals", a "Best Young Player"
+  given once (2019, Frenkie de Jong) and never repeated, and a Top Scorer -
+  so that line item in this file's own "Left for a future pass" list across
+  6+ prior runs was chasing an award that doesn't exist; dropped from this
+  and future entries rather than left open indefinitely.
+
+  Extended the "read a directory end-to-end, compare shared logic across
+  its files" method (already run against `src/lib/`, `src/components/` and
+  every `src/pages/` shape) to `scripts/` (18 files, ~3,858 lines) for the
+  first time, via a dedicated read-only audit. First confirmed the
+  711-vs-715-vs-710 page counts different scripts report are all correct
+  and mutually consistent (715 = every built `.html` file; 711 = Astro's own
+  page count, excluding the 4 `astro.config.mjs` redirect stubs; 710 = the
+  sitemap count, excluding those same 4 plus `404.html`'s `noindex`) - not a
+  bug. The real find: `check-reflow.mjs` exports `OVERFLOW_TOLERANCE_PX = 1`
+  precisely so sibling sweeps share one threshold, and its own live
+  "FAIL"-line check already used the constant, but `check-text-zoom.mjs` and
+  `check-print-width.mjs` each hardcoded the same threshold as a bare `1` in
+  their own live progress line while still importing `pagesOverflowing` (the
+  shared constant's consumer) for the final verdict - so if a future run
+  ever revised `OVERFLOW_TOLERANCE_PX`, the live per-page "FAIL" log and the
+  final pass/fail summary could visibly disagree on those two scripts.
+  Fixed both to import and use `OVERFLOW_TOLERANCE_PX` instead of the
+  literal. Re-ran both checks after the fix (711/711 pages clean on each)
+  and `pnpm test` (627/627, unchanged - no unit test covers these scripts'
+  console output). Full standing health check re-confirmed after: `pnpm
+  lint` (0/0/0), `pnpm test` (627/627), `pnpm build` (711 pages),
+  `check:text-zoom`/`check:print-width` (711/711 each), plus this run's
+  earlier pre-fix baseline pass of the remaining `check:*` scripts and
+  `check:lighthouse` (37/37 pages, all four categories 1.00 - unaffected by
+  this run's fix, so not re-run), and a full cold-start `pnpm test:e2e`.
+  See `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for
+  a future pass:** the same environment-blocked
+  items as ever (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+  `long-title` brand-suffix decision), plus the Nations League 2023
+  attendance conflict and 2021/2025's still-unconfirmed figures, and EURO
+  1996/2020's/World Cup 1930/1950's excluded attendance figures. The
+  directory-level "read end to end" method has now covered every `src/`
+  subtree and `scripts/`; `tests/` itself is the one remaining large,
+  unswept source directory if a future run wants to extend the same method
+  once more.
+- **`tests/` end-to-end audit**: closed 2026-09-12 (hundred-and-ninth
+  intensive run) - a standing health check first (all clean, matching the
+  hundred-eighth run's baseline: `pnpm lint` 0/0/0, `pnpm test` 627/627,
+  `pnpm build` 711 pages, all `check:*` scripts clean). Extended the
+  directory-level "read end to end, compare shared logic/constants across
+  files" method to `tests/` (47 files, ~16,435 lines), the one large
+  source directory the hundred-eighth run's own closing note had left
+  unswept. Found a real bug in the same shape as that run's own
+  `OVERFLOW_TOLERANCE_PX` find: `scripts/check-print-width.mjs` exports
+  `PRINT_CONTENT_WIDTH_PX` specifically so other files can share the A4
+  print-width constant, and `tests/unit/checkPrintWidth.test.ts` correctly
+  imports it, but `tests/e2e/print-styles.spec.ts` independently re-typed
+  the identical formula as its own local constant instead of importing it
+  - so a future `@page` geometry change could silently desync the e2e
+  spec's viewport from the script's own sweep. Fixed by importing the
+  shared constant; verified with a clean 143/143 run of
+  `print-styles.spec.ts` alone (same 1032px value, behavior-preserving)
+  and a full cold-start `pnpm test:e2e`. Two other candidates (Croatian
+  edition-page `<h1>` word order across all six per-family spec files;
+  every header-drawer-driving e2e test calling `openMenu(page)` first)
+  were checked and confirmed already consistent, not bugs. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
+  future pass:** the same environment-blocked items as ever (`typescript`
+  7, `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix
+  decision), plus the Nations League 2023 attendance conflict and
+  2021/2025's still-unconfirmed figures, and EURO 1996/2020's/World Cup
+  1930/1950's excluded attendance figures. The directory-level "read end
+  to end" method has now covered every large source directory on the site
+  (`src/` subtrees, `scripts/`, `tests/`) at least once - a future run's
+  best bet is a fresh source lead on the open attendance/brand-suffix
+  items, or a second pass over an already-swept directory with a
+  genuinely different lens than shared-constant drift.
+- **Non-page-component endpoint sweep (`robots.txt.ts`/`sitemap.xml.ts`/
+  `manifest.webmanifest.ts`/the three `*-index.json.ts` files); standing
+  health check re-confirmed clean**: closed 2026-09-12 (hundred-and-tenth
+  intensive run) - a standing health check first (`pnpm install`, `pnpm
+  outdated` still only the blocked `typescript` 7 entry, `pnpm lint`
+  0/0/0, `pnpm test` 627/627, `pnpm build` 711 pages, all 14 `check:*`
+  scripts clean including the three browser-based sweeps and
+  `check:lighthouse`, `pnpm test:coverage` unchanged at 99.91%/99.44%,
+  `pnpm dlx knip` unchanged, and a full cold-start `pnpm test:e2e`,
+  947/947, 14.4 minutes) - all matching the hundred-and-ninth run's
+  baseline exactly. Closed out the one item every recent run's own
+  closing note had explicitly left unswept: `robots.txt.ts`,
+  `sitemap.xml.ts`, `manifest.webmanifest.ts` (both the English and
+  Croatian copies), and `team-index.json.ts`/`player-index.json.ts`/
+  `edition-index.json.ts` - the handful of `src/pages/*.ts` API routes
+  that sit outside every page-component shape the "read end to end"
+  method had already covered. Read all seven files in full: the two
+  `manifest.webmanifest.ts` copies already share every field via one
+  `buildManifest(locale)` helper (`src/lib/manifest.ts`, itself already
+  swept in the `src/lib/` pass); `robots.txt.ts` builds its `Sitemap:`
+  line from the same `withBase()`/`site` origin every other generated
+  endpoint uses; and the three `*-index.json.ts` files are explicitly
+  written and commented as mirrors of one another (same response shape,
+  same `Cache-Control`, same reason for existing - letting
+  `scripts/generate-pdfs.mjs` enumerate slugs it can't derive any other
+  way) and were cross-checked line by line against each other and against
+  `scripts/pdf-pages.mjs`'s `EDITION_PDF_SOURCES` family-slug convention,
+  which `edition-index.json.ts`'s own doc comment says it must match - no
+  drift found. This closes the "read end to end" method's coverage of
+  every large source directory *and* every remaining page/endpoint shape
+  on the site; no genuinely unswept area of this kind is left. Also
+  re-attempted the standing Nations League attendance gaps: `WebSearch`
+  again independently surfaced 31,511 (2021)/41,110 (2023)/65,852 (2025)
+  and, new this run, a specific `uefa.com` match-events page URL for the
+  2021 final that could have served as a source independent of
+  Wikipedia - but `WebFetch` of that URL failed with the same
+  `EGRESS_BLOCKED` result this environment has given for `uefa.com`/
+  `en.wikipedia.org` on every prior attempt, so the "two independent,
+  independently-read sources" bar still isn't cleared and these stay out
+  of `content/uefa-nations-league.md`. No code or content change was
+  needed this run (the endpoint sweep found the files already correct,
+  and PDF/e2e/coverage counts are all unchanged), so no PDF regeneration
+  was required either - confirmed via a clean `check:pdfs` (700/700)
+  rather than assumed. **Left for a future pass:** the same
+  environment-blocked items as ever (`typescript` 7, `docs/SOURCES.md`
+  link-liveness, the `long-title` brand-suffix decision needing human
+  sign-off), plus the Nations League 2023 attendance conflict and
+  2021/2025's still-unconfirmed figures, and EURO 1996/2020's/World Cup
+  1930/1950's excluded attendance figures. With both the directory-level
+  and the page/endpoint-shape sweeps now exhausted, a future run's best
+  bet is a fresh source lead on the open attendance/brand-suffix items,
+  a second pass over an already-swept area with a genuinely different
+  lens, or picking a new quality dimension not yet tried (e.g. a from-
+  scratch UX walkthrough rather than a code-reading audit).
+- **Missing `x-default` hreflang alternate**: closed 2026-09-13
+  (hundred-and-eleventh intensive run) - a standing health check first (all
+  clean, matching the hundred-tenth run's baseline), then a fresh
+  SEO-specific read of `BaseLayout.astro`/`sitemap.xml.ts`'s hreflang
+  wiring rather than another internal-consistency sweep. Every bilingual
+  page and sitemap entry carried only `en`/`hr` alternates, missing the
+  `x-default` alternate Google's hreflang guidance recommends for a reader
+  whose browser locale matches neither - added to both (pointing at the
+  English version, this site's primary language), and factored
+  `sitemap.xml.ts`'s eight duplicated two-tag alternate blocks into one
+  shared `buildAltLinks()` helper in the process. See
+  `docs/PROJECT_STATUS.md`'s matching entry for detail. **Left for a
+  future pass:** the same environment-blocked items as ever (`typescript`
+  7, `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix
+  decision), plus the Nations League 2023 attendance conflict and
+  2021/2025's still-unconfirmed figures, and World Cup 1930/1950's/EURO
+  1996/2020's excluded attendance figures. A from-scratch manual UX
+  walkthrough of a full user journey is still untried by any prior run and
+  remains a good candidate for a future pass.
+- **References & review sections rendered many links in a row with
+  byte-identical text pointing at different URLs**: closed 2026-09-13
+  (hundred-and-twelfth intensive run) - took the hundred-and-eleventh run's
+  own suggestion and ran a genuine from-scratch manual UX walkthrough (built
+  and served the site, drove a real headless browser across ~16 page
+  families at both 360px and 1280px, read the actual rendered screenshots
+  rather than another internal-consistency code sweep). Found a real, sitewide
+  defect no prior run's automated a11y/lint/Lighthouse tooling had caught,
+  because it isn't a rule axe-core or Lighthouse check for: `extractSources()`
+  (`src/lib/sources.ts`) labels every citation link with the nearest bullet
+  text, but one editorial audit in `docs/SOURCES.md` routinely cites several
+  corroborating URLs (nested bullets under one description) - each became its
+  own link, correctly, but all inherited the exact same label, so the
+  References section rendered runs of 2-52 consecutive links reading
+  identically (e.g. "Final match dates audit (2026-08-02): the calendar
+  date of each edition's" repeated 4 times in a row, each pointing at a
+  different Wikipedia final-match page). Measured before fixing: 968 of the
+  980 total source links across `docs/SOURCES.md` (99%) fell into a
+  duplicate-label group. This is a real WCAG 2.4.4/2.4.9 problem (a reader,
+  especially one using a screen reader's "links list", has no way to tell
+  same-text links apart) as well as a plain scanability issue for a sighted
+  reader. Fixed centrally: a new exported `disambiguateLabels()` in
+  `src/lib/sources.ts`, called from `extractSources()`, appends a
+  "(source i of n)" suffix to every label shared by more than one link
+  within a list, in appearance order; a label used once is untouched. Built
+  idempotent (strips any existing suffix before regrouping) specifically
+  because 18 separate call sites across `/compare`, `/compare-players`,
+  `/records`, `/teams`, `/players`, `/quiz` and the combined Golden Boot
+  page (both languages of each) merge several competitions' already-
+  disambiguated source lists into one combined References section - without
+  idempotency, two different competitions' citations that each happened to
+  resolve to "(source 1 of 3)" independently would collide again after
+  merging. All 18 merge sites updated to wrap their existing URL-dedup
+  `.filter()` in `disambiguateLabels()`. Verified against the real built
+  output, not just the unit tests: a scan of all 715 built HTML files found
+  zero pages with any remaining duplicate link text in a `.references__list`
+  (down from 968 duplicated links across the site pre-fix). 4 new unit tests
+  in `tests/unit/sources.test.ts` (631/631 total) covering the untouched
+  single-link case, in-section numbering, cross-section scoping, and the
+  fallback-hostname-label case. Every content-embedding PDF regenerated
+  (`pnpm build:pdfs`) since the References section is printed into each one;
+  `check:pdfs` reverified clean after. Full standing health check clean:
+  `pnpm lint` (0/0/0), `pnpm test` (631/631), `pnpm build` (711 pages),
+  `check:links`/`check:html`/`check:jsonld`/`check:meta`/`check:pdfs` all
+  clean. See `docs/PROJECT_STATUS.md`'s matching entry for full detail.
+  **Left for a future pass:** the same environment-blocked items as ever
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+  brand-suffix decision), plus the Nations League 2023 attendance conflict
+  and 2021/2025's still-unconfirmed figures, and World Cup 1930/1950's/EURO
+  1996/2020's excluded attendance figures. The manual UX walkthrough this
+  run opened only covered a first pass across ~16 page families at two
+  viewports - a future run could extend it to pages not yet walked (the
+  Croatian award pages, the glossary's interactive states, the "On this
+  day" widget) or to a different interaction mode (keyboard-only navigation,
+  a screen reader emulation pass) rather than another code-reading sweep.
+
+- **Keyboard-only navigation walkthrough plus a new permanent test for the
+  one deliberate focus-outline suppression on the site**: closed 2026-09-13
+  (hundred-and-thirteenth intensive run) - a standing health check first
+  (`pnpm install`, `pnpm outdated` found one new in-range patch,
+  `@types/node` 26.5.0 -> 26.5.1, installed; `typescript` 7 still blocked by
+  `@astrojs/check`'s peer ceiling, re-confirmed via `npm view
+  @astrojs/check@latest peerDependencies`). `pnpm lint`/`test`/`build`/
+  `check:links`/`check:sitemap`/`check:precache`/`check:perf`/`check:pdfs`/
+  `check:jsonld`/`check:meta`/`check:html`/`check:award-tallies`/
+  `check:i18n-notes`/`check:spelling` and `pnpm dlx knip --no-config-hints`
+  all clean, matching the hundred-and-twelfth run's baseline. Acted on that
+  run's own suggestion (keyboard-only navigation, untried by any prior run)
+  with a genuine from-scratch pass: drove a real headless Chromium
+  Tab-by-Tab across 13 English and 12 Croatian page families (every
+  competition/award landing and edition page, both search pages, the quiz,
+  glossary, `/about/sources`, `/records`, and the home page's "On this day"
+  widget), reading `document.activeElement` at each stop rather than running
+  another axe-core/Lighthouse sweep - neither tool audits WCAG 2.4.7 Focus
+  Visible or genuine tab-order sanity. Two apparent findings turned out to be
+  false positives on closer inspection (Tab exhausting a page's focusable
+  elements lands briefly on `<body>` before wrapping - normal headless-Chromium
+  behavior with no browser chrome to tab into, not a trap; the "On this day"
+  widget has no interactive elements at all, so nothing to check there) and
+  are recorded here so a future run doesn't re-investigate the same two
+  dead ends. One real, previously-untested invariant did turn up: `grep -rn
+  "outline: none" src/` confirms `.team-search__input:focus-visible {
+  outline: none }` (`Nav.astro`) is the *only* place on the whole site a
+  focus outline is deliberately suppressed on the element that actually has
+  focus - relied on because the wrapping `.team-search__field:focus-within`
+  rule paints the visible ring around the whole field (icon + input)
+  instead. No test anywhere asserted this actually happens, so a future edit
+  removing the wrapper's `outline` rule without a replacement would silently
+  leave keyboard users with zero visible focus indicator on both search
+  widgets - not the kind of regression `check:html`/`check:jsonld`-style
+  content checks or axe-core's ruleset would ever catch. Added
+  `tests/e2e/accessibility-keyboard-focus.spec.ts` (3 tests: team search,
+  player search, and the Croatian home page) asserting both halves of the
+  pattern - the input's own `outline-style` computes to `none`, the
+  ancestor `.team-search__field`'s does not and has a non-zero width -
+  verified to actually catch the regression (temporarily deleted the
+  wrapper's `outline`/`outline-offset` declarations, confirmed all three new
+  tests fail with the expected message, restored the file, confirmed
+  `git diff` clean and the tests pass again). Also verified this run's own
+  test infrastructure gotcha for whoever hits it next: Playwright's
+  `webServer` config (`reuseExistingServer: !CI`) silently reuses *any*
+  already-listening `localhost:4321`, including a stale preview server left
+  running from an unrelated manual `pnpm preview`/prior test run with an
+  older build - a locally-run `pnpm test:e2e` after editing source can look
+  green (or wrongly red) against yesterday's build unless that port is freed
+  first (`lsof -i :4321`, kill the PID) before every fresh run; this run's
+  first attempt at the break/restore verification above was fooled by
+  exactly that. No page-weight, PDF, or `lastReviewed` changes needed - this
+  is a test-only, presentation-unrelated fix, matching every other
+  `accessibility-*.spec.ts` file's own convention. Full standing health
+  check re-run clean after the change (`pnpm lint` 188 files/0 errors,
+  `pnpm test` 631/631 unit, unchanged - e2e-only coverage, `pnpm build` 711
+  pages, every `check:*` script clean), plus a full cold-start `pnpm
+  test:e2e` (950/950 passed, up from 947, 16.7 minutes) confirming no
+  regression elsewhere. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
+  future pass:** the same environment-blocked items as ever (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix decision),
+  plus the Nations League 2023 attendance conflict (re-confirmed again this
+  run via WebSearch: both 41,110 and 41,500 still appear across sources with
+  no way to tell which is authoritative) and 2021/2025's still-unconfirmed
+  figures, Nations League's Team of the Tournament for 2021/2023/2025 (also
+  re-checked this run, still no complete official XI turned up), and World
+  Cup 1930/1950's/EURO 1996/2020's excluded attendance figures. The keyboard
+  walkthrough this run opened covered every page family at the site's one
+  test viewport (360px) plus a 1280px desktop check during manual
+  investigation - a future run could extend it to a screen-reader emulation
+  pass (untried by any prior run) or a different quality angle entirely.
+
+- **`check:edition-header-labels`: new permanent check for the seven
+  per-family edition-page `HEADER_LABELS` translation maps, plus one real
+  dead-key bug it caught**: closed 2026-09-13 (hundred-and-fourteenth
+  intensive run) - a standing health check first (all clean, matching the
+  hundred-and-thirteenth run's baseline; `pnpm outdated` still only the
+  blocked `typescript` 7 entry). Extended this run's own established
+  "read a shared component plus every call site end to end" method to the
+  one area explicitly flagged as not yet swept this way: the seven
+  `src/pages/hr/competitions/**/[year].astro` route trees (World Cup, EURO,
+  Nations League, Copa América, Ballon d'Or, Golden Boot x2), each of which
+  hand-maintains its own `HEADER_LABELS` object translating that
+  competition's raw English column headers for `EditionView.astro`'s
+  `label()` helper - which silently falls back to the raw English header
+  when a key is missing, the exact same "quiet fallback" shape that produced
+  the `hr/records` unit-noun bug (hundred-and-fifth run) and the Croatian
+  References `noteText` bug (hundred-and-twelfth run). Cross-checked all
+  seven maps against their live source table headers in `content/*.md`: six
+  were already complete, but UEFA Nations League's map carried a dead
+  `Season: 'Sezona'` entry - harmless today only because `EditionProfile`
+  deliberately excludes the Year/Season column from `facts` (so `label()`
+  never looks it up), but a maintenance trap masquerading as a real
+  translation. Removed it. New permanent tool,
+  `scripts/check-edition-header-labels.mjs`
+  (`pnpm check:edition-header-labels`): parses each family's source table
+  header row and its `.astro` file's `HEADER_LABELS` keys and flags both a
+  missing translation and a stale key with no matching column - plain
+  regex/string parsing of `content/*.md` plus the seven route files, no
+  build or browser needed, so wired into `.github/workflows/ci.yml` as a
+  required PR gate right after `check:award-tallies`. 4 new unit tests for
+  the exported `parseHeaderLabelKeys()` helper. All 8 affected PDFs
+  (`edition-nations-league-<slug>[-hr].pdf`, EN+HR x4 seasons) regenerated
+  and reverified with `pnpm check:pdfs` (700/700 fresh) - the dead key's
+  removal doesn't change any rendered `<dt>` text, but it does change the
+  source file `check:pdfs` hashes against. Full standing health check clean
+  after the change: `pnpm lint` (190 files, 0/0/0), `pnpm test` (635/635
+  unit, up from 631 - 4 new), `pnpm build` (711 pages, unchanged), all 12
+  `check:*` scripts clean including the new one itself (7 families, 0
+  problems), `pnpm dlx knip --no-config-hints` unchanged (the one standing
+  false positive). A full cold-start `pnpm test:e2e` also passed 950/950
+  (17.3 minutes, unchanged count), confirming no regression. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full
+  detail. **Left for a future pass:** the same environment-blocked items as
+  every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+  `long-title` brand-suffix decision), plus the Nations League 2023
+  attendance conflict, 2021/2025's still-unconfirmed figures, Nations
+  League's Team of the Tournament for 2021/2023/2025, and World Cup
+  1930/1950's/EURO 1996/2020's excluded attendance figures. The
+  "read end to end" method has now covered `src/lib/`, `src/components/`,
+  the top-level EN/HR page pairs, and the seven per-family edition-page
+  route trees - a future run's best bet is a genuine screen-reader
+  emulation pass (still untried), or a fresh
+  `docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.
+- **Screen-reader "links list" audit: `check:link-names`, plus three real
+  same-name-different-destination bugs it caught**: closed 2026-09-13
+  (hundred-and-fifteenth intensive run) - a standing health check first (all
+  clean, matching the hundred-and-fourteenth run's baseline; also applied
+  the one available `cspell` 10.3.0 -> 10.3.1 patch bump). Took the
+  screen-reader-emulation suggestion left by the two prior runs, scoped as
+  an automated "does any link on a page share another link's accessible
+  name while pointing somewhere else" sweep - the exact defect class a
+  screen reader's links list (which shows every link by name alone, no
+  visual context) can't resolve, and the same bug class the
+  hundred-and-twelfth run's References `disambiguateLabels()` fix addressed
+  for merged citation lists specifically. Found and fixed three real,
+  previously-unchecked bugs: (1) `/about/sources`/`/hr/about/sources`
+  disambiguated citation labels only within each `##` heading, so a label
+  colliding only within its own heading could still collide with an
+  unrelated citation from a different heading once every heading landed on
+  one page - fixed by re-running `disambiguateLabels()` across the
+  flattened set in `extractSourceSections()`; (2) Copa América's two 1959
+  Year-column links (`TournamentTable.astro`) shared byte-identical
+  accessible text ("1959") pointing at two different edition pages - fixed
+  with a conditional `aria-label` ("1959 (Argentina)"/"1959 (Ecuador)"),
+  added only when a year actually has more than one edition; (3)
+  `/hr/about/sources`'s five competition-heading links all pointed at the
+  English competition page even though every competition now has a
+  Croatian one (a stale stopgap from when Copa América was the only one
+  translated) - fixed to link to the Croatian route, which also happened to
+  resolve two of the accessible-name collisions the audit itself flagged.
+  One case reviewed and deliberately left as-is: `404.html`'s bilingual
+  "Popular pages" cards share two competition names ("EURO", "Copa
+  América") spelled identically in both languages - unavoidable given
+  GitHub Pages serves one static 404 file for both languages, and each
+  language's card has its own heading/`lang` attribute, satisfying WCAG
+  2.4.4's in-context clause. New permanent tool, `scripts/check-link-names.mjs`
+  (`pnpm check:link-names`), wired into CI right after `check:i18n-notes`;
+  12 new unit tests for it, 2 more extending `sources.test.ts` for the
+  cross-heading fix directly, plus extended (not new) e2e coverage in
+  `copa-america-edition-page.spec.ts` and `mobile.spec.ts`. All 700 PDFs
+  regenerated and reverified clean (both changed files are shared
+  dependencies of nearly every PDF, even though most have no visibly
+  different rendered output). Full health check clean after the change:
+  649/649 unit (14 new), 711 pages, all 13 `check:*` scripts clean
+  including the new one itself, plus a full cold-start `pnpm test:e2e`
+  (952/952, up from 950 - the two new e2e assertions). See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a future pass:** the same environment-blocked
+  items as ever (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+  `long-title` brand-suffix decision), plus the Nations League 2023
+  attendance conflict, 2021/2025's still-unconfirmed figures, Nations
+  League's Team of the Tournament for 2021/2023/2025, and World Cup
+  1930/1950's/EURO 1996/2020's excluded attendance figures. A future run's
+  best bet is a fresh source lead on any of those, or a different quality
+  angle - `check:lighthouse` hasn't had a logged run recently, worth
+  confirming still clean.
+- **`pnpm audit` dependency vulnerabilities (js-yaml/svgo, both transitive
+  via `astro`)**: closed 2026-09-13 (hundred-and-sixteenth intensive run) -
+  a standing health check first (all clean, matching the
+  hundred-and-fifteenth run's baseline exactly, including a fresh
+  `check:lighthouse` run per that run's own suggestion - still
+  1.00/1.00/1.00/1.00 on all 37 sampled pages). `pnpm audit`, last logged
+  clean, turned up 3 real advisories (`js-yaml@4.3.1` high-severity CPU-DoS,
+  `svgo@4.0.2` one high/one moderate executable-content sanitization bypass)
+  - both transitive through `astro@7.3.2` (already latest), neither imported
+  directly anywhere in this repo. Fixed with a `pnpm.overrides` block in
+  `package.json` pinned to a same-major-version caret range
+  (`^4.3.2`/`^4.1.0`) rather than an open `>=` range, after a first attempt
+  with `>=` jumped `js-yaml` to an unwanted major version 5. `pnpm audit`
+  now clean; full standing health check (lint/test/build/all `check:*`/a
+  cold-start `pnpm test:e2e`, 952/952) re-confirmed nothing else changed.
+  Also fixed a stale pair of test counts in `docs/PROJECT_STATUS.md`'s "How
+  to run" section (543/939, long since outgrown - now 649/952). Re-attempted
+  the standing Nations League attendance/Team-of-the-Tournament gaps once
+  more; no new information, same conclusion as the ninety-sixth/
+  hundred-and-second/hundred-and-eighth runs. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
+  future pass:** the same environment-blocked items as ever (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix decision),
+  plus the Nations League 2023 attendance conflict and 2021/2025's
+  still-unconfirmed figures, and World Cup 1930/1950's/EURO 1996/2020's
+  excluded attendance figures. `pnpm audit` is now worth adding to every
+  future run's own standing health-check list, the same way
+  `check:lighthouse` was folded in after its first manual run.
+- **Standing health check plus three fresh defect-class investigations**:
+  closed 2026-09-14 (hundred-and-seventeenth intensive run) - the full
+  standing health check (lint/test/coverage/build/all 16 `check:*`
+  scripts/`pnpm audit`/`knip`/`check:lighthouse`/`check:reflow`/
+  `check:text-zoom`/`check:print-width`/a cold-start `pnpm test:e2e`) came
+  back byte-identical to the hundred-and-sixteenth run's baseline: 649/649
+  unit, 99.91%/99.3% coverage, 711 pages, 952/952 e2e (16.5 minutes), zero
+  vulnerabilities. Investigated three fresh potential defect classes none
+  of the existing tooling checks - an `axe-core` rule-tag gap analysis, a
+  CSS visual-order-vs-DOM-order (WCAG 1.3.2) sweep, and an alt-text-quality
+  audit - and ruled out each with evidence rather than assuming (see
+  `docs/PROJECT_STATUS.md`'s matching entry for exactly what was checked
+  and why each is a non-issue here, not a gap). Also re-attempted the
+  Nations League Team of the Tournament research once more: found a named
+  Wikipedia "Team of the Tournament" page exists for the 2019 Finals
+  specifically, narrowing the hundred-and-eighth run's "UEFA doesn't
+  publish one" framing to "not readable from this session" - `WebFetch`
+  against both `en.wikipedia.org` and a fandom mirror still returned
+  `EGRESS_BLOCKED`, so nothing was added given the site's two-independent-
+  source bar. No code or content changed this run. **Left for a future
+  pass:** the same environment-blocked items as ever (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix decision),
+  plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed figures, the re-scoped Team of the Tournament sourcing
+  question, and World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+  figures. A future run's best bet is a fresh source lead from a session
+  with working external network access, or a genuinely new quality lens.
+- **Standing health check clean; host-map region-label fallback audited and
+  ruled out**: closed 2026-09-14 (hundred-and-eighteenth intensive run) -
+  the full standing health check (`pnpm install`/`outdated`/`lint`/`test`/
+  `test:coverage`/`build`/all 16 `check:*` scripts/`pnpm audit`/`knip`/
+  `check:lighthouse`/a cold-start `pnpm test:e2e`) came back byte-identical
+  to the hundred-and-seventeenth run's baseline: 649/649 unit,
+  99.91%/99.3% coverage, 711 pages, all 37 sampled Lighthouse pages still
+  1.00/1.00/1.00/1.00, zero `pnpm audit` vulnerabilities, and **952/952
+  e2e** passed on a clean re-run in isolation (an initial attempt run
+  concurrently with other health-check commands genuinely failed several
+  tests under CPU contention - not a repo bug, just this run's own mistake
+  running too much at once; re-run alone came back fully clean). Audited a
+  fresh defect-class hypothesis: `HostMap.astro`'s `regionLabels?.[region]
+  ?? region` lookup (line 105) is the exact same "quiet fallback to raw
+  English on a missing translation key" shape that produced the
+  `hr/records` unit-noun bug (hundred-and-fifth run) and the Croatian
+  References `noteText` bug (hundred-and-twelfth run), and had never been
+  checked directly. Cross-referenced every region value each of the four
+  host-map-bearing competitions' own coordinate table
+  (`WORLD_CUP_HOST_COORDINATES`/`EURO_HOST_COORDINATES`/
+  `NATIONS_LEAGUE_HOST_COORDINATES`/`COPA_AMERICA_HOST_COORDINATES` in
+  `src/lib/hostCoordinates.ts`) can actually produce against each Croatian
+  page's own `hostRegionLabels` map: all four are complete (World Cup's
+  five regions, EURO/Nations League's one region each, Copa América's two),
+  so this defect class cannot currently occur here - ruled out, not a bug.
+  No code or content changed this run. **Left for a future pass:** the same
+  environment-blocked items as ever (`typescript` 7, `docs/SOURCES.md`
+  link-liveness, the `long-title` brand-suffix decision), plus the Nations
+  League 2023 attendance conflict, 2021/2025's still-unconfirmed figures,
+  the Team of the Tournament sourcing question, and World Cup 1930/1950's/
+  EURO 1996/2020's excluded attendance figures. A future run's best bet is
+  still a fresh source lead from a session with working external network
+  access, or a genuinely new quality lens - the "read a shared
+  component/map end to end for a quiet-fallback bug" method has now been
+  applied to `EditionView`'s `label()` helper, References' `noteText`,
+  `hr/records`' unit nouns, and now `HostMap`'s `regionLabels`, all of
+  which are either fixed or confirmed clean.
+
+- **PDF metadata: every downloadable PDF now carries an `/Author`, added
+  without disturbing the existing tagged/PDF-UA structure**: closed
+  2026-09-14 (hundred-and-nineteenth intensive run) - a standing health
+  check first (all clean, matching the hundred-and-eighteenth run's
+  baseline exactly; one `check:lighthouse` run scored a single page 0.96
+  on best-practices instead of 1.00, but a clean isolated re-run scored it
+  a perfect 1.00 again - flaky metric-timing noise, not a regression, the
+  same "re-run alone before concluding a regression" lesson the
+  hundred-and-eighteenth run's own e2e contention already established).
+  Read `scripts/generate-pdfs.mjs` end to end and found a gap no prior PDF
+  pass had checked: `/Title` and the document catalog's `/Lang` are both
+  already correct and per-language on every PDF (set automatically by
+  Chromium's print-to-PDF from the live page's own `<title>`/`<html
+  lang>`), but `/Author` was entirely absent from all 700 PDFs - the only
+  place on the whole site that doesn't say who it's from, unlike
+  `og:site_name`/every page's own `<title>` suffix. A first-attempt fix
+  with `pdf-lib` was tested against a real generated PDF and rejected: it
+  shrank the file by almost half and silently dropped `/StructTreeRoot`/
+  `/MarkInfo`/`/Lang`/`/Outlines` entirely - exactly the PDF/UA
+  accessibility structure an earlier (2026-08-12) run's `tagged`/`outline`
+  addition exists to produce. The actual fix, `scripts/pdf-metadata.mjs`,
+  performs a standard PDF incremental update instead (the same append-only
+  mechanism Adobe Acrobat uses to edit a PDF's own properties): appends a
+  new revision of the Info object carrying `/Author`, plus a minimal xref
+  section and trailer whose `/Prev` points at the original file's xref -
+  every byte of the original, tagged/outlined file stays untouched.
+  Verified by hand against a real PDF (byte-for-byte identical structure
+  counts before/after, new `/Author` resolves correctly) before wiring it
+  into all four PDF-writing call sites in `generate-pdfs.mjs`. 8 new unit
+  tests (`tests/unit/pdfMetadata.test.ts`) against a structurally accurate
+  fixture, covering the happy path, xref/offset correctness, a non-`1 0
+  obj` Info object number, idempotency, literal-string escaping, and three
+  thrown-error cases. All 700 PDFs regenerated and reverified
+  (`check:pdfs` 700/700 fresh); spot-checked two live-generated PDFs by
+  hand to confirm the real output matches the fixture-tested behavior.
+  Full standing health check clean after: 657/657 unit (8 new), 711 pages,
+  every `check:*` clean, and a full cold-start `pnpm test:e2e` run alone
+  (**952/952 passed**, 22.1 minutes). See
+  `docs/PROJECT_STATUS.md`'s matching entry for the full byte-level
+  detail. **Left for a future pass:** the same environment-blocked items
+  as ever (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+  `long-title` brand-suffix decision), plus the Nations League 2023
+  attendance conflict, 2021/2025's still-unconfirmed figures, the Team of
+  the Tournament sourcing question, and World Cup 1930/1950's/EURO
+  1996/2020's excluded attendance figures. PDF `/Subject`/`/Keywords` were
+  considered and deliberately left out - no existing per-page "subject" or
+  keyword concept exists anywhere else on the site to draw from without
+  inventing one from scratch, unlike `/Author`, which directly reuses the
+  already-established `og:site_name`. A future run's best bet is still a
+  fresh source lead from a session with working external network access,
+  or a genuinely new quality lens - this run's own finding (a metadata gap
+  present since the PDF feature's first commit, never audited by any prior
+  run) is a reminder that this routine's own tooling, not just the site's
+  pages, can still hide an unchecked angle.
+- **Standing health check clean; EditionView/References translated-prop
+  parity swept across all seven per-edition route families**: closed
+  2026-09-14 (hundred-and-twentieth intensive run) - the full standing
+  health check (`pnpm install`/`outdated`/`lint`/`test`/`test:coverage`/
+  `build`/all 16 `check:*` scripts/`pnpm audit`/`knip`/`check:lighthouse`/
+  `check:reflow`/`check:text-zoom`/`check:print-width`/a cold-start `pnpm
+  test:e2e`) came back byte-identical to the hundred-and-nineteenth run's
+  baseline: 657/657 unit, 99.91%/99.3% coverage, 711 pages, all 37 sampled
+  Lighthouse pages still 1.00/1.00/1.00/1.00, zero `pnpm audit`
+  vulnerabilities, and **952/952 e2e** passed (22.5 minutes).
+  Extended the "read a shared component plus every call site end to end"
+  method - already applied to `src/lib/`, `src/components/`, and nine
+  EN/HR page-pairs outside the per-edition trees - to the one area every
+  recent run's own closing note had flagged as not yet covered by it: the
+  seven per-family `[year].astro` route trees (World Cup, EURO, Nations
+  League, Copa América, Ballon d'Or, and both Golden Boot race variants).
+  Precisely diffed, per file pair, exactly which `EditionView`/`References`
+  props each EN vs. HR call site sets (not just a file-wide prop-name
+  union, which produces false positives from components with multiple
+  instances) - the same two components every one of these 14 pages
+  shares, and the exact components the hundred-and-third/hundred-and-fifth
+  runs' own real bugs (the missing Croatian `noteText`/`unit` overrides)
+  came from. All seven pairs came back completely consistent: every
+  translatable prop with an English default (`eyebrow`, `headingTemplate`,
+  `introTemplate`, `pagerLabel`, `previousLabel`, `nextLabel`, `backLabel`,
+  `teamProfileHintTemplate`, `playerProfileHintTemplate`, `storyHeading`,
+  `glanceHeading`, `topScorerLabel`, `headerLabels`, `locale`, plus
+  References' `dateLocale`/`heading`/`lastReviewedPrefix`/`noSourcesText`/
+  `noteText`/`statusPrefix`/`statusText`) is correctly overridden at every
+  Croatian call site with no gaps - closing this method's queue, first
+  raised by the hundred-and-third run's own "a future pass could extend
+  the same method to the seven per-family edition-page route trees" note
+  and repeated by the hundred-and-fifth/hundred-and-nineteenth runs since.
+  Two shared strings that looked like candidate untranslated-text bugs at
+  first pass (`'FIFA World Cup Golden Boot'`/`'UEFA EURO Golden Boot'`
+  appearing identically in both the EN and HR Golden Boot `[year].astro`
+  files) were traced through `playerProfile.ts`'s `PlayerAwardSource.title`
+  and confirmed to be internal slug-building keys that are never rendered,
+  not a translation gap. No code or content changed this run. **Left for a
+  future pass:** the same environment-blocked items as ever (`typescript`
+  7, `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix
+  decision), plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed figures, the Team of the Tournament sourcing question,
+  and World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures -
+  this run re-confirmed `WebSearch` still can't demonstrate independent
+  sourcing for any of these beyond what the ninety-sixth/hundred-and-
+  seventeenth runs already established (direct `WebFetch`/`curl` to
+  Wikipedia/UEFA/fandom mirrors remains `EGRESS_BLOCKED` in this
+  environment), so this remains a dead end absent a session with broader
+  network access. The "read end to end" method has now covered
+  `src/lib/`, `src/components/`, and every `src/pages/` shape (the nine
+  flat EN/HR page-pairs and all seven per-edition route trees) - a future
+  pass's best bet is a genuinely different quality lens (the
+  hundred-and-seventeenth run's axe-core-rule-tag-gap/visual-order/
+  alt-text-quality angle is one template for what that can look like), or
+  a fresh `docs/WEBSITE_REQUIREMENTS.md` re-read against the live site.
+- **Standing health check clean; open-backlog and PR state re-confirmed
+  empty**: closed 2026-09-14 (hundred-and-twenty-first intensive run) - the
+  full standing health check (`pnpm install`/`outdated`/`lint`/`test`/
+  `test:coverage`/`build`/all 17 `check:*` scripts/`pnpm audit`/`knip`/
+  `check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/a
+  cold-start `pnpm test:e2e`) came back byte-identical to the
+  hundred-and-twentieth run's baseline: 657/657 unit, 99.91%/99.3%
+  coverage, 711 pages, zero `pnpm audit` vulnerabilities, one standing
+  `knip` false positive (`scripts/test-preview-server.mjs`), all 37 sampled
+  Lighthouse pages still 1.00/1.00/1.00/1.00, and **952/952 e2e** passed
+  (14.8 minutes). This run also checked something no prior run's own
+  entry mentions doing explicitly: the open PR itself
+  (github.com/slavisah/football-reference/pull/54) - confirmed green CI on
+  its current head, zero open review threads, and zero unaddressed PR
+  comments, so there was no reviewer feedback this run needed to act on.
+  Re-verified this routine's own full backlog history in `docs/ROADMAP.md`
+  line by line: every named item, from the original six-competition
+  milestone through all 120 prior intensive-run entries, is marked closed;
+  none reopened. Beyond the health check, tried several additional angles
+  looking for genuinely new work before concluding none exists: a
+  `target="_blank"` audit (every instance already carries
+  `rel="nofollow noopener external"`, `References.astro` plus both
+  `about/sources` pages), a PWA-installability re-check of
+  `src/lib/manifest.ts` (both maskable and non-maskable 192/512 icons,
+  `display: standalone`, `theme_color`/`background_color` all already
+  present), confirming `BreadcrumbList` JSON-LD is already wired
+  site-wide, and a fresh structural `## `-heading comparison across all
+  six `content/*.md` files - Copa América/Nations League's lack of a
+  "Young Player" award section was the one new-looking candidate, but both
+  are already-closed questions, not a fresh gap: the forty-seventh run
+  closed Copa América's "Best Young Player" award negatively (awarded only
+  "intermittently," not a clean per-edition fact), and the thirty-seventh
+  run closed Nations League's "Young Player of the Finals" the same way
+  (only one of four editions had a findable name) - re-ran both queries
+  fresh rather than trust either prior run's note alone, and both
+  reproduced the identical conclusion. Also re-tested the standing Nations
+  League attendance question via `WebSearch` once more (still available;
+  direct `WebFetch`/`curl` to `en.wikipedia.org` still `EGRESS_BLOCKED`):
+  the queries converged on the exact same figures already on record
+  (31,511; 41,110; 65,852), matching the hundred-and-twentieth run's own
+  re-test byte-for-byte - not new information. No code or content changed
+  this run. **Left for a future
+  pass:** the same environment-blocked items as ever (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix decision
+  needing human sign-off), plus the Nations League 2023 attendance
+  conflict, 2021/2025's still-unconfirmed figures, the Team of the
+  Tournament sourcing question, and World Cup 1930/1950's/EURO 1996/2020's
+  excluded attendance figures. With the backlog, the PR's own review
+  state, and every structural/accessibility/PWA angle tried so far all
+  coming back clean, a future run's best bet is still either a fresh
+  source lead from a session with broader network access, or a genuinely
+  new quality lens not yet listed in this file's own closed-item history.
+- **`check:heading-outline`: new permanent check for the site's `<h1>`-`<h6>`
+  structure**: closed 2026-09-14 (hundred-and-twenty-second intensive run) -
+  found a genuinely new quality lens after the hundred-and-twenty-first
+  run's own closing note: every accessibility pass logged so far went
+  through axe-core or Lighthouse, and neither rule set validates that a
+  page's heading levels form a correct outline (exactly one `<h1>`, no level
+  skipped ahead of the highest level seen so far) - `check:html`'s
+  `html-validate` pass accepts a `<h4>` nested straight inside a `<h2>` as
+  valid HTML5, so nothing on this site had ever checked that shape. New tool
+  `scripts/check-heading-outline.mjs` (`pnpm check:heading-outline`) parses
+  every heading on every built page via plain regex, the same territory as
+  `check:jsonld`/`check:links` (a couple of seconds, no browser needed), and
+  is wired into `.github/workflows/ci.yml` as a required PR gate. Ran clean
+  on the first pass (711/711 pages, exactly one `<h1>` each, no skips) - the
+  same "confirm a real signal, keep the tool permanent" outcome
+  `check:jsonld` itself had, so it exists to catch the next regression, not
+  to report one now. 12 new unit tests
+  (`tests/unit/checkHeadingOutline.test.ts`) cover heading extraction (text
+  stripped of nested markup, whitespace collapsed) and outline validation
+  (missing `<h1>`, duplicate `<h1>`, a level skip named with its from/to
+  levels and offending heading text, and the "already seen deeper, so no
+  skip" case a naive "compare consecutive headings only" check would get
+  wrong). Full standing health check re-run clean: `pnpm lint` (196 files,
+  0/0/0), `pnpm test` (669/669 unit, up from 657 - 12 new), `pnpm build`
+  (711 pages), `check:links` (715 pages), `check:sitemap` (710 entries),
+  `pnpm test:coverage` unchanged at 99.91%/99.3% (the new script isn't
+  instrumented, matching every other `scripts/check-*.mjs` tool), and `pnpm
+  dlx knip --no-config-hints` still shows only its one standing false
+  positive (`scripts/test-preview-server.mjs`). See
+  `docs/PROJECT_STATUS.md`'s matching entry for the full detail. **Left for
+  a future pass:** the same environment-blocked items as ever (`typescript`
+  7, `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix decision
+  needing human sign-off), plus the Nations League 2023 attendance
+  conflict, 2021/2025's still-unconfirmed figures, the Team of the
+  Tournament sourcing question, and World Cup 1930/1950's/EURO 1996/2020's
+  excluded attendance figures. Two runner-up angles a future run could take
+  next, surfaced but not yet executed: a non-text UI component contrast
+  audit (WCAG 1.4.11 - borders/focus rings/icons against their adjacent
+  background, a success criterion axe-core's default ruleset only partially
+  covers) and a `<table>` caption/`aria-describedby` completeness sweep for
+  tables outside the per-edition/`TournamentTable` trees (e.g. any ad-hoc
+  tables in `/glossary`, `/about/sources`).
+- **`check:reachability`: new permanent check that every indexable page is
+  reachable by clicking through the site from its two homepages**: closed
+  2026-09-15 (hundred-and-twenty-third intensive run) - tried both
+  hundred-and-twenty-second-run runner-up angles first: a manual audit of
+  every icon/border color found nothing new (the `--contrast-border`/
+  `--contrast-text-muted` tokens already cover borders under `prefers-
+  contrast: more`, the two site-wide `<svg>` icons use `stroke="currentColor"`
+  so they inherit already-passing text contrast, and print-only colors are
+  out of WCAG 1.4.11's screen scope), and a table caption/`aria-describedby`
+  sweep of every table outside `TournamentTable.astro`
+  (`compare.astro`/`compare-players.astro`/`records.astro`, both languages)
+  found every one already has a `<caption>` plus an `aria-label`/`role=
+  "region"` wrapper where it scrolls - both ruled out, not gaps. Found a
+  genuinely new angle instead: `check:links` verifies every `href`/`src`
+  resolves and `check:sitemap` verifies every indexable page is listed in
+  `sitemap.xml`, but nothing had ever checked that a page is actually
+  *reachable by clicking through the site* - a page can pass both existing
+  checks while having zero inbound `<a href>` from anywhere a reader would
+  browse (invisible to anyone not arriving via search or a direct URL). New
+  tool `scripts/check-reachability.mjs` (`pnpm check:reachability`) does a
+  breadth-first walk of `<a href>` links only (not every `href`/`src`,
+  which would count non-clickable references like `<link rel="canonical">`
+  as reachability) starting from the English and Croatian homepages, then
+  checks every non-`noindex` built page is in that reached set. Ran clean on
+  the first pass (710 indexable pages reached; the 404 page and the four
+  legacy `/awards/*` redirect stubs correctly excluded via their existing
+  `noindex` tag) - the same "confirm a real signal, keep the tool permanent"
+  outcome `check:heading-outline` itself had. Wired into
+  `.github/workflows/ci.yml` as a required PR gate (well under a second,
+  the same territory as `check:links`/`check:sitemap`). 10 new unit tests
+  (`tests/unit/checkReachability.test.ts`). Full standing fast-check suite
+  (`pnpm lint`/`pnpm test`/`pnpm build`/every `check:*` script/`pnpm
+  audit`/`knip`) re-confirmed clean. A cold-start `pnpm test:e2e` initially
+  failed twice with no pass/fail markers at all - not the CPU-contention
+  pattern it first looked like (matching the hundred-and-eighteenth run's
+  own entry), but a real environment mismatch: this session's pre-installed
+  Chromium is one revision behind what the repo's pinned
+  `@playwright/test` requests, and headless mode looks for a separate
+  `chrome-headless-shell` binary that isn't present at all. Re-run as `PW_
+  EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (the same escape
+  hatch `check-lighthouse.mjs`/`check-print-width.mjs` already use, wired
+  into `playwright.config.ts` but not previously needed for a plain `pnpm
+  test:e2e` run in this environment), it passed clean: **952/952 in 15.4
+  minutes**, matching every prior run's baseline. Recorded in
+  `docs/PROJECT_STATUS.md`'s matching entry so a future run in this same
+  environment doesn't repeat the same misattribution. **Left for a future
+  pass:** the same
+  environment-blocked items as ever (`typescript` 7, `docs/SOURCES.md`
+  link-liveness, the `long-title` brand-suffix decision needing human
+  sign-off), plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed figures, the Team of the Tournament sourcing question,
+  and World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures.
+  With both hundred-and-twenty-second-run runner-up angles now closed
+  negatively, a future run's best bet is again either a fresh source lead
+  or a genuinely new quality lens not yet listed in this file's history.
+- **`check:image-dimensions`: new permanent check that every declared image
+  pixel size (manifest icons, og:image/twitter:image) matches the real
+  file**: closed 2026-09-15 (hundred-and-twenty-fourth intensive run) - a
+  standing health check first (all clean, matching the hundred-and-
+  twenty-third run's baseline: 679/679 unit, 711 pages, coverage unchanged
+  at 99.91%/99.3%). Reading `BaseLayout.astro`'s Open Graph/Twitter Card
+  block end to end found two real, previously-unchecked gaps:
+  `check-internal-links.mjs`'s link extraction only matches `href`/`src`
+  attributes, so `<meta property="og:image" content="...">`/`<meta
+  name="twitter:image" content="...">` (both use `content`) have never had
+  their URL verified to resolve to a real file by `check:links` or
+  `check:precache`; and while `check:precache` confirms a manifest icon's
+  `src` resolves to a file, nothing anywhere confirms its declared `sizes`
+  (or the `og:image:width`/`og:image:height` meta tags next to `og:image`)
+  actually matches that file's real pixel dimensions. New tool
+  `scripts/check-image-dimensions.mjs` (`pnpm check:image-dimensions`)
+  parses a PNG's own `IHDR` chunk directly (no dependency, matching every
+  other `check:*` script's zero-dependency convention) and checks both:
+  every page's og:image/twitter:image resolves and matches its declared
+  width/height, and both `manifest.webmanifest` files' icons match their
+  declared `sizes`. Ran clean on the first pass (og-image.png genuinely
+  1200x630, all four manifest icons genuinely their claimed sizes) - the
+  same "confirm a real signal, keep the tool permanent" outcome
+  `check:heading-outline`/`check:reachability` had. Verified it actually
+  catches regressions by temporarily corrupting a built page's declared
+  og:image width and a built manifest's declared icon size, one at a time,
+  confirming each broke the check with the right message, then restoring
+  both (only ever edited in gitignored `dist/` output, never source - `git
+  status` clean throughout). 12 new unit tests
+  (`tests/unit/checkImageDimensions.test.ts`). Wired into
+  `.github/workflows/ci.yml` as a required PR gate (well under a second).
+  Full standing health check clean after the change: `pnpm lint` (0/0/0),
+  `pnpm test` (691/691 unit, up from 679 - 12 new), `pnpm build` (711
+  pages), every `check:*` script including the new one, `pnpm test:coverage`
+  unchanged at 99.91%/99.3%, and `pnpm dlx knip --no-config-hints` still
+  only its one standing false positive. No content file touched, so no PDF
+  regeneration or `lastReviewed` bump was needed. A cold-start `PW_
+  EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` ran markedly
+  slower than every recent run's 15-25-minute baseline in this session
+  (**952/952 passed, 20.9 minutes** once it finished) - confirmed clean,
+  see `docs/PROJECT_STATUS.md`'s matching entry for the timing detail.
+  **Left for a future pass:** the same environment-blocked items as ever
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+  brand-suffix decision), plus the Nations League 2023 attendance conflict,
+  2021/2025's still-unconfirmed figures, the Team of the Tournament
+  sourcing question, and World Cup 1930/1950's/EURO 1996/2020's excluded
+  attendance figures. Two unexplored angles this run noticed in passing:
+  whether `og:url`'s content ever disagrees with the same page's own
+  canonical URL (a consistency check, not a resolution check - both already
+  individually resolve correctly), and whether `robots.txt`'s Allow/Disallow
+  directives stay consistent with which pages actually carry a `noindex`
+  tag.
+- **`check:locale-consistency`: new permanent check that every page's
+  `<html lang>` matches its own URL**: closed 2026-09-15
+  (hundred-and-twenty-fifth intensive run) - ruled out both of the
+  hundred-and-twenty-fourth run's runner-up angles first: `og:url`/canonical
+  can never disagree (same `canonicalURL` expression rendered twice in
+  `BaseLayout.astro`, not two independently computed values), and
+  `robots.txt` has no `Disallow` lines at all to disagree with a page's
+  `noindex` tag. Also confirmed hreflang reciprocity - the other candidate
+  considered - is already covered transitively by `check:sitemap.mjs`, so
+  not a fresh gap either. Found a genuinely new one instead: `locale` (which
+  drives `<html lang={locale}>`) is a per-page prop each route file passes
+  by hand, unlike canonical/hreflang which derive straight from the URL - a
+  copy-pasted new Croatian page that forgot `locale="hr"` would build at a
+  `/hr/...` URL with `lang="en"`, invisible to every existing check
+  (`check:sitemap`/`check:links` verify hrefs, not language; axe-core's
+  `html-has-lang`/`html-lang-valid` only check the attribute is
+  present/well-formed, never that it matches the URL). New tool
+  `scripts/check-locale-consistency.mjs` (`pnpm check:locale-consistency`)
+  checks every built page's `<html lang>` against its own URL. Ran clean on
+  the first pass (711/711); verified it catches a real regression by
+  temporarily flipping a built page's `lang` in `dist/` only, confirmed it
+  failed, then restored it. 12 new unit tests
+  (`tests/unit/checkLocaleConsistency.test.ts`). Wired into
+  `.github/workflows/ci.yml` as a required PR gate. Full standing health
+  check re-run clean: `pnpm lint` (0/0/0), `pnpm test` (703/703 unit, up
+  from 691 - 12 new), `pnpm build` (711 pages), every `check:*` script, `pnpm
+  test:coverage` unchanged at 99.91%/99.3%, `pnpm dlx knip --no-config-hints`
+  still only its one standing false positive, and a cold-start `pnpm
+  test:e2e` clean (**952/952 passed, 15.2 minutes**, matching every recent
+  run's baseline). Also made one fresh, Wikipedia-excluded WebSearch attempt
+  at the Nations League 2021 attendance gap - no new source lead surfaced,
+  so 2021/2025 stay unconfirmed and 2023 stays a conflict, per the
+  ninety-sixth run's standing caution. See `docs/PROJECT_STATUS.md`'s
+  matching entry for full detail. **Left for a future pass:** the same
+  environment-blocked items as ever (`typescript` 7, `docs/SOURCES.md`
+  link-liveness, the `long-title` brand-suffix decision needing human
+  sign-off), plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed figures, the Team of the Tournament sourcing question,
+  and World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures.
+  With og:url/canonical, robots.txt/noindex and hreflang reciprocity all now
+  ruled out or confirmed covered, a future run's best bet is again either a
+  fresh source lead, or a genuinely new quality lens not yet listed in this
+  file's history.
+- **Dependency patch bump (vitest/`@vitest/coverage-v8` 5.0.0 -> 5.0.1, cspell
+  10.3.1 -> 10.3.2) plus a manual browser walkthrough that found and fixed a
+  real mid-word-break bug in the head-to-head comparison tables**: closed
+  2026-09-15 (hundred-and-twenty-sixth intensive run) - `typescript` 7 is
+  still blocked (`@astrojs/check@0.9.10` still only declares `typescript:
+  '^5.0.0 || ^6.0.0'`, re-confirmed). Rather than another `check:*`-script
+  pass, this run tried the "from-scratch manual UX walkthrough" angle the
+  hundred-and-ninth run's own closing note first suggested and no run since
+  had picked up: rendered ~20 real pages (both languages, mobile and desktop
+  viewports) with Playwright and actually looked at the screenshots, instead
+  of reading source or running an automated assertion. Found a genuine,
+  previously-unnoticed defect this way: `/compare`, `/compare-players` and
+  their Croatian pages render the selected teams'/players' names as a
+  `.vs__team` table-header cell sized to ~34% of the panel width, with
+  `overflow-wrap: anywhere` as its only wrap control - fine for multi-word
+  names (they break at the space) but for a single long word that doesn't
+  fit one line, `anywhere` breaks mid-word with no hyphen at all ("Argentina"
+  rendered as "Argentin" / "a" at 360px). No existing check catches this:
+  `check:reflow`/`check:text-zoom`/`check:print-width` only measure
+  `scrollWidth` overflow, which mid-word breaking prevents by design, and
+  axe-core has no rule for word-break quality. Added `hyphens: auto` (plus
+  `-webkit-hyphens: auto`, matching `global.css`'s existing
+  `-webkit-text-size-adjust` precedent for a belt-and-suspenders vendor
+  prefix) ahead of the existing `overflow-wrap: anywhere` fallback in all
+  four `.vs__team` rules (`compare.astro`, `hr/compare.astro`,
+  `compare-players.astro`, `hr/compare-players.astro` - the panel's CSS is
+  hand-duplicated across all four rather than shared, so each needed the
+  same edit). This is a correct, spec-standard fix (Chrome/Firefox/Safari
+  have all supported unprefixed `hyphens: auto` since roughly 2021, and it
+  only needs the `lang` attribute already present on every page since the
+  hundred-and-twenty-fifth run's own `check:locale-consistency` addition),
+  and strictly non-regressive even where unsupported (the existing
+  `overflow-wrap: anywhere` fallback still applies exactly as before). **One
+  honest caveat:** this session's own headless Chromium build could not be
+  used to visually confirm the hyphen actually renders - an isolated
+  `hyphens: auto` test page in this same browser produced no hyphenation
+  break at all, on this or any other test word, even where a normal
+  (non-`anywhere`) box would otherwise overflow, suggesting this specific
+  Playwright-bundled Chromium binary lacks the ICU hyphenation-pattern data
+  real desktop/mobile Chrome ships with - not something this run had a way
+  to work around. `check:reflow`/`check:text-zoom`/`check:print-width` all
+  stayed clean (711/711 each) after the change, confirming no overflow
+  regression at least, but a future run with a differently-provisioned
+  browser (or a human on a real device) should visually re-check that
+  `/compare`'s "Argentina"/`/hr/compare`'s "Nizozemska" etc. actually
+  hyphenate rather than raw-break now. All 700 PDFs regenerated
+  (`pnpm build:pdfs`) and reverified clean (`check:pdfs` 700/700) since the
+  four touched `.astro` files each feed a PDF. Full standing health check
+  clean: `pnpm lint` (0/0/0), `pnpm test` (703/703, unchanged), `pnpm build`
+  (711 pages), every `check:*` script, `pnpm test:coverage` unchanged at
+  99.91%/99.3%. A cold-start `pnpm test:e2e` confirmed clean: **952/952
+  passed, 21.7 minutes**, matching every recent run's baseline. Also made one
+  more `WebSearch` attempt at the Nations League Team of the Tournament gap;
+  it surfaced a specific-looking 2019 lineup, but with `WebFetch` still
+  `EGRESS_BLOCKED` against every source that could confirm it (as every
+  prior run's attempt), it stays unadded per this site's own two-source
+  standard - see that entry for detail on why this shouldn't be re-tried the
+  same way again. **Left for a future pass:** the same environment-blocked
+  items as ever (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+  `long-title` brand-suffix decision), the Nations League 2023 attendance
+  conflict, 2021/2025's still-unconfirmed figures, the Team of the
+  Tournament sourcing question, World Cup 1930/1950's/EURO 1996/2020's
+  excluded attendance figures, and the hyphenation-rendering re-check noted
+  above. The manual-screenshot-walkthrough method itself worked well and is
+  cheap to repeat - a future run could extend it to pages this run didn't
+  cover (team/player profile pages, the print stylesheet's rendered output,
+  dark mode specifically) rather than assuming this one pass exhausted it.
+- **Manual walkthrough of the Family Quiz's answered state finds and fixes
+  two real, previously untested bugs**: closed 2026-09-15 (hundred-and-
+  twenty-seventh intensive run) - a standing health check first (`pnpm
+  install --frozen-lockfile`, `pnpm lint`/`test`/`build`, all sixteen
+  `check:*` scripts), all byte-identical to the hundred-and-twenty-sixth
+  run's baseline: 703/703 unit, 711 pages, no drift on any check. Picked up
+  the hundred-and-twenty-sixth run's own closing suggestion to extend last
+  run's manual-screenshot method to pages it hadn't covered yet: rendered
+  player profile pages (including the three longest player-name slugs, to
+  stress-test wrapping) and a team profile in both languages/themes/
+  viewports (all clean, no defect), the print stylesheet's actual rendered
+  output for the World Cup competition page, `/records` and the head-to-head
+  compare panel (also clean - the host-country map, tables and page-break
+  behavior all render correctly on paper), and then - following the same
+  run's own explicit "family quiz's interactive answered/revealed states"
+  suggestion - the quiz's answered-question state, which no prior manual
+  walkthrough had actually looked at. Found two real, live bugs there, both
+  present since whenever these features first shipped and both slipping
+  through every unit/e2e test because no existing assertion checked the
+  exact text they broke: (1) the score bar's `{t(locale, 'quizScoreLabel')}`
+  expression sat on its own line above the following `<strong>` in both
+  `quiz.astro` and `hr/quiz.astro` - Astro's template compiler drops that
+  kind of whitespace-only line between an expression and the next tag, so
+  the built HTML read `Score:<strong>` with no space, rendering as
+  "Score:0 / 40"/"Rezultat:0 / 40" instead of "Score: 0 / 40"/"Rezultat: 0 /
+  40"; and (2) far more substantively, `QuizScript.astro`'s shared `check()`
+  function built its "Not quite - the answer is "X"." feedback sentence by
+  reading `labels[answerIndex].textContent` *after* that same function had
+  already written the "✓ correct" result badge into a sibling `<span>`
+  inside that label, so `textContent` picked up both and every incorrect
+  answer on every multiple-choice question, in both languages, read "the
+  answer is "Portugal✓ correct"." instead of "the answer is "Portugal".".
+  Existing e2e coverage never caught this because `mobile.spec.ts`'s one
+  incorrect-answer assertion only checked `.not.toBeEmpty()`, never the
+  actual string. Fixed the score-bar gap with an explicit `{' '}` in both
+  route files, and the feedback-text bug by reading the correct choice's
+  text from `label.querySelector('span:not(.quiz-card__result-badge)')`
+  instead of the whole label, with a comment explaining why (both in
+  `src/components/QuizScript.astro`, shared by the English and Croatian
+  quiz pages, so one fix covers both languages). Added two new regression
+  tests per language to `tests/e2e/mobile.spec.ts` (four total) that
+  deliberately pick a wrong answer and assert the exact feedback string,
+  plus assert the score-bar text matches `/^Score: \d+ \/ \d+$/` (English)
+  and `/^Rezultat: \d+ \/ \d+$/` (Croatian) - neither existed before, so
+  this defect class now has a permanent regression guard. Verified visually
+  with Playwright screenshots before and after (mobile, dark mode) showing
+  the exact "Portugal✓ correct" bug and its fix. Full health check re-run
+  clean after the change: `pnpm lint` (0/0/0), `pnpm test` (703/703,
+  unchanged - no unit-testable logic touched), `pnpm build` (711 pages,
+  unchanged), all sixteen `check:*` scripts clean, and the full quiz e2e
+  spec (27/27, including the 2 new tests) passing standalone. A full
+  cold-start `pnpm test:e2e` confirmed no regression sitewide: **954/954
+  passed, 21.8 minutes** (up from 952/952 by exactly the two new tests
+  added this run). No content file touched, so no PDF regeneration was
+  needed. **Left for a future pass:** the same
+  environment-blocked items as ever (`typescript` 7, `docs/SOURCES.md`
+  link-liveness, the `long-title` brand-suffix decision, the Nations League
+  Team of the Tournament sourcing question), the Nations League 2023
+  attendance conflict, 2021/2025's still-unconfirmed figures, World Cup
+  1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+  hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+  re-check on a real browser. The manual-walkthrough method has now found a
+  real bug two runs in a row - a future pass could extend it further to the
+  quiz's "just show me the answer" reveal state and the order-challenge's
+  answered state, which this run still didn't look at, or to team/player
+  profile pages' own print output, which this run's print pass didn't cover
+  (only the print stylesheet's shared table/map/page-break mechanics on
+  three other page types).
+- **Manual walkthrough of the quiz's order-challenge answered/reveal states
+  finds and fixes a real, previously untested `<select>`-clipping bug**:
+  closed 2026-09-15 (hundred-and-twenty-eighth intensive run) - a standing
+  health check first (`pnpm install --frozen-lockfile`, `pnpm lint`/`test`/
+  `build`, all sixteen `check:*` scripts), all byte-identical to the
+  hundred-and-twenty-seventh run's baseline: 703/703 unit, 711 pages, no
+  drift on any check. Picked up that same run's own closing suggestion:
+  extended the manual-screenshot method to the two quiz states it hadn't
+  covered yet, the order-challenge's answered state and the "just show me
+  the answer" reveal `<details>` on both card types, in both languages, at
+  a 390px mobile viewport.
+
+  Found a genuine, previously-unflagged bug, the same defect class the
+  seventieth intensive run fixed for `TournamentTable.astro`'s filter row
+  (a native `<select>` silently clips its own option text with no ellipsis
+  once the box is narrower than the text needs) but in a component that fix
+  never touched: `QuizOrderCard.astro`'s `.quiz-order__rank` rank-picker
+  `<select>` was fixed at `width: 5rem`, sized to fit the English
+  `quizRankPlaceholder` ("Rank...") with only a few px to spare, but the
+  longer Croatian translation ("Poredak...") measured ~79px against a
+  ~65px-wide content box (confirmed with the same canvas `measureText()`
+  technique the seventieth run used) - so on `/hr/quiz`, every unanswered
+  order-challenge item showed a silently truncated "Pored" instead of
+  "Poredak...", with no ellipsis or other cue that text was missing.
+  English wasn't broken, so no existing check or prior manual pass (this
+  quiz feature's states were only first walked manually last run, and that
+  pass covered the *answered* state, not an *unanswered* select's own
+  placeholder) had reason to catch it. Confirmed by rendering both
+  language's order cards with Playwright at 390px and reading the actual
+  select text.
+
+  Fixed by widening `.quiz-order__rank` from `5rem` to `7rem` - comfortably
+  fits the Croatian placeholder (a component-local, known-small string set:
+  the rank options themselves are always single/double-digit numbers) with
+  margin for the browser's own native dropdown-arrow reserve, re-confirmed
+  with the same canvas measurement and re-screenshotted at 390px on both
+  languages showing no overflow or wrapping regression. New regression
+  coverage: one test per language in `tests/e2e/mobile.spec.ts` (2 new)
+  that measures every rank `<select>`'s own option text against its content
+  box width via `canvas.measureText()` against the select's real computed
+  font/padding - the same technique used to find the bug, now a permanent
+  guard (a `scrollWidth`/`clientWidth` comparison, this codebase's usual
+  overflow-detection pattern, doesn't work for a native `<select>`'s
+  internal option text, which is why the original seventieth-run fix also
+  needed the canvas-measurement approach rather than that faster pattern).
+  Every other angle covered this run - the reveal `<details>` on both card
+  types, and the order-challenge answered state's badge/feedback text and
+  layout at 390px - came back clean in both languages, no defect found.
+
+  `check:reflow`/`check:print-width` both re-ran clean (711/711 each) after
+  the width change, confirming no overflow regression at 320px screen or
+  1032px print width. No content file or PDF-source `.astro` touched (the
+  quiz page isn't part of `build:pdfs`'s route set), so no PDF regeneration
+  was needed. Full standing health check clean after the change: `pnpm
+  lint` (0/0/0), `pnpm test` (703/703, unchanged - a CSS-only component fix
+  has no unit-testable logic), `pnpm build` (711 pages, unchanged), all
+  sixteen `check:*` scripts clean. Ran the full quiz e2e subset standalone
+  first (29/29, including the 2 new tests), then a full cold-start `pnpm
+  test:e2e`: **956/956 passed, 16.4 minutes** (up from 954/954 by exactly
+  the two new tests added this run, and within this site's normal 15-25
+  minute baseline range).
+
+  **Left for a future pass:** the same environment-blocked items as ever
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+  brand-suffix decision, the Nations League Team of the Tournament sourcing
+  question), the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed figures, World Cup 1930/1950's/EURO 1996/2020's
+  excluded attendance figures, and the hundred-and-twenty-sixth run's
+  still-open hyphenation-rendering visual re-check on a real browser
+  (unchanged this run). The manual-walkthrough method has now found a real,
+  user-facing bug in three consecutive runs - a future pass should keep
+  treating it as a first-class method and extend it to team/player profile
+  pages' own print output (still not covered by any run's manual pass) or
+  the home page's own interactive widgets (team/player search, theme
+  toggle) at states beyond what the accessibility specs already exercise.

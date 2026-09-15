@@ -32,6 +32,25 @@ test.describe('Copa América edition page', () => {
     await expect(ecuadorRow).toHaveAttribute('href', /\/competitions\/copa-america\/1959-ecuador\/?$/);
   });
 
+  test('both 1959 links carry a host-disambiguating aria-label - identical visible text would otherwise read the same to a screen reader\'s links list', async ({
+    page,
+  }) => {
+    await page.goto('competitions/copa-america');
+    const argentinaRow = page.locator('tbody tr[data-year="1959"][data-host="Argentina"] a', {
+      hasText: '1959',
+    });
+    const ecuadorRow = page.locator('tbody tr[data-year="1959"][data-host="Ecuador"] a', {
+      hasText: '1959',
+    });
+    await expect(argentinaRow).toHaveAttribute('aria-label', '1959 (Argentina)');
+    await expect(ecuadorRow).toHaveAttribute('aria-label', '1959 (Ecuador)');
+
+    // A normal, non-duplicate year keeps its plain text as its accessible
+    // name - the aria-label is only added where it's actually needed.
+    const normalYearLink = page.locator('tbody tr[data-year="2024"] a', { hasText: '2024' });
+    await expect(normalYearLink).not.toHaveAttribute('aria-label');
+  });
+
   test('each 1959 page shows its own champion, distinguished by host in the title', async ({ page }) => {
     await page.goto('competitions/copa-america/1959-argentina');
     await expect(page.locator('h1')).toHaveText('1959 (Argentina) Copa América');
@@ -115,7 +134,7 @@ test.describe('Croatian Copa América edition page', () => {
   test('renders translated chrome with the host disambiguator carried through', async ({ page }) => {
     await page.goto('hr/competitions/copa-america/1959-argentina');
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
-    await expect(page.locator('h1')).toHaveText('1959. (Argentina) Copa América');
+    await expect(page.locator('h1')).toHaveText('Copa América 1959. (Argentina)');
     await expect(page.locator('.edition__fact', { hasText: 'Prvak' })).toContainText('Argentina');
     await expect(page.locator('.references__note')).toContainText('Prednost imaju primarni izvori');
   });
@@ -128,6 +147,7 @@ test.describe('Croatian Copa América edition page', () => {
       hasText: '1959',
     });
     await expect(ecuadorRow).toHaveAttribute('href', /\/hr\/competitions\/copa-america\/1959-ecuador\/?$/);
+    await expect(ecuadorRow).toHaveAttribute('aria-label', '1959 (Ecuador)');
   });
 
   test('the pager uses Croatian copy alongside the host disambiguator', async ({ page }) => {

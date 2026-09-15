@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import References from '../components/References.astro';
 import PrintDownloadLink from '../components/PrintDownloadLink.astro';
 import { loadPageMeta } from '../lib/competition';
+import { disambiguateLabels } from '../lib/sources';
 import {
   buildAllCountryRecords,
   buildFinalsMeetings,
@@ -47,9 +48,11 @@ function cellText(value: number | null): string {
   return value === null ? '—' : String(value);
 }
 
-const sources = [worldCup, euro, copaAmerica, nationsLeague]
-  .flatMap((c) => c.sources)
-  .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+const sources = disambiguateLabels(
+  [worldCup, euro, copaAmerica, nationsLeague]
+    .flatMap((c) => c.sources)
+    .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index),
+);
 
 const lastReviewed = [worldCup, euro, copaAmerica, nationsLeague]
   .map((c) => c.lastReviewed)
@@ -463,6 +466,8 @@ const jsonLd: JsonLdObject[] = [
     width: 34%;
     font-size: 1rem;
     line-height: 1.25;
+    -webkit-hyphens: auto;
+    hyphens: auto;
     overflow-wrap: anywhere;
   }
 

@@ -27,6 +27,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PDF_PAGES as PAGES, TEAM_PDF_SOURCES, PLAYER_PDF_SOURCES, EDITION_PDF_SOURCES } from './pdf-pages.mjs';
+import { addAuthorMetadata, PDF_AUTHOR } from './pdf-metadata.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const PORT = 4399;
@@ -177,11 +178,25 @@ async function main() {
         outline: true,
       });
 
+      // page.pdf() itself (a thin wrapper over Chromium's Page.printToPDF)
+      // has no author-metadata option - see scripts/pdf-metadata.mjs's own
+      // header comment for why this is a post-write incremental-update
+      // patch rather than a printToPDF parameter or a full PDF-library
+      // re-serialize.
+      async function writePdfWithMetadata(outFile) {
+        await page.pdf(pdfOptions(outFile));
+        const original = await readFile(outFile);
+        const patched = addAuthorMetadata(original, PDF_AUTHOR);
+        if (patched !== original) {
+          await writeFile(outFile, patched);
+        }
+      }
+
       for (const { slug, path: pagePath } of PAGES) {
         const url = `${ORIGIN}${BASE}${pagePath}`;
         await page.goto(url, { waitUntil: 'networkidle' });
         const outFile = path.join(OUT_DIR, `${slug}.pdf`);
-        await page.pdf(pdfOptions(outFile));
+        await writePdfWithMetadata(outFile);
         console.log(`Wrote ${path.relative(ROOT, outFile)}`);
       }
 
@@ -216,7 +231,7 @@ async function main() {
           const url = `${ORIGIN}${BASE}${pagePath}`;
           await page.goto(url, { waitUntil: 'networkidle' });
           const outFile = path.join(OUT_DIR, `${fileSlug}.pdf`);
-          await page.pdf(pdfOptions(outFile));
+          await writePdfWithMetadata(outFile);
           teamManifestEntries.push({ slug: fileSlug, sources: TEAM_PDF_SOURCES });
         }
         console.log(`Wrote team-${slug}.pdf / team-${slug}-hr.pdf (${displayName})`);
@@ -254,7 +269,7 @@ async function main() {
           const url = `${ORIGIN}${BASE}${pagePath}`;
           await page.goto(url, { waitUntil: 'networkidle' });
           const outFile = path.join(OUT_DIR, `${fileSlug}.pdf`);
-          await page.pdf(pdfOptions(outFile));
+          await writePdfWithMetadata(outFile);
           playerManifestEntries.push({ slug: fileSlug, sources: PLAYER_PDF_SOURCES });
         }
         console.log(`Wrote player-${slug}.pdf / player-${slug}-hr.pdf (${displayName})`);
@@ -283,7 +298,7 @@ async function main() {
         const url = `${ORIGIN}${BASE}${pagePath}`;
         await page.goto(url, { waitUntil: 'networkidle' });
         const outFile = path.join(OUT_DIR, `${pdfSlug}.pdf`);
-        await page.pdf(pdfOptions(outFile));
+        await writePdfWithMetadata(outFile);
         editionManifestEntries.push({ slug: pdfSlug, sources: EDITION_PDF_SOURCES[family] });
       }
       console.log(`Wrote ${editionManifestEntries.length} edition PDFs.`);

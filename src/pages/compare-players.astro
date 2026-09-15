@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import References from '../components/References.astro';
 import PrintDownloadLink from '../components/PrintDownloadLink.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
+import { disambiguateLabels } from '../lib/sources';
 import { buildAllPlayerProfiles } from '../lib/playerProfile';
 import type { PlayerAwardSource } from '../lib/playerProfile';
 import {
@@ -46,9 +47,11 @@ const allRecords = buildAllComparePlayerRecords(profiles, awardDefs);
 const [defaultA, defaultB] = allRecords;
 const defaultSharedYears = buildSharedAwardYears(defaultA, defaultB);
 
-const combinedSources = [ballonDor.sources, worldCupGoldenBoot.sources, euroGoldenBoot.sources]
-  .flat()
-  .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+const combinedSources = disambiguateLabels(
+  [ballonDor.sources, worldCupGoldenBoot.sources, euroGoldenBoot.sources]
+    .flat()
+    .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index),
+);
 
 const lastReviewed = [ballonDor.lastReviewed, worldCupGoldenBoot.lastReviewed, euroGoldenBoot.lastReviewed]
   .concat(meta.lastReviewed)
@@ -411,6 +414,8 @@ const jsonLd: JsonLdObject[] = [
     width: 34%;
     font-size: 1rem;
     line-height: 1.25;
+    -webkit-hyphens: auto;
+    hyphens: auto;
     overflow-wrap: anywhere;
   }
 
