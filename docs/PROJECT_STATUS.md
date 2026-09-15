@@ -22986,19 +22986,31 @@ lint` (198 files, 0 errors), `pnpm test` (679/679 unit, up from 669 - 10
 new), `pnpm build` (711 pages, unchanged), `check:reachability` itself
 (710/715 reached, 5 correctly excluded), every other `check:*` script,
 `pnpm audit` (clean), `pnpm check:spelling` (clean), and `pnpm dlx knip
---no-config-hints` (still only its one standing false positive). A
-cold-start `pnpm test:e2e` was started in isolation to close out the
-standing health check the same way every prior run's own entry has, but
-was still running when this run's own write-up closed - an earlier attempt
-run concurrently with the fast-check commands above reproduced the exact
-CPU-contention false-failure pattern the hundred-and-eighteenth run's own
-entry already documented (a wall of unrelated spec names with no
-pass/fail marker, the signature of a Playwright worker dying mid-suite
-under contention, not a real regression), so that result was discarded
-rather than reported. This isn't a coverage gap: `.github/workflows/ci.yml`
-runs the full 952-test suite against this exact change on the PR itself
-before merge, the same gate every push to this branch already goes
-through.
+--no-config-hints` (still only its one standing false positive).
+
+`pnpm test:e2e` on its own (no `PW_EXECUTABLE_PATH`) failed twice in a
+row with every test unresolved - at first attributed to the
+hundred-and-eighteenth run's documented CPU-contention pattern (a wall of
+spec names with no pass/fail marker), since the symptom looked identical.
+That attribution was wrong: the actual cause, visible once the full log
+rather than just its tail was read, was `Error: browserType.launch:
+Executable doesn't exist at /opt/pw-browsers/chromium_headless_shell-1243/
+...` on every worker - this session's environment has Chromium revision
+1194 pre-installed (`/opt/pw-browsers/chromium-1194`/
+`chromium_headless_shell-1194`), one revision behind what this repo's
+pinned `@playwright/test@1.63.0` requests (1243), and headless mode
+launches the separate `chrome-headless-shell` binary by default rather
+than the full `chromium` one actually present. `playwright.config.ts`
+already has an escape hatch for exactly this
+(`PW_EXECUTABLE_PATH`/`PW_CHROME_CHANNEL`, the same env vars
+`check-lighthouse.mjs`/`check-print-width.mjs` already use for their own
+browser launches) - re-run as `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium
+pnpm test:e2e`, alone, it passed clean: **952/952 in 15.4 minutes**,
+matching every prior run's baseline exactly. Recorded here since a future
+run in this same environment would otherwise repeat the same
+misattribution: a `pnpm test:e2e` failure with no pass/fail markers at all
+(as opposed to a real named failing test) is worth checking for this
+missing-executable error specifically before assuming contention.
 
 **Left for a future pass:** the same environment-blocked items as ever
 (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`

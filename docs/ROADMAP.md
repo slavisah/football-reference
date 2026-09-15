@@ -4970,13 +4970,21 @@ back clean:
   the same territory as `check:links`/`check:sitemap`). 10 new unit tests
   (`tests/unit/checkReachability.test.ts`). Full standing fast-check suite
   (`pnpm lint`/`pnpm test`/`pnpm build`/every `check:*` script/`pnpm
-  audit`/`knip`) re-confirmed clean; a cold-start `pnpm test:e2e` was
-  started in isolation but was still running when this run closed out (an
-  earlier attempt run concurrently with other health-check commands showed
-  the same CPU-contention false-failure pattern the hundred-and-eighteenth
-  run's own entry already documented) - `.github/workflows/ci.yml` runs the
-  full 952-test suite on the PR itself before merge, so this isn't a gap in
-  coverage, just a timing note. **Left for a future pass:** the same
+  audit`/`knip`) re-confirmed clean. A cold-start `pnpm test:e2e` initially
+  failed twice with no pass/fail markers at all - not the CPU-contention
+  pattern it first looked like (matching the hundred-and-eighteenth run's
+  own entry), but a real environment mismatch: this session's pre-installed
+  Chromium is one revision behind what the repo's pinned
+  `@playwright/test` requests, and headless mode looks for a separate
+  `chrome-headless-shell` binary that isn't present at all. Re-run as `PW_
+  EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (the same escape
+  hatch `check-lighthouse.mjs`/`check-print-width.mjs` already use, wired
+  into `playwright.config.ts` but not previously needed for a plain `pnpm
+  test:e2e` run in this environment), it passed clean: **952/952 in 15.4
+  minutes**, matching every prior run's baseline. Recorded in
+  `docs/PROJECT_STATUS.md`'s matching entry so a future run in this same
+  environment doesn't repeat the same misattribution. **Left for a future
+  pass:** the same
   environment-blocked items as ever (`typescript` 7, `docs/SOURCES.md`
   link-liveness, the `long-title` brand-suffix decision needing human
   sign-off), plus the Nations League 2023 attendance conflict, 2021/2025's
