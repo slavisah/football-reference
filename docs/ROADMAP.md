@@ -4938,3 +4938,50 @@ back clean:
   covers) and a `<table>` caption/`aria-describedby` completeness sweep for
   tables outside the per-edition/`TournamentTable` trees (e.g. any ad-hoc
   tables in `/glossary`, `/about/sources`).
+- **`check:reachability`: new permanent check that every indexable page is
+  reachable by clicking through the site from its two homepages**: closed
+  2026-09-15 (hundred-and-twenty-third intensive run) - tried both
+  hundred-and-twenty-second-run runner-up angles first: a manual audit of
+  every icon/border color found nothing new (the `--contrast-border`/
+  `--contrast-text-muted` tokens already cover borders under `prefers-
+  contrast: more`, the two site-wide `<svg>` icons use `stroke="currentColor"`
+  so they inherit already-passing text contrast, and print-only colors are
+  out of WCAG 1.4.11's screen scope), and a table caption/`aria-describedby`
+  sweep of every table outside `TournamentTable.astro`
+  (`compare.astro`/`compare-players.astro`/`records.astro`, both languages)
+  found every one already has a `<caption>` plus an `aria-label`/`role=
+  "region"` wrapper where it scrolls - both ruled out, not gaps. Found a
+  genuinely new angle instead: `check:links` verifies every `href`/`src`
+  resolves and `check:sitemap` verifies every indexable page is listed in
+  `sitemap.xml`, but nothing had ever checked that a page is actually
+  *reachable by clicking through the site* - a page can pass both existing
+  checks while having zero inbound `<a href>` from anywhere a reader would
+  browse (invisible to anyone not arriving via search or a direct URL). New
+  tool `scripts/check-reachability.mjs` (`pnpm check:reachability`) does a
+  breadth-first walk of `<a href>` links only (not every `href`/`src`,
+  which would count non-clickable references like `<link rel="canonical">`
+  as reachability) starting from the English and Croatian homepages, then
+  checks every non-`noindex` built page is in that reached set. Ran clean on
+  the first pass (710 indexable pages reached; the 404 page and the four
+  legacy `/awards/*` redirect stubs correctly excluded via their existing
+  `noindex` tag) - the same "confirm a real signal, keep the tool permanent"
+  outcome `check:heading-outline` itself had. Wired into
+  `.github/workflows/ci.yml` as a required PR gate (well under a second,
+  the same territory as `check:links`/`check:sitemap`). 10 new unit tests
+  (`tests/unit/checkReachability.test.ts`). Full standing fast-check suite
+  (`pnpm lint`/`pnpm test`/`pnpm build`/every `check:*` script/`pnpm
+  audit`/`knip`) re-confirmed clean; a cold-start `pnpm test:e2e` was
+  started in isolation but was still running when this run closed out (an
+  earlier attempt run concurrently with other health-check commands showed
+  the same CPU-contention false-failure pattern the hundred-and-eighteenth
+  run's own entry already documented) - `.github/workflows/ci.yml` runs the
+  full 952-test suite on the PR itself before merge, so this isn't a gap in
+  coverage, just a timing note. **Left for a future pass:** the same
+  environment-blocked items as ever (`typescript` 7, `docs/SOURCES.md`
+  link-liveness, the `long-title` brand-suffix decision needing human
+  sign-off), plus the Nations League 2023 attendance conflict, 2021/2025's
+  still-unconfirmed figures, the Team of the Tournament sourcing question,
+  and World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures.
+  With both hundred-and-twenty-second-run runner-up angles now closed
+  negatively, a future run's best bet is again either a fresh source lead
+  or a genuinely new quality lens not yet listed in this file's history.
