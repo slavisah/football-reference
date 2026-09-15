@@ -87,6 +87,9 @@ jobs:
       - name: Offline install (manifest/service worker) integrity check
         run: pnpm check:precache
 
+      - name: Image-dimension integrity check (manifest icons, og:image/twitter:image)
+        run: pnpm check:image-dimensions
+
       - name: Install Playwright browser
         run: pnpm test:e2e:install
 

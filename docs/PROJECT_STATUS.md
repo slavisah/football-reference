@@ -15,7 +15,7 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 657 Vitest unit tests
+pnpm test                      # 691 Vitest unit tests
 pnpm build                     # static build + all content validation
 PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 952 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1/2.2 A/AA sweep,
@@ -16264,6 +16264,16 @@ Copa América captains.
   guard. JSON-LD is unaffected - `buildEditionSportsEvent()` and friends
   (`src/lib/jsonLd.ts`) build their own `description`/`competitor` fields
   independently of this prop.
+- `pnpm check:image-dimensions` (`scripts/check-image-dimensions.mjs`, added
+  2026-09-15, hundred-and-twenty-fourth intensive run) checks every built
+  page's `og:image`/`twitter:image` `<meta content="...">` URL resolves to a
+  real file (the one attribute `check:links`' href/src-only link extraction
+  never looks at) and matches its own `og:image:width`/`og:image:height`
+  meta tags against that file's real PNG pixel dimensions, plus both
+  `manifest.webmanifest`'s `icons[].sizes` against each icon file's real
+  dimensions (`check:precache` already confirms an icon `src` resolves to a
+  file, never that its declared size is true). Fast dist/PNG-header parsing,
+  no browser - wired into `.github/workflows/ci.yml` as a required PR gate.
 
 ### Notes jump nav: an in-page "Jump to a section" link list for every long note-card list - closed 2026-09-04 (sixty-third intensive run)
 
@@ -23022,6 +23032,116 @@ runner-up angles now closed negatively and this run's own new angle
 already landed, a future run's best bet is again either a fresh source
 lead from a session with broader network access, or a genuinely new
 quality lens not yet listed in this file's history.
+
+### `check:image-dimensions`: new permanent check that every declared image pixel size (manifest icons, og:image/twitter:image) matches the real file - closed 2026-09-15 (hundred-and-twenty-fourth intensive run)
+
+A full standing health check first: `pnpm install`, `pnpm lint` (200 files,
+0/0/0), `pnpm test` (679/679 unit going in), `pnpm build` (711 pages), every
+existing `check:*` script, `pnpm test:coverage` (99.91%/99.3%, unchanged),
+and `pnpm dlx knip --no-config-hints` (still only its one standing false
+positive, `scripts/test-preview-server.mjs`) - all byte-identical to the
+hundred-and-twenty-third run's baseline.
+
+With every recent run's own "left for a future pass" list still blocked on
+either an external source lead or human sign-off (the same standing items
+below), this run went looking for a fresh, previously-unchecked defect
+class instead, the same method the last several new `check:*` tools used:
+read a shared file end to end for an invariant nothing currently verifies.
+`BaseLayout.astro`'s Open Graph/Twitter Card block turned up two, once
+compared against what `check:links`/`check:precache` actually check:
+
+- `check-internal-links.mjs`'s `extractLinks()` only ever matches
+  `href="..."`/`src="..."` attributes. `<meta property="og:image"
+  content="...">` and `<meta name="twitter:image" content="...">` put their
+  URL in `content`, not `href`/`src` - so neither `check:links` nor
+  `check:precache` has ever verified that URL resolves to a real file. A
+  broken or stale one wouldn't 404 for a reader (nothing in the page
+  requests it directly), just silently break the link-preview card every
+  chat app/social platform builds when someone shares a page - invisible to
+  every existing check, the same "silently broken for one specific
+  reader/surface" bug class `check:links`' own doc comment already
+  describes for fragment links.
+- `check:precache` already confirms a manifest icon's `src` resolves to a
+  real file, but never opens that file to confirm its declared `sizes`
+  (e.g. `"192x192"`) is actually true, and nothing anywhere checks the
+  `og:image:width`/`og:image:height` meta tags sitting right next to
+  `og:image` against the real pixel dimensions of the file they describe.
+  Both are a regression a future edit could ship unnoticed: a
+  `scripts/generate-og-image.mjs` change (or a by-hand icon/og-image
+  replacement) that comes out a different size would leave browsers and
+  social platforms trusting a now-false declared size, since both use the
+  declared value to reserve layout/pick an install icon without
+  re-measuring the file themselves.
+
+New tool `scripts/check-image-dimensions.mjs` (`pnpm check:image-dimensions`):
+parses a PNG's own `IHDR` chunk directly (the fixed 8-byte signature, then
+width/height as two big-endian `uint32`s at bytes 16/20 - no dependency,
+the same territory as this project's other zero-dependency `check:*`
+scripts) rather than pulling in `sharp` (already a devDependency for
+`generate-og-image.mjs`, but heavier than this needs) or any other image
+library. Checks, for every built page: `og:image`/`twitter:image` resolve
+to a real dist file (reusing `check-internal-links.mjs`'s own
+`classifyLink`/`candidateDistPaths`, the same resolution `check:precache`
+already reuses for manifest icons/`start_url`), and `og:image`'s real PNG
+dimensions match its own `og:image:width`/`og:image:height` meta values.
+Separately, for both `manifest.webmanifest` files (en/hr): each icon's real
+PNG dimensions match its declared `sizes` string. Ran clean on the first
+pass (every page's og-image.png is genuinely 1200x630, matching its
+declared meta tags; all four manifest icons are genuinely the sizes they
+claim) - the same "confirm a real signal, keep the tool permanent" outcome
+`check:heading-outline`/`check:reachability` themselves had before it, not
+a regression report. Verified the check actually catches real regressions
+rather than being clean-by-construction: temporarily rewrote a built page's
+`og:image:width` to a wrong value and, separately, a built manifest's icon
+`sizes` to a wrong value, confirmed each broke the check with the right
+message, then restored both (`git status` clean throughout - these edits
+were only ever made to gitignored `dist/` output, never source). 12 new
+unit tests (`tests/unit/checkImageDimensions.test.ts`) cover
+`parsePngDimensions` (a valid signature+IHDR, a wrong signature, a buffer
+too short to contain one, an empty buffer), `parseSizesAttribute` (valid,
+malformed, and empty/undefined input), and `extractOgImageMeta` (all four
+fields present, all absent, and the `og:image`/`og:image:width` prefix
+collision - confirmed the regex's exact-match-then-quote anchoring doesn't
+let the shorter tag's name accidentally match inside the longer one's).
+Like `check:jsonld`/`check:meta`/`check:precache`, this is plain dist/PNG-
+header parsing with no build or browser needed (well under a second for
+all 711 pages plus both manifests), so it's wired into
+`.github/workflows/ci.yml` as a required PR gate immediately after the
+offline-install check. Full standing health check re-run clean after
+adding the tool: `pnpm lint` (0/0/0), `pnpm test` (691/691 unit, up from
+679 - 12 new), `pnpm build` (711 pages, unchanged), `check:image-dimensions`
+itself, every other `check:*` script, `pnpm test:coverage` (unchanged at
+99.91%/99.3% - the new script isn't instrumented, matching every other
+`scripts/check-*.mjs` tool), and `pnpm dlx knip --no-config-hints` (still
+only its one standing false positive). No content file touched, so no PDF
+regeneration or `lastReviewed` bump was needed. A cold-start
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` was also
+started (this environment's pre-installed Chromium is one revision behind
+what `@playwright/test` requests, per the hundred-and-twenty-third run's
+own entry above; the `PW_EXECUTABLE_PATH` escape hatch remains necessary
+here) but ran markedly slower in this session than the 15-25-minute
+baseline every recent run has recorded - at 2 workers, still well under a
+tenth complete after several minutes - so this entry does not claim a
+full e2e result. Nothing in the new tool touches page rendering, routing,
+or any Playwright-covered surface (it only reads already-built HTML/PNG
+bytes from disk), so this is a session-performance variance, not a signal
+to hold the change on; a future run/check-in should confirm the suite
+still finishes at 952/952 once it completes.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League 2023
+attendance conflict, 2021/2025's still-unconfirmed figures, the Team of the
+Tournament sourcing question, and World Cup 1930/1950's/EURO 1996/2020's
+excluded attendance figures. A future pass's best bet is again either a
+fresh source lead from a session with broader network access, or a
+genuinely new quality lens not yet listed in this file's history - two
+unexplored angles this run noticed in passing but didn't chase: whether
+`og:url`'s content ever disagrees with the same page's own `<link
+rel="canonical">` (a consistency check, not a resolution check - both
+already individually resolve correctly), and whether `robots.txt`'s
+`Allow`/`Disallow` directives stay consistent with which pages actually
+carry a `noindex` tag.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
