@@ -23557,10 +23557,11 @@ touched, only a template whitespace fix and a DOM-query fix that only e2e
 can exercise), `pnpm build` (711 pages, unchanged), and all sixteen
 `check:*` scripts clean with identical output to this run's own opening
 baseline. No content file was touched, so no PDF regeneration or
-`lastReviewed` bump was needed. A full cold-start `pnpm test:e2e` (954
-tests) was launched to confirm no regression sitewide beyond the quiz spec
-already re-run standalone - see the following commit for its confirmed
-result.
+`lastReviewed` bump was needed. A full cold-start `pnpm test:e2e` confirmed
+no regression sitewide beyond the quiz spec already re-run standalone:
+**954/954 passed, 21.8 minutes**, matching every recent run's baseline pass
+rate (up from 952/952 by exactly the two new regression tests added this
+run).
 
 **Left for a future pass:** the same environment-blocked items as ever
 (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`

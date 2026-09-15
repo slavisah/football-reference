@@ -5205,11 +5205,11 @@ back clean:
   clean after the change: `pnpm lint` (0/0/0), `pnpm test` (703/703,
   unchanged - no unit-testable logic touched), `pnpm build` (711 pages,
   unchanged), all sixteen `check:*` scripts clean, and the full quiz e2e
-  spec (27/27, including the 4 new tests) passing standalone. A full
-  cold-start `pnpm test:e2e` (954 tests, up from 952) was launched to
-  confirm no regression sitewide - see the next entry/a following commit
-  for its confirmed result once it finishes. No content file touched, so no
-  PDF regeneration was needed. **Left for a future pass:** the same
+  spec (27/27, including the 2 new tests) passing standalone. A full
+  cold-start `pnpm test:e2e` confirmed no regression sitewide: **954/954
+  passed, 21.8 minutes** (up from 952/952 by exactly the two new tests
+  added this run). No content file touched, so no PDF regeneration was
+  needed. **Left for a future pass:** the same
   environment-blocked items as ever (`typescript` 7, `docs/SOURCES.md`
   link-liveness, the `long-title` brand-suffix decision, the Nations League
   Team of the Tournament sourcing question), the Nations League 2023
