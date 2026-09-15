@@ -15,7 +15,7 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 691 Vitest unit tests
+pnpm test                      # 703 Vitest unit tests
 pnpm build                     # static build + all content validation
 PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 952 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1/2.2 A/AA sweep,
@@ -23143,6 +23143,127 @@ rel="canonical">` (a consistency check, not a resolution check - both
 already individually resolve correctly), and whether `robots.txt`'s
 `Allow`/`Disallow` directives stay consistent with which pages actually
 carry a `noindex` tag.
+
+### `check:locale-consistency`: new permanent check that every page's `<html lang>` matches its own URL - closed 2026-09-15 (hundred-and-twenty-fifth intensive run)
+
+A standing health check first (fresh container: `pnpm install`, `pnpm lint`
+(202 files, 0/0/0), `pnpm test` (691/691 unit going in), `pnpm build` (711
+pages), every existing `check:*` script, `pnpm test:coverage`
+(99.91%/99.3%, unchanged), and `pnpm dlx knip --no-config-hints` (still only
+its one standing false positive) - all byte-identical to the
+hundred-and-twenty-fourth run's baseline.
+
+Chased both of that run's own "noticed in passing" angles first, and ruled
+both out rather than assuming they were still open:
+
+- `og:url`'s `content` and `<link rel="canonical">`'s `href` can never
+  disagree - `BaseLayout.astro` renders both from the exact same
+  `canonicalURL` expression (`<meta property="og:url" content=
+  {canonicalURL} />` at line 191, `<link rel="canonical" href={canonicalURL}
+  />` at line 159), not two independently computed values. A consistency
+  check between them would only ever catch a hand-edit to one of the two
+  call sites, not a real content bug - not worth a dedicated tool.
+- `robots.txt` (`src/pages/robots.txt.ts`) has no `Disallow` lines at all -
+  just `Allow: /` and a `Sitemap:` line. With nothing to disagree with a
+  page's own `noindex` tag, "robots.txt consistency" isn't a real gap either.
+
+Went looking for a fresh angle with the same method the last several new
+`check:*` tools used (read a shared file end to end for an invariant nothing
+currently verifies), and also checked whether hreflang reciprocity - the
+other candidate this run considered - was already covered: it is,
+transitively, by `check:sitemap.mjs` (its own doc comment already says so:
+every page's own `<link rel="alternate">` tags are checked against the
+sitemap's entry for that page, and the sitemap's own alternates are checked
+for reciprocity in both directions), so a direct HTML-to-HTML reciprocity
+check would have been pure duplication.
+
+Found a genuinely new, previously-unchecked invariant instead:
+`BaseLayout.astro`'s `<html lang={locale}>` (line 134) renders from
+`locale`, a per-page prop each `src/pages/**` route file passes by hand
+(`locale="hr"` on every `src/pages/hr/**` file, the default `'en'`
+everywhere else) - unlike `alternateHref`/canonical/hreflang, which all
+derive from `Astro.url.pathname` itself and so can never drift from the
+page's own URL, `locale` has no such structural guarantee. A copy-pasted new
+Croatian route file that forgot to pass `locale="hr"` would build at a
+`/hr/...` URL yet render with `lang="en"`, English nav strings (`t(locale,
+...)`) and an English `og:locale` - wrong for a reader there and for a
+screen reader announcing the page's language, but invisible to every
+existing check: `check:sitemap`/`check:links` only verify hrefs resolve and
+agree with each other, `check:jsonld` only checks structural validity, and
+axe-core's `html-has-lang`/`html-lang-valid` rules (run across every
+`tests/e2e/` `AxeBuilder` sweep) only check a `lang` attribute is present and
+well-formed, never that it matches the URL a reader actually navigated to.
+
+New tool `scripts/check-locale-consistency.mjs` (`pnpm
+check:locale-consistency`) walks every built page (both languages, redirect
+stubs excluded via the existing `isRedirectStubHtml()` from
+`check-reflow.mjs`, the same exclusion `check:heading-outline` already
+reuses) and checks its `<html lang="...">` value against
+`expectedLocale(pagePath)` - `hr` for anything under `/hr/`, `en` for
+everything else. Ran clean on the first pass (711/711 pages correct) - the
+same "confirm a real signal, keep the tool permanent" outcome
+`check:heading-outline`/`check:reachability`/`check:image-dimensions`
+themselves had before it, not a regression report. Verified it actually
+catches a regression: temporarily flipped a built Croatian page's declared
+`lang` from `"hr"` to `"en"` (only ever in gitignored `dist/` output, never
+source - `git status` clean throughout), confirmed the check failed with the
+right message, then restored it and re-confirmed clean. 12 new unit tests
+(`tests/unit/checkLocaleConsistency.test.ts`) cover `expectedLocale` (home
+pages and nested pages in both trees, plus the `/teams/croatia/` case that
+proves the check matches on a `/hr/` path prefix, not a substring anywhere
+in the URL), `extractHtmlLang` (present, absent, and a redirect stub with no
+`<html>` tag at all), and `checkPageLocale` (both languages correct, both
+mismatched, and the no-attribute-at-all case, checking the expected value is
+named in the message every time). Plain regex extraction over already-built
+HTML, the same territory as `check:links`/`check:sitemap`/`check:jsonld` -
+well under a second for all 711 pages - so it's wired into
+`.github/workflows/ci.yml` as a required PR gate, immediately after the
+image-dimensions check.
+
+Full standing health check re-run clean after adding the tool: `pnpm lint`
+(0/0/0), `pnpm test` (703/703 unit, up from 691 - 12 new),
+`pnpm build` (711 pages, unchanged), `check:locale-consistency` itself
+(711/711 clean), every other `check:*` script (`check:pdfs` 700/700,
+`check:perf` within budget, `check:links` 715 pages, `check:sitemap` 710
+entries, `check:precache` 37 URLs, `check:html` 711/711, `check:jsonld`
+1783 blocks/711 pages, `check:heading-outline` 711/711, `check:reachability`
+710 reached, `check:meta` 710 pages, `check:award-tallies` 4/4,
+`check:edition-header-labels` 7/7, `check:i18n-notes` 7/7, `check:link-names`
+710 pages, `check:image-dimensions`, `check:spelling` 0 issues),
+`pnpm test:coverage` unchanged at 99.91%/99.3% (the new script isn't
+instrumented, matching every other `scripts/check-*.mjs` tool), and `pnpm
+dlx knip --no-config-hints` still only its one standing false positive
+(`scripts/test-preview-server.mjs`). No content file touched, so no PDF
+regeneration or `lastReviewed` bump was needed. A cold-start `PW_
+EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` run was kicked off
+to confirm the new tool doesn't affect the e2e suite (it shouldn't - a
+static `dist/` HTML regex check with no page-rendering or routing surface,
+the same reasoning `check:image-dimensions`/`check:heading-outline` already
+established for their own additions); this run's own PR CI is the
+authoritative confirmation once it runs.
+
+Also made one fresh, targeted WebSearch attempt at the standing Nations
+League 2021 Finals attendance gap (a different query shape than the
+ninety-fourth/ninety-sixth runs used, and with Wikipedia explicitly
+excluded via `blocked_domains` to force non-mirroring sources). It
+surfaced no new domain beyond the same "single repeated figure, no
+demonstrably independent second source" shape those two runs already
+documented - not a fresh source lead, so 2021/2025 stay unconfirmed and
+2023 stays a genuine 41,110/41,500 conflict, per the ninety-sixth run's own
+"don't re-spend a cycle on 2023 without a new lead" caution. Recorded here
+only so a future run doesn't re-attempt the identical query shape.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League 2023
+attendance conflict, 2021/2025's still-unconfirmed figures, the Team of the
+Tournament sourcing question, and World Cup 1930/1950's/EURO 1996/2020's
+excluded attendance figures. Both of the hundred-and-twenty-fourth run's own
+runner-up angles (og:url/canonical, robots.txt/noindex) are now closed
+negatively, and hreflang reciprocity is confirmed already covered
+transitively by `check:sitemap`, so a future run's best bet is again either
+a fresh source lead, or a genuinely new quality lens not yet listed in this
+file's history.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
