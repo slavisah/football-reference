@@ -72,6 +72,9 @@ jobs:
       - name: Heading-outline check
         run: pnpm check:heading-outline
 
+      - name: Page-reachability check
+        run: pnpm check:reachability
+
       - name: Title/meta-description integrity check
         run: pnpm check:meta
 

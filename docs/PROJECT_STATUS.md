@@ -22882,5 +22882,134 @@ ad-hoc tables in `/glossary`, `/about/sources`) that the existing
 table-focused checks don't reach. Either is a reasonable next angle for a
 future run once this one is reviewed.
 
+### `check:reachability`: new permanent check that every indexable page is reachable by clicking through the site from its two homepages - closed 2026-09-15 (hundred-and-twenty-third intensive run)
+
+A full standing health check first: `pnpm install`, `pnpm lint` (196 files
+plus the two new files this run added, 0/0/0), `pnpm test` (669/669 unit
+going in), `pnpm build` (711 pages), every existing `check:*` script,
+`pnpm audit` (clean), and `pnpm dlx knip --no-config-hints` (still only its
+one standing false positive, `scripts/test-preview-server.mjs`) - all
+byte-identical to the hundred-and-twenty-second run's baseline.
+
+Tried both of that run's own runner-up angles before looking for a third:
+
+- **Non-text UI component contrast (WCAG 1.4.11)**: read `src/styles/
+  global.css` end to end. The `--light-contrast-border`/
+  `--dark-contrast-border` tokens (added by an earlier pass, see that
+  token's own comment) already strengthen `--border` to 5.15:1/5.72:1 under
+  `prefers-contrast: more`, comfortably past the 3:1 non-text minimum, and
+  the focus ring (`outline: 3px solid var(--focus)`) uses the same
+  `--focus` token everywhere via one shared `:focus-visible` rule. The
+  site's only two `<svg>` icons (`Nav.astro`'s search-icon magnifying
+  glass, used in both the header and inline search widgets) use
+  `stroke="currentColor"` rather than a literal color, so they inherit
+  whatever text color already passes contrast at that spot - there is no
+  independent icon color to audit. `HostMap.astro`'s only literal-looking
+  values are `opacity` on map markers and `color: var(--text-muted)` on
+  labels, both already token-driven. The only hardcoded non-token colors
+  anywhere in `global.css` (`border-color: #999`/`--border: #888888`) are
+  inside `@media print` - out of WCAG 1.4.11's screen-rendering scope, and
+  print's own accuracy was already audited by an earlier run (see that
+  run's `.t-wrap { overflow-x: visible }` entry). Ruled out: not a gap.
+- **`<table>` caption/`aria-describedby` completeness outside
+  `TournamentTable.astro`**: grepped `<table` sitewide and found six
+  additional call sites - `compare.astro`/`compare-players.astro`/
+  `records.astro`, both languages (no ad-hoc tables exist in `/glossary` or
+  `/about/sources`, so those were never in scope to begin with). Every one
+  already has a `<caption>` (some `visually-hidden`, matching this site's
+  established convention for a caption that would otherwise duplicate an
+  adjacent visible heading) and, wherever the table scrolls horizontally, a
+  `.t-wrap[role="region"][aria-label=...]` wrapper identical in shape to
+  `TournamentTable.astro`'s own. The one un-wrapped table
+  (`compare-players.astro`/`compare.astro`'s three-column head-to-head
+  `vs__table`) has a fixed layout that doesn't need horizontal scroll on a
+  phone, so no wrapper is needed there either - confirmed by reading the
+  component's own layout CSS, not assumed. Ruled out: not a gap.
+
+Found a genuinely new angle instead, after both of those came back clean:
+none of `check:links` (every `href`/`src` resolves to a real file),
+`check:sitemap` (every indexable page has a matching `sitemap.xml` entry),
+or any other existing tool had ever verified that a page is actually
+**reachable by clicking through the site** - a page can pass both existing
+checks while having zero inbound `<a href>` from anywhere a reader would
+browse, making it invisible to anyone who doesn't arrive via a search
+engine or a bookmarked/typed URL. A first manual proof-of-concept (a
+breadth-first crawl of every `href`/`src` attribute, reusing
+`check-internal-links.mjs`'s own `extractLinks`) over-counted: it also
+followed `<link rel="canonical">`/hreflang/JSON-LD `url` references, which
+inflated the "reached" set with pages no reader can actually click to -
+rewritten to walk `<a href="...">` tags specifically (`extractAnchorHrefs`,
+new), the only element type a real reader can click through.
+
+New tool: `scripts/check-reachability.mjs` (`pnpm check:reachability`).
+`extractAnchorHrefs()` pulls every `href` off an `<a>` tag only (regex over
+already-built HTML, the same "no DOM parser needed" approach
+`check-heading-outline.mjs`/`check-jsonld.mjs` already use).
+`findReachablePages()` does a plain breadth-first walk over an in-memory
+page graph (dist-relative path -> raw HTML) starting from `index.html` and
+`hr/index.html` - this site's two independent nav trees - reusing
+`check-internal-links.mjs`'s own `classifyLink`/`candidateDistPaths` to
+resolve each `<a href>` to the dist file it points at, so a directory-style
+link (`/competitions/world-cup`) and its `index.html` are treated as the
+same node the same way every other link-aware check here already does.
+`main()` then checks every built page against that reached set, exempting
+any page whose own `<head>` already carries `<meta name="robots" content=
+"noindex">` (via `parsePageHead`, reused directly from `check-sitemap.mjs`
+rather than re-implementing the same regex a third time) - the site's 404
+page and its four legacy `/awards/*` redirect stubs are the only pages
+meant to have zero inbound on-site links, and both already self-identify as
+noindex, so reusing that existing signal avoids hardcoding those five paths
+by name.
+
+Ran clean on the first pass against the live build: 715 pages total, 710
+indexable pages all reached from one of the two homepages, and the 404 page
+plus the four redirect stubs correctly excluded via their own `noindex`
+tag - the same "confirm there's a real signal, but keep the tool permanent"
+outcome every recently-added `check:*` script has had. It exists to catch
+the next page shipped without being wired into any index/list/nav it should
+have appeared on, not to report one today. Well under a second for all 715
+pages (the same territory as `check:links`/`check:sitemap`/
+`check:heading-outline`), so wired into `.github/workflows/ci.yml` as a
+required PR gate immediately after the heading-outline check.
+
+10 new unit tests (`tests/unit/checkReachability.test.ts`): anchor-href
+extraction (ignores `<link>`/`<script>` href/src, dedupes a repeated href,
+handles an `<a>` with no href), and the BFS itself (a direct link, a
+several-hops-deep transitive chain, multiple entry points reached
+independently, a page with no inbound link correctly left unreached, an
+external link and a link cycle both handled without following the external
+link or looping forever, and a directory-style link resolving to its
+`index.html`).
+
+Full standing fast-check suite re-run clean after adding the tool: `pnpm
+lint` (198 files, 0 errors), `pnpm test` (679/679 unit, up from 669 - 10
+new), `pnpm build` (711 pages, unchanged), `check:reachability` itself
+(710/715 reached, 5 correctly excluded), every other `check:*` script,
+`pnpm audit` (clean), `pnpm check:spelling` (clean), and `pnpm dlx knip
+--no-config-hints` (still only its one standing false positive). A
+cold-start `pnpm test:e2e` was started in isolation to close out the
+standing health check the same way every prior run's own entry has, but
+was still running when this run's own write-up closed - an earlier attempt
+run concurrently with the fast-check commands above reproduced the exact
+CPU-contention false-failure pattern the hundred-and-eighteenth run's own
+entry already documented (a wall of unrelated spec names with no
+pass/fail marker, the signature of a Playwright worker dying mid-suite
+under contention, not a real regression), so that result was discarded
+rather than reported. This isn't a coverage gap: `.github/workflows/ci.yml`
+runs the full 952-test suite against this exact change on the PR itself
+before merge, the same gate every push to this branch already goes
+through.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision needing human sign-off), plus the Nations League 2023
+attendance conflict, 2021/2025's still-unconfirmed figures, the Team of the
+Tournament sourcing question, and World Cup 1930/1950's/EURO 1996/2020's
+excluded attendance figures. With both hundred-and-twenty-second-run
+runner-up angles now closed negatively and this run's own new angle
+already landed, a future run's best bet is again either a fresh source
+lead from a session with broader network access, or a genuinely new
+quality lens not yet listed in this file's history.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
