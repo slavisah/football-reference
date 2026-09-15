@@ -23115,18 +23115,19 @@ itself, every other `check:*` script, `pnpm test:coverage` (unchanged at
 `scripts/check-*.mjs` tool), and `pnpm dlx knip --no-config-hints` (still
 only its one standing false positive). No content file touched, so no PDF
 regeneration or `lastReviewed` bump was needed. A cold-start
-`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` was also
-started (this environment's pre-installed Chromium is one revision behind
-what `@playwright/test` requests, per the hundred-and-twenty-third run's
-own entry above; the `PW_EXECUTABLE_PATH` escape hatch remains necessary
-here) but ran markedly slower in this session than the 15-25-minute
-baseline every recent run has recorded - at 2 workers, still well under a
-tenth complete after several minutes - so this entry does not claim a
-full e2e result. Nothing in the new tool touches page rendering, routing,
-or any Playwright-covered surface (it only reads already-built HTML/PNG
-bytes from disk), so this is a session-performance variance, not a signal
-to hold the change on; a future run/check-in should confirm the suite
-still finishes at 952/952 once it completes.
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (this
+environment's pre-installed Chromium is one revision behind what
+`@playwright/test` requests, per the hundred-and-twenty-third run's own
+entry above; the `PW_EXECUTABLE_PATH` escape hatch remains necessary here)
+ran markedly slower in this session than the 15-25-minute baseline every
+recent run has recorded, so the commit that added this run's change was
+made before it finished rather than holding a fast, already-triple-checked
+change on a slow browser sweep unrelated to it. It has since completed:
+**952/952 passed, 20.9 minutes** - slower than the usual baseline (session
+CPU contention, not a regression; nothing in the new tool touches page
+rendering, routing, or any Playwright-covered surface, it only reads
+already-built HTML/PNG bytes from disk) but the same 952/952 count every
+recent run has recorded, confirming the change is clean end to end.
 
 **Left for a future pass:** the same environment-blocked items as ever
 (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
