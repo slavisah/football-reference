@@ -4607,6 +4607,29 @@ test.describe('desktop nav "More" menu (>=60rem)', () => {
     await expect(page.locator('#nav-more-menu')).toBeHidden();
   });
 
+  test('tabbing past the last link closes the menu instead of leaving it open over the page', async ({
+    page,
+  }) => {
+    // Found by actually tabbing through the open menu: unlike a click
+    // outside (handled above), moving focus out of the menu via keyboard
+    // used to leave it open and rendered on top of the page's own content,
+    // with focus already gone to whatever came next in the nav.
+    const toggle = page.locator('#nav-more-toggle');
+    await toggle.focus();
+    await page.keyboard.press('Enter');
+    const menu = page.locator('#nav-more-menu');
+    await expect(menu).toBeVisible();
+
+    const linkCount = await menu.getByRole('link').count();
+    for (let i = 0; i < linkCount; i++) {
+      await page.keyboard.press('Tab');
+      await expect(menu).toBeVisible();
+    }
+    await page.keyboard.press('Tab');
+    await expect(menu).toBeHidden();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
   test('the current secondary page is marked current inside the menu', async ({ page }) => {
     await page.goto('records');
     await page.locator('#nav-more-toggle').click();

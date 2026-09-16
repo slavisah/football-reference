@@ -24212,5 +24212,153 @@ the home page's hero/card interactions, or a fresh pass over any other
 multi-field flex layout on the site for the same "siblings squeeze each
 other below some wrap threshold" shape this run's fix addresses.
 
+### Dependency patch bump (astro 7.3.2 -> 7.3.3) plus a manual keyboard walkthrough of the desktop "More" menu finds and fixes a real bug: tabbing past the last link left the menu open over the page - closed 2026-09-16 (hundred-and-thirty-fourth intensive run)
+
+A standing health check first: `pnpm install --frozen-lockfile` clean,
+`pnpm outdated` found one new in-range release (`astro` 7.3.2 -> 7.3.3,
+within the declared `^7.3.3` range once bumped); installed via `pnpm update
+astro@7.3.3`. `typescript` 5.9.3 -> 7.0.2 remains the one major-version jump
+outside its declared range, still blocked by `@astrojs/check@0.9.10`'s own
+`typescript: '^5.0.0 || ^6.0.0'` peer ceiling (unchanged from every prior
+run's check). Full `pnpm lint` (0/0/0), `pnpm test` (703/703 unit), `pnpm
+build` (711 pages) and all eighteen `check:*` scripts clean after the bump,
+matching the hundred-and-thirty-third run's own baseline exactly.
+
+Re-attempted the Nations League Finals attendance gap next (2021/2023/2025
+- the standing item every recent run's closing note has carried forward):
+two fresh WebSearch passes per year turned up the same single repeated
+figures the ninety-fourth run already found (31,511 for 2021; 41,110 for
+2023; 65,852 for 2025) with no newly-independent, non-Wikipedia-mirroring
+domain confirming any of them outright, and specifically re-surfaced the
+ninety-sixth run's own 2023 conflict (RFEF's own match report describing De
+Kuip as "a full house with 41,500 spectators," a different figure from
+Wikipedia's 41,110) without resolving it either way. Drafted content edits
+for all three years, then reverted them (`git checkout --
+content/uefa-nations-league.md src/pages/hr/competitions/nations-league.astro`)
+once a closer read of `docs/SOURCES.md`'s own ninety-fourth/ninety-sixth-run
+entries showed this exact gap had already been investigated twice and
+explicitly flagged as needing "a new source lead," not another WebSearch
+pass reproducing the same result - publishing would have repeated a
+documented dead end rather than adding anything. Recorded here specifically
+so a future run doesn't spend a sixth or seventh cycle on the same three
+figures without a genuinely new lead.
+
+Moved to the hundred-and-thirty-third run's own explicit suggestion
+instead: extend the manual coordinate/keyboard-walkthrough method (four
+real bugs found in its last five applications - mobile drawer flex-wrap,
+desktop "More" menu overflow, the `/compare`/`/compare-players`
+select-squeeze, and now this run's own finding below) to two
+previously-unchecked surfaces, the home page's hero/card interactions and
+the "More" menu's own keyboard-focus behavior.
+
+**Home page hero/cards: a genuine negative result.** Tabbed through the
+whole page (skip link, brand, primary nav, search widgets, theme toggle,
+hero buttons, into the first competition card) at 1280px and read
+`document.activeElement` plus its `getBoundingClientRect()` at every stop -
+no clipped or unreachable focus target. Specifically tested the one
+plausible defect this page's own CSS suggested: `.comp-card { overflow:
+hidden }` combined with the sitewide `outline: 3px solid var(--focus);
+outline-offset: 2px` focus-visible style could, in principle, have its
+outline clipped by the card's own `overflow: hidden`. Confirmed empirically
+rather than reasoned from the spec alone - a focused card's cropped
+screenshot shows the full blue outline rendered outside the card's border
+box, uncropped, matching how outline painting is actually excluded from an
+element's own overflow-clipping in every major engine. Also swept full-page
+screenshots at 360/768/1280px, light and dark, plus a mouse-hover screenshot
+of the cards grid (the `translateY(-2px)` lift and accent border-color
+change render cleanly with no overlap into neighboring cards). No code
+change from this half - a genuine negative result, the same shape as the
+hundred-and-thirty-third run's own search-widget-listbox sweep. Also
+grep'd the codebase for every other flex layout using the same
+`flex: 1 1 <rem>`/`min-width` combination the `/compare` bug used
+(`QuizOrderCard.astro`, `TournamentTable.astro`, and the four
+compare/compare-players files) - all four are already-fixed or
+already-audited by earlier runs (seventieth, hundred-and-twenty-eighth,
+hundred-and-thirty-third); no new candidate surfaced.
+
+**The "More" menu's keyboard-focus behavior: a real bug.** `initNavMore`'s
+`setOpen()`/click-outside/Escape handlers (`src/components/Nav.astro`) only
+ever close the menu on a mouse click outside it or an explicit Escape -
+there was no equivalent for keyboard focus simply moving on. Confirmed by
+scripting the exact interaction a keyboard-only reader would perform: focus
+the `#nav-more-toggle` button, press Enter to open, then Tab through all
+eight links and one more time past the last one ("Sources"). Before the
+fix, that ninth Tab moved focus to the "Find a team" search input two
+widgets away while `#nav-more-menu` stayed `hidden: false` and
+`aria-expanded="true"` - a screenshot at that exact moment shows the full
+176x328px dropdown panel still rendered on top of the page, overlapping the
+records page's own "Individual award winners timeline"/"Most awards" filter
+chips underneath it, with the visible focus ring nowhere near the menu.
+Nothing on the page would tell a sighted keyboard user the menu was still
+open short of pressing Escape or clicking elsewhere.
+
+**Fix:** added one `focusin` listener next to the existing `click`
+listener in `initNavMore`, closing the menu the moment focus lands on
+anything outside both the menu and its toggle button:
+```js
+document.addEventListener('focusin', (event) => {
+  if (toggle.getAttribute('aria-expanded') !== 'true') return;
+  const target = event.target;
+  if (!(target instanceof Node)) return;
+  if (!menu.contains(target) && !toggle.contains(target)) setOpen(false);
+});
+```
+`focusin` (unlike `focusout`) bubbles to `document` and needs no
+`relatedTarget` bookkeeping, so it mirrors the existing click-outside
+handler almost exactly. Re-ran the same scripted interaction after the fix:
+the ninth Tab now closes the menu (`hidden: true`, `aria-expanded="false"`)
+before focus reaches the search input. Also re-verified the handler doesn't
+over-fire: tabbing forward through all eight links keeps the menu open at
+every step (focus stays `menu.contains(target)`), and Shift+Tab back from
+the first link to the toggle itself also correctly keeps it open
+(`toggle.contains(target)`).
+
+New regression coverage: one test in the existing `desktop nav "More" menu
+(>=60rem)` describe block (`tests/e2e/mobile.spec.ts`) that opens the menu
+via keyboard, tabs through every link (using the same link-count query the
+suite's own "every secondary nav destination" test already asserts against,
+so it stays correct if a future run adds or removes a secondary nav
+destination), then asserts one more Tab hides the menu and resets
+`aria-expanded`. Verified this test actually catches the regression it
+targets: reverted the fix (`git stash push -- src/components/Nav.astro`),
+rebuilt, re-ran the new test, and confirmed it fails with the expected
+diagnostic (`expect(locator).toBeHidden()` / "Received: visible" on
+`#nav-more-menu`) rather than passing vacuously; restored the fix
+(`git stash pop`) and reconfirmed green. The full `desktop nav "More" menu`
+block (9 tests, up from 8) passes together with no other change needed.
+
+`src/components/Nav.astro` is not one of `scripts/pdf-pages.mjs`'s tracked
+PDF sources (only `SectionJumpNav.astro` and each page's own content are),
+so no PDF regeneration was needed for this change - confirmed via
+`check:pdfs` staying clean with the fix applied and no `build:pdfs` run.
+Full standing health check re-run clean after the fix: `pnpm lint`
+(0/0/0), `pnpm test` (703/703 unit, unchanged - no unit-testable logic
+changed, only a DOM event listener), `pnpm build` (711 pages, unchanged),
+all eighteen `check:*` scripts clean (`check:reflow`/`check:text-zoom`/
+`check:print-width` re-run with `PW_EXECUTABLE_PATH` too). A full cold-start
+`pnpm test:e2e` was started to confirm no regression sitewide beyond the
+targeted block above; it was still running at the time this entry was
+written and committed (this run's own container is ephemeral, so committing
+promptly rather than holding the fix uncommitted while a 15-20 minute suite
+finishes was judged the safer choice) - see the next entry, or this
+session's own follow-up commit, for its result.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision, the Nations League Team of the Tournament sourcing
+question - confirmed exhausted, do not re-attempt the same queries), the
+Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+figures (re-confirmed a third time this run - needs a genuinely new source
+lead, not another WebSearch pass), World Cup 1930/1950's/EURO 1996/2020's
+excluded attendance figures, and the hundred-and-twenty-sixth run's
+still-open hyphenation-rendering visual re-check. Confirming this run's own
+background `pnpm test:e2e` run is the immediate next step for whoever picks
+this up next, if it isn't already confirmed by the time they start. Beyond
+that, the coordinate/keyboard-walkthrough method has now had one genuine
+negative result (home page hero/cards) alongside its four real finds - a
+future pass could extend it to team/player profile pages (not yet swept),
+or take a fresh non-content quality angle (SEO, a dead-code sweep, or a
+fresh `docs/WEBSITE_REQUIREMENTS.md` read against the live site).
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

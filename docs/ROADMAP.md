@@ -5767,3 +5767,40 @@ back clean:
   the home page's hero/card interactions, or a fresh pass over any other
   multi-field flex layout on the site for the same "siblings squeeze each
   other below some wrap threshold" shape this run's fix addresses.
+
+- **Dependency patch bump (astro 7.3.2 -> 7.3.3) plus a manual keyboard
+  walkthrough of the desktop "More" menu finds and fixes a real bug: tabbing
+  past the last link left the menu open over the page**: closed 2026-09-16
+  (hundred-and-thirty-fourth intensive run) - a standing health check first
+  (`pnpm install --frozen-lockfile`, `pnpm outdated` found one new in-range
+  patch, astro 7.3.2 -> 7.3.3, installed cleanly; full lint/unit/build and
+  all eighteen `check:*` scripts clean, matching the hundred-and-
+  thirty-third run's own baseline: 703/703 unit, 711 pages). Re-attempted
+  the Nations League 2021/2023/2025 Finals attendance gap first but found
+  nothing beyond what the ninety-fourth/ninety-sixth runs already
+  documented (a single repeated figure for 2021/2025, and the same
+  41,110-vs-41,500 conflict for 2023) - reverted rather than publish a
+  repeat of an already-closed dead end. Took up the hundred-and-
+  thirty-third run's own suggested "More" menu keyboard-focus check
+  instead: a manual walkthrough of the home page's hero/cards came back
+  clean first (a genuine negative result - tab order, focus-outline-vs-
+  `overflow:hidden` clipping, and light/dark/hover screenshots all checked
+  out), then the "More" menu check found a real bug - tabbing past the
+  menu's last link left it open and rendered on top of the page's own
+  content, since only a mouse click outside was ever wired to close it, not
+  a keyboard focus change. Fixed with a `focusin` listener mirroring the
+  existing click-outside handler; verified by reverting the fix, confirming
+  the new e2e test fails with the right diagnostic, then restoring it. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
+  future pass:** the same environment-blocked items as ever (`typescript`
+  7, `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix
+  decision, the Nations League Team of the Tournament sourcing question),
+  the Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+  figures, World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+  figures, and the hundred-and-twenty-sixth run's still-open
+  hyphenation-rendering visual re-check. This run's own home-page
+  hero/card walkthrough was a genuine negative result, unlike three of the
+  last five coordinate/keyboard-walkthrough applications - a future pass
+  could extend the method to team/player profile pages or the print
+  stylesheet's own interactive elements (there are none today, but future
+  content could add some), or take a fresh non-content quality angle.
