@@ -5338,3 +5338,81 @@ back clean:
   interactive widgets (team/player search, theme toggle) at states beyond
   what the accessibility specs already exercise, still not covered by any
   run's manual pass.
+- **Manual walkthrough of the "find a team"/"find a player" search widgets
+  finds and fixes a real, previously-untested Escape-key bug that also
+  closed the entire mobile drawer**: closed 2026-09-16 (hundred-and-
+  thirtieth intensive run) - a standing health check first (`pnpm install
+  --frozen-lockfile`, `pnpm lint`/`test`/`build`, all eighteen `check:*`
+  scripts using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` fallback
+  this environment's Chromium needs), all clean and matching the
+  hundred-and-twenty-ninth run's own baseline (703/703 unit, 711 pages).
+  Picked up that run's own closing suggestion and extended the
+  manual-walkthrough method to the two global combobox widgets in
+  `Nav.astro` (`initSearchWidget`, shared by "find a team" and "find a
+  player") at 360px/1280px, light/dark, English/Croatian.
+
+  Found a genuine, previously-unflagged bug reading the widget's own
+  `keydown` handler against the mobile drawer's own Escape handler
+  (`is:inline` script, same file): the widget's Escape branch never called
+  `stopPropagation()`, so a single Escape press while its listbox was open
+  bubbled straight through to the drawer's own document-level Escape
+  listener and closed the *entire* mobile drawer in the same keystroke -
+  not just the listbox - yanking focus from the search input to the menu
+  button. That, in turn, made the widget's own "a second Escape clears the
+  input" branch (`else { input.value = ''; }`) unreachable in practice: by
+  the time a reader could press Escape again, focus had already left the
+  input, so the keystroke never reached the widget's own listener at all.
+  Confirmed live with Playwright (not just by reading the code): typed
+  "brazil" into the mobile drawer's team-search box, pressed Escape once,
+  and read back `#menu-toggle[aria-expanded]` (`'false'`) and
+  `document.activeElement.id` (`'menu-toggle'`) - the drawer really did
+  close and focus really did move, both on the very first Escape.
+
+  Fixed with layered dismissal in `src/components/Nav.astro`: the Escape
+  branch now calls `event.stopPropagation()` whenever it does something
+  itself (closes the listbox, or clears a non-empty input), so the drawer's
+  own handler never sees a keystroke the widget already consumed; an
+  Escape on an already-empty, already-closed widget still does nothing
+  locally and correctly falls through to close the drawer, same as
+  pressing Escape on any other drawer control. Also fixed the narrower bug
+  that motivated the investigation: the keydown handler's early-return
+  guard (`if (listbox.hidden && event.key !== 'ArrowDown') return;`) used
+  to discard Escape too whenever the listbox was already hidden, making the
+  "clear the input" `else` branch dead code even before the propagation
+  issue - added an `event.key !== 'Escape'` exception so Escape always
+  reaches its own handler.
+
+  New regression coverage: three tests per widget (six total, English only
+  - this is pure interaction logic with no translated string involved, so
+  Croatian coverage would exercise identical code) in
+  `tests/e2e/team-search.spec.ts`/`tests/e2e/player-search.spec.ts`,
+  asserting the full three-step contract at each stage (`#menu-toggle`'s
+  `aria-expanded` and `document.activeElement` alongside the existing
+  listbox/URL assertions): first Escape closes the listbox but leaves the
+  drawer open and focus on the input; second Escape clears the input, same
+  no-drawer-close guarantee; third Escape (nothing left to do locally)
+  falls through and closes the drawer. Also re-ran the full existing
+  `tests/e2e/mobile.spec.ts` suite standalone (328/328) since the fix
+  touches the same file as the drawer/focus-trap/nav-more logic it covers -
+  clean, no regression. Full standing health check re-run clean after the
+  fix: `pnpm lint` (0/0/0), `pnpm test` (703/703, unchanged - no `.ts` logic
+  touched), `pnpm build` (711 pages, unchanged), all eighteen `check:*`
+  scripts clean. No content file touched, so no PDF regeneration was
+  needed. A full cold-start `pnpm test:e2e` is running to confirm
+  site-wide; see `docs/PROJECT_STATUS.md` for the confirmed pass count once
+  it completes.
+
+  **Left for a future pass:** the same environment-blocked items as ever
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+  brand-suffix decision, the Nations League Team of the Tournament sourcing
+  question - confirmed exhausted, do not re-attempt the same queries), the
+  Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+  figures, World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+  figures, and the hundred-and-twenty-sixth run's still-open
+  hyphenation-rendering visual re-check. The manual-walkthrough method has
+  now found a real bug in five consecutive runs - a future pass could
+  extend it next to the theme toggle (not covered by this run - the search
+  widgets were the higher-value target since they involve real
+  keyboard-interaction state machines, unlike the toggle's single click
+  handler) or to the home page's own hero/card interactions, still not
+  covered by any run's manual pass.
