@@ -5659,3 +5659,111 @@ back clean:
   behavior (where does focus land after a keyboard `Enter` versus a mouse
   click, at each clamp direction) or the home page's own hero/card
   interactions, still not covered by any run's manual pass.
+- **Full cold-start `pnpm test:e2e` confirmation, plus a full 300-1100px
+  coordinate sweep finds and fixes a real, wide-ranging `<select>`-clipping
+  bug on `/compare` and `/compare-players`' own team/player pickers**:
+  closed 2026-09-16 (hundred-and-thirty-third intensive run) - a standing
+  health check first (`pnpm install --frozen-lockfile`, `pnpm outdated`
+  found nothing new beyond the still-blocked `typescript` 7 entry; full
+  lint/unit/build and all eighteen `check:*` scripts clean, matching the
+  hundred-and-thirty-second run's own baseline: 703/703 unit, 711 pages).
+  Picked up that same run's own still-open item first: a full cold-start
+  `pnpm test:e2e` had been attempted but abandoned twice in a row (the
+  hundred-and-thirty-first and hundred-and-thirty-second runs both hit
+  sandbox CPU contention). This run's attempt succeeded cleanly: **962/962
+  passed, 17.4 minutes**, closing that standing item.
+
+  Rather than stop there, extended the same "render the real page and read
+  actual `getBoundingClientRect()`/canvas-measured text width against the
+  viewport" method the last several runs used to find the mobile-drawer and
+  desktop-"More"-menu overflow bugs to a third, previously-unchecked
+  surface: the two search-widget listboxes in `Nav.astro` (team/player
+  quick-jump) and the `<select>` pickers on `/compare`/`/compare-players`.
+  The search-widget listboxes came back clean across a 960-1400px x
+  both-languages sweep (180 opened, zero overflow) - a genuine negative
+  result, not pursued further.
+
+  The `/compare`/`/compare-players` team/player `<select>` pickers were a
+  different story: a full 300-1100px x both-languages coordinate sweep
+  (canvas-measuring every option's text width against the select's real
+  rendered content box, the same technique the seventieth and
+  hundred-and-twenty-eighth intensive runs used for `TournamentTable`'s
+  filter row and the quiz order-challenge's rank picker) found a genuine,
+  previously-uncaught, unusually wide-ranging bug: `content/`'s longest
+  option strings - `src/lib/countries.ts`'s merged-nation label "Germany
+  (incl. West Germany)" on `/compare`, and long player names like
+  "Karl-Heinz Rummenigge" on `/compare-players` - clipped with no ellipsis
+  across most of the 300-870px range on `/compare` (410-870px was the worst
+  band, where the two-up Team A/Team B layout squeezed each field below its
+  readable minimum) and 300-760px on `/compare-players`. That's the
+  overwhelming majority of real phone/tablet/small-laptop viewport widths,
+  including this site's own explicit 360px design target (`AGENTS.md`) -
+  the widest-reaching instance of this defect class found on the site so
+  far, on a core, heavily-used feature (the head-to-head comparison picker
+  every team/player profile page links to). Confirmed visually with
+  Playwright screenshots at 300px/360px/1000px before the fix (showing
+  literally "Germany (incl. West Germa" with the closing parenthesis and
+  final word sheared off) and after.
+
+  Root cause: `.compare__field { flex: 1 1 12rem; min-width: 12rem }`
+  inside a wrapping flex row meant that once the container was wide enough
+  for Team A and Team B to sit side by side but not wide enough for each to
+  comfortably fit the longest label, both fields sat squeezed at or near
+  their 12rem minimum for a very wide band of viewports - a structurally
+  different shape from the Nav.astro bugs (those were absolute-positioned
+  overlays overflowing the viewport edge; this is two flex siblings
+  squeezing each other). Fixed in all four files
+  (`compare.astro`/`hr/compare.astro`/`compare-players.astro`/
+  `hr/compare-players.astro`, whose CSS is hand-duplicated per
+  `docs/PROJECT_STATUS.md`'s existing note on this panel) with two media
+  queries: below the same `60rem` breakpoint `Nav.astro`'s own
+  drawer/single-row transition already uses, `.compare__picker` stacks
+  single-column (a field always gets the picker's full width instead of
+  half - `.compare__field` needs its `flex`/`min-width` explicitly reset
+  to `0 0 auto`/`0`, not just `width: 100%`, since switching
+  `flex-direction` to `column` reinterprets the unmodified `flex: 1 1
+  12rem` as a *vertical* basis and stretches the field's height instead);
+  below `26rem`, a small font-size/padding trim on the select and picker
+  closes the remaining gap down to 320px, `check:reflow`'s own tested
+  floor. Re-ran the full 300-1100px sweep after the fix (real built site,
+  not a synthetic override): **zero overflow instances** across all four
+  pages, down from 200 before the fix - the only clean result across the
+  fix's own combined 300-1100px/60rem-breakpoint/26rem-breakpoint design
+  space, confirmed by iterating on real coordinate measurements rather than
+  guessing font sizes.
+
+  New regression coverage: one test per describe block (four total -
+  `tests/e2e/mobile.spec.ts`'s English/Croatian `/compare` blocks,
+  `tests/e2e/compare-players.spec.ts`'s English/Croatian blocks), each
+  using the same canvas-`measureText()`-versus-content-box-width technique
+  the hundred-and-twenty-eighth run's own rank-picker regression test
+  established, checking every option in both `<select>` elements rather
+  than just the currently-selected one. All 700 PDFs regenerated
+  (`pnpm build:pdfs`) and reverified clean (`check:pdfs`), even though the
+  picker itself is marked `no-print` and invisible in the rendered PDF - the
+  freshness manifest is keyed on source-file hash, so any edit to a
+  PDF-source `.astro` file requires regeneration regardless of whether the
+  specific change is print-visible. A second full cold-start `pnpm
+  test:e2e` after the fix (this time including the four new tests)
+  confirmed no regression sitewide: **966/966 passed, 16.1 minutes** (up
+  from 962/962 by exactly the four new tests). Full standing health check
+  also clean: `pnpm lint` (0/0/0), `pnpm test` (703/703, unchanged - a
+  CSS-only fix has no unit-testable logic), `pnpm build` (711 pages,
+  unchanged), all eighteen `check:*` scripts clean.
+
+  **Left for a future pass:** the same environment-blocked items as ever
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+  brand-suffix decision, the Nations League Team of the Tournament sourcing
+  question - confirmed exhausted, do not re-attempt the same queries), the
+  Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+  figures, World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+  figures, and the hundred-and-twenty-sixth run's still-open
+  hyphenation-rendering visual re-check. The coordinate-sweep method has
+  now found a real, user-facing bug in three of its last four applications
+  (drawer flex-wrap, "More" menu overflow, this run's select-squeeze) across
+  a genuinely different defect shape each time - a future pass could extend
+  it to the "More" menu's own keyboard-focus behavior (still unchecked,
+  carried over from the hundred-and-thirty-second run's own closing note),
+  the home page's hero/card interactions, or a fresh pass over any other
+  multi-field flex layout on the site for the same "siblings squeeze each
+  other below some wrap threshold" shape this run's fix addresses.
