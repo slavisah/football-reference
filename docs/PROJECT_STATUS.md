@@ -23710,5 +23710,117 @@ shared table/map/page-break mechanics on other page types), or the home
 page's interactive widgets (team/player search, theme toggle) at
 interaction states beyond what the accessibility specs already exercise.
 
+### Manual print-output walkthrough finds and fixes a real, previously untested page-break bug: bordered "one row per year" boxes could be sliced in half across a PDF page boundary - closed 2026-09-16 (hundred-and-twenty-ninth intensive run)
+
+A standing health check first: `pnpm install --frozen-lockfile`, `pnpm
+lint` (0/0/0), `pnpm test` (703/703 unit), `pnpm build` (711 pages), and
+all sixteen `check:*` scripts (using the `PW_EXECUTABLE_PATH=/opt/pw-
+browsers/chromium` fallback this environment's Chromium needs for the
+three browser-driven ones) - all clean, matching the
+hundred-and-twenty-eighth run's own closing baseline.
+
+Picked up that run's own closing suggestion: extend the now-proven manual
+walkthrough method to team/player profile pages' own print output, not
+yet covered by any prior run's manual pass. Before looking at the print
+PDFs themselves, first re-attempted the standing Nations League research
+gaps with fresh `WebSearch` queries (the Team of the Tournament question
+for 2021/2023/2025 and the 2021/2023/2025 final-attendance figures) -
+both came back with the exact same result every recent run has already
+logged (no Team of the Tournament award found for any edition after 2019,
+and the attendance figures keep resurfacing but still can't be proven
+independent of the same Wikipedia text `WebSearch` itself surfaces), so
+nothing new to add there; not worth another run repeating this exact
+search.
+
+Moved on to the actual print-output walkthrough. Rendering `/players/
+lionel-messi` and `/teams/argentina` to a real PDF via Playwright's
+`page.pdf()` (the same call `scripts/generate-pdfs.mjs` itself makes) and
+paging through them found nothing wrong with their content, but reading
+`src/pages/players/[slug].astro` and `src/pages/teams/[slug].astro`
+end-to-end alongside the print rules in `src/styles/global.css` surfaced a
+real, previously unflagged bug: `.player-profile__list li` and
+`.team-profile__list li` - the bordered "one row per year" award/honour
+boxes on those two page types - have no `break-inside: avoid` in print
+media, unlike the near-identical `.champions__item` (`ChampionsSummary`)
+and `.host-map__item` (`HostMap`) boxes elsewhere, which already carry it.
+The same audit found two more components with the identical gap:
+`PodiumCards`' `.podium__card` and `ChampionsTimeline`'s `.timeline__card`
+(both bordered, both `background: var(--bg-elevated); border: 1px solid
+var(--border); border-radius: var(--radius)` - the exact same visual
+shape as the two already-protected components), used on every
+`CompetitionView`-based landing page and on `/records`.
+
+Confirmed this as a real, live defect rather than a theoretical gap two
+ways. First, a DOM measurement pass (print media, 1032px viewport, every
+`.podium__card`/`.timeline__card`/`.player-profile__list li`/
+`.team-profile__list li` element's absolute `offsetTop` checked against
+the ~703px A4-landscape page-content-height boundary) found dozens of
+crossings on `/records`, `/hr/records`, `/competitions/world-cup` and
+`/competitions/copa-america`. Second, and more convincingly, an actual
+before/after `page.pdf()` render of `/competitions/world-cup`: the
+unfixed PDF's "Podium by edition" section visibly sliced the 2014/2010/
+2006 podium cards in half at the bottom of a page (border and content cut
+off, spilling onto the next page); the fixed PDF moved all three cards
+whole onto the following page instead, with no other layout change.
+
+Fixed by adding `.podium__card`, `.timeline__card`, `.player-profile__list
+li` and `.team-profile__list li` to the same `break-inside: avoid` rule in
+`src/styles/global.css` that already covered `tr`/`.champions__item`, with
+a comment explaining the shared "bordered one-row-per-year box" shape and
+how this run confirmed it live rather than just in theory.
+
+**Left for a future pass, not shipped this run:** a permanent automated
+check for this defect class was attempted (measure every element with a
+computed `break-inside: avoid` against fixed page-height boundaries,
+site-wide) but abandoned after it produced false positives on `tr`/
+`.champions__item`/`.host-map__item` - elements already known-correct -
+on the site's longer pages (`/hr/competitions/copa-america`,
+`/hr/competitions/golden-boot`, etc.). The false positives are a real
+limitation of the approach, not a new bug: once even one earlier element
+on a page is genuinely pushed to the next page by `break-inside: avoid`,
+every later element's *real* paginated position shifts down by however
+much blank space that push added, so comparing raw (unpaginated)
+`offsetTop` against flat multiples of the page height stops matching
+reality partway down any sufficiently long page. Getting this right would
+need either driving Chromium's actual print pagination page-by-page (slow,
+and this run couldn't find a reliable way to script navigation inside
+Chromium's own built-in PDF viewer to verify it) or a genuine layout
+simulation, neither of which fit this run's scope - so the fix itself
+shipped, but the verification stays manual (the same before/after
+`page.pdf()` comparison used above) rather than a new `check:*` script.
+A future pass attempting this should know the flat-page-height-multiple
+approach doesn't generalize past the first forced break on a page, not
+retry it as-is.
+
+All 700 PDFs regenerated (`pnpm build:pdfs`) and reverified clean with
+`pnpm check:pdfs` (700/700) - every PDF's rendered output depends on the
+shared `src/styles/global.css` print rules (`scripts/pdf-pages.mjs`'s
+`GLOBAL_STYLES` dependency, added by the hundred-and-nineteenth run's own
+"a shared-stylesheet fix changes every PDF" correction), so this change
+marked all of them stale even though no content file was touched. Full
+standing health check re-run clean after the fix: `pnpm lint` (0/0/0),
+`pnpm test` (703/703, unchanged - a CSS-only fix touches no `.ts` logic),
+`pnpm build` (711 pages, unchanged), and all sixteen `check:*` scripts
+clean (matching this run's own opening baseline). A full cold-start `pnpm
+exec playwright test` also re-ran clean; see this run's own closing note
+below for the exact count.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7 still blocked on `@astrojs/check@0.9.10`'s
+`^5.0.0 || ^6.0.0` constraint, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix decision needing human sign-off), the Nations
+League 2023 attendance conflict, 2021/2025's still-unconfirmed figures,
+the Nations League Team of the Tournament sourcing question (re-confirmed
+exhausted again this run - stop re-attempting the exact same `WebSearch`
+queries), World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+figures, and the hundred-and-sixth run's still-open hyphenation-rendering
+visual re-check. The manual-walkthrough method has now found a real,
+user-facing (or in this case real, user-downloadable) bug in four
+consecutive runs - a future pass should keep treating it as a first-class
+method and could extend it next to the home page's own interactive
+widgets (team/player search, theme toggle) at interaction states beyond
+what the accessibility specs already exercise, still not covered by any
+run's manual pass.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
