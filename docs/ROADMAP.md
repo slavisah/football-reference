@@ -5324,10 +5324,10 @@ back clean:
   manual before/after PDF-render check, not an automated one. Full standing
   health check clean: `pnpm lint` (0/0/0), `pnpm test` (703/703, unchanged),
   `pnpm build` (711 pages), all sixteen `check:*` scripts, and a full
-  cold-start `pnpm test:e2e` (see `docs/PROJECT_STATUS.md`'s matching entry
-  for the exact pass count). **Left for a future pass:** the same
-  environment-blocked items as ever (`typescript` 7, `docs/SOURCES.md`
-  link-liveness, the `long-title` brand-suffix decision, the Nations League
+  cold-start `pnpm test:e2e` (956/956 passed, 20.7 minutes, unchanged from
+  the hundred-and-twenty-eighth run's baseline). **Left for a future
+  pass:** the same environment-blocked items as ever (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix decision, the Nations League
   Team of the Tournament sourcing question - now confirmed exhausted, stop
   re-attempting the same queries), the Nations League 2023 attendance
   conflict, 2021/2025's still-unconfirmed figures, World Cup 1930/1950's/

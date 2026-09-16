@@ -23802,8 +23802,11 @@ standing health check re-run clean after the fix: `pnpm lint` (0/0/0),
 `pnpm test` (703/703, unchanged - a CSS-only fix touches no `.ts` logic),
 `pnpm build` (711 pages, unchanged), and all sixteen `check:*` scripts
 clean (matching this run's own opening baseline). A full cold-start `pnpm
-exec playwright test` also re-ran clean; see this run's own closing note
-below for the exact count.
+exec playwright test` also re-ran clean: **956/956 passed, 20.7 minutes**
+(unchanged from the hundred-and-twenty-eighth run's own baseline - a
+print-media-only CSS fix has no e2e-visible effect outside
+`tests/e2e/print-styles.spec.ts`, which doesn't assert on these four
+classes specifically and stayed green throughout).
 
 **Left for a future pass:** the same environment-blocked items as every
 recent run (`typescript` 7 still blocked on `@astrojs/check@0.9.10`'s
