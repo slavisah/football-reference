@@ -2524,6 +2524,35 @@ test.describe('Compare page on a 360px phone', () => {
     expect(await rows.count()).toBeGreaterThan(10);
   });
 
+  test('the Team A/B <select> boxes are wide enough not to clip the longest team name', async ({
+    page,
+  }) => {
+    // Regression test: a native <select> silently clips its own option text
+    // with no ellipsis once the box is narrower than the text needs (the
+    // same defect class the seventieth intensive run fixed for
+    // TournamentTable's filter row, and the hundred-and-twenty-eighth run
+    // fixed for the quiz order-challenge's rank picker). A 300-1100px
+    // coordinate sweep found this exact shape here too: "Germany (incl. West
+    // Germany)" (src/lib/countries.ts's merged-nation label, the longest
+    // option in either select) clipped across most of that range once the
+    // two pickers sat side by side - fixed by forcing a single-column layout
+    // below 60rem plus a narrow-viewport font/padding trim (compare.astro).
+    for (const id of ['#compare-a', '#compare-b']) {
+      const fits = await page.locator(id).evaluate((el: HTMLSelectElement) => {
+        const cs = getComputedStyle(el);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+        const contentWidth =
+          el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        return Array.from(el.options).every(
+          (option) => ctx.measureText(option.textContent ?? '').width <= contentWidth,
+        );
+      });
+      expect(fits).toBe(true);
+    }
+  });
+
   test('choosing a different team updates the panel and the URL, and swap works', async ({
     page,
   }) => {
@@ -2593,6 +2622,27 @@ test.describe('Croatian compare page (/hr/compare) on a 360px phone', () => {
       return el.scrollWidth - el.clientWidth;
     });
     expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('the Team A/B <select> boxes are wide enough not to clip the longest team name', async ({
+    page,
+  }) => {
+    // Same regression test as the English compare page's own matching
+    // block - see that comment for the full defect history.
+    for (const id of ['#compare-a', '#compare-b']) {
+      const fits = await page.locator(id).evaluate((el: HTMLSelectElement) => {
+        const cs = getComputedStyle(el);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+        const contentWidth =
+          el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        return Array.from(el.options).every(
+          (option) => ctx.measureText(option.textContent ?? '').width <= contentWidth,
+        );
+      });
+      expect(fits).toBe(true);
+    }
   });
 
   test('renders translated chrome and headings, with translated competition names', async ({
