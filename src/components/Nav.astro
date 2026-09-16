@@ -1199,6 +1199,24 @@ function isCurrent(href: string): boolean {
       if (!(target instanceof Node)) return;
       if (!menu.contains(target) && !toggle.contains(target)) setOpen(false);
     });
+
+    // Keyboard-only equivalent of the click-outside handler above. Found by
+    // actually tabbing through the open menu rather than only asserting on
+    // aria-expanded/visibility: Tab past the last link left the menu open
+    // and rendered on top of the page - covering real content underneath -
+    // while focus had already moved on to whatever came next in the nav
+    // (the "Find a team" search box), with no way to tell from the page
+    // that it was still open short of pressing Escape or clicking away.
+    // `focusin` bubbles (unlike `focusout`, which would need a
+    // `relatedTarget` check to avoid closing on every internal focus move
+    // between the menu's own links), so this fires once per focus change
+    // and closes the menu the moment focus lands anywhere outside it.
+    document.addEventListener('focusin', (event) => {
+      if (toggle.getAttribute('aria-expanded') !== 'true') return;
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (!menu.contains(target) && !toggle.contains(target)) setOpen(false);
+    });
   }
 
   (function initNavMoreById() {
