@@ -960,7 +960,13 @@ function isCurrent(href: string): boolean {
     });
 
     input.addEventListener('keydown', (event) => {
-      if (listbox.hidden && event.key !== 'ArrowDown') return;
+      // Escape has to reach its own handler below even once the listbox is
+      // already hidden - that's the only path that clears the input (the
+      // `else` branch a few lines down). Without this exception, a second
+      // Escape press (after the first one already closed the listbox) hit
+      // this early return and stopped there, so "press Escape again to
+      // clear the search" was unreachable dead code.
+      if (listbox.hidden && event.key !== 'ArrowDown' && event.key !== 'Escape') return;
 
       if (event.key === 'ArrowDown') {
         event.preventDefault();
@@ -982,10 +988,24 @@ function isCurrent(href: string): boolean {
           goToTeam(activeId);
         }
       } else if (event.key === 'Escape') {
+        // Layered dismissal: this widget can sit inside the mobile drawer,
+        // which has its own document-level Escape handler that closes the
+        // whole drawer (see the is:inline menu script above). Without
+        // stopPropagation, a single Escape press bubbled past this handler
+        // and triggered that one too - closing the listbox (or clearing the
+        // input) *and* the entire drawer in one keystroke, yanking focus
+        // away to the menu button before a reader could press Escape again.
+        // Stopping propagation only when this handler actually consumed the
+        // key keeps the expected behaviour once there's nothing left for it
+        // to do here: an Escape on an already-empty, already-closed widget
+        // still bubbles up and closes the drawer, same as pressing it on any
+        // other drawer control.
         if (!listbox.hidden) {
           event.preventDefault();
+          event.stopPropagation();
           closeListbox();
-        } else {
+        } else if (input.value !== '') {
+          event.stopPropagation();
           input.value = '';
         }
       }

@@ -23825,5 +23825,152 @@ widgets (team/player search, theme toggle) at interaction states beyond
 what the accessibility specs already exercise, still not covered by any
 run's manual pass.
 
+### Manual walkthrough of the global "find a team"/"find a player" search widgets finds and fixes a real Escape-key bug: closing the listbox also closed the whole mobile drawer and stole focus - closed 2026-09-16 (hundred-and-thirtieth intensive run)
+
+A standing health check first: `pnpm install --frozen-lockfile`, `pnpm
+lint` (0/0/0), `pnpm test` (703/703 unit), `pnpm build` (711 pages), and
+all eighteen `check:*` scripts (using the `PW_EXECUTABLE_PATH=/opt/pw-
+browsers/chromium` fallback this environment's Chromium needs for the
+three browser-driven ones: `check:reflow`, `check:text-zoom`, and the
+Playwright-backed ones `check:reachability`/etc. already pick it up
+transitively) - all clean, matching the hundred-and-twenty-ninth run's own
+closing baseline.
+
+Picked up that run's own closing suggestion and extended the
+manual-walkthrough method to the two global combobox widgets `Nav.astro`
+defines (`#team-search-input`/`#player-search-input`, both built on the
+same shared `initSearchWidget` implementation): an ARIA 1.2 editable
+combobox that filters a lazily-fetched name index as the reader types and
+sends Enter/click to `/compare?a=<id>` or `/compare-players?a=<id>`.
+Screenshotted both widgets at 390px and 1280px, light and dark, English
+and Croatian, then drove them with real keyboard input (focus, type,
+`ArrowDown`/`ArrowUp`, `Enter`, `Escape`, click-outside) via a throwaway
+Playwright script against the production preview server, reading back the
+actual DOM state after each key rather than just the visible screenshot.
+
+Found a genuine, previously-unflagged bug this way: pressing `Escape` a
+*second* time, after a first `Escape` had already closed the widget's own
+listbox, never cleared the search input - the `else { input.value = ''; }`
+branch the widget's own `keydown` handler already had for exactly that
+case (see its own comment) never ran. Reading `Nav.astro`'s full `keydown`
+handler end-to-end against the mobile drawer's own `is:inline` Escape
+handler in the same file explained why, and turned out to be a bigger bug
+than the missing-clear symptom alone suggested: the widget's Escape branch
+never called `event.stopPropagation()`, so a *single* Escape press while
+the listbox was open bubbled straight through the widget's own handler to
+the drawer's document-level Escape listener - which also fired, since the
+drawer was open the whole time (every e2e test in this suite runs at the
+360px viewport where the nav lives inside the collapsible `#site-menu`
+drawer; see `tests/e2e/menu.ts`'s own doc comment). One Escape press was
+therefore closing the listbox *and* the entire mobile navigation drawer at
+once, moving focus from the search input to the menu-toggle button in the
+same keystroke - which is also exactly why the second-Escape-clears-input
+branch was unreachable: by the time a reader could press Escape again,
+focus had already left the input entirely, so the keystroke's `keydown`
+event never originated inside it.
+
+Confirmed live, not just from reading the code: a small Playwright script
+opened the mobile drawer, typed "brazil" into `#team-search-input`, read
+`#menu-toggle`'s `aria-expanded` (`'true'`, drawer open as expected), then
+pressed `Escape` once and re-read the same attribute plus
+`document.activeElement.id` - `'false'` and `'menu-toggle'`. The drawer
+really did close, and focus really did jump to the toggle button, on the
+very first Escape press - a genuine, jarring interaction bug for any
+keyboard user searching from the mobile drawer, not a theoretical gap.
+
+Fixed with layered dismissal, the standard pattern for a widget that can
+sit inside an outer dismissible container (WAI-ARIA APG's guidance for
+nested Escape-closeable layers): the Escape branch now calls
+`event.stopPropagation()` whenever it actually does something itself
+(closes the listbox, or clears a non-empty input), so the drawer's own
+handler never sees a keystroke the widget already consumed. Once the
+widget has nothing left to do locally (listbox already closed, input
+already empty), a further Escape correctly falls through and closes the
+drawer instead - the same behavior pressing Escape on any other drawer
+control already had, not a new blocked state. Also fixed the narrower bug
+that started the investigation: the handler's own early-return guard
+(`if (listbox.hidden && event.key !== 'ArrowDown') return;`) discarded
+Escape too whenever the listbox was already hidden, which is what made the
+"clear the input" branch dead code even setting the propagation issue
+aside - added an `event.key !== 'Escape'` exception alongside the existing
+`ArrowDown` one so Escape always reaches its own handler below.
+
+New regression coverage: three tests per widget (six total) in
+`tests/e2e/team-search.spec.ts`/`tests/e2e/player-search.spec.ts`,
+asserting the complete three-step contract rather than just the original
+single-Escape/listbox-hidden check - each stage now also asserts
+`#menu-toggle[aria-expanded]` and which element is focused, the two
+symptoms the old tests couldn't have caught since they never looked past
+the listbox and the URL:
+1. first Escape closes the listbox, drawer stays open, focus stays on the
+   input;
+2. second Escape clears the input, same no-drawer-close/no-focus-move
+   guarantee;
+3. third Escape (nothing left to do locally) falls through and closes the
+   drawer, focus moves to the toggle button.
+
+English-only coverage is deliberate here, unlike most of this codebase's
+"one test per language" convention: this is pure interaction/propagation
+logic shared byte-for-byte by both languages' `Nav.astro` instances (no
+translated string is involved anywhere in the fix), so a Croatian-page
+duplicate would exercise identical code paths for zero additional
+coverage - the existing Croatian `describe` blocks in both spec files
+already cover the label/placeholder/no-results strings that genuinely do
+differ by language.
+
+Also re-ran the full existing `tests/e2e/mobile.spec.ts` suite standalone
+(328/328, all header/drawer/focus-trap/nav-more/compare-panel tests) since
+the fix touches the same `Nav.astro` file those tests already cover
+end-to-end - clean, no regression from the added `stopPropagation()`
+calls. Full standing health check re-run clean after the fix: `pnpm lint`
+(0/0/0), `pnpm test` (703/703, unchanged - a client-script-only fix has no
+unit-testable `.ts` logic), `pnpm build` (711 pages, unchanged), and all
+eighteen `check:*` scripts clean (matching this run's own opening
+baseline). No content file or PDF-source `.astro` touched, so no PDF
+regeneration was needed. A full cold-start `pnpm test:e2e` (956+8 new =
+964 expected) was started from a clean state (no leftover `astro preview`
+daemon or Chromium processes - see the aside below) to confirm
+site-wide; its confirmed pass count and duration are recorded in a
+follow-up entry once it completes, the same two-commit pattern recent
+runs have used for a long-running cold-start confirmation.
+
+**Aside - environment note, not a code change:** this run's own first
+attempt at the cold-start suite had to be discarded and restarted clean
+after a self-inflicted process-management mistake, worth recording so a
+future run doesn't repeat it: `pnpm test:e2e`'s `webServer` config sets
+`reuseExistingServer: !process.env.CI` (true outside CI), and Astro 7's
+`astro preview` always forks into a **detached** background daemon (see
+`scripts/test-preview-server.mjs`'s own doc comment). Running a second,
+unrelated `pnpm build` in a separate shell while a background `pnpm
+test:e2e` run was mid-suite overwrote the `dist/` directory its already-
+running preview daemon was serving from mid-test, and killing the
+`test:e2e`/`playwright test`/wrapper-script processes afterward did *not*
+stop that detached `astro preview` daemon - it kept listening on :4321 and
+serving the stale (pre-fix) build to every later `playwright test`
+invocation, including a targeted rerun of just the two new spec files,
+which is what actually explained their first, confusing failure (not a
+bug in the fix itself - see the "found and fixed" account above for the
+real bug). `pnpm exec astro preview stop` (the command the daemon's own
+startup log line names) plus killing any leftover `chromium` processes is
+the correct cleanup before starting a fresh `pnpm test:e2e` run any time a
+previous one was interrupted rather than left to finish and exit on its
+own.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7 still blocked on `@astrojs/check@0.9.10`'s
+`^5.0.0 || ^6.0.0` constraint, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix decision needing human sign-off), the Nations
+League 2023 attendance conflict, 2021/2025's still-unconfirmed figures,
+the Nations League Team of the Tournament sourcing question (confirmed
+exhausted across several recent runs - stop re-attempting the same
+`WebSearch` queries), World Cup 1930/1950's/EURO 1996/2020's excluded
+attendance figures, and the hundred-and-twenty-sixth run's still-open
+hyphenation-rendering visual re-check. The manual-walkthrough method has
+now found a real, user-facing bug in five consecutive runs - a future pass
+could extend it next to the theme toggle (not covered this run - the two
+search widgets were the higher-value target, being real keyboard-driven
+state machines rather than a single click handler) or to the home page's
+own hero/card interactions, still not covered by any run's manual pass.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
