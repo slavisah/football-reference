@@ -4570,6 +4570,37 @@ test.describe('desktop nav "More" menu (>=60rem)', () => {
     await toggle.click();
     await expect(page.locator('#nav-more-menu a', { hasText: 'Rekordi' })).toBeVisible();
   });
+
+  // The `toBeVisible()`/attribute assertions above all passed even while the
+  // menu rendered up to 156px past the viewport's right edge at narrower
+  // >=60rem widths (e.g. 1000px, a real windowed-browser width, not just
+  // 1280px) - `body`'s own `overflow-x: hidden` (global.css) clips that
+  // overflow silently, no scrollbar, so Playwright's visibility check
+  // (which only asks "not display:none/zero-sized", not "within the
+  // viewport") never caught it. Reads real getBoundingClientRect()
+  // coordinates instead, the same technique that caught the mobile-drawer
+  // flex-wrap bug.
+  test('stays inside the viewport at a narrower >=60rem width', async ({ page }) => {
+    await page.setViewportSize({ width: 1000, height: 900 });
+    await page.goto('');
+    await page.locator('#nav-more-toggle').click();
+    const menu = page.locator('#nav-more-menu');
+    await expect(menu).toBeVisible();
+
+    const linkBoxes = await menu.locator('a').evaluateAll((links) =>
+      links.map((a) => a.getBoundingClientRect()),
+    );
+    for (const box of linkBoxes) {
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(1000);
+    }
+
+    // Prove the clamp doesn't just move the hit target - the previously
+    // unreachable last link (the menu's rightmost content, "Sources") is
+    // actually clickable.
+    await page.locator('#nav-more-menu a', { hasText: 'Sources' }).click();
+    await expect(page).toHaveURL(/\/about\/sources\/?$/);
+  });
 });
 
 // The head-to-head panel on /compare is a "versus" table: one row per

@@ -478,6 +478,13 @@ function isCurrent(href: string): boolean {
     position: absolute;
     inset-block-start: calc(100% + 0.3rem);
     inset-inline-start: 0;
+    /* Nudged in from script.ts's own viewport-clamp measurement below - see
+       that comment for why a static inset alone (left- or right-aligned to
+       the toggle) isn't enough. Physical `translateX`, not a logical
+       property: the clamp measures real `getBoundingClientRect()` pixels,
+       which are always physical/LTR, and both site languages (English,
+       Croatian) render left-to-right anyway. */
+    transform: translateX(var(--nav-more-shift, 0px));
     z-index: 5;
     display: flex;
     flex-direction: column;
@@ -1103,9 +1110,44 @@ function isCurrent(href: string): boolean {
 
     let collapsed = false;
 
+    // Left-aligned to the toggle by default (the CSS `inset-inline-start:
+    // 0`), which only works when the toggle sits well clear of the
+    // viewport's right edge. It doesn't at the narrow end of the >=60rem
+    // desktop range: real, reachable widths from roughly 960px up to
+    // ~1145px in Croatian (longer link labels push the row's own fit
+    // further out) put the toggle close enough to the right edge that the
+    // menu's own right side lands up to ~156px past the viewport - and
+    // since `body` has `overflow-x: hidden` (global.css, to stop the page
+    // scrolling sideways on small screens), that overflow is clipped
+    // silently with no scrollbar, making the menu's own rightmost links
+    // unreachable by a mouse/touch reader. A static right-aligned
+    // (`inset-inline-end: 0`) menu isn't a fix either, just a smaller
+    // version of the same bug on the other edge: right at the >=60rem
+    // breakpoint the nav row itself can still wrap onto two lines (a
+    // sub-pixel rounding gap between the CSS breakpoint and the viewport's
+    // real available width once a scrollbar is subtracted), stranding the
+    // toggle alone at the row's own left edge - from there a right-aligned
+    // menu overshoots left instead. Measuring and clamping against the
+    // real rendered rect on every open is the only anchor that's correct
+    // regardless of which edge the toggle ends up near.
+    //
+    // Found the same way the mobile-drawer flex-wrap bug was: rendering
+    // the real page and reading actual getBoundingClientRect() coordinates
+    // against the viewport, not just asserting on visibility/attributes.
     function setOpen(open: boolean) {
       menu.hidden = !open;
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (!open) return;
+      menu.style.setProperty('--nav-more-shift', '0px');
+      const rect = menu.getBoundingClientRect();
+      const viewportWidth = document.documentElement.clientWidth;
+      const overflowRight = rect.right - viewportWidth;
+      const overflowLeft = -rect.left;
+      if (overflowRight > 0) {
+        menu.style.setProperty('--nav-more-shift', `${-overflowRight}px`);
+      } else if (overflowLeft > 0) {
+        menu.style.setProperty('--nav-more-shift', `${overflowLeft}px`);
+      }
     }
 
     // Moves the real <li> nodes between the flat row and the dropdown
