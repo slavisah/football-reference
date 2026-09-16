@@ -24337,11 +24337,13 @@ changed, only a DOM event listener), `pnpm build` (711 pages, unchanged),
 all eighteen `check:*` scripts clean (`check:reflow`/`check:text-zoom`/
 `check:print-width` re-run with `PW_EXECUTABLE_PATH` too). A full cold-start
 `pnpm test:e2e` was started to confirm no regression sitewide beyond the
-targeted block above; it was still running at the time this entry was
-written and committed (this run's own container is ephemeral, so committing
-promptly rather than holding the fix uncommitted while a 15-20 minute suite
-finishes was judged the safer choice) - see the next entry, or this
-session's own follow-up commit, for its result.
+targeted block above; it was still running when the fix itself was
+committed (this run's own container is ephemeral, so committing promptly
+rather than holding the fix uncommitted while a 15-20 minute suite finishes
+was judged the safer choice). It has since finished clean: **967/967
+passed, 15.7 minutes** (up from 966/966 by exactly the one new test this
+run added), confirming the `focusin` fix and its regression test introduce
+no regression anywhere else in the suite.
 
 **Left for a future pass:** the same environment-blocked items as ever
 (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
@@ -24351,14 +24353,12 @@ Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
 figures (re-confirmed a third time this run - needs a genuinely new source
 lead, not another WebSearch pass), World Cup 1930/1950's/EURO 1996/2020's
 excluded attendance figures, and the hundred-and-twenty-sixth run's
-still-open hyphenation-rendering visual re-check. Confirming this run's own
-background `pnpm test:e2e` run is the immediate next step for whoever picks
-this up next, if it isn't already confirmed by the time they start. Beyond
-that, the coordinate/keyboard-walkthrough method has now had one genuine
-negative result (home page hero/cards) alongside its four real finds - a
-future pass could extend it to team/player profile pages (not yet swept),
-or take a fresh non-content quality angle (SEO, a dead-code sweep, or a
-fresh `docs/WEBSITE_REQUIREMENTS.md` read against the live site).
+still-open hyphenation-rendering visual re-check. The
+coordinate/keyboard-walkthrough method has now had one genuine negative
+result (home page hero/cards) alongside its five real finds - a future
+pass could extend it to team/player profile pages (not yet swept), or take
+a fresh non-content quality angle (SEO, a dead-code sweep, or a fresh
+`docs/WEBSITE_REQUIREMENTS.md` read against the live site).
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

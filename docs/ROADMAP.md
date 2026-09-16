@@ -5798,9 +5798,12 @@ back clean:
   the Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
   figures, World Cup 1930/1950's/EURO 1996/2020's excluded attendance
   figures, and the hundred-and-twenty-sixth run's still-open
-  hyphenation-rendering visual re-check. This run's own home-page
-  hero/card walkthrough was a genuine negative result, unlike three of the
-  last five coordinate/keyboard-walkthrough applications - a future pass
-  could extend the method to team/player profile pages or the print
-  stylesheet's own interactive elements (there are none today, but future
-  content could add some), or take a fresh non-content quality angle.
+  hyphenation-rendering visual re-check. A full cold-start `pnpm test:e2e`
+  after the fix confirmed no regression sitewide: **967/967 passed, 15.7
+  minutes** (up from 966/966 by exactly the one new test). This run's own
+  home-page hero/card walkthrough was a genuine negative result, unlike
+  three of the last five coordinate/keyboard-walkthrough applications - a
+  future pass could extend the method to team/player profile pages or the
+  print stylesheet's own interactive elements (there are none today, but
+  future content could add some), or take a fresh non-content quality
+  angle.
