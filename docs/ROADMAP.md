@@ -5398,9 +5398,10 @@ back clean:
   fix: `pnpm lint` (0/0/0), `pnpm test` (703/703, unchanged - no `.ts` logic
   touched), `pnpm build` (711 pages, unchanged), all eighteen `check:*`
   scripts clean. No content file touched, so no PDF regeneration was
-  needed. A full cold-start `pnpm test:e2e` is running to confirm
-  site-wide; see `docs/PROJECT_STATUS.md` for the confirmed pass count once
-  it completes.
+  needed. A full cold-start `pnpm test:e2e` confirmed no regression
+  site-wide: **960/960 passed, 13.4 minutes** (up from 956/956 by exactly
+  the four net new tests added this run - six new, two renamed in place of
+  the originals they replaced).
 
   **Left for a future pass:** the same environment-blocked items as ever
   (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
