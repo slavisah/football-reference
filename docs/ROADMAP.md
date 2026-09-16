@@ -5298,3 +5298,43 @@ back clean:
   pages' own print output (still not covered by any run's manual pass) or
   the home page's own interactive widgets (team/player search, theme
   toggle) at states beyond what the accessibility specs already exercise.
+- **Player/team profile print output: bordered award-history boxes could be
+  sliced across a PDF page boundary**: closed 2026-09-16 (hundred-and-
+  twenty-ninth intensive run) - a standing health check first (all clean,
+  matching the hundred-and-twenty-eighth run's baseline). Re-attempted the
+  Nations League Team of the Tournament/attendance research once more via
+  `WebSearch`; same exhausted result as every recent run, not worth
+  re-attempting again with the same queries. Extended the manual-walkthrough
+  method to team/player profile print output as suggested: found that
+  `.player-profile__list li`/`.team-profile__list li` (the bordered
+  award-history boxes on `/players/<slug>`/`/teams/<slug>`) and
+  `.podium__card`/`.timeline__card` (the "Podium by edition"/champions-
+  history boxes on every competition landing page and `/records`) had no
+  `break-inside: avoid` in print media, unlike the near-identical, already-
+  protected `.champions__item`/`.host-map__item`. Confirmed live (not just
+  theoretical) with a before/after `page.pdf()` render of
+  `/competitions/world-cup`: the unfixed PDF sliced three podium cards in
+  half across a page boundary; the fix moved them whole onto the next page.
+  Fixed in `src/styles/global.css`. All 700 PDFs regenerated and reverified
+  clean (`pnpm build:pdfs`/`pnpm check:pdfs`). A permanent automated check
+  for this defect class was attempted but abandoned - see
+  `docs/PROJECT_STATUS.md`'s matching entry for why the obvious approach
+  (offsetTop vs. flat page-height multiples) produces false positives past
+  the first forced break on a long page, so this defect class still needs a
+  manual before/after PDF-render check, not an automated one. Full standing
+  health check clean: `pnpm lint` (0/0/0), `pnpm test` (703/703, unchanged),
+  `pnpm build` (711 pages), all sixteen `check:*` scripts, and a full
+  cold-start `pnpm test:e2e` (see `docs/PROJECT_STATUS.md`'s matching entry
+  for the exact pass count). **Left for a future pass:** the same
+  environment-blocked items as ever (`typescript` 7, `docs/SOURCES.md`
+  link-liveness, the `long-title` brand-suffix decision, the Nations League
+  Team of the Tournament sourcing question - now confirmed exhausted, stop
+  re-attempting the same queries), the Nations League 2023 attendance
+  conflict, 2021/2025's still-unconfirmed figures, World Cup 1930/1950's/
+  EURO 1996/2020's excluded attendance figures, and the hundred-and-
+  twenty-sixth run's still-open hyphenation-rendering visual re-check. The
+  manual-walkthrough method has now found a real bug in four consecutive
+  runs - a future pass could extend it next to the home page's own
+  interactive widgets (team/player search, theme toggle) at states beyond
+  what the accessibility specs already exercise, still not covered by any
+  run's manual pass.

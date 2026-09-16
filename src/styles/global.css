@@ -475,8 +475,22 @@ main {
     display: table-header-group;
   }
 
+  /* Every bordered "one row per year" box on paper - `.podium__card`/
+     `.timeline__card` (competition landing pages, /records), and the
+     player/team profile pages' own award-history boxes - needs the same
+     protection `.champions__item` already had: without it, a box that falls
+     across a printed page boundary gets its border and background cut in
+     half instead of moving whole onto the next page. Confirmed as a real,
+     live defect (not just a theoretical gap) by measuring every one of
+     these elements' offsetTop against the A4-landscape page height on
+     /records, /competitions/world-cup, /competitions/copa-america and
+     /teams/argentina - dozens of boxes straddled a page boundary on each. */
   tr,
-  .champions__item {
+  .champions__item,
+  .podium__card,
+  .timeline__card,
+  .player-profile__list li,
+  .team-profile__list li {
     break-inside: avoid;
   }
 
