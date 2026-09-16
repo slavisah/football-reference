@@ -23927,12 +23927,12 @@ calls. Full standing health check re-run clean after the fix: `pnpm lint`
 unit-testable `.ts` logic), `pnpm build` (711 pages, unchanged), and all
 eighteen `check:*` scripts clean (matching this run's own opening
 baseline). No content file or PDF-source `.astro` touched, so no PDF
-regeneration was needed. A full cold-start `pnpm test:e2e` (956+8 new =
-964 expected) was started from a clean state (no leftover `astro preview`
-daemon or Chromium processes - see the aside below) to confirm
-site-wide; its confirmed pass count and duration are recorded in a
-follow-up entry once it completes, the same two-commit pattern recent
-runs have used for a long-running cold-start confirmation.
+regeneration was needed. A full cold-start `pnpm test:e2e` was started
+from a clean state (no leftover `astro preview` daemon or Chromium
+processes - see the aside below) to confirm site-wide: **960/960 passed,
+13.4 minutes** (up from 956/956 by exactly the four net new tests added
+this run - six new, two renamed in place of the single-Escape tests they
+replaced).
 
 **Aside - environment note, not a code change:** this run's own first
 attempt at the cold-start suite had to be discarded and restarted clean
