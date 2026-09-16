@@ -23972,5 +23972,139 @@ search widgets were the higher-value target, being real keyboard-driven
 state machines rather than a single click handler) or to the home page's
 own hero/card interactions, still not covered by any run's manual pass.
 
+### Dependency patch bump (html-validate 11.15.0 -> 11.16.0) plus a manual walkthrough of the theme toggle finds and fixes a real bug: the mobile drawer's `flex-wrap` left the toggle stranded off-screen - closed 2026-09-16 (hundred-and-thirty-first intensive run)
+
+Backfilled summary (this entry was never written when the run itself
+closed - see `docs/ROADMAP.md`'s own matching backlog entry for the full
+account this condenses). Extended the manual-walkthrough method to the
+theme toggle (`ThemeToggle.astro`) and found that `.site-header--js
+.site-menu.is-open` (`Nav.astro`) switched the drawer to
+`flex-direction: column` without resetting the desktop row's own
+`flex-wrap: wrap` back to `nowrap`, so the drawer's stacked content wrapped
+into a phantom second column past the viewport's right edge once it
+exceeded the drawer's `max-height` - stranding the toggle (last in DOM
+order) almost entirely off-screen at 360px on every page checked. Fixed
+with one `flex-wrap: nowrap;` declaration. New regression coverage: one
+e2e test in `tests/e2e/accessibility-theme-toggle.spec.ts` asserting the
+toggle's bounding box matches the language switch's own x/width, verified
+against a revert first. Also fixed two narrower latent test bugs the same
+underlying flex-wrap defect had been masking (both e2e tests that opened
+the drawer and interacted with content below it without ever closing the
+drawer, only passing because the bug's phantom column made the drawer's
+rendered footprint shorter than its correct height). Full standing health
+check clean: `pnpm lint` (0/0/0), `pnpm test` (703/703), `pnpm build` (711
+pages), all eighteen `check:*` scripts. Two full cold-start `pnpm
+test:e2e` runs: the first caught a regression the fix itself exposed in an
+existing test (960 passed, 1 failed), the second confirmed clean after
+fixing it: **961/961 passed, 13.1 minutes**.
+
+### Dependency patch bump (cspell 10.3.2 -> 10.3.3) plus the hundred-and-thirty-first run's own suggested next step - extending the manual-walkthrough method to the desktop "More" overflow menu - finds and fixes a real bug: `#nav-more-menu` rendered up to 156px past the viewport's right edge at real, reachable desktop widths - closed 2026-09-16 (hundred-and-thirty-second intensive run)
+
+A standing health check first: `pnpm install --frozen-lockfile`, `pnpm
+outdated` found one in-range patch bump beyond the still-blocked
+`typescript` 7 entry - installed cleanly; full lint/unit/build and all
+eighteen `check:*` scripts clean (using the `PW_EXECUTABLE_PATH=/opt/pw-
+browsers/chromium-1194/chrome-linux/chrome` fallback this environment's
+Chromium needs for the three browser-driven checks), matching the
+hundred-and-thirty-first run's own baseline: 703/703 unit, 711 pages.
+
+Picked up that run's own closing suggestion and extended the
+manual-walkthrough method - rendering the real page and reading actual
+`getBoundingClientRect()` coordinates against the viewport, not just
+asserting on visibility/attributes - to the desktop "More" overflow menu
+(`#nav-more-toggle`/`#nav-more-menu`, `Nav.astro`), the one interactive
+control that run's own closing note had named as never manually walked.
+
+Found a genuine, previously-uncaught bug the same shape as the
+hundred-and-thirty-first run's own drawer flex-wrap one: `.nav-more-menu`
+was `position: absolute; inset-inline-start: 0`, left-aligned to the
+toggle button's own leading edge. That's fine when the toggle sits well
+clear of the viewport's right edge, but the toggle is the *last* visible
+item in the single-row desktop nav (`>=60rem`), so at the narrower end of
+that range it sits close enough to the right edge that the menu's own
+right side renders past the viewport. A width sweep (960-1400px in 5px
+steps, both languages, via a throwaway Playwright script rendering the
+live `astro preview` output) found the menu overflowing the right edge at
+965-1025px in English and a wider 1050-1145px band in Croatian (longer
+link labels shift the row's own fit further out) - up to 156px of
+overflow at the worst point. Since `body` has `overflow-x: hidden`
+(`global.css`), that overflow was clipped silently with no scrollbar: the
+menu's own rightmost links (every link, in the worst cases, since they
+all share one `x` position stacked in a column) were simply unreachable by
+a mouse/touch reader. Confirmed directly: at 1000px, a normal
+(non-forced) Playwright click on the last link threw before the fix;
+after the fix the same click lands on `/about/sources`.
+
+A static fix alone isn't enough, and this run tried the obvious one first
+before rejecting it: right-aligning the menu instead
+(`inset-inline-end: 0`) cuts the overflow instances roughly in half across
+the same sweep but doesn't eliminate them - it moves the bug to the left
+edge in a narrower band (960-1045px) where a separate, pre-existing edge
+case (the nav row can still wrap onto two lines right at the exact
+`60rem` breakpoint, a sub-pixel rounding gap between the CSS breakpoint
+and the real available width once a scrollbar is subtracted) strands the
+toggle alone at the row's own left edge instead of its usual rightmost
+position. Fixed properly with a measure-and-clamp in `initNavMore`'s
+`setOpen()`: on every open, read the menu's real
+`getBoundingClientRect()` against `document.documentElement.clientWidth`
+and set a `--nav-more-shift` custom property consumed by
+`transform: translateX(var(--nav-more-shift, 0px))` on the menu (CSS keeps
+`inset-inline-start: 0` as the base position); shifts left if the menu
+overflows right, right if it overflows left, zero otherwise. Physical
+`translateX`, not a logical property, since the measurement itself is
+always physical/LTR pixels and both site languages render left-to-right.
+Re-ran the same sweep after the fix: **zero overflow instances**, versus
+33 before the fix and 17 with the rejected right-align-only approach.
+
+New regression coverage: one e2e test in the existing `desktop nav "More"
+menu (>=60rem)` describe block (`tests/e2e/mobile.spec.ts`), opening the
+menu at a real 1000px width, asserting every link's
+`getBoundingClientRect()` stays within `[0, 1000]`, then actually clicking
+the previously-unreachable last link ("Sources") through to
+`/about/sources` to prove the clamp doesn't just move the hit target.
+Verified this test actually catches the bug by reverting the fix first -
+confirmed it fails with the right diagnostic
+(`expect(1022.625).toBeLessThanOrEqual(1000)`, matching the coordinate
+sweep's own finding) - then restored the fix and reconfirmed green. Also
+re-ran the full existing `tests/e2e/mobile.spec.ts` suite standalone
+(329/329, up from 328/328 by exactly the one new test) since the fix
+touches the same file those tests already cover end-to-end - clean, no
+regression.
+
+No content file touched, so no PDF regeneration was needed. Full standing
+health check clean after the change: `pnpm lint` (0/0/0), `pnpm test`
+(703/703, unchanged), `pnpm build` (711 pages, unchanged), all eighteen
+`check:*` scripts clean (re-run in full, including
+`check:reflow`/`check:text-zoom`/`check:print-width`). A full cold-start
+`pnpm test:e2e` (962 tests) was attempted but had to be abandoned this
+run: the sandbox's own CPU contention (load average over 10 on a 4-core
+box, self-inflicted in part by running other health-check scripts
+concurrently) caused a false failure on an unrelated Croatian
+compare-players accessibility test (confirmed a flake, not a regression -
+it passed cleanly re-run in isolation) and then a stalled run that had to
+be killed. Substituted the full standalone `tests/e2e/mobile.spec.ts` file
+(329 tests - every header/drawer/focus-trap/nav-more/compare-panel test
+the site has, i.e. everything that actually exercises `Nav.astro`) once
+load had settled: clean, **329/329 passed, 1.8 minutes**. A future run
+should still get a full cold-start `pnpm test:e2e` confirmation once the
+environment isn't under the same contention.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision, the Nations League Team of the Tournament sourcing
+question), the Nations League 2023 attendance conflict, 2021/2025's
+still-unconfirmed figures, World Cup 1930/1950's/EURO 1996/2020's excluded
+attendance figures, and the hundred-and-twenty-sixth run's still-open
+hyphenation-rendering visual re-check. Also new this run: a full
+cold-start `pnpm test:e2e` confirmation once the sandbox isn't under heavy
+CPU contention, and the pre-existing "nav row wraps onto two lines right
+at the exact `60rem` breakpoint" edge case noted above - harmless now that
+the dropdown clamp handles it, but never itself the target of a fix. The
+manual-walkthrough method has now found a real, user-facing bug in seven
+consecutive runs - a future pass could extend it next to the "More"
+menu's own focus behavior (where does focus land after a keyboard `Enter`
+versus a mouse click, at each clamp direction) or the home page's own
+hero/card interactions, still not covered by any run's manual pass.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
