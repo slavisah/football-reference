@@ -4372,12 +4372,19 @@ test.describe('header menu on a 360px phone', () => {
   });
 
   test('a click outside closes the drawer', async ({ page }) => {
+    // The drawer's own `max-height` is `100dvh` minus the header, so at this
+    // suite's standard 740px phone height its full stacked content (nav
+    // list + both search fields + lang switch + theme toggle) needs nearly
+    // the whole viewport, leaving no real page content clear below it to
+    // click - taller here only so there is room to click "outside" at all;
+    // the drawer's own layout is otherwise unaffected by viewport height.
+    await page.setViewportSize({ width: 360, height: 1200 });
     await page.locator('#menu-toggle').click();
     await expect(page.locator('#site-menu')).toBeVisible();
 
-    // Just below the open drawer, which covers most of this 740px screen.
+    // Just below the open drawer.
     const box = (await page.locator('#site-menu').boundingBox())!;
-    expect(box.y + box.height + 12).toBeLessThan(740);
+    expect(box.y + box.height + 12).toBeLessThan(1200);
     await page.mouse.click(180, box.y + box.height + 12);
     await expect(page.locator('#site-menu')).toBeHidden();
   });

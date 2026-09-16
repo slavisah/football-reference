@@ -76,6 +76,47 @@ test.describe('theme toggle, English home page', () => {
     await runAxe(page);
   });
 
+  // Regression test for a real bug: `.site-menu.is-open` (the mobile drawer)
+  // switches to `flex-direction: column` but, until fixed, kept inheriting
+  // `.site-menu`'s own row-layout `flex-wrap: wrap` - so once the drawer's
+  // stacked content (nav list + both search fields + lang switch + theme
+  // toggle) grew taller than the drawer's own `max-height`, the column
+  // wrapped into a second column pushed off past the viewport's right edge
+  // instead of just overflowing vertically for `overflow-y: auto` to scroll.
+  // The theme toggle, last in DOM order, landed almost entirely outside the
+  // 360px viewport - invisible to a real touch/mouse user, even though every
+  // other test in this file kept passing: `.click()` and attribute
+  // assertions don't check whether an element is visually within its
+  // scrollable container's own bounds, and `document.documentElement`'s own
+  // scrollWidth never grew, because the drawer's own contained overflow-x
+  // (computed 'auto' per spec, since only overflow-y was set) never
+  // propagates to the document root - the exact blind spot
+  // `check:reflow`/"the open drawer adds no horizontal overflow" (both of
+  // which only ever measure document-level overflow) share.
+  test('the theme toggle stays inside the drawer, not wrapped into an off-screen column', async ({
+    page,
+  }) => {
+    await page.goto('');
+    await openMenu(page);
+
+    const menuBox = (await page.locator('#site-menu').boundingBox())!;
+    // The language switch is the drawer's previous item in DOM order, inset
+    // by the same padding as the toggle - the right basis for "same column,
+    // full-width" rather than the padded `#site-menu` box itself.
+    const langSwitchBox = (await page.locator('.lang-switch').boundingBox())!;
+    const toggleBox = (await page.locator('#theme-toggle').boundingBox())!;
+
+    // Same column, same width as its sibling controls - not sized down to
+    // its own content and shunted into a second column.
+    expect(toggleBox.x).toBeCloseTo(langSwitchBox.x, 0);
+    expect(toggleBox.width).toBeCloseTo(langSwitchBox.width, 0);
+    expect(toggleBox.x + toggleBox.width).toBeLessThanOrEqual(menuBox.x + menuBox.width + 1);
+
+    // Stacked after the language switch (the previous item in DOM order),
+    // not floated back up to the top of a phantom next column.
+    expect(toggleBox.y).toBeGreaterThan(langSwitchBox.y);
+  });
+
   test('is keyboard-operable and the saved choice survives a reload', async ({ page }) => {
     await page.goto('');
 
@@ -147,6 +188,14 @@ test.describe('theme toggle, quiz page', () => {
     await openMenu(page);
     await page.locator('#theme-toggle').click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+
+    // Close the drawer before touching the quiz cards below it - now that it
+    // correctly stacks every control in one column (see the fixed
+    // `flex-wrap` bug this file's "stays inside the drawer" test guards),
+    // its own scrollable height legitimately spans nearly the full viewport
+    // at this screen size, covering the first couple of cards otherwise.
+    await page.locator('#menu-toggle').click();
+    await expect(page.locator('#site-menu')).toBeHidden();
 
     // Answer the first two choice cards - one right, one deliberately wrong -
     // so both feedback classes render under the toggle-driven dark palette,

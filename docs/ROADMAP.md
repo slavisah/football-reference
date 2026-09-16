@@ -5417,3 +5417,116 @@ back clean:
   keyboard-interaction state machines, unlike the toggle's single click
   handler) or to the home page's own hero/card interactions, still not
   covered by any run's manual pass.
+- **Dependency patch bump (html-validate 11.15.0 -> 11.16.0) plus a manual
+  walkthrough of the theme toggle finds and fixes a real bug: the mobile
+  drawer's `flex-wrap` left the toggle stranded off-screen**: closed
+  2026-09-16 (hundred-and-thirty-first intensive run) - a standing health
+  check first (`pnpm install --frozen-lockfile`, `pnpm outdated` found one
+  in-range minor bump beyond the still-blocked `typescript` 7 entry -
+  installed cleanly; full lint/unit/build and all eighteen `check:*` scripts
+  clean, matching the hundred-and-thirtieth run's own baseline: 703/703 unit,
+  711 pages). Picked up that run's own closing suggestion and extended the
+  manual-walkthrough method to the theme toggle (`ThemeToggle.astro`), the
+  one interactive control the search-widget run had explicitly deferred.
+
+  Found a genuine, previously-uncaught layout bug by rendering the open
+  mobile drawer with Playwright and reading the *actual* computed
+  `getBoundingClientRect()` of every drawer child, not just asserting on
+  `.click()`/attribute outcomes the way every existing test does: `.site-menu`
+  (`Nav.astro`) sets `flex-wrap: wrap` for its desktop single-row layout, and
+  `.site-header--js .site-menu.is-open` (the mobile drawer override) switches
+  to `flex-direction: column` but never reset that inherited `flex-wrap` back
+  to `nowrap`. On every real page, the drawer's stacked content (the nav
+  list, both search fields, the language switch, and the theme toggle) is
+  taller than the drawer's own `max-height` - so instead of the intended
+  single scrollable column (`overflow-y: auto` already handles that), the
+  column *wrapped* into a second column once it hit `max-height`, and that
+  second column was positioned starting at the *first* column's own top,
+  offset to the right by the container's width - landing almost entirely
+  past the 360px viewport's right edge. The theme toggle, last in DOM order,
+  was the one control that fell into this phantom second column: at 360px on
+  every page checked (home, `/hr/`, `/competitions/world-cup`, `/records`,
+  `/quiz`), only about 3px of its 80px width remained inside the viewport -
+  to a real touch/mouse reader it was simply gone from the drawer, not a
+  subtle contrast or spacing issue.
+
+  This is exactly the blind spot the "open drawer adds no horizontal
+  overflow" test (`tests/e2e/mobile.spec.ts`) and `check:reflow` both share:
+  both measure `document.documentElement`'s own `scrollWidth`, but the
+  drawer's contained overflow-x computes to `auto` (per the CSS overflow
+  spec's own "one axis auto forces the other to auto too" rule, since only
+  `overflow-y` was set) rather than `visible`, so it never propagates to the
+  document root - confirmed directly by re-checking that exact metric against
+  the unfixed CSS (`0`) while the toggle's own bounding box already sat at
+  `x: 357.6, width: 80.7` in a 360px viewport. Every existing theme-toggle
+  test (`tests/e2e/accessibility-theme-toggle.spec.ts`) kept passing
+  regardless, for the same reason: Playwright's `.click()` and attribute
+  assertions don't check whether an element is visually within its
+  scrollable ancestor's own rendered bounds, only that it isn't
+  `display:none`/`visibility:hidden`/zero-sized.
+
+  Fixed with one added `flex-wrap: nowrap;` declaration on
+  `.site-header--js .site-menu.is-open` (`src/components/Nav.astro`),
+  restoring the single-column intent the surrounding `flex-direction: column`
+  and `overflow-y: auto` already implied. Verified live before/after with a
+  small Playwright script measuring every drawer child's real
+  `getBoundingClientRect()` at 360px/1280px x light/dark x English/Croatian:
+  after the fix the toggle sits in the same column as its siblings, full
+  drawer width, stacked directly after the language switch, scrollable into
+  view - confirmed both by coordinates and a rendered screenshot.
+
+  New regression coverage: one e2e test
+  (`tests/e2e/accessibility-theme-toggle.spec.ts`, "stays inside the drawer,
+  not wrapped into an off-screen column") asserting the toggle's bounding box
+  matches the language switch's own x/width and sits below it - verified this
+  test actually catches the bug by reverting the CSS fix, confirming the new
+  test fails with the right diagnostic (`x: 357.6` instead of `14.4`), then
+  restoring the fix and reconfirming green.
+
+  Fixing the bug also exposed two narrower latent issues, both fixed in the
+  same pass, both the same shape: an existing test that opened the drawer and
+  then interacted with page content below it without ever closing the
+  drawer, passing only because the *bug* made the drawer's rendered footprint
+  shorter than it should have been. `tests/e2e/accessibility-theme-toggle.spec.ts`'s
+  quiz-page test (clicks two quiz cards after toggling the theme) was fixed
+  by closing the drawer (a second `#menu-toggle` click) first - what a real
+  reader would do anyway. `tests/e2e/mobile.spec.ts`'s "a click outside
+  closes the drawer" test picked a click point 12px below the drawer's own
+  measured bottom edge and asserted that point still fit inside the suite's
+  standard 740px-tall viewport - true only because the bug's phantom second
+  column made the drawer's single visible column shorter (630px) than its
+  fixed, correct height (679px, leaving only 1px of the 740px viewport
+  clear). Fixed by giving that one test a taller 1200px-high viewport before
+  opening the drawer, so there is genuine room below it to click - the
+  drawer's own layout is otherwise unaffected by viewport height, only by
+  content.
+
+  No content file touched, so no PDF regeneration was needed. Full standing
+  health check clean after the change: `pnpm lint` (0/0/0), `pnpm test`
+  (703/703, unchanged - a CSS/test-only fix has no unit-testable logic),
+  `pnpm build` (711 pages, unchanged), all eighteen `check:*` scripts clean
+  (re-run in full, including `check:reflow`/`check:text-zoom`/
+  `check:print-width`, none of which are sensitive to this defect class -
+  confirmed, not assumed, since they measure document-level overflow only, as
+  this entry's own root-cause section explains). Two full cold-start `pnpm
+  test:e2e` runs this pass: the first caught the "click outside" regression
+  above (960 passed, 1 failed); after fixing it, a second full cold-start run
+  confirmed the whole suite clean: **961/961 passed, 13.1 minutes** (up from
+  the hundred-and-thirtieth run's own 960/960 by exactly the one new
+  regression test added here).
+
+  **Left for a future pass:** the same environment-blocked items as ever
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+  brand-suffix decision, the Nations League Team of the Tournament sourcing
+  question - confirmed exhausted, do not re-attempt the same queries), the
+  Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+  figures, World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+  figures, and the hundred-and-twenty-sixth run's still-open
+  hyphenation-rendering visual re-check. The manual-walkthrough method has
+  now found a real bug in six consecutive runs by reading actual rendered
+  layout/coordinates, not just interaction outcomes - a future pass could
+  extend that specific "read real `getBoundingClientRect()` coordinates
+  inside a scrollable/overlaid container" technique to the "More" overflow
+  menu (`#nav-more-menu`, desktop-only, never manually walked) or the home
+  page's own hero/card interactions, still not covered by any run's manual
+  pass.
