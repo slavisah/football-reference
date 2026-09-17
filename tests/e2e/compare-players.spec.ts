@@ -148,6 +148,16 @@ test.describe('Compare Players page', () => {
     expect(response.ok()).toBe(true);
     expect(response.headers()['content-type']).toContain('pdf');
   });
+
+  // The picker's new <noscript> disclosure (see tests/e2e/no-js-compare.spec.ts
+  // for the no-JS bug it documents) must never actually render once
+  // JavaScript is available.
+  test('the no-JavaScript picker note never renders with JavaScript enabled', async ({ page }) => {
+    await page.goto('compare-players');
+    await expect(page.locator('noscript')).not.toBeVisible();
+    const bodyText = await page.evaluate(() => document.body.innerText);
+    expect(bodyText).not.toContain('needs JavaScript to work');
+  });
 });
 
 test.describe('Croatian Compare Players page (/hr/compare-players)', () => {
@@ -257,6 +267,16 @@ test.describe('Croatian Compare Players page (/hr/compare-players)', () => {
     const response = await request.get(new URL(href!, page.url()).toString());
     expect(response.ok()).toBe(true);
     expect(response.headers()['content-type']).toContain('pdf');
+  });
+
+  // Same regression as the English compare-players page's own matching test
+  // above - see tests/e2e/no-js-compare.spec.ts for the no-JS bug this note
+  // fixes.
+  test('the no-JavaScript picker note never renders with JavaScript enabled', async ({ page }) => {
+    await page.goto('hr/compare-players');
+    await expect(page.locator('noscript')).not.toBeVisible();
+    const bodyText = await page.evaluate(() => document.body.innerText);
+    expect(bodyText).not.toContain('potreban je JavaScript');
   });
 });
 

@@ -151,6 +151,12 @@ const jsonLd: JsonLdObject[] = [
         </div>
       </div>
 
+      <noscript>
+        <p class="muted">
+          {`This picker needs JavaScript to work. Without it, the comparison below is always ${defaultA.displayName} vs ${defaultB.displayName} - selecting different teams above, or following a link for a different pair, has no effect.`}
+        </p>
+      </noscript>
+
       <p
         id="compare-status"
         class="visually-hidden"

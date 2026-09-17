@@ -2524,6 +2524,17 @@ test.describe('Compare page on a 360px phone', () => {
     expect(await rows.count()).toBeGreaterThan(10);
   });
 
+  // The picker's new <noscript> disclosure (see tests/e2e/no-js-compare.spec.ts
+  // for the no-JS bug it documents) must never actually render once
+  // JavaScript is available - <noscript> content ships as raw text in the
+  // page's HTML, so a real regression here would be the tag itself somehow
+  // becoming visible/read out with JS on, not just the string appearing.
+  test('the no-JavaScript picker note never renders with JavaScript enabled', async ({ page }) => {
+    await expect(page.locator('noscript')).not.toBeVisible();
+    const bodyText = await page.evaluate(() => document.body.innerText);
+    expect(bodyText).not.toContain('needs JavaScript to work');
+  });
+
   test('the Team A/B <select> boxes are wide enough not to clip the longest team name', async ({
     page,
   }) => {
@@ -2622,6 +2633,14 @@ test.describe('Croatian compare page (/hr/compare) on a 360px phone', () => {
       return el.scrollWidth - el.clientWidth;
     });
     expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  // Same regression as the English compare page's own matching test above -
+  // see tests/e2e/no-js-compare.spec.ts for the no-JS bug this note fixes.
+  test('the no-JavaScript picker note never renders with JavaScript enabled', async ({ page }) => {
+    await expect(page.locator('noscript')).not.toBeVisible();
+    const bodyText = await page.evaluate(() => document.body.innerText);
+    expect(bodyText).not.toContain('potreban je JavaScript');
   });
 
   test('the Team A/B <select> boxes are wide enough not to clip the longest team name', async ({

@@ -24527,5 +24527,129 @@ method after the next real content or layout change (the highest-value
 time to catch a regression), a fresh dependency-upgrade attempt, or a
 genuinely different quality angle not yet tried on this site.
 
+### First no-JavaScript audit of any kind finds and fixes a real, silent bug on `/compare` and `/compare-players`: a shared comparison link's `?a=&b=` pair was discarded with no indication anything was wrong - closed 2026-09-17 (hundred-and-thirty-seventh intensive run)
+
+A standing health check first (`pnpm install --frozen-lockfile`; `pnpm
+outdated` still only the blocked `typescript` 7 entry, `@astrojs/check`
+still only declaring `typescript: '^5.0.0 || ^6.0.0'`, re-confirmed; full
+`pnpm lint`/`test` (703/703)/`build` (711 pages) and all eighteen `check:*`
+scripts clean, matching the hundred-and-thirty-sixth run's own baseline
+exactly). With the original backlog long complete and the manual-
+walkthrough/coordinate-sweep/drag-interaction/keyboard-focus angles all
+already swept at least once, this run picked up the hundred-and-
+thirty-sixth run's own closing suggestion for "a genuinely different
+quality angle not yet tried": every existing `tests/e2e/` spec, and every
+prior manual walkthrough, drives the site with JavaScript enabled - the
+Playwright default - so nothing had ever looked at what a reader without
+JavaScript actually sees, despite the site's own `Nav.astro` deliberately
+supporting a no-JS reader (its top comment: "a no-JS reader still gets the
+old always-visible header rather than an inert button and no navigation at
+all").
+
+Rendered ~12 real pages across both languages and two viewports with a
+Playwright browser context created with `javaScriptEnabled: false`
+(`/opt/pw-browsers/chromium`) and compared against the same pages with
+JavaScript on. The header/nav itself held up well - already progressively
+enhanced on purpose, confirmed clean: the drawer ships expanded and the
+"More" menu's secondary links stay inline in the flat list rather than
+being collapsed into a dropdown, so no link is ever hidden without
+JavaScript, and there was no layout overflow at either 360px or 1280px on
+any page checked.
+
+Found a real, previously-unnoticed bug in `/compare` and
+`/compare-players` (both languages, four route files) instead: both pages
+support a shareable `?a=<id>&b=<id>` link - the nav's own "Find a
+team"/"Find a player" widgets send readers there, and the picker's own
+`writeParams()` keeps the URL in sync specifically so a reader can
+copy/paste a link to a specific comparison. But reading those params back
+out and filling the panel (`readParams()`/`render()` in each page's own
+inline `<script>`) is 100% client-side - this is a fully static site (`pnpm
+build` output, no server), so there is no request-time code that could read
+a visitor's query string even in principle. Confirmed with a real browser:
+`GET /compare?a=brazil&b=germany` with JavaScript disabled always rendered
+Argentina vs Uruguay (the hardcoded default pair, the two most-titled
+teams) with the `<select>` boxes silently reset to match - not an error,
+not a broken widget, just a different, unrelated comparison shown with
+nothing on the page indicating the link's own intent was ignored. The
+`<select>` pickers themselves are equally inert without JavaScript (no
+`<form>`, no submit control, `change` listeners only) - expected and
+unavoidable for a two-team live-diff panel on a host with no server, the
+same category of JavaScript-required interactivity the Family Quiz already
+has, not itself something to "fix". The shared-link case is different in
+kind: a reader who follows a specific link reasonably expects the page to
+either honour it or say plainly that it can't, not silently substitute
+something else.
+
+Since a static site genuinely cannot read the request's query string
+without JavaScript, there's no server-side fix available - the fix is
+disclosure. Added a `<noscript>` note directly under the picker in all four
+files (`compare.astro`, `hr/compare.astro`, `compare-players.astro`,
+`hr/compare-players.astro`, this panel's CSS/behaviour already
+hand-duplicated per this file's own earlier notes on it) naming the exact
+default pair actually shown and stating plainly that neither the picker
+above nor a link's own `a`/`b` params can change it without JavaScript
+enabled - reusing the existing `.muted` class rather than adding new CSS.
+Verified with real no-JS/JS-on browser contexts before and after: the note
+is invisible in the rendered page and absent from `document.body.innerText`
+once JavaScript is available (browsers never render `<noscript>` children
+in that case), and present with the correct wording (English and
+hand-translated Croatian, matching this panel's existing "no shared i18n
+system, hand-duplicated by file" convention) when it isn't.
+
+New regression coverage in a new file, `tests/e2e/no-js-compare.spec.ts`
+(the site's first `javaScriptEnabled: false` coverage of any kind) - four
+tests, one per touched page, each requesting a specific `?a=&b=` pair and
+asserting the panel still shows the unrelated default pair plus the
+disclosure text. Building these surfaced two real, environment-specific
+Playwright/Chromium quirks worth recording so a future run doesn't
+re-diagnose them from scratch: (1) this bundled Chromium's `<noscript>`
+element reads back an empty string from its own DOM `.textContent()` under
+`javaScriptEnabled: false`, even though the exact same content is present
+in the response HTML and, per a full accessibility-tree snapshot taken
+while debugging this, is genuinely rendered - worked around by asserting
+against `page.content()` (the raw response body) instead of the element's
+own DOM property; (2) declaring `test.use({ javaScriptEnabled: false })`
+anywhere in a spec file was found to also affect any `browser.newContext()`
+created later in tests in that *same file*, not just the built-in `page`
+fixture it's documented to configure - so the "this note must stay
+invisible with JavaScript on" regression lives instead in four small
+additions to the site's existing JavaScript-enabled suites
+(`tests/e2e/mobile.spec.ts`'s English/Croatian `Compare page` describe
+blocks, `tests/e2e/compare-players.spec.ts`'s English/Croatian ones),
+guaranteed to never share a file (and therefore never share this leak)
+with the no-JS tests. A full cold-start `pnpm test:e2e` confirmed no
+regression sitewide and the new coverage passing cleanly: **979/979
+passed, 21.6 minutes** (up from 967/967 by exactly the eight new tests -
+four in `no-js-compare.spec.ts`, four split across the two existing
+suites). All 700 PDFs regenerated (`pnpm build:pdfs`) and reverified fresh
+(`check:pdfs`), since the four touched `.astro` files each feed a PDF -
+the `<noscript>` note itself is invisible in a PDF too (PDF generation
+renders with JavaScript enabled), so this was a freshness-manifest
+formality, not a visible PDF change. Full standing health check re-run
+clean after the change: `pnpm lint` (0/0/0), `pnpm test` (703/703,
+unchanged - presentation-layer content, no new unit-testable logic),
+`pnpm build` (711 pages, unchanged - no new route), `check:html` (711/711
+valid), `check:perf` (heaviest page `hr/records` at 613.1 KB, within the
+640 KB budget), `check:pdfs` (700/700 fresh).
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision, the Nations League Team of the Tournament sourcing
+question - confirmed exhausted, do not re-attempt the same queries), the
+Nations League 2023 attendance conflict (a documented disagreement, not an
+unconfirmed figure), 2021/2025's still-unconfirmed Nations League figures,
+World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+re-check. This run's no-JS angle covered only `/compare` and
+`/compare-players`, the two pages with a shareable-link picker - a future
+pass could extend it to the Family Quiz's own answered/reveal states
+(expected to be fully inert without JavaScript, but never actually
+confirmed, and worth checking whether it at least fails visibly rather than
+silently) or the team/player search comboboxes (expected to degrade to a
+plain, inert text input - also never confirmed). The two Playwright/
+Chromium quirks this run documented (the `<noscript>` `textContent()` gap
+and the same-file `javaScriptEnabled: false` context leak) are worth
+keeping in mind for any future no-JS test in this suite.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
