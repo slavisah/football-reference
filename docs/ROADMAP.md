@@ -5942,3 +5942,36 @@ back clean:
   content or layout change (the highest-value time to catch a regression),
   a fresh dependency-upgrade attempt, or a genuinely different quality angle
   not yet tried on this site.
+- **First no-JavaScript audit finds and fixes a real, silent bug on
+  `/compare`/`/compare-players`**: closed 2026-09-17 (hundred-and-
+  thirty-seventh intensive run) - a standing health check first (same clean
+  baseline as the hundred-and-thirty-sixth run: 703/703 unit, 711 pages, all
+  eighteen `check:*` scripts). Picked up the "genuinely different quality
+  angle not yet tried" suggestion: every prior manual walkthrough and every
+  `tests/e2e/` spec drives the site with JavaScript enabled, so nothing had
+  ever checked what a no-JS reader sees. The nav/drawer held up well
+  (already deliberately progressive-enhancement-safe), but `/compare` and
+  `/compare-players` (both languages) didn't: their shareable `?a=&b=` link
+  is read entirely client-side, so a static build has no way to honour it
+  without JavaScript - a no-JS reader following a specific shared link
+  silently saw an unrelated default pair with no indication anything was
+  off. Fixed with a `<noscript>` disclosure naming the actual pair shown, in
+  all four route files. New coverage: `tests/e2e/no-js-compare.spec.ts`
+  (first `javaScriptEnabled: false` tests on this site) plus four
+  JavaScript-enabled regression tests split across `mobile.spec.ts`/
+  `compare-players.spec.ts` confirming the note stays invisible with JS on -
+  split that way after finding a same-file `javaScriptEnabled: false` leak
+  into manually-created browser contexts, one of two environment-specific
+  Playwright/Chromium quirks this run documented for future reference (see
+  `docs/PROJECT_STATUS.md`'s matching entry for both). All 700 PDFs
+  regenerated and reverified fresh. A full cold-start `pnpm test:e2e`
+  confirmed no regression sitewide: **979/979 passed, 21.6 minutes** (up
+  from 967/967 by exactly the eight new tests). **Left for a future pass:**
+  the same environment-blocked items as ever, the Nations League 2023
+  attendance conflict, 2021/2025's still-unconfirmed figures, World Cup
+  1930/1950's/EURO 1996/2020's excluded attendance figures, the
+  hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+  re-check, and - new this run - extending the no-JS angle to the Family
+  Quiz's answered/reveal states and the team/player search comboboxes
+  (both expected to degrade inertly without JavaScript, but never actually
+  confirmed).
