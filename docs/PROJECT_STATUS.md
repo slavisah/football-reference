@@ -24507,10 +24507,10 @@ negative result, no bug found. Added permanent regression coverage anyway
 the risk this sweep was checking for is specifically what a future
 refactor to `pointerdown`/`touchstart` handlers would reintroduce, and
 that's exactly the kind of regression a manual walkthrough won't be
-repeated for automatically. `pnpm test:e2e` confirmed green with the new
-file both in isolation and as part of a full cold-start run alongside the
-rest of the suite. No content or component file changed, so no PDF
-regeneration was needed - `check:pdfs` reverified clean.
+repeated for automatically. A full cold-start `pnpm test:e2e` confirmed no
+regression sitewide: **967/967 passed, 12.4 minutes** (up from 963/963 by
+exactly the four new tests). No content or component file changed, so no
+PDF regeneration was needed - `check:pdfs` reverified clean.
 
 **Left for a future pass:** the same environment-blocked items as ever
 (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`

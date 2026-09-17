@@ -5920,7 +5920,9 @@ back clean:
   that swaps any of these listeners for `pointerdown`/`touchstart` (which
   *would* reintroduce exactly this class of bug) gets caught immediately
   rather than relying on the invariant staying institutional knowledge.
-  `pnpm test:e2e` now at 951/951 (was 947). No content or component
+  A full cold-start `pnpm test:e2e` confirmed no regression sitewide:
+  **967/967 passed, 12.4 minutes** (up from 963/963 by exactly the four new
+  tests). No content or component
   change, so no PDF regeneration needed; `check:pdfs` reverified clean
   anyway per the hundred-and-fourth run's "check the rendered page, not
   just whether a content file changed" standing correction (this run
