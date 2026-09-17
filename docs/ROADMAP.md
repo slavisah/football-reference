@@ -5975,3 +5975,40 @@ back clean:
   Quiz's answered/reveal states and the team/player search comboboxes
   (both expected to degrade inertly without JavaScript, but never actually
   confirmed).
+- **No-JS audit of the Family Quiz and nav search comboboxes finds and
+  fixes a real bug**: closed 2026-09-17 (hundred-and-thirty-eighth
+  intensive run) - a standing health check first (all clean, matching the
+  hundred-and-thirty-seventh run's baseline: 703/703 unit, 711 pages, all
+  eighteen `check:*` scripts). Extended the no-JS angle to the two items
+  that run's own closing note flagged. The search comboboxes
+  (`#team-search-input`/`#player-search-input` in `Nav.astro`) were already
+  safe - plain `<input>`s with no wrapping `<form>`, entirely `fetch()`-driven,
+  so without JavaScript they're inert rather than misleading. The quiz page
+  was not: `quiz.astro`/`hr/quiz.astro`'s `.quiz__score { display: flex }`
+  rule overrode `[hidden]`'s `display: none` (author beats UA stylesheet at
+  equal specificity - the exact pitfall `Nav.astro` and
+  `TournamentTable.astro` already guard against three times over), so every
+  no-JS reader of `/quiz`/`/hr/quiz` saw a sticky "Score: 0 / 47" bar with a
+  dead "Restart quiz" button on first load. Fixed with a
+  `.quiz__score[hidden] { display: none; }` override in both files, the
+  same pattern already used elsewhere. New coverage:
+  `tests/e2e/no-js-quiz-and-search.spec.ts` (6 tests). No content file
+  touched, so `pnpm test` stays at 703/703; `check:pdfs` reverified clean
+  (a no-op - `.quiz__score` is already `no-print` and PDFs render with JS
+  on). Full standing health check clean, plus a full cold-start
+  `pnpm test:e2e` confirming no regression sitewide. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
+  future pass:** the same environment-blocked items as ever (`typescript`
+  7, `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix
+  decision, the Nations League Team of the Tournament sourcing question -
+  confirmed exhausted), the Nations League 2023 attendance conflict,
+  2021/2025's still-unconfirmed Nations League figures, World Cup
+  1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+  hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+  re-check. With both items from the hundred-and-thirty-seventh run's own
+  closing note now checked, the no-JS angle has covered every page with a
+  script-only interactive element or a client-side-only shareable-link
+  picker - a future pass's best bet is a fresh dependency-upgrade attempt,
+  re-running the coordinate/keyboard-walkthrough method after the next real
+  content or layout change, or a genuinely different quality angle not yet
+  tried on this site.

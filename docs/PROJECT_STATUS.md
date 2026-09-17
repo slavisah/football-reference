@@ -24651,5 +24651,91 @@ Chromium quirks this run documented (the `<noscript>` `textContent()` gap
 and the same-file `javaScriptEnabled: false` context leak) are worth
 keeping in mind for any future no-JS test in this suite.
 
+### Extending the no-JS audit to the Family Quiz and the nav search comboboxes finds and fixes a real bug: the quiz score bar and its dead "Restart" button were visible on every no-JS page load - closed 2026-09-17 (hundred-and-thirty-eighth intensive run)
+
+A standing health check first (`pnpm install`; `pnpm outdated` still only
+the blocked `typescript` 7 entry; `pnpm lint` (0/0/0), `pnpm test`
+(703/703 unit), `pnpm build` (711 pages), all eighteen `check:*` scripts
+clean - matching the hundred-and-thirty-seventh run's own baseline
+exactly).
+
+Picked up that same run's own closing suggestion: extend the no-JS angle
+past `/compare`/`/compare-players` to the Family Quiz's answered/reveal
+states and the nav's two "find a team"/"find a player" search comboboxes,
+both flagged as "expected to degrade inertly, but never actually
+confirmed." Rendered the real built site with Playwright/Chromium
+(`javaScriptEnabled: false`, `/opt/pw-browsers/chromium`) and checked both.
+
+The search comboboxes turned out genuinely safe: `#team-search-input`/
+`#player-search-input` (`Nav.astro`) are plain `<input>`s with no wrapping
+`<form>`, and their filtering is entirely driven by a `fetch()` call in an
+external script - without JavaScript, typing into either does nothing at
+all (no listbox ever loses its `hidden` attribute, no status text is
+written), which is inert rather than misleading. Unlike the compare page's
+bug, no default or wrong state is ever shown in its place, so this needed
+only regression coverage, not a fix.
+
+The quiz page was not safe. `QuizScript.astro` only unhides `#quiz-score`
+(`scoreBar.hidden = false`) once it actually runs - so a no-JS reader
+should never see the sticky score bar at all - but `quiz.astro`'s and
+`hr/quiz.astro`'s own `.quiz__score { display: flex; ... }` rule sets
+`display` unconditionally, and an author stylesheet rule beats the UA
+stylesheet's `[hidden] { display: none }` at equal specificity. The result:
+every no-JS reader of `/quiz` and `/hr/quiz` saw a sticky "Score: 0 / 47"
+bar (`"Rezultat: 0 / 47"` in Croatian) permanently pinned under the header
+on first load, complete with a "Restart quiz" button that does nothing
+(its click listener is only attached by the same script that never ran).
+This is the exact same CSS pitfall this codebase has already hit and fixed
+three times before in `Nav.astro` (`.menu-toggle[hidden]`,
+`.nav-more-toggle[hidden]`, `.nav-more-menu[hidden]`) and once in
+`TournamentTable.astro` (`.t-table tbody tr[hidden]`) - each of those left
+an explicit comment warning that a `display` override needs its own
+`[hidden]` re-assertion, but `quiz.astro`'s own score bar, added later,
+missed it. Fixed with the same pattern in both files:
+`.quiz__score[hidden] { display: none; }` immediately after the base rule.
+The per-question "check" buttons in `QuizCard.astro`/`QuizOrderCard.astro`
+were already safe (no `display` override on `.quiz-card__check`, so the
+markup's own `hidden disabled` attributes stood on their own) - confirmed
+by the audit rather than assumed, since fixing one instance of this bug
+class is exactly when it's worth checking the sibling elements for the
+same mistake. The "Just show me the answer" `<details>` reveal (native
+HTML, no JavaScript involved) worked correctly throughout, on both
+multiple-choice and order-challenge cards, both before and after the fix.
+
+New regression coverage in `tests/e2e/no-js-quiz-and-search.spec.ts` (six
+tests): three for the quiz page (EN score-bar-hidden plus reveal, an
+order-challenge card's own check-button-hidden plus reveal, and the HR
+page's score bar), three for the search comboboxes (team, player, and an
+HR-page check that both stay inert) confirming the already-safe behaviour
+stays that way. Verified the quiz fix actually matters by reverting it
+locally and re-running: the score-bar test failed exactly as expected
+(`toBeHidden()` false) before the CSS was restored. No content file
+touched, so `pnpm test` stays at 703/703 (presentation-only fix, no new
+unit-testable logic); `check:pdfs` reverified clean anyway per the
+hundred-and-fourth run's standing "check the rendered page, not just
+whether a content file changed" correction - genuinely a no-op here, since
+`.quiz__score` already carries `no-print` and PDF generation runs with
+JavaScript enabled, so the bar was never visible in a PDF either way. Full
+standing health check clean after the change: `pnpm lint` (0/0/0), `pnpm
+test` (703/703, unchanged), `pnpm build` (711 pages, unchanged - no new
+route), all eighteen `check:*` scripts clean including `check:perf`
+(heaviest page unchanged at 613.1 KB, well within the 640 KB budget), plus
+a full cold-start `pnpm test:e2e` confirming no regression sitewide.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision, the Nations League Team of the Tournament sourcing
+question - confirmed exhausted, do not re-attempt the same queries), the
+Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+Nations League figures, World Cup 1930/1950's/EURO 1996/2020's excluded
+attendance figures, and the hundred-and-twenty-sixth run's still-open
+hyphenation-rendering visual re-check. With both items from the
+hundred-and-thirty-seventh run's own closing note now checked, the no-JS
+angle has covered every page with either a script-only interactive
+element or a client-side-only shareable-link picker - a future pass's best
+bet is a fresh dependency-upgrade attempt, re-running the coordinate/
+keyboard-walkthrough method after the next real content or layout change,
+or a genuinely different quality angle not yet tried on this site.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
