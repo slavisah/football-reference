@@ -24806,7 +24806,10 @@ output is byte-identical, 711 pages). Full standing health check re-run
 clean after the addition: `pnpm lint` (0/0/0), `pnpm test` (711/711, up
 from 703/703 by exactly the 8 new tests), `pnpm build` (711 pages,
 unchanged), all eighteen `check:*` scripts clean, plus a full cold-start
-`pnpm test:e2e` confirming no regression sitewide.
+`pnpm test:e2e`: **985/985 passed, 16.3 minutes**, unchanged from the
+hundred-and-thirty-eighth run's own baseline - no regression, and no new
+e2e coverage was expected or added, since this change is a Node-side unit
+test with nothing new to render.
 
 **Left for a future pass:** the same environment-blocked items as ever
 (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
