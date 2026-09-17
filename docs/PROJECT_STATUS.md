@@ -24450,5 +24450,82 @@ re-checks, a fresh dependency-upgrade attempt, or a mouse-drag/touch-drag
 interaction test on the "More" menu or drawer, never attempted on this
 site).
 
+### Mouse-drag/touch-drag interaction sweep of every click-driven disclosure widget - closed 2026-09-17 (hundred-and-thirty-sixth intensive run)
+
+A standing health check first: `pnpm install --frozen-lockfile` clean,
+`pnpm outdated` still only the blocked `typescript` 5.9.3 -> 7.0.2 entry
+(unchanged). Full `pnpm lint` (0/0/0), `pnpm test` (703/703 unit), `pnpm
+build` (711 pages), all eighteen `check:*` scripts (including
+`check:reflow`/`check:text-zoom`/`check:print-width` with
+`PW_EXECUTABLE_PATH` set) and `pnpm dlx knip --no-config-hints` (the one
+standing `scripts/test-preview-server.mjs` false positive, unchanged) all
+clean - matching the hundred-and-thirty-fifth run's own baseline exactly.
+Also re-confirmed `WebFetch`/`curl` egress to `en.wikipedia.org` is still
+blocked (`EGRESS_BLOCKED`) and re-ran a `WebSearch` pass on the Nations
+League 2023 final attendance conflict: still only reproduces the same
+Wikipedia figure (41,110) already weighed against RFEF's conflicting
+41,500 - no new source, the conflict stays open exactly as the
+ninety-sixth run documented it.
+
+Picked up the hundred-and-thirty-fifth run's own closing suggestion. Every
+open/close/navigate action on the site's four click-driven disclosure
+widgets - the mobile `#site-menu` drawer, the desktop `#nav-more-menu`
+"More" overflow menu (`Nav.astro`), and both "find a team"/"find a player"
+search comboboxes - is wired to a `click` listener rather than
+`pointerdown`/`touchstart`. That's deliberate: a `click` event only fires
+when mousedown/mouseup (or a touch tap) land on the same interactive
+target, so a press-drag-release gesture - scrolling the drawer, selecting
+text inside a search input, a mouse drag that starts on one control and
+releases on another - never triggers it. No prior run had actually
+exercised that invariant with a real drag: every existing menu/combobox
+test in `tests/e2e/` drives a plain `.click()`, which is indistinguishable
+from a click-terminated drag as far as the test is concerned.
+
+Rendered the real built site with Playwright/Chromium
+(`/opt/pw-browsers/chromium`) and drove the drag itself with actual
+`mouse.down()`/`mouse.move({ steps: 10 })`/`mouse.up()` sequences (not
+`.click()`) across five scenarios:
+
+- Dragging from a nav link downward inside the open mobile drawer: stays on
+  the current page, drawer stays open (`#site-menu` keeps `.is-open`).
+- Desktop "More" menu: a drag starting on `#nav-more-toggle` and releasing
+  400px away stays closed (`aria-expanded="false"`, `#nav-more-menu`
+  hidden).
+- The reverse - a drag starting 400px away and releasing on the toggle -
+  also stays closed, confirming the browser's click-target resolution (the
+  nearest common ancestor of the mousedown/mouseup targets, not the
+  mouseup target alone) doesn't accidentally count as "click the toggle"
+  either direction.
+- Team-search combobox: a drag from the input into a visible result option
+  doesn't navigate away - it's ordinary text selection, not a triggered
+  `goToTeam()`.
+
+All five behaved exactly as the `click`-only wiring predicts - a genuine
+negative result, no bug found. Added permanent regression coverage anyway
+(`tests/e2e/drag-interactions.spec.ts`, 4 new tests grouped into three
+`describe` blocks) rather than filing this as a one-off manual finding:
+the risk this sweep was checking for is specifically what a future
+refactor to `pointerdown`/`touchstart` handlers would reintroduce, and
+that's exactly the kind of regression a manual walkthrough won't be
+repeated for automatically. `pnpm test:e2e` confirmed green with the new
+file both in isolation and as part of a full cold-start run alongside the
+rest of the suite. No content or component file changed, so no PDF
+regeneration was needed - `check:pdfs` reverified clean.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision, the Nations League Team of the Tournament sourcing
+question - confirmed exhausted, do not re-attempt the same queries), the
+Nations League 2023 attendance conflict (41,110 vs. 41,500, a documented
+disagreement rather than an unconfirmed figure), 2021/2025's
+still-unconfirmed Nations League figures, World Cup 1930/1950's/EURO
+1996/2020's excluded attendance figures, and the hundred-and-twenty-sixth
+run's still-open hyphenation-rendering visual re-check. With the
+drag-interaction angle now also closed out as a genuine negative result, a
+future pass's best bet is re-running the coordinate/keyboard-walkthrough
+method after the next real content or layout change (the highest-value
+time to catch a regression), a fresh dependency-upgrade attempt, or a
+genuinely different quality angle not yet tried on this site.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
