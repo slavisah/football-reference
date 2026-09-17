@@ -24827,5 +24827,178 @@ dependency-upgrade attempt, re-running the coordinate/keyboard-walkthrough
 method after the next real content or layout change, or a genuinely
 different quality angle not yet tried on this site.
 
+### The shared `:focus-visible` rule was missing `summary`: every `<details>` disclosure trigger fell back to the browser's own unstyled focus ring, a real dark-mode contrast failure - closed 2026-09-17 (hundred-and-fortieth intensive run)
+
+A standing health check first: `pnpm install --frozen-lockfile` clean,
+`pnpm outdated` showing only `@types/node` (26.5.1 -> 26.6.1, in-range) and
+the still-blocked `typescript` 7 entry, re-confirmed via
+`npm view @astrojs/check@latest peerDependencies` (still only
+`typescript: '^5.0.0 || ^6.0.0'` - `typescript` 7 remains blocked, do not
+re-attempt). Full `pnpm lint` (207 files, 0 errors/0 warnings/1 standing
+hint about a deprecated Playwright `input.type` call), `pnpm test`
+(711/711 unit), `pnpm test:coverage` (99.91% statements, identical
+uncovered-line set to the hundred-and-thirty-ninth run's own baseline),
+`pnpm build` (711 pages), all eighteen `check:*` scripts, `pnpm audit`
+(zero known vulnerabilities) and `pnpm dlx knip --no-config-hints` (one
+standing false positive, `scripts/test-preview-server.mjs`, and a plain
+`pnpm dlx knip` with no flags surfaced nothing else either) - all clean,
+matching the hundred-and-thirty-ninth run's baseline exactly.
+
+**Dependency bump.** Applied the `@types/node` patch (`pnpm update
+@types/node`, 26.5.1 -> 26.6.1). Re-ran `pnpm lint`/`pnpm test`/`pnpm
+build` afterward: all three stayed clean, no regression from the bump
+alone.
+
+**Finding the angle.** With the accessibility surface already swept
+repeatedly from several directions - a full sitewide `axe-core` pass (zero
+violations, hundred-and-thirty-fifth run), a dedicated keyboard-focus
+walkthrough that found and documented the site's only `outline: none`
+override (`accessibility-keyboard-focus.spec.ts`), a WCAG 1.4.11 non-text
+contrast audit (hundred-and-twenty-third run) - this run re-read that last
+audit's own reasoning rather than assuming the ground was fully covered.
+It stated: "the focus ring (`outline: 3px solid var(--focus);
+outline-offset: 2px`) uses the same `--focus` token everywhere via one
+shared `:focus-visible` rule." That's true of the rule's *intent*, but the
+audit never actually checked the rule's selector list against every native
+focusable element type the site uses - it was reasoning about color-token
+consistency, not selector completeness.
+
+Reading `src/styles/global.css`'s shared rule directly settled it:
+
+```css
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+```
+
+`summary` is missing. `<summary>` is a real, natively keyboard-focusable
+element - it's the trigger half of every `<details>` disclosure this site
+has: the quiz's "Just show me the answer" cards
+(`QuizCard.astro`/`QuizOrderCard.astro`, both English and Croatian) and
+`TournamentTable.astro`'s per-edition "story reveal" rows (one real
+instance confirmed on `/competitions/world-cup` and its Croatian sibling).
+Grepping the whole `src/` tree confirmed these are the *only* three
+`<summary>`/`<details>` call sites on the site, and confirmed there is no
+`<textarea>` or `[contenteditable]` anywhere either - so `summary` was the
+one gap in an otherwise-complete selector list, not the first of several.
+
+**Confirmed for real, not just reasoned from the CSS.** Launched the real
+built site with Playwright/Chromium (`/opt/pw-browsers/chromium`), used
+genuine `page.keyboard.press('Tab')` navigation (not a programmatic
+`.focus()` call, which doesn't reliably engage `:focus-visible` the same
+way) to reach a `.quiz-card__reveal summary`, and confirmed
+`element.matches(':focus-visible')` was `true` before reading its computed
+style. In light mode: `outlineStyle: 'auto'`, `outlineWidth: '1px'`,
+`outlineColor: 'rgb(16, 16, 16)'` - the browser's own default ring, not the
+site's 3px solid `--focus` ring every other control gets (confirmed the
+same walk on a `<button>` for comparison: `outlineStyle: 'solid'`,
+`outlineWidth: '3px'`, `outlineColor: 'rgb(31, 111, 235)'`).
+
+This isn't just a style inconsistency - in dark mode it's a real contrast
+failure. Rendered the same page with `colorScheme: 'dark'`: the `<summary>`
+focus outline still computes to `rgb(16, 16, 16)` (near-black), but the
+page background is now `rgb(15, 21, 32)` (`--dark-bg`, `#0f1520`) rather
+than the light background. Computing WCAG contrast between those two
+colors gives approximately **1.04:1** - functionally invisible, nowhere
+close to the 3:1 minimum WCAG 1.4.11 sets for non-text UI components.
+`--dark-focus` (`#6ba6ff`, `rgb(107, 166, 255)`) exists specifically to
+stay legible against `--dark-bg` - every other focusable control uses it
+correctly via the shared rule; `<summary>` alone fell through to a ring
+that, in dark mode, is essentially the same color as the page behind it. A
+keyboard user tabbing to either disclosure trigger in dark mode would see
+no visible focus indicator at all.
+
+This explains why no prior automated sweep caught it: `axe-core` has no
+rule that judges focus-ring *color* against its background (only whether
+one API-observably exists at all, and the browser's own default ring
+technically satisfies that), and Lighthouse's accessibility category
+doesn't audit focus-ring contrast either - both tools already scored every
+page a perfect 1.00 in earlier runs with this gap present. It took an
+actual rendered dark-mode measurement, the same "confirm empirically,
+don't reason from the spec alone" method several prior visual-audit runs
+in this file have already used, to see it.
+
+**Fix.** Added `summary:focus-visible` to the shared rule in
+`src/styles/global.css`, with a comment explaining the gap and the
+measured dark-mode contrast ratio for the next reader. No component-level
+override existed anywhere to fight it (grepped `outline` in
+`QuizCard.astro`, `QuizOrderCard.astro` and `TournamentTable.astro` - none
+of the three touch it), so the one-line selector-list addition was
+sufficient; this matches the shape of the hundred-and-twenty-third run's
+own then-current, still-correct description of how the site's focus ring
+*should* work everywhere - this run just closed the one place it didn't
+yet.
+
+**New coverage.** `tests/e2e/summary-focus-visible.spec.ts` (6 tests): both
+`<details>` call sites (`quiz.astro`'s `.quiz-card__reveal summary` and
+`TournamentTable.astro`'s `.story-reveal summary`), both languages, and
+both color schemes for the quiz page - pinned to the exact `--focus`/
+`--dark-focus` RGB values (not just "outline is present") so a future edit
+can't quietly swap in the wrong color and still pass. Verified the tests
+actually catch the regression, not just pass vacuously: reverted the
+`summary:focus-visible` selector locally, rebuilt, and reran - all 6 tests
+failed with the expected `outlineStyle: 'auto'` instead of `'solid'` - then
+restored the fix, rebuilt again, and confirmed all 6 pass.
+
+**PDF regeneration.** `src/styles/global.css` is itself one of the tracked
+source files `scripts/check-pdf-freshness.mjs` hashes against every PDF's
+manifest entry (every PDF renders with the site's real stylesheet applied,
+via `pnpm build:pdfs`'s own Playwright pass), so `pnpm check:pdfs`
+correctly flagged all 700 PDFs stale the moment the selector list changed
+- even though the change is a `:focus-visible`-only style, invisible in
+any static, unfocused PDF render. Regenerated with
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs` and
+reverified fresh (`pnpm check:pdfs`: 700/700), a manifest-freshness
+formality rather than a visible content change in any PDF.
+
+**One self-inflicted, corrected-in-place mishap worth recording.**
+Mid-run, this session issued an unrelated `pnpm build` (part of verifying
+the CSS fix alone) while the standing health-check batch's own
+`check:html`/`check:jsonld` steps were still reading the *previous*
+`dist/` output from a background shell. The race produced a spurious
+`ENOENT` on `check:html` (a file briefly vanished mid-rewrite) and a
+hollow "Validating JSON-LD on 0 pages" pass on `check:jsonld` (an empty
+read, not a real result) - neither is a real regression. Confirmed clean
+by rerunning both individually once the build was stable again (711/711
+valid HTML5, 1783 JSON-LD blocks across 711 pages structurally valid).
+This is a fresh instance of the same caution this file's own task
+instructions already carry for `pnpm test:e2e` ("never run it
+concurrently with another build") - it turns out the same risk applies to
+any `check:*` script reading `dist/` while a build is in flight, not just
+the e2e suite specifically. Worth remembering for a future run: once a
+background health-check batch is reading `dist/`, hold off on any other
+`pnpm build` until it finishes, or rerun the affected checks afterward as
+this run did.
+
+Full standing health check re-run clean after the change: `pnpm lint`
+(207 files, 0/0/1 - unchanged), `pnpm test` (711/711, unchanged -
+presentation-only CSS change, no new unit-testable logic), `pnpm build`
+(711 pages, unchanged), all eighteen `check:*` scripts clean (`check:perf`
+now shows `hr/records` at 613.1 KB and `records` at 608.1 KB, a ~0.1 KB
+increase from the added CSS, both comfortably within the 640 KB budget),
+`pnpm check:pdfs` (700/700 fresh), plus a full cold-start `pnpm test:e2e`:
+**991/991 passed** (up from 985/985 by exactly the six new tests).
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision, the Nations League Team of the Tournament sourcing
+question - confirmed exhausted, do not re-attempt the same queries), the
+Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+Nations League figures, World Cup 1930/1950's/EURO 1996/2020's excluded
+attendance figures, and the hundred-and-twenty-sixth run's still-open
+hyphenation-rendering visual re-check. With `summary` now covered, the
+shared `:focus-visible` selector list has been checked against every
+native focusable element type this site actually uses - a future pass's
+best bet is a fresh dependency-upgrade attempt, re-running the
+coordinate/keyboard-walkthrough method after the next real content or
+layout change, or a genuinely different quality angle not yet tried on
+this site.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

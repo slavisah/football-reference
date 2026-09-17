@@ -271,10 +271,25 @@ a {
   color: var(--accent);
 }
 
+/* `summary` is a real, natively keyboard-focusable element (the trigger
+   half of every `<details>` disclosure on this site: the quiz's "Just show
+   me the answer" cards in QuizCard.astro/QuizOrderCard.astro, and
+   TournamentTable.astro's "story reveal" rows) but was missing from this
+   selector list, so it fell all the way through to the browser's own
+   unstyled `outline: auto` ring instead of the site's `--focus` token like
+   every other control. That's not just a style inconsistency: in dark mode
+   Chromium's own default focus-ring color renders as a near-black
+   (~#101010) outline against this site's `--dark-bg` (#0f1520) - a measured
+   contrast ratio of about 1.04:1, i.e. functionally invisible - while
+   `--dark-focus` (#6ba6ff) exists specifically to stay visible against that
+   same background. Confirmed via a real keyboard Tab walk with
+   `:focus-visible` matching true before filing this, not assumed from
+   reading the CSS alone. */
 a:focus-visible,
 button:focus-visible,
 select:focus-visible,
 input:focus-visible,
+summary:focus-visible,
 [tabindex]:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
