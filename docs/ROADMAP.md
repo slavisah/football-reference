@@ -6058,3 +6058,69 @@ back clean:
   attempt, re-running the coordinate/keyboard-walkthrough method after the
   next real content or layout change, or a genuinely different quality
   angle not yet tried on this site.
+- **The shared `:focus-visible` rule was missing `summary`, leaving every
+  `<details>` disclosure trigger on the browser's own unstyled default
+  ring - a real dark-mode contrast failure (~1.04:1), not just a style
+  inconsistency**: closed 2026-09-17 (hundred-and-fortieth intensive run) -
+  a standing health check first (all clean, matching the hundred-and-
+  thirty-ninth run's baseline: 711/711 unit, 711 pages, all eighteen
+  `check:*` scripts, `pnpm audit` zero vulnerabilities, `knip` one standing
+  false positive; `pnpm outdated` re-confirmed only `@types/node` 26.5.1 ->
+  26.6.1 in-range and the still-blocked `typescript` 7 entry via
+  `npm view @astrojs/check@latest peerDependencies`, still only
+  `typescript: '^5.0.0 || ^6.0.0'`). Applied the `@types/node` patch bump;
+  lint/test/build stayed clean afterward. Picked up the "focus-visible
+  states across every interactive control" suggestion: `global.css`'s
+  shared `:focus-visible` rule (the one place every control's keyboard
+  focus ring is defined, via the `--focus` design token) lists `a`,
+  `button`, `select`, `input` and `[tabindex]`, but never `summary` - a
+  real, natively keyboard-focusable element and the trigger for every
+  `<details>` disclosure this site has (the quiz's "Just show me the
+  answer" cards, `TournamentTable.astro`'s per-edition "story reveal"
+  rows). A prior run (the hundred-and-twenty-third) had reasoned "the focus
+  ring uses the same `--focus` token everywhere via one shared
+  `:focus-visible` rule" while auditing WCAG 1.4.11 - true of the rule's
+  intent, not of its actual selector list. Verified for real with
+  Playwright (real keyboard Tab, `:focus-visible` confirmed matching)
+  rather than reasoned from the CSS alone: in dark mode the browser's own
+  default ring computes to a near-black `rgb(16, 16, 16)` against
+  `--dark-bg` (`#0f1520`) - about 1.04:1 contrast, functionally invisible -
+  while `--dark-focus` (`#6ba6ff`) exists specifically to stay legible
+  against that same background. Fixed by adding `summary:focus-visible` to
+  the shared rule. New coverage: `tests/e2e/summary-focus-visible.spec.ts`
+  (6 tests, both `<details>` call sites x both languages/color schemes,
+  pinned to the exact `--focus`/`--dark-focus` RGB values) - verified to
+  actually catch the regression by reverting the selector locally and
+  re-running (all 6 failed as expected, `outlineStyle: 'auto'` instead of
+  `'solid'`), then restoring it. Since `global.css` is itself a tracked PDF
+  source dependency, all 700 PDFs were correctly flagged stale and
+  regenerated (`pnpm build:pdfs`) and reverified fresh (`check:pdfs`
+  700/700), even though the change is a focus-state style invisible in any
+  static, unfocused PDF render. One self-inflicted, corrected-in-place
+  mishap worth recording: mid-run, an unrelated `pnpm build` raced the
+  standing health-check batch's own `check:html`/`check:jsonld` steps
+  reading `dist/`, producing a spurious `ENOENT` and a hollow "0 pages"
+  pass - not a real regression, confirmed clean by rerunning both
+  individually once the build was stable (711/711 valid HTML, 1783 JSON-LD
+  blocks across 711 pages) - a fresh instance of the established "never run
+  a build concurrently with something reading `dist/`" caution, this time
+  from a stray rebuild rather than the e2e suite. Full standing health
+  check clean after the change: `pnpm lint` (0/0/1, unchanged), `pnpm test`
+  (711/711, unchanged - CSS/test-only), `pnpm build` (711 pages,
+  unchanged), all eighteen `check:*` scripts clean, plus a full cold-start
+  `pnpm test:e2e`: **991/991 passed** (up from 985/985 by exactly the six
+  new tests). See `docs/PROJECT_STATUS.md`'s matching entry for full
+  detail. **Left for a future pass:** the same environment-blocked items as
+  ever (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+  brand-suffix decision, the Nations League Team of the Tournament sourcing
+  question - confirmed exhausted), the Nations League 2023 attendance
+  conflict, 2021/2025's still-unconfirmed Nations League figures, World Cup
+  1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+  hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+  re-check. With `summary` now covered, the shared `:focus-visible`
+  selector list has been checked against every native focusable element
+  type this site actually uses (no `<textarea>`/`[contenteditable]` exist
+  anywhere) - a future pass's best bet is a fresh dependency-upgrade
+  attempt, re-running the coordinate/keyboard-walkthrough method after the
+  next real content or layout change, or a genuinely different quality
+  angle not yet tried on this site.

@@ -46,7 +46,7 @@
     "@astrojs/check": "^0.9.10",
     "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.63.0",
-    "@types/node": "^26.5.1",
+    "@types/node": "^26.6.1",
     "@vitest/coverage-v8": "5.0.1",
     "cspell": "^10.3.3",
     "html-validate": "^11.16.0",
