@@ -24737,5 +24737,92 @@ bet is a fresh dependency-upgrade attempt, re-running the coordinate/
 keyboard-walkthrough method after the next real content or layout change,
 or a genuinely different quality angle not yet tried on this site.
 
+### New `tests/unit/inlineScriptParity.test.ts`: an executable parity check between every `is:inline` script's hand-duplicated logic and its `src/lib/` original, closing the last un-swept class of hand-duplication drift - closed 2026-09-17 (hundred-and-thirty-ninth intensive run)
+
+A standing health check first (`pnpm install --frozen-lockfile`; `pnpm
+outdated` still only the blocked `typescript` 7 entry, re-confirmed via
+`npm view @astrojs/check@latest peerDependencies` - still only
+`typescript: '^5.0.0 || ^6.0.0'`; `pnpm lint` (0/0/0), `pnpm test`
+(703/703 unit), `pnpm build` (711 pages), all eighteen `check:*` scripts,
+`pnpm audit` (zero vulnerabilities) and `knip` (one standing false
+positive, `scripts/test-preview-server.mjs`) - all clean, matching the
+hundred-and-thirty-eighth run's own baseline exactly).
+
+With the no-JS angle's own closing note pointing at "a genuinely different
+quality angle not yet tried," this run picked up a class of bug this site
+has now fixed three separate times under three different names -
+`check:award-tallies` (a hand-authored tally table drifting from the
+source table it summarizes), `check:i18n-notes` (a hand-translated
+Croatian note section drifting from its English source), and
+`check:edition-header-labels` (a hand-translated column-label map
+drifting from its source table) - but never generalized to the one
+remaining place this codebase deliberately hand-duplicates logic:
+`is:inline` `<script>` blocks. Astro's `define:vars` directive (used to
+hand data from frontmatter into a client script) only works on
+`is:inline` scripts, and an `is:inline` script cannot `import` a module -
+a real framework constraint, not an oversight - so two components
+(`OnThisDay.astro`, `TournamentTable.astro`) each carry a second,
+hand-copied implementation of logic that also lives in `src/lib/`
+(`OnThisDay.astro`'s inline script mirrors four functions from
+`src/lib/onThisDay.ts`: `entriesOnDate`, `fallbackEntry`,
+`formatOnThisDayDate`/`formatDate`, `onThisDayResultText`/`resultText`;
+`TournamentTable.astro`'s mirrors `compareCellText` from
+`src/lib/tableSort.ts`), each with an existing code comment noting "kept
+in sync manually" - the exact same shape of risk the three checks above
+were each built to close, just never checked here.
+
+A byte-for-byte text diff between the two copies isn't the right tool,
+and would have produced false positives: the two implementations are
+*deliberately* structured differently (`formatOnThisDayDate` is generic
+across both locales via a `Record<Locale, string[]>` lookup, while the
+inline `formatDate` closes over one already-resolved `monthNames` array
+for the page's own locale, passed in via `define:vars` - different
+source text, same behaviour). Instead, `tests/unit/inlineScriptParity.test.ts`
+extracts the *actual* shipped script source from each `.astro` file at
+test time (a small brace-balanced parser, `sliceBalancedBraces`/
+`extractFunctionSource`, since the relevant functions sit alongside
+DOM-wiring code that can't safely run under Node), evaluates it with
+`new Function(...)` closed over the same variables `define:vars` supplies
+in the browser, and runs it side by side with the real `src/lib/`
+implementation across a shared table of inputs - both locales, both sort
+directions, an empty entry list, multiple entries on one calendar day,
+a synthetic leap-day (29 February) entry, and the two isAward/final
+branches `onThisDayResultText` distinguishes. Verified the check actually
+catches drift (not just passing vacuously by accident of extracting the
+wrong text): temporarily swapped `formatDate`'s day/month word order in
+`OnThisDay.astro` locally and reran - both locale variants of the
+`formatDate` test failed immediately with the expected mismatched output,
+confirming the extraction targets the real shipped code; reverted before
+committing. All 8 new tests pass cleanly against the current, unmodified
+source - both hand-duplicated copies are correct today, so this is a
+permanent regression guard against a future edit to either side, not a
+bug fix.
+
+No content or component file changed (only a new test file), so no PDF
+regeneration was needed - reverified `check:pdfs` clean anyway per the
+hundred-and-fourth run's standing "check the rendered page, not just
+whether a content file changed" correction (genuinely a no-op here: build
+output is byte-identical, 711 pages). Full standing health check re-run
+clean after the addition: `pnpm lint` (0/0/0), `pnpm test` (711/711, up
+from 703/703 by exactly the 8 new tests), `pnpm build` (711 pages,
+unchanged), all eighteen `check:*` scripts clean, plus a full cold-start
+`pnpm test:e2e` confirming no regression sitewide.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision, the Nations League Team of the Tournament sourcing
+question - confirmed exhausted, do not re-attempt the same queries), the
+Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+Nations League figures, World Cup 1930/1950's/EURO 1996/2020's excluded
+attendance figures, and the hundred-and-twenty-sixth run's still-open
+hyphenation-rendering visual re-check. The hand-duplication-drift angle
+itself is now closed out across every known instance (`check:award-tallies`,
+`check:i18n-notes`, `check:edition-header-labels`, and now this run's
+inline-script parity test cover every hand-maintained "second copy" this
+codebase carries) - a future pass's best bet is a fresh
+dependency-upgrade attempt, re-running the coordinate/keyboard-walkthrough
+method after the next real content or layout change, or a genuinely
+different quality angle not yet tried on this site.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
