@@ -6012,3 +6012,46 @@ back clean:
   re-running the coordinate/keyboard-walkthrough method after the next real
   content or layout change, or a genuinely different quality angle not yet
   tried on this site.
+- **New `tests/unit/inlineScriptParity.test.ts`: an executable parity check
+  between every `is:inline` script's hand-duplicated logic and its
+  `src/lib/` original**: closed 2026-09-17 (hundred-and-thirty-ninth
+  intensive run) - a standing health check first (all clean, matching the
+  hundred-and-thirty-eighth run's baseline; `pnpm outdated`/`@astrojs/check`
+  peer-dependency ceiling re-confirmed still blocking `typescript` 7).
+  Generalized the `check:award-tallies`/`check:i18n-notes`/
+  `check:edition-header-labels` "hand-duplicated data can silently drift"
+  pattern to the one place it hadn't been checked yet: `is:inline` `<script>`
+  blocks, which can't `import` a module (a `define:vars` constraint, not an
+  oversight) and so hand-copy logic that also lives in `src/lib/` -
+  `OnThisDay.astro` mirrors four functions from `src/lib/onThisDay.ts`,
+  `TournamentTable.astro` mirrors `compareCellText` from
+  `src/lib/tableSort.ts`, both already commented "kept in sync manually."
+  Rather than a byte-diff (the two copies are deliberately structured
+  differently, which would false-positive), the new test extracts each
+  `.astro` file's real shipped script source with a small brace-balanced
+  parser and runs it via `new Function(...)`, side by side with the real
+  `src/lib/` implementation, across both locales/sort directions, an empty
+  entry list, multiple same-day entries, and a synthetic leap-day entry.
+  Verified the check actually catches drift (not passing vacuously) by
+  temporarily breaking `OnThisDay.astro`'s `formatDate` locally and
+  confirming both locale tests failed immediately, then reverting. All 8
+  new tests pass against the unmodified source - both duplicated copies are
+  correct today, so this is a permanent regression guard, not a bug fix. No
+  content/component file touched, so no PDF regen needed; `check:pdfs`
+  reverified clean anyway. Full standing health check clean: `pnpm lint`
+  (0/0/0), `pnpm test` (711/711, up from 703/703 by exactly the 8 new
+  tests), `pnpm build` (711 pages, unchanged), all eighteen `check:*`
+  scripts, plus a full cold-start `pnpm test:e2e`. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
+  future pass:** the same environment-blocked items as ever (`typescript`
+  7, `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix
+  decision, the Nations League Team of the Tournament sourcing question -
+  confirmed exhausted), the Nations League 2023 attendance conflict,
+  2021/2025's still-unconfirmed Nations League figures, World Cup
+  1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+  hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+  re-check. The hand-duplication-drift angle is now closed out across every
+  known instance - a future pass's best bet is a fresh dependency-upgrade
+  attempt, re-running the coordinate/keyboard-walkthrough method after the
+  next real content or layout change, or a genuinely different quality
+  angle not yet tried on this site.
