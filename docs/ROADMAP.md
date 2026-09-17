@@ -6041,7 +6041,10 @@ back clean:
   reverified clean anyway. Full standing health check clean: `pnpm lint`
   (0/0/0), `pnpm test` (711/711, up from 703/703 by exactly the 8 new
   tests), `pnpm build` (711 pages, unchanged), all eighteen `check:*`
-  scripts, plus a full cold-start `pnpm test:e2e`. See
+  scripts, plus a full cold-start `pnpm test:e2e`: **985/985 passed, 16.3
+  minutes** (unchanged from the hundred-and-thirty-eighth run's own
+  baseline - no new e2e coverage, only unit tests, since this change is
+  purely a Node-side script/lib parity check with nothing to render). See
   `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
   future pass:** the same environment-blocked items as ever (`typescript`
   7, `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix
