@@ -24360,5 +24360,95 @@ pass could extend it to team/player profile pages (not yet swept), or take
 a fresh non-content quality angle (SEO, a dead-code sweep, or a fresh
 `docs/WEBSITE_REQUIREMENTS.md` read against the live site).
 
+### Team/player profile-page manual walkthrough plus a full `axe-core` and `lighthouse` sweep of the same pages - closed 2026-09-17 (hundred-and-thirty-fifth intensive run)
+
+A standing health check first: `pnpm install --frozen-lockfile` clean,
+`pnpm outdated` found nothing new beyond the still-blocked `typescript`
+5.9.3 -> 7.0.2 entry (unchanged, `@astrojs/check@0.9.10`'s own peer ceiling
+still only declares `^5.0.0 || ^6.0.0`). Full `pnpm lint` (0/0/0), `pnpm
+test` (703/703 unit), `pnpm build` (711 pages) and all eighteen `check:*`
+scripts clean, including `check:reflow`/`check:text-zoom`/`check:print-width`
+re-run with `PW_EXECUTABLE_PATH` set - matching the hundred-and-thirty-fourth
+run's own baseline exactly.
+
+Picked up that run's own closing suggestion: extend the
+coordinate/keyboard-walkthrough method - which has found a real bug in
+seven of its last nine applications across nav, quiz, print, search-widget
+and compare-picker surfaces - to `/teams/<slug>` and `/players/<slug>`
+profile pages, the one major page family no prior run's manual pass had
+covered.
+
+Rendered Lionel Messi's and Karl-Heinz Rummenigge's player profiles and
+Germany's and Argentina's team profiles, both languages, with real
+Playwright/Chromium (`/opt/pw-browsers/chromium`, this container's own
+bundled binary): light and dark `colorScheme`, at 320/360/768/1280px.
+Measured every rendered page's real `document.documentElement.scrollWidth`
+against `clientWidth` directly (the same measurement `check:reflow` already
+takes at 320px sitewide, repeated here per-viewport/per-color-scheme for
+just these six pages) - zero overflow anywhere, at every combination.  Went
+one level deeper than a document-level check: measured the
+`.team-profile__totals`/`.player-profile__totals` four-stat grid and the
+`.team-profile__list`/`.player-profile__list` award-row `<li>` elements'
+own bounding boxes at 320px. The stat grid stays a clean two-per-row
+layout at every width tested (`repeat(auto-fit, minmax(7rem, 1fr))` never
+needs to fall back to one column at 320px). The award rows'
+`align-items: baseline` year/trophy/detail layout wraps its detail span
+onto a second line under the year rather than overflowing, confirmed by
+screenshotting Messi's full Ballon d'Or list (eight rows, including the
+longest real detail string, "Argentina - 11 January 2016") and inspecting
+it directly - no clipping, no overlap, no orphaned single-character wrap.
+
+A full `axe-core` sweep (the same `wcag2a`/`wcag2aa`/`wcag21a`/`wcag21aa`/
+`wcag22aa` plus `best-practice` tag set `tests/e2e/`'s own `AxeBuilder`
+calls already use, per the "Known caveats" entries on both) of all six
+rendered pages came back with **zero violations** on every one. Also ran a
+full `pnpm check:lighthouse` (37 pages total, sampling one player and one
+team profile in each language among them): every page scored >= 0.9 in
+every category, with all four sampled profile pages a perfect
+1.00/1.00/1.00/1.00 across performance/accessibility/best-practices/SEO.
+This is a genuine negative result across every angle tried this run - no
+code change.
+
+One thing surfaced along the way turned out to be a already-documented
+decision, not a new finding, worth recording so a future run doesn't
+re-investigate it: Argentina's `/hr/teams/argentina` team-profile page
+renders its 1930/1978/1986 award rows as "Runner-up"/"Champion" in English,
+even though the surrounding Croatian prose and stat labels ("Naslovi",
+"Drugo mjesto", ...) are translated. This looks at a glance like a missed
+translation the same way a real i18n bug would, but
+`src/pages/hr/teams/[slug].astro`'s own top-of-file comment already
+explains it: `buildTeamProfile()` (`src/lib/teamProfile.ts`) preserves each
+edition table's own historical column label verbatim in `role` (see that
+type's own doc comment - "the exact column label the edition table used
+... preserved verbatim rather than normalized"), the same
+never-normalize-a-historical-label rule every other hand-authored table on
+this site already follows; only the page's own surrounding prose/labels
+are Croatian. `check:i18n-notes` staying clean confirms the site's actual
+i18n-parity check (note-section structure, a different concern from this
+role text) isn't affected either. No code change needed - this is working
+as designed.
+
+Also re-ran `npx knip`: the standing single false positive
+(`scripts/test-preview-server.mjs`, invoked as a shell string from
+`playwright.config.ts`'s `webServer.command` rather than a static import,
+so knip's import-graph analysis can't see the reference) is still the only
+result. No new dead code surfaced.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision, the Nations League Team of the Tournament sourcing
+question - confirmed exhausted, do not re-attempt the same queries), the
+Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+figures, World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+figures, and the hundred-and-twenty-sixth run's still-open
+hyphenation-rendering visual re-check. With team/player profile pages now
+also swept clean, the coordinate/keyboard-walkthrough method has covered
+every major page family at least once - a future pass could either re-run
+it after the next real content/layout change (the highest-value time to
+catch a regression), or pivot fully to a different angle (content-accuracy
+re-checks, a fresh dependency-upgrade attempt, or a mouse-drag/touch-drag
+interaction test on the "More" menu or drawer, never attempted on this
+site).
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

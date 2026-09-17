@@ -5807,3 +5807,72 @@ back clean:
   print stylesheet's own interactive elements (there are none today, but
   future content could add some), or take a fresh non-content quality
   angle.
+- **Team/player profile-page manual walkthrough plus a full `axe-core` and
+  `lighthouse` sweep of the same pages**: closed 2026-09-17
+  (hundred-and-thirty-fifth intensive run) - a standing health check first
+  (`pnpm install --frozen-lockfile`, `pnpm outdated` found nothing new
+  beyond the still-blocked `typescript` 7 entry; `pnpm lint`/`pnpm test`
+  (703/703)/`pnpm build` (711 pages) and all eighteen `check:*` scripts
+  clean, including `check:reflow`/`check:text-zoom`/`check:print-width`
+  with `PW_EXECUTABLE_PATH` set, matching the hundred-and-thirty-fourth
+  run's own baseline). Picked up the hundred-and-thirty-fourth run's own
+  closing suggestion: extend the coordinate/keyboard-walkthrough method to
+  `/teams/<slug>` and `/players/<slug>` profile pages, not yet swept by any
+  prior run.
+
+  Rendered Lionel Messi's and Karl-Heinz Rummenigge's player profiles and
+  Germany's and Argentina's team profiles (both languages) with real
+  Playwright/Chromium, in light and dark mode, at 320/360/768/1280px, and
+  measured every page's real `document.documentElement.scrollWidth` against
+  its `clientWidth` - zero overflow anywhere, at every viewport and
+  color-scheme combination. Also measured the `.team-profile__totals`/
+  `.player-profile__totals` stat grid and the `.team-profile__list`/
+  `.player-profile__list` award rows directly (bounding boxes, not just
+  document-level overflow) at 320px - the four-stat grid stays two-per-row
+  and legible, and the award rows' baseline-aligned year/trophy/detail
+  layout wraps its detail text onto a second line cleanly with no visual
+  defect, even for the longest real detail strings ("Argentina - 11 January
+  2016"). A full `axe-core` sweep (WCAG 2.1/2.2 A/AA plus best-practice
+  rules, the same tag set `tests/e2e/` already uses) of all six rendered
+  pages came back with **zero violations**. A full `pnpm check:lighthouse`
+  re-run (37 pages, including both a player and a team profile in each
+  language) also came back clean: every page scored >= 0.9 in every
+  category, most (including all four profile pages sampled) a perfect
+  1.00/1.00/1.00/1.00. This is a genuine negative result across every angle
+  tried - no code change this run.
+
+  One real question surfaced and resolved along the way, not a bug: Germany
+  1930/1978/Argentina's team-profile award rows render "Runner-up"/
+  "Champion" in English even on the Croatian `/hr/teams/argentina` page,
+  which could look at a glance like a missed translation. It isn't -
+  `src/pages/hr/teams/[slug].astro`'s own top-of-file comment already
+  documents this as deliberate: `buildTeamProfile()`'s `role` field
+  preserves each edition table's own historical column label verbatim
+  (`src/lib/teamProfile.ts`'s doc comment on `TeamAppearance.role`), the
+  same "never normalize a historical label" rule the site's other
+  hand-authored tables already follow, and only the surrounding Croatian
+  prose/labels are translated - confirmed against `check:i18n-notes`
+  (which checks note-section parity, a different concern) staying clean.
+  Recorded here so a future run doesn't waste time re-investigating it as a
+  new finding.
+
+  Also re-confirmed the standing `knip` "unused file" false positive
+  (`scripts/test-preview-server.mjs`, invoked as a shell string from
+  `playwright.config.ts`'s `webServer.command`) is still the only result -
+  no new dead code surfaced.
+
+  **Left for a future pass:** the same environment-blocked items as ever
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+  brand-suffix decision, the Nations League Team of the Tournament sourcing
+  question - confirmed exhausted, do not re-attempt the same queries), the
+  Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+  figures, World Cup 1930/1950's/EURO 1996/2020's excluded attendance
+  figures, and the hundred-and-twenty-sixth run's still-open
+  hyphenation-rendering visual re-check. With team/player profile pages now
+  also swept clean, the coordinate/keyboard-walkthrough method has covered
+  every major page family at least once - a future pass could either
+  re-run it after the next real content/layout change (the highest-value
+  time to catch a regression), or pivot fully to a different angle
+  (content-accuracy re-checks, a fresh dependency-upgrade attempt, or the
+  "More" menu's own keyboard-focus behavior extended to a mouse-drag/
+  touch-drag interaction test, still never attempted on this site).
