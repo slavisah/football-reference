@@ -162,7 +162,37 @@ async function main() {
       const page = await browser.newPage();
       await page.emulateMedia({ media: 'print' });
 
-      const pdfOptions = (outFile) => ({
+      // Every PDF family renders a real multi-page A4-landscape document
+      // (records.pdf alone is 103 pages) but, until now, carried no page
+      // numbers anywhere - a reader who prints one or loses their place
+      // scrolling a long download has no way to tell page 40 of 103 from
+      // page 41, or to cite "page N" of a specific edition/team/player
+      // sheet. Playwright's `page.pdf()` supports this natively via
+      // `displayHeaderFooter`/`footerTemplate` (a thin wrapper over
+      // Chromium's own `Page.printToPDF` header/footer templates), rendered
+      // inside the existing `@page { margin: 12mm }` band from
+      // src/styles/global.css - verified empirically (a throwaway script
+      // rendering /records and /glossary, then reading the result back with
+      // pdfminer.six) that an 8px single-line footer fits inside that
+      // 12mm/34pt margin with no overlap against the lowest content text on
+      // either page, and that `pageNumber`/`totalPages` count correctly
+      // (both "Page 1 of 2" and "Page 103 of 103" came back exactly right).
+      // Deliberately does NOT use Playwright's `class="url"` token - it
+      // resolves to `document.location`, which during generation is this
+      // script's own `http://localhost:4399/football-reference/...` preview
+      // origin, not the real `https://slavisah.github.io/...` address a
+      // reader would see - that would leak a dead local URL into every
+      // shipped PDF. `class="title"` is safe to use instead: it reads the
+      // live page's own already-correct, per-language `<title>` (verified
+      // by `check:meta`), the same one `pdf-metadata.mjs`'s own comment
+      // notes Chromium already carries into the PDF's `/Title` automatically.
+      function footerTemplate(locale) {
+        const label = locale === 'hr' ? 'Stranica' : 'Page';
+        const of = locale === 'hr' ? 'od' : 'of';
+        return `<div style="width:100%; font-family:Arial,sans-serif; font-size:8px; color:#555555; display:flex; justify-content:space-between; padding:0 12mm; box-sizing:border-box;"><span class="title" style="max-width:70%; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"></span><span>${label} <span class="pageNumber"></span> ${of} <span class="totalPages"></span></span></div>`;
+      }
+
+      const pdfOptions = (outFile, locale) => ({
         path: outFile,
         preferCSSPageSize: true,
         printBackground: true,
@@ -176,6 +206,9 @@ async function main() {
         // PDF was untagged.
         tagged: true,
         outline: true,
+        displayHeaderFooter: true,
+        headerTemplate: '<span></span>',
+        footerTemplate: footerTemplate(locale),
       });
 
       // page.pdf() itself (a thin wrapper over Chromium's Page.printToPDF)
@@ -183,8 +216,8 @@ async function main() {
       // header comment for why this is a post-write incremental-update
       // patch rather than a printToPDF parameter or a full PDF-library
       // re-serialize.
-      async function writePdfWithMetadata(outFile) {
-        await page.pdf(pdfOptions(outFile));
+      async function writePdfWithMetadata(outFile, locale) {
+        await page.pdf(pdfOptions(outFile, locale));
         const original = await readFile(outFile);
         const patched = addAuthorMetadata(original, PDF_AUTHOR);
         if (patched !== original) {
@@ -192,11 +225,19 @@ async function main() {
         }
       }
 
+      // Every PDF family's page path uses this same `/hr/...` prefix
+      // convention for its Croatian half (confirmed across PAGES,
+      // TEAM_PDF_SOURCES-driven, PLAYER_PDF_SOURCES-driven and
+      // EDITION_PDF_SOURCES-driven paths below), so this one helper decides
+      // the footer's language everywhere rather than threading a separate
+      // locale value through each loop.
+      const localeFor = (pagePath) => (pagePath.startsWith('/hr/') ? 'hr' : 'en');
+
       for (const { slug, path: pagePath } of PAGES) {
         const url = `${ORIGIN}${BASE}${pagePath}`;
         await page.goto(url, { waitUntil: 'networkidle' });
         const outFile = path.join(OUT_DIR, `${slug}.pdf`);
-        await writePdfWithMetadata(outFile);
+        await writePdfWithMetadata(outFile, localeFor(pagePath));
         console.log(`Wrote ${path.relative(ROOT, outFile)}`);
       }
 
@@ -231,7 +272,7 @@ async function main() {
           const url = `${ORIGIN}${BASE}${pagePath}`;
           await page.goto(url, { waitUntil: 'networkidle' });
           const outFile = path.join(OUT_DIR, `${fileSlug}.pdf`);
-          await writePdfWithMetadata(outFile);
+          await writePdfWithMetadata(outFile, localeFor(pagePath));
           teamManifestEntries.push({ slug: fileSlug, sources: TEAM_PDF_SOURCES });
         }
         console.log(`Wrote team-${slug}.pdf / team-${slug}-hr.pdf (${displayName})`);
@@ -269,7 +310,7 @@ async function main() {
           const url = `${ORIGIN}${BASE}${pagePath}`;
           await page.goto(url, { waitUntil: 'networkidle' });
           const outFile = path.join(OUT_DIR, `${fileSlug}.pdf`);
-          await writePdfWithMetadata(outFile);
+          await writePdfWithMetadata(outFile, localeFor(pagePath));
           playerManifestEntries.push({ slug: fileSlug, sources: PLAYER_PDF_SOURCES });
         }
         console.log(`Wrote player-${slug}.pdf / player-${slug}-hr.pdf (${displayName})`);
@@ -298,7 +339,7 @@ async function main() {
         const url = `${ORIGIN}${BASE}${pagePath}`;
         await page.goto(url, { waitUntil: 'networkidle' });
         const outFile = path.join(OUT_DIR, `${pdfSlug}.pdf`);
-        await writePdfWithMetadata(outFile);
+        await writePdfWithMetadata(outFile, localeFor(pagePath));
         editionManifestEntries.push({ slug: pdfSlug, sources: EDITION_PDF_SOURCES[family] });
       }
       console.log(`Wrote ${editionManifestEntries.length} edition PDFs.`);
