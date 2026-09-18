@@ -25000,5 +25000,157 @@ coordinate/keyboard-walkthrough method after the next real content or
 layout change, or a genuinely different quality angle not yet tried on
 this site.
 
+### New `tests/e2e/color-vision-deficiency.spec.ts`: a permanent color-vision-deficiency emulation sweep of the site's three color-conveyed states - closed 2026-09-18 (hundred-and-forty-first intensive run)
+
+A standing health check first: `pnpm install --frozen-lockfile` clean,
+`pnpm lint` (207 files, 0/0/1, unchanged), `pnpm test` (711/711), `pnpm
+build` (711 pages). Running the browser-driven `check:*` scripts
+(`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`)
+in this session's own container failed at first with `browserType.launch:
+Executable doesn't exist at
+/opt/pw-browsers/chromium_headless_shell-1243/...` - this container's
+pre-installed Chromium is version 1194, one minor behind what
+`@playwright/test` 1.63.0 expects. Not a repo regression: all four scripts
+already support a `PW_EXECUTABLE_PATH` escape hatch (added by an earlier
+run for the same reason `playwright.config.ts`'s own e2e project supports
+it), and pointing it at the sibling `chromium-1194` build already present
+in `/opt/pw-browsers/` made all four pass clean. The other fourteen
+`check:*` scripts (no browser dependency) were clean without it. Worth
+noting for whichever run hits this again: the fix is a one-line env var,
+not a code change.
+
+**Finding the angle.** This file's last several closing notes have
+repeated the same suggestion - "a future pass's best bet is ... a
+genuinely different quality angle not yet tried on this site" - without
+naming one. Grepped this file and `docs/ROADMAP.md` (31,000+ combined
+lines) for every color-blindness/CVD-adjacent term ("color-blind",
+"colour-blind", "protanop", "deuteranop", "tritanop", "achromatops",
+"vision deficiency", "emulateVisionDeficiency", "CVD") and got zero
+matches anywhere, including in `tests/e2e/*.spec.ts`. That's a real gap,
+distinct from three angles already closed: the WCAG 1.4.1 use-of-color
+point fixes (the quiz's `is-correct`/`is-incorrect` badges, `forced-colors`
+high-contrast mode, `TournamentTable.astro`'s `.is-winner` underline) are
+all reasoned from contrast math and DOM structure, not from actually
+rendering the page the way a colorblind reader perceives it - the same
+distinction between "reasoned from the CSS" and "rendered and looked at"
+that separated the hundred-and-twenty-sixth run's hyphenation finding from
+every prior contrast audit.
+
+**Confirming the tool.** Assumed at first that Playwright exposes
+`page.emulateVisionDeficiency()` directly (this is in fact a Puppeteer API,
+not a Playwright one - a mix-up caught by testing it against this
+project's own pinned `playwright-core@1.63.0` before writing anything
+depending on it: `typeof page.emulateVisionDeficiency` is `undefined`, and
+grepping that package's own `types/types.d.ts` for the method name finds
+nothing). The underlying capability still exists one layer down: Chrome
+DevTools Protocol's `Emulation.setEmulatedVisionDeficiency` (confirmed
+present in `playwright-core`'s own `types/protocol.d.ts`, accepting
+`"none"|"blurredVision"|"reducedContrast"|"achromatopsia"|"deuteranopia"|
+"protanopia"|"tritanopia"`), reachable from any Chromium page via
+`context.newCDPSession(page)` and `cdp.send(...)`.
+
+**The manual pass.** Wrote a throwaway script using that CDP call to
+render and screenshot three representative color-conveyed states - the
+quiz's answered question (`/quiz`, after picking a wrong answer and
+clicking "Check answer"), the World Cup landing page's `TournamentTable`
+(`/competitions/world-cup`, its `.is-winner` column), and the same page's
+`PodiumCards` medal ranking - under `protanopia`/`deuteranopia`/
+`tritanopia`/`achromatopsia`, in both light and dark themes (20
+screenshots total), then actually looked at each one rather than reasoning
+from the CSS. Two early script bugs surfaced and got fixed before the real
+pass: the edition-level `/competitions/world-cup/2022` page doesn't use
+`TournamentTable` at all (that component lives on the landing page,
+`/competitions/world-cup`, which lists every edition in one table - the
+per-edition page uses a different layout via `EditionView.astro`), and the
+homepage (`/`) has no `.podium` section (`PodiumCards` is used by the
+three landing pages, not the homepage). Once pointed at the right pages,
+the result was a clean, thoroughly-checked negative: all three states
+stayed fully legible and distinguishable under every deficiency type
+tested. One real, purely visual observation worth recording even though it
+needed no fix: `PodiumCards`' 🥇/🥈/🥉 medal emoji do lose their
+gold/silver/bronze hue distinction under achromatopsia, rendering as
+near-identical desaturated blobs - but that was never the feature's actual
+accessibility mechanism. `PodiumCards.astro` (`src/components/
+PodiumCards.astro`) conveys rank through document order (champion listed
+first, runner-up second, etc.) plus a `visually-hidden` text label per row
+("Champion:", "Runner-up:", "Third:", "Fourth:") that a screen reader
+exposes regardless of any visual filter, and the fourth-place row never
+had a medal at all - just a plain "4." glyph. The emoji's color was always
+decorative on top of an already-accessible design, not the thing carrying
+the information.
+
+**Making it permanent.** A one-off screenshot pass has no lasting value
+once this run ends, and a pixel-diff regression test would be the wrong
+tool here anyway: CDP vision-deficiency emulation is a rendering-only
+filter, so it never changes what `getComputedStyle()` reports - a
+pixel-diff would only be re-testing Chromium's own filter implementation,
+not this site's markup. Instead added `tests/e2e/color-vision-
+deficiency.spec.ts`: 12 tests (the 4 deficiency types crossed with the 3
+states above), each wrapped in a real CDP-emulated context via a small
+`withVisionDeficiency()` helper, asserting the actual non-color signal
+each existing fix relies on rather than re-deriving it from pixels - the
+quiz badge's exact text (`✓ correct` / `✗ your answer`), the winner
+cell's computed `text-decoration-line` (contains `underline`) and
+`font-weight` (>= 700), and the podium's per-rank `visually-hidden` label
+set (at least 3 present, all mutually distinct, `"Champion:"` first).
+
+**Verified the tests actually catch a regression, not just pass
+vacuously** - the same discipline the hundred-and-fortieth run's
+`summary:focus-visible` test and the hundred-and-thirty-ninth run's
+`inlineScriptParity` test both established - by temporarily breaking each
+of the three underlying fixes in turn, rebuilding, and confirming the
+matching test failed with the expected message, then reverting and
+confirming a byte-identical `diff` against the pre-edit source before
+moving to the next:
+1. `TournamentTable.astro`'s `.t-table td.is-winner` rule: changed
+   `text-decoration: underline` to `text-decoration: none`. The
+   winner-cell test failed as expected: `Expected substring: "underline",
+   Received string: "none"`.
+2. `QuizScript.astro`'s `check()` function: replaced the result-badge's
+   conditional `textContent` assignment with an unconditional empty
+   string. The quiz test failed as expected: `Expected: "✓ correct",
+   Received: ""`.
+3. `PodiumCards.astro`: duplicated the champion row's `{championLabel}:`
+   `visually-hidden` text onto the runner-up row (simulating two ranks
+   accidentally sharing a label). The podium test failed as expected: the
+   distinct-label-count assertion got a set of size 3 against 4 labels.
+
+All three reverts were confirmed clean via `diff` against a saved copy of
+each file before rebuilding again. No source file carries a net change
+from this run - the only lasting diff is the new spec file - so no PDF
+regeneration was needed (`pnpm check:pdfs` reverified 700/700 fresh
+anyway, since it's a cheap confirmation regardless).
+
+Full standing health check clean after adding the test: `pnpm lint`
+(207 files, 0/0/1, unchanged), `pnpm test` (711/711, unchanged -
+e2e-only addition, no unit-testable logic touched), `pnpm build` (711
+pages, unchanged), all eighteen `check:*` scripts clean (`check:pdfs`
+700/700), and a full cold-start `pnpm test:e2e` confirmed clean:
+**1003/1003 passed, 13.3 minutes** (up from 991/991 by exactly the 12 new
+tests).
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision, the Nations League Team of the Tournament sourcing
+question - confirmed exhausted, do not re-attempt the same queries), the
+Nations League 2023 attendance conflict, 2021/2025's still-unconfirmed
+Nations League figures, World Cup 1930/1950's/EURO 1996/2020's excluded
+attendance figures, and the hundred-and-twenty-sixth run's still-open
+hyphenation-rendering visual re-check - this run's own CDP investigation
+happened to touch that one incidentally while confirming the
+`PW_EXECUTABLE_PATH` workaround: an isolated `hyphens: auto` test page
+rendered no visible hyphen break in either this session's bundled
+`chromium_headless_shell` *or* the full `chromium-1194` build used as this
+run's own Chromium-version workaround, narrowing the likely cause to this
+environment's Chromium builds generally lacking ICU hyphenation-pattern
+data (not just the specific headless-shell variant the hundred-and-
+twenty-sixth run tested) - still not something a future pass can resolve
+without a differently-provisioned browser or a real device. With
+color-vision deficiency now covered alongside `forced-colors` and the
+original WCAG 1.4.1 contrast/use-of-color audits, a future pass's best bet
+is a fresh dependency-upgrade attempt, re-running the coordinate/keyboard-
+walkthrough method after the next real content or layout change, or a
+genuinely different quality angle not yet tried on this site.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
