@@ -42,6 +42,7 @@ test.describe('theme toggle, English home page', () => {
     await openMenu(page);
     const toggle = page.locator('#theme-toggle');
     const label = page.locator('#theme-toggle .theme-toggle__label');
+    const themeColorMeta = page.locator('#theme-color-meta');
 
     // Fresh visit, no saved preference: the client script's sync() runs once
     // on load and falls back to the emulated OS color scheme (Playwright's
@@ -52,6 +53,10 @@ test.describe('theme toggle, English home page', () => {
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
     await expect(label).toHaveText('Light');
     expect(await page.evaluate(() => localStorage.getItem('theme'))).toBeNull();
+    // BaseLayout's before-paint script resolves the same light default and
+    // points the mobile browser-chrome tint at --light-accent (global.css) -
+    // confirming it never ships stuck on the server-rendered fallback value.
+    await expect(themeColorMeta).toHaveAttribute('content', '#1f6f4f');
 
     await toggle.click();
 
@@ -59,6 +64,9 @@ test.describe('theme toggle, English home page', () => {
     await expect(label).toHaveText('Dark');
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('dark');
+    // --dark-accent (global.css), so a dark-mode reader's browser chrome
+    // tints to the same green the toggle icon/accent color already uses.
+    await expect(themeColorMeta).toHaveAttribute('content', '#46c08a');
 
     // The click itself introduces no new DOM, but the whole page's rendered
     // colors are now driven by the dark palette - confirm that live state
@@ -72,8 +80,54 @@ test.describe('theme toggle, English home page', () => {
     await expect(label).toHaveText('Light');
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
     expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('light');
+    await expect(themeColorMeta).toHaveAttribute('content', '#1f6f4f');
 
     await runAxe(page);
+  });
+
+  // Regression coverage for a real gap: before this run, the theme-toggle's
+  // own visible label/aria-pressed and the theme-color meta tag only ever
+  // resolved the OS color scheme once, at load - a reader who never clicked
+  // the toggle but whose OS switched theme mid-session (e.g. a scheduled
+  // dark-mode switch at sunset) would keep seeing "Light"/aria-pressed=false
+  // and the light-mode browser-chrome tint until their next full reload,
+  // even though every CSS color token already updated live via global.css's
+  // own `@media (prefers-color-scheme: dark)` block.
+  test('a live OS color-scheme change updates the toggle and theme-color meta without a reload, unless a manual choice was saved', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.goto('');
+    await openMenu(page);
+
+    const toggle = page.locator('#theme-toggle');
+    const label = page.locator('#theme-toggle .theme-toggle__label');
+    const themeColorMeta = page.locator('#theme-color-meta');
+
+    await expect(label).toHaveText('Light');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(themeColorMeta).toHaveAttribute('content', '#1f6f4f');
+
+    await page.emulateMedia({ colorScheme: 'dark' });
+
+    await expect(label).toHaveText('Dark');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(themeColorMeta).toHaveAttribute('content', '#46c08a');
+    // No manual choice was ever made by clicking the toggle, so this stays
+    // an OS-driven preference, not a saved override.
+    expect(await page.evaluate(() => localStorage.getItem('theme'))).toBeNull();
+
+    // Once a reader does make a manual choice, it must stick even if the OS
+    // preference changes again afterward - the same "manual override wins"
+    // rule `current()`/ThemeToggle's change-listener guard already apply.
+    await toggle.click();
+    await expect(label).toHaveText('Light');
+    expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('light');
+
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await expect(label).toHaveText('Light');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(themeColorMeta).toHaveAttribute('content', '#1f6f4f');
   });
 
   // Regression test for a real bug: `.site-menu.is-open` (the mobile drawer)

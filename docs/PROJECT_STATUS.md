@@ -16274,6 +16274,17 @@ Copa América captains.
   dimensions (`check:precache` already confirms an icon `src` resolves to a
   file, never that its declared size is true). Fast dist/PNG-header parsing,
   no browser - wired into `.github/workflows/ci.yml` as a required PR gate.
+- `BaseLayout.astro`'s `<meta name="theme-color" id="theme-color-meta">`
+  carries `data-light="#1f6f4f"`/`data-dark="#46c08a"` attributes (added
+  2026-09-18, hundred-and-forty-second intensive run) that must be kept
+  literally equal to `global.css`'s `--light-accent`/`--dark-accent` tokens
+  - there is no shared source of truth between a CSS custom property and an
+  HTML attribute, so a future palette change to either accent color needs a
+  matching manual edit here or the mobile browser-chrome tint silently
+  drifts from the page's own accent color again. Both the before-paint
+  inline script in `BaseLayout.astro` and `ThemeToggle.astro`'s `sync()`
+  read these two attributes rather than hardcoding the colors a second
+  time.
 
 ### Notes jump nav: an in-page "Jump to a section" link list for every long note-card list - closed 2026-09-04 (sixty-third intensive run)
 
@@ -25151,6 +25162,139 @@ original WCAG 1.4.1 contrast/use-of-color audits, a future pass's best bet
 is a fresh dependency-upgrade attempt, re-running the coordinate/keyboard-
 walkthrough method after the next real content or layout change, or a
 genuinely different quality angle not yet tried on this site.
+
+### `theme-color` meta tag now tracks dark mode, and the toggle reacts live to an OS theme change mid-session - closed 2026-09-18 (hundred-and-forty-second intensive run)
+
+A standing health check first (`pnpm install --frozen-lockfile`; `pnpm
+outdated` found nothing new beyond the still-blocked `typescript` 7 entry;
+`pnpm lint` 0 errors/0 warnings/1 pre-existing unrelated hint; `pnpm test`
+711/711; `pnpm build` 711 pages).
+
+Re-attempted this run's own priority-ordered content check first (Nations
+League final-attendance gaps, the highest-named item still open in
+`docs/ROADMAP.md`'s "Left for a future pass" notes) via fresh WebSearch
+queries for the 2021/2023/2025 UEFA Nations League final attendance
+figures. Result: reconfirmed, not reversed, the ninety-sixth intensive
+run's finding. 2023 remains a genuine two-source conflict - every
+Wikipedia-mirroring source (Wikipedia itself, Fandom's football wiki,
+Grokipedia, ESPN-adjacent coverage) consistently states 41,110, but RFEF's
+own match report states 41,500, a different figure from a source that
+cannot itself be dismissed as a Wikipedia mirror. 2021 (31,511) and 2025
+(65,852) still only ever surface one consistently repeated figure with no
+second, demonstrably-independent source stating it outright. None of the
+three were added to `content/uefa-nations-league.md`; spending a third
+cycle re-confirming an already-twice-established negative result would not
+have been a genuinely new content contribution.
+
+Picked a different, previously-untried angle instead, per this file's own
+repeated closing suggestion. Read `ThemeToggle.astro`'s client script
+end-to-end looking for a gap the many prior theme/contrast/color-vision
+passes hadn't covered, and found two related ones:
+
+1. `BaseLayout.astro`'s `<meta name="theme-color">` - the tag mobile
+   Chrome/Safari use to tint the browser's own UI chrome (status bar/
+   address bar) around the page - was a single hardcoded light-mode value
+   (`#1f6f4f`, exactly `--light-accent` from `global.css`) that never
+   changed for a dark-mode reader, whether the dark theme came from OS
+   preference or a manual toggle click. Every CSS color token on the page
+   itself already resolves through the same four-block light/OS-dark/
+   explicit-light/explicit-dark shape `global.css`'s own `--danger` comment
+   documents, but this one meta tag was never wired into that resolution at
+   all.
+2. `ThemeToggle.astro`'s `sync()` function (which updates `aria-pressed`
+   and the visible "Light"/"Dark" label) only ever ran once at script load
+   and again on click - no `matchMedia` `change` listener. A reader who
+   never manually toggled but whose OS switched theme mid-session (e.g. a
+   scheduled OS dark-mode switch at sunset) would see every CSS color token
+   update live via `global.css`'s own
+   `@media (prefers-color-scheme: dark)` block while the toggle's own
+   visible label and `aria-pressed` state silently fell out of sync with
+   the page around it, until the reader's next full reload.
+
+Fixed both. The theme-color meta tag gained an `id="theme-color-meta"` and
+`data-light="#1f6f4f"`/`data-dark="#46c08a"` attributes (`--light-accent`/
+`--dark-accent` exactly, so a future palette change to either token and a
+forgotten matching update here can't silently drift, the same
+duplicated-constant caution `global.css`'s own header comment already
+raises for the light/dark token pairs themselves). `BaseLayout.astro`'s
+existing before-paint inline script (already resolving
+saved-theme-or-OS-preference to avoid a flash of the wrong theme) now also
+sets the meta tag's `content` to the matching value before first paint.
+`ThemeToggle.astro`'s `sync()` does the same on every click. A new
+`window.matchMedia('(prefers-color-scheme: dark)')` `change` listener
+calls `sync()` on a live OS switch, guarded to return early (leaving
+`localStorage`'s saved choice, and the page, untouched) whenever a reader
+has already made an explicit choice - the same "manual override wins"
+precedence `current()` already encodes for the initial resolution, so a
+reader who deliberately picked light mode never gets silently flipped back
+to dark just because their OS did.
+
+Extended `tests/e2e/accessibility-theme-toggle.spec.ts` (added specifically
+to cover the toggle's live-click interaction) rather than adding a new spec
+file. The existing "click toggles theme, aria-pressed, label text, and
+persists via localStorage" test now also asserts the meta tag's `content`
+at each of the three theme states exercised (default light, clicked dark,
+clicked back to light). A new test, "a live OS color-scheme change updates
+the toggle and theme-color meta without a reload, unless a manual choice
+was saved", drives `page.emulateMedia({ colorScheme })` after the initial
+`page.goto()` (no reload) to confirm: the toggle's label/`aria-pressed` and
+the meta tag's `content` all update live on an OS-only change; no
+`localStorage` entry gets written by a purely OS-driven change; and a
+manual choice made via a real toggle click afterward both takes effect
+immediately and then survives a subsequent OS flip unchanged.
+
+Verified both test extensions actually catch a regression, not just pass
+vacuously - the same revert-and-confirm method this file's own color-
+vision-deficiency and `:focus-visible`/`summary` entries already
+established. Two edits, checked one at a time:
+1. Removed the new meta-tag-sync block from `ThemeToggle.astro`'s `sync()`.
+   Killed the stale reused preview server first (Playwright's
+   `reuseExistingServer: !process.env.CI` otherwise serves the pre-edit
+   build - this file's own standing caution about trusting a cached preview
+   server against a source edit applies here too), then re-ran just the
+   "persists via localStorage" test: failed as expected, `Expected:
+   "#46c08a", Received: "#1f6f4f"`.
+2. Restored that file exactly, confirmed byte-identical via `diff` against
+   a pre-edit copy, then separately removed the new `matchMedia` `change`
+   listener and re-ran just the new OS-change test: failed as expected,
+   `Expected: "Dark", Received: "Light"`.
+Restored both edits byte-for-byte identical to the intended fix afterward,
+`diff`-confirmed clean before moving on.
+
+No PDF regeneration needed - PDFs are static print-media captures
+(`page.pdf()` via Playwright, see `scripts/generate-pdfs.mjs`) and a
+browser-chrome-only meta tag touches nothing `@media print` or the PDF
+renderer reads; `pnpm check:pdfs` reverified 700/700 fresh anyway, the same
+cheap-confirmation-regardless habit every run since PDFs launched has kept.
+
+Full standing health check clean after the change: `pnpm lint` (207 files,
+0 errors/0 warnings/1 hint, unchanged - the one hint is the pre-existing,
+unrelated `drag-interactions.spec.ts` Playwright API-deprecation notice),
+`pnpm test` (711/711, unchanged - both changed scripts are presentation-
+layer DOM event handlers, not pure functions, so there's no new
+unit-testable logic to cover), `pnpm build` (711 pages, unchanged), all
+eighteen `check:*` scripts clean (`check:pdfs` 700/700), and a full
+cold-start `pnpm test:e2e` (killed the stale reused preview server first,
+same reasoning as the verification step above):
+**1004/1004 passed, 15.3 minutes** (up from 1003/1003 by exactly the one
+new test).
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision, the Nations League Team of the Tournament sourcing
+question - confirmed exhausted, do not re-attempt the same queries), the
+now-twice-independently-reconfirmed Nations League 2023 attendance
+conflict and 2021/2025 unconfirmed figures (a third cycle here needs a
+genuinely new source lead, e.g. direct page-fetch access this
+environment's egress policy doesn't currently allow WebFetch/curl to
+reach, rather than another repeat of the same WebSearch queries), World Cup
+1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+re-check. A future pass's best bet is the same standing menu recent
+entries have named: a fresh dependency-upgrade attempt, re-running the
+coordinate/keyboard-walkthrough method after the next real content or
+layout change, or another genuinely different quality angle not yet tried
+on this site.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
