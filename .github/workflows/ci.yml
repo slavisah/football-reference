@@ -81,6 +81,9 @@ jobs:
       - name: English/Croatian note-section parity check
         run: pnpm check:i18n-notes
 
+      - name: English/Croatian attendance-number format check
+        run: pnpm check:attendance-format
+
       - name: Ambiguous link-name check
         run: pnpm check:link-names
 
