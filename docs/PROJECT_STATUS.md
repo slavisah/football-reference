@@ -25472,5 +25472,70 @@ reaching its scheduled date (EURO 2028, Copa América 2028, the 2026-27
 Nations League Finals in 2027, or the next Ballon d'Or ceremony), or a
 human decision on one of the two items above that only a person can make.
 
+### Dependency patch bump (lighthouse 13.4.1 -> 13.5.0) - closed 2026-09-18 (hundred-and-forty-fifth intensive run)
+
+A standing health check first: `git fetch`/rebase onto `main` was a no-op
+(branch already current), `pnpm install --frozen-lockfile` clean, `pnpm
+outdated` turned up one new in-range patch release beyond the still-blocked
+`typescript` 7 entry (`lighthouse` 13.4.1 -> 13.5.0; re-confirmed via `npm
+view @astrojs/check@latest peerDependencies` that `typescript: '^5.0.0 ||
+^6.0.0'` is still the ceiling). Installed the bump, then ran the full
+standing baseline: `pnpm lint` (0 errors/0 warnings/1 hint, the same
+pre-existing `drag-interactions.spec.ts` deprecation notice every recent run
+carries), `pnpm test` (726/726 unit), `pnpm build` (711 pages), all
+nineteen fast `check:*` scripts clean (`check:pdfs` 700/700 - no source file
+changed, so no PDF regeneration needed), `pnpm test:coverage` (unchanged at
+99.91%/99.3%), `pnpm audit` (no known vulnerabilities), and `pnpm dlx knip
+--no-config-hints` (the same single `scripts/test-preview-server.mjs` false
+positive every prior run has confirmed).
+
+Also ran the four full-site browser-based sweeps that stay
+manual/intensive-run-only rather than CI gates: `check:reflow` (711/711, no
+horizontal overflow at 320px), `check:text-zoom` (711/711, no overflow at
+200% text zoom), `check:print-width` (711/711, no overflow in print media at
+1032px), and `check:lighthouse` - the one this run's own dependency bump
+touches directly - all 37 sampled pages still a perfect 1.00/1.00/1.00/1.00
+performance/accessibility/best-practices/SEO, confirming the newer
+`lighthouse` release changed no score. (All four needed
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` this run - this container's
+`chromium_headless_shell` binary doesn't match the `@playwright/test`
+version currently resolved, the same fallback these scripts' own header
+comments already document; the bundled `/opt/pw-browsers/chromium` full
+build launches fine.)
+
+Per this routine's own priority order, re-attempted the highest-named
+still-open content item (the Nations League Team of the Tournament sourcing
+question / final-attendance gap) once more: a direct `WebFetch` to
+`en.wikipedia.org` again returned `EGRESS_BLOCKED` from this environment's
+network proxy, the same result the hundred-and-forty-fourth run's own
+first `WebFetch` attempt got. This reconfirms (rather than assumes) that
+blocker is still in force today, not stale information copied forward.
+
+No `content/*.md`, `src/`, `scripts/`, or `tests/` file needed a change this
+run beyond `package.json`/`pnpm-lock.yaml`, so no PDF regeneration and no
+unit- or e2e-test-count change. Full cold-start `pnpm test:e2e` (no stale
+preview server running beforehand, confirmed via `ps aux` before starting):
+**1004/1004 passed, 12.8 minutes** - unchanged from the
+hundred-and-forty-third/hundred-and-forty-fourth runs' baseline, confirming
+zero regression from the dependency bump.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7 - `@astrojs/check`'s peer ceiling re-confirmed
+unchanged; `docs/SOURCES.md` link-liveness and the Nations League attendance
+gap - both still blocked at the transport level for `WebFetch`; the
+`long-title` brand-suffix decision and the Nations League Team of the
+Tournament sourcing question - both need human input, not more research),
+World Cup 1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+re-check (needs a real desktop/mobile browser outside this environment, not
+just a different Playwright launch flag - this run's own
+`PW_EXECUTABLE_PATH` fallback above is a different Chromium build than the
+one that specific caveat is about, and didn't attempt to re-test it). Every
+named quality axis still has its own permanent automated check and came back
+clean again with zero drift; a future pass's realistic options remain the
+next upstream patch release, the next real content or layout change, the
+next real-world tournament reaching its scheduled date, or a human decision
+on one of the two items above.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
