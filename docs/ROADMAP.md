@@ -6370,3 +6370,11 @@ back clean:
   attendance gap (a direct `WebFetch` to `en.wikipedia.org`, rather than
   another `WebSearch` pass) both reconfirmed the same blockers, not new
   information. No code or content change this run.
+- **Dependency patch bump (lighthouse 13.4.1 -> 13.5.0)** - closed 2026-09-18
+  (hundred-and-forty-fifth intensive run) - `pnpm outdated` turned up one new
+  in-range patch release since the hundred-and-forty-fourth run's baseline
+  (`typescript` 7 stays the only blocked entry, re-confirmed via `npm view
+  @astrojs/check@latest peerDependencies`). Installed cleanly; see
+  `docs/PROJECT_STATUS.md`'s matching entry for the full verification
+  (including a repeat `WebFetch` to `en.wikipedia.org`, still
+  `EGRESS_BLOCKED`, reconfirming that blocker stays exhausted for now).
