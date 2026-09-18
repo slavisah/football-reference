@@ -6360,3 +6360,13 @@ back clean:
   dependency-upgrade attempt, re-running the coordinate/keyboard-walkthrough
   method after the next real content or layout change, or another
   genuinely different quality angle not yet tried on this site.
+- **Confirmation health check, no new angle found** - closed 2026-09-18
+  (hundred-and-forty-fourth intensive run) - see `docs/PROJECT_STATUS.md`'s
+  matching entry. Every fast `check:*` script and the four browser-based
+  manual sweeps (`check:reflow`/`check:text-zoom`/`check:print-width`/
+  `check:lighthouse`) came back clean and byte-for-byte unchanged from the
+  hundred-and-forty-third run's baseline; a fresh attempt at the standing
+  `typescript` 7 blocker and a genuinely new method for the Nations League
+  attendance gap (a direct `WebFetch` to `en.wikipedia.org`, rather than
+  another `WebSearch` pass) both reconfirmed the same blockers, not new
+  information. No code or content change this run.
