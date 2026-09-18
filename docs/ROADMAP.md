@@ -6304,3 +6304,57 @@ back clean:
   attempt, re-running the coordinate/keyboard-walkthrough method after the
   next real content or layout change, or another genuinely different
   quality angle not yet tried on this site.
+- **New `check:attendance-format`: cross-checks every EN/HR attendance
+  figure's thousands-separator convention, plus one real bug it caught**:
+  closed 2026-09-18 (hundred-and-forty-third intensive run) - a standing
+  health check first (`pnpm install`; `pnpm outdated` found nothing new
+  beyond the still-blocked `typescript` 7 entry; `pnpm lint` 0/0/1; `pnpm
+  test` 711/711; `pnpm build` 711 pages; all eighteen `check:*` scripts
+  clean). First swept the seven per-family edition-page route trees
+  (`[year].astro`, EN + HR) for `EditionView`/`References` prop-parity
+  drift, the same method the hundred-and-twentieth run already used there -
+  came back clean, confirming that angle stays exhausted. Picked a
+  genuinely new angle instead: every "Final venues" note section (World
+  Cup, EURO, Copa América, Nations League) hand-types an attendance figure
+  once per language, and English/Croatian use opposite thousands-separator
+  conventions (English commas, `55,000`; Croatian periods, `55.000`) -
+  nothing before this run ever cross-checked that a hand-translated
+  Croatian figure actually used its own locale's convention rather than a
+  stray English-style comma, a stray un-grouped number, or a plain digit
+  transposition. Found one real, live bug this way:
+  `hr/competitions/copa-america.astro`'s 2021 Maracanã COVID-era attendance
+  note read "6500 gledatelja" - ungrouped entirely, unlike every other
+  attendance figure in that same file - fixed to "6.500 gledatelja"
+  (`content/copa-america.md`'s English source already correctly said
+  "6,500"). Added `scripts/check-attendance-format.mjs`
+  (`pnpm check:attendance-format`, wired into CI): extracts every
+  comma-grouped English number and period-grouped Croatian number from each
+  matched "Final venues"/"Mjesta finala" page pair's list items (built-HTML
+  regex extraction, same territory as `check:i18n-notes`/`check:links` -
+  well under a second for all 711 pages) and diffs them positionally,
+  flagging a count mismatch, a digit mismatch, or a number using the wrong
+  language's separator convention. Verified it actually catches a
+  regression, not just passes vacuously, by reintroducing the exact "6500"
+  bug and confirming the check failed with the expected message, then
+  restoring the fix (`diff` confirmed byte-identical to the intended edit
+  afterward). 15 new unit tests (`tests/unit/checkAttendanceFormat.test.ts`)
+  cover the extraction and diff logic directly. All 700 PDFs regenerated
+  and reverified clean (`pnpm build:pdfs` then `pnpm check:pdfs`, since the
+  content fix changed one rendered Croatian page). Full standing health
+  check clean after the change: `pnpm lint` (0/0/1, unchanged), `pnpm test`
+  (726/726 unit, up from 711 - the 15 new cases), `pnpm build` (711 pages,
+  unchanged), all nineteen `check:*` scripts clean (the new one included),
+  `pnpm dlx knip --no-config-hints` (same one confirmed false positive as
+  every prior run). **Left for a future pass:** the same environment-blocked
+  items as ever (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+  `long-title` brand-suffix decision, the Nations League Team of the
+  Tournament sourcing question - confirmed exhausted), the Nations League
+  2023 attendance conflict and 2021/2025 unconfirmed figures, World Cup
+  1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+  hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+  re-check. With locale-aware number formatting now checked alongside note
+  structure (`check:i18n-notes`) and header labels
+  (`check:edition-header-labels`), a future pass's best bet is a fresh
+  dependency-upgrade attempt, re-running the coordinate/keyboard-walkthrough
+  method after the next real content or layout change, or another
+  genuinely different quality angle not yet tried on this site.

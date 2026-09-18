@@ -25296,5 +25296,104 @@ coordinate/keyboard-walkthrough method after the next real content or
 layout change, or another genuinely different quality angle not yet tried
 on this site.
 
+### New `check:attendance-format`: cross-checks every EN/HR attendance figure's thousands-separator convention, plus one real bug it caught - closed 2026-09-18 (hundred-and-forty-third intensive run)
+
+A standing health check first (`pnpm install`; `pnpm outdated` found
+nothing new beyond the still-blocked `typescript` 7 entry; `pnpm lint` 0
+errors/0 warnings/1 pre-existing unrelated hint; `pnpm test` 711/711;
+`pnpm build` 711 pages; all eighteen `check:*` scripts clean).
+
+Swept the seven per-family edition-page route trees (`[year].astro`, EN +
+HR: World Cup, EURO, Copa América, Nations League, Ballon d'Or, and both
+Golden Boot route trees) for `EditionView`/`References` prop-parity drift,
+the same "read every EN/HR call site end to end" method the
+hundred-and-twentieth run already applied there. Read all fourteen files
+in full - every `loadCompetition()` call, every `HEADER_LABELS` map, every
+`headingTemplate`/`introTemplate`/pager label, every `References` prop -
+and found nothing new: all seven pairs stay internally consistent. That
+angle is confirmed exhausted for this file shape a second time.
+
+Picked a genuinely different, previously-untried angle instead: every
+"Final venues" note section (World Cup, EURO, Copa América, Nations
+League - the only four content files with any attendance figure at all;
+Ballon d'Or/Golden Boot have none) hand-types its attendance figures once
+per language, and English and Croatian use *opposite* thousands-separator
+conventions - English groups with a comma (`55,000`), Croatian with a
+period (comma reserved for decimals: `55.000`). Every prior i18n-parity
+check on these pages (`check:i18n-notes`'s section/item-count check,
+`check:edition-header-labels`'s column-label check) compares *structure*,
+never digit *content* - nothing before this run ever verified that a
+hand-translated Croatian attendance figure actually used its own locale's
+separator, or even that it was grouped at all.
+
+Found one real, live bug this way: `src/pages/hr/competitions/
+copa-america.astro`'s "Final venues" section, 2021 entry (Estádio do
+Maracanã, played behind closed doors under COVID-19 restrictions), read
+"uz prijavljenih samo 6500 gledatelja" - a bare, ungrouped four-digit
+number, unlike every other attendance figure on that same page (`55.921`,
+`65.921`, etc.). `content/copa-america.md`'s English source correctly has
+"a reported attendance of just 6,500"; the Croatian hand-translation
+simply dropped the separator when re-typing the figure. Fixed to "6.500
+gledatelja", matching the page's own established convention.
+
+Added `scripts/check-attendance-format.mjs` (`pnpm check:attendance-format`,
+wired into `.github/workflows/ci.yml` as a required PR gate, alongside
+`check:i18n-notes`/`check:links`/`check:jsonld` in the same "plain regex
+over already-built HTML, well under a second for all 711 pages" tier
+rather than the four slower Playwright-based sweeps): for each English
+page with a "Final venues" note section and its Croatian counterpart
+(found via `check-i18n-notes.mjs`'s own exported `hrCounterpart()`),
+extracts every note-card list item's text restricted to sections whose
+heading ends in "Final venues"/"Mjesta finala" (matching by suffix, since
+the heading's own leading emoji `<span>` survives HTML-tag-stripping as a
+leaf character), then for each item pulls every comma-grouped English
+number and every period-grouped Croatian number via `\d{1,3}(?:[,.]\d{3})+`
+- a pattern that structurally cannot match a bare year (`1970`/`1970.`),
+since it requires a full three-digit group after the separator. Diffs the
+two lists positionally: a count mismatch, a digit mismatch, or - the most
+distinct failure mode - an English-style comma-grouped number found on the
+Croatian side (or a Croatian-style period-grouped number found on the
+English side) each get their own specific message rather than a generic
+"numbers differ" report.
+
+Verified the check actually catches a regression, not just passes
+vacuously: reintroduced the exact "6500" bug, confirmed
+`check:attendance-format` failed with `EN has 1 grouped number(s) [6500]
+but HR has 0 []` (the ungrouped-number case naturally falls out of the
+same "count mismatch" branch, rather than needing a fourth failure mode of
+its own), then restored the fix and confirmed byte-for-byte identical to
+the intended edit via `diff` before moving on. 15 new unit tests
+(`tests/unit/checkAttendanceFormat.test.ts`) cover `extractFinalVenuesItems`
+(section-heading matching, non-"Final venues" sections correctly ignored),
+`extractGroupedNumbers` (comma/period extraction, the bare-year exclusion
+both directions), and `diffAttendanceNumbers` (clean match, no-figure
+match, the ungrouped-number case, both stray-separator cases, and a plain
+digit mismatch).
+
+All 700 PDFs regenerated and reverified clean (`pnpm build:pdfs` then
+`pnpm check:pdfs`, since the content fix changed one rendered Croatian
+page's output). Full standing health check clean after the change: `pnpm
+lint` (0 errors/0 warnings/1 pre-existing unrelated hint), `pnpm test`
+(726/726 unit, up from 711 - the 15 new cases), `pnpm build` (711 pages,
+unchanged), all nineteen `check:*` scripts clean (the new
+`check:attendance-format` included: 4 "Final venues" page pairs checked,
+0 problems), `pnpm dlx knip --no-config-hints` (the same one confirmed
+false positive - `scripts/test-preview-server.mjs` - every prior run has
+already established).
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision, the Nations League Team of the Tournament sourcing
+question - confirmed exhausted), the Nations League 2023 attendance
+conflict and 2021/2025 unconfirmed figures, World Cup 1930/1950's/EURO
+1996/2020's excluded attendance figures, and the hundred-and-twenty-sixth
+run's still-open hyphenation-rendering visual re-check. With locale-aware
+number formatting now checked alongside note structure
+(`check:i18n-notes`) and column-header labels
+(`check:edition-header-labels`), a future pass's best bet is a fresh
+dependency-upgrade attempt, re-running the coordinate/keyboard-walkthrough
+method after the next real content or layout change, or another
+genuinely different quality angle not yet tried on this site.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
