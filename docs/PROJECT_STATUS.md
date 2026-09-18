@@ -25398,5 +25398,79 @@ dependency-upgrade attempt, re-running the coordinate/keyboard-walkthrough
 method after the next real content or layout change, or another
 genuinely different quality angle not yet tried on this site.
 
+### Confirmation health check, no new angle found - closed 2026-09-18 (hundred-and-forty-fourth intensive run)
+
+A standing health check first: `pnpm install` (fresh container), `pnpm
+outdated` still shows only the blocked `typescript` 7 entry (re-confirmed
+via `npm view @astrojs/check@latest peerDependencies` - still `typescript:
+'^5.0.0 || ^6.0.0'`), `pnpm lint` (207 files, 0 errors/0 warnings/1 hint,
+the same pre-existing `drag-interactions.spec.ts` deprecation notice every
+recent run has carried), `pnpm test` (726/726 unit), `pnpm build` (711
+pages), all nineteen fast `check:*` scripts clean (`check:pdfs` 700/700),
+and `pnpm dlx knip --no-config-hints` (the same single `unused files`
+false positive every prior run has confirmed -
+`scripts/test-preview-server.mjs`, which `playwright.config.ts`'s
+`webServer.command` actually invokes as a shell string, not a static
+import knip's analysis follows).
+
+Went further than the standard fast sweep this run and also ran the four
+full-site browser-based sweeps that stay manual/intensive-run-only rather
+than CI gates (each a ~700-page-load Playwright/Lighthouse run):
+`check:reflow` (711/711 pages, no horizontal overflow at 320px),
+`check:text-zoom` (711/711, no overflow at 200% text zoom),
+`check:print-width` (711/711, no overflow in print media at the
+1032px A4-landscape content width), and `check:lighthouse` (all 37 sampled
+pages, a perfect 1.00/1.00/1.00/1.00 performance/accessibility/
+best-practices/SEO across every one, including both `hr/*` mirrors of the
+heaviest landing page and both profile-page templates). All four matched
+their established clean baseline exactly - no regression from the
+hundred-and-forty-second/hundred-and-forty-third runs' theme-color-meta and
+attendance-format changes.
+
+Per this routine's own priority order, re-attempted the highest-named still-open
+content item (the Nations League 2021/2023/2025 final-attendance gap) with a
+genuinely different method this time rather than another `WebSearch` pass on
+the same queries the hundred-and-forty-second run's own note said not to
+repeat: a direct `WebFetch` to `en.wikipedia.org`, the "differently-provisioned
+access" the last two closing notes named as the only thing that could move
+this forward. Result: `EGRESS_BLOCKED` - this environment's egress proxy
+still refuses `en.wikipedia.org` outright for `WebFetch`, the same as every
+prior direct-`curl` attempt, not just a `WebSearch`-only limitation. This
+closes off the "maybe `WebFetch` reaches further than `curl`/`WebSearch`"
+question negatively rather than leaving it an untested assumption - a real,
+useful result in its own right per this file's own established
+negative-closure convention, even though it doesn't unblock the underlying
+gap.
+
+No `content/*.md`, `src/`, `scripts/`, or `tests/` file needed a change this
+run, so no PDF regeneration, no unit-test-count change, and no e2e-count
+change. Full cold-start `pnpm test:e2e` (killed the stale reused preview
+server first, the same standing caution every run since the theme-color
+entry has kept): **1004/1004 passed, 13.8 minutes** (unchanged from the
+hundred-and-forty-third run's baseline, as expected with zero code changes).
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7 - `@astrojs/check`'s peer ceiling re-confirmed unchanged;
+`docs/SOURCES.md` link-liveness and the Nations League attendance gap - both
+now confirmed blocked at the transport level for `WebFetch` too, not just
+`WebSearch`, so only a differently-provisioned network policy for this
+environment itself could move either forward; the `long-title` brand-suffix
+decision and the Nations League Team of the Tournament sourcing question -
+both need human input, not more research), World Cup 1930/1950's/EURO
+1996/2020's excluded attendance figures, and the hundred-and-twenty-sixth
+run's still-open hyphenation-rendering visual re-check. At this point every
+named quality axis (markup validity, JSON-LD structure, WCAG 2.1/2.2 A/AA
+plus best-practice and color-vision-deficiency coverage, three full-site
+layout axes, Lighthouse, meta/SEO integrity, locale/i18n consistency,
+spelling, PDF freshness and PDF/UA tagging, link/sitemap/reachability
+integrity) has its own permanent automated check and came back clean again
+this run with zero drift - a future pass's realistic options are a fresh
+`pnpm outdated` the next time an upstream package ships a patch, the next
+real content or layout change (which would make the coordinate/keyboard-
+walkthrough method worth re-running), the next real-world tournament
+reaching its scheduled date (EURO 2028, Copa América 2028, the 2026-27
+Nations League Finals in 2027, or the next Ballon d'Or ceremony), or a
+human decision on one of the two items above that only a person can make.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
