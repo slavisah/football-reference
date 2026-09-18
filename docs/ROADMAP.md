@@ -6214,3 +6214,93 @@ back clean:
   dependency-upgrade attempt, re-running the coordinate/keyboard-walkthrough
   method after the next real content or layout change, or a genuinely
   different quality angle not yet tried on this site.
+- **`theme-color` meta tag now tracks dark mode (OS preference and the
+  manual toggle), and the toggle itself reacts live to an OS theme change
+  mid-session**: closed 2026-09-18 (hundred-and-forty-second intensive run)
+  - a standing health check first (`pnpm install --frozen-lockfile`; `pnpm
+  outdated` found nothing new beyond the still-blocked `typescript` 7 entry;
+  `pnpm lint` 0 errors/0 warnings; `pnpm test` 711/711; `pnpm build` 711
+  pages). This run's own content-gap re-check (a fresh WebSearch attempt at
+  the still-open UEFA Nations League 2021/2023/2025 final-attendance gap)
+  reconfirmed rather than reversed the ninety-sixth run's finding: 2023 is a
+  genuine two-source conflict (Wikipedia-mirroring sources consistently say
+  41,110; RFEF's own match report says 41,500) and 2021/2025 still never
+  surface a second, demonstrably-independent (non-Wikipedia-mirroring)
+  source - so none of the three were added, avoiding a third cycle spent
+  re-confirming an already-exhausted negative result. Picked a genuinely
+  different, previously-untried angle instead, per this file's own repeated
+  closing suggestion: every color token in `global.css` already reacts to
+  both OS `prefers-color-scheme` and the in-page toggle's `data-theme`
+  override, but `BaseLayout.astro`'s `<meta name="theme-color">` (the tag
+  mobile Chrome/Safari use to tint the browser's own UI chrome around the
+  page) was a single hardcoded light-mode value (`#1f6f4f`,
+  `--light-accent`) that never changed for a dark-mode reader, whether from
+  OS preference or a manual toggle click - confirmed by reading
+  `ThemeToggle.astro`'s `sync()` function, which updates `aria-pressed` and
+  the visible label but had no equivalent for this meta tag. A related,
+  independent gap surfaced while reading that same script: `sync()` only
+  ever ran once at load and again on click, with no `matchMedia` listener,
+  so a reader who never manually toggled but whose OS switched theme mid
+  session (a scheduled OS dark-mode switch at sunset, for example) would see
+  every CSS color token update live via `global.css`'s own
+  `@media (prefers-color-scheme: dark)` block while the toggle's own visible
+  label/`aria-pressed` state silently fell out of sync with the page around
+  it until the next full reload.
+  Fixed both: the theme-color meta tag now carries `data-light`/`data-dark`
+  attributes (`#1f6f4f`/`#46c08a`, matching `--light-accent`/`--dark-accent`
+  exactly) and an `id`; `BaseLayout.astro`'s existing before-paint inline
+  script (already resolving saved-theme-or-OS-preference to avoid a color
+  flash) now also points the meta tag's `content` at the matching value
+  before first paint, and `ThemeToggle.astro`'s `sync()` does the same on
+  every click. A new `window.matchMedia('(prefers-color-scheme: dark)')`
+  `change` listener in `ThemeToggle.astro` calls `sync()` on a live OS
+  switch, guarded to skip resyncing (leaving the manual choice in
+  `localStorage` in force) whenever a reader has already made an explicit
+  choice - the same "manual override wins" precedence `current()` already
+  encodes for the initial resolution.
+  Extended `tests/e2e/accessibility-theme-toggle.spec.ts` (the file added
+  specifically to cover the toggle's live-click interaction) rather than
+  adding a new spec file: the existing "click toggles theme..." test now
+  also asserts the meta tag's `content` at each of the three theme states,
+  and a new test drives `page.emulateMedia({ colorScheme })` after load (no
+  reload) to confirm the toggle's label/`aria-pressed`/meta tag all update
+  live on an OS-only change, that no `localStorage` entry gets written by an
+  OS-driven change, and that a prior manual choice survives a subsequent OS
+  flip unchanged. Verified both extensions actually catch a regression, not
+  just pass vacuously, the same way this file's own prior additions have:
+  temporarily removed the meta-sync block from `sync()` (confirmed the
+  "persists via localStorage" test fails with `Expected: "#46c08a", Received:
+  "#1f6f4f"`) and separately removed the new `matchMedia` `change` listener
+  (confirmed the new OS-change test fails with `Expected: "Dark", Received:
+  "Light"`), then restored both edits byte-for-byte identical to the
+  intended fix before moving on - `diff` against a pre-edit copy confirmed
+  no drift. No PDF regeneration needed (PDFs are static print-media
+  captures; a browser-chrome-only meta tag doesn't touch anything
+  `page.pdf()` renders), `pnpm check:pdfs` reverified 700/700 fresh anyway.
+  Full standing health check clean after the change: `pnpm lint` (0/0/1,
+  unchanged - the one hint is the pre-existing, unrelated
+  `drag-interactions.spec.ts` deprecation notice), `pnpm test` (711/711,
+  unchanged - presentation-layer DOM scripts, no new unit-testable pure
+  logic), `pnpm build` (711 pages, unchanged), `check:html`/`check:jsonld`/
+  `check:links`/`check:sitemap`/`check:precache`/`check:meta`/
+  `check:award-tallies`/`check:edition-header-labels`/`check:i18n-notes`/
+  `check:link-names`/`check:image-dimensions`/`check:locale-consistency`/
+  `check:heading-outline`/`check:reachability`/`check:spelling` all clean,
+  and a full cold-start `pnpm test:e2e` (killed the stale reused preview
+  server first, per this file's own standing "never trust
+  `reuseExistingServer`'s cached build against a source edit" caution):
+  **1004/1004 passed** in 15.3 minutes.
+  **Left for a future pass:** the same environment-blocked items as ever
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+  brand-suffix decision, the Nations League Team of the Tournament sourcing
+  question - confirmed exhausted), the now-twice-independently-reconfirmed
+  Nations League 2023 attendance conflict and 2021/2025 unconfirmed figures
+  (a future pass shouldn't spend a third cycle here without a genuinely new
+  source lead, e.g. direct page-fetch access this environment's egress
+  policy doesn't currently allow), 2021/2025 World Cup/EURO 1996/2020's
+  excluded attendance figures, and the hundred-and-twenty-sixth run's
+  still-open hyphenation-rendering visual re-check. A future pass's best bet
+  is the same standing menu as recent entries: a fresh dependency-upgrade
+  attempt, re-running the coordinate/keyboard-walkthrough method after the
+  next real content or layout change, or another genuinely different
+  quality angle not yet tried on this site.

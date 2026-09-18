@@ -177,7 +177,13 @@ const structuredData = withInLanguage(
       href={withBase(locale === 'hr' ? '/hr/manifest.webmanifest' : '/manifest.webmanifest')}
     />
     <link rel="apple-touch-icon" href={withBase('/icons/icon-192.png')} />
-    <meta name="theme-color" content="#1f6f4f" />
+    <meta
+      name="theme-color"
+      id="theme-color-meta"
+      content="#1f6f4f"
+      data-light="#1f6f4f"
+      data-dark="#46c08a"
+    />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Football Reference" />
     <meta name="color-scheme" content="light dark" />
@@ -210,15 +216,28 @@ const structuredData = withInLanguage(
       ))
     }
 
-    {/* Apply the saved theme before paint to avoid a flash. */}
+    {/* Apply the saved theme before paint to avoid a flash, and point the
+    mobile browser-chrome tint (the theme-color meta tag above) at the same
+    resolved theme so it doesn't stay stuck on the light-mode brand color
+    for a dark-mode reader - ThemeToggle.astro's script keeps it in sync
+    after a manual toggle or a live OS theme change. */}
     <script is:inline>
       (function () {
+        var theme;
         try {
           var saved = localStorage.getItem('theme');
           if (saved === 'light' || saved === 'dark') {
+            theme = saved;
             document.documentElement.dataset.theme = saved;
           }
         } catch (e) {}
+        if (!theme) {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        var meta = document.getElementById('theme-color-meta');
+        if (meta) {
+          meta.setAttribute('content', theme === 'dark' ? meta.dataset.dark : meta.dataset.light);
+        }
       })();
     </script>
 
