@@ -25379,7 +25379,10 @@ unchanged), all nineteen `check:*` scripts clean (the new
 `check:attendance-format` included: 4 "Final venues" page pairs checked,
 0 problems), `pnpm dlx knip --no-config-hints` (the same one confirmed
 false positive - `scripts/test-preview-server.mjs` - every prior run has
-already established).
+already established), and a full cold-start `pnpm test:e2e`: **1004/1004
+passed, 14.5 minutes** (unchanged count from the hundred-and-forty-second
+run's baseline - `check:attendance-format` is a fast content-parsing
+script, not a Playwright test, so this run added no new e2e cases).
 
 **Left for a future pass:** the same environment-blocked items as ever
 (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`

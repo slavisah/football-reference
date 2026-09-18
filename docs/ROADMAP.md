@@ -6345,7 +6345,9 @@ back clean:
   (726/726 unit, up from 711 - the 15 new cases), `pnpm build` (711 pages,
   unchanged), all nineteen `check:*` scripts clean (the new one included),
   `pnpm dlx knip --no-config-hints` (same one confirmed false positive as
-  every prior run). **Left for a future pass:** the same environment-blocked
+  every prior run), and a full cold-start `pnpm test:e2e`: **1004/1004
+  passed, 14.5 minutes** (unchanged count - a fast content-parsing script,
+  not a Playwright test, so no new e2e cases). **Left for a future pass:** the same environment-blocked
   items as ever (`typescript` 7, `docs/SOURCES.md` link-liveness, the
   `long-title` brand-suffix decision, the Nations League Team of the
   Tournament sourcing question - confirmed exhausted), the Nations League
