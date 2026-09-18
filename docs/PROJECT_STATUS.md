@@ -25537,5 +25537,151 @@ next upstream patch release, the next real content or layout change, the
 next real-world tournament reaching its scheduled date, or a human decision
 on one of the two items above.
 
+### All 700 downloadable PDFs now carry page numbers - closed 2026-09-18 (hundred-and-forty-sixth intensive run)
+
+A standing health check first: `git fetch`/checkout of
+`intensive/football-reference` confirmed the branch is already a clean
+fast-forward ahead of `main` (no rebase needed - the prior PR hadn't merged
+yet), `pnpm install --frozen-lockfile` clean, `pnpm outdated` unchanged
+(only the still-blocked `typescript` 7 entry), `pnpm lint` (0 errors/0
+warnings/1 hint, the same pre-existing `drag-interactions.spec.ts`
+deprecation notice every recent run carries), `pnpm test` (726/726 unit),
+`pnpm build` (711 pages), and all nineteen fast `check:*` scripts clean -
+byte-for-byte matching the hundred-and-forty-fifth run's baseline.
+
+Per this routine's own priority order, the Copa América/Nations
+League/Ballon d'Or/Golden Boot content-mining angle has been exhausted for
+many runs now (every award-history table, tally cross-check, and
+i18n/locale-format invariant already has its own permanent `check:*` guard
+per the last several dozen entries above), so this run went looking for a
+genuinely different reader-facing gap instead of another
+health-check-and-confirm pass. Read `scripts/generate-pdfs.mjs` end to end
+(the same "read a shared generator/library file looking for a missing
+affordance" method several recent runs have already used successfully) and
+found one: every one of the 700 downloadable PDFs is a real multi-page A4-
+landscape document - confirmed by counting `/Type /Page` occurrences across
+every file in `public/downloads/` before touching anything: none is a
+single page, they range from 2 pages (`glossary-hr.pdf`) to 103 pages
+(`records.pdf`), 16,609 pages total across all 700 files - but not one of
+them carried a page number anywhere. A reader who prints `records.pdf` or
+loses their place scrolling a 50+ page team/player history PDF has no way
+to tell page 40 from page 41, or to cite a specific page of a specific
+edition sheet - a real, previously-unaddressed usability gap the site's own
+PDF feature (closed 2026-08-06, extended to every edition page 2026-08-25)
+created as a side effect of being genuinely popular/large, not a repeat of
+any prior accessibility/SEO/Lighthouse/PDF-freshness pass.
+
+Playwright's `page.pdf()` supports this natively (a thin wrapper over
+Chromium's own `Page.printToPDF` CDP command's header/footer templates), so
+no new dependency was needed. `pdfOptions()` in `scripts/generate-pdfs.mjs`
+- the single function that already builds every one of the 700 PDFs'
+`page.pdf()` call options (`tagged`/`outline` for PDF/UA accessibility
+structure, added 2026-08-something per that file's own comment) - now also
+sets `displayHeaderFooter: true` and a new `footerTemplate(locale)` helper:
+an 8px, single-line, flex-justified footer showing the page's own `<title>`
+on the left and "Page N of M" (Croatian: "Stranica N od M") on the right,
+rendered inside the existing `@page { margin: 12mm }` band from
+`src/styles/global.css` - no margin change needed, verified empirically
+rather than assumed:
+
+Before wiring this into the full 700-file pipeline, wrote a throwaway
+script (`scripts/pdf-experiment-tmp.mjs`, deleted before committing - never
+part of the shipped diff) that rendered `/records` (103 pages, this site's
+longest PDF) and `/glossary` (2 pages, its shortest along with its Croatian
+sibling) with the new options against a locally running `astro preview`,
+then read the results back with `pdfminer.six` (a Python package installed
+for this run's own verification only via `pip3 install`, not a new
+project/CI dependency - this environment's PyPI egress works even though
+direct `WebFetch`/`curl` to arbitrary sites like `en.wikipedia.org` stays
+blocked, confirmed separately this same run) to measure exact text
+bounding boxes rather than trust the templates render as intended. Findings
+that shaped the final implementation:
+- The footer's text sits at y=14.7-20.7pt on every page checked (out of a
+  595pt-tall A4-landscape page, matching the CSS `@page { margin: 12mm }` ≈
+  34pt margin band), while the lowest real content text on the same pages
+  never comes closer than y=38pt (a dense edition page) or y=44.9pt (a
+  team/player profile) - a comfortable, verified gap on both a
+  content-heavy and a content-light page, not just a best-case check.
+- `pageNumber`/`totalPages` count exactly right end to end: "Page 1 of 2"
+  on `/glossary`'s first page through "Page 103 of 103" on `/records`'s
+  last page, confirmed by extracting both the first and last page of the
+  longest document, not just assuming Chromium's own counter is correct.
+- Playwright's `headerTemplate`/`footerTemplate` support a `class="url"`
+  token that resolves to `document.location` - during PDF generation, that
+  is this script's own `http://localhost:4399/football-reference/...`
+  preview-server origin, not the real
+  `https://slavisah.github.io/football-reference/...` address a reader
+  would actually see. Using it would have silently baked a dead local URL
+  into all 700 shipped PDFs - a real bug this run caught by reading the
+  Playwright API docs for every available template class before picking
+  one, not by trial and error against the live output. `class="title"` was
+  used instead: it reads the live page's own already-correct, per-language
+  `<title>` (the same one `check:meta` already enforces is non-empty,
+  unique per language and under 160 characters, and the same one
+  `pdf-metadata.mjs`'s own header comment notes Chromium already carries
+  into the PDF's `/Title` field automatically with no code needed) - safe
+  because it is real per-page content, not a build-environment artifact.
+
+Locale (English "Page N of M" vs. Croatian "Stranica N od M") is derived
+from the same `/hr/`-prefixed page-path convention every one of the four
+PDF-generation loops (competition/award pages, national teams, award-
+winning players, tournament/award editions) already uses to pick which URL
+to fetch - one new `localeFor(pagePath)` helper (`pagePath.startsWith('/hr/')`)
+threaded through all four loops via `writePdfWithMetadata(outFile, locale)`'s
+new second parameter, rather than duplicating the same string check at each
+of the four call sites.
+
+Also verified this doesn't disturb `pdf-metadata.mjs`'s own post-write
+`/Author` patch - a hand-rolled PDF incremental update that depends on
+Chromium's exact trailer/xref byte shape staying the classic plain-text
+shape (see that file's own extensive header comment on why a full
+PDF-library re-serialize was rejected). Ran `addAuthorMetadata()` directly
+against a footer-enabled test PDF and confirmed: the patch still applies
+without throwing, the patched file still parses with `pdfminer.six`,
+`/StructTreeRoot` count stays at 2 (unchanged from the pre-patch file, the
+same invariant that file's own comment already documents), and the new
+`/Author` entry appears correctly.
+
+All 700 PDFs regenerated (`pnpm build:pdfs`, ~9 minutes) and reverified
+with `pnpm check:pdfs` (700/700 fresh - the content-hash manifest tracks
+`content/*.md`/component/library source files, none of which changed, so
+freshness was never in question; this run's own change is to the generator
+script itself, which that check doesn't and can't track, the same
+documented limitation `scripts/pdf-pages.mjs`'s own header comment already
+calls out for exactly this "rendering-logic-only change" shape). Spot-
+checked the shipped files directly with `pdfminer.six` (not just the
+generation script's own stdout): `records.pdf`/`records-hr.pdf` (103
+pages), `glossary.pdf`/`glossary-hr.pdf` (2 pages), `team-brazil.pdf`,
+`player-lionel-messi.pdf` and `edition-world-cup-2026.pdf` (16 pages) all
+show the correct footer text, correct language, correct page/total counts,
+and no overlap against that page's own lowest content text. No
+`content/*.md`, `src/`, or `tests/` file changed - only
+`scripts/generate-pdfs.mjs` itself and the 700 regenerated PDF binaries -
+so `pnpm lint`/`pnpm test`/`pnpm build` stayed at the exact same
+counts as the standing baseline (0/0/1, 726/726, 711 pages); no existing
+e2e case exercises a downloaded PDF's own binary content (only that the
+download link itself resolves and points at the right file, already
+covered elsewhere), so no e2e-count change either and a full cold-start
+`pnpm test:e2e` re-run wasn't needed to catch a regression this change
+could plausibly cause.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix decision, the Nations League Team of the
+Tournament sourcing question - confirmed exhausted), the Nations League
+2023 attendance conflict and 2021/2025 unconfirmed figures, World Cup
+1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+re-check. This run's own "read a shared generator script end to end
+looking for a missing reader-facing affordance" method has two more
+concrete leads still open in the same file: no PDF bookmark/outline entry
+per note-card section within a single long page (only one top-level
+bookmark per PDF today, via `outline: true`), and no cross-reference link
+from one edition PDF to the adjacent edition's own PDF. Either is a
+reasonable next angle, alongside the same standing menu (a fresh
+dependency-upgrade attempt, the coordinate/keyboard-walkthrough method
+after the next real content or layout change, or another genuinely
+different quality angle not yet tried on this site).
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

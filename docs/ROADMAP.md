@@ -6378,3 +6378,72 @@ back clean:
   `docs/PROJECT_STATUS.md`'s matching entry for the full verification
   (including a repeat `WebFetch` to `en.wikipedia.org`, still
   `EGRESS_BLOCKED`, reconfirming that blocker stays exhausted for now).
+- **All 700 downloadable PDFs now carry page numbers**: closed 2026-09-18
+  (hundred-and-forty-sixth intensive run) - a standing health check first
+  (`pnpm install --frozen-lockfile`; `pnpm outdated` unchanged - only the
+  still-blocked `typescript` 7 entry; `pnpm lint` 0/0/1; `pnpm test`
+  726/726; `pnpm build` 711 pages; all nineteen fast `check:*` scripts
+  clean, matching the hundred-and-forty-fifth run's baseline). Picked a
+  genuinely new angle: every one of the 700 downloadable PDFs
+  (`scripts/generate-pdfs.mjs`) is a real multi-page document (all 700
+  edition/team/player/competition sheets checked - none is a single page;
+  they range from 2 to 103 pages, 16,609 pages total) but none carried a
+  page number anywhere, unlike almost every other printed reference
+  document - a reader who prints `records.pdf` (103 pages) or loses their
+  place scrolling a long download has no way to tell page 40 from page 41,
+  or to cite a specific page of an edition/team/player sheet. Added
+  `displayHeaderFooter`/`footerTemplate` to `pdfOptions()` (the single
+  function that already builds every PDF's `page.pdf()` options), rendering
+  an 8px "‹page title› · Page N of M" (Croatian: "Stranica N od M") footer
+  inside the existing `@page { margin: 12mm }` band from
+  `src/styles/global.css` - verified empirically before wiring it into the
+  full pipeline: a throwaway script rendered `/records` (103 pages) and
+  `/glossary` (2 pages) with the new options, then read the result back
+  with `pdfminer.six` (installed for this run only, not a new project
+  dependency) to confirm the footer text sits at y=14.7-20.7pt on every
+  page checked - comfortably inside the 34pt margin band, with the lowest
+  real content text never closer than 38pt, so no overlap on either a short
+  or a 103-page document - and that `pageNumber`/`totalPages` count exactly
+  right ("Page 1 of 2" through "Page 103 of 103"). Deliberately does not
+  use Playwright's `class="url"` token: it resolves to `document.location`,
+  which during generation is this script's own
+  `http://localhost:4399/football-reference/...` preview origin, not the
+  real `https://slavisah.github.io/...` address a reader would see - using
+  it would have leaked a dead local URL into every shipped PDF, a bug this
+  run avoided by using `class="title"` instead (the live page's own
+  already-correct, per-language `<title>`, the same one Chromium already
+  carries into the PDF's `/Title` per `pdf-metadata.mjs`'s own comment).
+  Locale (English vs. Croatian footer wording) is derived from the same
+  `/hr/`-prefixed page-path convention every PDF loop already uses, via one
+  new `localeFor()` helper threaded through all four PDF loops
+  (competition/award pages, teams, players, editions) rather than
+  duplicated per call site. Verified the change doesn't disturb
+  `pdf-metadata.mjs`'s post-write `/Author` incremental-update patch (which
+  depends on Chromium's exact trailer/xref byte shape): ran it against a
+  footer-enabled test PDF and confirmed the patch still applies cleanly,
+  `/StructTreeRoot`/`/MarkInfo`/`/Marked true`/`/Lang`/`/Outlines` counts
+  stay unchanged, and the file still parses. All 700 PDFs regenerated
+  (`pnpm build:pdfs`) and reverified with `pnpm check:pdfs` (700/700 fresh);
+  spot-checked English and Croatian footers on `/records`,
+  `/glossary`, a team profile, a player profile and an edition page with
+  `pdfminer.six` directly against the shipped files - correct text, correct
+  counts, no overlap on any of them. No `content/*.md`, `src/`, or `tests/`
+  file changed - only `scripts/generate-pdfs.mjs` itself and the 700
+  regenerated PDF binaries - so `pnpm test`/`pnpm build`/`pnpm lint` stayed
+  at the exact same counts as the standing baseline; no e2e case exercises
+  the downloaded PDF's own binary content (only that the download link
+  itself resolves, already covered), so no e2e-count change either. See
+  `docs/PROJECT_STATUS.md`'s matching entry for full detail. **Left for a
+  future pass:** the same environment-blocked items as every recent run
+  (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+  brand-suffix decision, the Nations League Team of the Tournament sourcing
+  question - confirmed exhausted), the Nations League 2023 attendance
+  conflict and 2021/2025 unconfirmed figures, World Cup 1930/1950's/EURO
+  1996/2020's excluded attendance figures, and the
+  hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+  re-check. A future pass could extend this same "read a shared generator
+  script end to end looking for a missing reader-facing affordance" method
+  to the PDF pipeline's other remaining gaps (no PDF bookmarks/outline
+  entry per note-card section within a page, no cross-reference from one
+  edition PDF to the next/previous edition), or take another genuinely
+  different quality angle not yet tried on this site.
