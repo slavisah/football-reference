@@ -6791,3 +6791,49 @@ back clean:
   downloaded PDF's own internal link while offline) or the service worker's
   `activate`/cache-eviction path across a `CACHE_VERSION` bump, neither
   exercised end-to-end by any existing test today.
+- **New e2e coverage for the service worker's `activate`/cache-eviction path
+  across a `CACHE_VERSION` bump**: closed 2026-09-19 (hundred-and-fifty-second
+  intensive run) - the second of the hundred-and-fifty-first run's two
+  suggested angles (the print-PDF-to-live-site handoff stays open, see below).
+  A standing health check first (`pnpm install --frozen-lockfile`; `pnpm
+  outdated` still only the blocked `typescript` 7 entry; `pnpm lint` 0/0/1;
+  `pnpm test` 734/734; `pnpm build` 711 pages - all matching the
+  hundred-and-fifty-first run's baseline). `sw.js.ts`'s `activate` listener
+  (added to evict any Cache Storage entry left over from a previous
+  `CACHE_VERSION` bump so a stale, no-longer-referenced cache doesn't sit
+  around forever) had no test exercising the listener actually firing - every
+  existing offline test only ever exercised the `fetch` handler's read/write
+  behavior against whatever cache already existed from a single install.
+  Added a new `tests/e2e/mobile.spec.ts` case that seeds a bogus
+  differently-named cache (standing in for a stale previous-version cache),
+  then forces a brand-new service-worker registration (unregister the current
+  one, reload) - which, with no existing controller to wait behind, installs
+  and activates immediately the same way a first visit after a real deploy
+  would - and asserts the stale cache is gone afterward while the current
+  version's cache survives. Verified the test isn't a tautology before
+  committing to it: temporarily broke the real `activate` handler (dropped its
+  `caches.keys()`/`caches.delete()` step, keeping only `self.clients.claim()`)
+  and confirmed the new test fails with the stale cache still present, then
+  restored the original code and reconfirmed the test passes - so this is
+  real coverage of a previously-untested mechanism, not a check that only
+  restates its own setup. Full standing health check clean after adding it:
+  `pnpm lint` (0/0/1, unchanged), `pnpm test` (734/734, unchanged - no new
+  pure function, this is e2e-only coverage of already-generated `sw.js.ts`
+  behavior), `pnpm build` (711 pages, unchanged), all seventeen fast
+  `check:*` scripts plus the four daemon-driven ones (`check:reflow`,
+  `check:text-zoom`, `check:print-width`, `check:lighthouse` - 37/37 pages,
+  perfect 1.00 across every category) all clean, and a full cold-start `pnpm
+  test:e2e` (confirmed no stale preview server via `ps aux` beforehand):
+  **1015/1015 passed** (20.5 minutes), no failures or regressions anywhere in
+  the suite. **Left for a future pass:**
+  the same environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix decision, the
+  Nations League Team of the Tournament sourcing question - confirmed
+  exhausted), the Nations League 2023 attendance conflict and 2021/2025
+  unconfirmed figures, World Cup 1930/1950's/EURO 1996/2020's excluded
+  attendance figures, the hundred-and-twenty-sixth run's still-open
+  hyphenation-rendering visual re-check, and the hundred-and-forty-sixth
+  run's still-open per-section PDF bookmarks/outline lead. The
+  hundred-and-fifty-first run's other suggested angle - the print-PDF-to-
+  live-site handoff (a reader opening a downloaded PDF's own internal link
+  while offline) - stays open for a future run.

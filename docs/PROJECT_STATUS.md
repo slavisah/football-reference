@@ -26289,5 +26289,75 @@ downloaded PDF's own internal link while offline, for instance) or the
 service worker's `activate`/cache-eviction path across a `CACHE_VERSION`
 bump, neither of which any existing test drives end-to-end today.
 
+### New e2e coverage for the service worker's `activate`/cache-eviction path across a `CACHE_VERSION` bump - closed 2026-09-19 (hundred-and-fifty-second intensive run)
+
+A standing health check first (`pnpm install --frozen-lockfile`; `pnpm
+outdated` still only the blocked `typescript` 7 entry - re-confirmed via `npm
+view @astrojs/check@latest peerDependencies`; `pnpm lint` 0/0/1; `pnpm test`
+734/734; `pnpm build` 711 pages - all matching the hundred-and-fifty-first
+run's baseline exactly). Picked up the second of that run's own two
+suggested angles (the print-PDF-to-live-site handoff stays open for a future
+run - see below).
+
+`sw.js.ts`'s `activate` listener exists specifically so bumping
+`CACHE_VERSION` doesn't leave an older deploy's precached pages (and their
+storage quota) sitting in Cache Storage forever - it deletes every cache key
+that isn't the current build's `CACHE_NAME`. No test anywhere in the suite
+exercised that listener actually firing: every existing offline test in
+`mobile.spec.ts` only ever drove the `fetch` handler's read/write behavior
+against whatever single cache already existed from one `install`.
+
+Added a new test to the `Installability and offline reading` describe block
+in `tests/e2e/mobile.spec.ts`: after the service worker is ready, it seeds a
+bogus differently-named cache via the real Cache Storage API (standing in for
+a cache left over from a previous, now-superseded `CACHE_VERSION`), then
+forces a brand-new service-worker registration by unregistering the current
+one and reloading the page - with no existing controller for a new
+registration to wait behind, this installs and activates immediately, the
+same way a first visit after a real deploy would. The test asserts the stale
+cache is gone afterward and the current version's own cache survives.
+
+Verified this is real coverage, not a tautology, before committing to it:
+temporarily broke the actual `activate` handler in `src/pages/sw.js.ts`
+(reduced it to just `self.clients.claim()`, dropping the
+`caches.keys()`/`.filter()`/`caches.delete()` eviction step), rebuilt, and
+confirmed the new test fails with the stale cache still present in the
+`keysAfterReactivate` array - then restored the original file (confirmed
+`git diff` empty afterward) and reconfirmed the test passes again. Also ran
+the full `Installability and offline reading` block (10/10, including the
+new test) standalone to rule out any interaction with the other offline
+tests' own service-worker registration/unregistration.
+
+Full standing health check clean after adding the test: `pnpm lint` (0/0/1,
+unchanged), `pnpm test` (734/734, unchanged - this is e2e-only coverage of
+already-generated `sw.js.ts` behavior, no new pure function to unit test),
+`pnpm build` (711 pages, unchanged - no new route or source file besides the
+test itself), `pnpm check:perf`/`check:reflow`/`check:text-zoom`/
+`check:print-width` all clean (711 pages swept at each), `check:lighthouse`
+(37/37 pages, perfect 1.00 across all four categories), and every other fast
+`check:*` script (`check:links`, `check:sitemap`, `check:precache`,
+`check:html`, `check:jsonld`, `check:heading-outline`, `check:reachability`,
+`check:meta`, `check:award-tallies`, `check:edition-header-labels`,
+`check:i18n-notes`, `check:attendance-format`, `check:link-names`,
+`check:image-dimensions`, `check:locale-consistency`, `check:pdfs`,
+`check:spelling`) clean. A full cold-start `pnpm test:e2e` (confirmed no
+stale preview server via `ps aux` beforehand): **1015/1015 passed** (20.5
+minutes), no failures anywhere in the suite. No content file or PDF-source
+component touched, so no PDF regeneration was needed this run.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix decision, the Nations League Team of the
+Tournament sourcing question - confirmed exhausted), the Nations League 2023
+attendance conflict and 2021/2025 unconfirmed figures, World Cup
+1930/1950's/EURO 1996/2020's excluded attendance figures, the
+hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+re-check, and the hundred-and-forty-sixth run's still-open per-section PDF
+bookmarks/outline lead (unchanged - this run didn't touch either question).
+The hundred-and-fifty-first run's other suggested angle - the
+print-PDF-to-live-site handoff, i.e. a reader who opens a downloaded PDF's
+own internal link while offline - stays open for a future run to actually
+drive end-to-end.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

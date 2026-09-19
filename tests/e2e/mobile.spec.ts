@@ -3579,6 +3579,48 @@ test.describe('Installability and offline reading', () => {
     await expect(page.locator('a.lang-switch')).toHaveText('English');
     await context.setOffline(false);
   });
+
+  test('the activate handler evicts a stale cache left over from a previous CACHE_VERSION', async ({
+    page,
+  }) => {
+    // sw.js.ts's own activate listener deletes every Cache Storage entry
+    // whose key isn't the current build's CACHE_NAME, specifically so
+    // bumping CACHE_VERSION doesn't leave an older version's precached pages
+    // (and their storage quota) behind forever. No prior test exercised
+    // that listener actually firing - only the fetch handler's read/write
+    // behavior against whatever cache already existed. Simulates a real
+    // version bump by seeding a bogus differently-named cache (standing in
+    // for "football-reference-v3", the version before this build's) and
+    // then forcing a brand-new service worker registration, which - with no
+    // previous controller to wait behind - installs and activates
+    // immediately, the same way a first visit after a deploy would.
+    await page.goto('');
+    await page.evaluate(() => navigator.serviceWorker.ready);
+
+    const currentCacheName = await page.evaluate(async () => {
+      const keys = await caches.keys();
+      return keys.find((key) => key.startsWith('football-reference-'));
+    });
+    expect(currentCacheName).toBeTruthy();
+
+    await page.evaluate(async () => {
+      const staleCache = await caches.open('football-reference-v0-stale');
+      await staleCache.put('/stale-marker', new Response('stale'));
+    });
+    const keysBeforeReactivate = await page.evaluate(() => caches.keys());
+    expect(keysBeforeReactivate).toContain('football-reference-v0-stale');
+
+    await page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.getRegistration();
+      await registration?.unregister();
+    });
+    await page.reload();
+    await page.evaluate(() => navigator.serviceWorker.ready);
+
+    const keysAfterReactivate = await page.evaluate(() => caches.keys());
+    expect(keysAfterReactivate).not.toContain('football-reference-v0-stale');
+    expect(keysAfterReactivate).toContain(currentCacheName);
+  });
 });
 
 test.describe('Primary nav stays in the current language', () => {
