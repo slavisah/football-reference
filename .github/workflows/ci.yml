@@ -51,6 +51,9 @@ jobs:
       - name: Title-tally integrity check (content/*.md)
         run: pnpm check:award-tallies
 
+      - name: Edition-page header-label translation check
+        run: pnpm check:edition-header-labels
+
       - name: Build
         run: pnpm build
 
@@ -66,14 +69,32 @@ jobs:
       - name: JSON-LD structural-validity check
         run: pnpm check:jsonld
 
+      - name: Heading-outline check
+        run: pnpm check:heading-outline
+
+      - name: Page-reachability check
+        run: pnpm check:reachability
+
       - name: Title/meta-description integrity check
         run: pnpm check:meta
 
       - name: English/Croatian note-section parity check
         run: pnpm check:i18n-notes
 
+      - name: English/Croatian attendance-number format check
+        run: pnpm check:attendance-format
+
+      - name: Ambiguous link-name check
+        run: pnpm check:link-names
+
       - name: Offline install (manifest/service worker) integrity check
         run: pnpm check:precache
+
+      - name: Image-dimension integrity check (manifest icons, og:image/twitter:image)
+        run: pnpm check:image-dimensions
+
+      - name: Locale-consistency check (<html lang> vs URL)
+        run: pnpm check:locale-consistency
 
       - name: Install Playwright browser
         run: pnpm test:e2e:install

@@ -27,11 +27,19 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PDF_PAGES as PAGES, TEAM_PDF_SOURCES, PLAYER_PDF_SOURCES, EDITION_PDF_SOURCES } from './pdf-pages.mjs';
+import { addAuthorMetadata, PDF_AUTHOR } from './pdf-metadata.mjs';
+import { waitForServer } from './preview-daemon.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const PORT = 4399;
 const BASE = process.env.BASE_PATH ?? '/football-reference';
 const ORIGIN = `http://localhost:${PORT}`;
+// The real, deployed origin every internal link needs to resolve to once
+// baked into a static PDF - see rewriteInternalLinksForPrint() below for why.
+// Mirrors astro.config.mjs's own `SITE_URL` env var/default exactly, so this
+// script can never point PDFs at a different origin than the site itself was
+// built for.
+const SITE_URL = (process.env.SITE_URL ?? 'https://slavisah.github.io').replace(/\/$/, '');
 const OUT_DIR = path.join(ROOT, 'public', 'downloads');
 const MANIFEST_PATH = path.join(OUT_DIR, '.pdf-manifest.json');
 
@@ -86,20 +94,6 @@ function playerProfileSlug(name) {
     .replace(/[^a-z0-9]+/gi, '-')
     .replace(/^-+|-+$/g, '')
     .toLowerCase();
-}
-
-async function waitForServer(url, timeoutMs = 60_000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(url);
-      if (res.ok) return;
-    } catch {
-      // not up yet
-    }
-    await new Promise((resolve) => setTimeout(resolve, 300));
-  }
-  throw new Error(`Preview server at ${url} did not become ready in time`);
 }
 
 async function main() {
@@ -161,7 +155,37 @@ async function main() {
       const page = await browser.newPage();
       await page.emulateMedia({ media: 'print' });
 
-      const pdfOptions = (outFile) => ({
+      // Every PDF family renders a real multi-page A4-landscape document
+      // (records.pdf alone is 103 pages) but, until now, carried no page
+      // numbers anywhere - a reader who prints one or loses their place
+      // scrolling a long download has no way to tell page 40 of 103 from
+      // page 41, or to cite "page N" of a specific edition/team/player
+      // sheet. Playwright's `page.pdf()` supports this natively via
+      // `displayHeaderFooter`/`footerTemplate` (a thin wrapper over
+      // Chromium's own `Page.printToPDF` header/footer templates), rendered
+      // inside the existing `@page { margin: 12mm }` band from
+      // src/styles/global.css - verified empirically (a throwaway script
+      // rendering /records and /glossary, then reading the result back with
+      // pdfminer.six) that an 8px single-line footer fits inside that
+      // 12mm/34pt margin with no overlap against the lowest content text on
+      // either page, and that `pageNumber`/`totalPages` count correctly
+      // (both "Page 1 of 2" and "Page 103 of 103" came back exactly right).
+      // Deliberately does NOT use Playwright's `class="url"` token - it
+      // resolves to `document.location`, which during generation is this
+      // script's own `http://localhost:4399/football-reference/...` preview
+      // origin, not the real `https://slavisah.github.io/...` address a
+      // reader would see - that would leak a dead local URL into every
+      // shipped PDF. `class="title"` is safe to use instead: it reads the
+      // live page's own already-correct, per-language `<title>` (verified
+      // by `check:meta`), the same one `pdf-metadata.mjs`'s own comment
+      // notes Chromium already carries into the PDF's `/Title` automatically.
+      function footerTemplate(locale) {
+        const label = locale === 'hr' ? 'Stranica' : 'Page';
+        const of = locale === 'hr' ? 'od' : 'of';
+        return `<div style="width:100%; font-family:Arial,sans-serif; font-size:8px; color:#555555; display:flex; justify-content:space-between; padding:0 12mm; box-sizing:border-box;"><span class="title" style="max-width:70%; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"></span><span>${label} <span class="pageNumber"></span> ${of} <span class="totalPages"></span></span></div>`;
+      }
+
+      const pdfOptions = (outFile, locale) => ({
         path: outFile,
         preferCSSPageSize: true,
         printBackground: true,
@@ -175,13 +199,72 @@ async function main() {
         // PDF was untagged.
         tagged: true,
         outline: true,
+        displayHeaderFooter: true,
+        headerTemplate: '<span></span>',
+        footerTemplate: footerTemplate(locale),
       });
+
+      // The hundred-and-forty-seventh run's edition-to-edition PDF pager
+      // discovered a real, previously-undocumented bug in every one of the
+      // 700 already-shipped PDFs' *other* internal links (team/player/
+      // competition-page links, all built with the site's own withBase()
+      // helper): Chromium's page.pdf() bakes a PDF link annotation from the
+      // anchor's already-*resolved* href at print time, and withBase()
+      // returns a base-relative path (e.g. "/football-reference/teams/
+      // brazil"), which resolves against whatever origin the page happens
+      // to be loaded from - during generation that's this script's own
+      // `http://localhost:4399` preview server, not the published site, so
+      // every internal link in every shipped PDF pointed at a dead
+      // localhost URI. Rather than touch the 63 source files that call
+      // withBase() (which must stay base-relative for normal browsing, dev
+      // preview and e2e tests running against localhost), this rewrites the
+      // already-rendered DOM in place, right before printing: any anchor
+      // whose *resolved* href starts with this script's own ORIGIN gets that
+      // prefix swapped for the real deployed SITE_URL, leaving external
+      // links (a different origin entirely) and the pager's own
+      // already-absolute production hrefs (added by that same prior run)
+      // untouched.
+      async function rewriteInternalLinksForPrint() {
+        await page.evaluate(
+          ({ localOrigin, prodOrigin }) => {
+            document.querySelectorAll('a[href]').forEach((a) => {
+              if (a.href.startsWith(localOrigin)) {
+                a.href = prodOrigin + a.href.slice(localOrigin.length);
+              }
+            });
+          },
+          { localOrigin: ORIGIN, prodOrigin: SITE_URL },
+        );
+      }
+
+      // page.pdf() itself (a thin wrapper over Chromium's Page.printToPDF)
+      // has no author-metadata option - see scripts/pdf-metadata.mjs's own
+      // header comment for why this is a post-write incremental-update
+      // patch rather than a printToPDF parameter or a full PDF-library
+      // re-serialize.
+      async function writePdfWithMetadata(outFile, locale) {
+        await rewriteInternalLinksForPrint();
+        await page.pdf(pdfOptions(outFile, locale));
+        const original = await readFile(outFile);
+        const patched = addAuthorMetadata(original, PDF_AUTHOR);
+        if (patched !== original) {
+          await writeFile(outFile, patched);
+        }
+      }
+
+      // Every PDF family's page path uses this same `/hr/...` prefix
+      // convention for its Croatian half (confirmed across PAGES,
+      // TEAM_PDF_SOURCES-driven, PLAYER_PDF_SOURCES-driven and
+      // EDITION_PDF_SOURCES-driven paths below), so this one helper decides
+      // the footer's language everywhere rather than threading a separate
+      // locale value through each loop.
+      const localeFor = (pagePath) => (pagePath.startsWith('/hr/') ? 'hr' : 'en');
 
       for (const { slug, path: pagePath } of PAGES) {
         const url = `${ORIGIN}${BASE}${pagePath}`;
         await page.goto(url, { waitUntil: 'networkidle' });
         const outFile = path.join(OUT_DIR, `${slug}.pdf`);
-        await page.pdf(pdfOptions(outFile));
+        await writePdfWithMetadata(outFile, localeFor(pagePath));
         console.log(`Wrote ${path.relative(ROOT, outFile)}`);
       }
 
@@ -216,7 +299,7 @@ async function main() {
           const url = `${ORIGIN}${BASE}${pagePath}`;
           await page.goto(url, { waitUntil: 'networkidle' });
           const outFile = path.join(OUT_DIR, `${fileSlug}.pdf`);
-          await page.pdf(pdfOptions(outFile));
+          await writePdfWithMetadata(outFile, localeFor(pagePath));
           teamManifestEntries.push({ slug: fileSlug, sources: TEAM_PDF_SOURCES });
         }
         console.log(`Wrote team-${slug}.pdf / team-${slug}-hr.pdf (${displayName})`);
@@ -254,7 +337,7 @@ async function main() {
           const url = `${ORIGIN}${BASE}${pagePath}`;
           await page.goto(url, { waitUntil: 'networkidle' });
           const outFile = path.join(OUT_DIR, `${fileSlug}.pdf`);
-          await page.pdf(pdfOptions(outFile));
+          await writePdfWithMetadata(outFile, localeFor(pagePath));
           playerManifestEntries.push({ slug: fileSlug, sources: PLAYER_PDF_SOURCES });
         }
         console.log(`Wrote player-${slug}.pdf / player-${slug}-hr.pdf (${displayName})`);
@@ -283,7 +366,7 @@ async function main() {
         const url = `${ORIGIN}${BASE}${pagePath}`;
         await page.goto(url, { waitUntil: 'networkidle' });
         const outFile = path.join(OUT_DIR, `${pdfSlug}.pdf`);
-        await page.pdf(pdfOptions(outFile));
+        await writePdfWithMetadata(outFile, localeFor(pagePath));
         editionManifestEntries.push({ slug: pdfSlug, sources: EDITION_PDF_SOURCES[family] });
       }
       console.log(`Wrote ${editionManifestEntries.length} edition PDFs.`);

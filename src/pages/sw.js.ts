@@ -84,15 +84,26 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return;
 
   if (request.mode === 'navigate') {
+    // Every real page's canonical URL has a trailing slash (PRECACHE_URLS
+    // is built that way too, see offlineCache.ts's withTrailingSlash()) -
+    // normalizing the cache key here before every read/write means a reader
+    // who arrives via a shared/bookmarked canonical link (which always has
+    // the trailing slash) still hits the same precached entry an in-app nav
+    // click (which omits it) would, instead of a spurious cache miss
+    // silently landing them on the home page instead of the page they
+    // actually asked for while offline. The query string is left untouched,
+    // so a "?..." variant of a page still only matches if it was itself
+    // visited online first, same as before this change.
+    const cacheKey = (url.pathname.endsWith('/') ? url.pathname : url.pathname + '/') + url.search;
     event.respondWith(
       fetch(request)
         .then((response) => {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          caches.open(CACHE_NAME).then((cache) => cache.put(cacheKey, copy));
           return response;
         })
         .catch(() =>
-          caches.match(request).then((cached) => cached || caches.match(homeUrlFor(url.pathname)))
+          caches.match(cacheKey).then((cached) => cached || caches.match(homeUrlFor(url.pathname)))
         )
     );
     return;

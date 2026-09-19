@@ -271,10 +271,25 @@ a {
   color: var(--accent);
 }
 
+/* `summary` is a real, natively keyboard-focusable element (the trigger
+   half of every `<details>` disclosure on this site: the quiz's "Just show
+   me the answer" cards in QuizCard.astro/QuizOrderCard.astro, and
+   TournamentTable.astro's "story reveal" rows) but was missing from this
+   selector list, so it fell all the way through to the browser's own
+   unstyled `outline: auto` ring instead of the site's `--focus` token like
+   every other control. That's not just a style inconsistency: in dark mode
+   Chromium's own default focus-ring color renders as a near-black
+   (~#101010) outline against this site's `--dark-bg` (#0f1520) - a measured
+   contrast ratio of about 1.04:1, i.e. functionally invisible - while
+   `--dark-focus` (#6ba6ff) exists specifically to stay visible against that
+   same background. Confirmed via a real keyboard Tab walk with
+   `:focus-visible` matching true before filing this, not assumed from
+   reading the CSS alone. */
 a:focus-visible,
 button:focus-visible,
 select:focus-visible,
 input:focus-visible,
+summary:focus-visible,
 [tabindex]:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
@@ -372,6 +387,22 @@ main {
   border: 0;
 }
 
+/*
+ * Mirror image of `.no-print` below: hidden during normal browsing, shown
+ * only when printing or generating a PDF (scripts/generate-pdfs.mjs emulates
+ * print media before rendering). Added for content that only makes sense on
+ * the printed/PDF page and would be redundant clutter on screen - e.g.
+ * EditionView.astro's PDF-to-PDF cross-reference pager, a link to the
+ * sibling edition's own downloadable PDF file that only matters to a reader
+ * who is already reading a downloaded PDF (the live web page already has its
+ * own on-page pager to the sibling edition's live page). No prior use of
+ * this "opposite of .no-print" direction existed anywhere in this codebase
+ * before this one.
+ */
+.print-only {
+  display: none;
+}
+
 /* --- Print: readable A4-landscape tournament sheets --- */
 @page {
   size: A4 landscape;
@@ -403,6 +434,16 @@ main {
   .filters__reset,
   .no-print {
     display: none !important;
+  }
+
+  /* Reveal `.print-only` content (see that class's own comment above). A
+     bare `display: block` here is only the default toggle; a more specific
+     component (e.g. EditionView.astro's `.edition__pdf-pager`) can still set
+     its own `display` value under its own `@media print` block afterward -
+     Astro's scoped-style attribute selector always outranks this plain
+     global class regardless of source order. */
+  .print-only {
+    display: block;
   }
 
   main {
@@ -475,8 +516,22 @@ main {
     display: table-header-group;
   }
 
+  /* Every bordered "one row per year" box on paper - `.podium__card`/
+     `.timeline__card` (competition landing pages, /records), and the
+     player/team profile pages' own award-history boxes - needs the same
+     protection `.champions__item` already had: without it, a box that falls
+     across a printed page boundary gets its border and background cut in
+     half instead of moving whole onto the next page. Confirmed as a real,
+     live defect (not just a theoretical gap) by measuring every one of
+     these elements' offsetTop against the A4-landscape page height on
+     /records, /competitions/world-cup, /competitions/copa-america and
+     /teams/argentina - dozens of boxes straddled a page boundary on each. */
   tr,
-  .champions__item {
+  .champions__item,
+  .podium__card,
+  .timeline__card,
+  .player-profile__list li,
+  .team-profile__list li {
     break-inside: avoid;
   }
 

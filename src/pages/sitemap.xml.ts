@@ -42,6 +42,21 @@ function xmlEscape(value: string): string {
     .replace(/"/g, '&quot;');
 }
 
+// Every bilingual <url> block below needs the same three reciprocal
+// xhtml:link alternates: "en", "hr", and "x-default" (Google's hreflang
+// guidance for a reader whose browser locale matches neither - it should
+// resolve to this site's primary language rather than leaving search
+// engines to guess, the same x-default BaseLayout.astro's own per-page
+// <head> tags now carry). Centralized here so all eight call sites below
+// stay in lock step rather than each re-typing the same three-tag string.
+function buildAltLinks(enPath: string, hrPath: string, absolute: (path: string) => string): string {
+  return [
+    `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
+    `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
+    `<xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(absolute(enPath))}" />`,
+  ].join('');
+}
+
 // A sitemap generated at build time, one <url> per locale of every live page,
 // each carrying an xhtml:link back to its translation - so it stays in lock
 // step with NAV_LINKS/TRANSLATED_PATHS (src/lib/routes.ts, src/lib/i18n.ts)
@@ -79,12 +94,7 @@ export const GET: APIRoute = async ({ site, url }) => {
 
     for (const { path } of locales) {
       const loc = absolute(path);
-      const altLinks = hrPath
-        ? [
-            `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
-            `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
-          ].join('')
-        : '';
+      const altLinks = hrPath ? buildAltLinks(enPath, hrPath, absolute) : '';
       const lastmodTag = lastmod ? `<lastmod>${lastmod}</lastmod>` : '';
       urlEntries.push(`<url><loc>${xmlEscape(loc)}</loc>${lastmodTag}${altLinks}</url>`);
     }
@@ -108,10 +118,7 @@ export const GET: APIRoute = async ({ site, url }) => {
     const slug = teamProfileSlug(record.id);
     const enPath = `/teams/${slug}`;
     const hrPath = `/hr/teams/${slug}`;
-    const altLinks = [
-      `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
-      `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
-    ].join('');
+    const altLinks = buildAltLinks(enPath, hrPath, absolute);
     urlEntries.push(`<url><loc>${xmlEscape(absolute(enPath))}</loc>${lastmodTag}${altLinks}</url>`);
     urlEntries.push(`<url><loc>${xmlEscape(absolute(hrPath))}</loc>${lastmodTag}${altLinks}</url>`);
   }
@@ -156,10 +163,7 @@ export const GET: APIRoute = async ({ site, url }) => {
     const slug = playerProfileSlug(profile.id);
     const enPath = `/players/${slug}`;
     const hrPath = `/hr/players/${slug}`;
-    const altLinks = [
-      `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
-      `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
-    ].join('');
+    const altLinks = buildAltLinks(enPath, hrPath, absolute);
     urlEntries.push(`<url><loc>${xmlEscape(absolute(enPath))}</loc>${playersLastmodTag}${altLinks}</url>`);
     urlEntries.push(`<url><loc>${xmlEscape(absolute(hrPath))}</loc>${playersLastmodTag}${altLinks}</url>`);
   }
@@ -176,10 +180,7 @@ export const GET: APIRoute = async ({ site, url }) => {
   for (const profile of buildEditionProfiles(worldCup.editions)) {
     const enPath = `/competitions/world-cup/${profile.slug}`;
     const hrPath = `/hr/competitions/world-cup/${profile.slug}`;
-    const altLinks = [
-      `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
-      `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
-    ].join('');
+    const altLinks = buildAltLinks(enPath, hrPath, absolute);
     urlEntries.push(`<url><loc>${xmlEscape(absolute(enPath))}</loc>${worldCupEditionLastmodTag}${altLinks}</url>`);
     urlEntries.push(`<url><loc>${xmlEscape(absolute(hrPath))}</loc>${worldCupEditionLastmodTag}${altLinks}</url>`);
   }
@@ -195,10 +196,7 @@ export const GET: APIRoute = async ({ site, url }) => {
   for (const profile of buildEditionProfiles(copaAmerica.editions)) {
     const enPath = `/competitions/copa-america/${profile.slug}`;
     const hrPath = `/hr/competitions/copa-america/${profile.slug}`;
-    const altLinks = [
-      `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
-      `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
-    ].join('');
+    const altLinks = buildAltLinks(enPath, hrPath, absolute);
     urlEntries.push(`<url><loc>${xmlEscape(absolute(enPath))}</loc>${copaAmericaEditionLastmodTag}${altLinks}</url>`);
     urlEntries.push(`<url><loc>${xmlEscape(absolute(hrPath))}</loc>${copaAmericaEditionLastmodTag}${altLinks}</url>`);
   }
@@ -210,10 +208,7 @@ export const GET: APIRoute = async ({ site, url }) => {
   for (const profile of buildEditionProfiles(euro.editions)) {
     const enPath = `/competitions/euro/${profile.slug}`;
     const hrPath = `/hr/competitions/euro/${profile.slug}`;
-    const altLinks = [
-      `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
-      `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
-    ].join('');
+    const altLinks = buildAltLinks(enPath, hrPath, absolute);
     urlEntries.push(`<url><loc>${xmlEscape(absolute(enPath))}</loc>${euroEditionLastmodTag}${altLinks}</url>`);
     urlEntries.push(`<url><loc>${xmlEscape(absolute(hrPath))}</loc>${euroEditionLastmodTag}${altLinks}</url>`);
   }
@@ -228,10 +223,7 @@ export const GET: APIRoute = async ({ site, url }) => {
   for (const profile of buildEditionProfiles(nationsLeague.editions)) {
     const enPath = `/competitions/nations-league/${profile.slug}`;
     const hrPath = `/hr/competitions/nations-league/${profile.slug}`;
-    const altLinks = [
-      `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
-      `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
-    ].join('');
+    const altLinks = buildAltLinks(enPath, hrPath, absolute);
     urlEntries.push(
       `<url><loc>${xmlEscape(absolute(enPath))}</loc>${nationsLeagueEditionLastmodTag}${altLinks}</url>`,
     );
@@ -254,10 +246,7 @@ export const GET: APIRoute = async ({ site, url }) => {
   for (const profile of buildEditionProfiles(ballonDor.editions, undefined, { playerSlugs })) {
     const enPath = `/competitions/ballon-dor/${profile.slug}`;
     const hrPath = `/hr/competitions/ballon-dor/${profile.slug}`;
-    const altLinks = [
-      `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
-      `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
-    ].join('');
+    const altLinks = buildAltLinks(enPath, hrPath, absolute);
     urlEntries.push(
       `<url><loc>${xmlEscape(absolute(enPath))}</loc>${ballonDorEditionLastmodTag}${altLinks}</url>`,
     );
@@ -280,10 +269,7 @@ export const GET: APIRoute = async ({ site, url }) => {
   for (const profile of buildEditionProfiles(worldCupGoldenBoot.editions, undefined, { playerSlugs })) {
     const enPath = `/competitions/golden-boot/world-cup/${profile.slug}`;
     const hrPath = `/hr/competitions/golden-boot/world-cup/${profile.slug}`;
-    const altLinks = [
-      `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
-      `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
-    ].join('');
+    const altLinks = buildAltLinks(enPath, hrPath, absolute);
     urlEntries.push(
       `<url><loc>${xmlEscape(absolute(enPath))}</loc>${worldCupGoldenBootLastmodTag}${altLinks}</url>`,
     );
@@ -298,10 +284,7 @@ export const GET: APIRoute = async ({ site, url }) => {
   for (const profile of buildEditionProfiles(euroGoldenBoot.editions, undefined, { playerSlugs })) {
     const enPath = `/competitions/golden-boot/euro/${profile.slug}`;
     const hrPath = `/hr/competitions/golden-boot/euro/${profile.slug}`;
-    const altLinks = [
-      `<xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(absolute(enPath))}" />`,
-      `<xhtml:link rel="alternate" hreflang="hr" href="${xmlEscape(absolute(hrPath))}" />`,
-    ].join('');
+    const altLinks = buildAltLinks(enPath, hrPath, absolute);
     urlEntries.push(
       `<url><loc>${xmlEscape(absolute(enPath))}</loc>${euroGoldenBootLastmodTag}${altLinks}</url>`,
     );

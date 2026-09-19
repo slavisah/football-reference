@@ -16,6 +16,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import References from '../../components/References.astro';
 import PrintDownloadLink from '../../components/PrintDownloadLink.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
+import { disambiguateLabels } from '../../lib/sources';
 import {
   buildAllCountryRecords,
   buildFinalsMeetings,
@@ -84,9 +85,11 @@ function cellText(value: number | null): string {
   return value === null ? '—' : String(value);
 }
 
-const sources = [worldCup, euro, copaAmerica, nationsLeague]
-  .flatMap((c) => c.sources)
-  .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+const sources = disambiguateLabels(
+  [worldCup, euro, copaAmerica, nationsLeague]
+    .flatMap((c) => c.sources)
+    .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index),
+);
 
 const lastReviewed = [worldCup, euro, copaAmerica, nationsLeague]
   .map((c) => c.lastReviewed)
@@ -201,6 +204,12 @@ const jsonLd: JsonLdObject[] = [
           </select>
         </div>
       </div>
+
+      <noscript>
+        <p class="muted">
+          {`Za promjenu reprezentacija potreban je JavaScript. Bez njega usporedba ispod uvijek prikazuje ${defaultA.displayName} protiv ${defaultB.displayName} - odabir drugih reprezentacija iznad, kao ni poveznica s drugim parom, nemaju učinka.`}
+        </p>
+      </noscript>
 
       <p
         id="compare-status"
@@ -487,6 +496,52 @@ const jsonLd: JsonLdObject[] = [
     border-color: var(--accent);
   }
 
+  /* Two team pickers plus a swap button don't leave room for the widest
+     merged-nation label ("Germany (incl. West Germany)", see
+     src/lib/countries.ts) to render without clipping once they sit side by
+     side - a full 300-1100px coordinate sweep (measuring each <select>'s
+     own canvas-measured option-text width against its real rendered content
+     box) found the two-up layout squeezed each field below its readable
+     minimum from ~410px viewport all the way up to ~870px, well past this
+     site's own 360px design target (AGENTS.md). Stacking single-column all
+     the way to the same 60rem breakpoint Nav.astro's own drawer/single-row
+     transition uses removes that squeeze entirely - a single field always
+     gets the picker's full width instead of half. flex-basis/grow don't
+     carry over from the row layout unchanged: with flex-direction switched
+     to column, the unmodified `flex: 1 1 12rem` would apply that 12rem as a
+     *vertical* basis instead, stretching the field's height to fill the
+     column - reset to `flex: 0 0 auto` alongside the width override. */
+  @media (max-width: 60rem) {
+    .compare__picker {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .compare__field {
+      flex: 0 0 auto;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .compare__swap {
+      align-self: center;
+    }
+  }
+
+  /* Even at the picker's full width, the same label still clips below
+     ~390px (same sweep) - shrink the select's own font/padding just enough
+     to close that gap down to 320px, check:reflow's own tested floor. */
+  @media (max-width: 26rem) {
+    .compare__picker {
+      padding: 0.5rem;
+    }
+
+    .compare__field select {
+      font-size: 0.76rem;
+      padding-inline: 0.35rem;
+    }
+  }
+
   /* "Versus" comparison table: one row per statistic, Team A's value on the
      left, Team B's on the right, the metric label between them. Transposed
      from the two separate per-team tables this panel used to render, which
@@ -524,6 +579,8 @@ const jsonLd: JsonLdObject[] = [
     width: 34%;
     font-size: 1rem;
     line-height: 1.25;
+    -webkit-hyphens: auto;
+    hyphens: auto;
     overflow-wrap: anywhere;
   }
 

@@ -28,26 +28,39 @@
     "check:print-width": "node scripts/check-print-width.mjs",
     "check:html": "node scripts/check-html-validity.mjs",
     "check:jsonld": "node scripts/check-jsonld.mjs",
+    "check:heading-outline": "node scripts/check-heading-outline.mjs",
+    "check:reachability": "node scripts/check-reachability.mjs",
     "check:meta": "node scripts/check-meta.mjs",
     "check:award-tallies": "node scripts/check-award-tallies.mjs",
+    "check:edition-header-labels": "node scripts/check-edition-header-labels.mjs",
     "check:i18n-notes": "node scripts/check-i18n-notes.mjs",
+    "check:attendance-format": "node scripts/check-attendance-format.mjs",
+    "check:link-names": "node scripts/check-link-names.mjs",
+    "check:image-dimensions": "node scripts/check-image-dimensions.mjs",
+    "check:locale-consistency": "node scripts/check-locale-consistency.mjs",
     "check:spelling": "cspell --no-progress \"content/**/*.md\""
   },
   "dependencies": {
-    "astro": "^7.3.2"
+    "astro": "^7.3.3"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.63.0",
-    "@types/node": "^26.5.0",
-    "@vitest/coverage-v8": "5.0.0",
-    "cspell": "^10.3.0",
-    "html-validate": "^11.15.0",
-    "lighthouse": "^13.4.1",
+    "@types/node": "^26.6.2",
+    "@vitest/coverage-v8": "5.0.1",
+    "cspell": "^10.3.3",
+    "html-validate": "^11.16.0",
+    "lighthouse": "^13.5.0",
     "sharp": "0.35.4",
     "typescript": "^5.9.3",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.1"
   },
-  "packageManager": "pnpm@9.15.9"
+  "packageManager": "pnpm@9.15.9",
+  "pnpm": {
+    "overrides": {
+      "js-yaml@<4.3.2": "^4.3.2",
+      "svgo@<4.1.0": "^4.1.0"
+    }
+  }
 }

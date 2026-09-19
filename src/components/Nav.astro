@@ -275,6 +275,14 @@ function isCurrent(href: string): boolean {
     z-index: 21;
     display: flex;
     flex-direction: column;
+    /* Overrides .site-menu's own row-layout `flex-wrap: wrap` above -
+       without this, once the drawer's stacked content grows taller than
+       `max-height` (nav list + both search fields + lang switch + theme
+       toggle, on every real page), the column wraps into an invisible
+       second column pushed past the viewport's right edge instead of just
+       overflowing vertically for `overflow-y: auto` to scroll - silently
+       stranding the theme-toggle button (last in DOM order) off-screen. */
+    flex-wrap: nowrap;
     align-items: stretch;
     gap: 0.75rem;
     max-height: calc(100dvh - var(--site-header-height, 3.5rem));
@@ -470,6 +478,13 @@ function isCurrent(href: string): boolean {
     position: absolute;
     inset-block-start: calc(100% + 0.3rem);
     inset-inline-start: 0;
+    /* Nudged in from script.ts's own viewport-clamp measurement below - see
+       that comment for why a static inset alone (left- or right-aligned to
+       the toggle) isn't enough. Physical `translateX`, not a logical
+       property: the clamp measures real `getBoundingClientRect()` pixels,
+       which are always physical/LTR, and both site languages (English,
+       Croatian) render left-to-right anyway. */
+    transform: translateX(var(--nav-more-shift, 0px));
     z-index: 5;
     display: flex;
     flex-direction: column;
@@ -960,7 +975,13 @@ function isCurrent(href: string): boolean {
     });
 
     input.addEventListener('keydown', (event) => {
-      if (listbox.hidden && event.key !== 'ArrowDown') return;
+      // Escape has to reach its own handler below even once the listbox is
+      // already hidden - that's the only path that clears the input (the
+      // `else` branch a few lines down). Without this exception, a second
+      // Escape press (after the first one already closed the listbox) hit
+      // this early return and stopped there, so "press Escape again to
+      // clear the search" was unreachable dead code.
+      if (listbox.hidden && event.key !== 'ArrowDown' && event.key !== 'Escape') return;
 
       if (event.key === 'ArrowDown') {
         event.preventDefault();
@@ -982,10 +1003,24 @@ function isCurrent(href: string): boolean {
           goToTeam(activeId);
         }
       } else if (event.key === 'Escape') {
+        // Layered dismissal: this widget can sit inside the mobile drawer,
+        // which has its own document-level Escape handler that closes the
+        // whole drawer (see the is:inline menu script above). Without
+        // stopPropagation, a single Escape press bubbled past this handler
+        // and triggered that one too - closing the listbox (or clearing the
+        // input) *and* the entire drawer in one keystroke, yanking focus
+        // away to the menu button before a reader could press Escape again.
+        // Stopping propagation only when this handler actually consumed the
+        // key keeps the expected behaviour once there's nothing left for it
+        // to do here: an Escape on an already-empty, already-closed widget
+        // still bubbles up and closes the drawer, same as pressing it on any
+        // other drawer control.
         if (!listbox.hidden) {
           event.preventDefault();
+          event.stopPropagation();
           closeListbox();
-        } else {
+        } else if (input.value !== '') {
+          event.stopPropagation();
           input.value = '';
         }
       }
@@ -1075,9 +1110,44 @@ function isCurrent(href: string): boolean {
 
     let collapsed = false;
 
+    // Left-aligned to the toggle by default (the CSS `inset-inline-start:
+    // 0`), which only works when the toggle sits well clear of the
+    // viewport's right edge. It doesn't at the narrow end of the >=60rem
+    // desktop range: real, reachable widths from roughly 960px up to
+    // ~1145px in Croatian (longer link labels push the row's own fit
+    // further out) put the toggle close enough to the right edge that the
+    // menu's own right side lands up to ~156px past the viewport - and
+    // since `body` has `overflow-x: hidden` (global.css, to stop the page
+    // scrolling sideways on small screens), that overflow is clipped
+    // silently with no scrollbar, making the menu's own rightmost links
+    // unreachable by a mouse/touch reader. A static right-aligned
+    // (`inset-inline-end: 0`) menu isn't a fix either, just a smaller
+    // version of the same bug on the other edge: right at the >=60rem
+    // breakpoint the nav row itself can still wrap onto two lines (a
+    // sub-pixel rounding gap between the CSS breakpoint and the viewport's
+    // real available width once a scrollbar is subtracted), stranding the
+    // toggle alone at the row's own left edge - from there a right-aligned
+    // menu overshoots left instead. Measuring and clamping against the
+    // real rendered rect on every open is the only anchor that's correct
+    // regardless of which edge the toggle ends up near.
+    //
+    // Found the same way the mobile-drawer flex-wrap bug was: rendering
+    // the real page and reading actual getBoundingClientRect() coordinates
+    // against the viewport, not just asserting on visibility/attributes.
     function setOpen(open: boolean) {
       menu.hidden = !open;
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (!open) return;
+      menu.style.setProperty('--nav-more-shift', '0px');
+      const rect = menu.getBoundingClientRect();
+      const viewportWidth = document.documentElement.clientWidth;
+      const overflowRight = rect.right - viewportWidth;
+      const overflowLeft = -rect.left;
+      if (overflowRight > 0) {
+        menu.style.setProperty('--nav-more-shift', `${-overflowRight}px`);
+      } else if (overflowLeft > 0) {
+        menu.style.setProperty('--nav-more-shift', `${overflowLeft}px`);
+      }
     }
 
     // Moves the real <li> nodes between the flat row and the dropdown
@@ -1124,6 +1194,24 @@ function isCurrent(href: string): boolean {
     });
 
     document.addEventListener('click', (event) => {
+      if (toggle.getAttribute('aria-expanded') !== 'true') return;
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (!menu.contains(target) && !toggle.contains(target)) setOpen(false);
+    });
+
+    // Keyboard-only equivalent of the click-outside handler above. Found by
+    // actually tabbing through the open menu rather than only asserting on
+    // aria-expanded/visibility: Tab past the last link left the menu open
+    // and rendered on top of the page - covering real content underneath -
+    // while focus had already moved on to whatever came next in the nav
+    // (the "Find a team" search box), with no way to tell from the page
+    // that it was still open short of pressing Escape or clicking away.
+    // `focusin` bubbles (unlike `focusout`, which would need a
+    // `relatedTarget` check to avoid closing on every internal focus move
+    // between the menu's own links), so this fires once per focus change
+    // and closes the menu the moment focus lands anywhere outside it.
+    document.addEventListener('focusin', (event) => {
       if (toggle.getAttribute('aria-expanded') !== 'true') return;
       const target = event.target;
       if (!(target instanceof Node)) return;

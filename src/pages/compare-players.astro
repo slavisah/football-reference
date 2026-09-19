@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import References from '../components/References.astro';
 import PrintDownloadLink from '../components/PrintDownloadLink.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
+import { disambiguateLabels } from '../lib/sources';
 import { buildAllPlayerProfiles } from '../lib/playerProfile';
 import type { PlayerAwardSource } from '../lib/playerProfile';
 import {
@@ -46,9 +47,11 @@ const allRecords = buildAllComparePlayerRecords(profiles, awardDefs);
 const [defaultA, defaultB] = allRecords;
 const defaultSharedYears = buildSharedAwardYears(defaultA, defaultB);
 
-const combinedSources = [ballonDor.sources, worldCupGoldenBoot.sources, euroGoldenBoot.sources]
-  .flat()
-  .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+const combinedSources = disambiguateLabels(
+  [ballonDor.sources, worldCupGoldenBoot.sources, euroGoldenBoot.sources]
+    .flat()
+    .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index),
+);
 
 const lastReviewed = [ballonDor.lastReviewed, worldCupGoldenBoot.lastReviewed, euroGoldenBoot.lastReviewed]
   .concat(meta.lastReviewed)
@@ -139,6 +142,12 @@ const jsonLd: JsonLdObject[] = [
           </select>
         </div>
       </div>
+
+      <noscript>
+        <p class="muted">
+          {`This picker needs JavaScript to work. Without it, the comparison below is always ${defaultA.displayName} vs ${defaultB.displayName} - selecting different players above, or following a link for a different pair, has no effect.`}
+        </p>
+      </noscript>
 
       <p
         id="compare-status"
@@ -374,6 +383,48 @@ const jsonLd: JsonLdObject[] = [
     border-color: var(--accent);
   }
 
+  /* Two player pickers plus a swap button don't leave room for the longest
+     player names (e.g. "Karl-Heinz Rummenigge") to render without clipping
+     once they sit side by side - the same defect `compare.astro`'s own
+     matching comment documents in full for its "Germany (incl. West
+     Germany)" team label, found by the same 300-1100px coordinate sweep:
+     the two-up layout squeezed each field below its readable minimum across
+     most of that range, well past this site's own 360px design target
+     (AGENTS.md). Stacking single-column all the way to the same 60rem
+     breakpoint Nav.astro's own drawer/single-row transition uses removes
+     that squeeze entirely - see that comment for why `flex` also needs
+     resetting here, not just `width`. */
+  @media (max-width: 60rem) {
+    .compare__picker {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .compare__field {
+      flex: 0 0 auto;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .compare__swap {
+      align-self: center;
+    }
+  }
+
+  /* Even at the picker's full width, the longest names still clip below
+     ~390px (same sweep) - shrink the select's own font/padding just enough
+     to close that gap down to 320px, check:reflow's own tested floor. */
+  @media (max-width: 26rem) {
+    .compare__picker {
+      padding: 0.5rem;
+    }
+
+    .compare__field select {
+      font-size: 0.76rem;
+      padding-inline: 0.35rem;
+    }
+  }
+
   /* "Versus" comparison table: one row per statistic, Team A's value on the
      left, Team B's on the right, the metric label between them. Transposed
      from the two separate per-team tables this panel used to render, which
@@ -411,6 +462,8 @@ const jsonLd: JsonLdObject[] = [
     width: 34%;
     font-size: 1rem;
     line-height: 1.25;
+    -webkit-hyphens: auto;
+    hyphens: auto;
     overflow-wrap: anywhere;
   }
 
