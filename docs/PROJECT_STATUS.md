@@ -25887,5 +25887,124 @@ happens to be printing from - to every other internal link
 render, then regenerate and re-verify all 700 PDFs the same empirical,
 `pdfminer.six`-backed way this run did for just the new pager links.
 
+### Fixed the dead-localhost-link bug in every downloadable PDF's internal navigation links - closed 2026-09-19 (hundred-and-forty-eighth intensive run)
+
+The more urgent of the hundred-and-forty-seventh run's two "left for a future
+pass" items: every one of the 700 already-shipped PDFs' internal links
+(team/player/competition-page links, built with the site's own `withBase()`
+helper) resolved to a dead `http://localhost:4399/football-reference/...`
+URI instead of the live site. Cause, as that run's own investigation already
+documented: Chromium's `page.pdf()` (`scripts/generate-pdfs.mjs`) bakes a PDF
+link annotation from whatever the anchor's already-*resolved* `href` is at
+print time, and `withBase()` returns a base-relative path, which resolves
+against whatever origin the page happens to be loaded from - during
+generation that's this script's own local `astro preview` server, not the
+published site.
+
+A standing health check first: `pnpm install --frozen-lockfile` (497
+packages, no changes); `pnpm outdated` found nothing new beyond the still-blocked
+`typescript` 7 entry (`@astrojs/check@latest`'s `peerDependencies` still caps
+it at `^5.0.0 || ^6.0.0`); `pnpm lint` 0/0/1; `pnpm test` 733/733; `pnpm
+build` 711 pages - all unchanged from the hundred-and-forty-seventh run's
+baseline.
+
+**Why this fix lives in the script, not the 63 source files that call
+`withBase()`:** those files' base-relative links are correct and necessary
+for normal browsing, local dev (`astro dev`) and every e2e test that
+navigates against `localhost` - rewriting `withBase()` itself to emit
+absolute URLs everywhere would have broken all three. The fix instead targets
+the one place a base-relative link is provably wrong: the already-rendered
+DOM Chromium is about to print, moments before it prints it.
+
+**What was built:** a new `rewriteInternalLinksForPrint()` in
+`scripts/generate-pdfs.mjs`, called from inside the existing
+`writePdfWithMetadata()` helper (already the single call site all four PDF
+loops - pages, teams, players, editions - route through) right before
+`page.pdf()`. It runs one `page.evaluate()` that walks every `a[href]` on the
+page and, for any anchor whose *resolved* `href` starts with the script's own
+local `ORIGIN` (`http://localhost:4399`), rewrites it to the same path under
+a new `SITE_URL` constant (`process.env.SITE_URL ?? 'https://slavisah.github.io'`,
+deliberately mirroring `astro.config.mjs`'s own `site` env var/default
+exactly, so the two can never drift apart). This is a pure in-memory DOM edit
+on the page Chromium already has open - no raw PDF binary surgery, and no
+change to any `src/`, `content/` or `tests/` file. The hundred-and-forty-seventh
+run's own print-only PDF-to-PDF pager links are already absolute production
+URLs and never match the local-origin prefix, so they pass through untouched,
+confirmed by inspection rather than assumed.
+
+**Verification, empirical not just code review:**
+- Before regenerating anything, extracted every `/URI` link annotation from
+  the *pre-fix* `public/downloads/edition-world-cup-2022.pdf` still on disk
+  (a throwaway regex script reading the raw PDF bytes directly, `re.findall`
+  against `/URI\s*\(([^)]*)\)` - `pdfminer.six` was installed standalone for a
+  first attempt but an unrelated environment issue, a `cryptography`/`pyo3`
+  ABI conflict with this container's system Python packages surfaced as
+  `pyo3_runtime.PanicException: Python API call failed` on import, made it
+  unusable here; the raw-bytes regex approach the hundred-and-forty-seventh
+  run's own doc comment also mentions using for an initial catalog extraction
+  worked directly instead). Confirmed 5 internal links on that one page (four
+  team-profile links - Argentina, France, Croatia, Morocco - and one
+  competition-index link) carried the dead `localhost:4399` prefix, matching
+  the bug exactly as documented.
+- Regenerated all 700 PDFs (`pnpm build:pdfs`, `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`).
+  The first attempt was wrapped in a `timeout 590` (~10 minutes) that turned
+  out too tight for this environment - the whole run was killed mid-way,
+  leaving 665 of 701 files regenerated and 36 still stale. Re-ran the full
+  script again with no external timeout cap (the script is idempotent per
+  file, so a full re-run simply overwrites everything cleanly); it completed
+  in full this time, about 13 minutes.
+- Re-ran the same raw-bytes `/URI` regex sweep against all 700 shipped files:
+  **zero** URIs starting with `http://localhost` out of 409,320 total `/URI`
+  link annotations scanned. Spot-checked `edition-world-cup-2022.pdf`
+  directly: the same 5 links now read
+  `https://slavisah.github.io/football-reference/teams/argentina` (and
+  `france`/`croatia`/`morocco`/`competitions/world-cup`) instead of the dead
+  localhost prefix.
+- `pnpm check:pdfs` reverified all 700 PDFs fresh against their source
+  content hashes (unaffected by this change, since the manifest only hashes
+  `content/*.md`/`docs/SOURCES.md`, not link targets).
+
+Full standing health check clean after the change: `pnpm lint` (0/0/1,
+unchanged); `pnpm test` (**733/733**, unchanged - this is a build script with
+no unit-testable pure function extracted, unlike the prior run's
+`editionPdfFileName()`/`editionPdfDownloadUrl()`, so no new unit tests were
+added); `pnpm build` (711 pages, unchanged - no `src/` file changed). All
+nineteen fast `check:*` scripts were run; sixteen passed cleanly on the first
+try, but `check:reflow`, `check:text-zoom` and `check:print-width` each
+failed once with a bare `{ log: [], name: 'Error' }` and no other detail when
+run back-to-back with the others in the same shell session. Re-running each
+of those three in isolation immediately afterward passed cleanly every time,
+with no code or content change in between - diagnosed as a transient
+`astro preview` server start/stop timing race from launching many `check:*`
+scripts against the same port in quick succession (each script's own
+`astro preview` on port 4321 doesn't always finish tearing down before the
+next one tries to bind it), not a regression from this run's change, which
+never touches any of those three scripts, their Playwright driving code, or
+anything they check. A full cold-start `pnpm test:e2e` (confirmed via `ps
+aux` that no stale preview server was already listening beforehand):
+**1013/1013 passed** (14.9 minutes), unchanged from the hundred-and-forty-seventh
+run's baseline - expected, since this fix touches only
+`scripts/generate-pdfs.mjs` and the 700 regenerated PDF binaries, and no e2e
+case exercises a downloaded PDF's own binary content (the same standing gap
+that run's own entry noted; only that the download link itself resolves is
+covered).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix decision, the Nations League Team of the
+Tournament sourcing question - confirmed exhausted), the Nations League 2023
+attendance conflict and 2021/2025 unconfirmed figures, World Cup
+1930/1950's/EURO 1996/2020's excluded attendance figures, the
+hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+re-check, and the hundred-and-forty-sixth run's still-open per-section PDF
+bookmarks/outline lead (unchanged - this run didn't touch that question).
+New: this run's own transient `check:reflow`/`check:text-zoom`/
+`check:print-width` failures under back-to-back invocation were worked
+around (re-run each in isolation) rather than fixed; a future pass could look
+at whether those scripts' shared `astro preview` start/stop dance needs a
+short readiness wait, a distinct port per script, or a retry-once wrapper so
+a full `pnpm run check:*`-style batch invocation in automation doesn't need
+a human to notice and manually re-run a spuriously failing check.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
