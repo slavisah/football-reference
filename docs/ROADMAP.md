@@ -6652,3 +6652,40 @@ back clean:
   needs a small delay or retry when run immediately back-to-back in
   automation (this run simply re-ran each in isolation, which is a workaround
   rather than a fix).
+- **Fix the `check:reflow`/`check:text-zoom`/`check:print-width`
+  back-to-back preview-server-port race**: closed 2026-09-19
+  (hundred-and-forty-ninth intensive run) - the hundred-and-forty-eighth
+  run's own suggested fix for its own transient failure. `check:reflow`,
+  `check:text-zoom`, `check:print-width` and `check:lighthouse` each carried
+  a byte-identical copy of the same `astro preview` daemon start/stop dance
+  and Chromium launcher; extracted all four into one shared
+  `scripts/preview-daemon.mjs` so the fix only has to exist once, and fixed
+  the race at its actual source: `astro preview stop`'s own CLI call returns
+  as soon as the *stop command* finishes, not once the OS has actually
+  released the port, so a script starting right back up immediately after
+  could occasionally race a still-shutting-down daemon for the same port.
+  `stopPreviewDaemon()` now polls the port itself until it genuinely refuses
+  connections before returning, and `startPreviewDaemon()` retries the whole
+  stop/start/wait-for-ready sequence once more if a first attempt still
+  doesn't come up cleanly. Verified by re-running the exact back-to-back
+  sequence the hundred-and-forty-eighth run's health check hit the failure
+  on - `check:reflow` immediately followed by `check:print-width` and
+  `check:text-zoom` run one after the other in the same shell, no isolation
+  - twice after the fix, both times clean (711/711 pages, no overflow either
+  run). Full standing health check clean: `pnpm lint`
+  (0/0/1), `pnpm test` (733/733, unchanged - no unit-testable pure function
+  in the extracted module beyond what already existed), `pnpm build` (711
+  pages), all nineteen fast `check:*` scripts clean including all four
+  daemon-driven ones - `check:lighthouse` (37/37 pages, perfect 1.00 scores
+  across all four categories) run standalone too. A full cold-start
+  `pnpm test:e2e` (confirmed no stale preview server via `ps aux`
+  beforehand): **1013/1013 passed** (17.2 minutes), unchanged from the
+  hundred-and-forty-eighth run's baseline. **Left for a future pass:** the same environment-blocked
+  items as every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  the `long-title` brand-suffix decision, the Nations League Team of the
+  Tournament sourcing question - confirmed exhausted), the Nations League
+  2023 attendance conflict and 2021/2025 unconfirmed figures, World Cup
+  1930/1950's/EURO 1996/2020's excluded attendance figures, the
+  hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+  re-check, and the hundred-and-forty-sixth run's still-open per-section PDF
+  bookmarks/outline lead.

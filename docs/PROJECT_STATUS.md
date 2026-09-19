@@ -26006,5 +26006,80 @@ short readiness wait, a distinct port per script, or a retry-once wrapper so
 a full `pnpm run check:*`-style batch invocation in automation doesn't need
 a human to notice and manually re-run a spuriously failing check.
 
+### Fixed the check:reflow/check:text-zoom/check:print-width back-to-back preview-server-port race - closed 2026-09-19 (hundred-and-forty-ninth intensive run)
+
+The hundred-and-forty-eighth run's own suggested fix for its own transient
+failure: `check:reflow`, `check:text-zoom`, `check:print-width` and
+`check:lighthouse` each carried a byte-identical copy of the same `astro
+preview` daemon start/stop dance (`stopPreviewDaemon`/`waitForServer`/
+`startPreviewDaemon`) and headless-Chromium launcher (`launchChromium`) -
+four separate copies of the exact same ~35 lines, one in each script. A
+standing health check first (`pnpm install --frozen-lockfile`, no new
+in-range releases beyond the still-blocked `typescript` 7 entry; `pnpm lint`
+0/0/1; `pnpm test` 733/733; `pnpm build` 711 pages - all unchanged from the
+hundred-and-forty-eighth run's baseline).
+
+Extracted all four copies into one shared `scripts/preview-daemon.mjs`
+(`startPreviewDaemon`, `stopPreviewDaemon`, `waitForServer`, `launchChromium`)
+so the flakiness fix only has to exist once, then fixed the race at its
+actual source rather than papering over the symptom with a fixed delay:
+`astro preview stop`'s own CLI call returns as soon as the *stop command*
+itself finishes, not once the OS has actually released the port. A script
+that immediately turned around and called `astro preview --port` right after
+could occasionally lose that race against a still-shutting-down daemon
+holding the same port - exactly the failure mode the prior run hit running
+several `check:*` scripts back-to-back in the same shell.
+`stopPreviewDaemon()` now polls the port itself (repeatedly `fetch`ing it
+until the connection is refused, up to a 10s timeout) until it's genuinely
+free before returning, and `startPreviewDaemon()` additionally retries the
+whole stop/start/wait-for-ready sequence once more if a first attempt still
+doesn't come up cleanly (a slow-starting daemon, or some other process
+briefly holding the port), rather than leaving that as a "future pass could
+add a retry" suggestion the way the prior run's entry did.
+
+All four consumer scripts (`check-reflow.mjs`, `check-text-zoom.mjs`,
+`check-print-width.mjs`, `check-lighthouse.mjs`) were updated to import from
+the new module instead of defining their own copies - a net reduction of
+about 125 lines of duplicated code across the four files. `check-lighthouse.mjs`
+also lost its now-unused `ROOT`/`path`/`fileURLToPath` (only ever used to
+compute the `astroBin` path the shared module now owns) and gained a
+`launchChromium([...])` extra-args parameter so its own
+`--remote-debugging-port` CDP flag still gets passed through.
+
+**Verification, empirical not just code review:** reproduced the exact
+back-to-back sequence the hundred-and-forty-eighth run's own health check hit
+the failure on - `check:reflow` immediately followed by `check:print-width`
+and `check:text-zoom` run one after another in the same shell, no isolation
+between them, no stale preview server beforehand (confirmed via `ps aux`) -
+twice after the fix, both times clean: 711/711 pages, zero overflow, on
+every one of the six runs across those two attempts. `check:lighthouse` was
+also run standalone afterward (its own audit takes several minutes per page)
+and passed clean too: all 37 audited pages scored a perfect
+1.00/1.00/1.00/1.00 across all four categories, matching every prior run's
+baseline. All nineteen fast `check:*` scripts pass cleanly, and a full
+cold-start `pnpm test:e2e` (confirmed no stale preview server via `ps aux`
+beforehand): **1013/1013 passed** (17.2 minutes), unchanged from the
+hundred-and-forty-eighth run's baseline - expected, since no e2e spec drives
+any of these four `check:*` scripts directly. `pnpm test` stayed at
+733/733 - `vitest.config.ts`'s coverage scope is `src/lib/**/*.ts` only,
+deliberately excluding `scripts/*.mjs` (see that file's own doc comment), so
+no new unit test was required or added for the extracted module; its only
+genuinely new logic (`waitForPortFree`'s polling loop, the retry-once wrapper)
+is side-effecting process/network code in the same category `check-reflow.mjs`'s
+own `stopPreviewDaemon`/`startPreviewDaemon` already were, not the kind of
+pure, unit-testable function this repo's `tests/unit/check*.test.ts` pattern
+targets - consistent with every other `check:*` script's own split between a
+handful of exported pure helpers and an untested process-orchestration shell.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix decision, the Nations League Team of the
+Tournament sourcing question - confirmed exhausted), the Nations League 2023
+attendance conflict and 2021/2025 unconfirmed figures, World Cup
+1930/1950's/EURO 1996/2020's excluded attendance figures, the
+hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+re-check, and the hundred-and-forty-sixth run's still-open per-section PDF
+bookmarks/outline lead (unchanged - this run didn't touch either question).
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

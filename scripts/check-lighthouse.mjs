@@ -14,30 +14,22 @@
 // a manual/intensive-run tool rather than a required PR gate, the same way
 // `test:e2e:install` is manual infrastructure rather than part of `pnpm test`.
 //
-// Reuses the `astro preview` daemon dance `scripts/test-preview-server.mjs`
-// already worked out (Astro 7 forks `astro preview` into a detached
-// background process and returns immediately - see that script's own doc
-// comment for the full story) rather than importing it: that script's
-// "block forever, only exit on SIGTERM" shape is specific to being a
-// Playwright `webServer.command`, and duplicating just the start/stop logic
-// here is simpler than reshaping a script 804 e2e tests already depend on.
-//
-// Chromium launch mirrors playwright.config.ts's own escape hatches for a
-// pinned `@playwright/test` version whose bundled browser build doesn't
-// match what's on disk (this sandbox's pre-installed
-// `/opt/pw-browsers/chromium` is one such case) - set PW_EXECUTABLE_PATH to
-// point at it, or PW_CHROME_CHANNEL for a system Chrome/Chromium install; a
-// normal contributor machine or CI runner that ran `pnpm test:e2e:install`
-// needs neither and gets Playwright's own resolution.
+// Uses the shared `astro preview` daemon dance and Chromium launcher from
+// `scripts/preview-daemon.mjs` (originally worked out here and in
+// check-reflow.mjs/check-text-zoom.mjs/check-print-width.mjs as four
+// byte-identical copies, then extracted into that one module - see its own
+// doc comment for the full "Astro 7 forks preview into a detached background
+// process" story, the PW_EXECUTABLE_PATH/PW_CHROME_CHANNEL escape hatches
+// mirroring playwright.config.ts's own, and the retry-once fix for the
+// preview-server port race those four scripts could hit when run
+// back-to-back). Not `scripts/test-preview-server.mjs`: that script's "block
+// forever, only exit on SIGTERM" shape is specific to being a Playwright
+// `webServer.command`, not a fit for a script that needs the daemon to start
+// and stop within a single process run.
 
-import { spawnSync } from 'node:child_process';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { chromium } from '@playwright/test';
 import lighthouse from 'lighthouse';
+import { launchChromium, startPreviewDaemon, stopPreviewDaemon } from './preview-daemon.mjs';
 
-const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const astroBin = path.join(ROOT, 'node_modules', '.bin', 'astro');
 const PORT = process.env.PORT ?? '4321';
 const BASE = process.env.BASE_PATH ?? '/football-reference';
 const ORIGIN = `http://localhost:${PORT}`;
@@ -176,45 +168,6 @@ const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo'];
 // failure.
 export const MIN_SCORE = 0.9;
 
-function stopPreviewDaemon() {
-  spawnSync(astroBin, ['preview', 'stop'], { cwd: ROOT, stdio: 'inherit' });
-}
-
-async function waitForServer(url, timeoutMs = 60_000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(url);
-      if (res.ok) return;
-    } catch {
-      // not up yet
-    }
-    await new Promise((resolve) => setTimeout(resolve, 300));
-  }
-  throw new Error(`Preview server at ${url} did not become ready in time`);
-}
-
-async function startPreviewDaemon() {
-  stopPreviewDaemon();
-  console.log('Starting `astro preview`...');
-  spawnSync(astroBin, ['preview', '--port', PORT, '--host'], { cwd: ROOT, stdio: 'inherit' });
-  await waitForServer(`${ORIGIN}${BASE}/`);
-  console.log(`Preview server ready at ${ORIGIN}${BASE}/`);
-}
-
-async function launchChromium() {
-  const launchOptions = {
-    headless: true,
-    args: [`--remote-debugging-port=${CDP_PORT}`],
-  };
-  if (process.env.PW_EXECUTABLE_PATH) {
-    launchOptions.executablePath = process.env.PW_EXECUTABLE_PATH;
-  } else if (process.env.PW_CHROME_CHANNEL) {
-    launchOptions.channel = process.env.PW_CHROME_CHANNEL;
-  }
-  return chromium.launch(launchOptions);
-}
-
 /** Given a Lighthouse category-score map, which categories (if any) fall below MIN_SCORE. */
 export function scoresBelowMin(categoryScores, minScore) {
   return Object.entries(categoryScores).filter(([, score]) => score < minScore);
@@ -236,7 +189,7 @@ async function auditPage({ label, path: pagePath }) {
 
 async function main() {
   await startPreviewDaemon();
-  const browser = await launchChromium();
+  const browser = await launchChromium([`--remote-debugging-port=${CDP_PORT}`]);
 
   let results;
   try {
@@ -251,7 +204,7 @@ async function main() {
     }
   } finally {
     await browser.close();
-    stopPreviewDaemon();
+    await stopPreviewDaemon();
   }
 
   const failures = results.flatMap(({ label, categoryScores }) =>
@@ -270,8 +223,8 @@ async function main() {
   process.exitCode = 1;
 }
 
-main().catch((error) => {
+main().catch(async (error) => {
   console.error(error);
-  stopPreviewDaemon();
+  await stopPreviewDaemon();
   process.exitCode = 1;
 });
