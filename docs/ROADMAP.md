@@ -6575,18 +6575,80 @@ back clean:
   1930/1950's/EURO 1996/2020's excluded attendance figures, and the
   hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
   re-check. The hundred-and-forty-sixth run's other lead - per-section PDF
-  bookmarks/outline entries within a single long PDF - stays open; this run's
-  own investigation reconfirmed (rather than assumed) that it's the
-  higher-risk of the two, needing new hand-rolled `/Outlines`-tree binary
-  surgery with no way to empirically verify short of opening every affected
-  PDF in a real reader. New and more urgent: every one of the 700 already-
-  shipped PDFs' *other* internal links (team/player/competition-page links,
-  built with the site's own `withBase()` helper) resolve to a dead
-  `http://localhost:4399/football-reference/...` URI rather than the live
-  site, a real bug discovered while investigating this run's own feature (see
-  above) but out of scope to fix here - a future pass could extend the exact
-  same "compute the link as `editionPdfDownloadUrl()` does, from `Astro.site`
-  at build time rather than a `withBase()` path resolved at generation time"
-  fix to every other internal link `TournamentTable.astro`/`EditionView.astro`/
-  `References.astro`/etc. render, then regenerate and re-verify all 700 PDFs
-  the same way this run did for just the new pager links.
+  bookmarks/outline entries within a single long PDF - stays open; the
+  hundred-and-forty-seventh run's own investigation reconfirmed (rather than
+  assumed) that it's the higher-risk of the two, needing new hand-rolled
+  `/Outlines`-tree binary surgery with no way to empirically verify short of
+  opening every affected PDF in a real reader.
+- **Fix the dead-localhost-link bug in every downloadable PDF's internal
+  navigation links**: closed 2026-09-19 (hundred-and-forty-eighth intensive
+  run) - the more urgent of the hundred-and-forty-seventh run's two "left for
+  a future pass" items: every one of the 700 already-shipped PDFs' internal
+  links (team/player/competition-page links, built with the site's own
+  `withBase()` helper) resolved to a dead
+  `http://localhost:4399/football-reference/...` URI instead of the live
+  site, because Chromium's `page.pdf()` bakes a link annotation from the
+  anchor's already-*resolved* href, and `withBase()`'s base-relative path
+  resolves against whatever origin happens to be current at print time (this
+  script's own local `astro preview` server, not the published site). A
+  standing health check first (`pnpm install --frozen-lockfile`, no new
+  in-range releases beyond the still-blocked `typescript` 7 entry; `pnpm
+  lint` 0/0/1; `pnpm test` 733/733; `pnpm build` 711 pages - all unchanged
+  from the hundred-and-forty-seventh run's baseline).
+  Fixed at the render layer rather than the 63 source files that call
+  `withBase()` (which must stay base-relative for normal browsing, local dev
+  and e2e tests against localhost): a new `rewriteInternalLinksForPrint()` in
+  `scripts/generate-pdfs.mjs` runs a `page.evaluate()` right before every
+  `page.pdf()` call, rewriting any anchor whose *resolved* `href` starts with
+  the script's own local `ORIGIN` to the same path under the real `SITE_URL`
+  (mirrors `astro.config.mjs`'s own `SITE_URL` env var/default exactly)
+  instead - a pure DOM edit on the already-rendered page, no raw PDF binary
+  surgery, applied uniformly to every PDF via the one shared
+  `writePdfWithMetadata()` helper all four PDF loops (pages/teams/players/
+  editions) already call. The hundred-and-forty-seventh run's own
+  print-only PDF-to-PDF pager links (already absolute production URLs) are
+  correctly left untouched, since they never match the local-origin prefix.
+  Verified empirically, not just by code review: extracted every `/URI` link
+  annotation from the *pre-fix* `edition-world-cup-2022.pdf` (a throwaway
+  regex script directly against the PDF bytes, `pdfminer.six` installed
+  standalone for a first cross-check before an unrelated environment issue -
+  a `cryptography`/`pyo3` conflict with this container's system Python
+  packages - made it unusable for the full sweep) and confirmed 5 internal
+  links (4 team pages, 1 competition page) really did carry the dead
+  `localhost:4399` prefix. Regenerated all 700 PDFs (`pnpm build:pdfs`,
+  ~13 minutes this run, `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) and
+  re-ran the same regex sweep against every shipped file: **zero** localhost
+  URIs across 409,320 total `/URI` link annotations in all 700 PDFs, and the
+  same `edition-world-cup-2022.pdf` now carries the correct
+  `https://slavisah.github.io/football-reference/teams/<slug>` and
+  `.../competitions/world-cup` URLs for those same 5 links. `pnpm check:pdfs`
+  reverified 700/700 fresh. Full standing health check clean after the
+  change: `pnpm lint` (0/0/1), `pnpm test` (733/733, unchanged - a build
+  script with no unit-testable pure function, unlike the prior run's
+  `editionPdfFileName()`/`editionPdfDownloadUrl()`), `pnpm build` (711
+  pages), all nineteen fast `check:*` scripts clean (three -
+  `check:reflow`/`check:text-zoom`/`check:print-width` - failed on a first
+  pass with a bare `{ log: [], name: 'Error' }`, then passed cleanly on an
+  isolated re-run each; diagnosed as a transient preview-server-port race
+  from running many `check:*` scripts back-to-back in the same shell rather
+  than anything this change touched, not a real regression), and a full
+  cold-start `pnpm test:e2e` (confirmed no stale preview server via `ps aux`
+  beforehand): **1013/1013 passed** (14.9 minutes, unchanged - this fix
+  touches only `scripts/generate-pdfs.mjs` and the 700 regenerated PDF
+  binaries, no `src/`/`content/`/`tests/` file, so no e2e-count change was
+  expected; no e2e case exercises a downloaded PDF's own binary content, the
+  same standing gap the hundred-and-forty-seventh run's own entry noted).
+  **Left for a future pass:** the same environment-blocked items as every
+  recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+  `long-title` brand-suffix decision, the Nations League Team of the
+  Tournament sourcing question - confirmed exhausted), the Nations League
+  2023 attendance conflict and 2021/2025 unconfirmed figures, World Cup
+  1930/1950's/EURO 1996/2020's excluded attendance figures, the
+  hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+  re-check, and the hundred-and-forty-sixth run's still-open per-section PDF
+  bookmarks/outline lead. This run's own transient `check:reflow`/
+  `check:text-zoom`/`check:print-width` failures suggest a future pass could
+  look at whether those three scripts' `astro preview` start/stop handling
+  needs a small delay or retry when run immediately back-to-back in
+  automation (this run simply re-ran each in isolation, which is a workaround
+  rather than a fix).

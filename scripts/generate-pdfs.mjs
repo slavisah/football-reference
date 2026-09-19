@@ -33,6 +33,12 @@ const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const PORT = 4399;
 const BASE = process.env.BASE_PATH ?? '/football-reference';
 const ORIGIN = `http://localhost:${PORT}`;
+// The real, deployed origin every internal link needs to resolve to once
+// baked into a static PDF - see rewriteInternalLinksForPrint() below for why.
+// Mirrors astro.config.mjs's own `SITE_URL` env var/default exactly, so this
+// script can never point PDFs at a different origin than the site itself was
+// built for.
+const SITE_URL = (process.env.SITE_URL ?? 'https://slavisah.github.io').replace(/\/$/, '');
 const OUT_DIR = path.join(ROOT, 'public', 'downloads');
 const MANIFEST_PATH = path.join(OUT_DIR, '.pdf-manifest.json');
 
@@ -211,12 +217,46 @@ async function main() {
         footerTemplate: footerTemplate(locale),
       });
 
+      // The hundred-and-forty-seventh run's edition-to-edition PDF pager
+      // discovered a real, previously-undocumented bug in every one of the
+      // 700 already-shipped PDFs' *other* internal links (team/player/
+      // competition-page links, all built with the site's own withBase()
+      // helper): Chromium's page.pdf() bakes a PDF link annotation from the
+      // anchor's already-*resolved* href at print time, and withBase()
+      // returns a base-relative path (e.g. "/football-reference/teams/
+      // brazil"), which resolves against whatever origin the page happens
+      // to be loaded from - during generation that's this script's own
+      // `http://localhost:4399` preview server, not the published site, so
+      // every internal link in every shipped PDF pointed at a dead
+      // localhost URI. Rather than touch the 63 source files that call
+      // withBase() (which must stay base-relative for normal browsing, dev
+      // preview and e2e tests running against localhost), this rewrites the
+      // already-rendered DOM in place, right before printing: any anchor
+      // whose *resolved* href starts with this script's own ORIGIN gets that
+      // prefix swapped for the real deployed SITE_URL, leaving external
+      // links (a different origin entirely) and the pager's own
+      // already-absolute production hrefs (added by that same prior run)
+      // untouched.
+      async function rewriteInternalLinksForPrint() {
+        await page.evaluate(
+          ({ localOrigin, prodOrigin }) => {
+            document.querySelectorAll('a[href]').forEach((a) => {
+              if (a.href.startsWith(localOrigin)) {
+                a.href = prodOrigin + a.href.slice(localOrigin.length);
+              }
+            });
+          },
+          { localOrigin: ORIGIN, prodOrigin: SITE_URL },
+        );
+      }
+
       // page.pdf() itself (a thin wrapper over Chromium's Page.printToPDF)
       // has no author-metadata option - see scripts/pdf-metadata.mjs's own
       // header comment for why this is a post-write incremental-update
       // patch rather than a printToPDF parameter or a full PDF-library
       // re-serialize.
       async function writePdfWithMetadata(outFile, locale) {
+        await rewriteInternalLinksForPrint();
         await page.pdf(pdfOptions(outFile, locale));
         const original = await readFile(outFile);
         const patched = addAuthorMetadata(original, PDF_AUTHOR);
