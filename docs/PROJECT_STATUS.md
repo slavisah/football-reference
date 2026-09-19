@@ -26081,5 +26081,93 @@ hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
 re-check, and the hundred-and-forty-sixth run's still-open per-section PDF
 bookmarks/outline lead (unchanged - this run didn't touch either question).
 
+### Finished consolidating `waitForServer` into `scripts/preview-daemon.mjs` - closed 2026-09-19 (hundred-and-fiftieth intensive run)
+
+A standing health check first (`pnpm install --frozen-lockfile`; `pnpm outdated`
+found nothing new beyond the still-blocked `typescript` 7 entry; `pnpm lint`
+0/0/1; `pnpm test` 733/733; `pnpm build` 711 pages; all nineteen fast
+`check:*` scripts and the three daemon-driven ones
+(`check:reflow`/`check:text-zoom`/`check:print-width`, run with
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) clean - all matching the
+hundred-and-forty-ninth run's baseline exactly).
+
+The hundred-and-forty-ninth run's own `scripts/preview-daemon.mjs` extraction
+closed the four-way duplication across `check-reflow.mjs`/`check-text-zoom.mjs`/
+`check-print-width.mjs`/`check-lighthouse.mjs`, but a `pnpm dlx knip
+--no-config-hints` pass this run (part of the standing health check, run after
+the four scripts' own baseline confirmation) turned up a smaller, related gap
+that extraction didn't reach: knip flagged `preview-daemon.mjs`'s own exported
+`waitForServer` as an unused export - true, because nothing outside that
+module imported it (`launchPreviewOnce` only calls it as a same-file local
+reference), yet two *other* scripts each carried their own byte-identical copy
+of the exact same function predating the hundred-and-forty-ninth run's
+refactor: `scripts/generate-pdfs.mjs` (`build:pdfs`'s own preview server used
+for print-PDF generation) and `scripts/test-preview-server.mjs` (the
+`playwright.config.ts` `webServer.command` wrapper every `pnpm test:e2e` run
+depends on). Diffed all three copies byte-for-byte first to confirm they were
+genuinely identical (modulo `preview-daemon.mjs`'s `export` keyword and its
+`sleep()` helper indirection) rather than assuming from the name alone - they
+were - then replaced both remaining copies with
+`import { waitForServer } from './preview-daemon.mjs'`, deleting the two
+duplicate function bodies. Deliberately left the rest of each file's own
+process-management code untouched: `generate-pdfs.mjs` runs its preview server
+on a different port (4399 vs. `preview-daemon.mjs`'s default 4321) and layers
+its own detached-process-group kill on top of `astro preview stop` - a
+specific, commented-on-purpose defensive measure from an earlier real bug
+(an `astro preview` daemon that outlived a `pnpm build:pdfs` run) - and
+`test-preview-server.mjs` has to stay a long-running foreground process for
+Playwright's `webServer` feature, a fundamentally different shape from
+`preview-daemon.mjs`'s own start-then-return `startPreviewDaemon()`. Folding
+either into the shared module's higher-level functions would risk losing a
+purpose-built behavior for a cosmetic consolidation; only the one truly
+identical leaf function moved.
+
+Verified rather than assumed clean: re-ran `pnpm dlx knip --no-config-hints`
+after the change - the `waitForServer` unused-export finding is gone, leaving
+only the one standing false positive every prior run has already
+documented (`scripts/test-preview-server.mjs` itself, referenced solely as a
+string in `playwright.config.ts`'s `webServer.command`, which knip's static
+import graph can't see). `pnpm lint` (0/0/1), `pnpm test` (733/733) and
+`pnpm build` (711 pages) all stayed exactly at the standing baseline - a
+process-orchestration-only change, no `src/`/`content/`/`tests/` file
+touched, matching `vitest.config.ts`'s deliberate `src/lib/**/*.ts`-only
+coverage scope the hundred-and-forty-ninth run's own entry already
+explained. Regenerated all 700 PDFs with the edited `generate-pdfs.mjs`
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs`, ~9 minutes)
+and reverified `pnpm check:pdfs` clean (700/700 fresh) - the real functional
+proof that the consolidated `waitForServer` still gates the PDF generator's
+own browser launch correctly, not just that the code parses. Ran
+`tests/e2e/mobile.spec.ts` standalone against the edited
+`test-preview-server.mjs` (334/334 passed, confirming Playwright's
+`webServer.command` still boots and tears down the daemon correctly through
+the new import) before the full cold-start `pnpm test:e2e` run (no stale
+preview server confirmed via `ps aux` beforehand). One early run of that
+mobile spec, started concurrently with the still-running `build:pdfs`
+background job, hit a transient `net::ERR_CONNECTION_REFUSED` partway through
+from CPU/browser resource contention between two simultaneous Chromium
+instances (one per script, different ports) rather than any bug in the code
+change - confirmed by re-running the identical spec alone immediately after
+`build:pdfs` finished, which passed clean end to end; worth remembering as a
+new, narrower case of the hundred-and-forty-eighth run's own "don't trust a
+failure from scripts sharing resources back-to-back" caution, this time
+between `test:e2e` and `build:pdfs` rather than between two `check:*`
+scripts.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix decision, the Nations League Team of the
+Tournament sourcing question - confirmed exhausted), the Nations League 2023
+attendance conflict and 2021/2025 unconfirmed figures, World Cup
+1930/1950's/EURO 1996/2020's excluded attendance figures, the
+hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+re-check, and the hundred-and-forty-sixth run's still-open per-section PDF
+bookmarks/outline lead (unchanged - this run didn't touch either question).
+With the preview-daemon duplication now fully closed (all three scripts that
+start an `astro preview` server share one `waitForServer`), a future pass's
+best bet is the same standing menu: a fresh dependency-upgrade attempt, the
+coordinate/keyboard-walkthrough method after the next real content or layout
+change, or another genuinely different quality angle not yet tried on this
+site.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

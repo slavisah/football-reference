@@ -6689,3 +6689,44 @@ back clean:
   hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
   re-check, and the hundred-and-forty-sixth run's still-open per-section PDF
   bookmarks/outline lead.
+- **Finished consolidating `waitForServer` into `scripts/preview-daemon.mjs`**:
+  closed 2026-09-19 (hundred-and-fiftieth intensive run) - a standing health
+  check first (all clean, matching the hundred-and-forty-ninth run's
+  baseline). A `pnpm dlx knip --no-config-hints` pass flagged
+  `preview-daemon.mjs`'s own `waitForServer` export as unused - true, and the
+  reason was a gap the hundred-and-forty-ninth run's four-way
+  `check:reflow`/`check:text-zoom`/`check:print-width`/`check:lighthouse`
+  consolidation didn't reach: `scripts/generate-pdfs.mjs` (`build:pdfs`) and
+  `scripts/test-preview-server.mjs` (Playwright's `webServer.command`) each
+  still carried their own byte-identical copy of the same function predating
+  that refactor. Confirmed byte-for-byte identical, then pointed both at the
+  shared `preview-daemon.mjs` export instead, deleting the two duplicates;
+  left each file's own distinct process-management code (different port,
+  detached-process-group kill, foreground-blocking shape) untouched since
+  only the one truly identical leaf function was shared. Verified
+  empirically: `pnpm dlx knip --no-config-hints` no longer flags the export
+  (only the one standing `test-preview-server.mjs` false positive remains),
+  all 700 PDFs regenerated and reverified fresh via the edited
+  `generate-pdfs.mjs`, and `tests/e2e/mobile.spec.ts` (334/334) plus a full
+  cold-start `pnpm test:e2e` confirmed the edited `test-preview-server.mjs`
+  still boots/tears down Playwright's own preview daemon correctly. Full
+  standing health check clean: `pnpm lint` (0/0/1), `pnpm test` (733/733,
+  unchanged - process-orchestration-only change, outside
+  `vitest.config.ts`'s `src/lib/**/*.ts` coverage scope), `pnpm build` (711
+  pages), all nineteen fast `check:*` scripts clean plus the three
+  daemon-driven ones. See `docs/PROJECT_STATUS.md`'s matching entry for full
+  detail, including a transient `test:e2e`/`build:pdfs` resource-contention
+  false failure this run hit and ruled out (unrelated to the code change).
+  **Left for a future pass:** the same environment-blocked items as every
+  recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+  `long-title` brand-suffix decision, the Nations League Team of the
+  Tournament sourcing question - confirmed exhausted), the Nations League
+  2023 attendance conflict and 2021/2025 unconfirmed figures, World Cup
+  1930/1950's/EURO 1996/2020's excluded attendance figures, the
+  hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+  re-check, and the hundred-and-forty-sixth run's still-open per-section PDF
+  bookmarks/outline lead. With the preview-daemon duplication now fully
+  closed, a future pass's best bet is the same standing menu: a fresh
+  dependency-upgrade attempt, the coordinate/keyboard-walkthrough method
+  after the next real content or layout change, or another genuinely
+  different quality angle not yet tried on this site.
