@@ -6441,9 +6441,152 @@ back clean:
   conflict and 2021/2025 unconfirmed figures, World Cup 1930/1950's/EURO
   1996/2020's excluded attendance figures, and the
   hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
-  re-check. A future pass could extend this same "read a shared generator
-  script end to end looking for a missing reader-facing affordance" method
-  to the PDF pipeline's other remaining gaps (no PDF bookmarks/outline
-  entry per note-card section within a page, no cross-reference from one
-  edition PDF to the next/previous edition), or take another genuinely
-  different quality angle not yet tried on this site.
+  re-check. This run's own "read a shared generator script end to end
+  looking for a missing reader-facing affordance" method has two more
+  concrete leads still open in the same file: no PDF bookmark/outline entry
+  per note-card section within a single long page (only one top-level
+  bookmark per PDF today, via `outline: true`), and no cross-reference link
+  from one edition PDF to the adjacent edition's own PDF. Either is a
+  reasonable next angle, alongside the same standing menu (a fresh
+  dependency-upgrade attempt, the coordinate/keyboard-walkthrough method
+  after the next real content or layout change, or another genuinely
+  different quality angle not yet tried on this site).
+- **Edition-to-edition PDF cross-reference: a print-only "Previous/Next
+  edition" pager linking to the sibling edition's own downloadable PDF**:
+  closed 2026-09-19 (hundred-and-forty-seventh intensive run) - closes the
+  second of the hundred-and-forty-sixth run's two leads (the first,
+  per-section PDF bookmarks/outline entries, is re-opened below rather than
+  closed - see that decision's own reasoning). A standing health check first
+  (`pnpm install --frozen-lockfile`; `pnpm outdated` found one new in-range
+  patch beyond the still-blocked `typescript` 7 entry - `@types/node`
+  26.6.1 -> 26.6.2, installed; `npm view @astrojs/check@latest
+  peerDependencies` re-confirmed `typescript` 7 still exceeds its `^5.0.0 ||
+  ^6.0.0` ceiling; `pnpm lint` 0/0/1; `pnpm test` 726/726; `pnpm build` 711
+  pages; all nineteen fast `check:*` scripts clean, matching the
+  hundred-and-forty-sixth run's baseline).
+  Investigated both of the prior run's leads before picking one, per this
+  run's own instructions to confirm or overturn the "the PDF-to-PDF
+  cross-reference is the safer bet" read with real investigation rather than
+  trust it blindly - it held up: extending `pdf-metadata.mjs`'s hand-rolled
+  incremental-update technique to a whole `/Outlines` tree with
+  page-position-anchored destinations per note-card section would need new,
+  unverified low-level PDF surgery with no human reviewing before merge,
+  whereas the cross-reference could be done entirely by changing what HTML
+  Chromium prints - no raw PDF binary editing at all.
+  That investigation surfaced a real, previously-undocumented landmine before
+  it could be shipped as a new bug: extracting every `/URI` link annotation
+  from this repo's own already-committed `edition-fifa-world-cup-2022.pdf`
+  (via a throwaway Python regex script, `pdfminer.six` installed standalone
+  for verification only) showed every *site-relative* internal link the file
+  already carries - e.g. a team-profile link built with the site's own
+  `withBase()` helper - resolves to a dead `http://localhost:4399/football-
+  reference/...` URI, not the live `https://slavisah.github.io/...` address.
+  The cause: Chromium's `page.pdf()` (`scripts/generate-pdfs.mjs`) bakes a PDF
+  link annotation from whatever the anchor's already-*resolved* `href` is at
+  print time, and a relative href resolves against the page's *current*
+  origin - during PDF generation, that's the script's own local preview
+  server, not the published site (the same `class="url"` trap the
+  hundred-and-forty-sixth run's own footer-template work already documented
+  for a different element, just never previously checked for ordinary `<a>`
+  tags). This is a real bug in every one of the 700 PDFs' *other* internal
+  links, predating this run and out of its scope to fix (see "Left for a
+  future pass" below) - but it directly decided this feature's own
+  implementation: the new pager's href is a literal absolute URL
+  (`https://slavisah.github.io/football-reference/downloads/<slug>.pdf`)
+  computed from `Astro.site`/`Astro.url` at Astro's own *build* time (hours
+  or days before `generate-pdfs.mjs` ever runs `astro preview`), so it
+  survives into the printed PDF unchanged regardless of what origin Chromium
+  later happens to navigate to - confirmed empirically, not assumed, by
+  regenerating a sample of PDFs and re-running the same link-extraction
+  script against the shipped files (see verification below).
+  Implementation: a new `pdfPreviousUrl`/`pdfNextUrl` prop pair on
+  `EditionView.astro`, rendered as a second, distinctly-classed
+  (`.edition__pdf-pager`/`.edition__pdf-pager-link`, never reusing
+  `.edition__pager-link`/`--next`, so it can never collide with
+  `tests/e2e/edition-page.spec.ts`'s own locators for the existing on-page
+  pager) `<nav>` right below the existing "Previous/Next edition" pager
+  (which still links to the sibling's live page, unchanged) - present in the
+  DOM on every edition page but print-only, via a brand-new `.print-only`
+  utility class in `src/styles/global.css` (the literal mirror image of the
+  existing `.no-print` utility that same file's own `@media print` block
+  already uses: hidden by `display: none` outside of print, revealed by
+  `display: block` inside it), since a reader browsing the live site already
+  has the on-page pager and doesn't need a second, PDF-specific one
+  cluttering the screen. Two new pure helpers in `src/lib/editionProfile.ts`
+  - `editionPdfFileName()` (the `edition-<family>-<slug>[-hr]` filename
+  convention `scripts/pdf-pages.mjs`'s `EDITION_PDF_SOURCES` map and
+  `src/pages/edition-index.json.ts` already use) and `editionPdfDownloadUrl()`
+  (that filename resolved to an absolute URL, given `Astro.site ??
+  Astro.url`) - are called from all 14 `[year].astro` route files (7
+  competition/award families x English/Croatian), each supplying its own
+  literal family key exactly as it already does for that page's own
+  `pdfSlug` prop, so the sibling's PDF slug can never drift from the current
+  page's own. `profile.previous`/`profile.next` being `undefined` (the
+  first/last edition of a competition) naturally omits that side of the
+  pager, the same edge case the existing on-page pager already handles -
+  spot-checked directly against 1930 (World Cup's oldest edition, no
+  previous PDF link) and the Copa América 1959 host-disambiguation pair
+  (Argentina's "next" correctly resolves to `edition-copa-america-1959-
+  ecuador.pdf`, not a bare "1959" collision).
+  Verified empirically rather than by code review alone: regenerated all 700
+  PDFs (`pnpm build:pdfs`, ~9 minutes, `PW_EXECUTABLE_PATH=/opt/pw-
+  browsers/chromium`) and re-ran the same `/URI` link-extraction script
+  directly against the shipped files - `edition-world-cup-2018.pdf` carries
+  exactly `https://slavisah.github.io/football-reference/downloads/edition-
+  world-cup-2014.pdf` and `.../edition-world-cup-2022.pdf` (previous/next),
+  `edition-world-cup-2018-hr.pdf` carries the matching `-hr`-suffixed pair,
+  `edition-copa-america-1959-argentina.pdf`/`-1959-ecuador.pdf` carry the
+  correctly host-disambiguated pair in both directions, and
+  `edition-golden-boot-euro-1996.pdf`/`edition-golden-boot-world-cup-1994-
+  hr.pdf` carry their own family-prefixed, correctly-localized pairs - a
+  full-repo sweep for any `localhost` string co-occurring with `downloads/`
+  inside a `/URI` entry across every `edition-*.pdf` came back with zero
+  matches. Also confirmed this didn't disturb the PDF/UA tagging structure
+  `pdf-metadata.mjs`'s own header comment documents as fragile: `/StructTreeRoot`
+  (2), `/MarkInfo` (2), `/Marked true` (1), `/Outlines` (2) and `/Author` (1)
+  counts on a sampled edition PDF and `records.pdf` match the
+  hundred-and-forty-sixth run's own documented baseline exactly.
+  `pnpm check:pdfs` reverified 700/700 fresh afterward. 7 new unit tests
+  (`tests/unit/editionProfile.test.ts`) cover `editionPdfFileName()`/
+  `editionPdfDownloadUrl()` directly, including the Croatian suffix, a
+  multi-word family key (Golden Boot), a host-disambiguated slug (Copa
+  América 1959) and the no-site-configured (local dev) fallback. New e2e
+  coverage: a full mechanism test on the flagship World Cup spec
+  (`tests/e2e/edition-page.spec.ts`, both English and Croatian) confirming
+  the pager is `toBeHidden()` on screen and `toBeVisible()` under
+  `page.emulateMedia({ media: 'print' })`, the exact href on both sides, the
+  oldest-edition no-previous-link case, and the Croatian copy/href pair; a
+  lighter one-test-per-family href spot check added to each of the other
+  five family spec files (EURO, Nations League, Copa América including its
+  1959 disambiguation edge case, Ballon d'Or, and both Golden Boot route
+  trees) confirming that family's own PDF-slug prefix rather than duplicating
+  the full mechanism test six more times. Full standing health check clean
+  after the change: `pnpm lint` (0/0/1, unchanged), `pnpm test` (733/733, up
+  from 726 - the 7 new cases), `pnpm build` (711 pages, unchanged), all
+  nineteen `check:*` scripts clean (`check:pdfs` 700/700 fresh), and a full
+  cold-start `pnpm test:e2e` (no stale preview server running beforehand,
+  confirmed via `ps aux`): **1013/1013 passed** (up from 1004 - the 9 new
+  cases), in line with recent runs' timing.
+  **Left for a future pass:** the same environment-blocked items as every
+  recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+  `long-title` brand-suffix decision, the Nations League Team of the
+  Tournament sourcing question - confirmed exhausted), the Nations League
+  2023 attendance conflict and 2021/2025 unconfirmed figures, World Cup
+  1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+  hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+  re-check. The hundred-and-forty-sixth run's other lead - per-section PDF
+  bookmarks/outline entries within a single long PDF - stays open; this run's
+  own investigation reconfirmed (rather than assumed) that it's the
+  higher-risk of the two, needing new hand-rolled `/Outlines`-tree binary
+  surgery with no way to empirically verify short of opening every affected
+  PDF in a real reader. New and more urgent: every one of the 700 already-
+  shipped PDFs' *other* internal links (team/player/competition-page links,
+  built with the site's own `withBase()` helper) resolve to a dead
+  `http://localhost:4399/football-reference/...` URI rather than the live
+  site, a real bug discovered while investigating this run's own feature (see
+  above) but out of scope to fix here - a future pass could extend the exact
+  same "compute the link as `editionPdfDownloadUrl()` does, from `Astro.site`
+  at build time rather than a `withBase()` path resolved at generation time"
+  fix to every other internal link `TournamentTable.astro`/`EditionView.astro`/
+  `References.astro`/etc. render, then regenerate and re-verify all 700 PDFs
+  the same way this run did for just the new pager links.
