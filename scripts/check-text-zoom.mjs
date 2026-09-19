@@ -21,13 +21,13 @@
 // `pagesOverflowing`/`OVERFLOW_TOLERANCE_PX` budget check, rather than
 // duplicating logic already tested in `tests/unit/checkReflow.test.ts` - the
 // only genuinely different step is *how* each page is stressed (font-size,
-// not viewport width) before the same measurement runs.
+// not viewport width) before the same measurement runs. The `astro preview`
+// daemon dance and Chromium launcher are shared too, from
+// `scripts/preview-daemon.mjs`.
 
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { chromium } from '@playwright/test';
 import { listHtmlFiles } from './check-internal-links.mjs';
 import {
   htmlFileToPagePath,
@@ -35,10 +35,10 @@ import {
   OVERFLOW_TOLERANCE_PX,
   pagesOverflowing,
 } from './check-reflow.mjs';
+import { launchChromium, startPreviewDaemon, stopPreviewDaemon } from './preview-daemon.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const DIST_DIR = path.join(ROOT, 'dist');
-const astroBin = path.join(ROOT, 'node_modules', '.bin', 'astro');
 const PORT = process.env.PORT ?? '4321';
 const BASE = process.env.BASE_PATH ?? '/football-reference';
 const ORIGIN = `http://localhost:${PORT}`;
@@ -60,42 +60,6 @@ async function listAllPages() {
     }),
   );
   return pages.filter((page) => page !== null).sort();
-}
-
-function stopPreviewDaemon() {
-  spawnSync(astroBin, ['preview', 'stop'], { cwd: ROOT, stdio: 'inherit' });
-}
-
-async function waitForServer(url, timeoutMs = 60_000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(url);
-      if (res.ok) return;
-    } catch {
-      // not up yet
-    }
-    await new Promise((resolve) => setTimeout(resolve, 300));
-  }
-  throw new Error(`Preview server at ${url} did not become ready in time`);
-}
-
-async function startPreviewDaemon() {
-  stopPreviewDaemon();
-  console.log('Starting `astro preview`...');
-  spawnSync(astroBin, ['preview', '--port', PORT, '--host'], { cwd: ROOT, stdio: 'inherit' });
-  await waitForServer(`${ORIGIN}${BASE}/`);
-  console.log(`Preview server ready at ${ORIGIN}${BASE}/`);
-}
-
-async function launchChromium() {
-  const launchOptions = { headless: true };
-  if (process.env.PW_EXECUTABLE_PATH) {
-    launchOptions.executablePath = process.env.PW_EXECUTABLE_PATH;
-  } else if (process.env.PW_CHROME_CHANNEL) {
-    launchOptions.channel = process.env.PW_CHROME_CHANNEL;
-  }
-  return chromium.launch(launchOptions);
 }
 
 async function measureOverflow(page, pagePath) {
@@ -127,7 +91,7 @@ async function main() {
     }
   } finally {
     await browser.close();
-    stopPreviewDaemon();
+    await stopPreviewDaemon();
   }
 
   const failures = pagesOverflowing(measurements);
@@ -151,9 +115,9 @@ async function main() {
 // would also kick off a real `astro preview` + Chromium sweep as a side
 // effect of the import.
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
+  main().catch(async (error) => {
     console.error(error);
-    stopPreviewDaemon();
+    await stopPreviewDaemon();
     process.exitCode = 1;
   });
 }
