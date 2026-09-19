@@ -60,6 +60,24 @@ interface Props {
   pdfSlug?: string;
   pdfLabel?: string;
   pdfHint?: string;
+  /**
+   * Absolute production URL of the previous/next edition's own downloadable
+   * PDF (see `editionPdfDownloadUrl()` in src/lib/editionProfile.ts for why
+   * this must be a real absolute URL, not a `withBase()` site-relative one).
+   * Renders as a print-only pager - visible in the generated PDF but not on
+   * the live web page, which already has its own on-page pager to the
+   * sibling edition's live page just above (`.edition__pager`, hidden when
+   * printing) - so a reader working from a folder of downloaded PDFs can
+   * still jump from one edition's PDF to the next/previous, something no
+   * on-page link could ever do for them. Omit either one (the same
+   * first/last-edition case `profile.previous`/`profile.next` already
+   * leave undefined) to omit that side of the pager.
+   */
+  pdfPreviousUrl?: string;
+  pdfNextUrl?: string;
+  pdfPagerLabel?: string;
+  pdfPreviousLabel?: string;
+  pdfNextLabel?: string;
 }
 
 const {
@@ -86,6 +104,11 @@ const {
   pdfSlug,
   pdfLabel,
   pdfHint = 'A4 landscape, this edition’s full placings and final result.',
+  pdfPreviousUrl,
+  pdfNextUrl,
+  pdfPagerLabel = 'Downloadable edition PDFs',
+  pdfPreviousLabel = 'Previous edition (PDF)',
+  pdfNextLabel = 'Next edition (PDF)',
 } = Astro.props;
 
 const label = (raw: string) => headerLabels[raw] ?? raw;
@@ -210,6 +233,35 @@ const isFinalLabel = (raw: string) => /^final$/i.test(raw.trim());
     }
   </nav>
 
+  {
+    (pdfPreviousUrl || pdfNextUrl) && (
+      <nav class="edition__pdf-pager print-only" aria-label={pdfPagerLabel}>
+        {pdfPreviousUrl ? (
+          <a class="edition__pdf-pager-link" href={pdfPreviousUrl}>
+            <span class="edition__pdf-pager-role">&larr; {pdfPreviousLabel}</span>
+            <span class="edition__pdf-pager-year">
+              {profile.previous?.year}
+              {profile.previous?.disambiguator && ` (${profile.previous.disambiguator})`}
+            </span>
+          </a>
+        ) : (
+          <span />
+        )}
+        {pdfNextUrl ? (
+          <a class="edition__pdf-pager-link edition__pdf-pager-link--next" href={pdfNextUrl}>
+            <span class="edition__pdf-pager-role">{pdfNextLabel} &rarr;</span>
+            <span class="edition__pdf-pager-year">
+              {profile.next?.year}
+              {profile.next?.disambiguator && ` (${profile.next.disambiguator})`}
+            </span>
+          </a>
+        ) : (
+          <span />
+        )}
+      </nav>
+    )
+  }
+
   <p class="edition__back">
     <a href={withBase(backPath ?? competitionPath)}>{fill(backLabel)} &rarr;</a>
   </p>
@@ -305,9 +357,49 @@ const isFinalLabel = (raw: string) => /^final$/i.test(raw.trim());
     font-weight: 600;
   }
 
+  /*
+   * The print-only PDF-to-PDF cross-reference pager (see the `pdfPreviousUrl`/
+   * `pdfNextUrl` props' own doc comment above). `.print-only` (src/styles/
+   * global.css) already hides it on screen and reveals it under `@media
+   * print`; this block only needs to lay it out once it's visible, mirroring
+   * `.edition__pager`'s own layout above (a distinct class name throughout,
+   * not a reuse of `.edition__pager-link`/`--next`, so it can never collide
+   * with tests/e2e/edition-page.spec.ts's own `.edition__pager-link`
+   * locators, which assume exactly one on-page pager pair exists per page).
+   */
+  .edition__pdf-pager-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-decoration: none;
+  }
+
+  .edition__pdf-pager-link--next {
+    text-align: right;
+  }
+
+  .edition__pdf-pager-role {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .edition__pdf-pager-year {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
   @media print {
     .edition__pager {
       display: none;
+    }
+
+    .edition__pdf-pager {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
     }
   }
 </style>

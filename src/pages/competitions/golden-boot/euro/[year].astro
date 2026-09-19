@@ -9,7 +9,7 @@ import EditionView from '../../../../components/EditionView.astro';
 import References from '../../../../components/References.astro';
 import { loadCompetition } from '../../../../lib/competition';
 import { buildYearStories, isPlaceholderWinner } from '../../../../lib/editions';
-import { buildEditionProfiles, type EditionProfile } from '../../../../lib/editionProfile';
+import { buildEditionProfiles, editionPdfDownloadUrl, type EditionProfile } from '../../../../lib/editionProfile';
 import { buildAllCountryRecords } from '../../../../lib/compare';
 import { loadTeamCompetitions } from '../../../../lib/teamCompetitions';
 import { teamProfileSlug } from '../../../../lib/teamProfile';
@@ -84,6 +84,16 @@ const description = isPlaceholderWinner(profile.champion)
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
+
+// Print-only PDF-to-PDF cross-reference pager - see EditionView.astro's
+// `pdfPreviousUrl`/`pdfNextUrl` prop doc comment for why this must be an
+// absolute URL rather than `withBase()` alone.
+const pdfPreviousUrl = profile.previous
+  ? editionPdfDownloadUrl(Astro.site, Astro.url, 'golden-boot-euro', profile.previous.slug, 'en')
+  : undefined;
+const pdfNextUrl = profile.next
+  ? editionPdfDownloadUrl(Astro.site, Astro.url, 'golden-boot-euro', profile.next.slug, 'en')
+  : undefined;
 ---
 
 <BaseLayout
@@ -102,6 +112,8 @@ const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
     headingTemplate="{year} {competition}"
     introTemplate="Everything the {competition} table records about {year}, with every scorer linked to their full award history and their team linked separately. Tied scorers are shown together, exactly as the source table lists them."
     pdfSlug={`edition-golden-boot-euro-${profile.slug}`}
+    pdfPreviousUrl={pdfPreviousUrl}
+    pdfNextUrl={pdfNextUrl}
   >
     <References sources={sources} lastReviewed={lastReviewed} status={status} />
   </EditionView>

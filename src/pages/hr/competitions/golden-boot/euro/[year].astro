@@ -9,7 +9,7 @@ import EditionView from '../../../../../components/EditionView.astro';
 import References from '../../../../../components/References.astro';
 import { loadCompetition } from '../../../../../lib/competition';
 import { buildYearStories, isPlaceholderWinner } from '../../../../../lib/editions';
-import { buildEditionProfiles, type EditionProfile } from '../../../../../lib/editionProfile';
+import { buildEditionProfiles, editionPdfDownloadUrl, type EditionProfile } from '../../../../../lib/editionProfile';
 import { buildAllCountryRecords } from '../../../../../lib/compare';
 import { loadTeamCompetitions } from '../../../../../lib/teamCompetitions';
 import { teamProfileSlug } from '../../../../../lib/teamProfile';
@@ -103,6 +103,16 @@ const description = isPlaceholderWinner(profile.champion)
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
+
+// Print-only PDF-to-PDF cross-reference pager - see EditionView.astro's
+// `pdfPreviousUrl`/`pdfNextUrl` prop doc comment for why this must be an
+// absolute URL rather than `withBase()` alone.
+const pdfPreviousUrl = profile.previous
+  ? editionPdfDownloadUrl(Astro.site, Astro.url, 'golden-boot-euro', profile.previous.slug, 'hr')
+  : undefined;
+const pdfNextUrl = profile.next
+  ? editionPdfDownloadUrl(Astro.site, Astro.url, 'golden-boot-euro', profile.next.slug, 'hr')
+  : undefined;
 ---
 
 <BaseLayout
@@ -135,6 +145,11 @@ const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
     pdfSlug={`edition-golden-boot-euro-${profile.slug}-hr`}
     pdfLabel="Preuzmi PDF za ispis"
     pdfHint="A4 položeno, potpuni podaci ovog izdanja nagrade."
+    pdfPreviousUrl={pdfPreviousUrl}
+    pdfNextUrl={pdfNextUrl}
+    pdfPagerLabel="PDF datoteke susjednih izdanja"
+    pdfPreviousLabel="Prethodno izdanje (PDF)"
+    pdfNextLabel="Sljedeće izdanje (PDF)"
   >
     <References
       sources={sources}

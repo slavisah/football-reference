@@ -90,6 +90,31 @@ test.describe('Copa América edition page', () => {
     await expect(back).toHaveAttribute('href', /\/competitions\/copa-america\/?$/);
   });
 
+  // The print-only PDF pager (EditionView.astro's `pdfPreviousUrl`/
+  // `pdfNextUrl`) reuses `EditionProfile.previous`/`.next`'s own already
+  // host-disambiguated `.slug`, so the two 1959 editions' PDF hrefs need the
+  // same "-argentina"/"-ecuador" disambiguation the on-page pager above gets
+  // - a real edge case a plain year-only test could never exercise. Full
+  // coverage of the mechanism itself (hidden on screen, visible under print,
+  // both languages) lives on the shared component's flagship test in
+  // edition-page.spec.ts (World Cup).
+  test('the print-only PDF pager keeps the host disambiguation between the two 1959 editions\' own PDFs', async ({
+    page,
+  }) => {
+    await page.goto('competitions/copa-america/1959-argentina');
+    await page.emulateMedia({ media: 'print' });
+
+    const pdfPager = page.locator('.edition__pdf-pager');
+    await expect(pdfPager.locator('a', { hasText: 'Previous edition (PDF)' })).toHaveAttribute(
+      'href',
+      'https://slavisah.github.io/football-reference/downloads/edition-copa-america-1957.pdf',
+    );
+    await expect(pdfPager.locator('a', { hasText: 'Next edition (PDF)' })).toHaveAttribute(
+      'href',
+      'https://slavisah.github.io/football-reference/downloads/edition-copa-america-1959-ecuador.pdf',
+    );
+  });
+
   test('has no horizontal page overflow at 360px on either 1959 page', async ({ page }) => {
     for (const slug of ['1959-argentina', '1959-ecuador']) {
       await page.goto(`competitions/copa-america/${slug}`);
