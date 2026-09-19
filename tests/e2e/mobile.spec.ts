@@ -3520,6 +3520,28 @@ test.describe('Installability and offline reading', () => {
     await context.setOffline(false);
   });
 
+  test('a page reached via its canonical (trailing-slash) URL - never clicked in-app - still shows its own content offline, not the home page', async ({
+    page,
+    context,
+  }) => {
+    // Reproduces a real bug: PRECACHE_URLS/Nav.astro's in-app hrefs omit the
+    // trailing slash, but every page's actual canonical/sitemap/OG/hreflang
+    // URL (BaseLayout.astro's withTrailingSlash()) has one - the form a
+    // reader arrives at via a bookmark, a shared link, or a search result.
+    // Before the offlineCache.ts/sw.js.ts fix, that trailing-slash request
+    // was a spurious cache miss even though the page itself was precached
+    // under the slash-less key, so it silently fell back to the home page.
+    await page.goto('');
+    await page.evaluate(() => navigator.serviceWorker.ready);
+
+    await context.setOffline(true);
+    // Never visited in this test via an in-app (slash-less) link - only via
+    // its own canonical trailing-slash URL, simulating a bookmark/shared link.
+    await page.goto('records/');
+    await expect(page.locator('h1')).toHaveText('Records and Timelines');
+    await context.setOffline(false);
+  });
+
   test('a Croatian page that was never individually visited still works offline (precached on install)', async ({
     page,
     context,

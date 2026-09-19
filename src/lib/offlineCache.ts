@@ -26,6 +26,21 @@ export function withBasePath(basePath: string, path: string): string {
 }
 
 /**
+ * Every real page is a directory-format route (astro.config.mjs's
+ * `build.format: 'directory'`) whose canonical URL has a trailing slash -
+ * the same convention BaseLayout.astro's own `withTrailingSlash()` already
+ * applies to canonical/hreflang/OG/sitemap URLs. Applied here too so a
+ * precached entry's URL always matches the form a reader actually arrives
+ * at the page with when following one of those (a shared link, a bookmark,
+ * a search result) rather than only the bare NAV_LINKS path an in-app nav
+ * click uses - see sw.js.ts's fetch handler, which normalizes the same way
+ * before every cache read/write.
+ */
+function withTrailingSlash(path: string): string {
+  return path.endsWith('/') ? path : `${path}/`;
+}
+
+/**
  * Builds the list of URLs the service worker precaches on install, given the
  * site's base path. Every nav page is precached in both languages (the
  * Croatian page under its TRANSLATED_PATHS equivalent) - every NAV_LINKS
@@ -35,13 +50,14 @@ export function withBasePath(basePath: string, path: string): string {
  */
 export function buildPrecacheUrls(basePath: string): string[] {
   const withBase = (path: string) => withBasePath(basePath, path);
+  const withPageBase = (path: string) => withBase(withTrailingSlash(path));
 
   const pagePaths = NAV_LINKS.flatMap((link) => {
     const hrPath = TRANSLATED_PATHS[link.path];
     return hrPath ? [link.path, hrPath] : [link.path];
   });
 
-  const urls = [...pagePaths.map(withBase), ...STATIC_ASSETS.map(withBase)];
+  const urls = [...pagePaths.map(withPageBase), ...STATIC_ASSETS.map(withBase)];
 
   return Array.from(new Set(urls));
 }
