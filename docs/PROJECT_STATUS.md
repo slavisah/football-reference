@@ -26169,5 +26169,125 @@ coordinate/keyboard-walkthrough method after the next real content or layout
 change, or another genuinely different quality angle not yet tried on this
 site.
 
+### Fixed a real offline-mode bug: a page reached via its own canonical URL fell back to the home page instead of showing its precached self - closed 2026-09-19 (hundred-and-fifty-first intensive run)
+
+A standing health check first (`pnpm install --frozen-lockfile`; `pnpm outdated`
+found nothing new beyond the still-blocked `typescript` 7 entry; `pnpm audit`
+clean; `pnpm lint` 0/0/1; `pnpm test` 733/733; `pnpm build` 711 pages; `pnpm
+dlx knip --no-config-hints` matched the standing one false positive) - all
+matching the hundred-and-fiftieth run's baseline exactly. With the open
+backlog and every recent "left for a future pass" item still genuinely
+blocked (network egress, the `typescript` 7 peer ceiling, the `long-title`
+brand-suffix decision needing human sign-off, the hyphenation-rendering
+visual re-check needing a differently-provisioned browser), this run
+extended the "manual walkthrough, actually look at the result" method to two
+areas no prior run's own walkthrough list had named yet: `/records` and
+`/glossary` (both languages, mobile/desktop, light/dark - all sixteen
+combinations screenshotted and reviewed) and the PWA's actual offline
+navigation behavior, past the two specific offline scenarios `mobile.spec.ts`
+already had fixed coverage for.
+
+The screenshot pass itself found nothing - `/records` and `/glossary` render
+cleanly in every combination. But probing the offline path by hand (start the
+preview server, let the service worker install, go offline, navigate to a
+precached nav page *the way a real reader who bookmarked or was sent a link
+would* - via its canonical URL, not by clicking an in-app nav link first)
+reproduced a genuine, previously-unnoticed bug: requesting
+`/football-reference/records/` (the trailing-slash form every canonical
+`<link>`, `sitemap.xml` entry, OG/hreflang tag, and JSON-LD `url` on this site
+already uses - see `BaseLayout.astro`'s own `withTrailingSlash()`) while
+offline silently rendered the **home page** instead of Records, even though
+Records genuinely was precached on install. Root cause: `offlineCache.ts`'s
+`buildPrecacheUrls()` builds its list straight from `NAV_LINKS` paths, which
+(with the sole accidental exception of the two home pages, whose path is
+already just `/`) have no trailing slash - `/football-reference/records`, not
+`/football-reference/records/` - and `sw.js.ts`'s fetch handler does an exact
+`caches.match(request)` with no normalization. The two forms are different
+cache keys, so a reader who never happens to click an in-app link first (and
+instead always arrives via the canonical form) gets a spurious cache miss on
+every single nav page, and the navigate handler's own offline fallback for a
+genuine miss is "serve the cached home page" - so the wrong page renders with
+no error, no console warning, nothing to tell a reader they didn't get what
+they asked for. Confirmed empirically with a throwaway Playwright script
+before touching any code: polled the real Cache Storage API after
+`navigator.serviceWorker.ready` and past install completion and found
+`/football-reference/records` (no slash) present, `/football-reference/records/`
+(with slash) absent - not a timing race, a genuine key mismatch.
+
+Fixed at both ends of the same seam, mirroring the site's own established
+`withTrailingSlash()` convention rather than inventing a new one:
+
+- `offlineCache.ts`'s `buildPrecacheUrls()` now appends a trailing slash to
+  every `NAV_LINKS`-derived page URL (a new local `withTrailingSlash()`
+  helper) before prefixing it with the base path - `STATIC_ASSETS` (the
+  manifest, favicon, icons - real files, not directory routes) are left
+  exactly as before.
+- `sw.js.ts`'s generated fetch handler, for `navigate`-mode requests only,
+  now builds its cache key as the request's pathname (trailing slash added if
+  missing) plus its untouched search string, and uses that same normalized
+  key for both the network-first cache write and the offline-fallback cache
+  read - instead of the raw `request` object either end used before. The
+  query string is deliberately left alone: `?utm_source=...`/`?a=<id>`
+  variants of a page still only hit the cache if that exact variant was
+  itself visited online first, preserving `mobile.spec.ts`'s existing "falls
+  back to the cached home page offline for a URL that was never cached" test
+  (which uses a `?utm_source=nowhere` URL as its "never cached" example) -
+  this fix closes the trailing-slash gap specifically, not cache-key
+  normalization in general.
+- `check-precache.mjs`'s nav-link-vs-precache-list comparison (the automated
+  guard added the hundred-and-eleventh run specifically to catch this class of
+  drift) needed a matching update: `Nav.astro`'s real rendered hrefs
+  deliberately still omit the trailing slash (in-app navigation doesn't need
+  it - no server redirect exists either direction, confirmed by curling both
+  forms against `astro preview` directly), so the script's own href-vs-
+  precache-entry comparison now normalizes both sides with the same
+  `withTrailingSlash()` helper before comparing, rather than either changing
+  `Nav.astro`'s hrefs (out of scope - a site-wide link-generation change well
+  beyond this bug) or leaving the check permanently broken.
+
+New coverage: a unit test in `offlineCache.test.ts` asserting every
+`buildPrecacheUrls()` page entry ends with `/` (static assets excluded by
+name), plus the existing suite's literal URL assertions updated to the new
+trailing-slash form throughout. New e2e coverage in `mobile.spec.ts`,
+alongside the existing offline-reading block: a page reached only via its
+canonical trailing-slash URL (never clicked in-app first) now asserts its own
+`<h1>`, not the home page's - the exact bug shape, kept next to the sibling
+tests it complements (`a previously visited page keeps working offline`,
+`falls back to the cached home page offline for a URL that was never
+cached`) rather than a new file, since they cover the same feature.
+
+Verified rather than assumed: `pnpm test` (734/734, up from 733 - the one new
+precache-format test), `pnpm lint` (0/0/1, unchanged), `pnpm build` (711
+pages, unchanged - no new route), `pnpm check:precache` (37 precached URLs,
+clean - confirming the nav-link comparison fix actually works against the
+real built `dist/sw.js` and `dist/index.html`/`dist/hr/index.html`, not just
+in isolation), `pnpm check:links`/`check:sitemap`/`check:perf` all clean and
+unchanged. The full `Installability and offline reading` describe block in
+`mobile.spec.ts` (9/9, including the new test) and `pwa-savedata.spec.ts`
+(2/2) both run standalone first, then a full cold-start `pnpm test:e2e`
+(confirmed no stale preview server via `ps aux` beforehand). No content file
+or PDF-source component touched, so no PDF regeneration was needed this run
+- confirmed by inspection (`offlineCache.ts`/`sw.js.ts`/`check-precache.mjs`
+are outside `scripts/generate-pdfs.mjs`'s own source-file list).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix decision, the Nations League Team of the
+Tournament sourcing question - confirmed exhausted), the Nations League 2023
+attendance conflict and 2021/2025 unconfirmed figures, World Cup
+1930/1950's/EURO 1996/2020's excluded attendance figures, the
+hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+re-check, and the hundred-and-forty-sixth run's still-open per-section PDF
+bookmarks/outline lead (unchanged - this run didn't touch either question).
+The manual-walkthrough method found a real bug on the *first* previously-
+untried area it tried this run (the PWA offline path, never itself walked
+through by hand before, as opposed to read from source) - a future pass
+could look at whether the same "actually reproduce the real-world entry
+point, not just the happy path a click-through test takes" angle turns up
+anything on the print-PDF-to-live-site handoff (a reader who opens a
+downloaded PDF's own internal link while offline, for instance) or the
+service worker's `activate`/cache-eviction path across a `CACHE_VERSION`
+bump, neither of which any existing test drives end-to-end today.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

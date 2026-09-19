@@ -6730,3 +6730,64 @@ back clean:
   dependency-upgrade attempt, the coordinate/keyboard-walkthrough method
   after the next real content or layout change, or another genuinely
   different quality angle not yet tried on this site.
+- **Fixed a real offline-mode bug: a page reached via its own canonical URL
+  fell back to the home page instead of showing its precached self**: closed
+  2026-09-19 (hundred-and-fifty-first intensive run) - a standing health
+  check first (all clean, matching the hundred-and-fiftieth run's baseline).
+  Extended the manual-walkthrough method to two previously-untried areas:
+  screenshotting `/records`/`/glossary` (both languages, mobile/desktop,
+  light/dark - clean, no defect found) and, more productively, actually
+  exercising the PWA's offline navigation the way a real reader would -
+  requesting a precached nav page by its *canonical* (trailing-slash) URL
+  while offline, rather than only via an in-app nav-link click first. Found a
+  genuine, previously-unnoticed bug this way: `offlineCache.ts`'s
+  `buildPrecacheUrls()` (built straight from `NAV_LINKS` paths, which lack a
+  trailing slash) precaches every nav page under a *different* cache key than
+  its own canonical URL (`BaseLayout.astro`'s `withTrailingSlash()` - the form
+  every `<link rel="canonical">`, `sitemap.xml` entry, OG/hreflang tag and
+  JSON-LD `url` on the site already uses), and `sw.js.ts`'s fetch handler did
+  an exact, unnormalized `caches.match(request)` - so a reader who arrives via
+  a bookmark, a shared link, or a search result (always the canonical
+  trailing-slash form) and goes offline before clicking any in-app link got a
+  spurious cache miss on every single nav page, silently landing on the home
+  page instead, with no error or indication anything was wrong. Confirmed
+  empirically with a throwaway Playwright script polling the real Cache
+  Storage API before touching any code - not assumed from reading source.
+  Fixed at both ends: `buildPrecacheUrls()` now normalizes every page URL
+  (not the static assets) with a trailing slash before prefixing the base
+  path, and `sw.js.ts`'s navigate handler now normalizes its cache key the
+  same way for both the network-first write and the offline-fallback read,
+  deliberately leaving the query string untouched so the existing "falls back
+  to home for an uncached `?utm_source=...` URL" test/behavior is unaffected
+  - this closes the trailing-slash gap specifically, not cache-key
+  normalization in general. `check-precache.mjs`'s nav-link-vs-precache-list
+  guard (added the hundred-and-eleventh run to catch exactly this class of
+  drift) needed a matching normalization since `Nav.astro`'s real hrefs
+  deliberately still omit the trailing slash for in-app navigation (no server
+  redirect exists either direction - confirmed directly against `astro
+  preview`). New unit coverage (`offlineCache.test.ts`, every precache page
+  entry now asserted to end in `/`) and new e2e coverage (`mobile.spec.ts`,
+  alongside the existing offline-reading tests: the exact bug shape - a page
+  reached only by its canonical URL, never clicked in-app first, still shows
+  its own content offline). Full standing health check clean: `pnpm lint`
+  (0/0/1), `pnpm test` (734/734, up from 733 - the one new test), `pnpm build`
+  (711 pages, unchanged), `pnpm check:precache` (37 URLs, clean against the
+  real build), `check:links`/`check:sitemap`/`check:perf` all clean and
+  unchanged. No content file or PDF-source component touched, so no PDF
+  regeneration was needed. A full cold-start `pnpm test:e2e` confirmed no
+  regression sitewide (see `docs/PROJECT_STATUS.md`'s matching entry for the
+  exact pass count). **Left for a future pass:** the same environment-blocked
+  items as every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness,
+  the `long-title` brand-suffix decision, the Nations League Team of the
+  Tournament sourcing question - confirmed exhausted), the Nations League
+  2023 attendance conflict and 2021/2025 unconfirmed figures, World Cup
+  1930/1950's/EURO 1996/2020's excluded attendance figures, the
+  hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+  re-check, and the hundred-and-forty-sixth run's still-open per-section PDF
+  bookmarks/outline lead. This run's own "reproduce the real-world entry
+  point by hand, not just the happy path" angle found a real bug on the first
+  previously-untried area it tried (the PWA offline path) - a future pass
+  could extend it to the print-PDF-to-live-site handoff (a reader opening a
+  downloaded PDF's own internal link while offline) or the service worker's
+  `activate`/cache-eviction path across a `CACHE_VERSION` bump, neither
+  exercised end-to-end by any existing test today.

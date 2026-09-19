@@ -59,6 +59,16 @@ export function parseNavLinks(html) {
   return [...navMatch[1].matchAll(/\shref="([^"]*)"/g)].map((m) => m[1]);
 }
 
+/**
+ * Matches offlineCache.ts's own withTrailingSlash(): PRECACHE_URLS' page
+ * entries carry a trailing slash (the canonical URL form), but Nav.astro's
+ * real rendered hrefs intentionally don't - normalizing both sides before
+ * comparing keeps that a deliberate difference, not a false mismatch here.
+ */
+function withTrailingSlash(path) {
+  return path.endsWith('/') ? path : `${path}/`;
+}
+
 async function fileExists(filePath) {
   try {
     await readFile(filePath);
@@ -135,7 +145,7 @@ async function main() {
   // 3. Every real nav link, in both languages, is precached - so a page
   // wired into the nav but never added to the precache list (or removed
   // from it without removing the nav entry) doesn't ship unnoticed.
-  const precacheSet = new Set(precacheUrls);
+  const precacheSet = new Set(precacheUrls.map(withTrailingSlash));
   const navChecks = [
     { locale: 'en', html: homeHtml },
     { locale: 'hr', html: homeHrHtml },
@@ -143,7 +153,7 @@ async function main() {
   for (const { locale, html } of navChecks) {
     for (const href of parseNavLinks(html)) {
       if (classifyLink(href).kind !== 'internal') continue;
-      if (!precacheSet.has(href)) {
+      if (!precacheSet.has(withTrailingSlash(href))) {
         problems.push(`${locale} nav links to "${href}", which sw.js does not precache`);
       }
     }
