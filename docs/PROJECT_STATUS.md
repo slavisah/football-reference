@@ -26746,13 +26746,11 @@ Full standing health check clean: `pnpm lint` (0/0/1, unchanged), `pnpm
 test` (741/741 unit, up from 734 - the 7 new tests above), `pnpm build`
 (711 pages, unchanged), every fast `check:*` script clean and unchanged,
 `pnpm check:lighthouse` clean across all 37 pages (scores unchanged, zero
-actionable bfcache blockers). A second, fully isolated cold-start `pnpm
-test:e2e` re-run (no concurrent build this time) was kicked off after the
-race described above and was still in flight as this entry was written;
-this doc will get a short follow-up note once it completes confirming the
-final pass/fail count, the same way other runs have appended a closing
-confirmation when a long-running check finished after the main narrative
-was already drafted.
+actionable bfcache blockers), and a second, fully isolated cold-start `pnpm
+test:e2e` re-run (no concurrent build this time, kicked off after the race
+described above): **1016/1016 passed, 14.1 minutes** - confirms the
+~237-failure run really was the `dist/`-clobbering race and not a
+regression from this run's own change.
 
 **Left for a future pass:** the same environment-blocked items as every
 recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
