@@ -281,14 +281,34 @@ async function main() {
       // (root cause not fully pinned down - this environment's `astro
       // preview` server and/or Chromium's page-reuse across a very long
       // single session are the leading suspects).
+      //
+      // Checks `response.url()`, not `page.url()`: the hundred-and-fifty-
+      // eighth intensive run hit this throw for the first time since it was
+      // added, against `/compare` - not a repeat of the wrong-page bug above,
+      // but a real false positive this exact check introduced. `/compare`
+      // and `/compare-players` (both languages) intentionally render their
+      // default pair server-side with no query string ("before any JS runs",
+      // see pdf-pages.mjs's own comment on the `compare` entry), but their
+      // client script's own `render()` still calls `writeParams()` on load,
+      // which rewrites the URL bar via `history.replaceState` to record that
+      // default pair for shareability - a same-page, cosmetic URL change
+      // with no navigation at all. `page.url()` reflects that post-load
+      // mutation; `response.url()` is the URL of the actual navigation
+      // response (following only real server-side redirects), so it isn't
+      // affected by anything the page's own JS does afterward. Confirmed
+      // directly against a running preview server before changing this:
+      // `response.url()` stayed the requested `/compare` while `page.url()`
+      // had already picked up `?a=argentina&b=uruguay`. Still catches the
+      // original wrong-page bug this function exists for - a genuine
+      // server-side substitution changes the response's own URL too.
       async function gotoPageOrThrow(pagePath) {
         const url = `${ORIGIN}${BASE}${pagePath}`;
         const response = await page.goto(url, { waitUntil: 'networkidle' });
         if (!response || !response.ok()) {
           throw new Error(`Navigating to ${url} failed: HTTP ${response ? response.status() : '(no response)'}`);
         }
-        if (page.url() !== url) {
-          throw new Error(`Navigating to ${url} ended up at ${page.url()} instead`);
+        if (response.url() !== url) {
+          throw new Error(`Navigating to ${url} ended up at ${response.url()} instead`);
         }
       }
 
