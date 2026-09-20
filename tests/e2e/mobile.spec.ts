@@ -3621,6 +3621,58 @@ test.describe('Installability and offline reading', () => {
     expect(keysAfterReactivate).not.toContain('football-reference-v0-stale');
     expect(keysAfterReactivate).toContain(currentCacheName);
   });
+
+  test('a downloaded PDF\'s own internal link to a team page still works offline, if the reader visited that page online first', async ({
+    page,
+    context,
+  }) => {
+    // Every downloadable PDF's internal team/player links
+    // (scripts/generate-pdfs.mjs's rewriteInternalLinksForPrint()) are plain
+    // production URLs with no trailing slash - the exact same slash-less
+    // form src/lib/url.ts's withBase() already produces for every in-app
+    // link. Unlike every URL the offline tests above exercise (all of them
+    // top-level nav pages precached via PRECACHE_URLS/src/lib/routes.ts's
+    // NAV_LINKS), a team/player profile page such as /teams/brazil has no
+    // precache entry of its own - it only ever lands in Cache Storage
+    // opportunistically, the first time it's actually visited online. A
+    // reader who opens a downloaded PDF and clicks one of its internal
+    // team/player links while offline depends entirely on that ordinary
+    // network-first/cache-fallback fetch-handler path already having cached
+    // this specific leaf page - a previously-untested real-world entry
+    // point distinct from every case above (canonical vs. in-app URL forms
+    // of the same *precached* nav page).
+    await page.goto('');
+    await page.evaluate(() => navigator.serviceWorker.ready);
+
+    // Disables Chromium's ordinary HTTP disk/memory cache for this page, via
+    // CDP the same way color-vision-deficiency.spec.ts already drives CDP
+    // for its own emulation. Without this, the second, "offline" navigation
+    // below can be satisfied straight out of the browser's own HTTP cache -
+    // context.setOffline() blocks real network I/O but not a same-URL
+    // response Chromium already holds - which would let this test pass even
+    // if the service worker's own Cache Storage read/write were broken, the
+    // exact tautology risk this file's activate-handler test above already
+    // guards against for a different mechanism.
+    const cdp = await context.newCDPSession(page);
+    await cdp.send('Network.setCacheDisabled', { cacheDisabled: true });
+
+    // Simulates the reader visiting the team page once online, the same way
+    // they would before ever downloading its PDF - this is what actually
+    // populates the service worker's own cache, since the page carries no
+    // precache entry.
+    await page.goto('teams/brazil');
+    await expect(page.locator('h1')).toHaveText('Brazil');
+
+    await context.setOffline(true);
+    // Re-requests the exact same slash-less URL a PDF's own internal link
+    // would carry, as a fresh navigation rather than a page.reload() - the
+    // same request shape as clicking a link from outside the app entirely
+    // (a PDF viewer, another tab) rather than an in-page revisit.
+    await page.goto('teams/brazil');
+    await expect(page.locator('h1')).toHaveText('Brazil');
+    await context.setOffline(false);
+    await cdp.detach();
+  });
 });
 
 test.describe('Primary nav stays in the current language', () => {
