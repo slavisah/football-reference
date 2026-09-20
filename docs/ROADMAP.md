@@ -7054,3 +7054,40 @@ back clean:
   hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
   re-check. Font-loading strategy, dark-mode flash-of-wrong-theme on first
   paint, and focus-order are unexplored angles a future pass could try next.
+- **Investigated the dark-mode flash-of-wrong-theme lead - confirmed clean,
+  added a permanent regression check**: closed 2026-09-20
+  (hundred-and-fifty-sixth intensive run) - a standing health check first
+  (all clean, matching the hundred-and-fifty-fifth run's baseline). Ruled
+  out the prior run's other two flagged angles quickly: font-loading
+  strategy is a non-issue (the site loads no web fonts at all - `--font-
+  sans`/`--font-mono` are `system-ui`/OS-stack fallbacks only, so FOIT/FOUT
+  cannot occur), and a repo-wide grep for CSS `order`, `row-reverse`,
+  `column-reverse` and `grid-template-areas` (the ways visual order can
+  diverge from DOM/focus order) found zero uses in `src/`. The dark-mode
+  flash lead was real enough to verify properly: `BaseLayout.astro`'s
+  before-paint inline theme script only *documented* the intent to run
+  before any stylesheet, never actually verified against the *built* HTML.
+  Confirmed directly (a throwaway Python scan) that all 711 built pages
+  really do run the theme script before the stylesheet `<link>` Astro
+  injects - clean today, but nothing guarded it against a future regression
+  (moving the script later in `BaseLayout.astro`, or an Astro version that
+  injects the stylesheet earlier). Added `scripts/check-theme-flash.mjs`
+  (`pnpm check:theme-flash`, wired into CI after the heading-outline check)
+  as a permanent guard, verified as real coverage (not a tautology) by
+  temporarily reordering a built page's own tags and confirming the check
+  fails, then restoring and reconfirming clean. New
+  `tests/unit/checkThemeFlash.test.ts` (10 tests). Full standing health
+  check clean: `pnpm lint` (0/0/1), `pnpm test` (751/751, up from 741),
+  `pnpm build` (711 pages), every fast `check:*` script clean including the
+  new one (711/711). See `docs/PROJECT_STATUS.md`'s matching entry for full
+  detail. **Left for a future pass:** the same environment-blocked items as
+  every recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+  `long-title` brand-suffix decision, the Nations League Team of the
+  Tournament sourcing question - confirmed exhausted), the Nations League
+  2023 attendance conflict and 2021/2025 unconfirmed figures, World Cup
+  1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+  hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+  re-check. With all three of the hundred-and-fifty-fifth run's flagged
+  angles now closed, a future pass's best bet is another previously-untried
+  verification method, a fresh dependency-upgrade attempt, or a fresh source
+  lead on any of the open content gaps above.
