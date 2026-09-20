@@ -30,6 +30,7 @@
     "check:html": "node scripts/check-html-validity.mjs",
     "check:jsonld": "node scripts/check-jsonld.mjs",
     "check:heading-outline": "node scripts/check-heading-outline.mjs",
+    "check:theme-flash": "node scripts/check-theme-flash.mjs",
     "check:reachability": "node scripts/check-reachability.mjs",
     "check:meta": "node scripts/check-meta.mjs",
     "check:award-tallies": "node scripts/check-award-tallies.mjs",

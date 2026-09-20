@@ -26767,5 +26767,102 @@ focus-order as unexplored angles worth a closer look), a fresh
 dependency-upgrade attempt, or a fresh source lead on any of the open
 content gaps above.
 
+### Investigated the dark-mode flash-of-wrong-theme lead the prior run flagged - confirmed clean, and added a permanent regression check for it - closed 2026-09-20 (hundred-and-fifty-sixth intensive run)
+
+A standing health check first (`pnpm install --frozen-lockfile`; `pnpm
+outdated` still only the blocked `typescript` 7 entry; `pnpm lint` 0/0/1;
+`pnpm test` 741/741; `pnpm build` 711 pages; all seventeen fast `check:*`
+scripts clean - matching the hundred-and-fifty-fifth run's baseline).
+Picked up the first of that run's own three "unexplored angles"
+(font-loading strategy, dark-mode flash-of-wrong-theme on first paint,
+focus-order).
+
+Font-loading strategy and CSS-driven focus-order both turned out to be
+non-issues on direct inspection, quickly ruled out rather than pursued
+further: the site loads no web fonts at all (`--font-sans`/`--font-mono` in
+`src/styles/global.css` are `system-ui`/OS-stack fallback chains only, so
+FOIT/FOUT cannot occur), and a repo-wide grep for CSS `order`,
+`row-reverse`, `column-reverse` and `grid-template-areas` (the standard
+ways a page's visual order comes to diverge from its DOM/focus order) found
+zero uses anywhere in `src/`.
+
+The dark-mode flash lead was real enough to investigate properly.
+`BaseLayout.astro`'s own comment already documents the intent - an inline
+`<script is:inline>` in `<head>` reads `localStorage`/`prefers-color-scheme`
+and sets `document.documentElement.dataset.theme` before paint - but that
+intent had never actually been verified against the *built* HTML, only
+inferred from source. Checked directly: in every one of 711 built pages'
+`dist/*.html`, the inline theme script's `localStorage.getItem('theme')`
+call appears in `<head>` *before* the `<link rel="stylesheet">` Astro's
+bundler injects automatically (confirmed via a throwaway Python scan
+comparing string-index positions) - so the ordering is correct today, and
+because external stylesheets are render-blocking, nothing paints until
+after both have been parsed, meaning a dark-mode reader's very first frame
+already carries the resolved theme with no intermediate flash. The four
+legacy `/awards/*` redirect stubs (both languages) correctly have no
+`<head>` of their own to check (`<!doctype html><title>...` with a
+`meta http-equiv="refresh"`, no head/body wrapper at all) - excluded the
+same way `check:heading-outline`/`check:reflow` already exclude them via
+`isRedirectStubHtml()`.
+
+That ordering is exactly the kind of invariant nothing existing actually
+guards: `check:html`'s `html-validate` pass validates markup structure, not
+tag order; `check:jsonld`/`check:heading-outline` don't inspect `<head>`
+ordering either; and no e2e test screenshots the pre-hydration first paint.
+A routine future edit that moves the inline script later in
+`BaseLayout.astro` (past wherever Astro's bundler injects the stylesheet
+`<link>`), or a future Astro version that starts injecting it earlier,
+would silently reintroduce the flash with nothing catching it. Turned this
+into a permanent regression check, the same "confirm a real signal, keep
+the tool permanent" reasoning `check:jsonld`/`check:heading-outline`/
+`check:reflow` already established for their own clean first runs: new
+`scripts/check-theme-flash.mjs` (`pnpm check:theme-flash`), modeled
+directly on `check-heading-outline.mjs`'s structure and reusing
+`check-internal-links.mjs`'s `listHtmlFiles()` and `check-reflow.mjs`'s
+`htmlFileToPagePath()`/`isRedirectStubHtml()` helpers rather than
+duplicating them. Wired into `.github/workflows/ci.yml` right after the
+heading-outline check.
+
+Verified the check is real coverage, not a tautology, the same way recent
+runs' own new checks have been verified: took a copy of the built
+`dist/index.html`, used a throwaway Python script to move its
+`<link rel="stylesheet">` to just before the theme script (simulating the
+exact regression this check exists to catch), reran
+`node scripts/check-theme-flash.mjs` and confirmed it failed with the
+expected message, then restored the original file (confirmed via a second
+clean `pnpm build` afterward, byte-for-byte) and reconfirmed the check
+passes again. New `tests/unit/checkThemeFlash.test.ts` (10 tests) covers
+the two pure helpers (`extractHead()`, `checkThemeScriptOrder()`) plus the
+combining `checkPageThemeFlash()`, including the missing-`<head>` redirect-
+stub case and a case confirming a non-stylesheet `<link>` (icon, preload)
+before the theme script is correctly ignored.
+
+**Tests:** 10 new unit tests (`checkThemeFlash.test.ts`). No e2e change -
+this is a build-time/CI-only check script with no runtime site behavior
+touched.
+
+Full standing health check clean after adding it: `pnpm lint` (0/0/1,
+unchanged), `pnpm test` (751/751, up from 741 - the 10 new tests), `pnpm
+build` (711 pages, unchanged), every fast `check:*` script clean including
+the new `check:theme-flash` (711/711, zero risk found), and the four
+daemon-driven checks left at their last-confirmed-clean baseline (not
+re-run this pass - no template, layout or service-worker file changed, only
+a new standalone `scripts/check-theme-flash.mjs`). No content file, PDF-
+source component, or existing `src/` file changed, so no PDF regeneration
+was needed and no e2e spec needed updating.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix decision, the Nations League Team of the
+Tournament sourcing question - confirmed exhausted), the Nations League
+2023 attendance conflict and 2021/2025 unconfirmed figures, World Cup
+1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+re-check. With all three of the hundred-and-fifty-fifth run's flagged
+angles now closed (two ruled out as non-issues, one confirmed clean and
+given a permanent regression check), a future pass's best bet is another
+previously-untried verification method, a fresh dependency-upgrade
+attempt, or a fresh source lead on any of the open content gaps above.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
