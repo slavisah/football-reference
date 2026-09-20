@@ -7004,3 +7004,53 @@ back clean:
   best bet is a fresh dependency-upgrade attempt, the coordinate/keyboard-
   walkthrough method after the next real content or layout change, or
   another genuinely different quality angle not yet tried on this site.
+- **New `check:lighthouse` back/forward-cache (bfcache) assertion, surfacing
+  an audit the tool already ran but never read**: closed 2026-09-20
+  (hundred-and-fifty-fifth intensive run) - a standing health check first
+  (all clean, matching the hundred-and-fifty-fourth run's baseline). Found
+  that `scripts/check-lighthouse.mjs` already asks Lighthouse for a
+  `bf-cache` audit on all 37 audited pages every run (it lives inside the
+  `performance` category's own audit list, `weight: 0`) but only ever read
+  the four named category scores, discarding the rest of `result.lhr` -
+  never checked in the 14+ runs since this script was written, and a real
+  gap on a site with its own hand-rolled service worker
+  (`src/pages/sw.js.ts`) that has already produced genuine bugs. Probed five
+  diverse pages empirically first: every one reports the same two failure
+  reasons, both tagged `'Not actionable'` by Lighthouse itself - confirmed
+  the actual cause (Playwright's Chromium launches with
+  `--disable-back-forward-cache` by default, visible directly in this
+  environment's own running Chromium args) rather than assuming it. Added
+  `actionableBfCacheReasons()` (filters to `failureType !== 'Not actionable'`)
+  wired into `main()` alongside the existing score-budget check - a no-op in
+  this harness today, but a permanent regression guard for a future
+  service-worker change that actually breaks bfcache eligibility. Also found
+  and fixed a second, unrelated latent bug in the same file while adding a
+  unit test: `check-lighthouse.mjs` was the one `check-*.mjs` script that
+  called `main()` unconditionally at module scope instead of guarding it
+  behind the `import.meta.url` entrypoint check every other one uses -
+  confirmed real (not theoretical) when the first test run measurably
+  launched a real headless Chromium and preview server just from importing
+  the module. New `tests/unit/checkLighthouse.test.ts` (7 tests, also
+  covering the pre-existing `scoresBelowMin` helper which had none before).
+  Re-ran `check:lighthouse` against all 37 pages after the change: clean,
+  zero actionable bfcache blockers anywhere. Full standing health check
+  clean: `pnpm lint` (0/0/1), `pnpm test` (741/741, up from 734), `pnpm
+  build` (711 pages), every fast `check:*` script clean,
+  `check:lighthouse` clean. **Caution for a future run:** a `pnpm build`
+  issued mid-run from the same checkout while a separately-started
+  `pnpm test:e2e` cold-start pass was still in flight clobbered the shared
+  `dist/` the e2e suite's preview server was reading from, producing ~237
+  spurious failures across unrelated specs - a race condition, not a
+  regression (confirmed via a second, fully isolated re-run); never run
+  `pnpm build` or another `check:*`/`test:e2e` pass concurrently with one
+  already running in the same checkout. See `docs/PROJECT_STATUS.md`'s
+  matching entry for full detail, including its own follow-up note once the
+  isolated e2e re-run completes. **Left for a future pass:** the same
+  environment-blocked items as every recent run (`typescript` 7,
+  `docs/SOURCES.md` link-liveness, the `long-title` brand-suffix decision,
+  the Nations League Team of the Tournament sourcing question), the Nations
+  League 2023 attendance conflict and 2021/2025 unconfirmed figures, World
+  Cup 1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+  hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+  re-check. Font-loading strategy, dark-mode flash-of-wrong-theme on first
+  paint, and focus-order are unexplored angles a future pass could try next.
