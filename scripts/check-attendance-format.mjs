@@ -48,7 +48,7 @@ const DIST_DIR = path.join(ROOT, 'dist');
 // Every "Final venues" heading this site currently uses, English and
 // Croatian (all four team-competition families share one Croatian label,
 // "Final venues"/"Mjesta finala" - see the Croatian-heading-naming
-// reconciliation `docs/ROADMAP.md` already records).
+// reconciliation `docs/PROJECT_STATUS.md` already records).
 const FINAL_VENUES_HEADINGS = new Set(['Final venues', 'Mjesta finala']);
 
 /**

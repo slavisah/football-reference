@@ -26864,5 +26864,120 @@ given a permanent regression check), a future pass's best bet is another
 previously-untried verification method, a fresh dependency-upgrade
 attempt, or a fresh source lead on any of the open content gaps above.
 
+### Trimmed `docs/ROADMAP.md` from 7,093 lines back down to its own stated purpose (a short "what's next" entry point) - closed 2026-09-20 (hundred-and-fifty-seventh intensive run)
+
+A standing health check first (`pnpm install`; `pnpm outdated` still only the
+blocked `typescript` 7 entry, re-confirmed via `npm view
+@astrojs/check@latest peerDependencies`; `pnpm lint` 0/0/1; `pnpm test`
+751/751; `pnpm test:coverage` 99.91%/99.31% statement/branch, unchanged;
+`pnpm build` 711 pages; all 19 fast `check:*` scripts clean; `pnpm audit`
+zero vulnerabilities; `pnpm dlx knip --no-config-hints` unchanged - the one
+standing `scripts/test-preview-server.mjs` false positive). Every
+award-history content-mining angle across all six families is confirmed
+exhausted, `pnpm outdated` offers nothing beyond the still-blocked
+`typescript` 7 upgrade, this environment's outbound network policy still
+rejects external requests (re-confirmed: a direct `curl` to
+`en.wikipedia.org` returns a `403` from the egress proxy), and a fresh sweep
+for an untried verification method (PWA-category Lighthouse audits, ARIA
+live-region coverage on dynamic filters/quiz interactions, `rel="noopener"`
+on external links, `forced-colors`/`prefers-contrast` support, hreflang
+correctness, `pnpm dlx knip`, `pnpm audit`) turned up nothing new - every one
+of those was already covered by an existing check or component. Lighthouse
+13.5.0's own `default-config.js` confirms the `pwa` category was removed
+entirely upstream (replaced by an unrelated `agentic-browsing` category), so
+that specific lead is a dead end, not just unexplored.
+
+Instead, reading `docs/ROADMAP.md` end to end (as this run's own "read a
+shared file end to end looking for an unchecked invariant" method, applied
+to a doc file instead of a library this time) found a real, previously
+unnoticed problem with the routine's own tooling: the file's own header says
+"kept short on purpose" and states its job is tracking *only the open
+backlog*, pointing to this file (`docs/PROJECT_STATUS.md`) for the full
+history - but 156 intensive runs had each appended their own full closing
+paragraph directly into `docs/ROADMAP.md`'s "Open backlog"/"Ideas not yet
+scoped as backlog" sections instead, growing it to 7,093 lines that every
+future run has to read (at least in part) before it can even start working.
+The "Ideas not yet scoped as backlog" section in particular had drifted
+completely from its own name - nearly every entry under it was tagged
+"closed 2026-...-...  (Nth intensive run)", the same shape as "Open
+backlog"'s entries, not an unscoped idea at all.
+
+Verified before touching anything that no information would actually be
+lost: every single removed `docs/ROADMAP.md` entry already carries its own
+"See `docs/PROJECT_STATUS.md`'s matching entry for full detail" cross-
+reference (or is, itself, one of this file's own entries copied in slightly
+condensed form) - spot-checked several at random (the hundred-and-first
+through hundred-and-third runs, the eighty-sixth `check:html` entry, the
+sixty-second Copa América captain entry) and confirmed each has a matching,
+more detailed entry here. Rewrote `docs/ROADMAP.md` down to 111 lines:
+- A short intro (unchanged in spirit) plus a maintenance note explaining
+  this trim and asking future runs to close a backlog item by deleting its
+  bullet, not by appending a new closed-paragraph log entry here (that
+  belongs in this file, `docs/PROJECT_STATUS.md`, only).
+- A "Status" section condensing the "original backlog complete" summary
+  (unchanged in substance) plus the current standing health-check baseline
+  numbers.
+- An "Open backlog" section listing only the genuinely still-open items,
+  each in 2-4 sentences instead of a multi-paragraph run history: the
+  `typescript` 7 upgrade, the `docs/SOURCES.md` link-liveness sweep, the
+  `long-title` brand-suffix decision, Nations League's Team of the
+  Tournament for 2021/2023/2025, the Nations League attendance conflict/gaps,
+  the excluded World Cup/EURO attendance figures, the hyphenation-rendering
+  visual re-check, and the four files' defensively-unreachable coverage
+  gaps (see below).
+- An "Ideas not yet scoped" section with the one item that's genuinely still
+  just an idea: the "youngest winner" ranking, blocked on unsourced birth
+  dates.
+
+While re-deriving the coverage-gap bullet from a fresh `pnpm test:coverage`
+run (to state current line numbers accurately rather than copy possibly-
+stale ones), found that `src/lib/sources.ts` now has *two* sub-100%-branch
+lines (33 and 123) where the eighth intensive run's original classification
+only ever named one (33) - `disambiguateLabels()` (added well after that
+original sweep) has its own `counts.get(base) ?? 1` fallback, structurally
+identical to the documented shape: `counts` is built by iterating the exact
+same `links` array the map afterward re-derives `base` from, so the `?? 1`
+branch can never actually miss. Confirmed this by reading the function
+directly rather than assuming - the same class of defensively-unreachable
+code as the other four documented lines, not a new gap, but the roadmap
+entry re-derived here now names both `sources.ts` lines instead of one.
+
+Updated two source comments that pointed at history this trim removed from
+`docs/ROADMAP.md`, so they still resolve to somewhere the story actually
+lives: `src/lib/editionProfile.ts`'s doc comment (pointed at "docs/ROADMAP.md's
+hundred-and-forty-seventh entry" for the dead-localhost-PDF-link bug it
+found, and has since been fixed in the hundred-and-forty-eighth run - now
+points at this file and says so) and `scripts/check-attendance-format.mjs`'s
+"Final venues" heading-reconciliation comment (now points at this file
+instead of `docs/ROADMAP.md`). Left the `long-title`/`youngest-winner`/
+"original backlog complete" references in `scripts/check-html-validity.mjs`,
+`src/lib/jsonLd.ts` and `src/pages/hr/about/sources.astro` pointed at
+`docs/ROADMAP.md` unchanged, since the trimmed file still carries those
+specific items.
+
+**Tests:** none - this is a docs-only change (`docs/ROADMAP.md` plus two
+one-line comment edits), no `src/`, `content/`, or `tests/` behavior
+touched. Full standing health check re-run after the edit: `pnpm lint`
+(0/0/1, unchanged), `pnpm test` (751/751, unchanged), `pnpm build` (711
+pages, unchanged, not re-run again after the comment edits since neither
+touches build output). No content file changed, so no PDF regeneration
+needed and no e2e count change.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix decision, the Nations League Team of the
+Tournament sourcing question - confirmed exhausted), the Nations League 2023
+attendance conflict and 2021/2025 unconfirmed figures, World Cup 1930/1950's/
+EURO 1996/2020's excluded attendance figures, and the hundred-and-twenty-
+sixth run's still-open hyphenation-rendering visual re-check - all now
+tracked as short bullets in the trimmed `docs/ROADMAP.md` rather than
+buried in a 7,000-line file. Going forward, a run that closes one of those
+bullets should delete it from `docs/ROADMAP.md` and add its own full
+narrative entry here, the same convention this entry itself follows - not
+grow `docs/ROADMAP.md` back into a second copy of this file. A future run's
+best bet is still a fresh source lead from a session with working external
+network access, a fresh dependency-upgrade attempt, or another genuinely
+different quality angle not yet tried on this site.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
