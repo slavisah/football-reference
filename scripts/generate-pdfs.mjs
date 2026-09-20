@@ -260,9 +260,40 @@ async function main() {
       // locale value through each loop.
       const localeFor = (pagePath) => (pagePath.startsWith('/hr/') ? 'hr' : 'en');
 
-      for (const { slug, path: pagePath } of PAGES) {
+      // Every one of the four loops below navigates this same shared `page`
+      // hundreds of times in a row (700+ total across a full run) - found,
+      // after the hundred-and-fifty-fourth run's own PDF-outline check
+      // (scripts/check-pdf-outline.mjs) surfaced it as a real bug, to
+      // occasionally land on the wrong page entirely: 72 of the 80
+      // golden-boot edition PDFs (the last, most deeply-nested family this
+      // script generates) had silently captured the site's own home page or
+      // a bare "404: Not Found" response instead of their own content, even
+      // though every one of their *built* HTML files is independently
+      // confirmed correct - the bug is in this script's own navigation, not
+      // the site. `page.goto()`'s promise resolves successfully even when
+      // navigation actually failed over to something else, so nothing
+      // downstream ever noticed. This fails loudly the moment it happens
+      // instead: re-checks the just-navigated page's own URL and HTTP
+      // status (Playwright's `Response.status()`, not the DOM, so a
+      // same-status wrong-content page still can't slip past the URL check)
+      // and throws rather than silently writing a wrong PDF. See
+      // docs/PROJECT_STATUS.md's matching entry for the full investigation
+      // (root cause not fully pinned down - this environment's `astro
+      // preview` server and/or Chromium's page-reuse across a very long
+      // single session are the leading suspects).
+      async function gotoPageOrThrow(pagePath) {
         const url = `${ORIGIN}${BASE}${pagePath}`;
-        await page.goto(url, { waitUntil: 'networkidle' });
+        const response = await page.goto(url, { waitUntil: 'networkidle' });
+        if (!response || !response.ok()) {
+          throw new Error(`Navigating to ${url} failed: HTTP ${response ? response.status() : '(no response)'}`);
+        }
+        if (page.url() !== url) {
+          throw new Error(`Navigating to ${url} ended up at ${page.url()} instead`);
+        }
+      }
+
+      for (const { slug, path: pagePath } of PAGES) {
+        await gotoPageOrThrow(pagePath);
         const outFile = path.join(OUT_DIR, `${slug}.pdf`);
         await writePdfWithMetadata(outFile, localeFor(pagePath));
         console.log(`Wrote ${path.relative(ROOT, outFile)}`);
@@ -296,8 +327,7 @@ async function main() {
           [`/teams/${slug}`, `team-${slug}`],
           [`/hr/teams/${slug}`, `team-${slug}-hr`],
         ]) {
-          const url = `${ORIGIN}${BASE}${pagePath}`;
-          await page.goto(url, { waitUntil: 'networkidle' });
+          await gotoPageOrThrow(pagePath);
           const outFile = path.join(OUT_DIR, `${fileSlug}.pdf`);
           await writePdfWithMetadata(outFile, localeFor(pagePath));
           teamManifestEntries.push({ slug: fileSlug, sources: TEAM_PDF_SOURCES });
@@ -334,8 +364,7 @@ async function main() {
           [`/players/${slug}`, `player-${slug}`],
           [`/hr/players/${slug}`, `player-${slug}-hr`],
         ]) {
-          const url = `${ORIGIN}${BASE}${pagePath}`;
-          await page.goto(url, { waitUntil: 'networkidle' });
+          await gotoPageOrThrow(pagePath);
           const outFile = path.join(OUT_DIR, `${fileSlug}.pdf`);
           await writePdfWithMetadata(outFile, localeFor(pagePath));
           playerManifestEntries.push({ slug: fileSlug, sources: PLAYER_PDF_SOURCES });
@@ -363,8 +392,7 @@ async function main() {
 
       const editionManifestEntries = [];
       for (const { pdfSlug, path: pagePath, family } of editionIndex) {
-        const url = `${ORIGIN}${BASE}${pagePath}`;
-        await page.goto(url, { waitUntil: 'networkidle' });
+        await gotoPageOrThrow(pagePath);
         const outFile = path.join(OUT_DIR, `${pdfSlug}.pdf`);
         await writePdfWithMetadata(outFile, localeFor(pagePath));
         editionManifestEntries.push({ slug: pdfSlug, sources: EDITION_PDF_SOURCES[family] });

@@ -18,6 +18,7 @@
     "build:pdfs": "node scripts/generate-pdfs.mjs",
     "generate:og-image": "node scripts/generate-og-image.mjs",
     "check:pdfs": "node scripts/check-pdf-freshness.mjs",
+    "check:pdf-outline": "node scripts/check-pdf-outline.mjs",
     "check:perf": "node scripts/check-page-weight.mjs",
     "check:links": "node scripts/check-internal-links.mjs",
     "check:sitemap": "node scripts/check-sitemap.mjs",
