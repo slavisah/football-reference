@@ -26979,5 +26979,83 @@ best bet is still a fresh source lead from a session with working external
 network access, a fresh dependency-upgrade attempt, or another genuinely
 different quality angle not yet tried on this site.
 
+### Fixed a real `gotoPageOrThrow` false positive on `/compare`, found by CI on the hundred-and-fifty-seventh run's own PR - closed 2026-09-20 (same run, follow-up push)
+
+CI on the hundred-and-fifty-seventh run's own pull request failed
+`check:pdfs`: that run's comment-only edit to `src/lib/editionProfile.ts`
+(a listed source for many PDFs in `scripts/pdf-pages.mjs`) changed the
+file's hash, correctly invalidating every PDF built from it - a real
+freshness-check catch, not a bug. Regenerating them locally
+(`pnpm build:pdfs`) then hit a second, previously-latent problem:
+`gotoPageOrThrow()` (`scripts/generate-pdfs.mjs`, added the hundred-and-
+fifty-fourth run to catch the wrong-page-navigation bug that run found)
+threw on `/compare` - the first time this exact throw has fired since it
+was added, and the "hard evidence" a hundred-and-fifty-sixth-run note
+predicted would be needed to pin down its root cause.
+
+Investigated rather than just re-running to make it go away, per that
+same note's own instruction. The thrown message named the actual problem
+directly: navigating to `/compare` "ended up at"
+`/compare?a=argentina&b=uruguay` instead. `/compare` intentionally
+server-renders its default pair (the two most-titled teams) with no query
+string at all - `pdf-pages.mjs`'s own comment on the `compare` entry
+documents this as deliberate progressive enhancement, "exactly what a
+printed page shows" - but `src/pages/compare.astro`'s client script calls
+`render()` unconditionally on load, and `render()` always finishes by
+calling `writeParams(selectA.value, selectB.value)`, which rewrites the
+URL bar via `history.replaceState` to record whatever pair is currently
+selected (the defaults, on a bare load) for shareability. That's a
+same-page, cosmetic URL change with zero navigation involved - not the
+wrong-page bug `gotoPageOrThrow` exists to catch - but the check compared
+against `page.url()`, which reflects exactly this kind of later,
+client-side mutation.
+
+Confirmed empirically before changing anything (a throwaway script
+against a real running preview server, `page.goto()` via `@playwright/test`
+directly): `response.url()` - the URL of the actual navigation response,
+following only genuine server-side redirects - stayed
+`http://localhost:4399/football-reference/compare` the entire time, while
+`page.url()` had already picked up the `?a=argentina&b=uruguay` suffix by
+the time `waitUntil: 'networkidle'` resolved. Switched the check to
+`response.url()`: it still catches the original bug this function exists
+for (a genuine server-side substitution/redirect changes the response's
+own URL too, not just the browser's address bar), while no longer
+tripping on a page's own legitimate post-load URL bookkeeping. `/compare`
+was very likely never actually re-run through `gotoPageOrThrow` end-to-end
+since the hundred-and-fifty-fourth run added it despite several full
+`pnpm build:pdfs` passes in between - the most likely explanation, given
+this is a genuine (if narrow) timing race between Chromium's synchronous
+`<script>` execution and Playwright's `networkidle` resolution, not a
+guaranteed-every-time failure, so it's plausible earlier runs' own timing
+happened to check before the replace fired. Both `/compare-players` and
+both languages of each share the exact same `render()`-always-calls-
+`writeParams()` shape, so all four were equally exposed; only `/compare`
+happened to be hit this run given the fixed page-processing order.
+
+All 700 PDFs regenerated with the fix and reverified (`check:pdfs`
+700/700 fresh, `check:pdf-outline` 700/700 matching). Full standing
+health check re-run after: `pnpm lint` (0/0/1), `pnpm test` (751/751,
+unchanged - this is a script-only fix, no `src/`/`tests/` behavior
+touched), `pnpm build` (711 pages), `check:links` (715 pages, clean),
+`check:sitemap` (710 entries, clean). No unit test added: this function
+has no existing test harness (it drives a real Chromium instance, the
+same reason `check:lighthouse`/`check:reflow`-style scripts stay
+integration-only), and the fix was validated by direct empirical
+comparison against a live preview server (see above) plus reproducing the
+original failure and confirming its absence after, the same standard
+every other unattended-script fix on this site has used.
+
+**Tests:** none (script-only fix, verified empirically). PDF binaries
+only; no `src/`/`content/`/`tests/` file changed besides the one comment-
+sized code change in `scripts/generate-pdfs.mjs`.
+
+**Left for a future pass:** the same environment-blocked items as ever,
+now tracked in the trimmed `docs/ROADMAP.md`. This run's own finding is a
+reminder that a Playwright-driven, single-long-lived-`page`-object script
+like `generate-pdfs.mjs` can have real, narrow timing-dependent bugs that
+a single clean run doesn't rule out - worth remembering before assuming
+any one clean `pnpm build:pdfs` pass means every page shape it touches is
+provably race-free.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
