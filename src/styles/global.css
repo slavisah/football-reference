@@ -562,4 +562,20 @@ main {
     color: #333;
     word-break: break-all;
   }
+
+  /* ChampionsSummary.astro's bar track/fill are built from flat `background`
+     colors only (no border or pattern inside the bar itself). Chromium,
+     Firefox and Edge all default to *not* printing background colors on a
+     reader's own direct browser print (Ctrl+P) unless "Background graphics"
+     is manually checked in the print dialog - so without this, both the
+     track and the fill vanish, leaving a blank gap between a champion's
+     title count and its winning years. This doesn't affect the site's own
+     700 pre-generated downloadable PDFs - `scripts/generate-pdfs.mjs`
+     already passes `printBackground: true` there - only a reader's own
+     Ctrl+P of the live page, which has no such override. */
+  .champions__bar,
+  .champions__bar-fill {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
 }

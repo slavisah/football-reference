@@ -27057,5 +27057,80 @@ a single clean run doesn't rule out - worth remembering before assuming
 any one clean `pnpm build:pdfs` pass means every page shape it touches is
 provably race-free.
 
+### Fixed the `ChampionsSummary` bar charts printing invisible on a reader's own Ctrl+P (missing `print-color-adjust`) - closed 2026-09-20 (hundred-and-fifty-eighth intensive run)
+
+With the backlog otherwise complete and every previously-open item still
+blocked as documented in `docs/ROADMAP.md` (re-confirmed this run:
+`@astrojs/check@latest`'s `peerDependencies` still pin `typescript: '^5.0.0
+|| ^6.0.0'` even though `typescript@7.0.2` is now published, and a direct
+`curl` to `en.wikipedia.org` still gets a `403` from this environment's
+egress proxy), this run looked for a genuinely new quality angle instead of
+repeating an already-exhausted one.
+
+Found a real, previously-uncaught bug: `ChampionsSummary.astro`'s "Champions
+by titles" bar charts (used on all 6 competition/award landing pages plus
+`/records`, both locales - ~14 pages) render their track and fill from flat
+CSS `background` colors only, with no border or pattern inside the bar
+itself. Chromium, Firefox and Edge all default to *not* printing background
+colors on a reader's own direct browser print (Ctrl+P) unless "Background
+graphics" is manually checked in the print dialog - `src/styles/global.css`'s
+existing `@media print` block resets color tokens, table layout, `<details>`
+reveal state and page-break behavior for paper, but never set
+`print-color-adjust`, so both the bar's track and its fill vanished on a
+reader's default print, leaving a blank gap between a champion's title count
+and its winning years. This is a different failure class than every fixed-so-
+far print bug in this file's own history (table clipping, `<details>`
+reveal, page-break-straddling boxes) - none of them touch background-color
+reliance under print's default browser behavior. Confirmed this specific
+failure class isn't already guarded against anywhere else in `src/`: a
+repo-wide grep for `print-color-adjust` returned zero matches before this
+fix. Not a regression in the site's own 700 pre-generated downloadable PDFs
+- `scripts/generate-pdfs.mjs` already passes `printBackground: true` there -
+only a reader's own Ctrl+P of the live page, which has no such override.
+
+Fixed by adding `print-color-adjust: exact` / `-webkit-print-color-adjust:
+exact` for `.champions__bar`/`.champions__bar-fill` inside `global.css`'s
+existing `@media print` block, next to the file's other component-specific
+print overrides (matching the pattern already used for `.champions__item`,
+`.podium__card`, etc. in the same block). Verified empirically rather than
+just by inspection: a throwaway Playwright script (`page.emulateMedia({
+media: 'print' })` against a running preview server, then reading each
+element's computed `print-color-adjust`/`background-color`) confirmed
+`.champions__bar-fill` now computes `print-color-adjust: exact` with its
+accent-color background intact under print media, where before this fix the
+property was unset (browser default, `economy`).
+
+Since `global.css` is a tracked source for every downloadable PDF
+(`scripts/pdf-pages.mjs`'s `GLOBAL_STYLES` constant), this invalidated all
+700 PDFs' freshness hashes - expected and correct, not a bug. Regenerated
+all 700 with `pnpm build:pdfs` and reverified: `check:pdfs` 700/700 fresh,
+`check:pdf-outline` 700/700 matching (the fix has no effect on their own
+rendering, since they already forced `printBackground: true`, but the
+source-hash dependency still requires regeneration to stay accurate).
+
+**Tests:** none added - this is a two-property CSS fix inside an existing,
+already-tested `@media print` block, verified empirically against a real
+rendered page rather than via a new unit test (matching this file's own
+established standard for this class of unattended-script/CSS-only fix, e.g.
+the `gotoPageOrThrow` entry immediately above). Full standing health check
+re-run after: `pnpm lint` (0/0/1, unchanged), `pnpm test` (751/751,
+unchanged - no `src/`/`tests/` behavior touched besides styling), `pnpm
+build` (711 pages, unchanged), `check:print-width` (711/711 pages, no
+horizontal overflow introduced), `check:links` (715 pages, clean),
+`check:sitemap` (710 entries, clean), `check:pdfs`/`check:pdf-outline`
+(700/700 both, after regeneration).
+
+**Left for a future pass:** the same environment-blocked items as ever,
+tracked in `docs/ROADMAP.md`. This run's own finding suggests it's worth a
+future run doing a similar sweep of `src/`'s other `background`-only visual
+elements (e.g. any remaining bar/meter/badge-style component not yet
+audited for the same print-color-adjust gap) rather than assuming
+`ChampionsSummary.astro` was the only one - not done this run since a full
+audit of every component for this exact failure class is its own
+independently-schedulable pass, and this run's time went instead into
+verifying this one fix thoroughly (empirical computed-style check, full PDF
+regeneration, full standing health check) rather than rushing a wider,
+less-verified sweep.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
