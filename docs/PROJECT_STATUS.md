@@ -26636,5 +26636,138 @@ attempt, the coordinate/keyboard-walkthrough method after the next real
 content or layout change, or another genuinely different quality angle not
 yet tried on this site.
 
+### New `check:lighthouse` back/forward-cache (bfcache) assertion, surfacing an audit the tool already ran but never read - closed 2026-09-20 (hundred-and-fifty-fifth intensive run)
+
+A standing health check first: `pnpm install` (no dependency change),
+`pnpm outdated` still shows only the blocked `typescript` 7 entry
+(`@astrojs/check@latest`'s peer range is still `^5.0.0 || ^6.0.0`,
+re-confirmed), `pnpm lint` (0/0/1, the same pre-existing `input.type()`
+deprecation hint every recent run has carried), `pnpm test` (734/734),
+`pnpm build` (711 pages), and every fast `check:*` script (`links`,
+`sitemap`, `precache`, `perf`, `pdfs`, `pdf-outline`, `jsonld`, `meta`,
+`html`, `heading-outline`, `reachability`, `award-tallies`,
+`edition-header-labels`, `i18n-notes`, `attendance-format`, `link-names`,
+`image-dimensions`, `locale-consistency`) all clean and unchanged from the
+hundred-and-fifty-fourth run's baseline.
+
+With the per-section PDF bookmarks lead now closed and every recent content-
+gap search already exhausted, this run took the standing "another
+previously-untried verification method" fork the last several runs have
+each pointed to. Delegated the search itself to a research pass reading
+`scripts/check-lighthouse.mjs` end to end against Lighthouse's own
+`default-config.js`: `check:lighthouse` already asks Lighthouse for the
+`performance`/`accessibility`/`best-practices`/`seo` categories on all 37
+audited pages every time it runs, but the `bf-cache` audit (back/forward-
+cache eligibility) has a `weight: 0` entry *inside* the `performance`
+category's own audit list (`default-config.js:460`) - so Lighthouse has
+been computing it on every single one of those 37 pages, every run, since
+the fourteenth intensive run first wrote this script, and `auditPage()`
+simply never read it: it only ever extracted `result.lhr.categories[key]
+.score` for the four named categories and discarded the rest of
+`result.lhr`. This is a real, previously-unchecked gap specific to this
+site because it ships its own hand-rolled service worker
+(`src/pages/sw.js.ts`, already the source of genuine bugs the
+hundred-and-fifty-first/hundred-and-fifty-second/hundred-and-fifty-third
+runs found) - exactly the kind of code that can silently make a page
+ineligible for the bfcache (an open connection, an `unload` handler,
+certain caching behavior), and nothing on this site had ever looked.
+
+Before writing any assertion, empirically probed what the audit actually
+reports here with a throwaway script against five diverse pages (home,
+`/quiz/`, `/records/`, a player profile, `/compare/`): every one reports
+the exact same two failure reasons, and Lighthouse itself tags both
+`failureType: 'Not actionable'` - "Back/forward cache is disabled by
+flags" and "...by the command line". Confirmed the actual cause rather
+than assuming it: Playwright's Chromium launch passes
+`--disable-back-forward-cache` by default (visible directly in this
+environment's own running Chromium process args), a deliberate Playwright
+choice so its own automation doesn't get stale page state back on a
+`goBack()`/`goForward()` - nothing this site's markup, JavaScript, or
+service worker does. Lighthouse's own "Not actionable" classification
+already says so; this is the same "confirmed by reading the actual output,
+not assumed from the label" discipline `check-html-validity.mjs`'s
+`DISABLED_RULES` used for its five false-positive rules.
+
+Added `actionableBfCacheReasons()` to `scripts/check-lighthouse.mjs`:
+filters a `bf-cache` audit's failure items down to `failureType !==
+'Not actionable'`, wired into `auditPage()`/`main()` alongside the existing
+`scoresBelowMin` score-budget check, printing a distinct failure block and
+setting a non-zero exit code if any page ever reports a real, actionable
+bfcache blocker. In this exact harness the check is a no-op today (every
+page's only failure reasons are the two harness-level ones filtered out),
+but it is a real permanent regression guard going forward: a future
+service-worker change that, say, opens an IndexedDB transaction spanning a
+navigation, or adds an `unload` listener, would show up as `'Actionable'`
+and get caught here - a signal that existed in this tool's own output
+since run fourteen and was simply never read until now. Re-ran
+`pnpm check:lighthouse` against the full 37-page list after the change:
+all 37 still score >= 0.9 in every category, and all 37 report zero
+actionable bfcache blockers.
+
+While adding a unit test for the new pure function, found and fixed a
+second, unrelated latent bug in the same file: unlike every other
+`check-*.mjs` script (`check-award-tallies.mjs`, `check-html-validity.mjs`,
+etc.), `check-lighthouse.mjs` called `main()` unconditionally at module
+scope instead of guarding it behind the `import.meta.url ===
+file://${process.argv[1]}` entrypoint check those scripts use - harmless
+as long as nothing ever `import`ed the file, which nothing did until this
+run's own new test. Confirmed the bug is real, not theoretical: the first
+test run for `tests/unit/checkLighthouse.test.ts` measurably launched a
+real headless Chromium and an `astro preview` daemon as a side effect of
+merely importing the module (visible in both the test's log output and
+`ps aux`), before the guard was added. Fixed by adding the same guard;
+re-ran the test afterward with `ps aux` confirming no browser/server
+process starts on import. New `tests/unit/checkLighthouse.test.ts` (7
+tests) also covers the pre-existing `scoresBelowMin` helper, which had no
+test of its own before this run despite predating it by 141 runs.
+
+**Tests:** 7 new unit tests (`checkLighthouse.test.ts`): 3 for
+`scoresBelowMin` (all-pass, some-below-budget, exactly-at-budget), 4 for
+`actionableBfCacheReasons` (no items, no `details` at all, every item
+filtered as not-actionable, one genuinely actionable item kept). No e2e
+change - this is a build-time/manual-audit script change with no runtime
+site behavior touched.
+
+**Caution flagged for a future run:** mid-run, a `pnpm build` issued from
+this same checkout while a separate, already-running `pnpm test:e2e`
+cold-start pass was mid-flight (started as this run's own opening health
+check, before the bf-cache angle was chosen) clobbered the shared `dist/`
+directory the e2e suite's preview server was serving from, producing a
+cascading run of ~237 spurious failures across unrelated spec files
+(`print-styles.spec.ts`, `team-search.spec.ts`, `theme-token-parity.spec.ts`
+and others) - a race condition, not a real regression: a second, fully
+isolated cold-start `pnpm test:e2e` run with no concurrent build in
+progress is this run's actual verification (see the health-check summary
+below for its result). A future run should never issue `pnpm build` (or
+anything else that writes `dist/`) while a `pnpm test:e2e`/`check:*`
+browser sweep it also started is still in flight in the same checkout.
+
+Full standing health check clean: `pnpm lint` (0/0/1, unchanged), `pnpm
+test` (741/741 unit, up from 734 - the 7 new tests above), `pnpm build`
+(711 pages, unchanged), every fast `check:*` script clean and unchanged,
+`pnpm check:lighthouse` clean across all 37 pages (scores unchanged, zero
+actionable bfcache blockers). A second, fully isolated cold-start `pnpm
+test:e2e` re-run (no concurrent build this time) was kicked off after the
+race described above and was still in flight as this entry was written;
+this doc will get a short follow-up note once it completes confirming the
+final pass/fail count, the same way other runs have appended a closing
+confirmation when a long-running check finished after the main narrative
+was already drafted.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix decision, the Nations League Team of the
+Tournament sourcing question - confirmed exhausted), the Nations League
+2023 attendance conflict and 2021/2025 unconfirmed figures, World Cup
+1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+re-check. With `check:lighthouse` now reading everything Lighthouse
+already computes for it, a future pass's best bet is another previously-
+untried verification method (this run's own research pass also flagged
+font-loading strategy, dark-mode flash-of-wrong-theme on first paint, and
+focus-order as unexplored angles worth a closer look), a fresh
+dependency-upgrade attempt, or a fresh source lead on any of the open
+content gaps above.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

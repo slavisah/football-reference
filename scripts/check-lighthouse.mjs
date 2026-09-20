@@ -173,6 +173,35 @@ export function scoresBelowMin(categoryScores, minScore) {
   return Object.entries(categoryScores).filter(([, score]) => score < minScore);
 }
 
+// Lighthouse's `bf-cache` audit (back/forward-cache eligibility) has a
+// `weight: 0` in the `performance` category's own audit list, so it already
+// runs on every `auditPage()` call above and was simply never read - a real
+// gap on a site that ships its own hand-rolled service worker
+// (`src/pages/sw.js.ts`), exactly the kind of code that can silently make a
+// page bfcache-ineligible (an open connection, an `unload` handler, specific
+// caching behavior). Found by the hundred-and-fifty-fifth intensive run.
+//
+// Empirically probed (a throwaway script against `/`, `/quiz/`, `/records/`,
+// a player profile and `/compare/`) before writing any assertion: every page
+// reports exactly the same two failure reasons, both tagged
+// `failureType: 'Not actionable'` by Lighthouse itself - "disabled by flags"
+// and "disabled by the command line". Both are artifacts of Playwright's own
+// Chromium launch (it disables bfcache by default so its own automation
+// doesn't get stale page state back on a `goBack()`), not anything this
+// site's markup/JS/service-worker does - Lighthouse's own classification
+// already says so, the same way `check-html-validity.mjs`'s `DISABLED_RULES`
+// excludes rules confirmed to be false positives rather than real defects.
+// Filtering to `failureType !== 'Not actionable'` means this check is a
+// no-op in this exact harness today, but a real permanent regression guard
+// for the future: a genuine site-caused blocker (say, a future service-worker
+// change that opens an IndexedDB transaction across navigations) would show
+// up as `'Actionable'` and get caught, where nothing has ever looked before.
+/** Given a Lighthouse `bf-cache` audit result, which of its failure reasons (if any) are real/fixable rather than harness noise. */
+export function actionableBfCacheReasons(bfCacheAudit) {
+  const items = bfCacheAudit?.details?.items ?? [];
+  return items.filter((item) => item.failureType !== 'Not actionable');
+}
+
 async function auditPage({ label, path: pagePath }) {
   const url = `${ORIGIN}${BASE}${pagePath}`;
   const result = await lighthouse(url, {
@@ -184,7 +213,8 @@ async function auditPage({ label, path: pagePath }) {
   const categoryScores = Object.fromEntries(
     CATEGORIES.map((key) => [key, result.lhr.categories[key].score]),
   );
-  return { label, url, categoryScores };
+  const bfCacheReasons = actionableBfCacheReasons(result.lhr.audits['bf-cache']);
+  return { label, url, categoryScores, bfCacheReasons };
 }
 
 async function main() {
@@ -210,21 +240,38 @@ async function main() {
   const failures = results.flatMap(({ label, categoryScores }) =>
     scoresBelowMin(categoryScores, MIN_SCORE).map(([category, score]) => ({ label, category, score })),
   );
+  const bfCacheFailures = results.flatMap(({ label, url, bfCacheReasons }) =>
+    bfCacheReasons.map((item) => ({ label, url, reason: item.reason })),
+  );
 
-  if (failures.length === 0) {
-    console.log(`\nAll ${results.length} pages scored >= ${MIN_SCORE} in every category.`);
+  if (failures.length === 0 && bfCacheFailures.length === 0) {
+    console.log(
+      `\nAll ${results.length} pages scored >= ${MIN_SCORE} in every category, with no actionable back/forward-cache blockers.`,
+    );
     return;
   }
 
-  console.error(`\n${failures.length} category score(s) fell below the ${MIN_SCORE} budget:\n`);
-  for (const { label, category, score } of failures) {
-    console.error(`  ${label}: ${category} = ${score.toFixed(2)}`);
+  if (failures.length > 0) {
+    console.error(`\n${failures.length} category score(s) fell below the ${MIN_SCORE} budget:\n`);
+    for (const { label, category, score } of failures) {
+      console.error(`  ${label}: ${category} = ${score.toFixed(2)}`);
+    }
   }
+
+  if (bfCacheFailures.length > 0) {
+    console.error(`\n${bfCacheFailures.length} actionable back/forward-cache blocker(s) found:\n`);
+    for (const { label, url, reason } of bfCacheFailures) {
+      console.error(`  ${label} (${url}): ${reason}`);
+    }
+  }
+
   process.exitCode = 1;
 }
 
-main().catch(async (error) => {
-  console.error(error);
-  await stopPreviewDaemon();
-  process.exitCode = 1;
-});
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch(async (error) => {
+    console.error(error);
+    await stopPreviewDaemon();
+    process.exitCode = 1;
+  });
+}
