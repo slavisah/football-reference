@@ -72,6 +72,9 @@ jobs:
       - name: Heading-outline check
         run: pnpm check:heading-outline
 
+      - name: PDF outline/bookmark integrity check
+        run: pnpm check:pdf-outline
+
       - name: Page-reachability check
         run: pnpm check:reachability
 

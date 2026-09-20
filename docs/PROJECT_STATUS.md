@@ -26460,5 +26460,181 @@ built `dist/sw.js` for the change, not just the test result) before trusting
 a "verified, not a tautology" check, and kill any leftover preview/Chromium
 processes before a cold-start `pnpm test:e2e` run.
 
+### Closed the per-section PDF bookmarks/outline lead - and found a real content bug while verifying it: 72 of 80 Golden Boot edition PDFs silently carried the wrong page - closed 2026-09-20 (hundred-and-fifty-fourth intensive run)
+
+`docs/ROADMAP.md` had carried one lead as open and "highest-risk" since the
+hundred-and-forty-sixth run: "no PDF bookmark/outline entry per note-card
+section within a single long page (only one top-level bookmark per PDF
+today, via `outline: true`)". The hundred-and-forty-seventh run's own
+investigation reconfirmed it rather than closing it, judging it would need
+"new, unverified low-level PDF surgery with no way to empirically verify
+short of opening every affected PDF in a real reader" - the same `pdf-lib`
+full-re-serialize problem `scripts/pdf-metadata.mjs`'s own header comment
+already documents (it silently drops the `/StructTreeRoot`/`/MarkInfo`/
+`/Outlines` PDF/UA structure). Every run since has carried the same
+assessment forward unchanged.
+
+This run started from a standing health check (`pnpm install
+--frozen-lockfile`, no changes beyond the already-committed lockfile; `pnpm
+outdated` still only the blocked `typescript` 7 entry; `pnpm lint` 0/0/1;
+`pnpm test` 734/734; `pnpm build` 711 pages; all seventeen fast `check:*`
+scripts and `pnpm dlx knip --no-config-hints` clean, matching the
+hundred-and-fifty-third run's baseline exactly), then re-investigated the
+bookmarks lead directly rather than trusting the "confirmed exhausted" read
+at face value, since a repo this mature runs into diminishing returns on
+its usual quality-pass menu and this was the one concretely-named item still
+open.
+
+**The empirical check that overturned it:** rather than read the generator
+script again, this run installed `pypdf` standalone in a `python3 -m venv`
+(sidestepping this container's own `cryptography`/`pyo3` ABI conflict that
+already blocked the hundred-and-forty-eighth run's `pdfminer.six` attempt -
+confirmed hitting the identical `pyo3_runtime.PanicException` against the
+system Python before switching to a venv) and walked the actual outline
+tree of an already-shipped, representative PDF (`copa-america.pdf`, the
+family with the most note-card sections and the longest edition table).
+Result: **65 bookmarks**, not one - the page title at the root, with
+"Podium by edition" and all 48 edition-year sub-entries nested under it,
+the host-map region breakdown, and one entry per `EditorialNotes.astro`
+note-card section ("How it works", "Final venues", "Golden Boot winners",
+"Team of the Tournament winners", etc.), each linking to the correct page.
+`world-cup.pdf` (45), `records.pdf` (63), a sampled edition PDF, a team PDF
+and a player PDF all showed the same fully-nested structure. The feature
+this backlog item wanted had already been shipped, as a side effect of
+`outline: true` (a native Playwright/Chromium `page.pdf()` option) walking
+the page's real heading structure - nothing to build, only to notice.
+
+Pinned the exact rule rather than leaving it as "seems to work": the
+outline root's own `/Count` (PDF 32000-1:2008 7.7.3.4) equals the page's
+total `<h1>`-`<h6>` heading count minus its `.visually-hidden` ones.
+Confirmed by diffing `check-heading-outline.mjs`'s own `extractHeadings()`
+output for `/competitions/world-cup` (46 headings) against `world-cup.pdf`'s
+outline dump (45 titles): the *only* heading missing from the PDF was that
+page's screen-reader-only table caption (`TournamentTable.astro`'s `<h2
+class="visually-hidden">`) - Chromium's outline generation silently skips a
+visually-hidden heading, every other one (down to the `<h4>` edition-year
+sub-headings) makes it in. The same `.visually-hidden` heading pattern
+recurs on `EditionView.astro`, both index ("A to Z") pages, both profile
+pages' "Combined totals" heading, and `hr/glossary.astro` - all correctly
+excluded, confirmed against the matching PDFs for each.
+
+**Built a permanent check, not just a one-off finding:** new
+`scripts/check-pdf-outline.mjs` (`pnpm check:pdf-outline`) computes the
+expected outline count per page from its built HTML (reusing
+`extractHeadings()` from `check-heading-outline.mjs` and
+`candidateDistPaths()` from `check-internal-links.mjs` rather than
+duplicating either), extracts the actual count via the same low-level regex
+approach `pdf-metadata.mjs` already established for this site's own
+classic-xref PDF shape, and asserts they're equal across all 700 PDFs -
+covering every family via `pdf-pages.mjs`'s `PDF_PAGES` list plus
+`dist/edition-index.json`/`team-index.json`/`player-index.json` (the same
+live-roster endpoints `generate-pdfs.mjs` itself reads, with
+`teamProfileSlug()`/`playerProfileSlug()` duplicated the same way that file
+already duplicates them, for the same plain-Node reason). Pure regex over
+already-built output, no browser or PDF-editing library, well under a
+second for all 700 files - the same fast territory `check:pdfs`/
+`check:heading-outline`/`check:jsonld` already occupy, so it's wired into
+`.github/workflows/ci.yml` right after the heading-outline check (needs
+`dist/` built first, unlike `check:pdfs`, which only hashes source files
+and so runs earlier in the job).
+
+**Running it for the first time immediately paid for itself far beyond its
+original purpose:** 72 of the 80 Golden Boot edition PDFs (both the World
+Cup and EURO sub-families, both languages - the last and most deeply-nested
+family `generate-pdfs.mjs` generates, per-edition pages under
+`/competitions/golden-boot/<world-cup|euro>/<year>`) reported a constant,
+obviously-wrong outline count (12, regardless of which edition). Tracing it
+down: 69 of them had silently captured the site's own **home page**
+instead of their own content, and 3 had captured a bare **"404: Not
+Found"** response - confirmed two independent ways, via the outline
+mismatch itself and directly via each PDF's own `/Info` `/Title` (decoded
+by hand from both the literal-string and UTF-16BE hex-string forms
+Chromium's PDF writer uses, after an embarrassing false start: a first
+title-sweep script had a typo comparing against `'Ultimate Football
+Reference'` instead of `'The Ultimate Football Reference'` and undercounted
+the damage as 3 files instead of 72 - caught only by rechecking one file
+pypdf's own outline walk had already flagged and finding its title *did*
+read `'The Ultimate Football Reference'` exactly). Every one of these 80
+pages' own *built* HTML (`dist/competitions/golden-boot/...`) was
+independently confirmed to have the correct, page-specific `<title>` and
+content throughout - this is entirely a PDF-*generation*-time bug, not a
+site content or routing bug.
+
+**Why nothing had caught this in the ~5 weeks since the Golden Boot edition
+PDF family shipped:** `page.goto()`'s own promise resolves successfully
+even when navigation actually lands somewhere other than the intended URL,
+so `generate-pdfs.mjs` had no way to notice; and `check-pdf-freshness.mjs`'s
+freshness check only hashes *source* files (content/*.md, component files)
+to decide whether a PDF needs regenerating, never inspecting the PDF's own
+rendered content - so once a bad PDF was written, `pnpm check:pdfs` kept
+calling it "up to date" indefinitely, with nothing to compare it against.
+
+**Root cause:** not fully pinned down. The failure rate climbs across the
+single 700-job generation run rather than being uniform - the earliest,
+most-recently-processed World Cup Golden Boot editions (2026, 2022, 2014,
+2010, 2006) came through clean, while every one of the 34 EURO Golden Boot
+entries (processed last of all 700+ jobs) failed - consistent with some
+form of cumulative degradation in the one `page` object every one of
+`generate-pdfs.mjs`'s four loops (pages, teams, players, editions) shares
+across every navigation without ever recycling it, though a comparable
+degradation in this environment's own `astro preview` server under
+sustained load can't be ruled out either. Re-running `pnpm build:pdfs` in
+full this run (~11 minutes, `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`)
+did not reproduce the failure - every one of the 700 freshly-regenerated
+PDFs passed both `check:pdf-outline` and a full title re-sweep afterward -
+consistent with session-specific resource pressure during whatever earlier
+run originally produced the bad files, not a deterministic code path, but
+this is inference from a single successful re-run, not proof.
+
+**Fix, in two parts:**
+1. Regenerated all 700 PDFs fresh and reverified: `pnpm check:pdf-outline`
+   (700/700 clean) and a from-scratch title sweep across every file (zero
+   home-page or 404 titles anywhere, down from 72).
+2. Hardened `generate-pdfs.mjs` against a repeat regardless of root cause:
+   a new shared `gotoPageOrThrow(pagePath)` helper, now the single call site
+   all four loops route their navigation through (replacing four separate,
+   unchecked `page.goto(url, { waitUntil: 'networkidle' })` calls), checks
+   the navigation's own HTTP response (`response.ok()`) and Playwright's
+   `page.url()` against what was actually asked for, throwing immediately
+   if either doesn't match rather than silently proceeding to print and
+   write a wrong PDF. This can't fix an unknown root cause, but it converts
+   any future recurrence of this exact failure class - a same-status,
+   different-content wrong-page capture would still slip past a bare status
+   check, but a redirect, a 404, or a load of the wrong URL entirely all
+   throw - from a silent multi-file content bug that could sit undetected
+   for weeks into a loud, immediately-attributable build failure the next
+   time `pnpm build:pdfs` runs.
+
+Full standing health check clean throughout and after: `pnpm lint`
+(0/0/1, unchanged), `pnpm test` (734/734, unchanged - `generate-pdfs.mjs`
+has no unit-testable pure function of its own beyond what `pdf-metadata.mjs`
+already covers), `pnpm build` (711 pages, unchanged), `pnpm check:pdfs`
+(700/700 fresh), all seventeen prior fast `check:*` scripts clean,
+`check:spelling` clean, and the new `check:pdf-outline` clean (700/700, the
+first time it's ever run against the full corpus). No `content/*.md`,
+`src/`, or `tests/` file needed changing beyond `scripts/generate-pdfs.mjs`
+itself and the new `scripts/check-pdf-outline.mjs`, so no e2e run was
+needed this run (nothing under `tests/e2e/` or the site's own runtime
+behavior changed - the fix and the bug it fixed both live entirely in the
+build-time PDF-generation script).
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix decision, the Nations League Team of the
+Tournament sourcing question - confirmed exhausted), the Nations League
+2023 attendance conflict and 2021/2025 unconfirmed figures, World Cup
+1930/1950's/EURO 1996/2020's excluded attendance figures, and the
+hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+re-check. The exact root cause of this run's own navigation bug is still
+unconfirmed - if a future `pnpm build:pdfs` run ever actually hits the new
+`gotoPageOrThrow` throwing, that's the first hard evidence either way (which
+URL it was navigating to, and what it landed on instead) and is worth
+investigating immediately rather than just re-running until it goes away
+again. With the per-section PDF bookmarks lead now closed (it was never
+actually missing), a future pass's best bet is a fresh dependency-upgrade
+attempt, the coordinate/keyboard-walkthrough method after the next real
+content or layout change, or another genuinely different quality angle not
+yet tried on this site.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
