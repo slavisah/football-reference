@@ -26359,5 +26359,106 @@ print-PDF-to-live-site handoff, i.e. a reader who opens a downloaded PDF's
 own internal link while offline - stays open for a future run to actually
 drive end-to-end.
 
+### New e2e coverage for a downloaded PDF's own internal link, opened while offline - closed 2026-09-20 (hundred-and-fifty-third intensive run)
+
+A standing health check first (`pnpm install --frozen-lockfile`; `pnpm
+outdated` still only the blocked `typescript` 7 entry; `pnpm lint` 0/0/1;
+`pnpm test` 734/734; `pnpm build` 711 pages; all seventeen fast `check:*`
+scripts clean - all matching the hundred-and-fifty-second run's baseline).
+Picked up the hundred-and-fifty-first run's own remaining suggested angle
+(the print-PDF-to-live-site handoff).
+
+Investigated the mechanism before writing anything, rather than assume a gap
+exists: every downloadable PDF's internal team/player links
+(`scripts/generate-pdfs.mjs`'s `rewriteInternalLinksForPrint()`, added the
+hundred-and-forty-eighth run) are plain production URLs with no trailing
+slash - the exact same slash-less form every in-app link built with
+`withBase()` already uses - and `sw.js.ts`'s navigate handler normalizes
+every navigation request's cache key with a trailing slash before reading or
+writing Cache Storage (the hundred-and-fifty-first run's own fix),
+regardless of how the browser arrived at that URL. So a PDF's own internal
+link turns out not to be a distinct code path from an ordinary in-app link
+click. What no existing test had exercised, though, was this for a
+*team/player profile page* specifically: every offline test in
+`mobile.spec.ts` so far only used top-level nav pages (`/records`,
+`/competitions/world-cup`, etc.), which are precached on install
+(`NAV_LINKS`/`PRECACHE_URLS`, `src/lib/routes.ts`). Team and player pages
+carry no precache entry of their own - they only ever land in Cache Storage
+opportunistically, the first time they're actually visited online - so this
+is a genuinely different, previously-untested case: does the ordinary
+network-first/cache-fallback fetch handler correctly serve a *leaf* page
+(the kind the vast majority of a PDF's 409,320 link annotations actually
+point to) once it's been visited, not just the nineteen nav pages every
+prior offline test used.
+
+Added one new test to the `Installability and offline reading` describe
+block in `tests/e2e/mobile.spec.ts`: visits `/teams/brazil` online (the same
+way a reader would before ever downloading its PDF), goes offline, then
+re-requests the exact same slash-less URL as a fresh navigation (rather than
+a `page.reload()`) - the same request shape as a click arriving from outside
+the app entirely (a PDF viewer, another tab) rather than an in-page revisit
+- and asserts the cached content still renders.
+
+Verified this is real coverage, not a tautology, the same way the
+hundred-and-fifty-second run's own activate-handler test was: temporarily
+dropped the `cache.put()` call from `sw.js.ts`'s navigate handler. A first
+attempt to confirm the break took effect passed anyway - a red flag, not a
+green light - so rather than trust that result, checked `dist/sw.js`
+directly and found it still carried the *unmodified* source: Playwright's
+`webServer.reuseExistingServer` (true outside CI) had reused a preview
+server already running from an earlier step in this same session, so
+`pnpm build` never actually re-ran. Killed the stale preview process,
+re-ran the test (forcing a genuine `pnpm build && node
+scripts/test-preview-server.mjs`), and this time it failed exactly as
+expected: the home page's `<h1>` rendered instead of Brazil's. A second
+attempted verification angle - disabling Chromium's own HTTP cache via a
+page-level CDP `Network.setCacheDisabled` session, to rule out the browser's
+ordinary disk cache backstopping the result - made no difference either way
+once tried; consistent with `pwa-savedata.spec.ts`'s own documented finding
+that a page-level CDP override doesn't reach the service worker's own
+separate execution context, so this was abandoned in favor of the
+working method above (break the source, confirm a real rebuild, re-test).
+Restored the original `sw.js.ts` (confirmed `git diff` empty afterward) and
+reconfirmed the test passes again.
+
+Full standing health check clean after adding the test: `pnpm lint` (0/0/1,
+unchanged), `pnpm test` (734/734, unchanged - e2e-only coverage of
+already-generated `sw.js.ts` behavior, no new pure function to unit test),
+`pnpm build` (711 pages, unchanged), every fast `check:*` script clean
+(`check:links`, `check:sitemap`, `check:precache`, `check:html`,
+`check:jsonld`, `check:heading-outline`, `check:reachability`, `check:meta`,
+`check:award-tallies`, `check:edition-header-labels`, `check:i18n-notes`,
+`check:attendance-format`, `check:link-names`, `check:image-dimensions`,
+`check:locale-consistency`, `check:pdfs`, `check:spelling`), the four
+daemon-driven ones (`check:reflow`, `check:text-zoom`, `check:print-width`,
+`check:lighthouse`) also clean, and a full cold-start `pnpm test:e2e`
+(confirmed no stale preview server via `ps aux` beforehand): **1016/1016
+passed** (16.0 minutes), up from 1015 - the one new test, no regressions
+anywhere else in the suite. No content file, PDF-source component, or other
+`src/` file changed, so no PDF regeneration was needed.
+
+**Left for a future pass:** the same environment-blocked items as every
+recent run (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix decision, the Nations League Team of the
+Tournament sourcing question - confirmed exhausted), the Nations League 2023
+attendance conflict and 2021/2025 unconfirmed figures, World Cup
+1930/1950's/EURO 1996/2020's excluded attendance figures, the
+hundred-and-twenty-sixth run's still-open hyphenation-rendering visual
+re-check, and the hundred-and-forty-sixth run's still-open per-section PDF
+bookmarks/outline lead - still the highest-risk open lead (hand-rolled
+`/Outlines`-tree binary surgery with no way to empirically verify short of
+opening every affected PDF in a real reader). With both of the
+hundred-and-fifty-first run's own suggested angles now closed, a future pass
+likely needs either a fresh dependency-upgrade attempt, the
+coordinate/keyboard-walkthrough method after the next real content or
+layout change, or another genuinely different quality angle not yet tried on
+this site. Also worth a note for whoever runs this routine next: a stale
+reused preview server (`webServer.reuseExistingServer` outside CI) can mask
+a source change during manual verification exactly as it did on this run's
+first attempt - always confirm a real rebuild landed (e.g. `grep` the
+built `dist/sw.js` for the change, not just the test result) before trusting
+a "verified, not a tautology" check, and kill any leftover preview/Chromium
+processes before a cold-start `pnpm test:e2e` run.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
