@@ -366,6 +366,7 @@ const jsonLd: JsonLdObject[] = [
   buildQuizJsonLd(questions, {
     pageUrl: absolutePageUrl(Astro.url, Astro.site),
     name: 'Kompletna nogometna referenca - obiteljski kviz',
+    dateModified: lastReviewed,
   }),
 ];
 ---
@@ -376,6 +377,7 @@ const jsonLd: JsonLdObject[] = [
   locale="hr"
   alternateHref={withBase('/quiz')}
   jsonLd={jsonLd}
+  dateModified={lastReviewed}
 >
   <article class="quiz stack">
     <header class="quiz__header">

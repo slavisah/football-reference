@@ -46,6 +46,7 @@ const jsonLd: JsonLdObject[] = [
   buildCollectionPageJsonLd(buildPlayersDirectoryItemList(profiles, { pageUrl: playersPageUrl, name: playersName }), {
     pageUrl: playersPageUrl,
     name: playersName,
+    dateModified: lastReviewed,
   }),
 ];
 ---
@@ -55,6 +56,7 @@ const jsonLd: JsonLdObject[] = [
   description="Every Men's Ballon d'Or winner and FIFA World Cup or UEFA EURO Golden Boot winner, A to Z - pick one for their full year-by-year award record."
   alternateHref={withBase('/hr/players')}
   jsonLd={jsonLd}
+  dateModified={lastReviewed}
 >
   <article class="players stack">
     <header class="players__header">

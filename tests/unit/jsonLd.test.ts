@@ -738,6 +738,20 @@ describe('buildQuizJsonLd', () => {
     const quiz = buildQuizJsonLd([], { pageUrl: 'https://example.test/quiz/', name: 'Family Quiz' });
     expect(quiz.hasPart).toEqual([]);
   });
+
+  it('includes dateModified when provided', () => {
+    const quiz = buildQuizJsonLd(questions, {
+      pageUrl: 'https://example.test/quiz/',
+      name: 'Family Quiz',
+      dateModified: '2026-09-21',
+    });
+    expect(quiz.dateModified).toBe('2026-09-21');
+  });
+
+  it('omits dateModified entirely when not provided', () => {
+    const quiz = buildQuizJsonLd(questions, { pageUrl: 'https://example.test/quiz/', name: 'Family Quiz' });
+    expect('dateModified' in quiz).toBe(false);
+  });
 });
 
 describe('buildDefinedTermSet', () => {
@@ -775,6 +789,20 @@ describe('buildDefinedTermSet', () => {
   it('returns an empty hasDefinedTerm for an empty entry list', () => {
     const termSet = buildDefinedTermSet([], { pageUrl: 'https://example.test/glossary/', name: 'Glossary' });
     expect(termSet.hasDefinedTerm).toEqual([]);
+  });
+
+  it('includes dateModified when provided', () => {
+    const termSet = buildDefinedTermSet([], {
+      pageUrl: 'https://example.test/glossary/',
+      name: 'Glossary',
+      dateModified: '2026-09-21',
+    });
+    expect(termSet.dateModified).toBe('2026-09-21');
+  });
+
+  it('omits dateModified entirely when not provided', () => {
+    const termSet = buildDefinedTermSet([], { pageUrl: 'https://example.test/glossary/', name: 'Glossary' });
+    expect('dateModified' in termSet).toBe(false);
   });
 });
 
@@ -873,6 +901,35 @@ describe('buildCollectionPageJsonLd', () => {
       { '@type': 'ItemList', name: worldCup.name, url: worldCup.url, itemListElement: worldCup.itemListElement },
       { '@type': 'ItemList', name: euro.name, url: euro.url, itemListElement: euro.itemListElement },
     ]);
+  });
+
+  it('includes dateModified when provided', () => {
+    const itemList = buildChampionsItemList(champions, {
+      pageUrl: 'https://example.test/competitions/world-cup/',
+      name: 'FIFA World Cup - Champions by titles',
+    });
+
+    const page = buildCollectionPageJsonLd(itemList, {
+      pageUrl: 'https://example.test/competitions/world-cup/',
+      name: 'FIFA World Cup - Champions by titles',
+      dateModified: '2026-09-21',
+    });
+
+    expect(page.dateModified).toBe('2026-09-21');
+  });
+
+  it('omits dateModified entirely when not provided', () => {
+    const itemList = buildChampionsItemList(champions, {
+      pageUrl: 'https://example.test/competitions/world-cup/',
+      name: 'FIFA World Cup - Champions by titles',
+    });
+
+    const page = buildCollectionPageJsonLd(itemList, {
+      pageUrl: 'https://example.test/competitions/world-cup/',
+      name: 'FIFA World Cup - Champions by titles',
+    });
+
+    expect('dateModified' in page).toBe(false);
   });
 });
 

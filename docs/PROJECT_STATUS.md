@@ -27684,3 +27684,107 @@ beyond `og:image`/`twitter:image`) has the same gap.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
+
+### Added `og:updated_time`/JSON-LD `dateModified` so search engines get a page-freshness signal - closed 2026-09-21 (hundred-and-sixty-fourth intensive run)
+
+A prior research pass (this run's own starting point, not a fresh audit)
+had already confirmed the gap: nowhere on the site did any page emit a
+page-freshness signal to search engines, despite every content file already
+carrying its own `lastReviewed: YYYY-MM-DD` frontmatter date - already
+rendered visibly (the `<References>` component's "Last reviewed" line, or
+`/about/sources`' own inline equivalent) but never surfaced as machine-
+readable metadata. Zero hits for `dateModified`, `article:modified_time` or
+`og:updated_time` anywhere in `src/` before this run confirmed it was
+genuinely unaddressed, not a duplicate of any prior gap-closing run - the
+same class of gap the hundred-and-sixty-third run closed for
+`og:image:alt`/`twitter:image:alt`, closed here the same way: extend an
+existing required-PR-gate check script, add unit tests, update docs.
+
+**Changes:**
+
+- `src/layouts/BaseLayout.astro`: new optional `dateModified?: string` prop,
+  rendered as `<meta property="og:updated_time" content={dateModified}>`
+  right after the existing `og:image:alt` tag, guarded on presence. Uses
+  `og:updated_time`, not `article:modified_time` - this site's `og:type` is
+  always `"website"`, never `"article"`, and `article:modified_time` is only
+  valid Open Graph vocabulary under `og:type=article`; `og:updated_time` is
+  the generic, type-agnostic equivalent, so it works here without that
+  mismatch. Nothing was added to `BaseLayout.astro`'s own JSON-LD assembly -
+  see the next bullet for why that's handled per-builder instead.
+- `src/lib/jsonLd.ts`: added an optional `dateModified?: string` field
+  (same `...(x ? { x } : {})` conditional-spread style the file's own
+  `description` field already uses) to exactly three builders:
+  `buildQuizJsonLd`, `buildDefinedTermSet`, `buildCollectionPageJsonLd`.
+  Schema.org's `dateModified` property's `domainIncludes` is `CreativeWork`
+  only - of this file's ~15 builders, only these three (plus `WebSite`,
+  deliberately left untouched: it's only ever called once, for the home
+  page, which has no `lastReviewed` source to pass it, so adding unused
+  optional support there would be speculative) are actually `CreativeWork`
+  subtypes. `SportsEvent` (an `Event`), `ItemList`/`BreadcrumbList` (both
+  `Intangible`), `Person` and `SportsTeam` (`Organization`) are not, so they
+  correctly received no `dateModified` field anywhere - the `og:updated_time`
+  meta tag above is this site's universal, page-type-agnostic freshness
+  signal; the JSON-LD field is a secondary enhancement only where the
+  schema.org type actually supports it.
+- 46 page files (23 English + 23 Croatian) now pass `dateModified={...}` on
+  their `<BaseLayout>` call, reusing whatever `lastReviewed` (or an
+  already-computed combined/max-of-several-sources `lastReviewed` variable,
+  for pages like `/teams`, `/players`, `/quiz`, `/compare*`, `/records` that
+  merge more than one competition's review date) value that page already
+  had in scope - no new date computation added anywhere. Of those, the 20
+  files (10 English + 10 Croatian: the six competition/award landing pages,
+  `/glossary`, `/quiz`, `/teams`, `/players`) that call
+  `buildCollectionPageJsonLd`/`buildQuizJsonLd`/`buildDefinedTermSet` also
+  pass the same value as that builder's new `dateModified` option. The home
+  page (`/`, `/hr`) and `404.astro` were deliberately left untouched - no
+  content-file date source exists for either.
+- `scripts/check-meta.mjs`: new exported `extractOgUpdatedTime(html)`
+  (mirrors `extractMetaDescription()`'s regex-extract-and-trim shape) plus
+  a new `isHomePagePath(pagePath)` helper, and a validation pass requiring
+  every indexable page except the home page to carry a present,
+  `YYYY-MM-DD`-shaped `og:updated_time` - this is the same required-PR-gate
+  script (wired into `.github/workflows/ci.yml`) that already checks
+  `<title>`/meta-description, extended rather than duplicated into a new
+  script, matching `check-image-dimensions.mjs`'s own presence-check style
+  for `og:image:alt`.
+- `scripts/check-jsonld.mjs`: `validateJsonLdObject`'s node walk now checks
+  that any `dateModified` field is a `YYYY-MM-DD`-shaped string, and adds a
+  structural guard confirming `dateModified` never appears on a
+  `SportsEvent`/`ItemList`/`BreadcrumbList`/`Person`/`SportsTeam` node - a
+  correctness check that should never trigger given the implementation
+  above, kept anyway as a regression guard, matching this script's existing
+  `ListItem` `position`-sequencing invariant check.
+- `tests/unit/jsonLd.test.ts`: added a "present when passed"/"absent (no
+  key at all) when omitted" pair of test cases to each of the three
+  modified builders' existing `describe` blocks.
+- `tests/unit/checkMeta.test.ts`: added `extractOgUpdatedTime`/
+  `isHomePagePath` test cases (present/absent/malformed/whitespace),
+  matching the existing `extractMetaDescription`/`isNoindexHtml` cases'
+  shape.
+
+**Verification:** `pnpm lint` - 0 errors/0 warnings/0 hints. `pnpm test` -
+763/763 (up from 751; 12 new `it()` blocks). `pnpm build` - 711 pages.
+`node scripts/check-meta.mjs` against the fresh build - clean, with the new
+`og:updated_time` check active ("...every non-home page has a well-formed
+og:updated_time"). `node scripts/check-jsonld.mjs` against the fresh build -
+clean (1,783 JSON-LD blocks across 711 pages, all structurally valid).
+`node scripts/check-image-dimensions.mjs` - clean (unrelated but re-run to
+confirm no regression). Spot-checked `dist/competitions/world-cup/index.html`,
+`dist/teams/croatia/index.html` and `dist/glossary/index.html` directly:
+`og:updated_time` present with the expected date on all three (and the
+`CollectionPage`/`DefinedTermSet` JSON-LD blocks on the first and third
+carry a matching `dateModified`); `dist/index.html` (home page) confirmed to
+have no `og:updated_time` tag at all. `pnpm dlx knip --no-config-hints` -
+only the two pre-existing known false positives
+(`scripts/test-preview-server.mjs`, `@cspell/dict-hr-hr`), nothing new.
+
+**Left for a future pass:** the same environment-blocked items as ever -
+`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision, the UEFA Nations League Team of the Tournament
+gaps (2021/2023/2025) and attendance-figure source conflicts, the excluded
+World Cup 1930/1950 and EURO 1996/2020 attendance figures, and the
+hyphenation-rendering visual re-check - all unchanged this run and tracked
+in `docs/ROADMAP.md`'s "Open backlog".
+
+See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
+`docs/ADDING_CONTENT.md` (how to add or edit content).

@@ -68,6 +68,7 @@ const jsonLd = [
   buildCollectionPageJsonLd(buildChampionsItemList(data.champions, { pageUrl, name: championsName }), {
     pageUrl,
     name: championsName,
+    dateModified: data.lastReviewed,
   }),
   buildLatestEditionSportsEvent(data.editions, title),
 ].filter((item): item is JsonLdObject => item !== undefined);
@@ -320,6 +321,7 @@ const headerLabels: Record<string, string> = {
   locale="hr"
   alternateHref={withBase('/competitions/world-cup')}
   jsonLd={jsonLd}
+  dateModified={data.lastReviewed}
 >
   <article class="competition stack">
     <header class="competition__header">

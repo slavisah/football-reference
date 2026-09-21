@@ -65,7 +65,7 @@ const jsonLd: JsonLdObject[] = [
       describe: (profile) =>
         `${profile.totalAwards} ${profile.totalAwards === 1 ? 'nagrada' : 'nagrade'} u muškoj Zlatnoj lopti i Zlatnoj kopački Svjetskog prvenstva/EURA`,
     }),
-    { pageUrl: playersPageUrl, name: playersName },
+    { pageUrl: playersPageUrl, name: playersName, dateModified: lastReviewed },
   ),
 ];
 ---
@@ -76,6 +76,7 @@ const jsonLd: JsonLdObject[] = [
   locale="hr"
   alternateHref={withBase('/players')}
   jsonLd={jsonLd}
+  dateModified={lastReviewed}
 >
   <article class="players stack">
     <header class="players__header">

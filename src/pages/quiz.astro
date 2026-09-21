@@ -276,6 +276,7 @@ const jsonLd: JsonLdObject[] = [
   buildQuizJsonLd(questions, {
     pageUrl: absolutePageUrl(Astro.url, Astro.site),
     name: 'The Ultimate Football Reference - Family Quiz',
+    dateModified: lastReviewed,
   }),
 ];
 ---
@@ -285,6 +286,7 @@ const jsonLd: JsonLdObject[] = [
   description="A family football quiz from the World Cup, EURO, Copa América, Nations League, Ballon d'Or and Golden Boot tables - champions, hosts, finals and top scorers."
   alternateHref={withBase('/hr/quiz')}
   jsonLd={jsonLd}
+  dateModified={lastReviewed}
 >
   <article class="quiz stack">
     <header class="quiz__header">

@@ -45,6 +45,7 @@ const jsonLd = [
   buildCollectionPageJsonLd(buildChampionsItemList(data.champions, { pageUrl, name: championsName }), {
     pageUrl,
     name: championsName,
+    dateModified: data.lastReviewed,
   }),
   buildLatestEditionSportsEvent(data.editions, data.title),
 ].filter((item): item is JsonLdObject => item !== undefined);
@@ -55,6 +56,7 @@ const jsonLd = [
   description="Every UEFA European Championship edition, hosts, finalists and champions, with a generated title count. Filter by winner, year, host and team."
   alternateHref={withBase('/hr/competitions/euro')}
   jsonLd={jsonLd}
+  dateModified={data.lastReviewed}
 >
   <CompetitionView
     data={data}
