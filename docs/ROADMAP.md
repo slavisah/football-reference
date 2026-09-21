@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (161 intensive runs as of 2026-09-21) lives
+verification sweep and decision (162 intensive runs as of 2026-09-21) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -45,7 +45,7 @@ manual/intensive-run-only rather than a required PR gate; `check:spelling-hr`
 is fast but also manual/intensive-run-only for now, since its ignore-list
 dictionary is new - see `docs/PROJECT_STATUS.md`'s hundred-and-sixty-first
 run entry), `pnpm audit`, and `pnpm dlx knip --no-config-hints`. As of the
-hundred-and-sixty-first run (2026-09-21): 751/751 unit tests, 99.91%/99.31%
+hundred-and-sixty-second run (2026-09-21): 751/751 unit tests, 99.91%/99.31%
 statement/branch coverage, 711 pages built, zero `pnpm audit` vulnerabilities,
 and two standing `knip` false positives: `scripts/test-preview-server.mjs`
 (used only as a Playwright `webServer.command`, never imported) and
@@ -64,9 +64,15 @@ analysis just can't see a reference inside a config-file string.
   `@astrojs/check` release.
 - **`docs/SOURCES.md` link-liveness sweep**: blocked. This environment's
   outbound network/egress policy rejects direct requests to external
-  reference domains (e.g. a direct `curl`/`WebFetch` to `en.wikipedia.org`
-  returns a `403` from the egress proxy) - confirmed repeatedly, most
-  recently 2026-09-20. Needs a session with broader network access.
+  reference domains - confirmed repeatedly, most recently 2026-09-21
+  (hundred-and-sixty-second run), and now precisely scoped: `WebFetch` to
+  `en.wikipedia.org` *and* `www.uefa.com` both return `EGRESS_BLOCKED` from
+  the proxy (not a Wikipedia-specific block), so this is a general block on
+  direct fetches to reference domains, not one site's policy. `WebSearch`
+  itself *does* work in this environment (confirmed 2026-09-21) and returns
+  synthesized, sourced snippets - but that is no substitute for a live
+  status-code check of each `docs/SOURCES.md` link, which is what this item
+  needs. Still needs a session with `WebFetch`/direct-fetch access.
 - **`long-title` brand-suffix decision**: needs human sign-off, not an
   automated fix. `check:html`'s `long-title` rule is disabled
   (`scripts/check-html-validity.mjs`'s `DISABLED_RULES`) because 133 pages
@@ -77,12 +83,25 @@ analysis just can't see a reference inside a config-file string.
   reliable single source names an official XI for these three editions
   (unlike 1996-2024's EURO equivalent, or Copa América's own section) -
   checked across 6+ separate intensive runs, confirmed exhausted without new
-  network access.
+  network access. Re-tried with `WebSearch` the hundred-and-sixty-second run
+  (2026-09-21): it surfaces a Player of the Tournament (Rodri, 2023) but no
+  complete eleven-name Best XI for any of the three editions - same negative
+  result as every prior run's attempt, now via a tool that does have live
+  web access, not just a knowledge-cutoff limitation. Genuinely exhausted
+  short of a UEFA technical-report PDF this environment cannot fetch.
 - **UEFA Nations League attendance figures**: the 2023 Finals attendance has
   a genuine source conflict (41,110 vs. 41,500, both independently reported
   by different outlets); 2021 and 2025 have no attendance figure confirmed by
   two independent sources. Left unreported in `content/uefa-nations-league.md`
-  rather than guessed.
+  rather than guessed. Re-tried with `WebSearch` the hundred-and-sixty-second
+  run (2026-09-21): every result for all three editions traces back to the
+  same Wikipedia-derived figure (41,110 for 2023, 31,511 for 2021) with no
+  second, independently-*sourced* figure turning up in the search snippets
+  themselves (only mirrors/derivatives of the one figure) - so this still
+  doesn't clear the site's own two-independent-sources bar. `WebFetch` to
+  `uefa.com` (which might carry the tournament's own official figure) is
+  blocked (see the link-liveness item above), so there's no way to read a
+  second primary source directly, only search-engine summaries of one.
 - **Excluded historical attendance figures**: World Cup 1930 and 1950, and
   EURO 1996 and 2020, each have no single attendance figure with a source
   reliable enough to report - left out of their "Final venues" sections on
