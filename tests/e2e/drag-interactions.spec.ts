@@ -82,7 +82,10 @@ test.describe('search combobox survives a drag gesture', () => {
   test('dragging from the team-search input into a result does not navigate away', async ({ page }) => {
     const input = page.locator('#team-search-input');
     await input.click();
-    await input.type('a');
+    // Nav.astro's combobox listens for the input event, which fill() fires
+    // just as well as the deprecated type() API this replaces - no need to
+    // simulate real per-keystroke key events for a single-character value.
+    await input.fill('a');
     const option = page.locator('#team-search-listbox li').first();
     await expect(option).toBeVisible();
 

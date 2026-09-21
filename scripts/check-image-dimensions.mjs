@@ -21,6 +21,15 @@
 //   every chat app/social media link-preview card site-wide - the exact
 //   image Slack/Discord/iMessage/X actually crop against - with no test
 //   catching it.
+// - Every page's `og:image:alt`/`twitter:image:alt` `content` text (added
+//   alongside `og:image`/`twitter:image` in BaseLayout.astro): a
+//   screen-reader user browsing a link-preview card on a platform that
+//   surfaces alt text for it gets nothing without these, the same gap
+//   `og:image:width`/`og:image:height` closed for sighted layout. Checked
+//   for presence and non-empty content here rather than exact wording -
+//   the wording itself is `src/lib/i18n.ts`'s `ogImageAlt` string, plain
+//   editorial content, not something a build-output check should assert an
+//   exact value for.
 //
 // Plain regex/PNG-header parsing over already-built HTML and manifest JSON,
 // no browser needed - the same territory as check:jsonld/check:meta/
@@ -71,8 +80,10 @@ export function extractOgImageMeta(html) {
   const ogImage = html.match(/<meta property="og:image" content="([^"]*)"/)?.[1] ?? null;
   const ogWidth = html.match(/<meta property="og:image:width" content="([^"]*)"/)?.[1] ?? null;
   const ogHeight = html.match(/<meta property="og:image:height" content="([^"]*)"/)?.[1] ?? null;
+  const ogImageAlt = html.match(/<meta property="og:image:alt" content="([^"]*)"/)?.[1] ?? null;
   const twitterImage = html.match(/<meta name="twitter:image" content="([^"]*)"/)?.[1] ?? null;
-  return { ogImage, ogWidth, ogHeight, twitterImage };
+  const twitterImageAlt = html.match(/<meta name="twitter:image:alt" content="([^"]*)"/)?.[1] ?? null;
+  return { ogImage, ogWidth, ogHeight, ogImageAlt, twitterImage, twitterImageAlt };
 }
 
 async function fileExists(filePath) {
@@ -147,7 +158,7 @@ async function checkOgImages(problems) {
     const html = await readFile(file, 'utf8');
     if (isRedirectStubHtml(html)) continue;
     const pageName = path.relative(DIST_DIR, file);
-    const { ogImage, ogWidth, ogHeight, twitterImage } = extractOgImageMeta(html);
+    const { ogImage, ogWidth, ogHeight, ogImageAlt, twitterImage, twitterImageAlt } = extractOgImageMeta(html);
 
     for (const [label, url] of [
       ['og:image', ogImage],
@@ -160,6 +171,15 @@ async function checkOgImages(problems) {
       const distFile = await resolveDistFile(url);
       if (!distFile) {
         problems.push(`${pageName}: ${label} content "${url}" does not resolve to any built file`);
+      }
+    }
+
+    for (const [label, alt] of [
+      ['og:image:alt', ogImageAlt],
+      ['twitter:image:alt', twitterImageAlt],
+    ]) {
+      if (!alt || alt.trim() === '') {
+        problems.push(`${pageName}: missing or empty <meta ... ${label}> content`);
       }
     }
 
@@ -197,9 +217,13 @@ async function main() {
     throw error;
   }
 
-  console.log('Checked manifest icon sizes and every page\'s og:image/twitter:image against their real PNG dimensions.');
+  console.log(
+    'Checked manifest icon sizes, every page\'s og:image/twitter:image against their real PNG dimensions, and every og:image:alt/twitter:image:alt for presence.',
+  );
   if (problems.length === 0) {
-    console.log('Every declared image size matches the real file: no manifest icon or og:image/twitter:image drift found.');
+    console.log(
+      'Every declared image size matches the real file and every image has alt text: no manifest icon, og:image/twitter:image drift, or missing alt text found.',
+    );
     return;
   }
 
