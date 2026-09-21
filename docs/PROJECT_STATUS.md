@@ -27222,5 +27222,128 @@ likely needs a genuinely different quality angle (a fresh
 route-tree prop-diff sweep per the hundred-and-fifth run's own suggestion,
 or an accessibility/performance angle) rather than another print-CSS pass.
 
+### New `prefers-reduced-transparency` support for the sticky header: a genuinely untested accessibility media feature, distinct from every `prefers-*`/`forced-colors` check already in place - closed 2026-09-21 (hundred-and-sixtieth intensive run)
+
+A standing health check first (all clean: `pnpm install --frozen-lockfile`,
+`pnpm lint` 0 errors/0 warnings/1 hint, `pnpm test` 751/751, `pnpm build` 711
+pages). Also re-ran the five manual/intensive-run-only full-site sweeps this
+run's own brief specifically asked about: `check:print-width`,
+`check:text-zoom`, `check:reflow`, `check:html` (all 711/711 clean, no
+overflow or markup-validity findings) and `check:lighthouse` (all 37 audited
+pages still 1.00/1.00/1.00/1.00 across performance/accessibility/
+best-practices/SEO, no back/forward-cache blockers) - all five came back
+exactly as clean as the prior several runs' own re-confirmations, so this
+run moved on rather than re-litigating an exhausted angle. Also re-read
+`docs/WEBSITE_REQUIREMENTS.md` end to end against the live built site
+looking for drift: every required page, capability and nice-to-have is
+live, and the one prior drift this file could have caught (`/awards/
+ballon-dor`/`/awards/golden-boot` vs. the site's actual `/competitions/...`
+routes) was already fixed by an early intensive run's (2026-08-03) redirect
+stubs - confirmed the fix is still in place (`dist/awards/ballon-dor/
+index.html` and its three siblings still meta-refresh to their
+`/competitions/...` targets) rather than re-adding it. All 19 fast
+`check:*` scripts re-run individually and clean too (`check:pdfs`,
+`check:perf`, `check:links`, `check:sitemap`, `check:precache`,
+`check:jsonld`, `check:heading-outline`, `check:theme-flash`,
+`check:reachability`, `check:meta`, `check:award-tallies`,
+`check:edition-header-labels`, `check:i18n-notes`, `check:attendance-format`,
+`check:link-names`, `check:image-dimensions`, `check:locale-consistency`,
+`check:spelling`, `check:pdf-outline`).
+
+With every existing angle re-confirmed clean rather than newly broken, this
+run went looking for a genuinely untested one instead, per this run's own
+brief. The site already emulates and tests four other `prefers-*`/
+`forced-colors` reader preferences (`prefers-color-scheme`,
+`prefers-reduced-motion`, `prefers-contrast`, `forced-colors`, plus the
+distinct `emulateVisionDeficiency` CDP capability for color-vision
+deficiency, closed the hundred-and-forty-first run) - grepping this file and
+`tests/e2e/*.spec.ts` for `prefers-reduced-transparency`/`reduced
+transparency`/`reducedTransparency` found zero matches anywhere, a real gap
+distinct from all of those. Grepping `src/` for `backdrop-filter` found
+exactly one hit: `Nav.astro`'s sticky `.site-header`, which pairs `background:
+color-mix(in srgb, var(--bg-elevated) 88%, transparent)` with `backdrop-
+filter: blur(8px)` - a translucent, blurred surface stacked over whatever
+page content scrolls underneath it, exactly the pattern
+`prefers-reduced-transparency: reduce` (a reader's macOS/iOS "Reduce
+transparency" setting, or the Windows equivalent) exists to let a reader
+opt out of. Checked every other `color-mix(..., transparent)` use on the
+site too (`Nav.astro`'s own nav-link hover/active tints, `QuizCard.astro`/
+`QuizOrderCard.astro`'s correct/incorrect answer tints,
+`TournamentTable.astro`'s winner-row tint) - all are plain accent tints
+against the page's own already-solid background, never layered over
+scrolling content, so none of them are a real transparency/legibility
+concern and none were touched.
+
+Confirmed the underlying capability before depending on it, the same
+"confirm, don't assume" method the color-vision-deficiency work used for
+`Emulation.setEmulatedVisionDeficiency`: Playwright's own `page.
+emulateMedia()` has no `reducedTransparency` option (only `colorScheme`/
+`contrast`/`forcedColors`/`reducedMotion`/`media` - confirmed against this
+project's pinned `playwright-core@1.63.0` type declarations), but CDP's
+`Emulation.setEmulatedMedia` accepts an arbitrary `features` array, and a
+throwaway script confirmed this project's pinned Chromium build (141.0.7390.37)
+genuinely implements the media feature - a CDP round trip toggling a custom
+property inside `@media (prefers-reduced-transparency: reduce)` actually
+flipped, and (distinctly) a real header element's `getComputedStyle().
+backdropFilter`/`backgroundColor` changed from `blur(8px)`/a translucent
+`color(...)` value to `none`/a fully opaque `rgb(...)` once the fix was
+written, in both light and dark theme.
+
+Fixed with a new `@media (prefers-reduced-transparency: reduce)` block in
+`Nav.astro`'s `<style>`, right after `.site-header`'s own rule: drops
+`backdrop-filter` entirely and swaps the 88%-opacity background for the
+same `--bg-elevated` token at full opacity, so header text and controls
+read against a stable, known background instead of whatever happens to be
+scrolled underneath at any given moment - the same reasoning
+`prefers-contrast: more` already gets in this codebase, just for a
+different failure mode contrast math alone can't catch (a translucent
+header can pass a contrast check against whatever's scrolled underneath it
+at the instant it's measured, then fail against different content a moment
+later).
+
+New `tests/e2e/reduced-transparency.spec.ts` (4 tests): a default/
+no-preference sanity check (the header still keeps its blur and partial
+opacity when the reader has no preference, guarding against the media query
+accidentally always applying), reduce+light theme, reduce+dark theme, and
+one Croatian-mirror-page check (the fix lives in the one shared `Nav.astro`
+every locale renders, not an English-only page). `Nav.astro`'s `.site-header`
+is unconditionally `display: none !important` under `@media print`
+(`global.css`), so this change touches nothing any of the 700 downloadable
+PDFs render - confirmed `pnpm check:pdfs` stayed clean with no regeneration
+needed, rather than assuming so.
+
+Full standing health check re-run after: `pnpm lint` (0/0/1, unchanged),
+`pnpm test` (751/751, unchanged - CSS-only fix, no new unit-testable pure
+logic), `pnpm build` (711 pages, unchanged), `check:pdfs` (700/700, no
+regeneration needed - see above), full cold-start `pnpm test:e2e` (1018/1020
+passed, 27.8 minutes, up from 1016/1016 - the four new
+`reduced-transparency.spec.ts` tests). The 2 failures were both
+`print-styles.spec.ts`'s axe pass on `/records`/`hr/records` (the site's two
+heaviest built pages) timing out at exactly the shared 30s axe timeout under
+this run's 2-worker parallel load - the same resource-contention shape the
+hundred-and-fifty-ninth run's own entry already documented for a different
+pair of scripts run concurrently. Re-ran just those two tests in isolation
+(`playwright test tests/e2e/print-styles.spec.ts -g "has no WCAG violations
+when rendered for print"`, 35/35 passed, both `/records` variants finishing
+in 29.7s/29.8s - comfortably under 30s once not starved by a sibling
+worker) to confirm this is an environment flake unrelated to this run's
+change, not a regression - `Nav.astro`'s header is unconditionally hidden
+under print media, so this change touches nothing `print-styles.spec.ts`
+exercises in the first place.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision, Nations League Team of the Tournament/attendance
+gaps, excluded World Cup/EURO attendance figures, the hyphenation-rendering
+visual re-check), tracked in `docs/ROADMAP.md`. With
+`prefers-reduced-transparency` now covered alongside every other
+`prefers-*`/`forced-colors` reader preference, and the five manual/
+intensive-run-only sweeps plus a full `WEBSITE_REQUIREMENTS.md` re-read all
+re-confirmed clean this run, a future pass's best bet is either a genuinely
+different quality angle not yet tried (the hundred-and-fifth run's own
+`src/pages/` route-tree prop-diff sweep suggestion remains open) or a fresh
+dependency-upgrade attempt next time `pnpm outdated` shows movement beyond
+the still-blocked `typescript` 7 entry.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

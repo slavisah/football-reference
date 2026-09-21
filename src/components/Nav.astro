@@ -238,6 +238,30 @@ function isCurrent(href: string): boolean {
     border-bottom: 1px solid var(--border);
   }
 
+  /* A reader with macOS/iOS "Reduce transparency" or the equivalent Windows
+     setting on gets `prefers-reduced-transparency: reduce` - distinct from
+     `prefers-reduced-motion` (this header has no motion to begin with) and
+     from `prefers-contrast` (a blurred, partly see-through header can still
+     pass a contrast check against whatever happens to be scrolled underneath
+     at the moment it's measured, then fail against different content a
+     second later, which is exactly the legibility complaint this media
+     feature exists to address - contrast math alone can't catch it). Swap
+     the translucent, blurred backdrop for the same token at full opacity and
+     drop the blur entirely, so header text and controls read against a
+     stable, known background instead of whatever scrolls past behind them.
+     Confirmed Chromium actually implements this media feature (distinct from
+     an unrecognized one, which a browser also reports as non-matching rather
+     than erroring) via a CDP `Emulation.setEmulatedMedia` round trip before
+     relying on it - the same confirm-before-depending-on-it method the
+     hundred-and-forty-first run's color-vision-deficiency work used for
+     `Emulation.setEmulatedVisionDeficiency`. */
+  @media (prefers-reduced-transparency: reduce) {
+    .site-header {
+      background: var(--bg-elevated);
+      backdrop-filter: none;
+    }
+  }
+
   /* Mobile first: the header row is brand + menu button only, and
      everything else (nav links, both search widgets, the language switch
      and the theme toggle) lives in the #site-menu drawer below it. The
