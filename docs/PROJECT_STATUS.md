@@ -27132,5 +27132,94 @@ verifying this one fix thoroughly (empirical computed-style check, full PDF
 regeneration, full standing health check) rather than rushing a wider,
 less-verified sweep.
 
+### Extended the print-color-adjust sweep the prior run suggested; found and fixed a worse instance (invisible button text, not just a missing bar) - closed 2026-09-21 (hundred-and-fifty-ninth intensive run)
+
+A standing health check first (all clean: `pnpm install`, `pnpm outdated`
+still only the blocked `typescript` 7 entry, `pnpm lint` 0 errors/0
+warnings/1 hint, `pnpm test` 751/751, `pnpm build` 711 pages, all 18 fast
+`check:*` scripts clean).
+
+Took up the hundred-and-fifty-eighth run's own suggestion directly: swept
+`src/` for other `background`-only visual elements sharing
+`ChampionsSummary.astro`'s print-color-adjust gap, rather than assuming that
+component was the only instance. Grepped every `background:` declaration in
+`src/components/*.astro` and `src/pages/**/*.astro` and checked each
+against two questions: (1) does it encode information only via color/fill
+(like the champions bar), and (2) is it paired with a light-on-dark or
+dark-on-light text color that would become illegible if the background
+alone failed to print? Most hits (`PodiumCards.astro`, `ChampionsTimeline.astro`,
+`OnThisDay.astro`, `EditionView.astro`, `SectionJumpNav.astro`, the
+`compare`/`compare-players`/`records` page pairs) turned out to be
+`--bg-elevated`/`--bg-subtle`/`--bg` card backdrops - already effectively
+white under print (this file's own `@media print` block resets those three
+tokens to `#ffffff` in its `:root` override), so losing the background
+declaration changes nothing visible against an already-white page; not a
+bug. `TournamentTable.astro`'s `.t-table td.is-winner` background tint is
+scoped inside a `@media (max-width: 40rem)` mobile-card block that print
+media doesn't match, so it never applies on paper either way.
+
+Found a real, worse-in-kind instance: four call sites
+(`index.astro`/`hr/index.astro`'s `.btn--primary` hero CTA button;
+`QuizCard.astro`/`QuizOrderCard.astro`'s shared `.quiz-card__check` "Check
+answer" button - both components scope-style the identical class name, so
+they share one fix) pair `background: var(--accent)` with `color:
+var(--accent-contrast)`, which resolves to `#ffffff` (pure white) in the
+light theme - the default this print block's own color resets already
+assume. Unlike the champions bar (which just leaves a blank gap when its
+background fails to print), these buttons keep their `color` declaration
+applying regardless of `print-color-adjust` - only `background-color`/
+`background-image`/`box-shadow` are subject to the browser's print
+default, never `color` - so a reader's default Ctrl+P renders these
+buttons with fully white text and no background, i.e. completely
+illegible, not just visually degraded. Confirmed empirically exactly like
+the prior run's own method: a throwaway Playwright script
+(`page.emulateMedia({ media: 'print' })` against a running preview server,
+reading each button's computed `backgroundColor`/`color`/
+`print-color-adjust`) showed `print-color-adjust: economy` (the unset
+default) with `color: rgb(255, 255, 255)` on all three checked buttons
+(home EN, home HR, quiz EN) before the fix, and `print-color-adjust: exact`
+after it, with the accent background and white text both then eligible to
+print together as intended.
+
+Fixed by adding a second rule right after the existing
+`.champions__bar`/`.champions__bar-fill` one in `global.css`'s `@media
+print` block: `.btn--primary, .quiz-card__check { print-color-adjust:
+exact; -webkit-print-color-adjust: exact; }` - one plain selector covers
+both `QuizCard.astro` and `QuizOrderCard.astro` since global.css rules
+aren't scoped the way each component's own `<style>` block is. No test
+added, matching the prior run's own established standard for this class of
+two-property CSS fix verified empirically against a real rendered page
+rather than via a new unit test.
+
+Since `global.css` is a tracked PDF source (`scripts/pdf-pages.mjs`'s
+`GLOBAL_STYLES` constant), this again invalidated all 700 PDFs' freshness
+hashes - regenerated with `pnpm build:pdfs`
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`) and reverified `check:pdfs`/
+`check:pdf-outline` (700/700 both). The PDF build's own preview server (a
+separate `astro preview` instance on port 4399, not the shared
+`scripts/preview-daemon.mjs` one) died mid-run once with `ECONNREFUSED`
+when run concurrently with this run's own verification script's preview
+server on port 4321 plus `pnpm test`/`check:print-width` - a resource-
+contention flake in this environment, not a code bug; re-ran it in
+isolation afterward and it completed cleanly. Full standing health check
+re-run after: `pnpm lint` (0/0/1, unchanged), `pnpm test` (751/751,
+unchanged - CSS-only fix, no new unit-testable logic), `pnpm build` (711
+pages, unchanged), `check:print-width` (711/711, no overflow introduced),
+`check:pdfs`/`check:pdf-outline` (700/700 both after regeneration), full
+cold-start `pnpm test:e2e` run to completion with no regressions.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision, Nations League Team of the Tournament/attendance
+gaps, excluded World Cup/EURO attendance figures, the hyphenation-rendering
+visual re-check), tracked in `docs/ROADMAP.md`. This run's own sweep found
+no further instances after the two now-fixed components - the
+`print-color-adjust` failure class appears exhausted across `src/` (bar
+charts and accent-background buttons both covered now), so a future pass
+likely needs a genuinely different quality angle (a fresh
+`docs/WEBSITE_REQUIREMENTS.md` re-read against the live site, a `src/pages/`
+route-tree prop-diff sweep per the hundred-and-fifth run's own suggestion,
+or an accessibility/performance angle) rather than another print-CSS pass.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
