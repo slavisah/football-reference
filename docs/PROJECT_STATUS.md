@@ -27484,5 +27484,99 @@ stable, or extend its method to other freeform Croatian text if any is
 found elsewhere on the site (a quick sweep this run didn't find any - every
 other Croatian string is short/templated and already covered structurally).
 
+### Full standing health check, re-tried the two open network-access-blocked items with `WebSearch` and precisely re-scoped the blocker - closed 2026-09-21 (hundred-and-sixty-second intensive run)
+
+A standing health check first, run in full including every manual/
+intensive-run-only sweep (not just the fast ones): `pnpm install
+--frozen-lockfile`, `pnpm outdated` (still only the blocked `typescript` 7
+entry, re-confirmed via `npm view @astrojs/check@latest peerDependencies`),
+`pnpm audit` (0 vulnerabilities), `pnpm lint` (0 errors/0 warnings/1
+pre-existing hint), `pnpm test` (751/751), `pnpm test:coverage`
+(99.91%/99.31% statement/branch, matching the hundred-and-sixty-first run's
+baseline exactly), `pnpm build` (711 pages), all 17 fast `check:*` scripts,
+`check:spelling-hr` (57 unique Croatian note-card blocks, clean),
+`check:html` (711/711 valid), `check:reflow`/`check:text-zoom`/
+`check:print-width` (711/711 clean at 320px, 200% zoom and print media
+respectively), `check:lighthouse` (37 pages, every one 1.00/1.00/1.00/1.00
+performance/accessibility/best-practices/SEO), `check:pdfs`/
+`check:pdf-outline` (700/700 each, no drift), and `pnpm dlx knip
+--no-config-hints` (the same two confirmed-false-positive findings as every
+prior run). Nothing needed fixing - a genuinely clean baseline across every
+angle this project checks.
+
+With `docs/ROADMAP.md`'s open backlog still entirely blocked (network
+access or human sign-off) and no new untried quality angle turning up after
+a careful read of every backlog item plus a fresh look for anything else
+(placeholder/TODO markers in `content/*.md`: none; further `prefers-*`/
+`forced-colors` media features: all already covered, including the
+hundred-and-sixtieth run's `prefers-reduced-transparency` addition;
+shareable-URL-filter coverage per `AGENTS.md` rule 9: already swept
+repeatedly), this run tested something the "needs broader network access"
+blockers had never precisely distinguished before: whether `WebSearch`
+(distinct from the `WebFetch`/direct-fetch calls every prior run's
+blocker note referenced) actually works in this environment, and if so,
+whether it's enough to clear the two backlog items gated on it.
+
+It does work: `WebSearch` returned real, sourced results (confirmed
+against `en.wikipedia.org` and `www.uefa.com`-hosted pages showing up in
+result snippets). `WebFetch` itself stays blocked for both domains
+(`EGRESS_BLOCKED` from the proxy) - so the blocker isn't Wikipedia-specific
+the way `docs/ROADMAP.md` previously implied, it's a general block on
+direct fetches to reference domains, confirmed against a second domain for
+the first time this run.
+
+Re-tried both `WebSearch`-gated backlog items with that tool now confirmed
+working, rather than assuming the old "no network access" note still
+applied unchanged:
+
+- **Nations League Team of the Tournament (2021/2023/2025):** `WebSearch`
+  surfaces a Player of the Tournament for 2023 (Rodri) but no complete
+  eleven-name Best XI for any of the three editions across several
+  differently-worded queries. Same negative result every prior run
+  reached - now confirmed with a tool that has live web access, not a
+  training-data cutoff limitation, closing off "maybe a fresher tool would
+  find it" as a remaining excuse.
+- **Nations League attendance figures:** every `WebSearch` result for the
+  2023 Finals final, and for 2021's and 2025's finals, traced back to the
+  same single Wikipedia-derived figure per match (41,110 for 2023, 31,511
+  for 2021) with no second, independently-*sourced* figure appearing in any
+  result snippet - only mirrors/restatements of that one number. This
+  site's own editorial bar (`content/uefa-nations-league.md`'s "Final
+  venues" intro note) requires two independent sources before reporting a
+  figure; a search engine's synthesis of one underlying source, however
+  many pages repeat it, doesn't clear that bar. `WebFetch` to `uefa.com`
+  (which might carry the competition's own official figure, a genuinely
+  independent second source) is blocked the same way as every other
+  reference domain, so there's no way to read a primary source directly
+  here - only a search engine's summary of one.
+
+Neither item is closed - both stay open, exactly as before - but
+`docs/ROADMAP.md` previously described them as blocked on "network access"
+as an undifferentiated whole, which understated how close they actually
+are: a session with `WebFetch`/direct-fetch access to `uefa.com` (not
+necessarily full unrestricted egress) would likely be enough to resolve the
+attendance figures, since `WebSearch` already handles the "find the number"
+half and only the "read a second primary source directly" half is still
+missing. Updated `docs/ROADMAP.md`'s three affected entries
+(`docs/SOURCES.md` link-liveness, Nations League Team of the Tournament,
+Nations League attendance) with this precise finding, so a future run
+doesn't re-spend a cycle re-discovering that `WebSearch` alone isn't
+enough - it can start from "try `WebFetch` to `uefa.com` specifically"
+instead of re-testing whether any network access exists at all.
+
+No content or code changed this run (`docs/ROADMAP.md` only), so
+`pnpm test`/`pnpm build`/`check:pdfs` all stayed at their pre-run baseline
+with nothing to regenerate.
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, the `long-title` brand-suffix decision, excluded World
+Cup/EURO attendance figures, the hyphenation-rendering visual re-check),
+tracked in `docs/ROADMAP.md` - now with `docs/SOURCES.md` link-liveness and
+both Nations League items re-scoped as above. The most promising concrete
+next step for either Nations League item, or the link-liveness sweep, is a
+session with `WebFetch` access specifically to `uefa.com` (confirmed
+`WebSearch`-reachable, still `WebFetch`-blocked here) rather than another
+broad "does any network access exist" re-test.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
