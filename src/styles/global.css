@@ -578,4 +578,23 @@ main {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
+
+  /* Same root cause as the champions bar above, but a worse symptom: these
+     buttons (index.astro/hr/index.astro's ".btn--primary" hero CTA;
+     QuizCard.astro/QuizOrderCard.astro's shared ".quiz-card__check" - both
+     files scope-style the same class name, so one plain selector here covers
+     both) pair `background: var(--accent)` with `color:
+     var(--accent-contrast)`, which is white in the light theme (the
+     `:root`/`data-theme='light'` default this print block itself assumes -
+     see its own `--text`/`--bg` resets above). Confirmed empirically
+     (`page.emulateMedia({ media: 'print' })` + computed style) that without
+     this override, a reader's default Ctrl+P drops the accent background
+     (print-color-adjust's browser-default `economy`) but keeps the white
+     text color as-is - not just a missing decoration like the bar above, but
+     genuinely illegible white-on-white button text. */
+  .btn--primary,
+  .quiz-card__check {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
 }
