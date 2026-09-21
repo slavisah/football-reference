@@ -22,6 +22,9 @@ importers:
       '@axe-core/playwright':
         specifier: ^4.13.0
         version: 4.13.0(playwright-core@1.63.0)
+      '@cspell/dict-hr-hr':
+        specifier: ^3.1.2
+        version: 3.1.2
       '@playwright/test':
         specifier: ^1.63.0
         version: 1.63.0
@@ -355,6 +358,9 @@ packages:
 
   '@cspell/dict-haskell@4.0.6':
     resolution: {integrity: sha512-ib8SA5qgftExpYNjWhpYIgvDsZ/0wvKKxSP+kuSkkak520iPvTJumEpIE+qPcmJQo4NzdKMN8nEfaeci4OcFAQ==}
+
+  '@cspell/dict-hr-hr@3.1.2':
+    resolution: {integrity: sha512-P6vIYN0DI3OoLZ/4sFgZj3Qjfn8V93LhKP6V4SVhFzARNWh2MfkFNuDcTza6+5Qcwl/Gv7moRbPUmvX+GwWVGw==}
 
   '@cspell/dict-html-symbol-entities@4.0.5':
     resolution: {integrity: sha512-429alTD4cE0FIwpMucvSN35Ld87HCyuM8mF731KU5Rm4Je2SG6hmVx7nkBsLyrmH3sQukTcr1GaiZsiEg8svPA==}
@@ -2990,6 +2996,8 @@ snapshots:
   '@cspell/dict-google@1.0.9': {}
 
   '@cspell/dict-haskell@4.0.6': {}
+
+  '@cspell/dict-hr-hr@3.1.2': {}
 
   '@cspell/dict-html-symbol-entities@4.0.5': {}
 
