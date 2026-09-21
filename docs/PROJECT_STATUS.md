@@ -27206,7 +27206,8 @@ re-run after: `pnpm lint` (0/0/1, unchanged), `pnpm test` (751/751,
 unchanged - CSS-only fix, no new unit-testable logic), `pnpm build` (711
 pages, unchanged), `check:print-width` (711/711, no overflow introduced),
 `check:pdfs`/`check:pdf-outline` (700/700 both after regeneration), full
-cold-start `pnpm test:e2e` run to completion with no regressions.
+cold-start `pnpm test:e2e` (1016/1016 passed, 16.5 minutes, unchanged count
+- presentation-only fix, no new `test()` blocks needed).
 
 **Left for a future pass:** the same environment-blocked items as ever
 (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
