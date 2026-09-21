@@ -58,18 +58,22 @@ describe('parseSizesAttribute', () => {
 });
 
 describe('extractOgImageMeta', () => {
-  it('extracts all four fields from a real-shaped head', () => {
+  it('extracts all six fields from a real-shaped head', () => {
     const html = `<head>
       <meta property="og:image" content="https://example.com/og-image.png" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
+      <meta property="og:image:alt" content="A football icon and wordmark." />
       <meta name="twitter:image" content="https://example.com/og-image.png" />
+      <meta name="twitter:image:alt" content="A football icon and wordmark." />
     </head>`;
     expect(extractOgImageMeta(html)).toEqual({
       ogImage: 'https://example.com/og-image.png',
       ogWidth: '1200',
       ogHeight: '630',
+      ogImageAlt: 'A football icon and wordmark.',
       twitterImage: 'https://example.com/og-image.png',
+      twitterImageAlt: 'A football icon and wordmark.',
     });
   });
 
@@ -78,14 +82,17 @@ describe('extractOgImageMeta', () => {
       ogImage: null,
       ogWidth: null,
       ogHeight: null,
+      ogImageAlt: null,
       twitterImage: null,
+      twitterImageAlt: null,
     });
   });
 
-  it('does not confuse og:image with og:image:width/height (prefix collision)', () => {
-    const html = `<meta property="og:image:width" content="1200" /><meta property="og:image" content="https://example.com/x.png" />`;
+  it('does not confuse og:image with og:image:width/height/alt (prefix collision)', () => {
+    const html = `<meta property="og:image:width" content="1200" /><meta property="og:image:alt" content="Alt text" /><meta property="og:image" content="https://example.com/x.png" />`;
     const result = extractOgImageMeta(html);
     expect(result.ogImage).toBe('https://example.com/x.png');
     expect(result.ogWidth).toBe('1200');
+    expect(result.ogImageAlt).toBe('Alt text');
   });
 });

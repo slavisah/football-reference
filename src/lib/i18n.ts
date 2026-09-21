@@ -109,6 +109,10 @@ const UI_STRINGS = {
     hr: 'Popis igrača trenutno nije dostupan.',
   },
   navMoreLabel: { en: 'More', hr: 'Više' },
+  ogImageAlt: {
+    en: 'The site\'s football-icon mark and wordmark, "The Ultimate Football Reference," with a tagline listing FIFA World Cup, UEFA EURO, Copa América, UEFA Nations League, Ballon d\'Or and Golden Boot.',
+    hr: 'Znak s ikonom lopte i natpisom "The Ultimate Football Reference", s popisom FIFA Svjetsko prvenstvo, UEFA Europsko prvenstvo, Copa América, UEFA Liga nacija, Zlatna lopta i Zlatna kopačka.',
+  },
 } as const;
 
 export type UiStringKey = keyof typeof UI_STRINGS;

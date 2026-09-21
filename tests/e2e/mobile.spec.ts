@@ -3766,6 +3766,14 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
       'content',
       '630',
     );
+    // A screen-reader user browsing a link-preview card needs a text
+    // description of that shared og-image.png, the same way an <img> needs
+    // an alt attribute on the page itself - see BaseLayout.astro's own
+    // comment on these two tags.
+    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
+      'content',
+      /FIFA World Cup/,
+    );
     await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
       'content',
       'summary_large_image',
@@ -3773,6 +3781,10 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute(
       'content',
       `${SITE}/og-image.png`,
+    );
+    await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute(
+      'content',
+      /FIFA World Cup/,
     );
   });
 
@@ -3791,6 +3803,12 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute(
       'content',
       'hr_HR',
+    );
+    // The image itself is the same og-image.png on every page/language, but
+    // the alt text describing it is localized like every other UI string.
+    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
+      'content',
+      /FIFA Svjetsko prvenstvo/,
     );
     await expect(page.locator('link[rel="alternate"][hreflang="hr"]')).toHaveAttribute(
       'href',

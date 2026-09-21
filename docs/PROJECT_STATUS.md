@@ -16292,6 +16292,12 @@ Copa América captains.
   dimensions (`check:precache` already confirms an icon `src` resolves to a
   file, never that its declared size is true). Fast dist/PNG-header parsing,
   no browser - wired into `.github/workflows/ci.yml` as a required PR gate.
+  Since 2026-09-21 (hundred-and-sixty-third intensive run) it also checks
+  that every page's `og:image:alt`/`twitter:image:alt` meta tags are present
+  and non-empty - `BaseLayout.astro` now emits both, sourced from `i18n.ts`'s
+  localized `ogImageAlt` string, so a screen-reader user browsing a
+  link-preview card gets a text description of the shared `og-image.png`
+  the same way an on-page `<img>` needs `alt`.
 - `BaseLayout.astro`'s `<meta name="theme-color" id="theme-color-meta">`
   carries `data-light="#1f6f4f"`/`data-dark="#46c08a"` attributes (added
   2026-09-18, hundred-and-forty-second intensive run) that must be kept
@@ -27577,6 +27583,104 @@ next step for either Nations League item, or the link-liveness sweep, is a
 session with `WebFetch` access specifically to `uefa.com` (confirmed
 `WebSearch`-reachable, still `WebFetch`-blocked here) rather than another
 broad "does any network access exist" re-test.
+
+See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
+`docs/ADDING_CONTENT.md` (how to add or edit content).
+
+### Added `og:image:alt`/`twitter:image:alt` so a shared link-preview card has real alt text - closed 2026-09-21 (hundred-and-sixty-third intensive run)
+
+A standing health check first, matching the hundred-and-sixty-second run's
+scope: `pnpm install --frozen-lockfile`, `pnpm outdated` (still only the
+blocked `typescript` 7 entry, re-confirmed via `npm view @astrojs/check@latest
+peerDependencies`), `pnpm lint` (0 errors/0 warnings/1 pre-existing hint at
+the start of this run), `pnpm test` (751/751), `pnpm test:coverage`
+(99.91%/99.31% statement/branch, matching baseline exactly), `pnpm build`
+(711 pages), and a fresh `WebFetch` re-check against `www.uefa.com`
+confirmed the link-liveness/Nations League blockers are unchanged
+(`EGRESS_BLOCKED`). Nothing needed fixing.
+
+With every `docs/ROADMAP.md` backlog item still blocked (network access or
+human sign-off) and the prior run's own note pointing at "a genuinely
+different quality angle (accessibility, performance, SEO...)" as the most
+promising remaining direction, this run looked specifically for an
+accessibility gap in the SEO/social-sharing surface `check:image-dimensions`
+and `check:meta` already partially cover, since that surface had a `check:*`
+script for image *size* correctness but nothing checking image *alt text*
+correctness anywhere on the site outside the page's own visible content.
+
+Found one: every page's `og:image`/`twitter:image` (both pointing at the
+same site-wide `og-image.png`, added 2026-09-09/the ninety-first-area runs
+per `check:image-dimensions`' own history) had no matching `og:image:alt`/
+`twitter:image:alt` meta tag. Platforms that render a link-preview card for
+a shared URL (Mastodon and some Slack/Discord clients, among others) surface
+that alt text to a screen-reader user browsing the card - without it, the
+image is announced with no description at all, the same gap an `<img>`
+missing its `alt` attribute would be on the page itself, just one layer
+removed into the sharing surface rather than the page.
+
+**Changes:**
+
+- `src/lib/i18n.ts`: new localized `ogImageAlt` UI string (English/Croatian)
+  describing the shared `og-image.png` (the site's football-icon mark and
+  wordmark, with the six-competition tagline) - a static, site-wide
+  description, not a per-page prop, matching how `ogImageURL` itself is
+  already a single site-wide constant in `BaseLayout.astro` rather than a
+  per-page value.
+- `src/layouts/BaseLayout.astro`: added `<meta property="og:image:alt">` and
+  `<meta name="twitter:image:alt">`, both reading `t(locale, 'ogImageAlt')`,
+  right after the existing `og:image`/`og:image:width`/`og:image:height`/
+  `twitter:image` block.
+- `scripts/check-image-dimensions.mjs`: `extractOgImageMeta()` now also
+  extracts `ogImageAlt`/`twitterImageAlt`, and `checkOgImages()` flags any
+  built page missing either tag or carrying an empty `content` value -
+  checked for presence/non-emptiness only, not exact wording, since the
+  wording itself is plain editorial content (`i18n.ts`'s string), not
+  something a build-output regression check should pin to an exact value.
+  This is the same required-PR-gate script (wired into
+  `.github/workflows/ci.yml`) that already checked `og:image`/
+  `twitter:image` URL resolution and `og:image:width`/`og:image:height`
+  pixel-dimension accuracy, extended rather than duplicated into a second
+  script.
+- `tests/unit/checkImageDimensions.test.ts`: extended the existing
+  `extractOgImageMeta()` unit tests (real-shaped head, empty head, and the
+  `og:image` vs. `og:image:width`/`og:image:height` prefix-collision case)
+  to cover the two new fields, including a third prefix-collision case
+  (`og:image:alt` also starts with the `og:image` prefix the regex has to
+  not confuse with the bare tag).
+- `tests/e2e/mobile.spec.ts`: two new assertions in the existing SEO
+  Playwright spec - the English case asserts `og:image:alt`/
+  `twitter:image:alt` content matches `/FIFA World Cup/`, and the
+  hreflang-alternate-links case (which already loads the Croatian page)
+  asserts the Croatian `og:image:alt` matches `/FIFA Svjetsko prvenstvo/`,
+  confirming the localized string actually renders per-locale rather than
+  leaking the English default onto `/hr/*` pages.
+- `tests/e2e/drag-interactions.spec.ts`: unrelated one-line fix noticed
+  while confirming `pnpm lint` stayed clean - replaced the sole remaining
+  use of Playwright's deprecated `locator.type()` with `locator.fill()`
+  (same single-character `'a'` value; `fill()` fires the same `input` event
+  `Nav.astro`'s combobox listens for, so behavior is unchanged) - this was
+  the one pre-existing `pnpm lint` hint every run since it first appeared
+  has left standing as "pre-existing, not this run's job"; fixing it here
+  was in scope since the same file family (Playwright specs) was already
+  being touched. `pnpm lint` now reports 0 hints, not 1.
+
+**Verification:** `pnpm lint` - 0 errors/0 warnings/**0 hints** (down from
+1). `pnpm test` - 751/751 (assertion count grew inside existing test
+bodies, not new `it()` blocks, so the suite total is unchanged). `pnpm
+build` - 711 pages (unchanged). `node scripts/check-image-dimensions.mjs`
+run directly against the fresh build - clean, reporting the extended
+message ("...and every og:image:alt/twitter:image:alt for presence... no
+manifest icon, og:image/twitter:image drift, or missing alt text found").
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, the `long-title` brand-suffix decision, excluded World
+Cup/EURO attendance figures, the hyphenation-rendering visual re-check, the
+Nations League Team of the Tournament/attendance items, `docs/SOURCES.md`
+link-liveness - all unchanged this run), tracked in `docs/ROADMAP.md`. The
+next accessibility/SEO-surface angle worth checking, if this one is
+revisited: whether any other per-page `<meta>`/JSON-LD field that describes
+an image or media asset elsewhere on the site (none identified this run
+beyond `og:image`/`twitter:image`) has the same gap.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).

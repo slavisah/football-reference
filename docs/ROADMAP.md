@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (162 intensive runs as of 2026-09-21) lives
+verification sweep and decision (163 intensive runs as of 2026-09-21) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -45,8 +45,10 @@ manual/intensive-run-only rather than a required PR gate; `check:spelling-hr`
 is fast but also manual/intensive-run-only for now, since its ignore-list
 dictionary is new - see `docs/PROJECT_STATUS.md`'s hundred-and-sixty-first
 run entry), `pnpm audit`, and `pnpm dlx knip --no-config-hints`. As of the
-hundred-and-sixty-second run (2026-09-21): 751/751 unit tests, 99.91%/99.31%
+hundred-and-sixty-third run (2026-09-21): 751/751 unit tests, 99.91%/99.31%
 statement/branch coverage, 711 pages built, zero `pnpm audit` vulnerabilities,
+`pnpm lint` at 0 errors/0 warnings/0 hints (the one standing pre-existing
+hint, a deprecated Playwright `locator.type()` call, was fixed this run),
 and two standing `knip` false positives: `scripts/test-preview-server.mjs`
 (used only as a Playwright `webServer.command`, never imported) and
 `@cspell/dict-hr-hr` (used only via `.cspell/hr-notes.cspell.json`'s
