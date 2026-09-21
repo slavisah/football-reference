@@ -430,18 +430,23 @@ export function buildPlayersDirectoryItemList(
  * different question shape schema.org has no equivalent property for, so
  * folding them in here would misrepresent the format rather than describe it
  * accurately.
+ *
+ * `dateModified` (optional) is `CreativeWork`'s freshness property - `Quiz`
+ * qualifies (a `LearningResource`, a `CreativeWork` subtype) - and reuses the
+ * page's own editorial `lastReviewed` date when the caller passes one.
  */
 export function buildQuizJsonLd(
   questions: QuizQuestion[],
-  options: { pageUrl: string; name: string },
+  options: { pageUrl: string; name: string; dateModified?: string },
 ): JsonLdObject {
-  const { pageUrl, name } = options;
+  const { pageUrl, name, dateModified } = options;
   return {
     '@context': 'https://schema.org',
     '@type': 'Quiz',
     name,
     url: pageUrl,
     about: 'Football history',
+    ...(dateModified ? { dateModified } : {}),
     hasPart: questions.map((question) => ({
       '@type': 'Question',
       name: question.prompt,
@@ -458,17 +463,22 @@ export function buildQuizJsonLd(
  * DefinedTerm per entry, reusing the exact GlossaryEntry[] the page itself
  * renders (src/lib/glossary.ts's parseGlossaryEntries()), so the structured
  * data can never list a term the visible page doesn't also explain.
+ *
+ * `dateModified` (optional) is `CreativeWork`'s freshness property -
+ * `DefinedTermSet` qualifies - and reuses the page's own editorial
+ * `lastReviewed` date when the caller passes one.
  */
 export function buildDefinedTermSet(
   entries: { term: string; definition: string }[],
-  options: { pageUrl: string; name: string },
+  options: { pageUrl: string; name: string; dateModified?: string },
 ): JsonLdObject {
-  const { pageUrl, name } = options;
+  const { pageUrl, name, dateModified } = options;
   return {
     '@context': 'https://schema.org',
     '@type': 'DefinedTermSet',
     name,
     url: pageUrl,
+    ...(dateModified ? { dateModified } : {}),
     hasDefinedTerm: entries.map((entry) => ({
       '@type': 'DefinedTerm',
       name: entry.term,
@@ -555,12 +565,17 @@ export function withInLanguage(items: JsonLdObject[], locale: string): JsonLdObj
  * "@context" removal - nesting keeps its own "@type" (still 'ItemList') since
  * that's what tells a consumer what kind of mainEntity it's looking at; only
  * "@context" is document-level and doesn't belong repeated on a nested node.
+ *
+ * `dateModified` (optional) is `CreativeWork`'s freshness property -
+ * `CollectionPage` (a `WebPage`, itself `CreativeWork`) qualifies - and
+ * reuses the page's own editorial `lastReviewed` date when the caller passes
+ * one.
  */
 export function buildCollectionPageJsonLd(
   mainEntity: JsonLdObject | JsonLdObject[],
-  options: { pageUrl: string; name: string; description?: string },
+  options: { pageUrl: string; name: string; description?: string; dateModified?: string },
 ): JsonLdObject {
-  const { pageUrl, name, description } = options;
+  const { pageUrl, name, description, dateModified } = options;
   const stripContext = (item: JsonLdObject): JsonLdObject => {
     const { '@context': _context, ...rest } = item;
     return rest;
@@ -571,6 +586,7 @@ export function buildCollectionPageJsonLd(
     name,
     url: pageUrl,
     ...(description ? { description } : {}),
+    ...(dateModified ? { dateModified } : {}),
     mainEntity: Array.isArray(mainEntity) ? mainEntity.map(stripContext) : stripContext(mainEntity),
   };
 }

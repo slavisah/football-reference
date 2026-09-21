@@ -98,7 +98,7 @@ const jsonLd = [
         unit: ['award', 'awards'],
       }),
     ],
-    { pageUrl, name: worldCup.title },
+    { pageUrl, name: worldCup.title, dateModified: worldCup.lastReviewed },
   ),
   buildLatestEditionSportsEvent(worldCup.editions, 'FIFA World Cup Golden Boot'),
   buildLatestEditionSportsEvent(euro.editions, 'UEFA EURO Golden Boot'),
@@ -110,6 +110,7 @@ const jsonLd = [
   description="FIFA World Cup and UEFA EURO top-scorer awards, with player, team and goals. Filter each table by player, year and team."
   alternateHref={withBase('/hr/competitions/golden-boot')}
   jsonLd={jsonLd}
+  dateModified={worldCup.lastReviewed}
 >
   <article class="competition stack">
     <header class="competition__header">

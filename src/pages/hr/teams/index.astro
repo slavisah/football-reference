@@ -51,7 +51,7 @@ const jsonLd: JsonLdObject[] = [
       describe: (record) =>
         `${record.totalTitles} naslova, ${record.totalRunnerUps} drugih mjesta, ${record.totalFinals} odigranih finala na Svjetskom prvenstvu, EURU, Copa Américi i Ligi nacija`,
     }),
-    { pageUrl: teamsPageUrl, name: teamsName },
+    { pageUrl: teamsPageUrl, name: teamsName, dateModified: lastReviewed },
   ),
 ];
 ---
@@ -62,6 +62,7 @@ const jsonLd: JsonLdObject[] = [
   locale="hr"
   alternateHref={withBase('/teams')}
   jsonLd={jsonLd}
+  dateModified={lastReviewed}
 >
   <article class="teams stack">
     <header class="teams__header">

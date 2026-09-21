@@ -81,7 +81,7 @@ const jsonLd = [
         unit: ['nagrada', 'nagrade'],
       }),
     ],
-    { pageUrl, name: title },
+    { pageUrl, name: title, dateModified: worldCup.lastReviewed },
   ),
   buildLatestEditionSportsEvent(worldCup.editions, 'Zlatna kopačka Svjetskog prvenstva'),
   buildLatestEditionSportsEvent(euro.editions, 'Zlatna kopačka EURA'),
@@ -182,6 +182,7 @@ const headerLabels: Record<string, string> = {
   locale="hr"
   alternateHref={withBase('/competitions/golden-boot')}
   jsonLd={jsonLd}
+  dateModified={worldCup.lastReviewed}
 >
   <article class="competition stack">
     <header class="competition__header">

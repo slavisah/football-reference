@@ -11,6 +11,8 @@ import { truncateDescription } from '../lib/text';
 interface Props {
   title: string;
   description?: string;
+  /** This page's own editorial `lastReviewed` date (YYYY-MM-DD), when the page has one - renders as `og:updated_time` below. Omitted for the home page and 404, which have no content-file date source. */
+  dateModified?: string;
   /** Defaults to 'en'; only pages with a translation pass this. */
   locale?: Locale;
   /** The equivalent page in the other language, if one exists. */
@@ -26,6 +28,7 @@ interface Props {
 const {
   title,
   description,
+  dateModified,
   locale = 'en',
   alternateHref,
   jsonLd = [],
@@ -196,7 +199,13 @@ const structuredData = withInLanguage(
     surfaces alt text for it (e.g. Mastodon, some Slack/Discord clients) -
     the same image every page already links via og:image/twitter:image
     above, so this is a site-wide static string rather than a per-page prop,
-    same as ogImageURL itself. */}
+    same as ogImageURL itself.
+    og:updated_time (not article:modified_time) carries this page's own
+    `lastReviewed` editorial date as its page-freshness signal - this site's
+    og:type is always "website" (see below), never "article", and
+    article:modified_time is only valid Open Graph vocabulary under
+    og:type=article. og:updated_time is the generic, type-agnostic
+    equivalent, so it works here without that mismatch. */}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="The Ultimate Football Reference" />
     <meta property="og:title" content={fullTitle} />
@@ -208,6 +217,7 @@ const structuredData = withInLanguage(
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={t(locale, 'ogImageAlt')} />
+    {dateModified && <meta property="og:updated_time" content={dateModified} />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     {metaDescription && <meta name="twitter:description" content={metaDescription} />}
