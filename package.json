@@ -40,7 +40,8 @@
     "check:link-names": "node scripts/check-link-names.mjs",
     "check:image-dimensions": "node scripts/check-image-dimensions.mjs",
     "check:locale-consistency": "node scripts/check-locale-consistency.mjs",
-    "check:spelling": "cspell --no-progress \"content/**/*.md\""
+    "check:spelling": "cspell --no-progress \"content/**/*.md\"",
+    "check:spelling-hr": "node scripts/check-spelling-hr.mjs"
   },
   "dependencies": {
     "astro": "^7.3.3"
@@ -48,6 +49,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@axe-core/playwright": "^4.13.0",
+    "@cspell/dict-hr-hr": "^3.1.2",
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.6.2",
     "@vitest/coverage-v8": "5.0.1",

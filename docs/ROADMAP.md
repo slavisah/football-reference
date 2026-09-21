@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (160 intensive runs as of 2026-09-21) lives
+verification sweep and decision (161 intensive runs as of 2026-09-21) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -38,15 +38,21 @@ what exists and any standing quirks.
 
 Every recent run's standing health check comes back clean run after run:
 `pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm test`/`pnpm
-test:coverage`/`pnpm build`, all 24 `check:*` scripts (19 fast enough to run
+test:coverage`/`pnpm build`, all 25 `check:*` scripts (19 fast enough to run
 every time; `check:lighthouse`/`check:reflow`/`check:text-zoom`/
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
-manual/intensive-run-only rather than a required PR gate), `pnpm audit`, and
-`pnpm dlx knip --no-config-hints`. As of the hundred-and-fifty-sixth run
-(2026-09-20): 751/751 unit tests, 99.91%/99.31% statement/branch coverage,
-711 pages built, zero `pnpm audit` vulnerabilities, and one standing `knip`
-false positive (`scripts/test-preview-server.mjs`, used only as a Playwright
-`webServer.command`, never imported - not actually unused).
+manual/intensive-run-only rather than a required PR gate; `check:spelling-hr`
+is fast but also manual/intensive-run-only for now, since its ignore-list
+dictionary is new - see `docs/PROJECT_STATUS.md`'s hundred-and-sixty-first
+run entry), `pnpm audit`, and `pnpm dlx knip --no-config-hints`. As of the
+hundred-and-sixty-first run (2026-09-21): 751/751 unit tests, 99.91%/99.31%
+statement/branch coverage, 711 pages built, zero `pnpm audit` vulnerabilities,
+and two standing `knip` false positives: `scripts/test-preview-server.mjs`
+(used only as a Playwright `webServer.command`, never imported) and
+`@cspell/dict-hr-hr` (used only via `.cspell/hr-notes.cspell.json`'s
+`"import"` field, never a JS `import` - added the hundred-and-sixty-first
+run for `check:spelling-hr`) - neither actually unused, knip's static
+analysis just can't see a reference inside a config-file string.
 
 ## Open backlog
 

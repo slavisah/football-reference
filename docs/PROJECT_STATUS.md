@@ -16228,6 +16228,24 @@ Copa América captains.
   this one *is* wired into `.github/workflows/ci.yml` as a required PR gate:
   a markdown-only wordlist check runs in well under a second, nothing like
   those tools' ~700-page-load sweeps.
+- `pnpm check:spelling-hr` (`scripts/check-spelling-hr.mjs`, `.cspell/
+  hr-notes.cspell.json`, added 2026-09-21, hundred-and-sixty-first intensive
+  run) is `check:spelling`'s Croatian counterpart: `@cspell/dict-hr-hr`
+  against every `.notes__card` section's text on every built `/hr/*` page,
+  deduplicated. `check:spelling` only ever covered `content/*.md` (English);
+  this site's hand-translated Croatian prose (typed directly into
+  `src/pages/hr/competitions/*.astro`, never sourced from `content/*.md` -
+  see `check:i18n-notes`'s header comment for why) had no spelling/wording
+  coverage at all until this run, and its first pass found a real, live
+  mistranslation this way (see that run's entry below). Its own custom
+  dictionary (`.cspell/football-names-hr.txt`) holds the Croatian-declined
+  forms `.cspell/football-names.txt`'s nominative-case entries don't cover
+  (Croatian is a case language); the config loads both dictionaries plus
+  `@cspell/dict-hr-hr`. Manual/intensive-run-only for now, alongside
+  `check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
+  `check:html`, not a required PR gate - its ignore-list dictionary is new
+  and hasn't yet proven itself false-positive-free across many runs the way
+  `football-names.txt` has.
 - `pnpm check:jsonld` (`scripts/check-jsonld.mjs`, added 2026-09-09,
   eighty-seventh intensive run) parses every `<script type="application/ld+json">`
   block on every built page and checks it structurally: a real
@@ -27344,6 +27362,127 @@ different quality angle not yet tried (the hundred-and-fifth run's own
 `src/pages/` route-tree prop-diff sweep suggestion remains open) or a fresh
 dependency-upgrade attempt next time `pnpm outdated` shows movement beyond
 the still-blocked `typescript` 7 entry.
+
+### Fixed a real Croatian mistranslation ("presporno" -> "previše") in Copa América's "Winning captains" note; added `check:spelling-hr`, the site's first automated Croatian spelling check - closed 2026-09-21 (hundred-and-sixty-first intensive run)
+
+A standing health check first: `pnpm install --frozen-lockfile`, `pnpm
+outdated` (still only the blocked `typescript` 7 entry - re-confirmed via
+`npm view @astrojs/check@latest peerDependencies`), `pnpm lint` (0 errors/0
+warnings/1 pre-existing hint), `pnpm test` (751/751), `pnpm build` (711
+pages), all clean, matching the hundred-and-sixtieth run's baseline exactly.
+
+With the open backlog in `docs/ROADMAP.md` entirely blocked (network access
+or human sign-off) and every angle the last several runs tried (print-color-
+adjust, every `prefers-*`/`forced-colors` media feature, the per-family
+route-tree prop-diff sweep) confirmed exhausted, this run looked for a
+genuinely untried verification method rather than re-running the existing 24
+`check:*` scripts (already reconfirmed clean above). `check:spelling`
+(`cspell.json`) has always been scoped to `content/**/*.md` only - English.
+This site's Croatian prose is not translated from `content/*.md` at build
+time; each of the six competition/award pages hand-writes its own Croatian
+`NoteSection[]` array directly in `src/pages/hr/competitions/*.astro` (the
+same intentional EN/HR decoupling `check:i18n-notes`'s header comment
+explains, so a hand-translated string can never accidentally leak English
+markup). That means this site's Croatian prose - the same freeform,
+paragraph-length hand-written text that `check:spelling` exists to catch
+typos in on the English side - has had zero automated spelling or
+word-choice coverage since the site existed, unlike every other
+content-integrity angle (20+ dedicated `check:*` scripts). The eighty-fifth
+run's own closing note once floated "a Croatian-aware spell-checker" as a
+future idea; never acted on in the ~75 runs since.
+
+Confirmed the npm registry itself (distinct from this environment's blocked
+direct fetches to reference/documentation domains like Wikipedia - the
+`docs/SOURCES.md` link-liveness blocker) is reachable: `npm view
+@cspell/dict-hr-hr version` resolved cleanly, so `pnpm add -D
+@cspell/dict-hr-hr` (an actively-maintained official cspell Croatian
+dictionary) was not blocked the way the network-dependent backlog items are.
+
+Built `scripts/check-spelling-hr.mjs`: extracts every `.notes__card`
+section's rendered text (tags stripped) from every built `/hr/*` page,
+deduplicated by exact text (identical prose reused verbatim across pages -
+e.g. a shared "Kako funkcionira" explainer - is checked once), and runs it
+through `cspell stdin` with a dedicated config
+(`.cspell/hr-notes.cspell.json`: `@cspell/dict-hr-hr` + `.cspell/
+football-names.txt` + a new `.cspell/football-names-hr.txt`). Deliberately
+scoped to `.notes__card` text only (order of 50-60 unique blocks), not every
+Croatian string on the site: it is this site's only freeform, paragraph-
+length hand-written Croatian - tables/labels/UI chrome are short, templated,
+and already covered structurally by `check:locale-consistency`/
+`check:i18n-notes`/`check:edition-header-labels` - and a corpus small enough
+that its ignore-list dictionary could be curated by hand rather than
+guessed at scale (a full-site sweep's first prototype produced hundreds of
+proper-noun-declension false positives with no realistic way to verify all
+of them safely in one unattended run).
+
+Curating `.cspell/football-names-hr.txt` (238 entries) surfaced the actual
+bug: after excluding proper nouns already covered by the existing English
+`.cspell/football-names.txt` (most names are spelled the same, modulo
+Croatian's case declensions - `Beckenbaueru`, `Jašina`, `Zagallu`, etc., not
+in the English list since those exact inflected forms never appear in
+`content/*.md`) and English award/competition-name fragments the site
+deliberately keeps untranslated (`Golden Boot`, `Final Four`, `FIFA`, ...),
+one lowercase, non-proper-noun word remained genuinely wrong rather than a
+dictionary gap: `src/pages/hr/competitions/copa-america.astro`'s "Kapetani
+prvaka" section (introduced by commit `c303485c`, 2026-09-04, "Recover 10 of
+14 missing Copa América winning-captains editions"; never touched by any of
+the ~60 intensive runs since) read "...ocijenio je cijelo razdoblje
+1975.-2010. presporno nepouzdanim za objavu...", translating
+`content/copa-america.md`'s "...found the whole 1975-2010 span too
+unreliable to ship...". "presporno" (from "sporno" - disputed/contentious, a
+different concept than unreliable) doesn't correspond to "too unreliable";
+sitting directly next to "nepouzdanim" ("unreliable") it read as two
+mismatched qualifiers rather than one coherent phrase. Croatian forms
+intensified adjectives with a `pre-` prefix the same way English uses "too"
+(`prevruće` = too hot, `prekasno` = too late), so "previše nepouzdanim" (or
+"prenepouzdanim") was clearly what was meant. Fixed by replacing
+"presporno" with "previše" - a one-word, single-occurrence fix, purely a
+translation-fidelity correction verifiable against the site's own English
+source sentence, no editorial/brand judgment involved.
+
+Verified the check actually catches this class of bug before relying on it:
+temporarily re-broke the same word into a nonsense token, rebuilt, confirmed
+`check:spelling-hr` flagged it at the right page with the right surrounding
+context, then restored the real fix and rebuilt clean. Wired as
+`pnpm check:spelling-hr` in `package.json`; left manual/intensive-run-only
+(joins `check:lighthouse`/`check:reflow`/`check:text-zoom`/
+`check:print-width`/`check:html` rather than `.github/workflows/ci.yml`) -
+its ignore-list dictionary is brand new and hasn't yet proven itself
+false-positive-free across many runs the way `football-names.txt` has;
+promote it to a required PR gate once it has.
+
+Full standing health check re-run after: `pnpm lint` (unchanged), `pnpm
+test` (751/751, unchanged - no unit-testable pure logic changed), `pnpm
+build` (711 pages, unchanged), `pnpm check:spelling-hr` (clean, 57 unique
+blocks checked), every other fast `check:*` script (`check:sitemap`/
+`check:precache`/`check:jsonld`/`check:heading-outline`/`check:theme-flash`/
+`check:reachability`/`check:meta`/`check:award-tallies`/
+`check:edition-header-labels`/`check:i18n-notes`/`check:attendance-format`/
+`check:link-names`/`check:image-dimensions`/`check:locale-consistency`/
+`check:spelling`/`check:links`/`check:perf`, all clean). `pnpm check:pdfs`
+correctly flagged `copa-america-hr.pdf` as stale after the content edit;
+regenerated the full PDF fleet with `pnpm build:pdfs`
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` - this environment's
+Chromium build lives at a version-pinned path the script's default
+Playwright resolution doesn't find, the same fallback the four Playwright
+sweep scripts already document needing), then reconfirmed both
+`pnpm check:pdfs` and `pnpm check:pdf-outline` clean (700/700 each). Every
+one of the 700 PDFs shows as changed in git despite only one page's content
+actually changing - `generate-pdfs.mjs` has no partial/selective-regeneration
+mode, so any content-affecting run regenerates and commits the entire fleet;
+confirmed this matches established practice (e.g. commit `74cf980a`'s own
+all-700-PDFs diff for a single-page CSS fix).
+
+**Left for a future pass:** the same environment-blocked items as ever
+(`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix decision, Nations League Team of the Tournament/attendance
+gaps, excluded World Cup/EURO attendance figures, the hyphenation-rendering
+visual re-check), tracked in `docs/ROADMAP.md`. `check:spelling-hr` checked
+only the six competition/award pages' note-card prose this run; a future
+pass could decide whether to promote it to a CI gate once it's proven
+stable, or extend its method to other freeform Croatian text if any is
+found elsewhere on the site (a quick sweep this run didn't find any - every
+other Croatian string is short/templated and already covered structurally).
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
