@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (168 intensive runs as of 2026-09-22) lives
+verification sweep and decision (169 intensive runs as of 2026-09-22) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -45,25 +45,43 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates,
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-sixty-eighth run (2026-09-22): 772/772 unit tests (5
-new, for `check-theme-color.mjs`'s `parseCssCustomProperty`/
-`parseThemeColorMeta` helpers - see below), `pnpm lint` at 0 errors/0
-warnings/0 hints, 711 pages built, zero `pnpm audit` vulnerabilities, and two
-standing `knip` false positives: `scripts/test-preview-server.mjs`
-(used only as a Playwright `webServer.command`, never imported) and
-`@cspell/dict-hr-hr` (used only via `.cspell/hr-notes.cspell.json`'s
-`"import"` field, never a JS `import` - added the hundred-and-sixty-first
-run for `check:spelling-hr`) - neither actually unused, knip's static
-analysis just can't see a reference inside a config-file string. The four
-manual browser sweeps (`check:lighthouse`/`check:reflow`/`check:text-zoom`/
-`check:print-width`) were last executed the hundred-and-sixty-seventh run
-(2026-09-22): `check:reflow`/`check:text-zoom`/`check:print-width`/
-`check:html` clean on all 711 pages, `check:lighthouse` clean on all 38
-audited pages (every category a perfect 1.00 except the 404-page entry's
-`seo`, a known/bounded/documented exception, not a regression) - not
-re-run the hundred-and-sixty-eighth run since nothing that run touched (a
-source-only, no-build/no-browser regex check) is in their scope; a future
-run should still re-confirm them fresh.
+As of the hundred-and-sixty-ninth run (2026-09-22): 772/772 unit tests
+(unchanged - this run's edit was a coverage-list addition to
+`check-lighthouse.mjs`, nothing a unit test targets), `pnpm lint` at 0
+errors/0 warnings/0 hints, 711 pages built, zero `pnpm audit`
+vulnerabilities, and two standing `knip` false positives:
+`scripts/test-preview-server.mjs` (used only as a Playwright
+`webServer.command`, never imported) and `@cspell/dict-hr-hr` (used only via
+`.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS `import` -
+added the hundred-and-sixty-first run for `check:spelling-hr`) - neither
+actually unused, knip's static analysis just can't see a reference inside a
+config-file string. `check:lighthouse` was re-run fresh the
+hundred-and-sixty-ninth run: clean on all 39 audited pages (38 -> 39, the
+new `hr home` entry - see below), every category a perfect 1.00 except the
+404-page entry's `seo`, a known/bounded/documented exception, not a
+regression. `check:reflow`/`check:text-zoom`/`check:print-width`/
+`check:html` were last executed the hundred-and-sixty-seventh run
+(2026-09-22), clean on all 711 pages - not re-run the hundred-and-sixty-
+eighth or -ninth run since neither run's change (a source-only regex check,
+then a one-line addition to a Lighthouse page list) is in their scope; a
+future run should still re-confirm them fresh.
+
+**Hundred-and-sixty-ninth run:** with the open backlog below still fully
+blocked (re-confirmed: no new `@astrojs/check` release; no new angle on the
+network-access or human-sign-off items), this run re-read the thirtieth
+run's own "one entry per page shape in both languages" bar for
+`check:lighthouse` coverage against the current 38-page `PAGES_TO_AUDIT`
+list and found one shape the hundred-and-sixty-seventh run's own "closed the
+last uncovered page shape" entry had missed: `home` (`/`) had an English
+entry but no Croatian one (`/hr/`) anywhere in the list, even though every
+other shape that run's twelve-page Croatian sweep covered got one. Home
+renders `OnThisDay.astro`'s widget alongside the top-level competition/award
+card grid - a layout no other page shares - so it was never part of that
+sweep's landing/edition/directory/profile/comparison shape list in the first
+place. Added `{ label: 'hr home', path: '/hr/' }` to `PAGES_TO_AUDIT`
+(38 -> 39 pages); it scores a perfect 1.00 on every category, identical to
+its English sibling. See `docs/PROJECT_STATUS.md`'s matching entry for full
+detail.
 
 **Hundred-and-sixty-eighth run:** with the open backlog below still fully
 blocked (re-confirmed: `WebFetch` to `en.wikipedia.org` still returns
@@ -81,23 +99,6 @@ checkThemeColor.test.ts`), wired into `.github/workflows/ci.yml` as a
 required gate, and sanity-checked it actually fails on a deliberately
 introduced mismatch before reverting. See `docs/PROJECT_STATUS.md`'s
 matching entry for full detail.
-
-**Hundred-and-sixty-seventh run:** closed the one remaining page shape with
-zero `check:lighthouse` coverage: `/404.html`, the site's shared bilingual
-error page. Added it to `scripts/check-lighthouse.mjs`'s `PAGES_TO_AUDIT`,
-which surfaced a real (if fully expected) below-budget score - `seo: 0.63`,
-entirely from Lighthouse's `is-crawlable` audit correctly flagging the
-page's own deliberate `noindex` tag, confirmed by a direct per-audit probe
-to be the *only* failing SEO audit on that page. Rather than silently raise
-the file's global `MIN_SCORE` or drop the page from coverage, added a
-named, bounded, unit-tested exception (`EXPECTED_SEO_EXCEPTIONS`/
-`isExpectedSeoException`) that only suppresses a `seo` score at or above the
-known noindex-penalty floor for that one page - a further regression on that
-page still fails loudly. Also re-tried the small, four-data-point "excluded
-historical attendance figures" item below via `WebSearch` (1930 World Cup
-final) - still a genuine, unresolved source conflict (68,346 official vs.
-90,000+ widely reported), same as already documented, so left as-is rather
-than guessed.
 
 ## Open backlog
 

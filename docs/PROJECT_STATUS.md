@@ -28133,3 +28133,87 @@ confirmation per the routine's own standing practice.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
+
+### Added `check:lighthouse` coverage for `/hr/`, the Croatian home page - the last remaining "one shape, one language" gap - closed 2026-09-22 (hundred-and-sixty-ninth intensive run)
+
+A standing health check first, everything unchanged from the
+hundred-and-sixty-eighth run's baseline before any edit: `pnpm install
+--frozen-lockfile` clean, `pnpm outdated` still only shows the blocked
+`typescript` 5.9.3 -> 7.0.2 bump, `pnpm lint` (0 errors/0 warnings/0 hints),
+`pnpm test` (772/772), `pnpm test:coverage` (99.91%/99.31%/100%/100%, same
+four pre-existing "defensively unreachable" lines `docs/ROADMAP.md` already
+documents), `pnpm build` (711 pages), all 20 CI-gated `check:*` scripts plus
+`check:html` clean, `pnpm audit` (0 vulnerabilities), and `pnpm dlx knip
+--no-config-hints` (the same two pre-existing false positives,
+`scripts/test-preview-server.mjs` and `@cspell/dict-hr-hr`). Re-confirmed
+`docs/ROADMAP.md`'s entire "Open backlog" is still genuinely blocked: no new
+`@astrojs/check` release, and no new angle on the network-access or
+human-sign-off items.
+
+With the backlog itself still fully blocked, this run re-examined
+`scripts/check-lighthouse.mjs`'s own `PAGES_TO_AUDIT` list - the same file
+the hundred-and-sixty-seventh run's "closed the last uncovered page shape"
+entry had already trimmed down to zero gaps once, by its own account. A
+careful re-read of the thirtieth run's own closing bar - "at least one entry
+per page shape in both languages" - against the actual 38-page list (as of
+the hundred-and-sixty-eighth run) turned up exactly one shape that still
+only had an English entry: `home` (`/`, `src/pages/index.astro`) had no
+Croatian counterpart (`/hr/`, `src/pages/hr/index.astro`) anywhere in the
+list, even though every other shape the thirtieth run's twelve-page Croatian
+sweep covered (landing pages, an edition page, both comparison tools, the
+directories, both profile types, `/glossary`, `/quiz`, `/about/sources`) did
+get its Croatian sibling audited that same run. Home was never part of that
+twelve-page sweep because it isn't a landing/edition/directory/profile/
+comparison shape at all - it is the one page that renders
+`OnThisDay.astro`'s "on this day" widget alongside the top-level
+competition/award card grid, a layout no other page shares - so it fell
+through the same kind of shape-classification gap `404.html` fell through
+until the hundred-and-sixty-seventh run named that one explicitly. Confirmed
+by grepping the full `PAGES_TO_AUDIT` array for every `path: '/hr` entry:
+twelve Croatian entries existed, `/hr/` itself was not one of them.
+
+Added `{ label: 'hr home', path: '/hr/' }` immediately after the existing
+`home` entry in `PAGES_TO_AUDIT`, plus a dated paragraph in the file's own
+running header comment (the same "one paragraph per run that widened this
+list" convention every prior addition since the sixteenth run has used) -
+no script logic changed, since this is purely a coverage-list addition, the
+same shape as the hundred-and-sixty-seventh run's 404 addition minus the
+need for a new exception (home has no `noindex` or other deliberate
+penalty).
+
+**Verification:** ran `pnpm build` then `PW_EXECUTABLE_PATH=/opt/pw-browsers/
+chromium pnpm run check:lighthouse` against the fresh build: 39 pages
+audited (38 -> 39), `hr home` scored a perfect 1.00 on all four categories
+(performance/accessibility/best-practices/SEO), identical to its English
+sibling, and every other page's score is unchanged from the
+hundred-and-sixty-eighth run's own run, including the pre-existing 404-page
+`seo: 0.63` exception (still correctly excluded via
+`EXPECTED_SEO_EXCEPTIONS`, still only one bounded exception). `pnpm lint`
+(0/0/0), `pnpm test` (772/772, unchanged - no test references
+`PAGES_TO_AUDIT` directly, only `scoresBelowMin`/`actionableBfCacheReasons`/
+`isExpectedSeoException`, none of which this edit touched), `pnpm build`
+(711 pages, unchanged - no new route, this only changed what an existing
+built page gets externally audited for) all re-run clean after the edit.
+`pnpm audit` (0 vulnerabilities) and `pnpm dlx knip --no-config-hints` (same
+two pre-existing false positives) re-run clean, unaffected by a
+comment-and-array-literal-only change to one script. No PDF regeneration
+needed - `check-lighthouse.mjs` is not a PDF source file and no page content
+changed.
+
+**Left for a future pass:** the same environment-blocked items as ever - see
+`docs/ROADMAP.md`'s "Open backlog", unchanged. `check:lighthouse`'s
+`PAGES_TO_AUDIT` now has a genuine Croatian-or-English entry for every
+distinct page shape on the site with no known gap remaining (39 pages); a
+future run should still treat this as re-openable rather than permanently
+closed, the same way the hundred-and-sixty-seventh run's own "last uncovered
+page shape" claim about 404 held for two runs before this run's closer
+re-read of the thirtieth run's own bar found one it had missed. The four
+other manual browser sweeps (`check:reflow`/`check:text-zoom`/
+`check:print-width`) and `pnpm test:e2e`'s full 952-test suite weren't
+re-run this run given the narrow, single-file scope of this run's change (a
+comment plus one array literal entry, no markup/CSS/behavior change to any
+page); nothing this run touched is in their scope, but a future run should
+still re-confirm them fresh per the routine's own standing practice.
+
+See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
+`docs/ADDING_CONTENT.md` (how to add or edit content).
