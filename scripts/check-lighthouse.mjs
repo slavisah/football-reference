@@ -129,8 +129,23 @@ const CDP_PORT = 9223;
 // `EXPECTED_SEO_EXCEPTIONS` below for how this known, bounded exception is
 // carved out of the budget check without silently raising `MIN_SCORE` (and
 // without hiding a future, different SEO regression on this same page).
+//
+// The hundred-and-sixty-ninth intensive run closed the last remaining gap in
+// that same "one entry per page shape in both languages" bar the thirtieth
+// run set: `hr` (the Croatian home page, `src/pages/hr/index.astro`) had
+// never been audited, even though its English sibling (`home`, the very
+// first entry in this list) was covered from the start. Home is its own
+// distinct shape - the only page rendering `OnThisDay.astro`'s "on this day"
+// widget plus the top-level competition/award card grid - not one of the
+// landing/edition/directory/profile/comparison shapes the thirtieth run's
+// twelve-page Croatian sweep already covered, so it slipped through that
+// sweep the way `404.html` slipped through every prior run's audit until the
+// hundred-and-sixty-seventh run named it explicitly. Added `hr home` right
+// after the English `home` entry; it scores the same perfect 1.00 on every
+// category as its English sibling.
 export const PAGES_TO_AUDIT = [
   { label: 'home', path: '/' },
+  { label: 'hr home', path: '/hr/' },
   { label: 'records (heaviest page family, EN)', path: '/records/' },
   { label: 'hr/records (heaviest built page)', path: '/hr/records/' },
   {
