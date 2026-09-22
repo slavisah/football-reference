@@ -16241,11 +16241,16 @@ Copa América captains.
   dictionary (`.cspell/football-names-hr.txt`) holds the Croatian-declined
   forms `.cspell/football-names.txt`'s nominative-case entries don't cover
   (Croatian is a case language); the config loads both dictionaries plus
-  `@cspell/dict-hr-hr`. Manual/intensive-run-only for now, alongside
+  `@cspell/dict-hr-hr`. Promoted to a required `.github/workflows/ci.yml`
+  gate the hundred-and-sixty-sixth intensive run (2026-09-22), after five
+  runs (161-165) of confirmed-clean results proved its ignore-list
+  dictionary false-positive-free the same way `football-names.txt` already
+  was; unlike `check:spelling` (pure markdown, runs pre-`Build`), it reads
+  the built `/hr/*` HTML output, so its CI step runs after `Build`, not
+  alongside `check:spelling`'s pre-build step. Still joins
   `check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
-  `check:html`, not a required PR gate - its ignore-list dictionary is new
-  and hasn't yet proven itself false-positive-free across many runs the way
-  `football-names.txt` has.
+  `check:html` as manual-only in one respect: none of those five run in CI,
+  full stop, while `check:spelling-hr` alone graduated.
 - `pnpm check:jsonld` (`scripts/check-jsonld.mjs`, added 2026-09-09,
   eighty-seventh intensive run) parses every `<script type="application/ld+json">`
   block on every built page and checks it structurally: a real
@@ -27848,6 +27853,82 @@ requires either working `WebFetch` to reference domains, a
 `typescript`/`@astrojs/check` release, or human input on the two
 human-judgment items (`long-title` brand suffix, and any new
 editorial/content decision) - all already tracked in `docs/ROADMAP.md`.
+
+See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
+`docs/ADDING_CONTENT.md` (how to add or edit content).
+
+### Promoted `check:spelling-hr` to a required `.github/workflows/ci.yml` gate, now that five runs have proven it stable - closed 2026-09-22 (hundred-and-sixty-sixth intensive run)
+
+A standing health check first: `pnpm install --frozen-lockfile` clean,
+`pnpm lint` (0 errors/0 warnings/0 hints), `pnpm test` (763/763), `pnpm
+build` (711 pages), `pnpm check:spelling-hr` (clean, 57 unique Croatian
+note-card blocks, same count as every run since the hundred-and-sixty-first)
+- all unchanged from the hundred-and-sixty-fifth run's baseline.
+
+With `docs/ROADMAP.md`'s open backlog still entirely blocked on network
+access or human sign-off (re-confirmed, nothing new), this run picked up the
+hundred-and-sixty-first run's own explicit "left for a future pass" thread:
+`check:spelling-hr` (the site's Croatian note-card spell-checker, added that
+run) was deliberately kept out of `.github/workflows/ci.yml` because its
+ignore-list dictionary (`.cspell/football-names-hr.txt`) was brand new and
+hadn't yet proven itself false-positive-free the way the English
+`football-names.txt` had. Five runs later (161 through 165), every run that
+touched it - 161 (its own introduction, plus a temporary re-break/restore
+verifying it actually catches a real mistranslation), 162 (full standing
+health check), and 165 (full standing health check) - recorded it clean,
+with the unique-block count stable at 57 throughout (no drift, no new false
+positives surfacing as fresh Croatian content was added). That is the bar
+the hundred-and-sixty-first run's own entry set for graduating it, so this
+run promoted it: added a `Spelling check (Croatian note-card prose, built
+/hr/* pages)` step to `.github/workflows/ci.yml`, running `pnpm
+check:spelling-hr` immediately after the `Build` step rather than beside
+`check:spelling`'s pre-`Build` step - `check:spelling-hr` spell-checks the
+*built* `/hr/*` HTML output (`scripts/check-spelling-hr.mjs`'s `DIST_DIR`),
+unlike `check:spelling`, which only ever reads `content/**/*.md` directly
+and needs no build first. Verified the placement is correct by running
+`pnpm build && pnpm check:spelling-hr` locally in that exact order (clean),
+then confirming the script fails loudly rather than silently passing on a
+missing `dist/` (it does - `listHtmlFiles` throws on a nonexistent
+directory), so a CI misordering that ran it before `Build` would fail
+visibly rather than pass trivially with zero pages found.
+
+Updated `docs/ROADMAP.md`'s "Every recent run's standing health check..."
+paragraph and `docs/PROJECT_STATUS.md`'s own "Known caveats" entry for
+`check:spelling-hr` to describe it as CI-gated rather than
+manual-run-only, matching the same status `check:spelling`/`check:jsonld`/
+etc. already carry. It remains distinct from
+`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
+`check:html`, which stay manual/intensive-run-only on pure runtime cost
+(~700-page-load Playwright/browser sweeps) rather than an unproven
+ignore-list - that reason never applied to `check:spelling-hr`, which is a
+sub-second wordlist check once `dist/` exists, so there was never a
+performance reason to keep it out of CI, only the false-positive-proof bar
+this run confirmed cleared.
+
+Full standing health check re-run after: `pnpm lint`/`pnpm test`/`pnpm
+build` unchanged from above (no source code changed, only
+`.github/workflows/ci.yml` and these two docs files), `pnpm
+check:spelling-hr` still clean post-edit. All 19 other fast `check:*`
+scripts (`check:sitemap`/`check:precache`/`check:jsonld`/
+`check:heading-outline`/`check:theme-flash`/`check:reachability`/
+`check:meta`/`check:award-tallies`/`check:edition-header-labels`/
+`check:i18n-notes`/`check:attendance-format`/`check:link-names`/
+`check:image-dimensions`/`check:locale-consistency`/`check:spelling`/
+`check:links`/`check:perf`/`check:pdfs`/`check:pdf-outline`) re-run clean,
+matching the hundred-and-sixty-fifth run's numbers exactly - none of this
+run's changes touch any file those scripts check. `pnpm audit` - 0
+vulnerabilities. No PDF regeneration needed (no content or PDF-visible CSS
+changed).
+
+**Left for a future pass:** the same environment-blocked items as ever,
+unchanged - see `docs/ROADMAP.md`'s "Open backlog". `check:html`,
+`check:lighthouse`, `check:reflow`, `check:text-zoom` and `check:print-width`
+remain the only manual/intensive-run-only checks, kept out of CI purely for
+runtime cost (each is a full-site Playwright/browser sweep); none has an
+unproven-ignore-list blocker the way `check:spelling-hr` did, so there is no
+equivalent "prove it stable, then promote" path open for any of them - CI
+promotion for that group would require actually cutting their runtime down,
+a different problem than this run solved.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
