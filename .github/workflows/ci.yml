@@ -57,6 +57,9 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Spelling check (Croatian note-card prose, built /hr/* pages)
+        run: pnpm check:spelling-hr
+
       - name: Page-weight budget check
         run: pnpm check:perf
 

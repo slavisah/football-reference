@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (165 intensive runs as of 2026-09-22) lives
+verification sweep and decision (166 intensive runs as of 2026-09-22) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -38,15 +38,15 @@ what exists and any standing quirks.
 
 Every recent run's standing health check comes back clean run after run:
 `pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm test`/`pnpm
-test:coverage`/`pnpm build`, all 25 `check:*` scripts (19 fast enough to run
-every time; `check:lighthouse`/`check:reflow`/`check:text-zoom`/
-`check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
-manual/intensive-run-only rather than a required PR gate; `check:spelling-hr`
-is fast but also manual/intensive-run-only for now, since its ignore-list
-dictionary is new - see `docs/PROJECT_STATUS.md`'s hundred-and-sixty-first
-run entry), `pnpm audit`, and `pnpm dlx knip --no-config-hints`. As of the
-hundred-and-sixty-fifth run (2026-09-22, the most recent run to execute the
-four manual browser sweeps): 763/763 unit tests, 99.91%/99.31%
+test:coverage`/`pnpm build`, all 25 `check:*` scripts (20 fast enough to run
+every time and wired into `.github/workflows/ci.yml` as required PR gates,
+`check:spelling-hr` among them as of the hundred-and-sixty-sixth run;
+`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
+`check:html` are full-site Playwright/browser sweeps kept
+manual/intensive-run-only rather than a required PR gate, purely for their
+~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
+As of the hundred-and-sixty-fifth run (2026-09-22, the most recent run to
+execute the four manual browser sweeps): 763/763 unit tests, 99.91%/99.31%
 statement/branch coverage, 711 pages built, zero `pnpm audit` vulnerabilities,
 `pnpm lint` at 0 errors/0 warnings/0 hints, `check:reflow`/`check:text-zoom`/
 `check:print-width` clean on all 711 pages, `check:lighthouse` a perfect
