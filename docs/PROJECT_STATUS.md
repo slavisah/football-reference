@@ -28057,5 +28057,79 @@ not to source any content) doesn't change that calculus for the other ~129.
 uninterrupted, ideally not sharing a container with any `check:*` script
 that touches `scripts/preview-daemon.mjs`.
 
+### Added `check:theme-color`, closing a documented drift risk between `global.css` and `BaseLayout.astro`'s theme-color meta - closed 2026-09-22 (hundred-and-sixty-eighth intensive run)
+
+A standing health check first: `pnpm install` clean, `pnpm outdated` still
+only shows the blocked `typescript` 5.9.3 -> 7.0.2 bump (`@astrojs/check`
+still hasn't published a release declaring a `typescript: ^7` peer range),
+`pnpm test`/`pnpm lint`/`pnpm build` all clean (767/767 tests, 0 lint
+errors/warnings/hints, 711 pages built), and re-ran all 20 CI-gated
+`check:*` scripts plus `pnpm audit` (0 vulnerabilities) and `pnpm dlx knip
+--no-config-hints` (same two pre-existing false positives,
+`scripts/test-preview-server.mjs` and `@cspell/dict-hr-hr`) - everything
+confirmed clean, matching the hundred-and-sixty-seventh run's own report.
+Re-confirmed the entire "Open backlog" in `docs/ROADMAP.md` is still
+genuinely blocked: `WebFetch` to `en.wikipedia.org` still returns
+`EGRESS_BLOCKED` from this environment's proxy (re-tried directly this run
+against the 1930 World Cup final page), so the link-liveness sweep and the
+excluded-attendance-figures items stay exactly as documented; every other
+open item needs either a UEFA technical-report PDF this environment can't
+fetch or human sign-off on a brand-identity call.
+
+With the backlog itself still fully blocked, this run picked a genuinely
+new angle instead of repeating the standing health check alone: this file's
+own "Known caveats" list (the theme-color entry, added the
+hundred-and-forty-second run) already named a real, live drift risk that no
+automated check covered - `BaseLayout.astro`'s `<meta name="theme-color">`
+carries `content`/`data-light`/`data-dark` attributes that must stay
+byte-for-byte equal to `global.css`'s `--light-accent`/`--dark-accent`
+custom properties, with "no shared source of truth between a CSS custom
+property and an HTML attribute" called out explicitly as the risk. Every
+other hand-maintained cross-file pair in this repo already has a permanent
+regression guard in the same spirit (`check:award-tallies`,
+`check:edition-header-labels`, `check:image-dimensions`'s
+manifest-icon-size check) - this was the one documented exception.
+
+Added `scripts/check-theme-color.mjs`, following the same plain
+regex/string-parsing shape as `check:edition-header-labels` (no build or
+browser needed): `parseCssCustomProperty()` reads `global.css`'s
+`--light-accent`/`--dark-accent` hex values, `parseThemeColorMeta()` reads
+`BaseLayout.astro`'s `theme-color-meta` tag's `content`/`data-light`/
+`data-dark` attributes, and `main()` fails loudly if any of the three HTML
+attributes stops matching its corresponding CSS token. Both helpers are
+exported and unit-tested in `tests/unit/checkThemeColor.test.ts` (7 new
+cases: extracting a hex custom property, a missing property returning
+`null`, extracting all three meta attributes, a missing `theme-color` meta
+tag returning `null`, and ignoring unrelated meta tags around the target
+one) - 767 -> 772 unit tests. Wired up as `pnpm check:theme-color` in
+`package.json` and as a required `.github/workflows/ci.yml` gate
+immediately after the existing locale-consistency check, in the same
+pre-`test:e2e` block as the other fast, non-browser content-integrity
+checks.
+
+Sanity-checked the check actually catches drift, not just passes
+vacuously: temporarily changed `data-dark="#46c08a"` to `"#46c08b"` in
+`BaseLayout.astro` and confirmed `node scripts/check-theme-color.mjs` fails
+with a specific, correctly-worded mismatch message and a non-zero exit
+code, then reverted and confirmed a clean pass again.
+
+**Verification:** `pnpm test`/`pnpm lint`/`pnpm build` all clean after the
+change (772/772 tests, 0 lint errors/warnings/hints, 711 pages built);
+`pnpm check:theme-color` passes clean against the real (unmodified)
+`global.css`/`BaseLayout.astro` pair, since both files' accent colors
+already agreed before this run - this is a permanent regression guard, not
+a bug fix for an existing mismatch.
+
+**Left for a future pass:** the same environment-blocked items as ever -
+see `docs/ROADMAP.md`'s "Open backlog", unchanged. The full `test:e2e`
+sweep (952 tests) and the four manual browser-based `check:*` sweeps
+(`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`)
+weren't re-run this run given the time this run spent on the new check
+script and its tests instead; nothing this run touched (a source-only,
+no-build/no-browser regex check plus two static hex color attributes,
+unchanged by this run) is in their scope, so this isn't expected to affect
+their result, but a future run should still re-run them for a fresh
+confirmation per the routine's own standing practice.
+
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
