@@ -27932,3 +27932,130 @@ a different problem than this run solved.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
+
+### Closed the last uncovered `check:lighthouse` page shape (`/404.html`), with a named/bounded exception for its expected noindex SEO penalty - closed 2026-09-22 (hundred-and-sixty-seventh intensive run)
+
+A standing health check first, everything unchanged from the hundred-and-
+sixty-sixth run's baseline before any edit: `pnpm install --frozen-lockfile`
+clean (all 12 dependencies already at their locked/latest version, including
+`typescript` still pinned at 5.9.3 with `typescript` 7 still blocked - see
+below), `pnpm lint` (0/0/0), `pnpm test` (763/763), `pnpm audit` (0
+vulnerabilities), `pnpm dlx knip --no-config-hints` (the same two
+pre-existing false positives, `scripts/test-preview-server.mjs` and
+`@cspell/dict-hr-hr`), and all 19 non-browser `check:*` scripts clean.
+
+With `docs/ROADMAP.md`'s open backlog still entirely blocked on network
+access or human sign-off (re-confirmed: `WebFetch` to `en.wikipedia.org`
+still returns `EGRESS_BLOCKED`; `pnpm outdated` shows no new
+`@astrojs/check` release), this run went looking for the next genuinely new,
+unattended-safe angle the way the fourteenth through thirtieth runs' own
+"widen `check:lighthouse`" thread did, and found one real gap left: every
+page *family* on the site (landing pages, edition pages, directories,
+profiles, comparison tools, the quiz, `/about/sources`, both languages) had
+Lighthouse coverage in `scripts/check-lighthouse.mjs`'s `PAGES_TO_AUDIT` -
+except `src/pages/404.astro`, the site's one shared bilingual error page
+(GitHub Pages serves `dist/404.html` for any unmatched URL under the base
+path, in either language, since a static host can't route a 404 by locale -
+see the earlier "Quality pass: custom 404 page" entry). It had never been
+missing from the *other* full-site sweeps (`check:reflow`/`check:text-zoom`/
+`check:print-width`/`check:html`/`check:heading-outline` all walk every file
+in `dist/`, and Playwright's `mobile.spec.ts` has its own dedicated 404
+block), only from Lighthouse's curated, expensive, page-shape sample.
+
+Added the page to `PAGES_TO_AUDIT` and ran `check:lighthouse` before writing
+any justifying comment, the same discipline this file's own bf-cache-audit
+entry used: it scored a perfect 1.00 on performance/accessibility/best-
+practices, but only 0.63 on `seo` - below the script's `MIN_SCORE = 0.9`
+budget. Rather than assume why, probed the SEO category's own per-audit
+breakdown directly (a throwaway script mirroring `check-lighthouse.mjs`'s
+own preview-daemon/Chromium-launch dance): every SEO audit scored a clean 1
+except `is-crawlable` (weight 4.04, the single heaviest SEO audit for this
+page), which scores 0 whenever Lighthouse finds a `<meta name="robots"
+content="noindex">` tag - exactly what `404.astro` deliberately sets, and
+exactly the correct behavior for a page a static host is forced to serve for
+every broken URL. Not a defect, and no markup change to this page could fix
+it without undoing the `noindex` itself.
+
+Rather than either silently raise `MIN_SCORE` globally (which would hide a
+real regression on every *other* page) or drop the 404 page from
+`PAGES_TO_AUDIT` (losing its only Lighthouse coverage, the actual gap this
+run set out to close), added a small, named, bounded exception:
+`EXPECTED_SEO_EXCEPTIONS` is a `label -> { expectedFloor }` map (currently
+one entry, the 404 page at `0.6`) and a new exported `isExpectedSeoException`
+helper filters a below-budget `seo` failure out of the reported list only
+when its label has a listed exception *and* its score is still at or above
+that exception's own floor - a further regression on that same page (say, a
+future change that also breaks `meta-description` or `canonical`) would
+push the score below `0.6` and still fail loudly, unlike a blanket
+per-label suppression. This mirrors the shape `actionableBfCacheReasons`
+(added the hundred-and-fifty-fifth run) already uses for a different
+Lighthouse false positive on this same site: filter the specific known
+cause out by name, with a comment explaining why, rather than silence the
+whole category or page. Added 4 new Vitest cases for
+`isExpectedSeoException` in `tests/unit/checkLighthouse.test.ts` (recognizes
+the known exception; still fails a score below the exception's own floor;
+does not apply to a non-`seo` category; does not apply to an unlisted
+page) - 763 -> 767 unit tests. Also adjusted the script's own clean-run
+console message to name how many known exceptions were excluded, so a
+future reader of its output isn't left wondering why a "0.63" score doesn't
+appear as a failure.
+
+**Verification:** `pnpm lint`/`pnpm test`/`pnpm test:coverage`/`pnpm build`
+all clean after the edit (767/767 tests; coverage unchanged at
+99.91%/99.31%/100%/100%, same four pre-existing "defensively unreachable"
+lines `docs/ROADMAP.md` already documents; 711 pages built). Re-ran
+`check:lighthouse` against the fresh build: 38 pages audited (37 -> 38),
+every category a perfect 1.00 except the new 404 entry's `seo` at 0.63,
+correctly excluded as the documented exception, script exits 0. Also re-ran
+`check:reflow`/`check:text-zoom`/`check:print-width`/`check:html` (all
+711/711 clean, unchanged) and all 19 non-browser `check:*` scripts a second
+time post-edit (unchanged). `pnpm audit` - 0 vulnerabilities.
+`pnpm dlx knip --no-config-hints` - same two pre-existing false positives,
+no new ones from the new test file's imports.
+
+This run also attempted the full 952-test `pnpm test:e2e` Playwright/WCAG
+sweep (the hundred-and-sixty-fifth run's own "started but did not finish in
+this run's time budget" thread) with the same `PW_EXECUTABLE_PATH` escape
+hatch, but stopped it partway through once it became clear it would not
+finish before this run needed to land its actual code change - not treated
+as a finding, since the suite has multiple confirmed-clean runs on record
+and nothing this run touched is in its scope. (One process-hygiene note for
+future runs: don't run `check:lighthouse`/`check:reflow`/`check:text-zoom`/
+`check:print-width` concurrently with `test:e2e` in the same container -
+`scripts/preview-daemon.mjs`'s `stopPreviewDaemon()`/`astro preview stop`
+is a single global daemon control, not scoped per port, so starting one of
+those scripts while `test:e2e`'s own `webServer` is mid-run stops *its*
+preview server too, breaking the in-flight e2e run. Discovered by hitting it
+directly this run; worked around by not running them together, not by any
+code change, since this is Astro's own preview-daemon design, not a bug in
+this repo.)
+
+Also re-tried the "excluded historical attendance figures" backlog item
+(1930/1950 World Cup, 1996/2020 EURO - only four data points, a much smaller
+and more tractable ask than the "youngest winner" ranking's ~130 birth
+dates) with `WebSearch` for the 1930 World Cup final specifically: still a
+genuine, unresolved source conflict - 68,346 cited as the official
+attendance figure, but multiple other sources independently claim actual
+attendance was considerably higher (estimates from ~90,000 to 100,000) -
+the same conflict shape (and the same 68,346 figure) already implied by
+this item's existing "no single attendance figure with a source reliable
+enough to report" framing. Left unreported exactly as before; not a new
+finding, a re-confirmation that this exclusion is still correct.
+Deliberately did not attempt the much larger "youngest winner" ranking item
+(~130 Ballon d'Or/Golden Boot winner birth dates) this run: that item's own
+standing rationale - fabricating that many biographical facts in an
+unattended run, using only `WebSearch` snippets with no `WebFetch` access to
+verify a primary source directly, risks shipping confidently-wrong history
+across a large, high-editorial-bar table - still holds exactly as written,
+and one working `WebSearch` call for a single, very well-known player's
+birth date (used only to gauge whether the tool was usable at all this run,
+not to source any content) doesn't change that calculus for the other ~129.
+
+**Left for a future pass:** the same environment-blocked items as ever - see
+`docs/ROADMAP.md`'s "Open backlog", unchanged. The full `test:e2e` sweep
+(952 tests) still needs a run with enough time budget to let it finish
+uninterrupted, ideally not sharing a container with any `check:*` script
+that touches `scripts/preview-daemon.mjs`.
+
+See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
+`docs/ADDING_CONTENT.md` (how to add or edit content).

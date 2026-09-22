@@ -102,6 +102,33 @@ const CDP_PORT = 9223;
 // check:lighthouse" run has:
 // `hr/competitions/copa-america` (273.3 KB) is in fact the single heaviest
 // *landing* page on the whole site, EN included.
+//
+// The hundred-and-sixty-seventh intensive run closed the one remaining page
+// shape with zero Lighthouse coverage: `404.html`, the site's shared
+// bilingual error page (`src/pages/404.astro` - GitHub Pages serves it for
+// any unmatched URL under the base path, in either language, since a static
+// host can't pick a locale-specific 404). Every other page family above had
+// at least one entry; this page was covered by `check:reflow`/
+// `check:text-zoom`/`check:print-width`/`check:html`/`check:heading-outline`
+// (which walk every file in `dist/`) and by Playwright's own 404-specific
+// spec, but never by a real Lighthouse audit. It is a real page shape worth
+// auditing: `noindex` (see `docs/PROJECT_STATUS.md`'s "custom 404 page"
+// entry), two full stacked language sections on one page, and an emoji
+// eyebrow badge - nothing else in this list looks like it. It measures a
+// perfect 1.00 on performance/accessibility/best-practices, but only 0.63 on
+// `seo` - probed directly (per-audit, not just per-category) before writing
+// anything here: `is-crawlable` (weight 4.04, the single heaviest SEO audit)
+// scores 0 because Lighthouse's own crawlability audit fails any page with
+// a `<meta name="robots" content="noindex">` tag, and every other SEO audit
+// (title, description, canonical, hreflang, descriptive link text,
+// crawlable anchors, HTTP status) scores a clean 1. That is the deliberately
+// correct behavior for an error page a static host has to serve for every
+// broken URL (see `docs/PROJECT_STATUS.md`'s "custom 404 page" entry for why
+// it's `noindex` at all) - not a defect, and not something any change to
+// this page's markup could fix without undoing the `noindex` itself. See
+// `EXPECTED_SEO_EXCEPTIONS` below for how this known, bounded exception is
+// carved out of the budget check without silently raising `MIN_SCORE` (and
+// without hiding a future, different SEO regression on this same page).
 export const PAGES_TO_AUDIT = [
   { label: 'home', path: '/' },
   { label: 'records (heaviest page family, EN)', path: '/records/' },
@@ -155,6 +182,7 @@ export const PAGES_TO_AUDIT = [
   { label: 'hr/players directory index', path: '/hr/players/' },
   { label: 'hr/teams directory index', path: '/hr/teams/' },
   { label: 'hr/about/sources', path: '/hr/about/sources/' },
+  { label: '404 page (bilingual error page, noindex)', path: '/404.html' },
 ];
 
 const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo'];
@@ -167,6 +195,33 @@ const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo'];
 // been raised over time - not by lowering it reflexively to silence a
 // failure.
 export const MIN_SCORE = 0.9;
+
+// The 404 page (see PAGES_TO_AUDIT's own comment above) is the one page in
+// this list that is intentionally `noindex`, which sinks its `seo` category
+// to 0.63 - below MIN_SCORE - purely via Lighthouse's `is-crawlable` audit,
+// confirmed by a direct per-audit probe to be the only failing SEO audit on
+// that page. Rather than silently raise MIN_SCORE for every page (hiding a
+// real regression everywhere else) or drop the page from PAGES_TO_AUDIT
+// (losing its only Lighthouse coverage), this is a named, bounded exception:
+// `expectedFloor` is the lowest score this specific category on this
+// specific page is expected to ever measure (0.63, with a little headroom
+// for timing-driven audit-score noise elsewhere in the category) - a score
+// at or above it is the known, deliberate noindex penalty and gets filtered
+// out below; a score that falls further would mean some *other* SEO audit
+// broke too, and that still fails loudly, the same "filter the known false
+// positive out by name, not by silencing the whole category" shape
+// `actionableBfCacheReasons` above already uses for a different Lighthouse
+// quirk.
+const EXPECTED_SEO_EXCEPTIONS = new Map([
+  ['404 page (bilingual error page, noindex)', { expectedFloor: 0.6 }],
+]);
+
+/** Whether a below-MIN_SCORE failure is the known, bounded noindex/is-crawlable exception rather than a real regression. */
+export function isExpectedSeoException({ label, category, score }) {
+  if (category !== 'seo') return false;
+  const exception = EXPECTED_SEO_EXCEPTIONS.get(label);
+  return exception !== undefined && score >= exception.expectedFloor;
+}
 
 /** Given a Lighthouse category-score map, which categories (if any) fall below MIN_SCORE. */
 export function scoresBelowMin(categoryScores, minScore) {
@@ -237,16 +292,22 @@ async function main() {
     await stopPreviewDaemon();
   }
 
-  const failures = results.flatMap(({ label, categoryScores }) =>
-    scoresBelowMin(categoryScores, MIN_SCORE).map(([category, score]) => ({ label, category, score })),
-  );
+  const failures = results
+    .flatMap(({ label, categoryScores }) =>
+      scoresBelowMin(categoryScores, MIN_SCORE).map(([category, score]) => ({ label, category, score })),
+    )
+    .filter((failure) => !isExpectedSeoException(failure));
   const bfCacheFailures = results.flatMap(({ label, url, bfCacheReasons }) =>
     bfCacheReasons.map((item) => ({ label, url, reason: item.reason })),
   );
 
   if (failures.length === 0 && bfCacheFailures.length === 0) {
+    const exceptionNote =
+      EXPECTED_SEO_EXCEPTIONS.size > 0
+        ? ` (${EXPECTED_SEO_EXCEPTIONS.size} known, bounded noindex/seo exception(s) excluded - see EXPECTED_SEO_EXCEPTIONS)`
+        : '';
     console.log(
-      `\nAll ${results.length} pages scored >= ${MIN_SCORE} in every category, with no actionable back/forward-cache blockers.`,
+      `\nAll ${results.length} pages scored >= ${MIN_SCORE} in every category${exceptionNote}, with no actionable back/forward-cache blockers.`,
     );
     return;
   }
