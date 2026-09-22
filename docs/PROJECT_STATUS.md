@@ -28217,3 +28217,68 @@ still re-confirm them fresh per the routine's own standing practice.
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
+
+### Astro 7.3.3 -> 7.3.4 patch bump, plus a full cold-start `test:e2e` + all-five-manual-browser-sweep confirmation - closed 2026-09-22 (hundred-and-seventieth intensive run)
+
+A standing health check first: `pnpm install` clean, `pnpm outdated` showed
+one in-range patch release (`astro` 7.3.3 -> 7.3.4) alongside the same
+standing blocked `typescript` 5.9.3 -> 7.0.2 bump every recent run has
+confirmed (`npm view @astrojs/check@latest peerDependencies` still only
+declares `typescript: '^5.0.0 || ^6.0.0'`, re-checked this run too). Installed
+the astro patch with `pnpm update astro`, then ran the fast half of the
+standing health check against it: `pnpm lint` (0 errors/0 warnings/0 hints),
+`pnpm test` (772/772, unchanged), `pnpm test:coverage` (99.91%/99.31% stmt/
+branch, same four pre-existing "defensively unreachable" lines
+`docs/ROADMAP.md` already documents), `pnpm build` (711 pages), all 21
+CI-gated `check:*` scripts clean, `pnpm audit` (0 vulnerabilities), and
+`pnpm dlx knip --no-config-hints` (the same two pre-existing false
+positives, `scripts/test-preview-server.mjs` and `@cspell/dict-hr-hr`) - all
+identical to the hundred-and-sixty-ninth run's baseline. Committed the bump
+separately (`aa8c8d8e7`) once verified, rather than bundling it with the
+confirmation work below.
+
+With the astro bump verified safe and the open backlog itself still fully
+blocked (no new angle on the network-access or human-sign-off items), this
+run used the rest of its time on the full "slow half" of the standing health
+check that several recent runs' own "left for a future pass" notes kept
+deferring for scope reasons: the complete cold-start `pnpm test:e2e` suite
+and all five manual/intensive-run-only browser sweeps together in one run,
+none of which had all been re-run together since before the
+hundred-and-sixty-seventh run (each of the hundred-and-sixty-seventh through
+-ninth runs' own diffs were narrow enough in scope that re-running them
+wasn't expected to change the result, but per the routine's own standing
+practice a fresh confirmation was still owed).
+
+Ran, in order, against a fresh `pnpm build` on the bumped astro version:
+- `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cold start,
+  the same executable-path fallback every prior run has needed in this
+  environment): **1020/1020 passed, 16.5 minutes**.
+- `pnpm check:reflow`: all 711 pages, no horizontal overflow at 320px.
+- `pnpm check:text-zoom`: all 711 pages, no horizontal overflow at 200% text
+  zoom.
+- `pnpm check:print-width`: all 711 pages, no horizontal overflow in print
+  media at 1032px.
+- `pnpm check:html`: all 711 pages valid HTML5.
+- `pnpm check:lighthouse`: all 39 audited pages scored >= 0.9 in every
+  category (perfect 1.00 except the one known/bounded/documented 404-page
+  `seo: 0.63` exception), no actionable back/forward-cache blockers.
+
+Every result matches the documented baseline exactly - no regression from
+the astro patch bump, and no regression from any of the several small fixes
+(theme-color check, `hr home` Lighthouse coverage, and the earlier
+`References.astro`/`hr/records` unit-noun fixes from the runs before those)
+landed since the last time this full combination was run together. No new
+bug found; this run is a confirmation, not a fix.
+
+**Verification:** see the ordered list above; `pnpm check:pdfs` re-confirmed
+the existing 700 PDFs still fresh after the astro bump - astro's own output
+for every page was unaffected enough that nothing needed regenerating
+(`check:pdfs` compares rendered output, not just the astro version string,
+so this was verified, not assumed).
+
+**Left for a future pass:** the same environment-blocked items as ever - see
+`docs/ROADMAP.md`'s "Open backlog", unchanged. With a full e2e + all-five-
+browser-sweep confirmation now fresh as of this run, a future run's best bet
+is either a fresh source lead on any of the open attendance/Team-of-the-
+Tournament gaps, or a genuinely different quality angle not yet tried in the
+last several dozen runs.
