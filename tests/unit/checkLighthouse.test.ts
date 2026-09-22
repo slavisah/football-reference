@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { actionableBfCacheReasons, scoresBelowMin } from '../../scripts/check-lighthouse.mjs';
+import {
+  actionableBfCacheReasons,
+  isExpectedSeoException,
+  scoresBelowMin,
+} from '../../scripts/check-lighthouse.mjs';
 
 describe('scoresBelowMin', () => {
   it('returns nothing when every category clears the budget', () => {
@@ -70,5 +74,25 @@ describe('actionableBfCacheReasons', () => {
         failureType: 'Actionable',
       },
     ]);
+  });
+});
+
+describe('isExpectedSeoException', () => {
+  const label = '404 page (bilingual error page, noindex)';
+
+  it('recognizes the known 404 noindex/is-crawlable seo exception', () => {
+    expect(isExpectedSeoException({ label, category: 'seo', score: 0.63 })).toBe(true);
+  });
+
+  it('still fails a seo score that drops below the known exception floor', () => {
+    expect(isExpectedSeoException({ label, category: 'seo', score: 0.4 })).toBe(false);
+  });
+
+  it('does not apply to a category other than seo', () => {
+    expect(isExpectedSeoException({ label, category: 'performance', score: 0.5 })).toBe(false);
+  });
+
+  it('does not apply to a page with no listed exception', () => {
+    expect(isExpectedSeoException({ label: 'home', category: 'seo', score: 0.4 })).toBe(false);
   });
 });

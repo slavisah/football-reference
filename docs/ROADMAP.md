@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (166 intensive runs as of 2026-09-22) lives
+verification sweep and decision (167 intensive runs as of 2026-09-22) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -45,18 +45,43 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates,
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-sixty-fifth run (2026-09-22, the most recent run to
-execute the four manual browser sweeps): 763/763 unit tests, 99.91%/99.31%
-statement/branch coverage, 711 pages built, zero `pnpm audit` vulnerabilities,
-`pnpm lint` at 0 errors/0 warnings/0 hints, `check:reflow`/`check:text-zoom`/
-`check:print-width` clean on all 711 pages, `check:lighthouse` a perfect
-1.00/1.00/1.00/1.00 on all 37 audited pages, and two standing `knip` false
+As of the hundred-and-sixty-seventh run (2026-09-22, the most recent run to
+execute the four manual browser sweeps): 767/767 unit tests (4 new, for
+`check-lighthouse.mjs`'s new `isExpectedSeoException` helper - see below),
+99.91%/99.31% statement/branch coverage, 711 pages built, zero `pnpm audit`
+vulnerabilities, `pnpm lint` at 0 errors/0 warnings/0 hints,
+`check:reflow`/`check:text-zoom`/`check:print-width`/`check:html` clean on
+all 711 pages, `check:lighthouse` clean on all 38 audited pages (one more
+than the hundred-and-sixty-fifth run's 37 - see below; every category scores
+a perfect 1.00 except the new 404-page entry's `seo`, a known/bounded/
+documented exception, not a regression), and two standing `knip` false
 positives: `scripts/test-preview-server.mjs`
 (used only as a Playwright `webServer.command`, never imported) and
 `@cspell/dict-hr-hr` (used only via `.cspell/hr-notes.cspell.json`'s
 `"import"` field, never a JS `import` - added the hundred-and-sixty-first
 run for `check:spelling-hr`) - neither actually unused, knip's static
 analysis just can't see a reference inside a config-file string.
+
+**Hundred-and-sixty-seventh run:** with the open backlog below still fully
+blocked (re-confirmed: `WebFetch` to `en.wikipedia.org` still returns
+`EGRESS_BLOCKED`; `pnpm outdated` shows no new `@astrojs/check` release),
+this run's substantive change was closing the one remaining page shape with
+zero `check:lighthouse` coverage: `/404.html`, the site's shared bilingual
+error page. Added it to `scripts/check-lighthouse.mjs`'s `PAGES_TO_AUDIT`,
+which surfaced a real (if fully expected) below-budget score - `seo: 0.63`,
+entirely from Lighthouse's `is-crawlable` audit correctly flagging the
+page's own deliberate `noindex` tag, confirmed by a direct per-audit probe
+to be the *only* failing SEO audit on that page. Rather than silently raise
+the file's global `MIN_SCORE` or drop the page from coverage, added a
+named, bounded, unit-tested exception (`EXPECTED_SEO_EXCEPTIONS`/
+`isExpectedSeoException`) that only suppresses a `seo` score at or above the
+known noindex-penalty floor for that one page - a further regression on that
+page still fails loudly. Full standing health check re-run clean after (see
+above); also re-tried the small, four-data-point "excluded historical
+attendance figures" item below via `WebSearch` (1930 World Cup final) -
+still a genuine, unresolved source conflict (68,346 official vs. 90,000+
+widely reported), same as already documented, so left as-is rather than
+guessed.
 
 ## Open backlog
 
