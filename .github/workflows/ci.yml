@@ -105,6 +105,9 @@ jobs:
       - name: Locale-consistency check (<html lang> vs URL)
         run: pnpm check:locale-consistency
 
+      - name: Theme-color meta/CSS-token consistency check
+        run: pnpm check:theme-color
+
       - name: Install Playwright browser
         run: pnpm test:e2e:install
 
