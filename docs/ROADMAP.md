@@ -45,60 +45,42 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates,
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-sixty-ninth run (2026-09-22): 772/772 unit tests
-(unchanged - this run's edit was a coverage-list addition to
-`check-lighthouse.mjs`, nothing a unit test targets), `pnpm lint` at 0
-errors/0 warnings/0 hints, 711 pages built, zero `pnpm audit`
-vulnerabilities, and two standing `knip` false positives:
-`scripts/test-preview-server.mjs` (used only as a Playwright
-`webServer.command`, never imported) and `@cspell/dict-hr-hr` (used only via
-`.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS `import` -
-added the hundred-and-sixty-first run for `check:spelling-hr`) - neither
-actually unused, knip's static analysis just can't see a reference inside a
-config-file string. `check:lighthouse` was re-run fresh the
-hundred-and-sixty-ninth run: clean on all 39 audited pages (38 -> 39, the
-new `hr home` entry - see below), every category a perfect 1.00 except the
-404-page entry's `seo`, a known/bounded/documented exception, not a
-regression. `check:reflow`/`check:text-zoom`/`check:print-width`/
-`check:html` were last executed the hundred-and-sixty-seventh run
-(2026-09-22), clean on all 711 pages - not re-run the hundred-and-sixty-
-eighth or -ninth run since neither run's change (a source-only regex check,
-then a one-line addition to a Lighthouse page list) is in their scope; a
-future run should still re-confirm them fresh.
+As of the hundred-and-seventieth run (2026-09-22): 772/772 unit tests, `pnpm
+lint` at 0 errors/0 warnings/0 hints, 711 pages built, zero `pnpm audit`
+vulnerabilities, and the same two standing `knip` false positives as ever
+(`scripts/test-preview-server.mjs`, used only as a Playwright
+`webServer.command`, never imported; `@cspell/dict-hr-hr`, used only via
+`.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS `import`) -
+neither actually unused, knip's static analysis just can't see a reference
+inside a config-file string. All five manual browser sweeps
+(`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
+`check:html`) were re-run fresh this run against the current build: clean on
+all 711 pages, `check:lighthouse`'s 39 audited pages every category a perfect
+1.00 except the 404-page entry's `seo`, a known/bounded/documented exception,
+not a regression. The full `pnpm test:e2e` suite was also re-run cold-start:
+1020/1020 passed (16.5 minutes).
 
-**Hundred-and-sixty-ninth run:** with the open backlog below still fully
+**Hundred-and-seventieth run:** with the open backlog below still fully
 blocked (re-confirmed: no new `@astrojs/check` release; no new angle on the
-network-access or human-sign-off items), this run re-read the thirtieth
-run's own "one entry per page shape in both languages" bar for
-`check:lighthouse` coverage against the current 38-page `PAGES_TO_AUDIT`
-list and found one shape the hundred-and-sixty-seventh run's own "closed the
-last uncovered page shape" entry had missed: `home` (`/`) had an English
-entry but no Croatian one (`/hr/`) anywhere in the list, even though every
-other shape that run's twelve-page Croatian sweep covered got one. Home
-renders `OnThisDay.astro`'s widget alongside the top-level competition/award
-card grid - a layout no other page shares - so it was never part of that
-sweep's landing/edition/directory/profile/comparison shape list in the first
-place. Added `{ label: 'hr home', path: '/hr/' }` to `PAGES_TO_AUDIT`
-(38 -> 39 pages); it scores a perfect 1.00 on every category, identical to
-its English sibling. See `docs/PROJECT_STATUS.md`'s matching entry for full
-detail.
-
-**Hundred-and-sixty-eighth run:** with the open backlog below still fully
-blocked (re-confirmed: `WebFetch` to `en.wikipedia.org` still returns
-`EGRESS_BLOCKED`; `pnpm outdated` shows no new `@astrojs/check` release),
-this run closed a real, previously-documented-but-unguarded drift risk
-instead: `docs/PROJECT_STATUS.md`'s "Known caveats" list already named
-`BaseLayout.astro`'s theme-color meta (`content`/`data-light`/`data-dark`)
-as needing to stay byte-for-byte in sync with `global.css`'s
-`--light-accent`/`--dark-accent` custom properties, with no automated check
-enforcing it - the one hand-maintained cross-file pair in this repo without
-a permanent regression guard, unlike `check:award-tallies`/
-`check:edition-header-labels`/`check:image-dimensions`. Added
-`check:theme-color` (`scripts/check-theme-color.mjs` + `tests/unit/
-checkThemeColor.test.ts`), wired into `.github/workflows/ci.yml` as a
-required gate, and sanity-checked it actually fails on a deliberately
-introduced mismatch before reverting. See `docs/PROJECT_STATUS.md`'s
+network-access or human-sign-off items), this run found one genuinely
+actionable item - `pnpm outdated` showed an in-range `astro` patch release
+(7.3.3 -> 7.3.4) - installed it, then used the rest of the run for the full
+standing confirmation sweep the last several runs' own "left for a future
+pass" notes kept deferring: the complete cold-start `pnpm test:e2e` suite and
+all five manual browser sweeps, none of which had been re-run together since
+before the hundred-and-sixty-seventh run. Everything came back byte-identical
+to the documented baseline (no regression from the astro bump or from the
+several small fixes landed since): 772/772 unit, 1020/1020 e2e, 711 pages,
+all `check:*` scripts clean. No new bug found. See `docs/PROJECT_STATUS.md`'s
 matching entry for full detail.
+
+**Hundred-and-sixty-ninth run:** closed the last `check:lighthouse` coverage
+gap - `home` (`/`) had an English `PAGES_TO_AUDIT` entry but no Croatian one
+(`/hr/`), the one page shape the hundred-and-sixty-seventh run's own
+"last uncovered page shape" sweep had missed (it renders `OnThisDay.astro`'s
+widget, a layout no other page shares). Added `{ label: 'hr home', path:
+'/hr/' }`; scores a perfect 1.00 on every category. See
+`docs/PROJECT_STATUS.md`'s matching entry for full detail.
 
 ## Open backlog
 
