@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (164 intensive runs as of 2026-09-21) lives
+verification sweep and decision (165 intensive runs as of 2026-09-22) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -45,11 +45,13 @@ manual/intensive-run-only rather than a required PR gate; `check:spelling-hr`
 is fast but also manual/intensive-run-only for now, since its ignore-list
 dictionary is new - see `docs/PROJECT_STATUS.md`'s hundred-and-sixty-first
 run entry), `pnpm audit`, and `pnpm dlx knip --no-config-hints`. As of the
-hundred-and-sixty-third run (2026-09-21): 751/751 unit tests, 99.91%/99.31%
+hundred-and-sixty-fifth run (2026-09-22, the most recent run to execute the
+four manual browser sweeps): 763/763 unit tests, 99.91%/99.31%
 statement/branch coverage, 711 pages built, zero `pnpm audit` vulnerabilities,
-`pnpm lint` at 0 errors/0 warnings/0 hints (the one standing pre-existing
-hint, a deprecated Playwright `locator.type()` call, was fixed this run),
-and two standing `knip` false positives: `scripts/test-preview-server.mjs`
+`pnpm lint` at 0 errors/0 warnings/0 hints, `check:reflow`/`check:text-zoom`/
+`check:print-width` clean on all 711 pages, `check:lighthouse` a perfect
+1.00/1.00/1.00/1.00 on all 37 audited pages, and two standing `knip` false
+positives: `scripts/test-preview-server.mjs`
 (used only as a Playwright `webServer.command`, never imported) and
 `@cspell/dict-hr-hr` (used only via `.cspell/hr-notes.cspell.json`'s
 `"import"` field, never a JS `import` - added the hundred-and-sixty-first
@@ -61,20 +63,23 @@ analysis just can't see a reference inside a config-file string.
 - **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.10` (latest
   published) only declares `typescript: '^5.0.0 || ^6.0.0'` as a peer
   dependency - re-confirmed via `npm view @astrojs/check@latest
-  peerDependencies` as recently as the hundred-and-fifty-seventh run
-  (2026-09-20). Re-check whenever `pnpm outdated` next shows a new
-  `@astrojs/check` release.
+  peerDependencies` as recently as the hundred-and-sixty-fifth run
+  (2026-09-22; `pnpm outdated` shows `typescript` at 5.9.3 vs. 7.0.2 latest,
+  no new `@astrojs/check` release since). Re-check whenever `pnpm outdated`
+  next shows a new `@astrojs/check` release.
 - **`docs/SOURCES.md` link-liveness sweep**: blocked. This environment's
   outbound network/egress policy rejects direct requests to external
-  reference domains - confirmed repeatedly, most recently 2026-09-21
-  (hundred-and-sixty-second run), and now precisely scoped: `WebFetch` to
-  `en.wikipedia.org` *and* `www.uefa.com` both return `EGRESS_BLOCKED` from
-  the proxy (not a Wikipedia-specific block), so this is a general block on
-  direct fetches to reference domains, not one site's policy. `WebSearch`
-  itself *does* work in this environment (confirmed 2026-09-21) and returns
-  synthesized, sourced snippets - but that is no substitute for a live
-  status-code check of each `docs/SOURCES.md` link, which is what this item
-  needs. Still needs a session with `WebFetch`/direct-fetch access.
+  reference domains - confirmed repeatedly, most recently 2026-09-22
+  (hundred-and-sixty-fifth run: `WebFetch` to `en.wikipedia.org` still
+  returns `EGRESS_BLOCKED` from the proxy), and precisely scoped: `WebFetch`
+  to `en.wikipedia.org` *and* `www.uefa.com` both return `EGRESS_BLOCKED`
+  from the proxy (not a Wikipedia-specific block), so this is a general
+  block on direct fetches to reference domains, not one site's policy.
+  `WebSearch` itself *does* work in this environment (confirmed 2026-09-21)
+  and returns synthesized, sourced snippets - but that is no substitute for
+  a live status-code check of each `docs/SOURCES.md` link, which is what
+  this item needs. Still needs a session with `WebFetch`/direct-fetch
+  access.
 - **`long-title` brand-suffix decision**: needs human sign-off, not an
   automated fix. `check:html`'s `long-title` rule is disabled
   (`scripts/check-html-validity.mjs`'s `DISABLED_RULES`) because 133 pages

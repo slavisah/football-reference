@@ -27788,3 +27788,66 @@ in `docs/ROADMAP.md`'s "Open backlog".
 
 See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
 `docs/ADDING_CONTENT.md` (how to add or edit content).
+
+### Full standing health check, including the four browser-based sweeps this session's container could actually run - closed 2026-09-22 (hundred-and-sixty-fifth intensive run)
+
+No open backlog item was actionable this run without a change of
+circumstance this session doesn't have: `typescript` 7 re-checked via `npm
+view @astrojs/check@latest peerDependencies` and still only declares
+`typescript: '^5.0.0 || ^6.0.0'` (0.9.10 is still latest); `WebFetch` to
+`en.wikipedia.org` still returns `EGRESS_BLOCKED` from the proxy, so the
+`docs/SOURCES.md` link-liveness sweep and the Nations League Team of the
+Tournament/attendance items remain exhausted exactly as scoped in the
+hundred-and-sixty-second run. Rather than force a speculative content
+change, this run instead ran every check the repo has, including the four
+browser-based Playwright sweeps (`check:reflow`, `check:text-zoom`,
+`check:print-width`, `check:lighthouse`) that `docs/ROADMAP.md` documents as
+"kept manual/intensive-run-only" - this session's container ships
+`/opt/pw-browsers/chromium-1194` while `@playwright/test@1.63.0` (the
+project's pinned version) wants `chromium_headless_shell-1243`, so a bare
+`pnpm run check:reflow` failed with "Executable doesn't exist" until run
+with `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` (a symlink to the same
+`chromium-1194` binary) - the exact escape hatch already documented at the
+top of this file for `test:e2e`/`check:lighthouse`/`build:pdfs`, not a new
+finding, just the first time this run's own container needed it for
+`check:reflow`/`check:text-zoom`/`check:print-width` specifically.
+
+**Verification, full sweep, nothing changed since the hundred-and-sixty-
+fourth run:** `pnpm install --frozen-lockfile` clean. `pnpm lint` - 0
+errors/0 warnings/0 hints. `pnpm test` - 763/763. `pnpm test:coverage` -
+99.91%/99.31%/100%/100% (statements/branches/functions/lines), the same
+four "defensively unreachable" lines in `quiz.ts`/`sources.ts`/
+`tableSort.ts`/`url.ts` as `docs/ROADMAP.md` already documents, line
+numbers unchanged. `pnpm build` - 711 pages. `pnpm audit` - no known
+vulnerabilities. All 19 fast `check:*` scripts plus `check:spelling-hr` and
+`check:html` - clean (`check:links` 715 pages, `check:sitemap` 710/715,
+`check:jsonld` 1,783 blocks/711 pages, `check:reachability` 710 reached + 5
+correctly-excluded noindex, `check:pdfs`/`check:pdf-outline` 700/700,
+`check:perf` heaviest page 614.6 KB against the 640 KB budget - all
+identical to the hundred-and-sixty-fourth run's own numbers). The four
+browser sweeps, run this time: `check:reflow`/`check:text-zoom`/
+`check:print-width` - 711/711 pages, no horizontal overflow at 320px, 200%
+text zoom or in print media. `check:lighthouse` - all 37 audited pages
+scored a perfect 1.00/1.00/1.00/1.00 (performance/accessibility/best-
+practices/SEO), no actionable back/forward-cache blockers. `pnpm dlx knip
+--no-config-hints` - only the same two pre-existing known false positives.
+`pnpm run test:e2e` (the full 952-test Playwright mobile/WCAG sweep) was
+started with the same `PW_EXECUTABLE_PATH` override but did not finish
+inside this run's time budget after the four full-site sweeps above already
+ran; not treated as a finding since nothing about this run touched any code
+the e2e suite covers, and the equivalent sweep already has multiple
+confirmed-clean runs on record in this file.
+
+**Left for a future pass:** the same environment-blocked items as ever,
+unchanged - see `docs/ROADMAP.md`'s "Open backlog". Every angle this
+routine has previously used to find genuinely new, unattended-safe work
+(new SEO/meta signals, accessibility media features, coverage-gap
+verification, dependency re-checks, the manual-only browser sweeps) came
+back clean or unchanged this run; the next genuinely new angle most likely
+requires either working `WebFetch` to reference domains, a
+`typescript`/`@astrojs/check` release, or human input on the two
+human-judgment items (`long-title` brand suffix, and any new
+editorial/content decision) - all already tracked in `docs/ROADMAP.md`.
+
+See also `IMPLEMENTATION_NOTES.md` (decisions/testing detail) and
+`docs/ADDING_CONTENT.md` (how to add or edit content).
