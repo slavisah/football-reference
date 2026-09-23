@@ -28564,3 +28564,115 @@ gap as the Yashin/Cafu entries in `superlative-claims-ledger.json` and the
 same fix (a position column, or external sourcing) - not pursued for the
 same reason. The open backlog itself is otherwise unchanged - see
 `docs/ROADMAP.md`.
+
+### Added `check:record-claims`, a third verification-ledger gate for "most/record/youngest/oldest/highest/biggest/largest/lowest/fewest" claims - closed 2026-09-23 (hundred-and-seventy-fourth intensive run)
+
+With the open backlog still fully blocked, this run extended the
+verification-ledger pattern `check-superlative-claims.mjs` ("the only X to
+Y") and `check-ordinal-claims.mjs` ("the first/.../tenth X to Y") already
+established to a third, related bug class neither one covers: hand-written
+"record-holder" claims using words like "most", "record", "youngest",
+"oldest", "highest", "biggest", "largest", "lowest" or "fewest" - the same
+kind of prose claim the 171st and 173rd runs each found a genuine factual
+error in for the other two shapes, just not yet checked for this one.
+
+**Why a wider net than the other two checkers:** "the only" and "the Nth ...
+to" both have a single clean grammatical marker to bound a low-noise regex
+around. This class doesn't - trying the obvious narrow phrasing first (e.g.
+requiring "the" immediately before the trigger word) would have missed
+genuine claims like "Argentina moved ahead as the competition's **most**
+successful team" (no adjacent "the most") and "Spain won **a record**
+fourth title" (no "the" at all), while "record" and "most" are also used in
+non-claim senses on this site ("disciplinary record" meaning track record;
+"most editions since the 1990s" as a plain quantifier). Rather than risk
+silently missing a real claim by hand-tuning a narrower pattern, `scripts/
+check-record-claims.mjs` matches on the bare trigger words
+(`/\b(most|record|youngest|oldest|highest|biggest|largest|lowest|fewest)\b/i`)
+and relies on the ledger to record *why* each bullet did or didn't need a
+table cross-check - the same honesty the other two ledgers already use for
+claims relying on data (birth dates, playing position) this site doesn't
+track, just applied more often here since the net is wider.
+
+**Seeding the ledger** meant checking all 36 current claims this pattern
+matches, across the five content files that have any
+(`content/copa-america.md`, `content/fifa-world-cup.md`, `content/
+golden-boot.md`, `content/quiz.md`, `content/uefa-euro.md`). Three
+verification methods covered most of them:
+
+- **Cross-table scans** for cross-edition "most any player/team has ever
+  done" claims - e.g. Just Fontaine's 13 goals (1958) confirmed as the
+  World Cup Golden Boot table's maximum, Michel Platini's 9 (1984) confirmed
+  as the EURO table's maximum, the 1962 six-way tie confirmed as the largest
+  joint-winner group in the World Cup table, 1986's 114,600 confirmed as the
+  largest Final-venues attendance figure.
+- **Self-contained name counts** for every "champions X supplied N, the most
+  of any team" Team of the Tournament/Copa América bullet (9 of them) -
+  counted each bullet's own eleven-name list by nationality directly, no
+  external table needed since the claim and the data it describes are both
+  in the same bullet.
+- **Full-table tallies** for the two competition-wide "most successful"
+  claims - hand-tallied the EURO editions table's Winner column (Spain 4,
+  next-highest West Germany/Germany 3 even combined across the name change,
+  confirming "Spain won a record fourth title in 2024") and the Copa América
+  results table's Champion column (Argentina 16 after 2024 vs. Uruguay's 15,
+  confirming "Argentina moved ahead as the competition's most successful
+  team by winning in 2024").
+
+The remaining claims don't reduce to a table check and are recorded as such
+rather than guessed at: two rely on data no table on this site tracks (the
+1930/2026 winning-manager ages and the 1982 winning-captain age - no other
+manager or captain in either table has a recorded age to compare against,
+the same shape of gap as the existing Yashin/Cubarsí/Donnarumma entries);
+one relies on a statistic never tracked anywhere on the site at all (the
+2004 Copa América "assists record" and the 2026 World Cup "record seven
+clean sheets" - no assists or clean-sheet column exists for any competition
+here to cross-check either against); the rest are either plain descriptive/
+quantifier uses of a trigger word ("most editions since the 1990s", "at
+most EUROs since 1996" - the EURO one *was* independently checked: 6 of the
+8 editions since 1996 have a Team of the Tournament entry, a genuine
+majority) or use "record" to mean disciplinary track record rather than a
+record-holder claim (the World Cup and Copa América Fair Play Award
+bullets).
+
+**No new false claim turned up this run** - unlike the two the 171st and
+173rd runs' own ledger-seeding passes each found for the other claim
+shapes - but the checker itself is the same standing guard against a
+*future* one slipping in unverified as new editions are added or existing
+prose is reworded, which is the point of building it even on a clean pass.
+
+`tests/unit/checkRecordClaims.test.ts` covers the extraction regex (all
+eight trigger words, case-insensitively, ignores non-bullet lines) and
+reuses `diffClaimsAgainstLedger` directly from `check-superlative-claims.mjs`
+rather than duplicating it, the same reuse `check-ordinal-claims.mjs`
+already established.
+
+Wired into `.github/workflows/ci.yml` as a required PR gate immediately
+after `check:ordinal-claims`.
+
+**Verification:** `pnpm lint` (225 files, 0 errors/0 warnings/0 hints),
+`pnpm test` (805/805, up from 796 - the 9 new tests are `tests/unit/
+checkRecordClaims.test.ts`), `pnpm build` (711 pages, unchanged), `pnpm
+check:record-claims` (36 claims across 5 content files, 0 unverified, 0
+stale), `pnpm check:superlative-claims` (21/21) and `pnpm check:ordinal-claims`
+(17/17, both confirm this run didn't disturb either existing ledger), `pnpm
+check:award-tallies` (4/4), `pnpm check:i18n-notes` (7 EN/HR page pairs,
+still structurally identical - no content wording changed, only a new
+script/ledger/test/CI-step were added), `pnpm check:spelling` (15 files, 0
+issues), `pnpm check:spelling-hr` (57 Croatian note blocks, 0 unknown
+words), `pnpm check:links` (715 pages), `pnpm check:meta` (710 pages),
+`pnpm check:link-names` (710 pages), `pnpm dlx knip --no-config-hints` (the
+same two standing false positives as every prior run, nothing new). The
+full `pnpm test:e2e`/manual browser sweeps were not re-run - no content
+wording changed, out of scope for those sweeps per the routine's own
+standing practice on narrow-scope diffs.
+
+**Left for a future pass:** the five claims the new ledger records as
+not-independently-verifiable (1930/2026 winning-manager ages, 1982
+winning-captain age, the 2004 Copa América assists record, the 2026 World
+Cup clean-sheet record) would need either new per-person biographical/
+statistical data or external sourcing to close for good - not pursued for
+the same reason the Yashin/Guevara/Cafu/Cubarsí/Donnarumma entries in the
+other two ledgers weren't: fabricating that data from memory without an
+independent source to check it against risks shipping confidently-wrong
+history. The open backlog itself is otherwise unchanged - see
+`docs/ROADMAP.md`.
