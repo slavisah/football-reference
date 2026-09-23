@@ -167,7 +167,7 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(notes.getByText('Pau Cubarsí (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Fair Play Award winners' })).toBeVisible();
     await expect(
-      notes.getByText('the only team to win both the World Cup and the Fair Play Award'),
+      notes.getByText('the fifth team to win both the World Cup and the Fair Play Award'),
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
     await expect(notes.getByText('Luis de la Fuente (Spain)')).toBeVisible();
@@ -493,7 +493,7 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Dobitnici nagrade Fair Play' })).toBeVisible();
     await expect(
-      page.locator('.notes__card').getByText('jedina momčad koja je na istom turniru'),
+      page.locator('.notes__card').getByText('peta momčad koja je na istom turniru'),
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Izbornici prvaka' })).toBeVisible();
     await expect(

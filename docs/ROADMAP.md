@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (169 intensive runs as of 2026-09-22) lives
+verification sweep and decision (171 intensive runs as of 2026-09-23) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -60,6 +60,23 @@ all 711 pages, `check:lighthouse`'s 39 audited pages every category a perfect
 not a regression. The full `pnpm test:e2e` suite was also re-run cold-start:
 1020/1020 passed (16.5 minutes).
 
+**Hundred-and-seventy-first run:** with the open backlog below still fully
+blocked, this run tried a quality angle not used in the prior 170 runs:
+cross-checking hand-written prose "the only X to Y" superlative claims in
+the editorial note bullets against the actual data in the tables they
+summarize (rather than re-running the standing health-check suite, or
+searching for missing data). Found and fixed two genuine, previously-
+unnoticed factual errors - a false "only" claim in the FIFA World Cup Fair
+Play Award notes (2010's Spain was actually the *fifth* team to also win
+the World Cup that year, not the only one) and a false "only" claim in the
+Copa América Golden Boot notes (Eduardo Vargas wasn't the only player to win
+in consecutive editions - Pedro Petrone did too, in 1923-1924) - in both the
+English content and the matching hand-translated Croatian pages, plus the
+two e2e assertions pinned to the old wording. `pnpm lint`/`pnpm test`/`pnpm
+build` and every relevant `check:*` script re-ran clean after the fix. See
+`docs/PROJECT_STATUS.md`'s matching entry for full detail, including the
+~2 dozen other superlative claims spot-checked and confirmed still correct.
+
 **Hundred-and-seventieth run:** with the open backlog below still fully
 blocked (re-confirmed: no new `@astrojs/check` release; no new angle on the
 network-access or human-sign-off items), this run found one genuinely
@@ -73,14 +90,6 @@ to the documented baseline (no regression from the astro bump or from the
 several small fixes landed since): 772/772 unit, 1020/1020 e2e, 711 pages,
 all `check:*` scripts clean. No new bug found. See `docs/PROJECT_STATUS.md`'s
 matching entry for full detail.
-
-**Hundred-and-sixty-ninth run:** closed the last `check:lighthouse` coverage
-gap - `home` (`/`) had an English `PAGES_TO_AUDIT` entry but no Croatian one
-(`/hr/`), the one page shape the hundred-and-sixty-seventh run's own
-"last uncovered page shape" sweep had missed (it renders `OnThisDay.astro`'s
-widget, a layout no other page shares). Added `{ label: 'hr home', path:
-'/hr/' }`; scores a perfect 1.00 on every category. See
-`docs/PROJECT_STATUS.md`'s matching entry for full detail.
 
 ## Open backlog
 
@@ -165,3 +174,12 @@ widget, a layout no other page shares). Added `{ label: 'hr home', path:
   confidently-wrong history. Needs a session with working external network
   access to source it properly, the same blocker as the link-liveness sweep
   above.
+- **Narrow automated checker for "the only X to Y" prose claims** (flagged
+  by the hundred-and-seventy-first run after it found and fixed two false
+  ones by hand): a generic checker for arbitrary superlative claims in
+  editorial note bullets isn't tractable without NLP-level claim extraction,
+  but a narrower pattern-match (e.g. flag any note bullet matching `/\bthe
+  only\b/i` or an ordinal-plus-"to" pattern for manual re-verification
+  whenever its source table changes) could catch a recurrence of this bug
+  class cheaply. Not built yet - only worth it if this class of error
+  recurs.

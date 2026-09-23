@@ -166,7 +166,7 @@ Every World Cup edition has decided its champion in one match at one stadium, in
 - **1998:** England and France - the award's first of two shared years.
 - **2002:** Belgium.
 - **2006:** Brazil and Spain - the award's second and, to date, final shared year.
-- **2010:** Spain - the only team to win both the World Cup and the Fair Play Award at the same tournament.
+- **2010:** Spain - the fifth team to win both the World Cup and the Fair Play Award at the same tournament, after West Germany (1974), Argentina (1978), Brazil (1994) and France (1998, a shared award year).
 - **2014:** Colombia.
 - **2018:** Spain.
 - **2022:** England.
