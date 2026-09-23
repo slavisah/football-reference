@@ -37,6 +37,7 @@
     "check:superlative-claims": "node scripts/check-superlative-claims.mjs",
     "check:ordinal-claims": "node scripts/check-ordinal-claims.mjs",
     "check:record-claims": "node scripts/check-record-claims.mjs",
+    "check:consecutive-claims": "node scripts/check-consecutive-claims.mjs",
     "check:edition-header-labels": "node scripts/check-edition-header-labels.mjs",
     "check:i18n-notes": "node scripts/check-i18n-notes.mjs",
     "check:attendance-format": "node scripts/check-attendance-format.mjs",

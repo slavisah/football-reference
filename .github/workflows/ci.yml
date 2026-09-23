@@ -60,6 +60,9 @@ jobs:
       - name: "Record-claim (most/record/youngest/oldest/etc.) verification-ledger check (content/*.md)"
         run: pnpm check:record-claims
 
+      - name: "\"Consecutive\"/\"back-to-back\" claim verification-ledger check (content/*.md)"
+        run: pnpm check:consecutive-claims
+
       - name: Edition-page header-label translation check
         run: pnpm check:edition-header-labels
 
