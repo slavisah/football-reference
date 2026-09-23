@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (173 intensive runs as of 2026-09-23) lives
+verification sweep and decision (174 intensive runs as of 2026-09-23) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -38,14 +38,14 @@ what exists and any standing quirks.
 
 Every recent run's standing health check comes back clean run after run:
 `pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm test`/`pnpm
-test:coverage`/`pnpm build`, all 28 `check:*` scripts (23 fast enough to run
+test:coverage`/`pnpm build`, all 29 `check:*` scripts (24 fast enough to run
 every time and wired into `.github/workflows/ci.yml` as required PR gates,
-`check:ordinal-claims` the newest as of the hundred-and-seventy-third run;
+`check:record-claims` the newest as of the hundred-and-seventy-fourth run;
 `check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-seventy-third run (2026-09-23): 796/796 unit tests,
+As of the hundred-and-seventy-fourth run (2026-09-23): 805/805 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, zero `pnpm
 audit` vulnerabilities, and the same two standing `knip` false positives as
 ever (`scripts/test-preview-server.mjs`, used only as a Playwright
@@ -57,6 +57,17 @@ inside a config-file string. The five manual browser sweeps
 `check:html`) and the full `pnpm test:e2e` suite were last re-run together
 cold-start as of the hundred-and-seventieth run (2026-09-22): clean on all
 711 pages, 1020/1020 e2e passed.
+
+**Hundred-and-seventy-fourth run:** built `check:record-claims`
+(`scripts/check-record-claims.mjs`), a third verification-ledger gate
+alongside `check:superlative-claims` and `check:ordinal-claims`, this one
+for "most/record/youngest/oldest/highest/biggest/largest/lowest/fewest"
+record-holder claims - a bug class neither existing checker's pattern
+covers. Seeded the ledger by checking all 36 current claims this pattern
+matches; no new false claim turned up this run (unlike the 171st and 173rd
+runs' own ledger-seeding passes for the other two claim shapes), but the
+checker is now a standing guard against one slipping in unverified in the
+future. See `docs/PROJECT_STATUS.md`'s matching entry for full detail.
 
 **Hundred-and-seventy-third run:** built `check:ordinal-claims`
 (`scripts/check-ordinal-claims.mjs`), the other half of the idea the

@@ -57,6 +57,9 @@ jobs:
       - name: "\"The first/second/.../tenth X to Y\" ordinal-claim verification-ledger check (content/*.md)"
         run: pnpm check:ordinal-claims
 
+      - name: "Record-claim (most/record/youngest/oldest/etc.) verification-ledger check (content/*.md)"
+        run: pnpm check:record-claims
+
       - name: Edition-page header-label translation check
         run: pnpm check:edition-header-labels
 
