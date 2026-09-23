@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (171 intensive runs as of 2026-09-23) lives
+verification sweep and decision (172 intensive runs as of 2026-09-23) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -38,9 +38,9 @@ what exists and any standing quirks.
 
 Every recent run's standing health check comes back clean run after run:
 `pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm test`/`pnpm
-test:coverage`/`pnpm build`, all 26 `check:*` scripts (21 fast enough to run
+test:coverage`/`pnpm build`, all 27 `check:*` scripts (22 fast enough to run
 every time and wired into `.github/workflows/ci.yml` as required PR gates,
-`check:theme-color` among them as of the hundred-and-sixty-eighth run;
+`check:superlative-claims` among them as of the hundred-and-seventy-second run;
 `check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
@@ -59,6 +59,35 @@ all 711 pages, `check:lighthouse`'s 39 audited pages every category a perfect
 1.00 except the 404-page entry's `seo`, a known/bounded/documented exception,
 not a regression. The full `pnpm test:e2e` suite was also re-run cold-start:
 1020/1020 passed (16.5 minutes).
+
+**Hundred-and-seventy-second run:** built the "narrow automated checker for
+'the only X to Y' prose claims" idea the hundred-and-seventy-first run had
+flagged but not built (see `docs/ROADMAP.md`'s prior "Ideas not yet scoped"
+entry, now closed - superseded by this section). `check:superlative-claims`
+(`scripts/check-superlative-claims.mjs`) extracts every `content/*.md`
+bullet matching `/\bthe only\b/i` and diffs it against a hand-maintained
+verification ledger (`scripts/superlative-claims-ledger.json`); a bullet
+whose exact text isn't in the ledger - because it's brand new or its wording
+changed even slightly - fails the build until it's checked against the
+source table it summarizes and recorded with a note on how. Wired into
+`.github/workflows/ci.yml` as a required PR gate alongside
+`check:award-tallies`. Seeding the ledger meant actually re-verifying all 21
+current "the only" claims across all six content files against their real
+source tables (not just re-asserting the hundred-and-seventy-first run's own
+spot-check) - 18 were independently confirmed by cross-referencing counts/
+repeats/name-overlaps directly in the tables; three (Ballon d'Or's "Yashin
+is the only goalkeeper winner", Copa América's "Guevara is the only guest-
+nation winner", World Cup's "Cafu is the only player in three straight
+finals") aren't derivable from any column this site's tables carry (no
+position/confederation/full-squad-appearance data) and are recorded as such
+rather than given a fabricated verification method - the first two matching
+the hundred-and-seventy-first run's own documented caveat about Guevara, the
+Cafu case newly identified by this run. See `tests/unit/
+checkSuperlativeClaims.test.ts` for unit coverage of the extraction/diff
+logic. **Verification:** `pnpm lint` (221 files, 0/0/0), `pnpm test`
+(783/783, up from 772), `pnpm build` (711 pages), `pnpm check:superlative-
+claims` (21 claims, 0 unverified), `pnpm check:award-tallies` (4/4),
+`pnpm check:spelling` (15 files, 0 issues) - all clean.
 
 **Hundred-and-seventy-first run:** with the open backlog below still fully
 blocked, this run tried a quality angle not used in the prior 170 runs:
@@ -174,12 +203,3 @@ matching entry for full detail.
   confidently-wrong history. Needs a session with working external network
   access to source it properly, the same blocker as the link-liveness sweep
   above.
-- **Narrow automated checker for "the only X to Y" prose claims** (flagged
-  by the hundred-and-seventy-first run after it found and fixed two false
-  ones by hand): a generic checker for arbitrary superlative claims in
-  editorial note bullets isn't tractable without NLP-level claim extraction,
-  but a narrower pattern-match (e.g. flag any note bullet matching `/\bthe
-  only\b/i` or an ordinal-plus-"to" pattern for manual re-verification
-  whenever its source table changes) could catch a recurrence of this bug
-  class cheaply. Not built yet - only worth it if this class of error
-  recurs.

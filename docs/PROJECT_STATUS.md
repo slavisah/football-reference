@@ -28365,3 +28365,99 @@ chromium-1194/chrome-linux/chrome` instead of the usual `/opt/pw-browsers/
 chromium` to launch at all; worth a note for whichever future run next needs
 `pnpm test:e2e` or a browser sweep, in case the mismatch persists. The
 open backlog itself is unchanged - see `docs/ROADMAP.md`.
+
+### Added `check:superlative-claims`, a verification-ledger gate against future false "the only X to Y" claims - closed 2026-09-23 (hundred-and-seventy-second intensive run)
+
+The hundred-and-seventy-first run found and fixed two false "the only"
+superlative claims by hand, then flagged (but deliberately didn't build) a
+narrower follow-up in `docs/ROADMAP.md`: a cheap pattern-match gate to catch
+a recurrence of that bug class, rather than a full NLP-level claim checker.
+This run built it.
+
+**How it works:** `scripts/check-superlative-claims.mjs` extracts every
+`content/*.md` bullet matching `/\bthe only\b/i` (the exact pattern the
+roadmap entry proposed - deliberately not a broader "only"/exclusivity match
+like `"Colombia's only title"` or `"one of only three men"`, which exist too
+but would pull in far more incidental, unrelated uses of "only" and turn a
+cheap, low-noise gate into a noisy one). It diffs the current set of claims
+against `scripts/superlative-claims-ledger.json`, a hand-maintained record
+mapping each already-verified claim's *exact* text to a short note on how it
+was checked. A claim with no matching ledger entry - because it's brand new,
+or because its wording changed even slightly since it was last verified -
+fails the build: `pnpm check:superlative-claims` reports it and the build
+can't ship until someone (a future intensive run, most likely) reads it
+against the source table it summarizes and records that verification as a
+new ledger entry. This is deliberately strict about *any* wording change,
+not just claims that look "material" - a small rewording is exactly how the
+Fair Play Award false claim the 171st run fixed could have drifted from a
+verified true claim into an unverified new one without anybody re-checking
+it. A ledger entry whose text no longer matches any current claim (the
+bullet was reworded, moved, or deleted) is reported as stale but does not
+fail the build - it can never mask a genuinely new unverified claim, so
+there's no correctness reason to block on it, only a cleanliness one.
+
+Plain regex/string parsing of `content/*.md`, the same territory as
+`check:award-tallies`/`check:spelling` (well under a second, no build or
+browser needed), so it's wired into `.github/workflows/ci.yml` as a required
+PR gate immediately after `check:award-tallies`. `tests/unit/
+checkSuperlativeClaims.test.ts` covers the extraction regex (matches "the
+only" bullets, case-insensitively, ignores non-bullet lines and "only"-
+without-"the-only" bullets like "Europe-only" or "one of only three men")
+and the ledger diff (new claim, reworded claim producing both a new claim
+and a stale entry, removed claim producing only a stale entry, an
+entirely-new file with no ledger section at all).
+
+**Seeding the ledger meant actually re-verifying all 21 current claims**,
+not just re-asserting the 171st run's own "spot-checked and confirmed"
+summary. Read the real source tables (Best Player/Golden Boot/Golden
+Glove/Team of the Tournament/Winning managers/Winning captains on
+`copa-america.md`; Golden Ball/Golden Glove/Fair Play/Winning managers/
+Winning captains on `fifa-world-cup.md`; the Winners table on
+`ballon-dor.md`; the World Cup top-scorers table on `golden-boot.md`;
+Player of the Tournament/Team of the Tournament/Winning captains on
+`uefa-euro.md`) and either counted name occurrences, walked the list for
+adjacent-edition repeats, or cross-referenced two tables by year/name to
+confirm each claim, rather than assuming correctness. 18 of the 21 were
+independently confirmed this way (full methodology recorded per-claim in
+the ledger). Three were not: Ballon d'Or's "Lev Yashin remains the only
+goalkeeper to win the men's award" and Copa América's "Amado Guevara -
+the only winner from a guest nation outside CONMEBOL" both rely on a fact
+(playing position; confederation membership) no column on this site
+tracks - Guevara's case is exactly what the 171st run's own entry already
+flagged as unverifiable from table data, and Yashin's is the same shape
+of gap, newly identified here. FIFA World Cup's "Cafu - the only player
+to appear in three consecutive World Cup finals (1994, 1998 and 2002)"
+is a third, newly-identified case: the Winning captains table only names
+each year's *winning* captain, not every squad member of either
+finalist, so Cafu's own two non-captain final appearances (1994, 1998)
+aren't derivable from it. All three are left on the existing,
+well-established football history rather than guessed at or silently
+assumed, with the ledger recording *why* they can't be automatically
+re-verified rather than fabricating a cross-check that didn't happen -
+should any of the three ever need re-confirming, that's now a documented,
+explicit follow-up rather than a silent gap.
+
+**Verification:** `pnpm lint` (221 files, 0 errors/0 warnings/0 hints),
+`pnpm test` (783/783, up from 772 - the 11 new tests are `tests/unit/
+checkSuperlativeClaims.test.ts`), `pnpm build` (711 pages, unchanged),
+`pnpm check:superlative-claims` (21 claims checked across 15 content
+files, 0 unverified, 0 stale), `pnpm check:award-tallies` (4/4, confirms
+this run didn't disturb anything that script covers), `pnpm
+check:spelling` (15 files, 0 issues - confirms no content wording
+changed, only comments/scripts/docs were added), `pnpm dlx knip
+--no-config-hints` (the same two standing false positives as every prior
+run, nothing new from the added script/test/ledger files). The full
+`pnpm test:e2e`/manual browser sweeps were not re-run - this change adds a
+new content-only CI gate and its own unit tests, no markup/CSS/behavior
+change, out of scope for those sweeps per the routine's own standing
+practice on narrow-scope diffs.
+
+**Left for a future pass:** the three claims the ledger records as
+not-independently-verifiable (Yashin, Guevara, Cafu) would need either a
+new data column (playing position, confederation, or full per-edition
+finalist squads) or external sourcing to close for good - not pursued
+here for the same reason the "Youngest winner" ranking idea below is
+deferred: fabricating the missing structured data from memory without an
+independent source to check it against risks shipping confidently-wrong
+history. The open backlog itself is otherwise unchanged - see
+`docs/ROADMAP.md`.
