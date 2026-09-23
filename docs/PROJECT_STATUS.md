@@ -28461,3 +28461,106 @@ deferred: fabricating the missing structured data from memory without an
 independent source to check it against risks shipping confidently-wrong
 history. The open backlog itself is otherwise unchanged - see
 `docs/ROADMAP.md`.
+
+### Added `check:ordinal-claims`, a second verification-ledger gate for "the first/second/.../tenth X to Y" claims - found and fixed a genuine false claim in the process - closed 2026-09-23 (hundred-and-seventy-third intensive run)
+
+With the open backlog still fully blocked, this run built the other half of
+the idea the hundred-and-seventy-first run's "Left for a future pass" note
+sketched but didn't build: alongside `check:superlative-claims`'s "the
+only X to Y" pattern, that note also proposed a narrower checkable pattern
+for ordinal-rank claims (`/\bthe \w+(st|nd|rd|th)\b.*to\b/i`). This run
+built `check:ordinal-claims` (`scripts/check-ordinal-claims.mjs`) as a
+sibling to `check:superlative-claims`, same verification-ledger mechanism,
+its own ledger (`scripts/ordinal-claims-ledger.json`).
+
+**The proposed regex was too noisy to use as-is.** Trying the roadmap
+entry's own unbounded `.*\bto\b` pattern against the real content first
+(rather than assuming it would work) surfaced false matches with no
+connection between the ordinal word and the "to" - e.g. a `uefa-nations-
+league.md` "How it works" bullet matched only because "relegate the
+weakest **to** a lower one" happens to contain "**the** weak**est**" earlier
+in the same long sentence, and a `copa-america.md` sourcing-note bullet
+matched purely because "the captain..." and an unrelated "to" both occur
+somewhere in one very long paragraph-as-bullet. Bounding the pattern to a
+50-character, period-respecting window
+(`/\bthe (first|...|tenth)\b(?:(?!\.).){0,50}\bto\b/i`, ordinal words spelled
+out rather than a suffix match, since "weakest" also ends in a valid ordinal
+suffix) cut the false-match set to zero on the current corpus while keeping
+every genuine "the Nth of some category to do something" claim - 17 of them
+across 6 content files, one fewer file than `check:superlative-claims`
+covers (no ordinal-shaped claims exist in `content/teams.md`,
+`content/players.md`, etc., which have no such claims either).
+
+**Verifying all 17 to seed the ledger found a genuine, previously-unnoticed
+false claim**, the same way the 171st run's cross-check of "the only" claims
+did: `content/uefa-euro.md`'s Final venues section said 2020's Wembley
+Stadium final was "the same stadium as the 1996 final, **the second** to
+host two EURO finals." Scanning the venues list in order shows this is
+false - Rome's Stadio Olimpico reached two finals first, in 1980 (after
+1968), then **Paris's Parc des Princes reached two finals second, in 1984**
+(after 1960) - both years before Wembley's own second final in 2020. Wembley
+is actually the **third** stadium to host two EURO finals, not the second;
+the 1984 Paris entry describes the repeat itself ("the same stadium as the
+1960 final") but never states its own ordinal rank, which is presumably how
+this slipped through un-cross-referenced. Fixed the wording in both
+`content/uefa-euro.md` and its hand-translated Croatian counterpart
+(`src/pages/hr/competitions/euro.astro`, which keeps its own decoupled
+`NoteSection[]`/items array by the same design `check-superlative-claims`'s
+2020-08 fix followed) to name the correct rank and cite both earlier
+stadiums, in the same commit that adds the checker. No e2e assertion was
+pinned to the old wording (confirmed via grep before editing), so no test
+needed updating.
+
+Of the other 16 claims, 14 were independently confirmed by directly
+cross-referencing the table(s) each claim summarizes (methodology recorded
+per-claim in the ledger - repeat-name scans for "first two-time X" claims,
+year-order scans for "first to reach N" claims, and one direct
+cross-reference between the FIFA World Cup Editions and Fair Play Award
+tables for the "fifth team to win both" claim, which independently
+reproduced the claim's own enumeration exactly). Two - `fifa-world-cup.md`'s
+"Cubarsí, the first defender to win the [Young Player] award" and
+`uefa-euro.md`'s "Donnarumma, the first goalkeeper to win the [Player of
+the Tournament] award" - aren't derivable from either table (neither
+carries a position column), the same shape of gap as the existing
+Yashin/Cafu entries in `superlative-claims-ledger.json`; left on
+well-established football knowledge (both players' positions are
+undisputed) rather than guessed at, with the gap recorded rather than
+silently assumed.
+
+`tests/unit/checkOrdinalClaims.test.ts` covers the extraction regex
+(matches every ordinal first-tenth case-insensitively, requires "to" within
+the 50-character window, refuses to cross a period, ignores non-bullet
+lines) reusing `diffClaimsAgainstLedger` directly from
+`check-superlative-claims.mjs` rather than duplicating it, since the ledger-
+diff logic itself is identical between the two checkers and only the
+extraction pattern differs.
+
+Wired into `.github/workflows/ci.yml` as a required PR gate immediately
+after `check:superlative-claims`.
+
+**Verification:** `pnpm lint` (223 files, 0 errors/0 warnings/0 hints),
+`pnpm test` (796/796, up from 783 - the 13 new tests are `tests/unit/
+checkOrdinalClaims.test.ts`), `pnpm build` (711 pages, unchanged),
+`pnpm check:ordinal-claims` (17 claims across 6 content files, 0
+unverified, 0 stale), `pnpm check:superlative-claims` (21/21, confirms
+the Wembley wording fix didn't touch any "the only" claim), `pnpm
+check:award-tallies` (4/4), `pnpm check:i18n-notes` (7 EN/HR page pairs,
+still structurally identical - the Wembley bullet was reworded in both
+languages together, no bullet added or removed), `pnpm check:spelling`
+(15 files, 0 issues), `pnpm check:spelling-hr` (57 Croatian note blocks,
+0 unknown words - confirms the new Croatian "treći ... nakon Rima ...
+i Pariza" wording matches the HR dictionary), `pnpm check:links` (715
+pages), `pnpm check:meta` (710 pages), `pnpm check:link-names` (710
+pages), `pnpm dlx knip --no-config-hints` (the same two standing false
+positives as every prior run, nothing new). The full `pnpm test:e2e`/
+manual browser sweeps were not re-run - no assertion was pinned to the
+corrected wording (confirmed by grep) and the rest of this change is a
+new content-only CI gate plus its own unit tests, out of scope for those
+sweeps per the routine's own standing practice on narrow-scope diffs.
+
+**Left for a future pass:** the two claims the new ledger records as
+not-independently-verifiable (Cubarsí, Donnarumma) have the same shape of
+gap as the Yashin/Cafu entries in `superlative-claims-ledger.json` and the
+same fix (a position column, or external sourcing) - not pursued for the
+same reason. The open backlog itself is otherwise unchanged - see
+`docs/ROADMAP.md`.

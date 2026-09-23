@@ -39,7 +39,7 @@ Every EURO edition has decided its champion in one match at one stadium - even 2
 - **2008:** Ernst-Happel-Stadion, Vienna (Austria) - a reported attendance of 51,428.
 - **2012:** NSC Olimpiyskiy, Kyiv (Ukraine) - a reported attendance of 63,170.
 - **2016:** Stade de France, Saint-Denis (France) - a reported attendance of 75,868.
-- **2020:** Wembley Stadium, London (England) - the same stadium as the 1996 final, the second to host two EURO finals.
+- **2020:** Wembley Stadium, London (England) - the same stadium as the 1996 final, the third to host two EURO finals, after Rome (1980) and Paris (1984).
 - **2024:** Olympiastadion, Berlin (Germany) - a reported attendance of 65,600.
 
 ## Editions

@@ -54,6 +54,9 @@ jobs:
       - name: "\"The only X to Y\" superlative-claim verification-ledger check (content/*.md)"
         run: pnpm check:superlative-claims
 
+      - name: "\"The first/second/.../tenth X to Y\" ordinal-claim verification-ledger check (content/*.md)"
+        run: pnpm check:ordinal-claims
+
       - name: Edition-page header-label translation check
         run: pnpm check:edition-header-labels
 
