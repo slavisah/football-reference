@@ -34,6 +34,7 @@
     "check:reachability": "node scripts/check-reachability.mjs",
     "check:meta": "node scripts/check-meta.mjs",
     "check:award-tallies": "node scripts/check-award-tallies.mjs",
+    "check:superlative-claims": "node scripts/check-superlative-claims.mjs",
     "check:edition-header-labels": "node scripts/check-edition-header-labels.mjs",
     "check:i18n-notes": "node scripts/check-i18n-notes.mjs",
     "check:attendance-format": "node scripts/check-attendance-format.mjs",
