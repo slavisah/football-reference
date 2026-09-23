@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (172 intensive runs as of 2026-09-23) lives
+verification sweep and decision (173 intensive runs as of 2026-09-23) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -38,27 +38,46 @@ what exists and any standing quirks.
 
 Every recent run's standing health check comes back clean run after run:
 `pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm test`/`pnpm
-test:coverage`/`pnpm build`, all 27 `check:*` scripts (22 fast enough to run
+test:coverage`/`pnpm build`, all 28 `check:*` scripts (23 fast enough to run
 every time and wired into `.github/workflows/ci.yml` as required PR gates,
-`check:superlative-claims` among them as of the hundred-and-seventy-second run;
+`check:ordinal-claims` the newest as of the hundred-and-seventy-third run;
 `check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-seventieth run (2026-09-22): 772/772 unit tests, `pnpm
-lint` at 0 errors/0 warnings/0 hints, 711 pages built, zero `pnpm audit`
-vulnerabilities, and the same two standing `knip` false positives as ever
-(`scripts/test-preview-server.mjs`, used only as a Playwright
+As of the hundred-and-seventy-third run (2026-09-23): 796/796 unit tests,
+`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, zero `pnpm
+audit` vulnerabilities, and the same two standing `knip` false positives as
+ever (`scripts/test-preview-server.mjs`, used only as a Playwright
 `webServer.command`, never imported; `@cspell/dict-hr-hr`, used only via
 `.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS `import`) -
 neither actually unused, knip's static analysis just can't see a reference
-inside a config-file string. All five manual browser sweeps
+inside a config-file string. The five manual browser sweeps
 (`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
-`check:html`) were re-run fresh this run against the current build: clean on
-all 711 pages, `check:lighthouse`'s 39 audited pages every category a perfect
-1.00 except the 404-page entry's `seo`, a known/bounded/documented exception,
-not a regression. The full `pnpm test:e2e` suite was also re-run cold-start:
-1020/1020 passed (16.5 minutes).
+`check:html`) and the full `pnpm test:e2e` suite were last re-run together
+cold-start as of the hundred-and-seventieth run (2026-09-22): clean on all
+711 pages, 1020/1020 e2e passed.
+
+**Hundred-and-seventy-third run:** built `check:ordinal-claims`
+(`scripts/check-ordinal-claims.mjs`), the other half of the idea the
+hundred-and-seventy-first run's "Left for a future pass" note sketched but
+didn't build - a verification-ledger gate for "the first/second/.../tenth X
+to Y" ordinal-rank claims, sibling to `check:superlative-claims`. The
+roadmap's own proposed regex proved too noisy against the real content (it
+matched unrelated bullets on nothing more than an ordinal-suffixed word and
+an unconnected "to" appearing anywhere in a long sentence); a
+50-character, period-bounded window fixed that with zero false matches.
+Verifying all 17 current claims to seed the ledger found and fixed a
+genuine false claim: `content/uefa-euro.md` said Wembley's 2020 final was
+"the second" stadium to host two EURO finals, but Paris's Parc des Princes
+reached that milestone first, in 1984 (after Rome in 1980) - Wembley is
+actually the third, not the second. Fixed in both the English content and
+its Croatian counterpart (`src/pages/hr/competitions/euro.astro`). Two of
+the 17 claims (Cubarsí "first defender", Donnarumma "first goalkeeper") rely
+on player position, a fact no table on this site carries, and are recorded
+in the ledger as not-independently-verifiable rather than guessed at, the
+same treatment `superlative-claims-ledger.json` already gives the Yashin/
+Cafu cases. See `docs/PROJECT_STATUS.md`'s matching entry for full detail.
 
 **Hundred-and-seventy-second run:** built the "narrow automated checker for
 'the only X to Y' prose claims" idea the hundred-and-seventy-first run had
