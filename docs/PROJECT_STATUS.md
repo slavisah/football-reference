@@ -28282,3 +28282,86 @@ browser-sweep confirmation now fresh as of this run, a future run's best bet
 is either a fresh source lead on any of the open attendance/Team-of-the-
 Tournament gaps, or a genuinely different quality angle not yet tried in the
 last several dozen runs.
+
+### Two false "the only X to Y" superlative claims found and fixed by cross-checking prose against their own source tables - closed 2026-09-23 (hundred-and-seventy-first intensive run)
+
+With `docs/ROADMAP.md`'s open backlog still fully blocked (re-confirmed:
+`WebFetch` to `en.wikipedia.org` still returns `EGRESS_BLOCKED`, no new
+`@astrojs/check` release), this run tried a quality angle not used in any of
+the prior hundred-and-seventy runs' own health checks or content-gap
+passes: rather than re-running the standing suite or searching for missing
+data, it cross-checked every hand-written prose "the only team/player to
+..." and "the Nth team/player to ..." superlative claim in the editorial
+note bullets against the actual data in the tables those bullets summarize,
+programmatically rather than by eye. `check:award-tallies` and
+`check:i18n-notes` don't catch this class of bug - the first only compares
+tally tables against their own source tables, the second only checks EN/HR
+structural (bullet-count) parity, and neither reads a narrative sentence's
+factual claim against the data it describes.
+
+Two genuine, previously-unnoticed factual errors turned up:
+
+- **FIFA World Cup Fair Play Award:** `content/fifa-world-cup.md` claimed
+  Spain's 2010 win was "the only team to win both the World Cup and the Fair
+  Play Award at the same tournament." Cross-checking every Fair Play winner
+  against the Editions table's Winner column shows the World Cup champion
+  also won the Fair Play Award in five years, not one: West Germany (1974),
+  Argentina (1978), Brazil (1994), France (1998, a shared-award year) and
+  Spain (2010). Reworded to "the fifth team to win both ... after West
+  Germany (1974), Argentina (1978), Brazil (1994) and France (1998, a
+  shared award year)."
+- **Copa América Golden Boot:** `content/copa-america.md` claimed "Eduardo
+  Vargas is the only player to win in consecutive editions (2015 and
+  2016)." The same table shows Pedro Petrone winning in 1923 (shared) and
+  again in 1924 - also consecutive editions. Reworded to name both: "Eduardo
+  Vargas (2015 and 2016) and Pedro Petrone (1923 and 1924) are the only
+  players to win in consecutive editions."
+
+Both English content files, both matching Croatian pages
+(`src/pages/hr/competitions/world-cup.astro` and
+`src/pages/hr/competitions/copa-america.astro`, which keep their own
+hand-translated `NoteSection[]` arrays decoupled from the English content by
+design) were corrected together, plus the two `tests/e2e/mobile.spec.ts`
+assertions (one English, one Croatian) that were pinned to the old, wrong
+wording.
+
+About two dozen other "the only"/"one of only"/"the first" claims across all
+six content files (Copa América's back-to-back managers/captains, EURO's
+Team of the Tournament repeat selections, World Cup Golden Ball repeat
+winners, Ballon d'Or trophy repeat-winner claims, etc.) were spot-checked
+the same way and held up against their own tables; a few (e.g. "Amado
+Guevara - the only winner from a guest nation outside CONMEBOL") aren't
+verifiable from data already in the tables (no "guest nation" column) and
+would need either a new data column or external sourcing, so were left
+alone rather than guessed at.
+
+**Verification:** `pnpm lint` (219 files, 0 errors/0 warnings/0 hints),
+`pnpm test` (772/772), `pnpm build` (711 pages), `pnpm check:award-tallies`
+(4/4 tally tables still match their source tables - confirms this run
+didn't disturb anything that script covers), `pnpm check:i18n-notes` (7
+EN/HR page pairs, all still structurally identical - only existing bullets
+were reworded, none added or removed), `pnpm check:spelling` (15 files, 0
+issues), `pnpm check:spelling-hr` (57 Croatian note blocks, no unknown
+words - confirms the new Croatian wording matches the HR dictionary),
+`pnpm check:links` (715 pages, no broken internal links), `pnpm check:meta`
+(710 pages), `pnpm check:link-names` (710 pages). Targeted (not full-suite)
+Playwright runs of the two edited assertions plus their surrounding test
+blocks: 29/29 passed, 0 failed. The full `pnpm test:e2e`/manual browser
+sweeps were not re-run - this change only reworded two prose sentences with
+no markup/CSS/behavior change, out of scope for those sweeps per the
+routine's own standing practice on narrow-scope diffs.
+
+**Left for a future pass:** no new permanent `check:*` script was added for
+this bug class - a generic checker for arbitrary "the only X to Y" prose
+claims isn't tractable without NLP-level claim extraction, and a
+bespoke checker for just these two specific claims would be low-value
+single-purpose code. A narrower, checkable version of this idea (e.g. flag
+any note bullet matching `/\bthe only\b/i` or `/\bthe \w+(st|nd|rd|th)\b.*to\b/i`
+for manual re-verification whenever its source table changes) is a
+reasonable future automation if this bug class recurs. This environment's
+cached Playwright Chromium build was a version behind what a fresh `pnpm
+install` pulled in this run - needed `PW_EXECUTABLE_PATH=/opt/pw-browsers/
+chromium-1194/chrome-linux/chrome` instead of the usual `/opt/pw-browsers/
+chromium` to launch at all; worth a note for whichever future run next needs
+`pnpm test:e2e` or a browser sweep, in case the mismatch persists. The
+open backlog itself is unchanged - see `docs/ROADMAP.md`.
