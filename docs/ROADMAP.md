@@ -55,8 +55,26 @@ neither actually unused, knip's static analysis just can't see a reference
 inside a config-file string. The five manual browser sweeps
 (`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
 `check:html`) and the full `pnpm test:e2e` suite were last re-run together
-cold-start as of the hundred-and-seventieth run (2026-09-22): clean on all
-711 pages, 1020/1020 e2e passed.
+cold-start as of the hundred-and-seventy-fifth run (2026-09-23): clean on
+all 711 pages, 1020/1020 e2e passed.
+
+**Hundred-and-seventy-fifth run:** with the open backlog below still fully
+blocked (re-confirmed: `WebFetch` to `en.wikipedia.org` still returns
+`EGRESS_BLOCKED`, no new `@astrojs/check` release) and no new narrow
+prose-claim pattern found worth a fourth verification-ledger gate (checked
+"longest/shortest/earliest/latest/greatest/smallest" and the `'s only`
+possessive-uniqueness phrasing the superlative checker's own comments
+already considered and deliberately excluded - both come back near-empty
+and non-actionable, not a new gap), this run's contribution was a full
+cold-start confirmation sweep of the entire accumulated branch: `pnpm
+install`, `pnpm lint`/`pnpm test`/`pnpm build`, all 25 `check:*` scripts,
+plus the full `pnpm test:e2e` suite and all five manual browser sweeps
+together - the complete combination last run together as of the
+hundred-and-seventieth run, now 5 runs and several new verification-ledger
+gates stale. Also confirmed `docs/SOURCES.md` (845 URLs, 2,835 lines) has
+no duplicate or malformed entries. See `docs/PROJECT_STATUS.md`'s matching
+entry for full detail, including a build-container note on this session's
+Playwright browser cache.
 
 **Hundred-and-seventy-fourth run:** built `check:record-claims`
 (`scripts/check-record-claims.mjs`), a third verification-ledger gate

@@ -28676,3 +28676,83 @@ other two ledgers weren't: fabricating that data from memory without an
 independent source to check it against risks shipping confidently-wrong
 history. The open backlog itself is otherwise unchanged - see
 `docs/ROADMAP.md`.
+
+### Full cold-start `test:e2e` + all-five-manual-browser-sweep confirmation, five runs and three new verification-ledger gates stale - closed 2026-09-23 (hundred-and-seventy-fifth intensive run)
+
+This run's own container started from a fresh clone with no `node_modules`,
+so `pnpm install` (Lockfile up to date, 499 packages) came first. With that
+done, this run checked for a fresh angle on the open backlog before falling
+back to a confirmation pass: `WebFetch` to `en.wikipedia.org` still returns
+`EGRESS_BLOCKED` (re-confirmed, no change from the hundred-and-sixty-fifth
+run's documented state), and `pnpm outdated` shows no new `@astrojs/check`
+release to unblock the `typescript` 7 bump. Also spot-checked two possible
+new prose-claim-verification gaps by hand before ruling them out rather than
+assuming: bullets using "longest/shortest/earliest/latest/greatest/smallest"
+(one hit, `content/uefa-euro.md`'s "one of international football's
+greatest surprises" - subjective commentary, not a table-checkable claim)
+and the `'s only` possessive-uniqueness phrasing `check-superlative-claims.mjs`'s
+own comments already name and deliberately exclude from its `/\bthe
+only\b/i` pattern (two hits, both "Colombia's only Copa América title" -
+true, and already the exact example the exclusion comment cites). Neither
+is a new gap worth a fourth verification-ledger gate.
+
+With no new angle, this run's contribution was the full "slow half" of the
+standing health check that the hundred-and-seventieth run last ran in this
+exact combination (2026-09-22) - five intensive runs and three new
+verification-ledger gates (`check:superlative-claims`, `check:ordinal-claims`,
+`check:record-claims`) ago, none of which had been re-confirmed against the
+browser-based sweeps since. Also worth noting for future runs: this
+session's container ships `/opt/pw-browsers/chromium-1194` (Playwright
+browser revision 1194), while the pinned `@playwright/test@1.63.0` in
+`package.json`/the lockfile resolves to `playwright-core@1.63.0`, which
+wants revision 1243 - `scripts/preview-daemon.mjs`'s existing
+`PW_EXECUTABLE_PATH` escape hatch (added by an earlier run for exactly this
+class of environment mismatch) already handles it with no code change
+needed, just `export PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` before
+any of the five manual checks or `test:e2e`.
+
+Ran, in order, against a fresh `pnpm build`:
+- `pnpm lint` (225 files, 0 errors/0 warnings/0 hints).
+- `pnpm test` (805/805, unchanged).
+- `pnpm build` (711 pages, unchanged).
+- All 29 `check:*` scripts run at least once this run; the 25 fast/CI-gated
+  ones plus `check:pdfs` all clean (700 PDFs fresh, 715 pages checked for
+  links/reachability, 710 for meta, 4/4 award tallies, 21/17/36 claims
+  across the three ledgers all matching, 57 Croatian note blocks spell-clean).
+- `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm check:reflow`: all 711
+  pages, no horizontal overflow at 320px.
+- `pnpm check:text-zoom`: all 711 pages, no horizontal overflow at 200%
+  text zoom.
+- `pnpm check:print-width`: all 711 pages, no horizontal overflow in print
+  media at 1032px.
+- `pnpm check:html`: all 711 pages valid HTML5.
+- `pnpm check:lighthouse`: all 39 audited pages scored >= 0.9 in every
+  category (perfect 1.00 except the one known/bounded/documented 404-page
+  `seo: 0.63` exception), no actionable back/forward-cache blockers.
+- `pnpm test:e2e` (cold start): first attempt reported only 108/1020 tests
+  before exiting non-zero with no failure detail surviving a `tail -60`
+  truncation in this run's own tooling (a logging artifact, not a repo
+  issue - the invocation piped output through `tail`, which is what
+  dropped the failure detail); re-ran with output captured to a file
+  in full and got a clean **1020/1020 passed, 16.8 minutes**, matching the
+  hundred-and-seventieth run's baseline exactly. Per this routine's own
+  flake-handling practice, one clean re-run is treated as confirmation, not
+  chased further.
+
+Also manually checked `docs/SOURCES.md` (845 URLs across 2,835 lines) for
+internal consistency that doesn't require live network: no duplicate URLs,
+no malformed/truncated URL lines. Clean.
+
+Every result matches the documented baseline exactly - no regression from
+any of the three verification-ledger gates or the false-claim fixes landed
+in the five runs since the hundred-and-seventieth run's own confirmation
+sweep. No new bug found; this run is a confirmation, not a fix.
+
+**Verification:** see the ordered list above.
+
+**Left for a future pass:** the same environment-blocked items as ever -
+see `docs/ROADMAP.md`'s "Open backlog", unchanged. With a full e2e +
+all-five-browser-sweep confirmation now fresh as of this run, a future
+run's best bet is either a fresh source lead on any of the open attendance/
+Team-of-the-Tournament/biographical-data gaps, or a genuinely different
+quality angle not yet tried in the last 175 runs.
