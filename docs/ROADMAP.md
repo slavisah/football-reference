@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (174 intensive runs as of 2026-09-23) lives
+verification sweep and decision (176 intensive runs as of 2026-09-23) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -38,14 +38,14 @@ what exists and any standing quirks.
 
 Every recent run's standing health check comes back clean run after run:
 `pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm test`/`pnpm
-test:coverage`/`pnpm build`, all 29 `check:*` scripts (24 fast enough to run
+test:coverage`/`pnpm build`, all 30 `check:*` scripts (25 fast enough to run
 every time and wired into `.github/workflows/ci.yml` as required PR gates,
-`check:record-claims` the newest as of the hundred-and-seventy-fourth run;
+`check:consecutive-claims` the newest as of the hundred-and-seventy-sixth run;
 `check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-seventy-fourth run (2026-09-23): 805/805 unit tests,
+As of the hundred-and-seventy-sixth run (2026-09-23): 814/814 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, zero `pnpm
 audit` vulnerabilities, and the same two standing `knip` false positives as
 ever (`scripts/test-preview-server.mjs`, used only as a Playwright
@@ -57,6 +57,16 @@ inside a config-file string. The five manual browser sweeps
 `check:html`) and the full `pnpm test:e2e` suite were last re-run together
 cold-start as of the hundred-and-seventy-fifth run (2026-09-23): clean on
 all 711 pages, 1020/1020 e2e passed.
+
+**Hundred-and-seventy-sixth run:** built `check:consecutive-claims`
+(`scripts/check-consecutive-claims.mjs`), a fourth verification-ledger gate
+alongside `check:superlative-claims`/`check:ordinal-claims`/
+`check:record-claims`, this one for "consecutive"/"back-to-back" claims - a
+bug class none of the other three patterns reliably catches (e.g. "his
+second, back-to-back" matches neither "the only" nor "the first...to").
+Seeded the ledger by checking all 22 current claims this pattern matches; no
+new false claim turned up this run. See `docs/PROJECT_STATUS.md`'s matching
+entry for full detail.
 
 **Hundred-and-seventy-fifth run:** with the open backlog below still fully
 blocked (re-confirmed: `WebFetch` to `en.wikipedia.org` still returns

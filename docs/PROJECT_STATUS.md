@@ -28756,3 +28756,82 @@ all-five-browser-sweep confirmation now fresh as of this run, a future
 run's best bet is either a fresh source lead on any of the open attendance/
 Team-of-the-Tournament/biographical-data gaps, or a genuinely different
 quality angle not yet tried in the last 175 runs.
+
+### Added `check:consecutive-claims`, a fourth verification-ledger gate for "consecutive"/"back-to-back" claims - closed 2026-09-23 (hundred-and-seventy-sixth intensive run)
+
+With the open backlog still fully blocked (re-confirmed: `WebFetch` to
+`en.wikipedia.org` still returns `EGRESS_BLOCKED`, no new `@astrojs/check`
+release), this run found the "genuinely different quality angle" the
+hundred-and-seventy-fifth run's own "left for a future pass" note asked
+for: a fourth prose-claim shape none of the three existing verification-
+ledger gates (`check:superlative-claims`, `check:ordinal-claims`,
+`check:record-claims`) reliably catch. Auditing every `content/*.md` bullet
+containing "consecutive" or "back-to-back" (22 across five files) found
+several - mostly the Copa América "Winning managers"/"Winning captains"
+sections' `**19XX:** Name (Country) - his second, back-to-back` note lines -
+that match neither the "the only" nor the "the first/.../tenth X to Y"
+pattern, so a wording slip in one of these specific bullets (e.g. a wrong
+year pairing, or claiming "back-to-back" for a manager/captain who actually
+won two non-adjacent editions) would currently pass every existing content
+check silently.
+
+Built `scripts/check-consecutive-claims.mjs` on the exact same mechanism as
+the other three (`/\b(consecutive|back-to-back)\b/i` bullet extraction,
+diffed against a hand-maintained `scripts/consecutive-claims-ledger.json`
+via the shared `diffClaimsAgainstLedger` helper `check-superlative-claims.mjs`
+already exports), with its own unit test file
+(`tests/unit/checkConsecutiveClaims.test.ts`, mirroring
+`checkRecordClaims.test.ts`'s structure) and wired into
+`.github/workflows/ci.yml` as a required PR gate immediately after
+`check:record-claims`.
+
+Seeding the ledger meant verifying all 22 current claims against the tables
+they summarize: the Copa América Golden Boot, Team of the Tournament,
+Winning managers and Winning captains sections' "second, back-to-back"/
+"second consecutive" note lines (Basile 1991/1993, Scaloni 2021/2024,
+Ruggeri 1991/1993, Bravo 2015/2016, Messi 2021/2024 as captain, Pizzi's
+Chile 2016, Vargas's 2016 Golden Boot) were each cross-checked against the
+Champions timeline table or the section's own preceding-edition entry and
+confirmed correct; the two "only X in consecutive editions" summary bullets
+(Golden Boot, Team of the Tournament) were confirmed by scanning the full
+winner/name lists for any other adjacent-edition repeat (none found); the
+UEFA EURO Team of the Tournament's Kyle Walker (2020/2024) and Winning
+captains' Iker Casillas (2008/2012) entries, the FIFA World Cup's Vittorio
+Pozzo (1934/1938) and Ballon d'Or's Emiliano Martínez Yashin Trophy
+(2023/2024) entries all checked out the same way. One claim - FIFA World
+Cup's "Cafu... the only player to appear in three consecutive World Cup
+finals" - isn't derivable from this site's own tables (no per-squad
+finals-appearance data beyond the winning captain), the same caveat already
+recorded for this exact bullet in `scripts/superlative-claims-ledger.json`;
+recorded identically here rather than guessed at. No false claim turned up
+this run, unlike the ordinal-claims ledger's own seeding pass, but the
+checker is now a standing guard against one slipping in unverified in the
+future.
+
+**Verification:** `pnpm lint` (227 files, 0/0/0), `pnpm test` (814/814, up
+from 805), `pnpm build` (711 pages, unchanged), `pnpm
+check:consecutive-claims` (22 claims, 0 unverified), and every other
+`check:*` script re-run clean (`check:superlative-claims` 21/0,
+`check:ordinal-claims` 17/0, `check:record-claims` 36/0, `check:award-tallies`
+4/4, `check:spelling` 15 files/0 issues, `check:spelling-hr` 57 blocks/0
+issues, `check:links`/`check:meta`/`check:jsonld`/`check:heading-outline`/
+`check:theme-flash`/`check:sitemap`/`check:precache`/`check:i18n-notes`/
+`check:attendance-format`/`check:link-names`/`check:image-dimensions`/
+`check:locale-consistency`/`check:theme-color`/`check:pdfs`/
+`check:edition-header-labels` all clean), plus `pnpm audit` (0 vulnerabilities)
+and `pnpm dlx knip --no-config-hints` (the same two standing false positives
+as ever). The five manual browser sweeps and full `test:e2e` were not
+re-run this run (unchanged since the hundred-and-seventy-fifth run's fresh
+cold-start confirmation of both, one run ago) - nothing in this run's diff
+touches build output, page markup, or client-side behavior, only content-file
+validation tooling, so re-running them would re-confirm the same baseline
+rather than test anything this run changed.
+
+**Left for a future pass:** the same environment-blocked items as ever - see
+`docs/ROADMAP.md`'s "Open backlog", unchanged. Four verification-ledger
+gates now exist for four distinct prose-claim shapes; a future run's own
+"genuinely different quality angle" search should check whether a fifth
+shape is worth it (candidates not yet tried: comparative claims like "more
+titles than"/"fewer than", or attendance/scoreline superlatives phrased
+without "most"/"record") before re-running the full manual-browser-sweep +
+e2e confirmation, which is now one run further stale.
