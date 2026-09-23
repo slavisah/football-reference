@@ -64,6 +64,10 @@ For v1, Markdown tables may be parsed at build time. If this becomes awkward, in
 ## Definition of done
 
 - `pnpm test`, `pnpm lint`, and `pnpm build` pass
+- `pnpm check:pdfs` passes - **any edit to `content/*.md` or a translated
+  `src/pages/hr/**` page needs `pnpm build && pnpm build:pdfs` before
+  committing**, or the PDF(s) sourced from it go stale and CI's
+  `check:pdfs` fails on the next push (see `docs/ADDING_CONTENT.md`)
 - all pages are statically generated
 - no horizontal overflow on a 360px viewport
 - tables have accessible captions and column headers
