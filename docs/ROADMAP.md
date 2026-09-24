@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (179 intensive runs as of 2026-09-24) lives
+verification sweep and decision (180 intensive runs as of 2026-09-24) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -45,18 +45,57 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates,
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-seventy-ninth run (2026-09-24): 823/823 unit tests,
-`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, zero `pnpm
-audit` vulnerabilities, and the same two standing `knip` false positives as
-ever (`scripts/test-preview-server.mjs`, used only as a Playwright
-`webServer.command`, never imported; `@cspell/dict-hr-hr`, used only via
-`.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS `import`) -
-neither actually unused, knip's static analysis just can't see a reference
-inside a config-file string. The five manual browser sweeps
-(`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
-`check:html`) and the full `pnpm test:e2e` suite were last re-run together
-cold-start as of the hundred-and-seventy-ninth run (2026-09-24): clean on
-all 711 pages, 1020/1020 e2e passed - fresh as of this run.
+As of the hundred-and-eightieth run (2026-09-24): 823/823 unit tests,
+`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
+standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
+used only as a Playwright `webServer.command`, never imported;
+`@cspell/dict-hr-hr`, used only via `.cspell/hr-notes.cspell.json`'s
+`"import"` field, never a JS `import`) - neither actually unused, knip's
+static analysis just can't see a reference inside a config-file string. The
+full `pnpm test:e2e` suite was re-run cold-start as of the hundred-and-
+eightieth run (2026-09-24): 1023/1023 passed (up from 1020, three new tests
+for that run's sticky-header fix), 16.5 minutes; `check:print-width` and
+`check:reflow` (two of the five manual browser sweeps) were also re-run
+clean across all 711 pages - `check:lighthouse`/`check:text-zoom`/
+`check:html` were last confirmed clean as of the hundred-and-seventy-ninth
+run and weren't re-run this time (unaffected by this run's CSS-only,
+non-visual-layout fix).
+
+**Hundred-and-eightieth run:** found and fixed a real, long-standing bug
+while reviewing `TournamentTable.astro` for other quality angles:
+`.t-table thead th`'s `position: sticky; top: 0` had been present since the
+component was first written but never actually stuck to anything, on any of
+the ~700 pages that render a tournament table, at any desktop/tablet
+viewport - reproduced with a real Playwright scroll-and-measure before
+fixing it, not assumed from reading the CSS. Two things defeated it at once:
+`.t-wrap` had `overflow-x: auto` with no explicit `overflow-y` (which CSS
+force-promotes to `auto` too), making it its own scroll container, but with
+no bounded height nothing ever actually scrolled it; and `.t-table` itself
+(a closer ancestor of `thead th`) carried its own `overflow: hidden` -
+originally added only to clip its content to its `border-radius` - making
+*it* the nearer, and also never-scrolled, scroll-container ancestor instead.
+Fixed both: `.t-wrap` now gets a real `max-height` (`min(70vh, 42rem)`) with
+`overflow-y: auto`, becoming a genuinely scrollable box, and `.t-table`'s
+`overflow: hidden` is gone (the border-radius clip moves up to `.t-wrap`,
+confirmed with a screenshot that the corners are still intact). Reset to
+`overflow-y: visible`/`max-height: none` in the `<=40rem` mobile card layout
+(no sticky header there, thead is visually hidden) and, separately, in print
+media (a tall table's later printed pages need real header labels, not the
+wrapper's scrollport clipping them away) - the print-media reset required
+regenerating all 700 downloadable PDFs (`check:pdf-freshness` confirmed both
+that it was genuinely needed, by reverting the PDFs and re-running the
+check, and that the regenerated set is clean). Added
+`tests/e2e/sticky-table-header.spec.ts` (3 tests): a long table's header
+stays pinned while its own wrapper scrolls, a short table gets no needless
+scrollbar, and the pinned header never overlaps the site's own sticky nav
+header when the whole page scrolls instead. **Verification:** `pnpm lint`
+(0/0/0), `pnpm test` (823/823), `pnpm build` (711 pages), 12 relevant
+`check:*` scripts (links, jsonld, meta, heading-outline, theme-flash,
+reachability, precache, sitemap, image-dimensions, locale-consistency,
+theme-color, pdf-outline) all clean, `check:print-width`/`check:reflow`
+across all 711 pages (no horizontal overflow), and the full `pnpm test:e2e`
+cold-start run: 1023/1023 passed (16.5 minutes). See
+`docs/PROJECT_STATUS.md`'s matching entry for the full writeup.
 
 **Hundred-and-seventy-ninth run:** searched for a new verification-ledger
 claim shape (unbeaten/undefeated/highest-scoring/biggest-margin/fastest/

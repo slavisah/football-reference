@@ -29111,3 +29111,121 @@ verification-ledger claim shape found despite a genuine search, a future
 run's best bet is either a fresh source lead on any of the open attendance/
 Team-of-the-Tournament/biographical-data gaps, or a genuinely different
 quality angle not yet tried in the last 179 runs.
+
+### Fixed the tournament table sticky column header, dead since the component was first written; regenerated all 700 PDFs - closed 2026-09-24 (hundred-and-eightieth intensive run)
+
+With the open backlog still fully blocked (same environment-blocked items:
+no `WebFetch`/direct-fetch access, no new `@astrojs/check` release, the
+brand-suffix title-length decision still needs human sign-off) and no new
+verification-ledger claim shape found in the prior run's own genuine search,
+this run tried a different angle: re-reading `TournamentTable.astro`, the
+single shared component every one of the site's ~700 tournament-table
+renders goes through, end to end rather than assuming its existing CSS does
+what its own selectors suggest.
+
+`.t-table thead th` has carried `position: sticky; top: 0` since this
+component was first written, clearly intended to keep the column headers
+("Year", "Host(s)", "Winner", ...) visible while scrolling a long table
+horizontally-or-vertically-scrollable table. It never actually worked, on
+any page, at any viewport from 40rem up (the only range this renders as a
+real `<table>` rather than the mobile card list) - confirmed with a real
+Playwright scroll-and-measure against a throwaway script before touching any
+code, not assumed from reading the CSS: scrolling `.t-wrap` moved the header
+cell's own viewport position by the same amount as the scroll, exactly as if
+`position: sticky` were entirely absent.
+
+Two things defeated it at once. First, `.t-wrap` had `overflow-x: auto` with
+no explicit `overflow-y` set - CSS's own overflow computation silently
+force-promotes a `visible` `overflow-y` to `auto` the instant the other axis
+isn't `visible` (confirmed empirically: an explicit `overflow-y: visible`
+still computed to `auto`), which does make `.t-wrap` a scroll container. But
+`.t-wrap` never had a bounded height, so nothing ever actually scrolled *it*
+- an auto-height box has no scroll offset for a sticky descendant to pin
+against. Second, and more proximate: `.t-table` itself, `thead th`'s more
+immediate ancestor, carried its own `overflow: hidden` - added purely to
+clip its flat-cornered content to its `border-radius`, an unrelated and
+common pairing - which made *it*, not `.t-wrap`, the nearest scroll-container
+ancestor, and it was never scrolled either. An earlier run's own note
+elsewhere in this file (2026-08 era) had actually identified the first cause
+("top: 0 inside its own scroll container, not stacked under the site
+header") but never went the one step further to check whether the header
+stuck to anything *inside* that container - it didn't, doubly so.
+
+Fixed both at once: `.t-wrap` now gets a real bounded height
+(`max-height: min(70vh, 42rem)`) alongside `overflow-y: auto`, becoming a
+genuine, independently scrollable box (visibly inert - no scrollbar - for
+the many short award-winner tables that already fit under this height);
+`.t-table`'s own `overflow: hidden` is removed entirely, leaving `.t-wrap`
+as the *only* scroll-container ancestor `thead th` has left to stick
+against. `.t-wrap`'s own matching `border-radius` still clips `.t-table`'s
+flat corners to the same rounded shape - confirmed with a real screenshot,
+corners intact, nothing visually lost by moving the clip up one level. Below
+the `<=40rem` breakpoint, where the card list replaces the table entirely
+and `thead` is visually hidden, the bounded height is reset back to
+`overflow-y: visible; max-height: none` - nothing there needs protecting,
+and trapping a long card list inside its own tiny scrollport would be a
+regression, not a fix. The sticky header never needs a
+`--site-header-height` offset the way `/compare`'s `.vs__table thead th`
+already does: its scrollport is `.t-wrap`'s own top edge, not the page's, so
+it never sits anywhere near the site's own sticky nav header - a third test
+in the new suite (below) pins that down directly.
+
+Print media needed its own explicit reset, separately from the existing
+`global.css` rule that already resets the *unscoped* `.t-wrap` selector used
+by `/compare`/`/compare-players`/`/records` - Astro's per-component scoping
+attribute gives `TournamentTable.astro`'s own rules higher specificity than
+that plain selector can ever outrank (the same reason this file's
+`thead th` `nowrap` rule already needed its own scoped duplicate, see the
+`global.css` comment near that rule). Astro's build also minifies the
+component's separate `overflow-x: auto; overflow-y: auto` declarations down
+to the single shorthand `overflow: auto` (both values match), so the print
+reset has to zero *both* axes explicitly via the same shorthand, or
+`overflow-x` alone would keep losing to it even inside this component's own
+scope - confirmed the hard way: an `overflow-y`-only version of the reset
+left `overflow-x` still computing to `auto` under `@media print`. Without
+this fix, a tall table's later printed pages showed empty space where the
+column headers should repeat, and a wide table's columns clipped at the
+wrapper's right edge - both silently, invisible in a screen-only review,
+only visible in the actual print/PDF output. This is why the fix required
+regenerating all 700 downloadable PDFs: `pnpm check:pdfs` was run against
+the regenerated set (clean) and then re-run after temporarily reverting just
+the PDFs to confirm it correctly flags them stale without the fix in place
+(`public/downloads/*.pdf` <- `src/styles/global.css`, on every family) -
+confirming the regeneration is genuinely required by this change, not an
+incidental side effect of running `pnpm build:pdfs` unprompted.
+`pnpm check:pdf-outline` still passes for all 700 PDFs (their outline/
+bookmark structure is unaffected by an overflow/height CSS change).
+
+Added `tests/e2e/sticky-table-header.spec.ts` (3 tests, all new): a long
+table (World Cup Editions) genuinely needs its own scrollbar and the header
+tracks the wrapper's own top edge within 2px across three different scroll
+depths; a short table (Nations League Winning captains) never gains a
+scrollbar it doesn't need, proving the fix is invisible where it shouldn't
+apply; and the header never renders underneath the site's own sticky nav
+header when the whole page (not the table's own wrapper) scrolls instead.
+
+**Verification:** `pnpm lint` (0 errors/0 warnings/0 hints), `pnpm test`
+(823/823, unchanged), `pnpm build` (711 pages, unchanged), the 3 new e2e
+tests individually (all passed). Also ran clean: `check:links` (715 pages),
+`check:jsonld` (1783 blocks/711 pages), `check:meta` (710 indexable pages),
+`check:heading-outline`/`check:theme-flash`/`check:locale-consistency` (711
+pages each), `check:reachability` (710 reached, 5 noindex correctly
+excluded), `check:precache` (37 URLs), `check:sitemap` (710 entries),
+`check:image-dimensions`, `check:theme-color`, `check:pdf-outline` (700
+PDFs). `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm check:print-width`
+and `pnpm check:reflow`: all 711 pages, no horizontal overflow, in print
+media and at 320px respectively. Full cold-start
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm exec playwright test`:
+**1023/1023 passed, 16.5 minutes** (up from 1020 - the 3 new tests). Did not
+re-run `check:lighthouse`/`check:text-zoom`/`check:html` or the five-sweep
+combination as a group this run - this change is a scroll/overflow fix with
+no effect on Lighthouse scores, 200%-zoom reflow, or HTML validity, and
+those three were already confirmed clean as of the immediately-prior
+(hundred-and-seventy-ninth) run.
+
+**Left for a future pass:** the same environment-blocked open-backlog items
+as ever. Worth a spot-check next time `/compare`'s own `.vs__table` or any
+other scrollable-table pattern on the site is touched, to confirm none of
+them share this same dead-sticky-header bug independently - this run only
+found and fixed it in `TournamentTable.astro`, the one component every
+tournament-table page actually uses.
