@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (180 intensive runs as of 2026-09-24) lives
+verification sweep and decision (181 intensive runs as of 2026-09-24) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -38,28 +38,43 @@ what exists and any standing quirks.
 
 Every recent run's standing health check comes back clean run after run:
 `pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm test`/`pnpm
-test:coverage`/`pnpm build`, all 31 `check:*` scripts (26 fast enough to run
+test:coverage`/`pnpm build`, all 32 `check:*` scripts (27 fast enough to run
 every time and wired into `.github/workflows/ci.yml` as required PR gates,
-`check:since-claims` the newest as of the hundred-and-seventy-eighth run;
+`check:claims-hr` the newest as of the hundred-and-eighty-first run;
 `check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-eightieth run (2026-09-24): 823/823 unit tests,
+As of the hundred-and-eighty-first run (2026-09-24): 838/838 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
 `@cspell/dict-hr-hr`, used only via `.cspell/hr-notes.cspell.json`'s
 `"import"` field, never a JS `import`) - neither actually unused, knip's
 static analysis just can't see a reference inside a config-file string. The
-full `pnpm test:e2e` suite was re-run cold-start as of the hundred-and-
-eightieth run (2026-09-24): 1023/1023 passed (up from 1020, three new tests
-for that run's sticky-header fix), 16.5 minutes; `check:print-width` and
-`check:reflow` (two of the five manual browser sweeps) were also re-run
-clean across all 711 pages - `check:lighthouse`/`check:text-zoom`/
-`check:html` were last confirmed clean as of the hundred-and-seventy-ninth
-run and weren't re-run this time (unaffected by this run's CSS-only,
-non-visual-layout fix).
+full `pnpm test:e2e` suite was also re-run cold-start this run to confirm no
+regression from this run's CI workflow edit - see `docs/PROJECT_STATUS.md`'s
+matching entry for the confirmed pass/fail count.
+
+**Hundred-and-eighty-first run:** found a new angle none of the prior 180
+runs had tried - all five verification-ledger claim checkers
+(`check:superlative-claims`/`check:ordinal-claims`/`check:record-claims`/
+`check:consecutive-claims`/`check:since-claims`) are deliberately scoped to
+English `content/*.md` only, so nothing had ever verified a claim's Croatian
+translation still asserts the same fact. A full manual audit of all 144
+verified claims against their Croatian counterpart found zero discrepancies
+(a genuine, if negative, result), then built `check:claims-hr`
+(`scripts/check-claims-hr.mjs`) as a permanent, narrowly-scoped guard: every
+year a verified claim names must also appear in its page family's Croatian
+note prose, and the specific "the `<word>` earlier editions" completeness-
+claim phrasing (the exact shape the project's two prior real cross-language
+bugs took) must have its Croatian cardinal numeral present too. Self-tested
+against two deliberately introduced bugs (both immediately reverted) before
+committing - one caught, one missed due to a documented same-page-coincidence
+limitation (see the script's own header comment and its
+`docs/PROJECT_STATUS.md` entry for the honest scope). 15 new unit tests
+(`tests/unit/checkClaimsHr.test.ts`); wired into CI as a required gate. See
+`docs/PROJECT_STATUS.md`'s matching entry for the full writeup.
 
 **Hundred-and-eightieth run:** found and fixed a real, long-standing bug
 while reviewing `TournamentTable.astro` for other quality angles:

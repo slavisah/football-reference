@@ -42,6 +42,7 @@
     "check:edition-header-labels": "node scripts/check-edition-header-labels.mjs",
     "check:i18n-notes": "node scripts/check-i18n-notes.mjs",
     "check:attendance-format": "node scripts/check-attendance-format.mjs",
+    "check:claims-hr": "node scripts/check-claims-hr.mjs",
     "check:link-names": "node scripts/check-link-names.mjs",
     "check:image-dimensions": "node scripts/check-image-dimensions.mjs",
     "check:locale-consistency": "node scripts/check-locale-consistency.mjs",
