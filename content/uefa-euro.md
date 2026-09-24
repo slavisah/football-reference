@@ -85,7 +85,7 @@ A third-place match was played through 1980. From 1984 onward, UEFA recognizes b
 
 ## Player of the Tournament winners
 
-- UEFA has named a best-player award at every EURO since 1996; no equivalent award existed at the four earlier editions.
+- UEFA has named a best-player award at every EURO since 1996; no equivalent award existed at the nine earlier editions.
 - **1996:** Matthias Sammer (Germany).
 - **2000:** Zinedine Zidane (France).
 - **2004:** Theodoros Zagorakis (Greece) - captain of the surprise 2004 champions.

@@ -155,7 +155,7 @@ Every World Cup edition has decided its champion in one match at one stadium, in
 
 ## Fair Play Award winners
 
-- FIFA has named a team Fair Play Award, based on each squad's on-field disciplinary record, at every World Cup since 1970; no equivalent award existed at the four earlier editions. Awarded to a single team except in 1998 and 2006, the only two editions with a tie.
+- FIFA has named a team Fair Play Award, based on each squad's on-field disciplinary record, at every World Cup since 1970; no equivalent award existed at the eight earlier editions. Awarded to a single team except in 1998 and 2006, the only two editions with a tie.
 - **1970:** Peru - the award's first winner.
 - **1974:** West Germany.
 - **1978:** Argentina.
