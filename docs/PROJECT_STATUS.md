@@ -29324,9 +29324,11 @@ five verification-ledger gates individually, `check:edition-header-labels`,
 `check:precache`, `check:image-dimensions`, `check:locale-consistency`,
 `check:theme-color`, and `pnpm dlx knip --no-config-hints` (same two
 standing false positives as every prior run, nothing new). Full cold-start
-`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` also re-run
-this run to confirm no regression from the CI workflow edit - see this
-entry's own follow-up note below if the result isn't yet folded in above.
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` also re-run this
+run to confirm no regression from the CI workflow edit: **1023/1023 passed,
+17.3 minutes**, byte-identical to the hundred-and-eightieth run's own count -
+expected, since this run's change is a new script plus docs/CI-config edits,
+no page rendering touched.
 
 **Left for a future pass:** the same environment-blocked open-backlog items
 as every recent run. This run's own limitation note above is the concrete

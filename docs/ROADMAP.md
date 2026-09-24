@@ -53,8 +53,8 @@ used only as a Playwright `webServer.command`, never imported;
 `"import"` field, never a JS `import`) - neither actually unused, knip's
 static analysis just can't see a reference inside a config-file string. The
 full `pnpm test:e2e` suite was also re-run cold-start this run to confirm no
-regression from this run's CI workflow edit - see `docs/PROJECT_STATUS.md`'s
-matching entry for the confirmed pass/fail count.
+regression from this run's CI workflow edit: 1023/1023 passed (17.3 minutes),
+unchanged from the hundred-and-eightieth run's own count.
 
 **Hundred-and-eighty-first run:** found a new angle none of the prior 180
 runs had tried - all five verification-ledger claim checkers
