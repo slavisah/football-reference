@@ -420,8 +420,48 @@ const sortMinWidth = selectMinWidthRem(sortOptions.map((option) => option.label)
     color: var(--text-muted);
   }
 
+  /* `.t-table thead th`'s `position: sticky` below (present since this
+     component was first written) never actually stuck to anything - proven
+     with a real Playwright scroll-and-measure (not assumed from reading the
+     CSS): on every edition/award table site-wide, at every viewport from
+     40rem up (the only width range this renders as a real table rather than
+     the mobile card list further down), the header scrolled away with the
+     rest of the table exactly as if `position: sticky` were absent. An
+     earlier run's own note elsewhere in `docs/PROJECT_STATUS.md` (2026-08
+     era) had actually documented the *opposite* conclusion - "top: 0 inside
+     its own scroll container, [so] not stacked under the site header" - on
+     the reasoning that `overflow-x: auto` here makes this element its own
+     scroll container (true: CSS force-promotes a `visible` overflow-y to
+     `auto` the instant overflow-x isn't `visible`, confirmed empirically -
+     `overflow-y: visible` written explicitly still computed to `auto`), but
+     never went the one step further to check whether the sticky header
+     actually stuck to anything *inside* that container. It didn't, for a
+     second, more proximate reason: `.t-table` itself (this element's own
+     child, immediately below) carried its own `overflow: hidden` - purely
+     to clip its flat-cornered content to its `border-radius`, a common
+     pairing - which is a *closer* scroll-container ancestor than this
+     wrapper for `thead th`. A box nobody ever scrolls (nothing sets its
+     `scrollTop`) has no scroll offset for a sticky descendant to pin
+     against, whichever of the two ancestors ends up being the nearest one -
+     so the header was doubly, not just singly, prevented from ever
+     sticking. Fixed both at once: this wrapper now gets a real bounded
+     height (`max-height` below) so it becomes a genuine, independently
+     scrollable box instead of an auto-height one nothing ever needs to
+     scroll (visibly inert - no scrollbar - for the many short award-winner
+     tables on this site that fit under this height already), and
+     `.t-table`'s own `overflow: hidden` (see below) is gone, leaving this
+     wrapper as the *only* scroll-container ancestor `thead th` has to stick
+     against. This wrapper's own matching `border-radius` still clips
+     `.t-table`'s flat corners to the same rounded shape - confirmed with a
+     real screenshot, corners intact - so nothing is lost by moving the clip
+     up one level. This also means the sticky header never needs a
+     `--site-header-height` offset the way `/compare`'s `.vs__table thead th`
+     does: its scrollport is this box's own top edge, not the page's, so it
+     never sits anywhere near the site's own sticky nav header. */
   .t-wrap {
     overflow-x: auto;
+    overflow-y: auto;
+    max-height: min(70vh, 42rem);
     border-radius: var(--radius);
   }
 
@@ -431,7 +471,12 @@ const sortMinWidth = selectMinWidthRem(sortOptions.map((option) => option.label)
     background: var(--bg-elevated);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    overflow: hidden;
+    /* No `overflow: hidden` here - see `.t-wrap`'s own comment above for
+       why: it would make this element (rather than `.t-wrap`) the nearest
+       scroll-container ancestor for `thead th`'s `position: sticky`, and
+       nothing ever scrolls *this* element itself, which silently defeats
+       the sticky effect entirely. `.t-wrap`'s own matching `border-radius`
+       still clips this table's flat corners to the same rounded shape. */
   }
 
   .t-table caption {
@@ -505,6 +550,13 @@ const sortMinWidth = selectMinWidthRem(sortOptions.map((option) => option.label)
   @media (max-width: 40rem) {
     .t-wrap {
       overflow-x: visible;
+      /* The card list below has no sticky header to protect (thead is
+         visually hidden entirely, see below) and every card's own natural
+         height is part of the page's normal reading flow - undo the wide-
+         viewport scrollport bound above so a long list of cards is never
+         trapped in its own tiny scrollable box on a phone. */
+      overflow-y: visible;
+      max-height: none;
     }
 
     .t-table {
@@ -586,6 +638,29 @@ const sortMinWidth = selectMinWidthRem(sortOptions.map((option) => option.label)
     .t-table thead th {
       white-space: normal;
       font-size: 0.78rem;
+    }
+
+    /* This wrapper's screen-only bounded `max-height`/`overflow-y: auto`
+       (its sticky-header fix, see that rule's own comment above) has no
+       paper equivalent for the same reason `overflow-x: auto` never did -
+       global.css's own `@media print` block already resets *its* `.t-wrap`
+       selector's `overflow-x` back to `visible`, but that plain selector
+       can't win the cascade here any more than its `thead th` override
+       could (see that file's own comment) - and the base rule above sets
+       both axes via the `overflow` *shorthand* (Astro's build minifies
+       `overflow-x: auto; overflow-y: auto` down to `overflow: auto` since
+       both values match), so this override has to reset *both* axes too,
+       explicitly, in this component's own scope, or `overflow-x` alone
+       would silently keep losing to that higher-specificity shorthand even
+       with this rule in place (confirmed the hard way: an `overflow-y`-only
+       version of this rule left `overflow-x` still computing to `auto` in
+       print). Without this, a tall table's later rows print with their
+       header replaced by empty space instead of the actual header labels,
+       *and* a wide table's columns clip at the wrapper's right edge again -
+       both silently, on paper only, invisible in a screen-only review. */
+    .t-wrap {
+      overflow: visible;
+      max-height: none;
     }
   }
 </style>
