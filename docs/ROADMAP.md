@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (178 intensive runs as of 2026-09-24) lives
+verification sweep and decision (179 intensive runs as of 2026-09-24) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -45,7 +45,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates,
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-seventy-eighth run (2026-09-24): 823/823 unit tests,
+As of the hundred-and-seventy-ninth run (2026-09-24): 823/823 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, zero `pnpm
 audit` vulnerabilities, and the same two standing `knip` false positives as
 ever (`scripts/test-preview-server.mjs`, used only as a Playwright
@@ -55,8 +55,24 @@ neither actually unused, knip's static analysis just can't see a reference
 inside a config-file string. The five manual browser sweeps
 (`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
 `check:html`) and the full `pnpm test:e2e` suite were last re-run together
-cold-start as of the hundred-and-seventy-fifth run (2026-09-23): clean on
-all 711 pages, 1020/1020 e2e passed - three runs stale as of this run.
+cold-start as of the hundred-and-seventy-ninth run (2026-09-24): clean on
+all 711 pages, 1020/1020 e2e passed - fresh as of this run.
+
+**Hundred-and-seventy-ninth run:** searched for a new verification-ledger
+claim shape (unbeaten/undefeated/highest-scoring/biggest-margin/fastest/
+"last team to"/sole/unique/unprecedented/"last time"/reclaimed/regained
+phrasing, and spelled-out numeric-count claims) and found none systemic
+enough to justify a sixth gate - a real negative result. Re-confirmed all
+six competition/award content files are current through their latest 2024/
+2025 editions. With no new angle, ran the full cold-start `pnpm test:e2e` +
+all-five-manual-browser-sweep confirmation (four runs stale since the
+hundred-and-seventy-fifth run): everything came back byte-identical to the
+documented baseline, no regression from the two verification-ledger gates
+landed since. Also re-confirmed the `PW_EXECUTABLE_PATH=/opt/pw-browsers/
+chromium` escape hatch is still needed in a fresh container (Playwright
+browser revision mismatch, documented since the hundred-and-seventy-fifth
+run) - same known cause, not a new issue. See `docs/PROJECT_STATUS.md`'s
+matching entry for the full writeup.
 
 **Hundred-and-seventy-eighth run:** built `check:since-claims`
 (`scripts/check-since-claims.mjs`), a fifth verification-ledger gate

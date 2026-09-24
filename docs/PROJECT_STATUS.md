@@ -29011,3 +29011,103 @@ patterns has a similar unnoticed gap (the way the 177th run found one in
 before looking for a sixth claim shape, or re-run the full
 manual-browser-sweep + e2e confirmation, which is now three runs further
 stale.
+
+### Full cold-start `test:e2e` + all-five-manual-browser-sweep confirmation, four runs stale - closed 2026-09-24 (hundred-and-seventy-ninth intensive run)
+
+With every named milestone and every `docs/WEBSITE_REQUIREMENTS.md`
+requirement already live, and the open backlog below still fully blocked
+(re-confirmed: `pnpm outdated` still shows only the same in-range
+`typescript` 5.9.3 -> 7.0.2 gap with no new `@astrojs/check` release), this
+run first searched for a genuinely new prose-claim-verification gap the way
+the last several runs have - grepping `content/*.md` for `unbeaten`/
+`undefeated`/`highest-scoring`/`biggest margin`/`fastest`/`last team (to)`/
+`last player (to)`/`most recent`/`largest margin`/`widest margin`, the
+`sole`/`unique`/`unprecedented`/`unmatched`/`never before`/`never again`/
+`no other` family, `last time`/`reclaimed`/`regained`/`first time since`/
+`returned to`, and spelled-out numeric-count claims ("won ... three
+times/occasions/editions"). None of these turned up more than one or two
+isolated, non-systemic hits (a plain `undefeated`, a plain `most recent`, a
+plain `returned to` - none summarizing a table the way the five existing
+ledgers' claim shapes do), so none of them is a sixth verification-ledger
+gate waiting to be built - a real negative result, not a skipped search.
+Also re-confirmed the six competition/award content files' own latest-year
+rows are current: Copa América through 2024, Nations League through
+2024-25, Ballon d'Or through 2025 (Ousmane Dembélé), Golden Boot through
+2024 - nothing missing there either.
+
+With no new angle, this run's contribution was the full "slow half" of the
+standing health check, last run together as of the hundred-and-seventy-fifth
+run (2026-09-23) - four intensive runs and two new verification-ledger gates
+(`check:consecutive-claims`, `check:since-claims`) ago. Also confirmed, and
+worth re-recording for future runs since it changes container to container:
+this session's fresh `pnpm install` container ships `/opt/pw-browsers/
+chromium-1194`/`chromium_headless_shell-1194` (Playwright browser revision
+1194), while the pinned `@playwright/test@1.63.0` resolves to
+`playwright-core@1.63.0`, which wants revision 1243 - a plain
+`pnpm test:e2e` fails every single test immediately with `browserType.launch:
+Executable doesn't exist at .../chromium_headless_shell-1243/...` (confirmed
+by inspecting a failed run's own `test-results/*/error-context.md`, not
+assumed). `scripts/preview-daemon.mjs`'s existing `PW_EXECUTABLE_PATH`
+escape hatch (added by an earlier run for exactly this class of environment
+mismatch) already handles it with no code change needed, just
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` before `test:e2e` or any of
+the five manual checks - same fix, same root cause the hundred-and-seventy-
+fifth run's own entry already documented, re-confirmed rather than
+rediscovered as new.
+
+Ran, in order, against a fresh `pnpm build`:
+- `pnpm install` (Lockfile up to date), `pnpm outdated` (`typescript` only,
+  unchanged), `pnpm audit` (0 vulnerabilities), `pnpm dlx knip
+  --no-config-hints` (the same two documented false positives, nothing new).
+- `pnpm lint` (229 files, 0 errors/0 warnings/0 hints).
+- `pnpm test` (823/823, unchanged).
+- `pnpm build` (711 pages, unchanged).
+- All 26 CI-gated `check:*` scripts run individually and clean: `check:pdfs`
+  (700 PDFs fresh), `check:pdf-outline` (700 PDFs), `check:perf` (within
+  budget), `check:links` (715 pages, no broken links), `check:sitemap` (710
+  entries vs. 715 built pages), `check:precache` (37 precached URLs),
+  `check:jsonld` (1783 JSON-LD blocks across 711 pages), `check:heading-
+  outline`/`check:theme-flash`/`check:locale-consistency` (711 pages each),
+  `check:reachability` (710 reached, 5 noindex correctly excluded),
+  `check:meta` (710 indexable pages), `check:award-tallies` (4/4),
+  `check:superlative-claims` (21/0), `check:ordinal-claims` (43/0),
+  `check:record-claims` (36/0), `check:consecutive-claims` (22/0),
+  `check:since-claims` (23/0), `check:edition-header-labels` (7 families,
+  0 problems), `check:i18n-notes` (356 English pages, 7 matched pairs),
+  `check:attendance-format` (4 page pairs), `check:link-names` (710 pages),
+  `check:image-dimensions` (no drift, no missing alt text), `check:theme-
+  color` (matches), `check:spelling` (15 files, 0 issues), `check:spelling-
+  hr` (57 blocks, 0 issues).
+- `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cold start):
+  first attempt (plain `pnpm test:e2e`, no override) failed all 1020 tests
+  immediately on the browser-revision mismatch above; re-ran with the
+  override and got a clean **1020/1020 passed, 19.0 minutes**.
+- `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm check:lighthouse`: all
+  39 audited pages scored >= 0.9 in every category (perfect 1.00 except the
+  one known/bounded/documented 404-page `seo: 0.63` exception), no
+  actionable back/forward-cache blockers.
+- `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm check:reflow`: all 711
+  pages, no horizontal overflow at 320px.
+- `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm check:text-zoom`: all
+  711 pages, no horizontal overflow at 200% text zoom.
+- `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm check:print-width`: all
+  711 pages, no horizontal overflow in print media at 1032px.
+- `pnpm check:html` (no browser needed): all 711 pages valid HTML5.
+
+Also manually re-checked `docs/SOURCES.md` (845 URLs, 2,835 lines): no
+duplicate URLs, no malformed/truncated URL lines. Clean.
+
+Every result matches the documented baseline exactly - no regression from
+either of the two verification-ledger gates or the false-claim fixes landed
+in the four runs since the hundred-and-seventy-fifth run's own confirmation
+sweep. No new bug found; this run is a confirmation, not a fix.
+
+**Verification:** see the ordered list above.
+
+**Left for a future pass:** the same environment-blocked items as ever -
+see `docs/ROADMAP.md`'s "Open backlog", unchanged. With a full e2e +
+all-five-browser-sweep confirmation now fresh as of this run and no new
+verification-ledger claim shape found despite a genuine search, a future
+run's best bet is either a fresh source lead on any of the open attendance/
+Team-of-the-Tournament/biographical-data gaps, or a genuinely different
+quality angle not yet tried in the last 179 runs.
