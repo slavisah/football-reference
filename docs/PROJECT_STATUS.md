@@ -29229,3 +29229,111 @@ other scrollable-table pattern on the site is touched, to confirm none of
 them share this same dead-sticky-header bug independently - this run only
 found and fixed it in `TournamentTable.astro`, the one component every
 tournament-table page actually uses.
+
+### Added `check:claims-hr`, a new EN/Croatian translation-fidelity guard for the five verification-ledger claim gates, after a full manual audit found zero discrepancies - closed 2026-09-24 (hundred-and-eighty-first intensive run)
+
+With the open backlog still fully blocked (same environment-blocked items:
+`WebFetch` to `en.wikipedia.org` re-confirmed `EGRESS_BLOCKED` this run too,
+no new `@astrojs/check` release, the brand-suffix title-length decision still
+needs human sign-off, the Nations League Team of the Tournament/attendance
+gaps still genuinely exhausted), this run found a new angle none of the
+prior 180 runs had tried: every one of the site's five verification-ledger
+claim checkers (`check:superlative-claims`/`check:ordinal-claims`/
+`check:record-claims`/`check:consecutive-claims`/`check:since-claims`) is
+deliberately scoped to `content/*.md` (English) only, by each script's own
+header comment - none of them, or any other `check:*` script, has ever
+verified that a claim's **Croatian** translation (hand-maintained separately
+in each `src/pages/hr/competitions/<family>.astro`'s own `notes` array,
+`check:i18n-notes`'s own territory for *structure* but not claim *content*)
+still asserts the same underlying fact. Both of the two real bugs this
+project's own verification-ledger checkers have ever found (the Fair Play
+Award "four" vs. eight earlier editions, and the EURO Player of the
+Tournament "four" vs. nine) were fixed in Croatian too, in the same commit,
+because a human/run happened to be looking at both languages together at the
+time - nothing would have caught a similar slip if it had landed in English
+only, or if the Croatian side had been translated independently and gotten
+the number wrong on its own.
+
+**Manual audit (this run's first pass):** read all 144 verified claims
+across the five ledger files (`scripts/superlative-claims-ledger.json` 21,
+`ordinal-claims-ledger.json` 43, `record-claims-ledger.json` 36,
+`consecutive-claims-ledger.json` 22, `since-claims-ledger.json` 23 minus one
+Ballon d'Or entry not year-bearing - some claims are double-counted across
+ledgers) against their Croatian counterpart bullet in
+`src/pages/hr/competitions/{ballon-dor,copa-america,world-cup,golden-boot,
+euro,nations-league}.astro`, cross-checking every year, count, and named
+fact by hand. Zero discrepancies found - every Croatian translation
+(including the two already-fixed "osam"/"devet ranijih izdanja" corrections
+from the 178th run) faithfully restates its English counterpart's fact. A
+genuine, if negative, result: this specific risk (English-verified but
+Croatian-mistranslated) was real and previously unchecked, and it came back
+clean.
+
+**Permanent guard (`scripts/check-claims-hr.mjs`, `pnpm check:claims-hr`):**
+rather than leave this a one-time manual pass, built a lightweight,
+narrowly-scoped automated check that encodes the two things a plain
+regex/string match *can* verify reliably without attempting real claim
+semantics (ruled out for the same reason `check-superlative-claims.mjs`'s
+own header comment already rules out a from-scratch semantic checker): (1)
+every four-digit year (1900-2099) named in an already-verified ledger claim
+must also appear somewhere in that claim's page family's built Croatian
+`.notes__card` prose; (2) for the narrow "the `<word>` earlier editions"
+completeness-claim phrasing specifically - the exact shape both historical
+bugs took - the matching Croatian cardinal numeral (a small, deliberately
+narrow two-through-twelve dictionary; Croatian cardinals 2-12 take an
+invariant form modifying a neuter plural noun like "izdanja" regardless of
+grammatical case, which is what keeps this safe to check by plain substring
+match without engaging Croatian's wider case-agreement system) must be
+present too. Self-tested against two deliberately introduced bugs before
+committing (both reverted immediately after, confirmed via `git status` that
+`src/pages/hr/competitions/{euro,ballon-dor}.astro` came back byte-identical
+to their pre-test state): a corrupted "devet" -> "četiri" cardinal was
+caught correctly; a corrupted year (1995 -> 1996 in the Weah bullet) was
+*not* caught, because 1995 still coincidentally appears in a different,
+unrelated bullet on the same built page (the eligibility-rule-history
+sentence) - a genuine, now-documented limitation of the page-wide (not
+per-bullet-positional) anchor-presence approach, recorded in the script's own
+header comment alongside why closing it properly (real positional pairing
+the way `check-attendance-format.mjs` does for "Final venues" items) isn't
+attempted here: it would need every ledger claim mapped to its exact
+note-section/item index on both languages' pages, which the ledgers don't
+currently track. The check still reliably catches the shape new content
+actually takes - a year or count missing from the Croatian page *entirely*,
+not a same-page coincidental collision - which is real, incremental coverage
+over the "no automated Croatian check existed at all" status quo, honestly
+scoped rather than oversold.
+
+New unit coverage in `tests/unit/checkClaimsHr.test.ts` (15 tests) for all
+four exported pure functions (`extractYears`, `extractEarlierEditionsCardinal`,
+`extractNotesPlainText`, `diffClaimsAgainstHrNotes`), including both the
+positive (bug caught) and negative (bug missed) cases the self-test above
+found by hand. Wired into `.github/workflows/ci.yml` as a required PR gate
+immediately after `check:attendance-format`, the same required-gate tier as
+the other four fast, no-browser-needed EN/HR parity checks.
+
+**Verification:** `pnpm lint` (0/0/0), `pnpm test` (838/838, 15 new), `pnpm
+build` (711 pages, unchanged), `pnpm check:claims-hr` (144 claims checked, 0
+problems) alongside every other relevant `check:*` script re-run clean:
+`check:pdfs` (700/700, no regen needed - no rendered page's content
+changed), `check:spelling`/`check:spelling-hr`, `check:award-tallies`, all
+five verification-ledger gates individually, `check:edition-header-labels`,
+`check:perf`, `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:jsonld` (1783 blocks), `check:heading-outline`, `check:theme-flash`,
+`check:pdf-outline` (700 PDFs), `check:reachability`, `check:meta`,
+`check:i18n-notes`, `check:attendance-format`, `check:link-names`,
+`check:precache`, `check:image-dimensions`, `check:locale-consistency`,
+`check:theme-color`, and `pnpm dlx knip --no-config-hints` (same two
+standing false positives as every prior run, nothing new). Full cold-start
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e` also re-run
+this run to confirm no regression from the CI workflow edit - see this
+entry's own follow-up note below if the result isn't yet folded in above.
+
+**Left for a future pass:** the same environment-blocked open-backlog items
+as every recent run. This run's own limitation note above is the concrete
+next step if this angle is picked up again: positional per-claim EN/HR
+pairing would close the "coincidental same-page year" blind spot this run's
+self-test found, but needs the five ledgers (or a new sidecar file) to track
+each claim's exact note-section/item index on both languages' pages first -
+a bigger lift than this run's narrower page-wide anchor check, deliberately
+left for a session that picks this exact thread back up rather than
+half-built here.

@@ -108,6 +108,9 @@ jobs:
       - name: English/Croatian attendance-number format check
         run: pnpm check:attendance-format
 
+      - name: Verification-ledger claim/Croatian-translation anchor check
+        run: pnpm check:claims-hr
+
       - name: Ambiguous link-name check
         run: pnpm check:link-names
 
