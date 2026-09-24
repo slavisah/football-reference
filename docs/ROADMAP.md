@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (181 intensive runs as of 2026-09-24) lives
+verification sweep and decision (182 intensive runs as of 2026-09-24) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -45,16 +45,40 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates,
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-eighty-first run (2026-09-24): 838/838 unit tests,
-`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
-standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
-used only as a Playwright `webServer.command`, never imported;
-`@cspell/dict-hr-hr`, used only via `.cspell/hr-notes.cspell.json`'s
-`"import"` field, never a JS `import`) - neither actually unused, knip's
-static analysis just can't see a reference inside a config-file string. The
-full `pnpm test:e2e` suite was also re-run cold-start this run to confirm no
-regression from this run's CI workflow edit: 1023/1023 passed (17.3 minutes),
-unchanged from the hundred-and-eightieth run's own count.
+As of the hundred-and-eighty-second run (2026-09-24): 838/838 unit tests,
+`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, 1023/1023 e2e
+(16.5 minutes), and the same two standing `knip` false positives as ever
+(`scripts/test-preview-server.mjs`, used only as a Playwright
+`webServer.command`, never imported; `@cspell/dict-hr-hr`, used only via
+`.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS `import`) -
+neither actually unused, knip's static analysis just can't see a reference
+inside a config-file string.
+
+**Hundred-and-eighty-second run:** `pnpm outdated` surfaced two new in-range
+patch releases (`astro` 7.3.4 -> 7.3.5, `cspell` 10.3.3 -> 10.3.4); installed
+both. The hundred-and-eightieth run's own "left for a future pass" note
+suggested spot-checking every other scrollable-table pattern on the site for
+the same dead-sticky-header bug that run had found and fixed in
+`TournamentTable.astro` - read `/compare`'s and `/compare-players`' own
+`.vs__table thead th` sticky rule end to end and confirmed it does *not*
+share the bug: unlike `TournamentTable.astro`, neither page wraps its table
+in a `.t-wrap` scroll container at all (both files' own CSS comments say so
+explicitly - three columns fit any phone width with no horizontal scroll
+needed), so the sticky header correctly tracks the *page's* own scroll via
+the existing `--site-header-height` offset, a different and already-working
+pattern, not an unnoticed instance of the same bug. Also checked
+`/records`' one `.t-wrap`-wrapped table (the rivalries ranking): it has no
+sticky header at all, so the bug class doesn't apply there either - a real,
+if negative, result closing out that follow-up thread. With no other
+concrete lead, ran the full standing health check (`pnpm lint`/`pnpm test`/
+`pnpm build`, all 29 fast `check:*` scripts, `pnpm dlx knip
+--no-config-hints`, and a full cold-start `pnpm exec playwright test`):
+everything came back clean, matching the hundred-and-eighty-first run's own
+baseline (838/838 unit, 711 pages, 1023/1023 e2e in 16.5 minutes - the astro/
+cspell patch bump caused no regression). `pnpm outdated` and `npm view
+@astrojs/check@latest peerDependencies` both re-confirmed the `typescript` 7
+upgrade is still blocked on the same `^5.0.0 || ^6.0.0` peer ceiling. See
+`docs/PROJECT_STATUS.md`'s matching entry for full detail.
 
 **Hundred-and-eighty-first run:** found a new angle none of the prior 180
 runs had tried - all five verification-ledger claim checkers

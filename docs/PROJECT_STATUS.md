@@ -29339,3 +29339,74 @@ each claim's exact note-section/item index on both languages' pages first -
 a bigger lift than this run's narrower page-wide anchor check, deliberately
 left for a session that picks this exact thread back up rather than
 half-built here.
+
+### Dependency patch bump (astro 7.3.4 -> 7.3.5, cspell 10.3.3 -> 10.3.4) plus a sticky-header spot-check across every other scrollable-table pattern - closed 2026-09-24 (hundred-and-eighty-second intensive run)
+
+With the open backlog still fully blocked (re-confirmed this run:
+`WebFetch` to `en.wikipedia.org` still returns `EGRESS_BLOCKED`, `npm view
+@astrojs/check@latest peerDependencies` still only declares
+`typescript: '^5.0.0 || ^6.0.0'`, the brand-suffix title-length decision
+still needs human sign-off, the Nations League Team of the
+Tournament/attendance gaps still genuinely exhausted), this run picked up
+two concrete items: `pnpm outdated` showed two new in-range patch releases
+(`astro` 7.3.4 -> 7.3.5, `cspell` 10.3.3 -> 10.3.4), installed cleanly; and
+the hundred-and-eightieth run's own "left for a future pass" note, which
+asked for a spot-check of every other scrollable-table pattern on the site
+against the dead-sticky-header bug that run found and fixed in
+`TournamentTable.astro`.
+
+**The spot-check:** read `.vs__table thead th`'s sticky rule in both
+`src/pages/compare.astro` and `src/pages/compare-players.astro` end to end,
+plus `/records`' one `.t-wrap`-wrapped table (the "Fiercest rivalries"
+ranking). Neither `/compare` nor `/compare-players` shares the bug:
+`TournamentTable.astro`'s bug required two things to both be true - a
+`.t-wrap` scroll-container ancestor with no bounded height (so nothing ever
+actually scrolled it) and a *closer* `overflow: hidden` ancestor
+(`.t-table` itself) stealing the sticky positioning's actual scroll
+context. Neither `.vs__table` has a `.t-wrap` wrapper at all - both files'
+own CSS comments say so explicitly ("three narrow columns fit any phone
+width with no horizontal scroll, so no `.t-wrap` wrapper is needed here")
+- so `thead th`'s `position: sticky; top: var(--site-header-height, 3.5rem)`
+tracks the *page's* own scroll instead, the same working pattern
+`TournamentTable.astro` was supposed to have but never did. This is a
+different, already-correct pattern, not an unnoticed second instance of the
+same bug. `/records`' rivalries table has a `.t-wrap` wrapper but no sticky
+header rule on it at all, so the bug class doesn't apply there either - it
+only needs the one-time horizontal scroll `.t-wrap`'s plain `overflow-x:
+auto` already provides. A real, if negative, result: this closes out the
+hundred-and-eightieth run's own follow-up thread with no further sticky-
+header bugs found anywhere else on the site.
+
+With no other concrete lead beyond the two patch bumps and this spot-check,
+ran the full standing health check: `pnpm lint` (0 errors/0 warnings/0
+hints across 232 files), `pnpm test` (838/838 unit, unchanged), `pnpm
+build` (711 pages, unchanged), all 29 fast `check:*` scripts individually
+(pdfs, pdf-outline, perf, links, sitemap, precache, reflow, print-width,
+html, jsonld, heading-outline, theme-flash, reachability, meta,
+award-tallies, all five verification-ledger claim gates, claims-hr,
+edition-header-labels, i18n-notes, attendance-format, link-names,
+image-dimensions, locale-consistency, theme-color, spelling, spelling-hr -
+all clean), and `pnpm dlx knip --no-config-hints` (the same two standing
+false positives as every prior run: `scripts/test-preview-server.mjs` and
+`@cspell/dict-hr-hr`, both confirmed real uses knip's static analysis can't
+see through a config-file string, not actually unused). Full cold-start
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm exec playwright test`
+also re-run after the dependency bump: **1023/1023 passed, 16.5 minutes**,
+byte-identical to the hundred-and-eighty-first run's own count - no
+regression from either patch release.
+
+**Verification:** see the ordered list above.
+
+**Left for a future pass:** the same environment-blocked open-backlog items
+as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged. The
+hundred-and-eighty-first run's own concrete next step (positional per-claim
+EN/HR pairing for `check-claims-hr.mjs`, closing its documented same-page-
+coincidence blind spot) is still the most substantive, well-scoped thread
+available if a future run wants to pick it back up; this run deliberately
+didn't attempt it given how large and risky that ledger-schema/note-indexing
+change would be to get right in a single unattended pass. With the sticky-
+header follow-up now closed too, a future run's best bet is either a fresh
+source lead on any of the open attendance/Team-of-the-Tournament/
+biographical-data gaps, the `check-claims-hr.mjs` positional-pairing thread
+above, or a genuinely different quality angle not yet tried in the last 181
+runs.
