@@ -28835,3 +28835,89 @@ shape is worth it (candidates not yet tried: comparative claims like "more
 titles than"/"fewer than", or attendance/scoreline superlatives phrased
 without "most"/"record") before re-running the full manual-browser-sweep +
 e2e confirmation, which is now one run further stale.
+
+### Widened `check:ordinal-claims` to catch ordinal claims with no following "to"; fixed a genuine "two years later" arithmetic error found while seeding it - closed 2026-09-24 (hundred-and-seventy-seventh intensive run)
+
+Took up the hundred-and-seventy-sixth run's own "fifth shape" search first:
+checked both candidates it named - comparative claims ("more ... than any
+other") turned up only two hits across all `content/*.md` files, one of
+them (Copa América's own "format has varied more than any other on this
+site") meta-commentary about the site rather than a football fact, too thin
+to justify a fifth ledger gate the way the four existing gates' 17-36 claims
+each did; attendance/scoreline superlatives without "most"/"record" turned
+up nothing new either. Neither was worth building.
+
+Instead found that `check-ordinal-claims.mjs`'s own extraction pattern -
+requiring a `to` within 50 characters after "the first/.../tenth" - was
+itself an unnoticed gap in the *existing* fourth-oldest gate rather than a
+missing fifth one: it never caught the site's other common ordinal-claim
+phrasing, "the first of his N wins/titles/editions" (used throughout Copa
+América's Golden Boot/Winning managers/Winning captains sections for every
+repeat winner) or "became/won the first-ever X" - neither has a "to"
+anywhere nearby. Running the bare `/\bthe (first|...|tenth)\b/i` pattern
+against the full corpus first, to check it wouldn't reintroduce the noise
+the original narrowing was built to avoid, found 43 total matches (up from
+17) with zero false positives - every single one a genuine, table-checkable
+claim - so widened `CLAIM_PATTERN` to the bare pattern and verified all 26
+newly-caught claims (`content/ballon-dor.md`, `content/copa-america.md`,
+`content/fifa-world-cup.md`, `content/golden-boot.md`,
+`content/uefa-nations-league.md`) against the tables they summarize, adding
+each with its verification method to `scripts/ordinal-claims-ledger.json`.
+
+Seeding this wider set found one genuine, previously-unnoticed factual
+error, the same kind of bug the 171st/173rd runs' own ledger-seeding passes
+each found: Copa América's Winning captains section said Cafu's 1999
+armband was "the same armband he wore to a World Cup title two years
+later" - but `content/fifa-world-cup.md`'s own Editions table and Winning
+captains list both put Cafu's World Cup win at 2002, three years after
+1999, not two. Fixed to "three years later" in both `content/copa-america.md`
+and the matching Croatian page (`src/pages/hr/competitions/copa-america.astro`,
+"dvije godine kasnije" -> "tri godine kasnije"). The claim's other half -
+"captain of the fifth World Cup star" - was independently correct as
+written: Brazil's Champions-by-titles table lists five titles (1958, 1962,
+1970, 1994, 2002), 2002 is the fifth.
+
+Updated `tests/unit/checkOrdinalClaims.test.ts` for the widened pattern:
+the two tests asserting the old 50-character/sentence-boundary "to"
+requirement no longer hold (a bare ordinal now matches regardless), so
+replaced them with tests for the new capability ("the first of his two
+wins" with no "to" at all, a bare "the first half" with no "to" nearby),
+and fixed one existing test's expectation that had silently relied on the
+old narrower pattern to exclude a bullet it should now include. Updated the
+script's own header comment to document the widening and why the bare
+pattern is safe here (an ordinal number in this content is never used as a
+vague quantifier the way "most"/"record" can be, unlike the record-claims
+checker's own trigger words).
+
+**Verification:** `pnpm lint` (227 files, 0/0/0), `pnpm test` (814/814,
+unchanged - one test rewritten, one test's fixture corrected, net count
+the same), `pnpm build` (711 pages, unchanged), `pnpm check:ordinal-claims`
+(43 claims, 0 unverified, up from 17), and every other `check:*` script
+re-run clean (`check:superlative-claims` 21/0, `check:record-claims` 36/0,
+`check:consecutive-claims` 22/0, `check:award-tallies` 4/4, `check:spelling`
+15 files/0 issues, `check:spelling-hr` 57 blocks/0 issues, `check:links`/
+`check:sitemap`/`check:precache`/`check:jsonld`/`check:heading-outline`/
+`check:theme-flash`/`check:reachability`/`check:meta`/
+`check:edition-header-labels`/`check:i18n-notes`/`check:attendance-format`/
+`check:link-names`/`check:image-dimensions`/`check:locale-consistency`/
+`check:theme-color` all clean). `pnpm check:pdfs` correctly flagged the
+Copa América PDFs (English and Croatian, every edition page plus the
+competition page itself) as stale after the content fix; regenerated via
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs` (this
+session's container ships Playwright browser revision 1194 while the
+pinned `@playwright/test` wants 1243, the same environment mismatch the
+hundred-and-seventy-fifth run's own entry already documented). That script
+regenerates the entire 700-file PDF fleet in one pass rather than only the
+affected pages, so all 700 show as changed in this run's diff even though
+only the Copa América ones have different rendered content; and
+re-confirmed clean.
+
+**Left for a future pass:** the same environment-blocked items as ever -
+see `docs/ROADMAP.md`'s "Open backlog", unchanged. Four verification-ledger
+gates now exist, one widened this run; a future run's own search for a
+genuinely different quality angle should check whether any of the other
+three gates (`check:superlative-claims`, `check:record-claims`,
+`check:consecutive-claims`) has a similar unnoticed gap in its own
+extraction pattern before looking for an entirely new fifth claim shape or
+re-running the full manual-browser-sweep + e2e confirmation, which is now
+two runs further stale.

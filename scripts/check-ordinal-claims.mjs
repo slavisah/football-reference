@@ -30,19 +30,22 @@
 // claim nothing has verified yet, and fails the build until it's checked
 // against the source table it summarizes and recorded.
 //
-// Extraction pattern: `/\bthe (first|second|...|tenth)\b.{0,50}\bto\b/i`,
-// matched only within a 50-character window before the word "to" and never
-// crossing a sentence-ending period. A naive unbounded `.*\bto\b` (the
-// literal pattern the roadmap entry itself sketched, `/\bthe
-// \w+(st|nd|rd|th)\b.*to\b/i`) was tried first and rejected as too noisy:
-// on this site's actual content it also matched long, unrelated bullets
-// merely because they contained an ordinal-suffixed word *anywhere* (e.g.
-// "the weakest" in a "How it works" bullet, or "the captain is..." several
-// sentences before an unrelated "to") with no connection between the two.
-// The bounded window keeps the same narrow intent - "the Nth of some
-// category to do something" - while cutting that noise to zero on the
-// current corpus. Widen the window (or drop the period boundary) only if a
-// genuine claim is ever found sitting just outside it.
+// Extraction pattern: `/\bthe (first|second|...|tenth)\b/i`, a bare match
+// on the ordinal word itself. Originally this required a `to` within a
+// 50-character, period-bounded window after the ordinal (matching only
+// "the Nth ... to Y" claims) - the hundred-and-seventy-seventh intensive
+// run found that requirement itself was the gap: it missed the site's other
+// common ordinal-claim phrasing, "the first of his N wins/titles/editions"
+// and "became/won the first-ever X" (no "to" at all), 25 real claims across
+// four content files that were silently unverified (e.g. "the first of his
+// two consecutive title-winning editions" for every Copa América manager/
+// captain who won back-to-back). Re-checked the bare pattern against the
+// full corpus before widening to it (same diligence the original narrowing
+// used): every one of the 43 bullets it now matches is a genuine,
+// table-checkable claim, zero noise - unlike the record-claims checker's
+// trigger words ("record", "most"), an ordinal number in this content is
+// never used as a vague quantifier, so the bare word needs no "to" anchor
+// to stay precise.
 //
 // Plain regex/string parsing of `content/*.md`, no build or browser needed -
 // the same territory as `check-superlative-claims.mjs`, so this is wired
@@ -58,14 +61,14 @@ const CONTENT_DIR = path.join(ROOT, 'content');
 const LEDGER_PATH = path.join(ROOT, 'scripts', 'ordinal-claims-ledger.json');
 
 const ORDINALS = 'first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth';
-const CLAIM_PATTERN = new RegExp(`\\bthe (${ORDINALS})\\b(?:(?!\\.).){0,50}\\bto\\b`, 'i');
+const CLAIM_PATTERN = new RegExp(`\\bthe (${ORDINALS})\\b`, 'i');
 
 /**
  * Pure: every top-level Markdown list item's text in `markdown` that matches
- * the "the first/second/.../tenth X to Y" ordinal-claim pattern, in
- * document order. Content pages on this site use only flat, single-line
- * `- ` bullets (no nested lists), so a per-line regex is sufficient - no
- * Markdown parser needed.
+ * the "the first/second/.../tenth X" ordinal-claim pattern, in document
+ * order. Content pages on this site use only flat, single-line `- ` bullets
+ * (no nested lists), so a per-line regex is sufficient - no Markdown parser
+ * needed.
  */
 export function extractOrdinalClaims(markdown) {
   const claims = [];
@@ -124,7 +127,7 @@ async function main() {
 
   const totalClaims = Object.values(claimsByFile).reduce((sum, list) => sum + list.length, 0);
   console.log(
-    `Checked ${totalClaims} "the first/second/.../tenth X to Y" ordinal claim(s) across ${mdFiles.length} content file(s) against the verification ledger.`,
+    `Checked ${totalClaims} "the first/second/.../tenth X" ordinal claim(s) across ${mdFiles.length} content file(s) against the verification ledger.`,
   );
 
   if (staleEntries.length > 0) {

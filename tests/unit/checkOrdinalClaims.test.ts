@@ -17,14 +17,14 @@ describe('extractOrdinalClaims', () => {
     expect(extractOrdinalClaims(md)).toEqual(['the third team to do it.', 'the tenth player to do it.']);
   });
 
-  it('ignores an ordinal when "to" is more than 50 characters away', () => {
-    const md = `- the first entrant in this remarkably long descriptive clause stretching well beyond the fifty character limit before reaching the word to here.\n`;
-    expect(extractOrdinalClaims(md)).toEqual([]);
+  it('extracts an ordinal claim with no "to" at all, e.g. "the first of his two wins"', () => {
+    const md = `- Claudio Bravo (Chile) - the first of his two wins.\n`;
+    expect(extractOrdinalClaims(md)).toEqual(['Claudio Bravo (Chile) - the first of his two wins.']);
   });
 
-  it('does not let the match window cross a sentence boundary', () => {
-    const md = `- The first half was goalless. Results promote the best teams to a higher league.\n`;
-    expect(extractOrdinalClaims(md)).toEqual([]);
+  it('extracts an ordinal claim with no following "to", e.g. a bare "the first half"', () => {
+    const md = `- The first half was goalless.\n`;
+    expect(extractOrdinalClaims(md)).toEqual(['The first half was goalless.']);
   });
 
   it('ignores non-bullet lines even when they contain a matching phrase', () => {
@@ -34,7 +34,11 @@ describe('extractOrdinalClaims', () => {
 
   it('extracts multiple matching bullets in document order', () => {
     const md = `- the first of many.\n- the first team to win it.\n- Not a match.\n- the second player to win it.\n`;
-    expect(extractOrdinalClaims(md)).toEqual(['the first team to win it.', 'the second player to win it.']);
+    expect(extractOrdinalClaims(md)).toEqual([
+      'the first of many.',
+      'the first team to win it.',
+      'the second player to win it.',
+    ]);
   });
 
   it('returns an empty array for content with no matching bullets', () => {
