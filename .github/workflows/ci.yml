@@ -63,6 +63,9 @@ jobs:
       - name: "\"Consecutive\"/\"back-to-back\" claim verification-ledger check (content/*.md)"
         run: pnpm check:consecutive-claims
 
+      - name: "\"Since <year>\" completeness-claim verification-ledger check (content/*.md)"
+        run: pnpm check:since-claims
+
       - name: Edition-page header-label translation check
         run: pnpm check:edition-header-labels
 

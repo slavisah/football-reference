@@ -28921,3 +28921,93 @@ three gates (`check:superlative-claims`, `check:record-claims`,
 extraction pattern before looking for an entirely new fifth claim shape or
 re-running the full manual-browser-sweep + e2e confirmation, which is now
 two runs further stale.
+
+### Added `check:since-claims`, a fifth verification-ledger gate for "at every X since Y"/"no equivalent existed at earlier editions" completeness claims - found and fixed two genuine "four earlier editions" arithmetic errors - closed 2026-09-24 (hundred-and-seventy-eighth intensive run)
+
+Rather than re-checking the four existing gates' own extraction patterns for
+a gap (the hundred-and-seventy-seventh run's own suggestion), looked for a
+genuinely new claim shape none of them cover and found one: every
+`content/*.md` bullet reading "\[an award/rule\] has existed at every
+\[competition\] since \[year\]; no equivalent existed at earlier editions"
+(or a close variant). This is a different bug class from the other four -
+it names neither "the only", an ordinal, a record-holder word, nor
+"consecutive" - and it is also the one claim shape on this site that is
+arithmetic rather than purely cross-referential: several of these bullets
+also state the exact *count* of earlier editions, which is only correct if
+it equals the real number of editions before that year in the same file's
+own Editions/Champions-timeline table.
+
+`check-since-claims.mjs` extracts every bullet matching `/\bsince
+\d{4}\b/i` - the same broad-trigger-word approach `check-record-claims.mjs`
+already uses for a claim shape with no single clean grammatical marker -
+and diffs it against `since-claims-ledger.json` (same mechanism as the
+other four gates). Seeding the ledger meant checking all 23 current matches
+across five content files: for each per-year winners list (Golden Ball/
+Golden Glove/Young Player/Fair Play on `content/fifa-world-cup.md`, Player
+of the Tournament/Young Player of the Tournament/Team of the Tournament on
+`content/uefa-euro.md`, Best Player/Golden Glove/Fair Play/Team of the
+Tournament on `content/copa-america.md`, the World Cup Silver/Bronze Boot
+section of `content/golden-boot.md`, and every companion-trophy winners
+list on `content/ballon-dor.md`), counted the claimed start year's actual
+edition count against the file's own Editions/Champions-timeline table and
+confirmed the winners list itself has no gap or extra year. The remaining
+bullets this pattern also catches (eligibility-rule history, a
+format-milestone pointer, a companion-trophy's own gap-year note, the
+"no third-place match since 1980" historical fact) are descriptive
+statements rather than completeness claims and are recorded as such,
+the same honesty the record-claims ledger already uses for "track record"
+non-claims.
+
+Seeding this new ledger found two genuine, previously-unnoticed factual
+errors, both the identical mistake in two different files:
+`content/fifa-world-cup.md`'s Fair Play Award bullet said "no equivalent
+award existed at the four earlier editions" before 1970, but the Editions
+table lists eight World Cups before 1970 (1930, 1934, 1938, 1950, 1954,
+1958, 1962, 1966); and `content/uefa-euro.md`'s Player of the Tournament
+bullet said the same "four earlier editions" before 1996, but the Editions
+table lists nine EUROs before 1996 (1960, 1964, 1968, 1972, 1976, 1980,
+1984, 1988, 1992). Both corrected in their English content and matching
+Croatian translation (`src/pages/hr/competitions/world-cup.astro`,
+"četiri ranija izdanja" -> "osam ranijih izdanja"; `euro.astro`, "četiri
+ranija izdanja" -> "devet ranijih izdanja"). The Fair Play bullet's exact
+text is also a ledger key in `superlative-claims-ledger.json` (it uses
+"the only two editions with a tie") and `record-claims-ledger.json` (it
+uses "record"/disciplinary-record sense) - both keys updated to the
+corrected text rather than left stale, since the verification conclusion
+each recorded is unaffected by the year-count fix. The Player of the
+Tournament bullet's text does not appear in any other ledger. Both winners
+lists themselves already ran correctly with no gap - only the prose
+earlier-edition count was wrong in each case.
+
+Added `tests/unit/checkSinceClaims.test.ts`, mirroring
+`checkConsecutiveClaims.test.ts`. Wired `check:since-claims` into
+`.github/workflows/ci.yml` as a required PR gate immediately after
+`check:consecutive-claims`.
+
+**Verification:** `pnpm lint` (229 files, 0/0/0), `pnpm test` (823/823, up
+from 814), `pnpm build` (711 pages, unchanged), `pnpm check:since-claims`
+(23 claims, 0 unverified), and every other `check:*` script re-run clean
+(`check:superlative-claims` 21/0, `check:ordinal-claims` 43/0,
+`check:record-claims` 36/0, `check:consecutive-claims` 22/0,
+`check:award-tallies` 4/4, `check:spelling` 15 files/0 issues,
+`check:spelling-hr` 57 blocks/0 issues, `check:links`/`check:sitemap`/
+`check:precache`/`check:jsonld`/`check:heading-outline`/`check:theme-flash`/
+`check:reachability`/`check:meta`/`check:edition-header-labels`/
+`check:i18n-notes`/`check:attendance-format`/`check:link-names`/
+`check:image-dimensions`/`check:locale-consistency`/`check:theme-color`/
+`check:pdf-outline`/`check:perf` all clean). `pnpm check:pdfs` correctly
+flagged the World Cup and EURO PDFs (English and Croatian) as stale after
+the two content fixes; regenerated the full 700-file fleet via
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs` (the same
+environment mismatch every prior PDF-regeneration entry already documents)
+and re-confirmed `check:pdfs`/`check:pdf-outline` clean.
+
+**Left for a future pass:** the same environment-blocked items as ever -
+see `docs/ROADMAP.md`'s "Open backlog", unchanged. Five verification-ledger
+gates now exist. A future run's own search for a genuinely different
+quality angle should check whether any of the five gates' own extraction
+patterns has a similar unnoticed gap (the way the 177th run found one in
+`check:ordinal-claims` and this run found a new claim shape entirely)
+before looking for a sixth claim shape, or re-run the full
+manual-browser-sweep + e2e confirmation, which is now three runs further
+stale.

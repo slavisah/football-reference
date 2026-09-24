@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (177 intensive runs as of 2026-09-24) lives
+verification sweep and decision (178 intensive runs as of 2026-09-24) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -38,14 +38,14 @@ what exists and any standing quirks.
 
 Every recent run's standing health check comes back clean run after run:
 `pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm test`/`pnpm
-test:coverage`/`pnpm build`, all 30 `check:*` scripts (25 fast enough to run
+test:coverage`/`pnpm build`, all 31 `check:*` scripts (26 fast enough to run
 every time and wired into `.github/workflows/ci.yml` as required PR gates,
-`check:consecutive-claims` the newest as of the hundred-and-seventy-sixth run;
+`check:since-claims` the newest as of the hundred-and-seventy-eighth run;
 `check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-seventy-seventh run (2026-09-24): 814/814 unit tests,
+As of the hundred-and-seventy-eighth run (2026-09-24): 823/823 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, zero `pnpm
 audit` vulnerabilities, and the same two standing `knip` false positives as
 ever (`scripts/test-preview-server.mjs`, used only as a Playwright
@@ -56,7 +56,23 @@ inside a config-file string. The five manual browser sweeps
 (`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
 `check:html`) and the full `pnpm test:e2e` suite were last re-run together
 cold-start as of the hundred-and-seventy-fifth run (2026-09-23): clean on
-all 711 pages, 1020/1020 e2e passed.
+all 711 pages, 1020/1020 e2e passed - three runs stale as of this run.
+
+**Hundred-and-seventy-eighth run:** built `check:since-claims`
+(`scripts/check-since-claims.mjs`), a fifth verification-ledger gate
+alongside `check:superlative-claims`/`check:ordinal-claims`/
+`check:record-claims`/`check:consecutive-claims`, this one for "at every X
+since Y; no equivalent existed at earlier editions" completeness claims - a
+bug class none of the other four patterns catches, and the one claim shape
+on this site that is arithmetic (several bullets also name the exact count
+of earlier editions) rather than purely cross-referential. Seeding the
+ledger (23 claims across five content files) found and fixed two genuine
+errors, the identical "four earlier editions" mistake in two different
+files: `content/fifa-world-cup.md`'s Fair Play Award bullet should say
+eight (there are eight World Cups before 1970), and
+`content/uefa-euro.md`'s Player of the Tournament bullet should say nine
+(there are nine EUROs before 1996) - both fixed in English and Croatian.
+See `docs/PROJECT_STATUS.md`'s matching entry for the full writeup.
 
 **Hundred-and-seventy-seventh run:** widened `check:ordinal-claims`'s
 extraction pattern - it required a "to" within 50 characters of "the
