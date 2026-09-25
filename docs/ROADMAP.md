@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (186 intensive runs as of 2026-09-25) lives
+verification sweep and decision (187 intensive runs as of 2026-09-25) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,16 +44,47 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-eighty-sixth run (2026-09-25): 870/870 unit tests,
+As of the hundred-and-eighty-seventh run (2026-09-25): 880/880 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
 `@cspell/dict-hr-hr`, used only via `.cspell/hr-notes.cspell.json`'s
 `"import"` field, never a JS `import`) - neither actually unused, knip's
 static analysis just can't see a reference inside a config-file string. The
-full `pnpm test:e2e` count re-confirmed clean this run (real page content
-changed - see below); see the hundred-and-eighty-sixth run's own entry for
-the exact figure.
+full `pnpm test:e2e` count was last re-confirmed clean by the
+hundred-and-eighty-sixth run itself (1023/1023, since that run edited real
+page content); not re-run again this run, since this run changed only a
+build-time script and its own unit tests, no page markup or content.
+
+**Hundred-and-eighty-seventh run:** with every open backlog item below still
+environment-blocked or awaiting human sign-off, followed the
+hundred-and-eighty-sixth run's own named next step: manually read the other
+five Croatian competition/award pages' note sections against
+`content/*.md` the same way that run's own read of EURO's "Team of the
+Tournament" section found a real bug - independent of whether any bullet
+happened to match a ledger-checker's trigger word. Read all five pairs (FIFA
+World Cup, Copa América, UEFA Nations League, Ballon d'Or, Golden Boot) in
+full, bullet by bullet; found **zero** missing-commentary instances - a
+genuine, thorough negative result confirming the EURO bug was an isolated
+translation-pass gap, not systemic. Rather than stop there, turned the
+audit into a permanent, automated regression guard: extended
+`check:i18n-notes` with a dash-clause-parity check (flags an English note
+item's trailing " - commentary" clause silently missing from its Croatian
+counterpart at the same position) - after first calibrating and rejecting a
+length-ratio heuristic whose own numbers, checked against the real EURO bug,
+overlapped too heavily with ordinary legitimate variation to set a
+zero-false-positive threshold. The dash-clause signal was calibrated clean
+against all 507 current EN/HR item pairs site-wide and confirmed, via a live
+reintroduce-the-bug-and-rebuild test, to catch 5 of the 6 real EURO bugs (the
+sixth is a documented, honest gap - see `docs/PROJECT_STATUS.md`'s matching
+entry). 10 new unit tests, `pnpm test` 880/880 (up from 870), all 28 fast
+`check:*` scripts clean, `pnpm build` 711 pages, `pnpm lint` 0/0/0, coverage
+unchanged at 99.91%/99.31%, `pnpm audit` clean, knip same two standing false
+positives, `pnpm outdated` re-checked (no new releases). Full browser
+sweeps/`pnpm test:e2e` not re-run - only a build-time script and its own
+unit tests changed, no page markup or content. See
+`docs/PROJECT_STATUS.md`'s matching entry for the full per-page audit
+writeup and the length-ratio-vs-dash-clause calibration detail.
 
 **Hundred-and-eighty-sixth run:** closed `check-claims-hr.mjs`'s documented
 "same-page-coincidence" blind spot with real per-claim positional pairing

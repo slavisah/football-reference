@@ -128,6 +128,96 @@ export function hrCounterpart(pagePath) {
   return pagePath === '/' ? '/hr' : `/hr${pagePath}`;
 }
 
+/**
+ * Pure: extracts every `.notes__card` section's item TEXT (not just a count)
+ * from a built page's HTML, in document order, as `{ heading, items }` -
+ * the same `.notes__card`/intro/`<li>`-or-`<p>` structure `extractNoteCards()`
+ * above already parses, kept as a separate function (rather than added onto
+ * `extractNoteCards()`'s own return shape) so that function's exact object
+ * shape, and every existing test pinned to it via `toEqual`, stay unchanged.
+ * Used only by `diffDashClauses()` below.
+ */
+export function extractNoteCardItemTexts(html) {
+  const cards = [];
+  const cardRe = /<section class="notes__card card"[^>]*>([\s\S]*?)<\/section>/g;
+  let match;
+  while ((match = cardRe.exec(html))) {
+    const body = match[1];
+    const headingMatch = /<h2[^>]*>([\s\S]*?)<\/h2>/.exec(body);
+    const heading = headingMatch ? headingMatch[1].replace(/<[^>]+>/g, '').trim() : '(no heading)';
+
+    const withoutIntro = body.replace(/<p class="notes__intro"[\s\S]*?<\/p>/, '');
+    const liMatches = [...withoutIntro.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)];
+    const items =
+      liMatches.length > 0
+        ? liMatches.map((m) => m[1].replace(/<[^>]+>/g, '').trim())
+        : [...withoutIntro.matchAll(/<p(?![^>]*notes__intro)[^>]*>([\s\S]*?)<\/p>/g)].map((m) =>
+            m[1].replace(/<[^>]+>/g, '').trim(),
+          );
+
+    cards.push({ heading, items });
+  }
+  return cards;
+}
+
+/** Pure: true if `text` contains a " - "/" – " dash-clause separator. */
+function hasDashClause(text) {
+  return / [-–] /.test(text);
+}
+
+/**
+ * Pure: a narrow, low-noise regression guard for one specific bug class the
+ * hundred-and-eighty-sixth intensive run found by hand (see
+ * `docs/PROJECT_STATUS.md`) - a Croatian note item that keeps its English
+ * counterpart's core fact (names, a year, a number) but silently drops the
+ * item's entire trailing " - commentary" clause. `diffNoteCards()` above
+ * cannot see this: it only counts items and sections, and a dropped clause
+ * changes neither count. Checked here instead: for every positionally-
+ * matched item (same section index, same item index - meaningful only where
+ * section/item counts already match, so this silently no-ops on a page pair
+ * `diffNoteCards()` has already flagged for a structural mismatch), if the
+ * English item contains a " - "/" – " dash-clause separator, the Croatian
+ * item at the same position must contain one too.
+ *
+ * Deliberately narrow and one-directional, the same honesty every other
+ * checker on this site documents about its own scope: it flags a *dropped*
+ * clause, not a *shortened* one. A length-ratio heuristic was tried first and
+ * rejected - calibrated against the site's own real historical bug, its
+ * ratios (0.63-0.95 across the six buggy bullets) overlapped too heavily
+ * with ordinary legitimate variation across the corpus (site-wide 5th
+ * percentile 0.938, but the real bug's own least-truncated instance was
+ * 0.945) to set a threshold with zero false positives - it would have either
+ * missed real bugs or flagged good translations. This dash-clause signal was
+ * calibrated the same way: checked against all 507 current EN/HR item pairs
+ * site-wide with zero false positives, and confirmed to retroactively catch
+ * 5 of the 6 real bugs the hundred-and-eighty-sixth run found by hand (the
+ * sixth had already kept a different, shorter dash-clause in place of the
+ * dropped one, so no dash was missing for this check to see - a known,
+ * documented gap, not a defect pretending otherwise).
+ */
+export function diffDashClauses(enCards, hrCards, enPath, hrPath) {
+  const problems = [];
+  if (enCards.length !== hrCards.length) return problems;
+
+  for (let i = 0; i < enCards.length; i++) {
+    const en = enCards[i];
+    const hr = hrCards[i];
+    if (en.items.length !== hr.items.length) continue;
+
+    for (let j = 0; j < en.items.length; j++) {
+      if (hasDashClause(en.items[j]) && !hasDashClause(hr.items[j])) {
+        problems.push(
+          `${enPath} section ${i} ("${en.heading}") item ${j} has a trailing " - "/" – " clause but ` +
+            `${hrPath} section ${i} ("${hr.heading}") item ${j} does not - possible dropped Croatian ` +
+            `commentary. EN: "${en.items[j]}" | HR: "${hr.items[j]}"`,
+        );
+      }
+    }
+  }
+
+  return problems;
+}
+
 async function main() {
   const files = await listHtmlFiles(DIST_DIR);
   const htmlByPagePath = new Map();
@@ -156,10 +246,17 @@ async function main() {
 
     checked++;
     problems.push(...diffNoteCards(enCards, hrCards, enPath, hrPath));
+
+    const enItemCards = extractNoteCardItemTexts(htmlByPagePath.get(enPath));
+    const hrItemCards = extractNoteCardItemTexts(hrHtml);
+    problems.push(...diffDashClauses(enItemCards, hrItemCards, enPath, hrPath));
   }
 
   if (problems.length === 0) {
-    console.log(`\nEvery matched page pair (${checked} checked) has identical note-section structure.`);
+    console.log(
+      `\nEvery matched page pair (${checked} checked) has identical note-section structure, and no ` +
+        `English item's trailing commentary clause is missing from its Croatian counterpart.`,
+    );
     return;
   }
 

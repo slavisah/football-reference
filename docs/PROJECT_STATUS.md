@@ -29887,3 +29887,129 @@ gap - a targeted read of each page's own `notes`/`CROATIAN_MOMENTS`-style
 arrays against `content/*.md`, independent of whether any bullet happens to
 match a ledger-checker's trigger word, since this run's own finding shows a
 translation gap can hide entirely outside every existing pattern.
+
+### Audited the other five competition/award pages for the EURO bug's shape; found none, then built a permanent dash-clause regression guard - closed 2026-09-25 (hundred-and-eighty-seventh intensive run)
+
+Followed through on the hundred-and-eighty-sixth run's own named next step:
+a targeted read of every other Croatian competition/award page's `notes`/
+`CROATIAN_MOMENTS`-style array against its English `content/*.md` source,
+bullet by bullet, independent of whether a bullet happens to match any
+ledger-checker's trigger word - the same method that run's own manual read
+of EURO's "Team of the Tournament" section used to find five (of six)
+Croatian entries silently missing their entire trailing commentary clause.
+
+Read all five remaining pairs in full: `content/fifa-world-cup.md` (243
+lines) against `src/pages/hr/competitions/world-cup.astro` (444 lines),
+`content/copa-america.md` (322) against `copa-america.astro` (425),
+`content/uefa-nations-league.md` (76) against `nations-league.astro` (284),
+`content/ballon-dor.md` (189) against `ballon-dor.astro` (274), and
+`content/golden-boot.md` (109) against `golden-boot.astro` (330) - every
+note-card section, every bullet, checking each English item's trailing
+" - commentary" clause (age records, "the only X", cross-references to
+other sections, tiebreak explanations, and so on) against its Croatian
+counterpart at the same position. **Found zero missing-commentary
+instances** across all five pages - a genuine, thorough negative result:
+the EURO bug was an isolated incident from that page's own translation
+pass, not a systemic gap across the other five Croatian competition pages.
+
+Rather than let a clean manual audit be the end of it, turned the same
+concern into a permanent, automated regression guard - the pattern this
+project has followed for every other content-integrity concern found by
+hand (`check:superlative-claims`, `check:ordinal-claims`, `check:claims-hr`,
+and five more). `check:i18n-notes` (`scripts/check-i18n-notes.mjs`) already
+verifies every EN/HR page pair has the same note-card section count, the
+same intro-paragraph presence, and the same item count per section - but
+item *count* is exactly what a dropped trailing clause never changes, which
+is precisely why the EURO bug shipped unnoticed for as long as it did.
+
+**First approach tried and rejected:** a length-ratio heuristic - flag a
+Croatian item whose character length is suspiciously short relative to its
+English counterpart at the same position. Calibrated it against the site's
+own real historical bug before trusting it: reconstructing the exact six
+buggy EURO bullets from this same day's earlier commit
+(`b54a2694b`)'s diff and computing each one's EN/HR-buggy length ratio gave
+0.629-0.945 - and a site-wide calibration pass across all 498 real,
+currently-correct EN/HR item pairs (every matched page pair, not just the
+six competition pages) found a 5th-percentile ratio of 0.938, with the
+single lowest real ratio anywhere on the site (a paraphrased "Idealna
+momčad turnira" intro paragraph) sitting at 0.652 - already below several of
+the real bug's own ratios (0.629, 0.661). No threshold could separate the
+two: set it above ~0.65 and it flags legitimate paraphrased prose as
+false positives; set it below ~0.63 and it misses real bugs like the 2024
+entry's 0.945. Documented and abandoned rather than shipped with either
+flaw.
+
+**What was built instead:** `extractNoteCardItemTexts()`, a new function
+alongside `extractNoteCards()` that extracts each note-card section's actual
+item *text* (not just a count) from built HTML - deliberately a separate
+function rather than adding a field to `extractNoteCards()`'s own return
+shape, so that function's exact object shape, and every existing test
+pinned to it via `toEqual`, keep working unchanged. And `diffDashClauses()`:
+for every positionally-matched item where section/item counts already agree
+(a no-op on any page pair `diffNoteCards()` has already flagged
+structurally), if the English item contains a " - "/" – " dash-clause
+separator, its Croatian counterpart at the same position must contain one
+too - reading the whole corpus confirmed every Croatian note item on this
+site that carries trailing commentary does so via the identical " - "
+convention the English content uses, so this is a same-language-agnostic,
+structural signal rather than a translated-vocabulary one.
+
+**Calibration, the same way the length-ratio idea was checked and
+rejected:** run against all 507 current EN/HR item pairs site-wide (the
+`.notes__card` sections on every matched EN/HR page pair, not just the five
+audited above) - **zero false positives**. Retroactively tested against the
+six real EURO bugs reconstructed from `b54a2694b`'s diff: catches five of
+six (1996, 2004, 2008, 2016, 2020 - each had its entire trailing clause
+dropped, leaving no dash at all). The sixth (2024) is a documented, honest
+miss: that bullet's buggy Croatian version had already kept a *different*,
+shorter dash-clause in place of the dropped one ("Kyle Walker jedini je
+igrač..." survived; "prvaci Španjolska dali su šestoricu, najviše od svih
+reprezentacija" was the part actually dropped), so a presence-only check has
+no dash-shaped signal left to catch. This is the same kind of honestly-
+documented gap every ledger checker on this site already carries for its own
+claim shape, not a defect papered over as complete coverage.
+
+**Live regression test, not just retroactive reasoning:** temporarily
+reintroduced the exact 1996 bug into
+`src/pages/hr/competitions/euro.astro` (reverting that one bullet to its
+pre-fix, no-trailing-clause text), rebuilt, and confirmed `check:i18n-notes`
+now fails with a message naming the exact section, item index, and both the
+English and (bugged) Croatian text - then reverted and confirmed the
+restored file is byte-identical to the committed `HEAD` version (`git diff`
+empty) before moving on.
+
+Added 10 new unit tests to `tests/unit/checkI18nNotes.test.ts` covering
+`extractNoteCardItemTexts()` (bulleted-list extraction excluding the intro
+paragraph, single-paragraph extraction, inline-markup stripping) and
+`diffDashClauses()` (no problem when both sides have a clause; flags a
+missing HR clause; no false positive when neither side has one; no false
+positive when HR keeps a shorter-but-present clause - directly guarding
+against the length-ratio idea's own failure mode; recognizes an en dash as
+well as a hyphen; silently skips a section already flagged by a section- or
+item-count mismatch).
+
+**Verification:** `pnpm lint` (234 files, 0/0/0), `pnpm test` (880/880, up
+from 870), `pnpm build` (711 pages, unchanged), `pnpm check:i18n-notes`
+(clean against all 356 English pages' matched Croatian counterparts, the
+new dash-clause check included), all other 27 fast `check:*` scripts
+individually clean, `pnpm test:coverage` (99.91%/99.31%, unchanged - the
+same four defensively-unreachable lines as ever; the new functions are pure
+and covered directly by the new unit tests), `pnpm audit` (no known
+vulnerabilities), `pnpm dlx knip --no-config-hints` (the same two standing
+false positives as ever). `pnpm outdated` re-checked: no new releases since
+the hundred-and-eighty-sixth run (still only the blocked `typescript` 7
+major). Full browser sweeps and `pnpm test:e2e` not re-run - this run
+changed only a build-time verification script and its own unit tests, no
+page markup, content, or user-facing behavior.
+
+**Left for a future pass:** the concrete lead the hundred-and-eighty-sixth
+run named is now fully closed - both the manual audit it called for and the
+permanent automated guard that audit's own findings justified. The new
+check's one documented gap (a dropped clause replaced by a different,
+non-empty clause, as in the 2024 case) is a known, honest scope limit rather
+than an open thread to chase - the same treatment this project already gives
+every ledger checker's own claim-shape boundaries. With this closed and the
+standing open-backlog items below still all environment-blocked or awaiting
+human sign-off, the next fresh angle will need the same kind of
+first-principles search this run and the hundred-and-eighty-sixth run both
+used, rather than another checker-vocabulary widening pass.
