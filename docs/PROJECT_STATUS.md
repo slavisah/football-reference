@@ -29546,3 +29546,129 @@ have a matching possessive-phrasing (or other anchor-word) gap the same way
 `ordinal` just did - not yet attempted, and the kind of lead this run's own
 method (re-reading a checker's own pattern rather than hunting a new claim
 vocabulary) suggests trying next.
+
+### Checked all four remaining verification-ledger checkers for the same possessive-phrasing gap `check:ordinal-claims` had; found and closed one in `check:superlative-claims` - closed 2026-09-25 (hundred-and-eighty-fourth intensive run)
+
+With the open backlog still fully blocked (re-confirmed: `WebFetch` to
+`en.wikipedia.org` still returns `EGRESS_BLOCKED`, `npm view
+@astrojs/check@latest peerDependencies` still only declares
+`typescript: '^5.0.0 || ^6.0.0'`, `pnpm outdated` shows no new release beyond
+that same blocked `typescript` line, the brand-suffix title-length decision
+still needs human sign-off, the Nations League Team of the Tournament/
+attendance gaps still genuinely exhausted), this run picked up the
+hundred-and-eighty-third run's own named next step: check whether
+`check-record-claims.mjs`, `check-consecutive-claims.mjs` and
+`check-since-claims.mjs` have the same "literal anchor word required"
+possessive-phrasing gap `check-ordinal-claims.mjs` did, and whether
+`check-superlative-claims.mjs` does too.
+
+Read all four extraction patterns side by side rather than grepping content
+first:
+
+- `check-record-claims.mjs`: `/\b(most|record|youngest|oldest|highest|
+  biggest|largest|lowest|fewest)\b/i` - a bare trigger word, matched anywhere
+  in the bullet with no preceding-word requirement at all. A possessive
+  phrasing ("Spain's most titles", "his record fourth goal") still contains
+  the bare trigger word, so it was already caught. No gap.
+- `check-consecutive-claims.mjs`: `/\b(consecutive|back-to-back)\b/i` - same
+  shape, same conclusion. No gap.
+- `check-since-claims.mjs`: `/\bsince \d{4}\b/i` - anchored to a literal year,
+  not an ordinal or a "the"-prefixed word; a possessive doesn't apply to this
+  claim shape at all (there's no possessive equivalent of "since 2010"). No
+  gap.
+- `check-superlative-claims.mjs`: `/\bthe only\b/i` - the one pattern with
+  exactly the same shape as `check-ordinal-claims.mjs`'s original bug: a
+  literal word ("the") required immediately before the claim word ("only").
+  This one had the gap.
+
+Grepped `content/*.md` for every bullet containing "only" but not matching
+the existing `/\bthe only\b/i` pattern to see the real landscape before
+deciding whether to widen (same diligence as the ordinal fix): most
+non-matches are genuinely unrelated uses of "only" ("Europe-only",
+"had only four teams", "only entered the tournament") that the existing
+pattern's own header comment had already correctly identified as noise to
+stay out of. But three were the exact same uniqueness-claim shape as "the
+only X", just phrased with a possessive instead of "the" - and, notably, two
+of the three ("Colombia's only title", underlying the Maturana/Córdoba Copa
+América entries) were literally named as excluded examples in the existing
+header comment, written before anyone had checked whether they were real,
+silently-unverified claims or just noise:
+
+- `content/copa-america.md`: "**2001:** Francisco Maturana (Colombia) -
+  Colombia's only Copa América title, won undefeated."
+- `content/copa-america.md`: "Bolivia won its only title as host in 1963."
+- `content/uefa-euro.md`: "**1988:** Rinus Michels (Netherlands) - the
+  architect of \"Total Football\", coaching the Dutch golden generation to
+  their only European Championship title."
+
+(A fourth bullet, "**2001:** Iván Córdoba (Colombia) - scored the only goal
+of the final himself, Colombia's only Copa América title.", already matched
+the existing `/\bthe only\b/i` pattern via its own "the only goal" clause and
+was already ledgered, so it didn't newly appear.)
+
+Also found, but deliberately did not fold in: "one of only three men to win
+it as both player and manager" (`content/fifa-world-cup.md`, two bullets) and
+"one of only a handful of managers/players..." (`content/uefa-euro.md`, two
+bullets). These are a genuinely different claim shape - membership in a
+bounded set of a stated size, not a strict-uniqueness claim - the same kind
+of judgment call the ordinal checker's own widening made when it left "third-
+place match" and "at first" out. Folding "one of only N" into this pattern
+would also pull in the vaguer "a handful of" bullets, which aren't
+independently checkable against any table this site has (no
+player-position/dual-role column). Logged as its own "Ideas not yet scoped"
+entry in `docs/ROADMAP.md` rather than guessed at or force-fit into this run.
+
+Widened `check-superlative-claims.mjs`'s `CLAIM_PATTERN` to
+`/\bthe only\b|\b\w+'s\s+only\b|\b(his|her|its|their)\s+only\b/i`, the same
+two alternatives (possessive noun, possessive pronoun) the hundred-and-
+eighty-third run added to `check-ordinal-claims.mjs`. Re-checked the widened
+pattern against the full corpus before committing to it: exactly 3 new
+claims, zero noise - every other "only" bullet in `content/*.md` still has no
+possessive immediately before it. Verified all three by hand:
+
+- Colombia's Copa América title count: scanned the Champions table's
+  Champion column (1916-2024) - Colombia appears in exactly one row, 2001.
+  Confirms both "Colombia's only Copa América title" bullets (Maturana and,
+  for its already-ledgered "the only goal" half, Córdoba).
+- Bolivia's host-title claim: same table, same column - Bolivia appears in
+  exactly one row, 1963, the same year the Editions table lists Bolivia as
+  host.
+- Netherlands' EURO title count: scanned `content/uefa-euro.md`'s Champions
+  table's Champion column (1960-2024) - Netherlands appears in exactly one
+  row, 1988.
+
+All three recorded in `superlative-claims-ledger.json`
+(superlative-claims coverage: 21 -> 24 claims). Added three new unit tests to
+`tests/unit/checkSuperlativeClaims.test.ts` covering the possessive-noun and
+possessive-pronoun alternatives; the existing "ignores bullets that use
+'only' without 'the only'" test (which already includes "One of only three
+men to win it" as a non-match case) needed no change and still passes,
+confirming the widened pattern doesn't pull in the bounded-set shape.
+
+**Verification:** `pnpm lint` (232 files, 0 errors/0 warnings/0 hints),
+`pnpm test` (845/845, up from 842), `pnpm build` (711 pages, unchanged),
+`pnpm test:coverage` (99.91%/99.31%, unchanged - same four defensively-
+unreachable lines as ever), all 26 fast `check:*` scripts individually
+(pdfs, pdf-outline, perf, links, sitemap, precache, jsonld, heading-outline,
+theme-flash, reachability, meta, award-tallies, all five verification-ledger
+claim gates including `check:superlative-claims` itself - 24/24 now
+ledgered, claims-hr, edition-header-labels, i18n-notes, attendance-format,
+link-names, image-dimensions, locale-consistency, theme-color, spelling,
+spelling-hr - all clean), `pnpm audit` (no known vulnerabilities), and
+`pnpm dlx knip --no-config-hints` (the same two standing false positives as
+ever). The four browser-based sweeps
+(`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
+`check:html`) and the full `pnpm test:e2e` suite were not re-run this cycle -
+this change touches only a build-time content-verification script, its JSON
+ledger, and a unit test, with no change to any page's markup, styling or
+runtime behavior.
+
+**Left for a future pass:** the same environment-blocked open-backlog items
+as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged (now with the
+possessive-phrasing item removed, closed by this run). The
+hundred-and-eighty-first run's own concrete next step (positional per-claim
+EN/HR pairing for `check-claims-hr.mjs`, closing its documented same-page-
+coincidence blind spot) is still open and still the most substantive,
+well-scoped thread available. The "one of only N X" bounded-set claim shape
+flagged above is a second concrete, scoped idea worth picking up if a future
+run wants a checker angle rather than that thread.

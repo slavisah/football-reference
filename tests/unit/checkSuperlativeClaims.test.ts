@@ -12,9 +12,26 @@ describe('extractSuperlativeClaims', () => {
     expect(extractSuperlativeClaims(md)).toEqual(['THE ONLY player to do this.']);
   });
 
-  it('ignores bullets that use "only" without "the only"', () => {
+  it('ignores bullets that use "only" without "the only" or a possessive-only', () => {
     const md = `- Europe-only at first.\n- Had only four teams.\n- One of only three men to win it.\n`;
     expect(extractSuperlativeClaims(md)).toEqual([]);
+  });
+
+  it('extracts a possessive-noun "only" claim, e.g. "Colombia\'s only title"', () => {
+    const md = `- Francisco Maturana (Colombia) - Colombia's only Copa América title.\n`;
+    expect(extractSuperlativeClaims(md)).toEqual(["Francisco Maturana (Colombia) - Colombia's only Copa América title."]);
+  });
+
+  it('extracts a possessive-pronoun "only" claim, e.g. "its only title"', () => {
+    const md = `- Bolivia won its only title as host in 1963.\n`;
+    expect(extractSuperlativeClaims(md)).toEqual(['Bolivia won its only title as host in 1963.']);
+  });
+
+  it('extracts a possessive-pronoun "only" claim with "their", e.g. "their only European Championship title"', () => {
+    const md = `- Rinus Michels (Netherlands) - coached the Dutch to their only European Championship title.\n`;
+    expect(extractSuperlativeClaims(md)).toEqual([
+      'Rinus Michels (Netherlands) - coached the Dutch to their only European Championship title.',
+    ]);
   });
 
   it('ignores non-bullet lines even when they contain "the only"', () => {
