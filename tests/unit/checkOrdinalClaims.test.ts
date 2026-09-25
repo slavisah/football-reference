@@ -27,6 +27,26 @@ describe('extractOrdinalClaims', () => {
     expect(extractOrdinalClaims(md)).toEqual(['The first half was goalless.']);
   });
 
+  it('extracts a possessive-noun ordinal claim, e.g. "the trophy\'s first winner"', () => {
+    const md = `- Someone (Country) - the trophy's first winner.\n`;
+    expect(extractOrdinalClaims(md)).toEqual(["Someone (Country) - the trophy's first winner."]);
+  });
+
+  it('extracts a possessive-pronoun ordinal claim, e.g. "his second win"', () => {
+    const md = `- Someone (Country) - his second win.\n`;
+    expect(extractOrdinalClaims(md)).toEqual(['Someone (Country) - his second win.']);
+  });
+
+  it('extracts a possessive-noun ordinal claim with no "the" anywhere, e.g. "Colombia won its first title"', () => {
+    const md = `- Colombia won its first title in 2001.\n`;
+    expect(extractOrdinalClaims(md)).toEqual(['Colombia won its first title in 2001.']);
+  });
+
+  it('does not match a bare ordinal with no possessive and no "the", e.g. "at first" or a structural "third-place match"', () => {
+    const md = `- Eligibility was Europe-only at first.\n- No third-place match was played.\n`;
+    expect(extractOrdinalClaims(md)).toEqual([]);
+  });
+
   it('ignores non-bullet lines even when they contain a matching phrase', () => {
     const md = `This paragraph mentions the first team to do it in passing.\n`;
     expect(extractOrdinalClaims(md)).toEqual([]);

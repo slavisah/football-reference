@@ -47,6 +47,22 @@
 // never used as a vague quantifier, so the bare word needs no "to" anchor
 // to stay precise.
 //
+// Widened a second time by the hundred-and-eighty-third intensive run: the
+// "the (first|...)" pattern still required the literal word "the"
+// immediately before the ordinal, which missed every possessive phrasing of
+// the exact same claim shape - "the trophy's first winner", "Masantonio's
+// second win", "his second win", "its first title" - 48 real claims across
+// all six content files that were silently unverified, the same bug class
+// as the 177th run's own "to"-requirement gap. Added two alternatives to the
+// pattern: `\w+'s (first|...)` (a possessive noun) and `(his|her|its|their)
+// (first|...)` (a possessive pronoun). Re-checked both against the full
+// corpus before widening (same diligence as every prior narrowing/widening
+// on this file): zero noise - every matched bullet is a genuine, table-
+// checkable ordinal-rank claim, not a stray "at first"/"third-place match"/
+// generic-ordinal use (those never take a possessive immediately before the
+// ordinal word, so the narrower possessive anchor stays precise where the
+// bare-word widening above already proved unnecessary for this second net).
+//
 // Plain regex/string parsing of `content/*.md`, no build or browser needed -
 // the same territory as `check-superlative-claims.mjs`, so this is wired
 // into `.github/workflows/ci.yml` as a required PR gate immediately after
@@ -61,14 +77,19 @@ const CONTENT_DIR = path.join(ROOT, 'content');
 const LEDGER_PATH = path.join(ROOT, 'scripts', 'ordinal-claims-ledger.json');
 
 const ORDINALS = 'first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth';
-const CLAIM_PATTERN = new RegExp(`\\bthe (${ORDINALS})\\b`, 'i');
+const CLAIM_PATTERN = new RegExp(
+  `\\bthe (${ORDINALS})\\b|\\b\\w+'s\\s+(${ORDINALS})\\b|\\b(his|her|its|their)\\s+(${ORDINALS})\\b`,
+  'i',
+);
 
 /**
  * Pure: every top-level Markdown list item's text in `markdown` that matches
- * the "the first/second/.../tenth X" ordinal-claim pattern, in document
- * order. Content pages on this site use only flat, single-line `- ` bullets
- * (no nested lists), so a per-line regex is sufficient - no Markdown parser
- * needed.
+ * the "the first/second/.../tenth X" ordinal-claim pattern - either "the Nth"
+ * directly, or the same ordinal-rank claim phrased with a possessive
+ * ("the trophy's first winner", "Masantonio's second win", "his second win",
+ * "its first title") - in document order. Content pages on this site use
+ * only flat, single-line `- ` bullets (no nested lists), so a per-line regex
+ * is sufficient - no Markdown parser needed.
  */
 export function extractOrdinalClaims(markdown) {
   const claims = [];
