@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { extractNoteCards, diffNoteCards, hrCounterpart } from '../../scripts/check-i18n-notes.mjs';
+import {
+  extractNoteCards,
+  diffNoteCards,
+  hrCounterpart,
+  extractNoteCardItemTexts,
+  diffDashClauses,
+} from '../../scripts/check-i18n-notes.mjs';
 
 function card({ heading = 'Heading', intro = '', items = ['One'] }: { heading?: string; intro?: string; items?: string[] }) {
   const introHtml = intro ? `<p class="notes__intro">${intro}</p>` : '';
@@ -86,6 +92,75 @@ describe('diffNoteCards', () => {
     const en = [{ heading: 'Final venues', hasIntro: true, itemCount: 23 }];
     const hr = [{ heading: 'Mjesta finala', hasIntro: false, itemCount: 24 }];
     expect(diffNoteCards(en, hr, '/en/', '/hr/')).toHaveLength(2);
+  });
+});
+
+describe('extractNoteCardItemTexts', () => {
+  it('extracts item text for a bulleted-list section, excluding an intro paragraph', () => {
+    const html = card({ heading: 'Final venues', intro: 'Lead-in prose.', items: ['1930: Uruguay.', '1934: Italy.'] });
+    expect(extractNoteCardItemTexts(html)).toEqual([
+      { heading: 'Final venues', items: ['1930: Uruguay.', '1934: Italy.'] },
+    ]);
+  });
+
+  it('extracts item text for a single-paragraph section', () => {
+    const html = card({ heading: 'How it works', items: ['Just one paragraph.'] });
+    expect(extractNoteCardItemTexts(html)).toEqual([{ heading: 'How it works', items: ['Just one paragraph.'] }]);
+  });
+
+  it('strips inline markup from item text', () => {
+    const html = card({ heading: 'X', items: ['<strong>1986:</strong> a stadium.'] });
+    expect(extractNoteCardItemTexts(html)).toEqual([{ heading: 'X', items: ['1986: a stadium.'] }]);
+  });
+});
+
+describe('diffDashClauses', () => {
+  it('returns no problems when every item with an EN dash-clause has a matching HR one', () => {
+    const en = [{ heading: 'X', items: ['1990: a name - the trophy’s first winner.'] }];
+    const hr = [{ heading: 'Y', items: ['1990.: ime - prvi dobitnik nagrade.'] }];
+    expect(diffDashClauses(en, hr, '/en/', '/hr/')).toEqual([]);
+  });
+
+  it('flags an item where EN has a trailing dash-clause but HR does not (the dropped-commentary bug)', () => {
+    const en = [{ heading: 'Team of the Tournament winners', items: ['1996: a roster - champions Germany supplied three.'] }];
+    const hr = [{ heading: 'Idealna momčad turnira', items: ['1996.: sastav.'] }];
+    const problems = diffDashClauses(en, hr, '/competitions/euro/', '/hr/competitions/euro/');
+    expect(problems).toHaveLength(1);
+    expect(problems[0]).toContain('item 0 has a trailing " - "/" – " clause');
+    expect(problems[0]).toContain('possible dropped Croatian commentary');
+  });
+
+  it('does not flag an item where neither language has a dash-clause', () => {
+    const en = [{ heading: 'X', items: ['1990: a bare name.'] }];
+    const hr = [{ heading: 'Y', items: ['1990.: golo ime.'] }];
+    expect(diffDashClauses(en, hr, '/en/', '/hr/')).toEqual([]);
+  });
+
+  it('does not flag an item where HR keeps a dash-clause even if shorter than EN', () => {
+    const en = [{ heading: 'X', items: ['1996: a long roster of names - champions Germany supplied three, the most of any team.'] }];
+    const hr = [{ heading: 'Y', items: ['1996.: popis imena - prvaci su dali trojicu.'] }];
+    expect(diffDashClauses(en, hr, '/en/', '/hr/')).toEqual([]);
+  });
+
+  it('recognizes an en dash ("–") as a dash-clause separator too', () => {
+    const en = [{ heading: 'X', items: ['1990: a name – a clause.'] }];
+    const hr = [{ heading: 'Y', items: ['1990.: ime.'] }];
+    expect(diffDashClauses(en, hr, '/en/', '/hr/')).toHaveLength(1);
+  });
+
+  it('skips a section where item counts differ (already flagged by diffNoteCards)', () => {
+    const en = [{ heading: 'X', items: ['a - b.', 'c - d.'] }];
+    const hr = [{ heading: 'Y', items: ['a.'] }];
+    expect(diffDashClauses(en, hr, '/en/', '/hr/')).toEqual([]);
+  });
+
+  it('returns no problems when the section counts differ', () => {
+    const en = [{ heading: 'X', items: ['a - b.'] }];
+    const hr = [
+      { heading: 'Y', items: ['a.'] },
+      { heading: 'Z', items: ['c.'] },
+    ];
+    expect(diffDashClauses(en, hr, '/en/', '/hr/')).toEqual([]);
   });
 });
 
