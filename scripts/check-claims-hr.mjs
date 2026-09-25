@@ -1,18 +1,19 @@
-// Cross-checks every already-verified claim in the five verification-ledger
+// Cross-checks every already-verified claim in the six verification-ledger
 // files (`superlative-claims-ledger.json`, `ordinal-claims-ledger.json`,
 // `record-claims-ledger.json`, `consecutive-claims-ledger.json`,
-// `since-claims-ledger.json`) against its Croatian counterpart page's own
-// hand-translated note prose, on the actual built output - a gap none of
-// those five checkers close themselves, since each is deliberately scoped to
-// `content/*.md` (English) only (see each script's own header comment). A
-// claim's English wording is re-verified against its source table before it
-// ever enters a ledger, but nothing before this script has ever checked that
-// the *Croatian* translation of that same claim still asserts the same
-// underlying fact - a mistranslation or a stale Croatian bullet (left
-// unfixed after the English one was corrected) would ship silently, the same
-// failure mode `check:i18n-notes`/`check:attendance-format` already guard
-// against for section structure and grouped-number formatting respectively,
-// but for claim content specifically.
+// `since-claims-ledger.json`, `one-of-only-claims-ledger.json`) against its
+// Croatian counterpart page's own hand-translated note prose, on the actual
+// built output - a gap none of those six checkers close themselves, since
+// each is deliberately scoped to `content/*.md` (English) only (see each
+// script's own header comment). A claim's English wording is re-verified
+// against its source table before it ever enters a ledger, but nothing
+// before this script has ever checked that the *Croatian* translation of
+// that same claim still asserts the same underlying fact - a mistranslation
+// or a stale Croatian bullet (left unfixed after the English one was
+// corrected) would ship silently, the same failure mode
+// `check:i18n-notes`/`check:attendance-format` already guard against for
+// section structure and grouped-number formatting respectively, but for
+// claim content specifically.
 //
 // Doing this precisely (verifying the Croatian bullet asserts the exact same
 // fact as its English counterpart) isn't tractable with plain regex - that
@@ -21,37 +22,42 @@
 // comment already rules out for a from-scratch checker. What plain
 // regex/string matching *can* verify cheaply and reliably is that the two
 // languages' claims share the same numeric anchors: every four-digit year
-// (1900-2099) named in a verified English claim must also appear somewhere
-// in that claim's page family's Croatian note prose, and - narrower still,
-// scoped to the exact bug class `check-since-claims.mjs`'s own ledger-seeding
-// pass already found twice in English alone (`content/fifa-world-cup.md`'s
-// Fair Play Award bullet and `content/uefa-euro.md`'s Player of the
-// Tournament bullet both originally miscounted "the four earlier editions"
-// when the real count was eight/nine) - a spelled-out "the <N> earlier
-// editions" cardinal count must have its Croatian numeral translation present
-// too. Neither check proves the Croatian sentence means the same thing
-// (a manual read is still the only way to be sure of that - see this script's
-// own matching `docs/PROJECT_STATUS.md` entry for the full one-time manual
-// audit this script's first run performed, which found zero discrepancies
-// across all five ledgers), but a year or count silently missing from the
-// Croatian side is a strong, cheap, low-noise signal that something drifted.
+// (1900-2099) named in a verified English claim must also appear in its
+// Croatian counterpart, and - narrower still, scoped to the exact bug class
+// `check-since-claims.mjs`'s own ledger-seeding pass already found twice in
+// English alone (`content/fifa-world-cup.md`'s Fair Play Award bullet and
+// `content/uefa-euro.md`'s Player of the Tournament bullet both originally
+// miscounted "the four earlier editions" when the real count was
+// eight/nine) - a spelled-out "the <N> earlier editions" cardinal count must
+// have its Croatian numeral translation present too. Neither check proves
+// the Croatian sentence means the same thing (a manual read is still the
+// only way to be sure of that - see this script's own matching
+// `docs/PROJECT_STATUS.md` entry for the full one-time manual audit this
+// script's first run performed, which found zero discrepancies across all
+// five ledgers that existed at the time), but a year or count silently
+// missing from the Croatian side is a strong, cheap, low-noise signal that
+// something drifted.
 //
-// Known limitation, found while self-testing this script against a
-// deliberately introduced bug before committing it (see the same
-// `docs/PROJECT_STATUS.md` entry): a year is checked for presence anywhere
-// in the page family's combined note prose, not specifically within the
-// Croatian sentence that translates the matching English claim - a
-// mistranslated year that happens to also appear correctly in a *different*
-// bullet on the same page (e.g. an eligibility-rule bullet mentioning the
-// same year as a separate award-history bullet) would not be caught. Real
-// per-claim positional pairing (the way `check-attendance-format.mjs`
-// compares EN/HR "Final venues" items index-by-index) would close this, but
-// needs each ledger claim mapped to its exact note-section/item index on
-// both languages' pages, which the ledgers don't currently track - left as a
-// concrete next step rather than attempted half-built here. This check still
-// reliably catches a year or count that is missing from the Croatian page
-// *entirely*, the shape most new content (a freshly added edition's year, a
-// newly corrected count word) actually takes.
+// Positional pairing (closing the documented same-page-coincidence blind
+// spot the hundred-and-eighty-first run's own entry left open, per its
+// header comment's prior wording - see `docs/PROJECT_STATUS.md`'s matching
+// entry for this run): rather than checking a claim's year against the whole
+// page's combined note prose (which would miss a mistranslated year that
+// happens to also appear correctly in a *different*, unrelated bullet on the
+// same page), this locates the exact English `.notes__card` item a claim
+// renders as - `locateClaimPosition()` strips the claim's own `**bold**`/
+// `*italic*`/`` `code` `` Markdown markers the same way
+// `renderInlineMarkdown()` (`src/lib/notes.ts`) converts them for display,
+// then finds the one built `<li>`/`<p>` item (tags stripped, entities
+// unescaped) whose text matches exactly - and, since `check:i18n-notes`
+// already enforces identical section-count/order and item-count between
+// every English page and its Croatian counterpart as a required CI gate,
+// reads the Croatian item at that *same* section/item index instead of the
+// page's whole note prose. A claim that can't be matched to exactly one
+// English item (zero matches, or more than one - both would indicate this
+// script's own extraction needs attention, not a content bug) falls back to
+// the original whole-page check rather than silently skipping it, so
+// coverage never regresses below what this script already had.
 //
 // The cardinal-word dictionary is deliberately narrow (two through twelve
 // only, the range these claims actually use) and only fires on the exact
@@ -87,6 +93,7 @@ const LEDGER_FILES = [
   'record-claims-ledger.json',
   'consecutive-claims-ledger.json',
   'since-claims-ledger.json',
+  'one-of-only-claims-ledger.json',
 ];
 
 // Every `content/*.md` file any ledger keys claims under, mapped to the
@@ -143,10 +150,12 @@ export function extractEarlierEditionsCardinal(text) {
 
 /**
  * Pure: the concatenated plain text of every `.notes__card` section on a
- * built page - the same section this site's five claim ledgers' underlying
+ * built page - the same section this site's six claim ledgers' underlying
  * prose renders into on the English side, and where its Croatian
  * translation lives too. Mirrors `check-i18n-notes.mjs`'s own `.notes__card`
- * extraction and `check-attendance-format.mjs`'s tag-stripping.
+ * extraction and `check-attendance-format.mjs`'s tag-stripping. Used only as
+ * `diffClaimsAgainstHrNotes()`'s whole-page fallback now - the primary path
+ * is the positional one below.
  */
 export function extractNotesPlainText(html) {
   const cardRe = /<section class="notes__card card"[^>]*>([\s\S]*?)<\/section>/g;
@@ -159,9 +168,106 @@ export function extractNotesPlainText(html) {
 }
 
 /**
+ * Pure: strips `**bold**`/`*italic*`/`` `code` `` Markdown markers down to
+ * their inner text, the same substitutions `renderInlineMarkdown()`
+ * (`src/lib/notes.ts`) applies before wrapping them in `<strong>`/`<em>`/
+ * `<code>` tags - so a raw ledger claim string normalizes to the same plain
+ * text its rendered `<li>`/`<p>` item does once `stripNoteItemTags()` below
+ * removes those same three tags again. Whitespace is also collapsed, since a
+ * multi-line ledger claim and a built HTML item can differ only in how
+ * their internal whitespace was collapsed, never in content.
+ */
+export function stripMarkdownEmphasis(text) {
+  return text
+    .replace(/\*\*([^*]+?)\*\*/g, '$1')
+    .replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, '$1')
+    .replace(/`([^`]+?)`/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Pure: the plain text of one `.notes__card` item's inner HTML -
+ * `renderInlineMarkdown()`'s only three possible tags (`strong`/`em`/`code`)
+ * removed without inserting whitespace (unlike the coarse `<[^>]+>` -> ' '
+ * stripping `extractNotesPlainText()`/`check-i18n-notes.mjs` use for
+ * whole-section text, which would wrongly split "**Jair**." into "Jair ."),
+ * plus the same `&amp;`/`&lt;`/`&gt;` unescaping `renderInlineMarkdown()`'s
+ * own escaping step applied on the way in.
+ */
+function stripNoteItemTags(html) {
+  return html
+    .replace(/<\/?(?:strong|em|code)>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Pure: every `.notes__card` section on a built page as `{ heading, items }`,
+ * `items` being each bullet's (or, for a single-paragraph section, its one
+ * paragraph's) plain text - the positional counterpart to
+ * `check-i18n-notes.mjs`'s `extractNoteCards()`, which only counts items
+ * rather than keeping their text. Mirrors that function's own intro-paragraph
+ * and list-vs-paragraph handling exactly, since a mismatch here would throw
+ * off every index this module's positional pairing depends on.
+ */
+export function extractNoteCardsWithItems(html) {
+  const cards = [];
+  const cardRe = /<section class="notes__card card"[^>]*>([\s\S]*?)<\/section>/g;
+  let match;
+  while ((match = cardRe.exec(html))) {
+    const body = match[1];
+    const headingMatch = /<h2[^>]*>([\s\S]*?)<\/h2>/.exec(body);
+    const heading = headingMatch ? headingMatch[1].replace(/<[^>]+>/g, '').trim() : '(no heading)';
+    const withoutIntro = body.replace(/<p class="notes__intro"[\s\S]*?<\/p>/, '');
+
+    const liItems = [...withoutIntro.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => stripNoteItemTags(m[1]));
+    const items =
+      liItems.length > 0
+        ? liItems
+        : [...withoutIntro.matchAll(/<p(?![^>]*notes__intro)[^>]*>([\s\S]*?)<\/p>/g)].map((m) => stripNoteItemTags(m[1]));
+
+    cards.push({ heading, items });
+  }
+  return cards;
+}
+
+/**
+ * Pure: the `{ sectionIndex, itemIndex }` position of `claim` (a raw ledger
+ * claim string) within `enCards` (this page's `extractNoteCardsWithItems()`
+ * result) - or `null` when the claim's normalized text doesn't match exactly
+ * one item, which this treats as "can't positionally pair" rather than
+ * guessing, so the caller falls back to the whole-page check instead of
+ * pairing against the wrong bullet.
+ */
+export function locateClaimPosition(claim, enCards) {
+  const normalized = stripMarkdownEmphasis(claim);
+  let found = null;
+  for (let sectionIndex = 0; sectionIndex < enCards.length; sectionIndex++) {
+    const { items } = enCards[sectionIndex];
+    for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
+      if (items[itemIndex] === normalized) {
+        if (found) return null; // ambiguous - more than one exact match
+        found = { sectionIndex, itemIndex };
+      }
+    }
+  }
+  return found;
+}
+
+/**
  * Pure: diffs one page family's verified claims against its Croatian notes
  * text, returning human-readable problem strings - empty when every claim's
- * years (and, where applicable, earlier-editions cardinal) are present.
+ * years (and, where applicable, earlier-editions cardinal) are present. This
+ * is the whole-page fallback `diffClaimsPositionally()` below uses for a
+ * claim it can't positionally pair; kept as its own function (and its own
+ * exact behavior) since `tests/unit/checkClaimsHr.test.ts` already covers it
+ * directly and every claim on the site today *does* pair positionally, so
+ * this path only ever runs for a future claim this module's extraction
+ * doesn't yet handle.
  */
 export function diffClaimsAgainstHrNotes(claims, hrNotesText, contentFile, hrPath, ledgerName) {
   const problems = [];
@@ -186,6 +292,49 @@ export function diffClaimsAgainstHrNotes(claims, hrNotesText, contentFile, hrPat
   return problems;
 }
 
+/**
+ * Pure: diffs one page family's verified claims against its Croatian
+ * counterpart, positionally where possible - for each claim, locates its
+ * exact English note item via `locateClaimPosition()` and checks the
+ * Croatian item at that *same* section/item index (relying on
+ * `check:i18n-notes` already guaranteeing that index exists and means the
+ * same thing on both languages' pages); falls back to
+ * `diffClaimsAgainstHrNotes()`'s whole-page check, one claim at a time, for
+ * any claim that can't be positionally paired.
+ */
+export function diffClaimsPositionally(claims, enCards, hrCards, hrNotesText, contentFile, hrPath, ledgerName) {
+  const problems = [];
+  for (const claim of claims) {
+    const position = locateClaimPosition(claim, enCards);
+    const hrItem = position ? hrCards[position.sectionIndex]?.items[position.itemIndex] : undefined;
+
+    if (hrItem === undefined) {
+      problems.push(...diffClaimsAgainstHrNotes([claim], hrNotesText, contentFile, hrPath, ledgerName));
+      continue;
+    }
+
+    const years = extractYears(claim);
+    const missingYears = years.filter((year) => !hrItem.includes(year));
+    if (missingYears.length > 0) {
+      problems.push(
+        `${ledgerName}: ${contentFile}'s claim "${claim}" names ${missingYears.join(', ')} but its Croatian ` +
+          `counterpart bullet on ${hrPath} (section ${position.sectionIndex}, item ${position.itemIndex}) doesn't ` +
+          `mention ${missingYears.length === 1 ? 'it' : 'them'}`,
+      );
+    }
+
+    const cardinal = extractEarlierEditionsCardinal(claim);
+    if (cardinal && !hrItem.includes(cardinal)) {
+      problems.push(
+        `${ledgerName}: ${contentFile}'s claim "${claim}" names a count that should translate to ` +
+          `"${cardinal}" but its Croatian counterpart bullet on ${hrPath} (section ${position.sectionIndex}, item ` +
+          `${position.itemIndex}) doesn't contain it`,
+      );
+    }
+  }
+  return problems;
+}
+
 async function main() {
   const files = await listHtmlFiles(DIST_DIR);
   const htmlByPagePath = new Map();
@@ -196,6 +345,8 @@ async function main() {
   }
 
   const hrNotesTextByPagePath = new Map();
+  const enCardsByPagePath = new Map();
+  const hrCardsByPagePath = new Map();
   const problems = [];
   let totalClaims = 0;
 
@@ -218,9 +369,19 @@ async function main() {
         continue;
       }
 
+      if (!enCardsByPagePath.has(pagePath)) {
+        const enHtml = htmlByPagePath.get(pagePath);
+        enCardsByPagePath.set(pagePath, enHtml ? extractNoteCardsWithItems(enHtml) : []);
+      }
+      if (!hrCardsByPagePath.has(hrPath)) {
+        hrCardsByPagePath.set(hrPath, extractNoteCardsWithItems(htmlByPagePath.get(hrPath)));
+      }
+      const enCards = enCardsByPagePath.get(pagePath);
+      const hrCards = hrCardsByPagePath.get(hrPath);
+
       const claimTexts = Object.keys(claims);
       totalClaims += claimTexts.length;
-      problems.push(...diffClaimsAgainstHrNotes(claimTexts, hrNotesText, contentFile, hrPath, ledgerFile));
+      problems.push(...diffClaimsPositionally(claimTexts, enCards, hrCards, hrNotesText, contentFile, hrPath, ledgerFile));
     }
   }
 

@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (185 intensive runs as of 2026-09-25) lives
+verification sweep and decision (186 intensive runs as of 2026-09-25) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -39,23 +39,43 @@ what exists and any standing quirks.
 Every recent run's standing health check comes back clean run after run:
 `pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm test`/`pnpm
 test:coverage`/`pnpm build`, all 33 `check:*` scripts (28 fast enough to run
-every time and wired into `.github/workflows/ci.yml` as required PR gates,
-`check:one-of-only-claims` the newest as of this run;
+every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-eighty-fifth run (2026-09-25): 857/857 unit tests,
+As of the hundred-and-eighty-sixth run (2026-09-25): 870/870 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
 `@cspell/dict-hr-hr`, used only via `.cspell/hr-notes.cspell.json`'s
 `"import"` field, never a JS `import`) - neither actually unused, knip's
 static analysis just can't see a reference inside a config-file string. The
-full `pnpm test:e2e` count last confirmed at 1023/1023 (16.5 minutes) as of
-the hundred-and-eighty-first/-second runs; not re-run the hundred-and-
-eighty-third through hundred-and-eighty-fifth runs since none touched page
-markup/styling/behavior (see their own entries below).
+full `pnpm test:e2e` count re-confirmed clean this run (real page content
+changed - see below); see the hundred-and-eighty-sixth run's own entry for
+the exact figure.
+
+**Hundred-and-eighty-sixth run:** closed `check-claims-hr.mjs`'s documented
+"same-page-coincidence" blind spot with real per-claim positional pairing
+(the hundred-and-eighty-first/-fifth runs' own named next step), relying on
+`check:i18n-notes` already guaranteeing identical section/item structure
+between every EN/HR page pair to index straight into the right Croatian
+bullet instead of checking a claim's year against the whole page's note
+prose. The very first run against real content caught a genuine,
+previously-shipped bug this exact blind spot had been hiding: five of
+`content/uefa-euro.md`'s six Croatian "Team of the Tournament" entries were
+missing their entire trailing commentary sentence (a sixth was missing half
+of it) - fixed all six. Also found and fixed a second real gap while wiring
+the ledger list: `one-of-only-claims-ledger.json` (added two runs ago) had
+never been added to `check-claims-hr.mjs`'s own `LEDGER_FILES` array, so its
+two claims had zero Croatian-translation coverage since the day they were
+ledgered. `pnpm outdated` also found `vitest`/`@vitest/coverage-v8` 5.0.1 ->
+5.0.2, installed. See `docs/PROJECT_STATUS.md`'s matching entry for the full
+writeup, including the exact Croatian translations added and the full
+verification run (870/870 unit, 711 pages, `check:claims-hr` 196/196 claims
+clean, `check:pdfs`/`check:pdf-outline` 700/700 clean after a PDF
+regeneration, and a full cold-start `pnpm test:e2e` re-run since this run -
+unlike most recent ones - changed real page content).
 
 **Hundred-and-eighty-fifth run:** built `check:one-of-only-claims`
 (`scripts/check-one-of-only-claims.mjs`), a sixth verification-ledger gate
