@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (183 intensive runs as of 2026-09-25) lives
+verification sweep and decision (185 intensive runs as of 2026-09-25) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -38,14 +38,14 @@ what exists and any standing quirks.
 
 Every recent run's standing health check comes back clean run after run:
 `pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm test`/`pnpm
-test:coverage`/`pnpm build`, all 32 `check:*` scripts (27 fast enough to run
+test:coverage`/`pnpm build`, all 33 `check:*` scripts (28 fast enough to run
 every time and wired into `.github/workflows/ci.yml` as required PR gates,
-`check:claims-hr` the newest as of the hundred-and-eighty-first run;
+`check:one-of-only-claims` the newest as of this run;
 `check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-eighty-fourth run (2026-09-25): 845/845 unit tests,
+As of the hundred-and-eighty-fifth run (2026-09-25): 857/857 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
@@ -54,8 +54,45 @@ used only as a Playwright `webServer.command`, never imported;
 static analysis just can't see a reference inside a config-file string. The
 full `pnpm test:e2e` count last confirmed at 1023/1023 (16.5 minutes) as of
 the hundred-and-eighty-first/-second runs; not re-run the hundred-and-
-eighty-third or hundred-and-eighty-fourth runs since neither touched page
+eighty-third through hundred-and-eighty-fifth runs since none touched page
 markup/styling/behavior (see their own entries below).
+
+**Hundred-and-eighty-fifth run:** built `check:one-of-only-claims`
+(`scripts/check-one-of-only-claims.mjs`), a sixth verification-ledger gate
+alongside `check:superlative-claims`/`check:ordinal-claims`/
+`check:record-claims`/`check:consecutive-claims`/`check:since-claims`,
+closing the "one of only N X to Y" bounded-set-claim idea the
+hundred-and-eighty-fourth run's own investigation flagged but deliberately
+left unbuilt (see the "Ideas not yet scoped" entry this run removed). Same
+ledger-diff mechanism as the other five checkers, scoped to
+`/\bone of only (\d+|one|two|...|ten)\b/i` - a *numbered* bounded-set claim
+only, not the vaguer "one of only a handful of X" phrasing that also appears
+in `content/uefa-euro.md` twice (deliberately excluded: "a handful of" names
+no count to verify against, so matching it would just fail the build on an
+unresolvable claim). Only two claims on the whole site currently match, both
+in `content/fifa-world-cup.md`: the 1990 Winning managers bullet and the 1974
+Winning captains bullet each say Beckenbauer is "one of only three men to win
+it as both player and manager". Verified by cross-referencing the Winning
+managers and Winning captains/Winning managers tables for every name that
+appears as both a title-winning player in one year and a title-winning
+manager in another: exactly three - Mário Zagallo (player 1958/1962, manager
+1970), Franz Beckenbauer (player 1974, manager 1990) and Didier Deschamps
+(player 1998, manager 2018) - the last of whom the 2018 bullet itself already
+names as "joining Zagallo and Beckenbauer as a player-and-manager winner",
+independently confirming the count of three from within the same table. Both
+claims recorded in `one-of-only-claims-ledger.json`. Added 12 new unit tests
+(`tests/unit/checkOneOfOnlyClaims.test.ts`, mirroring
+`checkSuperlativeClaims.test.ts`'s structure) covering the digit/spelled-out
+forms, the "a handful of" exclusion, and the same ledger-diff behavior as the
+other five checkers. Wired into `package.json` and `.github/workflows/
+ci.yml` as a required PR gate alongside the other five. `pnpm test` 857/857
+(up from 845), all 28 fast `check:*` scripts clean, `pnpm build` 711 pages,
+`pnpm lint` 0/0/0, coverage unchanged at 99.91%/99.31%, `pnpm audit` clean,
+`pnpm dlx knip --no-config-hints` same two standing false positives. Browser
+sweeps and `pnpm test:e2e` not re-run - this change touches only a
+build-time content-verification script, its JSON ledger, a unit test and CI
+config, no page markup/styling/behavior. See `docs/PROJECT_STATUS.md`'s
+matching entry for the full writeup.
 
 **Hundred-and-eighty-fourth run:** with the named backlog item from the
 hundred-and-eighty-third run's own note ("check whether
@@ -426,19 +463,6 @@ matching entry for full detail.
 
 ## Ideas not yet scoped
 
-- **"One of only N X to Y" bounded-set claims**: `check:superlative-claims`
-  deliberately still doesn't catch this phrasing (e.g. "one of only three men
-  to win it as both player and manager" in `content/fifa-world-cup.md`, "one
-  of only a handful of managers/players..." in `content/uefa-euro.md`) - a
-  genuinely different claim shape from "the only X" (a bounded-set membership
-  claim with its own count to verify, not a strict-uniqueness claim), flagged
-  but not built by the hundred-and-eighty-fourth run's possessive-phrasing
-  investigation (see `docs/PROJECT_STATUS.md`'s matching entry). The vaguer
-  "a handful of" instances aren't independently checkable from this site's
-  own tables anyway; only the precisely-numbered ones ("one of only three
-  men") would be. Worth a dedicated pattern (`/\bone of only \d+\b/i` or
-  similar) and its own ledger if this shape recurs, following the same
-  narrow/low-noise approach as the other five claim checkers.
 - **"Youngest winner" ranking** (`/records`-style, alongside the existing
   "Longest wait between titles"/"Back-to-back champions" sections): needs a
   reliable per-player birth date for ~130 Ballon d'Or/Golden Boot winners,
