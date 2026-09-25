@@ -29672,3 +29672,104 @@ coincidence blind spot) is still open and still the most substantive,
 well-scoped thread available. The "one of only N X" bounded-set claim shape
 flagged above is a second concrete, scoped idea worth picking up if a future
 run wants a checker angle rather than that thread.
+
+### Built `check:one-of-only-claims`, a sixth verification-ledger gate for "one of only N X to Y" bounded-set claims - closed 2026-09-25 (hundred-and-eighty-fifth intensive run)
+
+With the open backlog still fully blocked (re-confirmed: `WebFetch` to
+`en.wikipedia.org` still returns `EGRESS_BLOCKED`, `npm view
+@astrojs/check@latest peerDependencies` still only declares
+`typescript: '^5.0.0 || ^6.0.0'`, `pnpm outdated` shows no new release beyond
+that same blocked `typescript` line), this run picked up the
+hundred-and-eighty-fourth run's own named next step from `docs/ROADMAP.md`'s
+"Ideas not yet scoped" section: build a sixth verification-ledger checker for
+"one of only N X to Y" bounded-set-membership claims, the phrasing the
+superlative-claims checker's possessive-phrasing investigation had found but
+deliberately declined to fold into `/\bthe only\b/i` (a bounded-set claim
+with its own count to verify is a different shape from a strict-uniqueness
+claim, and folding it in would also have pulled in the vaguer, unverifiable
+"a handful of" phrasing).
+
+Grepped `content/*.md` for `/\bone of only\b/i` to see the real landscape
+before writing a pattern, the same diligence every prior claim-checker build
+used: four bullets match across two files.
+
+- `content/fifa-world-cup.md` (x2): "one of only three men to win it as both
+  player and manager" - the 1990 Winning managers bullet and the 1974 Winning
+  captains bullet, both about Franz Beckenbauer, both the same underlying
+  claim restated in two sections.
+- `content/uefa-euro.md` (x2): "one of only a handful of managers to hold
+  both titles" and "one of only a handful of players to captain a team to
+  both trophies" - both about the 1972 West Germany team's dual World
+  Cup/EURO success, both an imprecise count ("a handful of") rather than a
+  stated number.
+
+Built `check-one-of-only-claims.mjs` with `CLAIM_PATTERN =
+/\bone of only (\d+|one|two|three|four|five|six|seven|eight|nine|ten)\b/i` -
+first tried the exact pattern the roadmap entry had sketched,
+`/\bone of only \d+\b/i`, and it matched zero bullets: this site's editorial
+prose always spells small counts out ("three", not "3"), a detail the
+roadmap entry's own sketch hadn't accounted for. Widened to match spelled-out
+number words up to ten (with the digit form still covered too, for
+completeness, even though nothing on the site currently uses it) - re-checked
+against the full corpus after widening and confirmed exactly the 2 numbered
+claims match, with both "a handful of" bullets correctly still excluded
+(no digit and no number word immediately follows "one of only" in either).
+
+Verified both matching claims by hand rather than trusting the "one of only
+three men" phrasing on faith: cross-referenced `content/fifa-world-cup.md`'s
+own "Winning managers" and "Winning captains" tables for every name that
+appears as a title-winning player in one year *and* a title-winning manager
+in another year. Three satisfy both: Mário Zagallo (player 1958/1962,
+manager 1970), Franz Beckenbauer (player 1974, manager 1990) and Didier
+Deschamps (player 1998, manager 2018) - and no fourth name does. The
+Winning managers table's own 2018 bullet already states this independently
+("also won the trophy as a player in 1998, joining Zagallo and Beckenbauer as
+a player-and-manager winner"), which corroborates the count of three from a
+second sentence in the same table rather than relying on a single read.
+Recorded both claims (the 1990 Winning managers bullet and the 1974 Winning
+captains bullet - different exact text, so both need their own ledger entry
+under the same file, same as every other checker's ledger format) in
+`one-of-only-claims-ledger.json`.
+
+Added `tests/unit/checkOneOfOnlyClaims.test.ts` (12 tests), mirroring
+`checkSuperlativeClaims.test.ts`'s structure exactly: extraction (bare
+match, case-insensitivity, the "a handful of" exclusion, ignoring "the only"
+without "one of only N", ignoring non-bullet lines, multiple bullets in
+document order, no matches) and the shared `diffClaimsAgainstLedger` helper
+(no new/no stale, new claim flagged, reworded claim flagged new *and* old
+text flagged stale, stale-only, unknown file treated as all-new) - the same
+ledger-diff logic already exercised by five other test files, so this
+suite's job is confirming the new extraction pattern, not re-testing
+diffing logic that hasn't changed.
+
+Wired `check:one-of-only-claims` into `package.json` (`scripts`) and
+`.github/workflows/ci.yml`, placed immediately after `check:since-claims`,
+matching every other verification-ledger gate's spot in both files.
+
+**Verification:** `pnpm lint` (234 files, 0 errors/0 warnings/0 hints),
+`pnpm test` (857/857, up from 845), `pnpm build` (711 pages, unchanged),
+`pnpm test:coverage` (99.91%/99.31%, unchanged - same four defensively-
+unreachable lines as ever), all 28 fast `check:*` scripts individually
+(pdfs, spelling, award-tallies, all six verification-ledger claim gates
+including `check:one-of-only-claims` itself - 2/2 now ledgered, perf, links,
+sitemap, jsonld, heading-outline, theme-flash, pdf-outline, reachability,
+meta, edition-header-labels, i18n-notes, attendance-format, claims-hr,
+link-names, precache, image-dimensions, locale-consistency, theme-color,
+spelling-hr - all clean), `pnpm audit` (no known vulnerabilities), and
+`pnpm dlx knip --no-config-hints` (the same two standing false positives as
+ever). `pnpm outdated` re-confirmed only the same blocked `typescript`
+line. The four browser-based sweeps
+(`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
+`check:html`) and the full `pnpm test:e2e` suite were not re-run this cycle -
+this change touches only a new build-time content-verification script, its
+JSON ledger, a unit test file, and CI/package config, with no change to any
+page's markup, styling or runtime behavior.
+
+**Left for a future pass:** the same environment-blocked open-backlog items
+as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged. The
+hundred-and-eighty-first run's own concrete next step (positional per-claim
+EN/HR pairing for `check-claims-hr.mjs`, closing its documented same-page-
+coincidence blind spot) is still open and still the most substantive,
+well-scoped thread available - the "one of only N X" idea this run closed
+was the other concrete thread on the board, so that pairing work is now the
+single most substantive lead left for a future run.
