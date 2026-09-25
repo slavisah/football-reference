@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (182 intensive runs as of 2026-09-24) lives
+verification sweep and decision (183 intensive runs as of 2026-09-25) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -45,14 +45,33 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates,
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-eighty-second run (2026-09-24): 838/838 unit tests,
-`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, 1023/1023 e2e
-(16.5 minutes), and the same two standing `knip` false positives as ever
-(`scripts/test-preview-server.mjs`, used only as a Playwright
-`webServer.command`, never imported; `@cspell/dict-hr-hr`, used only via
-`.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS `import`) -
-neither actually unused, knip's static analysis just can't see a reference
-inside a config-file string.
+As of the hundred-and-eighty-third run (2026-09-25): 842/842 unit tests,
+`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
+standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
+used only as a Playwright `webServer.command`, never imported;
+`@cspell/dict-hr-hr`, used only via `.cspell/hr-notes.cspell.json`'s
+`"import"` field, never a JS `import`) - neither actually unused, knip's
+static analysis just can't see a reference inside a config-file string. The
+full `pnpm test:e2e` count last confirmed at 1023/1023 (16.5 minutes) as of
+the hundred-and-eighty-first/-second runs; not re-run the hundred-and-
+eighty-third run since that run touched no page markup/styling/behavior
+(see its own entry below).
+
+**Hundred-and-eighty-third run:** widened `check:ordinal-claims` a second
+time (`\w+'s (first|...)` / `(his|her|its|their) (first|...)`, alongside the
+existing bare `the (first|...)`) after noticing its own pattern still missed
+every possessive phrasing of the identical claim shape - "the trophy's first
+winner", "his second win", "Colombia won its first title" - 47 real claims
+across all six content files that were silently unverified. Verified all 47
+by hand against their own source lists/tables (Kopa/Yashin/Gerd Müller/Johan
+Cruyff/Sócrates Trophy lists, Copa América's Best Player/Golden Glove/Golden
+Boot/managers/captains lists and Champions timeline, FIFA's Golden Ball/
+Golden Glove/Young Player/Fair Play Award lists and Editions table, the
+World Cup Silver/Bronze Boot list, EURO's Team of the Tournament section,
+Nations League's Finals table and Winning managers list); no false claim
+found this run - a real, if negative, content-accuracy result - but ordinal-
+claims coverage now stands at 90 claims, up from 43. See
+`docs/PROJECT_STATUS.md`'s matching entry for the full per-claim writeup.
 
 **Hundred-and-eighty-second run:** `pnpm outdated` surfaced two new in-range
 patch releases (`astro` 7.3.4 -> 7.3.5, `cspell` 10.3.3 -> 10.3.4); installed
@@ -301,6 +320,16 @@ matching entry for full detail.
 
 ## Open backlog
 
+- **Possessive-phrasing gap check for the other four verification-ledger
+  claim checkers**: not blocked, just not yet attempted. The
+  hundred-and-eighty-third run found `check:ordinal-claims`'s own pattern had
+  missed every possessive phrasing of its claim shape ("his second win" vs.
+  "the second X to Y") and widened it to close a 47-claim gap. Worth checking
+  whether `check:superlative-claims`/`check:record-claims`/
+  `check:consecutive-claims`/`check:since-claims` have a matching gap in
+  their own trigger words or anchoring - each was seeded/widened at least
+  once already but none has had this specific angle (a possessive or other
+  alternate phrasing of the same trigger word) tried against it yet.
 - **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.10` (latest
   published) only declares `typescript: '^5.0.0 || ^6.0.0'` as a peer
   dependency - re-confirmed via `npm view @astrojs/check@latest

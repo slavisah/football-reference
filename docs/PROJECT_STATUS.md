@@ -29410,3 +29410,139 @@ source lead on any of the open attendance/Team-of-the-Tournament/
 biographical-data gaps, the `check-claims-hr.mjs` positional-pairing thread
 above, or a genuinely different quality angle not yet tried in the last 181
 runs.
+
+### Widened `check:ordinal-claims` a second time to catch possessive-ordinal phrasing; found the gap by re-reading its own extraction pattern, not by trying a new claim vocabulary - closed 2026-09-25 (hundred-and-eighty-third intensive run)
+
+With the open backlog still fully blocked (re-confirmed: `WebFetch` to
+`en.wikipedia.org` still returns `EGRESS_BLOCKED`, `npm view
+@astrojs/check@latest peerDependencies` still only declares
+`typescript: '^5.0.0 || ^6.0.0'`, no new `pnpm outdated` releases this run
+beyond that same blocked `typescript` line, the brand-suffix title-length
+decision still needs human sign-off, the Nations League Team of the
+Tournament/attendance gaps still genuinely exhausted), this run found a real
+gap in an existing tool rather than building a new one from scratch.
+
+`check-ordinal-claims.mjs`'s extraction pattern was `/\bthe (first|second|
+...|tenth)\b/i` - a bare ordinal word, but only when the literal word "the"
+comes immediately before it. That still missed the exact same claim shape
+phrased with a possessive instead of "the": "the trophy's first winner",
+"Masantonio's second win", "his second win", "its first title", "Colombia
+won its first title in 2001". Found by re-reading the checker's own header
+comment (which already documents one prior widening, the 177th run's
+removal of the "to" requirement) and asking whether the *next* obvious gap
+in the same pattern had ever been checked - not by searching for a new
+claim vocabulary the way the 179th run's own "unbeaten/undefeated/..." sweep
+did. A quick corpus grep for every bullet containing an ordinal word but not
+matching the existing pattern turned up 48 candidates across all six content
+files with essentially zero noise (a few genuine non-claims like "at first"
+and "third-place match" correctly fell outside a possessive-anchored regex
+without needing to be hand-excluded).
+
+Widened the pattern to `\bthe (first|...)\b|\b\w+'s\s+(first|...)\b|
+\b(his|her|its|their)\s+(first|...)\b` (`scripts/check-ordinal-claims.mjs`).
+Re-checked the widened pattern against the full corpus before committing to
+it, the same diligence every prior narrowing/widening on this file has used:
+47 of the 48 candidates were genuine, independently-checkable ordinal-rank
+claims (the 48th, "the tournament's second- and third-highest goalscorers"
+in `content/golden-boot.md`, was already caught by the *existing* pattern
+via its own "the ... second-" wording, so the possessive alternative added
+exactly 47 new claims to the ledger, not 48). Verified every one of the 47
+by hand against the specific list or table it summarizes:
+
+- **`content/ballon-dor.md` (8 claims):** every "the trophy's/award's first
+  winner" bullet across the Kopa, Yashin, Gerd Müller, Johan Cruyff and
+  Sócrates companion-award sections checked against that section's own
+  winners list - each is genuinely that list's first entry. The Gerd Müller
+  Trophy's 2024 "first tie" checked against all five of its editions
+  (2021-2025): only 2024 names two winners. The Sócrates Award's 2024 "first
+  female recipient" and 2025 "first winner that is not an individual
+  footballer" checked against its full 2022-2025 list (Mané, Vinícius
+  Júnior both men; Hermoso the list's first woman; Xana Foundation the
+  list's first non-individual).
+- **`content/copa-america.md` (23 claims):** every Best Player/Golden
+  Glove/Golden Boot/Winning managers/Winning captains "his second/third
+  win"/"back-to-back" bullet cross-checked against that award's own winners
+  list and, for the back-to-back claims, the Champions timeline's edition
+  ordering - all consistent with entries this ledger already verified for
+  the matching "the first of his two..." half of the same pair (e.g.
+  Basile's 1993 "his second, back-to-back" checked against the already-
+  verified 1991 "the first of his two consecutive title-winning editions").
+  The three Memorable-moments bullets ("Colombia won its first title in
+  2001", "Chile won its first two titles... 2015 and 2016") checked by
+  scanning the Champions timeline's full Champion column for any earlier
+  entry - none found for either team. Two bullets (Ruggeri "scoring in the
+  final itself", Francescoli "his third and final title") carry a specific
+  match/biographical detail this site's own tables don't record (no
+  per-match scorer data, no per-edition squad lists beyond the named
+  captain/manager); recorded as such rather than guessed at, the same
+  treatment this ledger already gives Cubarsí/Donnarumma's playing position
+  and Messi's "first major trophy" note.
+- **`content/fifa-world-cup.md` (10 claims):** the Golden Ball/Golden
+  Glove/Young Player/Fair Play Award "the award's first winner" bullets
+  each checked against that award's own winners list's first entry. The
+  Fair Play Award's 1998/2006 "first of two shared years"/"second and,
+  to date, final shared year" checked against the section's own intro
+  bullet, which already names 1998 and 2006 as "the only two editions with
+  a tie" - order in the list settles which is first. "Croatia reached its
+  first final in 2018" and "Spain won its second title in 2026" checked
+  directly against the Editions table's Winner/Runner-up columns and the
+  Champions by titles table.
+- **`content/golden-boot.md` (1 claim):** the World Cup Silver/Bronze Boot
+  intro's "every World Cup since 2010" checked against its own winners
+  list - one entry for every edition from 2010 through 2026 with no gap.
+- **`content/uefa-euro.md` (2 claims):** the Team of the Tournament section's
+  2016 "Ronaldo's second selection... twelve years after 2004" and 2024
+  "Walker's second consecutive selection, the only player named in both
+  2020 and 2024" both checked by scanning every XI in the section (1996,
+  2004, 2008, 2016, 2020, 2024) for the named player - each claim held up
+  exactly as written.
+- **`content/uefa-nations-league.md` (3 claims):** "Croatia reached its
+  first Nations League final in 2023" checked against the Finals table's
+  Winner/Runner-up columns (no earlier Croatia entry). "Portugal... the
+  competition's first two-time champion" checked against the same table's
+  full Winner column (Portugal 2019, France 2021, Spain 2023, Portugal
+  2025 - Portugal the only repeat). Martínez's 2025 "his first trophy since
+  taking over from Fernando Santos" checked against the Winning managers
+  list (Martínez's only entry); exactly when he replaced Santos as manager
+  is a managerial-tenure fact outside this site's own tables, recorded as
+  such rather than guessed at.
+
+No false claim turned up this run, unlike the 173rd/177th/178th runs' own
+widening/seeding passes for this same checker - a genuine, if negative,
+result for content accuracy, but a real, previously-unverified gap closed
+in the standing verification-ledger machinery either way (90 ordinal claims
+now covered, up from 43). Added four new unit tests to
+`tests/unit/checkOrdinalClaims.test.ts` covering the possessive-noun and
+possessive-pronoun alternatives and confirming the widened pattern still
+correctly excludes non-claim bare-ordinal prose ("at first", "third-place
+match").
+
+**Verification:** `pnpm test` (842/842, up from 838), `pnpm lint` (0 errors/
+0 warnings/0 hints), `pnpm build` (711 pages, unchanged), all 29 fast
+`check:*` scripts individually (pdfs, pdf-outline, perf, links, sitemap,
+precache, jsonld, heading-outline, theme-flash, reachability, meta,
+award-tallies, all five verification-ledger claim gates including
+`check:ordinal-claims` itself - 90/90 now ledgered, claims-hr - now covering
+191 total claims across all five ledgers, up from 144, edition-header-labels,
+i18n-notes, attendance-format, link-names, image-dimensions,
+locale-consistency, theme-color, spelling, spelling-hr - all clean),
+`pnpm audit` (no known vulnerabilities), and `pnpm dlx knip --no-config-hints`
+(the same two standing false positives as ever). The four browser-based
+sweeps (`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
+`check:html`) and the full `pnpm test:e2e` suite were not re-run this cycle -
+this change touches only a build-time content-verification script, its JSON
+ledger, and a unit test, with no change to any page's markup, styling or
+runtime behavior, so a full browser/e2e sweep would not exercise anything
+this change could have affected.
+
+**Left for a future pass:** the same environment-blocked open-backlog items
+as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged. The
+hundred-and-eighty-first run's own concrete next step (positional per-claim
+EN/HR pairing for `check-claims-hr.mjs`, closing its documented same-page-
+coincidence blind spot) is still open and still the most substantive,
+well-scoped thread available. Worth checking whether any of the other four
+verification-ledger checkers (`superlative`/`record`/`consecutive`/`since`)
+have a matching possessive-phrasing (or other anchor-word) gap the same way
+`ordinal` just did - not yet attempted, and the kind of lead this run's own
+method (re-reading a checker's own pattern rather than hunting a new claim
+vocabulary) suggests trying next.
