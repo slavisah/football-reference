@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (187 intensive runs as of 2026-09-25) lives
+verification sweep and decision (188 intensive runs as of 2026-09-25) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,7 +44,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-eighty-seventh run (2026-09-25): 880/880 unit tests,
+As of the hundred-and-eighty-eighth run (2026-09-25): 880/880 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
@@ -53,8 +53,26 @@ used only as a Playwright `webServer.command`, never imported;
 static analysis just can't see a reference inside a config-file string. The
 full `pnpm test:e2e` count was last re-confirmed clean by the
 hundred-and-eighty-sixth run itself (1023/1023, since that run edited real
-page content); not re-run again this run, since this run changed only a
-build-time script and its own unit tests, no page markup or content.
+page content); not re-run again this run, since this run changed only
+`docs/ROADMAP.md`/`docs/PROJECT_STATUS.md`, no page markup or content. The
+five browser-based sweeps (`check:lighthouse`/`check:reflow`/`check:text-zoom`/
+`check:print-width`/`check:html`) *were* re-run this run (several runs
+stale) and all came back clean - see the hundred-and-eighty-eighth run's own
+entry below.
+
+**Hundred-and-eighty-eighth run:** with the hundred-and-eighty-seventh run's
+own thread fully closed and no new concrete next step named, tried five
+different fresh quality angles (a new-claim-vocabulary grep across
+`content/*.md`, a full manual read of the two least-audited content files -
+Golden Boot and Nations League, a tally-table coverage audit, a
+`forced-colors`/high-contrast-mode accessibility re-check, and a page-weight
+budget headroom review) - all five genuine, if negative, results, each
+reasoned through against the actual code/content rather than assumed. Used
+the rest of the run for a full standing health check including the five
+browser-based sweeps (`check:lighthouse`/`check:reflow`/`check:text-zoom`/
+`check:print-width`/`check:html`), several runs stale: all clean, matching
+the standing baseline exactly. See `docs/PROJECT_STATUS.md`'s matching entry
+for the full per-angle writeup.
 
 **Hundred-and-eighty-seventh run:** with every open backlog item below still
 environment-blocked or awaiting human sign-off, followed the

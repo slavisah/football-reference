@@ -30013,3 +30013,106 @@ standing open-backlog items below still all environment-blocked or awaiting
 human sign-off, the next fresh angle will need the same kind of
 first-principles search this run and the hundred-and-eighty-sixth run both
 used, rather than another checker-vocabulary widening pass.
+
+### Full standing health check plus five fresh quality angles, all negative results - closed 2026-09-25 (hundred-and-eighty-eighth intensive run)
+
+With the open backlog still fully blocked (re-confirmed: `WebFetch` to
+`en.wikipedia.org` still returns `EGRESS_BLOCKED` from the proxy; `npm view
+@astrojs/check@latest peerDependencies` still only declares `typescript:
+'^5.0.0 || ^6.0.0'`; `pnpm outdated` shows no new release beyond that same
+blocked `typescript` line; the brand-suffix title-length decision still
+needs human sign-off; the Nations League Team of the Tournament/attendance
+gaps still genuinely exhausted) and the hundred-and-eighty-seventh run's own
+thread (the i18n-notes dash-clause guard) fully closed with no further
+concrete next step named, this run tried five different fresh quality
+angles rather than one deep dive, each reasoned through and checked against
+the actual code/content rather than assumed - all five came back genuine,
+if negative, results:
+
+1. **New verification-ledger claim shapes.** Grepped every `content/*.md`
+   file for record-adjacent vocabulary none of the six existing checkers'
+   trigger words cover (`unbeaten`, `undefeated`, `unrivalled`,
+   `unprecedented`, `reclaimed`, `regained`, `sole`, `unique`, `unmatched`,
+   `never lost`, `remains the`, `still the`, `to date`, `longest`,
+   `shortest`, `earliest`, `latest`). Every hit traced back to a bullet
+   already covered by an existing trigger word in the same sentence (e.g.
+   golden-boot.md's "still the most any player has scored" already matches
+   `check:record-claims`'s "most"; fifa-world-cup.md's "the award's second
+   and, to date, final shared year" already matches `check:ordinal-claims`'s
+   possessive-ordinal pattern) - confirmed by grepping each ledger file
+   directly rather than assuming from the trigger-word list alone. One
+   phrase, "won undefeated" (`content/copa-america.md`'s 2001 Colombia
+   bullet), has no matching column on this site's own tables (no
+   match-by-match results), so it isn't independently checkable the same
+   honest way the existing ledgers already document for player-position/
+   birth-date claims - not a new gap to build a seventh checker for, just
+   one more instance of the same documented class of non-derivable aside.
+2. **Full manual read of two under-audited pages.** `content/golden-boot.md`
+   and `content/uefa-nations-league.md` (the two content files that get the
+   least standalone attention in this log, most other runs' own manual
+   reads having focused on World Cup/EURO/Copa América/Ballon d'Or) read in
+   full, bullet by bullet, cross-referenced against their own tables and,
+   where in scope, against `content/fifa-world-cup.md` (Luis de la Fuente's
+   Nations League 2023/EURO 2024/World Cup 2026 managerial treble, named in
+   `uefa-nations-league.md`'s Winning managers section, cross-checked
+   against `fifa-world-cup.md`'s own 2026 Winning managers entry - both
+   agree: Spain, de la Fuente, 2026). Zero new factual errors found.
+3. **Tally-table coverage audit.** `check:award-tallies` covers four
+   hand-authored tally tables (World Cup, EURO, Copa América, Ballon d'Or);
+   checked whether Golden Boot or Nations League have an equivalent
+   hand-authored "titles by nation/player" table that isn't wired into the
+   checker - neither file has one (Golden Boot's per-tournament winners
+   table has no separate tally section at all; Nations League has too few
+   editions for a repeat-winner tally to exist yet), so there is no
+   uncovered table, not a gap.
+4. **`forced-colors: active` (Windows/OS high-contrast mode) coverage
+   re-check.** This mode is real-user-relevant but outside what axe-core's
+   automated WCAG rules test, so it's the one accessibility class not
+   already covered by the full-site `AxeBuilder` sweeps. Read
+   `global.css`'s `forced-colors` block and
+   `tests/e2e/accessibility-forced-colors.spec.ts` end to end:
+   `QuizCard.astro`'s `.is-correct`/`.is-incorrect` color/border-color
+   states (the one other place on the site besides the already-fixed
+   `.is-winner` table cell and skip link that changes color to signal
+   state) already carry a real DOM text badge ("Correct"/"Incorrect X", not
+   `::after` generated content) as their WCAG-1.4.1-compliant non-color
+   signal, and the existing forced-colors e2e spec already exercises the
+   quiz page, a team profile, a player profile and a full two-color-scheme
+   site sweep. No uncovered element found.
+5. **Page-weight budget headroom.** `check:perf` shows `hr/records`/
+   `records` at 614.6/609.6 KB against the 640 KB budget (the closest any
+   page has run to its budget in this log) - checked whether this reflects
+   an un-optimized regression rather than organic content growth: the
+   budget's own history (590 KB -> 610 KB -> 640 KB across several earlier
+   runs, each raise tied to a specific, named content addition) shows this
+   is a deliberately and transparently managed growth curve, not a hidden
+   inefficiency; `/records` and `/compare`/`/compare-players`' Croatian
+   pages source their table data from the same build-time-parsed
+   `content/*.md` as their English counterparts (`loadCompetition()`), so
+   there is no hand-duplicated data to deduplicate either. No actionable
+   optimization found without new content to trim, which isn't this run's
+   call to make.
+
+With no code change justified by any of the five, used the rest of the run
+for the full standing health check, including the five browser-based sweeps
+that are manual/intensive-run-only rather than a required PR gate (last run
+together several runs ago): `pnpm install`, `pnpm outdated` (no new
+releases), `pnpm lint` (234 files, 0/0/0), `pnpm test` (880/880, unchanged),
+`pnpm build` (711 pages, unchanged), all 28 fast `check:*` scripts
+individually clean, `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+check:reflow`/`check:text-zoom`/`check:print-width` (all 711 pages, no
+horizontal overflow at 320px, at 200% text zoom, or in print media),
+`pnpm check:html` (711 pages, valid HTML5), `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium
+pnpm check:lighthouse` (all 39 audited pages >= 0.9 in every category, the
+same one documented `404`/SEO exception as ever), `pnpm audit` (no known
+vulnerabilities), and `pnpm dlx knip --no-config-hints` (the same two
+standing false positives as ever). `pnpm test:e2e` was not re-run: the
+hundred-and-eighty-sixth run's own 1023/1023 cold-start confirmation is only
+two runs stale, and this run changed no page markup, content, or runtime
+behavior for it to exercise.
+
+**Left for a future pass:** the same environment-blocked open-backlog items
+as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged. All five fresh
+angles this run tried are now closed, honestly negative results rather than
+open threads; the next run will need its own first-principles search for a
+sixth angle rather than repeating any of these five.
