@@ -64,6 +64,7 @@ Chaco
 Ciudad
 Claudio
 Colombes
+Cristiana
 Cristianom
 Córdoba
 Daniel
@@ -202,6 +203,7 @@ Rodrigo
 Roger
 Romano
 Romero
+Ronalda
 Ronaldom
 Rooney
 Ruiz
@@ -246,6 +248,7 @@ Xanu
 Year
 Yokohama
 Zagallu
+Zagorakisa
 bayernovog
 centenarnog
 docs

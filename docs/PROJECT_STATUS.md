@@ -29773,3 +29773,117 @@ coincidence blind spot) is still open and still the most substantive,
 well-scoped thread available - the "one of only N X" idea this run closed
 was the other concrete thread on the board, so that pairing work is now the
 single most substantive lead left for a future run.
+
+### `check:claims-hr` positional pairing, closing the documented same-page-coincidence blind spot; found and fixed a real Croatian translation gap and a real CI-coverage gap - closed 2026-09-25 (hundred-and-eighty-sixth intensive run)
+
+`pnpm outdated` found two new in-range patch releases (`vitest`/
+`@vitest/coverage-v8` 5.0.1 -> 5.0.2, the `typescript` 7 line still the only
+blocked entry); installed both, no regression. With that housekeeping done,
+this run picked up the hundred-and-eighty-first/-fifth runs' own named next
+step: close `check-claims-hr.mjs`'s documented "same-page-coincidence" blind
+spot (a year checked for presence anywhere in a Croatian page's combined
+note prose, not specifically within the one bullet that translates the
+matching English claim) with real positional pairing, the concrete next step
+both of those runs' own closing notes left on the board.
+
+**Building the pairing:** `check:i18n-notes` already enforces, as a required
+CI gate, that every English page and its Croatian counterpart render the
+exact same number of `.notes__card` sections in the same order, each with
+the same item count - so a claim's `(sectionIndex, itemIndex)` position on
+the English page is guaranteed to mean the same position on the Croatian
+page too, without needing any heading-translation lookup table. Added
+`extractNoteCardsWithItems()` (`scripts/check-claims-hr.mjs`), which parses
+a built page's `.notes__card` sections into `{ heading, items }` with each
+item's real text (not just a count, unlike `check-i18n-notes.mjs`'s own
+`extractNoteCards()`) - tags stripped without inserting whitespace (`<li>x
+<strong>y</strong>z</li>` -> `xyz`, not `x y z`, since a coarse `<[^>]+>` ->
+`' '` replace would wrongly split a mid-sentence `**bold**` span), and
+`&amp;`/`&lt;`/`&gt;` unescaped the way `renderInlineMarkdown()`
+(`src/lib/notes.ts`) escaped them on the way in. `stripMarkdownEmphasis()`
+does the mirror-image normalization on a raw ledger claim string (stripping
+`**bold**`/`*italic*`/`` `code` `` markers to their inner text, the same
+substitutions `renderInlineMarkdown()` applies before wrapping them in tags)
+so the two sides compare as equal plain text. `locateClaimPosition()` then
+finds the one English item whose normalized text exactly matches a claim's
+normalized text; `diffClaimsPositionally()` uses that position to read the
+Croatian item at the *same* index and checks it specifically, falling back
+to the original whole-page `diffClaimsAgainstHrNotes()` check for any claim
+that doesn't match exactly one item (zero or multiple matches - a signal
+this module's own extraction needs attention, not a content bug), so
+coverage never regresses below what the script already had. Verified this
+match-rate empirically before wiring it into `main()`: all 196 claims across
+all six ledgers matched exactly one English item on the first try.
+
+**Real bug #1, found the moment the new check ran against the real build:**
+`content/uefa-euro.md`'s 2016 Team of the Tournament bullet ends "...
+Cristiano Ronaldo's second selection on this list, twelve years after
+2004." - both `ordinal-claims-ledger.json` and `record-claims-ledger.json`
+carry this exact claim, already verified in English. Its Croatian
+counterpart bullet (`src/pages/hr/competitions/euro.astro`) was just the
+bare roster with no trailing commentary at all - "2004" doesn't appear in
+it. The old whole-page check never caught this because 2004 *does* appear
+elsewhere on the same Croatian page (the 2004 Team of the Tournament
+bullet's own year label), a textbook instance of the exact blind spot this
+run's own header comment had named but never demonstrated with a real
+example before. Investigating properly (reading the whole "Team of the
+Tournament winners" section in both languages, not just the one flagged
+bullet) found this was systemic, not a one-off: five of the six Croatian
+Team of the Tournament entries (1996, 2004, 2008, 2016, 2020) were missing
+their entire trailing commentary clause outright, and the sixth (2024) had
+only partially translated it (kept "Kyle Walker's second consecutive
+selection..." but dropped the preceding "champions Spain supplied six, the
+most of any team" clause). None of the other five entries' own missing
+clauses happened to trip any ledger checker themselves (2004's "including
+Zagorakis, both captain and Player of the Tournament" has no ledger-pattern
+trigger word at all), so nothing before this run's own manual read of the
+section had ever surfaced them - a real, previously-shipped content gap on
+five live pages, not a hypothetical the new checker merely guarded against.
+Translated all six clauses into Croatian, matching the file's own existing
+vocabulary for these concepts (`prvaci` for "champions", the paucal
+people-counting forms `trojicu`/`četvoricu`/`petoricu`/`šestoricu` already
+used elsewhere on the site for "supplied N players", `skupnoj fazi` for
+"group stage" from this same file's own qualification-format prose, and the
+genitive declension of "Cristiano Ronaldo" - `Cristiana Ronalda` - matching
+the instrumental `Cristianom Ronaldom` `golden-boot.astro` already uses for
+the same name). Two new proper-noun declined forms
+(`Cristiana`/`Ronalda`/`Zagorakisa`) added to `.cspell/football-names-hr.txt`
+in alphabetical position, confirmed clean with `pnpm check:spelling-hr`
+afterward.
+
+**Real bug #2, found while wiring the ledger list:** `check-claims-hr.mjs`'s
+`LEDGER_FILES` array still only listed the original five verification
+ledgers - `one-of-only-claims-ledger.json` (added by the hundred-and-
+eighty-fifth run, two runs ago) was never added to it, so its two claims
+(both naming years, both otherwise a required CI gate everywhere else) had
+silently had zero Croatian-translation coverage since the day that ledger
+was created. Added it to the array; both claims positionally paired and
+verified clean against their already-correct Croatian counterparts on the
+first run.
+
+**Verification:** `pnpm lint` (234 files, 0/0/0), `pnpm test` (870/870, up
+from 857 - 14 new tests for `stripMarkdownEmphasis()`/
+`extractNoteCardsWithItems()`/`locateClaimPosition()`/
+`diffClaimsPositionally()` in `tests/unit/checkClaimsHr.test.ts`, mirroring
+the file's existing structure), `pnpm test:coverage` (99.91%/99.31%,
+unchanged - same four defensively-unreachable lines as ever), `pnpm build`
+(711 pages, unchanged), `pnpm check:claims-hr` (196 claims across all six
+ledgers, 0 problems - up from a script that previously checked the same 196
+claims far more loosely), all other 27 fast `check:*` scripts individually
+clean, `pnpm audit` (no known vulnerabilities), `pnpm dlx knip
+--no-config-hints` (the same two standing false positives as ever). The
+Croatian content edit made `public/downloads/euro-hr.pdf` stale -
+regenerated with `pnpm build:pdfs` and reverified with `pnpm check:pdfs`
+(700/700 clean) and `pnpm check:pdf-outline` (700/700 clean). Unlike the
+hundred-and-eighty-fifth run's pure-script change, this run edited real page
+content, so the full cold-start `pnpm test:e2e` suite was re-run rather than
+skipped: 1023/1023 passed (23.9 minutes, `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`), matching the hundred-and-eighty-first/-second runs' own last-confirmed count exactly - no regression from the six translated bullets or from the `vitest` patch bump.
+
+**Left for a future pass:** the same environment-blocked open-backlog items
+as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged. With the
+positional-pairing thread now closed, the next concrete lead is auditing
+the other five Croatian competition/award pages' own note sections the same
+way this run's manual read of EURO's "Team of the Tournament" found a real
+gap - a targeted read of each page's own `notes`/`CROATIAN_MOMENTS`-style
+arrays against `content/*.md`, independent of whether any bullet happens to
+match a ledger-checker's trigger word, since this run's own finding shows a
+translation gap can hide entirely outside every existing pattern.

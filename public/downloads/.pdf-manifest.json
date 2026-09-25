@@ -216,7 +216,7 @@
     "src/components/References.astro": "e319f121aca3a9408ba9f3fa4a454fe27c8902c61bc5a15836f6d6e072230322",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
-    "src/pages/hr/competitions/euro.astro": "541a9d3c9f15e6c77c4e99f0f5aec285746f93496d3b75c24903bfc1bc7288be"
+    "src/pages/hr/competitions/euro.astro": "634fc27eb80d74bcbe6f8d1ef3071c7f7898cdd4816ebf2f2f8743648fc60626"
   },
   "nations-league-hr": {
     "content/uefa-nations-league.md": "eafb7d0fa2702060610c9279c6cfd437e4a6a9704bef34c13532a1714a880ba7",
