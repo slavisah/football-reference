@@ -36,12 +36,33 @@
 // this check exists to close.
 //
 // Deliberately scoped to the narrow `/\bthe only\b/i` pattern named in the
-// roadmap entry, not a broader "only"/exclusivity match (`"Colombia's only
-// title"`, `"one of only three men"`, etc.) - those exist too, but a wider
-// net catches far more incidental uses of "only" (`"Europe-only"`, `"had
-// only four teams"`, `"only entered the tournament"`) that have nothing to
-// do with this bug class, trading a cheap, low-noise gate for a noisy one.
-// Widen it only if this exact bug class recurs outside "the only" phrasing.
+// roadmap entry, not a broader "only"/exclusivity match (`"one of only three
+// men"`, etc.) - that phrasing exists too, but a wider net catches far more
+// incidental uses of "only" (`"Europe-only"`, `"had only four teams"`,
+// `"only entered the tournament"`) that have nothing to do with this bug
+// class, trading a cheap, low-noise gate for a noisy one. Widen it only if
+// this exact bug class recurs outside "the only" phrasing.
+//
+// Widened by the hundred-and-eighty-fourth intensive run, the same way the
+// hundred-and-eighty-third run's own possessive-ordinal fix widened
+// `check-ordinal-claims.mjs`: the roadmap's "possessive-phrasing gap check"
+// item, checking whether this checker's own pattern had the same "the X"
+// literal-word requirement that turned out to be a gap for ordinal claims.
+// It did - `"Colombia's only Copa América title"`, `"Bolivia won its only
+// title"` and `"their only European Championship title"` are the identical
+// uniqueness-claim shape as "the only X", just phrased with a possessive
+// noun or pronoun instead of "the", and were silently unverified (the exact
+// same three claims the header comment above used to cite as deliberately
+// excluded, before this run re-examined them). Added two pattern
+// alternatives, `\w+'s\s+only` and `(his|her|its|their)\s+only`, mirroring
+// the ordinal checker's own fix exactly. Re-checked both against the full
+// corpus before widening: 3 newly-caught claims, zero noise - every other
+// non-"the only" use of "only" in `content/*.md` (`"Europe-only"`, `"had
+// only four teams"`, `"one of only three men"`, etc.) still has no
+// possessive immediately before it, so the narrower possessive anchor stays
+// precise. `"one of only N X"` (a bounded-set claim, not a strict
+// uniqueness claim) is a different shape, deliberately still excluded - see
+// `docs/ROADMAP.md`'s "Ideas not yet scoped" section.
 //
 // Plain regex/string parsing of `content/*.md`, no build or browser needed -
 // the same territory as `check:award-tallies`/`check:spelling` (well under a
@@ -56,13 +77,15 @@ const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CONTENT_DIR = path.join(ROOT, 'content');
 const LEDGER_PATH = path.join(ROOT, 'scripts', 'superlative-claims-ledger.json');
 
-const CLAIM_PATTERN = /\bthe only\b/i;
+const CLAIM_PATTERN = /\bthe only\b|\b\w+'s\s+only\b|\b(his|her|its|their)\s+only\b/i;
 
 /**
  * Pure: every top-level Markdown list item's text in `markdown` that matches
- * the "the only" superlative-claim pattern, in document order. Content pages
- * on this site use only flat, single-line `- ` bullets (no nested lists), so
- * a per-line regex is sufficient - no Markdown parser needed.
+ * the "the only" superlative-claim pattern - either "the only" directly, or
+ * the same uniqueness claim phrased with a possessive ("Colombia's only
+ * title", "its only title", "their only title") - in document order. Content
+ * pages on this site use only flat, single-line `- ` bullets (no nested
+ * lists), so a per-line regex is sufficient - no Markdown parser needed.
  */
 export function extractSuperlativeClaims(markdown) {
   const claims = [];

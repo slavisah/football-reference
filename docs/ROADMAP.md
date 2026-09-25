@@ -45,7 +45,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates,
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-eighty-third run (2026-09-25): 842/842 unit tests,
+As of the hundred-and-eighty-fourth run (2026-09-25): 845/845 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
@@ -54,8 +54,42 @@ used only as a Playwright `webServer.command`, never imported;
 static analysis just can't see a reference inside a config-file string. The
 full `pnpm test:e2e` count last confirmed at 1023/1023 (16.5 minutes) as of
 the hundred-and-eighty-first/-second runs; not re-run the hundred-and-
-eighty-third run since that run touched no page markup/styling/behavior
-(see its own entry below).
+eighty-third or hundred-and-eighty-fourth runs since neither touched page
+markup/styling/behavior (see their own entries below).
+
+**Hundred-and-eighty-fourth run:** with the named backlog item from the
+hundred-and-eighty-third run's own note ("check whether
+`check:superlative-claims`/`check:record-claims`/`check:consecutive-claims`/
+`check:since-claims` have the same possessive-phrasing gap `check:ordinal-
+claims` had") the only concrete, not-yet-blocked item on the board, worked
+through all four. `check:record-claims` (bare trigger words: "most",
+"record", "youngest", etc.), `check:consecutive-claims`
+("consecutive"/"back-to-back") and `check:since-claims` ("since <year>") each
+already match anywhere in a bullet with no "the"-style anchor, so a
+possessive phrasing of the same trigger word was already caught - no gap,
+confirmed by reasoning about each pattern rather than assumed. `check:
+superlative-claims` was different: its `/\bthe only\b/i` pattern has exactly
+the same "the" requirement `check:ordinal-claims`'s did, and did have the gap
+- three real claims (`content/copa-america.md`'s "Colombia's only Copa
+América title" and "Bolivia won its only title", `content/uefa-euro.md`'s
+"their only European Championship title") were silently unverified, the same
+bug class the hundred-and-eighty-third run's ordinal fix closed. Widened the
+pattern with the same two alternatives (`\w+'s\s+only`, `(his|her|its|their)
+\s+only`), verified all three against their Champions tables (Colombia and
+Bolivia each appear in `content/copa-america.md`'s champions table exactly
+once; Netherlands in `content/uefa-euro.md`'s exactly once, 1988) and
+recorded them in `superlative-claims-ledger.json` - superlative-claims
+coverage goes from 21 to 24. Deliberately did not widen for "one of only N
+X" (a bounded-set membership claim, not a strict-uniqueness claim - a
+different shape, logged as its own "Ideas not yet scoped" entry rather than
+folded in and risking noise). Added three new unit tests to
+`tests/unit/checkSuperlativeClaims.test.ts` covering both possessive
+alternatives; the existing "ignores bullets that use 'only' without 'the
+only'" test (which includes "one of only three men to win it") still passes
+unchanged, confirming the widened pattern stays precise. `pnpm test` 845/845
+(up from 842), all 26 fast `check:*` scripts clean, `pnpm build` 711 pages,
+`pnpm lint` 0/0/0, coverage unchanged at 99.91%/99.31%. See
+`docs/PROJECT_STATUS.md`'s matching entry for the full per-claim writeup.
 
 **Hundred-and-eighty-third run:** widened `check:ordinal-claims` a second
 time (`\w+'s (first|...)` / `(his|her|its|their) (first|...)`, alongside the
@@ -320,16 +354,6 @@ matching entry for full detail.
 
 ## Open backlog
 
-- **Possessive-phrasing gap check for the other four verification-ledger
-  claim checkers**: not blocked, just not yet attempted. The
-  hundred-and-eighty-third run found `check:ordinal-claims`'s own pattern had
-  missed every possessive phrasing of its claim shape ("his second win" vs.
-  "the second X to Y") and widened it to close a 47-claim gap. Worth checking
-  whether `check:superlative-claims`/`check:record-claims`/
-  `check:consecutive-claims`/`check:since-claims` have a matching gap in
-  their own trigger words or anchoring - each was seeded/widened at least
-  once already but none has had this specific angle (a possessive or other
-  alternate phrasing of the same trigger word) tried against it yet.
 - **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.10` (latest
   published) only declares `typescript: '^5.0.0 || ^6.0.0'` as a peer
   dependency - re-confirmed via `npm view @astrojs/check@latest
@@ -402,6 +426,19 @@ matching entry for full detail.
 
 ## Ideas not yet scoped
 
+- **"One of only N X to Y" bounded-set claims**: `check:superlative-claims`
+  deliberately still doesn't catch this phrasing (e.g. "one of only three men
+  to win it as both player and manager" in `content/fifa-world-cup.md`, "one
+  of only a handful of managers/players..." in `content/uefa-euro.md`) - a
+  genuinely different claim shape from "the only X" (a bounded-set membership
+  claim with its own count to verify, not a strict-uniqueness claim), flagged
+  but not built by the hundred-and-eighty-fourth run's possessive-phrasing
+  investigation (see `docs/PROJECT_STATUS.md`'s matching entry). The vaguer
+  "a handful of" instances aren't independently checkable from this site's
+  own tables anyway; only the precisely-numbered ones ("one of only three
+  men") would be. Worth a dedicated pattern (`/\bone of only \d+\b/i` or
+  similar) and its own ledger if this shape recurs, following the same
+  narrow/low-noise approach as the other five claim checkers.
 - **"Youngest winner" ranking** (`/records`-style, alongside the existing
   "Longest wait between titles"/"Back-to-back champions" sections): needs a
   reliable per-player birth date for ~130 Ballon d'Or/Golden Boot winners,
