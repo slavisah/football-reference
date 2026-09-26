@@ -10,6 +10,7 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import References from '../../../components/References.astro';
 import { loadCompetition, loadPageMeta } from '../../../lib/competition';
+import { disambiguateLabels } from '../../../lib/sources';
 import { buildAllPlayerProfiles, playerProfileSlug, type PlayerAwardSource } from '../../../lib/playerProfile';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 import { buildCollectionPageJsonLd, buildPlayersDirectoryItemList, type JsonLdObject } from '../../../lib/jsonLd';
@@ -36,9 +37,11 @@ const sources: PlayerAwardSource[] = [
 
 const profiles = buildAllPlayerProfiles(sources);
 
-const combinedSources = [ballonDor.sources, worldCupGoldenBoot.sources, euroGoldenBoot.sources]
-  .flat()
-  .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+const combinedSources = disambiguateLabels(
+  [ballonDor.sources, worldCupGoldenBoot.sources, euroGoldenBoot.sources]
+    .flat()
+    .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index),
+);
 
 const lastReviewed = [ballonDor.lastReviewed, worldCupGoldenBoot.lastReviewed, euroGoldenBoot.lastReviewed]
   .concat(meta.lastReviewed)
@@ -62,7 +65,7 @@ const jsonLd: JsonLdObject[] = [
       describe: (profile) =>
         `${profile.totalAwards} ${profile.totalAwards === 1 ? 'nagrada' : 'nagrade'} u muškoj Zlatnoj lopti i Zlatnoj kopački Svjetskog prvenstva/EURA`,
     }),
-    { pageUrl: playersPageUrl, name: playersName },
+    { pageUrl: playersPageUrl, name: playersName, dateModified: lastReviewed },
   ),
 ];
 ---
@@ -73,6 +76,7 @@ const jsonLd: JsonLdObject[] = [
   locale="hr"
   alternateHref={withBase('/players')}
   jsonLd={jsonLd}
+  dateModified={lastReviewed}
 >
   <article class="players stack">
     <header class="players__header">

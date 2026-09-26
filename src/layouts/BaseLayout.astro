@@ -6,10 +6,13 @@ import Breadcrumb from '../components/Breadcrumb.astro';
 import { withBase } from '../lib/url';
 import { t, type Locale } from '../lib/i18n';
 import { buildBreadcrumbList, buildWebSiteJsonLd, withInLanguage, type JsonLdObject } from '../lib/jsonLd';
+import { truncateDescription } from '../lib/text';
 
 interface Props {
   title: string;
   description?: string;
+  /** This page's own editorial `lastReviewed` date (YYYY-MM-DD), when the page has one - renders as `og:updated_time` below. Omitted for the home page and 404, which have no content-file date source. */
+  dateModified?: string;
   /** Defaults to 'en'; only pages with a translation pass this. */
   locale?: Locale;
   /** The equivalent page in the other language, if one exists. */
@@ -25,6 +28,7 @@ interface Props {
 const {
   title,
   description,
+  dateModified,
   locale = 'en',
   alternateHref,
   jsonLd = [],
@@ -62,6 +66,13 @@ const canonicalURL = new URL(withTrailingSlash(Astro.url.pathname), siteOrigin);
 const alternateURL = alternateHref
   ? new URL(withTrailingSlash(alternateHref), siteOrigin)
   : undefined;
+// Google's hreflang guidance recommends an "x-default" alternate alongside
+// the language-specific ones, for a reader whose browser locale matches
+// neither en nor hr - it should resolve to this site's primary language
+// (English, the un-prefixed root) rather than leaving search engines to
+// guess. Only meaningful once both language versions of a page exist, the
+// same condition the two language-specific tags below already require.
+const defaultURL = alternateURL ? (locale === 'en' ? canonicalURL : alternateURL) : undefined;
 // A dedicated 1200x630 (1.91:1) social-card image (scripts/generate-og-image.mjs),
 // not the square PWA icon this used to point at - most link-unfurl surfaces
 // (Slack, Discord, iMessage, X/Twitter's "summary_large_image" card) expect
@@ -69,6 +80,14 @@ const alternateURL = alternateHref
 // docs/PROJECT_STATUS.md's 2026-08-01 SEO-essentials entry, which deferred a
 // dedicated image at the time.
 const ogImageURL = new URL(withBase('/og-image.png'), siteOrigin);
+// Most callers pass a short, already-in-budget literal string, but a
+// per-edition page builds this from editorial data (champion/runner-up
+// names, a Golden Boot tie's full co-winner list) that can push it past the
+// ~160-character guideline search engines and link-preview surfaces
+// truncate around - see src/lib/text.ts's doc comment for how that gap was
+// found. Clamping once here, rather than in each such page, covers every
+// current and future caller.
+const metaDescription = description ? truncateDescription(description) : undefined;
 const ogLocale = locale === 'hr' ? 'hr_HR' : 'en_US';
 const ogLocaleAlternate = locale === 'hr' ? 'en_US' : 'hr_HR';
 
@@ -138,7 +157,7 @@ const structuredData = withInLanguage(
     />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
-    {description && <meta name="description" content={description} />}
+    {metaDescription && <meta name="description" content={metaDescription} />}
     <meta name="generator" content={Astro.generator} />
     <link rel="canonical" href={canonicalURL} />
     {noindex && <meta name="robots" content="noindex" />}
@@ -151,6 +170,7 @@ const structuredData = withInLanguage(
             hreflang={locale === 'hr' ? 'en' : 'hr'}
             href={alternateURL}
           />
+          <link rel="alternate" hreflang="x-default" href={defaultURL} />
         </>
       )
     }
@@ -160,27 +180,49 @@ const structuredData = withInLanguage(
       href={withBase(locale === 'hr' ? '/hr/manifest.webmanifest' : '/manifest.webmanifest')}
     />
     <link rel="apple-touch-icon" href={withBase('/icons/icon-192.png')} />
-    <meta name="theme-color" content="#1f6f4f" />
+    <meta
+      name="theme-color"
+      id="theme-color-meta"
+      content="#1f6f4f"
+      data-light="#1f6f4f"
+      data-dark="#46c08a"
+    />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Football Reference" />
     <meta name="color-scheme" content="light dark" />
 
     {/* Open Graph + Twitter Card, so links shared to chat apps/social media
-    show a real title, description and image instead of a bare URL. */}
+    show a real title, description and image instead of a bare URL.
+    og:image:alt/twitter:image:alt (both point at the same localized
+    'ogImageAlt' string) give a text description of that shared og-image.png
+    to a screen-reader user browsing a link-preview card on a platform that
+    surfaces alt text for it (e.g. Mastodon, some Slack/Discord clients) -
+    the same image every page already links via og:image/twitter:image
+    above, so this is a site-wide static string rather than a per-page prop,
+    same as ogImageURL itself.
+    og:updated_time (not article:modified_time) carries this page's own
+    `lastReviewed` editorial date as its page-freshness signal - this site's
+    og:type is always "website" (see below), never "article", and
+    article:modified_time is only valid Open Graph vocabulary under
+    og:type=article. og:updated_time is the generic, type-agnostic
+    equivalent, so it works here without that mismatch. */}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="The Ultimate Football Reference" />
     <meta property="og:title" content={fullTitle} />
-    {description && <meta property="og:description" content={description} />}
+    {metaDescription && <meta property="og:description" content={metaDescription} />}
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:locale" content={ogLocale} />
     {alternateHref && <meta property="og:locale:alternate" content={ogLocaleAlternate} />}
     <meta property="og:image" content={ogImageURL} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={t(locale, 'ogImageAlt')} />
+    {dateModified && <meta property="og:updated_time" content={dateModified} />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
-    {description && <meta name="twitter:description" content={description} />}
+    {metaDescription && <meta name="twitter:description" content={metaDescription} />}
     <meta name="twitter:image" content={ogImageURL} />
+    <meta name="twitter:image:alt" content={t(locale, 'ogImageAlt')} />
 
     {/* schema.org structured data: an automatic Home > page BreadcrumbList (or,
     on the home page itself, an automatic WebSite block instead) plus whatever
@@ -193,15 +235,28 @@ const structuredData = withInLanguage(
       ))
     }
 
-    {/* Apply the saved theme before paint to avoid a flash. */}
+    {/* Apply the saved theme before paint to avoid a flash, and point the
+    mobile browser-chrome tint (the theme-color meta tag above) at the same
+    resolved theme so it doesn't stay stuck on the light-mode brand color
+    for a dark-mode reader - ThemeToggle.astro's script keeps it in sync
+    after a manual toggle or a live OS theme change. */}
     <script is:inline>
       (function () {
+        var theme;
         try {
           var saved = localStorage.getItem('theme');
           if (saved === 'light' || saved === 'dark') {
+            theme = saved;
             document.documentElement.dataset.theme = saved;
           }
         } catch (e) {}
+        if (!theme) {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        var meta = document.getElementById('theme-color-meta');
+        if (meta) {
+          meta.setAttribute('content', theme === 'dark' ? meta.dataset.dark : meta.dataset.light);
+        }
       })();
     </script>
 

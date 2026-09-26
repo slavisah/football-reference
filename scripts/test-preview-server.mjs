@@ -25,26 +25,13 @@
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { waitForServer } from './preview-daemon.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const PORT = process.env.PORT ?? '4321';
 const BASE = process.env.BASE_PATH ?? '/football-reference';
 const ORIGIN = `http://localhost:${PORT}`;
 const astroBin = path.join(ROOT, 'node_modules', '.bin', 'astro');
-
-async function waitForServer(url, timeoutMs = 60_000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(url);
-      if (res.ok) return;
-    } catch {
-      // not up yet
-    }
-    await new Promise((resolve) => setTimeout(resolve, 300));
-  }
-  throw new Error(`Preview server at ${url} did not become ready in time`);
-}
 
 function stopDaemon() {
   // Safe to call even when nothing is running (astro preview stop just

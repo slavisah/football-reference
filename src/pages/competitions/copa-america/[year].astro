@@ -13,7 +13,12 @@ import EditionView from '../../../components/EditionView.astro';
 import References from '../../../components/References.astro';
 import { loadCompetition } from '../../../lib/competition';
 import { buildYearStories } from '../../../lib/editions';
-import { buildEditionProfiles, editionSlug, type EditionProfile } from '../../../lib/editionProfile';
+import {
+  buildEditionProfiles,
+  editionPdfDownloadUrl,
+  editionSlug,
+  type EditionProfile,
+} from '../../../lib/editionProfile';
 import { buildAllCountryRecords } from '../../../lib/compare';
 import { loadTeamCompetitions } from '../../../lib/teamCompetitions';
 import { teamProfileSlug } from '../../../lib/teamProfile';
@@ -81,6 +86,16 @@ const description = [
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
+
+// Print-only PDF-to-PDF cross-reference pager - see EditionView.astro's
+// `pdfPreviousUrl`/`pdfNextUrl` prop doc comment for why this must be an
+// absolute URL rather than `withBase()` alone.
+const pdfPreviousUrl = profile.previous
+  ? editionPdfDownloadUrl(Astro.site, Astro.url, 'copa-america', profile.previous.slug, 'en')
+  : undefined;
+const pdfNextUrl = profile.next
+  ? editionPdfDownloadUrl(Astro.site, Astro.url, 'copa-america', profile.next.slug, 'en')
+  : undefined;
 ---
 
 <BaseLayout
@@ -89,6 +104,7 @@ const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
   alternateHref={withBase(`/hr/competitions/copa-america/${profile.slug}`)}
   breadcrumbTrail={[{ name: 'Copa América', url: withBase('/competitions/copa-america') }]}
   jsonLd={jsonLd}
+  dateModified={lastReviewed}
 >
   <EditionView
     profile={profile}
@@ -98,6 +114,8 @@ const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
     headingTemplate={`${yearLabel} {competition}`}
     glanceHeading={`${yearLabel} at a glance`}
     pdfSlug={`edition-copa-america-${profile.slug}`}
+    pdfPreviousUrl={pdfPreviousUrl}
+    pdfNextUrl={pdfNextUrl}
   >
     <References sources={sources} lastReviewed={lastReviewed} status={status} />
   </EditionView>

@@ -6,6 +6,7 @@ import References from '../components/References.astro';
 import PrintDownloadLink from '../components/PrintDownloadLink.astro';
 import SectionJumpNav from '../components/SectionJumpNav.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
+import { disambiguateLabels } from '../lib/sources';
 import {
   buildBiggestFinalMargins,
   buildHomeSoilTitles,
@@ -101,9 +102,11 @@ const individualAwards = [
 // Dedup source links across every competition and award loaded above, same
 // approach as the combined Golden Boot page.
 const allLoaded = [...competitions, ...individualAwards];
-const sources = allLoaded
-  .flatMap((c) => c.data.sources)
-  .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+const sources = disambiguateLabels(
+  allLoaded
+    .flatMap((c) => c.data.sources)
+    .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index),
+);
 
 const lastReviewed = allLoaded
   .map((c) => c.data.lastReviewed)
@@ -251,6 +254,7 @@ const jumpSections = [
   description="Champions timelines, team rankings and back-to-back champions from the World Cup, EURO, Copa América, Nations League, Ballon d'Or and Golden Boot."
   alternateHref={withBase('/hr/records')}
   jsonLd={jsonLd}
+  dateModified={lastReviewed}
 >
   <article class="records stack">
     <header class="records__header">

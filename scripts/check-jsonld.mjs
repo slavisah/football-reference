@@ -90,6 +90,24 @@ export function validateJsonLdObject(root, siteOrigin) {
     if ('position' in node && (!Number.isInteger(node.position) || node.position < 1)) {
       issues.push(`${nodePath}: "position" must be a positive integer, got ${JSON.stringify(node.position)}`);
     }
+    if ('dateModified' in node) {
+      if (typeof node.dateModified !== 'string' || !/^\d{4}-\d{2}-\d{2}/.test(node.dateModified)) {
+        issues.push(
+          `${nodePath}: "dateModified" must be a YYYY-MM-DD date string, got ${JSON.stringify(node.dateModified)}`,
+        );
+      }
+      // Structural guard: `dateModified`'s schema.org `domainIncludes` is
+      // `CreativeWork` only (see src/lib/jsonLd.ts's builder doc comments) -
+      // it must never appear on an `Event`/`Intangible`/`Person`/
+      // `Organization` node such as these. Should never trigger given a
+      // correct implementation; kept as a regression guard, matching this
+      // script's "position" sequencing check above.
+      const type = node['@type'];
+      const INELIGIBLE_TYPES = new Set(['SportsEvent', 'ItemList', 'BreadcrumbList', 'Person', 'SportsTeam']);
+      if (typeof type === 'string' && INELIGIBLE_TYPES.has(type)) {
+        issues.push(`${nodePath}: "dateModified" must not appear on a "${type}" node (not a CreativeWork)`);
+      }
+    }
     for (const key of ['url', 'item']) {
       const value = node[key];
       if (typeof value === 'string' && !isAbsoluteSiteUrl(value, siteOrigin)) {

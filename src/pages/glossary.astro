@@ -22,6 +22,7 @@ const jsonLd: JsonLdObject[] = [
   buildDefinedTermSet(entries, {
     pageUrl: absolutePageUrl(Astro.url, Astro.site),
     name: meta.title,
+    dateModified: meta.lastReviewed,
   }),
 ];
 
@@ -42,6 +43,7 @@ const reviewedLabel = Number.isNaN(reviewed.getTime())
   locale="en"
   alternateHref={withBase('/hr/glossary')}
   jsonLd={jsonLd}
+  dateModified={meta.lastReviewed}
 >
   <article class="glossary-page stack">
     <header class="glossary-page__header">

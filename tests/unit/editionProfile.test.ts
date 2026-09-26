@@ -4,6 +4,8 @@ import {
   buildEditionLinks,
   buildEditionProfiles,
   editionLinkKey,
+  editionPdfDownloadUrl,
+  editionPdfFileName,
   editionSlug,
 } from '../../src/lib/editionProfile';
 import type { MarkdownTable } from '../../src/lib/types';
@@ -401,5 +403,62 @@ describe('buildEditionLinks', () => {
   it('honours a localized base path', () => {
     const links = buildEditionLinks(buildEditionProfiles(worldCup), '/hr/competitions/world-cup');
     expect(links.get(editionLinkKey('2018', 'Russia'))).toBe('/hr/competitions/world-cup/2018');
+  });
+});
+
+// EditionView.astro's print-only PDF-to-PDF cross-reference pager (the
+// "Previous/Next edition" pair pointing at the sibling edition's own
+// downloadable PDF, rather than its live page) needs both of these: the
+// plain filename, matching scripts/pdf-pages.mjs's EDITION_PDF_SOURCES and
+// src/pages/edition-index.json.ts's own `edition-<family>-<slug>[-hr]`
+// convention exactly, and the absolute production URL built from it.
+describe('editionPdfFileName', () => {
+  it('builds the plain English filename', () => {
+    expect(editionPdfFileName('world-cup', '2022', 'en')).toBe('edition-world-cup-2022.pdf');
+  });
+
+  it('adds the -hr suffix for Croatian', () => {
+    expect(editionPdfFileName('world-cup', '2022', 'hr')).toBe('edition-world-cup-2022-hr.pdf');
+  });
+
+  it('handles a multi-word family key (Golden Boot\'s two route trees)', () => {
+    expect(editionPdfFileName('golden-boot-world-cup', '1962', 'en')).toBe(
+      'edition-golden-boot-world-cup-1962.pdf',
+    );
+  });
+
+  it('handles a host-disambiguated slug (Copa América\'s two 1959 editions)', () => {
+    expect(editionPdfFileName('copa-america', '1959-ecuador', 'en')).toBe(
+      'edition-copa-america-1959-ecuador.pdf',
+    );
+  });
+});
+
+describe('editionPdfDownloadUrl', () => {
+  it('resolves the PDF filename against the configured site origin', () => {
+    const site = new URL('https://slavisah.github.io/');
+    const fallback = new URL('http://localhost:4321/football-reference/competitions/world-cup/2026');
+    // import.meta.env.BASE_URL defaults to '/' under Vite/Vitest (see
+    // tests/unit/url.test.ts's own comment on the same default), so the
+    // downloads path below carries no /football-reference prefix here -
+    // withBase() itself is what adds that in a real build.
+    expect(editionPdfDownloadUrl(site, fallback, 'world-cup', '2026', 'en')).toBe(
+      'https://slavisah.github.io/downloads/edition-world-cup-2026.pdf',
+    );
+  });
+
+  it('adds the -hr suffix for a Croatian page', () => {
+    const site = new URL('https://slavisah.github.io/');
+    const fallback = new URL('http://localhost:4321/hr/competitions/world-cup/2026');
+    expect(editionPdfDownloadUrl(site, fallback, 'world-cup', '2026', 'hr')).toBe(
+      'https://slavisah.github.io/downloads/edition-world-cup-2026-hr.pdf',
+    );
+  });
+
+  it('falls back to the page URL\'s own origin when no site is configured (local dev)', () => {
+    const fallback = new URL('http://localhost:4321/competitions/euro/2024');
+    expect(editionPdfDownloadUrl(undefined, fallback, 'euro', '2024', 'en')).toBe(
+      'http://localhost:4321/downloads/edition-euro-2024.pdf',
+    );
   });
 });

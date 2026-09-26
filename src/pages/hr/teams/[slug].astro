@@ -21,7 +21,7 @@ import {
 import { loadTeamCompetitions } from '../../../lib/teamCompetitions';
 import { buildTeamProfile, teamProfileSlug } from '../../../lib/teamProfile';
 import { buildTeamProfileItemList, buildTeamSportsTeamJsonLd, type JsonLdObject } from '../../../lib/jsonLd';
-import type { SourceLink } from '../../../lib/sources';
+import { disambiguateLabels, type SourceLink } from '../../../lib/sources';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 
 export async function getStaticPaths() {
@@ -35,9 +35,11 @@ export async function getStaticPaths() {
   ];
   const records = buildAllCountryRecords(competitions);
 
-  const sources = [worldCup, euro, copaAmerica, nationsLeague]
-    .flatMap((c) => c.sources)
-    .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+  const sources = disambiguateLabels(
+    [worldCup, euro, copaAmerica, nationsLeague]
+      .flatMap((c) => c.sources)
+      .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index),
+  );
   const lastReviewed = [worldCup, euro, copaAmerica, nationsLeague]
     .map((c) => c.lastReviewed)
     .sort()
@@ -99,6 +101,7 @@ const jsonLd: JsonLdObject[] =
   alternateHref={withBase(`/teams/${slug}`)}
   jsonLd={jsonLd}
   breadcrumbTrail={[{ name: 'Reprezentacije', url: withBase('/hr/teams') }]}
+  dateModified={lastReviewed}
 >
   <article class="team-profile stack">
     <header class="team-profile__header">
