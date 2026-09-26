@@ -114,7 +114,13 @@ const correctOrderText = question.items
   .quiz-order__rank {
     font: inherit;
     flex: none;
-    width: 5rem;
+    /* Wide enough for the Croatian "Poredak..." placeholder (the longest
+       option text this select ever holds - the 1..N rank numbers
+       themselves are always single/double digits) plus the browser's own
+       native dropdown-arrow reserve. A native <select> silently clips its
+       own text with no ellipsis when too narrow - see the matching
+       selectMinWidthRem() fix for TournamentTable.astro's filter row. */
+    width: 7rem;
     padding: 0.35rem 0.4rem;
     color: var(--text);
     background: var(--bg-elevated);

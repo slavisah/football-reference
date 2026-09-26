@@ -14,30 +14,22 @@
 // a manual/intensive-run tool rather than a required PR gate, the same way
 // `test:e2e:install` is manual infrastructure rather than part of `pnpm test`.
 //
-// Reuses the `astro preview` daemon dance `scripts/test-preview-server.mjs`
-// already worked out (Astro 7 forks `astro preview` into a detached
-// background process and returns immediately - see that script's own doc
-// comment for the full story) rather than importing it: that script's
-// "block forever, only exit on SIGTERM" shape is specific to being a
-// Playwright `webServer.command`, and duplicating just the start/stop logic
-// here is simpler than reshaping a script 804 e2e tests already depend on.
-//
-// Chromium launch mirrors playwright.config.ts's own escape hatches for a
-// pinned `@playwright/test` version whose bundled browser build doesn't
-// match what's on disk (this sandbox's pre-installed
-// `/opt/pw-browsers/chromium` is one such case) - set PW_EXECUTABLE_PATH to
-// point at it, or PW_CHROME_CHANNEL for a system Chrome/Chromium install; a
-// normal contributor machine or CI runner that ran `pnpm test:e2e:install`
-// needs neither and gets Playwright's own resolution.
+// Uses the shared `astro preview` daemon dance and Chromium launcher from
+// `scripts/preview-daemon.mjs` (originally worked out here and in
+// check-reflow.mjs/check-text-zoom.mjs/check-print-width.mjs as four
+// byte-identical copies, then extracted into that one module - see its own
+// doc comment for the full "Astro 7 forks preview into a detached background
+// process" story, the PW_EXECUTABLE_PATH/PW_CHROME_CHANNEL escape hatches
+// mirroring playwright.config.ts's own, and the retry-once fix for the
+// preview-server port race those four scripts could hit when run
+// back-to-back). Not `scripts/test-preview-server.mjs`: that script's "block
+// forever, only exit on SIGTERM" shape is specific to being a Playwright
+// `webServer.command`, not a fit for a script that needs the daemon to start
+// and stop within a single process run.
 
-import { spawnSync } from 'node:child_process';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { chromium } from '@playwright/test';
 import lighthouse from 'lighthouse';
+import { launchChromium, startPreviewDaemon, stopPreviewDaemon } from './preview-daemon.mjs';
 
-const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const astroBin = path.join(ROOT, 'node_modules', '.bin', 'astro');
 const PORT = process.env.PORT ?? '4321';
 const BASE = process.env.BASE_PATH ?? '/football-reference';
 const ORIGIN = `http://localhost:${PORT}`;
@@ -110,8 +102,50 @@ const CDP_PORT = 9223;
 // check:lighthouse" run has:
 // `hr/competitions/copa-america` (273.3 KB) is in fact the single heaviest
 // *landing* page on the whole site, EN included.
+//
+// The hundred-and-sixty-seventh intensive run closed the one remaining page
+// shape with zero Lighthouse coverage: `404.html`, the site's shared
+// bilingual error page (`src/pages/404.astro` - GitHub Pages serves it for
+// any unmatched URL under the base path, in either language, since a static
+// host can't pick a locale-specific 404). Every other page family above had
+// at least one entry; this page was covered by `check:reflow`/
+// `check:text-zoom`/`check:print-width`/`check:html`/`check:heading-outline`
+// (which walk every file in `dist/`) and by Playwright's own 404-specific
+// spec, but never by a real Lighthouse audit. It is a real page shape worth
+// auditing: `noindex` (see `docs/PROJECT_STATUS.md`'s "custom 404 page"
+// entry), two full stacked language sections on one page, and an emoji
+// eyebrow badge - nothing else in this list looks like it. It measures a
+// perfect 1.00 on performance/accessibility/best-practices, but only 0.63 on
+// `seo` - probed directly (per-audit, not just per-category) before writing
+// anything here: `is-crawlable` (weight 4.04, the single heaviest SEO audit)
+// scores 0 because Lighthouse's own crawlability audit fails any page with
+// a `<meta name="robots" content="noindex">` tag, and every other SEO audit
+// (title, description, canonical, hreflang, descriptive link text,
+// crawlable anchors, HTTP status) scores a clean 1. That is the deliberately
+// correct behavior for an error page a static host has to serve for every
+// broken URL (see `docs/PROJECT_STATUS.md`'s "custom 404 page" entry for why
+// it's `noindex` at all) - not a defect, and not something any change to
+// this page's markup could fix without undoing the `noindex` itself. See
+// `EXPECTED_SEO_EXCEPTIONS` below for how this known, bounded exception is
+// carved out of the budget check without silently raising `MIN_SCORE` (and
+// without hiding a future, different SEO regression on this same page).
+//
+// The hundred-and-sixty-ninth intensive run closed the last remaining gap in
+// that same "one entry per page shape in both languages" bar the thirtieth
+// run set: `hr` (the Croatian home page, `src/pages/hr/index.astro`) had
+// never been audited, even though its English sibling (`home`, the very
+// first entry in this list) was covered from the start. Home is its own
+// distinct shape - the only page rendering `OnThisDay.astro`'s "on this day"
+// widget plus the top-level competition/award card grid - not one of the
+// landing/edition/directory/profile/comparison shapes the thirtieth run's
+// twelve-page Croatian sweep already covered, so it slipped through that
+// sweep the way `404.html` slipped through every prior run's audit until the
+// hundred-and-sixty-seventh run named it explicitly. Added `hr home` right
+// after the English `home` entry; it scores the same perfect 1.00 on every
+// category as its English sibling.
 export const PAGES_TO_AUDIT = [
   { label: 'home', path: '/' },
+  { label: 'hr home', path: '/hr/' },
   { label: 'records (heaviest page family, EN)', path: '/records/' },
   { label: 'hr/records (heaviest built page)', path: '/hr/records/' },
   {
@@ -163,6 +197,7 @@ export const PAGES_TO_AUDIT = [
   { label: 'hr/players directory index', path: '/hr/players/' },
   { label: 'hr/teams directory index', path: '/hr/teams/' },
   { label: 'hr/about/sources', path: '/hr/about/sources/' },
+  { label: '404 page (bilingual error page, noindex)', path: '/404.html' },
 ];
 
 const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo'];
@@ -176,48 +211,65 @@ const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo'];
 // failure.
 export const MIN_SCORE = 0.9;
 
-function stopPreviewDaemon() {
-  spawnSync(astroBin, ['preview', 'stop'], { cwd: ROOT, stdio: 'inherit' });
-}
+// The 404 page (see PAGES_TO_AUDIT's own comment above) is the one page in
+// this list that is intentionally `noindex`, which sinks its `seo` category
+// to 0.63 - below MIN_SCORE - purely via Lighthouse's `is-crawlable` audit,
+// confirmed by a direct per-audit probe to be the only failing SEO audit on
+// that page. Rather than silently raise MIN_SCORE for every page (hiding a
+// real regression everywhere else) or drop the page from PAGES_TO_AUDIT
+// (losing its only Lighthouse coverage), this is a named, bounded exception:
+// `expectedFloor` is the lowest score this specific category on this
+// specific page is expected to ever measure (0.63, with a little headroom
+// for timing-driven audit-score noise elsewhere in the category) - a score
+// at or above it is the known, deliberate noindex penalty and gets filtered
+// out below; a score that falls further would mean some *other* SEO audit
+// broke too, and that still fails loudly, the same "filter the known false
+// positive out by name, not by silencing the whole category" shape
+// `actionableBfCacheReasons` above already uses for a different Lighthouse
+// quirk.
+const EXPECTED_SEO_EXCEPTIONS = new Map([
+  ['404 page (bilingual error page, noindex)', { expectedFloor: 0.6 }],
+]);
 
-async function waitForServer(url, timeoutMs = 60_000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(url);
-      if (res.ok) return;
-    } catch {
-      // not up yet
-    }
-    await new Promise((resolve) => setTimeout(resolve, 300));
-  }
-  throw new Error(`Preview server at ${url} did not become ready in time`);
-}
-
-async function startPreviewDaemon() {
-  stopPreviewDaemon();
-  console.log('Starting `astro preview`...');
-  spawnSync(astroBin, ['preview', '--port', PORT, '--host'], { cwd: ROOT, stdio: 'inherit' });
-  await waitForServer(`${ORIGIN}${BASE}/`);
-  console.log(`Preview server ready at ${ORIGIN}${BASE}/`);
-}
-
-async function launchChromium() {
-  const launchOptions = {
-    headless: true,
-    args: [`--remote-debugging-port=${CDP_PORT}`],
-  };
-  if (process.env.PW_EXECUTABLE_PATH) {
-    launchOptions.executablePath = process.env.PW_EXECUTABLE_PATH;
-  } else if (process.env.PW_CHROME_CHANNEL) {
-    launchOptions.channel = process.env.PW_CHROME_CHANNEL;
-  }
-  return chromium.launch(launchOptions);
+/** Whether a below-MIN_SCORE failure is the known, bounded noindex/is-crawlable exception rather than a real regression. */
+export function isExpectedSeoException({ label, category, score }) {
+  if (category !== 'seo') return false;
+  const exception = EXPECTED_SEO_EXCEPTIONS.get(label);
+  return exception !== undefined && score >= exception.expectedFloor;
 }
 
 /** Given a Lighthouse category-score map, which categories (if any) fall below MIN_SCORE. */
 export function scoresBelowMin(categoryScores, minScore) {
   return Object.entries(categoryScores).filter(([, score]) => score < minScore);
+}
+
+// Lighthouse's `bf-cache` audit (back/forward-cache eligibility) has a
+// `weight: 0` in the `performance` category's own audit list, so it already
+// runs on every `auditPage()` call above and was simply never read - a real
+// gap on a site that ships its own hand-rolled service worker
+// (`src/pages/sw.js.ts`), exactly the kind of code that can silently make a
+// page bfcache-ineligible (an open connection, an `unload` handler, specific
+// caching behavior). Found by the hundred-and-fifty-fifth intensive run.
+//
+// Empirically probed (a throwaway script against `/`, `/quiz/`, `/records/`,
+// a player profile and `/compare/`) before writing any assertion: every page
+// reports exactly the same two failure reasons, both tagged
+// `failureType: 'Not actionable'` by Lighthouse itself - "disabled by flags"
+// and "disabled by the command line". Both are artifacts of Playwright's own
+// Chromium launch (it disables bfcache by default so its own automation
+// doesn't get stale page state back on a `goBack()`), not anything this
+// site's markup/JS/service-worker does - Lighthouse's own classification
+// already says so, the same way `check-html-validity.mjs`'s `DISABLED_RULES`
+// excludes rules confirmed to be false positives rather than real defects.
+// Filtering to `failureType !== 'Not actionable'` means this check is a
+// no-op in this exact harness today, but a real permanent regression guard
+// for the future: a genuine site-caused blocker (say, a future service-worker
+// change that opens an IndexedDB transaction across navigations) would show
+// up as `'Actionable'` and get caught, where nothing has ever looked before.
+/** Given a Lighthouse `bf-cache` audit result, which of its failure reasons (if any) are real/fixable rather than harness noise. */
+export function actionableBfCacheReasons(bfCacheAudit) {
+  const items = bfCacheAudit?.details?.items ?? [];
+  return items.filter((item) => item.failureType !== 'Not actionable');
 }
 
 async function auditPage({ label, path: pagePath }) {
@@ -231,12 +283,13 @@ async function auditPage({ label, path: pagePath }) {
   const categoryScores = Object.fromEntries(
     CATEGORIES.map((key) => [key, result.lhr.categories[key].score]),
   );
-  return { label, url, categoryScores };
+  const bfCacheReasons = actionableBfCacheReasons(result.lhr.audits['bf-cache']);
+  return { label, url, categoryScores, bfCacheReasons };
 }
 
 async function main() {
   await startPreviewDaemon();
-  const browser = await launchChromium();
+  const browser = await launchChromium([`--remote-debugging-port=${CDP_PORT}`]);
 
   let results;
   try {
@@ -251,27 +304,50 @@ async function main() {
     }
   } finally {
     await browser.close();
-    stopPreviewDaemon();
+    await stopPreviewDaemon();
   }
 
-  const failures = results.flatMap(({ label, categoryScores }) =>
-    scoresBelowMin(categoryScores, MIN_SCORE).map(([category, score]) => ({ label, category, score })),
+  const failures = results
+    .flatMap(({ label, categoryScores }) =>
+      scoresBelowMin(categoryScores, MIN_SCORE).map(([category, score]) => ({ label, category, score })),
+    )
+    .filter((failure) => !isExpectedSeoException(failure));
+  const bfCacheFailures = results.flatMap(({ label, url, bfCacheReasons }) =>
+    bfCacheReasons.map((item) => ({ label, url, reason: item.reason })),
   );
 
-  if (failures.length === 0) {
-    console.log(`\nAll ${results.length} pages scored >= ${MIN_SCORE} in every category.`);
+  if (failures.length === 0 && bfCacheFailures.length === 0) {
+    const exceptionNote =
+      EXPECTED_SEO_EXCEPTIONS.size > 0
+        ? ` (${EXPECTED_SEO_EXCEPTIONS.size} known, bounded noindex/seo exception(s) excluded - see EXPECTED_SEO_EXCEPTIONS)`
+        : '';
+    console.log(
+      `\nAll ${results.length} pages scored >= ${MIN_SCORE} in every category${exceptionNote}, with no actionable back/forward-cache blockers.`,
+    );
     return;
   }
 
-  console.error(`\n${failures.length} category score(s) fell below the ${MIN_SCORE} budget:\n`);
-  for (const { label, category, score } of failures) {
-    console.error(`  ${label}: ${category} = ${score.toFixed(2)}`);
+  if (failures.length > 0) {
+    console.error(`\n${failures.length} category score(s) fell below the ${MIN_SCORE} budget:\n`);
+    for (const { label, category, score } of failures) {
+      console.error(`  ${label}: ${category} = ${score.toFixed(2)}`);
+    }
   }
+
+  if (bfCacheFailures.length > 0) {
+    console.error(`\n${bfCacheFailures.length} actionable back/forward-cache blocker(s) found:\n`);
+    for (const { label, url, reason } of bfCacheFailures) {
+      console.error(`  ${label} (${url}): ${reason}`);
+    }
+  }
+
   process.exitCode = 1;
 }
 
-main().catch((error) => {
-  console.error(error);
-  stopPreviewDaemon();
-  process.exitCode = 1;
-});
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch(async (error) => {
+    console.error(error);
+    await stopPreviewDaemon();
+    process.exitCode = 1;
+  });
+}

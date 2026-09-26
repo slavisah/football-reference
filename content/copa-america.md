@@ -243,7 +243,7 @@ A **second, independent cross-check** of the Final date column (2026-08-12, inte
 - **2019:** Everton (Brazil); Paolo Guerrero (Peru) - 3 goals each - Guerrero's third win, the most of any player.
 - **2021:** Lionel Messi (Argentina); Luis Díaz (Colombia) - 4 goals each.
 - **2024:** Lautaro Martínez (Argentina) - 5 goals.
-- Paolo Guerrero's three wins (2011, 2015, 2019) are the most by any player; Eduardo Vargas is the only player to win in consecutive editions (2015 and 2016).
+- Paolo Guerrero's three wins (2011, 2015, 2019) are the most by any player; Eduardo Vargas (2015 and 2016) and Pedro Petrone (1923 and 1924) are the only players to win in consecutive editions.
 
 ## Fair Play Award winners
 
@@ -301,7 +301,7 @@ A **second, independent cross-check** of the Final date column (2026-08-12, inte
 - **1993:** Oscar Ruggeri (Argentina) - his second, back-to-back, scoring in the final itself.
 - **1995:** Enzo Francescoli (Uruguay) - his third and final Copa América title, though it was Pablo Bengoechea's late equalizer that forced the penalty shootout Uruguay went on to win.
 - **1997:** Dunga (Brazil) - Brazil's first title won away from home soil.
-- **1999:** Cafu (Brazil) - the same armband he wore to a World Cup title two years later, earning him Brazil's nickname "Capitão do Penta" (captain of the fifth World Cup star).
+- **1999:** Cafu (Brazil) - the same armband he wore to a World Cup title three years later, earning him Brazil's nickname "Capitão do Penta" (captain of the fifth World Cup star).
 - **2001:** Iván Córdoba (Colombia) - scored the only goal of the final himself, Colombia's only Copa América title.
 - **2004:** Alex (Brazil) - also set a tournament assists record that edition.
 - **2007:** Lúcio (Brazil).

@@ -84,6 +84,29 @@ test.describe('Golden Boot edition page (FIFA World Cup)', () => {
     await expect(page.locator('.edition__pager-link--next')).toBeVisible();
   });
 
+  // Spot check for this family's own "edition-golden-boot-world-cup-<slug>"
+  // PDF prefix (distinct from the sibling EURO route tree below, which shares
+  // the same "Golden Boot" competition name but a different family key) -
+  // full coverage of the print-only PDF pager mechanism itself (hidden on
+  // screen, visible under print, both languages) lives on the shared
+  // component's flagship test in edition-page.spec.ts (World Cup).
+  test('the print-only PDF pager links to the sibling World Cup Golden Boot editions\' own PDFs', async ({
+    page,
+  }) => {
+    await page.goto('competitions/golden-boot/world-cup/1994');
+    await page.emulateMedia({ media: 'print' });
+
+    const pdfPager = page.locator('.edition__pdf-pager');
+    await expect(pdfPager.locator('a', { hasText: 'Previous edition (PDF)' })).toHaveAttribute(
+      'href',
+      'https://slavisah.github.io/football-reference/downloads/edition-golden-boot-world-cup-1990.pdf',
+    );
+    await expect(pdfPager.locator('a', { hasText: 'Next edition (PDF)' })).toHaveAttribute(
+      'href',
+      'https://slavisah.github.io/football-reference/downloads/edition-golden-boot-world-cup-1998.pdf',
+    );
+  });
+
   test('links back to the shared Golden Boot page, not a non-existent World Cup sub-index', async ({ page }) => {
     await page.goto('competitions/golden-boot/world-cup/1958');
     const back = page.locator('.edition__back a');
@@ -163,6 +186,28 @@ test.describe('Golden Boot edition page (UEFA EURO)', () => {
   test('the oldest EURO edition has no previous link', async ({ page }) => {
     await page.goto('competitions/golden-boot/euro/1960');
     await expect(page.locator('.edition__pager-link', { hasText: 'Previous edition' })).toHaveCount(0);
+  });
+
+  // Spot check for this family's own "edition-golden-boot-euro-<slug>" PDF
+  // prefix (distinct from the sibling World Cup route tree above) - full
+  // coverage of the print-only PDF pager mechanism itself (hidden on screen,
+  // visible under print, both languages) lives on the shared component's
+  // flagship test in edition-page.spec.ts (World Cup).
+  test('the print-only PDF pager links to the sibling EURO Golden Boot editions\' own PDFs', async ({
+    page,
+  }) => {
+    await page.goto('competitions/golden-boot/euro/1996');
+    await page.emulateMedia({ media: 'print' });
+
+    const pdfPager = page.locator('.edition__pdf-pager');
+    await expect(pdfPager.locator('a', { hasText: 'Previous edition (PDF)' })).toHaveAttribute(
+      'href',
+      'https://slavisah.github.io/football-reference/downloads/edition-golden-boot-euro-1992.pdf',
+    );
+    await expect(pdfPager.locator('a', { hasText: 'Next edition (PDF)' })).toHaveAttribute(
+      'href',
+      'https://slavisah.github.io/football-reference/downloads/edition-golden-boot-euro-2000.pdf',
+    );
   });
 
   test('has no WCAG violations', async ({ page }) => {

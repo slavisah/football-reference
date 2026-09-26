@@ -32,6 +32,25 @@ test.describe('Copa América edition page', () => {
     await expect(ecuadorRow).toHaveAttribute('href', /\/competitions\/copa-america\/1959-ecuador\/?$/);
   });
 
+  test('both 1959 links carry a host-disambiguating aria-label - identical visible text would otherwise read the same to a screen reader\'s links list', async ({
+    page,
+  }) => {
+    await page.goto('competitions/copa-america');
+    const argentinaRow = page.locator('tbody tr[data-year="1959"][data-host="Argentina"] a', {
+      hasText: '1959',
+    });
+    const ecuadorRow = page.locator('tbody tr[data-year="1959"][data-host="Ecuador"] a', {
+      hasText: '1959',
+    });
+    await expect(argentinaRow).toHaveAttribute('aria-label', '1959 (Argentina)');
+    await expect(ecuadorRow).toHaveAttribute('aria-label', '1959 (Ecuador)');
+
+    // A normal, non-duplicate year keeps its plain text as its accessible
+    // name - the aria-label is only added where it's actually needed.
+    const normalYearLink = page.locator('tbody tr[data-year="2024"] a', { hasText: '2024' });
+    await expect(normalYearLink).not.toHaveAttribute('aria-label');
+  });
+
   test('each 1959 page shows its own champion, distinguished by host in the title', async ({ page }) => {
     await page.goto('competitions/copa-america/1959-argentina');
     await expect(page.locator('h1')).toHaveText('1959 (Argentina) Copa América');
@@ -69,6 +88,31 @@ test.describe('Copa América edition page', () => {
     const back = page.locator('.edition__back a');
     await expect(back).toContainText('All Copa América editions');
     await expect(back).toHaveAttribute('href', /\/competitions\/copa-america\/?$/);
+  });
+
+  // The print-only PDF pager (EditionView.astro's `pdfPreviousUrl`/
+  // `pdfNextUrl`) reuses `EditionProfile.previous`/`.next`'s own already
+  // host-disambiguated `.slug`, so the two 1959 editions' PDF hrefs need the
+  // same "-argentina"/"-ecuador" disambiguation the on-page pager above gets
+  // - a real edge case a plain year-only test could never exercise. Full
+  // coverage of the mechanism itself (hidden on screen, visible under print,
+  // both languages) lives on the shared component's flagship test in
+  // edition-page.spec.ts (World Cup).
+  test('the print-only PDF pager keeps the host disambiguation between the two 1959 editions\' own PDFs', async ({
+    page,
+  }) => {
+    await page.goto('competitions/copa-america/1959-argentina');
+    await page.emulateMedia({ media: 'print' });
+
+    const pdfPager = page.locator('.edition__pdf-pager');
+    await expect(pdfPager.locator('a', { hasText: 'Previous edition (PDF)' })).toHaveAttribute(
+      'href',
+      'https://slavisah.github.io/football-reference/downloads/edition-copa-america-1957.pdf',
+    );
+    await expect(pdfPager.locator('a', { hasText: 'Next edition (PDF)' })).toHaveAttribute(
+      'href',
+      'https://slavisah.github.io/football-reference/downloads/edition-copa-america-1959-ecuador.pdf',
+    );
   });
 
   test('has no horizontal page overflow at 360px on either 1959 page', async ({ page }) => {
@@ -115,7 +159,7 @@ test.describe('Croatian Copa América edition page', () => {
   test('renders translated chrome with the host disambiguator carried through', async ({ page }) => {
     await page.goto('hr/competitions/copa-america/1959-argentina');
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
-    await expect(page.locator('h1')).toHaveText('1959. (Argentina) Copa América');
+    await expect(page.locator('h1')).toHaveText('Copa América 1959. (Argentina)');
     await expect(page.locator('.edition__fact', { hasText: 'Prvak' })).toContainText('Argentina');
     await expect(page.locator('.references__note')).toContainText('Prednost imaju primarni izvori');
   });
@@ -128,6 +172,7 @@ test.describe('Croatian Copa América edition page', () => {
       hasText: '1959',
     });
     await expect(ecuadorRow).toHaveAttribute('href', /\/hr\/competitions\/copa-america\/1959-ecuador\/?$/);
+    await expect(ecuadorRow).toHaveAttribute('aria-label', '1959 (Ecuador)');
   });
 
   test('the pager uses Croatian copy alongside the host disambiguator', async ({ page }) => {

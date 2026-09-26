@@ -42,6 +42,7 @@ test.describe('theme toggle, English home page', () => {
     await openMenu(page);
     const toggle = page.locator('#theme-toggle');
     const label = page.locator('#theme-toggle .theme-toggle__label');
+    const themeColorMeta = page.locator('#theme-color-meta');
 
     // Fresh visit, no saved preference: the client script's sync() runs once
     // on load and falls back to the emulated OS color scheme (Playwright's
@@ -52,6 +53,10 @@ test.describe('theme toggle, English home page', () => {
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
     await expect(label).toHaveText('Light');
     expect(await page.evaluate(() => localStorage.getItem('theme'))).toBeNull();
+    // BaseLayout's before-paint script resolves the same light default and
+    // points the mobile browser-chrome tint at --light-accent (global.css) -
+    // confirming it never ships stuck on the server-rendered fallback value.
+    await expect(themeColorMeta).toHaveAttribute('content', '#1f6f4f');
 
     await toggle.click();
 
@@ -59,6 +64,9 @@ test.describe('theme toggle, English home page', () => {
     await expect(label).toHaveText('Dark');
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('dark');
+    // --dark-accent (global.css), so a dark-mode reader's browser chrome
+    // tints to the same green the toggle icon/accent color already uses.
+    await expect(themeColorMeta).toHaveAttribute('content', '#46c08a');
 
     // The click itself introduces no new DOM, but the whole page's rendered
     // colors are now driven by the dark palette - confirm that live state
@@ -72,8 +80,95 @@ test.describe('theme toggle, English home page', () => {
     await expect(label).toHaveText('Light');
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
     expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('light');
+    await expect(themeColorMeta).toHaveAttribute('content', '#1f6f4f');
 
     await runAxe(page);
+  });
+
+  // Regression coverage for a real gap: before this run, the theme-toggle's
+  // own visible label/aria-pressed and the theme-color meta tag only ever
+  // resolved the OS color scheme once, at load - a reader who never clicked
+  // the toggle but whose OS switched theme mid-session (e.g. a scheduled
+  // dark-mode switch at sunset) would keep seeing "Light"/aria-pressed=false
+  // and the light-mode browser-chrome tint until their next full reload,
+  // even though every CSS color token already updated live via global.css's
+  // own `@media (prefers-color-scheme: dark)` block.
+  test('a live OS color-scheme change updates the toggle and theme-color meta without a reload, unless a manual choice was saved', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.goto('');
+    await openMenu(page);
+
+    const toggle = page.locator('#theme-toggle');
+    const label = page.locator('#theme-toggle .theme-toggle__label');
+    const themeColorMeta = page.locator('#theme-color-meta');
+
+    await expect(label).toHaveText('Light');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(themeColorMeta).toHaveAttribute('content', '#1f6f4f');
+
+    await page.emulateMedia({ colorScheme: 'dark' });
+
+    await expect(label).toHaveText('Dark');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(themeColorMeta).toHaveAttribute('content', '#46c08a');
+    // No manual choice was ever made by clicking the toggle, so this stays
+    // an OS-driven preference, not a saved override.
+    expect(await page.evaluate(() => localStorage.getItem('theme'))).toBeNull();
+
+    // Once a reader does make a manual choice, it must stick even if the OS
+    // preference changes again afterward - the same "manual override wins"
+    // rule `current()`/ThemeToggle's change-listener guard already apply.
+    await toggle.click();
+    await expect(label).toHaveText('Light');
+    expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('light');
+
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await expect(label).toHaveText('Light');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(themeColorMeta).toHaveAttribute('content', '#1f6f4f');
+  });
+
+  // Regression test for a real bug: `.site-menu.is-open` (the mobile drawer)
+  // switches to `flex-direction: column` but, until fixed, kept inheriting
+  // `.site-menu`'s own row-layout `flex-wrap: wrap` - so once the drawer's
+  // stacked content (nav list + both search fields + lang switch + theme
+  // toggle) grew taller than the drawer's own `max-height`, the column
+  // wrapped into a second column pushed off past the viewport's right edge
+  // instead of just overflowing vertically for `overflow-y: auto` to scroll.
+  // The theme toggle, last in DOM order, landed almost entirely outside the
+  // 360px viewport - invisible to a real touch/mouse user, even though every
+  // other test in this file kept passing: `.click()` and attribute
+  // assertions don't check whether an element is visually within its
+  // scrollable container's own bounds, and `document.documentElement`'s own
+  // scrollWidth never grew, because the drawer's own contained overflow-x
+  // (computed 'auto' per spec, since only overflow-y was set) never
+  // propagates to the document root - the exact blind spot
+  // `check:reflow`/"the open drawer adds no horizontal overflow" (both of
+  // which only ever measure document-level overflow) share.
+  test('the theme toggle stays inside the drawer, not wrapped into an off-screen column', async ({
+    page,
+  }) => {
+    await page.goto('');
+    await openMenu(page);
+
+    const menuBox = (await page.locator('#site-menu').boundingBox())!;
+    // The language switch is the drawer's previous item in DOM order, inset
+    // by the same padding as the toggle - the right basis for "same column,
+    // full-width" rather than the padded `#site-menu` box itself.
+    const langSwitchBox = (await page.locator('.lang-switch').boundingBox())!;
+    const toggleBox = (await page.locator('#theme-toggle').boundingBox())!;
+
+    // Same column, same width as its sibling controls - not sized down to
+    // its own content and shunted into a second column.
+    expect(toggleBox.x).toBeCloseTo(langSwitchBox.x, 0);
+    expect(toggleBox.width).toBeCloseTo(langSwitchBox.width, 0);
+    expect(toggleBox.x + toggleBox.width).toBeLessThanOrEqual(menuBox.x + menuBox.width + 1);
+
+    // Stacked after the language switch (the previous item in DOM order),
+    // not floated back up to the top of a phantom next column.
+    expect(toggleBox.y).toBeGreaterThan(langSwitchBox.y);
   });
 
   test('is keyboard-operable and the saved choice survives a reload', async ({ page }) => {
@@ -147,6 +242,14 @@ test.describe('theme toggle, quiz page', () => {
     await openMenu(page);
     await page.locator('#theme-toggle').click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+
+    // Close the drawer before touching the quiz cards below it - now that it
+    // correctly stacks every control in one column (see the fixed
+    // `flex-wrap` bug this file's "stays inside the drawer" test guards),
+    // its own scrollable height legitimately spans nearly the full viewport
+    // at this screen size, covering the first couple of cards otherwise.
+    await page.locator('#menu-toggle').click();
+    await expect(page.locator('#site-menu')).toBeHidden();
 
     // Answer the first two choice cards - one right, one deliberately wrong -
     // so both feedback classes render under the toggle-driven dark palette,

@@ -54,6 +54,7 @@ const jsonLd = [
   buildCollectionPageJsonLd(buildChampionsItemList(data.champions, { pageUrl, name: championsName }), {
     pageUrl,
     name: championsName,
+    dateModified: data.lastReviewed,
   }),
   buildLatestEditionSportsEvent(data.editions, data.title),
 ].filter((item): item is JsonLdObject => item !== undefined);
@@ -95,7 +96,7 @@ const notes: NoteSection[] = [
       '2015.: Estadio Nacional Julio Martínez Prádanos, Santiago (Čile).',
       '2016.: MetLife Stadium, East Rutherford, New Jersey (Sjedinjene Američke Države) - Copa América Centenario.',
       '2019.: Estádio do Maracanã, Rio de Janeiro (Brazil).',
-      '2021.: Estádio do Maracanã, Rio de Janeiro (Brazil) - isti stadion kao finale 2019.; utakmica je odigrana bez gledatelja na tribinama zbog ograničenja uvedenih tijekom pandemije bolesti COVID-19, uz prijavljenih samo 6500 gledatelja (mali dio uobičajenog kapaciteta stadiona), jedno od najpraznijih finala u povijesti natjecanja.',
+      '2021.: Estádio do Maracanã, Rio de Janeiro (Brazil) - isti stadion kao finale 2019.; utakmica je odigrana bez gledatelja na tribinama zbog ograničenja uvedenih tijekom pandemije bolesti COVID-19, uz prijavljenih samo 6.500 gledatelja (mali dio uobičajenog kapaciteta stadiona), jedno od najpraznijih finala u povijesti natjecanja.',
       '2024.: Hard Rock Stadium, Miami Gardens, Florida (Sjedinjene Američke Države).',
     ],
   },
@@ -185,7 +186,7 @@ const notes: NoteSection[] = [
       '2019.: Everton (Brazil); Paolo Guerrero (Peru) - po 3 gola - Guerrerova treća nagrada, najviše od svih igrača.',
       '2021.: Lionel Messi (Argentina); Luis Díaz (Kolumbija) - po 4 gola.',
       '2024.: Lautaro Martínez (Argentina) - 5 golova.',
-      'Paolo Guerrerova tri osvajanja nagrade (2011., 2015., 2019.) najviše su od svih igrača; Eduardo Vargas jedini je igrač koji je nagradu osvojio u uzastopnim izdanjima (2015. i 2016.).',
+      'Paolo Guerrerova tri osvajanja nagrade (2011., 2015., 2019.) najviše su od svih igrača; Eduardo Vargas (2015. i 2016.) i Pedro Petrone (1923. i 1924.) jedini su igrači koji su nagradu osvojili u uzastopnim izdanjima.',
     ],
   },
   {
@@ -241,7 +242,7 @@ const notes: NoteSection[] = [
   {
     heading: 'Kapetani prvaka',
     items: [
-      'Kapetan je igrač koji na podiju podiže pehar. Za razliku od odjeljka "Izbornici prvaka" iznad, koji je pouzdano potvrđen sve do 1975. godine, ime kapetana pokazalo se znatno težom činjenicom za potvrditi na ovom natjecanju: raniji istraživački prolaz ocijenio je cijelo razdoblje 1975.-2010. presporno nepouzdanim za objavu, nakon što su neovisne provjere izravno opovrgnule dva izdanja koja je prvi prolaz već bio zabilježio kao potvrđena. Kasniji, temeljitiji prolaz - koji svako izdanje provjerava naspram najmanje dva neovisna izvora, isto mjerilo koje koristi svaki drugi odjeljak bilješki na ovoj stranici - uspio je potvrditi deset od tih trinaest izdanja, a dva naknadna prolaza razriješila su i ostatak: **1983.** (Rodolfo Rodríguez - njegova vlastita biografija i posvećena povijest kapetana urugvajske reprezentacije neovisno potvrđuju da je nosio vrpcu tijekom cijelog razdoblja 1980.-1986., uključujući ovaj naslov, čime je razriješena ranija sumnja "ključni igrač, nepotvrđen kao kapetan"), **1987.** (José Perdomo - ranija nedoumica "izvori se razilaze oko toga tko je uopće isključen" pokazala se jednostavnim objašnjenjem: i on i Enzo Francescoli isključeni su u tom finalu, u različitim minutama, no vrpcu je nosio samo Perdomo, koji se vratio na podij podići pehar), i **1979.** (Aldo Florentín - paragvajskog redovitog kapetana Huga Talaveru kontroverzno je izostavio predsjednik saveza neposredno prije odlučujuće utakmice zbog nepovezanog spora; njegova vlastita biografija i neovisno paragvajsko novinsko izvještavanje o dodjeli pehara potvrđuju da je Florentín nosio vrpcu i primio pehar umjesto njega), čime je zatvorena posljednja preostala praznina u ovom odjeljku.',
+      'Kapetan je igrač koji na podiju podiže pehar. Za razliku od odjeljka "Izbornici prvaka" iznad, koji je pouzdano potvrđen sve do 1975. godine, ime kapetana pokazalo se znatno težom činjenicom za potvrditi na ovom natjecanju: raniji istraživački prolaz ocijenio je cijelo razdoblje 1975.-2010. previše nepouzdanim za objavu, nakon što su neovisne provjere izravno opovrgnule dva izdanja koja je prvi prolaz već bio zabilježio kao potvrđena. Kasniji, temeljitiji prolaz - koji svako izdanje provjerava naspram najmanje dva neovisna izvora, isto mjerilo koje koristi svaki drugi odjeljak bilješki na ovoj stranici - uspio je potvrditi deset od tih trinaest izdanja, a dva naknadna prolaza razriješila su i ostatak: **1983.** (Rodolfo Rodríguez - njegova vlastita biografija i posvećena povijest kapetana urugvajske reprezentacije neovisno potvrđuju da je nosio vrpcu tijekom cijelog razdoblja 1980.-1986., uključujući ovaj naslov, čime je razriješena ranija sumnja "ključni igrač, nepotvrđen kao kapetan"), **1987.** (José Perdomo - ranija nedoumica "izvori se razilaze oko toga tko je uopće isključen" pokazala se jednostavnim objašnjenjem: i on i Enzo Francescoli isključeni su u tom finalu, u različitim minutama, no vrpcu je nosio samo Perdomo, koji se vratio na podij podići pehar), i **1979.** (Aldo Florentín - paragvajskog redovitog kapetana Huga Talaveru kontroverzno je izostavio predsjednik saveza neposredno prije odlučujuće utakmice zbog nepovezanog spora; njegova vlastita biografija i neovisno paragvajsko novinsko izvještavanje o dodjeli pehara potvrđuju da je Florentín nosio vrpcu i primio pehar umjesto njega), čime je zatvorena posljednja preostala praznina u ovom odjeljku.',
       '1975.: Héctor Chumpitaz (Peru) - nadimak "Capitán de América" za dva desetljeća vođenja reprezentacije; kapetan Perua i na Svjetskim prvenstvima 1970. i 1978.',
       '1979.: Aldo Florentín (Paragvaj) - preuzeo je vrpcu nakon što je redovitog kapetana Huga Talaveru kontroverzno izostavio predsjednik saveza neposredno prije odlučujuće serije; podigao je pehar nakon što je izjednačeno dvomečno finale protiv Čilea odlučeno trećom utakmicom.',
       '1983.: Rodolfo Rodríguez (Urugvaj) - stalni vratar momčadi i kapetan reprezentacije tijekom cijelog razdoblja 1980.-1986.; podigao je pehar nakon što je dvomeč finala protiv Brazila odlučen rezultatom 3:1 u bodovima.',
@@ -251,7 +252,7 @@ const notes: NoteSection[] = [
       '1993.: Oscar Ruggeri (Argentina) - njegova druga, uzastopna titula, sam je zabio gol u finalu.',
       '1995.: Enzo Francescoli (Urugvaj) - njegov treći i posljednji naslov na Copa Américi, iako je Pablo Bengoechea kasnim izjednačujućim golom donio produžetak koji je odveo na jedanaesterce koje je Urugvaj dobio.',
       '1997.: Dunga (Brazil) - Brazilov prvi naslov osvojen izvan domaćeg terena.',
-      '1999.: Cafu (Brazil) - istu vrpcu nosio je i na naslovu Svjetskog prvenstva dvije godine kasnije, zbog čega je u Brazilu prozvan "Capitão do Penta" (kapetan pete zvjezdice).',
+      '1999.: Cafu (Brazil) - istu vrpcu nosio je i na naslovu Svjetskog prvenstva tri godine kasnije, zbog čega je u Brazilu prozvan "Capitão do Penta" (kapetan pete zvjezdice).',
       '2001.: Iván Córdoba (Kolumbija) - sam je zabio jedini gol finala, Kolumbijin jedini naslov na Copa Américi.',
       '2004.: Alex (Brazil) - to je izdanje postavio i rekord natjecanja po broju asistencija.',
       '2007.: Lúcio (Brazil).',
@@ -303,6 +304,7 @@ const headerLabels: Record<string, string> = {
   locale="hr"
   alternateHref={withBase('/competitions/copa-america')}
   jsonLd={jsonLd}
+  dateModified={data.lastReviewed}
 >
   <article class="competition stack">
     <header class="competition__header">

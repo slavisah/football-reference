@@ -61,6 +61,25 @@ test.describe('Ballon d\'Or edition page', () => {
     await expect(page.locator('.edition__pager-link--next')).toBeVisible();
   });
 
+  // Spot check for this family's own "edition-ballon-dor-<slug>" PDF prefix -
+  // full coverage of the print-only PDF pager mechanism itself (hidden on
+  // screen, visible under print, both languages) lives on the shared
+  // component's flagship test in edition-page.spec.ts (World Cup).
+  test('the print-only PDF pager links to the sibling Ballon d\'Or editions\' own PDFs', async ({ page }) => {
+    await page.goto('competitions/ballon-dor/2018');
+    await page.emulateMedia({ media: 'print' });
+
+    const pdfPager = page.locator('.edition__pdf-pager');
+    await expect(pdfPager.locator('a', { hasText: 'Previous edition (PDF)' })).toHaveAttribute(
+      'href',
+      'https://slavisah.github.io/football-reference/downloads/edition-ballon-dor-2017.pdf',
+    );
+    await expect(pdfPager.locator('a', { hasText: 'Next edition (PDF)' })).toHaveAttribute(
+      'href',
+      'https://slavisah.github.io/football-reference/downloads/edition-ballon-dor-2019.pdf',
+    );
+  });
+
   test('links back to the full award table', async ({ page }) => {
     await page.goto('competitions/ballon-dor/2018');
     const back = page.locator('.edition__back a');

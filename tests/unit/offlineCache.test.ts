@@ -8,9 +8,9 @@ describe('buildPrecacheUrls', () => {
     const urls = buildPrecacheUrls('/football-reference/');
 
     expect(urls[0]).toBe('/football-reference/');
-    expect(urls).toContain('/football-reference/competitions/world-cup');
-    expect(urls).toContain('/football-reference/competitions/golden-boot');
-    expect(urls).toContain('/football-reference/quiz');
+    expect(urls).toContain('/football-reference/competitions/world-cup/');
+    expect(urls).toContain('/football-reference/competitions/golden-boot/');
+    expect(urls).toContain('/football-reference/quiz/');
     expect(urls).toContain('/football-reference/manifest.webmanifest');
     expect(urls).toContain('/football-reference/icons/icon-512.png');
   });
@@ -19,15 +19,35 @@ describe('buildPrecacheUrls', () => {
     const urls = buildPrecacheUrls('/football-reference/');
 
     expect(urls).toContain('/football-reference/hr/');
-    expect(urls).toContain('/football-reference/hr/competitions/world-cup');
-    expect(urls).toContain('/football-reference/hr/competitions/golden-boot');
-    expect(urls).toContain('/football-reference/hr/quiz');
-    expect(urls).toContain('/football-reference/hr/records');
-    expect(urls).toContain('/football-reference/hr/compare');
-    expect(urls).toContain('/football-reference/hr/teams');
-    expect(urls).toContain('/football-reference/hr/players');
-    expect(urls).toContain('/football-reference/hr/compare-players');
-    expect(urls).toContain('/football-reference/hr/about/sources');
+    expect(urls).toContain('/football-reference/hr/competitions/world-cup/');
+    expect(urls).toContain('/football-reference/hr/competitions/golden-boot/');
+    expect(urls).toContain('/football-reference/hr/quiz/');
+    expect(urls).toContain('/football-reference/hr/records/');
+    expect(urls).toContain('/football-reference/hr/compare/');
+    expect(urls).toContain('/football-reference/hr/teams/');
+    expect(urls).toContain('/football-reference/hr/players/');
+    expect(urls).toContain('/football-reference/hr/compare-players/');
+    expect(urls).toContain('/football-reference/hr/about/sources/');
+  });
+
+  it('gives every page entry a trailing slash, matching BaseLayout.astro\'s own canonical-URL convention - only the static (non-route) assets stay bare', () => {
+    const urls = buildPrecacheUrls('/football-reference/');
+    const staticAssetUrls = new Set(
+      [
+        '/manifest.webmanifest',
+        '/hr/manifest.webmanifest',
+        '/favicon.svg',
+        '/icons/icon-192.png',
+        '/icons/icon-512.png',
+        '/icons/icon-maskable-192.png',
+        '/icons/icon-maskable-512.png',
+      ].map((path) => `/football-reference${path}`),
+    );
+
+    for (const url of urls) {
+      if (staticAssetUrls.has(url)) continue;
+      expect(url.endsWith('/'), `expected page URL "${url}" to end with a trailing slash`).toBe(true);
+    }
   });
 
   it('every NAV_LINKS path has a Croatian translation, so none is silently English-only offline', () => {
@@ -51,8 +71,8 @@ describe('buildPrecacheUrls', () => {
   it('works with a bare "/" base path (local dev)', () => {
     const urls = buildPrecacheUrls('/');
     expect(urls[0]).toBe('/');
-    expect(urls).toContain('/quiz');
-    expect(urls).toContain('/hr/quiz');
+    expect(urls).toContain('/quiz/');
+    expect(urls).toContain('/hr/quiz/');
     expect(urls).toContain('/manifest.webmanifest');
     expect(urls.every((url) => !url.includes('//'))).toBe(true);
   });
@@ -108,8 +128,8 @@ describe('buildPrecacheUrls with an untranslated nav path', () => {
     }));
     const { buildPrecacheUrls: buildPrecacheUrlsWithMock } = await import('../../src/lib/offlineCache');
     const urls = buildPrecacheUrlsWithMock('/football-reference/');
-    expect(urls).toContain('/football-reference/only-english');
-    expect(urls).not.toContain('/football-reference/hr/only-english');
+    expect(urls).toContain('/football-reference/only-english/');
+    expect(urls).not.toContain('/football-reference/hr/only-english/');
     vi.doUnmock('../../src/lib/routes');
     vi.resetModules();
   });

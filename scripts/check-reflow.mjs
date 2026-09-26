@@ -25,23 +25,21 @@
 // manual/intensive-run tool rather than a required PR gate. Run manually
 // (`pnpm check:reflow`) after `pnpm build`.
 //
-// Reuses the `astro preview` daemon dance and Chromium-launch escape hatches
-// `scripts/check-lighthouse.mjs` already worked out (see that script's own
-// doc comment for the full "Astro 7 forks preview into a background daemon"
-// story and the PW_EXECUTABLE_PATH/PW_CHROME_CHANNEL fallbacks this
-// sandbox's pre-installed Chromium needs), and the site-wide HTML file walk
+// Reuses the shared `astro preview` daemon dance and Chromium launcher
+// (`scripts/preview-daemon.mjs` - see that module's own doc comment for the
+// full "Astro 7 forks preview into a background daemon" story and the
+// PW_EXECUTABLE_PATH/PW_CHROME_CHANNEL fallbacks this sandbox's
+// pre-installed Chromium needs), and the site-wide HTML file walk
 // `scripts/check-internal-links.mjs` already established (`listHtmlFiles()`).
 
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { chromium } from '@playwright/test';
 import { listHtmlFiles } from './check-internal-links.mjs';
+import { launchChromium, startPreviewDaemon, stopPreviewDaemon } from './preview-daemon.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const DIST_DIR = path.join(ROOT, 'dist');
-const astroBin = path.join(ROOT, 'node_modules', '.bin', 'astro');
 const PORT = process.env.PORT ?? '4321';
 const BASE = process.env.BASE_PATH ?? '/football-reference';
 const ORIGIN = `http://localhost:${PORT}`;
@@ -84,42 +82,6 @@ async function listAllPages() {
   return pages.filter((page) => page !== null).sort();
 }
 
-function stopPreviewDaemon() {
-  spawnSync(astroBin, ['preview', 'stop'], { cwd: ROOT, stdio: 'inherit' });
-}
-
-async function waitForServer(url, timeoutMs = 60_000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(url);
-      if (res.ok) return;
-    } catch {
-      // not up yet
-    }
-    await new Promise((resolve) => setTimeout(resolve, 300));
-  }
-  throw new Error(`Preview server at ${url} did not become ready in time`);
-}
-
-async function startPreviewDaemon() {
-  stopPreviewDaemon();
-  console.log('Starting `astro preview`...');
-  spawnSync(astroBin, ['preview', '--port', PORT, '--host'], { cwd: ROOT, stdio: 'inherit' });
-  await waitForServer(`${ORIGIN}${BASE}/`);
-  console.log(`Preview server ready at ${ORIGIN}${BASE}/`);
-}
-
-async function launchChromium() {
-  const launchOptions = { headless: true };
-  if (process.env.PW_EXECUTABLE_PATH) {
-    launchOptions.executablePath = process.env.PW_EXECUTABLE_PATH;
-  } else if (process.env.PW_CHROME_CHANNEL) {
-    launchOptions.channel = process.env.PW_CHROME_CHANNEL;
-  }
-  return chromium.launch(launchOptions);
-}
-
 // Allow a 1px rounding tolerance, matching every hand-written overflow
 // assertion in tests/e2e/mobile.spec.ts.
 export const OVERFLOW_TOLERANCE_PX = 1;
@@ -157,7 +119,7 @@ async function main() {
     }
   } finally {
     await browser.close();
-    stopPreviewDaemon();
+    await stopPreviewDaemon();
   }
 
   const failures = pagesOverflowing(measurements);
@@ -184,9 +146,9 @@ async function main() {
 // `node scripts/check-reflow.mjs`), the same guard check-internal-links.mjs
 // already established.
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
+  main().catch(async (error) => {
     console.error(error);
-    stopPreviewDaemon();
+    await stopPreviewDaemon();
     process.exitCode = 1;
   });
 }

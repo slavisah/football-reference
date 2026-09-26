@@ -96,6 +96,14 @@ const themeWord = t(locale, 'themeLabel');
     if (btn && word) {
       btn.setAttribute('aria-label', `${btn.dataset.themeWord}: ${word}`);
     }
+    // Keep the mobile browser-chrome tint (BaseLayout's #theme-color-meta,
+    // set pre-paint from the same saved-theme/OS-preference resolution
+    // `current()` above mirrors) matching whichever theme is now active.
+    const meta = document.getElementById('theme-color-meta');
+    if (meta instanceof HTMLMetaElement) {
+      const content = theme === 'dark' ? meta.dataset.dark : meta.dataset.light;
+      if (content) meta.content = content;
+    }
   }
 
   btn?.addEventListener('click', () => {
@@ -105,6 +113,20 @@ const themeWord = t(locale, 'themeLabel');
       localStorage.setItem('theme', next);
     } catch {
       /* ignore storage failures (private mode) */
+    }
+    sync();
+  });
+
+  // A reader who never manually toggled (no saved override, so `current()`
+  // still falls through to the OS preference) gets the same live update
+  // for a mid-session OS theme switch that global.css's own
+  // `@media (prefers-color-scheme: dark)` block already gives every color
+  // token - without this, only a reload would pick it up.
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    try {
+      if (localStorage.getItem('theme')) return; // manual override wins, unaffected by OS changes
+    } catch {
+      /* ignore storage failures (private mode); fall through and resync from matchMedia */
     }
     sync();
   });

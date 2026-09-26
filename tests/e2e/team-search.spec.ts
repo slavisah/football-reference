@@ -77,13 +77,43 @@ test.describe('Find a team (English)', () => {
     await expect(page.locator('#team-search-listbox')).toBeHidden();
   });
 
-  test('Escape closes an open listbox without navigating', async ({ page }) => {
+  test('Escape closes an open listbox without navigating, without also closing the drawer', async ({ page }) => {
     await page.goto('');
     await openAndType(page, 'brazil');
     await expect(page.locator('#team-search-listbox')).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(page.locator('#team-search-listbox')).toBeHidden();
     await expect(page).toHaveURL(/\/football-reference\/?$/);
+    // Regression: this Escape used to bubble past the widget and also
+    // trigger the mobile drawer's own Escape handler, closing the whole
+    // drawer and yanking focus to the menu button in the same keystroke.
+    await expect(page.locator('#menu-toggle')).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('#team-search-input')).toBeFocused();
+  });
+
+  test('a second Escape, once the listbox is already closed, clears the input without closing the drawer', async ({
+    page,
+  }) => {
+    await page.goto('');
+    await openAndType(page, 'brazil');
+    await expect(page.locator('#team-search-listbox')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#team-search-listbox')).toBeHidden();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#team-search-input')).toHaveValue('');
+    await expect(page.locator('#menu-toggle')).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('#team-search-input')).toBeFocused();
+  });
+
+  test('a third Escape, once the input is already empty, falls through and closes the drawer', async ({ page }) => {
+    await page.goto('');
+    await openAndType(page, 'brazil');
+    await page.keyboard.press('Escape');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#team-search-input')).toHaveValue('');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#menu-toggle')).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator('#menu-toggle')).toBeFocused();
   });
 
   test('ArrowDown then Enter selects the active option and navigates to /compare?a=<id>', async ({ page }) => {

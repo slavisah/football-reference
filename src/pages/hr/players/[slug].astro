@@ -23,7 +23,7 @@ import {
   type PlayerProfile,
 } from '../../../lib/playerProfile';
 import { buildPlayerPersonJsonLd, buildPlayerProfileItemList, type JsonLdObject } from '../../../lib/jsonLd';
-import type { SourceLink } from '../../../lib/sources';
+import { disambiguateLabels, type SourceLink } from '../../../lib/sources';
 import { absolutePageUrl, withBase } from '../../../lib/url';
 
 export async function getStaticPaths() {
@@ -47,9 +47,11 @@ export async function getStaticPaths() {
 
   const profiles = buildAllPlayerProfiles(sources, { goalsLabel: 'golova' });
 
-  const combinedSources = [ballonDor.sources, worldCupGoldenBoot.sources, euroGoldenBoot.sources]
-    .flat()
-    .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+  const combinedSources = disambiguateLabels(
+    [ballonDor.sources, worldCupGoldenBoot.sources, euroGoldenBoot.sources]
+      .flat()
+      .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index),
+  );
   const lastReviewed = [ballonDor.lastReviewed, worldCupGoldenBoot.lastReviewed, euroGoldenBoot.lastReviewed]
     .sort()
     .at(-1) as string;
@@ -100,6 +102,7 @@ const jsonLd: JsonLdObject[] =
   alternateHref={withBase(`/players/${slug}`)}
   jsonLd={jsonLd}
   breadcrumbTrail={[{ name: 'Igrači', url: withBase('/hr/players') }]}
+  dateModified={lastReviewed}
 >
   <article class="player-profile stack">
     <header class="player-profile__header">

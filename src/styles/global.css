@@ -271,10 +271,25 @@ a {
   color: var(--accent);
 }
 
+/* `summary` is a real, natively keyboard-focusable element (the trigger
+   half of every `<details>` disclosure on this site: the quiz's "Just show
+   me the answer" cards in QuizCard.astro/QuizOrderCard.astro, and
+   TournamentTable.astro's "story reveal" rows) but was missing from this
+   selector list, so it fell all the way through to the browser's own
+   unstyled `outline: auto` ring instead of the site's `--focus` token like
+   every other control. That's not just a style inconsistency: in dark mode
+   Chromium's own default focus-ring color renders as a near-black
+   (~#101010) outline against this site's `--dark-bg` (#0f1520) - a measured
+   contrast ratio of about 1.04:1, i.e. functionally invisible - while
+   `--dark-focus` (#6ba6ff) exists specifically to stay visible against that
+   same background. Confirmed via a real keyboard Tab walk with
+   `:focus-visible` matching true before filing this, not assumed from
+   reading the CSS alone. */
 a:focus-visible,
 button:focus-visible,
 select:focus-visible,
 input:focus-visible,
+summary:focus-visible,
 [tabindex]:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
@@ -372,6 +387,22 @@ main {
   border: 0;
 }
 
+/*
+ * Mirror image of `.no-print` below: hidden during normal browsing, shown
+ * only when printing or generating a PDF (scripts/generate-pdfs.mjs emulates
+ * print media before rendering). Added for content that only makes sense on
+ * the printed/PDF page and would be redundant clutter on screen - e.g.
+ * EditionView.astro's PDF-to-PDF cross-reference pager, a link to the
+ * sibling edition's own downloadable PDF file that only matters to a reader
+ * who is already reading a downloaded PDF (the live web page already has its
+ * own on-page pager to the sibling edition's live page). No prior use of
+ * this "opposite of .no-print" direction existed anywhere in this codebase
+ * before this one.
+ */
+.print-only {
+  display: none;
+}
+
 /* --- Print: readable A4-landscape tournament sheets --- */
 @page {
   size: A4 landscape;
@@ -403,6 +434,16 @@ main {
   .filters__reset,
   .no-print {
     display: none !important;
+  }
+
+  /* Reveal `.print-only` content (see that class's own comment above). A
+     bare `display: block` here is only the default toggle; a more specific
+     component (e.g. EditionView.astro's `.edition__pdf-pager`) can still set
+     its own `display` value under its own `@media print` block afterward -
+     Astro's scoped-style attribute selector always outranks this plain
+     global class regardless of source order. */
+  .print-only {
+    display: block;
   }
 
   main {
@@ -445,10 +486,17 @@ main {
      layout actually fits the A4-landscape page, so this had no automated
      coverage. `table-layout: fixed` plus wrapping cells makes every column
      share the page width and wrap its own content instead of growing past
-     it - TournamentTable.astro's own scoped `<style>` block carries the
-     matching header-`white-space` override this needs (its `thead th`
-     `nowrap` rule has scoping-attribute specificity a plain selector here
-     can never outrank, see that file's own comment). */
+     it. This rule covers every plain, unscoped `.t-wrap` user (`/compare`,
+     `/compare-players`, `/records`); TournamentTable.astro's own `.t-wrap`
+     (used by every edition/award table site-wide) needs the same reset
+     duplicated inside its own scoped `<style>` block instead, the same way
+     that file's own `thead th` print override already does and explains:
+     Astro's scoping attribute gives its rules more specificity than this
+     plain selector can ever win against - confirmed the hard way, not just
+     read off that file's comment, when this component's own bounded
+     `max-height`/sticky-header fix (see that file's comment) needed the
+     identical reset and an attempt to add it only here, unscoped, measurably
+     had no effect on the built page's computed print styles. */
   .t-wrap {
     overflow-x: visible;
   }
@@ -475,8 +523,22 @@ main {
     display: table-header-group;
   }
 
+  /* Every bordered "one row per year" box on paper - `.podium__card`/
+     `.timeline__card` (competition landing pages, /records), and the
+     player/team profile pages' own award-history boxes - needs the same
+     protection `.champions__item` already had: without it, a box that falls
+     across a printed page boundary gets its border and background cut in
+     half instead of moving whole onto the next page. Confirmed as a real,
+     live defect (not just a theoretical gap) by measuring every one of
+     these elements' offsetTop against the A4-landscape page height on
+     /records, /competitions/world-cup, /competitions/copa-america and
+     /teams/argentina - dozens of boxes straddled a page boundary on each. */
   tr,
-  .champions__item {
+  .champions__item,
+  .podium__card,
+  .timeline__card,
+  .player-profile__list li,
+  .team-profile__list li {
     break-inside: avoid;
   }
 
@@ -506,5 +568,40 @@ main {
     font-size: 9pt;
     color: #333;
     word-break: break-all;
+  }
+
+  /* ChampionsSummary.astro's bar track/fill are built from flat `background`
+     colors only (no border or pattern inside the bar itself). Chromium,
+     Firefox and Edge all default to *not* printing background colors on a
+     reader's own direct browser print (Ctrl+P) unless "Background graphics"
+     is manually checked in the print dialog - so without this, both the
+     track and the fill vanish, leaving a blank gap between a champion's
+     title count and its winning years. This doesn't affect the site's own
+     700 pre-generated downloadable PDFs - `scripts/generate-pdfs.mjs`
+     already passes `printBackground: true` there - only a reader's own
+     Ctrl+P of the live page, which has no such override. */
+  .champions__bar,
+  .champions__bar-fill {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Same root cause as the champions bar above, but a worse symptom: these
+     buttons (index.astro/hr/index.astro's ".btn--primary" hero CTA;
+     QuizCard.astro/QuizOrderCard.astro's shared ".quiz-card__check" - both
+     files scope-style the same class name, so one plain selector here covers
+     both) pair `background: var(--accent)` with `color:
+     var(--accent-contrast)`, which is white in the light theme (the
+     `:root`/`data-theme='light'` default this print block itself assumes -
+     see its own `--text`/`--bg` resets above). Confirmed empirically
+     (`page.emulateMedia({ media: 'print' })` + computed style) that without
+     this override, a reader's default Ctrl+P drops the accent background
+     (print-color-adjust's browser-default `economy`) but keeps the white
+     text color as-is - not just a missing decoration like the bar above, but
+     genuinely illegible white-on-white button text. */
+  .btn--primary,
+  .quiz-card__check {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 }

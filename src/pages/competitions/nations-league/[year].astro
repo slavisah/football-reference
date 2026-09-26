@@ -9,7 +9,7 @@ import EditionView from '../../../components/EditionView.astro';
 import References from '../../../components/References.astro';
 import { loadCompetition } from '../../../lib/competition';
 import { buildYearStories } from '../../../lib/editions';
-import { buildEditionProfiles, type EditionProfile } from '../../../lib/editionProfile';
+import { buildEditionProfiles, editionPdfDownloadUrl, type EditionProfile } from '../../../lib/editionProfile';
 import { buildAllCountryRecords } from '../../../lib/compare';
 import { loadTeamCompetitions } from '../../../lib/teamCompetitions';
 import { teamProfileSlug } from '../../../lib/teamProfile';
@@ -74,6 +74,16 @@ const description = [
 
 const pageUrl = absolutePageUrl(Astro.url, Astro.site);
 const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
+
+// Print-only PDF-to-PDF cross-reference pager - see EditionView.astro's
+// `pdfPreviousUrl`/`pdfNextUrl` prop doc comment for why this must be an
+// absolute URL rather than `withBase()` alone.
+const pdfPreviousUrl = profile.previous
+  ? editionPdfDownloadUrl(Astro.site, Astro.url, 'nations-league', profile.previous.slug, 'en')
+  : undefined;
+const pdfNextUrl = profile.next
+  ? editionPdfDownloadUrl(Astro.site, Astro.url, 'nations-league', profile.next.slug, 'en')
+  : undefined;
 ---
 
 <BaseLayout
@@ -82,6 +92,7 @@ const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
   alternateHref={withBase(`/hr/competitions/nations-league/${profile.slug}`)}
   breadcrumbTrail={[{ name: 'UEFA Nations League', url: withBase('/competitions/nations-league') }]}
   jsonLd={jsonLd}
+  dateModified={lastReviewed}
 >
   <EditionView
     profile={profile}
@@ -91,6 +102,8 @@ const jsonLd = [buildEditionSportsEvent(profile, { pageUrl, name: title })];
     headingTemplate="{year} {competition} Finals"
     glanceHeading="{year} Finals at a glance"
     pdfSlug={`edition-nations-league-${profile.slug}`}
+    pdfPreviousUrl={pdfPreviousUrl}
+    pdfNextUrl={pdfNextUrl}
   >
     <References sources={sources} lastReviewed={lastReviewed} status={status} />
   </EditionView>

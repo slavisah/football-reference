@@ -167,7 +167,7 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(notes.getByText('Pau Cubarsí (Spain)')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Fair Play Award winners' })).toBeVisible();
     await expect(
-      notes.getByText('the only team to win both the World Cup and the Fair Play Award'),
+      notes.getByText('the fifth team to win both the World Cup and the Fair Play Award'),
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Winning managers' })).toBeVisible();
     await expect(notes.getByText('Luis de la Fuente (Spain)')).toBeVisible();
@@ -493,7 +493,7 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Dobitnici nagrade Fair Play' })).toBeVisible();
     await expect(
-      page.locator('.notes__card').getByText('jedina momčad koja je na istom turniru'),
+      page.locator('.notes__card').getByText('peta momčad koja je na istom turniru'),
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Izbornici prvaka' })).toBeVisible();
     await expect(
@@ -2524,6 +2524,46 @@ test.describe('Compare page on a 360px phone', () => {
     expect(await rows.count()).toBeGreaterThan(10);
   });
 
+  // The picker's new <noscript> disclosure (see tests/e2e/no-js-compare.spec.ts
+  // for the no-JS bug it documents) must never actually render once
+  // JavaScript is available - <noscript> content ships as raw text in the
+  // page's HTML, so a real regression here would be the tag itself somehow
+  // becoming visible/read out with JS on, not just the string appearing.
+  test('the no-JavaScript picker note never renders with JavaScript enabled', async ({ page }) => {
+    await expect(page.locator('noscript')).not.toBeVisible();
+    const bodyText = await page.evaluate(() => document.body.innerText);
+    expect(bodyText).not.toContain('needs JavaScript to work');
+  });
+
+  test('the Team A/B <select> boxes are wide enough not to clip the longest team name', async ({
+    page,
+  }) => {
+    // Regression test: a native <select> silently clips its own option text
+    // with no ellipsis once the box is narrower than the text needs (the
+    // same defect class the seventieth intensive run fixed for
+    // TournamentTable's filter row, and the hundred-and-twenty-eighth run
+    // fixed for the quiz order-challenge's rank picker). A 300-1100px
+    // coordinate sweep found this exact shape here too: "Germany (incl. West
+    // Germany)" (src/lib/countries.ts's merged-nation label, the longest
+    // option in either select) clipped across most of that range once the
+    // two pickers sat side by side - fixed by forcing a single-column layout
+    // below 60rem plus a narrow-viewport font/padding trim (compare.astro).
+    for (const id of ['#compare-a', '#compare-b']) {
+      const fits = await page.locator(id).evaluate((el: HTMLSelectElement) => {
+        const cs = getComputedStyle(el);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+        const contentWidth =
+          el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        return Array.from(el.options).every(
+          (option) => ctx.measureText(option.textContent ?? '').width <= contentWidth,
+        );
+      });
+      expect(fits).toBe(true);
+    }
+  });
+
   test('choosing a different team updates the panel and the URL, and swap works', async ({
     page,
   }) => {
@@ -2593,6 +2633,35 @@ test.describe('Croatian compare page (/hr/compare) on a 360px phone', () => {
       return el.scrollWidth - el.clientWidth;
     });
     expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  // Same regression as the English compare page's own matching test above -
+  // see tests/e2e/no-js-compare.spec.ts for the no-JS bug this note fixes.
+  test('the no-JavaScript picker note never renders with JavaScript enabled', async ({ page }) => {
+    await expect(page.locator('noscript')).not.toBeVisible();
+    const bodyText = await page.evaluate(() => document.body.innerText);
+    expect(bodyText).not.toContain('potreban je JavaScript');
+  });
+
+  test('the Team A/B <select> boxes are wide enough not to clip the longest team name', async ({
+    page,
+  }) => {
+    // Same regression test as the English compare page's own matching
+    // block - see that comment for the full defect history.
+    for (const id of ['#compare-a', '#compare-b']) {
+      const fits = await page.locator(id).evaluate((el: HTMLSelectElement) => {
+        const cs = getComputedStyle(el);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+        const contentWidth =
+          el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        return Array.from(el.options).every(
+          (option) => ctx.measureText(option.textContent ?? '').width <= contentWidth,
+        );
+      });
+      expect(fits).toBe(true);
+    }
   });
 
   test('renders translated chrome and headings, with translated competition names', async ({
@@ -2740,6 +2809,37 @@ test.describe('Quiz page on a 360px phone', () => {
 
     const scoreValue = page.locator('#quiz-score-value');
     await expect(scoreValue).toHaveText(/0|1/);
+
+    // Regression test: the score label and its value used to render glued
+    // together ("Score:0 / 40") because the whitespace-only line between the
+    // {t(...)} expression and the following <strong> was compiled away.
+    await expect(page.locator('#quiz-score p')).toHaveText(/^Score: \d+ \/ \d+$/);
+  });
+
+  test('an incorrect answer\'s feedback text names only the correct choice, not its result badge', async ({
+    page,
+  }) => {
+    // Regression test: `check()` used to read the correct choice's whole
+    // label text (including the "✓ correct" badge it had just written into a
+    // sibling span) instead of just the choice text, so a wrong guess's
+    // feedback read `the answer is "Portugal✓ correct".` instead of
+    // `the answer is "Portugal".`.
+    const firstCard = page.locator('.quiz-card').first();
+    const answerIndex = Number(await firstCard.getAttribute('data-answer-index'));
+    const wrongIndex = answerIndex === 0 ? 1 : 0;
+
+    const correctChoiceText = await firstCard
+      .locator('.quiz-card__choice')
+      .nth(answerIndex)
+      .locator('span:not(.quiz-card__result-badge)')
+      .textContent();
+
+    await firstCard.locator('input[type="radio"]').nth(wrongIndex).check();
+    await firstCard.locator('.quiz-card__check').click();
+
+    await expect(firstCard.locator('.quiz-card__feedback')).toHaveText(
+      `Not quite - the answer is "${correctChoiceText!.trim()}".`
+    );
   });
 
   test('restart clears answers and resets the score', async ({ page }) => {
@@ -2831,6 +2931,31 @@ test.describe('Quiz page on a 360px phone', () => {
     await expect(reveal.locator('p')).not.toBeEmpty();
   });
 
+  test('the order challenge rank <select> is wide enough not to clip its own placeholder text', async ({
+    page,
+  }) => {
+    // Regression test: a native <select> silently clips its own option text
+    // with no ellipsis once the box is narrower than the text needs (the
+    // same defect class the seventieth intensive run fixed for
+    // TournamentTable's filter row via selectMinWidthRem() - this select is
+    // a separate, fixed-width component that fix never touched). The
+    // Croatian "Poredak..." placeholder is the longest text this select ever
+    // holds; confirm it fits inside the select's own content box.
+    const select = page.locator('.quiz-order__rank').first();
+    const fits = await select.evaluate((el: HTMLSelectElement) => {
+      const cs = getComputedStyle(el);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      const contentWidth =
+        el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      return Array.from(el.options).every(
+        (option) => ctx.measureText(option.textContent ?? '').width <= contentWidth,
+      );
+    });
+    expect(fits).toBe(true);
+  });
+
   test('the language switcher opens the Croatian quiz page', async ({ page }) => {
     await openMenu(page);
     await page.locator('a.lang-switch').click();
@@ -2891,6 +3016,35 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
 
     await expect(firstCard.locator('.quiz-card__feedback')).toHaveText('Točno!');
     await expect(page.locator('#quiz-score-value')).toHaveText('1');
+
+    // Regression test: same "Score:0 / 40"-style spacing bug as the English
+    // quiz page, since both share the same {t(...)}\n<strong> template shape.
+    await expect(page.locator('#quiz-score p')).toHaveText(/^Rezultat: \d+ \/ \d+$/);
+  });
+
+  test('an incorrect answer\'s Croatian feedback text names only the correct choice, not its result badge', async ({
+    page,
+  }) => {
+    // Regression test: same result-badge-bleed bug as the English quiz page
+    // (both share QuizScript.astro's check() function) - a wrong guess's
+    // feedback used to read `odgovor je "Portugal✓ točno".` instead of
+    // `odgovor je "Portugal".`.
+    const firstCard = page.locator('.quiz-card').first();
+    const answerIndex = Number(await firstCard.getAttribute('data-answer-index'));
+    const wrongIndex = answerIndex === 0 ? 1 : 0;
+
+    const correctChoiceText = await firstCard
+      .locator('.quiz-card__choice')
+      .nth(answerIndex)
+      .locator('span:not(.quiz-card__result-badge)')
+      .textContent();
+
+    await firstCard.locator('input[type="radio"]').nth(wrongIndex).check();
+    await firstCard.locator('.quiz-card__check').click();
+
+    await expect(firstCard.locator('.quiz-card__feedback')).toHaveText(
+      `Netočno - odgovor je "${correctChoiceText!.trim()}".`
+    );
   });
 
   test('includes a "koje je godine ... osvojio Zlatnu loptu" question, answerable like any other card', async ({
@@ -2970,6 +3124,27 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
     await expect(firstOrderCard.locator('.quiz-card__feedback')).toHaveText(
       'Svaki broj poretka smije se koristiti samo jednom - dvije stavke trenutačno dijele isti broj.',
     );
+  });
+
+  test('the order challenge rank <select> is wide enough not to clip the Croatian "Poredak..." placeholder', async ({
+    page,
+  }) => {
+    // Regression test: see the matching English-page test's comment - the
+    // Croatian placeholder is the longest text this select ever holds, so
+    // this is the case that was actually clipped before the fix.
+    const select = page.locator('.quiz-order__rank').first();
+    const fits = await select.evaluate((el: HTMLSelectElement) => {
+      const cs = getComputedStyle(el);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      const contentWidth =
+        el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      return Array.from(el.options).every(
+        (option) => ctx.measureText(option.textContent ?? '').width <= contentWidth,
+      );
+    });
+    expect(fits).toBe(true);
   });
 
   test('the language switcher returns to the English quiz page', async ({ page }) => {
@@ -3072,6 +3247,35 @@ test.describe('Croatian sources page (/hr/about/sources) on a 360px phone', () =
       worldCupGroup.getByRole('link', { name: 'FIFA Svjetsko prvenstvo' }),
     ).toHaveAttribute('href', /competitions\/world-cup$/);
     await expect(worldCupGroup.locator('a[href^="https://www.fifa.com"]').first()).toBeVisible();
+  });
+
+  // Every heading link used to point at the English competition page
+  // regardless of language (a stopgap from before all six competitions had a
+  // Croatian version) - fixed to link to the Croatian page a Croatian reader
+  // is already on. Two of the five (Copa América, Zlatna lopta) also happened
+  // to collide, by accessible-name text, with the header nav's own Croatian
+  // links to those same competitions elsewhere on this page: same text,
+  // English destination vs. the nav's Croatian one - a real screen-reader
+  // links-list ambiguity on top of the wrong-language bug. Explicitly
+  // requires the `/hr/` prefix (anchored to the end of the href) so this
+  // regresses loudly if the hrefs are ever pointed back at the English pages.
+  test('every competition heading links to the Croatian competition page, not the English one', async ({
+    page,
+  }) => {
+    const cases: [string, string][] = [
+      ['FIFA Svjetsko prvenstvo', 'world-cup'],
+      ['UEFA Europsko prvenstvo', 'euro'],
+      ['UEFA Liga nacija', 'nations-league'],
+      ['Copa América', 'copa-america'],
+      ['Zlatna lopta', 'ballon-dor'],
+    ];
+    for (const [heading, slug] of cases) {
+      const group = page.locator('.sources-page__group', { hasText: heading });
+      await expect(group.getByRole('link', { name: heading, exact: true })).toHaveAttribute(
+        'href',
+        new RegExp(`/hr/competitions/${slug}$`),
+      );
+    }
   });
 
   test('the language switcher returns to the English sources page', async ({ page }) => {
@@ -3316,6 +3520,28 @@ test.describe('Installability and offline reading', () => {
     await context.setOffline(false);
   });
 
+  test('a page reached via its canonical (trailing-slash) URL - never clicked in-app - still shows its own content offline, not the home page', async ({
+    page,
+    context,
+  }) => {
+    // Reproduces a real bug: PRECACHE_URLS/Nav.astro's in-app hrefs omit the
+    // trailing slash, but every page's actual canonical/sitemap/OG/hreflang
+    // URL (BaseLayout.astro's withTrailingSlash()) has one - the form a
+    // reader arrives at via a bookmark, a shared link, or a search result.
+    // Before the offlineCache.ts/sw.js.ts fix, that trailing-slash request
+    // was a spurious cache miss even though the page itself was precached
+    // under the slash-less key, so it silently fell back to the home page.
+    await page.goto('');
+    await page.evaluate(() => navigator.serviceWorker.ready);
+
+    await context.setOffline(true);
+    // Never visited in this test via an in-app (slash-less) link - only via
+    // its own canonical trailing-slash URL, simulating a bookmark/shared link.
+    await page.goto('records/');
+    await expect(page.locator('h1')).toHaveText('Records and Timelines');
+    await context.setOffline(false);
+  });
+
   test('a Croatian page that was never individually visited still works offline (precached on install)', async ({
     page,
     context,
@@ -3352,6 +3578,100 @@ test.describe('Installability and offline reading', () => {
     await openMenu(page);
     await expect(page.locator('a.lang-switch')).toHaveText('English');
     await context.setOffline(false);
+  });
+
+  test('the activate handler evicts a stale cache left over from a previous CACHE_VERSION', async ({
+    page,
+  }) => {
+    // sw.js.ts's own activate listener deletes every Cache Storage entry
+    // whose key isn't the current build's CACHE_NAME, specifically so
+    // bumping CACHE_VERSION doesn't leave an older version's precached pages
+    // (and their storage quota) behind forever. No prior test exercised
+    // that listener actually firing - only the fetch handler's read/write
+    // behavior against whatever cache already existed. Simulates a real
+    // version bump by seeding a bogus differently-named cache (standing in
+    // for "football-reference-v3", the version before this build's) and
+    // then forcing a brand-new service worker registration, which - with no
+    // previous controller to wait behind - installs and activates
+    // immediately, the same way a first visit after a deploy would.
+    await page.goto('');
+    await page.evaluate(() => navigator.serviceWorker.ready);
+
+    const currentCacheName = await page.evaluate(async () => {
+      const keys = await caches.keys();
+      return keys.find((key) => key.startsWith('football-reference-'));
+    });
+    expect(currentCacheName).toBeTruthy();
+
+    await page.evaluate(async () => {
+      const staleCache = await caches.open('football-reference-v0-stale');
+      await staleCache.put('/stale-marker', new Response('stale'));
+    });
+    const keysBeforeReactivate = await page.evaluate(() => caches.keys());
+    expect(keysBeforeReactivate).toContain('football-reference-v0-stale');
+
+    await page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.getRegistration();
+      await registration?.unregister();
+    });
+    await page.reload();
+    await page.evaluate(() => navigator.serviceWorker.ready);
+
+    const keysAfterReactivate = await page.evaluate(() => caches.keys());
+    expect(keysAfterReactivate).not.toContain('football-reference-v0-stale');
+    expect(keysAfterReactivate).toContain(currentCacheName);
+  });
+
+  test('a downloaded PDF\'s own internal link to a team page still works offline, if the reader visited that page online first', async ({
+    page,
+    context,
+  }) => {
+    // Every downloadable PDF's internal team/player links
+    // (scripts/generate-pdfs.mjs's rewriteInternalLinksForPrint()) are plain
+    // production URLs with no trailing slash - the exact same slash-less
+    // form src/lib/url.ts's withBase() already produces for every in-app
+    // link. Unlike every URL the offline tests above exercise (all of them
+    // top-level nav pages precached via PRECACHE_URLS/src/lib/routes.ts's
+    // NAV_LINKS), a team/player profile page such as /teams/brazil has no
+    // precache entry of its own - it only ever lands in Cache Storage
+    // opportunistically, the first time it's actually visited online. A
+    // reader who opens a downloaded PDF and clicks one of its internal
+    // team/player links while offline depends entirely on that ordinary
+    // network-first/cache-fallback fetch-handler path already having cached
+    // this specific leaf page - a previously-untested real-world entry
+    // point distinct from every case above (canonical vs. in-app URL forms
+    // of the same *precached* nav page).
+    await page.goto('');
+    await page.evaluate(() => navigator.serviceWorker.ready);
+
+    // Disables Chromium's ordinary HTTP disk/memory cache for this page, via
+    // CDP the same way color-vision-deficiency.spec.ts already drives CDP
+    // for its own emulation. Without this, the second, "offline" navigation
+    // below can be satisfied straight out of the browser's own HTTP cache -
+    // context.setOffline() blocks real network I/O but not a same-URL
+    // response Chromium already holds - which would let this test pass even
+    // if the service worker's own Cache Storage read/write were broken, the
+    // exact tautology risk this file's activate-handler test above already
+    // guards against for a different mechanism.
+    const cdp = await context.newCDPSession(page);
+    await cdp.send('Network.setCacheDisabled', { cacheDisabled: true });
+
+    // Simulates the reader visiting the team page once online, the same way
+    // they would before ever downloading its PDF - this is what actually
+    // populates the service worker's own cache, since the page carries no
+    // precache entry.
+    await page.goto('teams/brazil');
+    await expect(page.locator('h1')).toHaveText('Brazil');
+
+    await context.setOffline(true);
+    // Re-requests the exact same slash-less URL a PDF's own internal link
+    // would carry, as a fresh navigation rather than a page.reload() - the
+    // same request shape as clicking a link from outside the app entirely
+    // (a PDF viewer, another tab) rather than an in-page revisit.
+    await page.goto('teams/brazil');
+    await expect(page.locator('h1')).toHaveText('Brazil');
+    await context.setOffline(false);
+    await cdp.detach();
   });
 });
 
@@ -3446,6 +3766,14 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
       'content',
       '630',
     );
+    // A screen-reader user browsing a link-preview card needs a text
+    // description of that shared og-image.png, the same way an <img> needs
+    // an alt attribute on the page itself - see BaseLayout.astro's own
+    // comment on these two tags.
+    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
+      'content',
+      /FIFA World Cup/,
+    );
     await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
       'content',
       'summary_large_image',
@@ -3453,6 +3781,10 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute(
       'content',
       `${SITE}/og-image.png`,
+    );
+    await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute(
+      'content',
+      /FIFA World Cup/,
     );
   });
 
@@ -3471,6 +3803,12 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute(
       'content',
       'hr_HR',
+    );
+    // The image itself is the same og-image.png on every page/language, but
+    // the alt text describing it is localized like every other UI string.
+    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
+      'content',
+      /FIFA Svjetsko prvenstvo/,
     );
     await expect(page.locator('link[rel="alternate"][hreflang="hr"]')).toHaveAttribute(
       'href',
@@ -4237,12 +4575,19 @@ test.describe('header menu on a 360px phone', () => {
   });
 
   test('a click outside closes the drawer', async ({ page }) => {
+    // The drawer's own `max-height` is `100dvh` minus the header, so at this
+    // suite's standard 740px phone height its full stacked content (nav
+    // list + both search fields + lang switch + theme toggle) needs nearly
+    // the whole viewport, leaving no real page content clear below it to
+    // click - taller here only so there is room to click "outside" at all;
+    // the drawer's own layout is otherwise unaffected by viewport height.
+    await page.setViewportSize({ width: 360, height: 1200 });
     await page.locator('#menu-toggle').click();
     await expect(page.locator('#site-menu')).toBeVisible();
 
-    // Just below the open drawer, which covers most of this 740px screen.
+    // Just below the open drawer.
     const box = (await page.locator('#site-menu').boundingBox())!;
-    expect(box.y + box.height + 12).toBeLessThan(740);
+    expect(box.y + box.height + 12).toBeLessThan(1200);
     await page.mouse.click(180, box.y + box.height + 12);
     await expect(page.locator('#site-menu')).toBeHidden();
   });
@@ -4415,6 +4760,29 @@ test.describe('desktop nav "More" menu (>=60rem)', () => {
     await expect(page.locator('#nav-more-menu')).toBeHidden();
   });
 
+  test('tabbing past the last link closes the menu instead of leaving it open over the page', async ({
+    page,
+  }) => {
+    // Found by actually tabbing through the open menu: unlike a click
+    // outside (handled above), moving focus out of the menu via keyboard
+    // used to leave it open and rendered on top of the page's own content,
+    // with focus already gone to whatever came next in the nav.
+    const toggle = page.locator('#nav-more-toggle');
+    await toggle.focus();
+    await page.keyboard.press('Enter');
+    const menu = page.locator('#nav-more-menu');
+    await expect(menu).toBeVisible();
+
+    const linkCount = await menu.getByRole('link').count();
+    for (let i = 0; i < linkCount; i++) {
+      await page.keyboard.press('Tab');
+      await expect(menu).toBeVisible();
+    }
+    await page.keyboard.press('Tab');
+    await expect(menu).toBeHidden();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
   test('the current secondary page is marked current inside the menu', async ({ page }) => {
     await page.goto('records');
     await page.locator('#nav-more-toggle').click();
@@ -4427,6 +4795,37 @@ test.describe('desktop nav "More" menu (>=60rem)', () => {
     await expect(toggle).toHaveText('Više');
     await toggle.click();
     await expect(page.locator('#nav-more-menu a', { hasText: 'Rekordi' })).toBeVisible();
+  });
+
+  // The `toBeVisible()`/attribute assertions above all passed even while the
+  // menu rendered up to 156px past the viewport's right edge at narrower
+  // >=60rem widths (e.g. 1000px, a real windowed-browser width, not just
+  // 1280px) - `body`'s own `overflow-x: hidden` (global.css) clips that
+  // overflow silently, no scrollbar, so Playwright's visibility check
+  // (which only asks "not display:none/zero-sized", not "within the
+  // viewport") never caught it. Reads real getBoundingClientRect()
+  // coordinates instead, the same technique that caught the mobile-drawer
+  // flex-wrap bug.
+  test('stays inside the viewport at a narrower >=60rem width', async ({ page }) => {
+    await page.setViewportSize({ width: 1000, height: 900 });
+    await page.goto('');
+    await page.locator('#nav-more-toggle').click();
+    const menu = page.locator('#nav-more-menu');
+    await expect(menu).toBeVisible();
+
+    const linkBoxes = await menu.locator('a').evaluateAll((links) =>
+      links.map((a) => a.getBoundingClientRect()),
+    );
+    for (const box of linkBoxes) {
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(1000);
+    }
+
+    // Prove the clamp doesn't just move the hit target - the previously
+    // unreachable last link (the menu's rightmost content, "Sources") is
+    // actually clickable.
+    await page.locator('#nav-more-menu a', { hasText: 'Sources' }).click();
+    await expect(page).toHaveURL(/\/about\/sources\/?$/);
   });
 });
 

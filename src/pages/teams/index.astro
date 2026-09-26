@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import References from '../../components/References.astro';
 import { loadPageMeta } from '../../lib/competition';
+import { disambiguateLabels } from '../../lib/sources';
 import { buildAllCountryRecords } from '../../lib/compare';
 import { loadTeamCompetitions } from '../../lib/teamCompetitions';
 import { teamProfileSlug } from '../../lib/teamProfile';
@@ -15,9 +16,11 @@ const { worldCup, euro, copaAmerica, nationsLeague, competitions } = await loadT
 const allRecords = buildAllCountryRecords(competitions);
 const sortedByName = [...allRecords].sort((a, b) => a.displayName.localeCompare(b.displayName));
 
-const sources = [worldCup, euro, copaAmerica, nationsLeague]
-  .flatMap((c) => c.sources)
-  .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index);
+const sources = disambiguateLabels(
+  [worldCup, euro, copaAmerica, nationsLeague]
+    .flatMap((c) => c.sources)
+    .filter((source, index, all) => all.findIndex((s) => s.url === source.url) === index),
+);
 
 const lastReviewed = [worldCup, euro, copaAmerica, nationsLeague]
   .map((c) => c.lastReviewed)
@@ -39,7 +42,7 @@ const teamsName = 'National teams directory - combined World Cup, EURO, Copa AmÃ
 const jsonLd: JsonLdObject[] = [
   buildCollectionPageJsonLd(
     buildCountryRecordsItemList(allRecords, { pageUrl: teamsPageUrl, name: teamsName }),
-    { pageUrl: teamsPageUrl, name: teamsName },
+    { pageUrl: teamsPageUrl, name: teamsName, dateModified: lastReviewed },
   ),
 ];
 ---
@@ -49,6 +52,7 @@ const jsonLd: JsonLdObject[] = [
   description="Every national team that has reached a World Cup, EURO, Copa AmÃ©rica or Nations League final or semifinal, A to Z - pick one for its full year-by-year record."
   alternateHref={withBase('/hr/teams')}
   jsonLd={jsonLd}
+  dateModified={lastReviewed}
 >
   <article class="teams stack">
     <header class="teams__header">
