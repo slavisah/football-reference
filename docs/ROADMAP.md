@@ -58,7 +58,9 @@ its ledger, a unit test, and two lines of CI/package config - no page
 markup/styling/behavior) didn't need a re-run per the same no-rendered-
 output-changed precedent several prior runs already established, though it
 did start a routine cold-start confirmation sweep in the background as
-several runs' own gap since the last one had grown stale. The five
+several runs' own gap since the last one had grown stale - that sweep
+finished clean, 1023/1023 in 18.0 minutes, confirming the whole
+accumulated branch through this run's own commit. The five
 browser-based sweeps (`check:lighthouse`/`check:reflow`/`check:text-zoom`/
 `check:print-width`/`check:html`) were not re-run this run either (this run
 touched no rendered page output) - last re-confirmed clean by the
