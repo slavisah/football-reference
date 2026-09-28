@@ -69,6 +69,9 @@ jobs:
       - name: "\"One of only N X\" bounded-set-claim verification-ledger check (content/*.md)"
         run: pnpm check:one-of-only-claims
 
+      - name: "Undated completeness-claim (\"across all N editions\"/\"in every edition\") verification-ledger check (content/*.md)"
+        run: pnpm check:completeness-claims
+
       - name: Edition-page header-label translation check
         run: pnpm check:edition-header-labels
 
