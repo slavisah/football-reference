@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (192 intensive runs as of 2026-09-28) lives
+verification sweep and decision (193 intensive runs as of 2026-09-28) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,7 +44,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-ninety-second run (2026-09-28): 894/894 unit tests,
+As of the hundred-and-ninety-third run (2026-09-28): 897/897 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
@@ -55,7 +55,69 @@ full `pnpm test:e2e` count and all five browser-based sweeps
 (`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
 `check:html`, several runs stale since the hundred-and-eighty-eighth) were
 all freshly re-confirmed clean by the hundred-and-ninety-first run itself
-(1023/1023 e2e, cold-start, 16.6 minutes) - see that run's own entry below.
+(1023/1023 e2e, cold-start, 16.6 minutes) - not re-run this run, which
+touched only a build-time verification script, its JSON ledger and a unit
+test file, no page markup or content.
+
+**Hundred-and-ninety-third run:** the hundred-and-ninety-second run's own
+"Left for a future pass" note asked whether the other six verification-
+ledger checkers (`check:record-claims`/`check:consecutive-claims`/
+`check:since-claims`/`check:one-of-only-claims`/`check:completeness-claims`/
+`check:superlative-claims`) have the same "anchor word separated from the
+rest of the claim by intervening text" gap the ordinal-claims checker had
+just been widened a third time to close. Re-tested each one's own pattern
+against every real occurrence of its trigger vocabulary across all six
+`content/*.md` files (grepping broadly first, then checking each hit against
+the live regex with `node`, the same diligence the prior three widenings
+used) rather than assuming a clean pass. `record-claims`/`consecutive-
+claims` are bare trigger-word matches with no anchor to have a gap in - nothing
+to widen. `one-of-only-claims` and `superlative-claims` were re-checked
+against every "one of"/"only" occurrence site-wide and found already
+complete - no new "one of only N"/"the only" phrasing slipped past either
+pattern's own two prior widenings.
+`check:since-claims` did have the gap: its bare `since \d{4}` pattern missed
+"since <intervening possessive/determiner clause> <year>" phrasings -
+`content/uefa-nations-league.md`'s Player of the Finals bullet ("since the
+competition's 2019 launch") and `content/copa-america.md`'s Golden Boot
+completeness bullet ("since the first in 1916") were both silently
+unverified; a third, `content/ballon-dor.md`'s "since the award's creation
+in 1956" bullet, was already covered by `superlative-claims-ledger.json`
+(it also matches "the only") but had no `since-claims-ledger.json` entry of
+its own. Widened `CLAIM_PATTERN` with a second alternative - "since"
+followed by a determiner/possessive pronoun, 1-4 more words, then a year -
+re-checked against every `since (the|its|his|her|their)` occurrence
+site-wide before widening: 3 of 7 carried a year the bare pattern missed,
+the other 4 either have no year or aren't inside a `- ` bullet, so zero new
+noise. All three newly-caught claims verified true against their own
+tables (Copa América Golden Boot winners' 48 years match the Champions
+timeline's 48 editions exactly; Nations League Player of the Finals covers
+all four Finals editions with no gap; the Ballon d'Or Winners table has
+exactly one "Not awarded" row, 2020, across 1956-2025) and recorded in
+`since-claims-ledger.json` - since-claims coverage goes from 23 to 26. Added
+3 new unit tests to `tests/unit/checkSinceClaims.test.ts` covering the
+possessive/determiner alternative and confirming an unrelated year 5+ words
+after "since" still doesn't match.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the blocked `typescript` line), `pnpm lint` (236 files, 0 errors/0
+warnings/0 hints), `pnpm test` (897/897, up from 894), `pnpm build` (711
+pages), `pnpm test:coverage` (99.91%/99.31%, unchanged), all 29 fast
+`check:*` scripts individually clean (`check:since-claims` itself: 26
+claims checked, all ledgered; `check:claims-hr`: 205 claims, all paired,
+confirming the existing Croatian translations already state the same years
+correctly), `pnpm audit` (no known vulnerabilities), knip same two standing
+false positives. Browser sweeps and `pnpm test:e2e` not re-run - this
+change touches only a build-time verification script, its JSON ledger and a
+unit test file, no page markup, styling or rendered content.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see this file's "Open backlog", unchanged. The next
+run again needs its own first-principles search for a fresh angle -
+`check:one-of-only-claims`/`check:completeness-claims`/`check:superlative-
+claims` came back clean this run but were only checked against today's
+content; re-verify any of the seven checkers' patterns again whenever new
+bullets are added in a shape not seen before, rather than assuming a past
+clean pass stays clean forever.
 
 **Hundred-and-ninety-second run:** with every open backlog item below still
 either environment-blocked or awaiting human sign-off and `pnpm outdated`
