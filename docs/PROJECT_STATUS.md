@@ -30116,3 +30116,58 @@ as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged. All five fresh
 angles this run tried are now closed, honestly negative results rather than
 open threads; the next run will need its own first-principles search for a
 sixth angle rather than repeating any of these five.
+
+### Dependency patch bump plus a cold-start e2e re-run to verify it, since it touches Playwright/axe-core directly - closed 2026-09-28 (hundred-and-eighty-ninth intensive run)
+
+With the open backlog still fully blocked (re-confirmed: `npm view
+@astrojs/check@latest peerDependencies` still only declares `typescript:
+'^5.0.0 || ^6.0.0'`; the brand-suffix title-length decision still needs
+human sign-off; the Nations League Team of the Tournament/attendance gaps
+and the `docs/SOURCES.md` link-liveness sweep are still blocked on this
+environment's egress policy) and the hundred-and-eighty-eighth run's five
+fresh-angle searches all closed with no open thread, this run started from
+`pnpm outdated`, the same first move every recent run makes before hunting
+for a new angle by hand. It surfaced four genuine new in-range patch
+releases that a prior run's `pnpm outdated` hadn't yet seen: `@types/node`
+26.6.2 -> 26.6.3, `cspell` 10.3.4 -> 10.3.5, `html-validate` 11.16.0 ->
+11.16.1, and `sharp` 0.35.4 -> 0.35.5 (the last pinned to an exact version
+in `package.json` rather than a caret range, so `pnpm update` alone didn't
+touch it - bumped by hand and re-verified with a fresh `pnpm install`).
+`typescript` 7 remains the sole blocked line, unchanged.
+
+Unlike most recent dependency-bump/doc-only runs, two of these four
+packages - and, more importantly, `@playwright/test` itself, which had
+separately drifted since the last lockfile refresh - are exactly what the
+site's e2e suite depends on to run at all, and `@axe-core/playwright`
+is what every `has no WCAG violations` spec in that suite calls directly.
+A bump to either is precisely the kind of change the "no page markup or
+content changed, so skip e2e" reasoning several recent runs used does
+*not* cover - so, rather than defaulting to that skip, this run ran a full
+cold-start `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e`
+specifically to verify the bump. Result: 1023/1023 passed in 17.2 minutes,
+matching the hundred-and-eighty-sixth run's own last cold-start count
+exactly - a genuine, positive confirmation that the newer Playwright/
+axe-core builds changed no observable behavior on this site, not an
+assumption carried over from a stale prior run.
+
+**Verification:** `pnpm install` (fresh lockfile resolve, 550-line diff -
+version bumps only, no dependency-tree shape change), `pnpm outdated`
+(only the blocked `typescript` line remains), `pnpm lint` (234 files,
+0/0/0), `pnpm test` (880/880, unchanged), `pnpm build` (711 pages,
+unchanged), all 28 fast `check:*` scripts individually clean, `pnpm
+test:coverage` (99.91%/99.31%, unchanged - the same four defensively-
+unreachable lines as ever), `pnpm audit` (no known vulnerabilities), `pnpm
+dlx knip --no-config-hints` (the same two standing false positives as
+ever), and the cold-start `pnpm test:e2e` run described above (1023/1023).
+The five browser-based sweeps (`check:lighthouse`/`check:reflow`/
+`check:text-zoom`/`check:print-width`/`check:html`) were not re-run this
+run - they exercise rendered page output, not Playwright/axe-core's own
+test-runner internals, and the hundred-and-eighty-eighth run's own sweep
+is only one run stale.
+
+**Left for a future pass:** same environment-blocked open-backlog items as
+ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged. With this run's
+own angle (verify the Playwright/axe-core bump against the full e2e suite
+rather than assuming it's safe) now closed, the next run will again need
+its own first-principles search for a fresh angle, the same standing
+instruction the hundred-and-eighty-eighth run's entry already left.
