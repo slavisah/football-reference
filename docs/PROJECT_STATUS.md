@@ -30441,3 +30441,111 @@ verification-ledger checkers in turn, not yet done for
 `check:record-claims`/`check:consecutive-claims`/`check:since-claims`/
 `check:one-of-only-claims`/`check:completeness-claims`/
 `check:superlative-claims` this run.
+
+### `check:since-claims` widened a second time: a "since <intervening clause> <year>" phrasing was silently unverified in two bullets - closed 2026-09-28 (hundred-and-ninety-third intensive run)
+
+Followed the hundred-and-ninety-second run's own named next step exactly:
+re-test the other six verification-ledger checkers' own patterns against
+every real occurrence of their trigger vocabulary across all six
+`content/*.md` files, the same "does this checker's anchor requirement
+actually cover every phrasing of its own trigger word" question that run
+asked of `check-ordinal-claims.mjs`. `pnpm outdated` re-confirmed: still
+only the already-blocked `typescript` line, nothing new.
+
+Worked through all six in turn:
+
+- **`check:record-claims`** and **`check:consecutive-claims`** are bare
+  trigger-word matches (`\b(most|record|...)\b`, `\b(consecutive|back-to-
+  back)\b`) with no anchor requirement at all - there is no "intervening
+  clause" gap to have, by construction. Confirmed by re-reading both
+  patterns rather than assumed.
+- **`check:one-of-only-claims`** (`\bone of only (\d+|one|...|ten)\b`): grepped
+  every `one of ` occurrence site-wide. The two already-ledgered "one of
+  only three men" claims and the two deliberately-excluded "one of only a
+  handful of"/"one of the few" vague-count bullets are the whole set - no
+  new numbered bounded-set claim has been added since the checker's own
+  seeding run.
+- **`check:superlative-claims`** (`the only`/`\w+'s only`/`(his|her|its|their)
+  only`): grepped every `only` occurrence site-wide (excluding "not only").
+  Every exclusivity claim already matches one of the three alternatives;
+  every non-match is a genuine quantifier use ("only three entrants", "only
+  one stadium") the pattern is deliberately designed to skip. No gap.
+- **`check:completeness-claims`** (`across all N editions`/`in every
+  edition`): grepped every `every edition`/`all editions`/`each edition`-
+  style phrase site-wide. The two existing "across all N editions" claims
+  and `content/uefa-nations-league.md`'s "in every edition so far" bullet
+  (matches the second alternative literally) are the whole set. No gap in
+  this checker's own two alternatives.
+- **`check:since-claims`** (`since \d{4}`) did have the gap, the same shape
+  as the ordinal-claims fix last run: a claim's "since" anchor separated
+  from its year by an intervening possessive/determiner clause.
+  `content/uefa-nations-league.md`'s Player of the Finals bullet ("UEFA has
+  named a best-player award at every Nations League Finals since **the
+  competition's** 2019 launch") and `content/copa-america.md`'s Golden Boot
+  completeness bullet ("a top scorer can be identified for every edition
+  since **the first in** 1916") both state real per-edition completeness
+  claims the bare pattern never saw. A third bullet,
+  `content/ballon-dor.md`'s "The 2020 Ballon d'Or was the only edition since
+  **the award's creation in** 1956 not to be presented" also newly matches -
+  already verified once under `superlative-claims-ledger.json` (it also
+  matches "the only"), but had never had its own `since-claims-ledger.json`
+  entry.
+
+Confirmed the gap directly with `node -e` against the unwidened pattern
+before touching the source (all three: `false`), the same diligence the
+three prior possessive/anchor widenings on this site used. Grepped every
+`since (the|its|his|her|their)` occurrence across all six content files
+first to scope the fix rather than guessing a window size: 7 total, 3 carry
+a year 1-4 words later (the ones above), the other 4 either have no year at
+all or aren't inside a `- ` bullet (a paragraph, not a claim this checker
+extracts) - so a "since" + determiner/pronoun + 1-4 words + year alternative
+introduces zero new noise against the corpus as it stands. Added that
+alternative to `check-since-claims.mjs`'s `CLAIM_PATTERN`.
+
+All three newly-caught claims are real, true completeness claims, verified
+against their own source tables before ledgering:
+
+- **Copa América Golden Boot completeness:** the Golden Boot winners
+  list's 48 years (1916 through 2024, both 1959 editions included) match
+  the Champions timeline table's 48 editions exactly, position for
+  position - no gap, no extra year.
+- **Nations League Player of the Finals completeness:** the Finals table
+  lists exactly four editions (2019, 2021, 2023, 2025); the Player of the
+  Finals winners list covers all four with no gap.
+- **Ballon d'Or 2020 cancellation:** the Winners table runs one row per
+  year 1956-2025 with no missing year, and 2020 is the sole row marked "Not
+  awarded" - matches "the only edition ... not to be presented" exactly.
+
+All three recorded in `since-claims-ledger.json` - since-claims coverage
+goes from 23 to 26 claims. No content or Croatian-translation fix was
+needed for any of the three: `check:claims-hr` (205 claims, up from 202)
+confirms all three already state the same years on their Croatian
+counterpart pages, since none of this run's changes touched page content,
+only the checker script and its ledger.
+
+Added 3 new unit tests to `tests/unit/checkSinceClaims.test.ts`: one
+confirming the possessive-noun alternative ("since the award's creation in
+1956"), one confirming the possessive-pronoun/determiner alternative across
+two more real bullet shapes, and one confirming an unrelated year more than
+4 words after "since" still does not match (guarding against the
+alternative over-matching into an unrelated later clause).
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the blocked `typescript` line), `pnpm lint` (236 files, 0 errors/0
+warnings/0 hints), `pnpm test` (897/897, up from 894), `pnpm build` (711
+pages), `pnpm test:coverage` (99.91%/99.31%, unchanged), all 29 fast
+`check:*` scripts individually clean (`check:since-claims` itself: 26
+claims checked, all ledgered; `check:claims-hr`: 205 claims, all paired),
+`pnpm audit` (no known vulnerabilities), `pnpm dlx knip --no-config-hints`
+(same two standing false positives). Browser sweeps and `pnpm test:e2e` not
+re-run - this change touches only a build-time verification script, its
+JSON ledger, and a unit test file, no page markup, styling or rendered
+content.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+This run's own re-test-every-checker's-anchor-pattern angle came back clean
+for five of the six checkers and found one real gap in the sixth - worth
+repeating whenever new content is added in a phrasing shape not yet seen,
+rather than treating this run's clean results as permanent. The next run
+again needs its own first-principles search for a fresh angle beyond that.
