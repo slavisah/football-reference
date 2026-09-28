@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (189 intensive runs as of 2026-09-28) lives
+verification sweep and decision (190 intensive runs as of 2026-09-28) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -38,26 +38,61 @@ what exists and any standing quirks.
 
 Every recent run's standing health check comes back clean run after run:
 `pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm test`/`pnpm
-test:coverage`/`pnpm build`, all 33 `check:*` scripts (28 fast enough to run
+test:coverage`/`pnpm build`, all 34 `check:*` scripts (29 fast enough to run
 every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-eighty-ninth run (2026-09-28): 880/880 unit tests,
+As of the hundred-and-ninetieth run (2026-09-28): 892/892 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
 `@cspell/dict-hr-hr`, used only via `.cspell/hr-notes.cspell.json`'s
 `"import"` field, never a JS `import`) - neither actually unused, knip's
 static analysis just can't see a reference inside a config-file string. The
-full `pnpm test:e2e` count was re-confirmed clean by the
-hundred-and-eighty-ninth run itself (1023/1023, cold-start, specifically to
-verify that run's own `@playwright/test`/`@axe-core/playwright` dependency
-bump). The five browser-based sweeps (`check:lighthouse`/`check:reflow`/
-`check:text-zoom`/`check:print-width`/`check:html`) were not re-run this
-run (only one run stale, and this run touched no rendered page output) -
-last re-confirmed clean by the hundred-and-eighty-eighth run.
+full `pnpm test:e2e` count was last re-confirmed clean by the
+hundred-and-eighty-ninth run (1023/1023, cold-start); the hundred-and-
+ninetieth run's own change (a new build-time verification-ledger checker,
+its ledger, a unit test, and two lines of CI/package config - no page
+markup/styling/behavior) didn't need a re-run per the same no-rendered-
+output-changed precedent several prior runs already established, though it
+did start a routine cold-start confirmation sweep in the background as
+several runs' own gap since the last one had grown stale. The five
+browser-based sweeps (`check:lighthouse`/`check:reflow`/`check:text-zoom`/
+`check:print-width`/`check:html`) were not re-run this run either (this run
+touched no rendered page output) - last re-confirmed clean by the
+hundred-and-eighty-eighth run.
+
+**Hundred-and-ninetieth run:** built `check:completeness-claims`
+(`scripts/check-completeness-claims.mjs`), a seventh verification-ledger
+gate alongside `check:superlative-claims`/`check:ordinal-claims`/
+`check:record-claims`/`check:consecutive-claims`/`check:since-claims`/
+`check:one-of-only-claims`, this one for undated 100%-table-coverage claims
+("a pattern unbroken across all N editions", "has had one across all N
+editions", "in every edition so far") - a bug class none of the other six
+patterns catches, since it uses no ordinal, no "since <year>", and none of
+the other checkers' trigger words. A dedicated research pass grepping
+`content/*.md` for the two literal phrasings actually in use found five
+such claims, none previously ledgered: `content/fifa-world-cup.md`'s
+Winning managers/Winning captains intros, `content/uefa-euro.md`'s and
+`content/uefa-nations-league.md`'s Winning captains intros, and
+`content/uefa-nations-league.md`'s Memorable moments host-top-four closer.
+All five verified true by hand this run (World Cup managers' nationality
+against the Editions table's Winner column; the three captains claims by
+confirming no blank Winning-captains entry across 23/17/4 editions; the
+Nations League host claim against the Finals table's own placement
+columns) - no bug found, but a real, previously-unguarded gap closed.
+Seeded `completeness-claims-ledger.json` with all five. Added 9 new unit
+tests, wired into `package.json`/`.github/workflows/ci.yml`, and added
+`completeness-claims-ledger.json` to `check-claims-hr.mjs`'s own
+`LEDGER_FILES` array in the same commit (pre-emptively avoiding the exact
+"new ledger, zero Croatian coverage" gap the hundred-and-eighty-sixth run
+found and fixed for `one-of-only-claims-ledger.json`). `pnpm test` 892/892
+(up from 880), `pnpm check:claims-hr` 201/201 claims clean (up from 196),
+all 29 fast `check:*` scripts clean, `pnpm build` 711 pages, `pnpm lint`
+0/0/0, coverage unchanged at 99.91%/99.31%. See `docs/PROJECT_STATUS.md`'s
+matching entry for the full per-claim verification writeup.
 
 **Hundred-and-eighty-ninth run:** with the hundred-and-eighty-eighth run's
 five fresh quality angles all closed and no new concrete lead named, this

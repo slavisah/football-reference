@@ -30171,3 +30171,102 @@ own angle (verify the Playwright/axe-core bump against the full e2e suite
 rather than assuming it's safe) now closed, the next run will again need
 its own first-principles search for a fresh angle, the same standing
 instruction the hundred-and-eighty-eighth run's entry already left.
+
+### Built `check:completeness-claims`, a seventh verification-ledger gate for undated 100%-table-coverage claims ("across all N editions"/"in every edition") - closed 2026-09-28 (hundred-and-ninetieth intensive run)
+
+With `pnpm outdated` showing nothing new beyond the still-blocked `typescript`
+line and the full standing health check re-confirmed clean (`pnpm lint`
+234 files 0/0/0, `pnpm test` 880/880, `pnpm build` 711 pages, all 28 then-
+existing fast `check:*` scripts, `pnpm test:coverage` 99.91%/99.31%
+unchanged, `pnpm audit` clean, `pnpm dlx knip --no-config-hints` the same
+two standing false positives), this run tried a fresh content-accuracy
+angle via a dedicated research pass: grepping `content/*.md` for the two
+literal phrasings `across all N editions` and `in every edition` (rather
+than a trigger word already covered by one of the six existing
+verification-ledger checkers - superlative/ordinal/record/consecutive/
+since/one-of-only) surfaced five bullets asserting 100% table coverage that
+none of the six had ever caught, because none uses an ordinal, "since
+<year>", or any of the other six checkers' trigger words:
+
+- `content/fifa-world-cup.md`'s Winning managers intro ("a pattern unbroken
+  across all 23 editions") - every winning manager shares their team's
+  nationality.
+- `content/fifa-world-cup.md`'s, `content/uefa-euro.md`'s and
+  `content/uefa-nations-league.md`'s Winning captains intros ("across all
+  23/17/four completed editions") - every title-winning team has a named
+  captain.
+- `content/uefa-nations-league.md`'s Memorable moments closer ("in every
+  edition so far, including Germany finishing fourth in 2025") - every
+  Nations League Finals host has placed in the top four.
+
+All five were independently verified true this run, by hand, before being
+ledgered (not assumed from the research pass's own read): the World Cup
+managers claim by cross-checking all 23 Winning managers entries'
+parenthetical nation against the Editions table's Winner column for that
+year; the three captains claims by confirming every edition in each
+competition's own Editions/Finals table has a filled Winning captains
+entry (23 World Cup, 17 EURO, 4 Nations League, no blanks); the Nations
+League host claim by cross-checking the Finals table's Host column against
+its own Winner/Runner-up/Third/Fourth columns for all four editions (2019
+Portugal 1st, 2021 Italy 3rd, 2023 Netherlands 4th, 2025 Germany 4th). No
+false claim turned up - a genuine, if negative, content-accuracy result -
+but a real, previously-unguarded gap: a future edit leaving a captain/
+manager cell blank, or changing an edition count without updating "23"/
+"17"/"four" in these bullets, would have shipped silently, since nothing
+before this run read these five sentences against their tables.
+
+Built `check-completeness-claims.mjs` (`scripts/`), the same ledger-diff
+mechanism as the other six checkers (reusing `diffClaimsAgainstLedger()`
+from `check-superlative-claims.mjs`), scoped to
+`/\bacross all (\d+|one|...|ten)( completed)? editions\b|\bin every
+edition\b/i` - deliberately narrow: `content/copa-america.md` alone uses
+"every edition" three more times in bullets that name an exception ("every
+edition from 1993 onward except 2016") or are already "since"-anchored
+completeness claims check:since-claims already covers ("every edition
+since the first in 1916"), and a bare "every edition" match would have
+caught those too for zero benefit (the checker's only job is flagging a
+claim that needs a table cross-check, and those two shapes already get
+one, from a human reading the exception or from `check:since-claims`
+respectively). Seeded `completeness-claims-ledger.json` with the five
+claims above and their verification notes. Added 9 new unit tests
+(`tests/unit/checkCompletenessClaims.test.ts`, mirroring
+`checkSinceClaims.test.ts`'s structure, including a regression test that
+the two Copa América "every edition" phrasings above stay unmatched).
+Wired `check:completeness-claims` into `package.json` (`scripts`) and
+`.github/workflows/ci.yml`, placed immediately after
+`check:one-of-only-claims`. Also added `completeness-claims-ledger.json`
+to `check-claims-hr.mjs`'s own `LEDGER_FILES` array in the same commit -
+the hundred-and-eighty-sixth run's own `one-of-only-claims-ledger.json`
+miss (a brand-new ledger shipped with zero Croatian-translation coverage
+until a later run noticed) is the exact mistake this avoids pre-emptively
+rather than repeating it. Re-ran `pnpm check:claims-hr` after a full
+rebuild to confirm: 201 claims checked (up from 196), all clean - the
+Nations League host claim's own Croatian counterpart already names 2025
+("Njemačku, koja je 2025. bila četvrta"), the only one of the five with a
+four-digit year for that check to verify.
+
+**Verification:** `pnpm lint` (236 files, 0/0/0), `pnpm test` (892/892, up
+from 880), `pnpm build` (711 pages, unchanged), all 29 fast `check:*`
+scripts individually clean (including the new `check:completeness-claims`,
+5/5 claims verified, and `check:claims-hr`, 201/201 claims clean), `pnpm
+test:coverage` (99.91%/99.31%, unchanged - the new script is fully
+exercised by its own unit tests), `pnpm audit` (no known vulnerabilities),
+and `pnpm dlx knip --no-config-hints` (the same two standing false
+positives as ever). A full cold-start `PW_EXECUTABLE_PATH=/opt/pw-browsers/
+chromium pnpm test:e2e` was started this run as a routine confirmation
+sweep (several runs stale, unrelated to this change) but this run's own
+code/content change - a build-time script, its JSON ledger, a unit test,
+and two lines of CI/package config - needed no e2e re-run to ship per the
+same precedent the hundred-and-eighty-fifth/-sixth runs' own entries
+already established for identically-scoped changes (no page markup,
+styling, or runtime behavior touched).
+
+**Left for a future pass:** same environment-blocked open-backlog items as
+ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged. With this run's
+own angle now closed and seven verification-ledger gates covering every
+completeness/superlative/ordinal/record/consecutive/bounded-set claim
+shape found on the site so far, the next run will again need its own
+first-principles search for a fresh angle - the dedicated grep-for-a-new-
+phrasing approach this run used (rather than re-reading already-audited
+sections) is one candidate method worth repeating on a still-different
+phrase.

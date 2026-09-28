@@ -40,6 +40,7 @@
     "check:consecutive-claims": "node scripts/check-consecutive-claims.mjs",
     "check:since-claims": "node scripts/check-since-claims.mjs",
     "check:one-of-only-claims": "node scripts/check-one-of-only-claims.mjs",
+    "check:completeness-claims": "node scripts/check-completeness-claims.mjs",
     "check:edition-header-labels": "node scripts/check-edition-header-labels.mjs",
     "check:i18n-notes": "node scripts/check-i18n-notes.mjs",
     "check:attendance-format": "node scripts/check-attendance-format.mjs",
