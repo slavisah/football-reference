@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (190 intensive runs as of 2026-09-28) lives
+verification sweep and decision (191 intensive runs as of 2026-09-28) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,27 +44,43 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-ninetieth run (2026-09-28): 892/892 unit tests,
+As of the hundred-and-ninety-first run (2026-09-28): 892/892 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
 `@cspell/dict-hr-hr`, used only via `.cspell/hr-notes.cspell.json`'s
 `"import"` field, never a JS `import`) - neither actually unused, knip's
 static analysis just can't see a reference inside a config-file string. The
-full `pnpm test:e2e` count was last re-confirmed clean by the
-hundred-and-eighty-ninth run (1023/1023, cold-start); the hundred-and-
-ninetieth run's own change (a new build-time verification-ledger checker,
-its ledger, a unit test, and two lines of CI/package config - no page
-markup/styling/behavior) didn't need a re-run per the same no-rendered-
-output-changed precedent several prior runs already established, though it
-did start a routine cold-start confirmation sweep in the background as
-several runs' own gap since the last one had grown stale - that sweep
-finished clean, 1023/1023 in 18.0 minutes, confirming the whole
-accumulated branch through this run's own commit. The five
-browser-based sweeps (`check:lighthouse`/`check:reflow`/`check:text-zoom`/
-`check:print-width`/`check:html`) were not re-run this run either (this run
-touched no rendered page output) - last re-confirmed clean by the
-hundred-and-eighty-eighth run.
+full `pnpm test:e2e` count and all five browser-based sweeps
+(`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
+`check:html`, several runs stale since the hundred-and-eighty-eighth) were
+all freshly re-confirmed clean by the hundred-and-ninety-first run itself
+(1023/1023 e2e, cold-start, 16.6 minutes) - see that run's own entry below.
+
+**Hundred-and-ninety-first run:** with every open backlog item below still
+either environment-blocked or awaiting human sign-off, and `pnpm outdated`
+showing no new in-range release beyond the already-documented blocked
+`typescript` 7 line, used the run for a full standing health check -
+including the five full-site browser sweeps and a cold-start `pnpm
+test:e2e`, both several runs overdue for a re-confirmation (last done by the
+hundred-and-eighty-eighth/-ninth runs respectively). `pnpm install
+--frozen-lockfile`, `pnpm lint` (0/0/0), `pnpm test` (892/892), `pnpm build`
+(711 pages), `pnpm test:coverage` (99.91%/99.31%, unchanged), all 29 fast
+`check:*` scripts, `pnpm audit` (clean) and `pnpm dlx knip
+--no-config-hints` (same two standing false positives) all came back clean
+first. The five browser sweeps needed the environment's
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`
+escape hatch (this sandbox's bundled `@playwright/test` looks for a
+`chrome-headless-shell` build newer than the one preinstalled here - an
+already-known, already-documented environment quirk, not a new bug) and all
+came back clean: `check:reflow`/`check:text-zoom`/`check:print-width`/
+`check:html` each report zero violations across all 711 pages, and
+`check:lighthouse`'s 39-page representative sample scored >=0.9 in every
+category (the one documented noindex/SEO exception aside). The cold-start
+`pnpm exec playwright test` run matched the standing baseline exactly:
+1023/1023 passed in 16.6 minutes. No regressions, no new leads found - a
+genuine, if negative, confirmation that the whole accumulated branch still
+holds up end to end. See `docs/PROJECT_STATUS.md`'s matching entry.
 
 **Hundred-and-ninetieth run:** built `check:completeness-claims`
 (`scripts/check-completeness-claims.mjs`), a seventh verification-ledger

@@ -30274,3 +30274,85 @@ first-principles search for a fresh angle - the dedicated grep-for-a-new-
 phrasing approach this run used (rather than re-reading already-audited
 sections) is one candidate method worth repeating on a still-different
 phrase.
+
+### Full standing health check, including a several-runs-overdue re-run of all five browser sweeps and a cold-start e2e - closed 2026-09-28 (hundred-and-ninety-first intensive run)
+
+With every open backlog item still either environment-blocked (re-confirmed:
+`WebFetch` to `en.wikipedia.org` still returns `EGRESS_BLOCKED` from the
+proxy, so the `docs/SOURCES.md` link-liveness sweep and the Nations League
+attendance/Team-of-the-Tournament gaps stay closed; `npm view
+@astrojs/check@latest peerDependencies` still only declares `typescript:
+'^5.0.0 || ^6.0.0'`) or awaiting human sign-off (the brand-suffix
+title-length decision), and `pnpm outdated` surfacing nothing new beyond
+that same blocked `typescript` line, this run fell back to the routine's own
+default: a genuinely useful quality pass rather than a new checker or a new
+claim-vocabulary search (seven verification-ledger gates already cover
+every claim shape found on the site so far, and a dedicated re-grep for
+other superlative-shaped trigger words - "narrowest", "widest", "closest",
+"biggest", "unbeaten", "tallest", "shortest" - turned up nothing newly
+checkable: the handful of matches are either already-ledgered instances of
+existing patterns or subjective, non-numeric prose ("one of international
+football's biggest surprises") with no table to verify against).
+
+Instead, this run targeted the two standing checks that had gone the
+longest without a fresh confirmation: the five full-site browser sweeps
+(`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
+`check:html`, last re-run by the hundred-and-eighty-eighth run, three runs
+stale) and a cold-start `pnpm test:e2e` (last re-run by the
+hundred-and-eighty-ninth run, two runs stale). Both are exactly the kind of
+check no run has an excuse to keep deferring indefinitely just because the
+prior run's own change didn't touch rendered output - each additional run
+between confirmations is additional accumulated risk that goes unverified.
+
+Before any of that, ran the fast standing baseline first: `pnpm install
+--frozen-lockfile` (clean), `pnpm outdated` (only the blocked `typescript`
+line), `pnpm lint` (0 errors/0 warnings/0 hints), `pnpm test` (892/892,
+unchanged), `pnpm build` (711 pages), `pnpm test:coverage` (99.91%/99.31%,
+unchanged - the same four defensively-unreachable lines as ever), all 29
+fast `check:*` scripts individually clean, `pnpm audit` (no known
+vulnerabilities), and `pnpm dlx knip --no-config-hints` (the same two
+standing false positives). All matched the documented baseline exactly.
+
+The five browser sweeps needed this session's own preinstalled Chromium
+rather than the default bundled binary - an already-documented, recurring
+environment quirk (see the multiple earlier `PW_EXECUTABLE_PATH` entries
+above), not a new one: `pnpm exec playwright test`/`check:lighthouse` et al.
+look for a `chrome-headless-shell` build this sandbox doesn't have
+preinstalled, so every sweep this run used
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`, the
+same escape hatch `scripts/preview-daemon.mjs`'s `launchChromium()` and
+`playwright.config.ts`'s `mobile-chromium` project both already wire up for
+exactly this case. Results: `check:reflow` reports zero pages with
+horizontal overflow at 320px across all 711 pages; `check:text-zoom` the
+same at 200% root font size; `check:print-width` the same in emulated print
+media at the 1032px A4-landscape content width; `check:html` finds all 711
+pages valid HTML5 against the content model; `check:lighthouse`'s 39-page
+representative sample scores 1.00 across performance/accessibility/
+best-practices/SEO on every page except the one documented, intentional
+`noindex` 404-page SEO exception (0.63, expected and excluded by
+`EXPECTED_SEO_EXCEPTIONS`). No regression in any of the five, matching the
+hundred-and-eighty-eighth run's own last-confirmed baseline.
+
+The cold-start `pnpm exec playwright test`
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`)
+ran the full mobile-chromium suite from a clean build: **1023/1023 passed in
+16.6 minutes** - the same count as every prior cold-start run
+(hundred-and-eighty-sixth through hundred-and-eighty-ninth), confirming the
+four commits piled onto this branch since the last full e2e run (the
+`check:completeness-claims` gate and this run's own health check) introduced
+no regression anywhere in the suite, not just in the areas each individual
+change touched directly.
+
+**Verification:** every command above; no code, content, or configuration
+changed this run - this was a pure confirmation pass, not a fix. No new
+`docs/ROADMAP.md` backlog items closed (there was nothing new to close),
+but the "last re-confirmed" dates for both the browser sweeps and the
+cold-start e2e count are now current again as of this run rather than
+three/two runs behind.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open-backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
+unchanged. With no new lead surfaced this run either, the next run again
+needs its own first-principles search: a still-different claim-vocabulary
+grep, a fresh manual content re-read, or another angle not yet tried, per
+the standing instruction every recent all-clean run has left the next one.
