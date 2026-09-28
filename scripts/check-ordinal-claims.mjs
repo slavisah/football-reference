@@ -63,6 +63,22 @@
 // ordinal word, so the narrower possessive anchor stays precise where the
 // bare-word widening above already proved unnecessary for this second net).
 //
+// Widened a third time by the hundred-and-ninety-second intensive run: a
+// "first-ever"/"second-ever"/etc. claim only matched the pattern above when
+// directly preceded by "the" or an adjacent possessive - but
+// `content/ballon-dor.md`'s 2025 Johan Cruyff Trophy entry phrases the same
+// claim shape with the possessive several words earlier in a list ("PSG's
+// Ligue 1, Coupe de France and first-ever UEFA Champions League title"),
+// which neither existing alternative reaches. Confirmed by grepping every
+// `-ever` ordinal occurrence across all six content files first: 4 of 5 were
+// already caught via "the first-ever"; this one was the sole silent gap.
+// Added a fourth alternative, a bare `(first|...)-ever` match with no
+// anchor requirement at all - re-checked against the full corpus before
+// widening (same diligence as the two prior widenings): the hyphenated
+// "-ever" suffix itself is precise enough to need no possessive/"the" anchor,
+// since nothing on this site uses "Nth-ever" as a non-claim, vague
+// quantifier the way a bare ordinal word sometimes could.
+//
 // Plain regex/string parsing of `content/*.md`, no build or browser needed -
 // the same territory as `check-superlative-claims.mjs`, so this is wired
 // into `.github/workflows/ci.yml` as a required PR gate immediately after
@@ -78,7 +94,7 @@ const LEDGER_PATH = path.join(ROOT, 'scripts', 'ordinal-claims-ledger.json');
 
 const ORDINALS = 'first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth';
 const CLAIM_PATTERN = new RegExp(
-  `\\bthe (${ORDINALS})\\b|\\b\\w+'s\\s+(${ORDINALS})\\b|\\b(his|her|its|their)\\s+(${ORDINALS})\\b`,
+  `\\bthe (${ORDINALS})\\b|\\b\\w+'s\\s+(${ORDINALS})\\b|\\b(his|her|its|their)\\s+(${ORDINALS})\\b|\\b(${ORDINALS})-ever\\b`,
   'i',
 );
 
