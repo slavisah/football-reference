@@ -30356,3 +30356,88 @@ unchanged. With no new lead surfaced this run either, the next run again
 needs its own first-principles search: a still-different claim-vocabulary
 grep, a fresh manual content re-read, or another angle not yet tried, per
 the standing instruction every recent all-clean run has left the next one.
+
+### `check:ordinal-claims` widened a third time: a non-adjacent "first-ever" possessive claim was silently unverified - closed 2026-09-28 (hundred-and-ninety-second intensive run)
+
+With every open backlog item still either environment-blocked or awaiting
+human sign-off (re-confirmed: `pnpm outdated` shows only the already-blocked
+`typescript` line, no new `@astrojs/check` release), and the
+hundred-and-ninety-first run's own "next run needs its own first-principles
+search" note as the standing instruction, this run took a structural angle
+on the seven existing verification-ledger checkers rather than a new
+vocabulary grep: could any of them miss a claim shape that matches their own
+*trigger word* but not their *anchor requirement* - the exact bug class the
+hundred-and-eighty-third/-fourth runs already found and fixed twice
+(possessive phrasing with no literal "the")? Re-read `check-ordinal-claims.mjs`'s
+own three-alternative pattern (`the (first|...)`, `\w+'s (first|...)`,
+`(his|her|its|their) (first|...)`) against every real "-ever" ordinal
+occurrence across all six `content/*.md` files (`first-ever`/`second-ever`/
+etc.) rather than assuming the two prior widenings had closed every gap in
+that pattern shape.
+
+Found one real, previously-unguarded instance: `content/ballon-dor.md`'s 2025
+Johan Cruyff Trophy entry - "**2025:** Luis Enrique (Paris Saint-Germain) -
+honored for PSG's Ligue 1, Coupe de France and first-ever UEFA Champions
+League title." - phrases the claim with the possessive ("PSG's") three words
+before the ordinal, separated by an intervening list ("Ligue 1, Coupe de
+France and"), which none of the three existing alternatives reaches (the
+possessive alternatives both require the ordinal word immediately after the
+possessive). Confirmed by testing the exact regex against the line directly
+(`node -e`) before touching the source: `false` on the unwidened pattern.
+The other four `-ever` occurrences site-wide (`ballon-dor.md`'s "the
+first-ever Ballon d'Or", `golden-boot.md`'s two "the first-ever ... Golden
+Boot" entries, `uefa-nations-league.md`'s "the first-ever Nations League
+Finals") were already caught via the existing `the (first|...)` alternative
+(a hyphen is a regex word boundary, so "the first-ever" already matches
+`\bthe first\b`) - this PSG entry was the sole gap, not a systemic one.
+
+Added a fourth alternative to `CLAIM_PATTERN`: a bare `(first|...)-ever`
+match with no possessive/"the" anchor at all, since the site has zero
+non-claim uses of an "Nth-ever" hyphenated compound (unlike a bare ordinal
+word, which does need an anchor to stay precise against "at first"/
+"third-place match"-type prose) - re-checked against the full corpus before
+widening, same diligence as the two prior widenings, zero new noise
+introduced (91 total ordinal claims now, up from 90; the other 90 are
+unchanged from before this run).
+
+The newly-caught claim is a real-world football-history fact, not something
+this site's own content tracks in a table - UEFA Champions League standings
+are outside the six competitions/awards this site covers. Verified instead
+against the well-documented public record: Paris Saint-Germain's only prior
+European Cup/Champions League final appearance was 2020 (lost 0-1 to Bayern
+Munich); they won the 2025 final 5-0 against Inter Milan (31 May 2025) -
+their first title in the competition's history. Recorded in
+`ordinal-claims-ledger.json` with that reasoning. No content or Croatian
+translation needed a fix - `src/pages/hr/competitions/ballon-dor.astro`'s
+existing 2025 Johan Cruyff Trophy entry already states "prvi naslov u Ligi
+prvaka u povijesti PSG-a" ("first Champions League title in PSG's history"),
+correctly paired, and `check:claims-hr` (202 claims, up from 201) confirms it
+stays paired now that the claim is ledgered.
+
+Added 2 new unit tests to `tests/unit/checkOrdinalClaims.test.ts` covering
+the new bare `-ever` alternative (a list-separated possessive case matching
+the real PSG bullet's shape, and a synthetic "third-ever"/"tenth-ever" case
+confirming every ordinal word in the group is reachable through this fourth
+alternative, not just "first").
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the blocked `typescript` line), `pnpm lint` (236 files, 0 errors/0
+warnings/0 hints), `pnpm test` (894/894, up from 892), `pnpm build` (711
+pages), `pnpm test:coverage` (99.91%/99.31%, unchanged), all 29 fast
+`check:*` scripts individually clean (`check:ordinal-claims` itself: 91
+claims checked, all ledgered; `check:claims-hr`: 202 claims, all paired),
+`pnpm audit` (no known vulnerabilities). Browser sweeps and `pnpm test:e2e`
+not re-run - this change touches only a build-time verification script, its
+JSON ledger, and a unit test file, no page markup, styling or rendered
+content (the Croatian translation already matched, unchanged).
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+The next run again needs its own first-principles search for a fresh
+angle - this run's own approach (re-testing an existing checker's pattern
+against real content it should already cover, rather than searching for new
+vocabulary) is one candidate worth trying against the other six
+verification-ledger checkers in turn, not yet done for
+`check:record-claims`/`check:consecutive-claims`/`check:since-claims`/
+`check:one-of-only-claims`/`check:completeness-claims`/
+`check:superlative-claims` this run.

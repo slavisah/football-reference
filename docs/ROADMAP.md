@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (191 intensive runs as of 2026-09-28) lives
+verification sweep and decision (192 intensive runs as of 2026-09-28) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,7 +44,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-ninety-first run (2026-09-28): 892/892 unit tests,
+As of the hundred-and-ninety-second run (2026-09-28): 894/894 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
@@ -56,6 +56,31 @@ full `pnpm test:e2e` count and all five browser-based sweeps
 `check:html`, several runs stale since the hundred-and-eighty-eighth) were
 all freshly re-confirmed clean by the hundred-and-ninety-first run itself
 (1023/1023 e2e, cold-start, 16.6 minutes) - see that run's own entry below.
+
+**Hundred-and-ninety-second run:** with every open backlog item below still
+either environment-blocked or awaiting human sign-off and `pnpm outdated`
+showing nothing new, took a structural angle on the seven existing
+verification-ledger checkers instead of a new vocabulary grep: re-tested
+`check-ordinal-claims.mjs`'s own possessive-ordinal pattern against every
+real "-ever" occurrence in `content/*.md`, rather than assuming the
+hundred-and-eighty-third/-fourth runs' two prior widenings had closed every
+gap in that pattern shape. Found one real, previously-unguarded claim:
+`content/ballon-dor.md`'s 2025 Johan Cruyff Trophy entry phrases "PSG's ...
+first-ever UEFA Champions League title" with the possessive several words
+before the ordinal (separated by an intervening list), which neither
+existing possessive alternative reaches. Widened the pattern a third time
+with a bare `(first|...)-ever` alternative (no anchor needed - this site has
+no non-claim use of an "Nth-ever" compound), verified the newly-caught claim
+against the real-world record (PSG's only prior Champions League final was
+2020, lost; they won it 5-0 over Inter Milan in 2025 - their first title),
+and recorded it in `ordinal-claims-ledger.json`. `pnpm test` 894/894 (up
+from 892), all 29 fast `check:*` scripts clean (`check:ordinal-claims` now
+91 claims, `check:claims-hr` now 202), `pnpm build` 711 pages, `pnpm lint`
+0/0/0, coverage unchanged at 99.91%/99.31%, `pnpm audit` clean, knip same
+two standing false positives. Browser sweeps/`pnpm test:e2e` not re-run -
+only a build-time script, its ledger and a unit test changed, no page
+markup or content. See `docs/PROJECT_STATUS.md`'s matching entry for the
+full writeup.
 
 **Hundred-and-ninety-first run:** with every open backlog item below still
 either environment-blocked or awaiting human sign-off, and `pnpm outdated`
