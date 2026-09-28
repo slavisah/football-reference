@@ -30259,7 +30259,11 @@ code/content change - a build-time script, its JSON ledger, a unit test,
 and two lines of CI/package config - needed no e2e re-run to ship per the
 same precedent the hundred-and-eighty-fifth/-sixth runs' own entries
 already established for identically-scoped changes (no page markup,
-styling, or runtime behavior touched).
+styling, or runtime behavior touched). That background sweep finished
+after the rest of this run's own work was already pushed: **1023/1023
+passed in 18.0 minutes** - a genuine, positive confirmation that the
+accumulated branch (through this run's own commit) is still fully clean,
+not just this run's own narrow change.
 
 **Left for a future pass:** same environment-blocked open-backlog items as
 ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged. With this run's
