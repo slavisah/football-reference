@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (188 intensive runs as of 2026-09-25) lives
+verification sweep and decision (189 intensive runs as of 2026-09-28) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,21 +44,44 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-eighty-eighth run (2026-09-25): 880/880 unit tests,
+As of the hundred-and-eighty-ninth run (2026-09-28): 880/880 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
 `@cspell/dict-hr-hr`, used only via `.cspell/hr-notes.cspell.json`'s
 `"import"` field, never a JS `import`) - neither actually unused, knip's
 static analysis just can't see a reference inside a config-file string. The
-full `pnpm test:e2e` count was last re-confirmed clean by the
-hundred-and-eighty-sixth run itself (1023/1023, since that run edited real
-page content); not re-run again this run, since this run changed only
-`docs/ROADMAP.md`/`docs/PROJECT_STATUS.md`, no page markup or content. The
-five browser-based sweeps (`check:lighthouse`/`check:reflow`/`check:text-zoom`/
-`check:print-width`/`check:html`) *were* re-run this run (several runs
-stale) and all came back clean - see the hundred-and-eighty-eighth run's own
-entry below.
+full `pnpm test:e2e` count was re-confirmed clean by the
+hundred-and-eighty-ninth run itself (1023/1023, cold-start, specifically to
+verify that run's own `@playwright/test`/`@axe-core/playwright` dependency
+bump). The five browser-based sweeps (`check:lighthouse`/`check:reflow`/
+`check:text-zoom`/`check:print-width`/`check:html`) were not re-run this
+run (only one run stale, and this run touched no rendered page output) -
+last re-confirmed clean by the hundred-and-eighty-eighth run.
+
+**Hundred-and-eighty-ninth run:** with the hundred-and-eighty-eighth run's
+five fresh quality angles all closed and no new concrete lead named, this
+run's `pnpm outdated` surfaced four new in-range patch releases none of the
+last several runs had seen yet: `@types/node` 26.6.2 -> 26.6.3, `cspell`
+10.3.4 -> 10.3.5, `html-validate` 11.16.0 -> 11.16.1, and `sharp` 0.35.4 ->
+0.35.5 (pinned to an exact version in `package.json`, so bumped by hand
+after `pnpm update` alone left it untouched). `typescript` remains the sole
+blocked line (`@astrojs/check@0.9.10`'s peer dependency still only allows
+`^5.0.0 || ^6.0.0`, re-confirmed via `npm view`). Because two of the four
+bumped packages - and `@playwright/test` itself, which had separately
+drifted since the last lockfile refresh - are exactly what the site's e2e
+suite and its WCAG assertions depend on, this run didn't default to the
+"no content changed, skip e2e" shortcut several recent doc-only runs used;
+instead it ran a full cold-start `pnpm test:e2e` specifically to verify the
+bump didn't silently change behavior. Result: 1023/1023 passed (17.2
+minutes), matching the hundred-and-eighty-sixth run's own last cold-start
+count exactly - a genuine, positive confirmation, not an assumption carried
+over. `pnpm lint` (234 files, 0/0/0), `pnpm test` (880/880), `pnpm build`
+(711 pages), all 28 fast `check:*` scripts, `pnpm test:coverage`
+(99.91%/99.31%, unchanged), `pnpm audit` (clean), and `pnpm dlx knip
+--no-config-hints` (same two standing false positives) all re-confirmed
+clean after the bump. See `docs/PROJECT_STATUS.md`'s matching entry for the
+full writeup.
 
 **Hundred-and-eighty-eighth run:** with the hundred-and-eighty-seventh run's
 own thread fully closed and no new concrete next step named, tried five
