@@ -31104,14 +31104,24 @@ files, up from 236 - the new spec file - 0 errors/0 warnings/0 hints), `pnpm
 test` (897/897, unchanged - pure CSS/e2e, no unit-testable logic touched),
 `pnpm build` (711 pages), all 29 fast `check:*` scripts individually clean,
 `pnpm audit` (no known vulnerabilities), `pnpm dlx knip --no-config-hints`
-(same two standing false positives). `check:pdfs`/`check:pdf-outline` came
-back clean *without* a PDF regeneration - confirmed deliberately rather than
-skipped: Nav.astro's `.site-header` and every changed compare-page selector
-are already covered by `global.css`'s print-media rules (`.site-header,
+(same two standing false positives). Assumed at first that
+`check:pdfs`/`check:pdf-outline` needed no PDF regeneration, reasoning that
+Nav.astro's `.site-header` and every changed compare-page selector are
+already covered by `global.css`'s print-media rules (`.site-header,
 .site-footer, ..., .no-print { display: none !important }` for the header;
 the compare pages' own `@media print` sections already reset list styling
-for print), so none of the five changed rules can affect the printed/PDF
-output. `check:reflow`/`check:print-width`/`check:text-zoom`/`check:html`
+for print) and so can't affect the printed page - **wrong**:
+`check-pdf-freshness.mjs` hashes each PDF's *source file* to decide
+staleness, not its rendered print output, so touching `compare.astro`/
+`compare-players.astro`/their Croatian equivalents at all marks their PDFs
+stale regardless of whether the specific change is print-visible (this run's
+own reasoning conflated "doesn't change the printed page" with "doesn't
+need a PDF rebuild" - only the former was true). CI's required `check:pdfs`
+gate on this PR caught the mistake directly; a same-day follow-up commit
+(`cb5420b81`, from a separate PR-monitoring session responding to the CI
+failure) regenerated all 700 PDFs and confirmed both PDF checks clean. Local
+`pnpm build && pnpm check:pdfs` re-confirmed clean after rebasing onto that
+fix. `check:reflow`/`check:print-width`/`check:text-zoom`/`check:html`
 each individually re-confirmed clean (711/711) after the fixes, and every
 specific test file this run added or touched
 (`accessibility-forced-colors.spec.ts`, the new

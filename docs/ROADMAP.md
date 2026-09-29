@@ -101,13 +101,18 @@ sweep) and 4 in a new `tests/e2e/dynamic-list-styling.spec.ts` (finals-
 meetings/shared-years card layout survives a shared-URL-driven re-render,
 both languages). `pnpm test` 897/897 (unchanged - pure CSS/e2e), `pnpm lint`
 237 files 0/0/0, `pnpm build` 711 pages, all 29 fast `check:*` scripts clean,
-`pnpm audit` clean, knip same two standing false positives. Nav.astro/
-compare/compare-players are all print-hidden (`.site-header,
-.compare__field` etc. aside, none render in `@media print`), so no PDF
-regeneration was needed - `check:pdfs`/`check:pdf-outline` confirmed clean
-without a rebuild. See `docs/PROJECT_STATUS.md`'s matching entry for the
-full investigation, including the live before/after `getComputedStyle()`
-readings for all five fixed rules.
+`pnpm audit` clean, knip same two standing false positives. Assumed at
+first that no PDF regeneration was needed, reasoning that Nav.astro's
+`.site-header` and every changed compare-page selector are print-hidden -
+wrong: `check:pdf-freshness` hashes each PDF's *source file*, not its
+rendered print output, so any source change to `compare.astro`/
+`compare-players.astro`/their Croatian equivalents marks their PDFs stale
+regardless of whether the change is print-visible. CI's `check:pdfs` gate
+caught the mistake on this PR; a follow-up commit regenerated all 700 PDFs
+and confirmed `check:pdfs`/`check:pdf-outline` clean. See
+`docs/PROJECT_STATUS.md`'s matching entry for the full investigation,
+including the live before/after `getComputedStyle()` readings for all five
+fixed rules.
 
 **Hundred-and-ninety-eighth run:** with every "Open backlog" item below still
 either environment-blocked or awaiting human sign-off, this run took a
