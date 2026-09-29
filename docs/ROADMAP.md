@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (196 intensive runs as of 2026-09-29) lives
+verification sweep and decision (197 intensive runs as of 2026-09-29) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -57,6 +57,54 @@ full `pnpm test:e2e` count and all five browser-based sweeps
 all freshly re-confirmed clean by the hundred-and-ninety-fifth run itself
 (1023/1023 e2e, cold-start, 16.8 minutes) - due again whenever a future run
 touches actual page output.
+
+**Hundred-and-ninety-seventh run:** re-confirmed every item in "Open backlog"
+below is still blocked on the same three things - this environment's outbound
+network egress (rejects direct `WebFetch` to reference domains, confirmed
+again), the `@astrojs/check@0.9.10` -> `typescript` 7 peer-dependency ceiling
+(`npm view @astrojs/check@latest peerDependencies` unchanged: `^5.0.0 ||
+^6.0.0`), and the `long-title` brand-suffix call, which still needs a human,
+not a script. `pnpm outdated` showed nothing new beyond the same blocked
+`typescript` line.
+
+Rather than run another narrow `content/*.md` vocabulary grep - the last
+dozen-plus runs (roughly the hundred-and-eighty-fifth through
+hundred-and-ninety-sixth) have each tried a fresh word list and come back
+with zero-to-one non-actionable hits, a clearly flattening curve - this run
+instead spot-checked whether the two most recent real-world content updates
+(the 2026 FIFA World Cup final/awards, added earlier this year, and the 2025
+Ballon d'Or/Kopa/Yashin/Sócrates winners) are fully wired through the parts
+of the site that don't show up in a `content/*.md` grep: the hand-translated
+Croatian pages (`src/pages/hr/competitions/world-cup.astro` carries the same
+2026 figures - MetLife Stadium attendance, Rodri's Golden Ball, Cubarsí's
+Bronze Ball note - in Croatian) and the Golden Boot page (correctly scoped to
+only World Cup/EURO top scorers, so the 2025 European Golden Shoe is out of
+its scope by design, not a gap). Both checked out already current - no drift
+found.
+
+Ran the full fast standing health check: `pnpm install --frozen-lockfile`
+(clean), `pnpm outdated` (only the blocked `typescript` line), `pnpm lint`
+(236 files, 0 errors/0 warnings/0 hints), `pnpm test` (897/897, unchanged),
+`pnpm build` (711 pages, unchanged). Did not re-run the five browser-based
+sweeps or a cold-start `pnpm test:e2e` - unchanged since the
+hundred-and-ninety-fifth run's same-day refresh, no page markup, styling, or
+rendered content has changed since.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever, unchanged. Flagging for the human operator rather than
+burying it in yet another "nothing new" paragraph: this routine has now run
+197 times against a site whose original milestone and every website
+requirement have been complete since roughly the fortieth run, and the last
+~25 runs straight have found zero new bugs and shipped no user-facing
+change - every open item left is explicitly blocked on inputs only a human
+(or a differently-configured session) can supply: real outbound network
+access for the source-liveness sweep and Nations League Best XI/attendance
+lookups, a `typescript` 7-compatible `@astrojs/check` release, or a sign-off
+on the branded `<title>` length. Continuing to run this exact routine every 4
+hours is very unlikely to surface further value until one of those three
+inputs changes; worth the human's judgment on whether to merge the standing
+PR, pause or slow this schedule, or supply one of the blocking inputs
+directly.
 
 **Hundred-and-ninety-sixth run:** with every open backlog item below still
 either environment-blocked or awaiting human sign-off, and `pnpm outdated`
