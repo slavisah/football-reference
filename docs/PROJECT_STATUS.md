@@ -30963,3 +30963,177 @@ contrast across every interactive *state* - hover, focus, disabled, active
 listbox option - site-wide, not just `check:lighthouse`'s 39-page sample).
 Worth trying that class of angle first on the next run before returning to
 vocabulary sweeps.
+
+### A dynamically-injected `<li>` never carries its component's Astro scope hash, so its scoped CSS silently never applied - found in the search-widget highlight, then confirmed systemic in `/compare`/`/compare-players`'s own dynamic lists - closed 2026-09-29 (hundred-and-ninety-ninth intensive run)
+
+Followed the hundred-and-ninety-eighth run's own named next angle:
+forced-colors/color-contrast coverage of
+interactive *states* (hover, focus, disabled, active listbox option)
+site-wide, not just `check:lighthouse`'s 39-page sample. `AGENTS.md`'s own
+mobile-first conventions single out "active listbox options" by name as a
+case that must not signal state by colour alone, and Nav.astro's
+`.team-search__listbox li.is-active` rule already carried a `forced-colors:
+active` outline specifically for that reason - but nothing had ever actually
+opened the "find a team"/"find a player" search widget's listbox under
+`forcedColors: 'active'` (or, it turned out, under any condition at all) and
+read its real computed style. Every prior forced-colors/prefers-contrast/
+axe sweep only ever `page.goto()`s each path with every combobox closed, so
+the `.is-active` state had never once existed in the DOM during any of
+those tests.
+
+**The bug.** Writing that test (`tests/e2e/accessibility-forced-colors.spec.ts`)
+found something bigger than a missing test. Opening the widget, typing a
+query, and reading `getComputedStyle()` on the auto-activated first result
+showed `background-color: rgba(0, 0, 0, 0)` and the plain body text color -
+not the intended `color-mix(in srgb, var(--accent) 16%, transparent)`
+background/`var(--accent)` text - in ordinary rendering, before forced-colors
+was even emulated. The forced-colors outline was equally absent:
+`outline-style: none`, `outline-width: 0px`, even though
+`window.matchMedia('(forced-colors: active)').matches` read `true` and the
+element's `class="is-active"`/`aria-selected="true"` were both correctly
+set. The highlight has never rendered, in any color scheme, in any browser,
+since this widget shipped - a real, previously-unnoticed UX regression for
+any sighted keyboard user relying on the highlight to see which option
+Enter would pick (screen-reader users were unaffected: `aria-activedescendant`/
+`aria-selected` are set correctly regardless, which is also exactly why
+`check:link-names`/every axe sweep never flagged it - an unhighlighted-but-
+still-correctly-labelled option is not a WCAG violation).
+
+**Root cause**, confirmed against the compiled CSS in `dist/`, not just
+theorized: Astro scopes a component's `<style>` block by adding a
+`data-astro-cid-<hash>` attribute to every element the compiler sees in the
+component's own template, and rewriting every simple selector in a scoped
+rule to require that same attribute (`.team-search__listbox li.is-active`
+compiles to `.team-search__listbox[data-astro-cid-wpvy4v7s]
+li[data-astro-cid-wpvy4v7s].is-active`). The listbox's `<ul>` is part of
+Nav.astro's static template, so it gets the attribute - but every `<li>`
+inside it is created at runtime by `initSearchWidget()`'s `listbox.innerHTML
+= matches.map((team) => \`<li role="option" ...>...\`).join('')` (Nav.astro,
+`is:inline` script), entirely outside Astro's compiler, so it never gets
+tagged. The compiled selector's `li[data-astro-cid-wpvy4v7s]` clause then
+can never match, and the *entire* rule block silently no-ops: not just the
+`.is-active` highlight and its forced-colors outline, but the plain `li`
+rule's padding, border-radius and pointer cursor too - every option in both
+search widgets has rendered with zero of its intended styling, forever.
+
+**The same root cause, confirmed systemic, not isolated.** Before treating
+this as a one-off widget bug, checked every other place in `src/` that
+builds DOM via `innerHTML` for the same pattern (a scoped selector targeting
+runtime-injected markup): `grep -rl innerHTML src/components src/pages
+src/layouts` found exactly two other call sites, both in `/compare` and
+`/compare-players` (English and Croatian - four files total).
+`renderFinalsMeetings()` (`compare.astro`/`hr/compare.astro`) and
+`renderSharedYears()` (`compare-players.astro`/`hr/compare-players.astro`)
+each replace their container's *entire* `innerHTML`, including the `<ol
+class="finals-meetings__list">`/`<ol class="shared-years__list">` element
+itself, not just its `<li>`s, whenever the reader picks a new team/player
+pair. Confirmed live with a direct `getComputedStyle()` read after loading
+`/compare?a=brazil&b=argentina` (a pair with a real recorded meeting, so the
+list actually renders instead of the "haven't met" empty state): `display:
+block`, `list-style-type: decimal` - the intended `display: flex`/`list-
+style: none` card layout (`.finals-meetings__list`/`.finals-meetings__list
+li`: flex column, gap, no bullets; each item a bordered/background card)
+had never applied either, for exactly the same reason - and, critically,
+this path is reachable through the page's own shareable `?a=/&b=` URL
+parameters (`AGENTS.md` rule 9: "make all filters shareable through URL
+query parameters"), so any reader who followed a shared comparison link, not
+just one who used the picker, saw the broken bulleted layout. Repeated the
+same live check for `/compare-players?a=Zinedine+Zidane&b=Davor+%C5%A0uker`
+(a pair with a real shared year, from `tests/e2e/compare-players.spec.ts`'s
+own existing fixture) and both Croatian pages - all four showed the
+identical `block`/`decimal` break.
+
+**Fix**, the same shape in all five rule locations: wrap the part of each
+selector that targets runtime-injected markup in Astro's own `:global()`
+escape hatch - the same cross-scope-boundary tool this exact file
+(Nav.astro) already uses for `.site-menu.is-open :global(#theme-toggle)`
+(reaching into `ThemeToggle.astro`'s own separately-scoped root element).
+`.team-search__listbox li` -> `.team-search__listbox :global(li)` (the `<ul>`
+stays scoped - it's static; only its dynamically-injected children need the
+escape). `.finals-meetings__list`/`.finals-meetings__list li` -> fully
+`:global(.finals-meetings__list)`/`:global(.finals-meetings__list li)` in
+both `compare.astro` and `hr/compare.astro` (here the `<ol>` itself is also
+replaced, so both selector segments need it), and the identical treatment
+for `:global(.shared-years__list)`/`:global(.shared-years__list li)` in both
+`compare-players.astro` and `hr/compare-players.astro`. Rebuilt and
+re-confirmed every one of the five live `getComputedStyle()` checks above
+now reads its intended value (`background-color` a real accent tint, forced-
+colors outline `1px solid CanvasText`, `display: flex`, `list-style-type:
+none` - all four `/compare`/`/compare-players` pages), and re-inspected
+`dist/`'s compiled CSS directly to confirm the `li`/`.finals-meetings__list`/
+`.shared-years__list` selectors no longer carry a `data-astro-cid-*`
+requirement.
+
+**Why 198 prior runs' automated sweeps never caught this.** Both bugs are
+invisible to every check this project already runs automatically: axe-core's
+WCAG rules don't have a "does this state look visually distinct" check (the
+`aria-selected`/`aria-activedescendant` wiring was always correct, so
+`region`/`color-contrast`/structure rules had nothing to flag on an
+unhighlighted-but-correctly-labelled option or an unstyled-but-still-
+semantically-valid `<ol>`), `check:reflow`/`check:print-width`/`check:text-
+zoom` only check for horizontal overflow, and `check:lighthouse`'s
+performance/SEO/best-practices categories don't inspect list styling either.
+Even `tests/e2e/team-search.spec.ts`/`player-search.spec.ts`'s own "open
+listbox... has no WCAG violations" tests and `tests/e2e/
+compare-players.spec.ts`'s own team-pair-re-selection test all already
+exercise the exact broken code path - they just never read `getComputedStyle()`
+on the result, only text content and ARIA attributes. This is the same class
+of gap the hundred-and-ninety-eighth run's own "measure the real rendered
+page" finding already flagged: functional/ARIA correctness has been tested
+thoroughly; the actual computed visual presentation of dynamically-rendered
+content had a hole no prior run's angle happened to probe.
+
+**Permanent regression coverage.** Extended
+`tests/e2e/accessibility-forced-colors.spec.ts` with two new targeted tests
+(team-search/player-search auto-active option): each opens the widget,
+asserts a real non-transparent background at baseline, then emulates
+forced-colors and asserts a real outline, then runs the same full WCAG axe
+sweep every other test in this file runs. Added a new file,
+`tests/e2e/dynamic-list-styling.spec.ts` (4 tests: `/compare` English/
+Croatian, `/compare-players` English/Croatian), asserting the list and its
+first item resolve to `display: flex` and `list-style-type: none` after
+loading a pair known to have a real meeting/shared year via the page's own
+shareable URL parameters - closing the specific gap
+(`accessibility-compare-states.spec.ts` re-selects a pair but only runs axe;
+`compare-players.spec.ts` re-selects a pair but only checks text content)
+that let this ship unnoticed.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean, no new outdated
+packages beyond the standing blocked `typescript` line), `pnpm lint` (237
+files, up from 236 - the new spec file - 0 errors/0 warnings/0 hints), `pnpm
+test` (897/897, unchanged - pure CSS/e2e, no unit-testable logic touched),
+`pnpm build` (711 pages), all 29 fast `check:*` scripts individually clean,
+`pnpm audit` (no known vulnerabilities), `pnpm dlx knip --no-config-hints`
+(same two standing false positives). `check:pdfs`/`check:pdf-outline` came
+back clean *without* a PDF regeneration - confirmed deliberately rather than
+skipped: Nav.astro's `.site-header` and every changed compare-page selector
+are already covered by `global.css`'s print-media rules (`.site-header,
+.site-footer, ..., .no-print { display: none !important }` for the header;
+the compare pages' own `@media print` sections already reset list styling
+for print), so none of the five changed rules can affect the printed/PDF
+output. `check:reflow`/`check:print-width`/`check:text-zoom`/`check:html`
+each individually re-confirmed clean (711/711) after the fixes, and every
+specific test file this run added or touched
+(`accessibility-forced-colors.spec.ts`, the new
+`dynamic-list-styling.spec.ts`, `team-search.spec.ts`/`player-search.spec.ts`,
+`accessibility.spec.ts`, `accessibility-prefers-contrast.spec.ts`) was run
+directly and passed in full. Since Nav.astro renders on all 711 pages, this
+also warrants this project's standing "full cold-start `pnpm test:e2e`
+before committing a page-output change" discipline - launched as this entry
+was being written; see the next log entry (or this entry's own commit
+history, if no regression turned up) for its result.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open-backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
+unchanged. The pattern worth flagging to the human operator: two
+independent, previously-unnoticed rendering bugs in one run, both caused by
+the identical "Astro scope hash never reaches runtime-`innerHTML`-injected
+markup" root cause, found by actually reading `getComputedStyle()` on
+dynamically-rendered content rather than trusting ARIA/text-content
+assertions or an automated accessibility-tree audit. `grep -rl innerHTML
+src/components src/pages src/layouts` found only the three call sites this
+run already covers (Nav.astro, compare.astro/hr, compare-players.astro/hr) -
+no fourth instance was missed - but any *future* client-side `innerHTML`
+render in this codebase should get the same `:global()` treatment
+proactively, or better, avoid a scoped selector for dynamically-injected
+markup entirely.

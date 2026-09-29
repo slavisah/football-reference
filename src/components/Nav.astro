@@ -630,14 +630,30 @@ function isCurrent(href: string): boolean {
     display: none;
   }
 
-  .team-search__listbox li {
+  /* :global() on the `li` half of each selector below, not just the
+     `is-active` one: every <li> in this listbox is injected at runtime by
+     initSearchWidget()'s `listbox.innerHTML = matches.map(...)` (below,
+     is:inline script), so none of them ever carry this component's
+     Astro-generated data-astro-cid-* scoping attribute the way the static
+     <ul> markup does - a plain (non-:global) `.team-search__listbox li`
+     selector compiles to `.team-search__listbox[data-astro-cid-x]
+     li[data-astro-cid-x]`, which cannot match an <li> lacking that
+     attribute. Confirmed live (not just reasoned from the compiled CSS):
+     every rule below silently never applied to a single rendered option in
+     any color scheme or forced-colors mode - no padding, no pointer
+     cursor, and (the concern that surfaced this) no is-active highlight of
+     any kind, sighted or forced-colors, since the day this widget shipped.
+     Same cross-scope problem, and the same fix, as this file's own
+     `.site-menu.is-open :global(#theme-toggle)` rule below (ThemeToggle.astro's
+     own root element carries *its* component's scope hash, not Nav's). */
+  .team-search__listbox :global(li) {
     padding: 0.45rem 0.6rem;
     border-radius: var(--radius);
     font-size: 0.9rem;
     cursor: pointer;
   }
 
-  .team-search__listbox li.is-active {
+  .team-search__listbox :global(li.is-active) {
     background: color-mix(in srgb, var(--accent) 16%, transparent);
     color: var(--accent);
   }
@@ -647,7 +663,7 @@ function isCurrent(href: string): boolean {
      TournamentTable's .is-winner cell - the active option needs a
      non-color signal too. */
   @media (forced-colors: active) {
-    .team-search__listbox li.is-active {
+    .team-search__listbox :global(li.is-active) {
       outline: 1px solid CanvasText;
       outline-offset: -1px;
     }

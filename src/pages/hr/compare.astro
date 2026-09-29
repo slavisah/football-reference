@@ -754,7 +754,13 @@ const jsonLd: JsonLdObject[] = [
     max-width: 68ch;
   }
 
-  .finals-meetings__list {
+  /* :global() on both the list and its `li`s - see compare.astro's own copy
+     of this comment (the two files independently duplicate this component):
+     renderFinalsMeetings() (below) replaces the entire innerHTML, <ol>
+     included, whenever the reader picks a new team pair, so the
+     re-rendered markup never carries the data-astro-cid-* attribute a plain
+     scoped selector would require. Confirmed live, not assumed. */
+  :global(.finals-meetings__list) {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -763,7 +769,7 @@ const jsonLd: JsonLdObject[] = [
     margin: 0;
   }
 
-  .finals-meetings__list li {
+  :global(.finals-meetings__list li) {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;

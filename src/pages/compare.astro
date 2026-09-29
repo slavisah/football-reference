@@ -696,7 +696,20 @@ const jsonLd: JsonLdObject[] = [
     max-width: 68ch;
   }
 
-  .finals-meetings__list {
+  /* :global() on both the list and its `li`s: renderFinalsMeetings() (below)
+     replaces #finals-meetings-body's entire innerHTML - including the <ol>
+     itself, not just its items - whenever the reader picks a new team pair,
+     so the re-rendered markup never carries the data-astro-cid-* attribute
+     Astro's compiler adds to this file's own statically-authored <ol> (used
+     only for the page's initial/default pair) and requires of a plain
+     scoped selector. Without :global() this list silently reverts to an
+     unstyled, bulleted <ol> - no flex layout, no card background/border -
+     the moment a reader actually uses the page's own shareable ?a=/&b=
+     URL params or either picker, confirmed live via a direct
+     `/compare?a=<id>&b=<id>` load (`getComputedStyle` measured `display:
+     block`/`list-style: decimal`, not the intended `flex`/`none`), not
+     assumed from reading the CSS. */
+  :global(.finals-meetings__list) {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -705,7 +718,7 @@ const jsonLd: JsonLdObject[] = [
     margin: 0;
   }
 
-  .finals-meetings__list li {
+  :global(.finals-meetings__list li) {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;

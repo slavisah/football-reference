@@ -645,7 +645,13 @@ const jsonLd: JsonLdObject[] = [
     max-width: 68ch;
   }
 
-  .shared-years__list {
+  /* :global() on both the list and its `li`s - the player-profile
+     counterpart of compare.astro's own `.finals-meetings__list` fix:
+     renderSharedYears() (below) replaces the entire innerHTML, <ol>
+     included, whenever the reader picks a new player pair, so the
+     re-rendered markup never carries the data-astro-cid-* attribute a plain
+     scoped selector would require. Confirmed live, not assumed. */
+  :global(.shared-years__list) {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -654,7 +660,7 @@ const jsonLd: JsonLdObject[] = [
     margin: 0;
   }
 
-  .shared-years__list li {
+  :global(.shared-years__list li) {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;

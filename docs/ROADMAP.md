@@ -58,6 +58,57 @@ hundred-and-ninety-eighth run itself (1030/1030 e2e, cold-start, 17.8
 minutes; 39/39 Lighthouse pages) - due again whenever a future run touches
 actual page output.
 
+**Hundred-and-ninety-ninth run:** followed the hundred-and-ninety-eighth
+run's own suggested next angle - forced-colors/interactive-*state* coverage
+beyond `check:lighthouse`'s 39-page sample - and it found something more
+significant than a missing test: writing a `forced-colors: active` test for
+the "find a team"/"find a player" search widgets' auto-highlighted option
+(Nav.astro, every page, both languages) found that the highlight had never
+actually rendered, in *any* color scheme or mode, since the widget shipped.
+Root cause: every `<li>` in the listbox is injected at runtime via
+`listbox.innerHTML = matches.map(...)`, so it never carries the
+`data-astro-cid-*` attribute Astro's compiler adds to statically-authored
+markup and requires of a plain scoped CSS selector - the entire
+`.team-search__listbox li` rule block (padding, cursor, the `.is-active`
+highlight, and its forced-colors outline) silently never matched a single
+rendered option, confirmed with a live `getComputedStyle()` read
+(`background-color: rgba(0, 0, 0, 0)`, plain body text) before the fix, not
+assumed from the CSS. Fixed with `:global()` on the `li` half of each
+selector - the same cross-scope pattern this file already uses for
+`.site-menu.is-open :global(#theme-toggle)`.
+
+That fix pattern (dynamically-`innerHTML`-injected markup silently missing
+its component's scoped styles) turned out to be systemic, not a one-off:
+the same root cause independently breaks `/compare`'s `.finals-meetings__list`
+and `/compare-players`' `.shared-years__list` (both languages, four files
+total) - `renderFinalsMeetings()`/`renderSharedYears()` replace their
+container's entire `innerHTML`, `<ol>` included, whenever the reader picks a
+new pair, so the re-rendered list reverts to a bare bulleted `<ol>` (no flex
+card layout) the moment a reader uses either page's own shareable `?a=/&b=`
+URL parameters (AGENTS.md's own rule 9) or either picker - confirmed live via
+a direct `/compare?a=brazil&b=argentina` load. Fixed the same way in all four
+files. Neither bug was a WCAG violation axe-core's automated rules would
+flag (an unstyled-but-still-semantically-correct list/option isn't a
+contrast or structure violation), which is exactly why 198 prior runs' axe
+sweeps - including ones that already open this exact listbox or re-select a
+team pair - never caught either one: this class of bug needs a real
+`getComputedStyle()` read, not an accessibility-tree audit.
+
+Added 6 new permanent e2e regression tests: 2 in
+`tests/e2e/accessibility-forced-colors.spec.ts` (team-search/player-search
+active-option highlight, baseline plus forced-colors outline, plus a WCAG
+sweep) and 4 in a new `tests/e2e/dynamic-list-styling.spec.ts` (finals-
+meetings/shared-years card layout survives a shared-URL-driven re-render,
+both languages). `pnpm test` 897/897 (unchanged - pure CSS/e2e), `pnpm lint`
+237 files 0/0/0, `pnpm build` 711 pages, all 29 fast `check:*` scripts clean,
+`pnpm audit` clean, knip same two standing false positives. Nav.astro/
+compare/compare-players are all print-hidden (`.site-header,
+.compare__field` etc. aside, none render in `@media print`), so no PDF
+regeneration was needed - `check:pdfs`/`check:pdf-outline` confirmed clean
+without a rebuild. See `docs/PROJECT_STATUS.md`'s matching entry for the
+full investigation, including the live before/after `getComputedStyle()`
+readings for all five fixed rules.
+
 **Hundred-and-ninety-eighth run:** with every "Open backlog" item below still
 either environment-blocked or awaiting human sign-off, this run took a
 different angle from the last ~25 runs' vocabulary greps: a real
