@@ -496,6 +496,14 @@ const jsonLd: JsonLdObject[] = [
   #quiz-restart {
     font: inherit;
     padding: 0.5rem 0.9rem;
+    /* AGENTS.md's "Interactive targets are at least 44px in any
+       touch-facing control" - the padding above alone only reaches ~43px
+       tall, short of that floor. Measured with a real Playwright
+       boundingBox() at 360px, not assumed from the CSS. */
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border-radius: var(--radius);
     border: 1px solid var(--border);
     background: var(--bg-subtle);

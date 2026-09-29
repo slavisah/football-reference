@@ -392,6 +392,13 @@ const sortMinWidth = selectMinWidthRem(sortOptions.map((option) => option.label)
   .filters select {
     font: inherit;
     padding: 0.5rem 0.6rem;
+    /* AGENTS.md's "Interactive targets are at least 44px in any
+       touch-facing control" - the padding above alone only reaches ~39px
+       tall, short of that floor on every one of these five filters
+       (country/year/host/champion/sort) across every tournament table on
+       the site. Measured with a real Playwright boundingBox() at 360px, not
+       assumed from the CSS. */
+    min-height: 2.75rem;
     color: var(--text);
     background: var(--bg);
     border: 1px solid var(--border);

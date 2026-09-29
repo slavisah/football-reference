@@ -62,7 +62,7 @@
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.6.3",
     "@vitest/coverage-v8": "5.0.2",
-    "cspell": "^10.3.5",
+    "cspell": "^10.3.6",
     "html-validate": "^11.16.1",
     "lighthouse": "^13.5.0",
     "sharp": "0.35.5",
