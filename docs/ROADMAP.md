@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (194 intensive runs as of 2026-09-29) lives
+verification sweep and decision (195 intensive runs as of 2026-09-29) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,7 +44,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-ninety-third run (2026-09-28): 897/897 unit tests,
+As of the hundred-and-ninety-fifth run (2026-09-29): 897/897 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
@@ -53,11 +53,56 @@ used only as a Playwright `webServer.command`, never imported;
 static analysis just can't see a reference inside a config-file string. The
 full `pnpm test:e2e` count and all five browser-based sweeps
 (`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
-`check:html`, several runs stale since the hundred-and-eighty-eighth) were
-all freshly re-confirmed clean by the hundred-and-ninety-first run itself
-(1023/1023 e2e, cold-start, 16.6 minutes) - not re-run this run, which
-touched only a build-time verification script, its JSON ledger and a unit
-test file, no page markup or content.
+`check:html`, several runs stale since the hundred-and-ninety-first) were
+all freshly re-confirmed clean by the hundred-and-ninety-fifth run itself
+(1023/1023 e2e, cold-start, 16.8 minutes) - due again whenever a future run
+touches actual page output.
+
+**Hundred-and-ninety-fifth run:** with every open backlog item below still
+either environment-blocked or awaiting human sign-off, and `pnpm outdated`
+showing nothing new beyond the already-documented blocked `typescript` line,
+tried two more fresh vocabulary angles across `content/*.md` beyond the
+hundred-and-ninety-fourth run's own four: a comparative-numeric sweep
+("twice as many", "half as many", "three times as many", "most capped",
+"most appearances", "joint-most", "shares the record", "tied for the
+record") found only two hits, both already ledgered
+(`record-claims-ledger.json`'s Copa América "most successful team" entry and
+`quiz.ts`'s own generic "most titles" quiz-question text, which describes a
+question shape rather than asserting a specific fact and so isn't a claim
+any ledger covers); and a percentage/ratio sweep (`\d+%`, "half of its",
+"more than half", "one in two/three/four/five", "every other edition") found
+zero hits site-wide - this site has no claim shape phrased as a fraction or
+percentage. Both genuine, if negative, results; no new checker gap found.
+With the hundred-and-ninety-first run's own full-site browser sweeps and
+cold-start `pnpm test:e2e` now four runs stale (last refreshed 2026-09-28,
+none of runs 192-194 touched page markup so none re-ran them), and no new
+vocabulary lead to chase instead, used this run to refresh that full
+confirmation rather than defer it again: `pnpm install --frozen-lockfile`
+(clean), `pnpm outdated` (only the blocked `typescript` line), `pnpm lint`
+(236 files, 0/0/0), `pnpm test` (897/897, unchanged), `pnpm build` (711
+pages), all 29 fast `check:*` scripts individually re-run and clean
+(including all seven verification-ledger checkers and `check:claims-hr`),
+`pnpm test:coverage` (99.91%/99.31%, unchanged), `pnpm audit` (no known
+vulnerabilities), `pnpm dlx knip --no-config-hints` (same two standing false
+positives), all five browser-based sweeps
+(`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
+`check:html`, via this environment's documented
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`
+escape hatch - all clean, `check:lighthouse`'s 39-page sample scoring >=0.9
+in every category with the one documented noindex/SEO exception), and a
+cold-start `pnpm exec playwright test` (1023/1023 passed, 16.8 minutes).
+Everything matched the documented baseline exactly - a genuine, if negative,
+end-to-end confirmation that the whole accumulated branch still holds up.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see this file's "Open backlog", unchanged. This
+run's own two fresh-vocabulary angles (comparative-numeric phrasing,
+percentage/ratio claims) came back negative/already-covered - the next run
+needs its own new angle rather than repeating these or the
+hundred-and-ninety-fourth run's own four. No page markup, styling or content
+changed this run (only this file and `docs/PROJECT_STATUS.md`), so the
+freshly-confirmed browser sweeps and `pnpm test:e2e` baseline stays valid
+until a future run next touches actual page output.
 
 **Hundred-and-ninety-fourth run:** with every open backlog item below still
 either environment-blocked or awaiting human sign-off, and `pnpm outdated`

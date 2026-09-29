@@ -30627,3 +30627,82 @@ wider superlative-word sweep, comparative-negation claims, `docs/
 SOURCES.md` duplicate URLs) all came back negative/already-covered - the
 next run needs its own new angle rather than repeating these same four
 greps.
+
+### Full standing health check, including a four-runs-overdue re-run of all five browser sweeps and a cold-start e2e - closed 2026-09-29 (hundred-and-ninety-fifth intensive run)
+
+With every open backlog item still either environment-blocked (re-confirmed:
+`pnpm outdated` shows only the already-documented blocked `typescript` line,
+no new `@astrojs/check` release) or awaiting human sign-off, this run first
+tried two fresh claim-vocabulary angles across `content/*.md` beyond the
+hundred-and-ninety-fourth run's own four: a comparative-numeric sweep for
+"twice as many"/"half as many"/"three times as many"/"most capped"/"most
+appearances"/"joint-most"/"shares the record"/"tied for the record" found
+only two hits site-wide, both already accounted for -
+`content/copa-america.md`'s "Argentina moved ahead as the competition's most
+successful team" (already in `record-claims-ledger.json`, the same claim the
+hundred-and-ninety-fourth run's own comparative-negation sweep also
+surfaced) and `content/quiz.md`'s "Which team or player has won the most
+titles/awards in a competition overall?" (a generic quiz-question prompt
+describing a question shape, not a specific factual assertion any ledger
+checks); and a percentage/ratio sweep (`\d+%`, "half of its", "more than
+half", "less than half", "one in two/three/four/five", "every other
+edition") found zero hits anywhere in `content/*.md` - this site has no
+claim phrased as a fraction or percentage. Both genuine, if negative,
+results; no new checker gap found.
+
+With no new vocabulary lead to build on, and the hundred-and-ninety-first
+run's own full-site browser sweeps and cold-start `pnpm test:e2e` now four
+runs stale (last refreshed 2026-09-28; runs 192, 193 and 194 each touched
+only a build-time verification script, its JSON ledger and a unit test
+file, never page markup or rendered content, so none of them re-ran either
+check per the standing convention), this run treated that staleness itself
+as the actionable lead rather than deferring it a fifth time.
+
+Ran the fast standing baseline first: `pnpm install --frozen-lockfile`
+(clean), `pnpm outdated` (only the blocked `typescript` line), `pnpm lint`
+(236 files, 0 errors/0 warnings/0 hints), `pnpm test` (897/897, unchanged),
+`pnpm build` (711 pages, unchanged), `pnpm test:coverage` (99.91%/99.31%,
+unchanged - the same four defensively-unreachable lines as ever), all 29
+fast `check:*` scripts individually clean (all seven verification-ledger
+checkers at their existing counts - 24/91/36/22/26/2/5 - plus
+`check:claims-hr` at 205, all unchanged), `pnpm audit` (no known
+vulnerabilities), and `pnpm dlx knip --no-config-hints` (the same two
+standing false positives: `scripts/test-preview-server.mjs`,
+`@cspell/dict-hr-hr`). All matched the documented baseline exactly.
+
+The five browser sweeps again needed this environment's own preinstalled
+Chromium rather than the default bundled binary (the same recurring,
+already-documented quirk every prior browser-sweep run has hit):
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome` for
+every sweep. Results: `check:reflow` zero pages with horizontal overflow at
+320px across all 711 pages; `check:text-zoom` the same at 200% root font
+size; `check:print-width` the same in emulated print media at the 1032px
+A4-landscape content width; `check:html` all 711 pages valid HTML5 against
+the content model; `check:lighthouse`'s 39-page representative sample scores
+1.00 across performance/accessibility/best-practices/SEO on every page
+except the one documented, intentional `noindex` 404-page SEO exception
+(0.63, expected and excluded by `EXPECTED_SEO_EXCEPTIONS`). No regression in
+any of the five, matching the hundred-and-ninety-first run's own
+last-confirmed baseline exactly.
+
+The cold-start `pnpm exec playwright test`
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`)
+ran the full mobile-chromium suite from a clean build: **1023/1023 passed in
+16.8 minutes** - the same count as every prior cold-start run back through
+the hundred-and-eighty-sixth, confirming the commits piled onto this branch
+since the last full e2e run (three verification-ledger widenings plus their
+own health-check-only runs) introduced no regression anywhere in the suite.
+
+**Verification:** every command above; no code, content, or configuration
+changed this run - this was a pure confirmation pass, not a fix. No new
+`docs/ROADMAP.md` backlog items closed (there was nothing new to close), but
+the "last re-confirmed" dates for both the browser sweeps and the cold-start
+e2e count are now current again as of this run rather than four runs
+behind.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open-backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
+unchanged. This run's own two fresh-vocabulary angles (comparative-numeric
+phrasing, percentage/ratio claims) came back negative/already-covered - the
+next run needs its own new angle rather than repeating these or any of the
+hundred-and-ninety-fourth run's own four.
