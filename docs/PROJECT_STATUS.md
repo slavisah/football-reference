@@ -30706,3 +30706,93 @@ unchanged. This run's own two fresh-vocabulary angles (comparative-numeric
 phrasing, percentage/ratio claims) came back negative/already-covered - the
 next run needs its own new angle rather than repeating these or any of the
 hundred-and-ninety-fourth run's own four.
+
+### Two fresh vocabulary angles (ordinal words past "tenth", wider descriptive-claim sweep), both negative/non-actionable; full fast standing health check - closed 2026-09-29 (hundred-and-ninety-sixth intensive run)
+
+With every open backlog item still either environment-blocked or awaiting
+human sign-off, and `pnpm outdated` unchanged (still only the
+already-documented blocked `typescript` line), tried two fresh vocabulary
+angles across `content/*.md` neither of the prior 195 runs' own greps had
+specifically tried.
+
+First, a structural check on `check:ordinal-claims` itself:
+`scripts/check-ordinal-claims.mjs`'s `ORDINALS` constant lists only
+"first" through "tenth" - with 23 World Cup editions, 17 EUROs and enough
+Ballon d'Or/Golden Boot winners for a claim to plausibly need an eleventh,
+twelfth or higher ordinal, checked every content file for "eleventh"
+through "twenty-third" in case a claim had silently outgrown the list the
+same way three prior runs found phrasing gaps in its extraction pattern.
+Zero hits site-wide - no current claim needs an ordinal past "tenth", a
+genuine negative result confirming the list doesn't need widening (yet).
+
+Second, a wider descriptive-claim vocabulary sweep: "biggest", "widest
+margin", "record margin", "highest-scoring", "treble", "grand slam", "clean
+sweep", "most decorated", "most successful", "unbeaten", "undefeated",
+"winning streak", "longest streak", "hat-trick". Found three hits:
+
+- `content/copa-america.md`'s "Argentina moved ahead as the competition's
+  most successful team by winning in 2024" - already covered by
+  `record-claims-ledger.json` (the same claim the hundred-and-ninety-fourth
+  and hundred-and-ninety-fifth runs' own comparative sweeps also surfaced).
+- `content/uefa-euro.md`'s "the German manager behind one of international
+  football's biggest surprises" (2004, Otto Rehhagel's Winning managers
+  bullet) - the same subjective, non-quantifiable color-commentary class the
+  hundred-and-ninety-fourth run's own wider-superlative-word sweep already
+  found and excluded for the page's near-identical "Greece produced one of
+  international football's greatest surprises in 2004" line: no "biggest/
+  greatest surprise" column exists on any table this site carries, so
+  neither phrasing is a claim any ledger can check.
+- `content/copa-america.md`'s 2001 Winning managers bullet: "Francisco
+  Maturana (Colombia) - Colombia's only Copa América title, won undefeated."
+  The "only" half is already ledgered (`superlative-claims-ledger.json`);
+  the "won undefeated" half is a genuinely new claim shape none of the prior
+  195 runs' vocabulary greps had specifically tried. Checked whether it's
+  independently verifiable the same way every other new claim shape this
+  project has found gets checked: this site's content model carries no
+  match-by-match results data anywhere - not for 2001 Copa América, not for
+  any edition of any of the six competition/award families - only summary
+  champion/host/runner-up/third-fourth-place/top-scorer tables. There is
+  therefore no table on the site "undefeated" could be checked against, the
+  same non-independently-verifiable class already on record for the Yashin
+  ("only goalkeeper winner"), Cafu ("only player in three straight finals"),
+  Guevara ("only guest-nation winner"), Cubarsí ("first defender") and
+  Donnarumma ("first goalkeeper") claims. Not recorded as a false claim -
+  there is no way to falsify or confirm it from this site's own data - and a
+  single site-wide occurrence doesn't justify building an eighth
+  verification-ledger checker the way each of the existing seven's
+  systemic, multi-claim patterns did (each of those covered dozens of
+  claims once seeded, not one).
+
+Both angles genuine, if negative/non-actionable, results - no new bug found,
+no new checker built.
+
+With no new actionable lead, ran the full fast standing health check:
+`pnpm install --frozen-lockfile` (clean), `pnpm outdated` (only the blocked
+`typescript` line), `pnpm lint` (236 files, 0 errors/0 warnings/0 hints),
+`pnpm test` (897/897, unchanged), `pnpm build` (711 pages, unchanged), all
+28 fast `check:*` scripts individually re-run and clean - every
+verification-ledger checker and `check:claims-hr` at the same counts as the
+hundred-and-ninety-fifth run, all unchanged - `pnpm audit` (no known
+vulnerabilities), and `pnpm dlx knip --no-config-hints` (the same two
+standing false positives: `scripts/test-preview-server.mjs`,
+`@cspell/dict-hr-hr`). Everything matched the documented baseline exactly.
+
+Did not re-run the five browser-based sweeps
+(`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
+`check:html`) or a cold-start `pnpm test:e2e` this run - the
+hundred-and-ninety-fifth run refreshed both earlier the same day
+(2026-09-29), and no page markup, styling, or rendered content changed
+since (only `docs/ROADMAP.md` and this file), so that baseline stays
+current per the standing convention rather than needing another full
+~17-minute re-run for zero page-output changes.
+
+**Verification:** every command above; no code, content, or configuration
+changed this run beyond `docs/ROADMAP.md` and this file - a pure
+confirmation-and-investigation pass, not a fix.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open-backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
+unchanged. This run's own two fresh angles (ordinal words past "tenth", a
+wider descriptive-claim vocabulary sweep) came back negative/non-actionable
+- the next run needs its own new angle rather than repeating these or any
+prior run's own vocabulary greps.
