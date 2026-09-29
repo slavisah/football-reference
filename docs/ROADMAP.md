@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (195 intensive runs as of 2026-09-29) lives
+verification sweep and decision (196 intensive runs as of 2026-09-29) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -57,6 +57,56 @@ full `pnpm test:e2e` count and all five browser-based sweeps
 all freshly re-confirmed clean by the hundred-and-ninety-fifth run itself
 (1023/1023 e2e, cold-start, 16.8 minutes) - due again whenever a future run
 touches actual page output.
+
+**Hundred-and-ninety-sixth run:** with every open backlog item below still
+either environment-blocked or awaiting human sign-off, and `pnpm outdated`
+unchanged (still only the blocked `typescript` line), tried two fresh
+vocabulary angles across `content/*.md`: `check:ordinal-claims`'s own
+`ORDINALS` word list caps at "tenth", so checked every content file for
+"eleventh" through "twenty-third" in case a later-edition claim had outgrown
+it - zero hits, no claim on the site currently needs an ordinal past
+"tenth"; and a wider descriptive-claim sweep ("biggest", "widest margin",
+"record margin", "highest-scoring", "treble", "grand slam", "clean sweep",
+"most decorated", "most successful", "unbeaten", "undefeated", "winning
+streak", "longest streak", "hat-trick") found three hits, none actionable:
+`content/copa-america.md`'s "most successful team" bullet was already
+ledgered (the same claim two prior runs' own comparative sweeps also
+surfaced); `content/uefa-euro.md`'s "one of international football's
+biggest surprises" (2004, Rehhagel bullet) is the same subjective,
+non-quantifiable color-commentary class the hundred-and-ninety-fourth run's
+own superlative-word sweep already found and excluded for a near-identical
+phrase on the same edition; and `content/copa-america.md`'s "Colombia's only
+Copa América title, won undefeated" (2001, Maturana bullet) is a genuinely
+new claim shape none of the prior 195 runs' vocabulary greps had
+specifically tried, but - like the Yashin/Cafu/Guevara/Cubarsí/Donnarumma
+cases already on record - isn't derivable from any table this site carries:
+there is no match-by-match results data anywhere in the content model, only
+summary champion/host/runner-up/top-scorer tables, so "undefeated" can't be
+checked against anything and isn't recorded as a false claim, just a
+documented non-verifiable one. A single occurrence doesn't justify an eighth
+verification-ledger checker the way each of the existing seven's systemic,
+multi-claim patterns did. Both angles genuine, if negative/non-actionable,
+results.
+
+With no new actionable lead, ran the full fast standing health check:
+`pnpm install --frozen-lockfile` (clean), `pnpm outdated` (only the blocked
+`typescript` line), `pnpm lint` (236 files, 0 errors/0 warnings/0 hints),
+`pnpm test` (897/897, unchanged), `pnpm build` (711 pages, unchanged), all
+28 fast `check:*` scripts individually clean (same ledger counts as the
+hundred-and-ninety-fifth run, all unchanged), `pnpm audit` (no known
+vulnerabilities), and `pnpm dlx knip --no-config-hints` (same two standing
+false positives). Did not re-run the five browser-based sweeps or a
+cold-start `pnpm test:e2e` - the hundred-and-ninety-fifth run refreshed both
+earlier the same day (2026-09-29) and no page markup, styling, or rendered
+content changed since, so that baseline stays current per the standing
+convention.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see this file's "Open backlog", unchanged. This
+run's own two fresh angles (ordinal words past "tenth", a wider descriptive-
+claim vocabulary sweep) came back negative/non-actionable - the next run
+needs its own new angle rather than repeating these or any prior run's own
+vocabulary greps.
 
 **Hundred-and-ninety-fifth run:** with every open backlog item below still
 either environment-blocked or awaiting human sign-off, and `pnpm outdated`
