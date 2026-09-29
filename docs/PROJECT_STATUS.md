@@ -30549,3 +30549,81 @@ for five of the six checkers and found one real gap in the sixth - worth
 repeating whenever new content is added in a phrasing shape not yet seen,
 rather than treating this run's clean results as permanent. The next run
 again needs its own first-principles search for a fresh angle beyond that.
+
+### Four fresh claim-vocabulary angles, all negative or already-covered; full standing health check - closed 2026-09-29 (hundred-and-ninety-fourth intensive run)
+
+With every open backlog item still either environment-blocked or awaiting
+human sign-off, and `pnpm outdated` showing nothing new beyond the
+already-documented blocked `typescript` line, this run tried four fresh
+vocabulary/pattern angles across `content/*.md` distinct from any of the
+prior 193 runs' own greps, rather than defaulting straight to a pure
+health-check re-run:
+
+1. **Record-superseded phrasing:** grepped for "held the record until",
+   "surpassed", "broke the record", "broken by", "overtook", "eclipsed",
+   "matched the record", "equaled the record", "equalled the record" and
+   "tied the record" across all `content/*.md` files. Zero hits site-wide -
+   this site's editorial prose has no claim shape describing an old record
+   later being broken by a subsequent edition (every "record" bullet states
+   only the current, standing record). A real, if negative, result: no new
+   checker needed for a claim shape that doesn't exist in the content.
+2. **Wider superlative-word sweep:** grepped for "greatest", "fastest",
+   "widest", "narrowest", "smallest", "tallest", "shortest", "quickest",
+   "earliest" and "longest" (beyond the words `check:record-claims`'s
+   `RECORD_WORDS` already covers: most/record/youngest/oldest/highest/
+   biggest/largest/lowest/fewest). Found exactly one hit not already
+   ledgered: `content/uefa-euro.md`'s "Greece produced one of international
+   football's greatest surprises in 2004." Read it in context before
+   deciding whether it needed a ledger entry - it's subjective color
+   commentary ("one of ... greatest surprises" names no specific record to
+   check), not a countable claim against any table this site carries, the
+   same category the existing checkers' own ledgers already document for
+   claims like "biggest surprises" or opinion-based color text. Correctly
+   outside every checker's scope; no gap found.
+3. **Comparative-negation sweep:** grepped for "no other team", "no other
+   player", "no other nation", "no other country", "no other manager", "more
+   titles/trophies/wins than any", "most decorated", "most successful" and
+   "greatest number/highest number of". Found two hits, both already
+   ledgered: `content/copa-america.md`'s "Argentina moved ahead as the
+   competition's most successful team" (already in
+   `record-claims-ledger.json`) and `content/fifa-world-cup.md`'s "Brazil's
+   1970 side became the first team to win three World Cups" (already in
+   `ordinal-claims-ledger.json`). No new gap.
+4. **`docs/SOURCES.md` duplicate-URL re-check:** re-confirmed the
+   hundred-and-seventy-fifth run's own "no duplicate or malformed entries"
+   finding rather than assuming it's still true after many runs of new
+   citations added since. `sort | uniq -d` on every URL in the file does
+   surface several repeats, but manual inspection of each confirmed every
+   one is the same primary source (most commonly a Wikipedia edition page)
+   legitimately cited by more than one separate research note that drew on
+   it - not a copy-pasted or malformed entry. A genuine, if negative,
+   re-confirmation.
+
+All four angles came back negative or already-covered - a real, if
+unglamorous, result: no new checker to build, no new content bug to fix.
+With no new lead to act on, used the rest of the run for a full standing
+health check: `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the blocked `typescript` line, re-confirmed via `npm view
+@astrojs/check@latest peerDependencies`), `pnpm lint` (236 files, 0
+errors/0 warnings/0 hints), `pnpm test` (897/897, unchanged), `pnpm build`
+(711 pages, unchanged), all 29 fast `check:*` scripts individually re-run
+and clean (all seven verification-ledger checkers at their existing
+counts - 24/91/36/22/26/2/5 - plus `check:claims-hr` at 205, all
+unchanged), `pnpm check:spelling`/`check:spelling-hr` (both clean), `pnpm
+audit` (no known vulnerabilities), and `pnpm dlx knip --no-config-hints`
+(same two standing false positives - `scripts/test-preview-server.mjs`,
+`@cspell/dict-hr-hr`). Everything matched the hundred-and-ninety-third
+run's own documented baseline exactly - a genuine, if negative,
+confirmation that the whole accumulated branch still holds up with zero
+regressions. Browser sweeps and `pnpm test:e2e` not re-run this run - only
+`docs/ROADMAP.md`/`docs/PROJECT_STATUS.md` changed, no page markup, styling
+or rendered content, so per the standing convention those stay due whenever
+a future run next touches actual page output rather than documentation.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+This run's own four fresh-vocabulary angles (record-superseded phrasing, a
+wider superlative-word sweep, comparative-negation claims, `docs/
+SOURCES.md` duplicate URLs) all came back negative/already-covered - the
+next run needs its own new angle rather than repeating these same four
+greps.

@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (193 intensive runs as of 2026-09-28) lives
+verification sweep and decision (194 intensive runs as of 2026-09-29) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -58,6 +58,47 @@ all freshly re-confirmed clean by the hundred-and-ninety-first run itself
 (1023/1023 e2e, cold-start, 16.6 minutes) - not re-run this run, which
 touched only a build-time verification script, its JSON ledger and a unit
 test file, no page markup or content.
+
+**Hundred-and-ninety-fourth run:** with every open backlog item below still
+either environment-blocked or awaiting human sign-off, and `pnpm outdated`
+showing nothing new beyond the already-documented blocked `typescript` line,
+tried four fresh vocabulary angles across `content/*.md` none of the prior
+193 runs' own greps had specifically tried: "record-superseded" phrasing
+("held the record until", "surpassed", "broke the record", "broken by",
+"overtook", "eclipsed", "matched/equaled/equalled/tied the record") found
+zero hits site-wide - this site has no claim shape describing an
+old record being later broken; a wider superlative-word sweep
+("greatest", "fastest", "widest", "narrowest", "smallest", "tallest",
+"shortest", "quickest", "earliest", "latest", "longest") found exactly one
+hit beyond already-ledgered claims - `content/uefa-euro.md`'s "Greece
+produced one of international football's greatest surprises in 2004" - and
+confirmed it's subjective color commentary, not a countable claim against
+any table (no "greatest surprise" column exists to check it against, unlike
+"the only"/ordinal/record-holder claims which name a specific fact a table
+can confirm or refute); a "no other team/player has..." comparative-negation
+sweep found only two hits, both already covered by existing ledgers (`record-
+claims-ledger.json`'s Copa América "most successful team" entry, and the
+already-ledgered Brazil-1970 ordinal claim); and a `docs/SOURCES.md`
+duplicate-URL check found several URLs cited more than once, all confirmed
+by inspection to be the same primary source legitimately backing multiple
+separate research entries (e.g. a Wikipedia edition page cited once per
+research note that drew on it) rather than a malformed/copy-pasted entry -
+consistent with the hundred-and-seventy-fifth run's own "no duplicate or
+malformed entries" finding, re-confirmed rather than assumed stale. All four
+genuine, if negative, results. With no new angle to build on, used the rest
+of the run for a full standing health check: `pnpm install --frozen-lockfile`
+(clean), `pnpm outdated` (only the blocked `typescript` line), `pnpm lint`
+(236 files, 0/0/0), `pnpm test` (897/897, unchanged), `pnpm build` (711
+pages), all 29 fast `check:*` scripts individually re-run and clean
+(including all seven verification-ledger checkers and `check:claims-hr`),
+`pnpm check:spelling`/`check:spelling-hr` (both clean), `pnpm audit` (no
+known vulnerabilities), and `pnpm dlx knip --no-config-hints` (same two
+standing false positives as ever). Everything matched the documented
+baseline exactly - a genuine, if negative, confirmation that the whole
+accumulated branch still holds up. Browser sweeps and `pnpm test:e2e` not
+re-run this run - no page markup, styling or content changed, only this
+file; per the standing convention, those stay due whenever a run next
+touches actual page output.
 
 **Hundred-and-ninety-third run:** the hundred-and-ninety-second run's own
 "Left for a future pass" note asked whether the other six verification-
@@ -117,7 +158,11 @@ run again needs its own first-principles search for a fresh angle -
 claims` came back clean this run but were only checked against today's
 content; re-verify any of the seven checkers' patterns again whenever new
 bullets are added in a shape not seen before, rather than assuming a past
-clean pass stays clean forever.
+clean pass stays clean forever. The hundred-and-ninety-fourth run's own four
+fresh-vocabulary angles (record-superseded phrasing, a wider superlative-word
+sweep, comparative-negation claims, `docs/SOURCES.md` duplicate URLs) all
+came back negative/already-covered - the next run needs its own new angle
+rather than repeating these same four greps.
 
 **Hundred-and-ninety-second run:** with every open backlog item below still
 either environment-blocked or awaiting human sign-off and `pnpm outdated`
