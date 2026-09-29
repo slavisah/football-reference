@@ -44,7 +44,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-ninety-eighth run (2026-09-29): 897/897 unit tests,
+As of the hundred-and-ninety-ninth run (2026-09-29): 897/897 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
@@ -53,10 +53,10 @@ used only as a Playwright `webServer.command`, never imported;
 static analysis just can't see a reference inside a config-file string. The
 full `pnpm test:e2e` count and all five browser-based sweeps
 (`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
-`check:html`) were all freshly re-confirmed clean by the
-hundred-and-ninety-eighth run itself (1030/1030 e2e, cold-start, 17.8
-minutes; 39/39 Lighthouse pages) - due again whenever a future run touches
-actual page output.
+`check:html`) were all freshly re-confirmed clean by the hundred-and-
+ninety-ninth run itself (1036/1036 e2e, cold-start, 20.1 minutes - up from
+1030 with this run's own 6 new tests; 39/39 Lighthouse pages) - due again
+whenever a future run touches actual page output.
 
 **Hundred-and-ninety-ninth run:** followed the hundred-and-ninety-eighth
 run's own suggested next angle - forced-colors/interactive-*state* coverage

@@ -31118,10 +31118,20 @@ specific test file this run added or touched
 `dynamic-list-styling.spec.ts`, `team-search.spec.ts`/`player-search.spec.ts`,
 `accessibility.spec.ts`, `accessibility-prefers-contrast.spec.ts`) was run
 directly and passed in full. Since Nav.astro renders on all 711 pages, this
-also warrants this project's standing "full cold-start `pnpm test:e2e`
-before committing a page-output change" discipline - launched as this entry
-was being written; see the next log entry (or this entry's own commit
-history, if no regression turned up) for its result.
+also warranted this project's standing "full cold-start `pnpm test:e2e`
+before committing a page-output change" discipline: a full cold-start run
+(redirected straight to a log file rather than through `tail`, after a first
+attempt's `| tail -80` truncated the summary line and made a clean pass look
+like a handful of results) confirmed **1036/1036 passed** in 20.1 minutes -
+exactly the hundred-and-ninety-eighth run's 1030-test baseline plus this
+run's own 6 new tests, zero failures. `check:lighthouse` re-run cleanly on
+its own afterward (its first attempt, run concurrently with the first e2e
+attempt, crashed on a null category score - resource contention between two
+simultaneous full-site Chromium sweeps, not a real regression): 39/39 pages
+>= 0.9 in every category, the one documented noindex/SEO exception aside,
+no actionable back/forward-cache blockers. `check:reflow` also re-confirmed
+711/711 clean on its own once nothing else was competing for the preview
+server.
 
 **Left for a future pass:** the same environment-blocked/human-sign-off
 open-backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
