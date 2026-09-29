@@ -20,6 +20,23 @@ test.describe('World Cup page on a 360px phone', () => {
     expect(overflow).toBeLessThanOrEqual(1);
   });
 
+  // Found by a real Playwright boundingBox() measurement, not assumed from
+  // the CSS: the five filter <select>s (winner/year/host/team/sort) only
+  // reached ~39px tall, short of AGENTS.md's "Interactive targets are at
+  // least 44px in any touch-facing control" floor; the reset button already
+  // passed at ~44.4px. Fixed with an explicit min-height on `.filters
+  // select`. TournamentTable.astro is a single shared component, so this one
+  // check guards every competition's filter row (both languages) at once.
+  test('every filter control is at least a 44px tap target', async ({ page }) => {
+    const heights = await page
+      .locator('.filters select, .filters__reset')
+      .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height));
+    expect(heights.length).toBeGreaterThan(0);
+    for (const height of heights) {
+      expect(height).toBeGreaterThanOrEqual(44);
+    }
+  });
+
   test('has no horizontal page overflow at a 320px reflow width, even with the longest host selected', async ({
     page,
   }) => {
@@ -2524,6 +2541,23 @@ test.describe('Compare page on a 360px phone', () => {
     expect(await rows.count()).toBeGreaterThan(10);
   });
 
+  // Found by a real Playwright boundingBox() measurement, not assumed from
+  // the CSS: the two picker <select>s only reached ~39px tall, short of
+  // AGENTS.md's "Interactive targets are at least 44px in any touch-facing
+  // control" floor. Fixed with an explicit min-height alongside the swap
+  // button, which already passed. Guards against a regression here and on
+  // /compare-players and both Croatian equivalents, which share the same
+  // `.compare__field select`/`#compare-swap` class names and CSS shape.
+  test('the picker selects and swap button are at least 44px tap targets', async ({ page }) => {
+    const heights = await page
+      .locator('.compare__field select, #compare-swap')
+      .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height));
+    expect(heights.length).toBeGreaterThan(0);
+    for (const height of heights) {
+      expect(height).toBeGreaterThanOrEqual(44);
+    }
+  });
+
   // The picker's new <noscript> disclosure (see tests/e2e/no-js-compare.spec.ts
   // for the no-JS bug it documents) must never actually render once
   // JavaScript is available - <noscript> content ships as raw text in the
@@ -2636,6 +2670,21 @@ test.describe('Croatian compare page (/hr/compare) on a 360px phone', () => {
   });
 
   // Same regression as the English compare page's own matching test above -
+  // found by a real Playwright boundingBox() measurement, not assumed from
+  // the CSS: the two picker <select>s only reached ~39px tall, short of
+  // AGENTS.md's "Interactive targets are at least 44px in any touch-facing
+  // control" floor.
+  test('the picker selects and swap button are at least 44px tap targets', async ({ page }) => {
+    const heights = await page
+      .locator('.compare__field select, #compare-swap')
+      .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height));
+    expect(heights.length).toBeGreaterThan(0);
+    for (const height of heights) {
+      expect(height).toBeGreaterThanOrEqual(44);
+    }
+  });
+
+  // Same regression as the English compare page's own matching test above -
   // see tests/e2e/no-js-compare.spec.ts for the no-JS bug this note fixes.
   test('the no-JavaScript picker note never renders with JavaScript enabled', async ({ page }) => {
     await expect(page.locator('noscript')).not.toBeVisible();
@@ -2733,6 +2782,26 @@ test.describe('Quiz page on a 360px phone', () => {
       return el.scrollWidth - el.clientWidth;
     });
     expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  // Found by a real Playwright boundingBox() measurement, not assumed from
+  // the CSS: the "Check answer"/"Check order" buttons and restart button
+  // only reached ~43px tall, and the order-challenge rank <select>s only
+  // ~30px, all short of AGENTS.md's "Interactive targets are at least 44px
+  // in any touch-facing control" floor. These controls carry `hidden`
+  // markup that QuizScript.astro clears on load (not gated behind
+  // answering), so they're measurable straight off page load with no
+  // interaction needed. Fixed with an explicit min-height on each.
+  test('the check-answer, restart, and order-rank controls are at least 44px tap targets', async ({
+    page,
+  }) => {
+    const heights = await page
+      .locator('.quiz-card__check, #quiz-restart, .quiz-order__rank')
+      .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height));
+    expect(heights.length).toBeGreaterThan(0);
+    for (const height of heights) {
+      expect(height).toBeGreaterThanOrEqual(44);
+    }
   });
 
   test('shows a set of generated questions with multiple choices', async ({ page }) => {
@@ -2989,6 +3058,23 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
       return el.scrollWidth - el.clientWidth;
     });
     expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  // Same regression as the English quiz page's own matching test above -
+  // hr/quiz.astro duplicates its own `#quiz-restart` rule (its check/order
+  // buttons and rank selects come from the shared QuizCard.astro/
+  // QuizOrderCard.astro components already covered there), and it had the
+  // identical ~43px-short violation independently.
+  test('the check-answer, restart, and order-rank controls are at least 44px tap targets', async ({
+    page,
+  }) => {
+    const heights = await page
+      .locator('.quiz-card__check, #quiz-restart, .quiz-order__rank')
+      .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height));
+    expect(heights.length).toBeGreaterThan(0);
+    for (const height of heights) {
+      expect(height).toBeGreaterThanOrEqual(44);
+    }
   });
 
   test('renders translated chrome, prompts and controls', async ({ page }) => {

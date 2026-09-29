@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (197 intensive runs as of 2026-09-29) lives
+verification sweep and decision (198 intensive runs as of 2026-09-29) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,7 +44,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-ninety-fifth run (2026-09-29): 897/897 unit tests,
+As of the hundred-and-ninety-eighth run (2026-09-29): 897/897 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
@@ -53,10 +53,86 @@ used only as a Playwright `webServer.command`, never imported;
 static analysis just can't see a reference inside a config-file string. The
 full `pnpm test:e2e` count and all five browser-based sweeps
 (`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
-`check:html`, several runs stale since the hundred-and-ninety-first) were
-all freshly re-confirmed clean by the hundred-and-ninety-fifth run itself
-(1023/1023 e2e, cold-start, 16.8 minutes) - due again whenever a future run
-touches actual page output.
+`check:html`) were all freshly re-confirmed clean by the
+hundred-and-ninety-eighth run itself (1030/1030 e2e, cold-start, 17.8
+minutes; 39/39 Lighthouse pages) - due again whenever a future run touches
+actual page output.
+
+**Hundred-and-ninety-eighth run:** with every "Open backlog" item below still
+either environment-blocked or awaiting human sign-off, this run took a
+different angle from the last ~25 runs' vocabulary greps: a real
+Playwright `boundingBox()` accessibility audit of every custom interactive
+control's actual rendered size at the 360px phone viewport, rather than
+another `content/*.md` text sweep. AGENTS.md's own mobile-first convention
+states "Interactive targets are at least 44px in any touch-facing control",
+but the only automated guard for it was `tests/e2e/mobile.spec.ts`'s "every
+drawer control is at least a 44px tap target" test, scoped to the nav
+drawer alone - every other custom control on the site (the five tournament
+filter `<select>`s used on every competition page, the quiz's "Check
+answer"/"Check order"/restart buttons and order-challenge rank `<select>`s,
+and `/compare`'s and `/compare-players`' own two team/player-picker
+`<select>`s, both languages) had never actually been measured.
+
+Found real, previously-unnoticed violations: the tournament filter
+`<select>`s measured ~39px tall (`TournamentTable.astro`'s `.filters
+select`), the quiz's check/restart buttons ~43px and its order-challenge
+rank `<select>`s ~30px (`QuizCard.astro`/`QuizOrderCard.astro`/
+`quiz.astro`/`hr/quiz.astro`), and the compare pages' two picker
+`<select>`s ~39px (`compare.astro`/`compare-players.astro` and their
+Croatian equivalents) - all short of the 44px floor, all measured with a
+real headless-Chromium `boundingBox()` at 360px before and after, not
+assumed from reading the CSS. Fixed each with an explicit `min-height:
+2.75rem` (44px, this site's global `box-sizing: border-box`), re-measured
+every instance back at exactly 44.0px, and screenshotted the two busiest
+cases (the World Cup filter row, a quiz "Check answer" button) to confirm
+neither text centering nor layout broke.
+
+Adding `display: inline-flex` to the quiz buttons for centering caused a
+real regression the first pass missed: `.quiz-card__check` ships `hidden`
+in its markup until `QuizScript.astro` runs, and an author `display` rule
+at equal-or-higher specificity than the UA stylesheet's `[hidden] {
+display: none }` un-hides it - the exact CSS pitfall `quiz.astro`'s own
+`.quiz__score[hidden]` rule already documents and guards against. The
+first cold-start `pnpm test:e2e` run caught it directly (3 genuine
+failures in `tests/e2e/no-js-quiz-and-search.spec.ts`, expecting the
+check buttons to stay invisible with JavaScript off) rather than it
+shipping silently - fixed with the same established
+`.quiz-card__check[hidden] { display: none; }` override pattern, and a
+second full cold-start run confirmed 1030/1030 clean.
+
+Added seven new permanent regression tests (one per affected page/
+component, both languages where the markup is a separately-duplicated
+file rather than a shared component) to `tests/e2e/mobile.spec.ts` and
+`tests/e2e/compare-players.spec.ts`, each measuring the real rendered
+height of the relevant controls and asserting `>= 44`. Regenerated all 700
+downloadable PDFs (`pnpm build:pdfs`) since `TournamentTable.astro`/
+`compare.astro`/`compare-players.astro` and their Croatian equivalents all
+changed - `check:pdfs`/`check:pdf-outline` both clean (700/700).
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; also bumped
+`cspell` 10.3.5 -> 10.3.6, an in-range patch release `pnpm outdated`
+surfaced - `typescript` remains the sole blocked line), `pnpm lint` (236
+files, 0/0/0), `pnpm test` (897/897, unchanged - this is a pure CSS/e2e-test
+change, no unit-testable logic touched), `pnpm build` (711 pages), all 29
+fast `check:*` scripts individually clean, `pnpm audit` (no known
+vulnerabilities), `pnpm dlx knip --no-config-hints` (same two standing
+false positives), all five browser-based sweeps clean
+(`check:reflow`/`check:print-width`/`check:html`/`check:text-zoom`: 711/711
+pages each; `check:lighthouse`: 39/39 pages >= 0.9 in every category, the
+one documented noindex/SEO exception aside), and two full cold-start `pnpm
+test:e2e` runs - the first caught the `[hidden]` regression (1027 passed, 3
+failed, 17.9 minutes), the second confirmed the fix (1030/1030 passed, 17.8
+minutes, up from 1023 with the seven new tests).
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open-backlog items as ever - see this file's "Open backlog", unchanged. This
+run's own angle (measuring every custom control's real rendered size rather
+than grepping `content/*.md` vocabulary) found four real, previously-shipped
+touch-target violations across three features after ~25 runs of vocabulary
+sweeps had returned nothing actionable - worth trying other "measure the
+real rendered page" angles (e.g. `forced-colors`/color-contrast on
+site-wide interactive states beyond what `check:lighthouse`'s 39-page
+sample already covers) before returning to text-based content sweeps.
 
 **Hundred-and-ninety-seventh run:** re-confirmed every item in "Open backlog"
 below is still blocked on the same three things - this environment's outbound

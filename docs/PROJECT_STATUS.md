@@ -30796,3 +30796,170 @@ unchanged. This run's own two fresh angles (ordinal words past "tenth", a
 wider descriptive-claim vocabulary sweep) came back negative/non-actionable
 - the next run needs its own new angle rather than repeating these or any
 prior run's own vocabulary greps.
+
+### Real 44px touch-target audit finds and fixes four site-wide violations (tournament filters, quiz controls, compare pickers); catches and fixes a `[hidden]` regression along the way - closed 2026-09-29 (hundred-and-ninety-eighth intensive run)
+
+With every `docs/ROADMAP.md` "Open backlog" item still either
+environment-blocked or awaiting human sign-off, and the last ~25 runs'
+`content/*.md` vocabulary greps having flattened to zero-to-one
+non-actionable hits per run, this run tried a structurally different
+angle: instead of grepping page *text*, it measured page *rendering* -
+specifically, the real on-screen size of every custom interactive control
+at this site's 360px phone design baseline, via a real headless-Chromium
+`page.locator(...).boundingBox()`, not read off the CSS.
+
+The trigger was `AGENTS.md`'s own "Mobile-first UI conventions" section,
+which states as a non-negotiable rule: "Interactive targets are at least
+44px in any touch-facing control." Grepping the e2e suite for an existing
+guard on this rule found exactly one: `tests/e2e/mobile.spec.ts`'s "every
+drawer control is at least a 44px tap target" test, scoped to
+`#site-menu`'s own links/search fields/toggle - the nav drawer only.
+Every other custom control on the site (anything outside the drawer) had
+never actually been measured against the rule that supposedly covers all
+of them.
+
+**Investigation.** Wrote a throwaway Playwright script (using the
+project's own `scripts/preview-daemon.mjs` helpers, the same
+`launchChromium`/`startPreviewDaemon` plumbing `check:reflow` and friends
+already use) to load a representative page for each remaining custom
+control family at a 360px viewport and print each one's real
+`boundingBox()`. Found four real, previously-unnoticed violations, none
+close to a rounding-error margin:
+
+- `TournamentTable.astro`'s `.filters select` (the five filters - winner/
+  year/host/team/sort - present on every competition's landing and
+  directory-style pages, both languages, since this is a single shared
+  component): **~39.0px** tall. `.filters__reset` measured 44.4px, already
+  passing.
+- `QuizCard.astro`/`QuizOrderCard.astro`'s shared `.quiz-card__check`
+  ("Check answer"/"Check order" buttons): **~42.8px**.
+- `quiz.astro`'s `#quiz-restart` button: **~42.8px** (and `hr/quiz.astro`
+  independently duplicates the same rule with the same violation - these
+  two files are separately-maintained templates, not one shared
+  component, matching the pattern `compare.astro`/`hr/compare.astro`
+  already established).
+- `QuizOrderCard.astro`'s `.quiz-order__rank` (the per-item rank `<select>`
+  in the "put these in order" quiz question type): **~30.0px**, the worst
+  of the four.
+- `compare.astro`/`compare-players.astro`'s shared `.compare__field
+  select` (the Team A/Team B and Player A/Player B pickers) and their
+  Croatian equivalents (`hr/compare.astro`/`hr/compare-players.astro`,
+  each independently duplicating the same rule): **~39.0px**. `#compare-swap`
+  measured 44.4px, already passing.
+
+**Fix.** Each violating rule got an explicit `min-height: 2.75rem` (44px;
+this site sets `box-sizing: border-box` globally in `src/styles/
+global.css`, so the padding already present doesn't need separate
+recalculation). Rebuilt and re-ran the same measurement script: every
+previously-short control now measures exactly 44.0px, and the two controls
+that already passed (`.filters__reset`, `#compare-swap`) were left
+untouched. Took two Playwright screenshots (the World Cup filter row, a
+revealed quiz "Check answer" button) to visually confirm text stayed
+vertically centered and nothing clipped - both looked correct.
+
+**A regression the first pass introduced and the full e2e suite caught.**
+To guarantee vertical/horizontal centering on the two quiz button rules,
+the first pass also added `display: inline-flex; align-items: center;
+justify-content: center;` alongside the `min-height`. `.quiz-card__check`
+ships `hidden` directly in its markup (`<button ... class="quiz-card__check"
+hidden disabled>` in both `QuizCard.astro` and `QuizOrderCard.astro`) until
+`QuizScript.astro` runs client-side to reveal it - and an author `display`
+rule at equal-or-higher specificity than the UA stylesheet's own `[hidden]
+{ display: none }` silently wins, un-hiding the button regardless of the
+`hidden` attribute. This is the *exact* pitfall `quiz.astro`'s own
+`.quiz__score[hidden] { display: none; }` rule already has a code comment
+warning about (added for the `#quiz-score` sticky bar), and the first pass
+missed applying the same guard to the button it was touching in the same
+file family.
+
+Ran the mandatory cold-start `pnpm test:e2e` before committing, per this
+project's own standing "never push CSS/markup changes without a full
+suite re-run" discipline, and it caught the bug directly rather than it
+shipping silently: 3 genuine failures, all in
+`tests/e2e/no-js-quiz-and-search.spec.ts` (`test.use({ javaScriptEnabled:
+false })`), each asserting `.quiz-card__check:visible` has count 0 with
+JavaScript off - now failing because the check button was visible
+(disabled, but visible) on every page load regardless of the `hidden`
+attribute. Fixed with the identical established pattern:
+`.quiz-card__check[hidden] { display: none; }` added right after each of
+the two `.quiz-card__check` rule blocks (mirroring `quiz.astro`'s own
+code comment). A second full cold-start `pnpm test:e2e` run confirmed the
+fix: 1030/1030 passed, and the three previously-failing tests now pass.
+`#quiz-restart` itself needed no such guard - unlike `.quiz-card__check`,
+it never carries `hidden` directly; its ancestor `#quiz-score` div does,
+so the parent's own `display: none` already hides it regardless of the
+button's own `display` value.
+
+**Permanent regression coverage.** Added seven new e2e tests (one per
+distinct rendering context, since several of these pages are literally
+separate template files rather than one shared component reused across
+languages):
+
+- `tests/e2e/mobile.spec.ts`, "World Cup page on a 360px phone" describe
+  block: "every filter control is at least a 44px tap target" - covers
+  `TournamentTable.astro`'s shared `.filters select`/`.filters__reset` for
+  every competition and both languages at once, since it's one component.
+- `tests/e2e/mobile.spec.ts`, "Quiz page" (English) and "Croatian quiz
+  page" describe blocks: "the check-answer, restart, and order-rank
+  controls are at least 44px tap targets" - one test per language, since
+  `quiz.astro`/`hr/quiz.astro` are separate files with independently
+  duplicated `#quiz-restart` CSS (the shared `QuizCard.astro`/
+  `QuizOrderCard.astro` components are covered by both).
+- `tests/e2e/mobile.spec.ts`, "Compare page" (English) and "Croatian
+  compare page" describe blocks, plus `tests/e2e/compare-players.spec.ts`'s
+  English and Croatian describe blocks (four tests total): "the picker
+  selects and swap button are at least 44px tap targets" - one per
+  page/language, matching how `compare.astro`/`compare-players.astro`/
+  `hr/compare.astro`/`hr/compare-players.astro` each independently
+  duplicate the same `.compare__field select` rule.
+
+Each test reads the real `getBoundingClientRect().height` of the relevant
+controls via `evaluateAll` and asserts every one is `>= 44`, the same
+assertion style the existing drawer test already used. The quiz tests
+work without any interaction because `QuizScript.astro` unhides
+`.quiz-card__check`/`#quiz-score` on script init (only `disabled` state
+depends on an answer being picked, not `hidden`), confirmed against
+`QuizScript.astro`'s own init block rather than assumed.
+
+**PDFs.** `TournamentTable.astro`, `compare.astro`, `compare-players.astro`,
+`hr/compare.astro` and `hr/compare-players.astro` all changed, so per
+`docs/ADDING_CONTENT.md`'s standing rule, regenerated all 700 downloadable
+PDFs (`pnpm build:pdfs`) before committing. `check:pdfs`/`check:pdf-outline`
+both clean afterward (700/700 each).
+
+**Also this run:** `pnpm outdated` surfaced one new in-range patch release,
+`cspell` 10.3.5 -> 10.3.6 (installed); `typescript` remains the sole
+blocked line (`@astrojs/check@0.9.10`'s peer dependency still only allows
+`^5.0.0 || ^6.0.0`).
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the blocked `typescript` line after the cspell bump), `pnpm lint`
+(236 files, 0 errors/0 warnings/0 hints), `pnpm test` (897/897, unchanged -
+a pure CSS/e2e-test change touches no unit-testable logic), `pnpm build`
+(711 pages), all 29 fast `check:*` scripts individually clean, `pnpm audit`
+(no known vulnerabilities), `pnpm dlx knip --no-config-hints` (same two
+standing false positives), all five browser-based sweeps clean
+(`check:reflow`: 711/711 pages no overflow at 320px; `check:print-width`:
+711/711 no overflow at 1032px print width; `check:html`: 711/711 valid
+HTML5; `check:text-zoom`: 711/711 no overflow at 200% zoom;
+`check:lighthouse`: 39/39 sample pages >= 0.9 in every category, the one
+documented noindex/SEO exception aside), and two full cold-start `pnpm
+test:e2e` runs - the first surfaced the `[hidden]` regression (1027
+passed, 3 failed, 17.9 minutes), the second confirmed the complete fix
+(1030/1030 passed, 17.8 minutes, up from the prior 1023-test baseline with
+the seven new tests included).
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open-backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
+unchanged. The headline result worth flagging to the human operator: this
+run's "measure the real rendered page" angle found four genuine,
+previously-shipped accessibility violations across three separate features
+in one pass, after roughly the last 25 runs' `content/*.md` vocabulary
+greps had each come back negative or non-actionable - a clear signal that
+this project's remaining low-effort-high-value angle isn't more text
+scanning, it's auditing other rendered-page properties the existing
+browser sweeps don't already cover end-to-end (e.g. `forced-colors`/color-
+contrast across every interactive *state* - hover, focus, disabled, active
+listbox option - site-wide, not just `check:lighthouse`'s 39-page sample).
+Worth trying that class of angle first on the next run before returning to
+vocabulary sweeps.
