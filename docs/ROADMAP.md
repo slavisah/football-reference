@@ -50,7 +50,10 @@ false positives as ever (`scripts/test-preview-server.mjs`, used only as a
 Playwright `webServer.command`, never imported; `@cspell/dict-hr-hr`, used
 only via `.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS
 `import`) - neither actually unused, knip's static analysis just can't see a
-reference inside a config-file string.
+reference inside a config-file string. The full `pnpm test:e2e` count was
+freshly re-confirmed clean by the two-hundredth run itself (1038/1038,
+cold-start, 24.7 minutes - up from 1036 with this run's own 2 new tests) -
+due again whenever a future run touches actual page output.
 
 **Two-hundredth run:** the hundred-and-ninety-ninth run's own fix (three
 `innerHTML`-replaced dynamic lists silently losing their scoped CSS because
@@ -89,10 +92,11 @@ clean, knip same two standing false positives, `pnpm test:coverage`
 only page `OnThisDay.astro` renders on) has no downloadable PDF, unlike the
 hundred-and-ninety-ninth run's own compare-page fix. Both new tests, plus the
 full `mobile.spec.ts` "On this day" test group (8 tests total), were run
-directly and passed; a full cold-start `pnpm test:e2e` was kicked off before
+directly and passed; a full cold-start `pnpm test:e2e` was run before
 committing per this project's own standing discipline for a page-output
-change - see `docs/PROJECT_STATUS.md`'s matching entry for its result once
-it finishes.
+change and confirmed clean: **1038/1038 passed, 24.7 minutes** (up from 1036
+with this run's own 2 new tests, zero failures). CI also confirmed green on
+the pushed commit.
 
 **Left for a future pass:** the same environment-blocked/human-sign-off open
 backlog items as ever - see this file's "Open backlog", unchanged. This run's
