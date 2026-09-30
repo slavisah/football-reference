@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (202 intensive runs as of 2026-09-30) lives
+verification sweep and decision (203 intensive runs as of 2026-09-30) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,7 +44,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-second run (2026-09-30): 902/902 unit tests, `pnpm
+As of the two-hundred-and-third run (2026-09-30): 902/902 unit tests, `pnpm
 lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
@@ -56,8 +56,58 @@ last complete count; the two-hundred-and-first run added 4 more tests
 (1042 total) and ran them directly rather than the full cold-start suite,
 since its own final diff touched no `src/` file; the two-hundred-and-second
 run added 5 more unit tests (no e2e tests - its own change touches a
-build-time script, not page markup) - see that run's own entry below for why
+build-time script, not page markup); the two-hundred-and-third run added no
+new tests (a dependency bump plus a documentation-vs-implementation audit,
+neither touching `src/` or `tests/`) - see that run's own entry below for why
 a full suite run is due again next time `src/` itself changes.
+
+**Two-hundred-and-third run:** with every "Open backlog" item below still
+either environment-blocked or awaiting human sign-off, `pnpm outdated`
+surfaced one new in-range patch release beyond the already-documented blocked
+`typescript` line: `vitest`/`@vitest/coverage-v8` 5.0.2 -> 5.0.3 (the latter
+pinned to an exact version in `package.json`, so bumped by hand after `pnpm
+update` alone left it untouched, the same pattern the hundred-and-eighty-ninth
+run's own `sharp` bump needed). Continued the two-hundred-and-second run's own
+suggested next angle - auditing each `check:*` script's documented scope
+against what it actually implements, rather than assuming a script does
+everything its own header comment claims - against `check-image-dimensions.mjs`
+(confirmed its documented manifest-icon/og-image/alt-text coverage is fully
+implemented, including the `og:image:alt`/`twitter:image:alt` presence check
+its header describes) and a further read of `check-link-names.mjs`/
+`check-locale-consistency.mjs`/`check-record-claims.mjs`'s full bodies against
+their own header comments (all three match what they document; no gap found).
+Also swept every `scripts/*.mjs` and `src/**/*.{astro,ts}` file for a
+`TODO`/`FIXME`/`XXX` marker that might flag a self-documented gap none of the
+prior 202 runs' header-comment audits had specifically grepped for - zero
+hits, consistent with this project's own established discipline of closing a
+gap the run it's found rather than leaving a marker behind. Both angles
+genuine, if negative, results; no new checker gap found this run, unlike the
+two-hundred-and-second run's own JSON-LD-reachability find.
+
+With no new actionable lead, ran the full fast standing health check after the
+dependency bump: `pnpm install` (clean, `vitest`/`@vitest/coverage-v8` now
+5.0.3), `pnpm outdated` (only the blocked `typescript` line remains), `pnpm
+lint` (238 files, 0/0/0), `pnpm test` (902/902 against the bumped `vitest`,
+unchanged pass count), `pnpm test:coverage` (99.91%/99.31%, unchanged), `pnpm
+build` (711 pages), all 29 CI-gated fast `check:*` scripts individually
+re-run and clean, `pnpm audit` (no known vulnerabilities), `pnpm dlx knip
+--no-config-hints` (same two standing false positives). Browser sweeps and a
+full cold-start `pnpm test:e2e` not re-run - `vitest` only runs unit tests and
+this run's change touches no `src/`/`tests/` file, matching this project's own
+established practice for that class of change.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see this file's "Open backlog", unchanged. The
+documentation-vs-implementation audit angle (checking a `check:*` script's
+header comment against its actual body) is now three scripts further along
+(`check-image-dimensions`/`check-link-names`/`check-locale-consistency`/
+`check-record-claims` all confirmed accurate) with no new gap found beyond the
+two-hundred-and-second run's own JSON-LD find - worth continuing against the
+remaining unaudited scripts (`check-meta`/`check-pdf-outline`/`check-sitemap`/
+`check-since-claims`/`check-spelling-hr`/`check-superlative-claims`/
+`check-text-zoom`/`check-theme-flash`/`check-claims-hr`/`check-award-tallies`
+haven't been re-read this specific way yet) before returning to another
+content-vocabulary sweep.
 
 **Two-hundred-and-second run:** with every "Open backlog" item below still
 either environment-blocked or awaiting human sign-off, took a structural

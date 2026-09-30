@@ -31464,3 +31464,66 @@ accurate on inspection this run (it never claims to check reachability, so
 there was no gap to close there) - the remaining ~30 `check:*` scripts
 haven't all been re-read this way yet, and are worth trying before returning
 to another content-vocabulary sweep.
+
+### Dependency bump (`vitest`/`@vitest/coverage-v8` 5.0.2 -> 5.0.3) plus a continued documentation-vs-implementation audit, both negative/routine; full standing health check - closed 2026-09-30 (two-hundred-and-third intensive run)
+
+With every open backlog item still either environment-blocked or awaiting
+human sign-off, `pnpm outdated` surfaced one new in-range patch release
+beyond the already-documented blocked `typescript` line: `vitest`/
+`@vitest/coverage-v8` 5.0.2 -> 5.0.3. `@vitest/coverage-v8` is pinned to an
+exact version in `package.json` (no `^`), so `pnpm update vitest
+@vitest/coverage-v8` alone bumped `vitest` but left the pinned sibling
+untouched - the same "pinned exact version needs a manual `package.json`
+edit" pattern the hundred-and-eighty-ninth run's own `sharp` bump already
+hit. Edited `package.json` by hand and re-ran `pnpm install`; both packages
+now resolve to 5.0.3 and their peer-dependency warning (each unmet against
+the other mid-bump) cleared.
+
+Continued the two-hundred-and-second run's own suggested next angle -
+auditing each `check:*` script's documented scope (its own header comment)
+against what it actually implements, rather than assuming a script does
+everything its header claims - against four more scripts:
+`check-image-dimensions.mjs` (confirmed its documented three-part coverage -
+manifest icon sizes against real PNG dimensions, `og:image`/`twitter:image`
+against their real dimensions, and `og:image:alt`/`twitter:image:alt`
+presence - is all genuinely implemented, including the alt-text presence
+check its header describes, which a quick read could easily assume was
+aspirational given how much of that header is devoted to *why* each check
+matters rather than confirming it exists), and a full-body read of
+`check-link-names.mjs`, `check-locale-consistency.mjs` and
+`check-record-claims.mjs` against their own header comments (all three
+match; no gap found in any). Also swept every `scripts/*.mjs` and
+`src/**/*.{astro,ts}` file for a `TODO`/`FIXME`/`XXX` marker, on the theory
+that a script's author might have left an explicit note about a known gap
+rather than only describing scope in prose - zero hits site-wide, consistent
+with this project's own established discipline of closing a gap the run
+it's found rather than leaving a marker behind for later. Both angles
+genuine, if negative, results this run - no new checker gap found, unlike
+the two-hundred-and-second run's own JSON-LD-reachability find.
+
+With no new actionable lead, ran the full fast standing health check after
+the dependency bump: `pnpm install` (clean), `pnpm outdated` (only the
+blocked `typescript` line remains), `pnpm lint` (238 files, 0 errors/0
+warnings/0 hints), `pnpm test` (902/902 against the bumped `vitest`,
+unchanged pass count - a genuine confirmation the bump didn't silently
+change test-runner behavior, not an assumption), `pnpm test:coverage`
+(99.91%/99.31%, unchanged), `pnpm build` (711 pages), all 29 CI-gated fast
+`check:*` scripts individually re-run and clean, `pnpm audit` (no known
+vulnerabilities), `pnpm dlx knip --no-config-hints` (same two standing false
+positives as ever). Browser sweeps and a full cold-start `pnpm test:e2e` not
+re-run - `vitest` only runs this project's unit tests, never touches
+Playwright/e2e, and this run's change touches no `src/`/`tests/` file,
+matching this project's own established practice for that class of change.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+The documentation-vs-implementation audit angle is now four scripts further
+along (`check-image-dimensions`/`check-link-names`/`check-locale-consistency`/
+`check-record-claims` all confirmed accurate, on top of `check-jsonld`'s own
+re-read the prior run) with no new gap found since the two-hundred-and-second
+run's own JSON-LD find - worth continuing against the remaining unaudited
+scripts (`check-meta`/`check-pdf-outline`/`check-sitemap`/`check-since-claims`/
+`check-spelling-hr`/`check-superlative-claims`/`check-text-zoom`/
+`check-theme-flash`/`check-claims-hr`/`check-award-tallies` haven't been
+re-read this specific way yet) before returning to another
+content-vocabulary sweep.
