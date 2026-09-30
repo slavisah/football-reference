@@ -44,7 +44,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-fourth run (2026-09-30): 902/902 unit tests, `pnpm
+As of the two-hundred-and-fifth run (2026-09-30): 902/902 unit tests, `pnpm
 lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
@@ -52,11 +52,13 @@ used only as a Playwright `webServer.command`, never imported;
 `"import"` field, never a JS `import`) - neither actually unused, knip's
 static analysis just can't see a reference inside a config-file string. The
 two-hundred-and-fourth run's own full cold-start `pnpm test:e2e` (1042/1042)
-plus all five manual browser sweeps are the last complete, together
+plus all five manual browser sweeps remain the last complete, together
 confirmation (the combination had gone stale for four runs, since the
 two-hundredth run's own 1038/1038 count) - see that run's own entry below for
 the full writeup, including a container-specific Playwright browser-cache
-snag hit and worked around along the way.
+snag hit and worked around along the way; the two-hundred-and-fifth run's own
+change was a content-prose/translation fix with no markup or behavior
+change, so that baseline still stands.
 
 **Two-hundred-and-third run:** with every "Open backlog" item below still
 either environment-blocked or awaiting human sign-off, `pnpm outdated`
@@ -97,6 +99,79 @@ established practice for that class of change.
 the documentation-vs-implementation audit angle continued against the ten
 scripts still unaudited at the time - see that run's own entry for the
 result.
+
+**Two-hundred-and-fifth run:** with every "Open backlog" item below still
+either environment-blocked or awaiting human sign-off, and the two-hundred-
+and-fourth run's own documentation-vs-implementation `check:*` audit now
+complete, tried a genuinely different angle from the last several dozen
+runs' claim-vocabulary greps: rather than searching `content/*.md` for a new
+trigger phrase, picked the content file with the least recent full
+front-to-back read and re-read it bullet by bullet, cross-checking its own
+prose against its own tables directly - not just the specific claim shapes
+the seven verification-ledger checkers already pattern-match on.
+`content/ballon-dor.md` and `content/golden-boot.md` share the site's
+stalest `lastReviewed` date (2026-09-03), but Golden Boot (and Nations
+League) already got a dedicated full manual read at the hundred-and-
+eighty-eighth run - Ballon d'Or's own last full content-accuracy pass predates
+that (the Winner/National-team and Ceremony-date independent cross-checks,
+2026-08-07/2026-08-13); everything since has only touched it via trigger-word
+greps that skip any bullet not matching their specific vocabulary.
+
+Found a real, previously-unnoticed claim-vs-table mismatch: the "How it
+works" section's closing bullet stated "The winner is announced at an
+end-of-year ceremony organized by France Football magazine" - true through
+2021, but directly contradicted by the page's own Winners table for every
+edition since (2022: 17 October; 2023: 30 October; 2024: 28 October; 2025:
+22 September - all autumn, not year's end). None of the seven verification-
+ledger checkers would ever catch this: the bullet contains no ordinal, no
+"since <year>", no "the only", and no record/consecutive/completeness
+trigger word. The Croatian translation
+(`src/pages/hr/competitions/ballon-dor.astro`) carried the identical
+outdated claim, so this wasn't a translation-only slip either. Fixed both
+without fabricating a reason for the schedule shift (no network access to
+source one) - reworded to state only what the page's own, already
+independently-verified Ceremony date column already shows: "The winner is
+announced at a ceremony organized by France Football magazine - held at
+year's end through 2021, then moved to September/October from 2022 onward
+(see the Ceremony date column above)" (and the matching Croatian sentence).
+Deliberately avoided the word "since" in the new English wording, despite
+it reading naturally, to avoid adding an unnecessary eighth
+`since-claims-ledger.json` entry for what is just a cross-reference to a
+column already on the same page, not a new fact needing its own
+verification record. Bumped `content/ballon-dor.md`'s `lastReviewed` to
+2026-09-30.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the blocked `typescript` line), `pnpm lint` (238 files,
+0/0/0), `pnpm test` (902/902, unchanged - a pure prose/translation fix),
+`pnpm build` (711 pages), all 27 relevant fast `check:*` scripts individually
+re-run and clean, including `check:i18n-notes` (7 matched page pairs, still
+identical note-section structure and dash-clause parity - the rewritten
+bullet gained a dash-clause in both languages together, so parity held
+rather than newly appearing one-sided), `check:since-claims` (still 26
+claims, confirming the reword's "from 2022" phrasing didn't accidentally
+match the "since <year>" pattern), and `check:claims-hr` (205 claims,
+unchanged). Regenerated all 700 downloadable PDFs (`pnpm build && pnpm
+build:pdfs`, via the two-hundred-and-fourth run's own documented
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` container escape hatch) since
+both `content/ballon-dor.md` and its Croatian page changed;
+`check:pdfs`/`check:pdf-outline` both clean (700/700) after. Browser sweeps
+and a cold-start `pnpm test:e2e` not re-run - this change is pure
+prose/translation text with no markup, styling or interactive-behavior
+change, matching this project's own established practice for that class of
+change; the two-hundred-and-fourth run's own full sweep stays the current
+baseline.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see this file's "Open backlog", unchanged. This
+run's own angle (a fresh front-to-back read of the content file with the
+least recent full read, cross-checking prose against the page's own tables
+rather than only trigger-word-matched claims) found one real, previously-
+shipped mismatch; worth trying the same angle against
+`content/copa-america.md`, `content/uefa-euro.md` or
+`content/fifa-world-cup.md` next, since none has had this specific
+table-cross-check treatment as recently as Golden Boot/Nations League did at
+the hundred-and-eighty-eighth run - rather than another vocabulary sweep.
 
 **Two-hundred-and-fourth run:** closed out the documentation-vs-implementation
 audit the two-hundred-and-second run started and the two-hundred-and-third

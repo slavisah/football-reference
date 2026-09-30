@@ -31654,3 +31654,130 @@ unchanged. The documentation-vs-implementation audit angle is now complete
 across every `check:*` script in the repository; worth trying a genuinely
 new angle next (another content-vocabulary sweep, or auditing a script
 added since this pass began) rather than repeating this one.
+
+### A "How it works" bullet on `content/ballon-dor.md` contradicted the page's own Winners table for every edition since 2022 - closed 2026-09-30 (two-hundred-and-fifth intensive run)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, and the two-hundred-and-fourth run's own documentation-vs-
+implementation `check:*` audit now complete across every script, picked a
+genuinely different angle from the last several dozen runs' claim-vocabulary
+greps: rather than searching `content/*.md` for a new trigger phrase (an
+ordinal, a superlative, a "since <year>" completeness claim, and so on),
+picked the content file with the least recent full front-to-back read and
+re-read it bullet by bullet end to end, cross-checking its own prose
+directly against its own tables - not just the specific claim shapes the
+seven verification-ledger checkers already pattern-match on.
+
+`content/ballon-dor.md` and `content/golden-boot.md` share the site's
+stalest `lastReviewed` date (2026-09-03), but Golden Boot (and UEFA Nations
+League) already got a dedicated full manual read as one of the hundred-and-
+eighty-eighth run's five fresh quality angles. Ballon d'Or's own last
+genuinely full content-accuracy pass predates that - the Winner/National-team
+independent cross-check (2026-08-07) and the Ceremony-date independent
+cross-check (2026-08-13); every touch since has been either a new table
+section addition (Kopa/Yashin/Gerd Müller/Johan Cruyff/Sócrates trophies, the
+2025 results) or a trigger-word grep for one of the seven verification-ledger
+claim shapes, none of which reads a bullet that doesn't happen to contain
+their specific vocabulary.
+
+**Read `content/ballon-dor.md` in full**, section by section, checking every
+prose claim against the tables it summarizes rather than only the ones a
+checker's regex would flag. The "Multiple winners through 2025" tally table
+was re-counted directly against the Winners table (Messi 8, Ronaldo 5, Cruyff/
+Platini/van Basten 3 each, Di Stéfano/Beckenbauer/Keegan/Rummenigge/Ronaldo 2
+each - all ten confirmed by counting the Winners table's own rows) and the
+five companion-trophy sections (Kopa/Yashin/Gerd Müller/Johan Cruyff/Sócrates)
+were checked for internal chronological consistency (repeat-winner claims,
+"first" claims, gap-year claims) - all correct, no discrepancy found in any
+of those.
+
+**Found one real, previously-unnoticed mismatch in the "How it works"
+section's closing bullet:** "The winner is announced at an end-of-year
+ceremony organized by France Football magazine" - true for every edition
+from 1956 through 2021, but directly contradicted by the same page's own
+Winners table for every edition since: **2022** (17 October), **2023** (30
+October), **2024** (28 October) and **2025** (22 September) were all
+announced in September/October, not at year's end. None of the seven
+verification-ledger checkers (`check:superlative-claims`/`check:ordinal-
+claims`/`check:record-claims`/`check:consecutive-claims`/`check:since-claims`/
+`check:one-of-only-claims`/`check:completeness-claims`) would ever have
+caught this - the bullet contains no ordinal, no "since <year>", no "the
+only", and no record/consecutive/completeness trigger word, so it was
+invisible to every trigger-word grep the last ~185 runs' own vocabulary
+sweeps have tried, English or Croatian. The Croatian translation
+(`src/pages/hr/competitions/ballon-dor.astro`'s "Kako funkcionira" section)
+carried the identical outdated claim ("Pobjednik se objavljuje na svečanosti
+krajem godine koju organizira magazin France Football."), confirming this
+wasn't a translation-only slip but a fact that had gone stale in both
+languages since the ceremony's own scheduling changed.
+
+Fixed both files. Deliberately did not fabricate a reason for the ceremony's
+autumn move (this environment has no working outbound network access to
+source one - see the "Open backlog" link-liveness item) - instead reworded
+the bullet to state only what the page's own, already independently-verified
+Ceremony date column already shows:
+
+- **English** (`content/ballon-dor.md`): "The winner is announced at a
+  ceremony organized by France Football magazine - held at year's end
+  through 2021, then moved to September/October from 2022 onward (see the
+  Ceremony date column above)."
+- **Croatian** (`src/pages/hr/competitions/ballon-dor.astro`): "Pobjednika
+  objavljuje magazin France Football na svečanosti - do 2021. održavanoj
+  krajem godine, a od 2022. premještenoj u rujan/listopad (vidi stupac Datum
+  svečanosti iznad)."
+
+Deliberately avoided the word "since" in the new English wording (despite
+"ceremony has moved to autumn since 2022" reading equally naturally) to
+avoid adding an unnecessary eighth `since-claims-ledger.json` entry for what
+is really just a cross-reference to a column already on the same page, not a
+new fact needing its own independent verification record - confirmed after
+the edit that `check:since-claims` still reports the same 26 claims,
+unchanged. Bumped `content/ballon-dor.md`'s `lastReviewed` front-matter date
+to 2026-09-30, the same convention every prior content-fact fix on this page
+has followed.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(902/902, unchanged - a pure prose/translation fix touches no unit-testable
+logic), `pnpm build` (711 pages, unchanged), all 27 relevant fast `check:*`
+scripts individually re-run and clean:
+`check:links`/`check:sitemap`/`check:precache`/`check:jsonld`/`check:heading-
+outline`/`check:theme-flash`/`check:reachability`/`check:meta`/`check:award-
+tallies`/`check:superlative-claims`/`check:ordinal-claims`/`check:record-
+claims`/`check:consecutive-claims`/`check:since-claims`/`check:one-of-only-
+claims`/`check:completeness-claims`/`check:edition-header-labels`/`check:i18n-
+notes`/`check:attendance-format`/`check:claims-hr`/`check:link-
+names`/`check:image-dimensions`/`check:locale-consistency`/`check:theme-
+color`/`check:spelling`/`check:spelling-hr`/`check:perf`. Two worth calling
+out specifically: `check:i18n-notes` (7 matched page pairs) still reports
+identical note-section structure and dash-clause parity for both languages -
+the rewritten bullet gained a trailing " - " dash-clause in *both* languages
+together, so parity held rather than newly appearing one-sided; and
+`check:claims-hr` still reports 205 claims, unchanged, confirming this edit
+added no new claim either checker needed to separately verify.
+
+Regenerated all 700 downloadable PDFs (`pnpm build && pnpm build:pdfs`, via
+the two-hundred-and-fourth run's own documented
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` container escape hatch for
+this session's Playwright browser-cache mismatch) since both
+`content/ballon-dor.md` and its Croatian page changed;
+`check:pdfs`/`check:pdf-outline` both clean (700/700) afterward. Browser
+sweeps and a cold-start `pnpm test:e2e` were not re-run - this change is
+pure prose/translation text with no markup, styling or interactive-behavior
+change, matching this project's own established practice for that class of
+change (e.g. the hundred-and-seventy-seventh/-eighth runs' own claim-text
+fixes); the two-hundred-and-fourth run's own full cold-start `pnpm test:e2e`
+(1042/1042) plus all five manual browser sweeps remain the current baseline.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+This run's own angle (a fresh front-to-back read of the content file with
+the least recent full read, cross-checking its prose against its own tables
+directly rather than only trigger-word-matched claims) found one real,
+previously-shipped mismatch after ~185 runs of vocabulary sweeps had
+returned nothing actionable on this exact page - worth trying the same
+angle against `content/copa-america.md`, `content/uefa-euro.md` or
+`content/fifa-world-cup.md` next, since none has had this specific
+table-cross-check treatment as recently as Golden Boot/Nations League did at
+the hundred-and-eighty-eighth run.

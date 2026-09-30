@@ -4,7 +4,7 @@ slug: ballon-dor
 awardType: individual
 firstEdition: 1956
 lastCompletedEdition: 2025
-lastReviewed: 2026-09-03
+lastReviewed: 2026-09-30
 status: verified
 ---
 
@@ -17,7 +17,7 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 - The Ballon d'Or honors the best individual men's player of the year - it is not a team competition or a national-team trophy.
 - A panel of football journalists, one from each eligible country, ranks their top players; the votes are combined into one final ranking.
 - Eligibility has widened over time: Europe-only at first, then any nationality at a European club from 1995, then fully global since 2007 (see the introduction above).
-- The winner is announced at an end-of-year ceremony organized by France Football magazine.
+- The winner is announced at a ceremony organized by France Football magazine - held at year's end through 2021, then moved to September/October from 2022 onward (see the Ceremony date column above).
 
 ## Winners
 
