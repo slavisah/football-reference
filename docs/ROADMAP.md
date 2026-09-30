@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (201 intensive runs as of 2026-09-30) lives
+verification sweep and decision (202 intensive runs as of 2026-09-30) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,7 +44,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-first run (2026-09-30): 897/897 unit tests, `pnpm
+As of the two-hundred-and-second run (2026-09-30): 902/902 unit tests, `pnpm
 lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
@@ -54,8 +54,79 @@ static analysis just can't see a reference inside a config-file string. The
 two-hundredth run's own full cold-start `pnpm test:e2e` (1038/1038) is the
 last complete count; the two-hundred-and-first run added 4 more tests
 (1042 total) and ran them directly rather than the full cold-start suite,
-since its own final diff touches no `src/` file - see that run's own entry
-below for why a full suite run is due again next time `src/` itself changes.
+since its own final diff touched no `src/` file; the two-hundred-and-second
+run added 5 more unit tests (no e2e tests - its own change touches a
+build-time script, not page markup) - see that run's own entry below for why
+a full suite run is due again next time `src/` itself changes.
+
+**Two-hundred-and-second run:** with every "Open backlog" item below still
+either environment-blocked or awaiting human sign-off, took a structural
+angle rather than another `content/*.md` vocabulary grep: audited what each
+existing `check:*` script's own documented scope actually covers versus what
+it claims to. `check-internal-links.mjs`'s own header comment claimed
+"canonical/hreflang tags, JSON-LD urls" were all covered by its
+href/src-attribute crawl - true for canonical/hreflang (both are `<link
+href="...">` HTML attributes, so already matched), but false for JSON-LD:
+a JSON-LD `url`/`item` value is a JSON string inside a `<script
+type="application/ld+json">` tag's *text content*, never an HTML attribute,
+so the `href`/`src` regex never saw it. `check-jsonld.mjs` (the other script
+touching JSON-LD) only validates structure - a real `@context`/`@type`,
+sequential `position`s, every url absolute and under this site's own origin
+- never that the url actually resolves to a real page. So a stale or
+mistyped breadcrumb `item` URL (e.g. a copy-pasted edition year) would 404
+for a search engine or structured-data consumer, silently, forever - nothing
+on this site would have caught it. Confirmed live before treating it as
+real: wrote a throwaway probe extracting every `url`/`item` string from
+every page's JSON-LD blocks and checking each against the real build output
+- 3,176 values across all 715 built HTML files (711 pages plus 4 redirect
+stubs), all resolving today, a clean pass. Rather than leave the gap
+open since nothing's broken *yet*, closed it permanently: extended
+`check-internal-links.mjs` itself (the natural home - it already owns "does
+this internal reference resolve to a real file", just needed a second
+source of references) with `extractJsonLdLinks()`, which walks every parsed
+JSON-LD block for a `url`/`item` key at any depth (an `item` is sometimes a
+nested `Thing` object with no url of its own - e.g. an ItemList champion
+entry - walking into it correctly finds nothing to add, not a bug) and
+routes the results through the exact same `classifyLink`/`candidateDistPaths`
+resolution every plain `href`/`src` link already goes through, deduplicated
+against the page's own attribute-based links. Verified the new coverage
+actually catches a regression, per this project's own standing discipline:
+hand-edited a built page's breadcrumb JSON-LD to point at a nonexistent
+slug and confirmed `pnpm check:links` failed with exactly that broken URL
+named; reverted and rebuilt clean, confirmed passing again. Added 5 new
+unit tests to `tests/unit/checkInternalLinks.test.ts` (a breadcrumb-plus-
+self-referential-url extraction, the nested-Thing-with-no-url case, cross-
+block deduplication, malformed-JSON resilience, and the no-JSON-LD-at-all
+empty case).
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the blocked `typescript` line), `pnpm lint` (238 files, 0/0/0), `pnpm
+test` (902/902, up from 897), `pnpm test:coverage` (99.91%/99.31%,
+unchanged - the new function is fully exercised by its own unit tests),
+`pnpm build` (711 pages), `pnpm check:links` (715 pages checked, clean - and
+confirmed catching a deliberately-reintroduced broken JSON-LD url before
+being reverted), `pnpm check:jsonld` (unchanged, 1783 blocks across 711
+pages, all structurally valid - confirming this run's change is additive,
+not a duplicate of what that script already does), all other 27 fast
+`check:*` scripts individually clean, `pnpm audit` (clean), `pnpm dlx knip
+--no-config-hints` (same two standing false positives). Browser sweeps and a
+full cold-start `pnpm test:e2e` not re-run - this change touches only a
+build-time verification script and its own unit tests, no page markup,
+styling or rendered content, matching this project's own established
+practice for that class of change (e.g. the hundred-and-seventy-second run's
+`check:superlative-claims`, the two-hundred-and-first run's own
+`check:landscape`).
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see this file's "Open backlog", unchanged. This
+run's own angle (auditing each existing `check:*` script's documented scope
+against what it actually implements, rather than assuming a script does
+everything its own header comment claims) found one real, previously-open
+gap and closed it; worth trying the same angle against the other `check:*`
+scripts' own header comments before returning to another content-vocabulary
+sweep - `check-jsonld.mjs`'s own comment was accurate on inspection this run
+(it never claims to check reachability), but the remaining ~30 scripts
+haven't all been re-read this way yet.
 
 **Two-hundred-and-first run:** the two-hundredth run's own closing note
 suggested "returning to a 'measure the real rendered page' idea not yet
