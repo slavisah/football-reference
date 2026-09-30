@@ -31235,10 +31235,12 @@ without one - unlike the hundred-and-ninety-ninth run's own compare-page fix,
 `OnThisDay.astro` renders on the home page only, and the home page has no
 downloadable PDF at all (confirmed against `public/downloads/`'s file list),
 so there is no PDF source file for this change to make stale. A full
-cold-start `pnpm test:e2e` was started before committing, per this project's
-standing discipline for any change to real page output; see this entry's own
-follow-up note (or the next run's entry, if this one closed before the
-~20-minute run finished) for its result.
+cold-start `pnpm test:e2e` was run before committing, per this project's
+standing discipline for any change to real page output, and confirmed clean:
+**1038/1038 passed in 24.7 minutes** (up from the hundred-and-ninety-ninth
+run's 1036-test baseline, plus this run's own 2 new tests - zero failures).
+CI also confirmed green on the pushed commit (`test`/`open-pr` both
+succeeded on `84a28d53a`).
 
 **Left for a future pass:** the same environment-blocked/human-sign-off open
 backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
