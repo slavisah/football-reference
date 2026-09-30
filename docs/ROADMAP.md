@@ -44,19 +44,67 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the hundred-and-ninety-ninth run (2026-09-29): 897/897 unit tests,
-`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
-standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
-used only as a Playwright `webServer.command`, never imported;
-`@cspell/dict-hr-hr`, used only via `.cspell/hr-notes.cspell.json`'s
-`"import"` field, never a JS `import`) - neither actually unused, knip's
-static analysis just can't see a reference inside a config-file string. The
-full `pnpm test:e2e` count and all five browser-based sweeps
-(`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
-`check:html`) were all freshly re-confirmed clean by the hundred-and-
-ninety-ninth run itself (1036/1036 e2e, cold-start, 20.1 minutes - up from
-1030 with this run's own 6 new tests; 39/39 Lighthouse pages) - due again
-whenever a future run touches actual page output.
+As of the two-hundredth run (2026-09-30): 897/897 unit tests, `pnpm lint` at 0
+errors/0 warnings/0 hints, 711 pages built, and the same two standing `knip`
+false positives as ever (`scripts/test-preview-server.mjs`, used only as a
+Playwright `webServer.command`, never imported; `@cspell/dict-hr-hr`, used
+only via `.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS
+`import`) - neither actually unused, knip's static analysis just can't see a
+reference inside a config-file string.
+
+**Two-hundredth run:** the hundred-and-ninety-ninth run's own fix (three
+`innerHTML`-replaced dynamic lists silently losing their scoped CSS because
+Astro's compiler-added `data-astro-cid-*` attribute never reaches
+client-created markup) turned out not to be fully closed - that run searched
+`.innerHTML =` call sites only, and one more instance of the identical bug
+class used `document.createElement()`/`appendChild()` instead, so it never
+matched that grep. `OnThisDay.astro` (the home page's "On this day in
+football history" widget, shared by both languages) always rebuilds
+`#on-this-day-list`'s `<li>` cards client-side via `createElement`/
+`appendChild` on *every* page load with JavaScript enabled - not only on the
+rare day the visitor's real date differs from the last deploy's build date,
+the framing the component's own doc comment implied - so this one is more
+severely and more frequently triggered than the three the hundred-and-
+ninety-ninth run fixed. Confirmed live with a `getComputedStyle()` read
+before the fix (`padding: 0px`, `background-color: rgba(0, 0, 0, 0)`, no
+border, `data-astro-cid-*` absent from the freshly-created `<li>`) and again
+after (`padding: 12px 14.4px`, `background-color: rgb(238, 241, 245)`,
+`border: 1px solid rgb(215, 221, 229)`), not assumed from reading the CSS.
+Fixed with the same established `:global(.on-this-day__list li)` pattern
+`compare.astro`/`compare-players.astro` already use. Searched the rest of
+`src/` for every other `createElement`/`insertAdjacentHTML`/`cloneNode`/
+`appendChild` call site (`TournamentTable.astro`'s row-sort `appendChild` and
+`Nav.astro`'s "More" menu `appendChild` both only *move* already-rendered,
+already-scoped elements, never create new ones, so neither shares this bug)
+to confirm this was the last uncaught instance of the pattern site-wide.
+Added 2 new permanent e2e regression tests (`tests/e2e/mobile.spec.ts`, one
+per language) asserting the rendered card keeps a non-zero padding and a
+non-transparent background after the client script runs; both confirmed to
+fail against the pre-fix code (reverted and re-tested before restoring the
+fix) and pass after. `pnpm test` 897/897 (unchanged - pure CSS/e2e), `pnpm
+lint` 237 files 0/0/0, `pnpm build` 711 pages, all 29 fast `check:*` scripts
+clean, `pnpm outdated` (only the blocked `typescript` line), `pnpm audit`
+clean, knip same two standing false positives, `pnpm test:coverage`
+(99.91%/99.31%, unchanged). No PDF regeneration needed - the home page (the
+only page `OnThisDay.astro` renders on) has no downloadable PDF, unlike the
+hundred-and-ninety-ninth run's own compare-page fix. Both new tests, plus the
+full `mobile.spec.ts` "On this day" test group (8 tests total), were run
+directly and passed; a full cold-start `pnpm test:e2e` was kicked off before
+committing per this project's own standing discipline for a page-output
+change - see `docs/PROJECT_STATUS.md`'s matching entry for its result once
+it finishes.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see this file's "Open backlog", unchanged. This run's
+own angle (auditing every *other* client-side DOM-creation API for the same
+`data-astro-cid-*` scoping gap, not just `.innerHTML =`) is now exhausted
+site-wide - no further instance found. The next run needs its own fresh
+angle; the hundred-and-ninety-eighth run's suggested direction
+(`forced-colors`/interactive-state coverage beyond `check:lighthouse`'s
+39-page sample) is itself now closed by the hundred-and-ninety-ninth run, so
+returning to a "measure the real rendered page" idea not yet tried - rather
+than another `content/*.md` vocabulary grep - is likely the better next
+fork.
 
 **Hundred-and-ninety-ninth run:** followed the hundred-and-ninety-eighth
 run's own suggested next angle - forced-colors/interactive-*state* coverage

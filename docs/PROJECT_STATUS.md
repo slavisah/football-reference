@@ -31157,3 +31157,98 @@ no fourth instance was missed - but any *future* client-side `innerHTML`
 render in this codebase should get the same `:global()` treatment
 proactively, or better, avoid a scoped selector for dynamically-injected
 markup entirely.
+
+### The hundred-and-ninety-ninth run's own `grep -rl innerHTML` sweep missed a fourth instance of the same bug, reached via `createElement`/`appendChild` instead - closed 2026-09-30 (two-hundredth intensive run)
+
+The hundred-and-ninety-ninth run's own closing note flagged the fix pattern
+("a dynamically-injected element never carries its component's Astro scope
+hash, so a plain scoped CSS selector targeting it silently never matches")
+as worth checking for proactively in any *future* client-side render, and
+was confident its own `grep -rl innerHTML src/components src/pages
+src/layouts` had found every existing instance. That grep was too narrow: it
+only matched literal `.innerHTML =` assignments, so it never looked at
+`document.createElement()`/`appendChild()`-based DOM construction, a
+different API doing the exact same thing. A broader sweep this run
+(`grep -rn "createElement|insertAdjacentHTML|cloneNode|appendChild"
+src/`) found four more call sites beyond the three the prior run already
+covers: two in `TournamentTable.astro`/`Nav.astro` that only *move*
+already-rendered, already-scoped DOM nodes (a sort re-ordering existing
+`<tr>`s, the desktop "More" menu re-parenting existing `<li>`s) - not a
+match for this bug, since those elements were never re-created - and five in
+`OnThisDay.astro`, the home page's "On this day in football history" widget
+(shared by both languages), which *does* match: its inline script always
+rebuilds `#on-this-day-list`'s `<li>` cards from scratch via
+`document.createElement()`/`appendChild()`.
+
+**Read the code before assuming this is the same low-severity bug the prior
+run fixed.** The three finals-meetings/shared-years/search-listbox bugs the
+hundred-and-ninety-ninth run fixed only actually triggered on a comparatively
+rare path (an active-option keyboard highlight, or a compare page loaded via
+its own shareable URL params / re-picked pair). Reading `OnThisDay.astro`'s
+inline script closely matters here: it has no conditional guarding the
+rebuild - it doesn't check whether the visitor's real "today" actually
+differs from the page's build-time date before tearing down and
+reconstructing the list. It runs unconditionally on *every single page
+load* with JavaScript enabled, on the site's most-visited page (the home
+page, both languages). That makes this instance of the bug the most
+severely and most frequently triggered of the four found so far - not an
+edge case, the default state for nearly every real visit.
+
+**Reproduced live before fixing, per this project's own standing discipline.**
+Built the site (`pnpm build`), started `astro preview`, loaded the home page
+in headless Chromium, and read `getComputedStyle()` on the first
+`#on-this-day-list` `<li>` after the inline script ran: `padding: 0px`,
+`background-color: rgba(0, 0, 0, 0)`, `border: 0px none`, `border-radius:
+0px`, and no `data-astro-cid-*` attribute on the element - exactly the
+predicted failure, not assumed from reading the CSS alone. Fixed with the
+same established pattern `compare.astro`/`compare-players.astro` already use:
+wrapped the `.on-this-day__list li` rule in `:global(...)` (the list's own
+`<ul>` element is never replaced, only its children, so `.on-this-day__list`
+itself needed no change). Re-ran the same live check after rebuilding:
+`padding: 12px 14.4px`, `background-color: rgb(238, 241, 245)`, `border: 1px
+solid rgb(215, 221, 229)`, `border-radius: 9.6px` - the intended card
+styling, confirmed restored.
+
+**Permanent regression coverage, verified both directions.** Added two new
+tests to `tests/e2e/mobile.spec.ts` (English and Croatian home page, right
+next to the existing clock-mocked "On this day" tests), each loading the
+home page and asserting the first rendered card's `getComputedStyle()`
+padding is not `0px` and its background is not `rgba(0, 0, 0, 0)`. Before
+committing, reverted the component fix alone (`git stash push -- src/
+components/OnThisDay.astro`), rebuilt, and confirmed both new tests fail
+with exactly the predicted `0px`/`rgba(0, 0, 0, 0)` values; restored the fix,
+rebuilt again, and confirmed both pass, alongside the full existing
+"On this day" test group (8 tests total, both languages) - the same
+revert-and-reconfirm discipline used to validate a regression test actually
+tests the regression, not just that it passes once.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the already-documented blocked `typescript` line), `pnpm lint` (237
+files, 0 errors/0 warnings/0 hints - unchanged file count, only existing
+files touched), `pnpm test` (897/897, unchanged - pure CSS/e2e, no
+unit-testable logic touched), `pnpm test:coverage` (99.91%/99.31%,
+unchanged), `pnpm build` (711 pages), all 29 fast `check:*` scripts
+individually re-run and clean, `pnpm audit` (no known vulnerabilities),
+`pnpm dlx knip --no-config-hints` (same two standing false positives).
+`check:pdfs`/`check:pdf-outline` needed no regeneration and stayed clean
+without one - unlike the hundred-and-ninety-ninth run's own compare-page fix,
+`OnThisDay.astro` renders on the home page only, and the home page has no
+downloadable PDF at all (confirmed against `public/downloads/`'s file list),
+so there is no PDF source file for this change to make stale. A full
+cold-start `pnpm test:e2e` was started before committing, per this project's
+standing discipline for any change to real page output; see this entry's own
+follow-up note (or the next run's entry, if this one closed before the
+~20-minute run finished) for its result.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+This run's own angle (auditing every *other* client-side DOM-construction API
+- `createElement`/`insertAdjacentHTML`/`cloneNode`/`appendChild`, not just
+`.innerHTML =` - for the same `data-astro-cid-*` scoping gap) is now
+exhausted site-wide: every call site in `src/` has been read and classified,
+and none remain unaccounted for. The meta-lesson for whoever picks up this
+thread: a grep scoped to one specific API name (`innerHTML`) can miss a
+different API doing the identical thing, even in the very next run written
+specifically to close that bug class - when auditing "every instance of X",
+grep for the underlying *behavior* (DOM nodes created and inserted at
+runtime) rather than the first API spelling that comes to mind.
