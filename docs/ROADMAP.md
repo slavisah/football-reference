@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (198 intensive runs as of 2026-09-29) lives
+verification sweep and decision (201 intensive runs as of 2026-09-30) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -38,22 +38,106 @@ what exists and any standing quirks.
 
 Every recent run's standing health check comes back clean run after run:
 `pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm test`/`pnpm
-test:coverage`/`pnpm build`, all 34 `check:*` scripts (29 fast enough to run
+test:coverage`/`pnpm build`, all 35 `check:*` scripts (29 fast enough to run
 every time and wired into `.github/workflows/ci.yml` as required PR gates;
-`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
-`check:html` are full-site Playwright/browser sweeps kept
+`check:lighthouse`/`check:reflow`/`check:landscape`/`check:text-zoom`/
+`check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundredth run (2026-09-30): 897/897 unit tests, `pnpm lint` at 0
-errors/0 warnings/0 hints, 711 pages built, and the same two standing `knip`
-false positives as ever (`scripts/test-preview-server.mjs`, used only as a
-Playwright `webServer.command`, never imported; `@cspell/dict-hr-hr`, used
-only via `.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS
-`import`) - neither actually unused, knip's static analysis just can't see a
-reference inside a config-file string. The full `pnpm test:e2e` count was
-freshly re-confirmed clean by the two-hundredth run itself (1038/1038,
-cold-start, 24.7 minutes - up from 1036 with this run's own 2 new tests) -
-due again whenever a future run touches actual page output.
+As of the two-hundred-and-first run (2026-09-30): 897/897 unit tests, `pnpm
+lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
+standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
+used only as a Playwright `webServer.command`, never imported;
+`@cspell/dict-hr-hr`, used only via `.cspell/hr-notes.cspell.json`'s
+`"import"` field, never a JS `import`) - neither actually unused, knip's
+static analysis just can't see a reference inside a config-file string. The
+two-hundredth run's own full cold-start `pnpm test:e2e` (1038/1038) is the
+last complete count; the two-hundred-and-first run added 4 more tests
+(1042 total) and ran them directly rather than the full cold-start suite,
+since its own final diff touches no `src/` file - see that run's own entry
+below for why a full suite run is due again next time `src/` itself changes.
+
+**Two-hundred-and-first run:** the two-hundredth run's own closing note
+suggested "returning to a 'measure the real rendered page' idea not yet
+tried" as the next fork, rather than another `content/*.md` vocabulary grep.
+Surveyed every viewport size this project tests anywhere - every `check:*`
+browser sweep, every hand-written `page.setViewportSize()` in `tests/e2e/`,
+and `playwright.config.ts`'s own default - and found a genuine, previously
+untested band: every viewport is either <=410px wide (portrait phones) or
+>=1000px wide (tablet/desktop), and every one is >=740px tall. Nothing
+anywhere exercises the 34rem-60rem (544px-960px) width band this site's own
+media queries switch layouts across, and nothing shorter than 740px tall - a
+real, common way phones are actually held (landscape) has zero coverage.
+
+Investigated live with a throwaway probe (not assumed from reading the CSS):
+at a real landscape-phone size (667x375, an iPhone SE/8 rotated), the mobile
+nav drawer (`#site-menu`) genuinely overflows its own `max-height`
+(scrollHeight ~649px vs. clientHeight ~313px) - unlike every existing test's
+viewport, none of which come close to needing the drawer's `overflow-y: auto`
+fix (Nav.astro's own comment documents the bug that fix closed: the theme
+toggle, last in DOM order, silently stranded off-screen) to actually engage.
+That scroll path has been sitting completely untested since it was written.
+
+Built two permanent guards closing this gap:
+
+1. `scripts/check-landscape-viewport.mjs` (`pnpm check:landscape`) - the same
+   full-site horizontal-overflow sweep `check-reflow.mjs` already runs at
+   320px, but at 667x375. Reuses `check-reflow.mjs`'s own page-listing/
+   redirect-stub/budget helpers rather than duplicating them. Swept all 711
+   pages: zero overflow regressions found - a clean pass, the same "build the
+   permanent check even on a clean pass" reasoning `check-record-claims.mjs`'s
+   own doc comment already gives, since the untested viewport band itself was
+   the real gap, not a suspected specific bug.
+2. Four new `tests/e2e/mobile.spec.ts` tests (English + Croatian home page x
+   2 assertions each) at that same 667x375 viewport: one confirms the drawer
+   actually needs to scroll here (so the suite can't silently go vacuous if
+   the drawer's content ever shrinks), the other drives a real keyboard Tab
+   walk through every control and asserts each stays visible inside the
+   drawer as focus moves, including the theme toggle.
+
+**Verified the new tests actually catch a regression, per this project's own
+standing discipline - and learned this needed several attempts.** Swapping
+`overflow-y: auto` for `overflow-y: hidden`, and separately reverting
+`flex-wrap: nowrap` to `wrap`, both left all four new tests passing:
+Chromium's native focus-scroll algorithm silently scrolls an `overflow:
+hidden` container anyway (it only blocks user-initiated wheel/drag/scrollbar
+scrolling, not programmatic or focus-driven scrolling), and reverting
+`flex-wrap` alone happened to repack the drawer's content into a shorter,
+still-fully-visible two-column layout rather than reproducing a stranded
+control. Only `overflow-y: clip` (which genuinely blocks all scrolling,
+including programmatic) made the keyboard-reachability test fail as expected,
+in both languages - confirming that test, not the "needs to scroll" one,
+is what actually guards this behavior. Restored the correct code and
+reconfirmed all four tests pass again before committing. The meta-lesson:
+`overflow: hidden` is not "unscrollable" in Chromium the way it looks from
+reading the CSS - verify a regression test against a real failure before
+trusting it, exactly as this project's own established discipline already
+insists on for every fix, not just this one.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the already-documented blocked `typescript` line), `pnpm lint` (238
+files, 0/0/0), `pnpm test` (897/897, unchanged), `pnpm test:coverage`
+(99.91%/99.31%, unchanged), `pnpm build` (711 pages), `pnpm check:landscape`
+(new, 711/711 pages clean), `pnpm audit` (clean), `pnpm dlx knip
+--no-config-hints` (same two standing false positives - the new script is
+referenced from `package.json` so knip doesn't flag it). The final diff
+touches no `src/` file (the Nav.astro edits from the regression-proving
+exercise below were reverted before committing), so this run ran its own 4
+new `tests/e2e/mobile.spec.ts` tests directly (twice: once against the
+correct code, and - per the regression-proving section above - once each
+against three different deliberately-broken states) rather than a full
+cold-start `pnpm test:e2e`, matching this project's own established practice
+for a change that adds tooling/tests without touching page output (e.g. the
+hundred-and-seventy-second run's `check:superlative-claims`). A full
+cold-start run is still due whenever a future run next touches `src/` itself
+- see the standing-health-check paragraph above.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see this file's "Open backlog", unchanged. This run's
+own angle (viewport-size coverage gaps across every test/check in the repo)
+is closed for the one genuine gap found (mid-width x short-height,
+"landscape phone"); no other untested viewport combination stood out during
+the survey. The next run needs its own fresh angle.
 
 **Two-hundredth run:** the hundred-and-ninety-ninth run's own fix (three
 `innerHTML`-replaced dynamic lists silently losing their scoped CSS because

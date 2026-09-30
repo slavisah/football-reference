@@ -25,6 +25,7 @@
     "check:precache": "node scripts/check-precache.mjs",
     "check:lighthouse": "node scripts/check-lighthouse.mjs",
     "check:reflow": "node scripts/check-reflow.mjs",
+    "check:landscape": "node scripts/check-landscape-viewport.mjs",
     "check:text-zoom": "node scripts/check-text-zoom.mjs",
     "check:print-width": "node scripts/check-print-width.mjs",
     "check:html": "node scripts/check-html-validity.mjs",
