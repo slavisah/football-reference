@@ -31254,3 +31254,125 @@ different API doing the identical thing, even in the very next run written
 specifically to close that bug class - when auditing "every instance of X",
 grep for the underlying *behavior* (DOM nodes created and inserted at
 runtime) rather than the first API spelling that comes to mind.
+
+### A landscape-phone (667x375) viewport band - mid-width, short-height - had zero coverage across every check script and e2e test in the repo; added a full-site overflow sweep and closed a real drawer-reachability test gap - closed 2026-09-30 (two-hundred-and-first intensive run)
+
+The two-hundredth run's own closing note suggested "returning to a 'measure
+the real rendered page' idea not yet tried" as the next fork, rather than
+another `content/*.md` vocabulary grep. Surveyed every viewport size tested
+anywhere in this repo - every `check:*` browser sweep's own hardcoded
+viewport, every hand-written `page.setViewportSize()` across `tests/e2e/`,
+and `playwright.config.ts`'s own project default - before picking a new
+angle, rather than guessing one. The result: every viewport tested anywhere
+is either <=410px wide (portrait phones: 320, 360, 410) or >=1000px wide
+(tablet/desktop: 1000, 1024, 1280), and every single one is >=740px tall.
+Nothing exercises the 34rem-60rem (544px-960px) width band this site's own
+media queries switch layouts across (`Nav.astro`'s 60rem desktop-nav
+breakpoint, the many `min-width: 34rem` rules across `src/`), and nothing
+shorter than 740px tall - a real, ordinary way a phone is actually held
+(landscape) had never once been simulated.
+
+**Confirmed the gap mattered before building anything, with a live probe.**
+A throwaway script loaded the home page at a real, common landscape-phone
+size (667x375 - an iPhone SE/8 rotated, chosen as wide enough to clear the
+34rem breakpoint band and narrow enough to stay below the 60rem desktop-nav
+one) and read the mobile nav drawer's (`#site-menu`) real `scrollHeight`/
+`clientHeight` after opening it: 649px vs. ~313px - a genuine overflow.
+Every existing e2e test's viewport (360x740, 1024x800, 1280x800, etc.) has a
+drawer `max-height` (`calc(100dvh - var(--site-header-height))`, ~684px at
+360x740) that comfortably exceeds the drawer's real content height, so the
+`overflow-y: auto` fix `Nav.astro`'s own CSS comment documents - closing a
+real past bug where the drawer's content, once taller than its own
+max-height, could silently strand the theme-toggle button (last in DOM
+order) off-screen - has never actually been exercised by any test in this
+repository. It was working code with zero regression coverage, not a
+currently-broken feature.
+
+**Built two permanent guards.**
+
+1. `scripts/check-landscape-viewport.mjs` (`pnpm check:landscape`, not wired
+   into CI - same "too slow for a required gate" reasoning as
+   `check:reflow`/`check:lighthouse`): the same full-site horizontal-overflow
+   sweep `check-reflow.mjs` already runs at 320px, but at 667x375. Reuses
+   `check-reflow.mjs`'s own `htmlFileToPagePath`/`isRedirectStubHtml`/
+   `pagesOverflowing` helpers (already unit-tested in
+   `tests/unit/checkReflow.test.ts`) rather than duplicating them - only the
+   viewport and console labeling differ. Swept all 711 pages: zero overflow
+   regressions. A clean pass is still worth a permanent script here, the same
+   "build the check even when it finds nothing yet" reasoning
+   `check-record-claims.mjs`'s own doc comment already gives - the untested
+   *viewport band* was the actual gap being closed, not a suspected specific
+   page.
+2. Four new tests in `tests/e2e/mobile.spec.ts` (English + Croatian home
+   page, two assertions each, all at 667x375): one confirms `#site-menu`
+   genuinely needs to scroll at this viewport (so the suite can't quietly go
+   vacuous if the drawer's content ever shrinks below its max-height in the
+   future); the other drives a real keyboard Tab walk through every control
+   in the open drawer and asserts each one stays within the drawer's visible
+   bounds as focus moves onto it, including the theme toggle specifically
+   (the control the original bug this fix guards against actually stranded).
+
+**Verifying the new tests catch a real regression took three attempts, and
+the failures along the way are the more useful finding.** Per this project's
+own standing "prove a regression test actually fails against the bug"
+discipline: first tried swapping `overflow-y: auto` for `overflow-y: hidden`
+on `.site-header--js .site-menu.is-open` - all four new tests still passed.
+Then tried reverting `flex-wrap: nowrap` back to `wrap` (the layout property
+that rule's own comment blames for the original bug, not `overflow-y` itself)
+- still passed. Investigated why with a second throwaway probe rather than
+guessing: Chromium's native focus-scroll algorithm (the browser's own
+"scroll the newly-focused element into view" behavior on Tab) silently
+scrolls an `overflow: hidden` container anyway - that CSS value only blocks
+*user*-initiated scrolling (wheel, touch-drag, dragging a scrollbar that
+isn't rendered), not programmatic or focus-driven scrolling, a genuine
+browser quirk worth knowing about rather than assuming from the name
+"hidden". Reverting `flex-wrap` alone, separately, happened to repack the drawer's
+stacked content into a shorter two-column layout (measured: scrollHeight
+dropped to 425px, and the wider box's forced `overflow-x: auto` kept the
+second column reachable rather than stranded) - a different layout, not a
+broken one, so nothing to catch. Only `overflow-y: clip` (which genuinely blocks *all*
+scrolling, including programmatic) made the keyboard-reachability test fail
+as predicted, in both languages, while the "needs to scroll" test kept
+passing throughout (correctly - `scrollHeight > clientHeight` is unaffected
+by which `overflow-y` value is set, so that test's own job is only to prove
+the scenario isn't vacuous, not to test the scroll mechanism). Restored the
+correct code (`git checkout -- src/components/Nav.astro`) and reconfirmed
+all four tests pass again before committing. No `src/` file is actually
+changed in this run's final commit - only the two new tooling/test files -
+but the investigation is worth recording for whoever next needs to reason
+about this drawer's scroll behavior, or writes a focus-visibility test
+elsewhere in this codebase and assumes `overflow: hidden` means
+"unreachable".
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the already-documented blocked `typescript` line - `@astrojs/check@
+latest`'s peer dependency still caps at `^5.0.0 || ^6.0.0`, re-confirmed via
+`npm view`), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(897/897, unchanged - no unit-testable logic touched), `pnpm test:coverage`
+(99.91%/99.31%, unchanged), `pnpm build` (711 pages), `pnpm check:landscape`
+(new script, 711/711 pages clean), `pnpm audit` (no known vulnerabilities),
+`pnpm dlx knip --no-config-hints` (same two standing false positives -
+`scripts/check-landscape-viewport.mjs` is referenced from `package.json`'s
+new `check:landscape` script, so knip does not flag it as unused). The final
+diff touches no `src/` file (the Nav.astro edits used to prove the new tests
+against a real regression, above, were reverted before committing), so this
+run ran its own 4 new tests directly with Playwright - against the correct
+code, and again against each of the three deliberately-broken states above -
+rather than a full cold-start `pnpm test:e2e`, matching this project's own
+established practice for a change that adds tooling/tests without touching
+page output (e.g. the hundred-and-seventy-second run's own
+`check:superlative-claims`, which likewise skipped a full suite run). All 4
+new tests passed against the correct code; a full cold-start run remains due
+whenever a future run next touches `src/` itself.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+This run's own angle (a systematic survey of every viewport size tested
+anywhere in the repo, looking for an untested band rather than guessing one)
+is closed for the one genuine gap the survey found. No other untested
+viewport combination stood out while reading through every `check:*` script
+and every `tests/e2e/*.ts` file's own viewport calls to build that survey -
+whoever picks up this thread next should look for a different dimension
+entirely (an interaction pattern, a data-claim vocabulary, a dependency
+bump) rather than re-running the same viewport survey against an
+already-exhausted list.

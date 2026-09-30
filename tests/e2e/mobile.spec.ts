@@ -5036,3 +5036,70 @@ test.describe('compare panel on a 360px phone', () => {
   });
 
 });
+
+// Nav.astro's `.site-header--js .site-menu.is-open` rule gives the mobile
+// drawer `max-height: calc(100dvh - var(--site-header-height))` with
+// `overflow-y: auto` - a documented fix (see that rule's own comment) for a
+// real bug where the drawer's stacked content (nav links + both search
+// fields + language switch + theme toggle), once taller than the drawer's
+// own max-height, silently stranded the theme toggle - last in DOM order -
+// off-screen with no way to scroll to it.
+//
+// Every other suite in this file runs at the project's default 360x740
+// viewport (playwright.config.ts), where that max-height bound (~684px)
+// comfortably exceeds the drawer's real content height - so the overflow-y
+// scroll path this fix depends on is never actually exercised by any
+// existing test; it never needs to scroll. `scripts/check-landscape-
+// viewport.mjs`'s own doc comment has the measured numbers this suite's
+// first test also asserts directly, confirmed live before writing this: a
+// real, common landscape-phone size (667x375 - an iPhone SE/8 rotated)
+// forces `#site-menu` to overflow (scrollHeight ~649px vs. clientHeight
+// ~313px), unlike this file's other viewports.
+for (const { label, path: homePath } of [
+  { label: 'English', path: '' },
+  { label: 'Croatian', path: 'hr/' },
+]) {
+  test.describe(`nav drawer at a short landscape-phone viewport (667x375, ${label} home page)`, () => {
+    test.beforeEach(async ({ page }) => {
+      await page.setViewportSize({ width: 667, height: 375 });
+      await page.goto(homePath);
+      await openMenu(page);
+    });
+
+    test('the drawer genuinely needs to scroll here, not a vacuous check', async ({ page }) => {
+      const { scrollHeight, clientHeight } = await page
+        .locator('#site-menu')
+        .evaluate((el) => ({ scrollHeight: el.scrollHeight, clientHeight: el.clientHeight }));
+      expect(scrollHeight).toBeGreaterThan(clientHeight);
+    });
+
+    test('keyboard Tab reaches every control, including the theme toggle last in DOM order, and each stays visible inside the drawer as it scrolls into view', async ({
+      page,
+    }) => {
+      await page.locator('#menu-toggle').focus();
+
+      let sawThemeToggle = false;
+      // Comfortably more than the drawer's real control count (15 nav links
+      // + 2 search fields + language switch + theme toggle on a translated
+      // page) so the loop can't silently stop early before reaching the end.
+      for (let i = 0; i < 30; i++) {
+        await page.keyboard.press('Tab');
+        const info = await page.evaluate(() => {
+          const active = document.activeElement;
+          const menu = document.getElementById('site-menu');
+          if (!active || !menu || !menu.contains(active)) return null;
+          const rect = active.getBoundingClientRect();
+          const menuRect = menu.getBoundingClientRect();
+          return {
+            id: active.id,
+            visible: rect.top >= menuRect.top - 1 && rect.bottom <= menuRect.bottom + 1,
+          };
+        });
+        if (info === null) break;
+        expect(info.visible).toBe(true);
+        if (info.id === 'theme-toggle') sawThemeToggle = true;
+      }
+      expect(sawThemeToggle).toBe(true);
+    });
+  });
+}
