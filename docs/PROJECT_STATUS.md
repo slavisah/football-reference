@@ -31527,3 +31527,130 @@ scripts (`check-meta`/`check-pdf-outline`/`check-sitemap`/`check-since-claims`/
 `check-theme-flash`/`check-claims-hr`/`check-award-tallies` haven't been
 re-read this specific way yet) before returning to another
 content-vocabulary sweep.
+
+### Closed out the documentation-vs-implementation `check:*` audit (all ten remaining scripts confirmed accurate); full cold-start `test:e2e` + all five browser sweeps re-run clean after working around a container-specific Playwright browser-cache mismatch - closed 2026-09-30 (two-hundred-and-fourth intensive run)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, continued the two-hundred-and-second/-third runs' own
+documentation-vs-implementation audit - reading each `check:*` script's
+header comment against what it actually implements - against the ten
+scripts neither of those runs had reached yet: `check-meta.mjs`,
+`check-pdf-outline.mjs`, `check-sitemap.mjs`, `check-since-claims.mjs`,
+`check-spelling-hr.mjs`, `check-superlative-claims.mjs`,
+`check-text-zoom.mjs`, `check-theme-flash.mjs`, `check-claims-hr.mjs` and
+`check-award-tallies.mjs`. Read every one of the ten in full against its own
+header comment's claims, rather than sampling a few lines - the two-hundred-
+and-second run's own JSON-LD find came from exactly this kind of close read,
+not a skim.
+
+**Result: all ten confirmed accurate, no gap found.** Two specifics worth
+recording since they weren't obvious from the header comment alone and took
+an extra check to confirm rather than assume:
+
+- `check-sitemap.mjs`'s reverse pass ("every indexable built page has a
+  sitemap entry") doesn't special-case the four legacy `/awards/*` redirect
+  stubs the way `check-meta.mjs`/`check-theme-flash.mjs`/`check-spelling-
+  hr.mjs` explicitly do via `isRedirectStubHtml()`. Read the actual built
+  stub (`dist/awards/ballon-dor/index.html`) to confirm this isn't a gap:
+  Astro's own `redirects` config (`astro.config.mjs`) emits each stub with
+  both a `<meta name="robots" content="noindex">` tag and a `<link
+  rel="canonical">` pointing at the *destination* page, not itself - so
+  `check-sitemap.mjs`'s existing `if (head.noindex || !head.canonical)
+  continue` already skips every stub correctly, just via the `noindex`
+  branch rather than a dedicated stub check. Confirmed by building the site
+  and reading the four stub files directly rather than trusting the
+  script's silence on the subject.
+- `check-award-tallies.mjs`'s `CHECKS` array covers exactly four files
+  (`fifa-world-cup.md`, `uefa-euro.md`, `copa-america.md`, `ballon-dor.md`)
+  and its header comment never claims more - but confirmed this is a
+  deliberately complete set, not an oversight, by reading `golden-boot.md`'s
+  and `uefa-nations-league.md`'s own heading structure directly: neither
+  file has a second, hand-authored "titles by nation/player" tally table
+  alongside its source results table (golden-boot's per-competition top-
+  scorer tables have no repeat-winner tally at all; Nations League has only
+  three editions to date, too few for a meaningful tally table), so there is
+  nothing for a fifth/sixth `CHECKS` entry to audit.
+
+Combined with the two-hundred-and-third run's own four-script pass
+(`check-image-dimensions`/`check-link-names`/`check-locale-consistency`/
+`check-record-claims`) and the two-hundred-and-second run's own initial four
+(`check-jsonld` re-read plus its own JSON-LD-reachability fix), every
+`check:*` script in the repository has now had this specific "header
+comment vs. actual body" audit applied at least once. Only the two-hundred-
+and-second run's own JSON-LD-reachability gap ever turned up a real
+mismatch across all of them - a genuinely useful angle that has now run its
+course; a future run should try something else rather than repeating it
+against scripts already covered.
+
+Also re-confirmed both standing environment blockers rather than assuming
+their last-checked dates still held: `pnpm outdated` shows only the
+already-documented `typescript` 5.9.3 -> 7.0.2 line (no new
+`@astrojs/check` release), and `WebFetch` to `en.wikipedia.org` still
+returns `EGRESS_BLOCKED` from the proxy (2026-09-30) - the link-liveness
+sweep and the UEFA Nations League attendance/Best XI items remain genuinely
+blocked, not just stale.
+
+**Full standing health check**, since the audit itself found nothing to
+fix: `pnpm install --frozen-lockfile` (clean), `pnpm lint` (238 files,
+0 errors/0 warnings/0 hints), `pnpm test` (902/902), `pnpm test:coverage`
+(99.91%/99.31%, unchanged - the same four files' documented "defensively
+unreachable" branches as ever), `pnpm build` (711 pages), all 29 CI-gated
+fast `check:*` scripts individually re-run and clean, `pnpm audit` (no
+known vulnerabilities), `pnpm dlx knip --no-config-hints` (same two
+standing false positives).
+
+**The periodic full cold-start `pnpm test:e2e` + all five manual browser
+sweeps** (`check:reflow`/`check:landscape`/`check:text-zoom`/
+`check:print-width`/`check:lighthouse`) were four runs overdue - last run
+together at the two-hundredth run. The first attempt failed immediately and
+uniformly: every one of the six commands errored within seconds of
+launching Chromium with `browserType.launch: Executable doesn't exist at
+/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-
+linux64/chrome-headless-shell`. Diagnosed rather than assumed a real
+regression: `ls /opt/pw-browsers/` showed this session's own container only
+has Chromium/headless-shell cached at revision 1194 (plus a `chromium`
+symlink pointing at that revision's full, non-headless-shell binary), while
+the currently-pinned `@playwright/test` (1.63.0, confirmed via `pnpm
+install`'s own output) defaults its headless launch to revision 1243, which
+simply isn't present in this particular container's cache. Not a site bug
+or a code regression - a container-specific browser-cache/pinned-version
+mismatch, the exact scenario `scripts/preview-daemon.mjs`'s own
+`launchChromium()` already has a documented escape hatch for
+(`PW_EXECUTABLE_PATH`/`PW_CHROME_CHANNEL`, dating to the hundred-and-forty-
+eighth run's own preview-daemon extraction), and that `playwright.config.ts`'s
+`mobile-chromium` project already honors via the same two variables for
+`pnpm test:e2e` itself. Confirmed the fix empirically before trusting it:
+ran one narrow smoke test
+(`playwright test tests/e2e/mobile.spec.ts -g "no horizontal overflow"`)
+with `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` set - passed in 20.7s,
+confirming the full binary at the present revision launches cleanly.
+
+Re-ran the complete six-command sweep with `PW_EXECUTABLE_PATH` exported for
+the whole shell: **all clean, no regression across the four stale runs.**
+`pnpm test:e2e`: 1042/1042 passed (27.2m) - matches the two-hundred-and-first
+run's own count exactly (the run that last added e2e tests), confirming
+nothing broke in the interim. `check:reflow`: 711 pages, no horizontal
+overflow at 320px. `check:landscape`: 711 pages, no horizontal overflow at
+667x375. `check:text-zoom`: 711 pages, no horizontal overflow at 200% text
+zoom. `check:print-width`: 711 pages, no horizontal overflow in print media
+at 1032px. `check:lighthouse`: 39 pages, every category >= 0.90 (the one
+already-documented bounded noindex/SEO exception excluded as expected), no
+actionable back/forward-cache blockers.
+
+**No code change was made for the browser-cache mismatch itself.**
+`PW_EXECUTABLE_PATH` is deliberately an opt-in environment variable rather
+than a hardcoded sandbox path baked into `preview-daemon.mjs` or
+`playwright.config.ts` - hardcoding `/opt/pw-browsers/chromium` (a path
+specific to this one execution environment) into general project source
+would couple the repository to one sandbox's filesystem layout, the exact
+coupling the existing escape-hatch pattern was designed to avoid. Left as a
+one-off per-session environment note (this entry) rather than a repo
+change; a future run hitting the same error should reach for the same
+env var rather than re-diagnosing from scratch.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
+unchanged. The documentation-vs-implementation audit angle is now complete
+across every `check:*` script in the repository; worth trying a genuinely
+new angle next (another content-vocabulary sweep, or auditing a script
+added since this pass began) rather than repeating this one.

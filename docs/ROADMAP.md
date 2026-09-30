@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (203 intensive runs as of 2026-09-30) lives
+verification sweep and decision (204 intensive runs as of 2026-09-30) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,22 +44,19 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-third run (2026-09-30): 902/902 unit tests, `pnpm
+As of the two-hundred-and-fourth run (2026-09-30): 902/902 unit tests, `pnpm
 lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
 `@cspell/dict-hr-hr`, used only via `.cspell/hr-notes.cspell.json`'s
 `"import"` field, never a JS `import`) - neither actually unused, knip's
 static analysis just can't see a reference inside a config-file string. The
-two-hundredth run's own full cold-start `pnpm test:e2e` (1038/1038) is the
-last complete count; the two-hundred-and-first run added 4 more tests
-(1042 total) and ran them directly rather than the full cold-start suite,
-since its own final diff touched no `src/` file; the two-hundred-and-second
-run added 5 more unit tests (no e2e tests - its own change touches a
-build-time script, not page markup); the two-hundred-and-third run added no
-new tests (a dependency bump plus a documentation-vs-implementation audit,
-neither touching `src/` or `tests/`) - see that run's own entry below for why
-a full suite run is due again next time `src/` itself changes.
+two-hundred-and-fourth run's own full cold-start `pnpm test:e2e` (1042/1042)
+plus all five manual browser sweeps are the last complete, together
+confirmation (the combination had gone stale for four runs, since the
+two-hundredth run's own 1038/1038 count) - see that run's own entry below for
+the full writeup, including a container-specific Playwright browser-cache
+snag hit and worked around along the way.
 
 **Two-hundred-and-third run:** with every "Open backlog" item below still
 either environment-blocked or awaiting human sign-off, `pnpm outdated`
@@ -96,18 +93,76 @@ full cold-start `pnpm test:e2e` not re-run - `vitest` only runs unit tests and
 this run's change touches no `src/`/`tests/` file, matching this project's own
 established practice for that class of change.
 
+**Left for a future pass (closed by the two-hundred-and-fourth run below):**
+the documentation-vs-implementation audit angle continued against the ten
+scripts still unaudited at the time - see that run's own entry for the
+result.
+
+**Two-hundred-and-fourth run:** closed out the documentation-vs-implementation
+audit the two-hundred-and-second run started and the two-hundred-and-third
+run continued - read the remaining ten `check:*` scripts' own header comments
+against what they actually implement: `check-meta.mjs`, `check-pdf-outline.mjs`,
+`check-sitemap.mjs`, `check-since-claims.mjs`, `check-spelling-hr.mjs`,
+`check-superlative-claims.mjs`, `check-text-zoom.mjs`, `check-theme-flash.mjs`,
+`check-claims-hr.mjs` and `check-award-tallies.mjs`. All ten confirmed
+accurate - every documented behavior (including easy-to-miss specifics, like
+`check-sitemap.mjs`'s reverse pass correctly relying on the `/awards/*`
+redirect stubs' own `noindex` tag rather than needing its own explicit
+exclusion, and `check-award-tallies.mjs`'s four-file `CHECKS` list being a
+deliberately complete set - `golden-boot.md`/`uefa-nations-league.md` have no
+matching hand-authored tally table to audit, confirmed by reading both
+files' own headings) is genuinely implemented, not just described. Combined
+with the two-hundred-and-third run's own four-script pass, every `check:*`
+script in the repository has now had this specific audit applied at least
+once; only the two-hundred-and-second run's JSON-LD-reachability gap ever
+turned up a real mismatch. `pnpm outdated` re-checked (only the blocked
+`typescript` line); `WebFetch` to `en.wikipedia.org` re-confirmed still
+`EGRESS_BLOCKED` (2026-09-30) - the link-liveness/Nations League
+attendance/Best-XI items below remain genuinely blocked, not just stale.
+
+With the audit closed and no new lead, used the rest of the run on the
+full cold-start confirmation sweep four runs overdue (last run together at
+the two-hundredth): `pnpm install --frozen-lockfile`, `pnpm lint` (238
+files, 0/0/0), `pnpm test` (902/902), `pnpm test:coverage` (99.91%/99.31%,
+unchanged), `pnpm build` (711 pages), all 29 CI-gated fast `check:*` scripts
+individually clean, `pnpm audit` (no known vulnerabilities), `pnpm dlx knip
+--no-config-hints` (same two standing false positives), `pnpm test:e2e`, and
+all five manual browser sweeps (`check:reflow`/`check:landscape`/
+`check:text-zoom`/`check:print-width`/`check:lighthouse`).
+
+The first attempt at the browser-driven half failed immediately and
+uniformly: every one of `test:e2e` and the five sweeps errored within
+seconds with `browserType.launch: Executable doesn't exist at
+/opt/pw-browsers/chromium_headless_shell-1243/...` - this session's own
+container only has Chromium/headless-shell revision 1194 cached, but the
+currently-pinned `@playwright/test` (1.63.0) defaults to launching
+headless-shell revision 1243, which isn't present. Not a site bug or a
+regression - purely this particular container's browser cache not matching
+the pinned Playwright version, the identical scenario
+`scripts/preview-daemon.mjs`'s own `launchChromium()` already documents and
+already has an escape hatch for (`PW_EXECUTABLE_PATH`/`PW_CHROME_CHANNEL`),
+and `playwright.config.ts`'s own `mobile-chromium` project honors the same
+two variables. Setting `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` (the
+pre-installed full-Chromium build at a different, present revision) and
+re-running confirmed the suite itself is completely clean: `pnpm test:e2e`
+1042/1042 passed (27.2m; matches the two-hundred-and-first run's own count,
+confirming no regression across the four stale runs), `check:reflow` (711
+pages, no overflow at 320px), `check:landscape` (711 pages, no overflow at
+667x375), `check:text-zoom` (711 pages, no overflow at 200%),
+`check:print-width` (711 pages, no overflow in print media at 1032px), and
+`check:lighthouse` (39 pages, all >= 0.90 in every category, the one known
+bounded noindex/SEO exception excluded as documented). No code change was
+needed or made for the browser-cache mismatch itself - `PW_EXECUTABLE_PATH`
+is deliberately an opt-in environment variable rather than a hardcoded
+sandbox path baked into the scripts, the same design the hundred-and-
+forty-eighth run's own preview-daemon extraction already established, so
+this is left as a one-off environment note rather than a repo change.
+
 **Left for a future pass:** the same environment-blocked/human-sign-off open
 backlog items as ever - see this file's "Open backlog", unchanged. The
-documentation-vs-implementation audit angle (checking a `check:*` script's
-header comment against its actual body) is now three scripts further along
-(`check-image-dimensions`/`check-link-names`/`check-locale-consistency`/
-`check-record-claims` all confirmed accurate) with no new gap found beyond the
-two-hundred-and-second run's own JSON-LD find - worth continuing against the
-remaining unaudited scripts (`check-meta`/`check-pdf-outline`/`check-sitemap`/
-`check-since-claims`/`check-spelling-hr`/`check-superlative-claims`/
-`check-text-zoom`/`check-theme-flash`/`check-claims-hr`/`check-award-tallies`
-haven't been re-read this specific way yet) before returning to another
-content-vocabulary sweep.
+documentation-vs-implementation audit is now complete across every `check:*`
+script; worth trying a fresh angle (another content-vocabulary sweep, or
+re-reading a script added since this pass began) rather than repeating it.
 
 **Two-hundred-and-second run:** with every "Open backlog" item below still
 either environment-blocked or awaiting human sign-off, took a structural
@@ -1202,15 +1257,14 @@ matching entry for full detail.
 
 - **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.10` (latest
   published) only declares `typescript: '^5.0.0 || ^6.0.0'` as a peer
-  dependency - re-confirmed via `npm view @astrojs/check@latest
-  peerDependencies` as recently as the hundred-and-sixty-fifth run
-  (2026-09-22; `pnpm outdated` shows `typescript` at 5.9.3 vs. 7.0.2 latest,
-  no new `@astrojs/check` release since). Re-check whenever `pnpm outdated`
-  next shows a new `@astrojs/check` release.
+  dependency - re-confirmed via `pnpm outdated` as recently as the
+  two-hundred-and-fourth run (2026-09-30; `typescript` still at 5.9.3 vs.
+  7.0.2 latest, no new `@astrojs/check` release). Re-check whenever `pnpm
+  outdated` next shows a new `@astrojs/check` release.
 - **`docs/SOURCES.md` link-liveness sweep**: blocked. This environment's
   outbound network/egress policy rejects direct requests to external
-  reference domains - confirmed repeatedly, most recently 2026-09-22
-  (hundred-and-sixty-fifth run: `WebFetch` to `en.wikipedia.org` still
+  reference domains - confirmed repeatedly, most recently 2026-09-30
+  (two-hundred-and-fourth run: `WebFetch` to `en.wikipedia.org` still
   returns `EGRESS_BLOCKED` from the proxy), and precisely scoped: `WebFetch`
   to `en.wikipedia.org` *and* `www.uefa.com` both return `EGRESS_BLOCKED`
   from the proxy (not a Wikipedia-specific block), so this is a general
