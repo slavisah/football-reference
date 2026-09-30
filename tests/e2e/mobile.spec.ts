@@ -1892,6 +1892,31 @@ test.describe('Home page on a 360px phone', () => {
     await expect(page.locator('#on-this-day-hint')).toBeHidden();
   });
 
+  // OnThisDay.astro's inline script always rebuilds #on-this-day-list's <li>s
+  // client-side via createElement/appendChild, on every page load - not just
+  // when the visitor's real date differs from the build date - so the
+  // re-rendered items never carry the data-astro-cid-* attribute a plain
+  // scoped `<style>` selector requires, the same root cause
+  // dynamic-list-styling.spec.ts already guards on /compare and
+  // /compare-players. Before this fix, every card on every JS-enabled visit
+  // silently lost its padding/background/border, confirmed live via
+  // `getComputedStyle()` (`padding: 0px`, `background-color: rgba(0, 0, 0,
+  // 0)`, no border) rather than assumed from reading the CSS.
+  test('"On this day" cards keep their card styling after the client-side re-render', async ({
+    page,
+  }) => {
+    await page.clock.setFixedTime(new Date('2026-07-30T12:00:00'));
+    await page.goto('');
+    const firstItem = page.locator('#on-this-day-list li').first();
+    await expect(firstItem).toBeVisible();
+    const style = await firstItem.evaluate((el) => {
+      const computed = getComputedStyle(el);
+      return { padding: computed.padding, backgroundColor: computed.backgroundColor };
+    });
+    expect(style.padding).not.toBe('0px');
+    expect(style.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+  });
+
   test('"On this day" falls back to an archive card on a non-final date', async ({ page }) => {
     // No World Cup, EURO, Copa América, Nations League decisive match or
     // Ballon d'Or ceremony has ever fallen on 1 January.
@@ -2005,6 +2030,24 @@ test.describe('Croatian home page (/hr/) on a 360px phone', () => {
     await expect(list).toContainText('FIFA Svjetsko prvenstvo 1966');
     await expect(page.locator('#on-this-day-date')).toHaveText('30. srpnja');
     await expect(page.locator('#on-this-day-hint')).toBeHidden();
+  });
+
+  // Croatian counterpart of the English "keeps its card styling" test above -
+  // OnThisDay.astro is one shared component, so both languages hit the same
+  // client-side re-render path.
+  test('"On this day" cards keep their card styling after the client-side re-render', async ({
+    page,
+  }) => {
+    await page.clock.setFixedTime(new Date('2026-07-30T12:00:00'));
+    await page.goto('hr/');
+    const firstItem = page.locator('#on-this-day-list li').first();
+    await expect(firstItem).toBeVisible();
+    const style = await firstItem.evaluate((el) => {
+      const computed = getComputedStyle(el);
+      return { padding: computed.padding, backgroundColor: computed.backgroundColor };
+    });
+    expect(style.padding).not.toBe('0px');
+    expect(style.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
   });
 
   test('"On this day" falls back to a translated archive-card hint on a non-final date', async ({
