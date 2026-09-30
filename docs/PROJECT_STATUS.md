@@ -31376,3 +31376,91 @@ whoever picks up this thread next should look for a different dimension
 entirely (an interaction pattern, a data-claim vocabulary, a dependency
 bump) rather than re-running the same viewport survey against an
 already-exhausted list.
+
+### A JSON-LD breadcrumb/self-referential `url` value was never checked for reachability by any script, despite `check-internal-links.mjs`'s own header comment claiming it was - closed 2026-09-30 (two-hundred-and-second intensive run)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, took a structural angle rather than another `content/*.md`
+vocabulary grep: read each existing `check:*` script's own header comment
+against what it actually implements, rather than assuming a script's
+documented scope and its real behavior always agree. `check-internal-
+links.mjs`'s own comment claimed "canonical/hreflang tags, JSON-LD urls"
+were all covered by its href/src-attribute crawl - true for canonical/
+hreflang (both are `<link href="...">` HTML attributes its regex already
+matches), but false for JSON-LD: a `url`/`item` value there is a JSON string
+inside a `<script type="application/ld+json">` tag's text content, never an
+HTML attribute, so the `href`/`src` regex never saw it. The other script
+that touches JSON-LD, `check-jsonld.mjs`, only validates structure (a real
+`@context`/`@type`, sequential `position`s, every url absolute and under
+this site's own origin) - never that the url actually resolves to a real
+page. So a stale or mistyped breadcrumb `item` URL (e.g. a copy-pasted
+edition year) would 404 for a search engine or structured-data consumer,
+silently and permanently - nothing on this site would have caught it.
+
+**Confirmed the gap was real before building anything.** A throwaway probe
+extracted every `url`/`item` string from every built page's JSON-LD blocks
+and checked each against the real `dist/` output using the same
+`classifyLink`/`candidateDistPaths` resolution `check-internal-links.mjs`
+already uses for plain hrefs: 3,176 values across all 715 built HTML files
+(711 pages plus 4 redirect stubs), every one resolving today - a clean pass,
+the same "close the gap even though nothing's broken yet" reasoning every
+other `check:*` addition's own first clean run has already documented
+(`check:locale-consistency`, `check:landscape`, etc.).
+
+**Closed it in the natural place, not a new script.** Extended
+`check-internal-links.mjs` itself - it already owns "does this internal
+reference resolve to a real file", it just needed a second source of
+references - with `extractJsonLdLinks()`, which walks every parsed JSON-LD
+block for a `url`/`item` key at any depth. `item` is sometimes itself a
+nested `Thing` object with no url of its own (an ItemList champion/award/
+rivalry entry, per `src/lib/jsonLd.ts`) rather than a URL string; walking
+into the object form correctly finds nothing to add there, not a bug -
+verified by reading every `buildXItemList()` function in `jsonLd.ts` to
+confirm `item` is a bare URL string only for `buildBreadcrumbList()`, never
+elsewhere. The extracted urls flow through the exact same
+`classifyLink`/`candidateDistPaths` resolution every plain `href`/`src` link
+already goes through, deduplicated against the page's own attribute-based
+links before checking.
+
+**Verified the new coverage actually catches a regression, per this
+project's own standing discipline for a new check.** Hand-edited a built
+page's (`/records`) breadcrumb JSON-LD to point at a nonexistent slug and
+re-ran `pnpm check:links`: failed immediately, naming exactly that broken
+URL and page. Reverted the hand-edit and rebuilt clean from source; `pnpm
+check:links` passed again. Added 5 new unit tests to
+`tests/unit/checkInternalLinks.test.ts`: extracting a breadcrumb `item` plus
+an ItemList's own self-referential `url`, the nested-Thing-with-no-url case
+(confirming it correctly extracts nothing), cross-block deduplication,
+resilience against a malformed JSON-LD block (skipped, not thrown on - that
+class of error is `check-jsonld.mjs`'s job), and the no-JSON-LD-at-all empty
+case.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the already-documented blocked `typescript` line), `pnpm lint` (238
+files, 0 errors/0 warnings/0 hints), `pnpm test` (902/902, up from 897),
+`pnpm test:coverage` (99.91%/99.31%, unchanged - the new function is fully
+exercised by its own unit tests, no new uncovered lines), `pnpm build` (711
+pages), `pnpm check:links` (715 pages checked, clean - and separately
+confirmed catching a deliberately-reintroduced broken JSON-LD url before
+being reverted, as described above), `pnpm check:jsonld` (unchanged: 1783
+JSON-LD blocks across 711 pages, all structurally valid, confirming this
+run's addition is genuinely additive rather than a duplicate of what that
+script already checks), all other 27 fast `check:*` scripts individually
+clean, `pnpm audit` (no known vulnerabilities), `pnpm dlx knip
+--no-config-hints` (same two standing false positives as ever). Browser
+sweeps and a full cold-start `pnpm test:e2e` not re-run - this change
+touches only a build-time verification script and its own unit tests, no
+page markup, styling or rendered content, matching this project's
+established practice for that class of change (e.g. the
+hundred-and-seventy-second run's `check:superlative-claims`, the
+two-hundred-and-first run's own `check:landscape`).
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+This run's own angle (auditing each `check:*` script's documented scope
+against what it actually implements) found one real, previously-open gap
+and closed it. `check-jsonld.mjs`'s own header comment was re-read and found
+accurate on inspection this run (it never claims to check reachability, so
+there was no gap to close there) - the remaining ~30 `check:*` scripts
+haven't all been re-read this way yet, and are worth trying before returning
+to another content-vocabulary sweep.

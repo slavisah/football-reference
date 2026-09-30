@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   candidateDistPaths,
   classifyLink,
+  extractJsonLdLinks,
   extractLinks,
 } from '../../scripts/check-internal-links.mjs';
 
@@ -22,6 +23,73 @@ describe('extractLinks', () => {
 
   it('returns an empty list when a page has no href/src attributes', () => {
     expect(extractLinks('<html><body>No links here</body></html>')).toEqual([]);
+  });
+});
+
+describe('extractJsonLdLinks', () => {
+  it('extracts a breadcrumb item URL and an ItemList\'s own self-referential url', () => {
+    const html = `
+      <script type="application/ld+json">${JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://slavisah.github.io/football-reference/' },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'FIFA World Cup',
+            item: 'https://slavisah.github.io/football-reference/competitions/world-cup',
+          },
+        ],
+      })}</script>
+      <script type="application/ld+json">${JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        url: 'https://slavisah.github.io/football-reference/records',
+      })}</script>
+    `;
+    expect(extractJsonLdLinks(html)).toEqual([
+      'https://slavisah.github.io/football-reference/',
+      'https://slavisah.github.io/football-reference/competitions/world-cup',
+      'https://slavisah.github.io/football-reference/records',
+    ]);
+  });
+
+  it('ignores an ItemList entry whose `item` is a nested Thing object with no url of its own', () => {
+    const html = `
+      <script type="application/ld+json">${JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            item: { '@type': 'Thing', name: 'Brazil', description: '5 titles' },
+          },
+        ],
+      })}</script>
+    `;
+    expect(extractJsonLdLinks(html)).toEqual([]);
+  });
+
+  it('deduplicates a url repeated across multiple JSON-LD blocks', () => {
+    const html = `
+      <script type="application/ld+json">${JSON.stringify({ url: 'https://slavisah.github.io/football-reference/glossary' })}</script>
+      <script type="application/ld+json">${JSON.stringify({ url: 'https://slavisah.github.io/football-reference/glossary' })}</script>
+    `;
+    expect(extractJsonLdLinks(html)).toEqual(['https://slavisah.github.io/football-reference/glossary']);
+  });
+
+  it('skips a malformed JSON-LD block rather than throwing', () => {
+    const html = `
+      <script type="application/ld+json">{ not valid json </script>
+      <script type="application/ld+json">${JSON.stringify({ url: 'https://slavisah.github.io/football-reference/quiz' })}</script>
+    `;
+    expect(extractJsonLdLinks(html)).toEqual(['https://slavisah.github.io/football-reference/quiz']);
+  });
+
+  it('returns an empty list when a page has no JSON-LD blocks', () => {
+    expect(extractJsonLdLinks('<html><body>No structured data here</body></html>')).toEqual([]);
   });
 });
 
