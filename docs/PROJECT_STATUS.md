@@ -32527,3 +32527,106 @@ less-scrutinized `content/*.md` files (`records-and-timelines.md`,
 `glossary.md`, `quiz.md`, `teams.md`, `players.md`, `compare-countries.md`,
 `compare-players.md`, `about-sources.md`, `index.md`), the same treatment
 already applied to all six flagship competition/award pages.
+
+### Home page's historical-naming note fixed to match the site's actual one-case grouping policy (two-hundred-and-eleventh intensive run, 2026-10-01)
+
+Picked up the two-hundred-and-tenth run's own named next candidate: a first
+full front-to-back read of the site's smaller, less-scrutinized
+`content/*.md` files - `records-and-timelines.md`, `glossary.md`, `quiz.md`,
+`teams.md`, `players.md`, `compare-countries.md`, `compare-players.md`,
+`about-sources.md`, `index.md` (231 lines total across all nine) - the same
+treatment already applied to all six flagship competition/award pages.
+
+Read every file front to back and cross-checked each factual claim against
+either the live implementation or another content file's own documented
+policy. Found and fixed one genuine, previously-unnoticed factual error, on
+the single most-read page on the entire site: `content/index.md`'s
+"Important historical naming note" said "summary statistics may group
+sporting successors where that is conventional. Examples include West
+Germany/Germany, Soviet Union/Russia, and Czechoslovakia/Czechia" - naming
+all three as if each were grouped. That directly contradicts both
+`src/lib/countries.ts`'s own `SUCCESSOR_GROUPS` map and comment ("only the
+West Germany / Germany continuity is merged, which is the single case the
+editorial content itself groups. Every other name counts as itself") and
+`content/records-and-timelines.md`'s own "Historical identity rules"
+section ("Soviet Union and Russia should not automatically be merged";
+"Czechoslovakia and Czech Republic/Czechia should not automatically be
+merged without an explicit editorial rule") - two independent, correct
+sources the home page's own prose disagreed with. Confirmed against the
+code (`countries.ts`'s `SUCCESSOR_GROUPS` literally only contains the
+`west germany`/`germany` keys) rather than assumed from the other content
+file alone.
+
+Fixed `content/index.md` to state the true policy - grouping happens only
+in the one West Germany/Germany case, with Soviet Union/Russia and
+Czechoslovakia/Czechia both named as examples kept deliberately separate -
+and updated the matching hand-translated Croatian prose in
+`src/pages/hr/index.astro` (this page is hand-authored chrome, not a
+Markdown-driven competition page, so its Croatian text has no automatic
+sync path and had to be edited directly). Both language versions build and
+render the corrected sentence. Two e2e assertions were pinned to the old
+wording and needed updating to match: `tests/e2e/mobile.spec.ts`'s English
+"Important historical naming note" test (was matching literal substring
+"West Germany/Germany, Soviet Union/Russia"; now matches across the
+rewritten sentence boundary) and its Croatian "Važna napomena o povijesnim
+nazivima" counterpart (same substring-match update). A third, unrelated e2e
+test on `/records` asserting "Sovjetski Savez i Rusija se ne spajaju." was
+untouched and still passes - that assertion was already correct and
+describes a different page.
+
+The other eight files had no comparable claim: `glossary.md`'s "EURO has not
+played a third-place match since 1980" / semifinalists-from-1984 note
+matches `content/uefa-euro.md`'s own table and "Historical format note"
+verbatim; `players.md`'s "FIFA World Cup or UEFA EURO Golden Boot" scope
+matches `content/golden-boot.md`'s own "two separate Golden Boot races"
+description (no Copa América or other competition's Golden Boot exists to
+omit); `compare-players.md`'s "see 'Compare' for that comparison" correctly
+names the nav link's actual label (`src/lib/routes.ts`'s `'/compare'` entry
+is literally labelled `'Compare'`), not the `compare-countries` content
+slug a careless read might expect. `records-and-timelines.md`, `quiz.md`,
+`teams.md`, `compare-countries.md` and `about-sources.md` are pure
+editorial/UI-description prose with no independently-checkable factual
+claim in them.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 ->
+7.0.2 line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm
+test` (902/902, unchanged - the fix touched prose and a test assertion, not
+app logic), `pnpm test:coverage` (99.91%/99.31%, unchanged), `pnpm build`
+(711 pages). Manually confirmed the corrected sentence in both
+`dist/index.html` and `dist/hr/index.html`. All 29 CI-gated fast `check:*`
+scripts individually re-run and clean, including `check:i18n-notes` (7
+matched page pairs) and `check:claims-hr` (205 claims) - neither flagged
+the hand-edited Croatian sentence, since it isn't one of the claim shapes
+those two scripts pattern-match. `check:pdfs` (700/700) confirmed clean
+with nothing to regenerate - the home page has no corresponding entry in
+`public/downloads/` (print PDFs cover competition/award/edition/profile
+pages, `/records`, `/compare`, `/compare-players`, `/glossary`, and
+`/teams`/`/players` profiles, not the hand-authored home page), so no
+`pnpm build:pdfs` run was needed. `pnpm audit` (no known vulnerabilities).
+`pnpm dlx knip --no-config-hints` (same two standing false positives:
+`scripts/test-preview-server.mjs`, `@cspell/dict-hr-hr`). Ran the two
+updated e2e assertions plus the untouched `/records` one directly with
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` (this container's bundled
+Chromium lacks the `chrome-headless-shell` binary Playwright's default
+mobile-chromium project expects, the same container-specific snag the
+two-hundred-and-fourth run already documented) - all three passed. Did not
+re-run the full cold-start `pnpm test:e2e` suite or the five manual browser
+sweeps - no markup or interactive-behavior change beyond the two targeted
+assertions already re-run directly; the two-hundred-and-fourth run's own
+full cold-start `pnpm test:e2e` (1042/1042) plus the five manual browser
+sweeps remain the current baseline, with `check:lighthouse` last
+reconfirmed by the two-hundred-and-eighth run.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
+unchanged. The front-to-back read of all nine smaller `content/*.md` files
+is now complete and closed - combined with the two-hundred-and-ninth/
+two-hundred-and-tenth runs' by-hand recomputation of every `/records`
+ranking, every content file on the site (flagship and smaller alike) has
+now had at least one dedicated close-read pass. The next run most likely
+needs a genuinely new quality angle (accessibility, performance, a fresh
+`docs/WEBSITE_REQUIREMENTS.md`-vs-live-site read, or a second independent
+pass over files already checked once) rather than a first pass over
+anything still unread, unless a new source lead clears one of the blocked
+backlog items above.

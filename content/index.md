@@ -31,6 +31,6 @@ Each competition page contains:
 
 ## Important historical naming note
 
-National teams and states have changed over time. This project generally records the name used during the tournament, while summary statistics may group sporting successors where that is conventional. Examples include West Germany/Germany, Soviet Union/Russia, and Czechoslovakia/Czechia.
+National teams and states have changed over time. This project generally records the name used during the tournament. Summary statistics group a nation with its sporting successor only in the one case this site treats that way - West Germany/Germany title totals. Other historical name changes, such as Soviet Union/Russia or Czechoslovakia/Czechia, are kept separate rather than merged automatically.
 
 The website should explain these choices rather than pretending that political and sporting continuity is always simple.
