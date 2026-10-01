@@ -32166,3 +32166,238 @@ less-scrutinized `content/*.md` files (`records-and-timelines.md`,
 `compare-countries.md`, `compare-players.md`, `about-sources.md`,
 `index.md`), which have had far less individual front-to-back attention
 than the six flagship competition/award pages.
+
+### `/records`' generated "Back-to-back champions"/"Longest wait between titles" rankings hand-verified against every source table across all seven datasets, both languages - clean (two-hundred-and-ninth intensive run, 2026-10-01)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, picked up the first of the two-hundred-and-eighth run's own
+two named next candidates: a by-hand spot-check of `/records`' "Longest wait
+between titles" and "Back-to-back champions" sections against each
+competition's own source table, independent of the generator's own unit
+tests.
+
+**Correcting the framing going in.** The two-hundred-and-eighth run's own
+note (and this run's own task brief) described these sections as
+"hand-authored... generated from competition data, never independently
+re-verified against the source Champions-timeline tables" - checking
+`src/pages/records.astro` directly shows they are not hand-authored prose at
+all, unlike every other content/table cross-check prior runs have done
+(Ballon d'Or's ceremony-date bullet, Copa América's "only Ecuadorian" claim,
+etc., all free text in `content/*.md`). Both sections are generated entirely
+at build time by `buildLongestStreaks()` and `buildLongestTitleGaps()` in
+`src/lib/editions.ts`, fed by the exact same `Edition[]` arrays every other
+`/records` ranking on the page already uses (`buildChampionsSummary()`,
+`buildHostsSummary()`, etc.). Both functions already carry their own unit
+tests (`tests/unit/editions.test.ts`), with fixture-based coverage of the
+placeholder-year-breaks-a-streak case, the West-Germany/Germany grouping
+rule, and the "track the widest gap, not the first-to-last gap" logic. What
+no prior run had ever done is independently recompute their *real* output
+against *today's real* `content/*.md` tables by hand - a passing unit test
+only proves the function is internally consistent with its own small
+fixture, never that it produces the right numbers when run against the
+site's actual, much larger, hand-edited data. That is the gap this run
+closed, and it is a genuinely different kind of check from "does this
+function work" - it is "does this specific build, today, on this specific
+data, produce the right numbers", the same spirit as the two-hundred-and-
+second run's own "hand-edit the built output and confirm a checker actually
+catches it" discipline, just applied to editorial facts instead of a
+checker script.
+
+**Method.** Ran `pnpm build` (711 pages, clean), then extracted the rendered
+"Back-to-back champions" and "Longest wait between titles" sections verbatim
+from `dist/records/index.html` (stripping HTML tags with a throwaway Python
+one-liner, not assumed from reading the component source). Independently
+hand-recomputed every row shown there by walking each competition's own
+Editions/Champions-timeline/Winners table in `content/*.md` from scratch -
+reading the raw Markdown table row by row and doing the arithmetic by hand,
+not re-deriving the answer from reading `editions.ts`'s own logic. Covered
+all seven datasets the page renders: FIFA World Cup, UEFA EURO, Copa
+América, UEFA Nations League (the four team competitions), plus Ballon d'Or,
+Golden Boot (World Cup) and Golden Boot (EURO) (the three individual
+awards, which also get their own "Longest wait"/"Back-to-back" rows via the
+page's `allLoaded` array).
+
+**Back-to-back champions - every row recomputed:**
+
+- **FIFA World Cup** (23 editions): walked the Winner column in order -
+  Italy (1934, 1938) and Brazil (1958, 1962) are the only two adjacent-row
+  repeats anywhere in the table. Matches the rendered page exactly (2
+  streaks, no others).
+- **UEFA EURO** (17 editions): only Spain (2008, 2012) repeats on adjacent
+  rows. West Germany's 1972 and 1980 titles are not adjacent rows (Italy
+  1968, Czechoslovakia 1976 sit between/around them) so correctly form no
+  streak. Matches exactly (1 streak).
+- **Copa América** (48 editions, including the two separately-hosted 1959
+  entries): walked all 48 rows. Found 11 streaks: Argentina 1945-1947
+  (3-in-a-row, the longest on the page), then 10 two-in-a-rows - Uruguay
+  1916/1917, Uruguay 1923/1924, Argentina 1927/1929, Argentina 1957/1959
+  (the Argentina-hosted 1959 edition specifically, not the Ecuador-hosted
+  one three rows later), Uruguay 1983/1987, Argentina 1991/1993, Brazil
+  1997/1999, Brazil 2004/2007, Chile 2015/2016, Argentina 2021/2024. All 11
+  matched the rendered page in both count and sort order (3-streak first,
+  then the ten 2-streaks ordered by earliest start year: 1916, 1923, 1927,
+  1957, 1983, 1991, 1997, 2004, 2015, 2021 - exactly the rendered order).
+- **UEFA Nations League** (4 editions: Portugal, France, Spain, Portugal):
+  no adjacent repeat - matches the rendered "No one has won two editions in
+  a row yet."
+- **Ballon d'Or** (70 editions, 1956-2025): found 8 streaks - Messi
+  2009-2012 (4-in-a-row, the longest), Platini 1983-1985 (3), then five
+  2-in-a-rows (Cruyff 1973/1974, Keegan 1978/1979, Rummenigge 1980/1981, van
+  Basten 1988/1989, Cristiano Ronaldo 2013/2014) plus one more 2-in-a-row
+  (Cristiano Ronaldo 2016/2017). Specifically verified the 2020 "Not
+  awarded" placeholder year correctly breaks what would otherwise be a
+  Messi 2019-2021 3-in-a-row - it does not appear as a streak on the
+  rendered page, and recomputing by hand confirms 2019's Messi and 2021's
+  Messi are correctly treated as two separate, non-consecutive single wins
+  rather than merged across the gap. All 8 streaks and their sort order
+  (4, 3, then six 2s ordered by start year: 1973, 1978, 1980, 1988, 2013,
+  2016) matched exactly.
+- **Golden Boot (World Cup)** (23 editions): only Kylian Mbappé (2022, 2026)
+  repeats on adjacent rows - matches exactly (1 streak).
+- **Golden Boot (EURO)** (17 editions): no adjacent repeat among any of the
+  solo winners or tied-winner cells (checked all five tie years - 1960,
+  1964, 1992, 2012, 2024 - against their immediate neighbors) - matches the
+  rendered "No one has won two editions in a row yet."
+
+**Longest wait between titles - every row recomputed** (30 rows total
+across all seven datasets, every team/player with 2+ titles):
+
+- **FIFA World Cup** (7 entries): Italy 44 years (1938-1982), Argentina 36
+  (1986-2022), Brazil 24 (1970-1994), Germany incl. West Germany 24
+  (1990-2014), Uruguay 20 (1930-1950), France 20 (1998-2018), Spain 16
+  (2010-2026). All 7 matched, including the Brazil/Germany 24-year tie's
+  resolution (Brazil's gap starts earlier - 1970 vs. 1990 - so it correctly
+  sorts first) and the Uruguay/France 20-year tie (Uruguay's gap starts in
+  1930 vs. France's 1998, Uruguay correctly sorts first).
+- **UEFA EURO** (4 entries): Italy 52 (1968-2020), Spain 44 (1964-2008),
+  Germany incl. West Germany 16 (1980-1996), France 16 (1984-2000). All 4
+  matched, including the Germany/France 16-year tie (Germany's gap starts
+  earlier, 1980 vs. 1984, correctly sorts first).
+- **Copa América** (6 entries): Brazil 40 (1949-1989), Peru 36 (1939-1975),
+  Argentina 32 (1959-1991), Paraguay 26 (1953-1979), Uruguay 16 (1967-1983),
+  Chile 1 (2015-2016). All 6 matched - Uruguay's own widest gap specifically
+  required checking a genuine internal tie: Uruguay's title years (1916,
+  1917, 1920, 1923, 1924, 1926, 1935, 1942, 1956, 1959, 1967, 1983, 1987,
+  1995, 2011) produce two different 16-year gaps (1967-1983 and
+  1995-2011) - the rendered page shows 1967/1983, matching the generator's
+  documented "first occurrence of the widest gap wins" tie-break (a `>`
+  comparison, not `>=`), confirmed correct by hand.
+- **UEFA Nations League** (1 entry): Portugal 6 years (2018-19 to 2024-25) -
+  matched; `leadingYear()`'s season-label parsing (extracting "2018" from
+  "2018–19") confirmed correct by the arithmetic itself (2024-2018=6).
+- **Ballon d'Or** (10 entries): Ronaldo (Brazilian) 5 (1997-2002), Cristiano
+  Ronaldo 5 (2008-2013), Franz Beckenbauer 4 (1972-1976), Lionel Messi 4
+  (2015-2019), Marco van Basten 3 (1989-1992), Alfredo Di Stéfano 2
+  (1957-1959), Johan Cruyff 2 (1971-1973), Kevin Keegan 1 (1978-1979),
+  Karl-Heinz Rummenigge 1 (1980-1981), Michel Platini 1 (1983-1984). All 10
+  matched, including three separate ties resolved correctly by earliest
+  gap-start year (the two 5s, the two 4s, the two 2s) and three 1-year gaps
+  sorted correctly by start year (1978, 1980, 1983).
+- **Golden Boot (World Cup)** (1 entry): Kylian Mbappé 4 years (2022-2026) -
+  matched.
+- **Golden Boot (EURO)** (1 entry): Cristiano Ronaldo 8 years (2012-2020) -
+  matched, and specifically confirms `buildLongestTitleGaps()` correctly
+  inherits `buildChampionsSummary()`'s tied-winner-cell splitting: Ronaldo's
+  2012 Golden Boot was a six-way tie ("Mario Balotelli; Mario Gómez; Mario
+  Mandžukić; Cristiano Ronaldo; Alan Dzagoev; Fernando Torres"), yet still
+  correctly earns him individual credit that combines with his outright
+  2020 win for the 8-year gap shown.
+
+**Zero discrepancies found across all 30 title-gap rows and all 23
+back-to-back-champions rows, on all seven datasets.** A genuine, thorough
+negative result.
+
+**One real asymmetry found, investigated, and left deliberately unfixed as
+currently inert - not a shipped bug.** `buildLongestStreaks()` (unlike
+`buildChampionsSummary()`/`buildLongestTitleGaps()`, which both split a
+`"; "`-joined tied-winner cell into individual player credits before
+grouping) compares each edition's *raw, unsplit* winner-cell string for an
+exact match when deciding whether two adjacent editions share a winner. So a
+player who shares a tie in one edition and then wins outright in the next
+edition would currently be invisible to the streaks ranking - the literal
+strings "Cristiano Ronaldo" and "Mario Balotelli; Mario Gómez; Mario
+Mandžukić; Cristiano Ronaldo; Alan Dzagoev; Fernando Torres" never compare
+equal, even though the same real person is a genuine repeat winner across
+those two editions (this is exactly the shape the Golden Boot (EURO)
+title-gap check above confirms *does* get credited correctly in the
+gap-based ranking, via the split-aware `buildChampionsSummary()` path - so
+the two rankings' tie-handling genuinely diverge). Checked every tie year
+across all seven datasets (World Cup Golden Boot 1962 and 1994; EURO Golden
+Boot 1960, 1964, 1992, 2012 and 2024) against its immediately adjacent rows
+for this exact shape: none of today's content has a tie year adjacent to a
+matching solo winner from among the tied names, so this asymmetry produces
+no incorrect number on the live site today - a documented, currently-inert
+gap in the code, not a shipped factual error. Deliberately left unfixed
+this run: there is no live, currently-wrong claim to write a regression test
+against, so "fixing" the comparison blind would mean shipping an untested
+code change with no real failing case to prove it actually closes the gap
+correctly (the exact kind of unverified fix this project's own standing
+discipline - "verify a regression test against a real failure before
+trusting it" - argues against). Worth revisiting with a real
+split-aware rewrite (and a regression test) the day any future content edit
+actually creates a tie-adjacent-to-matching-solo-winner shape in any of the
+seven tables.
+
+**Croatian page cross-check.** Diffed the built `dist/hr/records/index.html`
+against the English `dist/records/index.html` for both sections: every team/
+player name, gap or streak count, and bounding year is byte-identical
+between the two languages (only the heading text, unit labels like "godine"/
+"godina" and the "Pogledajte cijelu tablicu" link text differ) - confirming
+both language pages load the same `loadCompetition()`-derived `Edition[]`
+arrays and call the same `buildLongestStreaks()`/`buildLongestTitleGaps()`
+functions, with nothing forked or hand-duplicated between `src/pages/
+records.astro` and `src/pages/hr/records.astro` for these two sections.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(902/902, unchanged - this run was a read-only hand cross-check against
+build output, no source file changed), `pnpm test:coverage`
+(99.91%/99.31%, unchanged - the same four defensively-unreachable branches
+in `quiz.ts`/`sources.ts`/`tableSort.ts`/`url.ts` as ever), `pnpm build`
+(711 pages, unchanged). All 29 CI-gated fast `check:*` scripts individually
+re-run and clean: `check:pdfs` (700/700), `check:pdf-outline` (700/700),
+`check:perf`, `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:precache`, `check:jsonld` (1783 blocks across 711 pages), `check:
+heading-outline`, `check:theme-flash`, `check:reachability`, `check:meta`,
+`check:award-tallies` (4/4), `check:superlative-claims` (24),
+`check:ordinal-claims` (91), `check:record-claims` (36),
+`check:consecutive-claims` (22), `check:since-claims` (26),
+`check:one-of-only-claims` (2), `check:completeness-claims` (5) - all seven
+claim-ledger checkers unchanged from the two-hundred-and-eighth run's own
+counts - `check:edition-header-labels`, `check:i18n-notes` (7 matched page
+pairs), `check:attendance-format`, `check:claims-hr` (205 claims),
+`check:link-names`, `check:image-dimensions`, `check:locale-consistency`,
+`check:theme-color`, `check:spelling` (15 files, 0 issues), `check:
+spelling-hr` (57 blocks, 0 unknown words). `pnpm audit` (no known
+vulnerabilities). `pnpm dlx knip --no-config-hints` (same two standing
+false positives as ever: `scripts/test-preview-server.mjs`,
+`@cspell/dict-hr-hr`).
+
+No content or markup changed this run - this was a pure read/verify pass,
+and nothing to fix turned up - so no PDF regeneration was needed; the clean
+`check:pdfs`/`check:pdf-outline` results above simply confirm the existing
+700 PDFs are still fresh, not that anything was freshly regenerated. Browser
+sweeps and a cold-start `pnpm test:e2e` were not re-run - no markup or
+interactive-behavior change this run; the two-hundred-and-fourth run's own
+full cold-start `pnpm test:e2e` (1042/1042) plus all five manual browser
+sweeps remain the current baseline, with `check:lighthouse` freshly
+reconfirmed perfect by the two-hundred-and-eighth run.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+This run's own angle (a by-hand spot-check of `/records`' generated
+rankings against their source tables, rather than trusting the generator's
+own unit tests) is now closed for the two sections it targeted, across all
+seven datasets and both languages - no discrepancy found, and the one
+latent code asymmetry found (`buildLongestStreaks()`'s non-split
+tied-winner comparison) is currently inert and documented above rather than
+fixed blind. The same by-hand treatment has not yet been applied to
+`/records`' other five generated rankings ("Most frequent hosts", "Titles
+won on home soil", "Nearly champions", "Nearly finalists", "Biggest final
+wins") or to "Fiercest rivalries" - a natural next candidate for run #210,
+alongside the two-hundred-and-eighth run's other still-untried suggestion: a
+first full front-to-back read of the site's smaller, less-scrutinized
+`content/*.md` files (`records-and-timelines.md`, `glossary.md`, `quiz.md`,
+`teams.md`, `players.md`, `compare-countries.md`, `compare-players.md`,
+`about-sources.md`, `index.md`).
