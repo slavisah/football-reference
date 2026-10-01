@@ -5,7 +5,7 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-09-10
+lastReviewed: 2026-10-01
 status: verified
 ---
 
@@ -222,7 +222,7 @@ A **second, independent cross-check** of the Final date column (2026-08-12, inte
 - **1957:** Humberto Maschio (Argentina); Javier Ambrois (Uruguay) - 9 goals each - shares the single-edition scoring record with Jair.
 - **1959 (Argentina):** Pelé (Brazil) - 8 goals.
 - **1959 (Ecuador):** José Sanfilippo (Argentina) - 6 goals.
-- **1963:** Carlos Alberto Raffo (Ecuador) - 6 goals - the only Ecuadorian to ever win an individual Copa América award.
+- **1963:** Carlos Alberto Raffo (Ecuador) - 6 goals - the only Ecuadorian to win the Best Player, Golden Glove, or Golden Boot award; Pervis Estupiñán (2021) and Piero Hincapié (2024) were later named to Team of the Tournament selections, a separate honor (see "Team of the Tournament winners" below).
 - **1967:** Luis Artime (Argentina) - 5 goals.
 - **1975:** Leopoldo Luque (Argentina); Ernesto Díaz (Colombia) - 4 goals each.
 - **1979:** Jorge Peredo (Chile); Eugenio Morel (Paraguay) - 4 goals each.

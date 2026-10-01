@@ -44,7 +44,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-fifth run (2026-09-30): 902/902 unit tests, `pnpm
+As of the two-hundred-and-sixth run (2026-10-01): 902/902 unit tests, `pnpm
 lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
@@ -56,9 +56,72 @@ plus all five manual browser sweeps remain the last complete, together
 confirmation (the combination had gone stale for four runs, since the
 two-hundredth run's own 1038/1038 count) - see that run's own entry below for
 the full writeup, including a container-specific Playwright browser-cache
-snag hit and worked around along the way; the two-hundred-and-fifth run's own
-change was a content-prose/translation fix with no markup or behavior
-change, so that baseline still stands.
+snag hit and worked around along the way; the two-hundred-and-fifth and
+two-hundred-and-sixth runs' own changes were both content-prose/translation
+fixes with no markup or behavior change, so that baseline still stands.
+
+**Two-hundred-and-sixth run:** with every "Open backlog" item below still
+either environment-blocked or awaiting human sign-off, continued the
+two-hundred-and-fifth run's own suggested next angle - a fresh front-to-back
+read of a content file, cross-checking its prose directly against its own
+tables rather than only the seven verification-ledger checkers' trigger-word
+matches - against `content/copa-america.md`, the first of that run's three
+suggested candidates.
+
+Read the whole page section by section. Re-counted the "Titles after 2024"
+tally table directly against the Champions timeline table (all eight
+nations' counts confirmed: Argentina 16, Uruguay 15, Brazil 9, Paraguay/
+Chile/Peru 2 each, Colombia/Bolivia 1 each, summing to all 48 editions).
+Checked the Best Player/Golden Glove "every edition since X; no award at Y
+earlier editions" counts, the Golden Boot repeat-winner bullet, and every
+"Memorable moments" bullet against the tables - all held up.
+
+Found one real, previously-unnoticed mismatch: the Golden Boot section's
+1963 bullet called Carlos Alberto Raffo (Ecuador) "the only Ecuadorian to
+ever win an individual Copa América award." Its own
+`superlative-claims-ledger.json` entry (verified 2026-09-23) explicitly
+scoped the check to "all three individual-award tables on this page (Best
+Player, Golden Glove, Golden Boot)" - but the page has a fourth
+individual-recognition section, Team of the Tournament, added at the
+fifty-second intensive run (2026-09-02) and already carrying an Ecuadorian
+name (Pervis Estupiñán, 2021) three weeks before the 2026-09-23 verification
+that declared Raffo "the only" one; Piero Hincapié (2024) added a second.
+Neither was ever caught because that verification's own methodology never
+looked at the Team of the Tournament section. Reworded the claim to the
+scope it was actually verified against ("the only Ecuadorian to win the Best
+Player, Golden Glove, or Golden Boot award") and named both Team of the
+Tournament picks explicitly, in English (`content/copa-america.md`) and
+Croatian (`src/pages/hr/competitions/copa-america.astro`), plus the matching
+`superlative-claims-ledger.json` entry. Bumped `content/copa-america.md`'s
+`lastReviewed` to 2026-10-01.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm lint` (238
+files, 0/0/0), `pnpm test` (902/902, unchanged - a pure prose/translation
+fix), `pnpm build` (711 pages, unchanged), all 29 CI-gated fast `check:*`
+scripts individually re-run and clean, including `check:superlative-claims`
+(24 claims, 0 unverified), `check:i18n-notes` (7 matched page pairs, parity
+held) and `check:claims-hr` (205 claims, unchanged). Regenerated all 700
+downloadable PDFs (`pnpm build && pnpm build:pdfs`, via the
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` container escape hatch) since
+both pages changed; `check:pdfs`/`check:pdf-outline` both clean (700/700)
+after a clean serial rebuild. One session-local snag along the way: a first
+`build:pdfs` invocation was accidentally left running in the background and
+a second one was started before it finished, and the two overlapping runs
+corrupted every "edition" PDF's outline (each ended up with the same wrong
+12-bookmark count regardless of its own page) - caught immediately by
+`check:pdf-outline`, not shipped; fixed by confirming no leftover preview-
+server/Playwright processes and re-running `build:pdfs` once, serially.
+Browser sweeps and a cold-start `pnpm test:e2e` not re-run, matching this
+project's own established practice for a pure prose/translation change - the
+two-hundred-and-fourth run's own full cold-start `pnpm test:e2e` (1042/1042)
+plus all five manual browser sweeps remain the current baseline.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see "Open backlog" below, unchanged. The
+two-hundred-and-fifth run's own angle (full front-to-back prose-vs-table
+read) has now been applied to Ballon d'Or and Copa América; worth trying it
+against `content/uefa-euro.md` or `content/fifa-world-cup.md` next, since
+neither has had this specific treatment as recently as the other two.
 
 **Two-hundred-and-third run:** with every "Open backlog" item below still
 either environment-blocked or awaiting human sign-off, `pnpm outdated`
