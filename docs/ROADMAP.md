@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (208 intensive runs as of 2026-10-01) lives
+verification sweep and decision (209 intensive runs as of 2026-10-01) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,7 +44,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-eighth run (2026-10-01): 902/902 unit tests, `pnpm
+As of the two-hundred-and-ninth run (2026-10-01): 902/902 unit tests, `pnpm
 lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.91%/99.31% coverage,
 and the same two standing `knip` false positives as ever (`scripts/
 test-preview-server.mjs`, used only as a Playwright `webServer.command`,
@@ -57,13 +57,151 @@ last complete, together confirmation (the combination had gone stale for
 four runs, since the two-hundredth run's own 1038/1038 count) - see that
 run's own entry below for the full writeup, including a container-specific
 Playwright browser-cache snag hit and worked around along the way; the
-two-hundred-and-fifth through two-hundred-and-eighth runs' own changes were
+two-hundred-and-fifth through two-hundred-and-ninth runs' own changes were
 all either content-prose/translation fixes or no-change verification passes,
 with no markup or behavior change, so that baseline still stands. The
 two-hundred-and-eighth run did re-run `check:lighthouse` on its own (a
 manual/intensive-run-only tool, not part of the cold-start `test:e2e` +
 browser-sweep baseline) and confirmed it is still perfect - see that run's
 own entry below.
+
+**Two-hundred-and-ninth run:** picked up the first of the two-hundred-and-
+eighth run's own two named next candidates - a by-hand spot-check of
+`/records`' "Longest wait between titles" and "Back-to-back champions"
+sections against each competition's own source table. Worth correcting the
+framing going in: these two sections are not hand-authored prose (unlike
+every other content/table cross-check prior runs have done) - they are
+generated at build time by `buildLongestStreaks()`/`buildLongestTitleGaps()`
+in `src/lib/editions.ts`, fed by the same `Edition[]` arrays every other
+`/records` ranking already uses. Both functions already have dedicated unit
+tests, but no prior run had ever independently recomputed their *real*
+output against the *real* content data by hand - unit tests only prove the
+function is internally consistent with its own fixtures, not that today's
+actual `content/*.md` tables produce today's actual displayed numbers. That
+gap is what this run closed.
+
+Built the site, extracted the rendered "Back-to-back champions" and
+"Longest wait between titles" sections from `dist/records/index.html`
+verbatim, then independently hand-recomputed every single row shown there
+by walking each competition's own Editions/Champions-timeline/Winners table
+in `content/*.md` from scratch - not by re-reading the generator's source,
+by literally re-deriving the answer from the table rows. Covered all seven
+datasets the page renders (FIFA World Cup, UEFA EURO, Copa América, UEFA
+Nations League, Ballon d'Or, Golden Boot World Cup, Golden Boot EURO):
+
+- **Back-to-back champions:** walked every table's Winner column in
+  chronological row order by hand, flagging every pair of adjacent rows with
+  an identical winner. Found 2 World Cup streaks (Italy 1934/1938, Brazil
+  1958/1962), 1 EURO streak (Spain 2008/2012), 11 Copa América streaks
+  (Argentina's 1945-1947 three-in-a-row plus ten two-in-a-rows), 0 Nations
+  League streaks, 8 Ballon d'Or streaks (Messi's 2009-2012 four-in-a-row down
+  to three separate one-year-apart pairs), 1 Golden Boot (World Cup) streak
+  (Mbappé 2022/2026), and 0 Golden Boot (EURO) streaks - every single one
+  matched the rendered page exactly, including sort order (titles descending,
+  ties broken by earliest start year). Specifically checked the two
+  documented edge cases the generator's own comments call out: the 2020
+  Ballon d'Or's "Not awarded" placeholder correctly breaks what would
+  otherwise have been a Messi 2019-2021 streak (it does), and West
+  Germany/Germany are correctly kept as separate entries for this ranking,
+  unlike the title-count groupings elsewhere on the page (confirmed no West
+  Germany-to-Germany streak appears anywhere, since none of 1954/1974/1990's
+  West Germany wins nor 2014's Germany win are adjacent table rows to each
+  other).
+- **Longest wait between titles:** for every team/player with 2+ titles in
+  each dataset, sorted their title years and independently computed the
+  widest gap between chronologically consecutive wins (not first-to-last).
+  Recomputed 7 World Cup entries, 4 EURO, 6 Copa América, 1 Nations League,
+  10 Ballon d'Or, 1 Golden Boot (World Cup), 1 Golden Boot (EURO) - 30 rows
+  total - including every tie-break (e.g. Brazil/Germany both at 24 years on
+  the World Cup table, resolved correctly by earliest gap-start year; Ronaldo
+  and Cristiano Ronaldo both at 5 years on the Ballon d'Or table, same
+  resolution). Every single row matched the rendered page's team name, gap
+  length and bounding years exactly - zero discrepancies anywhere.
+
+Also confirmed the Golden Boot (EURO) entry specifically exercises the
+tie-splitting behavior `buildLongestTitleGaps()` inherits from
+`buildChampionsSummary()` (which splits a "; "-joined tied-winner cell into
+individual credits): Cristiano Ronaldo's 2012 EURO Golden Boot was a six-way
+tie, but still correctly combines with his outright 2020 win for an 8-year
+gap (2012-2020) - confirming ties are split for this ranking, not just for
+the main title-count ranking.
+
+**One real asymmetry found, investigated, and confirmed currently inert (not
+a bug, not fixed):** `buildLongestStreaks()` compares each edition's *raw,
+unsplit* winner-cell string for an exact match, unlike
+`buildChampionsSummary()`/`buildLongestTitleGaps()`, which both split a
+tied-winner cell on `"; "` first. So a player who shares a tie in one
+edition and wins outright in the next would currently be invisible to the
+streaks ranking (the literal strings "Cristiano Ronaldo" and "Mario
+Balotelli; Mario Gómez; Mario Mandžukić; Cristiano Ronaldo; Alan Dzagoev;
+Fernando Torres" never match). Checked every tie year across all seven
+datasets (World Cup Golden Boot 1962/1994; EURO Golden Boot 1960/1964/1992/
+2012/2024) against its immediately adjacent editions for this exact shape -
+none exists in the current data, so this asymmetry produces no wrong number
+on the live site today. Left unfixed deliberately: there is no live claim to
+regression-test against building a fix blind would just be guessing at an
+edge case without a before/after to actually verify, the same
+reasoning several prior runs have given for leaving a documented,
+currently-harmless gap alone (e.g. the "Open backlog"'s own
+defensively-unreachable-coverage items). Worth a comment addition or a
+proper split-aware rewrite the day content ever creates that adjacency.
+
+Finally, cross-checked the Croatian `/hr/records` page: diffed its built
+`dist/hr/records/index.html` against the English numbers for both sections -
+byte-identical team names, gap/streak counts and years throughout (only the
+prose, unit labels and heading translations differ), confirming both
+language pages share the exact same `loadCompetition()`-derived `Edition[]`
+data and the generator functions are not duplicated or forked between them.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(902/902, unchanged - this run's own checking was a read-only hand
+cross-check against build output, no source file changed), `pnpm
+test:coverage` (99.91%/99.31%, unchanged), `pnpm build` (711 pages,
+unchanged). All 29 CI-gated fast `check:*` scripts individually re-run and
+clean: `check:pdfs` (700/700, nothing stale since nothing changed),
+`check:pdf-outline` (700/700), `check:perf`, `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache`, `check:jsonld` (1783 blocks
+across 711 pages), `check:heading-outline`, `check:theme-flash`,
+`check:reachability`, `check:meta`, `check:award-tallies` (4/4), all seven
+claim-ledger checkers (`check:superlative-claims` 24,
+`check:ordinal-claims` 91, `check:record-claims` 36,
+`check:consecutive-claims` 22, `check:since-claims` 26,
+`check:one-of-only-claims` 2, `check:completeness-claims` 5 - all unchanged),
+`check:edition-header-labels`, `check:i18n-notes` (7 matched page pairs),
+`check:attendance-format`, `check:claims-hr` (205 claims), `check:link-names`,
+`check:image-dimensions`, `check:locale-consistency`, `check:theme-color`,
+`check:spelling` (15 files, 0 issues), `check:spelling-hr` (57 blocks, 0
+unknown words). `pnpm audit` (no known vulnerabilities). `pnpm dlx knip
+--no-config-hints` (same two standing false positives as ever:
+`scripts/test-preview-server.mjs`, `@cspell/dict-hr-hr`). No content or
+markup changed this run (a pure read/verify pass - nothing to fix turned
+up), so no PDF regeneration was needed; the clean `check:pdfs`/
+`check:pdf-outline` results above simply confirm the existing 700 PDFs are
+still fresh. Browser sweeps and a cold-start `pnpm test:e2e` not re-run - no
+markup or interactive-behavior change this run; the two-hundred-and-fourth
+run's own full cold-start `pnpm test:e2e` (1042/1042) plus the five manual
+browser sweeps remain the current baseline, with `check:lighthouse` freshly
+reconfirmed by the two-hundred-and-eighth run.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see "Open backlog" below, unchanged. This run's own
+angle (a by-hand spot-check of `/records`' generated rankings against their
+source tables, as opposed to unit-testing the generator in isolation) is now
+closed for the two sections it targeted, across all seven datasets and both
+languages - no discrepancy found, and the one latent asymmetry found
+(`buildLongestStreaks()`'s non-split tied-winner comparison) is currently
+inert, documented above rather than guessed at blind. The same treatment has
+not yet been applied to `/records`' other five generated rankings ("Most
+frequent hosts", "Titles won on home soil", "Nearly champions", "Nearly
+finalists", "Biggest final wins") or to "Fiercest rivalries" - a natural
+next candidate for run #210, alongside the two-hundred-and-eighth run's
+other still-untried suggestion: a first full front-to-back read of the
+site's smaller, less-scrutinized `content/*.md` files
+(`records-and-timelines.md`, `glossary.md`, `quiz.md`, `teams.md`,
+`players.md`, `compare-countries.md`, `compare-players.md`,
+`about-sources.md`, `index.md`).
 
 **Two-hundred-and-eighth run:** with every "Open backlog" item below still
 either environment-blocked or awaiting human sign-off, tried two fresh
