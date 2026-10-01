@@ -31914,3 +31914,99 @@ table read) has now been applied to Ballon d'Or and Copa América; worth
 trying it against `content/uefa-euro.md` or `content/fifa-world-cup.md`
 next, since neither has had this specific treatment as recently as the other
 two.
+
+### A second, already-written Copa América intro paragraph was silently dropped by the page's own single-paragraph intro extraction - closed 2026-10-01 (two-hundred-and-seventh intensive run)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, tried a fresh angle none of the prior 206 runs had used: all
+of this project's claim-verification tooling (the seven ledger-backed
+checkers plus every ad hoc audit) only ever scans Markdown **bullet**
+lines - every `extract*Claims()` function in `scripts/check-*-claims.mjs`
+filters on `/^-\s(.*)$/` before testing its trigger-word pattern. Reader-
+facing **prose paragraphs** (the text outside bullets and tables) have never
+been covered by any of that machinery. Swept all nine `content/*.md` files
+for non-bullet, non-table, non-heading lines and checked each one for
+whether it actually reaches a live page at all, rather than just scanning
+for claim vocabulary within prose already known to render.
+
+**Found one real, previously-unnoticed bug.** `src/lib/competition.ts`'s
+`firstParagraph()` - which supplies every competition/award page's top
+`<p class="competition__intro">` - deliberately stops at the first blank
+line once it starts collecting text (confirmed intentional, not an
+oversight: `tests/unit/competition.test.ts` has an explicit case locking in
+"intro from the first paragraph" with a second paragraph, "This is not.",
+asserted to stay excluded). Of this site's nine content files, only
+`content/copa-america.md` actually has a second paragraph before its first
+`##` heading - two sentences of genuine editorial prose about the
+competition's unusually varied format history, written but never reaching
+either language's live page (confirmed directly: present in `content/
+copa-america.md`'s source, absent from `dist/competitions/copa-america/
+index.html`'s built output). The Croatian page (`src/pages/hr/competitions/
+copa-america.astro`) carries its own hand-translated intro as a hardcoded
+string rather than deriving it from `data.intro`, and independently stops at
+the same first sentence pair - so the two languages were at least
+consistent with each other, just consistently missing the same content.
+
+Checked whether the dropped paragraph's facts are redundant with the page's
+"How it works" section (which *is* rendered, via `noteHeadings`): two of its
+three claims overlap (`CONMEBOL... joined by invited guest teams... since
+1993`, the format-variety list), but "some were played over several months"
+- describing the League table era's multi-city, multi-month run rather than
+a single tournament window - appears nowhere else on the page. Not pure
+duplication, so worth surfacing rather than deleting.
+
+Did **not** change `firstParagraph()` itself - its single-paragraph
+contract is deliberate and tested, and loosening it would be a behavior
+change affecting all nine content files' intros, not a two-line content fix.
+Instead merged the dropped sentence into the first paragraph in
+`content/copa-america.md` (removed the blank line, folded "Its history is
+less uniform..." into one combined paragraph with a tightened "league table
+over several months rather than a single tournament" phrasing), so the
+existing, unchanged extraction logic now picks up the whole thing. Added the
+equivalent sentence to the Croatian hardcoded intro in `src/pages/hr/
+competitions/copa-america.astro`, reusing vocabulary ("konačni poredak
+lige", "pozvane gostujuće momčadi") already established elsewhere on that
+same page's "How it works" translation for consistency. No historical fact
+was altered - every sentence already existed in the source; only the
+paragraph break that was hiding it from both languages' readers changed.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged - only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(902/902, unchanged - a content/markup-only fix touches no unit-testable
+logic), `pnpm build` (711 pages, unchanged), confirmed directly in the built
+HTML that both languages' intro paragraphs now include the full text. All 26
+fast `check:*` content/quality scripts individually re-run and clean
+(`check:links`, `check:sitemap`, `check:html`, `check:jsonld`, `check:
+heading-outline`, `check:meta`, `check:award-tallies`, all seven claim-
+ledger checkers, `check:edition-header-labels`, `check:attendance-format`,
+`check:claims-hr`, `check:link-names`, `check:locale-consistency`, `check:
+spelling`, `check:spelling-hr`, `check:i18n-notes`, `check:perf`) - none of
+the claim checkers fired on the added sentence since, consistent with this
+run's own finding, they only scan bullets, and the added text is prose.
+Regenerated all 700 downloadable PDFs (`pnpm build && pnpm build:pdfs`, via
+the documented `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-
+linux/chrome` container escape hatch - this session's container has that
+exact versioned subdirectory rather than a bare `chromium` symlink, worth
+noting since prior runs' documented path didn't resolve here) since both
+`content/copa-america.md` and its Croatian page changed; waited for the
+single `build:pdfs` invocation to fully exit before checking anything,
+per the two-hundred-and-sixth run's own documented warning against
+overlapping invocations. `check:pdfs`/`check:pdf-outline` both clean
+(700/700). Browser sweeps and a cold-start `pnpm test:e2e` not re-run,
+matching established practice for a prose-only change with no markup or
+interactive-behavior change; the two-hundred-and-fourth run's full cold-start
+`pnpm test:e2e` (1042/1042) plus all five manual browser sweeps remain the
+current baseline.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+This run's new angle (prose reaching the page at all, not just prose
+vocabulary) only found one instance across all nine content files and is
+now exhausted for the current content - re-check it after any future edit
+adds a new multi-paragraph intro. A companion angle not yet tried: whether
+any `noteHeadings`-requested section's *bullets* (as opposed to the
+top-of-page intro checked here) are similarly written but silently dropped
+by `extractSection()` for a reason other than the documented "no bullets
+yet, more than one paragraph" case - skimmed but not exhaustively checked
+this run.

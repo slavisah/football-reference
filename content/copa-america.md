@@ -11,9 +11,7 @@ status: verified
 
 # Copa América
 
-Copa América began in 1916 and is the oldest still-running continental men's national-team competition. It was known as the South American Championship until 1975.
-
-Its history is less uniform than the World Cup or EURO. Some editions used a final league table, some were played over several months, some had no fixed host, and invited teams from outside South America have participated since 1993.
+Copa América began in 1916 and is the oldest still-running continental men's national-team competition. It was known as the South American Championship until 1975. Its history is less uniform than the World Cup or EURO: some editions crowned a champion by final league table over several months rather than a single tournament, some had no fixed host, and invited teams from outside South America have participated since 1993.
 
 ## How it works
 
