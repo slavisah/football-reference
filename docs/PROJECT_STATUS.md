@@ -31781,3 +31781,136 @@ angle against `content/copa-america.md`, `content/uefa-euro.md` or
 `content/fifa-world-cup.md` next, since none has had this specific
 table-cross-check treatment as recently as Golden Boot/Nations League did at
 the hundred-and-eighty-eighth run.
+
+### A "the only Ecuadorian" Golden Boot claim on `content/copa-america.md` was contradicted by two Team of the Tournament selections its own verification never checked - closed 2026-10-01 (two-hundred-and-sixth intensive run)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, continued the two-hundred-and-fifth run's own suggested next
+angle - a fresh front-to-back read of a content file, cross-checking its
+prose directly against its own tables rather than only the seven
+verification-ledger checkers' trigger-word matches - against
+`content/copa-america.md`, the first of that run's three suggested
+candidates (Copa América, UEFA EURO, FIFA World Cup).
+
+Read the whole page section by section, checking every prose claim against
+the table it summarizes, not just the ones a checker's regex would flag:
+
+- **Titles after 2024** tally table re-counted directly against the
+  Champions timeline table's 48 rows: Argentina 16, Uruguay 15, Brazil 9,
+  Paraguay 2, Chile 2, Peru 2, Colombia 1, Bolivia 1 - every count confirmed
+  by tallying the Champion column by hand, summing to all 48 editions.
+- Best Player's "every edition since 1987; no equivalent award at the 32
+  earlier editions" checked against the 48-edition total (48 - 16 editions
+  1987-2024 = 32) - correct.
+- Golden Glove's "every edition since 2011" checked against the 6 editions
+  2011-2024, all 6 present in the list - correct.
+- Every **Memorable moments** bullet checked against the Champions timeline
+  and Titles tables (the 1916 four-team claim, Bolivia's only 1963 title,
+  Colombia's first 2001 title, Chile's consecutive 2015/2016 titles,
+  Argentina's 2024 title overtaking Uruguay for most successful team) - all
+  held up.
+
+**Found one real, previously-unnoticed mismatch.** The Golden Boot section's
+1963 bullet reads: "**1963:** Carlos Alberto Raffo (Ecuador) - 6 goals - the
+only Ecuadorian to ever win an individual Copa América award." Its own
+`scripts/superlative-claims-ledger.json` entry, dated 2026-09-23, recorded
+its verification as: "scanned every winner's nation across all three
+individual-award tables on this page (Best Player, Golden Glove, Golden
+Boot) - Raffo (Golden Boot, 1963) is the sole Ecuador entry in any of them."
+That verification was accurate *for the three tables it checked* - but the
+page has a fourth individual-recognition section, **Team of the
+Tournament**, added two different ways:
+
+- **Pervis Estupiñán (Ecuador)** was added to the 2021 Team of the
+  Tournament roster at the fifty-second intensive run (2026-09-02, see this
+  file's matching entry) - three full weeks *before* the 2026-09-23
+  verification that declared Raffo "the only" Ecuadorian individual-award
+  winner.
+- **Piero Hincapié (Ecuador)** was added to the 2024 roster later still.
+
+Neither was ever caught by the superlative-claims ledger because the
+2026-09-23 verification's own methodology explicitly scoped itself to three
+tables and never considered the Team of the Tournament section - the exact
+same bug class as the two-hundred-and-fifth run's Ballon d'Or find (a claim
+whose verification methodology had a scope gap, not a claim nobody ever
+checked). Team of the Tournament selections are described on the page with
+"named", not "won" - CONMEBOL's Technical Study Group picks an eleven, there
+is no individual trophy the way there is for Best Player/Golden Glove/Golden
+Boot - so the honest fix is not to declare the original claim flatly false,
+but to scope it to what it was actually verified against and name the two
+Ecuadorian Team of the Tournament picks explicitly so a reader isn't misled
+either way.
+
+Reworded both the English and Croatian copies:
+
+- **English** (`content/copa-america.md`): "the only Ecuadorian to win the
+  Best Player, Golden Glove, or Golden Boot award; Pervis Estupiñán (2021)
+  and Piero Hincapié (2024) were later named to Team of the Tournament
+  selections, a separate honor (see \"Team of the Tournament winners\"
+  below)."
+- **Croatian** (`src/pages/hr/competitions/copa-america.astro`): "jedini
+  Ekvadorac koji je osvojio nagradu za najboljeg igrača, najboljeg vratara
+  ili Zlatnu kopačku; Pervis Estupiñán (2021.) i Piero Hincapié (2024.)
+  kasnije su uvršteni u idealnu momčad turnira, što je zasebno priznanje
+  (vidi "Idealna momčad turnira" niže)."
+
+Updated the `scripts/superlative-claims-ledger.json` entry to the new claim
+text with a note explaining the scope gap the old verification had, rather
+than just silently swapping the key. Bumped `content/copa-america.md`'s
+`lastReviewed` to 2026-10-01.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean, `pnpm outdated`
+unchanged - only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(902/902, unchanged - a pure prose/translation fix touches no unit-testable
+logic), `pnpm build` (711 pages, unchanged), all 29 CI-gated fast `check:*`
+scripts individually re-run and clean:
+`check:links`/`check:sitemap`/`check:precache`/`check:jsonld`/`check:heading-
+outline`/`check:theme-flash`/`check:reachability`/`check:meta`/`check:award-
+tallies`/`check:superlative-claims`/`check:ordinal-claims`/`check:record-
+claims`/`check:consecutive-claims`/`check:since-claims`/`check:one-of-only-
+claims`/`check:completeness-claims`/`check:edition-header-labels`/`check:i18n-
+notes`/`check:attendance-format`/`check:claims-hr`/`check:link-
+names`/`check:image-dimensions`/`check:locale-consistency`/`check:theme-
+color`/`check:spelling`/`check:spelling-hr`/`check:perf`. Two worth calling
+out specifically: `check:superlative-claims` reports 24 claims (unchanged
+count - a reword, not a new claim) with 0 unverified against the updated
+ledger; `check:i18n-notes` (7 matched page pairs) still reports identical
+note-section structure and dash-clause parity between languages, confirming
+the reworded bullet's added dash-clauses landed in both languages together.
+
+Regenerated all 700 downloadable PDFs (`pnpm build && pnpm build:pdfs`, via
+the two-hundred-and-fourth run's own documented
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` container escape hatch) since
+both `content/copa-america.md` and its Croatian page changed. **One
+session-local snag along the way, caught before anything was shipped:** a
+first `build:pdfs` invocation was started in the background, and - before
+confirming it had finished - a second `build:pdfs` invocation was started
+against the same `public/downloads/` output. The two overlapping Playwright/
+preview-server processes corrupted every "edition" PDF's outline (each ended
+up with the same wrong 12-bookmark count - e.g. `edition-ballon-dor-2021.pdf`
+reporting 12 bookmarks against an expected 2 - regardless of which page it
+actually came from), immediately caught by `check:pdf-outline` reporting 212
+mismatches rather than shipped. Fixed by confirming no leftover preview-
+server/Playwright/Chromium processes were still running, then re-running
+`build:pdfs` once, serially; `check:pdfs`/`check:pdf-outline` both came back
+clean (700/700) afterward. Worth a note for future runs: don't start a
+second `build:pdfs` (or any script that drives the shared preview server)
+while an earlier invocation might still be running in the background -
+confirm completion first.
+
+Browser sweeps and a cold-start `pnpm test:e2e` were not re-run - this
+change is pure prose/translation text with no markup, styling or
+interactive-behavior change, matching this project's own established
+practice for that class of change (e.g. the two-hundred-and-fifth run's own
+Ballon d'Or fix); the two-hundred-and-fourth run's own full cold-start `pnpm
+test:e2e` (1042/1042) plus all five manual browser sweeps remain the current
+baseline.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+The two-hundred-and-fifth run's own angle (a fresh front-to-back prose-vs-
+table read) has now been applied to Ballon d'Or and Copa América; worth
+trying it against `content/uefa-euro.md` or `content/fifa-world-cup.md`
+next, since neither has had this specific treatment as recently as the other
+two.
