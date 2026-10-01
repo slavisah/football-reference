@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (210 intensive runs as of 2026-10-01) lives
+verification sweep and decision (211 intensive runs as of 2026-10-01) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,7 +44,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-tenth run (2026-10-01): 902/902 unit tests, `pnpm
+As of the two-hundred-and-eleventh run (2026-10-01): 902/902 unit tests, `pnpm
 lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.91%/99.31% coverage,
 and the same two standing `knip` false positives as ever (`scripts/
 test-preview-server.mjs`, used only as a Playwright `webServer.command`,
@@ -57,13 +57,29 @@ last complete, together confirmation (the combination had gone stale for
 four runs, since the two-hundredth run's own 1038/1038 count) - see that
 run's own entry below for the full writeup, including a container-specific
 Playwright browser-cache snag hit and worked around along the way; the
-two-hundred-and-fifth through two-hundred-and-tenth runs' own changes were
-all either content-prose/translation fixes or no-change verification passes,
-with no markup or behavior change, so that baseline still stands. The
+two-hundred-and-fifth through two-hundred-and-eleventh runs' own changes
+were all either content-prose/translation fixes or no-change verification
+passes, with no markup or behavior change, so that baseline still stands. The
 two-hundred-and-eighth run did re-run `check:lighthouse` on its own (a
 manual/intensive-run-only tool, not part of the cold-start `test:e2e` +
 browser-sweep baseline) and confirmed it is still perfect - see that run's
 own entry below.
+
+**Two-hundred-and-eleventh run:** picked up the two-hundred-and-tenth run's
+own named next candidate - a first full front-to-back read of the site's
+smaller, less-scrutinized `content/*.md` files (`records-and-timelines.md`,
+`glossary.md`, `quiz.md`, `teams.md`, `players.md`, `compare-countries.md`,
+`compare-players.md`, `about-sources.md`, `index.md`). Found and fixed a
+real, previously-unnoticed bug on the home page: `content/index.md`'s
+"Important historical naming note" claimed Soviet Union/Russia and
+Czechoslovakia/Czechia "may" be grouped like West Germany/Germany, directly
+contradicting both `src/lib/countries.ts`'s own `SUCCESSOR_GROUPS` map
+(only West Germany/Germany is ever merged) and
+`content/records-and-timelines.md`'s own documented policy. Fixed the
+English prose, the matching hand-translated Croatian text in
+`src/pages/hr/index.astro`, and the two e2e assertions pinned to the old
+wording. The other eight files had no comparable claim. See
+`docs/PROJECT_STATUS.md`'s matching entry for full detail.
 
 **Two-hundred-and-tenth run:** picked up the two-hundred-and-ninth run's own
 named next candidate - extending its by-hand "independently recompute the

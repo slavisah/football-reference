@@ -1974,7 +1974,9 @@ test.describe('Home page on a 360px phone', () => {
     await expect(
       page.getByRole('heading', { name: 'Important historical naming note' }),
     ).toBeVisible();
-    await expect(page.getByText(/West Germany\/Germany, Soviet Union\/Russia/)).toBeVisible();
+    await expect(
+      page.getByText(/West Germany\/Germany title totals.*Soviet Union\/Russia/),
+    ).toBeVisible();
   });
 });
 
@@ -2090,7 +2092,9 @@ test.describe('Croatian home page (/hr/) on a 360px phone', () => {
     await expect(
       page.getByRole('heading', { name: 'Važna napomena o povijesnim nazivima' }),
     ).toBeVisible();
-    await expect(page.getByText(/Zapadnu Njemačku\/Njemačku, Sovjetski Savez\/Rusiju/)).toBeVisible();
+    await expect(
+      page.getByText(/Zapadne Njemačke\/Njemačke.*Sovjetskog Saveza\/Rusije/),
+    ).toBeVisible();
   });
 });
 
