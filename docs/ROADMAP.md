@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (204 intensive runs as of 2026-09-30) lives
+verification sweep and decision (208 intensive runs as of 2026-10-01) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,22 +44,108 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-seventh run (2026-10-01): 902/902 unit tests, `pnpm
-lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
-standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
-used only as a Playwright `webServer.command`, never imported;
-`@cspell/dict-hr-hr`, used only via `.cspell/hr-notes.cspell.json`'s
-`"import"` field, never a JS `import`) - neither actually unused, knip's
-static analysis just can't see a reference inside a config-file string. The
-two-hundred-and-fourth run's own full cold-start `pnpm test:e2e` (1042/1042)
-plus all five manual browser sweeps remain the last complete, together
-confirmation (the combination had gone stale for four runs, since the
-two-hundredth run's own 1038/1038 count) - see that run's own entry below for
-the full writeup, including a container-specific Playwright browser-cache
-snag hit and worked around along the way; the two-hundred-and-fifth,
-two-hundred-and-sixth and two-hundred-and-seventh runs' own changes were all
-content-prose/translation fixes with no markup or behavior change, so that
-baseline still stands.
+As of the two-hundred-and-eighth run (2026-10-01): 902/902 unit tests, `pnpm
+lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.91%/99.31% coverage,
+and the same two standing `knip` false positives as ever (`scripts/
+test-preview-server.mjs`, used only as a Playwright `webServer.command`,
+never imported; `@cspell/dict-hr-hr`, used only via `.cspell/
+hr-notes.cspell.json`'s `"import"` field, never a JS `import`) - neither
+actually unused, knip's static analysis just can't see a reference inside a
+config-file string. The two-hundred-and-fourth run's own full cold-start
+`pnpm test:e2e` (1042/1042) plus all five manual browser sweeps remain the
+last complete, together confirmation (the combination had gone stale for
+four runs, since the two-hundredth run's own 1038/1038 count) - see that
+run's own entry below for the full writeup, including a container-specific
+Playwright browser-cache snag hit and worked around along the way; the
+two-hundred-and-fifth through two-hundred-and-eighth runs' own changes were
+all either content-prose/translation fixes or no-change verification passes,
+with no markup or behavior change, so that baseline still stands. The
+two-hundred-and-eighth run did re-run `check:lighthouse` on its own (a
+manual/intensive-run-only tool, not part of the cold-start `test:e2e` +
+browser-sweep baseline) and confirmed it is still perfect - see that run's
+own entry below.
+
+**Two-hundred-and-eighth run:** with every "Open backlog" item below still
+either environment-blocked or awaiting human sign-off, tried two fresh
+angles. First, continued the two-hundred-and-seventh run's own suggested
+companion angle: whether any `noteHeadings`-requested section's *bullets*
+(as opposed to the top-of-page intro that run checked) are silently dropped
+by `extractSection()` (`src/lib/notes.ts`) for a reason beyond its documented
+"no bullets yet, more than one paragraph" intro case - specifically, a
+non-bullet, non-blank line appearing *after* bullets have already started
+(which the function's `bullets.length === 0` guard would silently discard,
+never add to either `bullets` or `paragraph`). Wrote a standalone script
+mirroring that exact line-classification logic and ran it against every
+`noteHeadings` section in all six `content/*.md` files that use
+`extractSection()` (`fifa-world-cup.md`, `uefa-euro.md`,
+`uefa-nations-league.md`, `copa-america.md`, `ballon-dor.md`,
+`golden-boot.md`) - zero lines dropped anywhere; every section is either
+pure bullets or pure intro-paragraph-then-bullets, matching the function's
+two documented shapes exactly. Negative result; this angle is now exhausted
+too.
+
+Second, picked up the two-hundred-and-fifth run's own suggested next
+candidate - a full front-to-back prose-vs-table read, the kind that caught
+the Ballon d'Or ceremony-date and Copa América "only Ecuadorian" bugs -
+against the two files that hadn't had it as recently as Ballon d'Or/Copa
+América/Golden Boot/Nations League: `content/fifa-world-cup.md` and
+`content/uefa-euro.md`. Read both end to end and cross-checked every bullet
+claim against the Editions/Champions/tally tables on the same page: title
+counts (Brazil 5, Germany-incl-West-Germany 4, Italy 4, etc. on
+`fifa-world-cup.md`; Spain 4 and the rest on `uefa-euro.md`) against their
+own Editions tables; every "since <year>; no equivalent award existed at the
+N earlier editions" award-introduction claim against the actual edition
+count on both sides of that year; every "X supplied the most of any team"
+Team of the Tournament claim on `uefa-euro.md` against a manual per-player
+nationality tally of that year's own eleven names; every format-milestone
+bullet against the Editions table's own `Teams` column; the Fair-Play-
+Award-plus-World-Cup "fifth team" claim's full chain of four named teams
+against both tables; and every player/manager/captain cross-reference
+between the two files' own "Winning managers"/"Winning captains" sections
+(e.g. Casillas as 2012 EURO captain claiming he also captained the 2010
+World Cup - confirmed against `fifa-world-cup.md`'s own 2010 captain entry;
+Deschamps/Deschamps and Beckenbauer/Beckenbauer similarly cross-checked both
+ways). No mismatch found on either file - every claim held up exactly
+against its own page's tables and against the other competition's page
+where cross-referenced. Negative result, but a genuine, specific check now
+done and closed off for these two files, matching the treatment Ballon d'Or/
+Copa América/Golden Boot/Nations League already had.
+
+With both angles exhausted without a new lead, re-ran `pnpm
+install`/`pnpm outdated` (clean; only the already-documented blocked
+`typescript` 5.9.3 -> 7.0.2 line), `pnpm lint` (238 files, 0/0/0), `pnpm
+test` (902/902, unchanged), `pnpm test:coverage` (99.91%/99.31%, unchanged -
+the same four defensively-unreachable branches as ever), `pnpm build` (711
+pages, unchanged), all 29 CI-gated fast `check:*` scripts individually
+re-run and clean, `pnpm audit` (no known vulnerabilities), and `pnpm dlx
+knip --no-config-hints` (same two standing false positives). Also re-ran
+`check:lighthouse` by hand (not part of that fast set) for the first time
+since the dependency versions it depends on (`lighthouse`, `@playwright/
+test`, `astro`) were last bumped - all 29 sampled pages still score a
+perfect 1.00/1.00/1.00/1.00 (performance/accessibility/best-practices/SEO),
+with the one already-documented, expected `/404` noindex SEO exception
+(0.63, correctly excluded by `EXPECTED_SEO_EXCEPTIONS`) and no actionable
+back/forward-cache blockers - confirming no regression since the fourteenth
+run's original audit. No content changed this run, so no PDF regeneration
+was needed; `check:pdfs`/`check:pdf-outline` not re-run since nothing could
+have gone stale. Browser sweeps other than `check:lighthouse` and a
+cold-start `pnpm test:e2e` not re-run - no markup or behavior change this
+run, matching established practice.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see "Open backlog" below, unchanged. Both of this
+run's own angles (the `extractSection()` bullet-drop audit, and the
+front-to-back prose-vs-table read) have now been applied to every
+`noteHeadings`-using content file and all six team-competition/award pages
+respectively - there is no obvious next file to point either angle at
+without repeating one already done. A genuinely different angle is probably
+needed next: e.g. the same front-to-back table-cross-check treatment hasn't
+yet been applied to the non-competition pages' own hand-authored tables
+(`/records`' "Longest wait between titles"/"Back-to-back champions"
+sections, which are generated from competition data but still worth a
+by-hand spot-check against the source tables one more time) or to the
+`content/*.md` files smaller than the six main ones, which have had far less
+individual scrutiny than the flagship competition pages.
 
 **Two-hundred-and-seventh run:** with every "Open backlog" item below still
 either environment-blocked or awaiting human sign-off, tried a fresh angle
