@@ -44,7 +44,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-sixth run (2026-10-01): 902/902 unit tests, `pnpm
+As of the two-hundred-and-seventh run (2026-10-01): 902/902 unit tests, `pnpm
 lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the same two
 standing `knip` false positives as ever (`scripts/test-preview-server.mjs`,
 used only as a Playwright `webServer.command`, never imported;
@@ -56,9 +56,52 @@ plus all five manual browser sweeps remain the last complete, together
 confirmation (the combination had gone stale for four runs, since the
 two-hundredth run's own 1038/1038 count) - see that run's own entry below for
 the full writeup, including a container-specific Playwright browser-cache
-snag hit and worked around along the way; the two-hundred-and-fifth and
-two-hundred-and-sixth runs' own changes were both content-prose/translation
-fixes with no markup or behavior change, so that baseline still stands.
+snag hit and worked around along the way; the two-hundred-and-fifth,
+two-hundred-and-sixth and two-hundred-and-seventh runs' own changes were all
+content-prose/translation fixes with no markup or behavior change, so that
+baseline still stands.
+
+**Two-hundred-and-seventh run:** with every "Open backlog" item below still
+either environment-blocked or awaiting human sign-off, tried a fresh angle
+none of the prior 206 runs had used: every claim-verification script in
+`scripts/check-*-claims.mjs` only ever scans Markdown **bullet** lines
+(`/^-\s(.*)$/`) - reader-facing **prose paragraphs** have never been checked
+by any of that tooling, not for claim vocabulary and not for whether they
+even reach a live page at all. Swept all nine `content/*.md` files for
+non-bullet, non-table, non-heading prose and checked each against its built
+HTML output.
+
+Found one real bug: `src/lib/competition.ts`'s `firstParagraph()` - which
+supplies every competition/award page's intro paragraph - deliberately
+stops at the first blank line (confirmed intentional via an explicit
+`tests/unit/competition.test.ts` case, not changed). Of all nine content
+files, only `content/copa-america.md` has a second paragraph before its
+first heading, and it was never reaching either language's page - confirmed
+present in the Markdown source, absent from `dist/competitions/copa-america/
+index.html`. Rather than loosen the tested single-paragraph extraction
+contract (which would change all nine pages' intros), merged the dropped
+sentence into the first paragraph in `content/copa-america.md` and added the
+equivalent sentence to the Croatian hardcoded intro in `src/pages/hr/
+competitions/copa-america.astro`. No historical fact changed - only the
+paragraph break hiding already-written text from both languages' readers.
+
+**Verification:** `pnpm lint` (238 files, 0/0/0), `pnpm test` (902/902,
+unchanged), `pnpm build` (711 pages, unchanged), confirmed both languages'
+full intro text in the built HTML, all 26 fast content/quality `check:*`
+scripts clean. Regenerated all 700 PDFs (`pnpm build && pnpm build:pdfs`,
+via `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome` -
+this container's exact versioned path differed from prior runs' documented
+one); waited for the single invocation to fully exit before checking
+anything, per the two-hundred-and-sixth run's own warning against
+overlapping `build:pdfs` runs. `check:pdfs`/`check:pdf-outline` both clean
+(700/700). Browser sweeps and e2e not re-run (prose-only change, no
+markup/behavior change) - the two-hundred-and-fourth run's baseline stands.
+
+**Left for a future pass:** this run's new angle (prose reaching the page at
+all) is now exhausted across all nine current content files - re-check
+after any future edit adds a new multi-paragraph intro. Untried: whether any
+`noteHeadings` section's *bullets* are similarly written but silently
+dropped by `extractSection()` for some reason beyond its documented cases.
 
 **Two-hundred-and-sixth run:** with every "Open backlog" item below still
 either environment-blocked or awaiting human sign-off, continued the
