@@ -32010,3 +32010,159 @@ top-of-page intro checked here) are similarly written but silently dropped
 by `extractSection()` for a reason other than the documented "no bullets
 yet, more than one paragraph" case - skimmed but not exhaustively checked
 this run.
+
+### Two fresh negative angles - `extractSection()` bullet-drop audit across all six `noteHeadings` files, plus a front-to-back prose-vs-table read of `fifa-world-cup.md`/`uefa-euro.md`; `check:lighthouse` re-confirmed perfect - closed 2026-10-01 (two-hundred-and-eighth intensive run)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, tried two fresh angles rather than another claim-vocabulary
+sweep.
+
+**Angle one, exhaustive this time:** the two-hundred-and-seventh run's own
+"left for a future pass" note flagged a companion angle it had only
+skimmed - whether any `noteHeadings`-requested section's *bullets* are
+silently dropped by `extractSection()` (`src/lib/notes.ts`) the same way
+that run found a top-of-page intro paragraph could be. Reading the function
+closely: once `bullets.length > 0`, its `else if (line.trim() !== '' &&
+bullets.length === 0)` branch can never fire again, so any later non-bullet,
+non-blank line - a closing sentence after a list, or a stray paragraph line
+between bullets - would be silently discarded, added to neither `bullets`
+nor `paragraph`, with no error or warning. This is a different failure mode
+from the one the two-hundred-and-seventh run found (which was about an
+*intro* paragraph before any bullets): this one would hide text *during or
+after* a bullet list. Wrote a standalone script
+(`/tmp/.../scratchpad/scan_notes.mjs`, not committed - a one-off audit tool,
+not project infrastructure) that mirrors `extractSection()`'s exact
+line-classification logic but reports every line it would drop instead of
+silently discarding it, and ran it against every `noteHeadings` section in
+all six content files that call `extractSection()`
+(`fifa-world-cup.md`, `uefa-euro.md`, `uefa-nations-league.md`,
+`copa-america.md`, `ballon-dor.md`, `golden-boot.md` - every heading listed
+in each of `src/pages/competitions/{world-cup,euro,nations-league,
+copa-america,ballon-dor,golden-boot}.astro`'s own `noteHeadings` array).
+Zero dropped lines anywhere - every section in every file is cleanly either
+all-bullets or intro-paragraph-then-bullets, matching `extractSection()`'s
+two documented, tested shapes exactly, with nothing in the third,
+undocumented shape this angle was looking for. Genuinely negative, and this
+specific audit (as opposed to the broader "any editorial content silently
+dropped" question, which could still have other instances) is now complete
+for the current content - re-run it after any edit adds new section
+content, especially a bullet followed by a trailing explanatory sentence.
+
+**Angle two:** the two-hundred-and-fifth run's own "left for a future pass"
+note suggested its front-to-back prose-vs-table read (the one that caught
+the Ballon d'Or ceremony-timing bug) go next to whichever of
+`content/fifa-world-cup.md`/`content/uefa-euro.md` hadn't had it as recently
+as Ballon d'Or/Copa América - and the two-hundred-and-sixth/-seventh runs
+then used up Copa América, leaving both World Cup and EURO still untried by
+this specific method. Did both in one pass. Checked, line by line, against
+each page's own tables:
+
+- Every title-tally claim (`fifa-world-cup.md`'s "Champions by titles after
+  2026" table: Brazil 5, Germany-incl.-West-Germany 4, Italy 4, Argentina 3,
+  France 2, Spain 2, Uruguay 2, England 1, summing to 23; `uefa-euro.md`'s
+  "Champions by titles": Spain 4, Germany-incl.-West-Germany 3, Italy 2,
+  France 2, and five nations on 1) against a direct recount from each
+  page's own Editions table - both tallies matched exactly.
+- Every "named at every [competition] since <year>; no equivalent award
+  existed at the N earlier editions" award-introduction bullet (Golden
+  Ball/Golden Glove/Young Player/Fair Play Award on `fifa-world-cup.md`;
+  Player of the Tournament/Young Player of the Tournament on `uefa-euro.md`)
+  against an actual count of editions on both sides of the stated year - all
+  six checked out (e.g. Fair Play Award "since 1970... eight earlier
+  editions": 1930-1966 is exactly eight World Cups; Player of the
+  Tournament "since 1996... nine earlier editions": 1960-1992 is exactly
+  nine EUROs).
+- `fifa-world-cup.md`'s Fair Play Award section's 2010 bullet ("the fifth
+  team to win both the World Cup and the Fair Play Award at the same
+  tournament, after West Germany (1974), Argentina (1978), Brazil (1994) and
+  France (1998)") against a full cross-tabulation of the Editions table's
+  winners against the Fair Play Award winners for every year both exist
+  (1970-2026): confirmed exactly those four years plus 2010 are the only
+  matches, and no later year (2014-2026) adds a sixth - the claim holds
+  with today's data.
+- `uefa-euro.md`'s Team of the Tournament section's five "champions X
+  supplied N, the most of any team" claims (1996 Germany 3, 2008 Spain 6,
+  2016 Portugal 4, 2020 Italy 5, 2024 Spain 6) against a manual
+  per-player nationality tally of each year's own eleven-name list - every
+  one checked out as that year's actual highest count (full tallies, e.g.
+  2004's three-way tie at 3 apiece between Greece/Portugal/Czech Republic,
+  confirmed the 2004 bullet itself makes no "the most" claim, only naming
+  Greece's count without the superlative - so no inconsistency there
+  either).
+- Every cross-reference between the two files' own "Winning managers"/
+  "Winning captains" sections and the other competition's page (Casillas
+  captaining both the 2012 EURO and, per `fifa-world-cup.md`'s own 2010
+  entry, the World Cup between his two EURO titles; Deschamps as 1998 World
+  Cup-winning captain who also captained the 2000 EURO win and later managed
+  the 2018 World Cup win, checked against both files' own entries for him;
+  Beckenbauer's 1972 EURO captaincy cross-referenced against his 1974 World
+  Cup captaincy) - every cross-file reference matched the other file's own
+  entry exactly.
+- Final-venue repeat-host claims (`fifa-world-cup.md`'s Estadio Azteca
+  "first to host two World Cup finals" in 1986; `uefa-euro.md`'s Stadio
+  Olimpico/Parc des Princes/Wembley sequence - "the third to host two EURO
+  finals, after Rome (1980) and Paris (1984)") against the full venue list -
+  both orderings are internally consistent with no earlier repeat omitted.
+
+No mismatch found on either file. Negative result, but both files now have
+the same specific front-to-back table-cross-check treatment Ballon d'Or,
+Copa América, Golden Boot and Nations League already had - closing the gap
+the two-hundred-and-fifth run's own note identified.
+
+**Also re-ran `check:lighthouse` by hand** (`PW_EXECUTABLE_PATH=/opt/
+pw-browsers/chromium-1194/chrome-linux/chrome pnpm run check:lighthouse`) -
+not part of the fast CI-gated set, and not re-run since well before the
+current `astro`/`@playwright/test`/`lighthouse` versions were last
+installed, so worth confirming no regression slipped in unnoticed. All 28
+sampled pages score a perfect 1.00/1.00/1.00/1.00
+(performance/accessibility/best-practices/SEO); the one bilingual `/404`
+page scores 0.63 on SEO only, exactly the already-documented, expected
+`EXPECTED_SEO_EXCEPTIONS` case (a `noindex` error page correctly isn't
+optimized for search), and the script's own pass/fail logic excludes it
+correctly. No actionable back/forward-cache blockers reported. Matches the
+fourteenth run's original 1.00-across-the-board finding with no drift.
+
+**Verification:** `pnpm install` (clean), `pnpm outdated` (only the
+already-documented blocked `typescript` 5.9.3 -> 7.0.2 line - no new
+`@astrojs/check` release), `pnpm lint` (238 files, 0 errors/0 warnings/0
+hints), `pnpm test` (902/902, unchanged), `pnpm test:coverage`
+(99.91%/99.31%, unchanged - the same four defensively-unreachable branches
+in `quiz.ts`/`sources.ts`/`tableSort.ts`/`url.ts` as ever), `pnpm build`
+(711 pages, unchanged). All 29 CI-gated fast `check:*` scripts individually
+re-run and clean (`check:pdfs`, `check:pdf-outline`, `check:perf`,
+`check:links`, `check:sitemap`, `check:precache`, `check:jsonld`,
+`check:heading-outline`, `check:theme-flash`, `check:reachability`,
+`check:meta`, `check:award-tallies`, all seven claim-ledger checkers,
+`check:edition-header-labels`, `check:i18n-notes`, `check:attendance-format`,
+`check:claims-hr`, `check:link-names`, `check:image-dimensions`,
+`check:locale-consistency`, `check:theme-color`, `check:spelling`,
+`check:spelling-hr`). `pnpm audit` (no known vulnerabilities). `pnpm dlx
+knip --no-config-hints` (same two standing false positives as ever:
+`scripts/test-preview-server.mjs`, `@cspell/dict-hr-hr`). No content or
+markup changed this run (both angles were audits, not fixes - nothing to
+fix turned up), so no PDF regeneration was needed and `check:pdfs`/
+`check:pdf-outline`'s clean results above are simply confirming the
+existing 700 PDFs are still fresh. Browser sweeps other than
+`check:lighthouse` (`check:reflow`/`check:landscape`/`check:text-zoom`/
+`check:print-width`/`check:html`) and a cold-start `pnpm test:e2e` not
+re-run - no markup or interactive-behavior change this run, matching
+established practice; the two-hundred-and-fourth run's own full cold-start
+`pnpm test:e2e` (1042/1042) plus those five sweeps remain the current
+baseline for everything except `check:lighthouse`, freshly reconfirmed here.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+Both of this run's own angles are now exhausted against every file they
+apply to (the `extractSection()` bullet-drop audit against all six
+`noteHeadings` files; the front-to-back prose-vs-table read against all six
+team-competition/award pages). Next candidates for a genuinely different
+angle: the same table-cross-check treatment applied to `/records`' own
+hand-authored "Longest wait between titles"/"Back-to-back champions"
+sections (generated from competition data, but worth a by-hand spot-check
+against the source tables directly rather than trusting the generator was
+never re-verified); or a first full read-through of the site's smaller,
+less-scrutinized `content/*.md` files (`records-and-timelines.md`,
+`glossary.md`, `quiz.md`, `teams.md`, `players.md`,
+`compare-countries.md`, `compare-players.md`, `about-sources.md`,
+`index.md`), which have had far less individual front-to-back attention
+than the six flagship competition/award pages.
