@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (209 intensive runs as of 2026-10-01) lives
+verification sweep and decision (210 intensive runs as of 2026-10-01) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,7 +44,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-ninth run (2026-10-01): 902/902 unit tests, `pnpm
+As of the two-hundred-and-tenth run (2026-10-01): 902/902 unit tests, `pnpm
 lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.91%/99.31% coverage,
 and the same two standing `knip` false positives as ever (`scripts/
 test-preview-server.mjs`, used only as a Playwright `webServer.command`,
@@ -57,13 +57,136 @@ last complete, together confirmation (the combination had gone stale for
 four runs, since the two-hundredth run's own 1038/1038 count) - see that
 run's own entry below for the full writeup, including a container-specific
 Playwright browser-cache snag hit and worked around along the way; the
-two-hundred-and-fifth through two-hundred-and-ninth runs' own changes were
+two-hundred-and-fifth through two-hundred-and-tenth runs' own changes were
 all either content-prose/translation fixes or no-change verification passes,
 with no markup or behavior change, so that baseline still stands. The
 two-hundred-and-eighth run did re-run `check:lighthouse` on its own (a
 manual/intensive-run-only tool, not part of the cold-start `test:e2e` +
 browser-sweep baseline) and confirmed it is still perfect - see that run's
 own entry below.
+
+**Two-hundred-and-tenth run:** picked up the two-hundred-and-ninth run's own
+named next candidate - extending its by-hand "independently recompute the
+generated ranking from the raw table rows, then diff against the real
+rendered page" treatment to `/records`' five remaining generated rankings it
+hadn't yet covered ("Most frequent hosts", "Titles won on home soil", "Nearly
+champions", "Nearly finalists", "Biggest final wins") plus "Fiercest
+rivalries" - the only generated section on the page none of the first 209
+runs had ever independently spot-checked at all.
+
+Built the site and extracted each section's real rendered output from
+`dist/records/index.html` verbatim (`buildHostsSummary()`,
+`buildHomeSoilTitles()`, `buildRunnerUpsWithoutTitle()`,
+`buildNearlyFinalists()`, `buildBiggestFinalMargins()` in `src/lib/
+editions.ts`, and `buildRivalries()`/`buildFinalsMeetings()` in `src/lib/
+compare.ts`), then independently re-derived every row by hand from each
+competition's own Editions/Finals/Champions-timeline table in
+`content/*.md`, without consulting the generator functions' own logic while
+doing the recomputation:
+
+- **Most frequent hosts:** tallied every Host(s) cell for all four team
+  competitions (FIFA World Cup, UEFA EURO, Copa América, UEFA Nations
+  League), excluding the three Copa América "Home-and-away" editions
+  (1975/1979/1983) that have no single host. All 19 World Cup hosts, 14 EURO
+  hosts, 11 Copa América hosts and 4 Nations League hosts matched the
+  rendered counts, years and sort order (titles descending, ties broken by
+  earliest hosting year, then name) exactly.
+- **Titles won on home soil:** for every edition, checked whether the Host
+  and Winner/Champion cells are an exact string match (confirming the
+  generator's own documented choice that a co-host which goes on to win,
+  e.g. Spain's 2026 World Cup title under "Canada, Mexico and United
+  States", correctly does *not* count). Found and matched all 6 World Cup,
+  3 EURO, 7 Copa América and 1 Nations League home-soil titles exactly,
+  including West Germany/Germany correctly grouping into one "Germany
+  (incl. West Germany)" entry for this ranking (unlike "Back-to-back
+  champions", which keeps them separate).
+- **Nearly champions:** for each competition, built the full set of
+  teams that have ever won (grouping West Germany under Germany), then
+  walked every Runner-up cell and kept only the ones belonging to a team
+  never in that winners' set. Matched all 5 World Cup, 4 EURO, 1 Copa
+  América and 2 Nations League entries and counts exactly - including Spain
+  correctly being excluded from the Nations League list despite two runner-up
+  finishes, since it won the competition outright in 2022-23.
+- **Nearly finalists:** built the set of teams that have ever reached *any*
+  final (winner or runner-up) per competition, then walked every
+  Third/Fourth/"Other semifinalist" cell and kept only non-finalist teams.
+  Matched all 12 World Cup, 5 EURO, 5 Copa América and 5 Nations League
+  entries and counts exactly, including same-year alphabetical tie-breaks
+  (e.g. World Cup 2002's "South Korea" before "Türkiye", both reaching
+  their first semifinal that year).
+- **Biggest final wins:** parsed the first score pair out of every "Final"
+  cell for World Cup, EURO and Nations League (Copa América has no such
+  column, as already documented) and took the absolute goal difference,
+  confirming a shootout-decided final (e.g. 1994's "Brazil 0-0 Italy; 3-2
+  pens") correctly ranks at margin 0 rather than counting the penalty score.
+  All 23 World Cup, 17 EURO and 4 Nations League margins, scores and years
+  matched the rendered page exactly, including the three-way tie at margin 3
+  on the World Cup table (1958, 1970, 1998, ordered by year) and EURO's own
+  margin-3 entry (1972) sorting behind its one margin-4 final (2012).
+- **Fiercest rivalries:** built every Champion-vs-Runner-up final pairing
+  across all four team competitions, counted meetings per unordered team
+  pair (grouping West Germany under Germany, as the rendered page does),
+  and kept every pair with 2+ meetings. All 11 rendered rows matched
+  exactly - rivalry pair, total meetings, head-to-head win/loss split,
+  which competition(s) contributed, and the most recent meeting - including
+  two rivalries only reaching the 2-meeting threshold by combining finals
+  across different competitions (France-Italy: EURO 2000 + World Cup 2006;
+  France-Spain: EURO 1984 + UEFA Nations League 2020-21). No pair with 2+
+  meetings was missing from the list, and no listed pair's head-to-head
+  record was wrong.
+
+No discrepancy found anywhere across all six sections - a genuinely new,
+specific check now done and closed for every generated ranking `/records`
+renders, completing the treatment the two-hundred-and-ninth run started on
+the page's other two generated rankings. Also cross-checked the Croatian
+`/hr/records` page the same way the two-hundred-and-ninth run did for its
+own two sections: diffed the numeric/year sequences and the full rivalries
+table against the English page - byte-identical throughout (only the
+heading text, unit labels and "vodi "/"-" head-to-head phrasing differ),
+confirming both language pages share the same generated data.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(902/902, unchanged - this run's own checking was a read-only hand
+cross-check against build output, no source file changed), `pnpm
+test:coverage` (99.91%/99.31%, unchanged), `pnpm build` (711 pages,
+unchanged). All 29 CI-gated fast `check:*` scripts individually re-run and
+clean: `check:pdfs` (700/700, nothing stale since nothing changed),
+`check:pdf-outline` (700/700), `check:perf`, `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache`, `check:jsonld` (1783 blocks
+across 711 pages), `check:heading-outline`, `check:theme-flash`,
+`check:reachability`, `check:meta`, `check:award-tallies` (4/4), all seven
+claim-ledger checkers (`check:superlative-claims` 24,
+`check:ordinal-claims` 91, `check:record-claims` 36,
+`check:consecutive-claims` 22, `check:since-claims` 26,
+`check:one-of-only-claims` 2, `check:completeness-claims` 5 - all unchanged),
+`check:edition-header-labels`, `check:i18n-notes` (7 matched page pairs),
+`check:attendance-format`, `check:claims-hr` (205 claims), `check:link-names`,
+`check:image-dimensions`, `check:locale-consistency`, `check:theme-color`,
+`check:spelling` (15 files, 0 issues), `check:spelling-hr` (57 blocks, 0
+unknown words). `pnpm audit` (no known vulnerabilities). `pnpm dlx knip
+--no-config-hints` (same two standing false positives: `scripts/
+test-preview-server.mjs`, `@cspell/dict-hr-hr`). No content or markup changed
+this run (a pure read/verify pass - nothing to fix turned up), so no PDF
+regeneration was needed. Browser sweeps and a cold-start `pnpm test:e2e` not
+re-run - no markup or interactive-behavior change this run; the
+two-hundred-and-fourth run's own full cold-start `pnpm test:e2e` (1042/1042)
+plus the five manual browser sweeps remain the current baseline, with
+`check:lighthouse` last reconfirmed by the two-hundred-and-eighth run.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see "Open backlog" below, unchanged. Every generated
+ranking on `/records` (all seven `ChampionsSummary`-shaped rankings plus
+"Fiercest rivalries") has now had this specific by-hand recomputation
+treatment at least once, across both languages - no further untried ranking
+remains on that page. The two-hundred-and-eighth run's other still-open
+suggestion stands as the natural next angle: a first full front-to-back read
+of the site's smaller, less-scrutinized `content/*.md` files
+(`records-and-timelines.md`, `glossary.md`, `quiz.md`, `teams.md`,
+`players.md`, `compare-countries.md`, `compare-players.md`,
+`about-sources.md`, `index.md`), the same treatment already applied to all
+six flagship competition/award pages.
 
 **Two-hundred-and-ninth run:** picked up the first of the two-hundred-and-
 eighth run's own two named next candidates - a by-hand spot-check of
