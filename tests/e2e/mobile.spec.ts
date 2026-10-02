@@ -20,6 +20,23 @@ test.describe('World Cup page on a 360px phone', () => {
     expect(overflow).toBeLessThanOrEqual(1);
   });
 
+  // Found by a real Playwright boundingBox() measurement, not assumed from
+  // the CSS: the five filter <select>s (winner/year/host/team/sort) only
+  // reached ~39px tall, short of AGENTS.md's "Interactive targets are at
+  // least 44px in any touch-facing control" floor; the reset button already
+  // passed at ~44.4px. Fixed with an explicit min-height on `.filters
+  // select`. TournamentTable.astro is a single shared component, so this one
+  // check guards every competition's filter row (both languages) at once.
+  test('every filter control is at least a 44px tap target', async ({ page }) => {
+    const heights = await page
+      .locator('.filters select, .filters__reset')
+      .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height));
+    expect(heights.length).toBeGreaterThan(0);
+    for (const height of heights) {
+      expect(height).toBeGreaterThanOrEqual(44);
+    }
+  });
+
   test('has no horizontal page overflow at a 320px reflow width, even with the longest host selected', async ({
     page,
   }) => {
@@ -1875,6 +1892,31 @@ test.describe('Home page on a 360px phone', () => {
     await expect(page.locator('#on-this-day-hint')).toBeHidden();
   });
 
+  // OnThisDay.astro's inline script always rebuilds #on-this-day-list's <li>s
+  // client-side via createElement/appendChild, on every page load - not just
+  // when the visitor's real date differs from the build date - so the
+  // re-rendered items never carry the data-astro-cid-* attribute a plain
+  // scoped `<style>` selector requires, the same root cause
+  // dynamic-list-styling.spec.ts already guards on /compare and
+  // /compare-players. Before this fix, every card on every JS-enabled visit
+  // silently lost its padding/background/border, confirmed live via
+  // `getComputedStyle()` (`padding: 0px`, `background-color: rgba(0, 0, 0,
+  // 0)`, no border) rather than assumed from reading the CSS.
+  test('"On this day" cards keep their card styling after the client-side re-render', async ({
+    page,
+  }) => {
+    await page.clock.setFixedTime(new Date('2026-07-30T12:00:00'));
+    await page.goto('');
+    const firstItem = page.locator('#on-this-day-list li').first();
+    await expect(firstItem).toBeVisible();
+    const style = await firstItem.evaluate((el) => {
+      const computed = getComputedStyle(el);
+      return { padding: computed.padding, backgroundColor: computed.backgroundColor };
+    });
+    expect(style.padding).not.toBe('0px');
+    expect(style.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+  });
+
   test('"On this day" falls back to an archive card on a non-final date', async ({ page }) => {
     // No World Cup, EURO, Copa América, Nations League decisive match or
     // Ballon d'Or ceremony has ever fallen on 1 January.
@@ -1932,7 +1974,9 @@ test.describe('Home page on a 360px phone', () => {
     await expect(
       page.getByRole('heading', { name: 'Important historical naming note' }),
     ).toBeVisible();
-    await expect(page.getByText(/West Germany\/Germany, Soviet Union\/Russia/)).toBeVisible();
+    await expect(
+      page.getByText(/West Germany\/Germany title totals.*Soviet Union\/Russia/),
+    ).toBeVisible();
   });
 });
 
@@ -1990,6 +2034,24 @@ test.describe('Croatian home page (/hr/) on a 360px phone', () => {
     await expect(page.locator('#on-this-day-hint')).toBeHidden();
   });
 
+  // Croatian counterpart of the English "keeps its card styling" test above -
+  // OnThisDay.astro is one shared component, so both languages hit the same
+  // client-side re-render path.
+  test('"On this day" cards keep their card styling after the client-side re-render', async ({
+    page,
+  }) => {
+    await page.clock.setFixedTime(new Date('2026-07-30T12:00:00'));
+    await page.goto('hr/');
+    const firstItem = page.locator('#on-this-day-list li').first();
+    await expect(firstItem).toBeVisible();
+    const style = await firstItem.evaluate((el) => {
+      const computed = getComputedStyle(el);
+      return { padding: computed.padding, backgroundColor: computed.backgroundColor };
+    });
+    expect(style.padding).not.toBe('0px');
+    expect(style.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+  });
+
   test('"On this day" falls back to a translated archive-card hint on a non-final date', async ({
     page,
   }) => {
@@ -2030,7 +2092,9 @@ test.describe('Croatian home page (/hr/) on a 360px phone', () => {
     await expect(
       page.getByRole('heading', { name: 'Važna napomena o povijesnim nazivima' }),
     ).toBeVisible();
-    await expect(page.getByText(/Zapadnu Njemačku\/Njemačku, Sovjetski Savez\/Rusiju/)).toBeVisible();
+    await expect(
+      page.getByText(/Zapadne Njemačke\/Njemačke.*Sovjetskog Saveza\/Rusije/),
+    ).toBeVisible();
   });
 });
 
@@ -2524,6 +2588,23 @@ test.describe('Compare page on a 360px phone', () => {
     expect(await rows.count()).toBeGreaterThan(10);
   });
 
+  // Found by a real Playwright boundingBox() measurement, not assumed from
+  // the CSS: the two picker <select>s only reached ~39px tall, short of
+  // AGENTS.md's "Interactive targets are at least 44px in any touch-facing
+  // control" floor. Fixed with an explicit min-height alongside the swap
+  // button, which already passed. Guards against a regression here and on
+  // /compare-players and both Croatian equivalents, which share the same
+  // `.compare__field select`/`#compare-swap` class names and CSS shape.
+  test('the picker selects and swap button are at least 44px tap targets', async ({ page }) => {
+    const heights = await page
+      .locator('.compare__field select, #compare-swap')
+      .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height));
+    expect(heights.length).toBeGreaterThan(0);
+    for (const height of heights) {
+      expect(height).toBeGreaterThanOrEqual(44);
+    }
+  });
+
   // The picker's new <noscript> disclosure (see tests/e2e/no-js-compare.spec.ts
   // for the no-JS bug it documents) must never actually render once
   // JavaScript is available - <noscript> content ships as raw text in the
@@ -2636,6 +2717,21 @@ test.describe('Croatian compare page (/hr/compare) on a 360px phone', () => {
   });
 
   // Same regression as the English compare page's own matching test above -
+  // found by a real Playwright boundingBox() measurement, not assumed from
+  // the CSS: the two picker <select>s only reached ~39px tall, short of
+  // AGENTS.md's "Interactive targets are at least 44px in any touch-facing
+  // control" floor.
+  test('the picker selects and swap button are at least 44px tap targets', async ({ page }) => {
+    const heights = await page
+      .locator('.compare__field select, #compare-swap')
+      .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height));
+    expect(heights.length).toBeGreaterThan(0);
+    for (const height of heights) {
+      expect(height).toBeGreaterThanOrEqual(44);
+    }
+  });
+
+  // Same regression as the English compare page's own matching test above -
   // see tests/e2e/no-js-compare.spec.ts for the no-JS bug this note fixes.
   test('the no-JavaScript picker note never renders with JavaScript enabled', async ({ page }) => {
     await expect(page.locator('noscript')).not.toBeVisible();
@@ -2733,6 +2829,26 @@ test.describe('Quiz page on a 360px phone', () => {
       return el.scrollWidth - el.clientWidth;
     });
     expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  // Found by a real Playwright boundingBox() measurement, not assumed from
+  // the CSS: the "Check answer"/"Check order" buttons and restart button
+  // only reached ~43px tall, and the order-challenge rank <select>s only
+  // ~30px, all short of AGENTS.md's "Interactive targets are at least 44px
+  // in any touch-facing control" floor. These controls carry `hidden`
+  // markup that QuizScript.astro clears on load (not gated behind
+  // answering), so they're measurable straight off page load with no
+  // interaction needed. Fixed with an explicit min-height on each.
+  test('the check-answer, restart, and order-rank controls are at least 44px tap targets', async ({
+    page,
+  }) => {
+    const heights = await page
+      .locator('.quiz-card__check, #quiz-restart, .quiz-order__rank')
+      .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height));
+    expect(heights.length).toBeGreaterThan(0);
+    for (const height of heights) {
+      expect(height).toBeGreaterThanOrEqual(44);
+    }
   });
 
   test('shows a set of generated questions with multiple choices', async ({ page }) => {
@@ -2989,6 +3105,23 @@ test.describe('Croatian quiz page (/hr/quiz) on a 360px phone', () => {
       return el.scrollWidth - el.clientWidth;
     });
     expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  // Same regression as the English quiz page's own matching test above -
+  // hr/quiz.astro duplicates its own `#quiz-restart` rule (its check/order
+  // buttons and rank selects come from the shared QuizCard.astro/
+  // QuizOrderCard.astro components already covered there), and it had the
+  // identical ~43px-short violation independently.
+  test('the check-answer, restart, and order-rank controls are at least 44px tap targets', async ({
+    page,
+  }) => {
+    const heights = await page
+      .locator('.quiz-card__check, #quiz-restart, .quiz-order__rank')
+      .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height));
+    expect(heights.length).toBeGreaterThan(0);
+    for (const height of heights) {
+      expect(height).toBeGreaterThanOrEqual(44);
+    }
   });
 
   test('renders translated chrome, prompts and controls', async ({ page }) => {
@@ -4907,3 +5040,70 @@ test.describe('compare panel on a 360px phone', () => {
   });
 
 });
+
+// Nav.astro's `.site-header--js .site-menu.is-open` rule gives the mobile
+// drawer `max-height: calc(100dvh - var(--site-header-height))` with
+// `overflow-y: auto` - a documented fix (see that rule's own comment) for a
+// real bug where the drawer's stacked content (nav links + both search
+// fields + language switch + theme toggle), once taller than the drawer's
+// own max-height, silently stranded the theme toggle - last in DOM order -
+// off-screen with no way to scroll to it.
+//
+// Every other suite in this file runs at the project's default 360x740
+// viewport (playwright.config.ts), where that max-height bound (~684px)
+// comfortably exceeds the drawer's real content height - so the overflow-y
+// scroll path this fix depends on is never actually exercised by any
+// existing test; it never needs to scroll. `scripts/check-landscape-
+// viewport.mjs`'s own doc comment has the measured numbers this suite's
+// first test also asserts directly, confirmed live before writing this: a
+// real, common landscape-phone size (667x375 - an iPhone SE/8 rotated)
+// forces `#site-menu` to overflow (scrollHeight ~649px vs. clientHeight
+// ~313px), unlike this file's other viewports.
+for (const { label, path: homePath } of [
+  { label: 'English', path: '' },
+  { label: 'Croatian', path: 'hr/' },
+]) {
+  test.describe(`nav drawer at a short landscape-phone viewport (667x375, ${label} home page)`, () => {
+    test.beforeEach(async ({ page }) => {
+      await page.setViewportSize({ width: 667, height: 375 });
+      await page.goto(homePath);
+      await openMenu(page);
+    });
+
+    test('the drawer genuinely needs to scroll here, not a vacuous check', async ({ page }) => {
+      const { scrollHeight, clientHeight } = await page
+        .locator('#site-menu')
+        .evaluate((el) => ({ scrollHeight: el.scrollHeight, clientHeight: el.clientHeight }));
+      expect(scrollHeight).toBeGreaterThan(clientHeight);
+    });
+
+    test('keyboard Tab reaches every control, including the theme toggle last in DOM order, and each stays visible inside the drawer as it scrolls into view', async ({
+      page,
+    }) => {
+      await page.locator('#menu-toggle').focus();
+
+      let sawThemeToggle = false;
+      // Comfortably more than the drawer's real control count (15 nav links
+      // + 2 search fields + language switch + theme toggle on a translated
+      // page) so the loop can't silently stop early before reaching the end.
+      for (let i = 0; i < 30; i++) {
+        await page.keyboard.press('Tab');
+        const info = await page.evaluate(() => {
+          const active = document.activeElement;
+          const menu = document.getElementById('site-menu');
+          if (!active || !menu || !menu.contains(active)) return null;
+          const rect = active.getBoundingClientRect();
+          const menuRect = menu.getBoundingClientRect();
+          return {
+            id: active.id,
+            visible: rect.top >= menuRect.top - 1 && rect.bottom <= menuRect.bottom + 1,
+          };
+        });
+        if (info === null) break;
+        expect(info.visible).toBe(true);
+        if (info.id === 'theme-toggle') sawThemeToggle = true;
+      }
+      expect(sawThemeToggle).toBe(true);
+    });
+  });
+}

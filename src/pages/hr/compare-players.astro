@@ -400,6 +400,11 @@ const jsonLd: JsonLdObject[] = [
   .compare__field select {
     font: inherit;
     padding: 0.5rem 0.6rem;
+    /* AGENTS.md's "Interactive targets are at least 44px in any
+       touch-facing control" - the padding above alone only reaches ~39px
+       tall, short of that floor. Measured with a real Playwright
+       boundingBox() at 360px, not assumed from the CSS. */
+    min-height: 2.75rem;
     color: var(--text);
     background: var(--bg);
     border: 1px solid var(--border);
@@ -722,7 +727,13 @@ const jsonLd: JsonLdObject[] = [
     max-width: 68ch;
   }
 
-  .shared-years__list {
+  /* :global() on both the list and its `li`s - see compare-players.astro's
+     own copy of this comment (the two files independently duplicate this
+     component): renderSharedYears() (below) replaces the entire innerHTML,
+     <ol> included, whenever the reader picks a new player pair, so the
+     re-rendered markup never carries the data-astro-cid-* attribute a plain
+     scoped selector would require. Confirmed live, not assumed. */
+  :global(.shared-years__list) {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -731,7 +742,7 @@ const jsonLd: JsonLdObject[] = [
     margin: 0;
   }
 
-  .shared-years__list li {
+  :global(.shared-years__list li) {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;

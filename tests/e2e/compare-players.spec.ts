@@ -22,6 +22,22 @@ test.describe('Compare Players page', () => {
     expect(overflow).toBeLessThanOrEqual(1);
   });
 
+  // Found by a real Playwright boundingBox() measurement, not assumed from
+  // the CSS: the two picker <select>s only reached ~39px tall, short of
+  // AGENTS.md's "Interactive targets are at least 44px in any touch-facing
+  // control" floor - the same bug /compare's own matching test found and
+  // fixed via `.compare__field select`, a class name shared by this page.
+  test('the picker selects and swap button are at least 44px tap targets', async ({ page }) => {
+    await page.goto('compare-players');
+    const heights = await page
+      .locator('.compare__field select, #compare-swap')
+      .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height));
+    expect(heights.length).toBeGreaterThan(0);
+    for (const height of heights) {
+      expect(height).toBeGreaterThanOrEqual(44);
+    }
+  });
+
   test('the Player A/B <select> boxes are wide enough not to clip the longest player name', async ({
     page,
   }) => {
@@ -168,6 +184,22 @@ test.describe('Croatian Compare Players page (/hr/compare-players)', () => {
       return el.scrollWidth - el.clientWidth;
     });
     expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  // Found by a real Playwright boundingBox() measurement, not assumed from
+  // the CSS: the two picker <select>s only reached ~39px tall, short of
+  // AGENTS.md's "Interactive targets are at least 44px in any touch-facing
+  // control" floor - the same bug /compare's own matching test found and
+  // fixed via `.compare__field select`, a class name shared by this page.
+  test('the picker selects and swap button are at least 44px tap targets', async ({ page }) => {
+    await page.goto('hr/compare-players');
+    const heights = await page
+      .locator('.compare__field select, #compare-swap')
+      .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height));
+    expect(heights.length).toBeGreaterThan(0);
+    for (const height of heights) {
+      expect(height).toBeGreaterThanOrEqual(44);
+    }
   });
 
   test('the Player A/B <select> boxes are wide enough not to clip the longest player name', async ({

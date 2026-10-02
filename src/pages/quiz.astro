@@ -7,12 +7,13 @@ import References from '../components/References.astro';
 import EditorialNotes from '../components/EditorialNotes.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import { disambiguateLabels } from '../lib/sources';
-import { buildTimeline } from '../lib/editions';
+import { buildBiggestFinalMargins, buildHostsSummary, buildTimeline } from '../lib/editions';
 import { t } from '../lib/i18n';
 import { absolutePageUrl, withBase } from '../lib/url';
 import { buildQuizJsonLd, type JsonLdObject } from '../lib/jsonLd';
 import type { Edition } from '../lib/types';
 import {
+  biggestFinalMarginQuestion,
   championByYearQuestions,
   chronologicalOrderQuestions,
   hostByYearQuestions,
@@ -85,6 +86,25 @@ const pools: QuizPool[] = [
     seed: 'pick:world-cup:most-titles',
   },
   {
+    questions: mostTitlesQuestion(
+      buildHostsSummary(worldCup.editions),
+      'FIFA World Cup',
+      'world-cup',
+      'host',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:most-hosted',
+  },
+  {
+    questions: biggestFinalMarginQuestion(
+      buildBiggestFinalMargins(worldCup.editions),
+      'FIFA World Cup',
+      'world-cup',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:biggest-margin',
+  },
+  {
     questions: yearByWinnerQuestions(worldCup.editions, 'FIFA World Cup', 'world-cup', 'en', 'team'),
     take: 1,
     seed: 'pick:world-cup:year-by-winner',
@@ -108,6 +128,16 @@ const pools: QuizPool[] = [
     questions: mostTitlesQuestion(euro.champions, 'UEFA EURO', 'euro'),
     take: 1,
     seed: 'pick:euro:most-titles',
+  },
+  {
+    questions: mostTitlesQuestion(buildHostsSummary(euro.editions), 'UEFA EURO', 'euro', 'host'),
+    take: 1,
+    seed: 'pick:euro:most-hosted',
+  },
+  {
+    questions: biggestFinalMarginQuestion(buildBiggestFinalMargins(euro.editions), 'UEFA EURO', 'euro'),
+    take: 1,
+    seed: 'pick:euro:biggest-margin',
   },
   {
     questions: yearByWinnerQuestions(euro.editions, 'UEFA EURO', 'euro', 'en', 'team'),
@@ -135,6 +165,16 @@ const pools: QuizPool[] = [
     seed: 'pick:copa-america:most-titles',
   },
   {
+    questions: mostTitlesQuestion(
+      buildHostsSummary(copaAmerica.editions),
+      'Copa América',
+      'copa-america',
+      'host',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:most-hosted',
+  },
+  {
     questions: yearByWinnerQuestions(copaAmerica.editions, 'Copa América', 'copa-america', 'en', 'team'),
     take: 1,
     seed: 'pick:copa-america:year-by-winner',
@@ -158,6 +198,25 @@ const pools: QuizPool[] = [
     questions: mostTitlesQuestion(nationsLeague.champions, 'UEFA Nations League', 'nations-league'),
     take: 1,
     seed: 'pick:nations-league:most-titles',
+  },
+  {
+    questions: mostTitlesQuestion(
+      buildHostsSummary(nationsLeague.editions),
+      'UEFA Nations League',
+      'nations-league',
+      'host',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:most-hosted',
+  },
+  {
+    questions: biggestFinalMarginQuestion(
+      buildBiggestFinalMargins(nationsLeague.editions),
+      'UEFA Nations League',
+      'nations-league',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:biggest-margin',
   },
   {
     questions: yearByWinnerQuestions(nationsLeague.editions, 'UEFA Nations League', 'nations-league', 'en', 'team'),
@@ -387,6 +446,14 @@ const jsonLd: JsonLdObject[] = [
   #quiz-restart {
     font: inherit;
     padding: 0.5rem 0.9rem;
+    /* AGENTS.md's "Interactive targets are at least 44px in any
+       touch-facing control" - the padding above alone only reaches ~43px
+       tall, short of that floor. Measured with a real Playwright
+       boundingBox() at 360px, not assumed from the CSS. */
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border-radius: var(--radius);
     border: 1px solid var(--border);
     background: var(--bg-subtle);

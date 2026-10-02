@@ -42,6 +42,25 @@
 // exact-text ledger entry is new or edited and fails the build until it is
 // checked against the source table it summarizes and recorded.
 //
+// Widened by the hundred-and-ninety-third intensive run: the bare
+// "since <year>" pattern required the year immediately after "since", which
+// missed the same claim shape phrased with an intervening possessive/
+// determiner clause - "since the award's creation in 1956", "since the
+// first in 1916", "since the competition's 2019 launch" - the identical bug
+// class the hundred-and-eighty-third/-ninety-second runs already found and
+// fixed twice for `check-superlative-claims.mjs`/`check-ordinal-claims.mjs`
+// (a claim's anchor word separated from the rest of the claim by intervening
+// text). Found by grepping every `since (the|its|his|her|their)` occurrence
+// across all six content files first (the same diligence those two prior
+// widenings used) rather than assuming the bare pattern already covered
+// every phrasing: 3 of 7 such occurrences carried a year 1-4 words later
+// that the bare pattern missed entirely; the other 4 either have no year at
+// all or aren't inside a `- ` bullet, so widening introduces zero noise
+// against the corpus as it stands today. Added a second alternative:
+// `since (the|its|his|her|their)` followed by 1-4 more words then a year,
+// bounded tightly enough to avoid spanning into an unrelated later year in
+// a long bullet.
+//
 // Plain regex/string parsing of `content/*.md`, no build or browser needed -
 // the same territory as the other four claim checkers, so this is wired
 // into `.github/workflows/ci.yml` as a required PR gate immediately after
@@ -56,13 +75,16 @@ const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CONTENT_DIR = path.join(ROOT, 'content');
 const LEDGER_PATH = path.join(ROOT, 'scripts', 'since-claims-ledger.json');
 
-const CLAIM_PATTERN = /\bsince \d{4}\b/i;
+const CLAIM_PATTERN =
+  /\bsince \d{4}\b|\bsince (?:the|its|his|her|their)(?:\s+[\w']+){1,4}\s+\d{4}\b/i;
 
 /**
  * Pure: every top-level Markdown list item's text in `markdown` that mentions
- * "since <year>", in document order. Content pages on this site use only
- * flat, single-line `- ` bullets (no nested lists), so a per-line regex is
- * sufficient - no Markdown parser needed.
+ * "since <year>" - either directly, or with an intervening possessive/
+ * determiner clause ("since the award's creation in 1956", "since the
+ * competition's 2019 launch") - in document order. Content pages on this
+ * site use only flat, single-line `- ` bullets (no nested lists), so a
+ * per-line regex is sufficient - no Markdown parser needed.
  */
 export function extractSinceClaims(markdown) {
   const claims = [];

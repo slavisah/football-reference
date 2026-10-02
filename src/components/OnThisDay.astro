@@ -83,7 +83,19 @@ const dateLabel = formatOnThisDayDate(buildDate.getMonth() + 1, buildDate.getDat
     gap: 0.6rem;
   }
 
-  .on-this-day__list li {
+  /* :global() on the `li`: the inline script below always replaces
+     #on-this-day-list's children via createElement/appendChild on every page
+     load (re-deriving "today" from the visitor's own clock, not just when it
+     differs from the build date), so the re-rendered <li>s never carry the
+     data-astro-cid-* attribute Astro's compiler adds to this file's own
+     statically-authored markup and requires of a plain scoped selector -
+     the same root cause the finals-meetings/shared-years lists on
+     /compare and /compare-players were fixed for. Without :global() every
+     card silently loses its padding/background/border/border-radius on
+     every single visit with JavaScript enabled, confirmed live via
+     `getComputedStyle()` (`padding: 0px`, `background-color: rgba(0, 0, 0,
+     0)`, no border) before this fix, not assumed from reading the CSS. */
+  :global(.on-this-day__list li) {
     padding: 0.75rem 0.9rem;
     background: var(--bg-subtle);
     border: 1px solid var(--border);

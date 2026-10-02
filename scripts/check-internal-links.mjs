@@ -1,17 +1,35 @@
 // Crawls the built site for broken internal links - a stale or mistyped
 // `href`/`src` (nav, footer, home cards, cross-links between pages, PDF
-// download links, canonical/hreflang tags, JSON-LD urls) that would 404 for
-// a real reader. Nothing previously checked this: check-page-weight.mjs
-// resolves each page's CSS refs but silently treats a missing asset as 0
-// bytes rather than an error (see resolveDistAsset/measurePage), so a broken
-// CSS link wouldn't fail that check either. This script is the first thing
-// on the site that actually verifies every internal link resolves to a real
-// file in the build output.
+// download links, canonical/hreflang tags) that would 404 for a real reader.
+// Nothing previously checked this: check-page-weight.mjs resolves each
+// page's CSS refs but silently treats a missing asset as 0 bytes rather than
+// an error (see resolveDistAsset/measurePage), so a broken CSS link wouldn't
+// fail that check either. This script is the first thing on the site that
+// actually verifies every internal link resolves to a real file in the
+// build output.
 //
 // Also verifies every same-page fragment link (e.g. the skip-link's
 // `href="#main"`) targets an `id` that actually exists on that page - the
 // same "silently broken for one specific reader" bug class as a 404 link,
 // just for keyboard/screen-reader users instead of everyone.
+//
+// Also crawls every page's JSON-LD `<script>` block(s) for a this-site
+// absolute URL under a `url`/`item` key (breadcrumb trail entries, each
+// ItemList/SportsEvent/Person/etc.'s own self-referential `url`) and checks
+// those resolve too - a real, previously-open gap `check-jsonld.mjs` doesn't
+// cover (it validates structure - a real `@context`/`@type`, sequential
+// `position`s, every url absolute and under this site's own origin - never
+// that the url actually resolves to a real page) and this script's own
+// `extractLinks` above didn't either, since a JSON-LD url is a JSON string
+// inside a `<script>` tag's text content, not an HTML attribute the
+// `href`/`src` regex would ever see. A stale/mistyped breadcrumb `item` URL
+// (e.g. a copy-pasted edition year) would 404 for a search engine or
+// screen-reader-plus-structured-data consumer, silently, forever - nothing
+// else on this site would have caught it. Confirmed live (not assumed):
+// checked all 3,176 JSON-LD url/item values across a full build before
+// adding this, all resolving - a clean pass, the same "close the gap even
+// though nothing's broken today" reasoning every other `check:*` addition's
+// own first clean run already documents.
 //
 // External links (http(s) URLs outside this site) are intentionally out of
 // scope - this environment's egress policy blocks outbound WebFetch/HTTP to
@@ -39,6 +57,48 @@ const BASE_PATH = (process.env.BASE_PATH ?? '/football-reference').replace(/\/$/
 export function extractLinks(html) {
   const matches = html.matchAll(/\s(?:href|src)="([^"]*)"/g);
   return [...new Set([...matches].map((m) => m[1]))];
+}
+
+/**
+ * Every string value under a `url`/`item` key, at any depth, inside the
+ * page's JSON-LD `<script type="application/ld+json">` block(s) -
+ * breadcrumb trail entries and each JSON-LD node's own self-referential
+ * `url`. `item` is sometimes itself a nested object (an ItemList entry's
+ * `Thing`, which never carries its own `url` on this site) rather than a
+ * URL string - only the string form is a link to check; walking into the
+ * object form just finds nothing to add, which is correct, not a bug.
+ * Malformed JSON is skipped rather than thrown on - a syntax error there is
+ * `check-jsonld.mjs`'s job to catch, not this function's.
+ */
+export function extractJsonLdLinks(html) {
+  const scripts = html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g);
+  const urls = [];
+
+  const walk = (node) => {
+    if (Array.isArray(node)) {
+      for (const item of node) walk(item);
+      return;
+    }
+    if (node && typeof node === 'object') {
+      for (const [key, value] of Object.entries(node)) {
+        if ((key === 'url' || key === 'item') && typeof value === 'string') {
+          urls.push(value);
+        } else {
+          walk(value);
+        }
+      }
+    }
+  };
+
+  for (const [, jsonText] of scripts) {
+    try {
+      walk(JSON.parse(jsonText));
+    } catch {
+      // Structural validity is check-jsonld.mjs's job, not this one's.
+    }
+  }
+
+  return [...new Set(urls)];
 }
 
 /**
@@ -112,7 +172,8 @@ async function checkPage(filePath) {
   const ids = extractIds(html);
   const broken = [];
 
-  for (const href of extractLinks(html)) {
+  const links = new Set([...extractLinks(html), ...extractJsonLdLinks(html)]);
+  for (const href of links) {
     const classified = classifyLink(href);
     if (classified.kind === 'external' || classified.kind === 'skip') continue;
 

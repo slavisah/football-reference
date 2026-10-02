@@ -1,7 +1,7 @@
 ---
 title: Family Quiz
 slug: quiz
-lastReviewed: 2026-09-05
+lastReviewed: 2026-10-02
 status: verified
 ---
 
@@ -33,6 +33,10 @@ the quiz stays in sync as new editions are added.
   winner win it? (only asked about a one-time champion/winner)
 - Which team or player has won the most titles/awards in a competition
   overall?
+- Which country has hosted the most editions of a given tournament overall?
+- In which year did a given tournament's final have the biggest winning
+  margin? (only asked when there's a single, unambiguous biggest margin -
+  not a tie for first)
 - Put four champions from a tournament, or four winners of an individual
   award (Ballon d'Or, Golden Boot), in chronological order (earliest
   first).

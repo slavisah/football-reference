@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { NAV_LINKS } from '../../src/lib/routes';
 import { TRANSLATED_PATHS } from '../../src/lib/i18n';
+import { openMenu } from './menu';
 
 // First-ever forced-colors (Windows/OS high-contrast theme) coverage of any
 // kind - nothing in src/ or tests/ referenced `forced-colors` before this
@@ -145,6 +146,100 @@ test.describe('forced-colors mode, quiz answer states', () => {
     // this test exists to confirm that stays true, not to fix a new gap.
     const correctBadge = page.locator('.quiz-card__choice.is-correct .quiz-card__result-badge').first();
     await expect(correctBadge).not.toHaveText('');
+
+    await runAxe(page);
+  });
+});
+
+// Nav.astro's `.team-search__listbox li.is-active` rule was meant to carry a
+// `forced-colors: active` outline (added specifically because - per its own
+// comment - background/color alone loses its signal under forced-colors,
+// the same concern that motivated the World Cup is-winner cell fix above),
+// but nothing had ever actually driven the search widgets' listbox open
+// under `forcedColors: 'active'` to confirm that outline renders: the three
+// targeted describes above and the full-site sweep below all only ever
+// `page.goto()` each path and leave every combobox closed, so the
+// `.is-active` state this rule targets had never once been present in the
+// DOM during any forced-colors test. Writing this test found a real,
+// previously-unnoticed bug, in every color scheme and forced-colors alike -
+// not just a missing test: every `<li>` in the listbox is injected at
+// runtime by `initSearchWidget()`'s `listbox.innerHTML = matches.map(...)`,
+// so it never carries the `data-astro-cid-*` attribute Astro's compiler adds
+// to statically-authored markup and to every simple selector of a scoped
+// rule that targets it - `.team-search__listbox li` compiled to
+// `.team-search__listbox[data-astro-cid-x] li[data-astro-cid-x]`, which
+// cannot match an `<li>` lacking that attribute. The entire rule block
+// (padding, cursor, and the `.is-active` background/color/outline) silently
+// never applied to a single rendered option, confirmed with a live
+// `getComputedStyle()` read (`background-color: rgba(0, 0, 0, 0)`, plain
+// body text color) before the fix, not assumed from reading the CSS - see
+// Nav.astro's own updated comment on the fix (wrapping the `li` half of each
+// selector in `:global()`, the same cross-scope pattern this file already
+// uses for `.site-menu.is-open :global(#theme-toggle)`). Both widgets share
+// the identical `initSearchWidget()` logic and CSS rule, so one auto-active
+// match per widget (the first result auto-activates on render, per
+// `setActive(matches[0].id)` - no arrow key needed) is enough to exercise
+// it, matching how team-search.spec.ts/player-search.spec.ts already test
+// the same auto-active behavior functionally. Each test below checks the
+// *baseline* (non-forced-colors) highlight first - the bug this file exists
+// to catch broke that too - then emulates forced-colors and checks the
+// outline on top of it.
+test.describe('forced-colors mode, team search active option', () => {
+  test('the auto-active team-search option is highlighted, keeps a non-color outline under forced-colors, and the page stays WCAG-clean', async ({
+    page,
+  }) => {
+    await page.goto('');
+    await openMenu(page);
+
+    const input = page.locator('#team-search-input');
+    await input.click();
+    await input.fill('braz');
+    await expect(page.locator('#team-search-status')).not.toHaveText('Loading teams…');
+
+    const activeOption = page.locator('#team-search-listbox [role="option"].is-active');
+    await expect(activeOption).toHaveText('Brazil');
+
+    // Baseline: the highlight must render before forced-colors is even
+    // considered, or the "is-active" state has no signal for a sighted
+    // keyboard user in any normal browser.
+    const baselineBg = await activeOption.evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(baselineBg).not.toBe('rgba(0, 0, 0, 0)');
+
+    await page.emulateMedia({ forcedColors: 'active' });
+    const outline = await activeOption.evaluate((el) => {
+      const style = getComputedStyle(el);
+      return `${style.outlineStyle} ${style.outlineWidth}`;
+    });
+    expect(outline).not.toBe('none 0px');
+
+    await runAxe(page);
+  });
+});
+
+test.describe('forced-colors mode, player search active option', () => {
+  test('the auto-active player-search option is highlighted, keeps a non-color outline under forced-colors, and the page stays WCAG-clean', async ({
+    page,
+  }) => {
+    await page.goto('');
+    await openMenu(page);
+
+    const input = page.locator('#player-search-input');
+    await input.click();
+    await input.fill('lionel messi');
+    await expect(page.locator('#player-search-status')).not.toHaveText('Loading players…');
+
+    const activeOption = page.locator('#player-search-listbox [role="option"].is-active');
+    await expect(activeOption).toHaveText('Lionel Messi');
+
+    const baselineBg = await activeOption.evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(baselineBg).not.toBe('rgba(0, 0, 0, 0)');
+
+    await page.emulateMedia({ forcedColors: 'active' });
+    const outline = await activeOption.evaluate((el) => {
+      const style = getComputedStyle(el);
+      return `${style.outlineStyle} ${style.outlineWidth}`;
+    });
+    expect(outline).not.toBe('none 0px');
 
     await runAxe(page);
   });

@@ -30116,3 +30116,2919 @@ as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged. All five fresh
 angles this run tried are now closed, honestly negative results rather than
 open threads; the next run will need its own first-principles search for a
 sixth angle rather than repeating any of these five.
+
+### Dependency patch bump plus a cold-start e2e re-run to verify it, since it touches Playwright/axe-core directly - closed 2026-09-28 (hundred-and-eighty-ninth intensive run)
+
+With the open backlog still fully blocked (re-confirmed: `npm view
+@astrojs/check@latest peerDependencies` still only declares `typescript:
+'^5.0.0 || ^6.0.0'`; the brand-suffix title-length decision still needs
+human sign-off; the Nations League Team of the Tournament/attendance gaps
+and the `docs/SOURCES.md` link-liveness sweep are still blocked on this
+environment's egress policy) and the hundred-and-eighty-eighth run's five
+fresh-angle searches all closed with no open thread, this run started from
+`pnpm outdated`, the same first move every recent run makes before hunting
+for a new angle by hand. It surfaced four genuine new in-range patch
+releases that a prior run's `pnpm outdated` hadn't yet seen: `@types/node`
+26.6.2 -> 26.6.3, `cspell` 10.3.4 -> 10.3.5, `html-validate` 11.16.0 ->
+11.16.1, and `sharp` 0.35.4 -> 0.35.5 (the last pinned to an exact version
+in `package.json` rather than a caret range, so `pnpm update` alone didn't
+touch it - bumped by hand and re-verified with a fresh `pnpm install`).
+`typescript` 7 remains the sole blocked line, unchanged.
+
+Unlike most recent dependency-bump/doc-only runs, two of these four
+packages - and, more importantly, `@playwright/test` itself, which had
+separately drifted since the last lockfile refresh - are exactly what the
+site's e2e suite depends on to run at all, and `@axe-core/playwright`
+is what every `has no WCAG violations` spec in that suite calls directly.
+A bump to either is precisely the kind of change the "no page markup or
+content changed, so skip e2e" reasoning several recent runs used does
+*not* cover - so, rather than defaulting to that skip, this run ran a full
+cold-start `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm test:e2e`
+specifically to verify the bump. Result: 1023/1023 passed in 17.2 minutes,
+matching the hundred-and-eighty-sixth run's own last cold-start count
+exactly - a genuine, positive confirmation that the newer Playwright/
+axe-core builds changed no observable behavior on this site, not an
+assumption carried over from a stale prior run.
+
+**Verification:** `pnpm install` (fresh lockfile resolve, 550-line diff -
+version bumps only, no dependency-tree shape change), `pnpm outdated`
+(only the blocked `typescript` line remains), `pnpm lint` (234 files,
+0/0/0), `pnpm test` (880/880, unchanged), `pnpm build` (711 pages,
+unchanged), all 28 fast `check:*` scripts individually clean, `pnpm
+test:coverage` (99.91%/99.31%, unchanged - the same four defensively-
+unreachable lines as ever), `pnpm audit` (no known vulnerabilities), `pnpm
+dlx knip --no-config-hints` (the same two standing false positives as
+ever), and the cold-start `pnpm test:e2e` run described above (1023/1023).
+The five browser-based sweeps (`check:lighthouse`/`check:reflow`/
+`check:text-zoom`/`check:print-width`/`check:html`) were not re-run this
+run - they exercise rendered page output, not Playwright/axe-core's own
+test-runner internals, and the hundred-and-eighty-eighth run's own sweep
+is only one run stale.
+
+**Left for a future pass:** same environment-blocked open-backlog items as
+ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged. With this run's
+own angle (verify the Playwright/axe-core bump against the full e2e suite
+rather than assuming it's safe) now closed, the next run will again need
+its own first-principles search for a fresh angle, the same standing
+instruction the hundred-and-eighty-eighth run's entry already left.
+
+### Built `check:completeness-claims`, a seventh verification-ledger gate for undated 100%-table-coverage claims ("across all N editions"/"in every edition") - closed 2026-09-28 (hundred-and-ninetieth intensive run)
+
+With `pnpm outdated` showing nothing new beyond the still-blocked `typescript`
+line and the full standing health check re-confirmed clean (`pnpm lint`
+234 files 0/0/0, `pnpm test` 880/880, `pnpm build` 711 pages, all 28 then-
+existing fast `check:*` scripts, `pnpm test:coverage` 99.91%/99.31%
+unchanged, `pnpm audit` clean, `pnpm dlx knip --no-config-hints` the same
+two standing false positives), this run tried a fresh content-accuracy
+angle via a dedicated research pass: grepping `content/*.md` for the two
+literal phrasings `across all N editions` and `in every edition` (rather
+than a trigger word already covered by one of the six existing
+verification-ledger checkers - superlative/ordinal/record/consecutive/
+since/one-of-only) surfaced five bullets asserting 100% table coverage that
+none of the six had ever caught, because none uses an ordinal, "since
+<year>", or any of the other six checkers' trigger words:
+
+- `content/fifa-world-cup.md`'s Winning managers intro ("a pattern unbroken
+  across all 23 editions") - every winning manager shares their team's
+  nationality.
+- `content/fifa-world-cup.md`'s, `content/uefa-euro.md`'s and
+  `content/uefa-nations-league.md`'s Winning captains intros ("across all
+  23/17/four completed editions") - every title-winning team has a named
+  captain.
+- `content/uefa-nations-league.md`'s Memorable moments closer ("in every
+  edition so far, including Germany finishing fourth in 2025") - every
+  Nations League Finals host has placed in the top four.
+
+All five were independently verified true this run, by hand, before being
+ledgered (not assumed from the research pass's own read): the World Cup
+managers claim by cross-checking all 23 Winning managers entries'
+parenthetical nation against the Editions table's Winner column for that
+year; the three captains claims by confirming every edition in each
+competition's own Editions/Finals table has a filled Winning captains
+entry (23 World Cup, 17 EURO, 4 Nations League, no blanks); the Nations
+League host claim by cross-checking the Finals table's Host column against
+its own Winner/Runner-up/Third/Fourth columns for all four editions (2019
+Portugal 1st, 2021 Italy 3rd, 2023 Netherlands 4th, 2025 Germany 4th). No
+false claim turned up - a genuine, if negative, content-accuracy result -
+but a real, previously-unguarded gap: a future edit leaving a captain/
+manager cell blank, or changing an edition count without updating "23"/
+"17"/"four" in these bullets, would have shipped silently, since nothing
+before this run read these five sentences against their tables.
+
+Built `check-completeness-claims.mjs` (`scripts/`), the same ledger-diff
+mechanism as the other six checkers (reusing `diffClaimsAgainstLedger()`
+from `check-superlative-claims.mjs`), scoped to
+`/\bacross all (\d+|one|...|ten)( completed)? editions\b|\bin every
+edition\b/i` - deliberately narrow: `content/copa-america.md` alone uses
+"every edition" three more times in bullets that name an exception ("every
+edition from 1993 onward except 2016") or are already "since"-anchored
+completeness claims check:since-claims already covers ("every edition
+since the first in 1916"), and a bare "every edition" match would have
+caught those too for zero benefit (the checker's only job is flagging a
+claim that needs a table cross-check, and those two shapes already get
+one, from a human reading the exception or from `check:since-claims`
+respectively). Seeded `completeness-claims-ledger.json` with the five
+claims above and their verification notes. Added 9 new unit tests
+(`tests/unit/checkCompletenessClaims.test.ts`, mirroring
+`checkSinceClaims.test.ts`'s structure, including a regression test that
+the two Copa América "every edition" phrasings above stay unmatched).
+Wired `check:completeness-claims` into `package.json` (`scripts`) and
+`.github/workflows/ci.yml`, placed immediately after
+`check:one-of-only-claims`. Also added `completeness-claims-ledger.json`
+to `check-claims-hr.mjs`'s own `LEDGER_FILES` array in the same commit -
+the hundred-and-eighty-sixth run's own `one-of-only-claims-ledger.json`
+miss (a brand-new ledger shipped with zero Croatian-translation coverage
+until a later run noticed) is the exact mistake this avoids pre-emptively
+rather than repeating it. Re-ran `pnpm check:claims-hr` after a full
+rebuild to confirm: 201 claims checked (up from 196), all clean - the
+Nations League host claim's own Croatian counterpart already names 2025
+("Njemačku, koja je 2025. bila četvrta"), the only one of the five with a
+four-digit year for that check to verify.
+
+**Verification:** `pnpm lint` (236 files, 0/0/0), `pnpm test` (892/892, up
+from 880), `pnpm build` (711 pages, unchanged), all 29 fast `check:*`
+scripts individually clean (including the new `check:completeness-claims`,
+5/5 claims verified, and `check:claims-hr`, 201/201 claims clean), `pnpm
+test:coverage` (99.91%/99.31%, unchanged - the new script is fully
+exercised by its own unit tests), `pnpm audit` (no known vulnerabilities),
+and `pnpm dlx knip --no-config-hints` (the same two standing false
+positives as ever). A full cold-start `PW_EXECUTABLE_PATH=/opt/pw-browsers/
+chromium pnpm test:e2e` was started this run as a routine confirmation
+sweep (several runs stale, unrelated to this change) but this run's own
+code/content change - a build-time script, its JSON ledger, a unit test,
+and two lines of CI/package config - needed no e2e re-run to ship per the
+same precedent the hundred-and-eighty-fifth/-sixth runs' own entries
+already established for identically-scoped changes (no page markup,
+styling, or runtime behavior touched). That background sweep finished
+after the rest of this run's own work was already pushed: **1023/1023
+passed in 18.0 minutes** - a genuine, positive confirmation that the
+accumulated branch (through this run's own commit) is still fully clean,
+not just this run's own narrow change.
+
+**Left for a future pass:** same environment-blocked open-backlog items as
+ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged. With this run's
+own angle now closed and seven verification-ledger gates covering every
+completeness/superlative/ordinal/record/consecutive/bounded-set claim
+shape found on the site so far, the next run will again need its own
+first-principles search for a fresh angle - the dedicated grep-for-a-new-
+phrasing approach this run used (rather than re-reading already-audited
+sections) is one candidate method worth repeating on a still-different
+phrase.
+
+### Full standing health check, including a several-runs-overdue re-run of all five browser sweeps and a cold-start e2e - closed 2026-09-28 (hundred-and-ninety-first intensive run)
+
+With every open backlog item still either environment-blocked (re-confirmed:
+`WebFetch` to `en.wikipedia.org` still returns `EGRESS_BLOCKED` from the
+proxy, so the `docs/SOURCES.md` link-liveness sweep and the Nations League
+attendance/Team-of-the-Tournament gaps stay closed; `npm view
+@astrojs/check@latest peerDependencies` still only declares `typescript:
+'^5.0.0 || ^6.0.0'`) or awaiting human sign-off (the brand-suffix
+title-length decision), and `pnpm outdated` surfacing nothing new beyond
+that same blocked `typescript` line, this run fell back to the routine's own
+default: a genuinely useful quality pass rather than a new checker or a new
+claim-vocabulary search (seven verification-ledger gates already cover
+every claim shape found on the site so far, and a dedicated re-grep for
+other superlative-shaped trigger words - "narrowest", "widest", "closest",
+"biggest", "unbeaten", "tallest", "shortest" - turned up nothing newly
+checkable: the handful of matches are either already-ledgered instances of
+existing patterns or subjective, non-numeric prose ("one of international
+football's biggest surprises") with no table to verify against).
+
+Instead, this run targeted the two standing checks that had gone the
+longest without a fresh confirmation: the five full-site browser sweeps
+(`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
+`check:html`, last re-run by the hundred-and-eighty-eighth run, three runs
+stale) and a cold-start `pnpm test:e2e` (last re-run by the
+hundred-and-eighty-ninth run, two runs stale). Both are exactly the kind of
+check no run has an excuse to keep deferring indefinitely just because the
+prior run's own change didn't touch rendered output - each additional run
+between confirmations is additional accumulated risk that goes unverified.
+
+Before any of that, ran the fast standing baseline first: `pnpm install
+--frozen-lockfile` (clean), `pnpm outdated` (only the blocked `typescript`
+line), `pnpm lint` (0 errors/0 warnings/0 hints), `pnpm test` (892/892,
+unchanged), `pnpm build` (711 pages), `pnpm test:coverage` (99.91%/99.31%,
+unchanged - the same four defensively-unreachable lines as ever), all 29
+fast `check:*` scripts individually clean, `pnpm audit` (no known
+vulnerabilities), and `pnpm dlx knip --no-config-hints` (the same two
+standing false positives). All matched the documented baseline exactly.
+
+The five browser sweeps needed this session's own preinstalled Chromium
+rather than the default bundled binary - an already-documented, recurring
+environment quirk (see the multiple earlier `PW_EXECUTABLE_PATH` entries
+above), not a new one: `pnpm exec playwright test`/`check:lighthouse` et al.
+look for a `chrome-headless-shell` build this sandbox doesn't have
+preinstalled, so every sweep this run used
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`, the
+same escape hatch `scripts/preview-daemon.mjs`'s `launchChromium()` and
+`playwright.config.ts`'s `mobile-chromium` project both already wire up for
+exactly this case. Results: `check:reflow` reports zero pages with
+horizontal overflow at 320px across all 711 pages; `check:text-zoom` the
+same at 200% root font size; `check:print-width` the same in emulated print
+media at the 1032px A4-landscape content width; `check:html` finds all 711
+pages valid HTML5 against the content model; `check:lighthouse`'s 39-page
+representative sample scores 1.00 across performance/accessibility/
+best-practices/SEO on every page except the one documented, intentional
+`noindex` 404-page SEO exception (0.63, expected and excluded by
+`EXPECTED_SEO_EXCEPTIONS`). No regression in any of the five, matching the
+hundred-and-eighty-eighth run's own last-confirmed baseline.
+
+The cold-start `pnpm exec playwright test`
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`)
+ran the full mobile-chromium suite from a clean build: **1023/1023 passed in
+16.6 minutes** - the same count as every prior cold-start run
+(hundred-and-eighty-sixth through hundred-and-eighty-ninth), confirming the
+four commits piled onto this branch since the last full e2e run (the
+`check:completeness-claims` gate and this run's own health check) introduced
+no regression anywhere in the suite, not just in the areas each individual
+change touched directly.
+
+**Verification:** every command above; no code, content, or configuration
+changed this run - this was a pure confirmation pass, not a fix. No new
+`docs/ROADMAP.md` backlog items closed (there was nothing new to close),
+but the "last re-confirmed" dates for both the browser sweeps and the
+cold-start e2e count are now current again as of this run rather than
+three/two runs behind.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open-backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
+unchanged. With no new lead surfaced this run either, the next run again
+needs its own first-principles search: a still-different claim-vocabulary
+grep, a fresh manual content re-read, or another angle not yet tried, per
+the standing instruction every recent all-clean run has left the next one.
+
+### `check:ordinal-claims` widened a third time: a non-adjacent "first-ever" possessive claim was silently unverified - closed 2026-09-28 (hundred-and-ninety-second intensive run)
+
+With every open backlog item still either environment-blocked or awaiting
+human sign-off (re-confirmed: `pnpm outdated` shows only the already-blocked
+`typescript` line, no new `@astrojs/check` release), and the
+hundred-and-ninety-first run's own "next run needs its own first-principles
+search" note as the standing instruction, this run took a structural angle
+on the seven existing verification-ledger checkers rather than a new
+vocabulary grep: could any of them miss a claim shape that matches their own
+*trigger word* but not their *anchor requirement* - the exact bug class the
+hundred-and-eighty-third/-fourth runs already found and fixed twice
+(possessive phrasing with no literal "the")? Re-read `check-ordinal-claims.mjs`'s
+own three-alternative pattern (`the (first|...)`, `\w+'s (first|...)`,
+`(his|her|its|their) (first|...)`) against every real "-ever" ordinal
+occurrence across all six `content/*.md` files (`first-ever`/`second-ever`/
+etc.) rather than assuming the two prior widenings had closed every gap in
+that pattern shape.
+
+Found one real, previously-unguarded instance: `content/ballon-dor.md`'s 2025
+Johan Cruyff Trophy entry - "**2025:** Luis Enrique (Paris Saint-Germain) -
+honored for PSG's Ligue 1, Coupe de France and first-ever UEFA Champions
+League title." - phrases the claim with the possessive ("PSG's") three words
+before the ordinal, separated by an intervening list ("Ligue 1, Coupe de
+France and"), which none of the three existing alternatives reaches (the
+possessive alternatives both require the ordinal word immediately after the
+possessive). Confirmed by testing the exact regex against the line directly
+(`node -e`) before touching the source: `false` on the unwidened pattern.
+The other four `-ever` occurrences site-wide (`ballon-dor.md`'s "the
+first-ever Ballon d'Or", `golden-boot.md`'s two "the first-ever ... Golden
+Boot" entries, `uefa-nations-league.md`'s "the first-ever Nations League
+Finals") were already caught via the existing `the (first|...)` alternative
+(a hyphen is a regex word boundary, so "the first-ever" already matches
+`\bthe first\b`) - this PSG entry was the sole gap, not a systemic one.
+
+Added a fourth alternative to `CLAIM_PATTERN`: a bare `(first|...)-ever`
+match with no possessive/"the" anchor at all, since the site has zero
+non-claim uses of an "Nth-ever" hyphenated compound (unlike a bare ordinal
+word, which does need an anchor to stay precise against "at first"/
+"third-place match"-type prose) - re-checked against the full corpus before
+widening, same diligence as the two prior widenings, zero new noise
+introduced (91 total ordinal claims now, up from 90; the other 90 are
+unchanged from before this run).
+
+The newly-caught claim is a real-world football-history fact, not something
+this site's own content tracks in a table - UEFA Champions League standings
+are outside the six competitions/awards this site covers. Verified instead
+against the well-documented public record: Paris Saint-Germain's only prior
+European Cup/Champions League final appearance was 2020 (lost 0-1 to Bayern
+Munich); they won the 2025 final 5-0 against Inter Milan (31 May 2025) -
+their first title in the competition's history. Recorded in
+`ordinal-claims-ledger.json` with that reasoning. No content or Croatian
+translation needed a fix - `src/pages/hr/competitions/ballon-dor.astro`'s
+existing 2025 Johan Cruyff Trophy entry already states "prvi naslov u Ligi
+prvaka u povijesti PSG-a" ("first Champions League title in PSG's history"),
+correctly paired, and `check:claims-hr` (202 claims, up from 201) confirms it
+stays paired now that the claim is ledgered.
+
+Added 2 new unit tests to `tests/unit/checkOrdinalClaims.test.ts` covering
+the new bare `-ever` alternative (a list-separated possessive case matching
+the real PSG bullet's shape, and a synthetic "third-ever"/"tenth-ever" case
+confirming every ordinal word in the group is reachable through this fourth
+alternative, not just "first").
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the blocked `typescript` line), `pnpm lint` (236 files, 0 errors/0
+warnings/0 hints), `pnpm test` (894/894, up from 892), `pnpm build` (711
+pages), `pnpm test:coverage` (99.91%/99.31%, unchanged), all 29 fast
+`check:*` scripts individually clean (`check:ordinal-claims` itself: 91
+claims checked, all ledgered; `check:claims-hr`: 202 claims, all paired),
+`pnpm audit` (no known vulnerabilities). Browser sweeps and `pnpm test:e2e`
+not re-run - this change touches only a build-time verification script, its
+JSON ledger, and a unit test file, no page markup, styling or rendered
+content (the Croatian translation already matched, unchanged).
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+The next run again needs its own first-principles search for a fresh
+angle - this run's own approach (re-testing an existing checker's pattern
+against real content it should already cover, rather than searching for new
+vocabulary) is one candidate worth trying against the other six
+verification-ledger checkers in turn, not yet done for
+`check:record-claims`/`check:consecutive-claims`/`check:since-claims`/
+`check:one-of-only-claims`/`check:completeness-claims`/
+`check:superlative-claims` this run.
+
+### `check:since-claims` widened a second time: a "since <intervening clause> <year>" phrasing was silently unverified in two bullets - closed 2026-09-28 (hundred-and-ninety-third intensive run)
+
+Followed the hundred-and-ninety-second run's own named next step exactly:
+re-test the other six verification-ledger checkers' own patterns against
+every real occurrence of their trigger vocabulary across all six
+`content/*.md` files, the same "does this checker's anchor requirement
+actually cover every phrasing of its own trigger word" question that run
+asked of `check-ordinal-claims.mjs`. `pnpm outdated` re-confirmed: still
+only the already-blocked `typescript` line, nothing new.
+
+Worked through all six in turn:
+
+- **`check:record-claims`** and **`check:consecutive-claims`** are bare
+  trigger-word matches (`\b(most|record|...)\b`, `\b(consecutive|back-to-
+  back)\b`) with no anchor requirement at all - there is no "intervening
+  clause" gap to have, by construction. Confirmed by re-reading both
+  patterns rather than assumed.
+- **`check:one-of-only-claims`** (`\bone of only (\d+|one|...|ten)\b`): grepped
+  every `one of ` occurrence site-wide. The two already-ledgered "one of
+  only three men" claims and the two deliberately-excluded "one of only a
+  handful of"/"one of the few" vague-count bullets are the whole set - no
+  new numbered bounded-set claim has been added since the checker's own
+  seeding run.
+- **`check:superlative-claims`** (`the only`/`\w+'s only`/`(his|her|its|their)
+  only`): grepped every `only` occurrence site-wide (excluding "not only").
+  Every exclusivity claim already matches one of the three alternatives;
+  every non-match is a genuine quantifier use ("only three entrants", "only
+  one stadium") the pattern is deliberately designed to skip. No gap.
+- **`check:completeness-claims`** (`across all N editions`/`in every
+  edition`): grepped every `every edition`/`all editions`/`each edition`-
+  style phrase site-wide. The two existing "across all N editions" claims
+  and `content/uefa-nations-league.md`'s "in every edition so far" bullet
+  (matches the second alternative literally) are the whole set. No gap in
+  this checker's own two alternatives.
+- **`check:since-claims`** (`since \d{4}`) did have the gap, the same shape
+  as the ordinal-claims fix last run: a claim's "since" anchor separated
+  from its year by an intervening possessive/determiner clause.
+  `content/uefa-nations-league.md`'s Player of the Finals bullet ("UEFA has
+  named a best-player award at every Nations League Finals since **the
+  competition's** 2019 launch") and `content/copa-america.md`'s Golden Boot
+  completeness bullet ("a top scorer can be identified for every edition
+  since **the first in** 1916") both state real per-edition completeness
+  claims the bare pattern never saw. A third bullet,
+  `content/ballon-dor.md`'s "The 2020 Ballon d'Or was the only edition since
+  **the award's creation in** 1956 not to be presented" also newly matches -
+  already verified once under `superlative-claims-ledger.json` (it also
+  matches "the only"), but had never had its own `since-claims-ledger.json`
+  entry.
+
+Confirmed the gap directly with `node -e` against the unwidened pattern
+before touching the source (all three: `false`), the same diligence the
+three prior possessive/anchor widenings on this site used. Grepped every
+`since (the|its|his|her|their)` occurrence across all six content files
+first to scope the fix rather than guessing a window size: 7 total, 3 carry
+a year 1-4 words later (the ones above), the other 4 either have no year at
+all or aren't inside a `- ` bullet (a paragraph, not a claim this checker
+extracts) - so a "since" + determiner/pronoun + 1-4 words + year alternative
+introduces zero new noise against the corpus as it stands. Added that
+alternative to `check-since-claims.mjs`'s `CLAIM_PATTERN`.
+
+All three newly-caught claims are real, true completeness claims, verified
+against their own source tables before ledgering:
+
+- **Copa América Golden Boot completeness:** the Golden Boot winners
+  list's 48 years (1916 through 2024, both 1959 editions included) match
+  the Champions timeline table's 48 editions exactly, position for
+  position - no gap, no extra year.
+- **Nations League Player of the Finals completeness:** the Finals table
+  lists exactly four editions (2019, 2021, 2023, 2025); the Player of the
+  Finals winners list covers all four with no gap.
+- **Ballon d'Or 2020 cancellation:** the Winners table runs one row per
+  year 1956-2025 with no missing year, and 2020 is the sole row marked "Not
+  awarded" - matches "the only edition ... not to be presented" exactly.
+
+All three recorded in `since-claims-ledger.json` - since-claims coverage
+goes from 23 to 26 claims. No content or Croatian-translation fix was
+needed for any of the three: `check:claims-hr` (205 claims, up from 202)
+confirms all three already state the same years on their Croatian
+counterpart pages, since none of this run's changes touched page content,
+only the checker script and its ledger.
+
+Added 3 new unit tests to `tests/unit/checkSinceClaims.test.ts`: one
+confirming the possessive-noun alternative ("since the award's creation in
+1956"), one confirming the possessive-pronoun/determiner alternative across
+two more real bullet shapes, and one confirming an unrelated year more than
+4 words after "since" still does not match (guarding against the
+alternative over-matching into an unrelated later clause).
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the blocked `typescript` line), `pnpm lint` (236 files, 0 errors/0
+warnings/0 hints), `pnpm test` (897/897, up from 894), `pnpm build` (711
+pages), `pnpm test:coverage` (99.91%/99.31%, unchanged), all 29 fast
+`check:*` scripts individually clean (`check:since-claims` itself: 26
+claims checked, all ledgered; `check:claims-hr`: 205 claims, all paired),
+`pnpm audit` (no known vulnerabilities), `pnpm dlx knip --no-config-hints`
+(same two standing false positives). Browser sweeps and `pnpm test:e2e` not
+re-run - this change touches only a build-time verification script, its
+JSON ledger, and a unit test file, no page markup, styling or rendered
+content.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+This run's own re-test-every-checker's-anchor-pattern angle came back clean
+for five of the six checkers and found one real gap in the sixth - worth
+repeating whenever new content is added in a phrasing shape not yet seen,
+rather than treating this run's clean results as permanent. The next run
+again needs its own first-principles search for a fresh angle beyond that.
+
+### Four fresh claim-vocabulary angles, all negative or already-covered; full standing health check - closed 2026-09-29 (hundred-and-ninety-fourth intensive run)
+
+With every open backlog item still either environment-blocked or awaiting
+human sign-off, and `pnpm outdated` showing nothing new beyond the
+already-documented blocked `typescript` line, this run tried four fresh
+vocabulary/pattern angles across `content/*.md` distinct from any of the
+prior 193 runs' own greps, rather than defaulting straight to a pure
+health-check re-run:
+
+1. **Record-superseded phrasing:** grepped for "held the record until",
+   "surpassed", "broke the record", "broken by", "overtook", "eclipsed",
+   "matched the record", "equaled the record", "equalled the record" and
+   "tied the record" across all `content/*.md` files. Zero hits site-wide -
+   this site's editorial prose has no claim shape describing an old record
+   later being broken by a subsequent edition (every "record" bullet states
+   only the current, standing record). A real, if negative, result: no new
+   checker needed for a claim shape that doesn't exist in the content.
+2. **Wider superlative-word sweep:** grepped for "greatest", "fastest",
+   "widest", "narrowest", "smallest", "tallest", "shortest", "quickest",
+   "earliest" and "longest" (beyond the words `check:record-claims`'s
+   `RECORD_WORDS` already covers: most/record/youngest/oldest/highest/
+   biggest/largest/lowest/fewest). Found exactly one hit not already
+   ledgered: `content/uefa-euro.md`'s "Greece produced one of international
+   football's greatest surprises in 2004." Read it in context before
+   deciding whether it needed a ledger entry - it's subjective color
+   commentary ("one of ... greatest surprises" names no specific record to
+   check), not a countable claim against any table this site carries, the
+   same category the existing checkers' own ledgers already document for
+   claims like "biggest surprises" or opinion-based color text. Correctly
+   outside every checker's scope; no gap found.
+3. **Comparative-negation sweep:** grepped for "no other team", "no other
+   player", "no other nation", "no other country", "no other manager", "more
+   titles/trophies/wins than any", "most decorated", "most successful" and
+   "greatest number/highest number of". Found two hits, both already
+   ledgered: `content/copa-america.md`'s "Argentina moved ahead as the
+   competition's most successful team" (already in
+   `record-claims-ledger.json`) and `content/fifa-world-cup.md`'s "Brazil's
+   1970 side became the first team to win three World Cups" (already in
+   `ordinal-claims-ledger.json`). No new gap.
+4. **`docs/SOURCES.md` duplicate-URL re-check:** re-confirmed the
+   hundred-and-seventy-fifth run's own "no duplicate or malformed entries"
+   finding rather than assuming it's still true after many runs of new
+   citations added since. `sort | uniq -d` on every URL in the file does
+   surface several repeats, but manual inspection of each confirmed every
+   one is the same primary source (most commonly a Wikipedia edition page)
+   legitimately cited by more than one separate research note that drew on
+   it - not a copy-pasted or malformed entry. A genuine, if negative,
+   re-confirmation.
+
+All four angles came back negative or already-covered - a real, if
+unglamorous, result: no new checker to build, no new content bug to fix.
+With no new lead to act on, used the rest of the run for a full standing
+health check: `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the blocked `typescript` line, re-confirmed via `npm view
+@astrojs/check@latest peerDependencies`), `pnpm lint` (236 files, 0
+errors/0 warnings/0 hints), `pnpm test` (897/897, unchanged), `pnpm build`
+(711 pages, unchanged), all 29 fast `check:*` scripts individually re-run
+and clean (all seven verification-ledger checkers at their existing
+counts - 24/91/36/22/26/2/5 - plus `check:claims-hr` at 205, all
+unchanged), `pnpm check:spelling`/`check:spelling-hr` (both clean), `pnpm
+audit` (no known vulnerabilities), and `pnpm dlx knip --no-config-hints`
+(same two standing false positives - `scripts/test-preview-server.mjs`,
+`@cspell/dict-hr-hr`). Everything matched the hundred-and-ninety-third
+run's own documented baseline exactly - a genuine, if negative,
+confirmation that the whole accumulated branch still holds up with zero
+regressions. Browser sweeps and `pnpm test:e2e` not re-run this run - only
+`docs/ROADMAP.md`/`docs/PROJECT_STATUS.md` changed, no page markup, styling
+or rendered content, so per the standing convention those stay due whenever
+a future run next touches actual page output rather than documentation.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+This run's own four fresh-vocabulary angles (record-superseded phrasing, a
+wider superlative-word sweep, comparative-negation claims, `docs/
+SOURCES.md` duplicate URLs) all came back negative/already-covered - the
+next run needs its own new angle rather than repeating these same four
+greps.
+
+### Full standing health check, including a four-runs-overdue re-run of all five browser sweeps and a cold-start e2e - closed 2026-09-29 (hundred-and-ninety-fifth intensive run)
+
+With every open backlog item still either environment-blocked (re-confirmed:
+`pnpm outdated` shows only the already-documented blocked `typescript` line,
+no new `@astrojs/check` release) or awaiting human sign-off, this run first
+tried two fresh claim-vocabulary angles across `content/*.md` beyond the
+hundred-and-ninety-fourth run's own four: a comparative-numeric sweep for
+"twice as many"/"half as many"/"three times as many"/"most capped"/"most
+appearances"/"joint-most"/"shares the record"/"tied for the record" found
+only two hits site-wide, both already accounted for -
+`content/copa-america.md`'s "Argentina moved ahead as the competition's most
+successful team" (already in `record-claims-ledger.json`, the same claim the
+hundred-and-ninety-fourth run's own comparative-negation sweep also
+surfaced) and `content/quiz.md`'s "Which team or player has won the most
+titles/awards in a competition overall?" (a generic quiz-question prompt
+describing a question shape, not a specific factual assertion any ledger
+checks); and a percentage/ratio sweep (`\d+%`, "half of its", "more than
+half", "less than half", "one in two/three/four/five", "every other
+edition") found zero hits anywhere in `content/*.md` - this site has no
+claim phrased as a fraction or percentage. Both genuine, if negative,
+results; no new checker gap found.
+
+With no new vocabulary lead to build on, and the hundred-and-ninety-first
+run's own full-site browser sweeps and cold-start `pnpm test:e2e` now four
+runs stale (last refreshed 2026-09-28; runs 192, 193 and 194 each touched
+only a build-time verification script, its JSON ledger and a unit test
+file, never page markup or rendered content, so none of them re-ran either
+check per the standing convention), this run treated that staleness itself
+as the actionable lead rather than deferring it a fifth time.
+
+Ran the fast standing baseline first: `pnpm install --frozen-lockfile`
+(clean), `pnpm outdated` (only the blocked `typescript` line), `pnpm lint`
+(236 files, 0 errors/0 warnings/0 hints), `pnpm test` (897/897, unchanged),
+`pnpm build` (711 pages, unchanged), `pnpm test:coverage` (99.91%/99.31%,
+unchanged - the same four defensively-unreachable lines as ever), all 29
+fast `check:*` scripts individually clean (all seven verification-ledger
+checkers at their existing counts - 24/91/36/22/26/2/5 - plus
+`check:claims-hr` at 205, all unchanged), `pnpm audit` (no known
+vulnerabilities), and `pnpm dlx knip --no-config-hints` (the same two
+standing false positives: `scripts/test-preview-server.mjs`,
+`@cspell/dict-hr-hr`). All matched the documented baseline exactly.
+
+The five browser sweeps again needed this environment's own preinstalled
+Chromium rather than the default bundled binary (the same recurring,
+already-documented quirk every prior browser-sweep run has hit):
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome` for
+every sweep. Results: `check:reflow` zero pages with horizontal overflow at
+320px across all 711 pages; `check:text-zoom` the same at 200% root font
+size; `check:print-width` the same in emulated print media at the 1032px
+A4-landscape content width; `check:html` all 711 pages valid HTML5 against
+the content model; `check:lighthouse`'s 39-page representative sample scores
+1.00 across performance/accessibility/best-practices/SEO on every page
+except the one documented, intentional `noindex` 404-page SEO exception
+(0.63, expected and excluded by `EXPECTED_SEO_EXCEPTIONS`). No regression in
+any of the five, matching the hundred-and-ninety-first run's own
+last-confirmed baseline exactly.
+
+The cold-start `pnpm exec playwright test`
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`)
+ran the full mobile-chromium suite from a clean build: **1023/1023 passed in
+16.8 minutes** - the same count as every prior cold-start run back through
+the hundred-and-eighty-sixth, confirming the commits piled onto this branch
+since the last full e2e run (three verification-ledger widenings plus their
+own health-check-only runs) introduced no regression anywhere in the suite.
+
+**Verification:** every command above; no code, content, or configuration
+changed this run - this was a pure confirmation pass, not a fix. No new
+`docs/ROADMAP.md` backlog items closed (there was nothing new to close), but
+the "last re-confirmed" dates for both the browser sweeps and the cold-start
+e2e count are now current again as of this run rather than four runs
+behind.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open-backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
+unchanged. This run's own two fresh-vocabulary angles (comparative-numeric
+phrasing, percentage/ratio claims) came back negative/already-covered - the
+next run needs its own new angle rather than repeating these or any of the
+hundred-and-ninety-fourth run's own four.
+
+### Two fresh vocabulary angles (ordinal words past "tenth", wider descriptive-claim sweep), both negative/non-actionable; full fast standing health check - closed 2026-09-29 (hundred-and-ninety-sixth intensive run)
+
+With every open backlog item still either environment-blocked or awaiting
+human sign-off, and `pnpm outdated` unchanged (still only the
+already-documented blocked `typescript` line), tried two fresh vocabulary
+angles across `content/*.md` neither of the prior 195 runs' own greps had
+specifically tried.
+
+First, a structural check on `check:ordinal-claims` itself:
+`scripts/check-ordinal-claims.mjs`'s `ORDINALS` constant lists only
+"first" through "tenth" - with 23 World Cup editions, 17 EUROs and enough
+Ballon d'Or/Golden Boot winners for a claim to plausibly need an eleventh,
+twelfth or higher ordinal, checked every content file for "eleventh"
+through "twenty-third" in case a claim had silently outgrown the list the
+same way three prior runs found phrasing gaps in its extraction pattern.
+Zero hits site-wide - no current claim needs an ordinal past "tenth", a
+genuine negative result confirming the list doesn't need widening (yet).
+
+Second, a wider descriptive-claim vocabulary sweep: "biggest", "widest
+margin", "record margin", "highest-scoring", "treble", "grand slam", "clean
+sweep", "most decorated", "most successful", "unbeaten", "undefeated",
+"winning streak", "longest streak", "hat-trick". Found three hits:
+
+- `content/copa-america.md`'s "Argentina moved ahead as the competition's
+  most successful team by winning in 2024" - already covered by
+  `record-claims-ledger.json` (the same claim the hundred-and-ninety-fourth
+  and hundred-and-ninety-fifth runs' own comparative sweeps also surfaced).
+- `content/uefa-euro.md`'s "the German manager behind one of international
+  football's biggest surprises" (2004, Otto Rehhagel's Winning managers
+  bullet) - the same subjective, non-quantifiable color-commentary class the
+  hundred-and-ninety-fourth run's own wider-superlative-word sweep already
+  found and excluded for the page's near-identical "Greece produced one of
+  international football's greatest surprises in 2004" line: no "biggest/
+  greatest surprise" column exists on any table this site carries, so
+  neither phrasing is a claim any ledger can check.
+- `content/copa-america.md`'s 2001 Winning managers bullet: "Francisco
+  Maturana (Colombia) - Colombia's only Copa América title, won undefeated."
+  The "only" half is already ledgered (`superlative-claims-ledger.json`);
+  the "won undefeated" half is a genuinely new claim shape none of the prior
+  195 runs' vocabulary greps had specifically tried. Checked whether it's
+  independently verifiable the same way every other new claim shape this
+  project has found gets checked: this site's content model carries no
+  match-by-match results data anywhere - not for 2001 Copa América, not for
+  any edition of any of the six competition/award families - only summary
+  champion/host/runner-up/third-fourth-place/top-scorer tables. There is
+  therefore no table on the site "undefeated" could be checked against, the
+  same non-independently-verifiable class already on record for the Yashin
+  ("only goalkeeper winner"), Cafu ("only player in three straight finals"),
+  Guevara ("only guest-nation winner"), Cubarsí ("first defender") and
+  Donnarumma ("first goalkeeper") claims. Not recorded as a false claim -
+  there is no way to falsify or confirm it from this site's own data - and a
+  single site-wide occurrence doesn't justify building an eighth
+  verification-ledger checker the way each of the existing seven's
+  systemic, multi-claim patterns did (each of those covered dozens of
+  claims once seeded, not one).
+
+Both angles genuine, if negative/non-actionable, results - no new bug found,
+no new checker built.
+
+With no new actionable lead, ran the full fast standing health check:
+`pnpm install --frozen-lockfile` (clean), `pnpm outdated` (only the blocked
+`typescript` line), `pnpm lint` (236 files, 0 errors/0 warnings/0 hints),
+`pnpm test` (897/897, unchanged), `pnpm build` (711 pages, unchanged), all
+28 fast `check:*` scripts individually re-run and clean - every
+verification-ledger checker and `check:claims-hr` at the same counts as the
+hundred-and-ninety-fifth run, all unchanged - `pnpm audit` (no known
+vulnerabilities), and `pnpm dlx knip --no-config-hints` (the same two
+standing false positives: `scripts/test-preview-server.mjs`,
+`@cspell/dict-hr-hr`). Everything matched the documented baseline exactly.
+
+Did not re-run the five browser-based sweeps
+(`check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`/
+`check:html`) or a cold-start `pnpm test:e2e` this run - the
+hundred-and-ninety-fifth run refreshed both earlier the same day
+(2026-09-29), and no page markup, styling, or rendered content changed
+since (only `docs/ROADMAP.md` and this file), so that baseline stays
+current per the standing convention rather than needing another full
+~17-minute re-run for zero page-output changes.
+
+**Verification:** every command above; no code, content, or configuration
+changed this run beyond `docs/ROADMAP.md` and this file - a pure
+confirmation-and-investigation pass, not a fix.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open-backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
+unchanged. This run's own two fresh angles (ordinal words past "tenth", a
+wider descriptive-claim vocabulary sweep) came back negative/non-actionable
+- the next run needs its own new angle rather than repeating these or any
+prior run's own vocabulary greps.
+
+### Real 44px touch-target audit finds and fixes four site-wide violations (tournament filters, quiz controls, compare pickers); catches and fixes a `[hidden]` regression along the way - closed 2026-09-29 (hundred-and-ninety-eighth intensive run)
+
+With every `docs/ROADMAP.md` "Open backlog" item still either
+environment-blocked or awaiting human sign-off, and the last ~25 runs'
+`content/*.md` vocabulary greps having flattened to zero-to-one
+non-actionable hits per run, this run tried a structurally different
+angle: instead of grepping page *text*, it measured page *rendering* -
+specifically, the real on-screen size of every custom interactive control
+at this site's 360px phone design baseline, via a real headless-Chromium
+`page.locator(...).boundingBox()`, not read off the CSS.
+
+The trigger was `AGENTS.md`'s own "Mobile-first UI conventions" section,
+which states as a non-negotiable rule: "Interactive targets are at least
+44px in any touch-facing control." Grepping the e2e suite for an existing
+guard on this rule found exactly one: `tests/e2e/mobile.spec.ts`'s "every
+drawer control is at least a 44px tap target" test, scoped to
+`#site-menu`'s own links/search fields/toggle - the nav drawer only.
+Every other custom control on the site (anything outside the drawer) had
+never actually been measured against the rule that supposedly covers all
+of them.
+
+**Investigation.** Wrote a throwaway Playwright script (using the
+project's own `scripts/preview-daemon.mjs` helpers, the same
+`launchChromium`/`startPreviewDaemon` plumbing `check:reflow` and friends
+already use) to load a representative page for each remaining custom
+control family at a 360px viewport and print each one's real
+`boundingBox()`. Found four real, previously-unnoticed violations, none
+close to a rounding-error margin:
+
+- `TournamentTable.astro`'s `.filters select` (the five filters - winner/
+  year/host/team/sort - present on every competition's landing and
+  directory-style pages, both languages, since this is a single shared
+  component): **~39.0px** tall. `.filters__reset` measured 44.4px, already
+  passing.
+- `QuizCard.astro`/`QuizOrderCard.astro`'s shared `.quiz-card__check`
+  ("Check answer"/"Check order" buttons): **~42.8px**.
+- `quiz.astro`'s `#quiz-restart` button: **~42.8px** (and `hr/quiz.astro`
+  independently duplicates the same rule with the same violation - these
+  two files are separately-maintained templates, not one shared
+  component, matching the pattern `compare.astro`/`hr/compare.astro`
+  already established).
+- `QuizOrderCard.astro`'s `.quiz-order__rank` (the per-item rank `<select>`
+  in the "put these in order" quiz question type): **~30.0px**, the worst
+  of the four.
+- `compare.astro`/`compare-players.astro`'s shared `.compare__field
+  select` (the Team A/Team B and Player A/Player B pickers) and their
+  Croatian equivalents (`hr/compare.astro`/`hr/compare-players.astro`,
+  each independently duplicating the same rule): **~39.0px**. `#compare-swap`
+  measured 44.4px, already passing.
+
+**Fix.** Each violating rule got an explicit `min-height: 2.75rem` (44px;
+this site sets `box-sizing: border-box` globally in `src/styles/
+global.css`, so the padding already present doesn't need separate
+recalculation). Rebuilt and re-ran the same measurement script: every
+previously-short control now measures exactly 44.0px, and the two controls
+that already passed (`.filters__reset`, `#compare-swap`) were left
+untouched. Took two Playwright screenshots (the World Cup filter row, a
+revealed quiz "Check answer" button) to visually confirm text stayed
+vertically centered and nothing clipped - both looked correct.
+
+**A regression the first pass introduced and the full e2e suite caught.**
+To guarantee vertical/horizontal centering on the two quiz button rules,
+the first pass also added `display: inline-flex; align-items: center;
+justify-content: center;` alongside the `min-height`. `.quiz-card__check`
+ships `hidden` directly in its markup (`<button ... class="quiz-card__check"
+hidden disabled>` in both `QuizCard.astro` and `QuizOrderCard.astro`) until
+`QuizScript.astro` runs client-side to reveal it - and an author `display`
+rule at equal-or-higher specificity than the UA stylesheet's own `[hidden]
+{ display: none }` silently wins, un-hiding the button regardless of the
+`hidden` attribute. This is the *exact* pitfall `quiz.astro`'s own
+`.quiz__score[hidden] { display: none; }` rule already has a code comment
+warning about (added for the `#quiz-score` sticky bar), and the first pass
+missed applying the same guard to the button it was touching in the same
+file family.
+
+Ran the mandatory cold-start `pnpm test:e2e` before committing, per this
+project's own standing "never push CSS/markup changes without a full
+suite re-run" discipline, and it caught the bug directly rather than it
+shipping silently: 3 genuine failures, all in
+`tests/e2e/no-js-quiz-and-search.spec.ts` (`test.use({ javaScriptEnabled:
+false })`), each asserting `.quiz-card__check:visible` has count 0 with
+JavaScript off - now failing because the check button was visible
+(disabled, but visible) on every page load regardless of the `hidden`
+attribute. Fixed with the identical established pattern:
+`.quiz-card__check[hidden] { display: none; }` added right after each of
+the two `.quiz-card__check` rule blocks (mirroring `quiz.astro`'s own
+code comment). A second full cold-start `pnpm test:e2e` run confirmed the
+fix: 1030/1030 passed, and the three previously-failing tests now pass.
+`#quiz-restart` itself needed no such guard - unlike `.quiz-card__check`,
+it never carries `hidden` directly; its ancestor `#quiz-score` div does,
+so the parent's own `display: none` already hides it regardless of the
+button's own `display` value.
+
+**Permanent regression coverage.** Added seven new e2e tests (one per
+distinct rendering context, since several of these pages are literally
+separate template files rather than one shared component reused across
+languages):
+
+- `tests/e2e/mobile.spec.ts`, "World Cup page on a 360px phone" describe
+  block: "every filter control is at least a 44px tap target" - covers
+  `TournamentTable.astro`'s shared `.filters select`/`.filters__reset` for
+  every competition and both languages at once, since it's one component.
+- `tests/e2e/mobile.spec.ts`, "Quiz page" (English) and "Croatian quiz
+  page" describe blocks: "the check-answer, restart, and order-rank
+  controls are at least 44px tap targets" - one test per language, since
+  `quiz.astro`/`hr/quiz.astro` are separate files with independently
+  duplicated `#quiz-restart` CSS (the shared `QuizCard.astro`/
+  `QuizOrderCard.astro` components are covered by both).
+- `tests/e2e/mobile.spec.ts`, "Compare page" (English) and "Croatian
+  compare page" describe blocks, plus `tests/e2e/compare-players.spec.ts`'s
+  English and Croatian describe blocks (four tests total): "the picker
+  selects and swap button are at least 44px tap targets" - one per
+  page/language, matching how `compare.astro`/`compare-players.astro`/
+  `hr/compare.astro`/`hr/compare-players.astro` each independently
+  duplicate the same `.compare__field select` rule.
+
+Each test reads the real `getBoundingClientRect().height` of the relevant
+controls via `evaluateAll` and asserts every one is `>= 44`, the same
+assertion style the existing drawer test already used. The quiz tests
+work without any interaction because `QuizScript.astro` unhides
+`.quiz-card__check`/`#quiz-score` on script init (only `disabled` state
+depends on an answer being picked, not `hidden`), confirmed against
+`QuizScript.astro`'s own init block rather than assumed.
+
+**PDFs.** `TournamentTable.astro`, `compare.astro`, `compare-players.astro`,
+`hr/compare.astro` and `hr/compare-players.astro` all changed, so per
+`docs/ADDING_CONTENT.md`'s standing rule, regenerated all 700 downloadable
+PDFs (`pnpm build:pdfs`) before committing. `check:pdfs`/`check:pdf-outline`
+both clean afterward (700/700 each).
+
+**Also this run:** `pnpm outdated` surfaced one new in-range patch release,
+`cspell` 10.3.5 -> 10.3.6 (installed); `typescript` remains the sole
+blocked line (`@astrojs/check@0.9.10`'s peer dependency still only allows
+`^5.0.0 || ^6.0.0`).
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the blocked `typescript` line after the cspell bump), `pnpm lint`
+(236 files, 0 errors/0 warnings/0 hints), `pnpm test` (897/897, unchanged -
+a pure CSS/e2e-test change touches no unit-testable logic), `pnpm build`
+(711 pages), all 29 fast `check:*` scripts individually clean, `pnpm audit`
+(no known vulnerabilities), `pnpm dlx knip --no-config-hints` (same two
+standing false positives), all five browser-based sweeps clean
+(`check:reflow`: 711/711 pages no overflow at 320px; `check:print-width`:
+711/711 no overflow at 1032px print width; `check:html`: 711/711 valid
+HTML5; `check:text-zoom`: 711/711 no overflow at 200% zoom;
+`check:lighthouse`: 39/39 sample pages >= 0.9 in every category, the one
+documented noindex/SEO exception aside), and two full cold-start `pnpm
+test:e2e` runs - the first surfaced the `[hidden]` regression (1027
+passed, 3 failed, 17.9 minutes), the second confirmed the complete fix
+(1030/1030 passed, 17.8 minutes, up from the prior 1023-test baseline with
+the seven new tests included).
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open-backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
+unchanged. The headline result worth flagging to the human operator: this
+run's "measure the real rendered page" angle found four genuine,
+previously-shipped accessibility violations across three separate features
+in one pass, after roughly the last 25 runs' `content/*.md` vocabulary
+greps had each come back negative or non-actionable - a clear signal that
+this project's remaining low-effort-high-value angle isn't more text
+scanning, it's auditing other rendered-page properties the existing
+browser sweeps don't already cover end-to-end (e.g. `forced-colors`/color-
+contrast across every interactive *state* - hover, focus, disabled, active
+listbox option - site-wide, not just `check:lighthouse`'s 39-page sample).
+Worth trying that class of angle first on the next run before returning to
+vocabulary sweeps.
+
+### A dynamically-injected `<li>` never carries its component's Astro scope hash, so its scoped CSS silently never applied - found in the search-widget highlight, then confirmed systemic in `/compare`/`/compare-players`'s own dynamic lists - closed 2026-09-29 (hundred-and-ninety-ninth intensive run)
+
+Followed the hundred-and-ninety-eighth run's own named next angle:
+forced-colors/color-contrast coverage of
+interactive *states* (hover, focus, disabled, active listbox option)
+site-wide, not just `check:lighthouse`'s 39-page sample. `AGENTS.md`'s own
+mobile-first conventions single out "active listbox options" by name as a
+case that must not signal state by colour alone, and Nav.astro's
+`.team-search__listbox li.is-active` rule already carried a `forced-colors:
+active` outline specifically for that reason - but nothing had ever actually
+opened the "find a team"/"find a player" search widget's listbox under
+`forcedColors: 'active'` (or, it turned out, under any condition at all) and
+read its real computed style. Every prior forced-colors/prefers-contrast/
+axe sweep only ever `page.goto()`s each path with every combobox closed, so
+the `.is-active` state had never once existed in the DOM during any of
+those tests.
+
+**The bug.** Writing that test (`tests/e2e/accessibility-forced-colors.spec.ts`)
+found something bigger than a missing test. Opening the widget, typing a
+query, and reading `getComputedStyle()` on the auto-activated first result
+showed `background-color: rgba(0, 0, 0, 0)` and the plain body text color -
+not the intended `color-mix(in srgb, var(--accent) 16%, transparent)`
+background/`var(--accent)` text - in ordinary rendering, before forced-colors
+was even emulated. The forced-colors outline was equally absent:
+`outline-style: none`, `outline-width: 0px`, even though
+`window.matchMedia('(forced-colors: active)').matches` read `true` and the
+element's `class="is-active"`/`aria-selected="true"` were both correctly
+set. The highlight has never rendered, in any color scheme, in any browser,
+since this widget shipped - a real, previously-unnoticed UX regression for
+any sighted keyboard user relying on the highlight to see which option
+Enter would pick (screen-reader users were unaffected: `aria-activedescendant`/
+`aria-selected` are set correctly regardless, which is also exactly why
+`check:link-names`/every axe sweep never flagged it - an unhighlighted-but-
+still-correctly-labelled option is not a WCAG violation).
+
+**Root cause**, confirmed against the compiled CSS in `dist/`, not just
+theorized: Astro scopes a component's `<style>` block by adding a
+`data-astro-cid-<hash>` attribute to every element the compiler sees in the
+component's own template, and rewriting every simple selector in a scoped
+rule to require that same attribute (`.team-search__listbox li.is-active`
+compiles to `.team-search__listbox[data-astro-cid-wpvy4v7s]
+li[data-astro-cid-wpvy4v7s].is-active`). The listbox's `<ul>` is part of
+Nav.astro's static template, so it gets the attribute - but every `<li>`
+inside it is created at runtime by `initSearchWidget()`'s `listbox.innerHTML
+= matches.map((team) => \`<li role="option" ...>...\`).join('')` (Nav.astro,
+`is:inline` script), entirely outside Astro's compiler, so it never gets
+tagged. The compiled selector's `li[data-astro-cid-wpvy4v7s]` clause then
+can never match, and the *entire* rule block silently no-ops: not just the
+`.is-active` highlight and its forced-colors outline, but the plain `li`
+rule's padding, border-radius and pointer cursor too - every option in both
+search widgets has rendered with zero of its intended styling, forever.
+
+**The same root cause, confirmed systemic, not isolated.** Before treating
+this as a one-off widget bug, checked every other place in `src/` that
+builds DOM via `innerHTML` for the same pattern (a scoped selector targeting
+runtime-injected markup): `grep -rl innerHTML src/components src/pages
+src/layouts` found exactly two other call sites, both in `/compare` and
+`/compare-players` (English and Croatian - four files total).
+`renderFinalsMeetings()` (`compare.astro`/`hr/compare.astro`) and
+`renderSharedYears()` (`compare-players.astro`/`hr/compare-players.astro`)
+each replace their container's *entire* `innerHTML`, including the `<ol
+class="finals-meetings__list">`/`<ol class="shared-years__list">` element
+itself, not just its `<li>`s, whenever the reader picks a new team/player
+pair. Confirmed live with a direct `getComputedStyle()` read after loading
+`/compare?a=brazil&b=argentina` (a pair with a real recorded meeting, so the
+list actually renders instead of the "haven't met" empty state): `display:
+block`, `list-style-type: decimal` - the intended `display: flex`/`list-
+style: none` card layout (`.finals-meetings__list`/`.finals-meetings__list
+li`: flex column, gap, no bullets; each item a bordered/background card)
+had never applied either, for exactly the same reason - and, critically,
+this path is reachable through the page's own shareable `?a=/&b=` URL
+parameters (`AGENTS.md` rule 9: "make all filters shareable through URL
+query parameters"), so any reader who followed a shared comparison link, not
+just one who used the picker, saw the broken bulleted layout. Repeated the
+same live check for `/compare-players?a=Zinedine+Zidane&b=Davor+%C5%A0uker`
+(a pair with a real shared year, from `tests/e2e/compare-players.spec.ts`'s
+own existing fixture) and both Croatian pages - all four showed the
+identical `block`/`decimal` break.
+
+**Fix**, the same shape in all five rule locations: wrap the part of each
+selector that targets runtime-injected markup in Astro's own `:global()`
+escape hatch - the same cross-scope-boundary tool this exact file
+(Nav.astro) already uses for `.site-menu.is-open :global(#theme-toggle)`
+(reaching into `ThemeToggle.astro`'s own separately-scoped root element).
+`.team-search__listbox li` -> `.team-search__listbox :global(li)` (the `<ul>`
+stays scoped - it's static; only its dynamically-injected children need the
+escape). `.finals-meetings__list`/`.finals-meetings__list li` -> fully
+`:global(.finals-meetings__list)`/`:global(.finals-meetings__list li)` in
+both `compare.astro` and `hr/compare.astro` (here the `<ol>` itself is also
+replaced, so both selector segments need it), and the identical treatment
+for `:global(.shared-years__list)`/`:global(.shared-years__list li)` in both
+`compare-players.astro` and `hr/compare-players.astro`. Rebuilt and
+re-confirmed every one of the five live `getComputedStyle()` checks above
+now reads its intended value (`background-color` a real accent tint, forced-
+colors outline `1px solid CanvasText`, `display: flex`, `list-style-type:
+none` - all four `/compare`/`/compare-players` pages), and re-inspected
+`dist/`'s compiled CSS directly to confirm the `li`/`.finals-meetings__list`/
+`.shared-years__list` selectors no longer carry a `data-astro-cid-*`
+requirement.
+
+**Why 198 prior runs' automated sweeps never caught this.** Both bugs are
+invisible to every check this project already runs automatically: axe-core's
+WCAG rules don't have a "does this state look visually distinct" check (the
+`aria-selected`/`aria-activedescendant` wiring was always correct, so
+`region`/`color-contrast`/structure rules had nothing to flag on an
+unhighlighted-but-correctly-labelled option or an unstyled-but-still-
+semantically-valid `<ol>`), `check:reflow`/`check:print-width`/`check:text-
+zoom` only check for horizontal overflow, and `check:lighthouse`'s
+performance/SEO/best-practices categories don't inspect list styling either.
+Even `tests/e2e/team-search.spec.ts`/`player-search.spec.ts`'s own "open
+listbox... has no WCAG violations" tests and `tests/e2e/
+compare-players.spec.ts`'s own team-pair-re-selection test all already
+exercise the exact broken code path - they just never read `getComputedStyle()`
+on the result, only text content and ARIA attributes. This is the same class
+of gap the hundred-and-ninety-eighth run's own "measure the real rendered
+page" finding already flagged: functional/ARIA correctness has been tested
+thoroughly; the actual computed visual presentation of dynamically-rendered
+content had a hole no prior run's angle happened to probe.
+
+**Permanent regression coverage.** Extended
+`tests/e2e/accessibility-forced-colors.spec.ts` with two new targeted tests
+(team-search/player-search auto-active option): each opens the widget,
+asserts a real non-transparent background at baseline, then emulates
+forced-colors and asserts a real outline, then runs the same full WCAG axe
+sweep every other test in this file runs. Added a new file,
+`tests/e2e/dynamic-list-styling.spec.ts` (4 tests: `/compare` English/
+Croatian, `/compare-players` English/Croatian), asserting the list and its
+first item resolve to `display: flex` and `list-style-type: none` after
+loading a pair known to have a real meeting/shared year via the page's own
+shareable URL parameters - closing the specific gap
+(`accessibility-compare-states.spec.ts` re-selects a pair but only runs axe;
+`compare-players.spec.ts` re-selects a pair but only checks text content)
+that let this ship unnoticed.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean, no new outdated
+packages beyond the standing blocked `typescript` line), `pnpm lint` (237
+files, up from 236 - the new spec file - 0 errors/0 warnings/0 hints), `pnpm
+test` (897/897, unchanged - pure CSS/e2e, no unit-testable logic touched),
+`pnpm build` (711 pages), all 29 fast `check:*` scripts individually clean,
+`pnpm audit` (no known vulnerabilities), `pnpm dlx knip --no-config-hints`
+(same two standing false positives). Assumed at first that
+`check:pdfs`/`check:pdf-outline` needed no PDF regeneration, reasoning that
+Nav.astro's `.site-header` and every changed compare-page selector are
+already covered by `global.css`'s print-media rules (`.site-header,
+.site-footer, ..., .no-print { display: none !important }` for the header;
+the compare pages' own `@media print` sections already reset list styling
+for print) and so can't affect the printed page - **wrong**:
+`check-pdf-freshness.mjs` hashes each PDF's *source file* to decide
+staleness, not its rendered print output, so touching `compare.astro`/
+`compare-players.astro`/their Croatian equivalents at all marks their PDFs
+stale regardless of whether the specific change is print-visible (this run's
+own reasoning conflated "doesn't change the printed page" with "doesn't
+need a PDF rebuild" - only the former was true). CI's required `check:pdfs`
+gate on this PR caught the mistake directly; a same-day follow-up commit
+(`cb5420b81`, from a separate PR-monitoring session responding to the CI
+failure) regenerated all 700 PDFs and confirmed both PDF checks clean. Local
+`pnpm build && pnpm check:pdfs` re-confirmed clean after rebasing onto that
+fix. `check:reflow`/`check:print-width`/`check:text-zoom`/`check:html`
+each individually re-confirmed clean (711/711) after the fixes, and every
+specific test file this run added or touched
+(`accessibility-forced-colors.spec.ts`, the new
+`dynamic-list-styling.spec.ts`, `team-search.spec.ts`/`player-search.spec.ts`,
+`accessibility.spec.ts`, `accessibility-prefers-contrast.spec.ts`) was run
+directly and passed in full. Since Nav.astro renders on all 711 pages, this
+also warranted this project's standing "full cold-start `pnpm test:e2e`
+before committing a page-output change" discipline: a full cold-start run
+(redirected straight to a log file rather than through `tail`, after a first
+attempt's `| tail -80` truncated the summary line and made a clean pass look
+like a handful of results) confirmed **1036/1036 passed** in 20.1 minutes -
+exactly the hundred-and-ninety-eighth run's 1030-test baseline plus this
+run's own 6 new tests, zero failures. `check:lighthouse` re-run cleanly on
+its own afterward (its first attempt, run concurrently with the first e2e
+attempt, crashed on a null category score - resource contention between two
+simultaneous full-site Chromium sweeps, not a real regression): 39/39 pages
+>= 0.9 in every category, the one documented noindex/SEO exception aside,
+no actionable back/forward-cache blockers. `check:reflow` also re-confirmed
+711/711 clean on its own once nothing else was competing for the preview
+server.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open-backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
+unchanged. The pattern worth flagging to the human operator: two
+independent, previously-unnoticed rendering bugs in one run, both caused by
+the identical "Astro scope hash never reaches runtime-`innerHTML`-injected
+markup" root cause, found by actually reading `getComputedStyle()` on
+dynamically-rendered content rather than trusting ARIA/text-content
+assertions or an automated accessibility-tree audit. `grep -rl innerHTML
+src/components src/pages src/layouts` found only the three call sites this
+run already covers (Nav.astro, compare.astro/hr, compare-players.astro/hr) -
+no fourth instance was missed - but any *future* client-side `innerHTML`
+render in this codebase should get the same `:global()` treatment
+proactively, or better, avoid a scoped selector for dynamically-injected
+markup entirely.
+
+### The hundred-and-ninety-ninth run's own `grep -rl innerHTML` sweep missed a fourth instance of the same bug, reached via `createElement`/`appendChild` instead - closed 2026-09-30 (two-hundredth intensive run)
+
+The hundred-and-ninety-ninth run's own closing note flagged the fix pattern
+("a dynamically-injected element never carries its component's Astro scope
+hash, so a plain scoped CSS selector targeting it silently never matches")
+as worth checking for proactively in any *future* client-side render, and
+was confident its own `grep -rl innerHTML src/components src/pages
+src/layouts` had found every existing instance. That grep was too narrow: it
+only matched literal `.innerHTML =` assignments, so it never looked at
+`document.createElement()`/`appendChild()`-based DOM construction, a
+different API doing the exact same thing. A broader sweep this run
+(`grep -rn "createElement|insertAdjacentHTML|cloneNode|appendChild"
+src/`) found four more call sites beyond the three the prior run already
+covers: two in `TournamentTable.astro`/`Nav.astro` that only *move*
+already-rendered, already-scoped DOM nodes (a sort re-ordering existing
+`<tr>`s, the desktop "More" menu re-parenting existing `<li>`s) - not a
+match for this bug, since those elements were never re-created - and five in
+`OnThisDay.astro`, the home page's "On this day in football history" widget
+(shared by both languages), which *does* match: its inline script always
+rebuilds `#on-this-day-list`'s `<li>` cards from scratch via
+`document.createElement()`/`appendChild()`.
+
+**Read the code before assuming this is the same low-severity bug the prior
+run fixed.** The three finals-meetings/shared-years/search-listbox bugs the
+hundred-and-ninety-ninth run fixed only actually triggered on a comparatively
+rare path (an active-option keyboard highlight, or a compare page loaded via
+its own shareable URL params / re-picked pair). Reading `OnThisDay.astro`'s
+inline script closely matters here: it has no conditional guarding the
+rebuild - it doesn't check whether the visitor's real "today" actually
+differs from the page's build-time date before tearing down and
+reconstructing the list. It runs unconditionally on *every single page
+load* with JavaScript enabled, on the site's most-visited page (the home
+page, both languages). That makes this instance of the bug the most
+severely and most frequently triggered of the four found so far - not an
+edge case, the default state for nearly every real visit.
+
+**Reproduced live before fixing, per this project's own standing discipline.**
+Built the site (`pnpm build`), started `astro preview`, loaded the home page
+in headless Chromium, and read `getComputedStyle()` on the first
+`#on-this-day-list` `<li>` after the inline script ran: `padding: 0px`,
+`background-color: rgba(0, 0, 0, 0)`, `border: 0px none`, `border-radius:
+0px`, and no `data-astro-cid-*` attribute on the element - exactly the
+predicted failure, not assumed from reading the CSS alone. Fixed with the
+same established pattern `compare.astro`/`compare-players.astro` already use:
+wrapped the `.on-this-day__list li` rule in `:global(...)` (the list's own
+`<ul>` element is never replaced, only its children, so `.on-this-day__list`
+itself needed no change). Re-ran the same live check after rebuilding:
+`padding: 12px 14.4px`, `background-color: rgb(238, 241, 245)`, `border: 1px
+solid rgb(215, 221, 229)`, `border-radius: 9.6px` - the intended card
+styling, confirmed restored.
+
+**Permanent regression coverage, verified both directions.** Added two new
+tests to `tests/e2e/mobile.spec.ts` (English and Croatian home page, right
+next to the existing clock-mocked "On this day" tests), each loading the
+home page and asserting the first rendered card's `getComputedStyle()`
+padding is not `0px` and its background is not `rgba(0, 0, 0, 0)`. Before
+committing, reverted the component fix alone (`git stash push -- src/
+components/OnThisDay.astro`), rebuilt, and confirmed both new tests fail
+with exactly the predicted `0px`/`rgba(0, 0, 0, 0)` values; restored the fix,
+rebuilt again, and confirmed both pass, alongside the full existing
+"On this day" test group (8 tests total, both languages) - the same
+revert-and-reconfirm discipline used to validate a regression test actually
+tests the regression, not just that it passes once.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the already-documented blocked `typescript` line), `pnpm lint` (237
+files, 0 errors/0 warnings/0 hints - unchanged file count, only existing
+files touched), `pnpm test` (897/897, unchanged - pure CSS/e2e, no
+unit-testable logic touched), `pnpm test:coverage` (99.91%/99.31%,
+unchanged), `pnpm build` (711 pages), all 29 fast `check:*` scripts
+individually re-run and clean, `pnpm audit` (no known vulnerabilities),
+`pnpm dlx knip --no-config-hints` (same two standing false positives).
+`check:pdfs`/`check:pdf-outline` needed no regeneration and stayed clean
+without one - unlike the hundred-and-ninety-ninth run's own compare-page fix,
+`OnThisDay.astro` renders on the home page only, and the home page has no
+downloadable PDF at all (confirmed against `public/downloads/`'s file list),
+so there is no PDF source file for this change to make stale. A full
+cold-start `pnpm test:e2e` was run before committing, per this project's
+standing discipline for any change to real page output, and confirmed clean:
+**1038/1038 passed in 24.7 minutes** (up from the hundred-and-ninety-ninth
+run's 1036-test baseline, plus this run's own 2 new tests - zero failures).
+CI also confirmed green on the pushed commit (`test`/`open-pr` both
+succeeded on `84a28d53a`).
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+This run's own angle (auditing every *other* client-side DOM-construction API
+- `createElement`/`insertAdjacentHTML`/`cloneNode`/`appendChild`, not just
+`.innerHTML =` - for the same `data-astro-cid-*` scoping gap) is now
+exhausted site-wide: every call site in `src/` has been read and classified,
+and none remain unaccounted for. The meta-lesson for whoever picks up this
+thread: a grep scoped to one specific API name (`innerHTML`) can miss a
+different API doing the identical thing, even in the very next run written
+specifically to close that bug class - when auditing "every instance of X",
+grep for the underlying *behavior* (DOM nodes created and inserted at
+runtime) rather than the first API spelling that comes to mind.
+
+### A landscape-phone (667x375) viewport band - mid-width, short-height - had zero coverage across every check script and e2e test in the repo; added a full-site overflow sweep and closed a real drawer-reachability test gap - closed 2026-09-30 (two-hundred-and-first intensive run)
+
+The two-hundredth run's own closing note suggested "returning to a 'measure
+the real rendered page' idea not yet tried" as the next fork, rather than
+another `content/*.md` vocabulary grep. Surveyed every viewport size tested
+anywhere in this repo - every `check:*` browser sweep's own hardcoded
+viewport, every hand-written `page.setViewportSize()` across `tests/e2e/`,
+and `playwright.config.ts`'s own project default - before picking a new
+angle, rather than guessing one. The result: every viewport tested anywhere
+is either <=410px wide (portrait phones: 320, 360, 410) or >=1000px wide
+(tablet/desktop: 1000, 1024, 1280), and every single one is >=740px tall.
+Nothing exercises the 34rem-60rem (544px-960px) width band this site's own
+media queries switch layouts across (`Nav.astro`'s 60rem desktop-nav
+breakpoint, the many `min-width: 34rem` rules across `src/`), and nothing
+shorter than 740px tall - a real, ordinary way a phone is actually held
+(landscape) had never once been simulated.
+
+**Confirmed the gap mattered before building anything, with a live probe.**
+A throwaway script loaded the home page at a real, common landscape-phone
+size (667x375 - an iPhone SE/8 rotated, chosen as wide enough to clear the
+34rem breakpoint band and narrow enough to stay below the 60rem desktop-nav
+one) and read the mobile nav drawer's (`#site-menu`) real `scrollHeight`/
+`clientHeight` after opening it: 649px vs. ~313px - a genuine overflow.
+Every existing e2e test's viewport (360x740, 1024x800, 1280x800, etc.) has a
+drawer `max-height` (`calc(100dvh - var(--site-header-height))`, ~684px at
+360x740) that comfortably exceeds the drawer's real content height, so the
+`overflow-y: auto` fix `Nav.astro`'s own CSS comment documents - closing a
+real past bug where the drawer's content, once taller than its own
+max-height, could silently strand the theme-toggle button (last in DOM
+order) off-screen - has never actually been exercised by any test in this
+repository. It was working code with zero regression coverage, not a
+currently-broken feature.
+
+**Built two permanent guards.**
+
+1. `scripts/check-landscape-viewport.mjs` (`pnpm check:landscape`, not wired
+   into CI - same "too slow for a required gate" reasoning as
+   `check:reflow`/`check:lighthouse`): the same full-site horizontal-overflow
+   sweep `check-reflow.mjs` already runs at 320px, but at 667x375. Reuses
+   `check-reflow.mjs`'s own `htmlFileToPagePath`/`isRedirectStubHtml`/
+   `pagesOverflowing` helpers (already unit-tested in
+   `tests/unit/checkReflow.test.ts`) rather than duplicating them - only the
+   viewport and console labeling differ. Swept all 711 pages: zero overflow
+   regressions. A clean pass is still worth a permanent script here, the same
+   "build the check even when it finds nothing yet" reasoning
+   `check-record-claims.mjs`'s own doc comment already gives - the untested
+   *viewport band* was the actual gap being closed, not a suspected specific
+   page.
+2. Four new tests in `tests/e2e/mobile.spec.ts` (English + Croatian home
+   page, two assertions each, all at 667x375): one confirms `#site-menu`
+   genuinely needs to scroll at this viewport (so the suite can't quietly go
+   vacuous if the drawer's content ever shrinks below its max-height in the
+   future); the other drives a real keyboard Tab walk through every control
+   in the open drawer and asserts each one stays within the drawer's visible
+   bounds as focus moves onto it, including the theme toggle specifically
+   (the control the original bug this fix guards against actually stranded).
+
+**Verifying the new tests catch a real regression took three attempts, and
+the failures along the way are the more useful finding.** Per this project's
+own standing "prove a regression test actually fails against the bug"
+discipline: first tried swapping `overflow-y: auto` for `overflow-y: hidden`
+on `.site-header--js .site-menu.is-open` - all four new tests still passed.
+Then tried reverting `flex-wrap: nowrap` back to `wrap` (the layout property
+that rule's own comment blames for the original bug, not `overflow-y` itself)
+- still passed. Investigated why with a second throwaway probe rather than
+guessing: Chromium's native focus-scroll algorithm (the browser's own
+"scroll the newly-focused element into view" behavior on Tab) silently
+scrolls an `overflow: hidden` container anyway - that CSS value only blocks
+*user*-initiated scrolling (wheel, touch-drag, dragging a scrollbar that
+isn't rendered), not programmatic or focus-driven scrolling, a genuine
+browser quirk worth knowing about rather than assuming from the name
+"hidden". Reverting `flex-wrap` alone, separately, happened to repack the drawer's
+stacked content into a shorter two-column layout (measured: scrollHeight
+dropped to 425px, and the wider box's forced `overflow-x: auto` kept the
+second column reachable rather than stranded) - a different layout, not a
+broken one, so nothing to catch. Only `overflow-y: clip` (which genuinely blocks *all*
+scrolling, including programmatic) made the keyboard-reachability test fail
+as predicted, in both languages, while the "needs to scroll" test kept
+passing throughout (correctly - `scrollHeight > clientHeight` is unaffected
+by which `overflow-y` value is set, so that test's own job is only to prove
+the scenario isn't vacuous, not to test the scroll mechanism). Restored the
+correct code (`git checkout -- src/components/Nav.astro`) and reconfirmed
+all four tests pass again before committing. No `src/` file is actually
+changed in this run's final commit - only the two new tooling/test files -
+but the investigation is worth recording for whoever next needs to reason
+about this drawer's scroll behavior, or writes a focus-visibility test
+elsewhere in this codebase and assumes `overflow: hidden` means
+"unreachable".
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the already-documented blocked `typescript` line - `@astrojs/check@
+latest`'s peer dependency still caps at `^5.0.0 || ^6.0.0`, re-confirmed via
+`npm view`), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(897/897, unchanged - no unit-testable logic touched), `pnpm test:coverage`
+(99.91%/99.31%, unchanged), `pnpm build` (711 pages), `pnpm check:landscape`
+(new script, 711/711 pages clean), `pnpm audit` (no known vulnerabilities),
+`pnpm dlx knip --no-config-hints` (same two standing false positives -
+`scripts/check-landscape-viewport.mjs` is referenced from `package.json`'s
+new `check:landscape` script, so knip does not flag it as unused). The final
+diff touches no `src/` file (the Nav.astro edits used to prove the new tests
+against a real regression, above, were reverted before committing), so this
+run ran its own 4 new tests directly with Playwright - against the correct
+code, and again against each of the three deliberately-broken states above -
+rather than a full cold-start `pnpm test:e2e`, matching this project's own
+established practice for a change that adds tooling/tests without touching
+page output (e.g. the hundred-and-seventy-second run's own
+`check:superlative-claims`, which likewise skipped a full suite run). All 4
+new tests passed against the correct code; a full cold-start run remains due
+whenever a future run next touches `src/` itself.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+This run's own angle (a systematic survey of every viewport size tested
+anywhere in the repo, looking for an untested band rather than guessing one)
+is closed for the one genuine gap the survey found. No other untested
+viewport combination stood out while reading through every `check:*` script
+and every `tests/e2e/*.ts` file's own viewport calls to build that survey -
+whoever picks up this thread next should look for a different dimension
+entirely (an interaction pattern, a data-claim vocabulary, a dependency
+bump) rather than re-running the same viewport survey against an
+already-exhausted list.
+
+### A JSON-LD breadcrumb/self-referential `url` value was never checked for reachability by any script, despite `check-internal-links.mjs`'s own header comment claiming it was - closed 2026-09-30 (two-hundred-and-second intensive run)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, took a structural angle rather than another `content/*.md`
+vocabulary grep: read each existing `check:*` script's own header comment
+against what it actually implements, rather than assuming a script's
+documented scope and its real behavior always agree. `check-internal-
+links.mjs`'s own comment claimed "canonical/hreflang tags, JSON-LD urls"
+were all covered by its href/src-attribute crawl - true for canonical/
+hreflang (both are `<link href="...">` HTML attributes its regex already
+matches), but false for JSON-LD: a `url`/`item` value there is a JSON string
+inside a `<script type="application/ld+json">` tag's text content, never an
+HTML attribute, so the `href`/`src` regex never saw it. The other script
+that touches JSON-LD, `check-jsonld.mjs`, only validates structure (a real
+`@context`/`@type`, sequential `position`s, every url absolute and under
+this site's own origin) - never that the url actually resolves to a real
+page. So a stale or mistyped breadcrumb `item` URL (e.g. a copy-pasted
+edition year) would 404 for a search engine or structured-data consumer,
+silently and permanently - nothing on this site would have caught it.
+
+**Confirmed the gap was real before building anything.** A throwaway probe
+extracted every `url`/`item` string from every built page's JSON-LD blocks
+and checked each against the real `dist/` output using the same
+`classifyLink`/`candidateDistPaths` resolution `check-internal-links.mjs`
+already uses for plain hrefs: 3,176 values across all 715 built HTML files
+(711 pages plus 4 redirect stubs), every one resolving today - a clean pass,
+the same "close the gap even though nothing's broken yet" reasoning every
+other `check:*` addition's own first clean run has already documented
+(`check:locale-consistency`, `check:landscape`, etc.).
+
+**Closed it in the natural place, not a new script.** Extended
+`check-internal-links.mjs` itself - it already owns "does this internal
+reference resolve to a real file", it just needed a second source of
+references - with `extractJsonLdLinks()`, which walks every parsed JSON-LD
+block for a `url`/`item` key at any depth. `item` is sometimes itself a
+nested `Thing` object with no url of its own (an ItemList champion/award/
+rivalry entry, per `src/lib/jsonLd.ts`) rather than a URL string; walking
+into the object form correctly finds nothing to add there, not a bug -
+verified by reading every `buildXItemList()` function in `jsonLd.ts` to
+confirm `item` is a bare URL string only for `buildBreadcrumbList()`, never
+elsewhere. The extracted urls flow through the exact same
+`classifyLink`/`candidateDistPaths` resolution every plain `href`/`src` link
+already goes through, deduplicated against the page's own attribute-based
+links before checking.
+
+**Verified the new coverage actually catches a regression, per this
+project's own standing discipline for a new check.** Hand-edited a built
+page's (`/records`) breadcrumb JSON-LD to point at a nonexistent slug and
+re-ran `pnpm check:links`: failed immediately, naming exactly that broken
+URL and page. Reverted the hand-edit and rebuilt clean from source; `pnpm
+check:links` passed again. Added 5 new unit tests to
+`tests/unit/checkInternalLinks.test.ts`: extracting a breadcrumb `item` plus
+an ItemList's own self-referential `url`, the nested-Thing-with-no-url case
+(confirming it correctly extracts nothing), cross-block deduplication,
+resilience against a malformed JSON-LD block (skipped, not thrown on - that
+class of error is `check-jsonld.mjs`'s job), and the no-JSON-LD-at-all empty
+case.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+(only the already-documented blocked `typescript` line), `pnpm lint` (238
+files, 0 errors/0 warnings/0 hints), `pnpm test` (902/902, up from 897),
+`pnpm test:coverage` (99.91%/99.31%, unchanged - the new function is fully
+exercised by its own unit tests, no new uncovered lines), `pnpm build` (711
+pages), `pnpm check:links` (715 pages checked, clean - and separately
+confirmed catching a deliberately-reintroduced broken JSON-LD url before
+being reverted, as described above), `pnpm check:jsonld` (unchanged: 1783
+JSON-LD blocks across 711 pages, all structurally valid, confirming this
+run's addition is genuinely additive rather than a duplicate of what that
+script already checks), all other 27 fast `check:*` scripts individually
+clean, `pnpm audit` (no known vulnerabilities), `pnpm dlx knip
+--no-config-hints` (same two standing false positives as ever). Browser
+sweeps and a full cold-start `pnpm test:e2e` not re-run - this change
+touches only a build-time verification script and its own unit tests, no
+page markup, styling or rendered content, matching this project's
+established practice for that class of change (e.g. the
+hundred-and-seventy-second run's `check:superlative-claims`, the
+two-hundred-and-first run's own `check:landscape`).
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+This run's own angle (auditing each `check:*` script's documented scope
+against what it actually implements) found one real, previously-open gap
+and closed it. `check-jsonld.mjs`'s own header comment was re-read and found
+accurate on inspection this run (it never claims to check reachability, so
+there was no gap to close there) - the remaining ~30 `check:*` scripts
+haven't all been re-read this way yet, and are worth trying before returning
+to another content-vocabulary sweep.
+
+### Dependency bump (`vitest`/`@vitest/coverage-v8` 5.0.2 -> 5.0.3) plus a continued documentation-vs-implementation audit, both negative/routine; full standing health check - closed 2026-09-30 (two-hundred-and-third intensive run)
+
+With every open backlog item still either environment-blocked or awaiting
+human sign-off, `pnpm outdated` surfaced one new in-range patch release
+beyond the already-documented blocked `typescript` line: `vitest`/
+`@vitest/coverage-v8` 5.0.2 -> 5.0.3. `@vitest/coverage-v8` is pinned to an
+exact version in `package.json` (no `^`), so `pnpm update vitest
+@vitest/coverage-v8` alone bumped `vitest` but left the pinned sibling
+untouched - the same "pinned exact version needs a manual `package.json`
+edit" pattern the hundred-and-eighty-ninth run's own `sharp` bump already
+hit. Edited `package.json` by hand and re-ran `pnpm install`; both packages
+now resolve to 5.0.3 and their peer-dependency warning (each unmet against
+the other mid-bump) cleared.
+
+Continued the two-hundred-and-second run's own suggested next angle -
+auditing each `check:*` script's documented scope (its own header comment)
+against what it actually implements, rather than assuming a script does
+everything its header claims - against four more scripts:
+`check-image-dimensions.mjs` (confirmed its documented three-part coverage -
+manifest icon sizes against real PNG dimensions, `og:image`/`twitter:image`
+against their real dimensions, and `og:image:alt`/`twitter:image:alt`
+presence - is all genuinely implemented, including the alt-text presence
+check its header describes, which a quick read could easily assume was
+aspirational given how much of that header is devoted to *why* each check
+matters rather than confirming it exists), and a full-body read of
+`check-link-names.mjs`, `check-locale-consistency.mjs` and
+`check-record-claims.mjs` against their own header comments (all three
+match; no gap found in any). Also swept every `scripts/*.mjs` and
+`src/**/*.{astro,ts}` file for a `TODO`/`FIXME`/`XXX` marker, on the theory
+that a script's author might have left an explicit note about a known gap
+rather than only describing scope in prose - zero hits site-wide, consistent
+with this project's own established discipline of closing a gap the run
+it's found rather than leaving a marker behind for later. Both angles
+genuine, if negative, results this run - no new checker gap found, unlike
+the two-hundred-and-second run's own JSON-LD-reachability find.
+
+With no new actionable lead, ran the full fast standing health check after
+the dependency bump: `pnpm install` (clean), `pnpm outdated` (only the
+blocked `typescript` line remains), `pnpm lint` (238 files, 0 errors/0
+warnings/0 hints), `pnpm test` (902/902 against the bumped `vitest`,
+unchanged pass count - a genuine confirmation the bump didn't silently
+change test-runner behavior, not an assumption), `pnpm test:coverage`
+(99.91%/99.31%, unchanged), `pnpm build` (711 pages), all 29 CI-gated fast
+`check:*` scripts individually re-run and clean, `pnpm audit` (no known
+vulnerabilities), `pnpm dlx knip --no-config-hints` (same two standing false
+positives as ever). Browser sweeps and a full cold-start `pnpm test:e2e` not
+re-run - `vitest` only runs this project's unit tests, never touches
+Playwright/e2e, and this run's change touches no `src/`/`tests/` file,
+matching this project's own established practice for that class of change.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+The documentation-vs-implementation audit angle is now four scripts further
+along (`check-image-dimensions`/`check-link-names`/`check-locale-consistency`/
+`check-record-claims` all confirmed accurate, on top of `check-jsonld`'s own
+re-read the prior run) with no new gap found since the two-hundred-and-second
+run's own JSON-LD find - worth continuing against the remaining unaudited
+scripts (`check-meta`/`check-pdf-outline`/`check-sitemap`/`check-since-claims`/
+`check-spelling-hr`/`check-superlative-claims`/`check-text-zoom`/
+`check-theme-flash`/`check-claims-hr`/`check-award-tallies` haven't been
+re-read this specific way yet) before returning to another
+content-vocabulary sweep.
+
+### Closed out the documentation-vs-implementation `check:*` audit (all ten remaining scripts confirmed accurate); full cold-start `test:e2e` + all five browser sweeps re-run clean after working around a container-specific Playwright browser-cache mismatch - closed 2026-09-30 (two-hundred-and-fourth intensive run)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, continued the two-hundred-and-second/-third runs' own
+documentation-vs-implementation audit - reading each `check:*` script's
+header comment against what it actually implements - against the ten
+scripts neither of those runs had reached yet: `check-meta.mjs`,
+`check-pdf-outline.mjs`, `check-sitemap.mjs`, `check-since-claims.mjs`,
+`check-spelling-hr.mjs`, `check-superlative-claims.mjs`,
+`check-text-zoom.mjs`, `check-theme-flash.mjs`, `check-claims-hr.mjs` and
+`check-award-tallies.mjs`. Read every one of the ten in full against its own
+header comment's claims, rather than sampling a few lines - the two-hundred-
+and-second run's own JSON-LD find came from exactly this kind of close read,
+not a skim.
+
+**Result: all ten confirmed accurate, no gap found.** Two specifics worth
+recording since they weren't obvious from the header comment alone and took
+an extra check to confirm rather than assume:
+
+- `check-sitemap.mjs`'s reverse pass ("every indexable built page has a
+  sitemap entry") doesn't special-case the four legacy `/awards/*` redirect
+  stubs the way `check-meta.mjs`/`check-theme-flash.mjs`/`check-spelling-
+  hr.mjs` explicitly do via `isRedirectStubHtml()`. Read the actual built
+  stub (`dist/awards/ballon-dor/index.html`) to confirm this isn't a gap:
+  Astro's own `redirects` config (`astro.config.mjs`) emits each stub with
+  both a `<meta name="robots" content="noindex">` tag and a `<link
+  rel="canonical">` pointing at the *destination* page, not itself - so
+  `check-sitemap.mjs`'s existing `if (head.noindex || !head.canonical)
+  continue` already skips every stub correctly, just via the `noindex`
+  branch rather than a dedicated stub check. Confirmed by building the site
+  and reading the four stub files directly rather than trusting the
+  script's silence on the subject.
+- `check-award-tallies.mjs`'s `CHECKS` array covers exactly four files
+  (`fifa-world-cup.md`, `uefa-euro.md`, `copa-america.md`, `ballon-dor.md`)
+  and its header comment never claims more - but confirmed this is a
+  deliberately complete set, not an oversight, by reading `golden-boot.md`'s
+  and `uefa-nations-league.md`'s own heading structure directly: neither
+  file has a second, hand-authored "titles by nation/player" tally table
+  alongside its source results table (golden-boot's per-competition top-
+  scorer tables have no repeat-winner tally at all; Nations League has only
+  three editions to date, too few for a meaningful tally table), so there is
+  nothing for a fifth/sixth `CHECKS` entry to audit.
+
+Combined with the two-hundred-and-third run's own four-script pass
+(`check-image-dimensions`/`check-link-names`/`check-locale-consistency`/
+`check-record-claims`) and the two-hundred-and-second run's own initial four
+(`check-jsonld` re-read plus its own JSON-LD-reachability fix), every
+`check:*` script in the repository has now had this specific "header
+comment vs. actual body" audit applied at least once. Only the two-hundred-
+and-second run's own JSON-LD-reachability gap ever turned up a real
+mismatch across all of them - a genuinely useful angle that has now run its
+course; a future run should try something else rather than repeating it
+against scripts already covered.
+
+Also re-confirmed both standing environment blockers rather than assuming
+their last-checked dates still held: `pnpm outdated` shows only the
+already-documented `typescript` 5.9.3 -> 7.0.2 line (no new
+`@astrojs/check` release), and `WebFetch` to `en.wikipedia.org` still
+returns `EGRESS_BLOCKED` from the proxy (2026-09-30) - the link-liveness
+sweep and the UEFA Nations League attendance/Best XI items remain genuinely
+blocked, not just stale.
+
+**Full standing health check**, since the audit itself found nothing to
+fix: `pnpm install --frozen-lockfile` (clean), `pnpm lint` (238 files,
+0 errors/0 warnings/0 hints), `pnpm test` (902/902), `pnpm test:coverage`
+(99.91%/99.31%, unchanged - the same four files' documented "defensively
+unreachable" branches as ever), `pnpm build` (711 pages), all 29 CI-gated
+fast `check:*` scripts individually re-run and clean, `pnpm audit` (no
+known vulnerabilities), `pnpm dlx knip --no-config-hints` (same two
+standing false positives).
+
+**The periodic full cold-start `pnpm test:e2e` + all five manual browser
+sweeps** (`check:reflow`/`check:landscape`/`check:text-zoom`/
+`check:print-width`/`check:lighthouse`) were four runs overdue - last run
+together at the two-hundredth run. The first attempt failed immediately and
+uniformly: every one of the six commands errored within seconds of
+launching Chromium with `browserType.launch: Executable doesn't exist at
+/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-
+linux64/chrome-headless-shell`. Diagnosed rather than assumed a real
+regression: `ls /opt/pw-browsers/` showed this session's own container only
+has Chromium/headless-shell cached at revision 1194 (plus a `chromium`
+symlink pointing at that revision's full, non-headless-shell binary), while
+the currently-pinned `@playwright/test` (1.63.0, confirmed via `pnpm
+install`'s own output) defaults its headless launch to revision 1243, which
+simply isn't present in this particular container's cache. Not a site bug
+or a code regression - a container-specific browser-cache/pinned-version
+mismatch, the exact scenario `scripts/preview-daemon.mjs`'s own
+`launchChromium()` already has a documented escape hatch for
+(`PW_EXECUTABLE_PATH`/`PW_CHROME_CHANNEL`, dating to the hundred-and-forty-
+eighth run's own preview-daemon extraction), and that `playwright.config.ts`'s
+`mobile-chromium` project already honors via the same two variables for
+`pnpm test:e2e` itself. Confirmed the fix empirically before trusting it:
+ran one narrow smoke test
+(`playwright test tests/e2e/mobile.spec.ts -g "no horizontal overflow"`)
+with `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` set - passed in 20.7s,
+confirming the full binary at the present revision launches cleanly.
+
+Re-ran the complete six-command sweep with `PW_EXECUTABLE_PATH` exported for
+the whole shell: **all clean, no regression across the four stale runs.**
+`pnpm test:e2e`: 1042/1042 passed (27.2m) - matches the two-hundred-and-first
+run's own count exactly (the run that last added e2e tests), confirming
+nothing broke in the interim. `check:reflow`: 711 pages, no horizontal
+overflow at 320px. `check:landscape`: 711 pages, no horizontal overflow at
+667x375. `check:text-zoom`: 711 pages, no horizontal overflow at 200% text
+zoom. `check:print-width`: 711 pages, no horizontal overflow in print media
+at 1032px. `check:lighthouse`: 39 pages, every category >= 0.90 (the one
+already-documented bounded noindex/SEO exception excluded as expected), no
+actionable back/forward-cache blockers.
+
+**No code change was made for the browser-cache mismatch itself.**
+`PW_EXECUTABLE_PATH` is deliberately an opt-in environment variable rather
+than a hardcoded sandbox path baked into `preview-daemon.mjs` or
+`playwright.config.ts` - hardcoding `/opt/pw-browsers/chromium` (a path
+specific to this one execution environment) into general project source
+would couple the repository to one sandbox's filesystem layout, the exact
+coupling the existing escape-hatch pattern was designed to avoid. Left as a
+one-off per-session environment note (this entry) rather than a repo
+change; a future run hitting the same error should reach for the same
+env var rather than re-diagnosing from scratch.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
+unchanged. The documentation-vs-implementation audit angle is now complete
+across every `check:*` script in the repository; worth trying a genuinely
+new angle next (another content-vocabulary sweep, or auditing a script
+added since this pass began) rather than repeating this one.
+
+### A "How it works" bullet on `content/ballon-dor.md` contradicted the page's own Winners table for every edition since 2022 - closed 2026-09-30 (two-hundred-and-fifth intensive run)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, and the two-hundred-and-fourth run's own documentation-vs-
+implementation `check:*` audit now complete across every script, picked a
+genuinely different angle from the last several dozen runs' claim-vocabulary
+greps: rather than searching `content/*.md` for a new trigger phrase (an
+ordinal, a superlative, a "since <year>" completeness claim, and so on),
+picked the content file with the least recent full front-to-back read and
+re-read it bullet by bullet end to end, cross-checking its own prose
+directly against its own tables - not just the specific claim shapes the
+seven verification-ledger checkers already pattern-match on.
+
+`content/ballon-dor.md` and `content/golden-boot.md` share the site's
+stalest `lastReviewed` date (2026-09-03), but Golden Boot (and UEFA Nations
+League) already got a dedicated full manual read as one of the hundred-and-
+eighty-eighth run's five fresh quality angles. Ballon d'Or's own last
+genuinely full content-accuracy pass predates that - the Winner/National-team
+independent cross-check (2026-08-07) and the Ceremony-date independent
+cross-check (2026-08-13); every touch since has been either a new table
+section addition (Kopa/Yashin/Gerd Müller/Johan Cruyff/Sócrates trophies, the
+2025 results) or a trigger-word grep for one of the seven verification-ledger
+claim shapes, none of which reads a bullet that doesn't happen to contain
+their specific vocabulary.
+
+**Read `content/ballon-dor.md` in full**, section by section, checking every
+prose claim against the tables it summarizes rather than only the ones a
+checker's regex would flag. The "Multiple winners through 2025" tally table
+was re-counted directly against the Winners table (Messi 8, Ronaldo 5, Cruyff/
+Platini/van Basten 3 each, Di Stéfano/Beckenbauer/Keegan/Rummenigge/Ronaldo 2
+each - all ten confirmed by counting the Winners table's own rows) and the
+five companion-trophy sections (Kopa/Yashin/Gerd Müller/Johan Cruyff/Sócrates)
+were checked for internal chronological consistency (repeat-winner claims,
+"first" claims, gap-year claims) - all correct, no discrepancy found in any
+of those.
+
+**Found one real, previously-unnoticed mismatch in the "How it works"
+section's closing bullet:** "The winner is announced at an end-of-year
+ceremony organized by France Football magazine" - true for every edition
+from 1956 through 2021, but directly contradicted by the same page's own
+Winners table for every edition since: **2022** (17 October), **2023** (30
+October), **2024** (28 October) and **2025** (22 September) were all
+announced in September/October, not at year's end. None of the seven
+verification-ledger checkers (`check:superlative-claims`/`check:ordinal-
+claims`/`check:record-claims`/`check:consecutive-claims`/`check:since-claims`/
+`check:one-of-only-claims`/`check:completeness-claims`) would ever have
+caught this - the bullet contains no ordinal, no "since <year>", no "the
+only", and no record/consecutive/completeness trigger word, so it was
+invisible to every trigger-word grep the last ~185 runs' own vocabulary
+sweeps have tried, English or Croatian. The Croatian translation
+(`src/pages/hr/competitions/ballon-dor.astro`'s "Kako funkcionira" section)
+carried the identical outdated claim ("Pobjednik se objavljuje na svečanosti
+krajem godine koju organizira magazin France Football."), confirming this
+wasn't a translation-only slip but a fact that had gone stale in both
+languages since the ceremony's own scheduling changed.
+
+Fixed both files. Deliberately did not fabricate a reason for the ceremony's
+autumn move (this environment has no working outbound network access to
+source one - see the "Open backlog" link-liveness item) - instead reworded
+the bullet to state only what the page's own, already independently-verified
+Ceremony date column already shows:
+
+- **English** (`content/ballon-dor.md`): "The winner is announced at a
+  ceremony organized by France Football magazine - held at year's end
+  through 2021, then moved to September/October from 2022 onward (see the
+  Ceremony date column above)."
+- **Croatian** (`src/pages/hr/competitions/ballon-dor.astro`): "Pobjednika
+  objavljuje magazin France Football na svečanosti - do 2021. održavanoj
+  krajem godine, a od 2022. premještenoj u rujan/listopad (vidi stupac Datum
+  svečanosti iznad)."
+
+Deliberately avoided the word "since" in the new English wording (despite
+"ceremony has moved to autumn since 2022" reading equally naturally) to
+avoid adding an unnecessary eighth `since-claims-ledger.json` entry for what
+is really just a cross-reference to a column already on the same page, not a
+new fact needing its own independent verification record - confirmed after
+the edit that `check:since-claims` still reports the same 26 claims,
+unchanged. Bumped `content/ballon-dor.md`'s `lastReviewed` front-matter date
+to 2026-09-30, the same convention every prior content-fact fix on this page
+has followed.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(902/902, unchanged - a pure prose/translation fix touches no unit-testable
+logic), `pnpm build` (711 pages, unchanged), all 27 relevant fast `check:*`
+scripts individually re-run and clean:
+`check:links`/`check:sitemap`/`check:precache`/`check:jsonld`/`check:heading-
+outline`/`check:theme-flash`/`check:reachability`/`check:meta`/`check:award-
+tallies`/`check:superlative-claims`/`check:ordinal-claims`/`check:record-
+claims`/`check:consecutive-claims`/`check:since-claims`/`check:one-of-only-
+claims`/`check:completeness-claims`/`check:edition-header-labels`/`check:i18n-
+notes`/`check:attendance-format`/`check:claims-hr`/`check:link-
+names`/`check:image-dimensions`/`check:locale-consistency`/`check:theme-
+color`/`check:spelling`/`check:spelling-hr`/`check:perf`. Two worth calling
+out specifically: `check:i18n-notes` (7 matched page pairs) still reports
+identical note-section structure and dash-clause parity for both languages -
+the rewritten bullet gained a trailing " - " dash-clause in *both* languages
+together, so parity held rather than newly appearing one-sided; and
+`check:claims-hr` still reports 205 claims, unchanged, confirming this edit
+added no new claim either checker needed to separately verify.
+
+Regenerated all 700 downloadable PDFs (`pnpm build && pnpm build:pdfs`, via
+the two-hundred-and-fourth run's own documented
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` container escape hatch for
+this session's Playwright browser-cache mismatch) since both
+`content/ballon-dor.md` and its Croatian page changed;
+`check:pdfs`/`check:pdf-outline` both clean (700/700) afterward. Browser
+sweeps and a cold-start `pnpm test:e2e` were not re-run - this change is
+pure prose/translation text with no markup, styling or interactive-behavior
+change, matching this project's own established practice for that class of
+change (e.g. the hundred-and-seventy-seventh/-eighth runs' own claim-text
+fixes); the two-hundred-and-fourth run's own full cold-start `pnpm test:e2e`
+(1042/1042) plus all five manual browser sweeps remain the current baseline.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+This run's own angle (a fresh front-to-back read of the content file with
+the least recent full read, cross-checking its prose against its own tables
+directly rather than only trigger-word-matched claims) found one real,
+previously-shipped mismatch after ~185 runs of vocabulary sweeps had
+returned nothing actionable on this exact page - worth trying the same
+angle against `content/copa-america.md`, `content/uefa-euro.md` or
+`content/fifa-world-cup.md` next, since none has had this specific
+table-cross-check treatment as recently as Golden Boot/Nations League did at
+the hundred-and-eighty-eighth run.
+
+### A "the only Ecuadorian" Golden Boot claim on `content/copa-america.md` was contradicted by two Team of the Tournament selections its own verification never checked - closed 2026-10-01 (two-hundred-and-sixth intensive run)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, continued the two-hundred-and-fifth run's own suggested next
+angle - a fresh front-to-back read of a content file, cross-checking its
+prose directly against its own tables rather than only the seven
+verification-ledger checkers' trigger-word matches - against
+`content/copa-america.md`, the first of that run's three suggested
+candidates (Copa América, UEFA EURO, FIFA World Cup).
+
+Read the whole page section by section, checking every prose claim against
+the table it summarizes, not just the ones a checker's regex would flag:
+
+- **Titles after 2024** tally table re-counted directly against the
+  Champions timeline table's 48 rows: Argentina 16, Uruguay 15, Brazil 9,
+  Paraguay 2, Chile 2, Peru 2, Colombia 1, Bolivia 1 - every count confirmed
+  by tallying the Champion column by hand, summing to all 48 editions.
+- Best Player's "every edition since 1987; no equivalent award at the 32
+  earlier editions" checked against the 48-edition total (48 - 16 editions
+  1987-2024 = 32) - correct.
+- Golden Glove's "every edition since 2011" checked against the 6 editions
+  2011-2024, all 6 present in the list - correct.
+- Every **Memorable moments** bullet checked against the Champions timeline
+  and Titles tables (the 1916 four-team claim, Bolivia's only 1963 title,
+  Colombia's first 2001 title, Chile's consecutive 2015/2016 titles,
+  Argentina's 2024 title overtaking Uruguay for most successful team) - all
+  held up.
+
+**Found one real, previously-unnoticed mismatch.** The Golden Boot section's
+1963 bullet reads: "**1963:** Carlos Alberto Raffo (Ecuador) - 6 goals - the
+only Ecuadorian to ever win an individual Copa América award." Its own
+`scripts/superlative-claims-ledger.json` entry, dated 2026-09-23, recorded
+its verification as: "scanned every winner's nation across all three
+individual-award tables on this page (Best Player, Golden Glove, Golden
+Boot) - Raffo (Golden Boot, 1963) is the sole Ecuador entry in any of them."
+That verification was accurate *for the three tables it checked* - but the
+page has a fourth individual-recognition section, **Team of the
+Tournament**, added two different ways:
+
+- **Pervis Estupiñán (Ecuador)** was added to the 2021 Team of the
+  Tournament roster at the fifty-second intensive run (2026-09-02, see this
+  file's matching entry) - three full weeks *before* the 2026-09-23
+  verification that declared Raffo "the only" Ecuadorian individual-award
+  winner.
+- **Piero Hincapié (Ecuador)** was added to the 2024 roster later still.
+
+Neither was ever caught by the superlative-claims ledger because the
+2026-09-23 verification's own methodology explicitly scoped itself to three
+tables and never considered the Team of the Tournament section - the exact
+same bug class as the two-hundred-and-fifth run's Ballon d'Or find (a claim
+whose verification methodology had a scope gap, not a claim nobody ever
+checked). Team of the Tournament selections are described on the page with
+"named", not "won" - CONMEBOL's Technical Study Group picks an eleven, there
+is no individual trophy the way there is for Best Player/Golden Glove/Golden
+Boot - so the honest fix is not to declare the original claim flatly false,
+but to scope it to what it was actually verified against and name the two
+Ecuadorian Team of the Tournament picks explicitly so a reader isn't misled
+either way.
+
+Reworded both the English and Croatian copies:
+
+- **English** (`content/copa-america.md`): "the only Ecuadorian to win the
+  Best Player, Golden Glove, or Golden Boot award; Pervis Estupiñán (2021)
+  and Piero Hincapié (2024) were later named to Team of the Tournament
+  selections, a separate honor (see \"Team of the Tournament winners\"
+  below)."
+- **Croatian** (`src/pages/hr/competitions/copa-america.astro`): "jedini
+  Ekvadorac koji je osvojio nagradu za najboljeg igrača, najboljeg vratara
+  ili Zlatnu kopačku; Pervis Estupiñán (2021.) i Piero Hincapié (2024.)
+  kasnije su uvršteni u idealnu momčad turnira, što je zasebno priznanje
+  (vidi "Idealna momčad turnira" niže)."
+
+Updated the `scripts/superlative-claims-ledger.json` entry to the new claim
+text with a note explaining the scope gap the old verification had, rather
+than just silently swapping the key. Bumped `content/copa-america.md`'s
+`lastReviewed` to 2026-10-01.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean, `pnpm outdated`
+unchanged - only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(902/902, unchanged - a pure prose/translation fix touches no unit-testable
+logic), `pnpm build` (711 pages, unchanged), all 29 CI-gated fast `check:*`
+scripts individually re-run and clean:
+`check:links`/`check:sitemap`/`check:precache`/`check:jsonld`/`check:heading-
+outline`/`check:theme-flash`/`check:reachability`/`check:meta`/`check:award-
+tallies`/`check:superlative-claims`/`check:ordinal-claims`/`check:record-
+claims`/`check:consecutive-claims`/`check:since-claims`/`check:one-of-only-
+claims`/`check:completeness-claims`/`check:edition-header-labels`/`check:i18n-
+notes`/`check:attendance-format`/`check:claims-hr`/`check:link-
+names`/`check:image-dimensions`/`check:locale-consistency`/`check:theme-
+color`/`check:spelling`/`check:spelling-hr`/`check:perf`. Two worth calling
+out specifically: `check:superlative-claims` reports 24 claims (unchanged
+count - a reword, not a new claim) with 0 unverified against the updated
+ledger; `check:i18n-notes` (7 matched page pairs) still reports identical
+note-section structure and dash-clause parity between languages, confirming
+the reworded bullet's added dash-clauses landed in both languages together.
+
+Regenerated all 700 downloadable PDFs (`pnpm build && pnpm build:pdfs`, via
+the two-hundred-and-fourth run's own documented
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` container escape hatch) since
+both `content/copa-america.md` and its Croatian page changed. **One
+session-local snag along the way, caught before anything was shipped:** a
+first `build:pdfs` invocation was started in the background, and - before
+confirming it had finished - a second `build:pdfs` invocation was started
+against the same `public/downloads/` output. The two overlapping Playwright/
+preview-server processes corrupted every "edition" PDF's outline (each ended
+up with the same wrong 12-bookmark count - e.g. `edition-ballon-dor-2021.pdf`
+reporting 12 bookmarks against an expected 2 - regardless of which page it
+actually came from), immediately caught by `check:pdf-outline` reporting 212
+mismatches rather than shipped. Fixed by confirming no leftover preview-
+server/Playwright/Chromium processes were still running, then re-running
+`build:pdfs` once, serially; `check:pdfs`/`check:pdf-outline` both came back
+clean (700/700) afterward. Worth a note for future runs: don't start a
+second `build:pdfs` (or any script that drives the shared preview server)
+while an earlier invocation might still be running in the background -
+confirm completion first.
+
+Browser sweeps and a cold-start `pnpm test:e2e` were not re-run - this
+change is pure prose/translation text with no markup, styling or
+interactive-behavior change, matching this project's own established
+practice for that class of change (e.g. the two-hundred-and-fifth run's own
+Ballon d'Or fix); the two-hundred-and-fourth run's own full cold-start `pnpm
+test:e2e` (1042/1042) plus all five manual browser sweeps remain the current
+baseline.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+The two-hundred-and-fifth run's own angle (a fresh front-to-back prose-vs-
+table read) has now been applied to Ballon d'Or and Copa América; worth
+trying it against `content/uefa-euro.md` or `content/fifa-world-cup.md`
+next, since neither has had this specific treatment as recently as the other
+two.
+
+### A second, already-written Copa América intro paragraph was silently dropped by the page's own single-paragraph intro extraction - closed 2026-10-01 (two-hundred-and-seventh intensive run)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, tried a fresh angle none of the prior 206 runs had used: all
+of this project's claim-verification tooling (the seven ledger-backed
+checkers plus every ad hoc audit) only ever scans Markdown **bullet**
+lines - every `extract*Claims()` function in `scripts/check-*-claims.mjs`
+filters on `/^-\s(.*)$/` before testing its trigger-word pattern. Reader-
+facing **prose paragraphs** (the text outside bullets and tables) have never
+been covered by any of that machinery. Swept all nine `content/*.md` files
+for non-bullet, non-table, non-heading lines and checked each one for
+whether it actually reaches a live page at all, rather than just scanning
+for claim vocabulary within prose already known to render.
+
+**Found one real, previously-unnoticed bug.** `src/lib/competition.ts`'s
+`firstParagraph()` - which supplies every competition/award page's top
+`<p class="competition__intro">` - deliberately stops at the first blank
+line once it starts collecting text (confirmed intentional, not an
+oversight: `tests/unit/competition.test.ts` has an explicit case locking in
+"intro from the first paragraph" with a second paragraph, "This is not.",
+asserted to stay excluded). Of this site's nine content files, only
+`content/copa-america.md` actually has a second paragraph before its first
+`##` heading - two sentences of genuine editorial prose about the
+competition's unusually varied format history, written but never reaching
+either language's live page (confirmed directly: present in `content/
+copa-america.md`'s source, absent from `dist/competitions/copa-america/
+index.html`'s built output). The Croatian page (`src/pages/hr/competitions/
+copa-america.astro`) carries its own hand-translated intro as a hardcoded
+string rather than deriving it from `data.intro`, and independently stops at
+the same first sentence pair - so the two languages were at least
+consistent with each other, just consistently missing the same content.
+
+Checked whether the dropped paragraph's facts are redundant with the page's
+"How it works" section (which *is* rendered, via `noteHeadings`): two of its
+three claims overlap (`CONMEBOL... joined by invited guest teams... since
+1993`, the format-variety list), but "some were played over several months"
+- describing the League table era's multi-city, multi-month run rather than
+a single tournament window - appears nowhere else on the page. Not pure
+duplication, so worth surfacing rather than deleting.
+
+Did **not** change `firstParagraph()` itself - its single-paragraph
+contract is deliberate and tested, and loosening it would be a behavior
+change affecting all nine content files' intros, not a two-line content fix.
+Instead merged the dropped sentence into the first paragraph in
+`content/copa-america.md` (removed the blank line, folded "Its history is
+less uniform..." into one combined paragraph with a tightened "league table
+over several months rather than a single tournament" phrasing), so the
+existing, unchanged extraction logic now picks up the whole thing. Added the
+equivalent sentence to the Croatian hardcoded intro in `src/pages/hr/
+competitions/copa-america.astro`, reusing vocabulary ("konačni poredak
+lige", "pozvane gostujuće momčadi") already established elsewhere on that
+same page's "How it works" translation for consistency. No historical fact
+was altered - every sentence already existed in the source; only the
+paragraph break that was hiding it from both languages' readers changed.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged - only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(902/902, unchanged - a content/markup-only fix touches no unit-testable
+logic), `pnpm build` (711 pages, unchanged), confirmed directly in the built
+HTML that both languages' intro paragraphs now include the full text. All 26
+fast `check:*` content/quality scripts individually re-run and clean
+(`check:links`, `check:sitemap`, `check:html`, `check:jsonld`, `check:
+heading-outline`, `check:meta`, `check:award-tallies`, all seven claim-
+ledger checkers, `check:edition-header-labels`, `check:attendance-format`,
+`check:claims-hr`, `check:link-names`, `check:locale-consistency`, `check:
+spelling`, `check:spelling-hr`, `check:i18n-notes`, `check:perf`) - none of
+the claim checkers fired on the added sentence since, consistent with this
+run's own finding, they only scan bullets, and the added text is prose.
+Regenerated all 700 downloadable PDFs (`pnpm build && pnpm build:pdfs`, via
+the documented `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-
+linux/chrome` container escape hatch - this session's container has that
+exact versioned subdirectory rather than a bare `chromium` symlink, worth
+noting since prior runs' documented path didn't resolve here) since both
+`content/copa-america.md` and its Croatian page changed; waited for the
+single `build:pdfs` invocation to fully exit before checking anything,
+per the two-hundred-and-sixth run's own documented warning against
+overlapping invocations. `check:pdfs`/`check:pdf-outline` both clean
+(700/700). Browser sweeps and a cold-start `pnpm test:e2e` not re-run,
+matching established practice for a prose-only change with no markup or
+interactive-behavior change; the two-hundred-and-fourth run's full cold-start
+`pnpm test:e2e` (1042/1042) plus all five manual browser sweeps remain the
+current baseline.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+This run's new angle (prose reaching the page at all, not just prose
+vocabulary) only found one instance across all nine content files and is
+now exhausted for the current content - re-check it after any future edit
+adds a new multi-paragraph intro. A companion angle not yet tried: whether
+any `noteHeadings`-requested section's *bullets* (as opposed to the
+top-of-page intro checked here) are similarly written but silently dropped
+by `extractSection()` for a reason other than the documented "no bullets
+yet, more than one paragraph" case - skimmed but not exhaustively checked
+this run.
+
+### Two fresh negative angles - `extractSection()` bullet-drop audit across all six `noteHeadings` files, plus a front-to-back prose-vs-table read of `fifa-world-cup.md`/`uefa-euro.md`; `check:lighthouse` re-confirmed perfect - closed 2026-10-01 (two-hundred-and-eighth intensive run)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, tried two fresh angles rather than another claim-vocabulary
+sweep.
+
+**Angle one, exhaustive this time:** the two-hundred-and-seventh run's own
+"left for a future pass" note flagged a companion angle it had only
+skimmed - whether any `noteHeadings`-requested section's *bullets* are
+silently dropped by `extractSection()` (`src/lib/notes.ts`) the same way
+that run found a top-of-page intro paragraph could be. Reading the function
+closely: once `bullets.length > 0`, its `else if (line.trim() !== '' &&
+bullets.length === 0)` branch can never fire again, so any later non-bullet,
+non-blank line - a closing sentence after a list, or a stray paragraph line
+between bullets - would be silently discarded, added to neither `bullets`
+nor `paragraph`, with no error or warning. This is a different failure mode
+from the one the two-hundred-and-seventh run found (which was about an
+*intro* paragraph before any bullets): this one would hide text *during or
+after* a bullet list. Wrote a standalone script
+(`/tmp/.../scratchpad/scan_notes.mjs`, not committed - a one-off audit tool,
+not project infrastructure) that mirrors `extractSection()`'s exact
+line-classification logic but reports every line it would drop instead of
+silently discarding it, and ran it against every `noteHeadings` section in
+all six content files that call `extractSection()`
+(`fifa-world-cup.md`, `uefa-euro.md`, `uefa-nations-league.md`,
+`copa-america.md`, `ballon-dor.md`, `golden-boot.md` - every heading listed
+in each of `src/pages/competitions/{world-cup,euro,nations-league,
+copa-america,ballon-dor,golden-boot}.astro`'s own `noteHeadings` array).
+Zero dropped lines anywhere - every section in every file is cleanly either
+all-bullets or intro-paragraph-then-bullets, matching `extractSection()`'s
+two documented, tested shapes exactly, with nothing in the third,
+undocumented shape this angle was looking for. Genuinely negative, and this
+specific audit (as opposed to the broader "any editorial content silently
+dropped" question, which could still have other instances) is now complete
+for the current content - re-run it after any edit adds new section
+content, especially a bullet followed by a trailing explanatory sentence.
+
+**Angle two:** the two-hundred-and-fifth run's own "left for a future pass"
+note suggested its front-to-back prose-vs-table read (the one that caught
+the Ballon d'Or ceremony-timing bug) go next to whichever of
+`content/fifa-world-cup.md`/`content/uefa-euro.md` hadn't had it as recently
+as Ballon d'Or/Copa América - and the two-hundred-and-sixth/-seventh runs
+then used up Copa América, leaving both World Cup and EURO still untried by
+this specific method. Did both in one pass. Checked, line by line, against
+each page's own tables:
+
+- Every title-tally claim (`fifa-world-cup.md`'s "Champions by titles after
+  2026" table: Brazil 5, Germany-incl.-West-Germany 4, Italy 4, Argentina 3,
+  France 2, Spain 2, Uruguay 2, England 1, summing to 23; `uefa-euro.md`'s
+  "Champions by titles": Spain 4, Germany-incl.-West-Germany 3, Italy 2,
+  France 2, and five nations on 1) against a direct recount from each
+  page's own Editions table - both tallies matched exactly.
+- Every "named at every [competition] since <year>; no equivalent award
+  existed at the N earlier editions" award-introduction bullet (Golden
+  Ball/Golden Glove/Young Player/Fair Play Award on `fifa-world-cup.md`;
+  Player of the Tournament/Young Player of the Tournament on `uefa-euro.md`)
+  against an actual count of editions on both sides of the stated year - all
+  six checked out (e.g. Fair Play Award "since 1970... eight earlier
+  editions": 1930-1966 is exactly eight World Cups; Player of the
+  Tournament "since 1996... nine earlier editions": 1960-1992 is exactly
+  nine EUROs).
+- `fifa-world-cup.md`'s Fair Play Award section's 2010 bullet ("the fifth
+  team to win both the World Cup and the Fair Play Award at the same
+  tournament, after West Germany (1974), Argentina (1978), Brazil (1994) and
+  France (1998)") against a full cross-tabulation of the Editions table's
+  winners against the Fair Play Award winners for every year both exist
+  (1970-2026): confirmed exactly those four years plus 2010 are the only
+  matches, and no later year (2014-2026) adds a sixth - the claim holds
+  with today's data.
+- `uefa-euro.md`'s Team of the Tournament section's five "champions X
+  supplied N, the most of any team" claims (1996 Germany 3, 2008 Spain 6,
+  2016 Portugal 4, 2020 Italy 5, 2024 Spain 6) against a manual
+  per-player nationality tally of each year's own eleven-name list - every
+  one checked out as that year's actual highest count (full tallies, e.g.
+  2004's three-way tie at 3 apiece between Greece/Portugal/Czech Republic,
+  confirmed the 2004 bullet itself makes no "the most" claim, only naming
+  Greece's count without the superlative - so no inconsistency there
+  either).
+- Every cross-reference between the two files' own "Winning managers"/
+  "Winning captains" sections and the other competition's page (Casillas
+  captaining both the 2012 EURO and, per `fifa-world-cup.md`'s own 2010
+  entry, the World Cup between his two EURO titles; Deschamps as 1998 World
+  Cup-winning captain who also captained the 2000 EURO win and later managed
+  the 2018 World Cup win, checked against both files' own entries for him;
+  Beckenbauer's 1972 EURO captaincy cross-referenced against his 1974 World
+  Cup captaincy) - every cross-file reference matched the other file's own
+  entry exactly.
+- Final-venue repeat-host claims (`fifa-world-cup.md`'s Estadio Azteca
+  "first to host two World Cup finals" in 1986; `uefa-euro.md`'s Stadio
+  Olimpico/Parc des Princes/Wembley sequence - "the third to host two EURO
+  finals, after Rome (1980) and Paris (1984)") against the full venue list -
+  both orderings are internally consistent with no earlier repeat omitted.
+
+No mismatch found on either file. Negative result, but both files now have
+the same specific front-to-back table-cross-check treatment Ballon d'Or,
+Copa América, Golden Boot and Nations League already had - closing the gap
+the two-hundred-and-fifth run's own note identified.
+
+**Also re-ran `check:lighthouse` by hand** (`PW_EXECUTABLE_PATH=/opt/
+pw-browsers/chromium-1194/chrome-linux/chrome pnpm run check:lighthouse`) -
+not part of the fast CI-gated set, and not re-run since well before the
+current `astro`/`@playwright/test`/`lighthouse` versions were last
+installed, so worth confirming no regression slipped in unnoticed. All 28
+sampled pages score a perfect 1.00/1.00/1.00/1.00
+(performance/accessibility/best-practices/SEO); the one bilingual `/404`
+page scores 0.63 on SEO only, exactly the already-documented, expected
+`EXPECTED_SEO_EXCEPTIONS` case (a `noindex` error page correctly isn't
+optimized for search), and the script's own pass/fail logic excludes it
+correctly. No actionable back/forward-cache blockers reported. Matches the
+fourteenth run's original 1.00-across-the-board finding with no drift.
+
+**Verification:** `pnpm install` (clean), `pnpm outdated` (only the
+already-documented blocked `typescript` 5.9.3 -> 7.0.2 line - no new
+`@astrojs/check` release), `pnpm lint` (238 files, 0 errors/0 warnings/0
+hints), `pnpm test` (902/902, unchanged), `pnpm test:coverage`
+(99.91%/99.31%, unchanged - the same four defensively-unreachable branches
+in `quiz.ts`/`sources.ts`/`tableSort.ts`/`url.ts` as ever), `pnpm build`
+(711 pages, unchanged). All 29 CI-gated fast `check:*` scripts individually
+re-run and clean (`check:pdfs`, `check:pdf-outline`, `check:perf`,
+`check:links`, `check:sitemap`, `check:precache`, `check:jsonld`,
+`check:heading-outline`, `check:theme-flash`, `check:reachability`,
+`check:meta`, `check:award-tallies`, all seven claim-ledger checkers,
+`check:edition-header-labels`, `check:i18n-notes`, `check:attendance-format`,
+`check:claims-hr`, `check:link-names`, `check:image-dimensions`,
+`check:locale-consistency`, `check:theme-color`, `check:spelling`,
+`check:spelling-hr`). `pnpm audit` (no known vulnerabilities). `pnpm dlx
+knip --no-config-hints` (same two standing false positives as ever:
+`scripts/test-preview-server.mjs`, `@cspell/dict-hr-hr`). No content or
+markup changed this run (both angles were audits, not fixes - nothing to
+fix turned up), so no PDF regeneration was needed and `check:pdfs`/
+`check:pdf-outline`'s clean results above are simply confirming the
+existing 700 PDFs are still fresh. Browser sweeps other than
+`check:lighthouse` (`check:reflow`/`check:landscape`/`check:text-zoom`/
+`check:print-width`/`check:html`) and a cold-start `pnpm test:e2e` not
+re-run - no markup or interactive-behavior change this run, matching
+established practice; the two-hundred-and-fourth run's own full cold-start
+`pnpm test:e2e` (1042/1042) plus those five sweeps remain the current
+baseline for everything except `check:lighthouse`, freshly reconfirmed here.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+Both of this run's own angles are now exhausted against every file they
+apply to (the `extractSection()` bullet-drop audit against all six
+`noteHeadings` files; the front-to-back prose-vs-table read against all six
+team-competition/award pages). Next candidates for a genuinely different
+angle: the same table-cross-check treatment applied to `/records`' own
+hand-authored "Longest wait between titles"/"Back-to-back champions"
+sections (generated from competition data, but worth a by-hand spot-check
+against the source tables directly rather than trusting the generator was
+never re-verified); or a first full read-through of the site's smaller,
+less-scrutinized `content/*.md` files (`records-and-timelines.md`,
+`glossary.md`, `quiz.md`, `teams.md`, `players.md`,
+`compare-countries.md`, `compare-players.md`, `about-sources.md`,
+`index.md`), which have had far less individual front-to-back attention
+than the six flagship competition/award pages.
+
+### `/records`' generated "Back-to-back champions"/"Longest wait between titles" rankings hand-verified against every source table across all seven datasets, both languages - clean (two-hundred-and-ninth intensive run, 2026-10-01)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, picked up the first of the two-hundred-and-eighth run's own
+two named next candidates: a by-hand spot-check of `/records`' "Longest wait
+between titles" and "Back-to-back champions" sections against each
+competition's own source table, independent of the generator's own unit
+tests.
+
+**Correcting the framing going in.** The two-hundred-and-eighth run's own
+note (and this run's own task brief) described these sections as
+"hand-authored... generated from competition data, never independently
+re-verified against the source Champions-timeline tables" - checking
+`src/pages/records.astro` directly shows they are not hand-authored prose at
+all, unlike every other content/table cross-check prior runs have done
+(Ballon d'Or's ceremony-date bullet, Copa América's "only Ecuadorian" claim,
+etc., all free text in `content/*.md`). Both sections are generated entirely
+at build time by `buildLongestStreaks()` and `buildLongestTitleGaps()` in
+`src/lib/editions.ts`, fed by the exact same `Edition[]` arrays every other
+`/records` ranking on the page already uses (`buildChampionsSummary()`,
+`buildHostsSummary()`, etc.). Both functions already carry their own unit
+tests (`tests/unit/editions.test.ts`), with fixture-based coverage of the
+placeholder-year-breaks-a-streak case, the West-Germany/Germany grouping
+rule, and the "track the widest gap, not the first-to-last gap" logic. What
+no prior run had ever done is independently recompute their *real* output
+against *today's real* `content/*.md` tables by hand - a passing unit test
+only proves the function is internally consistent with its own small
+fixture, never that it produces the right numbers when run against the
+site's actual, much larger, hand-edited data. That is the gap this run
+closed, and it is a genuinely different kind of check from "does this
+function work" - it is "does this specific build, today, on this specific
+data, produce the right numbers", the same spirit as the two-hundred-and-
+second run's own "hand-edit the built output and confirm a checker actually
+catches it" discipline, just applied to editorial facts instead of a
+checker script.
+
+**Method.** Ran `pnpm build` (711 pages, clean), then extracted the rendered
+"Back-to-back champions" and "Longest wait between titles" sections verbatim
+from `dist/records/index.html` (stripping HTML tags with a throwaway Python
+one-liner, not assumed from reading the component source). Independently
+hand-recomputed every row shown there by walking each competition's own
+Editions/Champions-timeline/Winners table in `content/*.md` from scratch -
+reading the raw Markdown table row by row and doing the arithmetic by hand,
+not re-deriving the answer from reading `editions.ts`'s own logic. Covered
+all seven datasets the page renders: FIFA World Cup, UEFA EURO, Copa
+América, UEFA Nations League (the four team competitions), plus Ballon d'Or,
+Golden Boot (World Cup) and Golden Boot (EURO) (the three individual
+awards, which also get their own "Longest wait"/"Back-to-back" rows via the
+page's `allLoaded` array).
+
+**Back-to-back champions - every row recomputed:**
+
+- **FIFA World Cup** (23 editions): walked the Winner column in order -
+  Italy (1934, 1938) and Brazil (1958, 1962) are the only two adjacent-row
+  repeats anywhere in the table. Matches the rendered page exactly (2
+  streaks, no others).
+- **UEFA EURO** (17 editions): only Spain (2008, 2012) repeats on adjacent
+  rows. West Germany's 1972 and 1980 titles are not adjacent rows (Italy
+  1968, Czechoslovakia 1976 sit between/around them) so correctly form no
+  streak. Matches exactly (1 streak).
+- **Copa América** (48 editions, including the two separately-hosted 1959
+  entries): walked all 48 rows. Found 11 streaks: Argentina 1945-1947
+  (3-in-a-row, the longest on the page), then 10 two-in-a-rows - Uruguay
+  1916/1917, Uruguay 1923/1924, Argentina 1927/1929, Argentina 1957/1959
+  (the Argentina-hosted 1959 edition specifically, not the Ecuador-hosted
+  one three rows later), Uruguay 1983/1987, Argentina 1991/1993, Brazil
+  1997/1999, Brazil 2004/2007, Chile 2015/2016, Argentina 2021/2024. All 11
+  matched the rendered page in both count and sort order (3-streak first,
+  then the ten 2-streaks ordered by earliest start year: 1916, 1923, 1927,
+  1957, 1983, 1991, 1997, 2004, 2015, 2021 - exactly the rendered order).
+- **UEFA Nations League** (4 editions: Portugal, France, Spain, Portugal):
+  no adjacent repeat - matches the rendered "No one has won two editions in
+  a row yet."
+- **Ballon d'Or** (70 editions, 1956-2025): found 8 streaks - Messi
+  2009-2012 (4-in-a-row, the longest), Platini 1983-1985 (3), then five
+  2-in-a-rows (Cruyff 1973/1974, Keegan 1978/1979, Rummenigge 1980/1981, van
+  Basten 1988/1989, Cristiano Ronaldo 2013/2014) plus one more 2-in-a-row
+  (Cristiano Ronaldo 2016/2017). Specifically verified the 2020 "Not
+  awarded" placeholder year correctly breaks what would otherwise be a
+  Messi 2019-2021 3-in-a-row - it does not appear as a streak on the
+  rendered page, and recomputing by hand confirms 2019's Messi and 2021's
+  Messi are correctly treated as two separate, non-consecutive single wins
+  rather than merged across the gap. All 8 streaks and their sort order
+  (4, 3, then six 2s ordered by start year: 1973, 1978, 1980, 1988, 2013,
+  2016) matched exactly.
+- **Golden Boot (World Cup)** (23 editions): only Kylian Mbappé (2022, 2026)
+  repeats on adjacent rows - matches exactly (1 streak).
+- **Golden Boot (EURO)** (17 editions): no adjacent repeat among any of the
+  solo winners or tied-winner cells (checked all five tie years - 1960,
+  1964, 1992, 2012, 2024 - against their immediate neighbors) - matches the
+  rendered "No one has won two editions in a row yet."
+
+**Longest wait between titles - every row recomputed** (30 rows total
+across all seven datasets, every team/player with 2+ titles):
+
+- **FIFA World Cup** (7 entries): Italy 44 years (1938-1982), Argentina 36
+  (1986-2022), Brazil 24 (1970-1994), Germany incl. West Germany 24
+  (1990-2014), Uruguay 20 (1930-1950), France 20 (1998-2018), Spain 16
+  (2010-2026). All 7 matched, including the Brazil/Germany 24-year tie's
+  resolution (Brazil's gap starts earlier - 1970 vs. 1990 - so it correctly
+  sorts first) and the Uruguay/France 20-year tie (Uruguay's gap starts in
+  1930 vs. France's 1998, Uruguay correctly sorts first).
+- **UEFA EURO** (4 entries): Italy 52 (1968-2020), Spain 44 (1964-2008),
+  Germany incl. West Germany 16 (1980-1996), France 16 (1984-2000). All 4
+  matched, including the Germany/France 16-year tie (Germany's gap starts
+  earlier, 1980 vs. 1984, correctly sorts first).
+- **Copa América** (6 entries): Brazil 40 (1949-1989), Peru 36 (1939-1975),
+  Argentina 32 (1959-1991), Paraguay 26 (1953-1979), Uruguay 16 (1967-1983),
+  Chile 1 (2015-2016). All 6 matched - Uruguay's own widest gap specifically
+  required checking a genuine internal tie: Uruguay's title years (1916,
+  1917, 1920, 1923, 1924, 1926, 1935, 1942, 1956, 1959, 1967, 1983, 1987,
+  1995, 2011) produce two different 16-year gaps (1967-1983 and
+  1995-2011) - the rendered page shows 1967/1983, matching the generator's
+  documented "first occurrence of the widest gap wins" tie-break (a `>`
+  comparison, not `>=`), confirmed correct by hand.
+- **UEFA Nations League** (1 entry): Portugal 6 years (2018-19 to 2024-25) -
+  matched; `leadingYear()`'s season-label parsing (extracting "2018" from
+  "2018–19") confirmed correct by the arithmetic itself (2024-2018=6).
+- **Ballon d'Or** (10 entries): Ronaldo (Brazilian) 5 (1997-2002), Cristiano
+  Ronaldo 5 (2008-2013), Franz Beckenbauer 4 (1972-1976), Lionel Messi 4
+  (2015-2019), Marco van Basten 3 (1989-1992), Alfredo Di Stéfano 2
+  (1957-1959), Johan Cruyff 2 (1971-1973), Kevin Keegan 1 (1978-1979),
+  Karl-Heinz Rummenigge 1 (1980-1981), Michel Platini 1 (1983-1984). All 10
+  matched, including three separate ties resolved correctly by earliest
+  gap-start year (the two 5s, the two 4s, the two 2s) and three 1-year gaps
+  sorted correctly by start year (1978, 1980, 1983).
+- **Golden Boot (World Cup)** (1 entry): Kylian Mbappé 4 years (2022-2026) -
+  matched.
+- **Golden Boot (EURO)** (1 entry): Cristiano Ronaldo 8 years (2012-2020) -
+  matched, and specifically confirms `buildLongestTitleGaps()` correctly
+  inherits `buildChampionsSummary()`'s tied-winner-cell splitting: Ronaldo's
+  2012 Golden Boot was a six-way tie ("Mario Balotelli; Mario Gómez; Mario
+  Mandžukić; Cristiano Ronaldo; Alan Dzagoev; Fernando Torres"), yet still
+  correctly earns him individual credit that combines with his outright
+  2020 win for the 8-year gap shown.
+
+**Zero discrepancies found across all 30 title-gap rows and all 23
+back-to-back-champions rows, on all seven datasets.** A genuine, thorough
+negative result.
+
+**One real asymmetry found, investigated, and left deliberately unfixed as
+currently inert - not a shipped bug.** `buildLongestStreaks()` (unlike
+`buildChampionsSummary()`/`buildLongestTitleGaps()`, which both split a
+`"; "`-joined tied-winner cell into individual player credits before
+grouping) compares each edition's *raw, unsplit* winner-cell string for an
+exact match when deciding whether two adjacent editions share a winner. So a
+player who shares a tie in one edition and then wins outright in the next
+edition would currently be invisible to the streaks ranking - the literal
+strings "Cristiano Ronaldo" and "Mario Balotelli; Mario Gómez; Mario
+Mandžukić; Cristiano Ronaldo; Alan Dzagoev; Fernando Torres" never compare
+equal, even though the same real person is a genuine repeat winner across
+those two editions (this is exactly the shape the Golden Boot (EURO)
+title-gap check above confirms *does* get credited correctly in the
+gap-based ranking, via the split-aware `buildChampionsSummary()` path - so
+the two rankings' tie-handling genuinely diverge). Checked every tie year
+across all seven datasets (World Cup Golden Boot 1962 and 1994; EURO Golden
+Boot 1960, 1964, 1992, 2012 and 2024) against its immediately adjacent rows
+for this exact shape: none of today's content has a tie year adjacent to a
+matching solo winner from among the tied names, so this asymmetry produces
+no incorrect number on the live site today - a documented, currently-inert
+gap in the code, not a shipped factual error. Deliberately left unfixed
+this run: there is no live, currently-wrong claim to write a regression test
+against, so "fixing" the comparison blind would mean shipping an untested
+code change with no real failing case to prove it actually closes the gap
+correctly (the exact kind of unverified fix this project's own standing
+discipline - "verify a regression test against a real failure before
+trusting it" - argues against). Worth revisiting with a real
+split-aware rewrite (and a regression test) the day any future content edit
+actually creates a tie-adjacent-to-matching-solo-winner shape in any of the
+seven tables.
+
+**Croatian page cross-check.** Diffed the built `dist/hr/records/index.html`
+against the English `dist/records/index.html` for both sections: every team/
+player name, gap or streak count, and bounding year is byte-identical
+between the two languages (only the heading text, unit labels like "godine"/
+"godina" and the "Pogledajte cijelu tablicu" link text differ) - confirming
+both language pages load the same `loadCompetition()`-derived `Edition[]`
+arrays and call the same `buildLongestStreaks()`/`buildLongestTitleGaps()`
+functions, with nothing forked or hand-duplicated between `src/pages/
+records.astro` and `src/pages/hr/records.astro` for these two sections.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(902/902, unchanged - this run was a read-only hand cross-check against
+build output, no source file changed), `pnpm test:coverage`
+(99.91%/99.31%, unchanged - the same four defensively-unreachable branches
+in `quiz.ts`/`sources.ts`/`tableSort.ts`/`url.ts` as ever), `pnpm build`
+(711 pages, unchanged). All 29 CI-gated fast `check:*` scripts individually
+re-run and clean: `check:pdfs` (700/700), `check:pdf-outline` (700/700),
+`check:perf`, `check:links` (715 pages), `check:sitemap` (710 entries),
+`check:precache`, `check:jsonld` (1783 blocks across 711 pages), `check:
+heading-outline`, `check:theme-flash`, `check:reachability`, `check:meta`,
+`check:award-tallies` (4/4), `check:superlative-claims` (24),
+`check:ordinal-claims` (91), `check:record-claims` (36),
+`check:consecutive-claims` (22), `check:since-claims` (26),
+`check:one-of-only-claims` (2), `check:completeness-claims` (5) - all seven
+claim-ledger checkers unchanged from the two-hundred-and-eighth run's own
+counts - `check:edition-header-labels`, `check:i18n-notes` (7 matched page
+pairs), `check:attendance-format`, `check:claims-hr` (205 claims),
+`check:link-names`, `check:image-dimensions`, `check:locale-consistency`,
+`check:theme-color`, `check:spelling` (15 files, 0 issues), `check:
+spelling-hr` (57 blocks, 0 unknown words). `pnpm audit` (no known
+vulnerabilities). `pnpm dlx knip --no-config-hints` (same two standing
+false positives as ever: `scripts/test-preview-server.mjs`,
+`@cspell/dict-hr-hr`).
+
+No content or markup changed this run - this was a pure read/verify pass,
+and nothing to fix turned up - so no PDF regeneration was needed; the clean
+`check:pdfs`/`check:pdf-outline` results above simply confirm the existing
+700 PDFs are still fresh, not that anything was freshly regenerated. Browser
+sweeps and a cold-start `pnpm test:e2e` were not re-run - no markup or
+interactive-behavior change this run; the two-hundred-and-fourth run's own
+full cold-start `pnpm test:e2e` (1042/1042) plus all five manual browser
+sweeps remain the current baseline, with `check:lighthouse` freshly
+reconfirmed perfect by the two-hundred-and-eighth run.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+This run's own angle (a by-hand spot-check of `/records`' generated
+rankings against their source tables, rather than trusting the generator's
+own unit tests) is now closed for the two sections it targeted, across all
+seven datasets and both languages - no discrepancy found, and the one
+latent code asymmetry found (`buildLongestStreaks()`'s non-split
+tied-winner comparison) is currently inert and documented above rather than
+fixed blind. The same by-hand treatment has not yet been applied to
+`/records`' other five generated rankings ("Most frequent hosts", "Titles
+won on home soil", "Nearly champions", "Nearly finalists", "Biggest final
+wins") or to "Fiercest rivalries" - a natural next candidate for run #210,
+alongside the two-hundred-and-eighth run's other still-untried suggestion: a
+first full front-to-back read of the site's smaller, less-scrutinized
+`content/*.md` files (`records-and-timelines.md`, `glossary.md`, `quiz.md`,
+`teams.md`, `players.md`, `compare-countries.md`, `compare-players.md`,
+`about-sources.md`, `index.md`).
+
+### `/records`' five remaining generated rankings plus "Fiercest rivalries" hand-verified against every source table, both languages - clean (two-hundred-and-tenth intensive run, 2026-10-01)
+
+Picked up the two-hundred-and-ninth run's own named next candidate -
+extending its by-hand "independently recompute the generated ranking from
+the raw table rows, then diff against the real rendered page" treatment to
+`/records`' five remaining generated rankings it hadn't yet covered ("Most
+frequent hosts", "Titles won on home soil", "Nearly champions", "Nearly
+finalists", "Biggest final wins") plus "Fiercest rivalries" - the only
+generated section on the page none of the first 209 runs had ever
+independently spot-checked at all.
+
+Built the site and extracted each section's real rendered output from
+`dist/records/index.html` verbatim (`buildHostsSummary()`,
+`buildHomeSoilTitles()`, `buildRunnerUpsWithoutTitle()`,
+`buildNearlyFinalists()`, `buildBiggestFinalMargins()` in
+`src/lib/editions.ts`, and `buildRivalries()`/`buildFinalsMeetings()` in
+`src/lib/compare.ts`), then independently re-derived every row by hand from
+each competition's own Editions/Finals/Champions-timeline table in
+`content/*.md`, without consulting the generator functions' own logic while
+doing the recomputation:
+
+- **Most frequent hosts:** tallied every Host(s) cell for all four team
+  competitions (FIFA World Cup, UEFA EURO, Copa América, UEFA Nations
+  League), excluding the three Copa América "Home-and-away" editions
+  (1975/1979/1983) that have no single host. All 19 World Cup hosts, 14 EURO
+  hosts, 11 Copa América hosts and 4 Nations League hosts matched the
+  rendered counts, years and sort order (titles descending, ties broken by
+  earliest hosting year, then name) exactly.
+- **Titles won on home soil:** for every edition, checked whether the Host
+  and Winner/Champion cells are an exact string match (confirming the
+  generator's own documented choice that a co-host which goes on to win,
+  e.g. Spain's 2026 World Cup title under "Canada, Mexico and United
+  States", correctly does *not* count). Found and matched all 6 World Cup,
+  3 EURO, 7 Copa América and 1 Nations League home-soil titles exactly,
+  including West Germany/Germany correctly grouping into one "Germany
+  (incl. West Germany)" entry for this ranking (unlike "Back-to-back
+  champions", which keeps them separate).
+- **Nearly champions:** for each competition, built the full set of teams
+  that have ever won (grouping West Germany under Germany), then walked
+  every Runner-up cell and kept only the ones belonging to a team never in
+  that winners' set. Matched all 5 World Cup, 4 EURO, 1 Copa América and 2
+  Nations League entries and counts exactly - including Spain correctly
+  being excluded from the Nations League list despite two runner-up
+  finishes, since it won the competition outright in 2022-23.
+- **Nearly finalists:** built the set of teams that have ever reached *any*
+  final (winner or runner-up) per competition, then walked every
+  Third/Fourth/"Other semifinalist" cell and kept only non-finalist teams.
+  Matched all 12 World Cup, 5 EURO, 5 Copa América and 5 Nations League
+  entries and counts exactly, including same-year alphabetical tie-breaks
+  (e.g. World Cup 2002's "South Korea" before "Türkiye", both reaching their
+  first semifinal that year).
+- **Biggest final wins:** parsed the first score pair out of every "Final"
+  cell for World Cup, EURO and Nations League (Copa América has no such
+  column, as already documented) and took the absolute goal difference,
+  confirming a shootout-decided final (e.g. 1994's "Brazil 0-0 Italy; 3-2
+  pens") correctly ranks at margin 0 rather than counting the penalty score.
+  All 23 World Cup, 17 EURO and 4 Nations League margins, scores and years
+  matched the rendered page exactly, including the three-way tie at margin 3
+  on the World Cup table (1958, 1970, 1998, ordered by year) and EURO's own
+  margin-3 entry (1972) sorting behind its one margin-4 final (2012).
+- **Fiercest rivalries:** built every Champion-vs-Runner-up final pairing
+  across all four team competitions, counted meetings per unordered team
+  pair (grouping West Germany under Germany, as the rendered page does), and
+  kept every pair with 2+ meetings. All 11 rendered rows matched exactly -
+  rivalry pair, total meetings, head-to-head win/loss split, which
+  competition(s) contributed, and the most recent meeting - including two
+  rivalries only reaching the 2-meeting threshold by combining finals across
+  different competitions (France-Italy: EURO 2000 + World Cup 2006;
+  France-Spain: EURO 1984 + UEFA Nations League 2020-21). No pair with 2+
+  meetings was missing from the list, and no listed pair's head-to-head
+  record was wrong.
+
+No discrepancy found anywhere across all six sections - a genuinely new,
+specific check now done and closed for every generated ranking `/records`
+renders, completing the treatment the two-hundred-and-ninth run started on
+the page's other two generated rankings. Also cross-checked the Croatian
+`/hr/records` page the same way the two-hundred-and-ninth run did for its
+own two sections: diffed the numeric/year sequences and the full rivalries
+table against the English page - byte-identical throughout (only the
+heading text, unit labels and "vodi "/"-" head-to-head phrasing differ),
+confirming both language pages share the same generated data.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(902/902, unchanged - this run's own checking was a read-only hand
+cross-check against build output, no source file changed), `pnpm
+test:coverage` (99.91%/99.31%, unchanged), `pnpm build` (711 pages,
+unchanged). All 29 CI-gated fast `check:*` scripts individually re-run and
+clean: `check:pdfs` (700/700, nothing stale since nothing changed),
+`check:pdf-outline` (700/700), `check:perf`, `check:links` (715 pages),
+`check:sitemap` (710 entries), `check:precache`, `check:jsonld` (1783
+blocks across 711 pages), `check:heading-outline`, `check:theme-flash`,
+`check:reachability`, `check:meta`, `check:award-tallies` (4/4), all seven
+claim-ledger checkers (`check:superlative-claims` 24,
+`check:ordinal-claims` 91, `check:record-claims` 36,
+`check:consecutive-claims` 22, `check:since-claims` 26,
+`check:one-of-only-claims` 2, `check:completeness-claims` 5 - all
+unchanged), `check:edition-header-labels`, `check:i18n-notes` (7 matched
+page pairs), `check:attendance-format`, `check:claims-hr` (205 claims),
+`check:link-names`, `check:image-dimensions`, `check:locale-consistency`,
+`check:theme-color`, `check:spelling` (15 files, 0 issues),
+`check:spelling-hr` (57 blocks, 0 unknown words). `pnpm audit` (no known
+vulnerabilities). `pnpm dlx knip --no-config-hints` (same two standing
+false positives: `scripts/test-preview-server.mjs`, `@cspell/dict-hr-hr`).
+No content or markup changed this run (a pure read/verify pass - nothing to
+fix turned up), so no PDF regeneration was needed. Browser sweeps and a
+cold-start `pnpm test:e2e` not re-run - no markup or interactive-behavior
+change this run; the two-hundred-and-fourth run's own full cold-start `pnpm
+test:e2e` (1042/1042) plus the five manual browser sweeps remain the
+current baseline, with `check:lighthouse` last reconfirmed by the
+two-hundred-and-eighth run.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
+unchanged. Every generated ranking on `/records` (all seven
+`ChampionsSummary`-shaped rankings plus "Fiercest rivalries") has now had
+this specific by-hand recomputation treatment at least once, across both
+languages - no further untried ranking remains on that page. The
+two-hundred-and-eighth run's other still-open suggestion stands as the
+natural next angle: a first full front-to-back read of the site's smaller,
+less-scrutinized `content/*.md` files (`records-and-timelines.md`,
+`glossary.md`, `quiz.md`, `teams.md`, `players.md`, `compare-countries.md`,
+`compare-players.md`, `about-sources.md`, `index.md`), the same treatment
+already applied to all six flagship competition/award pages.
+
+### Home page's historical-naming note fixed to match the site's actual one-case grouping policy (two-hundred-and-eleventh intensive run, 2026-10-01)
+
+Picked up the two-hundred-and-tenth run's own named next candidate: a first
+full front-to-back read of the site's smaller, less-scrutinized
+`content/*.md` files - `records-and-timelines.md`, `glossary.md`, `quiz.md`,
+`teams.md`, `players.md`, `compare-countries.md`, `compare-players.md`,
+`about-sources.md`, `index.md` (231 lines total across all nine) - the same
+treatment already applied to all six flagship competition/award pages.
+
+Read every file front to back and cross-checked each factual claim against
+either the live implementation or another content file's own documented
+policy. Found and fixed one genuine, previously-unnoticed factual error, on
+the single most-read page on the entire site: `content/index.md`'s
+"Important historical naming note" said "summary statistics may group
+sporting successors where that is conventional. Examples include West
+Germany/Germany, Soviet Union/Russia, and Czechoslovakia/Czechia" - naming
+all three as if each were grouped. That directly contradicts both
+`src/lib/countries.ts`'s own `SUCCESSOR_GROUPS` map and comment ("only the
+West Germany / Germany continuity is merged, which is the single case the
+editorial content itself groups. Every other name counts as itself") and
+`content/records-and-timelines.md`'s own "Historical identity rules"
+section ("Soviet Union and Russia should not automatically be merged";
+"Czechoslovakia and Czech Republic/Czechia should not automatically be
+merged without an explicit editorial rule") - two independent, correct
+sources the home page's own prose disagreed with. Confirmed against the
+code (`countries.ts`'s `SUCCESSOR_GROUPS` literally only contains the
+`west germany`/`germany` keys) rather than assumed from the other content
+file alone.
+
+Fixed `content/index.md` to state the true policy - grouping happens only
+in the one West Germany/Germany case, with Soviet Union/Russia and
+Czechoslovakia/Czechia both named as examples kept deliberately separate -
+and updated the matching hand-translated Croatian prose in
+`src/pages/hr/index.astro` (this page is hand-authored chrome, not a
+Markdown-driven competition page, so its Croatian text has no automatic
+sync path and had to be edited directly). Both language versions build and
+render the corrected sentence. Two e2e assertions were pinned to the old
+wording and needed updating to match: `tests/e2e/mobile.spec.ts`'s English
+"Important historical naming note" test (was matching literal substring
+"West Germany/Germany, Soviet Union/Russia"; now matches across the
+rewritten sentence boundary) and its Croatian "Važna napomena o povijesnim
+nazivima" counterpart (same substring-match update). A third, unrelated e2e
+test on `/records` asserting "Sovjetski Savez i Rusija se ne spajaju." was
+untouched and still passes - that assertion was already correct and
+describes a different page.
+
+The other eight files had no comparable claim: `glossary.md`'s "EURO has not
+played a third-place match since 1980" / semifinalists-from-1984 note
+matches `content/uefa-euro.md`'s own table and "Historical format note"
+verbatim; `players.md`'s "FIFA World Cup or UEFA EURO Golden Boot" scope
+matches `content/golden-boot.md`'s own "two separate Golden Boot races"
+description (no Copa América or other competition's Golden Boot exists to
+omit); `compare-players.md`'s "see 'Compare' for that comparison" correctly
+names the nav link's actual label (`src/lib/routes.ts`'s `'/compare'` entry
+is literally labelled `'Compare'`), not the `compare-countries` content
+slug a careless read might expect. `records-and-timelines.md`, `quiz.md`,
+`teams.md`, `compare-countries.md` and `about-sources.md` are pure
+editorial/UI-description prose with no independently-checkable factual
+claim in them.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 ->
+7.0.2 line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm
+test` (902/902, unchanged - the fix touched prose and a test assertion, not
+app logic), `pnpm test:coverage` (99.91%/99.31%, unchanged), `pnpm build`
+(711 pages). Manually confirmed the corrected sentence in both
+`dist/index.html` and `dist/hr/index.html`. All 29 CI-gated fast `check:*`
+scripts individually re-run and clean, including `check:i18n-notes` (7
+matched page pairs) and `check:claims-hr` (205 claims) - neither flagged
+the hand-edited Croatian sentence, since it isn't one of the claim shapes
+those two scripts pattern-match. `check:pdfs` (700/700) confirmed clean
+with nothing to regenerate - the home page has no corresponding entry in
+`public/downloads/` (print PDFs cover competition/award/edition/profile
+pages, `/records`, `/compare`, `/compare-players`, `/glossary`, and
+`/teams`/`/players` profiles, not the hand-authored home page), so no
+`pnpm build:pdfs` run was needed. `pnpm audit` (no known vulnerabilities).
+`pnpm dlx knip --no-config-hints` (same two standing false positives:
+`scripts/test-preview-server.mjs`, `@cspell/dict-hr-hr`). Ran the two
+updated e2e assertions plus the untouched `/records` one directly with
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` (this container's bundled
+Chromium lacks the `chrome-headless-shell` binary Playwright's default
+mobile-chromium project expects, the same container-specific snag the
+two-hundred-and-fourth run already documented) - all three passed. Did not
+re-run the full cold-start `pnpm test:e2e` suite or the five manual browser
+sweeps - no markup or interactive-behavior change beyond the two targeted
+assertions already re-run directly; the two-hundred-and-fourth run's own
+full cold-start `pnpm test:e2e` (1042/1042) plus the five manual browser
+sweeps remain the current baseline, with `check:lighthouse` last
+reconfirmed by the two-hundred-and-eighth run.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
+unchanged. The front-to-back read of all nine smaller `content/*.md` files
+is now complete and closed - combined with the two-hundred-and-ninth/
+two-hundred-and-tenth runs' by-hand recomputation of every `/records`
+ranking, every content file on the site (flagship and smaller alike) has
+now had at least one dedicated close-read pass. The next run most likely
+needs a genuinely new quality angle (accessibility, performance, a fresh
+`docs/WEBSITE_REQUIREMENTS.md`-vs-live-site read, or a second independent
+pass over files already checked once) rather than a first pass over
+anything still unread, unless a new source lead clears one of the blocked
+backlog items above.
+
+### New quiz question type - "Which country has hosted the most {competition} editions?" - added for all four team competitions (two-hundred-and-twelfth intensive run, 2026-10-02)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, and the two-hundred-and-eleventh run's own closing note
+pointing at "a genuinely new quality angle ... rather than a first pass over
+anything still unread," shipped a real feature addition instead of another
+verification pass: a new generated quiz question type, "Which country has
+hosted the most {competition} editions?", for the four team competitions
+with a Host column (FIFA World Cup, UEFA EURO, Copa América, UEFA Nations
+League).
+
+The quiz already asks "which team/player has won the most titles/awards" via
+`mostTitlesQuestion()` in `src/lib/quiz.ts`, fed by
+`buildChampionsSummary()`. `src/lib/editions.ts` already builds the exact
+same `ChampionSummary[]` shape for hosts (`buildHostsSummary()`, which backs
+`/records`' own "Most frequent hosts" ranking and had its own counts
+independently hand-verified against every Host cell at the
+two-hundred-and-tenth run) - so the new question type needed no new
+editorial research, just a new way of asking about data the site already
+displays and has already verified.
+
+Extended `mostTitlesQuestion()`'s `subject` parameter from `'team' |
+'player'` to add `'host'` (English "Which country has hosted the most
+{competition} editions?"; Croatian "Koja je država bila domaćin najviše
+izdanja natjecanja {competition}?"), and changed its internal choice-seed id
+from `${seedPrefix}:most-titles` to `${seedPrefix}:most-titles:${subject}` so
+a "most titles" and "most hosted" question for the same competition don't
+collide on the same id - this id is only ever used to seed the deterministic
+distractor shuffle (`buildChoice()`), never rendered in the DOM or persisted
+in a URL, so the change is invisible to any shared/printed quiz link, and no
+existing test asserted a specific choice order (only that the correct answer
+and choice count/uniqueness are right), confirmed by reading
+`tests/unit/quiz.test.ts` before relying on that. Wired a new `QuizPool`
+into both `src/pages/quiz.astro` and `src/pages/hr/quiz.astro` for each of
+the four team competitions, calling `mostTitlesQuestion(buildHostsSummary(...),
+..., 'host')`.
+
+`mostTitlesQuestion()`'s existing tie-and-sparse-data safety (returns no
+question when the top two entries are tied, or fewer than 3 distinct entries
+exist) applies unchanged and was confirmed against the real content tables
+by hand rather than assumed: FIFA World Cup has a 4-way tie at 2 hosts each
+(Mexico, Italy, France, Brazil all hosted twice) and UEFA Nations League has
+all 4 of its hosts tied at 1 each - both correctly produce no "most hosted"
+question. UEFA EURO (France, 3 hostings, a clear leader) and Copa América
+(Argentina, a clear leader) both correctly do produce one - confirmed live in
+`dist/quiz/index.html`/`dist/hr/quiz/index.html`'s own JSON-LD after a full
+build, not just from the unit tests.
+
+Added the matching bullet to `content/quiz.md`'s "Question types in this
+quiz" list ("Which country has hosted the most editions of a given
+tournament overall?", bumping its `lastReviewed` to 2026-10-02) and the
+matching Croatian bullet to the hardcoded notes list in
+`src/pages/hr/quiz.astro` ("Koja je država bila domaćin najviše izdanja
+danog natjecanja?"). Added six new unit tests to `tests/unit/quiz.test.ts`:
+the English "most hosted" prompt and correct answer from a dedicated
+host-count fixture built with `buildHostsSummary()`, the matching Croatian
+prompt, and an explicit regression test confirming the `'team'` and `'host'`
+subject questions for the same competition get different ids (the exact
+collision this run's id-format change was made to prevent).
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(905/905, up from 902 - the six new tests), `pnpm test:coverage`
+(99.91%/99.32%, both ticking up very slightly - the new code is fully
+exercised by its own tests, no new coverage gap), `pnpm build` (711 pages,
+unchanged - no new route, just new content on the existing `/quiz`/`/hr/quiz`
+pages). All 29 CI-gated fast `check:*` scripts individually re-run and
+clean, including `check:record-claims` (37 claims, up from 36 - the new
+"most hosted" bullet in `content/quiz.md` needed its own
+`record-claims-ledger.json` entry, added with the same "describes a
+generated quiz question type, not a static factual claim" rationale the
+existing "most titles/awards" bullet entry already used, since the actual
+answer is computed at build time from `buildHostsSummary()` rather than
+being a fixed fact to cross-reference against a static table),
+`check:i18n-notes` (7 matched page pairs, parity held for the new Croatian
+bullet), `check:jsonld` (1783 blocks across 711 pages, still structurally
+valid with the new questions included), `check:heading-outline`,
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:meta`,
+`check:spelling` (15 files, 0 issues), `check:spelling-hr` (57 blocks, 0
+unknown words - the new Croatian bullet's words already exist in the
+dictionary/wordlist, no new `.cspell` entry needed), and every other fast
+check unchanged and clean. `pnpm audit` (no known vulnerabilities). `pnpm
+dlx knip --no-config-hints` (same two standing false positives: `scripts/
+test-preview-server.mjs`, `@cspell/dict-hr-hr`).
+
+Regenerated all 700 downloadable PDFs
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs`, this
+session's own container-specific Chromium-revision escape hatch, the same
+snag the two-hundred-and-fourth run documented - this container's default
+Playwright Chromium resolves to revision 1243, which isn't cached here, only
+revision 1194 is) since `content/quiz.md` changed; `check:pdfs`/
+`check:pdf-outline` both clean (700/700) afterward.
+
+**One session-local operational snag along the way, worth recording in case
+a future run hits it again:** the first two `build:pdfs` attempts each
+failed differently - the first with `Error: Navigating to .../2002 failed:
+HTTP 404` partway through the edition-page phase (after successfully writing
+every team and player PDF), the second with `Error: Preview server at
+http://localhost:4399/football-reference/ did not become ready in time`
+before writing anything. Both traced to the same root cause: this run had
+directly invoked `playwright test` (not through `build:pdfs`) earlier to
+spot-check the new feature in a real browser, and that invocation's own
+`webServer` config (per `playwright.config.ts`) left an `astro preview`
+daemon running on port 4321 after the test process exited rather than
+tearing it down. `astro preview`'s start/stop lifecycle is tracked by a
+single project-level lock file, not per-port (`preview-daemon.mjs`'s own
+header comment already documents a related timing race from the
+hundred-and-forty-eighth run) - so `generate-pdfs.mjs`'s own unconditional
+`astro preview --port 4399` start collided with that stale lock: in the
+first attempt it appears to have torn the daemon down mid-run (the "Stopped
+preview server" log line immediately preceding the 404), and in the second
+attempt the CLI reported the old port-4321 instance as "already running",
+stopped it, and then the fresh port-4399 instance it tried to start next
+never came up within the 60-second timeout. Running `pnpm exec astro preview
+stop` once by hand to clear the stale lock before retrying fixed it
+immediately; the third attempt completed cleanly with no code change needed.
+Not a bug in `generate-pdfs.mjs` itself (it has no way to know a *different*
+tool left a stale lock behind) so much as an operational lesson for this
+routine: when a run exercises `playwright test` directly rather than only
+through an npm script that owns its own server lifecycle, run `pnpm exec
+astro preview stop` before `pnpm build:pdfs` (or any other script that
+starts its own preview daemon) rather than assuming a clean slate.
+
+Did not re-run the full cold-start `pnpm test:e2e` suite or the five manual
+browser sweeps - instead ran the two quiz-specific e2e specs directly
+(`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`, 14
+tests covering WCAG violations across both languages and both color schemes,
+plus the no-JS fallback state), which exercise every DOM state this run's
+change could plausibly affect; all 14 passed
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`, the same container-specific
+override). The two-hundred-and-fourth run's own full cold-start `pnpm
+test:e2e` (1042/1042) plus the five manual browser sweeps remain the
+standing baseline for everything else, with `check:lighthouse` last
+reconfirmed by the two-hundred-and-eighth run.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+The quiz's question-type surface now covers every `ChampionSummary`-shaped
+dataset the site generates (titles, awards, and now hosts) for every
+competition that has one; a natural next angle in the same "ship a feature,
+not another verification pass" vein would be a question type drawing on
+`/records`' other generated rankings (e.g. "back-to-back champions" or
+"biggest final win") not yet asked about in the quiz, or returning to the
+two-hundred-and-eleventh run's own suggestion of a fresh accessibility or
+performance angle.
+
+### Ballon d'Or "Memorable moments": youngest and oldest winners added, as a narrow first slice of the long-deferred "Youngest winner" ranking idea (two-hundred-and-thirteenth intensive run, 2026-10-02)
+
+Opened with the full standing health check (`pnpm install --frozen-lockfile`,
+`pnpm lint`/`pnpm test`/`pnpm build`, all 29 CI-gated fast `check:*`
+scripts individually, `pnpm audit`, `pnpm dlx knip --no-config-hints`):
+everything came back byte-identical to the two-hundred-and-twelfth run's own
+baseline (905/905 unit tests, 0/0/0 lint, 711 pages, no vulnerabilities, the
+same two standing `knip` false positives). Re-confirmed both standing
+network-dependent "Open backlog" blockers hold in this session too:
+`WebFetch` to `en.wikipedia.org` still returns `EGRESS_BLOCKED`, and a fresh
+`WebSearch` for the Nations League 2023 Finals attendance conflict (41,110 vs.
+41,500) still turns up only the one Wikipedia-derived figure with no second
+independently-sourced number, the same negative result every prior attempt
+since the hundred-and-sixty-second run found. `pnpm outdated` showed nothing
+actionable beyond the already-documented blocked `typescript` line and a
+trivial in-range `@types/node` patch.
+
+With every "Open backlog" item still blocked and no new verification-ledger
+claim shape surfacing on a fresh look, picked up `docs/ROADMAP.md`'s one
+remaining "Ideas not yet scoped" entry instead - the "Youngest winner"
+`/records`-style ranking - rather than attempting it at its originally-scoped
+size (a reliable birth date for all ~130 Ballon d'Or/Golden Boot winners,
+explicitly left unbuilt across 212 prior runs for the good reason that
+fabricating that many biographical facts in one unattended pass, each with no
+independent per-player source to cross-check against, risks shipping
+confidently-wrong history). Scoped a much narrower, lower-risk slice instead:
+just the two *endpoints* of that ranking - the single oldest and single
+youngest Ballon d'Or winner - which, unlike a raw birth date a future run
+would have to compute an age from itself, are each already a single,
+widely-reported, already-synthesized record most football outlets state
+outright and agree on. Golden Boot was deliberately left out of this slice
+entirely: its frequent joint-winner ties (up to six players sharing one
+edition, see `content/golden-boot.md`) make "the youngest/oldest winner"
+an ill-defined question for that award in a way it isn't for Ballon d'Or's
+clean one-winner-per-year table, so extending this same slice there isn't a
+simple copy-paste and was left for a future pass to scope properly.
+
+Verified both records via two independent `WebSearch` passes each, with a
+deliberately distinct source mix per pass: Stanley Matthews as the
+oldest-ever winner (41 years old at the inaugural 1956 ceremony, "41 years,
+321 days" per one source) is carried by Guinness World Records' own "oldest
+winner of football's (soccer's) Ballon d'Or award" page, and repeated
+consistently by ballondor.com's own site, Yahoo Sports, GiveMeSport and
+Oldest.org with no conflicting figure anywhere; Ronaldo (Brazil) as the
+youngest-ever winner (21 years old at the 23 December 1997 ceremony already
+on this page's own table, "21 years, 96 days" per one source and "21 years,
+3 months, 5 days" per another - both round to 21) is repeated the same way
+by Yahoo Sports, beIN Sports, ballondor.com's own site and SI.com. Both
+ceremony dates already on the page's own Winners table line up with the
+reported ages. The slight day-count variance between sources (a few days,
+plausibly from different outlets treating a private notification vs. the
+public gala date as "the" award moment, the same ambiguity this page's own
+"Important editorial note" already documents for the pre-1992 Ceremony-date
+column) is why both new bullets report only the whole-year age every source
+agrees on, not a precise day-count that would imply false precision.
+
+Added two bullets to `content/ballon-dor.md`'s "Memorable moments" section
+(bumping its `lastReviewed` to 2026-10-02) and the matching two bullets,
+hand-translated, to the Croatian `CROATIAN_MOMENTS` array in
+`src/pages/hr/competitions/ballon-dor.astro` - both written to avoid
+triggering `check:since-claims`/`check:superlative-claims`/
+`check:ordinal-claims`/`check:consecutive-claims`/`check:one-of-only-claims`/
+`check:completeness-claims`'s own trigger phrases ("since <year>", "the
+only", ordinal words, "consecutive"/"back-to-back", "one of only N", "across
+all N editions") so only `check:record-claims` (triggered by "oldest"/
+"youngest") needed a new ledger entry. Added both claims to
+`scripts/record-claims-ledger.json` under a new `"content/ballon-dor.md"`
+key (this file's first entry in that particular ledger), using the same
+"not independently verifiable from this site's own data" rationale the
+FIFA World Cup ledger's Suppici/de la Fuente/Zoff winning-manager/captain
+age entries already established for this exact gap (no birth-date/age column
+exists anywhere on this site to cross-check an age claim against), each
+entry's value recording the full WebSearch verification trail instead. Added
+a new "Youngest and oldest winners" entry to `docs/SOURCES.md`'s Ballon d'Or
+section with the full source list and reasoning for why this slice is a
+different, safer research task than the deferred full-ranking version.
+
+One of the two new bullets (Ronaldo/1997) gave the 1997 edition page a new
+"tap a year to reveal a short story" disclosure via `buildYearStories()`
+(`src/lib/editions.ts`) - that function joins each Memorable-moments bullet
+to the one edition whose year it names first, and 1997 previously had no
+bullet of its own. The 1956 bullet (Matthews) did not: an earlier, more
+specific bullet already claims 1956 ("Stanley Matthews won the first-ever
+Ballon d'Or in 1956."), and `buildYearStories()`'s own documented behavior
+keeps the first match per year, so the new bullet is correctly skipped for
+that disclosure (it still renders normally in the "Memorable moments" list
+itself) - confirmed by reading the function's own header comment rather than
+assumed.
+
+**Verification:** `pnpm lint` (238 files, 0/0/0), `pnpm test` (905/905,
+unchanged - no new unit-testable logic, just content/translation prose),
+`pnpm build` (711 pages, unchanged - no new route, the 1997 edition page
+already existed). `check:record-claims` (39 claims, up from 37 - the two new
+entries), `check:claims-hr` (the new English claims' "1956"/"1997" year
+anchors both confirmed present in the Croatian bullets at the matching
+position), `check:i18n-notes` (7 matched page pairs, parity held - both
+languages' "Memorable moments" section grew from 6 to 8 items together),
+`check:since-claims`/`check:superlative-claims`/`check:ordinal-claims`/
+`check:consecutive-claims`/`check:completeness-claims`/
+`check:one-of-only-claims` all clean (none of the other five claim-shape
+checkers matched the new bullets, as intended by the wording chosen),
+`check:spelling`/`check:spelling-hr`/`check:locale-consistency`/
+`check:links`/`check:jsonld`/`check:meta` and every other fast CI-gated
+check individually re-run and clean. `check:pdf-outline` initially failed
+on exactly one PDF (`edition-ballon-dor-1997.pdf`, 2 bookmarks vs. 3 expected
+- the new "tap a year" story section's own heading) after the content
+change, as expected per `AGENTS.md`'s PDF-freshness rule; regenerated all
+700 PDFs (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs`,
+this container's own documented Chromium-revision escape hatch, needed again
+in this fresh session - this container's default Playwright Chromium
+resolves to a revision not cached here, only the `/opt/pw-browsers/chromium`
+one is), after which `check:pdfs`/`check:pdf-outline` both passed clean
+(700/700).
+
+**Left for a future pass:** the full "Youngest winner" generated ranking
+(every winner, not just the two extremes) is still open, for both Ballon
+d'Or (needs ~47 more individual birth dates, each independently sourced) and
+Golden Boot (needs the joint-winner-ties question scoped first) - see
+`docs/ROADMAP.md`. The same environment-blocked/human-sign-off backlog items
+remain otherwise unchanged.
+
+### New quiz question type - "In which year did the {competition} final have the biggest winning margin?" - added for FIFA World Cup, UEFA EURO and UEFA Nations League (two-hundred-and-fourteenth intensive run, 2026-10-02)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, picked up the two-hundred-and-thirteenth run's own closing
+suggestion (itself carried forward from the two-hundred-and-twelfth run) - a
+quiz question type drawing on `/records`' other generated rankings not yet
+asked about in the quiz - and shipped it: a new generated quiz question
+type, "In which year did the {competition} final have the biggest winning
+margin?", for the three team competitions with a "Final" score column (FIFA
+World Cup, UEFA EURO, UEFA Nations League). Copa América has no such column
+(already documented on `/records` itself), so it is correctly not asked
+about.
+
+The quiz already asks "who won the title" and "which country hosted the
+most editions" via `mostTitlesQuestion()`, fed by `buildChampionsSummary()`/
+`buildHostsSummary()`. `src/lib/editions.ts` already builds a third
+`ChampionSummary[]`-shaped ranking for final-score margins
+(`buildBiggestFinalMargins()`, which backs `/records`' own "Biggest final
+wins" section and had its own per-edition margins independently
+hand-recomputed against every competition's own "Final" score cells at the
+two-hundred-and-tenth intensive run) - so, like the two-hundred-and-twelfth
+run's "most hosted" question, this new question type needed no new
+editorial research, just a new way of asking about data the site already
+displays and has already verified.
+
+Added `biggestFinalMarginQuestion()` to `src/lib/quiz.ts` rather than
+reusing `mostTitlesQuestion()` directly: `buildBiggestFinalMargins()`'s own
+`displayName` holds the full score text (e.g. "Brazil 5-2 Sweden"), which
+this question must never show or use as a choice (it would give the correct
+year away instantly) - so the new function builds its choices from each
+entry's `years[0]` instead, while keeping `mostTitlesQuestion()`'s own
+tie-and-sparse-data safety shape unchanged (no question when the top two
+margins are tied, or fewer than 3 distinct editions exist).
+
+That safety was confirmed against the real content tables by hand, not
+assumed - loaded each competition's actual `content/*.md` "Final"
+column via `buildBiggestFinalMargins()` in a throwaway Vitest probe before
+writing any page-level code: the FIFA World Cup has a three-way tie for the
+single biggest margin (1958's Brazil 5-2 Sweden, 1970's Brazil 4-1 Italy and
+1998's France 3-0 Brazil, all at margin 3) and UEFA Nations League has a
+two-way tie (2018-19's Portugal 1-0 Netherlands and 2020-21's France 2-1
+Spain, both at margin 1) - both correctly produce no question. UEFA EURO has
+a clear, unambiguous record (Spain's 4-0 win over Italy in 2012, margin 4,
+clear of 1972's margin-3 West Germany 3-0 Soviet Union final) and correctly
+does produce one - confirmed live in both
+`dist/quiz/index.html`/`dist/hr/quiz/index.html`'s own JSON-LD after a full
+build (`"acceptedAnswer":{"@type":"Answer","text":"2012"}` in both
+languages), not just from the unit tests; a direct grep for the World
+Cup/Nations League prompt strings in the same built output confirmed they
+never appear.
+
+Wired a new `QuizPool` into both `src/pages/quiz.astro` and
+`src/pages/hr/quiz.astro` for each of the three eligible competitions,
+calling `biggestFinalMarginQuestion(buildBiggestFinalMargins(...), ...)` -
+placed immediately after each competition's existing "most hosted" pool
+entry, matching that question type's own position in both files. Added the
+matching bullet to `content/quiz.md`'s "Question types in this quiz" list
+("In which year did a given tournament's final have the biggest winning
+margin? (only asked when there's a single, unambiguous biggest margin - not
+a tie for first)") and the matching Croatian bullet to the hardcoded notes
+list in `src/pages/hr/quiz.astro` ("Koje je godine finale danog natjecanja
+završilo najvećom pobjedom? ..."). Added eight new unit tests to
+`tests/unit/quiz.test.ts`, mirroring `buildBiggestFinalMargins()`'s own
+existing test fixture: the English prompt and correct answer, a dedicated
+assertion that no choice ever contains a score-line dash (guarding against
+ever accidentally showing `displayName` instead of a year), choice-count/
+uniqueness, determinism across repeated calls, the Croatian prompt (same
+underlying answer as English), the tie-returns-no-question case, the
+fewer-than-3-distinct-editions case, and the no-"Final"-column case (Copa
+América's own shape).
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(913/913, up from 905 - the eight new tests), `pnpm test:coverage`
+(99.83%/99.2% statements/branches, 100%/100% functions/lines - ticking down
+very slightly from 99.91%/99.32% only because of one new defensively-
+unreachable branch, `biggestFinalMarginQuestion()`'s own `if (!choice)
+return []` guard, which has the exact same shape as `mostTitlesQuestion()`'s
+own pre-existing uncovered guard at the same line offset - `buildChoice()`
+can only return `undefined` when fewer than 2 distinct distractors survive
+filtering, which this function's own tie/length checks already rule out by
+the time that guard runs, the same "Open backlog" coverage-gap
+classification this file documents for `quiz.ts`'s other branches), `pnpm
+build` (711 pages, unchanged - no new route, just new content on the
+existing `/quiz`/`/hr/quiz` pages). All 29 CI-gated fast `check:*` scripts
+individually re-run and clean, including `check:record-claims` (40 claims,
+up from 39 - the new "biggest winning margin" bullet in `content/quiz.md`
+needed its own `record-claims-ledger.json` entry, added with the same
+"describes a generated quiz question type, not a static factual claim"
+rationale the existing "most titles/awards"/"most hosted" entries already
+used, since the actual answer is computed at build time from
+`buildBiggestFinalMargins()` rather than being a fixed fact to
+cross-reference against a static table), `check:i18n-notes` (7 matched page
+pairs, parity held for the new Croatian bullet), `check:jsonld` (1783 blocks
+across 711 pages, still structurally valid with the new question included),
+`check:heading-outline`, `check:links` (715 pages), `check:sitemap` (710
+entries), `check:meta`, `check:spelling` (15 files, 0 issues),
+`check:spelling-hr` (57 blocks, 0 unknown words - the new Croatian bullet's
+words already exist in the dictionary/wordlist, no new `.cspell` entry
+needed), and every other fast check unchanged and clean. `pnpm audit` (no
+known vulnerabilities). `pnpm dlx knip --no-config-hints` (same two standing
+false positives: `scripts/test-preview-server.mjs`, `@cspell/dict-hr-hr`).
+
+Regenerated all 700 downloadable PDFs
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs`, this
+session's own container-specific Chromium-revision escape hatch - this
+container's default Playwright Chromium resolves to a revision not cached
+here, only the `/opt/pw-browsers/chromium` one is) since `content/quiz.md`
+changed; `check:pdfs`/`check:pdf-outline` both clean (700/700) afterward, no
+preview-server lock snag this time (ran `astro preview stop` first as a
+precaution, which correctly reported no server running).
+
+Did not re-run the full cold-start `pnpm test:e2e` suite or the five manual
+browser sweeps - instead ran the same two quiz-specific e2e specs the
+two-hundred-and-twelfth run used for its own quiz change
+(`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`, 14
+tests covering WCAG violations across both languages/both color schemes and
+the no-JS fallback state), which exercise every DOM state this run's change
+could plausibly affect; all 14 passed
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`). The two-hundred-and-fourth
+run's own full cold-start `pnpm test:e2e` (1042/1042) plus the five manual
+browser sweeps remain the standing baseline for everything else, with
+`check:lighthouse` last reconfirmed by the two-hundred-and-eighth run.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+The quiz's question-type surface now also covers `/records`' "Biggest final
+wins" ranking; "Back-to-back champions"/"Longest wait between titles" remain
+the two still-unasked-about generated rankings on that page, a natural next
+candidate in the same "ship a feature, not another verification pass" vein -
+or returning to the two-hundred-and-eleventh run's own suggestion of a fresh
+accessibility or performance angle.

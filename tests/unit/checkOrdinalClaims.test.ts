@@ -42,6 +42,18 @@ describe('extractOrdinalClaims', () => {
     expect(extractOrdinalClaims(md)).toEqual(['Colombia won its first title in 2001.']);
   });
 
+  it('extracts a bare "-ever" ordinal claim with no adjacent "the" or possessive, e.g. a list separating the possessive from the ordinal', () => {
+    const md = `- Someone (Club) - honored for the club's league title, cup and first-ever continental title.\n`;
+    expect(extractOrdinalClaims(md)).toEqual([
+      "Someone (Club) - honored for the club's league title, cup and first-ever continental title.",
+    ]);
+  });
+
+  it('matches every "-ever" ordinal word from first through tenth', () => {
+    const md = `- a third-ever instance.\n- a tenth-ever instance.\n`;
+    expect(extractOrdinalClaims(md)).toEqual(['a third-ever instance.', 'a tenth-ever instance.']);
+  });
+
   it('does not match a bare ordinal with no possessive and no "the", e.g. "at first" or a structural "third-place match"', () => {
     const md = `- Eligibility was Europe-only at first.\n- No third-place match was played.\n`;
     expect(extractOrdinalClaims(md)).toEqual([]);

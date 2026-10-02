@@ -1,0 +1,13 @@
+{
+  "content/fifa-world-cup.md": {
+    "Every World Cup-winning team has been led by a manager of the same nationality as the team itself, a pattern unbroken across all 23 editions.": "Verified 2026-09-28: cross-checked all 23 Winning managers entries' parenthetical nation against the Editions table's Winner column for that year - every one matches (e.g. 1930 Alberto Suppici (Uruguay) against Winner Uruguay, through 2026 Luis de la Fuente (Spain) against Winner Spain), no exception found.",
+    "The captain is the player who lifts the trophy on the podium; every World Cup-winning team has had one across all 23 editions.": "Verified 2026-09-28: the Winning captains section lists a named captain for all 23 editions (1930 through 2026), no blank or missing entry."
+  },
+  "content/uefa-euro.md": {
+    "The captain is the player who lifts the trophy on the podium; every EURO-winning team has had one across all 17 editions.": "Verified 2026-09-28: the Winning captains section lists a named captain for all 17 editions (1960 through 2024), no blank or missing entry."
+  },
+  "content/uefa-nations-league.md": {
+    "The captain is the player who lifts the trophy on the podium; every Nations League Finals winner has had one across all four completed editions.": "Verified 2026-09-28: the Winning captains section lists a named captain for all four editions (2019, 2021, 2023, 2025), no blank or missing entry.",
+    "The host nation has finished in the Finals' top four in every edition so far, including Germany finishing fourth in 2025.": "Verified 2026-09-28: cross-checked the Finals table's host against its own Winner/Runner-up/Third/Fourth columns for each edition - 2019 Portugal (1st, as Winner), 2021 Italy (3rd), 2023 Netherlands (4th), 2025 Germany (4th) - every host placed in the top four, no exception found."
+  }
+}
