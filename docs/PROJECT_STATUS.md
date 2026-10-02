@@ -32777,3 +32777,124 @@ not another verification pass" vein would be a question type drawing on
 "biggest final win") not yet asked about in the quiz, or returning to the
 two-hundred-and-eleventh run's own suggestion of a fresh accessibility or
 performance angle.
+
+### Ballon d'Or "Memorable moments": youngest and oldest winners added, as a narrow first slice of the long-deferred "Youngest winner" ranking idea (two-hundred-and-thirteenth intensive run, 2026-10-02)
+
+Opened with the full standing health check (`pnpm install --frozen-lockfile`,
+`pnpm lint`/`pnpm test`/`pnpm build`, all 29 CI-gated fast `check:*`
+scripts individually, `pnpm audit`, `pnpm dlx knip --no-config-hints`):
+everything came back byte-identical to the two-hundred-and-twelfth run's own
+baseline (905/905 unit tests, 0/0/0 lint, 711 pages, no vulnerabilities, the
+same two standing `knip` false positives). Re-confirmed both standing
+network-dependent "Open backlog" blockers hold in this session too:
+`WebFetch` to `en.wikipedia.org` still returns `EGRESS_BLOCKED`, and a fresh
+`WebSearch` for the Nations League 2023 Finals attendance conflict (41,110 vs.
+41,500) still turns up only the one Wikipedia-derived figure with no second
+independently-sourced number, the same negative result every prior attempt
+since the hundred-and-sixty-second run found. `pnpm outdated` showed nothing
+actionable beyond the already-documented blocked `typescript` line and a
+trivial in-range `@types/node` patch.
+
+With every "Open backlog" item still blocked and no new verification-ledger
+claim shape surfacing on a fresh look, picked up `docs/ROADMAP.md`'s one
+remaining "Ideas not yet scoped" entry instead - the "Youngest winner"
+`/records`-style ranking - rather than attempting it at its originally-scoped
+size (a reliable birth date for all ~130 Ballon d'Or/Golden Boot winners,
+explicitly left unbuilt across 212 prior runs for the good reason that
+fabricating that many biographical facts in one unattended pass, each with no
+independent per-player source to cross-check against, risks shipping
+confidently-wrong history). Scoped a much narrower, lower-risk slice instead:
+just the two *endpoints* of that ranking - the single oldest and single
+youngest Ballon d'Or winner - which, unlike a raw birth date a future run
+would have to compute an age from itself, are each already a single,
+widely-reported, already-synthesized record most football outlets state
+outright and agree on. Golden Boot was deliberately left out of this slice
+entirely: its frequent joint-winner ties (up to six players sharing one
+edition, see `content/golden-boot.md`) make "the youngest/oldest winner"
+an ill-defined question for that award in a way it isn't for Ballon d'Or's
+clean one-winner-per-year table, so extending this same slice there isn't a
+simple copy-paste and was left for a future pass to scope properly.
+
+Verified both records via two independent `WebSearch` passes each, with a
+deliberately distinct source mix per pass: Stanley Matthews as the
+oldest-ever winner (41 years old at the inaugural 1956 ceremony, "41 years,
+321 days" per one source) is carried by Guinness World Records' own "oldest
+winner of football's (soccer's) Ballon d'Or award" page, and repeated
+consistently by ballondor.com's own site, Yahoo Sports, GiveMeSport and
+Oldest.org with no conflicting figure anywhere; Ronaldo (Brazil) as the
+youngest-ever winner (21 years old at the 23 December 1997 ceremony already
+on this page's own table, "21 years, 96 days" per one source and "21 years,
+3 months, 5 days" per another - both round to 21) is repeated the same way
+by Yahoo Sports, beIN Sports, ballondor.com's own site and SI.com. Both
+ceremony dates already on the page's own Winners table line up with the
+reported ages. The slight day-count variance between sources (a few days,
+plausibly from different outlets treating a private notification vs. the
+public gala date as "the" award moment, the same ambiguity this page's own
+"Important editorial note" already documents for the pre-1992 Ceremony-date
+column) is why both new bullets report only the whole-year age every source
+agrees on, not a precise day-count that would imply false precision.
+
+Added two bullets to `content/ballon-dor.md`'s "Memorable moments" section
+(bumping its `lastReviewed` to 2026-10-02) and the matching two bullets,
+hand-translated, to the Croatian `CROATIAN_MOMENTS` array in
+`src/pages/hr/competitions/ballon-dor.astro` - both written to avoid
+triggering `check:since-claims`/`check:superlative-claims`/
+`check:ordinal-claims`/`check:consecutive-claims`/`check:one-of-only-claims`/
+`check:completeness-claims`'s own trigger phrases ("since <year>", "the
+only", ordinal words, "consecutive"/"back-to-back", "one of only N", "across
+all N editions") so only `check:record-claims` (triggered by "oldest"/
+"youngest") needed a new ledger entry. Added both claims to
+`scripts/record-claims-ledger.json` under a new `"content/ballon-dor.md"`
+key (this file's first entry in that particular ledger), using the same
+"not independently verifiable from this site's own data" rationale the
+FIFA World Cup ledger's Suppici/de la Fuente/Zoff winning-manager/captain
+age entries already established for this exact gap (no birth-date/age column
+exists anywhere on this site to cross-check an age claim against), each
+entry's value recording the full WebSearch verification trail instead. Added
+a new "Youngest and oldest winners" entry to `docs/SOURCES.md`'s Ballon d'Or
+section with the full source list and reasoning for why this slice is a
+different, safer research task than the deferred full-ranking version.
+
+One of the two new bullets (Ronaldo/1997) gave the 1997 edition page a new
+"tap a year to reveal a short story" disclosure via `buildYearStories()`
+(`src/lib/editions.ts`) - that function joins each Memorable-moments bullet
+to the one edition whose year it names first, and 1997 previously had no
+bullet of its own. The 1956 bullet (Matthews) did not: an earlier, more
+specific bullet already claims 1956 ("Stanley Matthews won the first-ever
+Ballon d'Or in 1956."), and `buildYearStories()`'s own documented behavior
+keeps the first match per year, so the new bullet is correctly skipped for
+that disclosure (it still renders normally in the "Memorable moments" list
+itself) - confirmed by reading the function's own header comment rather than
+assumed.
+
+**Verification:** `pnpm lint` (238 files, 0/0/0), `pnpm test` (905/905,
+unchanged - no new unit-testable logic, just content/translation prose),
+`pnpm build` (711 pages, unchanged - no new route, the 1997 edition page
+already existed). `check:record-claims` (39 claims, up from 37 - the two new
+entries), `check:claims-hr` (the new English claims' "1956"/"1997" year
+anchors both confirmed present in the Croatian bullets at the matching
+position), `check:i18n-notes` (7 matched page pairs, parity held - both
+languages' "Memorable moments" section grew from 6 to 8 items together),
+`check:since-claims`/`check:superlative-claims`/`check:ordinal-claims`/
+`check:consecutive-claims`/`check:completeness-claims`/
+`check:one-of-only-claims` all clean (none of the other five claim-shape
+checkers matched the new bullets, as intended by the wording chosen),
+`check:spelling`/`check:spelling-hr`/`check:locale-consistency`/
+`check:links`/`check:jsonld`/`check:meta` and every other fast CI-gated
+check individually re-run and clean. `check:pdf-outline` initially failed
+on exactly one PDF (`edition-ballon-dor-1997.pdf`, 2 bookmarks vs. 3 expected
+- the new "tap a year" story section's own heading) after the content
+change, as expected per `AGENTS.md`'s PDF-freshness rule; regenerated all
+700 PDFs (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs`,
+this container's own documented Chromium-revision escape hatch, needed again
+in this fresh session - this container's default Playwright Chromium
+resolves to a revision not cached here, only the `/opt/pw-browsers/chromium`
+one is), after which `check:pdfs`/`check:pdf-outline` both passed clean
+(700/700).
+
+**Left for a future pass:** the full "Youngest winner" generated ranking
+(every winner, not just the two extremes) is still open, for both Ballon
+d'Or (needs ~47 more individual birth dates, each independently sourced) and
+Golden Boot (needs the joint-winner-ties question scoped first) - see
+`docs/ROADMAP.md`. The same environment-blocked/human-sign-off backlog items
+remain otherwise unchanged.
