@@ -1,11 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { buildBiggestFinalMargins, buildChampionsSummary, buildEditions, buildHostsSummary } from '../../src/lib/editions';
+import {
+  buildBiggestFinalMargins,
+  buildChampionsSummary,
+  buildEditions,
+  buildHostsSummary,
+  buildLongestStreaks,
+  buildLongestTitleGaps,
+} from '../../src/lib/editions';
 import { buildTimeline } from '../../src/lib/editions';
 import {
   biggestFinalMarginQuestion,
   championByYearQuestions,
   chronologicalOrderQuestions,
   hostByYearQuestions,
+  longestStreakQuestion,
+  longestTitleGapQuestion,
   mostTitlesQuestion,
   runnerUpByYearQuestions,
   selectQuiz,
@@ -732,6 +741,183 @@ describe('biggestFinalMarginQuestion', () => {
     };
     const noMargins = buildBiggestFinalMargins(buildEditions(noFinalColumnTable));
     expect(biggestFinalMarginQuestion(noMargins, 'Test Cup', 'test')).toHaveLength(0);
+  });
+});
+
+describe('longestStreakQuestion', () => {
+  const streakTable: MarkdownTable = {
+    headers: ['Year', 'Winner'],
+    rows: [
+      ['1990', 'Brazil'],
+      ['1991', 'Brazil'],
+      ['1992', 'Brazil'],
+      ['1993', 'Italy'],
+      ['1994', 'Italy'],
+      ['1995', 'Argentina'],
+      ['1996', 'Germany'],
+      ['1997', 'Germany'],
+    ],
+  };
+  const clearStreaks = buildLongestStreaks(buildEditions(streakTable));
+
+  it('asks a "longest streak" question with the longest-streak entry as the answer', () => {
+    const questions = longestStreakQuestion(clearStreaks, 'FIFA World Cup', 'world-cup');
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe(
+      'Which team had the longest run of consecutive FIFA World Cup titles?',
+    );
+    expect(questions[0].category).toBe('FIFA World Cup');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('Brazil');
+  });
+
+  it('never repeats a choice and stays within the 3-4 choice range', () => {
+    const questions = longestStreakQuestion(clearStreaks, 'FIFA World Cup', 'world-cup');
+    const [q] = questions;
+    expect(new Set(q.choices).size).toBe(q.choices.length);
+    expect(q.choices.length).toBeGreaterThanOrEqual(3);
+    expect(q.choices.length).toBeLessThanOrEqual(4);
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const a = longestStreakQuestion(clearStreaks, 'FIFA World Cup', 'world-cup');
+    const b = longestStreakQuestion(clearStreaks, 'FIFA World Cup', 'world-cup');
+    expect(a).toEqual(b);
+  });
+
+  it('uses "awards" wording for an individual-award subject, e.g. Ballon d\'Or', () => {
+    const questions = longestStreakQuestion(clearStreaks, "Ballon d'Or", 'ballon-dor', 'player');
+    expect(questions[0].prompt).toBe("Who had the longest run of consecutive Ballon d'Or awards?");
+  });
+
+  it('builds a Croatian prompt when locale is "hr", with the same answer as English', () => {
+    const enQuestions = longestStreakQuestion(clearStreaks, 'FIFA World Cup', 'world-cup', 'team', 'en');
+    const hrQuestions = longestStreakQuestion(clearStreaks, 'FIFA World Cup', 'world-cup', 'team', 'hr');
+    expect(hrQuestions[0].prompt).toBe(
+      'Koja reprezentacija ima najdulji niz uzastopnih naslova na natjecanju FIFA World Cup?',
+    );
+    expect(hrQuestions[0].choices[hrQuestions[0].answerIndex]).toBe(
+      enQuestions[0].choices[enQuestions[0].answerIndex],
+    );
+  });
+
+  it('combines the Croatian prompt with individual-award wording (hr + player)', () => {
+    const questions = longestStreakQuestion(clearStreaks, "Ballon d'Or", 'ballon-dor', 'player', 'hr');
+    expect(questions[0].prompt).toBe("Tko ima najdulji niz uzastopnih osvojenih nagrada Ballon d'Or?");
+  });
+
+  it('returns no question when there is a tie for the single longest streak', () => {
+    const tiedTable: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1990', 'Brazil'],
+        ['1991', 'Brazil'],
+        ['1993', 'Italy'],
+        ['1994', 'Italy'],
+        ['1996', 'Germany'],
+        ['1997', 'Germany'],
+      ],
+    };
+    const tiedStreaks = buildLongestStreaks(buildEditions(tiedTable));
+    expect(longestStreakQuestion(tiedStreaks, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when fewer than 3 distinct streaks exist', () => {
+    const sparse = clearStreaks.slice(0, 2);
+    expect(longestStreakQuestion(sparse, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when the competition has no back-to-back streak at all (e.g. UEFA Nations League)', () => {
+    const noStreakTable: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['2019', 'Portugal'],
+        ['2021', 'France'],
+        ['2023', 'Spain'],
+        ['2025', 'Germany'],
+      ],
+    };
+    const noStreaks = buildLongestStreaks(buildEditions(noStreakTable));
+    expect(longestStreakQuestion(noStreaks, 'Test Cup', 'test')).toHaveLength(0);
+  });
+});
+
+describe('longestTitleGapQuestion', () => {
+  const gapTable: MarkdownTable = {
+    headers: ['Year', 'Winner'],
+    rows: [
+      ['1930', 'Brazil'],
+      ['1950', 'Italy'],
+      ['1960', 'Germany'],
+      ['1980', 'Italy'],
+      ['1985', 'Germany'],
+      ['1990', 'Brazil'],
+    ],
+  };
+  const clearGaps = buildLongestTitleGaps(buildEditions(gapTable));
+
+  it('asks a "longest wait" question with the widest-gap entry as the answer', () => {
+    const questions = longestTitleGapQuestion(clearGaps, 'FIFA World Cup', 'world-cup');
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe('Which team waited the longest between FIFA World Cup titles?');
+    expect(questions[0].category).toBe('FIFA World Cup');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('Brazil');
+  });
+
+  it('never repeats a choice and stays within the 3-4 choice range', () => {
+    const questions = longestTitleGapQuestion(clearGaps, 'FIFA World Cup', 'world-cup');
+    const [q] = questions;
+    expect(new Set(q.choices).size).toBe(q.choices.length);
+    expect(q.choices.length).toBeGreaterThanOrEqual(3);
+    expect(q.choices.length).toBeLessThanOrEqual(4);
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const a = longestTitleGapQuestion(clearGaps, 'FIFA World Cup', 'world-cup');
+    const b = longestTitleGapQuestion(clearGaps, 'FIFA World Cup', 'world-cup');
+    expect(a).toEqual(b);
+  });
+
+  it('uses "awards" wording for an individual-award subject, e.g. Ballon d\'Or', () => {
+    const questions = longestTitleGapQuestion(clearGaps, "Ballon d'Or", 'ballon-dor', 'player');
+    expect(questions[0].prompt).toBe("Who waited the longest between Ballon d'Or awards?");
+  });
+
+  it('builds a Croatian prompt when locale is "hr", with the same answer as English', () => {
+    const enQuestions = longestTitleGapQuestion(clearGaps, 'FIFA World Cup', 'world-cup', 'team', 'en');
+    const hrQuestions = longestTitleGapQuestion(clearGaps, 'FIFA World Cup', 'world-cup', 'team', 'hr');
+    expect(hrQuestions[0].prompt).toBe(
+      'Koja je reprezentacija najdulje čekala na sljedeći naslov na natjecanju FIFA World Cup?',
+    );
+    expect(hrQuestions[0].choices[hrQuestions[0].answerIndex]).toBe(
+      enQuestions[0].choices[enQuestions[0].answerIndex],
+    );
+  });
+
+  it('combines the Croatian prompt with individual-award wording (hr + player)', () => {
+    const questions = longestTitleGapQuestion(clearGaps, "Ballon d'Or", 'ballon-dor', 'player', 'hr');
+    expect(questions[0].prompt).toBe("Tko je najdulje čekao na sljedeću nagradu Ballon d'Or?");
+  });
+
+  it('returns no question when there is a tie for the single longest wait', () => {
+    const tiedTable: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1930', 'Brazil'],
+        ['1950', 'Italy'],
+        ['1960', 'Germany'],
+        ['1975', 'Germany'],
+        ['1990', 'Brazil'],
+        ['2010', 'Italy'],
+      ],
+    };
+    const tiedGaps = buildLongestTitleGaps(buildEditions(tiedTable));
+    expect(tiedGaps.length).toBeGreaterThanOrEqual(3);
+    expect(longestTitleGapQuestion(tiedGaps, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when fewer than 3 distinct entries exist', () => {
+    const sparse = clearGaps.slice(0, 2);
+    expect(longestTitleGapQuestion(sparse, 'Test Cup', 'test')).toHaveLength(0);
   });
 });
 

@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (214 intensive runs as of 2026-10-02) lives
+verification sweep and decision (215 intensive runs as of 2026-10-02) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,8 +44,8 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-fourteenth run (2026-10-02): 913/913 unit tests,
-`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.83%/99.2%
+As of the two-hundred-and-fifteenth run (2026-10-02): 930/930 unit tests,
+`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.67%/98.98%
 coverage, and the same two standing `knip` false positives as ever (`scripts/
 test-preview-server.mjs`, used only as a Playwright `webServer.command`,
 never imported; `@cspell/dict-hr-hr`, used only via `.cspell/
@@ -69,14 +69,142 @@ was judged sufficient; the two-hundred-and-thirteenth run's own two new
 "Memorable moments" bullets (below) are content/translation prose plus one
 new heading on a single edition page (PDF-only impact, caught by
 `check:pdf-outline` and fixed by regenerating PDFs), so no e2e re-run was
-judged necessary for it. The two-hundred-and-fourteenth run's own new quiz
-question type is, like the two-hundred-and-twelfth run's, a real
-markup/behavior change, so its own entry likewise re-ran just the two
-quiz-specific e2e specs (14 tests) rather than the full suite. The
-two-hundred-and-eighth run did re-run
-`check:lighthouse` on its own (a manual/intensive-run-only tool, not part of
-the cold-start `test:e2e` + browser-sweep baseline) and confirmed it is still
-perfect - see that run's own entry below.
+judged necessary for it. The two-hundred-and-fourteenth and
+two-hundred-and-fifteenth runs' own new quiz question types are, like the
+two-hundred-and-twelfth run's, a real markup/behavior change, so each entry
+likewise re-ran just the two quiz-specific e2e specs (14 tests) rather than
+the full suite. The two-hundred-and-eighth run did re-run `check:lighthouse`
+on its own (a manual/intensive-run-only tool, not part of the cold-start
+`test:e2e` + browser-sweep baseline) and confirmed it is still perfect - see
+that run's own entry below.
+
+**Two-hundred-and-fifteenth run:** picked up the two-hundred-and-fourteenth
+run's own closing suggestion - the quiz's question-type surface now also
+covers `/records`' "Back-to-back champions" and "Longest wait between
+titles" sections, the two generated rankings that were still unasked-about
+after the two-hundred-and-twelfth/two-hundred-and-fourteenth runs' "most
+hosted"/"biggest winning margin" additions. Shipped two new generated quiz
+question types: `longestStreakQuestion()` ("Which team/player had the
+longest run of consecutive {competition} titles/awards?", fed by
+`buildLongestStreaks()`) and `longestTitleGapQuestion()` ("Who waited the
+longest between {competition} titles/awards?", fed by
+`buildLongestTitleGaps()`) in `src/lib/quiz.ts` - both reuse the exact
+`ChampionSummary[]`-shaped rankings that already back `/records`' own
+sections (`src/lib/editions.ts`), independently hand-recomputed against
+every competition's own Winner column/title years at the
+two-hundred-and-ninth intensive run, so this needed no new editorial
+research, just a new way of asking about data the site already displays and
+has already verified. Both functions follow `biggestFinalMarginQuestion()`'s
+own tie-and-sparse-data safety exactly (no question when the top two
+entries tie, or fewer than 3 distinct entries exist) and take the same
+`subject: 'team' | 'player'` parameter `mostTitlesQuestion()` already uses,
+for the three individual-award datasets' Croatian wording.
+
+Wired both into every one of the seven `loadCompetition()` datasets already
+loaded on `src/pages/quiz.astro`/`src/pages/hr/quiz.astro` (FIFA World Cup,
+UEFA EURO, Copa América, UEFA Nations League, Ballon d'Or, World Cup Golden
+Boot, EURO Golden Boot) - the same "wire it everywhere the data shape
+applies, let the tie-safety logic decide per-run whether a question actually
+appears" precedent the "most hosted" question already established, so a
+future edition that breaks a current tie produces a question with no further
+code change needed. Confirmed against the real content tables (not assumed)
+which datasets currently produce a question: the "longest streak" question
+fires only for Copa América (Argentina, a 3-in-a-row 1945-1947, ahead of ten
+2-in-a-row ties) and Ballon d'Or (Lionel Messi, 2009-2012); it correctly
+produces no question for FIFA World Cup (Italy 1934/1938 and Brazil
+1958/1962 tied at 2), UEFA EURO (only one streak, Spain 2008/2012), UEFA
+Nations League and EURO Golden Boot (no streak at all), and World Cup Golden
+Boot (only one streak, Mbappé 2022/2026). The "longest wait" question fires
+for FIFA World Cup (Italy, 44 years), UEFA EURO (Italy, 52 years) and Copa
+América (Brazil, 40 years); it correctly produces no question for UEFA
+Nations League and both Golden Boot tables (only one team/player with 2+
+titles so far) and Ballon d'Or (Ronaldo and Cristiano Ronaldo tied at a
+5-year wait) - all twelve outcomes confirmed by extracting and parsing the
+real `dist/records/index.html` JSON-LD `ItemList` blocks for both sections
+(not just read off the rendered prose), then checked again directly against
+the newly-built `dist/quiz/index.html`/`dist/hr/quiz/index.html` JSON-LD,
+which produced exactly the five questions expected (Italy/Italy/Brazil for
+"longest wait", Argentina/Messi for "longest streak") with the expected
+answers, in both languages.
+
+Added the matching two bullets to `content/quiz.md`'s "Question types in
+this quiz" list and the two matching Croatian bullets to the hardcoded notes
+list in `src/pages/hr/quiz.astro`. Added 17 new unit tests to
+`tests/unit/quiz.test.ts` (two new `describe` blocks, 9 and 8 cases,
+mirroring `biggestFinalMarginQuestion`'s own test shape: the English/
+Croatian prompts and correct answers for both team and player subjects,
+choice-count/uniqueness, determinism, the tie-returns-no-question case, the
+fewer-than-3-entries case, and - for the streak question only, since its own
+`buildLongestStreaks()` can return an empty array outright rather than just
+too few entries - the no-streak-at-all case).
+
+One new claim-ledger wrinkle: the "longest run of consecutive" bullet's
+first line matches `check-consecutive-claims.mjs`'s trigger word
+("consecutive"), so it needed its own `scripts/consecutive-claims-ledger.json`
+entry under a new `content/quiz.md` key - same "describes a generated quiz
+question type, not a factual claim" rationale the three prior quiz-question
+ledger entries in `record-claims-ledger.json` already use. Neither new
+bullet matches any other claim checker's trigger words ("longest" itself
+isn't one of `record-claims`' `most|record|youngest|oldest|highest|biggest|
+largest|lowest|fewest` triggers). Also re-wrapped the "longest streak"
+bullet's line break so its second line doesn't itself start with `- `
+(which would otherwise be misread as a second, spurious top-level bullet by
+every claim checker's `/^-\s(.*)$/` line regex) - confirmed by running
+`check-consecutive-claims.mjs` before and after the rewrap.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+surfaced one new in-range patch beyond the already-documented blocked
+`typescript` line (`@types/node` 26.6.3 -> 26.6.4), bumped via `pnpm update
+@types/node`; `pnpm outdated` afterward shows only the blocked `typescript`
+line. `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(930/930, up from 913 - the 17 new quiz tests), `pnpm test:coverage`
+(99.67%/98.98% statements/branches, 100%/100% functions/lines - the two new
+uncovered branches are `longestStreakQuestion()`'s and
+`longestTitleGapQuestion()`'s own `if (!choice) return []` guards, the same
+defensively-unreachable shape `mostTitlesQuestion()`'s and
+`biggestFinalMarginQuestion()`'s identical guards already have, per this
+file's own "Open backlog" coverage-gap classification below, updated to
+include these two), `pnpm build` (711 pages, unchanged - no new route, just
+new content on the existing `/quiz`/`/hr/quiz` pages). All 29 CI-gated fast
+`check:*` scripts individually re-run and clean, including
+`check:consecutive-claims` (23 claims, up from 22 - the new ledger entry
+above), `check:record-claims` (40 claims, unchanged - neither new bullet
+matches its trigger words), `check:i18n-notes` (7 matched page pairs, parity
+held for the two new Croatian bullets), `check:jsonld` (1783 blocks across
+711 pages, still structurally valid with the new questions included).
+`pnpm audit` (no known vulnerabilities). `pnpm dlx knip --no-config-hints`
+(same two standing false positives). Regenerated all 700 downloadable PDFs
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs`, this
+session's own container-specific Chromium-revision escape hatch) since
+`content/quiz.md` changed; `check:pdfs`/`check:pdf-outline` both clean
+(700/700) after. Did not re-run the full cold-start `pnpm test:e2e` suite or
+the five manual browser sweeps - instead ran the same two quiz-specific e2e
+specs the two-hundred-and-twelfth/two-hundred-and-fourteenth runs used
+(`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`, 14
+tests covering WCAG violations across both languages/both color schemes and
+the no-JS fallback state), which exercise every DOM state this run's change
+could plausibly affect; all 14 passed. The two-hundred-and-fourth run's own
+full cold-start `pnpm test:e2e` (1042/1042) plus the five manual browser
+sweeps remain the standing baseline for everything else.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see "Open backlog" below, unchanged. The quiz's
+question-type surface now covers every `ChampionSummary[]`-shaped ranking
+`/records` renders (titles, awards, hosts, biggest final margins, back-to-back
+streaks and longest title gaps) for every competition that has one - no
+further untried `/records` ranking remains as a quiz-question candidate.
+"Fiercest rivalries" (`buildRivalries()`) and "Nearly champions"/"Nearly
+finalists" (`buildRunnerUpsWithoutTitle()`/`buildNearlyFinalists()`) are the
+only generated `/records` sections left with no quiz equivalent, but none of
+the three reduces naturally to a single clear "multiple choice" question the
+way the others do (a rivalry question would need a two-sided prompt shape,
+and "nearly champions/finalists" names a whole list rather than one record
+holder) - a genuinely new question *shape*, not just a new data source, so a
+natural next candidate worth scoping rather than assuming trivial. Otherwise,
+returning to the two-hundred-and-eleventh run's own suggestion of a fresh
+accessibility or performance angle, or the two-hundred-and-eighth run's
+still-untried front-to-back prose-vs-table read of the site's smaller
+`content/*.md` files, both remain open.
 
 **Two-hundred-and-fourteenth run:** with every "Open backlog" item below
 still either environment-blocked or awaiting human sign-off, picked up the
@@ -2082,15 +2210,18 @@ matching entry for full detail.
   rather than assumed. Needs a real browser with full ICU data to visually
   verify hyphenation renders as intended wherever the site's CSS requests it.
 - **Coverage gaps, defensively unreachable (not a bug, re-confirmed
-  2026-09-20)**: `quiz.ts`, `sources.ts` (two lines -
-  `disambiguateLabels()`'s `counts.get(base) ?? 1` fallback joins the
-  previously-documented `baseLabel`-lookup line), `tableSort.ts` and `url.ts`
-  each have one or two branches that an argument's own invariants make
-  unreachable in practice (e.g. `sources.ts`'s fallback can never actually
-  miss, since `counts` is built by iterating the exact same array being
-  mapped afterward). Left as-is per the eighth intensive run's original
-  classification; re-verify line numbers next time any of these four files
-  changes materially.
+  2026-10-02)**: `quiz.ts` (four lines as of the two-hundred-and-fifteenth
+  run - `mostTitlesQuestion()`'s and `biggestFinalMarginQuestion()`'s own
+  `if (!choice) return []` guards, joined this run by the identically-shaped
+  guards in the new `longestStreakQuestion()`/`longestTitleGapQuestion()`),
+  `sources.ts` (two lines - `disambiguateLabels()`'s `counts.get(base) ?? 1`
+  fallback joins the previously-documented `baseLabel`-lookup line),
+  `tableSort.ts` and `url.ts` each have one or two branches that an
+  argument's own invariants make unreachable in practice (e.g. `sources.ts`'s
+  fallback can never actually miss, since `counts` is built by iterating the
+  exact same array being mapped afterward). Left as-is per the eighth
+  intensive run's original classification; re-verify line numbers next time
+  any of these four files changes materially.
 
 ## Ideas not yet scoped
 

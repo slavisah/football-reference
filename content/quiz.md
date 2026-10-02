@@ -37,6 +37,12 @@ the quiz stays in sync as new editions are added.
 - In which year did a given tournament's final have the biggest winning
   margin? (only asked when there's a single, unambiguous biggest margin -
   not a tie for first)
+- Which team or player has the longest run of consecutive titles/awards in a
+  competition? (only asked when there's a single, unambiguous longest
+  streak - not a tie for first)
+- Which team or player waited the longest between titles/awards in a
+  competition? (only asked when there's a single, unambiguous longest wait -
+  not a tie for first)
 - Put four champions from a tournament, or four winners of an individual
   award (Ballon d'Or, Golden Boot), in chronological order (earliest
   first).
