@@ -33172,13 +33172,69 @@ entry needed), and every other fast check unchanged and clean. `pnpm audit`
 standing false positives: `scripts/test-preview-server.mjs`, `@cspell/
 dict-hr-hr`).
 
-Regenerated all 700 downloadable PDFs
+Regenerated all 700 downloadable PDFs since `content/quiz.md` changed
 (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs`, this
-session's own container-specific Chromium-revision escape hatch, run after an
-`astro preview stop` precaution per the two-hundred-and-twelfth run's own
-warning against an overlapping preview-server lock) since `content/quiz.md`
-changed; `check:pdfs`/`check:pdf-outline` both clean (700/700) afterward, no
-lock snag this time.
+session's own container-specific Chromium-revision escape hatch).
+
+**Self-inflicted PDF-corruption snag, caught on the pushed commit's own CI
+run, root-caused and fixed within this same run:** the first `build:pdfs`
+invocation above was still running in the background (700 pages takes
+several minutes end to end) when this run separately started the two quiz
+e2e specs below, whose own command opens with `astro preview stop` - copied
+from the two-hundred-and-twelfth run's own "stop any stale preview server
+first" precaution, but wrong to run here, since it killed the *same*
+preview server the still-in-flight `build:pdfs` run depended on to fetch
+each page.
+
+`generate-pdfs.mjs` did not hard-fail once its own page navigations started
+failing after the server died - it silently captured a stale/fallback
+(effectively home-page) render into every PDF it generated from that point
+on: 274 of 700 files (every Ballon d'Or edition, every Copa América edition,
+and both Golden Boot families' editions), each landing on one of only two
+suspiciously-identical byte sizes (one for the English PDFs, one for the
+Croatian ones) regardless of which year or competition they were supposed to
+be. `check:pdfs`/`check:pdf-outline` were both run once, correctly clean,
+*before* this corruption occurred; the run's own first commit and push went
+out against the already-corrupted on-disk state without re-running either
+check against what was actually there afterward - the gap this exposed.
+CI's own "test" check caught it on the pushed commit, which is how this run
+found out, not its own verification.
+
+Root-caused by inspecting the corrupted files directly rather than guessing:
+confirmed via `pdftotext` that the suspiciously-sized PDFs all contained the
+site's home-page copy ("Family-friendly football history", the six
+competition cards) instead of their own edition's content, and via file
+mtimes that the corruption window lined up exactly with when the
+`astro preview stop` command for the e2e run was issued, after the first
+`build:pdfs` process (confirmed still running via `ps aux` minutes earlier)
+would not yet have finished 700 pages.
+
+Fixed by: confirming no leftover `generate-pdfs.mjs`/preview/Chromium
+process was still running, then re-running `build:pdfs` a second time,
+start to finish, with nothing else invoked concurrently (no
+`astro preview stop`, no Playwright) until the background task's own
+completion notification confirmed it had fully exited - no manual
+process-polling race this time. Verified the fix three independent ways
+before trusting it: `check:pdfs`/`check:pdf-outline` both clean (700/700)
+again, a direct byte-size collision scan across all 700 files (zero sizes
+now shared by more than 2 files - the committed PDFs now vary like real
+rendered content should - versus 274 files collapsed onto just two sizes
+before), and `pdftotext` spot-checks of several previously-corrupted files
+(a 1960 EURO Golden Boot edition, a 1956 Ballon d'Or edition, a 1916 Copa
+América edition, a 1930 World Cup Golden Boot edition) confirming each now
+holds its own real page content. Only then re-ran the two quiz e2e specs
+(safely this time, with the PDF regeneration already finished and confirmed
+exited) and re-committed/re-pushed the corrected PDFs.
+
+**Lesson recorded for future runs:** never run `astro preview stop` (or
+start any other command that depends on or restarts the preview server)
+while a `build:pdfs` invocation from earlier in the same run might still be
+in flight in the background - a check that passed *before* the corruption
+is not evidence the corruption didn't happen *after*; confirm the earlier
+process has actually exited (via its own completion notification, not a
+manual `ps aux` sampled once) before starting anything else that touches
+the preview server, and re-run `check:pdfs`/`check:pdf-outline` as the very
+last step before committing, not just at some earlier point in the run.
 
 Did not re-run the full cold-start `pnpm test:e2e` suite or the five manual
 browser sweeps - instead ran the same two quiz-specific e2e specs the
@@ -33186,12 +33242,14 @@ two-hundred-and-twelfth/two-hundred-and-fourteenth runs used for their own
 quiz changes (`accessibility-quiz-states.spec.ts`,
 `no-js-quiz-and-search.spec.ts`, 14 tests covering WCAG violations across
 both languages/both color schemes and the no-JS fallback state), which
-exercise every DOM state this run's change could plausibly affect; all 14
-passed (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`). The
-two-hundred-and-fourth run's own full cold-start `pnpm test:e2e` (1042/1042)
-plus the five manual browser sweeps remain the standing baseline for
-everything else, with `check:lighthouse` last reconfirmed by the
-two-hundred-and-eighth run.
+exercise every DOM state this run's change could plausibly affect - these
+specs never load a PDF, so the corruption above didn't affect their result
+either time; all 14 passed both times (once against the corrupted PDFs,
+once again after the fix, `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+both times). The two-hundred-and-fourth run's own full cold-start `pnpm
+test:e2e` (1042/1042) plus the five manual browser sweeps remain the
+standing baseline for everything else, with `check:lighthouse` last
+reconfirmed by the two-hundred-and-eighth run.
 
 **Left for a future pass:** the same environment-blocked/human-sign-off open
 backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
