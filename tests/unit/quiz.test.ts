@@ -13,6 +13,7 @@ import {
   biggestFinalMarginQuestion,
   championByYearQuestions,
   chronologicalOrderQuestions,
+  fiercestRivalryQuestion,
   hostByYearQuestions,
   longestStreakQuestion,
   longestTitleGapQuestion,
@@ -1008,6 +1009,105 @@ describe('mostFrequentRivalryQuestion', () => {
 
   it('returns no question when there are no qualifying rivalries at all', () => {
     expect(mostFrequentRivalryQuestion([], 'Test Cup', 'test')).toHaveLength(0);
+  });
+});
+
+describe('fiercestRivalryQuestion', () => {
+  // Two separate "competitions" (unlike mostFrequentRivalryQuestion's own
+  // single-competition fixture above) - a pair that only meets once in each
+  // still counts as one combined rivalry, the cross-competition behavior
+  // this question type exists to ask about.
+  const compATable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'Runner-up'],
+    rows: [
+      ['1930', 'Argentina', 'Brazil'],
+      ['1934', 'Brazil', 'Argentina'],
+      ['1938', 'Argentina', 'Chile'],
+      ['1950', 'Chile', 'Argentina'],
+    ],
+  };
+  const compBTable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'Runner-up'],
+    rows: [
+      ['1962', 'Argentina', 'Denmark'],
+      ['1966', 'Denmark', 'Argentina'],
+      ['1970', 'Argentina', 'Denmark'],
+    ],
+  };
+  const crossRivalries = buildRivalries(
+    buildFinalsMeetings([
+      { title: 'Comp A', slug: 'comp-a', editions: buildEditions(compATable) },
+      { title: 'Comp B', slug: 'comp-b', editions: buildEditions(compBTable) },
+    ]),
+  );
+
+  it('has the widest-meeting pair (Argentina vs Denmark, 3 meetings, all from Comp B) as the clear leader', () => {
+    expect(crossRivalries.length).toBeGreaterThanOrEqual(3);
+    expect(crossRivalries[0].teamADisplayName).toBe('Argentina');
+    expect(crossRivalries[0].teamBDisplayName).toBe('Denmark');
+    expect(crossRivalries[0].meetings).toBe(3);
+  });
+
+  it('asks a cross-competition "fiercest rivalry" question with the top pair as the answer', () => {
+    const questions = fiercestRivalryQuestion(crossRivalries, 'test');
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe(
+      'Which two national teams have met each other the most times across World Cup, EURO, Copa América and Nations League finals, combined?',
+    );
+    expect(questions[0].category).toBe('Fiercest rivalries');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('Argentina vs Denmark');
+  });
+
+  it('never repeats a choice and stays within the 3-4 choice range', () => {
+    const [q] = fiercestRivalryQuestion(crossRivalries, 'test');
+    expect(new Set(q.choices).size).toBe(q.choices.length);
+    expect(q.choices.length).toBeGreaterThanOrEqual(3);
+    expect(q.choices.length).toBeLessThanOrEqual(4);
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const a = fiercestRivalryQuestion(crossRivalries, 'test');
+    const b = fiercestRivalryQuestion(crossRivalries, 'test');
+    expect(a).toEqual(b);
+  });
+
+  it('builds a Croatian prompt when locale is "hr", with the same answer as English', () => {
+    const enQuestions = fiercestRivalryQuestion(crossRivalries, 'test', 'en');
+    const hrQuestions = fiercestRivalryQuestion(crossRivalries, 'test', 'hr');
+    expect(hrQuestions[0].prompt).toBe(
+      'Koje su se dvije reprezentacije najčešće susrele u finalima Svjetskog prvenstva, EURO-a, Copa Américe i Liga nacija zajedno?',
+    );
+    expect(hrQuestions[0].category).toBe('Najžešći rivaliteti');
+    expect(hrQuestions[0].choices[hrQuestions[0].answerIndex]).toBe(
+      enQuestions[0].choices[enQuestions[0].answerIndex],
+    );
+  });
+
+  it('returns no question when there is a tie for the most frequent cross-competition rivalry', () => {
+    const tiedCompBTable: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up'],
+      rows: [
+        ['1962', 'Argentina', 'Denmark'],
+        ['1966', 'Denmark', 'Argentina'],
+      ],
+    };
+    const tiedRivalries = buildRivalries(
+      buildFinalsMeetings([
+        { title: 'Comp A', slug: 'comp-a', editions: buildEditions(compATable) },
+        { title: 'Comp B', slug: 'comp-b', editions: buildEditions(tiedCompBTable) },
+      ]),
+    );
+    expect(tiedRivalries.length).toBeGreaterThanOrEqual(3);
+    expect(fiercestRivalryQuestion(tiedRivalries, 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when fewer than 3 distinct rivalries exist', () => {
+    const sparse = crossRivalries.slice(0, 2);
+    expect(fiercestRivalryQuestion(sparse, 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when there are no qualifying rivalries at all', () => {
+    expect(fiercestRivalryQuestion([], 'test')).toHaveLength(0);
   });
 });
 

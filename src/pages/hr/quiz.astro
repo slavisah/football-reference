@@ -35,6 +35,7 @@ import {
   biggestFinalMarginQuestion,
   championByYearQuestions,
   chronologicalOrderQuestions,
+  fiercestRivalryQuestion,
   hostByYearQuestions,
   longestStreakQuestion,
   longestTitleGapQuestion,
@@ -87,6 +88,7 @@ const notes: NoteSection[] = [
       'Koja reprezentacija ili igrač ima najdulji niz uzastopnih naslova/nagrada na natjecanju? (pita se samo kad postoji jedan jasan rekord, a ne izjednačenost za prvo mjesto)',
       'Koja je reprezentacija ili igrač najdulje čekao/la na sljedeći naslov/nagradu na natjecanju? (pita se samo kad postoji jedan jasan rekord, a ne izjednačenost za prvo mjesto)',
       'Koje su se dvije reprezentacije najčešće susrele u finalima danog natjecanja? (pita se samo kad postoji jedan jasan rekord, a ne izjednačenost za prvo mjesto)',
+      'Koje su se dvije reprezentacije najčešće susrele u finalima Svjetskog prvenstva, EURO-a, Copa Américe i Liga nacija zajedno? (pita se samo kad postoji jedan jasan rekord, a ne izjednačenost za prvo mjesto)',
       'Poredaj četiri prvaka natjecanja, ili četiri dobitnika pojedinačne nagrade (Zlatna lopta, Zlatna kopačka), kronološkim redoslijedom (od najranijeg).',
     ],
   },
@@ -136,6 +138,18 @@ const NATIONS_LEAGUE_NAME = 'UEFA Liga nacija';
 const BALLON_DOR_NAME = 'Zlatna lopta';
 const GOLDEN_BOOT_WORLD_CUP_NAME = 'Zlatna kopačka Svjetskog prvenstva';
 const GOLDEN_BOOT_EURO_NAME = 'Zlatna kopačka Europskog prvenstva';
+
+// Combined, all-four-competition rivalries for fiercestRivalryQuestion() -
+// same as quiz.astro's own identical const, not scoped to one competition
+// like rivalriesFor() above.
+const fiercestRivalries = buildRivalries(
+  buildFinalsMeetings([
+    { title: WORLD_CUP_NAME, slug: 'fifa-world-cup', editions: worldCup.editions },
+    { title: EURO_NAME, slug: 'uefa-euro', editions: euro.editions },
+    { title: COPA_AMERICA_NAME, slug: 'copa-america', editions: copaAmerica.editions },
+    { title: NATIONS_LEAGUE_NAME, slug: 'uefa-nations-league', editions: nationsLeague.editions },
+  ]),
+);
 
 // Same pool structure/weights as the English page (see quiz.astro for why),
 // just with locale: 'hr' passed to each question builder so the generated
@@ -547,6 +561,11 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:golden-boot-euro:longest-gap',
+  },
+  {
+    questions: fiercestRivalryQuestion(fiercestRivalries, 'fiercest-rivalry', 'hr'),
+    take: 1,
+    seed: 'pick:fiercest-rivalry',
   },
 ];
 

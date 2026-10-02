@@ -23,6 +23,7 @@ import {
   biggestFinalMarginQuestion,
   championByYearQuestions,
   chronologicalOrderQuestions,
+  fiercestRivalryQuestion,
   hostByYearQuestions,
   longestStreakQuestion,
   longestTitleGapQuestion,
@@ -77,6 +78,19 @@ const [worldCup, euro, copaAmerica, nationsLeague, ballonDor, goldenBootWorldCup
       sourcesHeading: 'UEFA EURO',
     }),
   ]);
+
+// Combined, all-four-competition rivalries for fiercestRivalryQuestion() -
+// the exact same buildRivalries(buildFinalsMeetings([...])) call
+// src/pages/records.astro makes for its own "Fiercest rivalries" section,
+// deliberately *not* scoped to one competition like rivalriesFor() above.
+const fiercestRivalries = buildRivalries(
+  buildFinalsMeetings([
+    { title: 'FIFA World Cup', slug: 'fifa-world-cup', editions: worldCup.editions },
+    { title: 'UEFA EURO', slug: 'uefa-euro', editions: euro.editions },
+    { title: 'Copa América', slug: 'copa-america', editions: copaAmerica.editions },
+    { title: 'UEFA Nations League', slug: 'uefa-nations-league', editions: nationsLeague.editions },
+  ]),
+);
 
 // Each pool draws from one competition's real data; `take` caps how many of
 // its generated questions make the final quiz, kept modest so the quiz stays
@@ -423,6 +437,11 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:golden-boot-euro:longest-gap',
+  },
+  {
+    questions: fiercestRivalryQuestion(fiercestRivalries, 'fiercest-rivalry'),
+    take: 1,
+    seed: 'pick:fiercest-rivalry',
   },
 ];
 

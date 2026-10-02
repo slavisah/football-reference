@@ -536,6 +536,55 @@ export function mostFrequentRivalryQuestion(
   return [{ id, category: competition, prompt, ...choice }];
 }
 
+/**
+ * "Which two national teams have met each other the most times across World
+ * Cup, EURO, Copa América and Nations League finals, combined?" - the
+ * cross-competition counterpart `mostFrequentRivalryQuestion()`'s own comment
+ * flagged as a separate, unscoped idea (two-hundred-and-sixteenth intensive
+ * run), now scoped and shipped. Unlike that function, `rivalries` here is the
+ * exact same combined, all-four-competition `Rivalry[]` `/records`' own
+ * "Fiercest rivalries" section already renders - pass
+ * `buildRivalries(buildFinalsMeetings([...all four competitions...]))`
+ * directly, the same call `src/pages/records.astro` already makes - so a
+ * pair can qualify by meeting once each in two *different* competitions
+ * (e.g. France vs. Italy via EURO 2000 + the 2006 World Cup), which is
+ * exactly what makes this question distinct from the per-competition one.
+ * This needed no new editorial research: the combined ranking was
+ * independently hand-recomputed against every competition's own Champion/
+ * Runner-up columns at the two-hundred-and-tenth intensive run, and is the
+ * same data `/records` has displayed and had re-verified ever since.
+ *
+ * Same tie-and-sparse-data safety as every other generated question type
+ * (no question when the top two pairs are tied on meetings, or fewer than 3
+ * distinct pairs exist) - confirmed against the real combined ranking by
+ * hand: Argentina vs. Uruguay is the clear leader at 13 meetings, well ahead
+ * of Argentina vs. Brazil's 11, so this one does produce a question.
+ */
+export function fiercestRivalryQuestion(
+  rivalries: Rivalry[],
+  seedPrefix: string,
+  locale: Locale = 'en',
+): QuizQuestion[] {
+  const [top, runnerUp] = rivalries;
+  if (!top || !runnerUp || rivalries.length < 3) return [];
+  if (top.meetings === runnerUp.meetings) return [];
+
+  const pairLabel = (r: Rivalry) => `${r.teamADisplayName} vs ${r.teamBDisplayName}`;
+  const correct = pairLabel(top);
+  const pool = rivalries.map(pairLabel);
+  const id = `${seedPrefix}:cross-rivalry`;
+  const choice = buildChoice(id, correct, pool);
+  if (!choice) return [];
+
+  const category = locale === 'hr' ? 'Najžešći rivaliteti' : 'Fiercest rivalries';
+  const prompt =
+    locale === 'hr'
+      ? 'Koje su se dvije reprezentacije najčešće susrele u finalima Svjetskog prvenstva, EURO-a, Copa Américe i Liga nacija zajedno?'
+      : 'Which two national teams have met each other the most times across World Cup, EURO, Copa América and Nations League finals, combined?';
+
+  return [{ id, category, prompt, ...choice }];
+}
+
 export type QuizPool = {
   questions: QuizQuestion[];
   /** How many questions to take from this pool. */
