@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (213 intensive runs as of 2026-10-02) lives
+verification sweep and decision (214 intensive runs as of 2026-10-02) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,8 +44,8 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-thirteenth run (2026-10-02): 905/905 unit tests,
-`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.91%/99.32%
+As of the two-hundred-and-fourteenth run (2026-10-02): 913/913 unit tests,
+`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.83%/99.2%
 coverage, and the same two standing `knip` false positives as ever (`scripts/
 test-preview-server.mjs`, used only as a Playwright `webServer.command`,
 never imported; `@cspell/dict-hr-hr`, used only via `.cspell/
@@ -69,10 +69,106 @@ was judged sufficient; the two-hundred-and-thirteenth run's own two new
 "Memorable moments" bullets (below) are content/translation prose plus one
 new heading on a single edition page (PDF-only impact, caught by
 `check:pdf-outline` and fixed by regenerating PDFs), so no e2e re-run was
-judged necessary for it. The two-hundred-and-eighth run did re-run
+judged necessary for it. The two-hundred-and-fourteenth run's own new quiz
+question type is, like the two-hundred-and-twelfth run's, a real
+markup/behavior change, so its own entry likewise re-ran just the two
+quiz-specific e2e specs (14 tests) rather than the full suite. The
+two-hundred-and-eighth run did re-run
 `check:lighthouse` on its own (a manual/intensive-run-only tool, not part of
 the cold-start `test:e2e` + browser-sweep baseline) and confirmed it is still
 perfect - see that run's own entry below.
+
+**Two-hundred-and-fourteenth run:** with every "Open backlog" item below
+still either environment-blocked or awaiting human sign-off, picked up the
+two-hundred-and-thirteenth run's own closing suggestion (carried forward
+from the two-hundred-and-twelfth run before it) - a quiz question type
+drawing on `/records`' other generated rankings not yet asked about in the
+quiz - and shipped it: a new generated quiz question type, "In which year
+did the {competition} final have the biggest winning margin?", for the three
+team competitions with a "Final" score column (FIFA World Cup, UEFA EURO,
+UEFA Nations League; Copa América has no such column, as already
+documented).
+
+The new `biggestFinalMarginQuestion()` in `src/lib/quiz.ts` reuses
+`buildBiggestFinalMargins()` (`src/lib/editions.ts`) - the exact
+`ChampionSummary[]`-shaped per-edition margin ranking that already backs
+`/records`' own "Biggest final wins" section, independently hand-recomputed
+against every competition's own "Final" score cells at the
+two-hundred-and-tenth intensive run - so, like the two-hundred-and-twelfth
+run's "most hosted" question, this needed no new editorial research, just a
+new way of asking about data the site already displays and has already
+verified. The question asks about the *year*, not the score text itself
+(`displayName` holds e.g. "Brazil 5-2 Sweden", which would give the answer
+away if shown as a choice) - choices are built from `years[0]` instead,
+mirroring `mostTitlesQuestion()`'s own tie-and-sparse-data safety (no
+question when the top two margins are tied, or fewer than 3 distinct
+editions exist).
+
+That safety was confirmed against the real content tables by hand, not
+assumed: the FIFA World Cup has a three-way tie for the single biggest
+margin (1958, 1970 and 1998 all at margin 3) and UEFA Nations League has a
+two-way tie (2018-19 and 2020-21 both at margin 1) - both correctly produce
+no question. UEFA EURO has a clear, unambiguous record (Spain's 4-0 win over
+Italy in 2012, margin 4, ahead of 1972's margin-3 final) and correctly does
+produce one - confirmed live in `dist/quiz/index.html`/`dist/hr/quiz/index.html`'s
+own JSON-LD after a full build (`"acceptedAnswer":{"@type":"Answer","text":"2012"}`),
+not just from the unit tests.
+
+Wired a new `QuizPool` into both `src/pages/quiz.astro` and
+`src/pages/hr/quiz.astro` for each of the three eligible competitions
+(World Cup and Nations League correctly contribute zero questions at
+runtime, same as EURO/Copa América's own "most hosted" precedent). Added
+the matching bullet to `content/quiz.md`'s "Question types in this quiz"
+list ("In which year did a given tournament's final have the biggest
+winning margin? ...") and the matching Croatian bullet to the hardcoded
+notes list in `src/pages/hr/quiz.astro`. Added eight new unit tests to
+`tests/unit/quiz.test.ts`: the English prompt and correct answer, the
+no-score-text-as-choice guarantee, choice-count/uniqueness, determinism,
+the Croatian prompt, the tie-returns-no-question case, the
+fewer-than-3-entries case, and the no-"Final"-column case.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(913/913, up from 905 - the eight new tests), `pnpm test:coverage`
+(99.83%/99.2% statements/branches, 100%/100% functions/lines - the one new
+uncovered branch, `biggestFinalMarginQuestion()`'s own `if (!choice) return
+[]` guard, is the same defensively-unreachable shape `mostTitlesQuestion()`'s
+identical guard already has, per this file's own "Open backlog" coverage-gap
+classification), `pnpm build` (711 pages, unchanged - no new route, just new
+content on the existing `/quiz`/`/hr/quiz` pages). All 29 CI-gated fast
+`check:*` scripts individually re-run and clean, including
+`check:record-claims` (40 claims, up from 39 - the new "biggest winning
+margin" bullet in `content/quiz.md` needed its own
+`record-claims-ledger.json` entry, added with the same "describes a
+generated quiz question type, not a static factual claim" rationale the
+existing "most titles/awards"/"most hosted" entries already used),
+`check:i18n-notes` (7 matched page pairs, parity held for the new Croatian
+bullet), `check:jsonld` (1783 blocks across 711 pages, still structurally
+valid with the new question included), `check:spelling` (15 files, 0
+issues), `check:spelling-hr` (57 blocks, 0 unknown words). `pnpm audit` (no
+known vulnerabilities). `pnpm dlx knip --no-config-hints` (same two standing
+false positives). Regenerated all 700 downloadable PDFs
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs`, this
+session's own container-specific Chromium-revision escape hatch) since
+`content/quiz.md` changed; `check:pdfs`/`check:pdf-outline` both clean
+(700/700) after, no snags this time. Did not re-run the full cold-start
+`pnpm test:e2e` suite or the five manual browser sweeps - instead ran the
+same two quiz-specific e2e specs the two-hundred-and-twelfth run used
+(`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`, 14
+tests covering WCAG violations across both languages/both color schemes and
+the no-JS fallback state), which exercise every DOM state this run's change
+could plausibly affect; all 14 passed. The two-hundred-and-fourth run's own
+full cold-start `pnpm test:e2e` (1042/1042) plus the five manual browser
+sweeps remain the standing baseline for everything else.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see "Open backlog" below, unchanged. The quiz's
+question-type surface now also covers `/records`' "Biggest final wins"
+ranking; "Back-to-back champions"/"Longest wait between titles" remain the
+two still-unasked-about generated rankings on that page, a natural next
+candidate in the same vein - or returning to the two-hundred-and-eleventh
+run's own suggestion of a fresh accessibility or performance angle.
 
 **Two-hundred-and-thirteenth run:** opened with the full standing health
 check (unchanged from the two-hundred-and-twelfth run's own baseline) and a
