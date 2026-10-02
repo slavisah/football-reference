@@ -18,7 +18,7 @@ import References from '../../components/References.astro';
 import EditorialNotes from '../../components/EditorialNotes.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import { disambiguateLabels } from '../../lib/sources';
-import { buildTimeline } from '../../lib/editions';
+import { buildHostsSummary, buildTimeline } from '../../lib/editions';
 import { t } from '../../lib/i18n';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import { buildQuizJsonLd, type JsonLdObject } from '../../lib/jsonLd';
@@ -65,6 +65,7 @@ const notes: NoteSection[] = [
       'Tko je osvojio Zlatnu loptu u danoj godini?',
       'Koje je godine dana reprezentacija osvojila natjecanje, ili dani igrač osvojio Zlatnu loptu? (pita se samo o jednokratnim prvacima/dobitnicima)',
       'Koja reprezentacija ili igrač ima najviše naslova/nagrada na natjecanju?',
+      'Koja je država bila domaćin najviše izdanja danog natjecanja?',
       'Poredaj četiri prvaka natjecanja, ili četiri dobitnika pojedinačne nagrade (Zlatna lopta, Zlatna kopačka), kronološkim redoslijedom (od najranijeg).',
     ],
   },
@@ -140,6 +141,17 @@ const pools: QuizPool[] = [
     seed: 'pick:world-cup:most-titles',
   },
   {
+    questions: mostTitlesQuestion(
+      buildHostsSummary(worldCup.editions),
+      WORLD_CUP_NAME,
+      'world-cup',
+      'host',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:most-hosted',
+  },
+  {
     questions: yearByWinnerQuestions(worldCup.editions, WORLD_CUP_NAME, 'world-cup', 'hr', 'team'),
     take: 1,
     seed: 'pick:world-cup:year-by-winner',
@@ -163,6 +175,11 @@ const pools: QuizPool[] = [
     questions: mostTitlesQuestion(euro.champions, EURO_NAME, 'euro', 'team', 'hr'),
     take: 1,
     seed: 'pick:euro:most-titles',
+  },
+  {
+    questions: mostTitlesQuestion(buildHostsSummary(euro.editions), EURO_NAME, 'euro', 'host', 'hr'),
+    take: 1,
+    seed: 'pick:euro:most-hosted',
   },
   {
     questions: yearByWinnerQuestions(euro.editions, EURO_NAME, 'euro', 'hr', 'team'),
@@ -195,6 +212,17 @@ const pools: QuizPool[] = [
     seed: 'pick:copa-america:most-titles',
   },
   {
+    questions: mostTitlesQuestion(
+      buildHostsSummary(copaAmerica.editions),
+      COPA_AMERICA_NAME,
+      'copa-america',
+      'host',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:most-hosted',
+  },
+  {
     questions: yearByWinnerQuestions(copaAmerica.editions, COPA_AMERICA_NAME, 'copa-america', 'hr', 'team'),
     take: 1,
     seed: 'pick:copa-america:year-by-winner',
@@ -223,6 +251,17 @@ const pools: QuizPool[] = [
     questions: mostTitlesQuestion(nationsLeague.champions, NATIONS_LEAGUE_NAME, 'nations-league', 'team', 'hr'),
     take: 1,
     seed: 'pick:nations-league:most-titles',
+  },
+  {
+    questions: mostTitlesQuestion(
+      buildHostsSummary(nationsLeague.editions),
+      NATIONS_LEAGUE_NAME,
+      'nations-league',
+      'host',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:most-hosted',
   },
   {
     questions: yearByWinnerQuestions(nationsLeague.editions, NATIONS_LEAGUE_NAME, 'nations-league', 'hr', 'team'),

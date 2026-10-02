@@ -273,25 +273,30 @@ export function uniqueWinnerEditions(editions: Edition[]): Edition[] {
 }
 
 /**
- * "Which team/player has won the most {competition} titles/awards?" - a
- * single generated question per competition, built from the same
- * `ChampionSummary[]` totals `buildChampionsSummary()` already produces for
- * every competition page's "Most successful teams"/"Most awards" widget
- * (see `src/lib/editions.ts`) - no new editorial research, just a new way of
+ * "Which team/player has won the most {competition} titles/awards?" (or,
+ * for `subject: 'host'`, "Which country has hosted the most {competition}
+ * editions?") - a single generated question per competition, built from the
+ * same `ChampionSummary[]`-shaped totals `buildChampionsSummary()`/
+ * `buildHostsSummary()` already produce for every competition page's "Most
+ * successful teams"/"Most awards"/"Most frequent hosts" widget (see
+ * `src/lib/editions.ts`) - no new editorial research, just a new way of
  * asking about data every competition page already displays and every
- * content-accuracy pass has already audited.
+ * content-accuracy pass has already audited (`buildHostsSummary()`'s own
+ * counts were independently hand-verified against every Host cell at the
+ * two-hundred-and-tenth intensive run).
  *
  * `summary` must already be sorted by titles descending (every caller of
- * `buildChampionsSummary()` gets this for free - see its own sort). Returns
- * no question at all when there's a tie for first place (no single
- * unambiguous correct answer) or fewer than 3 distinct entries (not enough
- * distractors for a fair multiple-choice question).
+ * `buildChampionsSummary()`/`buildHostsSummary()` gets this for free - see
+ * each one's own sort). Returns no question at all when there's a tie for
+ * first place (no single unambiguous correct answer) or fewer than 3
+ * distinct entries (not enough distractors for a fair multiple-choice
+ * question) - e.g. UEFA Nations League's four hosts to date are too few.
  */
 export function mostTitlesQuestion(
   summary: ChampionSummary[],
   competition: string,
   seedPrefix: string,
-  subject: 'team' | 'player' = 'team',
+  subject: 'team' | 'player' | 'host' = 'team',
   locale: Locale = 'en',
 ): QuizQuestion[] {
   const [top, runnerUp] = summary;
@@ -300,7 +305,7 @@ export function mostTitlesQuestion(
 
   const correct = top.displayName;
   const pool = summary.map((s) => s.displayName);
-  const id = `${seedPrefix}:most-titles`;
+  const id = `${seedPrefix}:most-titles:${subject}`;
   const choice = buildChoice(id, correct, pool);
   if (!choice) return [];
 
@@ -308,10 +313,14 @@ export function mostTitlesQuestion(
     locale === 'hr'
       ? subject === 'player'
         ? `Tko ima najviše nagrada na natjecanju ${competition}?`
-        : `Koja reprezentacija ima najviše naslova na natjecanju ${competition}?`
+        : subject === 'host'
+          ? `Koja je država bila domaćin najviše izdanja natjecanja ${competition}?`
+          : `Koja reprezentacija ima najviše naslova na natjecanju ${competition}?`
       : subject === 'player'
         ? `Who has won the most ${competition} awards?`
-        : `Which team has won the most ${competition} titles?`;
+        : subject === 'host'
+          ? `Which country has hosted the most ${competition} editions?`
+          : `Which team has won the most ${competition} titles?`;
 
   return [{ id, category: competition, prompt, ...choice }];
 }

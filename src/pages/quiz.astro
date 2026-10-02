@@ -7,7 +7,7 @@ import References from '../components/References.astro';
 import EditorialNotes from '../components/EditorialNotes.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import { disambiguateLabels } from '../lib/sources';
-import { buildTimeline } from '../lib/editions';
+import { buildHostsSummary, buildTimeline } from '../lib/editions';
 import { t } from '../lib/i18n';
 import { absolutePageUrl, withBase } from '../lib/url';
 import { buildQuizJsonLd, type JsonLdObject } from '../lib/jsonLd';
@@ -85,6 +85,16 @@ const pools: QuizPool[] = [
     seed: 'pick:world-cup:most-titles',
   },
   {
+    questions: mostTitlesQuestion(
+      buildHostsSummary(worldCup.editions),
+      'FIFA World Cup',
+      'world-cup',
+      'host',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:most-hosted',
+  },
+  {
     questions: yearByWinnerQuestions(worldCup.editions, 'FIFA World Cup', 'world-cup', 'en', 'team'),
     take: 1,
     seed: 'pick:world-cup:year-by-winner',
@@ -108,6 +118,11 @@ const pools: QuizPool[] = [
     questions: mostTitlesQuestion(euro.champions, 'UEFA EURO', 'euro'),
     take: 1,
     seed: 'pick:euro:most-titles',
+  },
+  {
+    questions: mostTitlesQuestion(buildHostsSummary(euro.editions), 'UEFA EURO', 'euro', 'host'),
+    take: 1,
+    seed: 'pick:euro:most-hosted',
   },
   {
     questions: yearByWinnerQuestions(euro.editions, 'UEFA EURO', 'euro', 'en', 'team'),
@@ -135,6 +150,16 @@ const pools: QuizPool[] = [
     seed: 'pick:copa-america:most-titles',
   },
   {
+    questions: mostTitlesQuestion(
+      buildHostsSummary(copaAmerica.editions),
+      'Copa América',
+      'copa-america',
+      'host',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:most-hosted',
+  },
+  {
     questions: yearByWinnerQuestions(copaAmerica.editions, 'Copa América', 'copa-america', 'en', 'team'),
     take: 1,
     seed: 'pick:copa-america:year-by-winner',
@@ -158,6 +183,16 @@ const pools: QuizPool[] = [
     questions: mostTitlesQuestion(nationsLeague.champions, 'UEFA Nations League', 'nations-league'),
     take: 1,
     seed: 'pick:nations-league:most-titles',
+  },
+  {
+    questions: mostTitlesQuestion(
+      buildHostsSummary(nationsLeague.editions),
+      'UEFA Nations League',
+      'nations-league',
+      'host',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:most-hosted',
   },
   {
     questions: yearByWinnerQuestions(nationsLeague.editions, 'UEFA Nations League', 'nations-league', 'en', 'team'),

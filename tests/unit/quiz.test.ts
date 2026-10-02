@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildChampionsSummary, buildEditions } from '../../src/lib/editions';
+import { buildChampionsSummary, buildEditions, buildHostsSummary } from '../../src/lib/editions';
 import { buildTimeline } from '../../src/lib/editions';
 import {
   championByYearQuestions,
@@ -584,6 +584,66 @@ describe('mostTitlesQuestion', () => {
       { id: 'b', displayName: 'B', titles: 1, years: ['2004'], names: ['B'] },
     ];
     expect(mostTitlesQuestion(sparse, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('asks "which country has hosted the most" for subject "host", answered from buildHostsSummary()', () => {
+    const hostTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1930', 'Brazil', 'Uruguay'],
+        ['1934', 'Brazil', 'Italy'],
+        ['1938', 'Brazil', 'Italy'],
+        ['1950', 'Italy', 'Uruguay'],
+        ['1954', 'Italy', 'West Germany'],
+        ['1958', 'Germany', 'Brazil'],
+      ],
+    };
+    const hostsSummary = buildHostsSummary(buildEditions(hostTable));
+    const questions = mostTitlesQuestion(hostsSummary, 'FIFA World Cup', 'world-cup', 'host');
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe('Which country has hosted the most FIFA World Cup editions?');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('Brazil');
+  });
+
+  it('builds a Croatian "most hosted" prompt for subject "host"', () => {
+    const hostTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1930', 'Brazil', 'Uruguay'],
+        ['1934', 'Brazil', 'Italy'],
+        ['1938', 'Brazil', 'Italy'],
+        ['1950', 'Italy', 'Uruguay'],
+        ['1954', 'Italy', 'West Germany'],
+        ['1958', 'Germany', 'Brazil'],
+      ],
+    };
+    const hostsSummary = buildHostsSummary(buildEditions(hostTable));
+    const questions = mostTitlesQuestion(hostsSummary, 'FIFA World Cup', 'world-cup', 'host', 'hr');
+    expect(questions[0].prompt).toBe(
+      'Koja je država bila domaćin najviše izdanja natjecanja FIFA World Cup?',
+    );
+  });
+
+  it('keeps "host" and "team" ids distinct so both questions can coexist for the same competition', () => {
+    const teamQuestions = mostTitlesQuestion(clearSummary, 'FIFA World Cup', 'world-cup', 'team');
+    const hostTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1930', 'Brazil', 'Uruguay'],
+        ['1934', 'Brazil', 'Italy'],
+        ['1938', 'Brazil', 'Italy'],
+        ['1950', 'Italy', 'Uruguay'],
+        ['1954', 'Italy', 'West Germany'],
+        ['1958', 'Germany', 'Brazil'],
+      ],
+    };
+    const hostQuestions = mostTitlesQuestion(
+      buildHostsSummary(buildEditions(hostTable)),
+      'FIFA World Cup',
+      'world-cup',
+      'host',
+    );
+    expect(teamQuestions[0].id).not.toBe(hostQuestions[0].id);
   });
 });
 
