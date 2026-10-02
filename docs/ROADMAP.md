@@ -176,14 +176,54 @@ held for the two new Croatian bullets), `check:jsonld` (1783 blocks across
 (same two standing false positives). Regenerated all 700 downloadable PDFs
 (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs`, this
 session's own container-specific Chromium-revision escape hatch) since
-`content/quiz.md` changed; `check:pdfs`/`check:pdf-outline` both clean
-(700/700) after. Did not re-run the full cold-start `pnpm test:e2e` suite or
-the five manual browser sweeps - instead ran the same two quiz-specific e2e
-specs the two-hundred-and-twelfth/two-hundred-and-fourteenth runs used
+`content/quiz.md` changed.
+
+**Self-inflicted PDF-corruption snag, caught after the first push, fixed
+before this run closed:** this run's own first `build:pdfs` invocation was
+still running in the background (700 pages takes several minutes) when this
+run separately started the quiz e2e specs below, whose own command also
+opens with `astro preview stop` - a precaution copied from the
+two-hundred-and-twelfth run's note, but wrong here because it killed the
+*same* preview server the still-in-flight `build:pdfs` run depended on.
+`generate-pdfs.mjs` did not hard-fail when its own page navigations started
+failing after that - it silently wrote a stale/fallback (effectively
+home-page) capture into every PDF it generated from that point on, for 274
+of 700 files (every Ballon d'Or, Copa América and both Golden Boot edition
+PDFs), each pair landing on one of two suspiciously-identical byte sizes.
+`check:pdfs`/`check:pdf-outline` were both run once before this corruption
+occurred and correctly reported clean at that time; this run's own first
+commit (made against that already-corrupted state, and the push that
+followed) believed that stale-clean result rather than re-running the
+checks against what was actually on disk, as CI's own "test" check caught on
+the pushed commit.
+
+Fixed by: confirming no leftover `generate-pdfs.mjs`/preview/Chromium
+process was running, re-running `build:pdfs` a second time start-to-finish
+with nothing else invoked concurrently (no `astro preview stop`, no
+Playwright) until it fully exited, then verifying three independent ways
+before trusting it this time - `check:pdfs`/`check:pdf-outline` both clean
+(700/700), a direct byte-size collision scan across all 700 files (zero
+sizes now shared by more than 2 files, versus 274 files sharing just two
+sizes before), and `pdftotext` spot-checks of several previously-corrupted
+files confirming their own real page content (not the home page) - before
+re-running the two quiz e2e specs (now safely, with the regeneration already
+long finished) and re-committing/re-pushing the corrected PDFs. Lesson for
+future runs: never run `astro preview stop` (or start any other preview-
+server-dependent command) while a `build:pdfs` invocation from earlier in
+the same run might still be in flight in the background - confirm it has
+actually exited (not just that an earlier check passed) before starting
+anything else that touches the preview server.
+
+`check:pdfs`/`check:pdf-outline` both clean (700/700) after the fix. Did not
+re-run the full cold-start `pnpm test:e2e` suite or the five manual browser
+sweeps - instead ran the same two quiz-specific e2e specs the
+two-hundred-and-twelfth/two-hundred-and-fourteenth runs used
 (`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`, 14
 tests covering WCAG violations across both languages/both color schemes and
 the no-JS fallback state), which exercise every DOM state this run's change
-could plausibly affect; all 14 passed. The two-hundred-and-fourth run's own
+could plausibly affect; all 14 passed (twice - once against the corrupted
+PDFs, which don't affect e2e since those specs never load a PDF, and once
+again after the fix, both times clean). The two-hundred-and-fourth run's own
 full cold-start `pnpm test:e2e` (1042/1042) plus the five manual browser
 sweeps remain the standing baseline for everything else.
 
