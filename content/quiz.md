@@ -46,6 +46,10 @@ the quiz stays in sync as new editions are added.
 - Which two teams have met each other the most times in a given tournament's
   finals? (only asked when there's a single, unambiguous most-frequent
   pairing - not a tie for first)
+- Which two national teams have met each other the most times across World
+  Cup, EURO, Copa América and Nations League finals, combined? (only asked
+  when there's a single, unambiguous most-frequent pairing - not a tie for
+  first)
 - Put four champions from a tournament, or four winners of an individual
   award (Ballon d'Or, Golden Boot), in chronological order (earliest
   first).

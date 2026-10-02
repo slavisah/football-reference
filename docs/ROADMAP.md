@@ -44,8 +44,8 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-sixteenth run (2026-10-02): 938/938 unit tests,
-`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.59%/98.87%
+As of the two-hundred-and-seventeenth run (2026-10-02): 946/946 unit tests,
+`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.52%/98.76%
 coverage, and the same two standing `knip` false positives as ever (`scripts/
 test-preview-server.mjs`, used only as a Playwright `webServer.command`,
 never imported; `@cspell/dict-hr-hr`, used only via `.cspell/
@@ -73,12 +73,104 @@ judged necessary for it. The two-hundred-and-fourteenth and
 two-hundred-and-fifteenth runs' own new quiz question types are, like the
 two-hundred-and-twelfth run's, a real markup/behavior change, so each entry
 likewise re-ran just the two quiz-specific e2e specs (14 tests) rather than
-the full suite; the two-hundred-and-sixteenth run's own new quiz question
-type below follows the identical pattern. The two-hundred-and-eighth run did
-re-run `check:lighthouse`
+the full suite; the two-hundred-and-sixteenth and two-hundred-and-seventeenth
+runs' own new quiz question types below follow the identical pattern. The
+two-hundred-and-eighth run did re-run `check:lighthouse`
 on its own (a manual/intensive-run-only tool, not part of the cold-start
 `test:e2e` + browser-sweep baseline) and confirmed it is still perfect - see
 that run's own entry below.
+
+**Two-hundred-and-seventeenth run:** picked up the two-hundred-and-sixteenth
+run's own closing note - a true cross-competition "fiercest rivalry" quiz
+question (combining all four team competitions' finals, the way `/records`'
+own "Fiercest rivalries" section already does) was flagged as a separate,
+unscoped idea needing its own two-sided prompt shape rather than a drop-in
+reuse of `mostFrequentRivalryQuestion()`'s single-competition pattern. Scoped
+and shipped it: a new generated quiz question type, "Which two national teams
+have met each other the most times across World Cup, EURO, Copa América and
+Nations League finals, combined?".
+
+The new `fiercestRivalryQuestion()` in `src/lib/quiz.ts` takes the exact same
+combined, all-four-competition `Rivalry[]` `/records` (`src/pages/
+records.astro`) already renders - `buildRivalries(buildFinalsMeetings([...all
+four competitions...]))` - rather than `mostFrequentRivalryQuestion()`'s own
+per-competition call, so a pair can qualify by meeting once each in two
+*different* competitions (e.g. France vs. Italy via EURO 2000 + the 2006
+World Cup), which is exactly what distinguishes this question from the
+existing per-competition one. This needed no new editorial research: the
+combined ranking is the same data independently hand-recomputed against every
+competition's own Champion/Runner-up columns at the two-hundred-and-tenth
+intensive run. Confirmed live in `dist/quiz/index.html`/`dist/hr/quiz/index.html`'s
+own JSON-LD after a full build: Argentina vs Uruguay (13 meetings) is the
+clear leader, well ahead of Argentina vs Brazil's 11, matching `/records`'
+own rendered "Fiercest rivalries" section exactly in both languages. Same
+tie-and-sparse-data safety as every other generated question type (no
+question on a tie for the most meetings, or fewer than 3 distinct pairs).
+
+Wired a single new `QuizPool` into both `src/pages/quiz.astro` and
+`src/pages/hr/quiz.astro`, fed by a new `fiercestRivalries` const in each
+page that calls `buildRivalries(buildFinalsMeetings([...]))` across all four
+team competitions - distinct from each page's existing `rivalriesFor()`
+helper, which stays scoped to one competition for
+`mostFrequentRivalryQuestion()`. Unlike every other question type on this
+page, this one's `category` badge can't name a single competition (the
+question spans all four), so it uses "Fiercest rivalries"/"Najžešći
+rivaliteti" instead. Added the matching bullet to `content/quiz.md`'s
+"Question types in this quiz" list and the matching Croatian bullet to the
+hardcoded notes list in `src/pages/hr/quiz.astro`. Added eight new unit tests
+to `tests/unit/quiz.test.ts` (a new `describe` block mirroring
+`mostFrequentRivalryQuestion`'s own test shape, but with a two-competition
+fixture to exercise the cross-competition merge itself): the correct
+leader/answer, the English prompt and category, choice-count/uniqueness,
+determinism, the Croatian prompt and category, the tie-returns-no-question
+case, the fewer-than-3-entries case, and the no-qualifying-rivalries-at-all
+case.
+
+One new claim-ledger wrinkle, the same shape as every prior new quiz-question
+bullet: the new bullet's "most times" matches `check-record-claims.mjs`'s
+trigger word ("most"), so it needed its own `scripts/record-claims-ledger.json`
+entry under `content/quiz.md` - same "describes a generated quiz question
+type, not a factual claim" rationale the five prior quiz-question ledger
+entries already use.
+
+**Verification:** `pnpm install` (clean), `pnpm lint` (238 files, 0 errors/0
+warnings/0 hints), `pnpm test` (946/946, up from 938 - the eight new tests),
+`pnpm test:coverage` (99.52%/98.76% statements/branches, 100%/100%
+functions/lines - the one new uncovered branch is `fiercestRivalryQuestion()`'s
+own `if (!choice) return []` guard, the same defensively-unreachable shape
+every other question builder's identical guard already has), `pnpm build`
+(711 pages, unchanged - no new route, just new content on the existing
+`/quiz`/`/hr/quiz` pages). All 29 CI-gated fast `check:*` scripts
+individually re-run and clean, including `check:record-claims` (42 claims, up
+from 41 - the new ledger entry above), `check:i18n-notes` (7 matched page
+pairs, parity held for the new Croatian bullet), `check:jsonld` (1783 blocks
+across 711 pages, still structurally valid with the new question included),
+`check:spelling` (15 files, 0 issues), `check:spelling-hr` (57 unique blocks,
+0 unknown words), `check:pdfs` (700/700 clean, confirmed `/quiz` still has no
+entry in `scripts/pdf-pages.mjs`'s `PDF_PAGES` list, so no PDF regeneration
+needed for this run's `content/quiz.md` edit). `pnpm audit` (no known
+vulnerabilities). `pnpm dlx knip --no-config-hints` (same two standing false
+positives). Did not re-run the full cold-start `pnpm test:e2e` suite or the
+five manual browser sweeps - instead ran the same two quiz-specific e2e specs
+the two-hundred-and-twelfth/two-hundred-and-fourteenth/two-hundred-and-fifteenth/
+two-hundred-and-sixteenth runs used (`accessibility-quiz-states.spec.ts`,
+`no-js-quiz-and-search.spec.ts`, 14 tests covering WCAG violations across
+both languages/both color schemes and the no-JS fallback state), which
+exercise every DOM state this run's change could plausibly affect; all 14
+passed. The two-hundred-and-fourth run's own full cold-start `pnpm test:e2e`
+(1042/1042) plus the five manual browser sweeps remain the standing baseline
+for everything else.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see "Open backlog" below, unchanged. The quiz's
+question-type surface now covers every generated `/records` ranking,
+including both the per-competition and the cross-competition slices of
+"Fiercest rivalries" - no further untried `/records` ranking remains as a
+quiz-question candidate, in either shape. Otherwise, returning to the
+two-hundred-and-eleventh run's own suggestion of a fresh accessibility or
+performance angle, or the two-hundred-and-eighth run's still-untried
+front-to-back prose-vs-table read of the site's smaller `content/*.md`
+files, both remain open.
 
 **Two-hundred-and-sixteenth run:** picked up the two-hundred-and-fifteenth
 run's own closing note - "Fiercest rivalries" was the one remaining
