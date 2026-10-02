@@ -31,6 +31,24 @@ describe('extractSinceClaims', () => {
   it('returns an empty array for content with no matching bullets', () => {
     expect(extractSinceClaims('## Heading\n\n- A plain bullet.\n')).toEqual([]);
   });
+
+  it('extracts "since the X\'s ... <year>" with an intervening possessive clause', () => {
+    const md = `- Held every edition since the award's creation in 1956.\n`;
+    expect(extractSinceClaims(md)).toEqual(["Held every edition since the award's creation in 1956."]);
+  });
+
+  it('extracts "since its/their ... <year>" with an intervening pronoun clause', () => {
+    const md = `- Awarded at every Finals since the competition's 2019 launch.\n- Identified for every edition since the first in 1916.\n`;
+    expect(extractSinceClaims(md)).toEqual([
+      "Awarded at every Finals since the competition's 2019 launch.",
+      'Identified for every edition since the first in 1916.',
+    ]);
+  });
+
+  it('does not match "since" followed by an unrelated year more than 4 words later', () => {
+    const md = `- Disputed since the sources themselves cannot agree on which of several later figures from 1956 is correct.\n`;
+    expect(extractSinceClaims(md)).toEqual([]);
+  });
 });
 
 describe('diffClaimsAgainstLedger (shared logic with check-superlative-claims.mjs)', () => {

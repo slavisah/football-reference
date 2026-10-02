@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { buildChampionsSummary, buildEditions } from '../../src/lib/editions';
+import { buildBiggestFinalMargins, buildChampionsSummary, buildEditions, buildHostsSummary } from '../../src/lib/editions';
 import { buildTimeline } from '../../src/lib/editions';
 import {
+  biggestFinalMarginQuestion,
   championByYearQuestions,
   chronologicalOrderQuestions,
   hostByYearQuestions,
@@ -584,6 +585,153 @@ describe('mostTitlesQuestion', () => {
       { id: 'b', displayName: 'B', titles: 1, years: ['2004'], names: ['B'] },
     ];
     expect(mostTitlesQuestion(sparse, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('asks "which country has hosted the most" for subject "host", answered from buildHostsSummary()', () => {
+    const hostTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1930', 'Brazil', 'Uruguay'],
+        ['1934', 'Brazil', 'Italy'],
+        ['1938', 'Brazil', 'Italy'],
+        ['1950', 'Italy', 'Uruguay'],
+        ['1954', 'Italy', 'West Germany'],
+        ['1958', 'Germany', 'Brazil'],
+      ],
+    };
+    const hostsSummary = buildHostsSummary(buildEditions(hostTable));
+    const questions = mostTitlesQuestion(hostsSummary, 'FIFA World Cup', 'world-cup', 'host');
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe('Which country has hosted the most FIFA World Cup editions?');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('Brazil');
+  });
+
+  it('builds a Croatian "most hosted" prompt for subject "host"', () => {
+    const hostTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1930', 'Brazil', 'Uruguay'],
+        ['1934', 'Brazil', 'Italy'],
+        ['1938', 'Brazil', 'Italy'],
+        ['1950', 'Italy', 'Uruguay'],
+        ['1954', 'Italy', 'West Germany'],
+        ['1958', 'Germany', 'Brazil'],
+      ],
+    };
+    const hostsSummary = buildHostsSummary(buildEditions(hostTable));
+    const questions = mostTitlesQuestion(hostsSummary, 'FIFA World Cup', 'world-cup', 'host', 'hr');
+    expect(questions[0].prompt).toBe(
+      'Koja je država bila domaćin najviše izdanja natjecanja FIFA World Cup?',
+    );
+  });
+
+  it('keeps "host" and "team" ids distinct so both questions can coexist for the same competition', () => {
+    const teamQuestions = mostTitlesQuestion(clearSummary, 'FIFA World Cup', 'world-cup', 'team');
+    const hostTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1930', 'Brazil', 'Uruguay'],
+        ['1934', 'Brazil', 'Italy'],
+        ['1938', 'Brazil', 'Italy'],
+        ['1950', 'Italy', 'Uruguay'],
+        ['1954', 'Italy', 'West Germany'],
+        ['1958', 'Germany', 'Brazil'],
+      ],
+    };
+    const hostQuestions = mostTitlesQuestion(
+      buildHostsSummary(buildEditions(hostTable)),
+      'FIFA World Cup',
+      'world-cup',
+      'host',
+    );
+    expect(teamQuestions[0].id).not.toBe(hostQuestions[0].id);
+  });
+});
+
+describe('biggestFinalMarginQuestion', () => {
+  const marginsTable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'Final'],
+    rows: [
+      ['1930', 'Uruguay', 'Uruguay 4-2 Argentina'],
+      ['1958', 'Brazil', 'Brazil 5-2 Sweden'],
+      ['1974', 'West Germany', 'West Germany 2-1 Netherlands'],
+      ['1990', 'West Germany', 'West Germany 1-0 Argentina'],
+      ['1994', 'Brazil', 'Brazil 0-0 Italy; 3-2 pens'],
+    ],
+  };
+  const clearMargins = buildBiggestFinalMargins(buildEditions(marginsTable));
+
+  it('asks a "biggest winning margin" question with the widest-margin year as the answer', () => {
+    const questions = biggestFinalMarginQuestion(clearMargins, 'FIFA World Cup', 'world-cup');
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe(
+      'In which year did the FIFA World Cup final have the biggest winning margin?',
+    );
+    expect(questions[0].category).toBe('FIFA World Cup');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('1958');
+  });
+
+  it('never shows the score text as a choice, only years', () => {
+    const questions = biggestFinalMarginQuestion(clearMargins, 'FIFA World Cup', 'world-cup');
+    for (const choice of questions[0].choices) {
+      expect(choice).not.toContain('-');
+    }
+  });
+
+  it('never repeats a choice and stays within the 3-4 choice range', () => {
+    const questions = biggestFinalMarginQuestion(clearMargins, 'FIFA World Cup', 'world-cup');
+    const [q] = questions;
+    expect(new Set(q.choices).size).toBe(q.choices.length);
+    expect(q.choices.length).toBeGreaterThanOrEqual(3);
+    expect(q.choices.length).toBeLessThanOrEqual(4);
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const a = biggestFinalMarginQuestion(clearMargins, 'FIFA World Cup', 'world-cup');
+    const b = biggestFinalMarginQuestion(clearMargins, 'FIFA World Cup', 'world-cup');
+    expect(a).toEqual(b);
+  });
+
+  it('builds a Croatian prompt when locale is "hr", with the same answer as English', () => {
+    const enQuestions = biggestFinalMarginQuestion(clearMargins, 'FIFA World Cup', 'world-cup', 'en');
+    const hrQuestions = biggestFinalMarginQuestion(clearMargins, 'FIFA World Cup', 'world-cup', 'hr');
+    expect(hrQuestions[0].prompt).toBe(
+      'Koje je godine finale natjecanja FIFA World Cup završilo najvećom pobjedom?',
+    );
+    expect(hrQuestions[0].choices[hrQuestions[0].answerIndex]).toBe(
+      enQuestions[0].choices[enQuestions[0].answerIndex],
+    );
+  });
+
+  it('returns no question when there is a tie for the single biggest margin', () => {
+    const tiedTable: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Final'],
+      rows: [
+        ['1958', 'Brazil', 'Brazil 5-2 Sweden'],
+        ['1970', 'Brazil', 'Brazil 4-1 Italy'],
+        ['1998', 'France', 'France 3-0 Brazil'],
+      ],
+    };
+    const tiedMargins = buildBiggestFinalMargins(buildEditions(tiedTable));
+    expect(biggestFinalMarginQuestion(tiedMargins, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when fewer than 3 distinct editions exist', () => {
+    const sparse = clearMargins.slice(0, 2);
+    expect(biggestFinalMarginQuestion(sparse, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when the competition has no "Final" score column (e.g. Copa América)', () => {
+    const noFinalColumnTable: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1930', 'Uruguay'],
+        ['1934', 'Italy'],
+        ['1938', 'Italy'],
+      ],
+    };
+    const noMargins = buildBiggestFinalMargins(buildEditions(noFinalColumnTable));
+    expect(biggestFinalMarginQuestion(noMargins, 'Test Cup', 'test')).toHaveLength(0);
   });
 });
 

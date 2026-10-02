@@ -1,7 +1,8 @@
-// Cross-checks every already-verified claim in the six verification-ledger
+// Cross-checks every already-verified claim in the seven verification-ledger
 // files (`superlative-claims-ledger.json`, `ordinal-claims-ledger.json`,
 // `record-claims-ledger.json`, `consecutive-claims-ledger.json`,
-// `since-claims-ledger.json`, `one-of-only-claims-ledger.json`) against its
+// `since-claims-ledger.json`, `one-of-only-claims-ledger.json`,
+// `completeness-claims-ledger.json`) against its
 // Croatian counterpart page's own hand-translated note prose, on the actual
 // built output - a gap none of those six checkers close themselves, since
 // each is deliberately scoped to `content/*.md` (English) only (see each
@@ -94,6 +95,7 @@ const LEDGER_FILES = [
   'consecutive-claims-ledger.json',
   'since-claims-ledger.json',
   'one-of-only-claims-ledger.json',
+  'completeness-claims-ledger.json',
 ];
 
 // Every `content/*.md` file any ledger keys claims under, mapped to the

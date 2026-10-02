@@ -273,25 +273,30 @@ export function uniqueWinnerEditions(editions: Edition[]): Edition[] {
 }
 
 /**
- * "Which team/player has won the most {competition} titles/awards?" - a
- * single generated question per competition, built from the same
- * `ChampionSummary[]` totals `buildChampionsSummary()` already produces for
- * every competition page's "Most successful teams"/"Most awards" widget
- * (see `src/lib/editions.ts`) - no new editorial research, just a new way of
+ * "Which team/player has won the most {competition} titles/awards?" (or,
+ * for `subject: 'host'`, "Which country has hosted the most {competition}
+ * editions?") - a single generated question per competition, built from the
+ * same `ChampionSummary[]`-shaped totals `buildChampionsSummary()`/
+ * `buildHostsSummary()` already produce for every competition page's "Most
+ * successful teams"/"Most awards"/"Most frequent hosts" widget (see
+ * `src/lib/editions.ts`) - no new editorial research, just a new way of
  * asking about data every competition page already displays and every
- * content-accuracy pass has already audited.
+ * content-accuracy pass has already audited (`buildHostsSummary()`'s own
+ * counts were independently hand-verified against every Host cell at the
+ * two-hundred-and-tenth intensive run).
  *
  * `summary` must already be sorted by titles descending (every caller of
- * `buildChampionsSummary()` gets this for free - see its own sort). Returns
- * no question at all when there's a tie for first place (no single
- * unambiguous correct answer) or fewer than 3 distinct entries (not enough
- * distractors for a fair multiple-choice question).
+ * `buildChampionsSummary()`/`buildHostsSummary()` gets this for free - see
+ * each one's own sort). Returns no question at all when there's a tie for
+ * first place (no single unambiguous correct answer) or fewer than 3
+ * distinct entries (not enough distractors for a fair multiple-choice
+ * question) - e.g. UEFA Nations League's four hosts to date are too few.
  */
 export function mostTitlesQuestion(
   summary: ChampionSummary[],
   competition: string,
   seedPrefix: string,
-  subject: 'team' | 'player' = 'team',
+  subject: 'team' | 'player' | 'host' = 'team',
   locale: Locale = 'en',
 ): QuizQuestion[] {
   const [top, runnerUp] = summary;
@@ -300,7 +305,7 @@ export function mostTitlesQuestion(
 
   const correct = top.displayName;
   const pool = summary.map((s) => s.displayName);
-  const id = `${seedPrefix}:most-titles`;
+  const id = `${seedPrefix}:most-titles:${subject}`;
   const choice = buildChoice(id, correct, pool);
   if (!choice) return [];
 
@@ -308,10 +313,60 @@ export function mostTitlesQuestion(
     locale === 'hr'
       ? subject === 'player'
         ? `Tko ima najviše nagrada na natjecanju ${competition}?`
-        : `Koja reprezentacija ima najviše naslova na natjecanju ${competition}?`
+        : subject === 'host'
+          ? `Koja je država bila domaćin najviše izdanja natjecanja ${competition}?`
+          : `Koja reprezentacija ima najviše naslova na natjecanju ${competition}?`
       : subject === 'player'
         ? `Who has won the most ${competition} awards?`
-        : `Which team has won the most ${competition} titles?`;
+        : subject === 'host'
+          ? `Which country has hosted the most ${competition} editions?`
+          : `Which team has won the most ${competition} titles?`;
+
+  return [{ id, category: competition, prompt, ...choice }];
+}
+
+/**
+ * "In which year did the {competition} final have the biggest winning
+ * margin?" - a single generated question per competition, built from the
+ * same `ChampionSummary[]`-shaped margin ranking `buildBiggestFinalMargins()`
+ * already produces for `/records`' own "Biggest final wins" section (see
+ * `src/lib/editions.ts`) - no new editorial research, just a new way of
+ * asking about data the site already displays and has already verified
+ * (the two-hundred-and-tenth intensive run hand-recomputed every one of
+ * these margins against each competition's own "Final" score cells).
+ *
+ * `margins` must already be sorted by margin descending (`buildBiggestFinalMargins()`
+ * does this for free). Each entry's `displayName` holds the full score text
+ * (e.g. "Brazil 5-2 Sweden") - this question asks about the *year*, not the
+ * score, so the score text is never shown or used as a choice (it would give
+ * the answer away); `years[0]` (one edition per entry) is used instead.
+ * Returns no question at all when there's a tie for the single biggest
+ * margin (no unambiguous correct answer - e.g. the FIFA World Cup's own
+ * three-way tie at margin 3) or fewer than 3 distinct editions (not enough
+ * distractors) - e.g. Copa América has no "Final" score column at all, so
+ * `buildBiggestFinalMargins()` returns an empty array for it and this
+ * correctly produces no question.
+ */
+export function biggestFinalMarginQuestion(
+  margins: ChampionSummary[],
+  competition: string,
+  seedPrefix: string,
+  locale: Locale = 'en',
+): QuizQuestion[] {
+  const [top, runnerUp] = margins;
+  if (!top || !runnerUp || margins.length < 3) return [];
+  if (top.titles === runnerUp.titles) return [];
+
+  const correct = top.years[0];
+  const pool = margins.map((m) => m.years[0]);
+  const id = `${seedPrefix}:biggest-margin`;
+  const choice = buildChoice(id, correct, pool);
+  if (!choice) return [];
+
+  const prompt =
+    locale === 'hr'
+      ? `Koje je godine finale natjecanja ${competition} završilo najvećom pobjedom?`
+      : `In which year did the ${competition} final have the biggest winning margin?`;
 
   return [{ id, category: competition, prompt, ...choice }];
 }

@@ -122,6 +122,11 @@ const correctOrderText = question.items
        selectMinWidthRem() fix for TournamentTable.astro's filter row. */
     width: 7rem;
     padding: 0.35rem 0.4rem;
+    /* AGENTS.md's "Interactive targets are at least 44px in any
+       touch-facing control" - the padding above alone only reaches ~30px
+       tall, short of that floor. Measured with a real Playwright
+       boundingBox() at 360px, not assumed from the CSS. */
+    min-height: 2.75rem;
     color: var(--text);
     background: var(--bg-elevated);
     border: 1px solid var(--border);
@@ -168,11 +173,28 @@ const correctOrderText = question.items
   .quiz-card__check {
     font: inherit;
     padding: 0.5rem 0.9rem;
+    /* AGENTS.md's "Interactive targets are at least 44px in any
+       touch-facing control" - the padding above alone only reaches ~43px
+       tall, short of that floor. Measured with a real Playwright
+       boundingBox() at 360px, not assumed from the CSS. */
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border-radius: var(--radius);
     border: 1px solid var(--accent);
     background: var(--accent);
     color: var(--accent-contrast);
     cursor: pointer;
+  }
+
+  /* The inline-flex display above would otherwise override [hidden]'s
+     display:none (author styles beat the UA stylesheet at equal
+     specificity) - this button ships `hidden` until QuizScript.astro runs,
+     so without it a no-JS reader would see a dead "Check order" button.
+     Same fix quiz.astro's own `.quiz__score[hidden]` rule already uses. */
+  .quiz-card__check[hidden] {
+    display: none;
   }
 
   .quiz-card__check:disabled {

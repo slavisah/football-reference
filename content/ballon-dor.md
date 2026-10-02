@@ -4,7 +4,7 @@ slug: ballon-dor
 awardType: individual
 firstEdition: 1956
 lastCompletedEdition: 2025
-lastReviewed: 2026-09-03
+lastReviewed: 2026-10-02
 status: verified
 ---
 
@@ -17,7 +17,7 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 - The Ballon d'Or honors the best individual men's player of the year - it is not a team competition or a national-team trophy.
 - A panel of football journalists, one from each eligible country, ranks their top players; the votes are combined into one final ranking.
 - Eligibility has widened over time: Europe-only at first, then any nationality at a European club from 1995, then fully global since 2007 (see the introduction above).
-- The winner is announced at an end-of-year ceremony organized by France Football magazine.
+- The winner is announced at a ceremony organized by France Football magazine - held at year's end through 2021, then moved to September/October from 2022 onward (see the Ceremony date column above).
 
 ## Winners
 
@@ -179,6 +179,8 @@ See `docs/SOURCES.md` for the per-year citation list.
 - Lionel Messi won the first of his eight Ballon d'Or titles in 2009, more than any other player in the award's history.
 - Luka Modrić became the only Croatian winner of the Ballon d'Or in 2018.
 - The 2020 Ballon d'Or was the only edition since the award's creation in 1956 not to be presented.
+- Stanley Matthews remains the Ballon d'Or's oldest-ever winner, aged 41 when he claimed the inaugural award in 1956 - a record that has stood for seven decades.
+- Ronaldo (Brazil) is the Ballon d'Or's youngest-ever winner, aged 21 when he won in 1997.
 
 ## Notes
 
