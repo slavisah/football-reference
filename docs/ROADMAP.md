@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (215 intensive runs as of 2026-10-02) lives
+verification sweep and decision (216 intensive runs as of 2026-10-02) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,8 +44,8 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-fifteenth run (2026-10-02): 930/930 unit tests,
-`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.67%/98.98%
+As of the two-hundred-and-sixteenth run (2026-10-02): 938/938 unit tests,
+`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.59%/98.87%
 coverage, and the same two standing `knip` false positives as ever (`scripts/
 test-preview-server.mjs`, used only as a Playwright `webServer.command`,
 never imported; `@cspell/dict-hr-hr`, used only via `.cspell/
@@ -73,10 +73,130 @@ judged necessary for it. The two-hundred-and-fourteenth and
 two-hundred-and-fifteenth runs' own new quiz question types are, like the
 two-hundred-and-twelfth run's, a real markup/behavior change, so each entry
 likewise re-ran just the two quiz-specific e2e specs (14 tests) rather than
-the full suite. The two-hundred-and-eighth run did re-run `check:lighthouse`
+the full suite; the two-hundred-and-sixteenth run's own new quiz question
+type below follows the identical pattern. The two-hundred-and-eighth run did
+re-run `check:lighthouse`
 on its own (a manual/intensive-run-only tool, not part of the cold-start
 `test:e2e` + browser-sweep baseline) and confirmed it is still perfect - see
 that run's own entry below.
+
+**Two-hundred-and-sixteenth run:** picked up the two-hundred-and-fifteenth
+run's own closing note - "Fiercest rivalries" was the one remaining
+generated `/records` ranking with no quiz equivalent, flagged as needing real
+scoping rather than a drop-in reuse of `buildRivalries()` because that
+function's own cross-competition design (pairs can qualify by meeting once
+each in two *different* competitions, e.g. France-Italy via EURO 2000 + the
+2006 World Cup) doesn't fit the quiz's existing "one pool per competition"
+architecture or produce a prompt that can name a single tournament. Scoped
+and shipped a narrower, single-competition version instead: a new generated
+quiz question type, "Which two teams have met each other the most times in
+{competition} finals?", for the four team competitions with a Runner-up
+column (FIFA World Cup, UEFA EURO, Copa América, UEFA Nations League).
+
+The new `mostFrequentRivalryQuestion()` in `src/lib/quiz.ts` takes a
+`Rivalry[]` scoped to one competition's own finals only - built by calling
+`buildRivalries(buildFinalsMeetings([{ title, slug, editions }]))` with a
+single-element array, rather than `/records`' own call which combines all
+four team competitions into one cross-competition ranking - so the question
+and its "met in {competition} finals" prompt stay accurate to what it's
+actually asking about. This needed no new editorial research: `buildRivalries()`/
+`buildFinalsMeetings()` (`src/lib/compare.ts`) are the exact same generated
+ranking that already backs `/records`' own "Fiercest rivalries" section,
+independently hand-recomputed against every competition's own Champion/
+Runner-up columns at the two-hundred-and-tenth intensive run. The correct
+choice is formatted as "{teamA} vs {teamB}" (both already alphabetically
+ordered by `buildRivalries()`); distractors are every other qualifying
+pair's own label. Follows the same tie-and-sparse-data safety every other
+generated question type already uses (no question when the top two pairs
+are tied on meetings, or fewer than 3 distinct pairs exist).
+
+That safety was confirmed against the real content tables by hand, not
+assumed, via a one-off script computing each competition's own
+single-competition rivalries: FIFA World Cup has only 2 qualifying pairs
+(Argentina-Germany at 3 meetings, Brazil-Italy at 2) - too few distinct
+entries, correctly producing no question. UEFA EURO and UEFA Nations League
+have 0 pairs that meet twice within the competition alone (EURO's own
+qualifying cross-competition pairs, like France-Italy, only reach 2 meetings
+by combining with another competition's final, which this per-competition
+version deliberately excludes) - also correctly producing no question. Copa
+América has 7 qualifying pairs with a clear, unambiguous leader - Argentina
+vs. Uruguay, 12 meetings, ahead of Argentina vs. Brazil's 11 - and correctly
+does produce one; confirmed live in `dist/quiz/index.html`/`dist/hr/quiz/index.html`'s
+own JSON-LD after a full build (`"name":"Which two teams have met each other
+the most times in Copa América finals?","acceptedAnswer":{"text":"Argentina
+vs Uruguay"}`), identical in both languages.
+
+Wired a new `QuizPool` into both `src/pages/quiz.astro` and
+`src/pages/hr/quiz.astro` for each of the four team competitions (World Cup,
+EURO and Nations League correctly contribute zero questions at runtime, same
+as the "most hosted"/"longest streak" precedents before it), via a small
+shared `rivalriesFor()` helper on each page that builds the single-competition
+`Rivalry[]` list. Added the matching bullet to `content/quiz.md`'s "Question
+types in this quiz" list and the matching Croatian bullet to the hardcoded
+notes list in `src/pages/hr/quiz.astro`. Added eight new unit tests to
+`tests/unit/quiz.test.ts` (a new `describe` block mirroring
+`longestTitleGapQuestion`'s own test shape: the correct leader/answer, the
+English prompt, choice-count/uniqueness, determinism, the Croatian prompt,
+the tie-returns-no-question case, the fewer-than-3-entries case, and the
+no-qualifying-rivalries-at-all case).
+
+One new claim-ledger wrinkle, the same shape as every prior new quiz-question
+bullet: the new bullet's "most times" matches `check-record-claims.mjs`'s
+trigger word ("most"), so it needed its own `scripts/record-claims-ledger.json`
+entry under `content/quiz.md` - same "describes a generated quiz question
+type, not a factual claim" rationale the four prior quiz-question ledger
+entries already use. It matched no other claim checker's trigger words.
+
+**Verification:** `pnpm install` (clean; `pnpm outdated` unchanged, only the
+already-documented blocked `typescript` 5.9.3 -> 7.0.2 line), `pnpm lint`
+(238 files, 0 errors/0 warnings/0 hints), `pnpm test` (938/938, up from 930 -
+the eight new tests), `pnpm test:coverage` (99.59%/98.87% statements/branches,
+100%/100% functions/lines - the five new uncovered branches are
+`mostFrequentRivalryQuestion()`'s own `if (!top || !runnerUp ...)`/
+`if (!choice) return []` guards, the same defensively-unreachable shape
+every other question builder's identical guards already have, per this
+file's own "Open backlog" coverage-gap classification below, updated to
+include them), `pnpm build` (711 pages, unchanged - no new route, just new
+content on the existing `/quiz`/`/hr/quiz` pages). All 29 CI-gated fast
+`check:*` scripts individually re-run and clean, including
+`check:record-claims` (41 claims, up from 40 - the new ledger entry above),
+`check:consecutive-claims`/`check:superlative-claims`/`check:ordinal-claims`/
+`check:since-claims`/`check:one-of-only-claims`/`check:completeness-claims`
+(23/24/91/26/2/5, all unchanged - the new bullet matches none of their
+trigger words), `check:i18n-notes` (7 matched page pairs, parity held for
+the new Croatian bullet), `check:jsonld` (1783 blocks across 711 pages,
+still structurally valid with the new question included), `check:spelling`
+(15 files, 0 issues), `check:spelling-hr` (57 unique blocks, 0 unknown
+words - the new Croatian bullet's words already exist in the dictionary/
+wordlist). `pnpm audit` (no known vulnerabilities). `pnpm dlx knip
+--no-config-hints` (same two standing false positives). `check:pdfs` clean
+(700/700) with no regeneration needed - confirmed `/quiz` has no entry in
+`scripts/pdf-pages.mjs`'s `PDF_PAGES` list, so this run's `content/quiz.md`
+edit has no downloadable-PDF counterpart to go stale. Did not re-run the
+full cold-start `pnpm test:e2e` suite or the five manual browser sweeps -
+instead ran the same two quiz-specific e2e specs the two-hundred-and-twelfth/
+two-hundred-and-fourteenth/two-hundred-and-fifteenth runs used
+(`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`, 14
+tests covering WCAG violations across both languages/both color schemes and
+the no-JS fallback state), which exercise every DOM state this run's change
+could plausibly affect; all 14 passed. The two-hundred-and-fourth run's own
+full cold-start `pnpm test:e2e` (1042/1042) plus the five manual browser
+sweeps remain the standing baseline for everything else.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see "Open backlog" below, unchanged. The quiz's
+question-type surface now covers every generated `/records` ranking that
+reduces to a single clear multiple-choice question, including the
+single-competition slice of "Fiercest rivalries" - no further untried
+`/records` ranking remains as a quiz-question candidate; a true
+cross-competition rivalry question (the "two-sided prompt shape" the
+two-hundred-and-fifteenth run's own note flagged) remains a separate,
+unscoped idea, since it would need its own prompt/UI shape rather than
+reusing the existing per-competition pool pattern. Otherwise, returning to
+the two-hundred-and-eleventh run's own suggestion of a fresh accessibility or
+performance angle, or the two-hundred-and-eighth run's still-untried
+front-to-back prose-vs-table read of the site's smaller `content/*.md`
+files, both remain open.
 
 **Two-hundred-and-fifteenth run:** picked up the two-hundred-and-fourteenth
 run's own closing suggestion - the quiz's question-type surface now also
@@ -2250,11 +2370,12 @@ matching entry for full detail.
   rather than assumed. Needs a real browser with full ICU data to visually
   verify hyphenation renders as intended wherever the site's CSS requests it.
 - **Coverage gaps, defensively unreachable (not a bug, re-confirmed
-  2026-10-02)**: `quiz.ts` (four lines as of the two-hundred-and-fifteenth
-  run - `mostTitlesQuestion()`'s and `biggestFinalMarginQuestion()`'s own
+  2026-10-02)**: `quiz.ts` (five lines as of the two-hundred-and-sixteenth
+  run - `mostTitlesQuestion()`'s, `biggestFinalMarginQuestion()`'s,
+  `longestStreakQuestion()`'s and `longestTitleGapQuestion()`'s own
   `if (!choice) return []` guards, joined this run by the identically-shaped
-  guards in the new `longestStreakQuestion()`/`longestTitleGapQuestion()`),
-  `sources.ts` (two lines - `disambiguateLabels()`'s `counts.get(base) ?? 1`
+  guard in the new `mostFrequentRivalryQuestion()`), `sources.ts` (two lines -
+  `disambiguateLabels()`'s `counts.get(base) ?? 1`
   fallback joins the previously-documented `baseLabel`-lookup line),
   `tableSort.ts` and `url.ts` each have one or two branches that an
   argument's own invariants make unreachable in practice (e.g. `sources.ts`'s

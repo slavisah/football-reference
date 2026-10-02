@@ -14,6 +14,7 @@ import {
   buildLongestTitleGaps,
   buildTimeline,
 } from '../lib/editions';
+import { buildFinalsMeetings, buildRivalries } from '../lib/compare';
 import { t } from '../lib/i18n';
 import { absolutePageUrl, withBase } from '../lib/url';
 import { buildQuizJsonLd, type JsonLdObject } from '../lib/jsonLd';
@@ -25,6 +26,7 @@ import {
   hostByYearQuestions,
   longestStreakQuestion,
   longestTitleGapQuestion,
+  mostFrequentRivalryQuestion,
   mostTitlesQuestion,
   runnerUpByYearQuestions,
   topScorerByYearQuestions,
@@ -33,6 +35,13 @@ import {
   selectQuiz,
   type QuizPool,
 } from '../lib/quiz';
+
+// Rivalries for mostFrequentRivalryQuestion() below must be scoped to one
+// competition's own finals only (see that function's own comment for why) -
+// unlike /records' own buildRivalries() call, which deliberately combines all
+// four team competitions into one cross-competition ranking.
+const rivalriesFor = (title: string, editions: Edition[]) =>
+  buildRivalries(buildFinalsMeetings([{ title, slug: title, editions }]));
 
 const meta = await loadPageMeta('quiz', ['How it works', 'Question types in this quiz']);
 
@@ -123,6 +132,15 @@ const pools: QuizPool[] = [
     seed: 'pick:world-cup:longest-gap',
   },
   {
+    questions: mostFrequentRivalryQuestion(
+      rivalriesFor('FIFA World Cup', worldCup.editions),
+      'FIFA World Cup',
+      'world-cup',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:rivalry',
+  },
+  {
     questions: yearByWinnerQuestions(worldCup.editions, 'FIFA World Cup', 'world-cup', 'en', 'team'),
     take: 1,
     seed: 'pick:world-cup:year-by-winner',
@@ -166,6 +184,11 @@ const pools: QuizPool[] = [
     questions: longestTitleGapQuestion(buildLongestTitleGaps(euro.editions), 'UEFA EURO', 'euro'),
     take: 1,
     seed: 'pick:euro:longest-gap',
+  },
+  {
+    questions: mostFrequentRivalryQuestion(rivalriesFor('UEFA EURO', euro.editions), 'UEFA EURO', 'euro'),
+    take: 1,
+    seed: 'pick:euro:rivalry',
   },
   {
     questions: yearByWinnerQuestions(euro.editions, 'UEFA EURO', 'euro', 'en', 'team'),
@@ -215,6 +238,15 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:copa-america:longest-gap',
+  },
+  {
+    questions: mostFrequentRivalryQuestion(
+      rivalriesFor('Copa América', copaAmerica.editions),
+      'Copa América',
+      'copa-america',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:rivalry',
   },
   {
     questions: yearByWinnerQuestions(copaAmerica.editions, 'Copa América', 'copa-america', 'en', 'team'),
@@ -277,6 +309,15 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:nations-league:longest-gap',
+  },
+  {
+    questions: mostFrequentRivalryQuestion(
+      rivalriesFor('UEFA Nations League', nationsLeague.editions),
+      'UEFA Nations League',
+      'nations-league',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:rivalry',
   },
   {
     questions: yearByWinnerQuestions(nationsLeague.editions, 'UEFA Nations League', 'nations-league', 'en', 'team'),
