@@ -7,12 +7,13 @@ import References from '../components/References.astro';
 import EditorialNotes from '../components/EditorialNotes.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import { disambiguateLabels } from '../lib/sources';
-import { buildHostsSummary, buildTimeline } from '../lib/editions';
+import { buildBiggestFinalMargins, buildHostsSummary, buildTimeline } from '../lib/editions';
 import { t } from '../lib/i18n';
 import { absolutePageUrl, withBase } from '../lib/url';
 import { buildQuizJsonLd, type JsonLdObject } from '../lib/jsonLd';
 import type { Edition } from '../lib/types';
 import {
+  biggestFinalMarginQuestion,
   championByYearQuestions,
   chronologicalOrderQuestions,
   hostByYearQuestions,
@@ -95,6 +96,15 @@ const pools: QuizPool[] = [
     seed: 'pick:world-cup:most-hosted',
   },
   {
+    questions: biggestFinalMarginQuestion(
+      buildBiggestFinalMargins(worldCup.editions),
+      'FIFA World Cup',
+      'world-cup',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:biggest-margin',
+  },
+  {
     questions: yearByWinnerQuestions(worldCup.editions, 'FIFA World Cup', 'world-cup', 'en', 'team'),
     take: 1,
     seed: 'pick:world-cup:year-by-winner',
@@ -123,6 +133,11 @@ const pools: QuizPool[] = [
     questions: mostTitlesQuestion(buildHostsSummary(euro.editions), 'UEFA EURO', 'euro', 'host'),
     take: 1,
     seed: 'pick:euro:most-hosted',
+  },
+  {
+    questions: biggestFinalMarginQuestion(buildBiggestFinalMargins(euro.editions), 'UEFA EURO', 'euro'),
+    take: 1,
+    seed: 'pick:euro:biggest-margin',
   },
   {
     questions: yearByWinnerQuestions(euro.editions, 'UEFA EURO', 'euro', 'en', 'team'),
@@ -193,6 +208,15 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:nations-league:most-hosted',
+  },
+  {
+    questions: biggestFinalMarginQuestion(
+      buildBiggestFinalMargins(nationsLeague.editions),
+      'UEFA Nations League',
+      'nations-league',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:biggest-margin',
   },
   {
     questions: yearByWinnerQuestions(nationsLeague.editions, 'UEFA Nations League', 'nations-league', 'en', 'team'),

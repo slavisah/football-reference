@@ -32898,3 +32898,137 @@ d'Or (needs ~47 more individual birth dates, each independently sourced) and
 Golden Boot (needs the joint-winner-ties question scoped first) - see
 `docs/ROADMAP.md`. The same environment-blocked/human-sign-off backlog items
 remain otherwise unchanged.
+
+### New quiz question type - "In which year did the {competition} final have the biggest winning margin?" - added for FIFA World Cup, UEFA EURO and UEFA Nations League (two-hundred-and-fourteenth intensive run, 2026-10-02)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, picked up the two-hundred-and-thirteenth run's own closing
+suggestion (itself carried forward from the two-hundred-and-twelfth run) - a
+quiz question type drawing on `/records`' other generated rankings not yet
+asked about in the quiz - and shipped it: a new generated quiz question
+type, "In which year did the {competition} final have the biggest winning
+margin?", for the three team competitions with a "Final" score column (FIFA
+World Cup, UEFA EURO, UEFA Nations League). Copa América has no such column
+(already documented on `/records` itself), so it is correctly not asked
+about.
+
+The quiz already asks "who won the title" and "which country hosted the
+most editions" via `mostTitlesQuestion()`, fed by `buildChampionsSummary()`/
+`buildHostsSummary()`. `src/lib/editions.ts` already builds a third
+`ChampionSummary[]`-shaped ranking for final-score margins
+(`buildBiggestFinalMargins()`, which backs `/records`' own "Biggest final
+wins" section and had its own per-edition margins independently
+hand-recomputed against every competition's own "Final" score cells at the
+two-hundred-and-tenth intensive run) - so, like the two-hundred-and-twelfth
+run's "most hosted" question, this new question type needed no new
+editorial research, just a new way of asking about data the site already
+displays and has already verified.
+
+Added `biggestFinalMarginQuestion()` to `src/lib/quiz.ts` rather than
+reusing `mostTitlesQuestion()` directly: `buildBiggestFinalMargins()`'s own
+`displayName` holds the full score text (e.g. "Brazil 5-2 Sweden"), which
+this question must never show or use as a choice (it would give the correct
+year away instantly) - so the new function builds its choices from each
+entry's `years[0]` instead, while keeping `mostTitlesQuestion()`'s own
+tie-and-sparse-data safety shape unchanged (no question when the top two
+margins are tied, or fewer than 3 distinct editions exist).
+
+That safety was confirmed against the real content tables by hand, not
+assumed - loaded each competition's actual `content/*.md` "Final"
+column via `buildBiggestFinalMargins()` in a throwaway Vitest probe before
+writing any page-level code: the FIFA World Cup has a three-way tie for the
+single biggest margin (1958's Brazil 5-2 Sweden, 1970's Brazil 4-1 Italy and
+1998's France 3-0 Brazil, all at margin 3) and UEFA Nations League has a
+two-way tie (2018-19's Portugal 1-0 Netherlands and 2020-21's France 2-1
+Spain, both at margin 1) - both correctly produce no question. UEFA EURO has
+a clear, unambiguous record (Spain's 4-0 win over Italy in 2012, margin 4,
+clear of 1972's margin-3 West Germany 3-0 Soviet Union final) and correctly
+does produce one - confirmed live in both
+`dist/quiz/index.html`/`dist/hr/quiz/index.html`'s own JSON-LD after a full
+build (`"acceptedAnswer":{"@type":"Answer","text":"2012"}` in both
+languages), not just from the unit tests; a direct grep for the World
+Cup/Nations League prompt strings in the same built output confirmed they
+never appear.
+
+Wired a new `QuizPool` into both `src/pages/quiz.astro` and
+`src/pages/hr/quiz.astro` for each of the three eligible competitions,
+calling `biggestFinalMarginQuestion(buildBiggestFinalMargins(...), ...)` -
+placed immediately after each competition's existing "most hosted" pool
+entry, matching that question type's own position in both files. Added the
+matching bullet to `content/quiz.md`'s "Question types in this quiz" list
+("In which year did a given tournament's final have the biggest winning
+margin? (only asked when there's a single, unambiguous biggest margin - not
+a tie for first)") and the matching Croatian bullet to the hardcoded notes
+list in `src/pages/hr/quiz.astro` ("Koje je godine finale danog natjecanja
+završilo najvećom pobjedom? ..."). Added eight new unit tests to
+`tests/unit/quiz.test.ts`, mirroring `buildBiggestFinalMargins()`'s own
+existing test fixture: the English prompt and correct answer, a dedicated
+assertion that no choice ever contains a score-line dash (guarding against
+ever accidentally showing `displayName` instead of a year), choice-count/
+uniqueness, determinism across repeated calls, the Croatian prompt (same
+underlying answer as English), the tie-returns-no-question case, the
+fewer-than-3-distinct-editions case, and the no-"Final"-column case (Copa
+América's own shape).
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(913/913, up from 905 - the eight new tests), `pnpm test:coverage`
+(99.83%/99.2% statements/branches, 100%/100% functions/lines - ticking down
+very slightly from 99.91%/99.32% only because of one new defensively-
+unreachable branch, `biggestFinalMarginQuestion()`'s own `if (!choice)
+return []` guard, which has the exact same shape as `mostTitlesQuestion()`'s
+own pre-existing uncovered guard at the same line offset - `buildChoice()`
+can only return `undefined` when fewer than 2 distinct distractors survive
+filtering, which this function's own tie/length checks already rule out by
+the time that guard runs, the same "Open backlog" coverage-gap
+classification this file documents for `quiz.ts`'s other branches), `pnpm
+build` (711 pages, unchanged - no new route, just new content on the
+existing `/quiz`/`/hr/quiz` pages). All 29 CI-gated fast `check:*` scripts
+individually re-run and clean, including `check:record-claims` (40 claims,
+up from 39 - the new "biggest winning margin" bullet in `content/quiz.md`
+needed its own `record-claims-ledger.json` entry, added with the same
+"describes a generated quiz question type, not a static factual claim"
+rationale the existing "most titles/awards"/"most hosted" entries already
+used, since the actual answer is computed at build time from
+`buildBiggestFinalMargins()` rather than being a fixed fact to
+cross-reference against a static table), `check:i18n-notes` (7 matched page
+pairs, parity held for the new Croatian bullet), `check:jsonld` (1783 blocks
+across 711 pages, still structurally valid with the new question included),
+`check:heading-outline`, `check:links` (715 pages), `check:sitemap` (710
+entries), `check:meta`, `check:spelling` (15 files, 0 issues),
+`check:spelling-hr` (57 blocks, 0 unknown words - the new Croatian bullet's
+words already exist in the dictionary/wordlist, no new `.cspell` entry
+needed), and every other fast check unchanged and clean. `pnpm audit` (no
+known vulnerabilities). `pnpm dlx knip --no-config-hints` (same two standing
+false positives: `scripts/test-preview-server.mjs`, `@cspell/dict-hr-hr`).
+
+Regenerated all 700 downloadable PDFs
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs`, this
+session's own container-specific Chromium-revision escape hatch - this
+container's default Playwright Chromium resolves to a revision not cached
+here, only the `/opt/pw-browsers/chromium` one is) since `content/quiz.md`
+changed; `check:pdfs`/`check:pdf-outline` both clean (700/700) afterward, no
+preview-server lock snag this time (ran `astro preview stop` first as a
+precaution, which correctly reported no server running).
+
+Did not re-run the full cold-start `pnpm test:e2e` suite or the five manual
+browser sweeps - instead ran the same two quiz-specific e2e specs the
+two-hundred-and-twelfth run used for its own quiz change
+(`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`, 14
+tests covering WCAG violations across both languages/both color schemes and
+the no-JS fallback state), which exercise every DOM state this run's change
+could plausibly affect; all 14 passed
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`). The two-hundred-and-fourth
+run's own full cold-start `pnpm test:e2e` (1042/1042) plus the five manual
+browser sweeps remain the standing baseline for everything else, with
+`check:lighthouse` last reconfirmed by the two-hundred-and-eighth run.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+The quiz's question-type surface now also covers `/records`' "Biggest final
+wins" ranking; "Back-to-back champions"/"Longest wait between titles" remain
+the two still-unasked-about generated rankings on that page, a natural next
+candidate in the same "ship a feature, not another verification pass" vein -
+or returning to the two-hundred-and-eleventh run's own suggestion of a fresh
+accessibility or performance angle.

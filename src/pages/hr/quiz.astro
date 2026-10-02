@@ -18,13 +18,14 @@ import References from '../../components/References.astro';
 import EditorialNotes from '../../components/EditorialNotes.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import { disambiguateLabels } from '../../lib/sources';
-import { buildHostsSummary, buildTimeline } from '../../lib/editions';
+import { buildBiggestFinalMargins, buildHostsSummary, buildTimeline } from '../../lib/editions';
 import { t } from '../../lib/i18n';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import { buildQuizJsonLd, type JsonLdObject } from '../../lib/jsonLd';
 import type { Edition } from '../../lib/types';
 import type { NoteSection } from '../../lib/notes';
 import {
+  biggestFinalMarginQuestion,
   championByYearQuestions,
   chronologicalOrderQuestions,
   hostByYearQuestions,
@@ -66,6 +67,7 @@ const notes: NoteSection[] = [
       'Koje je godine dana reprezentacija osvojila natjecanje, ili dani igrač osvojio Zlatnu loptu? (pita se samo o jednokratnim prvacima/dobitnicima)',
       'Koja reprezentacija ili igrač ima najviše naslova/nagrada na natjecanju?',
       'Koja je država bila domaćin najviše izdanja danog natjecanja?',
+      'Koje je godine finale danog natjecanja završilo najvećom pobjedom? (pita se samo kad postoji jedan jasan rekord, a ne izjednačenost za prvo mjesto)',
       'Poredaj četiri prvaka natjecanja, ili četiri dobitnika pojedinačne nagrade (Zlatna lopta, Zlatna kopačka), kronološkim redoslijedom (od najranijeg).',
     ],
   },
@@ -152,6 +154,16 @@ const pools: QuizPool[] = [
     seed: 'pick:world-cup:most-hosted',
   },
   {
+    questions: biggestFinalMarginQuestion(
+      buildBiggestFinalMargins(worldCup.editions),
+      WORLD_CUP_NAME,
+      'world-cup',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:biggest-margin',
+  },
+  {
     questions: yearByWinnerQuestions(worldCup.editions, WORLD_CUP_NAME, 'world-cup', 'hr', 'team'),
     take: 1,
     seed: 'pick:world-cup:year-by-winner',
@@ -180,6 +192,11 @@ const pools: QuizPool[] = [
     questions: mostTitlesQuestion(buildHostsSummary(euro.editions), EURO_NAME, 'euro', 'host', 'hr'),
     take: 1,
     seed: 'pick:euro:most-hosted',
+  },
+  {
+    questions: biggestFinalMarginQuestion(buildBiggestFinalMargins(euro.editions), EURO_NAME, 'euro', 'hr'),
+    take: 1,
+    seed: 'pick:euro:biggest-margin',
   },
   {
     questions: yearByWinnerQuestions(euro.editions, EURO_NAME, 'euro', 'hr', 'team'),
@@ -262,6 +279,16 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:nations-league:most-hosted',
+  },
+  {
+    questions: biggestFinalMarginQuestion(
+      buildBiggestFinalMargins(nationsLeague.editions),
+      NATIONS_LEAGUE_NAME,
+      'nations-league',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:biggest-margin',
   },
   {
     questions: yearByWinnerQuestions(nationsLeague.editions, NATIONS_LEAGUE_NAME, 'nations-league', 'hr', 'team'),
