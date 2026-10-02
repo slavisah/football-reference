@@ -371,6 +371,111 @@ export function biggestFinalMarginQuestion(
   return [{ id, category: competition, prompt, ...choice }];
 }
 
+/**
+ * "Which team/player had the longest run of consecutive {competition}
+ * titles/awards?" - a single generated question per competition, built from
+ * the same `ChampionSummary[]`-shaped streak ranking `buildLongestStreaks()`
+ * already produces for `/records`' own "Back-to-back champions" section (see
+ * `src/lib/editions.ts`) - no new editorial research, just a new way of
+ * asking about data the site already displays and has already verified (the
+ * two-hundred-and-ninth intensive run hand-recomputed every one of these
+ * streaks against each competition's own Winner column).
+ *
+ * `streaks` must already be sorted by streak length descending
+ * (`buildLongestStreaks()` does this for free). Each entry's `titles` field
+ * holds the streak length (editions in a row), not a title count. Returns no
+ * question at all when there's a tie for the single longest streak (no
+ * unambiguous correct answer - e.g. the FIFA World Cup's own two-way tie
+ * between Italy 1934/1938 and Brazil 1958/1962, both length 2) or fewer than
+ * 3 distinct streaks (not enough distractors) - e.g. UEFA Nations League and
+ * the EURO Golden Boot have no back-to-back streak at all as of 2026, so
+ * `buildLongestStreaks()` returns an empty array for them and this correctly
+ * produces no question. A team/player can appear more than once in `streaks`
+ * (separate, non-adjacent streaks) - `buildChoice`'s own `[...new
+ * Set(pool)]` dedup already handles that without any extra filtering here.
+ */
+export function longestStreakQuestion(
+  streaks: ChampionSummary[],
+  competition: string,
+  seedPrefix: string,
+  subject: 'team' | 'player' = 'team',
+  locale: Locale = 'en',
+): QuizQuestion[] {
+  const [top, runnerUp] = streaks;
+  if (!top || !runnerUp || streaks.length < 3) return [];
+  if (top.titles === runnerUp.titles) return [];
+
+  const correct = top.displayName;
+  const pool = streaks.map((s) => s.displayName);
+  const id = `${seedPrefix}:longest-streak`;
+  const choice = buildChoice(id, correct, pool);
+  if (!choice) return [];
+
+  const prompt =
+    locale === 'hr'
+      ? subject === 'player'
+        ? `Tko ima najdulji niz uzastopnih osvojenih nagrada ${competition}?`
+        : `Koja reprezentacija ima najdulji niz uzastopnih naslova na natjecanju ${competition}?`
+      : subject === 'player'
+        ? `Who had the longest run of consecutive ${competition} awards?`
+        : `Which team had the longest run of consecutive ${competition} titles?`;
+
+  return [{ id, category: competition, prompt, ...choice }];
+}
+
+/**
+ * "Who waited the longest between {competition} titles/awards?" - a single
+ * generated question per competition, built from the same
+ * `ChampionSummary[]`-shaped gap ranking `buildLongestTitleGaps()` already
+ * produces for `/records`' own "Longest wait between titles" section (see
+ * `src/lib/editions.ts`) - no new editorial research, just a new way of
+ * asking about data the site already displays and has already verified (the
+ * two-hundred-and-ninth intensive run hand-recomputed every one of these
+ * gaps against each competition's own title years).
+ *
+ * `gaps` must already be sorted by gap length descending
+ * (`buildLongestTitleGaps()` does this for free). Each entry's `titles`
+ * field holds the gap length in years, not a title count, and each entry is
+ * one distinct team/player (unlike `longestStreakQuestion`'s `streaks`,
+ * which can repeat a name across separate runs), since
+ * `buildLongestTitleGaps()` iterates `buildChampionsSummary()` once per
+ * champion. Returns no question at all when there's a tie for the single
+ * longest wait (no unambiguous correct answer - e.g. the Ballon d'Or's own
+ * tie between Ronaldo and Cristiano Ronaldo, both a 5-year wait) or fewer
+ * than 3 distinct entries (not enough distractors) - e.g. UEFA Nations
+ * League and both Golden Boot tables have only one team/player with 2+
+ * titles so far, so `buildLongestTitleGaps()` returns too short a list for
+ * either.
+ */
+export function longestTitleGapQuestion(
+  gaps: ChampionSummary[],
+  competition: string,
+  seedPrefix: string,
+  subject: 'team' | 'player' = 'team',
+  locale: Locale = 'en',
+): QuizQuestion[] {
+  const [top, runnerUp] = gaps;
+  if (!top || !runnerUp || gaps.length < 3) return [];
+  if (top.titles === runnerUp.titles) return [];
+
+  const correct = top.displayName;
+  const pool = gaps.map((g) => g.displayName);
+  const id = `${seedPrefix}:longest-gap`;
+  const choice = buildChoice(id, correct, pool);
+  if (!choice) return [];
+
+  const prompt =
+    locale === 'hr'
+      ? subject === 'player'
+        ? `Tko je najdulje čekao na sljedeću nagradu ${competition}?`
+        : `Koja je reprezentacija najdulje čekala na sljedeći naslov na natjecanju ${competition}?`
+      : subject === 'player'
+        ? `Who waited the longest between ${competition} awards?`
+        : `Which team waited the longest between ${competition} titles?`;
+
+  return [{ id, category: competition, prompt, ...choice }];
+}
+
 export type QuizPool = {
   questions: QuizQuestion[];
   /** How many questions to take from this pool. */

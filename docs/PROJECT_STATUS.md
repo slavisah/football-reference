@@ -33032,3 +33032,181 @@ the two still-unasked-about generated rankings on that page, a natural next
 candidate in the same "ship a feature, not another verification pass" vein -
 or returning to the two-hundred-and-eleventh run's own suggestion of a fresh
 accessibility or performance angle.
+
+### New quiz question types - "Which team/player had the longest run of consecutive {competition} titles/awards?" and "Who waited the longest between {competition} titles/awards?" - added across all seven loaded competitions (two-hundred-and-fifteenth intensive run, 2026-10-02)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, picked up the two-hundred-and-fourteenth run's own closing
+suggestion directly: the quiz's question-type surface now also covers
+`/records`' "Back-to-back champions" and "Longest wait between titles"
+sections, the two generated rankings that run named as the remaining
+still-unasked-about candidates.
+
+`src/lib/editions.ts` already builds `ChampionSummary[]`-shaped rankings for
+both - `buildLongestStreaks()` (streak length standing in for `titles`) and
+`buildLongestTitleGaps()` (gap-in-years standing in for `titles`) - both
+independently hand-recomputed against every competition's own Winner
+column/title years at the two-hundred-and-ninth intensive run for
+`/records`' own sections. Like the two-hundred-and-twelfth/
+two-hundred-and-fourteenth runs' "most hosted"/"biggest winning margin"
+additions, this needed no new editorial research, just two new ways of
+asking about data the site already displays and has already verified. Added
+`longestStreakQuestion()` and `longestTitleGapQuestion()` to `src/lib/
+quiz.ts`, both following `biggestFinalMarginQuestion()`'s own tie-and-sparse-
+data safety shape exactly (no question when the top two entries tie, or
+fewer than 3 distinct entries exist) and `mostTitlesQuestion()`'s own
+`subject: 'team' | 'player'` parameter for Croatian wording on the three
+individual-award datasets.
+
+Wired both into every one of the seven `loadCompetition()` datasets already
+loaded on `src/pages/quiz.astro`/`src/pages/hr/quiz.astro` (FIFA World Cup,
+UEFA EURO, Copa América, UEFA Nations League, Ballon d'Or, World Cup Golden
+Boot, EURO Golden Boot) rather than only the datasets currently known to
+produce a question - the same "wire it everywhere the data shape applies,
+let the tie-safety logic decide per-run whether a question actually appears"
+precedent the "most hosted" question already established (World Cup/Nations
+League correctly contribute zero "most hosted" questions at runtime, same as
+here), so a future edition that happens to break a current tie produces a
+question with no further code change needed.
+
+Confirmed against the real content tables which datasets currently produce a
+question, the same "parse the real `/records` JSON-LD, not just the rendered
+prose" methodology the prior two quiz-question runs used: built the site and
+extracted every `"Back-to-back champions"`/`"Longest wait between titles"`
+`ItemList` block from `dist/records/index.html` with a throwaway script.
+"Longest streak" fires only for Copa América (Argentina's 1945-1947
+three-in-a-row, ahead of ten two-in-a-row ties at length 2) and Ballon d'Or
+(Lionel Messi's 2009-2012 four-in-a-row, ahead of Michel Platini's
+1983-1985 three-in-a-row); it correctly produces no question for FIFA World
+Cup (Italy 1934/1938 and Brazil 1958/1962 both tied at streak length 2),
+UEFA EURO (only one streak at all, Spain 2008/2012), UEFA Nations League and
+EURO Golden Boot (no back-to-back streak exists in either table), and World
+Cup Golden Boot (only one streak, Mbappé 2022/2026). "Longest wait" fires
+for FIFA World Cup (Italy, a 44-year wait between 1938 and 1982), UEFA EURO
+(Italy, 52 years between 1968 and 2020) and Copa América (Brazil, 40 years
+between 1949 and 1989); it correctly produces no question for UEFA Nations
+League and both Golden Boot tables (only one team/player anywhere in each
+table has 2+ titles so far, short of the 3-distinct-entries floor) and
+Ballon d'Or (Ronaldo and Cristiano Ronaldo tied at a 5-year wait, each
+sitting on three total distinct entries so the tie - not the length floor -
+is what suppresses the question).
+
+Re-confirmed all twelve outcomes a second way after wiring the pools in:
+built the site again and parsed `dist/quiz/index.html`/
+`dist/hr/quiz/index.html`'s own JSON-LD for every prompt containing
+"longest run of consecutive" or "waited the longest between" - exactly five
+questions appeared (Italy/Italy/Brazil for "longest wait" on World
+Cup/EURO/Copa América, Argentina/Messi for "longest streak" on Copa
+América/Ballon d'Or), each with the expected answer, in both languages, with
+no sixth or seventh question for any of the seven ties/sparse-data cases
+above.
+
+Added the matching two bullets to `content/quiz.md`'s "Question types in
+this quiz" list and the two matching Croatian bullets to the hardcoded notes
+list in `src/pages/hr/quiz.astro`. Added 17 new unit tests to
+`tests/unit/quiz.test.ts` (two new `describe` blocks, 9 and 8 cases,
+mirroring `biggestFinalMarginQuestion()`'s own test shape): the English/
+Croatian prompts and correct answers for both the `'team'` and `'player'`
+subject wording, choice-count/uniqueness, determinism across repeated calls,
+the tie-returns-no-question case, the fewer-than-3-entries case, and - for
+the streak question only, since `buildLongestStreaks()` can return an empty
+array outright rather than merely too few entries (no competition yet has
+exactly 1 or 2 streaks) - the no-streak-at-all case (modeled on UEFA Nations
+League's real shape: four distinct champions, no repeat winner anywhere).
+
+One new claim-ledger wrinkle, caught by running every fast `check:*` script
+rather than assuming the prior two quiz-question runs' ledger pattern was
+exhaustive: the "longest run of consecutive" bullet's first line matches
+`check-consecutive-claims.mjs`'s own trigger word ("consecutive"), something
+neither the "most hosted" nor "biggest winning margin" bullets ever
+triggered. Added a new `content/quiz.md` entry to `scripts/
+consecutive-claims-ledger.json`, using the exact same "describes a generated
+quiz question type, not a factual claim" rationale the three prior quiz-
+question entries in `record-claims-ledger.json` already use for the same
+underlying reason (the actual answer is computed at build time from a
+function whose own output was already independently hand-verified, so
+there's nothing here for the checker to cross-reference against a static
+table). The "longest wait" bullet and record-claims-ledger.json's own
+trigger words (`most|record|youngest|oldest|highest|biggest|largest|lowest|
+fewest`) were both checked and neither bullet matches any of them ("longest"
+itself is not one of the listed trigger words) - confirmed by running
+`check-record-claims.mjs` before and after, both clean with the same 40-claim
+count. Also caught and fixed, before it ever reached a committed file: the
+first draft of the "longest run of consecutive" bullet wrapped its second
+line as `  - not a tie for first)`, which `/^-\s(.*)$/` (the exact line regex
+every one of the seven claim checkers uses) would read as a second,
+spurious top-level bullet starting with "-" - confirmed by running
+`check-consecutive-claims.mjs` against the first draft and seeing it
+misparse the continuation line; rewrapped the line break so the continuation
+text never starts with "- ", matching the existing "biggest winning margin"
+bullet's own wrapping convention (trailing hyphen at the end of a line, never
+at the start of the next), then re-ran clean.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean). `pnpm outdated`
+surfaced one new in-range patch beyond the already-documented blocked
+`typescript` 5.9.3 -> 7.0.2 line (`@types/node` 26.6.3 -> 26.6.4); bumped via
+`pnpm update @types/node`, confirmed `pnpm outdated` afterward shows only the
+blocked `typescript` line. `pnpm lint` (238 files, 0 errors/0 warnings/0
+hints), `pnpm test` (930/930, up from 913 - the 17 new tests), `pnpm
+test:coverage` (99.67%/98.98% statements/branches, 100%/100% functions/lines
+- down slightly from 99.83%/99.2% only because of two new defensively-
+unreachable branches, `longestStreakQuestion()`'s and
+`longestTitleGapQuestion()`'s own `if (!choice) return []` guards, the exact
+same shape `mostTitlesQuestion()`'s and `biggestFinalMarginQuestion()`'s
+identical guards already have for the identical reason - `buildChoice()` can
+only return `undefined` when fewer than 2 distinct distractors survive
+filtering, which each function's own tie/length checks already rule out by
+the time that guard runs; `docs/ROADMAP.md`'s "Open backlog" coverage-gap
+entry updated to list these two new lines alongside the pre-existing ones),
+`pnpm build` (711 pages, unchanged - no new route, just new content on the
+existing `/quiz`/`/hr/quiz` pages). All 29 CI-gated fast `check:*` scripts
+individually re-run and clean, including `check:consecutive-claims` (23
+claims, up from 22 - the new ledger entry above), `check:record-claims` (40
+claims, unchanged), `check:i18n-notes` (7 matched page pairs, parity held for
+the two new Croatian bullets), `check:jsonld` (1783 blocks across 711 pages,
+still structurally valid with the new questions included), `check:links`
+(715 pages), `check:sitemap` (710 entries), `check:spelling` (15 files, 0
+issues), `check:spelling-hr` (57 blocks, 0 unknown words - no new `.cspell`
+entry needed), and every other fast check unchanged and clean. `pnpm audit`
+(no known vulnerabilities). `pnpm dlx knip --no-config-hints` (same two
+standing false positives: `scripts/test-preview-server.mjs`, `@cspell/
+dict-hr-hr`).
+
+Regenerated all 700 downloadable PDFs
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs`, this
+session's own container-specific Chromium-revision escape hatch, run after an
+`astro preview stop` precaution per the two-hundred-and-twelfth run's own
+warning against an overlapping preview-server lock) since `content/quiz.md`
+changed; `check:pdfs`/`check:pdf-outline` both clean (700/700) afterward, no
+lock snag this time.
+
+Did not re-run the full cold-start `pnpm test:e2e` suite or the five manual
+browser sweeps - instead ran the same two quiz-specific e2e specs the
+two-hundred-and-twelfth/two-hundred-and-fourteenth runs used for their own
+quiz changes (`accessibility-quiz-states.spec.ts`,
+`no-js-quiz-and-search.spec.ts`, 14 tests covering WCAG violations across
+both languages/both color schemes and the no-JS fallback state), which
+exercise every DOM state this run's change could plausibly affect; all 14
+passed (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`). The
+two-hundred-and-fourth run's own full cold-start `pnpm test:e2e` (1042/1042)
+plus the five manual browser sweeps remain the standing baseline for
+everything else, with `check:lighthouse` last reconfirmed by the
+two-hundred-and-eighth run.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+The quiz's question-type surface now covers every `ChampionSummary[]`-shaped
+ranking `/records` renders (titles, awards, hosts, biggest final margins,
+back-to-back streaks and longest title gaps) for every competition that has
+one - no further untried `/records` ranking remains as a quiz-question
+candidate in this same mold. "Fiercest rivalries", "Nearly champions" and
+"Nearly finalists" are the only generated `/records` sections left with no
+quiz equivalent, but none reduces naturally to a single clear multiple-choice
+question the way the others do (a rivalry question would need a two-sided
+prompt shape, and "nearly champions/finalists" names a whole list rather
+than one record holder) - a genuinely new question *shape* to scope, not
+just a new data source to plug into the existing one. Otherwise, returning
+to the two-hundred-and-eleventh run's own suggestion of a fresh
+accessibility or performance angle, or the two-hundred-and-eighth run's
+still-untried front-to-back prose-vs-table read of the site's smaller
+`content/*.md` files, both remain open.

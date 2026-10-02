@@ -18,7 +18,13 @@ import References from '../../components/References.astro';
 import EditorialNotes from '../../components/EditorialNotes.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import { disambiguateLabels } from '../../lib/sources';
-import { buildBiggestFinalMargins, buildHostsSummary, buildTimeline } from '../../lib/editions';
+import {
+  buildBiggestFinalMargins,
+  buildHostsSummary,
+  buildLongestStreaks,
+  buildLongestTitleGaps,
+  buildTimeline,
+} from '../../lib/editions';
 import { t } from '../../lib/i18n';
 import { absolutePageUrl, withBase } from '../../lib/url';
 import { buildQuizJsonLd, type JsonLdObject } from '../../lib/jsonLd';
@@ -29,6 +35,8 @@ import {
   championByYearQuestions,
   chronologicalOrderQuestions,
   hostByYearQuestions,
+  longestStreakQuestion,
+  longestTitleGapQuestion,
   mostTitlesQuestion,
   runnerUpByYearQuestions,
   topScorerByYearQuestions,
@@ -68,6 +76,8 @@ const notes: NoteSection[] = [
       'Koja reprezentacija ili igrač ima najviše naslova/nagrada na natjecanju?',
       'Koja je država bila domaćin najviše izdanja danog natjecanja?',
       'Koje je godine finale danog natjecanja završilo najvećom pobjedom? (pita se samo kad postoji jedan jasan rekord, a ne izjednačenost za prvo mjesto)',
+      'Koja reprezentacija ili igrač ima najdulji niz uzastopnih naslova/nagrada na natjecanju? (pita se samo kad postoji jedan jasan rekord, a ne izjednačenost za prvo mjesto)',
+      'Koja je reprezentacija ili igrač najdulje čekao/la na sljedeći naslov/nagradu na natjecanju? (pita se samo kad postoji jedan jasan rekord, a ne izjednačenost za prvo mjesto)',
       'Poredaj četiri prvaka natjecanja, ili četiri dobitnika pojedinačne nagrade (Zlatna lopta, Zlatna kopačka), kronološkim redoslijedom (od najranijeg).',
     ],
   },
@@ -164,6 +174,28 @@ const pools: QuizPool[] = [
     seed: 'pick:world-cup:biggest-margin',
   },
   {
+    questions: longestStreakQuestion(
+      buildLongestStreaks(worldCup.editions),
+      WORLD_CUP_NAME,
+      'world-cup',
+      'team',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:longest-streak',
+  },
+  {
+    questions: longestTitleGapQuestion(
+      buildLongestTitleGaps(worldCup.editions),
+      WORLD_CUP_NAME,
+      'world-cup',
+      'team',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:longest-gap',
+  },
+  {
     questions: yearByWinnerQuestions(worldCup.editions, WORLD_CUP_NAME, 'world-cup', 'hr', 'team'),
     take: 1,
     seed: 'pick:world-cup:year-by-winner',
@@ -197,6 +229,16 @@ const pools: QuizPool[] = [
     questions: biggestFinalMarginQuestion(buildBiggestFinalMargins(euro.editions), EURO_NAME, 'euro', 'hr'),
     take: 1,
     seed: 'pick:euro:biggest-margin',
+  },
+  {
+    questions: longestStreakQuestion(buildLongestStreaks(euro.editions), EURO_NAME, 'euro', 'team', 'hr'),
+    take: 1,
+    seed: 'pick:euro:longest-streak',
+  },
+  {
+    questions: longestTitleGapQuestion(buildLongestTitleGaps(euro.editions), EURO_NAME, 'euro', 'team', 'hr'),
+    take: 1,
+    seed: 'pick:euro:longest-gap',
   },
   {
     questions: yearByWinnerQuestions(euro.editions, EURO_NAME, 'euro', 'hr', 'team'),
@@ -238,6 +280,28 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:copa-america:most-hosted',
+  },
+  {
+    questions: longestStreakQuestion(
+      buildLongestStreaks(copaAmerica.editions),
+      COPA_AMERICA_NAME,
+      'copa-america',
+      'team',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:longest-streak',
+  },
+  {
+    questions: longestTitleGapQuestion(
+      buildLongestTitleGaps(copaAmerica.editions),
+      COPA_AMERICA_NAME,
+      'copa-america',
+      'team',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:longest-gap',
   },
   {
     questions: yearByWinnerQuestions(copaAmerica.editions, COPA_AMERICA_NAME, 'copa-america', 'hr', 'team'),
@@ -291,6 +355,28 @@ const pools: QuizPool[] = [
     seed: 'pick:nations-league:biggest-margin',
   },
   {
+    questions: longestStreakQuestion(
+      buildLongestStreaks(nationsLeague.editions),
+      NATIONS_LEAGUE_NAME,
+      'nations-league',
+      'team',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:longest-streak',
+  },
+  {
+    questions: longestTitleGapQuestion(
+      buildLongestTitleGaps(nationsLeague.editions),
+      NATIONS_LEAGUE_NAME,
+      'nations-league',
+      'team',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:longest-gap',
+  },
+  {
     questions: yearByWinnerQuestions(nationsLeague.editions, NATIONS_LEAGUE_NAME, 'nations-league', 'hr', 'team'),
     take: 1,
     seed: 'pick:nations-league:year-by-winner',
@@ -304,6 +390,28 @@ const pools: QuizPool[] = [
     questions: mostTitlesQuestion(ballonDor.champions, BALLON_DOR_NAME, 'ballon-dor', 'player', 'hr'),
     take: 1,
     seed: 'pick:ballon-dor:most-titles',
+  },
+  {
+    questions: longestStreakQuestion(
+      buildLongestStreaks(ballonDor.editions),
+      BALLON_DOR_NAME,
+      'ballon-dor',
+      'player',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:ballon-dor:longest-streak',
+  },
+  {
+    questions: longestTitleGapQuestion(
+      buildLongestTitleGaps(ballonDor.editions),
+      BALLON_DOR_NAME,
+      'ballon-dor',
+      'player',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:ballon-dor:longest-gap',
   },
   {
     questions: yearByWinnerQuestions(ballonDor.editions, BALLON_DOR_NAME, 'ballon-dor', 'hr'),
@@ -332,6 +440,28 @@ const pools: QuizPool[] = [
     seed: 'pick:golden-boot-world-cup:most-titles',
   },
   {
+    questions: longestStreakQuestion(
+      buildLongestStreaks(goldenBootWorldCup.editions),
+      GOLDEN_BOOT_WORLD_CUP_NAME,
+      'golden-boot-world-cup',
+      'player',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:golden-boot-world-cup:longest-streak',
+  },
+  {
+    questions: longestTitleGapQuestion(
+      buildLongestTitleGaps(goldenBootWorldCup.editions),
+      GOLDEN_BOOT_WORLD_CUP_NAME,
+      'golden-boot-world-cup',
+      'player',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:golden-boot-world-cup:longest-gap',
+  },
+  {
     questions: topScorerByYearQuestions(
       goldenBootEuro.editions,
       GOLDEN_BOOT_EURO_NAME,
@@ -351,6 +481,28 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:golden-boot-euro:most-titles',
+  },
+  {
+    questions: longestStreakQuestion(
+      buildLongestStreaks(goldenBootEuro.editions),
+      GOLDEN_BOOT_EURO_NAME,
+      'golden-boot-euro',
+      'player',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:golden-boot-euro:longest-streak',
+  },
+  {
+    questions: longestTitleGapQuestion(
+      buildLongestTitleGaps(goldenBootEuro.editions),
+      GOLDEN_BOOT_EURO_NAME,
+      'golden-boot-euro',
+      'player',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:golden-boot-euro:longest-gap',
   },
 ];
 
