@@ -8,6 +8,7 @@ import {
   buildLongestTitleGaps,
 } from '../../src/lib/editions';
 import { buildTimeline } from '../../src/lib/editions';
+import { buildFinalsMeetings, buildRivalries } from '../../src/lib/compare';
 import {
   biggestFinalMarginQuestion,
   championByYearQuestions,
@@ -15,6 +16,7 @@ import {
   hostByYearQuestions,
   longestStreakQuestion,
   longestTitleGapQuestion,
+  mostFrequentRivalryQuestion,
   mostTitlesQuestion,
   runnerUpByYearQuestions,
   selectQuiz,
@@ -918,6 +920,94 @@ describe('longestTitleGapQuestion', () => {
   it('returns no question when fewer than 3 distinct entries exist', () => {
     const sparse = clearGaps.slice(0, 2);
     expect(longestTitleGapQuestion(sparse, 'Test Cup', 'test')).toHaveLength(0);
+  });
+});
+
+describe('mostFrequentRivalryQuestion', () => {
+  const rivalryTable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'Runner-up'],
+    rows: [
+      ['1930', 'Argentina', 'Brazil'],
+      ['1934', 'Brazil', 'Argentina'],
+      ['1938', 'Argentina', 'Chile'],
+      ['1950', 'Chile', 'Argentina'],
+      ['1954', 'Brazil', 'Chile'],
+      ['1958', 'Chile', 'Brazil'],
+      ['1962', 'Argentina', 'Denmark'],
+      ['1966', 'Denmark', 'Argentina'],
+      ['1970', 'Argentina', 'Denmark'],
+    ],
+  };
+  const rivalryEditions = buildEditions(rivalryTable);
+  const clearRivalries = buildRivalries(
+    buildFinalsMeetings([{ title: 'Test Cup', slug: 'test', editions: rivalryEditions }]),
+  );
+
+  it('has the widest-meeting pair (Argentina vs Denmark, 3 meetings) as the clear leader', () => {
+    expect(clearRivalries.length).toBeGreaterThanOrEqual(3);
+    expect(clearRivalries[0].teamADisplayName).toBe('Argentina');
+    expect(clearRivalries[0].teamBDisplayName).toBe('Denmark');
+    expect(clearRivalries[0].meetings).toBe(3);
+  });
+
+  it('asks a "most frequent rivalry" question with the top pair as the answer', () => {
+    const questions = mostFrequentRivalryQuestion(clearRivalries, 'Test Cup', 'test');
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe('Which two teams have met each other the most times in Test Cup finals?');
+    expect(questions[0].category).toBe('Test Cup');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('Argentina vs Denmark');
+  });
+
+  it('never repeats a choice and stays within the 3-4 choice range', () => {
+    const [q] = mostFrequentRivalryQuestion(clearRivalries, 'Test Cup', 'test');
+    expect(new Set(q.choices).size).toBe(q.choices.length);
+    expect(q.choices.length).toBeGreaterThanOrEqual(3);
+    expect(q.choices.length).toBeLessThanOrEqual(4);
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const a = mostFrequentRivalryQuestion(clearRivalries, 'Test Cup', 'test');
+    const b = mostFrequentRivalryQuestion(clearRivalries, 'Test Cup', 'test');
+    expect(a).toEqual(b);
+  });
+
+  it('builds a Croatian prompt when locale is "hr", with the same answer as English', () => {
+    const enQuestions = mostFrequentRivalryQuestion(clearRivalries, 'Test Cup', 'test', 'en');
+    const hrQuestions = mostFrequentRivalryQuestion(clearRivalries, 'Test Cup', 'test', 'hr');
+    expect(hrQuestions[0].prompt).toBe(
+      'Koje su se dvije reprezentacije najčešće susrele u finalima natjecanja Test Cup?',
+    );
+    expect(hrQuestions[0].choices[hrQuestions[0].answerIndex]).toBe(
+      enQuestions[0].choices[enQuestions[0].answerIndex],
+    );
+  });
+
+  it('returns no question when there is a tie for the most frequent rivalry', () => {
+    const tiedTable: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up'],
+      rows: [
+        ['1930', 'Argentina', 'Brazil'],
+        ['1934', 'Brazil', 'Argentina'],
+        ['1938', 'Argentina', 'Chile'],
+        ['1950', 'Chile', 'Argentina'],
+        ['1954', 'Brazil', 'Chile'],
+        ['1958', 'Chile', 'Brazil'],
+      ],
+    };
+    const tiedRivalries = buildRivalries(
+      buildFinalsMeetings([{ title: 'Test Cup', slug: 'test', editions: buildEditions(tiedTable) }]),
+    );
+    expect(tiedRivalries.length).toBeGreaterThanOrEqual(3);
+    expect(mostFrequentRivalryQuestion(tiedRivalries, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when fewer than 3 distinct rivalries exist', () => {
+    const sparse = clearRivalries.slice(0, 2);
+    expect(mostFrequentRivalryQuestion(sparse, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when there are no qualifying rivalries at all', () => {
+    expect(mostFrequentRivalryQuestion([], 'Test Cup', 'test')).toHaveLength(0);
   });
 });
 

@@ -43,6 +43,9 @@ the quiz stays in sync as new editions are added.
 - Which team or player waited the longest between titles/awards in a
   competition? (only asked when there's a single, unambiguous longest wait -
   not a tie for first)
+- Which two teams have met each other the most times in a given tournament's
+  finals? (only asked when there's a single, unambiguous most-frequent
+  pairing - not a tie for first)
 - Put four champions from a tournament, or four winners of an individual
   award (Ballon d'Or, Golden Boot), in chronological order (earliest
   first).

@@ -1,4 +1,5 @@
 import { isPlaceholderWinner, NOT_A_HOST } from './editions';
+import type { Rivalry } from './compare';
 import type { Locale } from './i18n';
 import type { ChampionSummary, Edition, TimelineEntry } from './types';
 
@@ -472,6 +473,65 @@ export function longestTitleGapQuestion(
       : subject === 'player'
         ? `Who waited the longest between ${competition} awards?`
         : `Which team waited the longest between ${competition} titles?`;
+
+  return [{ id, category: competition, prompt, ...choice }];
+}
+
+/**
+ * "Which two teams have met each other the most times in {competition}
+ * finals?" - a single generated question per competition, built from the
+ * same `Rivalry[]`-shaped head-to-head ranking `buildRivalries()` already
+ * produces for `/records`' own "Fiercest rivalries" section (see
+ * `src/lib/compare.ts`), independently hand-recomputed against every
+ * competition's own Champion/Runner-up columns at the two-hundred-and-tenth
+ * intensive run - no new editorial research, just a new way of asking about
+ * data the site already displays and has already verified.
+ *
+ * Unlike `/records`' own "Fiercest rivalries" section, which combines finals
+ * across all four team competitions (so two teams can qualify by meeting once
+ * each in two different competitions, e.g. France-Italy via EURO 2000 + the
+ * 2006 World Cup), `rivalries` here must already be scoped to one
+ * competition's own finals only - pass `buildRivalries(buildFinalsMeetings([{
+ * title: competition, slug: competition, editions }]))` for a single
+ * competition, not the combined cross-competition list - so the question and
+ * its "met in {competition} finals" prompt stay accurate to what it's
+ * actually asking about. A cross-competition rivalry question would need its
+ * own two-sided prompt shape and is left as a separate, unscoped idea (see
+ * `docs/ROADMAP.md`).
+ *
+ * The correct choice is formatted as "{teamA} vs {teamB}" (both already in
+ * alphabetical order from `buildRivalries()`); distractors are every other
+ * qualifying pair's own "{teamA} vs {teamB}" label. Returns no question at
+ * all when there's a tie for the most meetings (no single unambiguous
+ * correct answer) or fewer than 3 distinct rivalries (not enough
+ * distractors) - confirmed against the real content tables by hand: FIFA
+ * World Cup (only 2 qualifying pairs) and both UEFA EURO and UEFA Nations
+ * League (0 pairs meeting twice within the competition alone) all correctly
+ * produce no question, while Copa América (7 qualifying pairs, Argentina vs.
+ * Uruguay's 12 meetings a clear, unambiguous leader over Argentina vs.
+ * Brazil's 11) correctly does.
+ */
+export function mostFrequentRivalryQuestion(
+  rivalries: Rivalry[],
+  competition: string,
+  seedPrefix: string,
+  locale: Locale = 'en',
+): QuizQuestion[] {
+  const [top, runnerUp] = rivalries;
+  if (!top || !runnerUp || rivalries.length < 3) return [];
+  if (top.meetings === runnerUp.meetings) return [];
+
+  const pairLabel = (r: Rivalry) => `${r.teamADisplayName} vs ${r.teamBDisplayName}`;
+  const correct = pairLabel(top);
+  const pool = rivalries.map(pairLabel);
+  const id = `${seedPrefix}:rivalry`;
+  const choice = buildChoice(id, correct, pool);
+  if (!choice) return [];
+
+  const prompt =
+    locale === 'hr'
+      ? `Koje su se dvije reprezentacije najčešće susrele u finalima natjecanja ${competition}?`
+      : `Which two teams have met each other the most times in ${competition} finals?`;
 
   return [{ id, category: competition, prompt, ...choice }];
 }
