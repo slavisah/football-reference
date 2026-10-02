@@ -2825,6 +2825,46 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Youngest and oldest winners (added 2026-10-02, two-hundred-and-thirteenth
+  intensive run): two new bullets in `content/ballon-dor.md`'s "Memorable
+  moments" section naming Stanley Matthews (1956, aged 41) as the award's
+  oldest-ever winner and Ronaldo (Brazil, 1997, aged 21) as its youngest-ever
+  - the first vertical slice of the "Youngest winner ranking" idea
+  `docs/ROADMAP.md`'s "Ideas not yet scoped" section had left unbuilt across
+  212 prior runs for exactly this reason: a full ranking needs a reliable
+  birth date for all ~130 Ballon d'Or/Golden Boot winners, which doesn't
+  exist anywhere in `content/` and risks shipping confidently-wrong history
+  if sourced wholesale in one unattended pass. These two specific superlative
+  records are a different, much lower-risk case: both are widely and
+  consistently reported, single, already-synthesized facts (not raw
+  birth dates this run would need to compute an age from), independently
+  confirmed via two separate WebSearch passes each - Matthews' record is
+  carried by Guinness World Records' own page, and both records are repeated
+  consistently across ballondor.com's own site, Yahoo Sports, beIN Sports,
+  SI.com, GiveMeSport and Oldest.org with no conflicting figure found
+  anywhere. The exact age-in-days figures differ slightly by source
+  (Matthews: "41 years, 321 days"; Ronaldo: "21 years, 96 days" vs. "21
+  years, 3 months, 5 days") - both content bullets deliberately report only
+  the whole-year age, which every source agrees on, rather than a
+  precise day-count that would imply false precision this page's own
+  Ceremony-date column (which tracks the France Football magazine/gala
+  date, not necessarily the exact moment "awarded") can't itself resolve
+  for the pre-1992 era (see this section's own Ceremony-dates-audit entry
+  above). The full ranking across all ~130 winners remains open - see
+  `docs/ROADMAP.md`. **No discrepancies found:**
+  - https://www.guinnessworldrecords.com/world-records/788751-oldest-winner-of-footballs-soccers-ballon-dor-award
+  - https://ballondor.com/news/posts/who-is-the-oldest-ballon-dor-winner
+  - https://ballondor.com/news/posts/who-is-the-youngest-winner-in-the-history-of-the-ballon-dor
+  - https://sports.yahoo.com/article/ballon-dor-oldest-player-ever-100500974.html
+  - https://sports.yahoo.com/article/yamal-break-record-youngest-ballon-105500980.html
+  - https://www.beinsports.com/en-us/soccer/articles/who-was-the-youngest-ballon-d-or-winner-2026-08-23
+  - https://www.si.com/soccer/the-youngest-ballon-dor-winner-ever
+  - https://www.givemesport.com/88101605-who-is-the-oldest-ever-ballon-dor-winner/
+  - https://www.oldest.org/sports/youngest-ballon-dor-winner/
+  - https://www.oldest.org/sports/oldest-ballon-dor-winners/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Review policy
 

@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (212 intensive runs as of 2026-10-02) lives
+verification sweep and decision (213 intensive runs as of 2026-10-02) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,9 +44,9 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-twelfth run (2026-10-02): 905/905 unit tests, `pnpm
-lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.91%/99.32% coverage,
-and the same two standing `knip` false positives as ever (`scripts/
+As of the two-hundred-and-thirteenth run (2026-10-02): 905/905 unit tests,
+`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.91%/99.32%
+coverage, and the same two standing `knip` false positives as ever (`scripts/
 test-preview-server.mjs`, used only as a Playwright `webServer.command`,
 never imported; `@cspell/dict-hr-hr`, used only via `.cspell/
 hr-notes.cspell.json`'s `"import"` field, never a JS `import`) - neither
@@ -54,21 +54,43 @@ actually unused, knip's static analysis just can't see a reference inside a
 config-file string. The two-hundred-and-fourth run's own full cold-start
 `pnpm test:e2e` (1042/1042) plus all five manual browser sweeps remain the
 last complete, together confirmation (the combination had gone stale for
-four runs, since the two-hundredth run's own 1038/1038 count) - see that
+five runs, since the two-hundredth run's own 1038/1038 count) - see that
 run's own entry below for the full writeup, including a container-specific
 Playwright browser-cache snag hit and worked around along the way; the
 two-hundred-and-fifth through two-hundred-and-eleventh runs' own changes
 were all either content-prose/translation fixes or no-change verification
 passes, with no markup or behavior change, so that baseline still stood
 through the two-hundred-and-eleventh run. The two-hundred-and-twelfth run's
-own new quiz question type (below) is a real markup/behavior change, so its
-own entry directly re-ran the two quiz-specific e2e specs
+own new quiz question type is a real markup/behavior change, so its own
+entry directly re-ran the two quiz-specific e2e specs
 (`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`, 14
 tests) rather than the full suite - see that entry for why a targeted re-run
-was judged sufficient. The two-hundred-and-eighth run did re-run
+was judged sufficient; the two-hundred-and-thirteenth run's own two new
+"Memorable moments" bullets (below) are content/translation prose plus one
+new heading on a single edition page (PDF-only impact, caught by
+`check:pdf-outline` and fixed by regenerating PDFs), so no e2e re-run was
+judged necessary for it. The two-hundred-and-eighth run did re-run
 `check:lighthouse` on its own (a manual/intensive-run-only tool, not part of
 the cold-start `test:e2e` + browser-sweep baseline) and confirmed it is still
 perfect - see that run's own entry below.
+
+**Two-hundred-and-thirteenth run:** opened with the full standing health
+check (unchanged from the two-hundred-and-twelfth run's own baseline) and a
+re-confirmation that both network-dependent "Open backlog" blockers below
+still hold in this session. With nothing new there and no fresh
+verification-ledger claim shape turning up, picked up the one remaining
+"Ideas not yet scoped" item - the "Youngest winner" ranking - and shipped a
+narrow, lower-risk first slice of it rather than the full ~130-birth-date
+version: two new `content/ballon-dor.md` "Memorable moments" bullets naming
+Stanley Matthews (1956, oldest-ever winner at 41) and Ronaldo/Brazil (1997,
+youngest-ever at 21), each a single, widely-and-consistently-reported record
+(not a raw birth date this run would need to compute an age from itself),
+independently confirmed via two separate WebSearch passes each - Matthews'
+is carried by Guinness World Records' own page. See the matching entry
+under "Ideas not yet scoped" below and `docs/PROJECT_STATUS.md`'s full
+writeup for why Golden Boot was deliberately left out of this slice and
+exactly how both claims were verified and wired into the Croatian page and
+every relevant `check:*` ledger.
 
 **Two-hundred-and-twelfth run:** with the two-hundred-and-eleventh run's own
 closing note pointing at "a genuinely new quality angle ... rather than a
@@ -1908,13 +1930,13 @@ matching entry for full detail.
 - **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.10` (latest
   published) only declares `typescript: '^5.0.0 || ^6.0.0'` as a peer
   dependency - re-confirmed via `pnpm outdated` as recently as the
-  two-hundred-and-fourth run (2026-09-30; `typescript` still at 5.9.3 vs.
+  two-hundred-and-thirteenth run (2026-10-02; `typescript` still at 5.9.3 vs.
   7.0.2 latest, no new `@astrojs/check` release). Re-check whenever `pnpm
   outdated` next shows a new `@astrojs/check` release.
 - **`docs/SOURCES.md` link-liveness sweep**: blocked. This environment's
   outbound network/egress policy rejects direct requests to external
-  reference domains - confirmed repeatedly, most recently 2026-09-30
-  (two-hundred-and-fourth run: `WebFetch` to `en.wikipedia.org` still
+  reference domains - confirmed repeatedly, most recently 2026-10-02
+  (two-hundred-and-thirteenth run: `WebFetch` to `en.wikipedia.org` still
   returns `EGRESS_BLOCKED` from the proxy), and precisely scoped: `WebFetch`
   to `en.wikipedia.org` *and* `www.uefa.com` both return `EGRESS_BLOCKED`
   from the proxy (not a Wikipedia-specific block), so this is a general
@@ -1977,11 +1999,22 @@ matching entry for full detail.
 ## Ideas not yet scoped
 
 - **"Youngest winner" ranking** (`/records`-style, alongside the existing
-  "Longest wait between titles"/"Back-to-back champions" sections): needs a
-  reliable per-player birth date for ~130 Ballon d'Or/Golden Boot winners,
-  which exists nowhere in `content/` today. Not pursued: fabricating that
-  many biographical facts from memory in an unattended run, with no
-  independent per-player source to cross-check against, risks shipping
-  confidently-wrong history. Needs a session with working external network
-  access to source it properly, the same blocker as the link-liveness sweep
-  above.
+  "Longest wait between titles"/"Back-to-back champions" sections): still
+  not built as a full ranking - would need a reliable per-player birth date
+  for all ~130 Ballon d'Or/Golden Boot winners, which exists nowhere in
+  `content/` today, and fabricating that many biographical facts in one
+  unattended pass (with no independent per-player source to cross-check each
+  one against) still risks shipping confidently-wrong history. The
+  two-hundred-and-thirteenth run shipped a much narrower, lower-risk slice
+  instead: the two *endpoints* of that ranking for Ballon d'Or specifically -
+  Stanley Matthews (oldest-ever winner, 1956, age 41) and Ronaldo/Brazil
+  (youngest-ever, 1997, age 21) - as two new `content/ballon-dor.md`
+  "Memorable moments" bullets, each independently confirmed via two separate
+  WebSearch passes (Guinness World Records' own page for Matthews; see
+  `docs/SOURCES.md`'s matching entry). These are single, already-synthesized,
+  widely-and-consistently-reported records, a fundamentally safer research
+  task than computing an age from a raw birth date for all ~130 winners with
+  no cross-check. The full generated ranking (every winner, not just the two
+  extremes) remains unbuilt and still needs either a trustworthy bulk birth-
+  date source or a session with direct page-fetch access to verify one
+  player at a time at that scale.
