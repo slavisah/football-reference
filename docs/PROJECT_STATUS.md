@@ -32630,3 +32630,150 @@ needs a genuinely new quality angle (accessibility, performance, a fresh
 pass over files already checked once) rather than a first pass over
 anything still unread, unless a new source lead clears one of the blocked
 backlog items above.
+
+### New quiz question type - "Which country has hosted the most {competition} editions?" - added for all four team competitions (two-hundred-and-twelfth intensive run, 2026-10-02)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, and the two-hundred-and-eleventh run's own closing note
+pointing at "a genuinely new quality angle ... rather than a first pass over
+anything still unread," shipped a real feature addition instead of another
+verification pass: a new generated quiz question type, "Which country has
+hosted the most {competition} editions?", for the four team competitions
+with a Host column (FIFA World Cup, UEFA EURO, Copa América, UEFA Nations
+League).
+
+The quiz already asks "which team/player has won the most titles/awards" via
+`mostTitlesQuestion()` in `src/lib/quiz.ts`, fed by
+`buildChampionsSummary()`. `src/lib/editions.ts` already builds the exact
+same `ChampionSummary[]` shape for hosts (`buildHostsSummary()`, which backs
+`/records`' own "Most frequent hosts" ranking and had its own counts
+independently hand-verified against every Host cell at the
+two-hundred-and-tenth run) - so the new question type needed no new
+editorial research, just a new way of asking about data the site already
+displays and has already verified.
+
+Extended `mostTitlesQuestion()`'s `subject` parameter from `'team' |
+'player'` to add `'host'` (English "Which country has hosted the most
+{competition} editions?"; Croatian "Koja je država bila domaćin najviše
+izdanja natjecanja {competition}?"), and changed its internal choice-seed id
+from `${seedPrefix}:most-titles` to `${seedPrefix}:most-titles:${subject}` so
+a "most titles" and "most hosted" question for the same competition don't
+collide on the same id - this id is only ever used to seed the deterministic
+distractor shuffle (`buildChoice()`), never rendered in the DOM or persisted
+in a URL, so the change is invisible to any shared/printed quiz link, and no
+existing test asserted a specific choice order (only that the correct answer
+and choice count/uniqueness are right), confirmed by reading
+`tests/unit/quiz.test.ts` before relying on that. Wired a new `QuizPool`
+into both `src/pages/quiz.astro` and `src/pages/hr/quiz.astro` for each of
+the four team competitions, calling `mostTitlesQuestion(buildHostsSummary(...),
+..., 'host')`.
+
+`mostTitlesQuestion()`'s existing tie-and-sparse-data safety (returns no
+question when the top two entries are tied, or fewer than 3 distinct entries
+exist) applies unchanged and was confirmed against the real content tables
+by hand rather than assumed: FIFA World Cup has a 4-way tie at 2 hosts each
+(Mexico, Italy, France, Brazil all hosted twice) and UEFA Nations League has
+all 4 of its hosts tied at 1 each - both correctly produce no "most hosted"
+question. UEFA EURO (France, 3 hostings, a clear leader) and Copa América
+(Argentina, a clear leader) both correctly do produce one - confirmed live in
+`dist/quiz/index.html`/`dist/hr/quiz/index.html`'s own JSON-LD after a full
+build, not just from the unit tests.
+
+Added the matching bullet to `content/quiz.md`'s "Question types in this
+quiz" list ("Which country has hosted the most editions of a given
+tournament overall?", bumping its `lastReviewed` to 2026-10-02) and the
+matching Croatian bullet to the hardcoded notes list in
+`src/pages/hr/quiz.astro` ("Koja je država bila domaćin najviše izdanja
+danog natjecanja?"). Added six new unit tests to `tests/unit/quiz.test.ts`:
+the English "most hosted" prompt and correct answer from a dedicated
+host-count fixture built with `buildHostsSummary()`, the matching Croatian
+prompt, and an explicit regression test confirming the `'team'` and `'host'`
+subject questions for the same competition get different ids (the exact
+collision this run's id-format change was made to prevent).
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(905/905, up from 902 - the six new tests), `pnpm test:coverage`
+(99.91%/99.32%, both ticking up very slightly - the new code is fully
+exercised by its own tests, no new coverage gap), `pnpm build` (711 pages,
+unchanged - no new route, just new content on the existing `/quiz`/`/hr/quiz`
+pages). All 29 CI-gated fast `check:*` scripts individually re-run and
+clean, including `check:record-claims` (37 claims, up from 36 - the new
+"most hosted" bullet in `content/quiz.md` needed its own
+`record-claims-ledger.json` entry, added with the same "describes a
+generated quiz question type, not a static factual claim" rationale the
+existing "most titles/awards" bullet entry already used, since the actual
+answer is computed at build time from `buildHostsSummary()` rather than
+being a fixed fact to cross-reference against a static table),
+`check:i18n-notes` (7 matched page pairs, parity held for the new Croatian
+bullet), `check:jsonld` (1783 blocks across 711 pages, still structurally
+valid with the new questions included), `check:heading-outline`,
+`check:links` (715 pages), `check:sitemap` (710 entries), `check:meta`,
+`check:spelling` (15 files, 0 issues), `check:spelling-hr` (57 blocks, 0
+unknown words - the new Croatian bullet's words already exist in the
+dictionary/wordlist, no new `.cspell` entry needed), and every other fast
+check unchanged and clean. `pnpm audit` (no known vulnerabilities). `pnpm
+dlx knip --no-config-hints` (same two standing false positives: `scripts/
+test-preview-server.mjs`, `@cspell/dict-hr-hr`).
+
+Regenerated all 700 downloadable PDFs
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs`, this
+session's own container-specific Chromium-revision escape hatch, the same
+snag the two-hundred-and-fourth run documented - this container's default
+Playwright Chromium resolves to revision 1243, which isn't cached here, only
+revision 1194 is) since `content/quiz.md` changed; `check:pdfs`/
+`check:pdf-outline` both clean (700/700) afterward.
+
+**One session-local operational snag along the way, worth recording in case
+a future run hits it again:** the first two `build:pdfs` attempts each
+failed differently - the first with `Error: Navigating to .../2002 failed:
+HTTP 404` partway through the edition-page phase (after successfully writing
+every team and player PDF), the second with `Error: Preview server at
+http://localhost:4399/football-reference/ did not become ready in time`
+before writing anything. Both traced to the same root cause: this run had
+directly invoked `playwright test` (not through `build:pdfs`) earlier to
+spot-check the new feature in a real browser, and that invocation's own
+`webServer` config (per `playwright.config.ts`) left an `astro preview`
+daemon running on port 4321 after the test process exited rather than
+tearing it down. `astro preview`'s start/stop lifecycle is tracked by a
+single project-level lock file, not per-port (`preview-daemon.mjs`'s own
+header comment already documents a related timing race from the
+hundred-and-forty-eighth run) - so `generate-pdfs.mjs`'s own unconditional
+`astro preview --port 4399` start collided with that stale lock: in the
+first attempt it appears to have torn the daemon down mid-run (the "Stopped
+preview server" log line immediately preceding the 404), and in the second
+attempt the CLI reported the old port-4321 instance as "already running",
+stopped it, and then the fresh port-4399 instance it tried to start next
+never came up within the 60-second timeout. Running `pnpm exec astro preview
+stop` once by hand to clear the stale lock before retrying fixed it
+immediately; the third attempt completed cleanly with no code change needed.
+Not a bug in `generate-pdfs.mjs` itself (it has no way to know a *different*
+tool left a stale lock behind) so much as an operational lesson for this
+routine: when a run exercises `playwright test` directly rather than only
+through an npm script that owns its own server lifecycle, run `pnpm exec
+astro preview stop` before `pnpm build:pdfs` (or any other script that
+starts its own preview daemon) rather than assuming a clean slate.
+
+Did not re-run the full cold-start `pnpm test:e2e` suite or the five manual
+browser sweeps - instead ran the two quiz-specific e2e specs directly
+(`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`, 14
+tests covering WCAG violations across both languages and both color schemes,
+plus the no-JS fallback state), which exercise every DOM state this run's
+change could plausibly affect; all 14 passed
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`, the same container-specific
+override). The two-hundred-and-fourth run's own full cold-start `pnpm
+test:e2e` (1042/1042) plus the five manual browser sweeps remain the
+standing baseline for everything else, with `check:lighthouse` last
+reconfirmed by the two-hundred-and-eighth run.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+The quiz's question-type surface now covers every `ChampionSummary`-shaped
+dataset the site generates (titles, awards, and now hosts) for every
+competition that has one; a natural next angle in the same "ship a feature,
+not another verification pass" vein would be a question type drawing on
+`/records`' other generated rankings (e.g. "back-to-back champions" or
+"biggest final win") not yet asked about in the quiz, or returning to the
+two-hundred-and-eleventh run's own suggestion of a fresh accessibility or
+performance angle.
