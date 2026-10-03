@@ -34004,3 +34004,92 @@ technique to a part of the site this pass didn't touch - the `/records`,
 `/compare`, `/compare-players`, `/teams/<slug>` and `/players/<slug>`
 generated/derived pages, which pull from these same content files but
 were out of scope for this run's file-by-file prose-vs-table method.
+
+### New permanent check: `/records`' 40 generated rankings independently cross-verified against `content/*.md`, zero discrepancies - `scripts/check-records-against-source.mjs` (two-hundred-and-twenty-third intensive run, 2026-10-03)
+
+Took up the two-hundred-and-twenty-second run's own suggestion to extend
+content-verification coverage to the generated/derived pages, starting with
+`/records` - the single heaviest, highest-claim-density page on the site (40
+separate rankings spanning all six competitions/awards, ~612 KB). Every
+other claim-checking script in `scripts/` (the superlative/ordinal/record/
+consecutive/since/one-of-only/completeness-claim ledgers, plus
+`check-award-tallies.mjs`) only scans hand-written `content/*.md` prose or a
+second hand-maintained tally table - none of them touch `/records` itself,
+whose rankings are computed at build time by `src/lib/editions.ts`/
+`compare.ts`. That code is unit-tested (`tests/unit/editions.test.ts`/
+`compare.test.ts`), but only against small synthetic fixtures - never
+against the real six-competition dataset with its actual edge cases (tied
+Golden Boot winners, Copa América's duplicate 1959 and three home-and-away
+editions with no single host, the West Germany/Germany merge, a cancelled
+2020 Ballon d'Or). A derivation bug (wrong tie-break order, a missed
+name-merge, an off-by-one in a streak or gap calculation) specific to the
+real data could ship wrong and nothing before this run would have caught it.
+
+Approach: rather than importing `src/lib/editions.ts`/`compare.ts` (which
+would only catch a template-wiring bug, not a bug shared by the check and
+the page), `scripts/check-records-against-source.mjs` re-implements each
+ranking's logic from scratch - reading `content/*.md`'s own tables via
+`check-award-tallies.mjs`'s existing `parseMarkdownTables`/
+`findTableByHeadingPrefix` helpers, then independently computing: most
+successful teams/players, most frequent hosts, titles won on home soil,
+back-to-back streaks (including Golden Boot ties, each tracked
+independently), nearly-champions/nearly-finalists, the longest gap between
+a team's own titles, biggest final-winning margins, and head-to-head
+"fiercest rivalry" meeting tallies - then diffs every one against that
+ranking's own JSON-LD `ItemList` block in the built `dist/records/
+index.html` (the English page only; `/hr/records` carries the same
+underlying numbers with translated labels, so checking one suffices).
+
+First pass against the real build surfaced four apparent mismatches, all
+four traced to bugs in the *checking* script, not the site: (1) the
+"Nearly finalists" third-place and fourth-place tallies need re-sorting by
+year after merging, not just concatenating; (2) UEFA Nations League's
+"Longest wait between titles" uses season-string labels ("2018–19,
+2024–25"), which the first regex (built assuming plain years) failed to
+parse - fixed by comparing the raw year tokens as strings rather than
+assuming integers; (3)/(4) were the same root cause. After those fixes, a
+full run across all 40 rankings (every "Most successful teams"/"Most
+frequent hosts"/"Titles won on home soil"/"Back-to-back champions"/"Nearly
+champions"/"Nearly finalists"/"Longest wait between titles" for all four
+team competitions, "Biggest final wins" for World Cup/EURO/Nations League,
+"Most awards"/"Back-to-back champions"/"Longest wait" for Ballon d'Or and
+both Golden Boots, and "Fiercest rivalries") found **zero real
+discrepancies** - every one of the site's own generated numbers agrees with
+an independently-written recomputation from the same source tables.
+
+Added as a permanent guard, not a one-off audit: wired into
+`.github/workflows/ci.yml` as a required PR gate immediately after `pnpm
+check:perf` (same `dist/`-reading precondition), with 18 new unit tests in
+`tests/unit/checkRecordsAgainstSource.test.ts` covering the pure tally/
+streak/gap/margin/rivalry functions directly (the same testing convention
+`tests/unit/checkAwardTallies.test.ts` already established for its sibling
+script) - so a future edit to the real content tables, or a future change
+to `src/lib/editions.ts`/`compare.ts`'s ranking logic, gets this same
+independent cross-check on every PR going forward, not just this one-time
+run.
+
+**Verification:** `pnpm test` (987/987, the 18 new tests plus the existing
+969), `pnpm lint` (241 files, 0 errors/0 warnings/0 hints - required two
+small JSDoc parameter-type annotations to satisfy `astro check`'s
+TypeScript inference across the new script/test-file boundary, the same
+class of fix `check-award-tallies.mjs`'s own sibling scripts already
+needed), `pnpm build` (711 pages, unchanged), `pnpm check:records-consistency`
+(new script, clean against the real build), and the standing health check
+(`pnpm check:perf` 612.3 KB heaviest/unchanged, `pnpm check:links` 715
+pages clean, `pnpm check:jsonld` 1,783 blocks valid, `pnpm check:sitemap`
+710 entries clean, `pnpm check:award-tallies` 4/4, `pnpm check:record-claims`
+43/43) all pass. No `content/*.md` file was touched, so `pnpm build &&
+pnpm build:pdfs` was not required for this run.
+
+**Left for a future pass:** `/compare`, `/compare-players`, `/teams/<slug>`
+and `/players/<slug>` remain the still-untouched generated/derived pages the
+two-hundred-and-twenty-second run's note named - each would need its own
+from-scratch independent recomputation the way this run built one for
+`/records`, since they derive from different `src/lib/` functions
+(`compare.ts`'s head-to-head builder, `teamProfile.ts`, `playerProfile.ts`)
+with their own real-data edge cases. The performance-profiling thread named
+by the two-hundred-and-twentieth/-second runs also remains open - this
+run's own look at it (bundle sizes already tiny with no web fonts/images,
+`check:lighthouse` already 1.00/1.00/1.00/1.00, the team/player search
+index already fetched lazily on first focus rather than eagerly) found no
+further low-hanging fruit, reinforcing rather than closing that item.
