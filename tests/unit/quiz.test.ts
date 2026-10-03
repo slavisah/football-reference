@@ -6,6 +6,8 @@ import {
   buildHostsSummary,
   buildLongestStreaks,
   buildLongestTitleGaps,
+  buildNearlyFinalists,
+  buildRunnerUpsWithoutTitle,
 } from '../../src/lib/editions';
 import { buildTimeline } from '../../src/lib/editions';
 import { buildFinalsMeetings, buildRivalries } from '../../src/lib/compare';
@@ -19,6 +21,8 @@ import {
   longestTitleGapQuestion,
   mostFrequentRivalryQuestion,
   mostTitlesQuestion,
+  nearlyChampionQuestions,
+  nearlyFinalistQuestions,
   runnerUpByYearQuestions,
   selectQuiz,
   topScorerByYearQuestions,
@@ -1108,6 +1112,177 @@ describe('fiercestRivalryQuestion', () => {
 
   it('returns no question when there are no qualifying rivalries at all', () => {
     expect(fiercestRivalryQuestion([], 'test')).toHaveLength(0);
+  });
+});
+
+describe('nearlyChampionQuestions', () => {
+  // Three distinct champions (Uruguay, Italy, West Germany) and four distinct
+  // "lost a final, never won" teams (Hungary twice, Argentina, Czechoslovakia,
+  // Brazil) - one question per nearly-champion entry, unlike every "most X"
+  // question type above, which asks a single question per competition.
+  const nearlyChampionTable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'Runner-up'],
+    rows: [
+      ['1930', 'Uruguay', 'Argentina'],
+      ['1934', 'Italy', 'Czechoslovakia'],
+      ['1938', 'Italy', 'Hungary'],
+      ['1950', 'Uruguay', 'Brazil'],
+      ['1954', 'West Germany', 'Hungary'],
+    ],
+  };
+  const nearlyChampionEditions = buildEditions(nearlyChampionTable);
+  const champions = buildChampionsSummary(nearlyChampionEditions);
+  const nearlyChampions = buildRunnerUpsWithoutTitle(nearlyChampionEditions);
+
+  it('has 3 distinct champions and 4 distinct nearly-champions in the fixture', () => {
+    expect(champions).toHaveLength(3);
+    expect(nearlyChampions).toHaveLength(4);
+  });
+
+  it('produces one question per nearly-champion entry, each with a correct answer drawn from that list', () => {
+    const questions = nearlyChampionQuestions(nearlyChampions, champions, 'Test Cup', 'test');
+    expect(questions).toHaveLength(4);
+    const answers = questions.map((q) => q.choices[q.answerIndex]).sort();
+    expect(answers).toEqual(nearlyChampions.map((c) => c.displayName).sort());
+  });
+
+  it('draws every distractor from the champions list - teams that have actually won', () => {
+    const championNames = new Set(champions.map((c) => c.displayName));
+    const questions = nearlyChampionQuestions(nearlyChampions, champions, 'Test Cup', 'test');
+    for (const q of questions) {
+      const correct = q.choices[q.answerIndex];
+      expect(championNames.has(correct)).toBe(false);
+      for (const choice of q.choices) {
+        if (choice === correct) continue;
+        expect(championNames.has(choice)).toBe(true);
+      }
+    }
+  });
+
+  it('asks "which of these teams reached a final without ever winning" with the right category', () => {
+    const [q] = nearlyChampionQuestions(nearlyChampions, champions, 'Test Cup', 'test');
+    expect(q.prompt).toBe('Which of these teams has reached a Test Cup final without ever winning the title?');
+    expect(q.category).toBe('Test Cup');
+  });
+
+  it('never repeats a choice and stays within the 3-4 choice range', () => {
+    for (const q of nearlyChampionQuestions(nearlyChampions, champions, 'Test Cup', 'test')) {
+      expect(new Set(q.choices).size).toBe(q.choices.length);
+      expect(q.choices.length).toBeGreaterThanOrEqual(3);
+      expect(q.choices.length).toBeLessThanOrEqual(4);
+    }
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const a = nearlyChampionQuestions(nearlyChampions, champions, 'Test Cup', 'test');
+    const b = nearlyChampionQuestions(nearlyChampions, champions, 'Test Cup', 'test');
+    expect(a).toEqual(b);
+  });
+
+  it('builds a Croatian prompt when locale is "hr", with the same answers as English', () => {
+    const enQuestions = nearlyChampionQuestions(nearlyChampions, champions, 'Test Cup', 'test', 'en');
+    const hrQuestions = nearlyChampionQuestions(nearlyChampions, champions, 'Test Cup', 'test', 'hr');
+    expect(hrQuestions[0].prompt).toBe(
+      'Koja je od ovih reprezentacija igrala u finalu natjecanja Test Cup, ali ga nikad nije osvojila?',
+    );
+    const enAnswers = enQuestions.map((q) => q.choices[q.answerIndex]).sort();
+    const hrAnswers = hrQuestions.map((q) => q.choices[q.answerIndex]).sort();
+    expect(hrAnswers).toEqual(enAnswers);
+  });
+
+  it('returns no question for any entry when the champions pool has fewer than 2 distinct teams', () => {
+    const sparseChampions = champions.slice(0, 1);
+    expect(nearlyChampionQuestions(nearlyChampions, sparseChampions, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when there are no qualifying nearly-champions at all', () => {
+    expect(nearlyChampionQuestions([], champions, 'Test Cup', 'test')).toHaveLength(0);
+  });
+});
+
+describe('nearlyFinalistQuestions', () => {
+  // Reuses the same semifinal fixture shape as buildNearlyFinalists' own unit
+  // tests (tests/unit/editions.test.ts): 3 finals (3 champions, 3
+  // never-won runner-ups) and 5 distinct semifinal-only teams.
+  const nearlyFinalistTable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'Runner-up', 'Third', 'Fourth'],
+    rows: [
+      ['1930', 'Uruguay', 'Argentina', 'United States', 'Yugoslavia'],
+      ['1962', 'Brazil', 'Czechoslovakia', 'Chile', 'Yugoslavia'],
+      ['1966', 'England', 'West Germany', 'Portugal', 'Soviet Union'],
+    ],
+  };
+  const nearlyFinalistEditions = buildEditions(nearlyFinalistTable);
+  const finalistChampions = buildChampionsSummary(nearlyFinalistEditions);
+  const finalistNearlyChampions = buildRunnerUpsWithoutTitle(nearlyFinalistEditions);
+  const finalists = [...finalistChampions, ...finalistNearlyChampions];
+  const nearlyFinalists = buildNearlyFinalists(nearlyFinalistEditions);
+
+  it('has 6 distinct finalists (3 champions + 3 never-won runners-up) and 5 distinct nearly-finalists', () => {
+    expect(finalists).toHaveLength(6);
+    expect(nearlyFinalists).toHaveLength(5);
+  });
+
+  it('produces one question per nearly-finalist entry, each with a correct answer drawn from that list', () => {
+    const questions = nearlyFinalistQuestions(nearlyFinalists, finalists, 'Test Cup', 'test');
+    expect(questions).toHaveLength(5);
+    const answers = questions.map((q) => q.choices[q.answerIndex]).sort();
+    expect(answers).toEqual(nearlyFinalists.map((f) => f.displayName).sort());
+  });
+
+  it('draws every distractor from the finalists list - teams that have reached a final, winner or runner-up', () => {
+    const finalistNames = new Set(finalists.map((f) => f.displayName));
+    const questions = nearlyFinalistQuestions(nearlyFinalists, finalists, 'Test Cup', 'test');
+    for (const q of questions) {
+      const correct = q.choices[q.answerIndex];
+      expect(finalistNames.has(correct)).toBe(false);
+      for (const choice of q.choices) {
+        if (choice === correct) continue;
+        expect(finalistNames.has(choice)).toBe(true);
+      }
+    }
+  });
+
+  it('asks "which of these teams reached a semifinal without ever reaching the final" with the right category', () => {
+    const [q] = nearlyFinalistQuestions(nearlyFinalists, finalists, 'Test Cup', 'test');
+    expect(q.prompt).toBe(
+      'Which of these teams has reached a Test Cup semifinal without ever reaching the final?',
+    );
+    expect(q.category).toBe('Test Cup');
+  });
+
+  it('never repeats a choice and stays within the 3-4 choice range', () => {
+    for (const q of nearlyFinalistQuestions(nearlyFinalists, finalists, 'Test Cup', 'test')) {
+      expect(new Set(q.choices).size).toBe(q.choices.length);
+      expect(q.choices.length).toBeGreaterThanOrEqual(3);
+      expect(q.choices.length).toBeLessThanOrEqual(4);
+    }
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const a = nearlyFinalistQuestions(nearlyFinalists, finalists, 'Test Cup', 'test');
+    const b = nearlyFinalistQuestions(nearlyFinalists, finalists, 'Test Cup', 'test');
+    expect(a).toEqual(b);
+  });
+
+  it('builds a Croatian prompt when locale is "hr", with the same answers as English', () => {
+    const enQuestions = nearlyFinalistQuestions(nearlyFinalists, finalists, 'Test Cup', 'test', 'en');
+    const hrQuestions = nearlyFinalistQuestions(nearlyFinalists, finalists, 'Test Cup', 'test', 'hr');
+    expect(hrQuestions[0].prompt).toBe(
+      'Koja je od ovih reprezentacija igrala u polufinalu natjecanja Test Cup, ali nikad nije igrala u finalu?',
+    );
+    const enAnswers = enQuestions.map((q) => q.choices[q.answerIndex]).sort();
+    const hrAnswers = hrQuestions.map((q) => q.choices[q.answerIndex]).sort();
+    expect(hrAnswers).toEqual(enAnswers);
+  });
+
+  it('returns no question for any entry when the finalists pool has fewer than 2 distinct teams', () => {
+    const sparseFinalists = finalists.slice(0, 1);
+    expect(nearlyFinalistQuestions(nearlyFinalists, sparseFinalists, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when there are no qualifying nearly-finalists at all', () => {
+    expect(nearlyFinalistQuestions([], finalists, 'Test Cup', 'test')).toHaveLength(0);
   });
 });
 

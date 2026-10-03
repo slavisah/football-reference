@@ -12,6 +12,8 @@ import {
   buildHostsSummary,
   buildLongestStreaks,
   buildLongestTitleGaps,
+  buildNearlyFinalists,
+  buildRunnerUpsWithoutTitle,
   buildTimeline,
 } from '../lib/editions';
 import { buildFinalsMeetings, buildRivalries } from '../lib/compare';
@@ -29,6 +31,8 @@ import {
   longestTitleGapQuestion,
   mostFrequentRivalryQuestion,
   mostTitlesQuestion,
+  nearlyChampionQuestions,
+  nearlyFinalistQuestions,
   runnerUpByYearQuestions,
   topScorerByYearQuestions,
   uniqueWinnerEditions,
@@ -155,6 +159,26 @@ const pools: QuizPool[] = [
     seed: 'pick:world-cup:rivalry',
   },
   {
+    questions: nearlyChampionQuestions(
+      buildRunnerUpsWithoutTitle(worldCup.editions),
+      worldCup.champions,
+      'FIFA World Cup',
+      'world-cup',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:nearly-champion',
+  },
+  {
+    questions: nearlyFinalistQuestions(
+      buildNearlyFinalists(worldCup.editions),
+      [...worldCup.champions, ...buildRunnerUpsWithoutTitle(worldCup.editions)],
+      'FIFA World Cup',
+      'world-cup',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:nearly-finalist',
+  },
+  {
     questions: yearByWinnerQuestions(worldCup.editions, 'FIFA World Cup', 'world-cup', 'en', 'team'),
     take: 1,
     seed: 'pick:world-cup:year-by-winner',
@@ -203,6 +227,26 @@ const pools: QuizPool[] = [
     questions: mostFrequentRivalryQuestion(rivalriesFor('UEFA EURO', euro.editions), 'UEFA EURO', 'euro'),
     take: 1,
     seed: 'pick:euro:rivalry',
+  },
+  {
+    questions: nearlyChampionQuestions(
+      buildRunnerUpsWithoutTitle(euro.editions),
+      euro.champions,
+      'UEFA EURO',
+      'euro',
+    ),
+    take: 1,
+    seed: 'pick:euro:nearly-champion',
+  },
+  {
+    questions: nearlyFinalistQuestions(
+      buildNearlyFinalists(euro.editions),
+      [...euro.champions, ...buildRunnerUpsWithoutTitle(euro.editions)],
+      'UEFA EURO',
+      'euro',
+    ),
+    take: 1,
+    seed: 'pick:euro:nearly-finalist',
   },
   {
     questions: yearByWinnerQuestions(euro.editions, 'UEFA EURO', 'euro', 'en', 'team'),
@@ -261,6 +305,26 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:copa-america:rivalry',
+  },
+  {
+    questions: nearlyChampionQuestions(
+      buildRunnerUpsWithoutTitle(copaAmerica.editions),
+      copaAmerica.champions,
+      'Copa América',
+      'copa-america',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:nearly-champion',
+  },
+  {
+    questions: nearlyFinalistQuestions(
+      buildNearlyFinalists(copaAmerica.editions),
+      [...copaAmerica.champions, ...buildRunnerUpsWithoutTitle(copaAmerica.editions)],
+      'Copa América',
+      'copa-america',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:nearly-finalist',
   },
   {
     questions: yearByWinnerQuestions(copaAmerica.editions, 'Copa América', 'copa-america', 'en', 'team'),
@@ -332,6 +396,26 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:nations-league:rivalry',
+  },
+  {
+    questions: nearlyChampionQuestions(
+      buildRunnerUpsWithoutTitle(nationsLeague.editions),
+      nationsLeague.champions,
+      'UEFA Nations League',
+      'nations-league',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:nearly-champion',
+  },
+  {
+    questions: nearlyFinalistQuestions(
+      buildNearlyFinalists(nationsLeague.editions),
+      [...nationsLeague.champions, ...buildRunnerUpsWithoutTitle(nationsLeague.editions)],
+      'UEFA Nations League',
+      'nations-league',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:nearly-finalist',
   },
   {
     questions: yearByWinnerQuestions(nationsLeague.editions, 'UEFA Nations League', 'nations-league', 'en', 'team'),

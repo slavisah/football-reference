@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (216 intensive runs as of 2026-10-02) lives
+verification sweep and decision (218 intensive runs as of 2026-10-03) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,8 +44,8 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-seventeenth run (2026-10-02): 946/946 unit tests,
-`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.52%/98.76%
+As of the two-hundred-and-eighteenth run (2026-10-03): 964/964 unit tests,
+`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.53%/98.78%
 coverage, and the same two standing `knip` false positives as ever (`scripts/
 test-preview-server.mjs`, used only as a Playwright `webServer.command`,
 never imported; `@cspell/dict-hr-hr`, used only via `.cspell/
@@ -73,12 +73,127 @@ judged necessary for it. The two-hundred-and-fourteenth and
 two-hundred-and-fifteenth runs' own new quiz question types are, like the
 two-hundred-and-twelfth run's, a real markup/behavior change, so each entry
 likewise re-ran just the two quiz-specific e2e specs (14 tests) rather than
-the full suite; the two-hundred-and-sixteenth and two-hundred-and-seventeenth
+the full suite; the two-hundred-and-sixteenth through two-hundred-and-eighteenth
 runs' own new quiz question types below follow the identical pattern. The
 two-hundred-and-eighth run did re-run `check:lighthouse`
 on its own (a manual/intensive-run-only tool, not part of the cold-start
 `test:e2e` + browser-sweep baseline) and confirmed it is still perfect - see
 that run's own entry below.
+
+**Two-hundred-and-eighteenth run:** the two-hundred-and-fifteenth run's own
+closing note had flagged "Nearly champions" and "Nearly finalists" -
+`/records`' two remaining generated rankings with no quiz equivalent - as
+needing a genuinely new question *shape* rather than a drop-in reuse of
+`mostTitlesQuestion()`'s own "single superlative record per competition"
+pattern, because both are list-membership rankings (every team that clears a
+bar), not a ranking with one record holder. Scoped and shipped both as two
+new generated quiz question types: "Which of these teams has reached a
+{competition} final without ever winning the title?" and "Which of these
+teams has reached a {competition} semifinal without ever reaching the
+final?", for the four team competitions with Runner-up/Third/Fourth columns
+(FIFA World Cup, UEFA EURO, Copa América, UEFA Nations League).
+
+The new `nearlyChampionQuestions()`/`nearlyFinalistQuestions()` in
+`src/lib/quiz.ts` take the exact `ChampionSummary[]`-shaped rankings
+`buildRunnerUpsWithoutTitle()`/`buildNearlyFinalists()` already produce for
+`/records`' own "Nearly champions"/"Nearly finalists" sections (see
+`src/lib/editions.ts`), independently hand-recomputed against every
+competition's own Winner/Runner-up/Third/Fourth columns at the
+two-hundred-and-tenth intensive run - no new editorial research needed.
+Unlike every earlier "most X" question type, which asks one question per
+*competition* about a single record holder, these ask one question per
+*qualifying team* (the same "iterate every entry" shape
+`championByYearQuestions()`/`hostByYearQuestions()`/`runnerUpByYearQuestions()`
+already use) - there is no single "most nearly-champion" team to crown, so a
+list-membership fact needs a membership question instead. The correct
+answer is drawn from the nearly-champions/nearly-finalists list itself;
+distractors are drawn from the complementary list - teams that *have* won
+(for "nearly champions") or reached *any* final (for "nearly finalists",
+built as `[...champions, ...nearlyChampions]`, the same union
+`buildNearlyFinalists()` already excludes internally via its own
+`finalistGroupIds` set) - so every distractor is wrong by construction, with
+no tie-break logic needed at all (each question has its own, independent
+correct answer).
+
+Confirmed against the real content tables by hand, not assumed: after a full
+build, `dist/quiz/index.html`/`dist/hr/quiz/index.html`'s own JSON-LD shows
+exactly 8 new questions (2 types x 4 competitions, each pool capped at
+`take: 1`) with byte-identical answers between languages - Wales and
+Bulgaria for "nearly finalist" (World Cup, EURO), Czechoslovakia and England
+for "nearly champion" (World Cup, EURO), United States and England for
+"nearly finalist" (Copa América, Nations League), and Netherlands and Mexico
+for "nearly champion" (Copa América, Nations League) - confirming every one
+of the four competitions has at least one qualifying entry in both lists and
+produces a question, not just the ones exercised by the unit tests' smaller
+fixtures.
+
+Wired two new `QuizPool`s per competition into both `src/pages/quiz.astro`
+and `src/pages/hr/quiz.astro` (right after each competition's existing
+rivalry pool), added the matching two bullets to `content/quiz.md`'s
+"Question types in this quiz" list (bumped its `lastReviewed` to
+2026-10-03) and the two matching Croatian bullets to the hardcoded notes
+list in `src/pages/hr/quiz.astro`, and added 18 new unit tests to
+`tests/unit/quiz.test.ts` (two new `describe` blocks: the correct
+answer-set match, the distractor-pool restriction, the English/Croatian
+prompts and category, choice-count/uniqueness, determinism, and the
+sparse-pool and no-qualifying-entries cases for each). Neither new bullet
+matches any claim-checker's trigger words ("without ever winning"/"without
+ever reaching" hits none of `most|record|youngest|oldest|highest|biggest|
+largest|lowest|fewest`, `consecutive|back-to-back`, `the only`, `the
+first...tenth`, `since <year>`, `one of only N`, or `across all N
+editions`), so no `*-claims-ledger.json` entry was needed.
+
+**New finding, unrelated to this run's own change:** `pnpm audit` now
+reports one high-severity transitive advisory - `http-cache-semantics`
+(bundled via `astro@7.3.5`'s own dependency tree) has no patched version
+yet (`npm audit`'s "Patched versions: <0.0.0"), and `astro` itself is
+already the latest 7.x release per `pnpm outdated`, so there is nothing to
+bump. `http-cache-semantics` is a dev-time HTTP-caching helper (Astro's own
+tooling/dev-server dependency chain), not a package this fully static site
+ships or runs on its production output, so it carries no runtime risk to
+the deployed site - but it is a new, real line item, not yet one of this
+file's documented standing exceptions. Added below under "Open backlog" as
+a new blocked item (same shape as the `typescript` 7 upgrade blocker) -
+re-check `pnpm audit`/`pnpm outdated` next time either changes upstream.
+
+**Verification:** `pnpm install` (clean; `pnpm outdated` unchanged, only the
+already-documented blocked `typescript` 5.9.3 -> 7.0.2 line), `pnpm lint`
+(238 files, 0 errors/0 warnings/0 hints), `pnpm test` (964/964, up from 946
+- the 18 new tests), `pnpm test:coverage` (99.53%/98.78% statements/
+branches, 100%/100% functions/lines - no new uncovered branch; both new
+functions use an `if (!choice) continue` loop guard, not the `if (!choice)
+return []` single-question guard every earlier "most X" question type has,
+and both branches of that guard are exercised by this run's own normal and
+sparse-pool test cases), `pnpm build` (711 pages, unchanged - no new route,
+just new content on the existing `/quiz`/`/hr/quiz` pages). All 29 CI-gated
+fast `check:*` scripts individually re-run and clean, including
+`check:record-claims` (42 claims, unchanged - neither new bullet matches its
+trigger words, see above), `check:i18n-notes` (7 matched page pairs, parity
+held for the two new Croatian bullets), `check:jsonld` (1783 blocks across
+711 pages, still structurally valid with the new questions included),
+`check:spelling` (15 files, 0 issues), `check:spelling-hr` (57 unique
+blocks, 0 unknown words), `check:pdfs` (700/700 clean, confirmed `/quiz`
+still has no entry in `scripts/pdf-pages.mjs`'s `PDF_PAGES` list, so no PDF
+regeneration needed for this run's `content/quiz.md` edit). `pnpm audit`
+(the one new, unrelated, currently-unfixable finding above). `pnpm dlx knip
+--no-config-hints` (same two standing false positives). Ran the same two
+quiz-specific e2e specs every prior quiz-question-type run has used
+(`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`, 14
+tests, `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`), which exercise every
+DOM state this run's change could plausibly affect; all 14 passed. The
+two-hundred-and-fourth run's own full cold-start `pnpm test:e2e` (1042/1042)
+plus the five manual browser sweeps remain the standing baseline for
+everything else.
+
+**Left for a future pass:** `/records`' every generated ranking now has a
+quiz-question counterpart (the per-competition and cross-competition
+"Fiercest rivalries" slices from the two-hundred-and-sixteenth/
+two-hundred-and-seventeenth runs, and now "Nearly champions"/"Nearly
+finalists" from this run) - genuinely none left untried. The same
+environment-blocked/human-sign-off open backlog items remain, plus the new
+`http-cache-semantics` advisory above. Otherwise, returning to the
+two-hundred-and-eleventh run's own suggestion of a fresh accessibility or
+performance angle remains open.
 
 **Two-hundred-and-seventeenth run:** picked up the two-hundred-and-sixteenth
 run's own closing note - a true cross-competition "fiercest rivalry" quiz
@@ -2409,6 +2524,17 @@ matching entry for full detail.
   two-hundred-and-thirteenth run (2026-10-02; `typescript` still at 5.9.3 vs.
   7.0.2 latest, no new `@astrojs/check` release). Re-check whenever `pnpm
   outdated` next shows a new `@astrojs/check` release.
+- **`http-cache-semantics` high-severity advisory**: blocked, found by the
+  two-hundred-and-eighteenth run's own `pnpm audit`. Pulled in transitively
+  via `astro@7.3.5` (`. > astro@7.3.5 > http-cache-semantics@4.2.0`); `npm
+  audit`'s advisory lists "Patched versions: <0.0.0" (none published yet),
+  and `pnpm outdated` shows `astro` itself already at its own latest 7.x
+  release, so there is no version bump available on either side yet.
+  `http-cache-semantics` is part of Astro's own dev-time tooling/dev-server
+  dependency chain, not a package this static site's production build ships
+  or runs - no runtime exposure on the deployed site, but still a real
+  open advisory worth closing once a fix exists upstream. Re-check `pnpm
+  audit` next time `astro` or any of its dependencies gets a new release.
 - **`docs/SOURCES.md` link-liveness sweep**: blocked. This environment's
   outbound network/egress policy rejects direct requests to external
   reference domains - confirmed repeatedly, most recently 2026-10-02

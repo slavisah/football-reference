@@ -1,7 +1,7 @@
 ---
 title: Family Quiz
 slug: quiz
-lastReviewed: 2026-10-02
+lastReviewed: 2026-10-03
 status: verified
 ---
 
@@ -50,6 +50,10 @@ the quiz stays in sync as new editions are added.
   Cup, EURO, Copa América and Nations League finals, combined? (only asked
   when there's a single, unambiguous most-frequent pairing - not a tie for
   first)
+- Which of these teams has reached a given tournament's final without ever
+  winning the title?
+- Which of these teams has reached a given tournament's semifinal without
+  ever reaching the final?
 - Put four champions from a tournament, or four winners of an individual
   award (Ballon d'Or, Golden Boot), in chronological order (earliest
   first).
