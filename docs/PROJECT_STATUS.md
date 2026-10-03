@@ -33032,3 +33032,1064 @@ the two still-unasked-about generated rankings on that page, a natural next
 candidate in the same "ship a feature, not another verification pass" vein -
 or returning to the two-hundred-and-eleventh run's own suggestion of a fresh
 accessibility or performance angle.
+
+### New quiz question types - "Which team/player had the longest run of consecutive {competition} titles/awards?" and "Who waited the longest between {competition} titles/awards?" - added across all seven loaded competitions (two-hundred-and-fifteenth intensive run, 2026-10-02)
+
+With every "Open backlog" item still either environment-blocked or awaiting
+human sign-off, picked up the two-hundred-and-fourteenth run's own closing
+suggestion directly: the quiz's question-type surface now also covers
+`/records`' "Back-to-back champions" and "Longest wait between titles"
+sections, the two generated rankings that run named as the remaining
+still-unasked-about candidates.
+
+`src/lib/editions.ts` already builds `ChampionSummary[]`-shaped rankings for
+both - `buildLongestStreaks()` (streak length standing in for `titles`) and
+`buildLongestTitleGaps()` (gap-in-years standing in for `titles`) - both
+independently hand-recomputed against every competition's own Winner
+column/title years at the two-hundred-and-ninth intensive run for
+`/records`' own sections. Like the two-hundred-and-twelfth/
+two-hundred-and-fourteenth runs' "most hosted"/"biggest winning margin"
+additions, this needed no new editorial research, just two new ways of
+asking about data the site already displays and has already verified. Added
+`longestStreakQuestion()` and `longestTitleGapQuestion()` to `src/lib/
+quiz.ts`, both following `biggestFinalMarginQuestion()`'s own tie-and-sparse-
+data safety shape exactly (no question when the top two entries tie, or
+fewer than 3 distinct entries exist) and `mostTitlesQuestion()`'s own
+`subject: 'team' | 'player'` parameter for Croatian wording on the three
+individual-award datasets.
+
+Wired both into every one of the seven `loadCompetition()` datasets already
+loaded on `src/pages/quiz.astro`/`src/pages/hr/quiz.astro` (FIFA World Cup,
+UEFA EURO, Copa América, UEFA Nations League, Ballon d'Or, World Cup Golden
+Boot, EURO Golden Boot) rather than only the datasets currently known to
+produce a question - the same "wire it everywhere the data shape applies,
+let the tie-safety logic decide per-run whether a question actually appears"
+precedent the "most hosted" question already established (World Cup/Nations
+League correctly contribute zero "most hosted" questions at runtime, same as
+here), so a future edition that happens to break a current tie produces a
+question with no further code change needed.
+
+Confirmed against the real content tables which datasets currently produce a
+question, the same "parse the real `/records` JSON-LD, not just the rendered
+prose" methodology the prior two quiz-question runs used: built the site and
+extracted every `"Back-to-back champions"`/`"Longest wait between titles"`
+`ItemList` block from `dist/records/index.html` with a throwaway script.
+"Longest streak" fires only for Copa América (Argentina's 1945-1947
+three-in-a-row, ahead of ten two-in-a-row ties at length 2) and Ballon d'Or
+(Lionel Messi's 2009-2012 four-in-a-row, ahead of Michel Platini's
+1983-1985 three-in-a-row); it correctly produces no question for FIFA World
+Cup (Italy 1934/1938 and Brazil 1958/1962 both tied at streak length 2),
+UEFA EURO (only one streak at all, Spain 2008/2012), UEFA Nations League and
+EURO Golden Boot (no back-to-back streak exists in either table), and World
+Cup Golden Boot (only one streak, Mbappé 2022/2026). "Longest wait" fires
+for FIFA World Cup (Italy, a 44-year wait between 1938 and 1982), UEFA EURO
+(Italy, 52 years between 1968 and 2020) and Copa América (Brazil, 40 years
+between 1949 and 1989); it correctly produces no question for UEFA Nations
+League and both Golden Boot tables (only one team/player anywhere in each
+table has 2+ titles so far, short of the 3-distinct-entries floor) and
+Ballon d'Or (Ronaldo and Cristiano Ronaldo tied at a 5-year wait, each
+sitting on three total distinct entries so the tie - not the length floor -
+is what suppresses the question).
+
+Re-confirmed all twelve outcomes a second way after wiring the pools in:
+built the site again and parsed `dist/quiz/index.html`/
+`dist/hr/quiz/index.html`'s own JSON-LD for every prompt containing
+"longest run of consecutive" or "waited the longest between" - exactly five
+questions appeared (Italy/Italy/Brazil for "longest wait" on World
+Cup/EURO/Copa América, Argentina/Messi for "longest streak" on Copa
+América/Ballon d'Or), each with the expected answer, in both languages, with
+no sixth or seventh question for any of the seven ties/sparse-data cases
+above.
+
+Added the matching two bullets to `content/quiz.md`'s "Question types in
+this quiz" list and the two matching Croatian bullets to the hardcoded notes
+list in `src/pages/hr/quiz.astro`. Added 17 new unit tests to
+`tests/unit/quiz.test.ts` (two new `describe` blocks, 9 and 8 cases,
+mirroring `biggestFinalMarginQuestion()`'s own test shape): the English/
+Croatian prompts and correct answers for both the `'team'` and `'player'`
+subject wording, choice-count/uniqueness, determinism across repeated calls,
+the tie-returns-no-question case, the fewer-than-3-entries case, and - for
+the streak question only, since `buildLongestStreaks()` can return an empty
+array outright rather than merely too few entries (no competition yet has
+exactly 1 or 2 streaks) - the no-streak-at-all case (modeled on UEFA Nations
+League's real shape: four distinct champions, no repeat winner anywhere).
+
+One new claim-ledger wrinkle, caught by running every fast `check:*` script
+rather than assuming the prior two quiz-question runs' ledger pattern was
+exhaustive: the "longest run of consecutive" bullet's first line matches
+`check-consecutive-claims.mjs`'s own trigger word ("consecutive"), something
+neither the "most hosted" nor "biggest winning margin" bullets ever
+triggered. Added a new `content/quiz.md` entry to `scripts/
+consecutive-claims-ledger.json`, using the exact same "describes a generated
+quiz question type, not a factual claim" rationale the three prior quiz-
+question entries in `record-claims-ledger.json` already use for the same
+underlying reason (the actual answer is computed at build time from a
+function whose own output was already independently hand-verified, so
+there's nothing here for the checker to cross-reference against a static
+table). The "longest wait" bullet and record-claims-ledger.json's own
+trigger words (`most|record|youngest|oldest|highest|biggest|largest|lowest|
+fewest`) were both checked and neither bullet matches any of them ("longest"
+itself is not one of the listed trigger words) - confirmed by running
+`check-record-claims.mjs` before and after, both clean with the same 40-claim
+count. Also caught and fixed, before it ever reached a committed file: the
+first draft of the "longest run of consecutive" bullet wrapped its second
+line as `  - not a tie for first)`, which `/^-\s(.*)$/` (the exact line regex
+every one of the seven claim checkers uses) would read as a second,
+spurious top-level bullet starting with "-" - confirmed by running
+`check-consecutive-claims.mjs` against the first draft and seeing it
+misparse the continuation line; rewrapped the line break so the continuation
+text never starts with "- ", matching the existing "biggest winning margin"
+bullet's own wrapping convention (trailing hyphen at the end of a line, never
+at the start of the next), then re-ran clean.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean). `pnpm outdated`
+surfaced one new in-range patch beyond the already-documented blocked
+`typescript` 5.9.3 -> 7.0.2 line (`@types/node` 26.6.3 -> 26.6.4); bumped via
+`pnpm update @types/node`, confirmed `pnpm outdated` afterward shows only the
+blocked `typescript` line. `pnpm lint` (238 files, 0 errors/0 warnings/0
+hints), `pnpm test` (930/930, up from 913 - the 17 new tests), `pnpm
+test:coverage` (99.67%/98.98% statements/branches, 100%/100% functions/lines
+- down slightly from 99.83%/99.2% only because of two new defensively-
+unreachable branches, `longestStreakQuestion()`'s and
+`longestTitleGapQuestion()`'s own `if (!choice) return []` guards, the exact
+same shape `mostTitlesQuestion()`'s and `biggestFinalMarginQuestion()`'s
+identical guards already have for the identical reason - `buildChoice()` can
+only return `undefined` when fewer than 2 distinct distractors survive
+filtering, which each function's own tie/length checks already rule out by
+the time that guard runs; `docs/ROADMAP.md`'s "Open backlog" coverage-gap
+entry updated to list these two new lines alongside the pre-existing ones),
+`pnpm build` (711 pages, unchanged - no new route, just new content on the
+existing `/quiz`/`/hr/quiz` pages). All 29 CI-gated fast `check:*` scripts
+individually re-run and clean, including `check:consecutive-claims` (23
+claims, up from 22 - the new ledger entry above), `check:record-claims` (40
+claims, unchanged), `check:i18n-notes` (7 matched page pairs, parity held for
+the two new Croatian bullets), `check:jsonld` (1783 blocks across 711 pages,
+still structurally valid with the new questions included), `check:links`
+(715 pages), `check:sitemap` (710 entries), `check:spelling` (15 files, 0
+issues), `check:spelling-hr` (57 blocks, 0 unknown words - no new `.cspell`
+entry needed), and every other fast check unchanged and clean. `pnpm audit`
+(no known vulnerabilities). `pnpm dlx knip --no-config-hints` (same two
+standing false positives: `scripts/test-preview-server.mjs`, `@cspell/
+dict-hr-hr`).
+
+Regenerated all 700 downloadable PDFs since `content/quiz.md` changed
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs`, this
+session's own container-specific Chromium-revision escape hatch).
+
+**Self-inflicted PDF-corruption snag, caught on the pushed commit's own CI
+run, root-caused and fixed within this same run:** the first `build:pdfs`
+invocation above was still running in the background (700 pages takes
+several minutes end to end) when this run separately started the two quiz
+e2e specs below, whose own command opens with `astro preview stop` - copied
+from the two-hundred-and-twelfth run's own "stop any stale preview server
+first" precaution, but wrong to run here, since it killed the *same*
+preview server the still-in-flight `build:pdfs` run depended on to fetch
+each page.
+
+`generate-pdfs.mjs` did not hard-fail once its own page navigations started
+failing after the server died - it silently captured a stale/fallback
+(effectively home-page) render into every PDF it generated from that point
+on: 274 of 700 files (every Ballon d'Or edition, every Copa América edition,
+and both Golden Boot families' editions), each landing on one of only two
+suspiciously-identical byte sizes (one for the English PDFs, one for the
+Croatian ones) regardless of which year or competition they were supposed to
+be. `check:pdfs`/`check:pdf-outline` were both run once, correctly clean,
+*before* this corruption occurred; the run's own first commit and push went
+out against the already-corrupted on-disk state without re-running either
+check against what was actually there afterward - the gap this exposed.
+CI's own "test" check caught it on the pushed commit, which is how this run
+found out, not its own verification.
+
+Root-caused by inspecting the corrupted files directly rather than guessing:
+confirmed via `pdftotext` that the suspiciously-sized PDFs all contained the
+site's home-page copy ("Family-friendly football history", the six
+competition cards) instead of their own edition's content, and via file
+mtimes that the corruption window lined up exactly with when the
+`astro preview stop` command for the e2e run was issued, after the first
+`build:pdfs` process (confirmed still running via `ps aux` minutes earlier)
+would not yet have finished 700 pages.
+
+Fixed by: confirming no leftover `generate-pdfs.mjs`/preview/Chromium
+process was still running, then re-running `build:pdfs` a second time,
+start to finish, with nothing else invoked concurrently (no
+`astro preview stop`, no Playwright) until the background task's own
+completion notification confirmed it had fully exited - no manual
+process-polling race this time. Verified the fix three independent ways
+before trusting it: `check:pdfs`/`check:pdf-outline` both clean (700/700)
+again, a direct byte-size collision scan across all 700 files (zero sizes
+now shared by more than 2 files - the committed PDFs now vary like real
+rendered content should - versus 274 files collapsed onto just two sizes
+before), and `pdftotext` spot-checks of several previously-corrupted files
+(a 1960 EURO Golden Boot edition, a 1956 Ballon d'Or edition, a 1916 Copa
+América edition, a 1930 World Cup Golden Boot edition) confirming each now
+holds its own real page content. Only then re-ran the two quiz e2e specs
+(safely this time, with the PDF regeneration already finished and confirmed
+exited) and re-committed/re-pushed the corrected PDFs.
+
+**Lesson recorded for future runs:** never run `astro preview stop` (or
+start any other command that depends on or restarts the preview server)
+while a `build:pdfs` invocation from earlier in the same run might still be
+in flight in the background - a check that passed *before* the corruption
+is not evidence the corruption didn't happen *after*; confirm the earlier
+process has actually exited (via its own completion notification, not a
+manual `ps aux` sampled once) before starting anything else that touches
+the preview server, and re-run `check:pdfs`/`check:pdf-outline` as the very
+last step before committing, not just at some earlier point in the run.
+
+Did not re-run the full cold-start `pnpm test:e2e` suite or the five manual
+browser sweeps - instead ran the same two quiz-specific e2e specs the
+two-hundred-and-twelfth/two-hundred-and-fourteenth runs used for their own
+quiz changes (`accessibility-quiz-states.spec.ts`,
+`no-js-quiz-and-search.spec.ts`, 14 tests covering WCAG violations across
+both languages/both color schemes and the no-JS fallback state), which
+exercise every DOM state this run's change could plausibly affect - these
+specs never load a PDF, so the corruption above didn't affect their result
+either time; all 14 passed both times (once against the corrupted PDFs,
+once again after the fix, `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+both times). The two-hundred-and-fourth run's own full cold-start `pnpm
+test:e2e` (1042/1042) plus the five manual browser sweeps remain the
+standing baseline for everything else, with `check:lighthouse` last
+reconfirmed by the two-hundred-and-eighth run.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+The quiz's question-type surface now covers every `ChampionSummary[]`-shaped
+ranking `/records` renders (titles, awards, hosts, biggest final margins,
+back-to-back streaks and longest title gaps) for every competition that has
+one - no further untried `/records` ranking remains as a quiz-question
+candidate in this same mold. "Fiercest rivalries", "Nearly champions" and
+"Nearly finalists" are the only generated `/records` sections left with no
+quiz equivalent, but none reduces naturally to a single clear multiple-choice
+question the way the others do (a rivalry question would need a two-sided
+prompt shape, and "nearly champions/finalists" names a whole list rather
+than one record holder) - a genuinely new question *shape* to scope, not
+just a new data source to plug into the existing one. Otherwise, returning
+to the two-hundred-and-eleventh run's own suggestion of a fresh
+accessibility or performance angle, or the two-hundred-and-eighth run's
+still-untried front-to-back prose-vs-table read of the site's smaller
+`content/*.md` files, both remain open.
+
+### New quiz question type - "Which two teams have met each other the most times in {competition} finals?" - added for FIFA World Cup, UEFA EURO, Copa América and UEFA Nations League (two-hundred-and-sixteenth intensive run, 2026-10-02)
+
+**Note added by the two-hundred-and-seventeenth run:** this entry was written
+retroactively to close a gap the two-hundred-and-seventeenth run found - the
+two-hundred-and-sixteenth run updated `docs/ROADMAP.md` with a full writeup
+of its own work but never appended the matching entry here, breaking this
+file's own "append-only, one entry per change" contract for that one run.
+Reconstructed from `docs/ROADMAP.md`'s own two-hundred-and-sixteenth-run
+section (which has the full detail) rather than re-derived from scratch, so
+the facts below match what that run actually verified at the time, not a new
+re-verification.
+
+Picked up the two-hundred-and-fifteenth run's own closing note - "Fiercest
+rivalries" was the one remaining generated `/records` ranking with no quiz
+equivalent, flagged as needing real scoping rather than a drop-in reuse of
+`buildRivalries()` because that function's own cross-competition design
+(pairs can qualify by meeting once each in two *different* competitions,
+e.g. France-Italy via EURO 2000 + the 2006 World Cup) doesn't fit the quiz's
+existing "one pool per competition" architecture or produce a prompt that
+can name a single tournament. Scoped and shipped a narrower,
+single-competition version instead: a new generated quiz question type,
+"Which two teams have met each other the most times in {competition}
+finals?", for the four team competitions with a Runner-up column (FIFA
+World Cup, UEFA EURO, Copa América, UEFA Nations League).
+
+The new `mostFrequentRivalryQuestion()` in `src/lib/quiz.ts` takes a
+`Rivalry[]` scoped to one competition's own finals only - built by calling
+`buildRivalries(buildFinalsMeetings([{ title, slug, editions }]))` with a
+single-element array, rather than `/records`' own call which combines all
+four team competitions into one cross-competition ranking - so the question
+and its "met in {competition} finals" prompt stay accurate to what it's
+actually asking about. This needed no new editorial research:
+`buildRivalries()`/`buildFinalsMeetings()` (`src/lib/compare.ts`) are the
+exact same generated ranking that already backs `/records`' own "Fiercest
+rivalries" section, independently hand-recomputed against every
+competition's own Champion/Runner-up columns at the two-hundred-and-tenth
+intensive run. The correct choice is formatted as "{teamA} vs {teamB}" (both
+already alphabetically ordered by `buildRivalries()`); distractors are every
+other qualifying pair's own label. Follows the same tie-and-sparse-data
+safety every other generated question type already uses (no question when
+the top two pairs are tied on meetings, or fewer than 3 distinct pairs
+exist).
+
+Confirmed against the real content tables by hand: FIFA World Cup has only 2
+qualifying pairs (Argentina-Germany at 3 meetings, Brazil-Italy at 2) - too
+few distinct entries, correctly producing no question. UEFA EURO and UEFA
+Nations League have 0 pairs that meet twice within the competition alone -
+also correctly producing no question. Copa América has 7 qualifying pairs
+with a clear, unambiguous leader - Argentina vs. Uruguay, 12 meetings, ahead
+of Argentina vs. Brazil's 11 - and correctly does produce one; confirmed
+live in `dist/quiz/index.html`/`dist/hr/quiz/index.html`'s own JSON-LD after
+a full build.
+
+Wired a new `QuizPool` into both `src/pages/quiz.astro` and
+`src/pages/hr/quiz.astro` for each of the four team competitions, via a
+small shared `rivalriesFor()` helper on each page that builds the
+single-competition `Rivalry[]` list. Added the matching bullet to
+`content/quiz.md`'s "Question types in this quiz" list and the matching
+Croatian bullet to the hardcoded notes list in `src/pages/hr/quiz.astro`.
+Added eight new unit tests to `tests/unit/quiz.test.ts`. One new
+claim-ledger wrinkle: the new bullet's "most times" matches
+`check-record-claims.mjs`'s trigger word ("most"), so it needed its own
+`scripts/record-claims-ledger.json` entry under `content/quiz.md`.
+
+**Verification (as recorded in `docs/ROADMAP.md` at the time):** `pnpm
+install` (clean), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints),
+`pnpm test` (938/938, up from 930 - the eight new tests), `pnpm
+test:coverage` (99.59%/98.87% statements/branches, 100%/100%
+functions/lines), `pnpm build` (711 pages, unchanged). All 29 CI-gated fast
+`check:*` scripts individually re-run and clean, including
+`check:record-claims` (41 claims, up from 40), `check:i18n-notes` (7 matched
+page pairs, parity held), `check:jsonld` (1783 blocks across 711 pages),
+`check:spelling` (15 files, 0 issues), `check:spelling-hr` (57 unique
+blocks, 0 unknown words). `pnpm audit` (no known vulnerabilities). `pnpm dlx
+knip --no-config-hints` (same two standing false positives). `check:pdfs`
+clean (700/700) with no regeneration needed - `/quiz` has no entry in
+`scripts/pdf-pages.mjs`'s `PDF_PAGES` list. Did not re-run the full
+cold-start `pnpm test:e2e` suite - instead ran the two quiz-specific e2e
+specs (`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`,
+14 tests); all 14 passed.
+
+**Left for a future pass:** a true cross-competition rivalry question (the
+"two-sided prompt shape" the two-hundred-and-fifteenth run's own note
+flagged) remained a separate, unscoped idea, since it would need its own
+prompt/UI shape rather than reusing the existing per-competition pool
+pattern - see the two-hundred-and-seventeenth run's own entry below for how
+that was scoped and shipped.
+
+### New quiz question type - "Which two national teams have met each other the most times across World Cup, EURO, Copa América and Nations League finals, combined?" (two-hundred-and-seventeenth intensive run, 2026-10-02)
+
+Picked up the two-hundred-and-sixteenth run's own closing note (directly
+above) - a true cross-competition "fiercest rivalry" quiz question, combining
+all four team competitions' finals the way `/records`' own "Fiercest
+rivalries" section already does, remained unscoped because it needs its own
+two-sided prompt shape rather than a drop-in reuse of
+`mostFrequentRivalryQuestion()`'s single-competition pattern. Scoped and
+shipped it as a new `fiercestRivalryQuestion()` function in `src/lib/
+quiz.ts`, structurally a near-twin of `mostFrequentRivalryQuestion()` but
+taking the exact combined, all-four-competition `Rivalry[]` `/records`
+(`src/pages/records.astro`) already renders -
+`buildRivalries(buildFinalsMeetings([...all four competitions...]))` -
+instead of a single-competition scope, and with a prompt that names all four
+competitions instead of one: "Which two national teams have met each other
+the most times across World Cup, EURO, Copa América and Nations League
+finals, combined?" ("Koje su se dvije reprezentacije najčešće susrele u
+finalima Svjetskog prvenstva, EURO-a, Copa Américe i Liga nacija zajedno?"
+in Croatian).
+
+This needed no new editorial research: the combined ranking is the same
+data independently hand-recomputed against every competition's own
+Champion/Runner-up columns at the two-hundred-and-tenth intensive run, and
+is the same ranking `/records` has displayed (and had re-verified) ever
+since. Confirmed live in `dist/quiz/index.html`/`dist/hr/quiz/index.html`'s
+own JSON-LD after a full build: Argentina vs Uruguay (13 meetings) is the
+clear leader, well ahead of Argentina vs Brazil's 11, matching `/records`'
+own rendered "Fiercest rivalries" top row exactly in both languages. Same
+tie-and-sparse-data safety as every other generated question type (no
+question on a tie for the most meetings, or fewer than 3 distinct pairs).
+
+Wired a single new `QuizPool` into both `src/pages/quiz.astro` and
+`src/pages/hr/quiz.astro`, fed by a new `fiercestRivalries` const in each
+page - distinct from each page's existing `rivalriesFor()` helper, which
+stays scoped to one competition for `mostFrequentRivalryQuestion()`. Unlike
+every other question type on this page, this one's `category` badge can't
+name a single competition, so it uses "Fiercest rivalries"/"Najžešći
+rivaliteti" instead - the first quiz question category that isn't a
+competition name. Added the matching bullet to `content/quiz.md`'s
+"Question types in this quiz" list and the matching Croatian bullet to the
+hardcoded notes list in `src/pages/hr/quiz.astro`. Added eight new unit
+tests to `tests/unit/quiz.test.ts` (a new `describe` block mirroring
+`mostFrequentRivalryQuestion`'s own test shape, but with a two-competition
+fixture - two separate `title`s each contributing one meeting between the
+same pair - to exercise the cross-competition merge itself, not just reuse
+a single-competition fixture): the correct leader/answer, the English
+prompt and category, choice-count/uniqueness, determinism, the Croatian
+prompt and category, the tie-returns-no-question case, the
+fewer-than-3-entries case, and the no-qualifying-rivalries-at-all case.
+
+One new claim-ledger wrinkle, the same shape as every prior new
+quiz-question bullet: the new bullet's "most times" matches
+`check-record-claims.mjs`'s trigger word ("most"), so it needed its own
+`scripts/record-claims-ledger.json` entry under `content/quiz.md` - same
+"describes a generated quiz question type, not a factual claim" rationale
+the five prior quiz-question ledger entries already use.
+
+Also fixed, while reconciling this file against `docs/ROADMAP.md`: the
+two-hundred-and-sixteenth run's own entry above was missing from this file
+entirely before this run added it back (see that entry's own "Note added by
+the two-hundred-and-seventeenth run" for why and how) - a lapse in this
+file's "append-only, one entry per change" contract that this run closed
+rather than let compound into future runs trusting an incomplete history.
+
+**Verification:** `pnpm install` (clean), `pnpm lint` (238 files, 0 errors/0
+warnings/0 hints), `pnpm test` (946/946, up from 938 - the eight new
+tests), `pnpm test:coverage` (99.52%/98.76% statements/branches, 100%/100%
+functions/lines - the one new uncovered branch is
+`fiercestRivalryQuestion()`'s own `if (!choice) return []` guard, the same
+defensively-unreachable shape every other question builder's identical
+guard already has), `pnpm build` (711 pages, unchanged - no new route, just
+new content on the existing `/quiz`/`/hr/quiz` pages). All 29 CI-gated fast
+`check:*` scripts individually re-run and clean, including
+`check:record-claims` (42 claims, up from 41 - the new ledger entry above),
+`check:i18n-notes` (7 matched page pairs, parity held for the new Croatian
+bullet), `check:jsonld` (1783 blocks across 711 pages, still structurally
+valid with the new question included), `check:spelling` (15 files, 0
+issues), `check:spelling-hr` (57 unique blocks, 0 unknown words),
+`check:pdfs` (700/700 clean, confirmed `/quiz` still has no entry in
+`scripts/pdf-pages.mjs`'s `PDF_PAGES` list, so no PDF regeneration needed).
+`pnpm audit` (no known vulnerabilities). `pnpm dlx knip --no-config-hints`
+(same two standing false positives: `scripts/test-preview-server.mjs`,
+`@cspell/dict-hr-hr`). Did not re-run the full cold-start `pnpm test:e2e`
+suite or the five manual browser sweeps - instead ran the same two
+quiz-specific e2e specs the two-hundred-and-twelfth/
+two-hundred-and-fourteenth/two-hundred-and-fifteenth/two-hundred-and-sixteenth
+runs used (`accessibility-quiz-states.spec.ts`,
+`no-js-quiz-and-search.spec.ts`, 14 tests, `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`),
+which exercise every DOM state this run's change could plausibly affect;
+all 14 passed. The two-hundred-and-fourth run's own full cold-start `pnpm
+test:e2e` (1042/1042) plus the five manual browser sweeps remain the
+standing baseline for everything else.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged.
+The quiz's question-type surface now covers every generated `/records`
+ranking, including both the per-competition and the cross-competition
+slices of "Fiercest rivalries" - no further untried `/records` ranking
+remains as a quiz-question candidate, in either shape. Otherwise, returning
+to the two-hundred-and-eleventh run's own suggestion of a fresh
+accessibility or performance angle, or the two-hundred-and-eighth run's
+still-untried front-to-back prose-vs-table read of the site's smaller
+`content/*.md` files, both remain open.
+
+### New quiz question types - "nearly champion"/"nearly finalist" (two-hundred-and-eighteenth intensive run, 2026-10-03)
+
+The two-hundred-and-fifteenth run's own closing note had flagged "Nearly
+champions" and "Nearly finalists" - `/records`' two remaining generated
+rankings with no quiz equivalent - as needing a genuinely new question
+*shape* rather than a drop-in reuse of `mostTitlesQuestion()`'s own "single
+superlative record per competition" pattern, because both are
+list-membership rankings (every team that clears a bar: reached a final but
+never won it, or reached a semifinal but never a final), not a ranking with
+one record holder. Scoped and shipped both as two new generated quiz
+question types: "Which of these teams has reached a {competition} final
+without ever winning the title?" and "Which of these teams has reached a
+{competition} semifinal without ever reaching the final?", for the four
+team competitions with Runner-up/Third/Fourth columns (FIFA World Cup, UEFA
+EURO, Copa América, UEFA Nations League).
+
+The new `nearlyChampionQuestions()`/`nearlyFinalistQuestions()` in
+`src/lib/quiz.ts` take the exact `ChampionSummary[]`-shaped rankings
+`buildRunnerUpsWithoutTitle()`/`buildNearlyFinalists()` already produce for
+`/records`' own "Nearly champions"/"Nearly finalists" sections (see
+`src/lib/editions.ts`), independently hand-recomputed against every
+competition's own Winner/Runner-up/Third/Fourth columns at the
+two-hundred-and-tenth intensive run - no new editorial research needed.
+Unlike every earlier "most X" question type, which asks one question per
+*competition* about a single record holder, these ask one question per
+*qualifying team* (the same "iterate every entry" shape
+`championByYearQuestions()`/`hostByYearQuestions()`/`runnerUpByYearQuestions()`
+already use) - there is no single "most nearly-champion" team to crown, so a
+list-membership fact needs a membership question instead. The correct
+answer is drawn from the nearly-champions/nearly-finalists list itself;
+distractors are drawn from the complementary list - teams that *have* won
+(for "nearly champions") or reached *any* final (for "nearly finalists",
+built by each page as `[...champions, ...nearlyChampions]`, the same union
+`buildNearlyFinalists()` already excludes internally via its own
+`finalistGroupIds` set, so no new `editions.ts` export was needed to build
+it) - so every distractor is wrong by construction, with no tie-break logic
+needed at all (unlike `mostTitlesQuestion()` and its siblings, each
+generated question here has its own, independent correct answer, so there
+is nothing to tie).
+
+Confirmed against the real content tables by hand, not assumed: after a
+full build, `dist/quiz/index.html`/`dist/hr/quiz/index.html`'s own JSON-LD
+shows exactly 8 new questions (2 question types x 4 competitions, each pool
+capped at `take: 1`) with byte-identical answers between languages - Wales
+and Bulgaria for "nearly finalist" (World Cup, EURO), Czechoslovakia and
+England for "nearly champion" (World Cup, EURO), United States and England
+for "nearly finalist" (Copa América, Nations League), and Netherlands and
+Mexico for "nearly champion" (Copa América, Nations League) - confirming
+every one of the four competitions has at least one qualifying entry in
+both lists and actually produces a question at build time, not just the
+small hand-built fixtures the unit tests use.
+
+Wired two new `QuizPool`s per competition into both `src/pages/quiz.astro`
+and `src/pages/hr/quiz.astro` (immediately after each competition's
+existing rivalry pool), added the matching two bullets to
+`content/quiz.md`'s "Question types in this quiz" list (bumped its
+`lastReviewed` to 2026-10-03) and the two matching Croatian bullets to the
+hardcoded notes list in `src/pages/hr/quiz.astro`, and added 18 new unit
+tests to `tests/unit/quiz.test.ts` (two new `describe` blocks: the
+correct answer-set match against the full nearly-champion/nearly-finalist
+list, the distractor-pool restriction to the complementary list, the
+English/Croatian prompts and category, choice-count/uniqueness,
+determinism, and the sparse-pool and no-qualifying-entries cases for each -
+13 assertions-worth of coverage per new function). Neither new bullet
+matches any claim-checker's trigger words ("without ever winning"/"without
+ever reaching" hits none of
+`most|record|youngest|oldest|highest|biggest|largest|lowest|fewest`,
+`consecutive|back-to-back`, `the only`, `the first...tenth`, `since
+<year>`, `one of only N`, or `across all N editions`), so no
+`*-claims-ledger.json` entry was needed this run.
+
+**New finding, unrelated to this run's own change:** `pnpm audit` now
+reports one high-severity transitive advisory - `http-cache-semantics`
+(pulled in via `astro@7.3.5`'s own dependency tree) has no patched version
+yet (`npm audit`'s advisory lists "Patched versions: <0.0.0"), and `astro`
+itself is already the latest 7.x release per `pnpm outdated`, so there is
+no version bump available on either side of this yet.
+`http-cache-semantics` sits in Astro's own dev-time tooling/dev-server
+dependency chain, not a package this fully static site's production build
+ships or runs on the deployed output - no runtime exposure on the live
+site - but it is a new, real advisory, not yet one of this file's
+documented standing exceptions. Added to `docs/ROADMAP.md`'s "Open
+backlog" as a new blocked item (same shape as the `typescript` 7 upgrade
+blocker already there); re-check `pnpm audit`/`pnpm outdated` next time
+either `astro` or one of its dependencies gets a new release.
+
+**Verification:** `pnpm install` (clean; `pnpm outdated` unchanged, only
+the already-documented blocked `typescript` 5.9.3 -> 7.0.2 line), `pnpm
+lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test` (964/964, up
+from 946 - the 18 new tests), `pnpm test:coverage` (99.53%/98.78%
+statements/branches, 100%/100% functions/lines - no new uncovered branch;
+both new functions use an `if (!choice) continue` loop guard, not the `if
+(!choice) return []` single-question guard every earlier "most X" question
+type has, and both branches of that guard are exercised by this run's own
+normal and sparse-pool test cases), `pnpm build` (711 pages, unchanged - no
+new route, just new content on the existing `/quiz`/`/hr/quiz` pages). All
+29 CI-gated fast `check:*` scripts individually re-run and clean, including
+`check:record-claims` (42 claims, unchanged - neither new bullet matches
+its trigger words, see above), `check:i18n-notes` (7 matched page pairs,
+parity held for the two new Croatian bullets), `check:jsonld` (1783 blocks
+across 711 pages, still structurally valid with the new questions
+included), `check:spelling` (15 files, 0 issues), `check:spelling-hr` (57
+unique blocks, 0 unknown words), `check:pdfs` (700/700 clean, confirmed
+`/quiz` still has no entry in `scripts/pdf-pages.mjs`'s `PDF_PAGES` list,
+so no PDF regeneration needed for this run's `content/quiz.md` edit).
+`pnpm audit` (the one new, unrelated, currently-unfixable finding above).
+`pnpm dlx knip --no-config-hints` (same two standing false positives:
+`scripts/test-preview-server.mjs`, `@cspell/dict-hr-hr`). Did not re-run
+the full cold-start `pnpm test:e2e` suite or the five manual browser
+sweeps - instead ran the same two quiz-specific e2e specs every prior
+quiz-question-type run has used (`accessibility-quiz-states.spec.ts`,
+`no-js-quiz-and-search.spec.ts`, 14 tests,
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`), which exercise every DOM
+state this run's change could plausibly affect; all 14 passed. The
+two-hundred-and-fourth run's own full cold-start `pnpm test:e2e`
+(1042/1042) plus the five manual browser sweeps remain the standing
+baseline for everything else.
+
+**Left for a future pass:** `/records`' every generated ranking now has a
+quiz-question counterpart - the per-competition and cross-competition
+"Fiercest rivalries" slices from the two-hundred-and-sixteenth/
+two-hundred-and-seventeenth runs, and now "Nearly champions"/"Nearly
+finalists" from this run - genuinely none left untried. The same
+environment-blocked/human-sign-off open backlog items remain (see
+`docs/ROADMAP.md`'s "Open backlog"), plus the new `http-cache-semantics`
+advisory above. Otherwise, returning to the two-hundred-and-eleventh run's
+own suggestion of a fresh accessibility or performance angle remains open.
+
+### New quiz question type - "Which team has won the most {competition} titles on home soil?" - added for FIFA World Cup, UEFA EURO, Copa América and UEFA Nations League (two-hundred-and-nineteenth intensive run, 2026-10-03)
+
+The two-hundred-and-eighteenth run's own closing note claimed the quiz's
+question-type surface covered "every generated `/records` ranking -
+genuinely none left untried." Re-checking that claim by sweeping every
+`build*` function exported from `src/lib/editions.ts`/`src/lib/compare.ts`
+against what's actually wired into `src/pages/quiz.astro`/`src/pages/hr/
+quiz.astro` found one genuine miss: `buildHomeSoilTitles()`, which backs
+`/records`' own "Titles won on home soil" section (rendered through the
+same `ChampionsSummary.astro` widget as "Most successful teams"/"Most
+frequent hosts"), had no quiz counterpart at all. It isn't a new data
+source - just an existing `ChampionSummary[]`-shaped ranking the quiz
+generator never got pointed at, missed by every prior "cover every
+generated ranking" pass (two-hundred-and-twelfth through
+two-hundred-and-eighteenth runs) because none of them re-enumerated the
+`editions.ts`/`compare.ts` exports directly against the quiz's own wiring -
+each one scoped its own sweep to the specific sections `/records.astro`'s
+own page body visibly renders in order, and "Titles won on home soil" sits
+between "Most frequent hosts" and "Back-to-back champions" rather than at
+the end, where a skim could miss it.
+
+Shipped it as a new `subject` value on the existing `mostTitlesQuestion()`
+in `src/lib/quiz.ts`, rather than a new standalone function - the same
+`ChampionSummary[]` shape, tie-and-sparse-data safety (no question on a tie
+for first place, or fewer than 3 distinct entries) and distractor-pool
+logic already apply unchanged, so extending the subject union from `'team'
+| 'player' | 'host'` to add `'home-soil'` was the correct-weight fix, not a
+parallel code path. English prompt: "Which team has won the most
+{competition} titles on home soil?"; Croatian: "Koja reprezentacija ima
+najviše naslova osvojenih na domaćem terenu na natjecanju {competition}?".
+No new editorial research needed: `buildHomeSoilTitles()`'s own Winner/Host
+row-matching logic was already independently hand-verified against every
+Host cell at the two-hundred-and-tenth intensive run, when it first
+extended that run's "recompute every generated ranking by hand" treatment
+to this exact function (and five others) that the first 209 runs had never
+spot-checked at all.
+
+Confirmed the tie-safety outcome against the real content tables by hand,
+not assumed, by extracting `dist/records/index.html`'s own "Titles won on
+home soil" JSON-LD `ItemList` blocks after a full build: FIFA World Cup (6
+home-soil winners - Uruguay, Italy, England, Germany, Argentina, France -
+every one tied at exactly 1 title) and UEFA EURO (3 winners - Spain, Italy,
+France - also all tied at 1) both correctly produce no question, since
+`mostTitlesQuestion()`'s own `top.titles === runnerUp.titles` guard fires
+for both. UEFA Nations League has only 1 qualifying entry (Portugal, 2018-19)
+- below the 3-distinct-entries floor, also correctly producing no question.
+Copa América is the only one of the four team competitions with a clear,
+unambiguous leader: Uruguay with 7 home-soil titles (1917, 1923, 1924, 1942,
+1956, 1967, 1995), clear of Argentina's 6 (1921, 1925, 1929, 1937, 1946,
+1959) and Brazil's 5 - confirmed live in `dist/quiz/index.html`'s own
+JSON-LD after a full build (`"name":"Which team has won the most Copa
+América titles on home soil?","acceptedAnswer":{"@type":"Answer","text":
+"Uruguay"}`), byte-identical in `dist/hr/quiz/index.html` except for the
+Croatian prompt text, with the same "Uruguay" answer.
+
+Wired a new `QuizPool` into both `src/pages/quiz.astro` and `src/pages/hr/
+quiz.astro` for each of the four team competitions (World Cup, EURO and
+Nations League correctly contribute zero questions at runtime at build
+time, the same "wire it everywhere, let the tie-safety logic decide
+per-run" precedent every earlier subject/question-type addition already
+established - a future edition that breaks one of these ties produces a
+question with no further code change needed). Added the matching bullet to
+`content/quiz.md`'s "Question types in this quiz" list (its `lastReviewed`
+was already bumped to 2026-10-03 by the prior run, so left unchanged - no
+second bump needed for a same-day follow-up edit) and the matching Croatian
+bullet to the hardcoded notes list in `src/pages/hr/quiz.astro`. Added
+seven new unit tests to `tests/unit/quiz.test.ts` within the existing
+`describe('mostTitlesQuestion', ...)` block (mirroring the existing
+`'host'`-subject test cases' own shape): the correct-answer/English-prompt
+case built from a hand-constructed home-soil-winners fixture, the Croatian
+prompt, an id-collision regression test confirming `'home-soil'` stays
+distinct from both `'team'` and `'host'` for the same competition (so all
+three can coexist without seed collisions), the tie-returns-no-question
+case, and the fewer-than-3-entries case.
+
+One new claim-ledger wrinkle, the same shape as every prior new
+quiz-question bullet: the new bullet's "most titles" matches
+`check-record-claims.mjs`'s trigger word ("most"), so it needed its own
+`scripts/record-claims-ledger.json` entry under `content/quiz.md` - same
+"describes a generated quiz question type, not a factual claim" rationale
+the six prior quiz-question ledger entries already use. It matched no other
+claim checker's trigger words (`consecutive|back-to-back`, `the only`, `the
+first...tenth`, `since <year>`, `one of only N`, or `across all N
+editions`).
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(969/969, up from 964 - the seven new tests), `pnpm test:coverage`
+(99.53%/98.78% statements/branches, 100%/100% functions/lines - no new
+uncovered branch, since the `'home-soil'` subject shares
+`mostTitlesQuestion()`'s existing `if (!choice) return []` guard rather than
+introducing its own), `pnpm build` (711 pages, unchanged - no new route,
+just new content on the existing `/quiz`/`/hr/quiz` pages). All 29
+CI-gated fast `check:*` scripts individually re-run and clean, including
+`check:record-claims` (43 claims, up from 42 - the new ledger entry above),
+`check:i18n-notes` (7 matched page pairs, parity held for the new Croatian
+bullet), `check:jsonld` (1783 blocks across 711 pages, still structurally
+valid with the new question included), `check:spelling` (15 files, 0
+issues), `check:spelling-hr` (57 unique blocks, 0 unknown words),
+`check:pdfs` (700/700 clean, confirmed `/quiz` still has no entry in
+`scripts/pdf-pages.mjs`'s `PDF_PAGES` list, so no PDF regeneration needed
+for this run's `content/quiz.md` edit). `pnpm audit` (the one standing,
+still-unfixable `http-cache-semantics` advisory, unchanged - no new
+findings). `pnpm dlx knip --no-config-hints` (same two standing false
+positives: `scripts/test-preview-server.mjs`, `@cspell/dict-hr-hr`). Did
+not re-run the full cold-start `pnpm test:e2e` suite or the five manual
+browser sweeps - instead ran the same two quiz-specific e2e specs every
+prior quiz-question-type run has used (`accessibility-quiz-states.spec.ts`,
+`no-js-quiz-and-search.spec.ts`, 14 tests,
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`), which exercise every DOM
+state this run's change could plausibly affect; all 14 passed. The
+two-hundred-and-fourth run's own full cold-start `pnpm test:e2e`
+(1042/1042) plus the five manual browser sweeps remain the standing
+baseline for everything else.
+
+**Left for a future pass:** having now re-swept every `build*` export from
+`editions.ts`/`compare.ts` directly (not just the sections `/records.astro`
+visibly renders) and confirmed each one is wired into the quiz except
+`buildPodiums()`/`buildTimeline()` (which back a timeline/podium display,
+not a superlative ranking - no single "most X" question fits their shape),
+the quiz's question-type surface genuinely has no further untried
+`ChampionSummary[]`/`Rivalry[]`-shaped ranking left this time. The same
+environment-blocked/human-sign-off open backlog items remain (see
+`docs/ROADMAP.md`'s "Open backlog"). Otherwise, returning to the
+two-hundred-and-eleventh run's own suggestion of a fresh accessibility or
+performance angle remains the next open thread.
+
+### New regression suite for WCAG 2.2 AA 2.4.11 "Focus Not Obscured (Minimum)" across all three sticky-overlay contexts - closed clean, no violation found (two-hundred-and-twentieth intensive run, 2026-10-03)
+
+Picked up the two-hundred-and-nineteenth run's own closing note: with the
+quiz-question-type vein genuinely exhausted, the next open thread was "the
+two-hundred-and-eleventh run's own suggestion of a fresh accessibility or
+performance angle". Chose accessibility, and specifically WCAG 2.2 AA 2.4.11
+"Focus Not Obscured (Minimum)" - a keyboard-focused element must never end
+up entirely hidden behind author-created content such as a sticky header.
+Confirmed this was genuinely untested before starting, not assumed:
+installed `axe-core`'s own `wcag22aa` tag currently ships only one rule
+(`target-size` - already documented in this file's "Known caveats" list),
+and `grep -rn "Obscured\|2.4.11"` across `tests/`/`docs/` turned up nothing
+anywhere on the site before this run.
+
+This site has exactly three distinct sticky-overlay contexts where a
+focused element could end up hidden: the site's own sticky nav header
+(`Nav.astro`'s `.site-header`, present on every page), `/quiz`'s second
+sticky score bar stacked directly below it (`.quiz__score`, see the
+2026-09-xx "sticky score bar" work referenced in its own file comment), and
+`TournamentTable.astro`'s own inner sticky column header (`.t-wrap thead
+th`, fixed for *programmatic* scrolling by an earlier run - see this file's
+own "sticky column header" entry and `tests/e2e/sticky-table-header.spec.ts`,
+which guards it). All three already carry `scroll-padding-top` engineering
+from earlier runs: `global.css`'s own `html { scroll-padding-top:
+var(--site-header-height) }` rule, and `quiz.astro`/`hr/quiz.astro`'s own
+`calc(var(--site-header-height, 3.6rem) + var(--quiz-score-height, 4.5rem))`
+override for the second sticky layer. Every one of those fixes, though, had
+only ever been proven against a *programmatic* scroll
+(`scrollIntoView()`/`window.scrollTo()` - see `sticky-table-header.spec.ts`'s
+own three tests, all driven that way). None had been proven against the
+browser's own focus-driven auto-scroll a real Tab key-press triggers, which
+is what a keyboard user actually experiences and is exactly what 2.4.11
+measures - a real, previously-unexercised gap between "the CSS fix exists"
+and "the fix actually protects a keyboard user," not a repeat of prior
+coverage.
+
+Verified by hand first, against the real built/served site (`pnpm build`
+plus `astro preview`), with a throwaway Node+Playwright script rather than
+assuming anything from reading the CSS: focused each `.t-wrap`, each
+`.quiz__score`-guarded page state, and ordinary page content under
+`.site-header` alone, pressed Tab repeatedly, and after each press (with a
+short settle delay for the browser's own scroll-into-view animation)
+compared `document.activeElement`'s `getBoundingClientRect()` against the
+relevant sticky element's own rect. All three contexts came back clean on
+the first honest measurement - no genuine 2.4.11 violation anywhere on the
+site. One measurement bug surfaced and got fixed *during* that
+hand-verification, before trusting any result: the very first run flagged
+the header's own brand link ("⚽Football Reference") as "fully hidden
+under the sticky site header" - a false positive, since checking a focused
+element against an ancestor it is itself a *child* of is nonsensical (a
+sticky element never hides its own descendants from itself, only content
+that scrolls underneath it from elsewhere on the page). Fixed with an
+explicit `obscurer.contains(el)` guard before drawing any conclusion from
+the script's output.
+
+Shipped the clean, hand-verified result as a permanent regression suite
+rather than a one-off verification note in this file alone - the same
+"close the gap with a real test, not just a sentence here" pattern
+`sticky-table-header.spec.ts` and every `accessibility-*-states.spec.ts`
+file already follows for their own gaps. New file:
+`tests/e2e/accessibility-focus-not-obscured.spec.ts`, three tests:
+
+1. Tabbing through the World Cup table's own `.t-wrap` (23 editions, deep
+   enough to actually need its own internal scrollbar per
+   `sticky-table-header.spec.ts`'s own confirmation) - walks both the year
+   links and the story-reveal `<summary>` toggles against the table's own
+   sticky column header.
+2. Tabbing through `/quiz` with both sticky layers actually engaged -
+   scrolled down first (`window.scrollTo(..., 500)`), the state a reader
+   answering question 5 or 10 is really in, not the untouched top-of-page
+   state every other quiz test starts from - against `.quiz__score`.
+3. Tabbing through `/records` (a long, link-heavy page) against the site
+   header alone, with no second sticky layer.
+
+Each test sanity-checks it actually walked a real minimum count of
+focusable elements (`expect(checked).toBeGreaterThan(...)` style, the same
+"don't let this pass vacuously" pattern `accessibility-table-states.spec.ts`
+already uses for its own no-results-combo lookup) - a future regression that
+silently stops finding any focusable row under test can't report a false
+pass.
+
+**Verification:** test-only change - no production code, markup or content
+edited, so the usual full content/build-check battery wasn't needed and
+wasn't re-run in full; what actually could be affected was checked directly.
+`pnpm lint` (239 files, 0 errors/0 warnings/0 hints - one more file than the
+two-hundred-and-nineteenth run's 238, the new `.spec.ts` file itself; astro
+check also type-checks test files under `tests/`), `pnpm test` (969/969,
+unchanged - no unit-level code touched), `pnpm build` (711 pages,
+unchanged). The new spec itself was run three times in a row via
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` to rule out flakiness from its
+own settle-delay timing - all three tests passed all three times, no
+flakes. Did not re-run the full cold-start `pnpm test:e2e` suite, the five
+manual browser sweeps, or any `check:*` script - nothing this run touched
+could plausibly affect any of them. The two-hundred-and-fourth run's own
+full cold-start `pnpm test:e2e` (1042/1042) plus the five manual browser
+sweeps remain the standing baseline for everything else.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items remain (see `docs/ROADMAP.md`'s "Open backlog"). The
+two-hundred-and-eleventh run's own "fresh accessibility or performance
+angle" pointer is now closed for this cycle - the novel axis it pointed at
+has been explored end-to-end and found already-compliant, with a permanent
+test now guarding it against regression. A performance angle specifically
+remains genuinely untried in the sense that pointer meant: every
+`check:lighthouse`/`check:perf` run so far has re-confirmed the *existing*
+implementation stays perfect, never gone looking for a new optimization
+from scratch. A second independent content-verification pass over files
+already checked once (the two-hundred-and-eleventh run's own other named
+option) also remains open.
+
+### `docs/ROADMAP.md` trimmed back to a current-state summary - the hundred-and-fifty-seventh run's own "kept short on purpose" policy had drifted back to 2,793 lines over the next 51 runs (two-hundred-and-twenty-first intensive run, 2026-10-03)
+
+With the quiz question-type vein exhausted (two-hundred-and-nineteenth run)
+and the accessibility angle closed clean (two-hundred-and-twentieth run),
+every item in `docs/ROADMAP.md`'s "Open backlog" still either
+environment-blocked or awaiting human sign-off, and the one item under
+"Ideas not yet scoped" still carrying the same fabrication risk that had
+kept it unscoped since the two-hundred-and-thirteenth run - this run took
+up the two-hundred-and-eleventh/two-hundred-and-twentieth runs' own other
+standing suggestion, "a second independent content-verification pass over
+files already checked once", but on `docs/ROADMAP.md` itself rather than
+`content/`: re-reading it end to end turned up a real, self-inflicted
+process bug, not a content error.
+
+`docs/ROADMAP.md` opens with its own stated purpose - "the short,
+current-state entry point for 'what's next' - kept short on purpose" - and
+a maintenance note from the hundred-and-fifty-seventh run (2026-09-20)
+describing exactly this failure mode once already: the file had grown to
+7,093 lines by letting every run append its own "what I did" paragraph
+under the "Status" heading instead of writing only to this file
+(`docs/PROJECT_STATUS.md`), where the append-only full history belongs. That
+note said it trimmed the file back down and asked future runs to close a
+backlog item "by deleting its bullet... instead of appending a 'closed'
+paragraph here."
+
+Checking the file's actual current length against that note's intent
+(rather than trusting the note was still being followed) showed it had
+drifted right back: 2,793 lines, with 51 separate bold "**Nth run:**"
+paragraphs under "Status" - one for every run from the hundred-and-seventieth
+through the two-hundred-and-twentieth - each narrating what that run did,
+in the same style the 2026-09-20 note had already flagged and removed once.
+Every one of those runs *did* also have its own proper entry in this file
+(that's how the 2026-09-20 trim was verified safe, and is cross-referenced
+by name in nearly every one of the 51 paragraphs being removed this time:
+"see `docs/PROJECT_STATUS.md`'s matching entry for full detail"), so the
+duplication was pure, harmless-looking accumulation each run - but 51 runs
+of it is exactly what made the file "increasingly expensive for every run
+to read before it can even start working" again, the precise cost the
+2026-09-20 note already named.
+
+Verified safe before deleting anything, the same way the 2026-09-20 trim
+documented its own verification: spot-checked five of the 51 run-labels
+spanning the full range (hundred-and-seventieth, hundred-and-eightieth,
+hundred-and-ninetieth, two-hundredth, two-hundred-and-tenth) against this
+file's own `### ` headings and confirmed each has an exact, matching entry
+with the same claims the `docs/ROADMAP.md` paragraph made about it. Removed
+all 51 run-paragraphs and replaced them with two short paragraphs: one
+unchanged "what's built" summary (already present, lightly re-verified
+against `docs/PROJECT_STATUS.md`'s own "Known caveats" section) and one new
+paragraph naming the two genuinely open threads next (a real performance-
+profiling pass, and a second content-verification pass) without narrating
+how each of the 51 runs got here. `docs/ROADMAP.md` is now 211 lines, down
+from 2,793; the "Open backlog" and "Ideas not yet scoped" sections
+themselves were left untouched - they were already correctly short, the
+bloat was entirely in "Status".
+
+Added a second, more concrete maintenance note (mirroring the
+hundred-and-fifty-seventh run's own note, which was evidently not enough on
+its own) spelling out exactly where a future run should write: a new `### `
+entry in this file for narrative, and nothing beyond a bullet-delete or an
+in-place summary edit in `docs/ROADMAP.md` itself. Whether that holds for
+another 50 runs is not something this run can guarantee, only flag plainly
+for whichever run next re-reads this file end to end.
+
+**Verification:** documentation-only change - no production code, content,
+or test touched, so the usual build/test battery doesn't apply to it
+directly. Confirmed `docs/ROADMAP.md` still reads coherently end to end
+after the edit (no dangling cross-reference to a removed run-paragraph left
+in the "Status" summary or the "Open backlog"/"Ideas not yet scoped"
+sections, which still reference specific run numbers for *their own* items,
+all of which remain accurate since those items themselves weren't touched).
+Ran `pnpm lint`/`pnpm test`/`pnpm build` anyway as a sanity check that
+nothing else was accidentally touched in the same working tree: all three
+clean and unchanged from the two-hundred-and-twentieth run's own counts
+(969/969 unit tests, 0 lint errors/warnings/hints, 711 pages).
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+`docs/ROADMAP.md` "Open backlog" items remain, unchanged by this run. The
+two genuinely open threads named in the trimmed summary stand: a real
+performance-profiling pass (not another `check:lighthouse` re-confirmation)
+and a second independent content-verification pass over `content/` files
+already checked once. Equally important going forward: the next several
+runs should actually follow the restated note above rather than letting
+`docs/ROADMAP.md` regrow a third time.
+
+### Second content-verification pass completes full `content/` coverage: `golden-boot.md` and `uefa-nations-league.md` hand-verified front-to-back - clean (two-hundred-and-twenty-second intensive run, 2026-10-03)
+
+Took up the two-hundred-and-eleventh/-twentieth/-twenty-first runs' own
+standing "second independent content-verification pass" thread, this time
+actually on `content/` rather than `docs/ROADMAP.md` (the
+two-hundred-and-twenty-first run's own target). The two-hundred-and-eighth
+run's front-to-back prose-vs-table read had covered `fifa-world-cup.md` and
+`uefa-euro.md`; the two-hundred-and-fifth through -seventh runs had each
+separately covered `ballon-dor.md` and `copa-america.md` while chasing
+specific bugs. That left exactly two of the six competition/award content
+files - `golden-boot.md` and `uefa-nations-league.md` - never read this
+same way. Read both end to end, checking every prose bullet against its
+own page's table(s) and, where a bullet names a fact that another page's
+table also carries, against that other file too.
+
+**`content/golden-boot.md` (109 lines):** checked every "World Cup
+notes"/"Silver and Bronze Boot"/"memorable moments" and "EURO" equivalent
+bullet against the two Winners tables. All consistent - the Mbappé
+2022/2026 consecutive-winner claim, the six-way 1962/1960 joint-winner
+counts, and every Silver/Bronze Boot year/goal figure all match their own
+table rows. One sentence read as a possible over-generalization on first
+pass - "before 2012 and from 2024 onward the award reverts to full joint
+winners" sounds, read in isolation, like it claims every pre-2012 EURO
+had a tied Golden Boot, when the table actually shows plenty of outright
+single winners in that span (1968, 1972, 1976, 1980, 1984, 1988, 1996,
+2004, 2008). Checked this against the fifty-fourth run's own
+`docs/PROJECT_STATUS.md` entry (which wrote this exact sentence) before
+treating it as a bug: that entry's own parenthetical - "2024's own six-way
+tie... confirms this" - shows the sentence is describing what happens
+*when* a tie occurs in that span (resolved as joint, never a ranked
+podium), not asserting every edition is tied. Read that way the sentence
+is accurate, just elliptical; left unchanged rather than "fixing" working,
+deliberately-reasoned prose on an ambiguous reading.
+
+**`content/uefa-nations-league.md` (77 lines):** checked the Finals table
+against every "Key facts"/"Final venues"/"Winning managers"/"Winning
+captains"/"Memorable moments" bullet. All consistent, including the host
+nation's Finals result in every "Final venues" entry matching the table's
+own "Finals host" column, and "Portugal became the first two-time champion
+in 2025" correctly accounting for France's 2021 and Spain's 2023 wins (one
+title each, so Portugal's second in 2025 is genuinely the first repeat).
+
+The one bullet worth tracing further: "**2023:** Luis de la Fuente (Spain)
+- the same season he took charge of Spain, before also winning EURO 2024
+and the 2026 World Cup with them" chains a claim across three separate
+content files. Cross-checked all three directly rather than taking the
+chain on faith: `content/uefa-euro.md` line 133 independently says "the
+same manager who went on to win the 2026 World Cup with Spain" for 2024,
+and `content/fifa-world-cup.md` line 200 independently confirms "Luis de
+la Fuente (Spain) - the oldest winning manager in World Cup history... and
+Spain's second title alongside 2010" for 2026. All three files agree with
+each other and with their own tables (Spain winner of EURO 2024 and the
+2026 World Cup, de la Fuente named manager in both) - no discrepancy.
+
+With this pass, every one of the six competition/award content files
+(`fifa-world-cup.md`, `uefa-euro.md`, `uefa-nations-league.md`,
+`copa-america.md`, `ballon-dor.md`, `golden-boot.md`) has now had this
+specific front-to-back prose-vs-table hand-verification applied at least
+once - closing out the "second content-verification pass" thread as
+*complete coverage*, not just "another file checked." `docs/ROADMAP.md`'s
+own "Status" prose updated in place (per its own maintenance-note
+instructions - an edit to the existing summary, not an appended
+paragraph) to reflect this and narrow the remaining open thread down to
+performance-profiling alone.
+
+**Verification:** no content or production code changed (this was a pure
+read-and-compare pass that found nothing to fix), so the usual
+content-edit battery (`pnpm build && pnpm build:pdfs`) wasn't needed. Ran
+the full fast standing health check anyway to confirm the working tree was
+otherwise untouched: `pnpm test` (969/969, unchanged), `pnpm lint` (239
+files, 0 errors/warnings/hints, unchanged), `pnpm build` (711 pages,
+unchanged), `pnpm check:links` (715 pages, no broken links), `pnpm
+check:perf` (`hr/records` still heaviest at 617.4 KB, within the 640 KB
+budget, unchanged) and all eight verification-ledger claim gates
+(`check:record-claims` 43, `check:superlative-claims` 24,
+`check:ordinal-claims` 91, `check:consecutive-claims` 23,
+`check:since-claims` 26, `check:one-of-only-claims` 2,
+`check:completeness-claims` 5, `check:award-tallies` 4 tally tables) -
+every one matches its existing ledger entry, consistent with no content
+having changed.
+
+**Left for a future pass:** the performance-profiling thread is now the
+sole genuinely open "quality angle" named in `docs/ROADMAP.md`'s "Status"
+summary - a real from-scratch optimization search (not another
+`check:lighthouse`/`check:perf` re-confirmation that the existing
+implementation stays within budget). A *third* content-verification pass
+re-reading files already checked twice would have steeply diminishing
+returns at this point; more valuable would be extending this same
+technique to a part of the site this pass didn't touch - the `/records`,
+`/compare`, `/compare-players`, `/teams/<slug>` and `/players/<slug>`
+generated/derived pages, which pull from these same content files but
+were out of scope for this run's file-by-file prose-vs-table method.
+
+### New permanent check: `/records`' 40 generated rankings independently cross-verified against `content/*.md`, zero discrepancies - `scripts/check-records-against-source.mjs` (two-hundred-and-twenty-third intensive run, 2026-10-03)
+
+Took up the two-hundred-and-twenty-second run's own suggestion to extend
+content-verification coverage to the generated/derived pages, starting with
+`/records` - the single heaviest, highest-claim-density page on the site (40
+separate rankings spanning all six competitions/awards, ~612 KB). Every
+other claim-checking script in `scripts/` (the superlative/ordinal/record/
+consecutive/since/one-of-only/completeness-claim ledgers, plus
+`check-award-tallies.mjs`) only scans hand-written `content/*.md` prose or a
+second hand-maintained tally table - none of them touch `/records` itself,
+whose rankings are computed at build time by `src/lib/editions.ts`/
+`compare.ts`. That code is unit-tested (`tests/unit/editions.test.ts`/
+`compare.test.ts`), but only against small synthetic fixtures - never
+against the real six-competition dataset with its actual edge cases (tied
+Golden Boot winners, Copa América's duplicate 1959 and three home-and-away
+editions with no single host, the West Germany/Germany merge, a cancelled
+2020 Ballon d'Or). A derivation bug (wrong tie-break order, a missed
+name-merge, an off-by-one in a streak or gap calculation) specific to the
+real data could ship wrong and nothing before this run would have caught it.
+
+Approach: rather than importing `src/lib/editions.ts`/`compare.ts` (which
+would only catch a template-wiring bug, not a bug shared by the check and
+the page), `scripts/check-records-against-source.mjs` re-implements each
+ranking's logic from scratch - reading `content/*.md`'s own tables via
+`check-award-tallies.mjs`'s existing `parseMarkdownTables`/
+`findTableByHeadingPrefix` helpers, then independently computing: most
+successful teams/players, most frequent hosts, titles won on home soil,
+back-to-back streaks (including Golden Boot ties, each tracked
+independently), nearly-champions/nearly-finalists, the longest gap between
+a team's own titles, biggest final-winning margins, and head-to-head
+"fiercest rivalry" meeting tallies - then diffs every one against that
+ranking's own JSON-LD `ItemList` block in the built `dist/records/
+index.html` (the English page only; `/hr/records` carries the same
+underlying numbers with translated labels, so checking one suffices).
+
+First pass against the real build surfaced four apparent mismatches, all
+four traced to bugs in the *checking* script, not the site: (1) the
+"Nearly finalists" third-place and fourth-place tallies need re-sorting by
+year after merging, not just concatenating; (2) UEFA Nations League's
+"Longest wait between titles" uses season-string labels ("2018–19,
+2024–25"), which the first regex (built assuming plain years) failed to
+parse - fixed by comparing the raw year tokens as strings rather than
+assuming integers; (3)/(4) were the same root cause. After those fixes, a
+full run across all 40 rankings (every "Most successful teams"/"Most
+frequent hosts"/"Titles won on home soil"/"Back-to-back champions"/"Nearly
+champions"/"Nearly finalists"/"Longest wait between titles" for all four
+team competitions, "Biggest final wins" for World Cup/EURO/Nations League,
+"Most awards"/"Back-to-back champions"/"Longest wait" for Ballon d'Or and
+both Golden Boots, and "Fiercest rivalries") found **zero real
+discrepancies** - every one of the site's own generated numbers agrees with
+an independently-written recomputation from the same source tables.
+
+Added as a permanent guard, not a one-off audit: wired into
+`.github/workflows/ci.yml` as a required PR gate immediately after `pnpm
+check:perf` (same `dist/`-reading precondition), with 18 new unit tests in
+`tests/unit/checkRecordsAgainstSource.test.ts` covering the pure tally/
+streak/gap/margin/rivalry functions directly (the same testing convention
+`tests/unit/checkAwardTallies.test.ts` already established for its sibling
+script) - so a future edit to the real content tables, or a future change
+to `src/lib/editions.ts`/`compare.ts`'s ranking logic, gets this same
+independent cross-check on every PR going forward, not just this one-time
+run.
+
+**Verification:** `pnpm test` (987/987, the 18 new tests plus the existing
+969), `pnpm lint` (241 files, 0 errors/0 warnings/0 hints - required two
+small JSDoc parameter-type annotations to satisfy `astro check`'s
+TypeScript inference across the new script/test-file boundary, the same
+class of fix `check-award-tallies.mjs`'s own sibling scripts already
+needed), `pnpm build` (711 pages, unchanged), `pnpm check:records-consistency`
+(new script, clean against the real build), and the standing health check
+(`pnpm check:perf` 612.3 KB heaviest/unchanged, `pnpm check:links` 715
+pages clean, `pnpm check:jsonld` 1,783 blocks valid, `pnpm check:sitemap`
+710 entries clean, `pnpm check:award-tallies` 4/4, `pnpm check:record-claims`
+43/43) all pass. No `content/*.md` file was touched, so `pnpm build &&
+pnpm build:pdfs` was not required for this run.
+
+**Left for a future pass:** `/compare`, `/compare-players`, `/teams/<slug>`
+and `/players/<slug>` remain the still-untouched generated/derived pages the
+two-hundred-and-twenty-second run's note named - each would need its own
+from-scratch independent recomputation the way this run built one for
+`/records`, since they derive from different `src/lib/` functions
+(`compare.ts`'s head-to-head builder, `teamProfile.ts`, `playerProfile.ts`)
+with their own real-data edge cases. The performance-profiling thread named
+by the two-hundred-and-twentieth/-second runs also remains open - this
+run's own look at it (bundle sizes already tiny with no web fonts/images,
+`check:lighthouse` already 1.00/1.00/1.00/1.00, the team/player search
+index already fetched lazily on first focus rather than eagerly) found no
+further low-hanging fruit, reinforcing rather than closing that item.

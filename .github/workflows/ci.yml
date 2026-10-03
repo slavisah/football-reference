@@ -84,6 +84,9 @@ jobs:
       - name: Page-weight budget check
         run: pnpm check:perf
 
+      - name: Records-page generated-ranking consistency check (vs content/*.md)
+        run: pnpm check:records-consistency
+
       - name: Internal link integrity check
         run: pnpm check:links
 
