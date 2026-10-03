@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (218 intensive runs as of 2026-10-03) lives
+verification sweep and decision (219 intensive runs as of 2026-10-03) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,7 +44,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-eighteenth run (2026-10-03): 964/964 unit tests,
+As of the two-hundred-and-nineteenth run (2026-10-03): 969/969 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.53%/98.78%
 coverage, and the same two standing `knip` false positives as ever (`scripts/
 test-preview-server.mjs`, used only as a Playwright `webServer.command`,
@@ -79,6 +79,97 @@ two-hundred-and-eighth run did re-run `check:lighthouse`
 on its own (a manual/intensive-run-only tool, not part of the cold-start
 `test:e2e` + browser-sweep baseline) and confirmed it is still perfect - see
 that run's own entry below.
+
+**Two-hundred-and-nineteenth run:** the two-hundred-and-eighteenth run's own
+closing note said the quiz's question-type surface covered "every generated
+`/records` ranking - genuinely none left untried." That turned out to be
+slightly off: `/records`' "Titles won on home soil" section
+(`buildHomeSoilTitles()` in `src/lib/editions.ts`, rendered via the same
+`ChampionsSummary.astro` widget as "Most successful teams"/"Most frequent
+hosts") had no quiz counterpart - it was simply missed by every prior
+"cover every `ChampionSummary[]`-shaped ranking" pass, since it isn't a new
+data source, just an existing one the quiz generator never got pointed at.
+Shipped it as a new `mostTitlesQuestion()` subject rather than a new
+function: extended the `subject` parameter from `'team' | 'player' | 'host'`
+to add `'home-soil'` ("Which team has won the most {competition} titles on
+home soil?"; Croatian "Koja reprezentacija ima najviše naslova osvojenih na
+domaćem terenu na natjecanju {competition}?"), reusing the exact same
+tie-and-sparse-data safety (no question on a tie for first, or fewer than 3
+distinct entries) every other subject already has - no new editorial
+research, since `buildHomeSoilTitles()`'s own Winner/Host row matching was
+already independently hand-verified against every Host cell at the
+two-hundred-and-tenth intensive run.
+
+Confirmed against the real content tables by hand, not assumed: FIFA World
+Cup (6 home-soil winners, all tied at 1 title each) and UEFA EURO (3
+winners, all tied at 1) both correctly produce no question; UEFA Nations
+League has only 1 qualifying team so far (Portugal) - too few distinct
+entries. Copa América is the only one of the four team competitions with a
+clear, unambiguous leader - Uruguay, 7 home-soil titles, ahead of Argentina's
+6 - and correctly does produce one; confirmed live in
+`dist/quiz/index.html`/`dist/hr/quiz/index.html`'s own JSON-LD after a full
+build (`"name":"Which team has won the most Copa América titles on home
+soil?","acceptedAnswer":{"text":"Uruguay"}`), identical in both languages.
+
+Wired a new `QuizPool` into both `src/pages/quiz.astro` and
+`src/pages/hr/quiz.astro` for each of the four team competitions (World Cup,
+EURO and Nations League correctly contribute zero questions at runtime, same
+as every earlier "wire it everywhere, let tie-safety decide" precedent).
+Added the matching bullet to `content/quiz.md`'s "Question types in this
+quiz" list (`lastReviewed` already at 2026-10-03 from the prior run, so left
+unchanged) and the matching Croatian bullet to the hardcoded notes list in
+`src/pages/hr/quiz.astro`. Added seven new unit tests to
+`tests/unit/quiz.test.ts` (the correct-answer/English-prompt case, the
+Croatian prompt, the id-collision regression test against both the
+existing `'team'` and `'host'` subjects for the same competition, the
+tie-returns-no-question case, and the fewer-than-3-entries case).
+
+One new claim-ledger wrinkle, the same shape as every prior new
+quiz-question bullet: the new bullet's "most titles" matches
+`check-record-claims.mjs`'s trigger word ("most"), so it needed its own
+`scripts/record-claims-ledger.json` entry under `content/quiz.md` - same
+"describes a generated quiz question type, not a factual claim" rationale
+the six prior quiz-question ledger entries already use. It matched no other
+claim checker's trigger words.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(969/969, up from 964 - the seven new tests), `pnpm test:coverage`
+(99.53%/98.78% statements/branches, 100%/100% functions/lines - no new
+uncovered branch, since the new `'home-soil'` subject shares
+`mostTitlesQuestion()`'s existing `if (!choice) return []` guard rather than
+adding its own), `pnpm build` (711 pages, unchanged - no new route, just new
+content on the existing `/quiz`/`/hr/quiz` pages). All 29 CI-gated fast
+`check:*` scripts individually re-run and clean, including
+`check:record-claims` (43 claims, up from 42 - the new ledger entry above),
+`check:i18n-notes` (7 matched page pairs, parity held for the new Croatian
+bullet), `check:jsonld` (1783 blocks across 711 pages, still structurally
+valid with the new question included), `check:spelling` (15 files, 0
+issues), `check:spelling-hr` (57 unique blocks, 0 unknown words),
+`check:pdfs` (700/700 clean, confirmed `/quiz` still has no entry in
+`scripts/pdf-pages.mjs`'s `PDF_PAGES` list, so no PDF regeneration needed
+for this run's `content/quiz.md` edit). `pnpm audit` (the one standing,
+still-unfixable `http-cache-semantics` advisory, unchanged). `pnpm dlx knip
+--no-config-hints` (same two standing false positives). Ran the same two
+quiz-specific e2e specs every prior quiz-question-type run has used
+(`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`, 14
+tests, `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`), which exercise every
+DOM state this run's change could plausibly affect; all 14 passed. The
+two-hundred-and-fourth run's own full cold-start `pnpm test:e2e` (1042/1042)
+plus the five manual browser sweeps remain the standing baseline for
+everything else.
+
+**Left for a future pass:** re-swept every `build*` function exported from
+`src/lib/editions.ts`/`src/lib/compare.ts` this run to confirm no other
+`ChampionSummary[]`/`Rivalry[]`-shaped ranking was similarly missed -
+`buildPodiums()` and `buildTimeline()` back `/records`' timeline/podium
+display rather than a superlative ranking (no single "most X" question fits
+their shape), and every other `build*` export is already wired into the
+quiz. Genuinely none left untried now. The same environment-blocked/
+human-sign-off open backlog items remain (see "Open backlog" below).
+Otherwise, returning to the two-hundred-and-eleventh run's own suggestion of
+a fresh accessibility or performance angle remains the next open thread.
 
 **Two-hundred-and-eighteenth run:** the two-hundred-and-fifteenth run's own
 closing note had flagged "Nearly champions" and "Nearly finalists" -
