@@ -585,6 +585,101 @@ export function fiercestRivalryQuestion(
   return [{ id, category, prompt, ...choice }];
 }
 
+/**
+ * "Which of these teams has reached a {competition} final without ever
+ * winning the title?" - one question per entry in
+ * `buildRunnerUpsWithoutTitle()`'s own "Nearly champions" ranking (see
+ * `src/lib/editions.ts`), the generated `/records` ranking flagged
+ * (two-hundred-and-fifteenth intensive run) as needing a genuinely new
+ * question *shape* rather than a drop-in reuse of `mostTitlesQuestion()`'s
+ * own pattern: "Nearly champions" is a list of every team that clears a bar
+ * (reached a final, never won it), not a single superlative record, so there
+ * is no one "most nearly-champion" team to ask about. This instead generates
+ * one question per qualifying team, the same "iterate every qualifying
+ * entry" shape `championByYearQuestions`/`hostByYearQuestions`/
+ * `runnerUpByYearQuestions` already use, rather than `mostTitlesQuestion`'s
+ * own "one question per competition" shape.
+ *
+ * The correct answer is drawn from `nearlyChampions`; distractors are drawn
+ * from `champions` (`buildChampionsSummary()`'s own title-winners list) -
+ * every distractor is genuinely wrong by construction, since a team in
+ * `champions` has, by definition, won the competition at least once. Needs
+ * at least 3 distinct champions to supply enough distractors
+ * (`MIN_DISTRACTORS` = 2 plus the correct answer's own slot); a question is
+ * simply skipped for any `nearlyChampions` entry where `buildChoice` can't
+ * find enough, the same per-entry sparse-data behaviour
+ * `championByYearQuestions` already has for an individual edition.
+ */
+export function nearlyChampionQuestions(
+  nearlyChampions: ChampionSummary[],
+  champions: ChampionSummary[],
+  competition: string,
+  seedPrefix: string,
+  locale: Locale = 'en',
+): QuizQuestion[] {
+  const pool = champions.map((c) => c.displayName);
+  const questions: QuizQuestion[] = [];
+  for (const entry of nearlyChampions) {
+    const correct = entry.displayName;
+    const id = `${seedPrefix}:nearly-champion:${entry.id}`;
+    const choice = buildChoice(id, correct, pool);
+    if (!choice) continue;
+    questions.push({
+      id,
+      category: competition,
+      prompt:
+        locale === 'hr'
+          ? `Koja je od ovih reprezentacija igrala u finalu natjecanja ${competition}, ali ga nikad nije osvojila?`
+          : `Which of these teams has reached a ${competition} final without ever winning the title?`,
+      ...choice,
+    });
+  }
+  return questions;
+}
+
+/**
+ * "Which of these teams has reached a {competition} semifinal without ever
+ * reaching the final?" - the "Nearly champions" sibling question's own
+ * one-tier-down counterpart, built the same way from
+ * `buildNearlyFinalists()`'s own ranking (see `src/lib/editions.ts`): one
+ * question per qualifying team, correct answers drawn from
+ * `nearlyFinalists`, distractors drawn from `finalists` - every team that
+ * has ever reached *any* final, winner or runner-up alike. `finalists` is
+ * simply `champions` and `nearlyChampions` combined (exactly the union
+ * `buildNearlyFinalists()` itself excludes from its own "Third"/"Fourth"
+ * tally internally, via its own `finalistGroupIds` set) - callers already
+ * have both lists in hand from the pool above, so no new editions.ts export
+ * is needed to build it. Same per-entry sparse-data behaviour as
+ * `nearlyChampionQuestions` - a question is skipped for any entry without
+ * enough distinct finalists to supply three distractors.
+ */
+export function nearlyFinalistQuestions(
+  nearlyFinalists: ChampionSummary[],
+  finalists: ChampionSummary[],
+  competition: string,
+  seedPrefix: string,
+  locale: Locale = 'en',
+): QuizQuestion[] {
+  const pool = finalists.map((f) => f.displayName);
+  const questions: QuizQuestion[] = [];
+  for (const entry of nearlyFinalists) {
+    const correct = entry.displayName;
+    const id = `${seedPrefix}:nearly-finalist:${entry.id}`;
+    const choice = buildChoice(id, correct, pool);
+    if (!choice) continue;
+    questions.push({
+      id,
+      category: competition,
+      prompt:
+        locale === 'hr'
+          ? `Koja je od ovih reprezentacija igrala u polufinalu natjecanja ${competition}, ali nikad nije igrala u finalu?`
+          : `Which of these teams has reached a ${competition} semifinal without ever reaching the final?`,
+      ...choice,
+    });
+  }
+  return questions;
+}
+
 export type QuizPool = {
   questions: QuizQuestion[];
   /** How many questions to take from this pool. */

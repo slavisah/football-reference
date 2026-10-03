@@ -23,6 +23,8 @@ import {
   buildHostsSummary,
   buildLongestStreaks,
   buildLongestTitleGaps,
+  buildNearlyFinalists,
+  buildRunnerUpsWithoutTitle,
   buildTimeline,
 } from '../../lib/editions';
 import { buildFinalsMeetings, buildRivalries } from '../../lib/compare';
@@ -41,6 +43,8 @@ import {
   longestTitleGapQuestion,
   mostFrequentRivalryQuestion,
   mostTitlesQuestion,
+  nearlyChampionQuestions,
+  nearlyFinalistQuestions,
   runnerUpByYearQuestions,
   topScorerByYearQuestions,
   uniqueWinnerEditions,
@@ -89,6 +93,8 @@ const notes: NoteSection[] = [
       'Koja je reprezentacija ili igrač najdulje čekao/la na sljedeći naslov/nagradu na natjecanju? (pita se samo kad postoji jedan jasan rekord, a ne izjednačenost za prvo mjesto)',
       'Koje su se dvije reprezentacije najčešće susrele u finalima danog natjecanja? (pita se samo kad postoji jedan jasan rekord, a ne izjednačenost za prvo mjesto)',
       'Koje su se dvije reprezentacije najčešće susrele u finalima Svjetskog prvenstva, EURO-a, Copa Américe i Liga nacija zajedno? (pita se samo kad postoji jedan jasan rekord, a ne izjednačenost za prvo mjesto)',
+      'Koja je od ponuđenih reprezentacija igrala u finalu danog natjecanja, ali ga nikad nije osvojila?',
+      'Koja je od ponuđenih reprezentacija igrala u polufinalu danog natjecanja, ali nikad nije igrala u finalu?',
       'Poredaj četiri prvaka natjecanja, ili četiri dobitnika pojedinačne nagrade (Zlatna lopta, Zlatna kopačka), kronološkim redoslijedom (od najranijeg).',
     ],
   },
@@ -229,6 +235,28 @@ const pools: QuizPool[] = [
     seed: 'pick:world-cup:rivalry',
   },
   {
+    questions: nearlyChampionQuestions(
+      buildRunnerUpsWithoutTitle(worldCup.editions),
+      worldCup.champions,
+      WORLD_CUP_NAME,
+      'world-cup',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:nearly-champion',
+  },
+  {
+    questions: nearlyFinalistQuestions(
+      buildNearlyFinalists(worldCup.editions),
+      [...worldCup.champions, ...buildRunnerUpsWithoutTitle(worldCup.editions)],
+      WORLD_CUP_NAME,
+      'world-cup',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:nearly-finalist',
+  },
+  {
     questions: yearByWinnerQuestions(worldCup.editions, WORLD_CUP_NAME, 'world-cup', 'hr', 'team'),
     take: 1,
     seed: 'pick:world-cup:year-by-winner',
@@ -277,6 +305,28 @@ const pools: QuizPool[] = [
     questions: mostFrequentRivalryQuestion(rivalriesFor(EURO_NAME, euro.editions), EURO_NAME, 'euro', 'hr'),
     take: 1,
     seed: 'pick:euro:rivalry',
+  },
+  {
+    questions: nearlyChampionQuestions(
+      buildRunnerUpsWithoutTitle(euro.editions),
+      euro.champions,
+      EURO_NAME,
+      'euro',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:euro:nearly-champion',
+  },
+  {
+    questions: nearlyFinalistQuestions(
+      buildNearlyFinalists(euro.editions),
+      [...euro.champions, ...buildRunnerUpsWithoutTitle(euro.editions)],
+      EURO_NAME,
+      'euro',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:euro:nearly-finalist',
   },
   {
     questions: yearByWinnerQuestions(euro.editions, EURO_NAME, 'euro', 'hr', 'team'),
@@ -350,6 +400,28 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:copa-america:rivalry',
+  },
+  {
+    questions: nearlyChampionQuestions(
+      buildRunnerUpsWithoutTitle(copaAmerica.editions),
+      copaAmerica.champions,
+      COPA_AMERICA_NAME,
+      'copa-america',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:nearly-champion',
+  },
+  {
+    questions: nearlyFinalistQuestions(
+      buildNearlyFinalists(copaAmerica.editions),
+      [...copaAmerica.champions, ...buildRunnerUpsWithoutTitle(copaAmerica.editions)],
+      COPA_AMERICA_NAME,
+      'copa-america',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:nearly-finalist',
   },
   {
     questions: yearByWinnerQuestions(copaAmerica.editions, COPA_AMERICA_NAME, 'copa-america', 'hr', 'team'),
@@ -433,6 +505,28 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:nations-league:rivalry',
+  },
+  {
+    questions: nearlyChampionQuestions(
+      buildRunnerUpsWithoutTitle(nationsLeague.editions),
+      nationsLeague.champions,
+      NATIONS_LEAGUE_NAME,
+      'nations-league',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:nearly-champion',
+  },
+  {
+    questions: nearlyFinalistQuestions(
+      buildNearlyFinalists(nationsLeague.editions),
+      [...nationsLeague.champions, ...buildRunnerUpsWithoutTitle(nationsLeague.editions)],
+      NATIONS_LEAGUE_NAME,
+      'nations-league',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:nearly-finalist',
   },
   {
     questions: yearByWinnerQuestions(nationsLeague.editions, NATIONS_LEAGUE_NAME, 'nations-league', 'hr', 'team'),
