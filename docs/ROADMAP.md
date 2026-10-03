@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (219 intensive runs as of 2026-10-03) lives
+verification sweep and decision (220 intensive runs as of 2026-10-03) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog, not the log of what already shipped.
 
@@ -44,7 +44,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-nineteenth run (2026-10-03): 969/969 unit tests,
+As of the two-hundred-and-twentieth run (2026-10-03): 969/969 unit tests,
 `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.53%/98.78%
 coverage, and the same two standing `knip` false positives as ever (`scripts/
 test-preview-server.mjs`, used only as a Playwright `webServer.command`,
@@ -170,6 +170,81 @@ quiz. Genuinely none left untried now. The same environment-blocked/
 human-sign-off open backlog items remain (see "Open backlog" below).
 Otherwise, returning to the two-hundred-and-eleventh run's own suggestion of
 a fresh accessibility or performance angle remains the next open thread.
+
+**Two-hundred-and-twentieth run:** the two-hundred-and-nineteenth run's own
+closing note said the quiz-question-type vein was genuinely exhausted and
+pointed at "the two-hundred-and-eleventh run's own suggestion of a fresh
+accessibility or performance angle" as the next open thread. Took that up:
+audited WCAG 2.2 AA 2.4.11 "Focus Not Obscured (Minimum)" - a keyboard-
+focused element must never end up entirely hidden behind author content such
+as a sticky header. Confirmed genuinely untested first, not assumed:
+installed `axe-core`'s own `wcag22aa` tag ships only one rule
+(`target-size`, already documented in `docs/PROJECT_STATUS.md`'s "Known
+caveats"), and `grep -rn "Obscured\|2.4.11"` across `tests/`/`docs/` turned
+up nothing before this run.
+
+This site has three distinct sticky-overlay contexts a focused element could
+end up behind: the site's own sticky nav header (`Nav.astro`'s
+`.site-header`), `/quiz`'s second sticky score bar stacked below it
+(`.quiz__score`), and `TournamentTable.astro`'s own inner sticky column
+header (`.t-wrap thead th`, fixed for *programmatic* scrolling by an earlier
+run - see `tests/e2e/sticky-table-header.spec.ts`). All three already carry
+`scroll-padding-top` engineering from earlier runs (`global.css`'s own rule,
+`quiz.astro`'s `calc(var(--site-header-height) + var(--quiz-score-height))`
+override) - but every one of those was only ever proven against a
+*programmatic* scroll (`scrollIntoView`/`window.scrollTo`). None had been
+proven against the browser's own focus-driven auto-scroll a real Tab
+key-press triggers, which is what a keyboard user actually experiences and
+is exactly what 2.4.11 is about.
+
+Verified by hand first: a throwaway Tab-and-measure script against the real
+built/served site (`pnpm build && astro preview`), walking focus through
+each of the three contexts and comparing the focused element's own
+`getBoundingClientRect()` against the relevant sticky element's, after
+letting the browser's own focus-scroll settle. All three came back clean -
+no genuine violation found. One measurement bug surfaced and got fixed
+*during* that hand-verification, before trusting the result: the
+focused-vs-obscurer overlap check needs to exclude elements that are
+themselves descendants of the obscuring container (the header's own brand
+link trivially reads as "fully covered" by `.site-header` otherwise, since
+it is a child of it, not content scrolling underneath it) - fixed with an
+explicit `obscurer.contains(el)` guard before it was ever asserted on.
+
+Shipped the clean result as a permanent regression suite rather than a
+one-off verification note, the same way `sticky-table-header.spec.ts` and
+every `accessibility-*-states.spec.ts` file already does for its own gap:
+`tests/e2e/accessibility-focus-not-obscured.spec.ts`, three tests - tabbing
+through the World Cup table's own `.t-wrap` (year links and story-reveal
+`<summary>` toggles against its sticky column header), tabbing through
+`/quiz` with both sticky layers actually engaged (scrolled down first, so
+stickiness has kicked in - the state a reader answering question 5 or 10 is
+really in), and tabbing through `/records` against the site header alone.
+Each test sanity-checks it actually walked a real minimum count of focusable
+elements, so a future regression that silently stops finding any focusable
+row can't pass vacuously.
+
+**Verification:** test-only change, no production code or content edited -
+`pnpm lint` (239 files, 0 errors/0 warnings/0 hints), `pnpm test` (969/969,
+unchanged), `pnpm build` (711 pages, unchanged). The new spec itself run
+three times in a row via `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+(stable, not flaky) - all three tests passed every time. Did not re-run the
+full cold-start `pnpm test:e2e` suite or any `check:*` script - nothing this
+run touched could affect either (no markup, behavior, or content changed,
+only new test coverage added). The two-hundred-and-fourth run's own full
+cold-start `pnpm test:e2e` (1042/1042) plus the five manual browser sweeps
+remain the standing baseline for everything else.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items remain (see "Open backlog" below). The two-hundred-and-
+eleventh run's own "fresh accessibility or performance angle" pointer is now
+closed for this cycle - the novel axis it pointed at has been explored and
+found already-compliant (three earlier runs' own `scroll-padding-top`/sticky
+fixes held up under a keyboard-focus test they had never actually been
+proven against). A performance angle specifically (not yet tried this way -
+every `check:lighthouse`/`check:perf` run so far has been a full-site sweep
+against the *existing* implementation, never a profiling pass looking for a
+genuinely new optimization) remains open for a future run, as does a second
+independent content-verification pass over files already checked once.
 
 **Two-hundred-and-eighteenth run:** the two-hundred-and-fifteenth run's own
 closing note had flagged "Nearly champions" and "Nearly finalists" -

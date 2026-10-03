@@ -33716,3 +33716,113 @@ environment-blocked/human-sign-off open backlog items remain (see
 `docs/ROADMAP.md`'s "Open backlog"). Otherwise, returning to the
 two-hundred-and-eleventh run's own suggestion of a fresh accessibility or
 performance angle remains the next open thread.
+
+### New regression suite for WCAG 2.2 AA 2.4.11 "Focus Not Obscured (Minimum)" across all three sticky-overlay contexts - closed clean, no violation found (two-hundred-and-twentieth intensive run, 2026-10-03)
+
+Picked up the two-hundred-and-nineteenth run's own closing note: with the
+quiz-question-type vein genuinely exhausted, the next open thread was "the
+two-hundred-and-eleventh run's own suggestion of a fresh accessibility or
+performance angle". Chose accessibility, and specifically WCAG 2.2 AA 2.4.11
+"Focus Not Obscured (Minimum)" - a keyboard-focused element must never end
+up entirely hidden behind author-created content such as a sticky header.
+Confirmed this was genuinely untested before starting, not assumed:
+installed `axe-core`'s own `wcag22aa` tag currently ships only one rule
+(`target-size` - already documented in this file's "Known caveats" list),
+and `grep -rn "Obscured\|2.4.11"` across `tests/`/`docs/` turned up nothing
+anywhere on the site before this run.
+
+This site has exactly three distinct sticky-overlay contexts where a
+focused element could end up hidden: the site's own sticky nav header
+(`Nav.astro`'s `.site-header`, present on every page), `/quiz`'s second
+sticky score bar stacked directly below it (`.quiz__score`, see the
+2026-09-xx "sticky score bar" work referenced in its own file comment), and
+`TournamentTable.astro`'s own inner sticky column header (`.t-wrap thead
+th`, fixed for *programmatic* scrolling by an earlier run - see this file's
+own "sticky column header" entry and `tests/e2e/sticky-table-header.spec.ts`,
+which guards it). All three already carry `scroll-padding-top` engineering
+from earlier runs: `global.css`'s own `html { scroll-padding-top:
+var(--site-header-height) }` rule, and `quiz.astro`/`hr/quiz.astro`'s own
+`calc(var(--site-header-height, 3.6rem) + var(--quiz-score-height, 4.5rem))`
+override for the second sticky layer. Every one of those fixes, though, had
+only ever been proven against a *programmatic* scroll
+(`scrollIntoView()`/`window.scrollTo()` - see `sticky-table-header.spec.ts`'s
+own three tests, all driven that way). None had been proven against the
+browser's own focus-driven auto-scroll a real Tab key-press triggers, which
+is what a keyboard user actually experiences and is exactly what 2.4.11
+measures - a real, previously-unexercised gap between "the CSS fix exists"
+and "the fix actually protects a keyboard user," not a repeat of prior
+coverage.
+
+Verified by hand first, against the real built/served site (`pnpm build`
+plus `astro preview`), with a throwaway Node+Playwright script rather than
+assuming anything from reading the CSS: focused each `.t-wrap`, each
+`.quiz__score`-guarded page state, and ordinary page content under
+`.site-header` alone, pressed Tab repeatedly, and after each press (with a
+short settle delay for the browser's own scroll-into-view animation)
+compared `document.activeElement`'s `getBoundingClientRect()` against the
+relevant sticky element's own rect. All three contexts came back clean on
+the first honest measurement - no genuine 2.4.11 violation anywhere on the
+site. One measurement bug surfaced and got fixed *during* that
+hand-verification, before trusting any result: the very first run flagged
+the header's own brand link ("⚽Football Reference") as "fully hidden
+under the sticky site header" - a false positive, since checking a focused
+element against an ancestor it is itself a *child* of is nonsensical (a
+sticky element never hides its own descendants from itself, only content
+that scrolls underneath it from elsewhere on the page). Fixed with an
+explicit `obscurer.contains(el)` guard before drawing any conclusion from
+the script's output.
+
+Shipped the clean, hand-verified result as a permanent regression suite
+rather than a one-off verification note in this file alone - the same
+"close the gap with a real test, not just a sentence here" pattern
+`sticky-table-header.spec.ts` and every `accessibility-*-states.spec.ts`
+file already follows for their own gaps. New file:
+`tests/e2e/accessibility-focus-not-obscured.spec.ts`, three tests:
+
+1. Tabbing through the World Cup table's own `.t-wrap` (23 editions, deep
+   enough to actually need its own internal scrollbar per
+   `sticky-table-header.spec.ts`'s own confirmation) - walks both the year
+   links and the story-reveal `<summary>` toggles against the table's own
+   sticky column header.
+2. Tabbing through `/quiz` with both sticky layers actually engaged -
+   scrolled down first (`window.scrollTo(..., 500)`), the state a reader
+   answering question 5 or 10 is really in, not the untouched top-of-page
+   state every other quiz test starts from - against `.quiz__score`.
+3. Tabbing through `/records` (a long, link-heavy page) against the site
+   header alone, with no second sticky layer.
+
+Each test sanity-checks it actually walked a real minimum count of
+focusable elements (`expect(checked).toBeGreaterThan(...)` style, the same
+"don't let this pass vacuously" pattern `accessibility-table-states.spec.ts`
+already uses for its own no-results-combo lookup) - a future regression that
+silently stops finding any focusable row under test can't report a false
+pass.
+
+**Verification:** test-only change - no production code, markup or content
+edited, so the usual full content/build-check battery wasn't needed and
+wasn't re-run in full; what actually could be affected was checked directly.
+`pnpm lint` (239 files, 0 errors/0 warnings/0 hints - one more file than the
+two-hundred-and-nineteenth run's 238, the new `.spec.ts` file itself; astro
+check also type-checks test files under `tests/`), `pnpm test` (969/969,
+unchanged - no unit-level code touched), `pnpm build` (711 pages,
+unchanged). The new spec itself was run three times in a row via
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` to rule out flakiness from its
+own settle-delay timing - all three tests passed all three times, no
+flakes. Did not re-run the full cold-start `pnpm test:e2e` suite, the five
+manual browser sweeps, or any `check:*` script - nothing this run touched
+could plausibly affect any of them. The two-hundred-and-fourth run's own
+full cold-start `pnpm test:e2e` (1042/1042) plus the five manual browser
+sweeps remain the standing baseline for everything else.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off open
+backlog items remain (see `docs/ROADMAP.md`'s "Open backlog"). The
+two-hundred-and-eleventh run's own "fresh accessibility or performance
+angle" pointer is now closed for this cycle - the novel axis it pointed at
+has been explored end-to-end and found already-compliant, with a permanent
+test now guarding it against regression. A performance angle specifically
+remains genuinely untried in the sense that pointer meant: every
+`check:lighthouse`/`check:perf` run so far has re-confirmed the *existing*
+implementation stays perfect, never gone looking for a new optimization
+from scratch. A second independent content-verification pass over files
+already checked once (the two-hundred-and-eleventh run's own other named
+option) also remains open.
