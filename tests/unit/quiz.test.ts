@@ -3,6 +3,7 @@ import {
   buildBiggestFinalMargins,
   buildChampionsSummary,
   buildEditions,
+  buildHomeSoilTitles,
   buildHostsSummary,
   buildLongestStreaks,
   buildLongestTitleGaps,
@@ -661,6 +662,116 @@ describe('mostTitlesQuestion', () => {
       'host',
     );
     expect(teamQuestions[0].id).not.toBe(hostQuestions[0].id);
+  });
+
+  it('asks "which team has won the most ... on home soil" for subject "home-soil", answered from buildHomeSoilTitles()', () => {
+    const homeSoilTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1917', 'Uruguay', 'Uruguay'],
+        ['1923', 'Uruguay', 'Uruguay'],
+        ['1924', 'Uruguay', 'Uruguay'],
+        ['1942', 'Uruguay', 'Uruguay'],
+        ['1921', 'Argentina', 'Argentina'],
+        ['1925', 'Argentina', 'Argentina'],
+        ['1929', 'Argentina', 'Argentina'],
+        ['1919', 'Brazil', 'Brazil'],
+        ['1922', 'Brazil', 'Brazil'],
+      ],
+    };
+    const homeSoilSummary = buildHomeSoilTitles(buildEditions(homeSoilTable));
+    const questions = mostTitlesQuestion(
+      homeSoilSummary,
+      'Copa América',
+      'copa-america',
+      'home-soil',
+    );
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe('Which team has won the most Copa América titles on home soil?');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('Uruguay');
+  });
+
+  it('builds a Croatian "most home-soil titles" prompt for subject "home-soil"', () => {
+    const homeSoilTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1917', 'Uruguay', 'Uruguay'],
+        ['1923', 'Uruguay', 'Uruguay'],
+        ['1924', 'Uruguay', 'Uruguay'],
+        ['1942', 'Uruguay', 'Uruguay'],
+        ['1921', 'Argentina', 'Argentina'],
+        ['1925', 'Argentina', 'Argentina'],
+        ['1929', 'Argentina', 'Argentina'],
+        ['1919', 'Brazil', 'Brazil'],
+        ['1922', 'Brazil', 'Brazil'],
+      ],
+    };
+    const homeSoilSummary = buildHomeSoilTitles(buildEditions(homeSoilTable));
+    const questions = mostTitlesQuestion(
+      homeSoilSummary,
+      'Copa América',
+      'copa-america',
+      'home-soil',
+      'hr',
+    );
+    expect(questions[0].prompt).toBe(
+      'Koja reprezentacija ima najviše naslova osvojenih na domaćem terenu na natjecanju Copa América?',
+    );
+  });
+
+  it('keeps "home-soil" ids distinct from "team" and "host" so all three can coexist for the same competition', () => {
+    const teamQuestions = mostTitlesQuestion(clearSummary, 'FIFA World Cup', 'world-cup', 'team');
+    const homeSoilTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1917', 'Uruguay', 'Uruguay'],
+        ['1923', 'Uruguay', 'Uruguay'],
+        ['1924', 'Uruguay', 'Uruguay'],
+        ['1942', 'Uruguay', 'Uruguay'],
+        ['1921', 'Argentina', 'Argentina'],
+        ['1925', 'Argentina', 'Argentina'],
+        ['1929', 'Argentina', 'Argentina'],
+        ['1919', 'Brazil', 'Brazil'],
+        ['1922', 'Brazil', 'Brazil'],
+      ],
+    };
+    const homeSoilQuestions = mostTitlesQuestion(
+      buildHomeSoilTitles(buildEditions(homeSoilTable)),
+      'FIFA World Cup',
+      'world-cup',
+      'home-soil',
+    );
+    expect(teamQuestions[0].id).not.toBe(homeSoilQuestions[0].id);
+  });
+
+  it('returns no question when there is a tie for first place among home-soil winners', () => {
+    const tiedHomeSoilTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1930', 'Uruguay', 'Uruguay'],
+        ['1934', 'Italy', 'Italy'],
+        ['1966', 'England', 'England'],
+      ],
+    };
+    const tiedHomeSoilSummary = buildHomeSoilTitles(buildEditions(tiedHomeSoilTable));
+    expect(
+      mostTitlesQuestion(tiedHomeSoilSummary, 'Test Cup', 'test', 'home-soil'),
+    ).toHaveLength(0);
+  });
+
+  it('returns no question when fewer than 3 distinct home-soil winners exist', () => {
+    const sparseHomeSoilTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1930', 'Uruguay', 'Uruguay'],
+        ['1934', 'Uruguay', 'Uruguay'],
+        ['1966', 'England', 'England'],
+      ],
+    };
+    const sparseHomeSoilSummary = buildHomeSoilTitles(buildEditions(sparseHomeSoilTable));
+    expect(
+      mostTitlesQuestion(sparseHomeSoilSummary, 'Test Cup', 'test', 'home-soil'),
+    ).toHaveLength(0);
   });
 });
 

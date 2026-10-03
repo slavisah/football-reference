@@ -20,6 +20,7 @@ import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import { disambiguateLabels } from '../../lib/sources';
 import {
   buildBiggestFinalMargins,
+  buildHomeSoilTitles,
   buildHostsSummary,
   buildLongestStreaks,
   buildLongestTitleGaps,
@@ -88,6 +89,7 @@ const notes: NoteSection[] = [
       'Koje je godine dana reprezentacija osvojila natjecanje, ili dani igrač osvojio Zlatnu loptu? (pita se samo o jednokratnim prvacima/dobitnicima)',
       'Koja reprezentacija ili igrač ima najviše naslova/nagrada na natjecanju?',
       'Koja je država bila domaćin najviše izdanja danog natjecanja?',
+      'Koja reprezentacija ima najviše naslova osvojenih na domaćem terenu na danom natjecanju? (pita se samo kad postoji jedan jasan rekord, a ne izjednačenost za prvo mjesto)',
       'Koje je godine finale danog natjecanja završilo najvećom pobjedom? (pita se samo kad postoji jedan jasan rekord, a ne izjednačenost za prvo mjesto)',
       'Koja reprezentacija ili igrač ima najdulji niz uzastopnih naslova/nagrada na natjecanju? (pita se samo kad postoji jedan jasan rekord, a ne izjednačenost za prvo mjesto)',
       'Koja je reprezentacija ili igrač najdulje čekao/la na sljedeći naslov/nagradu na natjecanju? (pita se samo kad postoji jedan jasan rekord, a ne izjednačenost za prvo mjesto)',
@@ -193,6 +195,17 @@ const pools: QuizPool[] = [
     seed: 'pick:world-cup:most-hosted',
   },
   {
+    questions: mostTitlesQuestion(
+      buildHomeSoilTitles(worldCup.editions),
+      WORLD_CUP_NAME,
+      'world-cup',
+      'home-soil',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:home-soil',
+  },
+  {
     questions: biggestFinalMarginQuestion(
       buildBiggestFinalMargins(worldCup.editions),
       WORLD_CUP_NAME,
@@ -287,6 +300,17 @@ const pools: QuizPool[] = [
     seed: 'pick:euro:most-hosted',
   },
   {
+    questions: mostTitlesQuestion(
+      buildHomeSoilTitles(euro.editions),
+      EURO_NAME,
+      'euro',
+      'home-soil',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:euro:home-soil',
+  },
+  {
     questions: biggestFinalMarginQuestion(buildBiggestFinalMargins(euro.editions), EURO_NAME, 'euro', 'hr'),
     take: 1,
     seed: 'pick:euro:biggest-margin',
@@ -368,6 +392,17 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:copa-america:most-hosted',
+  },
+  {
+    questions: mostTitlesQuestion(
+      buildHomeSoilTitles(copaAmerica.editions),
+      COPA_AMERICA_NAME,
+      'copa-america',
+      'home-soil',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:home-soil',
   },
   {
     questions: longestStreakQuestion(
@@ -463,6 +498,17 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:nations-league:most-hosted',
+  },
+  {
+    questions: mostTitlesQuestion(
+      buildHomeSoilTitles(nationsLeague.editions),
+      NATIONS_LEAGUE_NAME,
+      'nations-league',
+      'home-soil',
+      'hr',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:home-soil',
   },
   {
     questions: biggestFinalMarginQuestion(

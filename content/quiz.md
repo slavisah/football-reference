@@ -34,6 +34,9 @@ the quiz stays in sync as new editions are added.
 - Which team or player has won the most titles/awards in a competition
   overall?
 - Which country has hosted the most editions of a given tournament overall?
+- Which team has won the most titles on home soil in a given tournament?
+  (only asked when there's a single, unambiguous leader - not a tie for
+  first)
 - In which year did a given tournament's final have the biggest winning
   margin? (only asked when there's a single, unambiguous biggest margin -
   not a tie for first)

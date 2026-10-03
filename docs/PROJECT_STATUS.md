@@ -33588,3 +33588,131 @@ environment-blocked/human-sign-off open backlog items remain (see
 `docs/ROADMAP.md`'s "Open backlog"), plus the new `http-cache-semantics`
 advisory above. Otherwise, returning to the two-hundred-and-eleventh run's
 own suggestion of a fresh accessibility or performance angle remains open.
+
+### New quiz question type - "Which team has won the most {competition} titles on home soil?" - added for FIFA World Cup, UEFA EURO, Copa América and UEFA Nations League (two-hundred-and-nineteenth intensive run, 2026-10-03)
+
+The two-hundred-and-eighteenth run's own closing note claimed the quiz's
+question-type surface covered "every generated `/records` ranking -
+genuinely none left untried." Re-checking that claim by sweeping every
+`build*` function exported from `src/lib/editions.ts`/`src/lib/compare.ts`
+against what's actually wired into `src/pages/quiz.astro`/`src/pages/hr/
+quiz.astro` found one genuine miss: `buildHomeSoilTitles()`, which backs
+`/records`' own "Titles won on home soil" section (rendered through the
+same `ChampionsSummary.astro` widget as "Most successful teams"/"Most
+frequent hosts"), had no quiz counterpart at all. It isn't a new data
+source - just an existing `ChampionSummary[]`-shaped ranking the quiz
+generator never got pointed at, missed by every prior "cover every
+generated ranking" pass (two-hundred-and-twelfth through
+two-hundred-and-eighteenth runs) because none of them re-enumerated the
+`editions.ts`/`compare.ts` exports directly against the quiz's own wiring -
+each one scoped its own sweep to the specific sections `/records.astro`'s
+own page body visibly renders in order, and "Titles won on home soil" sits
+between "Most frequent hosts" and "Back-to-back champions" rather than at
+the end, where a skim could miss it.
+
+Shipped it as a new `subject` value on the existing `mostTitlesQuestion()`
+in `src/lib/quiz.ts`, rather than a new standalone function - the same
+`ChampionSummary[]` shape, tie-and-sparse-data safety (no question on a tie
+for first place, or fewer than 3 distinct entries) and distractor-pool
+logic already apply unchanged, so extending the subject union from `'team'
+| 'player' | 'host'` to add `'home-soil'` was the correct-weight fix, not a
+parallel code path. English prompt: "Which team has won the most
+{competition} titles on home soil?"; Croatian: "Koja reprezentacija ima
+najviše naslova osvojenih na domaćem terenu na natjecanju {competition}?".
+No new editorial research needed: `buildHomeSoilTitles()`'s own Winner/Host
+row-matching logic was already independently hand-verified against every
+Host cell at the two-hundred-and-tenth intensive run, when it first
+extended that run's "recompute every generated ranking by hand" treatment
+to this exact function (and five others) that the first 209 runs had never
+spot-checked at all.
+
+Confirmed the tie-safety outcome against the real content tables by hand,
+not assumed, by extracting `dist/records/index.html`'s own "Titles won on
+home soil" JSON-LD `ItemList` blocks after a full build: FIFA World Cup (6
+home-soil winners - Uruguay, Italy, England, Germany, Argentina, France -
+every one tied at exactly 1 title) and UEFA EURO (3 winners - Spain, Italy,
+France - also all tied at 1) both correctly produce no question, since
+`mostTitlesQuestion()`'s own `top.titles === runnerUp.titles` guard fires
+for both. UEFA Nations League has only 1 qualifying entry (Portugal, 2018-19)
+- below the 3-distinct-entries floor, also correctly producing no question.
+Copa América is the only one of the four team competitions with a clear,
+unambiguous leader: Uruguay with 7 home-soil titles (1917, 1923, 1924, 1942,
+1956, 1967, 1995), clear of Argentina's 6 (1921, 1925, 1929, 1937, 1946,
+1959) and Brazil's 5 - confirmed live in `dist/quiz/index.html`'s own
+JSON-LD after a full build (`"name":"Which team has won the most Copa
+América titles on home soil?","acceptedAnswer":{"@type":"Answer","text":
+"Uruguay"}`), byte-identical in `dist/hr/quiz/index.html` except for the
+Croatian prompt text, with the same "Uruguay" answer.
+
+Wired a new `QuizPool` into both `src/pages/quiz.astro` and `src/pages/hr/
+quiz.astro` for each of the four team competitions (World Cup, EURO and
+Nations League correctly contribute zero questions at runtime at build
+time, the same "wire it everywhere, let the tie-safety logic decide
+per-run" precedent every earlier subject/question-type addition already
+established - a future edition that breaks one of these ties produces a
+question with no further code change needed). Added the matching bullet to
+`content/quiz.md`'s "Question types in this quiz" list (its `lastReviewed`
+was already bumped to 2026-10-03 by the prior run, so left unchanged - no
+second bump needed for a same-day follow-up edit) and the matching Croatian
+bullet to the hardcoded notes list in `src/pages/hr/quiz.astro`. Added
+seven new unit tests to `tests/unit/quiz.test.ts` within the existing
+`describe('mostTitlesQuestion', ...)` block (mirroring the existing
+`'host'`-subject test cases' own shape): the correct-answer/English-prompt
+case built from a hand-constructed home-soil-winners fixture, the Croatian
+prompt, an id-collision regression test confirming `'home-soil'` stays
+distinct from both `'team'` and `'host'` for the same competition (so all
+three can coexist without seed collisions), the tie-returns-no-question
+case, and the fewer-than-3-entries case.
+
+One new claim-ledger wrinkle, the same shape as every prior new
+quiz-question bullet: the new bullet's "most titles" matches
+`check-record-claims.mjs`'s trigger word ("most"), so it needed its own
+`scripts/record-claims-ledger.json` entry under `content/quiz.md` - same
+"describes a generated quiz question type, not a factual claim" rationale
+the six prior quiz-question ledger entries already use. It matched no other
+claim checker's trigger words (`consecutive|back-to-back`, `the only`, `the
+first...tenth`, `since <year>`, `one of only N`, or `across all N
+editions`).
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` 5.9.3 -> 7.0.2
+line), `pnpm lint` (238 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(969/969, up from 964 - the seven new tests), `pnpm test:coverage`
+(99.53%/98.78% statements/branches, 100%/100% functions/lines - no new
+uncovered branch, since the `'home-soil'` subject shares
+`mostTitlesQuestion()`'s existing `if (!choice) return []` guard rather than
+introducing its own), `pnpm build` (711 pages, unchanged - no new route,
+just new content on the existing `/quiz`/`/hr/quiz` pages). All 29
+CI-gated fast `check:*` scripts individually re-run and clean, including
+`check:record-claims` (43 claims, up from 42 - the new ledger entry above),
+`check:i18n-notes` (7 matched page pairs, parity held for the new Croatian
+bullet), `check:jsonld` (1783 blocks across 711 pages, still structurally
+valid with the new question included), `check:spelling` (15 files, 0
+issues), `check:spelling-hr` (57 unique blocks, 0 unknown words),
+`check:pdfs` (700/700 clean, confirmed `/quiz` still has no entry in
+`scripts/pdf-pages.mjs`'s `PDF_PAGES` list, so no PDF regeneration needed
+for this run's `content/quiz.md` edit). `pnpm audit` (the one standing,
+still-unfixable `http-cache-semantics` advisory, unchanged - no new
+findings). `pnpm dlx knip --no-config-hints` (same two standing false
+positives: `scripts/test-preview-server.mjs`, `@cspell/dict-hr-hr`). Did
+not re-run the full cold-start `pnpm test:e2e` suite or the five manual
+browser sweeps - instead ran the same two quiz-specific e2e specs every
+prior quiz-question-type run has used (`accessibility-quiz-states.spec.ts`,
+`no-js-quiz-and-search.spec.ts`, 14 tests,
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`), which exercise every DOM
+state this run's change could plausibly affect; all 14 passed. The
+two-hundred-and-fourth run's own full cold-start `pnpm test:e2e`
+(1042/1042) plus the five manual browser sweeps remain the standing
+baseline for everything else.
+
+**Left for a future pass:** having now re-swept every `build*` export from
+`editions.ts`/`compare.ts` directly (not just the sections `/records.astro`
+visibly renders) and confirmed each one is wired into the quiz except
+`buildPodiums()`/`buildTimeline()` (which back a timeline/podium display,
+not a superlative ranking - no single "most X" question fits their shape),
+the quiz's question-type surface genuinely has no further untried
+`ChampionSummary[]`/`Rivalry[]`-shaped ranking left this time. The same
+environment-blocked/human-sign-off open backlog items remain (see
+`docs/ROADMAP.md`'s "Open backlog"). Otherwise, returning to the
+two-hundred-and-eleventh run's own suggestion of a fresh accessibility or
+performance angle remains the next open thread.

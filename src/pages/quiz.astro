@@ -9,6 +9,7 @@ import { loadCompetition, loadPageMeta } from '../lib/competition';
 import { disambiguateLabels } from '../lib/sources';
 import {
   buildBiggestFinalMargins,
+  buildHomeSoilTitles,
   buildHostsSummary,
   buildLongestStreaks,
   buildLongestTitleGaps,
@@ -131,6 +132,16 @@ const pools: QuizPool[] = [
     seed: 'pick:world-cup:most-hosted',
   },
   {
+    questions: mostTitlesQuestion(
+      buildHomeSoilTitles(worldCup.editions),
+      'FIFA World Cup',
+      'world-cup',
+      'home-soil',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:home-soil',
+  },
+  {
     questions: biggestFinalMarginQuestion(
       buildBiggestFinalMargins(worldCup.editions),
       'FIFA World Cup',
@@ -209,6 +220,16 @@ const pools: QuizPool[] = [
     seed: 'pick:euro:most-hosted',
   },
   {
+    questions: mostTitlesQuestion(
+      buildHomeSoilTitles(euro.editions),
+      'UEFA EURO',
+      'euro',
+      'home-soil',
+    ),
+    take: 1,
+    seed: 'pick:euro:home-soil',
+  },
+  {
     questions: biggestFinalMarginQuestion(buildBiggestFinalMargins(euro.editions), 'UEFA EURO', 'euro'),
     take: 1,
     seed: 'pick:euro:biggest-margin',
@@ -282,6 +303,16 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:copa-america:most-hosted',
+  },
+  {
+    questions: mostTitlesQuestion(
+      buildHomeSoilTitles(copaAmerica.editions),
+      'Copa América',
+      'copa-america',
+      'home-soil',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:home-soil',
   },
   {
     questions: longestStreakQuestion(buildLongestStreaks(copaAmerica.editions), 'Copa América', 'copa-america'),
@@ -360,6 +391,16 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:nations-league:most-hosted',
+  },
+  {
+    questions: mostTitlesQuestion(
+      buildHomeSoilTitles(nationsLeague.editions),
+      'UEFA Nations League',
+      'nations-league',
+      'home-soil',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:home-soil',
   },
   {
     questions: biggestFinalMarginQuestion(
