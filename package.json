@@ -20,6 +20,7 @@
     "check:pdfs": "node scripts/check-pdf-freshness.mjs",
     "check:pdf-outline": "node scripts/check-pdf-outline.mjs",
     "check:perf": "node scripts/check-page-weight.mjs",
+    "check:records-consistency": "node scripts/check-records-against-source.mjs",
     "check:links": "node scripts/check-internal-links.mjs",
     "check:sitemap": "node scripts/check-sitemap.mjs",
     "check:precache": "node scripts/check-precache.mjs",

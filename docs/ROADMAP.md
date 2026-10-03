@@ -98,12 +98,23 @@ least once (`fifa-world-cup.md`/`uefa-euro.md` in the two-hundred-and-eighth
 run, `ballon-dor.md`/`copa-america.md` in the two-hundred-and-fifth through
 -seventh runs, `golden-boot.md`/`uefa-nations-league.md` in the
 two-hundred-and-twenty-second run) - full coverage reached, no bugs found in
-the last two files. A performance angle - profiling for a genuinely new
-optimization, not re-confirming the existing implementation's
-`check:lighthouse`/`check:perf` scores - remains the one open quality-angle
-thread for a future run; see "Open backlog" and "Ideas not yet scoped" below
-for everything else still open. For the full run-by-run history behind all
-of this, see `docs/PROJECT_STATUS.md`.
+the last two files. That same verification effort has now also been
+extended past hand-written prose to a generated/derived page for the first
+time: `/records`' 40 build-time-computed rankings are independently
+recomputed from `content/*.md` and cross-checked against the page's own
+JSON-LD by the new `scripts/check-records-against-source.mjs`
+(two-hundred-and-twenty-third run), wired into CI as a permanent PR gate -
+zero discrepancies found. `/compare`, `/compare-players`, `/teams/<slug>`
+and `/players/<slug>` remain the still-untouched generated/derived pages for
+a future run to apply the same technique to. A performance angle -
+profiling for a genuinely new optimization, not re-confirming the existing
+implementation's `check:lighthouse`/`check:perf` scores - remains open; the
+two-hundred-and-twenty-third run looked again (bundle sizes already tiny
+with no web fonts/images, `check:lighthouse` already a perfect
+1.00/1.00/1.00/1.00, the team/player search index already fetched lazily on
+first focus) and found no further low-hanging fruit. See "Open backlog" and
+"Ideas not yet scoped" below for everything else still open. For the full
+run-by-run history behind all of this, see `docs/PROJECT_STATUS.md`.
 
 ## Open backlog
 
