@@ -33826,3 +33826,88 @@ implementation stays perfect, never gone looking for a new optimization
 from scratch. A second independent content-verification pass over files
 already checked once (the two-hundred-and-eleventh run's own other named
 option) also remains open.
+
+### `docs/ROADMAP.md` trimmed back to a current-state summary - the hundred-and-fifty-seventh run's own "kept short on purpose" policy had drifted back to 2,793 lines over the next 51 runs (two-hundred-and-twenty-first intensive run, 2026-10-03)
+
+With the quiz question-type vein exhausted (two-hundred-and-nineteenth run)
+and the accessibility angle closed clean (two-hundred-and-twentieth run),
+every item in `docs/ROADMAP.md`'s "Open backlog" still either
+environment-blocked or awaiting human sign-off, and the one item under
+"Ideas not yet scoped" still carrying the same fabrication risk that had
+kept it unscoped since the two-hundred-and-thirteenth run - this run took
+up the two-hundred-and-eleventh/two-hundred-and-twentieth runs' own other
+standing suggestion, "a second independent content-verification pass over
+files already checked once", but on `docs/ROADMAP.md` itself rather than
+`content/`: re-reading it end to end turned up a real, self-inflicted
+process bug, not a content error.
+
+`docs/ROADMAP.md` opens with its own stated purpose - "the short,
+current-state entry point for 'what's next' - kept short on purpose" - and
+a maintenance note from the hundred-and-fifty-seventh run (2026-09-20)
+describing exactly this failure mode once already: the file had grown to
+7,093 lines by letting every run append its own "what I did" paragraph
+under the "Status" heading instead of writing only to this file
+(`docs/PROJECT_STATUS.md`), where the append-only full history belongs. That
+note said it trimmed the file back down and asked future runs to close a
+backlog item "by deleting its bullet... instead of appending a 'closed'
+paragraph here."
+
+Checking the file's actual current length against that note's intent
+(rather than trusting the note was still being followed) showed it had
+drifted right back: 2,793 lines, with 51 separate bold "**Nth run:**"
+paragraphs under "Status" - one for every run from the hundred-and-seventieth
+through the two-hundred-and-twentieth - each narrating what that run did,
+in the same style the 2026-09-20 note had already flagged and removed once.
+Every one of those runs *did* also have its own proper entry in this file
+(that's how the 2026-09-20 trim was verified safe, and is cross-referenced
+by name in nearly every one of the 51 paragraphs being removed this time:
+"see `docs/PROJECT_STATUS.md`'s matching entry for full detail"), so the
+duplication was pure, harmless-looking accumulation each run - but 51 runs
+of it is exactly what made the file "increasingly expensive for every run
+to read before it can even start working" again, the precise cost the
+2026-09-20 note already named.
+
+Verified safe before deleting anything, the same way the 2026-09-20 trim
+documented its own verification: spot-checked five of the 51 run-labels
+spanning the full range (hundred-and-seventieth, hundred-and-eightieth,
+hundred-and-ninetieth, two-hundredth, two-hundred-and-tenth) against this
+file's own `### ` headings and confirmed each has an exact, matching entry
+with the same claims the `docs/ROADMAP.md` paragraph made about it. Removed
+all 51 run-paragraphs and replaced them with two short paragraphs: one
+unchanged "what's built" summary (already present, lightly re-verified
+against `docs/PROJECT_STATUS.md`'s own "Known caveats" section) and one new
+paragraph naming the two genuinely open threads next (a real performance-
+profiling pass, and a second content-verification pass) without narrating
+how each of the 51 runs got here. `docs/ROADMAP.md` is now 211 lines, down
+from 2,793; the "Open backlog" and "Ideas not yet scoped" sections
+themselves were left untouched - they were already correctly short, the
+bloat was entirely in "Status".
+
+Added a second, more concrete maintenance note (mirroring the
+hundred-and-fifty-seventh run's own note, which was evidently not enough on
+its own) spelling out exactly where a future run should write: a new `### `
+entry in this file for narrative, and nothing beyond a bullet-delete or an
+in-place summary edit in `docs/ROADMAP.md` itself. Whether that holds for
+another 50 runs is not something this run can guarantee, only flag plainly
+for whichever run next re-reads this file end to end.
+
+**Verification:** documentation-only change - no production code, content,
+or test touched, so the usual build/test battery doesn't apply to it
+directly. Confirmed `docs/ROADMAP.md` still reads coherently end to end
+after the edit (no dangling cross-reference to a removed run-paragraph left
+in the "Status" summary or the "Open backlog"/"Ideas not yet scoped"
+sections, which still reference specific run numbers for *their own* items,
+all of which remain accurate since those items themselves weren't touched).
+Ran `pnpm lint`/`pnpm test`/`pnpm build` anyway as a sanity check that
+nothing else was accidentally touched in the same working tree: all three
+clean and unchanged from the two-hundred-and-twentieth run's own counts
+(969/969 unit tests, 0 lint errors/warnings/hints, 711 pages).
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+`docs/ROADMAP.md` "Open backlog" items remain, unchanged by this run. The
+two genuinely open threads named in the trimmed summary stand: a real
+performance-profiling pass (not another `check:lighthouse` re-confirmation)
+and a second independent content-verification pass over `content/` files
+already checked once. Equally important going forward: the next several
+runs should actually follow the restated note above rather than letting
+`docs/ROADMAP.md` regrow a third time.
