@@ -33911,3 +33911,96 @@ and a second independent content-verification pass over `content/` files
 already checked once. Equally important going forward: the next several
 runs should actually follow the restated note above rather than letting
 `docs/ROADMAP.md` regrow a third time.
+
+### Second content-verification pass completes full `content/` coverage: `golden-boot.md` and `uefa-nations-league.md` hand-verified front-to-back - clean (two-hundred-and-twenty-second intensive run, 2026-10-03)
+
+Took up the two-hundred-and-eleventh/-twentieth/-twenty-first runs' own
+standing "second independent content-verification pass" thread, this time
+actually on `content/` rather than `docs/ROADMAP.md` (the
+two-hundred-and-twenty-first run's own target). The two-hundred-and-eighth
+run's front-to-back prose-vs-table read had covered `fifa-world-cup.md` and
+`uefa-euro.md`; the two-hundred-and-fifth through -seventh runs had each
+separately covered `ballon-dor.md` and `copa-america.md` while chasing
+specific bugs. That left exactly two of the six competition/award content
+files - `golden-boot.md` and `uefa-nations-league.md` - never read this
+same way. Read both end to end, checking every prose bullet against its
+own page's table(s) and, where a bullet names a fact that another page's
+table also carries, against that other file too.
+
+**`content/golden-boot.md` (109 lines):** checked every "World Cup
+notes"/"Silver and Bronze Boot"/"memorable moments" and "EURO" equivalent
+bullet against the two Winners tables. All consistent - the Mbappé
+2022/2026 consecutive-winner claim, the six-way 1962/1960 joint-winner
+counts, and every Silver/Bronze Boot year/goal figure all match their own
+table rows. One sentence read as a possible over-generalization on first
+pass - "before 2012 and from 2024 onward the award reverts to full joint
+winners" sounds, read in isolation, like it claims every pre-2012 EURO
+had a tied Golden Boot, when the table actually shows plenty of outright
+single winners in that span (1968, 1972, 1976, 1980, 1984, 1988, 1996,
+2004, 2008). Checked this against the fifty-fourth run's own
+`docs/PROJECT_STATUS.md` entry (which wrote this exact sentence) before
+treating it as a bug: that entry's own parenthetical - "2024's own six-way
+tie... confirms this" - shows the sentence is describing what happens
+*when* a tie occurs in that span (resolved as joint, never a ranked
+podium), not asserting every edition is tied. Read that way the sentence
+is accurate, just elliptical; left unchanged rather than "fixing" working,
+deliberately-reasoned prose on an ambiguous reading.
+
+**`content/uefa-nations-league.md` (77 lines):** checked the Finals table
+against every "Key facts"/"Final venues"/"Winning managers"/"Winning
+captains"/"Memorable moments" bullet. All consistent, including the host
+nation's Finals result in every "Final venues" entry matching the table's
+own "Finals host" column, and "Portugal became the first two-time champion
+in 2025" correctly accounting for France's 2021 and Spain's 2023 wins (one
+title each, so Portugal's second in 2025 is genuinely the first repeat).
+
+The one bullet worth tracing further: "**2023:** Luis de la Fuente (Spain)
+- the same season he took charge of Spain, before also winning EURO 2024
+and the 2026 World Cup with them" chains a claim across three separate
+content files. Cross-checked all three directly rather than taking the
+chain on faith: `content/uefa-euro.md` line 133 independently says "the
+same manager who went on to win the 2026 World Cup with Spain" for 2024,
+and `content/fifa-world-cup.md` line 200 independently confirms "Luis de
+la Fuente (Spain) - the oldest winning manager in World Cup history... and
+Spain's second title alongside 2010" for 2026. All three files agree with
+each other and with their own tables (Spain winner of EURO 2024 and the
+2026 World Cup, de la Fuente named manager in both) - no discrepancy.
+
+With this pass, every one of the six competition/award content files
+(`fifa-world-cup.md`, `uefa-euro.md`, `uefa-nations-league.md`,
+`copa-america.md`, `ballon-dor.md`, `golden-boot.md`) has now had this
+specific front-to-back prose-vs-table hand-verification applied at least
+once - closing out the "second content-verification pass" thread as
+*complete coverage*, not just "another file checked." `docs/ROADMAP.md`'s
+own "Status" prose updated in place (per its own maintenance-note
+instructions - an edit to the existing summary, not an appended
+paragraph) to reflect this and narrow the remaining open thread down to
+performance-profiling alone.
+
+**Verification:** no content or production code changed (this was a pure
+read-and-compare pass that found nothing to fix), so the usual
+content-edit battery (`pnpm build && pnpm build:pdfs`) wasn't needed. Ran
+the full fast standing health check anyway to confirm the working tree was
+otherwise untouched: `pnpm test` (969/969, unchanged), `pnpm lint` (239
+files, 0 errors/warnings/hints, unchanged), `pnpm build` (711 pages,
+unchanged), `pnpm check:links` (715 pages, no broken links), `pnpm
+check:perf` (`hr/records` still heaviest at 617.4 KB, within the 640 KB
+budget, unchanged) and all eight verification-ledger claim gates
+(`check:record-claims` 43, `check:superlative-claims` 24,
+`check:ordinal-claims` 91, `check:consecutive-claims` 23,
+`check:since-claims` 26, `check:one-of-only-claims` 2,
+`check:completeness-claims` 5, `check:award-tallies` 4 tally tables) -
+every one matches its existing ledger entry, consistent with no content
+having changed.
+
+**Left for a future pass:** the performance-profiling thread is now the
+sole genuinely open "quality angle" named in `docs/ROADMAP.md`'s "Status"
+summary - a real from-scratch optimization search (not another
+`check:lighthouse`/`check:perf` re-confirmation that the existing
+implementation stays within budget). A *third* content-verification pass
+re-reading files already checked twice would have steeply diminishing
+returns at this point; more valuable would be extending this same
+technique to a part of the site this pass didn't touch - the `/records`,
+`/compare`, `/compare-players`, `/teams/<slug>` and `/players/<slug>`
+generated/derived pages, which pull from these same content files but
+were out of scope for this run's file-by-file prose-vs-table method.

@@ -92,13 +92,18 @@ home-soil titles) - no further untried `/records` ranking remains as a
 quiz-question candidate. WCAG 2.2 AA 2.4.11 "Focus Not Obscured" has been
 audited across all three sticky-overlay contexts and found already-compliant
 (two-hundred-and-twentieth run), with a permanent regression suite now
-guarding it. A performance angle - profiling for a genuinely new
+guarding it. The front-to-back prose-vs-table content-verification pass has
+now been applied to every one of the six competition/award content files at
+least once (`fifa-world-cup.md`/`uefa-euro.md` in the two-hundred-and-eighth
+run, `ballon-dor.md`/`copa-america.md` in the two-hundred-and-fifth through
+-seventh runs, `golden-boot.md`/`uefa-nations-league.md` in the
+two-hundred-and-twenty-second run) - full coverage reached, no bugs found in
+the last two files. A performance angle - profiling for a genuinely new
 optimization, not re-confirming the existing implementation's
-`check:lighthouse`/`check:perf` scores - and a second independent
-content-verification pass over already-checked files both remain open
-threads for a future run; see "Open backlog" and "Ideas not yet scoped"
-below for everything else still open. For the full run-by-run history behind
-all of this, see `docs/PROJECT_STATUS.md`.
+`check:lighthouse`/`check:perf` scores - remains the one open quality-angle
+thread for a future run; see "Open backlog" and "Ideas not yet scoped" below
+for everything else still open. For the full run-by-run history behind all
+of this, see `docs/PROJECT_STATUS.md`.
 
 ## Open backlog
 
