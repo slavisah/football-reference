@@ -34093,3 +34093,65 @@ run's own look at it (bundle sizes already tiny with no web fonts/images,
 `check:lighthouse` already 1.00/1.00/1.00/1.00, the team/player search
 index already fetched lazily on first focus rather than eagerly) found no
 further low-hanging fruit, reinforcing rather than closing that item.
+
+### New permanent check: `/teams/<slug>`'s generated appearance lists and title counts independently cross-verified against `content/*.md`, zero discrepancies - `scripts/check-team-profiles-against-source.mjs` (two-hundred-and-twenty-fourth intensive run, 2026-10-04)
+
+Picked up the two-hundred-and-twenty-third run's own "left for a future
+pass" list: `/compare`, `/compare-players`, `/teams/<slug>` and
+`/players/<slug>` were the remaining generated/derived pages without an
+independent-recomputation check. Took the first of the four - `/teams/
+<slug>` (44 team profile pages as of this run, one per distinct country
+that has ever reached a tracked final or semifinal across the World Cup,
+EURO, Copa América or Nations League) - since `src/lib/teamProfile.ts`
+builds each profile straight from `src/lib/compare.ts`'s own winner/
+runner-up/semifinal matching and West Germany/Germany grouping, the exact
+kind of real-data-edge-case-sensitive derivation `check-records-against-
+source.mjs`'s own doc comment flags as undertested by
+`tests/unit/compare.test.ts`'s small synthetic fixtures alone.
+
+Approach, matching `check-records-against-source.mjs`'s own precedent:
+`scripts/check-team-profiles-against-source.mjs` re-implements the winner/
+runner-up/third/fourth matching and West Germany/Germany merge from scratch
+(never importing `src/lib/compare.ts`/`teamProfile.ts`, which would only
+catch a template-wiring bug, not a bug shared by the check and the page),
+reusing only the four competitions' *table schema* (`TEAM_COMPETITIONS`,
+now exported from `check-records-against-source.mjs` alongside
+`GERMANY_ALIASES`/`isEmptyCell`/`loadTable` for this new script to share
+rather than redefine) - genuinely new logic, not a copy, since teamProfile.ts
+tracks *appearances* (who reached which stage in which year, chronologically
+per competition) rather than records.ts's aggregate rankings. For each of
+the 44 teams, independently recomputes its full appearance list per
+competition and diffs the result against two separate pieces of that team's
+own `/teams/<slug>` JSON-LD: the `ItemList` (`buildTeamProfileItemList()`,
+"Role (Year), Role (Year), ..." per competition) and the `SportsTeam`
+block's `award` array (`buildTeamSportsTeamJsonLd()`, every title as
+"{competition} {year}"). Both checks ran clean against the real build on
+the first pass - **zero discrepancies** across all 44 teams.
+
+Added as a permanent guard: wired into `.github/workflows/ci.yml`
+immediately after `check:records-consistency` (`pnpm check:team-profiles-
+consistency`), with 9 new unit tests in `tests/unit/
+checkTeamProfilesAgainstSource.test.ts` covering `teamProfileSlug()`
+(a second, independent copy of `src/lib/teamProfile.ts`'s own slug
+function - pure string munging, not football-data logic, so copying it
+carries none of the "testing itself" risk), `appearancesByTeam()`,
+`describeAppearances()` and `parseTeamSportsTeamBlocks()` directly.
+
+**Verification:** `pnpm test` (996/996, the 9 new tests plus the existing
+987), `pnpm lint` (243 files, 0 errors/0 warnings/0 hints - one JSDoc-typed
+test-file parameter needed, same class of fix the two-hundred-and-twenty-
+third run's own new script/test pair needed), `pnpm build` (711 pages,
+unchanged), `pnpm check:team-profiles-consistency` (new script, clean) and
+`pnpm check:records-consistency` (still clean, confirming the newly-exported
+`TEAM_COMPETITIONS`/`GERMANY_ALIASES`/`isEmptyCell`/`loadTable` refactor
+changed no behavior), plus the standing health check (`pnpm check:perf`
+617.4 KB heaviest/unchanged, `pnpm check:links` 715 pages clean, `pnpm
+check:jsonld` 1,783 blocks valid). No `content/*.md` file was touched, so
+`pnpm build && pnpm build:pdfs` was not required for this run.
+
+**Left for a future pass:** `/compare`, `/compare-players` and `/players/
+<slug>` remain untouched by this technique - `/players/<slug>` is the
+closest sibling to this run's work (same `buildPlayerProfileItemList()`
+shape in `src/lib/jsonLd.ts`, same kind of real-data edge cases: Golden Boot
+ties, a cancelled Ballon d'Or year), while `/compare`/`/compare-players`
+would need a head-to-head-pair-shaped check rather than a per-team one.

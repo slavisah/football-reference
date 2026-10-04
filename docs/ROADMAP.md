@@ -104,9 +104,12 @@ time: `/records`' 40 build-time-computed rankings are independently
 recomputed from `content/*.md` and cross-checked against the page's own
 JSON-LD by the new `scripts/check-records-against-source.mjs`
 (two-hundred-and-twenty-third run), wired into CI as a permanent PR gate -
-zero discrepancies found. `/compare`, `/compare-players`, `/teams/<slug>`
-and `/players/<slug>` remain the still-untouched generated/derived pages for
-a future run to apply the same technique to. A performance angle -
+zero discrepancies found. The two-hundred-and-twenty-fourth run extended the
+same technique to `/teams/<slug>`'s per-team appearance lists and title
+counts (`scripts/check-team-profiles-against-source.mjs`, zero discrepancies)
+- `/compare`, `/compare-players` and `/players/<slug>` remain the still-
+untouched generated/derived pages for a future run to apply the same
+technique to. A performance angle -
 profiling for a genuinely new optimization, not re-confirming the existing
 implementation's `check:lighthouse`/`check:perf` scores - remains open; the
 two-hundred-and-twenty-third run looked again (bundle sizes already tiny

@@ -87,6 +87,9 @@ jobs:
       - name: Records-page generated-ranking consistency check (vs content/*.md)
         run: pnpm check:records-consistency
 
+      - name: Team-profile generated-appearance consistency check (vs content/*.md)
+        run: pnpm check:team-profiles-consistency
+
       - name: Internal link integrity check
         run: pnpm check:links
 

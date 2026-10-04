@@ -43,7 +43,7 @@ const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CONTENT_DIR = path.join(ROOT, 'content');
 const RECORDS_PAGE = path.join(ROOT, 'dist', 'records', 'index.html');
 
-const GERMANY_ALIASES = { 'West Germany': 'Germany (incl. West Germany)', Germany: 'Germany (incl. West Germany)' };
+export const GERMANY_ALIASES = { 'West Germany': 'Germany (incl. West Germany)', Germany: 'Germany (incl. West Germany)' };
 
 function columnIndex(table, name) {
   return table.headers.findIndex((header) => header.trim().toLowerCase() === name.toLowerCase());
@@ -73,7 +73,7 @@ export function splitNames(raw) {
 
 const EMPTY_CELL = new Set(['', '—', '-']);
 
-function isEmptyCell(value) {
+export function isEmptyCell(value) {
   return EMPTY_CELL.has(value.trim());
 }
 
@@ -397,7 +397,13 @@ function diffRivalries(label, computed, pageItems, problems) {
 // Per-competition verification
 // ---------------------------------------------------------------------------
 
-const TEAM_COMPETITIONS = [
+// Exported so scripts/check-team-profiles-against-source.mjs can read the
+// same four team-competition tables/columns without redefining this schema a
+// second time and risking the two drifting apart - it's just "which file,
+// heading and column holds what," not any of the ranking/matching logic
+// itself, so sharing it carries none of the "reusing the code under test"
+// risk the file's own top comment warns about.
+export const TEAM_COMPETITIONS = [
   {
     key: 'FIFA World Cup',
     file: 'fifa-world-cup.md',
@@ -439,7 +445,7 @@ const INDIVIDUAL_AWARDS = [
   { key: 'Golden Boot (EURO)', file: 'golden-boot.md', heading: 'uefa euro top scorers', columns: { year: 'Year', winner: 'Player(s)' } },
 ];
 
-async function loadTable(file, heading) {
+export async function loadTable(file, heading) {
   const markdown = await readFile(path.join(CONTENT_DIR, file), 'utf8');
   const table = findTableByHeadingPrefix(markdown, heading);
   if (!table) throw new Error(`no table found under a heading starting with "${heading}" in ${file}`);
