@@ -34221,3 +34221,83 @@ driving the comparison's own build-time helper functions directly with a
 range of real entity pairs and diffing against `src/lib/compare.ts`/
 `comparePlayers.ts`'s output) rather than a straightforward port of this
 run's approach.
+
+### New permanent check: `/compare` and `/compare-players`' embedded head-to-head data independently cross-verified against `content/*.md`, zero discrepancies - `scripts/check-compare-against-source.mjs` (two-hundred-and-twenty-sixth intensive run, 2026-10-04)
+
+Closed the exact gap the two-hundred-and-twenty-fifth run's own write-up
+named as the last two generated/derived pages still untouched by the
+"independently recompute from source, diff against the page's own data"
+technique: `/compare` and `/compare-players` have no per-pair JSON-LD the
+way `/records`, `/teams/<slug>` and `/players/<slug>` do, since the compared
+pair is chosen at request time via `?a=`/`?b=` URL params rather than baked
+into a fixed per-entity page. Their equivalent turned out to be the full
+`records`/`finalsMeetings` arrays `compare.astro`/`compare-players.astro`
+each embed as plain JSON in an Astro `define:vars` inline `<script>` - the
+same data that renders the page's default (no-JS) pair *and* backs every
+other pair the client-side picker can render, so verifying it gives the
+same end-to-end guarantee the JSON-LD diff gives the other four pages.
+
+New script `scripts/check-compare-against-source.mjs`: for `/compare`,
+reuses only the *table schema* already exported from
+`check-records-against-source.mjs` (`TEAM_COMPETITIONS`, `GERMANY_ALIASES`,
+`buildEditions`, `isEmptyCell`, `firstYear`, `loadTable`) - never
+`src/lib/compare.ts`, whose title/runner-up/semifinal tallying and West
+Germany/Germany grouping this script's own `tallyCompetition()`/`groupId()`/
+`groupDisplayName()` re-implement from scratch, independently, to verify it
+rather than reuse it. For `/compare-players`, reuses
+`check-player-profiles-against-source.mjs`'s own
+`buildExpectedPlayerProfiles()` - itself an independent, already-verified
+per-award recomputation with none of `comparePlayers.ts`'s award-total
+tallying in it to borrow - the same "reuse a sibling check script's table
+schema rather than a third from-scratch copy" precedent
+`check-team-profiles-against-source.mjs` set for
+`check-records-against-source.mjs`. A new `extractJsonArray()` helper reads
+the embedded `const records = [...]`/`const finalsMeetings = [...]` arrays
+out of the built page via bracket-depth counting (a lazy regex would stop at
+the first `]` inside the JSON itself, not the array's real end), and a new
+`deepEqual()` diffs the two sides order-independently on object keys (plain
+JSON.stringify string-equality would false-positive on nothing, since both
+sides are freshly serialized with the same key order in practice, but is a
+needlessly brittle guarantee to lean on) while staying order-sensitive on
+arrays.
+
+Both checks ran clean against the real build on the first pass - **zero
+discrepancies** across all 40 `/compare` teams and all 98 `/compare-players`
+award winners. Deliberately verified the diff mechanism isn't a silent
+no-op before trusting that clean result, the same precedent the
+two-hundred-and-twenty-fifth run set: hand-corrupted one built page's
+embedded Argentina record (`totalTitles` 19 -> 99), confirmed the script
+caught and reported the exact mismatch, then restored the file and
+re-confirmed a clean run.
+
+Added as a permanent guard: wired into `.github/workflows/ci.yml`
+immediately after `check:player-profiles-consistency`
+(`pnpm check:compare-consistency`), with 11 new unit tests in `tests/unit/
+checkCompareAgainstSource.test.ts` covering `groupId()`/`groupDisplayName()`,
+`tallyCompetition()`, `extractJsonArray()` (including a case where a `]`
+appears inside a string value, which a lazy regex would mis-parse) and
+`deepEqual()` directly. Confirmed the Croatian `/hr/compare`/
+`/hr/compare-players` pages embed the exact same `records`/`finalsMeetings`
+JSON (translated UI chrome only) before deciding, same as
+`check-records-against-source.mjs`'s own precedent, that checking the
+English pages only is sufficient.
+
+**Verification:** `pnpm test` (1017/1017, the 11 new tests plus the existing
+1006), `pnpm lint` (247 files, 0 errors/0 warnings/0 hints), `pnpm build`
+(711 pages, unchanged), `pnpm check:compare-consistency` (new script, clean,
+including the deliberate corrupt-then-restore round-trip above),
+`check:records-consistency`/`check:team-profiles-consistency`/
+`check:player-profiles-consistency` (all still clean), and `pnpm dlx knip
+--no-config-hints` (same two standing false positives as ever, no new
+unused code). No `content/*.md` file was touched, so `pnpm build && pnpm
+build:pdfs` was not required for this run.
+
+**Left for a future pass:** every generated/derived page now has its own
+independent-recomputation-against-source guard (`/records`, `/teams/<slug>`,
+`/players/<slug>`, `/compare`, `/compare-players`) - this technique's own
+backlog item is now fully closed. The remaining open items are the
+genuinely blocked ones `docs/ROADMAP.md`'s "Open backlog" already tracks
+(network-access-gated link/attendance/Nations-League-Best-XI lookups, the
+`typescript`/`http-cache-semantics` upstream-blocked bumps, and the
+brand-identity `long-title` sign-off) plus the still-unscoped "Youngest
+winner" full ranking idea.

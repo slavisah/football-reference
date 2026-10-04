@@ -93,6 +93,9 @@ jobs:
       - name: Player-profile generated-award consistency check (vs content/*.md)
         run: pnpm check:player-profiles-consistency
 
+      - name: Compare/compare-players embedded-data consistency check (vs content/*.md)
+        run: pnpm check:compare-consistency
+
       - name: Internal link integrity check
         run: pnpm check:links
 

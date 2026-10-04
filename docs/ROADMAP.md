@@ -107,13 +107,17 @@ JSON-LD by the new `scripts/check-records-against-source.mjs`
 zero discrepancies found. The two-hundred-and-twenty-fourth run extended the
 same technique to `/teams/<slug>`'s per-team appearance lists and title
 counts (`scripts/check-team-profiles-against-source.mjs`, zero discrepancies),
-and the two-hundred-and-twenty-fifth run extended it again to `/players/
-<slug>`'s per-award appearance lists (`scripts/check-player-profiles-
-against-source.mjs`, zero discrepancies) - `/compare` and `/compare-players`
-remain the only still-untouched generated/derived pages, and would need a
-differently-shaped check (see `docs/PROJECT_STATUS.md`'s two-hundred-and-
-twenty-fifth-run entry) rather than a straightforward port of the same
-technique. A performance angle -
+the two-hundred-and-twenty-fifth run extended it again to `/players/<slug>`'s
+per-award appearance lists (`scripts/check-player-profiles-against-
+source.mjs`, zero discrepancies), and the two-hundred-and-twenty-sixth run
+closed the last gap: `/compare`/`/compare-players` have no per-pair JSON-LD
+(the pair is chosen at request time via URL params), so the new
+`scripts/check-compare-against-source.mjs` instead diffs an independent
+recomputation against the `records`/`finalsMeetings` data the page itself
+embeds as JSON for its default pair and client-side picker - zero
+discrepancies across 40 teams and 98 players. Every generated/derived page
+now has its own independent-recomputation guard; this technique's backlog
+item is fully closed. A performance angle -
 profiling for a genuinely new optimization, not re-confirming the existing
 implementation's `check:lighthouse`/`check:perf` scores - remains open; the
 two-hundred-and-twenty-third run looked again (bundle sizes already tiny
