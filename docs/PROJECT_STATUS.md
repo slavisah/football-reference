@@ -34430,3 +34430,76 @@ future run doing further feature work should feel free to keep relying on
 the lighter "just the two quiz-specific e2e specs" proxy for quiz-only
 changes, per the existing precedent, and fall back to this full sweep again
 after another significant batch of unrelated changes accumulates.
+
+### New permanent check: a site-wide WCAG 2.2 AA SC 2.5.8 touch-target-size sweep, `scripts/check-target-size.mjs` - zero undersized controls found across 711 pages (two-hundred-and-twenty-ninth intensive run, 2026-10-04)
+
+With `docs/ROADMAP.md`'s "Open backlog" re-confirmed still fully blocked
+(same five items as the two-hundred-and-twenty-eighth run's own re-check:
+`typescript` 7 capped by `@astrojs/check@0.9.10`'s peer dependency,
+`http-cache-semantics` with no patched version published, the link-liveness
+sweep still `EGRESS_BLOCKED`, the `long-title` brand decision needing human
+sign-off, and the two UEFA Nations League source gaps) and `pnpm outdated`/
+`pnpm audit` showing nothing new to bump or patch, this run took the
+"genuinely useful quality pass" fallback AGENTS.md's scheduling prompt
+calls for when the backlog is exhausted, and picked an angle no prior run
+had covered: every one of this repo's existing 44px touch-target checks
+(`tests/e2e/mobile.spec.ts`'s "every filter control", "the picker selects
+and swap button", "every drawer control", "the check-answer, restart, and
+order-rank controls", and others) is a hand-written, per-page/per-component
+assertion - each one exists only because a prior run happened to measure
+that specific control. Every *other* button/select/input on the site's 711
+pages had no coverage at all: a future component shipping an undersized
+control would have nothing to fail until a human (or a future run) happened
+to write a matching test for it.
+
+Closed that gap the same way `check-reflow.mjs` closed the equivalent gap
+for 320px horizontal overflow: a new `scripts/check-target-size.mjs` loads
+every built page (both languages, both 711-page builds) in a real browser
+at the site's own 360px phone baseline (`playwright.config.ts`'s default
+viewport, and AGENTS.md's "Mobile-first UI conventions" design target) and
+measures every `button`, `select`, checkbox/radio/button/submit `input`,
+and explicit `role="button"` element against AGENTS.md's own 44px floor -
+deliberately *not* WCAG 2.5.8's lower 24px minimum, matching every existing
+hand-written test's stricter bar. Deliberately excludes plain `<a>`
+hyperlinks: this site's links are overwhelmingly inline text references
+(team/player names in prose and table cells, source citations, pagination
+words) that WCAG 2.5.8's own "link in a sentence or block of text"
+exception already covers, and flagging all of them site-wide would bury any
+real regression under hundreds of false positives instead of guarding
+anything.
+
+First pass found 232 apparent failures on both `/quiz/` and `/hr/quiz/`
+(every `<input type="radio">` answer choice, each only 13x13px) - a false
+positive, not a real bug: `QuizCard.astro` wraps each radio input in a
+`<label class="quiz-card__choice">`, so the real activation target a tap
+lands on is the whole padded label, not the native control's own small
+rendered box. Fixed by having the sweep resolve a checkbox/radio input to
+its wrapping (or `for`-associated) `<label>` before measuring, the same
+element a real tap actually activates. After that fix: zero undersized
+controls found across all 711 pages. A clean first full sweep, same as
+`check-landscape-viewport.mjs`'s own precedent for building the permanent
+guard anyway rather than discarding the tool just because this pass found
+nothing to fix.
+
+Added `pnpm check:target-size` (not wired into `.github/workflows/ci.yml`,
+the same reasoning `check:reflow`/`check:landscape`/`check:lighthouse`
+document: a full 711-page-load sweep is much slower than this repo's other
+`check:*` scripts) and a `tests/unit/checkTargetSize.test.ts` covering the
+pure `controlsBelowMinimum()` budget function the same way `checkReflow.
+test.ts` covers `pagesOverflowing()`.
+
+**Verification:** `pnpm test` (1022/1022, +5 new), `pnpm lint` (249 files,
+0/0/0), `pnpm build` (711 pages, unchanged), the new `pnpm check:target-size`
+(clean, 0 failures across 711 pages - required `PW_EXECUTABLE_PATH=/opt/
+pw-browsers/chromium` in this sandbox, the same escape hatch `preview-
+daemon.mjs` already documents, since the pnpm-managed Playwright build's own
+expected `chromium_headless_shell` revision wasn't present on disk). No
+`content/*.md` file was touched, so `pnpm build && pnpm build:pdfs` was not
+required for this run.
+
+**Left for a future pass:** everything `docs/ROADMAP.md`'s "Open backlog"
+already tracks, unchanged. This new sweep's first run was clean, so there is
+no follow-up fix pending from it - only the standing maintenance note that
+any new interactive component should expect this permanent guard to catch
+an undersized touch target automatically, without needing its own
+hand-written 44px test the way every prior component did.

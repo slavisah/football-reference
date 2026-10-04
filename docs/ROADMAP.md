@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (228 intensive runs as of 2026-10-04) lives
+verification sweep and decision (229 intensive runs as of 2026-10-04) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -65,7 +65,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-twenty-eighth run (2026-10-04): 1017/1017 unit
+As of the two-hundred-and-twenty-ninth run (2026-10-04): 1022/1022 unit
 tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the
 same two standing `knip` false positives as ever (`scripts/
 test-preview-server.mjs`, used only as a Playwright `webServer.command`,
@@ -123,9 +123,15 @@ implementation's `check:lighthouse`/`check:perf` scores - remains open; the
 two-hundred-and-twenty-third run looked again (bundle sizes already tiny
 with no web fonts/images, `check:lighthouse` already a perfect
 1.00/1.00/1.00/1.00, the team/player search index already fetched lazily on
-first focus) and found no further low-hanging fruit. See "Open backlog" and
-"Ideas not yet scoped" below for everything else still open. For the full
-run-by-run history behind all of this, see `docs/PROJECT_STATUS.md`.
+first focus) and found no further low-hanging fruit. The two-hundred-and-
+twenty-ninth run added the last missing site-wide regression guard in this
+family: every prior 44px touch-target check was a hand-written assertion on
+one specific component, so `scripts/check-target-size.mjs` (`pnpm
+check:target-size`) now sweeps every button/select/input/`role="button"`
+on all 711 pages against AGENTS.md's 44px floor in one pass - clean on its
+first run. See "Open backlog" and "Ideas not yet scoped" below for
+everything else still open. For the full run-by-run history behind all of
+this, see `docs/PROJECT_STATUS.md`.
 
 ## Open backlog
 
