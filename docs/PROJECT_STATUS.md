@@ -34155,3 +34155,69 @@ closest sibling to this run's work (same `buildPlayerProfileItemList()`
 shape in `src/lib/jsonLd.ts`, same kind of real-data edge cases: Golden Boot
 ties, a cancelled Ballon d'Or year), while `/compare`/`/compare-players`
 would need a head-to-head-pair-shaped check rather than a per-team one.
+
+### New permanent check: `/players/<slug>`'s generated per-award appearance lists independently cross-verified against `content/*.md`, zero discrepancies - `scripts/check-player-profiles-against-source.mjs` (two-hundred-and-twenty-fifth intensive run, 2026-10-04)
+
+Closed the exact gap the two-hundred-and-twenty-fourth run's own write-up
+named as the closest next target: `/players/<slug>` (every Men's Ballon d'Or
+and FIFA World Cup/UEFA EURO Golden Boot winner's profile page) was still
+unverified by the "independently recompute from source, diff against the
+page's own JSON-LD" technique `check-records-against-source.mjs` and
+`check-team-profiles-against-source.mjs` already applied to `/records` and
+`/teams/<slug>`. New script `scripts/check-player-profiles-against-source.mjs`
+closes it the same way: `AWARD_SOURCES` re-states which file/heading/column
+holds what for the same three tables `src/pages/players/[slug].astro`'s own
+`getStaticPaths()` reads (Ballon d'Or's "Winners" table; golden-boot.md's
+"FIFA World Cup top scorers" and "UEFA EURO top scorers" tables), reusing
+only generic table-schema helpers already exported from
+`check-records-against-source.mjs` (`loadTable`/`isEmptyCell`/`splitNames`/
+`firstYear`/`parsePageRankings`) - never `src/lib/playerProfile.ts`, whose
+tied-winner/team-column-alignment matching (`teamFor()`) is exactly what
+this script re-implements from scratch to verify independently, the same
+"reusing the code under test would only catch a rendering bug, not a shared
+computation bug" reasoning the file's own header restates.
+`playerProfileSlug()` is a second, independent copy of
+`playerProfile.ts`'s identically named function - pure string munging, so
+copying it carries none of that risk, same precedent as
+`check-team-profiles-against-source.mjs`'s own `teamProfileSlug()` copy.
+
+For every player who has won at least one of the three awards, independently
+recomputes their chronological per-award appearance list (year, aligned
+team, goals, ceremony date where the source table carries them) and diffs
+the result against two separate pieces of that player's own `/players/<slug>`
+JSON-LD: the `ItemList` (`buildPlayerProfileItemList()`, "Year (detail),
+Year (detail), ..." per award) and the `Person` block's `award` array
+(`buildPlayerPersonJsonLd()`, every win as "{award title} {year}"). Both
+checks ran clean against the real build on the first pass - **zero
+discrepancies** across every player profile. Deliberately verified the
+script's own diff mechanism isn't a silent no-op before trusting that clean
+result: corrupted one built page's `Person` JSON-LD `award` value by hand,
+confirmed the script caught and reported the exact mismatch, then rebuilt to
+restore the page and re-confirmed a clean run.
+
+Added as a permanent guard: wired into `.github/workflows/ci.yml`
+immediately after `check:team-profiles-consistency` (`pnpm check:player-
+profiles-consistency`), with 10 new unit tests in `tests/unit/
+checkPlayerProfilesAgainstSource.test.ts` covering `playerProfileSlug()`,
+`teamFor()` (including the "Multiple" tie placeholder and a mismatched
+joined-list/winner-count case), `describeAppearances()` and
+`parsePlayerPersonBlocks()` directly.
+
+**Verification:** `pnpm test` (1006/1006, the 10 new tests plus the existing
+996), `pnpm lint` (245 files, 0 errors/0 warnings/0 hints), `pnpm build` (711
+pages, unchanged), `pnpm check:player-profiles-consistency` (new script,
+clean, including the deliberate corrupt-then-restore round-trip above),
+`pnpm check:records-consistency` and `pnpm check:team-profiles-consistency`
+(both still clean), and `pnpm dlx knip --no-config-hints` (same two standing
+false positives as ever, no new unused code). No `content/*.md` file was
+touched, so `pnpm build && pnpm build:pdfs` was not required for this run.
+
+**Left for a future pass:** `/compare` and `/compare-players` remain the
+only generated/derived pages untouched by this technique - both are
+head-to-head comparisons between two entities chosen at request time (via
+URL query parameters) rather than a fixed per-entity profile with its own
+JSON-LD to diff against, so they would need a differently-shaped check (e.g.
+driving the comparison's own build-time helper functions directly with a
+range of real entity pairs and diffing against `src/lib/compare.ts`/
+`comparePlayers.ts`'s output) rather than a straightforward port of this
+run's approach.

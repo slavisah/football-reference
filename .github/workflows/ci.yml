@@ -90,6 +90,9 @@ jobs:
       - name: Team-profile generated-appearance consistency check (vs content/*.md)
         run: pnpm check:team-profiles-consistency
 
+      - name: Player-profile generated-award consistency check (vs content/*.md)
+        run: pnpm check:player-profiles-consistency
+
       - name: Internal link integrity check
         run: pnpm check:links
 
