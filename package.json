@@ -22,6 +22,7 @@
     "check:perf": "node scripts/check-page-weight.mjs",
     "check:records-consistency": "node scripts/check-records-against-source.mjs",
     "check:team-profiles-consistency": "node scripts/check-team-profiles-against-source.mjs",
+    "check:player-profiles-consistency": "node scripts/check-player-profiles-against-source.mjs",
     "check:links": "node scripts/check-internal-links.mjs",
     "check:sitemap": "node scripts/check-sitemap.mjs",
     "check:precache": "node scripts/check-precache.mjs",

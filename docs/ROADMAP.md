@@ -106,10 +106,14 @@ JSON-LD by the new `scripts/check-records-against-source.mjs`
 (two-hundred-and-twenty-third run), wired into CI as a permanent PR gate -
 zero discrepancies found. The two-hundred-and-twenty-fourth run extended the
 same technique to `/teams/<slug>`'s per-team appearance lists and title
-counts (`scripts/check-team-profiles-against-source.mjs`, zero discrepancies)
-- `/compare`, `/compare-players` and `/players/<slug>` remain the still-
-untouched generated/derived pages for a future run to apply the same
-technique to. A performance angle -
+counts (`scripts/check-team-profiles-against-source.mjs`, zero discrepancies),
+and the two-hundred-and-twenty-fifth run extended it again to `/players/
+<slug>`'s per-award appearance lists (`scripts/check-player-profiles-
+against-source.mjs`, zero discrepancies) - `/compare` and `/compare-players`
+remain the only still-untouched generated/derived pages, and would need a
+differently-shaped check (see `docs/PROJECT_STATUS.md`'s two-hundred-and-
+twenty-fifth-run entry) rather than a straightforward port of the same
+technique. A performance angle -
 profiling for a genuinely new optimization, not re-confirming the existing
 implementation's `check:lighthouse`/`check:perf` scores - remains open; the
 two-hundred-and-twenty-third run looked again (bundle sizes already tiny
