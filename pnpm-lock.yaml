@@ -38,8 +38,8 @@ importers:
         specifier: ^10.3.6
         version: 10.3.6
       html-validate:
-        specifier: ^11.16.1
-        version: 11.16.1(vitest@5.0.3)
+        specifier: ^11.16.2
+        version: 11.16.2(vitest@5.0.3)
       lighthouse:
         specifier: ^13.5.0
         version: 13.5.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))
@@ -690,8 +690,8 @@ packages:
   '@formatjs/intl-localematcher@0.6.2':
     resolution: {integrity: sha512-XOMO2Hupl0wdd172Y06h6kLpBz6Dv+J4okPLl4LPtzbr8f66WbIoy4ev98EBuZ6ZK4h5ydTN6XneT4QVpD7cdA==}
 
-  '@html-validate/stylish@6.0.0':
-    resolution: {integrity: sha512-d1/lI3qIXhGVJF3+MmKEBn1dRX6U4Z+BDaOdDI3E6SXcO+OQ7hC/3mSo6BIjwQlcuV6NdDOKm6QCrzIQL1EezQ==}
+  '@html-validate/stylish@6.1.0':
+    resolution: {integrity: sha512-ceNvF6/5hgvw/OrxXtdl2KurRVLN/Q/OkD/qminRRY/IIERmVaqJOpDF1nhRZMrOG/vyKKW0+Nxw6lSoHUP4Ow==}
     engines: {node: ^22.16.0 || >= 24.0.0}
 
   '@img/colour@1.1.0':
@@ -1670,8 +1670,8 @@ packages:
   html-escaper@3.0.3:
     resolution: {integrity: sha512-RuMffC89BOWQoY0WKGpIhn5gX3iI54O6nRA0yC124NYVtzjmFWBIiFd8M0x+ZdX0P9R4lADg1mgP8C7PxGOWuQ==}
 
-  html-validate@11.16.1:
-    resolution: {integrity: sha512-PklC0d9tLeXpvC6INePZcTBlXplZOmBkR0IQTYoJ9TSrtqxBKR74lMdKPXcnOImD4mAdp/L5/QJR/x6WrvDYvA==}
+  html-validate@11.16.2:
+    resolution: {integrity: sha512-oci8F4t1AQdAwkOK895hOOrMTSY0zZ6fk4p2LCvGKQDjL/CYDTGyIoVTzZWII0DfwA7gpq7+qJxAKubUofgo1Q==}
     engines: {node: ^22.22.0 || >= 24.8.0}
     hasBin: true
     peerDependencies:
@@ -3233,7 +3233,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@html-validate/stylish@6.0.0': {}
+  '@html-validate/stylish@6.1.0': {}
 
   '@img/colour@1.1.0': {}
 
@@ -4252,9 +4252,9 @@ snapshots:
 
   html-escaper@3.0.3: {}
 
-  html-validate@11.16.1(vitest@5.0.3):
+  html-validate@11.16.2(vitest@5.0.3):
     dependencies:
-      '@html-validate/stylish': 6.0.0
+      '@html-validate/stylish': 6.1.0
       '@sidvind/better-ajv-errors': 7.0.0(ajv@8.20.0)
       ajv: 8.20.0
       kleur: 4.1.5

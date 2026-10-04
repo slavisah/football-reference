@@ -34301,3 +34301,63 @@ genuinely blocked ones `docs/ROADMAP.md`'s "Open backlog" already tracks
 `typescript`/`http-cache-semantics` upstream-blocked bumps, and the
 brand-identity `long-title` sign-off) plus the still-unscoped "Youngest
 winner" full ranking idea.
+
+### Dependency patch bump plus a Golden Boot oldest/youngest research attempt abandoned on unreliable sources (two-hundred-and-twenty-seventh intensive run, 2026-10-04)
+
+With every generated/derived page's independent-recomputation guard now in
+place (prior run) and every item in `docs/ROADMAP.md`'s "Open backlog"
+confirmed still genuinely blocked (network egress, upstream peer-dependency
+caps, or a brand-identity call needing human sign-off - none of which had
+changed since their last re-check), this run first tried to open new,
+genuinely-safe ground rather than just re-confirm blocked items.
+
+Looked at extending the "Youngest/oldest winner" pattern the two-hundred-
+and-thirteenth run used for `ballon-dor.md` (Stanley Matthews/Ronaldo) to
+`golden-boot.md`, which has no equivalent "Memorable moments" bullets.
+`WebSearch` for "youngest/oldest player to win the World Cup Golden Boot"
+came back **unreliable**: one query's top synthesized answer named Thomas
+Müller (2010) as youngest, the other named either Jamie Vardy (33y197d -
+a Premier League Golden Boot, a different award entirely, conflated by
+that source with the World Cup one) or Davor Šuker (1998) as oldest, with
+no single source agreeing across both queries and no Guinness-World-
+Records-caliber reference the way Matthews/Ronaldo had. Unlike the
+Ballon d'Or case, this isn't a single already-synthesized record pulled
+from one authoritative source - it would require an independently-
+reconfirmed birth date for all 23 World Cup Golden Boot winners (several
+editions with 2-6 joint winners) to compute youngest/oldest correctly, the
+exact same bulk-fabrication risk the "Ideas not yet scoped" section already
+flags for the Ballon d'Or/Golden Boot "Youngest winner" ranking generally.
+Per AGENTS.md rule 2 ("do not silently alter historical facts"), declined
+to add anything from this search - no content change, but worth recording
+so a future run doesn't re-spend a cycle on the identical dead end. (Also
+confirms `check:record-claims`'s verification-ledger requirement for any
+new "youngest/oldest" bullet is doing real work: it would have correctly
+demanded sourcing this search couldn't supply.)
+
+Did the safe, real action instead: `pnpm outdated` showed `html-validate`
+at 11.16.1 with 11.16.2 published (`typescript` still capped by
+`@astrojs/check@0.9.10`'s peer dependency, unchanged). Bumped
+`html-validate` to 11.16.2 via `pnpm update html-validate@11.16.2`.
+
+**Verification:** `pnpm lint` (247 files, 0/0/0), `pnpm test` (1017/1017,
+unchanged), `pnpm build` (711 pages, unchanged), `pnpm check:html` (all 711
+pages still valid HTML5 against the bumped parser - confirms no behavior
+change), and every other fast CI-gated `check:*` script (29 scripts:
+`pdfs`, `spelling`, `award-tallies`, the seven claim-ledger checks,
+`edition-header-labels`, `spelling-hr`, `perf`, the four consistency
+checks, `links`, `sitemap`, `jsonld`, `heading-outline`, `theme-flash`,
+`pdf-outline`, `reachability`, `meta`, `i18n-notes`, `attendance-format`,
+`claims-hr`, `link-names`, `precache`, `image-dimensions`,
+`locale-consistency`, `theme-color`) - all clean, zero regressions. `pnpm
+audit`: still only the one known-blocked `http-cache-semantics` advisory
+(no patched version published yet). `pnpm dlx knip --no-config-hints`: same
+two standing false positives as ever, no new unused code. No `content/*.md`
+file was touched, so `pnpm build && pnpm build:pdfs` was not required for
+this run.
+
+**Left for a future pass:** everything `docs/ROADMAP.md`'s "Open backlog"
+already tracks, unchanged. The Golden Boot oldest/youngest idea is not
+re-added to "Ideas not yet scoped" as its own bullet - it's a narrower
+instance of the already-tracked "Youngest winner" ranking idea, which
+already carries the right caveat; this entry is the record of why that
+narrower slice specifically doesn't work the way the Ballon d'Or one did.
