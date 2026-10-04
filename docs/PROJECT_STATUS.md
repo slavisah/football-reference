@@ -34361,3 +34361,72 @@ re-added to "Ideas not yet scoped" as its own bullet - it's a narrower
 instance of the already-tracked "Youngest winner" ranking idea, which
 already carries the right caveat; this entry is the record of why that
 narrower slice specifically doesn't work the way the Ballon d'Or one did.
+
+### Full-site regression sweep: every manual/intensive-run-only browser check plus a cold-start full `pnpm test:e2e` re-confirmed clean, zero regressions across 14 commits (two-hundred-and-twenty-eighth intensive run, 2026-10-04)
+
+With every item in `docs/ROADMAP.md`'s "Open backlog" re-confirmed still
+genuinely blocked (re-checked `WebFetch` to `en.wikipedia.org` directly this
+run: still `EGRESS_BLOCKED` from the proxy, unchanged; `pnpm outdated`
+shows only the already-blocked `typescript` 7 bump; `pnpm audit` shows only
+the already-blocked `http-cache-semantics` advisory) and real content
+freshness checked rather than assumed (`WebSearch` confirms the 2026
+Ballon d'Or ceremony hasn't happened yet - scheduled 26 October 2026 in
+London, so `content/ballon-dor.md` correctly still ends at 2025; the 2026
+FIFA World Cup and Golden Boot are already fully authored in
+`content/fifa-world-cup.md`/`golden-boot.md` from an earlier run), this run
+picked a different angle: the six browser-driven sweeps the codebase itself
+documents as "manual/intensive-run-only" (too slow for a required CI gate,
+so never run automatically) hadn't been re-run since the two-hundred-and-
+eighth run (2026-10-01) for five of them, or the two-hundred-and-fourth run
+(2026-09-29) for the full e2e suite - 20+ runs and 14 real commits ago,
+including a new WCAG 2.2 AA 2.4.11 regression suite, five new quiz question
+types, and four new generated-page-vs-source consistency checks. None of
+that had been confirmed not to regress any of these six sweeps.
+
+Ran all of them fresh against a clean `pnpm build` (711 pages):
+
+- `pnpm check:reflow` (320px, 711 pages) - clean, no horizontal overflow.
+- `pnpm check:text-zoom` (200% zoom, 711 pages) - clean.
+- `pnpm check:print-width` (print media, 1032px, 711 pages) - clean.
+- `pnpm check:landscape` (667x375 landscape phone, 711 pages) - clean.
+- `pnpm check:html` (HTML5 content-model validity, 711 pages, against the
+  html-validate 11.16.2 bumped by the prior run) - clean.
+- `pnpm check:lighthouse` (39-page representative sample) - every page
+  scored 1.00/1.00/1.00/1.00 except the known, already-documented 404-page
+  SEO exception (0.63, expected for a bilingual noindex error page) - no
+  change from the last confirmation.
+- A full cold-start `pnpm test:e2e` (no filtering down to the two
+  quiz-specific specs most recent runs have used as a sufficient proxy) -
+  **1045/1045 passed** in 16.8 minutes, up from the two-hundred-and-fourth
+  run's 1042/1042 (3 net new tests since, consistent with the quiz-question-
+  type and WCAG-regression-suite work in the interim).
+
+Zero failures, zero regressions found across any of the six sweeps, despite
+14 commits of real feature and infrastructure work since the last time any
+of them ran. Also re-ran `pnpm dlx knip --no-config-hints`: same two
+standing false positives as every prior run (`scripts/
+test-preview-server.mjs`, `@cspell/dict-hr-hr`), no new unused code.
+
+Separately, noticed `docs/ROADMAP.md`'s own intro line still read "220
+intensive runs as of 2026-10-03" (written at the two-hundred-and-twentieth
+run's trim, now 8 runs and several real entries stale) - corrected per that
+file's own "edit the summary's own prose in place rather than appending a
+dated addendum" instruction from its second maintenance note.
+
+**Verification:** `pnpm test` (1017/1017, unchanged), `pnpm lint` (247
+files, 0/0/0), `pnpm build` (711 pages, unchanged), all 29 fast CI-gated
+`check:*` scripts (clean, same list the two-hundred-and-twenty-seventh run's
+entry already names in full), the six manual browser sweeps above (all
+clean), the full `pnpm test:e2e` cold start (1045/1045, clean), and `pnpm
+dlx knip --no-config-hints` (two standing false positives, unchanged). No
+`content/*.md` file was touched, so `pnpm build && pnpm build:pdfs` was not
+required for this run.
+
+**Left for a future pass:** everything `docs/ROADMAP.md`'s "Open backlog"
+already tracks, unchanged. The six manual browser sweeps and the full e2e
+suite now have a fresh, confirmed-clean baseline as of this run (2026-10-04)
+to replace the two-hundred-and-fourth/-eighth runs' now-superseded one; a
+future run doing further feature work should feel free to keep relying on
+the lighter "just the two quiz-specific e2e specs" proxy for quiz-only
+changes, per the existing precedent, and fall back to this full sweep again
+after another significant batch of unrelated changes accumulates.

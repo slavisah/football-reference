@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (220 intensive runs as of 2026-10-03) lives
+verification sweep and decision (228 intensive runs as of 2026-10-04) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -65,20 +65,20 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-twentieth run (2026-10-03): 969/969 unit tests,
-`pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, 99.53%/98.78%
-coverage, and the same two standing `knip` false positives as ever (`scripts/
+As of the two-hundred-and-twenty-eighth run (2026-10-04): 1017/1017 unit
+tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the
+same two standing `knip` false positives as ever (`scripts/
 test-preview-server.mjs`, used only as a Playwright `webServer.command`,
 never imported; `@cspell/dict-hr-hr`, used only via `.cspell/
 hr-notes.cspell.json`'s `"import"` field, never a JS `import`) - neither
 actually unused, knip's static analysis just can't see a reference inside a
-config-file string. The two-hundred-and-fourth run's own full cold-start
-`pnpm test:e2e` (1042/1042) plus all five manual browser sweeps remain the
-last complete, together confirmation of the full e2e suite (see
-`docs/PROJECT_STATUS.md`'s two-hundred-and-fourth-run entry for the full
-writeup, including a container-specific Playwright browser-cache snag hit
-and worked around along the way); most runs since then have instead re-run
-just the two quiz-specific e2e specs
+config-file string. The two-hundred-and-twenty-eighth run's own full
+cold-start `pnpm test:e2e` (1045/1045) plus all six manual browser sweeps
+(`check:lighthouse`/`check:reflow`/`check:landscape`/`check:text-zoom`/
+`check:print-width`/`check:html`) are now the last complete, together
+confirmation of the full e2e suite and every manual sweep (see
+`docs/PROJECT_STATUS.md`'s two-hundred-and-twenty-eighth-run entry for the
+full writeup); most runs still re-run just the two quiz-specific e2e specs
 (`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`, 14
 tests) when their own change was a quiz markup/behavior change, which is
 judged sufficient per-run - see each run's own `docs/PROJECT_STATUS.md`
