@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (232 intensive runs as of 2026-10-05) lives
+verification sweep and decision (235 intensive runs as of 2026-10-05) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -146,9 +146,20 @@ same-origin GET after it has succeeded once online. Both index files are a
 few KB each, now added to `STATIC_ASSETS` alongside the icons/manifest
 (`CACHE_VERSION` bumped to `v5` so existing installs pick up the change),
 with a new unit test and a new `tests/e2e/mobile.spec.ts` offline-first-use
-test guarding it. See "Open backlog" and "Ideas not yet scoped" below for
-everything else still open. For the full run-by-run history behind all of
-this, see `docs/PROJECT_STATUS.md`.
+test guarding it. The two-hundred-and-thirty-fifth run closed a genuinely
+untested accessibility axis: `check:reflow`/`check:text-zoom`/
+`check:print-width` stress a page's *viewport width*, *root font-size* and
+*print media* respectively, but nothing had ever stress-tested WCAG 2.1 SC
+1.4.12 Text Spacing's own four spacing minimums (1.5x line-height, 2x
+paragraph spacing, 0.12x letter-spacing, 0.16x word-spacing) - a distinct
+failure mode (a fixed-height container or overflow:hidden rule sized for
+single-line text can clip once spacing grows, independent of font-size or
+viewport width) that none of the three existing sweeps could have caught.
+The new `scripts/check-text-spacing.mjs` (`pnpm check:text-spacing`, manual/
+intensive-run-only like its three siblings) swept all 711 pages - clean on
+its first run, no bug found. See "Open backlog" and "Ideas not yet scoped"
+below for everything else still open. For the full run-by-run history behind
+all of this, see `docs/PROJECT_STATUS.md`.
 
 ## Open backlog
 
