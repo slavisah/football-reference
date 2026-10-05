@@ -34924,3 +34924,77 @@ every piece of this project's standing regression coverage is simultaneously
 current as of this run for the first time in several runs' worth of
 drift - a genuinely clean baseline for whichever real feature or content
 slice the next run finds.
+
+### New permanent check: a site-wide WCAG 2.1 SC 1.4.12 Text Spacing sweep, `scripts/check-text-spacing.mjs` - zero overflowing pages found across 711 pages (two-hundred-and-thirty-fifth intensive run, 2026-10-05)
+
+Re-confirmed `docs/ROADMAP.md`'s "Open backlog" still fully blocked
+(`pnpm outdated`: only the same capped `typescript` 7 upgrade; `pnpm audit`:
+the same single `http-cache-semantics` advisory, still no patched version;
+`WebFetch` to `en.wikipedia.org`: still `EGRESS_BLOCKED`) and
+`content/*.md` already current through the newest edition of every
+competition/award (2026 World Cup, 2025 Ballon d'Or, 2024-25 Nations League,
+2024 Copa América/EURO Golden Boot) - no new content slice was due, and
+every backlog item this routine's prior 234 runs left open is either
+environment-blocked or needs a human decision this routine won't make
+unattended (see that file for the full list, unchanged this run). Did a
+genuinely useful quality pass instead, in the accessibility direction the
+scheduled task's own fallback instructions name.
+
+Looked specifically for an accessibility success criterion none of this
+project's many existing sweeps actually covers, rather than re-running one
+that already does: `check:reflow` (SC 1.4.10, 320px viewport),
+`check:text-zoom` (SC 1.4.4, 200% root font-size) and `check:print-width`
+(print-media width) each stress one axis and share the same
+`scrollWidth - clientWidth` overflow measurement, but **SC 1.4.12 Text
+Spacing** - requiring no loss of content or functionality when a reader
+overrides line-height to >=1.5x, paragraph spacing to >=2x, letter-spacing
+to >=0.12x and word-spacing to >=0.16x font size - had zero coverage
+anywhere in `scripts/`, `tests/`, or `docs/` (confirmed via
+`grep -rln -i "text.spacing\|letter.spacing\|word.spacing"` across all
+three, no hits). This is a genuinely different failure mode from the three
+existing sweeps: a fixed-height card, a single-line-clamp rule, or a
+tightly-sized button label can clip or overlap once *spacing* grows, fully
+independent of font-size or viewport width - so a page clean under all
+three existing sweeps could still fail this one undetected.
+
+`scripts/check-text-spacing.mjs` follows the exact same shape
+`check-text-zoom.mjs`/`check-print-width.mjs` already established: reuse
+`check-reflow.mjs`'s page discovery (`listHtmlFiles`/`htmlFileToPagePath`/
+`isRedirectStubHtml`) and `pagesOverflowing`/`OVERFLOW_TOLERANCE_PX` budget
+check, reuse the shared `preview-daemon.mjs` daemon/Chromium dance, and swap
+in the one genuinely different step - here, `page.addStyleTag()` injecting
+the four SC 1.4.12 minimums as `!important` overrides (the same ratios the
+well-known Steve Faulkner text-spacing bookmarklet uses) - before the same
+`scrollWidth - clientWidth` measurement. Ran at the same 1280x800 viewport
+`check-text-zoom.mjs` uses (an ordinary reading width; `check:reflow` already
+owns the narrow-viewport axis). Wired into `package.json` as
+`check:text-spacing`; left out of `.github/workflows/ci.yml`, the same
+"~700-page-load sweep, too slow for a required PR gate" reasoning already
+applied to its three siblings and `check:lighthouse`/`check:html`. No
+dedicated unit test added, matching `check-text-zoom.mjs`'s own precedent -
+the script exports no new derived constant worth testing in isolation, only
+reusing `check-reflow.mjs`'s already-tested exports.
+
+Ran it cold via the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` escape
+hatch (no `chrome` channel in this container): **0 of 711 pages overflow** -
+the site's existing `min(...rem, 100%)`-wrapped filter widths, card-based
+mobile table layout, and absence of any fixed-height/line-clamp text
+container already happen to leave enough room for 1.5x line-height/0.12x
+letter-spacing/0.16x word-spacing/2x paragraph-spacing with no clipping
+anywhere. A clean sweep, not a no-op: the axis was genuinely untested before
+this run, and is now a permanent, rerunnable tool future component or content
+changes can be checked against.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean, no dependency
+changes), `pnpm lint` (258 files, 0/0/0), `pnpm test` (1047/1047), `pnpm
+build` (711 pages), the new `pnpm check:text-spacing` (0/711 overflowing),
+`pnpm check:pdfs` (700/700, confirming the content-untouched no-PDF-rebuild
+call was correct). No `content/*.md` or `src/pages/hr/**` file was touched,
+so `pnpm build:pdfs` was not required.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+backlog as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged. This
+run's own full e2e/manual-browser-sweep baseline (two-hundred-and-
+thirty-third/-fourth runs) was not re-run in full, since this run's only
+change was one new, independent, zero-dependency script with no `src/`
+or `content/` edits - nothing those suites exercise could regress from it.
