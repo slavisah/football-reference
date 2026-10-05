@@ -34503,3 +34503,82 @@ no follow-up fix pending from it - only the standing maintenance note that
 any new interactive component should expect this permanent guard to catch
 an undersized touch target automatically, without needing its own
 hand-written 44px test the way every prior component did.
+
+### Fixed a real offline-reading gap: the global team/player search widgets failed on their first use while offline, since neither index JSON was precached (two-hundred-and-thirtieth intensive run, 2026-10-05)
+
+With `docs/ROADMAP.md`'s "Open backlog" re-confirmed still fully blocked
+(same five items as the two-hundred-and-ninth/-twenty-eighth runs'
+re-checks: `typescript` 7 capped by `@astrojs/check@0.9.10`'s peer
+dependency, `http-cache-semantics` with no patched version published
+(`pnpm audit` re-run this run, unchanged), the link-liveness sweep still
+`EGRESS_BLOCKED` (re-confirmed this run via a direct `WebFetch` to
+`en.wikipedia.org`), the `long-title` brand decision needing human
+sign-off, and the two UEFA Nations League source gaps), and `pnpm
+outdated` showing nothing new to bump beyond the already-blocked
+`typescript` 7 release, this run took the "genuinely useful quality pass"
+fallback AGENTS.md's scheduling prompt calls for when the backlog is
+exhausted. Rather than hunt for another narrow WCAG criterion (the site
+already has permanent regression suites for 2.4.11, 2.5.8, forced-colors,
+reduced-transparency, prefers-contrast and color-vision-deficiency) or
+re-run a sweep the two-hundred-and-twenty-eighth/-ninth runs had already
+confirmed clean one day earlier, a background audit went looking
+specifically for a real, previously-uncovered defect instead.
+
+It found one: `Nav.astro`'s global "find a team"/"find a player" search
+widgets (rendered on all 711 pages, both languages, promoted to primary
+nav) fetch `/team-index.json`/`/player-index.json` lazily on first
+focus - a deliberate choice (`src/pages/team-index.json.ts`'s own header
+comment) to avoid every page paying for a ~60-country/130-player JSON
+payload against `scripts/check-page-weight.mjs`'s budget. But
+`src/lib/offlineCache.ts`'s `STATIC_ASSETS` list, which the service
+worker precaches on install so a reader can read any nav page offline
+without having visited it online first, never included either index
+file - and the service worker's generic fetch handler only ever caches a
+same-origin GET *after* it has succeeded once online (`src/pages/
+sw.js.ts`). So a reader who opened the (precached) home page while
+offline and tried the search box for the first time got the widget's
+`data-error-label` text instead of results, with no retry path once
+offline - a real break in a primary-nav feature that conflicts with the
+site's own "offline-readable reference" PWA framing. Nothing existing
+would have caught this: `scripts/check-precache.mjs`'s own scope is
+explicitly nav `<a href>` links parsed from the built home page, which
+structurally can't see a JS-driven `fetch()`; the "Installability and
+offline reading" `tests/e2e/mobile.spec.ts` suite's ~11 prior tests all
+drive page navigation, none focus the search inputs offline; and
+`tests/unit/offlineCache.test.ts` only ever asserted page/manifest/icon
+URLs.
+
+Fixed by adding `/team-index.json` and `/player-index.json` (1.7KB/5.2KB
+in `dist/`, confirmed cheap) to `offlineCache.ts`'s `STATIC_ASSETS`, and
+bumping `sw.js.ts`'s `CACHE_VERSION` to `v5` per that file's own
+"bump whenever the precache list changes" comment, so existing installs
+evict the stale cache and pick up both files on next activate. Extended
+`tests/unit/offlineCache.test.ts` with a new assertion that both URLs
+appear in `buildPrecacheUrls()`'s output (and updated its two tests that
+hardcoded the static-asset list/count). Added a new `tests/e2e/
+mobile.spec.ts` test to the "Installability and offline reading" suite
+that goes offline immediately after the service worker is ready (search
+never focused online first), then focuses both search inputs and asserts
+real results render instead of the error label - the test that would
+have caught this bug and now guards the fix. `scripts/check-precache.mjs`
+needed no changes: its existing "every precached URL resolves to a real
+`dist/` file" check (direction 1) already covers the two new entries
+generically once they're in the list, confirmed by its "Checked 39
+precached URLs" output (up from 37).
+
+**Verification:** `pnpm build` (711 pages, unchanged), `pnpm test`
+(1023/1023, +1 new), `pnpm lint` (249 files, 0/0/0), `pnpm check:precache`
+(39 precached URLs, clean), and the full 12-test "Installability and
+offline reading" `tests/e2e/mobile.spec.ts` suite run directly (all pass,
+including the one new test) - not just the two targeted tests, since the
+`CACHE_VERSION` bump touches the activate-handler eviction test too. No
+`content/*.md` file was touched, so `pnpm build && pnpm build:pdfs` was
+not required for this run.
+
+**Left for a future pass:** everything `docs/ROADMAP.md`'s "Open backlog"
+already tracks, unchanged. The fix is narrow and complete - no follow-up
+pending from it specifically - but the underlying pattern (a component
+that lazily `fetch()`es its own data client-side, outside the page's own
+precached HTML) is worth a mental note for any future nav-level widget:
+check whether its data endpoint needs adding to `STATIC_ASSETS` too,
+rather than assuming the generic cache-on-read fetch handler covers it.

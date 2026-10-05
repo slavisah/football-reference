@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (229 intensive runs as of 2026-10-04) lives
+verification sweep and decision (230 intensive runs as of 2026-10-05) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -65,7 +65,7 @@ every time and wired into `.github/workflows/ci.yml` as required PR gates;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-twenty-ninth run (2026-10-04): 1022/1022 unit
+As of the two-hundred-and-thirtieth run (2026-10-05): 1023/1023 unit
 tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, and the
 same two standing `knip` false positives as ever (`scripts/
 test-preview-server.mjs`, used only as a Playwright `webServer.command`,
@@ -129,7 +129,19 @@ family: every prior 44px touch-target check was a hand-written assertion on
 one specific component, so `scripts/check-target-size.mjs` (`pnpm
 check:target-size`) now sweeps every button/select/input/`role="button"`
 on all 711 pages against AGENTS.md's 44px floor in one pass - clean on its
-first run. See "Open backlog" and "Ideas not yet scoped" below for
+first run. The two-hundred-and-thirtieth run closed a real gap in the
+site's offline-reading story instead: the global team/player search
+widgets in `Nav.astro` fetch `/team-index.json`/`/player-index.json`
+lazily on first focus rather than on page load, and `src/lib/
+offlineCache.ts`'s install-time precache list never included either file -
+so a reader who opened the (already-precached) home page offline and then
+tried search for the first time got the widget's error state instead of
+results, since the service worker's generic fetch handler only caches a
+same-origin GET after it has succeeded once online. Both index files are a
+few KB each, now added to `STATIC_ASSETS` alongside the icons/manifest
+(`CACHE_VERSION` bumped to `v5` so existing installs pick up the change),
+with a new unit test and a new `tests/e2e/mobile.spec.ts` offline-first-use
+test guarding it. See "Open backlog" and "Ideas not yet scoped" below for
 everything else still open. For the full run-by-run history behind all of
 this, see `docs/PROJECT_STATUS.md`.
 

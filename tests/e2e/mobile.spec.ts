@@ -3806,6 +3806,42 @@ test.describe('Installability and offline reading', () => {
     await context.setOffline(false);
     await cdp.detach();
   });
+
+  test('the global team-search and player-search widgets work offline on their very first use, not just after being fetched once online', async ({
+    page,
+    context,
+  }) => {
+    // Reproduces a real gap: Nav.astro's search widgets fetch /team-index.json
+    // and /player-index.json lazily on first focus (not on page load, to
+    // avoid an eager request every visitor pays for), and the service
+    // worker's generic fetch handler only caches a same-origin GET after it
+    // has succeeded once online - so a reader who opens the (precached) home
+    // page offline and tries search for the first time previously got the
+    // widget's error state, not results. offlineCache.ts's STATIC_ASSETS now
+    // precaches both index files on install so this works without ever
+    // having fetched them online first.
+    await page.goto('');
+    await page.evaluate(() => navigator.serviceWorker.ready);
+
+    await context.setOffline(true);
+    await openMenu(page);
+
+    await page.locator('#team-search-input').fill('Brazil');
+    await expect(page.locator('#team-search-listbox')).toBeVisible();
+    await expect(page.locator('#team-search-listbox [role="option"]').first()).toHaveText('Brazil');
+    await expect(page.locator('#team-search-status')).not.toHaveText(
+      (await page.locator('#team-search-input').getAttribute('data-error-label')) ?? '',
+    );
+
+    await page.locator('#player-search-input').fill('Messi');
+    await expect(page.locator('#player-search-listbox')).toBeVisible();
+    await expect(page.locator('#player-search-listbox [role="option"]').first()).toContainText('Messi');
+    await expect(page.locator('#player-search-status')).not.toHaveText(
+      (await page.locator('#player-search-input').getAttribute('data-error-label')) ?? '',
+    );
+
+    await context.setOffline(false);
+  });
 });
 
 test.describe('Primary nav stays in the current language', () => {
