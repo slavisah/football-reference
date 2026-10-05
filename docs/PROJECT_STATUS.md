@@ -15,9 +15,9 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 703 Vitest unit tests
+pnpm test                      # 1047 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 952 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 1049 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1/2.2 A/AA sweep,
                                           # light and dark, across every page)
 ```
@@ -34867,3 +34867,60 @@ quiz-specific specs most runs re-run) is now the one piece of the
 two-hundred-and-twenty-eighth run's full baseline not re-confirmed this run
 - a reasonable next full-regression target once enough further commits have
 landed to justify it.
+
+### Full cold-start `pnpm test:e2e` re-confirmed clean (1049/1049), closing the gap the previous run flagged - plus a stale doc-count fix (two-hundred-and-thirty-fourth intensive run, 2026-10-05)
+
+With `docs/ROADMAP.md`'s "Open backlog" re-confirmed still fully blocked
+(`pnpm outdated` shows only the same capped `typescript` 7 upgrade, `pnpm
+audit` the same single `http-cache-semantics` advisory with no patched
+version yet, and `WebFetch` to `en.wikipedia.org` still returns
+`EGRESS_BLOCKED` - same three environment-level blocks as every recent run)
+and `content/ballon-dor.md` already carrying the 2025 edition (Ousmane
+Dembélé) with no newer Copa América/Nations League/Golden Boot edition due,
+there was no new content slice to ship this run. Took the previous run's own
+explicitly-flagged next step instead: the two-hundred-and-twenty-eighth
+run's cold-start `pnpm test:e2e` (1045/1045) was, until this run, still the
+most recent *complete* confirmation of the full e2e suite - runs 229 through
+233 had each only re-run the quiz-specific specs or the six manual browser
+sweeps, not the full interaction-behavior suite itself, while the suite
+itself grew to 1049 cases over those same five runs.
+
+Ran it cold via the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` escape
+hatch (this container's fixed Playwright 1.63.0 browser path, no `chrome`
+channel installed): **1049/1049 passed** in 22.0 minutes, zero flakes, zero
+retries. No code change was needed - this was a pure confirmation run.
+
+Also used the full standing health check that preceded it to catch and fix
+a real (if cosmetic) drift: `docs/PROJECT_STATUS.md`'s own "How to run"
+quick-start block still read "703 Vitest unit tests" and "952 Playwright
+tests" - stale by hundreds of commits (actual: 1047/1049) and the same kind
+of drift a much earlier run (see this file's own "543/939 -> 649/952" fix
+above) already flagged as worth catching whenever noticed. Updated both
+numbers to the current counts.
+
+**Verification:** `pnpm install` (clean, no dependency changes), `pnpm lint`
+(257 files, 0/0/0), `pnpm test` (1047/1047), `pnpm build` (711 pages), all 30
+CI-gated fast `check:*` scripts individually re-run and clean (`check:pdfs`
+700/700, `check:links` 715 pages checked, `check:sitemap` 710 entries,
+`check:feed`, `check:jsonld` 1783 blocks/711 pages, `check:target-size` -
+re-run alone after an initial false failure from a port clash with the
+concurrently-starting e2e preview server, `check:meta`, `check:precache`,
+`check:heading-outline`, `check:theme-flash`, `check:reachability`, the four
+independent-recomputation consistency checks, `check:award-tallies`, all
+seven claim-ledger checks, `check:edition-header-labels`, `check:i18n-notes`,
+`check:attendance-format`, `check:claims-hr`, `check:link-names`,
+`check:image-dimensions`, `check:locale-consistency`, `check:theme-color`,
+`check:spelling`/`check:spelling-hr`, `check:perf`, `check:pdf-outline`),
+`pnpm audit` (the one known-blocked advisory only), and `pnpm dlx knip
+--no-config-hints` (the same two standing false positives as ever). No
+`content/*.md` file was touched, so `pnpm build && pnpm build:pdfs` was not
+required.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+backlog as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged. With
+the full e2e baseline now re-confirmed alongside all six manual browser
+sweeps (two-hundred-and-thirty-third run) and every fast `check:*` script,
+every piece of this project's standing regression coverage is simultaneously
+current as of this run for the first time in several runs' worth of
+drift - a genuinely clean baseline for whichever real feature or content
+slice the next run finds.
