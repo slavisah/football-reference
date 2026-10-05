@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (231 intensive runs as of 2026-10-05) lives
+verification sweep and decision (232 intensive runs as of 2026-10-05) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -66,9 +66,11 @@ now including the two-hundred-and-thirty-first run's `check:feed`;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-thirty-first run (2026-10-05): 1043/1043 unit
-tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built plus the
-new `/feed.xml`/`/hr/feed.xml` Atom feeds, and the
+As of the two-hundred-and-thirty-second run (2026-10-05): 1047/1047 unit
+tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, the
+`/feed.xml`/`/hr/feed.xml` Atom feeds now also covering the newest edition
+of all seven edition-page route trees (22 entries per locale, up from 15),
+and the
 same two standing `knip` false positives as ever (`scripts/
 test-preview-server.mjs`, used only as a Playwright `webServer.command`,
 never imported; `@cspell/dict-hr-hr`, used only via `.cspell/
