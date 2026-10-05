@@ -66,23 +66,24 @@ now including the two-hundred-and-thirty-first run's `check:feed`;
 `check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
 manual/intensive-run-only rather than a required PR gate, purely for their
 ~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-thirty-second run (2026-10-05): 1047/1047 unit
+As of the two-hundred-and-thirty-third run (2026-10-05): 1047/1047 unit
 tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, the
-`/feed.xml`/`/hr/feed.xml` Atom feeds now also covering the newest edition
-of all seven edition-page route trees (22 entries per locale, up from 15),
-and the
+`/feed.xml`/`/hr/feed.xml` Atom feeds covering the newest edition of all
+seven edition-page route trees (22 entries per locale), `@cspell/dict-hr-hr`
+at 3.1.3, and the
 same two standing `knip` false positives as ever (`scripts/
 test-preview-server.mjs`, used only as a Playwright `webServer.command`,
 never imported; `@cspell/dict-hr-hr`, used only via `.cspell/
 hr-notes.cspell.json`'s `"import"` field, never a JS `import`) - neither
 actually unused, knip's static analysis just can't see a reference inside a
 config-file string. The two-hundred-and-twenty-eighth run's own full
-cold-start `pnpm test:e2e` (1045/1045) plus all six manual browser sweeps
+cold-start `pnpm test:e2e` (1045/1045) remains the last full confirmation of
+the e2e suite itself, but all six manual browser sweeps
 (`check:lighthouse`/`check:reflow`/`check:landscape`/`check:text-zoom`/
-`check:print-width`/`check:html`) are now the last complete, together
-confirmation of the full e2e suite and every manual sweep (see
-`docs/PROJECT_STATUS.md`'s two-hundred-and-twenty-eighth-run entry for the
-full writeup); most runs still re-run just the two quiz-specific e2e specs
+`check:print-width`/`check:html`) were re-confirmed clean again by the
+two-hundred-and-thirty-third run against the current build (see
+`docs/PROJECT_STATUS.md`'s matching entry for the full writeup); most runs
+still re-run just the two quiz-specific e2e specs
 (`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`, 14
 tests) when their own change was a quiz markup/behavior change, which is
 judged sufficient per-run - see each run's own `docs/PROJECT_STATUS.md`

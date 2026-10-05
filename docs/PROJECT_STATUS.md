@@ -34796,3 +34796,74 @@ family, behind some reader-facing filter/pagination - but that's a much
 larger feature (a feed reader has no UI for filtering an Atom feed) with no
 clear reader demand signal yet, not a natural next slice the way "the
 newest one per family" was.
+
+### Dependency patch bump plus a full re-confirmation of all six manual/intensive-run-only browser sweeps - zero regressions (two-hundred-and-thirty-third intensive run, 2026-10-05)
+
+With `docs/ROADMAP.md`'s "Open backlog" re-confirmed still fully blocked
+(same items as the last several runs - `pnpm outdated`/`pnpm audit` showed
+nothing new beyond the one dependency below) and the prior three runs having
+each shipped a real feature (offline search precaching, the Atom feed, then
+its per-edition extension), this run first looked for further new ground
+the same way the two-hundred-and-twenty-seventh run did, then fell back to
+the safe, genuinely useful maintenance action per `AGENTS.md`'s own
+fallback: `pnpm outdated` showed `@cspell/dict-hr-hr` at 3.1.2 with 3.1.3
+newly published (not yet available at the two-hundred-and-twenty-seventh
+run's own last check) - `typescript` remains capped by `@astrojs/
+check@0.9.10`'s peer dependency, unchanged. Bumped via `pnpm update
+@cspell/dict-hr-hr@3.1.3`.
+
+Also used this run to close a real staleness gap: the two-hundred-and-
+twenty-eighth run's full cold-start `pnpm test:e2e` plus all six manual
+browser sweeps (`check:lighthouse`/`check:reflow`/`check:landscape`/
+`check:text-zoom`/`check:print-width`/`check:html`) was, until this run,
+still the most recent *complete* confirmation of that whole group - five
+runs and three real feature commits (230-232) had landed since without a
+fresh full sweep, only `check:lighthouse` alone getting a one-off
+re-confirmation at run 208. Re-ran all six by hand against the current
+build: `check:html` (711/711 valid HTML5, no browser needed), then the five
+Playwright-driven sweeps (`check:target-size`, `check:reflow`,
+`check:landscape`, `check:text-zoom`, `check:print-width`,
+`check:lighthouse`) using the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`
+escape hatch this file's own "How to run" section already documents (this
+session's container ships Playwright 1.63.0's expected browser revision
+only at that fixed path, not the auto-discovered one `chromium.launch()`
+looks for by default). All six came back completely clean: no sub-44px
+touch target among 711 pages at 360px, no horizontal overflow at 320px,
+667x375 landscape, 200% text zoom, or 1032px print width, and
+`check:lighthouse`'s 39-page representative sample still at a perfect
+1.00/1.00/1.00/1.00 across every category (the one known, already-documented
+`EXPECTED_SEO_EXCEPTIONS` 404-page SEO score aside) with no back/forward-
+cache blockers.
+
+**Verification:** `pnpm install` (clean), `pnpm lint` (257 files, 0/0/0),
+`pnpm test` (1047/1047, unchanged - a devDependency bump touches no app
+code), `pnpm build` (711 pages, unchanged), `pnpm check:spelling-hr` (57
+blocks, 0 unknown words - confirms the bumped dictionary still recognizes
+every Croatian word already in use, the one behavior a dictionary-package
+bump could actually change), and all 33 other CI-gated fast `check:*`
+scripts individually re-run and clean (`check:pdfs` 700/700,
+`check:pdf-outline` 700/700, `check:perf`, the four consistency checks,
+`check:links`, `check:sitemap`, `check:feed`, `check:precache`,
+`check:target-size`, `check:jsonld`, `check:heading-outline`,
+`check:theme-flash`, `check:reachability`, `check:meta`,
+`check:award-tallies` 4/4, all seven claim-ledger checks,
+`check:edition-header-labels`, `check:i18n-notes`, `check:attendance-format`,
+`check:claims-hr`, `check:link-names`, `check:image-dimensions`,
+`check:locale-consistency`, `check:theme-color`, `check:spelling`). The six
+manual sweeps above, plus `pnpm audit` (still only the one known-blocked
+`http-cache-semantics` advisory) and `pnpm dlx knip --no-config-hints`
+(same two standing false positives: `scripts/test-preview-server.mjs`,
+`@cspell/dict-hr-hr`). No `content/*.md` file was touched, so `pnpm build
+&& pnpm build:pdfs` was not required for this run. Cold-start `pnpm
+test:e2e` itself was not re-run (the two-hundred-and-twenty-eighth run's
+1045/1045 remains the current full baseline) - this run's six manual sweeps
+cover the same browser-rendering surface that baseline already established,
+just not the interaction-behavior assertions `test:e2e` alone carries.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+open backlog items as ever - see `docs/ROADMAP.md`'s "Open backlog",
+unchanged. A fresh cold-start full `pnpm test:e2e` (rather than just the
+quiz-specific specs most runs re-run) is now the one piece of the
+two-hundred-and-twenty-eighth run's full baseline not re-confirmed this run
+- a reasonable next full-regression target once enough further commits have
+landed to justify it.
