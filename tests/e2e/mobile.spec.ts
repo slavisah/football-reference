@@ -4073,6 +4073,59 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(body).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
   });
 
+  test('every page links to its own-language Atom feed for autodiscovery', async ({ page }) => {
+    await page.goto('competitions/world-cup');
+    await expect(
+      page.locator('link[rel="alternate"][type="application/atom+xml"]'),
+    ).toHaveAttribute('href', `${SITE}/feed.xml`);
+
+    await page.goto('hr/competitions/world-cup');
+    await expect(
+      page.locator('link[rel="alternate"][type="application/atom+xml"]'),
+    ).toHaveAttribute('href', `${SITE}/hr/feed.xml`);
+  });
+
+  test('feed.xml is a well-formed Atom feed of recently reviewed pages, newest first', async ({
+    page,
+  }) => {
+    const response = await page.request.get('/football-reference/feed.xml');
+    expect(response.ok()).toBe(true);
+    // The local static-file preview server serves this by extension rather
+    // than honoring feed.xml.ts's own Content-Type response header (the
+    // same quirk the sitemap.xml/robots.txt tests above already work
+    // around) - loosely asserting "xml" rather than the exact media type.
+    expect(response.headers()['content-type']).toContain('xml');
+    const body = await response.text();
+
+    expect(body).toContain('<feed xmlns="http://www.w3.org/2005/Atom">');
+    expect(body).toContain(`<link rel="self" href="${SITE}/feed.xml" />`);
+    expect(body).toContain(`<link rel="alternate" href="${SITE}/" />`);
+    // One entry per NAV_LINKS page with a content-collection id
+    // (src/lib/contentPages.ts's CONTENT_ID_BY_PATH) - 15 as of this test.
+    expect(body.match(/<entry>/g)?.length).toBe(15);
+    expect(body).toContain(`<link rel="alternate" href="${SITE}/records/" />`);
+    expect(body).toContain('<title>Records and Timelines</title>');
+
+    const updatedDates = [...body.matchAll(/<entry>[\s\S]*?<updated>([^<]*)<\/updated>/g)].map(
+      (match) => match[1],
+    );
+    const sorted = [...updatedDates].sort().reverse();
+    expect(updatedDates).toEqual(sorted);
+  });
+
+  test('hr/feed.xml carries Croatian entry titles and only Croatian page links', async ({
+    page,
+  }) => {
+    const response = await page.request.get('/football-reference/hr/feed.xml');
+    expect(response.ok()).toBe(true);
+    const body = await response.text();
+
+    expect(body.match(/<entry>/g)?.length).toBe(15);
+    expect(body).toContain(`<link rel="alternate" href="${SITE}/hr/records/" />`);
+    expect(body).toContain('<title>Rekordi</title>');
+    expect(body).not.toMatch(new RegExp(`href="${SITE}/(?!hr/)[^"]*"`));
+  });
+
   async function jsonLdBlocks(page: import('@playwright/test').Page) {
     const raw = await page.locator('script[type="application/ld+json"]').allTextContents();
     return raw.map((text) => JSON.parse(text));

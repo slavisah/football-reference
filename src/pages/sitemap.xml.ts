@@ -9,30 +9,9 @@ import { teamProfileSlug } from '../lib/teamProfile';
 import { loadCompetition } from '../lib/competition';
 import { buildAllPlayerProfiles, playerProfileSlug, type PlayerAwardSource } from '../lib/playerProfile';
 import { buildEditionProfiles } from '../lib/editionProfile';
+import { CONTENT_ID_BY_PATH, derivedPageLastReviewed } from '../lib/contentPages';
 
 export const prerender = true;
-
-// path -> content collection id, purely to read `lastReviewed` for <lastmod>.
-// Every entry mirrors the loadCompetition/loadPageMeta id each page already
-// calls (see docs/ADDING_CONTENT.md section 7), so this can't drift from what
-// a page actually shows without also breaking that page's own build.
-const CONTENT_ID_BY_PATH: Record<string, string> = {
-  '/': 'index',
-  '/competitions/world-cup': 'fifa-world-cup',
-  '/competitions/euro': 'uefa-euro',
-  '/competitions/nations-league': 'uefa-nations-league',
-  '/competitions/copa-america': 'copa-america',
-  '/competitions/ballon-dor': 'ballon-dor',
-  '/competitions/golden-boot': 'golden-boot',
-  '/records': 'records-and-timelines',
-  '/compare': 'compare-countries',
-  '/teams': 'teams',
-  '/players': 'players',
-  '/compare-players': 'compare-players',
-  '/quiz': 'quiz',
-  '/glossary': 'glossary',
-  '/about/sources': 'about-sources',
-};
 
 function xmlEscape(value: string): string {
   return value
@@ -77,13 +56,34 @@ export const GET: APIRoute = async ({ site, url }) => {
     return new URL(withBase(withSlash), origin).toString();
   };
 
+  // Loaded up front (rather than where each loop that primarily needs them
+  // for other reasons first appears, as before) because the main NAV_LINKS
+  // loop below now also needs these same competitions' dates - see
+  // derivedPageLastReviewed()'s own doc comment in contentPages.ts for why
+  // five of the pages that loop covers can't just read their own content
+  // entry's `lastReviewed` the way every other page there does.
+  const { worldCup, euro, copaAmerica, nationsLeague, competitions } = await loadTeamCompetitions();
+  const [ballonDor, worldCupGoldenBoot, euroGoldenBoot] = await Promise.all([
+    loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'FIFA World Cup top scorers',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'UEFA EURO top scorers',
+      sourcesHeading: 'UEFA EURO',
+    }),
+  ]);
+  const teamCompetitionDates = [worldCup, euro, copaAmerica, nationsLeague].map((c) => c.lastReviewed);
+  const awardDates = [ballonDor, worldCupGoldenBoot, euroGoldenBoot].map((c) => c.lastReviewed);
+
   const urlEntries: string[] = [];
 
   for (const { path: enPath } of NAV_LINKS) {
     const hrPath = TRANSLATED_PATHS[enPath];
     const contentId = CONTENT_ID_BY_PATH[enPath];
     const entry = contentId ? await getEntry('pages', contentId) : undefined;
-    const lastmod = entry?.data.lastReviewed;
+    const lastmod = derivedPageLastReviewed(enPath, teamCompetitionDates, awardDates, entry?.data.lastReviewed);
 
     const locales: { path: string; lang: 'en' | 'hr' }[] = hrPath
       ? [
@@ -107,12 +107,12 @@ export const GET: APIRoute = async ({ site, url }) => {
   // with a single id the CONTENT_ID_BY_PATH map could name, so they still
   // need their own loop here - now emitting both languages per team with
   // reciprocal hreflang alternates, the same shape the main loop already
-  // gives every other bilingual page.
-  const { worldCup, euro, copaAmerica, nationsLeague, competitions } = await loadTeamCompetitions();
-  const teamsLastmod = [worldCup, euro, copaAmerica, nationsLeague]
-    .map((c) => c.lastReviewed)
-    .sort()
-    .at(-1);
+  // gives every other bilingual page. Reuses the same derivedPageLastReviewed('/teams', ...)
+  // value the main loop above just gave the /teams NAV_LINKS entry itself,
+  // rather than a second, narrower computation that (before this fix) left
+  // out the 'teams' content entry's own date.
+  const teamsEntry = await getEntry('pages', 'teams');
+  const teamsLastmod = derivedPageLastReviewed('/teams', teamCompetitionDates, awardDates, teamsEntry?.data.lastReviewed);
   const lastmodTag = teamsLastmod ? `<lastmod>${teamsLastmod}</lastmod>` : '';
   for (const record of buildAllCountryRecords(competitions)) {
     const slug = teamProfileSlug(record.id);
@@ -130,18 +130,7 @@ export const GET: APIRoute = async ({ site, url }) => {
   // page-content-collection entries with a single id CONTENT_ID_BY_PATH could
   // name, so they still need their own loop here - now emitting both languages
   // per player with reciprocal hreflang alternates, the same shape the /teams
-  // per-team loop below already uses.
-  const [ballonDor, worldCupGoldenBoot, euroGoldenBoot] = await Promise.all([
-    loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),
-    loadCompetition('golden-boot', {
-      editionsHeading: 'FIFA World Cup top scorers',
-      sourcesHeading: 'FIFA World Cup',
-    }),
-    loadCompetition('golden-boot', {
-      editionsHeading: 'UEFA EURO top scorers',
-      sourcesHeading: 'UEFA EURO',
-    }),
-  ]);
+  // per-team loop above already uses.
   const playerSources: PlayerAwardSource[] = [
     { title: "Ballon d'Or", slug: 'ballon-dor', editions: ballonDor.editions },
     { title: 'FIFA World Cup Golden Boot', slug: 'golden-boot', editions: worldCupGoldenBoot.editions },
@@ -149,15 +138,12 @@ export const GET: APIRoute = async ({ site, url }) => {
   ];
   const playerProfiles = buildAllPlayerProfiles(playerSources);
   const playersEntry = await getEntry('pages', 'players');
-  const playersLastmod = [
-    ballonDor.lastReviewed,
-    worldCupGoldenBoot.lastReviewed,
-    euroGoldenBoot.lastReviewed,
+  const playersLastmod = derivedPageLastReviewed(
+    '/players',
+    teamCompetitionDates,
+    awardDates,
     playersEntry?.data.lastReviewed,
-  ]
-    .filter((value): value is string => Boolean(value))
-    .sort()
-    .at(-1);
+  );
   const playersLastmodTag = playersLastmod ? `<lastmod>${playersLastmod}</lastmod>` : '';
   for (const profile of playerProfiles) {
     const slug = playerProfileSlug(profile.id);
