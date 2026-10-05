@@ -34582,3 +34582,121 @@ that lazily `fetch()`es its own data client-side, outside the page's own
 precached HTML) is worth a mental note for any future nav-level widget:
 check whether its data endpoint needs adding to `STATIC_ASSETS` too,
 rather than assuming the generic cache-on-read fetch handler covers it.
+
+### Added an Atom feed (`/feed.xml`, `/hr/feed.xml`) of recently-reviewed pages, and found + fixed a real freshness-date bug it exposed in `sitemap.xml.ts` (two-hundred-and-thirty-first intensive run, 2026-10-05)
+
+With `docs/ROADMAP.md`'s "Open backlog" re-confirmed still fully blocked (the
+same items the two-hundred-and-twenty-ninth/-thirtieth runs' own re-checks
+found: `typescript` 7 capped by `@astrojs/check@0.9.10`'s peer dependency,
+`http-cache-semantics` with no patched version published, the link-liveness
+sweep still `EGRESS_BLOCKED`, the `long-title` brand decision needing human
+sign-off, and the two UEFA Nations League source gaps) and `pnpm outdated`/
+`pnpm audit` showing nothing new to bump or patch, this run took the
+"genuinely useful quality pass" fallback AGENTS.md's scheduling prompt calls
+for when the backlog is exhausted. A background audit (every existing
+robots.txt/sitemap.xml/OG/Twitter-card/404/CSP/icon surface already
+checked, matching 230 prior runs' worth of SEO/accessibility/performance
+sweeps) found exactly one genuinely unbuilt surface: no RSS/Atom feed
+existed anywhere in the repo (confirmed by grepping src/, content/, docs/
+for rss|atom|feed.xml - zero hits besides the unrelated "RSSSF" source
+name), despite every page already carrying the `lastReviewed` date
+(`sitemap.xml.ts`'s own `<lastmod>`, `BaseLayout.astro`'s `og:updated_time`)
+a feed needs.
+
+Built `src/pages/feed.xml.ts`/`src/pages/hr/feed.xml.ts`: an Atom 1.0 feed,
+most-recently-reviewed entry first, scoped to the 15 top-level NAV_LINKS
+pages that have a `src/lib/contentPages.ts` `CONTENT_ID_BY_PATH` entry (the
+per-team/per-player/per-edition pages `sitemap.xml.ts` also enumerates would
+make this noisy rather than useful - hundreds of entries that mostly inherit
+their parent competition page's own date, not independently-reviewed
+items). English entries read title/description/date straight from the
+content collection (the one place that text lives); Croatian has no
+parallel per-page content collection (its page titles are literal strings
+in each `src/pages/hr/*.astro` file), so Croatian entries reuse
+`NAV_LINKS`' own short `labelHr` as the title and carry no summary rather
+than inventing a second, driftable copy of each page's Croatian title just
+for this feed. `BaseLayout.astro` now carries a `<link rel="alternate"
+type="application/atom+xml">` autodiscovery tag on every page, pointing at
+that page's own-language feed (absolute URL, matching canonical/hreflang/OG
+tags' own convention - a relative `withBase()` path like the icon/manifest
+links use would still be spec-valid here but was inconsistent with every
+other cross-reference tag in this `<head>`). `src/lib/feed.ts` holds the
+pure Atom-building logic (sorting, XML escaping, RFC3339 date formatting),
+kept separate from the two Astro route files the same way `sitemap.xml.ts`
+already keeps its own `xmlEscape`/`buildAltLinks` helpers factored out - so
+it has a direct `tests/unit/feed.test.ts` without needing Astro's
+content-collection runtime. The `CONTENT_ID_BY_PATH` map itself moved out of
+`sitemap.xml.ts` into a new shared `src/lib/contentPages.ts` so the feed
+and the sitemap read the exact same path-to-content-id table rather than two
+copies that could drift.
+
+Building the feed surfaced a real, previously-uncaught bug rather than just
+adding a new page: five of those fifteen pages - `/records`, `/compare`,
+`/compare-players`, `/teams`, `/players` - aren't independently-reviewed
+content in their own right. Each is a generated, cross-competition summary
+(`src/pages/records.astro`, `compare.astro`, `compare-players.astro`,
+`teams/index.astro`, `players/index.astro`) whose own `lastReviewed`
+constant - the one it actually passes to `BaseLayout`'s `dateModified` prop,
+and from there to `og:updated_time` - is computed as the latest date across
+every competition/award it draws from (plus, for four of the five, its own
+content file's date too), not simply its own `content/*.md` entry's date.
+`sitemap.xml.ts`'s main loop and the original `loadFeedEntries()` draft both
+used only the single content entry's date for these five paths - silently
+understating how fresh the page actually is (by six to ten weeks for some
+of them, confirmed by diffing against the real built `og:updated_time`) to
+every search engine reading `<lastmod>` and every feed reader reading
+`<updated>`. Caught by the new `scripts/check-feed.mjs`'s cross-check of
+each feed entry's date against its target page's own built
+`og:updated_time` - the same kind of "does the generated claim match the
+real page" check `check-sitemap.mjs` already does for canonical URLs,
+applied here to the one date a reader (or a feed) actually sees. This bug
+had been shipping in `sitemap.xml.ts` since it first grew per-page
+`<lastmod>` tags; nothing previously cross-checked a sitemap `<lastmod>`
+against its page's own freshness signal.
+
+Fixed with one new pure function, `derivedPageLastReviewed()`
+(`src/lib/contentPages.ts`, with `tests/unit/contentPages.test.ts`), that
+encodes the exact same per-path formula each of the five `.astro` files
+already computes for itself, taking the already-loaded competition dates a
+caller needs anyway rather than re-loading content a second time. Both
+`sitemap.xml.ts` (which now loads `loadTeamCompetitions()`/the three
+`loadCompetition()` calls once, up front, instead of scattered across its
+later per-team/per-player loops) and `loadFeedEntries()` call this one
+function, so the two surfaces can't drift apart from each other or from
+each page's own real computation again. Also fixed a second, narrower
+instance of the same bug class in passing: the per-team-profile loop's own
+`teamsLastmod` (used for all 40 `/teams/<slug>` pages' `<lastmod>`) had
+never concatenated the `teams` content entry's own date into its max - now
+folded into the same shared formula.
+
+Extended `scripts/check-sitemap.mjs` itself with a permanent version of the
+same cross-check (`parseSitemapUrls()` now also captures `<lastmod>`,
+`parsePageHead()` now also captures `og:updated_time`, and the forward pass
+flags any disagreement) so this bug class can't silently return to
+`sitemap.xml.ts` even on a run that never touches the feed.
+
+**Verification:** `pnpm test` (1043/1043, +20 new across `feed.test.ts`,
+`checkFeed.test.ts`, `contentPages.test.ts`, plus extended
+`checkSitemap.test.ts` cases), `pnpm lint` (257 files, 0/0/0), `pnpm build`
+(711 pages, unchanged), the new `pnpm check:feed` (clean, wired into
+`.github/workflows/ci.yml` as a required PR gate right after
+`check:sitemap` - fast enough, unlike the manual-only browser sweeps), `pnpm
+check:sitemap` (710 entries checked, clean - including the new `<lastmod>`-
+vs-`og:updated_time` cross-check), `pnpm check:links`/`check:html`/
+`check:jsonld`/`check:meta`/`check:perf`/`check:precache` (all clean,
+confirming the new feed routes and `<link rel="alternate"
+type="application/atom+xml">` tag introduced no regressions elsewhere), the
+two new `tests/e2e/mobile.spec.ts` feed tests plus the full existing "SEO:
+canonical/Open Graph tags, sitemap.xml, robots.txt" suite (31/31 passing),
+and `pnpm dlx knip --no-config-hints` (clean, same two pre-existing false
+positives as every prior run). No `content/*.md` file was touched, so `pnpm
+build && pnpm build:pdfs` was not required for this run.
+
+**Left for a future pass:** everything `docs/ROADMAP.md`'s "Open backlog"
+already tracks, unchanged. The feed itself is scoped to top-level pages only
+- extending it to per-edition pages (new tournament/award editions are
+arguably the single most "feed-worthy" kind of update this site could ever
+publish) remains a reasonable future slice, deliberately left out of this
+run to keep the entry count meaningful rather than noisy; `src/lib/feed.ts`'s
+`FeedEntry`/`buildAtomFeed()` are already generic enough to take such
+entries without changes if a future run wants to add them.

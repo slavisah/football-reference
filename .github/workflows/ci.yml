@@ -102,6 +102,9 @@ jobs:
       - name: Sitemap integrity check
         run: pnpm check:sitemap
 
+      - name: Atom feed integrity check
+        run: pnpm check:feed
+
       - name: JSON-LD structural-validity check
         run: pnpm check:jsonld
 
