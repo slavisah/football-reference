@@ -4101,8 +4101,10 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(body).toContain(`<link rel="self" href="${SITE}/feed.xml" />`);
     expect(body).toContain(`<link rel="alternate" href="${SITE}/" />`);
     // One entry per NAV_LINKS page with a content-collection id
-    // (src/lib/contentPages.ts's CONTENT_ID_BY_PATH) - 15 as of this test.
-    expect(body.match(/<entry>/g)?.length).toBe(15);
+    // (src/lib/contentPages.ts's CONTENT_ID_BY_PATH) - 15 as of this test -
+    // plus one more for the newest edition of each of the seven edition-page
+    // route trees (`buildEditionFeedEntry()`, same file) - 22 total.
+    expect(body.match(/<entry>/g)?.length).toBe(22);
     expect(body).toContain(`<link rel="alternate" href="${SITE}/records/" />`);
     expect(body).toContain('<title>Records and Timelines</title>');
 
@@ -4120,7 +4122,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(response.ok()).toBe(true);
     const body = await response.text();
 
-    expect(body.match(/<entry>/g)?.length).toBe(15);
+    expect(body.match(/<entry>/g)?.length).toBe(22);
     expect(body).toContain(`<link rel="alternate" href="${SITE}/hr/records/" />`);
     expect(body).toContain('<title>Rekordi</title>');
     expect(body).not.toMatch(new RegExp(`href="${SITE}/(?!hr/)[^"]*"`));

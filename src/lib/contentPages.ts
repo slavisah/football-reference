@@ -2,6 +2,8 @@ import { getEntry } from 'astro:content';
 import { NAV_LINKS } from './routes';
 import { loadTeamCompetitions } from './teamCompetitions';
 import { loadCompetition } from './competition';
+import { buildEditionProfiles, editionSlug, type EditionProfile } from './editionProfile';
+import type { Edition } from './types';
 import type { Locale } from './i18n';
 import type { FeedEntry } from './feed';
 
@@ -96,9 +98,58 @@ async function loadDerivedPageSources() {
     }),
   ]);
   return {
+    worldCup,
+    euro,
+    copaAmerica,
+    nationsLeague,
+    ballonDor,
+    worldCupGoldenBoot,
+    euroGoldenBoot,
     teamCompetitionDates: [worldCup, euro, copaAmerica, nationsLeague].map((c) => c.lastReviewed),
     awardDates: [ballonDor, worldCupGoldenBoot, euroGoldenBoot].map((c) => c.lastReviewed),
   };
+}
+
+/**
+ * One competition/award family's newest-edition feed entry, described
+ * declaratively so `loadFeedEntries()` below can build all seven (one per
+ * `/competitions/<slug>/<year>` route tree sitemap.xml.ts's own per-edition
+ * loops enumerate) from one shared builder rather than seven near-identical
+ * blocks of inline logic.
+ */
+export type EditionFeedFamily = {
+  /** This family's edition-page base path, e.g. '/competitions/world-cup' (see sitemap.xml.ts's matching per-edition loop). */
+  pathPrefix: string;
+  /** The competition-level `lastReviewed` every edition of this family shares (no per-edition date exists - see docs/PROJECT_STATUS.md's two-hundred-and-thirty-first-run entry). */
+  lastReviewed: string;
+  editions: Edition[];
+  /** Builds the exact title string this family's own `[year].astro` renders, so the feed never drifts from the real page title. */
+  titleEn: (profile: EditionProfile) => string;
+  titleHr: (profile: EditionProfile) => string;
+};
+
+/**
+ * One feed entry for a family's newest edition (`buildEditionProfiles()`
+ * returns newest-first, so the first element is always it), or undefined
+ * when the family has no editions - never happens for the six real families
+ * `loadFeedEntries()` passes, but keeps this function total rather than
+ * assuming its input.
+ */
+export function buildEditionFeedEntry(family: EditionFeedFamily, locale: Locale): FeedEntry | undefined {
+  const [profile] = buildEditionProfiles(family.editions);
+  if (!profile) return undefined;
+  return {
+    path: `${family.pathPrefix}/${profile.slug}`,
+    title: locale === 'hr' ? family.titleHr(profile) : family.titleEn(profile),
+    summary: locale === 'hr' || !profile.champion ? undefined : `${profile.champion} champion.`,
+    updated: family.lastReviewed,
+  };
+}
+
+/** Copa América's own `[year].astro`/`hr/[year].astro` year label, which appends the host only for the two slugs `assignEditionSlugs()` had to disambiguate (1959's two editions) - replicated here so the feed title can never drift from the real page title. */
+export function copaAmericaYearLabel(profile: EditionProfile): string {
+  const isDisambiguated = profile.slug !== editionSlug(profile.year);
+  return isDisambiguated && profile.host ? `${profile.year} (${profile.host})` : profile.year;
 }
 
 // Shared by src/pages/feed.xml.ts and src/pages/hr/feed.xml.ts (the same
@@ -112,7 +163,17 @@ async function loadDerivedPageSources() {
 // summary, rather than inventing a second, driftable copy of each page's
 // Croatian title just for this feed.
 export async function loadFeedEntries(locale: Locale): Promise<FeedEntry[]> {
-  const { teamCompetitionDates, awardDates } = await loadDerivedPageSources();
+  const {
+    teamCompetitionDates,
+    awardDates,
+    worldCup,
+    euro,
+    copaAmerica,
+    nationsLeague,
+    ballonDor,
+    worldCupGoldenBoot,
+    euroGoldenBoot,
+  } = await loadDerivedPageSources();
   const entries: FeedEntry[] = [];
   for (const { path, labelHr } of NAV_LINKS) {
     const contentId = CONTENT_ID_BY_PATH[path];
@@ -133,5 +194,71 @@ export async function loadFeedEntries(locale: Locale): Promise<FeedEntry[]> {
       updated,
     });
   }
+
+  // The newest edition of each of the seven edition-page route trees
+  // (sitemap.xml.ts's own per-edition loops enumerate every edition; a new
+  // tournament/award result is arguably the single most "feed-worthy" kind
+  // of update this site ever publishes, so this surfaces just the latest one
+  // per family rather than every edition - which would make the feed mostly
+  // noise, the same reasoning src/pages/feed.xml.ts's own doc comment
+  // already gives for excluding edition pages from the main NAV_LINKS loop
+  // above entirely). See docs/PROJECT_STATUS.md's two-hundred-and-thirty-
+  // first-run entry ("Left for a future pass").
+  const editionFamilies: EditionFeedFamily[] = [
+    {
+      pathPrefix: '/competitions/world-cup',
+      lastReviewed: worldCup.lastReviewed,
+      editions: worldCup.editions,
+      titleEn: (profile) => `${profile.year} FIFA World Cup`,
+      titleHr: (profile) => `FIFA Svjetsko prvenstvo ${profile.year}.`,
+    },
+    {
+      pathPrefix: '/competitions/euro',
+      lastReviewed: euro.lastReviewed,
+      editions: euro.editions,
+      titleEn: (profile) => `${profile.year} UEFA European Championship`,
+      titleHr: (profile) => `UEFA Europsko prvenstvo ${profile.year}.`,
+    },
+    {
+      pathPrefix: '/competitions/nations-league',
+      lastReviewed: nationsLeague.lastReviewed,
+      editions: nationsLeague.editions,
+      titleEn: (profile) => `${profile.year} UEFA Nations League Finals`,
+      titleHr: (profile) => `Final Four UEFA Lige nacija ${profile.year}.`,
+    },
+    {
+      pathPrefix: '/competitions/copa-america',
+      lastReviewed: copaAmerica.lastReviewed,
+      editions: copaAmerica.editions,
+      titleEn: (profile) => `${copaAmericaYearLabel(profile)} Copa América`,
+      titleHr: (profile) => `Copa América ${copaAmericaYearLabel(profile)}`,
+    },
+    {
+      pathPrefix: '/competitions/ballon-dor',
+      lastReviewed: ballonDor.lastReviewed,
+      editions: ballonDor.editions,
+      titleEn: (profile) => `${profile.year} Men's Ballon d'Or`,
+      titleHr: (profile) => `Zlatna lopta ${profile.year}.`,
+    },
+    {
+      pathPrefix: '/competitions/golden-boot/world-cup',
+      lastReviewed: worldCupGoldenBoot.lastReviewed,
+      editions: worldCupGoldenBoot.editions,
+      titleEn: (profile) => `${profile.year} FIFA World Cup Golden Boot`,
+      titleHr: (profile) => `Zlatna kopačka Svjetskog prvenstva ${profile.year}.`,
+    },
+    {
+      pathPrefix: '/competitions/golden-boot/euro',
+      lastReviewed: euroGoldenBoot.lastReviewed,
+      editions: euroGoldenBoot.editions,
+      titleEn: (profile) => `${profile.year} UEFA EURO Golden Boot`,
+      titleHr: (profile) => `Zlatna kopačka EURA ${profile.year}.`,
+    },
+  ];
+  for (const family of editionFamilies) {
+    const entry = buildEditionFeedEntry(family, locale);
+    if (entry) entries.push(entry);
+  }
+
   return entries;
 }

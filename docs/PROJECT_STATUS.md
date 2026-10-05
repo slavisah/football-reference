@@ -34700,3 +34700,99 @@ publish) remains a reasonable future slice, deliberately left out of this
 run to keep the entry count meaningful rather than noisy; `src/lib/feed.ts`'s
 `FeedEntry`/`buildAtomFeed()` are already generic enough to take such
 entries without changes if a future run wants to add them.
+
+### Feed extended to the newest edition of all seven edition-page route trees, closing the "future pass" the previous run left open (two-hundred-and-thirty-second intensive run, 2026-10-05)
+
+With `docs/ROADMAP.md`'s "Open backlog" re-confirmed still fully blocked
+(same five items as the last several runs: `typescript` 7, the
+`http-cache-semantics` advisory, the `docs/SOURCES.md` link-liveness sweep,
+the `long-title` brand-suffix decision, and the two UEFA Nations League
+source gaps - `pnpm outdated`/`pnpm audit` showed nothing new) and all six
+team/award competitions' pages already built per the "Recommended first
+milestone", this run took the previous (two-hundred-and-thirty-first) run's
+own explicit "Left for a future pass" suggestion: extend `/feed.xml`/
+`/hr/feed.xml` to cover per-edition pages, which that run deliberately
+scoped out.
+
+Doing *every* edition (as that run's own doc comment in `src/pages/
+feed.xml.ts` already argued) would make the feed mostly noise - roughly
+150-200 entries per locale, most of them decades old, dwarfing the 15
+top-level entries that actually represent "this page changed". Instead,
+`src/lib/contentPages.ts` gained one new entry per edition-page route tree
+(`/competitions/world-cup`, `/euro`, `/nations-league`, `/copa-america`,
+`/ballon-dor`, `/golden-boot/world-cup`, `/golden-boot/euro` - the same
+seven families `sitemap.xml.ts`'s own per-edition loops already enumerate),
+each covering only that family's newest edition: the one tournament/award
+result most likely to actually be "news" to a returning reader. A new pure
+`buildEditionFeedEntry(family, locale)` takes an `EditionFeedFamily`
+descriptor (path prefix, that family's shared `lastReviewed` date, its
+`Edition[]`, and an English/Croatian title-builder matching each family's
+own `[year].astro`/`hr/[year].astro` route file's title string exactly, so
+the feed entry's title can never drift from the real page's `<title>`) and
+calls the existing `buildEditionProfiles()` (already newest-first) to pick
+`profile[0]`. `loadFeedEntries()` now builds all seven descriptors from the
+competition data it already loads for the top-level-page dates (`
+loadDerivedPageSources()` extended to also return the six `CompetitionData`
+objects themselves, not just their dates) and appends one entry per family -
+22 entries per locale now, up from 15.
+
+There is no per-edition `lastReviewed` anywhere in the data model - every
+edition of one competition shares that competition's single `lastReviewed`
+date (confirmed while researching this: `EditionProfile` has no date field,
+and every edition page's own `dateModified` prop is literally the
+competition-level `data.lastReviewed`, unchanged across every edition of
+that competition). So this reuses that same shared date rather than
+inventing a false precision the source data doesn't have - consistent with
+`scripts/check-feed.mjs`'s own cross-check (an entry's `<updated>` must
+match its target page's real `og:updated_time`), which the new entries
+satisfy automatically since they're built from the exact value the edition
+page itself renders.
+
+Copa América's 1959 host-disambiguation (the only family where two editions
+can share a year) is handled by a small `copaAmericaYearLabel()` helper that
+replicates `src/pages/competitions/copa-america/[year].astro`'s own
+`isDisambiguated`/`yearLabel` logic exactly, so a future year where 1959
+becomes the "newest" edition (impossible, but the function doesn't assume
+it) would still render the same title the real page does. Each entry's
+`summary` is `"${profile.champion} champion."` (English only, matching
+every other entry's locale-null-summary-for-hr convention already in
+`loadFeedEntries()`) - the one fact already on `EditionProfile` without
+re-deriving the runner-up/host sentence each `[year].astro` file builds for
+itself, which would have meant either duplicating four different per-family
+description templates or genericizing them for no real benefit to a
+one-line feed summary.
+
+New `buildEditionFeedEntry`/`copaAmericaYearLabel` unit tests in
+`tests/unit/contentPages.test.ts` (4 new: newest-edition selection over an
+older one, the Croatian-locale title/no-summary branch, the empty-editions
+`undefined` case, and the Copa América 1959 host-disambiguation branch,
+built from a `buildEditions()`-derived fixture the same way
+`editionProfile.test.ts`'s own 1959 fixture already does) exercise the new
+pure logic directly; `loadFeedEntries()` itself still has no dedicated unit
+test, the same choice this file already documents for the rest of that
+function (exercised indirectly through the real build plus
+`scripts/check-feed.mjs`/`scripts/check-sitemap.mjs` instead). Also updated
+the two `tests/e2e/mobile.spec.ts` feed-entry-count assertions (15 → 22)
+that would otherwise have failed on this real, intentional count change.
+
+**Verification:** `pnpm test` (1047/1047, +4 new), `pnpm lint` (257 files,
+0/0/0), `pnpm build` (711 pages, unchanged - no new routes, only new feed
+entries for routes that already existed), `pnpm check:feed` (clean - every
+new entry's `<updated>` agrees with its target edition page's own
+`og:updated_time`), `pnpm check:sitemap` (710 entries, clean, unaffected -
+this run never touched `sitemap.xml.ts`), `pnpm check:links`/`check:jsonld`/
+`check:meta`/`check:precache` (all clean), the 8 `tests/e2e/mobile.spec.ts`
+quiz-feedback and feed/Atom-autodiscovery tests run directly (including both
+updated entry-count assertions), and `pnpm dlx knip --no-config-hints`
+(clean, same two pre-existing false positives as every prior run). No
+`content/*.md` file was touched, so `pnpm build && pnpm build:pdfs` was not
+required for this run.
+
+**Left for a future pass:** everything `docs/ROADMAP.md`'s "Open backlog"
+already tracks, unchanged. The feed's "future pass" suggestion from the
+previous run is now closed. A further, genuinely-scoped-out idea: the feed
+could in principle surface *every* edition rather than just the newest per
+family, behind some reader-facing filter/pagination - but that's a much
+larger feature (a feed reader has no UI for filtering an Atom feed) with no
+clear reader demand signal yet, not a natural next slice the way "the
+newest one per family" was.
