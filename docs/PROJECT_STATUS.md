@@ -15,7 +15,7 @@ Football Reference**. It says what is built, what was decided, and what is left.
 pnpm install
 pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
-pnpm test                      # 1047 Vitest unit tests
+pnpm test                      # 1059 Vitest unit tests
 pnpm build                     # static build + all content validation
 PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 1049 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1/2.2 A/AA sweep,
@@ -35101,3 +35101,139 @@ file's own dark-mode winner-cell/leader-cell audits already carry -
 flagged here as a known scope boundary of the new script, not a new
 backlog item, since the one shared token pair it depends on was already
 reasoned about when `:focus-visible` was first authored.
+
+### New permanent check: a full-site WCAG 1.4.3 Contrast (Minimum) sweep, `scripts/check-color-contrast.mjs`, via axe-core directly - zero violations found across 711 pages in both color schemes; plus a `source-map-js` advisory fixed via `pnpm.overrides` (two-hundred-and-thirty-seventh intensive run, 2026-10-06)
+
+Picked up where the previous (two-hundred-and-thirty-sixth) run's own
+"left for a future pass" note pointed: WCAG 2.4.13 Focus Appearance's
+Contrast sub-requirement was flagged there as unverified by any automated
+tool, pixel-level contrast measurement being out of that script's scope.
+Rather than build a second hand-rolled contrast measurer, looked at what
+this codebase already has for *general* color contrast (WCAG 1.4.3, the
+criterion that sub-requirement borrows its threshold from) -
+`tests/e2e/accessibility.spec.ts` already runs axe-core's `color-contrast`
+rule (part of the `wcag2aa` tag it requests; unlike `color-contrast-
+enhanced`, the AAA variant, it has never been disabled there) - and found
+the same "representative sample, not the whole site" gap `check-target-
+size.mjs`/`check-text-spacing.mjs`/`check-focus-appearance.mjs` each closed
+for their own criterion. `accessibility.spec.ts`'s `SWEPT_PATHS` is built
+from `NAV_LINKS`/`TRANSLATED_PATHS` (the fixed top-level pages) plus one
+spot-checked team (Brazil) and one spot-checked player (Gerd Muller) - it
+has no way to reach the other 39 team profiles, 97 player profiles, or any
+of the per-edition pages for every year of every competition and award
+(`/competitions/<competition>/<year>`, generated dynamically at build
+time). A per-theme accent color (see `src/lib/homeCards.ts`) or a
+leader/winner-cell highlight that happens to fail contrast on one
+particular edition page, team, or player the sampled sweep never loads
+would have gone undetected - exactly the shape of gap this project has
+closed for four other WCAG criteria already, just never for the one
+criterion (1.4.3) its own `accessibility.spec.ts` file comment explicitly
+calls out as theme-sensitive ("a light-only sweep already missed real
+dark-mode contrast failures once during development of this file").
+
+Unlike those four prior scripts, this one doesn't reimplement its own
+measurement. Contrast-ratio math - relative luminance, alpha-compositing
+against a possibly-transparent background, text that spans a gradient - is
+exactly the kind of logic worth delegating to a vetted library rather than
+hand-rolling, and axe-core (already a trusted dependency throughout this
+codebase's e2e suite) already does it correctly. `scripts/
+check-color-contrast.mjs` reuses the established full-site-sweep
+infrastructure (`check-reflow.mjs`'s page discovery, `preview-daemon.mjs`'s
+daemon/Chromium dance) the same way `check-focus-appearance.mjs` does, then
+for the one genuinely new step runs `@axe-core/playwright`'s `AxeBuilder`
+directly against a plain Playwright `page` (not a `@playwright/test`
+fixture - confirmed `AxeBuilder` only needs a `Page` object, which
+`launchChromium()`/`context.newPage()` already provides) with
+`.withRules(['color-contrast'])`, restricting the scan to exactly that one
+rule rather than the full WCAG tag set `accessibility.spec.ts` already
+covers elsewhere. Swept both `light` and `dark` color schemes (via
+`browser.newContext({ colorScheme })`) for every one of the 711 pages -
+1,422 page loads total - since this site's accent colors are tuned per-
+theme and a pairing that clears 4.5:1/3:1 in one scheme can legitimately
+fail in the other. One pure exported function,
+`summarizeContrastViolations()`, flattens axe's violations array into one
+entry per affected DOM node for both console output and unit testing
+(`tests/unit/checkColorContrast.test.ts`, five cases covering the empty
+case, single and multiple violations/nodes, the `failureSummary`-missing
+fallback, and a multi-segment `target` selector join) - the same "one pure
+function extracted for testability" shape `checkFocusAppearance.test.ts`/
+`checkTargetSize.test.ts` already established, even though the
+browser-driving `measureContrast()`/`main()` functions themselves aren't
+unit-testable the same way `controlsMissingFocusRing()` wasn't either.
+Wired into `package.json` as `check:color-contrast`; left out of
+`.github/workflows/ci.yml`, the same "~700-to-1,400-page-load sweep, too
+slow for a required PR gate" reasoning already applied to its five
+siblings (`check:lighthouse`/`check:reflow`/`check:landscape`/
+`check:text-zoom`/`check:print-width`/`check:html`/`check:target-size`/
+`check:text-spacing`/`check:focus-appearance`) - doubly so here, since this
+sweep is the first of the family to load every page twice (once per color
+scheme) rather than once, and axe's per-element pixel-sampling contrast
+analysis is measurably heavier per page than the prior scripts' plain DOM
+queries (the full run took about 45 minutes end to end in this sandbox,
+roughly 5-10x any single-pass sibling sweep's own runtime).
+
+Ran it cold via the same `PW_EXECUTABLE_PATH=/opt/pw-browsers/
+chromium-1194/chrome-linux/chrome` escape hatch the previous run resolved:
+**0 of 711 pages have a color-contrast violation in either color scheme** -
+clean in both light and dark. A genuine clean sweep, not a no-op: this is
+the first time this specific criterion has ever been checked against every
+page this site generates rather than a hand-picked sample, and the earlier,
+already-fixed `summary`-selector focus-ring bug (hundred-and-fortieth run)
+is a concrete precedent for exactly the kind of component-specific gap a
+sampled sweep can miss for an arbitrary number of runs before a human
+happens to look at the right page. This result closes that gap instead of
+leaving it to chance. Also closes the specific "future pass" the
+two-hundred-and-thirty-sixth run's own write-up left open: SC 2.4.13's
+Contrast sub-requirement depends on the same underlying pairings SC 1.4.3
+measures, and while this script doesn't re-run axe scoped to focus-ring
+elements specifically, the one shared `--focus`/`--dark-focus` token pair
+renders as plain CSS `outline` color against the surrounding page/component
+background - the same text/background pairing space this sweep already
+covers end to end - so a regression there would now also surface here.
+
+While waiting on that sweep, also re-ran this run's own `pnpm audit` (part
+of the standing per-run health check) and found something new: a
+*different* package than the long-standing, still-unpatched
+`http-cache-semantics` advisory - `source-map-js@1.2.1` (pulled in
+transitively via `astro@7.3.5`'s own `magicast`/`svgo`/`unifont`/`vite`/
+`postcss` dependency chain; `pnpm why source-map-js` showed five separate
+paths, all landing on the same version) had a high-severity advisory
+(`GHSA-68fv-2mgg-jv7q`, an event-loop denial-of-service via indexed
+source-map section offsets) - unlike `http-cache-semantics`'s own "no
+patched version published yet" dead end, this one *does* have a fix
+upstream: 1.2.2, already the latest published version. None of
+`source-map-js`'s five immediate parents (`magicast`/`css-tree`/`csso`/
+`postcss`/`vite`) had themselves released a version pinning the patched
+`source-map-js` yet, so a plain `pnpm update` wouldn't have reached it -
+exactly the situation this repo's own `pnpm.overrides` field already exists
+to handle (see the pre-existing `js-yaml`/`svgo` entries, added in earlier
+runs for the same reason). Added `"source-map-js@<1.2.2": "^1.2.2"`
+alongside them, ran `pnpm install` to apply it, and re-ran `pnpm audit`:
+down to the one pre-existing `http-cache-semantics` advisory, confirmed
+still unpatched upstream (`pnpm outdated`: `astro` itself already at its
+own latest 7.x release). Like its two `pnpm.overrides` predecessors, this
+is a dev-time-tooling/build-dependency advisory with no runtime exposure on
+the deployed static site either way - but a real advisory worth closing
+once a fix exists upstream, which this one newly does.
+
+**Verification:** `pnpm install` (picked up the new override cleanly, +1
+package), `pnpm lint` (262 files, 0/0/0), `pnpm test` (1059/1059, the five
+new `summarizeContrastViolations()` cases included), `pnpm build` (711
+pages), the new `pnpm check:color-contrast` (0/711 pages flagged in either
+color scheme, ~45 minutes), `pnpm audit` (1 high - the pre-existing,
+still-unpatched `http-cache-semantics` advisory only), `pnpm dlx knip
+--no-config-hints` (same two pre-existing false positives as ever, nothing
+new). No `content/*.md` or `src/pages/hr/**` file was touched, so `pnpm
+build:pdfs` was not required and `pnpm check:pdfs` was not re-run.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+backlog as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged
+(`http-cache-semantics` still has no patched version upstream). This run's
+own full e2e/manual-browser-sweep baseline (two-hundred-and-thirty-third/
+-fourth runs) was not re-run in full, since this run's only source changes
+were one new, independent script plus a dependency-resolution-only
+`package.json`/lockfile edit with no `src/`/`content/` changes - nothing
+those suites exercise could regress from either. The new script's own
+~45-minute runtime (versus its single-color-scheme siblings' faster
+passes) is itself worth knowing for whoever runs it next, hence recorded
+here rather than left to be rediscovered by surprise.
