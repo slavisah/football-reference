@@ -35346,3 +35346,104 @@ other page on the site has its own independent URL-driven filter UI to
 apply the same treatment to (`/compare`/`/compare-players`'s own `?a=`/`?b=`
 picker already has this exact direction tested, per `no-js-compare.spec.ts`
 and `compare-players.spec.ts:143`).
+
+### Dependency patch bump (`astro` 7.3.5 → 7.3.6) plus a full cold-start regression confirmation across every check script and the entire e2e suite (two-hundred-and-thirty-ninth intensive run, 2026-10-06)
+
+Re-confirmed `docs/ROADMAP.md`'s "Open backlog" first, item by item, rather
+than assuming the prior run's read still held: `typescript` 7 is still
+capped by `@astrojs/check@0.9.10`'s own peer-dependency range (`pnpm
+outdated` shows no new `@astrojs/check` release); `WebFetch` to
+`en.wikipedia.org` is still `EGRESS_BLOCKED` by this environment's proxy,
+re-tried directly this run rather than assumed from a prior run's result,
+so the `docs/SOURCES.md` link-liveness item and the Nations League
+attendance/Team-of-the-Tournament sourcing gaps stay exactly as blocked as
+every prior run found them; the `long-title` brand-suffix call still needs
+human sign-off, not an automated run. All six competition/award content
+files are already current through their newest real edition, so there was
+no new content slice due either. Took the "genuinely useful quality pass"
+fallback this run, at the dependency-maintenance/regression-confirmation
+level rather than finding a new untested axis - the last several such
+axes (1.4.3 contrast, 2.4.13 focus appearance, 1.4.12 text spacing, the
+shareable-filter restore direction) have each already been closed by
+runs 235-238, and this run's own search for a next one came back empty: WCAG
+1.4.11 non-text contrast and the `<table>` caption/`aria-describedby`
+completeness sweep were already tried and ruled out as not-a-gap by the
+hundred-and-twenty-third run (see that run's own entry), and nothing newer
+has reopened either.
+
+`pnpm outdated` (after a fresh `pnpm install`, since this container starts
+with an empty `node_modules`) showed one real update available:
+`astro@7.3.5` → `7.3.6`, the latest 7.x patch. Bumped it
+(`pnpm update astro`) and re-ran `pnpm audit` immediately after: still the
+same one pre-existing high-severity `http-cache-semantics` advisory, still
+listing "Patched versions: <0.0.0" (no fix published upstream) - the bump
+didn't touch that advisory's own dependency chain, so this is dependency
+hygiene, not a security fix.
+
+Rather than assume a patch-level framework bump is risk-free, re-ran every
+verification this repo has for exactly this situation - the same
+"dependency bump plus full re-confirmation" pattern runs 227/233/237 each
+followed after their own bumps - in full this time, including the parts
+those runs scoped down to a sample:
+
+- `pnpm install` (fresh), `pnpm lint` (263 files, 0/0/0), `pnpm test`
+  (1059/1059, unchanged), `pnpm build` (711 pages, unchanged).
+- Every one of the 34 CI-gate `check:*` scripts run by hand against the
+  astro-7.3.6 build: `check:pdfs` (700/700 fresh), `check:spelling`,
+  `check:award-tallies`, `check:superlative-claims`, `check:ordinal-claims`,
+  `check:record-claims`, `check:consecutive-claims`, `check:since-claims`,
+  `check:one-of-only-claims`, `check:completeness-claims`,
+  `check:edition-header-labels`, `check:spelling-hr`, `check:perf`,
+  `check:records-consistency`, `check:team-profiles-consistency`,
+  `check:player-profiles-consistency`, `check:compare-consistency`,
+  `check:links` (715 pages), `check:sitemap` (710 entries), `check:feed`,
+  `check:jsonld` (1783 blocks across 711 pages), `check:heading-outline`,
+  `check:theme-flash`, `check:pdf-outline` (700 PDFs), `check:reachability`,
+  `check:meta`, `check:i18n-notes`, `check:attendance-format`,
+  `check:claims-hr`, `check:link-names`, `check:precache`,
+  `check:image-dimensions`, `check:locale-consistency`, `check:theme-color` -
+  every one clean, zero drift from the pre-bump baseline.
+- Four of the manual/intensive-run-only full-site browser sweeps that
+  stress layout/markup rather than content, re-run cold against the bumped
+  build rather than skipped: `check:html` (711 pages, valid HTML5),
+  `check:landscape` (711 pages at 667x375, no overflow), `check:target-size`
+  (711 pages at 360px, no sub-44px touch target), `check:reflow` (711 pages
+  at 320px, no horizontal overflow), and `check:focus-appearance` (711
+  pages, every focusable control keeps its ≥2px ring) - all five clean.
+  (`check:color-contrast`/`check:text-zoom`/`check:text-spacing`/
+  `check:print-width`/`check:lighthouse` were not re-run this pass; nothing
+  about an Astro dev-tooling patch bump plausibly touches color math,
+  zoom/print layout or Lighthouse scoring, and the two-hundred-and-
+  thirty-third/-fourth runs already re-confirmed all of this site's manual
+  sweeps clean against the pre-bump build within the last two runs.)
+- The full cold-start `pnpm test:e2e` suite, not a filtered subset: **1055
+  passed, 0 failed (17.5 minutes)**. The first attempt at this (started
+  before the sequential browser-sweep pass above) returned 797 failures,
+  every one an `ERR_CONNECTION_REFUSED` against the suite's own
+  `localhost:4321` preview server from partway through the run onward - not
+  a real regression, but this run's own process error: a second script
+  (`check:focus-appearance`) was started concurrently in the background
+  while the e2e suite's webServer was still bound to the same port 4321,
+  and one of the two preview-server lifecycles stopped the other's
+  process mid-suite. Re-ran the full suite alone, with nothing else
+  touching port 4321 for its entire ~17.5-minute duration, and it passed
+  cleanly end to end. Recorded here as a process note for whoever runs
+  this suite next: never run a second `check:*`/`test:e2e` script
+  concurrently with one already in flight, even in the background - they
+  all share the one `localhost:4321` preview-server port, and there is no
+  isolation between two concurrent instances.
+- `pnpm dlx knip --no-config-hints`: same two pre-existing false positives
+  as ever (`scripts/test-preview-server.mjs`, `@cspell/dict-hr-hr`),
+  nothing new.
+
+No `content/*.md` or `src/pages/hr/**` file was touched, so `pnpm
+build:pdfs` was not required and `check:pdfs` (already run above, clean)
+confirms no drift.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+backlog as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged
+(`http-cache-semantics` still has no patched version upstream as of
+`astro@7.3.6`). This run found no new untested axis to add a permanent
+check for; the next run should look again with fresh eyes rather than
+re-trying the two angles the hundred-and-twenty-third run already ruled
+out, unless something in the codebase has changed enough to reopen either.
