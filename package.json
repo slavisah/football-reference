@@ -32,6 +32,7 @@
     "check:reflow": "node scripts/check-reflow.mjs",
     "check:landscape": "node scripts/check-landscape-viewport.mjs",
     "check:target-size": "node scripts/check-target-size.mjs",
+    "check:focus-appearance": "node scripts/check-focus-appearance.mjs",
     "check:text-zoom": "node scripts/check-text-zoom.mjs",
     "check:text-spacing": "node scripts/check-text-spacing.mjs",
     "check:print-width": "node scripts/check-print-width.mjs",
