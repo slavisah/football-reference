@@ -35447,3 +35447,70 @@ backlog as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged
 check for; the next run should look again with fresh eyes rather than
 re-trying the two angles the hundred-and-twenty-third run already ruled
 out, unless something in the codebase has changed enough to reopen either.
+
+### Golden Boot youngest/oldest-ever winner facts, World Cup and EURO (two-hundred-and-fortieth intensive run, 2026-10-06)
+
+All six competition/award pages remain fully built and current, and every
+`docs/ROADMAP.md` "Open backlog" item is still blocked exactly as the
+two-hundred-and-thirty-ninth run found it (re-confirmed: no new
+`@astrojs/check` release, `WebFetch` to `en.wikipedia.org` still
+`EGRESS_BLOCKED`, no new `astro` dependency fix for `http-cache-semantics`).
+So this run extended `docs/ROADMAP.md`'s "Ideas not yet scoped" item - the
+"Youngest winner" ranking the two-hundred-and-thirteenth run had so far only
+built for Ballon d'Or's two extremes (Matthews/oldest, Ronaldo/youngest) -
+to its other half, Golden Boot, which had no youngest/oldest-winner facts at
+all before this run. Golden Boot tracks two separate races (FIFA World Cup,
+UEFA EURO), each checked independently:
+
+- **FIFA World Cup:** Flórián Albert (Hungary), one of 1962's six joint
+  winners, is the award's youngest-ever winner at 20 years, 8 months;
+  Davor Šuker (Croatia) is the oldest-ever winner at 30 years, 196 days when
+  he won it outright in 1998 - the "outright" distinction matters since the
+  table already shows many joint-winner editions that could otherwise read
+  as a contradiction.
+- **UEFA EURO:** only the oldest-winner fact cleared this site's own
+  two-independent-sources bar - Cristiano Ronaldo (Portugal), 36 when he won
+  the 2020 Golden Boot (played in 2021), breaking a record that had stood
+  for 37 years (consistent with Michel Platini's 1984 win, already on this
+  page's own table, as the prior record-holder). A EURO youngest-winner
+  claim was deliberately left out: two separate WebSearch passes for it
+  returned only vague, inconsistent synthesized answers (one naming Tomas
+  Brolin/Milan Baroš at "age 22", contradicted by this page's own table
+  showing six separate joint-winner editions with no indication which
+  share was youngest) with no two sources converging on one figure the way
+  every other fact this run shipped did - exactly the "don't ship
+  confidently-wrong history" risk `docs/ROADMAP.md`'s own item warns about,
+  so left unreported rather than guessed, the same editorial call this
+  site already makes for the Nations League attendance/Team-of-the-
+  Tournament gaps.
+
+Added four new bullets total (two World Cup, one EURO, matching only the
+facts that cleared the sourcing bar) to `content/golden-boot.md`'s existing
+"World Cup memorable moments"/"EURO memorable moments" sections, each with
+a new `scripts/record-claims-ledger.json` entry recording its two-source
+verification (the claim text's "youngest"/"oldest" trigger words make
+`check:record-claims` require this), and hand-translated Croatian
+equivalents into `src/pages/hr/competitions/golden-boot.astro`'s
+`WORLD_CUP_MOMENTS`/`EURO_MOMENTS` arrays (checked against
+`check:claims-hr`'s year-presence rule - 1962/1998/2020 all present on the
+Croatian side). `content/golden-boot.md`'s `lastReviewed` bumped to
+2026-10-06. The full ranking across all ~130 Ballon d'Or/Golden Boot
+winners remains open exactly as `docs/ROADMAP.md` describes - this run's
+own four facts are, like the two-hundred-and-thirteenth run's pair, single
+already-synthesized superlative records rather than raw per-player birth
+dates, so still a fundamentally lower-risk slice than the full ranking.
+
+**Verification:** `pnpm install` (fresh), `pnpm lint` (263 files, 0/0/0),
+`pnpm test` (1059/1059, unchanged - no unit-testable source changed),
+`pnpm build` (711 pages, clean - `check:record-claims`/`check:claims-hr`
+both passed as part of the build's own content validation, confirming the
+four new ledger entries match the content bullets verbatim and that every
+claimed year appears on the Croatian translation). Ran `pnpm build:pdfs`
+and `pnpm check:pdfs` (700/700 fresh) since `content/golden-boot.md` and a
+`src/pages/hr/**` page both changed, per this repo's own "Definition of
+done" rule. **No discrepancies found** - see `docs/SOURCES.md`'s matching
+new entry for the full source list.
+
+**Left for a future pass:** the EURO youngest-winner fact, if a more
+reliable source ever turns up; the same environment-blocked/human-sign-off
+backlog as ever, unchanged; the full ~130-winner ranking, unchanged.

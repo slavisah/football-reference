@@ -278,17 +278,21 @@ run-by-run history behind all of this, see `docs/PROJECT_STATUS.md`.
   for all ~130 Ballon d'Or/Golden Boot winners, which exists nowhere in
   `content/` today, and fabricating that many biographical facts in one
   unattended pass (with no independent per-player source to cross-check each
-  one against) still risks shipping confidently-wrong history. The
-  two-hundred-and-thirteenth run shipped a much narrower, lower-risk slice
-  instead: the two *endpoints* of that ranking for Ballon d'Or specifically -
-  Stanley Matthews (oldest-ever winner, 1956, age 41) and Ronaldo/Brazil
-  (youngest-ever, 1997, age 21) - as two new `content/ballon-dor.md`
-  "Memorable moments" bullets, each independently confirmed via two separate
-  WebSearch passes (Guinness World Records' own page for Matthews; see
-  `docs/SOURCES.md`'s matching entry). These are single, already-synthesized,
-  widely-and-consistently-reported records, a fundamentally safer research
-  task than computing an age from a raw birth date for all ~130 winners with
-  no cross-check. The full generated ranking (every winner, not just the two
-  extremes) remains unbuilt and still needs either a trustworthy bulk birth-
-  date source or a session with direct page-fetch access to verify one
-  player at a time at that scale.
+  one against) still risks shipping confidently-wrong history. Two narrower,
+  lower-risk slices have shipped instead so far: the two-hundred-and-
+  thirteenth run added Ballon d'Or's own two extremes (Stanley Matthews,
+  oldest-ever, 1956, age 41; Ronaldo/Brazil, youngest-ever, 1997, age 21),
+  and the two-hundred-and-fortieth run added Golden Boot's (Flórián Albert,
+  World Cup youngest-ever, 1962, age 20; Davor Šuker, World Cup oldest-ever,
+  1998, age 30; Cristiano Ronaldo, EURO oldest-ever, 2020, age 36 - EURO's
+  own youngest-ever fact came back from two WebSearch passes without a
+  single converging figure, so was left out rather than guessed). Each fact
+  is a single, already-synthesized, widely-and-consistently-reported record
+  independently confirmed via two separate WebSearch passes (see
+  `docs/SOURCES.md`'s matching entries), a fundamentally safer research task
+  than computing an age from a raw birth date for all ~130 winners with no
+  cross-check. Still open: the EURO Golden Boot youngest-ever fact (needs a
+  source that actually converges - re-try with a fresh query next time), and
+  the full generated ranking (every winner, not just the extremes), which
+  still needs either a trustworthy bulk birth-date source or a session with
+  direct page-fetch access to verify one player at a time at that scale.
