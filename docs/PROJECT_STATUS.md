@@ -34998,3 +34998,106 @@ run's own full e2e/manual-browser-sweep baseline (two-hundred-and-
 thirty-third/-fourth runs) was not re-run in full, since this run's only
 change was one new, independent, zero-dependency script with no `src/`
 or `content/` edits - nothing those suites exercise could regress from it.
+
+### New permanent check: a site-wide WCAG 2.2 SC 2.4.13 Focus Appearance structural sweep, `scripts/check-focus-appearance.mjs` - zero controls with a missing focus ring found across 711 pages (two-hundred-and-thirty-sixth intensive run, 2026-10-06)
+
+Re-confirmed `docs/ROADMAP.md`'s "Open backlog" still fully blocked (`pnpm
+outdated`: same capped `typescript` 7 upgrade; `pnpm audit`: same single
+`http-cache-semantics` advisory, no patched version yet; `WebFetch` to
+`en.wikipedia.org`: re-tried directly this run, still `EGRESS_BLOCKED`) and
+all six competition/award content files already current through their
+newest edition - no new content slice was due, same as the last several
+runs. Did another genuinely useful accessibility pass instead, in the
+direction the scheduled task's own fallback instructions name, continuing
+the two-hundred-and-twenty-ninth/-thirty-fifth runs' pattern of finding a
+WCAG success criterion none of this project's many existing sweeps
+actually covers.
+
+Looked at `src/styles/global.css`'s shared `:focus-visible` rule (`outline:
+3px solid var(--focus); outline-offset: 2px;`, applied via a hand-picked
+selector list: `a, button, select, input, summary, [tabindex]`) and the
+history behind it: the hundred-and-fortieth run found `summary` had been
+missing from that exact list, so every `<details>` disclosure trigger
+(the quiz's "Just show me the answer" cards, `TournamentTable.astro`'s
+story-reveal rows) fell back to the browser's own default ring, which
+measured at roughly 1.04:1 contrast against this site's dark-mode
+background - functionally invisible - and that bug shipped and sat
+undetected for some number of runs because nothing had ever swept the
+*rendered* focus state of every control on every page; it was only found by
+a human re-reading the CSS. WCAG 2.2 SC 2.4.13 Focus Appearance (the
+criterion that bug actually violated) had zero coverage anywhere in
+`scripts/`, `tests/`, or `docs/` (confirmed via
+`grep -rln -i "2.4.13\|focus.appearance\|focus-appearance"` across all
+three, no hits) - the exact same kind of gap `check:target-size`
+(SC 2.5.8) and `check:text-spacing` (SC 1.4.12) each closed for their own
+criterion in earlier runs, just never closed for this one.
+
+`scripts/check-focus-appearance.mjs` follows the same shape
+`check-target-size.mjs` established: reuse `check-reflow.mjs`'s page
+discovery (`listHtmlFiles`/`htmlFileToPagePath`/`isRedirectStubHtml`) and
+the shared `preview-daemon.mjs` daemon/Chromium dance, then (the one
+genuinely new step) focus every matching element on every page in turn via
+`el.focus()` and read back `getComputedStyle(el)`'s `outlineStyle`/
+`outlineWidth` before `el.blur()`-ing it, flagging any control whose
+effective outline width falls under WCAG 2.4.13's own 2px Area-requirement
+floor and that also has no `box-shadow` (the one other legitimate
+focus-indicator technique, unused today but not assumed absent). Scope is
+explicitly narrower than the full criterion: SC 2.4.13 also has a Contrast
+sub-requirement (>=3:1 against both the unfocused component and the
+background) that needs actual rendered-pixel sampling, not DOM/CSS
+inspection - this script checks only the structural precondition every
+other control already shares (a real, non-zero ring exists at all), the
+same scope limitation this file's own doc comment states up front rather
+than overclaiming full-criterion coverage. The one shared `--focus`/
+`--dark-focus` token pair's own contrast was reasoned about by a human when
+`:focus-visible` was first authored and is covered by that one review, not
+re-derived from pixels on every run - what this script catches is a
+*different* control quietly falling outside that shared rule, exactly the
+`summary`-shaped bug that already happened once.
+
+Added a focused unit test (`tests/unit/checkFocusAppearance.test.ts`) for
+the one pure exported budget function, `controlsMissingFocusRing()` -
+including the box-shadow carve-out and the exact-at-threshold case -
+matching `checkTargetSize.test.ts`'s own precedent. Wired into
+`package.json` as `check:focus-appearance`; left out of
+`.github/workflows/ci.yml`, the same "~700-page-load sweep, too slow for a
+required PR gate" reasoning already applied to its six siblings
+(`check:lighthouse`/`check:reflow`/`check:landscape`/`check:text-zoom`/
+`check:print-width`/`check:html`) and `check:target-size`/
+`check:text-spacing`.
+
+Ran it cold via the `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/
+chrome-linux/chrome` escape hatch (this container's pre-installed Chromium
+build number differs from prior runs' `/opt/pw-browsers/chromium`; resolved
+by listing `/opt/pw-browsers/` directly rather than assuming the prior
+path, since `playwright install` is blocked by design in this sandbox):
+**0 of 711 pages have a focusable control with no visible ring** - the
+single shared `:focus-visible` rule's selector list already covers every
+focusable element this sweep can find, and no component ships a
+`outline: none`/more-specific override that would silently opt out of it.
+A clean sweep, not a no-op: the criterion was genuinely untested before
+this run, and the exact failure mode that already shipped once (a missing
+selector) now has a permanent, rerunnable guard against it recurring in a
+different component.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean, no dependency
+changes), `pnpm lint` (260 files, 0/0/0), `pnpm test` (1053/1053, the six
+new `controlsMissingFocusRing()` cases included), `pnpm build` (711 pages),
+the new `pnpm check:focus-appearance` (0/711 flagged), `pnpm dlx knip
+--no-config-hints` (same two pre-existing false positives as ever, nothing
+new). No `content/*.md` or `src/pages/hr/**` file was touched, so `pnpm
+build:pdfs` was not required and `pnpm check:pdfs` was not re-run.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+backlog as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged. This
+run's own full e2e/manual-browser-sweep baseline (two-hundred-and-
+thirty-third/-fourth runs) was not re-run in full, since this run's only
+change was one new, independent, zero-dependency script with no `src/
+components/` or `content/` edits - nothing those suites exercise could
+regress from it. SC 2.4.13's own Contrast sub-requirement (pixel-level,
+not DOM-structural) remains unverified by any automated tool, the same
+"reasoned from contrast math, not sampled from pixels" limitation this
+file's own dark-mode winner-cell/leader-cell audits already carry -
+flagged here as a known scope boundary of the new script, not a new
+backlog item, since the one shared token pair it depends on was already
+reasoned about when `:focus-visible` was first authored.

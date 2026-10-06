@@ -157,9 +157,17 @@ single-line text can clip once spacing grows, independent of font-size or
 viewport width) that none of the three existing sweeps could have caught.
 The new `scripts/check-text-spacing.mjs` (`pnpm check:text-spacing`, manual/
 intensive-run-only like its three siblings) swept all 711 pages - clean on
-its first run, no bug found. See "Open backlog" and "Ideas not yet scoped"
-below for everything else still open. For the full run-by-run history behind
-all of this, see `docs/PROJECT_STATUS.md`.
+its first run, no bug found. The two-hundred-and-thirty-sixth run closed
+another such gap: WCAG 2.2 SC 2.4.13 Focus Appearance (whether every
+focusable control actually renders a visible ring once focused - the same
+criterion a past missing-`summary`-selector bug violated) had no sweep of
+its own either; the new `scripts/check-focus-appearance.mjs` (`pnpm
+check:focus-appearance`, same manual/intensive-run-only tier, checks the
+structural precondition only - a real non-zero outline/box-shadow exists -
+not pixel-level contrast) found zero controls missing a ring across all 711
+pages. See "Open backlog" and "Ideas not yet scoped" below for everything
+else still open. For the full run-by-run history behind all of this, see
+`docs/PROJECT_STATUS.md`.
 
 ## Open backlog
 
