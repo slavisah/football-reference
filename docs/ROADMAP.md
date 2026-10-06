@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (235 intensive runs as of 2026-10-05) lives
+verification sweep and decision (238 intensive runs as of 2026-10-06) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -68,8 +68,12 @@ now including the two-hundred-and-thirty-first run's `check:feed`;
 browser sweeps kept manual/intensive-run-only rather than a required PR
 gate, purely for their ~700-to-1,400-page-load runtime), `pnpm audit`, and
 `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-thirty-seventh run (2026-10-06): 1059/1059 unit
-tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, the
+As of the two-hundred-and-thirty-eighth run (2026-10-06): 1059/1059 unit
+tests, 1055 Playwright e2e tests (up from 1049 - the two-hundred-and-
+thirty-eighth run's own new `tests/e2e/filter-url-restore.spec.ts`,
+covering the previously-untested "load a shared link and see the filtered
+view" direction of AGENTS.md rule 9's shareable-filter contract), `pnpm
+lint` at 0 errors/0 warnings/0 hints, 711 pages built, the
 `/feed.xml`/`/hr/feed.xml` Atom feeds covering the newest edition of all
 seven edition-page route trees (22 entries per locale), `@cspell/dict-hr-hr`
 at 3.1.3, and the
@@ -167,9 +171,18 @@ its own either; the new `scripts/check-focus-appearance.mjs` (`pnpm
 check:focus-appearance`, same manual/intensive-run-only tier, checks the
 structural precondition only - a real non-zero outline/box-shadow exists -
 not pixel-level contrast) found zero controls missing a ring across all 711
-pages. See "Open backlog" and "Ideas not yet scoped" below for everything
-else still open. For the full run-by-run history behind all of this, see
-`docs/PROJECT_STATUS.md`.
+pages. The two-hundred-and-thirty-eighth run closed a gap in the test
+suite itself rather than the site: AGENTS.md rule 9's shareable-filter
+contract had only ever been tested in the "selecting a filter updates the
+URL" direction - the opposite, equally load-bearing direction ("loading a
+URL that already carries a filter restores that view with no clicks," the
+whole point of a shared link) had no test at all, including the specific
+two-table-namespace-collision case `TournamentTable.astro`'s own
+`paramPrefix` prop exists to prevent. The new `tests/e2e/
+filter-url-restore.spec.ts` (six tests) closes it - no bug found, the
+existing restore logic already worked correctly. See "Open backlog" and
+"Ideas not yet scoped" below for everything else still open. For the full
+run-by-run history behind all of this, see `docs/PROJECT_STATUS.md`.
 
 ## Open backlog
 
