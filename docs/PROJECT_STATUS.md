@@ -17,7 +17,7 @@ pnpm dev                       # local preview
 pnpm lint                      # astro check (types)
 pnpm test                      # 1059 Vitest unit tests
 pnpm build                     # static build + all content validation
-PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 1049 Playwright tests at 360px (mobile
+PW_CHROME_CHANNEL=chrome pnpm test:e2e   # 1055 Playwright tests at 360px (mobile
                                           # smoke + a WCAG 2.1/2.2 A/AA sweep,
                                           # light and dark, across every page)
 ```
@@ -35237,3 +35237,112 @@ those suites exercise could regress from either. The new script's own
 ~45-minute runtime (versus its single-color-scheme siblings' faster
 passes) is itself worth knowing for whoever runs it next, hence recorded
 here rather than left to be rediscovered by surprise.
+
+### New permanent regression suite: `tests/e2e/filter-url-restore.spec.ts` closes the untested "load a shared link" half of AGENTS.md rule 9 - six new tests, zero bugs found (two-hundred-and-thirty-eighth intensive run, 2026-10-06)
+
+With every "Open backlog" item still either environment-blocked or
+awaiting human sign-off, looked for a genuinely untested axis of existing
+behavior rather than another content-accuracy or accessibility sweep.
+AGENTS.md's rule 9 ("Make all filters shareable through URL query
+parameters") has two directions: `TournamentTable.astro`'s inline script
+writes the current filter/sort selection into the URL as `writeParams()`
+(so a reader's own selection becomes a link worth sharing), and reads it
+back via `readParams()` on load (so a *received* link reproduces the
+sender's view with no clicks). Every existing spec that touches a filter -
+`mobile.spec.ts`'s per-competition filter tests, `print-styles.spec.ts`'s
+on-screen-filter-survives-print test - only ever exercises the first
+direction: select a filter via the UI, assert the URL grew the matching
+`?key=value`. A repo-wide search (`rg "goto\(.*(winner=|year=|host=|team=)"
+tests/`) turned up nothing that ever loads a competition page with a filter
+query param already present and checks the page rendered pre-filtered -
+the actual mechanic that makes a pasted link useful to whoever receives it,
+and the one direction a regression could break silently (nothing user-
+visible changes if `readParams()`'s restore block were ever deleted; the
+page just always loads unfiltered, same as today's behavior with no filter
+applied at all).
+
+Also untested in that direction: `TournamentTable.astro`'s own `paramPrefix`
+prop, added specifically so two tables on one page (Golden Boot's World Cup
++ EURO tables) don't share one bare `?year=`/`?winner=` key and silently
+clobber each other's filter in the URL - the doc comment states the
+failure mode explicitly, but no test had ever loaded a URL with *both*
+tables' namespaced keys present at once to confirm the isolation actually
+holds when both are live simultaneously (as opposed to one table's filter
+changing after the other's, which is all the existing click-driven tests
+ever produce).
+
+Added `tests/e2e/filter-url-restore.spec.ts`, six tests, all against the
+real built/served site (not mocked):
+
+- **World Cup, combined winner+host:** `?winner=Argentina&host=Mexico`
+  restores both `<select>` values and filters to the single matching row
+  (1986, the only World Cup Argentina won while Mexico hosted - 1978 and
+  2022 were Argentina wins hosted elsewhere).
+- **World Cup, team filter alone:** `?team=Portugal` (a team that never won
+  the competition, so this is genuinely exercising the team filter rather
+  than doubling up on winner) restores to Portugal's two non-winning
+  appearances (third in 1966, fourth in 2006).
+- **World Cup, filter + non-default sort combined:** `?winner=Brazil&sort=
+  year-asc`. Confirmed first that the server already renders rows
+  newest-first (`displayEditions` in `TournamentTable.astro` sorts
+  descending to match `defaultSortValue()`'s own "year-desc" default), so a
+  `sort=year-desc` URL would prove nothing - `year-asc` is the one value
+  that forces a real client-side re-sort on load. Restores both the filter
+  (5 visible rows, Brazil's own title count) and the sort (first visible row
+  1958, last 2002 - the reverse of the page's own default order).
+- **World Cup, an unrecognized value:** `?winner=Narnia` is ignored rather
+  than left half-applied - the `<select>` falls back to its default "all"
+  option, every row stays visible, and the status text reads "Showing all
+  23 editions." This guards the defensive `.some((o) => o.value ===
+  initial.winner)` check in the restore block, which had no test proving it
+  actually does anything (a stale or hand-edited link with a value that
+  predates/postdates the current option list must not get stuck showing a
+  blank, all-rows-hidden table).
+- **Croatian World Cup:** `hr/competitions/world-cup?winner=Argentina`
+  restores using the same plain "Argentina" data value the English page
+  uses (confirmed this is actually how it already works, not assumed - the
+  `hr` page only translates the bit-prefix/template strings, not the filter
+  values themselves, matching the opposite-direction assertion
+  `mobile.spec.ts`'s own Croatian World Cup test already makes at its
+  "updates the shareable URL" test).
+- **Golden Boot, two-table namespace isolation on load:** `?world-cup-
+  winner=Just+Fontaine&euro-year=1984` (both tables' own namespaced key
+  present in one request, not built up one click at a time) restores each
+  table's own filter, confirms neither table's *other* select (world-cup's
+  own year, euro's own winner) picked up a value, and confirms each table's
+  row count/status text reflects only its own filter.
+
+**Verification:** `pnpm lint` (263 files, 0/0/0), `pnpm test` (1059/1059,
+unchanged - this run added only a new Playwright spec, no unit-testable
+source changed), `pnpm build` (711 pages, unchanged). Ran the new spec file
+directly (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/
+chrome pnpm exec playwright test tests/e2e/filter-url-restore.spec.ts`): all
+six pass. Also re-ran every existing filter/sort/winner/host/team-related
+test across the full `tests/e2e/mobile.spec.ts` file (`-g
+"filter|winner|host|team|sort"`, 90 tests spanning every competition page
+in both languages) to confirm the new spec's assertions about default sort
+order, server-rendered row order and existing write-direction behavior
+match reality and that nothing about this addition regressed the tests
+already covering that surface: all 90 passed. Did not re-run the full
+cold-start `pnpm test:e2e` suite (now 1055 Playwright tests, up from
+1049 - the six new ones; bumped the stale "1049" count in this file's own
+"How to run" section at the top) or the manual browser sweeps - this run's
+change is a new, independent spec file with no `src/`/`content/` edits, so
+nothing those suites exercise could have regressed; the two-hundred-and-
+thirty-fourth run's own full cold-start count (1049/1049 at the time) plus
+the two-hundred-and-thirty-third run's six manual sweeps remain the current
+baseline for everything else. `pnpm dlx knip --no-config-hints` (same two
+standing false positives as ever, nothing new - a Playwright spec file is
+picked up by `testDir` config, not an import graph knip would flag).
+No `content/*.md` or `src/pages/hr/**` file touched, so `pnpm build:pdfs`
+was not required and `check:pdfs` was not re-run.
+
+**Left for a future pass:** the same environment-blocked/human-sign-off
+backlog as ever - see `docs/ROADMAP.md`'s "Open backlog", unchanged. This
+run's own angle (the restore-from-URL direction of the shareable-filter
+contract) is now covered for the one component that implements it
+(`TournamentTable.astro`, used by all six competition/award pages); no
+other page on the site has its own independent URL-driven filter UI to
+apply the same treatment to (`/compare`/`/compare-players`'s own `?a=`/`?b=`
+picker already has this exact direction tested, per `no-js-compare.spec.ts`
+and `compare-players.spec.ts:143`).
