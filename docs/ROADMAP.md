@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (239 intensive runs as of 2026-10-06) lives
+verification sweep and decision (241 intensive runs as of 2026-10-06) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -68,8 +68,10 @@ now including the two-hundred-and-thirty-first run's `check:feed`;
 browser sweeps kept manual/intensive-run-only rather than a required PR
 gate, purely for their ~700-to-1,400-page-load runtime), `pnpm audit`, and
 `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-thirty-eighth run (2026-10-06): 1059/1059 unit
-tests, 1055 Playwright e2e tests (up from 1049 - the two-hundred-and-
+As of the two-hundred-and-forty-first run (2026-10-06): 1060/1060 unit
+tests (up from 1059 - the two-hundred-and-fortieth run's own new
+`contentPages.test.ts` case for `/quiz`'s `derivedPageLastReviewed()`
+branch), 1055 Playwright e2e tests (up from 1049 - the two-hundred-and-
 thirty-eighth run's own new `tests/e2e/filter-url-restore.spec.ts`,
 covering the previously-untested "load a shared link and see the filtered
 view" direction of AGENTS.md rule 9's shareable-filter contract), `pnpm
@@ -186,6 +188,11 @@ run-by-run history behind all of this, see `docs/PROJECT_STATUS.md`.
 
 ## Open backlog
 
+- **2026 Ballon d'Or edition**: not due yet, not blocked. The two-hundred-
+  and-forty-first run confirmed via `WebSearch` that the ceremony is
+  scheduled for 26 October 2026 in London (its first time outside Paris) -
+  `content/ballon-dor.md`'s `lastCompletedEdition: 2025` is correct as of
+  this run's date (2026-10-06). Re-check once that date has passed.
 - **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.10` (latest
   published) only declares `typescript: '^5.0.0 || ^6.0.0'` as a peer
   dependency - re-confirmed via `pnpm outdated` as recently as the

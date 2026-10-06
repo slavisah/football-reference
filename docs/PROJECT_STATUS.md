@@ -35544,3 +35544,80 @@ Re-ran `pnpm build`/`check:sitemap`/`check:feed`/`pnpm lint`/`pnpm test`
 **Left for a future pass:** the EURO youngest-winner fact, if a more
 reliable source ever turns up; the same environment-blocked/human-sign-off
 backlog as ever, unchanged; the full ~130-winner ranking, unchanged.
+
+### Run 241 (2026-10-06): full backlog/content/dependency re-confirmation, no new gap found - genuinely exhausted this pass rather than assumed
+
+Went through `docs/ROADMAP.md`'s "Open backlog" item by item with fresh
+checks rather than trusting run 239/240's reads to still hold, then looked
+for new ground beyond it:
+
+- **`typescript` 7:** still capped - `npm view @astrojs/check peerDependencies`
+  still returns `{ typescript: '^5.0.0 || ^6.0.0' }`, and `npm view
+  @astrojs/check versions` shows no release past `0.9.10`. Unchanged.
+- **`http-cache-semantics` advisory:** `pnpm audit` after a fresh
+  `pnpm install` still surfaces exactly the one high-severity advisory
+  (`GHSA-ch52-4w7c-c8xp`), still "Patched versions: <0.0.0", still via
+  `astro@7.3.6 > http-cache-semantics@4.2.0`. `pnpm outdated` shows no
+  package update available at all except `typescript` (already covered
+  above) - astro itself is already on its latest 7.x release, so this
+  run's own attempt at the "dependency bump" fallback run 239 used came up
+  with nothing to bump.
+- **EURO Golden Boot youngest-ever winner:** re-tried with a fresh
+  `WebSearch` query (distinct wording from the hundred-and-sixty-second
+  run's and the two-hundred-and-fortieth run's own attempts) - still no
+  convergence. The results surface Lamine Yamal as EURO's youngest-ever
+  *goalscorer* (16y 362d, EURO 2024) but he did not win the Golden Boot
+  (shared six ways that year), and otherwise confirm what run 240 already
+  found: no single source names a youngest *Golden Boot winner* across the
+  six joint-winner EURO editions. Left unreported, same call as before.
+- **New real-world edition due:** checked whether any competition this
+  site tracks has a newer completed edition than what's already on its
+  page. The Ballon d'Or is the only one with a ceremony date close to
+  "now" (2026-10-06) - a fresh `WebSearch` found the 2026 ceremony is
+  scheduled for **26 October 2026, in London** (its first time outside
+  Paris), i.e. still three weeks in the future relative to this run's own
+  date, so `content/ballon-dor.md`'s `lastCompletedEdition: 2025` is
+  correctly current, not stale. No other tracked competition (EURO,
+  Nations League, Copa América, the next men's World Cup) has an edition
+  due before 2027-2028. The 2026 FIFA World Cup content itself (final,
+  all five individual awards, Fair Play, winning manager/captain) was
+  re-spot-checked against `docs/SOURCES.md`'s own existing entries rather
+  than re-fetched from scratch - every one of those sections already has
+  its own two-plus-independent-source verification recorded from the runs
+  that added them (2026-08-30 through 2026-09-02), so there was nothing
+  unverified left to close here.
+- **New untested quality axis:** re-ran the same search runs 235-239 each
+  made - grepped `src/`/`scripts`/`tests/`/`content/` for `TODO`/`FIXME`/
+  `XXX` (still finds nothing but this file's own prior mentions of the
+  grep), checked the viewport `<meta>` tag for a `user-scalable=no`/
+  `maximum-scale` zoom-disabling pattern (absent, as it should be - WCAG
+  1.4.4), and confirmed `forced-colors`/`prefers-contrast` coverage is
+  already a closed, fully-tested category (run 160-ish onward, per this
+  file's many `forced-colors` entries) rather than re-building a sweep
+  that already exists. Also checked whether `@axe-core/playwright` has a
+  newer release that would pull in a newer `axe-core` (the "Known caveats"
+  note's own stated trigger): `npm view @axe-core/playwright version`
+  still returns `4.13.0` (unchanged since it was installed), which pins
+  `axe-core` to `~4.13.0` - `axe-core` itself has released `4.14.0`
+  upstream, but nothing in this repo can take it without `@axe-core/
+  playwright` bumping first, so still not actionable. No new axis found.
+- **Branch/PR health:** `intensive/football-reference` (PR #56) is open,
+  not a draft, both its GitHub Actions checks (`open-pr`, `test`) are
+  green on its current head, and it carries 29 commits across runs
+  213-240 without having been merged yet. Nothing to fix here, but
+  flagged in this run's own notification since a long-lived green PR
+  sitting unreviewed is exactly the kind of thing a human maintainer
+  would want surfaced rather than silently re-confirmed run after run.
+
+**Verification:** fresh `pnpm install`, `pnpm lint` (263 files, 0/0/0),
+`pnpm test` (1060/1060, unchanged), `pnpm build` (711 pages, clean). No
+`content/*.md` or `src/pages/hr/**` file changed, so `pnpm build:pdfs`
+was not required.
+
+**Left for a future pass:** identical to run 240's own list - the EURO
+youngest-winner fact if a source ever converges; the same environment-
+blocked/human-sign-off backlog (`typescript` 7, `http-cache-semantics`,
+`docs/SOURCES.md` link-liveness, the `long-title` brand-suffix call); the
+full ~130-winner birth-date ranking. The 2026 Ballon d'Or ceremony
+(26 October 2026) is now close enough that it is worth checking again in
+the next run or two, once that date has actually passed.
