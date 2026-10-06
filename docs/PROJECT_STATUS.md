@@ -35511,6 +35511,36 @@ and `pnpm check:pdfs` (700/700 fresh) since `content/golden-boot.md` and a
 done" rule. **No discrepancies found** - see `docs/SOURCES.md`'s matching
 new entry for the full source list.
 
+Pushing this run's commit surfaced a real, pre-existing bug via CI's own
+`check:sitemap` gate rather than this run's own local checks (which don't
+build `/quiz` with every other content file changing at once the way CI's
+fresh install/build does): `src/lib/contentPages.ts`'s
+`derivedPageLastReviewed()` - the one function `sitemap.xml.ts` and
+`feed.xml.ts` both call so a generated/derived page's `<lastmod>`/
+`<updated>` can't drift from what that page's own `.astro` file actually
+shows - has a `switch` naming five of its six derived pages (`/teams`,
+`/compare`, `/players`, `/compare-players`, `/records`) but was missing a
+`/quiz` case; `/quiz` fell through to the `default: return ownDate` branch,
+silently using only `content/quiz.md`'s own `lastReviewed` instead of the
+same six-source maximum `src/pages/quiz.astro` itself already computes
+(`worldCup`/`euro`/`copaAmerica`/`nationsLeague`/`ballonDor`/
+`goldenBootWorldCup`/`meta.lastReviewed`, sorted). Latent since whichever
+earlier run centralized this function (it predates this run), because
+`content/quiz.md`'s own date happened to already be the latest of the six
+at the time; this run's own `content/golden-boot.md` bump past
+`content/quiz.md`'s date is what first made the two diverge, and CI's
+`check:sitemap` caught the resulting `<lastmod>`/`og:updated_time`
+mismatch on `/quiz` and `/hr/quiz` immediately. Fixed with a sixth `case
+'/quiz':` returning `maxLastReviewed([...teamCompetitionDates,
+...awardDates, ownDate])` - using the full `awardDates` (not just
+`ballonDor`/`goldenBootWorldCup`) changes nothing in practice since
+`worldCupGoldenBoot`/`euroGoldenBoot` are two loads of the same
+`golden-boot.md` file and always carry the same date. Added a new
+`contentPages.test.ts` case (`/quiz` takes the max the same way `/records`
+does, plus its own content date) so this can't regress silently again.
+Re-ran `pnpm build`/`check:sitemap`/`check:feed`/`pnpm lint`/`pnpm test`
+(1060/1060) clean after the fix.
+
 **Left for a future pass:** the EURO youngest-winner fact, if a more
 reliable source ever turns up; the same environment-blocked/human-sign-off
 backlog as ever, unchanged; the full ~130-winner ranking, unchanged.

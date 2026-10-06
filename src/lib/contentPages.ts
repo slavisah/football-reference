@@ -79,6 +79,14 @@ export function derivedPageLastReviewed(
       // and award, but (unlike the four cases above) never concats its own
       // content entry's date - matched exactly here.
       return maxLastReviewed([...teamCompetitionDates, ...awardDates]);
+    case '/quiz':
+      // quiz.astro's own `lastReviewed` draws from every team competition and
+      // award (its question pool spans all six), concatenated with its own
+      // content entry's date - a sixth derived case missed when the other
+      // five were centralized here, surfaced by check:sitemap once
+      // content/golden-boot.md's own lastReviewed moved past content/
+      // quiz.md's (two-hundred-and-fortieth intensive run).
+      return maxLastReviewed([...teamCompetitionDates, ...awardDates, ownDate]);
     default:
       return ownDate;
   }
