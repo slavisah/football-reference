@@ -59,6 +59,15 @@ describe('derivedPageLastReviewed', () => {
     );
   });
 
+  it('/quiz takes the max across every team competition and award, plus its own content date - matching quiz.astro\'s own lastReviewed computation', () => {
+    expect(derivedPageLastReviewed('/quiz', teamCompetitionDates, awardDates, '2026-01-01')).toBe(
+      '2026-10-02',
+    );
+    expect(derivedPageLastReviewed('/quiz', teamCompetitionDates, awardDates, '2026-11-01')).toBe(
+      '2026-11-01',
+    );
+  });
+
   it('every other path just passes its own content date through unchanged', () => {
     expect(
       derivedPageLastReviewed('/competitions/world-cup', teamCompetitionDates, awardDates, '2026-09-11'),
