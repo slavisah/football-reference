@@ -33,6 +33,7 @@
     "check:landscape": "node scripts/check-landscape-viewport.mjs",
     "check:target-size": "node scripts/check-target-size.mjs",
     "check:focus-appearance": "node scripts/check-focus-appearance.mjs",
+    "check:color-contrast": "node scripts/check-color-contrast.mjs",
     "check:text-zoom": "node scripts/check-text-zoom.mjs",
     "check:text-spacing": "node scripts/check-text-spacing.mjs",
     "check:print-width": "node scripts/check-print-width.mjs",
@@ -82,7 +83,8 @@
   "pnpm": {
     "overrides": {
       "js-yaml@<4.3.2": "^4.3.2",
-      "svgo@<4.1.0": "^4.1.0"
+      "svgo@<4.1.0": "^4.1.0",
+      "source-map-js@<1.2.2": "^1.2.2"
     }
   }
 }

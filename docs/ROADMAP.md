@@ -59,14 +59,16 @@ what exists and any standing quirks.
 
 Every recent run's standing health check comes back clean run after run:
 `pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm test`/`pnpm
-test:coverage`/`pnpm build`, all 36 `check:*` scripts (30 fast enough to run
+test:coverage`/`pnpm build`, all 44 `check:*` scripts (34 fast enough to run
 every time and wired into `.github/workflows/ci.yml` as required PR gates,
 now including the two-hundred-and-thirty-first run's `check:feed`;
 `check:lighthouse`/`check:reflow`/`check:landscape`/`check:text-zoom`/
-`check:print-width`/`check:html` are full-site Playwright/browser sweeps kept
-manual/intensive-run-only rather than a required PR gate, purely for their
-~700-page-load runtime), `pnpm audit`, and `pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-thirty-third run (2026-10-05): 1047/1047 unit
+`check:print-width`/`check:html`/`check:target-size`/`check:text-spacing`/
+`check:focus-appearance`/`check:color-contrast` are full-site Playwright/
+browser sweeps kept manual/intensive-run-only rather than a required PR
+gate, purely for their ~700-to-1,400-page-load runtime), `pnpm audit`, and
+`pnpm dlx knip --no-config-hints`.
+As of the two-hundred-and-thirty-seventh run (2026-10-06): 1059/1059 unit
 tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711 pages built, the
 `/feed.xml`/`/hr/feed.xml` Atom feeds covering the newest edition of all
 seven edition-page route trees (22 entries per locale), `@cspell/dict-hr-hr`
