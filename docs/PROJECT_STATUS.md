@@ -35764,3 +35764,95 @@ items (`typescript` 7, `http-cache-semantics`, `docs/SOURCES.md`
 link-liveness, the `long-title` brand-suffix call); the full ~130-winner
 birth-date ranking; the 2026 Ballon d'Or ceremony (26 October 2026) once
 that date has passed; PR #56 itself needs human review/merge attention.
+
+### Run 244 (2026-10-07): fix a real factual overgeneralization in `content/glossary.md`'s "third and fourth place" entry
+
+Runs 241-243 each independently confirmed the backlog genuinely exhausted
+(three consecutive re-confirmation-flavored passes), so this run tried an
+angle none of them had: re-reading the site's smaller, rarely-touched
+content files (`about-sources.md`, `compare-countries.md`,
+`records-and-timelines.md`, `index.md`, `teams.md`, `players.md`,
+`glossary.md`) - the same "front-to-back prose-vs-table" technique that
+already caught real bugs on the six flagship competition/award files, but
+which the two-hundred-and-eleventh run had only applied to these smaller
+files once, and even then found just the one `index.md` naming-policy bug.
+Most of these files turned out to be short directory/page-intro blurbs with
+no verifiable per-item claims (nothing in `about-sources.md`,
+`compare-countries.md`, `records-and-timelines.md`, `teams.md`, `players.md`
+asserts anything specific enough to be right or wrong), and `index.md`'s own
+historical-naming note still matches `src/lib/countries.ts`'s
+`SUCCESSOR_GROUPS` exactly (the two-hundred-and-eleventh run's fix holding).
+
+`content/glossary.md` was different: its "third and fourth place" entry
+asserted, unconditionally, that "For the FIFA World Cup, UEFA Nations
+League, and Copa América, the two semifinal losers play a separate match to
+decide third and fourth place." Cross-checking that against each
+competition's own historical notes found it false for two of the three:
+
+- `content/fifa-world-cup.md` itself documents that the 1930 tournament
+  "did not include a third-place match" - FIFA's own historical ranking
+  placed the United States third and Yugoslavia fourth instead.
+- `content/copa-america.md`'s own, extensively-audited "Third and fourth
+  places" section documents several editions that never decided those
+  places by a separate match at all: the full 1916-1967 league-table era
+  (third and fourth read directly off final standings), 1989 and 1991 (a
+  closing four-team round-robin group), and 1975/1979/1983 (two-legged
+  home-and-away finals only, "no standings table or third-place fixture of
+  any kind - there is nothing to read a placing from").
+
+Only UEFA Nations League (all four completed Finals editions use the same
+semifinals-plus-third-place-match format, per `content/
+uefa-nations-league.md`) actually matches the blanket claim. Reworded the
+entry to the general case plus a named exception for each of the other two
+competitions, in the same register as this glossary's own "semifinalist"
+entry (which already carries a comparable "for UEFA EURO from 1984 onward"
+scope). No Croatian translation needed - both locale glossary pages
+(`src/pages/glossary.astro`/`src/pages/hr/glossary.astro`) load the exact
+same `content/glossary.md` entries via `loadGlossaryEntries()`, by design
+(only the page chrome is translated; glossary definitions stay English-only
+per `AGENTS.md`), confirmed by reading both files rather than assumed.
+Bumped `content/glossary.md`'s `lastReviewed` to 2026-10-07.
+
+Confirmed none of the seven claim-verification ledger scripts
+(`check:superlative-claims`/`check:ordinal-claims`/`check:record-claims`/
+`check:consecutive-claims`/`check:since-claims`/`check:one-of-only-claims`/
+`check:completeness-claims`) needed a new entry: all seven only scan
+`content/*.md` lines starting with `- ` (a Markdown bullet), and every
+`glossary.md` entry is a plain paragraph under its own heading, never a
+bullet - confirmed by reading `content/glossary.md` itself, not assumed
+from the scripts' doc comments alone. Also confirmed no test pins the old
+wording verbatim (`grep -ri "third and fourth place|semifinal losers"`
+across the repo turned up only this file, this file's own ledger-adjacent
+mentions, `src/lib/editions.ts` and `src/components/PodiumCards.astro`'s
+own unrelated UI label strings, and `content/copa-america.md`'s own prose -
+no test fixture).
+
+**Verification:** fresh `pnpm install --frozen-lockfile`, `pnpm lint` (263
+files, 0 errors/0 warnings/0 hints), `pnpm test` (1060/1060, unchanged - a
+pure content-prose fix, no source/test file touched), `pnpm build` (711
+pages, clean; confirmed the new wording renders in `dist/glossary/
+index.html`). All 30 CI-gated fast `check:*` scripts individually re-run
+and clean, including `check:i18n-notes`, `check:claims-hr`, and all seven
+claim-ledger checkers (no new entries needed, per above). Regenerated all
+700 downloadable PDFs (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm
+build:pdfs`, this environment's own documented escape hatch) since
+`content/glossary.md` changed; `check:pdfs`/`check:pdf-outline` both clean
+(700/700) after. Browser sweeps and a cold-start `pnpm test:e2e` not
+re-run - a pure content-prose change with no markup/behavior difference,
+matching this project's own established practice for that class of change;
+run 243's own fresh full sweep (zero violations) remains the current
+baseline.
+
+**Left for a future pass:** unchanged backlog - the EURO youngest-winner
+fact (candidates: Džajić 1968, D. Müller 1976, Baroš 2004); the same
+environment-blocked/human-sign-off items (`typescript` 7,
+`http-cache-semantics`, `docs/SOURCES.md` link-liveness confirmed still
+`EGRESS_BLOCKED` this run too, the `long-title` brand-suffix call); the full
+~130-winner birth-date ranking; the 2026 Ballon d'Or ceremony (26 October
+2026) once that date has passed; PR #56 still open, now 5 days old,
+needs human review/merge attention. This run's own front-to-back read of
+the smaller content files is now done for the first time since run 211 -
+no further untried file of that kind remains, so a future run short on
+leads should look elsewhere (e.g. a fresh accessibility/performance angle,
+or re-trying the EGRESS_BLOCKED checks in case the environment's network
+policy ever changes).

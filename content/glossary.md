@@ -1,7 +1,7 @@
 ---
 title: Glossary
 slug: glossary
-lastReviewed: 2026-08-22
+lastReviewed: 2026-10-07
 status: verified
 ---
 
@@ -41,8 +41,13 @@ match result to separate them.
 ## third and fourth place
 
 For the FIFA World Cup, UEFA Nations League, and Copa América, the two
-semifinal losers play a separate match to decide third and fourth place, so
-those two positions are ranked rather than tied.
+semifinal losers usually play a separate match to decide third and fourth
+place, so those two positions are normally ranked rather than tied. A
+handful of editions are exceptions - the FIFA World Cup's first tournament
+(1930) ranked third and fourth without playing that match, and several
+early or short-format Copa América editions settled (or, for three of them,
+never settled) those places a different way. See each competition's own
+historical notes for the specifics.
 
 ## host
 
