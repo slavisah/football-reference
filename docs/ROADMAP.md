@@ -275,7 +275,13 @@ run-by-run history behind all of this, see `docs/PROJECT_STATUS.md`.
   fallback can never actually miss, since `counts` is built by iterating the
   exact same array being mapped afterward). Left as-is per the eighth
   intensive run's original classification; re-verify line numbers next time
-  any of these four files changes materially.
+  any of these four files changes materially. `contentPages.ts`'s own low
+  raw number (29% statements) looks like a fifth case but isn't the same
+  kind of gap - investigated and explained by the two-hundred-and-
+  forty-second run: its `loadFeedEntries()`/`loadDerivedPageSources()` are a
+  deliberate build-only integration-test choice (same as `sitemap.xml.ts`,
+  documented in `tests/unit/contentPages.test.ts`'s own header comment), not
+  an untested pure-function branch - no action needed, don't re-investigate.
 
 ## Ideas not yet scoped
 
