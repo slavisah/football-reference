@@ -35621,3 +35621,65 @@ blocked/human-sign-off backlog (`typescript` 7, `http-cache-semantics`,
 full ~130-winner birth-date ranking. The 2026 Ballon d'Or ceremony
 (26 October 2026) is now close enough that it is worth checking again in
 the next run or two, once that date has actually passed.
+
+### Run 242 (2026-10-07): second consecutive re-confirmation pass - one coverage number investigated and ruled out as a non-gap, everything else unchanged
+
+Before re-running the same checks run 241 just did, looked specifically for
+ground run 241 had not already covered, rather than repeating its own list
+verbatim:
+
+- **`src/lib/contentPages.ts`'s coverage number:** `pnpm test:coverage`
+  shows this file at only 29.62% statements/29.16% lines - far below every
+  other file in the report (96-100%) and not one of the four files
+  `docs/ROADMAP.md`'s "Coverage gaps, defensively unreachable" entry
+  already documents (`quiz.ts`, `sources.ts`, `tableSort.ts`, `url.ts`).
+  Read the file and its own test (`tests/unit/contentPages.test.ts`) to
+  check whether this is a real, previously-unnoticed gap worth a new test -
+  especially notable since this exact file's `derivedPageLastReviewed()`
+  was the site of a real bug the two-hundred-and-fortieth run's own fix
+  commit had to patch. It is not a gap: the test file's own header comment
+  documents the choice explicitly - `loadFeedEntries()` and
+  `loadDerivedPageSources()` (the two functions accounting for nearly all
+  of the uncovered lines, 95-117 and 173-271) call `astro:content`'s
+  `getEntry()` and are deliberately exercised only through the real build
+  plus `check:feed.mjs`/`check:sitemap.mjs` against its output, the same
+  choice `sitemap.xml.ts` already makes for the same reason - matching
+  `derivedPageLastReviewed()` and `maxLastReviewed()` themselves (the two
+  pure functions a prior bug actually lived in) are fully covered already.
+  No change made; this is worth noting here once so a future run doesn't
+  re-spend time re-investigating the same number.
+- **Re-confirmed unchanged, same as run 241:** `WebFetch` to
+  `en.wikipedia.org` still returns `EGRESS_BLOCKED`; fresh `pnpm install` +
+  `pnpm outdated` still shows only the already-capped `typescript` 7;
+  `pnpm audit` still surfaces only the one unpatched `http-cache-semantics`
+  advisory via `astro@7.3.6`; `npm view @axe-core/playwright version` still
+  `4.13.0`; `npm view @astrojs/check versions` still tops out at `0.9.10`.
+  Nothing moved in the one day since run 241.
+- **PR #56 health:** still open, not a draft, head commit `17414cac1`
+  (run 241's own commit) - now five days old (created 2026-10-02) without
+  a merge or a review. Already flagged once by run 241; not re-flagging
+  the PR body itself again here beyond this run's own changelog entry, but
+  repeating it in this run's push notification since the underlying
+  condition (a long-lived green PR nobody has looked at) hasn't changed.
+
+**Verification:** fresh `pnpm install`, `pnpm lint` (263 files, 0/0/0),
+`pnpm test` (1060/1060, unchanged), `pnpm test:coverage` (96.73%
+statements, unchanged profile), `pnpm build` (711 pages, clean). No
+`content/*.md` or `src/pages/hr/**` file changed, so `pnpm build:pdfs` was
+not required.
+
+**Left for a future pass:** unchanged from run 241 - the EURO
+youngest-winner fact if a source ever converges; the same environment-
+blocked/human-sign-off backlog (`typescript` 7, `http-cache-semantics`,
+`docs/SOURCES.md` link-liveness, the `long-title` brand-suffix call); the
+full ~130-winner birth-date ranking; the 2026 Ballon d'Or ceremony
+(26 October 2026) once that date has passed. Given two consecutive runs
+(241, 242) have now independently searched for new ground and found none,
+a future run short on new leads should consider re-running the manual/
+intensive-run-only full-site browser sweeps (`check:lighthouse`/
+`check:reflow`/`check:landscape`/`check:text-zoom`/`check:print-width`/
+`check:html`/`check:target-size`/`check:text-spacing`/
+`check:focus-appearance`/`check:color-contrast`) as genuinely useful
+re-verification work instead of another pure backlog re-read, since none
+of them has been re-run in several runs despite several dependency/content
+changes landing since.
