@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (241 intensive runs as of 2026-10-06) lives
+verification sweep and decision (243 intensive runs as of 2026-10-07) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -309,3 +309,14 @@ run-by-run history behind all of this, see `docs/PROJECT_STATUS.md`.
   the full generated ranking (every winner, not just the extremes), which
   still needs either a trustworthy bulk birth-date source or a session with
   direct page-fetch access to verify one player at a time at that scale.
+  The two-hundred-and-forty-third run tried a narrower angle on the EURO
+  fact specifically - computing candidate ages from each single, outright
+  winner's own birth date and that edition's final date, rather than
+  searching the aggregate "youngest-ever" claim directly - and got far
+  enough to name three closest candidates (Dragan Džajić, 1968; Dieter
+  Müller, 1976; Milan Baroš, 2004) before a `WebSearch` pass for Müller's
+  birth date contradicted this session's own assumed one, which is exactly
+  why it stopped there rather than ship a figure from a single unverified
+  pass - the three names are a starting point for a future run with
+  independent-source-verification access, not a result. See
+  `docs/PROJECT_STATUS.md`'s run-243 entry for the full reasoning.
