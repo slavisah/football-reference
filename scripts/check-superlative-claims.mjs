@@ -64,6 +64,19 @@
 // uniqueness claim) is a different shape, deliberately still excluded - see
 // `docs/ROADMAP.md`'s "Ideas not yet scoped" section.
 //
+// Widened again by the two-hundred-and-forty-sixth intensive run to close a
+// gap the two-hundred-and-seventh run documented but left open and the
+// two-hundred-and-forty-fourth run then hit for real: every one of this
+// file's seven sibling checkers (see `extractClaimableLines()` below, now
+// shared by all seven) only ever scanned `- ` bullet lines, leaving every
+// prose paragraph in `content/*.md` completely unguarded. Run 244 found and
+// fixed a false blanket claim in `content/glossary.md`'s "third and fourth
+// place" entry - a plain paragraph, not a bullet - that no claim checker
+// could have caught, only an occasional manual front-to-back read. All seven
+// `extract*Claims()` functions below now scan every claimable text unit
+// (bullets and prose paragraphs alike, each with any wrapped continuation
+// lines joined into one string first), not just bullets.
+//
 // Plain regex/string parsing of `content/*.md`, no build or browser needed -
 // the same territory as `check:award-tallies`/`check:spelling` (well under a
 // second), so this is wired into `.github/workflows/ci.yml` as a required PR
@@ -80,22 +93,74 @@ const LEDGER_PATH = path.join(ROOT, 'scripts', 'superlative-claims-ledger.json')
 const CLAIM_PATTERN = /\bthe only\b|\b\w+'s\s+only\b|\b(his|her|its|their)\s+only\b/i;
 
 /**
- * Pure: every top-level Markdown list item's text in `markdown` that matches
- * the "the only" superlative-claim pattern - either "the only" directly, or
- * the same uniqueness claim phrased with a possessive ("Colombia's only
- * title", "its only title", "their only title") - in document order. Content
- * pages on this site use only flat, single-line `- ` bullets (no nested
- * lists), so a per-line regex is sufficient - no Markdown parser needed.
+ * Pure: splits a `content/*.md` file's full text into claimable text units in
+ * document order - shared by all seven claim checkers in this family
+ * (`check-superlative-claims.mjs`/`check-ordinal-claims.mjs`/
+ * `check-record-claims.mjs`/`check-consecutive-claims.mjs`/
+ * `check-since-claims.mjs`/`check-one-of-only-claims.mjs`/
+ * `check-completeness-claims.mjs`). A unit is either one `- ` bullet's full
+ * text, or one prose paragraph's full text - either way with any wrapped
+ * continuation lines joined into a single string with a space, the same way
+ * `src/lib/glossary.ts`'s `parseGlossaryEntries()` already joins a wrapped
+ * definition. Frontmatter (between the file's first two `---` lines),
+ * headings (`#` through `######`) and table rows (lines starting with `|`)
+ * never start or continue a unit - each one, like a blank line, ends
+ * whatever unit precedes it without starting a new one of its own, so a
+ * table's data rows are never mistaken for prose. A bullet line always
+ * starts a new unit (even directly after another bullet, with no blank line
+ * between - the common case in this site's content); a non-bullet line
+ * continues whatever unit is open, or starts a new prose unit if none is.
+ */
+export function extractClaimableLines(markdown) {
+  const units = [];
+  let current = null;
+  let frontmatterClosed = false;
+  let inFrontmatter = false;
+
+  const closeCurrent = () => {
+    if (current) units.push(current.join(' '));
+    current = null;
+  };
+
+  for (const rawLine of markdown.split('\n')) {
+    const line = rawLine.trim();
+
+    if (!frontmatterClosed && line === '---') {
+      frontmatterClosed = inFrontmatter;
+      inFrontmatter = !inFrontmatter;
+      continue;
+    }
+    if (inFrontmatter) continue;
+
+    if (line === '' || /^#{1,6}\s/.test(line) || line.startsWith('|')) {
+      closeCurrent();
+      continue;
+    }
+
+    const bulletMatch = /^-\s(.*)$/.exec(line);
+    if (bulletMatch) {
+      closeCurrent();
+      current = [bulletMatch[1].trim()];
+      continue;
+    }
+
+    if (current) current.push(line);
+    else current = [line];
+  }
+  closeCurrent();
+
+  return units;
+}
+
+/**
+ * Pure: every claimable text unit (see `extractClaimableLines()`) in
+ * `markdown` that matches the "the only" superlative-claim pattern - either
+ * "the only" directly, or the same uniqueness claim phrased with a
+ * possessive ("Colombia's only title", "its only title", "their only
+ * title") - in document order.
  */
 export function extractSuperlativeClaims(markdown) {
-  const claims = [];
-  for (const rawLine of markdown.split('\n')) {
-    const match = /^-\s(.*)$/.exec(rawLine.trim());
-    if (!match) continue;
-    const text = match[1].trim();
-    if (CLAIM_PATTERN.test(text)) claims.push(text);
-  }
-  return claims;
+  return extractClaimableLines(markdown).filter((text) => CLAIM_PATTERN.test(text));
 }
 
 /**

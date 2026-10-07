@@ -35960,3 +35960,142 @@ back clean - this was the first recheck since the original fix 33 runs
 ago, and found exactly the two commits per file that forgot the bump, not
 a systemic pattern - so it's a worthwhile occasional spot-check, not
 something that needs re-running every single pass.
+
+### Run 246 (2026-10-07): closed a documented-but-never-fixed gap in all seven claim-verification ledgers - every one scanned only `- ` bullets, never a prose paragraph, and that gap had already produced a real bug once
+
+Run 207 documented, and Run 244 then hit in practice, the same standing gap:
+every one of this project's seven claim-verification checkers
+(`check-superlative-claims.mjs`/`check-ordinal-claims.mjs`/
+`check-record-claims.mjs`/`check-consecutive-claims.mjs`/
+`check-since-claims.mjs`/`check-one-of-only-claims.mjs`/
+`check-completeness-claims.mjs`) only ever extracted a claim from a
+`content/*.md` bullet matching `/^-\s(.*)$/` - a prose paragraph was
+invisible to all seven, no matter what it asserted. Run 244's own fix for
+`content/glossary.md`'s false "third and fourth place" blanket claim (a
+plain paragraph, not a bullet) was only found by an occasional manual
+front-to-back read, the exact failure mode this ledger family exists to
+replace with a permanent, cheap, CI-gated guard for every *other* claim
+shape it covers. This run closed that gap for prose too, rather than
+leaving it as a recurring "left for a future pass" line.
+
+Added one shared, exported `extractClaimableLines(markdown)` function to
+`check-superlative-claims.mjs` (now imported by all six siblings, replacing
+each one's own near-identical bullet-only loop): it splits a file's body
+into claimable text units in document order - frontmatter, headings and
+table rows never start or continue a unit, a `- ` line always starts a new
+one (even directly after another bullet, the common case here), and any
+other line continues whichever unit is open or starts a new prose one.
+Each unit joins any wrapped continuation lines into a single string with a
+space, the same way `src/lib/glossary.ts`'s `parseGlossaryEntries()`
+already joins a wrapped definition - necessary because this run also found
+bullets wrap across lines too (`content/quiz.md`'s question bullets, up to
+13 lines each): the bullet-only loop had been silently capturing only a
+wrapped bullet's *first* line as "the claim" ever since `check-record-
+claims.mjs`/`check-consecutive-claims.mjs` were built, a second, narrower
+bug fixed as a side effect of the same change (confirmed by diffing: five
+`record-claims-ledger.json`/one `consecutive-claims-ledger.json` entries for
+`content/quiz.md` were truncated first-line fragments, now replaced with
+each bullet's genuine full text).
+
+All seven `extract*Claims()` functions now call `extractClaimableLines()`
+and filter by their own existing `CLAIM_PATTERN`, unchanged otherwise - no
+checker's matching logic or ledger-diff mechanism changed, only its input
+scope. Re-running all seven against the now-widened scope surfaced 24 new
+matches across `content/*.md` (8 ordinal, 16 record, 1 consecutive, 2
+since - one bullet can match more than one checker, so these overlap
+partially with the quiz.md truncation fixes above) and 6 stale entries
+(the quiz.md truncated fragments). Each new match was individually read
+against what it actually asserts, same as any ledger-seeding pass, falling
+into three buckets:
+
+- **Not a football claim at all** (the large majority): page-intro/section
+  descriptions using "record"/"most" as a plain noun or quantifier rather
+  than naming a record-holder (`content/compare-countries.md`,
+  `content/compare-players.md`, `content/players.md`, `content/teams.md`,
+  `content/records-and-timelines.md`, `content/uefa-nations-league.md`,
+  `content/glossary.md`'s "host" entry); the Family Quiz's own on-page
+  question-type descriptions (`content/quiz.md`, five bullets - the same
+  ones whose truncated ledger entries this run also fixed); two false
+  positives where "the Second World War" (a proper noun) and "this closes
+  the third/fourth audit" (counting past intensive runs, not football
+  editions) happened to match the ordinal pattern's "the Nth" shape without
+  asserting any football ordinal-rank claim; and five large audit-
+  methodology paragraphs in `content/ballon-dor.md`/`content/
+  copa-america.md` (each under a heading - "Important editorial note"/
+  "Important editorial warning" - deliberately excluded from both pages'
+  own `noteHeadings` allowlist in their `.astro` files, so this prose is
+  never rendered to a reader in either language at all) whose "first
+  pass"/"second pass" wording describes past verification passes, not a
+  football record.
+- **Genuine claims, verified true**: `content/copa-america.md`'s intro
+  ("oldest still-running continental competition", "guest teams...since
+  1993") and `content/glossary.md`'s "EURO has not played a third-place
+  match since 1980" - all three checked against their own file's Editions/
+  format-notes tables (Copa América's 1993 guest-team entry confirmed via
+  Mexico's results from 1993 onward; EURO's 1980/1984 cutoff confirmed
+  against its own Editions table and existing "A third-place match was
+  played through 1980" line) and found correct.
+- **Genuine claim, already independently verified by a past run**:
+  `content/glossary.md`'s "the FIFA World Cup's first tournament (1930)
+  ranked third and fourth [without playing a match]" - this is the exact
+  fact Run 244 fixed and verified against `content/fifa-world-cup.md`'s own
+  Editions table; re-confirmed rather than re-asserted, since this checker
+  had never seen this paragraph before this run.
+
+No new factual error turned up this run (unlike Run 244's own prose-scan,
+which found one) - the point of this run was closing the structural gap
+itself, not another one-off find, though the quiz.md truncation fix is a
+small real correctness improvement in what the ledgers record.
+
+Widening the scope to prose also broke `check-claims-hr.mjs` (the eighth
+checker in this family, which cross-checks every *already-ledgered* claim's
+years against its Croatian counterpart): its positional-pairing logic
+assumed every ledgered claim rendered inside a `.notes__card` item, true by
+construction when claims only ever came from bullets (every bullet on
+these pages lives inside a `noteHeadings`-allowlisted section). Two of this
+run's new prose claims broke that assumption - the five audit-methodology
+paragraphs above are never rendered at all (not in either language), and
+`content/fifa-world-cup.md`'s own lead intro paragraph ("...not played in
+1942 or 1946...") *is* rendered on both language pages, just outside any
+notes card, so `check-claims-hr.mjs`'s notes-only text scan couldn't see
+its Croatian counterpart's 1942/1946 either and flagged seven false
+mismatches. Fixed by adding `extractPageBodyText()` (the full page's plain
+text, independent of `.notes__card` boundaries) and using it two ways in
+`diffClaimsPositionally()`'s existing whole-page fallback: a claim absent
+from the English page's full text entirely is now skipped rather than
+flagged (nothing published to translate), and a claim that *is* rendered
+but not positionally paired now checks its years against the Croatian
+page's full text instead of only its notes text. Re-ran `check:claims-hr`
+after this fix: clean, 223 claims checked, zero mismatches.
+
+**Verification:** fresh `pnpm install --frozen-lockfile`, `pnpm lint` (263
+files, 0/0/0), `pnpm test` (1071/1071, up from 1060 - eleven new test cases:
+five for `extractClaimableLines()` itself, one updated per checker for the
+"non-bullet lines are now caught" behavior change across all seven
+checkers' own test files, four for `check-claims-hr.mjs`'s new
+`extractPageBodyText()`/gating behavior), `pnpm build` (711 pages,
+unchanged output - this run touched no `content/*.md` or `src/` file, only
+`scripts/`, `scripts/*-ledger.json` and `tests/unit/`). All 31 CI-gated
+fast `check:*` scripts individually re-run and clean, including all seven
+claim-ledger checkers against their newly-widened scope and
+`check:claims-hr` against the fix above. No PDF regeneration needed (no
+`content/*.md` change) and no browser-sweep/e2e re-run needed (no markup or
+behavior change - confirmed via `git status`, only non-content files
+touched), matching this project's own established practice for that class
+of change.
+
+**Left for a future pass:** unchanged backlog - the EURO youngest-winner
+fact (candidates: Džajić 1968, D. Müller 1976, Baroš 2004); the same
+environment-blocked/human-sign-off items (`typescript` 7,
+`http-cache-semantics`, `docs/SOURCES.md` link-liveness still
+`EGRESS_BLOCKED` this run too - re-confirmed directly via `WebFetch` to
+`en.wikipedia.org`, same error as every prior check -, the `long-title`
+brand-suffix call); the full ~130-winner birth-date ranking; the 2026
+Ballon d'Or ceremony (26 October 2026) once that date has passed; PR #56
+still open (now the branch this run's own commit lands on). This run's own
+structural fix closes the last documented-but-unbuilt gap in the
+claim-verification-ledger family; a future pass looking for a similarly
+structural (not one-off) gap should look elsewhere - e.g. whether any other
+`content/*.md`-scoped checker (`check:award-tallies`, the four
+`check:*-against-source.mjs` scripts) shares an unstated scoping assumption
+the way this family's bullet-only assumption turned out to.

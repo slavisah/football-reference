@@ -46,7 +46,7 @@
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { diffClaimsAgainstLedger } from './check-superlative-claims.mjs';
+import { diffClaimsAgainstLedger, extractClaimableLines } from './check-superlative-claims.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CONTENT_DIR = path.join(ROOT, 'content');
@@ -56,22 +56,14 @@ const RECORD_WORDS = 'most|record|youngest|oldest|highest|biggest|largest|lowest
 const CLAIM_PATTERN = new RegExp(`\\b(${RECORD_WORDS})\\b`, 'i');
 
 /**
- * Pure: every top-level Markdown list item's text in `markdown` that
- * mentions a record-claim trigger word ("most", "record", "youngest",
+ * Pure: every claimable text unit (bullets and prose paragraphs alike - see
+ * `extractClaimableLines()` in `check-superlative-claims.mjs`) in `markdown`
+ * that mentions a record-claim trigger word ("most", "record", "youngest",
  * "oldest", "highest", "biggest", "largest", "lowest", "fewest"), in
- * document order. Content pages on this site use only flat, single-line
- * `- ` bullets (no nested lists), so a per-line regex is sufficient - no
- * Markdown parser needed.
+ * document order.
  */
 export function extractRecordClaims(markdown) {
-  const claims = [];
-  for (const rawLine of markdown.split('\n')) {
-    const match = /^-\s(.*)$/.exec(rawLine.trim());
-    if (!match) continue;
-    const text = match[1].trim();
-    if (CLAIM_PATTERN.test(text)) claims.push(text);
-  }
-  return claims;
+  return extractClaimableLines(markdown).filter((text) => CLAIM_PATTERN.test(text));
 }
 
 async function main() {
