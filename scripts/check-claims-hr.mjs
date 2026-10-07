@@ -261,6 +261,31 @@ export function locateClaimPosition(claim, enCards) {
 }
 
 /**
+ * Pure: the plain text of a built page's full `<body>`, independent of
+ * `.notes__card` boundaries - every tag replaced with a space (so two
+ * adjacent elements' text never runs together), `<script>`/`<style>` blocks
+ * dropped first, and the same handful of HTML entities
+ * `extractNoteCardsWithItems()`'s own `stripNoteItemTags()` already
+ * unescapes decoded back to plain characters. Used by `diffClaimsPositionally()`
+ * for two things a notes-only scan can't: checking whether a claim is
+ * rendered anywhere on the page at all (see that function's own comment),
+ * and, for a claim that is rendered but outside any `.notes__card` (a page's
+ * own lead intro paragraph, for instance), searching the whole page rather
+ * than only its note cards for the Croatian counterpart's years.
+ */
+export function extractPageBodyText(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/g, ' ')
+    .replace(/<style[\s\S]*?<\/style>/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
  * Pure: diffs one page family's verified claims against its Croatian notes
  * text, returning human-readable problem strings - empty when every claim's
  * years (and, where applicable, earlier-editions cardinal) are present. This
@@ -303,15 +328,34 @@ export function diffClaimsAgainstHrNotes(claims, hrNotesText, contentFile, hrPat
  * same thing on both languages' pages); falls back to
  * `diffClaimsAgainstHrNotes()`'s whole-page check, one claim at a time, for
  * any claim that can't be positionally paired.
+ *
+ * `enBodyText`/`hrBodyText` (the pages' full text - see
+ * `extractPageBodyText()`) exist for a gap `extractClaimableLines()`
+ * widening every claim checker to prose (not just `- ` bullets) opened in
+ * this run: a ledgered claim's own prose paragraph is sometimes under a
+ * heading a page's own `noteHeadings` allowlist (each `src/pages/
+ * competitions/*.astro`'s own prop) deliberately never renders at all - an
+ * internal-only audit/methodology note, published in neither language - or
+ * is the page's lead intro paragraph, rendered in both languages but outside
+ * any `.notes__card`, so `hrNotesText` alone would never contain it. A claim
+ * absent from `enBodyText` entirely is the first case: there is nothing
+ * published to translate, so it is skipped rather than flagged. A claim
+ * present in `enBodyText` but not positionally paired is the second case:
+ * its years are checked against `hrBodyText` (the whole Croatian page, not
+ * just its note cards) instead of `hrNotesText`.
  */
-export function diffClaimsPositionally(claims, enCards, hrCards, hrNotesText, contentFile, hrPath, ledgerName) {
+export function diffClaimsPositionally(claims, enCards, hrCards, hrNotesText, contentFile, hrPath, ledgerName, enBodyText, hrBodyText) {
   const problems = [];
   for (const claim of claims) {
     const position = locateClaimPosition(claim, enCards);
     const hrItem = position ? hrCards[position.sectionIndex]?.items[position.itemIndex] : undefined;
 
     if (hrItem === undefined) {
-      problems.push(...diffClaimsAgainstHrNotes([claim], hrNotesText, contentFile, hrPath, ledgerName));
+      if (enBodyText !== undefined && !enBodyText.includes(stripMarkdownEmphasis(claim))) {
+        continue; // never rendered on the English page at all - nothing to translate
+      }
+      const haystack = hrBodyText !== undefined ? hrBodyText : hrNotesText;
+      problems.push(...diffClaimsAgainstHrNotes([claim], haystack, contentFile, hrPath, ledgerName));
       continue;
     }
 
@@ -347,6 +391,8 @@ async function main() {
   }
 
   const hrNotesTextByPagePath = new Map();
+  const enBodyTextByPagePath = new Map();
+  const hrBodyTextByPagePath = new Map();
   const enCardsByPagePath = new Map();
   const hrCardsByPagePath = new Map();
   const problems = [];
@@ -381,9 +427,21 @@ async function main() {
       const enCards = enCardsByPagePath.get(pagePath);
       const hrCards = hrCardsByPagePath.get(hrPath);
 
+      if (!enBodyTextByPagePath.has(pagePath)) {
+        const enHtml = htmlByPagePath.get(pagePath);
+        enBodyTextByPagePath.set(pagePath, enHtml ? extractPageBodyText(enHtml) : '');
+      }
+      if (!hrBodyTextByPagePath.has(hrPath)) {
+        hrBodyTextByPagePath.set(hrPath, extractPageBodyText(htmlByPagePath.get(hrPath)));
+      }
+      const enBodyText = enBodyTextByPagePath.get(pagePath);
+      const hrBodyText = hrBodyTextByPagePath.get(hrPath);
+
       const claimTexts = Object.keys(claims);
       totalClaims += claimTexts.length;
-      problems.push(...diffClaimsPositionally(claimTexts, enCards, hrCards, hrNotesText, contentFile, hrPath, ledgerFile));
+      problems.push(
+        ...diffClaimsPositionally(claimTexts, enCards, hrCards, hrNotesText, contentFile, hrPath, ledgerFile, enBodyText, hrBodyText),
+      );
     }
   }
 
