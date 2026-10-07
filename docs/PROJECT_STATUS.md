@@ -35683,3 +35683,84 @@ intensive-run-only full-site browser sweeps (`check:lighthouse`/
 re-verification work instead of another pure backlog re-read, since none
 of them has been re-run in several runs despite several dependency/content
 changes landing since.
+
+### Run 243 (2026-10-07): full re-run of all ten manual/intensive-run-only browser sweeps - zero violations found; one near-miss on a EURO Golden Boot youngest-winner fact deliberately abandoned again
+
+Took run 242's own suggestion rather than a third consecutive pure
+backlog/dependency re-read: re-ran every manual, full-site, browser-driven
+`check:*` script in `docs/ROADMAP.md`'s "left for a future pass" list
+(`check:html`, `check:lighthouse`, `check:reflow`, `check:landscape`,
+`check:text-zoom`, `check:print-width`, `check:target-size`,
+`check:text-spacing`, `check:focus-appearance`, `check:color-contrast`) -
+none of them had been re-run since run 239 (2026-10-06, before the
+`astro` 7.3.6 bump and several content/quiz changes since).
+
+- **Environment note, not a repo bug:** this run's own container ships
+  Playwright browser `chromium-1194`/`chromium_headless_shell-1194` at
+  `/opt/pw-browsers`, while the pinned `@playwright/test@1.63.0` defaults
+  headless `chromium.launch()` to a `chromium_headless_shell-1243` build
+  that isn't present, so every browser-based sweep failed immediately with
+  "Executable doesn't exist" until re-run with
+  `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` (the escape hatch
+  `scripts/preview-daemon.mjs`'s `launchChromium()` already documents and
+  supports - no code change needed, this is a per-environment browser-version
+  mismatch, not something to fix in the repo). Noting it here so a future
+  run in a similarly-pinned container doesn't re-diagnose it from scratch.
+- **Result: all ten sweeps clean.** `check:html` - 0/711 pages with
+  markup-validity violations. `check:lighthouse` - 1.00/1.00/1.00/1.00
+  across its sampled page set (home, both directory indexes, the heaviest
+  landing page, both compare pages, the quiz, sampled profiles, both
+  locales). `check:reflow`/`check:landscape`/`check:text-zoom`/
+  `check:print-width`/`check:target-size`/`check:text-spacing`/
+  `check:focus-appearance` - 0 overflow/sub-44px/missing-ring violations
+  across all 711 pages each. `check:color-contrast` - the heaviest sweep
+  (1,422 page loads: 711 pages x two color schemes, ~29 minutes) - 0 WCAG
+  1.4.3 violations in either theme. No regression from any of the dependency
+  bumps, content additions, or quiz question types landed since run 239.
+- **Tried, abandoned again - EURO Golden Boot youngest-winner fact:**
+  before starting the sweep re-run, took one more angle at this specific
+  open item (`docs/ROADMAP.md`'s "Ideas not yet scoped") that prior runs
+  hadn't tried: instead of searching for the aggregate "youngest-ever EURO
+  Golden Boot winner" claim directly (which 162/240/241's own `WebSearch`
+  passes already found no two sources converging on), computed candidate
+  ages directly from each *single, outright* (non-"Multiple"-tie) winner's
+  own birth date and that edition's final date - a narrower, individually-
+  cross-checkable research task, the same shape that already worked for
+  this page's existing extremes (Flórián Albert/Davor Šuker/Cristiano
+  Ronaldo). First candidate tried, Dieter Müller (EURO 1976): a fresh
+  `WebSearch` returned 1 April 1954 as his birth date, which immediately
+  contradicted this session's own unverified recollection of 1 August 1954
+  - a real, caught discrepancy, not a hypothetical one. That alone is
+  reason enough not to ship an age computed from a single search pass: the
+  close next-youngest candidates (Dragan Džajić, 1968; Milan Baroš, 2004)
+  are separated by only weeks to a few months once computed, meaning a
+  single wrong digit in any one candidate's birth date could flip which
+  player is actually youngest, and the "Multiple"-tie years (1992, 2000,
+  2012, 2024) would need the same per-player precision check before they
+  could even be ruled out as containing a younger winner - which is exactly
+  the scale/precision problem `docs/ROADMAP.md` already flags as too risky
+  for the full ~130-winner ranking, just rediscovered one tier down. Stopped
+  here rather than spend the rest of this run chasing it; left exactly as
+  open as before, with this specific near-miss recorded so a future run
+  with independent-source-verification access (not just single-pass
+  `WebSearch`) has a concrete starting candidate list (Džajić 1968, D.
+  Müller 1976, Baroš 2004 look closest) instead of starting from zero.
+- **PR #56 health:** still open, not a draft, now carrying 31 commits
+  across runs 213-243 since 2026-10-02 (five days) without a merge or
+  human review. Flagged again in this run's own push notification, same as
+  runs 241 and 242.
+
+**Verification:** fresh `pnpm install`, `pnpm outdated` (still only the
+already-capped `typescript` 7), `pnpm audit` (still only the one unpatched
+`http-cache-semantics` advisory), `pnpm lint` (263 files, 0/0/0), `pnpm
+test` (1060/1060, unchanged), `pnpm build` (711 pages, clean), plus all ten
+manual browser sweeps above. No `content/*.md` or `src/pages/hr/**` file
+changed, so `pnpm build:pdfs` was not required.
+
+**Left for a future pass:** unchanged backlog - the EURO youngest-winner
+fact (now with three concrete next candidates to verify independently
+rather than guess, see above); the same environment-blocked/human-sign-off
+items (`typescript` 7, `http-cache-semantics`, `docs/SOURCES.md`
+link-liveness, the `long-title` brand-suffix call); the full ~130-winner
+birth-date ranking; the 2026 Ballon d'Or ceremony (26 October 2026) once
+that date has passed; PR #56 itself needs human review/merge attention.
