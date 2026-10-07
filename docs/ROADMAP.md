@@ -182,7 +182,16 @@ whole point of a shared link) had no test at all, including the specific
 two-table-namespace-collision case `TournamentTable.astro`'s own
 `paramPrefix` prop exists to prevent. The new `tests/e2e/
 filter-url-restore.spec.ts` (six tests) closes it - no bug found, the
-existing restore logic already worked correctly. See "Open backlog" and
+existing restore logic already worked correctly. Runs 241-243 each
+independently re-confirmed the backlog genuinely exhausted; run 244 then
+applied the front-to-back prose-vs-table read (previously only used on the
+six flagship competition/award files) to the site's smaller content files
+for the first time since run 211, and found a real one:
+`content/glossary.md`'s "third and fourth place" entry wrongly claimed a
+separate match always decides those places for the FIFA World Cup, UEFA
+Nations League, and Copa América - false for the World Cup's 1930 edition
+and several Copa América eras, both already documented on their own pages.
+Fixed; no further untried file of that kind remains. See "Open backlog" and
 "Ideas not yet scoped" below for everything else still open. For the full
 run-by-run history behind all of this, see `docs/PROJECT_STATUS.md`.
 
