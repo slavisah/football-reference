@@ -36099,3 +36099,95 @@ structural (not one-off) gap should look elsewhere - e.g. whether any other
 `content/*.md`-scoped checker (`check:award-tallies`, the four
 `check:*-against-source.mjs` scripts) shares an unstated scoping assumption
 the way this family's bullet-only assumption turned out to.
+
+### Run 247 (2026-10-07): bumped `@playwright/test` 1.63.0 → 1.64.0 (the only pending dependency update); followed up Run 246's own pointer and re-confirmed the award-tally/generated-page consistency-checker family has no matching scoping gap
+
+Two independent threads this run, picked because the backlog remains
+otherwise exhausted (runs 241-243 already confirmed this, run 244/245/246
+each then found real, narrower work beyond it):
+
+**1. Dependency bump.** `pnpm outdated` after a fresh `pnpm install` showed
+exactly one pending update: `@playwright/test` 1.63.0 → 1.64.0 (`typescript`
+5.9.3 → 7.0.2 is the only other outdated line, still blocked by
+`@astrojs/check@0.9.10`'s own `^5.0.0 || ^6.0.0` peer range, re-confirmed
+unchanged). Bumped it. Because a Playwright *version* bump changes the test
+harness itself rather than any page's markup, this run's verification scope
+was deliberately wider than the "just the two quiz specs" shortcut this
+project normally uses for a markup-only change: first the two quiz e2e specs
+(`accessibility-quiz-states.spec.ts`/`no-js-quiz-and-search.spec.ts`, 14
+tests) against this environment's pinned Chromium build (`PW_EXECUTABLE_PATH
+=/opt/pw-browsers/chromium` - that path is itself the executable, a symlink
+into `chromium-1194/chrome-linux/chrome`, not a directory to append
+`/chrome-linux/chrome` to again), then the full cold-start `pnpm test:e2e`
+suite once those passed: 1055/1055, 15.5 minutes, all against the same
+pinned 1194-revision Chromium build via the same env var - confirming
+1.64.0's test runner still drives this environment's already-installed
+browser correctly rather than expecting a newer bundled revision.
+
+**2. Scoping-gap follow-up.** Run 246's own write-up named a specific next
+angle: whether `check-award-tallies.mjs` or any of the four
+`check:*-against-source.mjs` scripts share an unstated scoping assumption
+the way the claim-ledger family's bullet-only extraction turned out to.
+Read all five scripts' own header comments and logic against the real
+`content/*.md` data rather than taking each script's own claim about its
+scope on faith:
+
+- `check-award-tallies.mjs`'s `CHECKS` array only covers four files
+  (`fifa-world-cup.md`/`uefa-euro.md`/`copa-america.md`/`ballon-dor.md`) -
+  confirmed this isn't an omission, not a gap: `golden-boot.md` has no
+  second hand-maintained "titles by player" tally table at all (ties make a
+  clean per-player count table impractical, and it doesn't have one to
+  drift), and `uefa-nations-league.md` has had only three editions with no
+  repeat champion yet, so there is nothing a tally table would even
+  summarize. Both files were re-read in full to check this, not inferred.
+- The four `check:*-against-source.mjs` scripts (`records`/`team-profiles`/
+  `player-profiles`/`compare`) already explicitly state, in their own header
+  comments, that between them they cover every generated/derived page family
+  the site has (`/records`, `/teams/<slug>`, `/players/<slug>`, `/compare`
+  and `/compare-players`) - this was exactly runs 223-226's own "close the
+  last gap" project. No sixth generated page family exists uncovered.
+- Also checked `check-attendance-format.mjs`, the other checker in this
+  directory whose own header comment makes an explicit, falsifiable scoping
+  claim ("Final venues" sections are "the only note sections on this site
+  that carry an attendance figure"): grepped every comma-grouped number
+  (`\d{1,3}(,\d{3})+`) across all of `content/*.md` and confirmed every
+  single match (21 in `fifa-world-cup.md`, 16 in `uefa-euro.md`, 2 in
+  `copa-america.md`, 1 in `uefa-nations-league.md`, 0 in `ballon-dor.md`/
+  `golden-boot.md`) falls under a "Final venues" heading - the comment's
+  claim holds, independently verified rather than trusted.
+
+No second "bullet-only"-style scoping bug turned up - unlike Run 246's own
+search of this same territory, which found a real one in the claim-ledger
+family, this pass came back clean. Recorded as a genuine negative result
+(the specific angle Run 246 flagged as worth checking has now actually been
+checked, not left as a standing suggestion) rather than silently dropped.
+
+**Also re-tried:** the long-open EURO Golden Boot youngest-ever-winner fact,
+with a fresh `WebSearch` query distinct from runs 162/240/241/243's own
+wording ("youngest player to win UEFA European Championship top scorer
+Golden Boot"). Same non-convergent result as every prior attempt - the
+results surface Lamine Yamal as EURO's youngest-ever *goalscorer* (not a
+Golden Boot winner, shared six ways in 2024) and Milan Baroš/Fernando
+Torres/David Villa as other winners with no source directly comparing their
+ages, let alone naming a youngest *winner* across all editions. Left
+unreported, same call as before.
+
+**Verification:** fresh `pnpm install`, `pnpm lint` (263 files, 0/0/0),
+`pnpm test` (1071/1071, unchanged), `pnpm build` (711 pages, unchanged
+output). All 34 CI-gated fast `check:*` scripts individually re-run and
+clean. Full cold-start `pnpm test:e2e`: 1055/1055, 15.5 minutes (see above -
+the appropriate scope for a test-harness dependency bump, not the usual
+quiz-only shortcut). No `content/*.md` or `src/pages/hr/**` file changed,
+so no PDF regeneration needed.
+
+**Left for a future pass:** unchanged backlog - the EURO youngest-winner
+fact (still no converging source); the same environment-blocked/human-
+sign-off items (`typescript` 7, `http-cache-semantics` - re-confirmed via a
+fresh `pnpm audit`, still the one high-severity advisory with no patched
+version published, still via `astro@7.3.6`'s own dependency chain, astro
+itself still at its latest release -, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix call); the full ~130-winner birth-date ranking;
+the 2026 Ballon d'Or ceremony (26 October 2026, now under three weeks away)
+once that date has passed. **Flagging again:** PR #56 is now 5 days old
+(opened 2026-10-02), green on both checks, mergeable, 35 commits across
+runs 213-247, still unreviewed/unmerged.
