@@ -35856,3 +35856,107 @@ no further untried file of that kind remains, so a future run short on
 leads should look elsewhere (e.g. a fresh accessibility/performance angle,
 or re-trying the EGRESS_BLOCKED checks in case the environment's network
 policy ever changes).
+
+### Run 245 (2026-10-07): fix three stale `lastReviewed` dates - a recurrence of a bug class fixed once before, found by auditing every content file's date against its own git history
+
+The two-hundred-and-thirteenth run (2026-08-29, "Fix stale lastReviewed
+dates on six content files") already established that a content-prose fix
+can land without bumping the file's own `lastReviewed` frontmatter date,
+silently understating how current the page actually is (the date backs
+the visible "Last reviewed" line, `og:updated_time`, each page's JSON-LD
+`dateModified`, and the sitemap/feed `lastmod`). No run since had gone
+back to check whether that bug class had recurred - this run did, by
+comparing each of the 15 `content/*.md` files' `lastReviewed` value against
+`git log`'s own record of the most recent commit that materially touched
+that file.
+
+Found three real recurrences:
+
+- `content/fifa-world-cup.md`: `lastReviewed` was still `2026-09-11`, but
+  two later commits corrected real factual errors in this file's prose -
+  the two-hundred-and-thirty-first run's "fix two false 'only' superlative
+  claims" (2026-09-23, the Fair Play/World Cup double-winner count) and the
+  two-hundred-and-thirty-third run's `check:since-claims` fix (2026-09-24,
+  "the four earlier editions" corrected to "the eight earlier editions" for
+  the Fair Play Award) - neither bumped the date. Bumped to `2026-09-24`.
+- `content/uefa-euro.md`: same stale `2026-09-11`, with the matching
+  two-hundred-and-thirty-second run's `check:ordinal-claims` fix
+  (2026-09-23, "second stadium" corrected to "third stadium" for Wembley's
+  two EURO finals) and the same 2026-09-24 `check:since-claims` fix (the
+  Player of the Tournament "four earlier editions" corrected to "nine")
+  both landing without a date bump. Bumped to `2026-09-24`.
+- `content/index.md`: `lastReviewed` was still `2026-07-23` (this file's
+  original authoring date), but Run 211 (2026-10-01) rewrote its
+  "Important historical naming note" to fix the West
+  Germany/Germany-vs-Soviet Union/Russia-vs-Czechoslovakia/Czechia
+  overgeneralization (see that run's own entry above) without bumping the
+  date. Bumped to `2026-10-01`.
+
+The other twelve content files' dates already matched their own most
+recent substantive commit - confirmed by reading each flagged commit's
+actual diff for that path rather than trusting `git log`'s path-filter
+alone, since this environment's shallow git checkout (`git rev-parse
+--is-shallow-repository` returns true, with several grafted/parent-missing
+commits in its history) makes a shallow boundary commit's diff against its
+own missing parent render as a spurious full-file addition - one such
+boundary commit matched the path filter for both `fifa-world-cup.md` and
+`uefa-euro.md` and was excluded after confirming (via `git cat-file -t` on
+its stated parent) that the parent object genuinely doesn't exist locally,
+not a real content change.
+
+Deliberately did not turn this into a permanent `check:*` CI gate the way
+most other content-accuracy findings on this project become one:
+`scripts/check-pdf-freshness.mjs`'s own doc comment already explains why a
+git-log-timestamp approach was tried and rejected for the adjacent
+PDF-staleness problem - it "silently degrades to useless on a shallow
+checkout (CI's default `actions/checkout` fetch depth), where `git log` on
+a path only sees whichever commits happen to be in that shallow slice."
+Confirmed this applies identically here: `.github/workflows/ci.yml` never
+passes `fetch-depth` to `actions/checkout@v7`, so CI's own checkout is
+shallow by default, same as this environment's. A CI-gated version of
+this run's own audit would pass trivially on every PR (since a shallow
+PR checkout's `git log` for any file only ever shows the PR's own new
+commits, never the file's true full history) while giving false
+confidence that the check is doing something - worse than no check at
+all. This has to stay a manual, periodic audit like this run's own,
+re-run whenever a future pass is looking for a lead the same way the
+two-hundred-and-thirteenth run's original fix was.
+
+Also fixed the one test that hardcoded the old date:
+`tests/e2e/mobile.spec.ts`'s "shows the last reviewed date and source
+links" test asserted `time[datetime="2026-09-11"]` on `/competitions/
+world-cup`; updated to `2026-09-24`. Confirmed no other test or source
+file references either stale date (`grep -rn "2026-09-11|2026-07-23"
+tests/ src/`) - `tests/unit/contentPages.test.ts`'s own `2026-09-11`/
+`2026-07-23`-shaped strings are synthetic fixture dates for
+`derivedPageLastReviewed()`'s unit tests, unrelated to real content.
+Also confirmed the `/teams`/`/compare`/`/records`/`/quiz`/`/players`/
+`/compare-players` pages' own derived-max-across-competitions dates are
+unaffected - `content/copa-america.md` (`2026-10-01`) and `content/
+golden-boot.md` (`2026-10-06`) were already later than either new date, so
+neither derived maximum changes.
+
+**Verification:** fresh `pnpm install --frozen-lockfile`, `pnpm lint` (263
+files, 0/0/0), `pnpm test` (1060/1060), `pnpm build` (711 pages). All 31
+CI-gated fast `check:*` scripts individually re-run and clean. Regenerated
+all 700 downloadable PDFs (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium
+pnpm build:pdfs`); `check:pdfs`/`check:pdf-outline` both clean (700/700)
+after. Full cold-start `pnpm test:e2e` re-run given the change touches
+every World Cup and EURO page's (23 + 17 editions, both locales, plus
+their index pages) displayed date, JSON-LD `dateModified`, and
+`og:updated_time` - a broader footprint than a single-page prose fix, so
+the narrower per-spec re-run used for e.g. Run 244's change wasn't enough
+to call this verified.
+
+**Left for a future pass:** unchanged backlog - the EURO youngest-winner
+fact, the environment-blocked/human-sign-off items (`typescript` 7,
+`http-cache-semantics`, `docs/SOURCES.md` link-liveness still
+`EGRESS_BLOCKED` this run too, the `long-title` brand-suffix call), the
+full ~130-winner birth-date ranking, the 2026 Ballon d'Or ceremony (26
+October 2026) once that date has passed, PR #56 (now 5 days old, opened
+2026-10-02, 33 commits, still unreviewed). A
+future run re-doing this run's own audit should expect it to usually come
+back clean - this was the first recheck since the original fix 33 runs
+ago, and found exactly the two commits per file that forgot the bump, not
+a systemic pattern - so it's a worthwhile occasional spot-check, not
+something that needs re-running every single pass.
