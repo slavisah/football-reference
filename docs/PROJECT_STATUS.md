@@ -36688,3 +36688,22 @@ attendance for 2021 (still single-source) and 2023/2025 (both now
 documented two-source conflicts, not gaps - no further search angle
 obviously left to try on either). PR #56 remains open, now 8 days old,
 still unreviewed/unmerged.
+
+### Fixed a real CI failure on PR #56: a stale hardcoded `lastReviewed` date in the sources-page e2e tests - closed 2026-10-08 (same run, follow-up push)
+
+CI's `test` job failed on Run 251's own push: `tests/e2e/mobile.spec.ts`'s
+two sources-page tests (English and Croatian) each hardcoded
+`time[datetime="2026-07-29"]` as the expected "last reviewed" date, but
+Run 251's own `lastReviewed` staleness sweep bumped
+`content/about-sources.md`'s date to `2026-10-08` without updating these
+two assertions to match - the same staleness bug class this project's
+checks catch on the content side, just on the test side this time, where
+no automated check watches for it. Confirmed against a fresh build
+(`dist/about/sources/index.html` really renders
+`<time datetime="2026-10-08">`) before fixing, then updated both
+locators. Verified with this container's pinned Chromium build
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium` - the bundled Playwright
+browser version didn't match this run's installed `@playwright/test`):
+both tests pass, plus a full re-run of lint (0/0/0), unit tests
+(1071/1071), build (711 pages), `check:pdfs`, and all 34 fast CI-gated
+`check:*` scripts.
