@@ -36707,3 +36707,49 @@ browser version didn't match this run's installed `@playwright/test`):
 both tests pass, plus a full re-run of lint (0/0/0), unit tests
 (1071/1071), build (711 pages), `check:pdfs`, and all 34 fast CI-gated
 `check:*` scripts.
+
+### Run 252 (2026-10-08): bumped `astro` 7.3.7 -> 7.3.8 (only pending
+dependency update), retried the EURO Golden Boot youngest-winner search
+with no new result
+
+Backlog re-confirmed still exhausted: `pnpm outdated` shows only `astro`
+itself (7.3.7 -> 7.3.8, a patch release - applied this run) and the
+already-blocked `typescript` 5.9.3 vs. 7.0.2 (re-checked `@astrojs/check@
+latest`'s own `peerDependencies` directly via `npm view` - still only
+`^5.0.0 || ^6.0.0`, no new release). `pnpm audit` still shows only the same
+unpatched `http-cache-semantics` advisory via `astro`'s own dependency
+chain (`Patched versions: <0.0.0`, confirmed astro itself already at its
+own latest 7.x). No `content/*.md` or `src/pages/hr/**` file changed this
+run, so PDFs needed no regeneration (`pnpm check:pdfs` confirmed clean
+without a rebuild) and the ten manual/intensive-run-only browser sweeps
+(still current as of Run 249) didn't need re-running either.
+
+With nothing else actionable in the standing backlog, retried
+`docs/ROADMAP.md`'s open "Ideas not yet scoped" item - whether any source
+has since named Jamal Musiala's EURO 2024 Golden Boot share (age 21) a
+youngest-ever record - with two fresh `WebSearch` passes (one naming him
+directly, one searching the "youngest EURO Golden Boot winner" claim in
+general). Same result as the five prior attempts: plenty of EURO 2024
+Golden Boot and Germany-youth coverage, several *other* genuine age
+records (Lamine Yamal's youngest-ever EURO goalscorer and youngest-ever
+EURO qualifying scorer; Renato Sanches's youngest-ever EURO winner and
+finalist), but nothing anywhere framing Musiala's Golden Boot share itself
+as an age record. No change to ship - `docs/ROADMAP.md`'s existing note
+already correctly describes this as the strongest-candidate-found-so-far
+rather than a confirmed fact, so left as-is rather than re-adding a
+redundant paragraph.
+
+**Verification:** fresh `pnpm install` (lockfile updated for the `astro`
+bump), `pnpm lint` (0/0/0), `pnpm test` (1071/1071), `pnpm build` (711
+pages), all 33 fast CI-gated `check:*` scripts, `pnpm check:pdfs` (700
+PDFs, no regeneration needed), and `pnpm dlx knip --no-config-hints` (only
+the one already-documented false positive), all green.
+
+**Left for a future pass:** unchanged backlog - the EURO youngest-winner
+fact (still no converging sourced claim); the same environment-blocked/
+human-sign-off items (`typescript` 7, `http-cache-semantics`, `docs/
+SOURCES.md` link-liveness, the `long-title` brand-suffix call); the full
+~130-winner birth-date ranking; the 2026 Ballon d'Or ceremony once 26
+October 2026 has passed; UEFA Nations League attendance for 2021 (still
+single-source) and 2023/2025 (both two-source conflicts). PR #56 remains
+open, still unreviewed/unmerged.
