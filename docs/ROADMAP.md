@@ -223,18 +223,6 @@ this, see `docs/PROJECT_STATUS.md`.
   two-hundred-and-thirteenth run (2026-10-02; `typescript` still at 5.9.3 vs.
   7.0.2 latest, no new `@astrojs/check` release). Re-check whenever `pnpm
   outdated` next shows a new `@astrojs/check` release.
-- **`http-cache-semantics` high-severity advisory**: blocked, found by the
-  two-hundred-and-eighteenth run's own `pnpm audit`, re-confirmed by the
-  two-hundred-and-fifty-second run. Pulled in transitively via
-  `astro@7.3.8` (`. > astro@7.3.8 > http-cache-semantics@4.2.0`); `npm
-  audit`'s advisory lists "Patched versions: <0.0.0" (none published yet),
-  and `pnpm outdated` shows `astro` itself already at its own latest 7.x
-  release, so there is no version bump available on either side yet.
-  `http-cache-semantics` is part of Astro's own dev-time tooling/dev-server
-  dependency chain, not a package this static site's production build ships
-  or runs - no runtime exposure on the deployed site, but still a real
-  open advisory worth closing once a fix exists upstream. Re-check `pnpm
-  audit` next time `astro` or any of its dependencies gets a new release.
 - **`docs/SOURCES.md` link-liveness sweep**: blocked. This environment's
   outbound network/egress policy rejects direct requests to external
   reference domains - confirmed repeatedly, most recently 2026-10-02
