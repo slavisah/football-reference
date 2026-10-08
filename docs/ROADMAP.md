@@ -54,8 +54,13 @@ light/dark mode, a print stylesheet, downloadable print PDFs (700, one per
 page - tagged/PDF-UA structured, with page numbers, an `/Author`, and a
 cross-reference pager between adjacent editions), a PWA/offline mode, and an
 "On this day" widget. See `docs/PROJECT_STATUS.md`'s "Known caveats" section
-(near the end of the file) for the authoritative, always-current summary of
-what exists and any standing quirks.
+(roughly 45% through the file - its own `### ` run-log entries kept
+appending after it, so despite its name it is not near the end) for a
+summary of what exists and any standing quirks. A run that ships a genuine
+standing quirk or a new permanent check should add its own bullet there in
+the same pass - see that section's own 2026-10-08 catch-up note for why this
+matters (a 107-run gap had opened up before the two-hundred-and-fiftieth
+run closed it).
 
 Every recent run's standing health check comes back clean run after run:
 `pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm test`/`pnpm
@@ -339,4 +344,26 @@ this, see `docs/PROJECT_STATUS.md`.
   why it stopped there rather than ship a figure from a single unverified
   pass - the three names are a starting point for a future run with
   independent-source-verification access, not a result. See
-  `docs/PROJECT_STATUS.md`'s run-243 entry for the full reasoning.
+  `docs/PROJECT_STATUS.md`'s run-243 entry for the full reasoning. The
+  two-hundred-and-fiftieth run widened the candidate search to *joint*
+  winners too (run 243 only checked outright single winners) and found a
+  stronger candidate than any of the three: Jamal Musiala, one of 2024's
+  six joint winners, was 21 at that EURO's final (14 July 2024; born 26
+  February 2003, confirmed via `WebSearch` against Wikipedia with no
+  conflicting figure found, unlike Müller's) - younger than Baroš/Brolin/
+  Džajić's ~22, and confirmed younger than every other 2024 co-winner and
+  2012's six joint winners (the only other all-joint EURO Golden Boot
+  years with plausibly-young players) by checking each one's own birth
+  year. Still not shipped as a "youngest-ever" fact: no independent source
+  found actually calls Musiala's 2024 share the record (this run's own
+  `WebSearch` passes turned up plenty of EURO 2024 Golden Boot coverage but
+  nothing framing his age as a record), so adding it would mean this run
+  originating the superlative claim from a self-computed comparison, the
+  exact risk this idea's own two already-shipped slices (Ballon d'Or,
+  World Cup/EURO Golden Boot oldest) deliberately avoided by only ever
+  sourcing an already-published "youngest-ever"/"oldest-ever" claim rather
+  than computing one. Musiala, age 21, is nonetheless the strongest
+  candidate found across five runs' worth of attempts - a future run with
+  a fresh `WebSearch` pass (or any source that frames a EURO Golden Boot
+  age record in writing) should check whether it names him before trying
+  another vocabulary angle from scratch.
