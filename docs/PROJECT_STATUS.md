@@ -36213,11 +36213,11 @@ lint` (263 files, 0/0/0), `pnpm test` (1071/1071, unchanged), `pnpm build`
 two quiz e2e specs (`accessibility-quiz-states.spec.ts`/
 `no-js-quiz-and-search.spec.ts`, 14/14) against this environment's pinned
 Chromium (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`), followed by the
-full cold-start `pnpm test:e2e` suite started in the background once those
-passed, to confirm the new astro patch's dev/preview server (which
-`test:e2e`'s own `webServer` config drives for every spec) still serves
-pages correctly end-to-end rather than only in the two specs most likely to
-notice a regression.
+full cold-start `pnpm test:e2e` suite, to confirm the new astro patch's
+dev/preview server (which `test:e2e`'s own `webServer` config drives for
+every spec) still serves pages correctly end-to-end rather than only in the
+two specs most likely to notice a regression: 1055/1055, 16.5 minutes, all
+green.
 
 Also re-ran `pnpm audit` (still the one high-severity `http-cache-
 semantics` advisory, unpatched upstream, now via `astro@7.3.7`'s own
