@@ -209,8 +209,9 @@ run-by-run history behind all of this, see `docs/PROJECT_STATUS.md`.
   7.0.2 latest, no new `@astrojs/check` release). Re-check whenever `pnpm
   outdated` next shows a new `@astrojs/check` release.
 - **`http-cache-semantics` high-severity advisory**: blocked, found by the
-  two-hundred-and-eighteenth run's own `pnpm audit`. Pulled in transitively
-  via `astro@7.3.5` (`. > astro@7.3.5 > http-cache-semantics@4.2.0`); `npm
+  two-hundred-and-eighteenth run's own `pnpm audit`, re-confirmed by the
+  two-hundred-and-forty-eighth run. Pulled in transitively via
+  `astro@7.3.7` (`. > astro@7.3.7 > http-cache-semantics@4.2.0`); `npm
   audit`'s advisory lists "Patched versions: <0.0.0" (none published yet),
   and `pnpm outdated` shows `astro` itself already at its own latest 7.x
   release, so there is no version bump available on either side yet.
