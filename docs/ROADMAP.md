@@ -266,17 +266,24 @@ this, see `docs/PROJECT_STATUS.md`.
   short of a UEFA technical-report PDF this environment cannot fetch.
 - **UEFA Nations League attendance figures**: the 2023 Finals attendance has
   a genuine source conflict (41,110 vs. 41,500, both independently reported
-  by different outlets); 2021 and 2025 have no attendance figure confirmed by
-  two independent sources. Left unreported in `content/uefa-nations-league.md`
-  rather than guessed. Re-tried with `WebSearch` the hundred-and-sixty-second
-  run (2026-09-21): every result for all three editions traces back to the
-  same Wikipedia-derived figure (41,110 for 2023, 31,511 for 2021) with no
-  second, independently-*sourced* figure turning up in the search snippets
-  themselves (only mirrors/derivatives of the one figure) - so this still
-  doesn't clear the site's own two-independent-sources bar. `WebFetch` to
-  `uefa.com` (which might carry the tournament's own official figure) is
-  blocked (see the link-liveness item above), so there's no way to read a
-  second primary source directly, only search-engine summaries of one.
+  by different outlets); 2021 has no attendance figure confirmed by two
+  independent sources; 2025 *now has* a second source (the German FA's own
+  `datencenter.dfb.de` match database, found the two-hundred-and-fifty-first
+  run) but it disagrees with Wikipedia's 65,852 by roughly 9,000 (a rounded
+  "sold out" 75,000) - too wide a gap to treat as the usual rounding/
+  reporting variance, so still a conflict rather than a confirmation; see
+  `content/uefa-nations-league.md`'s own 2025 bullet and `docs/SOURCES.md`'s
+  matching entry for the specifics. Left unreported in
+  `content/uefa-nations-league.md` rather than guessed. Re-tried with
+  `WebSearch` the hundred-and-sixty-second run (2026-09-21): every result for
+  all three editions traces back to the same Wikipedia-derived figure
+  (41,110 for 2023, 31,511 for 2021) with no second, independently-*sourced*
+  figure turning up in the search snippets themselves (only mirrors/
+  derivatives of the one figure) - so this still doesn't clear the site's own
+  two-independent-sources bar. `WebFetch` to `uefa.com` (which might carry
+  the tournament's own official figure) is blocked (see the link-liveness
+  item above), so there's no way to read a second primary source directly,
+  only search-engine summaries of one.
 - **Excluded historical attendance figures**: World Cup 1930 and 1950, and
   EURO 1996 and 2020, each have no single attendance figure with a source
   reliable enough to report - left out of their "Final venues" sections on

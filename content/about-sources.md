@@ -1,7 +1,7 @@
 ---
 title: Sources & Review Policy
 slug: about-sources
-lastReviewed: 2026-07-29
+lastReviewed: 2026-10-08
 status: verified
 ---
 
