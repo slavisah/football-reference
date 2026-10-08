@@ -36191,3 +36191,49 @@ the 2026 Ballon d'Or ceremony (26 October 2026, now under three weeks away)
 once that date has passed. **Flagging again:** PR #56 is now 5 days old
 (opened 2026-10-02), green on both checks, mergeable, 35 commits across
 runs 213-247, still unreviewed/unmerged.
+
+### Run 248 (2026-10-08): bumped `astro` 7.3.6 → 7.3.7 (the only pending dependency update); re-confirmed `knip`/`pnpm audit` otherwise unchanged
+
+Backlog remains exhausted (runs 241-247 each independently confirmed this,
+finding only narrower follow-up work beyond it); this run's own `pnpm
+outdated` after a fresh `pnpm install --frozen-lockfile` showed exactly one
+pending update: `astro` 7.3.6 → 7.3.7 (`typescript` 5.9.3 → 7.0.2 is the
+only other outdated line, still blocked by `@astrojs/check@0.9.10`'s own
+`^5.0.0 || ^6.0.0` peer range - re-confirmed unchanged). Bumped it with
+`pnpm update astro` (`package.json`'s own range was already `^7.3.6`; the
+lockfile just hadn't been nudged to resolve the new patch yet).
+
+Because this is the site's own static-site generator rather than a test
+tool, treated it with the same wider verification scope this project uses
+for a build-tool bump rather than the usual markup-only shortcut: `pnpm
+lint` (263 files, 0/0/0), `pnpm test` (1071/1071, unchanged), `pnpm build`
+(711 pages, byte-for-byte unchanged output - this run touched no
+`content/*.md` or `src/` file, only `package.json`/`pnpm-lock.yaml`), all
+33 CI-gated fast `check:*` scripts individually re-run and clean, then the
+two quiz e2e specs (`accessibility-quiz-states.spec.ts`/
+`no-js-quiz-and-search.spec.ts`, 14/14) against this environment's pinned
+Chromium (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`), followed by the
+full cold-start `pnpm test:e2e` suite started in the background once those
+passed, to confirm the new astro patch's dev/preview server (which
+`test:e2e`'s own `webServer` config drives for every spec) still serves
+pages correctly end-to-end rather than only in the two specs most likely to
+notice a regression.
+
+Also re-ran `pnpm audit` (still the one high-severity `http-cache-
+semantics` advisory, unpatched upstream, now via `astro@7.3.7`'s own
+dependency chain instead of `7.3.6`'s - same advisory, same "no runtime
+exposure on the deployed static site" read as every prior run) and `pnpm
+dlx knip --no-config-hints` (one unused-devDependency false positive,
+`@cspell/dict-hr-hr` - the same standing false positive documented in
+`docs/ROADMAP.md`; `scripts/test-preview-server.mjs` didn't surface as a
+second one this run, consistent with it only ever being knip's own
+static-analysis blind spot on a `webServer.command` string, not a real
+usage change).
+
+**Left for a future pass:** unchanged backlog - the EURO youngest-winner
+fact (still no converging source); the same environment-blocked/human-
+sign-off items (`typescript` 7, `http-cache-semantics`, `docs/SOURCES.md`
+link-liveness, the `long-title` brand-suffix call); the full ~130-winner
+birth-date ranking; the 2026 Ballon d'Or ceremony (26 October 2026, now
+under three weeks away) once that date has passed. PR #56 remains open,
+now 6 days old, still unreviewed/unmerged.
