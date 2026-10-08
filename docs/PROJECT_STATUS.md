@@ -36237,3 +36237,78 @@ link-liveness, the `long-title` brand-suffix call); the full ~130-winner
 birth-date ranking; the 2026 Ballon d'Or ceremony (26 October 2026, now
 under three weeks away) once that date has passed. PR #56 remains open,
 now 6 days old, still unreviewed/unmerged.
+
+### Run 249 (2026-10-08): re-ran all ten manual/intensive-run-only full-site browser sweeps for the first time since Run 243 - zero violations after five runs' worth of changes in between
+
+Backlog remains exhausted (runs 241-248 each independently confirmed this,
+this run's own fresh `pnpm outdated`/`pnpm audit` turning up nothing new
+either - `typescript` still blocked at 5.9.3 vs. 7.0.2 by `@astrojs/
+check@0.9.10`'s own `^5.0.0 || ^6.0.0` peer range, `http-cache-semantics`
+still the one unpatched high-severity advisory via `astro@7.3.7`'s own
+dependency chain, astro itself still at its latest release - so this run
+picked the same kind of task several recent runs have: a genuine
+re-verification gap rather than new content).
+
+**The gap:** Run 243 (2026-10-07) was the last time all ten manual/
+intensive-run-only full-site browser sweeps (`check:html`/
+`check:lighthouse`/`check:reflow`/`check:landscape`/`check:text-zoom`/
+`check:print-width`/`check:target-size`/`check:text-spacing`/
+`check:focus-appearance`/`check:color-contrast`) were run together. Runs
+244-248 each made a real change in between - a glossary content fix
+(244), stale `lastReviewed` date fixes (245), the claim-verification-
+ledger bullets-only-scan fix (246), a `@playwright/test` bump (247), and
+an `astro` bump (248) - but each run's own verification scope only covered
+its own two quiz-specific e2e specs (or, for the two dependency bumps, the
+full cold-start `pnpm test:e2e` suite) and the 32-34 fast CI-gated
+`check:*` scripts, never all ten of the slower manual-only sweeps. Five
+runs is long enough for that gap to be worth closing on its own, especially
+given two of those five changes were dependency bumps to the build tooling
+itself (`astro`, the site's own static-site generator) rather than
+content-only changes.
+
+**Result: all ten sweeps re-run clean, zero violations.** Ran the standard
+fast baseline first - fresh `pnpm install --frozen-lockfile`, `pnpm lint`
+(263 files, 0/0/0), `pnpm test` (1071/1071, unchanged), `pnpm build` (711
+pages, clean) - then all 32 CI-gated fast `check:*` scripts individually
+(all clean), then all ten manual sweeps against this environment's pinned
+Chromium (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`):
+
+- `check:html`: 0/711 pages with validity errors (34s)
+- `check:lighthouse`: all four categories still 1.00/1.00/1.00/1.00 (5m22s)
+- `check:reflow`: no horizontal overflow at 360px on any page (52s)
+- `check:landscape`: no horizontal overflow at 360×740 landscape (49s)
+- `check:text-zoom`: no clipping/overflow at 200% root font-size (1m11s)
+- `check:print-width`: no overflow under print media (1m6s)
+- `check:target-size`: every button/select/input/`role="button"` still
+  meets the 44px floor across all 711 pages (49s)
+- `check:text-spacing`: no clipping under WCAG 1.4.12's four spacing
+  minimums (1.5x line-height, 2x paragraph spacing, 0.12x letter-spacing,
+  0.16x word-spacing) (1m42s)
+- `check:focus-appearance`: every focusable control still renders a
+  visible focus ring (4m)
+- `check:color-contrast`: zero WCAG 1.4.3 violations across all 711 pages
+  in both color schemes (1,422 page loads total) - the slowest of the ten
+  in this run (the background shell running all ten sequentially hit this
+  session's own 30-minute background-task cap partway through this last
+  sweep; re-ran `check:color-contrast` alone in the foreground to let it
+  finish, since all nine before it had already completed and exited 0)
+
+No bug found - the five runs' worth of changes in between (one content fix,
+one scoping fix, two dependency bumps) didn't regress anything these ten
+sweeps watch for. Recorded as a genuine re-confirmation, not a no-op: the
+sweep baseline was five runs stale and is now current again.
+
+**Verification:** as described above - fresh install, lint, unit tests,
+build, all 32 fast `check:*` scripts, and all ten manual sweeps, all
+green. No `content/*.md` or `src/pages/hr/**` file changed this run, so no
+PDF regeneration was needed.
+
+**Left for a future pass:** unchanged backlog - the EURO youngest-winner
+fact (still no converging source); the same environment-blocked/human-
+sign-off items (`typescript` 7, `http-cache-semantics` - re-confirmed via a
+fresh `pnpm audit` this run, still the one high-severity advisory with no
+patched version published -, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix call); the full ~130-winner birth-date ranking;
+the 2026 Ballon d'Or ceremony (26 October 2026, now under three weeks
+away) once that date has passed. PR #56 remains open, now 7 days old,
+still unreviewed/unmerged.

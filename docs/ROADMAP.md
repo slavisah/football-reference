@@ -191,9 +191,19 @@ for the first time since run 211, and found a real one:
 separate match always decides those places for the FIFA World Cup, UEFA
 Nations League, and Copa América - false for the World Cup's 1930 edition
 and several Copa América eras, both already documented on their own pages.
-Fixed; no further untried file of that kind remains. See "Open backlog" and
-"Ideas not yet scoped" below for everything else still open. For the full
-run-by-run history behind all of this, see `docs/PROJECT_STATUS.md`.
+Fixed; no further untried file of that kind remains. Runs 245-248 then each
+made a real but narrower change (stale `lastReviewed` dates, the
+claim-verification-ledger bullets-only fix, and two dependency bumps
+including `astro` itself) without re-running the ten manual/intensive-run-
+only full-site browser sweeps those changes could in principle have
+affected; the two-hundred-and-forty-ninth run closed that gap, re-running
+all ten (`check:html`/`check:lighthouse`/`check:reflow`/`check:landscape`/
+`check:text-zoom`/`check:print-width`/`check:target-size`/
+`check:text-spacing`/`check:focus-appearance`/`check:color-contrast`)
+fresh against the current build - zero violations, so the sweep baseline is
+now current again. See "Open backlog" and "Ideas not yet scoped" below for
+everything else still open. For the full run-by-run history behind all of
+this, see `docs/PROJECT_STATUS.md`.
 
 ## Open backlog
 
@@ -210,7 +220,7 @@ run-by-run history behind all of this, see `docs/PROJECT_STATUS.md`.
   outdated` next shows a new `@astrojs/check` release.
 - **`http-cache-semantics` high-severity advisory**: blocked, found by the
   two-hundred-and-eighteenth run's own `pnpm audit`, re-confirmed by the
-  two-hundred-and-forty-eighth run. Pulled in transitively via
+  two-hundred-and-forty-ninth run. Pulled in transitively via
   `astro@7.3.7` (`. > astro@7.3.7 > http-cache-semantics@4.2.0`); `npm
   audit`'s advisory lists "Patched versions: <0.0.0" (none published yet),
   and `pnpm outdated` shows `astro` itself already at its own latest 7.x
