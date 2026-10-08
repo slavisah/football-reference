@@ -3334,7 +3334,7 @@ test.describe('Sources page on a 360px phone', () => {
 
   test('shows the review policy and a last reviewed date', async ({ page }) => {
     await expect(page.getByText('Historical team names are never rewritten')).toBeVisible();
-    await expect(page.locator('time[datetime="2026-07-29"]')).toBeVisible();
+    await expect(page.locator('time[datetime="2026-10-08"]')).toBeVisible();
   });
 
   test('is reachable from the nav and the footer', async ({ page }) => {
@@ -3371,7 +3371,7 @@ test.describe('Croatian sources page (/hr/about/sources) on a 360px phone', () =
     await expect(page.getByRole('heading', { name: 'Izvori i pravila provjere', level: 1 })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Izvori po natjecanjima' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Kako se provjeravaju izvori' })).toBeVisible();
-    await expect(page.locator('time[datetime="2026-07-29"]')).toBeVisible();
+    await expect(page.locator('time[datetime="2026-10-08"]')).toBeVisible();
   });
 
   test('groups source links by competition using the Croatian home-page names', async ({ page }) => {
