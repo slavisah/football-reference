@@ -16155,7 +16155,12 @@ Copa América captains.
   pages - see the 2026-09-03 "Save-Data-aware service worker precaching"
   entry. Anything else still gets cached the moment it's actually visited via
   the existing fetch-handler cache-on-read path, so offline reading for
-  already-opened pages is unaffected either way. `CACHE_VERSION` is `v4`.
+  already-opened pages is unaffected either way. `CACHE_VERSION` is `v5` (the
+  two-hundred-and-thirtieth intensive run, 2026-10-05, added
+  `/team-index.json`/`/player-index.json` to `STATIC_ASSETS` so the global
+  search widgets' first offline use doesn't fail, bumping from `v4`) -
+  `pnpm check:precache` enforces that every `STATIC_ASSETS` entry resolves to
+  a real built file.
 - `EditorialNotes.astro` renders a "Jump to a section"/"Skoči na odjeljak"
   in-page nav (`.notes__nav`, hidden via the existing `.no-print` class on
   paper) whenever a page hands it 4 or more note sections
@@ -16313,7 +16318,171 @@ Copa América captains.
   drifts from the page's own accent color again. Both the before-paint
   inline script in `BaseLayout.astro` and `ThemeToggle.astro`'s `sync()`
   read these two attributes rather than hardcoding the colors a second
-  time.
+  time. `pnpm check:theme-color` (`scripts/check-theme-color.mjs`, added
+  2026-09-22, hundred-and-sixty-eighth intensive run) now guards this
+  drift risk automatically via plain regex/string parsing of `global.css`
+  and `BaseLayout.astro`, no build or browser needed - wired into
+  `.github/workflows/ci.yml` as a required PR gate.
+
+**Catch-up note (2026-10-08, two-hundred-and-fiftieth intensive run):** this
+"Known caveats" list was last actively maintained around the
+hundred-and-forty-second intensive run (2026-09-18) - every bullet above this
+note predates it. `docs/ROADMAP.md` calls this section "the authoritative,
+always-current summary of what exists and any standing quirks," but 107
+further intensive runs (143 through 249) shipped real, still-standing
+features and gotchas with no matching bullet ever added here, and
+`docs/ROADMAP.md` also calls this section "near the end of the file," which
+stopped being true the moment those 107 runs' own `### ` entries kept
+appending after it - it now sits roughly 44% through this file's 36,000+
+lines, not near the end. This run fixed both: corrected `docs/ROADMAP.md`'s
+own description, and closed the content gap for the standing features/gotchas
+still relevant today (below). Going forward, a run that ships a genuine
+standing quirk or a new permanent check should add its own bullet here in
+the same pass, the same way runs already did through the
+hundred-and-forty-second - letting this list go another 107 runs without a
+matching edit is the exact drift this note exists to stop recurring.
+
+- Seven "verification-ledger" checks (`check:superlative-claims`/
+  `check:ordinal-claims`/`check:record-claims`/`check:consecutive-claims`/
+  `check:since-claims`/`check:one-of-only-claims`/`check:completeness-claims`,
+  added across the hundred-and-seventy-second through hundred-and-ninetieth
+  intensive runs, 2026-09-23 through -28) each guard one claim-vocabulary
+  pattern (`/\bthe only\b/i`, an ordinal like "the first/.../tenth X to Y",
+  "most/record/youngest/oldest/highest/biggest/largest/lowest/fewest",
+  "consecutive"/"back-to-back", "since <year>"/"no equivalent existed at
+  earlier editions", "one of only N X", and an undated "across all N
+  editions"/"in every edition" claim, respectively) against a hand-maintained
+  `*-claims-ledger.json` in `scripts/`, one JSON file per checker, mapping
+  each already-verified claim's exact text to a note on how it was verified.
+  A `content/*.md` claim matching the pattern that isn't byte-for-byte in its
+  ledger - because it's brand new, or its wording changed at all since last
+  verified - fails the build until a human (or an intensive run) checks it
+  against its source table and records a new ledger entry; this is
+  deliberately stricter than semantic equality, since a small wording change
+  can silently change what's actually being claimed. All seven are wired into
+  `.github/workflows/ci.yml` as required PR gates. `check:claims-hr` (added
+  2026-09-24, hundred-and-eighty-first intensive run) is these seven's
+  Croatian counterpart: it cross-checks every already-verified English
+  ledger claim's numeric anchors (years, counts) against the matching
+  Croatian note prose on the built `/hr/*` output, closing the same
+  English/Croatian-drift gap `check:i18n-notes`/`check:attendance-format`
+  already close for section structure and number formatting. All seven
+  extraction functions share one `extractClaimableLines(markdown)` helper
+  (added 2026-10-07, two-hundred-and-forty-sixth intensive run, in
+  `check-superlative-claims.mjs`, imported by the other six) that splits a
+  content file into claimable units in document order, bullets and prose
+  paragraphs alike, joining wrapped continuation lines into one string first
+  - before that run, all seven only ever matched a `/^-\s(.*)$/` bullet line,
+  so a plain prose paragraph (the shape of the false claim
+  `content/glossary.md` shipped and run 244 had to find by hand) was
+  invisible to every one of them, and a bullet that wrapped across multiple
+  lines (`content/quiz.md`'s question bullets) had only its first line
+  actually checked. Any future content-file claim shape that isn't a `- `
+  bullet or an ordinary paragraph (e.g. inside a table cell) is still outside
+  all eight checkers' reach.
+- A component's scoped `<style>` block (Astro's `data-astro-cid-<hash>`
+  attribute rewrite on every selector) only ever matches markup Astro's own
+  compiler saw in that component's template - any element injected at
+  runtime via `innerHTML`/`createElement`+`appendChild` (as
+  `Nav.astro`'s `initSearchWidget()` builds each search-result `<li>`, and
+  `compare.astro`/`compare-players.astro`'s `renderFinalsMeetings()`/
+  `renderSharedYears()` replace a list container's entire `innerHTML`) never
+  gets that attribute, so a scoped rule targeting it silently never matches -
+  not a console error, just styling (and any `forced-colors`/focus outline
+  riding on that same rule) that has never once applied, in any browser,
+  since the component shipped. Found and fixed site-wide the
+  hundred-and-ninety-ninth/two-hundredth intensive runs (2026-09-29/30):
+  every current instance now wraps the runtime-injected part of the selector
+  in Astro's `:global()` escape (e.g. `.team-search__listbox :global(li)`),
+  the same escape `Nav.astro` already used for
+  `.site-menu.is-open :global(#theme-toggle)`. Any future code that injects
+  markup via `innerHTML`/`createElement` inside a scoped Astro component
+  needs the same `:global()` treatment on any selector meant to reach it -
+  `grep -rl innerHTML src/components src/pages src/layouts` is how both runs
+  found every existing instance, and remains the way to re-sweep for a new
+  one.
+- `pnpm check:target-size` (`scripts/check-target-size.mjs`, added
+  2026-10-04, two-hundred-and-twenty-ninth intensive run) is the systematic,
+  full-site counterpart to this project's many hand-written per-component
+  44px-tap-target assertions (`tests/e2e/mobile.spec.ts`'s filter/picker/
+  drawer-control checks, each only covering the one component a prior run
+  happened to measure): it sweeps every button/select/input/`role="button"`
+  on all 711 pages (both languages) at the 360px viewport against AGENTS.md's
+  own 44px floor. A manual/intensive-run-only tool like
+  `check:lighthouse`/`check:reflow`/`check:text-zoom`/`check:print-width`,
+  not a required CI gate, for the same ~700-page-load-runtime reason.
+- `pnpm check:text-spacing` (`scripts/check-text-spacing.mjs`, added
+  2026-10-05, two-hundred-and-thirty-fifth intensive run) force-applies WCAG
+  2.1 SC 1.4.12's four spacing minimums (1.5x line-height, 2x paragraph
+  spacing, 0.12x letter-spacing, 0.16x word-spacing) via an injected
+  stylesheet on every page and fails on any resulting overflow or clipped
+  content - a fixed-height container or `overflow: hidden` rule sized for
+  single-line text can fail this independently of viewport width or root
+  font-size, so it's a distinct check from `check:reflow`/`check:text-zoom`,
+  not a duplicate. `pnpm check:focus-appearance`
+  (`scripts/check-focus-appearance.mjs`, added 2026-10-06,
+  two-hundred-and-thirty-sixth intensive run) focuses every focusable
+  element on every page and fails if its computed outline/box-shadow is
+  absent - the structural precondition WCAG 2.2 SC 2.4.13 requires, not
+  pixel-level contrast - closing the same class of gap the hundred-and-
+  fortieth run's `summary`-missing-from-`:focus-visible` bug shipped under.
+  `pnpm check:color-contrast` (`scripts/check-color-contrast.mjs`, added
+  2026-10-06, two-hundred-and-thirty-seventh intensive run) runs axe-core's
+  `color-contrast` rule (WCAG 1.4.3) against every built page in both color
+  schemes directly, rather than the sampled subset (`NAV_LINKS`/
+  `TRANSLATED_PATHS` plus one spot-checked team/player)
+  `tests/e2e/accessibility.spec.ts` already covered. All three are
+  manual/intensive-run-only, the same tier as `check:reflow` and siblings.
+  The same run also pinned `source-map-js` via `pnpm.overrides` to clear a
+  dependency advisory found along the way.
+- `/feed.xml`/`/hr/feed.xml` (added 2026-10-05, two-hundred-and-thirty-first
+  intensive run; widened to the newest edition of all seven edition-page
+  route trees the following run) are Atom feeds of recently-reviewed pages,
+  22 entries per locale. Adding that feed exposed and fixed a real
+  freshness-date bug in `sitemap.xml.ts` along the way (see that run's own
+  entry) - any future per-page "last reviewed"/freshness-date source needs
+  to stay consistent with both the sitemap's and the feed's own date logic,
+  not just one.
+- Five more full-site permanent checks, each guarding one previously-unswept
+  content- or markup-integrity gap, wired into `.github/workflows/ci.yml` as
+  required PR gates unless noted: `check:award-tallies` (hand-authored
+  title-tally tables - "Champions by titles," "Multiple winners through
+  2025," etc. - cross-checked against the results table each one
+  summarizes, since they're independently hand-maintained, not build-time
+  derived the way `/records`' rankings are); `check:i18n-notes` (every
+  English `EditorialNotes.astro` note-card section cross-checked against its
+  Croatian page's own separately-hand-written `notes` array, structurally);
+  `check:edition-header-labels` (every Croatian per-edition page's
+  `HEADER_LABELS` translation map cross-checked against its English
+  source table's real column headers - `EditionView.astro`'s `label()`
+  helper silently falls back to the raw English header on a missing key,
+  so a gap here ships an English `<dt>` on an otherwise Croatian page);
+  `check:link-names` (flags any two links on one built page sharing an
+  identical accessible name but pointing at different destinations - a
+  screen reader's "links list" shows accessible names only, out of visual
+  context); `check:heading-outline` (exactly one `<h1>` per page, no heading
+  level skipped ahead of the highest seen so far - distinct from
+  `check:html`'s HTML5-validity check and from axe-core, neither of which
+  catches a level skip). `check:reachability` (a manual/intensive-run-only
+  tool, not a CI gate) and `check:locale-consistency` are two more:
+  `check:reachability` click-walks from both homepages via real `<a href>`
+  navigation and fails if any indexable page is unreachable that way -
+  distinct from `check:links`' href-resolves-to-a-file check and
+  `check:sitemap`'s sitemap-inclusion check, neither of which asks whether
+  any page actually links *to* a given page; `check:locale-consistency`
+  verifies every built page's `<html lang>` matches the language tree it was
+  actually built into, since `locale` is a per-page prop each route file
+  passes to `BaseLayout.astro` by hand and nothing derives it automatically
+  the way hreflang/canonical do.
+- `tests/e2e/filter-url-restore.spec.ts` (added 2026-10-06,
+  two-hundred-and-thirty-eighth intensive run) tests the previously-untested
+  "load a URL that already carries a filter and see the filtered view with
+  no clicks" half of AGENTS.md rule 9's shareable-filter contract - the
+  opposite direction from every earlier filter test, which only checked that
+  picking a filter updates the URL. Confirmed the existing restore logic
+  (including `TournamentTable.astro`'s `paramPrefix` prop, which exists
+  specifically to prevent two filter tables on one page from reading each
+  other's query params) already worked; no bug found.
 
 ### Notes jump nav: an in-page "Jump to a section" link list for every long note-card list - closed 2026-09-04 (sixty-third intensive run)
 
@@ -36312,3 +36481,107 @@ patched version published -, `docs/SOURCES.md` link-liveness, the
 the 2026 Ballon d'Or ceremony (26 October 2026, now under three weeks
 away) once that date has passed. PR #56 remains open, now 7 days old,
 still unreviewed/unmerged.
+
+### Run 250 (2026-10-08): closed a real, 107-run documentation-staleness gap in this file's own "Known caveats" section, plus a negative-but-narrower EURO Golden Boot youngest-winner result
+
+Backlog still exhausted (re-confirmed: `pnpm outdated` only shows the same
+blocked `typescript` 5.9.3 vs. 7.0.2, `pnpm audit` only the same unpatched
+`http-cache-semantics` advisory, `WebFetch` to `en.wikipedia.org` still
+`ENOTFOUND` through this environment's proxy). Rather than re-run another
+already-clean sweep, this run went looking for a different kind of gap:
+whether `docs/PROJECT_STATUS.md`'s own "Known caveats" section - which
+`docs/ROADMAP.md` calls "the authoritative, always-current summary of what
+exists and any standing quirks... near the end of the file" - still matched
+either description.
+
+**The gap, found by checking rather than trusting the claim.** It didn't.
+`grep -n "^## Known caveats"` found exactly one heading, at line 16101 of
+what was then a 36,314-line file - 44% through, not near the end, because
+107 further runs' own `### ` entries (runs 143-249) kept appending after it
+the same way every run's entry always has. And the bullet list itself
+stopped picking up new entries around the hundred-and-forty-second run
+(2026-09-18): it still said `CACHE_VERSION` was `v4`, three runs after the
+two-hundred-and-thirtieth run bumped it to `v5`, and had no bullet at all
+for entire shipped feature families from the 107 runs since - the seven
+claim-verification-ledger checks plus `check:claims-hr`, five more
+full-site permanent checks (`check:award-tallies`/`check:i18n-notes`/
+`check:edition-header-labels`/`check:link-names`/`check:heading-outline`/
+`check:reachability`/`check:locale-consistency`/`check:theme-color`), the
+three newest accessibility sweeps (`check:text-spacing`/
+`check:focus-appearance`/`check:color-contrast`), `check:target-size`, the
+Atom feeds, and the real `:global()`-scoping bug class the hundred-and-
+ninety-ninth/two-hundredth runs found and fixed site-wide. None of that is
+hypothetical staleness risk the way a "could drift" caveat warns about -
+it had already drifted, and any run (including this one, before checking)
+relying on this section for "what exists and any standing quirk" would be
+working from an eight-month-old-in-run-count snapshot without knowing it.
+
+**Fix.** Added a catch-up note plus new bullets for every standing
+quirk/permanent-check family identified above (one consolidated bullet for
+the seven-plus-one claim-ledger family and for the five-plus-two smaller
+permanent checks, to keep this from becoming another 107-bullet wall), and
+corrected the stale `CACHE_VERSION` reference in place rather than leaving
+it for a future run to notice. Corrected `docs/ROADMAP.md`'s own "near the
+end of the file" claim to state the section's real, current position, and
+added a line asking future runs to add their own bullet here when they ship
+a standing quirk, in the same pass, rather than letting another 107-run gap
+open - the same "fix the habit, not just the symptom" shape
+`docs/ROADMAP.md`'s own two prior maintenance notes (2026-09-20,
+2026-10-03) already used on itself for an analogous drift. Did not attempt
+a full line-by-line audit of all 187 run entries between the old and new
+catch-up points - some narrower one-off bug fixes in that range likely
+still have no caveat bullet and don't need one (a fixed bug with no
+ongoing gotcha isn't a "standing quirk"); this pass prioritized the
+architecturally significant, still-relevant-today items a future run or
+contributor would actually need warned about.
+
+**Second, smaller thread: EURO Golden Boot youngest-ever winner,
+re-attempted with a wider candidate pool.** Runs 227/240/243 each tried and
+stopped short of shipping this fact, each time because the only candidates
+checked were *outright* single winners (Baroš 2004, Brolin 1992, Džajić
+1968, Dieter Müller 1976 - the last abandoned by run 243 after a `WebSearch`
+pass contradicted this session's own assumed birth date for him). This run
+noticed the page's own existing World Cup equivalent fact (Flórián Albert,
+one of 1962's six *joint* winners) treats a joint winner as eligible for
+"youngest-ever" exactly like an outright one - so the EURO side's candidate
+pool should include its own joint-winner years too, which none of the three
+prior attempts checked. EURO 2024 (six joint winners, including Jamal
+Musiala) and EURO 2012 (six joint winners) are the only two all-joint EURO
+Golden Boot years with a plausibly young player. Checked each 2024
+co-winner's birth date via `WebSearch` (Musiala: 26 February 2003,
+Wikipedia-confirmed, no conflicting figure found anywhere unlike Müller's
+case; Olmo: 7 May 1998; Mikautadze: 31 October 2000; Kane/Gakpo/Schranz all
+visibly older on sight) and the 2012 group by birth year only (Balotelli/
+Dzagoev 1990, the youngest of that six, still four years older than
+Musiala) - Musiala, 21 at EURO 2024's 14 July final, is the youngest
+candidate found across all five runs' worth of attempts, younger than every
+previously-considered name. Deliberately **not shipped as a fact**: no
+independent source frames Musiala's 2024 share as a record (this run's
+`WebSearch` passes found plenty of EURO 2024 Golden Boot coverage, none of
+it calling his age a record) - shipping it anyway would mean this run
+itself originating a superlative claim from a self-computed comparison,
+the exact risk this idea's two already-shipped slices (Ballon d'Or; World
+Cup/EURO Golden Boot oldest-ever) deliberately avoid by only ever sourcing
+an already-published claim. Recorded in `docs/ROADMAP.md`'s "Ideas not yet
+scoped" section as the strongest candidate found so far, so a future run
+checks whether a source has since named him before trying another
+vocabulary angle from scratch.
+
+**Verification:** fresh `pnpm install --frozen-lockfile`, `pnpm lint`
+(0/0/0), `pnpm test` (1071/1071), `pnpm build` (711 pages), and all 34 fast
+CI-gated `check:*` scripts, all green. No `content/*.md` or
+`src/pages/hr/**` file changed this run (only `docs/PROJECT_STATUS.md` and
+`docs/ROADMAP.md`), so `pnpm check:pdfs` needed no regeneration and the ten
+manual/intensive-run-only browser sweeps (last fully re-run by Run 249,
+still current) didn't need re-running either - this run touched no page
+markup, styling, or content.
+
+**Left for a future pass:** unchanged backlog - the EURO youngest-winner
+fact (still no converging *sourced* claim, though the candidate pool is now
+narrower); the same environment-blocked/human-sign-off items (`typescript`
+7, `http-cache-semantics`, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix call); the full ~130-winner birth-date ranking;
+the 2026 Ballon d'Or ceremony once 26 October 2026 has passed. A full
+line-by-line caveat audit of runs 143-249 for any remaining narrower
+one-off standing quirk this pass didn't catch, if a future run ever finds
+this list missing something specific.
