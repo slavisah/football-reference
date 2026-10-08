@@ -1,7 +1,7 @@
 ---
 title: Compare Players
 slug: compare-players
-lastReviewed: 2026-08-21
+lastReviewed: 2026-10-08
 status: verified
 ---
 

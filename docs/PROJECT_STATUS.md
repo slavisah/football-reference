@@ -36585,3 +36585,106 @@ the 2026 Ballon d'Or ceremony once 26 October 2026 has passed. A full
 line-by-line caveat audit of runs 143-249 for any remaining narrower
 one-off standing quirk this pass didn't catch, if a future run ever finds
 this list missing something specific.
+
+### Run 251 (2026-10-08): fixed a real sitemap-lastmod bug for every player-profile page, closed a seven-file `lastReviewed` staleness gap, and refined the Nations League 2025 attendance research with a new source
+
+Backlog still exhausted (re-confirmed: `pnpm outdated` only the same blocked
+`typescript` 5.9.3 vs. 7.0.2, `pnpm audit` only the same unpatched
+`http-cache-semantics` advisory, `pnpm test:coverage` the same five
+already-explained coverage gaps). Rather than re-run another already-clean
+sweep a sixth time, this run went looking in two different directions: a
+`lastReviewed` staleness check across every `content/*.md` file (not just
+the six flagship competition/award files runs 244-248 already covered), and
+one more attempt at the still-open Nations League attendance gap with a
+search angle not yet tried.
+
+**Thread one: seven-file `lastReviewed` staleness check.** `about-sources.md`
+(2026-07-29), `compare-countries.md` (2026-07-29), `compare-players.md`
+(2026-08-21), `players.md` (2026-08-20), `teams.md` (2026-08-17), and
+`records-and-timelines.md` (2026-08-15) hadn't been touched in 44-85 days
+despite Run 245's own "fix stale `lastReviewed` dates" pass only covering
+three other files (`fifa-world-cup.md`/`uefa-euro.md`/`index.md`). Checked
+each of the six against its live page before touching anything - every one
+is a short structural/descriptive blurb (not a data table), and each still
+matches its page's actual behavior (`/about/sources`, `/compare`,
+`/compare-players`, `/players`, `/teams`, `/records`, spot-checked via their
+own `description=` props and rendered content). No inaccuracy found in any
+of the six; `lastReviewed` bumped to 2026-10-08 for all six now that each
+has been freshly re-verified.
+
+**That edit surfaced a real, latent bug - not a false alarm.** Bumping
+`players.md`'s `lastReviewed` past every award file's own date caused
+`pnpm check:sitemap` to fail with 196 mismatches (every `/players/<slug>`
+and `/hr/players/<slug>` page, all 98 players): `sitemap.xml.ts`'s per-player
+loop was reusing `derivedPageLastReviewed('/players', ...)` - a formula
+designed for the `/players` *directory index page itself* - for every
+individual player profile page too, folding in `players.md`'s own date
+(the directory's one-paragraph blurb) even though `players/[slug].astro`'s
+own `og:updated_time` never does (it's just the max of the three award
+dates, correctly, since a player's profile doesn't care whether the
+directory's blurb was re-reviewed). The two formulas only ever agreed by
+coincidence - whenever `players.md`'s date happened to stay behind every
+award's own date - and `teams/[slug].astro`/`teams.md` had the exact same
+latent mismatch (a prior run's own comment in `sitemap.xml.ts` shows it was
+already reusing the directory formula for per-team pages too), just not
+currently visible because `teams.md`'s bumped date (2026-10-08) happened to
+tie with `uefa-nations-league.md`'s own new date (also bumped this run, see
+below) rather than exceed it. Fixed both: `sitemap.xml.ts`'s per-team and
+per-player loops now compute `maxLastReviewed(teamCompetitionDates)` and
+`maxLastReviewed(awardDates)` directly - matching each `[slug].astro` file's
+own formula exactly - instead of reusing the directory index's derived
+value. `pnpm check:sitemap` is clean again (0 problems, 710 entries checked
+against 715 built pages), and this fix makes the two formulas structurally
+match going forward rather than agreeing by coincidence - the same class of
+drift `check:sitemap`/`check:feed` exist to catch, caught here before it
+shipped silently wrong `<lastmod>` values to search engines for every
+player profile (and latently, every team profile, next time one of those
+two directory blurbs gets reviewed again on its own).
+
+**Thread two: Nations League attendance, 2025 final re-investigated with a
+new source family.** Runs 94/96/162 already established 2021 (single-source,
+31,511) and 2023 (genuine two-source conflict, 41,110 vs. 41,500) and left
+2025 as single-source-only (65,852, Wikipedia). This run's `WebSearch` pass
+surfaced a source none of those three had found: the German Football
+Association's own match database, `datencenter.dfb.de` (Germany hosted the
+2025 Finals). It lists the Portugal-Spain final at 75,000, marked "sold
+out" - a genuine second, independent source, but one that disagrees with
+Wikipedia's 65,852 by about 9,000, roughly 20x the ~400-person gap in the
+already-documented 2023 conflict. Too wide to be ordinary rounding/reporting
+variance between two sources describing the same count, so this is a
+conflict, not a confirmation - 2025 stays unreported, but now for a
+precisely documented reason instead of looking like a plain single-source
+gap. Added a specific, sourced note to `content/uefa-nations-league.md`'s
+"Final venues" section explaining why, a matching `docs/SOURCES.md` entry,
+and an updated `docs/ROADMAP.md` bullet. `datencenter.dfb.de` has no entry
+for 2019/2021/2023 (Germany didn't host those), so this doesn't change
+anything about the other three editions.
+
+**Verification:** fresh `pnpm install --frozen-lockfile`, `pnpm lint`
+(0/0/0), `pnpm test` (1071/1071), `pnpm check:spelling` (0 issues), `pnpm
+build` (711 pages), all 9 claim-verification-ledger/tally/header-label
+checks, `pnpm check:perf`, `check:records-consistency`/
+`check:team-profiles-consistency`/`check:player-profiles-consistency`/
+`check:compare-consistency`, `check:links` (715 pages, no broken links),
+`check:sitemap` (clean after the fix above), `check:feed`, `check:jsonld`
+(1783 blocks across 711 pages), `check:heading-outline`, and `check:
+theme-flash`, all green. Regenerated all 700 PDFs via `PW_EXECUTABLE_PATH=
+/opt/pw-browsers/chromium pnpm build:pdfs` (content/*.md and docs/SOURCES.md
+both changed; `pnpm check:pdfs` failed before regeneration exactly as
+designed, confirming every PDF genuinely needed it, and passes clean after)
+- first attempt hit a transient `HTTP 404` for one page mid-run from running
+a second `pnpm build` concurrently in another shell while the PDF script's
+own preview server was live against the same `dist/`; re-ran sequentially
+(fresh `pnpm build`, then `pnpm build:pdfs` alone, nothing else touching
+`dist/` meanwhile) and it completed cleanly.
+
+**Left for a future pass:** unchanged backlog otherwise - the EURO
+youngest-winner fact (still no converging *sourced* claim); the same
+environment-blocked/human-sign-off items (`typescript` 7,
+`http-cache-semantics`, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix call); the full ~130-winner birth-date ranking; the 2026
+Ballon d'Or ceremony once 26 October 2026 has passed; UEFA Nations League
+attendance for 2021 (still single-source) and 2023/2025 (both now
+documented two-source conflicts, not gaps - no further search angle
+obviously left to try on either). PR #56 remains open, now 8 days old,
+still unreviewed/unmerged.
