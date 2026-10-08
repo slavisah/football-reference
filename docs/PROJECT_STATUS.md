@@ -36753,3 +36753,55 @@ SOURCES.md` link-liveness, the `long-title` brand-suffix call); the full
 October 2026 has passed; UEFA Nations League attendance for 2021 (still
 single-source) and 2023/2025 (both two-source conflicts). PR #56 remains
 open, still unreviewed/unmerged.
+
+### Run 253 (2026-10-08): closed the `http-cache-semantics` advisory backlog item - already fixed upstream, just not re-checked since
+
+Full standing health sweep after a fresh `pnpm install` (this session started
+with no `node_modules`): `pnpm lint` (0/0/0), `pnpm test` (1071/1071), `pnpm
+build` (711 pages), all 33 fast CI-gated `check:*` scripts, `pnpm check:pdfs`
+(700 PDFs, no regeneration needed - no `content/*.md`/`src/pages/hr/**`
+file changed this run), `pnpm audit`, and `pnpm dlx knip --no-config-hints`
+(only the one already-documented `@cspell/dict-hr-hr` false positive) - all
+green, no new issue found by any of them.
+
+`pnpm audit` specifically came back clean (0 vulnerabilities across 591
+dependencies), which contradicts `docs/ROADMAP.md`'s own still-open
+"`http-cache-semantics` high-severity advisory" bullet (last re-confirmed by
+Run 252 as blocked, "Patched versions: <0.0.0 (none published yet)").
+Checked why: `pnpm why http-cache-semantics` shows `astro@7.3.8 >
+http-cache-semantics@4.3.0` - the lockfile already pins the patched 4.3.0
+(confirmed via `git diff pnpm-lock.yaml` after install: no change, so this
+isn't something this run's install upgraded; Run 252's own commit already
+carried 4.3.0 when it bumped `astro` to 7.3.8). So the underlying package
+was already patched as of Run 252's own `astro` bump; what's changed since
+is the advisory database itself catching up to list 4.3.0 as a patched
+version, which Run 252's own `pnpm audit` call ran too soon to see. No code
+change needed - the fix already shipped two runs ago. Removed the bullet
+from `docs/ROADMAP.md`'s "Open backlog" now that `pnpm audit` genuinely
+confirms it clean.
+
+Also re-confirmed the two other environment-blocked items unchanged: direct
+`curl`/`WebFetch` access to reference domains (tested `en.wikipedia.org`
+directly via `curl`) still returns a `403` policy denial from this
+environment's egress proxy - `docs/SOURCES.md` link-liveness sweep stays
+blocked - and `@astrojs/check@latest`'s own `peerDependencies` (checked via
+`npm view`) still only declares `typescript: '^5.0.0 || ^6.0.0'`, so the
+`typescript` 7 upgrade stays blocked too. The 2026 Ballon d'Or ceremony
+(26 October 2026) still hasn't happened as of this run's date (2026-10-08).
+
+**Verification:** `pnpm install`, `pnpm lint` (0/0/0), `pnpm test`
+(1071/1071), `pnpm build` (711 pages), all 33 fast CI-gated `check:*`
+scripts, `pnpm check:pdfs` (700 PDFs, clean without rebuild), `pnpm audit`
+(0 vulnerabilities), `pnpm dlx knip --no-config-hints` (one known false
+positive only). The ten manual/intensive-run-only browser sweeps were not
+re-run this run since no page-rendering code or content changed (last
+confirmed current by Run 249).
+
+**Left for a future pass:** unchanged backlog otherwise - the EURO Golden
+Boot youngest-winner fact (still no converging sourced claim); the same
+environment-blocked/human-sign-off items (`typescript` 7, `docs/
+SOURCES.md` link-liveness, the `long-title` brand-suffix call); the full
+~130-winner birth-date ranking; the 2026 Ballon d'Or ceremony once 26
+October 2026 has passed; UEFA Nations League attendance for 2021 (still
+single-source) and 2023/2025 (both two-source conflicts). PR #56 remains
+open, still unreviewed/unmerged.
