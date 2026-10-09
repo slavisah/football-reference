@@ -36878,3 +36878,86 @@ SOURCES.md` link-liveness, the `long-title` brand-suffix call); the full
 October 2026 has passed; UEFA Nations League attendance for 2021 (still
 single-source) and 2023/2025 (both two-source conflicts). PR #56 remains
 open, now a week old, still unreviewed/unmerged.
+
+### Run 255 (2026-10-09): full re-confirmation pass plus a fresh independent fact-check of `content/golden-boot.md` and a retry of the longest-dormant research gap - no bug found, no new sourced fact surfaced
+
+Backlog re-confirmed exhausted going into this run: `pnpm outdated` still
+shows only the already-blocked `typescript` 5.9.3 vs. latest 7.0.2
+(`@astrojs/check@0.9.10`'s peer dependency is unchanged at
+`^5.0.0 || ^6.0.0`), and `pnpm audit` is clean (0 vulnerabilities). The
+2026 Ballon d'Or ceremony (26 October 2026) still hasn't happened as of
+this run's date, so that edition stays not-due. With nothing in the
+standing backlog actionable, this run spent its effort on two fronts
+instead of a pure re-confirmation:
+
+- **Full individual re-run of every fast check script**, rather than only
+  the CI-batched subset: `pnpm install`, `pnpm lint` (0 errors/0 warnings/0
+  hints across 263 files), `pnpm test` (1071/1071), `pnpm build` (711
+  pages), `pnpm audit` (clean), `pnpm dlx knip --no-config-hints` (the same
+  one already-documented `@cspell/dict-hr-hr` false positive, nothing new),
+  and all 32 `check:*` scripts that don't require a full browser sweep
+  (`records-consistency`/`team-profiles-consistency`/
+  `player-profiles-consistency`/`compare-consistency`/`links`/`sitemap`/
+  `feed`/`precache`/`jsonld`/`heading-outline`/`theme-flash`/
+  `reachability`/`meta`/`image-dimensions`/`theme-color`/`spelling`/
+  `spelling-hr`/`perf`/`pdfs`/`pdf-outline`/`award-tallies`/
+  `edition-header-labels`/`i18n-notes`/`attendance-format`/`claims-hr`/
+  `link-names`/`locale-consistency`/all seven claim-verification ledgers) -
+  every one passed clean, individually, not just as part of a batched `pnpm
+  test:e2e`/CI run. No regression found since Run 254's full e2e
+  confirmation.
+- **A second, independent front-to-back prose-vs-table read of
+  `content/golden-boot.md`**, the same technique that found Run 244's real
+  `content/glossary.md` bug - this file's only prior full pass was the
+  two-hundred-and-twenty-second intensive run (2026-09-21), before several
+  later runs added new facts to it (the youngest/oldest-ever World Cup and
+  EURO facts in Runs 240 and the two-hundred-and-forty-ninth/-fiftieth
+  research attempts), so it was genuinely overdue for a fresh look rather
+  than assumed still-correct. Checked every prose claim in both
+  "memorable moments" sections and both Silver/Bronze Boot sections
+  against the two top-scorer tables directly: the 1958/1962 record and
+  largest-joint-tie claims, the Mbappé 2022-and-2026 consecutive-win claim
+  (verified no other player repeats across consecutive rows anywhere in the
+  table), every Silver/Bronze Boot goal count's internal ordering against
+  its edition's own Golden Boot total, and the 2012/2016/2020-only
+  ranked-podium claim against the table's own single-winner-vs-"Multiple"
+  rows. Zero discrepancies found - every claim in the file is still
+  internally consistent with its own tables.
+- **Retried the UEFA Nations League Team of the Tournament gap** (2021,
+  2023, 2025 editions) with fresh `WebSearch` passes for the first time
+  since the hundred-and-sixty-second intensive run (2026-09-21, roughly 93
+  runs ago) - the longest-dormant of the three standing research gaps,
+  unlike the EURO Golden Boot and Nations League attendance gaps both
+  retried as recently as Runs 250/251/254. Same negative result as every
+  prior attempt: searches for all three editions surface the Finals'
+  individual Player of the Tournament/best player (Rodri 2023, Nuno Mendes
+  2025, Sergio Busquets 2021) and full squad lists, but no source names a
+  complete eleven-player Team of the Tournament for any of the three -
+  genuinely still exhausted, not merely unretried. Also ran one more
+  targeted `WebSearch` pass on the EURO Golden Boot youngest-winner gap
+  specifically checking whether any source now frames Jamal Musiala's 2024
+  share as an age record (per Run 254's own note on what to check next): it
+  surfaced detailed age-record coverage for Musiala's EURO career
+  generally (youngest to score in a nation's first two group games;
+  Lamine Yamal holds the separate "youngest EURO scorer ever" record) but
+  still nothing calling his Golden Boot share itself a youngest-ever
+  record - unchanged from Run 254's finding one run earlier, confirming
+  that finding again rather than superseding it.
+
+**Verification:** `pnpm install`, `pnpm lint` (0/0/0), `pnpm test`
+(1071/1071), `pnpm build` (711 pages), `pnpm audit` (0 vulnerabilities),
+`pnpm outdated` (only the already-blocked `typescript` entry), `pnpm dlx
+knip --no-config-hints` (one known false positive only), and all 32
+non-browser-sweep `check:*` scripts run individually (all clean). Docs-only
+change (`docs/PROJECT_STATUS.md`) - no `content/*.md`/`src/pages/hr/**`
+touched, so no PDF regeneration needed (`pnpm check:pdfs` stayed clean
+throughout).
+
+**Left for a future pass:** unchanged backlog - the UEFA Nations League
+Team of the Tournament gap (2021/2023/2025, genuinely exhausted again);
+the EURO Golden Boot youngest-winner fact (still no converging sourced
+claim); the same environment-blocked/human-sign-off items (`typescript` 7,
+`docs/SOURCES.md` link-liveness, the `long-title` brand-suffix call); the
+full ~130-winner birth-date ranking; the 2026 Ballon d'Or ceremony once 26
+October 2026 has passed; UEFA Nations League attendance for 2021/2023/2025
+(unchanged conflicts). PR #56 remains open and unreviewed/unmerged.
