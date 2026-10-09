@@ -36961,3 +36961,78 @@ claim); the same environment-blocked/human-sign-off items (`typescript` 7,
 full ~130-winner birth-date ranking; the 2026 Ballon d'Or ceremony once 26
 October 2026 has passed; UEFA Nations League attendance for 2021/2023/2025
 (unchanged conflicts). PR #56 remains open and unreviewed/unmerged.
+
+### Run 256 (2026-10-09): re-ran all ten manual/intensive-run-only full-site browser sweeps for the first time since Run 249 - zero violations after seven runs' worth of changes in between
+
+Backlog remains exhausted: a fresh `pnpm outdated` turned up nothing new
+(`typescript` still blocked at 5.9.3 vs. 7.0.2 by `@astrojs/check@0.9.10`'s
+own `^5.0.0 || ^6.0.0` peer range, `astro` itself already at its latest
+7.3.8 release), `pnpm audit` now reports **no known vulnerabilities at
+all** (the `http-cache-semantics` advisory Run 253 closed stays closed),
+and `pnpm dlx knip --no-config-hints` still shows only the one
+long-documented false positive (`@cspell/dict-hr-hr`, used only via
+`.cspell/hr-notes.cspell.json`'s `"import"` field). A fresh `WebSearch`
+retry of the longest-open research gap (whether any source frames Jamal
+Musiala's EURO 2024 Golden Boot share as a youngest-ever record) again
+found no converging source - same negative result as five prior runs'
+attempts; still not shipped, for the same reason as before (this would be
+the run originating the superlative claim, not sourcing one).
+
+**The gap:** Run 249 (2026-10-08) was the last time all ten manual/
+intensive-run-only full-site browser sweeps (`check:html`/
+`check:lighthouse`/`check:reflow`/`check:landscape`/`check:text-zoom`/
+`check:print-width`/`check:target-size`/`check:text-spacing`/
+`check:focus-appearance`/`check:color-contrast`) were run together. Runs
+250-255 each made a real change in between - a sitemap-lastmod bug fix and
+`lastReviewed` staleness fixes (250, 251), a CI e2e-test date fix (251's
+follow-up), two more `astro` bumps (252 at 7.3.7->7.3.8, following 248's
+7.3.6->7.3.7), an advisory-backlog closure (253), a full cold-start
+`pnpm test:e2e` re-run (254), and a content fact-check (255) - but none of
+them re-ran all ten slower manual sweeps, the same kind of gap Run 249
+itself closed five runs earlier. Worth closing again on its own, especially
+given another `astro` bump (the site's own static-site generator) sat in
+the gap.
+
+**Result: all ten sweeps re-run clean, zero violations.** Ran the standard
+fast baseline first - fresh `pnpm install --frozen-lockfile`, `pnpm lint`
+(263 files, 0/0/0), `pnpm test` (1071/1071, unchanged), `pnpm build` (711
+pages, clean) - then all ten manual sweeps against this environment's
+pinned Chromium (`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium`):
+
+- `check:target-size`: every button/select/input/`role="button"` still
+  meets the 44px floor across all 711 pages (58s)
+- `check:html`: 0/711 pages with validity errors
+- `check:reflow`: no horizontal overflow at 320px on any page
+- `check:landscape`: no horizontal overflow at 667x375 landscape
+- `check:text-zoom`: no clipping/overflow at 200% root font-size
+- `check:print-width`: no overflow under print media at 1032px
+- `check:text-spacing`: no clipping under WCAG 1.4.12's four spacing
+  minimums
+- `check:focus-appearance`: every focusable control still renders a
+  visible focus ring of at least 2px
+- `check:color-contrast`: zero WCAG 1.4.3 violations across all 711 pages
+  in both color schemes (1,422 page loads total)
+- `check:lighthouse`: all 39 sampled pages still score 1.00 across
+  performance/accessibility/best-practices/seo (the one documented,
+  bounded 404-page SEO exception aside - `noindex` pages are expected to
+  score below 1.00 on SEO by design)
+
+No bug found - the seven runs' worth of changes in between (two dependency
+bumps, a real sitemap bug fix, staleness fixes, an advisory closure, a full
+e2e re-run, and a content fact-check) didn't regress anything these ten
+sweeps watch for. Recorded as a genuine re-confirmation, not a no-op: the
+sweep baseline was seven runs stale and is now current again.
+
+**Verification:** as described above - fresh install, lint, unit tests,
+build, and all ten manual sweeps, all green. No `content/*.md` or
+`src/pages/hr/**` file changed this run, so no PDF regeneration was needed.
+
+**Left for a future pass:** unchanged backlog - the EURO youngest-winner
+fact (still no converging source, six runs deep now); the same
+environment-blocked/human-sign-off items (`typescript` 7, `docs/
+SOURCES.md` link-liveness, the `long-title` brand-suffix call); the full
+~130-winner birth-date ranking; the 2026 Ballon d'Or ceremony (26 October
+2026, now 17 days away) once that date has passed; UEFA Nations League
+attendance for 2021/2023/2025 (unchanged conflicts). The sweep baseline
+established this run should be re-confirmed again once several more
+runs' worth of changes accumulate, the same pattern as Runs 243/249/256.

@@ -82,14 +82,16 @@ covering the previously-untested "load a shared link and see the filtered
 view" direction of AGENTS.md rule 9's shareable-filter contract), `pnpm
 lint` at 0 errors/0 warnings/0 hints, 711 pages built, the
 `/feed.xml`/`/hr/feed.xml` Atom feeds covering the newest edition of all
-seven edition-page route trees (22 entries per locale), `@cspell/dict-hr-hr`
-at 3.1.3, and the
-same two standing `knip` false positives as ever (`scripts/
-test-preview-server.mjs`, used only as a Playwright `webServer.command`,
-never imported; `@cspell/dict-hr-hr`, used only via `.cspell/
-hr-notes.cspell.json`'s `"import"` field, never a JS `import`) - neither
-actually unused, knip's static analysis just can't see a reference inside a
-config-file string. The two-hundred-and-fifty-fourth run re-ran the full
+seven edition-page route trees (22 entries per locale), and `@cspell/
+dict-hr-hr` at 3.1.3. As of the two-hundred-and-fifty-sixth run
+(2026-10-09), a fresh `pnpm dlx knip --no-config-hints` shows only **one**
+standing false positive now (`@cspell/dict-hr-hr`, used only via `.cspell/
+hr-notes.cspell.json`'s `"import"` field, never a JS `import` knip's static
+analysis can see) - the long-documented second one
+(`scripts/test-preview-server.mjs`, used only as a Playwright
+`webServer.command`) no longer appears in a fresh run's output; this file
+only corrects the stale "two" count, since no run flagged when or why that
+one stopped appearing. The two-hundred-and-fifty-fourth run re-ran the full
 cold-start `pnpm test:e2e` suite again (1055/1055, 15.9 minutes, pinned
 `/opt/pw-browsers/chromium`) - the full e2e baseline is current as of this
 run, superseding the two-hundred-and-thirty-fourth run's own full-suite
@@ -97,7 +99,7 @@ confirmation (1049/1049) from twenty runs earlier. All ten manual/
 intensive-run-only browser sweeps (`check:html`/`check:lighthouse`/
 `check:reflow`/`check:landscape`/`check:text-zoom`/`check:print-width`/
 `check:target-size`/`check:text-spacing`/`check:focus-appearance`/
-`check:color-contrast`) remain current as of the two-hundred-and-forty-ninth
+`check:color-contrast`) remain current as of the two-hundred-and-fifty-sixth
 run (see `docs/PROJECT_STATUS.md`'s matching entries for the full
 writeups); most runs
 still re-run just the two quiz-specific e2e specs
@@ -362,7 +364,9 @@ this, see `docs/PROJECT_STATUS.md`.
   World Cup/EURO Golden Boot oldest) deliberately avoided by only ever
   sourcing an already-published "youngest-ever"/"oldest-ever" claim rather
   than computing one. Musiala, age 21, is nonetheless the strongest
-  candidate found across five runs' worth of attempts - a future run with
+  candidate found across six runs' worth of attempts (the two-hundred-and-
+  fifty-sixth run tried again with a fresh `WebSearch` pass and again found
+  no source framing his share as a record) - a future run with
   a fresh `WebSearch` pass (or any source that frames a EURO Golden Boot
   age record in writing) should check whether it names him before trying
   another vocabulary angle from scratch.
