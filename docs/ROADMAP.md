@@ -118,11 +118,17 @@ audited across all three sticky-overlay contexts and found already-compliant
 (two-hundred-and-twentieth run), with a permanent regression suite now
 guarding it. The front-to-back prose-vs-table content-verification pass has
 now been applied to every one of the six competition/award content files at
-least once (`fifa-world-cup.md`/`uefa-euro.md` in the two-hundred-and-eighth
-run, `ballon-dor.md`/`copa-america.md` in the two-hundred-and-fifth through
--seventh runs, `golden-boot.md`/`uefa-nations-league.md` in the
-two-hundred-and-twenty-second run) - full coverage reached, no bugs found in
-the last two files. That same verification effort has now also been
+least once (`fifa-world-cup.md`/`uefa-euro.md` most recently in the
+two-hundred-and-fifty-seventh run, first done in the two-hundred-and-eighth
+run; `ballon-dor.md`/`copa-america.md` in the two-hundred-and-fifth through
+-seventh runs; `golden-boot.md`/`uefa-nations-league.md` in the
+two-hundred-and-twenty-second run, `golden-boot.md` again in the
+two-hundred-and-fifty-fifth run) - full coverage reached, no bugs found in
+the last three passes. The two-hundred-and-fifty-seventh run's pass on
+`fifa-world-cup.md`/`uefa-euro.md` also checked, for the first time, their
+two genuine cross-file facts (the 2024 EURO-winning manager's and the 2012
+EURO-winning captain's World Cup record) directly against the target file
+rather than trusting the citing file's own claim - both correct. That same verification effort has now also been
 extended past hand-written prose to a generated/derived page for the first
 time: `/records`' 40 build-time-computed rankings are independently
 recomputed from `content/*.md` and cross-checked against the page's own
