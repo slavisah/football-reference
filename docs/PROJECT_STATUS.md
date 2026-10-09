@@ -37036,3 +37036,87 @@ SOURCES.md` link-liveness, the `long-title` brand-suffix call); the full
 attendance for 2021/2023/2025 (unchanged conflicts). The sweep baseline
 established this run should be re-confirmed again once several more
 runs' worth of changes accumulate, the same pattern as Runs 243/249/256.
+
+### Run 257 (2026-10-09): full front-to-back prose-vs-table re-verification of `content/fifa-world-cup.md` and `content/uefa-euro.md` - the two most overdue files for this technique, 49 runs stale - zero discrepancies found
+
+With the standing backlog still exhausted (confirmed again: `pnpm outdated`
+shows nothing new beyond the already-blocked `typescript` entry; `docs/
+SOURCES.md` link-liveness is still blocked - a fresh `WebFetch` attempt to
+`en.wikipedia.org` this run returned `ENOTFOUND`, the same DNS-level block
+every prior attempt has hit), this run picked the single most overdue
+instance of the project's own established front-to-back
+prose-vs-table-verification technique: `content/fifa-world-cup.md` and
+`content/uefa-euro.md` had their last full pass in the two-hundred-and-
+eighth intensive run (2026-09-21) - 49 runs ago, far longer than any other
+content file (`content/golden-boot.md` had its second full pass just one
+run ago, in Run 255; every other flagship file has been re-checked within
+the last ~15 runs). These are also the two largest, most prose-heavy
+content files on the site (24 and 17 editions respectively, each with ten-
+plus sections of narrative facts), making them the highest-expected-value
+target for this technique per the same reasoning Run 244 used when it found
+a real bug in `content/glossary.md` after a 36-run gap.
+
+**Method:** read both files in full and independently cross-checked every
+section against every other section and against the other file, rather
+than re-trusting any single section in isolation:
+
+- `fifa-world-cup.md`: the 23-row Editions table against the "Champions by
+  titles" tally (5+4+4+3+2+2+2+1 = 23 titles = 23 editions, each nation's
+  listed winning years matched one-for-one against the table's own
+  `Winner` column), against "Format milestones" (16->24 in 1982, ->32 in
+  1998, ->48 in 2026, each matching the Editions table's own `Teams`
+  column on both sides of the change), and against all seven award
+  sections (Golden Ball/Silver-Bronze Ball/Golden Glove/Young Player/Fair
+  Play/Winning managers/Winning captains) - every nationality tag matches
+  the Editions table's own `Winner` column where a rule requires it (the
+  "every winning manager shares the winning team's nationality" claim,
+  unbroken across all 23 managers; same check on captains), every
+  "first"/"only"/"record" superlative was checked against every other
+  entry in its own list rather than assumed (e.g. the 1986 Azteca final's
+  114,600 attendance checked against all 20 other finals' figures to
+  confirm it really is the largest; the Fair Play Award's "Spain, 2010,
+  the fifth team to win both the World Cup and the Fair Play Award at the
+  same tournament" claim checked year-by-year against both tables back to
+  1970, and again forward to 2026, to confirm no sixth case has since
+  arrived unflagged).
+- `uefa-euro.md`: the same method against its 17-row Editions table and
+  "Champions by titles" tally (4+3+2+2+1+1+1+1+1+1 = 17 titles = 17
+  editions), its "Team of the Tournament" section's six yearly player
+  lists (each year's stated "supplied N, the most of any team" claim
+  recounted by nationality against that year's own 11 names), and its two
+  genuine cross-file references into `fifa-world-cup.md` - the 2024
+  "Winning managers" entry's claim that Luis de la Fuente "went on to win
+  the 2026 World Cup with Spain" (checked against that file's own 2026
+  manager entry), and the 2012 "Winning captains" entry's claim that Iker
+  Casillas also "captain[ed] Spain to the 2010 World Cup between them"
+  (checked against that file's own 2010 captain entry) - both confirmed
+  correct, the first time this project's verification technique has
+  explicitly checked a cross-file fact against its target file rather than
+  trusting the citing file's own claim.
+
+**Result: zero discrepancies in either file.** Every tally, every
+cross-reference, and every superlative claim checked out against the
+site's own data. No content change was needed beyond bumping both files'
+`lastReviewed` to today - a genuine re-confirmation closing the longest-
+open gap of this kind, not a no-op, the same standard Run 256 applied to
+the browser-sweep baseline.
+
+**Verification:** `pnpm install`, `pnpm lint` (263 files, 0/0/0), `pnpm
+test` (1071/1071, unchanged), `pnpm build` (711 pages, clean),
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs` (both
+`fifa-world-cup.md`'s and `uefa-euro.md`'s PDFs regenerated, required by
+this run's own `content/*.md` edits per `docs/ADDING_CONTENT.md`), `pnpm
+check:pdfs` (clean afterward). `content/fifa-world-cup.md` and `content/
+uefa-euro.md` are the only files this run touched.
+
+**Left for a future pass:** unchanged backlog - the EURO youngest-winner
+fact (still no converging source); the same environment-blocked/human-
+sign-off items (`typescript` 7, `docs/SOURCES.md` link-liveness - reconfirmed
+blocked again this run, the `long-title` brand-suffix call); the full
+~130-winner birth-date ranking; the 2026 Ballon d'Or ceremony (26 October
+2026, 17 days away); UEFA Nations League attendance for 2021/2023/2025. The
+front-to-back verification technique has now reached every one of the six
+flagship competition/award files at least twice; `content/ballon-dor.md`
+(last full pass 2026-10-02) and `content/copa-america.md` (2026-10-01) are
+now the next-most-overdue should a future run want to extend this pass
+further.
