@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (247 intensive runs as of 2026-10-07) lives
+verification sweep and decision (258 intensive runs as of 2026-10-09) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -118,17 +118,23 @@ audited across all three sticky-overlay contexts and found already-compliant
 (two-hundred-and-twentieth run), with a permanent regression suite now
 guarding it. The front-to-back prose-vs-table content-verification pass has
 now been applied to every one of the six competition/award content files at
-least once (`fifa-world-cup.md`/`uefa-euro.md` most recently in the
-two-hundred-and-fifty-seventh run, first done in the two-hundred-and-eighth
-run; `ballon-dor.md`/`copa-america.md` in the two-hundred-and-fifth through
--seventh runs; `golden-boot.md`/`uefa-nations-league.md` in the
-two-hundred-and-twenty-second run, `golden-boot.md` again in the
-two-hundred-and-fifty-fifth run) - full coverage reached, no bugs found in
-the last three passes. The two-hundred-and-fifty-seventh run's pass on
-`fifa-world-cup.md`/`uefa-euro.md` also checked, for the first time, their
-two genuine cross-file facts (the 2024 EURO-winning manager's and the 2012
+least twice, all within the last eight days as of the two-hundred-and-
+fifty-eighth run (`fifa-world-cup.md`/`uefa-euro.md` in the two-hundred-and-
+fifty-seventh run, first done in the two-hundred-and-eighth run;
+`ballon-dor.md`/`copa-america.md` in the two-hundred-and-fifty-eighth run,
+first done in the two-hundred-and-fifth through -seventh runs;
+`golden-boot.md`/`uefa-nations-league.md` in the two-hundred-and-
+fifty-fifth and two-hundred-and-twenty-second runs respectively) - full
+coverage reached twice over, no bugs found in the last four passes. The
+two-hundred-and-fifty-seventh run's pass on `fifa-world-cup.md`/
+`uefa-euro.md` also checked, for the first time, their two genuine
+cross-file facts (the 2024 EURO-winning manager's and the 2012
 EURO-winning captain's World Cup record) directly against the target file
-rather than trusting the citing file's own claim - both correct. That same verification effort has now also been
+rather than trusting the citing file's own claim - both correct. A future
+run extending this technique further should move on to the site's smaller
+content files next (`glossary.md` last done run 244; `quiz.md`/
+`records-and-timelines.md`/`teams.md`/`players.md`/`compare-countries.md`/
+`compare-players.md`/`about-sources.md` never yet). That same verification effort has now also been
 extended past hand-written prose to a generated/derived page for the first
 time: `/records`' 40 build-time-computed rankings are independently
 recomputed from `content/*.md` and cross-checked against the page's own
