@@ -89,13 +89,17 @@ test-preview-server.mjs`, used only as a Playwright `webServer.command`,
 never imported; `@cspell/dict-hr-hr`, used only via `.cspell/
 hr-notes.cspell.json`'s `"import"` field, never a JS `import`) - neither
 actually unused, knip's static analysis just can't see a reference inside a
-config-file string. The two-hundred-and-thirty-fourth run re-ran the full
-cold-start `pnpm test:e2e` suite (1049/1049, 22.0 minutes) - the full e2e
-baseline is now current again, alongside all six manual browser sweeps
-(`check:lighthouse`/`check:reflow`/`check:landscape`/`check:text-zoom`/
-`check:print-width`/`check:html`), re-confirmed clean by the
-two-hundred-and-thirty-third run against the current build (see
-`docs/PROJECT_STATUS.md`'s matching entries for the full writeups); most runs
+config-file string. The two-hundred-and-fifty-fourth run re-ran the full
+cold-start `pnpm test:e2e` suite again (1055/1055, 15.9 minutes, pinned
+`/opt/pw-browsers/chromium`) - the full e2e baseline is current as of this
+run, superseding the two-hundred-and-thirty-fourth run's own full-suite
+confirmation (1049/1049) from twenty runs earlier. All ten manual/
+intensive-run-only browser sweeps (`check:html`/`check:lighthouse`/
+`check:reflow`/`check:landscape`/`check:text-zoom`/`check:print-width`/
+`check:target-size`/`check:text-spacing`/`check:focus-appearance`/
+`check:color-contrast`) remain current as of the two-hundred-and-forty-ninth
+run (see `docs/PROJECT_STATUS.md`'s matching entries for the full
+writeups); most runs
 still re-run just the two quiz-specific e2e specs
 (`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`, 14
 tests) when their own change was a quiz markup/behavior change, which is

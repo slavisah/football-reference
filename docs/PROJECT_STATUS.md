@@ -36805,3 +36805,76 @@ SOURCES.md` link-liveness, the `long-title` brand-suffix call); the full
 October 2026 has passed; UEFA Nations League attendance for 2021 (still
 single-source) and 2023/2025 (both two-source conflicts). PR #56 remains
 open, still unreviewed/unmerged.
+
+### Run 254 (2026-10-09): re-ran the full cold-start `pnpm test:e2e` suite for the first time in twenty runs; re-tried the two longest-open research gaps with no new result
+
+Backlog re-confirmed exhausted going into this run: `pnpm outdated` shows
+only the already-blocked `typescript` 5.9.3 vs. `@astrojs/check@latest`'s
+still-`^5.0.0 || ^6.0.0` peer dependency (re-checked via `npm view`), and
+`pnpm audit` is clean (0 vulnerabilities, matching Run 253's finding).
+`pnpm dlx knip --no-config-hints` still shows only the one already-documented
+`@cspell/dict-hr-hr` false positive. `pnpm test:coverage` reproduces the
+same five already-classified-unreachable gaps exactly
+(`contentPages.ts`/`quiz.ts`/`sources.ts`/`tableSort.ts`/`url.ts`, same line
+numbers as last re-verified) - no new gap. No `content/*.md` or
+`src/pages/hr/**` file changed, so no PDF regeneration was needed
+(`pnpm check:pdfs` stayed clean throughout).
+
+With nothing in the standing backlog actionable, picked the one concrete
+quality-pass item that was genuinely overdue rather than re-confirming
+already-current state: the full cold-start `pnpm test:e2e` suite hadn't
+been run end-to-end since the two-hundred-and-thirty-fourth run (1049/1049)
+- twenty runs and many incremental content/code changes earlier. Most runs
+since then only re-ran the two quiz-specific specs relevant to their own
+change, which is sufficient per-run but leaves the *full* suite's baseline
+increasingly unconfirmed as a whole. Ran it cold (`PW_EXECUTABLE_PATH=
+/opt/pw-browsers/chromium pnpm test:e2e`, the pinned browser this
+environment's installed `@playwright/test` needs): **1055/1055 passed,
+15.9 minutes, zero failures** - the full e2e baseline is current again as
+of this run, with no regression found across the twenty runs' worth of
+changes it hadn't been exercised against.
+
+Also retried the two longest-open, not-fully-blocked research gaps with
+fresh `WebSearch` passes, since the environment's egress to reference
+domains is still confirmed `403`-blocked (re-tested directly via `curl` to
+`en.wikipedia.org`: `CONNECT tunnel failed, response 403`, and via
+`WebFetch` to the same URL: `ENOTFOUND` - both consistent with every prior
+run's finding, so `docs/SOURCES.md` link-liveness and the `typescript` 7
+upgrade stay blocked):
+
+- **UEFA Nations League 2021 Finals attendance**: searched specifically for
+  an independent corroboration of the 31,511 figure (San Siro, Spain 1-2
+  France, 10 October 2021). An 11v11.com national-team-statistics database
+  reports the same number, but a separate Italian-language search pass
+  found no official Italian source (league, federation, or venue) stating
+  it independently - both searches converge on the same Wikipedia-rooted
+  figure rather than a genuinely separate primary source. Still single-source;
+  `content/uefa-nations-league.md`'s existing note is accurate and
+  unchanged.
+- **EURO Golden Boot youngest-ever winner (Jamal Musiala, 2024, age 21)**:
+  one more fresh `WebSearch` pass turned up detailed Musiala age-record
+  coverage (youngest to score in a nation's first two EURO group games;
+  fourth-youngest-ever to reach two EURO goals) but, as in the six prior
+  attempts, nothing framing his Golden-Boot *share* itself as a youngest-ever
+  record - Lamine Yamal holds the separate "youngest scorer at a men's
+  EURO" record instead, which is a different claim. No change shipped, per
+  this idea's standing sourcing policy (ship only an already-published
+  superlative, never a self-computed one).
+
+**Verification:** fresh `pnpm install`, `pnpm lint` (0/0/0), `pnpm test`
+(1071/1071), `pnpm test:coverage` (same five pre-classified gaps only),
+`pnpm build` (711 pages), all 33 fast CI-gated `check:*` scripts, `pnpm
+check:pdfs` (700 PDFs, clean without rebuild), `pnpm audit` (0
+vulnerabilities), `pnpm dlx knip --no-config-hints` (one known false
+positive only), and the full cold-start `pnpm test:e2e` (1055/1055, 15.9
+minutes). Docs-only change (`docs/ROADMAP.md`/`docs/PROJECT_STATUS.md`) -
+no `content/*.md`/`src/pages/hr/**` touched, so no PDF regeneration needed.
+
+**Left for a future pass:** unchanged backlog otherwise - the EURO Golden
+Boot youngest-winner fact (still no converging sourced claim); the same
+environment-blocked/human-sign-off items (`typescript` 7, `docs/
+SOURCES.md` link-liveness, the `long-title` brand-suffix call); the full
+~130-winner birth-date ranking; the 2026 Ballon d'Or ceremony once 26
+October 2026 has passed; UEFA Nations League attendance for 2021 (still
+single-source) and 2023/2025 (both two-source conflicts). PR #56 remains
+open, now a week old, still unreviewed/unmerged.
