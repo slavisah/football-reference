@@ -37200,3 +37200,120 @@ records-and-timelines.md`/`content/teams.md`/`content/players.md`/
 about-sources.md` never yet - see each file's own `lastReviewed` date),
 or re-run the ten manual/intensive-run-only browser sweeps again once
 enough runs accumulate since Run 256.
+
+### Run 259 (2026-10-09): front-to-back prose-vs-table verification extended to the site's seven smaller content files - the last ones never checked by this technique - zero discrepancies, closing the gap for good
+
+Run 258's own "Left for a future pass" note pointed here next: with all
+six flagship competition/award files re-confirmed within the last eight
+days, this run extended the technique to the site's seven smaller content
+files (`quiz.md`, `records-and-timelines.md`, `teams.md`, `players.md`,
+`compare-countries.md`, `compare-players.md`, `about-sources.md`).
+
+First, a correction to the record: that note (echoing `docs/ROADMAP.md`'s
+own wording) described five of those seven as "never yet" checked by this
+technique. That's wrong - Run 244's own entry above says plainly that it
+read `about-sources.md`, `compare-countries.md`, `records-and-timelines.md`,
+`teams.md` and `players.md` front-to-back using this exact method, and
+found "no verifiable per-item claims" in most of them. What actually never
+happened is a *confirmed-clean* marker on those five (Run 244 didn't bump
+their `lastReviewed`, unlike this run and Runs 257/258's own practice of
+treating a clean pass as "not a no-op"), which is presumably why a later
+run, reading only `lastReviewed` dates rather than Run 244's own text,
+re-derived "never yet" by mistake. Only `quiz.md` and `compare-players.md`
+were genuinely never read by this technique before this run.
+
+**Method:** read all seven files front-to-back and, rather than treating
+them as unverifiable blurbs (Run 244's own characterization, correct for
+most but not all of them), cross-checked every specific, checkable claim
+against the source code or data it describes:
+
+- `quiz.md`'s "How it works" and "Question types in this quiz" sections
+  assert exact UI copy and generator behavior - checked every claim against
+  `src/lib/quiz.ts`'s actual functions rather than trusting the doc's own
+  wording: the "only asked about a one-time champion/winner" guard
+  (`yearByWinnerQuestions`'s `oneTimeWinners` filter, backed by
+  `uniqueWinnerEditions()`), the "only asked when there's a single,
+  unambiguous leader/margin/streak/wait/pairing" guards on all seven
+  superlative-style questions (`mostTitlesQuestion`,
+  `biggestFinalMarginQuestion`, `longestStreakQuestion`,
+  `longestTitleGapQuestion`, `mostFrequentRivalryQuestion`,
+  `fiercestRivalryQuestion` - each one's own `top.X === runnerUp.X` tie
+  check and `length < 3` sparse-data check read directly), the "four
+  champions... earliest first" chronological-order claim
+  (`chronologicalOrderQuestions`'s own `itemCount = 4` default and
+  ascending-`yearSort` comparator), and the exact button/control labels
+  ("Check answer", "Just show me the answer", "Restart quiz", "Check
+  order", the dropdown-based order challenge) against `QuizCard.astro`/
+  `QuizOrderCard.astro`/`src/lib/i18n.ts`'s own `quizCheckAnswer`/
+  `quizJustShowAnswer`/`quizRestart`/`quizCheckOrder`/`quizRankPlaceholder`
+  strings. Every claim matched exactly - no bug found.
+- `compare-players.md`/`players.md` both claim the comparison/directory
+  covers "Men's Ballon d'Or and FIFA World Cup/UEFA EURO Golden Boot" and
+  excludes national teams - checked against `src/pages/compare-players.astro`'s
+  and `src/pages/players/index.astro`'s own `loadCompetition()` calls (both
+  load exactly `ballon-dor` plus `golden-boot` twice, once per
+  `editionsHeading`/`sourcesHeading` pair for World Cup and EURO) - matches.
+- `teams.md`/`compare-countries.md` both claim coverage of titles,
+  runner-up finishes, and third/fourth-place or semifinal finishes across
+  FIFA World Cup/UEFA EURO/Copa América/UEFA Nations League - checked
+  against `src/lib/teamProfile.ts`'s runner-up/semifinal cell matching and
+  `src/pages/teams/index.astro`'s own `loadTeamCompetitions()` call (exactly
+  those four competitions) - matches.
+- `records-and-timelines.md`'s "Historical identity rules" section (West
+  Germany merged into Germany; Soviet Union/Russia, Czechoslovakia/Czech
+  Republic and Yugoslavia each left unmerged) - checked against
+  `src/lib/countries.ts`'s own `SUCCESSOR_GROUPS` map, which contains only
+  the `west germany`/`germany` entries and nothing for the other three
+  pairs - matches exactly, consistent with `index.md`'s own identical claim
+  (independently confirmed by the two-hundred-and-eleventh run).
+- `about-sources.md` is a single general policy sentence with no
+  per-item claim to check (confirmed by reading it, not assumed) - Run
+  244's "no verifiable per-item claims" characterization holds for this one
+  file alone of the seven.
+
+**Result: zero discrepancies across all seven files.** Bumped all seven
+files' `lastReviewed` to today, the same "a clean pass is a genuine
+re-confirmation, not a no-op" standard Runs 257/258 established -
+`quiz.md`'s was dated six days stale (2026-10-03), the other six were
+already current (2026-10-08) from unrelated same-day edits but got a fresh
+confirmed-clean bump anyway since this is the first time any of the six
+had the full technique (rather than Run 244's lighter blurb-reading pass)
+applied with a result worth recording.
+
+**Verification:** fresh `pnpm install --frozen-lockfile`, `pnpm lint` (263
+files, 0/0/0), `pnpm test` (1071/1071, unchanged - a pure content-prose
+`lastReviewed` change touches no source/test file), `pnpm build` (711
+pages, clean), all 30 CI-gated fast `check:*` scripts individually re-run
+and clean (including all seven claim-verification ledgers - none of these
+seven files' prose uses a `- ` bullet claim shape the ledgers scan, so none
+needed a new entry, confirmed by reading each file rather than assumed).
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs` (all 700
+PDFs regenerate every run regardless of which content changed, per this
+script's own existing behavior; `check:pdfs`/`check:pdf-outline` both clean
+at 700/700 after). `pnpm outdated` (one new non-blocking entry since Run
+258: `@types/node` 26.6.4 -> 26.6.5 dev-only type-definitions patch, left
+for a future run to pick up alongside other routine bumps since this run's
+own scope was already the content-verification pass), `pnpm audit` (clean),
+`pnpm dlx knip --no-config-hints` (unchanged, the one documented
+`@cspell/dict-hr-hr` false positive only). Browser sweeps not re-run - a
+pure content-prose/`lastReviewed` change with no markup/behavior
+difference, matching this project's own established practice for that
+class of change (e.g. Run 244); Run 256's own full sweep (zero violations)
+remains the current baseline.
+
+**Left for a future pass:** unchanged backlog - the EURO youngest-winner
+fact (still no converging source, six-plus runs deep); the same
+environment-blocked/human-sign-off items (`typescript` 7 still blocked by
+`@astrojs/check`'s peer-dependency range, `docs/SOURCES.md` link-liveness -
+a fresh `WebFetch` to `en.wikipedia.org` this run again returned
+`ENOTFOUND` at the DNS level, same as Runs 257/258 - the `long-title`
+brand-suffix call); the full ~130-winner birth-date ranking; the 2026
+Ballon d'Or ceremony (26 October 2026, now 17 days away); UEFA Nations
+League attendance for 2021/2023/2025; the new `@types/node` patch bump.
+With every content file on the site now covered by this verification
+technique at least once (all with a clean result), a future run should
+treat it as an ongoing rotation - re-check whichever file has gone longest
+since its last pass - rather than hunting for a next untried file, and
+should also re-run the ten manual/intensive-run-only browser sweeps once
+enough runs accumulate since Run 256 (three runs so far, same as Run 249's
+own gap-closing cadence).

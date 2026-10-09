@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (258 intensive runs as of 2026-10-09) lives
+verification sweep and decision (259 intensive runs as of 2026-10-09) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -130,11 +130,24 @@ two-hundred-and-fifty-seventh run's pass on `fifa-world-cup.md`/
 `uefa-euro.md` also checked, for the first time, their two genuine
 cross-file facts (the 2024 EURO-winning manager's and the 2012
 EURO-winning captain's World Cup record) directly against the target file
-rather than trusting the citing file's own claim - both correct. A future
-run extending this technique further should move on to the site's smaller
-content files next (`glossary.md` last done run 244; `quiz.md`/
-`records-and-timelines.md`/`teams.md`/`players.md`/`compare-countries.md`/
-`compare-players.md`/`about-sources.md` never yet). That same verification effort has now also been
+rather than trusting the citing file's own claim - both correct. The
+two-hundred-and-fifty-ninth run then closed the last remaining gap for
+this technique: `quiz.md` and `compare-players.md` (the only two content
+files no run had yet applied it to - run 244's own batch pass had in fact
+already covered `about-sources.md`/`compare-countries.md`/
+`records-and-timelines.md`/`teams.md`/`players.md`, contrary to the stale
+"never yet" this file previously claimed for those five; run 244's own
+`docs/PROJECT_STATUS.md` entry says so directly) were read front-to-back
+and every checkable claim (quiz question-type descriptions against
+`src/lib/quiz.ts`'s actual generator logic and UI copy; the two compare
+pages' award-source descriptions against `src/pages/compare-players.astro`/
+`teams.ts`/`comparePlayers.ts`) cross-checked against the code and content
+it describes - zero discrepancies, and the other five got a fresh
+re-confirmation pass in the same run for good measure, also zero
+discrepancies. Every content file on the site has now had this technique
+applied at least once with a clean result. A future run should treat this
+as an ongoing rotation (re-check the longest-`lastReviewed`-stale file each
+time) rather than a one-off backlog item.
 extended past hand-written prose to a generated/derived page for the first
 time: `/records`' 40 build-time-computed rankings are independently
 recomputed from `content/*.md` and cross-checked against the page's own
