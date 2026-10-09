@@ -37120,3 +37120,83 @@ flagship competition/award files at least twice; `content/ballon-dor.md`
 (last full pass 2026-10-02) and `content/copa-america.md` (2026-10-01) are
 now the next-most-overdue should a future run want to extend this pass
 further.
+
+### Run 258 (2026-10-09): full front-to-back prose-vs-table re-verification of `content/ballon-dor.md` and `content/copa-america.md` - the two most overdue flagship files for this technique - zero discrepancies found
+
+With the standing backlog still exhausted (re-confirmed this run: a fresh
+`WebFetch` attempt to `en.wikipedia.org` still returns `ENOTFOUND` at the DNS
+level, same as Run 257; `pnpm outdated` shows nothing new beyond the
+already-blocked `typescript` entry; the 2026 Ballon d'Or ceremony is still 17
+days out), this run picked the next instance of Run 257's own
+front-to-back-verification technique: `content/ballon-dor.md` (last full pass
+2026-10-02) and `content/copa-america.md` (2026-10-01) were, by `lastReviewed`
+date, the two most overdue of the six flagship competition/award files -
+every other one had already been touched within the last eight days.
+
+**Method:** read both files in full and cross-checked every section against
+every other section rather than trusting any one table or list in isolation:
+
+- `ballon-dor.md`: all 69 awarded editions' Winner column individually
+  tallied against the "Multiple winners through 2025" table (Messi's eight
+  wins - 2009, 2010, 2011, 2012, 2015, 2019, 2021, 2023 - Cristiano Ronaldo's
+  five, Cruyff/Platini/van Basten's three each, and all five two-time
+  winners each recounted year-by-year from the Winners table itself rather
+  than re-trusting the tally), the "oldest-ever"/"youngest-ever" Memorable
+  Moments claims checked against Matthews' and Ronaldo's own Winners-table
+  rows and ceremony dates, and all five companion-award sections (Kopa,
+  Yashin, Gerd Müller, Johan Cruyff, Sócrates) checked for internal
+  consistency - every "first of two/three wins"/"back-to-back"/"joint
+  winner" claim re-derived from that section's own year-by-year list rather
+  than assumed.
+- `copa-america.md`: the 48-edition Champions timeline's Champion column
+  individually re-tallied by nation against the "Titles after 2024" table
+  (Argentina's 16, Uruguay's 15, Brazil's 9, and all four two-title nations
+  each recounted edition-by-edition - total 48, matching the table's own
+  48-edition count), the 19-edition "Final venues" section cross-checked
+  against the timeline's own Final-date column for exact edition overlap,
+  and all seven note/award sections (Best Player, Golden Glove, Golden Boot,
+  Fair Play, Team of the Tournament, Winning managers, Winning captains)
+  checked for internal consistency - e.g. Best Player's "on a team that
+  finished third/runner-up" claims (1987 Valderrama, 2001 Guevara, 2024
+  Rodríguez) checked against the Champions timeline's own Third/Runner-up
+  columns for those years, Golden Boot's "shares the single-edition scoring
+  record" claim (Jair 1949, Maschio/Ambrois 1957, all at 9 goals) checked
+  against every other edition's own goal tally to confirm no edition
+  exceeds it, and the "only captains/managers to win back-to-back editions"
+  closing claims in both sections checked against each other (Ruggeri/
+  Basile 1991+1993, Bravo/Sampaoli+Pizzi 2015+2016, Messi/Scaloni
+  2021+2024 - the same three nation-year pairs in both sections, as
+  expected since captain and manager are tied to the same title-winning
+  team).
+
+**Result: zero discrepancies in either file.** Every tally, cross-reference,
+and superlative claim checked out against the site's own data - no content
+change was needed beyond bumping both files' `lastReviewed` to today, the
+same standard Run 257 applied to `fifa-world-cup.md`/`uefa-euro.md`. This
+closes the last gap in this round of the technique: all six flagship files
+have now had a confirmed-clean pass within the last eight days.
+
+**Verification:** `pnpm install --frozen-lockfile`, `pnpm lint` (263 files,
+0/0/0), `pnpm test` (1071/1071, unchanged), `pnpm build` (711 pages, clean),
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium pnpm build:pdfs` (both
+`ballon-dor.md`'s and `copa-america.md`'s PDFs regenerated, required by this
+run's own `content/*.md` edits per `docs/ADDING_CONTENT.md`), `pnpm
+check:pdfs` (clean afterward). `content/ballon-dor.md` and
+`content/copa-america.md` are the only files this run touched besides this
+entry and `docs/ROADMAP.md`'s own status summary.
+
+**Left for a future pass:** unchanged backlog - the EURO youngest-winner
+fact (still no converging source, six runs deep); the same
+environment-blocked/human-sign-off items (`typescript` 7, `docs/
+SOURCES.md` link-liveness - reconfirmed blocked again this run, the
+`long-title` brand-suffix call); the full ~130-winner birth-date ranking;
+the 2026 Ballon d'Or ceremony (26 October 2026, 17 days away); UEFA
+Nations League attendance for 2021/2023/2025. With all six flagship files
+now re-confirmed within the last eight days, a future run extending this
+technique further should look to the site's smaller content files next
+(`content/glossary.md` last done Run 244, `content/quiz.md`/`content/
+records-and-timelines.md`/`content/teams.md`/`content/players.md`/
+`content/compare-countries.md`/`content/compare-players.md`/`content/
+about-sources.md` never yet - see each file's own `lastReviewed` date),
+or re-run the ten manual/intensive-run-only browser sweeps again once
+enough runs accumulate since Run 256.
