@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (260 intensive runs as of 2026-10-10) lives
+verification sweep and decision (263 intensive runs as of 2026-10-10) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -31,6 +31,21 @@ entries their own cross-references in this file claimed) before removal. The
 instruction from the first maintenance note was correct but evidently not
 followed by habit alone - restated more concretely below.
 
+**Third maintenance note (2026-10-10, two-hundred-and-sixty-third intensive
+run):** the same drift happened a third time, this time unprefixed by a bold
+"**Nth run:**" marker, which is presumably why it survived two intervening
+cleanups - runs 222 through 262 kept extending the "Status" section's prose
+with "the two-hundred-and-Nth run..." sentences instead of writing only to
+`docs/PROJECT_STATUS.md`, regrowing it to 224 lines. Trimmed back down again
+to a current-state-only summary; nothing lost - every run number named in the
+removed prose (spot-checked: 223 through 262 inclusive, plus 241-251) has its
+own matching `### ` entry in `docs/PROJECT_STATUS.md`. Two prior notes
+weren't enough because both restated the rule only in prose; this run also
+found no code or doc mechanism that would actually prevent a future run from
+repeating this a fourth time, so flagged it in this run's own notification as
+something worth the user's attention rather than assuming a third restatement
+sticks where two didn't.
+
 **Going forward: a run closes a backlog item by deleting its bullet below**
 (after confirming its `docs/PROJECT_STATUS.md` entry exists), and records
 what it did *only* in `docs/PROJECT_STATUS.md` (a new `### ` entry there,
@@ -52,219 +67,56 @@ directories, `/glossary`, the Family Quiz, per-edition pages for every
 competition and both individual awards (`/competitions/<competition>/<year>`),
 light/dark mode, a print stylesheet, downloadable print PDFs (700, one per
 page - tagged/PDF-UA structured, with page numbers, an `/Author`, and a
-cross-reference pager between adjacent editions), a PWA/offline mode, and an
+cross-reference pager between adjacent editions), a PWA/offline mode, an
+Atom feed (`/feed.xml`, `/hr/feed.xml`) of recently-reviewed pages, and an
 "On this day" widget. See `docs/PROJECT_STATUS.md`'s "Known caveats" section
-(roughly 45% through the file - its own `### ` run-log entries kept
-appending after it, so despite its name it is not near the end) for a
-summary of what exists and any standing quirks. A run that ships a genuine
-standing quirk or a new permanent check should add its own bullet there in
-the same pass - see that section's own 2026-10-08 catch-up note for why this
-matters (a 107-run gap had opened up before the two-hundred-and-fiftieth
-run closed it).
+for a summary of what exists and any standing quirks; a run that ships a
+genuine standing quirk or a new permanent check should add its own bullet
+there in the same pass.
 
-Every recent run's standing health check comes back clean run after run:
-`pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm test`/`pnpm
-test:coverage`/`pnpm build`, all 44 `check:*` scripts (34 fast enough to run
-every time and wired into `.github/workflows/ci.yml` as required PR gates,
-now including the two-hundred-and-thirty-first run's `check:feed`;
-`check:lighthouse`/`check:reflow`/`check:landscape`/`check:text-zoom`/
-`check:print-width`/`check:html`/`check:target-size`/`check:text-spacing`/
-`check:focus-appearance`/`check:color-contrast` are full-site Playwright/
-browser sweeps kept manual/intensive-run-only rather than a required PR
-gate, purely for their ~700-to-1,400-page-load runtime), `pnpm audit`, and
-`pnpm dlx knip --no-config-hints`.
-As of the two-hundred-and-forty-first run (2026-10-06): 1060/1060 unit
-tests (up from 1059 - the two-hundred-and-fortieth run's own new
-`contentPages.test.ts` case for `/quiz`'s `derivedPageLastReviewed()`
-branch), 1055 Playwright e2e tests (up from 1049 - the two-hundred-and-
-thirty-eighth run's own new `tests/e2e/filter-url-restore.spec.ts`,
-covering the previously-untested "load a shared link and see the filtered
-view" direction of AGENTS.md rule 9's shareable-filter contract), `pnpm
-lint` at 0 errors/0 warnings/0 hints, 711 pages built, the
-`/feed.xml`/`/hr/feed.xml` Atom feeds covering the newest edition of all
-seven edition-page route trees (22 entries per locale), and `@cspell/
-dict-hr-hr` at 3.1.3. As of the two-hundred-and-fifty-sixth run
-(2026-10-09), a fresh `pnpm dlx knip --no-config-hints` shows only **one**
-standing false positive now (`@cspell/dict-hr-hr`, used only via `.cspell/
-hr-notes.cspell.json`'s `"import"` field, never a JS `import` knip's static
-analysis can see) - the long-documented second one
-(`scripts/test-preview-server.mjs`, used only as a Playwright
-`webServer.command`) no longer appears in a fresh run's output; this file
-only corrects the stale "two" count, since no run flagged when or why that
-one stopped appearing. The two-hundred-and-fifty-fourth run re-ran the full
-cold-start `pnpm test:e2e` suite again (1055/1055, 15.9 minutes, pinned
-`/opt/pw-browsers/chromium`) - the full e2e baseline is current as of this
-run, superseding the two-hundred-and-thirty-fourth run's own full-suite
-confirmation (1049/1049) from twenty runs earlier. All ten manual/
-intensive-run-only browser sweeps (`check:html`/`check:lighthouse`/
-`check:reflow`/`check:landscape`/`check:text-zoom`/`check:print-width`/
-`check:target-size`/`check:text-spacing`/`check:focus-appearance`/
-`check:color-contrast`) were re-run fresh by the two-hundred-and-sixtieth
-run (2026-10-10, four runs after the two-hundred-and-fifty-sixth run's own
-pass) - zero violations, baseline current again (see `docs/
-PROJECT_STATUS.md`'s matching entries for the full writeups); most runs
-still re-run just the two quiz-specific e2e specs
-(`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`, 14
-tests) when their own change was a quiz markup/behavior change, which is
-judged sufficient per-run - see each run's own `docs/PROJECT_STATUS.md`
-entry for its own verification scope and rationale.
+The standing health check (`pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm
+test`/`pnpm test:coverage`/`pnpm build`, all 44 `check:*` scripts, `pnpm
+audit`, `pnpm dlx knip --no-config-hints`) comes back clean run after run.
+34 of the `check:*` scripts are fast enough to run every time and are wired
+into `.github/workflows/ci.yml` as required PR gates; the other ten
+(`check:html`/`check:lighthouse`/`check:reflow`/`check:landscape`/
+`check:text-zoom`/`check:print-width`/`check:target-size`/
+`check:text-spacing`/`check:focus-appearance`/`check:color-contrast`) are
+full-site Playwright/browser sweeps kept manual/intensive-run-only rather
+than a required PR gate, purely for their ~700-to-1,400-page-load runtime -
+re-run periodically (most recently Run 260) rather than on every change.
+`knip` shows exactly one standing false positive (`@cspell/dict-hr-hr`,
+used only via `.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS
+`import` knip's static analysis can see). Current counts (confirmed fresh
+this run): 1071 unit tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711
+pages built; 1055 Playwright e2e tests as of the last full cold-start run
+(Run 254).
 
 The content-verification rotation (re-check whichever content file has
-gone longest since its last `lastReviewed` bump) is now an ongoing loop
-rather than a one-off pass: the two-hundred-and-sixty-second run took its
-turn on `golden-boot.md` and `uefa-nations-league.md`, this time
-cross-checking several claims against live `WebSearch` results (not just
-each file's own tables) since both cover recent 2025/2026 events this
-session has direct search access to confirm independently - zero
-discrepancies found, both files' `lastReviewed` bumped to 2026-10-10. See
-`docs/PROJECT_STATUS.md`'s matching entry for the full per-claim
-breakdown. Every content file has now been reviewed at least once since
-the two-hundred-and-fifty-ninth run closed the full-coverage gap; a future
-run should keep picking the next-longest-stale file by `lastReviewed`.
+gone longest since its last `lastReviewed` bump, cross-checking claims
+against the file's own tables and, for recent events, live `WebSearch`
+results) is an ongoing loop, not a one-off pass - every content file has
+now been through it at least once, most within the last two days (see
+`content/*.md`'s own `lastReviewed` frontmatter for the current state). It
+has found two real bugs so far (a `glossary.md` "third and fourth place"
+overgeneralization, and a `glossary.md` "host" entry that had the FIFA
+World Cup/UEFA EURO automatic-host-place rule backwards) - a future run
+should keep picking the next-longest-stale file.
 
-The quiz's generated question-type surface now covers every generated
-`/records` ranking (titles, awards, hosts, biggest final margins,
-back-to-back streaks, longest title gaps, per-competition and
-cross-competition rivalries, nearly-champions/nearly-finalists, and
-home-soil titles) - no further untried `/records` ranking remains as a
-quiz-question candidate. WCAG 2.2 AA 2.4.11 "Focus Not Obscured" has been
-audited across all three sticky-overlay contexts and found already-compliant
-(two-hundred-and-twentieth run), with a permanent regression suite now
-guarding it. The front-to-back prose-vs-table content-verification pass has
-now been applied to every one of the six competition/award content files at
-least twice, all within the last eight days as of the two-hundred-and-
-fifty-eighth run (`fifa-world-cup.md`/`uefa-euro.md` in the two-hundred-and-
-fifty-seventh run, first done in the two-hundred-and-eighth run;
-`ballon-dor.md`/`copa-america.md` in the two-hundred-and-fifty-eighth run,
-first done in the two-hundred-and-fifth through -seventh runs;
-`golden-boot.md`/`uefa-nations-league.md` in the two-hundred-and-
-fifty-fifth and two-hundred-and-twenty-second runs respectively) - full
-coverage reached twice over, no bugs found in the last four passes. The
-two-hundred-and-fifty-seventh run's pass on `fifa-world-cup.md`/
-`uefa-euro.md` also checked, for the first time, their two genuine
-cross-file facts (the 2024 EURO-winning manager's and the 2012
-EURO-winning captain's World Cup record) directly against the target file
-rather than trusting the citing file's own claim - both correct. The
-two-hundred-and-fifty-ninth run then closed the last remaining gap for
-this technique: `quiz.md` and `compare-players.md` (the only two content
-files no run had yet applied it to - run 244's own batch pass had in fact
-already covered `about-sources.md`/`compare-countries.md`/
-`records-and-timelines.md`/`teams.md`/`players.md`, contrary to the stale
-"never yet" this file previously claimed for those five; run 244's own
-`docs/PROJECT_STATUS.md` entry says so directly) were read front-to-back
-and every checkable claim (quiz question-type descriptions against
-`src/lib/quiz.ts`'s actual generator logic and UI copy; the two compare
-pages' award-source descriptions against `src/pages/compare-players.astro`/
-`teams.ts`/`comparePlayers.ts`) cross-checked against the code and content
-it describes - zero discrepancies, and the other five got a fresh
-re-confirmation pass in the same run for good measure, also zero
-discrepancies. Every content file on the site has now had this technique
-applied at least once with a clean result. A future run should treat this
-as an ongoing rotation (re-check the longest-`lastReviewed`-stale file each
-time) rather than a one-off backlog item.
-extended past hand-written prose to a generated/derived page for the first
-time: `/records`' 40 build-time-computed rankings are independently
-recomputed from `content/*.md` and cross-checked against the page's own
-JSON-LD by the new `scripts/check-records-against-source.mjs`
-(two-hundred-and-twenty-third run), wired into CI as a permanent PR gate -
-zero discrepancies found. The two-hundred-and-twenty-fourth run extended the
-same technique to `/teams/<slug>`'s per-team appearance lists and title
-counts (`scripts/check-team-profiles-against-source.mjs`, zero discrepancies),
-the two-hundred-and-twenty-fifth run extended it again to `/players/<slug>`'s
-per-award appearance lists (`scripts/check-player-profiles-against-
-source.mjs`, zero discrepancies), and the two-hundred-and-twenty-sixth run
-closed the last gap: `/compare`/`/compare-players` have no per-pair JSON-LD
-(the pair is chosen at request time via URL params), so the new
-`scripts/check-compare-against-source.mjs` instead diffs an independent
-recomputation against the `records`/`finalsMeetings` data the page itself
-embeds as JSON for its default pair and client-side picker - zero
-discrepancies across 40 teams and 98 players. Every generated/derived page
-now has its own independent-recomputation guard; this technique's backlog
-item is fully closed. A performance angle -
-profiling for a genuinely new optimization, not re-confirming the existing
-implementation's `check:lighthouse`/`check:perf` scores - remains open; the
-two-hundred-and-twenty-third run looked again (bundle sizes already tiny
-with no web fonts/images, `check:lighthouse` already a perfect
-1.00/1.00/1.00/1.00, the team/player search index already fetched lazily on
-first focus) and found no further low-hanging fruit. The two-hundred-and-
-twenty-ninth run added the last missing site-wide regression guard in this
-family: every prior 44px touch-target check was a hand-written assertion on
-one specific component, so `scripts/check-target-size.mjs` (`pnpm
-check:target-size`) now sweeps every button/select/input/`role="button"`
-on all 711 pages against AGENTS.md's 44px floor in one pass - clean on its
-first run. The two-hundred-and-thirtieth run closed a real gap in the
-site's offline-reading story instead: the global team/player search
-widgets in `Nav.astro` fetch `/team-index.json`/`/player-index.json`
-lazily on first focus rather than on page load, and `src/lib/
-offlineCache.ts`'s install-time precache list never included either file -
-so a reader who opened the (already-precached) home page offline and then
-tried search for the first time got the widget's error state instead of
-results, since the service worker's generic fetch handler only caches a
-same-origin GET after it has succeeded once online. Both index files are a
-few KB each, now added to `STATIC_ASSETS` alongside the icons/manifest
-(`CACHE_VERSION` bumped to `v5` so existing installs pick up the change),
-with a new unit test and a new `tests/e2e/mobile.spec.ts` offline-first-use
-test guarding it. The two-hundred-and-thirty-fifth run closed a genuinely
-untested accessibility axis: `check:reflow`/`check:text-zoom`/
-`check:print-width` stress a page's *viewport width*, *root font-size* and
-*print media* respectively, but nothing had ever stress-tested WCAG 2.1 SC
-1.4.12 Text Spacing's own four spacing minimums (1.5x line-height, 2x
-paragraph spacing, 0.12x letter-spacing, 0.16x word-spacing) - a distinct
-failure mode (a fixed-height container or overflow:hidden rule sized for
-single-line text can clip once spacing grows, independent of font-size or
-viewport width) that none of the three existing sweeps could have caught.
-The new `scripts/check-text-spacing.mjs` (`pnpm check:text-spacing`, manual/
-intensive-run-only like its three siblings) swept all 711 pages - clean on
-its first run, no bug found. The two-hundred-and-thirty-sixth run closed
-another such gap: WCAG 2.2 SC 2.4.13 Focus Appearance (whether every
-focusable control actually renders a visible ring once focused - the same
-criterion a past missing-`summary`-selector bug violated) had no sweep of
-its own either; the new `scripts/check-focus-appearance.mjs` (`pnpm
-check:focus-appearance`, same manual/intensive-run-only tier, checks the
-structural precondition only - a real non-zero outline/box-shadow exists -
-not pixel-level contrast) found zero controls missing a ring across all 711
-pages. The two-hundred-and-thirty-eighth run closed a gap in the test
-suite itself rather than the site: AGENTS.md rule 9's shareable-filter
-contract had only ever been tested in the "selecting a filter updates the
-URL" direction - the opposite, equally load-bearing direction ("loading a
-URL that already carries a filter restores that view with no clicks," the
-whole point of a shared link) had no test at all, including the specific
-two-table-namespace-collision case `TournamentTable.astro`'s own
-`paramPrefix` prop exists to prevent. The new `tests/e2e/
-filter-url-restore.spec.ts` (six tests) closes it - no bug found, the
-existing restore logic already worked correctly. Runs 241-243 each
-independently re-confirmed the backlog genuinely exhausted; run 244 then
-applied the front-to-back prose-vs-table read (previously only used on the
-six flagship competition/award files) to the site's smaller content files
-for the first time since run 211, and found a real one:
-`content/glossary.md`'s "third and fourth place" entry wrongly claimed a
-separate match always decides those places for the FIFA World Cup, UEFA
-Nations League, and Copa América - false for the World Cup's 1930 edition
-and several Copa América eras, both already documented on their own pages.
-Fixed; no further untried file of that kind remains. Runs 245-248 then each
-made a real but narrower change (stale `lastReviewed` dates, the
-claim-verification-ledger bullets-only fix, and two dependency bumps
-including `astro` itself) without re-running the ten manual/intensive-run-
-only full-site browser sweeps those changes could in principle have
-affected; the two-hundred-and-forty-ninth run closed that gap, re-running
-all ten (`check:html`/`check:lighthouse`/`check:reflow`/`check:landscape`/
-`check:text-zoom`/`check:print-width`/`check:target-size`/
-`check:text-spacing`/`check:focus-appearance`/`check:color-contrast`)
-fresh against the current build - zero violations, so the sweep baseline is
-now current again. Runs 250/251/256/257/258/259/260 kept the
-content-verification rotation and the manual-sweep baseline current; the
-two-hundred-and-sixty-first run's own turn in that rotation
-(`content/index.md`, `content/glossary.md`) found a second real bug of the
-same kind run 244 found: the glossary's "host" entry claimed hosting never
-grants an automatic tournament place, which is backwards for the FIFA World
-Cup (host nations have had a guaranteed place without qualifying for most of
-the competition's history, reconfirmed for 2026's three co-hosts) and for
-most single/dual-host UEFA EURO editions - only the UEFA Nations League
-Finals, whose host is chosen only from among teams that already won their
-qualifying group, actually matched the old wording. Fixed with a
-competition-specific rewrite instead of one blanket rule. See "Open backlog"
-and "Ideas not yet scoped" below for everything else still open. For the
-full run-by-run history behind all of this, see `docs/PROJECT_STATUS.md`.
+Every generated/derived page has its own independent-recomputation guard,
+wired into CI, that cross-checks its output against `content/*.md` rather
+than trusting the page's own rendering: `/records` (`check-records-against-
+source.mjs`), `/teams/<slug>` (`check-team-profiles-against-source.mjs`),
+`/players/<slug>` (`check-player-profiles-against-source.mjs`), and
+`/compare`/`/compare-players` (`check-compare-against-source.mjs`) - zero
+discrepancies found by any of them since they shipped. The quiz's generated
+question-type surface covers every `/records` ranking; no further untried
+ranking remains as a quiz-question candidate. A performance pass
+(`check:lighthouse` already 1.00/1.00/1.00/1.00, bundle sizes already tiny
+with no web fonts/images) has found no further low-hanging fruit. See "Open
+backlog" and "Ideas not yet scoped" below for everything still open. For
+the full run-by-run history behind all of this, see
+`docs/PROJECT_STATUS.md`.
 
 ## Open backlog
 
