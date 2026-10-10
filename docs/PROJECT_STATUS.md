@@ -37642,3 +37642,103 @@ gaps) - this run deliberately did not re-retry any of them today since
 each was already re-tried within the last one to two runs with no new
 result. Whoever reads this next should watch `docs/ROADMAP.md`'s "Status"
 section for a fourth recurrence of the drift this run fixed.
+
+### Run 264 (2026-10-10): re-ran the overdue ten-script manual browser sweep, found and fixed a real bug it hit along the way, 9/10 sweeps reconfirmed clean - `check:color-contrast` inconclusive (too slow in this container, not failing)
+
+**Why this run picked the sweep:** Run 263 closed with every "Open backlog"
+item either environment-blocked or not due yet, and all 15 `content/*.md`
+files already reviewed within the prior day, so a fresh content-
+verification pass would just re-check files confirmed fresh yesterday. The
+ten manual/intensive-run-only browser sweeps (`check:html`/
+`check:lighthouse`/`check:reflow`/`check:landscape`/`check:text-zoom`/
+`check:print-width`/`check:target-size`/`check:text-spacing`/
+`check:focus-appearance`/`check:color-contrast`) were last run in full at
+Run 260, so this run picked that up as its quality-pass work instead.
+
+**What it found:** running `check:html`, `check:reflow`, `check:landscape`,
+`check:text-zoom`, `check:print-width`, `check:target-size`,
+`check:text-spacing`, and `check:focus-appearance` sequentially all passed
+cleanly (711 pages, zero violations each). Running `check:lighthouse`
+*concurrently* with a looped background run of the others - a mistake this
+run made, not a site bug - crashed `check:lighthouse` with an opaque
+`TypeError: Cannot read properties of null (reading 'toFixed')`, because
+all of these scripts share one `astro preview` daemon on one port via
+`scripts/preview-daemon.mjs`, and one script's `stopPreviewDaemon()` call
+killed the other's server mid-sweep, which made Lighthouse return a `null`
+category score for whichever page was in flight. Confirmed the root cause
+by re-running `check:lighthouse` alone afterward, which passed cleanly
+(see below) - the crash reproduced every time the scripts ran concurrently
+and never once when run sequentially.
+
+**What this run shipped:** two small fixes to the diagnostic tooling
+itself (not the site), both in `scripts/`:
+- `check-lighthouse.mjs`'s `auditPage()` now checks for a `null` category
+  score immediately and throws a clear error naming the page/URL and the
+  likely cause (page failed to load, often a concurrently-run `check:*`
+  script sharing the preview daemon), instead of letting `null` reach a
+  `.toFixed(2)` call several lines later in `main()` and crash with an
+  unhelpful `TypeError`.
+- `preview-daemon.mjs`'s own header comment - which already documented a
+  *sequential* start/stop race between these scripts and its fix - now also
+  documents that running two of them *concurrently* is a different, still-
+  open hazard that fix doesn't cover: they share one daemon on one port, so
+  either script's own start/stop call can kill the other's server mid-sweep.
+  Not fixed (these scripts are intensive-run-only tooling never run
+  concurrently by CI, and serializing them would need a cross-process lock
+  this repo's own scripts have never needed before), just named clearly so
+  a future run doesn't lose time re-diagnosing the same thing from scratch.
+
+Both changes are `scripts/` only, covered by this run's `pnpm lint`/
+`pnpm test`/`pnpm build`, and don't touch `content/*.md` or
+`src/pages/hr/**`, so `check:pdfs`/`build:pdfs` weren't required.
+
+**Full sweep results, run strictly sequentially after the mistake above:**
+- `check:html`: 711 pages, valid HTML5, zero markup-validity violations.
+- `check:reflow`: 711 pages, zero horizontal overflow at 320px.
+- `check:landscape`: 711 pages, zero horizontal overflow at 667x375.
+- `check:text-zoom`: 711 pages, zero horizontal overflow at 200% text zoom.
+- `check:print-width`: 711 pages, zero horizontal overflow in print media
+  at 1032px.
+- `check:target-size`: 711 pages, every touch-facing control >= 44x44px at
+  360px.
+- `check:text-spacing`: 711 pages, zero horizontal overflow at WCAG 1.4.12
+  text spacing.
+- `check:focus-appearance`: 711 pages, every focusable control has a
+  visible focus ring >= 2px (WCAG 2.4.13).
+- `check:lighthouse`: 39 pages, all four categories (performance/
+  accessibility/best-practices/seo) at a perfect 1.00, except the one
+  known/expected 404-page `seo` exception (0.63, noindex-driven, already
+  excluded by `EXPECTED_SEO_EXCEPTIONS`). The fix above held up cleanly
+  through this full run with no crash.
+- `check:color-contrast`: **inconclusive, not failing.** This is the
+  heaviest sweep (1,422 page loads - every page in both color schemes) and
+  it was still running, with the Chromium renderer process actively
+  consuming CPU and visibly progressing (different renderer PIDs appearing
+  over successive checks, steady CPU accumulation), past the 30-minute
+  background-task allowance this run gave it. Rather than guess at a result,
+  it was killed and left unconfirmed this round instead of reported as
+  passing or failing. All nine other sweeps - including other axe-core/
+  Playwright-driven checks at the same 711-page, both-theme scale - ran at
+  normal speed in this exact container in the same session, so this looks
+  like `check:color-contrast` itself being slow here (more DOM/CSS
+  computation per page than a pure layout-overflow check, times 1,422 page
+  loads) rather than a hang or a real regression, but that is not confirmed.
+  Added as a dedicated "Open backlog" item rather than silently dropped:
+  the next run should give it the full 2-hour background budget before
+  concluding anything either way.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean, `pnpm outdated`
+unchanged - only the same blocked `typescript` 7 line), `pnpm lint` (263
+files, 0/0/0), `pnpm test` (1071/1071), `pnpm build` (711 pages) all clean,
+both before and after the `scripts/` fix. A fresh `WebFetch` to
+`en.wikipedia.org` for the `docs/SOURCES.md` link-liveness item again
+failed (`ENOTFOUND`) - still blocked, no change.
+
+**Left for a future pass:** `check:color-contrast` needs a real re-run with
+a longer time allowance to actually confirm one way or the other (see
+`docs/ROADMAP.md`'s new "Open backlog" entry). Everything else is
+unchanged from Run 263's list: the environment-blocked/human-sign-off
+items (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand call), the Nations League Best XI/attendance gaps, the full
+~130-winner birth-date ranking, and the 2026 Ballon d'Or ceremony (26
+October 2026, now 16 days away).

@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (263 intensive runs as of 2026-10-10) lives
+verification sweep and decision (264 intensive runs as of 2026-10-10) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -84,7 +84,12 @@ into `.github/workflows/ci.yml` as required PR gates; the other ten
 `check:text-spacing`/`check:focus-appearance`/`check:color-contrast`) are
 full-site Playwright/browser sweeps kept manual/intensive-run-only rather
 than a required PR gate, purely for their ~700-to-1,400-page-load runtime -
-re-run periodically (most recently Run 260) rather than on every change.
+re-run periodically (most recently Run 264: 9 of 10 clean; `check:color-
+contrast` alone - the heaviest, 1,422 page loads - ran over 30 minutes
+without finishing in this session's container and was killed rather than
+re-run with a longer allowance, so it's unconfirmed this round rather than
+failing; a future run should give it up to the 2-hour background budget
+before concluding anything's actually wrong) rather than on every change.
 `knip` shows exactly one standing false positive (`@cspell/dict-hr-hr`,
 used only via `.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS
 `import` knip's static analysis can see). Current counts (confirmed fresh
@@ -120,6 +125,16 @@ the full run-by-run history behind all of this, see
 
 ## Open backlog
 
+- **`check:color-contrast` re-confirmation**: unconfirmed, not failing. Run
+  264 tried to re-run all ten manual browser sweeps and got clean results on
+  nine; `check:color-contrast` (1,422 page loads, the heaviest sweep) was
+  still running past the 30-minute background allowance that run gave it and
+  was killed rather than left to finish, so this round has no result for it
+  either way. The other nine sweeps' own axe-core/Playwright machinery ran
+  fine at normal speed in the same container, so this looks like this one
+  script being slow in this session rather than a hang - but that's not
+  confirmed. Next run: give it the full 2-hour background budget before
+  concluding anything (good or bad).
 - **2026 Ballon d'Or edition**: not due yet, not blocked. The two-hundred-
   and-forty-first run confirmed via `WebSearch` that the ceremony is
   scheduled for 26 October 2026 in London (its first time outside Paris) -
