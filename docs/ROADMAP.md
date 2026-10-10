@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (259 intensive runs as of 2026-10-09) lives
+verification sweep and decision (260 intensive runs as of 2026-10-10) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -99,9 +99,10 @@ confirmation (1049/1049) from twenty runs earlier. All ten manual/
 intensive-run-only browser sweeps (`check:html`/`check:lighthouse`/
 `check:reflow`/`check:landscape`/`check:text-zoom`/`check:print-width`/
 `check:target-size`/`check:text-spacing`/`check:focus-appearance`/
-`check:color-contrast`) remain current as of the two-hundred-and-fifty-sixth
-run (see `docs/PROJECT_STATUS.md`'s matching entries for the full
-writeups); most runs
+`check:color-contrast`) were re-run fresh by the two-hundred-and-sixtieth
+run (2026-10-10, four runs after the two-hundred-and-fifty-sixth run's own
+pass) - zero violations, baseline current again (see `docs/
+PROJECT_STATUS.md`'s matching entries for the full writeups); most runs
 still re-run just the two quiz-specific e2e specs
 (`accessibility-quiz-states.spec.ts`, `no-js-quiz-and-search.spec.ts`, 14
 tests) when their own change was a quiz markup/behavior change, which is

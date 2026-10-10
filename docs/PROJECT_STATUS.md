@@ -37317,3 +37317,73 @@ since its last pass - rather than hunting for a next untried file, and
 should also re-run the ten manual/intensive-run-only browser sweeps once
 enough runs accumulate since Run 256 (three runs so far, same as Run 249's
 own gap-closing cadence).
+
+### Run 260 (2026-10-10): picked up the two items Run 259 left open - the `@types/node` patch bump and the overdue ten-script manual browser sweep re-run - both clean
+
+With the content-verification rotation itself fully caught up as of Run
+259 (all thirteen content files confirmed clean within the last two runs),
+this run worked through the two concrete items Run 259's own "Left for a
+future pass" note named: the one new non-blocking dependency update, and
+the ten manual/intensive-run-only full-site browser sweeps, overdue since
+Run 256 (four runs' gap by this run, one more than the three-run gap Run
+249 itself closed).
+
+**Dependency bump:** `pnpm outdated` showed exactly one actionable entry -
+`@types/node` 26.6.4 -> 26.6.5, a dev-only `@types/node` patch release.
+`typescript` 7 remains blocked by `@astrojs/check@0.9.10`'s
+`typescript: '^5.0.0 || ^6.0.0'` peer-dependency range (re-confirmed this
+run, no new `@astrojs/check` release). `pnpm update @types/node` bumped
+both `package.json` and `pnpm-lock.yaml`; `pnpm lint` (263 files, 0/0/0),
+`pnpm test` (1071/1071), and `pnpm build` (711 pages) all stayed clean
+afterward - a type-definitions-only patch, no runtime behavior to affect.
+
+**Browser sweeps:** before re-running them, re-confirmed `docs/
+SOURCES.md`'s link-liveness item is still genuinely blocked rather than
+assuming the four-run-old note: `WebFetch` to `en.wikipedia.org` this run
+returned `ENOTFOUND` at the DNS-resolution level (a different failure
+shape than Runs 257-259's `EGRESS_BLOCKED`, but the same practical
+outcome - no route to the host) - still blocked, no change. Then ran all
+ten manual sweeps (`check:html`, `check:lighthouse`, `check:reflow`,
+`check:landscape`, `check:text-zoom`, `check:print-width`,
+`check:target-size`, `check:text-spacing`, `check:focus-appearance`,
+`check:color-contrast`) fresh against the current build in one pass:
+
+- `check:html`: all 711 pages valid HTML5, no markup-validity violations.
+- `check:lighthouse`: all 39 sampled pages scored 1.00/1.00/1.00/1.00
+  (performance/accessibility/best-practices/SEO), except the one
+  already-known, bounded noindex exception (the bilingual 404 page's SEO
+  score, expected and excluded by `EXPECTED_SEO_EXCEPTIONS`).
+- `check:reflow`/`check:landscape`/`check:text-zoom`/`check:print-width`:
+  no horizontal overflow on any of 711 pages at 320px, 667x375 landscape,
+  200% text zoom, or 1032px print width respectively.
+- `check:target-size`: every touch-facing control on all 711 pages at
+  least 44x44px at 360px.
+- `check:text-spacing`: no horizontal overflow at WCAG 1.4.12's four
+  spacing minimums across all 711 pages.
+- `check:focus-appearance`: every focusable control on all 711 pages has
+  a visible focus ring of at least 2px (WCAG 2.4.13).
+- `check:color-contrast`: zero WCAG 1.4.3 violations across all 711 pages
+  in both color schemes (1,422 page loads).
+
+**Result: zero violations across all ten sweeps.** The full-site
+regression baseline from Run 256 holds four runs later with no drift.
+
+**Verification:** `pnpm install --frozen-lockfile`, `pnpm lint` (263
+files, 0/0/0), `pnpm test` (1071/1071, unchanged), `pnpm build` (711
+pages, clean) - all run once before the dependency bump's own
+re-verification and reused for the sweep pass, since neither the bump nor
+the sweeps touch `content/*.md` or any translated `src/pages/hr/**` page
+(no `pnpm build:pdfs`/`check:pdfs` needed this run). `pnpm audit` clean.
+`pnpm dlx knip --no-config-hints` unchanged (the one documented `@cspell/
+dict-hr-hr` false positive only).
+
+**Left for a future pass:** unchanged backlog - the EURO youngest-winner
+fact (still no converging source, six-plus runs deep); the same
+environment-blocked/human-sign-off items (`typescript` 7, `docs/
+SOURCES.md` link-liveness, the `long-title` brand-suffix call); the full
+~130-winner birth-date ranking; the 2026 Ballon d'Or ceremony (26 October
+2026, now 16 days away - not yet due); UEFA Nations League attendance for
+2021/2023/2025. The content-verification rotation Run 259 established
+should resume next: re-check whichever content file has gone longest
+since its last pass (by `lastReviewed` date) rather than re-sweeping
+everything again immediately.
