@@ -37387,3 +37387,87 @@ SOURCES.md` link-liveness, the `long-title` brand-suffix call); the full
 should resume next: re-check whichever content file has gone longest
 since its last pass (by `lastReviewed` date) rather than re-sweeping
 everything again immediately.
+
+### Run 261 (2026-10-10): resumed the content-verification rotation on `content/index.md` and `content/glossary.md` - found and fixed a real factual error in the glossary's "host" entry
+
+Picked the two longest-stale content files by `lastReviewed` (`index.md`,
+2026-10-01, untouched since Run 245; `glossary.md`, 2026-10-07, untouched
+since Run 246's claim-ledger-only pass) and read each front-to-back against
+the code/data it describes, per Run 259's established method.
+
+**`content/index.md`:** every checkable claim confirmed correct - the "four
+competitions, two awards" count matches the six competition/award pages
+live; the West Germany/Germany-only successor-grouping claim matches
+`src/lib/countries.ts`'s `SUCCESSOR_GROUPS` exactly (its own header comment
+says the same: "only the West Germany/Germany continuity is merged"); the
+"concise introduction/edition table/historical notes/champions summary/
+memorable facts/source links" page-contents bullet matches what
+`CompetitionView.astro` actually renders via `loadCompetition()`. No bug
+found; `lastReviewed` bumped to 2026-10-10.
+
+**`content/glossary.md`:** five of six entries checked out ("a.e.t."/"pens"
+match the exact shorthand `TournamentTable.astro`/`EditionView.astro` emit;
+"second winner" - the term the "runner-up" entry says this site never uses -
+does not appear anywhere in `content/` or `src/`, confirmed by grep; the
+EURO-1984-onward "semifinalist" framing and the World Cup/Nations League/
+Copa América "third and fourth place" framing with its 1930/Copa América
+exceptions both match each competition's own historical notes). The "host"
+entry did not: it claimed "Hosting does not grant an automatic spot in the
+tournament for most competitions covered here - a host still has to earn or
+qualify for its place the way any other team does." That's backwards for
+two of the four national-team competitions. Three independent `WebSearch`
+passes confirmed: the FIFA World Cup has given its host nation(s) an
+automatic finals place rather than requiring qualification for a very long
+stretch of its history, reconfirmed for the United States/Mexico/Canada's
+three-way hosting of 2026 (FIFA's own Council statement, reported by
+multiple outlets); UEFA's own bid rules guarantee the same for a single
+EURO host or two joint hosts (only breaking from that pattern for the
+planned four-co-host 2028 edition, confirmed by UEFA's May 2025 executive
+decision); the UEFA Nations League Finals is the one case the glossary's
+old wording actually fit - its host is chosen only from among the four
+teams that already won their qualifying group, confirmed across the
+2018-19/2022-23/2026-27 selection processes; Copa América sidesteps the
+question for most editions since CONMEBOL's ten members (who host almost
+every edition) all take part regardless of qualifying or hosting, with the
+two US-hosted exceptions (2016, 2024) handled by special arrangement rather
+than a blanket host rule.
+
+Rewrote the "host" entry to state the accurate, competition-specific
+picture instead of the one false blanket claim, cross-referencing each
+competition's own notes for specifics rather than re-deriving every
+historical exception inline. Also pruned `scripts/record-claims-ledger.json`'s
+now-stale entry for the old sentence (its presence had previously been
+treated, by Run 246's own pass, as confirmation the sentence was reviewed -
+but that pass only checked whether "most" named a specific record-holder,
+never the sentence's own football-history claim, which is how this sat
+wrong for an unknown number of runs before this one happened to read it
+front-to-back). `lastReviewed` bumped to 2026-10-10.
+
+**Verification:** re-ran all seven claim-ledger checkers
+(`check:record-claims`, `check:superlative-claims`, `check:ordinal-claims`,
+`check:since-claims`, `check:completeness-claims`,
+`check:one-of-only-claims`, `check:consecutive-claims`) plus `check:claims-hr`
+and `check:meta` - all clean, confirming the rewritten entry introduces no
+new unreviewed claim pattern. `pnpm lint` (263 files, 0/0/0), `pnpm test`
+(1071/1071), `pnpm build` (711 pages) all clean. Both edited files are
+`content/*.md`, so per this repo's own definition-of-done rebuilt the site
+and ran `pnpm build:pdfs` (using `PW_EXECUTABLE_PATH=/opt/pw-browsers/
+chromium-1194/chrome-linux/chrome` - this environment's installed Chromium
+build is older than what the currently-pinned `@playwright/test` expects by
+default) before `pnpm check:pdfs` (700/700 up to date) and
+`pnpm check:pdf-outline` (700/700 outlines match). `pnpm outdated` showed
+only the same long-blocked `typescript` 7 upgrade; `pnpm audit` clean;
+`pnpm dlx knip --no-config-hints` unchanged (the one documented `@cspell/
+dict-hr-hr` false positive only).
+
+**Left for a future pass:** the content-verification rotation continues -
+`uefa-nations-league.md` (2026-10-08) is now the longest-stale content file.
+Everything else from Run 260's own list is unchanged: the EURO
+youngest-winner fact (still no converging source, seven-plus runs deep,
+re-tried again this run with no new result); the environment-blocked/
+human-sign-off items (`typescript` 7, `docs/SOURCES.md` link-liveness, the
+`long-title` brand-suffix call); the full ~130-winner birth-date ranking;
+the 2026 Ballon d'Or ceremony (26 October 2026, 16 days away); UEFA Nations
+League attendance for 2021/2023/2025 and its Best XI gap for the same three
+editions (re-tried with fresh `WebSearch` queries this run, same negative
+result as every prior attempt).
