@@ -29,9 +29,9 @@ describe('extractRecordClaims', () => {
     ]);
   });
 
-  it('ignores non-bullet lines even when they contain a matching phrase', () => {
+  it('also catches a prose paragraph (not just a bullet) matching a trigger word', () => {
     const md = `This paragraph mentions a record fourth title in passing.\n`;
-    expect(extractRecordClaims(md)).toEqual([]);
+    expect(extractRecordClaims(md)).toEqual(['This paragraph mentions a record fourth title in passing.']);
   });
 
   it('extracts multiple matching bullets in document order, skipping non-matching ones', () => {

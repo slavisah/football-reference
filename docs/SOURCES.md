@@ -1479,6 +1479,30 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Final attendance, third re-investigation (added 2026-10-08, two-hundred-
+  and-fifty-first intensive run): re-attempted 2021/2023/2025 once more,
+  this time turning up a genuinely new source family the two prior attempts
+  hadn't surfaced - the German Football Association's own match database
+  (`datencenter.dfb.de`), independent of Wikipedia/UEFA/RFEF. It only covers
+  the 2025 final (Germany hosted that edition), but what it reports there is
+  informative: 75,000, marked "sold out" - a real number from a federation's
+  own data center, not a mirror of Wikipedia's 65,852. That's the opposite of
+  corroboration though: the two figures disagree by roughly 9,000, too wide a
+  gap to be the usual rounding/reporting variance between two sources
+  describing the same count (compare the already-documented 2023 conflict,
+  41,110 vs. 41,500, under 400 apart). Added as a precise, sourced "why this
+  one's still excluded" note in `content/uefa-nations-league.md` rather than
+  leaving 2025 looking like a plain unsourced gap the way 2021 still is.
+  2021 remains a single-source case (only Wikipedia's 31,511, still no
+  independent second domain found); datencenter.dfb.de has no entry for
+  that edition (Italy hosted, not Germany) or for 2019/2023. No change to
+  2023's already-documented conflict. All three stay out of the page:
+  - https://datencenter.dfb.de/datencenter/uefa-nations-league-endrunde/2024-2025/Finale/portugal-spanien-2391418
+  - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
+  - https://en.wikipedia.org/wiki/2021_UEFA_Nations_League_final
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Copa América
 
@@ -2862,6 +2886,37 @@ Primary sources should be preferred.
   - https://www.givemesport.com/88101605-who-is-the-oldest-ever-ballon-dor-winner/
   - https://www.oldest.org/sports/youngest-ballon-dor-winner/
   - https://www.oldest.org/sports/oldest-ballon-dor-winners/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Golden Boot youngest/oldest-ever winners (added 2026-10-06,
+  two-hundred-and-fortieth intensive run): three new bullets in
+  `content/golden-boot.md`'s "World Cup memorable moments"/"EURO memorable
+  moments" sections - the Golden Boot half of the "Youngest winner ranking"
+  idea `docs/ROADMAP.md`'s "Ideas not yet scoped" section had so far only
+  built for Ballon d'Or (two-hundred-and-thirteenth run). Verified each via
+  two independent WebSearch passes: Flórián Albert (Hungary) is the World
+  Cup Golden Boot's youngest-ever winner, one of 1962's six joint winners
+  at 20 years, 8 months, ahead of Thomas Müller's second-youngest 20 years,
+  10 months in 2010; Davor Šuker (Croatia) is its oldest-ever winner at 30
+  years, 196 days when he won outright in 1998; Cristiano Ronaldo
+  (Portugal) is the EURO Golden Boot's oldest-ever winner at 36 when he won
+  the 2020 edition (played in 2021), breaking a record that had stood for
+  37 years - consistent with Michel Platini's 1984 win (already on this
+  page's table) as the prior record-holder. A fourth fact, the EURO
+  Golden Boot's youngest-ever winner, was deliberately **not** added:
+  two separate WebSearch passes returned only vague, mutually inconsistent
+  synthesized answers (one naming Tomas Brolin/Milan Baroš at "age 22" with
+  no clear single record-holder, given EURO's many joint-winner editions)
+  that never converged on one sourced figure the way every other fact in
+  this entry did. **No discrepancies found (for the three facts actually
+  added):**
+  - https://sportsdigest.in/youngest-golden-boot-award-winners/195571/
+  - https://worldsoccertalk.com/world-cup/list-of-world-cup-golden-boot-winners-every-top-scorer-from-1930-to-present/
+  - https://www.si.com/soccer/2018/07/15/world-cup-golden-boot-award-winners-top-scorer-history
+  - https://briefly.co.za/sports/104632-ronaldo-shatters-37-year-record-after-winning-golden-boot-euro-2020-championship/
+  - https://yen.com.gh/sports/190306-ronaldo-shatters-37-year-record-after-winning-golden-boot-euro-2020-championship/
+  - https://onmanorama.com/sports/football/2021/07/12/european-championships-golden-boot-winners-list-ronaldo.html
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.

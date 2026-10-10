@@ -149,7 +149,7 @@ test.describe('World Cup page on a 360px phone', () => {
   });
 
   test('shows the last reviewed date and source links', async ({ page }) => {
-    await expect(page.locator('time[datetime="2026-09-11"]')).toBeVisible();
+    await expect(page.locator('time[datetime="2026-10-09"]')).toBeVisible();
     const sources = page.locator('.references__list a');
     await expect(sources.first()).toBeVisible();
     const count = await sources.count();
@@ -3334,7 +3334,7 @@ test.describe('Sources page on a 360px phone', () => {
 
   test('shows the review policy and a last reviewed date', async ({ page }) => {
     await expect(page.getByText('Historical team names are never rewritten')).toBeVisible();
-    await expect(page.locator('time[datetime="2026-07-29"]')).toBeVisible();
+    await expect(page.locator('time[datetime="2026-10-09"]')).toBeVisible();
   });
 
   test('is reachable from the nav and the footer', async ({ page }) => {
@@ -3371,7 +3371,7 @@ test.describe('Croatian sources page (/hr/about/sources) on a 360px phone', () =
     await expect(page.getByRole('heading', { name: 'Izvori i pravila provjere', level: 1 })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Izvori po natjecanjima' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Kako se provjeravaju izvori' })).toBeVisible();
-    await expect(page.locator('time[datetime="2026-07-29"]')).toBeVisible();
+    await expect(page.locator('time[datetime="2026-10-09"]')).toBeVisible();
   });
 
   test('groups source links by competition using the Croatian home-page names', async ({ page }) => {
@@ -3806,6 +3806,42 @@ test.describe('Installability and offline reading', () => {
     await context.setOffline(false);
     await cdp.detach();
   });
+
+  test('the global team-search and player-search widgets work offline on their very first use, not just after being fetched once online', async ({
+    page,
+    context,
+  }) => {
+    // Reproduces a real gap: Nav.astro's search widgets fetch /team-index.json
+    // and /player-index.json lazily on first focus (not on page load, to
+    // avoid an eager request every visitor pays for), and the service
+    // worker's generic fetch handler only caches a same-origin GET after it
+    // has succeeded once online - so a reader who opens the (precached) home
+    // page offline and tries search for the first time previously got the
+    // widget's error state, not results. offlineCache.ts's STATIC_ASSETS now
+    // precaches both index files on install so this works without ever
+    // having fetched them online first.
+    await page.goto('');
+    await page.evaluate(() => navigator.serviceWorker.ready);
+
+    await context.setOffline(true);
+    await openMenu(page);
+
+    await page.locator('#team-search-input').fill('Brazil');
+    await expect(page.locator('#team-search-listbox')).toBeVisible();
+    await expect(page.locator('#team-search-listbox [role="option"]').first()).toHaveText('Brazil');
+    await expect(page.locator('#team-search-status')).not.toHaveText(
+      (await page.locator('#team-search-input').getAttribute('data-error-label')) ?? '',
+    );
+
+    await page.locator('#player-search-input').fill('Messi');
+    await expect(page.locator('#player-search-listbox')).toBeVisible();
+    await expect(page.locator('#player-search-listbox [role="option"]').first()).toContainText('Messi');
+    await expect(page.locator('#player-search-status')).not.toHaveText(
+      (await page.locator('#player-search-input').getAttribute('data-error-label')) ?? '',
+    );
+
+    await context.setOffline(false);
+  });
 });
 
 test.describe('Primary nav stays in the current language', () => {
@@ -4035,6 +4071,61 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(body).toContain(`<loc>${SITE}/hr/competitions/golden-boot/euro/1996/</loc>`);
     expect(body).toContain(`hreflang="hr" href="${SITE}/hr/competitions/golden-boot/euro/1996/"`);
     expect(body).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
+  });
+
+  test('every page links to its own-language Atom feed for autodiscovery', async ({ page }) => {
+    await page.goto('competitions/world-cup');
+    await expect(
+      page.locator('link[rel="alternate"][type="application/atom+xml"]'),
+    ).toHaveAttribute('href', `${SITE}/feed.xml`);
+
+    await page.goto('hr/competitions/world-cup');
+    await expect(
+      page.locator('link[rel="alternate"][type="application/atom+xml"]'),
+    ).toHaveAttribute('href', `${SITE}/hr/feed.xml`);
+  });
+
+  test('feed.xml is a well-formed Atom feed of recently reviewed pages, newest first', async ({
+    page,
+  }) => {
+    const response = await page.request.get('/football-reference/feed.xml');
+    expect(response.ok()).toBe(true);
+    // The local static-file preview server serves this by extension rather
+    // than honoring feed.xml.ts's own Content-Type response header (the
+    // same quirk the sitemap.xml/robots.txt tests above already work
+    // around) - loosely asserting "xml" rather than the exact media type.
+    expect(response.headers()['content-type']).toContain('xml');
+    const body = await response.text();
+
+    expect(body).toContain('<feed xmlns="http://www.w3.org/2005/Atom">');
+    expect(body).toContain(`<link rel="self" href="${SITE}/feed.xml" />`);
+    expect(body).toContain(`<link rel="alternate" href="${SITE}/" />`);
+    // One entry per NAV_LINKS page with a content-collection id
+    // (src/lib/contentPages.ts's CONTENT_ID_BY_PATH) - 15 as of this test -
+    // plus one more for the newest edition of each of the seven edition-page
+    // route trees (`buildEditionFeedEntry()`, same file) - 22 total.
+    expect(body.match(/<entry>/g)?.length).toBe(22);
+    expect(body).toContain(`<link rel="alternate" href="${SITE}/records/" />`);
+    expect(body).toContain('<title>Records and Timelines</title>');
+
+    const updatedDates = [...body.matchAll(/<entry>[\s\S]*?<updated>([^<]*)<\/updated>/g)].map(
+      (match) => match[1],
+    );
+    const sorted = [...updatedDates].sort().reverse();
+    expect(updatedDates).toEqual(sorted);
+  });
+
+  test('hr/feed.xml carries Croatian entry titles and only Croatian page links', async ({
+    page,
+  }) => {
+    const response = await page.request.get('/football-reference/hr/feed.xml');
+    expect(response.ok()).toBe(true);
+    const body = await response.text();
+
+    expect(body.match(/<entry>/g)?.length).toBe(22);
+    expect(body).toContain(`<link rel="alternate" href="${SITE}/hr/records/" />`);
+    expect(body).toContain('<title>Rekordi</title>');
+    expect(body).not.toMatch(new RegExp(`href="${SITE}/(?!hr/)[^"]*"`));
   });
 
   async function jsonLdBlocks(page: import('@playwright/test').Page) {

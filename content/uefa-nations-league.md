@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 2018-19
 lastCompletedEdition: 2024-25
-lastReviewed: 2026-09-10
+lastReviewed: 2026-10-10
 status: verified
 ---
 
@@ -38,11 +38,11 @@ UEFA introduced the Nations League to replace many international friendlies with
 
 ## Final venues
 
-- All four teams that reach the Nations League Finals host a semifinal, but only one stadium in the host nation stages the final itself. A reported attendance figure is added only where it could be confirmed via two independent sources (2019 so far) - the other three editions' figures could not be reliably cross-checked and are left out rather than guessed.
+- All four teams that reach the Nations League Finals host a semifinal, but only one stadium in the host nation stages the final itself. A reported attendance figure is added only where it could be confirmed via two independent sources that actually converge (2019 so far) - the other three editions' figures are left out rather than guessed, either because only one source reports a figure at all (2021) or because the sources found disagree too much to treat as confirming the same count (2025, see below).
 - **2019:** Estádio do Dragão, Porto (Portugal) - a reported attendance of 43,199.
 - **2021:** San Siro, Milan (Italy).
 - **2023:** De Kuip, Rotterdam (Netherlands) - stepped in for the larger Johan Cruyff Arena in Amsterdam, which was unavailable because of a concert booking.
-- **2025:** Allianz Arena, Munich (Germany).
+- **2025:** Allianz Arena, Munich (Germany) - two sources were found for this final but disagree by roughly 9,000: one reports 65,852, another separately reports a rounded "sold out" figure of 75,000. That gap is too wide to treat as the usual rounding/reporting variance between two sources describing the same count, so no figure is reported here either.
 
 ## Player of the Finals winners
 

@@ -1,12 +1,29 @@
 import { describe, expect, it } from 'vitest';
-import { buildBiggestFinalMargins, buildChampionsSummary, buildEditions, buildHostsSummary } from '../../src/lib/editions';
+import {
+  buildBiggestFinalMargins,
+  buildChampionsSummary,
+  buildEditions,
+  buildHomeSoilTitles,
+  buildHostsSummary,
+  buildLongestStreaks,
+  buildLongestTitleGaps,
+  buildNearlyFinalists,
+  buildRunnerUpsWithoutTitle,
+} from '../../src/lib/editions';
 import { buildTimeline } from '../../src/lib/editions';
+import { buildFinalsMeetings, buildRivalries } from '../../src/lib/compare';
 import {
   biggestFinalMarginQuestion,
   championByYearQuestions,
   chronologicalOrderQuestions,
+  fiercestRivalryQuestion,
   hostByYearQuestions,
+  longestStreakQuestion,
+  longestTitleGapQuestion,
+  mostFrequentRivalryQuestion,
   mostTitlesQuestion,
+  nearlyChampionQuestions,
+  nearlyFinalistQuestions,
   runnerUpByYearQuestions,
   selectQuiz,
   topScorerByYearQuestions,
@@ -646,6 +663,116 @@ describe('mostTitlesQuestion', () => {
     );
     expect(teamQuestions[0].id).not.toBe(hostQuestions[0].id);
   });
+
+  it('asks "which team has won the most ... on home soil" for subject "home-soil", answered from buildHomeSoilTitles()', () => {
+    const homeSoilTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1917', 'Uruguay', 'Uruguay'],
+        ['1923', 'Uruguay', 'Uruguay'],
+        ['1924', 'Uruguay', 'Uruguay'],
+        ['1942', 'Uruguay', 'Uruguay'],
+        ['1921', 'Argentina', 'Argentina'],
+        ['1925', 'Argentina', 'Argentina'],
+        ['1929', 'Argentina', 'Argentina'],
+        ['1919', 'Brazil', 'Brazil'],
+        ['1922', 'Brazil', 'Brazil'],
+      ],
+    };
+    const homeSoilSummary = buildHomeSoilTitles(buildEditions(homeSoilTable));
+    const questions = mostTitlesQuestion(
+      homeSoilSummary,
+      'Copa América',
+      'copa-america',
+      'home-soil',
+    );
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe('Which team has won the most Copa América titles on home soil?');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('Uruguay');
+  });
+
+  it('builds a Croatian "most home-soil titles" prompt for subject "home-soil"', () => {
+    const homeSoilTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1917', 'Uruguay', 'Uruguay'],
+        ['1923', 'Uruguay', 'Uruguay'],
+        ['1924', 'Uruguay', 'Uruguay'],
+        ['1942', 'Uruguay', 'Uruguay'],
+        ['1921', 'Argentina', 'Argentina'],
+        ['1925', 'Argentina', 'Argentina'],
+        ['1929', 'Argentina', 'Argentina'],
+        ['1919', 'Brazil', 'Brazil'],
+        ['1922', 'Brazil', 'Brazil'],
+      ],
+    };
+    const homeSoilSummary = buildHomeSoilTitles(buildEditions(homeSoilTable));
+    const questions = mostTitlesQuestion(
+      homeSoilSummary,
+      'Copa América',
+      'copa-america',
+      'home-soil',
+      'hr',
+    );
+    expect(questions[0].prompt).toBe(
+      'Koja reprezentacija ima najviše naslova osvojenih na domaćem terenu na natjecanju Copa América?',
+    );
+  });
+
+  it('keeps "home-soil" ids distinct from "team" and "host" so all three can coexist for the same competition', () => {
+    const teamQuestions = mostTitlesQuestion(clearSummary, 'FIFA World Cup', 'world-cup', 'team');
+    const homeSoilTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1917', 'Uruguay', 'Uruguay'],
+        ['1923', 'Uruguay', 'Uruguay'],
+        ['1924', 'Uruguay', 'Uruguay'],
+        ['1942', 'Uruguay', 'Uruguay'],
+        ['1921', 'Argentina', 'Argentina'],
+        ['1925', 'Argentina', 'Argentina'],
+        ['1929', 'Argentina', 'Argentina'],
+        ['1919', 'Brazil', 'Brazil'],
+        ['1922', 'Brazil', 'Brazil'],
+      ],
+    };
+    const homeSoilQuestions = mostTitlesQuestion(
+      buildHomeSoilTitles(buildEditions(homeSoilTable)),
+      'FIFA World Cup',
+      'world-cup',
+      'home-soil',
+    );
+    expect(teamQuestions[0].id).not.toBe(homeSoilQuestions[0].id);
+  });
+
+  it('returns no question when there is a tie for first place among home-soil winners', () => {
+    const tiedHomeSoilTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1930', 'Uruguay', 'Uruguay'],
+        ['1934', 'Italy', 'Italy'],
+        ['1966', 'England', 'England'],
+      ],
+    };
+    const tiedHomeSoilSummary = buildHomeSoilTitles(buildEditions(tiedHomeSoilTable));
+    expect(
+      mostTitlesQuestion(tiedHomeSoilSummary, 'Test Cup', 'test', 'home-soil'),
+    ).toHaveLength(0);
+  });
+
+  it('returns no question when fewer than 3 distinct home-soil winners exist', () => {
+    const sparseHomeSoilTable: MarkdownTable = {
+      headers: ['Year', 'Host', 'Winner'],
+      rows: [
+        ['1930', 'Uruguay', 'Uruguay'],
+        ['1934', 'Uruguay', 'Uruguay'],
+        ['1966', 'England', 'England'],
+      ],
+    };
+    const sparseHomeSoilSummary = buildHomeSoilTitles(buildEditions(sparseHomeSoilTable));
+    expect(
+      mostTitlesQuestion(sparseHomeSoilSummary, 'Test Cup', 'test', 'home-soil'),
+    ).toHaveLength(0);
+  });
 });
 
 describe('biggestFinalMarginQuestion', () => {
@@ -732,6 +859,541 @@ describe('biggestFinalMarginQuestion', () => {
     };
     const noMargins = buildBiggestFinalMargins(buildEditions(noFinalColumnTable));
     expect(biggestFinalMarginQuestion(noMargins, 'Test Cup', 'test')).toHaveLength(0);
+  });
+});
+
+describe('longestStreakQuestion', () => {
+  const streakTable: MarkdownTable = {
+    headers: ['Year', 'Winner'],
+    rows: [
+      ['1990', 'Brazil'],
+      ['1991', 'Brazil'],
+      ['1992', 'Brazil'],
+      ['1993', 'Italy'],
+      ['1994', 'Italy'],
+      ['1995', 'Argentina'],
+      ['1996', 'Germany'],
+      ['1997', 'Germany'],
+    ],
+  };
+  const clearStreaks = buildLongestStreaks(buildEditions(streakTable));
+
+  it('asks a "longest streak" question with the longest-streak entry as the answer', () => {
+    const questions = longestStreakQuestion(clearStreaks, 'FIFA World Cup', 'world-cup');
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe(
+      'Which team had the longest run of consecutive FIFA World Cup titles?',
+    );
+    expect(questions[0].category).toBe('FIFA World Cup');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('Brazil');
+  });
+
+  it('never repeats a choice and stays within the 3-4 choice range', () => {
+    const questions = longestStreakQuestion(clearStreaks, 'FIFA World Cup', 'world-cup');
+    const [q] = questions;
+    expect(new Set(q.choices).size).toBe(q.choices.length);
+    expect(q.choices.length).toBeGreaterThanOrEqual(3);
+    expect(q.choices.length).toBeLessThanOrEqual(4);
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const a = longestStreakQuestion(clearStreaks, 'FIFA World Cup', 'world-cup');
+    const b = longestStreakQuestion(clearStreaks, 'FIFA World Cup', 'world-cup');
+    expect(a).toEqual(b);
+  });
+
+  it('uses "awards" wording for an individual-award subject, e.g. Ballon d\'Or', () => {
+    const questions = longestStreakQuestion(clearStreaks, "Ballon d'Or", 'ballon-dor', 'player');
+    expect(questions[0].prompt).toBe("Who had the longest run of consecutive Ballon d'Or awards?");
+  });
+
+  it('builds a Croatian prompt when locale is "hr", with the same answer as English', () => {
+    const enQuestions = longestStreakQuestion(clearStreaks, 'FIFA World Cup', 'world-cup', 'team', 'en');
+    const hrQuestions = longestStreakQuestion(clearStreaks, 'FIFA World Cup', 'world-cup', 'team', 'hr');
+    expect(hrQuestions[0].prompt).toBe(
+      'Koja reprezentacija ima najdulji niz uzastopnih naslova na natjecanju FIFA World Cup?',
+    );
+    expect(hrQuestions[0].choices[hrQuestions[0].answerIndex]).toBe(
+      enQuestions[0].choices[enQuestions[0].answerIndex],
+    );
+  });
+
+  it('combines the Croatian prompt with individual-award wording (hr + player)', () => {
+    const questions = longestStreakQuestion(clearStreaks, "Ballon d'Or", 'ballon-dor', 'player', 'hr');
+    expect(questions[0].prompt).toBe("Tko ima najdulji niz uzastopnih osvojenih nagrada Ballon d'Or?");
+  });
+
+  it('returns no question when there is a tie for the single longest streak', () => {
+    const tiedTable: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1990', 'Brazil'],
+        ['1991', 'Brazil'],
+        ['1993', 'Italy'],
+        ['1994', 'Italy'],
+        ['1996', 'Germany'],
+        ['1997', 'Germany'],
+      ],
+    };
+    const tiedStreaks = buildLongestStreaks(buildEditions(tiedTable));
+    expect(longestStreakQuestion(tiedStreaks, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when fewer than 3 distinct streaks exist', () => {
+    const sparse = clearStreaks.slice(0, 2);
+    expect(longestStreakQuestion(sparse, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when the competition has no back-to-back streak at all (e.g. UEFA Nations League)', () => {
+    const noStreakTable: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['2019', 'Portugal'],
+        ['2021', 'France'],
+        ['2023', 'Spain'],
+        ['2025', 'Germany'],
+      ],
+    };
+    const noStreaks = buildLongestStreaks(buildEditions(noStreakTable));
+    expect(longestStreakQuestion(noStreaks, 'Test Cup', 'test')).toHaveLength(0);
+  });
+});
+
+describe('longestTitleGapQuestion', () => {
+  const gapTable: MarkdownTable = {
+    headers: ['Year', 'Winner'],
+    rows: [
+      ['1930', 'Brazil'],
+      ['1950', 'Italy'],
+      ['1960', 'Germany'],
+      ['1980', 'Italy'],
+      ['1985', 'Germany'],
+      ['1990', 'Brazil'],
+    ],
+  };
+  const clearGaps = buildLongestTitleGaps(buildEditions(gapTable));
+
+  it('asks a "longest wait" question with the widest-gap entry as the answer', () => {
+    const questions = longestTitleGapQuestion(clearGaps, 'FIFA World Cup', 'world-cup');
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe('Which team waited the longest between FIFA World Cup titles?');
+    expect(questions[0].category).toBe('FIFA World Cup');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('Brazil');
+  });
+
+  it('never repeats a choice and stays within the 3-4 choice range', () => {
+    const questions = longestTitleGapQuestion(clearGaps, 'FIFA World Cup', 'world-cup');
+    const [q] = questions;
+    expect(new Set(q.choices).size).toBe(q.choices.length);
+    expect(q.choices.length).toBeGreaterThanOrEqual(3);
+    expect(q.choices.length).toBeLessThanOrEqual(4);
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const a = longestTitleGapQuestion(clearGaps, 'FIFA World Cup', 'world-cup');
+    const b = longestTitleGapQuestion(clearGaps, 'FIFA World Cup', 'world-cup');
+    expect(a).toEqual(b);
+  });
+
+  it('uses "awards" wording for an individual-award subject, e.g. Ballon d\'Or', () => {
+    const questions = longestTitleGapQuestion(clearGaps, "Ballon d'Or", 'ballon-dor', 'player');
+    expect(questions[0].prompt).toBe("Who waited the longest between Ballon d'Or awards?");
+  });
+
+  it('builds a Croatian prompt when locale is "hr", with the same answer as English', () => {
+    const enQuestions = longestTitleGapQuestion(clearGaps, 'FIFA World Cup', 'world-cup', 'team', 'en');
+    const hrQuestions = longestTitleGapQuestion(clearGaps, 'FIFA World Cup', 'world-cup', 'team', 'hr');
+    expect(hrQuestions[0].prompt).toBe(
+      'Koja je reprezentacija najdulje čekala na sljedeći naslov na natjecanju FIFA World Cup?',
+    );
+    expect(hrQuestions[0].choices[hrQuestions[0].answerIndex]).toBe(
+      enQuestions[0].choices[enQuestions[0].answerIndex],
+    );
+  });
+
+  it('combines the Croatian prompt with individual-award wording (hr + player)', () => {
+    const questions = longestTitleGapQuestion(clearGaps, "Ballon d'Or", 'ballon-dor', 'player', 'hr');
+    expect(questions[0].prompt).toBe("Tko je najdulje čekao na sljedeću nagradu Ballon d'Or?");
+  });
+
+  it('returns no question when there is a tie for the single longest wait', () => {
+    const tiedTable: MarkdownTable = {
+      headers: ['Year', 'Winner'],
+      rows: [
+        ['1930', 'Brazil'],
+        ['1950', 'Italy'],
+        ['1960', 'Germany'],
+        ['1975', 'Germany'],
+        ['1990', 'Brazil'],
+        ['2010', 'Italy'],
+      ],
+    };
+    const tiedGaps = buildLongestTitleGaps(buildEditions(tiedTable));
+    expect(tiedGaps.length).toBeGreaterThanOrEqual(3);
+    expect(longestTitleGapQuestion(tiedGaps, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when fewer than 3 distinct entries exist', () => {
+    const sparse = clearGaps.slice(0, 2);
+    expect(longestTitleGapQuestion(sparse, 'Test Cup', 'test')).toHaveLength(0);
+  });
+});
+
+describe('mostFrequentRivalryQuestion', () => {
+  const rivalryTable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'Runner-up'],
+    rows: [
+      ['1930', 'Argentina', 'Brazil'],
+      ['1934', 'Brazil', 'Argentina'],
+      ['1938', 'Argentina', 'Chile'],
+      ['1950', 'Chile', 'Argentina'],
+      ['1954', 'Brazil', 'Chile'],
+      ['1958', 'Chile', 'Brazil'],
+      ['1962', 'Argentina', 'Denmark'],
+      ['1966', 'Denmark', 'Argentina'],
+      ['1970', 'Argentina', 'Denmark'],
+    ],
+  };
+  const rivalryEditions = buildEditions(rivalryTable);
+  const clearRivalries = buildRivalries(
+    buildFinalsMeetings([{ title: 'Test Cup', slug: 'test', editions: rivalryEditions }]),
+  );
+
+  it('has the widest-meeting pair (Argentina vs Denmark, 3 meetings) as the clear leader', () => {
+    expect(clearRivalries.length).toBeGreaterThanOrEqual(3);
+    expect(clearRivalries[0].teamADisplayName).toBe('Argentina');
+    expect(clearRivalries[0].teamBDisplayName).toBe('Denmark');
+    expect(clearRivalries[0].meetings).toBe(3);
+  });
+
+  it('asks a "most frequent rivalry" question with the top pair as the answer', () => {
+    const questions = mostFrequentRivalryQuestion(clearRivalries, 'Test Cup', 'test');
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe('Which two teams have met each other the most times in Test Cup finals?');
+    expect(questions[0].category).toBe('Test Cup');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('Argentina vs Denmark');
+  });
+
+  it('never repeats a choice and stays within the 3-4 choice range', () => {
+    const [q] = mostFrequentRivalryQuestion(clearRivalries, 'Test Cup', 'test');
+    expect(new Set(q.choices).size).toBe(q.choices.length);
+    expect(q.choices.length).toBeGreaterThanOrEqual(3);
+    expect(q.choices.length).toBeLessThanOrEqual(4);
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const a = mostFrequentRivalryQuestion(clearRivalries, 'Test Cup', 'test');
+    const b = mostFrequentRivalryQuestion(clearRivalries, 'Test Cup', 'test');
+    expect(a).toEqual(b);
+  });
+
+  it('builds a Croatian prompt when locale is "hr", with the same answer as English', () => {
+    const enQuestions = mostFrequentRivalryQuestion(clearRivalries, 'Test Cup', 'test', 'en');
+    const hrQuestions = mostFrequentRivalryQuestion(clearRivalries, 'Test Cup', 'test', 'hr');
+    expect(hrQuestions[0].prompt).toBe(
+      'Koje su se dvije reprezentacije najčešće susrele u finalima natjecanja Test Cup?',
+    );
+    expect(hrQuestions[0].choices[hrQuestions[0].answerIndex]).toBe(
+      enQuestions[0].choices[enQuestions[0].answerIndex],
+    );
+  });
+
+  it('returns no question when there is a tie for the most frequent rivalry', () => {
+    const tiedTable: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up'],
+      rows: [
+        ['1930', 'Argentina', 'Brazil'],
+        ['1934', 'Brazil', 'Argentina'],
+        ['1938', 'Argentina', 'Chile'],
+        ['1950', 'Chile', 'Argentina'],
+        ['1954', 'Brazil', 'Chile'],
+        ['1958', 'Chile', 'Brazil'],
+      ],
+    };
+    const tiedRivalries = buildRivalries(
+      buildFinalsMeetings([{ title: 'Test Cup', slug: 'test', editions: buildEditions(tiedTable) }]),
+    );
+    expect(tiedRivalries.length).toBeGreaterThanOrEqual(3);
+    expect(mostFrequentRivalryQuestion(tiedRivalries, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when fewer than 3 distinct rivalries exist', () => {
+    const sparse = clearRivalries.slice(0, 2);
+    expect(mostFrequentRivalryQuestion(sparse, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when there are no qualifying rivalries at all', () => {
+    expect(mostFrequentRivalryQuestion([], 'Test Cup', 'test')).toHaveLength(0);
+  });
+});
+
+describe('fiercestRivalryQuestion', () => {
+  // Two separate "competitions" (unlike mostFrequentRivalryQuestion's own
+  // single-competition fixture above) - a pair that only meets once in each
+  // still counts as one combined rivalry, the cross-competition behavior
+  // this question type exists to ask about.
+  const compATable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'Runner-up'],
+    rows: [
+      ['1930', 'Argentina', 'Brazil'],
+      ['1934', 'Brazil', 'Argentina'],
+      ['1938', 'Argentina', 'Chile'],
+      ['1950', 'Chile', 'Argentina'],
+    ],
+  };
+  const compBTable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'Runner-up'],
+    rows: [
+      ['1962', 'Argentina', 'Denmark'],
+      ['1966', 'Denmark', 'Argentina'],
+      ['1970', 'Argentina', 'Denmark'],
+    ],
+  };
+  const crossRivalries = buildRivalries(
+    buildFinalsMeetings([
+      { title: 'Comp A', slug: 'comp-a', editions: buildEditions(compATable) },
+      { title: 'Comp B', slug: 'comp-b', editions: buildEditions(compBTable) },
+    ]),
+  );
+
+  it('has the widest-meeting pair (Argentina vs Denmark, 3 meetings, all from Comp B) as the clear leader', () => {
+    expect(crossRivalries.length).toBeGreaterThanOrEqual(3);
+    expect(crossRivalries[0].teamADisplayName).toBe('Argentina');
+    expect(crossRivalries[0].teamBDisplayName).toBe('Denmark');
+    expect(crossRivalries[0].meetings).toBe(3);
+  });
+
+  it('asks a cross-competition "fiercest rivalry" question with the top pair as the answer', () => {
+    const questions = fiercestRivalryQuestion(crossRivalries, 'test');
+    expect(questions).toHaveLength(1);
+    expect(questions[0].prompt).toBe(
+      'Which two national teams have met each other the most times across World Cup, EURO, Copa América and Nations League finals, combined?',
+    );
+    expect(questions[0].category).toBe('Fiercest rivalries');
+    expect(questions[0].choices[questions[0].answerIndex]).toBe('Argentina vs Denmark');
+  });
+
+  it('never repeats a choice and stays within the 3-4 choice range', () => {
+    const [q] = fiercestRivalryQuestion(crossRivalries, 'test');
+    expect(new Set(q.choices).size).toBe(q.choices.length);
+    expect(q.choices.length).toBeGreaterThanOrEqual(3);
+    expect(q.choices.length).toBeLessThanOrEqual(4);
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const a = fiercestRivalryQuestion(crossRivalries, 'test');
+    const b = fiercestRivalryQuestion(crossRivalries, 'test');
+    expect(a).toEqual(b);
+  });
+
+  it('builds a Croatian prompt when locale is "hr", with the same answer as English', () => {
+    const enQuestions = fiercestRivalryQuestion(crossRivalries, 'test', 'en');
+    const hrQuestions = fiercestRivalryQuestion(crossRivalries, 'test', 'hr');
+    expect(hrQuestions[0].prompt).toBe(
+      'Koje su se dvije reprezentacije najčešće susrele u finalima Svjetskog prvenstva, EURO-a, Copa Américe i Liga nacija zajedno?',
+    );
+    expect(hrQuestions[0].category).toBe('Najžešći rivaliteti');
+    expect(hrQuestions[0].choices[hrQuestions[0].answerIndex]).toBe(
+      enQuestions[0].choices[enQuestions[0].answerIndex],
+    );
+  });
+
+  it('returns no question when there is a tie for the most frequent cross-competition rivalry', () => {
+    const tiedCompBTable: MarkdownTable = {
+      headers: ['Year', 'Winner', 'Runner-up'],
+      rows: [
+        ['1962', 'Argentina', 'Denmark'],
+        ['1966', 'Denmark', 'Argentina'],
+      ],
+    };
+    const tiedRivalries = buildRivalries(
+      buildFinalsMeetings([
+        { title: 'Comp A', slug: 'comp-a', editions: buildEditions(compATable) },
+        { title: 'Comp B', slug: 'comp-b', editions: buildEditions(tiedCompBTable) },
+      ]),
+    );
+    expect(tiedRivalries.length).toBeGreaterThanOrEqual(3);
+    expect(fiercestRivalryQuestion(tiedRivalries, 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when fewer than 3 distinct rivalries exist', () => {
+    const sparse = crossRivalries.slice(0, 2);
+    expect(fiercestRivalryQuestion(sparse, 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when there are no qualifying rivalries at all', () => {
+    expect(fiercestRivalryQuestion([], 'test')).toHaveLength(0);
+  });
+});
+
+describe('nearlyChampionQuestions', () => {
+  // Three distinct champions (Uruguay, Italy, West Germany) and four distinct
+  // "lost a final, never won" teams (Hungary twice, Argentina, Czechoslovakia,
+  // Brazil) - one question per nearly-champion entry, unlike every "most X"
+  // question type above, which asks a single question per competition.
+  const nearlyChampionTable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'Runner-up'],
+    rows: [
+      ['1930', 'Uruguay', 'Argentina'],
+      ['1934', 'Italy', 'Czechoslovakia'],
+      ['1938', 'Italy', 'Hungary'],
+      ['1950', 'Uruguay', 'Brazil'],
+      ['1954', 'West Germany', 'Hungary'],
+    ],
+  };
+  const nearlyChampionEditions = buildEditions(nearlyChampionTable);
+  const champions = buildChampionsSummary(nearlyChampionEditions);
+  const nearlyChampions = buildRunnerUpsWithoutTitle(nearlyChampionEditions);
+
+  it('has 3 distinct champions and 4 distinct nearly-champions in the fixture', () => {
+    expect(champions).toHaveLength(3);
+    expect(nearlyChampions).toHaveLength(4);
+  });
+
+  it('produces one question per nearly-champion entry, each with a correct answer drawn from that list', () => {
+    const questions = nearlyChampionQuestions(nearlyChampions, champions, 'Test Cup', 'test');
+    expect(questions).toHaveLength(4);
+    const answers = questions.map((q) => q.choices[q.answerIndex]).sort();
+    expect(answers).toEqual(nearlyChampions.map((c) => c.displayName).sort());
+  });
+
+  it('draws every distractor from the champions list - teams that have actually won', () => {
+    const championNames = new Set(champions.map((c) => c.displayName));
+    const questions = nearlyChampionQuestions(nearlyChampions, champions, 'Test Cup', 'test');
+    for (const q of questions) {
+      const correct = q.choices[q.answerIndex];
+      expect(championNames.has(correct)).toBe(false);
+      for (const choice of q.choices) {
+        if (choice === correct) continue;
+        expect(championNames.has(choice)).toBe(true);
+      }
+    }
+  });
+
+  it('asks "which of these teams reached a final without ever winning" with the right category', () => {
+    const [q] = nearlyChampionQuestions(nearlyChampions, champions, 'Test Cup', 'test');
+    expect(q.prompt).toBe('Which of these teams has reached a Test Cup final without ever winning the title?');
+    expect(q.category).toBe('Test Cup');
+  });
+
+  it('never repeats a choice and stays within the 3-4 choice range', () => {
+    for (const q of nearlyChampionQuestions(nearlyChampions, champions, 'Test Cup', 'test')) {
+      expect(new Set(q.choices).size).toBe(q.choices.length);
+      expect(q.choices.length).toBeGreaterThanOrEqual(3);
+      expect(q.choices.length).toBeLessThanOrEqual(4);
+    }
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const a = nearlyChampionQuestions(nearlyChampions, champions, 'Test Cup', 'test');
+    const b = nearlyChampionQuestions(nearlyChampions, champions, 'Test Cup', 'test');
+    expect(a).toEqual(b);
+  });
+
+  it('builds a Croatian prompt when locale is "hr", with the same answers as English', () => {
+    const enQuestions = nearlyChampionQuestions(nearlyChampions, champions, 'Test Cup', 'test', 'en');
+    const hrQuestions = nearlyChampionQuestions(nearlyChampions, champions, 'Test Cup', 'test', 'hr');
+    expect(hrQuestions[0].prompt).toBe(
+      'Koja je od ovih reprezentacija igrala u finalu natjecanja Test Cup, ali ga nikad nije osvojila?',
+    );
+    const enAnswers = enQuestions.map((q) => q.choices[q.answerIndex]).sort();
+    const hrAnswers = hrQuestions.map((q) => q.choices[q.answerIndex]).sort();
+    expect(hrAnswers).toEqual(enAnswers);
+  });
+
+  it('returns no question for any entry when the champions pool has fewer than 2 distinct teams', () => {
+    const sparseChampions = champions.slice(0, 1);
+    expect(nearlyChampionQuestions(nearlyChampions, sparseChampions, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when there are no qualifying nearly-champions at all', () => {
+    expect(nearlyChampionQuestions([], champions, 'Test Cup', 'test')).toHaveLength(0);
+  });
+});
+
+describe('nearlyFinalistQuestions', () => {
+  // Reuses the same semifinal fixture shape as buildNearlyFinalists' own unit
+  // tests (tests/unit/editions.test.ts): 3 finals (3 champions, 3
+  // never-won runner-ups) and 5 distinct semifinal-only teams.
+  const nearlyFinalistTable: MarkdownTable = {
+    headers: ['Year', 'Winner', 'Runner-up', 'Third', 'Fourth'],
+    rows: [
+      ['1930', 'Uruguay', 'Argentina', 'United States', 'Yugoslavia'],
+      ['1962', 'Brazil', 'Czechoslovakia', 'Chile', 'Yugoslavia'],
+      ['1966', 'England', 'West Germany', 'Portugal', 'Soviet Union'],
+    ],
+  };
+  const nearlyFinalistEditions = buildEditions(nearlyFinalistTable);
+  const finalistChampions = buildChampionsSummary(nearlyFinalistEditions);
+  const finalistNearlyChampions = buildRunnerUpsWithoutTitle(nearlyFinalistEditions);
+  const finalists = [...finalistChampions, ...finalistNearlyChampions];
+  const nearlyFinalists = buildNearlyFinalists(nearlyFinalistEditions);
+
+  it('has 6 distinct finalists (3 champions + 3 never-won runners-up) and 5 distinct nearly-finalists', () => {
+    expect(finalists).toHaveLength(6);
+    expect(nearlyFinalists).toHaveLength(5);
+  });
+
+  it('produces one question per nearly-finalist entry, each with a correct answer drawn from that list', () => {
+    const questions = nearlyFinalistQuestions(nearlyFinalists, finalists, 'Test Cup', 'test');
+    expect(questions).toHaveLength(5);
+    const answers = questions.map((q) => q.choices[q.answerIndex]).sort();
+    expect(answers).toEqual(nearlyFinalists.map((f) => f.displayName).sort());
+  });
+
+  it('draws every distractor from the finalists list - teams that have reached a final, winner or runner-up', () => {
+    const finalistNames = new Set(finalists.map((f) => f.displayName));
+    const questions = nearlyFinalistQuestions(nearlyFinalists, finalists, 'Test Cup', 'test');
+    for (const q of questions) {
+      const correct = q.choices[q.answerIndex];
+      expect(finalistNames.has(correct)).toBe(false);
+      for (const choice of q.choices) {
+        if (choice === correct) continue;
+        expect(finalistNames.has(choice)).toBe(true);
+      }
+    }
+  });
+
+  it('asks "which of these teams reached a semifinal without ever reaching the final" with the right category', () => {
+    const [q] = nearlyFinalistQuestions(nearlyFinalists, finalists, 'Test Cup', 'test');
+    expect(q.prompt).toBe(
+      'Which of these teams has reached a Test Cup semifinal without ever reaching the final?',
+    );
+    expect(q.category).toBe('Test Cup');
+  });
+
+  it('never repeats a choice and stays within the 3-4 choice range', () => {
+    for (const q of nearlyFinalistQuestions(nearlyFinalists, finalists, 'Test Cup', 'test')) {
+      expect(new Set(q.choices).size).toBe(q.choices.length);
+      expect(q.choices.length).toBeGreaterThanOrEqual(3);
+      expect(q.choices.length).toBeLessThanOrEqual(4);
+    }
+  });
+
+  it('is deterministic across repeated calls', () => {
+    const a = nearlyFinalistQuestions(nearlyFinalists, finalists, 'Test Cup', 'test');
+    const b = nearlyFinalistQuestions(nearlyFinalists, finalists, 'Test Cup', 'test');
+    expect(a).toEqual(b);
+  });
+
+  it('builds a Croatian prompt when locale is "hr", with the same answers as English', () => {
+    const enQuestions = nearlyFinalistQuestions(nearlyFinalists, finalists, 'Test Cup', 'test', 'en');
+    const hrQuestions = nearlyFinalistQuestions(nearlyFinalists, finalists, 'Test Cup', 'test', 'hr');
+    expect(hrQuestions[0].prompt).toBe(
+      'Koja je od ovih reprezentacija igrala u polufinalu natjecanja Test Cup, ali nikad nije igrala u finalu?',
+    );
+    const enAnswers = enQuestions.map((q) => q.choices[q.answerIndex]).sort();
+    const hrAnswers = hrQuestions.map((q) => q.choices[q.answerIndex]).sort();
+    expect(hrAnswers).toEqual(enAnswers);
+  });
+
+  it('returns no question for any entry when the finalists pool has fewer than 2 distinct teams', () => {
+    const sparseFinalists = finalists.slice(0, 1);
+    expect(nearlyFinalistQuestions(nearlyFinalists, sparseFinalists, 'Test Cup', 'test')).toHaveLength(0);
+  });
+
+  it('returns no question when there are no qualifying nearly-finalists at all', () => {
+    expect(nearlyFinalistQuestions([], finalists, 'Test Cup', 'test')).toHaveLength(0);
   });
 });
 

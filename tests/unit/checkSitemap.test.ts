@@ -14,6 +14,7 @@ describe('parseSitemapUrls', () => {
     expect(parseSitemapUrls(xml)).toEqual([
       {
         loc: 'https://example.com/records/',
+        lastmod: '2026-08-01',
         alternates: [
           { hreflang: 'en', href: 'https://example.com/records/' },
           { hreflang: 'hr', href: 'https://example.com/hr/records/' },
@@ -24,7 +25,9 @@ describe('parseSitemapUrls', () => {
 
   it('parses a <url> entry with no alternates (no translation)', () => {
     const xml = '<urlset><url><loc>https://example.com/only-page</loc></url></urlset>';
-    expect(parseSitemapUrls(xml)).toEqual([{ loc: 'https://example.com/only-page', alternates: [] }]);
+    expect(parseSitemapUrls(xml)).toEqual([
+      { loc: 'https://example.com/only-page', lastmod: null, alternates: [] },
+    ]);
   });
 
   it('unescapes XML entities in <loc> and href values', () => {
@@ -57,7 +60,14 @@ describe('parsePageHead', () => {
         { hreflang: 'en', href: 'https://example.com/records/' },
         { hreflang: 'hr', href: 'https://example.com/hr/records/' },
       ],
+      ogUpdatedTime: null,
     });
+  });
+
+  it('extracts og:updated_time when present', () => {
+    const html =
+      '<html><head><meta property="og:updated_time" content="2026-08-15"></head></html>';
+    expect(parsePageHead(html).ogUpdatedTime).toBe('2026-08-15');
   });
 
   it('detects a noindex page', () => {
@@ -72,6 +82,7 @@ describe('parsePageHead', () => {
       canonical: null,
       noindex: false,
       alternates: [],
+      ogUpdatedTime: null,
     });
   });
 });

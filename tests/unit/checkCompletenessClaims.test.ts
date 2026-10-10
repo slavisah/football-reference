@@ -27,9 +27,9 @@ describe('extractCompletenessClaims', () => {
     expect(extractCompletenessClaims(md)).toEqual(['A pattern unbroken ACROSS ALL 23 EDITIONS.']);
   });
 
-  it('ignores non-bullet lines even when they contain a matching phrase', () => {
+  it('also catches a prose paragraph (not just a bullet) matching a completeness phrase', () => {
     const md = `This paragraph mentions a pattern across all 23 editions in passing.\n`;
-    expect(extractCompletenessClaims(md)).toEqual([]);
+    expect(extractCompletenessClaims(md)).toEqual(['This paragraph mentions a pattern across all 23 editions in passing.']);
   });
 
   it('does not match "every edition" phrasing that names an exception or a start year', () => {
