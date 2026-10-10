@@ -37553,3 +37553,92 @@ brand-suffix call); the full ~130-winner birth-date ranking; the 2026
 Ballon d'Or ceremony (26 October 2026, 16 days away); UEFA Nations League
 attendance for 2021/2023/2025 and its Best XI gap for the same three
 editions.
+
+### Run 263 (2026-10-10): third documentation-drift cleanup of `docs/ROADMAP.md`'s "Status" section, plus a full backlog/dependency/content re-confirmation - no new feature work, backlog genuinely exhausted this pass
+
+**Why this run shipped a cleanup rather than a feature:** every item in
+`docs/ROADMAP.md`'s "Open backlog" is either blocked on something outside
+this session's control (the `typescript` 7 peer-dependency ceiling, the
+egress-blocked `docs/SOURCES.md` link-liveness sweep, a human sign-off on
+the `long-title` brand call, exhausted research on the Nations League Best
+XI/attendance gaps) or not due yet (the 2026 Ballon d'Or ceremony, 16 days
+out). The "Ideas not yet scoped" EURO youngest-winner research has now been
+retried across eight-plus runs with the same negative result. All 15
+`content/*.md` files carry a `lastReviewed` date of 2026-10-09 or
+2026-10-10 - the content-verification rotation has fully caught up, so
+re-running it again today would just re-check files already confirmed
+fresh within the last day. `pnpm outdated` shows only the same
+long-blocked `typescript` line; `pnpm audit` and `pnpm dlx knip
+--no-config-hints` are both unchanged and clean. Per this routine's own
+instructions ("if the entire backlog is complete, do a genuinely useful
+quality pass instead"), this run looked for the highest-value quality work
+available rather than re-running checks that passed less than a day ago.
+
+**What it found:** `docs/ROADMAP.md`'s own header documents two prior
+"maintenance notes" (2026-09-20, Run 157; 2026-10-03, Run 221) for the
+exact same failure mode - runs appending their own "the two-hundred-and-Nth
+run..." narrative sentences to the "Status" section instead of writing
+*only* to this file, in direct violation of the rule stated in the file's
+own preceding paragraph. Both prior cleanups happened to catch the drift
+because it was marked with a bold "**Nth run:**" prefix; the third
+recurrence (Runs 222-262) used unprefixed prose instead, which is likely
+why it slipped past two intervening read-throughs and regrew the section
+to 224 lines of run-by-run narration - again directly inside the section
+whose own header forbids it.
+
+**What this run did:** rewrote `docs/ROADMAP.md`'s "Status" section down to
+a current-state-only summary (same facts, no per-run narration - counts
+re-verified fresh this run: `pnpm lint` 0/0/0 across 263 files, `pnpm test`
+1071/1071, `pnpm build` 711 pages, `pnpm check:links` 715 pages/zero broken
+links, `pnpm check:spelling` zero issues; corrected a stale "1060 unit
+tests" figure to the current 1071 in the same edit), added a third,
+more pointed maintenance note explaining why the first two restatements
+didn't hold, and corrected the file's own stale "260 intensive runs" count
+to 263. The "Open backlog"/"Ideas not yet scoped" sections were left as-is
+- their per-item run-history context is load-bearing (it's what lets a
+future run tell "re-tried and still negative" apart from "never tried"),
+unlike the "Status" section's pure progress narration.
+
+**A gap this run could not close on its own:** the file's rule-restatement
+approach has now failed twice in slightly different ways (prefixed drift,
+then unprefixed drift) despite both being individually fixed and
+re-explained. This run found no automated guard (e.g., a CI check on
+`docs/ROADMAP.md`'s line count, or a linter rule) that would catch a fourth
+recurrence before it regrows past a few hundred lines again, and judged
+inventing one unattended as more likely to be its own source of false
+positives (e.g. a legitimate new backlog item growing the file) than a
+clear net win. Flagged in this run's push notification instead, since a
+third unprefixed recurrence of the same drift - after two prior fixes each
+confidently declared complete - is exactly the kind of pattern-level signal
+worth a human's attention rather than a fourth unattended prose fix.
+
+**Also worth noting for whoever reads this next:** this is intensive run
+263 of a routine that has now run continuously since 2026-07-29 (73 days)
+with every item from `AGENTS.md`'s original milestone list and
+`docs/WEBSITE_REQUIREMENTS.md` shipped for well over a hundred runs. Recent
+runs (241-263) are overwhelmingly re-confirmation passes, dependency patch
+bumps, and increasingly narrow research retries on two or three research
+gaps that keep coming back negative - genuinely the right behavior per
+this routine's own "quality pass" fallback instruction when there is
+nothing new to build, but worth surfacing explicitly in case the person
+running this routine wants to lower its frequency, narrow its mandate, or
+pause it now that its original scope is this thoroughly finished.
+
+**Verification:** `pnpm lint` (263 files, 0/0/0), `pnpm test` (1071/1071),
+`pnpm build` (711 pages), `pnpm check:links` (715 pages, zero broken
+links), `pnpm check:spelling` (zero issues) all clean. `pnpm install
+--frozen-lockfile`, `pnpm outdated` (only the same blocked `typescript` 7
+line), `pnpm audit` (no known vulnerabilities), and `pnpm dlx knip
+--no-config-hints` (the one documented `@cspell/dict-hr-hr` false positive
+only) all re-confirmed unchanged. No `content/*.md` or `src/pages/hr/**`
+file was touched this run, so `pnpm build:pdfs`/`check:pdfs` were not
+required per this repo's own definition-of-done.
+
+**Left for a future pass:** everything from Run 262's list is unchanged
+(the EURO youngest-winner fact; the environment-blocked/human-sign-off
+items; the full ~130-winner birth-date ranking; the 2026 Ballon d'Or
+ceremony, now 16 days out; UEFA Nations League attendance and Best XI
+gaps) - this run deliberately did not re-retry any of them today since
+each was already re-tried within the last one to two runs with no new
+result. Whoever reads this next should watch `docs/ROADMAP.md`'s "Status"
+section for a fourth recurrence of the drift this run fixed.
