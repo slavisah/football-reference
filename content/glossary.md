@@ -1,7 +1,7 @@
 ---
 title: Glossary
 slug: glossary
-lastReviewed: 2026-10-07
+lastReviewed: 2026-10-10
 status: verified
 ---
 
@@ -51,10 +51,18 @@ historical notes for the specifics.
 
 ## host
 
-The country, or countries, that staged a tournament. Hosting does not grant
-an automatic spot in the tournament for most competitions covered here - a
-host still has to earn or qualify for its place the way any other team
-does.
+The country, or countries, that staged a tournament. For the FIFA World Cup,
+the host nation (or nations - the United States, Mexico, and Canada for
+2026) is normally given a guaranteed place in the finals rather than having
+to qualify, and several UEFA EURO hosts have been granted the same guarantee
+- though not every UEFA EURO edition has worked that way, so check each
+competition's own notes rather than assuming one rule fits every tournament.
+The UEFA Nations League Finals is the clearest exception: UEFA only ever
+chooses its host from among the four teams that have already won their
+qualifying group, so hosting that four-team event is never a substitute for
+qualifying. Copa América mostly sidesteps the question, since CONMEBOL's ten
+member nations - who host nearly every edition - take part regardless of who
+is hosting.
 
 ## confederation
 

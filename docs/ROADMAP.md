@@ -238,9 +238,20 @@ all ten (`check:html`/`check:lighthouse`/`check:reflow`/`check:landscape`/
 `check:text-zoom`/`check:print-width`/`check:target-size`/
 `check:text-spacing`/`check:focus-appearance`/`check:color-contrast`)
 fresh against the current build - zero violations, so the sweep baseline is
-now current again. See "Open backlog" and "Ideas not yet scoped" below for
-everything else still open. For the full run-by-run history behind all of
-this, see `docs/PROJECT_STATUS.md`.
+now current again. Runs 250/251/256/257/258/259/260 kept the
+content-verification rotation and the manual-sweep baseline current; the
+two-hundred-and-sixty-first run's own turn in that rotation
+(`content/index.md`, `content/glossary.md`) found a second real bug of the
+same kind run 244 found: the glossary's "host" entry claimed hosting never
+grants an automatic tournament place, which is backwards for the FIFA World
+Cup (host nations have had a guaranteed place without qualifying for most of
+the competition's history, reconfirmed for 2026's three co-hosts) and for
+most single/dual-host UEFA EURO editions - only the UEFA Nations League
+Finals, whose host is chosen only from among teams that already won their
+qualifying group, actually matched the old wording. Fixed with a
+competition-specific rewrite instead of one blanket rule. See "Open backlog"
+and "Ideas not yet scoped" below for everything else still open. For the
+full run-by-run history behind all of this, see `docs/PROJECT_STATUS.md`.
 
 ## Open backlog
 
