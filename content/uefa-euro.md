@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-10-09
+lastReviewed: 2026-10-10
 status: verified
 ---
 
@@ -161,3 +161,4 @@ A third-place match was played through 1980. From 1984 onward, UEFA recognizes b
 - Spain became the first nation to retain the EURO title in 2012.
 - The delayed EURO 2020 was played in 2021 across multiple countries.
 - Spain won a record fourth title in 2024.
+- Lamine Yamal became the youngest-ever scorer in European Championship history at EURO 2024, aged 16 years and 362 days when he scored against France in the semi-final - breaking the record Johan Vonlanthen had held since Euro 2004 (18 years, 141 days).

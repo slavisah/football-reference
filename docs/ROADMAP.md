@@ -126,15 +126,25 @@ the full run-by-run history behind all of this, see
 ## Open backlog
 
 - **`check:color-contrast` re-confirmation**: unconfirmed, not failing. Run
-  264 tried to re-run all ten manual browser sweeps and got clean results on
-  nine; `check:color-contrast` (1,422 page loads, the heaviest sweep) was
-  still running past the 30-minute background allowance that run gave it and
-  was killed rather than left to finish, so this round has no result for it
-  either way. The other nine sweeps' own axe-core/Playwright machinery ran
-  fine at normal speed in the same container, so this looks like this one
-  script being slow in this session rather than a hang - but that's not
-  confirmed. Next run: give it the full 2-hour background budget before
-  concluding anything (good or bad).
+  265 found the likely root cause of the "slow"/killed runs in 260 and
+  264: this script's `browserType.launch()` call needs the
+  `chrome-headless-shell` build specifically, and this environment's
+  pre-installed Playwright browser cache only carries the regular
+  `chromium` binary (the one `scripts/check-reflow.mjs` etc. use) at a
+  revision the installed `@playwright/test` doesn't expect for headless-
+  shell, so the very first launch attempt was throwing immediately
+  (`browserType.launch: Executable doesn't exist`) - not hanging at all.
+  `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell.real`
+  (the `headless_shell.real` binary already present under that
+  pre-installed revision directory) launches cleanly. Run 265's own attempt
+  at a full re-run was then interrupted by its own mistake - running
+  `pnpm build:pdfs` concurrently in the same container, which shares the
+  same `astro preview` daemon/port and killed the sweep's server mid-run
+  (the exact concurrent-sweep hazard `scripts/preview-daemon.mjs`'s header
+  comment already documents) - so this is still not confirmed either way.
+  Next run: re-run with the `PW_EXECUTABLE_PATH` override above, alone, with
+  nothing else touching the preview daemon concurrently, and give it the
+  full 2-hour budget.
 - **2026 Ballon d'Or edition**: not due yet, not blocked. The two-hundred-
   and-forty-first run confirmed via `WebSearch` that the ceremony is
   scheduled for 26 October 2026 in London (its first time outside Paris) -
