@@ -109,6 +109,19 @@ tests) when their own change was a quiz markup/behavior change, which is
 judged sufficient per-run - see each run's own `docs/PROJECT_STATUS.md`
 entry for its own verification scope and rationale.
 
+The content-verification rotation (re-check whichever content file has
+gone longest since its last `lastReviewed` bump) is now an ongoing loop
+rather than a one-off pass: the two-hundred-and-sixty-second run took its
+turn on `golden-boot.md` and `uefa-nations-league.md`, this time
+cross-checking several claims against live `WebSearch` results (not just
+each file's own tables) since both cover recent 2025/2026 events this
+session has direct search access to confirm independently - zero
+discrepancies found, both files' `lastReviewed` bumped to 2026-10-10. See
+`docs/PROJECT_STATUS.md`'s matching entry for the full per-claim
+breakdown. Every content file has now been reviewed at least once since
+the two-hundred-and-fifty-ninth run closed the full-coverage gap; a future
+run should keep picking the next-longest-stale file by `lastReviewed`.
+
 The quiz's generated question-type surface now covers every generated
 `/records` ranking (titles, awards, hosts, biggest final margins,
 back-to-back streaks, longest title gaps, per-competition and

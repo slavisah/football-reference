@@ -37471,3 +37471,85 @@ the 2026 Ballon d'Or ceremony (26 October 2026, 16 days away); UEFA Nations
 League attendance for 2021/2023/2025 and its Best XI gap for the same three
 editions (re-tried with fresh `WebSearch` queries this run, same negative
 result as every prior attempt).
+
+### Run 262 (2026-10-10): content-verification rotation on `content/golden-boot.md` and `content/uefa-nations-league.md` - zero discrepancies, both independently re-confirmed against live sources
+
+Picked the two longest-stale content files by `lastReviewed` - `golden-
+boot.md` (2026-10-06, stale despite Run 255's own front-to-back pass,
+which reviewed it but never bumped its frontmatter date) and `uefa-
+nations-league.md` (2026-10-08, the file Run 261 itself flagged as next).
+Unlike most rotation passes so far, which checked prose against this
+site's own tables, this run went a step further and independently
+re-verified several claims in each file against live `WebSearch` results
+rather than only against `content/*.md`'s own tables, since both files
+cover recent (2025/2026) events this session has direct search access to
+confirm.
+
+**`content/uefa-nations-league.md`:** cross-checked every Player of the
+Finals/winning-manager/winning-captain claim for all four completed
+editions against independent sources rather than only the file's own
+internal consistency:
+
+- **Player of the Finals:** Bernardo Silva (2019), Sergio Busquets (2021,
+  UEFA's own release on his award and tournament stats), Rodri (2023,
+  already confirmed by a prior run), and Nuno Mendes (2025, UEFA's own
+  announcement after the Munich final) all confirmed correct via
+  `WebSearch`.
+- **2025 captain/trophy-lift claim:** confirmed Cristiano Ronaldo wore the
+  captain's armband and lifted the trophy despite being substituted before
+  extra time - Getty/olympics.com photo captions and match reports both
+  confirm he lifted it alongside teammates, resolving what first looked
+  like a potential discrepancy (one AFP caption shows Francisco Conceição
+  holding it up too, but no source contradicts Ronaldo's own lift as
+  captain).
+- **2023 captain claim:** confirmed Jordi Alba - not a more senior starter -
+  held the Spain captaincy and collected the trophy after Sergio Busquets's
+  2022 international retirement, matching the file's own claim.
+- The "Player of the Tournament" renamed to "Player of the Finals" from
+  2021 onward framing is UEFA's own loosely-and-inconsistently applied
+  naming (its 2023 Rodri article uses both names, and its roll of honour
+  retroactively relabels 2019's award too) - not strictly false, left
+  as-is rather than rewritten on a nuance no source actually contradicts.
+
+No discrepancy found. `lastReviewed` bumped to 2026-10-10.
+
+**`content/golden-boot.md`:** re-verified the 2026 World Cup row (the
+file's most recent and least-previously-externally-checked entry) against
+live sources rather than assuming it from training knowledge: Mbappé's
+Golden Boot (10 goals), Messi's Silver Boot (8 goals) and Bellingham's
+Bronze Boot (7 goals) all confirmed via `WebSearch`, including the detail
+that Mbappé's decisive goals came in the third-place match against England
+- consistent with (not contradicting) `content/fifa-world-cup.md`'s own
+2026 final-four order (Spain beat Argentina in the final; England third,
+France fourth). The rest of the file (the 1930-2022 World Cup and
+1960-2024 EURO tables, both Silver/Bronze Boot sections, and both
+memorable-moments sections) was re-read front-to-back against its own
+tables one more time, extending Run 255's pass with no new discrepancy.
+
+No discrepancy found. `lastReviewed` bumped to 2026-10-10.
+
+**Verification:** `pnpm install --frozen-lockfile`, `pnpm lint` (263
+files, 0/0/0), `pnpm test` (1071/1071), `pnpm build` (711 pages) all
+clean. Re-ran all seven claim-ledger checkers
+(`check:record-claims`/`check:superlative-claims`/`check:ordinal-claims`/
+`check:since-claims`/`check:completeness-claims`/`check:one-of-only-claims`/
+`check:consecutive-claims`), `check:award-tallies`, `check:meta`, and
+`check:links` - all clean. Both edited files are `content/*.md`, so per
+this repo's own definition-of-done rebuilt the site and ran
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome
+pnpm build:pdfs` before `pnpm check:pdfs` and `pnpm check:pdf-outline`.
+`pnpm outdated` showed only the same long-blocked `typescript` 7 upgrade;
+a fresh `WebFetch` to `en.wikipedia.org` for the `docs/SOURCES.md`
+link-liveness item again returned `ENOTFOUND` - still blocked, no change.
+
+**Left for a future pass:** the content-verification rotation continues -
+every content file has now been reviewed at least once since Run 259
+closed the full-coverage gap; the next-longest-stale file by
+`lastReviewed` should be picked next run. Everything else is unchanged
+from Run 261's list: the EURO youngest-winner fact (still no converging
+source, eight-plus runs deep); the environment-blocked/human-sign-off
+items (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
+brand-suffix call); the full ~130-winner birth-date ranking; the 2026
+Ballon d'Or ceremony (26 October 2026, 16 days away); UEFA Nations League
+attendance for 2021/2023/2025 and its Best XI gap for the same three
+editions.
