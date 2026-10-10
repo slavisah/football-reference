@@ -84,12 +84,17 @@ into `.github/workflows/ci.yml` as required PR gates; the other ten
 `check:text-spacing`/`check:focus-appearance`/`check:color-contrast`) are
 full-site Playwright/browser sweeps kept manual/intensive-run-only rather
 than a required PR gate, purely for their ~700-to-1,400-page-load runtime -
-re-run periodically (most recently Run 264: 9 of 10 clean; `check:color-
-contrast` alone - the heaviest, 1,422 page loads - ran over 30 minutes
-without finishing in this session's container and was killed rather than
-re-run with a longer allowance, so it's unconfirmed this round rather than
-failing; a future run should give it up to the 2-hour background budget
-before concluding anything's actually wrong) rather than on every change.
+re-run periodically (most recently Run 265: all ten clean, including
+`check:color-contrast` - the heaviest, 1,422 page loads - which Runs 260
+and 264 had only ever seen "slow"/killed, not actually passing; Run 265
+found the real cause (it needs the `chrome-headless-shell` Playwright
+build, which this environment's pre-installed browser cache has at a
+revision `@playwright/test` doesn't look for by default, so the real
+failure was an immediate launch error, not a hang) and ran it to a clean
+completion with `PW_EXECUTABLE_PATH` pointed at the pre-installed
+`chromium_headless_shell-1194/chrome-linux/headless_shell.real` binary:
+zero WCAG 1.4.3 violations across all 711 pages in both color schemes)
+rather than on every change.
 `knip` shows exactly one standing false positive (`@cspell/dict-hr-hr`,
 used only via `.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS
 `import` knip's static analysis can see). Current counts (confirmed fresh
@@ -125,26 +130,6 @@ the full run-by-run history behind all of this, see
 
 ## Open backlog
 
-- **`check:color-contrast` re-confirmation**: unconfirmed, not failing. Run
-  265 found the likely root cause of the "slow"/killed runs in 260 and
-  264: this script's `browserType.launch()` call needs the
-  `chrome-headless-shell` build specifically, and this environment's
-  pre-installed Playwright browser cache only carries the regular
-  `chromium` binary (the one `scripts/check-reflow.mjs` etc. use) at a
-  revision the installed `@playwright/test` doesn't expect for headless-
-  shell, so the very first launch attempt was throwing immediately
-  (`browserType.launch: Executable doesn't exist`) - not hanging at all.
-  `PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell.real`
-  (the `headless_shell.real` binary already present under that
-  pre-installed revision directory) launches cleanly. Run 265's own attempt
-  at a full re-run was then interrupted by its own mistake - running
-  `pnpm build:pdfs` concurrently in the same container, which shares the
-  same `astro preview` daemon/port and killed the sweep's server mid-run
-  (the exact concurrent-sweep hazard `scripts/preview-daemon.mjs`'s header
-  comment already documents) - so this is still not confirmed either way.
-  Next run: re-run with the `PW_EXECUTABLE_PATH` override above, alone, with
-  nothing else touching the preview daemon concurrently, and give it the
-  full 2-hour budget.
 - **2026 Ballon d'Or edition**: not due yet, not blocked. The two-hundred-
   and-forty-first run confirmed via `WebSearch` that the ceremony is
   scheduled for 26 October 2026 in London (its first time outside Paris) -

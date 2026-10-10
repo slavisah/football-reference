@@ -37743,7 +37743,7 @@ brand call), the Nations League Best XI/attendance gaps, the full
 ~130-winner birth-date ranking, and the 2026 Ballon d'Or ceremony (26
 October 2026, now 16 days away).
 
-### Run 265 (2026-10-10): added a new, independently-sourced `content/uefa-euro.md` fact (Lamine Yamal's youngest-ever-scorer record); found the real cause of `check:color-contrast`'s "slow" runs, then re-broke it the same way Run 264 warned against
+### Run 265 (2026-10-10): added a new, independently-sourced `content/uefa-euro.md` fact (Lamine Yamal's youngest-ever-scorer record); fixed and finally confirmed `check:color-contrast` clean, closing the last open manual-sweep backlog item; fixed a CI failure from this run's own stale-build verification gap
 
 **Why this run picked this work:** every open backlog item is still either
 environment-blocked (network egress, the `typescript` 7 peer dependency) or
@@ -37814,15 +37814,39 @@ from Run 264's own `check:lighthouse` incident. Caught and killed the
 doomed sweep rather than report a false result, then started a clean,
 solo re-run (no other `check:*`/`build:pdfs` command running at the same
 time) with the `PW_EXECUTABLE_PATH` override, in the background, with the
-full 2-hour budget - still running as of this commit; `docs/ROADMAP.md`'s
-entry is updated with the root cause and the fix, but still marked
-unconfirmed pending that run's actual result. A future run (or a later
-commit this same run, if it finishes in time) should report what it found
-rather than re-diagnosing the browser-revision issue from scratch.
+full 2-hour budget. **Update, same run:** that clean solo re-run finished
+in about 8 minutes - **zero WCAG 1.4.3 color-contrast violations across
+all 711 pages in either color scheme.** This closes the "`check:color-
+contrast` re-confirmation" backlog item outright (deleted from
+`docs/ROADMAP.md`'s "Open backlog" per that file's own "close a backlog
+item by deleting its bullet" rule) - all ten manual browser sweeps are
+now confirmed clean as of this run, not nine of ten. The ~8-minute actual
+runtime also confirms Run 264's "maybe just slow" theory was wrong: once
+the browser launches at all, this sweep runs at a completely normal
+speed, in line with the other nine - the two prior "unconfirmed"/"killed
+past 30 minutes" results were an immediate launch failure stuck retrying
+or hanging some other way, not genuine slowness from extra per-page work.
+`docs/ROADMAP.md`'s "Status" section prose updated to match (Run 265, all
+ten clean, not Run 264's 9-of-10).
+
+**A second commit this run** fixed a CI failure the first commit's own
+Croatian translation introduced: `check:spelling-hr` flagged "Johana" and
+"Vonlanthena" (Croatian genitive-case forms of "Johan" and "Vonlanthen")
+as unknown words. Root cause was a gap in this run's own verification,
+not a tooling bug: `check:i18n-notes`/`check:claims-hr`/`check:spelling-
+hr` were run right after editing `src/pages/hr/competitions/euro.astro`
+but *before* re-running `pnpm build`, so they were still checking the
+previous build's output (missing the new Croatian bullet entirely) and
+passed falsely clean; the later `pnpm build` in this same run's own
+verification pass regenerated the dist with the real new content, but
+that full `check:*` battery was never re-run against it before the first
+commit shipped. CI (correctly) caught what the stale local check missed.
+Fixed by adding both declined forms to `.cspell/football-names-hr.txt`,
+then re-running `pnpm build` followed by the *entire* content-shaped
+`check:*` battery fresh in one pass (not interleaved with further edits)
+to avoid repeating the same mistake - all clean, pushed, CI green.
 
 **Left for a future pass:** the EURO Golden Boot youngest-ever-winner
 angle (Musiala) is unchanged - still no source frames his share as a
-record after a seventh attempt. `check:color-contrast`'s actual pass/fail
-result, now that the launch issue is fixed and the concurrent-sweep
-mistake isn't being repeated. Everything else is unchanged from Run 264's
-list.
+record after a seventh attempt. Everything else is unchanged from Run
+264's list, minus the now-closed `check:color-contrast` item.
