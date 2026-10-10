@@ -37742,3 +37742,87 @@ items (`typescript` 7, `docs/SOURCES.md` link-liveness, the `long-title`
 brand call), the Nations League Best XI/attendance gaps, the full
 ~130-winner birth-date ranking, and the 2026 Ballon d'Or ceremony (26
 October 2026, now 16 days away).
+
+### Run 265 (2026-10-10): added a new, independently-sourced `content/uefa-euro.md` fact (Lamine Yamal's youngest-ever-scorer record); found the real cause of `check:color-contrast`'s "slow" runs, then re-broke it the same way Run 264 warned against
+
+**Why this run picked this work:** every open backlog item is still either
+environment-blocked (network egress, the `typescript` 7 peer dependency) or
+needs human sign-off (`long-title`), so this run looked for a genuinely new,
+safe content addition instead of re-trying an already-exhausted angle. The
+"Ideas not yet scoped" EURO Golden Boot youngest-ever-winner angle
+(Musiala) was tried again first with a fresh `WebSearch` pass - still no
+source frames his 2024 share as a record, so still not shippable, same
+result as the six prior attempts. A broader search turned up a different,
+unrelated, and much better-sourced fact: Lamine Yamal is the youngest-ever
+*scorer* in European Championship history (a tournament-wide record, not a
+Golden-Boot-specific one, so it doesn't close the Musiala idea - it's a new
+fact, not a narrower cut at the same one).
+
+**What was added:** a new "Memorable moments" bullet on
+`content/uefa-euro.md` (and its Croatian translation on
+`src/pages/hr/competitions/euro.astro`): Lamine Yamal became the youngest-
+ever scorer in EURO history at EURO 2024 (16 years, 362 days; Spain vs.
+France, 2024 semi-final, 9 July 2024), breaking Johan Vonlanthen's Euro
+2004 record (18 years, 141 days). Verified via two separate `WebSearch`
+passes cross-checking AP (via ABC News/Naharnet), 90min, The Analyst,
+bluewin.ch, and - unusually for this site's research, which is normally
+blocked from fetching primary sources directly - UEFA.com's own history
+page, surfaced in search results and quoted verbatim by multiple outlets,
+naming the same four record-holders in the same order (Yamal, Vonlanthen,
+Rooney, Renato Sanches). No discrepancy found on either age figure across
+any source. New ledger entry added to `scripts/record-claims-ledger.json`
+(the "youngest"-triggered record-claims checker); new `docs/SOURCES.md`
+entry under "UEFA EURO"; `Vonlanthen` added to
+`.cspell/football-names.txt`. `lastReviewed` bumped on `content/uefa-
+euro.md`.
+
+**Verification:** `pnpm install --frozen-lockfile`, `pnpm lint` (263 files,
+0/0/0), `pnpm test` (1071/1071), `pnpm build` (711 pages), and every
+content-shaped `check:*` script relevant to this edit (`check:record-
+claims`, `check:superlative-claims`, `check:ordinal-claims`, `check:
+consecutive-claims`, `check:since-claims`, `check:one-of-only-claims`,
+`check:completeness-claims`, `check:spelling`, `check:spelling-hr`,
+`check:i18n-notes`, `check:claims-hr`, `check:locale-consistency`,
+`check:attendance-format`, `check:edition-header-labels`, `check:award-
+tallies`, `check:link-names`, `check:links`, `check:sitemap`, `check:feed`,
+`check:precache`, `check:jsonld`, `check:heading-outline`, `check:meta`,
+`check:reachability`, `check:theme-flash`, `check:theme-color`, `check:
+image-dimensions`, `check:perf`) all pass. Since this edit touched
+`content/*.md` and a translated `src/pages/hr/**` page, `pnpm build &&
+pnpm build:pdfs` was re-run per `docs/ADDING_CONTENT.md` - all 700 PDFs
+regenerated, `check:pdfs` and `check:pdf-outline` both clean.
+
+**The `check:color-contrast` side-quest:** Run 264 left this sweep
+"inconclusive" after killing it past a 30-minute allowance, suspecting it
+was just slow in this container. This run found the actual cause instead:
+the script's `browserType.launch()` needs the `chrome-headless-shell`
+Playwright build, and this container's pre-installed browser cache has it
+at a revision (`chromium_headless_shell-1194`, with a `headless_shell.real`
+binary inside it) the installed `@playwright/test` doesn't look for by
+default - so the very first launch attempt was throwing immediately
+(`Executable doesn't exist`), not hanging. Passing
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell.real`
+(the same escape hatch `scripts/preview-daemon.mjs` already wires up for
+the regular `chromium` binary) launches it cleanly. Having found that,
+this run then re-broke its own re-run: it started `check:color-contrast`
+in the background and, while waiting, ran `pnpm build:pdfs` in the
+foreground for the content work above - both share one `astro preview`
+daemon on one port, so `build:pdfs`'s own server start/stop calls killed
+`check:color-contrast`'s server mid-sweep, exactly the concurrent-sweep
+hazard `scripts/preview-daemon.mjs`'s header comment already documents
+from Run 264's own `check:lighthouse` incident. Caught and killed the
+doomed sweep rather than report a false result, then started a clean,
+solo re-run (no other `check:*`/`build:pdfs` command running at the same
+time) with the `PW_EXECUTABLE_PATH` override, in the background, with the
+full 2-hour budget - still running as of this commit; `docs/ROADMAP.md`'s
+entry is updated with the root cause and the fix, but still marked
+unconfirmed pending that run's actual result. A future run (or a later
+commit this same run, if it finishes in time) should report what it found
+rather than re-diagnosing the browser-revision issue from scratch.
+
+**Left for a future pass:** the EURO Golden Boot youngest-ever-winner
+angle (Musiala) is unchanged - still no source frames his share as a
+record after a seventh attempt. `check:color-contrast`'s actual pass/fail
+result, now that the launch issue is fixed and the concurrent-sweep
+mistake isn't being repeated. Everything else is unchanged from Run 264's
+list.

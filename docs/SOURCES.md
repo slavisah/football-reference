@@ -1212,6 +1212,21 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Youngest-ever scorer fact (2026-10-10, intensive run): added "Memorable
+  moments" bullet naming Lamine Yamal as the youngest-ever scorer in EURO
+  history (16 years, 362 days; Spain vs. France, 2024 semi-final, 9 July
+  2024), breaking Johan Vonlanthen's Euro 2004 record (18 years, 141 days;
+  Switzerland vs. France). Verified via two WebSearch passes against AP
+  (via ABC News/Naharnet), 90min, The Analyst, bluewin.ch, and UEFA.com's
+  own history page, which independently names the same four record-holders
+  in the same order (Yamal, Vonlanthen, Rooney, Renato Sanches). No
+  discrepancy found on either age figure across any source, including
+  UEFA's own:
+  - https://www.uefa.com/uefaeuro/history/news/028e-1b131a1d2848-526b6661948b-1000--euro-s-youngest-scorers-lamine-yamal-vonlanthen-rooney-renat/
+  - https://abcnews.go.com/Sports/wireStory/spains-lamine-yamal-youngest-player-score-mens-european-111788404
+  - https://theanalyst.com/2024/06/youngest-goalscorers-european-championship/
+  - https://www.90min.com/lamine-yamal-becomes-youngest-scorer-in-european-championship-history
+  - https://www.bluewin.ch/en/sport/football/yamal-16-becomes-the-youngest-goalscorer-in-european-championship-history-with-a-dream-goal-li.2277592
 
 ## UEFA Nations League
 
