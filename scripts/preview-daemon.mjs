@@ -19,6 +19,18 @@
 // itself until it actually refuses connections before returning, and
 // `startPreviewDaemon()` retries the whole stop/start/wait-for-ready dance
 // once more if the first attempt doesn't come up cleanly.
+//
+// This only fixes scripts run one after another. Two of these scripts run
+// *at the same time* (e.g. one in a shell foreground, another backgrounded)
+// will still stomp on each other: they share one `astro preview` daemon on
+// one port, so either script's own `startPreviewDaemon()`/
+// `stopPreviewDaemon()` call can restart or kill the other's server
+// mid-sweep, surfacing as a confusing mid-run failure in whichever script
+// loses the race (observed directly, Run 264: check:lighthouse ran in a
+// shell foreground while a loop of other check:* scripts ran backgrounded,
+// and the backgrounded loop's own stop/start calls killed check:lighthouse's
+// server mid-sweep). Always run these sequentially, never in parallel, in
+// the same container.
 
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
