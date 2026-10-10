@@ -2,7 +2,7 @@
 title: Golden Boot Winners
 slug: golden-boot
 awardType: scoring
-lastReviewed: 2026-10-06
+lastReviewed: 2026-10-10
 status: verified
 ---
 
