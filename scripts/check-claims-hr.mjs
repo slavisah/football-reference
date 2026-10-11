@@ -100,16 +100,39 @@ const LEDGER_FILES = [
 
 // Every `content/*.md` file any ledger keys claims under, mapped to the
 // English page path whose Croatian counterpart (via `hrCounterpart()`)
-// carries that file's hand-translated note prose. `quiz.md` is deliberately
+// carries that file's hand-translated note prose (or, for the six
+// generated-summary pages below whose own `.astro` file renders no
+// `.notes__card` section at all, whatever plain page text exists -
+// `diffClaimsPositionally()`'s own body-text fallback handles an empty
+// `enCards`/`hrCards` pair exactly like a claim it just couldn't positionally
+// pair, so no special-casing is needed here). `quiz.md` is deliberately
 // omitted: `record-claims-ledger.json`'s one `content/quiz.md` entry
 // describes a dynamically generated question type, not a per-edition
 // completeness claim tied to a specific page's prose (see that ledger's own
 // entry note), so there is no Croatian note section to check it against.
+//
+// `compare-countries.md`/`compare-players.md`/`glossary.md`/`players.md`/
+// `records-and-timelines.md`/`teams.md` were missing from this map entirely
+// (found by a code-review pass, run 270) - every claim `record-claims-ledger.json`/
+// `ordinal-claims-ledger.json`/`since-claims-ledger.json` key under them was
+// silently skipped by the `if (!pagePath) continue;` below, never cross-checked
+// against its Croatian translation. `content/glossary.md`'s two claims (the
+// 1930 World Cup and 1980/1984 EURO third-place-match history) are the one
+// case with real year anchors to check; the other five ledger entries are
+// each page's own generated intro/description paragraph, which names no year
+// or "earlier editions" count, so adding them closes the gap without changing
+// today's check output - see docs/PROJECT_STATUS.md's run 270 entry.
 const CONTENT_FILE_TO_PAGE_PATH = {
   'content/ballon-dor.md': '/competitions/ballon-dor/',
+  'content/compare-countries.md': '/compare/',
+  'content/compare-players.md': '/compare-players/',
   'content/copa-america.md': '/competitions/copa-america/',
   'content/fifa-world-cup.md': '/competitions/world-cup/',
+  'content/glossary.md': '/glossary/',
   'content/golden-boot.md': '/competitions/golden-boot/',
+  'content/players.md': '/players/',
+  'content/records-and-timelines.md': '/records/',
+  'content/teams.md': '/teams/',
   'content/uefa-euro.md': '/competitions/euro/',
   'content/uefa-nations-league.md': '/competitions/nations-league/',
 };
