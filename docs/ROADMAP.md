@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (268 intensive runs as of 2026-10-11) lives
+verification sweep and decision (269 intensive runs as of 2026-10-11) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -132,14 +132,22 @@ share an identical tie string yet). See `docs/PROJECT_STATUS.md`'s Run
 every other `src/lib/*.ts` file (`jsonLd.ts`, `editionProfile.ts`,
 `homeCards.ts`, `teamProfile.ts`, `playerProfile.ts`, `tableSort.ts`;
 `contentPages.ts` stays out of scope per the two-hundred-and-forty-second
-run's own explanation above) and found no further bug - a negative but
-genuine result that closes this angle for every file in `src/lib/`, at
-least until the next time one of them changes materially. Unlike the
-content-claim checks, nothing in CI currently catches a logic bug that
-produces a *consistent but wrong* result rather than a crash or a source
-mismatch, so this angle is worth re-running from scratch after a future
-run meaningfully edits any of these files, rather than treated as
-permanently closed.
+run's own explanation above) and found no further bug, closing the angle
+for every file in `src/lib/`. Run 269 extended the same angle to every
+`src/components/*.astro` file (19 files, 4,594 lines - the presentation
+layer, untouched by the `src/lib/` pass) and likewise found nothing,
+closing it there too, at least until the next time one of these files
+changes materially. Unlike the content-claim checks, nothing in CI
+currently catches a logic bug that produces a *consistent but wrong*
+result rather than a crash or a source mismatch, so this angle is worth
+re-running from scratch after a future run meaningfully edits any of
+these files, rather than treated as permanently closed.
+
+**Standing, unresolved process flag (raised Run 263, Run 268, Run 269):**
+PR #56 (`intensive/football-reference` -> `main`) has been open since
+2026-10-02 and has never been merged - 9 days and 68 commits as of Run 269,
+growing every 4 hours. No intensive run can merge or pause its own PR; this
+needs the user's own decision (merge it, or pause/slow this routine).
 
 Every generated/derived page has its own independent-recomputation guard,
 wired into CI, that cross-checks its output against `content/*.md` rather

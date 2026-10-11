@@ -38168,3 +38168,76 @@ it as permanently closed; (b) before starting work, fetch and inspect
 `main`) to avoid repeating this run's own near-miss; (c) PR #56 needs a
 human merge decision - it is not something a future intensive run can
 resolve on its own.
+
+### Run 269 (2026-10-11): extended the code-review angle to `src/components/*.astro` (no bug found, a genuine negative result); PR #56 still unmerged - re-flagged
+
+Began by fetching `origin/intensive/football-reference` and diffing it
+against `origin/main` before reading anything, per Run 268's own
+closing note (b) - confirmed the branch tip (Run 268's own commit) was not
+yet reflected in `main` (still at the Run 214-era PR #55 merge), rebased
+cleanly onto current `origin/main` with nothing to replay, and read
+`docs/ROADMAP.md` from that real tip rather than a stale checkout, avoiding
+the exact near-miss Run 268 itself hit.
+
+Every "Open backlog" item is still either environment-blocked or awaiting
+human sign-off (unchanged), and the `src/lib/*.ts` code-review angle Run
+267/268 ran is now closed for every file there. Picked a genuinely new,
+still-untried angle in the same vein: the same end-to-end logic-bug read,
+applied to every file in `src/components/*.astro` (19 files, 4,594 lines) -
+the presentation layer, which the `src/lib/*.ts` pass never touched. Read
+every component in full - `TournamentTable.astro` (the biggest and most
+stateful: client-side filter/sort/URL-param sync), `Nav.astro` (second
+biggest: mobile drawer, focus trap, the "find a team"/"find a player"
+combobox widgets, the desktop "More" overflow menu), `EditionView.astro`,
+`CompetitionView.astro`, `ChampionsSummary.astro`, `ChampionsTimeline.astro`,
+`PodiumCards.astro`, `OnThisDay.astro` (cross-checked its inline script's
+manually-duplicated `entriesOnDate()`/`fallbackEntry()`/`onThisDayResultText()`
+logic against the real `src/lib/onThisDay.ts` versions it's supposed to
+mirror - byte-for-byte identical, no drift), `HostMap.astro`,
+`QuizScript.astro`, `QuizCard.astro`, `QuizOrderCard.astro`,
+`ThemeToggle.astro`, `SectionJumpNav.astro`, `References.astro`,
+`EditorialNotes.astro`, `Breadcrumb.astro`, `Footer.astro` and
+`PrintDownloadLink.astro` - looking for the same bug shapes Run 267 found in
+`src/lib/*.ts` (a dead conditional, a missing placeholder/tie filter, two
+call sites that are supposed to agree but don't) plus presentation-specific
+equivalents (a `—`-placeholder leaking into a rendered label, a client-side
+script's hand-duplicated logic drifting from the server-rendered version it
+mirrors, an off-by-one in a loop).
+
+**No bug found anywhere.** A genuine negative result, not a shallow pass -
+closes this angle for every file in `src/components/` at least once,
+mirroring how Run 268 closed it for `src/lib/`. Nothing in CI currently
+exercises this specific "re-derive each component from scratch and compare"
+check (the same gap Run 267 noted for `src/lib/`), so worth re-running after
+a future run meaningfully edits any of these files, rather than treated as
+permanently closed.
+
+**Re-flagged, still not fixed (the same process/project-management finding
+Run 263 and Run 268 already raised):** PR #56 remains open - now 9 days and
+68 commits (Run ~215 through Run 269) on one never-merged, continuously-
+growing diff targeting `main`. Every run's own standing health check,
+including this one, still passes clean, so there is still no correctness
+reason blocking a merge; this is purely the review loop having fallen behind
+the commit loop. Two prior notifications (Run 263, Run 268) have apparently
+not resulted in a merge or a paused schedule yet, so this run's own
+notification says so plainly rather than assuming a third flag will land
+any differently from the first two - no intensive run can merge or pause
+its own PR, so this needs the user's own decision (merge it, or tell this
+routine to pause/slow down) rather than another automated flag next run.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `astro` unchanged
+at 7.3.8), `pnpm lint` (263 files, 0/0/0), `pnpm test` (1071/1071,
+unchanged - no source file touched), `pnpm build` (711 pages, unchanged).
+All 33 fast CI-gated `check:*` scripts individually re-run and clean
+(`check:pdfs`/`check:pdf-outline` included - nothing changed, so nothing
+went stale, no PDF regeneration needed). No `content/*.md` or
+`src/**/*.{astro,ts}` file changed this run (a pure read/review pass found
+nothing to fix), so the ten manual/intensive-run-only browser sweeps and a
+cold-start `pnpm test:e2e` were not re-run - no markup or behavior change to
+re-verify.
+
+**Left for a future pass:** unchanged from Run 266-268's list, plus: (a)
+re-run the `src/components/*.astro` code-review angle from scratch after a
+future run meaningfully edits any of these 19 files; (b) PR #56 still needs
+a human decision - merge it or pause/slow this routine - not another
+automated re-flag.
