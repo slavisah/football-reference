@@ -38086,3 +38086,85 @@ Boot youngest-winner, Nations League Best XI/attendance, `typescript` 7,
 ~130-winner birth-date ranking, the 2026 Ballon d'Or ceremony re-check) -
 plus the newly-identified remaining `src/lib/*.ts` files for a future
 code-review pass, listed above.
+
+### Run 268 (2026-10-11): completed the `src/lib/*.ts` code-review angle across every remaining file (no further bug found); flagged that PR #56 has gone 9 days/~50 runs without merging
+
+Started by picking up Run 214's own closing suggestion from `docs/ROADMAP.md`
+(read from a stale `main` checkout, before this run noticed the problem
+below) - a quiz question type for `/records`' "Longest wait between titles"
+ranking - and built it in full: a new `longestTitleGapQuestion()` in
+`src/lib/quiz.ts`, wired into both quiz pages for all seven loaded tables,
+nine new unit tests, a new `content/quiz.md` bullet, and a full PDF
+regeneration. Before committing, this run's own branch-strategy step (fetch
+`origin/intensive/football-reference`, diff it against `origin/main`) turned
+up something the stale `main` checkout had hidden: `origin/main` sat at the
+already-merged PR #55 (through Run 214), but `origin/intensive/football-
+reference` had moved on another 53 runs past that merge, all the way to Run
+267 - including, as it turned out, the *exact* same `longestTitleGapQuestion()`
+feature this run had just independently built (shipped two commits after
+Run 214 as "Add 'biggest final win' quiz question type", then again later
+as its own standalone addition). Caught this by checking out the real branch
+tip before pushing, confirmed the function already existed
+(`grep -n "export function longestTitleGapQuestion" src/lib/quiz.ts`), and
+discarded the redundant work (`git stash drop`) rather than shipping a
+duplicate or a merge conflict. No harm done, but worth recording as a
+process note: a run that reads `docs/ROADMAP.md` from an already-checked-out
+`main` rather than fetching and inspecting `origin/intensive/football-
+reference` first risks exactly this - redoing work another run already
+shipped, because `main` only reflects whichever PR last merged, not the
+rolling branch's actual current tip.
+
+With the planned work already done by an earlier run, picked a genuinely
+different, still-open angle instead: Run 267's own "worth repeating this
+angle periodically on the other `src/lib/*.ts` files" suggestion. Read
+`jsonLd.ts` (592 lines), `editionProfile.ts` (384 lines), `homeCards.ts`
+(242 lines), `playerProfile.ts` (161 lines), `tableSort.ts` (149 lines) and
+`teamProfile.ts` (105 lines) end to end, looking for the same shape of bug
+Run 267 found in `compare.ts`/`editions.ts`/`onThisDay.ts` (a dead
+conditional branch, a missing placeholder/tie filter one sibling function
+has and another doesn't, an inconsistency between two call sites that are
+supposed to derive the same fact). Specifically cross-checked
+`teamProfile.ts`'s `appearancesFor()` against `compare.ts`'s
+`buildCountryCompetitionRecord()` (the file's own comment claims they
+"reuse exactly the same winner/runner-up/semifinal matching ... so the two
+can never disagree") - both import the identical `RUNNER_UP_COLUMN`/
+`SEMIFINAL_COLUMN`/`matchesGroup()` from `compare.ts` rather than
+redefining them, and `matchesGroup()` itself already routes through
+`isMissingCell()`, so the exact "—"-placeholder gap Run 267 found in
+`editions.ts`'s `buildTimeline()`/`buildPodiums()` (which compared a raw
+string instead) structurally cannot recur here. No bug found in any of the
+six files - a genuine negative result, not a shallow pass: this closes the
+code-review angle for every file in `src/lib/` at least once
+(`contentPages.ts` stays separately out of scope per Run 242's own
+explanation, already noted in `docs/ROADMAP.md`).
+
+**Also flagged, not fixed (a process/project-management finding, not a code
+bug):** PR #56 (`intensive/football-reference` -> `main`), opened
+2026-10-02, is still open as of this run (2026-10-11) - nine days and
+roughly 50 runs' worth of commits (Run ~215 through Run 268) accumulated
+onto one never-merged, continuously-growing diff. Every one of those runs'
+own standing health checks passed, so there is no known correctness reason
+it can't merge - this is purely a "the rolling-PR review loop has fallen
+behind the rolling-commit loop" observation. Surfaced to the user in this
+run's own notification rather than left for a future run to re-notice,
+since the gap only grows the longer it goes unmerged (bigger diff, higher
+conflict risk, harder review) and no intensive run has the ability to
+merge its own PR.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `html-validate`
+11.16.1 -> 11.16.2 patch bump pulled in incidentally), `pnpm lint` (263
+files, 0/0/0), `pnpm test` (1071/1071, unchanged - no source file touched),
+`pnpm build` (711 pages, unchanged). No `content/*.md`/`src/**/*.{astro,ts}`
+file changed this run (the quiz feature was reverted via `git stash drop`
+before ever being committed, and the code-review pass found nothing to
+fix), so no PDF regeneration was needed and no `check:*` script was
+re-run beyond the three above.
+
+**Left for a future pass:** unchanged from Run 266/267's list, plus: (a)
+re-run the `src/lib/*.ts` code-review angle from scratch after a future run
+meaningfully edits any of the six files just reviewed, rather than treating
+it as permanently closed; (b) before starting work, fetch and inspect
+`origin/intensive/football-reference`'s actual tip (not just a checked-out
+`main`) to avoid repeating this run's own near-miss; (c) PR #56 needs a
+human merge decision - it is not something a future intensive run can
+resolve on its own.
