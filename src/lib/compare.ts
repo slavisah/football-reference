@@ -271,15 +271,14 @@ export type Rivalry = {
 
 /**
  * Every pair of teams that has met in 2 or more finals across the given
- * competitions, ranked by total meetings (ties broken by combined wins, then
- * name) - a "most frequent rivalry" ranking built entirely from
- * buildFinalsMeetings()'s existing per-meeting data, no new editorial
- * content. West Germany/Germany meetings are merged under one pair via the
- * same winnerId/runnerUpId grouping buildFinalsMeetings() already applies;
- * the display name uses summaryGroupFor() so a merged pair reads "Germany
- * (incl. West Germany)" exactly like every other generated ranking on this
- * page, even though the individual FinalsMeeting rows keep each meeting's
- * own historical name.
+ * competitions, ranked by total meetings (ties broken by name) - a "most
+ * frequent rivalry" ranking built entirely from buildFinalsMeetings()'s
+ * existing per-meeting data, no new editorial content. West Germany/Germany
+ * meetings are merged under one pair via the same winnerId/runnerUpId
+ * grouping buildFinalsMeetings() already applies; the display name uses
+ * summaryGroupFor() so a merged pair reads "Germany (incl. West Germany)"
+ * exactly like every other generated ranking on this page, even though the
+ * individual FinalsMeeting rows keep each meeting's own historical name.
  */
 export function buildRivalries(meetings: FinalsMeeting[]): Rivalry[] {
   const byPair = new Map<string, FinalsMeeting[]>();
@@ -320,9 +319,6 @@ export function buildRivalries(meetings: FinalsMeeting[]): Rivalry[] {
   }
 
   return rivalries.sort(
-    (a, b) =>
-      b.meetings - a.meetings ||
-      b.teamAWins + b.teamBWins - (a.teamAWins + a.teamBWins) ||
-      a.teamADisplayName.localeCompare(b.teamADisplayName),
+    (a, b) => b.meetings - a.meetings || a.teamADisplayName.localeCompare(b.teamADisplayName),
   );
 }

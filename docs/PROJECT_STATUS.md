@@ -37953,3 +37953,136 @@ gaps, the `typescript` 7 upgrade, the `docs/SOURCES.md` link-liveness
 sweep, the `long-title` brand call, and the full ~130-winner birth-date
 ranking - plus the 2026 Ballon d'Or ceremony re-check once 26 October
 2026 has passed.
+
+### Run 267 (2026-10-11): code-review pass over `src/lib/*.ts` found and fixed three latent logic bugs, all currently dormant (no content-file change needed)
+
+**Why this run tried a different angle:** Run 266 confirmed the open
+backlog is still exhausted (same blockers, same research dead ends) and
+every `content/*.md` file's `lastReviewed` date was still fresh (1-2
+days old), so re-running the content-verification rotation again this
+run would have re-checked files it had already caught up on days ago.
+This run's own `docs/ROADMAP.md` "Status" section already notes that
+every generated page has an independent-recomputation guard that
+cross-checks *output* against `content/*.md` - but nothing in this
+repo's CI specifically hunts for a logic bug in the derivation code
+itself that produces a *self-consistent but wrong* result (as opposed to
+a crash, a type error, or a mismatch the recomputation guards would
+catch). So this run used the `/code-review` skill (high effort) against
+the five largest/most complex files in `src/lib/` (`quiz.ts`,
+`editions.ts`, `compare.ts`, `onThisDay.ts`, `homeCards.ts`) looking
+specifically for correctness bugs, not content errors.
+
+**Three real bugs found and fixed, all in derivation code (no
+`content/*.md` edit, so no new fact was touched or at risk):**
+
+1. **`compare.ts`'s `buildRivalries()` had a dead tiebreak clause.** Its
+   sort comparator's second term, meant to break a tie in meeting-count
+   by "combined wins" (per its own doc comment), computed
+   `(b.teamAWins + b.teamBWins) - (a.teamAWins + a.teamBWins)` - but for
+   any single rivalry, `teamAWins + teamBWins` always equals `meetings`
+   (every meeting between the same two teams has exactly one winner
+   between them), and this term is only ever reached when `a.meetings ===
+   b.meetings` already. So it always evaluated to `0 - 0` and never
+   actually discriminated between two tied rivalries - ties silently fell
+   straight through to the alphabetical fallback the whole time, not
+   "combined wins first, alphabetical second" as documented. Fixed by
+   removing the dead clause and correcting the doc comment to describe
+   the actual (alphabetical-only) tiebreak, rather than inventing a new
+   tiebreak criterion the code never actually implemented - this is a
+   provable no-op fix, not a ranking change: removing a term that always
+   evaluates to 0 cannot alter any sort result.
+2. **Runner-up fields leaked the "—" no-data placeholder as a literal
+   team name**, in three places: `editions.ts`'s `buildTimeline()` (feeds
+   `ChampionsTimeline.astro` and `quiz.ts`'s `runnerUpByYearQuestions()`),
+   `buildPodiums()` (feeds `PodiumCards.astro`), and `onThisDay.ts`'s
+   `buildOnThisDayEntries()`. All three read the Runner-up column with the
+   same `cellValue()` helper `editions.ts` already uses for Third/Fourth -
+   but only Third/Fourth were passed through `definiteCell()`
+   (`value === '—' ? undefined : value`) before being stored; Runner-up
+   wasn't, even though three *other* functions in the same file
+   (`buildChampionsSummary`'s runner-up tally, `buildTopScorerFacts`, and
+   the finalist-group lookup around line 690) already guard the exact
+   same Runner-up cell against `'—'`/`isPlaceholderWinner`. Currently
+   dormant - every edition in all four team competitions always has a
+   real runner-up (even round-robin-era Copa América resolves one from
+   the final table), confirmed by grepping each content file's Runner-up
+   column for a literal "—", so nothing on the live site is wrong today -
+   but `quiz.ts`'s `runnerUpByYearQuestions()` does no additional
+   filtering of its own (`Boolean('—')` is `true`, so a leaked "—" would
+   sail straight through as a quiz answer and a distractor-pool entry),
+   so this would have been a real, reader-visible bug the moment any
+   future edition's Runner-up cell is ever left as "—". Fixed by wrapping
+   all three call sites in `definiteCell()` (added a local equivalent to
+   `onThisDay.ts`, built on `compare.ts`'s already-exported
+   `isMissingCell()` rather than duplicating its string check a third
+   time), matching the Third/Fourth convention already established two
+   lines away in the same file.
+3. **`buildLongestStreaks()` didn't exclude semicolon-joined joint-winner
+   ties.** Every sibling ranking in `editions.ts` that walks
+   `edition.winner` either splits on `;` to count joint winners
+   separately (`buildChampionsSummary`) or excludes a tied row outright
+   (`quiz.ts`'s `questionsFromWinners()`/`uniqueWinnerEditions()`, which
+   `editions.ts`'s own header comment cross-references) - but
+   `buildLongestStreaks()` did neither: it compared `edition.winner.trim()`
+   as one literal string, so a semicolon-joined tie (e.g. the Golden
+   Boot's six-way ties in 1962/1960/2012/2024) is treated as a single
+   compound "winner." `buildLongestStreaks()` is called directly on
+   Golden Boot editions (`src/pages/quiz.astro`, `records.astro`), the
+   one competition/award with real recorded ties. Currently dormant - no
+   two *adjacent* Golden Boot editions share a byte-for-byte identical
+   tie string yet, confirmed by reading `content/golden-boot.md`'s own
+   tie rows - but the moment two adjacent ties ever do match exactly,
+   this would render a multi-name tie string as if it were one
+   team/player's back-to-back streak through `ChampionsSummary.astro`/
+   `longestStreakQuestion()`. Fixed by adding the same
+   `winner.includes(';')` exclusion right next to the existing
+   placeholder-winner guard in the same `if`, breaking any streak
+   spanning a tied edition exactly like a placeholder (e.g. a cancelled
+   award) already does.
+
+A fourth review finding (the six single-superlative question builders in
+`quiz.ts` - `mostTitlesQuestion`, `biggestFinalMarginQuestion`,
+`longestStreakQuestion`, `longestTitleGapQuestion`,
+`mostFrequentRivalryQuestion`, `fiercestRivalryQuestion` - are
+near-identical ~45-line copies of the same shape) was a maintenance/
+duplication observation, not a correctness bug, and collapsing six
+already-working, already-tested functions into one generic helper risks
+introducing a real bug for a purely cosmetic win - left alone.
+
+**Verification:** `pnpm lint` (263 files, 0/0/0), `pnpm test` (1071/1071,
+unchanged pass count - the fixes are all in currently-dormant branches, so
+no existing test's expected output changed), `pnpm build` (711 pages),
+`pnpm dlx knip --no-config-hints` (the one documented false positive
+only), and re-ran `check:records-consistency`, `check:compare-consistency`,
+`check:award-tallies`, `check:superlative-claims`, `check:record-claims`,
+`check:consecutive-claims`, `check:completeness-claims` specifically
+(the independent-recomputation guards most likely to catch a regression
+in this derivation code) - all clean. Touched only `src/lib/compare.ts`,
+`src/lib/editions.ts`, `src/lib/onThisDay.ts` (code, not
+`content/*.md`), so no new fact needed sourcing or a `lastReviewed` bump
+- but `check:pdfs` tracks these files as PDF-generation dependencies (the
+downloadable per-page PDFs are built from the same derived data), so
+`pnpm build:pdfs` was still required and run (with
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell.real`,
+the same escape hatch Run 265 already documented) to keep all ~700 PDFs
+fresh before committing.
+
+**Worth repeating for whoever reads this next:** this is a new, so-far
+unexhausted angle for a "quality pass" run when the content backlog and
+content-verification rotation are both temporarily out of fresh work -
+`docs/ROADMAP.md`'s "Status" section now lists the `src/lib/*.ts` files
+not yet reviewed this way (`jsonLd.ts`, `editionProfile.ts`,
+`contentPages.ts`, `homeCards.ts` partially, `teamProfile.ts`,
+`playerProfile.ts`, `tableSort.ts`). All three bugs fixed this run were
+*dormant* (no live-site output was ever actually wrong) precisely
+because this site's content happens not to hit the edge case yet in
+every case checked - that won't necessarily hold for the next file
+reviewed, so treat a future finding there as higher-urgency than these
+three were.
+
+**Left for a future pass:** unchanged from Run 266's list (EURO Golden
+Boot youngest-winner, Nations League Best XI/attendance, `typescript` 7,
+`docs/SOURCES.md` link-liveness, `long-title` brand call, the full
+~130-winner birth-date ranking, the 2026 Ballon d'Or ceremony re-check) -
+plus the newly-identified remaining `src/lib/*.ts` files for a future
+code-review pass, listed above.
