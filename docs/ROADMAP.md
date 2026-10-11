@@ -143,11 +143,15 @@ result rather than a crash or a source mismatch, so this angle is worth
 re-running from scratch after a future run meaningfully edits any of
 these files, rather than treated as permanently closed.
 
-**Standing, unresolved process flag (raised Run 263, Run 268, Run 269):**
-PR #56 (`intensive/football-reference` -> `main`) has been open since
-2026-10-02 and has never been merged - 9 days and 68 commits as of Run 269,
-growing every 4 hours. No intensive run can merge or pause its own PR; this
-needs the user's own decision (merge it, or pause/slow this routine).
+**Standing, unresolved process flag (raised Run 263, 268, 269, 270, now
+271 - five runs running):** PR #56 (`intensive/football-reference` ->
+`main`) has been open since 2026-10-02 and has never been merged - 9 days
+and 69 commits as of Run 271, growing every 4 hours. No intensive run can
+merge or pause its own PR; four prior in-repo flags (this PR's own body,
+plus three `docs/PROJECT_STATUS.md` entries) have not produced either
+outcome, so Run 271 escalated via a push notification instead of a fifth
+repeat of the same unread flag. This needs the user's own decision (merge
+it, or pause/slow this routine).
 
 Every generated/derived page has its own independent-recomputation guard,
 wired into CI, that cross-checks its output against `content/*.md` rather
