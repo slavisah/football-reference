@@ -113,6 +113,28 @@ overgeneralization, and a `glossary.md` "host" entry that had the FIFA
 World Cup/UEFA EURO automatic-host-place rule backwards) - a future run
 should keep picking the next-longest-stale file.
 
+A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
+the content-verification rotation above, which checks editorial claims
+rather than the derivation code itself - found and fixed three latent
+logic bugs with no content-file edits needed: a dead "ties broken by
+combined wins" sort clause in `compare.ts`'s `buildRivalries()` (provably
+a no-op, since a pair's combined wins always equals its meeting count);
+a missing "—" placeholder filter on the Runner-up field in
+`editions.ts`'s `buildTimeline()`/`buildPodiums()` and `onThisDay.ts`'s
+`buildOnThisDayEntries()` (third/fourth already had this filter,
+runner-up didn't - currently dormant since no edition's runner-up cell
+is actually "—", but a real bug if one ever is); and a missing
+semicolon-joined-tie exclusion in `editions.ts`'s `buildLongestStreaks()`
+(every sibling ranking in the same file excludes or specially handles
+ties, this one didn't - also currently dormant, no two adjacent editions
+share an identical tie string yet). See `docs/PROJECT_STATUS.md`'s Run
+267 entry for the full detail. Worth repeating this angle periodically on
+the other `src/lib/*.ts` files (`jsonLd.ts`, `editionProfile.ts`,
+`contentPages.ts`, `homeCards.ts`, `teamProfile.ts`, `playerProfile.ts`,
+`tableSort.ts` not yet reviewed this way) - unlike the content-claim
+checks, nothing in CI currently catches a logic bug that produces a
+*consistent but wrong* result rather than a crash or a source mismatch.
+
 Every generated/derived page has its own independent-recomputation guard,
 wired into CI, that cross-checks its output against `content/*.md` rather
 than trusting the page's own rendering: `/records` (`check-records-against-
