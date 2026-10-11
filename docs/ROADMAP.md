@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (266 intensive runs as of 2026-10-11) lives
+verification sweep and decision (268 intensive runs as of 2026-10-11) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -128,12 +128,18 @@ semicolon-joined-tie exclusion in `editions.ts`'s `buildLongestStreaks()`
 (every sibling ranking in the same file excludes or specially handles
 ties, this one didn't - also currently dormant, no two adjacent editions
 share an identical tie string yet). See `docs/PROJECT_STATUS.md`'s Run
-267 entry for the full detail. Worth repeating this angle periodically on
-the other `src/lib/*.ts` files (`jsonLd.ts`, `editionProfile.ts`,
-`contentPages.ts`, `homeCards.ts`, `teamProfile.ts`, `playerProfile.ts`,
-`tableSort.ts` not yet reviewed this way) - unlike the content-claim
-checks, nothing in CI currently catches a logic bug that produces a
-*consistent but wrong* result rather than a crash or a source mismatch.
+267 entry for the full detail. Run 268 continued the same angle across
+every other `src/lib/*.ts` file (`jsonLd.ts`, `editionProfile.ts`,
+`homeCards.ts`, `teamProfile.ts`, `playerProfile.ts`, `tableSort.ts`;
+`contentPages.ts` stays out of scope per the two-hundred-and-forty-second
+run's own explanation above) and found no further bug - a negative but
+genuine result that closes this angle for every file in `src/lib/`, at
+least until the next time one of them changes materially. Unlike the
+content-claim checks, nothing in CI currently catches a logic bug that
+produces a *consistent but wrong* result rather than a crash or a source
+mismatch, so this angle is worth re-running from scratch after a future
+run meaningfully edits any of these files, rather than treated as
+permanently closed.
 
 Every generated/derived page has its own independent-recomputation guard,
 wired into CI, that cross-checks its output against `content/*.md` rather
