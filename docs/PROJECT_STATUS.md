@@ -38339,3 +38339,90 @@ small duplication/efficiency observations noted above, if a future run wants
 to spend a pass on cleanup rather than bug-hunting; (c) PR #56 still needs a
 human decision - merge it or pause/slow this routine - not another automated
 re-flag.
+
+### Run 271 (2026-10-11): extended the code-review angle to `src/pages/*.astro`'s English leaf pages (no new bug found)
+
+With Run 267-270's code-review angle now closed for `src/lib/*.ts`,
+`src/components/*.astro` and (for its seven largest files) `scripts/*.mjs`,
+picked the one major source directory that angle had not yet touched at
+all: `src/pages/*.astro` (49 files, 14,724 lines - the layer that wires
+`src/lib/`'s builders and `src/components/`'s presentation together into
+each actual route, and had never had this specific "re-derive the logic by
+hand and compare" treatment). Scoped this run to the 11 non-year, non-`hr/`
+English leaf pages with real page-level logic rather than mostly
+content-driven markup (`index.astro`, `records.astro`, `quiz.astro`,
+`compare.astro`, `compare-players.astro`, `teams/index.astro`,
+`teams/[slug].astro`, `players/index.astro`, `players/[slug].astro`,
+`glossary.astro`, `about/sources.astro` - 4,736 lines) - the 24
+`competitions/**/[year].astro`/`competitions/*.astro` landing pages and all
+25 `src/pages/hr/**` Croatian mirrors are still untried, see below.
+
+Read all 11 files end to end looking for the same bug shapes Run 267-269
+found elsewhere (a dead conditional, a missing placeholder/tie filter, two
+call sites or a client-side script and its server-rendered counterpart that
+are supposed to agree but don't, an off-by-one, a wrong array feeding a
+`.sort().at(-1)` "most recent date" computation). Specifically traced
+`compare.astro`'s and `compare-players.astro`'s client-side `<script
+is:inline>` blocks (`fillVersus()`/`renderFinalsMeetings()`/
+`sharedAwardYears()`) line-by-line against the server-side builders they
+are meant to mirror (`src/lib/compare.ts`'s `buildFinalsMeetings()`/
+`finalsMeetingsBetween()`, `src/lib/comparePlayers.ts`'s
+`buildSharedAwardYears()`) - byte-for-byte equivalent logic in both cases,
+no drift. Also specifically checked `quiz.astro`'s and `players/index.astro`'s
+`lastReviewed`/`dateModified` arrays, the exact shape of bug Run 267 found
+elsewhere (a forgotten array member silently understating a page's real
+last-modified date): `quiz.astro`'s own array omits `goldenBootEuro.lastReviewed`,
+which looked like the same gap at first read, but both Golden Boot
+`loadCompetition()` calls load the *same* `content/golden-boot.md` file (only
+`editionsHeading` differs, to pull a different table section) - so
+`goldenBootWorldCup.lastReviewed` and `goldenBootEuro.lastReviewed` are
+always identical by construction (both are `entry.data.lastReviewed` off the
+one file), and omitting one from the max-of array can never change the
+result. Confirmed this directly against `src/lib/competition.ts`'s
+`loadCompetition()` rather than assumed, then ruled it out as a non-bug.
+
+**No bug found.** A genuine negative result for these 11 files - closes this
+angle for them specifically, the same way Run 268/269 closed it for
+`src/lib/`/`src/components/`. Unlike those two directories, this is only a
+partial sweep of `src/pages/`: the 24 `competitions/**/[year].astro` and
+`competitions/*.astro` landing pages (more content-driven, less derived
+logic, but untried) and all 25 `src/pages/hr/**` Croatian mirrors (which
+each hand-duplicate their English sibling's data-loading and JSON-LD calls
+with translated strings - exactly the kind of "two call sites meant to
+agree" shape this angle looks for) remain untried - a natural next slice for
+a future run rather than treated as closed for the whole directory.
+
+**Re-flagged, still not fixed, now for a fifth consecutive run (Run 263, 268,
+269, 270, now 271):** PR #56 remains open - 9 days and, as of this run's own
+push, 69 commits (Run ~215 through Run 271) unmerged against `main`. This
+run's own standing health check, like every one before it, passes clean, so
+there is still no correctness reason blocking a merge. Four prior
+in-repo notifications (this PR's own body, plus Run 263/268/269's
+`docs/PROJECT_STATUS.md` entries) have not resulted in a merge or a paused
+schedule - text inside a PR body or a markdown file nobody is actively
+reading evidently doesn't reach the user, so this run's own notification
+goes out as a push notification instead (outside the repo, to the user's
+phone/inbox) rather than a sixth repeat of the same unread flag. No
+intensive run can merge or pause its own PR; this still needs the user's own
+decision.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm lint` (263
+files, 0/0/0), `pnpm test` (1071/1071, unchanged - no source file touched,
+this run's own checking was a read-only review that found nothing to fix),
+`pnpm build` (711 pages, unchanged). All 33 fast CI-gated `check:*` scripts
+individually re-run and clean (`check:pdfs`/`check:pdf-outline` included -
+nothing changed, so nothing went stale, no PDF regeneration needed). `pnpm
+audit` (no known vulnerabilities). `pnpm dlx knip --no-config-hints` (same
+one standing false positive, `@cspell/dict-hr-hr`). No `content/*.md` or
+`src/**/*.{astro,ts}` file changed this run, so the ten manual/
+intensive-run-only browser sweeps and a cold-start `pnpm test:e2e` were not
+re-run - no markup or behavior change to re-verify.
+
+**Left for a future pass:** unchanged from Run 266-270's list, plus: (a)
+extend the `src/pages/*.astro` code-review angle to the 24 untried
+`competitions/**` landing/edition pages and all 25 `src/pages/hr/**`
+Croatian mirrors - the mirrors in particular are the one remaining
+untried corner of the codebase with real "two call sites meant to agree"
+duplication risk; (b) PR #56 still needs a human decision - merge it or
+pause/slow this routine - this run escalated it via push notification
+rather than another automated in-repo flag.
