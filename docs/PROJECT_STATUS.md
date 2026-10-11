@@ -38241,3 +38241,101 @@ re-run the `src/components/*.astro` code-review angle from scratch after a
 future run meaningfully edits any of these 19 files; (b) PR #56 still needs
 a human decision - merge it or pause/slow this routine - not another
 automated re-flag.
+
+### Run 270 (2026-10-11): extended the code-review angle to `scripts/*.mjs`; found and fixed a real bug - six `content/*.md` files silently skipped by `check:claims-hr`'s EN/HR claim cross-check
+
+With Run 267-269's `src/lib/*.ts`/`src/components/*.astro` code-review angle
+now closed for both directories (no bug found in either), picked the one
+remaining untried corner of the codebase in the same vein: `scripts/*.mjs`,
+the 49 files (10,199 lines) behind every `check:*` CI gate. A logic bug here
+is higher-leverage than one in `src/lib`/`src/components` - it can let a real
+content error ship past CI silently rather than just rendering wrong once.
+Reviewed the seven largest/most logic-heavy verification scripts
+(`check-records-against-source.mjs`, `check-claims-hr.mjs`,
+`check-compare-against-source.mjs`, `check-award-tallies.mjs`,
+`check-i18n-notes.mjs`, `check-player-profiles-against-source.mjs`,
+`check-superlative-claims.mjs`) via the `/code-review` skill (high effort).
+
+**One real, confirmed bug found and fixed:** `check-claims-hr.mjs`'s own
+`CONTENT_FILE_TO_PAGE_PATH` map - which decides which content files' ledgered
+claims get cross-checked against their Croatian translation at all - was
+missing six of the twelve `content/*.md` files that `record-claims-ledger.json`/
+`ordinal-claims-ledger.json`/`since-claims-ledger.json` key claims under:
+`compare-countries.md`, `compare-players.md`, `glossary.md`, `players.md`,
+`records-and-timelines.md`, `teams.md`. The map's own header comment already
+documented the intended contract ("every `content/*.md` file any ledger keys
+claims under", `quiz.md` the one documented exception) - this was a gap
+between that documented intent and the actual object literal, not a
+deliberate scoping. Confirmed by listing every unique top-level key across
+all seven ledger JSON files with a one-off script and diffing against the
+map: exactly these six were present in a ledger but absent from the map, so
+`if (!pagePath) continue;` silently skipped every one of their claims, every
+run, with no warning.
+
+Of the six, `content/glossary.md`'s two claims (both added to
+`ordinal-claims-ledger.json`/`since-claims-ledger.json` for the "host" entry
+fix and the third/fourth-place history note) are the one case that actually
+matters today: each names real year anchors (1930; 1980/1984) that had never
+once been checked against `/hr/glossary`'s own translation since those
+ledger entries were created. The other five ledger entries turned out, on
+inspection, to be each page's own generated intro/description paragraph
+(`compare-countries.md`'s "Pick two national teams to compare..." and
+siblings) rather than a dated factual claim - `extractYears()`/
+`extractEarlierEditionsCardinal()` both return nothing for them, so adding
+them to the map is correct (closes the documented gap) but produces no new
+check output today; confirmed empirically, not just reasoned about, by
+diffing `check:claims-hr`'s own "N verified claim(s) checked" count before
+(205, matching Run 269's own cited figure) and after (231 - exactly the 26
+newly-included claims) the fix, with zero new problems reported either way.
+
+Also confirmed five of the six target pages (`/compare`, `/compare-players`,
+`/players`, `/teams`, `/glossary` - only `/records` renders an
+`EditorialNotes`/`.notes__card` section) render no notes card at all, so
+`extractNoteCardsWithItems()` returns `[]` for them; traced
+`diffClaimsPositionally()`'s own existing body-text fallback (it already
+handles "claim didn't positionally pair" by falling back to whole-page text)
+and confirmed it degrades correctly to that fallback for an entirely
+notes-card-less page rather than erroring - no code change needed there, the
+existing fallback already covers this shape.
+
+The other six scripts reviewed produced no comparable correctness bug - a
+handful of pure duplication/efficiency observations only (e.g.
+`check-compare-against-source.mjs`'s two builder functions each re-parsing
+the same four competition files independently; `columnIndex()` copy-pasted
+across three scripts; `check-i18n-notes.mjs`'s HTML-entity-unescaping gap
+relative to `check-claims-hr.mjs`'s own near-identical extractor). Left these
+alone, the same call Run 267 made for `quiz.ts`'s six near-identical
+question-builder functions: each is a working, independently-tested script,
+and refactoring shared plumbing across files whose whole design principle is
+staying independent of each other risks exactly the kind of coupling that
+would make a future bug harder to localize, for a purely cosmetic gain.
+
+**Re-flagged, still not fixed (the same process/project-management finding
+Run 263, 268 and 269 already raised):** PR #56 remains open - now 9 days and
+68 commits (Run ~215 through Run 270) unmerged against `main`. No intensive
+run can merge or pause its own PR; this still needs the user's own decision.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm lint` (263
+files, 0/0/0), `pnpm test` (1071/1071, unchanged - no test file touched, the
+fix is a pure data-mapping correction in a script already covered by its
+own `tests/unit/checkClaimsHr.test.ts` testing the pure functions directly,
+not the file-level constant), `pnpm build` (711 pages, unchanged). All 33
+fast CI-gated `check:*` scripts individually re-run and clean, including
+`check:claims-hr` itself (231 claims checked, up from 205, zero problems -
+see above). No `content/*.md` or `src/pages/hr/**` file changed (the fix is
+entirely inside `scripts/`), so no PDF regeneration was needed;
+`check:pdfs`/`check:pdf-outline` both clean (700/700, nothing stale). `pnpm
+audit` (no known vulnerabilities). `pnpm dlx knip --no-config-hints` (same
+one standing false positive, `@cspell/dict-hr-hr`). Browser sweeps and a
+cold-start `pnpm test:e2e` not re-run - no markup/behavior change this run,
+matching established practice for a scripts-only fix.
+
+**Left for a future pass:** unchanged from Run 266-269's list, plus: (a) the
+`scripts/*.mjs` code-review angle still has 42 of 49 files untried (the
+smaller/simpler ones, plus `pdf-pages.mjs`/`generate-pdfs.mjs`/
+`check-lighthouse.mjs` - infra/tooling scripts rather than content-
+verification logic, a different risk profile worth its own pass); (b) the
+small duplication/efficiency observations noted above, if a future run wants
+to spend a pass on cleanup rather than bug-hunting; (c) PR #56 still needs a
+human decision - merge it or pause/slow this routine - not another automated
+re-flag.
