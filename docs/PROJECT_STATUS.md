@@ -37850,3 +37850,106 @@ to avoid repeating the same mistake - all clean, pushed, CI green.
 angle (Musiala) is unchanged - still no source frames his share as a
 record after a seventh attempt. Everything else is unchanged from Run
 264's list, minus the now-closed `check:color-contrast` item.
+
+### Run 266 (2026-10-11): full backlog/dependency/content re-confirmation plus three open-research retries - no new feature work, no new result
+
+**Why this run shipped a confirmation pass rather than a feature:** every
+item in `docs/ROADMAP.md`'s "Open backlog" remains either blocked on
+something outside this session's control (the `typescript` 7
+peer-dependency ceiling, the egress-blocked `docs/SOURCES.md`
+link-liveness sweep, the `long-title` brand-suffix call needing human
+sign-off) or genuinely exhausted research (the Nations League Best XI and
+attendance gaps). The 2026 Ballon d'Or ceremony is still 15 days out. All
+15 `content/*.md` files already carried a `lastReviewed` date of
+2026-10-09 or 2026-10-10 - one or two days old, not stale enough to
+justify re-running the content-verification rotation on files it had
+already caught up on days ago. Per this routine's own "quality pass"
+fallback instruction, this run spent its effort on re-confirming nothing
+had regressed and on retrying the small number of genuinely open research
+gaps with fresh queries, rather than inventing busywork.
+
+**What this run re-confirmed clean, with nothing changed:**
+- `pnpm install --frozen-lockfile`, `pnpm lint` (263 files, 0 errors/0
+  warnings/0 hints), `pnpm test` (1071/1071), `pnpm build` (711 pages).
+- `pnpm outdated` (only the same long-blocked `typescript` 5.9.3 → 7.0.2
+  line - `@astrojs/check@0.9.10` still caps it at `^5.0.0 || ^6.0.0`),
+  `pnpm audit` (no known vulnerabilities), `pnpm dlx knip --no-config-hints`
+  (the one documented `@cspell/dict-hr-hr` false positive only).
+- All 32 of the fast, CI-wired `check:*` scripts (every one except the ten
+  manual/intensive-run-only full-site browser sweeps, which Run 265 already
+  re-confirmed clean in full) run fresh this run: `check:attendance-format`,
+  `check:award-tallies`, `check:claims-hr`, `check:compare-consistency`,
+  `check:completeness-claims`, `check:consecutive-claims`, `check:edition-
+  header-labels`, `check:feed`, `check:heading-outline`, `check:image-
+  dimensions`, `check:jsonld`, `check:link-names`, `check:links`, `check:
+  locale-consistency`, `check:meta`, `check:one-of-only-claims`, `check:
+  ordinal-claims`, `check:pdf-outline`, `check:pdfs`, `check:perf`,
+  `check:player-profiles-consistency`, `check:precache`, `check:record-
+  claims`, `check:records-consistency`, `check:reachability`, `check:since-
+  claims`, `check:sitemap`, `check:spelling`, `check:spelling-hr`,
+  `check:superlative-claims`, `check:team-profiles-consistency`,
+  `check:theme-color`, `check:theme-flash` - all pass, zero discrepancies.
+- Re-verified (via fresh `WebSearch` passes, not relying on prior runs'
+  citations) the four 2026 FIFA World Cup individual-award facts in
+  `content/fifa-world-cup.md` that are both the newest and the
+  highest-churn-risk claims in the file: Rodri's Golden Ball, Unai Simón's
+  Golden Glove (seven clean sheets in Spain's eight matches, one goal
+  conceded, matching the page's own "a record seven clean sheets" note),
+  Pau Cubarsí's Young Player Award (independently confirmed as the first
+  defender to win it), and Luis de la Fuente's "oldest winning manager in
+  World Cup history, aged 65" record. All four already had independent
+  sourcing on file (`docs/SOURCES.md` lines ~102, ~123-124, ~149); this
+  run's fresh search found no new discrepancy, so `content/fifa-world-
+  cup.md`'s `lastReviewed` was left as its existing 2026-10-09 date rather
+  than bumped for a pass that found nothing new to report.
+
+**Three open research gaps retried, all still negative:**
+- **EURO Golden Boot youngest-ever winner:** an eighth fresh `WebSearch`
+  pass (direct "youngest Golden Boot" query, then a Musiala-specific
+  follow-up) again found no source framing any single-tournament top
+  scorer's age as a record - the same result as every prior attempt.
+  Unchanged from Run 265's list.
+- **UEFA Nations League 2025 Finals Team of the Tournament:** retried with
+  a fresh query; still no official best-XI list surfaces, only a "best
+  player" (Nuno Mendes) and top-scorer trio (Mbappé/Ronaldo/Yamal, two
+  goals each) - the gap documented in `docs/ROADMAP.md` is unchanged.
+- **UEFA Nations League 2023 Finals attendance (41,110 vs. 41,500):** a
+  fresh query corroborates 41,110 (Wikipedia's match page) but still turns
+  up no source for 41,500 at all, and surfaces a second, smaller
+  discrepancy that doesn't change the page's own reporting: UEFA's own
+  news coverage puts the four-match tournament *total* at 126,200 against
+  Wikipedia's 126,319 - a ~119-person gap, immaterial next to the
+  five-figure single-match conflict the page already declines to resolve.
+  No change made; still correctly left unreported per the two-independent-
+  sources bar.
+- Also re-confirmed the `docs/SOURCES.md` link-liveness sweep is still
+  infeasible here: `WebFetch` to `en.wikipedia.org` returns
+  `getaddrinfo ENOTFOUND` (DNS-level failure, not even reaching the proxy's
+  earlier-documented 403s) - same outcome, different failure signature,
+  still a hard block on direct fetches to reference domains in this
+  environment.
+
+**Verification:** see the full re-confirmation list above; nothing in
+`content/*.md` or `src/pages/hr/**` was edited this run, so `pnpm
+build:pdfs`/`check:pdfs` regeneration was not required per this repo's own
+definition-of-done (`check:pdfs` was still run as part of the fast-check
+battery above and reported all 700 PDFs fresh).
+
+**Worth repeating for whoever reads this next:** Run 263 already flagged
+that this routine's original scope (`AGENTS.md`'s milestone list,
+`docs/WEBSITE_REQUIREMENTS.md`) has been fully shipped for well over a
+hundred runs, and that runs 241-263 were overwhelmingly re-confirmation
+passes and narrow research retries. That observation still holds three
+runs later (264-266 added one real bug fix, one new sourced fact, and now
+one more clean confirmation pass) - the shape of the work genuinely is
+"keep the lights on and retry three stubborn research gaps occasionally,"
+not "ship new features," and that's unlikely to change before the 2026
+Ballon d'Or ceremony (15 days out) gives the content-verification rotation
+its next genuinely new thing to check.
+
+**Left for a future pass:** unchanged from Run 265's list - the EURO
+Golden Boot youngest-winner angle, the Nations League Best XI/attendance
+gaps, the `typescript` 7 upgrade, the `docs/SOURCES.md` link-liveness
+sweep, the `long-title` brand call, and the full ~130-winner birth-date
+ranking - plus the 2026 Ballon d'Or ceremony re-check once 26 October
+2026 has passed.
