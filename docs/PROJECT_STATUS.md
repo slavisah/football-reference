@@ -38777,3 +38777,88 @@ escalation with no change in outcome. This run's own end-of-run push
 notification folds the PR-56 status in alongside the bug fix, same as Run
 274's choice, rather than treating every run as needing its own dedicated
 escalation message.
+
+### Run 276 (2026-10-12): code-review pass over `src/layouts/BaseLayout.astro` (no bug found); seventh negative retry of the EURO Golden Boot "youngest-ever" research angle; routine dependency/health re-confirmation
+
+With the `src/lib/*.ts`/`src/components/*.astro`/`src/pages/**`/`scripts/*.mjs`
+code-review angle now closed for every file in each of those directories
+(Runs 267-275), the one remaining `.astro`/`.ts` file never reviewed under
+this specific angle was `src/layouts/BaseLayout.astro` - the single shared
+page shell every route renders through (canonical/hreflang/Open Graph/
+JSON-LD head tags, the theme pre-paint script, the service-worker
+registration, the breadcrumb/WebSite JSON-LD split). Read it end to end
+looking for the same class of latent, currently-dormant logic bug the prior
+six files-angle runs found (a dead sort clause, a missing placeholder
+filter, a missing tie exclusion, a wrong path shape) rather than a crash or
+an obviously-wrong rendered page. Specifically traced: the `x-default`
+hreflang's `defaultURL` branch (`locale === 'en' ? canonicalURL :
+alternateURL` - correctly resolves to the English page from either
+direction, assuming each page always passes its own real counterpart's
+`alternateHref`, which every current caller does); the `isHome` trailing-
+slash-normalized comparison against `withBase(locale === 'hr' ? '/hr/' :
+'/')` (correct under a GitHub Pages base path, matching `withTrailingSlash()`'s
+own documented reasoning); and the `og:locale:alternate`/hreflang blocks'
+shared `alternateHref` guard (equivalent to gating on `alternateURL`, since
+`alternateURL` is derived from `alternateHref` with no other condition - no
+drift possible between the two guards). Found no mismatch, dead branch, or
+missing filter anywhere in the file - a genuine negative result, not an
+unexamined pass. `src/layouts/BaseLayout.astro` now joins `src/lib/*.ts`,
+`src/components/*.astro`, `src/pages/**` and `scripts/*.mjs` as reviewed
+under this angle at least once; between the five, essentially the entire
+non-generated codebase has now had this treatment, closing the angle until
+a future run materially edits one of these files.
+
+Also retried the "Ideas not yet scoped" EURO Golden Boot "youngest-ever"
+research angle a seventh time (Runs 243, 250, 256 and others previously
+tried; Run 250 named Jamal Musiala's 2024 share, age 21, as the strongest
+candidate found so far but found no source actually framing it as a
+record). Two fresh `WebSearch` passes - one targeted directly at Musiala's
+2024 share, one at the EURO Golden Boot age record generally - again found
+no source naming any age record for the award: results confirm Musiala's
+age (21, born 26 February 2003) and his tournament performance but never
+compare it against other joint winners' ages or call it a record, and the
+general query surfaced unrelated records (Platini's 9-goal single-tournament
+tally, Lamine Yamal's Golden Boy award, a Golden Boot winner being a Germany
+scoring milestone unrelated to this specific record) rather than anything
+on point. Still not shipped, for the same reason Run 250 gave: adding it now
+would mean this run originating the superlative claim from a self-computed
+comparison rather than sourcing an already-published one, the exact risk
+this idea's two already-shipped slices (Ballon d'Or; World Cup/EURO Golden
+Boot oldest-ever) deliberately avoided. Seventh consecutive negative result
+on this specific sub-item; the full generated "youngest winner" ranking
+(every winner, not just the extremes) remains the larger unbuilt piece of
+this idea and still needs either a trustworthy bulk birth-date source or
+direct page-fetch access.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm outdated`
+surfaced one new in-range patch release since Run 275's own check -
+`vitest`/`@vitest/coverage-v8` 5.0.3 -> 5.0.4 - bumped (only the
+already-documented blocked `typescript` 5.9.3 -> 7.0.2 line remains after),
+`pnpm lint` (263 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(1071/1071, unchanged - this run's own changes were a read-only code review
+plus two read-only `WebSearch` calls, no source file needed a fix), `pnpm
+build` (711 pages, unchanged). All 34 CI-gated fast `check:*` scripts
+individually re-run and clean against the bumped `vitest`/`@vitest/coverage-v8`.
+`pnpm audit` (no known vulnerabilities, both before and after the bump).
+`pnpm dlx knip --no-config-hints` (the same one standing false positive,
+`@cspell/dict-hr-hr`). Browser sweeps and a cold-start `pnpm test:e2e` not
+re-run - no markup, behavior or content change this run, matching
+established practice; the last full cold-start `pnpm test:e2e` (Run 254)
+and the ten-script manual browser sweep (Run 265) remain the standing
+baselines.
+
+**Left for a future pass:** (a) the `BaseLayout.astro`/`src/layouts/**`
+corner of the code-review angle is now closed, alongside every other
+directory already covered - the angle has no further untried file left in
+the non-generated codebase, so the next material edit to any of these
+files is what should trigger picking it back up, not a fresh sweep of
+files already covered; (b) the EURO Golden Boot youngest-ever sub-item has
+now had seven negative attempts - worth leaving alone for a few runs rather
+than retrying with no new angle each time, per the same reasoning Run 256
+already gave; (c) **PR #56 still needs a human decision - now 10 days and
+74+ commits unmerged**, ten runs (263, 268-275, now 276) past the first
+in-repo flag and five runs past the first push-notification escalation with
+no change in outcome. This run's own end-of-run push notification leads
+with the PR-56 status rather than this run's own (modest) findings, since
+ten runs of escalation with no response is itself the more important
+signal at this point.

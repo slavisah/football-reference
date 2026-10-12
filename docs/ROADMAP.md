@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (275 intensive runs as of 2026-10-12) lives
+verification sweep and decision (276 intensive runs as of 2026-10-12) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -102,6 +102,17 @@ this run): 1071 unit tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711
 pages built; 1055 Playwright e2e tests as of the last full cold-start run
 (Run 254).
 
+The code-review angle (Runs 267-276: a different check from the content-
+verification rotation below, reading derivation/presentation code itself
+for latent, currently-dormant logic bugs rather than checking editorial
+claims) has now covered `src/lib/*.ts`, `src/components/*.astro`,
+`src/pages/**` (English and Croatian), `scripts/*.mjs` and
+`src/layouts/BaseLayout.astro` - essentially the entire non-generated
+codebase - and found and fixed six real bugs along the way (see Runs 267,
+270, 272, 274, 275 in `docs/PROJECT_STATUS.md`). No further untried file
+remains; re-run from scratch only after a future run materially edits one
+of these files, per each entry's own caveat.
+
 The content-verification rotation (re-check whichever content file has
 gone longest since its last `lastReviewed` bump, cross-checking claims
 against the file's own tables and, for recent events, live `WebSearch`
@@ -157,15 +168,16 @@ mismatch, so this angle is worth re-running from scratch after a future run
 meaningfully edits any of these files, rather than treated as permanently
 closed.
 
-**Standing, unresolved process flag (raised Run 263, 268-274, now 275 -
-nine runs running):** PR #56 (`intensive/football-reference` -> `main`) has
-been open since 2026-10-02 and has never been merged - 10 days and 73+
-commits as of Run 275, growing every 4 hours. No intensive run can merge or
-pause its own PR; Runs 271, 272 and 273 already escalated this via push
+**Standing, unresolved process flag (raised Run 263, 268-275, now 276 - ten
+runs running):** PR #56 (`intensive/football-reference` -> `main`) has
+been open since 2026-10-02 and has never been merged - 10 days and 74+
+commits as of Run 276, growing every 4 hours. No intensive run can merge or
+pause its own PR; Runs 271, 272, 273 and 275 already escalated this via push
 notifications (outside the repo), and the PR is still open several runs
-later, so Run 275 sent another push notification rather than assuming the
-earlier ones will eventually be acted on. This needs the user's own
-decision (merge it, or pause/slow this routine).
+later, so Run 276 sent another push notification - leading with the PR-56
+status, not this run's own findings - rather than assuming the earlier ones
+will eventually be acted on. This needs the user's own decision (merge it,
+or pause/slow this routine).
 
 Every generated/derived page has its own independent-recomputation guard,
 wired into CI, that cross-checks its output against `content/*.md` rather
@@ -330,9 +342,11 @@ the full run-by-run history behind all of this, see
   World Cup/EURO Golden Boot oldest) deliberately avoided by only ever
   sourcing an already-published "youngest-ever"/"oldest-ever" claim rather
   than computing one. Musiala, age 21, is nonetheless the strongest
-  candidate found across six runs' worth of attempts (the two-hundred-and-
+  candidate found across seven runs' worth of attempts (the two-hundred-and-
   fifty-sixth run tried again with a fresh `WebSearch` pass and again found
-  no source framing his share as a record) - a future run with
-  a fresh `WebSearch` pass (or any source that frames a EURO Golden Boot
-  age record in writing) should check whether it names him before trying
-  another vocabulary angle from scratch.
+  no source framing his share as a record; Run 276 retried once more with
+  two fresh queries and again found nothing on point). Seven consecutive
+  negative results on this specific sub-item - worth leaving alone for a
+  few runs rather than retrying with no new angle each time, per Run 256's
+  own reasoning, until either a fresh source surfaces on its own or a
+  genuinely different search angle presents itself.
