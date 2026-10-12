@@ -143,14 +143,14 @@ result rather than a crash or a source mismatch, so this angle is worth
 re-running from scratch after a future run meaningfully edits any of
 these files, rather than treated as permanently closed.
 
-**Standing, unresolved process flag (raised Run 263, 268, 269, 270, 271, now
-272 - six runs running):** PR #56 (`intensive/football-reference` ->
-`main`) has been open since 2026-10-02 and has never been merged - 10 days
-and 70 commits as of Run 272, growing every 4 hours. No intensive run can
-merge or pause its own PR; Run 271 already escalated this via a push
-notification (outside the repo) rather than a sixth repeat of the same
-unread in-repo flag, and the PR is still open a run later, so Run 272 sent
-a second, brief push notification rather than assuming the first one will
+**Standing, unresolved process flag (raised Run 263, 268, 269, 270, 271,
+272, now 273 - seven runs running):** PR #56 (`intensive/football-reference`
+-> `main`) has been open since 2026-10-02 and has never been merged - 10
+days and 71 commits as of Run 273, growing every 4 hours. No intensive run
+can merge or pause its own PR; Runs 271 and 272 already escalated this via
+push notifications (outside the repo) rather than repeating the same
+unread in-repo flag, and the PR is still open two runs later, so Run 273
+sent a third push notification rather than assuming the first two will
 eventually be acted on. This needs the user's own decision (merge it, or
 pause/slow this routine).
 

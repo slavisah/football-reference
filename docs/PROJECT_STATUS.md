@@ -38515,3 +38515,59 @@ days and 70 commits unmerged, a run past Run 271's own push-notification
 escalation with no change in outcome, so this run sent a second, brief
 push notification rather than assuming the first one will eventually be
 read.
+
+### Run 273 (2026-10-12): fixed the `PodiumCards`/`HostMap` unconditional-call pattern Run 272 flagged and left open
+
+Picked up Run 272's own "left for a future pass" item (a): the English
+`CompetitionView.astro` wraps both `<PodiumCards>` and `<HostMap>` in a
+`{x && x.length > 0 && (...)}` guard, but all four hand-rolled Croatian
+competition pages that actually render these two components
+(`world-cup.astro`, `copa-america.astro`, `nations-league.astro` - both
+components; `euro.astro` - `HostMap` only, since EURO's own English page
+never passes a `podium` prop to begin with, so there was never a
+`PodiumCards` call to guard there) called them unconditionally. (Croatian
+`ballon-dor.astro`/`golden-boot.astro` don't import either component at
+all - individual-award pages have no podium/host-map concept - so Run
+272's "all six" framing was broader than the actual call sites; the real
+exposure is these four files, seven call sites total.)
+
+Currently dormant for the same reason Run 272 noted: `buildPodiums()`/
+`buildHostMapPoints()` never return `[]` for today's `content/*.md`, so
+no page has ever actually hit the unguarded branch. But it is a real
+latent bug, not a hypothetical one - if a future edit ever left a
+competition with no completed editions (a newly-added not-yet-played
+tournament, for example), the Croatian page would call `<PodiumCards
+entries={[]} .../>` / `<HostMap points={[]} .../>` where the English page
+would simply omit the section, a visible EN/HR behavioral drift of
+exactly the kind this whole code-review angle (Run 267 onward) exists to
+catch before it ships.
+
+**Fix:** wrapped each of the seven call sites in
+`world-cup.astro`/`euro.astro`/`copa-america.astro`/`nations-league.astro`
+in the same `{podium && podium.length > 0 && (...)}` /
+`{hostMap && hostMap.length > 0 && (...)}` guard as `CompetitionView.astro`,
+byte-for-byte matching condition shape (no behavior change for today's
+content - every guard currently evaluates true - purely closing the latent
+gap).
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm lint`
+(263 files, 0/0/0), `pnpm test` (1071/1071, unchanged - no unit-tested
+module touched), `pnpm build` (711 pages, unchanged page count). All 31
+fast, non-PDF CI-gated `check:*` scripts individually re-run and clean.
+All four edited files are translated `src/pages/hr/**` pages, so per
+AGENTS.md's "Definition of done" this run regenerated PDFs
+(`pnpm build:pdfs`, with `PW_EXECUTABLE_PATH` pointed at the pre-installed
+`chromium-1194/chrome-linux/chrome` binary, the same workaround Run 265/272
+used) before committing: `check:pdfs` (all 700 up to date) and
+`check:pdf-outline` (all 700 outlines match their page's heading structure)
+both clean. The ten manual/intensive-run-only browser sweeps and a
+cold-start `pnpm test:e2e` were not re-run - the change only adds a
+conditional wrapper around markup that already renders identically today,
+matching the risk profile Run 270-272 judged not to need a full sweep.
+
+**Left for a future pass:** (a) the 42 of 49 `scripts/*.mjs` files the
+code-review angle still hasn't reached (per Run 270); (b) PR #56 still
+needs a human decision - now 10 days and 71 commits unmerged, two runs
+past Run 271's own push-notification escalation with no change in
+outcome, so this run sent a third, brief push notification rather than
+assuming the first two will eventually be acted on.
