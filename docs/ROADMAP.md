@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (276 intensive runs as of 2026-10-12) lives
+verification sweep and decision (277 intensive runs as of 2026-10-12) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -168,13 +168,13 @@ mismatch, so this angle is worth re-running from scratch after a future run
 meaningfully edits any of these files, rather than treated as permanently
 closed.
 
-**Standing, unresolved process flag (raised Run 263, 268-275, now 276 - ten
-runs running):** PR #56 (`intensive/football-reference` -> `main`) has
-been open since 2026-10-02 and has never been merged - 10 days and 74+
-commits as of Run 276, growing every 4 hours. No intensive run can merge or
-pause its own PR; Runs 271, 272, 273 and 275 already escalated this via push
+**Standing, unresolved process flag (raised Run 263, 268-276, now 277 -
+eleven runs running):** PR #56 (`intensive/football-reference` -> `main`)
+has been open since 2026-10-02 and has never been merged - 10 days and 75+
+commits as of Run 277, growing every 4 hours. No intensive run can merge or
+pause its own PR; Runs 271-276 already escalated this via push
 notifications (outside the repo), and the PR is still open several runs
-later, so Run 276 sent another push notification - leading with the PR-56
+later, so Run 277 sent another push notification - leading with the PR-56
 status, not this run's own findings - rather than assuming the earlier ones
 will eventually be acted on. This needs the user's own decision (merge it,
 or pause/slow this routine).

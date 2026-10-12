@@ -38862,3 +38862,77 @@ no change in outcome. This run's own end-of-run push notification leads
 with the PR-56 status rather than this run's own (modest) findings, since
 ten runs of escalation with no response is itself the more important
 signal at this point.
+
+### Run 277 (2026-10-12): content-verification rotation on `content/fifa-world-cup.md`'s 2026 edition - full independent re-check against live sources, zero discrepancies found
+
+With the code-review angle (Runs 267-276) now closed for the entire
+non-generated codebase and every other `docs/ROADMAP.md` backlog item
+either environment-blocked or awaiting human sign-off, picked the
+content-verification rotation back up on its own oldest-`lastReviewed`
+tier (`content/about-sources.md`, `ballon-dor.md`, `compare-countries.md`,
+`compare-players.md`, `copa-america.md`, `fifa-world-cup.md`, `players.md`,
+`quiz.md`, `records-and-timelines.md`, `teams.md`, all tied at
+`lastReviewed: 2026-10-09`). Chose `content/fifa-world-cup.md` specifically
+for its 2026 edition content: every other competition file's facts predate
+this session's January 2026 knowledge cutoff and have already been through
+several WebSearch-backed rotation passes, but the 2026 World Cup section
+(final result, four individual awards, Fair Play Award, winning manager,
+winning captain, final attendance) was added to the site *after* that
+cutoff - the single highest-risk, least-independently-verified block of
+claims on the whole site, since no prior pass could have cross-checked it
+against this model's own training knowledge the way every earlier edition
+implicitly was.
+
+Independently re-verified, each via a fresh `WebSearch` pass against
+multiple outlets rather than trusting the content file's own prior
+sourcing: the final result (Spain 1-0 Argentina after extra time, Ferran
+Torres's 106th-minute winner, 19 July 2026, MetLife Stadium); the Golden
+Ball (Rodri, ahead of Messi's Silver Ball and Mbappé's Bronze Ball); the
+Golden Glove superlative claim ("a record seven clean sheets" - confirmed
+against FoxSports/Sunday Guardian/worldcupranking.com's matching 7-clean-
+sheet, 1-goal-conceded tally; one Gulf News headline's "six clean sheets"
+turned out to be a mid-tournament count before the final's own clean sheet,
+not a conflicting final tally, so no real source conflict); the Fair Play
+Award (Netherlands); the winning captain (Rodri, who lifted the trophy,
+confirmed via multiple outlets covering the trophy presentation); the
+winning manager's age claim ("the oldest winning manager in World Cup
+history, aged 65" - Luis de la Fuente, born 21 June 1961, confirmed 65 as
+of this tournament); and the final attendance figure (80,663, matching
+Wikipedia's "2026 FIFA World Cup final" article). Every claim checked out
+exactly as written - a genuine, substantive negative result, not a
+rubber-stamp: this is the first time any of these specific 2026 facts has
+been independently re-confirmed against live sources since whichever
+earlier run first added them. `lastReviewed` bumped to 2026-10-12.
+
+**Left for a future pass:** the content-verification rotation continues -
+`about-sources.md`, `ballon-dor.md`, `compare-countries.md`,
+`compare-players.md`, `copa-america.md`, `players.md`, `quiz.md`,
+`records-and-timelines.md` and `teams.md` are still at their
+`lastReviewed: 2026-10-09` tier and are the natural next pick; of these,
+`copa-america.md` is the only one with a comparable volume of checkable
+claims (`about-sources.md`/`compare-countries.md`/`compare-players.md`/
+`players.md`/`teams.md` are each ~10-line generated-directory blurbs with
+no standalone factual claims to verify beyond what the generated pages'
+own independent-recomputation guards already check). PR #56 remains
+unmerged - see this run's own `docs/ROADMAP.md` flag update and push
+notification.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean, no dependency
+change this run), `pnpm lint` (263 files, 0 errors/0 warnings/0 hints),
+`pnpm test` (1071/1071, unchanged), `pnpm build` (711 pages, unchanged).
+Only a `lastReviewed` date changed in `content/fifa-world-cup.md` - no
+table data, so none of the generated/derived pages' own factual output
+changed; re-ran `check:records-against-source` and the content-side
+`check:superlative-claims`/`check:record-claims` guards specifically (the
+ones most likely to catch a stale cross-reference) - both clean. `pnpm
+audit` clean, `knip` same one standing false positive. The visible "Last
+reviewed" date *is* rendered on every page sourced from this file
+(including its print PDFs), so - per AGENTS.md's unconditional
+"any edit to `content/*.md`" rule - still regenerated all 700 PDFs +
+manifest with `pnpm build:pdfs`; `check:pdfs`/`check:pdf-outline` both
+clean (700/700) afterward. Confirmed this the hard way: an earlier draft
+of this entry assumed a bare `lastReviewed` bump wouldn't need it, and
+`pnpm check:pdfs` immediately failed on all 70 World Cup PDFs (35 editions
+x EN/HR) until the rebuild ran - worth remembering for the next run that a
+*any* `content/*.md` edit means PDFs, full stop, not just a data-bearing
+one.
