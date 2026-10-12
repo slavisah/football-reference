@@ -38571,3 +38571,116 @@ needs a human decision - now 10 days and 71 commits unmerged, two runs
 past Run 271's own push-notification escalation with no change in
 outcome, so this run sent a third, brief push notification rather than
 assuming the first two will eventually be acted on.
+
+### Run 274 (2026-10-12): extended the `scripts/*.mjs` code-review angle to the remaining claim-ledger/profile checkers; found and fixed the same dead-code ENOENT bug in two files, one of them previously reviewed and missed
+
+Continued Run 270's own "left for a future pass" item (a): of the 49
+`scripts/*.mjs` files, 7 had the "re-derive the logic by hand, read for a
+correctness bug" `/code-review` treatment (Run 270); this run reviewed 7
+more - the remaining individual claim-ledger checkers
+(`check-ordinal-claims.mjs`, `check-since-claims.mjs`,
+`check-record-claims.mjs`, `check-consecutive-claims.mjs`,
+`check-completeness-claims.mjs`, `check-one-of-only-claims.mjs`) plus
+`check-team-profiles-against-source.mjs`, the `/teams/<slug>` sibling of
+Run 270's own `check-player-profiles-against-source.mjs`.
+
+**One real, confirmed bug, present in two files:**
+`check-team-profiles-against-source.mjs`'s `verifyAgainstSource()` loop
+catches each team's own `ENOENT` (missing `dist/teams/<slug>/index.html`)
+internally and pushes it onto the `problems` array instead of rethrowing -
+so `main()`'s top-level `.catch((error) => { if (error.code === 'ENOENT')
+... })`, clearly written to print one friendly "No build output found ...
+Run `pnpm build` first." hint (matching `check-records-against-source.mjs`'s
+own top-level-only pattern), can never actually fire: by the time
+`verifyAgainstSource()` resolves, the error has already been swallowed and
+rewritten into 40-some individual per-team problem strings. Confirmed by
+running the script against a repo with no `dist/` at all: instead of the
+one intended hint, it printed "40 /teams profile discrepancy(ies) found"
+with a generic "<Team>: expected a built page ... but found none" line
+per country.
+
+The exact same shape turned out to already exist in
+`check-player-profiles-against-source.mjs` - reviewed and marked "no
+comparable correctness bug" by Run 270 itself. That review evidently
+didn't trace what happens when the *entire* `dist/players/` directory is
+absent (as opposed to one individual page within an otherwise-successful
+build) - the one case where the per-item catch's `continue` silently
+defeats the top-level hint it was written alongside.
+
+**Fix, applied identically to both files:** added one upfront
+`access(TEAMS_DIR)` / `access(PLAYERS_DIR)` check at the top of `main()`,
+before calling `verifyAgainstSource()`, printing the same friendly
+"No build output found at dist/<teams|players>. Run `pnpm build` first."
+hint and returning early on `ENOENT`. Deliberately left the existing
+per-item `try`/`catch` inside `verifyAgainstSource()` itself untouched,
+rather than just letting the per-item `ENOENT` propagate: that inner catch
+still has independent value as a safety net for the different, genuine
+case (nothing in `src/pages/teams/[slug].astro`'s/`[slug].astro`'s own
+`getStaticPaths()` currently permits it, but nothing guarantees it either)
+where the build succeeds but one specific team/player's own page is
+missing - that case should still surface as a per-entity problem, not as a
+blanket "run build first" false negative. Verified both failure and
+success paths directly: `rm -rf dist && node scripts/check-team-profiles-
+against-source.mjs`/`check-player-profiles-against-source.mjs` now each
+print the single intended hint and exit 1 (confirmed only the hint prints,
+not 40-plus per-entity lines); `pnpm build && node scripts/...` on each
+afterward prints the normal "every ... matches an independent
+recomputation" success line and exits 0, unchanged from before this fix.
+
+**Other six scripts reviewed (`check-ordinal-claims.mjs`,
+`check-since-claims.mjs`, `check-record-claims.mjs`,
+`check-consecutive-claims.mjs`, `check-completeness-claims.mjs`,
+`check-one-of-only-claims.mjs`) produced no comparable correctness bug** -
+only a duplication observation, the same kind of finding Run 270 left
+alone for its own six clean scripts: `check-ordinal-claims.mjs` and
+`check-one-of-only-claims.mjs` each re-implement `diffClaimsAgainstLedger()`
+verbatim instead of importing the shared helper from
+`check-superlative-claims.mjs`, unlike their four sibling checkers (`check-
+record-claims.mjs`, `check-consecutive-claims.mjs`, `check-since-claims.mjs`,
+`check-completeness-claims.mjs`), which all import it. Left alone, the same
+call Run 267/270 made for `quiz.ts`'s near-identical question-builder
+functions and `check-compare-against-source.mjs`'s own duplicated table
+parsing: each checker is independently working and independently tested,
+and a future fix to the canonical `diffClaimsAgainstLedger()` not
+propagating to these two copies is a real but low-probability risk,
+worth a note here rather than a refactor bundled into a run that found an
+unrelated, higher-confidence bug.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` line), `pnpm
+lint` (263 files, 0/0/0), `pnpm test` (1071/1071, unchanged - neither
+fixed script has a dedicated unit-test file; both are exercised only via
+direct invocation, as done above), `pnpm build` (711 pages, unchanged).
+All 31 fast, non-PDF CI-gated `check:*` scripts individually re-run and
+clean, including both fixed scripts' own `check:team-profiles-consistency`/
+`check:player-profiles-consistency` (both clean against the real build, as
+expected - this run's fix only changes *when* the script fails, not
+*whether* it does for today's content). `pnpm audit` (no known
+vulnerabilities). `pnpm dlx knip --no-config-hints` (same standing
+`@cspell/dict-hr-hr` false positive). No `content/*.md` or `src/pages/**`
+file changed this run - only two `scripts/*.mjs` files - so per AGENTS.md's
+"Definition of done" no PDF regeneration was needed; `check:pdfs`/
+`check:pdf-outline` not re-run since nothing could have gone stale. Browser
+sweeps and a cold-start `pnpm test:e2e` not re-run for the same reason - no
+markup or page-rendering change this run.
+
+**Left for a future pass:** (a) 42 of 49 `scripts/*.mjs` files have now had
+this review (7 from Run 270, 7 from this run) - 35 remain, including
+`check-records-against-source.mjs`'s own much larger body (already
+reviewed at Run 270, but worth noting it is the one other file in this
+family big enough to warrant a second, deeper pass on its own) and the
+non-claims/non-profile checkers (`check-attendance-format.mjs`,
+`check-edition-header-labels.mjs`, `check-heading-outline.mjs`,
+`check-html-validity.mjs`, `check-image-dimensions.mjs`,
+`check-internal-links.mjs`, `check-jsonld.mjs`, `check-link-names.mjs`,
+`check-locale-consistency.mjs`, `check-meta.mjs`, `check-reachability.mjs`,
+`check-sitemap.mjs`, `check-theme-color.mjs`, `check-theme-flash.mjs`, and
+the dozen-plus browser/Playwright-driven sweep scripts), a natural next
+slice in the same vein; (b) the two duplicated `diffClaimsAgainstLedger()`
+copies noted above, left alone deliberately; (c) PR #56 still needs a
+human decision - now 10 days and 72 commits unmerged, three runs past Run
+271's own first push-notification escalation with no change in outcome.
+This run folded the PR-56 status into its single end-of-run push
+notification alongside the bug fix, rather than sending a fourth separate
+one, since three prior dedicated notifications produced no visible change
+and a notification budget is worth conserving.

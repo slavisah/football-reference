@@ -24,7 +24,7 @@
 // or from CI - see .github/workflows/ci.yml. Exits non-zero, listing every
 // mismatch, if any team's computed profile disagrees with its built page.
 
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -184,14 +184,24 @@ export async function verifyAgainstSource() {
 }
 
 async function main() {
-  const problems = await verifyAgainstSource().catch((error) => {
+  // Checked up front, rather than relying on the per-team ENOENT branch in
+  // verifyAgainstSource() to ever surface this: that branch catches and
+  // records a missing page as a per-team problem instead of rethrowing, so
+  // running this script before `pnpm build` produced one confusing
+  // "expected a built page ... but found none" line per team instead of this
+  // one clear hint.
+  try {
+    await access(TEAMS_DIR);
+  } catch (error) {
     if (error.code === 'ENOENT') {
-      console.error(`${error.message}\nRun \`pnpm build\` first.`);
+      console.error(`No build output found at ${path.relative(ROOT, TEAMS_DIR)}. Run \`pnpm build\` first.`);
       process.exitCode = 1;
-      return null;
+      return;
     }
     throw error;
-  });
+  }
+
+  const problems = await verifyAgainstSource();
   if (problems === null) return;
 
   if (problems.length === 0) {
