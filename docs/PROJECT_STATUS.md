@@ -38684,3 +38684,96 @@ This run folded the PR-56 status into its single end-of-run push
 notification alongside the bug fix, rather than sending a fourth separate
 one, since three prior dedicated notifications produced no visible change
 and a notification budget is worth conserving.
+
+### Run 275 (2026-10-12): finished the `scripts/*.mjs` code-review angle (24 remaining files) - found and fixed a real EN/HR coverage-gap bug in `check-i18n-notes.mjs`
+
+Completed the `scripts/*.mjs` code-review angle Run 270 started and Run 274
+continued: reviewed the 24 files neither prior run had read this way
+(`check-compare-against-source.mjs`, `check-records-against-source.mjs`,
+`check-feed.mjs`, `check-internal-links.mjs`, `check-sitemap.mjs`,
+`check-i18n-notes.mjs`, `check-locale-consistency.mjs`,
+`check-edition-header-labels.mjs`, `check-attendance-format.mjs`,
+`check-award-tallies.mjs`, `check-link-names.mjs`, `check-reachability.mjs`,
+`check-precache.mjs`, `check-theme-color.mjs`, `check-theme-flash.mjs`,
+`check-image-dimensions.mjs`, `check-meta.mjs`, `check-jsonld.mjs`,
+`check-heading-outline.mjs`, `check-html-validity.mjs`,
+`check-spelling-hr.mjs`, `check-page-weight.mjs`,
+`check-pdf-freshness.mjs`, `check-pdf-outline.mjs`) - all 49
+`scripts/*.mjs` files have now had this review at least once.
+
+**One real, currently-live bug found and fixed:** `check-i18n-notes.mjs`'s
+`hrCounterpart()` (also reused by `check-attendance-format.mjs`)
+special-cased the home page to `'/hr'` (no trailing slash), but
+`htmlFileToPagePath()` (the shared ground-truth path format every `check:*`
+script in this family uses, from `check-reflow.mjs`) renders a directory
+index as `'/hr/'` *with* a trailing slash - every other path already
+carries its own trailing slash from `htmlFileToPagePath()`, so
+`` `/hr${pagePath}` `` was already correct for them; only the home page's
+own hand-written special case had the wrong shape. Effect:
+`check-i18n-notes.mjs`'s `main()` looks up `htmlByPagePath.get(hrCounterpart(enPath))`
+to find each English page's Croatian counterpart - for the home page this
+lookup silently missed (`'/hr'` was never a key in the map, only `'/hr/'`),
+so the one page pair outside `src/pages/hr/competitions/**` that also
+renders `EditorialNotes` (both home pages' "How to use the reference"/
+"Important historical naming note" sections) was never checked for EN/HR
+note-section structural parity or dropped dash-clauses. Confirmed live, not
+hypothetical: before the fix, `pnpm check:i18n-notes` logged "Every matched
+page pair (**7** checked)" although `dist/index.html` and
+`dist/hr/index.html` both genuinely contain 2 `.notes__card` sections each;
+after the fix it logs "(**8** checked)" - the home page pair is now
+included (and was already clean, so this was a coverage gap, not a
+previously-masked mismatch).
+
+Fix: `hrCounterpart('/')` now returns `'/hr/'` instead of `'/hr'`, with an
+explanatory comment. Updated the one existing unit test
+(`tests/unit/checkI18nNotes.test.ts`) that was pinned to the old, buggy
+expectation. `check-attendance-format.mjs` also imports the same
+`hrCounterpart()`, but the home page has no "Final venues" section, so its
+own check output is unaffected (still "4 pairs checked", confirmed clean
+after the fix too).
+
+One false lead chased and ruled out: `check-meta.mjs`'s `findDuplicates()`
+looked at first glance like it destructured a composite `"locale value"`
+map key via `key.split(' ')`, which would mis-split a multi-word
+title/description back apart - but the file actually uses a literal NUL
+byte (`'\u0000'`) as the key separator (an editor/terminal rendering
+artifact displayed it as a plain space), which is unambiguous regardless of
+spaces in the value. No bug.
+
+Every other file reviewed clean: no dead branches, no missing
+sentinel/placeholder filters relevant to the real data (double-checked
+`check-records-against-source.mjs`'s `winnersAndRunners`/
+`tallyCompetition`/`nearlyTally` against the real `content/*.md` - the
+Winner/Runner-up columns are never empty for any of the four team
+competitions, so a theoretical missing-empty-cell-filter path there can't
+actually trigger today), and no further EN/HR or multi-call-site drift
+beyond the one fixed above.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean; `pnpm outdated`
+unchanged, only the already-documented blocked `typescript` line), `pnpm
+lint` (263 files, 0/0/0), `pnpm test` (1071/1071 - the one updated test
+failed against the pre-fix code, confirming the fix changes real behavior,
+then passed after), `pnpm build` (711 pages, unchanged). All 31 fast,
+non-PDF CI-gated `check:*` scripts individually re-run and clean, including
+the fixed `check:i18n-notes` itself (now "8 checked", up from 7) and
+`check:attendance-format` (unaffected, still "4 pairs checked"). `pnpm
+audit` (no known vulnerabilities). `pnpm dlx knip --no-config-hints` (same
+standing `@cspell/dict-hr-hr` false positive). No `content/*.md` or page
+markup changed this run - only `scripts/check-i18n-notes.mjs` and its unit
+test - so per AGENTS.md's "Definition of done" no PDF regeneration was
+needed; `check:pdfs`/`check:pdf-outline` not re-run since nothing could
+have gone stale. Browser sweeps and a cold-start `pnpm test:e2e` not re-run
+for the same reason - no markup or page-rendering change this run.
+
+**Left for a future pass:** (a) the `scripts/*.mjs` code-review angle is
+now closed for every file in the directory, at least until a future run
+materially edits one of them - same "re-run from scratch after a material
+edit" caveat already noted for `src/lib/*.ts`/`src/components/*.astro`;
+(b) the two duplicated `diffClaimsAgainstLedger()` copies Run 274 flagged
+remain untouched, deliberately; (c) PR #56 still needs a human decision -
+now 10 days and 73+ commits unmerged, nine runs (263, 268-274, now 275)
+past the first in-repo flag and four runs past the first push-notification
+escalation with no change in outcome. This run's own end-of-run push
+notification folds the PR-56 status in alongside the bug fix, same as Run
+274's choice, rather than treating every run as needing its own dedicated
+escalation message.
