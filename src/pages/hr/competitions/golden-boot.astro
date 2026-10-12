@@ -310,6 +310,9 @@ const headerLabels: Record<string, string> = {
       noteText="Prednost imaju primarni izvori. Povijesni formati i nazivi reprezentacija bilježe se onako kako su korišteni u to vrijeme; kontekst potražite u napomenama uz svako izdanje."
     />
   </article>
+  <p class="golden-boot__players-link no-print">
+    <a href={withBase('/hr/players')}>Pregledajte cjelovitu povijest nagrada svakog igrača &rarr;</a>
+  </p>
 </BaseLayout>
 
 <style>
@@ -329,5 +332,9 @@ const headerLabels: Record<string, string> = {
     max-width: 62ch;
     color: var(--text-muted);
     font-size: 1.05rem;
+  }
+
+  .golden-boot__players-link {
+    font-weight: 600;
   }
 </style>

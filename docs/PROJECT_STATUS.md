@@ -38426,3 +38426,92 @@ untried corner of the codebase with real "two call sites meant to agree"
 duplication risk; (b) PR #56 still needs a human decision - merge it or
 pause/slow this routine - this run escalated it via push notification
 rather than another automated in-repo flag.
+
+### Run 272 (2026-10-12): extended the code-review angle to all 24 `src/pages/hr/**` mirror pages - two real bugs found and fixed
+
+Picked up exactly where Run 271 left off: the one corner of the
+"re-derive the logic by hand and compare" code-review angle (Run 267-271)
+still untried was the 24 Croatian mirror pages under `src/pages/hr/**`,
+each hand-duplicating its English sibling's data-loading calls, JSON-LD
+generation, `lastReviewed`/`dateModified` arrays and slug/URL generation
+with translated strings - exactly the "two call sites meant to agree"
+shape this angle looks for, and the shape Run 271 flagged as the natural
+next slice. Read and diffed all 24 hr/en page pairs (48 files, every
+`competitions/**` landing/edition page and its two Golden Boot sub-routes
+included) against the same bug shapes Run 267-271 found elsewhere (a
+guard present on one call site but missing on its sibling, a dropped
+array member, drifted builder-call arguments, a client script out of
+sync with its server-side counterpart).
+
+**Two real bugs found, both fixed:**
+
+1. **`src/pages/hr/about/sources.astro` never called `validateSourceSections()`.**
+   The English `src/pages/about/sources.astro` imports and calls
+   `validateSourceSections(sections)` right after parsing
+   `docs/SOURCES.md` (AGENTS.md rule #10's "automated schema and link
+   validation" for this file); the Croatian page parses the exact same
+   file into the same shape but only ever called `extractSourceSections()`,
+   skipping the validation call entirely. `validateSourceSections` is
+   called from nowhere else in the codebase, so a malformed/truncated
+   `docs/SOURCES.md` entry would have silently reached the Croatian page
+   with no guard at all if the English page's own build were ever skipped
+   independently - dormant today only because both pages build in the same
+   `pnpm build`. Fixed by importing and calling it identically to the
+   English page.
+2. **Both Croatian individual-award pages (`ballon-dor.astro`,
+   `golden-boot.astro`) were missing the "browse every player's full award
+   history" cross-link to `/players`.** Both English siblings render a
+   `<p class="…__players-link no-print">` paragraph (plus its matching
+   `font-weight: 600` style rule) linking to the players directory as a
+   `<BaseLayout>` child sibling of the main `<article>`; neither Croatian
+   page had this paragraph, style, or any equivalent link at all - not a
+   translated-string omission, a whole navigational element dropped when
+   the pages were hand-authored. Fixed by adding the translated
+   equivalent (`Pregledajte cjelovitu povijest nagrada svakog igrača
+   &rarr;`, linking to `/hr/players`) plus the matching style rule to both
+   files.
+
+Also fixed one purely cosmetic finding from the same pass while already
+touching one of these files: `src/pages/hr/compare-players.astro` had a
+byte-for-byte duplicated `.t-wrap`/`.compare__table*` CSS block (the same
+eight rules appearing twice in a row) that its English sibling only has
+once - removed the duplicate copy, no visual or behavioral change.
+
+**Not fixed, flagged for awareness only:** all six hand-rolled Croatian
+competition pages (world-cup, euro, copa-america, nations-league,
+ballon-dor, golden-boot) call `<PodiumCards>`/`<HostMap>` unconditionally,
+while the English `CompetitionView.astro` guards both with
+`{x && x.length > 0 && (...)}`. This is the same "guard on one side,
+missing on the other" shape, but it is systemic (identical in all six
+files, not an isolated slip) and currently dormant - `buildPodiums()`/
+`buildHostMapPoints()` never return `[]` for today's content, and even if
+they did, `PodiumCards`/`HostMap` would render an empty-but-harmless
+section rather than crash. Left alone rather than editing six files in
+the same pass that found two unrelated, higher-confidence bugs; a natural
+next slice for a future run rather than bundled in here.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean), `pnpm lint`
+(263 files, 0/0/0), `pnpm test` (1071/1071, unchanged - no unit-tested
+module touched), `pnpm build` (711 pages). All 31 fast, non-PDF CI-gated
+`check:*` scripts individually re-run and clean. Both edited competition
+pages and `compare-players.astro` are translated `src/pages/hr/**` pages,
+so per AGENTS.md's "Definition of done" this run regenerated PDFs
+(`pnpm build:pdfs`, with `PW_EXECUTABLE_PATH` pointed at the pre-installed
+`chromium-1194/chrome-linux/chrome` binary the same way Run 265 did for
+`check:color-contrast` - the default Playwright-managed revision this
+environment's cache doesn't have) before committing: `check:pdfs` (all
+700 up to date) and `check:pdf-outline` (all 700 outlines match their
+page's heading structure) both clean. The ten manual/intensive-run-only
+browser sweeps and a cold-start `pnpm test:e2e` were not re-run - the
+markup change is additive (one new paragraph per page, already covered by
+the sitewide checks above) and matches the risk profile Run 270/271 judged
+not to need a full sweep.
+
+**Left for a future pass:** (a) the `PodiumCards`/`HostMap` unconditional-call
+pattern across the six hand-rolled Croatian competition pages, noted above;
+(b) the 42 of 49 `scripts/*.mjs` files the code-review angle still hasn't
+reached (per Run 270); (c) PR #56 still needs a human decision - now 10
+days and 70 commits unmerged, a run past Run 271's own push-notification
+escalation with no change in outcome, so this run sent a second, brief
+push notification rather than assuming the first one will eventually be
+read.
