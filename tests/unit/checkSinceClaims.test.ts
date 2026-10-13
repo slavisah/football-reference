@@ -13,9 +13,9 @@ describe('extractSinceClaims', () => {
     expect(extractSinceClaims(md)).toEqual(['Awarded every year SINCE 1996.']);
   });
 
-  it('ignores non-bullet lines even when they contain a matching phrase', () => {
+  it('also catches a prose paragraph (not just a bullet) matching "since <year>"', () => {
     const md = `This paragraph mentions an award since 1996 in passing.\n`;
-    expect(extractSinceClaims(md)).toEqual([]);
+    expect(extractSinceClaims(md)).toEqual(['This paragraph mentions an award since 1996 in passing.']);
   });
 
   it('does not match a bare year with no "since"', () => {

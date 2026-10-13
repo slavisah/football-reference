@@ -123,9 +123,18 @@ export function diffNoteCards(enCards, hrCards, enPath, hrPath) {
   return problems;
 }
 
-/** Pure: the `/hr/...` counterpart of an English page path, or `/hr` for the home page. */
+/**
+ * Pure: the `/hr/...` counterpart of an English page path, or `/hr/` for the
+ * home page - matching `htmlFileToPagePath()`'s own trailing-slash form for
+ * a directory index (`dist/hr/index.html` -> `/hr/`, not `/hr`). Returning
+ * the slash-less `/hr` here used to mean the home page's own Croatian
+ * counterpart could never be found in `htmlByPagePath` (keyed by the real
+ * built path), silently dropping the one page pair outside `src/pages/hr/
+ * competitions/**` that also renders `EditorialNotes` - both home pages'
+ * "How to use the reference"/"Important historical naming note" sections.
+ */
 export function hrCounterpart(pagePath) {
-  return pagePath === '/' ? '/hr' : `/hr${pagePath}`;
+  return pagePath === '/' ? '/hr/' : `/hr${pagePath}`;
 }
 
 /**

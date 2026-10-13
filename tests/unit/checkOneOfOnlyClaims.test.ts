@@ -24,9 +24,9 @@ describe('extractOneOfOnlyClaims', () => {
     expect(extractOneOfOnlyClaims(md)).toEqual([]);
   });
 
-  it('ignores non-bullet lines even when they contain "one of only N"', () => {
+  it('also catches a prose paragraph (not just a bullet) matching "one of only N"', () => {
     const md = `This paragraph mentions one of only three exceptions in passing.\n`;
-    expect(extractOneOfOnlyClaims(md)).toEqual([]);
+    expect(extractOneOfOnlyClaims(md)).toEqual(['This paragraph mentions one of only three exceptions in passing.']);
   });
 
   it('extracts multiple matching bullets in document order', () => {

@@ -131,7 +131,9 @@ function cellValue(edition: Edition, matcher: RegExp): string | undefined {
 /**
  * Reduce editions to champions-timeline cards: year, host, champion,
  * runner-up and final score. Runner-up/final are omitted when the source
- * table has no such column (e.g. Copa América has no "Final" score column).
+ * table has no such column (e.g. Copa América has no "Final" score column),
+ * or when the cell holds the site-wide "no data" placeholder ("—", see
+ * `isMissingCell()` in `compare.ts`) rather than a real team name.
  */
 export function buildTimeline(editions: Edition[]): TimelineEntry[] {
   return editions.map((edition) => ({
@@ -139,15 +141,15 @@ export function buildTimeline(editions: Edition[]): TimelineEntry[] {
     yearSort: edition.yearSort,
     champion: edition.winner,
     host: edition.host,
-    runnerUp: cellValue(edition, /runner-up|finalist/i),
+    runnerUp: definiteCell(cellValue(edition, /runner-up|finalist/i)),
     final: cellValue(edition, /^final$/i),
   }));
 }
 
 /**
  * Reduce editions to compact podium cards: year, host, and the top four
- * finishers (champion, runner-up, third, fourth). Third/fourth are omitted
- * when the source table has no such column, the same "undefined when
+ * finishers (champion, runner-up, third, fourth). Runner-up/third/fourth are
+ * omitted when the source table has no such column, the same "undefined when
  * absent, not a placeholder" convention `buildTimeline` already uses for
  * runner-up/final - a reader-facing "Podium by edition" widget for
  * competitions whose table already tracks all four places (e.g. the UEFA
@@ -166,9 +168,9 @@ export function buildTimeline(editions: Edition[]): TimelineEntry[] {
  * they were would misrepresent the historical record (AGENTS.md rule 2).
  * Callers should not wire podium cards into the EURO page for that reason.
  *
- * Third/fourth cells that hold the site-wide "no data" placeholder ("—",
- * see `isMissingCell()` in `compare.ts`) are treated as absent rather than
- * rendered as a literal team name - e.g. Copa América's 1975/1979/1983
+ * Runner-up/third/fourth cells that hold the site-wide "no data" placeholder
+ * ("—", see `isMissingCell()` in `compare.ts`) are treated as absent rather
+ * than rendered as a literal team name - e.g. Copa América's 1975/1979/1983
  * home-and-away editions, which had no standalone third-place match.
  */
 function definiteCell(value: string | undefined): string | undefined {
@@ -181,7 +183,7 @@ export function buildPodiums(editions: Edition[]): PodiumEntry[] {
     yearSort: edition.yearSort,
     champion: edition.winner,
     host: edition.host,
-    runnerUp: cellValue(edition, /runner-up|finalist/i),
+    runnerUp: definiteCell(cellValue(edition, /runner-up|finalist/i)),
     third: definiteCell(cellValue(edition, /^third$/i)),
     fourth: definiteCell(cellValue(edition, /^fourth\b/i)),
   }));
@@ -542,7 +544,14 @@ export function buildHomeSoilTitles(editions: Edition[]): ChampionSummary[] {
  * either. A placeholder winner (e.g. the 2020 Ballon d'Or's "Not awarded")
  * breaks any streak spanning it - Messi's 2019 and 2021 Ballon d'Or wins
  * are not "back-to-back" with a cancelled year between them, even though
- * they're adjacent table rows.
+ * they're adjacent table rows. A semicolon-joined joint-winner tie (e.g. the
+ * Golden Boot's six-way ties) also breaks any streak spanning it, the same
+ * "can't treat this as one exact-match winner" exclusion `quiz.ts`'s
+ * `questionsFromWinners()`/`uniqueWinnerEditions()` already apply - without
+ * it, two different editions that both happen to be ties would chain into a
+ * nonsense "streak" only if their tie strings were byte-for-byte identical,
+ * which no current data triggers, but the guard is cheap and matches the
+ * placeholder one right next to it.
  *
  * A competition/award with no repeat winner in a row (true of UEFA Nations
  * League and the EURO Golden Boot as of 2026) simply returns an empty
@@ -556,7 +565,7 @@ export function buildLongestStreaks(editions: Edition[]): ChampionSummary[] {
 
   for (const edition of sorted) {
     const winner = edition.winner.trim();
-    if (!winner || isPlaceholderWinner(winner)) {
+    if (!winner || isPlaceholderWinner(winner) || winner.includes(';')) {
       current = null;
       continue;
     }

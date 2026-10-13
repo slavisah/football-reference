@@ -59,9 +59,9 @@ describe('extractOrdinalClaims', () => {
     expect(extractOrdinalClaims(md)).toEqual([]);
   });
 
-  it('ignores non-bullet lines even when they contain a matching phrase', () => {
+  it('also catches a prose paragraph (not just a bullet) matching a claim phrase', () => {
     const md = `This paragraph mentions the first team to do it in passing.\n`;
-    expect(extractOrdinalClaims(md)).toEqual([]);
+    expect(extractOrdinalClaims(md)).toEqual(['This paragraph mentions the first team to do it in passing.']);
   });
 
   it('extracts multiple matching bullets in document order', () => {

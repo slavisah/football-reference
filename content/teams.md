@@ -1,7 +1,7 @@
 ---
 title: National Teams
 slug: teams
-lastReviewed: 2026-08-17
+lastReviewed: 2026-10-09
 status: verified
 ---
 

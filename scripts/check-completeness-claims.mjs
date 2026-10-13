@@ -56,7 +56,7 @@
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { diffClaimsAgainstLedger } from './check-superlative-claims.mjs';
+import { diffClaimsAgainstLedger, extractClaimableLines } from './check-superlative-claims.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CONTENT_DIR = path.join(ROOT, 'content');
@@ -66,21 +66,13 @@ const CLAIM_PATTERN =
   /\bacross all (\d+|one|two|three|four|five|six|seven|eight|nine|ten)( completed)? editions\b|\bin every edition\b/i;
 
 /**
- * Pure: every top-level Markdown list item's text in `markdown` that matches
- * the undated completeness-claim pattern - "across all N editions" or "in
- * every edition" - in document order. Content pages on this site use only
- * flat, single-line `- ` bullets (no nested lists), so a per-line regex is
- * sufficient - no Markdown parser needed.
+ * Pure: every claimable text unit (bullets and prose paragraphs alike - see
+ * `extractClaimableLines()` in `check-superlative-claims.mjs`) in `markdown`
+ * that matches the undated completeness-claim pattern - "across all N
+ * editions" or "in every edition" - in document order.
  */
 export function extractCompletenessClaims(markdown) {
-  const claims = [];
-  for (const rawLine of markdown.split('\n')) {
-    const match = /^-\s(.*)$/.exec(rawLine.trim());
-    if (!match) continue;
-    const text = match[1].trim();
-    if (CLAIM_PATTERN.test(text)) claims.push(text);
-  }
-  return claims;
+  return extractClaimableLines(markdown).filter((text) => CLAIM_PATTERN.test(text));
 }
 
 async function main() {

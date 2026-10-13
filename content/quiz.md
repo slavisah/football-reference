@@ -1,7 +1,7 @@
 ---
 title: Family Quiz
 slug: quiz
-lastReviewed: 2026-10-02
+lastReviewed: 2026-10-09
 status: verified
 ---
 
@@ -34,9 +34,29 @@ the quiz stays in sync as new editions are added.
 - Which team or player has won the most titles/awards in a competition
   overall?
 - Which country has hosted the most editions of a given tournament overall?
+- Which team has won the most titles on home soil in a given tournament?
+  (only asked when there's a single, unambiguous leader - not a tie for
+  first)
 - In which year did a given tournament's final have the biggest winning
   margin? (only asked when there's a single, unambiguous biggest margin -
   not a tie for first)
+- Which team or player has the longest run of consecutive titles/awards in a
+  competition? (only asked when there's a single, unambiguous longest
+  streak - not a tie for first)
+- Which team or player waited the longest between titles/awards in a
+  competition? (only asked when there's a single, unambiguous longest wait -
+  not a tie for first)
+- Which two teams have met each other the most times in a given tournament's
+  finals? (only asked when there's a single, unambiguous most-frequent
+  pairing - not a tie for first)
+- Which two national teams have met each other the most times across World
+  Cup, EURO, Copa América and Nations League finals, combined? (only asked
+  when there's a single, unambiguous most-frequent pairing - not a tie for
+  first)
+- Which of these teams has reached a given tournament's final without ever
+  winning the title?
+- Which of these teams has reached a given tournament's semifinal without
+  ever reaching the final?
 - Put four champions from a tournament, or four winners of an individual
   award (Ballon d'Or, Golden Boot), in chronological order (earliest
   first).

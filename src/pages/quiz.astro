@@ -7,7 +7,17 @@ import References from '../components/References.astro';
 import EditorialNotes from '../components/EditorialNotes.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import { disambiguateLabels } from '../lib/sources';
-import { buildBiggestFinalMargins, buildHostsSummary, buildTimeline } from '../lib/editions';
+import {
+  buildBiggestFinalMargins,
+  buildHomeSoilTitles,
+  buildHostsSummary,
+  buildLongestStreaks,
+  buildLongestTitleGaps,
+  buildNearlyFinalists,
+  buildRunnerUpsWithoutTitle,
+  buildTimeline,
+} from '../lib/editions';
+import { buildFinalsMeetings, buildRivalries } from '../lib/compare';
 import { t } from '../lib/i18n';
 import { absolutePageUrl, withBase } from '../lib/url';
 import { buildQuizJsonLd, type JsonLdObject } from '../lib/jsonLd';
@@ -16,8 +26,14 @@ import {
   biggestFinalMarginQuestion,
   championByYearQuestions,
   chronologicalOrderQuestions,
+  fiercestRivalryQuestion,
   hostByYearQuestions,
+  longestStreakQuestion,
+  longestTitleGapQuestion,
+  mostFrequentRivalryQuestion,
   mostTitlesQuestion,
+  nearlyChampionQuestions,
+  nearlyFinalistQuestions,
   runnerUpByYearQuestions,
   topScorerByYearQuestions,
   uniqueWinnerEditions,
@@ -25,6 +41,13 @@ import {
   selectQuiz,
   type QuizPool,
 } from '../lib/quiz';
+
+// Rivalries for mostFrequentRivalryQuestion() below must be scoped to one
+// competition's own finals only (see that function's own comment for why) -
+// unlike /records' own buildRivalries() call, which deliberately combines all
+// four team competitions into one cross-competition ranking.
+const rivalriesFor = (title: string, editions: Edition[]) =>
+  buildRivalries(buildFinalsMeetings([{ title, slug: title, editions }]));
 
 const meta = await loadPageMeta('quiz', ['How it works', 'Question types in this quiz']);
 
@@ -61,6 +84,19 @@ const [worldCup, euro, copaAmerica, nationsLeague, ballonDor, goldenBootWorldCup
     }),
   ]);
 
+// Combined, all-four-competition rivalries for fiercestRivalryQuestion() -
+// the exact same buildRivalries(buildFinalsMeetings([...])) call
+// src/pages/records.astro makes for its own "Fiercest rivalries" section,
+// deliberately *not* scoped to one competition like rivalriesFor() above.
+const fiercestRivalries = buildRivalries(
+  buildFinalsMeetings([
+    { title: 'FIFA World Cup', slug: 'fifa-world-cup', editions: worldCup.editions },
+    { title: 'UEFA EURO', slug: 'uefa-euro', editions: euro.editions },
+    { title: 'Copa América', slug: 'copa-america', editions: copaAmerica.editions },
+    { title: 'UEFA Nations League', slug: 'uefa-nations-league', editions: nationsLeague.editions },
+  ]),
+);
+
 // Each pool draws from one competition's real data; `take` caps how many of
 // its generated questions make the final quiz, kept modest so the quiz stays
 // a few minutes long rather than covering every edition ever played.
@@ -96,6 +132,16 @@ const pools: QuizPool[] = [
     seed: 'pick:world-cup:most-hosted',
   },
   {
+    questions: mostTitlesQuestion(
+      buildHomeSoilTitles(worldCup.editions),
+      'FIFA World Cup',
+      'world-cup',
+      'home-soil',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:home-soil',
+  },
+  {
     questions: biggestFinalMarginQuestion(
       buildBiggestFinalMargins(worldCup.editions),
       'FIFA World Cup',
@@ -103,6 +149,45 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:world-cup:biggest-margin',
+  },
+  {
+    questions: longestStreakQuestion(buildLongestStreaks(worldCup.editions), 'FIFA World Cup', 'world-cup'),
+    take: 1,
+    seed: 'pick:world-cup:longest-streak',
+  },
+  {
+    questions: longestTitleGapQuestion(buildLongestTitleGaps(worldCup.editions), 'FIFA World Cup', 'world-cup'),
+    take: 1,
+    seed: 'pick:world-cup:longest-gap',
+  },
+  {
+    questions: mostFrequentRivalryQuestion(
+      rivalriesFor('FIFA World Cup', worldCup.editions),
+      'FIFA World Cup',
+      'world-cup',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:rivalry',
+  },
+  {
+    questions: nearlyChampionQuestions(
+      buildRunnerUpsWithoutTitle(worldCup.editions),
+      worldCup.champions,
+      'FIFA World Cup',
+      'world-cup',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:nearly-champion',
+  },
+  {
+    questions: nearlyFinalistQuestions(
+      buildNearlyFinalists(worldCup.editions),
+      [...worldCup.champions, ...buildRunnerUpsWithoutTitle(worldCup.editions)],
+      'FIFA World Cup',
+      'world-cup',
+    ),
+    take: 1,
+    seed: 'pick:world-cup:nearly-finalist',
   },
   {
     questions: yearByWinnerQuestions(worldCup.editions, 'FIFA World Cup', 'world-cup', 'en', 'team'),
@@ -135,9 +220,54 @@ const pools: QuizPool[] = [
     seed: 'pick:euro:most-hosted',
   },
   {
+    questions: mostTitlesQuestion(
+      buildHomeSoilTitles(euro.editions),
+      'UEFA EURO',
+      'euro',
+      'home-soil',
+    ),
+    take: 1,
+    seed: 'pick:euro:home-soil',
+  },
+  {
     questions: biggestFinalMarginQuestion(buildBiggestFinalMargins(euro.editions), 'UEFA EURO', 'euro'),
     take: 1,
     seed: 'pick:euro:biggest-margin',
+  },
+  {
+    questions: longestStreakQuestion(buildLongestStreaks(euro.editions), 'UEFA EURO', 'euro'),
+    take: 1,
+    seed: 'pick:euro:longest-streak',
+  },
+  {
+    questions: longestTitleGapQuestion(buildLongestTitleGaps(euro.editions), 'UEFA EURO', 'euro'),
+    take: 1,
+    seed: 'pick:euro:longest-gap',
+  },
+  {
+    questions: mostFrequentRivalryQuestion(rivalriesFor('UEFA EURO', euro.editions), 'UEFA EURO', 'euro'),
+    take: 1,
+    seed: 'pick:euro:rivalry',
+  },
+  {
+    questions: nearlyChampionQuestions(
+      buildRunnerUpsWithoutTitle(euro.editions),
+      euro.champions,
+      'UEFA EURO',
+      'euro',
+    ),
+    take: 1,
+    seed: 'pick:euro:nearly-champion',
+  },
+  {
+    questions: nearlyFinalistQuestions(
+      buildNearlyFinalists(euro.editions),
+      [...euro.champions, ...buildRunnerUpsWithoutTitle(euro.editions)],
+      'UEFA EURO',
+      'euro',
+    ),
+    take: 1,
+    seed: 'pick:euro:nearly-finalist',
   },
   {
     questions: yearByWinnerQuestions(euro.editions, 'UEFA EURO', 'euro', 'en', 'team'),
@@ -175,6 +305,59 @@ const pools: QuizPool[] = [
     seed: 'pick:copa-america:most-hosted',
   },
   {
+    questions: mostTitlesQuestion(
+      buildHomeSoilTitles(copaAmerica.editions),
+      'Copa América',
+      'copa-america',
+      'home-soil',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:home-soil',
+  },
+  {
+    questions: longestStreakQuestion(buildLongestStreaks(copaAmerica.editions), 'Copa América', 'copa-america'),
+    take: 1,
+    seed: 'pick:copa-america:longest-streak',
+  },
+  {
+    questions: longestTitleGapQuestion(
+      buildLongestTitleGaps(copaAmerica.editions),
+      'Copa América',
+      'copa-america',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:longest-gap',
+  },
+  {
+    questions: mostFrequentRivalryQuestion(
+      rivalriesFor('Copa América', copaAmerica.editions),
+      'Copa América',
+      'copa-america',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:rivalry',
+  },
+  {
+    questions: nearlyChampionQuestions(
+      buildRunnerUpsWithoutTitle(copaAmerica.editions),
+      copaAmerica.champions,
+      'Copa América',
+      'copa-america',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:nearly-champion',
+  },
+  {
+    questions: nearlyFinalistQuestions(
+      buildNearlyFinalists(copaAmerica.editions),
+      [...copaAmerica.champions, ...buildRunnerUpsWithoutTitle(copaAmerica.editions)],
+      'Copa América',
+      'copa-america',
+    ),
+    take: 1,
+    seed: 'pick:copa-america:nearly-finalist',
+  },
+  {
     questions: yearByWinnerQuestions(copaAmerica.editions, 'Copa América', 'copa-america', 'en', 'team'),
     take: 1,
     seed: 'pick:copa-america:year-by-winner',
@@ -210,6 +393,16 @@ const pools: QuizPool[] = [
     seed: 'pick:nations-league:most-hosted',
   },
   {
+    questions: mostTitlesQuestion(
+      buildHomeSoilTitles(nationsLeague.editions),
+      'UEFA Nations League',
+      'nations-league',
+      'home-soil',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:home-soil',
+  },
+  {
     questions: biggestFinalMarginQuestion(
       buildBiggestFinalMargins(nationsLeague.editions),
       'UEFA Nations League',
@@ -217,6 +410,53 @@ const pools: QuizPool[] = [
     ),
     take: 1,
     seed: 'pick:nations-league:biggest-margin',
+  },
+  {
+    questions: longestStreakQuestion(
+      buildLongestStreaks(nationsLeague.editions),
+      'UEFA Nations League',
+      'nations-league',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:longest-streak',
+  },
+  {
+    questions: longestTitleGapQuestion(
+      buildLongestTitleGaps(nationsLeague.editions),
+      'UEFA Nations League',
+      'nations-league',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:longest-gap',
+  },
+  {
+    questions: mostFrequentRivalryQuestion(
+      rivalriesFor('UEFA Nations League', nationsLeague.editions),
+      'UEFA Nations League',
+      'nations-league',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:rivalry',
+  },
+  {
+    questions: nearlyChampionQuestions(
+      buildRunnerUpsWithoutTitle(nationsLeague.editions),
+      nationsLeague.champions,
+      'UEFA Nations League',
+      'nations-league',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:nearly-champion',
+  },
+  {
+    questions: nearlyFinalistQuestions(
+      buildNearlyFinalists(nationsLeague.editions),
+      [...nationsLeague.champions, ...buildRunnerUpsWithoutTitle(nationsLeague.editions)],
+      'UEFA Nations League',
+      'nations-league',
+    ),
+    take: 1,
+    seed: 'pick:nations-league:nearly-finalist',
   },
   {
     questions: yearByWinnerQuestions(nationsLeague.editions, 'UEFA Nations League', 'nations-league', 'en', 'team'),
@@ -232,6 +472,26 @@ const pools: QuizPool[] = [
     questions: mostTitlesQuestion(ballonDor.champions, "Ballon d'Or", 'ballon-dor', 'player'),
     take: 1,
     seed: 'pick:ballon-dor:most-titles',
+  },
+  {
+    questions: longestStreakQuestion(
+      buildLongestStreaks(ballonDor.editions),
+      "Ballon d'Or",
+      'ballon-dor',
+      'player',
+    ),
+    take: 1,
+    seed: 'pick:ballon-dor:longest-streak',
+  },
+  {
+    questions: longestTitleGapQuestion(
+      buildLongestTitleGaps(ballonDor.editions),
+      "Ballon d'Or",
+      'ballon-dor',
+      'player',
+    ),
+    take: 1,
+    seed: 'pick:ballon-dor:longest-gap',
   },
   {
     questions: yearByWinnerQuestions(ballonDor.editions, "Ballon d'Or", 'ballon-dor'),
@@ -254,6 +514,26 @@ const pools: QuizPool[] = [
     seed: 'pick:golden-boot-world-cup:most-titles',
   },
   {
+    questions: longestStreakQuestion(
+      buildLongestStreaks(goldenBootWorldCup.editions),
+      'World Cup Golden Boot',
+      'golden-boot-world-cup',
+      'player',
+    ),
+    take: 1,
+    seed: 'pick:golden-boot-world-cup:longest-streak',
+  },
+  {
+    questions: longestTitleGapQuestion(
+      buildLongestTitleGaps(goldenBootWorldCup.editions),
+      'World Cup Golden Boot',
+      'golden-boot-world-cup',
+      'player',
+    ),
+    take: 1,
+    seed: 'pick:golden-boot-world-cup:longest-gap',
+  },
+  {
     questions: topScorerByYearQuestions(goldenBootEuro.editions, 'EURO Golden Boot', 'golden-boot-euro'),
     take: 2,
     seed: 'pick:golden-boot-euro:scorer',
@@ -262,6 +542,31 @@ const pools: QuizPool[] = [
     questions: mostTitlesQuestion(goldenBootEuro.champions, 'EURO Golden Boot', 'golden-boot-euro', 'player'),
     take: 1,
     seed: 'pick:golden-boot-euro:most-titles',
+  },
+  {
+    questions: longestStreakQuestion(
+      buildLongestStreaks(goldenBootEuro.editions),
+      'EURO Golden Boot',
+      'golden-boot-euro',
+      'player',
+    ),
+    take: 1,
+    seed: 'pick:golden-boot-euro:longest-streak',
+  },
+  {
+    questions: longestTitleGapQuestion(
+      buildLongestTitleGaps(goldenBootEuro.editions),
+      'EURO Golden Boot',
+      'golden-boot-euro',
+      'player',
+    ),
+    take: 1,
+    seed: 'pick:golden-boot-euro:longest-gap',
+  },
+  {
+    questions: fiercestRivalryQuestion(fiercestRivalries, 'fiercest-rivalry'),
+    take: 1,
+    seed: 'pick:fiercest-rivalry',
   },
 ];
 

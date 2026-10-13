@@ -86,11 +86,11 @@ const notes: NoteSection[] = [
   {
     heading: 'Mjesta finala',
     items: [
-      'Sve četiri momčadi koje se plasiraju na Final Four Lige nacija ugoste po jedno polufinale, no samo jedan stadion u zemlji domaćinu ugosti finalnu utakmicu. Broj gledatelja naveden je samo tamo gdje ga je bilo moguće potvrditi iz dva neovisna izvora (2019. dosad) - za ostala tri izdanja broj gledatelja nije bilo moguće pouzdano provjeriti, pa je izostavljen umjesto pogađanja.',
+      'Sve četiri momčadi koje se plasiraju na Final Four Lige nacija ugoste po jedno polufinale, no samo jedan stadion u zemlji domaćinu ugosti finalnu utakmicu. Broj gledatelja naveden je samo tamo gdje ga je bilo moguće potvrditi iz dva neovisna izvora koji se zaista slažu (2019. dosad) - za ostala tri izdanja broj gledatelja je izostavljen umjesto pogađanja, bilo zato što samo jedan izvor navodi broj (2021.), bilo zato što se pronađeni izvori previše razlikuju da bi se smatralo da potvrđuju isti broj (2025., vidi dolje).',
       '2019.: Estádio do Dragão, Porto (Portugal) - prijavljeno 43.199 gledatelja.',
       '2021.: San Siro, Milano (Italija).',
       '2023.: De Kuip, Rotterdam (Nizozemska) - zamijenio je veću Johan Cruyff Arenu u Amsterdamu, koja nije bila dostupna zbog zakazanog koncerta.',
-      '2025.: Allianz Arena, München (Njemačka).',
+      '2025.: Allianz Arena, München (Njemačka) - za ovo finale pronađena su dva izvora, ali razlikuju se za otprilike 9.000: jedan navodi 65.852, drugi zasebno navodi zaokruženu brojku od 75.000 (rasprodano). Ta razlika je preširoka da bi se smatrala uobičajenim odstupanjem u zaokruživanju/izvještavanju između dva izvora koji opisuju isti broj, pa ni ovdje broj gledatelja nije naveden.',
     ],
   },
   {
@@ -215,16 +215,18 @@ const headerLabels: Record<string, string> = {
       yearLinks={yearLinks}
     />
 
-    <PodiumCards
-      entries={podium}
-      id="nations-league-podium"
-      heading="Pobjednici po izdanju"
-      hostedByLabel="Domaćin:"
-      championLabel="Prvak"
-      runnerUpLabel="Drugoplasirani"
-      thirdLabel="Treći"
-      fourthLabel="Četvrti"
-    />
+    {podium && podium.length > 0 && (
+      <PodiumCards
+        entries={podium}
+        id="nations-league-podium"
+        heading="Pobjednici po izdanju"
+        hostedByLabel="Domaćin:"
+        championLabel="Prvak"
+        runnerUpLabel="Drugoplasirani"
+        thirdLabel="Treći"
+        fourthLabel="Četvrti"
+      />
+    )}
 
     <ChampionsSummary
       champions={data.champions}
@@ -236,15 +238,17 @@ const headerLabels: Record<string, string> = {
       ofLabel="od"
     />
 
-    <HostMap
-      points={hostMap}
-      id="nations-league-host-map"
-      heading="Gdje je Final Four Lige nacija igrao domaćinu"
-      description="Približan položaj svakog domaćina na jednostavnoj mreži zemljopisne dužine i širine, grupiran po regijama u popisu ispod - ne tvrdimo točne granice, samo otprilike gdje se u svijetu igralo pojedino izdanje. Veće točke znače da je zemlja bila domaćin više puta."
-      unit={['put', 'puta']}
-      hostingYearsLabel="Godine domaćinstva: "
-      regionLabels={hostRegionLabels}
-    />
+    {hostMap && hostMap.length > 0 && (
+      <HostMap
+        points={hostMap}
+        id="nations-league-host-map"
+        heading="Gdje je Final Four Lige nacija igrao domaćinu"
+        description="Približan položaj svakog domaćina na jednostavnoj mreži zemljopisne dužine i širine, grupiran po regijama u popisu ispod - ne tvrdimo točne granice, samo otprilike gdje se u svijetu igralo pojedino izdanje. Veće točke znače da je zemlja bila domaćin više puta."
+        unit={['put', 'puta']}
+        hostingYearsLabel="Godine domaćinstva: "
+        regionLabels={hostRegionLabels}
+      />
+    )}
 
     <EditorialNotes sections={notes} jumpNavLabel="Skoči na odjeljak" />
 

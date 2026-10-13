@@ -283,6 +283,22 @@ async function auditPage({ label, path: pagePath }) {
   const categoryScores = Object.fromEntries(
     CATEGORIES.map((key) => [key, result.lhr.categories[key].score]),
   );
+  // A `null` category score means Lighthouse couldn't compute that category at
+  // all (e.g. the page failed to load because the shared `astro preview`
+  // daemon this script depends on died mid-sweep, or - as happened in
+  // practice - a second check:* script sharing the same port called
+  // stopPreviewDaemon() concurrently). Fail loudly here, naming the page and
+  // the likely cause, rather than letting `null` reach the `.toFixed(2)` call
+  // in `main()` below and crash with an unhelpful `TypeError`.
+  const nullCategories = CATEGORIES.filter((key) => categoryScores[key] === null);
+  if (nullCategories.length > 0) {
+    throw new Error(
+      `Lighthouse returned a null score for ${nullCategories.join(', ')} on "${label}" (${url}). ` +
+        'This usually means the page failed to load - check that no other check:* script ' +
+        'sharing the astro preview daemon ran concurrently with this one, and that the ' +
+        'preview server was still up for this request.',
+    );
+  }
   const bfCacheReasons = actionableBfCacheReasons(result.lhr.audits['bf-cache']);
   return { label, url, categoryScores, bfCacheReasons };
 }

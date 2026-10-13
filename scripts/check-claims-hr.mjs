@@ -100,16 +100,39 @@ const LEDGER_FILES = [
 
 // Every `content/*.md` file any ledger keys claims under, mapped to the
 // English page path whose Croatian counterpart (via `hrCounterpart()`)
-// carries that file's hand-translated note prose. `quiz.md` is deliberately
+// carries that file's hand-translated note prose (or, for the six
+// generated-summary pages below whose own `.astro` file renders no
+// `.notes__card` section at all, whatever plain page text exists -
+// `diffClaimsPositionally()`'s own body-text fallback handles an empty
+// `enCards`/`hrCards` pair exactly like a claim it just couldn't positionally
+// pair, so no special-casing is needed here). `quiz.md` is deliberately
 // omitted: `record-claims-ledger.json`'s one `content/quiz.md` entry
 // describes a dynamically generated question type, not a per-edition
 // completeness claim tied to a specific page's prose (see that ledger's own
 // entry note), so there is no Croatian note section to check it against.
+//
+// `compare-countries.md`/`compare-players.md`/`glossary.md`/`players.md`/
+// `records-and-timelines.md`/`teams.md` were missing from this map entirely
+// (found by a code-review pass, run 270) - every claim `record-claims-ledger.json`/
+// `ordinal-claims-ledger.json`/`since-claims-ledger.json` key under them was
+// silently skipped by the `if (!pagePath) continue;` below, never cross-checked
+// against its Croatian translation. `content/glossary.md`'s two claims (the
+// 1930 World Cup and 1980/1984 EURO third-place-match history) are the one
+// case with real year anchors to check; the other five ledger entries are
+// each page's own generated intro/description paragraph, which names no year
+// or "earlier editions" count, so adding them closes the gap without changing
+// today's check output - see docs/PROJECT_STATUS.md's run 270 entry.
 const CONTENT_FILE_TO_PAGE_PATH = {
   'content/ballon-dor.md': '/competitions/ballon-dor/',
+  'content/compare-countries.md': '/compare/',
+  'content/compare-players.md': '/compare-players/',
   'content/copa-america.md': '/competitions/copa-america/',
   'content/fifa-world-cup.md': '/competitions/world-cup/',
+  'content/glossary.md': '/glossary/',
   'content/golden-boot.md': '/competitions/golden-boot/',
+  'content/players.md': '/players/',
+  'content/records-and-timelines.md': '/records/',
+  'content/teams.md': '/teams/',
   'content/uefa-euro.md': '/competitions/euro/',
   'content/uefa-nations-league.md': '/competitions/nations-league/',
 };
@@ -261,6 +284,31 @@ export function locateClaimPosition(claim, enCards) {
 }
 
 /**
+ * Pure: the plain text of a built page's full `<body>`, independent of
+ * `.notes__card` boundaries - every tag replaced with a space (so two
+ * adjacent elements' text never runs together), `<script>`/`<style>` blocks
+ * dropped first, and the same handful of HTML entities
+ * `extractNoteCardsWithItems()`'s own `stripNoteItemTags()` already
+ * unescapes decoded back to plain characters. Used by `diffClaimsPositionally()`
+ * for two things a notes-only scan can't: checking whether a claim is
+ * rendered anywhere on the page at all (see that function's own comment),
+ * and, for a claim that is rendered but outside any `.notes__card` (a page's
+ * own lead intro paragraph, for instance), searching the whole page rather
+ * than only its note cards for the Croatian counterpart's years.
+ */
+export function extractPageBodyText(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/g, ' ')
+    .replace(/<style[\s\S]*?<\/style>/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
  * Pure: diffs one page family's verified claims against its Croatian notes
  * text, returning human-readable problem strings - empty when every claim's
  * years (and, where applicable, earlier-editions cardinal) are present. This
@@ -303,15 +351,34 @@ export function diffClaimsAgainstHrNotes(claims, hrNotesText, contentFile, hrPat
  * same thing on both languages' pages); falls back to
  * `diffClaimsAgainstHrNotes()`'s whole-page check, one claim at a time, for
  * any claim that can't be positionally paired.
+ *
+ * `enBodyText`/`hrBodyText` (the pages' full text - see
+ * `extractPageBodyText()`) exist for a gap `extractClaimableLines()`
+ * widening every claim checker to prose (not just `- ` bullets) opened in
+ * this run: a ledgered claim's own prose paragraph is sometimes under a
+ * heading a page's own `noteHeadings` allowlist (each `src/pages/
+ * competitions/*.astro`'s own prop) deliberately never renders at all - an
+ * internal-only audit/methodology note, published in neither language - or
+ * is the page's lead intro paragraph, rendered in both languages but outside
+ * any `.notes__card`, so `hrNotesText` alone would never contain it. A claim
+ * absent from `enBodyText` entirely is the first case: there is nothing
+ * published to translate, so it is skipped rather than flagged. A claim
+ * present in `enBodyText` but not positionally paired is the second case:
+ * its years are checked against `hrBodyText` (the whole Croatian page, not
+ * just its note cards) instead of `hrNotesText`.
  */
-export function diffClaimsPositionally(claims, enCards, hrCards, hrNotesText, contentFile, hrPath, ledgerName) {
+export function diffClaimsPositionally(claims, enCards, hrCards, hrNotesText, contentFile, hrPath, ledgerName, enBodyText, hrBodyText) {
   const problems = [];
   for (const claim of claims) {
     const position = locateClaimPosition(claim, enCards);
     const hrItem = position ? hrCards[position.sectionIndex]?.items[position.itemIndex] : undefined;
 
     if (hrItem === undefined) {
-      problems.push(...diffClaimsAgainstHrNotes([claim], hrNotesText, contentFile, hrPath, ledgerName));
+      if (enBodyText !== undefined && !enBodyText.includes(stripMarkdownEmphasis(claim))) {
+        continue; // never rendered on the English page at all - nothing to translate
+      }
+      const haystack = hrBodyText !== undefined ? hrBodyText : hrNotesText;
+      problems.push(...diffClaimsAgainstHrNotes([claim], haystack, contentFile, hrPath, ledgerName));
       continue;
     }
 
@@ -347,6 +414,8 @@ async function main() {
   }
 
   const hrNotesTextByPagePath = new Map();
+  const enBodyTextByPagePath = new Map();
+  const hrBodyTextByPagePath = new Map();
   const enCardsByPagePath = new Map();
   const hrCardsByPagePath = new Map();
   const problems = [];
@@ -381,9 +450,21 @@ async function main() {
       const enCards = enCardsByPagePath.get(pagePath);
       const hrCards = hrCardsByPagePath.get(hrPath);
 
+      if (!enBodyTextByPagePath.has(pagePath)) {
+        const enHtml = htmlByPagePath.get(pagePath);
+        enBodyTextByPagePath.set(pagePath, enHtml ? extractPageBodyText(enHtml) : '');
+      }
+      if (!hrBodyTextByPagePath.has(hrPath)) {
+        hrBodyTextByPagePath.set(hrPath, extractPageBodyText(htmlByPagePath.get(hrPath)));
+      }
+      const enBodyText = enBodyTextByPagePath.get(pagePath);
+      const hrBodyText = hrBodyTextByPagePath.get(hrPath);
+
       const claimTexts = Object.keys(claims);
       totalClaims += claimTexts.length;
-      problems.push(...diffClaimsPositionally(claimTexts, enCards, hrCards, hrNotesText, contentFile, hrPath, ledgerFile));
+      problems.push(
+        ...diffClaimsPositionally(claimTexts, enCards, hrCards, hrNotesText, contentFile, hrPath, ledgerFile, enBodyText, hrBodyText),
+      );
     }
   }
 

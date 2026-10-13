@@ -165,8 +165,8 @@ describe('diffDashClauses', () => {
 });
 
 describe('hrCounterpart', () => {
-  it('maps the home page to /hr', () => {
-    expect(hrCounterpart('/')).toBe('/hr');
+  it('maps the home page to /hr/, matching htmlFileToPagePath\'s own trailing-slash form for a directory index', () => {
+    expect(hrCounterpart('/')).toBe('/hr/');
   });
 
   it('prefixes every other path with /hr', () => {
