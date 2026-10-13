@@ -39275,3 +39275,111 @@ note); `check:pdfs`/`check:pdf-outline` clean after (700/700).
 still at `lastReviewed: 2026-10-09`, now the longest-stale group (all
 seven touched together by Run 259's single pass); `ballon-dor.md` is now
 current at 2026-10-13.
+
+### Run 281 (2026-10-13): re-ran the overdue ten-script manual browser sweep (16 runs since the prior full pass at Run 265) plus `check:lighthouse` - all clean, no regression found
+
+With the content-verification rotation's next targets (`about-sources.md`,
+`compare-countries.md`, `compare-players.md`, `players.md`, `quiz.md`,
+`records-and-timelines.md`, `teams.md`) all short, prescriptive meta/
+feature-description pages rather than fact-laden editorial content (each
+10-62 lines, describing what a page should do rather than asserting
+historical claims to audit), this run picked the other standing
+maintenance item instead: the ten full-site Playwright/browser sweeps
+(`check:html`, `check:reflow`, `check:landscape`, `check:text-zoom`,
+`check:print-width`, `check:target-size`, `check:text-spacing`,
+`check:focus-appearance`, `check:color-contrast`, `check:lighthouse`) kept
+manual/intensive-run-only rather than CI gates purely for their runtime,
+re-run periodically per `docs/ROADMAP.md`'s own note - last done in full
+at Run 265, sixteen runs ago.
+
+Ran the standard health check first: `pnpm install` (fresh container, no
+`node_modules` yet), `pnpm lint` (0/0/0), `pnpm test` (1071/1071,
+unchanged), `pnpm build` (711 pages, unchanged), all 33 fast `check:*`
+scripts wired into CI (clean), `pnpm outdated` (only `typescript` 7 vs.
+5.9.3, still blocked by `@astrojs/check@0.9.10`'s peer-dependency range,
+unchanged from every prior run), `pnpm audit` (no known vulnerabilities),
+`pnpm dlx knip --no-config-hints` (the one standing `@cspell/dict-hr-hr`
+false positive, unchanged).
+
+Then ran the ten manual sweeps. `check:html` needs no browser/preview
+server and was instant (711/711 valid HTML5). The remaining nine all use
+the shared `astro preview` daemon on port 4321 (`scripts/preview-
+daemon.mjs`); `check:reflow`, `check:landscape`, `check:text-zoom` were
+run three-at-a-time and `check:print-width` was added once those
+finished - all four came back clean (711/711, no horizontal overflow at
+320px/667x375 landscape/200% text zoom/1032px print width respectively),
+but their logs showed each script's preview-server start/stop PID
+bookkeeping didn't match its own process (e.g. one script logged
+"Stopped preview server" for a PID a *different* concurrent script had
+started) - the exact port race `check-lighthouse.mjs`'s own doc comment
+already names and says has a "retry-once fix" for. Confirmed this was
+cosmetic, not a correctness risk, before trusting the results: all four
+ran against the same static, unchanging `dist/` build (no rebuild between
+launches), each script's own terminal line explicitly stated full
+711-page coverage and a clean verdict (not just a masked non-zero exit),
+and none hit a connection error - so whichever single daemon instance was
+alive at a given moment served identical content to all of them
+regardless of which script's bookkeeping claimed to own it.
+
+That assumption was then tested for real: `check:target-size` and
+`check:text-spacing` were run one-at-a-time next (clean, 711/711 each -
+every touch target >= 44x44px at 360px; no overflow at WCAG 1.4.12 text
+spacing), then `check:focus-appearance` (clean, 711/711 - every focusable
+control has a visible focus ring). For the last two, `check:lighthouse`
+was started right after `check:color-contrast` (the heaviest sweep, 1,422
+page loads, needing the `chromium_headless_shell-1194/chrome-linux/
+headless_shell.real` binary per Run 265's fix) - and this time the race
+was *not* cosmetic: `check:lighthouse` finished first and its
+`stopPreviewDaemon()` call tore down the shared server while
+`check:color-contrast` was still mid-sweep, which crashed it with
+`net::ERR_CONNECTION_REFUSED` (exit code 1, masked by this run's own
+`| tail -60` wrapping the command - a process-hygiene mistake worth
+flagging for next time: don't pipe a check script's output through `tail`
+if the exit code still needs to be trusted). `check:lighthouse` itself
+came back clean on its own 39-page sample: all >= 0.9 in every category,
+with the same one documented noindex/SEO exception (the bilingual 404
+page) as every prior run - performance/accessibility/best-practices are
+1.00 everywhere except `/quiz` (0.97), `hr/quiz` (0.98), `/compare` and
+`hr/about/sources` (0.99 each), all still comfortably clear of the
+script's own 0.9 bar and not a regression (quiz and compare are the
+site's heaviest-interaction pages; nothing in this run's own earlier
+checks flagged a performance problem on either).
+
+Re-ran `check:color-contrast` alone (no concurrent sweep) to get a clean
+read. It still didn't finish inside this tool's default 30-minute
+background limit and was killed mid-sweep (not failing, just slow - the
+same "slow" symptom Runs 260/264 saw before Run 265's binary fix, except
+this time the binary was already correct; this container's Chromium
+headless-shell sweep over 1,422 page loads in both color schemes
+apparently needs more than 30 but less than 120 minutes end to end). Ran
+it a third time with a 2-hour background budget: completed cleanly in
+full - **zero WCAG 1.4.3 color-contrast violations across all 711 pages
+in both color schemes.**
+
+All ten manual sweeps are now reconfirmed clean with no regression since
+Run 265, across sixteen intervening runs' worth of content and code
+changes. Updated `docs/ROADMAP.md`'s standing-health-check paragraph to
+cite Run 281 instead of Run 265, note the "16 runs later" gap, and record
+`check:color-contrast`'s real-world runtime (needs the full 2-hour budget
+in this container, not the usual 30 minutes) so a future run doesn't
+re-discover the same timeout the hard way.
+
+No content files were touched this run (a pure verification pass), so no
+PDF rebuild was needed per `AGENTS.md`'s edit-triggered rule.
+
+**Verification:** see above - this run's entire content *is* the
+verification. `pnpm lint`/`test`/`build` and all 33 fast CI `check:*`
+scripts clean; all ten manual sweeps clean (nine fast ones individually,
+`check:color-contrast` on its third, uncontended, long-budget attempt).
+
+**Left for a future pass:** the content-verification rotation's seven
+tied longest-stale files (`about-sources.md`, `compare-countries.md`,
+`compare-players.md`, `players.md`, `quiz.md`,
+`records-and-timelines.md`, `teams.md`, all `lastReviewed: 2026-10-09`)
+are still open - this run deliberately picked the manual-sweep item
+instead since those seven are short meta/feature-description pages with
+few externally-checkable claims, not because the rotation is done. A
+future run should either find a meaningful verification angle for those
+seven (e.g. cross-checking their prose against what the live pages
+actually render, since they describe page behavior rather than
+historical facts) or re-justify skipping them again.
