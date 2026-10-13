@@ -2532,6 +2532,32 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/2021_Copa_Am%C3%A9rica_final
   - https://news.cgtn.com/news/2021-07-10/Maracana-Stadium-opens-to-10-of-fans-for-Copa-America-final-11MGbAUmCn6/index.html
   - https://www.outlookindia.com/website/story/sports-news-copa-america-final-rio-de-janeiro-officials-open-10-maracana-stadium-for-argentina-brazil-title-clash/387697
+- Best Player/Golden Glove/Fair Play Award external-source audit (2026-10-13,
+  intensive run): the first check of these three award lists' winner names
+  against sources outside this site's own internal consistency checks (see
+  the superlative-claims-ledger entries referenced from `docs/PROJECT_STATUS.md`).
+  Covers all 16 Best Player winners (1987-2024), all 6 Golden Glove winners
+  (2011-2024), and all 6 Fair Play Award winners (2011-2024):
+  - https://en.wikipedia.org/wiki/Copa_Am%C3%A9rica_awards
+  - https://www.topendsports.com/events/soccer/copa-america/best-player.htm
+  - https://copaamerica.com/en/news/all-conmebol-copa-america-editions-champions-host-nations-best-players
+  - https://copaamerica.com/news/mejor-jugador-goleador-mejor-arquero-los-destacados-de-la-conmebol-copa-america-2021/?lang=en
+    (2021 Best Player: CONMEBOL's own post-tournament recap names Messi
+    alone, the source preferred over pre-final wire coverage that had
+    floated Messi and Neymar as joint honorees)
+  - https://www.foxsports.com/articles/soccer/messi-and-neymar-picked-as-best-players-at-copa-america
+    (2021 Best Player: the pre-final joint-naming report, superseded by
+    CONMEBOL's own later recap above)
+  - https://www.sportskeeda.com/football/list-of-copa-america-golden-glove-winners
+  - https://mundoalbiceleste.com/2024/07/15/emiliano-martinez-wins-2024-copa-america-golden-glove
+  - https://www.mlssoccer.com/news/chiles-alexis-vargas-bravo-snare-official-copa-america-awards
+  - https://www.cooperativa.cl/noticias/site/artic/20160626/pags-amp/20160626233329.html
+    (2016 Fair Play: the ambiguous recap, resolved by the SoccerWire source
+    below)
+  - https://www.soccerwire.com/news/copa-america-centenario-awards-best-xi-announced/
+    (2016 Fair Play: independently confirms Argentina as sole winner)
+  - https://en.wikipedia.org/wiki/Colombia_at_the_Copa_Am%C3%A9rica
+    (2024 Fair Play: Colombia)
 
 ## Ballon d'Or
 
