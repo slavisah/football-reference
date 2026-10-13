@@ -39383,3 +39383,123 @@ future run should either find a meaningful verification angle for those
 seven (e.g. cross-checking their prose against what the live pages
 actually render, since they describe page behavior rather than
 historical facts) or re-justify skipping them again.
+
+### Run 282 (2026-10-13): took up Run 281's own suggested angle - cross-checked all seven tied longest-stale meta/feature-description content files against what their live pages actually render, and found and fixed a real, user-visible bug in `records-and-timelines.md`
+
+Read `content/about-sources.md`, `compare-countries.md`, `compare-players.md`,
+`players.md`, `quiz.md`, `records-and-timelines.md` and `teams.md` side by
+side with the Astro page (and, for `quiz.md`, the full `src/lib/quiz.ts`
+question-generator surface) each one feeds, rather than checking their prose
+against the competition tables the way every other content-verification pass
+on this rotation does - these seven describe page *behavior*, not historical
+facts, so the right cross-check is "does this match what the page actually
+does," per Run 281's own suggestion.
+
+Six of the seven checked out clean: `about-sources.md` (`src/pages/about/
+sources.astro` genuinely reads every source section live from
+`docs/SOURCES.md`, matching the page's own claim that it "can never drift out
+of sync"), `compare-countries.md`/`compare-players.md` (`src/pages/compare
+.astro`/`compare-players.astro` implement exactly the stated metrics - titles/
+runner-up/semifinal-or-4th/finals-reached for four team competitions, award
+counts/years for three individual awards - with the stated exclusions
+correctly enforced either way), `players.md`/`teams.md` (`src/pages/players/
+index.astro`/`teams/index.astro` are exactly the A-Z directories each file
+describes, with the same cross-exclusion each file states), and `quiz.md`
+(every one of its 17 "Question types in this quiz" bullets maps to exactly
+one of `src/lib/quiz.ts`'s 14 exported question-generator functions - traced
+function by function, including `mostTitlesQuestion()`'s three `subject`
+variants, which separately back the "most titles/awards," "hosted the most
+editions" and "most titles on home soil" bullets - and every function maps
+back to a bullet; no drift in either direction).
+
+`records-and-timelines.md` did not check out clean. `src/lib/competition
+.ts`'s `loadPageMeta()` takes a content file's first paragraph verbatim as
+`meta.intro`, and `src/pages/records.astro` renders that straight into the
+live `/records` page's own `<p class="records__intro">` - the first thing a
+reader sees under the `<h1>`. The file's first paragraph read: "This page is
+intended for derived summaries. The website should generate most title
+counts and timelines from the competition tables instead of maintaining
+duplicate hard-coded values." - an internal, aspirational engineering note
+from whichever run originally drafted this file (written before the page was
+actually built, per its own prescriptive "should generate"/"instead of
+maintaining" phrasing), never updated once `/records` actually shipped. It
+had been sitting in the live page's own intro paragraph, visible to every
+reader, ever since. Confirmed by reading the rendered page's own source: yes,
+`meta.intro` really is what appears there, not a developer-only comment -
+`src/pages/hr/records.astro` only confirms the gap further, since its
+Croatian counterpart was never built from this file at all - it hardcodes
+its own accurate, hand-translated intro directly in the `.astro` file,
+describing the page precisely ("every champion, host and final result in
+one place, along with rankings of the most successful teams and individual
+awards... all generated directly from the data already used by the
+individual competition pages") - so this bug was English-only.
+
+Meanwhile the real `/records` page has grown, run over run, into thirteen
+sections no version of this file ever described: a champions timeline, most
+successful teams, most frequent hosts, titles won on home soil, back-to-back
+champions, nearly champions, nearly finalists, longest wait between titles,
+biggest final wins, fiercest rivalries, an individual award winners timeline,
+most awards, and a "How historical nation names are handled" identity-rules
+section - read straight from `src/pages/records.astro`'s own section
+structure and `jumpSections` list to confirm the current, full feature set
+rather than guess at it. The file's old "Recommended generated views"
+section (two of these thirteen) and "Family quiz ideas" subsection (now its
+own fully-built `/quiz` page, documented by `content/quiz.md` instead) were
+equally stale leftovers from the same early planning-document draft.
+
+Rewrote the file: a new first paragraph that accurately describes the
+current page in one sentence (matching the style and accuracy bar every
+other one of these seven files already holds), and kept only the
+"Historical identity rules" section, verified word-for-word against both
+`src/pages/records.astro`'s own "How historical nation names are handled"
+section and `src/lib/countries.ts`'s `SUCCESSOR_GROUPS` map - West
+Germany-under-Germany only, Soviet Union/Russia kept separate, Czechoslovakia/
+Czech Republic kept separate absent an editorial rule, Yugoslavia kept
+labeled as Yugoslavia - all four confirmed still accurate as written, so
+carried over with only "may be grouped" tightened to "is grouped" to match
+the actual (unconditional, not optional) behavior. Bumped `lastReviewed` to
+today.
+
+The new wording was written to avoid every current claim-ledger trigger
+word (`most`/`record`/`youngest`/`oldest`/`highest`/`biggest`/`largest`/
+`lowest`/`fewest`, `the only`, an ordinal, a `since <year>` claim, an
+undated completeness claim, `consecutive`/`back-to-back`) rather than adding
+a new descriptive-use ledger entry for each one - simpler than ledger
+bookkeeping and avoids seeding six more "this is a quantifier, not a claim"
+entries for one paragraph. One first draft did trip `check:consecutive
+-claims` on "consecutive-title streaks"; reworded to "title-winning streaks"
+and it passed clean. Pruned the now-orphaned `record-claims-ledger.json`
+entry for the old intro sentence (the same entry `check-record-claims.mjs`
+itself would otherwise just report as a harmless "stale, safe to prune"
+line) rather than leaving it to rot.
+
+**Verification:** `pnpm lint` (0/0/0), `pnpm test` (1071/1071, unchanged),
+`pnpm build` (711 pages, unchanged). All nine claim-ledger checkers
+(`check:superlative-claims`, `check:ordinal-claims`, `check:record-claims`,
+`check:consecutive-claims`, `check:since-claims`, `check:one-of-only-claims`,
+`check:completeness-claims`) plus `check:claims-hr` and `check:i18n-notes`
+clean with zero new/stale entries. `check:records-consistency`,
+`check:compare-consistency`, `check:team-profiles-consistency`,
+`check:player-profiles-consistency`, `check:links`, `check:sitemap`,
+`check:feed`, `check:jsonld`, `check:heading-outline`, `check:meta`,
+`check:spelling`/`check:spelling-hr`, `check:locale-consistency`,
+`check:reachability`, `check:edition-header-labels`,
+`check:attendance-format`, `check:award-tallies`, `check:link-names`,
+`check:image-dimensions`, `check:theme-color` and `check:precache` all
+clean (the ten full-site browser sweeps were re-run in full just last run
+and this run touched no layout/CSS, so were not re-run). `pnpm outdated`
+(only `typescript`, unchanged) and `pnpm audit` (clean) unchanged from Run
+281. Rebuilt all 700 print PDFs per `AGENTS.md`'s edit-triggered rule
+(`check:pdfs`/`check:pdf-outline` both clean, 700/700) - the first attempt
+raced a concurrent `pnpm build` against the shared preview-server port (the
+exact hazard Run 281's own entry had just documented) and failed with an
+HTTP 404 navigating to an edition page; the second attempt, run alone with
+nothing else touching the preview server, completed cleanly.
+
+**Left for a future pass:** this closes Run 281's own "left for a future
+pass" item - all seven tied longest-stale meta/feature-description files
+have now had a behavior-accuracy pass, six found already accurate and one
+(`records-and-timelines.md`) fixed. The content-verification rotation's
+next candidates are whichever file now has the oldest `lastReviewed` date -
+check each file's own frontmatter rather than trusting this paragraph, since
+it goes stale the moment a future run touches any of them.
