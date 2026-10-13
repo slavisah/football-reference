@@ -24,8 +24,8 @@ importers:
         specifier: ^4.13.0
         version: 4.13.0(playwright-core@1.64.0)
       '@cspell/dict-hr-hr':
-        specifier: ^3.1.3
-        version: 3.1.3
+        specifier: ^3.1.4
+        version: 3.1.4
       '@playwright/test':
         specifier: ^1.64.0
         version: 1.64.0
@@ -360,8 +360,8 @@ packages:
   '@cspell/dict-haskell@4.0.6':
     resolution: {integrity: sha512-ib8SA5qgftExpYNjWhpYIgvDsZ/0wvKKxSP+kuSkkak520iPvTJumEpIE+qPcmJQo4NzdKMN8nEfaeci4OcFAQ==}
 
-  '@cspell/dict-hr-hr@3.1.3':
-    resolution: {integrity: sha512-Xd2vteB4lZD8Y6w4TvLFCGuSdbetsM/gij+lSEnwi2PafAGp5GLzYajvgA/DEX3pqmv9CziX9zY/DefrfwDitA==}
+  '@cspell/dict-hr-hr@3.1.4':
+    resolution: {integrity: sha512-Cb9PXHDuDcxLhpRF+uAJIZCuvKQHDhV0F+hABfRm3P3a92JRX1wuey7Ei6wrq/oeLaHAJ7/IlZBzkCXI27tRCg==}
 
   '@cspell/dict-html-symbol-entities@4.0.5':
     resolution: {integrity: sha512-429alTD4cE0FIwpMucvSN35Ld87HCyuM8mF731KU5Rm4Je2SG6hmVx7nkBsLyrmH3sQukTcr1GaiZsiEg8svPA==}
@@ -2980,7 +2980,7 @@ snapshots:
 
   '@cspell/dict-haskell@4.0.6': {}
 
-  '@cspell/dict-hr-hr@3.1.3': {}
+  '@cspell/dict-hr-hr@3.1.4': {}
 
   '@cspell/dict-html-symbol-entities@4.0.5': {}
 

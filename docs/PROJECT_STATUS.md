@@ -39174,3 +39174,104 @@ externally-checkable claims (per Run 278's own assessment, still
 accurate). PR #56 remains unmerged and is now flagged for a thirteenth run
 running - see this run's own `docs/ROADMAP.md` flag update and push
 notification.
+
+### Run 280 (2026-10-13): PR #56 merged by the user, closing a 13-run-old process flag; branch recreated fresh; content-verification rotation on `content/ballon-dor.md`'s five companion trophy sections - first second-pass audit, zero discrepancies found; routine dependency bump
+
+PR #56 (`intensive/football-reference` -> `main`), open since 2026-10-02
+and flagged as an unresolved process issue in Runs 263, 268-279 (thirteen
+runs in a row), was merged by the user on 2026-10-13 at 07:51 UTC (80
+commits, 798 files). Confirmed via the GitHub API (`merged: true`,
+`merged_by: slavisah`) before doing anything else this run, since the
+flag's own resolution criteria ("merge it, or pause/slow this routine")
+needed checking first. Per this routine's own branch-strategy
+instructions for a branch whose content-tree already matches `main`,
+recreated `intensive/football-reference` fresh from the current
+`origin/main` rather than reusing the now-merged history. Updated
+`docs/ROADMAP.md`'s standing flag to record the resolution.
+
+With the branch fresh and the standing flag cleared, picked up the
+content-verification rotation exactly where Run 279 left it:
+`content/ballon-dor.md` (`lastReviewed: 2026-10-09`, the single
+longest-stale content file, and the next explicitly-named target per Run
+279's own "Left for a future pass" note). Every individual claim on this
+page already has at least one documented external audit from prior runs
+(the Winners/National-team columns: 2026-08-07; the Ceremony date column:
+2026-08-13; the five companion trophy sections - Kopa, Yashin, Gerd
+Müller, Johan Cruyff, Sócrates - each at their own original authoring
+time, 2026-08-31 through 2026-09-03), so a from-scratch re-audit of
+already-twice-checked data would have had low marginal value. The five
+companion trophy sections were the one part of the page that had never
+had a *second*, independent pass the way the Winners/Ceremony columns
+both already have - so this run closed exactly that gap.
+
+Ran a fresh `WebSearch` pass per section (Kopa, Yashin, Gerd Müller,
+Johan Cruyff, Sócrates - 20 entries total, 2018-2025 depending on each
+trophy's own start year) against a source mix distinct from each
+section's original citations: Sports Illustrated's and TopEndSports' own
+"complete list" pages for Kopa/Yashin/Gerd Müller, Wikipedia's dedicated
+trophy articles, and Peace and Sport's own press releases for the
+Sócrates Award. **No discrepancies found** across all 20 entries - every
+name, year and nuance already on the page (Lamine Yamal's repeat Kopa win
+in 2025; Donnarumma's second Yashin Trophy; the Kane/Mbappé Gerd Müller
+tie in 2024; Ancelotti/Luis Enrique for the Johan Cruyff Trophy; Hermoso's
+first-female-recipient Sócrates win in 2024 and the Xana Foundation's 2025
+win) held up exactly as written. The only wrinkle: the first Sócrates
+Award search pass couldn't settle 2024 or 2025 from its initial result
+set (one low-quality source miscounted the award's total edition count),
+so two follow-up, year-specific queries were needed before both were
+confirmed with no conflict.
+
+Documented the audit with a new paragraph in `content/ballon-dor.md`'s
+"Important editorial note" section (matching this page's own established
+convention) and a matching `docs/SOURCES.md` entry with the full citation
+list. Bumped `lastReviewed` to 2026-10-13. The new paragraph is placed
+after the section's existing bullet list, so (per Run 278's own documented
+finding about `src/lib/notes.ts`'s `extractSection()`) it is not rendered
+as a `NoteSection` item and needed no Croatian-page counterpart or
+`check:i18n-notes` change - confirmed by running that check afterward.
+
+The new paragraph's prose tripped `check:superlative-claims` ("the only
+point worth recording") and `check:ordinal-claims` ("second-pass",
+"second...query") as a single whole-paragraph claim (this page has no
+bullet markup here, so the whole paragraph is one claim-ledger unit);
+added one matching entry to each of `scripts/superlative-claims-ledger.json`
+and `scripts/ordinal-claims-ledger.json`, each noting that the paragraph
+describes the verification act itself rather than asserting a new
+record, with the underlying facts cross-checked as above.
+
+Also ran the routine's own standing health check: `pnpm outdated` found
+one new patch release since the last check, `@cspell/dict-hr-hr`
+3.1.3 -> 3.1.4 (`typescript` 7 remains blocked by `@astrojs/check@0.9.10`'s
+peer-dependency range, unchanged from every prior run's finding); bumped
+it and re-ran `check:spelling`/`check:spelling-hr` clean. `pnpm audit`:
+no known vulnerabilities.
+
+**Verification:** `pnpm lint` (0 errors/warnings/hints), `pnpm test`
+(1071/1071, unchanged), `pnpm build` (711 pages, unchanged). Every
+content-side claim-ledger gate individually: `check:record-claims`,
+`check:superlative-claims`, `check:ordinal-claims`, `check:consecutive-claims`,
+`check:since-claims`, `check:one-of-only-claims`, `check:completeness-claims`,
+`check:claims-hr` (239 claims, all clean) - all clean after the two new
+ledger entries. `check:i18n-notes` (8 EN/HR page pairs, structure
+unchanged as expected), `check:spelling`/`check:spelling-hr`,
+`check:award-tallies`, `check:links` (715 pages), `check:meta`,
+`check:link-names`, `check:jsonld` (711 pages, 1783 blocks),
+`check:heading-outline`, `check:edition-header-labels`,
+`check:attendance-format`, `check:locale-consistency`,
+`check:records-consistency`, `check:compare-consistency`,
+`check:team-profiles-consistency`, `check:player-profiles-consistency`,
+`check:sitemap`, `check:feed`, `check:precache`, `check:image-dimensions`,
+`check:theme-color`, `check:reachability`, `check:theme-flash`,
+`check:html` - all clean. Per AGENTS.md's unconditional "any edit to
+`content/*.md`" rule, rebuilt all 700 PDFs with `pnpm build:pdfs`
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell.real`,
+the same workaround Runs 265/278/279 already documented, run on a `dist/`
+with no concurrent `pnpm build` in flight per Run 279's own process
+note); `check:pdfs`/`check:pdf-outline` clean after (700/700).
+
+**Left for a future pass:** the content-verification rotation continues -
+`about-sources.md`, `compare-countries.md`, `compare-players.md`,
+`players.md`, `quiz.md`, `records-and-timelines.md` and `teams.md` are
+still at `lastReviewed: 2026-10-09`, now the longest-stale group (all
+seven touched together by Run 259's single pass); `ballon-dor.md` is now
+current at 2026-10-13.

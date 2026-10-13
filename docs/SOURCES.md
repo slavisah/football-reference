@@ -2939,6 +2939,32 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Companion trophy sections second-pass audit (2026-10-13, Run 280): a fresh,
+  independent re-check of all five companion trophy sections above (Kopa,
+  Yashin, Gerd Müller, Johan Cruyff, Sócrates - 20 entries total), closing
+  the gap that these five sections had each only ever had their original
+  authoring-time verification (2026-08-31 through 2026-09-03) and no further
+  external re-check since, unlike the Winners/Ceremony date columns above,
+  which both already carry a documented second independent pass. Used a
+  source mix distinct from each section's own original citations. **No
+  discrepancies found** across all 20 entries:
+  - https://www.si.com/soccer/kopa-trophy-list-winners-most-wins-all-time
+  - https://www.si.com/soccer/yashin-trophy-list-winners-most-wins-all-time
+  - https://www.topendsports.com/sport/soccer/award-striker-of-the-year.htm
+  - https://en.wikipedia.org/wiki/Johan_Cruyff_Trophy_(France_Football)
+  - https://en.wikipedia.org/wiki/S%C3%B3crates_Award
+  - https://www.peace-sport.org/news/jenni-hermoso-winner-of-the-socrates-award-at-the-2024-ballon-dor-ceremony/
+  - https://www.monaco-tribune.com/en/2024/10/ballon-dor-2024-jenni-hermoso-first-female-winner-of-the-socrates-prize/
+  - https://www.peace-sport.org/news/h-s-h-prince-albert-ii-and-peace-and-sport-welcome-the-xana-foundation-winner-of-the-2025-socrates-award-in-monaco-2/
+  - Note: the only wrinkle was the Sócrates Award's first search pass
+    returning no settled result for 2024 or 2025 from its initial result
+    set (one source miscounting the award's total edition count); two
+    follow-up, year-specific queries resolved both cleanly with no
+    conflict against the page's existing Jennifer Hermoso (2024)/Xana
+    Foundation (2025) entries. The same egress-blocked-domains caveat
+    every prior audit in this file has noted applies here too;
+    verification relied on WebSearch's synthesized summaries of indexed
+    pages rather than direct page loads.
 - Youngest and oldest winners (added 2026-10-02, two-hundred-and-thirteenth
   intensive run): two new bullets in `content/ballon-dor.md`'s "Memorable
   moments" section naming Stanley Matthews (1956, aged 41) as the award's

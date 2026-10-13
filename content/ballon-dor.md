@@ -4,7 +4,7 @@ slug: ballon-dor
 awardType: individual
 firstEdition: 1956
 lastCompletedEdition: 2025
-lastReviewed: 2026-10-09
+lastReviewed: 2026-10-13
 status: verified
 ---
 
@@ -168,6 +168,25 @@ Two sourcing notes worth flagging:
 A second, independent cross-check of every Winner and National team cell (2026-08-07, intensive run) found **no discrepancies** across all 69 awarded editions (1956-2025) or the Messi=8/Cristiano Ronaldo=5 totals, using a source mix deliberately distinct from the first pass (2026-08-04) - see `docs/SOURCES.md` for the full breakdown. That pass also surfaced one genuine labeling nuance worth recording rather than treating as an error: **1990's National team, "West Germany"**, is defensible either way in the wild - Lothar Matthäus's World Cup-winning captaincy that earned him the award came in July 1990 with West Germany, but the ballot itself was announced in December 1990, ten weeks after reunification. The page keeps "West Germany" for consistency with every other pre-1990 row and because the achievement being honored predates reunification; 1996 (Matthias Sammer) has no such ambiguity and is unambiguously "Germany" in every source.
 
 A second, independent cross-check of the **Ceremony date** column (2026-08-13, intensive run) re-verified all 69 dated editions (1956-2025, excluding the 2020 cancellation) in four era-based passes, deliberately drawing on a source mix distinct from the first pass's Wikipedia/France-Football-issue/Tuesday-heuristic combination - RSSSF's per-year "European Footballer of the Year" pages (`rsssf.org/miscellaneous/europa-poy*.html`), Britannica, official club sites (Benfica, Dynamo Kyiv, AC Milan, PSG), UEFA.com, contemporaneous wire coverage (VOA News, Reuters-affiliated reprints), and physical France Football issue-cover-date listings (auction/collector sites). **No discrepancies found** - every one of the 69 dates already on the page held up against this independent pass. This closed out both years the first pass had flagged as sourced from only a single corroborating reference (1965, 1973) with further non-Wikipedia corroboration, and resolved the apparent "29 vs 30 December 1986" conflict with a genuine explanation rather than just re-asserting one side: Soviet-era retrospectives (Dynamo Kyiv/Ukrainian press) describe Belanov being privately notified of the result on 29 December, while France Football's own issue (#2125) carrying the published result is dated 30 December - the page tracks the publication date, so 30 December stands correct, and the "29 December" figure some club sources repeat refers to a different (earlier, private) moment in the same story rather than an error. The Tuesday-publication heuristic used throughout the 1956-2001 span visibly breaks down from **2002 onward** (12 December 2002 is a Thursday, 22 December 2003 and 13 December 2004 are both Mondays) - all three dates are independently corroborated by contemporaneous sources regardless (a BigSoccer forum post discussing the 2002 result on 16 December, a VOA News wire dateline for 2003, and UEFA.com's own report naming the day of the week for 2004), so this is a real shift in France Football's release-day pattern around this time, not a data error; future audits of this column should not treat the Tuesday pattern as informative past 2001.
+
+A fresh, independent second-pass audit of the five companion trophy
+sections above (Kopa, Yashin, Gerd Müller, Johan Cruyff and Sócrates;
+2026-10-13, intensive run) re-verified every entry via `WebSearch` against
+a source mix distinct from each section's original authoring citations
+(Sports Illustrated's and TopEndSports' own "complete list" pages for
+Kopa/Yashin/Gerd Müller, Wikipedia's dedicated trophy articles, and
+Peace and Sport's own press releases for the two Sócrates years the
+first search pass left unsettled, 2024 and 2025). **No discrepancies
+found** across all 20 entries in the five sections - the only point
+worth recording is that the first search pass for the Sócrates Award
+could not independently confirm 2024 or 2025 from its initial result set
+and needed a second, more targeted query for each year before both
+(Jennifer Hermoso, 2024; the Xana Foundation, 2025) were confirmed
+exactly as already on the page. These five sections had each had two
+independent `WebSearch` passes at authoring time (2026-08-31 through
+2026-09-03) but no further external re-check since, unlike the Winners/Ceremony
+date columns above, which both already have a documented second
+independent pass; this run closes that gap.
 
 See `docs/SOURCES.md` for the per-year citation list.
 
