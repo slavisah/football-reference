@@ -38936,3 +38936,111 @@ of this entry assumed a bare `lastReviewed` bump wouldn't need it, and
 x EN/HR) until the rebuild ran - worth remembering for the next run that a
 *any* `content/*.md` edit means PDFs, full stop, not just a data-bearing
 one.
+
+### Run 278 (2026-10-13): content-verification rotation on `content/copa-america.md`'s Best Player/Golden Glove/Fair Play Award winner lists - first external-source cross-check for these three sections, zero discrepancies found
+
+Continued the content-verification rotation, picking up where Run 277 left
+off: of the files still at the oldest `lastReviewed: 2026-10-09` tier,
+`copa-america.md` was the one Run 277 itself flagged as the natural next
+pick (the only one of that tier with a comparable volume of checkable
+claims). Rather than re-running the Champion/Runner-up, Format, Third/
+Fourth, or Final date audits this page's own "Important editorial warning"
+section already documents two independent passes each for, looked for the
+next genuinely unaudited angle on this specific page: the **Best Player**
+(16 entries, 1987-2024), **Golden Glove** (6 entries, 2011-2024), and
+**Fair Play Award** (6 entries, 2011-2024) winner lists had each only ever
+been checked for *internal* consistency (the hundred-and-seventy-first/
+-second runs' superlative-claims-ledger seeding, which cross-referenced
+these lists against this page's own other tables) - never against an
+external source the way every other audited column on this page has been.
+28 entries combined, a complete, independently-useful slice.
+
+Verified all 28 via fresh `WebSearch` passes (four queries: 1987-1999 Best
+Player, 2001-2024 Best Player, 2011-2024 Golden Glove, 2011-2024 Fair Play),
+cross-checking against CONMEBOL's own recap articles, Wikipedia's "Copa
+América awards" summary, Sportskeeda's Golden Glove list, and independent
+press coverage. **No discrepancies found** against any name or year already
+on the page. Two genuine ambiguities surfaced in the raw search results and
+were run down with a follow-up query each rather than left unresolved:
+
+- **2021 Best Player:** contemporary wire coverage (AP, via Fox Sports/
+  Daily Sabah) reported CONMEBOL naming Messi *and* Neymar jointly as
+  "players of the tournament" ahead of the final. CONMEBOL's own
+  post-tournament recap article, published after the final, names only
+  Messi - preferring the later, official recap over the earlier wire
+  report is the same methodology this page's own Champion/Runner-up audit
+  already established, and it's the source the page's existing sole-Messi
+  entry matches.
+- **2016 Fair Play:** one Spanish-language recap (Cooperativa.cl) reads
+  ambiguously on a first pass - it names Argentina as the winner in one
+  sentence, then describes Chile's own card tally in the next. A second,
+  independent source (SoccerWire's Centenario awards recap) confirms
+  Argentina as the sole winner, matching the page's existing entry.
+
+Added an audit paragraph to `content/copa-america.md` documenting this
+(matching the page's own established "audited <date> (intensive run) ...
+No discrepancies found" convention used for its other four columns) and a
+matching `docs/SOURCES.md` entry with the full citation list. Bumped
+`lastReviewed` to 2026-10-13.
+
+Two secondary issues turned up while verifying the new paragraph against
+this site's own automated claim gates, both fixed before committing: the
+first draft's "are the first pass to check..." phrasing tripped
+`check:ordinal-claims`' bare "the first" pattern (reworded to state the same
+fact without an ordinal-claim shape, since it's a claim about this page's
+own audit history, not a football fact worth ledgering) and "Chile's
+disciplinary record" tripped `check:record-claims`' "record" trigger word
+in its generic sense, not a superlative claim (reworded to "Chile's own
+card tally"). Also confirmed the two sentences describing the 2021/2016
+ambiguities needed to stay plain prose, not bullets: `src/lib/notes.ts`'s
+`extractSection()` only renders a bare bullet or the single lead-in
+paragraph before a section's first bullet - any later plain-paragraph text
+is captured for the audit trail in the markdown source but silently
+dropped from the rendered `NoteSection`, which is exactly how every other
+"second independent cross-check" paragraph on this page already behaves.
+Drafting the two ambiguity write-ups as actual `- ` bullets at first would
+have made them render for the first time (unlike the surrounding prose),
+risking an EN/HR note-parity mismatch against the Croatian page's own
+hand-translated array; caught before committing by checking
+`src/lib/notes.ts`'s actual parsing logic rather than assuming the
+rendering would match the rest of the section, and `pnpm check:i18n-notes`
+confirmed no new section/item appeared after the rewrite.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean, no dependency
+change), `pnpm lint` (263 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(1071/1071, unchanged), `pnpm build` (711 pages, unchanged). Ran every
+content-side claim-ledger gate individually, since this edit touched
+exactly the kind of prose those gates watch: `check:superlative-claims`,
+`check:ordinal-claims` (99/99, down from the pre-edit 100 after the reword
+removed one bare ordinal match net of the new paragraph - no ledger entry
+needed), `check:since-claims`, `check:consecutive-claims`,
+`check:one-of-only-claims`, `check:record-claims` (57/57, matching the
+pre-edit count after the reword), `check:completeness-claims`,
+`check:claims-hr` - all clean, no new unledgered claims. `check:i18n-notes`
+(8 EN/HR page pairs, structurally identical - confirms the new paragraph
+added no renderable section/item). `check:spelling` (added "Cooperativa" to
+`.cspell/football-names.txt`; 0 issues after). `check:award-tallies`,
+`check:links` (715 pages), `check:meta`/`check:link-names` (710 pages),
+`check:jsonld` (711 pages, 1783 blocks), `check:heading-outline` (711
+pages), `check:edition-header-labels`, `check:attendance-format`,
+`check:locale-consistency` (711 pages) - all clean. Per AGENTS.md's
+unconditional "any edit to `content/*.md`" rule, rebuilt all 700 PDFs with
+`pnpm build:pdfs` (needed `PW_EXECUTABLE_PATH=/opt/pw-browsers/
+chromium_headless_shell-1194/chrome-linux/headless_shell.real` to launch at
+all in this environment, the same workaround Run 265 already documented for
+`check:color-contrast`'s own browser launch - worth noting this applies to
+`build:pdfs` too, not just that one check); `check:pdfs`/`check:pdf-outline`
+re-run after.
+
+**Left for a future pass:** the content-verification rotation continues -
+`about-sources.md`, `ballon-dor.md`, `compare-countries.md`,
+`compare-players.md`, `players.md`, `quiz.md`, `records-and-timelines.md`
+and `teams.md` are still at `lastReviewed: 2026-10-09`; of these,
+`ballon-dor.md` is the next with a comparable volume of standalone,
+externally-checkable claims (the others are short generated-directory
+blurbs, per Run 277's own assessment). `copa-america.md`'s Golden Boot
+winners list (48 entries, several tied) is a larger, not-yet-externally-
+audited sibling of the three sections this run covered - a reasonable next
+target on this same page specifically, scoped separately because of its
+size. PR #56 remains unmerged and is now flagged for a twelfth run running
+- see this run's own `docs/ROADMAP.md` flag update and push notification.
