@@ -1285,7 +1285,7 @@ test.describe('Copa América page on a 360px phone', () => {
       page.locator('.notes__card').getByText('Isabelino Gradín (Uruguay) - 3 goals'),
     ).toBeVisible();
     await expect(
-      page.locator('.notes__card').getByText("Guerrero's third win, the most of any player."),
+      page.locator('.notes__card').getByText("Guerrero's third win, tied for the most of any player."),
     ).toBeVisible();
   });
 
@@ -1514,7 +1514,7 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
       page.locator('.notes__card').getByText('Isabelino Gradín (Urugvaj) - 3 gola'),
     ).toBeVisible();
     await expect(
-      page.locator('.notes__card').getByText('Guerrerova treća nagrada, najviše od svih igrača.'),
+      page.locator('.notes__card').getByText('Guerrerova treća nagrada, izjednačeno najviše od svih igrača.'),
     ).toBeVisible();
   });
 
