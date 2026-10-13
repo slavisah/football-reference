@@ -28,6 +28,7 @@ Alba
 Alberto
 Aldo
 Alexis
+Alfredo
 Alistair
 Amado
 Américe
@@ -188,7 +189,10 @@ Pasadena
 Paul
 Payetom
 Peace
+Pedra
 Pedro
+Petronea
+Petroneova
 Pierre
 Platinija
 Play
@@ -203,6 +207,7 @@ Rodolfo
 Rodrigo
 Roger
 Romano
+Romanova
 Romero
 Ronalda
 Ronaldom
@@ -216,6 +221,7 @@ Santos
 Santosa
 Schick
 Schumacher
+Segundo
 Senna
 Sergio
 Shearer
