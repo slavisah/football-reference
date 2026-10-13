@@ -39044,3 +39044,133 @@ audited sibling of the three sections this run covered - a reasonable next
 target on this same page specifically, scoped separately because of its
 size. PR #56 remains unmerged and is now flagged for a twelfth run running
 - see this run's own `docs/ROADMAP.md` flag update and push notification.
+
+### Run 279 (2026-10-13): content-verification rotation on `content/copa-america.md`'s Golden Boot winners list (48 entries) - two real errors found and corrected (1920, 1927), with a knock-on "most wins" fact fixed too
+
+Picked up exactly where Run 278 left off: the Golden Boot winners list (48
+entries, 1916-2024) was the explicitly-flagged next target, a larger
+sibling of the Best Player/Golden Glove/Fair Play lists Run 278 had just
+finished auditing. Ran a fresh `WebSearch`-based cross-check of every
+entry against RSSSF's per-edition goal-scorer tables, Wikipedia's
+per-edition articles, and CONMEBOL's own top-scorer retrospectives.
+
+**Two real, pre-existing errors found and corrected** - both pre-1930
+editions where this page had evidently been sourced from a single RSSSF
+tournament-*summary* line rather than RSSSF's own more detailed per-match
+goal-scorer table, and the two disagree with each other:
+
+- **1920:** the page said Ángel Romano alone, 4 goals. RSSSF's detailed
+  goal-scorer table, the 1920 South American Championship's Wikipedia
+  article, and an independent Spanish-language historical recap all agree
+  the actual result was a joint top scorer: José Pérez and Ángel Romano
+  (both Uruguay), 3 goals each. Corrected.
+- **1927:** the page said Roberto Figueroa alone, 4 goals. Wikipedia's
+  1927 tournament article and RSSSF's own detailed goal-scorer table both
+  agree on a five-way tie at 3 goals each: Alfredo Carricaberry and
+  Segundo Luna (Argentina), and Pedro Petrone, Héctor Scarone, and
+  Figueroa (Uruguay). Corrected.
+
+The 1927 fix has a real downstream consequence that needed its own fix,
+not just a silent data change: it gives Pedro Petrone a third Golden Boot
+(1923, 1924, now 1927), which ties Paolo Guerrero's three wins (2011,
+2015, 2019) - previously described on the page as uniquely "the most by
+any player." Found this by re-counting every name's win total across the
+corrected 48-entry list after making the 1920/1927 fixes, specifically
+because this page already carries a hand-written superlative sentence
+about it; reworded both the 2019 Golden Boot bullet ("Guerrero's third
+win, tied for the most of any player") and the page's own summary bullet
+("tied for the most by any player with Pedro Petrone's three") to state
+the tie rather than a sole record. Petrone's 1923/1924 pair is still the
+only *consecutive* part of his record (1927 isn't adjacent to 1924), so
+the separate, already-correct "only players to win in consecutive
+editions" claim (Vargas 2015/2016, Petrone 1923/1924) needed no change.
+Mirrored all of these fixes on the Croatian `/hr/competitions/copa-america`
+page (`src/pages/hr/competitions/copa-america.astro`), which carries its
+own hand-translated copy of the same Golden Boot list and summary
+sentence rather than being derived from the English content file.
+
+Two more apparent discrepancies surfaced in the raw search results and
+were run down rather than left unchecked, in both cases *confirming* the
+page's existing figure over a conflicting source:
+
+- **1959 Ecuador edition:** RSSSF's own lower-detail results-summary page
+  gives José Sanfilippo 5 goals, but RSSSF's own more detailed goal-scorer
+  table and Wikipedia's tournament article both agree on 6 - the same
+  "detailed table over tournament summary" pattern as the two real
+  corrections above, this time confirming rather than overturning the
+  page's existing 6.
+- **1983 edition:** RSSSF's tournament-summary page lists a fourth
+  co-scorer, Eduardo Malásquez (Peru), at 3 goals, but RSSSF's own
+  detailed goal-scorer table and Wikipedia's tournament article both place
+  him at 2 goals - the page's existing three-name entry (Burruchaga,
+  Dinamite, Aguilera, without Malásquez) is correct as-is.
+
+Every other entry in the 48-entry list (1916-1919, 1921-1926, 1929-2024)
+was independently checked against the same source mix and matched with no
+conflict. Documented all of this with a new audit paragraph in
+`content/copa-america.md`'s "Important editorial warning" section
+(matching the page's own established "audited \<date\> (intensive run) ...
+No discrepancies found" convention, here reporting two corrections rather
+than zero) and a matching `docs/SOURCES.md` entry with the full citation
+list, including the two outlier RSSSF tournament-summary URLs themselves
+so a future reader can see exactly which source each old, wrong figure
+traced back to.
+
+The rewording triggered four different claim-ledger gates at once (the
+long explanatory paragraph uses "highest"/"most"/"only"/"third"/
+"consecutive" - trigger words for `check:record-claims`,
+`check:superlative-claims`, `check:ordinal-claims`, and
+`check:consecutive-claims` respectively), on top of the two reworded
+bullets and the summary sentence themselves changing text. Added nine new
+ledger entries (one per claimable text unit per gate it tripped) and
+pruned five stale ones (the old, now-superseded bullet/summary text) across
+`record-claims-ledger.json`, `superlative-claims-ledger.json`,
+`ordinal-claims-ledger.json`, and `consecutive-claims-ledger.json`, each
+with its own verification note rather than a copy-pasted one.
+`check:claims-hr` then caught a genuine EN/HR parity gap the ledger edits
+alone didn't cover: the Croatian summary bullet still only named 1923/1924
+for Petrone, not the new 1927 - fixed by the Croatian-page edit described
+above, confirmed clean on re-run.
+
+**Verification:** `pnpm install --frozen-lockfile` (clean, no dependency
+change), `pnpm lint` (263 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(1071/1071, unchanged), `pnpm build` (711 pages, unchanged). Ran every
+content-side claim-ledger gate individually after the ledger edits:
+`check:record-claims`, `check:superlative-claims`, `check:ordinal-claims`,
+`check:consecutive-claims`, `check:since-claims`, `check:one-of-only-claims`,
+`check:completeness-claims`, `check:claims-hr` (237 claims, all clean after
+the Croatian-page fix), `check:i18n-notes` (8 EN/HR page pairs - the new
+"Important editorial warning" paragraph is prose rather than a bullet, so
+(per Run 278's own documented finding about `src/lib/notes.ts`'s
+`extractSection()`) it isn't rendered as a `NoteSection` item at all and
+needed no Croatian counterpart there) - all clean. `check:spelling` (added
+Carricaberry, Malásquez, Pérez, and Scarone to
+`.cspell/football-names.txt`), `check:spelling-hr`, `check:award-tallies`,
+`check:links` (715 pages), `check:meta`, `check:link-names`, `check:jsonld`
+(711 pages, 1783 blocks), `check:heading-outline`, `check:edition-header-labels`,
+`check:attendance-format`, `check:locale-consistency`,
+`check:records-consistency`, `check:compare-consistency`,
+`check:team-profiles-consistency`, `check:player-profiles-consistency`,
+`check:sitemap`, `check:feed`, `check:precache`, `check:image-dimensions`,
+`check:theme-color`, `check:reachability`, `check:theme-flash`, `check:html`
+- all clean. Per AGENTS.md's unconditional "any edit to `content/*.md`"
+rule, rebuilt all 700 PDFs with `pnpm build:pdfs`
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell.real`,
+the same workaround Run 265/278 already documented); `check:pdfs`/
+`check:pdf-outline` re-run clean after. One process note worth recording
+for a future run: starting a second `pnpm build` in the foreground while
+`pnpm build:pdfs`'s own `astro preview` server was still running against
+`dist/` in the background corrupted the in-progress PDF run (an HTTP 404
+partway through, on `/teams/croatia`) - `build:pdfs` needs a quiet,
+unshared `dist/` for its whole run, not just at the start of it; re-ran it
+cleanly afterward with no other build in flight.
+
+**Left for a future pass:** the content-verification rotation continues -
+`about-sources.md`, `ballon-dor.md`, `compare-countries.md`,
+`compare-players.md`, `players.md`, `quiz.md`, `records-and-timelines.md`
+and `teams.md` are still at `lastReviewed: 2026-10-09`; `ballon-dor.md`
+remains the next with a comparable volume of standalone,
+externally-checkable claims (per Run 278's own assessment, still
+accurate). PR #56 remains unmerged and is now flagged for a thirteenth run
+running - see this run's own `docs/ROADMAP.md` flag update and push
+notification.
