@@ -15,6 +15,13 @@ describe('buildPrecacheUrls', () => {
     expect(urls).toContain('/football-reference/icons/icon-512.png');
   });
 
+  it('precaches the global search widgets\' team/player index JSON, so searching works offline on the first attempt', () => {
+    const urls = buildPrecacheUrls('/football-reference/');
+
+    expect(urls).toContain('/football-reference/team-index.json');
+    expect(urls).toContain('/football-reference/player-index.json');
+  });
+
   it('also precaches every Croatian nav page, so offline reading works in both languages', () => {
     const urls = buildPrecacheUrls('/football-reference/');
 
@@ -41,6 +48,8 @@ describe('buildPrecacheUrls', () => {
         '/icons/icon-512.png',
         '/icons/icon-maskable-192.png',
         '/icons/icon-maskable-512.png',
+        '/team-index.json',
+        '/player-index.json',
       ].map((path) => `/football-reference${path}`),
     );
 
@@ -58,7 +67,7 @@ describe('buildPrecacheUrls', () => {
 
   it('includes exactly two entries (English + Croatian) per nav link plus the static assets, deduped', () => {
     const urls = buildPrecacheUrls('/football-reference/');
-    expect(urls.length).toBe(NAV_LINKS.length * 2 + 7);
+    expect(urls.length).toBe(NAV_LINKS.length * 2 + 9);
     expect(new Set(urls).size).toBe(urls.length);
   });
 

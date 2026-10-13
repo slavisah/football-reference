@@ -69,7 +69,7 @@
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { diffClaimsAgainstLedger } from './check-superlative-claims.mjs';
+import { diffClaimsAgainstLedger, extractClaimableLines } from './check-superlative-claims.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CONTENT_DIR = path.join(ROOT, 'content');
@@ -79,22 +79,14 @@ const CLAIM_PATTERN =
   /\bsince \d{4}\b|\bsince (?:the|its|his|her|their)(?:\s+[\w']+){1,4}\s+\d{4}\b/i;
 
 /**
- * Pure: every top-level Markdown list item's text in `markdown` that mentions
- * "since <year>" - either directly, or with an intervening possessive/
- * determiner clause ("since the award's creation in 1956", "since the
- * competition's 2019 launch") - in document order. Content pages on this
- * site use only flat, single-line `- ` bullets (no nested lists), so a
- * per-line regex is sufficient - no Markdown parser needed.
+ * Pure: every claimable text unit (bullets and prose paragraphs alike - see
+ * `extractClaimableLines()` in `check-superlative-claims.mjs`) in `markdown`
+ * that mentions "since <year>" - either directly, or with an intervening
+ * possessive/determiner clause ("since the award's creation in 1956", "since
+ * the competition's 2019 launch") - in document order.
  */
 export function extractSinceClaims(markdown) {
-  const claims = [];
-  for (const rawLine of markdown.split('\n')) {
-    const match = /^-\s(.*)$/.exec(rawLine.trim());
-    if (!match) continue;
-    const text = match[1].trim();
-    if (CLAIM_PATTERN.test(text)) claims.push(text);
-  }
-  return claims;
+  return extractClaimableLines(markdown).filter((text) => CLAIM_PATTERN.test(text));
 }
 
 async function main() {

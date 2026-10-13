@@ -3,6 +3,7 @@ import {
   extractYears,
   extractEarlierEditionsCardinal,
   extractNotesPlainText,
+  extractPageBodyText,
   stripMarkdownEmphasis,
   extractNoteCardsWithItems,
   locateClaimPosition,
@@ -66,6 +67,26 @@ describe('extractNotesPlainText', () => {
 
   it('returns an empty string when the page has no note cards', () => {
     expect(extractNotesPlainText('<main><p>Nothing here.</p></main>')).toBe('');
+  });
+});
+
+describe('extractPageBodyText', () => {
+  it('strips every tag to plain text, inserting a space so adjacent elements never run together', () => {
+    const html = '<main><p>Prvi dio.</p><p>Drugi dio.</p></main>';
+    expect(extractPageBodyText(html)).toBe('Prvi dio. Drugi dio.');
+  });
+
+  it('drops script and style blocks entirely', () => {
+    const html = '<style>.a{color:red}</style><p>Visible.</p><script>var x=1;</script>';
+    expect(extractPageBodyText(html)).toBe('Visible.');
+  });
+
+  it('unescapes the same handful of HTML entities extractNoteCardsWithItems() does', () => {
+    expect(extractPageBodyText('<p>Bosnia &amp; Herzegovina</p>')).toBe('Bosnia & Herzegovina');
+  });
+
+  it('collapses internal whitespace left by stripped tags', () => {
+    expect(extractPageBodyText('<p>A</p>\n\n<p>B</p>')).toBe('A B');
   });
 });
 
@@ -218,5 +239,52 @@ describe('diffClaimsPositionally', () => {
     const problems = diffClaimsPositionally(claims, enCards, [], '1996. 2004.', 'content/uefa-euro.md', '/hr/competitions/euro/', 'x.json');
     expect(problems).toHaveLength(1);
     expect(problems[0]).toContain('2030');
+  });
+
+  it('skips a claim entirely when enBodyText is given and the claim is not rendered anywhere on the English page - an internal-only editorial note excluded from a page\'s own noteHeadings allowlist, published in neither language', () => {
+    const claims = ['A second, independent cross-check re-verified every row in 2026.'];
+    const problems = diffClaimsPositionally(
+      claims,
+      enCards,
+      [],
+      'unused notes text',
+      'content/ballon-dor.md',
+      '/hr/competitions/ballon-dor/',
+      'x.json',
+      'This English page never mentions that audit paragraph at all.',
+      'unused Croatian body text',
+    );
+    expect(problems).toEqual([]);
+  });
+
+  it('checks the whole Croatian page (not just note cards) for a claim that is rendered outside any .notes__card, e.g. a page\'s own lead intro paragraph', () => {
+    const claims = ['The FIFA World Cup began in Uruguay in 1930 and was not played in 1942 or 1946.'];
+    const enBodyText = 'The FIFA World Cup began in Uruguay in 1930 and was not played in 1942 or 1946.';
+    const problemsWhenPresent = diffClaimsPositionally(
+      claims,
+      enCards,
+      [],
+      'unused notes text',
+      'content/fifa-world-cup.md',
+      '/hr/competitions/world-cup/',
+      'x.json',
+      enBodyText,
+      'Svjetsko prvenstvo počelo je 1930., nije igrano 1942. i 1946.',
+    );
+    expect(problemsWhenPresent).toEqual([]);
+
+    const problemsWhenMissing = diffClaimsPositionally(
+      claims,
+      enCards,
+      [],
+      'unused notes text',
+      'content/fifa-world-cup.md',
+      '/hr/competitions/world-cup/',
+      'x.json',
+      enBodyText,
+      'Svjetsko prvenstvo počelo je 1930. - no mention of the war years at all',
+    );
+    expect(problemsWhenMissing).toHaveLength(1);
+    expect(problemsWhenMissing[0]).toContain('1942');
   });
 });

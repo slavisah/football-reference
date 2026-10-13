@@ -84,11 +84,26 @@ jobs:
       - name: Page-weight budget check
         run: pnpm check:perf
 
+      - name: Records-page generated-ranking consistency check (vs content/*.md)
+        run: pnpm check:records-consistency
+
+      - name: Team-profile generated-appearance consistency check (vs content/*.md)
+        run: pnpm check:team-profiles-consistency
+
+      - name: Player-profile generated-award consistency check (vs content/*.md)
+        run: pnpm check:player-profiles-consistency
+
+      - name: Compare/compare-players embedded-data consistency check (vs content/*.md)
+        run: pnpm check:compare-consistency
+
       - name: Internal link integrity check
         run: pnpm check:links
 
       - name: Sitemap integrity check
         run: pnpm check:sitemap
+
+      - name: Atom feed integrity check
+        run: pnpm check:feed
 
       - name: JSON-LD structural-validity check
         run: pnpm check:jsonld

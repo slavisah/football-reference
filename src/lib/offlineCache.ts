@@ -3,6 +3,17 @@ import { TRANSLATED_PATHS } from './i18n';
 
 // Static, non-page assets the service worker precaches alongside every nav
 // page. Kept separate from NAV_LINKS since these aren't links a reader clicks.
+//
+// /team-index.json and /player-index.json are here too: Nav.astro's global
+// search widgets fetch them lazily on first focus (not on page load, to
+// avoid an eager request every visitor pays for), which means a reader who
+// opens the precached home page offline and *then* focuses search for the
+// first time would otherwise get the widget's error state instead of
+// results - the generic fetch handler below only caches a same-origin GET
+// after it has succeeded once online, so "never fetched while online" was a
+// real gap in offline reading, not just a slow first search. Both files are
+// a few KB (see dist/team-index.json, dist/player-index.json), cheap to
+// precache alongside the icons above.
 const STATIC_ASSETS = [
   '/manifest.webmanifest',
   '/hr/manifest.webmanifest',
@@ -11,6 +22,8 @@ const STATIC_ASSETS = [
   '/icons/icon-512.png',
   '/icons/icon-maskable-192.png',
   '/icons/icon-maskable-512.png',
+  '/team-index.json',
+  '/player-index.json',
 ];
 
 /**

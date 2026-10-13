@@ -1212,6 +1212,21 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Youngest-ever scorer fact (2026-10-10, intensive run): added "Memorable
+  moments" bullet naming Lamine Yamal as the youngest-ever scorer in EURO
+  history (16 years, 362 days; Spain vs. France, 2024 semi-final, 9 July
+  2024), breaking Johan Vonlanthen's Euro 2004 record (18 years, 141 days;
+  Switzerland vs. France). Verified via two WebSearch passes against AP
+  (via ABC News/Naharnet), 90min, The Analyst, bluewin.ch, and UEFA.com's
+  own history page, which independently names the same four record-holders
+  in the same order (Yamal, Vonlanthen, Rooney, Renato Sanches). No
+  discrepancy found on either age figure across any source, including
+  UEFA's own:
+  - https://www.uefa.com/uefaeuro/history/news/028e-1b131a1d2848-526b6661948b-1000--euro-s-youngest-scorers-lamine-yamal-vonlanthen-rooney-renat/
+  - https://abcnews.go.com/Sports/wireStory/spains-lamine-yamal-youngest-player-score-mens-european-111788404
+  - https://theanalyst.com/2024/06/youngest-goalscorers-european-championship/
+  - https://www.90min.com/lamine-yamal-becomes-youngest-scorer-in-european-championship-history
+  - https://www.bluewin.ch/en/sport/football/yamal-16-becomes-the-youngest-goalscorer-in-european-championship-history-with-a-dream-goal-li.2277592
 
 ## UEFA Nations League
 
@@ -1476,6 +1491,30 @@ Primary sources should be preferred.
   - https://rfef.es/en/noticias/match-report-spain-crowned-champions-in-a-memorable-final-decided-by-penalties-0-0-and-4-5
   - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
   - https://muenchen.t-online.de/region/muenchen/id_101224878/muenchen-dfb-team-bestreitet-nations-league-spiel-in-der-allianz-arena.html
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Final attendance, third re-investigation (added 2026-10-08, two-hundred-
+  and-fifty-first intensive run): re-attempted 2021/2023/2025 once more,
+  this time turning up a genuinely new source family the two prior attempts
+  hadn't surfaced - the German Football Association's own match database
+  (`datencenter.dfb.de`), independent of Wikipedia/UEFA/RFEF. It only covers
+  the 2025 final (Germany hosted that edition), but what it reports there is
+  informative: 75,000, marked "sold out" - a real number from a federation's
+  own data center, not a mirror of Wikipedia's 65,852. That's the opposite of
+  corroboration though: the two figures disagree by roughly 9,000, too wide a
+  gap to be the usual rounding/reporting variance between two sources
+  describing the same count (compare the already-documented 2023 conflict,
+  41,110 vs. 41,500, under 400 apart). Added as a precise, sourced "why this
+  one's still excluded" note in `content/uefa-nations-league.md` rather than
+  leaving 2025 looking like a plain unsourced gap the way 2021 still is.
+  2021 remains a single-source case (only Wikipedia's 31,511, still no
+  independent second domain found); datencenter.dfb.de has no entry for
+  that edition (Italy hosted, not Germany) or for 2019/2023. No change to
+  2023's already-documented conflict. All three stay out of the page:
+  - https://datencenter.dfb.de/datencenter/uefa-nations-league-endrunde/2024-2025/Finale/portugal-spanien-2391418
+  - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
+  - https://en.wikipedia.org/wiki/2021_UEFA_Nations_League_final
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
@@ -2493,6 +2532,81 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/2021_Copa_Am%C3%A9rica_final
   - https://news.cgtn.com/news/2021-07-10/Maracana-Stadium-opens-to-10-of-fans-for-Copa-America-final-11MGbAUmCn6/index.html
   - https://www.outlookindia.com/website/story/sports-news-copa-america-final-rio-de-janeiro-officials-open-10-maracana-stadium-for-argentina-brazil-title-clash/387697
+- Best Player/Golden Glove/Fair Play Award external-source audit (2026-10-13,
+  intensive run): the first check of these three award lists' winner names
+  against sources outside this site's own internal consistency checks (see
+  the superlative-claims-ledger entries referenced from `docs/PROJECT_STATUS.md`).
+  Covers all 16 Best Player winners (1987-2024), all 6 Golden Glove winners
+  (2011-2024), and all 6 Fair Play Award winners (2011-2024):
+  - https://en.wikipedia.org/wiki/Copa_Am%C3%A9rica_awards
+  - https://www.topendsports.com/events/soccer/copa-america/best-player.htm
+  - https://copaamerica.com/en/news/all-conmebol-copa-america-editions-champions-host-nations-best-players
+  - https://copaamerica.com/news/mejor-jugador-goleador-mejor-arquero-los-destacados-de-la-conmebol-copa-america-2021/?lang=en
+    (2021 Best Player: CONMEBOL's own post-tournament recap names Messi
+    alone, the source preferred over pre-final wire coverage that had
+    floated Messi and Neymar as joint honorees)
+  - https://www.foxsports.com/articles/soccer/messi-and-neymar-picked-as-best-players-at-copa-america
+    (2021 Best Player: the pre-final joint-naming report, superseded by
+    CONMEBOL's own later recap above)
+  - https://www.sportskeeda.com/football/list-of-copa-america-golden-glove-winners
+  - https://mundoalbiceleste.com/2024/07/15/emiliano-martinez-wins-2024-copa-america-golden-glove
+  - https://www.mlssoccer.com/news/chiles-alexis-vargas-bravo-snare-official-copa-america-awards
+  - https://www.cooperativa.cl/noticias/site/artic/20160626/pags-amp/20160626233329.html
+    (2016 Fair Play: the ambiguous recap, resolved by the SoccerWire source
+    below)
+  - https://www.soccerwire.com/news/copa-america-centenario-awards-best-xi-announced/
+    (2016 Fair Play: independently confirms Argentina as sole winner)
+  - https://en.wikipedia.org/wiki/Colombia_at_the_Copa_Am%C3%A9rica
+    (2024 Fair Play: Colombia)
+- Golden Boot winners external-source audit (2026-10-13, intensive run): the
+  next check in the same rotation, covering the larger 48-entry Golden Boot
+  winners list (1916-2024) - found and corrected two errors (1920, 1927; see
+  `content/copa-america.md`'s own "Important editorial warning" section and
+  `docs/PROJECT_STATUS.md`'s matching entry), confirmed every other entry:
+  - https://en.wikipedia.org/wiki/1920_South_American_Championship
+    (1920: joint Pérez/Romano, 3 goals each - the correction)
+  - https://rsssf.org/tables/20sa-scor.html
+    (1920: RSSSF's detailed goal-scorer table agrees with Wikipedia)
+  - https://rsssf.org/tables/20sa.html
+    (1920: RSSSF's own tournament-summary page is the outlier this page had
+    previously followed - "4 goals", contradicted by RSSSF's own
+    goal-scorer table above)
+  - https://en.wikipedia.org/wiki/%C3%81ngel_Romano
+  - https://en.wikipedia.org/wiki/1927_South_American_Championship
+    (1927: five-way tie at 3 goals each - the correction)
+  - https://rsssf.org/tables/27sa-scor.html
+    (1927: RSSSF's detailed goal-scorer table agrees with Wikipedia)
+  - https://rsssf.org/tables/27sa.html
+    (1927: again the outlier tournament-summary page this site had
+    previously followed - "Figueroa, 4 goals")
+  - https://en.wikipedia.org/wiki/Segundo_Luna
+  - https://en.wikipedia.org/wiki/Alfredo_Carricaberry
+  - https://rsssf.org/tables/57sa.html ; https://rsssf.org/tables/63sa.html ;
+    https://rsssf.org/tables/67sa.html
+    (1957/1963/1967: confirmed matching the page, no change)
+  - https://rsssf.org/tables/59-2sa-scor.html ;
+    https://en.wikipedia.org/wiki/1959_South_American_Championship_(Ecuador)
+    (1959 Ecuador: Sanfilippo 6 goals - confirms the page's existing figure
+    over RSSSF's own lower-detail results page, which gives 5)
+  - https://rsssf.org/tables/83sa-scor.html ;
+    https://en.wikipedia.org/wiki/1983_Copa_Am%C3%A9rica
+    (1983: confirms the page's existing three-name entry; RSSSF's
+    tournament-summary page lists a fourth name, Malásquez, at 3 goals, but
+    its own detailed goal-scorer table and Wikipedia both place him at 2)
+  - https://rsssf.org/tables/93sa-scor.html ; https://rsssf.org/tables/95sa-scor.html ;
+    https://rsssf.org/tables/97sa-scor.html
+    (1993/1995/1997: confirmed matching the page, no change)
+  - https://rsssf.org/tables/99sa-scor.html ;
+    https://en.wikipedia.org/wiki/1999_Copa_Am%C3%A9rica
+    (1999: confirmed matching the page, no change)
+  - https://en.wikipedia.org/wiki/2004_Copa_Am%C3%A9rica ;
+    https://rsssf.org/tables/2007sa-scor.html
+    (2004/2007: confirmed matching the page, no change)
+  - https://simple.wikipedia.com/wiki/Copa_Am%C3%A9rica_Centenario
+    (2016: confirmed matching the page, no change)
+  - Note: the egress-blocked-domains caveat every prior audit in this file
+    has noted applies here too; verification relied entirely on WebSearch's
+    synthesized summaries of RSSSF/Wikipedia rather than direct page loads.
 
 ## Ballon d'Or
 
@@ -2862,6 +2976,37 @@ Primary sources should be preferred.
   - https://www.givemesport.com/88101605-who-is-the-oldest-ever-ballon-dor-winner/
   - https://www.oldest.org/sports/youngest-ballon-dor-winner/
   - https://www.oldest.org/sports/oldest-ballon-dor-winners/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Golden Boot youngest/oldest-ever winners (added 2026-10-06,
+  two-hundred-and-fortieth intensive run): three new bullets in
+  `content/golden-boot.md`'s "World Cup memorable moments"/"EURO memorable
+  moments" sections - the Golden Boot half of the "Youngest winner ranking"
+  idea `docs/ROADMAP.md`'s "Ideas not yet scoped" section had so far only
+  built for Ballon d'Or (two-hundred-and-thirteenth run). Verified each via
+  two independent WebSearch passes: Flórián Albert (Hungary) is the World
+  Cup Golden Boot's youngest-ever winner, one of 1962's six joint winners
+  at 20 years, 8 months, ahead of Thomas Müller's second-youngest 20 years,
+  10 months in 2010; Davor Šuker (Croatia) is its oldest-ever winner at 30
+  years, 196 days when he won outright in 1998; Cristiano Ronaldo
+  (Portugal) is the EURO Golden Boot's oldest-ever winner at 36 when he won
+  the 2020 edition (played in 2021), breaking a record that had stood for
+  37 years - consistent with Michel Platini's 1984 win (already on this
+  page's table) as the prior record-holder. A fourth fact, the EURO
+  Golden Boot's youngest-ever winner, was deliberately **not** added:
+  two separate WebSearch passes returned only vague, mutually inconsistent
+  synthesized answers (one naming Tomas Brolin/Milan Baroš at "age 22" with
+  no clear single record-holder, given EURO's many joint-winner editions)
+  that never converged on one sourced figure the way every other fact in
+  this entry did. **No discrepancies found (for the three facts actually
+  added):**
+  - https://sportsdigest.in/youngest-golden-boot-award-winners/195571/
+  - https://worldsoccertalk.com/world-cup/list-of-world-cup-golden-boot-winners-every-top-scorer-from-1930-to-present/
+  - https://www.si.com/soccer/2018/07/15/world-cup-golden-boot-award-winners-top-scorer-history
+  - https://briefly.co.za/sports/104632-ronaldo-shatters-37-year-record-after-winning-golden-boot-euro-2020-championship/
+  - https://yen.com.gh/sports/190306-ronaldo-shatters-37-year-record-after-winning-golden-boot-euro-2020-championship/
+  - https://onmanorama.com/sports/football/2021/07/12/european-championships-golden-boot-winners-list-ronaldo.html
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.

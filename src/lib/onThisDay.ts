@@ -1,5 +1,6 @@
 import type { Edition } from './types';
 import type { Locale } from './i18n';
+import { isMissingCell } from './compare';
 
 // "On this day in football history": reduces editions that have a "Final
 // date" (tournaments) or "Ceremony date" (individual awards, e.g. Ballon
@@ -56,6 +57,11 @@ function cellValue(edition: Edition, matcher: RegExp): string | undefined {
   return cell?.value.trim() || undefined;
 }
 
+/** Treats the site-wide "no data" placeholder ("—") as absent, not a literal team name. */
+function definiteCell(value: string | undefined): string | undefined {
+  return isMissingCell(value) ? undefined : value;
+}
+
 /**
  * Builds "on this day" entries from editions with a "Final date" (or, for an
  * individual award with no match, "Ceremony date") column. Editions without
@@ -78,7 +84,7 @@ export function buildOnThisDayEntries(editions: Edition[], competition: string):
       month: parsed.month,
       day: parsed.day,
       champion: edition.winner,
-      runnerUp: cellValue(edition, /runner-up|finalist/i),
+      runnerUp: definiteCell(cellValue(edition, /runner-up|finalist/i)),
       final: cellValue(edition, /^final$/i),
       isAward: Boolean(ceremonyDateRaw),
     });

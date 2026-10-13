@@ -204,6 +204,7 @@ const notes: NoteSection[] = [
       'Španjolska je 2012. postala prva reprezentacija koja je obranila naslov EURA.',
       'Odgođeni EURO 2020. odigran je 2021. u više zemalja.',
       'Španjolska je 2024. osvojila rekordni četvrti naslov.',
+      'Lamine Yamal postao je 2024. najmlađi strijelac u povijesti Europskog prvenstva - u polufinalu protiv Francuske zabio je u dobi od 16 godina i 362 dana, oborivši rekord Johana Vonlanthena koji je od EURA 2004. iznosio 18 godina i 141 dan.',
     ],
   },
 ];
@@ -302,15 +303,17 @@ const headerLabels: Record<string, string> = {
       ofLabel="od"
     />
 
-    <HostMap
-      points={hostMap}
-      id="euro-host-map"
-      heading="Gdje je Europsko prvenstvo igralo domaćinu"
-      description="Približan položaj svakog domaćina na jednostavnoj mreži zemljopisne dužine i širine, grupiran po regijama u popisu ispod - ne tvrdimo točne granice, samo otprilike gdje se u svijetu igralo pojedino izdanje. Veće točke znače da je zemlja bila domaćin više puta."
-      unit={['put', 'puta']}
-      hostingYearsLabel="Godine domaćinstva: "
-      regionLabels={hostRegionLabels}
-    />
+    {hostMap && hostMap.length > 0 && (
+      <HostMap
+        points={hostMap}
+        id="euro-host-map"
+        heading="Gdje je Europsko prvenstvo igralo domaćinu"
+        description="Približan položaj svakog domaćina na jednostavnoj mreži zemljopisne dužine i širine, grupiran po regijama u popisu ispod - ne tvrdimo točne granice, samo otprilike gdje se u svijetu igralo pojedino izdanje. Veće točke znače da je zemlja bila domaćin više puta."
+        unit={['put', 'puta']}
+        hostingYearsLabel="Godine domaćinstva: "
+        regionLabels={hostRegionLabels}
+      />
+    )}
 
     <EditorialNotes sections={notes} jumpNavLabel="Skoči na odjeljak" />
 

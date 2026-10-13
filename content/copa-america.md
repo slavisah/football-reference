@@ -5,7 +5,7 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-10-01
+lastReviewed: 2026-10-13
 status: verified
 ---
 
@@ -160,6 +160,17 @@ The **Final date** column (added 2026-08-03, intensive run) records the calendar
 
 A **second, independent cross-check** of the Final date column (2026-08-12, intensive run) re-verified all 19 dated editions in four era-based WebSearch passes (the five pre-1960 Final playoff deciders; the 1987-1999 knockout-final era; 2001-2011; 2015-2024), deliberately drawing on a source mix distinct from the 2026-08-08 first pass - worldfootball.net, footballdatabase.eu, besoccer.com, soccer365.net, athlet.org, topendsports.com, 11v11.com, Transfermarkt, resultados-futbol.com, official federation/CONMEBOL histories, and contemporary press/wire coverage (UPI, Washington Post, AP via spokesman.com, CNN) rather than Wikipedia/RSSSF/ESPN alone. **No discrepancies found** across any of the 19 dates, including the two cases the first pass flagged for extra scrutiny: 1999's final (footballdatabase.eu's lone 17 July claim was reconfirmed as an outlier against Transfermarkt and 11v11's independently agreeing 18 July) and 2021's final (US-dated wire and official sources again confirmed 10 July over the 11 July shown on some regional ESPN pages). One additional soft note: 11v11.com's own listing for the 1922 play-off carries a mislabeled 22 October date inconsistent with every other source for that match, including 11v11's own site elsewhere - a source-reliability flag, not a contradiction of the page's 6 November 1922 date, which every other source (including worldfootball.net, checked specifically for this pass) confirms. See `docs/SOURCES.md` for the full per-era citation list.
 
+The **Best Player**, **Golden Glove**, and **Fair Play Award** sections below (28 entries combined) - audited 2026-10-13 (intensive run) via fresh `WebSearch` passes against CONMEBOL's own recap articles, Wikipedia's "Copa América awards" summary, and independent press coverage - now have the same external-source check the Champion/Runner-up, Format, Third/Fourth, and Final date columns above already had; only this page's own internal consistency checks (see `docs/PROJECT_STATUS.md`'s one-hundred-and-seventy-first/-second-run entries) had looked at these three award lists' winner *names* before this run. **No discrepancies found** against the names and years already on the page, with two genuine ambiguities investigated and resolved rather than left unchecked: 2021 Best Player (some contemporary wire coverage, via Fox Sports/Daily Sabah, reported CONMEBOL naming Messi and Neymar jointly as "players of the tournament" ahead of the final, quoting CONMEBOL as saying "it is not possible to choose only one"; CONMEBOL's own post-tournament recap article, published after the final, names only Messi - the same official-recap-over-wire-coverage preference this page's Champion/Runner-up audit already established, and the source the page's existing sole-Messi entry matches) and 2016 Fair Play (one Spanish-language recap, Cooperativa.cl, reads ambiguously, naming Argentina as the winner in one sentence and describing Chile's own card tally in the next; a second source, SoccerWire's Centenario awards recap, independently confirms Argentina as the sole winner, matching the page's existing entry). Every other entry (1987-2024 Best Player; 2011-2024 Golden Glove; 2011-2024 Fair Play, excluding the two cases above which needed a second query) matched at least one external source with no conflict found. See `docs/SOURCES.md` for the full citation list.
+
+The **Golden Boot winners** section below (48 entries, 1916-2024) was next in the same rotation - a larger, not-yet-externally-audited sibling of the three award lists above, flagged as the natural next target by the prior run's own notes. Audited 2026-10-13 (intensive run) via fresh `WebSearch` passes against RSSSF's per-edition goal-scorer tables, Wikipedia's per-edition articles, and CONMEBOL's own top-scorer retrospectives (see `docs/SOURCES.md`). **Two discrepancies found and corrected**, both pre-1930 editions where this page had previously carried only a single tournament-summary source's figure rather than the more detailed per-edition goal-scorer breakdown:
+
+- **1920:** the page previously credited Ángel Romano alone with 4 goals. RSSSF's detailed goal-scorer table, that edition's Wikipedia article, and a Spanish-language historical recap all independently agree the actual joint top scorers were José Pérez and Ángel Romano, 3 goals each - a single RSSSF tournament-summary line (contradicted by RSSSF's own more detailed scorer table) was the only source for the old "Romano alone, 4 goals" figure. Corrected to the joint, 3-goal result; Romano's "second win" note now reads "shared this time" since it no longer stands alone.
+- **1927:** the page previously credited Roberto Figueroa alone with 4 goals. Both that edition's Wikipedia article and RSSSF's own detailed goal-scorer table independently agree on a five-way tie at 3 goals each: Alfredo Carricaberry and Segundo Luna (Argentina), and Pedro Petrone, Héctor Scarone, and Figueroa (Uruguay) - again, only RSSSF's own tournament-summary line (contradicted by its own detailed table) supported the old single-winner, 4-goal figure. Corrected to the five-way tie.
+
+The 1927 correction has a knock-on effect worth calling out explicitly rather than leaving implicit: it gives Pedro Petrone a third Golden Boot (1923, 1924, and now 1927), tying Paolo Guerrero's previously-uniquely-highest three wins (2011, 2015, 2019). The page's own "most by any player" and "Guerrero's third win, the most of any player" bullets have been reworded to describe a tie rather than a sole record-holder - Petrone's 1923/1924 pair remains the only part of his record that is *consecutive* (1927 is not adjacent to 1924), so the separate "only players to win in consecutive editions" claim (Vargas 2015/2016, Petrone 1923/1924) is unaffected and still correct.
+
+Every other entry in the 48-entry list (1916-1919, 1921-1926, 1929-2024) was independently checked against the same source mix and matched with no conflict, including the genuinely ambiguous-looking 1959 Ecuador edition (RSSSF's own results-summary page gives José Sanfilippo 5 goals, but RSSSF's more detailed goal-scorer table and Wikipedia's tournament article both agree on 6 - the same "detailed table over tournament summary" preference established by the two corrections above, and the figure the page already carried) and 1983 (RSSSF's tournament-summary line lists a fourth co-scorer, Eduardo Malásquez, at 3 goals, but RSSSF's own detailed goal-scorer table and Wikipedia both place him at 2 - the page's existing three-name entry, without Malásquez, is correct). See `docs/SOURCES.md` for the full citation list.
+
 ## Best Player winners
 
 - CONMEBOL has named a best-player award at every Copa América since 1987; no equivalent award existed at the 32 earlier editions.
@@ -196,14 +207,14 @@ A **second, independent cross-check** of the Final date column (2026-08-12, inte
 - **1916:** Isabelino Gradín (Uruguay) - 3 goals - the tournament's first Golden Boot.
 - **1917:** Ángel Romano (Uruguay) - 4 goals - the first of his two wins.
 - **1919:** Arthur Friedenreich; Neco (both Brazil) - 4 goals each.
-- **1920:** Ángel Romano (Uruguay) - 4 goals - his second win.
+- **1920:** José Pérez; Ángel Romano (both Uruguay) - 3 goals each - Romano's second win, shared this time.
 - **1921:** Julio Libonatti (Argentina) - 3 goals.
 - **1922:** Juan Francia (Argentina) - 4 goals.
 - **1923:** Vicente Aguirre (Argentina); Pedro Petrone (Uruguay) - 3 goals each.
 - **1924:** Pedro Petrone (Uruguay) - 4 goals.
 - **1925:** Manuel Seoane (Argentina) - 6 goals.
 - **1926:** David Arellano (Chile) - 7 goals.
-- **1927:** Roberto Figueroa (Uruguay) - 4 goals.
+- **1927:** Alfredo Carricaberry; Segundo Luna (both Argentina); Pedro Petrone; Héctor Scarone; Roberto Figueroa (all Uruguay) - 3 goals each - Petrone's third win.
 - **1929:** Aurelio González (Paraguay) - 5 goals.
 - **1935:** Herminio Masantonio (Argentina) - 4 goals - the first of his two wins.
 - **1937:** Raúl Toro (Chile) - 7 goals.
@@ -238,10 +249,10 @@ A **second, independent cross-check** of the Final date column (2026-08-12, inte
 - **2011:** Paolo Guerrero (Peru) - 5 goals - the first of his three wins.
 - **2015:** Eduardo Vargas (Chile); Paolo Guerrero (Peru) - 4 goals each - Guerrero's second win, the first of Vargas's two.
 - **2016:** Eduardo Vargas (Chile) - 6 goals - Copa América Centenario, his second consecutive win.
-- **2019:** Everton (Brazil); Paolo Guerrero (Peru) - 3 goals each - Guerrero's third win, the most of any player.
+- **2019:** Everton (Brazil); Paolo Guerrero (Peru) - 3 goals each - Guerrero's third win, tied for the most of any player.
 - **2021:** Lionel Messi (Argentina); Luis Díaz (Colombia) - 4 goals each.
 - **2024:** Lautaro Martínez (Argentina) - 5 goals.
-- Paolo Guerrero's three wins (2011, 2015, 2019) are the most by any player; Eduardo Vargas (2015 and 2016) and Pedro Petrone (1923 and 1924) are the only players to win in consecutive editions.
+- Paolo Guerrero's three wins (2011, 2015, 2019) are tied for the most by any player with Pedro Petrone's three (1923, 1924 and 1927); Eduardo Vargas (2015 and 2016) and Petrone (1923 and 1924) are the only players to win in consecutive editions.
 
 ## Fair Play Award winners
 

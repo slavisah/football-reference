@@ -1,7 +1,7 @@
 ---
 title: Compare National Teams
 slug: compare-countries
-lastReviewed: 2026-07-29
+lastReviewed: 2026-10-09
 status: verified
 ---
 

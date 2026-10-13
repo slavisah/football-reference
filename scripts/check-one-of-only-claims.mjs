@@ -35,6 +35,7 @@
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { extractClaimableLines } from './check-superlative-claims.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CONTENT_DIR = path.join(ROOT, 'content');
@@ -43,20 +44,13 @@ const LEDGER_PATH = path.join(ROOT, 'scripts', 'one-of-only-claims-ledger.json')
 const CLAIM_PATTERN = /\bone of only (\d+|one|two|three|four|five|six|seven|eight|nine|ten)\b/i;
 
 /**
- * Pure: every top-level Markdown list item's text in `markdown` that matches
- * the "one of only N" bounded-set-claim pattern, in document order. Content
- * pages on this site use only flat, single-line `- ` bullets (no nested
- * lists), so a per-line regex is sufficient - no Markdown parser needed.
+ * Pure: every claimable text unit (bullets and prose paragraphs alike - see
+ * `extractClaimableLines()` in `check-superlative-claims.mjs`) in `markdown`
+ * that matches the "one of only N" bounded-set-claim pattern, in document
+ * order.
  */
 export function extractOneOfOnlyClaims(markdown) {
-  const claims = [];
-  for (const rawLine of markdown.split('\n')) {
-    const match = /^-\s(.*)$/.exec(rawLine.trim());
-    if (!match) continue;
-    const text = match[1].trim();
-    if (CLAIM_PATTERN.test(text)) claims.push(text);
-  }
-  return claims;
+  return extractClaimableLines(markdown).filter((text) => CLAIM_PATTERN.test(text));
 }
 
 /**

@@ -11,13 +11,14 @@
 // authored rather than translated per-locale.
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { loadPageMeta } from '../../../lib/competition';
-import { extractSourceSections } from '../../../lib/sources';
+import { extractSourceSections, validateSourceSections } from '../../../lib/sources';
 import { withBase } from '../../../lib/url';
 import sourcesRaw from '../../../../docs/SOURCES.md?raw';
 
 const meta = await loadPageMeta('about-sources');
 
 const sections = extractSourceSections(sourcesRaw);
+validateSourceSections(sections);
 
 // Every competition page now has a Croatian version (see docs/ROADMAP.md's
 // "original backlog complete" note), so these link to the Croatian route for

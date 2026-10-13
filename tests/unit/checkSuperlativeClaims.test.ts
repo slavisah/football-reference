@@ -1,5 +1,39 @@
 import { describe, expect, it } from 'vitest';
-import { extractSuperlativeClaims, diffClaimsAgainstLedger } from '../../scripts/check-superlative-claims.mjs';
+import {
+  extractSuperlativeClaims,
+  diffClaimsAgainstLedger,
+  extractClaimableLines,
+} from '../../scripts/check-superlative-claims.mjs';
+
+describe('extractClaimableLines', () => {
+  it('extracts a prose paragraph as one unit, joining its wrapped lines with a space', () => {
+    const md = '## Term\n\nFirst line of the\nparagraph, continued\nacross three lines.\n';
+    expect(extractClaimableLines(md)).toEqual(['First line of the paragraph, continued across three lines.']);
+  });
+
+  it('extracts each bullet as its own unit even with no blank line between bullets', () => {
+    const md = '- First bullet.\n- Second bullet.\n';
+    expect(extractClaimableLines(md)).toEqual(['First bullet.', 'Second bullet.']);
+  });
+
+  it("joins a bullet's own wrapped continuation lines into one unit", () => {
+    const md = '- First line of a bullet\n  that wraps onto a second line.\n- Next bullet.\n';
+    expect(extractClaimableLines(md)).toEqual([
+      'First line of a bullet that wraps onto a second line.',
+      'Next bullet.',
+    ]);
+  });
+
+  it('skips frontmatter, headings and table rows', () => {
+    const md = '---\ntitle: X\n---\n\n# Heading\n\n| A | B |\n|---|---|\n\nProse paragraph.\n';
+    expect(extractClaimableLines(md)).toEqual(['Prose paragraph.']);
+  });
+
+  it('keeps document order across a mix of prose and bullets', () => {
+    const md = 'Intro paragraph.\n\n- Bullet one.\n- Bullet two.\n\nClosing paragraph.\n';
+    expect(extractClaimableLines(md)).toEqual(['Intro paragraph.', 'Bullet one.', 'Bullet two.', 'Closing paragraph.']);
+  });
+});
 
 describe('extractSuperlativeClaims', () => {
   it('extracts a bullet matching "the only"', () => {
@@ -34,9 +68,9 @@ describe('extractSuperlativeClaims', () => {
     ]);
   });
 
-  it('ignores non-bullet lines even when they contain "the only"', () => {
+  it('also catches a prose paragraph (not just a bullet) matching "the only"', () => {
     const md = `This paragraph mentions the only exception in passing.\n`;
-    expect(extractSuperlativeClaims(md)).toEqual([]);
+    expect(extractSuperlativeClaims(md)).toEqual(['This paragraph mentions the only exception in passing.']);
   });
 
   it('extracts multiple matching bullets in document order', () => {

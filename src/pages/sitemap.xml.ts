@@ -9,30 +9,9 @@ import { teamProfileSlug } from '../lib/teamProfile';
 import { loadCompetition } from '../lib/competition';
 import { buildAllPlayerProfiles, playerProfileSlug, type PlayerAwardSource } from '../lib/playerProfile';
 import { buildEditionProfiles } from '../lib/editionProfile';
+import { CONTENT_ID_BY_PATH, derivedPageLastReviewed, maxLastReviewed } from '../lib/contentPages';
 
 export const prerender = true;
-
-// path -> content collection id, purely to read `lastReviewed` for <lastmod>.
-// Every entry mirrors the loadCompetition/loadPageMeta id each page already
-// calls (see docs/ADDING_CONTENT.md section 7), so this can't drift from what
-// a page actually shows without also breaking that page's own build.
-const CONTENT_ID_BY_PATH: Record<string, string> = {
-  '/': 'index',
-  '/competitions/world-cup': 'fifa-world-cup',
-  '/competitions/euro': 'uefa-euro',
-  '/competitions/nations-league': 'uefa-nations-league',
-  '/competitions/copa-america': 'copa-america',
-  '/competitions/ballon-dor': 'ballon-dor',
-  '/competitions/golden-boot': 'golden-boot',
-  '/records': 'records-and-timelines',
-  '/compare': 'compare-countries',
-  '/teams': 'teams',
-  '/players': 'players',
-  '/compare-players': 'compare-players',
-  '/quiz': 'quiz',
-  '/glossary': 'glossary',
-  '/about/sources': 'about-sources',
-};
 
 function xmlEscape(value: string): string {
   return value
@@ -77,13 +56,34 @@ export const GET: APIRoute = async ({ site, url }) => {
     return new URL(withBase(withSlash), origin).toString();
   };
 
+  // Loaded up front (rather than where each loop that primarily needs them
+  // for other reasons first appears, as before) because the main NAV_LINKS
+  // loop below now also needs these same competitions' dates - see
+  // derivedPageLastReviewed()'s own doc comment in contentPages.ts for why
+  // five of the pages that loop covers can't just read their own content
+  // entry's `lastReviewed` the way every other page there does.
+  const { worldCup, euro, copaAmerica, nationsLeague, competitions } = await loadTeamCompetitions();
+  const [ballonDor, worldCupGoldenBoot, euroGoldenBoot] = await Promise.all([
+    loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'FIFA World Cup top scorers',
+      sourcesHeading: 'FIFA World Cup',
+    }),
+    loadCompetition('golden-boot', {
+      editionsHeading: 'UEFA EURO top scorers',
+      sourcesHeading: 'UEFA EURO',
+    }),
+  ]);
+  const teamCompetitionDates = [worldCup, euro, copaAmerica, nationsLeague].map((c) => c.lastReviewed);
+  const awardDates = [ballonDor, worldCupGoldenBoot, euroGoldenBoot].map((c) => c.lastReviewed);
+
   const urlEntries: string[] = [];
 
   for (const { path: enPath } of NAV_LINKS) {
     const hrPath = TRANSLATED_PATHS[enPath];
     const contentId = CONTENT_ID_BY_PATH[enPath];
     const entry = contentId ? await getEntry('pages', contentId) : undefined;
-    const lastmod = entry?.data.lastReviewed;
+    const lastmod = derivedPageLastReviewed(enPath, teamCompetitionDates, awardDates, entry?.data.lastReviewed);
 
     const locales: { path: string; lang: 'en' | 'hr' }[] = hrPath
       ? [
@@ -102,18 +102,26 @@ export const GET: APIRoute = async ({ site, url }) => {
 
   // The /teams directory's index page (src/pages/teams/index.astro and its
   // Croatian sibling) is now a normal NAV_LINKS/TRANSLATED_PATHS entry and
-  // is covered by the loop above. Its 40 per-team profile pages
-  // (src/pages/teams/[slug].astro) aren't page-content-collection entries
-  // with a single id the CONTENT_ID_BY_PATH map could name, so they still
-  // need their own loop here - now emitting both languages per team with
-  // reciprocal hreflang alternates, the same shape the main loop already
-  // gives every other bilingual page.
-  const { worldCup, euro, copaAmerica, nationsLeague, competitions } = await loadTeamCompetitions();
-  const teamsLastmod = [worldCup, euro, copaAmerica, nationsLeague]
-    .map((c) => c.lastReviewed)
-    .sort()
-    .at(-1);
-  const lastmodTag = teamsLastmod ? `<lastmod>${teamsLastmod}</lastmod>` : '';
+  // is covered by the loop above (via derivedPageLastReviewed('/teams', ...),
+  // which folds in the 'teams' content entry's own date - that's the
+  // directory index's own freshness, not any one team's). Its 40 per-team
+  // profile pages (src/pages/teams/[slug].astro) aren't page-content-
+  // collection entries with a single id the CONTENT_ID_BY_PATH map could
+  // name, so they still need their own loop here - now emitting both
+  // languages per team with reciprocal hreflang alternates, the same shape
+  // the main loop already gives every other bilingual page. Each profile
+  // page's own og:updated_time (computed in teams/[slug].astro) is the max
+  // of just the four team-competition dates - it never reads the 'teams'
+  // content entry's date, since that entry is only the directory index's
+  // one-paragraph blurb, not any individual team's data. This loop matches
+  // that formula exactly (maxLastReviewed(teamCompetitionDates), no ownDate)
+  // rather than reusing the directory index's own derivedPageLastReviewed('/teams', ...)
+  // value, which used to get applied to every team profile page too - wrong
+  // whenever 'teams' content entry's own date moved past every team
+  // competition's, the same class of bug check:sitemap/check:feed's
+  // cross-check exists to catch (two-hundred-and-fifty-first intensive run).
+  const teamProfileLastmod = maxLastReviewed(teamCompetitionDates);
+  const lastmodTag = teamProfileLastmod ? `<lastmod>${teamProfileLastmod}</lastmod>` : '';
   for (const record of buildAllCountryRecords(competitions)) {
     const slug = teamProfileSlug(record.id);
     const enPath = `/teams/${slug}`;
@@ -125,40 +133,32 @@ export const GET: APIRoute = async ({ site, url }) => {
 
   // The /players directory index page (src/pages/players/index.astro and its
   // Croatian sibling) is now a normal NAV_LINKS/TRANSLATED_PATHS entry and is
-  // covered by the main loop above. Its per-player profile pages
-  // (src/pages/players/[slug].astro and /hr/players/[slug].astro) aren't
-  // page-content-collection entries with a single id CONTENT_ID_BY_PATH could
-  // name, so they still need their own loop here - now emitting both languages
-  // per player with reciprocal hreflang alternates, the same shape the /teams
-  // per-team loop below already uses.
-  const [ballonDor, worldCupGoldenBoot, euroGoldenBoot] = await Promise.all([
-    loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),
-    loadCompetition('golden-boot', {
-      editionsHeading: 'FIFA World Cup top scorers',
-      sourcesHeading: 'FIFA World Cup',
-    }),
-    loadCompetition('golden-boot', {
-      editionsHeading: 'UEFA EURO top scorers',
-      sourcesHeading: 'UEFA EURO',
-    }),
-  ]);
+  // covered by the main loop above (via derivedPageLastReviewed('/players', ...),
+  // which folds in the 'players' content entry's own date - that's the
+  // directory index's own freshness, not any one player's). Its per-player
+  // profile pages (src/pages/players/[slug].astro and /hr/players/[slug].astro)
+  // aren't page-content-collection entries with a single id CONTENT_ID_BY_PATH
+  // could name, so they still need their own loop here - now emitting both
+  // languages per player with reciprocal hreflang alternates, the same shape
+  // the /teams per-team loop above already uses. Each profile page's own
+  // og:updated_time (computed in players/[slug].astro) is the max of just the
+  // three award dates - it never reads the 'players' content entry's date,
+  // since that entry is only the directory index's one-paragraph blurb, not
+  // any individual player's data. This loop matches that formula exactly
+  // (maxLastReviewed(awardDates), no ownDate) rather than reusing the
+  // directory index's own derivedPageLastReviewed('/players', ...) value,
+  // which used to get applied to every player profile page too - wrong
+  // whenever 'players' content entry's own date moved past every award's,
+  // the same class of bug the matching /teams fix above addresses
+  // (two-hundred-and-fifty-first intensive run).
   const playerSources: PlayerAwardSource[] = [
     { title: "Ballon d'Or", slug: 'ballon-dor', editions: ballonDor.editions },
     { title: 'FIFA World Cup Golden Boot', slug: 'golden-boot', editions: worldCupGoldenBoot.editions },
     { title: 'UEFA EURO Golden Boot', slug: 'golden-boot', editions: euroGoldenBoot.editions },
   ];
   const playerProfiles = buildAllPlayerProfiles(playerSources);
-  const playersEntry = await getEntry('pages', 'players');
-  const playersLastmod = [
-    ballonDor.lastReviewed,
-    worldCupGoldenBoot.lastReviewed,
-    euroGoldenBoot.lastReviewed,
-    playersEntry?.data.lastReviewed,
-  ]
-    .filter((value): value is string => Boolean(value))
-    .sort()
-    .at(-1);
-  const playersLastmodTag = playersLastmod ? `<lastmod>${playersLastmod}</lastmod>` : '';
+  const playerProfileLastmod = maxLastReviewed(awardDates);
+  const playersLastmodTag = playerProfileLastmod ? `<lastmod>${playerProfileLastmod}</lastmod>` : '';
   for (const profile of playerProfiles) {
     const slug = playerProfileSlug(profile.id);
     const enPath = `/players/${slug}`;

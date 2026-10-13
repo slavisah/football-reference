@@ -1,4 +1,5 @@
 import { isPlaceholderWinner, NOT_A_HOST } from './editions';
+import type { Rivalry } from './compare';
 import type { Locale } from './i18n';
 import type { ChampionSummary, Edition, TimelineEntry } from './types';
 
@@ -275,28 +276,32 @@ export function uniqueWinnerEditions(editions: Edition[]): Edition[] {
 /**
  * "Which team/player has won the most {competition} titles/awards?" (or,
  * for `subject: 'host'`, "Which country has hosted the most {competition}
- * editions?") - a single generated question per competition, built from the
- * same `ChampionSummary[]`-shaped totals `buildChampionsSummary()`/
- * `buildHostsSummary()` already produce for every competition page's "Most
- * successful teams"/"Most awards"/"Most frequent hosts" widget (see
- * `src/lib/editions.ts`) - no new editorial research, just a new way of
- * asking about data every competition page already displays and every
- * content-accuracy pass has already audited (`buildHostsSummary()`'s own
- * counts were independently hand-verified against every Host cell at the
- * two-hundred-and-tenth intensive run).
+ * editions?"; or, for `subject: 'home-soil'`, "Which team has won the most
+ * {competition} titles on home soil?") - a single generated question per
+ * competition, built from the same `ChampionSummary[]`-shaped totals
+ * `buildChampionsSummary()`/`buildHostsSummary()`/`buildHomeSoilTitles()`
+ * already produce for every competition page's "Most successful teams"/"Most
+ * awards"/"Most frequent hosts" widget and `/records`' own "Titles won on
+ * home soil" section (see `src/lib/editions.ts`) - no new editorial
+ * research, just a new way of asking about data every competition page
+ * already displays and every content-accuracy pass has already audited
+ * (`buildHostsSummary()`'s own counts, and `buildHomeSoilTitles()`'s own
+ * Winner/Host row matching, were independently hand-verified against every
+ * Host cell at the two-hundred-and-tenth intensive run).
  *
  * `summary` must already be sorted by titles descending (every caller of
- * `buildChampionsSummary()`/`buildHostsSummary()` gets this for free - see
- * each one's own sort). Returns no question at all when there's a tie for
- * first place (no single unambiguous correct answer) or fewer than 3
- * distinct entries (not enough distractors for a fair multiple-choice
- * question) - e.g. UEFA Nations League's four hosts to date are too few.
+ * `buildChampionsSummary()`/`buildHostsSummary()`/`buildHomeSoilTitles()`
+ * gets this for free - see each one's own sort). Returns no question at all
+ * when there's a tie for first place (no single unambiguous correct answer)
+ * or fewer than 3 distinct entries (not enough distractors for a fair
+ * multiple-choice question) - e.g. UEFA Nations League's four hosts to date,
+ * or its single home-soil title, are too few.
  */
 export function mostTitlesQuestion(
   summary: ChampionSummary[],
   competition: string,
   seedPrefix: string,
-  subject: 'team' | 'player' | 'host' = 'team',
+  subject: 'team' | 'player' | 'host' | 'home-soil' = 'team',
   locale: Locale = 'en',
 ): QuizQuestion[] {
   const [top, runnerUp] = summary;
@@ -315,12 +320,16 @@ export function mostTitlesQuestion(
         ? `Tko ima najviše nagrada na natjecanju ${competition}?`
         : subject === 'host'
           ? `Koja je država bila domaćin najviše izdanja natjecanja ${competition}?`
-          : `Koja reprezentacija ima najviše naslova na natjecanju ${competition}?`
+          : subject === 'home-soil'
+            ? `Koja reprezentacija ima najviše naslova osvojenih na domaćem terenu na natjecanju ${competition}?`
+            : `Koja reprezentacija ima najviše naslova na natjecanju ${competition}?`
       : subject === 'player'
         ? `Who has won the most ${competition} awards?`
         : subject === 'host'
           ? `Which country has hosted the most ${competition} editions?`
-          : `Which team has won the most ${competition} titles?`;
+          : subject === 'home-soil'
+            ? `Which team has won the most ${competition} titles on home soil?`
+            : `Which team has won the most ${competition} titles?`;
 
   return [{ id, category: competition, prompt, ...choice }];
 }
@@ -369,6 +378,314 @@ export function biggestFinalMarginQuestion(
       : `In which year did the ${competition} final have the biggest winning margin?`;
 
   return [{ id, category: competition, prompt, ...choice }];
+}
+
+/**
+ * "Which team/player had the longest run of consecutive {competition}
+ * titles/awards?" - a single generated question per competition, built from
+ * the same `ChampionSummary[]`-shaped streak ranking `buildLongestStreaks()`
+ * already produces for `/records`' own "Back-to-back champions" section (see
+ * `src/lib/editions.ts`) - no new editorial research, just a new way of
+ * asking about data the site already displays and has already verified (the
+ * two-hundred-and-ninth intensive run hand-recomputed every one of these
+ * streaks against each competition's own Winner column).
+ *
+ * `streaks` must already be sorted by streak length descending
+ * (`buildLongestStreaks()` does this for free). Each entry's `titles` field
+ * holds the streak length (editions in a row), not a title count. Returns no
+ * question at all when there's a tie for the single longest streak (no
+ * unambiguous correct answer - e.g. the FIFA World Cup's own two-way tie
+ * between Italy 1934/1938 and Brazil 1958/1962, both length 2) or fewer than
+ * 3 distinct streaks (not enough distractors) - e.g. UEFA Nations League and
+ * the EURO Golden Boot have no back-to-back streak at all as of 2026, so
+ * `buildLongestStreaks()` returns an empty array for them and this correctly
+ * produces no question. A team/player can appear more than once in `streaks`
+ * (separate, non-adjacent streaks) - `buildChoice`'s own `[...new
+ * Set(pool)]` dedup already handles that without any extra filtering here.
+ */
+export function longestStreakQuestion(
+  streaks: ChampionSummary[],
+  competition: string,
+  seedPrefix: string,
+  subject: 'team' | 'player' = 'team',
+  locale: Locale = 'en',
+): QuizQuestion[] {
+  const [top, runnerUp] = streaks;
+  if (!top || !runnerUp || streaks.length < 3) return [];
+  if (top.titles === runnerUp.titles) return [];
+
+  const correct = top.displayName;
+  const pool = streaks.map((s) => s.displayName);
+  const id = `${seedPrefix}:longest-streak`;
+  const choice = buildChoice(id, correct, pool);
+  if (!choice) return [];
+
+  const prompt =
+    locale === 'hr'
+      ? subject === 'player'
+        ? `Tko ima najdulji niz uzastopnih osvojenih nagrada ${competition}?`
+        : `Koja reprezentacija ima najdulji niz uzastopnih naslova na natjecanju ${competition}?`
+      : subject === 'player'
+        ? `Who had the longest run of consecutive ${competition} awards?`
+        : `Which team had the longest run of consecutive ${competition} titles?`;
+
+  return [{ id, category: competition, prompt, ...choice }];
+}
+
+/**
+ * "Who waited the longest between {competition} titles/awards?" - a single
+ * generated question per competition, built from the same
+ * `ChampionSummary[]`-shaped gap ranking `buildLongestTitleGaps()` already
+ * produces for `/records`' own "Longest wait between titles" section (see
+ * `src/lib/editions.ts`) - no new editorial research, just a new way of
+ * asking about data the site already displays and has already verified (the
+ * two-hundred-and-ninth intensive run hand-recomputed every one of these
+ * gaps against each competition's own title years).
+ *
+ * `gaps` must already be sorted by gap length descending
+ * (`buildLongestTitleGaps()` does this for free). Each entry's `titles`
+ * field holds the gap length in years, not a title count, and each entry is
+ * one distinct team/player (unlike `longestStreakQuestion`'s `streaks`,
+ * which can repeat a name across separate runs), since
+ * `buildLongestTitleGaps()` iterates `buildChampionsSummary()` once per
+ * champion. Returns no question at all when there's a tie for the single
+ * longest wait (no unambiguous correct answer - e.g. the Ballon d'Or's own
+ * tie between Ronaldo and Cristiano Ronaldo, both a 5-year wait) or fewer
+ * than 3 distinct entries (not enough distractors) - e.g. UEFA Nations
+ * League and both Golden Boot tables have only one team/player with 2+
+ * titles so far, so `buildLongestTitleGaps()` returns too short a list for
+ * either.
+ */
+export function longestTitleGapQuestion(
+  gaps: ChampionSummary[],
+  competition: string,
+  seedPrefix: string,
+  subject: 'team' | 'player' = 'team',
+  locale: Locale = 'en',
+): QuizQuestion[] {
+  const [top, runnerUp] = gaps;
+  if (!top || !runnerUp || gaps.length < 3) return [];
+  if (top.titles === runnerUp.titles) return [];
+
+  const correct = top.displayName;
+  const pool = gaps.map((g) => g.displayName);
+  const id = `${seedPrefix}:longest-gap`;
+  const choice = buildChoice(id, correct, pool);
+  if (!choice) return [];
+
+  const prompt =
+    locale === 'hr'
+      ? subject === 'player'
+        ? `Tko je najdulje čekao na sljedeću nagradu ${competition}?`
+        : `Koja je reprezentacija najdulje čekala na sljedeći naslov na natjecanju ${competition}?`
+      : subject === 'player'
+        ? `Who waited the longest between ${competition} awards?`
+        : `Which team waited the longest between ${competition} titles?`;
+
+  return [{ id, category: competition, prompt, ...choice }];
+}
+
+/**
+ * "Which two teams have met each other the most times in {competition}
+ * finals?" - a single generated question per competition, built from the
+ * same `Rivalry[]`-shaped head-to-head ranking `buildRivalries()` already
+ * produces for `/records`' own "Fiercest rivalries" section (see
+ * `src/lib/compare.ts`), independently hand-recomputed against every
+ * competition's own Champion/Runner-up columns at the two-hundred-and-tenth
+ * intensive run - no new editorial research, just a new way of asking about
+ * data the site already displays and has already verified.
+ *
+ * Unlike `/records`' own "Fiercest rivalries" section, which combines finals
+ * across all four team competitions (so two teams can qualify by meeting once
+ * each in two different competitions, e.g. France-Italy via EURO 2000 + the
+ * 2006 World Cup), `rivalries` here must already be scoped to one
+ * competition's own finals only - pass `buildRivalries(buildFinalsMeetings([{
+ * title: competition, slug: competition, editions }]))` for a single
+ * competition, not the combined cross-competition list - so the question and
+ * its "met in {competition} finals" prompt stay accurate to what it's
+ * actually asking about. A cross-competition rivalry question would need its
+ * own two-sided prompt shape and is left as a separate, unscoped idea (see
+ * `docs/ROADMAP.md`).
+ *
+ * The correct choice is formatted as "{teamA} vs {teamB}" (both already in
+ * alphabetical order from `buildRivalries()`); distractors are every other
+ * qualifying pair's own "{teamA} vs {teamB}" label. Returns no question at
+ * all when there's a tie for the most meetings (no single unambiguous
+ * correct answer) or fewer than 3 distinct rivalries (not enough
+ * distractors) - confirmed against the real content tables by hand: FIFA
+ * World Cup (only 2 qualifying pairs) and both UEFA EURO and UEFA Nations
+ * League (0 pairs meeting twice within the competition alone) all correctly
+ * produce no question, while Copa América (7 qualifying pairs, Argentina vs.
+ * Uruguay's 12 meetings a clear, unambiguous leader over Argentina vs.
+ * Brazil's 11) correctly does.
+ */
+export function mostFrequentRivalryQuestion(
+  rivalries: Rivalry[],
+  competition: string,
+  seedPrefix: string,
+  locale: Locale = 'en',
+): QuizQuestion[] {
+  const [top, runnerUp] = rivalries;
+  if (!top || !runnerUp || rivalries.length < 3) return [];
+  if (top.meetings === runnerUp.meetings) return [];
+
+  const pairLabel = (r: Rivalry) => `${r.teamADisplayName} vs ${r.teamBDisplayName}`;
+  const correct = pairLabel(top);
+  const pool = rivalries.map(pairLabel);
+  const id = `${seedPrefix}:rivalry`;
+  const choice = buildChoice(id, correct, pool);
+  if (!choice) return [];
+
+  const prompt =
+    locale === 'hr'
+      ? `Koje su se dvije reprezentacije najčešće susrele u finalima natjecanja ${competition}?`
+      : `Which two teams have met each other the most times in ${competition} finals?`;
+
+  return [{ id, category: competition, prompt, ...choice }];
+}
+
+/**
+ * "Which two national teams have met each other the most times across World
+ * Cup, EURO, Copa América and Nations League finals, combined?" - the
+ * cross-competition counterpart `mostFrequentRivalryQuestion()`'s own comment
+ * flagged as a separate, unscoped idea (two-hundred-and-sixteenth intensive
+ * run), now scoped and shipped. Unlike that function, `rivalries` here is the
+ * exact same combined, all-four-competition `Rivalry[]` `/records`' own
+ * "Fiercest rivalries" section already renders - pass
+ * `buildRivalries(buildFinalsMeetings([...all four competitions...]))`
+ * directly, the same call `src/pages/records.astro` already makes - so a
+ * pair can qualify by meeting once each in two *different* competitions
+ * (e.g. France vs. Italy via EURO 2000 + the 2006 World Cup), which is
+ * exactly what makes this question distinct from the per-competition one.
+ * This needed no new editorial research: the combined ranking was
+ * independently hand-recomputed against every competition's own Champion/
+ * Runner-up columns at the two-hundred-and-tenth intensive run, and is the
+ * same data `/records` has displayed and had re-verified ever since.
+ *
+ * Same tie-and-sparse-data safety as every other generated question type
+ * (no question when the top two pairs are tied on meetings, or fewer than 3
+ * distinct pairs exist) - confirmed against the real combined ranking by
+ * hand: Argentina vs. Uruguay is the clear leader at 13 meetings, well ahead
+ * of Argentina vs. Brazil's 11, so this one does produce a question.
+ */
+export function fiercestRivalryQuestion(
+  rivalries: Rivalry[],
+  seedPrefix: string,
+  locale: Locale = 'en',
+): QuizQuestion[] {
+  const [top, runnerUp] = rivalries;
+  if (!top || !runnerUp || rivalries.length < 3) return [];
+  if (top.meetings === runnerUp.meetings) return [];
+
+  const pairLabel = (r: Rivalry) => `${r.teamADisplayName} vs ${r.teamBDisplayName}`;
+  const correct = pairLabel(top);
+  const pool = rivalries.map(pairLabel);
+  const id = `${seedPrefix}:cross-rivalry`;
+  const choice = buildChoice(id, correct, pool);
+  if (!choice) return [];
+
+  const category = locale === 'hr' ? 'Najžešći rivaliteti' : 'Fiercest rivalries';
+  const prompt =
+    locale === 'hr'
+      ? 'Koje su se dvije reprezentacije najčešće susrele u finalima Svjetskog prvenstva, EURO-a, Copa Américe i Liga nacija zajedno?'
+      : 'Which two national teams have met each other the most times across World Cup, EURO, Copa América and Nations League finals, combined?';
+
+  return [{ id, category, prompt, ...choice }];
+}
+
+/**
+ * "Which of these teams has reached a {competition} final without ever
+ * winning the title?" - one question per entry in
+ * `buildRunnerUpsWithoutTitle()`'s own "Nearly champions" ranking (see
+ * `src/lib/editions.ts`), the generated `/records` ranking flagged
+ * (two-hundred-and-fifteenth intensive run) as needing a genuinely new
+ * question *shape* rather than a drop-in reuse of `mostTitlesQuestion()`'s
+ * own pattern: "Nearly champions" is a list of every team that clears a bar
+ * (reached a final, never won it), not a single superlative record, so there
+ * is no one "most nearly-champion" team to ask about. This instead generates
+ * one question per qualifying team, the same "iterate every qualifying
+ * entry" shape `championByYearQuestions`/`hostByYearQuestions`/
+ * `runnerUpByYearQuestions` already use, rather than `mostTitlesQuestion`'s
+ * own "one question per competition" shape.
+ *
+ * The correct answer is drawn from `nearlyChampions`; distractors are drawn
+ * from `champions` (`buildChampionsSummary()`'s own title-winners list) -
+ * every distractor is genuinely wrong by construction, since a team in
+ * `champions` has, by definition, won the competition at least once. Needs
+ * at least 3 distinct champions to supply enough distractors
+ * (`MIN_DISTRACTORS` = 2 plus the correct answer's own slot); a question is
+ * simply skipped for any `nearlyChampions` entry where `buildChoice` can't
+ * find enough, the same per-entry sparse-data behaviour
+ * `championByYearQuestions` already has for an individual edition.
+ */
+export function nearlyChampionQuestions(
+  nearlyChampions: ChampionSummary[],
+  champions: ChampionSummary[],
+  competition: string,
+  seedPrefix: string,
+  locale: Locale = 'en',
+): QuizQuestion[] {
+  const pool = champions.map((c) => c.displayName);
+  const questions: QuizQuestion[] = [];
+  for (const entry of nearlyChampions) {
+    const correct = entry.displayName;
+    const id = `${seedPrefix}:nearly-champion:${entry.id}`;
+    const choice = buildChoice(id, correct, pool);
+    if (!choice) continue;
+    questions.push({
+      id,
+      category: competition,
+      prompt:
+        locale === 'hr'
+          ? `Koja je od ovih reprezentacija igrala u finalu natjecanja ${competition}, ali ga nikad nije osvojila?`
+          : `Which of these teams has reached a ${competition} final without ever winning the title?`,
+      ...choice,
+    });
+  }
+  return questions;
+}
+
+/**
+ * "Which of these teams has reached a {competition} semifinal without ever
+ * reaching the final?" - the "Nearly champions" sibling question's own
+ * one-tier-down counterpart, built the same way from
+ * `buildNearlyFinalists()`'s own ranking (see `src/lib/editions.ts`): one
+ * question per qualifying team, correct answers drawn from
+ * `nearlyFinalists`, distractors drawn from `finalists` - every team that
+ * has ever reached *any* final, winner or runner-up alike. `finalists` is
+ * simply `champions` and `nearlyChampions` combined (exactly the union
+ * `buildNearlyFinalists()` itself excludes from its own "Third"/"Fourth"
+ * tally internally, via its own `finalistGroupIds` set) - callers already
+ * have both lists in hand from the pool above, so no new editions.ts export
+ * is needed to build it. Same per-entry sparse-data behaviour as
+ * `nearlyChampionQuestions` - a question is skipped for any entry without
+ * enough distinct finalists to supply three distractors.
+ */
+export function nearlyFinalistQuestions(
+  nearlyFinalists: ChampionSummary[],
+  finalists: ChampionSummary[],
+  competition: string,
+  seedPrefix: string,
+  locale: Locale = 'en',
+): QuizQuestion[] {
+  const pool = finalists.map((f) => f.displayName);
+  const questions: QuizQuestion[] = [];
+  for (const entry of nearlyFinalists) {
+    const correct = entry.displayName;
+    const id = `${seedPrefix}:nearly-finalist:${entry.id}`;
+    const choice = buildChoice(id, correct, pool);
+    if (!choice) continue;
+    questions.push({
+      id,
+      category: competition,
+      prompt:
+        locale === 'hr'
+          ? `Koja je od ovih reprezentacija igrala u polufinalu natjecanja ${competition}, ali nikad nije igrala u finalu?`
+          : `Which of these teams has reached a ${competition} semifinal without ever reaching the final?`,
+      ...choice,
+    });
+  }
+  return questions;
 }
 
 export type QuizPool = {

@@ -70,6 +70,7 @@ Cannavaro
 Capitán
 Capitão
 Carles
+Carricaberry
 Carvalho
 Casemiro
 Casillas
@@ -79,6 +80,7 @@ Chiesa
 Chilena
 Chumpitaz
 Combi
+Cooperativa
 Copa
 Courtois
 Cristian
@@ -271,6 +273,7 @@ López
 Lúcio
 Maguire
 Maignan
+Malásquez
 Maldini
 Mandžukić
 Maniche
@@ -355,6 +358,7 @@ Penta
 Perdomo
 Pereda
 Peredo
+Pérez
 Pervis
 Petr
 Petrone
@@ -407,6 +411,7 @@ Sanches
 Sanfilippo
 Savo
 Scaloni
+Scarone
 Schillaci
 Schranz
 Schön
@@ -462,6 +467,7 @@ Vini
 Vinícius
 Vittorio
 Vogts
+Vonlanthen
 Václav
 Víctor
 Wankdorf
