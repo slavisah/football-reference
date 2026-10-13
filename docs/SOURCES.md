@@ -2558,6 +2558,55 @@ Primary sources should be preferred.
     (2016 Fair Play: independently confirms Argentina as sole winner)
   - https://en.wikipedia.org/wiki/Colombia_at_the_Copa_Am%C3%A9rica
     (2024 Fair Play: Colombia)
+- Golden Boot winners external-source audit (2026-10-13, intensive run): the
+  next check in the same rotation, covering the larger 48-entry Golden Boot
+  winners list (1916-2024) - found and corrected two errors (1920, 1927; see
+  `content/copa-america.md`'s own "Important editorial warning" section and
+  `docs/PROJECT_STATUS.md`'s matching entry), confirmed every other entry:
+  - https://en.wikipedia.org/wiki/1920_South_American_Championship
+    (1920: joint Pérez/Romano, 3 goals each - the correction)
+  - https://rsssf.org/tables/20sa-scor.html
+    (1920: RSSSF's detailed goal-scorer table agrees with Wikipedia)
+  - https://rsssf.org/tables/20sa.html
+    (1920: RSSSF's own tournament-summary page is the outlier this page had
+    previously followed - "4 goals", contradicted by RSSSF's own
+    goal-scorer table above)
+  - https://en.wikipedia.org/wiki/%C3%81ngel_Romano
+  - https://en.wikipedia.org/wiki/1927_South_American_Championship
+    (1927: five-way tie at 3 goals each - the correction)
+  - https://rsssf.org/tables/27sa-scor.html
+    (1927: RSSSF's detailed goal-scorer table agrees with Wikipedia)
+  - https://rsssf.org/tables/27sa.html
+    (1927: again the outlier tournament-summary page this site had
+    previously followed - "Figueroa, 4 goals")
+  - https://en.wikipedia.org/wiki/Segundo_Luna
+  - https://en.wikipedia.org/wiki/Alfredo_Carricaberry
+  - https://rsssf.org/tables/57sa.html ; https://rsssf.org/tables/63sa.html ;
+    https://rsssf.org/tables/67sa.html
+    (1957/1963/1967: confirmed matching the page, no change)
+  - https://rsssf.org/tables/59-2sa-scor.html ;
+    https://en.wikipedia.org/wiki/1959_South_American_Championship_(Ecuador)
+    (1959 Ecuador: Sanfilippo 6 goals - confirms the page's existing figure
+    over RSSSF's own lower-detail results page, which gives 5)
+  - https://rsssf.org/tables/83sa-scor.html ;
+    https://en.wikipedia.org/wiki/1983_Copa_Am%C3%A9rica
+    (1983: confirms the page's existing three-name entry; RSSSF's
+    tournament-summary page lists a fourth name, Malásquez, at 3 goals, but
+    its own detailed goal-scorer table and Wikipedia both place him at 2)
+  - https://rsssf.org/tables/93sa-scor.html ; https://rsssf.org/tables/95sa-scor.html ;
+    https://rsssf.org/tables/97sa-scor.html
+    (1993/1995/1997: confirmed matching the page, no change)
+  - https://rsssf.org/tables/99sa-scor.html ;
+    https://en.wikipedia.org/wiki/1999_Copa_Am%C3%A9rica
+    (1999: confirmed matching the page, no change)
+  - https://en.wikipedia.org/wiki/2004_Copa_Am%C3%A9rica ;
+    https://rsssf.org/tables/2007sa-scor.html
+    (2004/2007: confirmed matching the page, no change)
+  - https://simple.wikipedia.com/wiki/Copa_Am%C3%A9rica_Centenario
+    (2016: confirmed matching the page, no change)
+  - Note: the egress-blocked-domains caveat every prior audit in this file
+    has noted applies here too; verification relied entirely on WebSearch's
+    synthesized summaries of RSSSF/Wikipedia rather than direct page loads.
 
 ## Ballon d'Or
 

@@ -70,6 +70,7 @@ Cannavaro
 Capitán
 Capitão
 Carles
+Carricaberry
 Carvalho
 Casemiro
 Casillas
@@ -272,6 +273,7 @@ López
 Lúcio
 Maguire
 Maignan
+Malásquez
 Maldini
 Mandžukić
 Maniche
@@ -356,6 +358,7 @@ Penta
 Perdomo
 Pereda
 Peredo
+Pérez
 Pervis
 Petr
 Petrone
@@ -408,6 +411,7 @@ Sanches
 Sanfilippo
 Savo
 Scaloni
+Scarone
 Schillaci
 Schranz
 Schön
