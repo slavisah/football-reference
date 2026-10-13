@@ -39503,3 +39503,114 @@ have now had a behavior-accuracy pass, six found already accurate and one
 next candidates are whichever file now has the oldest `lastReviewed` date -
 check each file's own frontmatter rather than trusting this paragraph, since
 it goes stale the moment a future run touches any of them.
+
+### Run 283 (2026-10-13): closed a `lastReviewed` bookkeeping gap Run 282 left open; full from-scratch dependency/health re-confirmation after a clean `pnpm install`; found and worked around a new Playwright/pre-installed-browser version mismatch while regenerating PDFs
+
+**The bookkeeping gap:** Run 282 hand-verified six of the seven tied
+longest-stale meta/feature-description files (`about-sources.md`,
+`compare-countries.md`, `compare-players.md`, `players.md`, `quiz.md`,
+`teams.md`) as behaviorally accurate against the live pages they describe,
+but only bumped `lastReviewed` on the seventh file it actually edited
+(`records-and-timelines.md`) - leaving the other six still dated
+2026-10-09 despite having just been reviewed on 2026-10-13, inconsistent
+with every other file in `content/` (e.g. `content/ballon-dor.md`'s Run
+280 entry: "first second-pass audit, zero discrepancies found" still
+bumped the date). Bumped all six to 2026-10-13 to match that established
+convention - a review that finds a file accurate still counts as a review.
+
+**Why a confirmation pass rather than a new feature this run:** this
+session's container started with no `node_modules` installed at all (a
+fresh environment, not a resumed one), so before picking a backlog item
+the first order of business was establishing the project still builds and
+passes clean from a genuinely cold start - not something recent runs could
+simply assume. Beyond that, `docs/ROADMAP.md`'s "Open backlog" is unchanged
+from Run 266's assessment: every item is still either blocked on something
+outside this session's control or already-exhausted research (re-tried two
+of them below with the same fresh-environment opportunity, both still
+negative), and the 2026 Ballon d'Or ceremony (26 October) is still 13 days
+out.
+
+**Re-confirmed clean from a cold start:**
+- `pnpm install` (493 packages, no lockfile drift), `pnpm lint` (263 files,
+  0/0/0), `pnpm test` (1071/1071), `pnpm build` (711 pages).
+- `pnpm outdated` (only the same long-blocked `typescript` 5.9.3 → 7.0.2
+  line; re-confirmed `@astrojs/check@latest`'s peer dependency is still
+  `^5.0.0 || ^6.0.0` via `npm view`), `pnpm audit` (no known
+  vulnerabilities), `pnpm dlx knip --no-config-hints` (the one documented
+  `@cspell/dict-hr-hr` false positive only).
+- All 34 of the fast, CI-wired `check:*` scripts, run fresh: `check:award-
+  tallies`, `check:superlative-claims`, `check:ordinal-claims`, `check:
+  record-claims`, `check:consecutive-claims`, `check:since-claims`, `check:
+  one-of-only-claims`, `check:completeness-claims`, `check:edition-header-
+  labels`, `check:spelling`, `check:spelling-hr`, `check:pdfs`, `check:pdf-
+  outline`, `check:perf`, `check:records-consistency`, `check:team-
+  profiles-consistency`, `check:player-profiles-consistency`, `check:
+  compare-consistency`, `check:links`, `check:sitemap`, `check:feed`,
+  `check:jsonld`, `check:heading-outline`, `check:theme-flash`, `check:
+  reachability`, `check:meta`, `check:i18n-notes`, `check:attendance-
+  format`, `check:claims-hr`, `check:link-names`, `check:precache`,
+  `check:image-dimensions`, `check:locale-consistency`, `check:theme-color`
+  - all pass, zero discrepancies. The ten manual/intensive-run-only
+  full-site browser sweeps were not re-run - Run 281 already completed a
+  full clean pass of all ten just two runs ago, and this run's only
+  content edits were six frontmatter-only date bumps, nothing layout- or
+  CSS-affecting.
+
+**A new, genuinely fresh-environment-only finding:** regenerating the 700
+PDFs (required by the six `lastReviewed` bumps above, per `AGENTS.md`'s
+edit-triggered rule - each page's own "Last reviewed" date is part of its
+rendered content) failed on the first attempt: `pnpm install` had just
+pulled `@playwright/test@1.64.0` fresh (the lockfile-pinned version, not
+previously installed in this container), which bundles browser revision
+1248, while this sandbox's pre-installed Chromium binaries are only
+revision 1194 (`/opt/pw-browsers/chromium_headless_shell-1194/`) - a
+narrower version of the same escape-hatch problem Run 265 already
+documented and fixed for `check:color-contrast`, now hit for the first
+time in `scripts/generate-pdfs.mjs` because this is the first run to
+invoke it against a genuinely fresh `pnpm install` rather than a container
+with `node_modules` already in place from a prior run. Re-ran with
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium_headless_shell-1194/chrome-
+linux/headless_shell.real` (the exact binary Run 265's own fix already
+established as the correct one) and all 700 PDFs regenerated cleanly;
+`check:pdfs`/`check:pdf-outline` both confirm all 700 fresh. No code
+change needed - `generate-pdfs.mjs` already reads this environment
+variable (see its own code, line ~150) - but worth logging as a reminder
+for the next run that starts from a genuinely empty `node_modules`: the
+pinned `@playwright/test` version and this sandbox's pre-installed
+browser revision can drift apart after a routine lockfile bump, and
+`PW_EXECUTABLE_PATH` is the fix, not a `playwright install` (which this
+sandboxed network can't actually download from).
+
+**Two open research gaps retried with the same fresh-environment access,
+both still negative:**
+- **UEFA Nations League 2023 Finals Team of the Tournament:** a fresh
+  `WebSearch` pass (`"Team of the Tournament" OR "Best XI" squad`) again
+  surfaced only squads, results and Rodri's Player of the Tournament award
+  - no official best-XI list. Unchanged from every prior attempt.
+- **UEFA Nations League 2025 Finals Team of the Tournament:** same result
+  - Nuno Mendes's Player of the Finals award and the Mbappé/Ronaldo/Yamal
+  top-scorer tie surface repeatedly, no best-XI list. Unchanged.
+- Also re-confirmed `docs/SOURCES.md`'s link-liveness sweep is still
+  infeasible here: `WebFetch` to `en.wikipedia.org` returns `getaddrinfo
+  ENOTFOUND` - the same DNS-level block as Run 266 found, not a new
+  failure mode.
+
+**Verification:** see the full re-confirmation list above. `pnpm build` and
+`pnpm build:pdfs` were both re-run after the six `lastReviewed` bumps;
+`check:pdfs`/`check:pdf-outline` (700/700) and every other fast `check:*`
+script above were run against that rebuilt output, not stale state.
+
+**Left for a future pass:** unchanged from Run 266's list - the EURO
+Golden Boot youngest-winner angle (last retried Run 276, deliberately left
+alone per its own "worth leaving alone for a few runs" note), the Nations
+League Best XI/attendance gaps, the `typescript` 7 upgrade, the
+`docs/SOURCES.md` link-liveness sweep, the `long-title` brand call, and the
+full ~130-winner birth-date ranking - plus the 2026 Ballon d'Or ceremony
+re-check once 26 October 2026 has passed (13 days out as of this run). The
+content-verification rotation's next candidates are whichever file now has
+the oldest `lastReviewed` date: as of this run that's the five-way tie at
+2026-10-10 (`glossary.md`, `golden-boot.md`, `index.md`, `uefa-euro.md`,
+`uefa-nations-league.md`) - all five already had a full front-to-back
+pass within the last three days (Runs 261-262), so a future run should
+weigh whether re-running it finds anything genuinely new before spending a
+full pass on a near-certain repeat of "zero discrepancies."
