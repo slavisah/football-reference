@@ -668,6 +668,37 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- "Format milestones" and "Memorable moments" sections (audited 2026-10-14,
+  two-hundred-and-eighty-fifth intensive run): the content-verification
+  rotation's next target per `lastReviewed` staleness. Every other section
+  on this page already had a dedicated audit entry above; these two were the
+  one remaining gap - cross-checked independently rather than assumed correct
+  just because the underlying facts (host/teams/winner columns, final dates,
+  attendance) they summarize were already verified elsewhere. Four claims
+  checked: Brazil's 1970 win being the first time any team won three World
+  Cups (confirmed - 1958, 1962, 1970); 1982 being the first 24-team finals,
+  up from 16 (confirmed); 1998 being the first 32-team finals, up from 24
+  (confirmed); and 2026 being the first 48-team finals and the first hosted
+  by three countries (confirmed; Mexico also became the first country to
+  host a men's World Cup three times - 1970, 1986, 2026). One low-quality
+  pre-tournament mirror site surfaced during the 2026 search claiming a
+  different team won the final than this page records; it contradicted every
+  other source (including the dozens already cited above and in the
+  "Winning managers"/"Golden Ball" entries, all dated after the tournament
+  actually finished) and was discarded as noise rather than treated as a
+  conflict. **No discrepancies found.** The remaining "Memorable moments"
+  bullets (Maradona 1986, Croatia's first final in 2018, the 2022 3-3 final)
+  restate facts the "Editions" table audit already covers and weren't
+  re-litigated separately:
+  - https://loki.editorial.aetnd.com/this-day-in-history/pele-leads-brazil-over-italy-in-world-cup-championship
+  - https://en.wikipedia.org/wiki/1982_FIFA_World_Cup
+  - https://footballhistory.org/world-cup/1982-spain.html
+  - https://en.wikipedia.org/wiki/1998_FIFA_World_Cup
+  - https://en.wikipedia.org/wiki/1998_FIFA_World_Cup_final
+  - https://worldatlas.com/articles/where-will-the-2026-fifa-world-cup-be-held.html
+  - https://simple.wikipedia.com/wiki/2026_FIFA_World_Cup (the unreliable
+    pre-tournament-outcome mirror noted above - not used as a source for any
+    fact on this page)
 
 ## UEFA EURO
 
