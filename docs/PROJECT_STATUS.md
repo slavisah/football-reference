@@ -39687,3 +39687,77 @@ above, the `typescript` 7 upgrade, the `docs/SOURCES.md` link-liveness
 sweep, the `long-title` brand call, the full ~130-winner birth-date ranking,
 and the 2026 Ballon d'Or ceremony re-check (26 October, now 12 days out)
 are all otherwise unchanged from Run 283's own list.
+
+### Run 285 (2026-10-14): closed the last unaudited gap on `content/fifa-world-cup.md` (now the longest-stale file) - its "Format milestones" and "Memorable moments" sections had never had a dedicated `docs/SOURCES.md` audit entry of their own
+
+`fifa-world-cup.md` became the longest-stale content file after Run 284's
+bumps (`lastReviewed: 2026-10-12`). Checking `docs/SOURCES.md`'s existing
+"FIFA World Cup" section first (the right move before spending a full pass
+on a page this heavily audited already) showed every other section already
+had its own dedicated entry - Golden Ball, Silver/Bronze Ball, Golden Glove,
+Young Player Award, Fair Play Award, Winning managers, Winning captains,
+Final venues, Final attendance, and the Editions table itself - except two:
+"Format milestones" and "Memorable moments" had never been independently
+checked, only ever implicitly covered by the facts the Editions table audit
+already verifies.
+
+Four claims specific to "Format milestones" were checked with fresh
+`WebSearch` queries: Brazil's 1970 win being the first time any team won
+three World Cups (confirmed: 1958, 1962, 1970); 1982 being the first
+24-team finals, up from 16 (confirmed, also the tournament's only
+three-round-group format, used once); 1998 being the first 32-team finals,
+up from 24 (confirmed); and 2026 being the first 48-team finals and the
+first hosted by three countries (confirmed; Mexico also became the first
+men's World Cup three-time host - 1970, 1986, 2026). The remaining
+"Memorable moments" bullets (Maradona's 1986, Croatia's first final in
+2018, the 2022 3-3 final) restate facts the Editions table audit already
+covers and weren't re-litigated as a separate claim.
+
+One piece of noise surfaced and was deliberately discarded rather than
+treated as a conflict: a `simple.wikipedia.com` mirror page, indexed before
+the 2026 tournament actually finished, speculatively named a different
+final winner. It contradicted every other, post-tournament source already
+cited across this page's own "Winning managers"/"Golden Ball"/"Golden
+Glove" entries (FIFA.com, ESPN, aninews.in, dated after 20 July 2026), so
+it was recorded in the new `docs/SOURCES.md` entry as the unreliable
+pre-tournament outlier it is, not used for any fact, and not treated as
+grounds to re-open an already-well-sourced result. **No discrepancies
+found.** Bumped `lastReviewed` to 2026-10-14.
+
+This session's container also started with no `node_modules` installed
+(cold start, same situation as Runs 283 and 284) - `pnpm install` (493
+packages, no drift) confirmed clean before picking up any backlog item.
+
+**Branch-strategy note:** confirmed via GitHub that PR #56 (the prior
+rolling PR) was merged and PR #57 (opened fresh by Run 280 per the
+branch-strategy's squash-merge-recreation rule) is open and tracking Runs
+280-284's work; this run rebased cleanly onto it with nothing further
+needed (`origin/intensive/football-reference` was already a strict
+descendant of `origin/main`).
+
+**Verification:** `pnpm lint` (263 files, 0/0/0), `pnpm test` (1071/1071),
+`pnpm build` (711 pages) all clean. All 32 fast CI-gated `check:*` scripts
+clean (no claim-ledger regressions, zero new/stale entries). `check:pdfs`
+rebuilt all 700 print PDFs per `AGENTS.md`'s edit-triggered rule, with
+`PW_EXECUTABLE_PATH` pointed at the pre-installed
+`chromium_headless_shell-1194/chrome-linux/headless_shell.real` binary (the
+same fix Runs 265/283/284 already established for this sandbox's
+Playwright/browser-revision mismatch); `check:pdfs`/`check:pdf-outline`
+both confirm 700/700 fresh afterward. The ten manual/intensive-run-only
+browser sweeps were not re-run - Run 281 completed a full clean pass four
+runs ago and this run's only content edit was a single frontmatter date
+bump plus a `docs/SOURCES.md` addition, nothing layout- or CSS-affecting.
+
+**Left for a future pass:** the content-verification rotation's next
+candidates are the nine-way tie at `lastReviewed: 2026-10-13`
+(`about-sources.md`, `ballon-dor.md`, `compare-countries.md`,
+`compare-players.md`, `copa-america.md`, `players.md`, `quiz.md`,
+`records-and-timelines.md`, `teams.md`) - a future run should check
+`docs/SOURCES.md` for each one's own existing audit coverage first, the
+same way this run found `fifa-world-cup.md`'s two-section gap, rather than
+assuming a full re-walk is the only option. Everything else is unchanged
+from Run 284's own list: the two open research gaps (Nations League Finals
+attendance, EURO Golden Boot youngest-ever winner), the `typescript` 7
+upgrade, the `docs/SOURCES.md` link-liveness sweep, the `long-title` brand
+call, the full ~130-winner birth-date ranking, and the 2026 Ballon d'Or
+ceremony re-check (26 October, now 12 days out).
