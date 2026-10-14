@@ -1,7 +1,7 @@
 ---
 title: Glossary
 slug: glossary
-lastReviewed: 2026-10-10
+lastReviewed: 2026-10-14
 status: verified
 ---
 
