@@ -39614,3 +39614,76 @@ the oldest `lastReviewed` date: as of this run that's the five-way tie at
 pass within the last three days (Runs 261-262), so a future run should
 weigh whether re-running it finds anything genuinely new before spending a
 full pass on a near-certain repeat of "zero discrepancies."
+
+### Run 284 (2026-10-14): content-verification rotation on the five-way-tied longest-stale files, targeted at the one piece of their content added *after* Runs 261-262's own full pass; two open research gaps retried, both still negative; cold-start dependency re-confirmation
+
+**Why targeted rather than a full re-walk:** Run 283 had already flagged that
+`glossary.md`, `golden-boot.md`, `index.md`, `uefa-euro.md` and
+`uefa-nations-league.md` (the five-way tie at 2026-10-10) each had a full
+front-to-back claim-by-claim pass within the prior three days (Runs
+261-262), and asked a future run to weigh whether repeating that exact pass
+would find anything genuinely new before spending the effort. It would not
+have: four of the five have had no content changes since that pass.
+`golden-boot.md` is the one exception - its "World Cup Silver Boot and
+Bronze Boot winners" 2026 bullet (Messi's Silver Boot, Bellingham's Bronze
+Boot) and the 2026 row of its own top-scorer table were both already
+present by Runs 261-262's own pass, but this run is the first to re-check
+them with a session that has both live `WebSearch` access and a clean
+run of time since the event - the 2026 World Cup is the one piece of
+material across these five files that postdates this project's own
+knowledge cutoff, making it the highest-risk content to leave unverified a
+second time. Fresh `WebSearch` passes confirmed all of it exactly: Mbappé's
+Golden Boot on 10 goals, Messi's Silver Boot on 8, Bellingham's Bronze Boot
+on 7 - matching the page, `fifa-world-cup.md`'s own editions table, and the
+existing `docs/SOURCES.md` entries for this award (added 2026-09-02,
+2026-10-13) with no discrepancy. `glossary.md` and `index.md` have no
+externally-verifiable football-history claims at all (they describe this
+site's own rules and structure, not match results), so they were instead
+checked for internal consistency against the rest of the site - e.g.
+`glossary.md`'s "host" entry's three-nation 2026 mention matches
+`fifa-world-cup.md`'s own hosting note - clean.
+
+**Two open research gaps retried with fresh queries, both still negative:**
+- UEFA Nations League Finals attendance: a fresh pass on both the 2025 Final
+  (Munich) and, for the first time in several runs, the 2023 Final
+  (Rotterdam) again turned up only the same single Wikipedia-sourced figures
+  (65,852 and 41,110) with no independent UEFA-primary figure surfacing for
+  either - unchanged from every prior attempt.
+- EURO Golden Boot youngest-ever winner: a fresh, differently-worded
+  `WebSearch` pass (ninth consecutive attempt across prior runs) again found
+  plenty of EURO Golden Boot history but no source naming a youngest-ever
+  record holder. Left exactly as the backlog already had it - still worth
+  leaving alone rather than retrying again with no new angle.
+
+Bumped `lastReviewed` to 2026-10-14 on all five files per this project's own
+convention that a review finding a file accurate still counts as a review
+(Run 280/283 precedent). This session's container also started with no
+`node_modules` installed (cold, not resumed) - confirmed `pnpm install`
+(493 packages, no drift) clean before picking up any backlog item, same as
+Run 283's own cold-start finding.
+
+**Verification:** `pnpm lint` (263 files, 0/0/0), `pnpm test` (1071/1071),
+`pnpm build` (711 pages) all clean. All 34 fast CI-gated `check:*` scripts
+clean, including every claim-ledger checker and `check:claims-hr`/
+`check:i18n-notes`/`check:locale-consistency`/`check:reachability` with
+zero new or stale entries. `check:pdfs` initially failed as expected (the
+five `lastReviewed` bumps change each page's own rendered "Last reviewed"
+footer); rebuilt all 700 print PDFs per `AGENTS.md`'s edit-triggered rule
+with `PW_EXECUTABLE_PATH` pointed at the pre-installed
+`chromium_headless_shell-1194/chrome-linux/headless_shell.real` binary
+(the same fix Run 265 and Run 283 already established for this sandbox's
+Playwright/browser-revision mismatch) - all 700 regenerated cleanly on the
+first attempt this time (no shared-preview-server race, since nothing else
+touched port 4321 concurrently); `check:pdfs`/`check:pdf-outline` both
+confirm 700/700 fresh afterward. The ten manual/intensive-run-only browser
+sweeps were not re-run - Run 281 completed a full clean pass three runs ago
+and this run's only content edits were five frontmatter-only date bumps,
+nothing layout- or CSS-affecting.
+
+**Left for a future pass:** the content-verification rotation's next
+candidate is whichever file now has the oldest `lastReviewed` date - after
+this run's bumps that's `fifa-world-cup.md` (2026-10-12). The research gaps
+above, the `typescript` 7 upgrade, the `docs/SOURCES.md` link-liveness
+sweep, the `long-title` brand call, the full ~130-winner birth-date ranking,
+and the 2026 Ballon d'Or ceremony re-check (26 October, now 12 days out)
+are all otherwise unchanged from Run 283's own list.
