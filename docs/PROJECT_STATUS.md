@@ -39761,3 +39761,106 @@ attendance, EURO Golden Boot youngest-ever winner), the `typescript` 7
 upgrade, the `docs/SOURCES.md` link-liveness sweep, the `long-title` brand
 call, the full ~130-winner birth-date ranking, and the 2026 Ballon d'Or
 ceremony re-check (26 October, now 12 days out).
+
+### Run 286 (2026-10-14): content-verification rotation closed out the nine-way tie - every `content/*.md` file is now reviewed as of this run, for the first time since this rotation began
+
+**Branch-strategy note:** confirmed PR #56 was merged and PR #57 (opened
+fresh by Run 280) tracked Runs 280-285's work correctly; this run's base
+(`origin/main`) already contained PR #56's merge and `origin/intensive/
+football-reference` was already a strict descendant of it, so no rebase
+was needed.
+
+Followed Run 285's own playbook - check `docs/SOURCES.md`'s existing
+coverage for gaps before spending a full re-walk - across the remaining
+nine-way tie at `lastReviewed: 2026-10-13` (`about-sources.md`,
+`ballon-dor.md`, `compare-countries.md`, `compare-players.md`,
+`copa-america.md`, `players.md`, `quiz.md`, `records-and-timelines.md`,
+`teams.md`):
+
+- **`ballon-dor.md`**: `docs/SOURCES.md`'s Ballon d'Or section already has
+  a dedicated audit entry for every section on the page, including all
+  five companion-trophy sections (Kopa, Yashin, Gerd Müller, Johan Cruyff,
+  Sócrates). Its "Memorable moments" section is, like `fifa-world-cup.md`'s
+  own equivalent (Run 285), composed entirely of facts the main Winners
+  table's own audit already covers - not a separate claim needing its own
+  entry.
+- **`copa-america.md`**: same result - every section (Final venues,
+  Best Player, Golden Glove, Golden Boot, Fair Play, Team of the
+  Tournament, Winning managers, Winning captains) already has its own
+  dedicated `docs/SOURCES.md` entry. "Champions timeline", "Titles after
+  2024" and "Memorable moments" are all derived directly from the
+  Champions/Runner-up table itself (already audited twice over - the
+  2026-08-05 Champion/Runner-up audit and its 2026-08-07 second-source
+  follow-up) rather than independent claims.
+- **`about-sources.md`, `compare-countries.md`, `compare-players.md`,
+  `players.md`, `quiz.md`, `records-and-timelines.md`, `teams.md`**: these
+  seven are, like `glossary.md`/`index.md` before them (Run 284), pages
+  that describe this site's own rules, tooling or derivation scope rather
+  than football history - no externally-verifiable claim to check against
+  a web source. Checked instead for internal consistency against the code
+  that actually implements each page's described behavior, rather than
+  taken on faith:
+  - `players.md`/`compare-players.md` both state the scope is Ballon d'Or
+    plus *World Cup and EURO* Golden Boot only (not Copa América's Best
+    Player/Golden Boot) - confirmed against `playerProfile.ts`'s own
+    header comment, which independently describes the identical scope.
+  - `teams.md`/`compare-countries.md` both state team records cover
+    titles, runner-up, and third/fourth-place-or-semifinal finishes across
+    the four team competitions - confirmed against `teamProfile.ts`'s and
+    `compare.ts`'s `SEMIFINAL_COLUMN` matching, which implements exactly
+    that.
+  - `quiz.md`'s "Question types in this quiz" list was checked one-by-one
+    against every exported question-building function in `src/lib/
+    quiz.ts` (`championByYearQuestions`, `topScorerByYearQuestions`,
+    `hostByYearQuestions`, `runnerUpByYearQuestions`,
+    `yearByWinnerQuestions`, `mostTitlesQuestion`'s four `subject` variants,
+    `biggestFinalMarginQuestion`, `longestStreakQuestion`,
+    `longestTitleGapQuestion`, `mostFrequentRivalryQuestion`,
+    `fiercestRivalryQuestion`, `nearlyChampionQuestions`,
+    `nearlyFinalistQuestions`, `chronologicalOrderQuestions`) - every
+    function has a matching bullet and no bullet lacks a function.
+  - `records-and-timelines.md`'s "Historical identity rules" section
+    (West Germany/Germany grouping, Soviet Union/Russia and
+    Czechoslovakia/Czechia kept separate, Yugoslavia unattributed) states
+    an editorial policy rather than a fact to verify, and matches the
+    aggregation rules `editions.ts`'s title-tally builders actually apply.
+  - `about-sources.md` is a two-sentence page intro with no factual claim
+    at all.
+
+**No discrepancies found anywhere.** No new `docs/SOURCES.md` entry was
+needed for any of the nine (per Run 284's own precedent: an internal-
+consistency check against this site's own code, finding no mismatch,
+doesn't need an external-source ledger entry the way a web-sourced fact
+does). Bumped `lastReviewed` to 2026-10-14 on all nine files.
+
+**Milestone:** every one of the 15 `content/*.md` files now carries
+`lastReviewed: 2026-10-14` - the first time since this rotation began that
+every file has been through at least one full pass within the same day.
+The next run's rotation has no single "longest-stale" file to prioritize;
+pick any file (or wait for the next content edit to make one stale again).
+
+**Verification:** this session's container started with no `node_modules`
+installed (cold start, same situation as Runs 283-285) - `pnpm install`
+(493 packages, no drift) confirmed clean before picking up any backlog
+item. `pnpm lint` (263 files, 0/0/0), `pnpm test` (1071/1071), `pnpm build`
+(711 pages) all clean. All 32 fast CI-gated `check:*` scripts clean (no
+claim-ledger regressions, zero new/stale entries). `check:pdfs` rebuilt all
+700 print PDFs per `AGENTS.md`'s edit-triggered rule, with
+`PW_EXECUTABLE_PATH` pointed at the pre-installed
+`chromium_headless_shell-1194/chrome-linux/headless_shell.real` binary (the
+same fix Runs 265/283/284/285 already established for this sandbox's
+Playwright/browser-revision mismatch); `check:pdfs`/`check:pdf-outline`
+both confirm 700/700 fresh afterward. The ten manual/intensive-run-only
+browser sweeps were not re-run - Run 281 completed a full clean pass five
+runs ago and this run's only content edits were nine frontmatter-only date
+bumps, nothing layout- or CSS-affecting.
+
+**Left for a future pass:** unchanged from Run 285's own list - the two
+open research gaps (Nations League Finals attendance, EURO Golden Boot
+youngest-ever winner), the `typescript` 7 upgrade, the `docs/SOURCES.md`
+link-liveness sweep, the `long-title` brand call, the full ~130-winner
+birth-date ranking, and the 2026 Ballon d'Or ceremony re-check (26
+October, now 12 days out). The content-verification rotation itself has
+no overdue file to pick next (see "Milestone" above) - a future run should
+either wait for a content edit to make one stale, or pick one at random
+for a repeat pass if nothing else is more pressing.
