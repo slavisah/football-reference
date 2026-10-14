@@ -40011,3 +40011,116 @@ re-confirmation only), so no PDF rebuild was needed; `git diff` against
 manual browser sweeps are now current again (this run) - no need to
 re-run until either a layout/CSS-affecting change lands or roughly a week
 passes, whichever comes first.
+
+### Run 289 (2026-10-14): diagnosed the actual mechanism behind `.git`'s size after this run's own `git fetch` failed twice; flagged as a new, human-decision-needed backlog item rather than guessed at or fixed blind
+
+Before this run could even start working, `git fetch origin` against this
+repo failed twice in a row with `RPC failed; curl 56 Recv failure:
+Connection reset by peer` / `fatal: early EOF` / `fetch-pack: invalid
+index-pack output` - a third attempt (run in the background, longer
+timeout) finally succeeded. This hadn't happened to a prior run's own
+`git fetch` as far as this file's history shows, so rather than retry and
+move on, this run checked why. The agent-proxy's own `/__agentproxy/status`
+endpoint confirmed it wasn't a one-off blip: `recentRelayFailures` showed a
+`ws_closed_mid_exchange` entry against `github.com:443`, 126 seconds in,
+**after 1.04 GB had already been received** - the transfer itself, not the
+connection, is the problem. `.git` is 5.2-5.5 GB locally.
+
+This project's own history already has a standing note that
+`public/downloads/` (the 700 generated print PDFs) is a documented,
+intentional ~500 MB of on-disk bloat - but every instance of that note (the
+earliest found: 2026-08-18) is about the *working tree*, never about `.git`
+itself or about fetch/clone reliability. This run tested a different,
+previously-unchecked question: when `pnpm build:pdfs` regenerates all 700
+PDFs with the underlying content completely unchanged, are the bytes it
+writes identical to what's already committed (so `git` sees no diff), or
+does every regeneration mint a fresh set of blobs regardless? Ran
+`pnpm build:pdfs` from a clean working tree (no `content/*.md` edit, nothing
+else changed) and checked `git status --porcelain public/downloads`
+afterward: **all 700 files showed as modified**, not zero. The regenerated
+files were discarded (`git checkout -- public/downloads`) rather than
+committed - this was a diagnostic, not a fix, and shipping a 700-file
+non-functional-change binary rewrite on a hunch would have made the
+problem measurably worse, not better.
+
+One pair was diffed byte-for-byte to find out *why* they differ
+(`public/downloads/ballon-dor.pdf`, old committed copy vs. the freshly
+regenerated one, same page, same content): three distinct things changed,
+not one -
+- `/CreationDate` and `/ModDate` always change - Chromium's print-to-PDF
+  pipeline stamps the current instant on every call, and Playwright's
+  `page.pdf()` exposes no option to pin it.
+- `/Creator` changed from the literal string `Chromium` (the committed
+  file) to a full `Mozilla/5.0 ... HeadlessChrome/141.0.0.0 ...`
+  user-agent string (the freshly regenerated one) - meaning whichever prior
+  session/environment produced the currently-committed PDFs was running a
+  different Chromium build/channel than this session's
+  `/opt/pw-browsers/chromium-1194`, not just a different clock.
+- The compressed content and font-subsetting streams differ throughout the
+  file, confirmed with a line-level diff (`difflib.SequenceMatcher`) on the
+  raw bytes - not only the metadata header. Chromium's print-to-PDF output
+  for the same page is not byte-stable across builds/versions, even when
+  the rendered result is visually identical.
+
+Put together: `AGENTS.md`'s own unconditional rule ("any edit to
+`content/*.md` ... needs `pnpm build && pnpm build:pdfs` before committing")
+means essentially every content-touching run (the large majority of this
+routine's 289 runs so far) commits a wholesale, non-delta-able rewrite of
+all 700 PDFs - each one several hundred KB to ~1 MB - even for pages whose
+own content never changed. Git stores a full new blob per changed binary
+file with no useful delta against the previous version, so this compounds
+every time rather than amortizing. This is almost certainly the dominant
+contributor to `.git`'s 5+ GB size, and it is a fetch-reliability problem
+now, confirmed directly against this very repository today, not just a
+disk-space one.
+
+**No fix attempted.** Every option this run could think of carries either
+real risk or a product/infrastructure decision that belongs to the user,
+not to an unattended routine:
+- Git LFS for `public/downloads/*.pdf` - changes how the repo is cloned and
+  how GitHub Pages deployment serves those files; needs verifying LFS works
+  with the existing Pages workflow before committing to it.
+- Rewriting history to drop the old PDF blobs (`git filter-repo` or
+  equivalent) - destructive, rewrites commit hashes on shared history that
+  PRs and this routine's own branch depend on; explicitly against this
+  project's own standing rule against rewriting shared history.
+- Regenerating/committing only the PDFs whose source page actually changed,
+  instead of all 700 every run - would slow future growth but does nothing
+  for the 5+ GB already in history, and `scripts/generate-pdfs.mjs` has no
+  current mechanism to know which pages changed since the last commit.
+- Pinning one specific Chromium build for all PDF generation (addressing
+  the `/Creator`/content-stream non-determinism specifically) would at
+  least stop the *version*-driven portion of the diff, but wouldn't touch
+  the `/CreationDate`/`/ModDate` churn, which changes on literally every
+  regeneration regardless of environment.
+
+Documented as a new, explicitly flagged "Open backlog" item in
+`docs/ROADMAP.md` (not a "Status" paragraph, per this file's own
+appending-only convention) rather than guessed at or silently patched -
+this needs the user's own decision on direction, the same posture this
+routine already takes for other irreversible/architectural calls (e.g. the
+`long-title` brand-suffix item). Escalated via this run's own push
+notification rather than left to be noticed only on the next backlog read,
+since a `.git` that is already failing `git fetch` roughly 2 times out of 3
+is a live operational risk to this routine's own ability to keep running,
+not a someday concern.
+
+**Verification:** this run's own standing health check, run fresh before
+the diagnosis above (cold-start container, no prior `node_modules`):
+`pnpm install` (495 packages, no drift from Run 288's 493 - routine lockfile
+churn, not a content change), `pnpm lint` (263 files, 0 errors/0 warnings/0
+hints), `pnpm test` (1071/1071), `pnpm build` (711 pages), all 32 CI-gated
+`check:*` scripts run individually, `pnpm outdated` (only the already-known
+-blocked `typescript` 7 upgrade), `pnpm audit` (no known vulnerabilities),
+`pnpm dlx knip --no-config-hints` (the one standing `@cspell/dict-hr-hr`
+false positive, unchanged) - all clean, no drift. No `content/*.md` file
+was edited this run, so no PDF rebuild was needed for the site itself; the
+700-file diff produced during diagnosis was discarded, never committed.
+`git status` is clean against this commit.
+
+**Left for a future pass:** the direction on the new `.git`-bloat item
+above needs the user's own call before any run acts on it. Everything else
+is unchanged from Run 288's own list - every "Open backlog" item is still
+either not-yet-due, environment-blocked, or needing human sign-off, and the
+ten manual browser sweeps stay current (re-run by Run 288, no CSS/layout
+change since).

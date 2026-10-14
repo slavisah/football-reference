@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (288 intensive runs as of 2026-10-14) lives
+verification sweep and decision (289 intensive runs as of 2026-10-14) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -191,6 +191,45 @@ the full run-by-run history behind all of this, see
 
 ## Open backlog
 
+- **`.git` history bloat from non-deterministic PDF regeneration - needs human
+  decision (raised Run 289, 2026-10-14):** this environment's own `git fetch
+  origin` failed twice this run with `RPC failed; curl 56 Recv failure:
+  Connection reset by peer` / `fatal: early EOF` before a third attempt
+  succeeded; the agent-proxy's own status endpoint logged a matching
+  `ws_closed_mid_exchange` relay failure against `github.com:443` after
+  **1.04 GB** had already been received. `.git` is now 5.2-5.5 GB. Root
+  cause, confirmed directly this run rather than assumed: regenerating all
+  700 PDFs with nothing else changed (`pnpm build:pdfs`, discarded afterward,
+  not committed) rewrote **all 700** as binary diffs, not zero. One pair
+  (`public/downloads/ballon-dor.pdf`, old committed copy vs. freshly
+  regenerated) was diffed byte-for-byte: `/CreationDate`/`/ModDate` always
+  change (Chromium stamps the current instant on every print-to-PDF call,
+  with no Playwright `page.pdf()` option to pin it), `/Creator` changed from
+  `Chromium` to a full `HeadlessChrome/141.0.0.0` user-agent string (a
+  different Chromium build/version than whichever produced the currently-
+  committed file), and the compressed content/font streams differ throughout
+  - not just the metadata, the actual page bytes aren't stable across
+  Chromium versions even for pixel-identical output. AGENTS.md's own
+  unconditional rule (any `content/*.md` edit needs `pnpm build:pdfs` before
+  committing) means essentially every content-touching run commits a fresh
+  ~500 MB wholesale rewrite of all 700 PDFs, forever, since git cannot
+  usefully delta non-identical binaries - this is almost certainly the
+  dominant contributor to `.git`'s size, and is a different, more
+  consequential mechanism than the long-standing "PDF-bloat documented/
+  intentional" note elsewhere in this project's history (that note is about
+  `public/downloads/`'s own ~500 MB-on-disk size, a working-tree concern;
+  this is about unbounded, non-recoverable *history* growth, which just
+  started actually breaking `git fetch` for this routine itself). No fix
+  attempted this run - every option carries real risk or a design call a
+  human should make, not an unattended routine: migrating
+  `public/downloads/*.pdf` to Git LFS (changes how the repo is cloned/
+  deployed), rewriting history to drop old PDF blobs (destructive, rewrites
+  shared history), or regenerating/committing only the PDFs whose source
+  page actually changed instead of all 700 every time (would slow future
+  growth but not shrink what's already there, and `scripts/generate-pdfs.mjs`
+  doesn't currently have a way to tell which pages changed). Needs the user's
+  own call on which direction (if any) to take; a future run should not
+  attempt a destructive history rewrite without that sign-off.
 - **2026 Ballon d'Or edition**: not due yet, not blocked. The two-hundred-
   and-forty-first run confirmed via `WebSearch` that the ceremony is
   scheduled for 26 October 2026 in London (its first time outside Paris) -
