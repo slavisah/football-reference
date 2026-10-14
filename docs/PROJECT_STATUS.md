@@ -39936,3 +39936,78 @@ intensive-run-only browser sweeps were last run in full at Run 281 (six
 runs ago); still not clearly overdue enough to justify the ~2-hour
 `check:color-contrast` budget this run, but worth picking up soon if no
 higher-value item appears first.
+
+### Run 288 (2026-10-14): full ten-script manual browser sweep re-run (seven runs overdue); confirmed PR #56/#57 branch-strategy handoff; every Open-backlog item re-confirmed still blocked/not-due, no content edit made
+
+With the content-verification rotation and code-review angle both closed
+out as of Run 286, and every "Open backlog" item either not-yet-due,
+environment-blocked, or needing human sign-off (re-confirmed below), this
+run picked up the one maintenance task Run 287 flagged as next-in-line but
+didn't have budget for: the ten manual/intensive-run-only Playwright
+browser sweeps (`check:html`, `check:lighthouse`, `check:reflow`,
+`check:landscape`, `check:text-zoom`, `check:print-width`,
+`check:target-size`, `check:text-spacing`, `check:focus-appearance`,
+`check:color-contrast`), last run in full at Run 281, now seven runs/
+roughly 28 hours stale.
+
+**Branch-strategy note:** confirmed via the GitHub API
+(`search_pull_requests`) that PR #56 was merged 2026-10-13 and PR #57
+(opened fresh by Run 280) is open and correctly tracks this branch's
+Runs 280-287 history. `origin/intensive/football-reference` was already a
+strict descendant of `origin/main` (`git rebase origin/main` reported
+"up to date"), so this run branched straight off it with no rebase needed
+- the same handoff Run 287 already confirmed, re-verified independently
+rather than assumed.
+
+**Cold-start baseline** (this session's container started with no
+`node_modules`): `pnpm install` (493 packages, no drift), `pnpm lint` (263
+files, 0/0/0), `pnpm test` (1071/1071), `pnpm build` (711 pages), all 32
+CI-gated `check:*` scripts (including `check:i18n-notes` and
+`check:spelling`, run individually to make sure neither was silently
+skipped), `pnpm outdated` (only the already-known-blocked `typescript` 7
+upgrade), `pnpm audit` (no known vulnerabilities), `pnpm dlx knip
+--no-config-hints` (the one standing `@cspell/dict-hr-hr` false positive,
+unchanged) - all clean, no drift from Run 287's baseline.
+
+**Manual browser sweep:** ran all ten scripts with `PW_EXECUTABLE_PATH`
+pointed at the pre-installed
+`chromium_headless_shell-1194/chrome-linux/headless_shell.real` binary
+(Run 265's own fix for this sandbox's Playwright/browser-revision
+mismatch). All ten exited 0:
+- `check:color-contrast`: zero WCAG 1.4.3 violations across all 711 pages
+  in both color schemes (the heaviest script, ~1,400 page loads).
+- `check:lighthouse`: all 39 sampled pages scored >= 0.9 in every
+  category, the one documented noindex/SEO exception (the bilingual 404
+  page, seo: 0.63 by design) unchanged, no actionable back/forward-cache
+  blockers.
+- `check:html`, `check:reflow`, `check:landscape`, `check:text-zoom`,
+  `check:print-width`, `check:target-size`, `check:text-spacing`,
+  `check:focus-appearance`: all clean, no new findings since Run 281.
+
+No regression found across any of the ten - the site remains clean on
+every axis this sweep covers, 7 runs/~28 hours and one merged PR
+(`#56` -> `#57` handoff) after the last full pass.
+
+**Open backlog re-confirmed, no change made:**
+- `docs/SOURCES.md` link-liveness sweep: re-tested directly this run
+  (`WebFetch` to `en.wikipedia.org`) rather than assumed from the backlog
+  note - still `ENOTFOUND` from this environment's egress proxy, same
+  block as every prior check. Still blocked.
+- `typescript` 7 upgrade: `pnpm outdated` shows the same single blocked
+  entry as Run 287 (`@astrojs/check@0.9.10` still only declares
+  `typescript: '^5.0.0 || ^6.0.0'`). Still blocked.
+- 2026 Ballon d'Or ceremony: 26 October, now 12 days out - not yet due.
+- UEFA Nations League Team of the Tournament/attendance gaps, EURO Golden
+  Boot youngest-ever winner, `long-title` brand call, excluded historical
+  attendance figures, defensively-unreachable coverage gaps: unchanged
+  from Run 287's own list, nothing new to add this run.
+
+No `content/*.md` file was edited this run (sweep + standing-check
+re-confirmation only), so no PDF rebuild was needed; `git diff` against
+`origin/intensive/football-reference` touches only this file and
+`docs/ROADMAP.md`.
+
+**Left for a future pass:** unchanged from Run 287's own list. The ten
+manual browser sweeps are now current again (this run) - no need to
+re-run until either a layout/CSS-affecting change lands or roughly a week
+passes, whichever comes first.
