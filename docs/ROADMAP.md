@@ -199,10 +199,10 @@ the full run-by-run history behind all of this, see
   this run's date (2026-10-06). Re-check once that date has passed.
 - **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.10` (latest
   published) only declares `typescript: '^5.0.0 || ^6.0.0'` as a peer
-  dependency - re-confirmed via `pnpm outdated` as recently as the
-  two-hundred-and-thirteenth run (2026-10-02; `typescript` still at 5.9.3 vs.
-  7.0.2 latest, no new `@astrojs/check` release). Re-check whenever `pnpm
-  outdated` next shows a new `@astrojs/check` release.
+  dependency - re-confirmed via `pnpm outdated` as recently as Run 287
+  (2026-10-14; `typescript` still at 5.9.3 vs. 7.0.2 latest, no new
+  `@astrojs/check` release). Re-check whenever `pnpm outdated` next shows a
+  new `@astrojs/check` release.
 - **`docs/SOURCES.md` link-liveness sweep**: blocked. This environment's
   outbound network/egress policy rejects direct requests to external
   reference domains - confirmed repeatedly, most recently 2026-10-02
@@ -255,7 +255,15 @@ the full run-by-run history behind all of this, see
 - **Excluded historical attendance figures**: World Cup 1930 and 1950, and
   EURO 1996 and 2020, each have no single attendance figure with a source
   reliable enough to report - left out of their "Final venues" sections on
-  purpose.
+  purpose. 1930/1950 are a genuine dispute (official/paid count vs. a
+  larger total-inside-stadium estimate, both widely cited - no single
+  number can be presented as fact). 1996/2020 are a single-source gap
+  (Run 98, 2026-09-11: 73,611 and 67,173 respectively, but no UEFA.com
+  match page found for either); re-tried with fresh `WebSearch` at Run 287
+  (2026-10-14) and turned up the identical evidence already weighed and
+  rejected (Wikipedia plus 11v11.com/a national-team-results mirror, no
+  UEFA.com page) - not a new source, so still excluded. Re-check only with
+  a genuinely different search angle, not a repeat of the same query.
 - **Hyphenation-rendering visual re-check** (flagged hundred-and-twenty-sixth
   run, 2026-09-15): this environment's Chromium (both the Playwright-bundled
   build and `/opt/pw-browsers/chromium`) lacks ICU hyphenation-pattern data,

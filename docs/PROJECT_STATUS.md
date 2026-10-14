@@ -39864,3 +39864,75 @@ October, now 12 days out). The content-verification rotation itself has
 no overdue file to pick next (see "Milestone" above) - a future run should
 either wait for a content edit to make one stale, or pick one at random
 for a repeat pass if nothing else is more pressing.
+
+### Run 287 (2026-10-14): routine dependency bumps, full cold-start health re-confirmation, EURO 1996/2020 final-attendance re-investigation re-closed with no new angle found
+
+**Branch-strategy note:** confirmed via the GitHub API that PR #56 was
+merged (2026-10-13) and PR #57 (opened fresh by Run 280) correctly tracked
+Runs 280-286's work; `origin/intensive/football-reference` was already a
+strict descendant of `origin/main`, so this run branched straight off it
+with no rebase needed.
+
+With the content-verification rotation and the code-review angle both
+fully closed out as of Run 286 (every `content/*.md` file reviewed within
+the same day; every non-generated source file covered at least once), and
+every "Open backlog" item either not-yet-due, environment-blocked, or
+needing human sign-off, this run did a maintenance/quality pass rather than
+force a content change:
+
+- **Dependency bumps:** `pnpm outdated` showed two safe patch bumps -
+  `@playwright/test` 1.64.0 -> 1.64.1 and `cspell` 10.3.6 -> 10.4.0. Applied
+  both (`pnpm update @playwright/test cspell --latest`). `typescript` 7
+  remains blocked - re-confirmed `@astrojs/check@0.9.10` (still latest, no
+  new release) only declares `typescript: '^5.0.0 || ^6.0.0'` as its peer
+  dependency.
+- **Full cold-start re-confirmation** (this session's container started
+  with no `node_modules`, same situation as Runs 283-286): `pnpm install`
+  (493 packages, no drift), `pnpm lint` (263 files, 0/0/0), `pnpm test`
+  (1071/1071), `pnpm build` (711 pages), all 32 CI-gated `check:*` scripts,
+  `check:pdfs`/`check:pdf-outline` (700/700, no rebuild needed since no
+  content changed), `pnpm audit` (clean), `pnpm dlx knip --no-config-hints`
+  (the one standing `@cspell/dict-hr-hr` false positive, unchanged) - all
+  clean, no drift from Run 286's baseline.
+- **EURO 1996/2020 final-attendance re-investigation:** the "Excluded
+  historical attendance figures" backlog item names four gaps (World Cup
+  1930/1950, EURO 1996/2020) without logging any specific retry history for
+  them, unlike the Nations League attendance item's three logged
+  re-investigations - worth checking whether that silence meant "never
+  retried" or just "not logged as thoroughly." Checked `docs/SOURCES.md`
+  first: World Cup 1930/1950 are a *genuine dispute* (official/paid count
+  vs. a larger total-inside-stadium estimate both widely cited), not a
+  single-source gap, so re-searching wouldn't change anything - correctly
+  left alone. EURO 1996/2020 *are* a single-source gap (Run 98,
+  2026-09-11, already found the figures - 73,611 and 67,173 - but
+  couldn't tie either to a UEFA.com match page). Re-ran fresh `WebSearch`
+  queries for both: found the exact same evidence Run 98 already weighed
+  and rejected (Wikipedia's figure, 11v11.com independently listing the
+  same number, and for 1996 a Germany national-team-results page) - no
+  UEFA.com match page surfaced for either edition, and no new source
+  appeared. Per this project's own retry bar ("until a fresh source
+  surfaces on its own or a genuinely different search angle presents
+  itself"), this is not new evidence, so Run 98's exclusion stands
+  unchanged - no content edit made. Documenting this here (rather than
+  silently re-trying the identical query next time) so a future run can
+  skip straight to "needs a different angle" instead of re-running the same
+  search.
+
+No content files were touched this run (dependency bumps only), so no PDF
+rebuild was needed.
+
+**Verification:** see the cold-start re-confirmation list above - all
+clean. `git diff` confirms only `package.json`/`pnpm-lock.yaml` changed.
+
+**Left for a future pass:** unchanged from Run 286's own list - the two
+open research gaps (Nations League Finals attendance, EURO Golden Boot
+youngest-ever winner, now 9 consecutive negative passes - leave alone per
+Run 256's reasoning absent a new angle), the `typescript` 7 upgrade, the
+`docs/SOURCES.md` link-liveness sweep, the `long-title` brand call, the
+full ~130-winner birth-date ranking (still judged too risky for an
+unattended pass without a trustworthy bulk source), and the 2026 Ballon
+d'Or ceremony re-check (26 October, now 12 days out). The ten manual/
+intensive-run-only browser sweeps were last run in full at Run 281 (six
+runs ago); still not clearly overdue enough to justify the ~2-hour
+`check:color-contrast` budget this run, but worth picking up soon if no
+higher-value item appears first.
