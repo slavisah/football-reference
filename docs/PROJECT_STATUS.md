@@ -40435,3 +40435,65 @@ and CI both already cover, for no new signal.
 **Left for a future pass:** unchanged from Run 293 - the `.git`-bloat
 history-size question is still the user's own call, and the same handful
 of not-yet-due/blocked/needs-sign-off items remain open.
+
+### Run 295 (2026-10-15): full health re-confirmation, clean, no drift from Run 294; re-ran the ten-script manual browser sweep (due again, three runs after Run 292's last full pass) - clean across all ten
+
+Re-read `docs/ROADMAP.md` end to end first, same approach as the last few
+runs: every "Open backlog" entry is still either not-yet-due (2026 Ballon
+d'Or, ceremony 2026-10-26, eleven days out), environment-blocked
+(`typescript` 7 - `@astrojs/check@0.9.10` still caps at `^5.0.0 ||
+^6.0.0`; `docs/SOURCES.md` link-liveness - this container's egress still
+rejects direct fetches to reference domains), or needing human sign-off
+(`long-title`, the `.git`-bloat item). The content-verification rotation
+has all fifteen `content/*.md` files still tied at `lastReviewed:
+2026-10-14` - nothing newly stale to pick up. `pnpm outdated` turned up
+nothing beyond the already-blocked `typescript` 7 upgrade - Run 294
+already caught the four packages that had become available.
+
+With no new content, dependency, or research angle available, and the
+project's own ROADMAP.md explicitly flagging prior drift from runs
+padding this file with "nothing to do, confirmed clean" narrative instead
+of picking up real work, took up the one concrete, not-yet-exhausted item
+on the table instead: the ten-script manual browser/accessibility sweep
+(`check:html`, `check:reflow`, `check:landscape`, `check:text-zoom`,
+`check:print-width`, `check:target-size`, `check:text-spacing`,
+`check:focus-appearance`, `check:lighthouse`, `check:color-contrast`),
+last fully clean at Run 292 (three runs ago, inside the established
+~4-run cadence). Ran it backgrounded with the documented
+`PW_EXECUTABLE_PATH` workaround
+(`/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell.real`),
+end to end in one pass (~30 minutes, no interruption this time). All ten
+passed clean:
+
+- `check:html`: all 711 pages valid HTML5.
+- `check:reflow` (320px), `check:landscape` (667x375), `check:text-zoom`
+  (200%), `check:print-width` (1032px print media), `check:text-spacing`
+  (WCAG 1.4.12): no horizontal overflow on any of the 711 pages.
+- `check:target-size`: every touch-facing control on all 711 pages is
+  still >= 44x44px at 360px.
+- `check:focus-appearance`: every focusable control on all 711 pages
+  still has a visible focus ring of at least 2px (WCAG 2.4.13).
+- `check:lighthouse`: all 39 sampled pages >= 0.9 in every category (the
+  same one documented noindex/SEO exception as always), no actionable
+  back/forward-cache blockers.
+- `check:color-contrast`: zero WCAG 1.4.3 violations across all 711 pages
+  in both color schemes (1,422 page loads total) - the heaviest script in
+  the sweep, unchanged from Run 292.
+
+No regression found anywhere in the sweep.
+
+**Verification:** `pnpm install` (588 packages, no drift), `pnpm lint`
+(263 files, 0 errors/0 warnings/0 hints), `pnpm test` (1071/1071), `pnpm
+build` (711 pages), `pnpm check:pdfs` (all 700 up to date - no
+`content/*.md` edit this run), `pnpm outdated` (only the already-blocked
+`typescript` 7), `pnpm audit` (clean) - no drift from Run 294. Plus the
+full ten-script sweep above. Re-confirmed PR #57
+(`intensive/football-reference` -> `main`) still open and current via the
+GitHub API, no review comments waiting on a reply.
+
+**Left for a future pass:** unchanged from Run 294 - the `.git`-bloat
+history-size question is still the user's own call, and the same handful
+of not-yet-due/blocked/needs-sign-off items remain open. The ten-script
+sweep is freshly clean again; treat it as a normal periodic re-run
+candidate after another few runs or a real CSS/layout change, not an open
+item.
