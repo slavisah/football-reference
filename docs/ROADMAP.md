@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (293 intensive runs as of 2026-10-15) lives
+verification sweep and decision (294 intensive runs as of 2026-10-15) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -93,7 +93,17 @@ with `PW_EXECUTABLE_PATH` pointed at the pre-installed
 Run 265's own fix - zero WCAG 1.4.3 violations across all 711 pages in
 both color schemes; `check:lighthouse` also reconfirmed, 39 pages all
 >= 0.9 in every category with the same one documented noindex/SEO
-exception as before) rather than on every change.
+exception as before) rather than on every change. Run 294 found this same
+`PW_EXECUTABLE_PATH` fix is also needed for `pnpm test:e2e` in this
+session's container (not just the ten manual scripts above) - without it,
+every test fails instantly with a `chrome-headless-shell`
+executable-not-found error (the cache only has the `-1194` revision,
+whatever `@playwright/test` release this container's cache predates looks
+for a later one); with it, a 43-test sample (including every axe-core-
+driven accessibility spec, the ones most likely to break from that run's
+`@axe-core/playwright` bump) passed clean before the full 1055-test run
+was handed off to CI, which runs the same suite with its own clean
+Playwright browser install on every PR push.
 `knip` shows exactly one standing false positive (`@cspell/dict-hr-hr`,
 used only via `.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS
 `import` knip's static analysis can see). Current counts (confirmed fresh

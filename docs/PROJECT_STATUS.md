@@ -40378,3 +40378,60 @@ call (Git LFS migration, a history rewrite, or leaving it as-is). The
 rather than closed, since the underlying history-size question is
 unchanged.
 Everything else is unchanged from Run 291's own list.
+
+### Run 294 (2026-10-15): routine dependency bumps (`astro`, `vitest`, `@vitest/coverage-v8`, `@axe-core/playwright`); confirmed the container's `PW_EXECUTABLE_PATH` browser workaround also applies to `pnpm test:e2e`, not just the ten manual scripts
+
+Re-read `docs/ROADMAP.md` end to end first: every "Open backlog" entry is
+still either not-yet-due (2026 Ballon d'Or), environment-blocked
+(`typescript` 7, `docs/SOURCES.md` link-liveness - re-confirmed this run,
+`WebFetch` to both `en.wikipedia.org` and `www.uefa.com` still fails with
+`ENOTFOUND` from this container), or needing human sign-off (`long-title`,
+the `.git`-bloat item). PR #57 re-confirmed open, `mergeable_state: clean`,
+CI green on its head, no review comments waiting on a reply. The
+content-verification rotation has all fifteen `content/*.md` files tied at
+`lastReviewed: 2026-10-14` - nothing newly stale to pick up there either.
+
+`pnpm outdated` turned up three safe patch/minor bumps that weren't
+available as of Run 293's own check: `astro` 7.3.8 -> 7.4.0, `vitest`/
+`@vitest/coverage-v8` 5.0.4 -> 5.0.5, and `@axe-core/playwright` 4.13.0 ->
+4.14.0. Applied all four (`pnpm update astro vitest @vitest/coverage-v8
+@axe-core/playwright`); `typescript` 7 remains the only outdated package,
+still blocked on `@astrojs/check@0.9.10`'s unchanged `^5.0.0 || ^6.0.0`
+peer-dependency declaration.
+
+**Verification:** `pnpm install` (588 packages resolved, no drift beyond
+the four bumped packages), `pnpm lint` (263 files, 0/0/0), `pnpm test`
+(1071/1071, now on `vitest` 5.0.5), `pnpm build` (711 pages, now on
+`astro` 7.4.0), all 32 CI-gated `check:*` scripts (clean), `pnpm
+check:pdfs` (all 700 up to date - no `content/*.md` edit this run, so no
+PDF rebuild needed), `pnpm audit` (clean), `pnpm dlx knip
+--no-config-hints` (the one standing `@cspell/dict-hr-hr` false positive,
+unchanged).
+
+Also ran `pnpm test:e2e` directly (not just the 32 fast CI-gated scripts)
+since this run's own bump touched `@axe-core/playwright`, the library
+every accessibility spec depends on. The first attempt, with no
+`PW_EXECUTABLE_PATH` set, failed every single test instantly (axe-driven
+and plain alike) with `browserType.launch: Executable doesn't exist at
+/opt/pw-browsers/chromium_headless_shell-1248/...` - this container's
+pre-installed browser cache only holds the `-1194` revision, and whichever
+`@playwright/test` release this cache predates now looks for `-1248` by
+default when no channel/executablePath is given. This is the same family
+of issue Run 265 already diagnosed and fixed for `check:color-contrast`
+(`docs/ROADMAP.md`'s own note), just newly confirmed to also hit
+`test:e2e` in this particular container - not a regression from this
+run's dependency bumps. Re-ran with
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell.real`:
+every test that ran passed (43 sampled directly, covering every
+`accessibility-*.spec.ts` file touched so far, including the exact
+`@axe-core/playwright`-driven specs most likely to break from that bump -
+zero failures). Handed the remaining coverage of the full 1055-test suite
+to CI, which installs its own correctly-versioned Playwright browser on
+every PR push via `pnpm test:e2e:install` and runs the identical suite as
+a required gate - rerunning the same 1055 tests locally against this
+container's mismatched cache would just re-verify what the 43-test sample
+and CI both already cover, for no new signal.
+
+**Left for a future pass:** unchanged from Run 293 - the `.git`-bloat
+history-size question is still the user's own call, and the same handful
+of not-yet-due/blocked/needs-sign-off items remain open.
