@@ -40300,4 +40300,81 @@ run, so no PDF rebuild was needed.
 own direction. The ten-script manual browser sweep is now freshly
 confirmed clean (treat it as a normal periodic re-run candidate again
 after enough runs or content/CSS changes accumulate, not an open item).
+
+### Run 293 (2026-10-15): `scripts/generate-pdfs.mjs` now skips re-rendering a PDF whose sources haven't changed, cutting future `.git` growth from Run 289's bloat diagnosis without any destructive history action
+
+Re-read `docs/ROADMAP.md` end to end first: every "Open backlog" entry is
+still either not-yet-due, environment-blocked, or needing human sign-off,
+and the content-verification rotation has every `content/*.md` file tied
+at 2026-10-14 - no new content or dependency work available, same as Runs
+291-292 found. PR #57 re-confirmed open, `mergeable_state: clean`, CI
+green on its head, no review comments waiting on a reply.
+
+Picked up a genuinely new angle on the one urgent, still-open item: Run
+289's `.git`-bloat diagnosis (confirmed again this run: `.git fetch` is
+still fine today, but the root cause stands) found that `generate-pdfs.mjs`
+unconditionally re-renders and rewrites **every** PDF on every
+`pnpm build:pdfs` run, even when nothing feeding a given PDF (its
+`content/*.md` table, the rendering `.ts`/`.astro` files, `global.css`,
+`docs/SOURCES.md` - `pdf-pages.mjs`'s own per-slug `sources` lists, already
+comprehensive enough to catch a rendering-code-only bug per that file's own
+header comment) has changed since the last run - because Chromium's
+`page.pdf()` output isn't byte-stable across runs even for identical input
+(`/CreationDate`/`/ModDate` always change; `/Creator` and the compressed
+content streams can too across Chromium builds). Since `AGENTS.md` requires
+a full PDF rebuild after any `content/*.md` edit, nearly every
+content-touching run was committing a fresh ~500 MB wholesale rewrite of
+all 700 PDFs regardless of which one or two the edit actually affected -
+confirmed by Run 289 as almost certainly the dominant driver of the
+bloat that broke `git fetch` for that run.
+
+This doesn't touch what's already in history - migrating to Git LFS or
+rewriting history to drop old PDF blobs are still real architectural/risk
+calls for the user alone to make, exactly as Run 289 flagged - but it stops
+digging the hole deeper on every future run. `generate-pdfs.mjs` now loads
+the already-committed `.pdf-manifest.json` before rendering anything, and
+before each of the four PDF families (the six-competition/`/records`-style
+`PDF_PAGES` list, team, player, and edition PDFs) re-renders and rewrites a
+given slug, it first re-hashes that slug's own `sources` list and skips the
+render entirely if the hash still matches the manifest's recorded one *and*
+the PDF file is already on disk - logging `Skipping <file> (unchanged since
+last build:pdfs)` instead. `FORCE_ALL_PDFS=1` bypasses this and forces a
+full regeneration regardless, for the cases this hash model can't see (a
+Playwright/Chromium version bump, or any other change that isn't one of
+`pdf-pages.mjs`'s own tracked files).
+
+Verified both directions directly against the live 700-PDF set, not just
+reasoned about: a clean `pnpm build:pdfs` run (nothing in `pdf-pages.mjs`'s
+tracked sources changed) regenerated 0 of 700 PDFs, skipped all 700, and
+left `public/downloads/` and its manifest byte-for-byte identical to the
+already-committed copies (`git status --short public/downloads/` empty
+afterward) - confirming the no-op case produces a genuinely empty diff
+instead of a 500 MB rewrite. Then, as a targeted positive-control test
+(reverted afterward, not part of this commit), touched a single
+narrowly-scoped source file (`src/pages/competitions/ballon-dor.astro`,
+which only `ballon-dor`'s own `PDF_PAGES` entry depends on) and re-ran:
+exactly 1 of 700 PDFs regenerated (`ballon-dor.pdf`) and 699 stayed
+skipped, with `git status --short public/downloads/` showing only that one
+PDF plus one manifest line changed - confirming the skip logic is neither
+too eager (it still catches a real change) nor too lazy (it doesn't touch
+anything it shouldn't). `pnpm check:pdfs` still passes cleanly against the
+resulting manifest either way, since this change doesn't alter what the
+manifest records, only when a PDF actually gets re-rendered.
+
+**Verification:** `pnpm install --frozen-lockfile` (495 packages, no
+drift), `pnpm lint` (263 files, 0/0/0), `pnpm test` (1071/1071), `pnpm
+build` (711 pages), `pnpm check:pdfs` (all 700 up to date), `pnpm outdated`
+(only the already-blocked `typescript` 7 upgrade), `pnpm audit` (clean),
+`knip` (the one standing `@cspell/dict-hr-hr` false positive, unchanged) -
+no drift from Run 292 beyond this run's own change. No `content/*.md` file
+was edited, so the normal "rebuild PDFs after a content edit" rule doesn't
+apply here - this run's own PDF regeneration above was the verification,
+not a content-driven rebuild.
+
+**Left for a future pass:** this only slows further growth; it doesn't
+shrink the ~5 GB already in `.git` history, which is still the user's own
+call (Git LFS migration, a history rewrite, or leaving it as-is). The
+`.git`-bloat `docs/ROADMAP.md` item is updated to note this mitigation
+rather than closed, since the underlying history-size question is
+unchanged.
 Everything else is unchanged from Run 291's own list.

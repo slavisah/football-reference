@@ -197,6 +197,13 @@ Chromium) to render and print each page, which would slow down every deploy
 for a file that only changes when editorial content does. See
 `scripts/generate-pdfs.mjs`.
 
+It only re-renders and rewrites the PDF(s) whose own sources (per
+`scripts/pdf-pages.mjs`) actually changed since the last run - everything
+else is skipped, so a normal content edit produces a small, targeted diff
+under `public/downloads/` rather than rewriting all 700 files. Set
+`FORCE_ALL_PDFS=1` before the command above to force a full regeneration
+regardless (e.g. after a Playwright/Chromium version bump).
+
 If you forget, CI now catches it: `pnpm check:pdfs`
 (`scripts/check-pdf-freshness.mjs`) compares a hash of each PDF's source
 content against a manifest recorded the last time `pnpm build:pdfs` ran, and

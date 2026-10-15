@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (292 intensive runs as of 2026-10-15) lives
+verification sweep and decision (293 intensive runs as of 2026-10-15) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -224,13 +224,27 @@ the full run-by-run history behind all of this, see
   attempted this run - every option carries real risk or a design call a
   human should make, not an unattended routine: migrating
   `public/downloads/*.pdf` to Git LFS (changes how the repo is cloned/
-  deployed), rewriting history to drop old PDF blobs (destructive, rewrites
-  shared history), or regenerating/committing only the PDFs whose source
-  page actually changed instead of all 700 every time (would slow future
-  growth but not shrink what's already there, and `scripts/generate-pdfs.mjs`
-  doesn't currently have a way to tell which pages changed). Needs the user's
-  own call on which direction (if any) to take; a future run should not
-  attempt a destructive history rewrite without that sign-off.
+  deployed), or rewriting history to drop old PDF blobs (destructive,
+  rewrites shared history). Needs the user's own call on which direction (if
+  any) to take; a future run should not attempt a destructive history
+  rewrite without that sign-off.
+
+  **Partially mitigated, Run 293 (2026-10-15):** the third option above -
+  regenerating/committing only the PDFs whose source actually changed,
+  instead of all 700 every time - is no longer blocked on
+  `scripts/generate-pdfs.mjs` having no way to tell which pages changed; it
+  already has one (`pdf-pages.mjs`'s per-slug `sources` lists plus the
+  committed `.pdf-manifest.json`), it just wasn't being used to skip
+  anything. `generate-pdfs.mjs` now re-hashes each slug's sources before
+  rendering it and skips the render (and the resulting binary rewrite)
+  entirely when the hash still matches the manifest and the file is already
+  on disk - verified directly against the live 700-PDF set: a no-op
+  `pnpm build:pdfs` run (nothing changed) regenerated 0/700 with an empty
+  `public/downloads/` diff, and a single-file-touch test regenerated exactly
+  1/700. This stops future growth from the common case (most runs touch one
+  or two content files, not all of them) but does not shrink the ~5 GB
+  already in `.git` history - the Git-LFS/history-rewrite choice above is
+  still open and still the user's own call.
 - **2026 Ballon d'Or edition**: not due yet, not blocked. The two-hundred-
   and-forty-first run confirmed via `WebSearch` that the ceremony is
   scheduled for 26 October 2026 in London (its first time outside Paris) -
