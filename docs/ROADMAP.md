@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (289 intensive runs as of 2026-10-14) lives
+verification sweep and decision (290 intensive runs as of 2026-10-15) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -392,3 +392,12 @@ the full run-by-run history behind all of this, see
   few runs rather than retrying with no new angle each time, per Run 256's
   own reasoning, until either a fresh source surfaces on its own or a
   genuinely different search angle presents itself.
+- **Copa América Best Player / EURO Player of the Tournament "oldest-
+  youngest-ever" facts** (tried Run 290, 2026-10-15): no source ranks
+  either award's winners by age or frames any one of them as a record
+  holder, so neither was shipped - same bar as the item above (an
+  already-published superlative claim, never a self-computed one). Dani
+  Alves (2019 Copa América Best Player, won at 36) and Lionel Messi (2021,
+  won at 34) are the strongest self-computed "oldest" candidates if a
+  source ever does surface. Re-try only with a genuinely different search
+  angle, not a repeat of the same query.

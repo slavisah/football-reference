@@ -40124,3 +40124,83 @@ is unchanged from Run 288's own list - every "Open backlog" item is still
 either not-yet-due, environment-blocked, or needing human sign-off, and the
 ten manual browser sweeps stay current (re-run by Run 288, no CSS/layout
 change since).
+
+### Run 290 (2026-10-15): confirmed PR #56 was merged by the user and PR #57 is the new active rolling branch; full health re-confirmation, clean; two new "oldest/youngest-ever" award facts investigated and ruled out, no converging source
+
+This run opened by checking the eleven-run-running standing flag from Runs
+263/268-279 (PR #56 open 11+ days, 78+ commits, never merged) against
+GitHub directly rather than assuming it was still unresolved: PR #56 was in
+fact merged by the user (`merged_by: slavisah`) on 2026-10-13, and a fresh
+PR #57 (`intensive/football-reference` -> `main`) opened automatically two
+hours later for this routine's continued work, already carrying Runs
+280-289's commits by the time this run started. The thirteen-run escalation
+worked - noted here so a future run doesn't re-raise it as still-open.
+
+This run's own `git fetch origin` was slow enough to need a background
+retry before completing (no hard failure this time, unlike Run 289's two
+outright `RPC failed`/`early EOF` errors), consistent with Run 289's own
+diagnosis that `.git`'s history-driven size (5+ GB, from every
+content-touching run's non-deterministic full 700-PDF binary rewrite) is a
+live, worsening fetch-reliability risk, not just a disk-space one. No new
+diagnosis attempted this run - Run 289's own three flagged options (Git LFS,
+history rewrite, or regenerating/committing only changed PDFs) still each
+carry either real risk or an architecture/product call that belongs to the
+user, and this run found no new information that would change that
+assessment. Still needs the user's own direction before any run acts on it.
+
+With the PR-56 flag resolved and no new fetch failure to re-diagnose, this
+run read the full `docs/ROADMAP.md` backlog end to end looking for a
+not-yet-done, not-blocked item: every "Open backlog" entry is still either
+not-yet-due (2026 Ballon d'Or, 11 days out), environment-blocked
+(`typescript` 7, `docs/SOURCES.md` link-liveness - re-confirmed this run,
+`WebFetch` to `en.wikipedia.org` now fails with `getaddrinfo ENOTFOUND`
+rather than the previously-seen `EGRESS_BLOCKED`, but the practical result
+is identical: still no direct-fetch access), or needing human sign-off
+(`long-title`, the new `.git`-bloat item). The content-verification
+rotation has every `content/*.md` file reviewed as of yesterday (2026-10-14,
+Run 286's nine-way-tie closeout), so nothing there was stale enough to
+re-check yet either.
+
+Rather than force a page/feature that doesn't exist to build, tried two
+narrow, low-risk research angles in the same spirit as the already-shipped
+Ballon d'Or/Golden Boot "oldest/youngest-ever" extremes - an
+already-published superlative claim, independently sourced, never a
+self-computed one:
+- **Copa América Best Player (Golden Ball) award, oldest/youngest-ever
+  winner:** fresh `WebSearch` pass. No source ranks the 16 winners
+  (1987-2024) by age or frames any one of them as a record holder - only
+  unrelated appearance/scoring age records turned up (Humberto Elgueta,
+  youngest-ever *player* in a Copa América match, 1920; Claudio Bravo,
+  oldest-ever *player*, 2024 - neither is a Best Player award fact). Dani
+  Alves (2019, won the award at 36) and Lionel Messi (2021, won at 34) are
+  self-computed candidates for "oldest," same as Jamal Musiala's EURO
+  Golden Boot case - not shipped, for the same reason that one wasn't:
+  no independent source actually calls either a record.
+- **UEFA EURO Player of the Tournament, oldest/youngest-ever winner:**
+  fresh `WebSearch` pass. Found plenty of EURO age-record coverage, but all
+  of it is for the separate, already-named-on-the-page Young Player of the
+  Tournament award (Renato Sanches 2016, Lamine Yamal 2024) or for
+  tournament-wide appearance/scoring records (Pepe, Modrić) - nothing
+  ranking the senior Player of the Tournament winners themselves by age.
+
+Both ruled out for now rather than shipped from a self-computed comparison;
+added as a single compact bullet to `docs/ROADMAP.md`'s "Ideas not yet
+scoped" section so a future run doesn't repeat the identical searches
+without a new angle, matching the EURO Golden Boot item's own precedent.
+
+**Verification:** full standing health check, run fresh (cold-start
+container, no prior `node_modules`): `pnpm install` (495 packages, no
+drift), `pnpm lint` (263 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(1071/1071), `pnpm build` (711 pages), all 33 CI-gated `check:*` scripts run
+individually - all clean, `pnpm outdated` (only the already-known-blocked
+`typescript` 7 upgrade), `pnpm audit` (no known vulnerabilities), `pnpm dlx
+knip --no-config-hints` (the one standing `@cspell/dict-hr-hr` false
+positive, unchanged) - no drift from Run 289. The ten manual browser sweeps
+were not re-run (done two runs ago at Run 288, no CSS/layout change since).
+No `content/*.md` file was edited this run (both research angles came back
+negative), so no PDF rebuild was needed.
+
+**Left for a future pass:** the `.git`-bloat item still needs the user's
+own direction before any run acts on it. Everything else is unchanged from
+Run 289's own list - every "Open backlog" item is still either not-yet-due,
+environment-blocked, or needing human sign-off.
