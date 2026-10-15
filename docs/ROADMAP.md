@@ -84,9 +84,8 @@ into `.github/workflows/ci.yml` as required PR gates; the other ten
 `check:text-spacing`/`check:focus-appearance`/`check:color-contrast`) are
 full-site Playwright/browser sweeps kept manual/intensive-run-only rather
 than a required PR gate, purely for their ~700-to-1,400-page-load runtime -
-re-run periodically (most recently Run 292, four runs after the prior
-full pass at Run 288 - Run 291's own attempt was lost mid-run to a
-container restart, not a failure: all ten clean, including
+re-run periodically (most recently Run 295, three runs after the prior
+full pass at Run 292 - all ten clean again, including
 `check:color-contrast` - the heaviest, ~1,400 page loads, confirmed clean
 with `PW_EXECUTABLE_PATH` pointed at the pre-installed
 `chromium_headless_shell-1194/chrome-linux/headless_shell.real` binary per
