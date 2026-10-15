@@ -40250,3 +40250,54 @@ file was edited this run, so no PDF rebuild was needed.
 own direction. The ten-script manual browser sweep is now overdue for a
 real (uninterrupted) re-run. Everything else is unchanged from Run 290's
 own list.
+
+### Run 292 (2026-10-15): completed the ten-script manual browser sweep Run 291 started but lost to a container restart - clean across all ten, closing that re-run candidate
+
+Re-read `docs/ROADMAP.md` end to end first, same approach as Runs 290-291:
+every "Open backlog" entry is still either not-yet-due (2026 Ballon d'Or),
+environment-blocked (`typescript` 7, `docs/SOURCES.md` link-liveness), or
+needing human sign-off (`long-title`, the `.git`-bloat item from Run 289).
+The content-verification rotation has every `content/*.md` file reviewed
+as of 2026-10-14 (all fifteen still tied), and `pnpm outdated` turned up
+nothing beyond the already-blocked `typescript` 7 upgrade - no new content
+or dependency work available to pick up, same as Run 291 found.
+
+Took up the one concrete item Run 291 explicitly left open rather than
+re-attempting a fresh angle on an already-exhausted research item: the
+ten-script manual browser sweep (`check:html`, `check:reflow`,
+`check:landscape`, `check:text-zoom`, `check:print-width`,
+`check:target-size`, `check:text-spacing`, `check:focus-appearance`,
+`check:lighthouse`, `check:color-contrast`) that Run 291 started but lost
+mid-run to a container restart. Ran it backgrounded, with the documented
+`PW_EXECUTABLE_PATH` workaround pointed at
+`/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell.real`,
+and let it run to completion this time rather than racing it. All ten
+scripts passed clean:
+
+- `check:html`: all 711 pages valid against the HTML5 content model.
+- `check:reflow`, `check:landscape`, `check:text-zoom`,
+  `check:print-width`, `check:target-size`, `check:text-spacing`,
+  `check:focus-appearance`: no violations.
+- `check:lighthouse`: all 39 sampled pages >= 0.9 in every category (1
+  known, bounded noindex/SEO exception on the 404 page), no actionable
+  back/forward-cache blockers.
+- `check:color-contrast`: zero WCAG 1.4.3 violations across all 711 pages
+  in both color schemes (1,422 page loads total).
+
+This closes the sweep Run 291 flagged as "now overdue for a real
+(uninterrupted) re-run" - no regression found, full re-confirmation.
+
+**Verification:** `pnpm install --frozen-lockfile` (495 packages, no
+drift), `pnpm lint` (263 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(1071/1071), `pnpm build` (711 pages), `pnpm outdated` (only the
+already-blocked `typescript` 7 upgrade) - no drift from Run 291. Plus the
+full ten-script sweep above. Re-confirmed PR #57
+(`intensive/football-reference` → `main`) still open, `mergeable_state:
+clean`, unchanged since Run 291. No `content/*.md` file was edited this
+run, so no PDF rebuild was needed.
+
+**Left for a future pass:** the `.git`-bloat item still needs the user's
+own direction. The ten-script manual browser sweep is now freshly
+confirmed clean (treat it as a normal periodic re-run candidate again
+after enough runs or content/CSS changes accumulate, not an open item).
+Everything else is unchanged from Run 291's own list.

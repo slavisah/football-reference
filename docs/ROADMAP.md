@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (290 intensive runs as of 2026-10-15) lives
+verification sweep and decision (292 intensive runs as of 2026-10-15) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -84,10 +84,11 @@ into `.github/workflows/ci.yml` as required PR gates; the other ten
 `check:text-spacing`/`check:focus-appearance`/`check:color-contrast`) are
 full-site Playwright/browser sweeps kept manual/intensive-run-only rather
 than a required PR gate, purely for their ~700-to-1,400-page-load runtime -
-re-run periodically (most recently Run 288, seven runs after the prior
-full pass at Run 281: all ten clean, including `check:color-contrast` -
-the heaviest, ~1,400 page loads, confirmed clean with
-`PW_EXECUTABLE_PATH` pointed at the pre-installed
+re-run periodically (most recently Run 292, four runs after the prior
+full pass at Run 288 - Run 291's own attempt was lost mid-run to a
+container restart, not a failure: all ten clean, including
+`check:color-contrast` - the heaviest, ~1,400 page loads, confirmed clean
+with `PW_EXECUTABLE_PATH` pointed at the pre-installed
 `chromium_headless_shell-1194/chrome-linux/headless_shell.real` binary per
 Run 265's own fix - zero WCAG 1.4.3 violations across all 711 pages in
 both color schemes; `check:lighthouse` also reconfirmed, 39 pages all
