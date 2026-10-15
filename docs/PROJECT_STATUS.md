@@ -40204,3 +40204,49 @@ negative), so no PDF rebuild was needed.
 own direction before any run acts on it. Everything else is unchanged from
 Run 289's own list - every "Open backlog" item is still either not-yet-due,
 environment-blocked, or needing human sign-off.
+
+### Run 291 (2026-10-15): full health re-confirmation, clean, no drift from Run 290; `docs/SOURCES.md` link-liveness re-tested and still blocked; ten-script manual browser sweep interrupted mid-run by a container restart, not re-attempted this run since Run 288 already covered it one day ago with no CSS/layout change since
+
+Re-read `docs/ROADMAP.md` end to end looking for a not-yet-done, not-blocked
+item before falling back to a maintenance pass, same as Run 290's own
+approach: every "Open backlog" entry is still either not-yet-due (2026
+Ballon d'Or, now 11 days out), environment-blocked (`typescript` 7,
+`docs/SOURCES.md` link-liveness), or needing human sign-off (`long-title`,
+the `.git`-bloat item from Run 289). The content-verification rotation has
+every `content/*.md` file reviewed as of 2026-10-14 (all fifteen tied on
+the same `lastReviewed` date), so nothing there was stale enough to re-pick
+yet either, and `pnpm outdated` turned up nothing beyond the
+already-blocked `typescript` 7 upgrade - no new dependency bump available.
+
+Re-tested `docs/SOURCES.md`'s link-liveness blocker directly rather than
+assuming the prior result still holds: `WebFetch` to
+`en.wikipedia.org` still fails (`getaddrinfo ENOTFOUND`), matching Run 290's
+own re-check - no change in this environment's egress policy.
+
+Started the ten-script manual browser sweep (`check:html` through
+`check:color-contrast`/`check:lighthouse`, last run in full at Run 288) as
+this run's quality-pass pick, backgrounded with the documented
+`PW_EXECUTABLE_PATH` workaround. The container running this session was
+restarted mid-sweep (after `check:html` had started) and the in-progress
+run was lost with no result - not a code or environment regression, just
+infrastructure churn. Given Run 288 already ran the full sweep clean one
+day ago with no CSS/layout/content change in between, re-attempting it a
+second time this run would almost certainly just re-confirm the same clean
+result at real time cost, so it was not re-attempted; a future run should
+still treat it as a normal periodic re-run candidate (not "done this run")
+rather than assume this attempt's interruption counted.
+
+**Verification:** `pnpm install --frozen-lockfile` (495 packages, no
+drift), `pnpm lint` (263 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(1071/1071), `pnpm build` (711 pages), `pnpm outdated` (only the
+already-blocked `typescript` 7 upgrade), `pnpm audit` (no known
+vulnerabilities), `pnpm dlx knip --no-config-hints` (the one standing
+`@cspell/dict-hr-hr` false positive, unchanged) - no drift from Run 290.
+Re-confirmed PR #57 (`intensive/football-reference` → `main`) still open,
+`mergeable_state: clean`, CI green on its current head. No `content/*.md`
+file was edited this run, so no PDF rebuild was needed.
+
+**Left for a future pass:** the `.git`-bloat item still needs the user's
+own direction. The ten-script manual browser sweep is now overdue for a
+real (uninterrupted) re-run. Everything else is unchanged from Run 290's
+own list.
