@@ -40497,3 +40497,116 @@ of not-yet-due/blocked/needs-sign-off items remain open. The ten-script
 sweep is freshly clean again; treat it as a normal periodic re-run
 candidate after another few runs or a real CSS/layout change, not an open
 item.
+
+### Run 296 (2026-10-16): code-review angle on Run 293's new PDF-skip-cache logic - split it into a testable module and gave it real unit test coverage; two negative research retries, no new content
+
+With PR #56 confirmed merged (by the user, 2026-10-13) and PR #57 open and
+current, picked up where Run 295 left off. Every open `docs/ROADMAP.md`
+backlog item is still either not-yet-due (2026 Ballon d'Or, ten days out),
+environment-blocked (`typescript` 7 - `pnpm outdated` still shows only that
+one entry; `docs/SOURCES.md` link-liveness - a fresh `WebFetch` to
+`en.wikipedia.org` still fails at the DNS level, `getaddrinfo ENOTFOUND`),
+or needing human sign-off (`.git`-bloat, `long-title`). The content-
+verification rotation has all 15 `content/*.md` files tied at
+`lastReviewed: 2026-10-14`, with nothing left to differentiate a next pick.
+
+Two fresh-angle research retries on the longest-dormant open items, per
+Run 256's own "retry only with a genuinely different search angle" rule
+(last tried: UEFA Nations League attendance at Run 162/251, EURO Golden
+Boot youngest-ever at Run 276) - both came back negative again, same as
+every prior attempt: the 2023 Nations League Finals attendance search
+still resolves to the same single Wikipedia-derived 41,110 figure with no
+second independently-sourced number; a "EURO Golden Boot youngest ever"
+search surfaces EURO's youngest-*scorer* records (Yamal, Rooney, Sanches)
+but nothing naming a youngest Golden-Boot-*winner* specifically. No content
+change - both items stay exactly as documented in `docs/ROADMAP.md`.
+
+With no safe new content to ship, took the one genuinely new angle instead:
+the code-review technique (Runs 267-276, closed for every file in
+`src/lib/*.ts`/`src/components/*.astro`/`src/pages/**`/`scripts/*.mjs`/
+`src/layouts/BaseLayout.astro` as of Run 275) explicitly reopens for a file
+"after a future run materially edits" it - and Run 293 did exactly that to
+`scripts/generate-pdfs.mjs`, adding its `loadExistingManifest`/
+`fileExists`/`hashesMatch`/`hashSources`/`buildManifest` PDF-regeneration-
+skip logic with only a manual "verified directly against the live 700-PDF
+set" check, no unit test. Reviewed that new logic specifically rather than
+re-scanning the whole already-closed codebase.
+
+**Finding:** no live bug - `hashesMatch()`'s key-count check (not just
+iterating one side's keys) already correctly treats a `sources`-list
+edit (a file added or removed from a PDF's dependency list) as "changed"
+even when every key the two hash maps still share continues to match, and
+`buildManifest()` always re-hashes every entry fresh at the end of a run
+regardless of which PDFs were skipped, so the committed manifest never
+drifts from what's actually on disk. The one real limitation found -
+`skipUnchanged()` only ever checks whether a PDF's *sources* changed, never
+whether the on-disk PDF file itself is still intentionally well-formed (a
+manually corrupted or half-written PDF with an unchanged source hash would
+now be skipped forever instead of self-healing on the next content-
+triggered regeneration, the way the old unconditional-rewrite behavior
+incidentally did) - but this is a pre-existing property of the whole
+manifest-based freshness design, not a regression: `check-pdf-
+freshness.mjs`'s `pnpm check:pdfs` already only ever compares hashes
+against the same manifest, never a PDF's own byte content, and that
+tradeoff was already deliberately made and documented when `check:pdfs`
+itself shipped (2026-08-06) - not something this run's own code-review
+pass needs to fix.
+
+**Shipped anyway, since the lack of test coverage was real:** this logic,
+if subtly wrong, would silently mean a stale PDF never regenerates (the
+same bug this whole feature exists to avoid committing, just one level
+up) - exactly the kind of currently-correct-but-untested risk the other
+code-review passes have been fixing by adding regression tests, not just
+reading the code and moving on. `generate-pdfs.mjs` can't be imported
+directly in a test, though: its own `main()` call at the bottom runs
+unconditionally the moment the module loads, which would spin up a whole
+`astro preview` server and launch Chromium just to import one helper
+function. Split `loadExistingManifest`/`fileExists`/`hashesMatch`/
+`hashSources`/`buildManifest` out into a new side-effect-free module,
+`scripts/pdf-manifest.mjs` (mirroring why `pdf-metadata.mjs`'s
+`addAuthorMetadata()` already lives in its own importable file rather than
+inline in `generate-pdfs.mjs`), with `generate-pdfs.mjs` now importing them
+and passing `ROOT`/`MANIFEST_PATH` in explicitly instead of closing over
+module-level constants. Added `tests/unit/pdfManifest.test.ts` (15 cases):
+`hashesMatch()`'s match/mismatch/grown-key/shrunk-key/different-key/absent-
+manifest-entry/both-empty cases, `fileExists()`/`loadExistingManifest()`
+against real temp files (including the ENOENT-to-`{}` and malformed-JSON-
+rethrows-rather-than-swallows paths), and `hashSources()`/`buildManifest()`
+hashing real temp fixture files (deterministic, content-dependent, and
+per-slug-keyed).
+
+Two TypeScript errors surfaced immediately from `pnpm lint` once the test
+file indexed the new module's inferred-`{}` return types with a string key
+- fixed by adding explicit JSDoc `@param`/`@returns` annotations to
+`hashSources()`/`buildManifest()` in `pdf-manifest.mjs` (this project's
+`tsconfig.json` has `allowJs` but not `checkJs`, so a plain `.mjs` file's
+own body is never type-checked, but a `.ts` file that imports and indexes
+its return value still gets inference-based errors without one).
+
+**Verified the refactor didn't change real behavior**, not just that the
+new unit tests pass in isolation: ran `PW_EXECUTABLE_PATH=.../
+headless_shell.real pnpm build:pdfs` against the live 700-PDF set
+afterward, the same positive-control style check Run 293 itself used -
+`0 PDF(s) regenerated, 700 unchanged and skipped (of 700 total)`, an empty
+`git status` diff on `public/downloads/`, and `pnpm check:pdfs` still
+passing clean immediately after.
+
+**Verification:** `pnpm install --frozen-lockfile` (no drift), `pnpm lint`
+(265 files - two new, 0 errors/0 warnings/0 hints), `pnpm test` (1086/1086,
++15 new), `pnpm build` (711 pages, unchanged), `pnpm check:pdfs` (700/700,
+re-confirmed twice - before and after the live `build:pdfs` run above),
+`pnpm dlx knip --no-config-hints` (same one standing `@cspell/dict-hr-hr`
+false positive, no new unused export flagged for `pdf-manifest.mjs`),
+`pnpm audit` (clean), `pnpm outdated` (only the already-blocked
+`typescript` 7). No `content/*.md` touched, so no PDF regeneration was
+owed under AGENTS.md's rule - confirmed directly rather than assumed, since
+this run's own change happened to touch the PDF-generation script itself.
+
+**Left for a future pass:** unchanged - the `.git`-bloat/`typescript`
+7/`docs/SOURCES.md` link-liveness/`long-title` items all stay exactly as
+documented in `docs/ROADMAP.md`; the two research retries above found
+nothing new, so stay noted there rather than reopened as "untried." The
+code-review angle is now closed for `scripts/generate-pdfs.mjs` again
+(and newly extends to its own `scripts/pdf-manifest.mjs` split, already
+covered by this run's own tests) - re-open only after a future run
+materially edits either file.
