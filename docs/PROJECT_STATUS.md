@@ -40610,3 +40610,65 @@ code-review angle is now closed for `scripts/generate-pdfs.mjs` again
 (and newly extends to its own `scripts/pdf-manifest.mjs` split, already
 covered by this run's own tests) - re-open only after a future run
 materially edits either file.
+
+### Run 297 (2026-10-16): tightened the `.git`-bloat backlog item into an actionable three-option comparison instead of restating the same open question a ninth time; full health re-confirmed, no drift
+
+Every other open `docs/ROADMAP.md` item is still not-yet-due (2026 Ballon
+d'Or, ceremony 26 October, ten days out), environment-blocked
+(`typescript` 7 - `pnpm outdated` still shows only that one entry;
+`docs/SOURCES.md` link-liveness - outbound egress to reference domains is
+still blocked), or already retried with a fresh search angle as recently
+as Run 296 (UEFA Nations League attendance, EURO Golden Boot youngest-
+ever) with nothing new to show - retrying either again this run with no
+new angle would just repeat Run 296's own negative result, per Run 256's
+"don't retry without a genuinely different angle" rule. The content-
+verification rotation has all 15 `content/*.md` files tied at
+`lastReviewed: 2026-10-14` with nothing to differentiate a next pick.
+
+That left the `.git`-history-bloat item (`docs/ROADMAP.md`), open and
+restated as "needs a human decision" at Runs 289, 290, 292, 293 (as
+"partially mitigated, still open"), 294, 295 and 296 - eight runs in a
+row without the user acting on it, and each restatement added little the
+previous one hadn't already said. Read back every one of those entries
+plus the full Run 289 (root-cause diagnosis) and Run 293 (partial fix)
+entries in this file: the underlying analysis was already correct and
+complete, it just wasn't organized as something a human can act on in one
+read - the `docs/ROADMAP.md` bullet had grown into a few paragraphs of
+narrative (duplicating detail already in this file's own Run 289/293
+entries) rather than a tight comparison of the actual choices on the
+table.
+
+**Rewrote the `docs/ROADMAP.md` bullet** to point at this file's Run
+289/293 entries for the full history (rather than re-narrating it) and
+lead with three concretely-stated options - Git LFS migration
+(`git lfs migrate import`), a direct history rewrite/blob purge (`git
+filter-repo`, keeping only each PDF's latest blob), or stopping PDF
+generation from being a committed artifact at all (move `pnpm
+build:pdfs` to a deploy-time build step) - each with its actual command
+or mechanism, its real cost (two of the three require a forced push and
+every existing clone to be redone; the third is a deployment-architecture
+change, not a git operation), and a one-line steer (option 3 matches the
+direction Run 293's own skip-cache logic already treats PDFs - as a build
+artifact with a freshness check, not an edited file - but adopting it,
+and whether to *also* do a one-time cleanup of the ~5 GB already
+committed, is still the user's call, not this routine's). No code change:
+this is purely making an already-correct, already-flagged decision easier
+to actually make, not resolving it unilaterally - a future run still must
+not pick one of these three without explicit sign-off. Flagged directly
+to the user in this run's own notification rather than left for a ninth
+routine restatement.
+
+**Verification:** `pnpm install --frozen-lockfile` (588 packages, no
+drift), `pnpm lint` (265 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(1086/1086, unchanged from Run 296), `pnpm build` (711 pages, unchanged),
+`pnpm check:pdfs` (700/700 up to date - no `content/*.md` edit this run,
+only `docs/*.md`, so no PDF regeneration owed under AGENTS.md's rule),
+`pnpm outdated` (only the already-blocked `typescript` 7). No `content/`
+or `src/` file touched, so no new PDF/code-review surface was opened.
+
+**Left for a future pass:** the `.git`-bloat item is now a clean three-way
+decision for the user rather than an open-ended one; everything else
+stays exactly as documented in `docs/ROADMAP.md` (not-yet-due/blocked/
+already-retried-with-nothing-new). Once the user picks a direction on
+`.git` bloat, a future run can execute it (with that explicit sign-off in
+hand) rather than analyze it further.
