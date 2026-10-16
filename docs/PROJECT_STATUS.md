@@ -40831,3 +40831,54 @@ ceremony has happened. Five consecutive runs (296-300) have now found no
 new actionable item - consistent with Run 299's own observation that the
 pool of real, non-duplicate work is shrinking until the user acts on one
 of the two pending decisions, or the Ballon d'Or ceremony happens.
+
+### Run 301 (2026-10-16): ten-script manual browser/accessibility sweep back on cadence (due again, three runs after Run 298) - clean across all ten; confirmed PR #57 green, no pending review activity; sixth consecutive run with no new actionable backlog item
+
+Confirmed PR #57 (`intensive/football-reference` -> `main`) is still open,
+`mergeable_state: clean`, both required checks (`test`, `open-pr`)
+`success` on the current head, zero pending review comments - nothing on
+GitHub needed a response this run.
+
+Re-read `docs/ROADMAP.md` end to end: every "Open backlog" item is
+unchanged from Run 300 - still either not-yet-due (2026 Ballon d'Or, now
+ten days out), environment-blocked (`typescript` 7 - `pnpm outdated`
+re-confirmed no new bumpable package beyond that one entry; `docs/
+SOURCES.md` link-liveness, not re-tested a third time in three runs with no
+new angle), or awaiting the user's own sign-off (`.git`-bloat,
+`long-title`). All 15 `content/*.md` files remain tied at `lastReviewed:
+2026-10-14` with no differentiated next content-verification pick.
+
+With nothing new ready and the standing ten-script manual Playwright/
+browser sweep (`check:html`, `check:reflow`, `check:landscape`,
+`check:text-zoom`, `check:print-width`, `check:target-size`,
+`check:text-spacing`, `check:focus-appearance`, `check:lighthouse`,
+`check:color-contrast`) due again on its own roughly-every-three-run
+cadence (last full pass: Run 298), ran it in full with `PW_EXECUTABLE_PATH`
+pointed at the pre-installed `chromium_headless_shell-1194` binary (Run
+265's fix, also needed for `pnpm test:e2e` per Run 294). All ten clean:
+711/711 pages valid HTML5; no horizontal overflow at 320px, landscape
+667x375, 200% text zoom, print-media 1032px, or WCAG 1.4.12 text spacing;
+every touch-facing control >= 44x44px at 360px; every focusable control has
+a >= 2px focus ring; Lighthouse's 39 sampled pages all >= 0.9 in every
+category (the one documented noindex/404 SEO exception aside); zero WCAG
+1.4.3 color-contrast violations across all 711 pages in both color schemes
+(1,422 page loads).
+
+**Verification:** `pnpm install --frozen-lockfile` (588 packages, no
+drift), `pnpm lint` (265 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(1086/1086, unchanged), `pnpm build` (711 pages, unchanged), `pnpm audit`
+(no known vulnerabilities), `pnpm dlx knip --no-config-hints` (one standing
+false positive, `@cspell/dict-hr-hr`, unchanged). No `content/*.md` or
+`src/` file touched, so no PDF regeneration or code-review reopening was
+owed; `docs/*.md` only.
+
+**Left for a future pass:** unchanged from Run 300 - `.git`-bloat and
+`long-title` are still the user's own call; the ten-script browser sweep
+just ran, so it's not due again for another two to three runs; the
+content-verification rotation has no differentiated next pick until a
+file's `lastReviewed` diverges again; the 2026 Ballon d'Or edition becomes
+checkable once the 26 October ceremony has happened. This is the sixth
+consecutive run (296-301) to find no new actionable backlog item beyond
+re-confirming the standing checklist - consistent with Run 299's own
+observation that real, non-duplicate work stays scarce until the user acts
+on one of the two pending decisions, or the Ballon d'Or ceremony happens.
