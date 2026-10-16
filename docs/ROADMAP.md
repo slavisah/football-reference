@@ -207,59 +207,48 @@ the full run-by-run history behind all of this, see
 
 ## Open backlog
 
-- **`.git` history bloat from non-deterministic PDF regeneration - needs human
-  decision (raised Run 289, 2026-10-14):** this environment's own `git fetch
-  origin` failed twice this run with `RPC failed; curl 56 Recv failure:
-  Connection reset by peer` / `fatal: early EOF` before a third attempt
-  succeeded; the agent-proxy's own status endpoint logged a matching
-  `ws_closed_mid_exchange` relay failure against `github.com:443` after
-  **1.04 GB** had already been received. `.git` is now 5.2-5.5 GB. Root
-  cause, confirmed directly this run rather than assumed: regenerating all
-  700 PDFs with nothing else changed (`pnpm build:pdfs`, discarded afterward,
-  not committed) rewrote **all 700** as binary diffs, not zero. One pair
-  (`public/downloads/ballon-dor.pdf`, old committed copy vs. freshly
-  regenerated) was diffed byte-for-byte: `/CreationDate`/`/ModDate` always
-  change (Chromium stamps the current instant on every print-to-PDF call,
-  with no Playwright `page.pdf()` option to pin it), `/Creator` changed from
-  `Chromium` to a full `HeadlessChrome/141.0.0.0` user-agent string (a
-  different Chromium build/version than whichever produced the currently-
-  committed file), and the compressed content/font streams differ throughout
-  - not just the metadata, the actual page bytes aren't stable across
-  Chromium versions even for pixel-identical output. AGENTS.md's own
-  unconditional rule (any `content/*.md` edit needs `pnpm build:pdfs` before
-  committing) means essentially every content-touching run commits a fresh
-  ~500 MB wholesale rewrite of all 700 PDFs, forever, since git cannot
-  usefully delta non-identical binaries - this is almost certainly the
-  dominant contributor to `.git`'s size, and is a different, more
-  consequential mechanism than the long-standing "PDF-bloat documented/
-  intentional" note elsewhere in this project's history (that note is about
-  `public/downloads/`'s own ~500 MB-on-disk size, a working-tree concern;
-  this is about unbounded, non-recoverable *history* growth, which just
-  started actually breaking `git fetch` for this routine itself). No fix
-  attempted this run - every option carries real risk or a design call a
-  human should make, not an unattended routine: migrating
-  `public/downloads/*.pdf` to Git LFS (changes how the repo is cloned/
-  deployed), or rewriting history to drop old PDF blobs (destructive,
-  rewrites shared history). Needs the user's own call on which direction (if
-  any) to take; a future run should not attempt a destructive history
-  rewrite without that sign-off.
-
-  **Partially mitigated, Run 293 (2026-10-15):** the third option above -
-  regenerating/committing only the PDFs whose source actually changed,
-  instead of all 700 every time - is no longer blocked on
-  `scripts/generate-pdfs.mjs` having no way to tell which pages changed; it
-  already has one (`pdf-pages.mjs`'s per-slug `sources` lists plus the
-  committed `.pdf-manifest.json`), it just wasn't being used to skip
-  anything. `generate-pdfs.mjs` now re-hashes each slug's sources before
-  rendering it and skips the render (and the resulting binary rewrite)
-  entirely when the hash still matches the manifest and the file is already
-  on disk - verified directly against the live 700-PDF set: a no-op
-  `pnpm build:pdfs` run (nothing changed) regenerated 0/700 with an empty
-  `public/downloads/` diff, and a single-file-touch test regenerated exactly
-  1/700. This stops future growth from the common case (most runs touch one
-  or two content files, not all of them) but does not shrink the ~5 GB
-  already in `.git` history - the Git-LFS/history-rewrite choice above is
-  still open and still the user's own call.
+- **`.git` history bloat from committed PDFs - decision overdue, unresolved
+  across 8 runs (289-296, 2026-10-14 to 2026-10-16):** root cause and the
+  Run 293 partial fix are fully written up in `docs/PROJECT_STATUS.md`'s
+  Run 289 and Run 293 entries - not repeated here. Current state: `.git`
+  is 5.2-5.5 GB; Run 293 already stopped the *common* case of further
+  growth (a content-touching run that doesn't change a PDF's own source no
+  longer rewrites that PDF), but the ~5 GB already in history is untouched,
+  and a run whose edit *does* change a PDF's source still adds one full
+  binary rewrite (Chromium's print-to-PDF output isn't byte-stable across
+  runs even for identical content, so git can't delta it). Three options,
+  compared here so the decision is actually actionable rather than
+  re-flagged a ninth time:
+  1. **Git LFS migration** (`git lfs migrate import --include="public/
+     downloads/*.pdf" --everything`): moves the PDF blobs out of the
+     regular object store into LFS pointers, shrinking the *packed* `.git`
+     significantly. Still rewrites every commit SHA that ever touched a
+     PDF (forced push, every existing clone needs redoing), and shifts the
+     cost to GitHub LFS storage/bandwidth quotas instead of removing it -
+     700 PDFs regenerating periodically could run into the free-tier cap.
+  2. **History rewrite / blob purge** (e.g. `git filter-repo`, keeping only
+     each PDF's latest blob): the most direct shrink of the bloat already
+     committed. Destructive in the same way as option 1 (rewrites SHAs,
+     needs a forced push and fresh clones) but with no new ongoing
+     infrastructure - losing old PDF *history* isn't a content-loss risk
+     the way losing a `content/*.md` edit would be, since the PDFs are a
+     generated artifact, not editorial source.
+  3. **Stop committing generated PDFs at all**: generate them as a deploy-
+     time build step (the production host runs `pnpm build:pdfs` before
+     serving, the same command this repo already runs locally) instead of
+     versioning `public/downloads/*.pdf` in git. The only option that fixes
+     the growth mechanism at its root rather than relocating/shrinking the
+     existing bloat - but it's a deployment-architecture change, not a git
+     operation: whichever host serves this site needs to start running a
+     build step it may not run today.
+  Option 3 is the direction Run 293's own skip-cache logic already treats
+  PDFs as heading (a build artifact with a freshness check, not an edited
+  file) - but adopting it, and whether to *also* do a one-time cleanup
+  (option 1 or 2) for the ~5 GB already committed, needs the user's actual
+  sign-off: this is a destructive-or-architecture-changing decision no
+  unattended run should make unilaterally. No code change proposed here,
+  only the comparison - flag this to the user directly rather than letting
+  a ninth run restate the same open question.
 - **2026 Ballon d'Or edition**: not due yet, not blocked. The two-hundred-
   and-forty-first run confirmed via `WebSearch` that the ceremony is
   scheduled for 26 October 2026 in London (its first time outside Paris) -
