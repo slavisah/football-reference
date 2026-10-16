@@ -40772,3 +40772,62 @@ due again in roughly two more runs; the content-verification rotation has
 no differentiated next pick until a file's `lastReviewed` diverges again;
 the 2026 Ballon d'Or edition becomes checkable once the 26 October ceremony
 has happened.
+
+### Run 300 (2026-10-16): fifth consecutive run with no new actionable backlog item; tried fresh search angles on both open "oldest/youngest" idea-backlog sub-items, still negative; confirmed PR #57 green with no pending review activity
+
+Confirmed `origin/intensive/football-reference` still only fully-merged-
+into-`main` pattern applies to the old PR #56 (already resolved at Run
+280); the live branch is PR #57, open, `mergeable`, CI green (`test` and
+`open-pr` checks both `success` on the current head), zero review
+comments pending - nothing on GitHub needed a response this run.
+
+Re-read `docs/ROADMAP.md` end to end: unchanged from Run 299's own
+summary - every "Open backlog" item is still not-yet-due (2026 Ballon
+d'Or, ten days out), environment-blocked (`typescript` 7 - `pnpm
+outdated` confirmed still only that one entry; `docs/SOURCES.md`
+link-liveness), or needing human sign-off (`.git`-bloat, `long-title`).
+`pnpm outdated` re-confirmed no new bumpable package.
+
+Rather than retry the same already-exhausted research questions with the
+same queries, tried one genuinely fresh `WebSearch` angle on each of the
+two open "Ideas not yet scoped" sub-items instead of re-running the
+standing health checklist a fifth time in one day:
+- **EURO Golden Boot youngest-ever winner**: searched specifically for
+  youngest-*scorer*/youngest-*player* EURO records (a different angle
+  than past runs' direct "youngest Golden Boot winner" queries) on the
+  theory a youngest-scorer record might name the actual tournament top
+  scorer. Turned up Lamine Yamal's youngest-ever-EURO-scorer and
+  youngest-ever-EURO-player records (2024) and Johan Vonlanthen's older
+  youngest-scorer record (2004) - but neither is the tournament's Golden
+  Boot *winner* (Yamal did not finish 2024 as top scorer), so this is
+  still not a usable fact. No new angle left untried that this run can
+  identify.
+- **Copa América Best Player oldest/youngest-ever**: searched for the
+  tournament's oldest-player *records* generally rather than the Best
+  Player award specifically, on the theory an oldest-player record might
+  coincide with an award winner. Found Claudio Bravo's oldest-starter
+  record (2024, age 41) - but he won Best *Goalkeeper* (2015, 2016), not
+  Best Player, so this doesn't close the gap either. Same outcome as
+  Run 290's own attempt: no source ranks Best Player winners by age.
+
+Both negative, same as every prior attempt - not shipped, per this idea's
+own standing bar (an already-published superlative claim, never a
+self-computed one). No `docs/ROADMAP.md` change: neither sub-item's status
+changes, and this run's two queries are now exhausted angles too (a future
+run should look for a different angle again, not repeat either of these).
+
+**Verification:** `pnpm install --frozen-lockfile` (588 packages, no
+drift), `pnpm lint` (265 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(1086/1086, unchanged from Run 299), `pnpm build` (711 pages, unchanged).
+No `content/*.md` or `src/` file touched, so no PDF regeneration or
+code-review reopening was owed.
+
+**Left for a future pass:** unchanged from Run 299 - `.git`-bloat and
+`long-title` are still the user's own call; the ten-script browser sweep
+is due again in roughly two more runs; the content-verification rotation
+has no differentiated next pick until a file's `lastReviewed` diverges
+again; the 2026 Ballon d'Or edition becomes checkable once the 26 October
+ceremony has happened. Five consecutive runs (296-300) have now found no
+new actionable item - consistent with Run 299's own observation that the
+pool of real, non-duplicate work is shrinking until the user acts on one
+of the two pending decisions, or the Ballon d'Or ceremony happens.
