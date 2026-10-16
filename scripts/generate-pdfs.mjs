@@ -21,14 +21,14 @@
 // content it was rendered from, without needing a browser or git history.
 
 import { chromium } from '@playwright/test';
-import { createHash } from 'node:crypto';
 import { spawn, spawnSync } from 'node:child_process';
-import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PDF_PAGES as PAGES, TEAM_PDF_SOURCES, PLAYER_PDF_SOURCES, EDITION_PDF_SOURCES } from './pdf-pages.mjs';
 import { addAuthorMetadata, PDF_AUTHOR } from './pdf-metadata.mjs';
 import { waitForServer } from './preview-daemon.mjs';
+import { loadExistingManifest, fileExists, hashesMatch, hashSources, buildManifest } from './pdf-manifest.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const PORT = 4399;
@@ -61,31 +61,13 @@ const MANIFEST_PATH = path.join(OUT_DIR, '.pdf-manifest.json');
 // Chromium version bump, or any other change this hash model can't see).
 const FORCE_ALL_PDFS = process.env.FORCE_ALL_PDFS === '1';
 
-async function loadExistingManifest() {
-  try {
-    return JSON.parse(await readFile(MANIFEST_PATH, 'utf8'));
-  } catch (error) {
-    if (error.code === 'ENOENT') return {};
-    throw error;
-  }
-}
-
-async function fileExists(filePath) {
-  try {
-    await access(filePath);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function hashesMatch(a, b) {
-  if (!a || !b) return false;
-  const aKeys = Object.keys(a);
-  const bKeys = Object.keys(b);
-  if (aKeys.length !== bKeys.length) return false;
-  return aKeys.every((key) => a[key] === b[key]);
-}
+// loadExistingManifest/fileExists/hashesMatch/hashSources/buildManifest now
+// live in ./pdf-manifest.mjs, a side-effect-free module unit-tested directly
+// by tests/unit/pdfManifest.test.ts - see that file's own header comment for
+// why they were split out of this one (this script's `main()` call at the
+// bottom runs unconditionally the moment the file is loaded, which would
+// make importing any function from here for a test spin up a whole preview
+// server and browser).
 
 // One PDF per required competition page (src/pages/competitions/*.astro)
 // plus /records, and which file(s) each page's rendered content is sourced
@@ -93,23 +75,6 @@ function hashesMatch(a, b) {
 // References section every page shares) - the shared PDF_PAGES list
 // (scripts/pdf-pages.mjs) so this can never drift from
 // scripts/check-pdf-freshness.mjs's PDF_SOURCES.
-
-async function hashSources(sources) {
-  const hashes = {};
-  for (const file of sources) {
-    const contents = await readFile(path.join(ROOT, file), 'utf8');
-    hashes[file] = createHash('sha256').update(contents).digest('hex');
-  }
-  return hashes;
-}
-
-async function buildManifest(entries) {
-  const manifest = {};
-  for (const { slug, sources } of entries) {
-    manifest[slug] = await hashSources(sources);
-  }
-  return manifest;
-}
 
 // Mirrors src/lib/teamProfile.ts's teamProfileSlug() exactly (a pure string
 // transform, no Astro/content dependency) so a team fetched from the live
@@ -142,7 +107,7 @@ function playerProfileSlug(name) {
 
 async function main() {
   await mkdir(OUT_DIR, { recursive: true });
-  const existingManifest = await loadExistingManifest();
+  const existingManifest = await loadExistingManifest(MANIFEST_PATH);
   let skippedCount = 0;
 
   // Shared by all four loops below: true when `slug`'s already-committed
@@ -153,7 +118,7 @@ async function main() {
   async function skipUnchanged(slug, sources, outFile) {
     if (FORCE_ALL_PDFS) return false;
     if (!(await fileExists(outFile))) return false;
-    const currentHashes = await hashSources(sources);
+    const currentHashes = await hashSources(ROOT, sources);
     if (!hashesMatch(existingManifest[slug], currentHashes)) return false;
     skippedCount += 1;
     console.log(`Skipping ${path.relative(ROOT, outFile)} (unchanged since last build:pdfs)`);
@@ -493,7 +458,7 @@ async function main() {
     stopServer();
   }
 
-  const manifest = await buildManifest([...PAGES, ...teamEntries, ...playerEntries, ...editionEntries]);
+  const manifest = await buildManifest(ROOT, [...PAGES, ...teamEntries, ...playerEntries, ...editionEntries]);
   await writeFile(MANIFEST_PATH, `${JSON.stringify(manifest, null, 2)}\n`);
   console.log(`Wrote ${path.relative(ROOT, MANIFEST_PATH)}`);
   const totalPdfs = PAGES.length + teamEntries.length + playerEntries.length + editionEntries.length;

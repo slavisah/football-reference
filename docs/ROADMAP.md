@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (294 intensive runs as of 2026-10-15) lives
+verification sweep and decision (296 intensive runs as of 2026-10-16) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -106,7 +106,7 @@ Playwright browser install on every PR push.
 `knip` shows exactly one standing false positive (`@cspell/dict-hr-hr`,
 used only via `.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS
 `import` knip's static analysis can see). Current counts (confirmed fresh
-this run): 1071 unit tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711
+this run): 1086 unit tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711
 pages built; 1055 Playwright e2e tests as of the last full cold-start run
 (Run 254).
 
@@ -160,7 +160,13 @@ changes materially. Run 270 then extended the angle to `scripts/*.mjs`
 (7 of 49 files), Run 274 covered 7 more (the remaining claim-ledger/profile
 checkers, fixing a dead-code ENOENT bug present in two files), and Run 275
 finished the remaining 24 files - all of `scripts/*.mjs` has now had this
-review at least once. Run 275 found and fixed one real, currently-live bug:
+review at least once. `scripts/generate-pdfs.mjs` reopened for this angle
+after Run 293 materially edited it (new PDF-regeneration-skip cache logic);
+Run 296 reviewed that new logic, found no live bug, and split it into a new
+side-effect-free `scripts/pdf-manifest.mjs` module with its own unit tests
+(`tests/unit/pdfManifest.test.ts`, 15 cases) - re-open only after a future
+run materially edits either file again. Run 275 found and fixed one real,
+currently-live bug:
 `check-i18n-notes.mjs`'s `hrCounterpart()` mapped the home page to `/hr`
 instead of `/hr/`, the one path shape that doesn't match
 `htmlFileToPagePath()`'s own trailing-slash convention for a directory
