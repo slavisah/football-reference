@@ -40672,3 +40672,55 @@ stays exactly as documented in `docs/ROADMAP.md` (not-yet-due/blocked/
 already-retried-with-nothing-new). Once the user picks a direction on
 `.git` bloat, a future run can execute it (with that explicit sign-off in
 hand) rather than analyze it further.
+
+### Run 298 (2026-10-16): full health re-confirmation, no drift; re-ran the ten-script manual browser/accessibility sweep (due again, three runs after Run 295) - clean across all ten; re-confirmed the `docs/SOURCES.md` link-liveness egress block is still in place
+
+Every open `docs/ROADMAP.md` backlog item is still either not-yet-due
+(2026 Ballon d'Or ceremony, ten days out), environment-blocked
+(`typescript` 7 - `pnpm outdated` still shows only that one entry, no new
+`@astrojs/check` release; `docs/SOURCES.md` link-liveness), or needing
+human sign-off (`.git`-bloat, `long-title`). All 15 `content/*.md` files
+remain tied at `lastReviewed: 2026-10-14`, with nothing to differentiate a
+next content-verification pick, and Run 297 already tightened the
+`.git`-bloat item into its clearest-yet actionable form - re-stating it
+again this run would add nothing new, so it's left as Run 297 wrote it and
+flagged once more in this run's own notification rather than re-narrated.
+
+Re-tried the `docs/SOURCES.md` link-liveness item's premise directly
+(`WebFetch` to `en.wikipedia.org`) rather than assuming the standing block
+is still accurate: still blocked (`getaddrinfo ENOTFOUND`, a different
+failure shape than the `EGRESS_BLOCKED` message prior runs saw, but the
+same outcome - no direct fetch to a reference domain succeeds). No roadmap
+change: the item was already correctly marked blocked, and a different
+error string for the same underlying block isn't new information worth a
+rewrite.
+
+With no new or ready backlog item, picked the ten-script manual
+Playwright/browser sweep (`check:html`, `check:reflow`, `check:landscape`,
+`check:text-zoom`, `check:print-width`, `check:target-size`,
+`check:text-spacing`, `check:focus-appearance`, `check:lighthouse`,
+`check:color-contrast`) back up - due again per the project's own
+roughly-every-three-run cadence (last full pass: Run 295). Ran all ten
+end to end with `PW_EXECUTABLE_PATH` pointed at the pre-installed
+`chromium_headless_shell-1194/chrome-linux/headless_shell.real` binary
+(Run 265's fix, still needed in this container). All ten passed clean:
+711/711 pages valid HTML5; no horizontal overflow at 320px, landscape
+667x375, 200% text zoom, print-media 1032px, or WCAG 1.4.12 text spacing;
+every touch target on all 711 pages >= 44x44px at 360px; every focusable
+control has a >= 2px visible focus ring; `check:lighthouse`'s 39 sampled
+pages all >= 0.9 in every category (the one documented noindex/404-page
+SEO exception aside); and zero WCAG 1.4.3 color-contrast violations across
+all 711 pages in both color schemes (1,422 page loads).
+
+**Verification:** `pnpm install --frozen-lockfile` (588 packages, no
+drift), `pnpm lint` (265 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(1086/1086, unchanged from Run 297), `pnpm build` (711 pages, unchanged),
+`pnpm outdated` (only the already-blocked `typescript` 7). No
+`content/*.md` or `src/` file touched, so no PDF regeneration or
+code-review reopening was owed under AGENTS.md's rule; `docs/*.md` only.
+
+**Left for a future pass:** everything stays exactly as `docs/ROADMAP.md`
+already documents (not-yet-due/blocked/needing human sign-off on
+`.git`-bloat and `long-title`). The ten-script sweep is due again in
+roughly three more runs; the content-verification rotation has no
+differentiated next pick until a file's `lastReviewed` diverges again.
