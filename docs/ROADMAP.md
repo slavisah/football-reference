@@ -347,6 +347,26 @@ the full run-by-run history behind all of this, see
   deliberate build-only integration-test choice (same as `sitemap.xml.ts`,
   documented in `tests/unit/contentPages.test.ts`'s own header comment), not
   an untested pure-function branch - no action needed, don't re-investigate.
+- **Routine cadence vs. diminishing returns (flagged Run 299, 2026-10-16):**
+  four runs in a row now (296, 297, 298, 299), all within about 16 hours,
+  each independently concluded there was no new actionable backlog item:
+  every open item above is either not-yet-due, environment-blocked, or
+  explicitly awaiting the user's own sign-off, and every retriable research
+  question was already retried with no new angle available. Each of those
+  runs still did real, non-duplicate work (a dependency bump, a code-review/
+  test-coverage pass, a full browser/accessibility sweep, tightening this
+  file's own `.git`-bloat bullet) rather than idling, but the pool of such
+  "real work that isn't a straight repeat" is visibly shrinking: this run
+  found nothing left to do beyond re-confirming the standing health check
+  stays green (`pnpm lint`/`test`/`build`/`audit`, all clean, no drift from
+  Run 298). Two concrete things would unblock genuinely new work: the user
+  picking one of the three `.git`-bloat options above (or the `long-title`
+  call), or the 2026 Ballon d'Or ceremony actually happening (26 October,
+  ten days out) so its results can be added. Until either happens, a future
+  run picking up this item should feel free to space out the standing
+  browser sweep/dependency-bump checks further rather than re-running them
+  every single firing - raised here rather than silently repeating a now
+  fully-clean checklist a fifth time.
 
 ## Ideas not yet scoped
 
