@@ -40956,3 +40956,62 @@ consecutive run (296-302) to find no new actionable backlog item - this
 run's own contribution was the FIFA World Cup 2026 coverage double-check
 (confirmed already done) and one newly-recorded, non-resolving UEFA source
 for the 2023 Nations League attendance conflict.
+
+### Run 303 (2026-10-17): confirmed Run 302's own CI-failure fix (`43cddc92e`, pushed before this run started) is green; found the 2026 Ballon d'Or men's shortlist has already been announced - deliberately flagged to the user as a scope decision rather than shipped unilaterally; full health re-confirmation, no drift
+
+Confirmed PR #57 is still open, `mergeable_state: clean`, 27 commits.
+Its one pending item going in was a CI failure on `2eb000328` (Run 302's
+own `docs/SOURCES.md` edit, which invalidated all 700 PDFs' freshness
+checksums without regenerating them) - already fixed by a `43cddc92e`
+push (`pnpm build && pnpm build:pdfs`, 698 PDFs changed) before this run
+began; both required checks (`test`, `open-pr`) are `success` on that
+head and there is no further pending review activity. Nothing on GitHub
+needed a response this run.
+
+Re-read `docs/ROADMAP.md` end to end: every open item is unchanged from
+Run 302 except the one below - still not-yet-due (2026 Ballon d'Or
+ceremony itself, now nine days out), environment-blocked (`typescript` 7,
+re-confirmed via `pnpm outdated`; `docs/SOURCES.md` link-liveness), or
+awaiting the user's own sign-off (`.git`-bloat, `long-title`). The browser
+sweep last ran at Run 301 and isn't due again for one to two more runs.
+
+Rather than retry an already-exhausted research angle an eighth time,
+tried a genuinely different question on the one open Ballon d'Or item:
+not "has the 2026 ceremony happened" (no - it's nine days out), but
+"has anything about the 2026 edition become knowable *before* the
+ceremony." It has: France Football announced the men's 30-name shortlist
+on 8 September 2026. Two independent "full list" tables (Sports
+Illustrated, TheSportsCast) converged on the exact same 30 names with no
+discrepancy, clearing this site's own usual two-source bar - see
+`docs/SOURCES.md`'s new entry for the full list.
+
+**Deliberately not shipped as page content.** Two separate reasons, both
+written out in `docs/ROADMAP.md`'s updated bullet: (1) every fact on
+`content/ballon-dor.md` today is a *completed* historical result; a
+nominee shortlist is an announced-but-undecided one, a genuinely new kind
+of content this site has never carried in 303 runs, and whether the site
+wants that at all is an editorial-scope call, not a sourcing one - the
+same footing as the `.git`-bloat/`long-title` items already awaiting the
+user's sign-off. (2) it isn't a one-line add regardless: the page's
+"Memorable moments"-style sections render through `EditorialNotes.astro`,
+and `check-i18n-notes.mjs` enforces structural EN/HR parity (same section
+and bullet counts) - a 30-item English section would need a genuinely
+hand-translated 30-item Croatian counterpart, not a mechanical copy.
+Flagged to the user directly in this run's own push notification, with
+the research already done so a future run can ship it immediately (both
+languages) if they say yes.
+
+**Verification:** `pnpm install --frozen-lockfile` (588 packages, no
+drift), `pnpm lint` (265 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(1086/1086, unchanged), `pnpm build` (711 pages, unchanged), `pnpm
+outdated` (only the already-blocked `typescript` 7). Only `docs/*.md`
+touched - no `content/*.md` or `src/` edit, so no PDF regeneration or
+code-review reopening was owed.
+
+**Left for a future pass:** `.git`-bloat, `long-title`, and now also the
+"should the site carry a pre-ceremony nominees preview" question are all
+the user's own call; the browser sweep isn't due for one to two more
+runs; the content-verification rotation has no differentiated next pick;
+the 2026 Ballon d'Or ceremony itself becomes checkable once 26 October has
+passed, but its shortlist can now be added immediately if the user
+greenlights the content-scope question above.
