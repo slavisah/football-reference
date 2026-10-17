@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (301 intensive runs as of 2026-10-16) lives
+verification sweep and decision (302 intensive runs as of 2026-10-17) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -348,23 +348,25 @@ the full run-by-run history behind all of this, see
   documented in `tests/unit/contentPages.test.ts`'s own header comment), not
   an untested pure-function branch - no action needed, don't re-investigate.
 - **Routine cadence vs. diminishing returns (flagged Run 299, 2026-10-16;
-  still open at Run 301):** six runs in a row now (296-301), all within
-  about a day, each independently concluded there was no new actionable
+  still open at Run 302):** seven runs in a row now (296-302), all within
+  about two days, each independently concluded there was no new actionable
   backlog item: every open item above is either not-yet-due,
   environment-blocked, or explicitly awaiting the user's own sign-off, and
   every retriable research question was already retried with no new angle
   available. Each of those runs still did real, non-duplicate work (a
   dependency bump, a code-review/test-coverage pass, two full
   browser/accessibility sweeps on their own due cadence, tightening this
-  file's own `.git`-bloat bullet) rather than idling, but the pool of such
-  "real work that isn't a straight repeat" is visibly shrinking. Two
-  concrete things would unblock genuinely new work: the user picking one of
-  the three `.git`-bloat options above (or the `long-title` call), or the
-  2026 Ballon d'Or ceremony actually happening (26 October, now ten days
-  out) so its results can be added. Until either happens, a future run
-  should keep running the standing browser sweep/dependency-bump checks
-  only on their own stated due cadence (not on every single firing) rather
-  than restating this same observation a third time.
+  file's own `.git`-bloat bullet, a double-check that the 2026 FIFA World
+  Cup's own results were already covered, a newly-recorded UEFA attendance
+  source) rather than idling, but the pool of such "real work that isn't a
+  straight repeat" is visibly shrinking. Two concrete things would unblock
+  genuinely new work: the user picking one of the three `.git`-bloat
+  options above (or the `long-title` call), or the 2026 Ballon d'Or
+  ceremony actually happening (26 October, now nine days out) so its
+  results can be added. Until either happens, a future run should keep
+  running the standing browser sweep/dependency-bump checks only on their
+  own stated due cadence (not on every single firing) rather than
+  restating this same observation a third time.
 
 ## Ideas not yet scoped
 
