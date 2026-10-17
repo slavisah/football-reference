@@ -311,12 +311,19 @@ the full run-by-run history behind all of this, see
   result as every prior run's attempt, now via a tool that does have live
   web access, not just a knowledge-cutoff limitation. Genuinely exhausted
   short of a UEFA technical-report PDF this environment cannot fetch.
-  **Untried angle (noted Run 305):** the German FA's own
-  `datencenter.dfb.de` match database unexpectedly turned up a page for
-  EURO 2020's final even though Germany didn't play in it (see the EURO
-  1996/2020 attendance resolution above), so it may be worth checking
-  directly for a Nations League Finals Team-of-the-Tournament page before
-  treating this as closed for good - not yet tried.
+  **Angle tried and also exhausted (Run 306):** the German FA's own
+  `datencenter.dfb.de` match database, flagged by Run 305 as untried for
+  this item, turns out to be a match-result database (scores, lineups,
+  goal-scorers, referees, attendance) with no awards/best-XI listing at
+  all - confirmed via `WebSearch` for the 2024-2025 semi-final Germany
+  actually played (Germany 1-2 Portugal, Munich, 4 June 2025: the page
+  exists and surfaces match facts) and for 2025's Best Player (Nuno Mendes,
+  per Wikipedia, not DFB), with no Team-of-the-Tournament eleven appearing
+  for any of the three editions in either case. Direct `WebFetch` to
+  `datencenter.dfb.de` itself still fails (`ENOTFOUND`, the same egress
+  block as the link-liveness item above), so there's no way to browse the
+  site further than what search snippets surface. Genuinely exhausted now
+  on this angle too, not just the original search-the-claim-directly one.
 - **UEFA Nations League attendance figures**: the 2023 Finals attendance has
   a genuine source conflict (41,110 vs. 41,500, both independently reported
   by different outlets); 2021 has no attendance figure confirmed by two
@@ -336,7 +343,19 @@ the full run-by-run history behind all of this, see
   two-independent-sources bar. `WebFetch` to `uefa.com` (which might carry
   the tournament's own official figure) is blocked (see the link-liveness
   item above), so there's no way to read a second primary source directly,
-  only search-engine summaries of one.
+  only search-engine summaries of one. **DFB-datencenter angle also tried
+  (Run 306):** found a `datencenter.dfb.de` match page for 2021's final
+  (Spain 1-2 France, Milan) via `WebSearch`, but the search snippet itself
+  didn't surface an attendance figure from it, and direct `WebFetch` to
+  the domain fails (`ENOTFOUND`, egress-blocked) - so the page may well
+  carry the figure, but it can't be read from this environment. No DFB
+  page turned up at all for 2023's final (played in Rotterdam, no German
+  team involved - unlike EURO 2020's Germany-less final, which the DFB
+  database covered anyway, there's no equivalent page here to find), so
+  that conflict stays unresolved by this angle too. 2025's figure (the
+  65,852 vs. ~75,000 conflict) wasn't re-checked this run - no new angle
+  on it beyond the one already tried by the two-hundred-and-fifty-first
+  run.
 - **Excluded historical attendance figures**: World Cup 1930 and 1950 have
   no single attendance figure with a source reliable enough to report -
   left out of their "Final venues" sections on purpose. This is a genuine
@@ -398,10 +417,14 @@ the full run-by-run history behind all of this, see
   `long-title` call, or the pre-ceremony-shortlist scope question), or the
   2026 Ballon d'Or ceremony actually happening (26 October). Until either
   happens, a future run should keep trying genuinely different angles on
-  the remaining open research items (the DFB-datencenter approach is
-  untried on UEFA Nations League's own Team-of-the-Tournament/attendance
-  gaps - see that bullet's note) before falling back to the standing
-  browser sweep/dependency-bump cadence as a default.
+  the remaining open research items before falling back to the standing
+  browser sweep/dependency-bump cadence as a default. **Update (Run 306):**
+  the DFB-datencenter approach this note flagged as untried on UEFA Nations
+  League's Team-of-the-Tournament/attendance gaps has now been tried and is
+  also exhausted (see those two bullets' own notes) - no genuinely new
+  angle on any open research item is currently known; the next one will
+  need to come from a future run's own fresh idea, not a restatement of
+  this note.
 
 ## Ideas not yet scoped
 

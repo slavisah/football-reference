@@ -41067,6 +41067,7 @@ the 2026 Ballon d'Or ceremony itself becomes checkable once 26 October has
 passed. Ninth consecutive run (296-304) to find no new actionable backlog
 item - this run's own contribution was the due browser/accessibility
 sweep (genuinely new verification work, not a repeat) plus the Golden
+Boot 2026 double-check.
 
 ### Run 305 (2026-10-17): resolved the standing EURO 1996/2020 final-attendance single-source gap (open since Run 98) by querying the German FA's own `datencenter.dfb.de` match database directly rather than searching for the attendance figure itself; `html-validate` patch bump; full health re-confirmation
 
@@ -41159,4 +41160,80 @@ text; updated both to assert the new figures instead. Both fixes
 verified locally (full check suite, `pnpm test`, and the 5 "Final
 venues" e2e tests with `PW_EXECUTABLE_PATH` set) before pushing; PR #57
 is green on the current head.
-Boot 2026 double-check.
+
+### Run 306 (2026-10-17): tried Run 305's own flagged "untried angle" (DFB-datencenter for UEFA Nations League Team-of-the-Tournament/attendance) - genuinely exhausted on both counts; fixed a split-sentence/orphaned-fragment doc bug in this file; full health re-confirmation, no drift
+
+Confirmed PR #57 was green going in: no statuses/check-runs pending
+against the current head, and `get_review_comments` showed zero open
+review threads - nothing needed a response before starting new work.
+Also confirmed PR #56 (the routine's own standing eleven-day-stuck PR,
+escalated via push notification every run from 271 through 279) has
+since been merged into `main` - the blocker those earlier runs flagged
+is resolved; `intensive/football-reference` was recreated after that
+merge and PR #57 is its current, healthy, non-stuck replacement.
+
+Picked up Run 305's own "Left for a future pass" note verbatim: it
+explicitly named the DFB-datencenter angle as reusable on UEFA Nations
+League's Team-of-the-Tournament and attendance gaps (both still open on
+the "Open backlog" list) since Germany was in the Finals four-team pool
+for 2021 and 2025. Tried it directly rather than letting it sit as a
+suggestion for an eleventh "nothing new" run:
+
+- **Team of the Tournament:** `WebSearch` confirms `datencenter.dfb.de`
+  runs an official match page for Germany's own 2024-25 semi-final
+  (Germany 1-2 Portugal, Allianz Arena, 4 June 2025) and that page
+  surfaces match facts (scorers, referee, kickoff time) but no
+  awards/best-XI section of any kind - it's a match-result database, not
+  an awards database. 2025's actual Best Player (Nuno Mendes) is sourced
+  from Wikipedia in every search result, never DFB. No DFB page for 2023
+  surfaced at all (that final was played in Rotterdam with no German team
+  involved, unlike EURO 2020's Germany-less final the DFB database
+  unexpectedly still covered - there's no equivalent "it's German soil or
+  a German federation fixture" hook here). Genuinely exhausted on this
+  angle now, joining the exhausted-by-direct-search result already on
+  file.
+- **Attendance:** found the DFB page for 2021's final (Spain 1-2 France,
+  Milan) via `WebSearch`, but the crawled snippet didn't surface an
+  attendance figure, and direct `WebFetch` to `datencenter.dfb.de` fails
+  outright (`getaddrinfo ENOTFOUND` - the same egress block already
+  documented for `en.wikipedia.org`/`www.uefa.com`), so there's no way to
+  browse the page itself from this environment to check further. No DFB
+  page found at all for 2023 (Rotterdam, no German team, as above), so
+  that conflict is untouched by this angle. 2025's existing 65,852-vs-
+  ~75,000 conflict wasn't re-tried this run - no new angle on that specific
+  number beyond the one the two-hundred-and-fifty-first run already used.
+
+Recorded both negative results in `docs/ROADMAP.md`'s matching bullets so
+a future run doesn't re-suggest the same angle as "untried."
+
+**Incidental doc fix:** while reading this file's own Run 304/305 entries
+for context, found that Run 305's edit had split one of Run 304's own
+sentences in half - Run 304's "Left for a future pass" paragraph ended
+mid-word at "...plus the Golden" immediately before the new Run 305
+heading, with the missing "Boot 2026 double-check." fragment stranded by
+itself at the very end of the file after Run 305's own text, with no
+paragraph break. Reassembled the sentence in place and removed the
+orphaned trailing fragment; no content was lost, both halves were still
+present, just mis-ordered by a prior Edit that inserted new text in the
+wrong spot relative to the existing paragraph.
+
+**Verification:** `pnpm install --frozen-lockfile` (588 packages, no
+drift), `pnpm outdated` (only the already-blocked `typescript` 7, no new
+bumpable package this run), `pnpm lint` (265 files, 0 errors/0 warnings/0
+hints), `pnpm test` (1086/1086, unchanged), `pnpm build` (711 pages,
+unchanged). Only `docs/ROADMAP.md` and this file were edited this run -
+no `content/*.md` or `src/` change, so no PDF regeneration was owed.
+
+**Left for a future pass:** `.git`-bloat, `long-title`, and the
+pre-ceremony Ballon d'Or shortlist scope question remain the user's own
+call. The browser sweep isn't due again for two more runs. The
+content-verification rotation still has no differentiated pick (every
+`content/*.md` file tied at `lastReviewed: 2026-10-17`). UEFA Nations
+League's Team-of-the-Tournament and attendance gaps are now exhausted on
+every angle tried so far (direct search and DFB-datencenter alike) -
+would need either a UEFA technical-report PDF or working `WebFetch`
+access to a reference domain to make further progress, neither available
+in this environment. World Cup 1930/1950 attendance stays excluded (a
+genuine dispute, not a single-source gap). The 2026 Ballon d'Or ceremony
+becomes checkable once 26 October has passed (nine days out as of this
+run).
