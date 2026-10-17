@@ -254,6 +254,28 @@ the full run-by-run history behind all of this, see
   scheduled for 26 October 2026 in London (its first time outside Paris) -
   `content/ballon-dor.md`'s `lastCompletedEdition: 2025` is correct as of
   this run's date (2026-10-06). Re-check once that date has passed.
+  Run 303 (2026-10-17) found France Football already announced the men's
+  30-name shortlist on 8 September 2026 (Messi, Mbappé, Kane, Haaland,
+  Yamal, defending winner Dembélé among them) - two independently-sourced
+  "full list" tables (Sports Illustrated, TheSportsCast) matched exactly on
+  all 30 names, clearing this site's own usual two-source bar - see
+  `docs/SOURCES.md`'s matching entry for the full list and sources.
+  **Deliberately not added to `content/ballon-dor.md`**: a nominee
+  shortlist is a different kind of fact from everything else on this page -
+  an announced-but-not-yet-decided result, not a completed historical
+  record - and this would be the first time in the site's history any page
+  carries "not yet happened" content rather than only confirmed outcomes.
+  It also isn't a drop-in edit: the "Memorable moments"/companion-trophy
+  style sections render through `EditorialNotes.astro`'s note-card system,
+  which `check-i18n-notes.mjs` enforces structural EN/HR parity on (same
+  section count, same bullet count per section) - a 30-item English list
+  would need a genuinely hand-translated Croatian counterpart with the same
+  30 items, not a mechanical copy. That's a real but doable follow-up, not
+  a blocker; what's not this routine's call to make unattended is *whether*
+  the site wants pre-ceremony "shortlist" content at all, a scope decision
+  on the same footing as the `.git`-bloat and `long-title` items above.
+  Flagged to the user directly; a future run should add the section (both
+  languages) if the user says yes, or drop this note if they say no.
 - **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.10` (latest
   published) only declares `typescript: '^5.0.0 || ^6.0.0'` as a peer
   dependency - re-confirmed via `pnpm outdated` as recently as Run 287

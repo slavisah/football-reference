@@ -3086,6 +3086,30 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- **2026 men's shortlist research (2026-10-17, Run 303)** - not added to
+  `content/ballon-dor.md` (see `docs/ROADMAP.md`'s matching bullet for why:
+  a scope question for the user, not a sourcing gap). Recorded here purely
+  so a future run that does get a green light doesn't have to re-research
+  it. France Football announced the 30-man men's shortlist on 8 September
+  2026; the ceremony itself is scheduled for 26 October 2026 in London.
+  Two independent "full list" tables converged on the exact same 30 names
+  with no discrepancy: Jude Bellingham, Pau Cubarsí, Marc Cucurella,
+  Ousmane Dembélé, Luis Díaz, Bruno Fernandes, Gabriel, Erling Haaland,
+  Achraf Hakimi, Harry Kane, Khvicha Kvaratskhelia, Lamine Yamal, Sadio
+  Mané, Marquinhos, Lautaro Martínez, Kylian Mbappé, Nuno Mendes, Lionel
+  Messi, João Neves, Michael Olise, Willian Pacho, Julián Quiñones, Declan
+  Rice, Rodri, Fabián Ruiz, William Saliba, Ferran Torres, Dayot Upamecano,
+  Vinícius Júnior, and Vitinha. One immaterial discrepancy between the two
+  tables (Upamecano's club: Bayern Munich per one, PSG per the other) has
+  no bearing on the name list itself, so doesn't block treating the 30
+  names as confirmed; it would matter only if a future run adds per-player
+  club detail. **Converging, two-source-confirmed names (club detail not
+  cross-checked):**
+  - https://www.si.com/soccer/ballon-dor-2026-full-list-nominees
+  - https://thesportscast.net/2026/09/08/2026-ballon-dor-nominees-full-list-of-30-players-nominated/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Review policy
 
