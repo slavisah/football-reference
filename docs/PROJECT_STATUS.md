@@ -41145,4 +41145,18 @@ if a future run tries it - UEFA Nations League 2021/2023/2025 all have
 Germany in the Finals four-team pool for 2021 and 2025, which the DFB
 datencenter might cover the way it unexpectedly covered EURO 2020's
 Germany-less final).
+
+**CI fix-forward, same run:** the first push above turned CI red twice,
+both fixed before this run ended. (1) `check:ordinal-claims` failed
+because the 2020 Final-venues bullet's full text is also this file's
+ledger key for a separately-verified ordinal claim ("the third to host
+two EURO finals"); appending the attendance clause changed that key, so
+`scripts/ordinal-claims-ledger.json` needed its key updated to match
+(the ordinal claim itself was untouched and didn't need re-verifying).
+(2) Two `tests/e2e/mobile.spec.ts` assertions (English and Croatian)
+were pinned to the old "1996 and 2020 stay without one" no-attendance
+text; updated both to assert the new figures instead. Both fixes
+verified locally (full check suite, `pnpm test`, and the 5 "Final
+venues" e2e tests with `PW_EXECUTABLE_PATH` set) before pushing; PR #57
+is green on the current head.
 Boot 2026 double-check.
