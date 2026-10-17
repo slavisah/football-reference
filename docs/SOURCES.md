@@ -3086,6 +3086,39 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- **EURO 1996/2020 final attendance, resolved (2026-10-17, Run 305)**:
+  these two editions had been excluded from `content/uefa-euro.md`'s "Final
+  venues" section since Run 98 (2026-09-11) as a single-source gap - every
+  figure found (73,611 for 1996, 67,173 for 2020) traced back to Wikipedia
+  plus a mirror site (11v11.com/a national-team-results aggregator), never
+  a first-tier independent outlet, confirmed unchanged as recently as
+  Run 287 (2026-10-14). This run tried a genuinely different angle: rather
+  than searching for the attendance figure itself, it queried the German
+  FA's own `datencenter.dfb.de` match database directly by its own
+  competition/edition/round URL structure (the same source this file
+  already treats as credible for UEFA Nations League 2025's attendance,
+  see below). That federation database runs an official match page for
+  both finals - Germany played in and won the 1996 final, and (perhaps
+  unexpectedly, since England v. Italy didn't involve Germany) its
+  datencenter also carries a page for the 2020 final - and both
+  independently confirm the exact figure already on file, with no
+  discrepancy: 73,611 for 1996 (30 June 1996, Wembley, referee Pierluigi
+  Pairetto) and 67,173 for 2020 (11 July 2021, Wembley, referee Björn
+  Kuipers). Both now clear the two-independent-source bar and were added to
+  `content/uefa-euro.md` and its Croatian counterpart
+  (`src/pages/hr/competitions/euro.astro`, "prijavljeno 73.611/67.173
+  gledatelja"). Sky Sports (UK and Germany editions), TheSportsDB,
+  Goal.com and the National Post were also found independently reporting
+  67,173 for 2020, corroborating the DFB figure further. **No discrepancies
+  found:**
+  - https://datencenter.dfb.de/datencenter/europameisterschaft/1996-in-england/finale/deutschland-tschechische-republik-634569
+  - https://datencenter.dfb.de/en/data-center/uefa-european-championship/2020-in-europe/final/2261445
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1996_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2020_final
+  - https://www.skysports.com/football/italy-vs-england/report/421532
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 - **2026 men's shortlist research (2026-10-17, Run 303)** - not added to
   `content/ballon-dor.md` (see `docs/ROADMAP.md`'s matching bullet for why:
   a scope question for the user, not a sourcing gap). Recorded here purely

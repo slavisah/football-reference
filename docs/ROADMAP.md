@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (304 intensive runs as of 2026-10-17) lives
+verification sweep and decision (305 intensive runs as of 2026-10-17) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -311,6 +311,12 @@ the full run-by-run history behind all of this, see
   result as every prior run's attempt, now via a tool that does have live
   web access, not just a knowledge-cutoff limitation. Genuinely exhausted
   short of a UEFA technical-report PDF this environment cannot fetch.
+  **Untried angle (noted Run 305):** the German FA's own
+  `datencenter.dfb.de` match database unexpectedly turned up a page for
+  EURO 2020's final even though Germany didn't play in it (see the EURO
+  1996/2020 attendance resolution above), so it may be worth checking
+  directly for a Nations League Finals Team-of-the-Tournament page before
+  treating this as closed for good - not yet tried.
 - **UEFA Nations League attendance figures**: the 2023 Finals attendance has
   a genuine source conflict (41,110 vs. 41,500, both independently reported
   by different outlets); 2021 has no attendance figure confirmed by two
@@ -331,18 +337,27 @@ the full run-by-run history behind all of this, see
   the tournament's own official figure) is blocked (see the link-liveness
   item above), so there's no way to read a second primary source directly,
   only search-engine summaries of one.
-- **Excluded historical attendance figures**: World Cup 1930 and 1950, and
-  EURO 1996 and 2020, each have no single attendance figure with a source
-  reliable enough to report - left out of their "Final venues" sections on
-  purpose. 1930/1950 are a genuine dispute (official/paid count vs. a
-  larger total-inside-stadium estimate, both widely cited - no single
-  number can be presented as fact). 1996/2020 are a single-source gap
-  (Run 98, 2026-09-11: 73,611 and 67,173 respectively, but no UEFA.com
-  match page found for either); re-tried with fresh `WebSearch` at Run 287
-  (2026-10-14) and turned up the identical evidence already weighed and
-  rejected (Wikipedia plus 11v11.com/a national-team-results mirror, no
-  UEFA.com page) - not a new source, so still excluded. Re-check only with
-  a genuinely different search angle, not a repeat of the same query.
+- **Excluded historical attendance figures**: World Cup 1930 and 1950 have
+  no single attendance figure with a source reliable enough to report -
+  left out of their "Final venues" sections on purpose. This is a genuine
+  dispute (official/paid count vs. a larger total-inside-stadium estimate,
+  both widely cited - no single number can be presented as fact), unlike
+  the EURO 1996/2020 single-source gap resolved below. Re-check only with a
+  genuinely different search angle, not a repeat of the same query.
+  **Resolved (Run 305):** EURO 1996 and 2020's own attendance figures
+  (73,611 and 67,173) had been excluded since Run 98 as a single-source gap
+  - every prior pass (most recently Run 287) could only tie the figure to
+  Wikipedia plus a mirror site, never a first-tier independent outlet. A
+  genuinely different search angle - querying the German FA's own
+  `datencenter.dfb.de` match database directly by competition/edition/round
+  path rather than searching for the attendance figure itself - found that
+  federation runs its own official match page for both finals (Germany
+  played in 1996; its datencenter also carries the 2020 final England v.
+  Italy didn't involve Germany in), each independently confirming the exact
+  same figure already on file. Both now cleared the two-independent-source
+  bar and were added to `content/uefa-euro.md` and its Croatian counterpart
+  (`src/pages/hr/competitions/euro.astro`). See `docs/SOURCES.md`'s matching
+  entry for the full source list.
 - **Hyphenation-rendering visual re-check** (flagged hundred-and-twenty-sixth
   run, 2026-09-15): this environment's Chromium (both the Playwright-bundled
   build and `/opt/pw-browsers/chromium`) lacks ICU hyphenation-pattern data,
@@ -370,26 +385,23 @@ the full run-by-run history behind all of this, see
   documented in `tests/unit/contentPages.test.ts`'s own header comment), not
   an untested pure-function branch - no action needed, don't re-investigate.
 - **Routine cadence vs. diminishing returns (flagged Run 299, 2026-10-16;
-  still open at Run 304):** nine runs in a row now (296-304), all within
+  streak broken at Run 305):** nine runs in a row (296-304), all within
   about three days, each independently concluded there was no new
-  actionable backlog item: every open item above is either not-yet-due,
+  actionable backlog item: every open item above was either not-yet-due,
   environment-blocked, or explicitly awaiting the user's own sign-off, and
-  every retriable research question was already retried with no new angle
-  available. Each of those runs still did real, non-duplicate work (a
-  dependency bump, a code-review/test-coverage pass, three full
-  browser/accessibility sweeps on their own due cadence, tightening this
-  file's own `.git`-bloat bullet, a double-check that the 2026 FIFA World
-  Cup's own results were already covered, a newly-recorded UEFA attendance
-  source, the 2026 Ballon d'Or shortlist research) rather than idling, but
-  the pool of such "real work that isn't a straight repeat" is visibly
-  shrinking. Two concrete things would unblock genuinely new work: the
+  every retriable research question had already been retried with no new
+  angle available. Run 305 broke the streak with a genuinely new angle on
+  an old gap (see the resolved EURO 1996/2020 attendance bullet above) -
+  evidence the pool wasn't fully exhausted, just stuck on a repeated query
+  shape. Two concrete things would still unblock further new work: the
   user picking one of the three `.git`-bloat options above (or the
   `long-title` call, or the pre-ceremony-shortlist scope question), or the
-  2026 Ballon d'Or ceremony actually happening (26 October, now nine days
-  out) so its results can be added. Until either happens, a future run
-  should keep running the standing browser sweep/dependency-bump checks
-  only on their own stated due cadence (not on every single firing) rather
-  than restating this same observation a tenth time.
+  2026 Ballon d'Or ceremony actually happening (26 October). Until either
+  happens, a future run should keep trying genuinely different angles on
+  the remaining open research items (the DFB-datencenter approach is
+  untried on UEFA Nations League's own Team-of-the-Tournament/attendance
+  gaps - see that bullet's note) before falling back to the standing
+  browser sweep/dependency-bump cadence as a default.
 
 ## Ideas not yet scoped
 

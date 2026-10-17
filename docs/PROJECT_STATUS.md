@@ -41067,4 +41067,82 @@ the 2026 Ballon d'Or ceremony itself becomes checkable once 26 October has
 passed. Ninth consecutive run (296-304) to find no new actionable backlog
 item - this run's own contribution was the due browser/accessibility
 sweep (genuinely new verification work, not a repeat) plus the Golden
+
+### Run 305 (2026-10-17): resolved the standing EURO 1996/2020 final-attendance single-source gap (open since Run 98) by querying the German FA's own `datencenter.dfb.de` match database directly rather than searching for the attendance figure itself; `html-validate` patch bump; full health re-confirmation
+
+Confirmed PR #57 was green going in: both required checks (`test`,
+`open-pr`) `success` on the current head (`0e7d749e1`), and its two
+existing comments are both this routine's own earlier CI-fix writeups
+(Runs 302/303) - no pending review activity needed a response.
+
+With the tenth consecutive run (296-304) having found no new actionable
+backlog item via the usual research angles, tried a genuinely different
+one on the oldest still-open research gap rather than restate "nothing
+new" an eleventh time: the "Excluded historical attendance figures" bullet
+has flagged EURO 1996 and 2020's own final attendance (73,611 and 67,173)
+as a single-source gap since Run 98 (2026-09-11) - every prior pass,
+including Run 287's most recent retry, could only tie the figure to
+Wikipedia plus a mirror/aggregator site, never a first-tier independent
+outlet. Rather than searching for the attendance figure itself again (the
+same query shape that kept finding the same mirror), this run queried the
+German FA's own `datencenter.dfb.de` match database directly by its own
+competition/edition/round URL path - the same source this file already
+treats as credible elsewhere (UEFA Nations League 2025's attendance, Run
+251). That federation database runs an official match page for the 1996
+final (Germany played in and won it) and - more surprisingly, since
+England v. Italy didn't involve Germany - also carries one for the 2020
+final. Both pages independently confirm the exact figure already on file,
+with no discrepancy: 73,611 (30 June 1996, referee Pierluigi Pairetto) and
+67,173 (11 July 2021, referee Björn Kuipers). Sky Sports (UK and Germany
+editions), TheSportsDB, Goal.com and the National Post were also found
+independently reporting 67,173 for 2020, corroborating the DFB figure
+further. Both editions now clear the two-independent-source bar.
+
+Added both figures to `content/uefa-euro.md`'s "Final venues" section
+("a reported attendance of 73,611" / "...67,173, reduced by COVID-19
+capacity limits") and their Croatian counterparts in
+`src/pages/hr/competitions/euro.astro` ("prijavljeno 73.611/67.173
+gledatelja"), verified against each other by `check:attendance-format`
+(EN comma-grouping vs. HR period-grouping, positionally). Bumped
+`content/uefa-euro.md`'s `lastReviewed` to today. Updated
+`docs/ROADMAP.md`'s "Excluded historical attendance figures" bullet to
+drop EURO 1996/2020 (keeping only the genuinely disputed World Cup
+1930/1950 entries) and record the resolution; full sourcing recorded in
+`docs/SOURCES.md`'s matching entry.
+
+Also bumped `html-validate` 11.16.2 -> 11.16.3 (patch, the one new
+bumpable package `pnpm outdated` showed this run).
+
+**Verification:** `pnpm install --frozen-lockfile` (588 packages after the
+`html-validate` bump), `pnpm lint` (265 files, 0/0/0), `pnpm test`
+(1086/1086, unchanged), `pnpm build` (711 pages, unchanged),
+`pnpm check:attendance-format` (4 "Final venues" page pairs, EN/HR match),
+`pnpm check:i18n-notes` (8 page pairs, structure parity), `pnpm
+check:spelling`/`check:spelling-hr`/`check:claims-hr`/
+`check:locale-consistency`/`check:links` (all clean), `pnpm audit`
+(clean), `pnpm dlx knip --no-config-hints` (one standing false positive,
+unchanged). `content/uefa-euro.md` and `src/pages/hr/competitions/
+euro.astro` both touched, so regenerated all 700 PDFs with
+`PW_EXECUTABLE_PATH` pointed at the pre-installed
+`chromium_headless_shell-1194` binary (698 rewritten, 2 unchanged and
+skipped per the Run 293 skip-cache logic); `pnpm check:pdfs` and `pnpm
+check:pdf-outline` both confirm all 700 PDFs fresh and outline-correct
+after regeneration.
+
+**Left for a future pass:** `.git`-bloat, `long-title`, and the
+pre-ceremony Ballon d'Or shortlist scope question remain the user's own
+call, unchanged by this run. The browser sweep isn't due again for two
+more runs. The content-verification rotation still has no differentiated
+pick (every `content/*.md` file, `uefa-euro.md` included, is now tied at
+`lastReviewed: 2026-10-17`). Of the other standing research gaps, World
+Cup 1930/1950 attendance stays excluded (a genuine dispute, not a
+single-source gap the DFB angle could resolve - Germany didn't play in
+either final, so there's no DFB page to check), and the UEFA Nations
+League Team of the Tournament/attendance gaps and the EURO/Copa América
+"youngest-ever" idea-backlog items weren't retried this run (no new angle
+on those specifically, and the DFB-datencenter angle is reusable on them
+if a future run tries it - UEFA Nations League 2021/2023/2025 all have
+Germany in the Finals four-team pool for 2021 and 2025, which the DFB
+datencenter might cover the way it unexpectedly covered EURO 2020's
+Germany-less final).
 Boot 2026 double-check.
