@@ -357,8 +357,9 @@ test.describe('EURO page on a 360px phone', () => {
       notes.getByText('Stadio Olimpico, Rome (Italy) - the same stadium as the 1968 final'),
     ).toBeVisible();
     await expect(notes.getByText('a reported attendance of 65,600')).toBeVisible();
-    // 1996 and 2020 stay without one - only a single, unconfirmable source.
-    await expect(notes.getByText('Wembley Stadium, London (England).')).toBeVisible();
+    // 1996 and 2020 now carry attendance too, confirmed via the DFB datencenter (Run 305).
+    await expect(notes.getByText('a reported attendance of 73,611')).toBeVisible();
+    await expect(notes.getByText('a reported attendance of 67,173')).toBeVisible();
   });
 
   test('shows the Historical format note as a paragraph, Player of the Tournament winners and Memorable moments as a list', async ({ page }) => {
@@ -638,7 +639,9 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
       notes.getByText('Stadio Olimpico, Rim (Italija) - isti stadion kao finale 1968.'),
     ).toBeVisible();
     await expect(notes.getByText('prijavljeno 65.600 gledatelja')).toBeVisible();
-    await expect(notes.getByText('1996.: Wembley Stadium, London (Engleska).')).toBeVisible();
+    // 1996 and 2020 now carry attendance too, confirmed via the DFB datencenter (Run 305).
+    await expect(notes.getByText('prijavljeno 73.611 gledatelja')).toBeVisible();
+    await expect(notes.getByText('prijavljeno 67.173 gledatelja')).toBeVisible();
     // The section's lead-in methodology sentence renders as its own intro
     // paragraph, not as a bogus first list item among the actual venues.
     await expect(page.locator('.notes__intro', { hasText: 'Svako izdanje EURA' })).toBeVisible();
