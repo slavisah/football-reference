@@ -1549,6 +1549,25 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Final attendance, fourth re-investigation (added 2026-10-17, three-
+  hundred-and-second intensive run): tried a different angle on 2023
+  specifically - UEFA's own aggregate reporting for the whole four-team
+  Finals mini-tournament, rather than the final match alone. Found a genuine
+  UEFA.com figure: "126,200 - 95% of the stadiums' combined capacity" across
+  all four 2023 Finals matches (the two semifinals, the third-place
+  play-off, and the final) in Rotterdam and Enschede. This is real and
+  UEFA-sourced, but it cannot resolve the already-documented 41,110/41,500
+  final-specific conflict: it is a four-match total with no published
+  per-match breakdown in the result, so the final's own share of it can't be
+  isolated, and the implied per-match average (31,550) is close to neither
+  disputed figure on its own. Recorded here so a future run doesn't treat
+  this aggregate as a lead worth re-pursuing for the final-specific number;
+  2023's conflict stays exactly as already documented, unresolved:
+  - https://www.uefa.com/uefanationsleague/news/028a-1a1d74edcea7-53be43f3e6b4-1000--nations-league-maintaining-momentum/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summary of this UEFA.com article rather than a direct page
+    load.
 
 ## Copa América
 

@@ -40882,3 +40882,77 @@ consecutive run (296-301) to find no new actionable backlog item beyond
 re-confirming the standing checklist - consistent with Run 299's own
 observation that real, non-duplicate work stays scarce until the user acts
 on one of the two pending decisions, or the Ballon d'Or ceremony happens.
+
+### Run 302 (2026-10-17): full health re-confirmation, no drift; two fresh research angles (one new UEFA source recorded, neither closes an open gap); explicitly checked for the single highest-risk gap this routine could have - deliberately verified it is already closed
+
+Before touching the standing checklist, checked the one thing that would
+have dwarfed every other open item if missed: whether the 2026 FIFA World
+Cup (11 June - 19 July 2026, the actual real-world tournament whose date
+this routine's own "today" of 2026-10-17 now falls after) was already
+covered. It is - `content/fifa-world-cup.md`'s `lastCompletedEdition: 2026`
+and every section (Finals table, Golden Ball/Boot/Glove/Young Player
+winners, winning manager/captain, Champions-by-titles count, Memorable
+moments) already carries the 2026 edition (Spain beat Argentina 1-0 a.e.t.
+in the final, Rodri won the Golden Ball, de la Fuente the oldest-ever
+winning manager at 65), and `pnpm test`'s independent-recomputation guards
+(`check-records-against-source.mjs` et al.) already pass against it. Not a
+gap; confirmed rather than assumed, since this is exactly the kind of
+large, dated, easy-to-silently-miss addition a maintenance-mode routine
+could otherwise overlook for weeks.
+
+Re-read `docs/ROADMAP.md` end to end: every "Open backlog" item is
+unchanged from Run 301 - not-yet-due (2026 Ballon d'Or, now nine days out),
+environment-blocked (`typescript` 7 - `pnpm outdated` re-confirmed no new
+bumpable package beyond that one entry; `docs/SOURCES.md` link-liveness),
+or awaiting the user's own sign-off (`.git`-bloat, `long-title`). The
+ten-script manual browser/accessibility sweep just ran at Run 301 and isn't
+due for another two to three runs, so wasn't re-run. All 15 `content/*.md`
+files remain tied at `lastReviewed: 2026-10-14` with no differentiated next
+content-verification pick.
+
+Tried two fresh `WebSearch` angles on open research gaps, rather than
+re-stating the standing "nothing new" observation a seventh time with no
+new attempt behind it:
+- **UEFA Nations League Team of the Tournament (2021/2023/2025):** searched
+  directly for UEFA's own Technical Observers' XI pages for the 2025
+  Finals. The UEFA.com URL pattern that should carry it instead serves
+  content that reads as the 2019 Finals' Team of the Tournament (David
+  Moyes/Packie Bonner as observers, a Ronaldo hat-trick reference) under a
+  2025-dated-looking slug - a stale/mislabeled page, not a genuine 2025
+  result. No complete XI for any of the three editions surfaced. Same
+  negative outcome as every prior attempt (6+ runs); not re-logged as its
+  own `docs/SOURCES.md` entry since it adds nothing beyond what
+  `docs/ROADMAP.md`'s own bullet already states.
+- **UEFA Nations League 2023 Finals attendance:** tried the "aggregate
+  across the whole mini-tournament" angle instead of the final specifically
+  - a genuinely different question from the three prior per-final attempts.
+  Found a real, UEFA-sourced figure (126,200 across all four 2023 Finals
+  matches, "95% of the stadiums' combined capacity," per UEFA.com's own
+  recap) - but it's a four-match total with no per-match breakdown, so it
+  can't be decomposed to the final's own attendance and doesn't move the
+  already-documented 41,110-vs-41,500 conflict either way. Recorded as a
+  fourth re-investigation entry in `docs/SOURCES.md`'s "UEFA Nations
+  League" section specifically so a future run doesn't spend a cycle
+  re-chasing this same aggregate figure thinking it might resolve the
+  final-specific question - it doesn't, and that's now written down. No
+  `content/uefa-nations-league.md` change: the 2023 final's own attendance
+  stays unreported, exactly as before.
+
+**Verification:** `pnpm install --frozen-lockfile` (588 packages, no
+drift), `pnpm lint` (265 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(1086/1086, unchanged), `pnpm build` (711 pages, unchanged), `pnpm outdated`
+(only the already-blocked `typescript` 7). Confirmed PR #57
+(`intensive/football-reference` -> `main`) still open, `mergeable_state:
+clean`, 25 commits, no pending review activity. Only `docs/*.md` touched -
+no `content/*.md` or `src/` edit, so no PDF regeneration or code-review
+reopening was owed.
+
+**Left for a future pass:** unchanged from Run 301 - `.git`-bloat and
+`long-title` are still the user's own call; the browser sweep isn't due for
+two to three more runs; the content-verification rotation has no
+differentiated next pick; the 2026 Ballon d'Or edition becomes checkable
+once the 26 October ceremony (now nine days out) has happened. Seventh
+consecutive run (296-302) to find no new actionable backlog item - this
+run's own contribution was the FIFA World Cup 2026 coverage double-check
+(confirmed already done) and one newly-recorded, non-resolving UEFA source
+for the 2023 Nations League attendance conflict.
