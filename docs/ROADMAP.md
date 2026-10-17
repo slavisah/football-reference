@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (279 intensive runs as of 2026-10-13) lives
+verification sweep and decision (305 intensive runs as of 2026-10-17) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -84,21 +84,29 @@ into `.github/workflows/ci.yml` as required PR gates; the other ten
 `check:text-spacing`/`check:focus-appearance`/`check:color-contrast`) are
 full-site Playwright/browser sweeps kept manual/intensive-run-only rather
 than a required PR gate, purely for their ~700-to-1,400-page-load runtime -
-re-run periodically (most recently Run 265: all ten clean, including
-`check:color-contrast` - the heaviest, 1,422 page loads - which Runs 260
-and 264 had only ever seen "slow"/killed, not actually passing; Run 265
-found the real cause (it needs the `chrome-headless-shell` Playwright
-build, which this environment's pre-installed browser cache has at a
-revision `@playwright/test` doesn't look for by default, so the real
-failure was an immediate launch error, not a hang) and ran it to a clean
-completion with `PW_EXECUTABLE_PATH` pointed at the pre-installed
-`chromium_headless_shell-1194/chrome-linux/headless_shell.real` binary:
-zero WCAG 1.4.3 violations across all 711 pages in both color schemes)
-rather than on every change.
+re-run periodically (most recently Run 304, three runs after the prior
+full pass at Run 301 - all ten clean again, including
+`check:color-contrast` - the heaviest, ~1,400 page loads, confirmed clean
+with `PW_EXECUTABLE_PATH` pointed at the pre-installed
+`chromium_headless_shell-1194/chrome-linux/headless_shell.real` binary per
+Run 265's own fix - zero WCAG 1.4.3 violations across all 711 pages in
+both color schemes; `check:lighthouse` also reconfirmed, 39 pages all
+>= 0.9 in every category with the same one documented noindex/SEO
+exception as before) rather than on every change. Run 294 found this same
+`PW_EXECUTABLE_PATH` fix is also needed for `pnpm test:e2e` in this
+session's container (not just the ten manual scripts above) - without it,
+every test fails instantly with a `chrome-headless-shell`
+executable-not-found error (the cache only has the `-1194` revision,
+whatever `@playwright/test` release this container's cache predates looks
+for a later one); with it, a 43-test sample (including every axe-core-
+driven accessibility spec, the ones most likely to break from that run's
+`@axe-core/playwright` bump) passed clean before the full 1055-test run
+was handed off to CI, which runs the same suite with its own clean
+Playwright browser install on every PR push.
 `knip` shows exactly one standing false positive (`@cspell/dict-hr-hr`,
 used only via `.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS
 `import` knip's static analysis can see). Current counts (confirmed fresh
-this run): 1071 unit tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711
+this run): 1086 unit tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711
 pages built; 1055 Playwright e2e tests as of the last full cold-start run
 (Run 254).
 
@@ -152,7 +160,13 @@ changes materially. Run 270 then extended the angle to `scripts/*.mjs`
 (7 of 49 files), Run 274 covered 7 more (the remaining claim-ledger/profile
 checkers, fixing a dead-code ENOENT bug present in two files), and Run 275
 finished the remaining 24 files - all of `scripts/*.mjs` has now had this
-review at least once. Run 275 found and fixed one real, currently-live bug:
+review at least once. `scripts/generate-pdfs.mjs` reopened for this angle
+after Run 293 materially edited it (new PDF-regeneration-skip cache logic);
+Run 296 reviewed that new logic, found no live bug, and split it into a new
+side-effect-free `scripts/pdf-manifest.mjs` module with its own unit tests
+(`tests/unit/pdfManifest.test.ts`, 15 cases) - re-open only after a future
+run materially edits either file again. Run 275 found and fixed one real,
+currently-live bug:
 `check-i18n-notes.mjs`'s `hrCounterpart()` mapped the home page to `/hr`
 instead of `/hr/`, the one path shape that doesn't match
 `htmlFileToPagePath()`'s own trailing-slash convention for a directory
@@ -168,16 +182,13 @@ mismatch, so this angle is worth re-running from scratch after a future run
 meaningfully edits any of these files, rather than treated as permanently
 closed.
 
-**Standing, unresolved process flag (raised Run 263, 268-277, 278, now 279 -
-thirteen runs running):** PR #56 (`intensive/football-reference` -> `main`)
-has been open since 2026-10-02 and has never been merged - 11 days and 77+
-commits as of Run 279, growing every 4 hours. No intensive run can merge or
-pause its own PR; Runs 271-278 already escalated this via push
-notifications (outside the repo), and the PR is still open several runs
-later, so Run 279 sent another push notification - leading with the PR-56
-status, not this run's own findings - rather than assuming the earlier ones
-will eventually be acted on. This needs the user's own decision (merge it,
-or pause/slow this routine).
+**Resolved (Run 280):** PR #56 (`intensive/football-reference` -> `main`),
+flagged as a standing unresolved process issue across Runs 263, 268-279
+(thirteen runs), was merged by the user on 2026-10-13 (80 commits, 798
+files). The `intensive/football-reference` branch has been recreated fresh
+from the post-merge `main` for this and future runs, per the routine's own
+branch-strategy instructions for a squash-merged branch. No action needed;
+noted here only so a future run doesn't wonder why the flag disappeared.
 
 Every generated/derived page has its own independent-recomputation guard,
 wired into CI, that cross-checks its output against `content/*.md` rather
@@ -196,17 +207,81 @@ the full run-by-run history behind all of this, see
 
 ## Open backlog
 
+- **`.git` history bloat from committed PDFs - decision overdue, unresolved
+  across 8 runs (289-296, 2026-10-14 to 2026-10-16):** root cause and the
+  Run 293 partial fix are fully written up in `docs/PROJECT_STATUS.md`'s
+  Run 289 and Run 293 entries - not repeated here. Current state: `.git`
+  is 5.2-5.5 GB; Run 293 already stopped the *common* case of further
+  growth (a content-touching run that doesn't change a PDF's own source no
+  longer rewrites that PDF), but the ~5 GB already in history is untouched,
+  and a run whose edit *does* change a PDF's source still adds one full
+  binary rewrite (Chromium's print-to-PDF output isn't byte-stable across
+  runs even for identical content, so git can't delta it). Three options,
+  compared here so the decision is actually actionable rather than
+  re-flagged a ninth time:
+  1. **Git LFS migration** (`git lfs migrate import --include="public/
+     downloads/*.pdf" --everything`): moves the PDF blobs out of the
+     regular object store into LFS pointers, shrinking the *packed* `.git`
+     significantly. Still rewrites every commit SHA that ever touched a
+     PDF (forced push, every existing clone needs redoing), and shifts the
+     cost to GitHub LFS storage/bandwidth quotas instead of removing it -
+     700 PDFs regenerating periodically could run into the free-tier cap.
+  2. **History rewrite / blob purge** (e.g. `git filter-repo`, keeping only
+     each PDF's latest blob): the most direct shrink of the bloat already
+     committed. Destructive in the same way as option 1 (rewrites SHAs,
+     needs a forced push and fresh clones) but with no new ongoing
+     infrastructure - losing old PDF *history* isn't a content-loss risk
+     the way losing a `content/*.md` edit would be, since the PDFs are a
+     generated artifact, not editorial source.
+  3. **Stop committing generated PDFs at all**: generate them as a deploy-
+     time build step (the production host runs `pnpm build:pdfs` before
+     serving, the same command this repo already runs locally) instead of
+     versioning `public/downloads/*.pdf` in git. The only option that fixes
+     the growth mechanism at its root rather than relocating/shrinking the
+     existing bloat - but it's a deployment-architecture change, not a git
+     operation: whichever host serves this site needs to start running a
+     build step it may not run today.
+  Option 3 is the direction Run 293's own skip-cache logic already treats
+  PDFs as heading (a build artifact with a freshness check, not an edited
+  file) - but adopting it, and whether to *also* do a one-time cleanup
+  (option 1 or 2) for the ~5 GB already committed, needs the user's actual
+  sign-off: this is a destructive-or-architecture-changing decision no
+  unattended run should make unilaterally. No code change proposed here,
+  only the comparison - flag this to the user directly rather than letting
+  a ninth run restate the same open question.
 - **2026 Ballon d'Or edition**: not due yet, not blocked. The two-hundred-
   and-forty-first run confirmed via `WebSearch` that the ceremony is
   scheduled for 26 October 2026 in London (its first time outside Paris) -
   `content/ballon-dor.md`'s `lastCompletedEdition: 2025` is correct as of
   this run's date (2026-10-06). Re-check once that date has passed.
+  Run 303 (2026-10-17) found France Football already announced the men's
+  30-name shortlist on 8 September 2026 (Messi, Mbappé, Kane, Haaland,
+  Yamal, defending winner Dembélé among them) - two independently-sourced
+  "full list" tables (Sports Illustrated, TheSportsCast) matched exactly on
+  all 30 names, clearing this site's own usual two-source bar - see
+  `docs/SOURCES.md`'s matching entry for the full list and sources.
+  **Deliberately not added to `content/ballon-dor.md`**: a nominee
+  shortlist is a different kind of fact from everything else on this page -
+  an announced-but-not-yet-decided result, not a completed historical
+  record - and this would be the first time in the site's history any page
+  carries "not yet happened" content rather than only confirmed outcomes.
+  It also isn't a drop-in edit: the "Memorable moments"/companion-trophy
+  style sections render through `EditorialNotes.astro`'s note-card system,
+  which `check-i18n-notes.mjs` enforces structural EN/HR parity on (same
+  section count, same bullet count per section) - a 30-item English list
+  would need a genuinely hand-translated Croatian counterpart with the same
+  30 items, not a mechanical copy. That's a real but doable follow-up, not
+  a blocker; what's not this routine's call to make unattended is *whether*
+  the site wants pre-ceremony "shortlist" content at all, a scope decision
+  on the same footing as the `.git`-bloat and `long-title` items above.
+  Flagged to the user directly; a future run should add the section (both
+  languages) if the user says yes, or drop this note if they say no.
 - **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.10` (latest
   published) only declares `typescript: '^5.0.0 || ^6.0.0'` as a peer
-  dependency - re-confirmed via `pnpm outdated` as recently as the
-  two-hundred-and-thirteenth run (2026-10-02; `typescript` still at 5.9.3 vs.
-  7.0.2 latest, no new `@astrojs/check` release). Re-check whenever `pnpm
-  outdated` next shows a new `@astrojs/check` release.
+  dependency - re-confirmed via `pnpm outdated` as recently as Run 287
+  (2026-10-14; `typescript` still at 5.9.3 vs. 7.0.2 latest, no new
+  `@astrojs/check` release). Re-check whenever `pnpm outdated` next shows a
+  new `@astrojs/check` release.
 - **`docs/SOURCES.md` link-liveness sweep**: blocked. This environment's
   outbound network/egress policy rejects direct requests to external
   reference domains - confirmed repeatedly, most recently 2026-10-02
@@ -236,6 +311,19 @@ the full run-by-run history behind all of this, see
   result as every prior run's attempt, now via a tool that does have live
   web access, not just a knowledge-cutoff limitation. Genuinely exhausted
   short of a UEFA technical-report PDF this environment cannot fetch.
+  **Angle tried and also exhausted (Run 306):** the German FA's own
+  `datencenter.dfb.de` match database, flagged by Run 305 as untried for
+  this item, turns out to be a match-result database (scores, lineups,
+  goal-scorers, referees, attendance) with no awards/best-XI listing at
+  all - confirmed via `WebSearch` for the 2024-2025 semi-final Germany
+  actually played (Germany 1-2 Portugal, Munich, 4 June 2025: the page
+  exists and surfaces match facts) and for 2025's Best Player (Nuno Mendes,
+  per Wikipedia, not DFB), with no Team-of-the-Tournament eleven appearing
+  for any of the three editions in either case. Direct `WebFetch` to
+  `datencenter.dfb.de` itself still fails (`ENOTFOUND`, the same egress
+  block as the link-liveness item above), so there's no way to browse the
+  site further than what search snippets surface. Genuinely exhausted now
+  on this angle too, not just the original search-the-claim-directly one.
 - **UEFA Nations League attendance figures**: the 2023 Finals attendance has
   a genuine source conflict (41,110 vs. 41,500, both independently reported
   by different outlets); 2021 has no attendance figure confirmed by two
@@ -255,11 +343,40 @@ the full run-by-run history behind all of this, see
   two-independent-sources bar. `WebFetch` to `uefa.com` (which might carry
   the tournament's own official figure) is blocked (see the link-liveness
   item above), so there's no way to read a second primary source directly,
-  only search-engine summaries of one.
-- **Excluded historical attendance figures**: World Cup 1930 and 1950, and
-  EURO 1996 and 2020, each have no single attendance figure with a source
-  reliable enough to report - left out of their "Final venues" sections on
-  purpose.
+  only search-engine summaries of one. **DFB-datencenter angle also tried
+  (Run 306):** found a `datencenter.dfb.de` match page for 2021's final
+  (Spain 1-2 France, Milan) via `WebSearch`, but the search snippet itself
+  didn't surface an attendance figure from it, and direct `WebFetch` to
+  the domain fails (`ENOTFOUND`, egress-blocked) - so the page may well
+  carry the figure, but it can't be read from this environment. No DFB
+  page turned up at all for 2023's final (played in Rotterdam, no German
+  team involved - unlike EURO 2020's Germany-less final, which the DFB
+  database covered anyway, there's no equivalent page here to find), so
+  that conflict stays unresolved by this angle too. 2025's figure (the
+  65,852 vs. ~75,000 conflict) wasn't re-checked this run - no new angle
+  on it beyond the one already tried by the two-hundred-and-fifty-first
+  run.
+- **Excluded historical attendance figures**: World Cup 1930 and 1950 have
+  no single attendance figure with a source reliable enough to report -
+  left out of their "Final venues" sections on purpose. This is a genuine
+  dispute (official/paid count vs. a larger total-inside-stadium estimate,
+  both widely cited - no single number can be presented as fact), unlike
+  the EURO 1996/2020 single-source gap resolved below. Re-check only with a
+  genuinely different search angle, not a repeat of the same query.
+  **Resolved (Run 305):** EURO 1996 and 2020's own attendance figures
+  (73,611 and 67,173) had been excluded since Run 98 as a single-source gap
+  - every prior pass (most recently Run 287) could only tie the figure to
+  Wikipedia plus a mirror site, never a first-tier independent outlet. A
+  genuinely different search angle - querying the German FA's own
+  `datencenter.dfb.de` match database directly by competition/edition/round
+  path rather than searching for the attendance figure itself - found that
+  federation runs its own official match page for both finals (Germany
+  played in 1996; its datencenter also carries the 2020 final England v.
+  Italy didn't involve Germany in), each independently confirming the exact
+  same figure already on file. Both now cleared the two-independent-source
+  bar and were added to `content/uefa-euro.md` and its Croatian counterpart
+  (`src/pages/hr/competitions/euro.astro`). See `docs/SOURCES.md`'s matching
+  entry for the full source list.
 - **Hyphenation-rendering visual re-check** (flagged hundred-and-twenty-sixth
   run, 2026-09-15): this environment's Chromium (both the Playwright-bundled
   build and `/opt/pw-browsers/chromium`) lacks ICU hyphenation-pattern data,
@@ -286,6 +403,28 @@ the full run-by-run history behind all of this, see
   deliberate build-only integration-test choice (same as `sitemap.xml.ts`,
   documented in `tests/unit/contentPages.test.ts`'s own header comment), not
   an untested pure-function branch - no action needed, don't re-investigate.
+- **Routine cadence vs. diminishing returns (flagged Run 299, 2026-10-16;
+  streak broken at Run 305):** nine runs in a row (296-304), all within
+  about three days, each independently concluded there was no new
+  actionable backlog item: every open item above was either not-yet-due,
+  environment-blocked, or explicitly awaiting the user's own sign-off, and
+  every retriable research question had already been retried with no new
+  angle available. Run 305 broke the streak with a genuinely new angle on
+  an old gap (see the resolved EURO 1996/2020 attendance bullet above) -
+  evidence the pool wasn't fully exhausted, just stuck on a repeated query
+  shape. Two concrete things would still unblock further new work: the
+  user picking one of the three `.git`-bloat options above (or the
+  `long-title` call, or the pre-ceremony-shortlist scope question), or the
+  2026 Ballon d'Or ceremony actually happening (26 October). Until either
+  happens, a future run should keep trying genuinely different angles on
+  the remaining open research items before falling back to the standing
+  browser sweep/dependency-bump cadence as a default. **Update (Run 306):**
+  the DFB-datencenter approach this note flagged as untried on UEFA Nations
+  League's Team-of-the-Tournament/attendance gaps has now been tried and is
+  also exhausted (see those two bullets' own notes) - no genuinely new
+  angle on any open research item is currently known; the next one will
+  need to come from a future run's own fresh idea, not a restatement of
+  this note.
 
 ## Ideas not yet scoped
 
@@ -350,3 +489,12 @@ the full run-by-run history behind all of this, see
   few runs rather than retrying with no new angle each time, per Run 256's
   own reasoning, until either a fresh source surfaces on its own or a
   genuinely different search angle presents itself.
+- **Copa América Best Player / EURO Player of the Tournament "oldest-
+  youngest-ever" facts** (tried Run 290, 2026-10-15): no source ranks
+  either award's winners by age or frames any one of them as a record
+  holder, so neither was shipped - same bar as the item above (an
+  already-published superlative claim, never a self-computed one). Dani
+  Alves (2019 Copa América Best Player, won at 36) and Lionel Messi (2021,
+  won at 34) are the strongest self-computed "oldest" candidates if a
+  source ever does surface. Re-try only with a genuinely different search
+  angle, not a repeat of the same query.

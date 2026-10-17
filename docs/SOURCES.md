@@ -668,6 +668,37 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- "Format milestones" and "Memorable moments" sections (audited 2026-10-14,
+  two-hundred-and-eighty-fifth intensive run): the content-verification
+  rotation's next target per `lastReviewed` staleness. Every other section
+  on this page already had a dedicated audit entry above; these two were the
+  one remaining gap - cross-checked independently rather than assumed correct
+  just because the underlying facts (host/teams/winner columns, final dates,
+  attendance) they summarize were already verified elsewhere. Four claims
+  checked: Brazil's 1970 win being the first time any team won three World
+  Cups (confirmed - 1958, 1962, 1970); 1982 being the first 24-team finals,
+  up from 16 (confirmed); 1998 being the first 32-team finals, up from 24
+  (confirmed); and 2026 being the first 48-team finals and the first hosted
+  by three countries (confirmed; Mexico also became the first country to
+  host a men's World Cup three times - 1970, 1986, 2026). One low-quality
+  pre-tournament mirror site surfaced during the 2026 search claiming a
+  different team won the final than this page records; it contradicted every
+  other source (including the dozens already cited above and in the
+  "Winning managers"/"Golden Ball" entries, all dated after the tournament
+  actually finished) and was discarded as noise rather than treated as a
+  conflict. **No discrepancies found.** The remaining "Memorable moments"
+  bullets (Maradona 1986, Croatia's first final in 2018, the 2022 3-3 final)
+  restate facts the "Editions" table audit already covers and weren't
+  re-litigated separately:
+  - https://loki.editorial.aetnd.com/this-day-in-history/pele-leads-brazil-over-italy-in-world-cup-championship
+  - https://en.wikipedia.org/wiki/1982_FIFA_World_Cup
+  - https://footballhistory.org/world-cup/1982-spain.html
+  - https://en.wikipedia.org/wiki/1998_FIFA_World_Cup
+  - https://en.wikipedia.org/wiki/1998_FIFA_World_Cup_final
+  - https://worldatlas.com/articles/where-will-the-2026-fifa-world-cup-be-held.html
+  - https://simple.wikipedia.com/wiki/2026_FIFA_World_Cup (the unreliable
+    pre-tournament-outcome mirror noted above - not used as a source for any
+    fact on this page)
 
 ## UEFA EURO
 
@@ -1518,6 +1549,25 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Final attendance, fourth re-investigation (added 2026-10-17, three-
+  hundred-and-second intensive run): tried a different angle on 2023
+  specifically - UEFA's own aggregate reporting for the whole four-team
+  Finals mini-tournament, rather than the final match alone. Found a genuine
+  UEFA.com figure: "126,200 - 95% of the stadiums' combined capacity" across
+  all four 2023 Finals matches (the two semifinals, the third-place
+  play-off, and the final) in Rotterdam and Enschede. This is real and
+  UEFA-sourced, but it cannot resolve the already-documented 41,110/41,500
+  final-specific conflict: it is a four-match total with no published
+  per-match breakdown in the result, so the final's own share of it can't be
+  isolated, and the implied per-match average (31,550) is close to neither
+  disputed figure on its own. Recorded here so a future run doesn't treat
+  this aggregate as a lead worth re-pursuing for the final-specific number;
+  2023's conflict stays exactly as already documented, unresolved:
+  - https://www.uefa.com/uefanationsleague/news/028a-1a1d74edcea7-53be43f3e6b4-1000--nations-league-maintaining-momentum/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summary of this UEFA.com article rather than a direct page
+    load.
 
 ## Copa América
 
@@ -2939,6 +2989,32 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Companion trophy sections second-pass audit (2026-10-13, Run 280): a fresh,
+  independent re-check of all five companion trophy sections above (Kopa,
+  Yashin, Gerd Müller, Johan Cruyff, Sócrates - 20 entries total), closing
+  the gap that these five sections had each only ever had their original
+  authoring-time verification (2026-08-31 through 2026-09-03) and no further
+  external re-check since, unlike the Winners/Ceremony date columns above,
+  which both already carry a documented second independent pass. Used a
+  source mix distinct from each section's own original citations. **No
+  discrepancies found** across all 20 entries:
+  - https://www.si.com/soccer/kopa-trophy-list-winners-most-wins-all-time
+  - https://www.si.com/soccer/yashin-trophy-list-winners-most-wins-all-time
+  - https://www.topendsports.com/sport/soccer/award-striker-of-the-year.htm
+  - https://en.wikipedia.org/wiki/Johan_Cruyff_Trophy_(France_Football)
+  - https://en.wikipedia.org/wiki/S%C3%B3crates_Award
+  - https://www.peace-sport.org/news/jenni-hermoso-winner-of-the-socrates-award-at-the-2024-ballon-dor-ceremony/
+  - https://www.monaco-tribune.com/en/2024/10/ballon-dor-2024-jenni-hermoso-first-female-winner-of-the-socrates-prize/
+  - https://www.peace-sport.org/news/h-s-h-prince-albert-ii-and-peace-and-sport-welcome-the-xana-foundation-winner-of-the-2025-socrates-award-in-monaco-2/
+  - Note: the only wrinkle was the Sócrates Award's first search pass
+    returning no settled result for 2024 or 2025 from its initial result
+    set (one source miscounting the award's total edition count); two
+    follow-up, year-specific queries resolved both cleanly with no
+    conflict against the page's existing Jennifer Hermoso (2024)/Xana
+    Foundation (2025) entries. The same egress-blocked-domains caveat
+    every prior audit in this file has noted applies here too;
+    verification relied on WebSearch's synthesized summaries of indexed
+    pages rather than direct page loads.
 - Youngest and oldest winners (added 2026-10-02, two-hundred-and-thirteenth
   intensive run): two new bullets in `content/ballon-dor.md`'s "Memorable
   moments" section naming Stanley Matthews (1956, aged 41) as the award's
@@ -3007,6 +3083,63 @@ Primary sources should be preferred.
   - https://briefly.co.za/sports/104632-ronaldo-shatters-37-year-record-after-winning-golden-boot-euro-2020-championship/
   - https://yen.com.gh/sports/190306-ronaldo-shatters-37-year-record-after-winning-golden-boot-euro-2020-championship/
   - https://onmanorama.com/sports/football/2021/07/12/european-championships-golden-boot-winners-list-ronaldo.html
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- **EURO 1996/2020 final attendance, resolved (2026-10-17, Run 305)**:
+  these two editions had been excluded from `content/uefa-euro.md`'s "Final
+  venues" section since Run 98 (2026-09-11) as a single-source gap - every
+  figure found (73,611 for 1996, 67,173 for 2020) traced back to Wikipedia
+  plus a mirror site (11v11.com/a national-team-results aggregator), never
+  a first-tier independent outlet, confirmed unchanged as recently as
+  Run 287 (2026-10-14). This run tried a genuinely different angle: rather
+  than searching for the attendance figure itself, it queried the German
+  FA's own `datencenter.dfb.de` match database directly by its own
+  competition/edition/round URL structure (the same source this file
+  already treats as credible for UEFA Nations League 2025's attendance,
+  see below). That federation database runs an official match page for
+  both finals - Germany played in and won the 1996 final, and (perhaps
+  unexpectedly, since England v. Italy didn't involve Germany) its
+  datencenter also carries a page for the 2020 final - and both
+  independently confirm the exact figure already on file, with no
+  discrepancy: 73,611 for 1996 (30 June 1996, Wembley, referee Pierluigi
+  Pairetto) and 67,173 for 2020 (11 July 2021, Wembley, referee Björn
+  Kuipers). Both now clear the two-independent-source bar and were added to
+  `content/uefa-euro.md` and its Croatian counterpart
+  (`src/pages/hr/competitions/euro.astro`, "prijavljeno 73.611/67.173
+  gledatelja"). Sky Sports (UK and Germany editions), TheSportsDB,
+  Goal.com and the National Post were also found independently reporting
+  67,173 for 2020, corroborating the DFB figure further. **No discrepancies
+  found:**
+  - https://datencenter.dfb.de/datencenter/europameisterschaft/1996-in-england/finale/deutschland-tschechische-republik-634569
+  - https://datencenter.dfb.de/en/data-center/uefa-european-championship/2020-in-europe/final/2261445
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1996_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2020_final
+  - https://www.skysports.com/football/italy-vs-england/report/421532
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- **2026 men's shortlist research (2026-10-17, Run 303)** - not added to
+  `content/ballon-dor.md` (see `docs/ROADMAP.md`'s matching bullet for why:
+  a scope question for the user, not a sourcing gap). Recorded here purely
+  so a future run that does get a green light doesn't have to re-research
+  it. France Football announced the 30-man men's shortlist on 8 September
+  2026; the ceremony itself is scheduled for 26 October 2026 in London.
+  Two independent "full list" tables converged on the exact same 30 names
+  with no discrepancy: Jude Bellingham, Pau Cubarsí, Marc Cucurella,
+  Ousmane Dembélé, Luis Díaz, Bruno Fernandes, Gabriel, Erling Haaland,
+  Achraf Hakimi, Harry Kane, Khvicha Kvaratskhelia, Lamine Yamal, Sadio
+  Mané, Marquinhos, Lautaro Martínez, Kylian Mbappé, Nuno Mendes, Lionel
+  Messi, João Neves, Michael Olise, Willian Pacho, Julián Quiñones, Declan
+  Rice, Rodri, Fabián Ruiz, William Saliba, Ferran Torres, Dayot Upamecano,
+  Vinícius Júnior, and Vitinha. One immaterial discrepancy between the two
+  tables (Upamecano's club: Bayern Munich per one, PSG per the other) has
+  no bearing on the name list itself, so doesn't block treating the 30
+  names as confirmed; it would matter only if a future run adds per-player
+  club detail. **Converging, two-source-confirmed names (club detail not
+  cross-checked):**
+  - https://www.si.com/soccer/ballon-dor-2026-full-list-nominees
+  - https://thesportscast.net/2026/09/08/2026-ballon-dor-nominees-full-list-of-30-players-nominated/
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
