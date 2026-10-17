@@ -41015,3 +41015,56 @@ runs; the content-verification rotation has no differentiated next pick;
 the 2026 Ballon d'Or ceremony itself becomes checkable once 26 October has
 passed, but its shortlist can now be added immediately if the user
 greenlights the content-scope question above.
+
+### Run 304 (2026-10-17): ten-script manual browser/accessibility sweep back on its due cadence (three runs after Run 301) - clean across all ten again; confirmed PR #57 green with no pending review activity; full health re-confirmation, no drift
+
+Confirmed PR #57 is still open, `mergeable_state: clean`, 29 commits. Its
+two prior comments are both this routine's own earlier CI-fix writeups
+(Run 302's and Run 303's PDF-regeneration pushes); both required checks
+(`test`, `open-pr`) are `success` on the current head
+(`78aa5f261`) and there is no pending review activity needing a response.
+
+Re-read `docs/ROADMAP.md` end to end: every open item unchanged from Run
+303 - not-yet-due (2026 Ballon d'Or ceremony, still nine days out),
+environment-blocked (`typescript` 7, re-confirmed via `pnpm outdated`;
+`docs/SOURCES.md` link-liveness), or awaiting the user's own sign-off
+(`.git`-bloat, `long-title`, the pre-ceremony Ballon d'Or shortlist scope
+question raised by Run 303). Golden Boot's own 2026 World Cup winner is
+already present in `content/golden-boot.md` (`lastReviewed: 2026-10-14`),
+double-checked directly rather than assumed, since it's the kind of gap
+this routine could otherwise silently miss the way Run 302 checked for the
+World Cup edition itself.
+
+With the ten-script manual Playwright/browser sweep (`check:html`,
+`check:reflow`, `check:landscape`, `check:text-zoom`, `check:print-width`,
+`check:target-size`, `check:text-spacing`, `check:focus-appearance`,
+`check:lighthouse`, `check:color-contrast`) due again on its own
+roughly-every-three-run cadence (last full pass: Run 301), ran it in full
+with `PW_EXECUTABLE_PATH` pointed at the pre-installed
+`chromium_headless_shell-1194` binary. All ten clean: 711/711 pages valid
+HTML5; no horizontal overflow at 320px, landscape 667x375, 200% text
+zoom, or print-media 1032px; no WCAG 1.4.12 text-spacing overflow; every
+touch-facing control >= 44x44px at 360px; every focusable control has a
+>= 2px focus ring (WCAG 2.4.13); Lighthouse's 39 sampled pages all >= 0.9
+in every category (the one documented noindex/SEO exception aside, no
+actionable back/forward-cache blockers); zero WCAG 1.4.3 color-contrast
+violations across all 711 pages in both color schemes (1,422 page loads).
+
+**Verification:** `pnpm install --frozen-lockfile` (588 packages, no
+drift), `pnpm lint` (265 files, 0 errors/0 warnings/0 hints), `pnpm test`
+(1086/1086, unchanged), `pnpm build` (711 pages, unchanged), `pnpm audit`
+(clean), `pnpm dlx knip --no-config-hints` (one standing false positive,
+unchanged), `pnpm outdated` (only the already-blocked `typescript` 7). No
+`content/*.md` or `src/` edit this run, so no PDF regeneration or
+code-review reopening was owed.
+
+**Left for a future pass:** `.git`-bloat, `long-title`, and the
+pre-ceremony Ballon d'Or shortlist scope question are all the user's own
+call; the browser sweep just ran and isn't due again for two to three
+more runs; the content-verification rotation has no differentiated next
+pick (every `content/*.md` file is tied at `lastReviewed: 2026-10-14`);
+the 2026 Ballon d'Or ceremony itself becomes checkable once 26 October has
+passed. Ninth consecutive run (296-304) to find no new actionable backlog
+item - this run's own contribution was the due browser/accessibility
+sweep (genuinely new verification work, not a repeat) plus the Golden
+Boot 2026 double-check.
