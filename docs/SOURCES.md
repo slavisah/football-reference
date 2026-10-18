@@ -1568,6 +1568,33 @@ Primary sources should be preferred.
     file has noted applies here too; verification relied on WebSearch's
     synthesized summary of this UEFA.com article rather than a direct page
     load.
+- Whole-page third independent cross-check (2026-10-18, intensive run): with
+  every individual column/section on this page already carrying its own
+  first-and-second-pass audit (Finals table, Final venues, Player of the
+  Finals, Winning managers, Winning captains - each entry above), this run's
+  content-verification rotation gave the page a single combined third pass
+  instead of targeting one still-unaudited piece, since none remained. Fresh
+  `WebSearch` queries re-checked all four editions' Finals results/scores,
+  Player of the Finals winners, winning managers, and winning captains, plus
+  the "Final venues" section's own claim that the Johan Cruyff Arena was
+  unavailable for the 2023 final because of a concert booking. **No
+  discrepancies found anywhere:** every fact already on the page - including
+  the Johan Cruyff Arena/Philips Stadion concert-booking reason (Wikipedia
+  and a Stadium Astro report both independently confirm it, and add that
+  Philips Stadion was unavailable for the same reason, not just the Arena)
+  and Roberto Martínez's full name/role as Fernando Santos's successor -
+  matched this fresh pass too:
+  - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_final
+  - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_Finals
+  - https://english.stadiumastro.com/football/netherlands-confirmed-host-2023-nations-league-finals-225264
+  - https://www.channelstv.com/2021/10/10/france-beat-spain-to-win-nations-league/amp/
+  - https://www.football-espana.net/2023/06/10/jordi-alba-message-nations-league-spain
+  - https://extratime.com/articles/35981/penalty-win-secures-portugal-uefa-nations-league/
+  - https://www.gettyimages.com/detail/news-photo/cristiano-ronaldo-of-portugal-and-roberto-martinez-manager-news-photo/2219214839
+  - https://www.soccerladuma.co.za/international/uefa-nations-league/uefa-nations-league-player-of-the-tournament-revealed-20190609
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Copa América
 
