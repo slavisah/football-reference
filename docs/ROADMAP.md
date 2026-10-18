@@ -84,9 +84,9 @@ into `.github/workflows/ci.yml` as required PR gates; the other ten
 `check:text-spacing`/`check:focus-appearance`/`check:color-contrast`) are
 full-site Playwright/browser sweeps kept manual/intensive-run-only rather
 than a required PR gate, purely for their ~700-to-1,400-page-load runtime -
-re-run periodically (most recently Run 304, three runs after the prior
-full pass at Run 301 - all ten clean again, including
-`check:color-contrast` - the heaviest, ~1,400 page loads, confirmed clean
+re-run periodically (most recently Run 308, four runs after the prior
+full pass at Run 304 - all ten clean again, including
+`check:color-contrast` - the heaviest, 1,422 page loads, confirmed clean
 with `PW_EXECUTABLE_PATH` pointed at the pre-installed
 `chromium_headless_shell-1194/chrome-linux/headless_shell.real` binary per
 Run 265's own fix - zero WCAG 1.4.3 violations across all 711 pages in
@@ -438,7 +438,16 @@ the full run-by-run history behind all of this, see
   came back negative, same as every other angle tried on these two items.
   Still no new angle known; a future run is better spent on the health-
   check/browser-sweep cadence or the items awaiting the user's sign-off
-  above until one surfaces.
+  above until one surfaces. **Update (Run 308):** no new research angle
+  surfaced this run either; ran the due ten-script manual browser/
+  accessibility sweep instead (clean across all ten - see the Status
+  section above) as the genuinely useful quality pass this note's own
+  fallback describes, plus a routine `html-validate` patch bump and a
+  full health re-confirmation. PR #56 (the 11-day-stuck PR flagged across
+  13 runs, 263-279) was confirmed merged as of Run 299 and is not a
+  concern on PR #57, open 5 days with a clean mergeable state as of this
+  run - the standing process flag from the "Status" history above is
+  resolved and does not need repeating.
 
 ## Ideas not yet scoped
 
