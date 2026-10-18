@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (310 intensive runs as of 2026-10-18) lives
+verification sweep and decision (311 intensive runs as of 2026-10-18) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -108,7 +108,8 @@ used only via `.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS
 `import` knip's static analysis can see). Current counts (confirmed fresh
 this run): 1086 unit tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711
 pages built; 1055 Playwright e2e tests as of the last full cold-start run
-(Run 254).
+(Run 254). Run 311 also re-confirmed `pnpm audit` clean and `knip`'s one
+standing false positive unchanged.
 
 The code-review angle (Runs 267-276: a different check from the content-
 verification rotation below, reading derivation/presentation code itself
@@ -447,7 +448,16 @@ the full run-by-run history behind all of this, see
   13 runs, 263-279) was confirmed merged as of Run 299 and is not a
   concern on PR #57, open 5 days with a clean mergeable state as of this
   run - the standing process flag from the "Status" history above is
-  resolved and does not need repeating.
+  resolved and does not need repeating. **Update (Run 311):** picked up
+  the content-verification rotation's 13-way tie with a whole-page third
+  independent cross-check of `content/uefa-nations-league.md` (see its
+  own `docs/PROJECT_STATUS.md` entry) - no discrepancies, `lastReviewed`
+  bumped. The three items awaiting the user's own sign-off (`.git`-bloat,
+  `long-title`, pre-ceremony Ballon d'Or shortlist scope) have now sat
+  unanswered since Runs 289-296/298/303 respectively with no response in
+  the interim - flagged again directly in this run's push notification,
+  since restating them in this file alone clearly hasn't surfaced them to
+  the user.
 
 ## Ideas not yet scoped
 
