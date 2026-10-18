@@ -528,3 +528,14 @@ the full run-by-run history behind all of this, see
   two awards above - not shipped for the same reason. Nuno Mendes (2025,
   won at 22) and Sergio Busquets (2021, won at 33) are the strongest
   self-computed youngest/oldest candidates if a source ever surfaces.
+  **Extended to Copa América's own Golden Boot (Run 309, 2026-10-18):** a
+  genuine gap in prior coverage, not a repeat - the three attempts above all
+  checked a *player* award, never Copa América's *scoring* award, even
+  though `content/golden-boot.md` already ships EURO/World Cup Golden Boot
+  oldest-ever facts under this same idea. Two fresh `WebSearch` passes
+  (youngest-ever, oldest-ever) found related Copa América scoring records
+  (Johnnier Montaño's 1999 youngest-ever-goalscorer mark, aged 16 years 171
+  days; the Méndez/Zizinho 17-goal all-time scoring record) but no source
+  naming either the youngest or oldest Golden Boot *winner* specifically -
+  not shipped, same bar as the other three sub-items. Re-try only with a
+  genuinely different search angle.
