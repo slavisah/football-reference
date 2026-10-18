@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (305 intensive runs as of 2026-10-17) lives
+verification sweep and decision (307 intensive runs as of 2026-10-18) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -309,7 +309,13 @@ the full run-by-run history behind all of this, see
   (2026-09-21): it surfaces a Player of the Tournament (Rodri, 2023) but no
   complete eleven-name Best XI for any of the three editions - same negative
   result as every prior run's attempt, now via a tool that does have live
-  web access, not just a knowledge-cutoff limitation. Genuinely exhausted
+  web access, not just a knowledge-cutoff limitation. Run 306 tried the
+  DFB-datencenter angle specifically (Germany was in the 2021/2025 Finals
+  pool) and found it covers match results, not awards - exhausted. Run 307
+  tried a further angle (national-federation sites for the other Finals
+  participants - RFEF for 2021, and FIGC/FFF/a Portuguese-language search
+  for 2023/2025) rather than general search or a single federation's site -
+  no official best-XI surfaced from any of them either. Genuinely exhausted
   short of a UEFA technical-report PDF this environment cannot fetch.
   **Angle tried and also exhausted (Run 306):** the German FA's own
   `datencenter.dfb.de` match database, flagged by Run 305 as untried for
@@ -424,7 +430,15 @@ the full run-by-run history behind all of this, see
   also exhausted (see those two bullets' own notes) - no genuinely new
   angle on any open research item is currently known; the next one will
   need to come from a future run's own fresh idea, not a restatement of
-  this note.
+  this note. **Update (Run 307):** tried two fresh angles anyway - other
+  Finals participants' federation sites (RFEF/FIGC/FFF, plus a Portuguese-
+  language search) for the Nations League Team-of-the-Tournament gap, and
+  extending the "oldest/youngest award winner" idea to Nations League's
+  own Player of the Finals award (only 4 editions, cheap to check) - both
+  came back negative, same as every other angle tried on these two items.
+  Still no new angle known; a future run is better spent on the health-
+  check/browser-sweep cadence or the items awaiting the user's sign-off
+  above until one surfaces.
 
 ## Ideas not yet scoped
 
@@ -490,11 +504,18 @@ the full run-by-run history behind all of this, see
   own reasoning, until either a fresh source surfaces on its own or a
   genuinely different search angle presents itself.
 - **Copa América Best Player / EURO Player of the Tournament "oldest-
-  youngest-ever" facts** (tried Run 290, 2026-10-15): no source ranks
+  youngest-ever" facts** (tried Run 290, 2026-10-15; Copa América re-tried
+  Run 307, 2026-10-18, same negative result, no new angle): no source ranks
   either award's winners by age or frames any one of them as a record
   holder, so neither was shipped - same bar as the item above (an
   already-published superlative claim, never a self-computed one). Dani
   Alves (2019 Copa América Best Player, won at 36) and Lionel Messi (2021,
   won at 34) are the strongest self-computed "oldest" candidates if a
   source ever does surface. Re-try only with a genuinely different search
-  angle, not a repeat of the same query.
+  angle, not a repeat of the same query. **Extended to UEFA Nations
+  League's "Player of the Finals" award too (Run 307):** only four
+  editions (2019-2025) exist, and a `WebSearch` for a published youngest/
+  oldest-winner claim for this award came back empty, same as the other
+  two awards above - not shipped for the same reason. Nuno Mendes (2025,
+  won at 22) and Sergio Busquets (2021, won at 33) are the strongest
+  self-computed youngest/oldest candidates if a source ever surfaces.
