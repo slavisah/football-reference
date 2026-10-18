@@ -699,6 +699,50 @@ Primary sources should be preferred.
   - https://simple.wikipedia.com/wiki/2026_FIFA_World_Cup (the unreliable
     pre-tournament-outcome mirror noted above - not used as a source for any
     fact on this page)
+- Whole-page third independent cross-check (2026-10-18, three-hundred-and-
+  twelfth intensive run): the content-verification rotation's next target per
+  `lastReviewed` staleness (tied with eleven other files at 2026-10-14).
+  Re-checked every section rather than only the 2026 edition: internal
+  consistency of the "Champions by titles" table against the "Editions"
+  table (23 titles across 8 nations, summing correctly); every one of the 23
+  winning managers' nationality matching their team, confirming the page's
+  own "unbroken pattern" claim; and, independently via fresh `WebSearch`
+  queries, every checkable 2026 fact - Rodri's Golden Ball (Messi Silver
+  Ball, Mbappé Bronze Ball), Unai Simón's seven clean sheets and Golden
+  Glove, Pau Cubarsí's Young Player Award, the 1-0 (a.e.t.) final score with
+  Ferran Torres's 106th-minute winner, and the 80,663 attendance figure, all
+  confirmed by multiple independent outlets (AP, Sky Sports, Fox Sports,
+  FourFourTwo, The Statesman). **No discrepancies found.** One finding
+  examined and deliberately not acted on: several outlets (Wego, Free Press
+  Journal) describe Cubarsí as "the first defender" to win the Young Player
+  Award, while a Fox Sports table of the same award lists earlier defender
+  winners (Beckenbauer 1966, Żmuda 1974, Cabrini 1978, Amoros 1982) - but
+  those press reports are conflating the modern FIFA Young Player Award
+  (2006-present, the only one this page documents) with an older, similarly-
+  named "Best Young Player" trophy dating to 1958 that this page's own text
+  already explicitly excludes ("FIFA has named a best-player-aged-21-or-
+  under award at every World Cup since 2006; no equivalent award existed at
+  earlier editions"). Within that correctly-stated 2006+ scope, none of the
+  five prior winners (Podolski, Müller, Pogba, Mbappé, Fernández) played as a
+  defender, so "first defender" is accurate as written; no edit made.
+  Also independently re-confirmed Luis de la Fuente's age (born 21 June
+  1961, so 65 at the 19 July 2026 final) against the page's own "oldest
+  winning manager in World Cup history, aged 65" claim - matches exactly:
+  - https://www.thescore.com/worldcup/news/3550006/rodri-takes-golden-ball-over-messi-mbappe-claims-golden-boot-again
+  - https://fourfourtwo.com/competition/rodri-denies-lionel-messi-and-claims-world-cup-golden-ball-after-spain-prevail-against-argentina
+  - https://amp.foxsports.com/stories/soccer/2026-fifa-world-cup-every-individual-award-winner
+  - https://www.thestatesman.com/sports/rodri-wins-fifa-world-cup-2026-golden-ball-after-leading-spain-to-title-1503618606.html
+  - https://www.skysports.com/football/spain-vs-argentina/live/549869
+  - https://lasvegassun.com/news/2026/jul/19/ferran-torres-scores-in-extra-time-as-spain-beats-/
+  - https://santamariatimes.com/ap/sports/ferran-torres-scores-in-extra-time-as-spain-beats-argentina-1-0-to-win-the/article_a8e21e5c-8c25-54ce-b065-7ebb7225d56f.html
+  - https://www.foxsports.com/stories/soccer/spain-goalkeeper-unai-simon-wins-golden-glove-after-historic-world-cup
+  - https://worldcupranking.com/blog/unai-simon-golden-glove-world-cup-2026/
+  - https://amp.foxsports.com/stories/soccer/world-cup-pau-cubarsi-spain-young-player-award
+  - https://theanalyst.com/articles/pau-cubarsi-world-cup-2026-young-player-of-the-tournament
+  - https://en.wikipedia.org/wiki/Luis_de_la_Fuente_(footballer,_born_1961)
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## UEFA EURO
 
