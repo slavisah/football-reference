@@ -2382,6 +2382,35 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Team of the Tournament winners, second independent cross-check (added
+  2026-10-18, intensive run): re-verified all five editions (2015, 2016,
+  2019, 2021, 2024) using a source mix deliberately distinct from the
+  2026-09-02 first pass (Cooperativa.cl, La Nación, AI-search-summary
+  descriptions) - NBC Sports and SoccerWire/ISN Soccer's own reporting of
+  the Technical Study Group's announcements, and CONMEBOL's own
+  `copaamerica.com` articles directly. **No discrepancies found**: 2015 and
+  2016 each matched a single source giving the full eleven outright (NBC
+  Sports for 2015, SoccerWire/ISN for 2016), both exactly as already on the
+  page; 2019 and 2021 matched their already-documented CONMEBOL-attributed
+  rosters again. 2024 needed a different check - every outlet search
+  returned editorial "best XI" picks (90min, Yahoo, ESPN) that disagree
+  with each other and with the page, the same official-TSG-vs-editorial-
+  picks split the original 2015 audit had already hit - so it was resolved
+  via CONMEBOL's own nationality breakdown (five Argentinians, two
+  Colombians, one Ecuadorian, one Canadian, one Uruguayan, one Brazilian)
+  rather than a competing named list; the page's existing eleven names sort
+  into exactly that breakdown, the same nationality-count method the
+  original 2015 audit used:
+  - https://www.nbcsports.com/soccer/news/2015-copa-america-champions-chile-dominate-team-of-the-tournament
+  - https://www.soccerwire.com/news/copa-america-centenario-awards-best-xi-announced/
+  - https://isnsoccer.com/technical-study-group-announces-copa-america-centenario-awards
+  - https://copaamerica.com/en/news/best-xi-team-tournament-copa-america-2024
+  - https://copaamerica.com/en/news/one-by-one-the-team-of-the-conmebol-copa-america-chosen-by-get
+  - https://nbcsports.com/soccer/news/copa-america-team-of-the-tournament-announced
+    (2019)
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 - Winning captains, 1975-2010 span recovered (added 2026-09-04, intensive
   run): the 2026-09-01 entry above dropped the entire 1975-2010 span after
   cross-checks contradicted two editions (1995, 2004) it had first logged as
