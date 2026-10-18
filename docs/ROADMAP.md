@@ -549,3 +549,15 @@ the full run-by-run history behind all of this, see
   naming either the youngest or oldest Golden Boot *winner* specifically -
   not shipped, same bar as the other three sub-items. Re-try only with a
   genuinely different search angle.
+- **E2E tests assert a literal `lastReviewed` date, breaking on every
+  content-verification-rotation bump (flagged Run 312, 2026-10-18):** the
+  content-verification rotation's own `lastReviewed` bump routinely breaks
+  an e2e assertion hardcoding that page's old date as a literal
+  `time[datetime="..."]` string (e.g. `tests/e2e/mobile.spec.ts`'s World Cup
+  test, fixed this run; two earlier "Fix CI" commits noted in Run 305's own
+  entry were the same shape on other pages). Low-risk, not yet attempted:
+  change these assertions to something date-agnostic (match any present
+  `time[datetime]`, or read the expected value from the content file's own
+  frontmatter at test time) so a routine `lastReviewed` bump stops being a
+  recurring, predictable CI break. Small enough for a future run to pick up
+  as a standalone fix.
