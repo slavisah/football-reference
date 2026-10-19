@@ -1662,6 +1662,36 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- **"How it works" qualification-mechanism fix (2026-10-19, Run 315):** the
+  page's "How it works" section stated unconditionally that "the four League
+  A group winners advance to the Nations League Finals" - true through the
+  2022-23 edition, but UEFA added a two-legged quarter-final round starting
+  with the 2024-25 edition: each League A group winner now plays a runner-up
+  from a different group, and only the four quarter-final *winners* advance
+  to the Finals. Confirmed via WebSearch (Wikipedia's 2024-25 UEFA Nations
+  League A article, Bundesliga's and Al Jazeera's own explainers, and
+  theScore's Nations League review): Germany (Group A3 winner) beat Italy
+  (Group A2 runner-up) in the quarter-final en route to hosting and reaching
+  the 2025 Finals, confirming the new mechanism actually operated in 2025,
+  not just on paper. All four 2025 Finals participants (France, Germany,
+  Portugal, Spain) happened to also be group winners that year - no
+  runner-up has yet won a quarter-final - so this was a description-of-the-
+  rule bug, not a wrong result in the Finals table itself (unaffected).
+  Fixed the "How it works" bullet to describe both the pre-2024 and current
+  mechanism, and reworded `content/glossary.md`'s "host" entry (which had
+  summarized the Nations League host-selection rule as "chooses its host
+  from among the four teams that have already won their qualifying group")
+  to describe the host as one of the four teams that reach the Finals,
+  without naming the now-outdated group-winners-only mechanism - so the
+  glossary entry stays correct even if a future runner-up wins a
+  quarter-final.
+  - https://en.wikipedia.org/wiki/2024%E2%80%9325_UEFA_Nations_League_A
+  - https://amp.bundesliga.com/en/bundesliga/news/uefa-nations-league-explainer-format-winners-dates-29313
+  - https://www.aljazeera.com/sports/2024/9/3/uefa-nations-league-2024-25-teams-groups-format-schedule-prize
+  - https://www.thescore.com/news/3133315/sms:
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Copa América
 

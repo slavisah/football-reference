@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 2018-19
 lastCompletedEdition: 2024-25
-lastReviewed: 2026-10-18
+lastReviewed: 2026-10-19
 status: verified
 ---
 
@@ -17,7 +17,13 @@ UEFA introduced the Nations League to replace many international friendlies with
 
 - Every UEFA national team is placed into one of four leagues (A to D) by strength, then split into small groups within its league.
 - Teams play each other in their group; results promote the best teams to a higher league and relegate the weakest to a lower one, alongside separate World Cup/EURO qualifying.
-- The four League A group winners advance to the Nations League Finals: two semifinals, a third-place match, and a final, all hosted by one of the four finalists.
+- Through the 2022-23 edition, the four League A group winners advanced
+  directly to the Nations League Finals. From the 2024-25 edition on, each
+  League A group winner instead plays a two-legged quarter-final against a
+  runner-up from a different group (the group winner hosts the return leg);
+  the four quarter-final winners advance to the Nations League Finals: two
+  semifinals, a third-place match, and a final, all hosted by one of the
+  four finalists.
 - Held every two years.
 
 ## Finals
