@@ -129,11 +129,13 @@ gone longest since its last `lastReviewed` bump, cross-checking claims
 against the file's own tables, the actual generating code, and, for recent
 events, live `WebSearch` results) is an ongoing loop, not a one-off pass -
 every one of the 14 `content/*.md` files has now been through it at least
-once, and as of Run 316 (2026-10-19) all 14 are tied at the same
-`lastReviewed` date, so the rotation starts its second full pass from a
-clean slate rather than hunting for an untried file (see `content/*.md`'s
-own `lastReviewed` frontmatter for the current state). It has found three
-real bugs so far (a `glossary.md` "third and fourth place"
+once, and as of Run 317 (2026-10-19) all 14 are genuinely tied at the same
+`lastReviewed` date (Run 316 had claimed this a run early - `uefa-euro.md`
+was still 2 days stale at the time; Run 317 caught and corrected this, see
+its own `docs/PROJECT_STATUS.md` entry), so the rotation starts its second
+full pass from a clean slate rather than hunting for an untried file (see
+`content/*.md`'s own `lastReviewed` frontmatter for the current state). It
+has found three real bugs so far (a `glossary.md` "third and fourth place"
 overgeneralization, a `glossary.md` "host" entry that had the FIFA World
 Cup/UEFA EURO automatic-host-place rule backwards, and a `glossary.md`/
 `uefa-nations-league.md` Nations League host-qualification description

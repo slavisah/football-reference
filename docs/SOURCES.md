@@ -1179,6 +1179,39 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Winning managers/Winning captains, second independent cross-check
+  (2026-10-19, Run 317): content-verification rotation pick (uefa-euro.md
+  was the longest-stale `content/*.md` file, 2026-10-17). Unlike most other
+  sections on this page, these two had never had a dated, separately
+  logged second pass - the original 2026-08-31/2026-09-01 audits above
+  already used three-to-four independent WebSearch passes each, but all
+  within one dated entry rather than a later, deliberately distinct source
+  mix the way "Final match dates", "Golden Boot", "Champion/Runner-up/
+  Final-score" and "Host(s)/Teams" above all did. Re-verified all 17
+  managers and all 17 captains (1960-2024) via a source mix distinct from
+  the original pass (Wikipedia's dedicated "List of UEFA European
+  Championship winning managers"/"...winning players" list articles,
+  thestatszone.com's season-by-season coaches table, and press coverage of
+  the two most recent titles - ANSA, Outlook India, Gulf News, Himalayan
+  Times, insideworldfootball.com - rather than the original pass's
+  olympics.com/myfootballfacts.com/UEFA retrospective/Britannica/
+  GiveMeSport/These Football Times/FourFourTwo/gameofthepeople.com mix).
+  Specifically re-confirmed the two facts the original passes called out
+  as easy to get wrong: Otto Rehhagel's 2004 Greece win as the competition's
+  only foreign-coached title (explicitly restated by this pass's own
+  Wikipedia summary), and Bernard Dietz's 1980 West Germany captaincy
+  (distinct from the same squad's more famous Karl-Heinz Rummenigge).
+  **No discrepancies found** across either section:
+  - https://en.wikipedia.org/wiki/List_of_UEFA_European_Championship_winning_managers
+  - https://en.wikipedia.org/wiki/List_of_UEFA_European_Championship_winning_players
+  - https://www.thestatszone.com/football/euro-2020/every-european-championship-winning-coach
+  - https://www.ansa.it/amp/europei_2024/photogallery/2024/07/15/la-spagna-vince-gli-europei-2024_9075beeb-9082-4eff-8eff-70502dedc1d4.html
+  - https://www.outlookindia.com/sports/football/esp-vs-eng-uefa-euro-2024-final-marc-cucurella-salutes-spain-family-as-alvaro-morata-thanks-andres-iniesta
+  - https://gulfnews.com/amp/story/sport%2Ffootball%2Fsantos-inspires-portugal-to-ultimate-ugly-win-1.1860641
+  - https://thehimalayantimes.com/ampArticle/166267
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 - Team of the Tournament winners (added 2026-09-04, intensive run): a new
   "Team of the Tournament winners" note section on `content/uefa-euro.md`,
   the same shape as Copa América's own "Team of the Tournament winners"
