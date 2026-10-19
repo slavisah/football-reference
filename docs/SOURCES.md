@@ -743,6 +743,29 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Golden Boot 2026 World Cup podium, third independent cross-check
+  (2026-10-19, three-hundred-and-fourteenth intensive run): the
+  content-verification rotation's next target per `lastReviewed` staleness
+  (tied with nine other files at 2026-10-14). `content/golden-boot.md`'s
+  World Cup and EURO tables already had two independent audit passes each
+  (2026-08-04 and 2026-08-07, plus a 2026-08-28 tie-resolution pass and a
+  2026-10-06 youngest/oldest-winner pass), so rather than repeat a full-table
+  check, gave the single highest-risk block - the 2026 World Cup Golden/
+  Silver/Bronze Boot trio, this page's newest and least-aged content - a
+  third independent `WebSearch` pass. Re-confirmed Kylian Mbappé's Golden
+  Boot (10 goals, the same total already on file, and independently
+  confirmed as both a) his second consecutive World Cup Golden Boot (after
+  2022) - the page's own "only player to win it in consecutive editions
+  since 1930" claim - and b) the first double-digit tally since Gerd
+  Müller's 10 in 1970, matching the table's own figures), Lionel Messi's
+  Silver Boot (8 goals), and Jude Bellingham's Bronze Boot (7 goals, scored
+  in the third-place match against France). **No discrepancies found**:
+  - https://gulfnews.com/sport/football/world-cup/kylian-mbappe-wins-2026-world-cup-golden-boot-beats-messi-again-full-list-of-all-awards-1.500613609
+  - https://www.tovima.com/sports/mbappe-claims-back-to-back-world-cup-golden-boots/
+  - https://www.si.com/soccer/jude-bellingham-celebrates-mystery-world-cup-award
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## UEFA EURO
 

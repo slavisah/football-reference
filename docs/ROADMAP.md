@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (313 intensive runs as of 2026-10-19) lives
+verification sweep and decision (314 intensive runs as of 2026-10-19) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -190,6 +190,14 @@ files). The `intensive/football-reference` branch has been recreated fresh
 from the post-merge `main` for this and future runs, per the routine's own
 branch-strategy instructions for a squash-merged branch. No action needed;
 noted here only so a future run doesn't wonder why the flag disappeared.
+
+**Operational note (Run 314):** the ten-script manual browser/accessibility
+sweep and `pnpm build:pdfs` both depend on a shared `astro preview` daemon -
+running either one concurrently with any other `check:*`/`build:pdfs`
+invocation causes one to silently stop the other's server mid-request.
+Confirmed directly this run (a concurrent sweep + `build:pdfs` attempt broke
+both). Never run more than one `astro preview`-dependent command at a time
+in this repo.
 
 Every generated/derived page has its own independent-recomputation guard,
 wired into CI, that cross-checks its output against `content/*.md` rather
