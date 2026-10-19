@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (314 intensive runs as of 2026-10-19) lives
+verification sweep and decision (316 intensive runs as of 2026-10-19) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -126,14 +126,20 @@ of these files, per each entry's own caveat.
 
 The content-verification rotation (re-check whichever content file has
 gone longest since its last `lastReviewed` bump, cross-checking claims
-against the file's own tables and, for recent events, live `WebSearch`
-results) is an ongoing loop, not a one-off pass - every content file has
-now been through it at least once, most within the last two days (see
-`content/*.md`'s own `lastReviewed` frontmatter for the current state). It
-has found two real bugs so far (a `glossary.md` "third and fourth place"
-overgeneralization, and a `glossary.md` "host" entry that had the FIFA
-World Cup/UEFA EURO automatic-host-place rule backwards) - a future run
-should keep picking the next-longest-stale file.
+against the file's own tables, the actual generating code, and, for recent
+events, live `WebSearch` results) is an ongoing loop, not a one-off pass -
+every one of the 14 `content/*.md` files has now been through it at least
+once, and as of Run 316 (2026-10-19) all 14 are tied at the same
+`lastReviewed` date, so the rotation starts its second full pass from a
+clean slate rather than hunting for an untried file (see `content/*.md`'s
+own `lastReviewed` frontmatter for the current state). It has found three
+real bugs so far (a `glossary.md` "third and fourth place"
+overgeneralization, a `glossary.md` "host" entry that had the FIFA World
+Cup/UEFA EURO automatic-host-place rule backwards, and a `glossary.md`/
+`uefa-nations-league.md` Nations League host-qualification description
+stuck on the pre-2024 "four group winners" mechanism UEFA replaced with a
+quarter-final round) - a future run should pick by the routine's own
+competition/award ordering once the tie recurs.
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims
@@ -287,12 +293,12 @@ the full run-by-run history behind all of this, see
   on the same footing as the `.git`-bloat and `long-title` items above.
   Flagged to the user directly; a future run should add the section (both
   languages) if the user says yes, or drop this note if they say no.
-- **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.10` (latest
-  published) only declares `typescript: '^5.0.0 || ^6.0.0'` as a peer
-  dependency - re-confirmed via `pnpm outdated` as recently as Run 287
-  (2026-10-14; `typescript` still at 5.9.3 vs. 7.0.2 latest, no new
-  `@astrojs/check` release). Re-check whenever `pnpm outdated` next shows a
-  new `@astrojs/check` release.
+- **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.11` (latest
+  published, bumped from 0.9.10 by Run 316) still only declares
+  `typescript: '^5.0.0 || ^6.0.0'` as a peer dependency - re-confirmed via
+  `npm view @astrojs/check@0.9.11 peerDependencies` by Run 316 (2026-10-19;
+  `typescript` still at 5.9.3 vs. 7.0.2 latest). Re-check whenever `pnpm
+  outdated` next shows a new `@astrojs/check` release.
 - **`docs/SOURCES.md` link-liveness sweep**: blocked. This environment's
   outbound network/egress policy rejects direct requests to external
   reference domains - confirmed repeatedly, most recently 2026-10-02
