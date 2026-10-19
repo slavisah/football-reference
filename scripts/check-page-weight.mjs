@@ -70,8 +70,13 @@ const DIST_DIR = path.join(ROOT, 'dist');
 // carries by far the largest share of the roughly 968 relabeled links
 // site-wide, pushing it to 613.0 KB, just over the 610 KB budget (the
 // twelfth such deliberate raise) - genuinely necessary accessibility
-// markup, not a regression.
-export const PAGE_WEIGHT_BUDGET_BYTES = 640 * 1024;
+// markup, not a regression. Raised again to 650 KB on 2026-10-19 (Run 313):
+// a third independent cross-check of `content/ballon-dor.md`'s Winners
+// table added six more `docs/SOURCES.md` citation URLs under the "Ballon
+// d'Or" heading, pushing `hr/records` to 641.3 KB, just over the 640 KB
+// budget (the thirteenth such deliberate raise) - same mechanism as every
+// prior raise above, not a regression.
+export const PAGE_WEIGHT_BUDGET_BYTES = 650 * 1024;
 
 /** Every same-origin CSS asset path (e.g. "/football-reference/_astro/foo.css") referenced by an HTML page. */
 export function findCssRefs(html) {

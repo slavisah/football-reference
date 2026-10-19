@@ -149,7 +149,9 @@ test.describe('World Cup page on a 360px phone', () => {
   });
 
   test('shows the last reviewed date and source links', async ({ page }) => {
-    await expect(page.locator('time[datetime="2026-10-18"]')).toBeVisible();
+    const reviewed = page.locator('time[datetime]');
+    await expect(reviewed).toBeVisible();
+    await expect(reviewed).toHaveAttribute('datetime', /^\d{4}-\d{2}-\d{2}$/);
     const sources = page.locator('.references__list a');
     await expect(sources.first()).toBeVisible();
     const count = await sources.count();
@@ -3337,7 +3339,9 @@ test.describe('Sources page on a 360px phone', () => {
 
   test('shows the review policy and a last reviewed date', async ({ page }) => {
     await expect(page.getByText('Historical team names are never rewritten')).toBeVisible();
-    await expect(page.locator('time[datetime="2026-10-14"]')).toBeVisible();
+    const reviewed = page.locator('time[datetime]');
+    await expect(reviewed).toBeVisible();
+    await expect(reviewed).toHaveAttribute('datetime', /^\d{4}-\d{2}-\d{2}$/);
   });
 
   test('is reachable from the nav and the footer', async ({ page }) => {
@@ -3374,7 +3378,12 @@ test.describe('Croatian sources page (/hr/about/sources) on a 360px phone', () =
     await expect(page.getByRole('heading', { name: 'Izvori i pravila provjere', level: 1 })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Izvori po natjecanjima' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Kako se provjeravaju izvori' })).toBeVisible();
-    await expect(page.locator('time[datetime="2026-10-14"]')).toBeVisible();
+
+    const hrDatetime = await page.locator('time[datetime]').getAttribute('datetime');
+    expect(hrDatetime).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+
+    await page.goto('about/sources');
+    await expect(page.locator('time[datetime]')).toHaveAttribute('datetime', hrDatetime ?? '');
   });
 
   test('groups source links by competition using the Croatian home-page names', async ({ page }) => {

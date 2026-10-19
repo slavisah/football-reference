@@ -3243,6 +3243,32 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- **Third independent cross-check of the Winners table and two superlative
+  claims (2026-10-19, Run 313):** re-confirmed the 2025 Winner cell
+  (Ousmane Dembélé, PSG, beating Lamine Yamal) and the "Multiple winners
+  through 2025" tally table's arithmetic against the Winners table itself
+  (Messi 8, Cristiano Ronaldo 5, Cruyff/Platini/van Basten 3 each - all
+  recount cleanly from the Winners table's own rows). Also specifically
+  re-checked two of the page's "Memorable moments"/"Notes" superlative
+  claims, the kind of overgeneralization the content-verification
+  rotation has previously caught in `glossary.md`: "Lev Yashin remains
+  the only goalkeeper to win the men's award" (confirmed - no goalkeeper
+  has won since 1963, and no source names an exception) and "George Weah
+  became the first African player to win the Ballon d'Or in 1995"
+  (confirmed as written - this is the first *African-national* winner,
+  which is how the page's own "National team" column already frames every
+  entry; Eusébio, born in Mozambique but capped for Portugal, is a
+  different, narrower "first Black winner" claim the page does not make).
+  No discrepancies found.
+  - https://www.wionews.com/sports/football-french-forward-ousmane-dembele-wins-2025-ballon-d-or-spain-s-lamine-yamal-settles-for-kopa-trophy-aitana-bonmati-1758568787767/amp
+  - https://www.si.com/soccer/ousmane-dembele-wins-2025-ballon-dor
+  - https://thesefootballtimes.co/2017/08/23/lev-yashin-the-only-goalkeeper-to-win-the-ballon-dor/
+  - https://global.espn.com/football/story/_/id/38742563/why-goalkeeper-never-win-ballon-dor-again
+  - https://en.wikipedia.org/wiki/1995_Ballon_d%27Or
+  - https://www.90min.com/posts/ballon-d-or-1995-george-weah-delivers-football-s-greatest-individual-prize-to-africa
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Review policy
 

@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (311 intensive runs as of 2026-10-18) lives
+verification sweep and decision (313 intensive runs as of 2026-10-19) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -549,15 +549,12 @@ the full run-by-run history behind all of this, see
   naming either the youngest or oldest Golden Boot *winner* specifically -
   not shipped, same bar as the other three sub-items. Re-try only with a
   genuinely different search angle.
-- **E2E tests assert a literal `lastReviewed` date, breaking on every
-  content-verification-rotation bump (flagged Run 312, 2026-10-18):** the
-  content-verification rotation's own `lastReviewed` bump routinely breaks
-  an e2e assertion hardcoding that page's old date as a literal
-  `time[datetime="..."]` string (e.g. `tests/e2e/mobile.spec.ts`'s World Cup
-  test, fixed this run; two earlier "Fix CI" commits noted in Run 305's own
-  entry were the same shape on other pages). Low-risk, not yet attempted:
-  change these assertions to something date-agnostic (match any present
-  `time[datetime]`, or read the expected value from the content file's own
-  frontmatter at test time) so a routine `lastReviewed` bump stops being a
-  recurring, predictable CI break. Small enough for a future run to pick up
-  as a standalone fix.
+**Resolved (Run 313):** the three `tests/e2e/mobile.spec.ts` assertions
+pinned to a literal `lastReviewed` date (World Cup page, English Sources
+page, Croatian Sources page) - the recurring CI-break shape flagged Run 312
+and twice before that per Run 305's own entry - were made date-agnostic:
+the first two now check `time[datetime]` against a `YYYY-MM-DD` regex
+instead of an exact string, and the Croatian/English parity test now
+actually navigates both pages and compares their `datetime` values at run
+time instead of hardcoding the same literal in both. A routine
+`lastReviewed` bump can no longer break any of these three tests.
