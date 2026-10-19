@@ -4,7 +4,7 @@ slug: ballon-dor
 awardType: individual
 firstEdition: 1956
 lastCompletedEdition: 2025
-lastReviewed: 2026-10-14
+lastReviewed: 2026-10-19
 status: verified
 ---
 
@@ -187,6 +187,21 @@ independent `WebSearch` passes at authoring time (2026-08-31 through
 2026-09-03) but no further external re-check since, unlike the Winners/Ceremony
 date columns above, which both already have a documented second
 independent pass; this run closes that gap.
+
+A third independent cross-check of the Winners table (2026-10-19, intensive
+run) re-confirmed the 2025 row (Dembélé) and re-summed the "Multiple
+winners through 2025" table against the Winners table itself - both held
+up with no discrepancies. This pass also specifically re-verified two of
+the exclusivity/precedence claims in the "Memorable moments"/"Notes"
+sections below, the kind of overgeneralization the site's
+content-verification rotation has previously caught elsewhere
+(`glossary.md`): the claim that no other goalkeeper besides Yashin has won
+the men's award, and the claim crediting Weah's 1995 win as the earliest
+by an African national-team player (that framing specifically means the
+earliest African-*national* winner, matching this page's own "National
+team" column throughout - a different, narrower claim from crediting him
+as the earliest Black winner, which the page does not make). Both
+confirmed as written.
 
 See `docs/SOURCES.md` for the per-year citation list.
 
