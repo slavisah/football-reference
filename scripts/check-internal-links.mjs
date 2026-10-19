@@ -1,6 +1,6 @@
 // Crawls the built site for broken internal links - a stale or mistyped
-// `href`/`src` (nav, footer, home cards, cross-links between pages, PDF
-// download links, canonical/hreflang tags) that would 404 for a real reader.
+// `href`/`src` (nav, footer, home cards, cross-links between pages,
+// canonical/hreflang tags) that would 404 for a real reader.
 // Nothing previously checked this: check-page-weight.mjs resolves each
 // page's CSS refs but silently treats a missing asset as 0 bytes rather than
 // an error (see resolveDistAsset/measurePage), so a broken CSS link wouldn't

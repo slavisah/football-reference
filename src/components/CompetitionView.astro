@@ -8,7 +8,6 @@ import ChampionsSummary from './ChampionsSummary.astro';
 import HostMap from './HostMap.astro';
 import EditorialNotes from './EditorialNotes.astro';
 import References from './References.astro';
-import PrintDownloadLink from './PrintDownloadLink.astro';
 
 interface Props {
   data: CompetitionData;
@@ -16,8 +15,6 @@ interface Props {
   tableCaption: string;
   /** Optional display-only column joined onto the table by edition year. */
   extraColumn?: { label: string; values: Map<string, string> };
-  /** Slug of the pre-generated PDF at public/downloads/<pdfSlug>.pdf. Omit to hide the download link. */
-  pdfSlug?: string;
   /** Optional compact "podium by edition" cards, shown between the table and the champions summary. */
   podium?: PodiumEntry[];
   podiumHeading?: string;
@@ -32,7 +29,6 @@ const {
   tableId,
   tableCaption,
   extraColumn,
-  pdfSlug,
   podium,
   podiumHeading = 'Podium by edition',
   hostMap,
@@ -55,7 +51,6 @@ const stories = memorableMoments
     <p class="eyebrow badge">{data.status === 'verified' ? 'Verified' : 'In review'}</p>
     <h1>{data.title}</h1>
     <p class="competition__intro">{data.intro}</p>
-    {pdfSlug && <PrintDownloadLink slug={pdfSlug} />}
   </header>
 
   <TournamentTable

@@ -55,10 +55,8 @@ const compareHref = withBase(locale === 'hr' ? TRANSLATED_PATHS['/compare'] : '/
 // Same idea, one level down: the "find a player" widget sends a selected
 // player to /compare-players?a=<id>, the shareable param
 // src/pages/compare-players.astro's own two <select> pickers already
-// read/write. /player-index.json.ts already existed (built for
-// scripts/generate-pdfs.mjs to enumerate /players/<slug> PDF targets) but
-// was, until this widget, not read by any client-side code - see that
-// file's own doc comment.
+// read/write. The roster comes from /player-index.json - see that file's
+// own doc comment.
 const playerCompareHref = withBase(
   locale === 'hr' ? TRANSLATED_PATHS['/compare-players'] : '/compare-players',
 );

@@ -65,9 +65,8 @@ Nations League, Copa América, Men's Ballon d'Or, Golden Boot), `/records`,
 `/compare`, `/compare-players`, `/teams/<slug>` and `/players/<slug>` profile
 directories, `/glossary`, the Family Quiz, per-edition pages for every
 competition and both individual awards (`/competitions/<competition>/<year>`),
-light/dark mode, a print stylesheet, downloadable print PDFs (700, one per
-page - tagged/PDF-UA structured, with page numbers, an `/Author`, and a
-cross-reference pager between adjacent editions), a PWA/offline mode, an
+light/dark mode, a print stylesheet (readers print or save as PDF from the
+browser), a PWA/offline mode, an
 Atom feed (`/feed.xml`, `/hr/feed.xml`) of recently-reviewed pages, and an
 "On this day" widget. See `docs/PROJECT_STATUS.md`'s "Known caveats" section
 for a summary of what exists and any standing quirks; a run that ships a
@@ -92,8 +91,8 @@ with `PW_EXECUTABLE_PATH` pointed at the pre-installed
 Run 265's own fix - zero WCAG 1.4.3 violations across all 711 pages in
 both color schemes; `check:lighthouse` also reconfirmed, 39 pages all
 >= 0.9 in every category with the same one documented noindex/SEO
-exception as before. Run 314 also found that this sweep and `pnpm
-build:pdfs` must never run concurrently - see this file's "Operational
+exception as before. Run 314 also found that this sweep must never run
+concurrently with another `astro preview` command - see this file's "Operational
 note (Run 314)" above) rather than on every change. Run 294 found this same
 `PW_EXECUTABLE_PATH` fix is also needed for `pnpm test:e2e` in this
 session's container (not just the ten manual scripts above) - without it,
@@ -163,12 +162,7 @@ changes materially. Run 270 then extended the angle to `scripts/*.mjs`
 (7 of 49 files), Run 274 covered 7 more (the remaining claim-ledger/profile
 checkers, fixing a dead-code ENOENT bug present in two files), and Run 275
 finished the remaining 24 files - all of `scripts/*.mjs` has now had this
-review at least once. `scripts/generate-pdfs.mjs` reopened for this angle
-after Run 293 materially edited it (new PDF-regeneration-skip cache logic);
-Run 296 reviewed that new logic, found no live bug, and split it into a new
-side-effect-free `scripts/pdf-manifest.mjs` module with its own unit tests
-(`tests/unit/pdfManifest.test.ts`, 15 cases) - re-open only after a future
-run materially edits either file again. Run 275 found and fixed one real,
+review at least once. Run 275 found and fixed one real,
 currently-live bug:
 `check-i18n-notes.mjs`'s `hrCounterpart()` mapped the home page to `/hr`
 instead of `/hr/`, the one path shape that doesn't match
@@ -194,11 +188,9 @@ branch-strategy instructions for a squash-merged branch. No action needed;
 noted here only so a future run doesn't wonder why the flag disappeared.
 
 **Operational note (Run 314):** the ten-script manual browser/accessibility
-sweep and `pnpm build:pdfs` both depend on a shared `astro preview` daemon -
-running either one concurrently with any other `check:*`/`build:pdfs`
-invocation causes one to silently stop the other's server mid-request.
-Confirmed directly this run (a concurrent sweep + `build:pdfs` attempt broke
-both). Never run more than one `astro preview`-dependent command at a time
+sweep depends on a shared `astro preview` daemon - running it concurrently
+with any other `astro preview`-dependent `check:*` invocation causes one to
+silently stop the other's server mid-request. Never run more than one `astro preview`-dependent command at a time
 in this repo.
 
 Every generated/derived page has its own independent-recomputation guard,
@@ -218,48 +210,12 @@ the full run-by-run history behind all of this, see
 
 ## Open backlog
 
-- **`.git` history bloat from committed PDFs - decision overdue, unresolved
-  across 8 runs (289-296, 2026-10-14 to 2026-10-16):** root cause and the
-  Run 293 partial fix are fully written up in `docs/PROJECT_STATUS.md`'s
-  Run 289 and Run 293 entries - not repeated here. Current state: `.git`
-  is 5.2-5.5 GB; Run 293 already stopped the *common* case of further
-  growth (a content-touching run that doesn't change a PDF's own source no
-  longer rewrites that PDF), but the ~5 GB already in history is untouched,
-  and a run whose edit *does* change a PDF's source still adds one full
-  binary rewrite (Chromium's print-to-PDF output isn't byte-stable across
-  runs even for identical content, so git can't delta it). Three options,
-  compared here so the decision is actually actionable rather than
-  re-flagged a ninth time:
-  1. **Git LFS migration** (`git lfs migrate import --include="public/
-     downloads/*.pdf" --everything`): moves the PDF blobs out of the
-     regular object store into LFS pointers, shrinking the *packed* `.git`
-     significantly. Still rewrites every commit SHA that ever touched a
-     PDF (forced push, every existing clone needs redoing), and shifts the
-     cost to GitHub LFS storage/bandwidth quotas instead of removing it -
-     700 PDFs regenerating periodically could run into the free-tier cap.
-  2. **History rewrite / blob purge** (e.g. `git filter-repo`, keeping only
-     each PDF's latest blob): the most direct shrink of the bloat already
-     committed. Destructive in the same way as option 1 (rewrites SHAs,
-     needs a forced push and fresh clones) but with no new ongoing
-     infrastructure - losing old PDF *history* isn't a content-loss risk
-     the way losing a `content/*.md` edit would be, since the PDFs are a
-     generated artifact, not editorial source.
-  3. **Stop committing generated PDFs at all**: generate them as a deploy-
-     time build step (the production host runs `pnpm build:pdfs` before
-     serving, the same command this repo already runs locally) instead of
-     versioning `public/downloads/*.pdf` in git. The only option that fixes
-     the growth mechanism at its root rather than relocating/shrinking the
-     existing bloat - but it's a deployment-architecture change, not a git
-     operation: whichever host serves this site needs to start running a
-     build step it may not run today.
-  Option 3 is the direction Run 293's own skip-cache logic already treats
-  PDFs as heading (a build artifact with a freshness check, not an edited
-  file) - but adopting it, and whether to *also* do a one-time cleanup
-  (option 1 or 2) for the ~5 GB already committed, needs the user's actual
-  sign-off: this is a destructive-or-architecture-changing decision no
-  unattended run should make unilaterally. No code change proposed here,
-  only the comparison - flag this to the user directly rather than letting
-  a ninth run restate the same open question.
+- **`.git` history bloat from committed PDFs - growth stopped
+  2026-10-19:** the pre-generated PDF downloads were removed entirely
+  (see `docs/PROJECT_STATUS.md`'s "Decisions on record"), so no further
+  PDF blobs are added. The ~5 GB already in history is untouched; shrinking
+  it needs a history rewrite (e.g. `git filter-repo`) and a forced push,
+  which is the user's call.
 - **2026 Ballon d'Or edition**: not due yet, not blocked. The two-hundred-
   and-forty-first run confirmed via `WebSearch` that the ceremony is
   scheduled for 26 October 2026 in London (its first time outside Paris) -

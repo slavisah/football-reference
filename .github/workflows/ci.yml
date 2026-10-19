@@ -42,9 +42,6 @@ jobs:
       - name: Unit tests
         run: pnpm test
 
-      - name: PDF freshness check
-        run: pnpm check:pdfs
-
       - name: Spelling check (content/*.md)
         run: pnpm check:spelling
 
@@ -113,9 +110,6 @@ jobs:
 
       - name: Theme pre-paint ordering check
         run: pnpm check:theme-flash
-
-      - name: PDF outline/bookmark integrity check
-        run: pnpm check:pdf-outline
 
       - name: Page-reachability check
         run: pnpm check:reachability

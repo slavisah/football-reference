@@ -387,22 +387,6 @@ main {
   border: 0;
 }
 
-/*
- * Mirror image of `.no-print` below: hidden during normal browsing, shown
- * only when printing or generating a PDF (scripts/generate-pdfs.mjs emulates
- * print media before rendering). Added for content that only makes sense on
- * the printed/PDF page and would be redundant clutter on screen - e.g.
- * EditionView.astro's PDF-to-PDF cross-reference pager, a link to the
- * sibling edition's own downloadable PDF file that only matters to a reader
- * who is already reading a downloaded PDF (the live web page already has its
- * own on-page pager to the sibling edition's live page). No prior use of
- * this "opposite of .no-print" direction existed anywhere in this codebase
- * before this one.
- */
-.print-only {
-  display: none;
-}
-
 /* --- Print: readable A4-landscape tournament sheets --- */
 @page {
   size: A4 landscape;
@@ -434,16 +418,6 @@ main {
   .filters__reset,
   .no-print {
     display: none !important;
-  }
-
-  /* Reveal `.print-only` content (see that class's own comment above). A
-     bare `display: block` here is only the default toggle; a more specific
-     component (e.g. EditionView.astro's `.edition__pdf-pager`) can still set
-     its own `display` value under its own `@media print` block afterward -
-     Astro's scoped-style attribute selector always outranks this plain
-     global class regardless of source order. */
-  .print-only {
-    display: block;
   }
 
   main {
@@ -479,12 +453,9 @@ main {
   /* `.t-wrap`'s screen-only `overflow-x: auto` (the small-screen horizontal
      scrollbar) has no paper equivalent - a reader can't scroll a printed
      page, so anything past its right edge was silently clipped instead of
-     wrapping onto the page. Confirmed as a real bug in the shipped
-     downloadable PDFs for every wide table (World Cup, EURO, Nations League
-     HR, Copa América HR, the /records rivalries table): `pnpm check:pdfs`
-     only hashes source content for freshness, never checks the rendered
-     layout actually fits the A4-landscape page, so this had no automated
-     coverage. `table-layout: fixed` plus wrapping cells makes every column
+     wrapping onto the page. Confirmed as a real bug for every wide table
+     (World Cup, EURO, Nations League HR, Copa América HR, the /records
+     rivalries table). `table-layout: fixed` plus wrapping cells makes every column
      share the page width and wrap its own content instead of growing past
      it. This rule covers every plain, unscoped `.t-wrap` user (`/compare`,
      `/compare-players`, `/records`); TournamentTable.astro's own `.t-wrap`
@@ -576,10 +547,7 @@ main {
      reader's own direct browser print (Ctrl+P) unless "Background graphics"
      is manually checked in the print dialog - so without this, both the
      track and the fill vanish, leaving a blank gap between a champion's
-     title count and its winning years. This doesn't affect the site's own
-     700 pre-generated downloadable PDFs - `scripts/generate-pdfs.mjs`
-     already passes `printBackground: true` there - only a reader's own
-     Ctrl+P of the live page, which has no such override. */
+     title count and its winning years. */
   .champions__bar,
   .champions__bar-fill {
     print-color-adjust: exact;

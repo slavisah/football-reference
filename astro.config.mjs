@@ -19,7 +19,7 @@ export default defineConfig({
   // /competitions/ballon-dor and /competitions/golden-boot (grouped with the
   // other competition pages, matching the site nav). Rather than moving the
   // canonical pages now - which would touch every existing internal link,
-  // both languages' TRANSLATED_PATHS, the generated PDFs, and every test
+  // both languages' TRANSLATED_PATHS, and every test
   // that already asserts the /competitions/ URL - keep the established
   // structure and satisfy the documented required path with a redirect.
   // Astro does not prepend `base` to redirect destinations automatically

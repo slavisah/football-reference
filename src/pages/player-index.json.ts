@@ -4,17 +4,10 @@ import { buildAllPlayerProfiles, type PlayerAwardSource } from '../lib/playerPro
 
 export const prerender = true;
 
-// Data endpoint mirroring team-index.json.ts, originally built for the
-// /players/<slug> PDF family: scripts/generate-pdfs.mjs has no way to
-// enumerate player slugs itself (they're derived from the three award
-// tables at build time, not hand-typed - the same reason team-index.json.ts
-// exists for /teams/<slug>), so it asks this endpoint for the live roster
-// the same way it asks /team-index.json for teams.
-//
-// Also fetched lazily, client-side, by Nav.astro's "find a player" search
-// widget (added 2026-08-21, mirroring the earlier "find a team" widget) -
-// the same endpoint now serves both the build-time PDF script and the
-// browser, exactly like /team-index.json already did.
+// Data endpoint mirroring team-index.json.ts: player slugs are derived from
+// the three award tables at build time, not hand-typed, so Nav.astro's
+// "find a player" search widget fetches the live roster from here lazily,
+// client-side, the same way the "find a team" widget uses /team-index.json.
 export const GET: APIRoute = async () => {
   const [ballonDor, worldCupGoldenBoot, euroGoldenBoot] = await Promise.all([
     loadCompetition('ballon-dor', { editionsHeading: 'Winners', sourcesHeading: "Ballon d'Or" }),

@@ -8,9 +8,7 @@ import type { CompetitionEditions } from './compare';
 // frontmatter was the only place that loaded and shaped these four calls;
 // src/pages/team-index.json.ts (the global "find a team" search widget's
 // data endpoint) needs the exact same country list, so this is factored out
-// once rather than risking the two drifting apart on load options the way
-// e.g. scripts/pdf-pages.mjs's shared PDF_PAGES list already prevents for
-// PDF generation.
+// once rather than risking the two drifting apart on load options.
 export type TeamCompetitions = {
   worldCup: CompetitionData;
   euro: CompetitionData;

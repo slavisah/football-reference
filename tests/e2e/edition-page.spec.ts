@@ -52,47 +52,6 @@ test.describe('World Cup edition page', () => {
     await expect(page.locator('.edition__pager-link--next')).toBeVisible();
   });
 
-  // The print-only PDF-to-PDF cross-reference pager (EditionView.astro's
-  // `pdfPreviousUrl`/`pdfNextUrl`): a second, differently-classed pager that
-  // links to the sibling edition's own downloadable PDF file rather than its
-  // live page - for a reader working from a folder of downloaded PDFs, not
-  // the live site. Hidden on screen (`.print-only`, src/styles/global.css)
-  // so it never clutters normal browsing or collides with the on-page
-  // `.edition__pager-link` locators above.
-  test('the print-only PDF pager links to the sibling editions\' own PDFs and stays hidden on screen', async ({
-    page,
-  }) => {
-    await page.goto('competitions/world-cup/2018');
-
-    const pdfPager = page.locator('.edition__pdf-pager');
-    await expect(pdfPager).toBeHidden();
-
-    // 2018's previous/next PDFs are 2014/2022, matching the on-page pager's
-    // own live-page neighbours above - confirmed absolute (not site-relative)
-    // so the link still resolves from a PDF a reader saved to their own disk,
-    // not just when served from the live site's own origin (see
-    // editionPdfDownloadUrl()'s own doc comment in src/lib/editionProfile.ts).
-    await expect(pdfPager.locator('a', { hasText: 'Previous edition (PDF)' })).toHaveAttribute(
-      'href',
-      'https://slavisah.github.io/football-reference/downloads/edition-world-cup-2014.pdf',
-    );
-    await expect(pdfPager.locator('a', { hasText: 'Next edition (PDF)' })).toHaveAttribute(
-      'href',
-      'https://slavisah.github.io/football-reference/downloads/edition-world-cup-2022.pdf',
-    );
-
-    await page.emulateMedia({ media: 'print' });
-    await expect(pdfPager).toBeVisible();
-  });
-
-  test('the oldest edition has no previous PDF link either', async ({ page }) => {
-    await page.goto('competitions/world-cup/1930');
-    await page.emulateMedia({ media: 'print' });
-
-    await expect(page.locator('.edition__pdf-pager a', { hasText: 'Previous edition (PDF)' })).toHaveCount(0);
-    await expect(page.locator('.edition__pdf-pager a', { hasText: 'Next edition (PDF)' })).toBeVisible();
-  });
-
   test('links back to the full competition table', async ({ page }) => {
     await page.goto('competitions/world-cup/2018');
     const back = page.locator('.edition__back a');
@@ -125,17 +84,6 @@ test.describe('World Cup edition page', () => {
     await expect(page).toHaveURL(/\/hr\/competitions\/world-cup\/2018\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
-
-  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
-    await page.goto('competitions/world-cup/2018');
-    const link = page.locator('a[download][href$="downloads/edition-world-cup-2018.pdf"]');
-    await expect(link).toBeVisible();
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
-  });
 });
 
 test.describe('Croatian World Cup edition page', () => {
@@ -163,24 +111,6 @@ test.describe('Croatian World Cup edition page', () => {
     await expect(page.locator('.edition__pager-link--next')).toContainText('Sljedeće izdanje');
   });
 
-  test('the print-only PDF pager uses Croatian copy and links to the Croatian sibling PDFs', async ({
-    page,
-  }) => {
-    await page.goto('hr/competitions/world-cup/2018');
-    await page.emulateMedia({ media: 'print' });
-
-    const pdfPager = page.locator('.edition__pdf-pager');
-    await expect(pdfPager).toBeVisible();
-    await expect(pdfPager.locator('a', { hasText: 'Prethodno izdanje (PDF)' })).toHaveAttribute(
-      'href',
-      'https://slavisah.github.io/football-reference/downloads/edition-world-cup-2014-hr.pdf',
-    );
-    await expect(pdfPager.locator('a', { hasText: 'Sljedeće izdanje (PDF)' })).toHaveAttribute(
-      'href',
-      'https://slavisah.github.io/football-reference/downloads/edition-world-cup-2022-hr.pdf',
-    );
-  });
-
   test('the language switcher returns to the English edition page', async ({ page }) => {
     await page.goto('hr/competitions/world-cup/2018');
     await openMenu(page);
@@ -196,16 +126,5 @@ test.describe('Croatian World Cup edition page', () => {
       .disableRules(['region', 'color-contrast-enhanced'])
       .analyze();
     expect(results.violations).toEqual([]);
-  });
-
-  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
-    await page.goto('hr/competitions/world-cup/2018');
-    const link = page.locator('a[download][href$="downloads/edition-world-cup-2018-hr.pdf"]');
-    await expect(link).toBeVisible();
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
   });
 });

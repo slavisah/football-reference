@@ -6,8 +6,8 @@
 //
 // Distinct from every existing link/sitemap check, which none of them
 // currently verify: `check:links` confirms every `href`/`src` attribute on
-// every tag (including `<link rel="canonical">`, JSON-LD `url` fields, and
-// PDF download links) resolves to a real file - it never asks whether any
+// every tag (including `<link rel="canonical">` and JSON-LD `url` fields)
+// resolves to a real file - it never asks whether any
 // page actually links *to* a given page, only whether a page's own outgoing
 // references are valid. `check:sitemap` confirms every indexable page has a
 // matching `sitemap.xml` `<loc>` entry, which covers search-engine

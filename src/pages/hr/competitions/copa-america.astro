@@ -10,7 +10,7 @@
 // hr/records.astro and hr/compare.astro) rather than through the shared
 // English-only CompetitionView, so the five untouched English competition
 // pages needed no changes beyond the new optional locale props on
-// TournamentTable/PrintDownloadLink (defaulted to the original English text).
+// TournamentTable (defaulted to the original English text).
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import TournamentTable from '../../../components/TournamentTable.astro';
 import PodiumCards from '../../../components/PodiumCards.astro';
@@ -18,7 +18,6 @@ import ChampionsSummary from '../../../components/ChampionsSummary.astro';
 import HostMap from '../../../components/HostMap.astro';
 import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
-import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
 import { buildPodiums, buildYearStories, buildHostMapPoints } from '../../../lib/editions';
 import { buildEditionLinks, buildEditionProfiles } from '../../../lib/editionProfile';
@@ -320,11 +319,6 @@ const headerLabels: Record<string, string> = {
         pozvane gostujuće momčadi izvan Južne Amerike sudjeluju od 1993.
         godine.
       </p>
-      <PrintDownloadLink
-        slug="copa-america-hr"
-        label="Preuzmi PDF za ispis"
-        hint="A4 položeno, ista tablica i zbrojevi kao na ovoj stranici."
-      />
     </header>
 
     <TournamentTable

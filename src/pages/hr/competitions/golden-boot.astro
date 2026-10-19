@@ -16,7 +16,6 @@ import TournamentTable from '../../../components/TournamentTable.astro';
 import ChampionsSummary from '../../../components/ChampionsSummary.astro';
 import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
-import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
 import { disambiguateLabels } from '../../../lib/sources';
 import { buildYearStories } from '../../../lib/editions';
@@ -198,11 +197,6 @@ const headerLabels: Record<string, string> = {
         dijeljene pobjednike ondje gdje ih je povijesno natjecanje
         priznavalo.
       </p>
-      <PrintDownloadLink
-        slug="golden-boot-hr"
-        label="Preuzmi PDF za ispis"
-        hint="A4 položeno, ista tablica i zbrojevi kao na ovoj stranici."
-      />
     </header>
 
     <section class="stack">

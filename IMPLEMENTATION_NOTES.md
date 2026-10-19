@@ -105,7 +105,7 @@ full Croatian/English localization, and the "by team" filter (shipped
 any team that appears in a Winner/Runner-up/Third/Fourth/semifinalist
 column) - see `docs/PROJECT_STATUS.md` for the complete, continuously-updated
 list (it now also covers `/compare`, `/teams`, a PWA/offline mode,
-downloadable print PDFs, and an "On this day" widget, none of which existed
+and an "On this day" widget, none of which existed
 when this section was last accurate).
 **Correction (2026-08-20 intensive run):** this section previously named the
 "by team" filter as the one still-missing requirement. That was stale - the

@@ -19,7 +19,6 @@ import TournamentTable from '../../../components/TournamentTable.astro';
 import ChampionsSummary from '../../../components/ChampionsSummary.astro';
 import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
-import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
 import { buildYearStories } from '../../../lib/editions';
 import { buildEditionLinks, buildEditionProfiles } from '../../../lib/editionProfile';
@@ -190,11 +189,6 @@ const headerLabels: Record<string, string> = {
         potpuno globalna. Od 2010. do 2015. dodjeljivala se zajedno s
         FIFA-om.
       </p>
-      <PrintDownloadLink
-        slug="ballon-dor-hr"
-        label="Preuzmi PDF za ispis"
-        hint="A4 položeno, ista tablica i zbrojevi kao na ovoj stranici."
-      />
     </header>
 
     <TournamentTable

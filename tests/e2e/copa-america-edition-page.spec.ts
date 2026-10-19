@@ -90,31 +90,6 @@ test.describe('Copa América edition page', () => {
     await expect(back).toHaveAttribute('href', /\/competitions\/copa-america\/?$/);
   });
 
-  // The print-only PDF pager (EditionView.astro's `pdfPreviousUrl`/
-  // `pdfNextUrl`) reuses `EditionProfile.previous`/`.next`'s own already
-  // host-disambiguated `.slug`, so the two 1959 editions' PDF hrefs need the
-  // same "-argentina"/"-ecuador" disambiguation the on-page pager above gets
-  // - a real edge case a plain year-only test could never exercise. Full
-  // coverage of the mechanism itself (hidden on screen, visible under print,
-  // both languages) lives on the shared component's flagship test in
-  // edition-page.spec.ts (World Cup).
-  test('the print-only PDF pager keeps the host disambiguation between the two 1959 editions\' own PDFs', async ({
-    page,
-  }) => {
-    await page.goto('competitions/copa-america/1959-argentina');
-    await page.emulateMedia({ media: 'print' });
-
-    const pdfPager = page.locator('.edition__pdf-pager');
-    await expect(pdfPager.locator('a', { hasText: 'Previous edition (PDF)' })).toHaveAttribute(
-      'href',
-      'https://slavisah.github.io/football-reference/downloads/edition-copa-america-1957.pdf',
-    );
-    await expect(pdfPager.locator('a', { hasText: 'Next edition (PDF)' })).toHaveAttribute(
-      'href',
-      'https://slavisah.github.io/football-reference/downloads/edition-copa-america-1959-ecuador.pdf',
-    );
-  });
-
   test('has no horizontal page overflow at 360px on either 1959 page', async ({ page }) => {
     for (const slug of ['1959-argentina', '1959-ecuador']) {
       await page.goto(`competitions/copa-america/${slug}`);
@@ -141,17 +116,6 @@ test.describe('Copa América edition page', () => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/competitions\/copa-america\/1959-ecuador\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
-  });
-
-  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
-    await page.goto('competitions/copa-america/1959-argentina');
-    const link = page.locator('a[download][href$="downloads/edition-copa-america-1959-argentina.pdf"]');
-    await expect(link).toBeVisible();
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
   });
 });
 
@@ -196,16 +160,5 @@ test.describe('Croatian Copa América edition page', () => {
       .disableRules(['region', 'color-contrast-enhanced'])
       .analyze();
     expect(results.violations).toEqual([]);
-  });
-
-  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
-    await page.goto('hr/competitions/copa-america/1959-argentina');
-    const link = page.locator('a[download][href$="downloads/edition-copa-america-1959-argentina-hr.pdf"]');
-    await expect(link).toBeVisible();
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
   });
 });

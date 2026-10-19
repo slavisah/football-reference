@@ -178,40 +178,6 @@ To publish: commit and **push to `main`**. GitHub Actions builds and deploys to
 GitHub Pages automatically. The live site is
 <https://slavisah.github.io/football-reference/>.
 
-If you changed an **Editions table** on a competition page that has a
-"Download printable PDF" link (all six competition/award pages plus
-`/records`, each with an English and a Croatian PDF - see
-`scripts/pdf-pages.mjs` for the full list of 14; note that any competition's
-table also feeds `/records`' rankings, so editing one may need to regenerate
-`records.pdf`/`records-hr.pdf` too), regenerate the matching file(s) under
-`public/downloads/` and commit them too, otherwise the downloadable PDF will
-silently go stale relative to the live table:
-
-```bash
-pnpm build && pnpm build:pdfs
-```
-
-This is a separate, manual step - not part of `pnpm build` or the deploy
-workflow - since it drives a real browser (Playwright's pre-installed
-Chromium) to render and print each page, which would slow down every deploy
-for a file that only changes when editorial content does. See
-`scripts/generate-pdfs.mjs`.
-
-It only re-renders and rewrites the PDF(s) whose own sources (per
-`scripts/pdf-pages.mjs`) actually changed since the last run - everything
-else is skipped, so a normal content edit produces a small, targeted diff
-under `public/downloads/` rather than rewriting all 700 files. Set
-`FORCE_ALL_PDFS=1` before the command above to force a full regeneration
-regardless (e.g. after a Playwright/Chromium version bump).
-
-If you forget, CI now catches it: `pnpm check:pdfs`
-(`scripts/check-pdf-freshness.mjs`) compares a hash of each PDF's source
-content against a manifest recorded the last time `pnpm build:pdfs` ran, and
-fails the build if any content file has changed since - no browser required,
-so it runs on every pull request alongside the type check and unit tests
-(`.github/workflows/ci.yml`), not just when someone remembers to check by
-hand.
-
 ## 9. Editorial reminders
 
 - Preserve historical team names in edition tables; do not "modernise" them.

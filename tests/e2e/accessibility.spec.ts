@@ -179,8 +179,8 @@ for (const colorScheme of COLOR_SCHEMES) {
 // build time, so this sweep - built the same way, from the same list - never
 // reached a single player profile either. Unlike /teams/<slug>, this was
 // missed from day one rather than caught and fixed in a later pass. Spot-
-// checked one representative player (Gerd Muller, the same slug the PDF
-// download Playwright coverage already uses) rather than one test per player.
+// checked one representative player (Gerd Muller) rather than one test per
+// player.
 for (const colorScheme of COLOR_SCHEMES) {
   test.describe(`player profile page, ${colorScheme} color scheme`, () => {
     test.use({ colorScheme });

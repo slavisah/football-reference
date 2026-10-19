@@ -3,7 +3,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ChampionsTimeline from '../components/ChampionsTimeline.astro';
 import ChampionsSummary from '../components/ChampionsSummary.astro';
 import References from '../components/References.astro';
-import PrintDownloadLink from '../components/PrintDownloadLink.astro';
 import SectionJumpNav from '../components/SectionJumpNav.astro';
 import { loadCompetition, loadPageMeta } from '../lib/competition';
 import { disambiguateLabels } from '../lib/sources';
@@ -261,10 +260,6 @@ const jumpSections = [
       <p class="eyebrow badge">Generated from the competition tables</p>
       <h1>{meta.title}</h1>
       <p class="records__intro">{meta.intro}</p>
-      <PrintDownloadLink
-        slug="records"
-        hint="A4 landscape, every ranking and timeline on this page."
-      />
     </header>
 
     <SectionJumpNav sections={jumpSections} />
@@ -837,7 +832,7 @@ const jumpSections = [
      page's own separately-styled rivalries table: the screen-only `nowrap`/
      `min-width: 34rem`/`.t-wrap`'s horizontal scrollbar have no paper
      equivalent, so content past the page's right edge was silently clipped
-     in the downloaded PDF instead of wrapping. */
+     on paper instead of wrapping. */
   @media print {
     .t-wrap {
       overflow-x: visible;

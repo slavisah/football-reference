@@ -17,7 +17,6 @@ import ChampionsSummary from '../../../components/ChampionsSummary.astro';
 import HostMap from '../../../components/HostMap.astro';
 import EditorialNotes from '../../../components/EditorialNotes.astro';
 import References from '../../../components/References.astro';
-import PrintDownloadLink from '../../../components/PrintDownloadLink.astro';
 import { loadCompetition } from '../../../lib/competition';
 import { buildTopScorerFacts, buildYearStories, buildHostMapPoints } from '../../../lib/editions';
 import { buildEditionLinks, buildEditionProfiles } from '../../../lib/editionProfile';
@@ -251,11 +250,6 @@ const headerLabels: Record<string, string> = {
         proširio se na osam momčadi 1980., šesnaest 1996. i dvadeset i četiri
         2016.
       </p>
-      <PrintDownloadLink
-        slug="euro-hr"
-        label="Preuzmi PDF za ispis"
-        hint="A4 položeno, ista tablica i zbrojevi kao na ovoj stranici."
-      />
     </header>
 
     <TournamentTable

@@ -12,9 +12,8 @@ import { PRINT_CONTENT_WIDTH_PX } from '../../scripts/check-print-width.mjs';
 // file closes that gap - it's a genuinely different rendering path from
 // everything else in the suite, not a duplicate of the screen-media
 // filter/sort/theme-toggle interaction-state coverage already added
-// elsewhere, and print correctness is exactly what the six downloadable
-// per-competition PDFs (scripts/generate-pdfs.mjs) depend on, even though
-// that script itself has no accessibility assertions of its own.
+// elsewhere, and print correctness is exactly what a reader's own browser
+// print or save as PDF depends on.
 
 async function runAxe(page: Page) {
   const results = await new AxeBuilder({ page })
@@ -389,15 +388,13 @@ test.describe('World Cup story reveal in print media', () => {
 // no paper equivalent, and every wide `.t-table` (7+ columns, e.g. World Cup's
 // Year/Host(s)/Teams/Winner/Runner-up/Third/Fourth/Final/Final date/Top
 // scorer/Story) rendered wider than the printable A4-landscape page - so
-// content past the page's right edge was silently clipped in the actual
-// downloaded PDF, not just scrollable as it is on screen. `pnpm check:pdfs`
-// only ever hashed source content for freshness, and every other test in
-// this file runs at the suite's default 360px mobile viewport, which is
-// narrower than the print stylesheet's own mobile-card breakpoint and so
-// never exercised the real table layout at all - neither one could ever have
-// caught this. This test approximates the actual print-to-PDF layout width
-// (scripts/generate-pdfs.mjs's `@page` rule: A4 landscape, 297mm wide, 12mm
-// margins each side = 273mm of usable content) by setting the viewport to
+// content past the page's right edge was silently clipped on paper, not just
+// scrollable as it is on screen. Every other test in this file runs at the
+// suite's default 360px mobile viewport, which is narrower than the print
+// stylesheet's own mobile-card breakpoint and so never exercised the real
+// table layout at all. This test approximates the actual print layout width
+// (global.css's `@page` rule: A4 landscape, 297mm wide, 12mm margins each
+// side = 273mm of usable content) by setting the viewport to
 // that same width before emulating print media, then confirms every element
 // on the page fits inside it - the same measurement approach the site's own
 // filter-`<select>`-width fix (docs/ROADMAP.md, seventieth intensive run)

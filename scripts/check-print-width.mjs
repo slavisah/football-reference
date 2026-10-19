@@ -1,7 +1,7 @@
 // A systematic print-media width sweep, across every page on the site (both
 // languages), at the same usable A4-landscape content width
 // `tests/e2e/print-styles.spec.ts`'s `PRINT_CONTENT_WIDTH_PX` already uses
-// (`scripts/generate-pdfs.mjs`'s `@page` rule: A4 landscape, 297mm wide, 12mm
+// (global.css's `@page` rule: A4 landscape, 297mm wide, 12mm
 // margins each side = 273mm ~= 1032px usable width).
 //
 // That hand-written spec's own `WIDE_TABLE_PRINT_PAGES` list already covers

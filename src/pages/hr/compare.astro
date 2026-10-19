@@ -14,7 +14,6 @@
 // (champion/country names are the underlying data, not UI chrome).
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import References from '../../components/References.astro';
-import PrintDownloadLink from '../../components/PrintDownloadLink.astro';
 import { loadCompetition, loadPageMeta } from '../../lib/competition';
 import { disambiguateLabels } from '../../lib/sources';
 import {
@@ -159,11 +158,6 @@ const jsonLd: JsonLdObject[] = [
         Pojedinačne nagrade (Zlatna lopta, Zlatna kopačka) ovdje nisu
         uključene jer nagrađuju igrače, a ne reprezentacije.
       </p>
-      <PrintDownloadLink
-        slug="compare-hr"
-        label="Preuzmi PDF za ispis"
-        hint="A4 položeno, zadani par prikazan ispod te cjelokupni poredak reprezentacija."
-      />
     </header>
 
     <section class="card stack" aria-labelledby="head-to-head-heading">

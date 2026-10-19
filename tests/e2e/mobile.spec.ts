@@ -254,16 +254,6 @@ test.describe('World Cup page on a 360px phone', () => {
     await expect(page.locator('#world-cup-sort')).toHaveValue('winner-asc');
   });
 
-  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
-    const link = page.locator('a[download][href$="downloads/world-cup.pdf"]');
-    await expect(link).toBeVisible();
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
-  });
-
   test('the language switcher opens the Croatian World Cup page', async ({ page }) => {
     await openMenu(page);
     await page.locator('a.lang-switch').click();
@@ -551,19 +541,6 @@ test.describe('Croatian World Cup page (/hr/competitions/world-cup) on a 360px p
     await expect(page.locator('#dobitnici-zlatne-rukavice')).toBeInViewport();
   });
 
-  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
-    page,
-    request,
-  }) => {
-    const link = page.locator('a[download][href$="downloads/world-cup-hr.pdf"]');
-    await expect(link).toContainText('Preuzmi PDF za ispis');
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
-  });
-
   test('the language switcher returns to the English World Cup page', async ({ page }) => {
     await openMenu(page);
     await page.locator('a.lang-switch').click();
@@ -680,19 +657,6 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
     // Scoped to the notes cards, not the table - the same sentence is now
     // also joined onto its edition row as a "tap a year for a story" reveal.
     await expect(page.locator('.notes__card').getByText('Slavna "panenka" Antonína Panenke')).toBeVisible();
-  });
-
-  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
-    page,
-    request,
-  }) => {
-    const link = page.locator('a[download][href$="downloads/euro-hr.pdf"]');
-    await expect(link).toContainText('Preuzmi PDF za ispis');
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
   });
 
   test('the language switcher returns to the English EURO page', async ({ page }) => {
@@ -817,16 +781,6 @@ test.describe('Golden Boot page on a 360px phone', () => {
     await expect(firstRow).toContainText('Just Fontaine');
   });
 
-  test('offers a downloadable print PDF covering both tables', async ({ page, request }) => {
-    const link = page.locator('a[download][href$="downloads/golden-boot.pdf"]');
-    await expect(link).toBeVisible();
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
-  });
-
   test('the language switcher opens the Croatian Golden Boot page', async ({ page }) => {
     await openMenu(page);
     await page.locator('a.lang-switch').click();
@@ -937,19 +891,6 @@ test.describe('Croatian Golden Boot page (/hr/competitions/golden-boot) on a 360
 
     expect(hrTop).toBe(enTop);
     expect(hrCount?.match(/\d+/)?.[0]).toBe(enCount?.match(/\d+/)?.[0]);
-  });
-
-  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
-    page,
-    request,
-  }) => {
-    const link = page.locator('a[download][href$="downloads/golden-boot-hr.pdf"]');
-    await expect(link).toContainText('Preuzmi PDF za ispis');
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
   });
 
   test('the language switcher returns to the English Golden Boot page', async ({ page }) => {
@@ -1210,19 +1151,6 @@ test.describe("Croatian Ballon d'Or page (/hr/competitions/ballon-dor) on a 360p
     await expect(
       page.locator('.notes__card').getByText('Xana Foundation'),
     ).toBeVisible();
-  });
-
-  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
-    page,
-    request,
-  }) => {
-    const link = page.locator('a[download][href$="downloads/ballon-dor-hr.pdf"]');
-    await expect(link).toContainText('Preuzmi PDF za ispis');
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
   });
 
   test("the language switcher returns to the English Ballon d'Or page", async ({ page }) => {
@@ -1617,19 +1545,6 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     ).toBeVisible();
   });
 
-  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
-    page,
-    request,
-  }) => {
-    const link = page.locator('a[download][href$="downloads/copa-america-hr.pdf"]');
-    await expect(link).toContainText('Preuzmi PDF za ispis');
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
-  });
-
   test('the language switcher returns to the English Copa América page', async ({ page }) => {
     await openMenu(page);
     await page.locator('a.lang-switch').click();
@@ -1828,19 +1743,6 @@ test.describe('Croatian Nations League page (/hr/competitions/nations-league) on
     await expect(latest.getByText('Domaćin: Germany')).toBeVisible();
     await expect(latest).toContainText('Portugal');
     await expect(latest).toContainText('Spain');
-  });
-
-  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
-    page,
-    request,
-  }) => {
-    const link = page.locator('a[download][href$="downloads/nations-league-hr.pdf"]');
-    await expect(link).toContainText('Preuzmi PDF za ispis');
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
   });
 
   test('the language switcher returns to the English Nations League page', async ({ page }) => {
@@ -2307,19 +2209,6 @@ test.describe('Records page on a 360px phone', () => {
     await expect(page.getByText('Ousmane Dembélé').first()).toBeVisible();
   });
 
-  test('offers a downloadable print PDF covering every ranking and timeline', async ({
-    page,
-    request,
-  }) => {
-    const link = page.locator('a[download][href$="downloads/records.pdf"]');
-    await expect(link).toBeVisible();
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
-  });
-
   test('the language switcher opens the Croatian records page', async ({ page }) => {
     await openMenu(page);
     await page.locator('a.lang-switch').click();
@@ -2557,19 +2446,6 @@ test.describe('Croatian records page (/hr/records) on a 360px phone', () => {
     expect(barLabel).toMatch(/^\d+ od \d+$/);
     expect(barLabel).not.toContain(' of ');
   });
-
-  test('offers a downloadable print PDF with the translated label, linking to the Croatian PDF', async ({
-    page,
-    request,
-  }) => {
-    const link = page.locator('a[download][href$="downloads/records-hr.pdf"]');
-    await expect(link).toContainText('Preuzmi PDF za ispis');
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
-  });
 });
 
 test.describe('Compare page on a 360px phone', () => {
@@ -2693,19 +2569,6 @@ test.describe('Compare page on a 360px phone', () => {
     await expect(page).toHaveURL(/\/hr\/compare(\?|$)/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
-
-  test('offers a downloadable print PDF covering the default pair and the all-teams ranking', async ({
-    page,
-    request,
-  }) => {
-    const link = page.locator('a[download][href$="downloads/compare.pdf"]');
-    await expect(link).toBeVisible();
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
-  });
 });
 
 test.describe('Croatian compare page (/hr/compare) on a 360px phone', () => {
@@ -2809,17 +2672,6 @@ test.describe('Croatian compare page (/hr/compare) on a 360px phone', () => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/football-reference\/compare(\?|$)/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  });
-
-  test('offers a downloadable print PDF with translated labels', async ({ page, request }) => {
-    const link = page.locator('a[download][href$="downloads/compare-hr.pdf"]');
-    await expect(link).toBeVisible();
-    await expect(link).toHaveText(/Preuzmi PDF za ispis/);
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
   });
 });
 
@@ -3466,16 +3318,6 @@ test.describe('Glossary page on a 360px phone', () => {
     await expect(page).toHaveURL(/\/hr\/glossary$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
   });
-
-  test('offers a downloadable print PDF of the glossary', async ({ page, request }) => {
-    const link = page.locator('a[download][href$="downloads/glossary.pdf"]');
-    await expect(link).toBeVisible();
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
-  });
 });
 
 test.describe('Croatian glossary page (/hr/glossary) on a 360px phone', () => {
@@ -3503,17 +3345,6 @@ test.describe('Croatian glossary page (/hr/glossary) on a 360px phone', () => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/glossary$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  });
-
-  test('offers a downloadable print PDF with translated labels', async ({ page, request }) => {
-    const link = page.locator('a[download][href$="downloads/glossary-hr.pdf"]');
-    await expect(link).toBeVisible();
-    await expect(link).toHaveText(/Preuzmi PDF za ispis/);
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
   });
 });
 
@@ -3767,25 +3598,20 @@ test.describe('Installability and offline reading', () => {
     expect(keysAfterReactivate).toContain(currentCacheName);
   });
 
-  test('a downloaded PDF\'s own internal link to a team page still works offline, if the reader visited that page online first', async ({
+  test('a team page visited once online still loads offline from a fresh navigation', async ({
     page,
     context,
   }) => {
-    // Every downloadable PDF's internal team/player links
-    // (scripts/generate-pdfs.mjs's rewriteInternalLinksForPrint()) are plain
-    // production URLs with no trailing slash - the exact same slash-less
-    // form src/lib/url.ts's withBase() already produces for every in-app
-    // link. Unlike every URL the offline tests above exercise (all of them
+    // Uses the slash-less URL form src/lib/url.ts's withBase() produces for
+    // every in-app link. Unlike every URL the offline tests above exercise (all of them
     // top-level nav pages precached via PRECACHE_URLS/src/lib/routes.ts's
     // NAV_LINKS), a team/player profile page such as /teams/brazil has no
     // precache entry of its own - it only ever lands in Cache Storage
-    // opportunistically, the first time it's actually visited online. A
-    // reader who opens a downloaded PDF and clicks one of its internal
-    // team/player links while offline depends entirely on that ordinary
-    // network-first/cache-fallback fetch-handler path already having cached
-    // this specific leaf page - a previously-untested real-world entry
-    // point distinct from every case above (canonical vs. in-app URL forms
-    // of the same *precached* nav page).
+    // opportunistically, the first time it's actually visited online, so an
+    // offline revisit depends entirely on the ordinary network-first/
+    // cache-fallback fetch-handler path having cached this leaf page - a
+    // case distinct from every one above (canonical vs. in-app URL forms of
+    // the same *precached* nav page).
     await page.goto('');
     await page.evaluate(() => navigator.serviceWorker.ready);
 
@@ -3801,18 +3627,16 @@ test.describe('Installability and offline reading', () => {
     const cdp = await context.newCDPSession(page);
     await cdp.send('Network.setCacheDisabled', { cacheDisabled: true });
 
-    // Simulates the reader visiting the team page once online, the same way
-    // they would before ever downloading its PDF - this is what actually
-    // populates the service worker's own cache, since the page carries no
+    // Simulates the reader visiting the team page once online - this is what
+    // actually populates the service worker's own cache, since the page carries no
     // precache entry.
     await page.goto('teams/brazil');
     await expect(page.locator('h1')).toHaveText('Brazil');
 
     await context.setOffline(true);
-    // Re-requests the exact same slash-less URL a PDF's own internal link
-    // would carry, as a fresh navigation rather than a page.reload() - the
-    // same request shape as clicking a link from outside the app entirely
-    // (a PDF viewer, another tab) rather than an in-page revisit.
+    // Re-requests the same slash-less URL as a fresh navigation rather than a
+    // page.reload() - the same request shape as following a link from
+    // outside the app entirely (another tab, a saved page).
     await page.goto('teams/brazil');
     await expect(page.locator('h1')).toHaveText('Brazil');
     await context.setOffline(false);

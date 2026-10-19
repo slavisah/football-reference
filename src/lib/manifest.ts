@@ -8,8 +8,8 @@ import type { Locale } from './i18n';
 // differ per locale. Before this, both locales served the single English manifest: a
 // Croatian reader installing the PWA from an /hr/ page got an app that always launched
 // to the English home page and reported itself as English to the OS (lang: 'en') - the
-// same "reader silently dropped back into English" bug class as the nav aria-label and
-// PDF downloads had, just in the install/launch path instead of a visible page.
+// same "reader silently dropped back into English" bug class as the nav aria-label
+// had, just in the install/launch path instead of a visible page.
 const DESCRIPTIONS: Record<Locale, string> = {
   en: "A family-friendly, offline-readable reference for the FIFA World Cup, UEFA EURO, Copa America, Nations League, Ballon d'Or and Golden Boot history.",
   hr: 'Obiteljski prijateljski, offline dostupan pregled povijesti Svjetskog prvenstva, UEFA EURO-a, Copa América, Lige nacija, Zlatne lopte i Zlatne kopačke.',

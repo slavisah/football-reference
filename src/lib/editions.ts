@@ -421,9 +421,7 @@ export function buildHostsSummary(editions: Edition[]): ChampionSummary[] {
  * Join `buildHostsSummary()`'s grouped hosting totals onto a fixed
  * coordinate table, for HostMap.astro's schematic locator map. Deliberately
  * throws on any host with no entry in `coordinates` rather than silently
- * dropping it - the same "don't let a real gap render as if everything is
- * covered" reasoning `scripts/pdf-pages.mjs`'s own header comment documents
- * for PDF freshness, applied here so a newly-added future host (e.g. a real
+ * dropping it, so a newly-added future host (e.g. a real
  * 2030 edition) fails the build loudly instead of quietly missing its
  * marker. Sorted by region (`regionOrder`, falling back to appearance order
  * for an unlisted region) then by first-hosted year, so the map's paired

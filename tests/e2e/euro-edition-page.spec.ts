@@ -52,25 +52,6 @@ test.describe('EURO edition page', () => {
     await expect(page.locator('.edition__pager-link--next')).toBeVisible();
   });
 
-  // Spot check for this family's own "edition-euro-<slug>" PDF prefix - full
-  // coverage of the print-only PDF pager mechanism itself (hidden on screen,
-  // visible under print, both languages) lives on the shared component's
-  // flagship test in edition-page.spec.ts (World Cup).
-  test('the print-only PDF pager links to the sibling EURO editions\' own PDFs', async ({ page }) => {
-    await page.goto('competitions/euro/2016');
-    await page.emulateMedia({ media: 'print' });
-
-    const pdfPager = page.locator('.edition__pdf-pager');
-    await expect(pdfPager.locator('a', { hasText: 'Previous edition (PDF)' })).toHaveAttribute(
-      'href',
-      'https://slavisah.github.io/football-reference/downloads/edition-euro-2012.pdf',
-    );
-    await expect(pdfPager.locator('a', { hasText: 'Next edition (PDF)' })).toHaveAttribute(
-      'href',
-      'https://slavisah.github.io/football-reference/downloads/edition-euro-2020.pdf',
-    );
-  });
-
   test('links back to the full competition table', async ({ page }) => {
     await page.goto('competitions/euro/2016');
     const back = page.locator('.edition__back a');
@@ -102,17 +83,6 @@ test.describe('EURO edition page', () => {
     await page.locator('a.lang-switch').click();
     await expect(page).toHaveURL(/\/hr\/competitions\/euro\/2016\/?$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'hr');
-  });
-
-  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
-    await page.goto('competitions/euro/2016');
-    const link = page.locator('a[download][href$="downloads/edition-euro-2016.pdf"]');
-    await expect(link).toBeVisible();
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
   });
 });
 
@@ -156,16 +126,5 @@ test.describe('Croatian EURO edition page', () => {
       .disableRules(['region', 'color-contrast-enhanced'])
       .analyze();
     expect(results.violations).toEqual([]);
-  });
-
-  test('offers a downloadable print PDF that actually resolves', async ({ page, request }) => {
-    await page.goto('hr/competitions/euro/2016');
-    const link = page.locator('a[download][href$="downloads/edition-euro-2016-hr.pdf"]');
-    await expect(link).toBeVisible();
-
-    const href = await link.getAttribute('href');
-    const response = await request.get(new URL(href!, page.url()).toString());
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('pdf');
   });
 });
