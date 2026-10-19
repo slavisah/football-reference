@@ -84,15 +84,17 @@ into `.github/workflows/ci.yml` as required PR gates; the other ten
 `check:text-spacing`/`check:focus-appearance`/`check:color-contrast`) are
 full-site Playwright/browser sweeps kept manual/intensive-run-only rather
 than a required PR gate, purely for their ~700-to-1,400-page-load runtime -
-re-run periodically (most recently Run 308, four runs after the prior
-full pass at Run 304 - all ten clean again, including
+re-run periodically (most recently Run 314, six runs after the prior
+full pass at Run 308 - all ten clean again, including
 `check:color-contrast` - the heaviest, 1,422 page loads, confirmed clean
 with `PW_EXECUTABLE_PATH` pointed at the pre-installed
 `chromium_headless_shell-1194/chrome-linux/headless_shell.real` binary per
 Run 265's own fix - zero WCAG 1.4.3 violations across all 711 pages in
 both color schemes; `check:lighthouse` also reconfirmed, 39 pages all
 >= 0.9 in every category with the same one documented noindex/SEO
-exception as before) rather than on every change. Run 294 found this same
+exception as before. Run 314 also found that this sweep and `pnpm
+build:pdfs` must never run concurrently - see this file's "Operational
+note (Run 314)" above) rather than on every change. Run 294 found this same
 `PW_EXECUTABLE_PATH` fix is also needed for `pnpm test:e2e` in this
 session's container (not just the ten manual scripts above) - without it,
 every test fails instantly with a `chrome-headless-shell`
