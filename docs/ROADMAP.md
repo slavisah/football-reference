@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (316 intensive runs as of 2026-10-19) lives
+verification sweep and decision (322 intensive runs as of 2026-10-20) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -325,9 +325,9 @@ the full run-by-run history behind all of this, see
   Flagged to the user directly; a future run should add the section (both
   languages) if the user says yes, or drop this note if they say no.
 - **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.11` (latest
-  published, bumped from 0.9.10 by Run 316) still only declares
+  published, no new release since Run 316's bump) still only declares
   `typescript: '^5.0.0 || ^6.0.0'` as a peer dependency - re-confirmed via
-  `npm view @astrojs/check@0.9.11 peerDependencies` by Run 316 (2026-10-19;
+  `npm view @astrojs/check@latest peerDependencies` by Run 322 (2026-10-20;
   `typescript` still at 5.9.3 vs. 7.0.2 latest). Re-check whenever `pnpm
   outdated` next shows a new `@astrojs/check` release.
 - **`docs/SOURCES.md` link-liveness sweep**: blocked. This environment's
@@ -605,7 +605,16 @@ the full run-by-run history behind all of this, see
   negative results on this specific sub-item - worth leaving alone for a
   few runs rather than retrying with no new angle each time, per Run 256's
   own reasoning, until either a fresh source surfaces on its own or a
-  genuinely different search angle presents itself.
+  genuinely different search angle presents itself. **Run 322 tried a
+  genuinely different angle** (a Croatian-language `WebSearch` query, since
+  no prior attempt had searched outside English) plus a fresh English query
+  framed around "youngest top scorer" rather than "youngest winner" -
+  both surfaced only the separate, already-distinguished "youngest-ever
+  EURO goalscorer" record (Lamine Yamal, 2024, age 16) and general
+  youngest-scorer lists, never a sourced claim about the youngest Golden
+  Boot *winner* specifically, the same gap every prior attempt hit. Eighth
+  consecutive negative result; still worth leaving alone until a genuinely
+  new angle (not language or phrasing) presents itself.
 - **Copa América Best Player / EURO Player of the Tournament "oldest-
   youngest-ever" facts** (tried Run 290, 2026-10-15; Copa América re-tried
   Run 307, 2026-10-18, same negative result, no new angle): no source ranks
