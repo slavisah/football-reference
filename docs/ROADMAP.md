@@ -497,10 +497,22 @@ the full run-by-run history behind all of this, see
   next-longest-stale file) - no discrepancies found this time (unlike
   Run 318's Copa América pass); see `docs/PROJECT_STATUS.md`'s Run 319
   entry and `docs/SOURCES.md`'s matching FIFA World Cup entry.
-  `fifa-world-cup.md` is now also at `2026-10-20`, tying `copa-america.md`;
-  the other 12 `content/*.md` files sit one day behind at `2026-10-19` -
-  a future run should pick one of those 12 next by the routine's own
-  competition/award ordering.
+  `fifa-world-cup.md` is now also at `2026-10-20`, tying `copa-america.md`.
+  **Update (Run 320):** picked `content/uefa-nations-league.md` next, per
+  the routine's own competition/award ordering (Copa América, done by Run
+  318; Nations League next). Its "Winning managers"/"Winning captains"
+  sections had already been touched by the 2026-10-18 whole-page pass, but
+  only as part of one combined check, not a later, separately-dated pass
+  against a deliberately distinct source mix - gave them that dedicated
+  second cross-check (Run 317's pattern). All four managers and all four
+  captains (2019-2025) re-confirmed via a source mix distinct from both the
+  original audits and the 2026-10-18 pass; no discrepancies found. See
+  `docs/PROJECT_STATUS.md`'s Run 320 entry and `docs/SOURCES.md`'s matching
+  Nations League entry. `uefa-nations-league.md` is now at `2026-10-20`,
+  tying `copa-america.md`/`fifa-world-cup.md`; the remaining 11
+  `content/*.md` files sit one day behind at `2026-10-19` - a future run
+  should pick one of those 11 next by the routine's own competition/award
+  ordering (Ballon d'Or is next).
 
 ## Ideas not yet scoped
 

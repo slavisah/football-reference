@@ -1766,6 +1766,43 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Winning managers and Winning captains, dedicated second independent
+  cross-check (added 2026-10-20, Run 320): this page's "Winning managers"
+  and "Winning captains" sections had already been touched by the
+  2026-10-18 whole-page third cross-check above, but only as part of a
+  single combined pass rather than a later, separately-dated pass against
+  a deliberately distinct source mix - the same gap Run 317 closed for
+  `uefa-euro.md`, Run 318 closed for `copa-america.md` (finding a real bug),
+  and Run 319 closed for `fifa-world-cup.md`. Re-verified all four winning
+  managers and all four winning captains (2019-2025) via a source mix
+  distinct from both the original audits and the 2026-10-18 whole-page
+  pass: AP-syndicated coverage (via portugoal.net, spin.ph, baynews9,
+  foxnews.com) for Fernando Santos's 2019 win, Al Jazeera/CBS Sports/
+  TheScore/getfootballnewsfrance for Didier Deschamps's 2021 win, Arab
+  News/Kuwait Times/UEFA.com/football-espana for Luis de la Fuente's 2023
+  win, and Tottenham Hotspur's own club site for Hugo Lloris's 2021
+  captaincy, alongside UEFA.com, Soccerway/Flashscore and Baynews9 for the
+  2019/2023/2025 captains. **No discrepancies found: all four managers and
+  all four captains confirmed exactly as written.** One unrelated source
+  discrepancy surfaced and was left alone as out of scope - two 2023 news
+  reports give Luis de la Fuente's age as 61 at the time of the final,
+  while a biography page's birth date would make him 62; the page makes no
+  age claim about him, so nothing to correct:
+  - https://portugoal.net/selecao/1392-portugal-2019-uefa-nations-league-success-euro-2020-qualification-secured
+  - https://www.spin.ph/football/ronaldo-s-portugal-wins-1st-nations-league-title-a1643-20190610
+  - https://baynews9.com/fl/tampa/ap-top-news/2019/06/09/portugal-beats-netherlands-to-win-1st-nations-league-final
+  - https://www.aljazeera.com/amp/sports/2021/10/11/france-beat-spain-to-lift-nations-league-title
+  - https://www.cbssports.com/soccer/news/how-nations-league-triumph-can-get-france-back-on-track-to-defend-world-cup-title-in-qatar
+  - https://www.thescore.com/news/2201456
+  - https://www.getfootballnewsfrance.com/2021/feature-france-win-the-nations-league-but-what-did-we-learn/
+  - https://arabnews.com/node/2324566/
+  - https://kuwaittimes.com/spains-triumph-calms-fears-on-fuente-project/
+  - https://www.uefa.com/uefanationsleague/news/0290-1ba5edb56db9-396191d7cb20-1000--de-la-fuente-on-spain-s-2023-nations-league-triumph/
+  - https://www.football-espana.net/2023/06/17/luis-de-la-fuente-spain-croatia-europes-best
+  - https://www.tottenhamhotspur.com/news/992365/internationals-hugo-wins-the-nations-league
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Copa América
 
