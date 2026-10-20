@@ -75,8 +75,15 @@ const DIST_DIR = path.join(ROOT, 'dist');
 // table added six more `docs/SOURCES.md` citation URLs under the "Ballon
 // d'Or" heading, pushing `hr/records` to 641.3 KB, just over the 640 KB
 // budget (the thirteenth such deliberate raise) - same mechanism as every
-// prior raise above, not a regression.
-export const PAGE_WEIGHT_BUDGET_BYTES = 650 * 1024;
+// prior raise above, not a regression. Raised again to 660 KB on
+// 2026-10-20 (CI fix after Run 319): Run 318's Copa América "Winning
+// managers"/"Winning captains" second cross-check and Run 319's own FIFA
+// World Cup equivalent each added a new `docs/SOURCES.md` citation block
+// (under the "Copa América" and "FIFA World Cup" headings respectively),
+// pushing `hr/records` to 650.05 KB, just over the 650 KB budget (the
+// fourteenth such deliberate raise) - same mechanism as every prior raise
+// above, not a regression.
+export const PAGE_WEIGHT_BUDGET_BYTES = 660 * 1024;
 
 /** Every same-origin CSS asset path (e.g. "/football-reference/_astro/foo.css") referenced by an HTML page. */
 export function findCssRefs(html) {
