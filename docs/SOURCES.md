@@ -2843,6 +2843,71 @@ Primary sources should be preferred.
   - Note: the egress-blocked-domains caveat every prior audit in this file
     has noted applies here too; verification relied entirely on WebSearch's
     synthesized summaries of RSSSF/Wikipedia rather than direct page loads.
+- Winning managers and Winning captains, second independent cross-check
+  (added 2026-10-20, Run 318): these two sections had each been built up
+  through the original 2026-09-04/-05 research passes above but, unlike
+  every other column/section on this page (Champion/Runner-up, Format,
+  Third/Fourth, Final date, the three award lists, Golden Boot, Team of the
+  Tournament), had never had a dedicated, separately-dated *second*
+  cross-check against a source mix distinct from the original passes - the
+  same gap Run 317 had just closed for UEFA EURO's equivalent two sections.
+  Re-verified all 18 post-1975 winning managers and all 19 winning captains
+  (1975-2024) via 11v11.com's own match-report lineups (which label the
+  starting captain explicitly), Wikipedia/Spanish-language biography pages,
+  and period press coverage of individual finals - a mix distinct from the
+  original passes' primarily nickname-corroboration and dedicated-biography
+  method. **All 18 managers held up with no discrepancy**, including the one
+  flagged for extra scrutiny mid-pass: a general search's own uncorroborated
+  guess floated Víctor Púa as a possible alternative to the page's Héctor
+  Núñez for 1995, but Núñez is independently confirmed by Wikipedia, Cuba's
+  EcuRed encyclopedia, a dedicated Brazilian retrospective
+  (trivela.com.br), and his own 2011 obituary coverage - Púa never appeared
+  in any of those, an uncorroborated single-search artifact rather than a
+  genuine second candidate.
+  **One discrepancy found and corrected in Winning captains**: 2007 was
+  recorded as Lúcio (Brazil), but Lúcio was not part of the 2007 Copa
+  América squad at all (he is independently absent from that edition's
+  squad list alongside Ronaldinho, Ronaldo and Kaká, per a dedicated
+  retrospective on that "strange" squad). 11v11.com's own match-report
+  lineup for the final explicitly labels Juan the Brazil captain, and a
+  second, independently-sourced lineup (Grokipedia's own matchday page, not
+  a known mirror of 11v11's data) agrees, both also omitting Lúcio from
+  the starting eleven entirely. Separately confirmed why a makeshift
+  armband was needed: Al Jazeera's own match report names Gilberto Silva as
+  the suspended regular skipper that final, replaced by Elano in the
+  starting eleven (Elano, not the armband-wearer - Juan wore that). Corrected
+  to Juan, with the suspension context folded into the page's own entry.
+  Every other Winning captains edition held up against this pass's source
+  mix, including the three editions the original 2026-09-04 recovery
+  itself flagged as hardest to get right (1995's Bengoechea/Francescoli
+  distinction, 2001's Córdoba, and the back-to-back 1991/1993 Ruggeri
+  pair) and the three the original pass needed extra follow-up passes to
+  resolve at all (1979 Florentín, 1983 Rodríguez, 1987 Perdomo).
+  `content/copa-america.md`'s `lastReviewed` bumped to 2026-10-20; the
+  Croatian counterpart (`src/pages/hr/competitions/copa-america.astro`)
+  hand-translated the same 2007 correction.
+  - https://www.11v11.com/matches/argentina-v-brazil-15-july-2007-277903/
+    (2007: lineup explicitly labels Juan "(captain)", no Lúcio in the XI)
+  - https://grokipedia.com/page/2007_Copa_Am%C3%A9rica_final
+    (2007: independent second lineup source, same captain, same absence)
+  - https://www.aljazeera.com/news/2007/7/16/brazil-destroy-argentina
+    (2007: confirms Gilberto Silva suspended for the final, Elano his
+    replacement in the XI - the context for why a makeshift captain was
+    needed)
+  - https://www.planetfootball.com/quick-reads/where-are-they-now-the-brazil-team-from-the-2007-copa-america-final
+    (2007: confirms Lúcio, Ronaldinho, Ronaldo and Kaká were all absent
+    from that squad)
+  - https://en.wikipedia.org/wiki/H%C3%A9ctor_N%C3%BAñez
+  - https://www.ecured.cu/H%C3%A9ctor_Nu%C3%B1ez
+  - https://trivela.com.br/america-do-sul/os-25-anos-da-copa-america-de-1995-um-titulo-marcante-do-uruguai-sob-a-maestria-de-francescoli/
+    (1995 manager: Héctor Núñez independently confirmed, Púa unsupported)
+  - https://en.wikipedia.org/wiki/Omar_Borr%C3%A1s
+  - https://en.wikipedia.org/wiki/Sebasti%C3%A3o_Lazaroni
+  - https://en.wikipedia.org/wiki/Francisco_Maturana
+  - https://en.wikipedia.org/wiki/%C3%93scar_Tab%C3%A1rez
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied entirely on
+    WebSearch's synthesized summaries rather than direct page loads.
 
 ## Ballon d'Or
 

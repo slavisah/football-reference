@@ -5,7 +5,7 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-10-18
+lastReviewed: 2026-10-20
 status: verified
 ---
 
@@ -315,7 +315,7 @@ The **Team of the Tournament winners** section below (55 entries across five edi
 - **1999:** Cafu (Brazil) - the same armband he wore to a World Cup title three years later, earning him Brazil's nickname "Capitão do Penta" (captain of the fifth World Cup star).
 - **2001:** Iván Córdoba (Colombia) - scored the only goal of the final himself, Colombia's only Copa América title.
 - **2004:** Alex (Brazil) - also set a tournament assists record that edition.
-- **2007:** Lúcio (Brazil).
+- **2007:** Juan (Brazil) - wore the armband as a makeshift replacement after regular skipper Gilberto Silva was suspended for the final following a card picked up in the semi-final shootout.
 - **2011:** Diego Lugano (Uruguay) - wore the armband in all six of Uruguay's matches, lifting the trophy after a 3-0 final win over Paraguay.
 - **2015:** Claudio Bravo (Chile) - the first of his two title-winning editions as captain, saving a penalty in the final shootout against Argentina.
 - **2016:** Claudio Bravo (Chile) - his second, back-to-back, Copa América Centenario.

@@ -475,7 +475,25 @@ the full run-by-run history behind all of this, see
   unanswered since Runs 289-296/298/303 respectively with no response in
   the interim - flagged again directly in this run's push notification,
   since restating them in this file alone clearly hasn't surfaced them to
-  the user.
+  the user. **Update (Run 318):** found another real, live bug via the same
+  rotation - Run 317's own "Winning managers"/"Winning captains" second-pass
+  pattern (first applied to UEFA EURO) extended to Copa América turned up a
+  genuine factual error this page had carried since the original 2026-09-04
+  captain-recovery pass: 2007's winning captain was recorded as Lúcio, who
+  was not even in that edition's squad; two independent lineup sources
+  (11v11.com's own match-report lineup, and a second, separately-sourced
+  lineup) agree the actual captain was Juan, standing in for suspended
+  regular skipper Gilberto Silva. Corrected in both languages - see
+  `docs/PROJECT_STATUS.md`'s Run 318 entry and `docs/SOURCES.md`'s matching
+  Copa América entry for the full citation list. Also corrected this file's
+  own prior claim (from Run 317's entry above) that all 14 `content/*.md`
+  files were tied at `lastReviewed: 2026-10-19` - `copa-america.md` and
+  `fifa-world-cup.md` were actually still at `2026-10-18`, the same kind of
+  stale-date miscount Run 317 itself had to correct from Run 316; confirmed
+  by running `grep lastReviewed content/*.md` directly rather than trusting
+  the prior entry's prose. `copa-america.md` is now at `2026-10-20`;
+  `fifa-world-cup.md` remains the next-longest-stale file at `2026-10-18` for
+  a future run to pick up.
 
 ## Ideas not yet scoped
 

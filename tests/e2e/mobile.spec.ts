@@ -1336,7 +1336,7 @@ test.describe('Copa América page on a 360px phone', () => {
     await expect(
       page.locator('.notes__card').getByText('Aldo Florentín (Paraguay) - stepped into the armband'),
     ).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('Lúcio (Brazil).')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Juan (Brazil) - wore the armband')).toBeVisible();
   });
 
   test('shows an audited "Format" badge per edition', async ({ page }) => {
@@ -1565,7 +1565,7 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await expect(
       page.locator('.notes__card').getByText('Aldo Florentín (Paragvaj) - preuzeo je vrpcu'),
     ).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('Lúcio (Brazil).')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Juan (Brazil) - nosio je vrpcu')).toBeVisible();
   });
 
   test('shows the same champion totals as the English page', async ({ page, baseURL }) => {
