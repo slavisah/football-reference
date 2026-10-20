@@ -226,6 +226,35 @@ the full run-by-run history behind all of this, see
 
 ## Open backlog
 
+- **Safety flag (raised 2026-10-20, Run 321): this container's git clone can
+  be *shallow* and missing remote-tracking refs for `intensive/football-
+  reference` even when the branch exists on GitHub with real history -
+  `git branch -a`/a plain `git fetch -q origin` are NOT reliable ways to
+  check whether the branch exists.** Run 321 started with a shallow clone
+  that had no local ref for `origin/intensive/football-reference` (confirmed
+  via `.git/shallow`'s presence), wrongly concluded per the branch-strategy
+  step 3 that the branch "does NOT exist," created a fresh one from `main`,
+  and force-pushed it - which overwrote the real branch (Runs 280-320, 54
+  commits) on GitHub with a single stale commit. This was caught and fully
+  recovered in the same run: the pre-overwrite head SHA was still visible in
+  this repo's own GitHub Actions run history (`list_workflow_runs` on the
+  `intensive/football-reference` branch), the commit was still fetchable by
+  SHA (`git fetch origin <sha>`) because GitHub had not yet garbage-collected
+  it, and the branch was restored with a second force-push back to that SHA.
+  No work was actually lost, but it was close. **Before any future run
+  concludes `origin/intensive/football-reference` doesn't exist, it must
+  verify directly against the remote** - `git ls-remote origin
+  refs/heads/intensive/football-reference` (returns nothing only if the ref
+  truly doesn't exist, regardless of clone depth/local ref state) - rather
+  than trusting local branch listings, which a shallow clone can leave
+  empty even when the remote branch is real. This routine's own stored
+  prompt (synced from YAML in a separate repo, per the "Routine Drift Check"
+  routine's own notes - `update_trigger` refuses to rewrite a trigger it
+  didn't create, so this session could not patch the prompt directly) still
+  has the old, unsafe check as of this run; flagging here, and in this run's
+  push notification, for the user to fix via that sync process rather than
+  waiting for a future run to hit the same near-miss without the warning
+  this entry provides.
 - **`.git` history bloat from committed PDFs - decision overdue, unresolved
   across 8 runs (289-296, 2026-10-14 to 2026-10-16):** root cause and the
   Run 293 partial fix are fully written up in `docs/PROJECT_STATUS.md`'s
