@@ -766,6 +766,47 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Winning managers and Winning captains, second independent cross-check
+  (added 2026-10-20, Run 319): unlike most other sections on this page
+  (Final venues, the Editions table's Champion/Runner-up/Final-score/Final
+  date columns, the four award lists), "Winning managers" and "Winning
+  captains" had each only ever had their original 2026-08-31/2026-09-01
+  audits - already four and two independent WebSearch passes respectively,
+  but all logged within one dated entry rather than a later, separately-
+  dated pass against a deliberately distinct source mix. The same gap Run
+  317 closed for `uefa-euro.md` and Run 318 closed for `copa-america.md`.
+  Re-verified all 23 managers and all 23 captains (1930-2026) via Wikipedia's
+  own dedicated "List of FIFA World Cup winning managers" list article (not
+  used by the original audit, which relied on manager biography pages
+  instead), plus a source mix distinct from the original passes: DAZN,
+  worldsoccertalk.com, 90min, thehexblog.com and chaseyoursport.com/
+  fifaworldcupnews.com's dedicated winning-captains tables, and a fresh
+  check of the 2026 final itself (NBC-affiliate match coverage) for the
+  Spain 1-0 Argentina (a.e.t.) result, Ferran Torres's 106th-minute winner,
+  and the MetLife Stadium/80,663-attendance venue facts already on file.
+  One apparent discrepancy was run down and resolved as a non-issue rather
+  than a new error: a crowdsourced quiz site's comment thread floated a
+  claim that Italy's 1934 final captain differed from the tournament
+  opener's captain - checked directly against 11v11.com's own 1934 Italy
+  squad/lineup page and an Italian-language retrospective (open.online),
+  both confirming Gianpiero Combi captained the final itself (and that the
+  comment conflated a defender, Eraldo Monzeglio, who started the final in
+  defence, not as captain) - no change needed, the page's existing entry was
+  already correct. **No further discrepancies found anywhere; all 23
+  managers and all 23 captains confirmed exactly as written:**
+  - https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_winning_managers
+  - https://www.dazn.com/en-CA/news/soccer/fifa-world-cup-winning-managers-1930-to-2018/5lik9x2kcrzizhylhe8mhl5q
+  - https://worldsoccertalk.com/world-cup/list-of-world-cup-winning-coaches-every-manager-to-win-the-trophy-by-year/
+  - https://www.90min.com/posts/the-most-successful-world-cup-managers-ever
+  - https://thehexblog.com/2026/07/08/most-successful-world-cup-managers-history/
+  - https://www.chaseyoursport.com/football/all-fifa-world-cup-winning-captains-history/12710
+  - https://www.fifaworldcupnews.com/?p=26362
+  - https://www.11v11.com/matches/italy-v-austria-03-june-1934-224402/
+  - https://www.open.online/2019/06/10/85-anni-fa-il-primo-trionfo-dellitalia-ai-mondiali-di-calcio/
+  - https://www.nbcwashington.com/world-cup/spain-argentina-final-messi-yamal-score/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## UEFA EURO
 

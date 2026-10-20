@@ -491,9 +491,16 @@ the full run-by-run history behind all of this, see
   `fifa-world-cup.md` were actually still at `2026-10-18`, the same kind of
   stale-date miscount Run 317 itself had to correct from Run 316; confirmed
   by running `grep lastReviewed content/*.md` directly rather than trusting
-  the prior entry's prose. `copa-america.md` is now at `2026-10-20`;
-  `fifa-world-cup.md` remains the next-longest-stale file at `2026-10-18` for
-  a future run to pick up.
+  the prior entry's prose. `copa-america.md` is now at `2026-10-20`.
+  **Update (Run 319):** extended the same "Winning managers"/"Winning
+  captains" second-cross-check pattern to `content/fifa-world-cup.md` (the
+  next-longest-stale file) - no discrepancies found this time (unlike
+  Run 318's Copa América pass); see `docs/PROJECT_STATUS.md`'s Run 319
+  entry and `docs/SOURCES.md`'s matching FIFA World Cup entry.
+  `fifa-world-cup.md` is now also at `2026-10-20`, tying `copa-america.md`;
+  the other 12 `content/*.md` files sit one day behind at `2026-10-19` -
+  a future run should pick one of those 12 next by the routine's own
+  competition/award ordering.
 
 ## Ideas not yet scoped
 
