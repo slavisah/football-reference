@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (322 intensive runs as of 2026-10-20) lives
+verification sweep and decision (323 intensive runs as of 2026-10-20) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -84,17 +84,21 @@ into `.github/workflows/ci.yml` as required PR gates; the other ten
 `check:text-spacing`/`check:focus-appearance`/`check:color-contrast`) are
 full-site Playwright/browser sweeps kept manual/intensive-run-only rather
 than a required PR gate, purely for their ~700-to-1,400-page-load runtime -
-re-run periodically (most recently Run 314, six runs after the prior
-full pass at Run 308 - all ten clean again, including
+re-run periodically (most recently Run 323, nine runs after the prior
+full pass at Run 314 - all ten clean again, including
 `check:color-contrast` - the heaviest, 1,422 page loads, confirmed clean
 with `PW_EXECUTABLE_PATH` pointed at the pre-installed
 `chromium_headless_shell-1194/chrome-linux/headless_shell.real` binary per
 Run 265's own fix - zero WCAG 1.4.3 violations across all 711 pages in
 both color schemes; `check:lighthouse` also reconfirmed, 39 pages all
 >= 0.9 in every category with the same one documented noindex/SEO
-exception as before. Run 314 also found that this sweep and `pnpm
-build:pdfs` must never run concurrently - see this file's "Operational
-note (Run 314)" above) rather than on every change. Run 294 found this same
+exception as before. Run 323 ran each of the ten scripts individually in
+its own foreground/background call rather than one combined pass, after a
+container restart killed an earlier combined attempt mid-run with no
+partial result - see Run 323's own `docs/PROJECT_STATUS.md` entry. Run 314
+also found that this sweep and `pnpm build:pdfs` must never run
+concurrently - see this file's "Operational note (Run 314)" above) rather
+than on every change. Run 294 found this same
 `PW_EXECUTABLE_PATH` fix is also needed for `pnpm test:e2e` in this
 session's container (not just the ten manual scripts above) - without it,
 every test fails instantly with a `chrome-headless-shell`
