@@ -766,6 +766,37 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- "How it works" tiebreaker-summary fix (2026-10-21, Run 328): every other
+  section of `content/golden-boot.md` had already been through at least two
+  independent audit passes (see the entries above and below), but - following
+  the same angle Run 327 just applied to `content/ballon-dor.md`'s own "How
+  it works" bullets - the page's own top-of-page "How it works" summary had
+  never been individually sourced. Its third bullet claimed "modern
+  tie-breakers may use assists or minutes played", implying tiebreakers are
+  the more-recent mechanism and joint ties the older one. That direction is
+  backwards for UEFA EURO specifically: this page's own "EURO Silver Boot and
+  Bronze Boot winners" section already documents that UEFA used a single-
+  winner tiebreak only for 2012, 2016 and 2020, then *reverted* to full joint
+  winners from 2024 onward - so for EURO, "modern" (2024-) actually means no
+  tiebreak, the opposite of what the summary bullet implied. The FIFA World
+  Cup side of the claim holds (an assists-then-minutes tiebreaker has applied
+  to every tie since 2010, per the existing "World Cup Silver Boot and Bronze
+  Boot winners" section), so this was a summary-wording gap, not a wrong fact
+  on either table. Re-verified both competitions' tiebreaker timelines via a
+  fresh `WebSearch` pass before editing, rather than assuming the page's own
+  existing sections were still accurate:
+  - https://arynews.tv/world-cup-2026-golden-boot-battle-lionel-messi-vs-kylian-mbappe-tie-breaker-rules-explained
+  - https://www.beinsports.com/en-us/soccer/fifa-world-cup-2026/articles/kylian-mbappe-ties-lionel-messi-what-is-the-golden-boot-tiebreaker-at-the-2026-fifa-world-cup-2026-07-09
+  - https://www.goal.com/en-us/lists/uefa-rule-change-harry-kane-one-hand-golden-boot-bulk-order-top-goalscorer-prize-euro-2024-england-final-spain/blt302369b6176b4608
+  - https://thestar.com.my/sport/football/2024/07/16/six-share-golden-boot
+  - https://www.goal.com/en-za/news/can-ronaldo-win-euro-2020-golden-boot-tie-break-rules-how-top-scorer-prize-decided/s677z931dvw51bqto159m6ewg
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+  Reworded the bullet (both `content/golden-boot.md` and its Croatian
+  counterpart, `src/pages/hr/competitions/golden-boot.astro`) to state the
+  World Cup/EURO tiebreaker history explicitly instead of generalizing by
+  "modern" vs. "earlier". No change to either table's own data.
 - Winning managers and Winning captains, second independent cross-check
   (added 2026-10-20, Run 319): unlike most other sections on this page
   (Final venues, the Editions table's Champion/Runner-up/Final-score/Final

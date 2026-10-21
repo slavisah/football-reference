@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (323 intensive runs as of 2026-10-20) lives
+verification sweep and decision (328 intensive runs as of 2026-10-21) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -310,6 +310,14 @@ the full run-by-run history behind all of this, see
   shallow-clone variant; this variant needs the staleness check itself to
   never be shortcut by a faster-but-weaker substitute signal. See
   `docs/PROJECT_STATUS.md`'s Run 327 entry for the full sequence.
+  **Run 328: clean data point, streak broken.** Also a shallow clone; used
+  `git ls-remote origin refs/heads/intensive/football-reference` first (per
+  this entry's own fix) and waited for the full `git fetch`/`merge-tree`
+  staleness check to actually finish before checking out the branch at its
+  real tip - no recreate, no force-push. The routine's own stored prompt
+  still hasn't been patched via the sync process mentioned above; this run's
+  clean outcome is from the run itself following the recommended checks
+  manually, not from the prompt being fixed. Still needs the user's fix.
 - **`.git` history bloat from committed PDFs - decision overdue, unresolved
   across 8 runs (289-296, 2026-10-14 to 2026-10-16):** root cause and the
   Run 293 partial fix are fully written up in `docs/PROJECT_STATUS.md`'s
