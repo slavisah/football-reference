@@ -3498,6 +3498,48 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Voting-panel history, "How it works" section (added 2026-10-21, intensive
+  run): with the Winners table and all five companion trophy lists on
+  `content/ballon-dor.md` already independently cross-checked two or three
+  times (see entries above, no discrepancies in any of them), this run
+  turned to the page's own descriptive "How it works" bullets instead,
+  which had never been individually sourced the way every dated fact on
+  this page has. Two real gaps turned up and were corrected (an accuracy
+  addition, not a correction of a false claim - see
+  `content/ballon-dor.md`'s own matching editorial-note paragraph for the
+  full reasoning):
+  - The voting-panel bullet described the panel as "journalists, one from
+    each eligible country" without qualifying that this wasn't true for
+    2010-2015, when FIFA jointly presented the award: that panel also
+    included national-team captains and coaches, each roughly a third of a
+    combined panel of around 500 voters, reverting to journalists-only in
+    2016.
+  - It also didn't mention a real 2022 reform that shrank the journalist
+    pool itself from roughly 170 voting countries to one journalist per
+    country from only the top 100 nations in the FIFA men's world ranking -
+    a cap still in effect for the 2025 award.
+  Both facts were corroborated across two independent WebSearch passes
+  each, with multiple distinct outlets agreeing in every pass. **No
+  discrepancies found in what's cited below, both facts added to the
+  page:**
+  - https://en.wikipedia.org/wiki/FIFA_Ballon_d%27Or
+  - https://bleacherreport.com/articles/1881792-how-is-the-ballon-dor-winner-selected
+  - https://www.si.com/soccer/2015/01/12/jurgen-klinsmann-ballon-dor-ballot-messi-ronaldo-neuer-robben
+  - https://www.topendsports.com/sport/soccer/awards/ballondor-voting.htm
+  - https://www.footyheadlines.com/2016/09/say-goodbye-to-fifa-ballon-dor.html
+  - https://www.eurosport.co.uk/football/ballon-d-or/2021/ballon-dor-2022-a-number-of-major-changes-to-award-have-been-confirmed-and-come-into-play-from-2022_sto8838643/story.shtml
+  - https://news.cgtn.com/news/2022-03-12/Ballon-d-Or-award-announces-rule-changes-after-controversial-Messi-win-18kQ17x3HZS/share_amp.html
+  - https://www.90min.com/fr/posts/revolution-les-4-changements-majeurs-que-va-subir-le-ballon-d-or
+  - https://www.jordannews.jo/Section-71/Football/3-Criteria-That-Decide-the-2026-Ballon-d-Or-How-Are-Nominees-Chosen-and-Who-Picks-the-Winner-55636
+  - https://foot-africa.com/en/news/ballon-dor-namibia-excluded-from-the-2025-jury-875946/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+    The exact current ballot/points format (sources disagree: a 5-pick
+    6-4-3-2-1 scale per the 2022-reform coverage vs. a 10-pick 15-12-10-
+    8-7-5-4-3-2-1 scale per more recent coverage) was deliberately left out
+    of the page rather than guessed, the same conservative call this
+    rotation makes whenever two source sets don't converge.
 
 ## Review policy
 

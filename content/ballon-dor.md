@@ -4,7 +4,7 @@ slug: ballon-dor
 awardType: individual
 firstEdition: 1956
 lastCompletedEdition: 2025
-lastReviewed: 2026-10-19
+lastReviewed: 2026-10-21
 status: verified
 ---
 
@@ -15,7 +15,8 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 ## How it works
 
 - The Ballon d'Or honors the best individual men's player of the year - it is not a team competition or a national-team trophy.
-- A panel of football journalists, one from each eligible country, ranks their top players; the votes are combined into one final ranking.
+- A panel of football journalists, one per eligible country, ranks their top players from a shortlist, and the votes are combined into one final ranking - but the panel hasn't always been journalists alone: from 2010 to 2015, while FIFA jointly presented the award (see above), national-team captains and coaches voted alongside journalists in a combined panel of roughly 500, before it reverted to journalists only in 2016.
+- The journalist panel's own size has changed too: roughly 170 countries had a vote before a 2022 reform capped it at one journalist per country from the top 100 nations in the FIFA men's world ranking, a cap still in effect for the 2025 award.
 - Eligibility has widened over time: Europe-only at first, then any nationality at a European club from 1995, then fully global since 2007 (see the introduction above).
 - The winner is announced at a ceremony organized by France Football magazine - held at year's end through 2021, then moved to September/October from 2022 onward (see the Ceremony date column above).
 
@@ -202,6 +203,30 @@ earliest African-*national* winner, matching this page's own "National
 team" column throughout - a different, narrower claim from crediting him
 as the earliest Black winner, which the page does not make). Both
 confirmed as written.
+
+A fresh pass (2026-10-21, intensive run) turned to the "How it works" section
+itself, rather than re-checking the Winners table or the five companion
+trophies above (each already independently cross-checked two or three times
+with no discrepancies, per the audits above). That section's voting-panel
+bullet had described the panel as "journalists, one from each eligible
+country" throughout the award's history without qualification - true of the
+1956-2009 and 2016-present eras, but not of 2010-2015, when FIFA jointly
+presented the award: that panel also included national-team captains and
+coaches voting alongside journalists, each roughly a third of a combined
+panel of around 500. It also left out a real, well-documented 2022 reform
+that shrank the journalist pool itself, from roughly 170 voting countries to
+one journalist per country from only the top 100 nations in the FIFA men's
+world ranking - a cap still in force for the 2025 award. Both facts are
+corroborated across multiple independent outlets (Wikipedia's FIFA Ballon
+d'Or article, Bleacher Report, Sports Illustrated, and Eurosport/CGTN/90min's
+contemporaneous 2022-reform coverage, among others - see `docs/SOURCES.md`).
+Rewrote the bullet to state both eras accurately and added a second bullet
+for the 2022 reform; mirrored on the Croatian page
+(`src/pages/hr/competitions/ballon-dor.astro`), which hand-translates this
+section separately from `content/ballon-dor.md`. This is an accuracy
+addition, not a correction of a false claim - the original text wasn't
+wrong across the bulk of the award's history, just silent about two eras
+where the mechanism was different.
 
 See `docs/SOURCES.md` for the per-year citation list.
 

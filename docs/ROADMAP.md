@@ -283,6 +283,33 @@ the full run-by-run history behind all of this, see
   own push notification too, since two confirmed near-misses without a fix
   is worth surfacing again rather than assuming the first flag will
   eventually be acted on.
+  **Third occurrence, this one an actual overwrite, not a near-miss (Run
+  327, 2026-10-21):** a variant of the same root fragility, but not the
+  same proximate cause as Run 321/326 - this run's clone was *not* shallow
+  and `git branch -a` correctly showed the branch existed. What went wrong
+  instead: the run started the recommended `git merge-tree`-based
+  staleness check (comparing `origin/main` against
+  `origin/intensive/football-reference` to decide recreate-vs-rebase), but
+  that check ran slowly in the background, and rather than waiting for it,
+  the run substituted a weaker signal - the *original* PR #56 being
+  merged - concluded the branch was stale, recreated it from `main`, and
+  force-pushed, overwriting 46 further runs of real work (280-326) that
+  had accumulated under a second, newer PR (#57) this run hadn't yet
+  looked for. Caught immediately after the push (a `list_pull_requests`
+  call for the branch surfaced PR #57's unfamiliar 46-run changelog) and
+  fully recovered within the same run: the real pre-overwrite tip was
+  still in the run's own local object database from its earlier full
+  `git fetch`, so a second force-push restored it exactly, and the run's
+  own content work was redone as a new commit on top of the correct base.
+  **No work was lost**, but this is now three confirmed occurrences (two
+  executed-and-recovered, one caught pre-push) of the same underlying
+  fragility - the branch-strategy step's own safety depends on either
+  waiting for a merge-tree/staleness check already started, or not having
+  a second PR silently accumulate work under a reused branch name without
+  a run checking for it first. The `git ls-remote` fix above addresses the
+  shallow-clone variant; this variant needs the staleness check itself to
+  never be shortcut by a faster-but-weaker substitute signal. See
+  `docs/PROJECT_STATUS.md`'s Run 327 entry for the full sequence.
 - **`.git` history bloat from committed PDFs - decision overdue, unresolved
   across 8 runs (289-296, 2026-10-14 to 2026-10-16):** root cause and the
   Run 293 partial fix are fully written up in `docs/PROJECT_STATUS.md`'s
