@@ -572,6 +572,20 @@ the full run-by-run history behind all of this, see
   not new coverage. Spent this run's research budget on the Nations League
   Team-of-the-Tournament gap instead (see that item's own update below) -
   still negative, but via a genuinely narrower angle than any prior attempt.
+  **Update (Run 325):** second consecutive run with no new rotation pick,
+  content-file edit, or resolved research gap - a full re-check of every
+  open item in this file found nothing had moved since Run 324 (confirmed
+  directly rather than trusted from its own prose). Spent the run on a full
+  health re-confirmation (`pnpm install`/`lint`/`test`/`build`, all 33 fast
+  `check:*` scripts individually, `pnpm audit`, `knip`, `pnpm outdated`) and
+  a direct re-verification of PR #57's CI/mergeability/comment state via
+  GitHub's own API rather than assuming it - all clean, nothing new. The
+  World Cup 1930/1950 attendance gap was deliberately left untried (it's a
+  two-conflicting-sources dispute, not a no-source gap - see that item's own
+  wording above; another search would just re-surface the same two
+  figures). The three items awaiting the user's own sign-off are now
+  unanswered for roughly two weeks (the oldest since Run 289) - flagged
+  again in this run's own push notification.
 
 ## Ideas not yet scoped
 
