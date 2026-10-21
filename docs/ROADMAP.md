@@ -382,6 +382,18 @@ the full run-by-run history behind all of this, see
   block as the link-liveness item above), so there's no way to browse the
   site further than what search snippets surface. Genuinely exhausted now
   on this angle too, not just the original search-the-claim-directly one.
+  **Update (Run 324):** tried a `uefa.com`-domain-restricted `WebSearch`
+  for 2021 and 2023 (a narrower angle than general search or a single
+  federation's site) - confirmed UEFA.com does publish a "Team of the
+  Tournament" feature as a format (surfaced for 2019: Pickford, Semedo,
+  Dias, van Dijk, Blind, Bruno Fernandes, de Jong, Wijnaldum, Bernardo
+  Silva, Shaqiri), but the same restricted search for 2021/2023 found only
+  individual-award coverage (Player of the Finals, top scorer, Goal of the
+  Tournament pieces) and the 2023 Finals PDF programme - no Team of the
+  Tournament page for either year. Ninth consecutive negative result;
+  genuinely exhausted short of direct `WebFetch` access to `uefa.com`
+  itself (currently egress-blocked) to browse its news index rather than
+  rely on search-engine coverage of it.
 - **UEFA Nations League attendance figures**: the 2023 Finals attendance has
   a genuine source conflict (41,110 vs. 41,500, both independently reported
   by different outlets); 2021 has no attendance figure confirmed by two
@@ -546,6 +558,20 @@ the full run-by-run history behind all of this, see
   `content/*.md` files sit one day behind at `2026-10-19` - a future run
   should pick one of those 11 next by the routine's own competition/award
   ordering (Ballon d'Or is next).
+  **Update (Run 321-323):** no further rotation pick made - Run 322
+  explicitly skipped a redundant Ballon d'Or re-audit (already had three
+  independent passes on record with no under-audited sub-section left) in
+  favor of research-angle and health-check work; Run 323 ran the ten-script
+  browser sweep instead. The 11-file tie at `2026-10-19` is unchanged.
+  **Update (Run 324):** re-confirmed the 11-file tie is still unchanged and
+  deliberately did not force a fourth Ballon d'Or pass or a second Golden
+  Boot pass with no new angle - every `content/*.md` file already has at
+  least two independent verification passes on record per the Status
+  section above; a third/fourth pass on the same file with the same kind of
+  check (not a genuinely distinct source mix or sub-section) is restatement,
+  not new coverage. Spent this run's research budget on the Nations League
+  Team-of-the-Tournament gap instead (see that item's own update below) -
+  still negative, but via a genuinely narrower angle than any prior attempt.
 
 ## Ideas not yet scoped
 
