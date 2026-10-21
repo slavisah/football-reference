@@ -259,6 +259,30 @@ the full run-by-run history behind all of this, see
   push notification, for the user to fix via that sync process rather than
   waiting for a future run to hit the same near-miss without the warning
   this entry provides.
+  **Confirmed still unfixed, second independent near-miss (Run 326,
+  2026-10-21):** this run's own container was also a shallow clone
+  (`.git/shallow` present), and its stored prompt still carried the exact
+  same unsafe check this entry describes - a plain `git fetch -q origin`
+  followed by `git branch -a` showed no local ref for `origin/intensive/
+  football-reference` at all, which would have led this run to the same
+  wrong "branch doesn't exist" conclusion Run 321 reached, had the
+  branch-strategy step been followed as literally written. Caught this run
+  not via the `git ls-remote` check this entry recommends but by a
+  different route - a `pull_request_read` lookup of the still-open PR #57
+  (done to check its status before starting work) surfaced the real
+  branch's head SHA independently, prompting a direct `git fetch origin
+  intensive/football-reference` that then succeeded and revealed 59 real,
+  unmerged commits (Runs 280-325). Ran `git ls-remote origin refs/heads/
+  intensive/football-reference` afterward specifically to confirm it does
+  report the branch correctly even from this same shallow clone (it does -
+  this entry's recommended fix is sound, the stored prompt simply still
+  doesn't use it). This is the second independently-caught instance of
+  exactly the failure mode Run 321 described, confirming it's a real,
+  recurring risk rather than a one-off fluke - not every future run will
+  happen to cross-check a PR first and get lucky. Re-flagged in this run's
+  own push notification too, since two confirmed near-misses without a fix
+  is worth surfacing again rather than assuming the first flag will
+  eventually be acted on.
 - **`.git` history bloat from committed PDFs - decision overdue, unresolved
   across 8 runs (289-296, 2026-10-14 to 2026-10-16):** root cause and the
   Run 293 partial fix are fully written up in `docs/PROJECT_STATUS.md`'s
