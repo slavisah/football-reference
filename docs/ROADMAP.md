@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (328 intensive runs as of 2026-10-21) lives
+verification sweep and decision (331 intensive runs as of 2026-10-22) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -84,18 +84,21 @@ into `.github/workflows/ci.yml` as required PR gates; the other ten
 `check:text-spacing`/`check:focus-appearance`/`check:color-contrast`) are
 full-site Playwright/browser sweeps kept manual/intensive-run-only rather
 than a required PR gate, purely for their ~700-to-1,400-page-load runtime -
-re-run periodically (most recently Run 323, nine runs after the prior
-full pass at Run 314 - all ten clean again, including
+re-run periodically (most recently Run 331, eight runs after the prior
+full pass at Run 323 - all ten clean again, including
 `check:color-contrast` - the heaviest, 1,422 page loads, confirmed clean
 with `PW_EXECUTABLE_PATH` pointed at the pre-installed
 `chromium_headless_shell-1194/chrome-linux/headless_shell.real` binary per
 Run 265's own fix - zero WCAG 1.4.3 violations across all 711 pages in
 both color schemes; `check:lighthouse` also reconfirmed, 39 pages all
 >= 0.9 in every category with the same one documented noindex/SEO
-exception as before. Run 323 ran each of the ten scripts individually in
-its own foreground/background call rather than one combined pass, after a
-container restart killed an earlier combined attempt mid-run with no
-partial result - see Run 323's own `docs/PROJECT_STATUS.md` entry. Run 314
+exception as before. Run 331, like Run 323, ran each of the ten scripts
+individually in its own foreground/background call rather than one
+combined pass - and a container restart killed the `check:color-contrast`
+run mid-sweep with no partial result, the same failure mode Run 323 hit,
+confirming it's a recurring environment trait rather than a one-off; the
+script was simply restarted and completed clean on the second attempt with
+no work lost. See Run 331's own `docs/PROJECT_STATUS.md` entry. Run 314
 also found that this sweep and `pnpm build:pdfs` must never run
 concurrently - see this file's "Operational note (Run 314)" above) rather
 than on every change. Run 294 found this same
@@ -387,12 +390,32 @@ the full run-by-run history behind all of this, see
   on the same footing as the `.git`-bloat and `long-title` items above.
   Flagged to the user directly; a future run should add the section (both
   languages) if the user says yes, or drop this note if they say no.
-- **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.11` (latest
-  published, no new release since Run 316's bump) still only declares
-  `typescript: '^5.0.0 || ^6.0.0'` as a peer dependency - re-confirmed via
-  `npm view @astrojs/check@latest peerDependencies` by Run 322 (2026-10-20;
-  `typescript` still at 5.9.3 vs. 7.0.2 latest). Re-check whenever `pnpm
-  outdated` next shows a new `@astrojs/check` release.
+- **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.12` (latest
+  published, bumped by Run 331 - see the `astro`/`@astrojs/check` item just
+  below) still only declares `typescript: '^5.0.0 || ^6.0.0'` as a peer
+  dependency - re-confirmed via `npm view @astrojs/check@0.9.12
+  peerDependencies` by Run 331 (2026-10-22; `typescript` still at 5.9.3 vs.
+  7.0.2 latest). Re-check whenever `pnpm outdated` next shows a new
+  `@astrojs/check` release.
+- **`astro` 7.4.2 patch bump: blocked by this environment's Node version,
+  not a peer-dependency issue (new, Run 331, 2026-10-22).** `pnpm outdated`
+  showed routine patch releases for `astro` (7.4.1 -> 7.4.2) and
+  `@astrojs/check` (0.9.11 -> 0.9.12). `@astrojs/check@0.9.12` bumped clean
+  (its own peer range unchanged, see above) and is now installed, but
+  `astro@7.4.2` raises Astro's own minimum supported Node.js version to
+  `>=22.23.4` - this environment's container runs `v22.22.0`, one patch
+  below that floor. Installing it broke `pnpm lint`/`pnpm build` outright
+  (`Node.js v22.22.0 is not supported by Astro!`), confirmed by reproducing
+  the failure directly rather than assuming it from the changelog; reverted
+  `astro` back to 7.4.1 (keeping the unrelated `@astrojs/check` bump) and
+  re-confirmed clean (`pnpm lint`/`test`/`build`, 1086 tests, 711 pages, 0/0/0
+  lint). This is a new, narrower blocker than the existing `typescript` 7
+  item above - it isn't about this project's own peer-dependency range, it's
+  that the container's own Node.js binary is now one patch version behind
+  what the next Astro patch itself requires. Unblocks automatically once
+  this environment's Node.js is upgraded to >=22.23.4 (no project-side fix
+  possible) - re-check `node --version` the next time `pnpm outdated` shows
+  a newer `astro`.
 - **`docs/SOURCES.md` link-liveness sweep**: blocked. This environment's
   outbound network/egress policy rejects direct requests to external
   reference domains - confirmed repeatedly, most recently 2026-10-02
@@ -645,6 +668,25 @@ the full run-by-run history behind all of this, see
   figures). The three items awaiting the user's own sign-off are now
   unanswered for roughly two weeks (the oldest since Run 289) - flagged
   again in this run's own push notification.
+  **Update (Run 331, 2026-10-22):** picked up the due ten-script manual
+  browser/accessibility sweep (eight runs since the last full pass, Run
+  323) rather than force a content-verification pick with no fresh angle -
+  every `content/*.md` file still sits at a `lastReviewed` tied at
+  `2026-10-19` or later with no new access path on any open research item.
+  All ten scripts came back clean (see the Status section above); a
+  container restart killed the `check:color-contrast` run mid-sweep (the
+  same failure mode Run 323 hit - a recurring environment trait, not a bug
+  in this run's own commands), and it was simply restarted and completed
+  clean with no work lost. Also found a new, narrower dependency blocker
+  while running the routine `pnpm outdated` check: `astro@7.4.2` (the next
+  patch release) requires Node.js `>=22.23.4`, and this container's Node is
+  `v22.22.0` - one patch below that floor. Bumped `@astrojs/check` to
+  0.9.12 alone (its own peer range unaffected) but reverted the `astro`
+  bump after it broke `pnpm lint`/`pnpm build` outright; see the new
+  dedicated backlog item above. The three sign-off items remain
+  unanswered, now 8 days past Run 289's original flag; re-escalated in
+  this run's own push notification. The 2026 Ballon d'Or ceremony is four
+  days out (26 October) - still not checkable.
 
 ## Ideas not yet scoped
 
