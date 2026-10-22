@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (331 intensive runs as of 2026-10-22) lives
+verification sweep and decision (334 intensive runs as of 2026-10-22) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -485,6 +485,15 @@ the full run-by-run history behind all of this, see
   selection for either edition, only general tournament/squad pages.
   Tenth and eleventh consecutive negative results; still genuinely
   exhausted short of direct `WebFetch` access.
+  **Update (Run 334):** tried Croatian-language press specifically (Index.hr,
+  Novi list, N1, HRT), on the reasoning that Croatia reaching the actual
+  2023 final (lost to Spain on penalties) makes its own home-language sports
+  media the single most plausible place a "best XI" feature would run if one
+  exists anywhere - extensive 2023 final/Rodri-award coverage turned up, but
+  no Team-of-the-Tournament eleven for 2021, 2023, or 2025. Twelfth
+  consecutive negative result; now exhausted across federation sites,
+  stats-site framing, UEFA's own domain, and a finalist's home-language
+  press - still short of direct `WebFetch` access to `uefa.com` itself.
 - **UEFA Nations League attendance figures**: the 2023 Finals attendance has
   a genuine source conflict (41,110 vs. 41,500, both independently reported
   by different outlets); 2021 has no attendance figure confirmed by two
@@ -722,6 +731,15 @@ the full run-by-run history behind all of this, see
   items are now a full four (the three above plus the branch-recreation
   safety flag), 9-10 days unanswered; re-escalated again in this run's own
   push notification. The 2026 Ballon d'Or ceremony is four days out (26
+  October) - still not yet checkable.
+  **Update (Run 334):** found one genuinely new angle to try - Croatian-
+  language press on the Nations League Team-of-the-Tournament gap (see that
+  item's own update above) - which came back negative, a twelfth
+  consecutive result. Otherwise a repeat of Run 333's own full health
+  re-confirmation (clean throughout - see `docs/PROJECT_STATUS.md`'s Run
+  334 entry), no code or content change. The four sign-off items are now
+  10-11 days unanswered; re-escalated again in this run's own push
+  notification. The 2026 Ballon d'Or ceremony is three days out (26
   October) - still not yet checkable.
 
 ## Ideas not yet scoped
