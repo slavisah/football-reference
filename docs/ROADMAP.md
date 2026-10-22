@@ -136,19 +136,22 @@ gone longest since its last `lastReviewed` bump, cross-checking claims
 against the file's own tables, the actual generating code, and, for recent
 events, live `WebSearch` results) is an ongoing loop, not a one-off pass -
 every one of the 14 `content/*.md` files has now been through it at least
-once, and as of Run 317 (2026-10-19) all 14 are genuinely tied at the same
-`lastReviewed` date (Run 316 had claimed this a run early - `uefa-euro.md`
-was still 2 days stale at the time; Run 317 caught and corrected this, see
-its own `docs/PROJECT_STATUS.md` entry), so the rotation starts its second
-full pass from a clean slate rather than hunting for an untried file (see
-`content/*.md`'s own `lastReviewed` frontmatter for the current state). It
-has found three real bugs so far (a `glossary.md` "third and fourth place"
-overgeneralization, a `glossary.md` "host" entry that had the FIFA World
-Cup/UEFA EURO automatic-host-place rule backwards, and a `glossary.md`/
-`uefa-nations-league.md` Nations League host-qualification description
-stuck on the pre-2024 "four group winners" mechanism UEFA replaced with a
-quarter-final round) - a future run should pick by the routine's own
-competition/award ordering once the tie recurs.
+once. As of Run 332 (2026-10-22) all 14 are tied again, at `2026-10-21` or
+`2026-10-22` (the six flagship competition/award pages from Runs 327-331's
+"How it works" pass and sweep; the remaining eight thin utility pages plus
+`glossary.md` from Run 332's own second independent front-to-back read,
+cross-checked against the live implementation rather than just another
+content file's prose - no new discrepancy found, since Run 211 already
+fixed the one real bug this angle catches on these nine files). It has
+found three real bugs so far on `glossary.md`/`uefa-nations-league.md` (a
+"third and fourth place" overgeneralization, a "host" entry that had the
+FIFA World Cup/UEFA EURO automatic-host-place rule backwards, and a Nations
+League host-qualification description stuck on the pre-2024 "four group
+winners" mechanism UEFA replaced with a quarter-final round), plus the
+historical-naming fix on `index.md` from Run 211's first pass over these
+nine files - a future run should pick by the routine's own competition/
+award ordering once the tie recurs, favoring a genuinely different angle
+over a third read of a file two independent passes already cleared.
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims
@@ -476,6 +479,12 @@ the full run-by-run history behind all of this, see
   genuinely exhausted short of direct `WebFetch` access to `uefa.com`
   itself (currently egress-blocked) to browse its news index rather than
   rely on search-engine coverage of it.
+  **Update (Run 332):** tried an Opta/WhoScored-framed `WebSearch` for 2021
+  and 2023 specifically (stats-site coverage, not yet tried as its own
+  angle) - found no stats-site "Team of the Tournament"/"dream team"
+  selection for either edition, only general tournament/squad pages.
+  Tenth and eleventh consecutive negative results; still genuinely
+  exhausted short of direct `WebFetch` access.
 - **UEFA Nations League attendance figures**: the 2023 Finals attendance has
   a genuine source conflict (41,110 vs. 41,500, both independently reported
   by different outlets); 2021 has no attendance figure confirmed by two
@@ -687,6 +696,16 @@ the full run-by-run history behind all of this, see
   unanswered, now 8 days past Run 289's original flag; re-escalated in
   this run's own push notification. The 2026 Ballon d'Or ceremony is four
   days out (26 October) - still not checkable.
+  **Update (Run 332):** picked up the nine thin utility `content/*.md`
+  files for a second independent front-to-back cross-reference against the
+  live implementation (see the Status section's content-verification
+  paragraph above) - no new discrepancy found, `lastReviewed` bumped so all
+  fourteen content files are tied again. Also tried one more negative
+  search angle on the Nations League Team-of-the-Tournament gap (see that
+  item's own update above). The three sign-off items are now 9+ days
+  unanswered; re-escalated again in this run's own push notification. The
+  2026 Ballon d'Or ceremony is still four days out (26 October) - not yet
+  checkable.
 
 ## Ideas not yet scoped
 
