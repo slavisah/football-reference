@@ -3017,6 +3017,24 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied entirely on
     WebSearch's synthesized summaries rather than direct page loads.
+- "How it works" format-history bullet fix (2026-10-21, Run 329): the
+  bullet's "most editions since the 1990s by a group stage into a knockout
+  bracket" phrasing was internally inconsistent with this same page's own
+  Champions timeline table, whose Format column already shows "Knockout
+  final" first at 1987 - four years before the 1990s - with a reversion to
+  "League table" at 1989 and 1991 in between. Corrected to name 1987 as an
+  earlier one-off trial and 1993 as when the format took hold for good, in
+  `content/copa-america.md` and the Croatian translation
+  (`src/pages/hr/competitions/copa-america.astro`). Cross-checked against
+  the format audit above (RSSSF's 1987 tables) plus a fresh WebSearch pass:
+  - https://rsssf.org/tables/87sa.html (1987: three round-robin groups of
+    three into semifinals and a final)
+  - https://en.wikipedia.org/wiki/List_of_Copa_Am%C3%A9rica_finals
+    (confirms the single-elimination final stage used since 1975 "except in
+    1989 and 1991, which featured a final group stage")
+  - https://en.wikipedia.org/wiki/1989_Copa_Am%C3%A9rica ;
+    https://en.wikipedia.org/wiki/1991_Copa_Am%C3%A9rica (both already
+    cited above for the third/fourth-place audit's own final-group reading)
 
 ## Ballon d'Or
 

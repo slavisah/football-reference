@@ -5,7 +5,7 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-10-20
+lastReviewed: 2026-10-21
 status: verified
 ---
 
@@ -16,7 +16,7 @@ Copa América began in 1916 and is the oldest still-running continental men's na
 ## How it works
 
 - CONMEBOL's ten South American national teams compete, sometimes joined by invited guest teams from outside the region since 1993.
-- The tournament's format has varied more than any other on this site: some early editions crowned a champion by final league-table standings, others by a home-and-away final, and most editions since the 1990s by a group stage into a knockout bracket.
+- The tournament's format has varied more than any other on this site: some early editions crowned a champion by final league-table standings, others (1975, 1979, 1983) by a home-and-away final, and a group stage into a knockout final has decided every edition since 1993 - 1987 was an earlier one-off trial of the same format, and 1989 and 1991 briefly reverted to league-table standings in between.
 - Copa América has not always run on a fixed four-year cycle, unlike the World Cup or EURO.
 
 ## Final venues
