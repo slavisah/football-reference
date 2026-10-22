@@ -706,6 +706,23 @@ the full run-by-run history behind all of this, see
   unanswered; re-escalated again in this run's own push notification. The
   2026 Ballon d'Or ceremony is still four days out (26 October) - not yet
   checkable.
+  **Update (Run 333):** no new rotation pick or research angle - every
+  content file is already tied, the ten-script sweep isn't due, and
+  re-trying the Nations League gap one run after Run 332's own attempt
+  would be restatement. Re-checked both environment blockers directly
+  instead of assuming them stale: this run's own container is still on
+  Node.js `v22.22.0` (the `astro` 7.4.2 bump stays blocked) and `WebFetch`
+  to `en.wikipedia.org` still returns `ENOTFOUND` (the link-liveness sweep
+  stays blocked) - same results as Run 331/the two-hundred-and-thirteenth
+  run respectively, now reconfirmed rather than carried forward unchecked.
+  Spent the rest of the run on a full health re-confirmation (clean
+  throughout - see `docs/PROJECT_STATUS.md`'s Run 333 entry) and made no
+  code or content change, on the view that a verification-only pass is
+  more honest than manufacturing a diff with no real value. The sign-off
+  items are now a full four (the three above plus the branch-recreation
+  safety flag), 9-10 days unanswered; re-escalated again in this run's own
+  push notification. The 2026 Ballon d'Or ceremony is four days out (26
+  October) - still not yet checkable.
 
 ## Ideas not yet scoped
 
