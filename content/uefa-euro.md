@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-10-19
+lastReviewed: 2026-10-22
 status: verified
 ---
 
@@ -17,7 +17,7 @@ The European Championship began in 1960 as the European Nations' Cup. Early fina
 
 - UEFA national teams qualify over roughly two years of group matches before the finals.
 - The finals open with a group stage; the best-placed teams in each group move on.
-- From the quarterfinals onward it is a straight knockout: a single loss ends a team's tournament.
+- From the round of 16 onward (the quarterfinals before the finals expanded to sixteen teams in 1996), it is a straight knockout: a single loss ends a team's tournament.
 - The final decides the champion; no third-place match has been played since 1980 (see "Historical format note" below).
 
 ## Final venues

@@ -838,6 +838,25 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- "How it works" knockout-stage bullet fix (2026-10-22, Run 330): extending
+  Run 329's "How it works" bullet-sourcing angle (first applied to
+  `content/copa-america.md`) to `content/fifa-world-cup.md` found a real,
+  currently-live gap: the third bullet said the knockout stage began "from
+  the round of 16 onward", which was accurate for every edition from the
+  24-team era (1986) through 2022's 32-team era, but is no longer accurate
+  for 2026 - the field's expansion to 48 teams (already documented in this
+  same page's own "Format milestones" section) added a new Round of 32 as
+  the actual first knockout round, with the Round of 16 now the second.
+  Reworded to name both eras explicitly rather than generalizing, in English
+  and the Croatian translation (`src/pages/hr/competitions/world-cup.astro`).
+  Confirmed via WebSearch:
+  - https://blog.wego.com/round-of-32-at-fifa-world-cup/ (confirms Round of
+    32 is "a new round that has never existed at a World Cup" before 2026,
+    with the winners advancing to the Round of 16)
+  - https://morungexpress.com/fifa-2026-explained-how-the-48-team-world-cup-will-work
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## UEFA EURO
 
@@ -1430,6 +1449,22 @@ Primary sources should be preferred.
   - https://theanalyst.com/2024/06/youngest-goalscorers-european-championship/
   - https://www.90min.com/lamine-yamal-becomes-youngest-scorer-in-european-championship-history
   - https://www.bluewin.ch/en/sport/football/yamal-16-becomes-the-youngest-goalscorer-in-european-championship-history-with-a-dream-goal-li.2277592
+- "How it works" knockout-stage bullet fix (2026-10-22, Run 330): the same
+  bullet-sourcing angle applied to `content/fifa-world-cup.md` this run
+  found a matching gap here too - the third bullet said the knockout stage
+  began "from the quarterfinals onward", which was accurate only for the
+  eight-team era (1980-1992), not for the sixteen-team era this page's own
+  lead paragraph names as "the modern EURO" (1996 onward) or the current
+  twenty-four-team era (2016-2024), both of which open their knockout stage
+  with a Round of 16 before the quarterfinals. Reworded to name both eras
+  explicitly, in English and the Croatian translation
+  (`src/pages/hr/competitions/euro.astro`). Confirmed via WebSearch against
+  EURO 2024's own bracket, which has a Round of 16 before the quarterfinals:
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2024_knockout_stage
+  - https://global.espn.com/football/story/_/page/uefaeuro/euro-2024-bracket-fixtures-schedule-finals
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## UEFA Nations League
 
