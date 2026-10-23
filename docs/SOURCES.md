@@ -857,6 +857,31 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Golden Boot (top-scorer) content-verification rotation pick, fourth
+  independent cross-check of the 2026 World Cup podium (2026-10-23, Run 337):
+  `golden-boot.md` was the single longest-stale `content/*.md` file
+  (`lastReviewed: 2026-10-21`), next per the rotation's own staleness
+  ordering. The World Cup/EURO tables already carry two full-table audits
+  plus a tie-resolution pass and a 2026-10-19 third independent check of the
+  2026 World Cup Golden/Silver/Bronze Boot trio specifically (see that entry
+  above), so this pass re-confirmed the same trio via a fresh `WebSearch`
+  rather than repeat a full-table read with no new angle - a fourth,
+  confirmatory check rather than a new angle, logged for the rotation's own
+  record-keeping. **No discrepancies found:** Mbappé's Golden Boot (10
+  goals), Messi's Silver Boot (8 goals), Bellingham's Bronze Boot (7 goals)
+  all match the page exactly. Also re-checked the EURO section's "Cristiano
+  Ronaldo... breaking a record that had stood for 37 years" claim (2020
+  Golden Boot) - still traces to the same SunSport/GiveMeSport-derived
+  reporting already on file, with no independent source naming the prior
+  record-holder or the exact margin; left as-is, consistent with how this
+  fact was originally sourced.
+  - https://www.nbcchicago.com/world-cup/golden-boot-tracker-2026/3949885/
+  - https://sundayguardianlive.com/sports/fifa-world-cup-2026-golden-boot-winner-kylian-mbappe-wins-historic-award-who-claimed-the-silver-boot-and-bronze-boot-241753/
+  - https://www.hitc.com/every-award-winner-from-2026-world-cup-confirmed-as-rodri-beats-lionel-messi-to-golden-ball/
+  - https://briefly.co.za/sports/104632-ronaldo-shatters-37-year-record-after-winning-golden-boot-euro-2020-championship/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## UEFA EURO
 

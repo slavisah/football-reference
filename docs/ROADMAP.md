@@ -136,10 +136,9 @@ gone longest since its last `lastReviewed` bump, cross-checking claims
 against the file's own tables, the actual generating code, and, for recent
 events, live `WebSearch` results) is an ongoing loop, not a one-off pass -
 every one of the 14 `content/*.md` files has now been through it at least
-once. As of Run 336 (2026-10-23), `uefa-nations-league.md`/`uefa-euro.md`/
-`copa-america.md`/`ballon-dor.md` are tied at `2026-10-23`; `golden-boot.md`
-sits one day behind at `2026-10-21`; the remaining eight thin utility pages
-plus `glossary.md` are at `2026-10-22` (Run 332's second independent
+once. As of Run 337 (2026-10-23), `uefa-nations-league.md`/`uefa-euro.md`/
+`copa-america.md`/`ballon-dor.md`/`golden-boot.md` are tied at `2026-10-23`;
+the remaining eight thin utility pages plus `glossary.md` are at `2026-10-22` (Run 332's second independent
 front-to-back read, cross-checked against the live implementation rather
 than just another content file's prose - no new discrepancy found, since
 Run 211 already fixed the one real bug this angle catches on these nine
@@ -752,6 +751,26 @@ the full run-by-run history behind all of this, see
   10-11 days unanswered; re-escalated again in this run's own push
   notification. The 2026 Ballon d'Or ceremony is three days out (26
   October) - still not yet checkable.
+  **Update (Run 337):** picked up `golden-boot.md`, the content-verification
+  rotation's last remaining longest-stale file (`2026-10-21`) - its World
+  Cup/EURO tables already carry two full-table audits, a tie-resolution
+  pass, and a third independent cross-check of the 2026 World Cup podium
+  specifically, so rather than force a new angle with none available, gave
+  that same podium a fourth confirmatory `WebSearch` pass (still correct)
+  and re-checked the EURO "37-year record" claim (still traces to the same
+  single ultimate source, unchanged). All fourteen `content/*.md` files are
+  now tied at `lastReviewed` 2026-10-22 or 2026-10-23. Full health
+  re-confirmation otherwise clean (`pnpm install --frozen-lockfile`/`lint`/
+  `test`/`build`, all 32 fast non-browser `check:*` scripts bar the two
+  PDF ones individually, `pnpm audit`, `knip`, `pnpm outdated`); both
+  environment blockers (Node `v22.22.0` vs. `astro@7.4.2`'s `>=22.23.4`
+  floor; `@astrojs/check`'s peer range vs. `typescript` 7) reconfirmed
+  unchanged. PR #57 reconfirmed healthy directly via GitHub's API
+  (`mergeable_state: "clean"`, head SHA matching this run's own starting
+  point, all 4 PR comments are prior self-resolved CI fixes). The four
+  sign-off items are now 12+ days unanswered; re-escalated again in this
+  run's own push notification. The 2026 Ballon d'Or ceremony is three days
+  out (26 October) - still not yet checkable.
 
 ## Ideas not yet scoped
 
