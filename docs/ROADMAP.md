@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (334 intensive runs as of 2026-10-22) lives
+verification sweep and decision (335 intensive runs as of 2026-10-23) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -136,22 +136,38 @@ gone longest since its last `lastReviewed` bump, cross-checking claims
 against the file's own tables, the actual generating code, and, for recent
 events, live `WebSearch` results) is an ongoing loop, not a one-off pass -
 every one of the 14 `content/*.md` files has now been through it at least
-once. As of Run 332 (2026-10-22) all 14 are tied again, at `2026-10-21` or
-`2026-10-22` (the six flagship competition/award pages from Runs 327-331's
-"How it works" pass and sweep; the remaining eight thin utility pages plus
-`glossary.md` from Run 332's own second independent front-to-back read,
-cross-checked against the live implementation rather than just another
-content file's prose - no new discrepancy found, since Run 211 already
-fixed the one real bug this angle catches on these nine files). It has
-found three real bugs so far on `glossary.md`/`uefa-nations-league.md` (a
-"third and fourth place" overgeneralization, a "host" entry that had the
-FIFA World Cup/UEFA EURO automatic-host-place rule backwards, and a Nations
-League host-qualification description stuck on the pre-2024 "four group
-winners" mechanism UEFA replaced with a quarter-final round), plus the
+once. As of Run 335 (2026-10-23), `uefa-nations-league.md`/`uefa-euro.md`/
+`copa-america.md` are tied at `2026-10-23` (Run 335's own "Key facts"/
+"Memorable moments" superlative-bullet-sourcing pass - see below);
+`ballon-dor.md`/`golden-boot.md` sit one day behind at `2026-10-21`; the
+remaining eight thin utility pages plus `glossary.md` are at `2026-10-22`
+(Run 332's second independent front-to-back read, cross-checked against
+the live implementation rather than just another content file's prose - no
+new discrepancy found, since Run 211 already fixed the one real bug this
+angle catches on these nine files). It has found three real bugs so far on
+`glossary.md`/`uefa-nations-league.md` (a "third and fourth place"
+overgeneralization, a "host" entry that had the FIFA World Cup/UEFA EURO
+automatic-host-place rule backwards, and a Nations League
+host-qualification description stuck on the pre-2024 "four group winners"
+mechanism UEFA replaced with a quarter-final round), plus the
 historical-naming fix on `index.md` from Run 211's first pass over these
 nine files - a future run should pick by the routine's own competition/
 award ordering once the tie recurs, favoring a genuinely different angle
-over a third read of a file two independent passes already cleared.
+over a third read of a file two independent passes already cleared. Run
+335 found a genuinely new, previously-untried angle on the three
+longest-stale competition pages: each page's Finals/Champions table, award
+lists, winning managers and winning captains already had at least one
+dedicated external `docs/SOURCES.md` audit, but each page's own "Key
+facts"/"Memorable moments" superlative bullet (Nations League: Portugal's
+first two-time-champion claim; EURO: Spain's first-to-retain-in-2012 and
+record-fourth-title-in-2024 claims; Copa América: Argentina's
+most-successful-team claim) had only ever been checked as an *internal*
+cross-reference against each page's own table, never against an
+independent external source - the same gap Run 285 closed on the World Cup
+page. All three confirmed independently; no discrepancies found. The same
+angle remains open on `ballon-dor.md` (partially done by an earlier run)
+if a future run wants full six-page closure; `golden-boot.md` already has
+it (confirmed before Run 335 started, not repeated).
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims

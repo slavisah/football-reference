@@ -1465,6 +1465,30 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- **"Memorable moments" superlative-bullet audit (2026-10-23, Run 335):**
+  this page's Champions table, format history, and the Yamal/Vonlanthen
+  youngest-scorer fact above have each had a dedicated external audit, but
+  two further "Memorable moments" superlatives - "Spain became the first
+  nation to retain the EURO title in 2012" and "Spain won a record fourth
+  title in 2024" - had only ever been checked as an internal cross-reference
+  against this page's own Champions table (which does show Spain winning
+  both 2008 and 2012 back-to-back, then a fourth time in 2024, ahead of
+  Germany/West Germany's three), never against an independent external
+  source the way the World Cup page's equivalent superlatives were audited
+  at Run 285. A fresh `WebSearch` pass confirms both independently: Spain's
+  2008 and 2012 wins are reported as the first time any nation retained the
+  European Championship, and its 2024 win is widely reported as a new
+  record of four titles, the most of any nation (West Germany/Germany next
+  on three). **No discrepancies found**; the remaining bullets (Panenka's
+  1976 penalty, Denmark 1992, Greece 2004, EURO 2020's delayed multi-country
+  staging) restate facts the Champions table/Format-history audits already
+  cover and weren't re-litigated separately.
+  - https://sundayobserver.lk/2024/07/21/sport/28131/spain-first-nation-to-win-four-euro-cups
+  - https://www.kyivpost.com/amp/post/35819
+  - https://www.atalayar.com/en/articulo/sports/spains-dynasty-reigns-supreme-in-europe-after-beating-england-in-berlin/20240715130414202906.html
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## UEFA Nations League
 
@@ -1866,6 +1890,35 @@ Primary sources should be preferred.
   - https://www.uefa.com/uefanationsleague/news/0290-1ba5edb56db9-396191d7cb20-1000--de-la-fuente-on-spain-s-2023-nations-league-triumph/
   - https://www.football-espana.net/2023/06/17/luis-de-la-fuente-spain-croatia-europes-best
   - https://www.tottenhamhotspur.com/news/992365/internationals-hugo-wins-the-nations-league
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- **"Key facts"/"Memorable moments" superlative-bullet audit (2026-10-23,
+  Run 335):** every column and award list on this page already had at least
+  two independent audit passes (Finals table, venues, Player of the Finals,
+  winning managers/captains - see the entries above), but the "Key facts"
+  and "Memorable moments" sections' own standalone superlative claim -
+  "Portugal became the first two-time champion in 2025" - had only ever
+  been checked as an *internal* cross-reference against this page's own
+  Finals table (which does show Portugal alone winning twice, 2019 and
+  2025, among four editions), never against an independent external source
+  the way the World Cup page's equivalent "Format milestones"/"Memorable
+  moments" superlatives were audited at Run 285. A fresh `WebSearch` pass
+  confirms the claim is also independently reported as such, not just
+  arithmetically true from this site's own table: multiple outlets
+  describe Portugal's 2025 final win as making it "the first team to win
+  the UEFA Nations League on two occasions." The remaining "Memorable
+  moments" bullets (Italy hosting 2021 without reaching the final, Spain's
+  2023 penalty win, the host-nation-top-four-every-edition claim) restate
+  facts the Finals table audit already covers and weren't re-litigated
+  separately - the host-top-four claim in particular is directly checkable
+  against the page's own Finals-host and Third/Fourth columns (Italy third
+  in 2021, Netherlands fourth in 2023, Germany fourth in 2025, Portugal
+  champion as host in 2019), with no external claim to source. **No
+  discrepancies found.**
+  - https://www.moroccoworldnews.com/2025/06/209853/portugal-beat-spain-on-penalties-to-win-nations-league-title/
+  - https://www.si.com/soccer/uefa-nations-league-winners-complete-list-of-past-champions
+  - https://extratime.com/articles/35981/penalty-win-secures-portugal-uefa-nations-league/
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
@@ -3070,6 +3123,29 @@ Primary sources should be preferred.
   - https://en.wikipedia.org/wiki/1989_Copa_Am%C3%A9rica ;
     https://en.wikipedia.org/wiki/1991_Copa_Am%C3%A9rica (both already
     cited above for the third/fourth-place audit's own final-group reading)
+- **"Memorable moments" superlative-bullet audit (2026-10-23, Run 335):**
+  this page's Champions table, Best Player/Golden Glove/Fair Play Award
+  lists, Golden Boot list, winning managers, and winning captains have each
+  had at least one dedicated external audit (see the entries above), but
+  the "Memorable moments" section's own standalone superlative claim -
+  "Argentina moved ahead as the competition's most successful team by
+  winning in 2024" - had never been checked against an independent source,
+  the same gap this angle closed for `content/uefa-nations-league.md` and
+  `content/uefa-euro.md` this same run. A fresh `WebSearch` pass confirms
+  the claim: Argentina's 2024 final win (1-0 over Colombia) gave it a 16th
+  title, breaking its prior tie with Uruguay at 15 - independently reported
+  by CONMEBOL's own site and multiple outlets, not just derivable from this
+  page's own Champions table. The remaining bullets (the 1916 inaugural
+  four, Bolivia's 1963 home title, Colombia's first 2001 title, Chile's
+  back-to-back 2015/2016 titles) restate facts the Champions table audit
+  already covers and weren't re-litigated separately. **No discrepancies
+  found.**
+  - https://copaamerica.com/en/news/titles-argentina-champion-copa-america
+  - https://databoks.katadata.co.id/en/environment/statistics/75c1641619ff520/argentina-becomes-the-most-successful-copa-america-champion-in-history
+  - https://olympics.com/en/news/copa-america-winners-list-champions-record
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Ballon d'Or
 
