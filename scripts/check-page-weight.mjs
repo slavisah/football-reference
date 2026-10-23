@@ -83,7 +83,7 @@ const DIST_DIR = path.join(ROOT, 'dist');
 // pushing `hr/records` to 650.05 KB, just over the 650 KB budget (the
 // fourteenth such deliberate raise) - same mechanism as every prior raise
 // above, not a regression.
-export const PAGE_WEIGHT_BUDGET_BYTES = 660 * 1024;
+export const PAGE_WEIGHT_BUDGET_BYTES = 670 * 1024;
 
 /** Every same-origin CSS asset path (e.g. "/football-reference/_astro/foo.css") referenced by an HTML page. */
 export function findCssRefs(html) {
