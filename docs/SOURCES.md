@@ -3700,6 +3700,49 @@ Primary sources should be preferred.
     8-7-5-4-3-2-1 scale per more recent coverage) was deliberately left out
     of the page rather than guessed, the same conservative call this
     rotation makes whenever two source sets don't converge.
+- "Memorable moments" external-sourcing audit, and a real bug fix
+  (2026-10-23, Run 336): extended the content-verification rotation's "Key
+  facts"/"Memorable moments" external-sourcing angle (Run 285 on the World
+  Cup page, Run 335 on Nations League/EURO/Copa América) to this page, the
+  one still flagged open in `docs/ROADMAP.md`. Two fresh, independent
+  `WebSearch` passes - one on the 2007 eligibility change, one on the 1995
+  eligibility change - found that the page's existing "Kaká won the 2007
+  Ballon d'Or, the first year the award opened to any nationality at any
+  club worldwide" bullet was **factually wrong**, and inconsistent with this
+  same page's own introductory paragraph and "How it works" section (both of
+  which correctly state nationality eligibility opened in **1995**, not
+  2007). The 2007 change actually removed the requirement that a player's
+  *club* be based in Europe - a club-location change, not a nationality one;
+  Kaká himself still played for a European club (AC Milan) that year.
+  Wikipedia and Reuters' contemporaneous coverage of the 2007 change, cross-
+  checked against a second pass on the 1995 change (Eurosport's "Black
+  History Month" retrospective on Weah's win, Topendsports), agree on both
+  facts independently:
+  - https://en.wikipedia.org/wiki/2007_Ballon_d%27Or
+  - https://reuters.screenocean.com/record/334880
+  - https://www.topendsports.com/sport/soccer/awards/ballondor-2007.htm
+  - https://www.eurosport.co.uk/football/ballon-d-or/2022/black-history-month-how-george-weah-s-historic-1995-ballon-d-or-win-put-black-and-african-players-on_sto9192984/story.shtml
+  - https://www.topendsports.com/sport/soccer/awards/ballondor-timeline.htm
+  - Note: the prior verification of this exact bullet (`scripts/ordinal-
+    claims-ledger.json`, dated 2026-09-23) had only cross-checked it against
+    this page's own intro paragraph for the "fully global in 2007" clause -
+    it missed that the bullet's "any nationality" phrase contradicted that
+    same paragraph's separate 1995 clause. A claim passing its own ledger
+    check once is not permanent proof against a differently-angled re-read
+    catching a subtler error later, the same lesson `glossary.md`'s two
+    corrected overgeneralizations already taught this rotation. Reworded on
+    both `content/ballon-dor.md` and its hand-translated Croatian
+    counterpart (`src/pages/hr/competitions/ballon-dor.astro`), which
+    repeated the identical conflation; the ledger entry was updated to match
+    (see that file's own note for the full correction). The other two
+    previously-unaudited bullets considered for this pass - Messi's "more
+    than any other player" 2009 claim and the 2020-cancellation claim - were
+    independently confirmed accurate (Messi's 8 titles are already the
+    page's own highest total, re-confirmed via `WebSearch` against general
+    coverage; the 2020 cancellation is universally reported as the award's
+    first break since 1956, per France Football's own statement) and needed
+    no change. This closes the "Key facts"/"Memorable moments" external-
+    sourcing angle for all six competition/award pages.
 
 ## Review policy
 
