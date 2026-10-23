@@ -60,7 +60,8 @@
     "check:locale-consistency": "node scripts/check-locale-consistency.mjs",
     "check:theme-color": "node scripts/check-theme-color.mjs",
     "check:spelling": "cspell --no-progress \"content/**/*.md\"",
-    "check:spelling-hr": "node scripts/check-spelling-hr.mjs"
+    "check:spelling-hr": "node scripts/check-spelling-hr.mjs",
+    "routine:branch-state": "node scripts/check-intensive-branch-state.mjs"
   },
   "dependencies": {
     "astro": "^7.4.1"

@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (338 intensive runs as of 2026-10-23) lives
+verification sweep and decision (339 intensive runs as of 2026-10-23) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -331,6 +331,33 @@ the full run-by-run history behind all of this, see
   still hasn't been patched via the sync process mentioned above; this run's
   clean outcome is from the run itself following the recommended checks
   manually, not from the prompt being fixed. Still needs the user's fix.
+  **Run 339: added a repo-side mitigation that doesn't need the external
+  prompt-sync fix at all.** All three incidents trace to the same moment -
+  a run under time pressure hand-deriving the ls-remote/fetch/merge-tree
+  sequence from prose and reaching for a faster, weaker local signal
+  instead. `scripts/check-intensive-branch-state.mjs` (new, run via `pnpm
+  routine:branch-state [branch] [base]`) encodes the exact safe sequence as
+  one read-only command - `git ls-remote` against the real remote (never a
+  local `git branch -a` listing), a full `git fetch` of both refs by name,
+  then `git merge-base --is-ancestor` checked in *both* directions to tell
+  "already merged, recreate" apart from "diverged, rebase" apart from
+  "strictly ahead, check out as-is" - and prints one of exactly three
+  verdicts (`RECREATE_FROM_BASE`/`REBASE_ONTO_BASE`/`UP_TO_DATE`) plus the
+  evidence behind it. It makes no git state changes itself (no push, no
+  branch creation), so adding it carries none of the risk it exists to
+  prevent. Smoke-tested this run against three real cases on this
+  repository's own remote: a genuinely nonexistent branch name
+  (`RECREATE_FROM_BASE` via the ls-remote-empty path), this run's own
+  `intensive/football-reference` vs. `main` (`UP_TO_DATE`, 73 commits
+  ahead - matches `pull_request_read`'s own commit count on PR #57
+  independently), and the unrelated `intensive/mobile-header-menu` branch
+  vs. `main` (`REBASE_ONTO_BASE`, confirmed diverged) - all three verdicts
+  matched hand-verification. This does not patch the routine's own stored
+  prompt (that external sync-process fix is still the user's call, per the
+  original flag above) - it gives any future run, including one still
+  reading the old unsafe instructions literally, a one-command safe
+  alternative to reach for instead of re-deriving the check from scratch
+  under the same time pressure that caused all three incidents.
 - **`.git` history bloat from committed PDFs - decision overdue, unresolved
   across 8 runs (289-296, 2026-10-14 to 2026-10-16):** root cause and the
   Run 293 partial fix are fully written up in `docs/PROJECT_STATUS.md`'s
@@ -780,6 +807,32 @@ the full run-by-run history behind all of this, see
   sign-off items are unchanged and still 12+ days unanswered; re-escalated
   again in this run's own push notification. The 2026 Ballon d'Or ceremony
   is three days out (26 October) - still not yet checkable.
+  **Update (Run 339):** no new rotation pick either (the `lastReviewed`
+  split is unchanged) and a fresh player-by-player `WebSearch` angle on the
+  Nations League Team-of-the-Tournament gap (checking individual players'
+  own coverage/bios rather than the tournament-level query every prior
+  attempt used) came back negative too - fifteenth consecutive negative
+  result, see that item's own entry above. Instead of re-running the
+  ten-script browser sweep a run early (not due until several more runs
+  past Run 338) or manufacturing a content diff with no real finding behind
+  it, picked up the one standing item this routine itself *can* act on
+  without the user's sign-off: the branch-recreation safety flag's own
+  three-incident root cause. Added `scripts/check-intensive-branch-state.mjs`
+  (see the safety-flag entry above for the full detail) - a repo-side,
+  read-only safe-check tool that doesn't depend on the external
+  stored-prompt sync fix the flag has been waiting on since Run 321. Full
+  health re-confirmation otherwise clean (`pnpm install --frozen-lockfile`,
+  `pnpm lint`/`test`/`build` - 1086 tests, 711 pages, 0/0/0 lint, unchanged
+  counts; `pnpm dlx knip --no-config-hints` clean including the new
+  script, which knip correctly resolves as a `package.json` script entry
+  point rather than flagging unused); both environment blockers (Node
+  `v22.22.0` vs. `astro@7.4.2`'s floor; `typescript` 7 vs. `@astrojs/check`'s
+  peer range) reconfirmed unchanged via a fresh `pnpm outdated`. PR #57
+  reconfirmed healthy directly via GitHub's API before and will be
+  reconfirmed again after this push. The four sign-off items are now 13+
+  days unanswered; re-escalated again in this run's own push notification.
+  The 2026 Ballon d'Or ceremony is three days out (26 October) - still not
+  yet checkable.
 
 ## Ideas not yet scoped
 
