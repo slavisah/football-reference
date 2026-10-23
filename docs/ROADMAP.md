@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (336 intensive runs as of 2026-10-23) lives
+verification sweep and decision (338 intensive runs as of 2026-10-23) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -84,21 +84,18 @@ into `.github/workflows/ci.yml` as required PR gates; the other ten
 `check:text-spacing`/`check:focus-appearance`/`check:color-contrast`) are
 full-site Playwright/browser sweeps kept manual/intensive-run-only rather
 than a required PR gate, purely for their ~700-to-1,400-page-load runtime -
-re-run periodically (most recently Run 331, eight runs after the prior
-full pass at Run 323 - all ten clean again, including
+re-run periodically (most recently Run 338, seven runs after the prior
+full pass at Run 331 - all ten clean again, including
 `check:color-contrast` - the heaviest, 1,422 page loads, confirmed clean
 with `PW_EXECUTABLE_PATH` pointed at the pre-installed
 `chromium_headless_shell-1194/chrome-linux/headless_shell.real` binary per
 Run 265's own fix - zero WCAG 1.4.3 violations across all 711 pages in
 both color schemes; `check:lighthouse` also reconfirmed, 39 pages all
 >= 0.9 in every category with the same one documented noindex/SEO
-exception as before. Run 331, like Run 323, ran each of the ten scripts
-individually in its own foreground/background call rather than one
-combined pass - and a container restart killed the `check:color-contrast`
-run mid-sweep with no partial result, the same failure mode Run 323 hit,
-confirming it's a recurring environment trait rather than a one-off; the
-script was simply restarted and completed clean on the second attempt with
-no work lost. See Run 331's own `docs/PROJECT_STATUS.md` entry. Run 314
+exception as before. Run 338 ran all ten scripts to completion with no
+container-restart interruption, unlike Runs 323/331's own mid-sweep
+restarts (recovered same-run both times with no work lost). See Run 338's
+own `docs/PROJECT_STATUS.md` entry. Run 314
 also found that this sweep and `pnpm build:pdfs` must never run
 concurrently - see this file's "Operational note (Run 314)" above) rather
 than on every change. Run 294 found this same
@@ -771,6 +768,18 @@ the full run-by-run history behind all of this, see
   sign-off items are now 12+ days unanswered; re-escalated again in this
   run's own push notification. The 2026 Ballon d'Or ceremony is three days
   out (26 October) - still not yet checkable.
+  **Update (Run 338):** no new rotation pick or research angle available
+  either - the fourteen-way `lastReviewed` tie is unchanged and
+  `en.wikipedia.org` is still egress-blocked. Picked up the one genuinely
+  overdue item instead: the ten-script manual browser/accessibility sweep
+  (seven runs since Run 331's last full pass) - all ten clean, including a
+  full, uninterrupted `check:color-contrast` run (1,422 page loads, zero
+  WCAG 1.4.3 violations), with no container restart mid-sweep this time.
+  Otherwise a full health re-confirmation, clean throughout, no code or
+  content change - see `docs/PROJECT_STATUS.md`'s Run 338 entry. The four
+  sign-off items are unchanged and still 12+ days unanswered; re-escalated
+  again in this run's own push notification. The 2026 Ballon d'Or ceremony
+  is three days out (26 October) - still not yet checkable.
 
 ## Ideas not yet scoped
 
