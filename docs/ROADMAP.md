@@ -126,7 +126,12 @@ claims) has now covered `src/lib/*.ts`, `src/components/*.astro`,
 codebase - and found and fixed six real bugs along the way (see Runs 267,
 270, 272, 274, 275 in `docs/PROJECT_STATUS.md`). No further untried file
 remains; re-run from scratch only after a future run materially edits one
-of these files, per each entry's own caveat.
+of these files, per each entry's own caveat. **Run 340 extended this angle
+to the test files themselves** (a different failure mode - a weak or
+tautological assertion masking a bug rather than producing one) across the
+~30 "domain-logic" `tests/unit/*.test.ts` files; zero found, no file
+changed. The ~37 `checkXxx.test.ts` files (testing the `scripts/*.mjs`
+validators) are the explicit next slice, left untried.
 
 The content-verification rotation (re-check whichever content file has
 gone longest since its last `lastReviewed` bump, cross-checking claims
