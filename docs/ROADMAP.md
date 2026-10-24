@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (341 intensive runs as of 2026-10-24) lives
+verification sweep and decision (343 intensive runs as of 2026-10-24) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -137,7 +137,7 @@ Playwright browser install on every PR push.
 `knip` shows exactly one standing false positive (`@cspell/dict-hr-hr`,
 used only via `.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS
 `import` knip's static analysis can see). Current counts (confirmed fresh
-this run): 1086 unit tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711
+this run): 1094 unit tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711
 pages built; 1055 Playwright e2e tests as of the last full cold-start run
 (Run 254). Run 311 also re-confirmed `pnpm audit` clean and `knip`'s one
 standing false positive unchanged.
@@ -166,10 +166,15 @@ The content-verification rotation (re-check whichever content file has
 gone longest since its last `lastReviewed` bump, cross-checking claims
 against the file's own tables, the actual generating code, and, for recent
 events, live `WebSearch` results) is an ongoing loop, not a one-off pass -
-every one of the 14 `content/*.md` files has now been through it at least
-once. As of Run 337 (2026-10-23), `uefa-nations-league.md`/`uefa-euro.md`/
-`copa-america.md`/`ballon-dor.md`/`golden-boot.md` are tied at `2026-10-23`;
-the remaining eight thin utility pages plus `glossary.md` are at `2026-10-22` (Run 332's second independent
+every one of the 15 `content/*.md` files has now been through it at least
+once. As of Run 343 (2026-10-24), `fifa-world-cup.md` is the most recent
+(a front-to-back internal-consistency re-check against its own tables,
+`docs/SOURCES.md`, and the generating code - `hostCoordinates.ts`'s 2026
+three-country host entry and `golden-boot.md`'s joined top-scorer column
+both cross-checked clean; no discrepancy found). `uefa-nations-league.md`/
+`uefa-euro.md`/`copa-america.md`/`ballon-dor.md`/`golden-boot.md` are tied
+one day behind at `2026-10-23`; the remaining eight thin utility pages plus
+`glossary.md` are at `2026-10-22` (Run 332's second independent
 front-to-back read, cross-checked against the live implementation rather
 than just another content file's prose - no new discrepancy found, since
 Run 211 already fixed the one real bug this angle catches on these nine
