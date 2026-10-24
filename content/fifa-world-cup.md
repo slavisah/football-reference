@@ -5,7 +5,7 @@ competitionType: international
 confederation: FIFA
 firstEdition: 1930
 lastCompletedEdition: 2026
-lastReviewed: 2026-10-12
+lastReviewed: 2026-10-24
 status: verified
 ---
 
@@ -17,7 +17,7 @@ The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 b
 
 - National teams first play years of qualifying matches within their own confederation to win one of a limited number of finals places.
 - The finals begin with a group stage, where each team plays the others in its group; the leading teams advance.
-- From the round of 16 onward, it is a straight knockout: one defeat and a team is out.
+- From the round of 32 onward (the round of 16 before the 48-team expansion in 2026), it is a straight knockout: one defeat and a team is out.
 - The two semifinal winners meet in the final to decide the champion.
 - The tournament has expanded several times since 1930 - see "Format milestones" below for exactly when.
 

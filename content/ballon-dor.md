@@ -4,7 +4,7 @@ slug: ballon-dor
 awardType: individual
 firstEdition: 1956
 lastCompletedEdition: 2025
-lastReviewed: 2026-10-09
+lastReviewed: 2026-10-23
 status: verified
 ---
 
@@ -15,7 +15,8 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 ## How it works
 
 - The Ballon d'Or honors the best individual men's player of the year - it is not a team competition or a national-team trophy.
-- A panel of football journalists, one from each eligible country, ranks their top players; the votes are combined into one final ranking.
+- A panel of football journalists, one per eligible country, ranks their top players from a shortlist, and the votes are combined into one final ranking - but the panel hasn't always been journalists alone: from 2010 to 2015, while FIFA jointly presented the award (see above), national-team captains and coaches voted alongside journalists in a combined panel of roughly 500, before it reverted to journalists only in 2016.
+- The journalist panel's own size has changed too: roughly 170 countries had a vote before a 2022 reform capped it at one journalist per country from the top 100 nations in the FIFA men's world ranking, a cap still in effect for the 2025 award.
 - Eligibility has widened over time: Europe-only at first, then any nationality at a European club from 1995, then fully global since 2007 (see the introduction above).
 - The winner is announced at a ceremony organized by France Football magazine - held at year's end through 2021, then moved to September/October from 2022 onward (see the Ceremony date column above).
 
@@ -169,13 +170,71 @@ A second, independent cross-check of every Winner and National team cell (2026-0
 
 A second, independent cross-check of the **Ceremony date** column (2026-08-13, intensive run) re-verified all 69 dated editions (1956-2025, excluding the 2020 cancellation) in four era-based passes, deliberately drawing on a source mix distinct from the first pass's Wikipedia/France-Football-issue/Tuesday-heuristic combination - RSSSF's per-year "European Footballer of the Year" pages (`rsssf.org/miscellaneous/europa-poy*.html`), Britannica, official club sites (Benfica, Dynamo Kyiv, AC Milan, PSG), UEFA.com, contemporaneous wire coverage (VOA News, Reuters-affiliated reprints), and physical France Football issue-cover-date listings (auction/collector sites). **No discrepancies found** - every one of the 69 dates already on the page held up against this independent pass. This closed out both years the first pass had flagged as sourced from only a single corroborating reference (1965, 1973) with further non-Wikipedia corroboration, and resolved the apparent "29 vs 30 December 1986" conflict with a genuine explanation rather than just re-asserting one side: Soviet-era retrospectives (Dynamo Kyiv/Ukrainian press) describe Belanov being privately notified of the result on 29 December, while France Football's own issue (#2125) carrying the published result is dated 30 December - the page tracks the publication date, so 30 December stands correct, and the "29 December" figure some club sources repeat refers to a different (earlier, private) moment in the same story rather than an error. The Tuesday-publication heuristic used throughout the 1956-2001 span visibly breaks down from **2002 onward** (12 December 2002 is a Thursday, 22 December 2003 and 13 December 2004 are both Mondays) - all three dates are independently corroborated by contemporaneous sources regardless (a BigSoccer forum post discussing the 2002 result on 16 December, a VOA News wire dateline for 2003, and UEFA.com's own report naming the day of the week for 2004), so this is a real shift in France Football's release-day pattern around this time, not a data error; future audits of this column should not treat the Tuesday pattern as informative past 2001.
 
+A fresh, independent second-pass audit of the five companion trophy
+sections above (Kopa, Yashin, Gerd Müller, Johan Cruyff and Sócrates;
+2026-10-13, intensive run) re-verified every entry via `WebSearch` against
+a source mix distinct from each section's original authoring citations
+(Sports Illustrated's and TopEndSports' own "complete list" pages for
+Kopa/Yashin/Gerd Müller, Wikipedia's dedicated trophy articles, and
+Peace and Sport's own press releases for the two Sócrates years the
+first search pass left unsettled, 2024 and 2025). **No discrepancies
+found** across all 20 entries in the five sections - the only point
+worth recording is that the first search pass for the Sócrates Award
+could not independently confirm 2024 or 2025 from its initial result set
+and needed a second, more targeted query for each year before both
+(Jennifer Hermoso, 2024; the Xana Foundation, 2025) were confirmed
+exactly as already on the page. These five sections had each had two
+independent `WebSearch` passes at authoring time (2026-08-31 through
+2026-09-03) but no further external re-check since, unlike the Winners/Ceremony
+date columns above, which both already have a documented second
+independent pass; this run closes that gap.
+
+A third independent cross-check of the Winners table (2026-10-19, intensive
+run) re-confirmed the 2025 row (Dembélé) and re-summed the "Multiple
+winners through 2025" table against the Winners table itself - both held
+up with no discrepancies. This pass also specifically re-verified two of
+the exclusivity/precedence claims in the "Memorable moments"/"Notes"
+sections below, the kind of overgeneralization the site's
+content-verification rotation has previously caught elsewhere
+(`glossary.md`): the claim that no other goalkeeper besides Yashin has won
+the men's award, and the claim crediting Weah's 1995 win as the earliest
+by an African national-team player (that framing specifically means the
+earliest African-*national* winner, matching this page's own "National
+team" column throughout - a different, narrower claim from crediting him
+as the earliest Black winner, which the page does not make). Both
+confirmed as written.
+
+A fresh pass (2026-10-21, intensive run) turned to the "How it works" section
+itself, rather than re-checking the Winners table or the five companion
+trophies above (each already independently cross-checked two or three times
+with no discrepancies, per the audits above). That section's voting-panel
+bullet had described the panel as "journalists, one from each eligible
+country" throughout the award's history without qualification - true of the
+1956-2009 and 2016-present eras, but not of 2010-2015, when FIFA jointly
+presented the award: that panel also included national-team captains and
+coaches voting alongside journalists, each roughly a third of a combined
+panel of around 500. It also left out a real, well-documented 2022 reform
+that shrank the journalist pool itself, from roughly 170 voting countries to
+one journalist per country from only the top 100 nations in the FIFA men's
+world ranking - a cap still in force for the 2025 award. Both facts are
+corroborated across multiple independent outlets (Wikipedia's FIFA Ballon
+d'Or article, Bleacher Report, Sports Illustrated, and Eurosport/CGTN/90min's
+contemporaneous 2022-reform coverage, among others - see `docs/SOURCES.md`).
+Rewrote the bullet to state both eras accurately and added a second bullet
+for the 2022 reform; mirrored on the Croatian page
+(`src/pages/hr/competitions/ballon-dor.astro`), which hand-translates this
+section separately from `content/ballon-dor.md`. This is an accuracy
+addition, not a correction of a false claim - the original text wasn't
+wrong across the bulk of the award's history, just silent about two eras
+where the mechanism was different.
+
 See `docs/SOURCES.md` for the per-year citation list.
 
 ## Memorable moments
 
 - Stanley Matthews won the first-ever Ballon d'Or in 1956.
 - George Weah became the first African player to win the Ballon d'Or in 1995.
-- Kaká won the 2007 Ballon d'Or, the first year the award opened to any nationality at any club worldwide.
+- Kaká won the 2007 Ballon d'Or, the first year the award was open to players at any club worldwide, not just clubs in Europe - eligibility had already widened to any nationality in 1995.
 - Lionel Messi won the first of his eight Ballon d'Or titles in 2009, more than any other player in the award's history.
 - Luka Modrić became the only Croatian winner of the Ballon d'Or in 2018.
 - The 2020 Ballon d'Or was the only edition since the award's creation in 1956 not to be presented.

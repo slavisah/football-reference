@@ -1,7 +1,7 @@
 ---
 title: Glossary
 slug: glossary
-lastReviewed: 2026-10-10
+lastReviewed: 2026-10-22
 status: verified
 ---
 
@@ -58,9 +58,9 @@ to qualify, and several UEFA EURO hosts have been granted the same guarantee
 - though not every UEFA EURO edition has worked that way, so check each
 competition's own notes rather than assuming one rule fits every tournament.
 The UEFA Nations League Finals is the clearest exception: UEFA only ever
-chooses its host from among the four teams that have already won their
-qualifying group, so hosting that four-team event is never a substitute for
-qualifying. Copa América mostly sidesteps the question, since CONMEBOL's ten
+chooses its host from among the four teams that reach the Finals through the
+competition's own league phase and knockout rounds, so hosting that
+four-team event is never a substitute for qualifying. Copa América mostly sidesteps the question, since CONMEBOL's ten
 member nations - who host nearly every edition - take part regardless of who
 is hosting.
 

@@ -63,6 +63,7 @@ Burruchaga
 Busquets
 CONCACAF
 CONMEBOL
+CGTN
 Cafu
 Calderón
 Campín
@@ -123,6 +124,7 @@ Enzo
 Erling
 Estádio
 Estupiñán
+Eurosport
 Eusébio
 Everton
 Fabien

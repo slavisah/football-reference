@@ -21,7 +21,6 @@
 // content it was rendered from, without needing a browser or git history.
 
 import { chromium } from '@playwright/test';
-import { createHash } from 'node:crypto';
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -29,6 +28,7 @@ import { fileURLToPath } from 'node:url';
 import { PDF_PAGES as PAGES, TEAM_PDF_SOURCES, PLAYER_PDF_SOURCES, EDITION_PDF_SOURCES } from './pdf-pages.mjs';
 import { addAuthorMetadata, PDF_AUTHOR } from './pdf-metadata.mjs';
 import { waitForServer } from './preview-daemon.mjs';
+import { loadExistingManifest, fileExists, hashesMatch, hashSources, buildManifest } from './pdf-manifest.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const PORT = 4399;
@@ -42,6 +42,32 @@ const ORIGIN = `http://localhost:${PORT}`;
 const SITE_URL = (process.env.SITE_URL ?? 'https://slavisah.github.io').replace(/\/$/, '');
 const OUT_DIR = path.join(ROOT, 'public', 'downloads');
 const MANIFEST_PATH = path.join(OUT_DIR, '.pdf-manifest.json');
+// docs/ROADMAP.md's "`.git` history bloat" item (raised Run 289, 2026-10-14):
+// every one of this script's runs previously rewrote all 700 PDFs
+// unconditionally, even when nothing they're sourced from (pdf-pages.mjs's
+// own per-slug `sources` list - content/*.md, docs/SOURCES.md, global.css
+// and every rendering .ts/.astro file involved) had changed since the last
+// run, because Chromium's print-to-PDF output isn't byte-stable even for
+// pixel-identical input (CreationDate/ModDate always change; the Chromium
+// build/version baked into /Creator and the compressed content streams can
+// too) - so every content-touching commit's AGENTS.md-mandated PDF rebuild
+// committed a fresh ~500 MB wholesale binary rewrite regardless of which
+// PDF(s) the edit actually affected. This doesn't shrink what's already in
+// history (that's the user's own call - see the ROADMAP item), but it stops
+// digging: skip re-rendering and re-writing a PDF whose already-committed
+// manifest entry still matches every one of its sources' current hashes,
+// and the file itself is already on disk. Set FORCE_ALL_PDFS=1 to bypass
+// this and force a full regeneration regardless (e.g. after a Playwright/
+// Chromium version bump, or any other change this hash model can't see).
+const FORCE_ALL_PDFS = process.env.FORCE_ALL_PDFS === '1';
+
+// loadExistingManifest/fileExists/hashesMatch/hashSources/buildManifest now
+// live in ./pdf-manifest.mjs, a side-effect-free module unit-tested directly
+// by tests/unit/pdfManifest.test.ts - see that file's own header comment for
+// why they were split out of this one (this script's `main()` call at the
+// bottom runs unconditionally the moment the file is loaded, which would
+// make importing any function from here for a test spin up a whole preview
+// server and browser).
 
 // One PDF per required competition page (src/pages/competitions/*.astro)
 // plus /records, and which file(s) each page's rendered content is sourced
@@ -49,23 +75,6 @@ const MANIFEST_PATH = path.join(OUT_DIR, '.pdf-manifest.json');
 // References section every page shares) - the shared PDF_PAGES list
 // (scripts/pdf-pages.mjs) so this can never drift from
 // scripts/check-pdf-freshness.mjs's PDF_SOURCES.
-
-async function hashSources(sources) {
-  const hashes = {};
-  for (const file of sources) {
-    const contents = await readFile(path.join(ROOT, file), 'utf8');
-    hashes[file] = createHash('sha256').update(contents).digest('hex');
-  }
-  return hashes;
-}
-
-async function buildManifest(entries) {
-  const manifest = {};
-  for (const { slug, sources } of entries) {
-    manifest[slug] = await hashSources(sources);
-  }
-  return manifest;
-}
 
 // Mirrors src/lib/teamProfile.ts's teamProfileSlug() exactly (a pure string
 // transform, no Astro/content dependency) so a team fetched from the live
@@ -98,6 +107,23 @@ function playerProfileSlug(name) {
 
 async function main() {
   await mkdir(OUT_DIR, { recursive: true });
+  const existingManifest = await loadExistingManifest(MANIFEST_PATH);
+  let skippedCount = 0;
+
+  // Shared by all four loops below: true when `slug`'s already-committed
+  // manifest entry and on-disk PDF both still match `sources`' current
+  // hashes, so re-rendering it would only produce new CreationDate/ModDate/
+  // Chromium-build noise, not a real content or layout change - see
+  // FORCE_ALL_PDFS's own comment above for the escape hatch.
+  async function skipUnchanged(slug, sources, outFile) {
+    if (FORCE_ALL_PDFS) return false;
+    if (!(await fileExists(outFile))) return false;
+    const currentHashes = await hashSources(ROOT, sources);
+    if (!hashesMatch(existingManifest[slug], currentHashes)) return false;
+    skippedCount += 1;
+    console.log(`Skipping ${path.relative(ROOT, outFile)} (unchanged since last build:pdfs)`);
+    return true;
+  }
 
   console.log('Starting `astro preview`...');
   // Spawn the astro binary directly (not through `pnpm exec`) and detached
@@ -312,9 +338,10 @@ async function main() {
         }
       }
 
-      for (const { slug, path: pagePath } of PAGES) {
-        await gotoPageOrThrow(pagePath);
+      for (const { slug, path: pagePath, sources } of PAGES) {
         const outFile = path.join(OUT_DIR, `${slug}.pdf`);
+        if (await skipUnchanged(slug, sources, outFile)) continue;
+        await gotoPageOrThrow(pagePath);
         await writePdfWithMetadata(outFile, localeFor(pagePath));
         console.log(`Wrote ${path.relative(ROOT, outFile)}`);
       }
@@ -347,12 +374,13 @@ async function main() {
           [`/teams/${slug}`, `team-${slug}`],
           [`/hr/teams/${slug}`, `team-${slug}-hr`],
         ]) {
-          await gotoPageOrThrow(pagePath);
           const outFile = path.join(OUT_DIR, `${fileSlug}.pdf`);
-          await writePdfWithMetadata(outFile, localeFor(pagePath));
           teamManifestEntries.push({ slug: fileSlug, sources: TEAM_PDF_SOURCES });
+          if (await skipUnchanged(fileSlug, TEAM_PDF_SOURCES, outFile)) continue;
+          await gotoPageOrThrow(pagePath);
+          await writePdfWithMetadata(outFile, localeFor(pagePath));
         }
-        console.log(`Wrote team-${slug}.pdf / team-${slug}-hr.pdf (${displayName})`);
+        console.log(`Wrote/confirmed team-${slug}.pdf / team-${slug}-hr.pdf (${displayName})`);
       }
 
       teamEntries = teamManifestEntries;
@@ -384,12 +412,13 @@ async function main() {
           [`/players/${slug}`, `player-${slug}`],
           [`/hr/players/${slug}`, `player-${slug}-hr`],
         ]) {
-          await gotoPageOrThrow(pagePath);
           const outFile = path.join(OUT_DIR, `${fileSlug}.pdf`);
-          await writePdfWithMetadata(outFile, localeFor(pagePath));
           playerManifestEntries.push({ slug: fileSlug, sources: PLAYER_PDF_SOURCES });
+          if (await skipUnchanged(fileSlug, PLAYER_PDF_SOURCES, outFile)) continue;
+          await gotoPageOrThrow(pagePath);
+          await writePdfWithMetadata(outFile, localeFor(pagePath));
         }
-        console.log(`Wrote player-${slug}.pdf / player-${slug}-hr.pdf (${displayName})`);
+        console.log(`Wrote/confirmed player-${slug}.pdf / player-${slug}-hr.pdf (${displayName})`);
       }
 
       playerEntries = playerManifestEntries;
@@ -412,12 +441,14 @@ async function main() {
 
       const editionManifestEntries = [];
       for (const { pdfSlug, path: pagePath, family } of editionIndex) {
-        await gotoPageOrThrow(pagePath);
+        const sources = EDITION_PDF_SOURCES[family];
         const outFile = path.join(OUT_DIR, `${pdfSlug}.pdf`);
+        editionManifestEntries.push({ slug: pdfSlug, sources });
+        if (await skipUnchanged(pdfSlug, sources, outFile)) continue;
+        await gotoPageOrThrow(pagePath);
         await writePdfWithMetadata(outFile, localeFor(pagePath));
-        editionManifestEntries.push({ slug: pdfSlug, sources: EDITION_PDF_SOURCES[family] });
       }
-      console.log(`Wrote ${editionManifestEntries.length} edition PDFs.`);
+      console.log(`Wrote/confirmed ${editionManifestEntries.length} edition PDFs (${skippedCount} unchanged, skipped).`);
 
       editionEntries = editionManifestEntries;
     } finally {
@@ -427,9 +458,13 @@ async function main() {
     stopServer();
   }
 
-  const manifest = await buildManifest([...PAGES, ...teamEntries, ...playerEntries, ...editionEntries]);
+  const manifest = await buildManifest(ROOT, [...PAGES, ...teamEntries, ...playerEntries, ...editionEntries]);
   await writeFile(MANIFEST_PATH, `${JSON.stringify(manifest, null, 2)}\n`);
   console.log(`Wrote ${path.relative(ROOT, MANIFEST_PATH)}`);
+  const totalPdfs = PAGES.length + teamEntries.length + playerEntries.length + editionEntries.length;
+  console.log(
+    `${totalPdfs - skippedCount} PDF(s) regenerated, ${skippedCount} unchanged and skipped (of ${totalPdfs} total).`,
+  );
 }
 
 main()
