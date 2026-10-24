@@ -302,10 +302,25 @@ the full run-by-run history behind all of this, see
   plus its evidence - usable without depending on the routine's own
   externally-synced stored prompt being patched (`update_trigger` can't
   rewrite a trigger this session didn't create, so that prompt-sync fix
-  remains the user's own call). Runs 328-340 (13 consecutive runs) have used
+  remains the user's own call). Runs 328-341 (14 consecutive runs) had used
   the safe sequence, manually or via the new script, with no further
-  incident. See `docs/PROJECT_STATUS.md`'s Run 321/326/327/339 entries for
-  the full incident-by-incident detail.
+  incident - broken by **Run 342 (2026-10-24): a fourth overwrite**, caught
+  and fully recovered same-run, zero work lost. Unlike 321/326/327 (each a
+  *weak/stale signal* failure with the real check attempted), this one
+  shows the external stored prompt genuinely still carries the old unsafe
+  sequence verbatim: the run followed it literally (`git fetch -q origin`
+  + `git branch -r`, which a shallow/partial clone can leave empty even
+  with a real remote branch), never reached for Run 339's
+  `scripts/check-intensive-branch-state.mjs` at all because the prompt it
+  was following doesn't mention it, and force-pushed a fresh branch over
+  this same PR #57's 76 commits before running any check. Caught via
+  `list_pull_requests`/`pull_request_read` immediately after the push
+  (PR #57's head SHA didn't match what had just been pushed), restored
+  with `git push --force origin <pre-overwrite-SHA>:intensive/football-reference`,
+  then confirmed `UP_TO_DATE` via the safety script *before* continuing.
+  This confirms the prompt-sync fix is not merely unapplied but the tool
+  built to route around it hasn't reached the prompt text that would tell
+  a run to use it - see `docs/PROJECT_STATUS.md`'s Run 342 entry.
 - **`.git` history bloat from committed PDFs - decision overdue, unresolved
   across 8 runs (289-296, 2026-10-14 to 2026-10-16):** root cause and the
   Run 293 partial fix are fully written up in `docs/PROJECT_STATUS.md`'s
