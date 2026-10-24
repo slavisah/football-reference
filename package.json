@@ -61,6 +61,7 @@
     "check:theme-color": "node scripts/check-theme-color.mjs",
     "check:spelling": "cspell --no-progress \"content/**/*.md\"",
     "check:spelling-hr": "node scripts/check-spelling-hr.mjs",
+    "check:roadmap-size": "node scripts/check-roadmap-size.mjs",
     "routine:branch-state": "node scripts/check-intensive-branch-state.mjs"
   },
   "dependencies": {

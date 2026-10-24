@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (339 intensive runs as of 2026-10-23) lives
+verification sweep and decision (341 intensive runs as of 2026-10-24) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -45,6 +45,31 @@ found no code or doc mechanism that would actually prevent a future run from
 repeating this a fourth time, so flagged it in this run's own notification as
 something worth the user's attention rather than assuming a third restatement
 sticks where two didn't.
+
+**Fourth maintenance note (2026-10-24, three-hundred-and-forty-first
+intensive run):** the same drift happened a fourth time, exactly as the
+third note's closing sentence warned it might - but in a different spot
+than the first three (which all hit the "Status" section's prose). This
+time, two "Open backlog" bullets (the branch-recreation safety flag and
+"Routine cadence vs. diminishing returns") each accumulated a growing
+`**Update (Run N):**`/`**Run N: ...**` sub-paragraph on every run that
+touched them, from Run 299 (safety flag) and Run 321 (routine cadence)
+through Run 339/340, regrowing this file to 949 lines despite the
+"Going forward" rule already explicitly naming "Open backlog" as covered.
+Trimmed both bullets back down to a current-state summary; nothing lost -
+every run number named in the removed text (verified: Runs 305-340
+inclusive, spot-checked against Runs 321, 326, 327, 339 by name) has its
+own matching `### ` entry in `docs/PROJECT_STATUS.md`. Unlike the first
+three notes, which only restated the rule in prose (and the third note's
+own text predicted that alone wouldn't hold), this run also added a
+structural enforcement mechanism: `scripts/check-roadmap-size.mjs`
+(`pnpm check:roadmap-size`, wired into CI as a required PR gate) fails the
+build if this file exceeds a fixed line budget, the same pattern
+`check-page-weight.mjs` already uses for page weight. A future run that
+would otherwise let this file regrow past the budget now gets a hard CI
+failure forcing a trim in the same PR, rather than a prose reminder it can
+silently ignore under time pressure the way this happened four times
+running.
 
 **Going forward: a run closes a backlog item by deleting its bullet below**
 (after confirming its `docs/PROJECT_STATUS.md` entry exists), and records
@@ -126,12 +151,16 @@ claims) has now covered `src/lib/*.ts`, `src/components/*.astro`,
 codebase - and found and fixed six real bugs along the way (see Runs 267,
 270, 272, 274, 275 in `docs/PROJECT_STATUS.md`). No further untried file
 remains; re-run from scratch only after a future run materially edits one
-of these files, per each entry's own caveat. **Run 340 extended this angle
-to the test files themselves** (a different failure mode - a weak or
-tautological assertion masking a bug rather than producing one) across the
-~30 "domain-logic" `tests/unit/*.test.ts` files; zero found, no file
-changed. The ~37 `checkXxx.test.ts` files (testing the `scripts/*.mjs`
-validators) are the explicit next slice, left untried.
+of these files, per each entry's own caveat. **Runs 340-341 extended this
+angle to the test files themselves** (a different failure mode - a weak or
+tautological assertion masking a bug rather than producing one), covering
+both populations: the ~30 "domain-logic" `tests/unit/*.test.ts` files
+(Run 340, zero found) and the ~37 `checkXxx.test.ts` files testing the
+`scripts/*.mjs` validators (Run 341, two genuine test-coverage gaps found
+and strengthened - `checkRecordsAgainstSource.test.ts`'s and
+`checkJsonLd.test.ts`'s own weak containment checks - neither masking a
+live bug). No further untried file remains in either population; re-run
+only after a future run materially edits a test file.
 
 The content-verification rotation (re-check whichever content file has
 gone longest since its last `lastReviewed` bump, cross-checking claims
@@ -248,121 +277,35 @@ the full run-by-run history behind all of this, see
 
 ## Open backlog
 
-- **Safety flag (raised 2026-10-20, Run 321): this container's git clone can
-  be *shallow* and missing remote-tracking refs for `intensive/football-
-  reference` even when the branch exists on GitHub with real history -
-  `git branch -a`/a plain `git fetch -q origin` are NOT reliable ways to
-  check whether the branch exists.** Run 321 started with a shallow clone
-  that had no local ref for `origin/intensive/football-reference` (confirmed
-  via `.git/shallow`'s presence), wrongly concluded per the branch-strategy
-  step 3 that the branch "does NOT exist," created a fresh one from `main`,
-  and force-pushed it - which overwrote the real branch (Runs 280-320, 54
-  commits) on GitHub with a single stale commit. This was caught and fully
-  recovered in the same run: the pre-overwrite head SHA was still visible in
-  this repo's own GitHub Actions run history (`list_workflow_runs` on the
-  `intensive/football-reference` branch), the commit was still fetchable by
-  SHA (`git fetch origin <sha>`) because GitHub had not yet garbage-collected
-  it, and the branch was restored with a second force-push back to that SHA.
-  No work was actually lost, but it was close. **Before any future run
-  concludes `origin/intensive/football-reference` doesn't exist, it must
-  verify directly against the remote** - `git ls-remote origin
-  refs/heads/intensive/football-reference` (returns nothing only if the ref
-  truly doesn't exist, regardless of clone depth/local ref state) - rather
-  than trusting local branch listings, which a shallow clone can leave
-  empty even when the remote branch is real. This routine's own stored
-  prompt (synced from YAML in a separate repo, per the "Routine Drift Check"
-  routine's own notes - `update_trigger` refuses to rewrite a trigger it
-  didn't create, so this session could not patch the prompt directly) still
-  has the old, unsafe check as of this run; flagging here, and in this run's
-  push notification, for the user to fix via that sync process rather than
-  waiting for a future run to hit the same near-miss without the warning
-  this entry provides.
-  **Confirmed still unfixed, second independent near-miss (Run 326,
-  2026-10-21):** this run's own container was also a shallow clone
-  (`.git/shallow` present), and its stored prompt still carried the exact
-  same unsafe check this entry describes - a plain `git fetch -q origin`
-  followed by `git branch -a` showed no local ref for `origin/intensive/
-  football-reference` at all, which would have led this run to the same
-  wrong "branch doesn't exist" conclusion Run 321 reached, had the
-  branch-strategy step been followed as literally written. Caught this run
-  not via the `git ls-remote` check this entry recommends but by a
-  different route - a `pull_request_read` lookup of the still-open PR #57
-  (done to check its status before starting work) surfaced the real
-  branch's head SHA independently, prompting a direct `git fetch origin
-  intensive/football-reference` that then succeeded and revealed 59 real,
-  unmerged commits (Runs 280-325). Ran `git ls-remote origin refs/heads/
-  intensive/football-reference` afterward specifically to confirm it does
-  report the branch correctly even from this same shallow clone (it does -
-  this entry's recommended fix is sound, the stored prompt simply still
-  doesn't use it). This is the second independently-caught instance of
-  exactly the failure mode Run 321 described, confirming it's a real,
-  recurring risk rather than a one-off fluke - not every future run will
-  happen to cross-check a PR first and get lucky. Re-flagged in this run's
-  own push notification too, since two confirmed near-misses without a fix
-  is worth surfacing again rather than assuming the first flag will
-  eventually be acted on.
-  **Third occurrence, this one an actual overwrite, not a near-miss (Run
-  327, 2026-10-21):** a variant of the same root fragility, but not the
-  same proximate cause as Run 321/326 - this run's clone was *not* shallow
-  and `git branch -a` correctly showed the branch existed. What went wrong
-  instead: the run started the recommended `git merge-tree`-based
-  staleness check (comparing `origin/main` against
-  `origin/intensive/football-reference` to decide recreate-vs-rebase), but
-  that check ran slowly in the background, and rather than waiting for it,
-  the run substituted a weaker signal - the *original* PR #56 being
-  merged - concluded the branch was stale, recreated it from `main`, and
-  force-pushed, overwriting 46 further runs of real work (280-326) that
-  had accumulated under a second, newer PR (#57) this run hadn't yet
-  looked for. Caught immediately after the push (a `list_pull_requests`
-  call for the branch surfaced PR #57's unfamiliar 46-run changelog) and
-  fully recovered within the same run: the real pre-overwrite tip was
-  still in the run's own local object database from its earlier full
-  `git fetch`, so a second force-push restored it exactly, and the run's
-  own content work was redone as a new commit on top of the correct base.
-  **No work was lost**, but this is now three confirmed occurrences (two
-  executed-and-recovered, one caught pre-push) of the same underlying
-  fragility - the branch-strategy step's own safety depends on either
-  waiting for a merge-tree/staleness check already started, or not having
-  a second PR silently accumulate work under a reused branch name without
-  a run checking for it first. The `git ls-remote` fix above addresses the
-  shallow-clone variant; this variant needs the staleness check itself to
-  never be shortcut by a faster-but-weaker substitute signal. See
-  `docs/PROJECT_STATUS.md`'s Run 327 entry for the full sequence.
-  **Run 328: clean data point, streak broken.** Also a shallow clone; used
-  `git ls-remote origin refs/heads/intensive/football-reference` first (per
-  this entry's own fix) and waited for the full `git fetch`/`merge-tree`
-  staleness check to actually finish before checking out the branch at its
-  real tip - no recreate, no force-push. The routine's own stored prompt
-  still hasn't been patched via the sync process mentioned above; this run's
-  clean outcome is from the run itself following the recommended checks
-  manually, not from the prompt being fixed. Still needs the user's fix.
-  **Run 339: added a repo-side mitigation that doesn't need the external
-  prompt-sync fix at all.** All three incidents trace to the same moment -
-  a run under time pressure hand-deriving the ls-remote/fetch/merge-tree
-  sequence from prose and reaching for a faster, weaker local signal
-  instead. `scripts/check-intensive-branch-state.mjs` (new, run via `pnpm
-  routine:branch-state [branch] [base]`) encodes the exact safe sequence as
-  one read-only command - `git ls-remote` against the real remote (never a
-  local `git branch -a` listing), a full `git fetch` of both refs by name,
-  then `git merge-base --is-ancestor` checked in *both* directions to tell
-  "already merged, recreate" apart from "diverged, rebase" apart from
-  "strictly ahead, check out as-is" - and prints one of exactly three
-  verdicts (`RECREATE_FROM_BASE`/`REBASE_ONTO_BASE`/`UP_TO_DATE`) plus the
-  evidence behind it. It makes no git state changes itself (no push, no
-  branch creation), so adding it carries none of the risk it exists to
-  prevent. Smoke-tested this run against three real cases on this
-  repository's own remote: a genuinely nonexistent branch name
-  (`RECREATE_FROM_BASE` via the ls-remote-empty path), this run's own
-  `intensive/football-reference` vs. `main` (`UP_TO_DATE`, 73 commits
-  ahead - matches `pull_request_read`'s own commit count on PR #57
-  independently), and the unrelated `intensive/mobile-header-menu` branch
-  vs. `main` (`REBASE_ONTO_BASE`, confirmed diverged) - all three verdicts
-  matched hand-verification. This does not patch the routine's own stored
-  prompt (that external sync-process fix is still the user's call, per the
-  original flag above) - it gives any future run, including one still
-  reading the old unsafe instructions literally, a one-command safe
-  alternative to reach for instead of re-deriving the check from scratch
-  under the same time pressure that caused all three incidents.
+- **Safety flag (raised Run 321, 2026-10-20): `git branch -a` / a plain `git
+  fetch -q origin` are NOT reliable ways to check whether
+  `intensive/football-reference` exists** - a shallow clone can show no
+  local ref for it even when the branch is real on GitHub with substantial
+  history. Three incidents followed from exactly this gap: Run 321 (a
+  shallow clone's missing ref led it to wrongly conclude the branch "doesn't
+  exist," recreate it from `main`, and force-push over 54 real commits -
+  caught and fully recovered the same run via the pre-overwrite SHA still
+  in GitHub's Actions history); Run 326 (a second near-miss, caught before
+  any push by cross-checking PR #57 first); Run 327 (an actual overwrite of
+  46 further runs' work, this time from substituting a weaker signal for a
+  slow-running staleness check rather than a shallow clone - caught
+  immediately after the push and fully recovered, no work lost). The safe
+  sequence: `git ls-remote origin refs/heads/intensive/football-reference`
+  to check existence (reliable regardless of clone depth), a full `git
+  fetch` of both branch names, then `git merge-base --is-ancestor` checked
+  in *both* directions to tell "already merged, recreate," "diverged,
+  rebase," and "strictly ahead, check out as-is" apart - never substituting
+  a faster, weaker signal under time pressure. **Run 339 added
+  `scripts/check-intensive-branch-state.mjs`** (`pnpm routine:branch-state
+  [branch] [base]`), a read-only repo-side tool encoding that exact sequence
+  and printing one of `RECREATE_FROM_BASE`/`REBASE_ONTO_BASE`/`UP_TO_DATE`
+  plus its evidence - usable without depending on the routine's own
+  externally-synced stored prompt being patched (`update_trigger` can't
+  rewrite a trigger this session didn't create, so that prompt-sync fix
+  remains the user's own call). Runs 328-340 (13 consecutive runs) have used
+  the safe sequence, manually or via the new script, with no further
+  incident. See `docs/PROJECT_STATUS.md`'s Run 321/326/327/339 entries for
+  the full incident-by-incident detail.
 - **`.git` history bloat from committed PDFs - decision overdue, unresolved
   across 8 runs (289-296, 2026-10-14 to 2026-10-16):** root cause and the
   Run 293 partial fix are fully written up in `docs/PROJECT_STATUS.md`'s
@@ -612,232 +555,35 @@ the full run-by-run history behind all of this, see
   deliberate build-only integration-test choice (same as `sitemap.xml.ts`,
   documented in `tests/unit/contentPages.test.ts`'s own header comment), not
   an untested pure-function branch - no action needed, don't re-investigate.
-- **Routine cadence vs. diminishing returns (flagged Run 299, 2026-10-16;
-  streak broken at Run 305):** nine runs in a row (296-304), all within
-  about three days, each independently concluded there was no new
-  actionable backlog item: every open item above was either not-yet-due,
-  environment-blocked, or explicitly awaiting the user's own sign-off, and
-  every retriable research question had already been retried with no new
-  angle available. Run 305 broke the streak with a genuinely new angle on
-  an old gap (see the resolved EURO 1996/2020 attendance bullet above) -
-  evidence the pool wasn't fully exhausted, just stuck on a repeated query
-  shape. Two concrete things would still unblock further new work: the
-  user picking one of the three `.git`-bloat options above (or the
-  `long-title` call, or the pre-ceremony-shortlist scope question), or the
-  2026 Ballon d'Or ceremony actually happening (26 October). Until either
-  happens, a future run should keep trying genuinely different angles on
-  the remaining open research items before falling back to the standing
-  browser sweep/dependency-bump cadence as a default. **Update (Run 306):**
-  the DFB-datencenter approach this note flagged as untried on UEFA Nations
-  League's Team-of-the-Tournament/attendance gaps has now been tried and is
-  also exhausted (see those two bullets' own notes) - no genuinely new
-  angle on any open research item is currently known; the next one will
-  need to come from a future run's own fresh idea, not a restatement of
-  this note. **Update (Run 307):** tried two fresh angles anyway - other
-  Finals participants' federation sites (RFEF/FIGC/FFF, plus a Portuguese-
-  language search) for the Nations League Team-of-the-Tournament gap, and
-  extending the "oldest/youngest award winner" idea to Nations League's
-  own Player of the Finals award (only 4 editions, cheap to check) - both
-  came back negative, same as every other angle tried on these two items.
-  Still no new angle known; a future run is better spent on the health-
-  check/browser-sweep cadence or the items awaiting the user's sign-off
-  above until one surfaces. **Update (Run 308):** no new research angle
-  surfaced this run either; ran the due ten-script manual browser/
-  accessibility sweep instead (clean across all ten - see the Status
-  section above) as the genuinely useful quality pass this note's own
-  fallback describes, plus a routine `html-validate` patch bump and a
-  full health re-confirmation. PR #56 (the 11-day-stuck PR flagged across
-  13 runs, 263-279) was confirmed merged as of Run 299 and is not a
-  concern on PR #57, open 5 days with a clean mergeable state as of this
-  run - the standing process flag from the "Status" history above is
-  resolved and does not need repeating. **Update (Run 311):** picked up
-  the content-verification rotation's 13-way tie with a whole-page third
-  independent cross-check of `content/uefa-nations-league.md` (see its
-  own `docs/PROJECT_STATUS.md` entry) - no discrepancies, `lastReviewed`
-  bumped. The three items awaiting the user's own sign-off (`.git`-bloat,
-  `long-title`, pre-ceremony Ballon d'Or shortlist scope) have now sat
-  unanswered since Runs 289-296/298/303 respectively with no response in
-  the interim - flagged again directly in this run's push notification,
-  since restating them in this file alone clearly hasn't surfaced them to
-  the user. **Update (Run 318):** found another real, live bug via the same
-  rotation - Run 317's own "Winning managers"/"Winning captains" second-pass
-  pattern (first applied to UEFA EURO) extended to Copa América turned up a
-  genuine factual error this page had carried since the original 2026-09-04
-  captain-recovery pass: 2007's winning captain was recorded as Lúcio, who
-  was not even in that edition's squad; two independent lineup sources
-  (11v11.com's own match-report lineup, and a second, separately-sourced
-  lineup) agree the actual captain was Juan, standing in for suspended
-  regular skipper Gilberto Silva. Corrected in both languages - see
-  `docs/PROJECT_STATUS.md`'s Run 318 entry and `docs/SOURCES.md`'s matching
-  Copa América entry for the full citation list. Also corrected this file's
-  own prior claim (from Run 317's entry above) that all 14 `content/*.md`
-  files were tied at `lastReviewed: 2026-10-19` - `copa-america.md` and
-  `fifa-world-cup.md` were actually still at `2026-10-18`, the same kind of
-  stale-date miscount Run 317 itself had to correct from Run 316; confirmed
-  by running `grep lastReviewed content/*.md` directly rather than trusting
-  the prior entry's prose. `copa-america.md` is now at `2026-10-20`.
-  **Update (Run 319):** extended the same "Winning managers"/"Winning
-  captains" second-cross-check pattern to `content/fifa-world-cup.md` (the
-  next-longest-stale file) - no discrepancies found this time (unlike
-  Run 318's Copa América pass); see `docs/PROJECT_STATUS.md`'s Run 319
-  entry and `docs/SOURCES.md`'s matching FIFA World Cup entry.
-  `fifa-world-cup.md` is now also at `2026-10-20`, tying `copa-america.md`.
-  **Update (Run 320):** picked `content/uefa-nations-league.md` next, per
-  the routine's own competition/award ordering (Copa América, done by Run
-  318; Nations League next). Its "Winning managers"/"Winning captains"
-  sections had already been touched by the 2026-10-18 whole-page pass, but
-  only as part of one combined check, not a later, separately-dated pass
-  against a deliberately distinct source mix - gave them that dedicated
-  second cross-check (Run 317's pattern). All four managers and all four
-  captains (2019-2025) re-confirmed via a source mix distinct from both the
-  original audits and the 2026-10-18 pass; no discrepancies found. See
-  `docs/PROJECT_STATUS.md`'s Run 320 entry and `docs/SOURCES.md`'s matching
-  Nations League entry. `uefa-nations-league.md` is now at `2026-10-20`,
-  tying `copa-america.md`/`fifa-world-cup.md`; the remaining 11
-  `content/*.md` files sit one day behind at `2026-10-19` - a future run
-  should pick one of those 11 next by the routine's own competition/award
-  ordering (Ballon d'Or is next).
-  **Update (Run 321-323):** no further rotation pick made - Run 322
-  explicitly skipped a redundant Ballon d'Or re-audit (already had three
-  independent passes on record with no under-audited sub-section left) in
-  favor of research-angle and health-check work; Run 323 ran the ten-script
-  browser sweep instead. The 11-file tie at `2026-10-19` is unchanged.
-  **Update (Run 324):** re-confirmed the 11-file tie is still unchanged and
-  deliberately did not force a fourth Ballon d'Or pass or a second Golden
-  Boot pass with no new angle - every `content/*.md` file already has at
-  least two independent verification passes on record per the Status
-  section above; a third/fourth pass on the same file with the same kind of
-  check (not a genuinely distinct source mix or sub-section) is restatement,
-  not new coverage. Spent this run's research budget on the Nations League
-  Team-of-the-Tournament gap instead (see that item's own update below) -
-  still negative, but via a genuinely narrower angle than any prior attempt.
-  **Update (Run 325):** second consecutive run with no new rotation pick,
-  content-file edit, or resolved research gap - a full re-check of every
-  open item in this file found nothing had moved since Run 324 (confirmed
-  directly rather than trusted from its own prose). Spent the run on a full
-  health re-confirmation (`pnpm install`/`lint`/`test`/`build`, all 33 fast
-  `check:*` scripts individually, `pnpm audit`, `knip`, `pnpm outdated`) and
-  a direct re-verification of PR #57's CI/mergeability/comment state via
-  GitHub's own API rather than assuming it - all clean, nothing new. The
-  World Cup 1930/1950 attendance gap was deliberately left untried (it's a
-  two-conflicting-sources dispute, not a no-source gap - see that item's own
-  wording above; another search would just re-surface the same two
-  figures). The three items awaiting the user's own sign-off are now
-  unanswered for roughly two weeks (the oldest since Run 289) - flagged
-  again in this run's own push notification.
-  **Update (Run 331, 2026-10-22):** picked up the due ten-script manual
-  browser/accessibility sweep (eight runs since the last full pass, Run
-  323) rather than force a content-verification pick with no fresh angle -
-  every `content/*.md` file still sits at a `lastReviewed` tied at
-  `2026-10-19` or later with no new access path on any open research item.
-  All ten scripts came back clean (see the Status section above); a
-  container restart killed the `check:color-contrast` run mid-sweep (the
-  same failure mode Run 323 hit - a recurring environment trait, not a bug
-  in this run's own commands), and it was simply restarted and completed
-  clean with no work lost. Also found a new, narrower dependency blocker
-  while running the routine `pnpm outdated` check: `astro@7.4.2` (the next
-  patch release) requires Node.js `>=22.23.4`, and this container's Node is
-  `v22.22.0` - one patch below that floor. Bumped `@astrojs/check` to
-  0.9.12 alone (its own peer range unaffected) but reverted the `astro`
-  bump after it broke `pnpm lint`/`pnpm build` outright; see the new
-  dedicated backlog item above. The three sign-off items remain
-  unanswered, now 8 days past Run 289's original flag; re-escalated in
-  this run's own push notification. The 2026 Ballon d'Or ceremony is four
-  days out (26 October) - still not checkable.
-  **Update (Run 332):** picked up the nine thin utility `content/*.md`
-  files for a second independent front-to-back cross-reference against the
-  live implementation (see the Status section's content-verification
-  paragraph above) - no new discrepancy found, `lastReviewed` bumped so all
-  fourteen content files are tied again. Also tried one more negative
-  search angle on the Nations League Team-of-the-Tournament gap (see that
-  item's own update above). The three sign-off items are now 9+ days
-  unanswered; re-escalated again in this run's own push notification. The
-  2026 Ballon d'Or ceremony is still four days out (26 October) - not yet
-  checkable.
-  **Update (Run 333):** no new rotation pick or research angle - every
-  content file is already tied, the ten-script sweep isn't due, and
-  re-trying the Nations League gap one run after Run 332's own attempt
-  would be restatement. Re-checked both environment blockers directly
-  instead of assuming them stale: this run's own container is still on
-  Node.js `v22.22.0` (the `astro` 7.4.2 bump stays blocked) and `WebFetch`
-  to `en.wikipedia.org` still returns `ENOTFOUND` (the link-liveness sweep
-  stays blocked) - same results as Run 331/the two-hundred-and-thirteenth
-  run respectively, now reconfirmed rather than carried forward unchecked.
-  Spent the rest of the run on a full health re-confirmation (clean
-  throughout - see `docs/PROJECT_STATUS.md`'s Run 333 entry) and made no
-  code or content change, on the view that a verification-only pass is
-  more honest than manufacturing a diff with no real value. The sign-off
-  items are now a full four (the three above plus the branch-recreation
-  safety flag), 9-10 days unanswered; re-escalated again in this run's own
-  push notification. The 2026 Ballon d'Or ceremony is four days out (26
-  October) - still not yet checkable.
-  **Update (Run 334):** found one genuinely new angle to try - Croatian-
-  language press on the Nations League Team-of-the-Tournament gap (see that
-  item's own update above) - which came back negative, a twelfth
-  consecutive result. Otherwise a repeat of Run 333's own full health
-  re-confirmation (clean throughout - see `docs/PROJECT_STATUS.md`'s Run
-  334 entry), no code or content change. The four sign-off items are now
-  10-11 days unanswered; re-escalated again in this run's own push
-  notification. The 2026 Ballon d'Or ceremony is three days out (26
-  October) - still not yet checkable.
-  **Update (Run 337):** picked up `golden-boot.md`, the content-verification
-  rotation's last remaining longest-stale file (`2026-10-21`) - its World
-  Cup/EURO tables already carry two full-table audits, a tie-resolution
-  pass, and a third independent cross-check of the 2026 World Cup podium
-  specifically, so rather than force a new angle with none available, gave
-  that same podium a fourth confirmatory `WebSearch` pass (still correct)
-  and re-checked the EURO "37-year record" claim (still traces to the same
-  single ultimate source, unchanged). All fourteen `content/*.md` files are
-  now tied at `lastReviewed` 2026-10-22 or 2026-10-23. Full health
-  re-confirmation otherwise clean (`pnpm install --frozen-lockfile`/`lint`/
-  `test`/`build`, all 32 fast non-browser `check:*` scripts bar the two
-  PDF ones individually, `pnpm audit`, `knip`, `pnpm outdated`); both
-  environment blockers (Node `v22.22.0` vs. `astro@7.4.2`'s `>=22.23.4`
-  floor; `@astrojs/check`'s peer range vs. `typescript` 7) reconfirmed
-  unchanged. PR #57 reconfirmed healthy directly via GitHub's API
-  (`mergeable_state: "clean"`, head SHA matching this run's own starting
-  point, all 4 PR comments are prior self-resolved CI fixes). The four
-  sign-off items are now 12+ days unanswered; re-escalated again in this
-  run's own push notification. The 2026 Ballon d'Or ceremony is three days
-  out (26 October) - still not yet checkable.
-  **Update (Run 338):** no new rotation pick or research angle available
-  either - the fourteen-way `lastReviewed` tie is unchanged and
-  `en.wikipedia.org` is still egress-blocked. Picked up the one genuinely
-  overdue item instead: the ten-script manual browser/accessibility sweep
-  (seven runs since Run 331's last full pass) - all ten clean, including a
-  full, uninterrupted `check:color-contrast` run (1,422 page loads, zero
-  WCAG 1.4.3 violations), with no container restart mid-sweep this time.
-  Otherwise a full health re-confirmation, clean throughout, no code or
-  content change - see `docs/PROJECT_STATUS.md`'s Run 338 entry. The four
-  sign-off items are unchanged and still 12+ days unanswered; re-escalated
-  again in this run's own push notification. The 2026 Ballon d'Or ceremony
-  is three days out (26 October) - still not yet checkable.
-  **Update (Run 339):** no new rotation pick either (the `lastReviewed`
-  split is unchanged) and a fresh player-by-player `WebSearch` angle on the
-  Nations League Team-of-the-Tournament gap (checking individual players'
-  own coverage/bios rather than the tournament-level query every prior
-  attempt used) came back negative too - fifteenth consecutive negative
-  result, see that item's own entry above. Instead of re-running the
-  ten-script browser sweep a run early (not due until several more runs
-  past Run 338) or manufacturing a content diff with no real finding behind
-  it, picked up the one standing item this routine itself *can* act on
-  without the user's sign-off: the branch-recreation safety flag's own
-  three-incident root cause. Added `scripts/check-intensive-branch-state.mjs`
-  (see the safety-flag entry above for the full detail) - a repo-side,
-  read-only safe-check tool that doesn't depend on the external
-  stored-prompt sync fix the flag has been waiting on since Run 321. Full
-  health re-confirmation otherwise clean (`pnpm install --frozen-lockfile`,
-  `pnpm lint`/`test`/`build` - 1086 tests, 711 pages, 0/0/0 lint, unchanged
-  counts; `pnpm dlx knip --no-config-hints` clean including the new
-  script, which knip correctly resolves as a `package.json` script entry
-  point rather than flagging unused); both environment blockers (Node
-  `v22.22.0` vs. `astro@7.4.2`'s floor; `typescript` 7 vs. `@astrojs/check`'s
-  peer range) reconfirmed unchanged via a fresh `pnpm outdated`. PR #57
-  reconfirmed healthy directly via GitHub's API before and will be
-  reconfirmed again after this push. The four sign-off items are now 13+
-  days unanswered; re-escalated again in this run's own push notification.
-  The 2026 Ballon d'Or ceremony is three days out (26 October) - still not
-  yet checkable.
+- **Routine cadence vs. diminishing returns (flagged Run 299, 2026-10-16):**
+  every open backlog item above is now either not-yet-due, environment-
+  blocked, or awaiting the user's own sign-off, and every retriable research
+  question (UEFA Nations League's Team-of-the-Tournament/attendance gaps,
+  the various "oldest/youngest award winner" sub-items under "Ideas not yet
+  scoped" below) has been retried across 15+ independently-reasoned angles
+  (federation sites, UEFA's own domain, stats-site framing, Croatian-
+  language press, player-level search) with no new lead - see each item's
+  own entry above/below for its angle-by-angle detail, which is where that
+  detail belongs rather than repeated here. Runs 299-340 have each
+  independently reconfirmed this rather than manufacturing busywork,
+  picking up whichever genuinely due item existed instead (the periodic
+  ten-script browser/accessibility sweep, dependency bumps, full health
+  re-confirmations, PR #57 status re-checks) - and when a genuinely new
+  angle or gap did surface, shipped it (Run 305's EURO 1996/2020 attendance
+  resolution, Run 315's Nations League host-rule fix, Runs 317-320's
+  winning-manager/captain second cross-checks finding one real bug in
+  Copa América, Run 339's branch-safety tooling, Run 340's test-file
+  code-review angle). **Four items await the user's own sign-off** (the
+  `.git`-bloat decision, the `long-title` call, the pre-ceremony Ballon
+  d'Or shortlist scope question, and the branch-recreation stored-prompt
+  fix - the last now largely mitigated by Run 339's repo-side tool),
+  unanswered since Run 289 (2026-10-14); each run re-escalates via its own
+  push notification rather than assume an earlier one will be acted on. The
+  2026 Ballon d'Or ceremony (26 October) is only days out - once it passes,
+  `content/ballon-dor.md`'s 2026 edition becomes addable, and a future run
+  should re-check `pnpm outdated` for the `astro`/Node.js and `typescript`/
+  `@astrojs/check` blockers each time a new release appears.
+
 
 ## Ideas not yet scoped
 
