@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (344 intensive runs as of 2026-10-24) lives
+verification sweep and decision (345 intensive runs as of 2026-10-24) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -110,25 +110,24 @@ into `.github/workflows/ci.yml` as required PR gates; the other ten
 `check:text-spacing`/`check:focus-appearance`/`check:color-contrast`) are
 full-site Playwright/browser sweeps kept manual/intensive-run-only rather
 than a required PR gate, purely for their ~700-to-1,400-page-load runtime -
-re-run periodically (most recently Run 338, seven runs after the prior
-full pass at Run 331 - all ten clean again, including
-`check:color-contrast` - the heaviest, 1,422 page loads, confirmed clean
-with `PW_EXECUTABLE_PATH` pointed at the pre-installed
-`chromium_headless_shell-1194/chrome-linux/headless_shell.real` binary per
-Run 265's own fix - zero WCAG 1.4.3 violations across all 711 pages in
-both color schemes; `check:lighthouse` also reconfirmed, 39 pages all
->= 0.9 in every category with the same one documented noindex/SEO
-exception as before. Run 338 ran all ten scripts to completion with no
-container-restart interruption, unlike Runs 323/331's own mid-sweep
-restarts (recovered same-run both times with no work lost). See Run 338's
-own `docs/PROJECT_STATUS.md` entry. Run 314
-also found that this sweep and `pnpm build:pdfs` must never run
-concurrently - see this file's "Operational note (Run 314)" above) rather
-than on every change. Run 294 found this same
+re-run periodically (most recently Run 345, seven runs after the prior
+full pass at Run 338 - all ten clean again, including
+`check:color-contrast` - the heaviest, 1,422 page loads - zero WCAG 1.4.3
+violations across all 711 pages in both color schemes; `check:lighthouse`
+also reconfirmed, 39 pages all >= 0.9 in every category with the same one
+documented noindex/SEO exception as before. The pre-installed Playwright
+browser cache's `chrome-headless-shell` revision has drifted again since
+Run 265's fix (now `chromium_headless_shell-1243`, not `-1194`) - same
+`PW_EXECUTABLE_PATH` workaround, just pointed at the current revision's
+`.real` binary; this is expected per-environment drift, not a bug, and the
+exact revision number is only worth re-noting here if a future run hits it
+again. Run 314 also found that this sweep and `pnpm build:pdfs` must never
+run concurrently - see this file's "Operational note (Run 314)" above)
+rather than on every change. Run 294 found this same
 `PW_EXECUTABLE_PATH` fix is also needed for `pnpm test:e2e` in this
 session's container (not just the ten manual scripts above) - without it,
 every test fails instantly with a `chrome-headless-shell`
-executable-not-found error (the cache only has the `-1194` revision,
+executable-not-found error (the cache only has one revision installed,
 whatever `@playwright/test` release this container's cache predates looks
 for a later one); with it, a 43-test sample (including every axe-core-
 driven accessibility spec, the ones most likely to break from that run's
