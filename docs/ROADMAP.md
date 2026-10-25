@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (346 intensive runs as of 2026-10-24) lives
+verification sweep and decision (347 intensive runs as of 2026-10-25) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -101,8 +101,9 @@ there in the same pass.
 
 The standing health check (`pnpm install`/`pnpm outdated`, `pnpm lint`/`pnpm
 test`/`pnpm test:coverage`/`pnpm build`, all 44 `check:*` scripts, `pnpm
-audit`, `pnpm dlx knip --no-config-hints`) comes back clean run after run,
-with one new standing exception as of Run 344 - see "Open backlog" below.
+audit`, `pnpm dlx knip --no-config-hints`) comes back clean run after run -
+the one standing `pnpm audit` exception Run 344 found was resolved in-range
+by Run 347, see `docs/PROJECT_STATUS.md`'s matching entry.
 34 of the `check:*` scripts are fast enough to run every time and are wired
 into `.github/workflows/ci.yml` as required PR gates; the other ten
 (`check:html`/`check:lighthouse`/`check:reflow`/`check:landscape`/
@@ -395,23 +396,6 @@ the full run-by-run history behind all of this, see
   on the same footing as the `.git`-bloat and `long-title` items above.
   Flagged to the user directly; a future run should add the section (both
   languages) if the user says yes, or drop this note if they say no.
-- **`pnpm audit` high-severity `zod` finding (new, Run 344, 2026-10-24) - blocked, dev-only.**
-  `lighthouse@13.5.0 > puppeteer-core@25.11.0 > chromium-bidi@17.0.2 > zod@3.25.76`
-  carries [GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5)
-  (memory exhaustion validating oversized constrained collections); the fix
-  needs `zod >=4.6.6`, but `chromium-bidi@17.0.2` itself declares
-  `zod: "^3.24.1"`, a major-version-incompatible range this project can't
-  widen with a `pnpm.overrides` force without risking breaking `lighthouse`'s
-  own internals (zod v4 changed its API from v3) - untested and not worth
-  risking for a dev-only tool used solely in the manual `check:lighthouse`
-  sweep, never shipped to the site itself. Four other `pnpm audit` findings
-  surfaced the same run (`fast-uri@3.1.8`, pulled in via `@astrojs/check`'s
-  language-server/`ajv` chain, two moderate + two low) *were* safely fixable
-  in-range (`ajv` itself declares `fast-uri: "^3.0.1"`, and `3.1.9` is the
-  patched version within that range) - fixed via `pnpm update fast-uri`
-  (lockfile-only change, no `package.json` edit needed), re-confirmed clean
-  on `pnpm lint`/`test`/`build` after. Re-check next time `pnpm outdated`
-  shows a new `lighthouse`/`puppeteer-core` release.
 - **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.12` (latest
   published, bumped by Run 331 - see the `astro`/`@astrojs/check` item just
   below) still only declares `typescript: '^5.0.0 || ^6.0.0'` as a peer
