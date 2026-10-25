@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (349 intensive runs as of 2026-10-25) lives
+verification sweep and decision (352 intensive runs as of 2026-10-25) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -111,18 +111,17 @@ into `.github/workflows/ci.yml` as required PR gates; the other ten
 `check:text-spacing`/`check:focus-appearance`/`check:color-contrast`) are
 full-site Playwright/browser sweeps kept manual/intensive-run-only rather
 than a required PR gate, purely for their ~700-to-1,400-page-load runtime -
-re-run periodically (most recently Run 345, seven runs after the prior
-full pass at Run 338 - all ten clean again, including
+re-run periodically (most recently Run 352, seven runs after the prior
+full pass at Run 345 - all ten clean again, including
 `check:color-contrast` - the heaviest, 1,422 page loads - zero WCAG 1.4.3
 violations across all 711 pages in both color schemes; `check:lighthouse`
 also reconfirmed, 39 pages all >= 0.9 in every category with the same one
 documented noindex/SEO exception as before. The pre-installed Playwright
-browser cache's `chrome-headless-shell` revision has drifted again since
-Run 265's fix (now `chromium_headless_shell-1243`, not `-1194`) - same
-`PW_EXECUTABLE_PATH` workaround, just pointed at the current revision's
-`.real` binary; this is expected per-environment drift, not a bug, and the
-exact revision number is only worth re-noting here if a future run hits it
-again. Run 314 also found that this sweep and `pnpm build:pdfs` must never
+browser cache's `chrome-headless-shell` revision is still `chromium_headless_shell-1243`
+(unchanged since Run 345) - same `PW_EXECUTABLE_PATH` workaround, just
+pointed at that revision's `.real` binary; this is expected per-environment
+drift, not a bug, and the exact revision number is only worth re-noting here
+if a future run hits a different one. Run 314 also found that this sweep and `pnpm build:pdfs` must never
 run concurrently - see this file's "Operational note (Run 314)" above)
 rather than on every change. Run 294 found this same
 `PW_EXECUTABLE_PATH` fix is also needed for `pnpm test:e2e` in this
@@ -138,7 +137,7 @@ Playwright browser install on every PR push.
 `knip` shows exactly one standing false positive (`@cspell/dict-hr-hr`,
 used only via `.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS
 `import` knip's static analysis can see). Current counts (confirmed fresh
-this run): 1094 unit tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711
+this run): 1112 unit tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711
 pages built; 1055 Playwright e2e tests as of the last full cold-start run
 (Run 254). Run 311 also re-confirmed `pnpm audit` clean and `knip`'s one
 standing false positive unchanged.
