@@ -326,7 +326,18 @@ the full run-by-run history behind all of this, see
   then confirmed `UP_TO_DATE` via the safety script *before* continuing.
   This confirms the prompt-sync fix is not merely unapplied but the tool
   built to route around it hasn't reached the prompt text that would tell
-  a run to use it - see `docs/PROJECT_STATUS.md`'s Run 342 entry.
+  a run to use it - see `docs/PROJECT_STATUS.md`'s Run 342 entry. **Runs 349
+  and 350 (2026-10-25) each repeated it again** - same unpatched-prompt root
+  cause, two further distinct proximate failure modes (349: a narrow `git
+  fetch origin main` leaving no local ref at all; 350: a correct `git fetch
+  -q origin` whose own branch-listing result the run itself misread) - both
+  caught via the same `list_pull_requests` cross-check and fully recovered
+  with zero work lost. Three runs, three different ways of getting the
+  hand-rolled check wrong, the one scripted fix never reached for because
+  nothing in the prompt mentions it - see `docs/PROJECT_STATUS.md`'s Run 349
+  and Run 350 entries. Still the user's own call to patch the stored prompt
+  itself; re-escalated via each run's own push notification rather than
+  attempted unilaterally.
 - **`.git` history bloat from committed PDFs - decision overdue, unresolved
   across 8 runs (289-296, 2026-10-14 to 2026-10-16):** root cause and the
   Run 293 partial fix are fully written up in `docs/PROJECT_STATUS.md`'s
