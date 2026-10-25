@@ -335,9 +335,23 @@ the full run-by-run history behind all of this, see
   with zero work lost. Three runs, three different ways of getting the
   hand-rolled check wrong, the one scripted fix never reached for because
   nothing in the prompt mentions it - see `docs/PROJECT_STATUS.md`'s Run 349
-  and Run 350 entries. Still the user's own call to patch the stored prompt
-  itself; re-escalated via each run's own push notification rather than
-  attempted unilaterally.
+  and Run 350 entries. **Run 351 added a second, independent layer that
+  doesn't depend on any run's prompt text at all:** a pre-push git hook
+  (`.githooks/pre-push` + `scripts/guard-intensive-branch-push.mjs`, wired in
+  automatically by `package.json`'s new `postinstall` script setting
+  `core.hooksPath`) that refuses any non-fast-forward push to this branch
+  unless every commit the remote currently has survives as a patch-id
+  somewhere in the new history being pushed (so a legitimate rebase still
+  passes, but a branch recreated from `main` with none of the prior work is
+  refused) - verified directly against this branch's own real state (a safe
+  no-op push and a simulated recreate-from-`main` disaster were each
+  correctly allowed/refused) before being relied on. This closes the gap at
+  the git level on every future run regardless of whether the stored prompt
+  itself ever gets patched; a deliberate override remains available
+  (`ALLOW_FORCE_PUSH_INTENSIVE_BRANCH=1`) for a genuinely-intended case. Still
+  the user's own call to patch the stored prompt itself on top of this;
+  re-escalated via each run's own push notification rather than attempted
+  unilaterally.
 - **`.git` history bloat from committed PDFs - decision overdue, unresolved
   across 8 runs (289-296, 2026-10-14 to 2026-10-16):** root cause and the
   Run 293 partial fix are fully written up in `docs/PROJECT_STATUS.md`'s
