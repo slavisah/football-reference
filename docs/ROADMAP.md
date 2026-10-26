@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (352 intensive runs as of 2026-10-25) lives
+verification sweep and decision (356 intensive runs as of 2026-10-26) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -160,7 +160,18 @@ both populations: the ~30 "domain-logic" `tests/unit/*.test.ts` files
 and strengthened - `checkRecordsAgainstSource.test.ts`'s and
 `checkJsonLd.test.ts`'s own weak containment checks - neither masking a
 live bug). No further untried file remains in either population; re-run
-only after a future run materially edits a test file. **Run 354 extended
+only after a future run materially edits a test file. **Run 356 extended
+the same angle to `tests/e2e/*.spec.ts`** (34 files, 11,107 lines - the one
+test-file population Runs 340-341 hadn't covered) and found one real gap:
+`accessibility-focus-not-obscured.spec.ts`'s quiz/records sticky-overlay
+tests each loop up to 60 Tab presses capped at 8/10 matching elements, but
+only asserted `found > 0` on exit - unlike the same file's own table-header
+test 19 lines earlier, which calibrates an identical check to `> 5`.
+Measured the real steady-state counts directly (8 and 10) before picking
+`> 5`/`> 6`, and mutation-tested by capping the loop at 1 to confirm the
+old assertion would have passed while the new one correctly fails. No
+further finding across the other 33 files; re-run only after a future run
+materially edits one of these 34. **Run 354 extended
 the same angle to the three branch-safety scripts added after the original
 sweep closed** (`check-intensive-branch-state.mjs`, Run 339;
 `guard-intensive-branch-push.mjs`, Run 351; `check-roadmap-size.mjs`, Run
