@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (357 intensive runs as of 2026-10-26) lives
+verification sweep and decision (358 intensive runs as of 2026-10-26) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -111,8 +111,8 @@ into `.github/workflows/ci.yml` as required PR gates; the other ten
 `check:text-spacing`/`check:focus-appearance`/`check:color-contrast`) are
 full-site Playwright/browser sweeps kept manual/intensive-run-only rather
 than a required PR gate, purely for their ~700-to-1,400-page-load runtime -
-re-run periodically (most recently Run 352, seven runs after the prior
-full pass at Run 345 - all ten clean again, including
+re-run periodically (most recently Run 358, six runs after the prior
+full pass at Run 352 - all ten clean again, including
 `check:color-contrast` - the heaviest, 1,422 page loads - zero WCAG 1.4.3
 violations across all 711 pages in both color schemes; `check:lighthouse`
 also reconfirmed, 39 pages all >= 0.9 in every category with the same one
