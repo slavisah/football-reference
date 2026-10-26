@@ -107,7 +107,10 @@ test.describe('focus is never entirely hidden behind a sticky overlay (WCAG 2.4.
       found += 1;
       expect(result.fullyCovered, `${result.tag} "${result.text}" fully hidden under the sticky score bar`).toBe(false);
     }
-    expect(found).toBeGreaterThan(0);
+    // Sanity: this really walked most of the 8-element sample the loop caps
+    // at, not an empty loop that would pass vacuously (same standard as the
+    // table-header test above).
+    expect(found).toBeGreaterThan(5);
   });
 
   test('tabbing through a long content page never hides focus under the sticky site header', async ({ page }) => {
@@ -122,6 +125,9 @@ test.describe('focus is never entirely hidden behind a sticky overlay (WCAG 2.4.
       found += 1;
       expect(result.fullyCovered, `${result.tag} "${result.text}" fully hidden under the sticky site header`).toBe(false);
     }
-    expect(found).toBeGreaterThan(0);
+    // Sanity: this really walked most of the 10-element sample the loop caps
+    // at, not an empty loop that would pass vacuously (same standard as the
+    // table-header test above).
+    expect(found).toBeGreaterThan(6);
   });
 });
