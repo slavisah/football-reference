@@ -160,7 +160,24 @@ both populations: the ~30 "domain-logic" `tests/unit/*.test.ts` files
 and strengthened - `checkRecordsAgainstSource.test.ts`'s and
 `checkJsonLd.test.ts`'s own weak containment checks - neither masking a
 live bug). No further untried file remains in either population; re-run
-only after a future run materially edits a test file.
+only after a future run materially edits a test file. **Run 354 extended
+the same angle to the three branch-safety scripts added after the original
+sweep closed** (`check-intensive-branch-state.mjs`, Run 339;
+`guard-intensive-branch-push.mjs`, Run 351; `check-roadmap-size.mjs`, Run
+341 - none existed when Run 275 closed `scripts/*.mjs` as fully covered,
+so none had had this angle applied) and found one real, currently-dormant
+gap: `guard-intensive-branch-push.mjs`'s `checkOneRef()` learned the
+remote's true tip via `ls-remote` but never fetched that commit, so a
+`merge-base`/patch-id check against it would fail with "unknown revision"
+- misread as "unverifiable, refuse" - whenever this clone's last fetch
+predated the remote's current tip (its own sibling script,
+`check-intensive-branch-state.mjs`, already fetches both refs explicitly
+for exactly this reason). Fixed by fetching the guarded ref before
+reasoning about it; re-verified by hand against this branch's own real
+state (the same no-op/simulated-disaster pair Run 351 used) with no
+regression. No further untried file remains in `scripts/*.mjs`, including
+every file added since the original sweep; re-run only after a future run
+materially edits one of these three again.
 
 The content-verification rotation (re-check whichever content file has
 gone longest since its last `lastReviewed` bump, cross-checking claims

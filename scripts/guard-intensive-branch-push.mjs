@@ -158,6 +158,23 @@ function checkOneRef({ localSha, remoteRef }) {
     return evaluatePush({ trueRemoteSha, localSha, remoteIsAncestorOfLocal: false, missingPatchIds: [] });
   }
 
+  // `ls-remote` only reports the SHA - it never transfers the commit
+  // object. If this clone's last fetch predates the remote's current tip
+  // (e.g. a push landed on the branch after that fetch), every merge-base/
+  // patch-id call below would otherwise fail with "unknown revision" on
+  // `trueRemoteSha`, and that failure gets misread as "not an ancestor" /
+  // "could not verify" rather than "needs a fetch first" - refusing an
+  // actually-safe push for the wrong reason (`check-intensive-branch-
+  // state.mjs` already fetches both refs explicitly before comparing them
+  // for exactly this reason; this hook skipped that step for the branch
+  // side). Fetching by the exact ref name, not the SHA, works against
+  // GitHub even when fetching an arbitrary commit by SHA would not.
+  try {
+    git(['fetch', '-q', 'origin', remoteRef]);
+  } catch (err) {
+    return { allowed: false, reason: `could not fetch ${remoteRef} to verify this push is safe (${err.message}) - refusing out of caution.` };
+  }
+
   const remoteIsAncestorOfLocal = gitOk(['merge-base', '--is-ancestor', trueRemoteSha, localSha]);
   if (remoteIsAncestorOfLocal) {
     return evaluatePush({ trueRemoteSha, localSha, remoteIsAncestorOfLocal, missingPatchIds: [] });
