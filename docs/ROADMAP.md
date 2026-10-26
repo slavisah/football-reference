@@ -350,7 +350,21 @@ the full run-by-run history behind all of this, see
   (`ALLOW_FORCE_PUSH_INTENSIVE_BRANCH=1`) for a genuinely-intended case. Still
   the user's own call to patch the stored prompt itself on top of this;
   re-escalated via each run's own push notification rather than attempted
-  unilaterally.
+  unilaterally. **Run 353 (2026-10-26): a seventh incident, a repeat of
+  Run 327's specific pattern** (trusted PR #56's `merged: true` as proof the
+  branch could be recreated from `main`, without checking for a successor
+  PR first) - caught via `pull_request_read` on PR #57, recovered with zero
+  work lost (the pre-overwrite tip was still a local object from an earlier
+  `git fetch`). Confirmed a precise gap in Run 351's hook: it cannot catch
+  a "recreate from `main`" push at all, because `.githooks/pre-push` only
+  exists in commits on the real `intensive/football-reference` branch, so a
+  checkout of `main` never has it to begin with - `pnpm install` sets
+  `core.hooksPath` regardless, but there's no hook file there for git to
+  run. Also directly tried `update_trigger` on the scheduled task itself:
+  refused ("this routine was created via http_api, not by an agent"),
+  confirming the stored-prompt fix genuinely requires the user's own edit,
+  not just a prior run's assumption that it does. See
+  `docs/PROJECT_STATUS.md`'s Run 353 entry for the full incident.
 - **`.git` history bloat from committed PDFs - decision overdue, unresolved
   across 8 runs (289-296, 2026-10-14 to 2026-10-16):** root cause and the
   Run 293 partial fix are fully written up in `docs/PROJECT_STATUS.md`'s
