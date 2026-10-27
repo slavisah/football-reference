@@ -5,6 +5,7 @@
   "private": true,
   "description": "The Ultimate Football Reference - a family-friendly static football-history website built from Markdown.",
   "scripts": {
+    "postinstall": "git config core.hooksPath .githooks 2>/dev/null || true",
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
@@ -60,10 +61,13 @@
     "check:locale-consistency": "node scripts/check-locale-consistency.mjs",
     "check:theme-color": "node scripts/check-theme-color.mjs",
     "check:spelling": "cspell --no-progress \"content/**/*.md\"",
-    "check:spelling-hr": "node scripts/check-spelling-hr.mjs"
+    "check:spelling-hr": "node scripts/check-spelling-hr.mjs",
+    "check:roadmap-size": "node scripts/check-roadmap-size.mjs",
+    "routine:branch-state": "node scripts/check-intensive-branch-state.mjs",
+    "routine:guard-branch-push": "node scripts/guard-intensive-branch-push.mjs"
   },
   "dependencies": {
-    "astro": "^7.3.8"
+    "astro": "^7.4.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",

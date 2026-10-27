@@ -121,12 +121,10 @@ describe('backToBackStreaks', () => {
       { year: '1968', winner: ['C'] },
     ];
     const streaks = backToBackStreaks(tiedEditions, { multiWinner: true });
-    expect(streaks).toEqual(
-      expect.arrayContaining([
-        { name: 'B', years: ['1960', '1964'] },
-        { name: 'C', years: ['1964', '1968'] },
-      ]),
-    );
+    expect(streaks).toEqual([
+      { name: 'B', years: ['1960', '1964'] },
+      { name: 'C', years: ['1964', '1968'] },
+    ]);
   });
 });
 

@@ -5,7 +5,7 @@ competitionType: international
 confederation: FIFA
 firstEdition: 1930
 lastCompletedEdition: 2026
-lastReviewed: 2026-10-12
+lastReviewed: 2026-10-27
 status: verified
 ---
 
@@ -17,7 +17,7 @@ The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 b
 
 - National teams first play years of qualifying matches within their own confederation to win one of a limited number of finals places.
 - The finals begin with a group stage, where each team plays the others in its group; the leading teams advance.
-- From the round of 16 onward, it is a straight knockout: one defeat and a team is out.
+- From the round of 32 onward (the round of 16 before the 48-team expansion in 2026), it is a straight knockout: one defeat and a team is out.
 - The two semifinal winners meet in the final to decide the champion.
 - The tournament has expanded several times since 1930 - see "Format milestones" below for exactly when.
 
@@ -217,7 +217,7 @@ Every World Cup edition has decided its champion in one match at one stadium, in
 - **1986:** Diego Maradona (Argentina).
 - **1990:** Lothar Matthäus (West Germany).
 - **1994:** Dunga (Brazil).
-- **1998:** Didier Deschamps (France) - also went on to win the trophy as a manager in 2018, joining Beckenbauer as a player-and-manager winner (see "Winning managers" above).
+- **1998:** Didier Deschamps (France) - also went on to win the trophy as a manager in 2018, joining Zagallo and Beckenbauer as a player-and-manager winner (see "Winning managers" above).
 - **2002:** Cafu (Brazil) - the only player to appear in three consecutive World Cup finals (1994, 1998 and 2002).
 - **2006:** Fabio Cannavaro (Italy).
 - **2010:** Iker Casillas (Spain).

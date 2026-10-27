@@ -5,7 +5,7 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-10-13
+lastReviewed: 2026-10-27
 status: verified
 ---
 
@@ -16,7 +16,7 @@ Copa América began in 1916 and is the oldest still-running continental men's na
 ## How it works
 
 - CONMEBOL's ten South American national teams compete, sometimes joined by invited guest teams from outside the region since 1993.
-- The tournament's format has varied more than any other on this site: some early editions crowned a champion by final league-table standings, others by a home-and-away final, and most editions since the 1990s by a group stage into a knockout bracket.
+- The tournament's format has varied more than any other on this site: some early editions crowned a champion by final league-table standings, others (1975, 1979, 1983) by a home-and-away final, and a group stage into a knockout final has decided every edition since 1993 - 1987 was an earlier one-off trial of the same format, and 1989 and 1991 briefly reverted to league-table standings in between.
 - Copa América has not always run on a fixed four-year cycle, unlike the World Cup or EURO.
 
 ## Final venues
@@ -171,6 +171,8 @@ The 1927 correction has a knock-on effect worth calling out explicitly rather th
 
 Every other entry in the 48-entry list (1916-1919, 1921-1926, 1929-2024) was independently checked against the same source mix and matched with no conflict, including the genuinely ambiguous-looking 1959 Ecuador edition (RSSSF's own results-summary page gives José Sanfilippo 5 goals, but RSSSF's more detailed goal-scorer table and Wikipedia's tournament article both agree on 6 - the same "detailed table over tournament summary" preference established by the two corrections above, and the figure the page already carried) and 1983 (RSSSF's tournament-summary line lists a fourth co-scorer, Eduardo Malásquez, at 3 goals, but RSSSF's own detailed goal-scorer table and Wikipedia both place him at 2 - the page's existing three-name entry, without Malásquez, is correct). See `docs/SOURCES.md` for the full citation list.
 
+The **Team of the Tournament winners** section below (55 entries across five editions, 2015-2024) - the only section on this page that had never had a dedicated second independent cross-check, unlike every column/section audited above - got one (2026-10-18, intensive run) via a source mix deliberately distinct from the original 2026-09-02 pass (Cooperativa.cl, La Nación, and AI-search-summary descriptions of indexed pages): NBC Sports and SoccerWire/ISN Soccer's own reporting of the Technical Study Group's announcements, and CONMEBOL's own official Copa América website directly. **No discrepancies found** across any of the five editions: NBC Sports' report of the official 2015 XI (Bravo; Murillo, Medel, Otamendi; Cueva, Díaz, Mascherano, Vidal; Vargas, Guerrero, Messi) matches the page's existing eleven names exactly, resolving the three-way source disagreement the original pass had already flagged and settled via the "Chile supplied five" fact, this time with a source that lists the full roster outright rather than just that one derived fact; SoccerWire/ISN's report of 2016's Technical Study Group XI (Bravo; Isla, Otamendi, Medel, Beausejour; Mascherano, Vidal, Aránguiz; Messi, Vargas, Sánchez) likewise matches exactly, including the "Chile supplied eight" split; 2019 and 2021 both matched their already-documented CONMEBOL-attributed rosters again. 2024 needed a different check, since every outlet search turned up editorial "best XI" picks (90min, Yahoo, ESPN) that visibly disagree with each other and with the page - the same split between official-TSG and fan/outlet picks the 2015 cross-check had already run into; CONMEBOL's own official Best XI article gives a nationality breakdown instead of repeating the outlet picks (five Argentinians, two Colombians, one Ecuadorian, one Canadian, one Uruguayan, one Brazilian), and the page's existing eleven names sort into exactly that breakdown (Martínez/Romero/De Paul/Messi/Lautaro Martínez = 5 Argentina; Davinson Sánchez/James Rodríguez = 2 Colombia; Hincapié = 1 Ecuador; Johnston = 1 Canada; Ugarte = 1 Uruguay; Raphinha = 1 Brazil) - the same nationality-count confirmation method the original 2015 audit used, now independently repeated on a different edition. See `docs/SOURCES.md` for the full citation list.
+
 ## Best Player winners
 
 - CONMEBOL has named a best-player award at every Copa América since 1987; no equivalent award existed at the 32 earlier editions.
@@ -313,7 +315,7 @@ Every other entry in the 48-entry list (1916-1919, 1921-1926, 1929-2024) was ind
 - **1999:** Cafu (Brazil) - the same armband he wore to a World Cup title three years later, earning him Brazil's nickname "Capitão do Penta" (captain of the fifth World Cup star).
 - **2001:** Iván Córdoba (Colombia) - scored the only goal of the final himself, Colombia's only Copa América title.
 - **2004:** Alex (Brazil) - also set a tournament assists record that edition.
-- **2007:** Lúcio (Brazil).
+- **2007:** Juan (Brazil) - wore the armband as a makeshift replacement after regular skipper Gilberto Silva was suspended for the final following a card picked up in the semi-final shootout.
 - **2011:** Diego Lugano (Uruguay) - wore the armband in all six of Uruguay's matches, lifting the trophy after a 3-0 final win over Paraguay.
 - **2015:** Claudio Bravo (Chile) - the first of his two title-winning editions as captain, saving a penalty in the final shootout against Argentina.
 - **2016:** Claudio Bravo (Chile) - his second, back-to-back, Copa América Centenario.
