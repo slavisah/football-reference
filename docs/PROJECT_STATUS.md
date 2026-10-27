@@ -39174,3 +39174,103 @@ externally-checkable claims (per Run 278's own assessment, still
 accurate). PR #56 remains unmerged and is now flagged for a thirteenth run
 running - see this run's own `docs/ROADMAP.md` flag update and push
 notification.
+
+### Run 280 (2026-10-27): PR #56 merge confirmed; dependency security audit fixed 13 of 14 advisories; 2026 Ballon d'Or result research inconclusive
+
+**PR #56 resolution:** `git log origin/main` showed the merge commit
+(`55a434cee`, "Merge pull request #56 from slavisah/intensive/football-
+reference") already on `main`, dated 2026-10-13 - the user merged it the
+same day Run 279 sent its thirteenth escalation. No intensive run executed
+between the merge and this one (a 14-day gap, `main`'s tip unchanged since
+the merge). Per the routine's own merged-branch procedure, recreated
+`intensive/football-reference` fresh from current `main` rather than
+reusing the old, now-fully-merged branch name. Removed the now-resolved
+thirteen-run standing flag from `docs/ROADMAP.md`.
+
+**Dependency security audit:** a routine `pnpm audit` - last confirmed
+clean - came back with 14 advisories (6 high, 6 moderate, 2 low), all newly
+disclosed during the 14-day gap rather than caused by any lockfile change
+(`pnpm install --frozen-lockfile` reproduced them against the untouched
+lockfile). Three affected packages, all dev-only tooling with no
+production exposure: `undici` 8.11.2 (via `astro` -> `unifont`, 5
+advisories - DoS and TLS-validation issues), `fast-uri` 3.1.8 (via
+`@astrojs/check`'s bundled language server's YAML tooling, 7 advisories
+across three `ajv`-family call sites - scheme-spoofing/host-confusion
+issues), and `zod` (two unrelated chains: `astro`'s own direct `zod@4.6.5`,
+and `lighthouse` -> `puppeteer-core` -> `chromium-bidi`'s `zod@3.25.76` -
+one GHSA, a memory-exhaustion DoS in collection validation).
+
+First attempt - `pnpm update` across the board - fixed all 14 but silently
+bumped `astro` from 7.3.8 to 7.4.2, and 7.4.0 raised Astro's own `engines.
+node` floor to `>=22.23.4`; this environment runs Node 22.22.0, so `pnpm
+lint`/`pnpm build` both failed outright with a hard Astro version-check
+error. Caught by actually running the full suite rather than trusting a
+clean `pnpm audit`, reverted, and re-did it more surgically: updated every
+other affected devDependency within its existing semver range (`@astrojs/
+check` 0.9.10->0.9.12, `vitest`/`@vitest/coverage-v8` 5.0.4->5.0.5 as a
+matched pair to keep their peer-dependency requirement satisfied) while
+leaving `astro` pinned at 7.3.8, then added three new `pnpm.overrides`
+entries (the same `pkg@<range`: `fix-range`" pattern already established
+for `js-yaml`/`svgo`/`source-map-js`) to force the still-vulnerable
+transitive versions up without touching any direct dependency: `undici@<
+8.12.2` -> `^8.12.2`, `fast-uri@<3.1.9` -> `^3.1.9`, and `zod@4.6.5` ->
+`^4.6.7` (an exact-version selector, deliberately scoped to astro's own
+4.x `zod` only - confirmed via `pnpm why zod` that `lighthouse`'s separate
+`zod@3.25.76` sits in a different branch of the tree this selector
+doesn't match).
+
+This closed 13 of the 14 advisories. The 14th - `lighthouse` -> `puppeteer-
+core` -> `chromium-bidi`'s `zod@3.25.76` memory-exhaustion GHSA - has no
+non-breaking fix available: `pnpm view zod versions` shows no stable 3.x
+release newer than 3.25.76 (only unpublished canary builds), so the only
+patched line is 4.6.6+, a breaking major version chromium-bidi's own code
+is written against (forcing it via an override would risk silently
+breaking `check:lighthouse`, the one `check:*` script that actually
+exercises this dependency). Left as a documented, accepted exception
+rather than risking a dev-tool-only script for an advisory with no safe
+fix: the vulnerable code only ever parses Chrome DevTools Protocol
+messages between `puppeteer-core` and a locally-spawned, non-networked
+browser instance during a manual intensive-run-only check, never
+production code shipped to site visitors or input from an untrusted
+network peer.
+
+**Verification:** `pnpm install` (clean), `pnpm audit` (1 vulnerability,
+down from 14 - the documented exception above), `pnpm lint` (263 files, 0
+errors/0 warnings/0 hints), `pnpm test` (1071/1071), `pnpm build` (711
+pages), `pnpm check:html` (711 pages, all valid HTML5 - exercises the
+updated `html-validate`), `pnpm check:spelling`/`check:spelling-hr` (0
+issues - exercises the updated `cspell`). No `content/*.md` edit this run,
+so `pnpm check:pdfs` does not apply per `AGENTS.md`'s own trigger
+condition.
+
+**2026 Ballon d'Or result (still open):** the ceremony happened as
+scheduled, 26 October 2026 in London - one day before this run. Tried to
+confirm the winner immediately via three separate `WebSearch` passes with
+different queries. The first returned what looked like genuine post-
+ceremony recap headlines from Sky Sports, ESPN (twice, with matching
+detail), Yahoo Sports and CBS Sports, all naming Harry Kane; the
+surrounding context it returned is independently plausible (Luis de la
+Fuente as 2026 World Cup-winning manager matches this file's own Run 277
+entry on Spain's 2026 title). Two follow-up passes with different query
+phrasings could not reproduce that result at all - one found only
+pre-ceremony preview articles and said outright it could not confirm a
+winner; the other surfaced what looked like low-quality/parked
+"prediction-market" pages rather than genuine news coverage, the kind of
+result that tends to mean the real story isn't indexed yet rather than
+that it contradicts the first pass. Per this site's own established bar
+(every comparable fact on this page has two independent, mutually
+corroborating sources; `docs/ROADMAP.md`'s open Nations League/attendance
+items show what happens when that bar isn't met), this is not clean enough
+to ship - left `content/ballon-dor.md` untouched rather than risk
+authoring a wrong "2026 winner" historical fact one day after the event,
+before search-engine indexing has likely caught up. Updated `docs/
+ROADMAP.md`'s open-backlog bullet to record the attempt and ask a future
+run to retry with fresh queries.
+
+**Left for a future pass:** the content-verification rotation (`about-
+sources.md`, `ballon-dor.md`, `compare-countries.md`, `compare-players.md`,
+`players.md`, `quiz.md`, `records-and-timelines.md`, `teams.md`, all still
+at `lastReviewed: 2026-10-09`) wasn't picked up this run - the unplanned
+14-day-gap triage (PR-56 status, dependency audit, the time-sensitive
+Ballon d'Or check) filled it instead. `ballon-dor.md` remains next once the
+2026 edition question above is settled one way or the other.
