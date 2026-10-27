@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-10-10
+lastReviewed: 2026-10-27
 status: verified
 ---
 
@@ -17,7 +17,7 @@ The European Championship began in 1960 as the European Nations' Cup. Early fina
 
 - UEFA national teams qualify over roughly two years of group matches before the finals.
 - The finals open with a group stage; the best-placed teams in each group move on.
-- From the quarterfinals onward it is a straight knockout: a single loss ends a team's tournament.
+- From the round of 16 onward (the quarterfinals before the finals expanded to sixteen teams in 1996), it is a straight knockout: a single loss ends a team's tournament.
 - The final decides the champion; no third-place match has been played since 1980 (see "Historical format note" below).
 
 ## Final venues
@@ -33,13 +33,13 @@ Every EURO edition has decided its champion in one match at one stadium - even 2
 - **1984:** Parc des Princes, Paris (France) - the same stadium as the 1960 final; a reported attendance of 47,368.
 - **1988:** Olympiastadion, Munich (West Germany) - a reported attendance of 62,770.
 - **1992:** Ullevi, Gothenburg (Sweden) - a reported attendance of 37,800.
-- **1996:** Wembley Stadium, London (England).
+- **1996:** Wembley Stadium, London (England) - a reported attendance of 73,611.
 - **2000:** De Kuip, Rotterdam (Netherlands) - a reported attendance of 48,100.
 - **2004:** Estádio da Luz, Lisbon (Portugal) - a reported attendance of 62,865.
 - **2008:** Ernst-Happel-Stadion, Vienna (Austria) - a reported attendance of 51,428.
 - **2012:** NSC Olimpiyskiy, Kyiv (Ukraine) - a reported attendance of 63,170.
 - **2016:** Stade de France, Saint-Denis (France) - a reported attendance of 75,868.
-- **2020:** Wembley Stadium, London (England) - the same stadium as the 1996 final, the third to host two EURO finals, after Rome (1980) and Paris (1984).
+- **2020:** Wembley Stadium, London (England) - the same stadium as the 1996 final, the third to host two EURO finals, after Rome (1980) and Paris (1984); a reported attendance of 67,173, reduced by COVID-19 capacity limits.
 - **2024:** Olympiastadion, Berlin (Germany) - a reported attendance of 65,600.
 
 ## Editions

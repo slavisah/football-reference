@@ -80,7 +80,10 @@ describe('validateJsonLdObject', () => {
       itemListElement: [{ '@type': 'ListItem', position: 0 }],
     };
     const issues = validateJsonLdObject(obj, ORIGIN);
-    expect(issues.some((issue) => issue.includes('"position" must be a positive integer'))).toBe(true);
+    expect(issues).toEqual([
+      '$.itemListElement: "position" values must be exactly 1..1 with no gap or duplicate, got [0]',
+      '$.itemListElement[0]: "position" must be a positive integer, got 0',
+    ]);
   });
 
   it('flags an "itemListElement" with a gap in its position sequence', () => {
@@ -114,7 +117,7 @@ describe('validateJsonLdObject', () => {
   it('flags an empty "itemListElement" array', () => {
     const obj = { '@context': 'https://schema.org', '@type': 'ItemList', itemListElement: [] };
     const issues = validateJsonLdObject(obj, ORIGIN);
-    expect(issues.some((issue) => issue.includes('must be a non-empty array'))).toBe(true);
+    expect(issues).toEqual(['$.itemListElement: must be a non-empty array, got []']);
   });
 
   it('flags a relative "url"/"item" string instead of an absolute site URL', () => {

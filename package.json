@@ -5,6 +5,7 @@
   "private": true,
   "description": "The Ultimate Football Reference - a family-friendly static football-history website built from Markdown.",
   "scripts": {
+    "postinstall": "git config core.hooksPath .githooks 2>/dev/null || true",
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
@@ -60,24 +61,27 @@
     "check:locale-consistency": "node scripts/check-locale-consistency.mjs",
     "check:theme-color": "node scripts/check-theme-color.mjs",
     "check:spelling": "cspell --no-progress \"content/**/*.md\"",
-    "check:spelling-hr": "node scripts/check-spelling-hr.mjs"
+    "check:spelling-hr": "node scripts/check-spelling-hr.mjs",
+    "check:roadmap-size": "node scripts/check-roadmap-size.mjs",
+    "routine:branch-state": "node scripts/check-intensive-branch-state.mjs",
+    "routine:guard-branch-push": "node scripts/guard-intensive-branch-push.mjs"
   },
   "dependencies": {
-    "astro": "^7.3.8"
+    "astro": "^7.4.1"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.10",
-    "@axe-core/playwright": "^4.13.0",
-    "@cspell/dict-hr-hr": "^3.1.3",
-    "@playwright/test": "^1.64.0",
+    "@astrojs/check": "^0.9.12",
+    "@axe-core/playwright": "^4.14.0",
+    "@cspell/dict-hr-hr": "^3.1.4",
+    "@playwright/test": "^1.64.1",
     "@types/node": "^26.6.5",
-    "@vitest/coverage-v8": "5.0.4",
-    "cspell": "^10.3.6",
-    "html-validate": "^11.16.2",
+    "@vitest/coverage-v8": "5.0.5",
+    "cspell": "^10.4.0",
+    "html-validate": "^11.17.0",
     "lighthouse": "^13.5.0",
     "sharp": "0.35.5",
     "typescript": "^5.9.3",
-    "vitest": "^5.0.4"
+    "vitest": "^5.0.5"
   },
   "packageManager": "pnpm@9.15.9",
   "pnpm": {
