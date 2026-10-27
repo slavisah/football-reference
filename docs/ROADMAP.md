@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (358 intensive runs as of 2026-10-26) lives
+verification sweep and decision (359 intensive runs as of 2026-10-27) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -435,33 +435,22 @@ the full run-by-run history behind all of this, see
   unattended run should make unilaterally. No code change proposed here,
   only the comparison - flag this to the user directly rather than letting
   a ninth run restate the same open question.
-- **2026 Ballon d'Or edition**: not due yet, not blocked. The two-hundred-
-  and-forty-first run confirmed via `WebSearch` that the ceremony is
-  scheduled for 26 October 2026 in London (its first time outside Paris) -
-  `content/ballon-dor.md`'s `lastCompletedEdition: 2025` is correct as of
-  this run's date (2026-10-06). Re-check once that date has passed.
-  Run 303 (2026-10-17) found France Football already announced the men's
-  30-name shortlist on 8 September 2026 (Messi, Mbappé, Kane, Haaland,
-  Yamal, defending winner Dembélé among them) - two independently-sourced
-  "full list" tables (Sports Illustrated, TheSportsCast) matched exactly on
-  all 30 names, clearing this site's own usual two-source bar - see
-  `docs/SOURCES.md`'s matching entry for the full list and sources.
-  **Deliberately not added to `content/ballon-dor.md`**: a nominee
-  shortlist is a different kind of fact from everything else on this page -
-  an announced-but-not-yet-decided result, not a completed historical
-  record - and this would be the first time in the site's history any page
-  carries "not yet happened" content rather than only confirmed outcomes.
-  It also isn't a drop-in edit: the "Memorable moments"/companion-trophy
-  style sections render through `EditorialNotes.astro`'s note-card system,
-  which `check-i18n-notes.mjs` enforces structural EN/HR parity on (same
-  section count, same bullet count per section) - a 30-item English list
-  would need a genuinely hand-translated Croatian counterpart with the same
-  30 items, not a mechanical copy. That's a real but doable follow-up, not
-  a blocker; what's not this routine's call to make unattended is *whether*
-  the site wants pre-ceremony "shortlist" content at all, a scope decision
-  on the same footing as the `.git`-bloat and `long-title` items above.
-  Flagged to the user directly; a future run should add the section (both
-  languages) if the user says yes, or drop this note if they say no.
+- **2026 Ballon d'Or edition - main award added, companion trophies still
+  open (Run 359, 2026-10-27):** the 26 October 2026 ceremony result (Harry
+  Kane, England's first winner since Michael Owen in 2001) was added to
+  `content/ballon-dor.md`'s Winners table and its Croatian counterpart,
+  confirmed via two independent post-ceremony sources (ESPN, Yahoo Sports -
+  see `docs/SOURCES.md`'s matching entry). **Still open:** the 2026 winners
+  of the five companion trophies (Kopa, Yashin, Gerd Müller, Johan Cruyff,
+  Sócrates) - every targeted `WebSearch` attempt for each one individually
+  surfaced only pre-ceremony shortlist/favorites coverage, not a
+  post-ceremony result, unlike the main award itself. Likely just an
+  indexing-lag gap (the ceremony was only a day before this run), not a
+  genuinely exhausted research angle yet - a future run should re-try each
+  one with a fresh `WebSearch` pass before treating it as exhausted. The
+  separate pre-ceremony-shortlist-as-content scope question this item used
+  to raise is now moot: the ceremony has happened and the main award is a
+  completed historical record, not a "not yet happened" projection.
 - **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.12` (latest
   published, bumped by Run 331 - see the `astro`/`@astrojs/check` item just
   below) still only declares `typescript: '^5.0.0 || ^6.0.0'` as a peer
@@ -660,16 +649,17 @@ the full run-by-run history behind all of this, see
   resolution, Run 315's Nations League host-rule fix, Runs 317-320's
   winning-manager/captain second cross-checks finding one real bug in
   Copa América, Run 339's branch-safety tooling, Run 340's test-file
-  code-review angle). **Four items await the user's own sign-off** (the
-  `.git`-bloat decision, the `long-title` call, the pre-ceremony Ballon
-  d'Or shortlist scope question, and the branch-recreation stored-prompt
-  fix - the last now largely mitigated by Run 339's repo-side tool),
-  unanswered since Run 289 (2026-10-14); each run re-escalates via its own
-  push notification rather than assume an earlier one will be acted on. The
-  2026 Ballon d'Or ceremony (26 October) is only days out - once it passes,
-  `content/ballon-dor.md`'s 2026 edition becomes addable, and a future run
-  should re-check `pnpm outdated` for the `astro`/Node.js and `typescript`/
-  `@astrojs/check` blockers each time a new release appears.
+  code-review angle). **Three items await the user's own sign-off** (the
+  `.git`-bloat decision, the `long-title` call, and the branch-recreation
+  stored-prompt fix - the last now largely mitigated by Run 339's repo-side
+  tool), unanswered since Run 289 (2026-10-14); each run re-escalates via
+  its own push notification rather than assume an earlier one will be acted
+  on. The pre-ceremony Ballon d'Or shortlist scope question this bullet
+  used to also list is now moot - the 2026 ceremony happened and its main
+  award is a completed historical record (see "Open backlog" above), not a
+  "not yet happened" projection. A future run should re-check `pnpm
+  outdated` for the `astro`/Node.js and `typescript`/`@astrojs/check`
+  blockers each time a new release appears.
 
 
 ## Ideas not yet scoped

@@ -3768,6 +3768,27 @@ Primary sources should be preferred.
     first break since 1956, per France Football's own statement) and needed
     no change. This closes the "Key facts"/"Memorable moments" external-
     sourcing angle for all six competition/award pages.
+- **2026 men's winner, added (2026-10-27, Run 359)**: the 2026 Ballon d'Or
+  ceremony (26 October 2026, London Palladium) had been checked and found
+  not-yet-resolved by Runs 357-358; this run re-checked the morning after
+  and found two independent post-ceremony recap articles converging exactly:
+  Harry Kane won, ahead of Lamine Yamal and Kylian Mbappé, the first English
+  winner since Michael Owen in 2001. Added to `content/ballon-dor.md`'s
+  Winners table and its Croatian counterpart
+  (`src/pages/hr/competitions/ballon-dor.astro`, via the shared table data -
+  only the hand-translated "Memorable moments"/"Notes" prose needed a
+  separate edit). **Deliberately not added this run**: the 2026 winners of
+  the five companion trophies (Kopa, Yashin, Gerd Müller, Johan Cruyff,
+  Sócrates) - every targeted `WebSearch` attempt for each one individually
+  surfaced only pre-ceremony shortlist/favourites coverage, never a
+  post-ceremony result, unlike the main award itself; see
+  `docs/ROADMAP.md`'s matching bullet for the next-run follow-up.
+  **Converging, two-source-confirmed:**
+  - https://www.espn.com/soccer/story/_/id/50236983/harry-kane-2026-ballon-dor-kylian-mbappe-lamine-yamal
+  - https://sports.yahoo.com/articles/ballon-dor-2026-live-updates-140001627.html
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Review policy
 

@@ -3,8 +3,8 @@ title: Men's Ballon d'Or
 slug: ballon-dor
 awardType: individual
 firstEdition: 1956
-lastCompletedEdition: 2025
-lastReviewed: 2026-10-23
+lastCompletedEdition: 2026
+lastReviewed: 2026-10-27
 status: verified
 ---
 
@@ -94,8 +94,9 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 | 2023 | Lionel Messi | Argentina | 30 October 2023 |
 | 2024 | Rodri | Spain | 28 October 2024 |
 | 2025 | Ousmane Dembélé | France | 22 September 2025 |
+| 2026 | Harry Kane | England | 26 October 2026 |
 
-## Multiple winners through 2025
+## Multiple winners through 2026
 
 | Player | Awards |
 |---|---:|
@@ -228,6 +229,23 @@ addition, not a correction of a false claim - the original text wasn't
 wrong across the bulk of the award's history, just silent about two eras
 where the mechanism was different.
 
+The **2026 edition** (added 2026-10-27, intensive run) was confirmed via `WebSearch`
+against two independent post-ceremony recap articles (ESPN and Yahoo Sports,
+both published the morning after the 26 October 2026 ceremony at the London
+Palladium) that agree exactly: Harry Kane won the men's Ballon d'Or ahead of
+Lamine Yamal and Kylian Mbappé, the first English winner since Michael Owen
+in 2001. Deliberately **not added this run**: the 2026 winners of the five
+companion trophies above (Kopa, Yashin, Gerd Müller, Johan Cruyff, Sócrates) -
+unlike the main award, no second independent source could be found converging
+on any one of them as of this run; every search attempt surfaced only
+pre-ceremony shortlist/favorites coverage for those five awards specifically,
+even though the same search approach cleanly surfaced the main award's result
+from two outlets. This isn't a research dead end the way the Nations League
+Team-of-the-Tournament item above is - the ceremony happened only a day
+before this run, so same-day recap coverage of the secondary awards may
+simply not have been indexed yet. A future run should re-try each companion
+trophy with a fresh `WebSearch` pass before assuming the gap is exhausted.
+
 See `docs/SOURCES.md` for the per-year citation list.
 
 ## Memorable moments
@@ -240,6 +258,7 @@ See `docs/SOURCES.md` for the per-year citation list.
 - The 2020 Ballon d'Or was the only edition since the award's creation in 1956 not to be presented.
 - Stanley Matthews remains the Ballon d'Or's oldest-ever winner, aged 41 when he claimed the inaugural award in 1956 - a record that has stood for seven decades.
 - Ronaldo (Brazil) is the Ballon d'Or's youngest-ever winner, aged 21 when he won in 1997.
+- Harry Kane won the 2026 Ballon d'Or, England's first winner since Michael Owen claimed the award in 2001.
 
 ## Notes
 
@@ -248,3 +267,4 @@ See `docs/SOURCES.md` for the per-year citation list.
 - Luka Modrić won in 2018.
 - The 2020 award was cancelled.
 - Ousmane Dembélé won the 2025 award.
+- Harry Kane won the 2026 award.
