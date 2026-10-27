@@ -195,18 +195,22 @@ gone longest since its last `lastReviewed` bump, cross-checking claims
 against the file's own tables, the actual generating code, and, for recent
 events, live `WebSearch` results) is an ongoing loop, not a one-off pass -
 every one of the 15 `content/*.md` files has now been through it at least
-once. As of Run 343 (2026-10-24), `fifa-world-cup.md` is the most recent
-(a front-to-back internal-consistency re-check against its own tables,
-`docs/SOURCES.md`, and the generating code - `hostCoordinates.ts`'s 2026
-three-country host entry and `golden-boot.md`'s joined top-scorer column
-both cross-checked clean; no discrepancy found). `uefa-nations-league.md`/
-`uefa-euro.md`/`copa-america.md`/`ballon-dor.md`/`golden-boot.md` are tied
-one day behind at `2026-10-23`; the remaining eight thin utility pages plus
-`glossary.md` are at `2026-10-22` (Run 332's second independent
-front-to-back read, cross-checked against the live implementation rather
-than just another content file's prose - no new discrepancy found, since
-Run 211 already fixed the one real bug this angle catches on these nine
-files). It has found four real bugs so far: a `glossary.md` "third and
+once. As of Run 361 (2026-10-27), the nine files that had been tied at
+`2026-10-22` since Run 332 (`about-sources.md`, `compare-countries.md`,
+`compare-players.md`, `glossary.md`, `index.md`, `players.md`, `quiz.md`,
+`records-and-timelines.md`, `teams.md`) were each re-checked - the five
+10-line directory/comparison pages against the actual page/library
+behavior they describe, `glossary.md`'s seven terminology entries against
+each competition page's own matching rule, `index.md`/`records-and-
+timelines.md`'s shared historical-naming policy against each other, and
+`quiz.md`'s 15-bullet question-type list against `src/lib/quiz.ts`'s actual
+exported functions - no discrepancy found, and all nine bumped to
+`2026-10-27`. `ballon-dor.md` is now the most recent on its own (Run 360,
+2026-10-27); `fifa-world-cup.md` is next-oldest at `2026-10-24`, with
+`uefa-nations-league.md`/`uefa-euro.md`/`copa-america.md`/`golden-boot.md`
+tied at `2026-10-23` - a future run's next-longest-stale file is therefore
+one of those four once it ages behind `ballon-dor.md`. It has found four
+real bugs so far: a `glossary.md` "third and
 fourth place" overgeneralization, a `glossary.md` "host" entry that had the
 FIFA World Cup/UEFA EURO automatic-host-place rule backwards, a Nations
 League host-qualification description stuck on the pre-2024 "four group

@@ -351,14 +351,14 @@
     "src/pages/hr/compare-players.astro": "649425299fa7c77a04e8dc3d50e9d007f14b96e4a82a1c1e32c77eca33bc5d35"
   },
   "glossary": {
-    "content/glossary.md": "aad0ba4ccd7416627f90027b389172161f662cf1b3ea8c99a6489c0e21adcd43",
+    "content/glossary.md": "3ebc17e53b80452df3b7807048fba341e293f10b07f4287b6d7005e2c3628528",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
     "src/lib/glossary.ts": "076bddfbcce373b1f10cc0ce4a053d4eb42fdddfadc6f584946b1dbd33cd73d1",
     "src/pages/glossary.astro": "737bf8c4fb4019cc43608e1a9ce0460f6de1a7a9966a9e1ee7bdbfe953714d02"
   },
   "glossary-hr": {
-    "content/glossary.md": "aad0ba4ccd7416627f90027b389172161f662cf1b3ea8c99a6489c0e21adcd43",
+    "content/glossary.md": "3ebc17e53b80452df3b7807048fba341e293f10b07f4287b6d7005e2c3628528",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
     "src/lib/glossary.ts": "076bddfbcce373b1f10cc0ce4a053d4eb42fdddfadc6f584946b1dbd33cd73d1",
