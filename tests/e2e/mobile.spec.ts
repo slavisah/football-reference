@@ -4032,7 +4032,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     // edition pages x 2 languages (src/pages/competitions/euro/[year].astro
     // and its Croatian sibling), 4 UEFA Nations League Finals edition pages
     // x 2 languages (src/pages/competitions/nations-league/[year].astro and
-    // its Croatian sibling), and 70 Men's Ballon d'Or edition pages x 2
+    // its Croatian sibling), and 71 Men's Ballon d'Or edition pages x 2
     // languages (src/pages/competitions/ballon-dor/[year].astro and its
     // Croatian sibling - the first individual-award edition pages, see
     // `individualAward` in src/lib/editionProfile.ts; the 2020 "Not awarded"
@@ -4040,7 +4040,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     // alternates - /glossary is a fully bilingual NAV_LINKS entry from launch
     // (see docs/PROJECT_STATUS.md's Glossary entry), so it flows through the
     // main loop like every other top-level page.
-    expect(body.match(/<url>/g)?.length).toBe(710);
+    expect(body.match(/<url>/g)?.length).toBe(712);
     expect(body).toContain(`<loc>${SITE}/glossary/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/glossary/</loc>`);
     expect(body).toContain(`hreflang="hr" href="${SITE}/hr/glossary/"`);
@@ -4225,9 +4225,9 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(blocks.find((b) => b['@type'] === 'CollectionPage').name).toContain('Most awards');
 
     const sportsEvent = blocks.find((b) => b['@type'] === 'SportsEvent');
-    expect(sportsEvent.name).toBe("2025 Men's Ballon d'Or");
+    expect(sportsEvent.name).toBe("2026 Men's Ballon d'Or");
     expect(sportsEvent.location).toBeUndefined();
-    expect(sportsEvent.competitor).toEqual({ '@type': 'SportsTeam', name: 'Ousmane Dembélé' });
+    expect(sportsEvent.competitor).toEqual({ '@type': 'SportsTeam', name: 'Harry Kane' });
   });
 
   test('the Golden Boot page carries one ItemList and one SportsEvent per table', async ({ page }) => {
