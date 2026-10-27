@@ -122,6 +122,7 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 - **2023:** Jude Bellingham (England).
 - **2024:** Lamine Yamal (Spain).
 - **2025:** Lamine Yamal (Spain) - the first player to win the Kopa Trophy twice.
+- **2026:** Lamine Yamal (Spain) - his third consecutive Kopa Trophy, the first player to win it three times.
 
 ## Yashin Trophy winners
 
@@ -133,6 +134,7 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 - **2023:** Emiliano Martínez (Argentina).
 - **2024:** Emiliano Martínez (Argentina) - the first goalkeeper to win the Yashin Trophy in consecutive years.
 - **2025:** Gianluigi Donnarumma (Italy) - his second Yashin Trophy, making him the second goalkeeper (after Martínez) to win it more than once.
+- **2026:** Unai Simón (Spain).
 
 ## Gerd Müller Trophy winners
 
@@ -142,12 +144,14 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 - **2023:** Erling Haaland (Norway).
 - **2024:** Harry Kane (England) and Kylian Mbappé (France) - the trophy's first tie, both credited as joint winners on the same goal tally.
 - **2025:** Viktor Gyökeres (Sweden).
+- **2026:** Harry Kane (England) - his second Gerd Müller Trophy, making him the second player (after Lewandowski) to win it more than once.
 
 ## Johan Cruyff Trophy winners
 
 - France Football has also presented the Johan Cruyff Trophy, a companion "best men's coach" award named after the Netherlands great (three-time Ballon d'Or winner, see the Winners table above), alongside the Ballon d'Or every year since 2024 - the newest of the three companion trophies on this page, with no gap year since it started after the Kopa/Yashin/Gerd Müller trophies had already established the pattern.
 - **2024:** Carlo Ancelotti (Real Madrid) - the trophy's first winner, honored for Real Madrid's La Liga and UEFA Champions League double.
 - **2025:** Luis Enrique (Paris Saint-Germain) - honored for PSG's Ligue 1, Coupe de France and first-ever UEFA Champions League title.
+- **2026:** Luis de la Fuente (Spain) - honored for leading Spain to their second FIFA World Cup title (after 2010).
 
 ## Socrates Award winners
 
@@ -156,6 +160,7 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 - **2023:** Vinícius Júnior (Brazil) - honored for Instituto Vini Jr.'s work against racism and educational inequality in Brazil.
 - **2024:** Jennifer Hermoso (Spain) - the award's first female recipient, honored for her advocacy against sexual abuse and harassment in sport.
 - **2025:** Xana Foundation - founded by Johan Cruyff Trophy winner Luis Enrique (see above) and his wife Elena Cullell in memory of their daughter Xana, who died in 2019; the award's first winner that is not an individual footballer.
+- **2026:** Bukayo Saka (England) - honored for his humanitarian work through the BigShoe foundation, including funding surgeries for children in Nigeria.
 
 ## Important editorial note
 
@@ -234,17 +239,23 @@ against two independent post-ceremony recap articles (ESPN and Yahoo Sports,
 both published the morning after the 26 October 2026 ceremony at the London
 Palladium) that agree exactly: Harry Kane won the men's Ballon d'Or ahead of
 Lamine Yamal and Kylian Mbappé, the first English winner since Michael Owen
-in 2001. Deliberately **not added this run**: the 2026 winners of the five
-companion trophies above (Kopa, Yashin, Gerd Müller, Johan Cruyff, Sócrates) -
-unlike the main award, no second independent source could be found converging
-on any one of them as of this run; every search attempt surfaced only
-pre-ceremony shortlist/favorites coverage for those five awards specifically,
-even though the same search approach cleanly surfaced the main award's result
-from two outlets. This isn't a research dead end the way the Nations League
-Team-of-the-Tournament item above is - the ceremony happened only a day
-before this run, so same-day recap coverage of the secondary awards may
-simply not have been indexed yet. A future run should re-try each companion
-trophy with a fresh `WebSearch` pass before assuming the gap is exhausted.
+in 2001. **Update (2026-10-27, Run 360):** the five companion trophies flagged above
+as an indexing-lag gap were confirmed the next day - a fresh `WebSearch` pass
+found dedicated post-ceremony recap coverage for every one of them, each
+independently confirmed by at least two outlets (see `docs/SOURCES.md` for
+the full per-trophy citation list). Added to the five
+companion-trophy sections above and mirrored on the Croatian page
+(`src/pages/hr/competitions/ballon-dor.astro`). One methodology note worth
+recording: an initial broad multi-award query synthesized an answer naming
+Harry Kane as the Gerd Müller Trophy's sole 2026 winner without flagging that
+his *2024* win had been a tie with Kylian Mbappé; a narrower follow-up query
+on that trophy alone then surfaced only the 2024 tie with no 2026 result,
+which could have been misread as a contradiction rather than a different
+year. Only a third, season-specific query resolved it cleanly across
+multiple dedicated recap articles. Future per-trophy re-checks should prefer
+a dated, trophy-specific query over a broad multi-award one, and verify any
+single search's synthesized summary with a second targeted query before
+trusting it.
 
 See `docs/SOURCES.md` for the per-year citation list.
 

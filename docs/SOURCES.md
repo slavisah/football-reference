@@ -3789,6 +3789,47 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- **2026 companion trophies, added (2026-10-27, Run 360)**: the gap Run 359
+  left open (every search attempt that run tried surfaced only pre-ceremony
+  shortlist coverage for the five companion trophies) turned out to be the
+  indexing-lag gap it suspected, not an exhausted one - a fresh `WebSearch`
+  pass the next day found dedicated post-ceremony recap coverage for every
+  trophy, each independently confirmed by at least two outlets. Added to
+  `content/ballon-dor.md`'s five companion-trophy sections and mirrored on
+  the Croatian page (`src/pages/hr/competitions/ballon-dor.astro`).
+  - **Kopa Trophy (best young player) - Lamine Yamal, his third consecutive
+    win, the first player to win it three times:**
+    - https://sports.yahoo.com/articles/lamine-yamal-wins-2026-ballon-212900002.html
+    - https://khelnow.com/football/ballon-dor-kopa-trophy-winners-202610
+    - https://onefootball.com/en/news/lamine-yamal-wins-2026-ballon-dor-kopa-trophy-lennart-karl-finishes-fourth-43678222
+  - **Yashin Trophy (best goalkeeper) - Unai Simón:**
+    - https://www.dazn.com/en-US/news/soccer/ballon-dor-2026-winners-lev-yashin-trophy-goalkeeper/1ounud7yqpyhc1keeaqfb1yanb
+    - https://khelnow.com/football/ballon-dor-yashin-trophy-winners-202610
+    - https://www.arsenal.com/news/our-2026-ballon-dor-results-in-full-aM34k3e4zgpu
+  - **Gerd Müller Trophy (top scorer) - Harry Kane, his second trophy
+    outright (after the 2024 tie with Kylian Mbappé), the second player
+    (after Lewandowski) to win it more than once:**
+    - https://www.si.com/soccer/harry-kane-history-books-2026-gerd-muller-trophy
+    - https://khelnow.com/football/ballon-dor-gerd-muller-trophy-winners-202610
+    - https://www.pulse.com.gh/story/full-list-of-gerd-muller-trophy-winners-from-2021-2026-2026102612245031010
+  - **Johan Cruyff Trophy (best coach) - Luis de la Fuente:**
+    - https://www.dazn.com/en-GB/news/football/ballon-dor-2026-winners-johan-cruyff-trophy-coach-of-the-year/7c3fvi1d49le1t1bv9xy76p0o
+    - https://www.pulse.com.gh/story/johan-cruyff-trophy-winners-list-2024-2026-2026102612455241417
+    - https://depor.com/en/us-live/2026-ballon-dor-winners-all-award-categories-and-recipients-nnda-nnrt-noticia/
+  - **Sócrates Award (humanitarian) - Bukayo Saka:**
+    - https://sports.yahoo.com/articles/bukayo-saka-wins-socrates-award-220149187.html
+    - https://www.goal.com/en/news/ballon-d-or-2026-bukayo-saka-wins-the-socrates-award-for-humanitarian-work/blt56fa02ceffa40d5f
+    - https://bolavip.com/en/soccer/what-is-the-socrates-award-at-the-2026-ballon-dor
+  - Methodology note: an initial broad multi-award query's synthesized
+    answer named Kane as the Gerd Müller Trophy's sole 2026 winner without
+    flagging that his 2024 win had been a tie with Mbappé; a narrower
+    trophy-only follow-up then surfaced only that 2024 tie with no 2026
+    result, which could have read as a contradiction rather than a
+    different year. A third, season-specific query resolved it cleanly - see
+    `content/ballon-dor.md`'s own matching editorial-note paragraph.
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Review policy
 

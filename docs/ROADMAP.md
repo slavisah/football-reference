@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (359 intensive runs as of 2026-10-27) lives
+verification sweep and decision (360 intensive runs as of 2026-10-27) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -435,22 +435,6 @@ the full run-by-run history behind all of this, see
   unattended run should make unilaterally. No code change proposed here,
   only the comparison - flag this to the user directly rather than letting
   a ninth run restate the same open question.
-- **2026 Ballon d'Or edition - main award added, companion trophies still
-  open (Run 359, 2026-10-27):** the 26 October 2026 ceremony result (Harry
-  Kane, England's first winner since Michael Owen in 2001) was added to
-  `content/ballon-dor.md`'s Winners table and its Croatian counterpart,
-  confirmed via two independent post-ceremony sources (ESPN, Yahoo Sports -
-  see `docs/SOURCES.md`'s matching entry). **Still open:** the 2026 winners
-  of the five companion trophies (Kopa, Yashin, Gerd Müller, Johan Cruyff,
-  Sócrates) - every targeted `WebSearch` attempt for each one individually
-  surfaced only pre-ceremony shortlist/favorites coverage, not a
-  post-ceremony result, unlike the main award itself. Likely just an
-  indexing-lag gap (the ceremony was only a day before this run), not a
-  genuinely exhausted research angle yet - a future run should re-try each
-  one with a fresh `WebSearch` pass before treating it as exhausted. The
-  separate pre-ceremony-shortlist-as-content scope question this item used
-  to raise is now moot: the ceremony has happened and the main award is a
-  completed historical record, not a "not yet happened" projection.
 - **`typescript` 7 upgrade**: blocked. `@astrojs/check@0.9.12` (latest
   published, bumped by Run 331 - see the `astro`/`@astrojs/check` item just
   below) still only declares `typescript: '^5.0.0 || ^6.0.0'` as a peer
