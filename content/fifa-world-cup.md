@@ -5,7 +5,7 @@ competitionType: international
 confederation: FIFA
 firstEdition: 1930
 lastCompletedEdition: 2026
-lastReviewed: 2026-10-24
+lastReviewed: 2026-10-27
 status: verified
 ---
 

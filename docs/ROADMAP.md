@@ -220,9 +220,15 @@ only matches literal "one of only N" phrasing, not this "joining X and Y"
 shape) would have caught it, so it isn't just a stale-ledger-entry case.
 `uefa-nations-league.md`/`uefa-euro.md`/`copa-america.md`/`golden-boot.md`
 themselves had zero discrepancies and are bumped to `2026-10-27`;
-`fifa-world-cup.md` (2026-10-24) is now the next-longest-stale file once it
-ages behind the five just bumped. It has found five
-real bugs so far: a `glossary.md` "third and
+`fifa-world-cup.md` (2026-10-24) was the next-longest-stale file; Run 363
+(2026-10-27) re-checked it the same way - internal tallies (every
+title-count table re-summed against the Editions/Winning-managers/
+Winning-captains lists, all consistent) plus eight further recurring-person
+cross-file checks (Scaloni, del Bosque, Rodri, Mbappé, Deschamps,
+Beckenbauer, Modrić, and a second look at Zagallo/Parreira) - and found
+zero further discrepancies; bumped to `2026-10-27`, so all six
+competition/award files are now tied at the same date. The rotation has
+found five real bugs so far: a `glossary.md` "third and
 fourth place" overgeneralization, a `glossary.md` "host" entry that had the
 FIFA World Cup/UEFA EURO automatic-host-place rule backwards, a Nations
 League host-qualification description stuck on the pre-2024 "four group
@@ -239,15 +245,16 @@ bullet had only ever been checked as an *internal* cross-reference against
 the page's own table) is now closed for all six competition/award pages:
 World Cup (Run 285), Nations League/EURO/Copa América (Run 335), Ballon
 d'Or (Run 336, finding the bug above), Golden Boot (already covered before
-Run 335 started). A future run should pick the content-verification
-rotation's next file by the routine's own competition/award ordering once
-the current tie recurs, and should keep trying the recurring-person
-cross-file-consistency angle Run 362 opened - it isn't scoped to any one
-file, so it stays open even after every file's own `lastReviewed` is
-current, and a dedicated claim-ledger checker for the "joining X[, Y,] and
-Z" bounded-membership phrasing (alongside the existing "one of only N"
-checker) is a well-scoped follow-up a future run could build the same way
-Run 185 built `check-one-of-only-claims.mjs`.
+Run 335 started). With all six competition/award files now tied at `2026-10-27`, a future
+run should pick the rotation's next target among the other nine
+`content/*.md` files by the same oldest-`lastReviewed`-first rule, and
+should keep trying the recurring-person cross-file-consistency angle Runs
+362-363 opened - it isn't scoped to any one file, so it stays open
+regardless of which file's `lastReviewed` is oldest, and a dedicated
+claim-ledger checker for the "joining X[, Y,] and Z" bounded-membership
+phrasing (alongside the existing "one of only N" checker) remains a
+well-scoped follow-up a future run could build the same way Run 185 built
+`check-one-of-only-claims.mjs`.
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims
