@@ -195,30 +195,43 @@ gone longest since its last `lastReviewed` bump, cross-checking claims
 against the file's own tables, the actual generating code, and, for recent
 events, live `WebSearch` results) is an ongoing loop, not a one-off pass -
 every one of the 15 `content/*.md` files has now been through it at least
-once. As of Run 361 (2026-10-27), the nine files that had been tied at
-`2026-10-22` since Run 332 (`about-sources.md`, `compare-countries.md`,
-`compare-players.md`, `glossary.md`, `index.md`, `players.md`, `quiz.md`,
-`records-and-timelines.md`, `teams.md`) were each re-checked - the five
-10-line directory/comparison pages against the actual page/library
-behavior they describe, `glossary.md`'s seven terminology entries against
-each competition page's own matching rule, `index.md`/`records-and-
-timelines.md`'s shared historical-naming policy against each other, and
-`quiz.md`'s 15-bullet question-type list against `src/lib/quiz.ts`'s actual
-exported functions - no discrepancy found, and all nine bumped to
-`2026-10-27`. `ballon-dor.md` is now the most recent on its own (Run 360,
-2026-10-27); `fifa-world-cup.md` is next-oldest at `2026-10-24`, with
+once. Run 361 (2026-10-27) closed out the nine files tied at `2026-10-22`
+since Run 332 (see `docs/PROJECT_STATUS.md`'s Run 361 entry for the detail);
+Run 362 (2026-10-27) then re-checked the four next-longest-stale files -
+`uefa-nations-league.md`, `uefa-euro.md`, `copa-america.md`, and
+`golden-boot.md`, tied at `2026-10-23` - against their own internal tallies
+(every title-count table's totals re-summed against its own timeline table)
+and, since every external-sourcing angle on these four was already closed,
+a genuinely different angle instead: cross-checking facts about people who
+recur across *multiple* `content/*.md` files (managers/captains who also
+won a different competition) for self-consistency between the pages that
+mention them. That angle found a real, previously-uncaught bug - not on one
+of the four files themselves, but surfaced by checking a name anchored in
+one of them (Copa América's Zagallo/Parreira cross-references) against
+`fifa-world-cup.md`, which turned out to have the bug internally: its 2018
+"Winning managers" entry for Didier Deschamps says he joined *Zagallo and
+Beckenbauer* as a player-and-manager World Cup winner, but its 1998
+"Winning captains" entry for the same person said he joined *only
+Beckenbauer* - the same three-person fact stated two different ways on the
+same page. Fixed both the English content and its Croatian mirror
+(`src/pages/hr/competitions/world-cup.astro`) to name both predecessors
+consistently; no existing claim-ledger checker (`check-one-of-only-claims.mjs`
+only matches literal "one of only N" phrasing, not this "joining X and Y"
+shape) would have caught it, so it isn't just a stale-ledger-entry case.
 `uefa-nations-league.md`/`uefa-euro.md`/`copa-america.md`/`golden-boot.md`
-tied at `2026-10-23` - a future run's next-longest-stale file is therefore
-one of those four once it ages behind `ballon-dor.md`. It has found four
+themselves had zero discrepancies and are bumped to `2026-10-27`;
+`fifa-world-cup.md` (2026-10-24) is now the next-longest-stale file once it
+ages behind the five just bumped. It has found five
 real bugs so far: a `glossary.md` "third and
 fourth place" overgeneralization, a `glossary.md` "host" entry that had the
 FIFA World Cup/UEFA EURO automatic-host-place rule backwards, a Nations
 League host-qualification description stuck on the pre-2024 "four group
-winners" mechanism UEFA replaced with a quarter-final round, and (Run 336)
-a `ballon-dor.md` "Memorable moments" bullet that misdated the award's 1995
-nationality-eligibility change to 2007, contradicting that same page's own
-introduction - plus the historical-naming fix on `index.md` from Run 211's
-first pass over the nine thin files. The "Key facts"/"Memorable moments"
+winners" mechanism UEFA replaced with a quarter-final round, a `ballon-
+dor.md` "Memorable moments" bullet that misdated the award's 1995
+nationality-eligibility change to 2007 (Run 336), and the `fifa-world-
+cup.md` Deschamps/Zagallo/Beckenbauer inconsistency above (Run 362) - plus
+the historical-naming fix on `index.md` from Run 211's first pass over the
+nine thin files. The "Key facts"/"Memorable moments"
 external-sourcing angle (each page's Finals/Champions table, award lists,
 winning managers and winning captains already had at least one dedicated
 external `docs/SOURCES.md` audit, but the page's own top-line superlative
@@ -228,8 +241,13 @@ World Cup (Run 285), Nations League/EURO/Copa América (Run 335), Ballon
 d'Or (Run 336, finding the bug above), Golden Boot (already covered before
 Run 335 started). A future run should pick the content-verification
 rotation's next file by the routine's own competition/award ordering once
-the current tie recurs, favoring a genuinely different angle over a repeat
-read of a file multiple independent passes have already cleared.
+the current tie recurs, and should keep trying the recurring-person
+cross-file-consistency angle Run 362 opened - it isn't scoped to any one
+file, so it stays open even after every file's own `lastReviewed` is
+current, and a dedicated claim-ledger checker for the "joining X[, Y,] and
+Z" bounded-membership phrasing (alongside the existing "one of only N"
+checker) is a well-scoped follow-up a future run could build the same way
+Run 185 built `check-one-of-only-claims.mjs`.
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims
