@@ -245,16 +245,15 @@ bullet had only ever been checked as an *internal* cross-reference against
 the page's own table) is now closed for all six competition/award pages:
 World Cup (Run 285), Nations League/EURO/Copa América (Run 335), Ballon
 d'Or (Run 336, finding the bug above), Golden Boot (already covered before
-Run 335 started). With all six competition/award files now tied at `2026-10-27`, a future
-run should pick the rotation's next target among the other nine
-`content/*.md` files by the same oldest-`lastReviewed`-first rule, and
-should keep trying the recurring-person cross-file-consistency angle Runs
-362-363 opened - it isn't scoped to any one file, so it stays open
-regardless of which file's `lastReviewed` is oldest, and a dedicated
-claim-ledger checker for the "joining X[, Y,] and Z" bounded-membership
-phrasing (alongside the existing "one of only N" checker) remains a
-well-scoped follow-up a future run could build the same way Run 185 built
-`check-one-of-only-claims.mjs`.
+Run 335 started). All 15 `content/*.md` files are now tied at the same
+`lastReviewed` date (`2026-10-27`); a future run should pick the rotation's
+next target by the same oldest-`lastReviewed`-first rule once any file goes
+stale again, and should keep trying the recurring-person cross-file-
+consistency angle Runs 362-363 opened - it isn't scoped to any one file, so
+it stays open regardless of which file's `lastReviewed` is oldest. **Run 365
+built the "joining X[, Y,] and Z" claim-ledger checker** this paragraph used
+to flag as a follow-up (`scripts/check-joining-claims.mjs`, see
+`docs/PROJECT_STATUS.md`'s Run 365 entry for the full detail), closing it.
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims
