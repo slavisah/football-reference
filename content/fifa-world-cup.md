@@ -220,7 +220,7 @@ Every World Cup edition has decided its champion in one match at one stadium, in
 - **1998:** Didier Deschamps (France) - also went on to win the trophy as a manager in 2018, joining Zagallo and Beckenbauer as a player-and-manager winner (see "Winning managers" above).
 - **2002:** Cafu (Brazil) - the only player to appear in three consecutive World Cup finals (1994, 1998 and 2002).
 - **2006:** Fabio Cannavaro (Italy).
-- **2010:** Iker Casillas (Spain).
+- **2010:** Iker Casillas (Spain) - also captained Spain to the UEFA EURO title in 2008 and 2012.
 - **2014:** Philipp Lahm (Germany).
 - **2018:** Hugo Lloris (France).
 - **2022:** Lionel Messi (Argentina).

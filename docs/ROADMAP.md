@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (366 intensive runs as of 2026-10-28) lives
+verification sweep and decision (367 intensive runs as of 2026-10-28) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -254,10 +254,11 @@ it stays open regardless of which file's `lastReviewed` is oldest. **Run 365
 built the "joining X[, Y,] and Z" claim-ledger checker** this paragraph used
 to flag as a follow-up (`scripts/check-joining-claims.mjs`, see
 `docs/PROJECT_STATUS.md`'s Run 365 entry for the full detail), closing it.
-**Run 366 continued the angle across 8 further names**, zero new
-discrepancies; `players.md`/`teams.md`/`compare-*.md` are directory blurbs
-with nothing to cross-check, a dead end - keep the angle on the six award
-files.
+Runs 366-367 continued the angle across 18 further names; `players.md`/
+`teams.md`/`compare-*.md` are directory blurbs with nothing to check, a
+dead end. Run 367 found one real gap (a missing reciprocal EURO/World Cup
+cross-reference on Casillas's captaincy entries, fixed in both languages -
+see `docs/PROJECT_STATUS.md`) - keep the angle on the six award files.
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims
@@ -688,7 +689,6 @@ the full run-by-run history behind all of this, see
   "not yet happened" projection. A future run should re-check `pnpm
   outdated` for the `astro`/Node.js and `typescript`/`@astrojs/check`
   blockers each time a new release appears.
-
 
 ## Ideas not yet scoped
 
