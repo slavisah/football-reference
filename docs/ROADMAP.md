@@ -249,8 +249,7 @@ Run 335 started). All 15 `content/*.md` files are now tied at the same
 `lastReviewed` date (`2026-10-27`); a future run should pick the rotation's
 next target by the same oldest-`lastReviewed`-first rule once any file goes
 stale again, and should keep trying the recurring-person cross-file-
-consistency angle Runs 362-363 opened - it isn't scoped to any one file, so
-it stays open regardless of which file's `lastReviewed` is oldest. **Run 365
+consistency angle Runs 362-363 opened. **Run 365
 built the "joining X[, Y,] and Z" claim-ledger checker** this paragraph used
 to flag as a follow-up (`scripts/check-joining-claims.mjs`, see
 `docs/PROJECT_STATUS.md`'s Run 365 entry for the full detail), closing it.
@@ -261,7 +260,11 @@ Bosque's, de la Fuente's and Parreira's winning-manager entries), fixed in
 both languages, plus two similar-looking cases (Santos, Deschamps - both
 EURO/World Cup vs. Nations League double winners) left as an idea rather
 than fixed, since neither side yet states the fact to repair - see
-`docs/PROJECT_STATUS.md`. Keep the angle on the six award files.
+`docs/PROJECT_STATUS.md`. Run 369 found four more one-way gaps of the same
+shape (Zagallo's Copa América 1997 win, Beckenbauer's EURO 1972 captaincy,
+de la Fuente's Nations League 2023 win, Cafu's Copa América 1999
+captaincy), fixed in both languages; see `docs/PROJECT_STATUS.md`. Keep
+the angle going - still productive, not yet exhausted.
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims
@@ -683,10 +686,7 @@ the full run-by-run history behind all of this, see
   stored-prompt fix - the last now largely mitigated by Run 339's repo-side
   tool), unanswered since Run 289 (2026-10-14); each run re-escalates via
   its own push notification rather than assume an earlier one will be acted
-  on. The pre-ceremony Ballon d'Or shortlist scope question this bullet
-  used to also list is now moot - the 2026 ceremony happened and its main
-  award is a completed historical record (see "Open backlog" above), not a
-  "not yet happened" projection. A future run should re-check `pnpm
+  on. A future run should re-check `pnpm
   outdated` for the `astro`/Node.js and `typescript`/`@astrojs/check`
   blockers each time a new release appears.
 

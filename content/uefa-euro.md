@@ -130,7 +130,7 @@ A third-place match was played through 1980. From 1984 onward, UEFA recognizes b
 - **2012:** Vicente del Bosque (Spain) - also won the FIFA World Cup as Spain's manager in 2010.
 - **2016:** Fernando Santos (Portugal).
 - **2020:** Roberto Mancini (Italy).
-- **2024:** Luis de la Fuente (Spain) - the same manager who went on to win the 2026 World Cup with Spain.
+- **2024:** Luis de la Fuente (Spain) - also won the 2023 UEFA Nations League as Spain's manager, and went on to win the 2026 World Cup with Spain.
 
 ## Winning captains
 
