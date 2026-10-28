@@ -254,11 +254,14 @@ it stays open regardless of which file's `lastReviewed` is oldest. **Run 365
 built the "joining X[, Y,] and Z" claim-ledger checker** this paragraph used
 to flag as a follow-up (`scripts/check-joining-claims.mjs`, see
 `docs/PROJECT_STATUS.md`'s Run 365 entry for the full detail), closing it.
-Runs 366-367 continued the angle across 18 further names; `players.md`/
-`teams.md`/`compare-*.md` are directory blurbs with nothing to check, a
-dead end. Run 367 found one real gap (a missing reciprocal EURO/World Cup
-cross-reference on Casillas's captaincy entries, fixed in both languages -
-see `docs/PROJECT_STATUS.md`) - keep the angle on the six award files.
+Runs 366-368 continued the angle across 28 names (`players.md`/`teams.md`/
+`compare-*.md` are directory blurbs, a dead end); Runs 367-368 found four
+real reciprocal-cross-reference gaps (Casillas's captaincy; Schön's, del
+Bosque's, de la Fuente's and Parreira's winning-manager entries), fixed in
+both languages, plus two similar-looking cases (Santos, Deschamps - both
+EURO/World Cup vs. Nations League double winners) left as an idea rather
+than fixed, since neither side yet states the fact to repair - see
+`docs/PROJECT_STATUS.md`. Keep the angle on the six award files.
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims
@@ -501,11 +504,8 @@ the full run-by-run history behind all of this, see
   what the next Astro patch itself requires. Unblocks automatically once
   this environment's Node.js is upgraded to >=22.23.4 (no project-side fix
   possible) - re-check `node --version` the next time `pnpm outdated` shows
-  a newer `astro`. Independently re-confirmed by Run 280 (2026-10-27, after
-  a 14-day gap with no runs in between): a blind `pnpm update` across the
-  board reproduced the exact same `astro@7.4.2` Node-floor failure before
-  being caught and reverted - see this file's own Run 280 entry in
-  `docs/PROJECT_STATUS.md`.
+  a newer `astro`. Re-confirmed by Run 280 (14-day gap, same failure/revert)
+  and Run 368 (`node --version` still `v22.22.0`) - see `docs/PROJECT_STATUS.md`.
 - **`docs/SOURCES.md` link-liveness sweep**: blocked. This environment's
   outbound network/egress policy rejects direct requests to external
   reference domains - confirmed repeatedly, most recently 2026-10-02

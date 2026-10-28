@@ -127,7 +127,7 @@ A third-place match was played through 1980. From 1984 onward, UEFA recognizes b
 - **2000:** Roger Lemerre (France).
 - **2004:** Otto Rehhagel (Greece) - the German manager behind one of international football's biggest surprises.
 - **2008:** Luis Aragonés (Spain).
-- **2012:** Vicente del Bosque (Spain).
+- **2012:** Vicente del Bosque (Spain) - also won the FIFA World Cup as Spain's manager in 2010.
 - **2016:** Fernando Santos (Portugal).
 - **2020:** Roberto Mancini (Italy).
 - **2024:** Luis de la Fuente (Spain) - the same manager who went on to win the 2026 World Cup with Spain.

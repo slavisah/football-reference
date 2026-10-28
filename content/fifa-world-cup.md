@@ -184,20 +184,20 @@ Every World Cup edition has decided its champion in one match at one stadium, in
 - **1962:** Aymoré Moreira (Brazil).
 - **1966:** Alf Ramsey (England).
 - **1970:** Mário Zagallo (Brazil) - also won the trophy as a player in 1958 and 1962.
-- **1974:** Helmut Schön (West Germany).
+- **1974:** Helmut Schön (West Germany) - also won the 1972 UEFA European Championship as West Germany's manager.
 - **1978:** César Luis Menotti (Argentina).
 - **1982:** Enzo Bearzot (Italy).
 - **1986:** Carlos Bilardo (Argentina).
 - **1990:** Franz Beckenbauer (West Germany) - also won the trophy as a player in 1974, one of only three men to win it as both player and manager.
-- **1994:** Carlos Alberto Parreira (Brazil).
+- **1994:** Carlos Alberto Parreira (Brazil) - also won the Copa América as Brazil's manager in 2004.
 - **1998:** Aimé Jacquet (France).
 - **2002:** Luiz Felipe Scolari (Brazil).
 - **2006:** Marcello Lippi (Italy).
-- **2010:** Vicente del Bosque (Spain).
+- **2010:** Vicente del Bosque (Spain) - also won the UEFA European Championship as Spain's manager in 2012.
 - **2014:** Joachim Löw (Germany).
 - **2018:** Didier Deschamps (France) - also won the trophy as a player in 1998, joining Zagallo and Beckenbauer as a player-and-manager winner.
 - **2022:** Lionel Scaloni (Argentina).
-- **2026:** Luis de la Fuente (Spain) - the oldest winning manager in World Cup history, aged 65, and Spain's second title alongside 2010.
+- **2026:** Luis de la Fuente (Spain) - the oldest winning manager in World Cup history, aged 65, and Spain's second title alongside 2010. He also won the 2024 UEFA European Championship as Spain's manager.
 
 ## Winning captains
 
