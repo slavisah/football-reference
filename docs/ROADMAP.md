@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (360 intensive runs as of 2026-10-27) lives
+verification sweep and decision (366 intensive runs as of 2026-10-28) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -137,10 +137,10 @@ Playwright browser install on every PR push.
 `knip` shows exactly one standing false positive (`@cspell/dict-hr-hr`,
 used only via `.cspell/hr-notes.cspell.json`'s `"import"` field, never a JS
 `import` knip's static analysis can see). Current counts (confirmed fresh
-this run): 1112 unit tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 711
+this run): 1125 unit tests, `pnpm lint` at 0 errors/0 warnings/0 hints, 713
 pages built; 1055 Playwright e2e tests as of the last full cold-start run
-(Run 254). Run 311 also re-confirmed `pnpm audit` clean and `knip`'s one
-standing false positive unchanged.
+(Run 254). `pnpm audit`/`knip` stay clean (Run 366 bumped `lighthouse`;
+`astro`/`typescript` stay blocked).
 
 The code-review angle (Runs 267-276: a different check from the content-
 verification rotation below, reading derivation/presentation code itself
@@ -254,6 +254,10 @@ it stays open regardless of which file's `lastReviewed` is oldest. **Run 365
 built the "joining X[, Y,] and Z" claim-ledger checker** this paragraph used
 to flag as a follow-up (`scripts/check-joining-claims.mjs`, see
 `docs/PROJECT_STATUS.md`'s Run 365 entry for the full detail), closing it.
+**Run 366 continued the angle across 8 further names**, zero new
+discrepancies; `players.md`/`teams.md`/`compare-*.md` are directory blurbs
+with nothing to cross-check, a dead end - keep the angle on the six award
+files.
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims
