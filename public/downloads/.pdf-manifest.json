@@ -1,6 +1,6 @@
 {
   "world-cup": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -64,7 +64,7 @@
     "src/pages/competitions/nations-league.astro": "f13a0299fb5345e07a80af82fe76fd46c8ac433fcbd99fd1004e2d39a35ec94f"
   },
   "copa-america": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -120,9 +120,9 @@
     "src/pages/competitions/golden-boot.astro": "43d25e112782d058ede7dde347b9cc95e0e8dc8c958baeac3e21988b4febf56f"
   },
   "records": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "content/ballon-dor.md": "3cb54ecb5240130c01859f8c16971617bf5318b19b7ff532ae37644d3638b3f6",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
@@ -143,9 +143,9 @@
     "src/pages/records.astro": "e6f27f0e414bb119c281c000d9c503e5718533f0e1a10bb0c19271a882d3938c"
   },
   "compare": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -178,7 +178,7 @@
     "src/pages/compare-players.astro": "1b64511b6b1f0cc3bcc5ccb96243150a437683bed5daca2b9a005515d7d7415d"
   },
   "world-cup-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -196,7 +196,7 @@
     "src/components/PodiumCards.astro": "edd24bb458ca41c8c16260ed932e454919737be8034c07dfbce30bd3ed2f8e7c",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
-    "src/pages/hr/competitions/world-cup.astro": "6af88d4155023a564df39e1f83e52ccb7cec3ceed4f7e47caddee38f687b80da"
+    "src/pages/hr/competitions/world-cup.astro": "4c2bfabc2682b46bc1ae762cb89c76349a130a8dff886a6189e6765db558769f"
   },
   "euro-hr": {
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
@@ -239,7 +239,7 @@
     "src/pages/hr/competitions/nations-league.astro": "b45b291dced162b54117d6573a164633c0fe5525f243e7da941bd5b856d229a9"
   },
   "copa-america-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -256,7 +256,7 @@
     "src/components/PodiumCards.astro": "edd24bb458ca41c8c16260ed932e454919737be8034c07dfbce30bd3ed2f8e7c",
     "src/components/HostMap.astro": "07afffaaef4d2335647cb6cb184b94c007d958ab3cf0dec58bcee4b0e8d14e56",
     "src/lib/hostCoordinates.ts": "0310eb5ec9867aa06ad6c621a4cf3ad1a7a8601d776433e662f4eb52a88fe376",
-    "src/pages/hr/competitions/copa-america.astro": "7c95ae51b5318a5ac87e5f5e259c7f679fea6779f9b29107d0d9e142104a5ddc"
+    "src/pages/hr/competitions/copa-america.astro": "bd70c5bc3d7e4456d5e3c9397c9643096fad667ce426f2d0affc8f026eda65bf"
   },
   "ballon-dor-hr": {
     "content/ballon-dor.md": "3cb54ecb5240130c01859f8c16971617bf5318b19b7ff532ae37644d3638b3f6",
@@ -293,9 +293,9 @@
     "src/pages/hr/competitions/golden-boot.astro": "4269aa5d78f6d0f315efcc84410bbc19a424745759631eff28c25e51c680853a"
   },
   "records-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "content/ballon-dor.md": "3cb54ecb5240130c01859f8c16971617bf5318b19b7ff532ae37644d3638b3f6",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
@@ -316,9 +316,9 @@
     "src/pages/hr/records.astro": "9ca90604ec0b34be21ac4a456cc7c9cefff7f9447a3e40b75df1160bf46143d9"
   },
   "compare-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -365,9 +365,9 @@
     "src/pages/hr/glossary.astro": "11d88ac472d9d2242c4fbd635c31f947490fae3127fe5038681fff15088a3ff8"
   },
   "team-argentina": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -385,9 +385,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-argentina-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -405,9 +405,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-austria": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -425,9 +425,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-austria-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -445,9 +445,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-belgium": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -465,9 +465,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-belgium-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -485,9 +485,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-bolivia": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -505,9 +505,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-bolivia-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -525,9 +525,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-brazil": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -545,9 +545,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-brazil-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -565,9 +565,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-bulgaria": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -585,9 +585,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-bulgaria-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -605,9 +605,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-canada": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -625,9 +625,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-canada-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -645,9 +645,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-chile": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -665,9 +665,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-chile-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -685,9 +685,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-colombia": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -705,9 +705,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-colombia-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -725,9 +725,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-croatia": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -745,9 +745,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-croatia-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -765,9 +765,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-czech-republic": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -785,9 +785,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-czech-republic-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -805,9 +805,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-czechoslovakia": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -825,9 +825,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-czechoslovakia-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -845,9 +845,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-denmark": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -865,9 +865,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-denmark-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -885,9 +885,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-ecuador": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -905,9 +905,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-ecuador-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -925,9 +925,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-england": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -945,9 +945,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-england-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -965,9 +965,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-france": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -985,9 +985,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-france-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1005,9 +1005,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-germany": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1025,9 +1025,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-germany-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1045,9 +1045,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-greece": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1065,9 +1065,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-greece-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1085,9 +1085,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-honduras": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1105,9 +1105,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-honduras-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1125,9 +1125,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-hungary": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1145,9 +1145,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-hungary-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1165,9 +1165,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-italy": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1185,9 +1185,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-italy-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1205,9 +1205,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-mexico": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1225,9 +1225,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-mexico-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1245,9 +1245,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-morocco": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1265,9 +1265,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-morocco-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1285,9 +1285,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-netherlands": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1305,9 +1305,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-netherlands-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1325,9 +1325,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-paraguay": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1345,9 +1345,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-paraguay-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1365,9 +1365,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-peru": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1385,9 +1385,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-peru-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1405,9 +1405,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-poland": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1425,9 +1425,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-poland-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1445,9 +1445,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-portugal": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1465,9 +1465,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-portugal-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1485,9 +1485,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-russia": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1505,9 +1505,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-russia-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1525,9 +1525,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-south-korea": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1545,9 +1545,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-south-korea-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1565,9 +1565,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-soviet-union": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1585,9 +1585,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-soviet-union-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1605,9 +1605,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-spain": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1625,9 +1625,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-spain-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1645,9 +1645,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-sweden": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1665,9 +1665,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-sweden-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1685,9 +1685,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-switzerland": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1705,9 +1705,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-switzerland-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1725,9 +1725,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-turkiye": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1745,9 +1745,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-turkiye-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1765,9 +1765,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-united-states": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1785,9 +1785,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-united-states-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1805,9 +1805,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-uruguay": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1825,9 +1825,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-uruguay-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1845,9 +1845,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-venezuela": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1865,9 +1865,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-venezuela-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1885,9 +1885,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-wales": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1905,9 +1905,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-wales-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1925,9 +1925,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-yugoslavia": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -1945,9 +1945,9 @@
     "src/pages/hr/teams/[slug].astro": "2d8af47dd8b22490791bd93cd00694f861b3fd564e9667dfb9294eb1d5329088"
   },
   "team-yugoslavia-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/uefa-euro.md": "8ce38f77181fe8eab180121380fcd3c019f139512f2f79fc52c00c5b96fde20a",
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "content/uefa-nations-league.md": "9974581959021d11449adda8318d5bb1a0102f22e15fda58e1978c66d1dbee65",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5101,7 +5101,7 @@
     "src/pages/hr/players/[slug].astro": "2078be591a537bab5cf37c2670c9b7dbd165a6ec2480b208f29e48a647b9eb86"
   },
   "edition-world-cup-2026": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5118,7 +5118,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-2026-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5135,7 +5135,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-2022": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5152,7 +5152,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-2022-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5169,7 +5169,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-2018": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5186,7 +5186,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-2018-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5203,7 +5203,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-2014": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5220,7 +5220,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-2014-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5237,7 +5237,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-2010": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5254,7 +5254,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-2010-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5271,7 +5271,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-2006": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5288,7 +5288,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-2006-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5305,7 +5305,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-2002": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5322,7 +5322,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-2002-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5339,7 +5339,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1998": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5356,7 +5356,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1998-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5373,7 +5373,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1994": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5390,7 +5390,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1994-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5407,7 +5407,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1990": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5424,7 +5424,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1990-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5441,7 +5441,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1986": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5458,7 +5458,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1986-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5475,7 +5475,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1982": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5492,7 +5492,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1982-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5509,7 +5509,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1978": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5526,7 +5526,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1978-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5543,7 +5543,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1974": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5560,7 +5560,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1974-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5577,7 +5577,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1970": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5594,7 +5594,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1970-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5611,7 +5611,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1966": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5628,7 +5628,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1966-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5645,7 +5645,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1962": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5662,7 +5662,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1962-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5679,7 +5679,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1958": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5696,7 +5696,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1958-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5713,7 +5713,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1954": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5730,7 +5730,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1954-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5747,7 +5747,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1950": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5764,7 +5764,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1950-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5781,7 +5781,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1938": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5798,7 +5798,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1938-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5815,7 +5815,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1934": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5832,7 +5832,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1934-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5849,7 +5849,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1930": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -5866,7 +5866,7 @@
     "src/pages/hr/competitions/world-cup/[year].astro": "507ae747a49158d737ecbcd9128f4a5025543cd96004d601f021863458ff53e0"
   },
   "edition-world-cup-1930-hr": {
-    "content/fifa-world-cup.md": "596c6c19ba389a0837d44bbf41ab0a702c432a244081a3aed0040507527269c7",
+    "content/fifa-world-cup.md": "d0948613e1a814498fcfe8131438ffa6bbf0b5cf128b8fa340d4ec669ce9265c",
     "content/golden-boot.md": "a334f097f31d824d33b45443c85bc136423db46d2dd2f035d1d196e04e1cacdc",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
@@ -6589,7 +6589,7 @@
     "src/pages/hr/competitions/nations-league/[year].astro": "c23ac0b22722bf9458592a86c7a526466c5ec873060362d3404bddb096c1cd71"
   },
   "edition-copa-america-2024": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6605,7 +6605,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2024-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6621,7 +6621,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2021": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6637,7 +6637,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2021-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6653,7 +6653,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2019": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6669,7 +6669,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2019-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6685,7 +6685,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2016": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6701,7 +6701,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2016-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6717,7 +6717,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2015": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6733,7 +6733,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2015-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6749,7 +6749,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2011": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6765,7 +6765,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2011-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6781,7 +6781,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2007": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6797,7 +6797,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2007-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6813,7 +6813,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2004": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6829,7 +6829,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2004-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6845,7 +6845,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2001": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6861,7 +6861,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-2001-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6877,7 +6877,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1999": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6893,7 +6893,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1999-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6909,7 +6909,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1997": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6925,7 +6925,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1997-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6941,7 +6941,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1995": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6957,7 +6957,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1995-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6973,7 +6973,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1993": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -6989,7 +6989,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1993-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7005,7 +7005,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1991": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7021,7 +7021,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1991-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7037,7 +7037,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1989": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7053,7 +7053,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1989-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7069,7 +7069,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1987": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7085,7 +7085,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1987-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7101,7 +7101,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1983": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7117,7 +7117,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1983-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7133,7 +7133,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1979": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7149,7 +7149,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1979-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7165,7 +7165,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1975": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7181,7 +7181,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1975-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7197,7 +7197,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1967": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7213,7 +7213,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1967-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7229,7 +7229,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1963": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7245,7 +7245,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1963-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7261,7 +7261,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1959-ecuador": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7277,7 +7277,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1959-ecuador-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7293,7 +7293,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1959-argentina": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7309,7 +7309,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1959-argentina-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7325,7 +7325,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1957": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7341,7 +7341,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1957-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7357,7 +7357,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1956": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7373,7 +7373,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1956-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7389,7 +7389,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1955": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7405,7 +7405,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1955-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7421,7 +7421,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1953": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7437,7 +7437,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1953-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7453,7 +7453,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1949": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7469,7 +7469,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1949-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7485,7 +7485,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1947": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7501,7 +7501,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1947-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7517,7 +7517,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1946": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7533,7 +7533,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1946-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7549,7 +7549,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1945": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7565,7 +7565,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1945-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7581,7 +7581,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1942": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7597,7 +7597,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1942-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7613,7 +7613,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1941": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7629,7 +7629,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1941-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7645,7 +7645,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1939": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7661,7 +7661,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1939-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7677,7 +7677,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1937": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7693,7 +7693,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1937-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7709,7 +7709,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1935": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7725,7 +7725,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1935-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7741,7 +7741,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1929": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7757,7 +7757,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1929-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7773,7 +7773,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1927": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7789,7 +7789,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1927-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7805,7 +7805,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1926": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7821,7 +7821,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1926-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7837,7 +7837,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1925": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7853,7 +7853,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1925-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7869,7 +7869,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1924": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7885,7 +7885,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1924-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7901,7 +7901,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1923": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7917,7 +7917,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1923-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7933,7 +7933,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1922": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7949,7 +7949,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1922-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7965,7 +7965,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1921": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7981,7 +7981,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1921-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -7997,7 +7997,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1920": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -8013,7 +8013,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1920-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -8029,7 +8029,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1919": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -8045,7 +8045,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1919-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -8061,7 +8061,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1917": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -8077,7 +8077,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1917-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -8093,7 +8093,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1916": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",
@@ -8109,7 +8109,7 @@
     "src/pages/hr/competitions/copa-america/[year].astro": "adc8eb030757d60c632ed8ba69fac36d77e8af42f090b57ae308ca98214b1115"
   },
   "edition-copa-america-1916-hr": {
-    "content/copa-america.md": "2d54cee2f2ac6b78f470e48b0e582a53abacf31b234ce0ec6dcce94b05f1a30a",
+    "content/copa-america.md": "7f44b46f9d0000c7fdef31d6e58097fa2da6b24b0c05d96d34d344bbfdd350de",
     "docs/SOURCES.md": "10d3b54e7904a33a7a08e06d8178e4e9c9164b4bffc9d628e93eb1c9ba63a948",
     "src/styles/global.css": "eb630cc428042ab26b6c08eeb734a88d05fa46152587940cd82160111705e848",
     "src/lib/competition.ts": "411001ff7fc30b5f0dedcaf1fec08770c711b302a71befef77972856de8d2f9c",

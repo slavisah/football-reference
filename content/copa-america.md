@@ -321,7 +321,7 @@ The **Team of the Tournament winners** section below (55 entries across five edi
 - **2016:** Claudio Bravo (Chile) - his second, back-to-back, Copa América Centenario.
 - **2019:** Dani Alves (Brazil) - given the armband by manager Tite after Neymar was stripped of the captaincy following an off-field incident.
 - **2021:** Lionel Messi (Argentina) - the first of his two consecutive title-winning editions, his first major trophy with the senior Argentina team.
-- **2024:** Lionel Messi (Argentina) - his second, back-to-back, though an injury forced him off before the trophy lift.
+- **2024:** Lionel Messi (Argentina) - his second, back-to-back, though an injury forced him off before the trophy lift; also captained Argentina to the FIFA World Cup title in 2022, between these two Copa América wins.
 - Oscar Ruggeri, Claudio Bravo and Lionel Messi are the only captains on this list to win back-to-back editions - Bravo as a goalkeeper, a rarer position for the honor.
 
 ## Memorable moments
