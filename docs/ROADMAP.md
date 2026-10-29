@@ -260,9 +260,16 @@ captaincy), fixed in both languages; see `docs/PROJECT_STATUS.md`. Run 372
 widened the angle to recurring *individual-award* winners across
 competitions (the specific extension Run 370 flagged as still open) and
 shipped Rodri's Nations League 2023/EURO 2024/Ballon d'Or 2024 award-sweep
-cross-references; see `docs/PROJECT_STATUS.md`. Keep trying both the
-captaincy/managerial and individual-award versions of this angle - still
-productive, not yet exhausted.
+cross-references; see `docs/PROJECT_STATUS.md`. Run 373 found a second
+individual-award case of the same widened shape, this time landing in a
+single year rather than across adjacent competition cycles: Paolo Rossi's
+1982 World Cup title/Golden Ball/Golden Boot/Ballon d'Or sweep, already
+named independently on three separate pages (`fifa-world-cup.md`,
+`golden-boot.md`, `ballon-dor.md`) with no cross-reference between any of
+them; fixed in all three plus their Croatian counterparts; see
+`docs/PROJECT_STATUS.md`. Keep trying both the captaincy/managerial and
+individual-award versions of this angle - still productive, not yet
+exhausted.
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims
@@ -391,15 +398,11 @@ the full run-by-run history behind all of this, see
   This confirms the prompt-sync fix is not merely unapplied but the tool
   built to route around it hasn't reached the prompt text that would tell
   a run to use it - see `docs/PROJECT_STATUS.md`'s Run 342 entry. **Runs 349
-  and 350 (2026-10-25) each repeated it again** - same unpatched-prompt root
-  cause, two further distinct proximate failure modes (349: a narrow `git
-  fetch origin main` leaving no local ref at all; 350: a correct `git fetch
-  -q origin` whose own branch-listing result the run itself misread) - both
-  caught via the same `list_pull_requests` cross-check and fully recovered
-  with zero work lost. Three runs, three different ways of getting the
-  hand-rolled check wrong, the one scripted fix never reached for because
-  nothing in the prompt mentions it - see `docs/PROJECT_STATUS.md`'s Run 349
-  and Run 350 entries. **Run 351 added a second, independent layer that
+  and 350 (2026-10-25) each repeated it again**, two further proximate
+  failure modes of the same unpatched-prompt root cause, both caught via the
+  same `list_pull_requests` cross-check with zero work lost - see
+  `docs/PROJECT_STATUS.md`'s Run 349 and Run 350 entries. **Run 351 added a
+  second, independent layer that
   doesn't depend on any run's prompt text at all:** a pre-push git hook
   (`.githooks/pre-push` + `scripts/guard-intensive-branch-push.mjs`, wired in
   automatically by `package.json`'s new `postinstall` script setting

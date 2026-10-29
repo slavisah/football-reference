@@ -5,7 +5,7 @@ competitionType: international
 confederation: FIFA
 firstEdition: 1930
 lastCompletedEdition: 2026
-lastReviewed: 2026-10-27
+lastReviewed: 2026-10-29
 status: verified
 ---
 
@@ -101,7 +101,7 @@ Every World Cup edition has decided its champion in one match at one stadium, in
 ## Golden Ball winners
 
 - FIFA has named a best-player award at every World Cup since 1982; no equivalent award existed at earlier editions.
-- **1982:** Paolo Rossi (Italy) - the award's first winner.
+- **1982:** Paolo Rossi (Italy) - the award's first winner; that same year he also won the World Cup Golden Boot and the Ballon d'Or.
 - **1986:** Diego Maradona (Argentina).
 - **1990:** Salvatore Schillaci (Italy).
 - **1994:** Romário (Brazil).

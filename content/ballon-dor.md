@@ -283,11 +283,41 @@ separated from the trigger word by a name rather than a bare year or a
 possessive/determiner clause, so no entry was needed in that second
 ledger.
 
+**Paolo Rossi's 1982 World Cup/Golden Ball/Golden Boot/Ballon d'Or sweep**
+(added 2026-10-29, Run 373): a second case of the same recurring-individual-
+award angle Run 372 opened above, found by checking which other names appear
+on both this page's Winners table and `fifa-world-cup.md`'s Golden Ball
+winners list for the same year. Paolo Rossi led Italy to the 1982 World Cup
+title while also winning that tournament's Golden Boot and Golden Ball, then
+won the 1982 Ballon d'Or - all four facts were already independently correct
+on this site (this page's own Winners table, `fifa-world-cup.md`'s Editions
+and Golden Ball sections, `golden-boot.md`'s World Cup table), but none of
+the three pages cross-referenced any of the others despite all three naming
+Rossi for 1982. Confirmed via `WebSearch` against Wikipedia's Paolo Rossi
+article and ESPN FC's analysis (syndicated by Scroll.in and Sportsmax), which
+independently agree Rossi is the only player in history to win all four in
+the same year. Also specifically checked the closest apparent rival claim,
+Ronaldo's 2002 World Cup/Golden Boot/Ballon d'Or treble (itself genuine and
+already correctly on file) - he did not also win that year's Golden Ball,
+which went to Oliver Kahn (already correctly credited on `fifa-world-cup.md`,
+including its own note that Kahn is "the only goalkeeper to date" to win
+it) - so Rossi's four-award sweep is not contradicted by a second instance.
+Added a new "Memorable moments" bullet below recording the sweep, with brief,
+non-superlative cross-references added to `fifa-world-cup.md`'s 1982 Golden
+Ball entry and `golden-boot.md`'s World Cup memorable moments section (all
+three mirrored on their Croatian counterparts). Recorded in
+`scripts/superlative-claims-ledger.json` (this page's new bullet) and
+`scripts/ordinal-claims-ledger.json` (`fifa-world-cup.md`'s edited entry,
+which already matched that pattern before this run); `golden-boot.md`'s new
+bullet matched none of the eight claim-ledger checkers' patterns, so needed
+no ledger entry.
+
 See `docs/SOURCES.md` for the per-year citation list.
 
 ## Memorable moments
 
 - Stanley Matthews won the first-ever Ballon d'Or in 1956.
+- Paolo Rossi became the only player in history to win the World Cup, its Golden Ball, its Golden Boot, and the Ballon d'Or all in the same year, 1982.
 - George Weah became the first African player to win the Ballon d'Or in 1995.
 - Kaká won the 2007 Ballon d'Or, the first year the award was open to players at any club worldwide, not just clubs in Europe - eligibility had already widened to any nationality in 1995.
 - Lionel Messi won the first of his eight Ballon d'Or titles in 2009, more than any other player in the award's history.

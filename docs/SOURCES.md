@@ -882,6 +882,17 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Paolo Rossi's 1982 Golden Ball/Golden Boot/Ballon d'Or cross-reference
+  (2026-10-29, Run 373): the recurring-individual-award cross-reference
+  angle Run 372 opened with Rodri, applied to a second name found on both
+  this page's Golden Ball winners list and `content/ballon-dor.md`'s
+  Winners table for the same year. Added a brief cross-reference to this
+  page's own 1982 Golden Ball entry (and a matching one on
+  `content/golden-boot.md`'s World Cup memorable moments section) naming
+  Rossi's same-year World Cup Golden Boot and Ballon d'Or wins; the full
+  sourcing and the "only player to win all four" claim itself are recorded
+  under this file's "## Ballon d'Or" section below, where the superlative
+  statement actually lives. See that entry for the full citation list.
 
 ## UEFA EURO
 
@@ -3854,6 +3865,33 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries rather than direct page loads.
+- Paolo Rossi's 1982 World Cup/Golden Ball/Golden Boot/Ballon d'Or sweep
+  (2026-10-29, Run 373): a second case of the recurring-individual-award
+  cross-reference angle Run 372 opened with Rodri. Confirmed via WebSearch
+  that Rossi led Italy to the 1982 World Cup title while winning that
+  tournament's Golden Boot and Golden Ball, then also won the 1982 Ballon
+  d'Or - independently described as the only player in football history to
+  win all four in the same year.
+  - https://en.wikipedia.org/wiki/Paolo_Rossi
+  - https://scroll.in/field/980819/scroll_in (republishes ESPN FC's analysis
+    naming Rossi "the only male player in history to have won the World Cup,
+    WC Golden Ball, WC Golden Boot and Ballon d'Or in the same year")
+  - https://www.sportsmax.tv/studentwriters/itemlist/tag/Paolo%20Rossi
+  - https://worldfootballindex.com/2020/12/remembering-paolo-rossi-the-bolt-in-blue-vs-brazil-the-star-of-82/
+  - Also checked the closest apparent rival claim, Ronaldo's 2002 World
+    Cup/Golden Boot/Ballon d'Or treble (itself genuine), to confirm it does
+    not also include a Golden Ball win that would contradict Rossi's
+    uniqueness:
+  - https://worldcupranking.com/blog/2002-world-cup-golden-boot-winner/
+  - https://www.11v11.com/ronaldo/
+  - Note: 2002's Golden Ball went to Oliver Kahn, already correctly on
+    `content/fifa-world-cup.md` (including its own "the only goalkeeper to
+    date to also win the award" note) - no source found crediting Ronaldo
+    with a 2002 Golden Ball, confirming no second instance of the four-award
+    sweep.
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Review policy
 
