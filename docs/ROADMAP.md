@@ -267,9 +267,11 @@ single year rather than across adjacent competition cycles: Paolo Rossi's
 named independently on three separate pages (`fifa-world-cup.md`,
 `golden-boot.md`, `ballon-dor.md`) with no cross-reference between any of
 them; fixed in all three plus their Croatian counterparts; see
-`docs/PROJECT_STATUS.md`. Keep trying both the captaincy/managerial and
-individual-award versions of this angle - still productive, not yet
-exhausted.
+`docs/PROJECT_STATUS.md`. Run 374 shipped Run 373's flagged-unshipped third
+candidate (Ronaldo's 2002 World Cup/Golden Boot/Ballon d'Or treble, already
+correct on all three pages - just a cross-reference). Keep trying both the
+captaincy/managerial and individual-award versions of this angle - still
+productive, not yet exhausted.
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims
@@ -683,11 +685,10 @@ the full run-by-run history behind all of this, see
   code-review angle). **Three items await the user's own sign-off** (the
   `.git`-bloat decision, the `long-title` call, and the branch-recreation
   stored-prompt fix - the last now largely mitigated by Run 339's repo-side
-  tool), unanswered since Run 289 (2026-10-14); each run re-escalates via
-  its own push notification rather than assume an earlier one will be acted
-  on. A future run should re-check `pnpm
-  outdated` for the `astro`/Node.js and `typescript`/`@astrojs/check`
-  blockers each time a new release appears.
+  tool), unanswered since Run 289 (2026-10-14); each run re-escalates rather
+  than assume an earlier notification was acted on. A future run should
+  re-check `pnpm outdated` for the `astro`/Node.js and
+  `typescript`/`@astrojs/check` blockers each time a new release appears.
 
 ## Ideas not yet scoped
 

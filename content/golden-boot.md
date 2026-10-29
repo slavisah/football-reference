@@ -66,6 +66,7 @@ The name and tie-breaking rules of top-scorer awards have changed over time. Thi
 - Just Fontaine scored 13 goals for France in 1958, still the most any player has scored at a single World Cup.
 - Six players finished level on four goals each in 1962 - the largest group of joint winners in FIFA World Cup Golden Boot history.
 - Paolo Rossi (Italy) won the 1982 World Cup Golden Boot the same year he also won the tournament's Golden Ball and the Ballon d'Or.
+- Ronaldo (Brazil) won the 2002 World Cup Golden Boot the same year he also won the tournament and the Ballon d'Or.
 - Kylian Mbappé won the World Cup Golden Boot in both 2022 and 2026, the only player to win it in consecutive editions since 1930, scoring ten goals in 2026 for a personal best.
 - Flórián Albert (Hungary) is the award's youngest-ever winner, sharing the 1962 Golden Boot aged 20.
 - Davor Šuker (Croatia) is the award's oldest-ever winner, aged 30 when he won it outright in 1998.

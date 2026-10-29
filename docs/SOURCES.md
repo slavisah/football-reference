@@ -893,6 +893,16 @@ Primary sources should be preferred.
   sourcing and the "only player to win all four" claim itself are recorded
   under this file's "## Ballon d'Or" section below, where the superlative
   statement actually lives. See that entry for the full citation list.
+- Ronaldo's 2002 World Cup/Golden Boot/Ballon d'Or treble cross-reference
+  (2026-10-29, Run 374): the same recurring-individual-award angle applied
+  to the candidate Run 373 itself flagged as unshipped. All three facts
+  (2002 World Cup champion, this page's own 2002 Golden Boot winner, and
+  `content/ballon-dor.md`'s 2002 Winners-table entry) were already
+  independently correct and already sourced by Run 373's own
+  rival-claim check (see this file's "## Ballon d'Or" section below) - no
+  new research needed, only the cross-reference itself. Added a brief
+  bullet to this page's own "Memorable moments" and a matching one on
+  `content/golden-boot.md`'s World Cup memorable moments section.
 
 ## UEFA EURO
 
@@ -3892,6 +3902,14 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Ronaldo's 2002 World Cup/Golden Boot/Ballon d'Or treble cross-reference
+  (2026-10-29, Run 374): Run 373 above already confirmed this treble is
+  genuine while checking it as Rossi's one plausible rival claim
+  (https://worldcupranking.com/blog/2002-world-cup-golden-boot-winner/,
+  https://www.11v11.com/ronaldo/) - this run adds the cross-reference
+  itself (a new "Memorable moments" bullet here, plus matching ones on
+  `content/fifa-world-cup.md` and `content/golden-boot.md`), reusing that
+  existing verification rather than re-deriving it.
 
 ## Review policy
 
