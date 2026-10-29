@@ -111,17 +111,19 @@ into `.github/workflows/ci.yml` as required PR gates; the other ten
 `check:text-spacing`/`check:focus-appearance`/`check:color-contrast`) are
 full-site Playwright/browser sweeps kept manual/intensive-run-only rather
 than a required PR gate, purely for their ~700-to-1,400-page-load runtime -
-re-run periodically (most recently Run 358, six runs after the prior
-full pass at Run 352 - all ten clean again, including
-`check:color-contrast` - the heaviest, 1,422 page loads - zero WCAG 1.4.3
-violations across all 711 pages in both color schemes; `check:lighthouse`
+re-run periodically (most recently Run 371, thirteen runs after Run 358 -
+all ten clean again, including `check:color-contrast` - the heaviest,
+1,426 page loads - zero WCAG 1.4.3
+violations across all 713 pages in both color schemes; `check:lighthouse`
 also reconfirmed, 39 pages all >= 0.9 in every category with the same one
 documented noindex/SEO exception as before. The pre-installed Playwright
 browser cache's `chrome-headless-shell` revision is still `chromium_headless_shell-1243`
 (unchanged since Run 345) - same `PW_EXECUTABLE_PATH` workaround, just
 pointed at that revision's `.real` binary; this is expected per-environment
 drift, not a bug, and the exact revision number is only worth re-noting here
-if a future run hits a different one. Run 314 also found that this sweep and `pnpm build:pdfs` must never
+if a future run hits a different one (Run 371: real path is now
+`.../chrome-headless-shell-linux64/chrome-headless-shell.real`, not
+`.../chrome-linux/headless_shell.real` - verify with `find`/`ls`). Run 314 also found that this sweep and `pnpm build:pdfs` must never
 run concurrently - see this file's "Operational note (Run 314)" above)
 rather than on every change. Run 294 found this same
 `PW_EXECUTABLE_PATH` fix is also needed for `pnpm test:e2e` in this
@@ -487,8 +489,8 @@ the full run-by-run history behind all of this, see
   below) still only declares `typescript: '^5.0.0 || ^6.0.0'` as a peer
   dependency - re-confirmed via `npm view @astrojs/check@0.9.12
   peerDependencies` by Run 331 (2026-10-22; `typescript` still at 5.9.3 vs.
-  7.0.2 latest). Re-check whenever `pnpm outdated` next shows a new
-  `@astrojs/check` release.
+  7.0.2 latest, re-confirmed unchanged by Run 371). Re-check whenever
+  `pnpm outdated` next shows a new `@astrojs/check` release.
 - **`astro` 7.4.2 patch bump: blocked by this environment's Node version,
   not a peer-dependency issue (new, Run 331, 2026-10-22).** `pnpm outdated`
   showed routine patch releases for `astro` (7.4.1 -> 7.4.2) and
@@ -501,14 +503,12 @@ the full run-by-run history behind all of this, see
   the failure directly rather than assuming it from the changelog; reverted
   `astro` back to 7.4.1 (keeping the unrelated `@astrojs/check` bump) and
   re-confirmed clean (`pnpm lint`/`test`/`build`, 1086 tests, 711 pages, 0/0/0
-  lint). This is a new, narrower blocker than the existing `typescript` 7
-  item above - it isn't about this project's own peer-dependency range, it's
-  that the container's own Node.js binary is now one patch version behind
-  what the next Astro patch itself requires. Unblocks automatically once
-  this environment's Node.js is upgraded to >=22.23.4 (no project-side fix
-  possible) - re-check `node --version` the next time `pnpm outdated` shows
-  a newer `astro`. Re-confirmed by Run 280 (14-day gap, same failure/revert)
-  and Run 368 (`node --version` still `v22.22.0`) - see `docs/PROJECT_STATUS.md`.
+  lint). A narrower blocker than the `typescript` 7 item above - the
+  container's Node.js binary, not a project-side peer range. Unblocks once
+  Node.js here reaches >=22.23.4 (no project-side fix possible); re-check
+  `node --version` whenever `pnpm outdated` shows a newer `astro`.
+  Re-confirmed by Run 371 (latest is now 7.4.4, same `>=22.23.4` requirement
+  against this container's still-`v22.22.0`).
 - **`docs/SOURCES.md` link-liveness sweep**: blocked. This environment's
   outbound network/egress policy rejects direct requests to external
   reference domains - confirmed repeatedly, most recently 2026-10-02
