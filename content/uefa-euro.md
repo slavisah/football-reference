@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-10-27
+lastReviewed: 2026-10-29
 status: verified
 ---
 
@@ -93,7 +93,7 @@ A third-place match was played through 1980. From 1984 onward, UEFA recognizes b
 - **2012:** Andrés Iniesta (Spain).
 - **2016:** Antoine Griezmann (France) - runner-up with France, the only winner of the award not to lift the trophy that year.
 - **2020:** Gianluigi Donnarumma (Italy) - the first goalkeeper to win the award.
-- **2024:** Rodri (Spain).
+- **2024:** Rodri (Spain) - also the UEFA Nations League 2023 Finals' Player of the Finals, and later that year the Ballon d'Or winner.
 
 ## Young Player of the Tournament winners
 

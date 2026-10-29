@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 2018-19
 lastCompletedEdition: 2024-25
-lastReviewed: 2026-10-27
+lastReviewed: 2026-10-29
 status: verified
 ---
 
@@ -55,7 +55,7 @@ UEFA introduced the Nations League to replace many international friendlies with
 - UEFA has named a best-player award at every Nations League Finals since the competition's 2019 launch, initially called "Player of the Tournament" before being renamed "Player of the Finals" from 2021 onward.
 - **2019:** Bernardo Silva (Portugal).
 - **2021:** Sergio Busquets (Spain).
-- **2023:** Rodri (Spain).
+- **2023:** Rodri (Spain) - went on to also win UEFA EURO 2024's Player of the Tournament award and the 2024 Ballon d'Or.
 - **2025:** Nuno Mendes (Portugal).
 
 ## Winning managers

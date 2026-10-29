@@ -3830,6 +3830,30 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Rodri's cross-competition individual-award sweep (2026-10-29, intensive
+  run): confirmed via WebSearch that Rodri's 2024 Ballon d'Or made him the
+  first defensive midfielder to win the award since Lothar Matthäus in
+  1990, and that by then he had already been named UEFA Nations League
+  2023 Player of the Finals and UEFA EURO 2024 Player of the Tournament.
+  - "First defensive midfielder since Matthäus" - Reuters-syndicated
+    reports from the 28 October 2024 ceremony, independently republished
+    by multiple outlets:
+    - https://www.dailydispatch.co.za/sport/2024-10-29-spain-and-man-citys-rodri-wins-ballon-dor/
+    - https://www.thestar.com.my/sport/football/2024/10/29/soccer-spain039s-rodri-wins-ballon-d039or-for-best-player-in-the-world
+    - https://www.khaleejtimes.com/sports/football/manchester-citys-spanish-midfielder-rodri-wins-ballon-dor-for-best-player-in-the-world
+    - https://www.timeslive.co.za/sport/soccer/2024-10-29-spain-and-man-citys-rodri-wins-ballon-dor/
+    - https://www.businessday.co.za/bd/sport/soccer/2024-10-29-spain-and-man-citys-rodri-wins-ballon-dor/
+  - 2023 UEFA Nations League Player of the Finals - UEFA's own site
+    (already the primary source for `content/uefa-nations-league.md`'s
+    existing 2023 entry), corroborated by contemporaneous wire coverage:
+    - https://www.uefa.com/uefanationsleague/news/0282-1849de0ccdfe-e28eb8d71909-1000--rodri-named-2023-uefa-nations-league-player-of-the-finals
+    - https://www.malaymail.com/amp/news/sports/2023/06/19/rodri-named-uefa-nations-league-player-of-the-tournament/75177
+  - 2024 UEFA EURO Player of the Tournament - already independently
+    sourced for `content/uefa-euro.md`'s existing 2024 entry; re-confirmed
+    this run via https://businessday.ng/sports/article/euro-2024-rodri-wins-best-player-of-the-tournament
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
 
 ## Review policy
 

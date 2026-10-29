@@ -4,7 +4,7 @@ slug: ballon-dor
 awardType: individual
 firstEdition: 1956
 lastCompletedEdition: 2026
-lastReviewed: 2026-10-27
+lastReviewed: 2026-10-29
 status: verified
 ---
 
@@ -257,6 +257,32 @@ a dated, trophy-specific query over a broad multi-award one, and verify any
 single search's synthesized summary with a second targeted query before
 trusting it.
 
+**Individual-award cross-references across competitions** (added 2026-10-29,
+intensive run): a genuinely new verification angle - recurring *individual*
+award winners across different competitions, as distinct from the recurring
+managers/captains Runs 367-370 already cross-referenced (`docs/ROADMAP.md`
+flagged this specific widening, e.g. "Rodri's Nations League/EURO/World-Cup/
+Ballon d'Or award run," as still open). The new "Memorable moments" bullet
+added below - including its defensive-midfielder/Matthäus framing
+(Matthäus's own 1990 win is already on this page's Winners table above) -
+was confirmed via `WebSearch` against a single Reuters wire report from the
+28 October 2024 ceremony, independently republished by outlets across
+South Africa, Malaysia and the United Arab Emirates (see `docs/SOURCES.md`
+for the full list). By then Rodri had already been named UEFA Nations League
+2023 Player of the Finals and UEFA EURO 2024 Player of the
+Tournament (both already on `content/uefa-nations-league.md` and
+`content/uefa-euro.md`, confirmed directly against UEFA.com's own coverage
+for the former). Added a new "Memorable moments" bullet below recording the
+sweep, with matching one-line cross-references added to the Nations League
+and EURO pages' own Player-of-the-Finals/Tournament entries (and all three
+mirrored on their Croatian counterparts). Recorded in
+`scripts/ordinal-claims-ledger.json`, which the new bullet's ordinal
+phrasing matches; its own Matthäus-anchored "since" clause does not match
+`check-since-claims.mjs`'s narrower pattern, since the year there is
+separated from the trigger word by a name rather than a bare year or a
+possessive/determiner clause, so no entry was needed in that second
+ledger.
+
 See `docs/SOURCES.md` for the per-year citation list.
 
 ## Memorable moments
@@ -267,6 +293,7 @@ See `docs/SOURCES.md` for the per-year citation list.
 - Lionel Messi won the first of his eight Ballon d'Or titles in 2009, more than any other player in the award's history.
 - Luka Modrić became the only Croatian winner of the Ballon d'Or in 2018.
 - The 2020 Ballon d'Or was the only edition since the award's creation in 1956 not to be presented.
+- Rodri became the first defensive midfielder to win the Ballon d'Or since Lothar Matthäus in 1990, after also being named the UEFA Nations League 2023 Player of the Finals and UEFA EURO 2024 Player of the Tournament.
 - Stanley Matthews remains the Ballon d'Or's oldest-ever winner, aged 41 when he claimed the inaugural award in 1956 - a record that has stood for seven decades.
 - Ronaldo (Brazil) is the Ballon d'Or's youngest-ever winner, aged 21 when he won in 1997.
 - Harry Kane won the 2026 Ballon d'Or, England's first winner since Michael Owen claimed the award in 2001.

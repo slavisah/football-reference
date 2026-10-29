@@ -163,31 +163,22 @@ and strengthened - `checkRecordsAgainstSource.test.ts`'s and
 `checkJsonLd.test.ts`'s own weak containment checks - neither masking a
 live bug). No further untried file remains in either population; re-run
 only after a future run materially edits a test file. **Run 356 extended
-the same angle to `tests/e2e/*.spec.ts`** (34 files, 11,107 lines - the one
-test-file population Runs 340-341 hadn't covered) and found one real gap:
-`accessibility-focus-not-obscured.spec.ts`'s quiz/records sticky-overlay
-tests each loop up to 60 Tab presses capped at 8/10 matching elements, but
-only asserted `found > 0` on exit - unlike the same file's own table-header
-test 19 lines earlier, which calibrates an identical check to `> 5`.
-Measured the real steady-state counts directly (8 and 10) before picking
-`> 5`/`> 6`, and mutation-tested by capping the loop at 1 to confirm the
-old assertion would have passed while the new one correctly fails. No
+the same angle to `tests/e2e/*.spec.ts`** (34 files) and fixed one real
+gap - a weak `found > 0` assertion in
+`accessibility-focus-not-obscured.spec.ts`'s sticky-overlay tests,
+tightened to the same calibrated threshold its own table-header test
+already used, mutation-tested to confirm the fix actually bites. No
 further finding across the other 33 files; re-run only after a future run
 materially edits one of these 34. **Run 354 extended
 the same angle to the three branch-safety scripts added after the original
 sweep closed** (`check-intensive-branch-state.mjs`, Run 339;
 `guard-intensive-branch-push.mjs`, Run 351; `check-roadmap-size.mjs`, Run
-341 - none existed when Run 275 closed `scripts/*.mjs` as fully covered,
-so none had had this angle applied) and found one real, currently-dormant
-gap: `guard-intensive-branch-push.mjs`'s `checkOneRef()` learned the
-remote's true tip via `ls-remote` but never fetched that commit, so a
-`merge-base`/patch-id check against it would fail with "unknown revision"
-- misread as "unverifiable, refuse" - whenever this clone's last fetch
-predated the remote's current tip (its own sibling script,
-`check-intensive-branch-state.mjs`, already fetches both refs explicitly
-for exactly this reason). Fixed by fetching the guarded ref before
-reasoning about it; re-verified by hand against this branch's own real
-state (the same no-op/simulated-disaster pair Run 351 used) with no
+341) and fixed one real, currently-dormant gap:
+`guard-intensive-branch-push.mjs`'s `checkOneRef()` learned the remote's
+true tip via `ls-remote` but never fetched that commit, so a
+`merge-base`/patch-id check against it would misread "unverifiable" as
+"refuse" whenever this clone's last fetch predated the remote's current
+tip. Fixed by fetching the guarded ref first; re-verified by hand with no
 regression. No further untried file remains in `scripts/*.mjs`, including
 every file added since the original sweep; re-run only after a future run
 materially edits one of these three again.
@@ -265,8 +256,13 @@ than fixed, since neither side yet states the fact to repair - see
 `docs/PROJECT_STATUS.md`. Run 369 found four more one-way gaps of the same
 shape (Zagallo's Copa América 1997 win, Beckenbauer's EURO 1972 captaincy,
 de la Fuente's Nations League 2023 win, Cafu's Copa América 1999
-captaincy), fixed in both languages; see `docs/PROJECT_STATUS.md`. Keep
-the angle going - still productive, not yet exhausted.
+captaincy), fixed in both languages; see `docs/PROJECT_STATUS.md`. Run 372
+widened the angle to recurring *individual-award* winners across
+competitions (the specific extension Run 370 flagged as still open) and
+shipped Rodri's Nations League 2023/EURO 2024/Ballon d'Or 2024 award-sweep
+cross-references; see `docs/PROJECT_STATUS.md`. Keep trying both the
+captaincy/managerial and individual-award versions of this angle - still
+productive, not yet exhausted.
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims
