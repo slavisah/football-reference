@@ -3970,6 +3970,27 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries rather than direct page loads.
+- Gerd Müller's 1970 World Cup Golden Boot/Ballon d'Or cross-reference
+  (2026-10-30, Run 377): a seventh case of the recurring-individual-award
+  cross-reference angle Run 372 opened with Rodri, and the first where the
+  player did not also win the tournament itself - West Germany finished
+  third at the 1970 World Cup (beating Uruguay in the third-place match),
+  with Brazil winning the title. Both underlying facts were already
+  independently on file - Müller's ten-goal 1970 World Cup Golden Boot
+  (`content/golden-boot.md`'s World Cup table) and his 1970 Ballon d'Or
+  (`content/ballon-dor.md`'s Winners table) - so this run only needed to
+  confirm and add the connecting cross-reference, not re-derive either
+  fact. Confirmed via WebSearch against RSSSF's own Ballon d'Or results
+  page (Müller 77 points, Bobby Moore second on 70, Luigi Riva third on
+  65) and Wikipedia's Gerd Müller and 1970 FIFA World Cup articles, which
+  independently corroborate both the goal tally and the Ballon d'Or win in
+  the same calendar year:
+  - https://rsssf.org/miscellaneous/europa-poy70.html
+  - https://en.wikipedia.org/wiki/Gerd_M%C3%BCller
+  - https://worldcupranking.com/blog/1970-world-cup-golden-boot-winner/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
 
 ## Review policy
 

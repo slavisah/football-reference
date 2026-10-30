@@ -321,6 +321,7 @@ See `docs/SOURCES.md` for the per-year citation list.
 - Ronaldo (Brazil) won the 2002 Ballon d'Or the same year he also won the World Cup and that tournament's Golden Boot.
 - Zinedine Zidane (France) won the 1998 Ballon d'Or the same year he also won the World Cup.
 - Michel Platini (France) won the 1984 Ballon d'Or the same year he captained France to the EURO title and finished as the tournament's top scorer.
+- Gerd Müller (West Germany) won the 1970 Ballon d'Or the same year he also won the World Cup Golden Boot, even though West Germany finished third rather than winning that tournament.
 - George Weah became the first African player to win the Ballon d'Or in 1995.
 - Kaká won the 2007 Ballon d'Or, the first year the award was open to players at any club worldwide, not just clubs in Europe - eligibility had already widened to any nationality in 1995.
 - Lionel Messi won the first of his eight Ballon d'Or titles in 2009, more than any other player in the award's history.
