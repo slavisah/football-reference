@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-10-29
+lastReviewed: 2026-10-30
 status: verified
 ---
 
@@ -141,7 +141,7 @@ A third-place match was played through 1980. From 1984 onward, UEFA recognizes b
 - **1972:** Franz Beckenbauer (West Germany) - also captained West Germany to the 1974 World Cup title, one of only a handful of players to captain a team to both trophies.
 - **1976:** Anton Ondruš (Czechoslovakia).
 - **1980:** Bernard Dietz (West Germany).
-- **1984:** Michel Platini (France).
+- **1984:** Michel Platini (France) - also won that year's Ballon d'Or and was EURO 1984's top scorer.
 - **1988:** Ruud Gullit (Netherlands).
 - **1992:** Lars Olsen (Denmark).
 - **1996:** Jürgen Klinsmann (Germany).

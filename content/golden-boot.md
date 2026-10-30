@@ -2,7 +2,7 @@
 title: Golden Boot Winners
 slug: golden-boot
 awardType: scoring
-lastReviewed: 2026-10-29
+lastReviewed: 2026-10-30
 status: verified
 ---
 
@@ -109,6 +109,7 @@ The name and tie-breaking rules of top-scorer awards have changed over time. Thi
 
 - The first-ever EURO Golden Boot, in 1960, was shared by five players tied on two goals each.
 - Michel Platini scored nine goals in five matches for France in 1984, still the most any player has scored at a single EURO.
+- Michel Platini's 1984 Golden Boot came the same year he captained France to the EURO title and won the Ballon d'Or.
 - Cristiano Ronaldo won the 2020 EURO Golden Boot with five goals, in the tournament delayed to 2021.
 - Six players shared the 2024 EURO Golden Boot on three goals each, the tournament's most recent edition.
 - Cristiano Ronaldo (Portugal) is the award's oldest-ever winner, aged 36 when he won the 2020 Golden Boot - breaking a record that had stood for 37 years.

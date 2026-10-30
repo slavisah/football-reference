@@ -3949,6 +3949,27 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries rather than direct page loads.
+- Michel Platini's 1984 EURO/Golden Boot/Ballon d'Or cross-reference
+  (2026-10-30, Run 376): a sixth case of the recurring-individual-award
+  cross-reference angle Run 372 opened with Rodri, and the first to pair a
+  EURO (rather than World Cup) title with the Golden Boot and Ballon d'Or
+  in the same year. All three underlying facts were already independently
+  on file - France's 1984 EURO title and Platini's captaincy
+  (`content/uefa-euro.md`'s Editions/Winning captains tables), his 1984
+  EURO Golden Boot with nine goals (`content/golden-boot.md`'s EURO
+  table), and his 1984 Ballon d'Or (`content/ballon-dor.md`'s Winners
+  table) - so this run only needed to confirm and add the connecting
+  cross-reference, not re-derive any of the three facts. Confirmed via
+  WebSearch against theanalyst.com's EURO 1984 retrospective and
+  soccerway.com's "EURO Rewind" feature, which independently corroborate
+  all three: Platini captained France to the title, scored nine goals in
+  five matches (still the single-tournament EURO record, already on file),
+  and won the 1984 Ballon d'Or the same year:
+  - https://theanalyst.com/2024/06/michel-platini-euro-1984/
+  - https://www.soccerway.com/news/soccer-euro-euro-rewind-the-magic-of-platini-lights-up-host-success-in-1984/x8c52o95
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
 
 ## Review policy
 
