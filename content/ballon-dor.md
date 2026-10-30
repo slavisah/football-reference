@@ -324,6 +324,8 @@ See `docs/SOURCES.md` for the per-year citation list.
 - Gerd Müller (West Germany) won the 1970 Ballon d'Or the same year he also won the World Cup Golden Boot, even though West Germany finished third rather than winning that tournament.
 - Lothar Matthäus (West Germany) won the 1990 Ballon d'Or the same year he captained West Germany to the World Cup title.
 - Fabio Cannavaro (Italy) won the 2006 Ballon d'Or the same year he captained Italy to the World Cup title.
+- Ruud Gullit (Netherlands) won the 1987 Ballon d'Or the year before he captained the Netherlands to the EURO 1988 title.
+- Marco van Basten (Netherlands) won the 1988 Ballon d'Or the same year he also won the EURO Golden Boot and the Netherlands won the title.
 - George Weah became the first African player to win the Ballon d'Or in 1995.
 - Kaká won the 2007 Ballon d'Or, the first year the award was open to players at any club worldwide, not just clubs in Europe - eligibility had already widened to any nationality in 1995.
 - Lionel Messi won the first of his eight Ballon d'Or titles in 2009, more than any other player in the award's history.

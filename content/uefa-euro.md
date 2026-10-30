@@ -142,7 +142,7 @@ A third-place match was played through 1980. From 1984 onward, UEFA recognizes b
 - **1976:** Anton Ondruš (Czechoslovakia).
 - **1980:** Bernard Dietz (West Germany).
 - **1984:** Michel Platini (France) - also won that year's Ballon d'Or and was EURO 1984's top scorer.
-- **1988:** Ruud Gullit (Netherlands).
+- **1988:** Ruud Gullit (Netherlands) - won the 1987 Ballon d'Or the year before captaining the Netherlands to the title.
 - **1992:** Lars Olsen (Denmark).
 - **1996:** Jürgen Klinsmann (Germany).
 - **2000:** Didier Deschamps (France) - also captained France to the 1998 World Cup title, then went on to win the 2018 World Cup as manager (see "Winning managers" above).

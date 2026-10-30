@@ -42598,3 +42598,96 @@ clean), plus `check:roadmap-size` (800/800, within budget) and
 `check:pdfs`/`check:pdf-outline` after the full 702-PDF rebuild (both
 clean: all PDFs fresh, every outline matching its own page's heading
 count). No regression found anywhere.
+
+### Run 379 (2026-10-30): recurring individual-award cross-reference angle extended to a tenth and eleventh case - Ruud Gullit's 1987 Ballon d'Or/1988 EURO-winning-captaincy pairing (the first to land a year apart rather than the same year) and Marco van Basten's 1988 EURO Golden Boot/Ballon d'Or sweep
+
+Continued the same angle Run 372 opened and Runs 373-378 have kept
+extending. Re-read `content/uefa-euro.md`'s "Winning captains" table and
+`content/golden-boot.md`'s EURO top-scorers table against
+`content/ballon-dor.md`'s Winners table for any further same-or-adjacent-
+year name match the prior nine cases hadn't covered, and found two in the
+Netherlands' 1988 EURO-winning squad specifically: **Ruud Gullit** won the
+1987 Ballon d'Or and captained the Netherlands to the EURO title the
+following year, and **Marco van Basten** won that EURO's Golden Boot
+(five goals) and the 1988 Ballon d'Or the same year - both facts already
+independently correct on this site (`content/ballon-dor.md`'s Winners
+table, `content/uefa-euro.md`'s Winning captains table, and
+`content/golden-boot.md`'s EURO top-scorers table), never cross-
+referenced as their own fact. Gullit's pairing is the first in this entire
+series where the Ballon d'Or and the trophy land in different (if
+consecutive) calendar years rather than the same one - every prior
+captaincy/managerial or on-pitch-award case (Matthäus, Cannavaro, Rossi,
+Ronaldo, Zidane, Platini, Müller) had both halves in the same year.
+Van Basten's is the second EURO Golden Boot/Ballon d'Or sweep in the same
+year after Platini's 1984 (the only other on-pitch-award/Ballon d'Or
+sweep from a EURO rather than a World Cup). Confirmed via two separate
+`WebSearch` passes: Gullit's pairing against Wikipedia's Ruud Gullit
+article and UEFA.com's own Gullit retrospective (both describing his 1987
+Ballon d'Or win after joining AC Milan and his captaincy through the
+Netherlands' EURO 1988 title the following year), and Van Basten's pairing
+against Wikipedia's Marco van Basten and 1988 Ballon d'Or articles and
+UEFA.com's own "1988 at a glance" EURO retrospective (all three
+independently corroborating the five-goal Golden Boot tally, the
+Netherlands' tournament win, and the same-year Ballon d'Or).
+
+Added one plain, non-superlative bullet each for both players to
+`content/ballon-dor.md`'s "Memorable moments" section, extended the
+existing 1988 entry in `content/uefa-euro.md`'s "Winning captains" section
+in place with a matching "- won the 1987 Ballon d'Or..." clause (the same
+in-place-extension shape Runs 367-369/378 used), and added one bullet to
+`content/golden-boot.md`'s "EURO memorable moments" section for Van
+Basten's Golden Boot side of the pairing. Mirrored all four edits on the
+Croatian counterparts (`src/pages/hr/competitions/ballon-dor.astro`,
+`src/pages/hr/competitions/euro.astro`, `src/pages/hr/competitions/golden-
+boot.astro`), plus two matching `docs/SOURCES.md` citation entries.
+Deliberately avoided every claim-ledger trigger word (checked each of the
+nine extraction patterns in `scripts/check-*-claims.mjs` by hand before
+writing the final wording), so no ledger file needed an entry - the same
+lowest-risk shape Runs 376-378 used; `check:claims-hr` and the eight
+content-side ledger checkers confirmed unaffected. `check:spelling-hr`
+caught one genuine gap the English `check:spelling` pass didn't: "Marco"
+wasn't yet in either cspell dictionary (Gullit/Van Basten/Basten were
+already present from their own Winners-table/top-scorers-table rows, but
+Marco van Basten's Croatian bullets are the first place his given name
+appears in running Croatian prose) - added to `.cspell/football-names.txt`
+alphabetically; re-run confirmed clean. Both `content/ballon-dor.md`,
+`content/uefa-euro.md` and `content/golden-boot.md` were already at
+today's `lastReviewed` date from Run 378's own cycle, so no bump was
+needed.
+
+Tightened `docs/ROADMAP.md`'s cross-reference-angle paragraph in place
+again (trimming wording while adding both new cases) to stay exactly at
+its 800-line CI budget (800/800 - still zero headroom; the next run that
+extends this paragraph must trim elsewhere in the file in the same pass).
+Bumped the intensive-run count in this file's own opening line to 379.
+
+**Verification:** `pnpm install` (clean, no dependency change), `pnpm
+lint` (272 files, 0 errors/0 warnings/0 hints), `pnpm test` (1125/1125, 70
+files), `pnpm build` (713 pages, unchanged). All 32 non-PDF fast CI-gated
+`check:*` scripts individually (`check:spelling-hr` caught the "Marco" gap
+above on the first pass, clean after the dictionary fix and re-run; every
+other check clean on the first pass), plus `check:roadmap-size` (800/800,
+within budget). Rebuilt all 702 downloadable PDFs per AGENTS.md's
+unconditional "any edit to `content/*.md`" rule
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium_headless_shell-1243/chrome-
+headless-shell-linux64/chrome-headless-shell.real`, the same revision Run
+378 confirmed this container's Playwright cache still has);
+`check:pdfs`/`check:pdf-outline` re-run clean after. No regression found
+anywhere.
+
+**Branch/PR housekeeping note:** this session's initial `git branch -a`/
+`git fetch -q origin` showed no local ref for `intensive/football-
+reference` at all (a shallow clone, the exact failure mode the "Safety
+flag" item in `docs/ROADMAP.md`'s Open backlog warns about) - did **not**
+treat that as "branch doesn't exist" or recreate from `main`. Instead used
+the safe sequence directly: `git ls-remote origin
+refs/heads/intensive/football-reference` (found it, real SHA), a full
+`git fetch` of that exact ref, `git fetch --unshallow`, and `git
+merge-base --is-ancestor` checked in both directions against `origin/main`
+(result: strictly ahead, 120 commits, 0 behind - `origin/main` fully
+contained, matching PR #57's own `head`/`base` SHAs via a direct GitHub
+API read) - so this run checked the branch out as-is with no rebase and no
+force-push risk, per the Safety flag's own documented decision tree. PR #57
+remains open (its merge/pause is the user's own call, not this routine's);
+PR #58 (the Run 364 recovery-branch leftover) is also still open and still
+redundant, not this run's call to close either.

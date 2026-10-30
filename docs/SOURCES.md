@@ -4029,6 +4029,45 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries rather than direct page loads.
+- Ruud Gullit's 1987 Ballon d'Or/1988 EURO-winning-captaincy cross-reference
+  (2026-10-30, Run 379): a tenth case of the recurring individual-award
+  cross-reference angle, and the first where the Ballon d'Or and the
+  trophy fall in different (but consecutive) calendar years rather than
+  the same one - every prior captaincy/managerial or on-pitch-award pairing
+  in this series (Matthäus, Cannavaro, Rossi, Ronaldo, Zidane, Platini,
+  Müller) had both halves land in the same year. Both underlying facts
+  were already independently on file - Gullit's 1987 Ballon d'Or
+  (`content/ballon-dor.md`'s Winners table) and his 1988 EURO-winning
+  captaincy for the Netherlands (`content/uefa-euro.md`'s Winning captains
+  table) - so this run only needed to confirm and add the connecting
+  cross-reference, not re-derive either fact. Confirmed via WebSearch,
+  which corroborates both facts consistently: Gullit was voted 1987 Ballon
+  d'Or winner by France Football after his transfer to AC Milan, and
+  Wikipedia/UEFA.com both describe him as the Netherlands' captain across
+  their EURO 1988 win the following year:
+  - https://en.wikipedia.org/wiki/Ruud_Gullit
+  - https://www.uefa.com/uefaeuro/history/news/0253-0d7f3abb72ce-45e093ec673d-1000--ruud-gullit
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
+- Marco van Basten's 1988 EURO Golden Boot/Ballon d'Or cross-reference
+  (2026-10-30, Run 379): an eleventh case of the same angle, and the second
+  EURO Golden Boot/Ballon d'Or sweep in the same year besides Platini's
+  1984 (the only prior on-pitch-award/Ballon d'Or sweep from a EURO rather
+  than a World Cup). Both underlying facts were already independently on
+  file - Van Basten's 1988 EURO Golden Boot, five goals
+  (`content/golden-boot.md`'s EURO top scorers table) and his 1988 Ballon
+  d'Or (`content/ballon-dor.md`'s Winners table) - so this run only needed
+  to confirm and add the connecting cross-reference, not re-derive either
+  fact. Confirmed via WebSearch against Wikipedia's Marco van Basten and
+  1988 Ballon d'Or articles and UEFA.com's own EURO 1988 retrospective,
+  which independently corroborate the five-goal tally, the Netherlands'
+  tournament win, and the same-year Ballon d'Or:
+  - https://en.wikipedia.org/wiki/Marco_van_Basten
+  - https://www.uefa.com/uefaeuro/history/news/0253-0d7d771b1d5a-bab36b6c142e-1000--1988-at-a-glance/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
 
 ## Review policy
 
