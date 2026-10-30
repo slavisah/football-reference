@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (370 intensive runs as of 2026-10-29) lives
+verification sweep and decision (375 intensive runs as of 2026-10-30) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -238,10 +238,12 @@ bullet had only ever been checked as an *internal* cross-reference against
 the page's own table) is now closed for all six competition/award pages:
 World Cup (Run 285), Nations League/EURO/Copa América (Run 335), Ballon
 d'Or (Run 336, finding the bug above), Golden Boot (already covered before
-Run 335 started). All 15 `content/*.md` files are now tied at the same
-`lastReviewed` date (`2026-10-27`); a future run should pick the rotation's
-next target by the same oldest-`lastReviewed`-first rule once any file goes
-stale again, and should keep trying the recurring-person cross-file-
+Run 335 started). All 15 `content/*.md` files started tied at the same
+`lastReviewed` date (`2026-10-27`); later runs' own cross-reference fixes
+have since bumped individual files past that date (see each file's own
+frontmatter for the current state) - a future run should pick the
+rotation's next target by the same oldest-`lastReviewed`-first rule once a
+file goes stale again, and should keep trying the recurring-person cross-file-
 consistency angle Runs 362-363 opened. **Run 365
 built the "joining X[, Y,] and Z" claim-ledger checker** this paragraph used
 to flag as a follow-up (`scripts/check-joining-claims.mjs`, see
@@ -260,18 +262,15 @@ captaincy), fixed in both languages; see `docs/PROJECT_STATUS.md`. Run 372
 widened the angle to recurring *individual-award* winners across
 competitions (the specific extension Run 370 flagged as still open) and
 shipped Rodri's Nations League 2023/EURO 2024/Ballon d'Or 2024 award-sweep
-cross-references; see `docs/PROJECT_STATUS.md`. Run 373 found a second
-individual-award case of the same widened shape, this time landing in a
-single year rather than across adjacent competition cycles: Paolo Rossi's
-1982 World Cup title/Golden Ball/Golden Boot/Ballon d'Or sweep, already
-named independently on three separate pages (`fifa-world-cup.md`,
-`golden-boot.md`, `ballon-dor.md`) with no cross-reference between any of
-them; fixed in all three plus their Croatian counterparts; see
-`docs/PROJECT_STATUS.md`. Run 374 shipped Run 373's flagged-unshipped third
-candidate (Ronaldo's 2002 World Cup/Golden Boot/Ballon d'Or treble, already
-correct on all three pages - just a cross-reference). Keep trying both the
-captaincy/managerial and individual-award versions of this angle - still
-productive, not yet exhausted.
+cross-reference; Run 373 shipped a second case, Paolo Rossi's 1982 World
+Cup/Golden Ball/Golden Boot/Ballon d'Or sweep; Run 374 shipped a third,
+Ronaldo's 2002 World Cup/Golden Boot/Ballon d'Or treble; Run 375 shipped a
+fourth, narrower case - Zinedine Zidane's 1998 World Cup/Ballon d'Or
+pairing (no Golden Ball/Golden Boot leg: 1998's Golden Ball went to
+Ronaldo, not Zidane). See each run's own `docs/PROJECT_STATUS.md` entry
+for the full detail. Keep trying both the captaincy/managerial and
+individual-award versions of this angle - still productive, not yet
+exhausted.
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims

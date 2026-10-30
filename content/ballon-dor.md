@@ -4,7 +4,7 @@ slug: ballon-dor
 awardType: individual
 firstEdition: 1956
 lastCompletedEdition: 2026
-lastReviewed: 2026-10-29
+lastReviewed: 2026-10-30
 status: verified
 ---
 
@@ -319,10 +319,11 @@ See `docs/SOURCES.md` for the per-year citation list.
 - Stanley Matthews won the first-ever Ballon d'Or in 1956.
 - Paolo Rossi became the only player in history to win the World Cup, its Golden Ball, its Golden Boot, and the Ballon d'Or all in the same year, 1982.
 - Ronaldo (Brazil) won the 2002 Ballon d'Or the same year he also won the World Cup and that tournament's Golden Boot.
+- Zinedine Zidane (France) won the 1998 Ballon d'Or the same year he also won the World Cup.
 - George Weah became the first African player to win the Ballon d'Or in 1995.
 - Kaká won the 2007 Ballon d'Or, the first year the award was open to players at any club worldwide, not just clubs in Europe - eligibility had already widened to any nationality in 1995.
 - Lionel Messi won the first of his eight Ballon d'Or titles in 2009, more than any other player in the award's history.
-- Luka Modrić became the only Croatian winner of the Ballon d'Or in 2018.
+- Luka Modrić became the only Croatian winner of the Ballon d'Or in 2018, the same year he also won the World Cup Golden Ball.
 - The 2020 Ballon d'Or was the only edition since the award's creation in 1956 not to be presented.
 - Rodri became the first defensive midfielder to win the Ballon d'Or since Lothar Matthäus in 1990, after also being named the UEFA Nations League 2023 Player of the Finals and UEFA EURO 2024 Player of the Tournament.
 - Stanley Matthews remains the Ballon d'Or's oldest-ever winner, aged 41 when he claimed the inaugural award in 1956 - a record that has stood for seven decades.

@@ -3910,6 +3910,45 @@ Primary sources should be preferred.
   itself (a new "Memorable moments" bullet here, plus matching ones on
   `content/fifa-world-cup.md` and `content/golden-boot.md`), reusing that
   existing verification rather than re-deriving it.
+- Zinedine Zidane's 1998 World Cup/Ballon d'Or cross-reference (2026-10-30,
+  Run 375): a fourth case of the recurring-individual-award cross-reference
+  angle Run 372 opened with Rodri - a two-award pairing rather than a
+  three- or four-award sweep, since 1998's World Cup Golden Ball went to
+  Ronaldo (Brazil), not Zidane, so no Golden Ball/Golden Boot leg applies
+  here. Both underlying facts were already independently on file and
+  cross-checked in prior audits - the 1998 Ballon d'Or winner
+  (`content/ballon-dor.md`'s Winners table) and France's 1998 World Cup
+  title (`content/fifa-world-cup.md`'s Editions table) - so this run only
+  needed to confirm the connection itself, not re-derive either fact.
+  Confirmed via WebSearch against Wikipedia's 1998 Ballon d'Or article and
+  independent corroboration from fotmob.com/stadiumastro.com (both carrying
+  Zidane's own on-record reflection that his World Cup final performance -
+  two goals in the 3-0 win over Brazil - drove the award):
+  - https://en.wikipedia.org/wiki/1998_Ballon_d%27Or
+  - https://www.fotmob.com/fi/news/3u05c89ki386124keadcby01r/%27I-was-the-best-player-in-the-world%27---Zidane-reflects-on-1998-Ballon-d%27Or-win
+  - https://english.stadiumastro.com/football/i-was-best-player-world-zidane-reflects-1998-ballon-dor-win-217026
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
+- Luka Modrić's 2018 World Cup Golden Ball/Ballon d'Or cross-reference
+  (2026-10-30, Run 375): the second candidate shipped this run, and the
+  one Run 373/374 both explicitly flagged as open - another two-award
+  pairing (no Golden Boot/Golden Ball-of-a-different-award overlap to
+  check, unlike Rossi/Ronaldo, since the World Cup Golden Ball itself is
+  one of the two awards in this pairing). Both underlying facts were
+  already independently on file - Modrić's 2018 World Cup Golden Ball
+  (`content/fifa-world-cup.md`'s Golden Ball winners list) and his 2018
+  Ballon d'Or (`content/ballon-dor.md`'s Winners table, already carrying a
+  verified "only Croatian winner" superlative). Confirmed via WebSearch
+  against SI.com, beIN Sports and Scroll.in, which independently report
+  both wins and date the Ballon d'Or ceremony to 3 December 2018, matching
+  the date already on file:
+  - https://www.si.com/soccer/2018/07/15/world-cup-golden-ball-luka-modric-croatia
+  - https://www.beinsports.com/en-us/articles/luka-modric-wins-world-cup-golden-ball
+  - https://scroll.in/field/904421/scroll_in
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
 
 ## Review policy
 

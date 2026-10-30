@@ -5,7 +5,7 @@ competitionType: international
 confederation: FIFA
 firstEdition: 1930
 lastCompletedEdition: 2026
-lastReviewed: 2026-10-29
+lastReviewed: 2026-10-30
 status: verified
 ---
 
@@ -110,7 +110,7 @@ Every World Cup edition has decided its champion in one match at one stadium, in
 - **2006:** Zinedine Zidane (France).
 - **2010:** Diego Forlán (Uruguay).
 - **2014:** Lionel Messi (Argentina) - the first of his two wins, still the only player to win the award more than once.
-- **2018:** Luka Modrić (Croatia).
+- **2018:** Luka Modrić (Croatia) - that same year he also won the Ballon d'Or.
 - **2022:** Lionel Messi (Argentina) - his second win.
 - **2026:** Rodri (Spain) - the first Spain player to win the award.
 
@@ -231,6 +231,7 @@ Every World Cup edition has decided its champion in one match at one stadium, in
 - Uruguay defeated Brazil in the decisive 1950 match at the Maracanã, a result remembered as the *Maracanazo*.
 - Brazil's 1970 side became the first team to win three World Cups.
 - Diego Maradona inspired Argentina in 1986.
+- Zinedine Zidane (France) won the 1998 World Cup and that year's Ballon d'Or.
 - Ronaldo (Brazil) won the 2002 World Cup, that year's Golden Boot, and the Ballon d'Or.
 - Croatia reached its first final in 2018.
 - Argentina and France played a 3–3 final in 2022 before Argentina won the shoot-out.
