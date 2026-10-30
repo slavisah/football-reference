@@ -4068,6 +4068,26 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries rather than direct page loads.
+- Franz Beckenbauer's 1972 Ballon d'Or/EURO-winning-captaincy cross-reference
+  (2026-10-30, Run 380): a twelfth case of the same recurring individual-
+  award angle, and the second same-year EURO-captaincy/Ballon d'Or pairing
+  after Platini's 1984 (Gullit's 1987/1988 pairing landed a year apart, not
+  the same year). Both underlying facts were already independently on file
+  - Beckenbauer's 1972 Ballon d'Or (`content/ballon-dor.md`'s Winners
+  table) and his 1972 EURO-winning captaincy for West Germany
+  (`content/uefa-euro.md`'s Winning captains table, which already noted his
+  *other* same-shape double, the 1974 World Cup captaincy, but made no
+  mention of the Ballon d'Or) - so this run only needed to confirm and add
+  the connecting cross-reference, not re-derive either fact. Confirmed via
+  two independent WebSearch passes against Wikipedia's "1972 Ballon d'Or"
+  article (explicitly framing the award as coming "after leading West
+  Germany to the European title") and UEFA.com's own German-language
+  Beckenbauer retrospective describing his EURO 1972 captaincy:
+  - https://en.wikipedia.org/wiki/1972_Ballon_d%27Or
+  - https://de.uefa.com/uefaeuro/history/news/0253-0d7de25f77f9-952295b997f7-1000--beckenbauer-leader-of-west-germany-s-glorious-class-of-72
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
 
 ## Review policy
 

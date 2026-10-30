@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (379 intensive runs as of 2026-10-30) lives
+verification sweep and decision (380 intensive runs as of 2026-10-30) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -261,17 +261,17 @@ de la Fuente's Nations League 2023 win, Cafu's Copa América 1999
 captaincy), fixed in both languages; see `docs/PROJECT_STATUS.md`. Run 372
 widened the angle to recurring *individual-award* winners across
 competitions (the specific extension Run 370 flagged as still open); Runs
-372-379 have since shipped eleven cases - Rodri's Nations League 2023/EURO
+372-380 have since shipped twelve cases - Rodri's Nations League 2023/EURO
 2024/Ballon d'Or 2024 sweep, Paolo Rossi's and Ronaldo's World Cup/Golden
 Boot/Ballon d'Or sweeps (1982, 2002), Zidane's and Modrić's World
 Cup/Ballon d'Or pairings (1998, 2018), Platini's and Van Basten's 1984/1988
 EURO Golden Boot/Ballon d'Or sweeps, Müller's 1970 World Cup Golden
 Boot/Ballon d'Or pairing (the only one where the player didn't also win
-the tournament), and Matthäus's/Cannavaro's/Gullit's 1990/2006/1987-88
-winning-captaincy/Ballon d'Or pairings (Gullit's alone lands a year apart
-rather than the same year) - see `docs/PROJECT_STATUS.md`. Keep trying
-both the captaincy/managerial and individual-award versions of this angle -
-still productive, not yet exhausted.
+the tournament), and Matthäus's/Cannavaro's/Gullit's/Beckenbauer's
+1990/2006/1987-88/1972 winning-captaincy/Ballon d'Or pairings (Gullit's
+alone lands a year apart, same-year every other time) - see
+`docs/PROJECT_STATUS.md`. Keep trying both angle shapes - still
+productive, not yet exhausted.
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims
@@ -442,7 +442,15 @@ the full run-by-run history behind all of this, see
   force push at all - the harness's own destructive-git-operation guard
   refused one, so recovery used an ordinary new-branch push to preserve
   the orphaned commit, then a `--no-ff` merge to restore it as a plain
-  fast-forward. See `docs/PROJECT_STATUS.md`'s Run 364 entry.
+  fast-forward. See `docs/PROJECT_STATUS.md`'s Run 364 entry. **Run 380
+  (2026-10-30): a ninth incident, a new variant** - an unqualified `git
+  fetch -q origin` (not `git branch -a`/`-r`) twice timed out, leaving no
+  local ref and the same false "doesn't exist" conclusion; a run's worth of
+  duplicate content got built before the plain (non-force) `git push`
+  itself was rejected as non-fast-forward, catching it with zero work lost
+  and no force-push anywhere in the sequence. Confirms the plain-push step
+  is a real, proven backstop on its own, not just incidental caution - see
+  `docs/PROJECT_STATUS.md`'s Run 380 entry.
 - **`.git` history bloat from committed PDFs - decision overdue, unresolved
   across 8 runs (289-296, 2026-10-14 to 2026-10-16):** root cause and the
   Run 293 partial fix are fully written up in `docs/PROJECT_STATUS.md`'s
@@ -558,32 +566,18 @@ the full run-by-run history behind all of this, see
   block as the link-liveness item above), so there's no way to browse the
   site further than what search snippets surface. Genuinely exhausted now
   on this angle too, not just the original search-the-claim-directly one.
-  **Update (Run 324):** tried a `uefa.com`-domain-restricted `WebSearch`
-  for 2021 and 2023 (a narrower angle than general search or a single
-  federation's site) - confirmed UEFA.com does publish a "Team of the
-  Tournament" feature as a format (surfaced for 2019: Pickford, Semedo,
-  Dias, van Dijk, Blind, Bruno Fernandes, de Jong, Wijnaldum, Bernardo
-  Silva, Shaqiri), but the same restricted search for 2021/2023 found only
-  individual-award coverage (Player of the Finals, top scorer, Goal of the
-  Tournament pieces) and the 2023 Finals PDF programme - no Team of the
-  Tournament page for either year. Ninth consecutive negative result;
-  genuinely exhausted short of direct `WebFetch` access to `uefa.com`
-  itself (currently egress-blocked) to browse its news index rather than
-  rely on search-engine coverage of it.
-  **Update (Run 332):** tried an Opta/WhoScored-framed `WebSearch` for 2021
-  and 2023 specifically (stats-site coverage, not yet tried as its own
-  angle) - found no stats-site "Team of the Tournament"/"dream team"
-  selection for either edition, only general tournament/squad pages.
-  Tenth and eleventh consecutive negative results; still genuinely
-  exhausted short of direct `WebFetch` access.
-  **Update (Run 334):** tried Croatian-language press specifically (Index.hr,
-  Novi list, N1, HRT), on the reasoning that Croatia reaching the actual
-  2023 final (lost to Spain on penalties) makes its own home-language sports
-  media the single most plausible place a "best XI" feature would run if one
-  exists anywhere - extensive 2023 final/Rodri-award coverage turned up, but
-  no Team-of-the-Tournament eleven for 2021, 2023, or 2025. Twelfth
-  consecutive negative result; now exhausted across federation sites,
-  stats-site framing, UEFA's own domain, and a finalist's home-language
+  **Updates (Runs 324, 332, 334):** three further angles, each negative -
+  a `uefa.com`-restricted `WebSearch` (confirms UEFA.com does publish a
+  "Team of the Tournament" feature as a format, e.g. 2019's Pickford/
+  Semedo/Dias/van Dijk/Blind/Bruno Fernandes/de Jong/Wijnaldum/Bernardo
+  Silva/Shaqiri XI, but only individual-award coverage for 2021/2023, no
+  Team-of-the-Tournament page for either); an Opta/WhoScored stats-site
+  framing (no "dream team" selection for either edition); and Croatian-
+  language press specifically (Croatia reached the actual 2023 final, the
+  single most plausible place a "best XI" feature would run if one
+  exists - extensive coverage, still no eleven for 2021, 2023, or 2025).
+  Twelfth consecutive negative result; exhausted across federation sites,
+  UEFA's own domain, stats-site framing, and a finalist's home-language
   press - still short of direct `WebFetch` access to `uefa.com` itself.
 - **UEFA Nations League attendance figures**: the 2023 Finals attendance has
   a genuine source conflict (41,110 vs. 41,500, both independently reported

@@ -42691,3 +42691,121 @@ force-push risk, per the Safety flag's own documented decision tree. PR #57
 remains open (its merge/pause is the user's own call, not this routine's);
 PR #58 (the Run 364 recovery-branch leftover) is also still open and still
 redundant, not this run's call to close either.
+
+### Run 380 (2026-10-30): a ninth occurrence of the "shallow/incomplete fetch -> wrongly conclude the branch doesn't exist" failure mode, caught before any push with zero work lost; also shipped a twelfth recurring individual-award cross-reference (Franz Beckenbauer's 1972 Ballon d'Or/EURO-winning-captaincy pairing)
+
+**Incident first, since it's the more important finding:** this session's
+initial `git fetch -q origin` (a plain, unqualified full fetch) twice timed
+out (120s, then a retried 60s) without completing, leaving no local
+remote-tracking ref for `intensive/football-reference` at all. `git
+rev-parse origin/intensive/football-reference` then genuinely returned
+"unknown revision" - not a stale cached answer, but the honest result of
+an incomplete fetch, which is exactly the "shallow/partial clone can show
+no ref for a real branch" gap `docs/ROADMAP.md`'s "Safety flag" item
+describes (incidents at Runs 321, 326, 327, 342, 349, 350, 353, 364 - this
+makes nine). Treated that as "the branch doesn't exist, recreate it from
+`main`" (matching the merged-PR-#56 state this session's container was
+seeded from) and built a full run's worth of content on top - re-adding
+the 2026 Ballon d'Or edition and its five companion-award winners,
+complete with new ledger entries, spelling-dictionary additions, and
+regenerated PDFs - before attempting `git push -u origin
+intensive/football-reference`.
+
+**The push itself caught it**, with zero work lost and no force-push
+anywhere in the sequence: a plain (non-force) push to a branch recreated
+from a stale base is a `git`-level non-fast-forward rejection by
+construction, so the push failed on its own before this run ever reached
+for `--force`/`--force-with-lease`. That rejection prompted a fresh `git
+fetch origin intensive/football-reference`, which this time completed and
+revealed the real state: the branch is 121 commits ahead of `main` (Runs
+280-379, a separate session having run throughout the roughly 17 days
+since Run 279 while this session had no visibility into it), and -
+critically - another run (somewhere around Run 303-310 per a `git log`
+scan of the real branch) had already added the exact same 2026 Ballon
+d'Or edition this run had just independently drafted. Re-ran
+`pnpm routine:branch-state intensive/football-reference main` (the Run
+339 tool built for exactly this check) and got a clean `UP_TO_DATE`
+verdict against the real remote tip; confirmed PR #57 (the real, 121-
+commit-ahead PR) via `list_pull_requests` rather than trusting the stale
+local assumption further. Discarded the duplicate commit entirely (kept
+briefly as a local, never-pushed backup branch, then deleted once the
+real branch was confirmed) and checked out the actual
+`origin/intensive/football-reference` tip to continue from.
+
+**Why this is a genuinely new variant worth its own note**, not just a
+tenth instance of an already-fully-diagnosed bug: every prior incident
+(321, 326, 327, 342, 349, 350, 353, 364) involved either weakening the
+safe-sequence check under time pressure or a destructive force-push that
+needed active recovery. This one shows the *unqualified* `git fetch -q
+origin` step itself - not `git branch -a`/`git branch -r`, the specific
+commands Run 339's own `docs/ROADMAP.md` write-up names - can time out
+and silently leave an incomplete ref set, and that `git push` (without
+`--force`) is itself a free, zero-cost safety net against exactly this
+failure mode: a legitimately-diverged-and-rebased push would fast-forward
+fine, so the rejection only ever fires on a genuinely bad base, with no
+chance of false-positive-blocking real work. Worth adding to
+`docs/ROADMAP.md`'s Safety flag item as a concrete reason the plain
+non-force push step is not just incidental caution but a real, already-
+proven backstop - done in this same commit (compensating by trimming
+elsewhere in the same file to stay within `check:roadmap-size`'s 800-line
+budget, per Run 379's own precedent for that budget).
+
+**The actual new work, once re-based on the real branch tip:** continued
+the recurring individual-award cross-reference angle Runs 372-379 opened,
+re-reading `content/uefa-euro.md`'s Winning captains table against
+`content/ballon-dor.md`'s Winners table for a further same-year captaincy
+pairing none of the prior eleven cases had covered, and found one:
+**Franz Beckenbauer** won the 1972 Ballon d'Or the same year he captained
+West Germany to the UEFA EURO 1972 title - both facts were already
+independently on the site (the EURO page's own 1972 Winning-captains
+bullet already noted his *other* same-shape double, the 1974 World Cup
+captaincy, but made no mention of the Ballon d'Or at all), so this was a
+missing cross-reference, not a missing fact. The first same-year
+EURO-captaincy/Ballon d'Or pairing in this series (Gullit's 1987/1988
+pairing, the only other EURO-captaincy case, lands a year apart).
+Confirmed via two independent `WebSearch` passes: Wikipedia's own "1972
+Ballon d'Or" article, which frames the award explicitly as coming "after
+leading West Germany to the European title," and UEFA.com's own
+German-language Beckenbauer EURO-1972 retrospective describing his
+captaincy - see `docs/SOURCES.md` for the full citation list. Extended the
+existing `content/uefa-euro.md` 1972 bullet in place with a "- also won
+that year's Ballon d'Or" clause (the same in-place-extension shape Runs
+367-369/378/379 used) and added one plain, non-superlative bullet to
+`content/ballon-dor.md`'s "Memorable moments" section; mirrored both edits
+on the Croatian counterparts (`src/pages/hr/competitions/ballon-dor.astro`,
+`src/pages/hr/competitions/euro.astro`). Deliberately checked the final
+wording against every one of the nine `scripts/check-*-claims.mjs`
+extraction patterns by hand before writing it, the same low-risk-wording
+discipline Runs 376-379 used - no claim-ledger trigger word appears in
+either new clause, so no ledger entry was needed. Two pre-existing stale
+ledger entries surfaced by `check:ordinal-claims`/`check:superlative-claims`
+(the Rossi/Modrić bullets Runs 362/373 had since extended with their own
+cross-references) turned out to be deliberately-kept historical records
+of the pre-extension wording, not an actual gap - confirmed both already
+have a second, current-text ledger entry alongside the flagged stale one,
+so no fix was needed there.
+
+**Verification:** `pnpm install` (clean, no dependency change), `pnpm
+lint` (272 files, 0/0/0), `pnpm test` (1125/1125), `pnpm build` (713 pages,
+unchanged - a plain prose cross-reference, not a new edition row). All 32
+non-PDF fast CI-gated `check:*` scripts individually, plus
+`check:roadmap-size` (800/800, within budget after the compensating trim)
+- all clean, including `check:claims-hr` (251 claims) and `check:i18n-notes`
+(8 EN/HR page pairs). `check:spelling`/`check:spelling-hr` clean with no
+new dictionary entries needed (Beckenbauer/EURO/Ballon d'Or vocabulary
+already present from the existing bullets). Rebuilt all 702 downloadable
+PDFs per AGENTS.md's unconditional content-edit rule
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium_headless_shell-1243/chrome-
+headless-shell-linux64/chrome-headless-shell.real`, confirmed still the
+right revision for this container); `check:pdfs`/`check:pdf-outline`/
+`check:links` all clean after.
+
+**Left for a future pass:** keep trying both the captaincy/managerial and
+individual-award versions of the recurring cross-reference angle - still
+productive, not yet exhausted at twelve cases. PR #57 (121 commits as of
+this run) and PR #58 (the Run 364 recovery-branch leftover) both remain
+open; neither is this routine's call to merge or close. The three items
+awaiting the user's own sign-off (`.git`-bloat decision, `long-title`
+brand-suffix call, and the branch-recreation stored-prompt fix) are
+unchanged and re-escalated via this run's own push notification, same as
+every run since 289.

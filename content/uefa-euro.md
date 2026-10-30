@@ -138,7 +138,7 @@ A third-place match was played through 1980. From 1984 onward, UEFA recognizes b
 - **1960:** Igor Netto (Soviet Union).
 - **1964:** Ferran Olivella (Spain).
 - **1968:** Giacinto Facchetti (Italy).
-- **1972:** Franz Beckenbauer (West Germany) - also captained West Germany to the 1974 World Cup title, one of only a handful of players to captain a team to both trophies.
+- **1972:** Franz Beckenbauer (West Germany) - also won that year's Ballon d'Or, and captained West Germany to the 1974 World Cup title too, one of only a handful of players to captain a team to both trophies.
 - **1976:** Anton Ondruš (Czechoslovakia).
 - **1980:** Bernard Dietz (West Germany).
 - **1984:** Michel Platini (France) - also won that year's Ballon d'Or and was EURO 1984's top scorer.
