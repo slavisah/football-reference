@@ -3991,6 +3991,44 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries rather than direct page loads.
+- Lothar Matthäus's 1990 World Cup-winning-captain/Ballon d'Or cross-reference
+  (2026-10-30, Run 378): an eighth case of the recurring-individual-award
+  cross-reference angle Run 372 opened with Rodri, and the first to pair a
+  *winning captaincy* (rather than a Golden Ball/Golden Boot/top-scorer
+  award) with the Ballon d'Or in the same year. Both underlying facts were
+  already independently on file - Matthäus's 1990 World Cup-winning
+  captaincy for West Germany (`content/fifa-world-cup.md`'s Winning
+  captains table) and his 1990 Ballon d'Or (`content/ballon-dor.md`'s
+  Winners table, already referenced in passing by the existing Rodri bullet
+  as "since Lothar Matthäus in 1990" but never given its own cross-reference
+  bullet) - so this run only needed to confirm and add the connecting
+  cross-reference, not re-derive either fact. Confirmed via WebSearch, which
+  corroborates both facts consistently across sources describing Matthäus
+  captaining West Germany to the 1-0 final win over Argentina and receiving
+  the 1990 Ballon d'Or as Europe's player of the year that same season:
+  - https://en.wikipedia.org/wiki/Lothar_Matth%C3%A4us
+  - https://fcbayern.com/en/news/2021/03/10-special-moments-in-lothar-matthaeus-career
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
+- Fabio Cannavaro's 2006 World Cup-winning-captain/Ballon d'Or cross-reference
+  (2026-10-30, Run 378): a ninth case of the same angle, and the second
+  winning-captaincy/Ballon d'Or pairing (after Matthäus, above). Both
+  underlying facts were already independently on file - Cannavaro's 2006
+  World Cup-winning captaincy for Italy (`content/fifa-world-cup.md`'s
+  Winning captains table, which already separately noted his tournament
+  Silver Ball) and his 2006 Ballon d'Or (`content/ballon-dor.md`'s Winners
+  table) - so this run only needed to confirm and add the connecting
+  cross-reference, not re-derive either fact. Confirmed via WebSearch
+  against Reuters' and RTÉ's own 2006 award-announcement coverage, which
+  independently corroborate both that Cannavaro captained Italy to the
+  title in Germany and that France Football named him European Footballer
+  of the Year the same November:
+  - https://www.reuters.com (via reuters.screenocean.com/record/815120)
+  - https://www.rte.ie/sport/soccer/2006/1127/211766-cannavaro
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
 
 ## Review policy
 

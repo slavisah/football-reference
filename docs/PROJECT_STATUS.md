@@ -42497,3 +42497,104 @@ too. `docs/ROADMAP.md`'s cross-reference paragraph has only one line of
 budget headroom left; the next run to extend it should trim prose
 elsewhere in the file in the same pass rather than let `check:roadmap-size`
 fail outright.
+
+### Run 378 (2026-10-30): recurring individual-award cross-reference angle extended to an eighth and ninth case - Lothar Matthäus's 1990 and Fabio Cannavaro's 2006 World Cup-winning-captaincy/Ballon d'Or pairings, the first two cases pairing a captaincy rather than an on-pitch award with the Ballon d'Or; `chrome-headless-shell` revision drift (1243 vs. 1248) hit and worked around during PDF regeneration
+
+Continued the recurring-individual-award cross-reference angle Run 372
+opened and Runs 373-377 have kept extending (Rossi, Ronaldo, Zidane,
+Modrić, Platini, Müller). Re-read `content/fifa-world-cup.md`'s "Winning
+captains" table against `content/ballon-dor.md`'s Winners table for any
+further same-year name match the prior six cases (all on-pitch
+awards - Golden Ball, Golden Boot, top-scorer) hadn't covered, and found
+two: **Lothar Matthäus** captained West Germany to the 1990 World Cup
+title and won the 1990 Ballon d'Or the same year, and **Fabio Cannavaro**
+captained Italy to the 2006 World Cup title and won the 2006 Ballon d'Or
+the same year - both facts already independently correct on this site
+(Matthäus's 1990 Ballon d'Or was already referenced in passing by the
+existing Rodri bullet, "since Lothar Matthäus in 1990", but had never been
+given its own cross-reference bullet; Cannavaro's pairing wasn't mentioned
+at all), never cross-referenced as their own fact. Unlike every prior case
+in this series, both players earned the Ballon d'Or primarily for a
+*captaincy*, not an on-pitch individual award (Golden Ball/Boot/top-scorer)
+- the first two instances of this angle shaped this way. Confirmed via two
+separate `WebSearch` passes: Matthäus's pairing against Wikipedia's Lothar
+Matthäus article and FC Bayern's own retrospective (both describing him
+captaining West Germany's 1-0 final win over Argentina and receiving the
+1990 Ballon d'Or as Europe's player of the year the same season), and
+Cannavaro's pairing against Reuters' and RTÉ's own 2006 award-announcement
+coverage (both confirming France Football named him European Footballer
+of the Year in November 2006, the same year he captained Italy to the
+title in Germany).
+
+Added one plain, non-superlative bullet each for both players to
+`content/ballon-dor.md`'s "Memorable moments" section, and extended the
+existing 1990/2006 entries in `content/fifa-world-cup.md`'s "Winning
+captains" section in place with a matching "- also won the Nineteen-Ninety/
+Two-Thousand-and-Six Ballon d'Or" clause (the same in-place-extension shape
+Run 367-369's captaincy/managerial cross-references used). Mirrored all
+four edits on the Croatian counterparts
+(`src/pages/hr/competitions/ballon-dor.astro`,
+`src/pages/hr/competitions/world-cup.astro`), plus two matching
+`docs/SOURCES.md` citation entries. Deliberately avoided every
+claim-ledger trigger word (checked each of the nine extraction patterns in
+`scripts/check-*-claims.mjs` by hand before writing the final wording), so
+no ledger file needed an entry - the same lowest-risk shape Runs 376-377
+used. No new name needed adding to `.cspell/football-names.txt` (both
+players' names were already present from their own Winners-table/
+Winning-captains-table rows). Both `content/ballon-dor.md` and
+`content/fifa-world-cup.md` were already at today's `lastReviewed` date
+from an earlier run this cycle, so no bump was needed.
+
+Tightened `docs/ROADMAP.md`'s cross-reference-angle paragraph in place
+(trimming its wording, not just appending) to name both new cases while
+landing exactly at its 800-line CI budget (800/800 - zero headroom left;
+the next run that extends this paragraph again must trim elsewhere in the
+file in the same pass, not just within the paragraph itself, or
+`check:roadmap-size` will fail outright). Bumped the intensive-run count in
+this file's own opening line to 378.
+
+**Operational note: `chrome-headless-shell` revision drift hit again.**
+`pnpm build:pdfs` failed outright on the first attempt this run with
+`browserType.launch: Executable doesn't exist at
+/opt/pw-browsers/chromium_headless_shell-1248/...` - this container's
+pre-installed Playwright browser cache is still at revision 1243 (unchanged
+since Run 345, confirmed again by Run 371), but the `@playwright/test`
+release in this `pnpm install` now looks for 1248. Same root cause and fix
+documented since Run 265/294/371: found the real installed revision with
+`find /opt/pw-browsers -iname '*headless*'` and re-ran with
+`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell.real`,
+which succeeded. A first `build:pdfs` attempt (before the explicit path was
+set) also separately hit this session's 30-minute background-task time
+limit partway through (621 of 702 PDFs already regenerated when stopped,
+no corruption or stray process left behind) - re-running the same command
+picked up cleanly via the generator's own stale/unchanged-skip manifest
+logic (`700 PDF(s) regenerated, 2 unchanged and skipped (of 702 total)` on
+the second, completed attempt), so no work was lost, just extra wall-clock
+time. Future runs should budget for `build:pdfs` needing more than one
+background-task slot on a cold `node_modules` install.
+
+**PR #57/#58 status, re-checked via the GitHub API directly:** PR #57 is
+still open - now 17 days old (created 2026-10-13), 119 commits going into
+this run, `mergeable_state: "clean"`. Still nothing blocking merge except
+the user's own action; this run adds its own commit on top via a plain,
+non-force `git push` (checked out at the exact remote tip reported by
+`pnpm routine:branch-state`'s `UP_TO_DATE` verdict, no divergence). PR #58
+(the Run 364 recovery-branch leftover) is also still open and still
+redundant - not this run's call to close. The three items awaiting the
+user's own sign-off (`.git`-bloat, the `long-title` call, and the
+branch-recreation stored-prompt fix) remain unanswered since Run 289;
+re-flagged in this run's own push notification rather than assumed acted
+on.
+
+**Verification:** fresh `pnpm install` (this session's container started
+with no `node_modules` at all; 492 packages installed clean, matching the
+locked versions), `pnpm lint` (272 files, 0 errors/0 warnings/0 hints),
+`pnpm test` (1125/1125, 70 files), `pnpm build` (713 pages, unchanged, run
+twice - before and after the PDF rebuild - with identical results). All 32
+non-PDF fast CI-gated `check:*` scripts individually (`check:spelling`/
+`check:spelling-hr` both clean with no new words needed, `check:claims-hr`
+unaffected since no ledger entry was added, `check:i18n-notes` 8 pairs
+clean), plus `check:roadmap-size` (800/800, within budget) and
+`check:pdfs`/`check:pdf-outline` after the full 702-PDF rebuild (both
+clean: all PDFs fresh, every outline matching its own page's heading
+count). No regression found anywhere.

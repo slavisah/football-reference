@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (377 intensive runs as of 2026-10-30) lives
+verification sweep and decision (378 intensive runs as of 2026-10-30) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -261,16 +261,17 @@ de la Fuente's Nations League 2023 win, Cafu's Copa América 1999
 captaincy), fixed in both languages; see `docs/PROJECT_STATUS.md`. Run 372
 widened the angle to recurring *individual-award* winners across
 competitions (the specific extension Run 370 flagged as still open); Runs
-372-377 have since shipped seven cases - Rodri's Nations League 2023/EURO
+372-378 have since shipped nine cases - Rodri's Nations League 2023/EURO
 2024/Ballon d'Or 2024 sweep, Paolo Rossi's and Ronaldo's World Cup/Golden
 Boot/Ballon d'Or sweeps (1982, 2002), Zidane's and Modrić's World
 Cup/Ballon d'Or pairings (1998, 2018), Platini's 1984 EURO/Golden
-Boot/Ballon d'Or sweep (the first EURO rather than World Cup pairing), and
+Boot/Ballon d'Or sweep (the first EURO rather than World Cup pairing),
 Müller's 1970 World Cup Golden Boot/Ballon d'Or pairing (the first where
-the player didn't also win the tournament). See each run's own
-`docs/PROJECT_STATUS.md` entry for the full detail. Keep trying both the
-captaincy/managerial and individual-award versions of this angle - still
-productive, not yet exhausted.
+the player didn't also win the tournament), and Matthäus's/Cannavaro's
+1990/2006 World Cup-winning-captaincy/Ballon d'Or pairings (the first two
+pairing a captaincy with the award) - see `docs/PROJECT_STATUS.md`. Keep
+trying both the captaincy/managerial and individual-award versions of this
+angle - still productive, not yet exhausted.
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims
