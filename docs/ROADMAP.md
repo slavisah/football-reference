@@ -453,7 +453,16 @@ the full run-by-run history behind all of this, see
   itself was rejected as non-fast-forward, catching it with zero work lost
   and no force-push anywhere in the sequence. Confirms the plain-push step
   is a real, proven backstop on its own, not just incidental caution - see
-  `docs/PROJECT_STATUS.md`'s Run 380 entry.
+  `docs/PROJECT_STATUS.md`'s Run 380 entry. **Run 383 (2026-10-31): a tenth
+  incident** - caught with zero work lost, but by neither repo-side
+  defense: unrelated network fetch failures caused the same false
+  "doesn't exist" conclusion, and the resulting `--force-with-lease` push
+  was rejected only because those same failures had also blocked
+  establishing a lease baseline, not because anything caught the real
+  125 commits it would have overwritten. First-hand evidence the two
+  defenses alone aren't sufficient - see `docs/PROJECT_STATUS.md`'s Run
+  383 entry for the full sequence and why this raises the stored-prompt
+  fix's urgency.
 - **`.git` history bloat from committed PDFs - decision overdue, unresolved
   across 8 runs (289-296, 2026-10-14 to 2026-10-16):** root cause and the
   Run 293 partial fix are fully written up in `docs/PROJECT_STATUS.md`'s

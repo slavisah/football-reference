@@ -43047,3 +43047,96 @@ this run's own push notification. A future run should try `pnpm dlx
 knip` again in case a future session's permission layer allows it, purely
 to re-confirm the documented baseline rather than because anything this
 run did would plausibly have changed it.
+
+### Run 383 (2026-10-31): a tenth occurrence of the branch-recreation failure mode, caught with zero work lost but *not* by either existing defense - a near-miss worth recording precisely because of how it was actually caught; no new content shipped
+
+**What happened, in sequence.** This run's own stored prompt (unchanged
+from the version Runs 321/327/342/349/350/353/364/380 already quoted and
+flagged as still carrying the old, unsafe check) told it to verify the
+branch's existence with `find`/`git branch -a`/`git fetch -q origin` and
+a `git merge-tree` comparison against `origin/main` - not
+`scripts/check-intensive-branch-state.mjs`, which this run never reached
+for because the prompt it was executing doesn't mention it (same root
+cause as every prior incident in this series). A string of genuine
+network failures this run hit independently (`git fetch origin` and
+`git fetch origin intensive/football-reference` both repeatedly timed
+out or hit mid-transfer TLS resets - unrelated to the branch-safety bug,
+just this session's actual network conditions) meant the old check's
+`git branch -a` legitimately showed only `main`, and its `git fetch -q
+origin` legitimately returned with no error while still having failed to
+populate `refs/remotes/origin/intensive/football-reference` at all - the
+exact "shallow/incomplete fetch -> wrongly conclude the branch doesn't
+exist" shape Runs 321/380 already named, not a new failure mode. Checked
+out a fresh `intensive/football-reference` from `origin/main`, redid the
+entire 2026 Ballon d'Or edition from scratch (unaware it already shipped
+on the real branch - see below), and ran `git push --force-with-lease`.
+
+**What actually stopped it: not the pre-push hook, and not this run's own
+diligence - the same network flakiness that caused the mistake also
+blocked executing it.** `--force-with-lease` with no explicit expected
+SHA refused every attempt with "stale info", because this session's git
+had no remote-tracking ref for `intensive/football-reference` at all (per
+the failed fetches above) and so had no baseline to assert - not because
+anything detected the real branch's 125 commits of unrelated work. Run
+353's own finding already explains why `.githooks/pre-push` could not
+have caught this either: that hook only exists in commits on the real
+branch, and a fresh checkout of `main` never has it. Had the network
+allowed even one of the lease-less force-push attempts through, this
+would have been a tenth actual overwrite, not a tenth near-miss - the
+outcome here came from an unrelated network condition, not from either
+of the two defenses Runs 339/351 built. This is itself the most important
+single finding of this run: **both existing defenses can still be
+bypassed by ordinary bad luck** (a `main`-only shallow state plus a
+force-push that happens to land before any fetch succeeds), and nothing
+in the current design would have caught it if the network had simply
+behaved normally on this run instead of this one's own specific
+mitigating failure.
+
+**How it was actually caught.** After the lease rejections, retried the
+fetch with `--filter=blob:none` (the repo's large PDF-binary history is
+almost certainly why every full/branch-scoped fetch attempt had been
+timing out or resetting mid-transfer - a blobless fetch pulls only
+commit/tree metadata) - this succeeded where five prior full-fetch
+attempts and one SHA-targeted fetch had not. That surfaced the real
+remote tip (`7848727b`, "Run 382"), 125 commits ahead of `main` with real
+work including this exact safety-flag's own prior incidents.
+`git merge-base --is-ancestor` confirmed the real tip is *not* an
+ancestor of `main` (genuine unmerged work, not a stale merged branch),
+and `pnpm run routine:branch-state` then independently confirmed
+`UP_TO_DATE`. Checked out the real branch (discarding the locally-made,
+now-redundant commit entirely - never pushed, so nothing to revert on the
+remote) and confirmed via `list_pull_requests`/`pull_request_read` that
+PR #57's head SHA matches exactly.
+
+**The redone work was already shipped.** The 2026 Ballon d'Or edition
+this run had independently researched and drafted (Harry Kane; Kopa:
+Yamal third straight; Yashin: Simón; Gerd Müller: Kane; Johan Cruyff: de
+la Fuente) turned out to duplicate work already on the real branch since
+2026-10-27 (see `content/ballon-dor.md`'s own dated note), including the
+Sócrates Award entry (Bukayo Saka) this run had deliberately left out for
+lacking a second source - the real branch's version evidently found one.
+No content changes were needed or made this run.
+
+**Verification (full health reconfirmation on the real branch, no content
+edit):** `pnpm install --frozen-lockfile` against the real `pnpm-
+lock.yaml` (this run's earlier install had been run against the
+now-discarded branch's lockfile and needed redoing - `astro` alone
+differed, 7.3.8 vs. the real 7.4.4), `pnpm lint` (0/0/0), `pnpm test`
+(1125/1125), `pnpm build` (713 pages), `pnpm audit` (the same two
+pre-existing moderate `lighthouse`-transitive-`glob` advisories every
+recent run has documented, unchanged), `pnpm outdated` (only the
+already-blocked `typescript`/`@astrojs/check` pair - every other
+dependency Run 382 already brought current). No `check:*` script run
+individually this run since no file changed; CI will cover the next real
+push.
+
+**Left for a future pass:** the three items awaiting the user's own
+sign-off are unchanged (see Run 382's own list). Added to this run's own
+push notification: the stored-prompt fix is now more urgent than a
+"would be nice" - this run is direct, first-hand evidence that the two
+repo-side defenses alone are not sufficient, and the next incident might
+not have an unrelated network failure available to accidentally block
+it. A future run with reliable network access should consider whether
+`scripts/check-intensive-branch-state.mjs`'s verdict should be checked
+*before* any fetch-failure fallback logic runs at all, rather than only
+when a run remembers to call it.
