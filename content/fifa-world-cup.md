@@ -5,7 +5,7 @@ competitionType: international
 confederation: FIFA
 firstEdition: 1930
 lastCompletedEdition: 2026
-lastReviewed: 2026-10-30
+lastReviewed: 2026-10-31
 status: verified
 ---
 
@@ -229,6 +229,7 @@ Every World Cup edition has decided its champion in one match at one stadium, in
 ## Memorable moments
 
 - Uruguay defeated Brazil in the decisive 1950 match at the Maracanã, a result remembered as the *Maracanazo*.
+- Bobby Charlton (England) won the 1966 World Cup and that year's Ballon d'Or.
 - Brazil's 1970 side became the first team to win three World Cups.
 - Diego Maradona inspired Argentina in 1986.
 - Zinedine Zidane (France) won the 1998 World Cup and that year's Ballon d'Or.

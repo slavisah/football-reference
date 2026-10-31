@@ -4088,6 +4088,33 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries rather than direct page loads.
+- Bobby Charlton's 1966 World Cup/Ballon d'Or cross-reference (2026-10-31,
+  Run 381): a thirteenth case of the same recurring individual-award
+  angle, and the first in the series tied to a World Cup win itself
+  rather than a captaincy or on-pitch tournament award (the same shape as
+  the existing Zidane-1998/Modrić-2018 bullets). Both underlying facts
+  were already independently on file - Charlton's 1966 Ballon d'Or
+  (`content/ballon-dor.md`'s Winners table) and England's 1966 World Cup
+  win, with Bobby Moore (not Charlton) already correctly listed as the
+  winning captain (`content/fifa-world-cup.md`'s Finals and Winning
+  captains tables) - so this run only needed to confirm and add the
+  connecting cross-reference, not re-derive either fact. Confirmed via two
+  independent WebSearch passes against Wikipedia's "1966 Ballon d'Or"
+  article and Bobby Charlton's own biographical coverage, both
+  independently corroborating the Ballon d'Or win and his place in
+  England's 1966 World Cup-winning squad:
+  - https://en.wikipedia.org/wiki/1966_Ballon_d%27Or
+  - https://en.wikipedia.org/wiki/Bobby_Charlton
+  - Note: both WebSearch passes also asserted Charlton won the World
+    Cup's "Golden Ball" in 1966 - checked against this site's own
+    `content/fifa-world-cup.md` ("FIFA has named a best-player award at
+    every World Cup since 1982; no equivalent award existed at earlier
+    editions") and found to be anachronistic, so left out entirely rather
+    than shipped; only the two mutually-consistent, already-independently-
+    sourced facts (the World Cup win and the Ballon d'Or) were added. The
+    same egress-blocked-domains caveat every prior audit in this file has
+    noted applies here too; verification relied on WebSearch's synthesized
+    summaries rather than direct page loads.
 
 ## Review policy
 

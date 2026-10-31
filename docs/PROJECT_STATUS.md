@@ -42809,3 +42809,119 @@ awaiting the user's own sign-off (`.git`-bloat decision, `long-title`
 brand-suffix call, and the branch-recreation stored-prompt fix) are
 unchanged and re-escalated via this run's own push notification, same as
 every run since 289.
+
+### Run 381 (2026-10-31): PR #56 merged by the user; resumed on PR #57 as-is; shipped a thirteenth recurring individual-award cross-reference (Bobby Charlton's 1966 World Cup/Ballon d'Or pairing)
+
+**Branch/PR state first:** this session found `origin/main` already
+contains the PR #56 merge commit (`55a434cee`, merged by the user since
+Run 380) - the first of the long-escalated PR-56/57 flags to actually
+close via a real merge rather than a routine's own notification alone.
+`origin/intensive/football-reference` (PR #57's head) is 122 commits
+ahead of the new `main` and strictly contains it (`merge-base
+--is-ancestor origin/main origin/intensive/football-reference` true), so
+per the Safety flag's own decision tree this was `UP_TO_DATE` - checked
+out as-is, no rebase, no force-push risk. Also re-confirmed PR #58 (the
+Run 364 recovery-branch leftover) is fully contained in PR #57's branch
+(`merge-base --is-ancestor` true in that direction too) - still redundant,
+still not this routine's call to close.
+
+**This run's own fetch note:** an initial unqualified `git fetch -q
+origin` and a follow-up explicit single-ref fetch both timed out (120s,
+then 60s) before a third attempt with a 90s timeout completed - the same
+"plain fetch can time out and leave an incomplete ref set" shape Run 380
+flagged as a tenth-incident risk. Unlike Run 380, this session caught it
+*before* drawing any conclusion or building anything: it simply retried
+until a fetch actually completed, then ran the full safe sequence
+(`git ls-remote`, explicit ref fetch, `merge-base --is-ancestor` both
+ways) against the result rather than trusting the timed-out state. No
+incident, just a slow network this run - worth a data point either way.
+
+**The content work:** continued the recurring individual-award
+cross-reference angle (Runs 372-380, flagged as "still productive, not
+yet exhausted"), re-reading `content/ballon-dor.md`'s Winners table
+against each competition's own winning-player/captain lists for a further
+same-year pairing none of the prior twelve cases had covered, and found
+one: **Bobby Charlton** won the 1966 Ballon d'Or the same year he was part
+of England's 1966 World Cup-winning squad. Both facts were already
+independently on file (Charlton's 1966 Ballon d'Or in
+`content/ballon-dor.md`'s Winners table; England's 1966 World Cup win in
+`content/fifa-world-cup.md`'s Finals table, with Bobby *Moore*, not
+Charlton, already correctly listed as the winning captain) - so this run
+only needed to confirm and add the connecting cross-reference, not
+re-derive either fact. This is the first case in the series tied to a
+World Cup win itself rather than a captaincy or an on-pitch tournament
+award (matching the shape of the existing Zidane-1998/Modrić-2018 bullets,
+not the captaincy-pattern ones).
+
+**A near-miss worth recording:** both initial `WebSearch` passes also
+asserted Charlton won the World Cup's "Golden Ball" in 1966, alongside the
+Ballon d'Or and World Cup facts. Cross-checked against this site's own
+`content/fifa-world-cup.md` before writing anything - its "Golden Ball
+winners" section states plainly "FIFA has named a best-player award at
+every World Cup since 1982; no equivalent award existed at earlier
+editions," directly contradicting the search snippets. Rather than ship
+the anachronistic claim, left it out entirely and only added the two
+already-independently-sourced, mutually-consistent facts (the 1966 World
+Cup win and the 1966 Ballon d'Or), exactly the same "don't ship a
+self-computed or search-synthesized superlative without independent
+convergence" discipline this routine has applied to every prior case in
+this series. Confirmed via two independent `WebSearch` passes (Wikipedia's
+"1966 Ballon d'Or" article and Bobby Charlton biographical coverage, both
+independently corroborating the Ballon d'Or win and the World Cup squad
+membership with no conflicting detail on those two facts specifically):
+see `docs/SOURCES.md` for the full citation list.
+
+Added one plain, non-superlative bullet to each of `content/fifa-world-
+cup.md`'s and `content/ballon-dor.md`'s "Memorable moments" sections,
+matching the exact prose shape of the existing Zidane/Ronaldo and
+Beckenbauer/Platini bullets respectively; mirrored both edits on the
+Croatian counterparts (`src/pages/hr/competitions/world-cup.astro`,
+`src/pages/hr/competitions/ballon-dor.astro`). Bumped both files'
+`lastReviewed` to 2026-10-31. Checked the final wording against every one
+of the eight `scripts/check-*-claims.mjs` extraction patterns by hand
+before writing it (no "only"/"first"/ordinal/"since"/"consecutive"/
+"record"/"one of only"/"joining" trigger words in either new clause) - no
+claim-ledger entry was needed, confirmed by re-running every claim-ledger
+check after the edit with no new stale/missing entries attributable to
+this change (two pre-existing stale entries the superlative/ordinal
+checkers flagged - the Modrić "only Croatian winner" and Rossi "award's
+first winner" lines - predate this run and are unrelated, same
+already-investigated "deliberately-kept historical record of prior
+wording, not an actual gap" case Run 380 found).
+
+Added "Charlton" to `.cspell/football-names-hr.txt` (alphabetically
+between "Chaco" and "Ciudad") after `check:spelling-hr` flagged it as an
+unrecognized word in the new Croatian sentence.
+
+**Verification:** `pnpm install` (clean, no dependency change), `pnpm
+lint` (272 files, 0 errors/0 warnings/0 hints), `pnpm test` (1125/1125,
+70 files), `pnpm build` (713 pages, unchanged). All 32 non-PDF fast
+CI-gated `check:*` scripts individually (`check:spelling-hr` caught the
+"Charlton" gap above on the first pass, clean after the dictionary fix and
+re-run; every other check clean on the first pass, including
+`check:records-consistency`/`check:team-profiles-consistency`/
+`check:player-profiles-consistency`/`check:compare-consistency`'s
+independent-recomputation guards), plus `check:roadmap-size` (796/800,
+within budget). `pnpm audit` (2 pre-existing moderate advisories, both in
+`lighthouse`'s transitive `glob` dependency, unrelated to this change) and
+`pnpm dlx knip --no-config-hints` (the one standing `@cspell/dict-hr-hr`
+false positive, unchanged) both at their documented baseline. Rebuilt all
+702 downloadable PDFs per AGENTS.md's unconditional "any edit to
+`content/*.md`" rule (`PW_EXECUTABLE_PATH=/opt/pw-browsers/
+chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-
+headless-shell.real`, the same revision Run 380 confirmed this container's
+Playwright cache still has) - 554 of 702 regenerated (every Ballon d'Or
+and World Cup edition PDF in both languages, plus every derived
+player/team/compare/records PDF that embeds either competition's data,
+all cascading from the two `lastReviewed` bumps; 148 unrelated PDFs
+unchanged and skipped); `check:pdfs`/`check:pdf-outline` both clean after.
+No regression found anywhere.
+
+**Left for a future pass:** keep trying both angle shapes in the recurring
+cross-reference series - still productive, not yet exhausted at thirteen
+cases. PR #57 (122 commits as of this run) remains open and is now the
+sole standing PR-merge flag (PR #56 is resolved); PR #58 (redundant
+recovery-branch leftover) also remains open. The three items awaiting the
+user's own sign-off (`.git`-bloat decision, `long-title` brand-suffix
+call, and the branch-recreation stored-prompt fix) are unchanged and
+re-escalated via this run's own push notification.

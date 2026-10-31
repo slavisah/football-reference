@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (380 intensive runs as of 2026-10-30) lives
+verification sweep and decision (381 intensive runs as of 2026-10-31) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -261,13 +261,15 @@ de la Fuente's Nations League 2023 win, Cafu's Copa América 1999
 captaincy), fixed in both languages; see `docs/PROJECT_STATUS.md`. Run 372
 widened the angle to recurring *individual-award* winners across
 competitions (the specific extension Run 370 flagged as still open); Runs
-372-380 have since shipped twelve cases - Rodri's Nations League 2023/EURO
+372-381 have since shipped thirteen cases - Rodri's Nations League 2023/EURO
 2024/Ballon d'Or 2024 sweep, Paolo Rossi's and Ronaldo's World Cup/Golden
-Boot/Ballon d'Or sweeps (1982, 2002), Zidane's and Modrić's World
-Cup/Ballon d'Or pairings (1998, 2018), Platini's and Van Basten's 1984/1988
-EURO Golden Boot/Ballon d'Or sweeps, Müller's 1970 World Cup Golden
-Boot/Ballon d'Or pairing (the only one where the player didn't also win
-the tournament), and Matthäus's/Cannavaro's/Gullit's/Beckenbauer's
+Boot/Ballon d'Or sweeps (1982, 2002), Zidane's, Modrić's and Bobby
+Charlton's World Cup/Ballon d'Or pairings (1998, 2018, 1966 - Charlton's
+is the only one not tied to a captaincy or on-pitch award, just the Cup
+and the Ballon d'Or itself), Platini's and Van Basten's 1984/1988 EURO
+Golden Boot/Ballon d'Or sweeps, Müller's 1970 World Cup Golden Boot/Ballon
+d'Or pairing (the only one where the player didn't also win the
+tournament), and Matthäus's/Cannavaro's/Gullit's/Beckenbauer's
 1990/2006/1987-88/1972 winning-captaincy/Ballon d'Or pairings (Gullit's
 alone lands a year apart, same-year every other time) - see
 `docs/PROJECT_STATUS.md`. Keep trying both angle shapes - still
