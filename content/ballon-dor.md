@@ -3,8 +3,8 @@ title: Men's Ballon d'Or
 slug: ballon-dor
 awardType: individual
 firstEdition: 1956
-lastCompletedEdition: 2025
-lastReviewed: 2026-10-09
+lastCompletedEdition: 2026
+lastReviewed: 2026-10-31
 status: verified
 ---
 
@@ -15,7 +15,8 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 ## How it works
 
 - The Ballon d'Or honors the best individual men's player of the year - it is not a team competition or a national-team trophy.
-- A panel of football journalists, one from each eligible country, ranks their top players; the votes are combined into one final ranking.
+- A panel of football journalists, one per eligible country, ranks their top players from a shortlist, and the votes are combined into one final ranking - but the panel hasn't always been journalists alone: from 2010 to 2015, while FIFA jointly presented the award (see above), national-team captains and coaches voted alongside journalists in a combined panel of roughly 500, before it reverted to journalists only in 2016.
+- The journalist panel's own size has changed too: roughly 170 countries had a vote before a 2022 reform capped it at one journalist per country from the top 100 nations in the FIFA men's world ranking, a cap still in effect for the 2025 award.
 - Eligibility has widened over time: Europe-only at first, then any nationality at a European club from 1995, then fully global since 2007 (see the introduction above).
 - The winner is announced at a ceremony organized by France Football magazine - held at year's end through 2021, then moved to September/October from 2022 onward (see the Ceremony date column above).
 
@@ -93,8 +94,9 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 | 2023 | Lionel Messi | Argentina | 30 October 2023 |
 | 2024 | Rodri | Spain | 28 October 2024 |
 | 2025 | Ousmane Dembélé | France | 22 September 2025 |
+| 2026 | Harry Kane | England | 26 October 2026 |
 
-## Multiple winners through 2025
+## Multiple winners through 2026
 
 | Player | Awards |
 |---|---:|
@@ -120,6 +122,7 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 - **2023:** Jude Bellingham (England).
 - **2024:** Lamine Yamal (Spain).
 - **2025:** Lamine Yamal (Spain) - the first player to win the Kopa Trophy twice.
+- **2026:** Lamine Yamal (Spain) - his third consecutive Kopa Trophy, the first player to win it three times.
 
 ## Yashin Trophy winners
 
@@ -131,6 +134,7 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 - **2023:** Emiliano Martínez (Argentina).
 - **2024:** Emiliano Martínez (Argentina) - the first goalkeeper to win the Yashin Trophy in consecutive years.
 - **2025:** Gianluigi Donnarumma (Italy) - his second Yashin Trophy, making him the second goalkeeper (after Martínez) to win it more than once.
+- **2026:** Unai Simón (Spain).
 
 ## Gerd Müller Trophy winners
 
@@ -140,12 +144,14 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 - **2023:** Erling Haaland (Norway).
 - **2024:** Harry Kane (England) and Kylian Mbappé (France) - the trophy's first tie, both credited as joint winners on the same goal tally.
 - **2025:** Viktor Gyökeres (Sweden).
+- **2026:** Harry Kane (England) - his second Gerd Müller Trophy, making him the second player (after Lewandowski) to win it more than once.
 
 ## Johan Cruyff Trophy winners
 
 - France Football has also presented the Johan Cruyff Trophy, a companion "best men's coach" award named after the Netherlands great (three-time Ballon d'Or winner, see the Winners table above), alongside the Ballon d'Or every year since 2024 - the newest of the three companion trophies on this page, with no gap year since it started after the Kopa/Yashin/Gerd Müller trophies had already established the pattern.
 - **2024:** Carlo Ancelotti (Real Madrid) - the trophy's first winner, honored for Real Madrid's La Liga and UEFA Champions League double.
 - **2025:** Luis Enrique (Paris Saint-Germain) - honored for PSG's Ligue 1, Coupe de France and first-ever UEFA Champions League title.
+- **2026:** Luis de la Fuente (Spain) - honored for leading Spain to their second FIFA World Cup title (after 2010).
 
 ## Socrates Award winners
 
@@ -154,6 +160,7 @@ France Football created the Ballon d'Or in 1956. Eligibility rules changed over 
 - **2023:** Vinícius Júnior (Brazil) - honored for Instituto Vini Jr.'s work against racism and educational inequality in Brazil.
 - **2024:** Jennifer Hermoso (Spain) - the award's first female recipient, honored for her advocacy against sexual abuse and harassment in sport.
 - **2025:** Xana Foundation - founded by Johan Cruyff Trophy winner Luis Enrique (see above) and his wife Elena Cullell in memory of their daughter Xana, who died in 2019; the award's first winner that is not an individual footballer.
+- **2026:** Bukayo Saka (England) - honored for his humanitarian work through the BigShoe foundation, including funding surgeries for children in Nigeria.
 
 ## Important editorial note
 
@@ -169,18 +176,170 @@ A second, independent cross-check of every Winner and National team cell (2026-0
 
 A second, independent cross-check of the **Ceremony date** column (2026-08-13, intensive run) re-verified all 69 dated editions (1956-2025, excluding the 2020 cancellation) in four era-based passes, deliberately drawing on a source mix distinct from the first pass's Wikipedia/France-Football-issue/Tuesday-heuristic combination - RSSSF's per-year "European Footballer of the Year" pages (`rsssf.org/miscellaneous/europa-poy*.html`), Britannica, official club sites (Benfica, Dynamo Kyiv, AC Milan, PSG), UEFA.com, contemporaneous wire coverage (VOA News, Reuters-affiliated reprints), and physical France Football issue-cover-date listings (auction/collector sites). **No discrepancies found** - every one of the 69 dates already on the page held up against this independent pass. This closed out both years the first pass had flagged as sourced from only a single corroborating reference (1965, 1973) with further non-Wikipedia corroboration, and resolved the apparent "29 vs 30 December 1986" conflict with a genuine explanation rather than just re-asserting one side: Soviet-era retrospectives (Dynamo Kyiv/Ukrainian press) describe Belanov being privately notified of the result on 29 December, while France Football's own issue (#2125) carrying the published result is dated 30 December - the page tracks the publication date, so 30 December stands correct, and the "29 December" figure some club sources repeat refers to a different (earlier, private) moment in the same story rather than an error. The Tuesday-publication heuristic used throughout the 1956-2001 span visibly breaks down from **2002 onward** (12 December 2002 is a Thursday, 22 December 2003 and 13 December 2004 are both Mondays) - all three dates are independently corroborated by contemporaneous sources regardless (a BigSoccer forum post discussing the 2002 result on 16 December, a VOA News wire dateline for 2003, and UEFA.com's own report naming the day of the week for 2004), so this is a real shift in France Football's release-day pattern around this time, not a data error; future audits of this column should not treat the Tuesday pattern as informative past 2001.
 
+A fresh, independent second-pass audit of the five companion trophy
+sections above (Kopa, Yashin, Gerd Müller, Johan Cruyff and Sócrates;
+2026-10-13, intensive run) re-verified every entry via `WebSearch` against
+a source mix distinct from each section's original authoring citations
+(Sports Illustrated's and TopEndSports' own "complete list" pages for
+Kopa/Yashin/Gerd Müller, Wikipedia's dedicated trophy articles, and
+Peace and Sport's own press releases for the two Sócrates years the
+first search pass left unsettled, 2024 and 2025). **No discrepancies
+found** across all 20 entries in the five sections - the only point
+worth recording is that the first search pass for the Sócrates Award
+could not independently confirm 2024 or 2025 from its initial result set
+and needed a second, more targeted query for each year before both
+(Jennifer Hermoso, 2024; the Xana Foundation, 2025) were confirmed
+exactly as already on the page. These five sections had each had two
+independent `WebSearch` passes at authoring time (2026-08-31 through
+2026-09-03) but no further external re-check since, unlike the Winners/Ceremony
+date columns above, which both already have a documented second
+independent pass; this run closes that gap.
+
+A third independent cross-check of the Winners table (2026-10-19, intensive
+run) re-confirmed the 2025 row (Dembélé) and re-summed the "Multiple
+winners through 2025" table against the Winners table itself - both held
+up with no discrepancies. This pass also specifically re-verified two of
+the exclusivity/precedence claims in the "Memorable moments"/"Notes"
+sections below, the kind of overgeneralization the site's
+content-verification rotation has previously caught elsewhere
+(`glossary.md`): the claim that no other goalkeeper besides Yashin has won
+the men's award, and the claim crediting Weah's 1995 win as the earliest
+by an African national-team player (that framing specifically means the
+earliest African-*national* winner, matching this page's own "National
+team" column throughout - a different, narrower claim from crediting him
+as the earliest Black winner, which the page does not make). Both
+confirmed as written.
+
+A fresh pass (2026-10-21, intensive run) turned to the "How it works" section
+itself, rather than re-checking the Winners table or the five companion
+trophies above (each already independently cross-checked two or three times
+with no discrepancies, per the audits above). That section's voting-panel
+bullet had described the panel as "journalists, one from each eligible
+country" throughout the award's history without qualification - true of the
+1956-2009 and 2016-present eras, but not of 2010-2015, when FIFA jointly
+presented the award: that panel also included national-team captains and
+coaches voting alongside journalists, each roughly a third of a combined
+panel of around 500. It also left out a real, well-documented 2022 reform
+that shrank the journalist pool itself, from roughly 170 voting countries to
+one journalist per country from only the top 100 nations in the FIFA men's
+world ranking - a cap still in force for the 2025 award. Both facts are
+corroborated across multiple independent outlets (Wikipedia's FIFA Ballon
+d'Or article, Bleacher Report, Sports Illustrated, and Eurosport/CGTN/90min's
+contemporaneous 2022-reform coverage, among others - see `docs/SOURCES.md`).
+Rewrote the bullet to state both eras accurately and added a second bullet
+for the 2022 reform; mirrored on the Croatian page
+(`src/pages/hr/competitions/ballon-dor.astro`), which hand-translates this
+section separately from `content/ballon-dor.md`. This is an accuracy
+addition, not a correction of a false claim - the original text wasn't
+wrong across the bulk of the award's history, just silent about two eras
+where the mechanism was different.
+
+The **2026 edition** (added 2026-10-27, intensive run) was confirmed via `WebSearch`
+against two independent post-ceremony recap articles (ESPN and Yahoo Sports,
+both published the morning after the 26 October 2026 ceremony at the London
+Palladium) that agree exactly: Harry Kane won the men's Ballon d'Or ahead of
+Lamine Yamal and Kylian Mbappé, the first English winner since Michael Owen
+in 2001. **Update (2026-10-27, Run 360):** the five companion trophies flagged above
+as an indexing-lag gap were confirmed the next day - a fresh `WebSearch` pass
+found dedicated post-ceremony recap coverage for every one of them, each
+independently confirmed by at least two outlets (see `docs/SOURCES.md` for
+the full per-trophy citation list). Added to the five
+companion-trophy sections above and mirrored on the Croatian page
+(`src/pages/hr/competitions/ballon-dor.astro`). One methodology note worth
+recording: an initial broad multi-award query synthesized an answer naming
+Harry Kane as the Gerd Müller Trophy's sole 2026 winner without flagging that
+his *2024* win had been a tie with Kylian Mbappé; a narrower follow-up query
+on that trophy alone then surfaced only the 2024 tie with no 2026 result,
+which could have been misread as a contradiction rather than a different
+year. Only a third, season-specific query resolved it cleanly across
+multiple dedicated recap articles. Future per-trophy re-checks should prefer
+a dated, trophy-specific query over a broad multi-award one, and verify any
+single search's synthesized summary with a second targeted query before
+trusting it.
+
+**Individual-award cross-references across competitions** (added 2026-10-29,
+intensive run): a genuinely new verification angle - recurring *individual*
+award winners across different competitions, as distinct from the recurring
+managers/captains Runs 367-370 already cross-referenced (`docs/ROADMAP.md`
+flagged this specific widening, e.g. "Rodri's Nations League/EURO/World-Cup/
+Ballon d'Or award run," as still open). The new "Memorable moments" bullet
+added below - including its defensive-midfielder/Matthäus framing
+(Matthäus's own 1990 win is already on this page's Winners table above) -
+was confirmed via `WebSearch` against a single Reuters wire report from the
+28 October 2024 ceremony, independently republished by outlets across
+South Africa, Malaysia and the United Arab Emirates (see `docs/SOURCES.md`
+for the full list). By then Rodri had already been named UEFA Nations League
+2023 Player of the Finals and UEFA EURO 2024 Player of the
+Tournament (both already on `content/uefa-nations-league.md` and
+`content/uefa-euro.md`, confirmed directly against UEFA.com's own coverage
+for the former). Added a new "Memorable moments" bullet below recording the
+sweep, with matching one-line cross-references added to the Nations League
+and EURO pages' own Player-of-the-Finals/Tournament entries (and all three
+mirrored on their Croatian counterparts). Recorded in
+`scripts/ordinal-claims-ledger.json`, which the new bullet's ordinal
+phrasing matches; its own Matthäus-anchored "since" clause does not match
+`check-since-claims.mjs`'s narrower pattern, since the year there is
+separated from the trigger word by a name rather than a bare year or a
+possessive/determiner clause, so no entry was needed in that second
+ledger.
+
+**Paolo Rossi's 1982 World Cup/Golden Ball/Golden Boot/Ballon d'Or sweep**
+(added 2026-10-29, Run 373): a second case of the same recurring-individual-
+award angle Run 372 opened above, found by checking which other names appear
+on both this page's Winners table and `fifa-world-cup.md`'s Golden Ball
+winners list for the same year. Paolo Rossi led Italy to the 1982 World Cup
+title while also winning that tournament's Golden Boot and Golden Ball, then
+won the 1982 Ballon d'Or - all four facts were already independently correct
+on this site (this page's own Winners table, `fifa-world-cup.md`'s Editions
+and Golden Ball sections, `golden-boot.md`'s World Cup table), but none of
+the three pages cross-referenced any of the others despite all three naming
+Rossi for 1982. Confirmed via `WebSearch` against Wikipedia's Paolo Rossi
+article and ESPN FC's analysis (syndicated by Scroll.in and Sportsmax), which
+independently agree Rossi is the only player in history to win all four in
+the same year. Also specifically checked the closest apparent rival claim,
+Ronaldo's 2002 World Cup/Golden Boot/Ballon d'Or treble (itself genuine and
+already correctly on file) - he did not also win that year's Golden Ball,
+which went to Oliver Kahn (already correctly credited on `fifa-world-cup.md`,
+including its own note that Kahn is "the only goalkeeper to date" to win
+it) - so Rossi's four-award sweep is not contradicted by a second instance.
+Added a new "Memorable moments" bullet below recording the sweep, with brief,
+non-superlative cross-references added to `fifa-world-cup.md`'s 1982 Golden
+Ball entry and `golden-boot.md`'s World Cup memorable moments section (all
+three mirrored on their Croatian counterparts). Recorded in
+`scripts/superlative-claims-ledger.json` (this page's new bullet) and
+`scripts/ordinal-claims-ledger.json` (`fifa-world-cup.md`'s edited entry,
+which already matched that pattern before this run); `golden-boot.md`'s new
+bullet matched none of the eight claim-ledger checkers' patterns, so needed
+no ledger entry.
+
 See `docs/SOURCES.md` for the per-year citation list.
 
 ## Memorable moments
 
 - Stanley Matthews won the first-ever Ballon d'Or in 1956.
+- Paolo Rossi became the only player in history to win the World Cup, its Golden Ball, its Golden Boot, and the Ballon d'Or all in the same year, 1982.
+- Ronaldo (Brazil) won the 2002 Ballon d'Or the same year he also won the World Cup and that tournament's Golden Boot.
+- Zinedine Zidane (France) won the 1998 Ballon d'Or the same year he also won the World Cup.
+- Michel Platini (France) won the 1984 Ballon d'Or the same year he captained France to the EURO title and finished as the tournament's top scorer.
+- Gerd Müller (West Germany) won the 1970 Ballon d'Or the same year he also won the World Cup Golden Boot, even though West Germany finished third rather than winning that tournament.
+- Lothar Matthäus (West Germany) won the 1990 Ballon d'Or the same year he captained West Germany to the World Cup title.
+- Fabio Cannavaro (Italy) won the 2006 Ballon d'Or the same year he captained Italy to the World Cup title.
+- Ruud Gullit (Netherlands) won the 1987 Ballon d'Or the year before he captained the Netherlands to the EURO 1988 title.
+- Marco van Basten (Netherlands) won the 1988 Ballon d'Or the same year he also won the EURO Golden Boot and the Netherlands won the title.
+- Franz Beckenbauer (West Germany) won the 1972 Ballon d'Or the same year he captained West Germany to the EURO title.
+- Bobby Charlton (England) won the 1966 Ballon d'Or the same year he also won the World Cup.
+- Matthias Sammer (Germany) won the 1996 Ballon d'Or the same year he was named UEFA EURO 1996's Player of the Tournament as Germany won the title.
+- Lionel Messi (Argentina) won the 2021 Ballon d'Or the same year he captained Argentina to the Copa América title.
 - George Weah became the first African player to win the Ballon d'Or in 1995.
-- Kaká won the 2007 Ballon d'Or, the first year the award opened to any nationality at any club worldwide.
+- Kaká won the 2007 Ballon d'Or, the first year the award was open to players at any club worldwide, not just clubs in Europe - eligibility had already widened to any nationality in 1995.
 - Lionel Messi won the first of his eight Ballon d'Or titles in 2009, more than any other player in the award's history.
-- Luka Modrić became the only Croatian winner of the Ballon d'Or in 2018.
+- Luka Modrić became the only Croatian winner of the Ballon d'Or in 2018, the same year he also won the World Cup Golden Ball.
 - The 2020 Ballon d'Or was the only edition since the award's creation in 1956 not to be presented.
+- Rodri became the first defensive midfielder to win the Ballon d'Or since Lothar Matthäus in 1990, after also being named the UEFA Nations League 2023 Player of the Finals and UEFA EURO 2024 Player of the Tournament.
 - Stanley Matthews remains the Ballon d'Or's oldest-ever winner, aged 41 when he claimed the inaugural award in 1956 - a record that has stood for seven decades.
 - Ronaldo (Brazil) is the Ballon d'Or's youngest-ever winner, aged 21 when he won in 1997.
+- Harry Kane won the 2026 Ballon d'Or, England's first winner since Michael Owen claimed the award in 2001.
+- Lionel Messi (Argentina) won the 2023 Ballon d'Or largely on the strength of captaining Argentina to the 2022 World Cup title.
 
 ## Notes
 
@@ -189,3 +348,4 @@ See `docs/SOURCES.md` for the per-year citation list.
 - Luka Modrić won in 2018.
 - The 2020 award was cancelled.
 - Ousmane Dembélé won the 2025 award.
+- Harry Kane won the 2026 award.

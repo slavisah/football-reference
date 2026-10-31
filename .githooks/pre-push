@@ -1,0 +1,23 @@
+#!/bin/sh
+# Thin wrapper invoking the real guard logic in
+# scripts/guard-intensive-branch-push.mjs. See that file's header comment and
+# docs/ROADMAP.md's "Safety flag" entry for why this hook exists: six
+# separate incidents (Runs 321, 326, 327, 342, 349, 350) where the
+# `intensive/football-reference` scheduled routine force-pushed a
+# recreated-from-main branch over real, unmerged work because it misjudged
+# the branch's remote state. Those incidents were all caught and recovered
+# by a human-style cross-check *after* the push; this hook exists to refuse
+# the push *before* it happens, at the git level, so it still protects the
+# branch even when a run's own (externally-stored, not-committed-to-this-repo)
+# prompt text is out of date and never mentions this safeguard.
+#
+# This hook only activates for a non-fast-forward update of
+# `refs/heads/intensive/football-reference` - every other push (main, a
+# feature branch, a normal fast-forward) passes straight through.
+#
+# core.hooksPath must point at this directory for git to run it - the
+# repo's own "postinstall" script (package.json) sets that on every
+# `pnpm install`, so this is active again automatically in a fresh clone.
+
+repo_root=$(git rev-parse --show-toplevel) || exit 0
+exec node "$repo_root/scripts/guard-intensive-branch-push.mjs" "$@"

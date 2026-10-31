@@ -69,6 +69,9 @@ jobs:
       - name: "\"One of only N X\" bounded-set-claim verification-ledger check (content/*.md)"
         run: pnpm check:one-of-only-claims
 
+      - name: "\"Joining X[, Y,] and Z\" named-membership-claim verification-ledger check (content/*.md)"
+        run: pnpm check:joining-claims
+
       - name: "Undated completeness-claim (\"across all N editions\"/\"in every edition\") verification-ledger check (content/*.md)"
         run: pnpm check:completeness-claims
 
@@ -146,6 +149,9 @@ jobs:
 
       - name: Theme-color meta/CSS-token consistency check
         run: pnpm check:theme-color
+
+      - name: Roadmap doc size-drift guard (docs/ROADMAP.md)
+        run: pnpm check:roadmap-size
 
       - name: Install Playwright browser
         run: pnpm test:e2e:install

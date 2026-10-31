@@ -668,6 +668,241 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- "Format milestones" and "Memorable moments" sections (audited 2026-10-14,
+  two-hundred-and-eighty-fifth intensive run): the content-verification
+  rotation's next target per `lastReviewed` staleness. Every other section
+  on this page already had a dedicated audit entry above; these two were the
+  one remaining gap - cross-checked independently rather than assumed correct
+  just because the underlying facts (host/teams/winner columns, final dates,
+  attendance) they summarize were already verified elsewhere. Four claims
+  checked: Brazil's 1970 win being the first time any team won three World
+  Cups (confirmed - 1958, 1962, 1970); 1982 being the first 24-team finals,
+  up from 16 (confirmed); 1998 being the first 32-team finals, up from 24
+  (confirmed); and 2026 being the first 48-team finals and the first hosted
+  by three countries (confirmed; Mexico also became the first country to
+  host a men's World Cup three times - 1970, 1986, 2026). One low-quality
+  pre-tournament mirror site surfaced during the 2026 search claiming a
+  different team won the final than this page records; it contradicted every
+  other source (including the dozens already cited above and in the
+  "Winning managers"/"Golden Ball" entries, all dated after the tournament
+  actually finished) and was discarded as noise rather than treated as a
+  conflict. **No discrepancies found.** The remaining "Memorable moments"
+  bullets (Maradona 1986, Croatia's first final in 2018, the 2022 3-3 final)
+  restate facts the "Editions" table audit already covers and weren't
+  re-litigated separately:
+  - https://loki.editorial.aetnd.com/this-day-in-history/pele-leads-brazil-over-italy-in-world-cup-championship
+  - https://en.wikipedia.org/wiki/1982_FIFA_World_Cup
+  - https://footballhistory.org/world-cup/1982-spain.html
+  - https://en.wikipedia.org/wiki/1998_FIFA_World_Cup
+  - https://en.wikipedia.org/wiki/1998_FIFA_World_Cup_final
+  - https://worldatlas.com/articles/where-will-the-2026-fifa-world-cup-be-held.html
+  - https://simple.wikipedia.com/wiki/2026_FIFA_World_Cup (the unreliable
+    pre-tournament-outcome mirror noted above - not used as a source for any
+    fact on this page)
+- Whole-page third independent cross-check (2026-10-18, three-hundred-and-
+  twelfth intensive run): the content-verification rotation's next target per
+  `lastReviewed` staleness (tied with eleven other files at 2026-10-14).
+  Re-checked every section rather than only the 2026 edition: internal
+  consistency of the "Champions by titles" table against the "Editions"
+  table (23 titles across 8 nations, summing correctly); every one of the 23
+  winning managers' nationality matching their team, confirming the page's
+  own "unbroken pattern" claim; and, independently via fresh `WebSearch`
+  queries, every checkable 2026 fact - Rodri's Golden Ball (Messi Silver
+  Ball, Mbappé Bronze Ball), Unai Simón's seven clean sheets and Golden
+  Glove, Pau Cubarsí's Young Player Award, the 1-0 (a.e.t.) final score with
+  Ferran Torres's 106th-minute winner, and the 80,663 attendance figure, all
+  confirmed by multiple independent outlets (AP, Sky Sports, Fox Sports,
+  FourFourTwo, The Statesman). **No discrepancies found.** One finding
+  examined and deliberately not acted on: several outlets (Wego, Free Press
+  Journal) describe Cubarsí as "the first defender" to win the Young Player
+  Award, while a Fox Sports table of the same award lists earlier defender
+  winners (Beckenbauer 1966, Żmuda 1974, Cabrini 1978, Amoros 1982) - but
+  those press reports are conflating the modern FIFA Young Player Award
+  (2006-present, the only one this page documents) with an older, similarly-
+  named "Best Young Player" trophy dating to 1958 that this page's own text
+  already explicitly excludes ("FIFA has named a best-player-aged-21-or-
+  under award at every World Cup since 2006; no equivalent award existed at
+  earlier editions"). Within that correctly-stated 2006+ scope, none of the
+  five prior winners (Podolski, Müller, Pogba, Mbappé, Fernández) played as a
+  defender, so "first defender" is accurate as written; no edit made.
+  Also independently re-confirmed Luis de la Fuente's age (born 21 June
+  1961, so 65 at the 19 July 2026 final) against the page's own "oldest
+  winning manager in World Cup history, aged 65" claim - matches exactly:
+  - https://www.thescore.com/worldcup/news/3550006/rodri-takes-golden-ball-over-messi-mbappe-claims-golden-boot-again
+  - https://fourfourtwo.com/competition/rodri-denies-lionel-messi-and-claims-world-cup-golden-ball-after-spain-prevail-against-argentina
+  - https://amp.foxsports.com/stories/soccer/2026-fifa-world-cup-every-individual-award-winner
+  - https://www.thestatesman.com/sports/rodri-wins-fifa-world-cup-2026-golden-ball-after-leading-spain-to-title-1503618606.html
+  - https://www.skysports.com/football/spain-vs-argentina/live/549869
+  - https://lasvegassun.com/news/2026/jul/19/ferran-torres-scores-in-extra-time-as-spain-beats-/
+  - https://santamariatimes.com/ap/sports/ferran-torres-scores-in-extra-time-as-spain-beats-argentina-1-0-to-win-the/article_a8e21e5c-8c25-54ce-b065-7ebb7225d56f.html
+  - https://www.foxsports.com/stories/soccer/spain-goalkeeper-unai-simon-wins-golden-glove-after-historic-world-cup
+  - https://worldcupranking.com/blog/unai-simon-golden-glove-world-cup-2026/
+  - https://amp.foxsports.com/stories/soccer/world-cup-pau-cubarsi-spain-young-player-award
+  - https://theanalyst.com/articles/pau-cubarsi-world-cup-2026-young-player-of-the-tournament
+  - https://en.wikipedia.org/wiki/Luis_de_la_Fuente_(footballer,_born_1961)
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Golden Boot 2026 World Cup podium, third independent cross-check
+  (2026-10-19, three-hundred-and-fourteenth intensive run): the
+  content-verification rotation's next target per `lastReviewed` staleness
+  (tied with nine other files at 2026-10-14). `content/golden-boot.md`'s
+  World Cup and EURO tables already had two independent audit passes each
+  (2026-08-04 and 2026-08-07, plus a 2026-08-28 tie-resolution pass and a
+  2026-10-06 youngest/oldest-winner pass), so rather than repeat a full-table
+  check, gave the single highest-risk block - the 2026 World Cup Golden/
+  Silver/Bronze Boot trio, this page's newest and least-aged content - a
+  third independent `WebSearch` pass. Re-confirmed Kylian Mbappé's Golden
+  Boot (10 goals, the same total already on file, and independently
+  confirmed as both a) his second consecutive World Cup Golden Boot (after
+  2022) - the page's own "only player to win it in consecutive editions
+  since 1930" claim - and b) the first double-digit tally since Gerd
+  Müller's 10 in 1970, matching the table's own figures), Lionel Messi's
+  Silver Boot (8 goals), and Jude Bellingham's Bronze Boot (7 goals, scored
+  in the third-place match against France). **No discrepancies found**:
+  - https://gulfnews.com/sport/football/world-cup/kylian-mbappe-wins-2026-world-cup-golden-boot-beats-messi-again-full-list-of-all-awards-1.500613609
+  - https://www.tovima.com/sports/mbappe-claims-back-to-back-world-cup-golden-boots/
+  - https://www.si.com/soccer/jude-bellingham-celebrates-mystery-world-cup-award
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- "How it works" tiebreaker-summary fix (2026-10-21, Run 328): every other
+  section of `content/golden-boot.md` had already been through at least two
+  independent audit passes (see the entries above and below), but - following
+  the same angle Run 327 just applied to `content/ballon-dor.md`'s own "How
+  it works" bullets - the page's own top-of-page "How it works" summary had
+  never been individually sourced. Its third bullet claimed "modern
+  tie-breakers may use assists or minutes played", implying tiebreakers are
+  the more-recent mechanism and joint ties the older one. That direction is
+  backwards for UEFA EURO specifically: this page's own "EURO Silver Boot and
+  Bronze Boot winners" section already documents that UEFA used a single-
+  winner tiebreak only for 2012, 2016 and 2020, then *reverted* to full joint
+  winners from 2024 onward - so for EURO, "modern" (2024-) actually means no
+  tiebreak, the opposite of what the summary bullet implied. The FIFA World
+  Cup side of the claim holds (an assists-then-minutes tiebreaker has applied
+  to every tie since 2010, per the existing "World Cup Silver Boot and Bronze
+  Boot winners" section), so this was a summary-wording gap, not a wrong fact
+  on either table. Re-verified both competitions' tiebreaker timelines via a
+  fresh `WebSearch` pass before editing, rather than assuming the page's own
+  existing sections were still accurate:
+  - https://arynews.tv/world-cup-2026-golden-boot-battle-lionel-messi-vs-kylian-mbappe-tie-breaker-rules-explained
+  - https://www.beinsports.com/en-us/soccer/fifa-world-cup-2026/articles/kylian-mbappe-ties-lionel-messi-what-is-the-golden-boot-tiebreaker-at-the-2026-fifa-world-cup-2026-07-09
+  - https://www.goal.com/en-us/lists/uefa-rule-change-harry-kane-one-hand-golden-boot-bulk-order-top-goalscorer-prize-euro-2024-england-final-spain/blt302369b6176b4608
+  - https://thestar.com.my/sport/football/2024/07/16/six-share-golden-boot
+  - https://www.goal.com/en-za/news/can-ronaldo-win-euro-2020-golden-boot-tie-break-rules-how-top-scorer-prize-decided/s677z931dvw51bqto159m6ewg
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+  Reworded the bullet (both `content/golden-boot.md` and its Croatian
+  counterpart, `src/pages/hr/competitions/golden-boot.astro`) to state the
+  World Cup/EURO tiebreaker history explicitly instead of generalizing by
+  "modern" vs. "earlier". No change to either table's own data.
+- Winning managers and Winning captains, second independent cross-check
+  (added 2026-10-20, Run 319): unlike most other sections on this page
+  (Final venues, the Editions table's Champion/Runner-up/Final-score/Final
+  date columns, the four award lists), "Winning managers" and "Winning
+  captains" had each only ever had their original 2026-08-31/2026-09-01
+  audits - already four and two independent WebSearch passes respectively,
+  but all logged within one dated entry rather than a later, separately-
+  dated pass against a deliberately distinct source mix. The same gap Run
+  317 closed for `uefa-euro.md` and Run 318 closed for `copa-america.md`.
+  Re-verified all 23 managers and all 23 captains (1930-2026) via Wikipedia's
+  own dedicated "List of FIFA World Cup winning managers" list article (not
+  used by the original audit, which relied on manager biography pages
+  instead), plus a source mix distinct from the original passes: DAZN,
+  worldsoccertalk.com, 90min, thehexblog.com and chaseyoursport.com/
+  fifaworldcupnews.com's dedicated winning-captains tables, and a fresh
+  check of the 2026 final itself (NBC-affiliate match coverage) for the
+  Spain 1-0 Argentina (a.e.t.) result, Ferran Torres's 106th-minute winner,
+  and the MetLife Stadium/80,663-attendance venue facts already on file.
+  One apparent discrepancy was run down and resolved as a non-issue rather
+  than a new error: a crowdsourced quiz site's comment thread floated a
+  claim that Italy's 1934 final captain differed from the tournament
+  opener's captain - checked directly against 11v11.com's own 1934 Italy
+  squad/lineup page and an Italian-language retrospective (open.online),
+  both confirming Gianpiero Combi captained the final itself (and that the
+  comment conflated a defender, Eraldo Monzeglio, who started the final in
+  defence, not as captain) - no change needed, the page's existing entry was
+  already correct. **No further discrepancies found anywhere; all 23
+  managers and all 23 captains confirmed exactly as written:**
+  - https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_winning_managers
+  - https://www.dazn.com/en-CA/news/soccer/fifa-world-cup-winning-managers-1930-to-2018/5lik9x2kcrzizhylhe8mhl5q
+  - https://worldsoccertalk.com/world-cup/list-of-world-cup-winning-coaches-every-manager-to-win-the-trophy-by-year/
+  - https://www.90min.com/posts/the-most-successful-world-cup-managers-ever
+  - https://thehexblog.com/2026/07/08/most-successful-world-cup-managers-history/
+  - https://www.chaseyoursport.com/football/all-fifa-world-cup-winning-captains-history/12710
+  - https://www.fifaworldcupnews.com/?p=26362
+  - https://www.11v11.com/matches/italy-v-austria-03-june-1934-224402/
+  - https://www.open.online/2019/06/10/85-anni-fa-il-primo-trionfo-dellitalia-ai-mondiali-di-calcio/
+  - https://www.nbcwashington.com/world-cup/spain-argentina-final-messi-yamal-score/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- "How it works" knockout-stage bullet fix (2026-10-22, Run 330): extending
+  Run 329's "How it works" bullet-sourcing angle (first applied to
+  `content/copa-america.md`) to `content/fifa-world-cup.md` found a real,
+  currently-live gap: the third bullet said the knockout stage began "from
+  the round of 16 onward", which was accurate for every edition from the
+  24-team era (1986) through 2022's 32-team era, but is no longer accurate
+  for 2026 - the field's expansion to 48 teams (already documented in this
+  same page's own "Format milestones" section) added a new Round of 32 as
+  the actual first knockout round, with the Round of 16 now the second.
+  Reworded to name both eras explicitly rather than generalizing, in English
+  and the Croatian translation (`src/pages/hr/competitions/world-cup.astro`).
+  Confirmed via WebSearch:
+  - https://blog.wego.com/round-of-32-at-fifa-world-cup/ (confirms Round of
+    32 is "a new round that has never existed at a World Cup" before 2026,
+    with the winners advancing to the Round of 16)
+  - https://morungexpress.com/fifa-2026-explained-how-the-48-team-world-cup-will-work
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Golden Boot (top-scorer) content-verification rotation pick, fourth
+  independent cross-check of the 2026 World Cup podium (2026-10-23, Run 337):
+  `golden-boot.md` was the single longest-stale `content/*.md` file
+  (`lastReviewed: 2026-10-21`), next per the rotation's own staleness
+  ordering. The World Cup/EURO tables already carry two full-table audits
+  plus a tie-resolution pass and a 2026-10-19 third independent check of the
+  2026 World Cup Golden/Silver/Bronze Boot trio specifically (see that entry
+  above), so this pass re-confirmed the same trio via a fresh `WebSearch`
+  rather than repeat a full-table read with no new angle - a fourth,
+  confirmatory check rather than a new angle, logged for the rotation's own
+  record-keeping. **No discrepancies found:** Mbappé's Golden Boot (10
+  goals), Messi's Silver Boot (8 goals), Bellingham's Bronze Boot (7 goals)
+  all match the page exactly. Also re-checked the EURO section's "Cristiano
+  Ronaldo... breaking a record that had stood for 37 years" claim (2020
+  Golden Boot) - still traces to the same SunSport/GiveMeSport-derived
+  reporting already on file, with no independent source naming the prior
+  record-holder or the exact margin; left as-is, consistent with how this
+  fact was originally sourced.
+  - https://www.nbcchicago.com/world-cup/golden-boot-tracker-2026/3949885/
+  - https://sundayguardianlive.com/sports/fifa-world-cup-2026-golden-boot-winner-kylian-mbappe-wins-historic-award-who-claimed-the-silver-boot-and-bronze-boot-241753/
+  - https://www.hitc.com/every-award-winner-from-2026-world-cup-confirmed-as-rodri-beats-lionel-messi-to-golden-ball/
+  - https://briefly.co.za/sports/104632-ronaldo-shatters-37-year-record-after-winning-golden-boot-euro-2020-championship/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Paolo Rossi's 1982 Golden Ball/Golden Boot/Ballon d'Or cross-reference
+  (2026-10-29, Run 373): the recurring-individual-award cross-reference
+  angle Run 372 opened with Rodri, applied to a second name found on both
+  this page's Golden Ball winners list and `content/ballon-dor.md`'s
+  Winners table for the same year. Added a brief cross-reference to this
+  page's own 1982 Golden Ball entry (and a matching one on
+  `content/golden-boot.md`'s World Cup memorable moments section) naming
+  Rossi's same-year World Cup Golden Boot and Ballon d'Or wins; the full
+  sourcing and the "only player to win all four" claim itself are recorded
+  under this file's "## Ballon d'Or" section below, where the superlative
+  statement actually lives. See that entry for the full citation list.
+- Ronaldo's 2002 World Cup/Golden Boot/Ballon d'Or treble cross-reference
+  (2026-10-29, Run 374): the same recurring-individual-award angle applied
+  to the candidate Run 373 itself flagged as unshipped. All three facts
+  (2002 World Cup champion, this page's own 2002 Golden Boot winner, and
+  `content/ballon-dor.md`'s 2002 Winners-table entry) were already
+  independently correct and already sourced by Run 373's own
+  rival-claim check (see this file's "## Ballon d'Or" section below) - no
+  new research needed, only the cross-reference itself. Added a brief
+  bullet to this page's own "Memorable moments" and a matching one on
+  `content/golden-boot.md`'s World Cup memorable moments section.
 
 ## UEFA EURO
 
@@ -1081,6 +1316,39 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Winning managers/Winning captains, second independent cross-check
+  (2026-10-19, Run 317): content-verification rotation pick (uefa-euro.md
+  was the longest-stale `content/*.md` file, 2026-10-17). Unlike most other
+  sections on this page, these two had never had a dated, separately
+  logged second pass - the original 2026-08-31/2026-09-01 audits above
+  already used three-to-four independent WebSearch passes each, but all
+  within one dated entry rather than a later, deliberately distinct source
+  mix the way "Final match dates", "Golden Boot", "Champion/Runner-up/
+  Final-score" and "Host(s)/Teams" above all did. Re-verified all 17
+  managers and all 17 captains (1960-2024) via a source mix distinct from
+  the original pass (Wikipedia's dedicated "List of UEFA European
+  Championship winning managers"/"...winning players" list articles,
+  thestatszone.com's season-by-season coaches table, and press coverage of
+  the two most recent titles - ANSA, Outlook India, Gulf News, Himalayan
+  Times, insideworldfootball.com - rather than the original pass's
+  olympics.com/myfootballfacts.com/UEFA retrospective/Britannica/
+  GiveMeSport/These Football Times/FourFourTwo/gameofthepeople.com mix).
+  Specifically re-confirmed the two facts the original passes called out
+  as easy to get wrong: Otto Rehhagel's 2004 Greece win as the competition's
+  only foreign-coached title (explicitly restated by this pass's own
+  Wikipedia summary), and Bernard Dietz's 1980 West Germany captaincy
+  (distinct from the same squad's more famous Karl-Heinz Rummenigge).
+  **No discrepancies found** across either section:
+  - https://en.wikipedia.org/wiki/List_of_UEFA_European_Championship_winning_managers
+  - https://en.wikipedia.org/wiki/List_of_UEFA_European_Championship_winning_players
+  - https://www.thestatszone.com/football/euro-2020/every-european-championship-winning-coach
+  - https://www.ansa.it/amp/europei_2024/photogallery/2024/07/15/la-spagna-vince-gli-europei-2024_9075beeb-9082-4eff-8eff-70502dedc1d4.html
+  - https://www.outlookindia.com/sports/football/esp-vs-eng-uefa-euro-2024-final-marc-cucurella-salutes-spain-family-as-alvaro-morata-thanks-andres-iniesta
+  - https://gulfnews.com/amp/story/sport%2Ffootball%2Fsantos-inspires-portugal-to-ultimate-ugly-win-1.1860641
+  - https://thehimalayantimes.com/ampArticle/166267
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 - Team of the Tournament winners (added 2026-09-04, intensive run): a new
   "Team of the Tournament winners" note section on `content/uefa-euro.md`,
   the same shape as Copa América's own "Team of the Tournament winners"
@@ -1227,6 +1495,46 @@ Primary sources should be preferred.
   - https://theanalyst.com/2024/06/youngest-goalscorers-european-championship/
   - https://www.90min.com/lamine-yamal-becomes-youngest-scorer-in-european-championship-history
   - https://www.bluewin.ch/en/sport/football/yamal-16-becomes-the-youngest-goalscorer-in-european-championship-history-with-a-dream-goal-li.2277592
+- "How it works" knockout-stage bullet fix (2026-10-22, Run 330): the same
+  bullet-sourcing angle applied to `content/fifa-world-cup.md` this run
+  found a matching gap here too - the third bullet said the knockout stage
+  began "from the quarterfinals onward", which was accurate only for the
+  eight-team era (1980-1992), not for the sixteen-team era this page's own
+  lead paragraph names as "the modern EURO" (1996 onward) or the current
+  twenty-four-team era (2016-2024), both of which open their knockout stage
+  with a Round of 16 before the quarterfinals. Reworded to name both eras
+  explicitly, in English and the Croatian translation
+  (`src/pages/hr/competitions/euro.astro`). Confirmed via WebSearch against
+  EURO 2024's own bracket, which has a Round of 16 before the quarterfinals:
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2024_knockout_stage
+  - https://global.espn.com/football/story/_/page/uefaeuro/euro-2024-bracket-fixtures-schedule-finals
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- **"Memorable moments" superlative-bullet audit (2026-10-23, Run 335):**
+  this page's Champions table, format history, and the Yamal/Vonlanthen
+  youngest-scorer fact above have each had a dedicated external audit, but
+  two further "Memorable moments" superlatives - "Spain became the first
+  nation to retain the EURO title in 2012" and "Spain won a record fourth
+  title in 2024" - had only ever been checked as an internal cross-reference
+  against this page's own Champions table (which does show Spain winning
+  both 2008 and 2012 back-to-back, then a fourth time in 2024, ahead of
+  Germany/West Germany's three), never against an independent external
+  source the way the World Cup page's equivalent superlatives were audited
+  at Run 285. A fresh `WebSearch` pass confirms both independently: Spain's
+  2008 and 2012 wins are reported as the first time any nation retained the
+  European Championship, and its 2024 win is widely reported as a new
+  record of four titles, the most of any nation (West Germany/Germany next
+  on three). **No discrepancies found**; the remaining bullets (Panenka's
+  1976 penalty, Denmark 1992, Greece 2004, EURO 2020's delayed multi-country
+  staging) restate facts the Champions table/Format-history audits already
+  cover and weren't re-litigated separately.
+  - https://sundayobserver.lk/2024/07/21/sport/28131/spain-first-nation-to-win-four-euro-cups
+  - https://www.kyivpost.com/amp/post/35819
+  - https://www.atalayar.com/en/articulo/sports/spains-dynasty-reigns-supreme-in-europe-after-beating-england-in-berlin/20240715130414202906.html
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## UEFA Nations League
 
@@ -1515,6 +1823,148 @@ Primary sources should be preferred.
   - https://datencenter.dfb.de/datencenter/uefa-nations-league-endrunde/2024-2025/Finale/portugal-spanien-2391418
   - https://en.wikipedia.org/wiki/2025_UEFA_Nations_League_final
   - https://en.wikipedia.org/wiki/2021_UEFA_Nations_League_final
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Final attendance, fourth re-investigation (added 2026-10-17, three-
+  hundred-and-second intensive run): tried a different angle on 2023
+  specifically - UEFA's own aggregate reporting for the whole four-team
+  Finals mini-tournament, rather than the final match alone. Found a genuine
+  UEFA.com figure: "126,200 - 95% of the stadiums' combined capacity" across
+  all four 2023 Finals matches (the two semifinals, the third-place
+  play-off, and the final) in Rotterdam and Enschede. This is real and
+  UEFA-sourced, but it cannot resolve the already-documented 41,110/41,500
+  final-specific conflict: it is a four-match total with no published
+  per-match breakdown in the result, so the final's own share of it can't be
+  isolated, and the implied per-match average (31,550) is close to neither
+  disputed figure on its own. Recorded here so a future run doesn't treat
+  this aggregate as a lead worth re-pursuing for the final-specific number;
+  2023's conflict stays exactly as already documented, unresolved:
+  - https://www.uefa.com/uefanationsleague/news/028a-1a1d74edcea7-53be43f3e6b4-1000--nations-league-maintaining-momentum/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summary of this UEFA.com article rather than a direct page
+    load.
+- Whole-page third independent cross-check (2026-10-18, intensive run): with
+  every individual column/section on this page already carrying its own
+  first-and-second-pass audit (Finals table, Final venues, Player of the
+  Finals, Winning managers, Winning captains - each entry above), this run's
+  content-verification rotation gave the page a single combined third pass
+  instead of targeting one still-unaudited piece, since none remained. Fresh
+  `WebSearch` queries re-checked all four editions' Finals results/scores,
+  Player of the Finals winners, winning managers, and winning captains, plus
+  the "Final venues" section's own claim that the Johan Cruyff Arena was
+  unavailable for the 2023 final because of a concert booking. **No
+  discrepancies found anywhere:** every fact already on the page - including
+  the Johan Cruyff Arena/Philips Stadion concert-booking reason (Wikipedia
+  and a Stadium Astro report both independently confirm it, and add that
+  Philips Stadion was unavailable for the same reason, not just the Arena)
+  and Roberto Martínez's full name/role as Fernando Santos's successor -
+  matched this fresh pass too:
+  - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_final
+  - https://en.wikipedia.org/wiki/2023_UEFA_Nations_League_Finals
+  - https://english.stadiumastro.com/football/netherlands-confirmed-host-2023-nations-league-finals-225264
+  - https://www.channelstv.com/2021/10/10/france-beat-spain-to-win-nations-league/amp/
+  - https://www.football-espana.net/2023/06/10/jordi-alba-message-nations-league-spain
+  - https://extratime.com/articles/35981/penalty-win-secures-portugal-uefa-nations-league/
+  - https://www.gettyimages.com/detail/news-photo/cristiano-ronaldo-of-portugal-and-roberto-martinez-manager-news-photo/2219214839
+  - https://www.soccerladuma.co.za/international/uefa-nations-league/uefa-nations-league-player-of-the-tournament-revealed-20190609
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- **"How it works" qualification-mechanism fix (2026-10-19, Run 315):** the
+  page's "How it works" section stated unconditionally that "the four League
+  A group winners advance to the Nations League Finals" - true through the
+  2022-23 edition, but UEFA added a two-legged quarter-final round starting
+  with the 2024-25 edition: each League A group winner now plays a runner-up
+  from a different group, and only the four quarter-final *winners* advance
+  to the Finals. Confirmed via WebSearch (Wikipedia's 2024-25 UEFA Nations
+  League A article, Bundesliga's and Al Jazeera's own explainers, and
+  theScore's Nations League review): Germany (Group A3 winner) beat Italy
+  (Group A2 runner-up) in the quarter-final en route to hosting and reaching
+  the 2025 Finals, confirming the new mechanism actually operated in 2025,
+  not just on paper. All four 2025 Finals participants (France, Germany,
+  Portugal, Spain) happened to also be group winners that year - no
+  runner-up has yet won a quarter-final - so this was a description-of-the-
+  rule bug, not a wrong result in the Finals table itself (unaffected).
+  Fixed the "How it works" bullet to describe both the pre-2024 and current
+  mechanism, and reworded `content/glossary.md`'s "host" entry (which had
+  summarized the Nations League host-selection rule as "chooses its host
+  from among the four teams that have already won their qualifying group")
+  to describe the host as one of the four teams that reach the Finals,
+  without naming the now-outdated group-winners-only mechanism - so the
+  glossary entry stays correct even if a future runner-up wins a
+  quarter-final.
+  - https://en.wikipedia.org/wiki/2024%E2%80%9325_UEFA_Nations_League_A
+  - https://amp.bundesliga.com/en/bundesliga/news/uefa-nations-league-explainer-format-winners-dates-29313
+  - https://www.aljazeera.com/sports/2024/9/3/uefa-nations-league-2024-25-teams-groups-format-schedule-prize
+  - https://www.thescore.com/news/3133315/sms:
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Winning managers and Winning captains, dedicated second independent
+  cross-check (added 2026-10-20, Run 320): this page's "Winning managers"
+  and "Winning captains" sections had already been touched by the
+  2026-10-18 whole-page third cross-check above, but only as part of a
+  single combined pass rather than a later, separately-dated pass against
+  a deliberately distinct source mix - the same gap Run 317 closed for
+  `uefa-euro.md`, Run 318 closed for `copa-america.md` (finding a real bug),
+  and Run 319 closed for `fifa-world-cup.md`. Re-verified all four winning
+  managers and all four winning captains (2019-2025) via a source mix
+  distinct from both the original audits and the 2026-10-18 whole-page
+  pass: AP-syndicated coverage (via portugoal.net, spin.ph, baynews9,
+  foxnews.com) for Fernando Santos's 2019 win, Al Jazeera/CBS Sports/
+  TheScore/getfootballnewsfrance for Didier Deschamps's 2021 win, Arab
+  News/Kuwait Times/UEFA.com/football-espana for Luis de la Fuente's 2023
+  win, and Tottenham Hotspur's own club site for Hugo Lloris's 2021
+  captaincy, alongside UEFA.com, Soccerway/Flashscore and Baynews9 for the
+  2019/2023/2025 captains. **No discrepancies found: all four managers and
+  all four captains confirmed exactly as written.** One unrelated source
+  discrepancy surfaced and was left alone as out of scope - two 2023 news
+  reports give Luis de la Fuente's age as 61 at the time of the final,
+  while a biography page's birth date would make him 62; the page makes no
+  age claim about him, so nothing to correct:
+  - https://portugoal.net/selecao/1392-portugal-2019-uefa-nations-league-success-euro-2020-qualification-secured
+  - https://www.spin.ph/football/ronaldo-s-portugal-wins-1st-nations-league-title-a1643-20190610
+  - https://baynews9.com/fl/tampa/ap-top-news/2019/06/09/portugal-beats-netherlands-to-win-1st-nations-league-final
+  - https://www.aljazeera.com/amp/sports/2021/10/11/france-beat-spain-to-lift-nations-league-title
+  - https://www.cbssports.com/soccer/news/how-nations-league-triumph-can-get-france-back-on-track-to-defend-world-cup-title-in-qatar
+  - https://www.thescore.com/news/2201456
+  - https://www.getfootballnewsfrance.com/2021/feature-france-win-the-nations-league-but-what-did-we-learn/
+  - https://arabnews.com/node/2324566/
+  - https://kuwaittimes.com/spains-triumph-calms-fears-on-fuente-project/
+  - https://www.uefa.com/uefanationsleague/news/0290-1ba5edb56db9-396191d7cb20-1000--de-la-fuente-on-spain-s-2023-nations-league-triumph/
+  - https://www.football-espana.net/2023/06/17/luis-de-la-fuente-spain-croatia-europes-best
+  - https://www.tottenhamhotspur.com/news/992365/internationals-hugo-wins-the-nations-league
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- **"Key facts"/"Memorable moments" superlative-bullet audit (2026-10-23,
+  Run 335):** every column and award list on this page already had at least
+  two independent audit passes (Finals table, venues, Player of the Finals,
+  winning managers/captains - see the entries above), but the "Key facts"
+  and "Memorable moments" sections' own standalone superlative claim -
+  "Portugal became the first two-time champion in 2025" - had only ever
+  been checked as an *internal* cross-reference against this page's own
+  Finals table (which does show Portugal alone winning twice, 2019 and
+  2025, among four editions), never against an independent external source
+  the way the World Cup page's equivalent "Format milestones"/"Memorable
+  moments" superlatives were audited at Run 285. A fresh `WebSearch` pass
+  confirms the claim is also independently reported as such, not just
+  arithmetically true from this site's own table: multiple outlets
+  describe Portugal's 2025 final win as making it "the first team to win
+  the UEFA Nations League on two occasions." The remaining "Memorable
+  moments" bullets (Italy hosting 2021 without reaching the final, Spain's
+  2023 penalty win, the host-nation-top-four-every-edition claim) restate
+  facts the Finals table audit already covers and weren't re-litigated
+  separately - the host-top-four claim in particular is directly checkable
+  against the page's own Finals-host and Third/Fourth columns (Italy third
+  in 2021, Netherlands fourth in 2023, Germany fourth in 2025, Portugal
+  champion as host in 2019), with no external claim to source. **No
+  discrepancies found.**
+  - https://www.moroccoworldnews.com/2025/06/209853/portugal-beat-spain-on-penalties-to-win-nations-league-title/
+  - https://www.si.com/soccer/uefa-nations-league-winners-complete-list-of-past-champions
+  - https://extratime.com/articles/35981/penalty-win-secures-portugal-uefa-nations-league/
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
@@ -2332,6 +2782,35 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Team of the Tournament winners, second independent cross-check (added
+  2026-10-18, intensive run): re-verified all five editions (2015, 2016,
+  2019, 2021, 2024) using a source mix deliberately distinct from the
+  2026-09-02 first pass (Cooperativa.cl, La Nación, AI-search-summary
+  descriptions) - NBC Sports and SoccerWire/ISN Soccer's own reporting of
+  the Technical Study Group's announcements, and CONMEBOL's own
+  `copaamerica.com` articles directly. **No discrepancies found**: 2015 and
+  2016 each matched a single source giving the full eleven outright (NBC
+  Sports for 2015, SoccerWire/ISN for 2016), both exactly as already on the
+  page; 2019 and 2021 matched their already-documented CONMEBOL-attributed
+  rosters again. 2024 needed a different check - every outlet search
+  returned editorial "best XI" picks (90min, Yahoo, ESPN) that disagree
+  with each other and with the page, the same official-TSG-vs-editorial-
+  picks split the original 2015 audit had already hit - so it was resolved
+  via CONMEBOL's own nationality breakdown (five Argentinians, two
+  Colombians, one Ecuadorian, one Canadian, one Uruguayan, one Brazilian)
+  rather than a competing named list; the page's existing eleven names sort
+  into exactly that breakdown, the same nationality-count method the
+  original 2015 audit used:
+  - https://www.nbcsports.com/soccer/news/2015-copa-america-champions-chile-dominate-team-of-the-tournament
+  - https://www.soccerwire.com/news/copa-america-centenario-awards-best-xi-announced/
+  - https://isnsoccer.com/technical-study-group-announces-copa-america-centenario-awards
+  - https://copaamerica.com/en/news/best-xi-team-tournament-copa-america-2024
+  - https://copaamerica.com/en/news/one-by-one-the-team-of-the-conmebol-copa-america-chosen-by-get
+  - https://nbcsports.com/soccer/news/copa-america-team-of-the-tournament-announced
+    (2019)
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 - Winning captains, 1975-2010 span recovered (added 2026-09-04, intensive
   run): the 2026-09-01 entry above dropped the entire 1975-2010 span after
   cross-checks contradicted two editions (1995, 2004) it had first logged as
@@ -2607,6 +3086,112 @@ Primary sources should be preferred.
   - Note: the egress-blocked-domains caveat every prior audit in this file
     has noted applies here too; verification relied entirely on WebSearch's
     synthesized summaries of RSSSF/Wikipedia rather than direct page loads.
+- Winning managers and Winning captains, second independent cross-check
+  (added 2026-10-20, Run 318): these two sections had each been built up
+  through the original 2026-09-04/-05 research passes above but, unlike
+  every other column/section on this page (Champion/Runner-up, Format,
+  Third/Fourth, Final date, the three award lists, Golden Boot, Team of the
+  Tournament), had never had a dedicated, separately-dated *second*
+  cross-check against a source mix distinct from the original passes - the
+  same gap Run 317 had just closed for UEFA EURO's equivalent two sections.
+  Re-verified all 18 post-1975 winning managers and all 19 winning captains
+  (1975-2024) via 11v11.com's own match-report lineups (which label the
+  starting captain explicitly), Wikipedia/Spanish-language biography pages,
+  and period press coverage of individual finals - a mix distinct from the
+  original passes' primarily nickname-corroboration and dedicated-biography
+  method. **All 18 managers held up with no discrepancy**, including the one
+  flagged for extra scrutiny mid-pass: a general search's own uncorroborated
+  guess floated Víctor Púa as a possible alternative to the page's Héctor
+  Núñez for 1995, but Núñez is independently confirmed by Wikipedia, Cuba's
+  EcuRed encyclopedia, a dedicated Brazilian retrospective
+  (trivela.com.br), and his own 2011 obituary coverage - Púa never appeared
+  in any of those, an uncorroborated single-search artifact rather than a
+  genuine second candidate.
+  **One discrepancy found and corrected in Winning captains**: 2007 was
+  recorded as Lúcio (Brazil), but Lúcio was not part of the 2007 Copa
+  América squad at all (he is independently absent from that edition's
+  squad list alongside Ronaldinho, Ronaldo and Kaká, per a dedicated
+  retrospective on that "strange" squad). 11v11.com's own match-report
+  lineup for the final explicitly labels Juan the Brazil captain, and a
+  second, independently-sourced lineup (Grokipedia's own matchday page, not
+  a known mirror of 11v11's data) agrees, both also omitting Lúcio from
+  the starting eleven entirely. Separately confirmed why a makeshift
+  armband was needed: Al Jazeera's own match report names Gilberto Silva as
+  the suspended regular skipper that final, replaced by Elano in the
+  starting eleven (Elano, not the armband-wearer - Juan wore that). Corrected
+  to Juan, with the suspension context folded into the page's own entry.
+  Every other Winning captains edition held up against this pass's source
+  mix, including the three editions the original 2026-09-04 recovery
+  itself flagged as hardest to get right (1995's Bengoechea/Francescoli
+  distinction, 2001's Córdoba, and the back-to-back 1991/1993 Ruggeri
+  pair) and the three the original pass needed extra follow-up passes to
+  resolve at all (1979 Florentín, 1983 Rodríguez, 1987 Perdomo).
+  `content/copa-america.md`'s `lastReviewed` bumped to 2026-10-20; the
+  Croatian counterpart (`src/pages/hr/competitions/copa-america.astro`)
+  hand-translated the same 2007 correction.
+  - https://www.11v11.com/matches/argentina-v-brazil-15-july-2007-277903/
+    (2007: lineup explicitly labels Juan "(captain)", no Lúcio in the XI)
+  - https://grokipedia.com/page/2007_Copa_Am%C3%A9rica_final
+    (2007: independent second lineup source, same captain, same absence)
+  - https://www.aljazeera.com/news/2007/7/16/brazil-destroy-argentina
+    (2007: confirms Gilberto Silva suspended for the final, Elano his
+    replacement in the XI - the context for why a makeshift captain was
+    needed)
+  - https://www.planetfootball.com/quick-reads/where-are-they-now-the-brazil-team-from-the-2007-copa-america-final
+    (2007: confirms Lúcio, Ronaldinho, Ronaldo and Kaká were all absent
+    from that squad)
+  - https://en.wikipedia.org/wiki/H%C3%A9ctor_N%C3%BAñez
+  - https://www.ecured.cu/H%C3%A9ctor_Nu%C3%B1ez
+  - https://trivela.com.br/america-do-sul/os-25-anos-da-copa-america-de-1995-um-titulo-marcante-do-uruguai-sob-a-maestria-de-francescoli/
+    (1995 manager: Héctor Núñez independently confirmed, Púa unsupported)
+  - https://en.wikipedia.org/wiki/Omar_Borr%C3%A1s
+  - https://en.wikipedia.org/wiki/Sebasti%C3%A3o_Lazaroni
+  - https://en.wikipedia.org/wiki/Francisco_Maturana
+  - https://en.wikipedia.org/wiki/%C3%93scar_Tab%C3%A1rez
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied entirely on
+    WebSearch's synthesized summaries rather than direct page loads.
+- "How it works" format-history bullet fix (2026-10-21, Run 329): the
+  bullet's "most editions since the 1990s by a group stage into a knockout
+  bracket" phrasing was internally inconsistent with this same page's own
+  Champions timeline table, whose Format column already shows "Knockout
+  final" first at 1987 - four years before the 1990s - with a reversion to
+  "League table" at 1989 and 1991 in between. Corrected to name 1987 as an
+  earlier one-off trial and 1993 as when the format took hold for good, in
+  `content/copa-america.md` and the Croatian translation
+  (`src/pages/hr/competitions/copa-america.astro`). Cross-checked against
+  the format audit above (RSSSF's 1987 tables) plus a fresh WebSearch pass:
+  - https://rsssf.org/tables/87sa.html (1987: three round-robin groups of
+    three into semifinals and a final)
+  - https://en.wikipedia.org/wiki/List_of_Copa_Am%C3%A9rica_finals
+    (confirms the single-elimination final stage used since 1975 "except in
+    1989 and 1991, which featured a final group stage")
+  - https://en.wikipedia.org/wiki/1989_Copa_Am%C3%A9rica ;
+    https://en.wikipedia.org/wiki/1991_Copa_Am%C3%A9rica (both already
+    cited above for the third/fourth-place audit's own final-group reading)
+- **"Memorable moments" superlative-bullet audit (2026-10-23, Run 335):**
+  this page's Champions table, Best Player/Golden Glove/Fair Play Award
+  lists, Golden Boot list, winning managers, and winning captains have each
+  had at least one dedicated external audit (see the entries above), but
+  the "Memorable moments" section's own standalone superlative claim -
+  "Argentina moved ahead as the competition's most successful team by
+  winning in 2024" - had never been checked against an independent source,
+  the same gap this angle closed for `content/uefa-nations-league.md` and
+  `content/uefa-euro.md` this same run. A fresh `WebSearch` pass confirms
+  the claim: Argentina's 2024 final win (1-0 over Colombia) gave it a 16th
+  title, breaking its prior tie with Uruguay at 15 - independently reported
+  by CONMEBOL's own site and multiple outlets, not just derivable from this
+  page's own Champions table. The remaining bullets (the 1916 inaugural
+  four, Bolivia's 1963 home title, Colombia's first 2001 title, Chile's
+  back-to-back 2015/2016 titles) restate facts the Champions table audit
+  already covers and weren't re-litigated separately. **No discrepancies
+  found.**
+  - https://copaamerica.com/en/news/titles-argentina-champion-copa-america
+  - https://databoks.katadata.co.id/en/environment/statistics/75c1641619ff520/argentina-becomes-the-most-successful-copa-america-champion-in-history
+  - https://olympics.com/en/news/copa-america-winners-list-champions-record
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
 
 ## Ballon d'Or
 
@@ -2939,6 +3524,32 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- Companion trophy sections second-pass audit (2026-10-13, Run 280): a fresh,
+  independent re-check of all five companion trophy sections above (Kopa,
+  Yashin, Gerd Müller, Johan Cruyff, Sócrates - 20 entries total), closing
+  the gap that these five sections had each only ever had their original
+  authoring-time verification (2026-08-31 through 2026-09-03) and no further
+  external re-check since, unlike the Winners/Ceremony date columns above,
+  which both already carry a documented second independent pass. Used a
+  source mix distinct from each section's own original citations. **No
+  discrepancies found** across all 20 entries:
+  - https://www.si.com/soccer/kopa-trophy-list-winners-most-wins-all-time
+  - https://www.si.com/soccer/yashin-trophy-list-winners-most-wins-all-time
+  - https://www.topendsports.com/sport/soccer/award-striker-of-the-year.htm
+  - https://en.wikipedia.org/wiki/Johan_Cruyff_Trophy_(France_Football)
+  - https://en.wikipedia.org/wiki/S%C3%B3crates_Award
+  - https://www.peace-sport.org/news/jenni-hermoso-winner-of-the-socrates-award-at-the-2024-ballon-dor-ceremony/
+  - https://www.monaco-tribune.com/en/2024/10/ballon-dor-2024-jenni-hermoso-first-female-winner-of-the-socrates-prize/
+  - https://www.peace-sport.org/news/h-s-h-prince-albert-ii-and-peace-and-sport-welcome-the-xana-foundation-winner-of-the-2025-socrates-award-in-monaco-2/
+  - Note: the only wrinkle was the Sócrates Award's first search pass
+    returning no settled result for 2024 or 2025 from its initial result
+    set (one source miscounting the award's total edition count); two
+    follow-up, year-specific queries resolved both cleanly with no
+    conflict against the page's existing Jennifer Hermoso (2024)/Xana
+    Foundation (2025) entries. The same egress-blocked-domains caveat
+    every prior audit in this file has noted applies here too;
+    verification relied on WebSearch's synthesized summaries of indexed
+    pages rather than direct page loads.
 - Youngest and oldest winners (added 2026-10-02, two-hundred-and-thirteenth
   intensive run): two new bullets in `content/ballon-dor.md`'s "Memorable
   moments" section naming Stanley Matthews (1956, aged 41) as the award's
@@ -3010,6 +3621,558 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries of indexed pages rather than direct page loads.
+- **EURO 1996/2020 final attendance, resolved (2026-10-17, Run 305)**:
+  these two editions had been excluded from `content/uefa-euro.md`'s "Final
+  venues" section since Run 98 (2026-09-11) as a single-source gap - every
+  figure found (73,611 for 1996, 67,173 for 2020) traced back to Wikipedia
+  plus a mirror site (11v11.com/a national-team-results aggregator), never
+  a first-tier independent outlet, confirmed unchanged as recently as
+  Run 287 (2026-10-14). This run tried a genuinely different angle: rather
+  than searching for the attendance figure itself, it queried the German
+  FA's own `datencenter.dfb.de` match database directly by its own
+  competition/edition/round URL structure (the same source this file
+  already treats as credible for UEFA Nations League 2025's attendance,
+  see below). That federation database runs an official match page for
+  both finals - Germany played in and won the 1996 final, and (perhaps
+  unexpectedly, since England v. Italy didn't involve Germany) its
+  datencenter also carries a page for the 2020 final - and both
+  independently confirm the exact figure already on file, with no
+  discrepancy: 73,611 for 1996 (30 June 1996, Wembley, referee Pierluigi
+  Pairetto) and 67,173 for 2020 (11 July 2021, Wembley, referee Björn
+  Kuipers). Both now clear the two-independent-source bar and were added to
+  `content/uefa-euro.md` and its Croatian counterpart
+  (`src/pages/hr/competitions/euro.astro`, "prijavljeno 73.611/67.173
+  gledatelja"). Sky Sports (UK and Germany editions), TheSportsDB,
+  Goal.com and the National Post were also found independently reporting
+  67,173 for 2020, corroborating the DFB figure further. **No discrepancies
+  found:**
+  - https://datencenter.dfb.de/datencenter/europameisterschaft/1996-in-england/finale/deutschland-tschechische-republik-634569
+  - https://datencenter.dfb.de/en/data-center/uefa-european-championship/2020-in-europe/final/2261445
+  - https://en.wikipedia.org/wiki/UEFA_Euro_1996_final
+  - https://en.wikipedia.org/wiki/UEFA_Euro_2020_final
+  - https://www.skysports.com/football/italy-vs-england/report/421532
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- **2026 men's shortlist research (2026-10-17, Run 303)** - not added to
+  `content/ballon-dor.md` (see `docs/ROADMAP.md`'s matching bullet for why:
+  a scope question for the user, not a sourcing gap). Recorded here purely
+  so a future run that does get a green light doesn't have to re-research
+  it. France Football announced the 30-man men's shortlist on 8 September
+  2026; the ceremony itself is scheduled for 26 October 2026 in London.
+  Two independent "full list" tables converged on the exact same 30 names
+  with no discrepancy: Jude Bellingham, Pau Cubarsí, Marc Cucurella,
+  Ousmane Dembélé, Luis Díaz, Bruno Fernandes, Gabriel, Erling Haaland,
+  Achraf Hakimi, Harry Kane, Khvicha Kvaratskhelia, Lamine Yamal, Sadio
+  Mané, Marquinhos, Lautaro Martínez, Kylian Mbappé, Nuno Mendes, Lionel
+  Messi, João Neves, Michael Olise, Willian Pacho, Julián Quiñones, Declan
+  Rice, Rodri, Fabián Ruiz, William Saliba, Ferran Torres, Dayot Upamecano,
+  Vinícius Júnior, and Vitinha. One immaterial discrepancy between the two
+  tables (Upamecano's club: Bayern Munich per one, PSG per the other) has
+  no bearing on the name list itself, so doesn't block treating the 30
+  names as confirmed; it would matter only if a future run adds per-player
+  club detail. **Converging, two-source-confirmed names (club detail not
+  cross-checked):**
+  - https://www.si.com/soccer/ballon-dor-2026-full-list-nominees
+  - https://thesportscast.net/2026/09/08/2026-ballon-dor-nominees-full-list-of-30-players-nominated/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- **Third independent cross-check of the Winners table and two superlative
+  claims (2026-10-19, Run 313):** re-confirmed the 2025 Winner cell
+  (Ousmane Dembélé, PSG, beating Lamine Yamal) and the "Multiple winners
+  through 2025" tally table's arithmetic against the Winners table itself
+  (Messi 8, Cristiano Ronaldo 5, Cruyff/Platini/van Basten 3 each - all
+  recount cleanly from the Winners table's own rows). Also specifically
+  re-checked two of the page's "Memorable moments"/"Notes" superlative
+  claims, the kind of overgeneralization the content-verification
+  rotation has previously caught in `glossary.md`: "Lev Yashin remains
+  the only goalkeeper to win the men's award" (confirmed - no goalkeeper
+  has won since 1963, and no source names an exception) and "George Weah
+  became the first African player to win the Ballon d'Or in 1995"
+  (confirmed as written - this is the first *African-national* winner,
+  which is how the page's own "National team" column already frames every
+  entry; Eusébio, born in Mozambique but capped for Portugal, is a
+  different, narrower "first Black winner" claim the page does not make).
+  No discrepancies found.
+  - https://www.wionews.com/sports/football-french-forward-ousmane-dembele-wins-2025-ballon-d-or-spain-s-lamine-yamal-settles-for-kopa-trophy-aitana-bonmati-1758568787767/amp
+  - https://www.si.com/soccer/ousmane-dembele-wins-2025-ballon-dor
+  - https://thesefootballtimes.co/2017/08/23/lev-yashin-the-only-goalkeeper-to-win-the-ballon-dor/
+  - https://global.espn.com/football/story/_/id/38742563/why-goalkeeper-never-win-ballon-dor-again
+  - https://en.wikipedia.org/wiki/1995_Ballon_d%27Or
+  - https://www.90min.com/posts/ballon-d-or-1995-george-weah-delivers-football-s-greatest-individual-prize-to-africa
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Voting-panel history, "How it works" section (added 2026-10-21, intensive
+  run): with the Winners table and all five companion trophy lists on
+  `content/ballon-dor.md` already independently cross-checked two or three
+  times (see entries above, no discrepancies in any of them), this run
+  turned to the page's own descriptive "How it works" bullets instead,
+  which had never been individually sourced the way every dated fact on
+  this page has. Two real gaps turned up and were corrected (an accuracy
+  addition, not a correction of a false claim - see
+  `content/ballon-dor.md`'s own matching editorial-note paragraph for the
+  full reasoning):
+  - The voting-panel bullet described the panel as "journalists, one from
+    each eligible country" without qualifying that this wasn't true for
+    2010-2015, when FIFA jointly presented the award: that panel also
+    included national-team captains and coaches, each roughly a third of a
+    combined panel of around 500 voters, reverting to journalists-only in
+    2016.
+  - It also didn't mention a real 2022 reform that shrank the journalist
+    pool itself from roughly 170 voting countries to one journalist per
+    country from only the top 100 nations in the FIFA men's world ranking -
+    a cap still in effect for the 2025 award.
+  Both facts were corroborated across two independent WebSearch passes
+  each, with multiple distinct outlets agreeing in every pass. **No
+  discrepancies found in what's cited below, both facts added to the
+  page:**
+  - https://en.wikipedia.org/wiki/FIFA_Ballon_d%27Or
+  - https://bleacherreport.com/articles/1881792-how-is-the-ballon-dor-winner-selected
+  - https://www.si.com/soccer/2015/01/12/jurgen-klinsmann-ballon-dor-ballot-messi-ronaldo-neuer-robben
+  - https://www.topendsports.com/sport/soccer/awards/ballondor-voting.htm
+  - https://www.footyheadlines.com/2016/09/say-goodbye-to-fifa-ballon-dor.html
+  - https://www.eurosport.co.uk/football/ballon-d-or/2021/ballon-dor-2022-a-number-of-major-changes-to-award-have-been-confirmed-and-come-into-play-from-2022_sto8838643/story.shtml
+  - https://news.cgtn.com/news/2022-03-12/Ballon-d-Or-award-announces-rule-changes-after-controversial-Messi-win-18kQ17x3HZS/share_amp.html
+  - https://www.90min.com/fr/posts/revolution-les-4-changements-majeurs-que-va-subir-le-ballon-d-or
+  - https://www.jordannews.jo/Section-71/Football/3-Criteria-That-Decide-the-2026-Ballon-d-Or-How-Are-Nominees-Chosen-and-Who-Picks-the-Winner-55636
+  - https://foot-africa.com/en/news/ballon-dor-namibia-excluded-from-the-2025-jury-875946/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+    The exact current ballot/points format (sources disagree: a 5-pick
+    6-4-3-2-1 scale per the 2022-reform coverage vs. a 10-pick 15-12-10-
+    8-7-5-4-3-2-1 scale per more recent coverage) was deliberately left out
+    of the page rather than guessed, the same conservative call this
+    rotation makes whenever two source sets don't converge.
+- "Memorable moments" external-sourcing audit, and a real bug fix
+  (2026-10-23, Run 336): extended the content-verification rotation's "Key
+  facts"/"Memorable moments" external-sourcing angle (Run 285 on the World
+  Cup page, Run 335 on Nations League/EURO/Copa América) to this page, the
+  one still flagged open in `docs/ROADMAP.md`. Two fresh, independent
+  `WebSearch` passes - one on the 2007 eligibility change, one on the 1995
+  eligibility change - found that the page's existing "Kaká won the 2007
+  Ballon d'Or, the first year the award opened to any nationality at any
+  club worldwide" bullet was **factually wrong**, and inconsistent with this
+  same page's own introductory paragraph and "How it works" section (both of
+  which correctly state nationality eligibility opened in **1995**, not
+  2007). The 2007 change actually removed the requirement that a player's
+  *club* be based in Europe - a club-location change, not a nationality one;
+  Kaká himself still played for a European club (AC Milan) that year.
+  Wikipedia and Reuters' contemporaneous coverage of the 2007 change, cross-
+  checked against a second pass on the 1995 change (Eurosport's "Black
+  History Month" retrospective on Weah's win, Topendsports), agree on both
+  facts independently:
+  - https://en.wikipedia.org/wiki/2007_Ballon_d%27Or
+  - https://reuters.screenocean.com/record/334880
+  - https://www.topendsports.com/sport/soccer/awards/ballondor-2007.htm
+  - https://www.eurosport.co.uk/football/ballon-d-or/2022/black-history-month-how-george-weah-s-historic-1995-ballon-d-or-win-put-black-and-african-players-on_sto9192984/story.shtml
+  - https://www.topendsports.com/sport/soccer/awards/ballondor-timeline.htm
+  - Note: the prior verification of this exact bullet (`scripts/ordinal-
+    claims-ledger.json`, dated 2026-09-23) had only cross-checked it against
+    this page's own intro paragraph for the "fully global in 2007" clause -
+    it missed that the bullet's "any nationality" phrase contradicted that
+    same paragraph's separate 1995 clause. A claim passing its own ledger
+    check once is not permanent proof against a differently-angled re-read
+    catching a subtler error later, the same lesson `glossary.md`'s two
+    corrected overgeneralizations already taught this rotation. Reworded on
+    both `content/ballon-dor.md` and its hand-translated Croatian
+    counterpart (`src/pages/hr/competitions/ballon-dor.astro`), which
+    repeated the identical conflation; the ledger entry was updated to match
+    (see that file's own note for the full correction). The other two
+    previously-unaudited bullets considered for this pass - Messi's "more
+    than any other player" 2009 claim and the 2020-cancellation claim - were
+    independently confirmed accurate (Messi's 8 titles are already the
+    page's own highest total, re-confirmed via `WebSearch` against general
+    coverage; the 2020 cancellation is universally reported as the award's
+    first break since 1956, per France Football's own statement) and needed
+    no change. This closes the "Key facts"/"Memorable moments" external-
+    sourcing angle for all six competition/award pages.
+- **2026 men's winner, added (2026-10-27, Run 359)**: the 2026 Ballon d'Or
+  ceremony (26 October 2026, London Palladium) had been checked and found
+  not-yet-resolved by Runs 357-358; this run re-checked the morning after
+  and found two independent post-ceremony recap articles converging exactly:
+  Harry Kane won, ahead of Lamine Yamal and Kylian Mbappé, the first English
+  winner since Michael Owen in 2001. Added to `content/ballon-dor.md`'s
+  Winners table and its Croatian counterpart
+  (`src/pages/hr/competitions/ballon-dor.astro`, via the shared table data -
+  only the hand-translated "Memorable moments"/"Notes" prose needed a
+  separate edit). **Deliberately not added this run**: the 2026 winners of
+  the five companion trophies (Kopa, Yashin, Gerd Müller, Johan Cruyff,
+  Sócrates) - every targeted `WebSearch` attempt for each one individually
+  surfaced only pre-ceremony shortlist/favourites coverage, never a
+  post-ceremony result, unlike the main award itself; see
+  `docs/ROADMAP.md`'s matching bullet for the next-run follow-up.
+  **Converging, two-source-confirmed:**
+  - https://www.espn.com/soccer/story/_/id/50236983/harry-kane-2026-ballon-dor-kylian-mbappe-lamine-yamal
+  - https://sports.yahoo.com/articles/ballon-dor-2026-live-updates-140001627.html
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- **2026 companion trophies, added (2026-10-27, Run 360)**: the gap Run 359
+  left open (every search attempt that run tried surfaced only pre-ceremony
+  shortlist coverage for the five companion trophies) turned out to be the
+  indexing-lag gap it suspected, not an exhausted one - a fresh `WebSearch`
+  pass the next day found dedicated post-ceremony recap coverage for every
+  trophy, each independently confirmed by at least two outlets. Added to
+  `content/ballon-dor.md`'s five companion-trophy sections and mirrored on
+  the Croatian page (`src/pages/hr/competitions/ballon-dor.astro`).
+  - **Kopa Trophy (best young player) - Lamine Yamal, his third consecutive
+    win, the first player to win it three times:**
+    - https://sports.yahoo.com/articles/lamine-yamal-wins-2026-ballon-212900002.html
+    - https://khelnow.com/football/ballon-dor-kopa-trophy-winners-202610
+    - https://onefootball.com/en/news/lamine-yamal-wins-2026-ballon-dor-kopa-trophy-lennart-karl-finishes-fourth-43678222
+  - **Yashin Trophy (best goalkeeper) - Unai Simón:**
+    - https://www.dazn.com/en-US/news/soccer/ballon-dor-2026-winners-lev-yashin-trophy-goalkeeper/1ounud7yqpyhc1keeaqfb1yanb
+    - https://khelnow.com/football/ballon-dor-yashin-trophy-winners-202610
+    - https://www.arsenal.com/news/our-2026-ballon-dor-results-in-full-aM34k3e4zgpu
+  - **Gerd Müller Trophy (top scorer) - Harry Kane, his second trophy
+    outright (after the 2024 tie with Kylian Mbappé), the second player
+    (after Lewandowski) to win it more than once:**
+    - https://www.si.com/soccer/harry-kane-history-books-2026-gerd-muller-trophy
+    - https://khelnow.com/football/ballon-dor-gerd-muller-trophy-winners-202610
+    - https://www.pulse.com.gh/story/full-list-of-gerd-muller-trophy-winners-from-2021-2026-2026102612245031010
+  - **Johan Cruyff Trophy (best coach) - Luis de la Fuente:**
+    - https://www.dazn.com/en-GB/news/football/ballon-dor-2026-winners-johan-cruyff-trophy-coach-of-the-year/7c3fvi1d49le1t1bv9xy76p0o
+    - https://www.pulse.com.gh/story/johan-cruyff-trophy-winners-list-2024-2026-2026102612455241417
+    - https://depor.com/en/us-live/2026-ballon-dor-winners-all-award-categories-and-recipients-nnda-nnrt-noticia/
+  - **Sócrates Award (humanitarian) - Bukayo Saka:**
+    - https://sports.yahoo.com/articles/bukayo-saka-wins-socrates-award-220149187.html
+    - https://www.goal.com/en/news/ballon-d-or-2026-bukayo-saka-wins-the-socrates-award-for-humanitarian-work/blt56fa02ceffa40d5f
+    - https://bolavip.com/en/soccer/what-is-the-socrates-award-at-the-2026-ballon-dor
+  - Methodology note: an initial broad multi-award query's synthesized
+    answer named Kane as the Gerd Müller Trophy's sole 2026 winner without
+    flagging that his 2024 win had been a tie with Mbappé; a narrower
+    trophy-only follow-up then surfaced only that 2024 tie with no 2026
+    result, which could have read as a contradiction rather than a
+    different year. A third, season-specific query resolved it cleanly - see
+    `content/ballon-dor.md`'s own matching editorial-note paragraph.
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Rodri's cross-competition individual-award sweep (2026-10-29, intensive
+  run): confirmed via WebSearch that Rodri's 2024 Ballon d'Or made him the
+  first defensive midfielder to win the award since Lothar Matthäus in
+  1990, and that by then he had already been named UEFA Nations League
+  2023 Player of the Finals and UEFA EURO 2024 Player of the Tournament.
+  - "First defensive midfielder since Matthäus" - Reuters-syndicated
+    reports from the 28 October 2024 ceremony, independently republished
+    by multiple outlets:
+    - https://www.dailydispatch.co.za/sport/2024-10-29-spain-and-man-citys-rodri-wins-ballon-dor/
+    - https://www.thestar.com.my/sport/football/2024/10/29/soccer-spain039s-rodri-wins-ballon-d039or-for-best-player-in-the-world
+    - https://www.khaleejtimes.com/sports/football/manchester-citys-spanish-midfielder-rodri-wins-ballon-dor-for-best-player-in-the-world
+    - https://www.timeslive.co.za/sport/soccer/2024-10-29-spain-and-man-citys-rodri-wins-ballon-dor/
+    - https://www.businessday.co.za/bd/sport/soccer/2024-10-29-spain-and-man-citys-rodri-wins-ballon-dor/
+  - 2023 UEFA Nations League Player of the Finals - UEFA's own site
+    (already the primary source for `content/uefa-nations-league.md`'s
+    existing 2023 entry), corroborated by contemporaneous wire coverage:
+    - https://www.uefa.com/uefanationsleague/news/0282-1849de0ccdfe-e28eb8d71909-1000--rodri-named-2023-uefa-nations-league-player-of-the-finals
+    - https://www.malaymail.com/amp/news/sports/2023/06/19/rodri-named-uefa-nations-league-player-of-the-tournament/75177
+  - 2024 UEFA EURO Player of the Tournament - already independently
+    sourced for `content/uefa-euro.md`'s existing 2024 entry; re-confirmed
+    this run via https://businessday.ng/sports/article/euro-2024-rodri-wins-best-player-of-the-tournament
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
+- Paolo Rossi's 1982 World Cup/Golden Ball/Golden Boot/Ballon d'Or sweep
+  (2026-10-29, Run 373): a second case of the recurring-individual-award
+  cross-reference angle Run 372 opened with Rodri. Confirmed via WebSearch
+  that Rossi led Italy to the 1982 World Cup title while winning that
+  tournament's Golden Boot and Golden Ball, then also won the 1982 Ballon
+  d'Or - independently described as the only player in football history to
+  win all four in the same year.
+  - https://en.wikipedia.org/wiki/Paolo_Rossi
+  - https://scroll.in/field/980819/scroll_in (republishes ESPN FC's analysis
+    naming Rossi "the only male player in history to have won the World Cup,
+    WC Golden Ball, WC Golden Boot and Ballon d'Or in the same year")
+  - https://www.sportsmax.tv/studentwriters/itemlist/tag/Paolo%20Rossi
+  - https://worldfootballindex.com/2020/12/remembering-paolo-rossi-the-bolt-in-blue-vs-brazil-the-star-of-82/
+  - Also checked the closest apparent rival claim, Ronaldo's 2002 World
+    Cup/Golden Boot/Ballon d'Or treble (itself genuine), to confirm it does
+    not also include a Golden Ball win that would contradict Rossi's
+    uniqueness:
+  - https://worldcupranking.com/blog/2002-world-cup-golden-boot-winner/
+  - https://www.11v11.com/ronaldo/
+  - Note: 2002's Golden Ball went to Oliver Kahn, already correctly on
+    `content/fifa-world-cup.md` (including its own "the only goalkeeper to
+    date to also win the award" note) - no source found crediting Ronaldo
+    with a 2002 Golden Ball, confirming no second instance of the four-award
+    sweep.
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries of indexed pages rather than direct page loads.
+- Ronaldo's 2002 World Cup/Golden Boot/Ballon d'Or treble cross-reference
+  (2026-10-29, Run 374): Run 373 above already confirmed this treble is
+  genuine while checking it as Rossi's one plausible rival claim
+  (https://worldcupranking.com/blog/2002-world-cup-golden-boot-winner/,
+  https://www.11v11.com/ronaldo/) - this run adds the cross-reference
+  itself (a new "Memorable moments" bullet here, plus matching ones on
+  `content/fifa-world-cup.md` and `content/golden-boot.md`), reusing that
+  existing verification rather than re-deriving it.
+- Zinedine Zidane's 1998 World Cup/Ballon d'Or cross-reference (2026-10-30,
+  Run 375): a fourth case of the recurring-individual-award cross-reference
+  angle Run 372 opened with Rodri - a two-award pairing rather than a
+  three- or four-award sweep, since 1998's World Cup Golden Ball went to
+  Ronaldo (Brazil), not Zidane, so no Golden Ball/Golden Boot leg applies
+  here. Both underlying facts were already independently on file and
+  cross-checked in prior audits - the 1998 Ballon d'Or winner
+  (`content/ballon-dor.md`'s Winners table) and France's 1998 World Cup
+  title (`content/fifa-world-cup.md`'s Editions table) - so this run only
+  needed to confirm the connection itself, not re-derive either fact.
+  Confirmed via WebSearch against Wikipedia's 1998 Ballon d'Or article and
+  independent corroboration from fotmob.com/stadiumastro.com (both carrying
+  Zidane's own on-record reflection that his World Cup final performance -
+  two goals in the 3-0 win over Brazil - drove the award):
+  - https://en.wikipedia.org/wiki/1998_Ballon_d%27Or
+  - https://www.fotmob.com/fi/news/3u05c89ki386124keadcby01r/%27I-was-the-best-player-in-the-world%27---Zidane-reflects-on-1998-Ballon-d%27Or-win
+  - https://english.stadiumastro.com/football/i-was-best-player-world-zidane-reflects-1998-ballon-dor-win-217026
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
+- Luka Modrić's 2018 World Cup Golden Ball/Ballon d'Or cross-reference
+  (2026-10-30, Run 375): the second candidate shipped this run, and the
+  one Run 373/374 both explicitly flagged as open - another two-award
+  pairing (no Golden Boot/Golden Ball-of-a-different-award overlap to
+  check, unlike Rossi/Ronaldo, since the World Cup Golden Ball itself is
+  one of the two awards in this pairing). Both underlying facts were
+  already independently on file - Modrić's 2018 World Cup Golden Ball
+  (`content/fifa-world-cup.md`'s Golden Ball winners list) and his 2018
+  Ballon d'Or (`content/ballon-dor.md`'s Winners table, already carrying a
+  verified "only Croatian winner" superlative). Confirmed via WebSearch
+  against SI.com, beIN Sports and Scroll.in, which independently report
+  both wins and date the Ballon d'Or ceremony to 3 December 2018, matching
+  the date already on file:
+  - https://www.si.com/soccer/2018/07/15/world-cup-golden-ball-luka-modric-croatia
+  - https://www.beinsports.com/en-us/articles/luka-modric-wins-world-cup-golden-ball
+  - https://scroll.in/field/904421/scroll_in
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
+- Michel Platini's 1984 EURO/Golden Boot/Ballon d'Or cross-reference
+  (2026-10-30, Run 376): a sixth case of the recurring-individual-award
+  cross-reference angle Run 372 opened with Rodri, and the first to pair a
+  EURO (rather than World Cup) title with the Golden Boot and Ballon d'Or
+  in the same year. All three underlying facts were already independently
+  on file - France's 1984 EURO title and Platini's captaincy
+  (`content/uefa-euro.md`'s Editions/Winning captains tables), his 1984
+  EURO Golden Boot with nine goals (`content/golden-boot.md`'s EURO
+  table), and his 1984 Ballon d'Or (`content/ballon-dor.md`'s Winners
+  table) - so this run only needed to confirm and add the connecting
+  cross-reference, not re-derive any of the three facts. Confirmed via
+  WebSearch against theanalyst.com's EURO 1984 retrospective and
+  soccerway.com's "EURO Rewind" feature, which independently corroborate
+  all three: Platini captained France to the title, scored nine goals in
+  five matches (still the single-tournament EURO record, already on file),
+  and won the 1984 Ballon d'Or the same year:
+  - https://theanalyst.com/2024/06/michel-platini-euro-1984/
+  - https://www.soccerway.com/news/soccer-euro-euro-rewind-the-magic-of-platini-lights-up-host-success-in-1984/x8c52o95
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
+- Gerd Müller's 1970 World Cup Golden Boot/Ballon d'Or cross-reference
+  (2026-10-30, Run 377): a seventh case of the recurring-individual-award
+  cross-reference angle Run 372 opened with Rodri, and the first where the
+  player did not also win the tournament itself - West Germany finished
+  third at the 1970 World Cup (beating Uruguay in the third-place match),
+  with Brazil winning the title. Both underlying facts were already
+  independently on file - Müller's ten-goal 1970 World Cup Golden Boot
+  (`content/golden-boot.md`'s World Cup table) and his 1970 Ballon d'Or
+  (`content/ballon-dor.md`'s Winners table) - so this run only needed to
+  confirm and add the connecting cross-reference, not re-derive either
+  fact. Confirmed via WebSearch against RSSSF's own Ballon d'Or results
+  page (Müller 77 points, Bobby Moore second on 70, Luigi Riva third on
+  65) and Wikipedia's Gerd Müller and 1970 FIFA World Cup articles, which
+  independently corroborate both the goal tally and the Ballon d'Or win in
+  the same calendar year:
+  - https://rsssf.org/miscellaneous/europa-poy70.html
+  - https://en.wikipedia.org/wiki/Gerd_M%C3%BCller
+  - https://worldcupranking.com/blog/1970-world-cup-golden-boot-winner/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
+- Lothar Matthäus's 1990 World Cup-winning-captain/Ballon d'Or cross-reference
+  (2026-10-30, Run 378): an eighth case of the recurring-individual-award
+  cross-reference angle Run 372 opened with Rodri, and the first to pair a
+  *winning captaincy* (rather than a Golden Ball/Golden Boot/top-scorer
+  award) with the Ballon d'Or in the same year. Both underlying facts were
+  already independently on file - Matthäus's 1990 World Cup-winning
+  captaincy for West Germany (`content/fifa-world-cup.md`'s Winning
+  captains table) and his 1990 Ballon d'Or (`content/ballon-dor.md`'s
+  Winners table, already referenced in passing by the existing Rodri bullet
+  as "since Lothar Matthäus in 1990" but never given its own cross-reference
+  bullet) - so this run only needed to confirm and add the connecting
+  cross-reference, not re-derive either fact. Confirmed via WebSearch, which
+  corroborates both facts consistently across sources describing Matthäus
+  captaining West Germany to the 1-0 final win over Argentina and receiving
+  the 1990 Ballon d'Or as Europe's player of the year that same season:
+  - https://en.wikipedia.org/wiki/Lothar_Matth%C3%A4us
+  - https://fcbayern.com/en/news/2021/03/10-special-moments-in-lothar-matthaeus-career
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
+- Fabio Cannavaro's 2006 World Cup-winning-captain/Ballon d'Or cross-reference
+  (2026-10-30, Run 378): a ninth case of the same angle, and the second
+  winning-captaincy/Ballon d'Or pairing (after Matthäus, above). Both
+  underlying facts were already independently on file - Cannavaro's 2006
+  World Cup-winning captaincy for Italy (`content/fifa-world-cup.md`'s
+  Winning captains table, which already separately noted his tournament
+  Silver Ball) and his 2006 Ballon d'Or (`content/ballon-dor.md`'s Winners
+  table) - so this run only needed to confirm and add the connecting
+  cross-reference, not re-derive either fact. Confirmed via WebSearch
+  against Reuters' and RTÉ's own 2006 award-announcement coverage, which
+  independently corroborate both that Cannavaro captained Italy to the
+  title in Germany and that France Football named him European Footballer
+  of the Year the same November:
+  - https://www.reuters.com (via reuters.screenocean.com/record/815120)
+  - https://www.rte.ie/sport/soccer/2006/1127/211766-cannavaro
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
+- Ruud Gullit's 1987 Ballon d'Or/1988 EURO-winning-captaincy cross-reference
+  (2026-10-30, Run 379): a tenth case of the recurring individual-award
+  cross-reference angle, and the first where the Ballon d'Or and the
+  trophy fall in different (but consecutive) calendar years rather than
+  the same one - every prior captaincy/managerial or on-pitch-award pairing
+  in this series (Matthäus, Cannavaro, Rossi, Ronaldo, Zidane, Platini,
+  Müller) had both halves land in the same year. Both underlying facts
+  were already independently on file - Gullit's 1987 Ballon d'Or
+  (`content/ballon-dor.md`'s Winners table) and his 1988 EURO-winning
+  captaincy for the Netherlands (`content/uefa-euro.md`'s Winning captains
+  table) - so this run only needed to confirm and add the connecting
+  cross-reference, not re-derive either fact. Confirmed via WebSearch,
+  which corroborates both facts consistently: Gullit was voted 1987 Ballon
+  d'Or winner by France Football after his transfer to AC Milan, and
+  Wikipedia/UEFA.com both describe him as the Netherlands' captain across
+  their EURO 1988 win the following year:
+  - https://en.wikipedia.org/wiki/Ruud_Gullit
+  - https://www.uefa.com/uefaeuro/history/news/0253-0d7f3abb72ce-45e093ec673d-1000--ruud-gullit
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
+- Marco van Basten's 1988 EURO Golden Boot/Ballon d'Or cross-reference
+  (2026-10-30, Run 379): an eleventh case of the same angle, and the second
+  EURO Golden Boot/Ballon d'Or sweep in the same year besides Platini's
+  1984 (the only prior on-pitch-award/Ballon d'Or sweep from a EURO rather
+  than a World Cup). Both underlying facts were already independently on
+  file - Van Basten's 1988 EURO Golden Boot, five goals
+  (`content/golden-boot.md`'s EURO top scorers table) and his 1988 Ballon
+  d'Or (`content/ballon-dor.md`'s Winners table) - so this run only needed
+  to confirm and add the connecting cross-reference, not re-derive either
+  fact. Confirmed via WebSearch against Wikipedia's Marco van Basten and
+  1988 Ballon d'Or articles and UEFA.com's own EURO 1988 retrospective,
+  which independently corroborate the five-goal tally, the Netherlands'
+  tournament win, and the same-year Ballon d'Or:
+  - https://en.wikipedia.org/wiki/Marco_van_Basten
+  - https://www.uefa.com/uefaeuro/history/news/0253-0d7d771b1d5a-bab36b6c142e-1000--1988-at-a-glance/
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
+- Franz Beckenbauer's 1972 Ballon d'Or/EURO-winning-captaincy cross-reference
+  (2026-10-30, Run 380): a twelfth case of the same recurring individual-
+  award angle, and the second same-year EURO-captaincy/Ballon d'Or pairing
+  after Platini's 1984 (Gullit's 1987/1988 pairing landed a year apart, not
+  the same year). Both underlying facts were already independently on file
+  - Beckenbauer's 1972 Ballon d'Or (`content/ballon-dor.md`'s Winners
+  table) and his 1972 EURO-winning captaincy for West Germany
+  (`content/uefa-euro.md`'s Winning captains table, which already noted his
+  *other* same-shape double, the 1974 World Cup captaincy, but made no
+  mention of the Ballon d'Or) - so this run only needed to confirm and add
+  the connecting cross-reference, not re-derive either fact. Confirmed via
+  two independent WebSearch passes against Wikipedia's "1972 Ballon d'Or"
+  article (explicitly framing the award as coming "after leading West
+  Germany to the European title") and UEFA.com's own German-language
+  Beckenbauer retrospective describing his EURO 1972 captaincy:
+  - https://en.wikipedia.org/wiki/1972_Ballon_d%27Or
+  - https://de.uefa.com/uefaeuro/history/news/0253-0d7de25f77f9-952295b997f7-1000--beckenbauer-leader-of-west-germany-s-glorious-class-of-72
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
+- Bobby Charlton's 1966 World Cup/Ballon d'Or cross-reference (2026-10-31,
+  Run 381): a thirteenth case of the same recurring individual-award
+  angle, and the first in the series tied to a World Cup win itself
+  rather than a captaincy or on-pitch tournament award (the same shape as
+  the existing Zidane-1998/Modrić-2018 bullets). Both underlying facts
+  were already independently on file - Charlton's 1966 Ballon d'Or
+  (`content/ballon-dor.md`'s Winners table) and England's 1966 World Cup
+  win, with Bobby Moore (not Charlton) already correctly listed as the
+  winning captain (`content/fifa-world-cup.md`'s Finals and Winning
+  captains tables) - so this run only needed to confirm and add the
+  connecting cross-reference, not re-derive either fact. Confirmed via two
+  independent WebSearch passes against Wikipedia's "1966 Ballon d'Or"
+  article and Bobby Charlton's own biographical coverage, both
+  independently corroborating the Ballon d'Or win and his place in
+  England's 1966 World Cup-winning squad:
+  - https://en.wikipedia.org/wiki/1966_Ballon_d%27Or
+  - https://en.wikipedia.org/wiki/Bobby_Charlton
+  - Note: both WebSearch passes also asserted Charlton won the World
+    Cup's "Golden Ball" in 1966 - checked against this site's own
+    `content/fifa-world-cup.md` ("FIFA has named a best-player award at
+    every World Cup since 1982; no equivalent award existed at earlier
+    editions") and found to be anachronistic, so left out entirely rather
+    than shipped; only the two mutually-consistent, already-independently-
+    sourced facts (the World Cup win and the Ballon d'Or) were added. The
+    same egress-blocked-domains caveat every prior audit in this file has
+    noted applies here too; verification relied on WebSearch's synthesized
+    summaries rather than direct page loads.
+- Lionel Messi's 2021 Copa América-winning-captaincy/Ballon d'Or
+  cross-reference (2026-10-31, Run 382): a fourteenth case of the same
+  recurring individual-award angle, and the first tied to a Copa América
+  win rather than a World Cup/EURO trophy or on-pitch tournament award.
+  Both underlying facts were already independently on file - Messi's 2021
+  Ballon d'Or (`content/ballon-dor.md`'s Winners table) and his 2021 Copa
+  América-winning captaincy for Argentina (`content/copa-america.md`'s
+  Winning captains table, which already noted it was his "first major
+  trophy with the senior Argentina team" but made no mention of the
+  Ballon d'Or) - so this run only needed to confirm and add the
+  connecting cross-reference, not re-derive either fact. Confirmed via two
+  independent WebSearch passes, both corroborating the pairing and
+  Messi's own framing at the ceremony ("I think I won this trophy thanks
+  to what we did at the Copa América"):
+  - https://en.psg.fr/teams/first-team/content/leo-messi-wins-2021-ballon-dor
+  - https://www.tntsports.co.uk/football/ballon-dor-2021-lionel-messi-wins-historic-seventh-award-ahead-of-robert-lewandowski-and-jorginho_sto8648942/story.shtml
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
+- Lionel Messi's 2022 World Cup-winning-captaincy/2023 Ballon d'Or
+  cross-reference (2026-10-31, Run 384): a fifteenth case of the same
+  recurring individual-award angle, and the first where the Ballon d'Or
+  landed the year *after* the trophy win rather than the same year (the
+  established pattern for a year-apart pairing, per Run 379's Gullit/EURO
+  1988 case). Both underlying facts were already independently on file -
+  Messi's 2022 World Cup-winning captaincy (`content/fifa-world-cup.md`'s
+  Winning captains list, which already noted his Copa América captaincies
+  but made no mention of the Ballon d'Or) and his 2023 Ballon d'Or
+  (`content/ballon-dor.md`'s Winners table) - so this run only needed to
+  confirm and add the connecting cross-reference, not re-derive either
+  fact. Confirmed via two independent WebSearch passes (one a dedicated
+  verification pass, one a direct follow-up), both explicitly tying the
+  award to the World Cup performance:
+  - https://www.espn.com/soccer/story/_/id/38779218/
+  - https://www.fourfourtwo.com/news/lionel-messi-wins-the-2023-ballon-dor
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
+- Matthias Sammer's 1996 Ballon d'Or/UEFA EURO 1996 Player of the
+  Tournament cross-reference (2026-10-31, Run 385): a sixteenth case of
+  the same recurring individual-award angle, and the earliest-dated
+  same-year pairing in the series after Beckenbauer's 1972 and Charlton's
+  1966. Both underlying facts were already independently on file -
+  Sammer's 1996 Ballon d'Or (`content/ballon-dor.md`'s Winners table) and
+  his 1996 EURO Player of the Tournament award for champions Germany
+  (`content/uefa-euro.md`'s "Player of the Tournament winners" list,
+  which already noted the award but made no mention of the Ballon
+  d'Or) - so this run only needed to confirm and add the connecting
+  cross-reference, not re-derive either fact. Confirmed via two
+  independent WebSearch passes, both corroborating the pairing (Sammer
+  was the first defender to win the Ballon d'Or since Beckenbauer in
+  1976) and his Player of the Tournament honour as Germany's
+  libero/sweeper en route to the title:
+  - https://en.wikipedia.org/wiki/Matthias_Sammer
+  - https://www.fourfourtwo.com/features/euros-legends-looking-back-at-germany-icon-matthias-sammer-the-greatest-sweeper-youve-forgotten-about
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
 
 ## Review policy
 

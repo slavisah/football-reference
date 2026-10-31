@@ -5,7 +5,7 @@ competitionType: international
 confederation: FIFA
 firstEdition: 1930
 lastCompletedEdition: 2026
-lastReviewed: 2026-10-12
+lastReviewed: 2026-10-31
 status: verified
 ---
 
@@ -17,7 +17,7 @@ The FIFA World Cup began in Uruguay in 1930. It was not played in 1942 or 1946 b
 
 - National teams first play years of qualifying matches within their own confederation to win one of a limited number of finals places.
 - The finals begin with a group stage, where each team plays the others in its group; the leading teams advance.
-- From the round of 16 onward, it is a straight knockout: one defeat and a team is out.
+- From the round of 32 onward (the round of 16 before the 48-team expansion in 2026), it is a straight knockout: one defeat and a team is out.
 - The two semifinal winners meet in the final to decide the champion.
 - The tournament has expanded several times since 1930 - see "Format milestones" below for exactly when.
 
@@ -101,7 +101,7 @@ Every World Cup edition has decided its champion in one match at one stadium, in
 ## Golden Ball winners
 
 - FIFA has named a best-player award at every World Cup since 1982; no equivalent award existed at earlier editions.
-- **1982:** Paolo Rossi (Italy) - the award's first winner.
+- **1982:** Paolo Rossi (Italy) - the award's first winner; that same year he also won the World Cup Golden Boot and the Ballon d'Or.
 - **1986:** Diego Maradona (Argentina).
 - **1990:** Salvatore Schillaci (Italy).
 - **1994:** Romário (Brazil).
@@ -110,7 +110,7 @@ Every World Cup edition has decided its champion in one match at one stadium, in
 - **2006:** Zinedine Zidane (France).
 - **2010:** Diego Forlán (Uruguay).
 - **2014:** Lionel Messi (Argentina) - the first of his two wins, still the only player to win the award more than once.
-- **2018:** Luka Modrić (Croatia).
+- **2018:** Luka Modrić (Croatia) - that same year he also won the Ballon d'Or.
 - **2022:** Lionel Messi (Argentina) - his second win.
 - **2026:** Rodri (Spain) - the first Spain player to win the award.
 
@@ -183,21 +183,21 @@ Every World Cup edition has decided its champion in one match at one stadium, in
 - **1958:** Vicente Feola (Brazil).
 - **1962:** Aymoré Moreira (Brazil).
 - **1966:** Alf Ramsey (England).
-- **1970:** Mário Zagallo (Brazil) - also won the trophy as a player in 1958 and 1962.
-- **1974:** Helmut Schön (West Germany).
+- **1970:** Mário Zagallo (Brazil) - also won the trophy as a player in 1958 and 1962, and later won the Copa América as Brazil's manager in 1997.
+- **1974:** Helmut Schön (West Germany) - also won the 1972 UEFA European Championship as West Germany's manager.
 - **1978:** César Luis Menotti (Argentina).
 - **1982:** Enzo Bearzot (Italy).
 - **1986:** Carlos Bilardo (Argentina).
 - **1990:** Franz Beckenbauer (West Germany) - also won the trophy as a player in 1974, one of only three men to win it as both player and manager.
-- **1994:** Carlos Alberto Parreira (Brazil).
+- **1994:** Carlos Alberto Parreira (Brazil) - also won the Copa América as Brazil's manager in 2004.
 - **1998:** Aimé Jacquet (France).
 - **2002:** Luiz Felipe Scolari (Brazil).
 - **2006:** Marcello Lippi (Italy).
-- **2010:** Vicente del Bosque (Spain).
+- **2010:** Vicente del Bosque (Spain) - also won the UEFA European Championship as Spain's manager in 2012.
 - **2014:** Joachim Löw (Germany).
 - **2018:** Didier Deschamps (France) - also won the trophy as a player in 1998, joining Zagallo and Beckenbauer as a player-and-manager winner.
 - **2022:** Lionel Scaloni (Argentina).
-- **2026:** Luis de la Fuente (Spain) - the oldest winning manager in World Cup history, aged 65, and Spain's second title alongside 2010.
+- **2026:** Luis de la Fuente (Spain) - the oldest winning manager in World Cup history, aged 65, and Spain's second title alongside 2010. He also won the 2023 UEFA Nations League and the 2024 UEFA European Championship as Spain's manager.
 
 ## Winning captains
 
@@ -211,26 +211,29 @@ Every World Cup edition has decided its champion in one match at one stadium, in
 - **1962:** Mauro Ramos (Brazil).
 - **1966:** Bobby Moore (England).
 - **1970:** Carlos Alberto Torres (Brazil).
-- **1974:** Franz Beckenbauer (West Germany) - also went on to win the trophy as a manager in 1990, one of only three men to win it as both player and manager (see "Winning managers" above).
+- **1974:** Franz Beckenbauer (West Germany) - also captained West Germany to the 1972 UEFA European Championship title, and went on to win the World Cup as a manager in 1990, one of only three men to win it as both player and manager (see "Winning managers" above).
 - **1978:** Daniel Passarella (Argentina).
 - **1982:** Dino Zoff (Italy) - at 40 years old, still the oldest player to captain a World Cup-winning team.
 - **1986:** Diego Maradona (Argentina).
-- **1990:** Lothar Matthäus (West Germany).
+- **1990:** Lothar Matthäus (West Germany) - also won the 1990 Ballon d'Or.
 - **1994:** Dunga (Brazil).
-- **1998:** Didier Deschamps (France) - also went on to win the trophy as a manager in 2018, joining Beckenbauer as a player-and-manager winner (see "Winning managers" above).
-- **2002:** Cafu (Brazil) - the only player to appear in three consecutive World Cup finals (1994, 1998 and 2002).
-- **2006:** Fabio Cannavaro (Italy).
-- **2010:** Iker Casillas (Spain).
+- **1998:** Didier Deschamps (France) - also went on to win the trophy as a manager in 2018, joining Zagallo and Beckenbauer as a player-and-manager winner (see "Winning managers" above).
+- **2002:** Cafu (Brazil) - the only player to appear in three consecutive World Cup finals (1994, 1998 and 2002); also captained Brazil to the 1999 Copa América title.
+- **2006:** Fabio Cannavaro (Italy) - also won the 2006 Ballon d'Or.
+- **2010:** Iker Casillas (Spain) - also captained Spain to the UEFA EURO title in 2008 and 2012.
 - **2014:** Philipp Lahm (Germany).
 - **2018:** Hugo Lloris (France).
-- **2022:** Lionel Messi (Argentina).
+- **2022:** Lionel Messi (Argentina) - also captained Argentina to the Copa América title in 2021 and 2024, and went on to win the 2023 Ballon d'Or largely on the strength of this title.
 - **2026:** Rodri (Spain) - also named the tournament's Golden Ball winner the same year (see "Golden Ball winners" above).
 
 ## Memorable moments
 
 - Uruguay defeated Brazil in the decisive 1950 match at the Maracanã, a result remembered as the *Maracanazo*.
+- Bobby Charlton (England) won the 1966 World Cup and that year's Ballon d'Or.
 - Brazil's 1970 side became the first team to win three World Cups.
 - Diego Maradona inspired Argentina in 1986.
+- Zinedine Zidane (France) won the 1998 World Cup and that year's Ballon d'Or.
+- Ronaldo (Brazil) won the 2002 World Cup, that year's Golden Boot, and the Ballon d'Or.
 - Croatia reached its first final in 2018.
 - Argentina and France played a 3–3 final in 2022 before Argentina won the shoot-out.
 - Spain won its second title in 2026.

@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-10-10
+lastReviewed: 2026-10-31
 status: verified
 ---
 
@@ -17,7 +17,7 @@ The European Championship began in 1960 as the European Nations' Cup. Early fina
 
 - UEFA national teams qualify over roughly two years of group matches before the finals.
 - The finals open with a group stage; the best-placed teams in each group move on.
-- From the quarterfinals onward it is a straight knockout: a single loss ends a team's tournament.
+- From the round of 16 onward (the quarterfinals before the finals expanded to sixteen teams in 1996), it is a straight knockout: a single loss ends a team's tournament.
 - The final decides the champion; no third-place match has been played since 1980 (see "Historical format note" below).
 
 ## Final venues
@@ -33,13 +33,13 @@ Every EURO edition has decided its champion in one match at one stadium - even 2
 - **1984:** Parc des Princes, Paris (France) - the same stadium as the 1960 final; a reported attendance of 47,368.
 - **1988:** Olympiastadion, Munich (West Germany) - a reported attendance of 62,770.
 - **1992:** Ullevi, Gothenburg (Sweden) - a reported attendance of 37,800.
-- **1996:** Wembley Stadium, London (England).
+- **1996:** Wembley Stadium, London (England) - a reported attendance of 73,611.
 - **2000:** De Kuip, Rotterdam (Netherlands) - a reported attendance of 48,100.
 - **2004:** Estádio da Luz, Lisbon (Portugal) - a reported attendance of 62,865.
 - **2008:** Ernst-Happel-Stadion, Vienna (Austria) - a reported attendance of 51,428.
 - **2012:** NSC Olimpiyskiy, Kyiv (Ukraine) - a reported attendance of 63,170.
 - **2016:** Stade de France, Saint-Denis (France) - a reported attendance of 75,868.
-- **2020:** Wembley Stadium, London (England) - the same stadium as the 1996 final, the third to host two EURO finals, after Rome (1980) and Paris (1984).
+- **2020:** Wembley Stadium, London (England) - the same stadium as the 1996 final, the third to host two EURO finals, after Rome (1980) and Paris (1984); a reported attendance of 67,173, reduced by COVID-19 capacity limits.
 - **2024:** Olympiastadion, Berlin (Germany) - a reported attendance of 65,600.
 
 ## Editions
@@ -86,14 +86,14 @@ A third-place match was played through 1980. From 1984 onward, UEFA recognizes b
 ## Player of the Tournament winners
 
 - UEFA has named a best-player award at every EURO since 1996; no equivalent award existed at the nine earlier editions.
-- **1996:** Matthias Sammer (Germany).
+- **1996:** Matthias Sammer (Germany) - also that year's Ballon d'Or winner.
 - **2000:** Zinedine Zidane (France).
 - **2004:** Theodoros Zagorakis (Greece) - captain of the surprise 2004 champions.
 - **2008:** Xavi Hernández (Spain).
 - **2012:** Andrés Iniesta (Spain).
 - **2016:** Antoine Griezmann (France) - runner-up with France, the only winner of the award not to lift the trophy that year.
 - **2020:** Gianluigi Donnarumma (Italy) - the first goalkeeper to win the award.
-- **2024:** Rodri (Spain).
+- **2024:** Rodri (Spain) - also the UEFA Nations League 2023 Finals' Player of the Finals, and later that year the Ballon d'Or winner.
 
 ## Young Player of the Tournament winners
 
@@ -127,10 +127,10 @@ A third-place match was played through 1980. From 1984 onward, UEFA recognizes b
 - **2000:** Roger Lemerre (France).
 - **2004:** Otto Rehhagel (Greece) - the German manager behind one of international football's biggest surprises.
 - **2008:** Luis Aragonés (Spain).
-- **2012:** Vicente del Bosque (Spain).
+- **2012:** Vicente del Bosque (Spain) - also won the FIFA World Cup as Spain's manager in 2010.
 - **2016:** Fernando Santos (Portugal).
 - **2020:** Roberto Mancini (Italy).
-- **2024:** Luis de la Fuente (Spain) - the same manager who went on to win the 2026 World Cup with Spain.
+- **2024:** Luis de la Fuente (Spain) - also won the 2023 UEFA Nations League as Spain's manager, and went on to win the 2026 World Cup with Spain.
 
 ## Winning captains
 
@@ -138,11 +138,11 @@ A third-place match was played through 1980. From 1984 onward, UEFA recognizes b
 - **1960:** Igor Netto (Soviet Union).
 - **1964:** Ferran Olivella (Spain).
 - **1968:** Giacinto Facchetti (Italy).
-- **1972:** Franz Beckenbauer (West Germany) - also captained West Germany to the 1974 World Cup title, one of only a handful of players to captain a team to both trophies.
+- **1972:** Franz Beckenbauer (West Germany) - also won that year's Ballon d'Or, and captained West Germany to the 1974 World Cup title too, one of only a handful of players to captain a team to both trophies.
 - **1976:** Anton Ondruš (Czechoslovakia).
 - **1980:** Bernard Dietz (West Germany).
-- **1984:** Michel Platini (France).
-- **1988:** Ruud Gullit (Netherlands).
+- **1984:** Michel Platini (France) - also won that year's Ballon d'Or and was EURO 1984's top scorer.
+- **1988:** Ruud Gullit (Netherlands) - won the 1987 Ballon d'Or the year before captaining the Netherlands to the title.
 - **1992:** Lars Olsen (Denmark).
 - **1996:** Jürgen Klinsmann (Germany).
 - **2000:** Didier Deschamps (France) - also captained France to the 1998 World Cup title, then went on to win the 2018 World Cup as manager (see "Winning managers" above).

@@ -1,48 +1,19 @@
 ---
 title: Records and Timelines
 slug: records-and-timelines
-lastReviewed: 2026-10-09
+lastReviewed: 2026-10-27
 status: verified
 ---
 
 # Records and Timelines
 
-This page is intended for derived summaries. The website should generate most title counts and timelines from the competition tables instead of maintaining duplicate hard-coded values.
+Every champion, host and final result from the FIFA World Cup, UEFA EURO, Copa América, UEFA Nations League, Ballon d'Or and Golden Boot in one place, alongside team and player rankings generated straight from those same tables - titles, hosting counts, title-winning streaks, waits between titles, final-match margins and head-to-head meetings - instead of being maintained as separate hand-typed figures.
 
-## Recommended generated views
+## Historical identity rules
 
-### Champions timeline
+Edition tables and champions timelines always keep the name a team competed under at the time (West Germany, Soviet Union, Czechoslovakia, Yugoslavia) - history is never rewritten. Only the generated title totals apply a small, explicit set of aggregation rules:
 
-Display one compact card per edition:
-
-- year;
-- host;
-- champion;
-- finalist;
-- final score.
-
-### Most successful teams
-
-Generate rankings separately for:
-
-- FIFA World Cup;
-- UEFA EURO;
-- Copa América;
-- UEFA Nations League.
-
-### Family quiz ideas
-
-- Which country hosted this tournament?
-- Who defeated whom in the final?
-- Put the champions in chronological order.
-- Match a player to his Ballon d'Or year.
-- Guess the top scorer from the tournament year.
-
-### Historical identity rules
-
-The UI must explain aggregation choices:
-
-- West Germany may be grouped under Germany in title totals.
-- Soviet Union and Russia should not automatically be merged.
-- Czechoslovakia and Czech Republic/Czechia should not automatically be merged without an explicit editorial rule.
-- Yugoslavia's historical results should remain labeled as Yugoslavia.
+- West Germany is grouped under Germany in title totals only, shown as "Germany (incl. West Germany)" - the one sporting-successor case the source content itself groups.
+- Soviet Union and Russia are not merged; they are treated as distinct entries with separate title counts.
+- Czechoslovakia and Czech Republic/Czechia are not merged without an explicit editorial rule; today there is none, so each counts separately.
+- Yugoslavia's results stay labeled as Yugoslavia and are not attributed to any of its successor states.

@@ -59,10 +59,12 @@ Boateng
 Bonucci
 Borrás
 Brolin
+Bukayo
 Burruchaga
 Busquets
 CONCACAF
 CONMEBOL
+CGTN
 Cafu
 Calderón
 Campín
@@ -123,6 +125,7 @@ Enzo
 Erling
 Estádio
 Estupiñán
+Eurosport
 Eusébio
 Everton
 Fabien
@@ -283,6 +286,7 @@ Maracanã
 Maradona
 Marcello
 Marchena
+Marco
 Marquinhos
 Martínez
 Marvezzi
@@ -403,6 +407,7 @@ Ruggeri
 Rummenigge
 Ruud
 Sadio
+Saka
 Salenko
 Saliba
 Sammer
@@ -428,6 +433,7 @@ Siro
 Sneijder
 Solna
 Spinazzola
+Sportsmax
 Stade
 Stadio
 Stadion

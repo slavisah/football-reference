@@ -149,7 +149,9 @@ test.describe('World Cup page on a 360px phone', () => {
   });
 
   test('shows the last reviewed date and source links', async ({ page }) => {
-    await expect(page.locator('time[datetime="2026-10-12"]')).toBeVisible();
+    const reviewed = page.locator('time[datetime]');
+    await expect(reviewed).toBeVisible();
+    await expect(reviewed).toHaveAttribute('datetime', /^\d{4}-\d{2}-\d{2}$/);
     const sources = page.locator('.references__list a');
     await expect(sources.first()).toBeVisible();
     const count = await sources.count();
@@ -357,8 +359,9 @@ test.describe('EURO page on a 360px phone', () => {
       notes.getByText('Stadio Olimpico, Rome (Italy) - the same stadium as the 1968 final'),
     ).toBeVisible();
     await expect(notes.getByText('a reported attendance of 65,600')).toBeVisible();
-    // 1996 and 2020 stay without one - only a single, unconfirmable source.
-    await expect(notes.getByText('Wembley Stadium, London (England).')).toBeVisible();
+    // 1996 and 2020 now carry attendance too, confirmed via the DFB datencenter (Run 305).
+    await expect(notes.getByText('a reported attendance of 73,611')).toBeVisible();
+    await expect(notes.getByText('a reported attendance of 67,173')).toBeVisible();
   });
 
   test('shows the Historical format note as a paragraph, Player of the Tournament winners and Memorable moments as a list', async ({ page }) => {
@@ -638,7 +641,9 @@ test.describe('Croatian EURO page (/hr/competitions/euro) on a 360px phone', () 
       notes.getByText('Stadio Olimpico, Rim (Italija) - isti stadion kao finale 1968.'),
     ).toBeVisible();
     await expect(notes.getByText('prijavljeno 65.600 gledatelja')).toBeVisible();
-    await expect(notes.getByText('1996.: Wembley Stadium, London (Engleska).')).toBeVisible();
+    // 1996 and 2020 now carry attendance too, confirmed via the DFB datencenter (Run 305).
+    await expect(notes.getByText('prijavljeno 73.611 gledatelja')).toBeVisible();
+    await expect(notes.getByText('prijavljeno 67.173 gledatelja')).toBeVisible();
     // The section's lead-in methodology sentence renders as its own intro
     // paragraph, not as a bogus first list item among the actual venues.
     await expect(page.locator('.notes__intro', { hasText: 'Svako izdanje EURA' })).toBeVisible();
@@ -1331,7 +1336,7 @@ test.describe('Copa América page on a 360px phone', () => {
     await expect(
       page.locator('.notes__card').getByText('Aldo Florentín (Paraguay) - stepped into the armband'),
     ).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('Lúcio (Brazil).')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Juan (Brazil) - wore the armband')).toBeVisible();
   });
 
   test('shows an audited "Format" badge per edition', async ({ page }) => {
@@ -1560,7 +1565,7 @@ test.describe('Croatian Copa América page (/hr/competitions/copa-america) on a 
     await expect(
       page.locator('.notes__card').getByText('Aldo Florentín (Paragvaj) - preuzeo je vrpcu'),
     ).toBeVisible();
-    await expect(page.locator('.notes__card').getByText('Lúcio (Brazil).')).toBeVisible();
+    await expect(page.locator('.notes__card').getByText('Juan (Brazil) - nosio je vrpcu')).toBeVisible();
   });
 
   test('shows the same champion totals as the English page', async ({ page, baseURL }) => {
@@ -3334,7 +3339,9 @@ test.describe('Sources page on a 360px phone', () => {
 
   test('shows the review policy and a last reviewed date', async ({ page }) => {
     await expect(page.getByText('Historical team names are never rewritten')).toBeVisible();
-    await expect(page.locator('time[datetime="2026-10-09"]')).toBeVisible();
+    const reviewed = page.locator('time[datetime]');
+    await expect(reviewed).toBeVisible();
+    await expect(reviewed).toHaveAttribute('datetime', /^\d{4}-\d{2}-\d{2}$/);
   });
 
   test('is reachable from the nav and the footer', async ({ page }) => {
@@ -3371,7 +3378,12 @@ test.describe('Croatian sources page (/hr/about/sources) on a 360px phone', () =
     await expect(page.getByRole('heading', { name: 'Izvori i pravila provjere', level: 1 })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Izvori po natjecanjima' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Kako se provjeravaju izvori' })).toBeVisible();
-    await expect(page.locator('time[datetime="2026-10-09"]')).toBeVisible();
+
+    const hrDatetime = await page.locator('time[datetime]').getAttribute('datetime');
+    expect(hrDatetime).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+
+    await page.goto('about/sources');
+    await expect(page.locator('time[datetime]')).toHaveAttribute('datetime', hrDatetime ?? '');
   });
 
   test('groups source links by competition using the Croatian home-page names', async ({ page }) => {
@@ -4020,7 +4032,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     // edition pages x 2 languages (src/pages/competitions/euro/[year].astro
     // and its Croatian sibling), 4 UEFA Nations League Finals edition pages
     // x 2 languages (src/pages/competitions/nations-league/[year].astro and
-    // its Croatian sibling), and 70 Men's Ballon d'Or edition pages x 2
+    // its Croatian sibling), and 71 Men's Ballon d'Or edition pages x 2
     // languages (src/pages/competitions/ballon-dor/[year].astro and its
     // Croatian sibling - the first individual-award edition pages, see
     // `individualAward` in src/lib/editionProfile.ts; the 2020 "Not awarded"
@@ -4028,7 +4040,7 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     // alternates - /glossary is a fully bilingual NAV_LINKS entry from launch
     // (see docs/PROJECT_STATUS.md's Glossary entry), so it flows through the
     // main loop like every other top-level page.
-    expect(body.match(/<url>/g)?.length).toBe(710);
+    expect(body.match(/<url>/g)?.length).toBe(712);
     expect(body).toContain(`<loc>${SITE}/glossary/</loc>`);
     expect(body).toContain(`<loc>${SITE}/hr/glossary/</loc>`);
     expect(body).toContain(`hreflang="hr" href="${SITE}/hr/glossary/"`);
@@ -4213,9 +4225,9 @@ test.describe('SEO: canonical/Open Graph tags, sitemap.xml, robots.txt', () => {
     expect(blocks.find((b) => b['@type'] === 'CollectionPage').name).toContain('Most awards');
 
     const sportsEvent = blocks.find((b) => b['@type'] === 'SportsEvent');
-    expect(sportsEvent.name).toBe("2025 Men's Ballon d'Or");
+    expect(sportsEvent.name).toBe("2026 Men's Ballon d'Or");
     expect(sportsEvent.location).toBeUndefined();
-    expect(sportsEvent.competitor).toEqual({ '@type': 'SportsTeam', name: 'Ousmane Dembélé' });
+    expect(sportsEvent.competitor).toEqual({ '@type': 'SportsTeam', name: 'Harry Kane' });
   });
 
   test('the Golden Boot page carries one ItemList and one SportsEvent per table', async ({ page }) => {

@@ -62,6 +62,7 @@ Carbo
 Carlo
 Carlos
 Chaco
+Charlton
 Ciudad
 Claudio
 Colombes
@@ -88,6 +89,7 @@ Figueroa
 Final
 Fontainea
 Football
+Footballa
 Four
 Foura
 Francisco
@@ -96,6 +98,7 @@ Fuentea
 Gabriel
 Gardens
 Gary
+Gilberto
 Girouda
 Giuseppe
 Golden
@@ -140,15 +143,18 @@ Kyle
 Lars
 Laurent
 Leopoldo
+Lewandowskog
 Ligi
 Lilian
 Lionel
 Lionela
 Lippi
 Lorenzo
+Lothar
 Luisa
 Mancini
 Manuel
+Matthäus
 Maracaibo
 Maracani
 Marc
@@ -163,6 +169,7 @@ Mauricio
 Mauro
 Menotti
 Messija
+Michael
 Michel
 Michela
 Miguel
@@ -182,6 +189,7 @@ Oliviera
 Olsen
 Omar
 Otto
+Owen
 Pablo
 Panenke
 Parc
@@ -233,6 +241,7 @@ Sterling
 Stoičkov
 Striker
 Sócratesu
+šesnaestine
 Talaveru
 Thomas
 Thomasom

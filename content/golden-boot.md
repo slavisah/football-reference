@@ -2,7 +2,7 @@
 title: Golden Boot Winners
 slug: golden-boot
 awardType: scoring
-lastReviewed: 2026-10-10
+lastReviewed: 2026-10-30
 status: verified
 ---
 
@@ -14,7 +14,7 @@ The name and tie-breaking rules of top-scorer awards have changed over time. Thi
 
 - The Golden Boot goes to a tournament's top goalscorer (or scorers) - it is a personal scoring award, not the team championship.
 - Whoever scores the most goals across every match in that tournament wins it, counting goals from the group stage through the final.
-- Two or more players can finish level on goals; earlier tournaments often recognized every player tied at the top, while modern tie-breakers may use assists or minutes played to separate them (see the notes under each table below).
+- Two or more players can finish level on goals; whether that tie gets broken depends on the competition and era, not simply on how recent the tournament is - the FIFA World Cup has applied an assists-then-minutes-played tiebreaker to every tie since 2010, while UEFA EURO used one only for 2012, 2016 and 2020 before reverting to joint winners from 2024 onward (see the notes under each table below).
 - This page tracks two separate Golden Boot races, one for the FIFA World Cup and one for UEFA EURO, each with its own table of winners.
 
 # FIFA World Cup top scorers
@@ -65,7 +65,10 @@ The name and tie-breaking rules of top-scorer awards have changed over time. Thi
 - Guillermo Stábile won the first-ever FIFA World Cup Golden Boot in 1930, scoring eight goals for Argentina.
 - Just Fontaine scored 13 goals for France in 1958, still the most any player has scored at a single World Cup.
 - Six players finished level on four goals each in 1962 - the largest group of joint winners in FIFA World Cup Golden Boot history.
+- Paolo Rossi (Italy) won the 1982 World Cup Golden Boot the same year he also won the tournament's Golden Ball and the Ballon d'Or.
+- Ronaldo (Brazil) won the 2002 World Cup Golden Boot the same year he also won the tournament and the Ballon d'Or.
 - Kylian Mbappé won the World Cup Golden Boot in both 2022 and 2026, the only player to win it in consecutive editions since 1930, scoring ten goals in 2026 for a personal best.
+- Gerd Müller (West Germany) won the 1970 World Cup Golden Boot with ten goals the same year he also won the Ballon d'Or, even though West Germany finished third rather than winning that tournament.
 - Flórián Albert (Hungary) is the award's youngest-ever winner, sharing the 1962 Golden Boot aged 20.
 - Davor Šuker (Croatia) is the award's oldest-ever winner, aged 30 when he won it outright in 1998.
 
@@ -107,6 +110,8 @@ The name and tie-breaking rules of top-scorer awards have changed over time. Thi
 
 - The first-ever EURO Golden Boot, in 1960, was shared by five players tied on two goals each.
 - Michel Platini scored nine goals in five matches for France in 1984, still the most any player has scored at a single EURO.
+- Michel Platini's 1984 Golden Boot came the same year he captained France to the EURO title and won the Ballon d'Or.
+- Marco van Basten (Netherlands) won the 1988 EURO Golden Boot the same year the Netherlands won the title and he also won the Ballon d'Or.
 - Cristiano Ronaldo won the 2020 EURO Golden Boot with five goals, in the tournament delayed to 2021.
 - Six players shared the 2024 EURO Golden Boot on three goals each, the tournament's most recent edition.
 - Cristiano Ronaldo (Portugal) is the award's oldest-ever winner, aged 36 when he won the 2020 Golden Boot - breaking a record that had stood for 37 years.
