@@ -43140,3 +43140,91 @@ it. A future run with reliable network access should consider whether
 `scripts/check-intensive-branch-state.mjs`'s verdict should be checked
 *before* any fetch-failure fallback logic runs at all, rather than only
 when a run remembers to call it.
+
+### Run 384 (2026-10-31): fifteenth recurring individual-award cross-reference (Lionel Messi's 2022 World Cup-winning-captaincy/2023 Ballon d'Or pairing, the second year-apart case in the series)
+
+**Branch/PR state first:** a plain `git fetch -q origin` hung (the same
+PDF-history-size symptom Run 383 just documented), so rather than
+concluding the branch "doesn't exist" from that timeout, used
+`git fetch --filter=blob:none -q origin intensive/football-reference main`
+(the workaround named in PR #57's own body) - succeeded immediately.
+Checked out `origin/intensive/football-reference` directly and confirmed
+with `pnpm routine:branch-state`: `UP_TO_DATE`, 126 commits strictly ahead
+of `main` with no divergence - no rebase, no force-push, no incident.
+Cross-checked `list_pull_requests`/`pull_request_read` directly: PR #57 is
+open, `mergeable_state: clean`, 126 commits, created 2026-10-13 (18 days
+old); PR #58 (the Run 364 recovery-branch leftover) remains open and still
+redundant - unchanged from Run 382/383's re-confirmation.
+
+**The cross-reference:** re-read `content/fifa-world-cup.md`'s Winning
+captains list against `content/ballon-dor.md`'s Winners table for any
+pairing the prior fourteen cases (Runs 372-382) hadn't covered, and found
+one: Lionel Messi captained Argentina to the 2022 World Cup title and won
+the 2023 Ballon d'Or the following year, largely credited to that
+performance - the second year-apart case in this series (after Run 379's
+Gullit/EURO 1988 case), but with the trophy and the award in the opposite
+order (trophy first, award the year after, rather than award first). Both
+underlying facts were already independently on file - the World Cup
+Winning captains entry already credited Messi's Copa América captaincies
+but made no mention of the Ballon d'Or, and the Ballon d'Or Winners table
+already listed him for 2023 - only the connecting cross-reference was
+missing, confirmed by grepping both files for "Ballon"/"World Cup"
+cross-mentions and finding none before this change. Confirmed via two
+independent WebSearch passes (ESPN and FourFourTwo, both explicitly tying
+the award to the World Cup performance, with Yahoo Sports and CBS Sports
+corroborating): see `docs/SOURCES.md`'s new entry for the full citation
+list. No meaningful controversy found to flag - Haaland's runner-up
+finish is noted as context in coverage, not a dispute over the rationale.
+
+Extended the existing `content/fifa-world-cup.md` 2022 captain bullet in
+place with a "- and went on to win the YYYY Ballon d'Or..." clause (the
+same shape as prior year-apart cases) and added one plain,
+non-superlative bullet to `content/ballon-dor.md`'s "Memorable moments"
+section, matching the exact prose shape of the existing Charlton/Zidane/
+Messi-2021 bullets; mirrored both edits on the Croatian counterparts
+(`src/pages/hr/competitions/world-cup.astro`,
+`src/pages/hr/competitions/ballon-dor.astro`). Both files' `lastReviewed`
+were already at today's date (2026-10-31) from Runs 381/382, so no bump
+needed.
+
+Hand-checked the new/extended text against all eight `check:*-claims.mjs`
+trigger-word patterns before running anything (none matched - no "only",
+ordinal, "consecutive", "since", "one of only N", "joining... as", or
+"across all N editions" construction in either new clause), then
+confirmed by actually running all eight scripts: all clean, no new ledger
+entries needed. (Two long-pre-existing, intentionally-kept "stale but
+harmless" ledger entries unrelated to this run's edits - Modrić's
+superseded "only Croatian winner" entry and Rossi's superseded "award's
+first winner" entry - were flagged again by `check:superlative-claims`/
+`check:ordinal-claims`, exactly as they have been every run since Runs
+373/375 documented them as deliberately retained; left untouched.)
+
+Updated the running cross-reference-series summary in `docs/ROADMAP.md`'s
+"Open backlog" (fourteen cases -> fifteen, Runs 372-382 -> 372-384) and
+the intensive-run count in the file's own header (382 -> 384); trimmed
+wording slightly elsewhere in the same paragraph to stay within
+`check:roadmap-size`'s 800-line budget (799/800 after this edit - a future
+run touching this paragraph should trim before adding, not after).
+
+**Verification:** `pnpm install --frozen-lockfile` (clean, no dependency
+change, confirms Run 382's `astro` 7.4.4 bump is still current), `pnpm
+lint` (272 files, 0/0/0), `pnpm test` (1125/1125, 70 files), `pnpm build`
+(713 pages, unchanged). All eight claim-ledger gates individually (see
+above), plus `check:claims-hr` (251 claims across 7 ledgers, all clean),
+`check:i18n-notes` (8 EN/HR page pairs, clean), `check:locale-consistency`
+(713 pages), `check:links` (717 pages), `check:meta` (712 pages),
+`check:award-tallies` (4 tables), `check:spelling`/`check:spelling-hr`,
+`check:heading-outline` (713 pages), `check:jsonld` (713 pages, 1787
+blocks), `check:roadmap-size` (799/800) - all clean. Per AGENTS.md's
+unconditional "any edit to `content/*.md`" rule, rebuilt all PDFs sourced
+from `fifa-world-cup.md` and `ballon-dor.md` with `pnpm build:pdfs`;
+`check:pdfs`/`check:pdf-outline` re-run clean after.
+
+**Left for a future pass:** the recurring individual-award cross-reference
+angle continues - no further untried pairing found this run beyond the
+one shipped; a future run should re-scan both tables for any newly-added
+edition (e.g. a future World Cup/EURO/Copa América captain who later wins
+a Ballon d'Or) rather than re-checking the same fifteen now-covered names.
+PR #57 remains open (18 days, 126 commits, clean/mergeable) and PR #58
+remains open and redundant - both re-escalated via this run's own push
+notification rather than assumed already acted on.

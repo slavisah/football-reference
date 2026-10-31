@@ -223,7 +223,7 @@ Every World Cup edition has decided its champion in one match at one stadium, in
 - **2010:** Iker Casillas (Spain) - also captained Spain to the UEFA EURO title in 2008 and 2012.
 - **2014:** Philipp Lahm (Germany).
 - **2018:** Hugo Lloris (France).
-- **2022:** Lionel Messi (Argentina) - also captained Argentina to the Copa América title in 2021 and 2024.
+- **2022:** Lionel Messi (Argentina) - also captained Argentina to the Copa América title in 2021 and 2024, and went on to win the 2023 Ballon d'Or largely on the strength of this title.
 - **2026:** Rodri (Spain) - also named the tournament's Golden Ball winner the same year (see "Golden Ball winners" above).
 
 ## Memorable moments

@@ -4134,6 +4134,25 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries rather than direct page loads.
+- Lionel Messi's 2022 World Cup-winning-captaincy/2023 Ballon d'Or
+  cross-reference (2026-10-31, Run 384): a fifteenth case of the same
+  recurring individual-award angle, and the first where the Ballon d'Or
+  landed the year *after* the trophy win rather than the same year (the
+  established pattern for a year-apart pairing, per Run 379's Gullit/EURO
+  1988 case). Both underlying facts were already independently on file -
+  Messi's 2022 World Cup-winning captaincy (`content/fifa-world-cup.md`'s
+  Winning captains list, which already noted his Copa América captaincies
+  but made no mention of the Ballon d'Or) and his 2023 Ballon d'Or
+  (`content/ballon-dor.md`'s Winners table) - so this run only needed to
+  confirm and add the connecting cross-reference, not re-derive either
+  fact. Confirmed via two independent WebSearch passes (one a dedicated
+  verification pass, one a direct follow-up), both explicitly tying the
+  award to the World Cup performance:
+  - https://www.espn.com/soccer/story/_/id/38779218/
+  - https://www.fourfourtwo.com/news/lionel-messi-wins-the-2023-ballon-dor
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
 
 ## Review policy
 

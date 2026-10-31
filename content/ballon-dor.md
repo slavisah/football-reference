@@ -338,6 +338,7 @@ See `docs/SOURCES.md` for the per-year citation list.
 - Stanley Matthews remains the Ballon d'Or's oldest-ever winner, aged 41 when he claimed the inaugural award in 1956 - a record that has stood for seven decades.
 - Ronaldo (Brazil) is the Ballon d'Or's youngest-ever winner, aged 21 when he won in 1997.
 - Harry Kane won the 2026 Ballon d'Or, England's first winner since Michael Owen claimed the award in 2001.
+- Lionel Messi (Argentina) won the 2023 Ballon d'Or largely on the strength of captaining Argentina to the 2022 World Cup title.
 
 ## Notes
 
