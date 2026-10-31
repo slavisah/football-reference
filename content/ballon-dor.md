@@ -328,6 +328,7 @@ See `docs/SOURCES.md` for the per-year citation list.
 - Marco van Basten (Netherlands) won the 1988 Ballon d'Or the same year he also won the EURO Golden Boot and the Netherlands won the title.
 - Franz Beckenbauer (West Germany) won the 1972 Ballon d'Or the same year he captained West Germany to the EURO title.
 - Bobby Charlton (England) won the 1966 Ballon d'Or the same year he also won the World Cup.
+- Matthias Sammer (Germany) won the 1996 Ballon d'Or the same year he was named UEFA EURO 1996's Player of the Tournament as Germany won the title.
 - Lionel Messi (Argentina) won the 2021 Ballon d'Or the same year he captained Argentina to the Copa América title.
 - George Weah became the first African player to win the Ballon d'Or in 1995.
 - Kaká won the 2007 Ballon d'Or, the first year the award was open to players at any club worldwide, not just clubs in Europe - eligibility had already widened to any nationality in 1995.

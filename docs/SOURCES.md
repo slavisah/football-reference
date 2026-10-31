@@ -4153,6 +4153,26 @@ Primary sources should be preferred.
   - Note: the same egress-blocked-domains caveat every prior audit in this
     file has noted applies here too; verification relied on WebSearch's
     synthesized summaries rather than direct page loads.
+- Matthias Sammer's 1996 Ballon d'Or/UEFA EURO 1996 Player of the
+  Tournament cross-reference (2026-10-31, Run 385): a sixteenth case of
+  the same recurring individual-award angle, and the earliest-dated
+  same-year pairing in the series after Beckenbauer's 1972 and Charlton's
+  1966. Both underlying facts were already independently on file -
+  Sammer's 1996 Ballon d'Or (`content/ballon-dor.md`'s Winners table) and
+  his 1996 EURO Player of the Tournament award for champions Germany
+  (`content/uefa-euro.md`'s "Player of the Tournament winners" list,
+  which already noted the award but made no mention of the Ballon
+  d'Or) - so this run only needed to confirm and add the connecting
+  cross-reference, not re-derive either fact. Confirmed via two
+  independent WebSearch passes, both corroborating the pairing (Sammer
+  was the first defender to win the Ballon d'Or since Beckenbauer in
+  1976) and his Player of the Tournament honour as Germany's
+  libero/sweeper en route to the title:
+  - https://en.wikipedia.org/wiki/Matthias_Sammer
+  - https://www.fourfourtwo.com/features/euros-legends-looking-back-at-germany-icon-matthias-sammer-the-greatest-sweeper-youve-forgotten-about
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
 
 ## Review policy
 

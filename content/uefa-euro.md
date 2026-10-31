@@ -5,7 +5,7 @@ competitionType: continental
 confederation: UEFA
 firstEdition: 1960
 lastCompletedEdition: 2024
-lastReviewed: 2026-10-30
+lastReviewed: 2026-10-31
 status: verified
 ---
 
@@ -86,7 +86,7 @@ A third-place match was played through 1980. From 1984 onward, UEFA recognizes b
 ## Player of the Tournament winners
 
 - UEFA has named a best-player award at every EURO since 1996; no equivalent award existed at the nine earlier editions.
-- **1996:** Matthias Sammer (Germany).
+- **1996:** Matthias Sammer (Germany) - also that year's Ballon d'Or winner.
 - **2000:** Zinedine Zidane (France).
 - **2004:** Theodoros Zagorakis (Greece) - captain of the surprise 2004 champions.
 - **2008:** Xavi Hernández (Spain).

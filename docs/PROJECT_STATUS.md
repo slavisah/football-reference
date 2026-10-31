@@ -43228,3 +43228,93 @@ a Ballon d'Or) rather than re-checking the same fifteen now-covered names.
 PR #57 remains open (18 days, 126 commits, clean/mergeable) and PR #58
 remains open and redundant - both re-escalated via this run's own push
 notification rather than assumed already acted on.
+
+### Run 385 (2026-10-31): sixteenth recurring individual-award cross-reference (Matthias Sammer's 1996 Ballon d'Or/UEFA EURO 1996 Player of the Tournament pairing)
+
+**Branch/PR state first:** a plain `git fetch -q origin intensive/football-reference`
+hung (the same PDF-history-size symptom Runs 380/383/384 documented), so
+used `git fetch --filter=blob:none origin intensive/football-reference`
+instead of concluding the branch didn't exist - succeeded immediately.
+Checked out `origin/intensive/football-reference` directly and confirmed
+with `pnpm routine:branch-state`: `UP_TO_DATE`, 127 commits strictly ahead
+of `main` with no divergence - no rebase, no force-push, no incident.
+Cross-checked `list_pull_requests`/`pull_request_read` directly: PR #57 is
+still open, `mergeable_state: clean`, 127 commits, created 2026-10-13 (18
+days old); PR #58 (the Run 364 recovery-branch leftover) remains open and
+still redundant - unchanged from Runs 382-384's re-confirmation. (Also
+separately confirmed PR #56, the *prior* rolling PR flagged as a standing
+process issue across Runs 263-279, was in fact merged by the user on
+2026-10-13 - already recorded by Run 380/381; this run's own first check
+of a stale local `main` clone briefly re-surfaced the old PR #56 text
+before the branch checkout above corrected it, so noted here only to
+confirm no actual confusion carried into the work below.)
+
+**The cross-reference:** re-read `content/uefa-euro.md`'s "Player of the
+Tournament winners" list against `content/ballon-dor.md`'s Winners table
+for any pairing the prior fifteen cases (Runs 372-384) hadn't covered, and
+found one: Matthias Sammer was named EURO 1996's Player of the Tournament
+as Germany won the title, then won the 1996 Ballon d'Or the same year -
+the first case in this series where the individual-tournament honour is a
+best-player award rather than a captaincy, and the earliest-dated
+same-year pairing after Beckenbauer's 1972 and Charlton's 1966. Both
+underlying facts were already independently on file - the EURO 1996
+Player of the Tournament entry and the Ballon d'Or 1996 Winners-table row
+- but neither mentioned the other. Confirmed via two independent
+WebSearch passes (Wikipedia and FourFourTwo, both corroborating the
+pairing and noting Sammer was the first defender to win the Ballon d'Or
+since Beckenbauer in 1976, and both independently describing his
+libero/sweeper role for champions Germany): see `docs/SOURCES.md`'s new
+entry for the full citation list. No controversy or conflicting framing
+found to flag.
+
+Extended the existing `content/uefa-euro.md` 1996 Player of the Tournament
+bullet in place with a "- also that year's Ballon d'Or winner" clause, and
+added one plain, non-superlative bullet to `content/ballon-dor.md`'s
+"Memorable moments" section, matching the exact prose shape of the
+existing Beckenbauer/Charlton bullets it sits between; mirrored both edits
+on the Croatian counterparts (`src/pages/hr/competitions/euro.astro`,
+`src/pages/hr/competitions/ballon-dor.astro`). Bumped `uefa-euro.md`'s
+`lastReviewed` to today (2026-10-31, it was one day stale at 2026-10-30);
+`ballon-dor.md` was already at today's date.
+
+Hand-checked the new/extended text against all eight
+`check:*-claims.mjs` trigger-word patterns before running anything (none
+matched - no "only", ordinal, "consecutive", "since", "one of only N",
+"joining... as", or "across all N editions" construction in either new
+clause), then confirmed by actually running all eight scripts: all clean,
+no new ledger entries needed.
+
+Updated the running cross-reference-series summary in `docs/ROADMAP.md`'s
+"Open backlog" (fifteen cases -> sixteen, Runs 372-384 -> 372-385) and the
+intensive-run count in the file's own header (384 -> 385); the paragraph
+was already tight against `check:roadmap-size`'s 800-line budget (799/800
+going in), so trimmed a few words in the same edit to land exactly at
+800/800 rather than over, per Run 384's own note to trim before adding.
+
+**Verification:** `pnpm install` (clean, 494 packages, no lockfile drift),
+`pnpm lint` (272 files, 0/0/0), `pnpm test` (1125/1125, 70 files), `pnpm
+build` (713 pages, unchanged). All eight claim-ledger gates individually
+(see above), plus `check:claims-hr`, `check:i18n-notes` (8 EN/HR page
+pairs), `check:locale-consistency`, `check:links`, `check:meta`,
+`check:award-tallies`, `check:spelling`/`check:spelling-hr`,
+`check:heading-outline`, `check:jsonld`, `check:edition-header-labels`,
+`check:attendance-format`, `check:link-names`,
+`check:records-consistency`/`check:team-profiles-consistency`/
+`check:player-profiles-consistency`/`check:compare-consistency`,
+`check:sitemap`, `check:feed`, `check:precache`, `check:image-dimensions`,
+`check:theme-color`, `check:reachability`, `check:theme-flash`,
+`check:html`, `check:roadmap-size` (800/800) - all 34 fast gates clean.
+Per AGENTS.md's unconditional "any edit to `content/*.md`" rule, rebuilt
+all PDFs with `PW_EXECUTABLE_PATH` pointed at this container's installed
+`chromium_headless_shell-1243` revision (unchanged since Run 345,
+confirmed again this run); `pnpm build:pdfs` regenerated 700 of 702 (2
+unchanged and skipped, the already-current non-content PDFs); `check:pdfs`
+and `check:pdf-outline` both re-run clean after (702/702 each).
+
+**Left for a future pass:** the recurring individual-award cross-reference
+angle continues - no further untried pairing found this run beyond the
+one shipped; a future run should re-scan both tables for any newly-added
+edition rather than re-checking the same sixteen now-covered names. PR #57
+remains open (18 days, 127 commits, clean/mergeable) and PR #58 remains
+open and redundant - both re-escalated via this run's own push
+notification rather than assumed already acted on.
