@@ -68,7 +68,7 @@
     "routine:guard-branch-push": "node scripts/guard-intensive-branch-push.mjs"
   },
   "dependencies": {
-    "astro": "^7.4.1"
+    "astro": "^7.4.4"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",

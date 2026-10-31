@@ -2,7 +2,7 @@
 
 This file is the short, current-state entry point for "what's next" - kept
 short on purpose. The full run-by-run history of every feature, bug fix,
-verification sweep and decision (381 intensive runs as of 2026-10-31) lives
+verification sweep and decision (382 intensive runs as of 2026-10-31) lives
 in `docs/PROJECT_STATUS.md` (append-only, one entry per change); this file
 only tracks the open backlog and current-state summary, not the log of what
 already shipped.
@@ -261,7 +261,7 @@ de la Fuente's Nations League 2023 win, Cafu's Copa América 1999
 captaincy), fixed in both languages; see `docs/PROJECT_STATUS.md`. Run 372
 widened the angle to recurring *individual-award* winners across
 competitions (the specific extension Run 370 flagged as still open); Runs
-372-381 have since shipped thirteen cases - Rodri's Nations League 2023/EURO
+372-382 have since shipped fourteen cases - Rodri's Nations League 2023/EURO
 2024/Ballon d'Or 2024 sweep, Paolo Rossi's and Ronaldo's World Cup/Golden
 Boot/Ballon d'Or sweeps (1982, 2002), Zidane's, Modrić's and Bobby
 Charlton's World Cup/Ballon d'Or pairings (1998, 2018, 1966 - Charlton's
@@ -269,11 +269,12 @@ is the only one not tied to a captaincy or on-pitch award, just the Cup
 and the Ballon d'Or itself), Platini's and Van Basten's 1984/1988 EURO
 Golden Boot/Ballon d'Or sweeps, Müller's 1970 World Cup Golden Boot/Ballon
 d'Or pairing (the only one where the player didn't also win the
-tournament), and Matthäus's/Cannavaro's/Gullit's/Beckenbauer's
+tournament), Matthäus's/Cannavaro's/Gullit's/Beckenbauer's
 1990/2006/1987-88/1972 winning-captaincy/Ballon d'Or pairings (Gullit's
-alone lands a year apart, same-year every other time) - see
-`docs/PROJECT_STATUS.md`. Keep trying both angle shapes - still
-productive, not yet exhausted.
+alone lands a year apart, same-year every other time), and Messi's 2021
+Copa América-winning-captaincy/Ballon d'Or pairing (the first tied to a
+Copa América win) - see `docs/PROJECT_STATUS.md`. Keep trying both angle
+shapes - still productive, not yet exhausted.
 
 A code-review pass of `src/lib/*.ts` (Run 267) - a different angle from
 the content-verification rotation above, which checks editorial claims
@@ -502,24 +503,15 @@ the full run-by-run history behind all of this, see
   peerDependencies` by Run 331 (2026-10-22; `typescript` still at 5.9.3 vs.
   7.0.2 latest, re-confirmed unchanged by Run 371). Re-check whenever
   `pnpm outdated` next shows a new `@astrojs/check` release.
-- **`astro` 7.4.2 patch bump: blocked by this environment's Node version,
-  not a peer-dependency issue (new, Run 331, 2026-10-22).** `pnpm outdated`
-  showed routine patch releases for `astro` (7.4.1 -> 7.4.2) and
-  `@astrojs/check` (0.9.11 -> 0.9.12). `@astrojs/check@0.9.12` bumped clean
-  (its own peer range unchanged, see above) and is now installed, but
-  `astro@7.4.2` raises Astro's own minimum supported Node.js version to
-  `>=22.23.4` - this environment's container runs `v22.22.0`, one patch
-  below that floor. Installing it broke `pnpm lint`/`pnpm build` outright
-  (`Node.js v22.22.0 is not supported by Astro!`), confirmed by reproducing
-  the failure directly rather than assuming it from the changelog; reverted
-  `astro` back to 7.4.1 (keeping the unrelated `@astrojs/check` bump) and
-  re-confirmed clean (`pnpm lint`/`test`/`build`, 1086 tests, 711 pages, 0/0/0
-  lint). A narrower blocker than the `typescript` 7 item above - the
-  container's Node.js binary, not a project-side peer range. Unblocks once
-  Node.js here reaches >=22.23.4 (no project-side fix possible); re-check
-  `node --version` whenever `pnpm outdated` shows a newer `astro`.
-  Re-confirmed by Run 371 (latest is now 7.4.4, same `>=22.23.4` requirement
-  against this container's still-`v22.22.0`).
+- **Resolved (Run 382):** the `astro` patch bump blocked since Run 331 by
+  this environment's Node.js floor - re-confirmed stuck as recently as Run
+  371 (container still on `v22.22.0` against `astro`'s `>=22.23.4`
+  requirement) - unblocked itself: this run found the container now on
+  `v22.23.4`, exactly clearing that floor. Bumped `astro` to the current
+  latest, 7.4.4 (`pnpm update astro`); `pnpm lint`/`test`/`build` all clean
+  (1125 tests, 713 pages, 0/0/0 lint) and `pnpm audit`/PDF freshness
+  unaffected. No project-side fix was needed or possible - this was purely
+  the container's own Node.js version catching up.
 - **`docs/SOURCES.md` link-liveness sweep**: blocked. This environment's
   outbound network/egress policy rejects direct requests to external
   reference domains - confirmed repeatedly, most recently 2026-10-02

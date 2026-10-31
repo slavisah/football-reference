@@ -42925,3 +42925,125 @@ recovery-branch leftover) also remains open. The three items awaiting the
 user's own sign-off (`.git`-bloat decision, `long-title` brand-suffix
 call, and the branch-recreation stored-prompt fix) are unchanged and
 re-escalated via this run's own push notification.
+
+### Run 382 (2026-10-31): fourteenth recurring individual-award cross-reference (Lionel Messi's 2021 Copa América-winning-captaincy/Ballon d'Or pairing, the first in the series tied to a Copa América win); unblocked and shipped the `astro` 7.4.4 patch bump after the container's own Node.js version caught up to its floor
+
+**Branch/PR state first:** `git ls-remote`/a full `git fetch` confirmed
+`origin/intensive/football-reference` (PR #57's head, `f5d12dc50`) is 124
+commits ahead of `origin/main` (`55a434cee`, the PR #56 merge commit) and
+strictly contains it (`git merge-base --is-ancestor origin/main
+origin/intensive/football-reference` true) - `UP_TO_DATE` per the Safety
+flag's own decision tree, checked out as-is with no rebase. PR #58 (the
+Run 364 recovery-branch leftover) remains open and redundant; unchanged
+from Run 381's re-confirmation, not re-checked again this run since
+nothing about it could have changed.
+
+**The cross-reference:** re-read `content/copa-america.md`'s Winning
+captains list against `content/ballon-dor.md`'s Winners table for any
+pairing the prior thirteen cases (Runs 372-381) hadn't covered, and found
+one: Lionel Messi captained Argentina to the 2021 Copa América title (its
+first senior trophy since 1993) and won the 2021 Ballon d'Or the same
+year - the first case in this series tied to a Copa América win rather
+than a World Cup/EURO trophy. Both underlying facts were already
+independently on file (the Winning captains entry already said 2021 was
+"his first major trophy with the senior Argentina team", and the Ballon
+d'Or Winners table already listed him for 2021); only the connecting
+cross-reference was missing - confirmed by grepping both files for
+"Ballon"/"Messi" cross-mentions and finding none before this change.
+Confirmed via two independent WebSearch passes, both corroborating the
+pairing and quoting Messi's own framing at the ceremony ("I think I won
+this trophy thanks to what we did at the Copa América"): see
+`docs/SOURCES.md`'s new entry for the full citation list.
+
+Extended the existing `content/copa-america.md` 2021 captain bullet in
+place with an "- and also won that year's Ballon d'Or" clause (the same
+shape as Run 380's Beckenbauer/EURO edit) and added one plain,
+non-superlative bullet to `content/ballon-dor.md`'s "Memorable moments"
+section, matching the exact prose shape of the existing Charlton/Zidane
+bullets; mirrored both edits on the Croatian counterparts
+(`src/pages/hr/competitions/copa-america.astro`,
+`src/pages/hr/competitions/ballon-dor.astro`). Bumped
+`copa-america.md`'s `lastReviewed` to 2026-10-31 (`ballon-dor.md`'s was
+already at today's date from Run 381).
+
+The extended copa-america.md 2021 bullet's pre-existing "first"/
+"consecutive" trigger words meant its claim-ledger entries (keyed on
+exact claim text) went stale when the text changed - caught by
+`check:consecutive-claims` and `check:ordinal-claims` on the first run,
+both failing with "no matching ledger entry" for the new text. Updated
+both ledger entries (`scripts/consecutive-claims-ledger.json`,
+`scripts/ordinal-claims-ledger.json`) to the new claim text with a note
+that the pre-existing portions were already verified by earlier runs and
+only the new Ballon d'Or clause needed fresh verification (done via the
+same two WebSearch passes above); both checks clean after. The new
+`content/ballon-dor.md` bullet introduced no new ledger-tracked claim
+(checked by hand against all eight `check:*-claims.mjs` trigger-word
+patterns first, same as Run 381's Charlton bullet) - no new ledger entry
+needed there.
+
+Also updated the running cross-reference-series summary in
+`docs/ROADMAP.md`'s "Open backlog" (thirteen cases -> fourteen, Runs
+372-381 -> 372-382) and the intensive-run count in the file's own header
+(381 -> 382).
+
+**Secondary finding, independently actionable:** `pnpm outdated` plus a
+direct `node --version` check found this container now running Node.js
+`v22.23.4` - exactly clearing the `>=22.23.4` floor that has blocked the
+`astro` patch bump since Run 331 (last re-confirmed stuck at Run 371
+against a `v22.22.0` container). Bumped `astro` to the current latest,
+7.4.4, via `pnpm update astro` (within the existing `^7.4.1` package.json
+range, so only `pnpm-lock.yaml` changed); `typescript` stays blocked
+unchanged (`@astrojs/check@0.9.12`'s peer range is still `^5.0.0 ||
+^6.0.0` against typescript's latest 7.0.2, re-confirmed via `npm view`).
+Closed the now-resolved item in `docs/ROADMAP.md`'s "Open backlog" with a
+"Resolved (Run 382)" note, following the file's own established pattern
+for closed blockers, rather than leaving a stale "still blocked" bullet
+for a future run to re-discover as already-fixed.
+
+**Verification:** `pnpm install` (astro 7.4.1 -> 7.4.4, no other
+dependency change), `pnpm lint` (272 files, 0 errors/0 warnings/0 hints),
+`pnpm test` (1125/1125, 70 files), `pnpm build` (713 pages, unchanged
+count) - all re-run and re-confirmed clean after the astro bump
+specifically, not just before it. All 35 fast CI-gated `check:*` scripts
+individually (`check:consecutive-claims`/`check:ordinal-claims` caught
+the ledger-staleness gap above on the first pass, both clean after the
+ledger fixes and re-run; every other check clean on the first pass,
+including the four independent-recomputation guards
+`check:records-consistency`/`check:team-profiles-consistency`/
+`check:player-profiles-consistency`/`check:compare-consistency` and
+`check:claims-hr`'s EN/HR parity check), plus `check:roadmap-size`
+(788/800, within budget even after this run's own additions). `pnpm
+audit` re-confirmed at its documented baseline (2 pre-existing moderate
+advisories, both in `lighthouse`'s transitive `glob` dependency,
+unaffected by the astro bump). `pnpm dlx knip` could not be run this run
+- this session's own permission layer refused the `dlx` invocation
+outright (a sandboxing classifier decision, not a project or network
+issue); left unconfirmed rather than worked around, since every
+`scripts/*.mjs`/`src/**` file this run touched has its own dedicated
+`check:*` coverage above and `knip`'s own documented baseline (one
+standing `@cspell/dict-hr-hr` false positive) hasn't needed updating by
+any dependency or source change this run made. Rebuilt all 702
+downloadable PDFs per AGENTS.md's unconditional "any edit to
+`content/*.md`" rule
+(`PW_EXECUTABLE_PATH=/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell.real`,
+the same revision prior runs have used) - 700 of 702 regenerated (every
+Ballon d'Or and Copa América edition PDF in both languages, plus every
+derived player/team/compare/records PDF that embeds either competition's
+data, cascading from the two content edits and the `copa-america.md`
+`lastReviewed` bump; 2 unchanged PDFs skipped); `check:pdfs`/
+`check:pdf-outline` both clean (702/702) after, re-confirmed clean a
+second time post-astro-bump too (page content and PDF hashes were
+unaffected by the dependency version alone). No regression found
+anywhere.
+
+**Left for a future pass:** keep trying both angle shapes in the
+recurring cross-reference series - still productive, not yet exhausted
+at fourteen cases. PR #57 (125 commits as of this run) remains open and
+is the sole standing PR-merge flag; PR #58 (redundant recovery-branch
+leftover) also remains open. The three items awaiting the user's own
+sign-off (`.git`-bloat decision, `long-title` brand-suffix call, and the
+branch-recreation stored-prompt fix) are unchanged and re-escalated via
+this run's own push notification. A future run should try `pnpm dlx
+knip` again in case a future session's permission layer allows it, purely
+to re-confirm the documented baseline rather than because anything this
+run did would plausibly have changed it.

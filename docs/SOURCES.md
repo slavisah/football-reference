@@ -4115,6 +4115,25 @@ Primary sources should be preferred.
     same egress-blocked-domains caveat every prior audit in this file has
     noted applies here too; verification relied on WebSearch's synthesized
     summaries rather than direct page loads.
+- Lionel Messi's 2021 Copa América-winning-captaincy/Ballon d'Or
+  cross-reference (2026-10-31, Run 382): a fourteenth case of the same
+  recurring individual-award angle, and the first tied to a Copa América
+  win rather than a World Cup/EURO trophy or on-pitch tournament award.
+  Both underlying facts were already independently on file - Messi's 2021
+  Ballon d'Or (`content/ballon-dor.md`'s Winners table) and his 2021 Copa
+  América-winning captaincy for Argentina (`content/copa-america.md`'s
+  Winning captains table, which already noted it was his "first major
+  trophy with the senior Argentina team" but made no mention of the
+  Ballon d'Or) - so this run only needed to confirm and add the
+  connecting cross-reference, not re-derive either fact. Confirmed via two
+  independent WebSearch passes, both corroborating the pairing and
+  Messi's own framing at the ceremony ("I think I won this trophy thanks
+  to what we did at the Copa América"):
+  - https://en.psg.fr/teams/first-team/content/leo-messi-wins-2021-ballon-dor
+  - https://www.tntsports.co.uk/football/ballon-dor-2021-lionel-messi-wins-historic-seventh-award-ahead-of-robert-lewandowski-and-jorginho_sto8648942/story.shtml
+  - Note: the same egress-blocked-domains caveat every prior audit in this
+    file has noted applies here too; verification relied on WebSearch's
+    synthesized summaries rather than direct page loads.
 
 ## Review policy
 

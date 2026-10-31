@@ -5,7 +5,7 @@ competitionType: continental
 confederation: CONMEBOL
 firstEdition: 1916
 lastCompletedEdition: 2024
-lastReviewed: 2026-10-27
+lastReviewed: 2026-10-31
 status: verified
 ---
 
@@ -320,7 +320,7 @@ The **Team of the Tournament winners** section below (55 entries across five edi
 - **2015:** Claudio Bravo (Chile) - the first of his two title-winning editions as captain, saving a penalty in the final shootout against Argentina.
 - **2016:** Claudio Bravo (Chile) - his second, back-to-back, Copa América Centenario.
 - **2019:** Dani Alves (Brazil) - given the armband by manager Tite after Neymar was stripped of the captaincy following an off-field incident.
-- **2021:** Lionel Messi (Argentina) - the first of his two consecutive title-winning editions, his first major trophy with the senior Argentina team.
+- **2021:** Lionel Messi (Argentina) - the first of his two consecutive title-winning editions, his first major trophy with the senior Argentina team, and also won that year's Ballon d'Or.
 - **2024:** Lionel Messi (Argentina) - his second, back-to-back, though an injury forced him off before the trophy lift; also captained Argentina to the FIFA World Cup title in 2022, between these two Copa América wins.
 - Oscar Ruggeri, Claudio Bravo and Lionel Messi are the only captains on this list to win back-to-back editions - Bravo as a goalkeeper, a rarer position for the honor.
 
